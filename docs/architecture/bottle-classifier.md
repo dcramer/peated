@@ -40,9 +40,21 @@ Follow the [Whisky Identity Model](./whisky-identity-model.md). Each marketed
 version must be a complete Bottle on its own.
 
 A `create_bottle` result proposes one complete Bottle. `proposedBottle.name` is
-the stable marketed expression. The server adds an explicit edition without
-repeating it and stores supported facts such as age, ABV, years, and cask flags
-in their fields. The server creates the Bottle and manages BottleGroup
+the Bottle's common name without the Brand, following the identity model: it
+keeps the age, vintage, cask number, and strength wording that the product
+title prints, and adds none the title omits. A title that is only the Brand, an
+age, and style words gets a name such as `12-year-old`. A style phrase is the
+name only when nothing else names the Bottle. The server
+adds an explicit edition without repeating it and stores supported facts such
+as age, ABV, years, and cask flags in their fields as well.
+
+Related releases can differ only in ABV, batch, or year, so one differing fact
+can mean a new Bottle. Sources also make mistakes. Before creating a Bottle
+that differs from an existing one in a single fact, the classifier confirms
+from other evidence that a release with the source value exists. When other
+evidence places the release at the existing Bottle's value and nothing shows
+the source value, the source is wrong and the classifier matches the existing
+Bottle. The server creates the Bottle and manages BottleGroup
 membership. The classifier never chooses a BottleGroup.
 
 `identityScope = product` is the default. Use `exact_cask` only when a specific

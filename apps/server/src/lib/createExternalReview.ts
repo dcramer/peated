@@ -7,6 +7,7 @@ import { externalSites } from "@peated/server/db/schema";
 import { storeExternalReviewArticleInTransaction } from "@peated/server/externalReviews/store";
 import { getPeatedSystemActor } from "@peated/server/lib/actors";
 import {
+  persistReviewBottleCheck,
   resolveBottleReferenceTarget,
   resolveScrapedBottleReferenceTarget,
 } from "@peated/server/lib/bottleReferenceResolution";
@@ -159,6 +160,15 @@ export async function createExternalReview(
         throw new Error("Unable to store external review.");
       }
       const { previousBottleId, externalReview } = storedExternalReview;
+      if (resolution.classification) {
+        await persistReviewBottleCheck(
+          {
+            reviewId: externalReview.id,
+            classification: resolution.classification,
+          },
+          tx,
+        );
+      }
 
       const appliedIncomingIdentity = externalReview.bottleId === bottleId;
       if (!bottleId || !appliedIncomingIdentity) {

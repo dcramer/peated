@@ -2,6 +2,7 @@ import {
   isIgnoredBottleClassification,
   type BottleClassificationResult,
   type BottleReferenceInput,
+  type ClassifyBottleReferenceInput,
 } from "@peated/bottle-classifier";
 import type {
   BottleClassificationDecision,
@@ -11,7 +12,8 @@ import type {
 import { classifyBottleReference } from "@peated/server/agents/bottleClassifier/classifyBottleReference";
 import { classifyScrapedBottleReference } from "@peated/server/agents/bottleClassifier/scrapedBottleReference";
 import config from "@peated/server/config";
-import { db, type AnyTransaction } from "@peated/server/db";
+import { db, type AnyDatabase, type AnyTransaction } from "@peated/server/db";
+import { createBottleCheck } from "@peated/server/lib/bottleChecks";
 import { findBottleReferenceAssignment } from "@peated/server/lib/bottleFinder";
 import type { BottleReferenceIdentitySnapshot } from "@peated/server/lib/bottleReferences";
 import {
@@ -52,7 +54,38 @@ export type BottleReferenceResolution = {
   classifierEvidence: BottleReferenceClassifierEvidence | null;
   createdBottle: boolean;
   sourceReferenceIdentity?: BottleReferenceIdentitySnapshot;
+  // Present whenever the classifier ran, so the caller can save the run.
+  classification?: ReferenceClassificationRun;
 };
+
+export type ReferenceClassificationRun = {
+  input: ClassifyBottleReferenceInput;
+  result: BottleClassificationResult;
+};
+
+/**
+ * Saves a review's classifier run as a Bottle check so the exact input,
+ * candidates, and evidence can be replayed as an eval test case later.
+ */
+export async function persistReviewBottleCheck(
+  {
+    reviewId,
+    classification,
+  }: { reviewId: number; classification: ReferenceClassificationRun },
+  database: AnyDatabase = db,
+) {
+  await createBottleCheck(
+    {
+      intent: "resolve_reference",
+      sourceKind: "review",
+      sourceId: reviewId,
+      input: classification.input,
+      result: classification.result,
+      model: config.BOTTLE_CLASSIFIER_MODEL,
+    },
+    database,
+  );
+}
 
 /** Locks the resolved Bottle before any reference or consumer row is locked. */
 export async function lockBottleReferenceResolutionAssignmentInTransaction(
@@ -208,10 +241,11 @@ async function resolveBottleReferenceTargetWithClassifier(
   }
 
   let classification: BottleClassificationResult;
+  // Source titles carry no structured facts. Supplying an extracted identity
+  // here, even an empty one, would make the classifier skip text extraction.
+  const classificationInput: ClassifyBottleReferenceInput = { reference };
   try {
-    // Source titles carry no structured facts. Supplying an extracted identity
-    // here, even an empty one, would make the classifier skip text extraction.
-    classification = await classify({ reference });
+    classification = await classify(classificationInput);
   } catch (error) {
     return {
       assignment: null,
@@ -225,6 +259,11 @@ async function resolveBottleReferenceTargetWithClassifier(
     };
   }
 
+  const classificationRun = {
+    input: classificationInput,
+    result: classification,
+  };
+
   if (isIgnoredBottleClassification(classification)) {
     return {
       assignment: null,
@@ -235,6 +274,7 @@ async function resolveBottleReferenceTargetWithClassifier(
       rationale: null,
       classifierEvidence: null,
       createdBottle: false,
+      classification: classificationRun,
     };
   }
 
@@ -260,6 +300,7 @@ async function resolveBottleReferenceTargetWithClassifier(
         rationale: decisionRationale,
         classifierEvidence,
         createdBottle: false,
+        classification: classificationRun,
       };
     }
 
@@ -273,6 +314,7 @@ async function resolveBottleReferenceTargetWithClassifier(
         rationale: decisionRationale,
         classifierEvidence,
         createdBottle: false,
+        classification: classificationRun,
       };
     }
 
@@ -289,6 +331,7 @@ async function resolveBottleReferenceTargetWithClassifier(
       rationale: decisionRationale,
       classifierEvidence,
       createdBottle: result.createdBottle,
+      classification: classificationRun,
     };
   } catch (error) {
     return {
@@ -303,6 +346,7 @@ async function resolveBottleReferenceTargetWithClassifier(
       rationale: null,
       classifierEvidence: null,
       createdBottle: false,
+      classification: classificationRun,
     };
   }
 }

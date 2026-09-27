@@ -2,12 +2,14 @@ import { BottleClassificationResultSchema } from "@peated/bottle-classifier";
 import type { BottleClassificationDecision } from "@peated/server/agents/bottleClassifier";
 import { db } from "@peated/server/db";
 import {
+  bottleChecks,
   bottleReferences,
   externalReviews,
   incomingBottleDecisionLogs,
   storePrices,
 } from "@peated/server/db/schema";
 import { getPeatedSystemActor } from "@peated/server/lib/actors";
+import { listActionableBottleChecks } from "@peated/server/lib/bottleChecks";
 import { normalizeBottleReferenceKey } from "@peated/server/lib/normalize";
 import * as workerClient from "@peated/server/lib/test/workerDispatch";
 import {
@@ -40,6 +42,15 @@ type MockClassificationArtifacts = {
 function createMissingBottles(rawInput?: JobPayload) {
   return createMissingBottlesWithServices(rawInput, {
     classifyReference: classifyBottleReferenceMock,
+  });
+}
+
+async function findReviewBottleCheck(reviewId: number) {
+  return await db.query.bottleChecks.findFirst({
+    where: and(
+      eq(bottleChecks.sourceKind, "review"),
+      eq(bottleChecks.sourceId, String(reviewId)),
+    ),
   });
 }
 
@@ -187,6 +198,25 @@ describe("createMissingBottles", () => {
       }),
     });
 
+    // The saved run lets a wrong decision become an eval test case later.
+    const check = await findReviewBottleCheck(review.id);
+    expect(check).toMatchObject({
+      intent: "resolve_reference",
+      sourceKind: "review",
+      sourceId: String(review.id),
+      model: expect.any(String),
+      inputSnapshot: {
+        reference: expect.objectContaining({ name: review.name, url }),
+      },
+      output: expect.objectContaining({
+        status: "classified",
+        decision: expect.objectContaining({ action: "create_bottle" }),
+      }),
+      artifacts: expect.objectContaining({ candidates: [] }),
+    });
+    const actionable = await listActionableBottleChecks({ limit: 100 });
+    expect(actionable.results.map((item) => item.id)).not.toContain(check?.id);
+
     expect(workerClient.pushUniqueJob).toHaveBeenCalledWith(
       "IndexBottleSearch",
       {
@@ -327,6 +357,11 @@ describe("createMissingBottles", () => {
     });
     expect(marked?.bottleId).toBeNull();
     expect(marked?.bottleNoMatchAt).toBeInstanceOf(Date);
+    expect(await findReviewBottleCheck(review.id)).toMatchObject({
+      output: expect.objectContaining({
+        decision: expect.objectContaining({ action: "no_match" }),
+      }),
+    });
   });
 
   test("asks again after a classifier failure", async ({ fixtures }) => {

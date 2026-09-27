@@ -326,7 +326,7 @@ export const ProposedBottleFields = {
     .trim()
     .min(1)
     .describe(
-      "Stable marketed expression relative to the Brand. Omit the Brand prefix and exact traits represented by other fields. When no separate expression is marketed, use the source-supported product or style phrase. Do not repeat the Brand, copy a retailer title, or invent an expression.",
+      "The Bottle's common name relative to the Brand, as the producer's product title prints it. Keep the age, vintage, cask number, and strength wording such as `Cask Strength` that the title prints, writing ages as `12-year-old`, and also store those facts in their fields. Do not add an age or other fact that the title does not print. For an independent bottling whose title features a distillery, use that distillery with the title's age wording. Leave out the Brand, the edition, package text, and generic style or category words; use a style phrase only when nothing else names the Bottle. Do not copy a retailer title, build a name from fields, or invent an expression.",
     ),
   series: ProposedSeriesChoiceSchema.nullable().default(null),
   category: CategoryEnum.nullable().default(null),

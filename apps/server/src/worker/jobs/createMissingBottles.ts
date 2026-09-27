@@ -8,7 +8,10 @@ import {
   publishResolvedReview,
 } from "@peated/server/externalReviews/publication";
 import { getPeatedSystemActor } from "@peated/server/lib/actors";
-import { resolveScrapedBottleReferenceTarget } from "@peated/server/lib/bottleReferenceResolution";
+import {
+  persistReviewBottleCheck,
+  resolveScrapedBottleReferenceTarget,
+} from "@peated/server/lib/bottleReferenceResolution";
 import {
   assignBottleReferenceInTransaction,
   finalizeBottleReferenceAssignment,
@@ -94,6 +97,13 @@ export async function createMissingBottles(
         },
         services?.classifyReference,
       );
+
+      if (resolution.classification) {
+        await persistReviewBottleCheck({
+          reviewId: review.id,
+          classification: resolution.classification,
+        });
+      }
 
       const resolvedAssignment = resolution.assignment;
       const bottleId = resolvedAssignment?.bottleId ?? null;

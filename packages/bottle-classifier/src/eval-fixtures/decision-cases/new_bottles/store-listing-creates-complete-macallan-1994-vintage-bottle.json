@@ -67,11 +67,11 @@
       "brand": {
         "name": "Macallan"
       },
-      "name": "Sherry Oak",
       "category": "single_malt",
       "statedAge": 18,
       "vintageYear": 1994
     },
-    "summary": "Create one independently complete Macallan 18-year-old Sherry Oak 1994 Vintage Bottle; the 1993 sibling is identity evidence but does not authorize group selection."
+    "summary": "Create one independently complete Macallan 18-year-old Sherry Oak 1994 Vintage Bottle; the 1993 sibling is identity evidence but does not authorize group selection.",
+    "proposedBottleNameIncludes": ["Sherry Oak", "18-year-old", "1994"]
   }
 }

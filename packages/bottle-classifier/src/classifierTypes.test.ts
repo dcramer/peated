@@ -26,10 +26,10 @@ const AgentDecisionJsonSchema = z
 describe("BottleClassifierAgentDecisionSchema", () => {
   test("defines proposed Bottle names at the field boundary", () => {
     expect(ProposedBottleFields.name.description).toContain(
-      "Stable marketed expression relative to the Brand",
+      "Do not add an age or other fact that the title does not print",
     );
     expect(ProposedBottleFields.name.description).toContain(
-      "When no separate expression is marketed, use the source-supported product or style phrase",
+      "use a style phrase only when nothing else names the Bottle",
     );
   });
 

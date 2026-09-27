@@ -706,6 +706,10 @@ function buildClassifierAdapters(
   if (entityContexts.size > 0) {
     dataSource.getEntityContext = async (entityId: number) =>
       entityContexts.get(entityId) ?? null;
+    if (!testCase.testCase.localCatalog) {
+      dataSource.searchEntities =
+        createInspectedEntitySearch(inspectedEntities);
+    }
   }
   return dataSource;
 }
@@ -846,6 +850,22 @@ function auditEntityContext(entity: EntityResolution): EntityContext {
   });
 }
 
+// Captured fixtures without a local catalog still need Entity search, or the
+// classifier cannot reuse the inspected Brand and distiller ids.
+function createInspectedEntitySearch(inspectedEntities: EntityResolution[]) {
+  return createLocalCatalogDataSource({
+    entities: inspectedEntities.map((entity) => ({
+      id: entity.entityId,
+      name: entity.name,
+      shortName: entity.shortName,
+      aliases: entity.reference ? [entity.reference] : [],
+      kind: entity.kind,
+    })),
+    bottles: [],
+    references: [],
+  }).searchEntities;
+}
+
 function createAuditEvalClassifierOptions(testCase: AuditBottleEvalFixture) {
   const { currentBottle, inspectedBottles, inspectedEntities } =
     testCase.input.context;
@@ -861,18 +881,6 @@ function createAuditEvalClassifierOptions(testCase: AuditBottleEvalFixture) {
       auditEntityContext(entity),
     ]),
   );
-  const entitySearch = createLocalCatalogDataSource({
-    entities: inspectedEntities.map((entity) => ({
-      id: entity.entityId,
-      name: entity.name,
-      shortName: entity.shortName,
-      aliases: entity.reference ? [entity.reference] : [],
-      kind: entity.kind,
-    })),
-    bottles: [],
-    references: [],
-  }).searchEntities;
-
   return createEvalClassifierOptions({
     searchBottles: buildSearchBottlesAdapter(testCase),
     getBottleCandidateById: async (bottleId) =>
@@ -880,7 +888,7 @@ function createAuditEvalClassifierOptions(testCase: AuditBottleEvalFixture) {
         (candidate) => candidate.bottleId === bottleId,
       ) ?? null,
     getBottleContext: async (bottleId) => bottleContexts.get(bottleId) ?? null,
-    searchEntities: entitySearch,
+    searchEntities: createInspectedEntitySearch(inspectedEntities),
     getEntityContext: async (entityId) => entityContexts.get(entityId) ?? null,
   });
 }

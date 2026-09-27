@@ -4,6 +4,7 @@ import type { BottleClassificationDecision } from "@peated/server/agents/bottleC
 import { db } from "@peated/server/db";
 import { getPostgresConnectionConfig } from "@peated/server/db/connection";
 import {
+  bottleChecks,
   bottleReferences,
   bottleTombstones,
   externalReviewArticles,
@@ -496,6 +497,25 @@ describe("POST /external-reviews", () => {
       decision: "match",
       bottleId: bottle.id,
       createdBottle: false,
+    });
+    expect(
+      await db.query.bottleChecks.findFirst({
+        where: and(
+          eq(bottleChecks.sourceKind, "review"),
+          eq(bottleChecks.sourceId, String(result.id)),
+        ),
+      }),
+    ).toMatchObject({
+      intent: "resolve_reference",
+      inputSnapshot: {
+        reference: expect.objectContaining({ name: reviewName, url }),
+      },
+      output: expect.objectContaining({
+        decision: expect.objectContaining({
+          action: "match",
+          matchedBottleId: bottle.id,
+        }),
+      }),
     });
   });
 

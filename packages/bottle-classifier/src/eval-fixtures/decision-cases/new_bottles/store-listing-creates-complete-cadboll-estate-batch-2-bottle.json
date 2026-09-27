@@ -50,11 +50,11 @@
       "brand": {
         "name": "Glenmorangie"
       },
-      "name": "The Cadboll Estate",
       "category": "single_malt",
       "statedAge": 15,
       "edition": "Batch 2"
     },
-    "summary": "Create one independently complete Glenmorangie 15-year-old The Cadboll Estate Batch 2 Bottle without repairing the existing Batch 1 Bottle or selecting a group."
+    "summary": "Create one independently complete Glenmorangie 15-year-old The Cadboll Estate Batch 2 Bottle without repairing the existing Batch 1 Bottle or selecting a group.",
+    "proposedBottleNameIncludes": ["The Cadboll Estate", "15-year-old"]
   }
 }
