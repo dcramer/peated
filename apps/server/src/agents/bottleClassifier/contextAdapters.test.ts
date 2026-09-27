@@ -4,12 +4,13 @@ import { bottleImages, bottleObservations } from "@peated/server/db/schema";
 import { storeFile } from "@peated/server/lib/uploads";
 import { absoluteUrl } from "@peated/server/lib/urls";
 import { Readable } from "node:stream";
-import { describe, expect, test } from "vitest";
+import { describe, expect, test, vi } from "vitest";
 
 import {
   getBottleClassifierContext,
   getBottleClassifierImageInput,
   getEntityClassifierContext,
+  readBottleClassifierImageLabel,
 } from "./contextAdapters";
 
 describe("Bottle classifier context adapters", () => {
@@ -206,6 +207,49 @@ describe("Bottle classifier context adapters", () => {
     await expect(
       getBottleClassifierImageInput("https://images.example.com/external.webp"),
     ).resolves.toBe("https://images.example.com/external.webp");
+  });
+
+  test("saves an image label reading and reuses it for the same extractor", async () => {
+    const imageUrl = "https://example.com/label-reading.webp";
+    const reading = {
+      extractedIdentity: null,
+      rawLabelText: "EXAMPLE SINGLE MALT 10",
+    };
+    const read = vi.fn(async () => reading);
+
+    await expect(
+      readBottleClassifierImageLabel({ imageUrl, version: "v1", read }),
+    ).resolves.toEqual(reading);
+    await expect(
+      readBottleClassifierImageLabel({ imageUrl, version: "v1", read }),
+    ).resolves.toEqual(reading);
+    expect(read).toHaveBeenCalledOnce();
+
+    // A changed extractor reads the label again.
+    await readBottleClassifierImageLabel({ imageUrl, version: "v2", read });
+    expect(read).toHaveBeenCalledTimes(2);
+  });
+
+  test("does not save a failed image label reading", async () => {
+    const imageUrl = "https://example.com/failed-label-reading.webp";
+    const failure = new Error("provider down");
+
+    await expect(
+      readBottleClassifierImageLabel({
+        imageUrl,
+        version: "v1",
+        read: async () => {
+          throw failure;
+        },
+      }),
+    ).rejects.toBe(failure);
+
+    const read = vi.fn(async () => ({
+      extractedIdentity: null,
+      rawLabelText: null,
+    }));
+    await readBottleClassifierImageLabel({ imageUrl, version: "v1", read });
+    expect(read).toHaveBeenCalledOnce();
   });
 
   test("returns Entity kind and related Bottle relationships", async ({

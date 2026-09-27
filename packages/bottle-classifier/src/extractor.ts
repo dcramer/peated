@@ -1,3 +1,4 @@
+import { createHash } from "node:crypto";
 import type OpenAI from "openai";
 import { zodTextFormat } from "openai/helpers/zod";
 import { z } from "zod";
@@ -13,6 +14,7 @@ const ResponseSchema = z.object({
   rawLabelText: z.string().trim().min(1).max(4000).nullable().default(null),
 });
 const ResponseFormat = zodTextFormat(ResponseSchema, "ExtractedBottleDetails");
+const IMAGE_DETAIL = "high";
 
 interface WhiskyLabelProviderResponse {
   id: string;
@@ -54,6 +56,30 @@ export type WhiskyLabelExtractionMetadata = {
 
 export type WhiskyLabelExtractionResult = WhiskyLabelExtractionMetadata &
   z.infer<typeof ResponseSchema>;
+
+/**
+ * Identifies everything that shapes an image label reading, so a saved reading
+ * is reused only when the same extractor would produce it again.
+ */
+export function getImageLabelExtractionVersion({
+  model,
+  reasoningEffort,
+}: {
+  model: string;
+  reasoningEffort?: OpenAIReasoningEffort;
+}): string {
+  return createHash("sha256")
+    .update(
+      JSON.stringify({
+        model,
+        settings: getStableOpenAISettings(model, reasoningEffort),
+        instructions: buildWhiskyLabelExtractorInstructions({ mode: "image" }),
+        format: ResponseFormat,
+        detail: IMAGE_DETAIL,
+      }),
+    )
+    .digest("hex");
+}
 
 export function createWhiskyLabelExtractor({
   client,
@@ -145,7 +171,7 @@ export async function extractFromImageWithMetadata({
           {
             type: "input_image",
             image_url: imageUrlOrBase64,
-            detail: "high",
+            detail: IMAGE_DETAIL,
           },
         ],
       },

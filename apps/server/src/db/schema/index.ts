@@ -18,6 +18,7 @@ export * from "./externalSites";
 export * from "./flights";
 export * from "./follows";
 export * from "./identities";
+export * from "./imageLabelExtractions";
 export * from "./incomingBottleDecisionLogs";
 export * from "./memberReviews";
 export * from "./notifications";

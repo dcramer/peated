@@ -32,6 +32,7 @@ import {
   getBottleClassifierContext,
   getBottleClassifierImageInput,
   getEntityClassifierContext,
+  readBottleClassifierImageLabel,
 } from "./contextAdapters";
 import { resolveExactReferenceBottleRun } from "./findExactReferenceBottleCandidate";
 
@@ -122,6 +123,7 @@ export function getBottleClassifier(
       getBottleCandidateById,
       getBottleContext: getBottleClassifierContext,
       getBottleContextImageInput: getBottleClassifierImageInput,
+      readImageLabel: readBottleClassifierImageLabel,
       getEntityContext: getEntityClassifierContext,
       searchEntities: searchBottleClassifierEntities,
     },

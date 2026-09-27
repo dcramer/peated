@@ -1,5 +1,7 @@
+import type { BottleClassifierDataSource } from "@peated/bottle-classifier/internal/runtime";
 import {
   BottleContextSourceSchema,
+  BottleExtractedDetailsSchema,
   EntityContextSchema,
   MAX_BOTTLE_CONTEXT_IMAGES,
   MAX_BOTTLE_CONTEXT_OBSERVATION_DATA_LENGTH,
@@ -27,6 +29,7 @@ import {
   entityAliases,
   entityReferences,
   entityTombstones,
+  imageLabelExtractions,
   regions,
   tastings,
   users,
@@ -91,6 +94,42 @@ function normalizedHttpUrl(value: string | null) {
     return null;
   }
 }
+
+/**
+ * Reuses a saved label reading for this image and extractor version, or reads
+ * the label and saves it. A failed read throws and is not saved, so the next
+ * inspection tries again.
+ */
+export const readBottleClassifierImageLabel: NonNullable<
+  BottleClassifierDataSource["readImageLabel"]
+> = async ({ imageUrl, version, read }) => {
+  const saved = await db.query.imageLabelExtractions.findFirst({
+    where: and(
+      eq(imageLabelExtractions.imageUrl, imageUrl),
+      eq(imageLabelExtractions.version, version),
+    ),
+  });
+  if (saved) {
+    return {
+      extractedIdentity: BottleExtractedDetailsSchema.nullable().parse(
+        saved.extractedIdentity,
+      ),
+      rawLabelText: saved.rawLabelText,
+    };
+  }
+
+  const reading = await read();
+  await db
+    .insert(imageLabelExtractions)
+    .values({
+      imageUrl,
+      version,
+      extractedIdentity: reading.extractedIdentity,
+      rawLabelText: reading.rawLabelText,
+    })
+    .onConflictDoNothing();
+  return reading;
+};
 
 /** Resolves Peated-owned images without asking a model provider to refetch them. */
 export async function getBottleClassifierImageInput(

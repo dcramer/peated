@@ -2122,6 +2122,13 @@
       "when": 1790443804444,
       "tag": "0302_rewrite_price_match_terms",
       "breakpoints": false
+    },
+    {
+      "idx": 303,
+      "version": "7",
+      "when": 1790466164892,
+      "tag": "0303_image_label_extractions",
+      "breakpoints": false
     }
   ]
 }

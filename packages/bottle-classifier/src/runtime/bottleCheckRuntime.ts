@@ -45,6 +45,7 @@ import { webEvidenceUrlsMatch } from "../webEvidenceUrl";
 import {
   bottleContextToCandidate,
   createBottleContextLoader,
+  type ReadImageLabel,
 } from "./bottleCheckContext";
 import { findUnsupportedPopulatedBottlePatchField } from "./bottlePatchEvidence";
 import {
@@ -66,6 +67,7 @@ export type BottleClassifierDataSource = {
   ) => Promise<BottleCandidate | null>;
   getBottleContext?: (bottleId: number) => Promise<BottleContextSource | null>;
   getBottleContextImageInput?: (imageUrl: string) => Promise<string>;
+  readImageLabel?: ReadImageLabel;
   getEntityContext?: (entityId: number) => Promise<EntityContext | null>;
   searchEntities?: (args: SearchEntitiesArgs) => Promise<EntityResolution[]>;
 };
