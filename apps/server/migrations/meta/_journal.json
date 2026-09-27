@@ -2129,6 +2129,13 @@
       "when": 1790466164892,
       "tag": "0303_image_label_extractions",
       "breakpoints": false
+    },
+    {
+      "idx": 304,
+      "version": "7",
+      "when": 1790475517257,
+      "tag": "0304_entity_name_pattern_indexes",
+      "breakpoints": false
     }
   ]
 }
