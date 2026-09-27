@@ -1,6 +1,9 @@
 # C29: keep printed age, vintage, and cask wording in proposed names
 
-**Pending.** Recorded before the runs.
+**Accepted.** Target name checks rose from 1/21 to 13/21 in focused runs, below
+the 18/21 recorded beforehand, and the full suite rose from 73 to 79 of 109
+checks at the same cost. No reviewed loss was caused by the change except a
+name-expectation conflict with the current naming rule.
 
 ## Problem
 
@@ -146,4 +149,56 @@ every treatment run, a new difference in a case that fails in both versions.
 
 ## Full-suite run
 
-Pending.
+Both versions ran the full suite once, concurrently, between 22:52 and 23:43
+UTC, with fresh replay directories.
+
+| Measure              | Control (V0) | Treatment (V1) | Change |
+| -------------------- | -----------: | -------------: | -----: |
+| Passed               |       73/109 |         79/109 |     +6 |
+| Total tokens         |    4,328,415 |      4,343,790 |  +0.4% |
+| Cached input tokens  |    3,640,213 |      3,683,508 |  +1.2% |
+| Output tokens        |      307,901 |        306,205 |  -0.6% |
+| Reasoning tokens     |      247,737 |        245,338 |  -1.0% |
+| Model requests       |          512 |            519 |     +7 |
+| Firecrawl calls      |          205 |            209 |     +4 |
+| Estimated model cost |    $0.237852 |      $0.234158 |  -1.6% |
+| Total case time      |    3,067.9 s |      3,090.7 s |  +0.7% |
+| Median case time     |       25.4 s |         24.8 s | -0.6 s |
+| 95th percentile      |       65.2 s |         61.5 s | -3.7 s |
+
+The treatment gained twelve cases: the seven name cases above plus Octomore
+13.1, Heaven's Door Bootleg Series, Woodford Reserve Double Double Oaked,
+Laphroaig Càirdeas 2022 Warehouse 1, and the malformed Laphroaig audit. It lost
+six. Each loss was reviewed:
+
+- Canadian Club Reserve 9-year-old matched Bottle 17346 instead of requiring
+  review. A focused repeat passed 3/3 in both versions.
+- High West High Country chose Bottle 44284. A focused repeat failed 3/3 in
+  the control and 3/3 in the treatment, so the case fails without this change.
+- Talisker 2001 The Distillers Edition failed 3/3 in a focused repeat against
+  0/3 for the control. The treatment named it `2001 The Distillers Edition`
+  twice and `2001` with a Distillers Edition Series once. The test case, from
+  July 2026, expected the vintage dropped, which the 2026-09-16 naming rule
+  reverses; Peated's own `Clynelish Distillers Edition 1993` keeps it. The case
+  now expects the printed vintage. This correction was made after seeing the
+  result. The `2001`-only name remains a real miss that the corrected case
+  still fails.
+- Elijah Craig Cask Strength and Four Roses Limited Edition Small Batch
+  returned `no_match` instead of their expected match and creation. Neither
+  source title prints an age or vintage, and neither answer is unsafe.
+- The same-release evidence audit lost one proposed change; audits do not use
+  the proposed Bottle name.
+
+## Decision
+
+Keep the change. It missed the target bar recorded before the runs, so the
+acceptance rests on the full picture instead: target names improved twelvefold
+without any comparison case losing a pass, the one new unsafe match did not
+repeat, cost and time were flat, and the full suite gained six checks.
+
+Open follow-ups:
+
+- Black Label Islay Origin drops its printed `12-year-old`.
+- The Exclusive Malts photo case keeps its cask only in `caskNumber`.
+- Komagatake's edition wording changed to `Edition 2022`.
+- One Talisker run named the Bottle `2001` alone.
