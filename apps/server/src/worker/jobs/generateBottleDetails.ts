@@ -300,6 +300,9 @@ export async function generateBottleDetails(
         expectedSharedState,
         actorId: actor.id,
         creationSource: "repair_workflow",
+        // Change history rule: generated details are derived text, marked by
+        // descriptionSrc "generated", and do not appear as a Bottle edit.
+        recordChange: false,
       });
     });
   } catch (error) {
