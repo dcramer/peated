@@ -1,7 +1,7 @@
 // Drafts a decision eval test case from a saved production classifier run.
 //
-//   pnpm cli api get '/audits/runs?sourceKind=review&sourceId=123' > run.json
-//   node packages/bottle-classifier/scripts/draft-eval-fixture.mjs run.json <fixture-id> <out-dir>
+//   pnpm -s cli api get '/audits/runs?sourceKind=review&sourceId=123' > run.json
+//   pnpm --filter @peated/bottle-classifier fixtures:draft "$PWD/run.json" <fixture-id> "$PWD/<out-dir>"
 //
 // Writes <fixture-id>.json, a decision test case with the observed input,
 // candidates, Bottle and Entity context, and a provenance outline, and

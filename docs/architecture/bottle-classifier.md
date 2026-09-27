@@ -48,24 +48,6 @@ name only when nothing else names the Bottle. The server
 adds an explicit edition without repeating it and stores supported facts such
 as age, ABV, years, and cask flags in their fields as well.
 
-Related releases can differ only in ABV, batch, or year, so one differing fact
-can mean a new Bottle. Sources also make mistakes. Before creating a Bottle
-that differs from an existing one in a single fact, the classifier confirms
-from other evidence that a release with the source value exists. When other
-evidence places the release at the existing Bottle's value and nothing shows
-the source value, the source is wrong and the classifier matches the existing
-Bottle. The server creates the Bottle and manages BottleGroup
-membership. The classifier never chooses a BottleGroup.
-
-`identityScope = product` is the default. Use `exact_cask` only when a specific
-cask is the marketed Bottle identity. Generic cask or barrel wording is not
-enough.
-
-Keep each fact at the product level supported by its evidence. For example, do
-not give a blend a component's age, year, or strength. Keep a production lot,
-bottle number, or retailer selector as an observation unless evidence shows
-that it identifies the marketed Bottle.
-
 `maturation` is the producer's cask statement as one short phrase, at most 120
 characters, following the [Whisky Identity Model](./whisky-identity-model.md).
 Do not split it into inferred cask type, size, or fill. `caskNumber` is a marketed cask or barrel identifier.

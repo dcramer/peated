@@ -93,6 +93,57 @@ the recorded runs:
   `edition`, which is valid and keeps the full name distinct. The case now
   requires `21-year-old` in the name and still checks `caskNumber` 665.
 
-## Results
+## Focused result
+
+Runs finished 2026-09-27 between 22:13 and 22:51 UTC. V0 and V1 ran
+concurrently, so neither version ran first. V1's figures are its runs of the
+same 13 test cases.
+
+Name checks on the target cases, out of three runs each:
+
+| Case                                     | Control (V0) name                           | Treatment (V1) name                            |  Control | Treatment |
+| ---------------------------------------- | ------------------------------------------- | ---------------------------------------------- | -------: | --------: |
+| Macallan 12 Double Cask at 43%           | `Double Cask`, one wrong match to Bottle 25 | `12-year-old Double Cask`                      |        0 |         3 |
+| Glen Breton 21 cask 665                  | `21-year-old` once, `no_match` twice        | same                                           |        1 |         1 |
+| Shieldaig Speyside 21 and 30             | `Speyside`                                  | `Speyside 21-year-old`, `Speyside 30-year-old` |      0/6 |       6/6 |
+| Creag Isle 12                            | `Island Single Malt Scotch Whisky`          | `12-year-old`                                  |        0 |         3 |
+| Black Label Islay Origin 12              | `Islay Origin`                              | `Black Label Islay Origin`, once `no_match`    |        0 |         0 |
+| Exclusive Malts Islay 8, 2007, cask 1661 | `Islay`, once `no_match`                    | `Islay 8-year-old 2007`                        |        0 |         0 |
+| **Target name checks**                   |                                             |                                                | **1/21** | **13/21** |
+
+Comparison cases, passes out of three:
+
+| Case                                    | Control | Treatment | Note                                                                            |
+| --------------------------------------- | ------: | --------: | ------------------------------------------------------------------------------- |
+| Russell's Reserve Single Barrel Rye     |       3 |         3 |                                                                                 |
+| Elijah Craig Barrel Proof Batch C923    |       3 |         3 | `Barrel Proof` in every run; no age added                                       |
+| Woodford Reserve Kentucky Straight Malt |       1 |         2 | Treatment kept `Whiskey` 3/3; control dropped it twice                          |
+| Watchpost Whiskey                       |       0 |         0 | `no_match` in every run of both versions                                        |
+| Compass Box Hedonism²                   |       0 |         0 | Age, bottling year, and relationship misses in both                             |
+| Mars Komagatake 2022 Edition            |       0 |         0 | Treatment wrote the edition as `Edition 2022` 3/3; control wrote `2022 Edition` |
+
+| Measure                    | Control (V0) | Treatment (V1) | Change |
+| -------------------------- | -----------: | -------------: | -----: |
+| Passed                     |         8/39 |          21/39 |    +13 |
+| Incorrect existing matches |            1 |              0 |     -1 |
+| Total tokens               |    2,236,148 |      2,293,997 |  +2.6% |
+| Cached input tokens        |    1,943,220 |      1,962,469 |  +1.0% |
+| Output tokens              |      145,105 |        155,099 |  +6.9% |
+| Reasoning tokens           |      114,668 |        124,327 |  +8.4% |
+| Model requests             |          245 |            250 |     +5 |
+| Firecrawl calls            |          104 |            113 |     +9 |
+| Estimated model cost       |    $0.110444 |      $0.119209 |  +7.9% |
+| Total case time            |    1,506.5 s |      1,561.3 s |  +3.6% |
+| Median case time           |       34.7 s |         38.7 s | +4.0 s |
+| 95th percentile            |       65.0 s |         68.4 s | +3.4 s |
+
+The treatment passed 13 of 21 target name checks, below the 18 recorded before
+the runs. The remaining misses are consistent rather than random: the Black
+Label name kept the range but not `12-year-old`, the Exclusive Malts name kept
+age and vintage but put the cask only in `caskNumber`, and Glen Breton returned
+`no_match` twice in both versions. The Komagatake edition wording changed in
+every treatment run, a new difference in a case that fails in both versions.
+
+## Full-suite run
 
 Pending.

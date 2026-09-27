@@ -39,9 +39,9 @@ input, decision, and artifacts. To turn a wrong decision into a test case:
 1. Find the source record. The moderation history entry for the decision gives
    its source kind and ID.
 2. Fetch the saved run with the authenticated CLI:
-   `pnpm cli api get '/audits/runs?sourceKind=review&sourceId=123' > run.json`.
+   `pnpm -s cli api get '/audits/runs?sourceKind=review&sourceId=123' > run.json`.
 3. Draft the test case and its evidence pack:
-   `node packages/bottle-classifier/scripts/draft-eval-fixture.mjs run.json <fixture-id> <out-dir>`.
+   `pnpm --filter @peated/bottle-classifier fixtures:draft "$PWD/run.json" <fixture-id> "$PWD/<out-dir>"`.
 4. Verify the Bottle online, write `expected`, complete `provenance`, and move
    the test case into `src/eval-fixtures/decision-cases/`. The validator rejects
    the draft until you do.

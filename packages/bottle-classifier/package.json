@@ -84,6 +84,7 @@
     "build": "tsc",
     "dev": "tsc --watch",
     "evals": "sh -c 'if [ \"$1\" = \"--\" ]; then shift; fi; pnpm exec vitest run \"$@\" --config vitest.evals.config.mts' --",
+    "fixtures:draft": "node scripts/draft-eval-fixture.mjs",
     "fixtures:validate": "vitest run --config vitest.config.mts src/evalFixtures.validate.test.ts",
     "test": "vitest run --config vitest.config.mts",
     "terms:check": "node scripts/check-terms.mjs",
