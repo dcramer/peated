@@ -1136,6 +1136,7 @@ export async function updateBottleInTransaction(
     actorId,
     creationSource,
     invalidateGeneratedDetails = true,
+    recordChange = true,
   }: {
     bottleId: number;
     input: SystemBottlePatch;
@@ -1144,6 +1145,9 @@ export async function updateBottleInTransaction(
     actorId: number;
     creationSource: CatalogVerificationCreationSource;
     invalidateGeneratedDetails?: boolean;
+    // False only for derived content, such as generated details, that no
+    // person or source asserted; it is not a catalog edit.
+    recordChange?: boolean;
   },
 ): Promise<BottleUpdateFinalizationManifest> {
   const expectedReferencedEntityIds =
@@ -1612,6 +1616,7 @@ export async function updateBottleInTransaction(
         : sharedChanged
           ? "shared"
           : "exact";
+    if (!recordChange) continue;
     await tx.insert(changes).values({
       objectType: "bottle",
       objectId: member.id,
