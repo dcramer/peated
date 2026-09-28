@@ -1,15 +1,10 @@
 # Peated Classifiers
 
-Use this when the work touches the Bottle or Entity classifier. The docs below
-own the rules; this file lists what to read and what reviews usually check.
-
 ## Bottle Classifier
 
-Start with [packages/bottle-classifier/AGENTS.md](../../../packages/bottle-classifier/AGENTS.md).
-It lists the required reading, commands, and package boundaries. The main rules
-are in [bottle-classifier.md](../../../docs/architecture/bottle-classifier.md).
-
-Code to read, by question:
+Start with [packages/bottle-classifier/AGENTS.md](../../../packages/bottle-classifier/AGENTS.md)
+for required reading, commands, and package boundaries. The rules are in
+[bottle-classifier.md](../../../docs/architecture/bottle-classifier.md).
 
 | Question                              | Read                                                                   |
 | ------------------------------------- | ---------------------------------------------------------------------- |
@@ -22,33 +17,29 @@ Code to read, by question:
 | How price matching uses it            | `apps/server/src/lib/priceMatchingProposals.ts`                        |
 | Model checks                          | `src/eval-fixtures/`, `*.eval.test.ts`, `.vitest-evals/AGENTS.md`      |
 
-There are three entry points with separate contracts:
+Keep the three entry points apart:
 
 - extraction reads facts and never decides identity;
-- classification returns `match`, `create_bottle`, or `no_match`;
-- `auditBottle` returns Suggested Changes and findings that always need
+- classification returns `match`, `create_bottle`, or `no_match`, never a
+  Suggested Change;
+- `auditBottle` returns Suggested Changes and findings, which always need
   moderator approval.
-
-A reference result never carries a Suggested Change. Keep the three apart.
 
 Check:
 
-- the model may match only a candidate retrieved in that run;
+- the model matches only a candidate found in that run;
 - local search comes before web search;
 - extraction leaves a field `null` or `[]` rather than guessing;
 - `identityScope` separates `product` from `exact_cask`;
-- no numeric confidence: any `unresolvedRisks` entry forces review, and
-  `deriveAutomationTier` sets the tier from action risk, evidence, and verified
-  anchors;
-- a typed field conflict adds a risk and sends a Match to review. It never
-  turns a Match into No Match;
-- exact stored references and verified codes such as SMWS are input anchors,
-  not a way around the agent;
-- post-model code may reject or send to review, but never upgrades a decision
-  or requires agreement from name, rank, or brand-prefix rules;
-- web tools are read-only, and when they are unavailable nothing substitutes
-  another model or provider;
-- instructions stay static; request data arrives through input and tools.
+- any `unresolvedRisks` entry forces review, and `deriveAutomationTier` sets the
+  tier from the action, evidence, and verified facts;
+- a conflicting typed field sends a Match to review. It never turns it into No
+  Match;
+- exact stored references and verified codes such as SMWS are starting facts
+  for the agent, not a way to skip it;
+- code never upgrades a decision or requires agreement from name, rank, or
+  brand-prefix rules;
+- web tools only read, and nothing replaces them when they are down.
 
 ## Entity Classifier
 
@@ -59,18 +50,17 @@ then `packages/entity-classifier/src/` (`contract.ts`, `classifierRuntime.ts`,
 
 Check:
 
-- queue discovery finds suspect Entities; it does not decide the fix;
+- the review queue finds suspect Entities; it does not decide the fix;
 - one Entity per run;
 - local Entity search comes before web search;
 - advice never picks Bottle IDs or fields to change;
-- metadata advice needs authoritative support;
-- advice tells Brand apart from distillery, owner, bottler, importer, and
+- metadata advice needs an authoritative source;
+- advice tells a Brand apart from a distillery, owner, bottler, importer, or
   product or category wording;
 - names such as `fullName` are weak evidence.
 
 ## Model Checks
 
-Follow [model-checks.md](../../../docs/development/model-checks.md). Live runs
-are slow and cost money: run the focused check for the change, not the full
+Live runs are slow and cost money. Run the check for your change, not the full
 set, unless you are comparing two classifier versions. Add the `trigger-evals`
-label to run them in a pull request.
+label to run them on a pull request.
