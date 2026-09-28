@@ -1,0 +1,1290 @@
+{
+  "id": "review-creates-duncan-taylor-glenlivet-1968-35-year-old-without-the-word-vintage",
+  "name": "review: creates Duncan Taylor Glenlivet 1968 35-year-old without the word Vintage",
+  "input": {
+    "reference": {
+      "id": 8258,
+      "url": "https://whiskyadvocate.com/Duncan-Taylor-distilled-at-Glenlivet-1968-Vintage-35-year-old-43-1",
+      "name": "Duncan Taylor 1968 Vintage 35-year-old (distilled at Glenlivet)",
+      "imageUrl": null,
+      "externalSiteId": 5,
+      "currentBottleId": null
+    },
+    "extractedIdentity": {
+      "abv": null,
+      "brand": "Duncan Taylor",
+      "series": null,
+      "bottler": "Duncan Taylor",
+      "edition": null,
+      "outturn": null,
+      "category": null,
+      "distillery": ["Glenlivet"],
+      "expression": null,
+      "maturation": null,
+      "stated_age": 35,
+      "cask_number": null,
+      "release_day": null,
+      "single_cask": null,
+      "release_year": null,
+      "vintage_year": 1968,
+      "bottling_year": null,
+      "cask_strength": null,
+      "release_month": null
+    },
+    "imageEvidence": null,
+    "initialCandidates": [
+      {
+        "abv": 45.1,
+        "brand": "Duncan Taylor",
+        "score": 79.674904,
+        "series": null,
+        "source": ["vector", "text", "brand_coverage", "context"],
+        "bottler": "Duncan Taylor",
+        "edition": "Cask #7009",
+        "outturn": null,
+        "bottleId": 65748,
+        "category": "single_malt",
+        "fullName": "Duncan Taylor Strathisla - Cask #7009",
+        "reference": "Duncan Taylor (distilled at Strathisla), 35-year-old, Cask #7009, 45.1%",
+        "statedAge": 35,
+        "caskNumber": "7009",
+        "comparison": {
+          "missing": [],
+          "conflicts": ["distillers"],
+          "agreements": ["statedAge", "vintageYear", "brand", "bottler"]
+        },
+        "distillery": ["Strathisla"],
+        "maturation": null,
+        "releaseDay": null,
+        "singleCask": true,
+        "releaseYear": null,
+        "vintageYear": 1968,
+        "bottlingYear": null,
+        "caskStrength": null,
+        "releaseMonth": null,
+        "familyContext": {
+          "siblingBottles": []
+        }
+      },
+      {
+        "abv": null,
+        "brand": "Mackillop's Choice",
+        "score": 74.49007,
+        "series": null,
+        "source": ["text"],
+        "bottler": null,
+        "edition": null,
+        "outturn": null,
+        "bottleId": 18754,
+        "category": "single_malt",
+        "fullName": "Mackillop's Choice 35-year-old old, 1968 Vintage (distilled at Caperdonich)",
+        "reference": null,
+        "statedAge": 35,
+        "caskNumber": null,
+        "comparison": {
+          "missing": ["bottler", "distillers"],
+          "conflicts": ["brand"],
+          "agreements": ["statedAge", "vintageYear"]
+        },
+        "distillery": [],
+        "maturation": null,
+        "releaseDay": null,
+        "singleCask": null,
+        "releaseYear": null,
+        "vintageYear": 1968,
+        "bottlingYear": null,
+        "caskStrength": null,
+        "releaseMonth": null,
+        "familyContext": {
+          "siblingBottles": []
+        }
+      },
+      {
+        "abv": 40.7,
+        "brand": "Bruichladdich",
+        "score": 72.843735,
+        "series": "Legacy Series",
+        "source": ["text"],
+        "bottler": null,
+        "edition": null,
+        "outturn": 1572,
+        "bottleId": 18617,
+        "category": "single_malt",
+        "fullName": "Bruichladdich Legacy Series Three",
+        "reference": null,
+        "statedAge": 35,
+        "caskNumber": null,
+        "comparison": {
+          "missing": ["bottler"],
+          "conflicts": ["brand", "distillers"],
+          "agreements": ["statedAge", "vintageYear"]
+        },
+        "distillery": ["Bruichladdich"],
+        "maturation": null,
+        "releaseDay": null,
+        "singleCask": null,
+        "releaseYear": 2004,
+        "vintageYear": 1968,
+        "bottlingYear": 2004,
+        "caskStrength": null,
+        "releaseMonth": null,
+        "familyContext": {
+          "siblingBottles": []
+        }
+      },
+      {
+        "abv": null,
+        "brand": "BenRiach",
+        "score": 56.51313,
+        "series": null,
+        "source": ["text"],
+        "bottler": null,
+        "edition": null,
+        "outturn": null,
+        "bottleId": 16461,
+        "category": "single_malt",
+        "fullName": "BenRiach 35-year-old",
+        "reference": null,
+        "statedAge": 35,
+        "caskNumber": null,
+        "comparison": {
+          "missing": ["vintageYear", "bottler", "distillers"],
+          "conflicts": ["brand"],
+          "agreements": ["statedAge"]
+        },
+        "distillery": [],
+        "maturation": null,
+        "releaseDay": null,
+        "singleCask": null,
+        "releaseYear": null,
+        "vintageYear": null,
+        "bottlingYear": null,
+        "caskStrength": null,
+        "releaseMonth": null,
+        "familyContext": {
+          "siblingBottles": []
+        }
+      },
+      {
+        "abv": 46.8,
+        "brand": "Glengoyne",
+        "score": 56.23926,
+        "series": null,
+        "source": ["text"],
+        "bottler": null,
+        "edition": null,
+        "outturn": 500,
+        "bottleId": 65425,
+        "category": "single_malt",
+        "fullName": "Glengoyne 35-year-old",
+        "reference": null,
+        "statedAge": 35,
+        "caskNumber": null,
+        "comparison": {
+          "missing": ["vintageYear", "bottler"],
+          "conflicts": ["brand", "distillers"],
+          "agreements": ["statedAge"]
+        },
+        "distillery": ["Glengoyne"],
+        "maturation": null,
+        "releaseDay": null,
+        "singleCask": null,
+        "releaseYear": null,
+        "vintageYear": null,
+        "bottlingYear": null,
+        "caskStrength": null,
+        "releaseMonth": null,
+        "familyContext": {
+          "siblingBottles": []
+        }
+      },
+      {
+        "abv": null,
+        "brand": "anCnoc",
+        "score": 55.38221,
+        "series": null,
+        "source": ["text"],
+        "bottler": "Knockdhu",
+        "edition": null,
+        "outturn": null,
+        "bottleId": 4390,
+        "category": "single_malt",
+        "fullName": "anCnoc 35-year-old Limited Edition",
+        "reference": null,
+        "statedAge": 35,
+        "caskNumber": null,
+        "comparison": {
+          "missing": ["abv", "vintageYear", "distillers"],
+          "conflicts": ["brand", "bottler"],
+          "agreements": ["category", "statedAge"]
+        },
+        "distillery": [],
+        "maturation": null,
+        "releaseDay": null,
+        "singleCask": null,
+        "releaseYear": null,
+        "vintageYear": null,
+        "bottlingYear": null,
+        "caskStrength": null,
+        "releaseMonth": null,
+        "familyContext": {
+          "siblingBottles": []
+        }
+      },
+      {
+        "abv": null,
+        "brand": "Old Pulteney",
+        "score": 54.779274,
+        "series": null,
+        "source": ["text"],
+        "bottler": null,
+        "edition": null,
+        "outturn": null,
+        "bottleId": 16536,
+        "category": "single_malt",
+        "fullName": "Old Pulteney 35-year-old",
+        "reference": null,
+        "statedAge": 35,
+        "caskNumber": null,
+        "comparison": {
+          "missing": ["vintageYear", "bottler", "distillers"],
+          "conflicts": ["brand"],
+          "agreements": ["statedAge"]
+        },
+        "distillery": [],
+        "maturation": null,
+        "releaseDay": null,
+        "singleCask": null,
+        "releaseYear": null,
+        "vintageYear": null,
+        "bottlingYear": null,
+        "caskStrength": null,
+        "releaseMonth": null,
+        "familyContext": {
+          "siblingBottles": []
+        }
+      },
+      {
+        "abv": null,
+        "brand": "Benromach",
+        "score": 54.56143,
+        "series": null,
+        "source": ["text"],
+        "bottler": "Benromach",
+        "edition": null,
+        "outturn": null,
+        "bottleId": 3688,
+        "category": "single_malt",
+        "fullName": "Benromach 35-year-old Heritage",
+        "reference": null,
+        "statedAge": 35,
+        "caskNumber": null,
+        "comparison": {
+          "missing": ["abv", "vintageYear", "distillers"],
+          "conflicts": ["brand", "bottler"],
+          "agreements": ["category", "statedAge"]
+        },
+        "distillery": [],
+        "maturation": null,
+        "releaseDay": null,
+        "singleCask": null,
+        "releaseYear": null,
+        "vintageYear": null,
+        "bottlingYear": null,
+        "caskStrength": null,
+        "releaseMonth": null,
+        "familyContext": {
+          "siblingBottles": []
+        }
+      },
+      {
+        "abv": null,
+        "brand": "The Antiquary",
+        "score": 54.4277,
+        "series": null,
+        "source": ["text"],
+        "bottler": null,
+        "edition": null,
+        "outturn": null,
+        "bottleId": 16201,
+        "category": "blend",
+        "fullName": "The Antiquary 35-year-old",
+        "reference": null,
+        "statedAge": 35,
+        "caskNumber": null,
+        "comparison": {
+          "missing": ["vintageYear", "bottler", "distillers"],
+          "conflicts": ["brand"],
+          "agreements": ["statedAge"]
+        },
+        "distillery": [],
+        "maturation": null,
+        "releaseDay": null,
+        "singleCask": null,
+        "releaseYear": null,
+        "vintageYear": null,
+        "bottlingYear": null,
+        "caskStrength": null,
+        "releaseMonth": null,
+        "familyContext": {
+          "siblingBottles": []
+        }
+      },
+      {
+        "abv": null,
+        "brand": "Springbank",
+        "score": 53.641186,
+        "series": null,
+        "source": ["text"],
+        "bottler": "Springbank",
+        "edition": null,
+        "outturn": null,
+        "bottleId": 5401,
+        "category": "single_malt",
+        "fullName": "Springbank 35-year-old Millennium Bottling Limited Edition",
+        "reference": null,
+        "statedAge": 35,
+        "caskNumber": null,
+        "comparison": {
+          "missing": ["abv", "vintageYear", "distillers"],
+          "conflicts": ["brand", "bottler"],
+          "agreements": ["category", "statedAge"]
+        },
+        "distillery": [],
+        "maturation": null,
+        "releaseDay": null,
+        "singleCask": null,
+        "releaseYear": null,
+        "vintageYear": null,
+        "bottlingYear": null,
+        "caskStrength": null,
+        "releaseMonth": null,
+        "familyContext": {
+          "siblingBottles": []
+        }
+      },
+      {
+        "abv": null,
+        "brand": "anCnoc",
+        "score": 52.755096,
+        "series": null,
+        "source": ["text"],
+        "bottler": null,
+        "edition": null,
+        "outturn": null,
+        "bottleId": 15833,
+        "category": "single_malt",
+        "fullName": "anCnoc 35-year-old Second Release",
+        "reference": null,
+        "statedAge": 35,
+        "caskNumber": null,
+        "comparison": {
+          "missing": ["vintageYear", "bottler", "distillers"],
+          "conflicts": ["brand"],
+          "agreements": ["statedAge"]
+        },
+        "distillery": [],
+        "maturation": null,
+        "releaseDay": null,
+        "singleCask": null,
+        "releaseYear": null,
+        "vintageYear": null,
+        "bottlingYear": null,
+        "caskStrength": null,
+        "releaseMonth": null,
+        "familyContext": {
+          "siblingBottles": []
+        }
+      },
+      {
+        "abv": null,
+        "brand": "Glenalba",
+        "score": 52.667618,
+        "series": null,
+        "source": ["text"],
+        "bottler": "Clydesdale",
+        "edition": null,
+        "outturn": null,
+        "bottleId": 845,
+        "category": "single_malt",
+        "fullName": "Glenalba 35-year-old",
+        "reference": null,
+        "statedAge": 35,
+        "caskNumber": null,
+        "comparison": {
+          "missing": ["abv", "vintageYear", "distillers"],
+          "conflicts": ["brand", "bottler"],
+          "agreements": ["category", "statedAge"]
+        },
+        "distillery": [],
+        "maturation": null,
+        "releaseDay": null,
+        "singleCask": null,
+        "releaseYear": null,
+        "vintageYear": null,
+        "bottlingYear": null,
+        "caskStrength": null,
+        "releaseMonth": null,
+        "familyContext": {
+          "siblingBottles": []
+        }
+      },
+      {
+        "abv": null,
+        "brand": "Aberlour",
+        "score": 51.19876,
+        "series": null,
+        "source": ["text"],
+        "bottler": null,
+        "edition": "Batch 35",
+        "outturn": null,
+        "bottleId": 44743,
+        "category": "single_malt",
+        "fullName": "Aberlour A'bunadh - Batch 35",
+        "reference": null,
+        "statedAge": null,
+        "caskNumber": null,
+        "comparison": {
+          "missing": ["statedAge", "abv", "vintageYear", "bottler"],
+          "conflicts": ["brand", "distillers"],
+          "agreements": ["category"]
+        },
+        "distillery": ["Aberlour"],
+        "maturation": null,
+        "releaseDay": null,
+        "singleCask": null,
+        "releaseYear": null,
+        "vintageYear": null,
+        "bottlingYear": null,
+        "caskStrength": null,
+        "releaseMonth": null,
+        "familyContext": {
+          "siblingBottles": [
+            {
+              "abv": null,
+              "edition": null,
+              "outturn": null,
+              "bottleId": 1238,
+              "fullName": "Aberlour A'bunadh",
+              "statedAge": null,
+              "caskNumber": null,
+              "maturation": null,
+              "releaseDay": null,
+              "singleCask": null,
+              "releaseYear": null,
+              "traitFields": [],
+              "vintageYear": null,
+              "bottlingYear": null,
+              "caskStrength": null,
+              "releaseMonth": null
+            },
+            {
+              "abv": null,
+              "edition": "Batch 20",
+              "outturn": null,
+              "bottleId": 44741,
+              "fullName": "Aberlour A'bunadh - Batch 20",
+              "statedAge": null,
+              "caskNumber": null,
+              "maturation": null,
+              "releaseDay": null,
+              "singleCask": null,
+              "releaseYear": null,
+              "traitFields": ["edition"],
+              "vintageYear": null,
+              "bottlingYear": null,
+              "caskStrength": null,
+              "releaseMonth": null
+            },
+            {
+              "abv": null,
+              "edition": "Batch 25",
+              "outturn": null,
+              "bottleId": 44742,
+              "fullName": "Aberlour A'bunadh - Batch 25",
+              "statedAge": null,
+              "caskNumber": null,
+              "maturation": null,
+              "releaseDay": null,
+              "singleCask": null,
+              "releaseYear": null,
+              "traitFields": ["edition"],
+              "vintageYear": null,
+              "bottlingYear": null,
+              "caskStrength": null,
+              "releaseMonth": null
+            },
+            {
+              "abv": null,
+              "edition": "Batch 30",
+              "outturn": null,
+              "bottleId": 44747,
+              "fullName": "Aberlour A'bunadh - Batch 30",
+              "statedAge": null,
+              "caskNumber": null,
+              "maturation": null,
+              "releaseDay": null,
+              "singleCask": null,
+              "releaseYear": null,
+              "traitFields": ["edition"],
+              "vintageYear": null,
+              "bottlingYear": null,
+              "caskStrength": null,
+              "releaseMonth": null
+            },
+            {
+              "abv": null,
+              "edition": "Batch 31",
+              "outturn": null,
+              "bottleId": 44746,
+              "fullName": "Aberlour A'bunadh - Batch 31",
+              "statedAge": null,
+              "caskNumber": null,
+              "maturation": null,
+              "releaseDay": null,
+              "singleCask": null,
+              "releaseYear": null,
+              "traitFields": ["edition"],
+              "vintageYear": null,
+              "bottlingYear": null,
+              "caskStrength": null,
+              "releaseMonth": null
+            },
+            {
+              "abv": null,
+              "edition": "Batch 32",
+              "outturn": null,
+              "bottleId": 44745,
+              "fullName": "Aberlour A'bunadh - Batch 32",
+              "statedAge": null,
+              "caskNumber": null,
+              "maturation": null,
+              "releaseDay": null,
+              "singleCask": null,
+              "releaseYear": null,
+              "traitFields": ["edition"],
+              "vintageYear": null,
+              "bottlingYear": null,
+              "caskStrength": null,
+              "releaseMonth": null
+            },
+            {
+              "abv": null,
+              "edition": "Batch 34",
+              "outturn": null,
+              "bottleId": 44744,
+              "fullName": "Aberlour A'bunadh - Batch 34",
+              "statedAge": null,
+              "caskNumber": null,
+              "maturation": null,
+              "releaseDay": null,
+              "singleCask": null,
+              "releaseYear": null,
+              "traitFields": ["edition"],
+              "vintageYear": null,
+              "bottlingYear": null,
+              "caskStrength": null,
+              "releaseMonth": null
+            },
+            {
+              "abv": null,
+              "edition": "Batch 37",
+              "outturn": null,
+              "bottleId": 44749,
+              "fullName": "Aberlour A'bunadh - Batch 37",
+              "statedAge": null,
+              "caskNumber": null,
+              "maturation": null,
+              "releaseDay": null,
+              "singleCask": null,
+              "releaseYear": null,
+              "traitFields": ["edition"],
+              "vintageYear": null,
+              "bottlingYear": null,
+              "caskStrength": null,
+              "releaseMonth": null
+            }
+          ]
+        }
+      },
+      {
+        "abv": null,
+        "brand": "Glenglassaugh",
+        "score": 51.077667,
+        "series": null,
+        "source": ["text"],
+        "bottler": null,
+        "edition": null,
+        "outturn": null,
+        "bottleId": 17244,
+        "category": "single_malt",
+        "fullName": "Glenglassaugh 35-year-old The Chosen Few",
+        "reference": null,
+        "statedAge": 35,
+        "caskNumber": null,
+        "comparison": {
+          "missing": ["vintageYear", "bottler", "distillers"],
+          "conflicts": ["brand"],
+          "agreements": ["statedAge"]
+        },
+        "distillery": [],
+        "maturation": null,
+        "releaseDay": null,
+        "singleCask": null,
+        "releaseYear": null,
+        "vintageYear": null,
+        "bottlingYear": null,
+        "caskStrength": null,
+        "releaseMonth": null,
+        "familyContext": {
+          "siblingBottles": []
+        }
+      },
+      {
+        "abv": null,
+        "brand": "The Exclusive Blend",
+        "score": 50.828594,
+        "series": null,
+        "source": ["text"],
+        "bottler": null,
+        "edition": null,
+        "outturn": null,
+        "bottleId": 15981,
+        "category": "blend",
+        "fullName": "The Exclusive Blend 35-year-old 1980",
+        "reference": null,
+        "statedAge": 35,
+        "caskNumber": null,
+        "comparison": {
+          "missing": ["vintageYear", "bottler", "distillers"],
+          "conflicts": ["brand"],
+          "agreements": ["statedAge"]
+        },
+        "distillery": [],
+        "maturation": null,
+        "releaseDay": null,
+        "singleCask": null,
+        "releaseYear": null,
+        "vintageYear": null,
+        "bottlingYear": null,
+        "caskStrength": null,
+        "releaseMonth": null,
+        "familyContext": {
+          "siblingBottles": []
+        }
+      },
+      {
+        "abv": null,
+        "brand": "Peerless",
+        "score": 50.282825,
+        "series": null,
+        "source": ["text"],
+        "bottler": null,
+        "edition": null,
+        "outturn": null,
+        "bottleId": 19035,
+        "category": "single_malt",
+        "fullName": "Peerless 1967, 35-year-old (distilled at Glenrothes)",
+        "reference": null,
+        "statedAge": 35,
+        "caskNumber": null,
+        "comparison": {
+          "missing": ["vintageYear", "bottler", "distillers"],
+          "conflicts": ["brand"],
+          "agreements": ["statedAge"]
+        },
+        "distillery": [],
+        "maturation": null,
+        "releaseDay": null,
+        "singleCask": null,
+        "releaseYear": null,
+        "vintageYear": null,
+        "bottlingYear": null,
+        "caskStrength": null,
+        "releaseMonth": null,
+        "familyContext": {
+          "siblingBottles": []
+        }
+      },
+      {
+        "abv": null,
+        "brand": "Peerless",
+        "score": 50.282825,
+        "series": null,
+        "source": ["text"],
+        "bottler": null,
+        "edition": null,
+        "outturn": null,
+        "bottleId": 19030,
+        "category": "single_malt",
+        "fullName": "Peerless 1967, 35-year-old (distilled at Strathisla)",
+        "reference": null,
+        "statedAge": 35,
+        "caskNumber": null,
+        "comparison": {
+          "missing": ["vintageYear", "bottler", "distillers"],
+          "conflicts": ["brand"],
+          "agreements": ["statedAge"]
+        },
+        "distillery": [],
+        "maturation": null,
+        "releaseDay": null,
+        "singleCask": null,
+        "releaseYear": null,
+        "vintageYear": null,
+        "bottlingYear": null,
+        "caskStrength": null,
+        "releaseMonth": null,
+        "familyContext": {
+          "siblingBottles": []
+        }
+      },
+      {
+        "abv": null,
+        "brand": "GlenAllachie",
+        "score": 49.181587,
+        "series": null,
+        "source": ["text"],
+        "bottler": "Speciality Drinks Ltd",
+        "edition": null,
+        "outturn": null,
+        "bottleId": 4775,
+        "category": "single_malt",
+        "fullName": "GlenAllachie 35-year-old Anniversary Selection",
+        "reference": null,
+        "statedAge": 35,
+        "caskNumber": null,
+        "comparison": {
+          "missing": ["abv", "vintageYear", "distillers"],
+          "conflicts": ["brand", "bottler"],
+          "agreements": ["category", "statedAge"]
+        },
+        "distillery": [],
+        "maturation": null,
+        "releaseDay": null,
+        "singleCask": null,
+        "releaseYear": null,
+        "vintageYear": null,
+        "bottlingYear": null,
+        "caskStrength": null,
+        "releaseMonth": null,
+        "familyContext": {
+          "siblingBottles": []
+        }
+      },
+      {
+        "abv": null,
+        "brand": "Glenglassaugh",
+        "score": 48.055477,
+        "series": null,
+        "source": ["text"],
+        "bottler": null,
+        "edition": null,
+        "outturn": null,
+        "bottleId": 16630,
+        "category": "single_malt",
+        "fullName": "Glenglassaugh Massandra Connection 35-year-old Madeira Wood Finish",
+        "reference": null,
+        "statedAge": 35,
+        "caskNumber": null,
+        "comparison": {
+          "missing": ["vintageYear", "bottler", "distillers"],
+          "conflicts": ["brand"],
+          "agreements": ["statedAge"]
+        },
+        "distillery": [],
+        "maturation": null,
+        "releaseDay": null,
+        "singleCask": null,
+        "releaseYear": null,
+        "vintageYear": null,
+        "bottlingYear": null,
+        "caskStrength": null,
+        "releaseMonth": null,
+        "familyContext": {
+          "siblingBottles": []
+        }
+      },
+      {
+        "abv": null,
+        "brand": "That Boutique-y Whisky Company",
+        "score": 46.792374,
+        "series": null,
+        "source": ["text"],
+        "bottler": null,
+        "edition": null,
+        "outturn": null,
+        "bottleId": 14394,
+        "category": "single_malt",
+        "fullName": "TBWC 35-year-old (distilled at Glenturret)",
+        "reference": null,
+        "statedAge": 35,
+        "caskNumber": null,
+        "comparison": {
+          "missing": ["vintageYear", "bottler", "distillers"],
+          "conflicts": ["brand"],
+          "agreements": ["statedAge"]
+        },
+        "distillery": [],
+        "maturation": null,
+        "releaseDay": null,
+        "singleCask": null,
+        "releaseYear": null,
+        "vintageYear": null,
+        "bottlingYear": null,
+        "caskStrength": null,
+        "releaseMonth": null,
+        "familyContext": {
+          "siblingBottles": []
+        }
+      },
+      {
+        "abv": null,
+        "brand": "That Boutique-y Whisky Company",
+        "score": 46.305733,
+        "series": null,
+        "source": ["text"],
+        "bottler": null,
+        "edition": null,
+        "outturn": null,
+        "bottleId": 14163,
+        "category": "blend",
+        "fullName": "TBWC Blended Whisky No.1 35-year-old",
+        "reference": null,
+        "statedAge": 35,
+        "caskNumber": null,
+        "comparison": {
+          "missing": ["vintageYear", "bottler", "distillers"],
+          "conflicts": ["brand"],
+          "agreements": ["statedAge"]
+        },
+        "distillery": [],
+        "maturation": null,
+        "releaseDay": null,
+        "singleCask": null,
+        "releaseYear": null,
+        "vintageYear": null,
+        "bottlingYear": null,
+        "caskStrength": null,
+        "releaseMonth": null,
+        "familyContext": {
+          "siblingBottles": []
+        }
+      }
+    ]
+  },
+  "context": {
+    "inspectedBottleIds": [65748],
+    "bottleContexts": [
+      {
+        "exact": {
+          "abv": 45.1,
+          "edition": "Cask #7009",
+          "outturn": null,
+          "statedAge": 35,
+          "caskNumber": "7009",
+          "maturation": null,
+          "releaseDay": null,
+          "singleCask": true,
+          "releaseYear": null,
+          "vintageYear": 1968,
+          "bottlingYear": null,
+          "caskStrength": null,
+          "releaseMonth": null
+        },
+        "shared": {
+          "name": "Strathisla",
+          "brand": {
+            "name": "Duncan Taylor",
+            "entityId": 5632
+          },
+          "series": null,
+          "bottler": {
+            "name": "Duncan Taylor",
+            "entityId": 5632
+          },
+          "category": "single_malt",
+          "statedAge": null,
+          "distillers": [
+            {
+              "name": "Strathisla",
+              "entityId": 1379
+            }
+          ]
+        },
+        "groupId": 38709,
+        "bottleId": 65748,
+        "fullName": "Duncan Taylor Strathisla - Cask #7009",
+        "siblings": [],
+        "references": [
+          {
+            "name": "Duncan Taylor 35-year-old old, Cask #7009 (distilled at Strathisla)",
+            "ignored": false
+          },
+          {
+            "name": "Duncan Taylor (distilled at Strathisla), 35-year-old, Cask #7009, 45.1%",
+            "ignored": false
+          }
+        ],
+        "observations": [],
+        "imageSources": []
+      }
+    ],
+    "inspectedEntities": [
+      {
+        "kind": "bottler",
+        "name": "Duncan Taylor",
+        "score": 1,
+        "source": ["exact", "text", "prefix", "contained"],
+        "entityId": 5632,
+        "reference": "Duncan Taylor",
+        "shortName": null,
+        "retrievedFor": [
+          {
+            "exact": true,
+            "query": "Duncan Taylor"
+          }
+        ]
+      },
+      {
+        "kind": "distillery",
+        "name": "The Glenlivet",
+        "score": 1,
+        "source": ["exact", "text", "prefix", "contained"],
+        "entityId": 244,
+        "reference": "Glenlivet",
+        "shortName": null,
+        "retrievedFor": [
+          {
+            "exact": true,
+            "query": "Glenlivet"
+          }
+        ]
+      },
+      {
+        "kind": "distillery",
+        "name": "Strathisla",
+        "score": 1,
+        "source": ["exact", "text", "prefix", "contained"],
+        "entityId": 1379,
+        "reference": "Strathisla",
+        "shortName": null,
+        "retrievedFor": [
+          {
+            "exact": true,
+            "query": "Strathisla"
+          }
+        ]
+      },
+      {
+        "kind": "bottler",
+        "name": "Mackillop's Choice",
+        "score": 1,
+        "source": ["exact", "text", "prefix", "contained"],
+        "entityId": 6014,
+        "reference": "Mackillop's Choice",
+        "shortName": null,
+        "retrievedFor": [
+          {
+            "exact": true,
+            "query": "Mackillop's Choice"
+          }
+        ]
+      },
+      {
+        "kind": "distillery",
+        "name": "Bruichladdich",
+        "score": 1,
+        "source": ["exact", "text", "prefix", "contained"],
+        "entityId": 192,
+        "reference": "Bruichladdich",
+        "shortName": "",
+        "retrievedFor": [
+          {
+            "exact": true,
+            "query": "Bruichladdich"
+          }
+        ]
+      },
+      {
+        "kind": "distillery",
+        "name": "BenRiach",
+        "score": 1,
+        "source": ["exact", "text", "prefix", "contained"],
+        "entityId": 225,
+        "reference": "BenRiach",
+        "shortName": null,
+        "retrievedFor": [
+          {
+            "exact": true,
+            "query": "BenRiach"
+          }
+        ]
+      },
+      {
+        "kind": "brand",
+        "name": "Old Pulteney",
+        "score": 1,
+        "source": ["exact", "text", "prefix", "contained"],
+        "entityId": 1227,
+        "reference": "Old Pulteney",
+        "shortName": null,
+        "retrievedFor": [
+          {
+            "exact": true,
+            "query": "Old Pulteney"
+          }
+        ]
+      },
+      {
+        "kind": "brand",
+        "name": "The Antiquary",
+        "score": 1,
+        "source": ["exact", "text", "prefix", "contained"],
+        "entityId": 1401,
+        "reference": "The Antiquary",
+        "shortName": null,
+        "retrievedFor": [
+          {
+            "exact": true,
+            "query": "The Antiquary"
+          }
+        ]
+      },
+      {
+        "kind": "brand",
+        "name": "anCnoc",
+        "score": 1,
+        "source": ["exact", "text", "prefix", "contained"],
+        "entityId": 35,
+        "reference": "anCnoc",
+        "shortName": null,
+        "retrievedFor": [
+          {
+            "exact": true,
+            "query": "anCnoc"
+          }
+        ]
+      },
+      {
+        "kind": "distillery",
+        "name": "Glenglassaugh",
+        "score": 1,
+        "source": ["exact", "text", "prefix", "contained"],
+        "entityId": 255,
+        "reference": "Glenglassaugh",
+        "shortName": null,
+        "retrievedFor": [
+          {
+            "exact": true,
+            "query": "Glenglassaugh"
+          }
+        ]
+      },
+      {
+        "kind": "brand",
+        "name": "The Exclusive Blend",
+        "score": 1,
+        "source": ["exact", "text", "prefix", "contained"],
+        "entityId": 4195,
+        "reference": "The Exclusive Blend",
+        "shortName": null,
+        "retrievedFor": [
+          {
+            "exact": true,
+            "query": "The Exclusive Blend"
+          }
+        ]
+      },
+      {
+        "kind": "brand",
+        "name": "Peerless",
+        "score": 1,
+        "source": ["exact", "text", "prefix", "contained"],
+        "entityId": 1258,
+        "reference": "Peerless",
+        "shortName": null,
+        "retrievedFor": [
+          {
+            "exact": true,
+            "query": "Peerless"
+          }
+        ]
+      },
+      {
+        "kind": "bottler",
+        "name": "That Boutique-y Whisky Company",
+        "score": 1,
+        "source": ["exact", "text", "prefix", "contained"],
+        "entityId": 5978,
+        "reference": "That Boutique-y Whisky Company",
+        "shortName": "TBWC",
+        "retrievedFor": [
+          {
+            "exact": true,
+            "query": "That Boutique-y Whisky Company"
+          }
+        ]
+      },
+      {
+        "kind": "distillery",
+        "name": "Glengoyne",
+        "score": 1,
+        "source": ["exact", "text", "prefix", "contained"],
+        "entityId": 979,
+        "reference": "Glengoyne",
+        "shortName": null,
+        "retrievedFor": [
+          {
+            "exact": true,
+            "query": "Glengoyne"
+          }
+        ]
+      },
+      {
+        "kind": "brand",
+        "name": "Bruichladdich Octomore",
+        "score": 0.5,
+        "source": ["text", "prefix"],
+        "entityId": 1210,
+        "reference": "Octomore",
+        "shortName": "Octomore",
+        "retrievedFor": [
+          {
+            "query": "Bruichladdich"
+          }
+        ]
+      },
+      {
+        "kind": "brand",
+        "name": "Bruichladdich Port Charlotte",
+        "score": 0.5,
+        "source": ["text", "prefix"],
+        "entityId": 1269,
+        "reference": "Port Charlotte",
+        "shortName": "Port Charlotte",
+        "retrievedFor": [
+          {
+            "query": "Bruichladdich"
+          }
+        ]
+      },
+      {
+        "kind": "distillery",
+        "name": "Kentucky Peerless Distilling Co.",
+        "score": 0.5,
+        "source": ["text", "prefix"],
+        "entityId": 1780,
+        "reference": "Peerless Distillery",
+        "shortName": null,
+        "retrievedFor": [
+          {
+            "query": "Peerless"
+          }
+        ]
+      },
+      {
+        "kind": "bottler",
+        "name": "&Whisky",
+        "score": 0.29615384615384616,
+        "source": ["contained"],
+        "entityId": 365821,
+        "reference": "&Whisky",
+        "shortName": null,
+        "retrievedFor": [
+          {
+            "query": "That Boutique-y Whisky Company"
+          }
+        ]
+      },
+      {
+        "kind": "distillery",
+        "name": "Aberlour",
+        "score": 0.2,
+        "source": ["text"],
+        "entityId": 13,
+        "reference": null,
+        "shortName": null,
+        "retrievedFor": [
+          {
+            "query": "Glenlivet"
+          }
+        ]
+      },
+      {
+        "kind": "distillery",
+        "name": "Braeval",
+        "score": 0.2,
+        "source": ["text"],
+        "entityId": 416,
+        "reference": null,
+        "shortName": null,
+        "retrievedFor": [
+          {
+            "query": "Glenlivet"
+          }
+        ]
+      },
+      {
+        "kind": "distillery",
+        "name": "The Macallan",
+        "score": 0.2,
+        "source": ["text"],
+        "entityId": 1157,
+        "reference": null,
+        "shortName": null,
+        "retrievedFor": [
+          {
+            "query": "Glenlivet"
+          }
+        ]
+      },
+      {
+        "kind": "distillery",
+        "name": "Knockdhu",
+        "score": 0.2,
+        "source": ["text"],
+        "entityId": 1116,
+        "reference": null,
+        "shortName": null,
+        "retrievedFor": [
+          {
+            "query": "anCnoc"
+          }
+        ]
+      }
+    ],
+    "inspectedSeries": []
+  },
+  "provenance": {
+    "source": "production_miss",
+    "verifiedSourceUrls": [
+      "https://whiskyadvocate.com/Duncan-Taylor-distilled-at-Glenlivet-1968-Vintage-35-year-old-43-1",
+      "https://www.thewhiskyexchange.com/p/69375/glenlivet-1968-35-year-old-cask-2840-duncan-taylor",
+      "https://www.whiskybase.com/whiskies/whisky/6503/glenlivet-1968-dt"
+    ],
+    "dbOutcome": {
+      "bottleId": 65832,
+      "createsBottle": true,
+      "summary": "Production returned create_bottle with the name `Glenlivet 1968 Vintage 35-year-old`."
+    },
+    "notes": "Captured from saved classifier run 18565 (review 8258, model openai/gpt-6-luna, 2026-09-28T06:26:25.056Z). Production rationale: The Whisky Advocate product title identifies Duncan Taylor, Glenlivet, a 1968 vintage, 35-year age, and 43.1% ABV; its result also identifies the category as single malt. No inspected local candidate represents that complete product. Bottle 65748 is a distinct Duncan Taylor Strathisla bottling: its inspected record specifies Cask #7009 and 45.1% ABV. Create the Glenlivet product without inferring a cask number or single-cask status. The Whisky Exchange lists Glenlivet 1968 35 Year Old Duncan Taylor; Whiskybase lists Glenlivet 1968 DT."
+  },
+  "expected": {
+    "status": "classified",
+    "action": "create_bottle",
+    "identityScope": "product",
+    "matchedBottleId": null,
+    "proposedBottle": {
+      "brand": {
+        "id": 5632,
+        "name": "Duncan Taylor"
+      },
+      "statedAge": 35,
+      "vintageYear": 1968
+    },
+    "proposedBottleNameOneOf": ["Glenlivet 1968 35-year-old"],
+    "proposedBottleNameExcludes": ["Vintage"],
+    "summary": "Create the Duncan Taylor Glenlivet named Glenlivet 1968 35-year-old: distillery, vintage, age, without the word Vintage."
+  }
+}

@@ -839,7 +839,8 @@ function auditEntityContext(entity: EntityResolution): EntityContext {
   return EntityContextSchema.parse({
     entityId: entity.entityId,
     name: entity.name,
-    shortName: entity.shortName,
+    // Saved production Entities can carry an empty short name.
+    shortName: entity.shortName || null,
     kind: entity.kind,
     website: null,
     country: null,
@@ -857,7 +858,7 @@ function createInspectedEntitySearch(inspectedEntities: EntityResolution[]) {
     entities: inspectedEntities.map((entity) => ({
       id: entity.entityId,
       name: entity.name,
-      shortName: entity.shortName,
+      shortName: entity.shortName || null,
       aliases: entity.reference ? [entity.reference] : [],
       kind: entity.kind,
     })),

@@ -1,0 +1,1393 @@
+{
+  "id": "review-creates-gm-rosebank-1991-cask-1535-without-an-unprinted-age",
+  "name": "review: creates G&M Rosebank 1991 cask 1535 without an age its label does not print",
+  "input": {
+    "reference": {
+      "id": 8265,
+      "url": "https://whiskyadvocate.com/Gordon-MacPhail-Single-Cask-N1535-distilled-at-Rosebank-1991-Vintage-59-2-ABV",
+      "name": "Gordon & MacPhail Single Cask #1535 1991 Vintage, 59.2% ABV (distilled at Rosebank)",
+      "imageUrl": null,
+      "externalSiteId": 5,
+      "currentBottleId": null
+    },
+    "extractedIdentity": {
+      "abv": 59.2,
+      "brand": "Gordon & MacPhail",
+      "series": null,
+      "bottler": "Gordon & MacPhail",
+      "edition": "Cask #1535",
+      "outturn": null,
+      "category": null,
+      "distillery": ["Rosebank"],
+      "expression": null,
+      "maturation": null,
+      "stated_age": null,
+      "cask_number": "1535",
+      "release_day": null,
+      "single_cask": true,
+      "release_year": null,
+      "vintage_year": 1991,
+      "bottling_year": null,
+      "cask_strength": null,
+      "release_month": null
+    },
+    "imageEvidence": null,
+    "initialCandidates": [
+      {
+        "abv": 59.3,
+        "brand": "Gordon & MacPhail",
+        "score": 80.70097,
+        "series": null,
+        "source": ["vector", "text", "brand", "brand_coverage", "context"],
+        "bottler": "Gordon & MacPhail",
+        "edition": null,
+        "outturn": null,
+        "bottleId": 65711,
+        "category": "single_malt",
+        "fullName": "Gordon & MacPhail Rosebank",
+        "reference": "Gordon & MacPhail cask #1536, 1991 vintage, 13-year-old (distilled at Rosebank)",
+        "statedAge": 13,
+        "caskNumber": "#1536",
+        "comparison": {
+          "missing": ["edition"],
+          "conflicts": ["statedAge", "abv", "caskNumber"],
+          "agreements": [
+            "category",
+            "vintageYear",
+            "singleCask",
+            "brand",
+            "bottler",
+            "distillers"
+          ]
+        },
+        "distillery": ["Rosebank"],
+        "maturation": "refill sherry cask",
+        "releaseDay": null,
+        "singleCask": true,
+        "releaseYear": null,
+        "vintageYear": 1991,
+        "bottlingYear": null,
+        "caskStrength": null,
+        "releaseMonth": null,
+        "familyContext": {
+          "siblingBottles": []
+        }
+      },
+      {
+        "abv": 40,
+        "brand": "Gordon & MacPhail",
+        "score": 79.046684,
+        "series": null,
+        "source": ["text", "vector"],
+        "bottler": "Gordon & MacPhail",
+        "edition": null,
+        "outturn": null,
+        "bottleId": 65814,
+        "category": "single_malt",
+        "fullName": "Gordon & MacPhail Caol Ila 12-year-old, 1991 Vintage",
+        "reference": "Gordon & MacPhail 12-year-old old, 1991 Vintage (distilled at Caol Ila)",
+        "statedAge": 12,
+        "caskNumber": null,
+        "comparison": {
+          "missing": ["edition", "caskNumber", "singleCask"],
+          "conflicts": ["abv", "distillers"],
+          "agreements": ["vintageYear", "brand", "bottler"]
+        },
+        "distillery": ["Caol Ila"],
+        "maturation": null,
+        "releaseDay": null,
+        "singleCask": null,
+        "releaseYear": null,
+        "vintageYear": 1991,
+        "bottlingYear": null,
+        "caskStrength": null,
+        "releaseMonth": null,
+        "familyContext": {
+          "siblingBottles": []
+        }
+      },
+      {
+        "abv": 43,
+        "brand": "Signatory Vintage",
+        "score": 74.808304,
+        "series": "Vintage Collection",
+        "source": ["text"],
+        "bottler": "Signatory Vintage",
+        "edition": null,
+        "outturn": null,
+        "bottleId": 65792,
+        "category": "single_malt",
+        "fullName": "Signatory Vintage Rosebank",
+        "reference": null,
+        "statedAge": 12,
+        "caskNumber": null,
+        "comparison": {
+          "missing": ["edition", "caskNumber", "singleCask"],
+          "conflicts": ["abv", "brand", "bottler"],
+          "agreements": ["vintageYear", "distillers"]
+        },
+        "distillery": ["Rosebank"],
+        "maturation": null,
+        "releaseDay": null,
+        "singleCask": null,
+        "releaseYear": null,
+        "vintageYear": 1991,
+        "bottlingYear": null,
+        "caskStrength": null,
+        "releaseMonth": null,
+        "familyContext": {
+          "siblingBottles": []
+        }
+      },
+      {
+        "abv": 53.1,
+        "brand": "Gordon & MacPhail",
+        "score": 71.67067,
+        "series": "Connoisseurs Choice Heritage",
+        "source": ["vector", "text", "context", "brand"],
+        "bottler": "Gordon & MacPhail",
+        "edition": null,
+        "outturn": null,
+        "bottleId": 47124,
+        "category": "single_malt",
+        "fullName": "Gordon & MacPhail Rosebank - 34-year-old - 2025 Release - 1991 Vintage - 53.1% ABV",
+        "reference": "Gordon & MacPhail Rosebank - 34-year-old - 2025 Release - 1991 Vintage - 53.1% ABV",
+        "statedAge": 34,
+        "caskNumber": null,
+        "comparison": {
+          "missing": ["edition", "caskNumber", "singleCask"],
+          "conflicts": ["abv"],
+          "agreements": ["vintageYear", "brand", "bottler", "distillers"]
+        },
+        "distillery": ["Rosebank"],
+        "maturation": null,
+        "releaseDay": null,
+        "singleCask": null,
+        "releaseYear": 2025,
+        "vintageYear": 1991,
+        "bottlingYear": null,
+        "caskStrength": null,
+        "releaseMonth": null,
+        "familyContext": {
+          "siblingBottles": []
+        }
+      },
+      {
+        "abv": 58.1,
+        "brand": "Gordon & MacPhail",
+        "score": 62.47773,
+        "series": null,
+        "source": ["vector", "text"],
+        "bottler": "Gordon & MacPhail",
+        "edition": null,
+        "outturn": null,
+        "bottleId": 65798,
+        "category": "single_malt",
+        "fullName": "Gordon & MacPhail Highland Park 12-year-old 1992 Vintage",
+        "reference": "Gordon & MacPhail 12-year-old 1992 Vintage (distilled at Highland Park)",
+        "statedAge": 12,
+        "caskNumber": null,
+        "comparison": {
+          "missing": ["edition", "caskNumber", "singleCask"],
+          "conflicts": ["abv", "vintageYear", "distillers"],
+          "agreements": ["category", "statedAge", "brand", "bottler"]
+        },
+        "distillery": ["Highland Park"],
+        "maturation": null,
+        "releaseDay": null,
+        "singleCask": null,
+        "releaseYear": null,
+        "vintageYear": 1992,
+        "bottlingYear": null,
+        "caskStrength": null,
+        "releaseMonth": null,
+        "familyContext": {
+          "siblingBottles": []
+        }
+      },
+      {
+        "abv": 43,
+        "brand": "Gordon & MacPhail",
+        "score": 60.1688,
+        "series": "Discovery",
+        "source": ["text"],
+        "bottler": "Gordon & MacPhail",
+        "edition": null,
+        "outturn": null,
+        "bottleId": 60961,
+        "category": "single_malt",
+        "fullName": "Gordon & MacPhail Ledaig 12-year-old",
+        "reference": null,
+        "statedAge": 12,
+        "caskNumber": null,
+        "comparison": {
+          "missing": ["edition", "vintageYear", "caskNumber", "singleCask"],
+          "conflicts": ["abv", "distillers"],
+          "agreements": ["category", "statedAge", "brand", "bottler"]
+        },
+        "distillery": ["Tobermory"],
+        "maturation": "Bourbon and Sherry casks",
+        "releaseDay": null,
+        "singleCask": null,
+        "releaseYear": null,
+        "vintageYear": null,
+        "bottlingYear": 2018,
+        "caskStrength": null,
+        "releaseMonth": null,
+        "familyContext": {
+          "siblingBottles": []
+        }
+      },
+      {
+        "abv": null,
+        "brand": "Rosebank",
+        "score": 57.422157,
+        "series": null,
+        "source": ["text"],
+        "bottler": "Rosebank",
+        "edition": null,
+        "outturn": null,
+        "bottleId": 5189,
+        "category": "single_malt",
+        "fullName": "Rosebank 12-year-old Flora & Fauna",
+        "reference": null,
+        "statedAge": 12,
+        "caskNumber": null,
+        "comparison": {
+          "missing": [
+            "edition",
+            "abv",
+            "vintageYear",
+            "caskNumber",
+            "singleCask",
+            "distillers"
+          ],
+          "conflicts": ["brand", "bottler"],
+          "agreements": ["category", "statedAge"]
+        },
+        "distillery": [],
+        "maturation": null,
+        "releaseDay": null,
+        "singleCask": null,
+        "releaseYear": null,
+        "vintageYear": null,
+        "bottlingYear": null,
+        "caskStrength": null,
+        "releaseMonth": null,
+        "familyContext": {
+          "siblingBottles": []
+        }
+      },
+      {
+        "abv": 40,
+        "brand": "Gordon & MacPhail",
+        "score": 57.41091,
+        "series": "Connoisseurs Choice",
+        "source": ["text"],
+        "bottler": "Gordon & MacPhail",
+        "edition": null,
+        "outturn": null,
+        "bottleId": 61337,
+        "category": "single_malt",
+        "fullName": "Gordon & MacPhail Convalmore 1969 12-year-old",
+        "reference": null,
+        "statedAge": 12,
+        "caskNumber": null,
+        "comparison": {
+          "missing": ["edition", "caskNumber", "singleCask"],
+          "conflicts": ["abv", "vintageYear", "distillers"],
+          "agreements": ["category", "statedAge", "brand", "bottler"]
+        },
+        "distillery": ["Convalmore"],
+        "maturation": null,
+        "releaseDay": null,
+        "singleCask": null,
+        "releaseYear": null,
+        "vintageYear": 1969,
+        "bottlingYear": null,
+        "caskStrength": null,
+        "releaseMonth": null,
+        "familyContext": {
+          "siblingBottles": []
+        }
+      },
+      {
+        "abv": 43,
+        "brand": "Gordon & MacPhail",
+        "score": 56.196472,
+        "series": "Connoisseurs Choice",
+        "source": ["text"],
+        "bottler": "Gordon & MacPhail",
+        "edition": null,
+        "outturn": null,
+        "bottleId": 58762,
+        "category": "single_malt",
+        "fullName": "Gordon & MacPhail Littlemill 1991",
+        "reference": null,
+        "statedAge": null,
+        "caskNumber": null,
+        "comparison": {
+          "missing": ["edition", "caskNumber", "singleCask"],
+          "conflicts": ["abv", "distillers"],
+          "agreements": ["vintageYear", "brand", "bottler"]
+        },
+        "distillery": ["Littlemill"],
+        "maturation": "Refill bourbon barrels",
+        "releaseDay": null,
+        "singleCask": null,
+        "releaseYear": null,
+        "vintageYear": 1991,
+        "bottlingYear": 2010,
+        "caskStrength": null,
+        "releaseMonth": null,
+        "familyContext": {
+          "siblingBottles": []
+        }
+      },
+      {
+        "abv": 46,
+        "brand": "Gordon & MacPhail",
+        "score": 55.245083,
+        "series": null,
+        "source": ["text", "vector"],
+        "bottler": "Gordon & MacPhail",
+        "edition": null,
+        "outturn": null,
+        "bottleId": 65785,
+        "category": "single_malt",
+        "fullName": "Gordon & MacPhail Caol Ila",
+        "reference": "Gordon & MacPhail 14-year-old old, 1991 vintage (distilled at Caol Ila)",
+        "statedAge": 14,
+        "caskNumber": null,
+        "comparison": {
+          "missing": ["edition", "caskNumber", "singleCask"],
+          "conflicts": ["abv", "distillers"],
+          "agreements": ["vintageYear", "brand", "bottler"]
+        },
+        "distillery": ["Caol Ila"],
+        "maturation": "cognac wood finish",
+        "releaseDay": null,
+        "singleCask": null,
+        "releaseYear": null,
+        "vintageYear": 1991,
+        "bottlingYear": null,
+        "caskStrength": null,
+        "releaseMonth": null,
+        "familyContext": {
+          "siblingBottles": []
+        }
+      },
+      {
+        "abv": 46,
+        "brand": "Gordon & MacPhail",
+        "score": 54.249023,
+        "series": "Connoisseurs Choice",
+        "source": ["text", "vector"],
+        "bottler": "Gordon & MacPhail",
+        "edition": null,
+        "outturn": null,
+        "bottleId": 65820,
+        "category": "single_malt",
+        "fullName": "Gordon & MacPhail Bladnoch 13-year-old 1991 Vintage",
+        "reference": "Gordon & MacPhail 'Connoisseurs Choice' 13-year-old old, 1991 Vintage (distilled at Bladnoch)",
+        "statedAge": 13,
+        "caskNumber": null,
+        "comparison": {
+          "missing": ["edition", "caskNumber", "singleCask"],
+          "conflicts": ["abv", "distillers"],
+          "agreements": ["vintageYear", "brand", "bottler"]
+        },
+        "distillery": ["Bladnoch"],
+        "maturation": null,
+        "releaseDay": null,
+        "singleCask": null,
+        "releaseYear": null,
+        "vintageYear": 1991,
+        "bottlingYear": null,
+        "caskStrength": null,
+        "releaseMonth": null,
+        "familyContext": {
+          "siblingBottles": []
+        }
+      },
+      {
+        "abv": 43,
+        "brand": "Gordon & MacPhail",
+        "score": 54.025757,
+        "series": "Connoisseurs Choice",
+        "source": ["text"],
+        "bottler": "Gordon & MacPhail",
+        "edition": null,
+        "outturn": null,
+        "bottleId": 58638,
+        "category": "single_malt",
+        "fullName": "Gordon & MacPhail Lochside 1991",
+        "reference": null,
+        "statedAge": null,
+        "caskNumber": null,
+        "comparison": {
+          "missing": ["edition", "caskNumber", "singleCask"],
+          "conflicts": ["abv", "distillers"],
+          "agreements": ["vintageYear", "brand", "bottler"]
+        },
+        "distillery": ["Lochside"],
+        "maturation": "Refill bourbon barrels",
+        "releaseDay": null,
+        "singleCask": null,
+        "releaseYear": null,
+        "vintageYear": 1991,
+        "bottlingYear": 2010,
+        "caskStrength": null,
+        "releaseMonth": null,
+        "familyContext": {
+          "siblingBottles": []
+        }
+      },
+      {
+        "abv": 43,
+        "brand": "Gordon & MacPhail",
+        "score": 54.025757,
+        "series": "Connoisseurs Choice",
+        "source": ["text"],
+        "bottler": "Gordon & MacPhail",
+        "edition": null,
+        "outturn": null,
+        "bottleId": 58742,
+        "category": "single_malt",
+        "fullName": "Gordon & MacPhail Lochside 1991",
+        "reference": null,
+        "statedAge": null,
+        "caskNumber": null,
+        "comparison": {
+          "missing": ["edition", "caskNumber", "singleCask"],
+          "conflicts": ["abv", "distillers"],
+          "agreements": ["vintageYear", "brand", "bottler"]
+        },
+        "distillery": ["Lochside"],
+        "maturation": "Refill bourbon barrels",
+        "releaseDay": null,
+        "singleCask": null,
+        "releaseYear": null,
+        "vintageYear": 1991,
+        "bottlingYear": 2005,
+        "caskStrength": null,
+        "releaseMonth": null,
+        "familyContext": {
+          "siblingBottles": []
+        }
+      },
+      {
+        "abv": 54.4,
+        "brand": "Gordon & MacPhail",
+        "score": 51.708267,
+        "series": "Private Collection",
+        "source": ["text"],
+        "bottler": "Gordon & MacPhail",
+        "edition": null,
+        "outturn": null,
+        "bottleId": 65653,
+        "category": "single_malt",
+        "fullName": "Gordon & MacPhail Glenlivet Decades",
+        "reference": null,
+        "statedAge": null,
+        "caskNumber": null,
+        "comparison": {
+          "missing": ["edition", "caskNumber", "singleCask"],
+          "conflicts": ["abv", "distillers"],
+          "agreements": ["vintageYear", "brand", "bottler"]
+        },
+        "distillery": ["The Glenlivet"],
+        "maturation": null,
+        "releaseDay": null,
+        "singleCask": null,
+        "releaseYear": null,
+        "vintageYear": 1991,
+        "bottlingYear": null,
+        "caskStrength": null,
+        "releaseMonth": null,
+        "familyContext": {
+          "siblingBottles": []
+        }
+      },
+      {
+        "abv": 40,
+        "brand": "Gordon & MacPhail",
+        "score": 51.32829,
+        "series": "Connoisseurs Choice",
+        "source": ["text"],
+        "bottler": "Gordon & MacPhail",
+        "edition": null,
+        "outturn": null,
+        "bottleId": 58773,
+        "category": "single_malt",
+        "fullName": "Gordon & MacPhail Ardbeg 1991",
+        "reference": null,
+        "statedAge": null,
+        "caskNumber": null,
+        "comparison": {
+          "missing": ["edition", "caskNumber", "singleCask"],
+          "conflicts": ["abv", "distillers"],
+          "agreements": ["vintageYear", "brand", "bottler"]
+        },
+        "distillery": ["Ardbeg"],
+        "maturation": null,
+        "releaseDay": null,
+        "singleCask": null,
+        "releaseYear": null,
+        "vintageYear": 1991,
+        "bottlingYear": 2002,
+        "caskStrength": null,
+        "releaseMonth": null,
+        "familyContext": {
+          "siblingBottles": []
+        }
+      },
+      {
+        "abv": 51.8,
+        "brand": "Gordon & MacPhail",
+        "score": 50.312096,
+        "series": "Connoisseurs Choice",
+        "source": ["text", "brand_coverage"],
+        "bottler": "Gordon & MacPhail",
+        "edition": null,
+        "outturn": 260,
+        "bottleId": 59467,
+        "category": "single_malt",
+        "fullName": "Gordon & MacPhail Balblair",
+        "reference": null,
+        "statedAge": 31,
+        "caskNumber": "3371",
+        "comparison": {
+          "missing": ["edition"],
+          "conflicts": ["statedAge", "abv", "caskNumber", "distillers"],
+          "agreements": [
+            "category",
+            "vintageYear",
+            "singleCask",
+            "caskStrength",
+            "brand",
+            "bottler"
+          ]
+        },
+        "distillery": ["Balblair"],
+        "maturation": "refill American hogshead",
+        "releaseDay": null,
+        "singleCask": true,
+        "releaseYear": null,
+        "vintageYear": 1991,
+        "bottlingYear": 2023,
+        "caskStrength": true,
+        "releaseMonth": null,
+        "familyContext": {
+          "siblingBottles": []
+        }
+      },
+      {
+        "abv": 43,
+        "brand": "Glenglassaugh",
+        "score": 49.852654,
+        "series": null,
+        "source": ["text"],
+        "bottler": null,
+        "edition": null,
+        "outturn": null,
+        "bottleId": 52969,
+        "category": "single_malt",
+        "fullName": "Glenglassaugh 12-year-old",
+        "reference": null,
+        "statedAge": 12,
+        "caskNumber": null,
+        "comparison": {
+          "missing": [
+            "edition",
+            "vintageYear",
+            "caskNumber",
+            "singleCask",
+            "bottler"
+          ],
+          "conflicts": ["abv", "brand", "distillers"],
+          "agreements": ["category", "statedAge"]
+        },
+        "distillery": ["Glenglassaugh"],
+        "maturation": null,
+        "releaseDay": null,
+        "singleCask": null,
+        "releaseYear": null,
+        "vintageYear": null,
+        "bottlingYear": 1991,
+        "caskStrength": null,
+        "releaseMonth": null,
+        "familyContext": {
+          "siblingBottles": []
+        }
+      },
+      {
+        "abv": 46,
+        "brand": "Gordon & MacPhail",
+        "score": 49.683815,
+        "series": "Connoisseurs Choice",
+        "source": ["text"],
+        "bottler": "Gordon & MacPhail",
+        "edition": null,
+        "outturn": null,
+        "bottleId": 65807,
+        "category": "single_malt",
+        "fullName": "Gordon & MacPhail Caol Ila 13-year-old",
+        "reference": null,
+        "statedAge": 13,
+        "caskNumber": null,
+        "comparison": {
+          "missing": ["edition", "caskNumber", "singleCask"],
+          "conflicts": ["abv", "distillers"],
+          "agreements": ["vintageYear", "brand", "bottler"]
+        },
+        "distillery": ["Caol Ila"],
+        "maturation": null,
+        "releaseDay": null,
+        "singleCask": null,
+        "releaseYear": null,
+        "vintageYear": 1991,
+        "bottlingYear": null,
+        "caskStrength": null,
+        "releaseMonth": null,
+        "familyContext": {
+          "siblingBottles": []
+        }
+      },
+      {
+        "abv": 45,
+        "brand": "Gordon & MacPhail",
+        "score": 47.801968,
+        "series": "Private Collection",
+        "source": ["text", "brand_coverage"],
+        "bottler": "Gordon & MacPhail",
+        "edition": null,
+        "outturn": null,
+        "bottleId": 65546,
+        "category": "single_malt",
+        "fullName": "Gordon & MacPhail Crozes-Hermitage Finish",
+        "reference": null,
+        "statedAge": 20,
+        "caskNumber": null,
+        "comparison": {
+          "missing": ["edition", "caskNumber", "singleCask"],
+          "conflicts": ["abv", "distillers"],
+          "agreements": ["vintageYear", "brand", "bottler"]
+        },
+        "distillery": ["Balblair"],
+        "maturation": "40-month Crozes-Hermitage cask finish",
+        "releaseDay": null,
+        "singleCask": null,
+        "releaseYear": null,
+        "vintageYear": 1991,
+        "bottlingYear": null,
+        "caskStrength": null,
+        "releaseMonth": null,
+        "familyContext": {
+          "siblingBottles": []
+        }
+      },
+      {
+        "abv": 53,
+        "brand": "Decadent Drams",
+        "score": 47.519264,
+        "series": null,
+        "source": ["text"],
+        "bottler": "Decadent Drinks",
+        "edition": null,
+        "outturn": 295,
+        "bottleId": 47463,
+        "category": "blend",
+        "fullName": "Decadent Drams Blended Scotch - 12-year-old - 2025 Release - 53.0% ABV",
+        "reference": null,
+        "statedAge": 12,
+        "caskNumber": null,
+        "comparison": {
+          "missing": [
+            "edition",
+            "vintageYear",
+            "caskNumber",
+            "singleCask",
+            "distillers"
+          ],
+          "conflicts": ["category", "abv", "brand", "bottler"],
+          "agreements": ["statedAge"]
+        },
+        "distillery": [],
+        "maturation": "refill sherrywood",
+        "releaseDay": null,
+        "singleCask": null,
+        "releaseYear": 2025,
+        "vintageYear": null,
+        "bottlingYear": 2025,
+        "caskStrength": null,
+        "releaseMonth": null,
+        "familyContext": {
+          "siblingBottles": []
+        }
+      },
+      {
+        "abv": 50,
+        "brand": "Douglas Laing",
+        "score": 45.35201,
+        "series": "Old Malt Cask",
+        "source": ["text"],
+        "bottler": "Douglas Laing",
+        "edition": null,
+        "outturn": null,
+        "bottleId": 47094,
+        "category": "single_malt",
+        "fullName": "Douglas Laing Ardbeg - 18-year-old - 2009 Release - 1991 Vintage - 50.0% ABV - Hogshead - Refill",
+        "reference": null,
+        "statedAge": 18,
+        "caskNumber": null,
+        "comparison": {
+          "missing": ["edition", "caskNumber", "singleCask"],
+          "conflicts": ["statedAge", "abv", "brand", "bottler", "distillers"],
+          "agreements": ["category", "vintageYear"]
+        },
+        "distillery": ["Ardbeg"],
+        "maturation": null,
+        "releaseDay": null,
+        "singleCask": null,
+        "releaseYear": 2009,
+        "vintageYear": 1991,
+        "bottlingYear": null,
+        "caskStrength": null,
+        "releaseMonth": null,
+        "familyContext": {
+          "siblingBottles": []
+        }
+      },
+      {
+        "abv": 59.2,
+        "brand": "The Scotch Malt Whisky Society",
+        "score": 44.916615,
+        "series": null,
+        "source": ["text"],
+        "bottler": "The Scotch Malt Whisky Society",
+        "edition": null,
+        "outturn": 242,
+        "bottleId": 48550,
+        "category": "single_malt",
+        "fullName": "SMWS 46.96 Becoming fonder with ponder",
+        "reference": null,
+        "statedAge": 12,
+        "caskNumber": "46.96",
+        "comparison": {
+          "missing": ["edition"],
+          "conflicts": [
+            "vintageYear",
+            "caskNumber",
+            "brand",
+            "bottler",
+            "distillers"
+          ],
+          "agreements": ["category", "statedAge", "abv", "singleCask"]
+        },
+        "distillery": ["Glenlossie"],
+        "maturation": "Refill ex-bourbon hogshead",
+        "releaseDay": null,
+        "singleCask": true,
+        "releaseYear": null,
+        "vintageYear": 2007,
+        "bottlingYear": null,
+        "caskStrength": null,
+        "releaseMonth": null,
+        "familyContext": {
+          "siblingBottles": []
+        }
+      },
+      {
+        "abv": null,
+        "brand": "Lux Row Distillers",
+        "score": 43.570297,
+        "series": null,
+        "source": ["text"],
+        "bottler": null,
+        "edition": null,
+        "outturn": null,
+        "bottleId": 13599,
+        "category": "bourbon",
+        "fullName": "Lux Row Distillers 12-year-old Double Barrel Kentucky Straight Bourbon",
+        "reference": null,
+        "statedAge": 12,
+        "caskNumber": null,
+        "comparison": {
+          "missing": [
+            "edition",
+            "abv",
+            "vintageYear",
+            "caskNumber",
+            "singleCask",
+            "bottler",
+            "distillers"
+          ],
+          "conflicts": ["category", "brand"],
+          "agreements": ["statedAge"]
+        },
+        "distillery": [],
+        "maturation": null,
+        "releaseDay": null,
+        "singleCask": null,
+        "releaseYear": null,
+        "vintageYear": null,
+        "bottlingYear": null,
+        "caskStrength": null,
+        "releaseMonth": null,
+        "familyContext": {
+          "siblingBottles": []
+        }
+      },
+      {
+        "abv": 43,
+        "brand": "Gordon & MacPhail",
+        "score": 42.498093,
+        "series": "Connoisseurs Choice",
+        "source": ["text"],
+        "bottler": "Gordon & MacPhail",
+        "edition": null,
+        "outturn": null,
+        "bottleId": 55810,
+        "category": "single_malt",
+        "fullName": "Gordon & MacPhail Brora",
+        "reference": null,
+        "statedAge": null,
+        "caskNumber": null,
+        "comparison": {
+          "missing": ["edition", "statedAge", "caskNumber", "singleCask"],
+          "conflicts": ["abv", "vintageYear", "distillers"],
+          "agreements": ["category", "brand", "bottler"]
+        },
+        "distillery": ["Brora"],
+        "maturation": "Refill sherry butts",
+        "releaseDay": null,
+        "singleCask": null,
+        "releaseYear": null,
+        "vintageYear": 1982,
+        "bottlingYear": 2006,
+        "caskStrength": null,
+        "releaseMonth": null,
+        "familyContext": {
+          "siblingBottles": []
+        }
+      },
+      {
+        "abv": null,
+        "brand": "Rosebank",
+        "score": 41.236076,
+        "series": null,
+        "source": ["text"],
+        "bottler": "Speciality Drinks Ltd",
+        "edition": null,
+        "outturn": null,
+        "bottleId": 4698,
+        "category": "single_malt",
+        "fullName": "Rosebank 1991 SMS The Single Malts of Scotland",
+        "reference": null,
+        "statedAge": 30,
+        "caskNumber": null,
+        "comparison": {
+          "missing": [
+            "edition",
+            "abv",
+            "vintageYear",
+            "caskNumber",
+            "singleCask",
+            "distillers"
+          ],
+          "conflicts": ["brand", "bottler"],
+          "agreements": []
+        },
+        "distillery": [],
+        "maturation": null,
+        "releaseDay": null,
+        "singleCask": null,
+        "releaseYear": null,
+        "vintageYear": null,
+        "bottlingYear": null,
+        "caskStrength": null,
+        "releaseMonth": null,
+        "familyContext": {
+          "siblingBottles": []
+        }
+      },
+      {
+        "abv": null,
+        "brand": "Gordon & MacPhail",
+        "score": 34.832558,
+        "series": null,
+        "source": ["text"],
+        "bottler": "Gordon & MacPhail",
+        "edition": null,
+        "outturn": null,
+        "bottleId": 64035,
+        "category": "single_malt",
+        "fullName": "Gordon & MacPhail Mortlach",
+        "reference": null,
+        "statedAge": 21,
+        "caskNumber": null,
+        "comparison": {
+          "missing": [
+            "edition",
+            "abv",
+            "vintageYear",
+            "caskNumber",
+            "singleCask"
+          ],
+          "conflicts": ["distillers"],
+          "agreements": ["brand", "bottler"]
+        },
+        "distillery": ["Mortlach"],
+        "maturation": "first fill and refill sherry casks",
+        "releaseDay": null,
+        "singleCask": null,
+        "releaseYear": null,
+        "vintageYear": null,
+        "bottlingYear": null,
+        "caskStrength": null,
+        "releaseMonth": null,
+        "familyContext": {
+          "siblingBottles": []
+        }
+      },
+      {
+        "abv": null,
+        "brand": "Rosebank",
+        "score": 0.7356379164065437,
+        "series": null,
+        "source": ["vector"],
+        "bottler": null,
+        "edition": null,
+        "outturn": null,
+        "bottleId": 12877,
+        "category": "single_malt",
+        "fullName": "Rosebank 30-year-old 1990 (Release 1)",
+        "reference": "Rosebank 30-year-old 1990 (Release 1), 48.6%",
+        "statedAge": 30,
+        "caskNumber": null,
+        "comparison": {
+          "missing": [
+            "edition",
+            "abv",
+            "vintageYear",
+            "caskNumber",
+            "singleCask",
+            "bottler",
+            "distillers"
+          ],
+          "conflicts": ["brand"],
+          "agreements": []
+        },
+        "distillery": [],
+        "maturation": null,
+        "releaseDay": null,
+        "singleCask": null,
+        "releaseYear": null,
+        "vintageYear": null,
+        "bottlingYear": null,
+        "caskStrength": null,
+        "releaseMonth": null,
+        "familyContext": {
+          "siblingBottles": []
+        }
+      }
+    ]
+  },
+  "context": {
+    "inspectedBottleIds": [47124, 65711],
+    "bottleContexts": [
+      {
+        "exact": {
+          "abv": 53.1,
+          "edition": null,
+          "outturn": null,
+          "statedAge": 34,
+          "caskNumber": null,
+          "maturation": null,
+          "releaseDay": null,
+          "singleCask": null,
+          "releaseYear": 2025,
+          "vintageYear": 1991,
+          "bottlingYear": null,
+          "caskStrength": null,
+          "releaseMonth": null
+        },
+        "shared": {
+          "name": "Rosebank",
+          "brand": {
+            "name": "Gordon & MacPhail",
+            "entityId": 5645
+          },
+          "series": {
+            "name": "Connoisseurs Choice Heritage",
+            "seriesId": 361
+          },
+          "bottler": {
+            "name": "Gordon & MacPhail",
+            "entityId": 5645
+          },
+          "category": "single_malt",
+          "statedAge": null,
+          "distillers": [
+            {
+              "name": "Rosebank",
+              "entityId": 1296
+            }
+          ]
+        },
+        "groupId": 20084,
+        "bottleId": 47124,
+        "fullName": "Gordon & MacPhail Rosebank - 34-year-old - 2025 Release - 1991 Vintage - 53.1% ABV",
+        "siblings": [],
+        "references": [
+          {
+            "name": "Gordon & MacPhail Rosebank - 34-year-old - 2025 Release - 1991 Vintage - 53.1% ABV",
+            "ignored": false
+          },
+          {
+            "name": "Rosebank 34-year-old 1991/2025 (53.1%, Gordon & MacPhail, Connoisseurs Choice Heritage Collection, First-Fill Bourbon Barrel)",
+            "ignored": false
+          }
+        ],
+        "observations": [],
+        "imageSources": []
+      },
+      {
+        "exact": {
+          "abv": 59.3,
+          "edition": null,
+          "outturn": null,
+          "statedAge": 13,
+          "caskNumber": "#1536",
+          "maturation": "refill sherry cask",
+          "releaseDay": null,
+          "singleCask": true,
+          "releaseYear": null,
+          "vintageYear": 1991,
+          "bottlingYear": null,
+          "caskStrength": null,
+          "releaseMonth": null
+        },
+        "shared": {
+          "name": "Rosebank",
+          "brand": {
+            "name": "Gordon & MacPhail",
+            "entityId": 5645
+          },
+          "series": null,
+          "bottler": {
+            "name": "Gordon & MacPhail",
+            "entityId": 5645
+          },
+          "category": "single_malt",
+          "statedAge": null,
+          "distillers": [
+            {
+              "name": "Rosebank",
+              "entityId": 1296
+            }
+          ]
+        },
+        "groupId": 38672,
+        "bottleId": 65711,
+        "fullName": "Gordon & MacPhail Rosebank",
+        "siblings": [],
+        "references": [
+          {
+            "name": "Gordon & MacPhail cask #1536, 1991 vintage, 13-year-old (distilled at Rosebank)",
+            "ignored": false
+          },
+          {
+            "name": "Gordon & MacPhail (distilled at Rosebank), cask #1536, 1991 vintage, 13-year-old, 59.3%",
+            "ignored": false
+          }
+        ],
+        "observations": [],
+        "imageSources": []
+      }
+    ],
+    "inspectedEntities": [
+      {
+        "kind": "bottler",
+        "name": "Gordon & MacPhail",
+        "score": 1,
+        "source": ["exact", "text", "prefix", "contained"],
+        "entityId": 5645,
+        "reference": "Gordon & MacPhail",
+        "shortName": null,
+        "retrievedFor": [
+          {
+            "exact": true,
+            "query": "Gordon & MacPhail"
+          }
+        ]
+      },
+      {
+        "kind": "distillery",
+        "name": "Rosebank",
+        "score": 1,
+        "source": ["exact", "text", "prefix", "contained"],
+        "entityId": 1296,
+        "reference": "Rosebank",
+        "shortName": null,
+        "retrievedFor": [
+          {
+            "exact": true,
+            "query": "Rosebank"
+          }
+        ]
+      },
+      {
+        "kind": "distillery",
+        "name": "Mortlach",
+        "score": 1,
+        "source": ["exact", "text", "prefix", "contained"],
+        "entityId": 1189,
+        "reference": "Mortlach",
+        "shortName": null,
+        "retrievedFor": [
+          {
+            "exact": true,
+            "query": "Mortlach"
+          }
+        ]
+      },
+      {
+        "kind": "bottler",
+        "name": "Speciality Drinks Ltd",
+        "score": 1,
+        "source": ["exact", "text", "prefix", "contained"],
+        "entityId": 6052,
+        "reference": "Speciality Drinks Ltd",
+        "shortName": null,
+        "retrievedFor": [
+          {
+            "exact": true,
+            "query": "Speciality Drinks Ltd"
+          }
+        ]
+      },
+      {
+        "kind": "distillery",
+        "name": "Littlemill",
+        "score": 1,
+        "source": ["exact", "text", "prefix", "contained"],
+        "entityId": 1142,
+        "reference": "Littlemill",
+        "shortName": null,
+        "retrievedFor": [
+          {
+            "exact": true,
+            "query": "Littlemill"
+          }
+        ]
+      },
+      {
+        "kind": "distillery",
+        "name": "The Glenlivet",
+        "score": 1,
+        "source": ["exact", "text", "prefix", "contained"],
+        "entityId": 244,
+        "reference": "Glenlivet",
+        "shortName": null,
+        "retrievedFor": [
+          {
+            "exact": true,
+            "query": "The Glenlivet"
+          }
+        ]
+      },
+      {
+        "kind": "distillery",
+        "name": "Ardbeg",
+        "score": 1,
+        "source": ["exact", "text", "prefix", "contained"],
+        "entityId": 28,
+        "reference": "Ardbeg",
+        "shortName": null,
+        "retrievedFor": [
+          {
+            "exact": true,
+            "query": "Ardbeg"
+          }
+        ]
+      },
+      {
+        "kind": "distillery",
+        "name": "Caol Ila",
+        "score": 1,
+        "source": ["exact", "text", "prefix", "contained"],
+        "entityId": 366,
+        "reference": "Caol Ila",
+        "shortName": "",
+        "retrievedFor": [
+          {
+            "exact": true,
+            "query": "Caol Ila"
+          }
+        ]
+      },
+      {
+        "kind": "distillery",
+        "name": "Lochside",
+        "score": 1,
+        "source": ["exact", "text", "prefix", "contained"],
+        "entityId": 1147,
+        "reference": "Lochside",
+        "shortName": null,
+        "retrievedFor": [
+          {
+            "exact": true,
+            "query": "Lochside"
+          }
+        ]
+      },
+      {
+        "kind": "distillery",
+        "name": "Bladnoch",
+        "score": 1,
+        "source": ["exact", "text", "prefix", "contained"],
+        "entityId": 110,
+        "reference": "Bladnoch",
+        "shortName": null,
+        "retrievedFor": [
+          {
+            "exact": true,
+            "query": "Bladnoch"
+          }
+        ]
+      },
+      {
+        "kind": "distillery",
+        "name": "Balblair",
+        "score": 1,
+        "source": ["exact", "text", "prefix", "contained"],
+        "entityId": 38,
+        "reference": "Balblair",
+        "shortName": null,
+        "retrievedFor": [
+          {
+            "exact": true,
+            "query": "Balblair"
+          }
+        ]
+      },
+      {
+        "kind": "bottler",
+        "name": "Signatory Vintage",
+        "score": 1,
+        "source": ["exact", "text", "prefix", "contained"],
+        "entityId": 5725,
+        "reference": "Signatory Vintage",
+        "shortName": null,
+        "retrievedFor": [
+          {
+            "exact": true,
+            "query": "Signatory Vintage"
+          }
+        ]
+      },
+      {
+        "kind": "bottler",
+        "name": "Littlemill Blenders Ltd.",
+        "score": 0.5,
+        "source": ["text", "prefix"],
+        "entityId": 5862,
+        "reference": "Littlemill Blenders Ltd.",
+        "shortName": null,
+        "retrievedFor": [
+          {
+            "query": "Littlemill"
+          }
+        ]
+      },
+      {
+        "kind": "bottler",
+        "name": "Bladnoch Forum",
+        "score": 0.5,
+        "source": ["text", "prefix"],
+        "entityId": 5595,
+        "reference": "Bladnoch Forum",
+        "shortName": null,
+        "retrievedFor": [
+          {
+            "query": "Bladnoch"
+          }
+        ]
+      },
+      {
+        "kind": "brand",
+        "name": "Emill",
+        "score": 0.35,
+        "source": ["contained"],
+        "entityId": 2682,
+        "reference": "Emill",
+        "shortName": null,
+        "retrievedFor": [
+          {
+            "query": "Littlemill"
+          }
+        ]
+      },
+      {
+        "kind": "brand",
+        "name": "Vintage",
+        "score": 0.3375,
+        "source": ["contained"],
+        "entityId": 4392,
+        "reference": "Vintage",
+        "shortName": null,
+        "retrievedFor": [
+          {
+            "query": "Signatory Vintage"
+          }
+        ]
+      },
+      {
+        "kind": "distillery",
+        "name": "The Macallan",
+        "score": 0.2,
+        "source": ["text"],
+        "entityId": 1157,
+        "reference": null,
+        "shortName": null,
+        "retrievedFor": [
+          {
+            "query": "The Glenlivet"
+          }
+        ]
+      }
+    ],
+    "inspectedSeries": []
+  },
+  "provenance": {
+    "source": "production_miss",
+    "verifiedSourceUrls": [
+      "https://whiskyadvocate.com/Gordon-MacPhail-Single-Cask-N1535-distilled-at-Rosebank-1991-Vintage-59-2-ABV",
+      "https://www.thewhiskyexchange.com/p/11261/rosebank-1991-cask-strength-gordon-macphail"
+    ],
+    "dbOutcome": {
+      "bottleId": 65834,
+      "createsBottle": true,
+      "summary": "Production returned create_bottle with the name `Rosebank 12-year-old`."
+    },
+    "notes": "Captured from saved classifier run 18571 (review 8265, model openai/gpt-6-luna, 2026-09-28T06:28:15.952Z). Production rationale: Create the exact Gordon & MacPhail Rosebank single-cask release: the Whisky Advocate listing identifies cask #1535, 1991 vintage, and 59.2% ABV; its description gives a 12-year age and cask strength. The nearby local cask #1536 bottle is a different release (13 years, 59.3%, cask #1536), and bottle 47124 is a distinct 2025, 34-year release at 53.1%. No inspected local candidate represents this product. The Whisky Exchange lists the G&M Cask Strength release as Rosebank 1991 with no age; production named it Rosebank 12-year-old."
+  },
+  "expected": {
+    "status": "classified",
+    "action": "create_bottle",
+    "identityScope": "exact_cask",
+    "matchedBottleId": null,
+    "proposedBottle": {
+      "brand": {
+        "id": 5645,
+        "name": "Gordon & MacPhail"
+      },
+      "vintageYear": 1991
+    },
+    "proposedBottleNameOneOf": ["Rosebank 1991"],
+    "proposedBottleNameExcludes": ["year-old", "Vintage"],
+    "summary": "Create the G&M Cask Strength Rosebank 1991 single cask named Rosebank 1991, with the cask in edition or caskNumber and no age, because neither the title nor the trade listing prints one."
+  }
+}

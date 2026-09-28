@@ -1,0 +1,1270 @@
+{
+  "id": "review-creates-gm-rosebank-1989-10-year-old-with-vintage-before-age",
+  "name": "review: creates G&M Rosebank 1989 with the vintage before the age",
+  "input": {
+    "reference": {
+      "id": 8383,
+      "url": "https://whiskyadvocate.com/Gordon-MacPhail-distilled-at-Rosebank-1989-Vintage-10-year-old-40",
+      "name": "Gordon & MacPhail 1989 Vintage, 10-year-old (distilled at Rosebank)",
+      "imageUrl": null,
+      "externalSiteId": 5,
+      "currentBottleId": null
+    },
+    "extractedIdentity": {
+      "abv": null,
+      "brand": "Gordon & MacPhail",
+      "series": null,
+      "bottler": "Gordon & MacPhail",
+      "edition": null,
+      "outturn": null,
+      "category": null,
+      "distillery": ["Rosebank"],
+      "expression": null,
+      "maturation": null,
+      "stated_age": 10,
+      "cask_number": null,
+      "release_day": null,
+      "single_cask": null,
+      "release_year": null,
+      "vintage_year": 1989,
+      "bottling_year": null,
+      "cask_strength": null,
+      "release_month": null
+    },
+    "imageEvidence": null,
+    "initialCandidates": [
+      {
+        "abv": 43,
+        "brand": "Gordon & MacPhail",
+        "score": 65.061035,
+        "series": "Discovery",
+        "source": ["text"],
+        "bottler": "Gordon & MacPhail",
+        "edition": null,
+        "outturn": null,
+        "bottleId": 45885,
+        "category": "single_malt",
+        "fullName": "Gordon & MacPhail Auchroisk - 10-year-old - 43.0% ABV - Bourbon Cask",
+        "reference": null,
+        "statedAge": 10,
+        "caskNumber": null,
+        "comparison": {
+          "missing": ["vintageYear"],
+          "conflicts": ["distillers"],
+          "agreements": ["statedAge", "brand", "bottler"]
+        },
+        "distillery": ["Auchroisk"],
+        "maturation": "bourbon",
+        "releaseDay": null,
+        "singleCask": null,
+        "releaseYear": null,
+        "vintageYear": null,
+        "bottlingYear": null,
+        "caskStrength": null,
+        "releaseMonth": null,
+        "familyContext": {
+          "siblingBottles": []
+        }
+      },
+      {
+        "abv": 43,
+        "brand": "Gordon & MacPhail",
+        "score": 65.061035,
+        "series": "Discovery",
+        "source": ["text"],
+        "bottler": "Gordon & MacPhail",
+        "edition": null,
+        "outturn": null,
+        "bottleId": 47153,
+        "category": "single_malt",
+        "fullName": "Gordon & MacPhail Miltonduff - 10-year-old - 43.0% ABV - Other Cask",
+        "reference": null,
+        "statedAge": 10,
+        "caskNumber": null,
+        "comparison": {
+          "missing": ["vintageYear"],
+          "conflicts": ["distillers"],
+          "agreements": ["statedAge", "brand", "bottler"]
+        },
+        "distillery": ["Miltonduff"],
+        "maturation": "other",
+        "releaseDay": null,
+        "singleCask": null,
+        "releaseYear": null,
+        "vintageYear": null,
+        "bottlingYear": null,
+        "caskStrength": null,
+        "releaseMonth": null,
+        "familyContext": {
+          "siblingBottles": []
+        }
+      },
+      {
+        "abv": 40,
+        "brand": "Gordon & MacPhail",
+        "score": 64.60834,
+        "series": null,
+        "source": ["text"],
+        "bottler": "Gordon & MacPhail",
+        "edition": null,
+        "outturn": null,
+        "bottleId": 58744,
+        "category": "single_malt",
+        "fullName": "Gordon & MacPhail Dallas Dhu 10-year-old",
+        "reference": null,
+        "statedAge": 10,
+        "caskNumber": null,
+        "comparison": {
+          "missing": ["vintageYear"],
+          "conflicts": ["distillers"],
+          "agreements": ["statedAge", "brand", "bottler"]
+        },
+        "distillery": ["Dallas Dhu"],
+        "maturation": null,
+        "releaseDay": null,
+        "singleCask": null,
+        "releaseYear": null,
+        "vintageYear": null,
+        "bottlingYear": null,
+        "caskStrength": null,
+        "releaseMonth": null,
+        "familyContext": {
+          "siblingBottles": []
+        }
+      },
+      {
+        "abv": 40,
+        "brand": "Gordon & MacPhail",
+        "score": 63.20668,
+        "series": null,
+        "source": ["vector", "text"],
+        "bottler": "Gordon & MacPhail",
+        "edition": null,
+        "outturn": null,
+        "bottleId": 65057,
+        "category": "single_malt",
+        "fullName": "Gordon & MacPhail Glen Grant",
+        "reference": "Gordon & MacPhail 10-year-old (distilled at Glen Grant), 40%",
+        "statedAge": 10,
+        "caskNumber": null,
+        "comparison": {
+          "missing": ["vintageYear"],
+          "conflicts": ["distillers"],
+          "agreements": ["statedAge", "brand", "bottler"]
+        },
+        "distillery": ["The Glen Grant"],
+        "maturation": "refill bourbon casks",
+        "releaseDay": null,
+        "singleCask": null,
+        "releaseYear": null,
+        "vintageYear": null,
+        "bottlingYear": null,
+        "caskStrength": null,
+        "releaseMonth": null,
+        "familyContext": {
+          "siblingBottles": []
+        }
+      },
+      {
+        "abv": 40,
+        "brand": "Gordon & MacPhail",
+        "score": 61.035954,
+        "series": "Connoisseurs Choice",
+        "source": ["text", "brand_coverage"],
+        "bottler": "Gordon & MacPhail",
+        "edition": null,
+        "outturn": null,
+        "bottleId": 60998,
+        "category": "single_malt",
+        "fullName": "Gordon & MacPhail Ledaig 10-year-old 1972",
+        "reference": null,
+        "statedAge": 10,
+        "caskNumber": null,
+        "comparison": {
+          "missing": [],
+          "conflicts": ["vintageYear", "distillers"],
+          "agreements": ["statedAge", "brand", "bottler"]
+        },
+        "distillery": ["Tobermory"],
+        "maturation": null,
+        "releaseDay": null,
+        "singleCask": null,
+        "releaseYear": null,
+        "vintageYear": 1972,
+        "bottlingYear": null,
+        "caskStrength": null,
+        "releaseMonth": null,
+        "familyContext": {
+          "siblingBottles": []
+        }
+      },
+      {
+        "abv": 43,
+        "brand": "Gordon & MacPhail",
+        "score": 58.9412,
+        "series": "Distillery Labels",
+        "source": ["text"],
+        "bottler": "Gordon & MacPhail",
+        "edition": null,
+        "outturn": null,
+        "bottleId": 65164,
+        "category": "single_malt",
+        "fullName": "Gordon & MacPhail Balblair",
+        "reference": null,
+        "statedAge": 10,
+        "caskNumber": null,
+        "comparison": {
+          "missing": ["vintageYear"],
+          "conflicts": ["distillers"],
+          "agreements": ["statedAge", "brand", "bottler"]
+        },
+        "distillery": ["Balblair"],
+        "maturation": null,
+        "releaseDay": null,
+        "singleCask": null,
+        "releaseYear": null,
+        "vintageYear": null,
+        "bottlingYear": null,
+        "caskStrength": null,
+        "releaseMonth": null,
+        "familyContext": {
+          "siblingBottles": []
+        }
+      },
+      {
+        "abv": 46,
+        "brand": "Gordon & MacPhail",
+        "score": 58.339386,
+        "series": null,
+        "source": ["vector", "text", "brand_coverage"],
+        "bottler": "Gordon & MacPhail",
+        "edition": null,
+        "outturn": null,
+        "bottleId": 65800,
+        "category": "single_malt",
+        "fullName": "Gordon & MacPhail Longmorn 15-year-old, 1989 vintage",
+        "reference": "Gordon & MacPhail 15-year-old old, 1989 vintage (distilled at Longmorn)",
+        "statedAge": 15,
+        "caskNumber": null,
+        "comparison": {
+          "missing": [],
+          "conflicts": ["statedAge", "distillers"],
+          "agreements": ["vintageYear", "brand", "bottler"]
+        },
+        "distillery": ["Longmorn"],
+        "maturation": null,
+        "releaseDay": null,
+        "singleCask": null,
+        "releaseYear": null,
+        "vintageYear": 1989,
+        "bottlingYear": null,
+        "caskStrength": null,
+        "releaseMonth": null,
+        "familyContext": {
+          "siblingBottles": []
+        }
+      },
+      {
+        "abv": 43,
+        "brand": "Gordon & MacPhail",
+        "score": 58.148113,
+        "series": "Distillery Labels",
+        "source": ["text"],
+        "bottler": "Gordon & MacPhail",
+        "edition": null,
+        "outturn": null,
+        "bottleId": 65059,
+        "category": "single_malt",
+        "fullName": "Gordon & MacPhail Scapa",
+        "reference": null,
+        "statedAge": 10,
+        "caskNumber": null,
+        "comparison": {
+          "missing": [],
+          "conflicts": ["vintageYear", "distillers"],
+          "agreements": ["statedAge", "brand", "bottler"]
+        },
+        "distillery": ["Scapa"],
+        "maturation": "First-fill bourbon barrels",
+        "releaseDay": null,
+        "singleCask": null,
+        "releaseYear": null,
+        "vintageYear": 2001,
+        "bottlingYear": null,
+        "caskStrength": null,
+        "releaseMonth": null,
+        "familyContext": {
+          "siblingBottles": []
+        }
+      },
+      {
+        "abv": 43,
+        "brand": "Gordon & MacPhail",
+        "score": 57.34857,
+        "series": "Connoisseurs Choice",
+        "source": ["vector", "text"],
+        "bottler": "Gordon & MacPhail",
+        "edition": null,
+        "outturn": null,
+        "bottleId": 65817,
+        "category": "single_malt",
+        "fullName": "Gordon & MacPhail Tamnavulin 1989 Vintage",
+        "reference": "Gordon & MacPhail 43%, 1989 Vintage (distilled at Tamnavulin)",
+        "statedAge": null,
+        "caskNumber": null,
+        "comparison": {
+          "missing": ["statedAge"],
+          "conflicts": ["distillers"],
+          "agreements": ["vintageYear", "brand", "bottler"]
+        },
+        "distillery": ["Tamnavulin"],
+        "maturation": null,
+        "releaseDay": null,
+        "singleCask": null,
+        "releaseYear": null,
+        "vintageYear": 1989,
+        "bottlingYear": 2004,
+        "caskStrength": null,
+        "releaseMonth": null,
+        "familyContext": {
+          "siblingBottles": []
+        }
+      },
+      {
+        "abv": 57.9,
+        "brand": "Gordon & MacPhail",
+        "score": 56.954067,
+        "series": null,
+        "source": ["text"],
+        "bottler": "Gordon & MacPhail",
+        "edition": null,
+        "outturn": null,
+        "bottleId": 65837,
+        "category": "single_malt",
+        "fullName": "Gordon & MacPhail Bruichladdich 1989 Vintage",
+        "reference": null,
+        "statedAge": null,
+        "caskNumber": "#1961",
+        "comparison": {
+          "missing": ["statedAge"],
+          "conflicts": ["distillers"],
+          "agreements": ["vintageYear", "brand", "bottler"]
+        },
+        "distillery": ["Bruichladdich"],
+        "maturation": null,
+        "releaseDay": null,
+        "singleCask": true,
+        "releaseYear": null,
+        "vintageYear": 1989,
+        "bottlingYear": null,
+        "caskStrength": null,
+        "releaseMonth": null,
+        "familyContext": {
+          "siblingBottles": []
+        }
+      },
+      {
+        "abv": null,
+        "brand": "Murray McDavid",
+        "score": 55.42514,
+        "series": null,
+        "source": ["text"],
+        "bottler": null,
+        "edition": null,
+        "outturn": null,
+        "bottleId": 18994,
+        "category": "single_malt",
+        "fullName": "Murray McDavid 1992, 10-year-old (distilled at Rosebank)",
+        "reference": null,
+        "statedAge": 10,
+        "caskNumber": null,
+        "comparison": {
+          "missing": ["vintageYear", "bottler", "distillers"],
+          "conflicts": ["brand"],
+          "agreements": ["statedAge"]
+        },
+        "distillery": [],
+        "maturation": null,
+        "releaseDay": null,
+        "singleCask": null,
+        "releaseYear": null,
+        "vintageYear": null,
+        "bottlingYear": null,
+        "caskStrength": null,
+        "releaseMonth": null,
+        "familyContext": {
+          "siblingBottles": []
+        }
+      },
+      {
+        "abv": 40,
+        "brand": "Gordon & MacPhail",
+        "score": 55.248608,
+        "series": "Rare Old",
+        "source": ["text", "brand_coverage"],
+        "bottler": "Gordon & MacPhail",
+        "edition": null,
+        "outturn": null,
+        "bottleId": 55986,
+        "category": "single_malt",
+        "fullName": "Gordon & MacPhail Brora",
+        "reference": null,
+        "statedAge": null,
+        "caskNumber": null,
+        "comparison": {
+          "missing": ["statedAge", "caskStrength"],
+          "conflicts": ["vintageYear", "distillers"],
+          "agreements": ["category", "abv", "brand", "bottler", "series"]
+        },
+        "distillery": ["Brora"],
+        "maturation": null,
+        "releaseDay": null,
+        "singleCask": null,
+        "releaseYear": null,
+        "vintageYear": 1972,
+        "bottlingYear": 1997,
+        "caskStrength": null,
+        "releaseMonth": null,
+        "familyContext": {
+          "siblingBottles": []
+        }
+      },
+      {
+        "abv": 40,
+        "brand": "Gordon & MacPhail",
+        "score": 53.666527,
+        "series": "Rare Old",
+        "source": ["text"],
+        "bottler": "Gordon & MacPhail",
+        "edition": null,
+        "outturn": null,
+        "bottleId": 61360,
+        "category": "single_malt",
+        "fullName": "Gordon & MacPhail Convalmore 1960",
+        "reference": null,
+        "statedAge": null,
+        "caskNumber": null,
+        "comparison": {
+          "missing": ["statedAge", "caskStrength"],
+          "conflicts": ["vintageYear", "distillers"],
+          "agreements": ["category", "abv", "brand", "bottler", "series"]
+        },
+        "distillery": ["Convalmore"],
+        "maturation": null,
+        "releaseDay": null,
+        "singleCask": null,
+        "releaseYear": null,
+        "vintageYear": 1960,
+        "bottlingYear": 1996,
+        "caskStrength": null,
+        "releaseMonth": null,
+        "familyContext": {
+          "siblingBottles": []
+        }
+      },
+      {
+        "abv": 40,
+        "brand": "Gordon & MacPhail",
+        "score": 53.666527,
+        "series": "Rare Old",
+        "source": ["text", "brand_coverage"],
+        "bottler": "Gordon & MacPhail",
+        "edition": null,
+        "outturn": null,
+        "bottleId": 61344,
+        "category": "single_malt",
+        "fullName": "Gordon & MacPhail Convalmore 1960",
+        "reference": null,
+        "statedAge": null,
+        "caskNumber": null,
+        "comparison": {
+          "missing": ["statedAge", "caskStrength"],
+          "conflicts": ["vintageYear", "distillers"],
+          "agreements": ["category", "abv", "brand", "bottler", "series"]
+        },
+        "distillery": ["Convalmore"],
+        "maturation": null,
+        "releaseDay": null,
+        "singleCask": null,
+        "releaseYear": null,
+        "vintageYear": 1960,
+        "bottlingYear": 2002,
+        "caskStrength": null,
+        "releaseMonth": null,
+        "familyContext": {
+          "siblingBottles": []
+        }
+      },
+      {
+        "abv": 46,
+        "brand": "Gordon & MacPhail",
+        "score": 53.020576,
+        "series": "Private Collection",
+        "source": ["vector", "text"],
+        "bottler": "Gordon & MacPhail",
+        "edition": null,
+        "outturn": null,
+        "bottleId": 65658,
+        "category": "single_malt",
+        "fullName": "Gordon & MacPhail Port Wood Finish",
+        "reference": "Gordon & MacPhail \"Private Collection\" Port Wood Finish 1998 Vintage, 10-year-old (distilled at Caol Ila)",
+        "statedAge": 10,
+        "caskNumber": null,
+        "comparison": {
+          "missing": [],
+          "conflicts": ["vintageYear", "distillers"],
+          "agreements": ["statedAge", "brand", "bottler"]
+        },
+        "distillery": ["Caol Ila"],
+        "maturation": "Port wood finish",
+        "releaseDay": null,
+        "singleCask": null,
+        "releaseYear": null,
+        "vintageYear": 1998,
+        "bottlingYear": null,
+        "caskStrength": null,
+        "releaseMonth": null,
+        "familyContext": {
+          "siblingBottles": []
+        }
+      },
+      {
+        "abv": 46,
+        "brand": "Gordon & MacPhail",
+        "score": 53.020576,
+        "series": "Private Collection",
+        "source": ["text"],
+        "bottler": "Gordon & MacPhail",
+        "edition": null,
+        "outturn": null,
+        "bottleId": 65659,
+        "category": "single_malt",
+        "fullName": "Gordon & MacPhail Madeira Wood Finish",
+        "reference": null,
+        "statedAge": 10,
+        "caskNumber": null,
+        "comparison": {
+          "missing": [],
+          "conflicts": ["vintageYear", "distillers"],
+          "agreements": ["statedAge", "brand", "bottler"]
+        },
+        "distillery": ["Caol Ila"],
+        "maturation": "Madeira wood finish",
+        "releaseDay": null,
+        "singleCask": null,
+        "releaseYear": null,
+        "vintageYear": 1998,
+        "bottlingYear": null,
+        "caskStrength": null,
+        "releaseMonth": null,
+        "familyContext": {
+          "siblingBottles": []
+        }
+      },
+      {
+        "abv": 40,
+        "brand": "Isle of Jura",
+        "score": 51.107513,
+        "series": null,
+        "source": ["text"],
+        "bottler": null,
+        "edition": null,
+        "outturn": null,
+        "bottleId": 45943,
+        "category": "single_malt",
+        "fullName": "Isle of Jura Origin - 10-year-old - 40.0% ABV - Oloroso Cask",
+        "reference": null,
+        "statedAge": 10,
+        "caskNumber": null,
+        "comparison": {
+          "missing": ["vintageYear", "caskStrength", "bottler"],
+          "conflicts": ["brand", "distillers"],
+          "agreements": ["category", "statedAge", "abv"]
+        },
+        "distillery": ["Isle of Jura"],
+        "maturation": "oloroso",
+        "releaseDay": null,
+        "singleCask": null,
+        "releaseYear": null,
+        "vintageYear": null,
+        "bottlingYear": null,
+        "caskStrength": null,
+        "releaseMonth": null,
+        "familyContext": {
+          "siblingBottles": []
+        }
+      },
+      {
+        "abv": 40,
+        "brand": "anCnoc",
+        "score": 50.624207,
+        "series": null,
+        "source": ["text"],
+        "bottler": null,
+        "edition": null,
+        "outturn": null,
+        "bottleId": 45882,
+        "category": "single_malt",
+        "fullName": "anCnoc Peated - 10-year-old - 40.0% ABV - Bourbon Cask",
+        "reference": null,
+        "statedAge": 10,
+        "caskNumber": null,
+        "comparison": {
+          "missing": ["vintageYear", "caskStrength", "bottler"],
+          "conflicts": ["brand", "distillers"],
+          "agreements": ["category", "statedAge", "abv"]
+        },
+        "distillery": ["Knockdhu"],
+        "maturation": "bourbon",
+        "releaseDay": null,
+        "singleCask": null,
+        "releaseYear": null,
+        "vintageYear": null,
+        "bottlingYear": null,
+        "caskStrength": null,
+        "releaseMonth": null,
+        "familyContext": {
+          "siblingBottles": []
+        }
+      },
+      {
+        "abv": null,
+        "brand": "Glen Breton Rare",
+        "score": 47.207947,
+        "series": null,
+        "source": ["text"],
+        "bottler": null,
+        "edition": null,
+        "outturn": null,
+        "bottleId": 16267,
+        "category": "single_malt",
+        "fullName": "Glen Breton Rare 10-year-old",
+        "reference": null,
+        "statedAge": 10,
+        "caskNumber": null,
+        "comparison": {
+          "missing": [
+            "abv",
+            "vintageYear",
+            "caskStrength",
+            "bottler",
+            "series"
+          ],
+          "conflicts": ["brand", "distillers"],
+          "agreements": ["category", "statedAge"]
+        },
+        "distillery": ["Glenora Distillery"],
+        "maturation": null,
+        "releaseDay": null,
+        "singleCask": null,
+        "releaseYear": null,
+        "vintageYear": null,
+        "bottlingYear": null,
+        "caskStrength": null,
+        "releaseMonth": null,
+        "familyContext": {
+          "siblingBottles": []
+        }
+      },
+      {
+        "abv": 40,
+        "brand": "Isle of Jura",
+        "score": 46.90142,
+        "series": null,
+        "source": ["text"],
+        "bottler": null,
+        "edition": null,
+        "outturn": null,
+        "bottleId": 44114,
+        "category": "single_malt",
+        "fullName": "Isle of Jura 10-year-old - 40.0% ABV - Oloroso Cask",
+        "reference": null,
+        "statedAge": 10,
+        "caskNumber": null,
+        "comparison": {
+          "missing": ["vintageYear", "caskStrength", "bottler"],
+          "conflicts": ["brand", "distillers"],
+          "agreements": ["category", "statedAge", "abv"]
+        },
+        "distillery": ["Isle of Jura"],
+        "maturation": "oloroso",
+        "releaseDay": null,
+        "singleCask": null,
+        "releaseYear": null,
+        "vintageYear": null,
+        "bottlingYear": null,
+        "caskStrength": null,
+        "releaseMonth": null,
+        "familyContext": {
+          "siblingBottles": []
+        }
+      },
+      {
+        "abv": null,
+        "brand": "Eagle Rare",
+        "score": 45.89458,
+        "series": null,
+        "source": ["text"],
+        "bottler": null,
+        "edition": null,
+        "outturn": null,
+        "bottleId": 19173,
+        "category": "bourbon",
+        "fullName": "Eagle Rare Single Barrel 10-year-old",
+        "reference": null,
+        "statedAge": 10,
+        "caskNumber": null,
+        "comparison": {
+          "missing": [
+            "abv",
+            "vintageYear",
+            "caskStrength",
+            "bottler",
+            "series",
+            "distillers"
+          ],
+          "conflicts": ["category", "brand"],
+          "agreements": ["statedAge"]
+        },
+        "distillery": [],
+        "maturation": null,
+        "releaseDay": null,
+        "singleCask": true,
+        "releaseYear": null,
+        "vintageYear": null,
+        "bottlingYear": null,
+        "caskStrength": null,
+        "releaseMonth": null,
+        "familyContext": {
+          "siblingBottles": []
+        }
+      },
+      {
+        "abv": 40,
+        "brand": "Master of Malt",
+        "score": 45.40923,
+        "series": null,
+        "source": ["text"],
+        "bottler": "Master of Malt",
+        "edition": null,
+        "outturn": null,
+        "bottleId": 45638,
+        "category": "single_malt",
+        "fullName": "Master of Malt A Secret Speyside Distillery - 10-year-old - 40.0% ABV",
+        "reference": null,
+        "statedAge": 10,
+        "caskNumber": null,
+        "comparison": {
+          "missing": ["vintageYear", "caskStrength", "distillers"],
+          "conflicts": ["brand", "bottler"],
+          "agreements": ["category", "statedAge", "abv"]
+        },
+        "distillery": [],
+        "maturation": null,
+        "releaseDay": null,
+        "singleCask": false,
+        "releaseYear": null,
+        "vintageYear": null,
+        "bottlingYear": null,
+        "caskStrength": null,
+        "releaseMonth": null,
+        "familyContext": {
+          "siblingBottles": []
+        }
+      },
+      {
+        "abv": 40,
+        "brand": "Dublin in the Rare Auld Times",
+        "score": 44.189888,
+        "series": null,
+        "source": ["text"],
+        "bottler": null,
+        "edition": null,
+        "outturn": null,
+        "bottleId": 65279,
+        "category": "single_malt",
+        "fullName": "Dublin in the Rare Auld Times Irish Single Malt Whiskey",
+        "reference": null,
+        "statedAge": 10,
+        "caskNumber": null,
+        "comparison": {
+          "missing": [
+            "vintageYear",
+            "caskStrength",
+            "bottler",
+            "series",
+            "distillers"
+          ],
+          "conflicts": ["brand"],
+          "agreements": ["category", "statedAge", "abv"]
+        },
+        "distillery": [],
+        "maturation": null,
+        "releaseDay": null,
+        "singleCask": null,
+        "releaseYear": null,
+        "vintageYear": null,
+        "bottlingYear": null,
+        "caskStrength": null,
+        "releaseMonth": null,
+        "familyContext": {
+          "siblingBottles": []
+        }
+      },
+      {
+        "abv": 40,
+        "brand": "Gordon & MacPhail",
+        "score": 40.76883,
+        "series": "Distillery Labels",
+        "source": ["text"],
+        "bottler": "Gordon & MacPhail",
+        "edition": null,
+        "outturn": null,
+        "bottleId": 65178,
+        "category": "single_malt",
+        "fullName": "Gordon & MacPhail Pulteney",
+        "reference": null,
+        "statedAge": 8,
+        "caskNumber": null,
+        "comparison": {
+          "missing": ["vintageYear", "caskStrength"],
+          "conflicts": ["statedAge", "series", "distillers"],
+          "agreements": ["category", "abv", "brand", "bottler"]
+        },
+        "distillery": ["Pulteney Distillery"],
+        "maturation": null,
+        "releaseDay": null,
+        "singleCask": null,
+        "releaseYear": null,
+        "vintageYear": null,
+        "bottlingYear": null,
+        "caskStrength": null,
+        "releaseMonth": null,
+        "familyContext": {
+          "siblingBottles": []
+        }
+      },
+      {
+        "abv": 40,
+        "brand": "Laphroaig",
+        "score": 39.50715,
+        "series": null,
+        "source": ["text"],
+        "bottler": null,
+        "edition": null,
+        "outturn": null,
+        "bottleId": 54469,
+        "category": "single_malt",
+        "fullName": "Laphroaig 10-year-old",
+        "reference": null,
+        "statedAge": 10,
+        "caskNumber": null,
+        "comparison": {
+          "missing": ["vintageYear", "bottler"],
+          "conflicts": ["brand", "distillers"],
+          "agreements": ["category", "statedAge", "abv", "caskStrength"]
+        },
+        "distillery": ["Laphroaig"],
+        "maturation": "Matured for 10 years in ex-bourbon barrels",
+        "releaseDay": null,
+        "singleCask": false,
+        "releaseYear": null,
+        "vintageYear": null,
+        "bottlingYear": null,
+        "caskStrength": false,
+        "releaseMonth": null,
+        "familyContext": {
+          "siblingBottles": []
+        }
+      },
+      {
+        "abv": 40,
+        "brand": "The Deveron",
+        "score": 38.696217,
+        "series": null,
+        "source": ["text"],
+        "bottler": null,
+        "edition": null,
+        "outturn": null,
+        "bottleId": 65163,
+        "category": "single_malt",
+        "fullName": "The Deveron 10-year-old",
+        "reference": null,
+        "statedAge": 10,
+        "caskNumber": null,
+        "comparison": {
+          "missing": ["vintageYear", "caskStrength", "bottler"],
+          "conflicts": ["brand", "distillers"],
+          "agreements": ["category", "statedAge", "abv"]
+        },
+        "distillery": ["Macduff Distillery"],
+        "maturation": null,
+        "releaseDay": null,
+        "singleCask": null,
+        "releaseYear": 2015,
+        "vintageYear": null,
+        "bottlingYear": null,
+        "caskStrength": null,
+        "releaseMonth": null,
+        "familyContext": {
+          "siblingBottles": []
+        }
+      },
+      {
+        "abv": 47.3,
+        "brand": "Gordon & MacPhail",
+        "score": 0.75,
+        "series": null,
+        "source": ["brand_coverage"],
+        "bottler": "Gordon & MacPhail",
+        "edition": "Connoisseurs Choice Upper",
+        "outturn": null,
+        "bottleId": 62225,
+        "category": "single_malt",
+        "fullName": "Gordon & MacPhail Bunnahabhain 34-year-old - Connoisseurs Choice Upper",
+        "reference": null,
+        "statedAge": 34,
+        "caskNumber": null,
+        "comparison": {
+          "missing": [],
+          "conflicts": ["statedAge", "distillers"],
+          "agreements": ["vintageYear", "brand", "bottler"]
+        },
+        "distillery": ["Bunnahabhain"],
+        "maturation": null,
+        "releaseDay": null,
+        "singleCask": null,
+        "releaseYear": null,
+        "vintageYear": 1989,
+        "bottlingYear": null,
+        "caskStrength": true,
+        "releaseMonth": null,
+        "familyContext": {
+          "siblingBottles": []
+        }
+      },
+      {
+        "abv": 56.9,
+        "brand": "Gordon & MacPhail",
+        "score": 0.75,
+        "series": "Connoisseurs Choice",
+        "source": ["brand_coverage"],
+        "bottler": "Gordon & MacPhail",
+        "edition": null,
+        "outturn": 219,
+        "bottleId": 60793,
+        "category": "single_malt",
+        "fullName": "Gordon & MacPhail Glenburgie",
+        "reference": null,
+        "statedAge": 33,
+        "caskNumber": "14143",
+        "comparison": {
+          "missing": [],
+          "conflicts": ["statedAge", "distillers"],
+          "agreements": ["vintageYear", "brand", "bottler"]
+        },
+        "distillery": ["Glenburgie"],
+        "maturation": "Refill sherry hogshead",
+        "releaseDay": null,
+        "singleCask": true,
+        "releaseYear": null,
+        "vintageYear": 1989,
+        "bottlingYear": 2022,
+        "caskStrength": true,
+        "releaseMonth": null,
+        "familyContext": {
+          "siblingBottles": []
+        }
+      }
+    ]
+  },
+  "context": {
+    "inspectedBottleIds": [],
+    "bottleContexts": [],
+    "inspectedEntities": [
+      {
+        "kind": "bottler",
+        "name": "Gordon & MacPhail",
+        "score": 1,
+        "source": ["exact", "text", "prefix", "contained"],
+        "entityId": 5645,
+        "reference": "Gordon & MacPhail",
+        "shortName": null,
+        "retrievedFor": [
+          {
+            "exact": true,
+            "query": "Gordon & MacPhail"
+          }
+        ]
+      },
+      {
+        "kind": "distillery",
+        "name": "Rosebank",
+        "score": 1,
+        "source": ["exact", "text", "prefix", "contained"],
+        "entityId": 1296,
+        "reference": "Rosebank",
+        "shortName": null,
+        "retrievedFor": [
+          {
+            "exact": true,
+            "query": "Rosebank"
+          }
+        ]
+      },
+      {
+        "kind": "distillery",
+        "name": "Auchroisk",
+        "score": 1,
+        "source": ["exact", "text", "prefix", "contained"],
+        "entityId": 27,
+        "reference": "Auchroisk",
+        "shortName": null,
+        "retrievedFor": [
+          {
+            "exact": true,
+            "query": "Auchroisk"
+          }
+        ]
+      },
+      {
+        "kind": "distillery",
+        "name": "Miltonduff",
+        "score": 1,
+        "source": ["exact", "text", "prefix", "contained"],
+        "entityId": 1185,
+        "reference": "Miltonduff",
+        "shortName": null,
+        "retrievedFor": [
+          {
+            "exact": true,
+            "query": "Miltonduff"
+          }
+        ]
+      },
+      {
+        "kind": "distillery",
+        "name": "Dallas Dhu",
+        "score": 1,
+        "source": ["exact", "text", "prefix", "contained"],
+        "entityId": 869,
+        "reference": "Dallas Dhu",
+        "shortName": null,
+        "retrievedFor": [
+          {
+            "exact": true,
+            "query": "Dallas Dhu"
+          }
+        ]
+      },
+      {
+        "kind": "distillery",
+        "name": "The Glen Grant",
+        "score": 1,
+        "source": ["exact", "text", "prefix", "contained"],
+        "entityId": 273,
+        "reference": "Glen Grant",
+        "shortName": null,
+        "retrievedFor": [
+          {
+            "exact": true,
+            "query": "The Glen Grant"
+          }
+        ]
+      },
+      {
+        "kind": "distillery",
+        "name": "Balblair",
+        "score": 1,
+        "source": ["exact", "text", "prefix", "contained"],
+        "entityId": 38,
+        "reference": "Balblair",
+        "shortName": null,
+        "retrievedFor": [
+          {
+            "exact": true,
+            "query": "Balblair"
+          }
+        ]
+      },
+      {
+        "kind": "distillery",
+        "name": "Tamnavulin",
+        "score": 1,
+        "source": ["exact", "text", "prefix", "contained"],
+        "entityId": 1387,
+        "reference": "Tamnavulin",
+        "shortName": null,
+        "retrievedFor": [
+          {
+            "exact": true,
+            "query": "Tamnavulin"
+          }
+        ]
+      },
+      {
+        "kind": "distillery",
+        "name": "Bruichladdich",
+        "score": 1,
+        "source": ["exact", "text", "prefix", "contained"],
+        "entityId": 192,
+        "reference": "Bruichladdich",
+        "shortName": "",
+        "retrievedFor": [
+          {
+            "exact": true,
+            "query": "Bruichladdich"
+          }
+        ]
+      },
+      {
+        "kind": "bottler",
+        "name": "Murray McDavid",
+        "score": 1,
+        "source": ["exact", "text", "prefix", "contained"],
+        "entityId": 5670,
+        "reference": "Murray McDavid",
+        "shortName": null,
+        "retrievedFor": [
+          {
+            "exact": true,
+            "query": "Murray McDavid"
+          }
+        ]
+      },
+      {
+        "kind": "distillery",
+        "name": "Longmorn",
+        "score": 1,
+        "source": ["exact", "text", "prefix", "contained"],
+        "entityId": 1151,
+        "reference": "Longmorn",
+        "shortName": null,
+        "retrievedFor": [
+          {
+            "exact": true,
+            "query": "Longmorn"
+          }
+        ]
+      },
+      {
+        "kind": "distillery",
+        "name": "Scapa",
+        "score": 1,
+        "source": ["exact", "text", "prefix", "contained"],
+        "entityId": 1314,
+        "reference": "Scapa",
+        "shortName": null,
+        "retrievedFor": [
+          {
+            "exact": true,
+            "query": "Scapa"
+          }
+        ]
+      },
+      {
+        "kind": "distillery",
+        "name": "Tobermory",
+        "score": 1,
+        "source": ["exact", "text", "prefix", "contained"],
+        "entityId": 1441,
+        "reference": "Tobermory",
+        "shortName": null,
+        "retrievedFor": [
+          {
+            "exact": true,
+            "query": "Tobermory"
+          }
+        ]
+      },
+      {
+        "kind": "distillery",
+        "name": "Caol Ila",
+        "score": 1,
+        "source": ["exact", "text", "prefix", "contained"],
+        "entityId": 366,
+        "reference": "Caol Ila",
+        "shortName": "",
+        "retrievedFor": [
+          {
+            "exact": true,
+            "query": "Caol Ila"
+          }
+        ]
+      },
+      {
+        "kind": "brand",
+        "name": "Bruichladdich Octomore",
+        "score": 0.5,
+        "source": ["text", "prefix"],
+        "entityId": 1210,
+        "reference": "Octomore",
+        "shortName": "Octomore",
+        "retrievedFor": [
+          {
+            "query": "Bruichladdich"
+          }
+        ]
+      },
+      {
+        "kind": "brand",
+        "name": "Bruichladdich Port Charlotte",
+        "score": 0.5,
+        "source": ["text", "prefix"],
+        "entityId": 1269,
+        "reference": "Port Charlotte",
+        "shortName": "Port Charlotte",
+        "retrievedFor": [
+          {
+            "query": "Bruichladdich"
+          }
+        ]
+      },
+      {
+        "kind": "brand",
+        "name": "The Singleton of Auchroisk",
+        "score": 0.2,
+        "source": ["text"],
+        "entityId": 1424,
+        "reference": null,
+        "shortName": null,
+        "retrievedFor": [
+          {
+            "query": "Auchroisk"
+          }
+        ]
+      }
+    ],
+    "inspectedSeries": []
+  },
+  "provenance": {
+    "source": "production_miss",
+    "verifiedSourceUrls": [
+      "https://whiskyadvocate.com/Gordon-MacPhail-distilled-at-Rosebank-1989-Vintage-10-year-old-40",
+      "https://www.whiskybase.com/whiskies/whisky/54141/rosebank-1989-gm",
+      "https://www.whiskymarketplace.com/whiskies/rosebank-1989-connoisseurs-choice-gordon-and-macphail"
+    ],
+    "dbOutcome": {
+      "bottleId": 65842,
+      "createsBottle": true,
+      "summary": "Production returned create_bottle with the name `Rosebank 10-year-old, 1989 Vintage`."
+    },
+    "notes": "Captured from saved classifier run 18630 (review 8383, model openai/gpt-6-luna, 2026-09-28T06:57:24.366Z). Production rationale: The Whisky Advocate product title confirms a Gordon & MacPhail Rosebank, 1989 Vintage, 10-year-old at 40%. A search result identifies the Rosebank 1989 release as part of Gordon & MacPhail's Rare Old range. No local candidate represents this complete identity; the returned Gordon & MacPhail bottles are for other distilleries or otherwise conflict. Trade listings name it Rosebank 1989 (Whiskybase, Whisky Marketplace); the label age is not independently confirmed, so the name may omit it."
+  },
+  "expected": {
+    "status": "classified",
+    "action": "create_bottle",
+    "identityScope": "product",
+    "matchedBottleId": null,
+    "proposedBottle": {
+      "brand": {
+        "id": 5645,
+        "name": "Gordon & MacPhail"
+      },
+      "vintageYear": 1989
+    },
+    "proposedBottleNameOneOf": ["Rosebank 1989 10-year-old", "Rosebank 1989"],
+    "proposedBottleNameExcludes": ["Vintage", ","],
+    "summary": "Create the G&M Rosebank 1989 Bottle named for the distillery, then the vintage, then the age, as the trade names it; no comma and no word Vintage."
+  }
+}
