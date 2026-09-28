@@ -36,15 +36,17 @@ without losing match, create, or relationship accuracy.
 ## Exact change
 
 - `instructions.ts`: add `<identity_rules>` after the mission, used by the
-  reference and audit prompts, with seven one-line rules for Bottle identity,
-  relationships, name, independent-bottling names, edition, style phrases, and
-  unknown facts. Remove the edition-wording and style-word bullets from the
-  evidence policy, the edition and observation restatements from decision
-  step 1, and the parts of the Brand and bottler paragraphs the rules now
-  state.
-- `classifierTypes.ts`: `proposedBottle.name` becomes a one-line definition that
-  points to the identity rules. The search tool's `expression` input becomes
-  search text, not a Bottle name.
+  reference and audit prompts, with eight one-line rules for Bottle identity,
+  relationships, name, independent-bottling names, edition, style phrases,
+  `identityScope`, and unknown facts. Remove the edition-wording and style-word
+  bullets from the evidence policy, the edition, observation, and
+  `identityScope` restatements from decision step 1, and the parts of the Brand
+  and bottler paragraphs the rules now state. The input map says that
+  `extractedIdentity.expression` omits age and style words and is not the
+  Bottle name.
+- `classifierTypes.ts`: `proposedBottle.name` and `identityScope` become
+  one-line definitions that point to the identity rules. The search tool's
+  `expression` input becomes search text, not a Bottle name.
 - The extractor prompt and tools are unchanged.
 
 ## Cases and decision rule
@@ -67,6 +69,14 @@ Keep the change if target name checks improve over the control, no comparison
 case loses a pass it had in the control, incorrect existing matches do not
 rise, and cost and time stay within 15%. If the focused result is a net win,
 run the full suite once with a same-day control before accepting.
+
+## Run log
+
+A first start was stopped before any repeat finished, after a review against
+the rebuilt agent-design-review skill found two gaps in the change: the
+`identityScope` rule had moved into its schema description, and the input map
+did not say that the extracted `expression` is not the Bottle name. Both were
+added to the exact change above before the recorded runs.
 
 ## Results
 

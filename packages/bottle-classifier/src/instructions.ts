@@ -37,7 +37,8 @@ const BOTTLE_IDENTITY_RULES = [
     "4. An independent bottling whose label features a distillery is named for that distillery, then the printed vintage year, then the printed age: `Distillery 1990 20-year-old`. Write the year without the word `vintage`.",
     "5. `edition` is the marketed release descriptor exactly as the title or label prints it, such as `Batch 24` or `2022 Edition`. Keep edition and cask numbers out of `name`; put a printed cask number in `caskNumber`.",
     "6. A style or category phrase such as `Single Malt` is the name only when nothing else names the Bottle.",
-    "7. Leave any fact null when evidence does not support it.",
+    "7. Set `identityScope` to `exact_cask` only when the exact cask itself is the marketed Bottle, as with an SMWS code. Generic cask or barrel wording is `product`.",
+    "8. Leave any fact null when evidence does not support it.",
   ]),
   "</identity_rules>",
 ].join("\n");
@@ -76,7 +77,7 @@ const BOTTLE_EVIDENCE_POLICY = [
 const SHARED_INPUT_MAP = [
   "`reference.name` is the observed source label. Treat it as evidence, not as canonical Bottle identity.",
   "`reference.url` is the source page. `reference.imageUrl` identifies the submitted image; use `extractedIdentity` and any `imageEvidence` for its readable content.",
-  "`extractedIdentity` is a structured extraction from the source. It can be incomplete or wrong.",
+  "`extractedIdentity` is a structured extraction from the source. It can be incomplete or wrong. Its `expression` omits age and style words and is not the Bottle name.",
   "`imageEvidence.fieldCandidates` contains image-derived field guesses. Use `photoSuitability` and `conflicts` to judge whether the image evidence is reliable.",
   "A public image `sourceUrl` identifies the page that supplied the image. Read that page when its producer title or product text is needed to confirm canonical name or edition wording.",
   "`localSearch.candidates` contains existing Bottle candidates. `bottleId` is the catalog id, `fullName` is the display name, and `reference` is the accepted name that retrieval matched.",

@@ -580,7 +580,7 @@ const BottleClassifierDecisionBaseSchema = z
       .max(MAX_BOTTLE_CANDIDATES)
       .default([]),
     identityScope: BottleIdentityScopeEnum.default("product").describe(
-      "`product` for stable bottle-family identity; `exact_cask` only when the exact cask itself is the marketed bottle identity. SMWS codes qualify; generic cask/barrel details do not qualify without reliable evidence that the listed product is an exact single-cask identity.",
+      "Whether the decision identifies a stable product or one exact cask, following the identity rules.",
     ),
     referenceScope: ReferenceScopeEnum.optional().describe(
       "`global_alias` only when the listing label is safe to store as a reusable Bottle reference; `none` when no reusable reference should be created.",
