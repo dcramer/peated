@@ -7,6 +7,7 @@ import { externalSites } from "@peated/server/db/schema";
 import { storeExternalReviewArticleInTransaction } from "@peated/server/externalReviews/store";
 import { getPeatedSystemActor } from "@peated/server/lib/actors";
 import {
+  persistReviewBottleCheck,
   resolveBottleReferenceTarget,
   resolveScrapedBottleReferenceTarget,
 } from "@peated/server/lib/bottleReferenceResolution";
@@ -224,6 +225,13 @@ export async function createExternalReview(
       throw new ExternalReviewBottleStateError(error);
     }
     throw error;
+  }
+
+  if (resolution.classification) {
+    await persistReviewBottleCheck({
+      reviewId: stored.externalReview.id,
+      classification: resolution.classification,
+    });
   }
 
   if (stored.referenceAssignment) {

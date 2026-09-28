@@ -6,6 +6,7 @@ import details from "./details";
 import list from "./list";
 import rejectSelected from "./reject-selected";
 import retry from "./retry";
+import runs from "./runs";
 
 export default base.tag("audits").router({
   approveSelected,
@@ -15,4 +16,5 @@ export default base.tag("audits").router({
   list,
   rejectSelected,
   retry,
+  runs,
 });

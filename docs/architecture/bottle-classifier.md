@@ -40,19 +40,13 @@ Follow the [Whisky Identity Model](./whisky-identity-model.md). Each marketed
 version must be a complete Bottle on its own.
 
 A `create_bottle` result proposes one complete Bottle. `proposedBottle.name` is
-the stable marketed expression. The server adds an explicit edition without
-repeating it and stores supported facts such as age, ABV, years, and cask flags
-in their fields. The server creates the Bottle and manages BottleGroup
-membership. The classifier never chooses a BottleGroup.
-
-`identityScope = product` is the default. Use `exact_cask` only when a specific
-cask is the marketed Bottle identity. Generic cask or barrel wording is not
-enough.
-
-Keep each fact at the product level supported by its evidence. For example, do
-not give a blend a component's age, year, or strength. Keep a production lot,
-bottle number, or retailer selector as an observation unless evidence shows
-that it identifies the marketed Bottle.
+the Bottle's common name without the Brand, following the identity model: it
+keeps the age, vintage, cask number, and strength wording that the product
+title prints, and adds none the title omits. A title that is only the Brand, an
+age, and style words gets a name such as `12-year-old`. A style phrase is the
+name only when nothing else names the Bottle. The server adds an explicit
+edition without repeating it and stores supported facts such as age, ABV, years,
+and cask flags in their fields as well.
 
 `maturation` is the producer's cask statement as one short phrase, at most 120
 characters, following the [Whisky Identity Model](./whisky-identity-model.md).

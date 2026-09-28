@@ -67,7 +67,8 @@
       "abv": 41.5
     },
     "expectedTier": "auto",
-    "summary": "Create the exact Whiskyland Chapter Twenty Nine Bottle under the consumer-facing Whiskyland Brand. Keep Decadent Drinks as the independent bottler and Glenturret as the distiller; do not model Whiskyland as a Series beneath Decadent Drinks."
+    "summary": "Create the exact Whiskyland Chapter Twenty Nine Bottle under the consumer-facing Whiskyland Brand. Keep Decadent Drinks as the independent bottler and Glenturret as the distiller; do not model Whiskyland as a Series beneath Decadent Drinks.",
+    "proposedBottleNameIncludes": ["Glenturret", "35-year-old"]
   },
   "localCatalog": {
     "entities": [

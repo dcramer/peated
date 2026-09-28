@@ -31,6 +31,24 @@ judgment that a repeatable code test cannot prove.
 - Run focused model checks while changing model behavior. Run the full suite
   once at a deliberate full-suite run.
 
+## Capture a production miss
+
+Store-price and review classifier runs are saved as Bottle checks with the full
+input, decision, and artifacts. To turn a wrong decision into a test case:
+
+1. Find the source record. The moderation history entry for the decision gives
+   its source kind and ID.
+2. Fetch the saved run with the authenticated CLI:
+   `pnpm -s cli api get '/audits/runs?sourceKind=review&sourceId=123' > run.json`.
+3. Draft the test case and its evidence pack:
+   `pnpm --filter @peated/bottle-classifier fixtures:draft "$PWD/run.json" <fixture-id> "$PWD/<out-dir>"`.
+4. Verify the Bottle online, write `expected`, complete `provenance`, and move
+   the test case into `src/eval-fixtures/decision-cases/`. The validator rejects
+   the draft until you do.
+
+Do not rely on Sentry for this. It keeps only some classifier runs and cuts
+long inputs and tool outputs.
+
 ## Pull request checks
 
 - Add `trigger-evals` to run classifier model checks.

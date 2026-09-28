@@ -40,7 +40,6 @@
     "action": "create_bottle",
     "identityScope": "product",
     "proposedBottle": {
-      "name": "Speyside",
       "brand": {
         "name": "Shieldaig"
       },
@@ -48,7 +47,8 @@
       "statedAge": 30
     },
     "verifyEligible": false,
-    "summary": "Create a new Shieldaig Speyside 30-year-old Bottle with Speyside as the stable expression and 30 in the structured statedAge field."
+    "summary": "Create a new Shieldaig Speyside 30-year-old Bottle whose name keeps the printed Speyside and 30-year-old wording, with 30 also in the structured statedAge field.",
+    "proposedBottleNameIncludes": ["Speyside", "30-year-old"]
   },
   "localCatalog": {
     "entities": [
