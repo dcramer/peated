@@ -1,6 +1,9 @@
 # C31: name independent bottlings as distillery, vintage, then age
 
-**Pending.** Recorded before the runs.
+**Superseded by [C32](./C32-identity-rules-up-front.md).** Stopped after one
+valid repeat. The added sentence produced the trade names for the target cases
+but changed unrelated names, which led to C32's restructure instead of another
+field-description edit.
 
 ## Problem
 
@@ -76,4 +79,16 @@ empty short name as missing, in both versions, and the runs restarted.
 
 ## Results
 
-Pending.
+One valid repeat per version ran before C32 replaced this change. The target
+names moved to the trade shape: control `Glenlivet 1968 Vintage 35-year-old`,
+`Rosebank 10-year-old, 1989 vintage`, and `Rosebank` became treatment
+`Glenlivet 1968 35-year-old`, `Rosebank 1989 10-year-old`, and `Rosebank 1991`.
+The same repeat also changed names the sentence did not target: Glen Breton
+became `21-year-old (Cask 665)`, Elijah Craig `Barrel Proof (Batch C923)`,
+Talisker 2001 The Distillers Edition `2001`, and Whiskyland Glenturret gained
+an unprinted `1990`.
+
+Two target checks failed in both versions because the test cases excluded
+`,`, which the scorer's text normalization removes, so the check matched every
+name. The exclusion was removed before C32. One repeat is too little to decide
+the change; it is recorded as superseded, not rejected.

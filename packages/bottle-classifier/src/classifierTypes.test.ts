@@ -24,12 +24,9 @@ const AgentDecisionJsonSchema = z
   .passthrough();
 
 describe("BottleClassifierAgentDecisionSchema", () => {
-  test("defines proposed Bottle names at the field boundary", () => {
+  test("points proposed Bottle names to the identity rules", () => {
     expect(ProposedBottleFields.name.description).toContain(
-      "Do not add an age or other fact that the title does not print",
-    );
-    expect(ProposedBottleFields.name.description).toContain(
-      "use a style phrase only when nothing else names the Bottle",
+      "following the identity rules",
     );
   });
 

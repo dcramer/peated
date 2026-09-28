@@ -1666,7 +1666,7 @@
       "vintageYear": 1989
     },
     "proposedBottleNameOneOf": ["Cragganmore 1989 15-year-old"],
-    "proposedBottleNameExcludes": ["Vintage", ","],
+    "proposedBottleNameExcludes": ["Vintage"],
     "summary": "Create the Signatory Cragganmore named Cragganmore 1989 15-year-old: distillery, vintage, age."
   }
 }

@@ -1264,7 +1264,7 @@
       "vintageYear": 1989
     },
     "proposedBottleNameOneOf": ["Rosebank 1989 10-year-old", "Rosebank 1989"],
-    "proposedBottleNameExcludes": ["Vintage", ","],
+    "proposedBottleNameExcludes": ["Vintage"],
     "summary": "Create the G&M Rosebank 1989 Bottle named for the distillery, then the vintage, then the age, as the trade names it; no comma and no word Vintage."
   }
 }
