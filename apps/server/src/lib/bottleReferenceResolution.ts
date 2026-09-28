@@ -12,7 +12,7 @@ import type {
 import { classifyBottleReference } from "@peated/server/agents/bottleClassifier/classifyBottleReference";
 import { classifyScrapedBottleReference } from "@peated/server/agents/bottleClassifier/scrapedBottleReference";
 import config from "@peated/server/config";
-import { db, type AnyDatabase, type AnyTransaction } from "@peated/server/db";
+import { db, type AnyTransaction } from "@peated/server/db";
 import { createBottleCheck } from "@peated/server/lib/bottleChecks";
 import { findBottleReferenceAssignment } from "@peated/server/lib/bottleFinder";
 import type { BottleReferenceIdentitySnapshot } from "@peated/server/lib/bottleReferences";
@@ -20,6 +20,7 @@ import {
   createOrReuseBottleInTransaction,
   finalizeCreatedBottle,
 } from "@peated/server/lib/createBottle";
+import { logTelemetryError } from "@peated/server/lib/log";
 import { buildClassifierBottleInput } from "./classifierDecisionCreateInputs";
 import {
   ActiveBottleSelectionError,
@@ -66,25 +67,29 @@ export type ReferenceClassificationRun = {
 /**
  * Saves a review's classifier run as a Bottle check so the exact input,
  * candidates, and evidence can be replayed as an eval test case later.
+ *
+ * Best effort: the review does not depend on this record, so call it after the
+ * review is saved. A failure is logged with the review id and never thrown.
  */
-export async function persistReviewBottleCheck(
-  {
-    reviewId,
-    classification,
-  }: { reviewId: number; classification: ReferenceClassificationRun },
-  database: AnyDatabase = db,
-) {
-  await createBottleCheck(
-    {
+export async function persistReviewBottleCheck({
+  reviewId,
+  classification,
+}: {
+  reviewId: number;
+  classification: ReferenceClassificationRun;
+}) {
+  try {
+    await createBottleCheck({
       intent: "resolve_reference",
       sourceKind: "review",
       sourceId: reviewId,
       input: classification.input,
       result: classification.result,
       model: config.BOTTLE_CLASSIFIER_MODEL,
-    },
-    database,
-  );
+    });
+  } catch (error) {
+    logTelemetryError(error, { extra: { reviewId } });
+  }
 }
 
 /** Locks the resolved Bottle before any reference or consumer row is locked. */

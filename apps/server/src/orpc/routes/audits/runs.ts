@@ -32,7 +32,6 @@ export default procedure
           z
             .object({
               id: z.number(),
-              intent: z.string(),
               sourceKind: z.string().nullable(),
               sourceId: z.string().nullable(),
               model: z.string().nullable(),
@@ -63,7 +62,6 @@ export default procedure
     return {
       results: rows.map((row) => ({
         id: row.id,
-        intent: row.intent,
         sourceKind: row.sourceKind,
         sourceId: row.sourceId,
         model: row.model,

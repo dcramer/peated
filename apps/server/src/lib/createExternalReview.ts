@@ -160,15 +160,6 @@ export async function createExternalReview(
         throw new Error("Unable to store external review.");
       }
       const { previousBottleId, externalReview } = storedExternalReview;
-      if (resolution.classification) {
-        await persistReviewBottleCheck(
-          {
-            reviewId: externalReview.id,
-            classification: resolution.classification,
-          },
-          tx,
-        );
-      }
 
       const appliedIncomingIdentity = externalReview.bottleId === bottleId;
       if (!bottleId || !appliedIncomingIdentity) {
@@ -234,6 +225,13 @@ export async function createExternalReview(
       throw new ExternalReviewBottleStateError(error);
     }
     throw error;
+  }
+
+  if (resolution.classification) {
+    await persistReviewBottleCheck({
+      reviewId: stored.externalReview.id,
+      classification: resolution.classification,
+    });
   }
 
   if (stored.referenceAssignment) {

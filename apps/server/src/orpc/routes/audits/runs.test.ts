@@ -77,7 +77,6 @@ test("returns the saved runs for one source, newest first", async ({
     expect.objectContaining({ name: "First Title" }),
   ]);
   expect(results[0]).toMatchObject({
-    intent: "resolve_reference",
     sourceKind: "review",
     sourceId: "501",
     output: expect.objectContaining({

@@ -44,9 +44,9 @@ the Bottle's common name without the Brand, following the identity model: it
 keeps the age, vintage, cask number, and strength wording that the product
 title prints, and adds none the title omits. A title that is only the Brand, an
 age, and style words gets a name such as `12-year-old`. A style phrase is the
-name only when nothing else names the Bottle. The server
-adds an explicit edition without repeating it and stores supported facts such
-as age, ABV, years, and cask flags in their fields as well.
+name only when nothing else names the Bottle. The server adds an explicit
+edition without repeating it and stores supported facts such as age, ABV, years,
+and cask flags in their fields as well.
 
 `maturation` is the producer's cask statement as one short phrase, at most 120
 characters, following the [Whisky Identity Model](./whisky-identity-model.md).

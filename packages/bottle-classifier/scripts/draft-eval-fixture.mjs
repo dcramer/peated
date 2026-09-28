@@ -21,7 +21,7 @@ if (!runPath || !fixtureId || !outDir) {
 }
 
 const response = JSON.parse(await readFile(runPath, "utf8"));
-const run = response.results?.[0] ?? response;
+const run = response.results?.[0];
 if (!run?.input?.reference || !run.artifacts) {
   throw new Error(`${runPath} does not contain a saved classifier run.`);
 }
