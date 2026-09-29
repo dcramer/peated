@@ -43,8 +43,10 @@ A `create_bottle` result proposes one complete Bottle. `proposedBottle.name` is
 the Bottle's common name without the Brand, following the identity model: it
 keeps the age, vintage, cask number, and strength wording that the product
 title prints, and adds none the title omits. A title that is only the Brand, an
-age, and style words gets a name such as `12-year-old`. A style phrase is the
-name only when nothing else names the Bottle. The server adds an explicit
+age, and style words gets a name such as `12-year-old`. An independent
+bottling named for a distillery gets the distillery, then the printed vintage,
+then the printed age, such as `Glenlivet 1968 35-year-old`. A style phrase is
+the name only when nothing else names the Bottle. The server adds an explicit
 edition without repeating it and stores supported facts such as age, ABV, years,
 and cask flags in their fields as well.
 

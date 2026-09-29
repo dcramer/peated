@@ -6,6 +6,22 @@ import {
   WHISKY_LABEL_COMPONENTS,
 } from "./instructions";
 
+describe("identity rules", () => {
+  test.each([
+    ["reference classifier", buildBottleClassifierInstructions()],
+    ["Bottle audit", buildBottleAuditInstructions()],
+  ])("state the naming rules once in %s", (_, instructions) => {
+    expect(instructions).toContain("<identity_rules>");
+    expect(
+      instructions.split("Never add a fact that the title does not print"),
+    ).toHaveLength(2);
+    expect(instructions).toContain("`Distillery 1990 20-year-old`");
+    expect(instructions).toContain(
+      "is the name only when nothing else names the Bottle",
+    );
+  });
+});
+
 describe("bottler instructions", () => {
   test.each([
     ["reference classifier", buildBottleClassifierInstructions()],

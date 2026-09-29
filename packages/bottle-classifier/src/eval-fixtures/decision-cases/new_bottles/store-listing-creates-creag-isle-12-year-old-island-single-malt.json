@@ -323,6 +323,7 @@
       "statedAge": 12
     },
     "summary": "Create the distinct Creag Isle 12-year-old Island Single Malt product with a name that keeps its printed 12-year-old wording; none of the local candidates share the Creag Isle brand and independent evidence confirms the bottle.",
-    "proposedBottleNameIncludes": ["12-year-old"]
+    "proposedBottleNameIncludes": ["12-year-old"],
+    "proposedBottleNameExcludes": ["Single Malt", "Scotch"]
   }
 }

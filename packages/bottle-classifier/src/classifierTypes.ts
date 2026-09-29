@@ -326,7 +326,7 @@ export const ProposedBottleFields = {
     .trim()
     .min(1)
     .describe(
-      "The Bottle's common name relative to the Brand, as the producer's product title prints it. Keep the age, vintage, cask number, and strength wording such as `Cask Strength` that the title prints, writing ages as `12-year-old`, and also store those facts in their fields. Do not add an age or other fact that the title does not print. For an independent bottling whose title features a distillery, use that distillery with the title's age wording. Leave out the Brand, the edition, package text, and generic style or category words; use a style phrase only when nothing else names the Bottle. Do not copy a retailer title, build a name from fields, or invent an expression.",
+      "The Bottle's common name without the Brand, following the identity rules.",
     ),
   series: ProposedSeriesChoiceSchema.nullable().default(null),
   category: CategoryEnum.nullable().default(null),
@@ -405,7 +405,7 @@ export const BottleCandidateSearchInputSchema = z
       .nullable()
       .default(null)
       .describe(
-        "Core release name after removing brand, age, ABV, and generic style words.",
+        "Distinctive release words to search for, without the Brand. This is search text, not the proposed Bottle name.",
       ),
     series: z
       .string()
@@ -580,7 +580,7 @@ const BottleClassifierDecisionBaseSchema = z
       .max(MAX_BOTTLE_CANDIDATES)
       .default([]),
     identityScope: BottleIdentityScopeEnum.default("product").describe(
-      "`product` for stable bottle-family identity; `exact_cask` only when the exact cask itself is the marketed bottle identity. SMWS codes qualify; generic cask/barrel details do not qualify without reliable evidence that the listed product is an exact single-cask identity.",
+      "Whether the decision identifies a stable product or one exact cask, following the identity rules.",
     ),
     referenceScope: ReferenceScopeEnum.optional().describe(
       "`global_alias` only when the listing label is safe to store as a reusable Bottle reference; `none` when no reusable reference should be created.",

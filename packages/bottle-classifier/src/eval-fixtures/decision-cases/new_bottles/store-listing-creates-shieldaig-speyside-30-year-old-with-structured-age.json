@@ -48,7 +48,8 @@
     },
     "verifyEligible": false,
     "summary": "Create a new Shieldaig Speyside 30-year-old Bottle whose name keeps the printed Speyside and 30-year-old wording, with 30 also in the structured statedAge field.",
-    "proposedBottleNameIncludes": ["Speyside", "30-year-old"]
+    "proposedBottleNameIncludes": ["Speyside", "30-year-old"],
+    "proposedBottleNameExcludes": ["Sin Malt", "Scotch"]
   },
   "localCatalog": {
     "entities": [

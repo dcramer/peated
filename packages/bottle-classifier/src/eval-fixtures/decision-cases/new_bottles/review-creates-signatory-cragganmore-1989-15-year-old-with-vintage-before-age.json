@@ -1,0 +1,1672 @@
+{
+  "id": "review-creates-signatory-cragganmore-1989-15-year-old-with-vintage-before-age",
+  "name": "review: creates Signatory Cragganmore 1989 15-year-old with the vintage before the age",
+  "input": {
+    "reference": {
+      "id": 8120,
+      "url": "https://whiskyadvocate.com/Signatory-Unchillfiltered-distilled-at-Cragganmore-15-year-old-1989-vintage-46",
+      "name": "Signatory 'Unchillfiltered' 15-year-old old, 1989 vintage (distilled at Cragganmore)",
+      "imageUrl": null,
+      "externalSiteId": 5,
+      "currentBottleId": null
+    },
+    "extractedIdentity": {
+      "abv": null,
+      "brand": "Signatory Vintage",
+      "series": "Un-Chillfiltered Collection",
+      "bottler": "Signatory Vintage",
+      "edition": null,
+      "outturn": null,
+      "category": null,
+      "distillery": ["Cragganmore"],
+      "expression": null,
+      "maturation": null,
+      "stated_age": 15,
+      "cask_number": null,
+      "release_day": null,
+      "single_cask": null,
+      "release_year": null,
+      "vintage_year": 1989,
+      "bottling_year": null,
+      "cask_strength": null,
+      "release_month": null
+    },
+    "imageEvidence": null,
+    "initialCandidates": [
+      {
+        "abv": 46,
+        "brand": "Signatory Vintage",
+        "score": 90.91793,
+        "series": "The Un-Chillfiltered Collection",
+        "source": ["text", "brand_coverage"],
+        "bottler": "Signatory Vintage",
+        "edition": null,
+        "outturn": null,
+        "bottleId": 45755,
+        "category": "single_grain",
+        "fullName": "Signatory Vintage Port Dundas - 15-year-old - 2010 Vintage - 46.0% ABV",
+        "reference": null,
+        "statedAge": 15,
+        "caskNumber": null,
+        "comparison": {
+          "missing": [],
+          "conflicts": ["vintageYear", "series", "distillers"],
+          "agreements": ["statedAge", "brand", "bottler"]
+        },
+        "distillery": ["Port Dundas"],
+        "maturation": null,
+        "releaseDay": null,
+        "singleCask": null,
+        "releaseYear": null,
+        "vintageYear": 2010,
+        "bottlingYear": null,
+        "caskStrength": null,
+        "releaseMonth": null,
+        "familyContext": {
+          "siblingBottles": []
+        }
+      },
+      {
+        "abv": 43,
+        "brand": "Signatory Vintage",
+        "score": 86.76538,
+        "series": null,
+        "source": ["text"],
+        "bottler": "Signatory Vintage",
+        "edition": "Un-Chillfiltered Collection",
+        "outturn": null,
+        "bottleId": 62678,
+        "category": "single_grain",
+        "fullName": "Signatory Vintage Port Dundas 2006 - Un-Chillfiltered Collection",
+        "reference": null,
+        "statedAge": null,
+        "caskNumber": null,
+        "comparison": {
+          "missing": ["statedAge", "series"],
+          "conflicts": ["vintageYear", "distillers"],
+          "agreements": ["brand", "bottler"]
+        },
+        "distillery": ["Port Dundas"],
+        "maturation": null,
+        "releaseDay": null,
+        "singleCask": null,
+        "releaseYear": null,
+        "vintageYear": 2006,
+        "bottlingYear": null,
+        "caskStrength": null,
+        "releaseMonth": null,
+        "familyContext": {
+          "siblingBottles": []
+        }
+      },
+      {
+        "abv": 46,
+        "brand": "Signatory Vintage",
+        "score": 82.28372,
+        "series": "The Un-Chillfiltered Collection",
+        "source": ["text"],
+        "bottler": "Signatory Vintage",
+        "edition": null,
+        "outturn": null,
+        "bottleId": 47598,
+        "category": "single_malt",
+        "fullName": "Signatory Vintage Edradour - 10-year-old - 46.0% ABV",
+        "reference": null,
+        "statedAge": 10,
+        "caskNumber": null,
+        "comparison": {
+          "missing": ["vintageYear"],
+          "conflicts": ["statedAge", "series", "distillers"],
+          "agreements": ["brand", "bottler"]
+        },
+        "distillery": ["Edradour"],
+        "maturation": "Oloroso cask matured",
+        "releaseDay": null,
+        "singleCask": false,
+        "releaseYear": null,
+        "vintageYear": null,
+        "bottlingYear": 2022,
+        "caskStrength": false,
+        "releaseMonth": null,
+        "familyContext": {
+          "siblingBottles": []
+        }
+      },
+      {
+        "abv": 46,
+        "brand": "Signatory Vintage",
+        "score": 81.92192,
+        "series": "The Un-Chillfiltered Collection",
+        "source": ["vector", "text"],
+        "bottler": "Signatory Vintage",
+        "edition": null,
+        "outturn": null,
+        "bottleId": 65344,
+        "category": "single_malt",
+        "fullName": "Signatory Vintage Edradour",
+        "reference": "Signatory Un-Chillfiltered Collection 11-year-old (distilled at Edradour)",
+        "statedAge": 11,
+        "caskNumber": "1013",
+        "comparison": {
+          "missing": [],
+          "conflicts": ["statedAge", "vintageYear", "distillers"],
+          "agreements": ["category", "brand", "bottler", "series"]
+        },
+        "distillery": ["Edradour"],
+        "maturation": null,
+        "releaseDay": null,
+        "singleCask": true,
+        "releaseYear": null,
+        "vintageYear": 2002,
+        "bottlingYear": 2014,
+        "caskStrength": null,
+        "releaseMonth": null,
+        "familyContext": {
+          "siblingBottles": []
+        }
+      },
+      {
+        "abv": 46,
+        "brand": "Signatory Vintage",
+        "score": 79.65405,
+        "series": "The Un-Chillfiltered Collection",
+        "source": ["vector", "text"],
+        "bottler": "Signatory Vintage",
+        "edition": null,
+        "outturn": null,
+        "bottleId": 65786,
+        "category": "single_malt",
+        "fullName": "Signatory Vintage Clynelish",
+        "reference": "Signatory 'Un-chillfiltered' 13-year-old old, 1991 vintage (distilled at Clynelish)",
+        "statedAge": 13,
+        "caskNumber": null,
+        "comparison": {
+          "missing": [],
+          "conflicts": ["statedAge", "vintageYear", "distillers"],
+          "agreements": ["category", "brand", "bottler", "series"]
+        },
+        "distillery": ["Clynelish"],
+        "maturation": null,
+        "releaseDay": null,
+        "singleCask": null,
+        "releaseYear": null,
+        "vintageYear": 1991,
+        "bottlingYear": null,
+        "caskStrength": null,
+        "releaseMonth": null,
+        "familyContext": {
+          "siblingBottles": []
+        }
+      },
+      {
+        "abv": 64.3,
+        "brand": "Signatory Vintage",
+        "score": 77.46367,
+        "series": null,
+        "source": ["text"],
+        "bottler": "Signatory Vintage",
+        "edition": "",
+        "outturn": null,
+        "bottleId": 43570,
+        "category": "single_malt",
+        "fullName": "Signatory Vintage The Un-Chillfiltered Collection",
+        "reference": null,
+        "statedAge": 16,
+        "caskNumber": null,
+        "comparison": {
+          "missing": ["vintageYear", "series", "distillers"],
+          "conflicts": ["statedAge"],
+          "agreements": ["brand", "bottler"]
+        },
+        "distillery": [],
+        "maturation": null,
+        "releaseDay": null,
+        "singleCask": null,
+        "releaseYear": null,
+        "vintageYear": null,
+        "bottlingYear": null,
+        "caskStrength": true,
+        "releaseMonth": null,
+        "familyContext": {
+          "siblingBottles": []
+        }
+      },
+      {
+        "abv": 46,
+        "brand": "Signatory Vintage",
+        "score": 75.534775,
+        "series": "The Un-Chillfiltered Collection",
+        "source": ["text"],
+        "bottler": "Signatory Vintage",
+        "edition": null,
+        "outturn": null,
+        "bottleId": 45835,
+        "category": "single_malt",
+        "fullName": "Signatory Vintage Glen Garioch - 14-year-old - 2026 Release - 2011 Vintage - 46.0% ABV - Bourbon Cask",
+        "reference": null,
+        "statedAge": 14,
+        "caskNumber": null,
+        "comparison": {
+          "missing": ["caskStrength"],
+          "conflicts": ["statedAge", "vintageYear", "distillers"],
+          "agreements": [
+            "category",
+            "abv",
+            "singleCask",
+            "brand",
+            "bottler",
+            "series"
+          ]
+        },
+        "distillery": ["Glen Garioch"],
+        "maturation": "bourbon",
+        "releaseDay": null,
+        "singleCask": false,
+        "releaseYear": 2026,
+        "vintageYear": 2011,
+        "bottlingYear": null,
+        "caskStrength": null,
+        "releaseMonth": null,
+        "familyContext": {
+          "siblingBottles": []
+        }
+      },
+      {
+        "abv": 46,
+        "brand": "Signatory Vintage",
+        "score": 72.666626,
+        "series": "The Un-Chillfiltered Collection",
+        "source": ["text"],
+        "bottler": "Signatory Vintage",
+        "edition": null,
+        "outturn": 806,
+        "bottleId": 55775,
+        "category": "single_malt",
+        "fullName": "Signatory Vintage Brora",
+        "reference": null,
+        "statedAge": 22,
+        "caskNumber": "1635",
+        "comparison": {
+          "missing": [],
+          "conflicts": ["statedAge", "vintageYear", "distillers"],
+          "agreements": ["category", "brand", "bottler", "series"]
+        },
+        "distillery": ["Brora"],
+        "maturation": "Sherry butt",
+        "releaseDay": null,
+        "singleCask": true,
+        "releaseYear": null,
+        "vintageYear": 1981,
+        "bottlingYear": 2003,
+        "caskStrength": false,
+        "releaseMonth": null,
+        "familyContext": {
+          "siblingBottles": []
+        }
+      },
+      {
+        "abv": 46,
+        "brand": "Signatory Vintage",
+        "score": 72.666626,
+        "series": "The Un-Chillfiltered Collection",
+        "source": ["text", "brand_coverage"],
+        "bottler": "Signatory Vintage",
+        "edition": null,
+        "outturn": 851,
+        "bottleId": 55777,
+        "category": "single_malt",
+        "fullName": "Signatory Vintage Brora",
+        "reference": null,
+        "statedAge": 22,
+        "caskNumber": "1560",
+        "comparison": {
+          "missing": [],
+          "conflicts": ["statedAge", "vintageYear", "distillers"],
+          "agreements": ["category", "brand", "bottler", "series"]
+        },
+        "distillery": ["Brora"],
+        "maturation": "Refill butt",
+        "releaseDay": null,
+        "singleCask": true,
+        "releaseYear": null,
+        "vintageYear": 1981,
+        "bottlingYear": 2004,
+        "caskStrength": false,
+        "releaseMonth": null,
+        "familyContext": {
+          "siblingBottles": []
+        }
+      },
+      {
+        "abv": 46,
+        "brand": "Signatory Vintage",
+        "score": 72.666626,
+        "series": "The Un-Chillfiltered Collection",
+        "source": ["text", "brand_coverage"],
+        "bottler": "Signatory Vintage",
+        "edition": null,
+        "outturn": 749,
+        "bottleId": 55772,
+        "category": "single_malt",
+        "fullName": "Signatory Vintage Brora",
+        "reference": null,
+        "statedAge": 21,
+        "caskNumber": "1586",
+        "comparison": {
+          "missing": [],
+          "conflicts": ["statedAge", "vintageYear", "distillers"],
+          "agreements": ["category", "brand", "bottler", "series"]
+        },
+        "distillery": ["Brora"],
+        "maturation": "Refill sherry",
+        "releaseDay": null,
+        "singleCask": true,
+        "releaseYear": null,
+        "vintageYear": 1981,
+        "bottlingYear": 2003,
+        "caskStrength": false,
+        "releaseMonth": null,
+        "familyContext": {
+          "siblingBottles": []
+        }
+      },
+      {
+        "abv": 46,
+        "brand": "Signatory Vintage",
+        "score": 72.50937,
+        "series": "The Un-Chillfiltered Collection",
+        "source": ["text"],
+        "bottler": "Signatory Vintage",
+        "edition": null,
+        "outturn": null,
+        "bottleId": 55137,
+        "category": "single_malt",
+        "fullName": "Signatory Vintage Glen Spey",
+        "reference": null,
+        "statedAge": 10,
+        "caskNumber": "802462 & 802463",
+        "comparison": {
+          "missing": [],
+          "conflicts": ["statedAge", "vintageYear", "distillers"],
+          "agreements": [
+            "category",
+            "abv",
+            "singleCask",
+            "caskStrength",
+            "brand",
+            "bottler",
+            "series"
+          ]
+        },
+        "distillery": ["Glen Spey"],
+        "maturation": "first-use hogsheads",
+        "releaseDay": null,
+        "singleCask": false,
+        "releaseYear": null,
+        "vintageYear": 2011,
+        "bottlingYear": 2022,
+        "caskStrength": false,
+        "releaseMonth": null,
+        "familyContext": {
+          "siblingBottles": []
+        }
+      },
+      {
+        "abv": 46,
+        "brand": "Signatory Vintage",
+        "score": 72.379845,
+        "series": "The Un-Chillfiltered Collection",
+        "source": ["text"],
+        "bottler": "Signatory Vintage",
+        "edition": null,
+        "outturn": 839,
+        "bottleId": 55769,
+        "category": "single_malt",
+        "fullName": "Signatory Vintage Brora",
+        "reference": null,
+        "statedAge": 20,
+        "caskNumber": "1420",
+        "comparison": {
+          "missing": [],
+          "conflicts": ["statedAge", "vintageYear", "distillers"],
+          "agreements": ["category", "brand", "bottler", "series"]
+        },
+        "distillery": ["Brora"],
+        "maturation": "Refill sherry butt",
+        "releaseDay": null,
+        "singleCask": true,
+        "releaseYear": null,
+        "vintageYear": 1981,
+        "bottlingYear": 2002,
+        "caskStrength": false,
+        "releaseMonth": null,
+        "familyContext": {
+          "siblingBottles": []
+        }
+      },
+      {
+        "abv": 46,
+        "brand": "Signatory Vintage",
+        "score": 72.379845,
+        "series": "The Un-Chillfiltered Collection",
+        "source": ["text"],
+        "bottler": "Signatory Vintage",
+        "edition": null,
+        "outturn": 927,
+        "bottleId": 55771,
+        "category": "single_malt",
+        "fullName": "Signatory Vintage Brora",
+        "reference": null,
+        "statedAge": 21,
+        "caskNumber": "1422",
+        "comparison": {
+          "missing": [],
+          "conflicts": ["statedAge", "vintageYear", "distillers"],
+          "agreements": ["category", "brand", "bottler", "series"]
+        },
+        "distillery": ["Brora"],
+        "maturation": "Refill sherry butt",
+        "releaseDay": null,
+        "singleCask": true,
+        "releaseYear": null,
+        "vintageYear": 1981,
+        "bottlingYear": 2003,
+        "caskStrength": false,
+        "releaseMonth": null,
+        "familyContext": {
+          "siblingBottles": []
+        }
+      },
+      {
+        "abv": 46,
+        "brand": "Signatory Vintage",
+        "score": 72.379845,
+        "series": "The Un-Chillfiltered Collection",
+        "source": ["text", "brand_coverage"],
+        "bottler": "Signatory Vintage",
+        "edition": null,
+        "outturn": 513,
+        "bottleId": 55773,
+        "category": "single_malt",
+        "fullName": "Signatory Vintage Brora",
+        "reference": null,
+        "statedAge": 21,
+        "caskNumber": "1587",
+        "comparison": {
+          "missing": [],
+          "conflicts": ["statedAge", "vintageYear", "distillers"],
+          "agreements": ["category", "brand", "bottler", "series"]
+        },
+        "distillery": ["Brora"],
+        "maturation": "Refill sherry butt",
+        "releaseDay": null,
+        "singleCask": true,
+        "releaseYear": null,
+        "vintageYear": 1981,
+        "bottlingYear": 2003,
+        "caskStrength": false,
+        "releaseMonth": null,
+        "familyContext": {
+          "siblingBottles": []
+        }
+      },
+      {
+        "abv": 46,
+        "brand": "Signatory Vintage",
+        "score": 70.64262,
+        "series": "The Un-Chillfiltered Collection",
+        "source": ["text"],
+        "bottler": "Signatory Vintage",
+        "edition": null,
+        "outturn": 408,
+        "bottleId": 55778,
+        "category": "single_malt",
+        "fullName": "Signatory Vintage Brora",
+        "reference": null,
+        "statedAge": 23,
+        "caskNumber": "05/147",
+        "comparison": {
+          "missing": [],
+          "conflicts": ["statedAge", "vintageYear", "distillers"],
+          "agreements": ["category", "brand", "bottler", "series"]
+        },
+        "distillery": ["Brora"],
+        "maturation": "Refill butt",
+        "releaseDay": null,
+        "singleCask": true,
+        "releaseYear": null,
+        "vintageYear": 1981,
+        "bottlingYear": 2005,
+        "caskStrength": false,
+        "releaseMonth": null,
+        "familyContext": {
+          "siblingBottles": []
+        }
+      },
+      {
+        "abv": 46,
+        "brand": "Signatory Vintage",
+        "score": 67.698456,
+        "series": "The Un-Chillfiltered Collection",
+        "source": ["text", "brand_coverage"],
+        "bottler": "Signatory Vintage",
+        "edition": null,
+        "outturn": null,
+        "bottleId": 55005,
+        "category": "single_malt",
+        "fullName": "Signatory Vintage Blair Athol",
+        "reference": null,
+        "statedAge": 11,
+        "caskNumber": "306899, 306905, 306911, 306913",
+        "comparison": {
+          "missing": [],
+          "conflicts": ["statedAge", "vintageYear", "distillers"],
+          "agreements": [
+            "category",
+            "abv",
+            "singleCask",
+            "caskStrength",
+            "brand",
+            "bottler",
+            "series"
+          ]
+        },
+        "distillery": ["Blair Athol"],
+        "maturation": "Four decharred and recharred hogsheads",
+        "releaseDay": null,
+        "singleCask": false,
+        "releaseYear": 2023,
+        "vintageYear": 2011,
+        "bottlingYear": 2023,
+        "caskStrength": false,
+        "releaseMonth": 1,
+        "familyContext": {
+          "siblingBottles": []
+        }
+      },
+      {
+        "abv": 46,
+        "brand": "Signatory Vintage",
+        "score": 66.35212,
+        "series": "The Un-Chillfiltered Collection",
+        "source": ["text"],
+        "bottler": "Signatory Vintage",
+        "edition": "Casks #102 & #103",
+        "outturn": null,
+        "bottleId": 54789,
+        "category": "single_malt",
+        "fullName": "Signatory Vintage Linkwood - Casks #102 & #103",
+        "reference": null,
+        "statedAge": 11,
+        "caskNumber": null,
+        "comparison": {
+          "missing": [],
+          "conflicts": ["statedAge", "vintageYear", "distillers"],
+          "agreements": [
+            "category",
+            "abv",
+            "singleCask",
+            "caskStrength",
+            "brand",
+            "bottler",
+            "series"
+          ]
+        },
+        "distillery": ["Linkwood"],
+        "maturation": "First-fill Oloroso sherry butts",
+        "releaseDay": null,
+        "singleCask": false,
+        "releaseYear": 2023,
+        "vintageYear": 2012,
+        "bottlingYear": 2023,
+        "caskStrength": false,
+        "releaseMonth": 10,
+        "familyContext": {
+          "siblingBottles": []
+        }
+      },
+      {
+        "abv": 46,
+        "brand": "Signatory Vintage",
+        "score": 63.39157,
+        "series": "The Un-Chillfiltered Collection",
+        "source": ["text"],
+        "bottler": "Signatory Vintage",
+        "edition": "Cask DRU 17/A195 #44",
+        "outturn": null,
+        "bottleId": 45617,
+        "category": "single_malt",
+        "fullName": "Signatory Vintage Unnamed Speyside - Cask DRU 17/A195 #44 - 13-year-old - 2022 Release - 2009 Vintage - 46.0% ABV - Butt - Refill",
+        "reference": null,
+        "statedAge": 13,
+        "caskNumber": null,
+        "comparison": {
+          "missing": ["distillers"],
+          "conflicts": ["statedAge", "vintageYear"],
+          "agreements": [
+            "category",
+            "abv",
+            "singleCask",
+            "caskStrength",
+            "brand",
+            "bottler",
+            "series"
+          ]
+        },
+        "distillery": [],
+        "maturation": null,
+        "releaseDay": null,
+        "singleCask": false,
+        "releaseYear": 2022,
+        "vintageYear": 2009,
+        "bottlingYear": null,
+        "caskStrength": false,
+        "releaseMonth": null,
+        "familyContext": {
+          "siblingBottles": []
+        }
+      },
+      {
+        "abv": 46,
+        "brand": "Gordon & MacPhail",
+        "score": 58.540157,
+        "series": null,
+        "source": ["text"],
+        "bottler": "Gordon & MacPhail",
+        "edition": null,
+        "outturn": null,
+        "bottleId": 65800,
+        "category": "single_malt",
+        "fullName": "Gordon & MacPhail Longmorn 15-year-old, 1989 vintage",
+        "reference": null,
+        "statedAge": 15,
+        "caskNumber": null,
+        "comparison": {
+          "missing": ["series"],
+          "conflicts": ["brand", "bottler", "distillers"],
+          "agreements": ["statedAge", "vintageYear"]
+        },
+        "distillery": ["Longmorn"],
+        "maturation": null,
+        "releaseDay": null,
+        "singleCask": null,
+        "releaseYear": null,
+        "vintageYear": 1989,
+        "bottlingYear": null,
+        "caskStrength": null,
+        "releaseMonth": null,
+        "familyContext": {
+          "siblingBottles": []
+        }
+      },
+      {
+        "abv": 46,
+        "brand": "The GlenDronach",
+        "score": 56.97231,
+        "series": null,
+        "source": ["text"],
+        "bottler": "The GlenDronach",
+        "edition": null,
+        "outturn": null,
+        "bottleId": 45997,
+        "category": "single_malt",
+        "fullName": "The GlenDronach Revival - 15-year-old - 46.0% ABV",
+        "reference": null,
+        "statedAge": 15,
+        "caskNumber": null,
+        "comparison": {
+          "missing": ["vintageYear", "singleCask", "caskStrength", "series"],
+          "conflicts": ["brand", "bottler", "distillers"],
+          "agreements": ["category", "statedAge", "abv"]
+        },
+        "distillery": ["The GlenDronach"],
+        "maturation": null,
+        "releaseDay": null,
+        "singleCask": null,
+        "releaseYear": null,
+        "vintageYear": null,
+        "bottlingYear": null,
+        "caskStrength": null,
+        "releaseMonth": null,
+        "familyContext": {
+          "siblingBottles": []
+        }
+      },
+      {
+        "abv": 46,
+        "brand": "William Cadenhead's",
+        "score": 56.54178,
+        "series": "Original Collection",
+        "source": ["text"],
+        "bottler": "William Cadenhead's",
+        "edition": null,
+        "outturn": null,
+        "bottleId": 47611,
+        "category": "single_malt",
+        "fullName": "Cadenhead's Miltonduff-Glenlivet - 15-year-old - 2008 Vintage - 46.0% ABV",
+        "reference": null,
+        "statedAge": 15,
+        "caskNumber": null,
+        "comparison": {
+          "missing": ["singleCask", "caskStrength"],
+          "conflicts": [
+            "vintageYear",
+            "brand",
+            "bottler",
+            "series",
+            "distillers"
+          ],
+          "agreements": ["category", "statedAge", "abv"]
+        },
+        "distillery": ["Miltonduff"],
+        "maturation": "bourbon",
+        "releaseDay": null,
+        "singleCask": null,
+        "releaseYear": null,
+        "vintageYear": 2008,
+        "bottlingYear": 2024,
+        "caskStrength": null,
+        "releaseMonth": null,
+        "familyContext": {
+          "siblingBottles": []
+        }
+      },
+      {
+        "abv": 46,
+        "brand": "Signatory Vintage",
+        "score": 55.417427,
+        "series": "The Un-Chillfiltered Collection",
+        "source": ["text"],
+        "bottler": "Signatory Vintage",
+        "edition": "Cask DRU17/A197 #6",
+        "outturn": null,
+        "bottleId": 56352,
+        "category": "single_malt",
+        "fullName": "Signatory Vintage Unnamed Speyside - Cask DRU17/A197 #6",
+        "reference": null,
+        "statedAge": 12,
+        "caskNumber": "DRU17/A197 #6",
+        "comparison": {
+          "missing": ["distillers"],
+          "conflicts": ["statedAge", "vintageYear"],
+          "agreements": ["category", "brand", "bottler", "series"]
+        },
+        "distillery": [],
+        "maturation": "Refill butt",
+        "releaseDay": null,
+        "singleCask": true,
+        "releaseYear": 2021,
+        "vintageYear": 2009,
+        "bottlingYear": null,
+        "caskStrength": false,
+        "releaseMonth": null,
+        "familyContext": {
+          "siblingBottles": []
+        }
+      },
+      {
+        "abv": 46,
+        "brand": "Curious Whiskies",
+        "score": 52.703957,
+        "series": null,
+        "source": ["text"],
+        "bottler": "Curious Whiskies",
+        "edition": null,
+        "outturn": null,
+        "bottleId": 46184,
+        "category": "single_malt",
+        "fullName": "Curious Whiskies Craigellachie - 15-year-old - 2009 Vintage - 46.0% ABV",
+        "reference": null,
+        "statedAge": 15,
+        "caskNumber": null,
+        "comparison": {
+          "missing": ["singleCask", "caskStrength", "series"],
+          "conflicts": ["vintageYear", "brand", "bottler", "distillers"],
+          "agreements": ["category", "statedAge", "abv"]
+        },
+        "distillery": ["Craigellachie"],
+        "maturation": null,
+        "releaseDay": null,
+        "singleCask": null,
+        "releaseYear": null,
+        "vintageYear": 2009,
+        "bottlingYear": null,
+        "caskStrength": null,
+        "releaseMonth": null,
+        "familyContext": {
+          "siblingBottles": []
+        }
+      },
+      {
+        "abv": 46,
+        "brand": "Tomatin",
+        "score": 52.374123,
+        "series": "Sherry Collection",
+        "source": ["text"],
+        "bottler": "Tomatin",
+        "edition": null,
+        "outturn": null,
+        "bottleId": 46239,
+        "category": "single_malt",
+        "fullName": "Tomatin Palo Cortado Edition - 15-year-old - 2008 Vintage - 46.0% ABV - Palo Cortado Cask - Butt",
+        "reference": null,
+        "statedAge": 15,
+        "caskNumber": null,
+        "comparison": {
+          "missing": ["singleCask", "caskStrength"],
+          "conflicts": [
+            "vintageYear",
+            "brand",
+            "bottler",
+            "series",
+            "distillers"
+          ],
+          "agreements": ["category", "statedAge", "abv"]
+        },
+        "distillery": ["Tomatin"],
+        "maturation": "palo_cortado",
+        "releaseDay": null,
+        "singleCask": null,
+        "releaseYear": null,
+        "vintageYear": 2008,
+        "bottlingYear": null,
+        "caskStrength": null,
+        "releaseMonth": null,
+        "familyContext": {
+          "siblingBottles": []
+        }
+      },
+      {
+        "abv": 46,
+        "brand": "Glenfarclas",
+        "score": 52.21348,
+        "series": null,
+        "source": ["text"],
+        "bottler": null,
+        "edition": null,
+        "outturn": null,
+        "bottleId": 46677,
+        "category": "single_malt",
+        "fullName": "Glenfarclas Cheltenham Bottling - 15-year-old - 46.0% ABV",
+        "reference": null,
+        "statedAge": 15,
+        "caskNumber": null,
+        "comparison": {
+          "missing": [
+            "vintageYear",
+            "singleCask",
+            "caskStrength",
+            "bottler",
+            "series"
+          ],
+          "conflicts": ["brand", "distillers"],
+          "agreements": ["category", "statedAge", "abv"]
+        },
+        "distillery": ["Glenfarclas"],
+        "maturation": null,
+        "releaseDay": null,
+        "singleCask": null,
+        "releaseYear": null,
+        "vintageYear": null,
+        "bottlingYear": null,
+        "caskStrength": null,
+        "releaseMonth": null,
+        "familyContext": {
+          "siblingBottles": []
+        }
+      },
+      {
+        "abv": 46,
+        "brand": "Tamdhu",
+        "score": 50.846615,
+        "series": null,
+        "source": ["text"],
+        "bottler": null,
+        "edition": null,
+        "outturn": null,
+        "bottleId": 46233,
+        "category": "single_malt",
+        "fullName": "Tamdhu Sherry Cask Matured - 15-year-old - 46.0% ABV - Oloroso Cask",
+        "reference": null,
+        "statedAge": 15,
+        "caskNumber": null,
+        "comparison": {
+          "missing": [
+            "vintageYear",
+            "singleCask",
+            "caskStrength",
+            "bottler",
+            "series"
+          ],
+          "conflicts": ["brand", "distillers"],
+          "agreements": ["category", "statedAge", "abv"]
+        },
+        "distillery": ["Tamdhu"],
+        "maturation": "oloroso",
+        "releaseDay": null,
+        "singleCask": null,
+        "releaseYear": null,
+        "vintageYear": null,
+        "bottlingYear": null,
+        "caskStrength": null,
+        "releaseMonth": null,
+        "familyContext": {
+          "siblingBottles": []
+        }
+      },
+      {
+        "abv": 46,
+        "brand": "Glencadam",
+        "score": 50.76738,
+        "series": null,
+        "source": ["text"],
+        "bottler": null,
+        "edition": null,
+        "outturn": null,
+        "bottleId": 45436,
+        "category": "single_malt",
+        "fullName": "Glencadam The Rather Dignified - 15-year-old - 46.0% ABV",
+        "reference": null,
+        "statedAge": 15,
+        "caskNumber": null,
+        "comparison": {
+          "missing": [
+            "vintageYear",
+            "singleCask",
+            "caskStrength",
+            "bottler",
+            "series"
+          ],
+          "conflicts": ["brand", "distillers"],
+          "agreements": ["category", "statedAge", "abv"]
+        },
+        "distillery": ["Glencadam"],
+        "maturation": null,
+        "releaseDay": null,
+        "singleCask": null,
+        "releaseYear": null,
+        "vintageYear": null,
+        "bottlingYear": null,
+        "caskStrength": null,
+        "releaseMonth": null,
+        "familyContext": {
+          "siblingBottles": []
+        }
+      },
+      {
+        "abv": 56.6,
+        "brand": "Signatory Vintage",
+        "score": 50.44087,
+        "series": null,
+        "source": ["vector", "text"],
+        "bottler": "Signatory Vintage",
+        "edition": null,
+        "outturn": null,
+        "bottleId": 65747,
+        "category": "single_malt",
+        "fullName": "Signatory Vintage Rosebank",
+        "reference": "Signatory 15-year-old old, 1990 vintage, Cask # 1509 (distilled at Rosebank)",
+        "statedAge": 15,
+        "caskNumber": "1509",
+        "comparison": {
+          "missing": ["series"],
+          "conflicts": ["vintageYear", "distillers"],
+          "agreements": ["statedAge", "brand", "bottler"]
+        },
+        "distillery": ["Rosebank"],
+        "maturation": null,
+        "releaseDay": null,
+        "singleCask": true,
+        "releaseYear": null,
+        "vintageYear": 1990,
+        "bottlingYear": null,
+        "caskStrength": null,
+        "releaseMonth": null,
+        "familyContext": {
+          "siblingBottles": []
+        }
+      },
+      {
+        "abv": null,
+        "brand": "A.D. Rattray",
+        "score": 49.698334,
+        "series": "Cask Collection",
+        "source": ["text"],
+        "bottler": "A.D. Rattray",
+        "edition": "Cask No. 3880",
+        "outturn": 380,
+        "bottleId": 59155,
+        "category": "single_malt",
+        "fullName": "A.D. Rattray Craigellachie 1989 15-year-old - Cask No. 3880",
+        "reference": null,
+        "statedAge": 15,
+        "caskNumber": "3880",
+        "comparison": {
+          "missing": [],
+          "conflicts": ["brand", "bottler", "series", "distillers"],
+          "agreements": ["statedAge", "vintageYear"]
+        },
+        "distillery": ["Craigellachie"],
+        "maturation": "Oak",
+        "releaseDay": null,
+        "singleCask": true,
+        "releaseYear": null,
+        "vintageYear": 1989,
+        "bottlingYear": 2004,
+        "caskStrength": null,
+        "releaseMonth": null,
+        "familyContext": {
+          "siblingBottles": []
+        }
+      },
+      {
+        "abv": 59.9,
+        "brand": "A.D. Rattray",
+        "score": 49.52449,
+        "series": "Cask Collection",
+        "source": ["text"],
+        "bottler": "A.D. Rattray",
+        "edition": "Cask No. 50062",
+        "outturn": 430,
+        "bottleId": 59151,
+        "category": "single_malt",
+        "fullName": "A.D. Rattray Benriach 1989 15-year-old - Cask No. 50062",
+        "reference": null,
+        "statedAge": 15,
+        "caskNumber": "50062",
+        "comparison": {
+          "missing": [],
+          "conflicts": ["brand", "bottler", "series", "distillers"],
+          "agreements": ["statedAge", "vintageYear"]
+        },
+        "distillery": ["BenRiach"],
+        "maturation": null,
+        "releaseDay": null,
+        "singleCask": true,
+        "releaseYear": null,
+        "vintageYear": 1989,
+        "bottlingYear": 2004,
+        "caskStrength": null,
+        "releaseMonth": null,
+        "familyContext": {
+          "siblingBottles": []
+        }
+      },
+      {
+        "abv": 52.9,
+        "brand": "A.D. Rattray",
+        "score": 49.52449,
+        "series": "Cask Collection",
+        "source": ["text"],
+        "bottler": "A.D. Rattray",
+        "edition": "Cask No. 1091",
+        "outturn": 261,
+        "bottleId": 59153,
+        "category": "single_malt",
+        "fullName": "A.D. Rattray Bowmore 1989 15-year-old - Cask No. 1091",
+        "reference": null,
+        "statedAge": 15,
+        "caskNumber": "1091",
+        "comparison": {
+          "missing": [],
+          "conflicts": ["brand", "bottler", "series", "distillers"],
+          "agreements": ["statedAge", "vintageYear"]
+        },
+        "distillery": ["Bowmore"],
+        "maturation": null,
+        "releaseDay": null,
+        "singleCask": true,
+        "releaseYear": null,
+        "vintageYear": 1989,
+        "bottlingYear": 2004,
+        "caskStrength": null,
+        "releaseMonth": null,
+        "familyContext": {
+          "siblingBottles": []
+        }
+      },
+      {
+        "abv": 54.2,
+        "brand": "A.D. Rattray",
+        "score": 49.52449,
+        "series": "Cask Collection",
+        "source": ["text"],
+        "bottler": "A.D. Rattray",
+        "edition": "Cask No. 3882",
+        "outturn": 315,
+        "bottleId": 59171,
+        "category": "single_malt",
+        "fullName": "A.D. Rattray Craigellachie 1989 15-year-old - Cask No. 3882",
+        "reference": null,
+        "statedAge": 15,
+        "caskNumber": "3882",
+        "comparison": {
+          "missing": [],
+          "conflicts": ["brand", "bottler", "series", "distillers"],
+          "agreements": ["statedAge", "vintageYear"]
+        },
+        "distillery": ["Craigellachie"],
+        "maturation": null,
+        "releaseDay": null,
+        "singleCask": true,
+        "releaseYear": null,
+        "vintageYear": 1989,
+        "bottlingYear": 2005,
+        "caskStrength": null,
+        "releaseMonth": null,
+        "familyContext": {
+          "siblingBottles": []
+        }
+      },
+      {
+        "abv": 63.5,
+        "brand": "A.D. Rattray",
+        "score": 49.52449,
+        "series": "Cask Collection",
+        "source": ["text"],
+        "bottler": "A.D. Rattray",
+        "edition": "Cask No. 10303",
+        "outturn": 407,
+        "bottleId": 59161,
+        "category": "single_malt",
+        "fullName": "A.D. Rattray Strathmill 1989 15-year-old - Cask No. 10303",
+        "reference": null,
+        "statedAge": 15,
+        "caskNumber": "10303",
+        "comparison": {
+          "missing": [],
+          "conflicts": ["brand", "bottler", "series", "distillers"],
+          "agreements": ["statedAge", "vintageYear"]
+        },
+        "distillery": ["Strathmill"],
+        "maturation": null,
+        "releaseDay": null,
+        "singleCask": true,
+        "releaseYear": null,
+        "vintageYear": 1989,
+        "bottlingYear": 2004,
+        "caskStrength": null,
+        "releaseMonth": null,
+        "familyContext": {
+          "siblingBottles": []
+        }
+      },
+      {
+        "abv": 59.1,
+        "brand": "A.D. Rattray",
+        "score": 49.18725,
+        "series": "Cask Collection",
+        "source": ["text"],
+        "bottler": "A.D. Rattray",
+        "edition": "Cask No. 18146",
+        "outturn": 270,
+        "bottleId": 59176,
+        "category": "single_malt",
+        "fullName": "A.D. Rattray Glenrothes 1989 15-year-old - Cask No. 18146",
+        "reference": null,
+        "statedAge": 15,
+        "caskNumber": "18146",
+        "comparison": {
+          "missing": [],
+          "conflicts": ["brand", "bottler", "series", "distillers"],
+          "agreements": ["statedAge", "vintageYear"]
+        },
+        "distillery": ["The Glenrothes"],
+        "maturation": "Bourbon",
+        "releaseDay": null,
+        "singleCask": true,
+        "releaseYear": null,
+        "vintageYear": 1989,
+        "bottlingYear": 2005,
+        "caskStrength": null,
+        "releaseMonth": null,
+        "familyContext": {
+          "siblingBottles": []
+        }
+      },
+      {
+        "abv": 55.6,
+        "brand": "A.D. Rattray",
+        "score": 48.321617,
+        "series": "Cask Collection",
+        "source": ["text"],
+        "bottler": "A.D. Rattray",
+        "edition": "Cask No. 10506",
+        "outturn": 292,
+        "bottleId": 59158,
+        "category": "single_malt",
+        "fullName": "A.D. Rattray Highland Park 1989 15-year-old - Cask No. 10506",
+        "reference": null,
+        "statedAge": 15,
+        "caskNumber": "10506",
+        "comparison": {
+          "missing": [],
+          "conflicts": ["brand", "bottler", "series", "distillers"],
+          "agreements": ["statedAge", "vintageYear"]
+        },
+        "distillery": ["Highland Park"],
+        "maturation": null,
+        "releaseDay": null,
+        "singleCask": true,
+        "releaseYear": null,
+        "vintageYear": 1989,
+        "bottlingYear": 2004,
+        "caskStrength": null,
+        "releaseMonth": null,
+        "familyContext": {
+          "siblingBottles": []
+        }
+      },
+      {
+        "abv": 46,
+        "brand": "Signatory Vintage",
+        "score": 1,
+        "series": null,
+        "source": ["vector", "context"],
+        "bottler": "Signatory Vintage",
+        "edition": null,
+        "outturn": 634,
+        "bottleId": 65763,
+        "category": "single_malt",
+        "fullName": "Signatory Vintage Caol Ila",
+        "reference": "Signatory 15-year-old old, 1991 vintage, cask #06/324/1&2 (distilled at Caol Ila)",
+        "statedAge": 15,
+        "caskNumber": "06/324/1&2",
+        "comparison": {
+          "missing": ["series"],
+          "conflicts": ["vintageYear", "distillers"],
+          "agreements": ["statedAge", "brand", "bottler"]
+        },
+        "distillery": ["Caol Ila"],
+        "maturation": null,
+        "releaseDay": null,
+        "singleCask": false,
+        "releaseYear": null,
+        "vintageYear": 1991,
+        "bottlingYear": null,
+        "caskStrength": null,
+        "releaseMonth": null,
+        "familyContext": {
+          "siblingBottles": []
+        }
+      },
+      {
+        "abv": 60.8,
+        "brand": "Signatory Vintage",
+        "score": 0.7685143410459667,
+        "series": null,
+        "source": ["vector"],
+        "bottler": "Signatory Vintage",
+        "edition": null,
+        "outturn": 794,
+        "bottleId": 65427,
+        "category": "single_malt",
+        "fullName": "Signatory Vintage Laphroaig",
+        "reference": "Signatory 1998 (distilled at Laphroaig)",
+        "statedAge": 15,
+        "caskNumber": "700393",
+        "comparison": {
+          "missing": ["series"],
+          "conflicts": ["vintageYear", "distillers"],
+          "agreements": ["statedAge", "brand", "bottler"]
+        },
+        "distillery": ["Laphroaig"],
+        "maturation": "Refill sherry cask",
+        "releaseDay": null,
+        "singleCask": true,
+        "releaseYear": null,
+        "vintageYear": 1998,
+        "bottlingYear": 2013,
+        "caskStrength": null,
+        "releaseMonth": null,
+        "familyContext": {
+          "siblingBottles": []
+        }
+      }
+    ]
+  },
+  "context": {
+    "inspectedBottleIds": [65763],
+    "bottleContexts": [
+      {
+        "exact": {
+          "abv": 46,
+          "edition": null,
+          "outturn": 634,
+          "statedAge": 15,
+          "caskNumber": "06/324/1&2",
+          "maturation": null,
+          "releaseDay": null,
+          "singleCask": false,
+          "releaseYear": null,
+          "vintageYear": 1991,
+          "bottlingYear": null,
+          "caskStrength": null,
+          "releaseMonth": null
+        },
+        "shared": {
+          "name": "Caol Ila",
+          "brand": {
+            "name": "Signatory Vintage",
+            "entityId": 5725
+          },
+          "series": null,
+          "bottler": {
+            "name": "Signatory Vintage",
+            "entityId": 5725
+          },
+          "category": "single_malt",
+          "statedAge": null,
+          "distillers": [
+            {
+              "name": "Caol Ila",
+              "entityId": 366
+            }
+          ]
+        },
+        "groupId": 38724,
+        "bottleId": 65763,
+        "fullName": "Signatory Vintage Caol Ila",
+        "siblings": [],
+        "references": [
+          {
+            "name": "Signatory 15-year-old old, 1991 vintage, cask #06/324/1&2 (distilled at Caol Ila)",
+            "ignored": false
+          },
+          {
+            "name": "Signatory (distilled at Caol Ila), 15-year-old, 1991 vintage, cask #06/324/1&2, 46%",
+            "ignored": false
+          }
+        ],
+        "observations": [],
+        "imageSources": []
+      }
+    ],
+    "inspectedEntities": [
+      {
+        "kind": "bottler",
+        "name": "Signatory Vintage",
+        "score": 1,
+        "source": ["exact", "text", "prefix", "contained"],
+        "entityId": 5725,
+        "reference": "Signatory Vintage",
+        "shortName": null,
+        "retrievedFor": [
+          {
+            "exact": true,
+            "query": "Signatory Vintage"
+          }
+        ]
+      },
+      {
+        "kind": "distillery",
+        "name": "Cragganmore",
+        "score": 1,
+        "source": ["exact", "text", "prefix", "contained"],
+        "entityId": 859,
+        "reference": "Cragganmore",
+        "shortName": null,
+        "retrievedFor": [
+          {
+            "exact": true,
+            "query": "Cragganmore"
+          }
+        ]
+      },
+      {
+        "kind": "bottler",
+        "name": "Gordon & MacPhail",
+        "score": 1,
+        "source": ["exact", "text", "prefix", "contained"],
+        "entityId": 5645,
+        "reference": "Gordon & MacPhail",
+        "shortName": null,
+        "retrievedFor": [
+          {
+            "exact": true,
+            "query": "Gordon & MacPhail"
+          }
+        ]
+      },
+      {
+        "kind": "distillery",
+        "name": "Longmorn",
+        "score": 1,
+        "source": ["exact", "text", "prefix", "contained"],
+        "entityId": 1151,
+        "reference": "Longmorn",
+        "shortName": null,
+        "retrievedFor": [
+          {
+            "exact": true,
+            "query": "Longmorn"
+          }
+        ]
+      },
+      {
+        "kind": "bottler",
+        "name": "A.D. Rattray",
+        "score": 1,
+        "source": ["exact", "text", "prefix", "contained"],
+        "entityId": 5817,
+        "reference": "A.D. Rattray",
+        "shortName": null,
+        "retrievedFor": [
+          {
+            "exact": true,
+            "query": "A.D. Rattray"
+          }
+        ]
+      },
+      {
+        "kind": "distillery",
+        "name": "Craigellachie",
+        "score": 1,
+        "source": ["exact", "text", "prefix", "contained"],
+        "entityId": 860,
+        "reference": "Craigellachie",
+        "shortName": null,
+        "retrievedFor": [
+          {
+            "exact": true,
+            "query": "Craigellachie"
+          }
+        ]
+      },
+      {
+        "kind": "distillery",
+        "name": "BenRiach",
+        "score": 1,
+        "source": ["exact", "text", "prefix", "contained"],
+        "entityId": 225,
+        "reference": "BenRiach",
+        "shortName": null,
+        "retrievedFor": [
+          {
+            "exact": true,
+            "query": "BenRiach"
+          }
+        ]
+      },
+      {
+        "kind": "distillery",
+        "name": "Bowmore",
+        "score": 1,
+        "source": ["exact", "text", "prefix", "contained"],
+        "entityId": 394,
+        "reference": "Bowmore",
+        "shortName": null,
+        "retrievedFor": [
+          {
+            "exact": true,
+            "query": "Bowmore"
+          }
+        ]
+      },
+      {
+        "kind": "distillery",
+        "name": "Strathmill",
+        "score": 1,
+        "source": ["exact", "text", "prefix", "contained"],
+        "entityId": 1380,
+        "reference": "Strathmill",
+        "shortName": null,
+        "retrievedFor": [
+          {
+            "exact": true,
+            "query": "Strathmill"
+          }
+        ]
+      },
+      {
+        "kind": "distillery",
+        "name": "The Glenrothes",
+        "score": 1,
+        "source": ["exact", "text", "prefix", "contained"],
+        "entityId": 985,
+        "reference": "Glenrothes",
+        "shortName": null,
+        "retrievedFor": [
+          {
+            "exact": true,
+            "query": "The Glenrothes"
+          }
+        ]
+      },
+      {
+        "kind": "distillery",
+        "name": "Highland Park",
+        "score": 1,
+        "source": ["exact", "text", "prefix", "contained"],
+        "entityId": 438,
+        "reference": "Highland Park",
+        "shortName": null,
+        "retrievedFor": [
+          {
+            "exact": true,
+            "query": "Highland Park"
+          }
+        ]
+      },
+      {
+        "kind": "distillery",
+        "name": "Rosebank",
+        "score": 1,
+        "source": ["exact", "text", "prefix", "contained"],
+        "entityId": 1296,
+        "reference": "Rosebank",
+        "shortName": null,
+        "retrievedFor": [
+          {
+            "exact": true,
+            "query": "Rosebank"
+          }
+        ]
+      },
+      {
+        "kind": "distillery",
+        "name": "Caol Ila",
+        "score": 1,
+        "source": ["exact", "text", "prefix", "contained"],
+        "entityId": 366,
+        "reference": "Caol Ila",
+        "shortName": "",
+        "retrievedFor": [
+          {
+            "exact": true,
+            "query": "Caol Ila"
+          }
+        ]
+      },
+      {
+        "kind": "distillery",
+        "name": "Laphroaig",
+        "score": 1,
+        "source": ["exact", "text", "prefix", "contained"],
+        "entityId": 1129,
+        "reference": "Laphroaig",
+        "shortName": "",
+        "retrievedFor": [
+          {
+            "exact": true,
+            "query": "Laphroaig"
+          }
+        ]
+      },
+      {
+        "kind": "brand",
+        "name": "Vintage",
+        "score": 0.3375,
+        "source": ["contained"],
+        "entityId": 4392,
+        "reference": "Vintage",
+        "shortName": null,
+        "retrievedFor": [
+          {
+            "query": "Signatory Vintage"
+          }
+        ]
+      },
+      {
+        "kind": "company",
+        "name": "Morrison Bowmore Distillers Ltd",
+        "score": 0.2,
+        "source": ["text"],
+        "entityId": 5684,
+        "reference": null,
+        "shortName": null,
+        "retrievedFor": [
+          {
+            "query": "Bowmore"
+          }
+        ]
+      },
+      {
+        "kind": "company",
+        "name": "D. Johnston & Co. (Laphroaig) Ltd.",
+        "score": 0.2,
+        "source": ["text"],
+        "entityId": 5737,
+        "reference": null,
+        "shortName": null,
+        "retrievedFor": [
+          {
+            "query": "Laphroaig"
+          }
+        ]
+      }
+    ],
+    "inspectedSeries": []
+  },
+  "provenance": {
+    "source": "production_miss",
+    "verifiedSourceUrls": [
+      "https://whiskyadvocate.com/Signatory-Unchillfiltered-distilled-at-Cragganmore-15-year-old-1989-vintage-46",
+      "https://www.whiskybase.com/whiskies/whisky/1329/cragganmore-1989-sv",
+      "https://www.whisky.com/whisky-database/details/cragganmore-50.html"
+    ],
+    "dbOutcome": {
+      "bottleId": 65815,
+      "createsBottle": true,
+      "summary": "Production returned create_bottle with the name `Cragganmore 15-year-old, 1989 vintage`."
+    },
+    "notes": "Captured from saved classifier run 18481 (review 8120, model openai/gpt-6-luna, 2026-09-28T05:48:31.587Z). Production rationale: The Whisky Advocate product title identifies Signatory's Cragganmore bottling as 15 years old, 1989 vintage, at 46% ABV. Product-specific search evidence supports its single-malt identity. The inspected Signatory candidate, Bottle 65763, is a different Caol Ila bottling from 1991, and no local candidate represents this complete product. Whiskybase lists Cragganmore 1989 SV and Whisky.com lists Cragganmore 15 Years 1989. This case uses different values from the Rosebank and Glenlivet cases to test that the rule generalizes."
+  },
+  "expected": {
+    "status": "classified",
+    "action": "create_bottle",
+    "identityScope": "product",
+    "matchedBottleId": null,
+    "proposedBottle": {
+      "brand": {
+        "id": 5725,
+        "name": "Signatory Vintage"
+      },
+      "statedAge": 15,
+      "vintageYear": 1989
+    },
+    "proposedBottleNameOneOf": ["Cragganmore 1989 15-year-old"],
+    "proposedBottleNameExcludes": ["Vintage"],
+    "summary": "Create the Signatory Cragganmore named Cragganmore 1989 15-year-old: distillery, vintage, age."
+  }
+}

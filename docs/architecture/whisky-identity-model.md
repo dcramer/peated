@@ -265,11 +265,20 @@ Entity.
   structured facts as well. Never generate a name suffix from those fields to
   make a Bottle look unique, and do not use a generic category word such as
   `Single Malt` as the name unless the marketed name is exactly that.
-- For a uniform multi-distillery label with no separate expression name, use
-  the featured distillery as the Bottle name, keeping the age wording the label
-  prints: `Glenury Royal 55-year-old` for the Rare Series release. Store its
-  55-year age, 1970 vintage, 2026 release year, and 62.4% ABV in their fields
-  as well; do not add the vintage, release year, or ABV to the name.
+- For a uniform multi-distillery label with no separate expression name, such
+  as an independent bottler's single cask, use the featured distillery as the
+  Bottle name, followed by the vintage and then the age the label prints:
+  `Glenury Royal 1970 55-year-old` for the Rare Series release and
+  `Glenlivet 1968 35-year-old` for a Duncan Taylor cask. Retailers, auction
+  houses, and Whiskybase name these bottles the same way, and the vintage is
+  often what tells two casks of the same age apart. Write the year alone,
+  without the word `vintage`, unless the producer's title uses `Vintage` as
+  part of the name.
+  Include only a vintage or age that the label prints; a source title that
+  omits one does not remove it from the label, and a stored field does not add
+  it. Store the age, vintage, release year, and ABV in their fields as well,
+  put a printed cask number in `edition`, and leave release year and ABV out
+  of the name.
 - `vintageYear` is the distillation year. `bottlingYear` is the year the whisky
   was bottled. `releaseYear` is the known year the marketed release became
   available. Store `releaseMonth` and `releaseDay` only when the source gives
