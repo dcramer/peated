@@ -128,6 +128,11 @@ Then apply these rules:
 - Merge records only when they describe the same marketed release. Package
   volume and market packaging alone do not create a new Bottle. Different
   vintage, age, ABV, edition, or cask facts usually require separate Bottles.
+  Records with the same name are not proof of a duplicate. Before merging,
+  read both records' references and prices: a batch, season, or proof printed
+  only there can mark separate releases. For example, Parker's Heritage
+  Collection 10th Edition was bottled separately from fall 1990 and spring
+  1991 distillations, and only the back label shows which.
 - Unaged new-make or new-pot spirit is not whisky and is out of scope. So is
   anything that is not a marketed release under the identity model's
   definition: visitor hand-fills, private casks never sold as labeled
@@ -320,6 +325,16 @@ that will remain, `222`:
 pnpm cli api post /bottles/111/merge --input /tmp/bottle-merge.json
 ```
 
+Keep as survivor the Bottle with tastings, an image, or the older ID. The
+survivor keeps only its own fields. Tastings, prices, collections, aliases, and
+references move to it, but the retired Bottle's facts do not. After the
+merge:
+
+- patch the survivor with any facts from the retired Bottle that the evidence
+  supports, such as `abv`, `statedAge`, or `distillers`;
+- list the survivor's references and unassign any moved reference whose text
+  names another release, such as an automatic name with the wrong batch.
+
 An Entity merge uses the same body and direction with
 `POST /entities/111/merge` (moderator only). Merge Entities only when the
 producer's own pages prove that two records describe one organization or one
@@ -373,7 +388,8 @@ pnpm cli api delete /bottles/123/aliases/789
 - Fetch each uploaded `imageUrl` again and inspect the stored image. Confirm that
   it still shows the expected release after server processing.
 - After a merge, fetch both IDs. Confirm that the old ID resolves to the chosen
-  survivor and that references, facts, and the best image were preserved.
+  survivor, that its facts include the retired Bottle's supported facts, and
+  that references and the best image were preserved.
 - After a name change or merge, fetch aliases and references again. Confirm that
   verified public names remain visible and active references point to the
   expected Bottle.
