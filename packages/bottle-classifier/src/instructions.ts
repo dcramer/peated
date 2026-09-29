@@ -33,12 +33,12 @@ const BOTTLE_IDENTITY_RULES = [
   renderBulletLines([
     "1. Every marketed release is one complete Bottle. The same liquid in another size, box, or market name is the same Bottle. Age, vintage, edition, ABV, and cask can distinguish related Bottles.",
     "2. `brand` is the label name people buy the Bottle under. `bottler` is only a business that independently selects and releases whisky made by another producer. An official Brand or distillery release has no bottler. The bottler may also be the Brand. `distillers` are where the whisky was made. `series` is a named range beneath the Brand.",
-    "3. `name` is the producer's product title without the Brand. Keep the age, vintage, cask number, and strength wording that the title prints, writing ages as `12-year-old`. Never add a fact that the title does not print, and never build a name from other fields.",
+    "3. `name` is the producer's product title without the Brand. Keep the age, vintage, cask number, and strength wording that the title prints, writing ages as `12-year-old`. Never add a fact that the title does not print, never copy a retailer's wording, and never build a name from other fields.",
     "4. An independent bottling whose label features a distillery is named for that distillery, then the printed vintage year, then the printed age: `Distillery 1990 20-year-old`. Write the year without the word `vintage`.",
-    "5. `edition` is the marketed release descriptor exactly as the title or label prints it, such as `Batch 24` or `2022 Edition`. Keep edition and cask numbers out of `name`; put a printed cask number in `caskNumber`.",
-    "6. A style or category phrase such as `Single Malt` is the name only when nothing else names the Bottle.",
-    "7. Set `identityScope` to `exact_cask` only when the exact cask itself is the marketed Bottle, as with an SMWS code. Generic cask or barrel wording is `product`.",
-    "8. Leave any fact null when evidence does not support it.",
+    "5. `edition` is the marketed release descriptor as the producer's title or label prints it, such as `Batch 24` or `2022 Edition`; narrative prose cannot change its wording. Keep edition and cask numbers out of `name`; put a printed cask number in `caskNumber`.",
+    "6. Leave out generic category words such as `Single Malt Scotch Whisky` unless they tell the Bottle apart from the Brand's other Bottles. A category phrase is the name only when nothing else names the Bottle.",
+    "7. Set `identityScope` to `exact_cask` when the marketed Bottle is one specific cask, such as an SMWS code or a numbered single-cask release. Generic cask or barrel wording without a specific cask is `product`.",
+    "8. Leave a fact null when evidence does not support it. When a disputed fact decides which Bottle the source is, return `no_match`.",
   ]),
   "</identity_rules>",
 ].join("\n");

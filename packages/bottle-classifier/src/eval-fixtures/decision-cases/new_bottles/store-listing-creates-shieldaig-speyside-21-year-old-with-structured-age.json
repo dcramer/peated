@@ -49,7 +49,8 @@
     },
     "verifyEligible": false,
     "summary": "Create a separate Shieldaig Speyside 21-year-old Bottle whose name keeps the printed Speyside and 21-year-old wording, with 21 also in the structured statedAge field.",
-    "proposedBottleNameIncludes": ["Speyside", "21-year-old"]
+    "proposedBottleNameIncludes": ["Speyside", "21-year-old"],
+    "proposedBottleNameExcludes": ["Single Malt", "Scotch"]
   },
   "localCatalog": {
     "entities": [
