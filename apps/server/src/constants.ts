@@ -66,7 +66,7 @@ export type ReservedCollectionSlug = (typeof RESERVED_COLLECTION_SLUGS)[number];
 // `initialRunEvery` applies only when a site is first added. Change an existing
 // schedule through the admin API.
 export const EXTERNAL_SITE_DEFINITIONS = {
-  // Auction collection stays manual until its refresh capacity and publication review are confirmed.
+  // Auction collection stays manual until a full run and live-auction refresh capacity are checked.
   scotchwhiskyauctions: {
     name: "Scotch Whisky Auctions",
     initialRunEvery: null,
