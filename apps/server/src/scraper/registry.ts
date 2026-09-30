@@ -39,6 +39,11 @@ import {
   LegacyPriceCursorSchema,
 } from "./adapters/legacyPrice";
 import {
+  scotchWhiskyAuctionsAdapter,
+  ScotchWhiskyAuctionsCursorSchema,
+  ScotchWhiskyAuctionsObservationSchema,
+} from "./adapters/scotchWhiskyAuctions";
+import {
   whiskyAdvocateAdapter,
   WhiskyAdvocateCursorSchema,
   WhiskyAdvocateObservationSchema,
@@ -54,6 +59,7 @@ import {
   defineScrapeTarget,
 } from "./definitions";
 import { loadSingleCaskNationReleases } from "./singleCaskNationReleases";
+import { auctionSink } from "./sinks/auctions";
 import { createBottleObservationSink } from "./sinks/bottles";
 import { externalReviewSink } from "./sinks/externalReviews";
 import {
@@ -169,6 +175,16 @@ const legacyBottleSources = [
 
 export const scraperRegistry = createScraperRegistry({
   targets: [
+    defineScrapeTarget({
+      key: "scotchwhiskyauctions",
+      enabled: false,
+      origins: [
+        {
+          origin: "https://www.scotchwhiskyauctions.com",
+          robots: { mode: "enforce" },
+        },
+      ],
+    }),
     ...legacyPriceSources.map((source) =>
       defineScrapeTarget({
         key: source.type,
@@ -393,6 +409,16 @@ export const scraperRegistry = createScraperRegistry({
     }),
   ],
   sources: [
+    defineScraperSource({
+      key: "scotchwhiskyauctions",
+      externalSiteKey: "scotchwhiskyauctions",
+      recordType: "auction",
+      targetKeys: ["scotchwhiskyauctions"],
+      cursorSchema: ScotchWhiskyAuctionsCursorSchema,
+      observationSchema: ScotchWhiskyAuctionsObservationSchema,
+      adapter: scotchWhiskyAuctionsAdapter,
+      sink: auctionSink,
+    }),
     ...legacyPriceSources.map((source) =>
       defineScraperSource({
         key: source.type,

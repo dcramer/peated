@@ -5,6 +5,9 @@
 import { db, type AnyTransaction } from "@peated/server/db";
 import type { Bottle, User } from "@peated/server/db/schema";
 import {
+  auctionAlerts,
+  auctionLots,
+  auctionWatches,
   bottleBarcodes,
   bottleFlavorProfiles,
   bottleGroupDistillers,
@@ -395,6 +398,41 @@ async function repointBottleConsumers(
     memberReviewsMoved: memberReviewChanges.moved,
     memberReviewsCollapsed: memberReviewChanges.collapsed,
   };
+  // Auction history owns durable lot references; watches collapse by member on a Bottle merge.
+  const sourceWatches = await tx
+    .select()
+    .from(auctionWatches)
+    .where(eq(auctionWatches.bottleId, sourceBottleId))
+    .orderBy(asc(auctionWatches.id))
+    .for("update");
+  for (const watch of sourceWatches) {
+    await tx
+      .insert(auctionWatches)
+      .values({
+        userId: watch.userId,
+        bottleId: destinationBottleId,
+        createdAt: watch.createdAt,
+      })
+      .onConflictDoUpdate({
+        target: [auctionWatches.userId, auctionWatches.bottleId],
+        set: {
+          createdAt: sql`LEAST(${auctionWatches.createdAt}, ${watch.createdAt})`,
+        },
+      });
+    await tx.delete(auctionWatches).where(eq(auctionWatches.id, watch.id));
+  }
+  for (const [name, table] of [
+    ["auctionLots", auctionLots],
+    ["auctionAlerts", auctionAlerts],
+  ] as const) {
+    const updated = await tx
+      .update(table)
+      .set({ bottleId: destinationBottleId })
+      .where(eq(table.bottleId, sourceBottleId))
+      .returning({ id: table.id });
+    if (updated.length) counts[name] = updated.length;
+  }
+  if (sourceWatches.length) counts.auctionWatches = sourceWatches.length;
   for (const [name, table, column] of [
     ["tastings", tastings, tastings.bottleId],
     ["reviews", externalReviews, externalReviews.bottleId],

@@ -135,8 +135,11 @@ and reviews still using the observed Bottle, plus unresolved exact-name
 consumers. Unassignment moves only exact-name consumers still using the
 observed Bottle back to `null`. An intentionally ambiguous or invalid reference
 may also be marked ignored so automated maintenance does not reconsider it.
-Consumers assigned to any other Bottle stay unchanged. An ignored reference
-cannot remain assigned, and a current Bottle full name cannot be reassigned or
+Consumers assigned to any other Bottle stay unchanged. A reference correction
+also invalidates auction assignments that explicitly recorded that accepted
+reference. Auction lots return to matching or are ignored; moderator-reviewed
+lot assignments remain unchanged. An ignored reference cannot remain assigned,
+and a current Bottle full name cannot be reassigned or
 unassigned.
 
 ## Resolution Pipeline

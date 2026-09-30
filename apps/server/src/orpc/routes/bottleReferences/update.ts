@@ -21,7 +21,7 @@ export default procedure
     path: "/bottle-references/{reference}",
     summary: "Correct a Bottle reference",
     description:
-      "Reassign, unassign, or ignore one exact Bottle reference and update matching imported prices and reviews. Requires a moderator.",
+      "Correct one exact Bottle reference, update matching imported prices and reviews, and invalidate auction matches made from it. Requires a moderator.",
     operationId: "updateBottleReference",
   })
   .input(

@@ -1,0 +1,2 @@
+ALTER TABLE "auction_lot" ADD COLUMN "matched_reference_id" bigint;
+ALTER TABLE "auction_lot" ADD CONSTRAINT "auction_lot_matched_reference_id_bottle_reference_id_fk" FOREIGN KEY ("matched_reference_id") REFERENCES "public"."bottle_reference"("id") ON DELETE no action ON UPDATE no action;

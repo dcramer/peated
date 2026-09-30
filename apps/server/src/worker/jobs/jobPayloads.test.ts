@@ -11,10 +11,12 @@ import { IndexEntitySearchJobArgsSchema } from "./indexEntitySearch";
 import { OnEntityChangeJobArgsSchema } from "./onEntityChange";
 import { ProcessNotificationJobArgsSchema } from "./processNotification";
 import { ProcessStorePriceMatchRetryRunJobArgsSchema } from "./processStorePriceMatchRetryRun";
+import { ResolveAuctionLotJobArgsSchema } from "./resolveAuctionLot";
 import { ResolveStorePriceBottleJobArgsSchema } from "./resolveStorePriceBottle";
 import { VerifyEntityCreationJobArgsSchema } from "./verifyEntityCreation";
 
 const jobPayloads = [
+  [ResolveAuctionLotJobArgsSchema, { lotId: 1, fingerprint: "source-facts" }],
   [
     CapturePriceImageJobArgsSchema,
     { priceId: 1, imageUrl: "https://example.com/a.jpg" },

@@ -4,8 +4,12 @@ import { serialize, serializer } from ".";
 import { db } from "../db";
 import type { Notification, User } from "../db/schema";
 import {
+  auctionAlerts,
+  auctionLots,
+  auctions,
   bottles,
   comments,
+  externalSites,
   follows,
   tastings,
   toasts,
@@ -27,6 +31,13 @@ type TastingRef = NonNullable<
 type NotificationAttrs = {
   fromUser: ReturnType<(typeof UserSerializer)["item"]> | null;
 } & (
+  | {
+      type: "auction_available";
+      ref: Extract<
+        SerializedNotification,
+        { type: "auction_available" }
+      >["ref"];
+    }
   | {
       type: "friend_request";
       ref: FriendRequestRef | null;
@@ -137,9 +148,44 @@ export const NotificationSerializer = serializer({
       }
       return { ...reference, bottleId: reference.bottleId };
     });
+    const auctionAlertIds = itemList
+      .filter((item) => item.type === "auction_available")
+      .map((item) => item.objectId);
+    const alertRows = auctionAlertIds.length
+      ? await db
+          .select({
+            id: auctionAlerts.id,
+            userId: auctionAlerts.userId,
+            bottleId: auctionAlerts.bottleId,
+            lotId: auctionLots.id,
+            url: auctionLots.url,
+            sourceName: externalSites.name,
+          })
+          .from(auctionAlerts)
+          .innerJoin(
+            auctionLots,
+            and(
+              eq(auctionAlerts.lotId, auctionLots.id),
+              eq(auctionAlerts.bottleId, auctionLots.bottleId),
+            ),
+          )
+          .innerJoin(auctions, eq(auctionLots.auctionId, auctions.id))
+          .innerJoin(
+            externalSites,
+            eq(auctions.externalSiteId, externalSites.id),
+          )
+          .where(
+            and(
+              inArray(auctionAlerts.id, auctionAlertIds),
+              eq(auctionAlerts.userId, currentUser.id),
+            ),
+          )
+      : [];
+    const alertsById = new Map(alertRows.map((alert) => [alert.id, alert]));
     const bottleIds = Array.from(
       new Set(directBottleReferences.map((reference) => reference.bottleId)),
     );
+    bottleIds.push(...alertRows.map((alert) => alert.bottleId));
     const bottleList = bottleIds.length
       ? await db.select().from(bottles).where(inArray(bottles.id, bottleIds))
       : [];
@@ -208,6 +254,23 @@ export const NotificationSerializer = serializer({
         : null;
 
       switch (notification.type) {
+        case "auction_available": {
+          const alert = alertsById.get(notification.objectId);
+          const bottle = alert ? bottlesById.get(alert.bottleId) : null;
+          return {
+            type: notification.type,
+            fromUser: null,
+            ref:
+              alert && bottle
+                ? {
+                    lotId: alert.lotId,
+                    bottle,
+                    url: alert.url,
+                    sourceName: alert.sourceName,
+                  }
+                : null,
+          };
+        }
         case "friend_request":
           return {
             type: notification.type,
@@ -248,6 +311,8 @@ export const NotificationSerializer = serializer({
     };
 
     switch (attrs.type) {
+      case "auction_available":
+        return { ...common, type: attrs.type, ref: attrs.ref };
       case "friend_request":
         return { ...common, type: attrs.type, ref: attrs.ref };
       case "toast":

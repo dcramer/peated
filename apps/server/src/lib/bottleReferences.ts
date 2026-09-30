@@ -8,6 +8,7 @@ import type {
   BottleReferenceAssignmentSource,
 } from "@peated/server/db/schema";
 import {
+  auctionLots,
   bottleImages,
   bottleReferences,
   bottleTombstones,
@@ -1018,6 +1019,29 @@ export async function correctBottleReference(
     }
 
     const previousBottleId = reference.bottleId;
+    // Reference corrections invalidate only auction matches made from this assertion.
+    // Auction matching rechecks source facts on the next collection; manual matches stay.
+    await tx
+      .update(auctionLots)
+      .set({
+        bottleId: null,
+        matchStatus: ignored ? "ignored" : "pending",
+        matchCheckId: null,
+        matchedAt: null,
+        matchedById: null,
+        availableSince: null,
+      })
+      .where(
+        and(
+          eq(auctionLots.matchedReferenceId, reference.id),
+          previousBottleId === null
+            ? isNull(auctionLots.bottleId)
+            : or(
+                isNull(auctionLots.bottleId),
+                eq(auctionLots.bottleId, previousBottleId),
+              ),
+        ),
+      );
     const lookupName = reference.name.toLowerCase();
     const priorPriceIdentity =
       previousBottleId === null

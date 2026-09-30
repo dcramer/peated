@@ -18,6 +18,7 @@ const registeredSources = [
   "masterofmalt",
   "missionliquor",
   "reservebar",
+  "scotchwhiskyauctions",
   "smws",
   "smwsa",
   "singlecasknation",
@@ -71,6 +72,16 @@ test("registers each built-in scraper source with its target", () => {
   }
   expect(scraperRegistry.targets.get("astorwines")?.enabled).toBe(true);
   expect(EXTERNAL_SITE_DEFINITIONS.astorwines.initialRunEvery).toBeNull();
+  expect(
+    EXTERNAL_SITE_DEFINITIONS.scotchwhiskyauctions.initialRunEvery,
+  ).toBeNull();
+  expect(scraperRegistry.targets.get("scotchwhiskyauctions")?.enabled).toBe(
+    false,
+  );
+  expect(scraperRegistry.sources.get("scotchwhiskyauctions")?.recordType).toBe(
+    "auction",
+  );
+  expectHourlyLimit("scotchwhiskyauctions", 120);
   expect(EXTERNAL_SITE_DEFINITIONS.berrybrosrudd.initialRunEvery).toBeNull();
   expect(EXTERNAL_SITE_DEFINITIONS.dramfool.initialRunEvery).toBe(10080);
   expect(scraperRegistry.targets.get("dramfool")?.enabled).toBe(true);
