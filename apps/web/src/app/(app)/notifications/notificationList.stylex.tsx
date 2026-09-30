@@ -21,7 +21,7 @@ import TimeSince from "@peated/web/components/timeSince";
 import { getFormErrorMessage } from "@peated/web/lib/formHelpers";
 import { logError } from "@peated/web/lib/log";
 import { useORPC } from "@peated/web/lib/orpc/context";
-import { getTastingUrl } from "@peated/web/lib/urls";
+import { getBottleUrl, getTastingUrl } from "@peated/web/lib/urls";
 import { foundationStyles } from "../../../styles/foundations.stylex";
 import { colors, controlMetrics, space } from "../../../styles/tokens.stylex";
 
@@ -245,6 +245,10 @@ export function NotificationListLoading() {
 
 function getNotificationHref(notification: Notification) {
   switch (notification.type) {
+    case "auction_available":
+      return notification.ref
+        ? `${getBottleUrl(notification.ref.bottle)}/auctions`
+        : undefined;
     case "friend_request":
       return notification.fromUser
         ? `/users/${notification.fromUser.username}`
@@ -257,6 +261,10 @@ function getNotificationHref(notification: Notification) {
 
 function getNotificationMessage(notification: Notification) {
   switch (notification.type) {
+    case "auction_available":
+      return notification.ref
+        ? `${formatBottleDisplayName(notification.ref.bottle)} was listed at ${notification.ref.sourceName}`
+        : "An auction listing is no longer available";
     case "friend_request":
       return "sent you a friend request";
     case "toast":

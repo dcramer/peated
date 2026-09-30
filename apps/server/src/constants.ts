@@ -66,6 +66,11 @@ export type ReservedCollectionSlug = (typeof RESERVED_COLLECTION_SLUGS)[number];
 // `initialRunEvery` applies only when a site is first added. Change an existing
 // schedule through the admin API.
 export const EXTERNAL_SITE_DEFINITIONS = {
+  // Auction collection stays manual until its refresh capacity and publication review are confirmed.
+  scotchwhiskyauctions: {
+    name: "Scotch Whisky Auctions",
+    initialRunEvery: null,
+  },
   // Astor stays manual-only while its non-browser catalog behavior is checked.
   astorwines: { name: "Astor Wines", initialRunEvery: null },
   // Berry Bros. & Rudd does not run automatically because robots.txt does not

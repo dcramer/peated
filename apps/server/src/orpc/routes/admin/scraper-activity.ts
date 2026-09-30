@@ -78,6 +78,8 @@ function savedKindForRun(
       return "reviews";
     case "price":
       return "prices";
+    case "auction":
+      return null;
     case "bottle":
     case "catalog":
       return "catalogListings";

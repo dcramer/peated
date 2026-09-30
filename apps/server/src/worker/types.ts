@@ -1,6 +1,7 @@
 import { z } from "zod";
 
 export type JobName =
+  | "ResolveAuctionLot"
   | "CapturePriceImage"
   | "CleanupPendingUploads"
   | "GenerateBottleDetails"

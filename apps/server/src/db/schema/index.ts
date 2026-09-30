@@ -1,4 +1,5 @@
 export * from "./actors";
+export * from "./auctions";
 export * from "./badges";
 export * from "./bottleChecks";
 export * from "./bottles";

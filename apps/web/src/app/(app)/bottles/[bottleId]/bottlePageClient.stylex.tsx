@@ -176,6 +176,7 @@ function getTabs(bottle: Bottle): [PageTabItem, ...PageTabItem[]] {
       label: "Reviews",
     },
     { href: `${baseUrl}/prices`, label: "Prices" },
+    { href: `${baseUrl}/auctions`, label: "Auctions" },
   ];
 
   if (bottle.group && bottle.group.totalBottles > 1) {

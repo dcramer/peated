@@ -28,6 +28,17 @@ const FriendRequestNotificationRefSchema = z.object({
 
 export const NotificationSchema = z.discriminatedUnion("type", [
   NotificationBaseSchema.extend({
+    type: z.literal("auction_available"),
+    ref: z
+      .object({
+        lotId: z.number(),
+        bottle: BottleSchema,
+        sourceName: z.string(),
+        url: z.url(),
+      })
+      .nullable(),
+  }),
+  NotificationBaseSchema.extend({
     type: z.literal("friend_request").describe("Type of notification"),
     ref: FriendRequestNotificationRefSchema.nullable().describe(
       "Friend request referenced by this notification",

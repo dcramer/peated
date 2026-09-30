@@ -1,0 +1,414 @@
+import type { BottleExtractedDetails } from "@peated/bottle-classifier/contract";
+import { getBottleFieldConflicts } from "@peated/bottle-classifier/fieldConflicts";
+import { normalizeBottleReferenceKey } from "@peated/bottle-classifier/normalize";
+import { db } from "@peated/server/db";
+import {
+  auctionAlerts,
+  auctionLotResults,
+  auctionLots,
+  auctions,
+  auctionWatches,
+  bottleReferences,
+  bottles,
+  notifications,
+  type AuctionLot,
+  type Bottle,
+} from "@peated/server/db/schema";
+import {
+  AuctionObservationSchema,
+  type AuctionObservation,
+} from "@peated/server/schemas/auctions";
+import { and, desc, eq, lte, sql } from "drizzle-orm";
+import { createHash } from "node:crypto";
+import { resolveActiveBottleIds } from "./resolveActiveBottleIds";
+
+export const AUCTION_FRESHNESS_MS = 6 * 60 * 60_000;
+
+/** Auction matching rejects direct conflicts in populated fields, never free-text similarity. */
+export function hasAuctionIdentityConflict(
+  facts: BottleExtractedDetails | null,
+  bottle: Bottle,
+) {
+  if (!facts) return false;
+  return (
+    getBottleFieldConflicts(facts, bottle).length > 0 ||
+    (facts.cask_number != null &&
+      bottle.caskNumber != null &&
+      facts.cask_number !== bottle.caskNumber) ||
+    (facts.bottling_year != null &&
+      bottle.bottlingYear != null &&
+      facts.bottling_year !== bottle.bottlingYear) ||
+    (facts.release_month != null &&
+      bottle.releaseMonth != null &&
+      facts.release_month !== bottle.releaseMonth) ||
+    (facts.release_day != null &&
+      bottle.releaseDay != null &&
+      facts.release_day !== bottle.releaseDay)
+  );
+}
+
+export function auctionAvailability(
+  lot: Pick<AuctionLot, "state" | "endsAt" | "lastCheckedAt">,
+  now = new Date(),
+) {
+  if (lot.state === "closed" || lot.state === "withdrawn")
+    return "unavailable" as const;
+  if (
+    lot.state === "unknown" ||
+    lot.lastCheckedAt.getTime() > now.getTime() ||
+    now.getTime() - lot.lastCheckedAt.getTime() >= AUCTION_FRESHNESS_MS
+  )
+    return "unknown" as const;
+  if (lot.state === "aftersale") return "aftersale" as const;
+  if (lot.endsAt && lot.endsAt <= now) return "unknown" as const;
+  return lot.state;
+}
+
+function identityFingerprint(
+  input: Pick<AuctionLot, "name" | "volume" | "sourceBottleIdentity">,
+) {
+  return createHash("sha256")
+    .update(
+      JSON.stringify([
+        normalizeBottleReferenceKey(input.name),
+        input.volume,
+        input.sourceBottleIdentity,
+      ]),
+    )
+    .digest("hex");
+}
+
+/** Auction ingestion owns occurrence identity; missing optional facts do not erase evidence. */
+export async function upsertAuctionObservation(
+  externalSiteId: number,
+  raw: AuctionObservation,
+) {
+  const input = AuctionObservationSchema.parse(raw);
+  const observedAt = new Date(input.observedAt);
+  if (observedAt.getTime() > Date.now() + 60_000)
+    throw new Error("Auction observation is in the future.");
+  return db.transaction(async (tx) => {
+    await tx.execute(
+      sql`SELECT pg_advisory_xact_lock(hashtextextended(${`auction:${externalSiteId}:${input.auction.sourceKey}`}, 0))`,
+    );
+    let [auction] = await tx
+      .select()
+      .from(auctions)
+      .where(
+        and(
+          eq(auctions.externalSiteId, externalSiteId),
+          eq(auctions.sourceKey, input.auction.sourceKey),
+        ),
+      )
+      .for("update");
+    const auctionValues = {
+      name: input.auction.name,
+      url: input.auction.url,
+      startsAt:
+        input.auction.startsAt === undefined
+          ? (auction?.startsAt ?? null)
+          : input.auction.startsAt
+            ? new Date(input.auction.startsAt)
+            : null,
+      endsAt:
+        input.auction.endsAt === undefined
+          ? (auction?.endsAt ?? null)
+          : input.auction.endsAt
+            ? new Date(input.auction.endsAt)
+            : null,
+      lastCheckedAt: observedAt,
+    };
+    if (!auction) {
+      [auction] = await tx
+        .insert(auctions)
+        .values({
+          externalSiteId,
+          sourceKey: input.auction.sourceKey,
+          ...auctionValues,
+        })
+        .returning();
+    } else if (observedAt > auction.lastCheckedAt) {
+      [auction] = await tx
+        .update(auctions)
+        .set(auctionValues)
+        .where(eq(auctions.id, auction.id))
+        .returning();
+    }
+    if (!auction) throw new Error("Auction was not saved.");
+    const [existing] = await tx
+      .select()
+      .from(auctionLots)
+      .where(
+        and(
+          eq(auctionLots.auctionId, auction.id),
+          eq(auctionLots.sourceKey, input.lot.sourceKey),
+        ),
+      )
+      .for("update");
+    if (existing && observedAt <= existing.lastCheckedAt)
+      return { lot: existing, isNew: false };
+    const sameTitle = existing?.name === input.lot.name;
+    const identity = {
+      name: input.lot.name,
+      volume:
+        input.lot.volume === undefined
+          ? sameTitle
+            ? (existing?.volume ?? null)
+            : null
+          : input.lot.volume,
+      sourceBottleIdentity:
+        input.lot.sourceBottleIdentity === undefined
+          ? sameTitle
+            ? (existing?.sourceBottleIdentity ?? null)
+            : null
+          : input.lot.sourceBottleIdentity,
+    };
+    const fingerprint = identityFingerprint(identity);
+    const changed = existing && fingerprint !== existing.sourceFingerprint;
+    const values: Omit<
+      typeof auctionLots.$inferInsert,
+      "auctionId" | "sourceKey" | "firstSeenAt"
+    > = {
+      ...identity,
+      url: input.lot.url,
+      sourceFingerprint: fingerprint,
+      lotNumber:
+        input.lot.lotNumber === undefined
+          ? (existing?.lotNumber ?? null)
+          : input.lot.lotNumber,
+      imageUrl:
+        input.lot.imageUrl === undefined
+          ? (existing?.imageUrl ?? null)
+          : input.lot.imageUrl,
+      condition:
+        input.lot.condition === undefined
+          ? (existing?.condition ?? null)
+          : input.lot.condition,
+      state: input.lot.state,
+      endsAt:
+        input.lot.endsAt === undefined
+          ? (existing?.endsAt ?? auction.endsAt ?? null)
+          : input.lot.endsAt
+            ? new Date(input.lot.endsAt)
+            : null,
+      currentBid:
+        input.lot.currentBid === undefined
+          ? (existing?.currentBid ?? null)
+          : input.lot.currentBid,
+      bidCurrency:
+        input.lot.bidCurrency === undefined
+          ? (existing?.bidCurrency ?? null)
+          : input.lot.bidCurrency,
+      lastSeenAt: observedAt,
+      lastCheckedAt: observedAt,
+    };
+    if (changed) {
+      values.bottleId = null;
+      values.matchStatus = "pending";
+      values.matchCheckId = null;
+      values.matchedReferenceId = null;
+      values.matchedById = null;
+      values.matchedAt = null;
+      values.availableSince = null;
+    }
+    const [lot] = existing
+      ? await tx
+          .update(auctionLots)
+          .set(values)
+          .where(eq(auctionLots.id, existing.id))
+          .returning()
+      : await tx
+          .insert(auctionLots)
+          .values({
+            auctionId: auction.id,
+            sourceKey: input.lot.sourceKey,
+            firstSeenAt: observedAt,
+            ...values,
+          })
+          .returning();
+    if (!lot) throw new Error("Auction lot was not saved.");
+    if (
+      lot.bottleId &&
+      !lot.availableSince &&
+      auctionAvailability(lot) === "live"
+    ) {
+      lot.availableSince = observedAt;
+      await tx
+        .update(auctionLots)
+        .set({ availableSince: observedAt })
+        .where(eq(auctionLots.id, lot.id));
+    }
+    if (input.lot.result) {
+      const [previous] = await tx
+        .select()
+        .from(auctionLotResults)
+        .where(eq(auctionLotResults.lotId, lot.id))
+        .orderBy(desc(auctionLotResults.id))
+        .limit(1);
+      const result = {
+        ...input.lot.result,
+        soldAt: input.lot.result.soldAt
+          ? new Date(input.lot.result.soldAt)
+          : null,
+      };
+      const comparable = previous
+        ? {
+            outcome: previous.outcome,
+            amount: previous.amount,
+            currency: previous.currency,
+            priceKind: previous.priceKind,
+            soldAt: previous.soldAt,
+            priceNote: previous.priceNote,
+          }
+        : null;
+      if (JSON.stringify(result) !== JSON.stringify(comparable)) {
+        await tx
+          .insert(auctionLotResults)
+          .values({ lotId: lot.id, ...result, sourceUrl: lot.url, observedAt });
+      }
+    }
+    return { lot, isNew: !existing };
+  });
+}
+
+export class AuctionLotMatchChangedError extends Error {
+  constructor() {
+    super(
+      "Auction lot identity or assignment changed. Refresh before matching.",
+    );
+  }
+}
+
+/** Bottle locks precede lot locks so assignments and catalog merges share lock order. */
+export async function assignAuctionLot({
+  lotId,
+  bottleId,
+  fingerprint,
+  expectedBottleId,
+  userId,
+  checkId,
+  referenceName,
+}: {
+  lotId: number;
+  bottleId: number;
+  fingerprint: string;
+  expectedBottleId: number | null;
+  userId?: number;
+  checkId?: number;
+  referenceName?: string;
+}) {
+  return db.transaction(async (tx) => {
+    await resolveActiveBottleIds(tx, [bottleId]);
+    const [reference] = referenceName
+      ? await tx
+          .select()
+          .from(bottleReferences)
+          .where(
+            eq(
+              sql`LOWER(${bottleReferences.name})`,
+              referenceName.toLowerCase(),
+            ),
+          )
+          .for("share")
+      : [];
+    if (
+      referenceName &&
+      (!reference || reference.bottleId !== bottleId || reference.ignored)
+    )
+      throw new AuctionLotMatchChangedError();
+    const [lot] = await tx
+      .select()
+      .from(auctionLots)
+      .where(eq(auctionLots.id, lotId))
+      .for("update");
+    if (
+      !lot ||
+      lot.sourceFingerprint !== fingerprint ||
+      lot.bottleId !== expectedBottleId
+    )
+      throw new AuctionLotMatchChangedError();
+    const now = new Date();
+    if (reference) {
+      const bottle = await tx.query.bottles.findFirst({
+        where: eq(bottles.id, bottleId),
+      });
+      if (
+        !bottle ||
+        hasAuctionIdentityConflict(lot.sourceBottleIdentity, bottle)
+      )
+        throw new AuctionLotMatchChangedError();
+    }
+    const [updated] = await tx
+      .update(auctionLots)
+      .set({
+        bottleId,
+        matchStatus: "matched",
+        matchedAt: now,
+        matchedById: userId ?? null,
+        matchCheckId: checkId ?? lot.matchCheckId,
+        matchedReferenceId: reference?.id ?? null,
+        availableSince:
+          auctionAvailability(lot, now) === "live"
+            ? lot.bottleId === bottleId
+              ? (lot.availableSince ?? now)
+              : now
+            : null,
+      })
+      .where(eq(auctionLots.id, lotId))
+      .returning();
+    return updated;
+  });
+}
+
+/** Alerts own permanent deduplication; the notification and alert are committed together. */
+export async function notifyAuctionLot(lotId: number) {
+  const snapshot = await db.query.auctionLots.findFirst({
+    where: eq(auctionLots.id, lotId),
+  });
+  if (!snapshot?.bottleId) return 0;
+  const bottleId = snapshot.bottleId;
+  return db.transaction(async (tx) => {
+    await resolveActiveBottleIds(tx, [bottleId]);
+    const [lot] = await tx
+      .select()
+      .from(auctionLots)
+      .where(eq(auctionLots.id, lotId))
+      .for("update");
+    if (
+      !lot ||
+      !lot.bottleId ||
+      lot.bottleId !== snapshot.bottleId ||
+      !lot.availableSince ||
+      auctionAvailability(lot) !== "live"
+    )
+      return 0;
+    const watches = await tx
+      .select()
+      .from(auctionWatches)
+      .where(
+        and(
+          eq(auctionWatches.bottleId, lot.bottleId),
+          lte(auctionWatches.createdAt, lot.availableSince),
+        ),
+      )
+      .orderBy(auctionWatches.id)
+      .for("share");
+    let count = 0;
+    for (const watch of watches) {
+      const [alert] = await tx
+        .insert(auctionAlerts)
+        .values({ userId: watch.userId, lotId, bottleId: lot.bottleId })
+        .onConflictDoNothing()
+        .returning();
+      if (!alert) continue;
+      await tx.insert(notifications).values({
+        userId: watch.userId,
+        objectId: alert.id,
+        type: "auction_available",
+        createdAt: alert.createdAt,
+      });
+      count += 1;
+    }
+    return count;
+  });
+}

@@ -28,6 +28,7 @@ import repairBottleStats from "./repairBottleStats";
 import repairCollectionBottleCounts from "./repairCollectionBottleCounts";
 import repairEntityBottleCounts from "./repairEntityBottleCounts";
 import repairLocationBottleCounts from "./repairLocationBottleCounts";
+import resolveAuctionLot from "./resolveAuctionLot";
 import resolveStorePriceBottle from "./resolveStorePriceBottle";
 import runScraper from "./runScraper";
 import updateBottleStats from "./updateBottleStats";
@@ -43,6 +44,7 @@ import verifyEntityCreation from "./verifyEntityCreation";
 // queue so fast derived-data work such as search indexing and stats never
 // waits behind a classifier call.
 registry.add("CapturePriceImage", capturePriceImage);
+registry.add("ResolveAuctionLot", resolveAuctionLot, { queueName: "models" });
 registry.add("CleanupPendingUploads", cleanupPendingUploads);
 registry.add("GenerateBottleDetails", generateBottleDetails, {
   queueName: "models",

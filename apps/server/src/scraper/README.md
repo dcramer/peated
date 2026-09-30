@@ -37,6 +37,9 @@ External review sources must also follow the
 [external review source procedure](../../../../docs/operations/external-review-sources.md).
 It covers review publishing, source approval, and rollback.
 
+Auction collection follows the [auction model and activation limits](../../../../docs/features/auctions.md).
+The initial auction target is disabled; it does not activate a production feed.
+
 ## Registering a source
 
 1. Define a target in `registry.ts`. A target groups sources that must share a

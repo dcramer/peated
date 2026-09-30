@@ -93,6 +93,7 @@ const mockUploadImage = Buffer.from(
 );
 
 const collectionStateByToken = new Map();
+const auctionWatchStateByToken = new Map();
 const pendingUploadStateByToken = new Map();
 const userModeratorStateByToken = new Map();
 const appliedQueueProposalTokens = new Set();
@@ -235,6 +236,74 @@ async function handleRpcRequest({ request, response, url }) {
   }
 
   switch (path) {
+    case "auctions/list": {
+      const base = {
+        id: 9801,
+        bottleId: input.bottle,
+        auction: {
+          id: 9810,
+          name: "September auction",
+          url: "https://example.com/auction",
+          site: { name: "Example Whisky Auctions", type: "example" },
+        },
+        lotNumber: "183-3264",
+        name: existingBottle.fullName,
+        url: "https://example.com/lot",
+        volume: 700,
+        condition: null,
+        state: "live",
+        availability: "live",
+        endsAt: null,
+        currentBid: 9000,
+        bidCurrency: "gbp",
+        lastCheckedAt: new Date().toISOString(),
+        result: null,
+      };
+      sendRpcResponse(response, {
+        results: [
+          base,
+          {
+            ...base,
+            id: 9802,
+            state: "closed",
+            availability: "unavailable",
+            result: {
+              id: 9803,
+              outcome: "sold",
+              amount: 12000,
+              currency: "gbp",
+              priceKind: "hammer",
+              soldAt: null,
+              observedAt: base.lastCheckedAt,
+              priceNote: null,
+            },
+          },
+          { ...base, id: 9804, availability: "unknown" },
+          { ...base, id: 9805, state: "closed", availability: "unavailable" },
+        ],
+        rel: { nextCursor: null, prevCursor: null },
+      });
+      return true;
+    }
+    case "auctions/watch":
+      sendRpcResponse(response, {
+        watching:
+          auctionWatchStateByToken.get(
+            `${getAccessToken(request)}:${input.bottle}`,
+          ) ?? false,
+      });
+      return true;
+    case "auctions/updateWatch":
+      if (!isBoolean(input?.watching)) {
+        sendRpcError(response, "Unexpected auction watch payload");
+        return true;
+      }
+      auctionWatchStateByToken.set(
+        `${getAccessToken(request)}:${input.bottle}`,
+        input.watching,
+      );
+      sendRpcResponse(response, { watching: input.watching });
+      return true;
     case "root":
       sendRpcResponse(response, {
         version: "playwright",

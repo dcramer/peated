@@ -2,6 +2,7 @@ import { api } from "@peated/server/orpc";
 import activity from "./activity";
 import admin from "./admin";
 import ai from "./ai";
+import auctions from "./auctions";
 import audits from "./audits";
 import auth from "./auth";
 import badges from "./badges";
@@ -48,6 +49,7 @@ export interface Router {
   admin: typeof admin;
   ai: typeof ai;
   audits: typeof audits;
+  auctions: typeof auctions;
   auth: typeof auth;
   badges: typeof badges;
   bottles: typeof bottles;
@@ -94,6 +96,7 @@ export default api.router({
   admin,
   ai,
   audits,
+  auctions,
   auth,
   badges,
   bottles,
