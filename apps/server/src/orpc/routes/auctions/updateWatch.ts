@@ -15,6 +15,8 @@ export default procedure
     method: "PUT",
     path: "/bottles/{bottle}/auction-watch",
     summary: "Update your auction watch",
+    description:
+      "Start or stop watching a bottle for new auction alerts for the signed-in user.",
     operationId: "updateAuctionWatch",
   })
   .input(

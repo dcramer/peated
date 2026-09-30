@@ -756,7 +756,7 @@ describe("OpenAPI generation ($ref reuse)", () => {
     );
 
     for (const schema of [listItemSchema, updateSchema]) {
-      expect(schema?.anyOf).toHaveLength(3);
+      expect(schema?.anyOf).toHaveLength(4);
       const variants = Object.fromEntries(
         schema.anyOf.map((variant: any) => [
           variant.properties?.type?.const,
@@ -764,10 +764,41 @@ describe("OpenAPI generation ($ref reuse)", () => {
         ]),
       );
       expect(Object.keys(variants).sort()).toEqual([
+        "auction_available",
         "comment",
         "friend_request",
         "toast",
       ]);
+
+      const auctionRef = variants.auction_available.properties.ref;
+      expect(auctionRef.anyOf).toHaveLength(2);
+      expect(auctionRef.anyOf).toContainEqual({ type: "null" });
+      const auctionRefObject = auctionRef.anyOf.find(
+        (candidate: any) => candidate.type === "object",
+      );
+      expect(Object.keys(auctionRefObject.properties)).toEqual([
+        "lotId",
+        "bottle",
+        "sourceName",
+        "url",
+      ]);
+      expect(auctionRefObject.required).toEqual([
+        "lotId",
+        "bottle",
+        "sourceName",
+        "url",
+      ]);
+      expect(auctionRefObject.properties.lotId).toMatchObject({
+        type: "number",
+      });
+      expect(auctionRefObject.properties.sourceName).toMatchObject({
+        type: "string",
+      });
+      expect(auctionRefObject.properties.url).toMatchObject({
+        type: "string",
+        format: "uri",
+      });
+      expectBottleResponse(auctionRefObject.properties.bottle);
 
       const friendRef = variants.friend_request.properties.ref;
       expect(friendRef.anyOf).toHaveLength(2);

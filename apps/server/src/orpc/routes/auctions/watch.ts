@@ -11,6 +11,8 @@ export default procedure
     method: "GET",
     path: "/bottles/{bottle}/auction-watch",
     summary: "Get your auction watch",
+    description:
+      "Get whether the signed-in user is watching a bottle for new auction alerts.",
     operationId: "getAuctionWatch",
   })
   .input(z.object({ bottle: z.coerce.number().int().positive() }))

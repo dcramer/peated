@@ -16,6 +16,8 @@ export default procedure
     method: "GET",
     path: "/auction-lots/match-queue",
     summary: "Review unresolved auction lots",
+    description:
+      "List unresolved auction lots with source identity and matching evidence for moderator review.",
     operationId: "listAuctionLotMatchQueue",
   })
   .input(

@@ -14,6 +14,8 @@ export default procedure
     method: "PUT",
     path: "/auction-lots/{lot}/bottle",
     summary: "Assign a reviewed auction lot",
+    description:
+      "Assign an auction lot to an active bottle after checking its source fingerprint and previous assignment. Requires a moderator.",
     operationId: "matchAuctionLot",
   })
   .input(
