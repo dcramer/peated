@@ -8,6 +8,7 @@ import { dispatchBottleStatsRecompute } from "@peated/server/lib/dispatchBottleS
 import {
   recordIncomingBottleDecisionInTransaction,
   shouldRecordIncomingBottleDecision,
+  type IncomingBottleDecisionMetadata,
 } from "@peated/server/lib/incomingBottleDecisionLog";
 import {
   ActiveBottleSelectionError,
@@ -102,7 +103,11 @@ export default procedure
         const { article, externalReview: lockedExternalReview } = locked;
 
         const update: Partial<typeof externalReviews.$inferInsert> = {};
-        if (hasBottleUpdate) update.bottleId = nextBottleId;
+        if (hasBottleUpdate) {
+          update.bottleId = nextBottleId;
+          update.matchedReferenceId = null;
+          update.bottleNoMatchAt = null;
+        }
         if (hasHiddenUpdate) update.hidden = hidden;
         const [externalReview] = await tx
           .update(externalReviews)
@@ -116,23 +121,32 @@ export default procedure
         }
 
         if (
-          nextBottleId != null &&
-          shouldRecordIncomingBottleDecision({
-            previousBottleId: lockedExternalReview.bottleId,
-            bottleId: nextBottleId,
-            decision: "match",
-          })
+          hasBottleUpdate &&
+          (lockedExternalReview.matchedReferenceId !== null ||
+            shouldRecordIncomingBottleDecision({
+              previousBottleId: lockedExternalReview.bottleId,
+              bottleId: nextBottleId,
+              decision: nextBottleId === null ? "unassign" : "match",
+            }))
         ) {
           const actor = await getUserActorForDatabase(tx, context.user);
+          const metadata: IncomingBottleDecisionMetadata = {
+            previousBottleId: lockedExternalReview.bottleId,
+            resolutionSource: "moderator",
+          };
+          if (lockedExternalReview.matchedReferenceId !== null)
+            metadata.previousReferenceId =
+              lockedExternalReview.matchedReferenceId;
           await recordIncomingBottleDecisionInTransaction(tx, {
             sourceKind: "review",
             sourceId: externalReview.id,
             externalSiteId: article.externalSiteId,
             name: externalReview.name,
             url: article.canonicalUrl,
-            decision: "match",
+            decision: nextBottleId === null ? "unassign" : "match",
             actor,
             bottleId: nextBottleId,
+            metadata,
           });
         }
 

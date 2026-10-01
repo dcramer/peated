@@ -341,6 +341,8 @@ async function persistStorePriceInTransaction({
   name,
   normalizedBarcode,
   bottleId,
+  matchedReferenceId,
+  independentMatch,
 }: {
   tx: AnyTransaction;
   externalSiteId: number;
@@ -348,6 +350,8 @@ async function persistStorePriceInTransaction({
   name: string;
   normalizedBarcode: NormalizedGtin | null;
   bottleId: number | null;
+  matchedReferenceId: number | null;
+  independentMatch: boolean;
 }) {
   const identity = {
     externalProductId: input.externalProductId,
@@ -370,6 +374,7 @@ async function persistStorePriceInTransaction({
       .insert(storePrices)
       .values({
         bottleId,
+        matchedReferenceId,
         externalSiteId,
         externalProductId: input.externalProductId ?? null,
         sourceFingerprint,
@@ -445,6 +450,12 @@ async function persistStorePriceInTransaction({
     .update(storePrices)
     .set({
       bottleId: persistedBottleId,
+      matchedReferenceId:
+        identityChanged ||
+        existing.bottleId === null ||
+        (independentMatch && persistedBottleId === bottleId)
+          ? matchedReferenceId
+          : existing.matchedReferenceId,
       legacyReleaseId: identityChanged ? null : existing.legacyReleaseId,
       externalProductId: input.externalProductId ?? existing.externalProductId,
       sourceFingerprint,
@@ -519,7 +530,6 @@ async function createStorePricesInternal(
         const { price, referenceAssignment } = await db.transaction(
           async (tx) => {
             const { name } = normalizeBottleInput({ name: sp.name });
-            const referenceKey = normalizeBottleReferenceKey(sp.name);
             let bottleMatch;
             try {
               bottleMatch = trustedBottleSource
@@ -561,26 +571,30 @@ async function createStorePricesInternal(
               name,
               normalizedBarcode,
               bottleId,
+              matchedReferenceId:
+                bottleMatch.source === "reference"
+                  ? (match?.referenceId ?? null)
+                  : null,
+              independentMatch:
+                bottleId !== null && bottleMatch.source !== "reference",
             });
             const priceId = persisted.price.id;
             const persistedBottleId = persisted.price.bottleId;
             const hasDirectMatch =
               persisted.sourceIdentityReused ||
               (bottleId !== null && persistedBottleId === bottleId);
-            const hasReferenceMatch =
+            const referenceAssignment =
               !persisted.sourceIdentityReused &&
               hasDirectMatch &&
-              bottleMatch.source === "reference";
-            const referenceAssignment =
-              bottleId !== null && hasReferenceMatch
+              bottleMatch.source === "reference" &&
+              bottleId !== null
                 ? await assignBottleReferenceInTransaction(tx, {
-                    name: referenceKey,
+                    bottleId,
+                    name: normalizeBottleReferenceKey(sp.name),
                     backfillNames: [name, sp.name],
                     externalSiteId: site.id,
                     volume: sp.volume,
-                    assignmentSource: "source_approved",
                     assignedByActorId: actorId,
-                    bottleId,
                     sourceReferenceIdentity: match?.reference,
                   })
                 : null;
@@ -619,6 +633,7 @@ async function createStorePricesInternal(
             }
 
             return {
+              referenceAssignment,
               price: {
                 id: priceId,
                 isNew: persisted.isNew,
@@ -628,16 +643,14 @@ async function createStorePricesInternal(
                 hasDirectMatch,
                 directMatchSource,
               },
-              referenceAssignment,
             };
           },
         );
 
-        if (referenceAssignment) {
+        if (referenceAssignment)
           await finalizeBottleReferenceAssignment(referenceAssignment, {
             price: { id: price.id, site: input.site, name: sp.name },
           });
-        }
 
         if (!price.imageUrl && sp.imageUrl) {
           await pushUniqueJob("CapturePriceImage", {

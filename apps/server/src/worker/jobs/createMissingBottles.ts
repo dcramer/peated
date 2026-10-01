@@ -9,14 +9,16 @@ import {
 } from "@peated/server/externalReviews/publication";
 import { getPeatedSystemActor } from "@peated/server/lib/actors";
 import {
+  assignReviewBottleResolutionInTransaction,
   persistReviewBottleCheck,
   resolveScrapedBottleReferenceTarget,
 } from "@peated/server/lib/bottleReferenceResolution";
+import type { assignBottleReferenceInTransaction } from "@peated/server/lib/bottleReferences";
 import {
-  assignBottleReferenceInTransaction,
   finalizeBottleReferenceAssignment,
   StaleBottleReferenceReviewIdentityError,
 } from "@peated/server/lib/bottleReferences";
+import { dispatchBottleStatsRecompute } from "@peated/server/lib/dispatchBottleStatsRecompute";
 import {
   getIncomingBottleDecisionFromResolutionSource,
   recordIncomingBottleDecisionInTransaction,
@@ -183,14 +185,13 @@ export async function createMissingBottles(
           if (resolution.source !== "exact_reference") {
             referenceInput.assignmentSource = "classifier_approved";
           }
-          const referenceAssignment = await assignBottleReferenceInTransaction(
-            tx,
-            {
+          const referenceAssignment =
+            await assignReviewBottleResolutionInTransaction(tx, resolution, {
               bottleId,
               sourceReferenceIdentity: resolution.sourceReferenceIdentity,
               ...referenceInput,
-            },
-          );
+              expectedReview: review,
+            });
 
           if (
             decision !== null &&
@@ -240,6 +241,14 @@ export async function createMissingBottles(
         throw error;
       }
 
+      if (!referenceAssignment) {
+        await dispatchBottleStatsRecompute(
+          "externalReview",
+          review.id,
+          bottleId,
+        );
+        continue;
+      }
       await finalizeBottleReferenceAssignment(referenceAssignment, {
         review: {
           id: review.id,

@@ -13,6 +13,7 @@ import { classifyBottleReference } from "@peated/server/agents/bottleClassifier/
 import { classifyScrapedBottleReference } from "@peated/server/agents/bottleClassifier/scrapedBottleReference";
 import config from "@peated/server/config";
 import { db, type AnyTransaction } from "@peated/server/db";
+import { externalReviews } from "@peated/server/db/schema";
 import { createBottleCheck } from "@peated/server/lib/bottleChecks";
 import { findBottleReferenceAssignment } from "@peated/server/lib/bottleFinder";
 import type { BottleReferenceIdentitySnapshot } from "@peated/server/lib/bottleReferences";
@@ -21,6 +22,12 @@ import {
   finalizeCreatedBottle,
 } from "@peated/server/lib/createBottle";
 import { logTelemetryError } from "@peated/server/lib/log";
+import { eq } from "drizzle-orm";
+import {
+  assertExpectedReviewIdentity,
+  assignBottleReferenceInTransaction,
+  type BottleReferenceAssignmentInput,
+} from "./bottleReferences";
 import { buildClassifierBottleInput } from "./classifierDecisionCreateInputs";
 import {
   ActiveBottleSelectionError,
@@ -63,6 +70,45 @@ export type ReferenceClassificationRun = {
   input: ClassifyBottleReferenceInput;
   result: BottleClassificationResult;
 };
+
+/** A source-only classifier match must never become a reusable name assertion. */
+export async function assignReviewBottleResolutionInTransaction(
+  tx: AnyTransaction,
+  resolution: BottleReferenceResolution,
+  input: BottleReferenceAssignmentInput & {
+    expectedReview: NonNullable<
+      BottleReferenceAssignmentInput["expectedReview"]
+    >;
+  },
+) {
+  const classification = resolution.classification?.result;
+  if (
+    resolution.source === "exact_reference" ||
+    (classification?.status === "classified" &&
+      classification.decision.referenceScope === "global_alias")
+  ) {
+    const result = await assignBottleReferenceInTransaction(tx, {
+      ...input,
+      sourceReferenceIdentity: resolution.sourceReferenceIdentity,
+    });
+    await tx
+      .update(externalReviews)
+      .set({ matchedReferenceId: result.referenceId })
+      .where(eq(externalReviews.id, input.expectedReview.id));
+    return result;
+  }
+  await resolveActiveBottleIds(tx, [input.bottleId], { lock: "update" });
+  await assertExpectedReviewIdentity(tx, input.expectedReview);
+  await tx
+    .update(externalReviews)
+    .set({
+      bottleId: input.bottleId,
+      matchedReferenceId: null,
+      bottleNoMatchAt: null,
+    })
+    .where(eq(externalReviews.id, input.expectedReview.id));
+  return null;
+}
 
 /**
  * Saves a review's classifier run as a Bottle check so the exact input,

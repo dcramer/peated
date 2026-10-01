@@ -11,6 +11,7 @@ import { getBottleCandidateById } from "@peated/server/lib/bottleReferenceCandid
 import type { NormalizedGtin } from "@peated/server/lib/gtin";
 import { resolveActiveBottleIds } from "@peated/server/lib/resolveActiveBottleIds";
 import { eq } from "drizzle-orm";
+import { lockBottleReferenceIdentitySnapshotInTransaction } from "./bottleReferences";
 
 export type StorePriceBottleMatch = {
   bottleId: number | null;
@@ -57,6 +58,10 @@ export async function resolveStorePriceBottleMatchInTransaction(
     await resolveActiveBottleIds(tx, [referenceMatch.bottleId], {
       lock: "update",
     });
+    await lockBottleReferenceIdentitySnapshotInTransaction(
+      tx,
+      referenceMatch.reference,
+    );
     return {
       bottleId: referenceMatch.bottleId,
       candidate: null,

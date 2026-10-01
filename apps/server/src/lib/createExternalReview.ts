@@ -3,17 +3,18 @@ import {
   normalizeBottleReferenceKey,
 } from "@peated/bottle-classifier/normalize";
 import { db } from "@peated/server/db";
-import { externalSites } from "@peated/server/db/schema";
+import { bottleReferences, externalSites } from "@peated/server/db/schema";
 import { storeExternalReviewArticleInTransaction } from "@peated/server/externalReviews/store";
 import { getPeatedSystemActor } from "@peated/server/lib/actors";
 import {
+  assignReviewBottleResolutionInTransaction,
   persistReviewBottleCheck,
   resolveBottleReferenceTarget,
   resolveScrapedBottleReferenceTarget,
 } from "@peated/server/lib/bottleReferenceResolution";
 import {
-  assignBottleReferenceInTransaction,
   finalizeBottleReferenceAssignment,
+  lockBottleReferenceIdentitySnapshotInTransaction,
 } from "@peated/server/lib/bottleReferences";
 import { dispatchBottleStatsRecompute } from "@peated/server/lib/dispatchBottleStatsRecompute";
 import { ExternalSiteNotFoundError } from "@peated/server/lib/externalSites";
@@ -29,7 +30,7 @@ import {
   resolveActiveBottleIds,
 } from "@peated/server/lib/resolveActiveBottleIds";
 import { ExternalReviewInputSchema } from "@peated/server/schemas";
-import { and, eq } from "drizzle-orm";
+import { and, eq, sql } from "drizzle-orm";
 import type { z } from "zod";
 
 /**
@@ -127,6 +128,26 @@ export async function createExternalReview(
   let stored;
   try {
     stored = await db.transaction(async (tx) => {
+      if (bottleId !== null) {
+        await resolveActiveBottleIds(tx, [bottleId], { lock: "update" });
+        if (resolution.sourceReferenceIdentity) {
+          await lockBottleReferenceIdentitySnapshotInTransaction(
+            tx,
+            resolution.sourceReferenceIdentity,
+          );
+        } else {
+          await tx
+            .select({ id: bottleReferences.id })
+            .from(bottleReferences)
+            .where(
+              eq(
+                sql`LOWER(${bottleReferences.name})`,
+                referenceKey.toLowerCase(),
+              ),
+            )
+            .for("update");
+        }
+      }
       const result = await storeExternalReviewArticleInTransaction(
         tx,
         {
@@ -162,22 +183,24 @@ export async function createExternalReview(
       const { previousBottleId, externalReview } = storedExternalReview;
 
       const appliedIncomingIdentity = externalReview.bottleId === bottleId;
-      if (!bottleId || !appliedIncomingIdentity) {
+      if (!bottleId || !appliedIncomingIdentity || previousBottleId != null) {
         return { externalReview, previousBottleId, referenceAssignment: null };
       }
 
-      const referenceAssignment = await assignBottleReferenceInTransaction(tx, {
-        bottleId,
-        name: referenceKey,
-        backfillNames: [reviewName, rawName],
-        externalSiteId: site.id,
-        assignmentSource:
-          resolution.source === "exact_reference"
-            ? undefined
-            : "classifier_approved",
-        assignedByActorId: systemActor.id,
-        sourceReferenceIdentity: resolution.sourceReferenceIdentity,
-      });
+      const referenceAssignment =
+        await assignReviewBottleResolutionInTransaction(tx, resolution, {
+          bottleId,
+          name: referenceKey,
+          backfillNames: [reviewName, rawName],
+          externalSiteId: site.id,
+          assignmentSource:
+            resolution.source === "exact_reference"
+              ? undefined
+              : "classifier_approved",
+          assignedByActorId: systemActor.id,
+          sourceReferenceIdentity: resolution.sourceReferenceIdentity,
+          expectedReview: externalReview,
+        });
 
       const decision = getIncomingBottleDecisionFromResolutionSource(
         resolution.source,

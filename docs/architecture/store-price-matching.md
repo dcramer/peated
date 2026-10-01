@@ -20,6 +20,8 @@ Read these identity rules first:
 ## Saved Identity
 
 - `store_price.bottleId` is the Bottle assigned to the listing.
+- `matchedReferenceId` records a reference-derived assignment, not a guess
+  from the listing name. Explicit approval or a trusted identifier clears it.
 - A null `bottleId` means unresolved. Do not guess from old release fields.
 - One `store_price_match_proposal` stores the current proposal for each price.
 - `store_price_match_attempt` keeps earlier attempts and review outcomes.
@@ -104,6 +106,14 @@ Moderators can:
 - approve one complete new Bottle;
 - choose a different existing Bottle; or
 - ignore the proposal.
+
+A reference correction clears only listings known to have used that reference
+and reopens their proposals for review. The old suggestion and automatic
+approval are not reused. For a legacy approved proposal whose price was already
+cleared, `POST /prices/match-queue/{proposal}/reopen` performs the same reset.
+It requires moderator access, the observed proposal update time and source
+fingerprint, an unassigned price, and no active evaluation. It does not queue
+model work or change the catalog. Earlier decisions and attempts remain saved.
 
 A moderator may atomically create a complete, independently reviewed Bottle
 from any reviewable proposal, including an `errored` one. An active

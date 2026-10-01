@@ -9,7 +9,7 @@ import {
   storePriceMatchProposals,
   storePrices,
 } from "@peated/server/db/schema";
-import { getPeatedSystemActor } from "@peated/server/lib/actors";
+import { getPeatedSystemActor, getUserActor } from "@peated/server/lib/actors";
 import { createStorePricesAsPeated } from "@peated/server/lib/createStorePrices";
 import {
   normalizeBottleInput,
@@ -46,6 +46,49 @@ async function waitForSessionBlockedBy(
 }
 
 describe("POST /external-sites/:site/prices", () => {
+  test("records reference dependency without replacing its human approval", async ({
+    fixtures,
+  }) => {
+    const site = await fixtures.ExternalSiteOrExisting();
+    const user = await fixtures.User({ admin: true });
+    const actor = await getUserActor(user);
+    const bottle = await fixtures.Bottle();
+    const reference = await fixtures.BottleReference({
+      name: "Verified listing title",
+      bottleId: bottle.id,
+      assignmentSource: "human_approved",
+      assignedByActorId: actor.id,
+    });
+    const url = "https://example.com/verified-listing";
+    for (const price of [1000, 1100])
+      await createStorePricesAsPeated({
+        site: site.type,
+        prices: [
+          {
+            name: reference.name,
+            url,
+            price,
+            currency: "gbp",
+            volume: 700,
+          },
+        ],
+      });
+    expect(
+      await db.query.storePrices.findFirst({ where: eq(storePrices.url, url) }),
+    ).toMatchObject({
+      bottleId: bottle.id,
+      matchedReferenceId: reference.id,
+      price: 1100,
+    });
+    expect(
+      await db.query.bottleReferences.findFirst({
+        where: eq(bottleReferences.id, reference.id),
+      }),
+    ).toMatchObject({
+      assignmentSource: "human_approved",
+      assignedByActorId: actor.id,
+    });
+  });
   beforeEach(() => {
     vi.resetAllMocks();
   });
@@ -198,7 +241,7 @@ describe("POST /external-sites/:site/prices", () => {
     });
   });
 
-  test("worker ingestion attributes alias approval to Peated", async ({
+  test("worker ingestion preserves the accepted alias approval", async ({
     fixtures,
   }) => {
     const site = await fixtures.ExternalSiteOrExisting({ type: "totalwine" });
@@ -229,8 +272,8 @@ describe("POST /external-sites/:site/prices", () => {
       }),
     ).toMatchObject({
       bottleId: bottle.id,
-      assignmentSource: "source_approved",
-      assignedByActorId: systemActor.id,
+      assignmentSource: alias.assignmentSource,
+      assignedByActorId: alias.assignedByActorId,
     });
   });
 

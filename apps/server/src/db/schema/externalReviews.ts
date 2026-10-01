@@ -14,7 +14,7 @@ import {
   varchar,
 } from "drizzle-orm/pg-core";
 import { actors } from "./actors";
-import { bottles } from "./bottles";
+import { bottleReferences, bottles } from "./bottles";
 import { categoryEnum } from "./enums";
 import { externalSites } from "./externalSites";
 
@@ -52,6 +52,9 @@ export const externalReviews = pgTable(
     bottleId: bigint("bottle_id", { mode: "number" }).references(
       () => bottles.id,
     ),
+    matchedReferenceId: bigint("matched_reference_id", {
+      mode: "number",
+    }).references(() => bottleReferences.id, { onDelete: "set null" }),
     // TODO(ratings): Drop this old Release reference after all deployed code
     // uses Bottle identity for external reviews.
     legacyReleaseId: bigint("release_id", { mode: "number" }),
@@ -91,6 +94,9 @@ export const externalReviews = pgTable(
       table.sourceKey,
     ),
     index("review_bottle_idx").on(table.bottleId),
+    index("review_matched_reference_idx")
+      .on(table.matchedReferenceId)
+      .where(sql`${table.matchedReferenceId} IS NOT NULL`),
     index("review_release_idx").on(table.legacyReleaseId),
     index("review_removed_updated_idx").on(
       table.removedAt,

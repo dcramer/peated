@@ -23,6 +23,7 @@ import {
   actors,
   bottleBarcodes,
   bottleObservations,
+  bottleReferences,
   bottles,
   storePriceMatchAttempts,
   storePriceMatchProposals,
@@ -729,6 +730,7 @@ async function clearIgnoredStorePriceAssignmentInTransaction(
     .update(storePrices)
     .set({
       bottleId: null,
+      matchedReferenceId: null,
       updatedAt: sql`NOW()`,
     })
     .where(
@@ -1391,6 +1393,20 @@ export async function getStorePriceMatchProposalForReviewInTransaction(
     expectedProcessingToken?: string;
   },
 ): Promise<StorePriceMatchProposalForReview> {
+  const preflight = await getStorePriceMatchProposalPreflight(tx, proposalId);
+  // Price matching owns lock order: reusable references precede their consumers.
+  if (preflight.referenceScope === "global_alias") {
+    await tx
+      .select({ id: bottleReferences.id })
+      .from(bottleReferences)
+      .where(
+        eq(
+          sql`LOWER(${bottleReferences.name})`,
+          normalizeBottleReferenceKey(preflight.price.name).toLowerCase(),
+        ),
+      )
+      .for("update");
+  }
   const [row] = await tx
     .select({
       proposal: storePriceMatchProposals,
@@ -1407,6 +1423,12 @@ export async function getStorePriceMatchProposalForReviewInTransaction(
 
   if (!row) {
     throw new UnknownStorePriceMatchProposalError(proposalId);
+  }
+  if (
+    row.price.name !== preflight.price.name ||
+    row.proposal.referenceScope !== preflight.referenceScope
+  ) {
+    throw new StorePriceMatchProposalIdentityChangedError(proposalId);
   }
   // A row written by the previous release during a deploy may use old names.
   row.proposal.status = toCurrentProposalStatus(row.proposal.status);
@@ -1537,6 +1559,7 @@ async function persistApprovedStorePriceMatchInTransaction(
     .update(storePrices)
     .set({
       bottleId,
+      matchedReferenceId: null,
       updatedAt: sql`NOW()`,
     })
     .where(eq(storePrices.id, proposal.price.id));
@@ -1555,13 +1578,16 @@ async function persistApprovedStorePriceMatchInTransaction(
     createdById: reviewedById,
   });
 
-  // The decision writer is idempotent by source. Always offer a completed
+  // The decision writer deduplicates retries, not later assignments. Offer a completed
   // moderation decision so legacy or preassigned prices still gain history.
   const metadata: IncomingBottleDecisionMetadata = {
     ...decisionLog.metadata,
     proposalType: proposal.proposalType,
     referenceScope: proposal.referenceScope ?? "none",
+    previousBottleId: proposal.price.bottleId,
   };
+  if (proposal.price.matchedReferenceId !== null)
+    metadata.previousReferenceId = proposal.price.matchedReferenceId;
   if (decisionLog.actor.type === "system") {
     metadata.initiatedByUserId = reviewedById;
   }

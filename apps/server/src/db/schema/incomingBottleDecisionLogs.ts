@@ -10,7 +10,6 @@ import {
   pgTable,
   text,
   timestamp,
-  uniqueIndex,
 } from "drizzle-orm/pg-core";
 import { actors } from "./actors";
 import { bottles } from "./bottles";
@@ -42,6 +41,7 @@ export const incomingBottleDecisionTypeEnum = pgEnum(
     "create_bottle_and_release",
     // TODO(prices): Drop match_existing once migration 0302 has rewritten it.
     "match",
+    "unassign",
   ],
 );
 export const incomingBottleDecisionLogs = pgTable(
@@ -82,7 +82,7 @@ export const incomingBottleDecisionLogs = pgTable(
     createdAt: timestamp("created_at").defaultNow().notNull(),
   },
   (table) => [
-    uniqueIndex("incoming_bottle_decision_source_unq").on(
+    index("incoming_bottle_decision_source_idx").on(
       table.sourceKind,
       table.sourceId,
     ),

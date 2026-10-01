@@ -138,6 +138,25 @@ export default procedure
     today.setUTCHours(0, 0, 0, 0);
     const firstDay = new Date(today);
     firstDay.setUTCDate(firstDay.getUTCDate() - (DAYS - 1));
+    const latestDecisions = db
+      .selectDistinctOn(
+        [
+          incomingBottleDecisionLogs.sourceKind,
+          incomingBottleDecisionLogs.sourceId,
+        ],
+        {
+          sourceKind: incomingBottleDecisionLogs.sourceKind,
+          sourceId: incomingBottleDecisionLogs.sourceId,
+          createdBottle: incomingBottleDecisionLogs.createdBottle,
+        },
+      )
+      .from(incomingBottleDecisionLogs)
+      .orderBy(
+        incomingBottleDecisionLogs.sourceKind,
+        incomingBottleDecisionLogs.sourceId,
+        desc(incomingBottleDecisionLogs.id),
+      )
+      .as("latest_decisions");
 
     const [rows, reviewResolutionRows, priceResolutionRows] = await Promise.all(
       [
@@ -161,15 +180,15 @@ export default procedure
         db
           .select({
             unknown: sql<number>`count(*) filter (where ${externalReviews.bottleId} is null)::int`,
-            created: sql<number>`count(*) filter (where ${externalReviews.bottleId} is not null and coalesce(${incomingBottleDecisionLogs.createdBottle}, false))::int`,
-            matched: sql<number>`count(*) filter (where ${externalReviews.bottleId} is not null and not coalesce(${incomingBottleDecisionLogs.createdBottle}, false))::int`,
+            created: sql<number>`count(*) filter (where ${externalReviews.bottleId} is not null and coalesce(${latestDecisions.createdBottle}, false))::int`,
+            matched: sql<number>`count(*) filter (where ${externalReviews.bottleId} is not null and not coalesce(${latestDecisions.createdBottle}, false))::int`,
           })
           .from(externalReviews)
           .leftJoin(
-            incomingBottleDecisionLogs,
+            latestDecisions,
             and(
-              eq(incomingBottleDecisionLogs.sourceKind, "review"),
-              eq(incomingBottleDecisionLogs.sourceId, externalReviews.id),
+              eq(latestDecisions.sourceKind, "review"),
+              eq(latestDecisions.sourceId, externalReviews.id),
             ),
           )
           .where(
@@ -181,15 +200,15 @@ export default procedure
         db
           .select({
             unknown: sql<number>`count(*) filter (where ${storePrices.bottleId} is null)::int`,
-            created: sql<number>`count(*) filter (where ${storePrices.bottleId} is not null and coalesce(${incomingBottleDecisionLogs.createdBottle}, false))::int`,
-            matched: sql<number>`count(*) filter (where ${storePrices.bottleId} is not null and not coalesce(${incomingBottleDecisionLogs.createdBottle}, false))::int`,
+            created: sql<number>`count(*) filter (where ${storePrices.bottleId} is not null and coalesce(${latestDecisions.createdBottle}, false))::int`,
+            matched: sql<number>`count(*) filter (where ${storePrices.bottleId} is not null and not coalesce(${latestDecisions.createdBottle}, false))::int`,
           })
           .from(storePrices)
           .leftJoin(
-            incomingBottleDecisionLogs,
+            latestDecisions,
             and(
-              eq(incomingBottleDecisionLogs.sourceKind, "store_price"),
-              eq(incomingBottleDecisionLogs.sourceId, storePrices.id),
+              eq(latestDecisions.sourceKind, "store_price"),
+              eq(latestDecisions.sourceId, storePrices.id),
             ),
           )
           .where(

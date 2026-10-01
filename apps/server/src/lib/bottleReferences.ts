@@ -8,7 +8,9 @@ import type {
   BottleReferenceAssignmentSource,
 } from "@peated/server/db/schema";
 import {
+  actors,
   auctionLots,
+  auctions,
   bottleImages,
   bottleReferences,
   bottleTombstones,
@@ -32,6 +34,14 @@ import {
 } from "@peated/server/lib/resolveActiveBottleIds";
 import { pushJob, pushUniqueJob } from "@peated/server/worker/dispatch";
 import { and, asc, eq, inArray, isNull, or, sql } from "drizzle-orm";
+import {
+  recordIncomingBottleDecisionInTransaction,
+  type IncomingBottleDecisionMetadata,
+} from "./incomingBottleDecisionLog";
+import {
+  priceMatchProposalHistory,
+  reopenStorePriceMatchesInTransaction,
+} from "./reopenStorePriceMatches";
 
 /** Lists unresolved, non-ignored references for bounded maintenance output. */
 export async function listUnmatchedBottleReferenceNames(
@@ -202,6 +212,7 @@ export type BottleImageCandidate = {
 };
 
 export type BottleReferenceAssignmentResult = {
+  referenceId: number;
   reference: BottleReferenceIdentitySnapshot;
   referenceChanged: boolean;
   isNew: boolean;
@@ -265,12 +276,13 @@ function assertBottleReferenceIdentitySnapshot(
 }
 
 /** Locks a distinct source reference and rejects a stale lookup precondition. */
-async function lockBottleReferenceIdentitySnapshotInTransaction(
+export async function lockBottleReferenceIdentitySnapshotInTransaction(
   tx: AnyTransaction,
   snapshot: BottleReferenceIdentitySnapshot,
-): Promise<void> {
+): Promise<number> {
   const [lockedReference] = await tx
     .select({
+      id: bottleReferences.id,
       name: bottleReferences.name,
       bottleId: bottleReferences.bottleId,
       ignored: bottleReferences.ignored,
@@ -282,6 +294,7 @@ async function lockBottleReferenceIdentitySnapshotInTransaction(
     .limit(1)
     .for("update");
   assertBottleReferenceIdentitySnapshot(lockedReference, snapshot);
+  return lockedReference.id;
 }
 
 async function lockActiveBottleInTransaction(
@@ -514,7 +527,7 @@ export async function reserveExactBottleReferenceInTransaction(
   });
 }
 
-async function assertExpectedReviewIdentity(
+export async function assertExpectedReviewIdentity(
   tx: AnyTransaction,
   expectedReview: BottleReferenceReviewIdentitySnapshot,
 ) {
@@ -550,12 +563,14 @@ async function syncBottleReferenceConsumersInTransaction(
     lookupNames,
     volume,
     expectedReview,
+    referenceId,
   }: {
     bottleId: number;
     externalSiteId?: number;
     lookupNames: string[];
     volume?: number;
     expectedReview?: BottleReferenceReviewIdentitySnapshot;
+    referenceId: number;
   },
 ) {
   if (expectedReview) {
@@ -568,7 +583,10 @@ async function syncBottleReferenceConsumersInTransaction(
   );
   const matchingPrices = await tx
     .update(storePrices)
-    .set({ bottleId })
+    .set({
+      bottleId,
+      matchedReferenceId: sql`CASE WHEN ${storePrices.bottleId} IS NULL THEN ${referenceId} ELSE ${storePrices.matchedReferenceId} END`,
+    })
     .where(
       and(
         or(
@@ -592,7 +610,7 @@ async function syncBottleReferenceConsumersInTransaction(
   );
   const changedReviews = await tx
     .update(externalReviews)
-    .set({ bottleId })
+    .set({ bottleId, matchedReferenceId: referenceId, bottleNoMatchAt: null })
     .where(
       and(
         or(
@@ -665,15 +683,6 @@ export async function assignBottleReferenceInTransaction(
       [name, ...backfillNames].map((value) => value.trim().toLowerCase()),
     ),
   ).filter(Boolean);
-  const { bottleImageCandidate, changedReviewBottleIds } =
-    await syncBottleReferenceConsumersInTransaction(tx, {
-      bottleId,
-      externalSiteId,
-      lookupNames,
-      volume,
-      expectedReview,
-    });
-
   const sourceIsCanonicalName =
     sourceReferenceIdentity?.name.toLowerCase() === name.toLowerCase();
   const claimInput: Parameters<
@@ -690,15 +699,37 @@ export async function assignBottleReferenceInTransaction(
   if (sourceReferenceIdentity && sourceIsCanonicalName) {
     claimInput.expectedIdentity = sourceReferenceIdentity;
   }
-  const claim = await claimBottleReferenceNameInTransaction(tx, claimInput);
-  if (sourceReferenceIdentity && !sourceIsCanonicalName) {
+  // Reference matching owns this rule: reuse does not replace approval attribution.
+  const reuse = sourceReferenceIdentity?.bottleId === bottleId;
+  const claim = reuse
+    ? {
+        reference: sourceReferenceIdentity,
+        changed: false,
+        inserted: false,
+      }
+    : await claimBottleReferenceNameInTransaction(tx, claimInput);
+  const referenceId = await lockBottleReferenceIdentitySnapshotInTransaction(
+    tx,
+    claim.reference,
+  );
+  if (sourceReferenceIdentity && !reuse && !sourceIsCanonicalName) {
     await lockBottleReferenceIdentitySnapshotInTransaction(
       tx,
       sourceReferenceIdentity,
     );
   }
+  const { bottleImageCandidate, changedReviewBottleIds } =
+    await syncBottleReferenceConsumersInTransaction(tx, {
+      bottleId,
+      externalSiteId,
+      lookupNames,
+      volume,
+      expectedReview,
+      referenceId,
+    });
 
   return {
+    referenceId,
     reference: claim.reference,
     referenceChanged: claim.changed,
     isNew: claim.inserted,
@@ -717,6 +748,7 @@ export async function syncBottleReferenceConsumersForReferenceChange(
   const changedReviewBottleIds = await db.transaction(async (tx) => {
     const [reference] = await tx
       .select({
+        id: bottleReferences.id,
         name: bottleReferences.name,
         bottleId: bottleReferences.bottleId,
         ignored: bottleReferences.ignored,
@@ -743,10 +775,12 @@ export async function syncBottleReferenceConsumersForReferenceChange(
       }
       throw error;
     }
+    await lockBottleReferenceIdentitySnapshotInTransaction(tx, reference);
     const { changedReviewBottleIds } =
       await syncBottleReferenceConsumersInTransaction(tx, {
         bottleId: reference.bottleId,
         lookupNames: [reference.name.toLowerCase()],
+        referenceId: reference.id,
       });
 
     const [unchangedReference] = await tx
@@ -1027,6 +1061,24 @@ export async function correctBottleReference(
     }
 
     const previousBottleId = reference.bottleId;
+    const [actor] = await tx
+      .select()
+      .from(actors)
+      .where(eq(actors.id, assignedByActorId));
+    if (!actor) throw new Error("Reference correction actor not found.");
+    const affectedLots = await tx
+      .select({ lot: auctionLots, externalSiteId: auctions.externalSiteId })
+      .from(auctionLots)
+      .innerJoin(auctions, eq(auctions.id, auctionLots.auctionId))
+      .where(
+        and(
+          eq(auctionLots.matchedReferenceId, reference.id),
+          previousBottleId === null
+            ? isNull(auctionLots.bottleId)
+            : eq(auctionLots.bottleId, previousBottleId),
+        ),
+      )
+      .for("update", { of: auctionLots });
     // Reference corrections invalidate only auction matches made from this assertion.
     // Auction matching rechecks source facts on the next collection; manual matches stay.
     await tx
@@ -1050,7 +1102,6 @@ export async function correctBottleReference(
               ),
         ),
       );
-    const lookupName = reference.name.toLowerCase();
     const priorPriceIdentity =
       previousBottleId === null
         ? isNull(storePrices.bottleId)
@@ -1066,30 +1117,111 @@ export async function correctBottleReference(
             eq(externalReviews.bottleId, previousBottleId),
           );
 
-    await tx
-      .update(storePrices)
-      .set({ bottleId })
+    const affectedPrices = await tx
+      .select()
+      .from(storePrices)
       .where(
         and(
-          eq(sql`LOWER(${storePrices.name})`, lookupName),
-          bottleId === null && previousBottleId !== null
-            ? eq(storePrices.bottleId, previousBottleId)
-            : priorPriceIdentity,
+          eq(storePrices.matchedReferenceId, reference.id),
+          priorPriceIdentity,
+        ),
+      )
+      .for("update");
+    const affectedReviews = await tx
+      .select({ review: externalReviews, article: externalReviewArticles })
+      .from(externalReviews)
+      .innerJoin(
+        externalReviewArticles,
+        eq(externalReviewArticles.id, externalReviews.articleId),
+      )
+      .where(
+        and(
+          eq(externalReviews.matchedReferenceId, reference.id),
+          priorReviewIdentity,
+        ),
+      )
+      .for("update", { of: externalReviews });
+    await tx
+      .update(storePrices)
+      .set({ bottleId: null, matchedReferenceId: null, updatedAt: sql`NOW()` })
+      .where(
+        and(
+          eq(storePrices.matchedReferenceId, reference.id),
+          priorPriceIdentity,
         ),
       );
     const changedReviews = await tx
       .update(externalReviews)
-      .set({ bottleId })
+      .set({
+        bottleId: null,
+        matchedReferenceId: null,
+        bottleNoMatchAt: null,
+        updatedAt: sql`NOW()`,
+      })
       .where(
         and(
-          eq(sql`LOWER(${externalReviews.name})`, lookupName),
-          bottleId === null && previousBottleId !== null
-            ? eq(externalReviews.bottleId, previousBottleId)
-            : priorReviewIdentity,
-          sql`${externalReviews.bottleId} IS DISTINCT FROM ${bottleId}`,
+          eq(externalReviews.matchedReferenceId, reference.id),
+          priorReviewIdentity,
         ),
       )
       .returning({ id: externalReviews.id });
+
+    const previousProposals = await reopenStorePriceMatchesInTransaction(
+      tx,
+      affectedPrices.map((price) => price.id),
+    );
+    for (const consumer of [
+      ...affectedPrices.map((price) => ({
+        kind: "store_price" as const,
+        id: price.id,
+        bottleId: price.bottleId,
+        externalSiteId: price.externalSiteId,
+        name: price.name,
+        url: price.url,
+      })),
+      ...affectedReviews.map(({ review, article }) => ({
+        kind: "review" as const,
+        id: review.id,
+        bottleId: review.bottleId,
+        externalSiteId: article.externalSiteId,
+        name: review.name,
+        url: article.canonicalUrl,
+      })),
+      ...affectedLots.map(({ lot, externalSiteId }) => ({
+        kind: "auction_lot" as const,
+        id: lot.id,
+        bottleId: lot.bottleId,
+        externalSiteId,
+        name: lot.name,
+        url: lot.url,
+      })),
+    ]) {
+      if (consumer.bottleId === null) continue;
+      const previousProposal =
+        consumer.kind === "store_price"
+          ? previousProposals.find(
+              (proposal) => proposal.priceId === consumer.id,
+            )
+          : undefined;
+      const metadata: IncomingBottleDecisionMetadata = {
+        previousBottleId: consumer.bottleId,
+        referenceId: reference.id,
+        resolutionSource: "reference_correction",
+      };
+      if (previousProposal)
+        metadata.previousProposal = priceMatchProposalHistory(previousProposal);
+      await recordIncomingBottleDecisionInTransaction(tx, {
+        sourceKind: consumer.kind,
+        sourceId: consumer.id,
+        externalSiteId: consumer.externalSiteId,
+        name: consumer.name,
+        url: consumer.url,
+        actor,
+        bottleId: null,
+        decision: "unassign",
+        metadata,
+      });
+    }
 
     const [updatedReference] = await tx
       .update(bottleReferences)

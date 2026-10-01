@@ -139,6 +139,7 @@ function queueItem(overrides: Partial<QueueItem> = {}): QueueItem {
       id: 12,
       name: "Springbank 12 Cask Strength Batch 24",
       externalProductId: null,
+      sourceFingerprint: null,
       barcode: null,
       price: 150,
       currency: "usd",
