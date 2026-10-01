@@ -1,4 +1,5 @@
 import registry from "../registry";
+import applyAuctionLotMatch from "./applyAuctionLotMatch";
 import capturePriceImage from "./capturePriceImage";
 import cleanupPendingUploads from "./cleanupPendingUploads";
 import createMissingBottles from "./createMissingBottles";
@@ -44,6 +45,7 @@ import verifyEntityCreation from "./verifyEntityCreation";
 // queue so fast derived-data work such as search indexing and stats never
 // waits behind a classifier call.
 registry.add("CapturePriceImage", capturePriceImage);
+registry.add("ApplyAuctionLotMatch", applyAuctionLotMatch);
 registry.add("ResolveAuctionLot", resolveAuctionLot, { queueName: "models" });
 registry.add("CleanupPendingUploads", cleanupPendingUploads);
 registry.add("GenerateBottleDetails", generateBottleDetails, {

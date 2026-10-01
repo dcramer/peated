@@ -72,8 +72,10 @@ Pending matching belongs in Background work, not Inbox.
 Administrators can recheck 1–100 explicit imported lots with expected source,
 Bottle, and check versions. The whole batch is validated before work is saved;
 matched and ignored lots are skipped. Workers reuse references and saved checks
-before classifying again. Dispatch failures leave pending work that can be
-submitted again. Rechecks do not collect auctions or crawl detail pages.
+on the default queue through `ApplyAuctionLotMatch`, so this work does not wait
+behind new classifications. Only missing checks queue `ResolveAuctionLot` on
+the models queue. Dispatch failures leave pending work that can be submitted
+again. Rechecks do not collect auctions or crawl detail pages.
 
 Auction matching never creates Bottles, edits catalog facts, or automatically
 accepts new references. Creation proposals need separate catalog review; ignored

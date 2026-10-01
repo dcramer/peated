@@ -16,7 +16,7 @@ import { getBottleCandidateById } from "@peated/server/lib/bottleReferenceCandid
 import { correctBottleReference } from "@peated/server/lib/bottleReferences";
 import { pushUniqueJob } from "@peated/server/lib/test/workerDispatch";
 import { routerClient } from "@peated/server/orpc/router";
-import resolveAuctionLotJob from "@peated/server/worker/jobs/resolveAuctionLot";
+import applyAuctionLotMatchJob from "@peated/server/worker/jobs/applyAuctionLotMatch";
 import { eq } from "drizzle-orm";
 import {
   afterEach,
@@ -413,11 +413,11 @@ describe("POST /auction-lots/recheck", () => {
       await routerClient.auctions.recheck(input, { context: { user: admin } }),
     ).toEqual({ queued: [data.lot.id], skipped: [] });
     const run = vi.spyOn(classifier, "runScrapedBottleReference");
-    await resolveAuctionLotJob({
+    await applyAuctionLotMatchJob({
       lotId: data.lot.id,
       fingerprint: data.lot.sourceFingerprint,
     });
-    await resolveAuctionLotJob({
+    await applyAuctionLotMatchJob({
       lotId: data.lot.id,
       fingerprint: data.lot.sourceFingerprint,
     });
@@ -454,7 +454,7 @@ describe("POST /auction-lots/recheck", () => {
         { context: { user: admin } },
       ),
     ).toEqual({ queued: [data.lot.id], skipped: [] });
-    expect(pushUniqueJob).toHaveBeenCalledWith("ResolveAuctionLot", {
+    expect(pushUniqueJob).toHaveBeenCalledWith("ApplyAuctionLotMatch", {
       lotId: data.lot.id,
       fingerprint: data.lot.sourceFingerprint,
     });
@@ -513,7 +513,7 @@ describe("POST /auction-lots/recheck", () => {
       ),
     ).toEqual({ queued: [], skipped: [data.lot.id] });
     expect(pushUniqueJob).not.toHaveBeenCalledWith(
-      "ResolveAuctionLot",
+      "ApplyAuctionLotMatch",
       expect.anything(),
     );
   });

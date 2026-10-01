@@ -25,6 +25,22 @@ import { ActiveBottleSelectionError } from "./resolveActiveBottleIds";
 
 /** Reuse accepted decisions first; only evidence-backed existing-Bottle matches may apply automatically. */
 export async function resolveAuctionLot(lotId: number, fingerprint: string) {
+  await resolveAuctionLotMatch(lotId, fingerprint, true);
+}
+
+/** Auction worker rule: return false when model work is needed; never run it here. */
+export async function applySavedAuctionLotMatch(
+  lotId: number,
+  fingerprint: string,
+) {
+  return resolveAuctionLotMatch(lotId, fingerprint, false);
+}
+
+async function resolveAuctionLotMatch(
+  lotId: number,
+  fingerprint: string,
+  allowClassification: boolean,
+) {
   const lot = await db.query.auctionLots.findFirst({
     where: eq(auctionLots.id, lotId),
   });
@@ -33,7 +49,7 @@ export async function resolveAuctionLot(lotId: number, fingerprint: string) {
     lot.sourceFingerprint !== fingerprint ||
     lot.matchStatus !== "pending"
   )
-    return;
+    return true;
   const reference = await findBottleReferenceAssignment(
     normalizeBottleReferenceKey(lot.name),
   );
@@ -53,7 +69,7 @@ export async function resolveAuctionLot(lotId: number, fingerprint: string) {
           expectedBottleId: null,
           referenceName: reference.reference.name,
         });
-        return;
+        return true;
       } catch (error) {
         if (
           !(error instanceof AuctionLotMatchChangedError) &&
@@ -69,7 +85,7 @@ export async function resolveAuctionLot(lotId: number, fingerprint: string) {
           current.matchStatus !== "pending" ||
           current.bottleId !== null
         )
-          return;
+          return true;
       }
     }
   }
@@ -78,6 +94,7 @@ export async function resolveAuctionLot(lotId: number, fingerprint: string) {
     where: eq(bottleChecks.backgroundEventKey, backgroundEventKey),
   });
   if (!check) {
+    if (!allowClassification) return false;
     const auction = await db.query.auctions.findFirst({
       where: eq(auctions.id, lot.auctionId),
     });
@@ -121,7 +138,7 @@ export async function resolveAuctionLot(lotId: number, fingerprint: string) {
       ),
     )
     .returning();
-  if (!current) return;
+  if (!current) return true;
   const assessment = assessAuctionMatch(current, check);
   if (assessment?.automationEligible && assessment.bottleId !== null) {
     try {
@@ -134,7 +151,7 @@ export async function resolveAuctionLot(lotId: number, fingerprint: string) {
         automatic: true,
         referenceName: assessment.referenceName ?? undefined,
       });
-      return;
+      return true;
     } catch (error) {
       if (
         !(error instanceof AuctionLotMatchChangedError) &&
@@ -159,4 +176,5 @@ export async function resolveAuctionLot(lotId: number, fingerprint: string) {
         isNull(auctionLots.bottleId),
       ),
     );
+  return true;
 }
