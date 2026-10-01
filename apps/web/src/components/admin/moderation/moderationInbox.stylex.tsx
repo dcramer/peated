@@ -43,11 +43,13 @@ export function inboxTaskHref(
   const id =
     task.source.kind === "listing"
       ? task.source.proposalId
-      : task.source.kind === "operation"
-        ? task.source.operationId
-        : task.source.kind === "report"
-          ? task.source.reportId
-          : task.source.checkId;
+      : task.source.kind === "auction_lot"
+        ? task.source.lotId
+        : task.source.kind === "operation"
+          ? task.source.operationId
+          : task.source.kind === "report"
+            ? task.source.reportId
+            : task.source.checkId;
   const href = `/admin/moderation/inbox/${task.kind}/${id}`;
   return query ? `${href}?${query}` : href;
 }
@@ -230,11 +232,12 @@ export function ModerationInboxContent({
               onClick={() => setConfirmingIgnore(true)}
               variant="danger"
             >
-              Ignore all {data.counts.inconclusive} inconclusive
+              Ignore inconclusive store listings
             </Button>
             <p {...stylex.props(foundationStyles.metadata, styles.help)}>
-              These listings have no recommended bottle. Ignoring them removes
-              them from the inbox without assigning one.
+              These store listings have no recommended bottle. Ignoring them
+              removes them from the inbox without assigning one. Auction lots
+              are not changed.
             </p>
           </div>
         ) : null}
@@ -248,15 +251,15 @@ export function ModerationInboxContent({
         ) : null}
       </header>
       <ConfirmationDialog
-        continueLabel={`Ignore ${data.counts.inconclusive} listings`}
+        continueLabel="Ignore store listings"
         isOpen={confirmingIgnore}
-        message="Every actionable inconclusive listing will leave the moderation inbox without a bottle assignment. Listings with a match, proposed bottle, error, or active classification will not be changed."
+        message="Every actionable inconclusive store listing will leave the moderation inbox without a bottle assignment. Auction lots and listings with a match, proposed bottle, error, or active classification will not be changed."
         onCancel={() => setConfirmingIgnore(false)}
         onContinue={() => {
           setConfirmingIgnore(false);
           void onIgnoreInconclusive?.();
         }}
-        title="Ignore all inconclusive listings?"
+        title="Ignore inconclusive store listings?"
       />
       {data.results.length ? (
         <ol {...stylex.props(styles.taskList)}>

@@ -1,7 +1,13 @@
 import { notFound } from "next/navigation";
 import { z } from "zod";
 
-const InboxKindSchema = z.enum(["listing", "operation", "finding", "report"]);
+const InboxKindSchema = z.enum([
+  "listing",
+  "auction_lot",
+  "operation",
+  "finding",
+  "report",
+]);
 
 export default async function Page({
   params,

@@ -8,11 +8,14 @@ import {
   auctionLots,
   auctions,
   auctionWatches,
+  bottleChecks,
   bottleReferences,
   bottles,
   notifications,
+  users,
   type AuctionLot,
   type Bottle,
+  type BottleCheck,
 } from "@peated/server/db/schema";
 import {
   AuctionObservationSchema,
@@ -20,6 +23,20 @@ import {
 } from "@peated/server/schemas/auctions";
 import { and, desc, eq, lte, sql } from "drizzle-orm";
 import { createHash } from "node:crypto";
+import {
+  getPeatedSystemActorForDatabase,
+  getUserActorByIdForDatabase,
+} from "./actors";
+import {
+  assessAuctionMatch,
+  readAuctionMatchEvidence,
+} from "./auctionMatchEvidence";
+import {
+  assignBottleReferenceInTransaction,
+  finalizeBottleReferenceAssignment,
+  type BottleReferenceAssignmentResult,
+} from "./bottleReferences";
+import { recordIncomingBottleDecisionInTransaction } from "./incomingBottleDecisionLog";
 import { resolveActiveBottleIds } from "./resolveActiveBottleIds";
 
 export const AUCTION_FRESHNESS_MS = 6 * 60 * 60_000;
@@ -288,6 +305,9 @@ export async function assignAuctionLot({
   userId,
   checkId,
   referenceName,
+  automatic = false,
+  rememberReference = false,
+  expectedCheckId,
 }: {
   lotId: number;
   bottleId: number;
@@ -296,9 +316,64 @@ export async function assignAuctionLot({
   userId?: number;
   checkId?: number;
   referenceName?: string;
+  automatic?: boolean;
+  rememberReference?: boolean;
+  expectedCheckId?: number | null;
 }) {
-  return db.transaction(async (tx) => {
-    await resolveActiveBottleIds(tx, [bottleId]);
+  const result = await db.transaction(async (tx) => {
+    if (userId !== undefined) {
+      const user = await tx.query.users.findFirst({
+        where: eq(users.id, userId),
+      });
+      if (!user || (!user.mod && !user.admin))
+        throw new Error("Auction assignment requires a moderator.");
+    }
+    if (rememberReference && (userId === undefined || expectedCheckId == null))
+      throw new AuctionLotMatchChangedError();
+    await resolveActiveBottleIds(tx, [bottleId], {
+      lock: rememberReference ? "update" : "share",
+    });
+    const actor =
+      userId === undefined
+        ? await getPeatedSystemActorForDatabase(tx)
+        : await getUserActorByIdForDatabase(tx, userId);
+    let remembered: BottleReferenceAssignmentResult | null = null;
+    let check: BottleCheck | undefined;
+    if (rememberReference) {
+      const snapshot = await tx.query.auctionLots.findFirst({
+        where: eq(auctionLots.id, lotId),
+      });
+      check =
+        expectedCheckId == null
+          ? undefined
+          : await tx.query.bottleChecks.findFirst({
+              where: eq(bottleChecks.id, expectedCheckId),
+            });
+      const evidence = snapshot && readAuctionMatchEvidence(snapshot, check);
+      if (
+        !snapshot ||
+        snapshot.matchCheckId !== expectedCheckId ||
+        !evidence ||
+        evidence.output.status !== "classified" ||
+        evidence.output.decision.action !== "match" ||
+        evidence.output.decision.referenceScope !== "global_alias" ||
+        evidence.output.decision.matchedBottleId !== bottleId
+      )
+        throw new AuctionLotMatchChangedError();
+      const auction = await tx.query.auctions.findFirst({
+        where: eq(auctions.id, snapshot.auctionId),
+      });
+      if (!auction) throw new Error("Auction lot has no auction.");
+      remembered = await assignBottleReferenceInTransaction(tx, {
+        bottleId,
+        name: normalizeBottleReferenceKey(snapshot.name),
+        externalSiteId: auction.externalSiteId,
+        volume: snapshot.volume ?? undefined,
+        assignmentSource: "human_approved",
+        assignedByActorId: actor.id,
+        rejectIgnored: true,
+      });
+    }
     const [reference] = referenceName
       ? await tx
           .select()
@@ -324,11 +399,35 @@ export async function assignAuctionLot({
     if (
       !lot ||
       lot.sourceFingerprint !== fingerprint ||
-      lot.bottleId !== expectedBottleId
+      lot.bottleId !== expectedBottleId ||
+      (expectedCheckId !== undefined && lot.matchCheckId !== expectedCheckId) ||
+      (automatic &&
+        (lot.matchStatus !== "pending" || lot.matchCheckId !== checkId))
     )
       throw new AuctionLotMatchChangedError();
     const now = new Date();
-    if (reference) {
+    const savedCheckId = checkId ?? lot.matchCheckId;
+    if (check?.id !== savedCheckId) {
+      check =
+        savedCheckId === null
+          ? undefined
+          : await tx.query.bottleChecks.findFirst({
+              where: eq(bottleChecks.id, savedCheckId),
+            });
+    }
+    const evidence = readAuctionMatchEvidence(lot, check);
+    if (checkId !== undefined && !evidence)
+      throw new AuctionLotMatchChangedError();
+    if (automatic) {
+      const assessment = check && assessAuctionMatch(lot, check);
+      if (
+        !assessment?.automationEligible ||
+        assessment.bottleId !== bottleId ||
+        (assessment.referenceName ?? undefined) !== referenceName
+      )
+        throw new AuctionLotMatchChangedError();
+    }
+    if (reference || automatic) {
       const bottle = await tx.query.bottles.findFirst({
         where: eq(bottles.id, bottleId),
       });
@@ -356,8 +455,44 @@ export async function assignAuctionLot({
       })
       .where(eq(auctionLots.id, lotId))
       .returning();
-    return updated;
+    if (lot.bottleId !== bottleId) {
+      const auction = await tx.query.auctions.findFirst({
+        where: eq(auctions.id, lot.auctionId),
+      });
+      if (!auction) throw new Error("Auction lot has no auction.");
+      await recordIncomingBottleDecisionInTransaction(tx, {
+        sourceKind: "auction_lot",
+        sourceId: lot.id,
+        externalSiteId: auction.externalSiteId,
+        name: lot.name,
+        url: lot.url,
+        decision: "match",
+        actor,
+        bottleId,
+        model: check?.model ?? null,
+        rationale:
+          evidence?.output.status === "classified"
+            ? evidence.output.decision.rationale
+            : null,
+        metadata: {
+          resolutionSource: userId === undefined ? "automatic" : "moderator",
+          matchingBasis: reference
+            ? "accepted_reference"
+            : "classifier_or_review",
+          referenceScope: rememberReference ? "global_alias" : "none",
+          classifierEvidence: check ? { checkId: check.id } : null,
+        },
+      });
+    }
+    return { lot: updated, remembered };
   });
+  // Auction matching owns assignments, not catalog images, even when remembering a name.
+  if (result.remembered)
+    await finalizeBottleReferenceAssignment({
+      ...result.remembered,
+      bottleImageCandidate: null,
+    });
+  return result.lot;
 }
 
 /** Alerts own permanent deduplication; the notification and alert are committed together. */

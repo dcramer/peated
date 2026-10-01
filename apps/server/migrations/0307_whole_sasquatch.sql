@@ -1,0 +1,1 @@
+ALTER TYPE "public"."incoming_bottle_decision_source_kind" ADD VALUE 'auction_lot';

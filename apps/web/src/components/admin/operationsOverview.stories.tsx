@@ -71,6 +71,7 @@ const meta = {
       },
       needsAttention: [],
       recentRuns: [],
+      pendingAuctions: [],
     },
   },
 } satisfies Meta<typeof OperationsOverview>;
@@ -113,6 +114,7 @@ export const Quiet: Story = {
       },
       needsAttention: [],
       recentRuns: [],
+      pendingAuctions: [],
     },
   },
 };

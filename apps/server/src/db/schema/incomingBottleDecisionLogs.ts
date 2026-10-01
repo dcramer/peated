@@ -31,7 +31,7 @@ interface PersistedDecisionMetadata {
 
 export const incomingBottleDecisionSourceKindEnum = pgEnum(
   "incoming_bottle_decision_source_kind",
-  ["review", "store_price"],
+  ["review", "store_price", "auction_lot"],
 );
 export const incomingBottleDecisionTypeEnum = pgEnum(
   "incoming_bottle_decision_type",

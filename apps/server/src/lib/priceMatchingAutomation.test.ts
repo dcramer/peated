@@ -204,4 +204,33 @@ describe("assessStorePriceMatch", () => {
       automationBlockers: [],
     });
   });
+
+  test("a shared match assessment still reviews conflicting source facts", () => {
+    expect(
+      assess({
+        action: "match",
+        suggestedBottleId: 1,
+        candidates: [buildCandidate()],
+        proposedBottle: null,
+        sourceBottleIdentity: buildExtractedLabel({ abv: 46 }),
+        webEvidence: "not_needed",
+      }),
+    ).toEqual({
+      automationEligible: false,
+      automationBlockers: ["conflicts with the store's product facts (abv)"],
+    });
+  });
+
+  test("a shared match assessment keeps a current assignment without new web evidence", () => {
+    expect(
+      assess({
+        action: "match",
+        price: { bottleId: 1 },
+        suggestedBottleId: 1,
+        candidates: [buildCandidate()],
+        proposedBottle: null,
+        webEvidence: "not_used",
+      }),
+    ).toMatchObject({ automationEligible: true });
+  });
 });

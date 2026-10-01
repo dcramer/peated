@@ -1,0 +1,26 @@
+{
+  "writtenAt": "2026-10-01T16:11:35.689Z",
+  "toolName": "firecrawl_read_page",
+  "input": {
+    "url": "https://whiskyadvocate.com/Clynelish-14-year-old-43",
+    "focus": "Confirm the exact Clynelish product, printed age and ABV, product title, and whether this is the standard official 14-year-old release."
+  },
+  "output": {
+    "provider": "firecrawl",
+    "query": "Confirm the exact Clynelish product, printed age and ABV, product title, and whether this is the standard official 14-year-old release.",
+    "summary": "Clynelish 14 year old, 43%",
+    "results": [
+      {
+        "title": "Clynelish 14 year old, 43%",
+        "url": "https://whiskyadvocate.com/Clynelish-14-year-old-43",
+        "domain": "whiskyadvocate.com",
+        "description": "Ahh, Clynelish. The enigma of the northeast coast. A single malt whose waxy character — and it does smell of snuffed&hellip;",
+        "extraSnippets": []
+      }
+    ]
+  },
+  "metadata": {
+    "cacheKey": "8bbacfc32a3aa57ff072b8e103b3101f6032a333d18cc03c78c47469d3730e0b",
+    "mode": "auto"
+  }
+}

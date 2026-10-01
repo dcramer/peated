@@ -4,6 +4,13 @@ Store price matching links each retailer listing to one complete Bottle. It
 uses the shared [Bottle Classifier](./bottle-classifier.md) and adds saved
 proposals, review, and automation rules.
 
+Existing-Bottle automation is assessed by
+`apps/server/src/lib/bottleMatchingAutomation.ts`, shared with auctions. It
+checks the classifier's retrieved target, populated source conflicts, assignment
+replacement, evidence, and unresolved risks. Price creation keeps its separate
+assessment in `priceMatchingAutomation.ts`; auction matching never creates
+Bottles or automatically accepts names.
+
 Read these identity rules first:
 
 - [Whisky Identity Model](./whisky-identity-model.md)

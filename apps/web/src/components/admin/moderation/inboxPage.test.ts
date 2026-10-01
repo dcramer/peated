@@ -61,6 +61,12 @@ describe("nextTaskAfterCompletion", () => {
 });
 
 describe("selectedInboxTask", () => {
+  test("reads a source-owned auction task", () => {
+    expect(selectedInboxTask("/admin/moderation/inbox/auction_lot/7")).toEqual({
+      kind: "auction_lot",
+      id: 7,
+    });
+  });
   test("reads a selected task from the inbox route", () => {
     expect(selectedInboxTask("/admin/moderation/inbox/operation/42")).toEqual({
       kind: "operation",

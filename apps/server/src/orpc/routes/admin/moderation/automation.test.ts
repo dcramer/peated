@@ -5,6 +5,7 @@ import {
   bottleOperations,
   storePriceMatchRetryRuns,
 } from "@peated/server/db/schema";
+import { upsertAuctionObservation } from "@peated/server/lib/auctions";
 import { BOTTLE_CHECK_SCHEMA_VERSION } from "@peated/server/lib/bottleChecks";
 import { routerClient } from "@peated/server/orpc/router";
 import {
@@ -29,6 +30,47 @@ describe("admin moderation automation", () => {
       counts: { wait: 3, active: 2, completed: 20, failed: 1 },
       failedJobs: [failedJob],
     });
+  });
+
+  test("pending auction work remains visible without becoming an Inbox decision", async ({
+    fixtures,
+  }) => {
+    const admin = await fixtures.User({ admin: true });
+    const site = await fixtures.ExternalSite();
+    const { lot } = await upsertAuctionObservation(site.id, {
+      auction: {
+        sourceKey: "pending",
+        name: "Auction",
+        url: "https://example.com/auction",
+      },
+      lot: {
+        sourceKey: "pending",
+        name: "Pending whisky",
+        url: "https://example.com/lot",
+        state: "closed",
+      },
+      observedAt: new Date().toISOString(),
+    });
+    const client = createRouterClient(
+      { automation: createModerationAutomationProcedure(getQueueState) },
+      { context: { user: admin } },
+    );
+    expect((await client.automation()).pendingAuctions).toEqual([
+      expect.objectContaining({
+        key: `auction_lot:${lot.id}`,
+        kind: "auction_lot",
+        status: "pending",
+        title: lot.name,
+      }),
+    ]);
+    expect(
+      (
+        await routerClient.admin.moderation.listTasks(
+          {},
+          { context: { user: admin } },
+        )
+      ).results,
+    ).toEqual([]);
   });
 
   test("keeps operational failures out of Inbox and exposes recovery locators", async ({
