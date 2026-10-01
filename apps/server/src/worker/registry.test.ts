@@ -77,8 +77,10 @@ test("jobs that wait on a model do not share the default queue with indexing", a
   const registry = (await import("./registry")).default;
   expect(registry.getQueueName("IndexBottleSearch")).toBe("default");
   expect(registry.getQueueName("UpdateBottleStats")).toBe("default");
+  expect(registry.getQueueName("ApplyAuctionLotMatch")).toBe("default");
   for (const jobName of [
     "CreateMissingBottles",
+    "ResolveAuctionLot",
     "ResolveStorePriceBottle",
     "ProcessStorePriceMatchRetryRun",
     "VerifyBottleCreation",

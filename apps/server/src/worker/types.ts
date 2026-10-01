@@ -2,6 +2,7 @@ import { z } from "zod";
 
 export type JobName =
   | "ResolveAuctionLot"
+  | "ApplyAuctionLotMatch"
   | "CapturePriceImage"
   | "CleanupPendingUploads"
   | "GenerateBottleDetails"

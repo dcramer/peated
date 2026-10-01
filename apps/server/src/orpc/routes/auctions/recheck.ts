@@ -106,7 +106,7 @@ export default procedure
       return { queued, skipped };
     });
     for (const args of result.queued)
-      await pushUniqueJob("ResolveAuctionLot", args);
+      await pushUniqueJob("ApplyAuctionLotMatch", args);
     return {
       queued: result.queued.map(({ lotId }) => lotId),
       skipped: result.skipped,

@@ -16,11 +16,13 @@ import {
 } from "@peated/server/db/schema";
 import { eq } from "drizzle-orm";
 import { afterEach, vi } from "vitest";
+import applyAuctionLotMatchJob from "../worker/jobs/applyAuctionLotMatch";
 import { auctionLotCheckKey } from "./auctionMatchEvidence";
 import { resolveAuctionLot } from "./auctionMatching";
 import { assignAuctionLot, upsertAuctionObservation } from "./auctions";
 import { createBottleCheck } from "./bottleChecks";
 import { getBottleCandidateById } from "./bottleReferenceCandidates";
+import { pushUniqueJob } from "./test/workerDispatch";
 
 async function importedLot(
   siteId: number,
@@ -120,8 +122,15 @@ test("reuses an accepted reference without a new model decision", async ({
     observedAt: new Date().toISOString(),
   });
   const run = vi.spyOn(classifier, "runScrapedBottleReference");
-  await resolveAuctionLot(lot.id, lot.sourceFingerprint);
+  await applyAuctionLotMatchJob({
+    lotId: lot.id,
+    fingerprint: lot.sourceFingerprint,
+  });
   expect(run).not.toHaveBeenCalled();
+  expect(pushUniqueJob).not.toHaveBeenCalledWith(
+    "ResolveAuctionLot",
+    expect.anything(),
+  );
   expect(await db.query.auctionLots.findFirst()).toMatchObject({
     bottleId: bottle.id,
     matchedReferenceId: reference.id,
@@ -239,9 +248,17 @@ test("a supported saved match applies without a model call or new reference", as
   const check = await saveMatch(lot, await matchResult(bottle.id));
   const referencesBefore = await db.query.bottleReferences.findMany();
   const run = vi.spyOn(classifier, "runScrapedBottleReference");
-  await resolveAuctionLot(lot.id, lot.sourceFingerprint);
+  await applyAuctionLotMatchJob({
+    lotId: lot.id,
+    fingerprint: lot.sourceFingerprint,
+  });
+  // A model job already waiting for this version must leave the completed match alone.
   await resolveAuctionLot(lot.id, lot.sourceFingerprint);
   expect(run).not.toHaveBeenCalled();
+  expect(pushUniqueJob).not.toHaveBeenCalledWith(
+    "ResolveAuctionLot",
+    expect.anything(),
+  );
   expect(await db.query.auctionLots.findFirst()).toMatchObject({
     bottleId: bottle.id,
     matchCheckId: check.id,
@@ -301,7 +318,10 @@ test("a saved creation proposal stays in review without catalog writes", async (
   });
   await saveMatch(lot, result);
   const run = vi.spyOn(classifier, "runScrapedBottleReference");
-  await resolveAuctionLot(lot.id, lot.sourceFingerprint);
+  await applyAuctionLotMatchJob({
+    lotId: lot.id,
+    fingerprint: lot.sourceFingerprint,
+  });
   expect(run).not.toHaveBeenCalled();
   expect(await db.query.auctionLots.findFirst()).toMatchObject({
     bottleId: null,
@@ -323,7 +343,10 @@ test("unsupported saved check schemas stay in review rather than calling the mod
     .set({ schemaVersion: 999 })
     .where(eq(bottleChecks.id, check.id));
   const run = vi.spyOn(classifier, "runScrapedBottleReference");
-  await resolveAuctionLot(lot.id, lot.sourceFingerprint);
+  await applyAuctionLotMatchJob({
+    lotId: lot.id,
+    fingerprint: lot.sourceFingerprint,
+  });
   expect(run).not.toHaveBeenCalled();
   expect(await db.query.auctionLots.findFirst()).toMatchObject({
     bottleId: null,
@@ -355,7 +378,16 @@ test.for([
   const bottle = await fixtures.Bottle();
   const lot = await importedLot(site.id);
   await saveMatch(lot, await matchResult(bottle.id, { confidenceBasis }));
-  await resolveAuctionLot(lot.id, lot.sourceFingerprint);
+  const run = vi.spyOn(classifier, "runScrapedBottleReference");
+  await applyAuctionLotMatchJob({
+    lotId: lot.id,
+    fingerprint: lot.sourceFingerprint,
+  });
+  expect(run).not.toHaveBeenCalled();
+  expect(pushUniqueJob).not.toHaveBeenCalledWith(
+    "ResolveAuctionLot",
+    expect.anything(),
+  );
   expect(await db.query.auctionLots.findFirst()).toMatchObject({
     bottleId: null,
     matchStatus: "review",
@@ -373,11 +405,118 @@ test("populated source conflicts and changed target facts block a saved match", 
     .update(bottles)
     .set({ statedAge: 18 })
     .where(eq(bottles.id, bottle.id));
-  await resolveAuctionLot(lot.id, lot.sourceFingerprint);
+  await applyAuctionLotMatchJob({
+    lotId: lot.id,
+    fingerprint: lot.sourceFingerprint,
+  });
   expect(await db.query.auctionLots.findFirst()).toMatchObject({
     bottleId: null,
     matchStatus: "review",
   });
+});
+
+test("a recheck without saved evidence queues model work instead of running it", async ({
+  fixtures,
+}) => {
+  const site = await fixtures.ExternalSite();
+  const lot = await importedLot(site.id);
+  const args = { lotId: lot.id, fingerprint: lot.sourceFingerprint };
+  const run = vi.spyOn(classifier, "runScrapedBottleReference");
+  await applyAuctionLotMatchJob(args);
+  expect(run).not.toHaveBeenCalled();
+  expect(pushUniqueJob).toHaveBeenCalledWith("ResolveAuctionLot", args);
+  expect(await db.query.bottleChecks.findMany()).toHaveLength(0);
+  expect(await db.query.auctionLots.findFirst()).toMatchObject({
+    bottleId: null,
+    matchStatus: "pending",
+  });
+});
+
+test("a conflicting accepted name cannot bypass source facts on the fast queue", async ({
+  fixtures,
+}) => {
+  const site = await fixtures.ExternalSite();
+  const bottle = await fixtures.Bottle({ statedAge: 18 });
+  const lot = await importedLot(site.id, { stated_age: 12 });
+  await fixtures.BottleReference({
+    name: normalizeBottleReferenceKey(lot.name),
+    bottleId: bottle.id,
+  });
+  const args = { lotId: lot.id, fingerprint: lot.sourceFingerprint };
+  const run = vi.spyOn(classifier, "runScrapedBottleReference");
+  await applyAuctionLotMatchJob(args);
+  expect(run).not.toHaveBeenCalled();
+  expect(pushUniqueJob).toHaveBeenCalledWith("ResolveAuctionLot", args);
+  expect(await db.query.auctionLots.findFirst()).toMatchObject({
+    bottleId: null,
+    matchStatus: "pending",
+    matchedReferenceId: null,
+  });
+  expect(await db.query.incomingBottleDecisionLogs.findMany()).toHaveLength(0);
+});
+
+test("failed model dispatch stays pending and can be retried without classifying inline", async ({
+  fixtures,
+}) => {
+  const site = await fixtures.ExternalSite();
+  const lot = await importedLot(site.id);
+  const args = { lotId: lot.id, fingerprint: lot.sourceFingerprint };
+  const run = vi.spyOn(classifier, "runScrapedBottleReference");
+  pushUniqueJob.mockRejectedValueOnce(new Error("Queue unavailable"));
+  await expect(applyAuctionLotMatchJob(args)).rejects.toThrow(
+    "Queue unavailable",
+  );
+  expect(await db.query.auctionLots.findFirst()).toMatchObject({
+    bottleId: null,
+    matchStatus: "pending",
+  });
+  await applyAuctionLotMatchJob(args);
+  expect(pushUniqueJob).toHaveBeenCalledWith("ResolveAuctionLot", args);
+  expect(run).not.toHaveBeenCalled();
+  expect(await db.query.bottleChecks.findMany()).toHaveLength(0);
+});
+
+test("stale or already reviewed rechecks do not dispatch model work", async ({
+  fixtures,
+}) => {
+  const site = await fixtures.ExternalSite();
+  const lot = await importedLot(site.id);
+  const run = vi.spyOn(classifier, "runScrapedBottleReference");
+  await applyAuctionLotMatchJob({ lotId: lot.id, fingerprint: "stale" });
+  await db
+    .update(auctionLots)
+    .set({ matchStatus: "review" })
+    .where(eq(auctionLots.id, lot.id));
+  await applyAuctionLotMatchJob({
+    lotId: lot.id,
+    fingerprint: lot.sourceFingerprint,
+  });
+  expect(run).not.toHaveBeenCalled();
+  expect(pushUniqueJob).not.toHaveBeenCalledWith(
+    "ResolveAuctionLot",
+    expect.anything(),
+  );
+});
+
+test("saved-match jobs reject unowned payload fields before making changes", async ({
+  fixtures,
+}) => {
+  const site = await fixtures.ExternalSite();
+  const lot = await importedLot(site.id);
+  const run = vi.spyOn(classifier, "runScrapedBottleReference");
+  await expect(
+    applyAuctionLotMatchJob({
+      lotId: lot.id,
+      fingerprint: lot.sourceFingerprint,
+      bottleId: 123,
+    }),
+  ).rejects.toThrow();
+  expect(await db.query.auctionLots.findFirst()).toMatchObject({
+    matchStatus: "pending",
+    bottleId: null,
+  });
+  expect(run).not.toHaveBeenCalled();
+  expect(pushUniqueJob).not.toHaveBeenCalled();
 });
 
 test("a source identity change during classification cannot apply the old decision", async ({

@@ -94,9 +94,15 @@ conflict that changes neither the lot nor reference.
 If dispatch fails, pending lots remain in Background work. Resubmit their
 observed versions; do not clear saved checks or force new model runs. Missing
 checks may require classification through the existing evidence tools.
+Rechecks apply current references and saved checks on the default queue; only
+missing evidence joins the models queue. A model job already queued for the same
+lot becomes a no-op if the recheck finishes first.
+Deploy the worker with `ApplyAuctionLotMatch` before the API starts dispatching
+that job. Re-fetch unresolved pilot lots after deployment and submit their
+current versions; no collection run is needed.
 
-Stop the pilot by not submitting more lots. For rollback, pause the models worker
-while deploying the previous API, worker, and UI together. Keep migration `0307`
-and all saved records. Correct confirmed errors through lot assignment or the
-reference-correction API, not SQL or evidence deletion. This release does not add
+Stop the pilot by not submitting more lots. For rollback, pause the default and
+models queues while deploying the previous API, worker, and UI together. Keep
+migration `0307` and all saved records. Correct confirmed errors through lot
+assignment or the reference-correction API, not SQL or evidence deletion. This release does not add
 detail collection, automatic Bottle creation, global reprocessing, or scheduling.
