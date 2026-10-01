@@ -109,6 +109,13 @@ normalization output, and unresolved source text are not references.
 - An ignored reference does not participate in exact matching.
 - The assignment source record says whether the assertion came from canonical
   creation, an accepted source, classifier review, or human review.
+- Reusing a reference preserves its original approval and actor.
+- A classifier may assign a review using source context without accepting its
+  title as a reference. Only an explicit `referenceScope: global_alias` allows
+  that title to become reusable; missing scope means `none`.
+- Prices, reviews, and auction lots record `matchedReferenceId` when their
+  assignment used an accepted reference. Manual and source-only assignments
+  do not depend on a reference.
 
 Reference lookup and reference writes use the same identity-preserving key for a
 workflow. Lossy or semantic normalization may retrieve evidence but cannot
@@ -130,17 +137,22 @@ names as “Also known as.”
 A moderator may correct an accepted reference by its stable reference ID. The
 write must include the Bottle ID and ignored state observed before the
 correction, including `null` for an unresolved reference. A stale value fails
-instead of overwriting another decision. Reassignment moves exact-name prices
-and reviews still using the observed Bottle, plus unresolved exact-name
-consumers. Unassignment moves only exact-name consumers still using the
-observed Bottle back to `null`. An intentionally ambiguous or invalid reference
+instead of overwriting another decision. Corrections clear only matches that
+recorded this reference and still use its observed Bottle. Dependent prices
+return to moderator review without repeating the old automatic approval.
+Dependent reviews return to Bottle resolution. Auction lots return to matching
+or are ignored. An intentionally ambiguous or invalid reference
 may also be marked ignored so automated maintenance does not reconsider it.
-Consumers assigned to any other Bottle stay unchanged. A reference correction
-also invalidates auction assignments that explicitly recorded that accepted
-reference. Auction lots return to matching or are ignored; moderator-reviewed
-lot assignments remain unchanged. An ignored reference cannot remain assigned,
+Independent assignments, including manual matches to the same Bottle, stay
+unchanged. Legacy matches without recorded dependency require explicit review;
+matching names are not enough to backfill that evidence. Each removed match
+adds an attributed history entry. An ignored reference cannot remain assigned,
 and a current Bottle full name cannot be reassigned or
 unassigned.
+
+Decision history keeps later matches, corrections, and unassignments for the
+same source item. Repeated saves of the same decision are idempotent; history
+is not limited to the first assignment.
 
 ## Resolution Pipeline
 

@@ -29,6 +29,7 @@ type MockClassificationDecision = Pick<
 > & {
   candidateBottleIds?: number[];
   matchedBottleId?: number;
+  referenceScope?: "global_alias" | "none";
   proposedBottle?: Extract<
     BottleClassificationDecision,
     { action: "create_bottle" }
@@ -65,6 +66,7 @@ function buildClassification(
       candidateBottleIds: [],
       identityScope: "product",
       observation: null,
+      referenceScope: "global_alias",
       ...decision,
     },
     artifacts: {
@@ -81,6 +83,50 @@ function buildClassification(
 }
 
 describe("createMissingBottles", () => {
+  test("assigns only the review when source context cannot support a global alias", async ({
+    fixtures,
+  }) => {
+    const bottle = await fixtures.Bottle({ name: "Dated release 2020" });
+    const review = await fixtures.ExternalReview({
+      bottleId: null,
+      name: "Generic title",
+      issue: "Fall 2020",
+    });
+    const price = await fixtures.StorePrice({
+      bottleId: null,
+      name: review.name,
+    });
+    classifyBottleReferenceMock.mockResolvedValue(
+      buildClassification(
+        {
+          action: "match",
+          matchedBottleId: bottle.id,
+          candidateBottleIds: [bottle.id],
+          referenceScope: "none",
+        },
+        { candidates: [{ bottleId: bottle.id }] },
+      ),
+    );
+    await createMissingBottles({ articleId: review.articleId });
+    expect(
+      await db.query.externalReviews.findFirst({
+        where: eq(externalReviews.id, review.id),
+      }),
+    ).toMatchObject({ bottleId: bottle.id, matchedReferenceId: null });
+    expect(
+      await db.query.storePrices.findFirst({
+        where: eq(storePrices.id, price.id),
+      }),
+    ).toMatchObject({ bottleId: null });
+    expect(
+      await db.query.bottleReferences.findFirst({
+        where: eq(
+          bottleReferences.name,
+          normalizeBottleReferenceKey(review.name),
+        ),
+      }),
+    ).toBeUndefined();
+  });
   beforeEach(() => {
     classifyBottleReferenceMock.mockReset();
     vi.mocked(workerClient.pushUniqueJob).mockReset();

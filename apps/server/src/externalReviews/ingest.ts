@@ -95,6 +95,7 @@ export async function ingestExternalReviewArticle(
     storedExternalReviews.push({
       ...externalReview,
       bottleId: referenceMatch?.bottleId ?? null,
+      matchedReferenceId: referenceMatch?.referenceId ?? null,
       clip: processed?.clip ?? undefined,
       body,
       tags: processed?.tags,

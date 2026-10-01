@@ -190,7 +190,12 @@ export function createModerationAutomationProcedure(
         db
           .select({ count: sql<number>`count(*)::int` })
           .from(incomingBottleDecisionLogs)
-          .where(gte(incomingBottleDecisionLogs.createdAt, startOfToday)),
+          .where(
+            and(
+              gte(incomingBottleDecisionLogs.createdAt, startOfToday),
+              sql`${incomingBottleDecisionLogs.decision} <> 'unassign'`,
+            ),
+          ),
         db
           .select({
             automationEligible: storePriceMatchAttempts.automationEligible,

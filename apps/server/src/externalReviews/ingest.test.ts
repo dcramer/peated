@@ -1,5 +1,6 @@
 import { db } from "@peated/server/db";
 import {
+  bottleReferences,
   bottleTags,
   bottleTombstones,
   externalReviewArticles,
@@ -64,6 +65,10 @@ test("stores exact references and queues model resolution after storage", async 
 }) => {
   const site = await fixtures.ExternalSite({ type: "whiskyadvocate" });
   const bottle = await fixtures.Bottle({ name: "Resolved Review Bottle" });
+  const reference = await db.query.bottleReferences.findFirst({
+    where: eq(bottleReferences.name, bottle.fullName),
+  });
+  if (!reference) throw new Error("Missing canonical reference fixture.");
   const unresolvedName =
     "Mister Sam Tribute Whiskey (66,9%, OB 2019 (Batch 1), 1200 btl.)";
 
@@ -96,6 +101,7 @@ test("stores exact references and queues model resolution after storage", async 
     {
       sourceKey: "resolved",
       bottleId: bottle.id,
+      matchedReferenceId: reference.id,
       hidden: true,
     },
     {
@@ -103,6 +109,7 @@ test("stores exact references and queues model resolution after storage", async 
       name: unresolvedName,
       category: "single_malt",
       bottleId: null,
+      matchedReferenceId: null,
       hidden: true,
     },
   ]);

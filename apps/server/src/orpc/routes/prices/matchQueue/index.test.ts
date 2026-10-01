@@ -1948,7 +1948,7 @@ describe("price match queue", () => {
     });
   });
 
-  test("preserves the first incoming decision while assigning a new Bottle", async ({
+  test("preserves the first decision and appends the replacement Bottle decision", async ({
     fixtures,
   }) => {
     const user = await fixtures.User({ mod: true });
@@ -2061,7 +2061,13 @@ describe("price match queue", () => {
     });
     expect(alias).toMatchObject(expectedNewRuntimeIdentity);
     expect(observation).toMatchObject(expectedNewRuntimeIdentity);
-    expect(decisionLogs).toEqual([priorDecision]);
+    expect(decisionLogs).toHaveLength(2);
+    expect(decisionLogs[0]).toEqual(priorDecision);
+    expect(decisionLogs[1]).toMatchObject({
+      decision: "create_bottle",
+      bottleId: result.id,
+      actorId: actor.id,
+    });
   });
 
   test("creates an independent Bottle from a complete Bottle input", async ({

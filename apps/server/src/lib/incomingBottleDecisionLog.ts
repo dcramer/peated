@@ -1,14 +1,16 @@
-import type { AnyDatabase } from "@peated/server/db";
+import type { AnyTransaction } from "@peated/server/db";
 import {
   incomingBottleDecisionLogs,
   type Actor,
   type IncomingBottleDecisionLog,
 } from "@peated/server/db/schema";
+import { and, desc, eq, sql } from "drizzle-orm";
 import { z } from "zod";
+import type { priceMatchProposalHistory } from "./reopenStorePriceMatches";
 
 export type IncomingBottleDecisionType = Extract<
   IncomingBottleDecisionLog["decision"],
-  "match" | "create_bottle"
+  "match" | "create_bottle" | "unassign"
 >;
 export type IncomingBottleDecisionSourceKind =
   IncomingBottleDecisionLog["sourceKind"];
@@ -25,6 +27,10 @@ export interface IncomingBottleDecisionMetadata {
   proposalType?: string;
   resolutionSource?: string;
   reusedExistingBottle?: boolean;
+  previousBottleId?: number | null;
+  referenceId?: number;
+  previousReferenceId?: number;
+  previousProposal?: ReturnType<typeof priceMatchProposalHistory>;
 }
 
 const IncomingBottleDecisionMetadataSchema = z.record(z.string(), z.json());
@@ -36,6 +42,7 @@ export function getIncomingBottleDecisionFromResolutionSource(
 ): IncomingBottleDecisionType | null {
   switch (source) {
     case "classifier_match":
+    case "exact_reference":
       return "match";
     case "classifier_create_bottle":
       return createdBottle === false ? "match" : "create_bottle";
@@ -53,11 +60,11 @@ export function shouldRecordIncomingBottleDecision({
   bottleId: number | null | undefined;
   decision: IncomingBottleDecisionType | null;
 }) {
-  return previousBottleId == null && bottleId != null && decision !== null;
+  return (previousBottleId ?? null) !== (bottleId ?? null) && decision !== null;
 }
 
 export async function recordIncomingBottleDecisionInTransaction(
-  tx: AnyDatabase,
+  tx: AnyTransaction,
   {
     sourceKind,
     sourceId,
@@ -82,7 +89,7 @@ export async function recordIncomingBottleDecisionInTransaction(
     url?: string | null;
     decision: IncomingBottleDecisionType;
     actor: IncomingBottleDecisionActor;
-    bottleId: number;
+    bottleId: number | null;
     createdBottle?: boolean;
     confidence?: number | null;
     model?: string | null;
@@ -93,6 +100,33 @@ export async function recordIncomingBottleDecisionInTransaction(
   if (actor.type === "user" && !actor.userId) {
     throw new Error(`User actor ${actor.id} is missing user attribution.`);
   }
+  if (decision === "unassign" && bottleId !== null) {
+    throw new Error("An unassignment decision cannot assign a Bottle.");
+  }
+
+  // Matching owns retry safety: serialize decisions for one source, not its lifetime.
+  await tx.execute(
+    sql`SELECT pg_advisory_xact_lock(hashtextextended(${`incoming-bottle-decision:${sourceKind}:${sourceId}`}, 0))`,
+  );
+  const [previous] = await tx
+    .select()
+    .from(incomingBottleDecisionLogs)
+    .where(
+      and(
+        eq(incomingBottleDecisionLogs.sourceKind, sourceKind),
+        eq(incomingBottleDecisionLogs.sourceId, sourceId),
+      ),
+    )
+    .orderBy(desc(incomingBottleDecisionLogs.id))
+    .limit(1);
+  if (
+    previous &&
+    previous.bottleId === bottleId &&
+    previous.decision === decision &&
+    previous.actorId === actor.id &&
+    previous.metadata.resolutionSource === metadata.resolutionSource
+  )
+    return null;
 
   const [log] = await tx
     .insert(incomingBottleDecisionLogs)
@@ -111,12 +145,6 @@ export async function recordIncomingBottleDecisionInTransaction(
       model,
       rationale,
       metadata: IncomingBottleDecisionMetadataSchema.parse(metadata),
-    })
-    .onConflictDoNothing({
-      target: [
-        incomingBottleDecisionLogs.sourceKind,
-        incomingBottleDecisionLogs.sourceId,
-      ],
     })
     .returning();
 

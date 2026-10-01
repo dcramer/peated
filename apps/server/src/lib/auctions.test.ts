@@ -5,6 +5,7 @@ import {
   auctionLotResults,
   auctionLots,
   auctionWatches,
+  incomingBottleDecisionLogs,
   notifications,
 } from "@peated/server/db/schema";
 import { routerClient } from "@peated/server/orpc/router";
@@ -452,6 +453,32 @@ test("reference corrections invalidate automatic matches but leave manual decisi
       where: eq(auctionLots.id, automatic.lot.id),
     }),
   ).toMatchObject({ bottleId: null, matchStatus: "pending" });
+  await assignAuctionLot({
+    lotId: automatic.lot.id,
+    bottleId: destination.id,
+    fingerprint: automatic.lot.sourceFingerprint,
+    expectedBottleId: null,
+    referenceName: reference.name,
+  });
+  const history = await db.query.incomingBottleDecisionLogs.findMany({
+    where: (table, { and, eq }) =>
+      and(
+        eq(table.sourceKind, "auction_lot"),
+        eq(table.sourceId, automatic.lot.id),
+      ),
+    orderBy: incomingBottleDecisionLogs.id,
+  });
+  expect(history.map(({ decision, bottleId }) => [decision, bottleId])).toEqual(
+    [
+      ["match", source.id],
+      ["unassign", null],
+      ["match", destination.id],
+    ],
+  );
+  expect(history[1]).toMatchObject({
+    actorId: actor.id,
+    metadata: { previousBottleId: source.id, referenceId: reference.id },
+  });
 });
 
 test("a Bottle with auction history cannot be deleted", async ({

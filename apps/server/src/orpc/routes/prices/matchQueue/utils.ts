@@ -254,7 +254,10 @@ export async function serializeQueueItems(
         isProcessing: row.isProcessing,
         price: row.price,
       }),
-      price: prices[index],
+      price: {
+        ...prices[index],
+        sourceFingerprint: row.price.sourceFingerprint,
+      },
       currentBottle: row.proposal.currentBottleId
         ? (bottlesById[row.proposal.currentBottleId] ?? null)
         : null,

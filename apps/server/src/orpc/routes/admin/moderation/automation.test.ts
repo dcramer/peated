@@ -3,8 +3,10 @@ import { db } from "@peated/server/db";
 import {
   bottleChecks,
   bottleOperations,
+  incomingBottleDecisionLogs,
   storePriceMatchRetryRuns,
 } from "@peated/server/db/schema";
+import { getPeatedSystemActor } from "@peated/server/lib/actors";
 import { upsertAuctionObservation } from "@peated/server/lib/auctions";
 import { BOTTLE_CHECK_SCHEMA_VERSION } from "@peated/server/lib/bottleChecks";
 import { routerClient } from "@peated/server/orpc/router";
@@ -211,6 +213,17 @@ describe("admin moderation automation", () => {
     fixtures,
   }) => {
     const admin = await fixtures.User({ admin: true });
+    const actor = await getPeatedSystemActor();
+    const site = await fixtures.ExternalSiteOrExisting();
+    await db.insert(incomingBottleDecisionLogs).values({
+      sourceKind: "store_price",
+      sourceId: 42,
+      externalSiteId: site.id,
+      name: "Reopened listing",
+      decision: "unassign",
+      actorId: actor.id,
+      bottleId: null,
+    });
     const now = new Date();
     const yesterday = new Date(now.getTime() - 24 * 60 * 60 * 1000);
     const [failedRun] = await db

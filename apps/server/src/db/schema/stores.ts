@@ -22,7 +22,7 @@ import {
   uniqueIndex,
   varchar,
 } from "drizzle-orm/pg-core";
-import { bottles } from "./bottles";
+import { bottleReferences, bottles } from "./bottles";
 import { externalSites, type ExternalSite } from "./externalSites";
 import { users } from "./users";
 
@@ -106,6 +106,9 @@ export const storePrices = pgTable(
     bottleId: bigint("bottle_id", { mode: "number" }).references(
       () => bottles.id,
     ),
+    matchedReferenceId: bigint("matched_reference_id", {
+      mode: "number",
+    }).references(() => bottleReferences.id, { onDelete: "set null" }),
     // Retained compatibility field for safe migrations; do not use in new logic.
     legacyReleaseId: bigint("release_id", { mode: "number" }),
     hidden: boolean("hidden").default(false).notNull(),
@@ -127,6 +130,9 @@ export const storePrices = pgTable(
       table.volume,
     ),
     index("store_price_bottle_idx").on(table.bottleId),
+    index("store_price_matched_reference_idx")
+      .on(table.matchedReferenceId)
+      .where(sql`${table.matchedReferenceId} IS NOT NULL`),
     check(
       "store_price_barcode_check",
       sql`${table.barcode} IS NULL OR (${table.barcode} ~ '^[0-9]+$' AND char_length(${table.barcode}) IN (8, 12, 13, 14))`,

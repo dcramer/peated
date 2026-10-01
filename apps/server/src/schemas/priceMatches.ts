@@ -193,6 +193,7 @@ export const StorePriceMatchQueueItemSchema =
   StorePriceMatchProposalSchema.extend({
     price: StorePriceSchema.extend({
       site: ExternalSiteSchema,
+      sourceFingerprint: z.string().nullable(),
     }),
     currentBottle: BottleSchema.nullable(),
     suggestedBottle: BottleSchema.nullable(),

@@ -166,6 +166,15 @@ describe("PATCH /external-reviews/:externalReview", () => {
       bottleId: null,
     });
     expect(response.bottle).toBeNull();
+    expect(
+      await db.query.incomingBottleDecisionLogs.findFirst({
+        where: eq(incomingBottleDecisionLogs.sourceId, review.id),
+      }),
+    ).toMatchObject({
+      decision: "unassign",
+      bottleId: null,
+      metadata: { previousBottleId: bottle.id },
+    });
   });
 
   test("rejects a missing Bottle without partial updates", async ({
