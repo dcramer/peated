@@ -20,6 +20,7 @@
 - [x] 4.1 Add integration coverage for identity, relisting, results, deadlines, stale matching, permissions, and alert retries.
 - [x] 4.2 Run focused tests, server/web typechecks, formatting, lint, and appropriate manual QA.
 - [x] 4.3 Document the shipped model and source operation; reconcile the proposal with implemented behavior and remaining activation limits.
+- [x] 4.4 Enable Scotch Whisky Auctions for manual runs, recheck public pages with the real parser, and document the production rollout. Keep automatic collection unscheduled until full-run capacity and live markup are checked.
 
 ## Verification scope
 
@@ -39,3 +40,12 @@ Full repository tests remain a PR CI check. No production migration, source
 activation, or archive backfill was performed. Live-auction verification and
 targeted hourly collection remain explicit activation/follow-up limits in
 the feature document.
+
+The manual-rollout follow-up passed 76 focused scraper tests, server typecheck,
+changed-file lint and formatting, and strict OpenSpec validation. Five spaced
+public requests with Peated's crawler identity verified robots, discovery,
+first/final-page parsing, and closed results. The registry is now enabled for
+manual collection; production was still disabled and unscheduled at the
+read-only health check. Deployment and the first full production run remain
+operator steps in `docs/operations/auctions.md`. No production writes or
+automatic schedule changes were made.

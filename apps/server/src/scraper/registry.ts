@@ -177,7 +177,7 @@ export const scraperRegistry = createScraperRegistry({
   targets: [
     defineScrapeTarget({
       key: "scotchwhiskyauctions",
-      enabled: false,
+      enabled: true,
       origins: [
         {
           origin: "https://www.scotchwhiskyauctions.com",

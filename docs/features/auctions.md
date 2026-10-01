@@ -87,10 +87,19 @@ page of the 2 most recent numeric auction links, revisiting those auctions for
 published closing results and corrections. Repeating a saved page is safe.
 This is a recent-window collector, not a complete archive backfill.
 
-The target is disabled and its automatic schedule is null. No production
-source, schedule, or migration was activated during implementation. Before
-activation, an operator must review permitted use and public republication,
-verify a currently open auction's markup, and test the source's request capacity.
+Auction collection follows the scraper's
+[responsible public-facts collection policy](../../apps/server/src/scraper/README.md#responsible-collection-of-public-facts).
+We collect lot identifiers, Bottle matching facts, availability, dates, and
+reported prices for discovery and history, with source attribution and links.
+We do not seek explicit permission to index these public facts. We do not copy
+the source's photographs, descriptions, or editorial content.
+
+The target is enabled for manual runs and its initial automatic schedule is
+null. Deploy the API and worker before triggering the first production run.
+The [rollout procedure](../operations/auctions.md) covers that run and checks
+before scheduling repeat collection. A closed-auction run can verify history;
+live availability still needs a currently open auction's markup and measured
+refresh capacity.
 The dated [source audit](../research/2026-09-30-whisky-auction-sources.md) records
 the checked public evidence and limits.
 
@@ -98,7 +107,7 @@ The initial adapter does not infer precise closing times from a date-only
 heading, fetch detail-page condition or identity facts, or implement prioritized
 hourly watched-lot checks. Full repeat runs reconcile the recent window;
 late corrections beyond that window require an explicitly scoped collection.
-Choose an approved repeat interval within the 6-hour freshness window only after
+Choose a repeat interval within the 6-hour freshness window only after
 measuring a complete run. Automated activation is a separate operator decision.
 
 Rollback stops the source and hides the UI; it must preserve saved lots,

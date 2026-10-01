@@ -76,7 +76,7 @@ test("registers each built-in scraper source with its target", () => {
     EXTERNAL_SITE_DEFINITIONS.scotchwhiskyauctions.initialRunEvery,
   ).toBeNull();
   expect(scraperRegistry.targets.get("scotchwhiskyauctions")?.enabled).toBe(
-    false,
+    true,
   );
   expect(scraperRegistry.sources.get("scotchwhiskyauctions")?.recordType).toBe(
     "auction",
@@ -145,24 +145,26 @@ test("registers each built-in scraper source with its target", () => {
   }
 });
 
-test("dispatches built-in sources to the scraper job", async ({ fixtures }) => {
-  const requestedBy = await fixtures.User({ admin: true });
-  const site = await fixtures.ExternalSite({ type: "dramfool" });
-  const enqueue = vi.fn(async () => undefined);
+for (const type of ["dramfool", "scotchwhiskyauctions"] as const) {
+  test(`dispatches ${type} to the scraper job`, async ({ fixtures }) => {
+    const requestedBy = await fixtures.User({ admin: true });
+    const site = await fixtures.ExternalSite({ type });
+    const enqueue = vi.fn(async () => undefined);
 
-  const run = await createScraperLifecycle({
-    registry: scraperRegistry,
-    enqueue,
-  }).queueManualExternalSiteRun({ site, requestedById: requestedBy.id });
+    const run = await createScraperLifecycle({
+      registry: scraperRegistry,
+      enqueue,
+    }).queueManualExternalSiteRun({ site, requestedById: requestedBy.id });
 
-  expect(run.requestLimit).toBe(100);
-  expect(enqueue).toHaveBeenCalledWith(
-    "RunScraper",
-    { runId: run.id },
-    {
-      jobId: `external-site-run-${run.id}`,
-      removeOnComplete: true,
-      removeOnFail: true,
-    },
-  );
-});
+    expect(run.requestLimit).toBe(100);
+    expect(enqueue).toHaveBeenCalledWith(
+      "RunScraper",
+      { runId: run.id },
+      {
+        jobId: `external-site-run-${run.id}`,
+        removeOnComplete: true,
+        removeOnFail: true,
+      },
+    );
+  });
+}

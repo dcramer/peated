@@ -33,12 +33,38 @@ Registered source implementations must not import raw HTTP, queue, database,
 or product-saving clients. Tests check every source listed in the production
 registry, including sources in subfolders.
 
+## Responsible collection of public facts
+
+Peated collects public facts for discovery and reference, with attribution and
+links to the original source. We do not seek explicit permission as a condition
+of indexing those facts. A missing reuse licence is not an activation blocker.
+This is our collection policy, not a claim that every use is legally permitted.
+
+- Collect only the facts needed for the feature. Do not turn factual listings
+  into copies of a source's photographs, descriptions, tasting notes, or articles.
+- Name the source and link to the original listing. Keep Peated's catalog
+  information separate from source-reported facts.
+- Use conservative request limits, cache unchanged data, and avoid unnecessary
+  repeat requests. Back off on temporary failures and rate limits.
+- Respect robots rules. Do not bypass logins, paywalls, blocks, or access controls.
+- Record concrete source restrictions and how they relate to the intended use.
+  Do not turn broad copyright notices or a missing licence into a requirement to
+  request permission. Attribution and low request volume do not erase restrictions.
+- Stop collection if the source objects. Preserve saved history while the source
+  is reviewed.
+
+Copying or publishing source-authored content is a separate use, not covered by
+this public-facts policy. External reviews follow their own storage and
+publication rules below.
+
 External review sources must also follow the
 [external review source procedure](../../../../docs/operations/external-review-sources.md).
 It covers review publishing, source approval, and rollback.
 
 Auction collection follows the [auction model and activation limits](../../../../docs/features/auctions.md).
-The initial auction target is disabled; it does not activate a production feed.
+Scotch Whisky Auctions is enabled for manual runs, with no automatic schedule.
+Follow the [auction rollout procedure](../../../../docs/operations/auctions.md)
+after deploying the API and worker.
 
 ## Registering a source
 
