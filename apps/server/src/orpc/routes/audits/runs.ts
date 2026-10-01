@@ -20,7 +20,7 @@ export default procedure
   .input(
     z
       .object({
-        sourceKind: z.enum(["review", "store_price"]),
+        sourceKind: z.enum(["review", "store_price", "auction_lot"]),
         sourceId: z.coerce.number().int().positive(),
       })
       .strict(),

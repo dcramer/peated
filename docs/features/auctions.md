@@ -47,18 +47,37 @@ not a sale time. Missing prices and dates remain null.
 
 ## Bottle matching
 
-The collector queues unresolved lots through `ResolveAuctionLot`. Exact accepted
-Bottle references can reuse a prior decision when source facts do not directly
-conflict. Assignment locks and rechecks the reference and active Bottle. New
-classifier decisions are saved as Bottle checks and require moderator review;
-they cannot create Bottles or change catalog fields. Ignored classifications
-stay out of review. No new model, prompt, or heuristic matching system is added.
+The collector queues unresolved lots through `ResolveAuctionLot`. Matching first
+reuses an exact accepted Bottle reference unless source facts conflict. Otherwise
+it saves the classifier decision as a Bottle check. A match can apply automatically
+under the same evidence rules as store prices: the chosen Bottle must be a
+retrieved, active candidate, supporting evidence must justify the match, and
+populated facts must not conflict. Missing evidence or unresolved risks require
+review. Exact-reference classifier shortcuts keep their reference dependency.
 
-Moderators use the auction match queue and assignment API. They must supply the
-observed source fingerprint and previous Bottle ID. A source identity change
-clears the assignment and check link. Correcting a Bottle reference invalidates
-only automatic auction assignments made from it; moderator decisions remain.
-Unresolved ended lots remain reviewable for history.
+Moderators review unresolved lots, including ended lots, in the Inbox. Protected
+lot details and saved-run APIs provide source facts and evidence. The UI sends
+the observed fingerprint, previous Bottle ID, and check ID. "Assign this lot"
+changes only the lot. "Assign and remember name" also accepts a normalized Bottle
+reference, but requires a current `global_alias` match and its suggested Bottle.
+A different Bottle choice or missing reuse scope cannot remember a name.
+Both writes commit together; an ignored or conflicting reference rejects the
+whole save. The moderator can still assign just the lot.
+
+A source identity change clears the assignment and check link. Correcting a
+reference invalidates assignments made from it, not direct moderator decisions.
+Completed matches appear in History with their actor and saved-check locator.
+Pending matching belongs in Background work, not Inbox.
+
+Administrators can recheck 1–100 explicit imported lots with expected source,
+Bottle, and check versions. The whole batch is validated before work is saved;
+matched and ignored lots are skipped. Workers reuse references and saved checks
+before classifying again. Dispatch failures leave pending work that can be
+submitted again. Rechecks do not collect auctions or crawl detail pages.
+
+Auction matching never creates Bottles, edits catalog facts, or automatically
+accepts new references. Creation proposals need separate catalog review; ignored
+classifications stay out of the Inbox.
 
 Bottle merges move lots, alert references, and watches to the replacement Bottle;
 duplicate member watches collapse, preserving the earlier subscription time.

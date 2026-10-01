@@ -1,0 +1,39 @@
+{
+  "id": "auction-brand-only-title-needs-review",
+  "name": "auction title: a brand alone cannot identify or teach a bottle",
+  "input": {
+    "reference": { "name": "Ardbeg" },
+    "initialCandidates": [
+      {
+        "bottleId": 910001,
+        "fullName": "Ardbeg 10-year-old",
+        "brand": "Ardbeg",
+        "category": "single_malt",
+        "statedAge": 10,
+        "abv": 46,
+        "source": ["text"]
+      },
+      {
+        "bottleId": 910003,
+        "fullName": "Ardbeg Uigeadail",
+        "brand": "Ardbeg",
+        "category": "single_malt",
+        "abv": 54.2,
+        "source": ["text"]
+      }
+    ],
+    "candidateExpansion": "initial_only"
+  },
+  "provenance": {
+    "source": "synthetic",
+    "notes": "Deliberately incomplete auction input with no product facts, URL, or image. This is not an observed production miss. Candidate IDs are fixture-only. A brand names several products and cannot become a reference to one of them."
+  },
+  "expected": {
+    "status": "classified",
+    "action": "no_match",
+    "identityScope": "product",
+    "referenceScope": "none",
+    "expectedTier": "review",
+    "summary": "Leave the lot unresolved and reject reusable-name authority when the input names only the brand."
+  }
+}

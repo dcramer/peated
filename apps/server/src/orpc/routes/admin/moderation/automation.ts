@@ -1,5 +1,6 @@
 import { db } from "@peated/server/db";
 import {
+  auctionLots,
   bottleChecks,
   bottleOperations,
   incomingBottleDecisionLogs,
@@ -233,6 +234,16 @@ export function createModerationAutomationProcedure(
         )
         .orderBy(desc(bottleOperations.updatedAt))
         .limit(FAILED_LIST_LIMIT);
+      const pendingAuctions = await db
+        .select({
+          id: auctionLots.id,
+          name: auctionLots.name,
+          lastSeenAt: auctionLots.lastSeenAt,
+        })
+        .from(auctionLots)
+        .where(eq(auctionLots.matchStatus, "pending"))
+        .orderBy(desc(auctionLots.lastSeenAt), desc(auctionLots.id))
+        .limit(25);
       return {
         generatedAt: new Date().toISOString(),
         counts: {
@@ -257,6 +268,16 @@ export function createModerationAutomationProcedure(
             proposalType: toCurrentProposalType(attempt.proposalType),
           })),
         ),
+        pendingAuctions: pendingAuctions.map((lot) => ({
+          key: `auction_lot:${lot.id}`,
+          kind: "auction_lot" as const,
+          title: lot.name,
+          status: "pending",
+          detail:
+            "Waiting for matching. Use the auction recheck API if queued work was lost.",
+          href: null,
+          occurredAt: lot.lastSeenAt.toISOString(),
+        })),
         needsAttention: [
           ...failedOperations.map(({ operation }) => ({
             key: `operation:${operation.id}`,

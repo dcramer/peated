@@ -21,11 +21,17 @@ those records into a second task system.
 
 ## Inbox
 
-The Inbox includes open store-price proposals, Bottle or Entity changes waiting
+The Inbox includes open store-price proposals, reviewable auction lots, Bottle or Entity changes waiting
 for review, unresolved findings, and open member reports. Work that is still
 running, failed, stale, or waiting to retry belongs in Background work until it
 needs a person to decide. A store-price proposal appears only while the store
 still shows the listing; see `docs/architecture/store-price-matching.md`.
+
+Auction tasks are keyed by the lot ID, not by a generic classifier-check ID.
+Ended lots stay reviewable for sale history. A reviewer can assign an existing
+Bottle to just that lot, or explicitly remember a name when the saved decision
+supports reuse. The auction screen does not create Bottles or edit catalog
+facts. See [Whisky auctions](./auctions.md).
 
 A catalog task reads its saved Bottle check through
 `apps/server/src/lib/bottleCheckEvidence.ts`, which keeps only the IDs, links,
@@ -61,6 +67,10 @@ Bottle resolution of review and price inputs added in the last 30 days.
 Background work shows retry runs, queued jobs, and catalog changes that
 stopped. It is not a measure of decision accuracy and cannot approve a catalog
 change.
+
+Pending auction matches remain visible here even if queue dispatch failed.
+Administrators can resubmit explicit lots with expected versions through the
+bounded auction recheck API. Pending work is not an Inbox decision.
 
 Failed work is recent by definition. A failed queued job or price retry stays in
 the failed count and the stopped-work list for three days, then the worker

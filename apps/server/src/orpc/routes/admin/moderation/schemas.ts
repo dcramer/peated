@@ -2,6 +2,7 @@ import { z } from "zod";
 
 export const ModerationTaskKindSchema = z.enum([
   "listing",
+  "auction_lot",
   "operation",
   "finding",
   "report",
@@ -15,9 +16,15 @@ export const ModerationTaskStateSchema = z.enum(["ready", "blocked"]);
 
 export const ModerationTaskKeySchema = z
   .string()
-  .regex(/^(listing|operation|finding|report):\d+$/);
+  .regex(/^(listing|auction_lot|operation|finding|report):\d+$/);
 
 export const ModerationTaskSourceSchema = z.discriminatedUnion("kind", [
+  z
+    .object({
+      kind: z.literal("auction_lot"),
+      lotId: z.number().int().positive(),
+    })
+    .strict(),
   z
     .object({
       kind: z.literal("listing"),
@@ -165,7 +172,7 @@ export const ModerationHistoryDetailsSchema = z
 const AutomationItemSchema = z
   .object({
     key: z.string(),
-    kind: z.enum(["listing", "operation", "retry_run", "job"]),
+    kind: z.enum(["listing", "auction_lot", "operation", "retry_run", "job"]),
     title: z.string(),
     status: z.string(),
     detail: z.string().nullable(),
@@ -210,6 +217,7 @@ export const ModerationAutomationResponseSchema = z
       .strict(),
     needsAttention: z.array(AutomationItemSchema),
     recentRuns: z.array(AutomationItemSchema),
+    pendingAuctions: z.array(AutomationItemSchema).max(25),
   })
   .strict();
 

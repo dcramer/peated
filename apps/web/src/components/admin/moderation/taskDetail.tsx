@@ -35,6 +35,7 @@ import {
 import { Check, Copy, RotateCcw } from "lucide-react";
 import { Fragment, useState } from "react";
 import { z } from "zod";
+import AuctionTask from "./auctionTask";
 import BottleSelector from "./bottleSelector";
 import { formatPriceMatchQueueLlmExport } from "./llmExport";
 import {
@@ -407,7 +408,11 @@ function AuditTask({
 }) {
   const source = task.source;
   const checkId =
-    source.kind === "listing" || source.kind === "report" ? 0 : source.checkId;
+    source.kind === "listing" ||
+    source.kind === "report" ||
+    source.kind === "auction_lot"
+      ? 0
+      : source.checkId;
   const orpc = useORPC();
   const queryClient = useQueryClient();
   const { data } = useSuspenseQuery(
@@ -603,6 +608,8 @@ export default function TaskDetail({
     return <ModerationLoading>Loading decision…</ModerationLoading>;
   if (locator.isError || !locator.data) return <UnavailableTask />;
   const task = locator.data.task;
+  if (task.source.kind === "auction_lot")
+    return <AuctionTask onComplete={onComplete} task={task} />;
   if (task.source.kind === "listing")
     return <ListingTask onComplete={onComplete} task={task} />;
   if (task.source.kind === "report")

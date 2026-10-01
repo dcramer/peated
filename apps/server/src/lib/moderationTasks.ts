@@ -2,6 +2,9 @@
 // must not load full listing or audit detail while listing or locating them.
 import { db } from "@peated/server/db";
 import {
+  auctionLots,
+  auctions,
+  bottleChecks,
   bottleOperations,
   externalSites,
   reports,
@@ -26,10 +29,46 @@ import {
 import { currentStorePriceCondition } from "@peated/server/lib/storePriceValidity";
 import type { ModerationTaskSummary } from "@peated/server/orpc/routes/admin/moderation/schemas";
 import { REPORT_REASON_LABELS } from "@peated/server/schemas/reports";
-import { and, asc, eq, inArray, isNull, lte, or } from "drizzle-orm";
+import { and, asc, eq, inArray, isNull, lte, or, sql } from "drizzle-orm";
 
 const MAX_PROJECTED_SOURCE_ROWS = 10_000;
 const OPERATIONAL_STATUSES = new Set(["applying", "stale", "failed"]);
+
+async function auctionTasks(lotId?: number): Promise<ModerationTaskSummary[]> {
+  const rows = await db
+    .select({
+      id: auctionLots.id,
+      name: auctionLots.name,
+      firstSeenAt: auctionLots.firstSeenAt,
+      siteName: externalSites.name,
+      action: sql<string | null>`${bottleChecks.output}->'decision'->>'action'`,
+    })
+    .from(auctionLots)
+    .innerJoin(auctions, eq(auctions.id, auctionLots.auctionId))
+    .innerJoin(externalSites, eq(externalSites.id, auctions.externalSiteId))
+    .leftJoin(bottleChecks, eq(bottleChecks.id, auctionLots.matchCheckId))
+    .where(
+      and(
+        eq(auctionLots.matchStatus, "review"),
+        lotId === undefined ? undefined : eq(auctionLots.id, lotId),
+      ),
+    )
+    .orderBy(asc(auctionLots.firstSeenAt), asc(auctionLots.id))
+    .limit(MAX_PROJECTED_SOURCE_ROWS);
+  return rows.map((row) => ({
+    key: `auction_lot:${row.id}`,
+    kind: "auction_lot",
+    category: "listing",
+    state: "ready",
+    inconclusive: row.action === "no_match",
+    title: row.name,
+    sourceLabel: row.siteName,
+    question: "Which bottle should this auction lot use?",
+    statusLabel: "Auction match",
+    attentionAt: row.firstSeenAt.toISOString(),
+    source: { kind: "auction_lot", lotId: row.id },
+  }));
+}
 
 function listingQuestion(proposalType: string): string {
   switch (proposalType) {
@@ -330,12 +369,13 @@ async function catalogTasks(): Promise<ModerationTaskSummary[]> {
 export async function projectModerationTasks(): Promise<
   ModerationTaskSummary[]
 > {
-  const [listings, catalog, reportList] = await Promise.all([
+  const [listings, catalog, reportList, auctionList] = await Promise.all([
     listingTasks(),
     catalogTasks(),
     reportTasks(),
+    auctionTasks(),
   ]);
-  const tasks = [...listings, ...catalog, ...reportList];
+  const tasks = [...listings, ...catalog, ...reportList, ...auctionList];
   return tasks.sort(
     (left, right) =>
       left.attentionAt.localeCompare(right.attentionAt) ||
@@ -348,6 +388,7 @@ export async function locateModerationTask(
 ): Promise<ModerationTaskSummary | null> {
   const [kind, rawId] = key.split(":");
   const id = Number(rawId);
+  if (kind === "auction_lot") return (await auctionTasks(id)).at(0) ?? null;
   if (kind === "listing") return (await listingTasks(id)).at(0) ?? null;
   if (kind === "report") return (await reportTasks(id)).at(0) ?? null;
 

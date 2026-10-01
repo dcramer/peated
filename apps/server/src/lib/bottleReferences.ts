@@ -186,6 +186,7 @@ export type BottleReferenceAssignmentInput = {
   assignedByActorId: number;
   sourceReferenceIdentity?: BottleReferenceIdentitySnapshot;
   expectedReview?: BottleReferenceReviewIdentitySnapshot;
+  rejectIgnored?: boolean;
 };
 
 export type BottleReferenceAssignmentOptions = Pick<
@@ -328,6 +329,7 @@ async function claimBottleReferenceNameInTransaction(
     assignmentSource,
     assignedByActorId,
     reservation,
+    rejectIgnored = false,
   }: {
     name: string;
     bottleId: number;
@@ -336,6 +338,7 @@ async function claimBottleReferenceNameInTransaction(
     assignmentSource?: BottleReferenceAssignmentSource;
     assignedByActorId: number;
     reservation: boolean;
+    rejectIgnored?: boolean;
   },
 ): Promise<ExactBottleReferenceClaimResult> {
   if (!name.trim()) {
@@ -356,6 +359,9 @@ async function claimBottleReferenceNameInTransaction(
       .limit(1)
       .for("update");
 
+    if (rejectIgnored && existingReference?.ignored) {
+      throw new BottleReferenceIdentityChangedError(name);
+    }
     if (expectedIdentity) {
       const convergedIdentity: BottleReferenceIdentitySnapshot = {
         name,
@@ -646,6 +652,7 @@ export async function assignBottleReferenceInTransaction(
     assignedByActorId,
     sourceReferenceIdentity,
     expectedReview,
+    rejectIgnored,
   }: BottleReferenceAssignmentInput,
 ): Promise<BottleReferenceAssignmentResult> {
   if (!name.trim()) {
@@ -678,6 +685,7 @@ export async function assignBottleReferenceInTransaction(
     assignmentSource,
     assignedByActorId,
     reservation: false,
+    rejectIgnored,
   };
   if (sourceReferenceIdentity && sourceIsCanonicalName) {
     claimInput.expectedIdentity = sourceReferenceIdentity;

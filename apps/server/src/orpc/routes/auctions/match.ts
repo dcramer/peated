@@ -3,6 +3,10 @@ import {
   AuctionLotMatchChangedError,
   notifyAuctionLot,
 } from "@peated/server/lib/auctions";
+import {
+  BottleReferenceIdentityChangedError,
+  ExactBottleReferenceConflictError,
+} from "@peated/server/lib/bottleReferences";
 import { ActiveBottleSelectionError } from "@peated/server/lib/resolveActiveBottleIds";
 import { procedure } from "@peated/server/orpc";
 import { requireMod } from "@peated/server/orpc/middleware";
@@ -25,6 +29,13 @@ export default procedure
         bottleId: z.number().int().positive(),
         fingerprint: z.string().min(1),
         expectedBottleId: z.number().int().positive().nullable(),
+        expectedCheckId: z.number().int().positive().nullable().optional(),
+        rememberReference: z
+          .boolean()
+          .default(false)
+          .describe(
+            "Accept this title as a reusable Bottle reference. Requires the current check and its suggested Bottle.",
+          ),
       })
       .strict(),
   )
@@ -39,6 +50,14 @@ export default procedure
     } catch (error) {
       if (error instanceof AuctionLotMatchChangedError)
         throw errors.CONFLICT({ message: error.message });
+      if (
+        error instanceof BottleReferenceIdentityChangedError ||
+        error instanceof ExactBottleReferenceConflictError
+      )
+        throw errors.CONFLICT({
+          message:
+            "This name is ignored or assigned differently. Refresh or assign only this lot.",
+        });
       if (error instanceof ActiveBottleSelectionError)
         throw errors.NOT_FOUND({ message: "Active bottle not found." });
       throw error;

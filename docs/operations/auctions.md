@@ -58,3 +58,45 @@ and deploy both processes. Preserve lots, results, watches, and alert receipts.
 
 See the [auction model](../features/auctions.md) for freshness, matching,
 result history, and notification rules.
+
+## Matching rollout
+
+Deploy migration `0307` (the `auction_lot` decision-history enum value), the API,
+worker, and review UI together. Scheduling and existing assignments do not
+change during deployment.
+
+For a small pilot, choose up to 100 unresolved lots from
+`GET /auction-lots/match-queue`. Read each through `GET /auction-lots/{lot}` and
+keep its `fingerprint`, `lot.bottleId`, and `matchCheckId`. Both reads require a
+moderator. Prefer lots with current saved checks to avoid new classification
+requests. Put their observed versions in a temporary JSON file:
+
+```json
+{
+  "lots": [
+    {
+      "lotId": 123,
+      "fingerprint": "observed-fingerprint",
+      "expectedBottleId": null,
+      "expectedCheckId": 456
+    }
+  ]
+}
+```
+
+The IDs above are examples. An administrator submits the real file with
+`pnpm cli api post /auction-lots/recheck --input PATH`. A stale batch queues
+nothing. After workers finish, verify assignments, review outcomes, History
+actors, and saved checks. Ended lots must not send alerts. Check a lot-only
+approval, a remembered name reused by a later occurrence, and a reference
+conflict that changes neither the lot nor reference.
+
+If dispatch fails, pending lots remain in Background work. Resubmit their
+observed versions; do not clear saved checks or force new model runs. Missing
+checks may require classification through the existing evidence tools.
+
+Stop the pilot by not submitting more lots. For rollback, pause the models worker
+while deploying the previous API, worker, and UI together. Keep migration `0307`
+and all saved records. Correct confirmed errors through lot assignment or the
+reference-correction API, not SQL or evidence deletion. This release does not add
+detail collection, automatic Bottle creation, global reprocessing, or scheduling.
