@@ -117,7 +117,13 @@ async function finalizeTrustedSourceAssignmentInTransaction({
     .where(
       and(
         eq(storePriceMatchProposals.priceId, priceId),
-        inArray(storePriceMatchProposals.status, ["pending_review", "errored"]),
+        // Trusted-source rule: close every unfinished legacy state, including
+        // `verified`, so a status rewrite cannot surface a decided listing.
+        inArray(storePriceMatchProposals.status, [
+          "verified",
+          "pending_review",
+          "errored",
+        ]),
       ),
     )
     .returning({ id: storePriceMatchProposals.id });
