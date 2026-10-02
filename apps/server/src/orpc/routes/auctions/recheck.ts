@@ -9,7 +9,7 @@ import { auctionLotCheckKey } from "@peated/server/lib/auctionMatchEvidence";
 import { procedure } from "@peated/server/orpc";
 import { requireAdmin } from "@peated/server/orpc/middleware";
 import { pushUniqueJob } from "@peated/server/worker/client";
-import { asc, eq, inArray } from "drizzle-orm";
+import { asc, eq, inArray, sql } from "drizzle-orm";
 import { z } from "zod";
 
 const InputSchema = z
@@ -123,15 +123,8 @@ export default procedure
             input.refreshSourceDetails
               ? {
                   matchStatus: "review",
-                  sourceDetailsRequestedAt: new Date(
-                    Math.max(
-                      Date.now(),
-                      ...lots.map(
-                        (lot) =>
-                          (lot.sourceDetailsRequestedAt?.getTime() ?? 0) + 1,
-                      ),
-                    ),
-                  ),
+                  // Auction detail retries must advance each lot's own request, not another lot's.
+                  sourceDetailsRequestedAt: sql`GREATEST(clock_timestamp(), ${auctionLots.sourceDetailsRequestedAt} + INTERVAL '1 millisecond')`,
                   sourceDetailsCheckedAt: null,
                   sourceDetailsRunId: null,
                 }

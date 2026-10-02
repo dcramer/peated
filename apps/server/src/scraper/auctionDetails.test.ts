@@ -731,6 +731,64 @@ test("explicit detail retry is admin-only, versioned, and invalidates an earlier
   });
 });
 
+test("detail retries advance each queued lot's own request and leave skipped lots unchanged", async ({
+  fixtures,
+}) => {
+  const site = await fixtures.ExternalSite({ type: "scotchwhiskyauctions" });
+  const first = await importedLot(site.id);
+  const second = await importedLot(site.id, "893369");
+  const skipped = await importedLot(site.id, "893370");
+  const previousRequest = new Date(Date.now() + 60_000);
+  await db
+    .update(auctionLots)
+    .set({ sourceDetailsRequestedAt: previousRequest })
+    .where(eq(auctionLots.id, first.id));
+  const [ignored] = await db
+    .update(auctionLots)
+    .set({
+      matchStatus: "ignored",
+      sourceDetailsRequestedAt: new Date(Date.now() + 3_600_000),
+    })
+    .where(eq(auctionLots.id, skipped.id))
+    .returning();
+  const admin = await fixtures.User({ admin: true });
+  const beforeRetry = Date.now();
+  expect(
+    await routerClient.auctions.recheck(
+      {
+        refreshSourceDetails: true,
+        lots: [first, second, ignored].map((lot) => ({
+          lotId: lot.id,
+          fingerprint: lot.sourceFingerprint,
+          expectedBottleId: lot.bottleId,
+          expectedCheckId: lot.matchCheckId,
+        })),
+      },
+      { context: { user: admin } },
+    ),
+  ).toEqual({ queued: [first.id, second.id], skipped: [skipped.id] });
+  const retriedFirst = await db.query.auctionLots.findFirst({
+    where: eq(auctionLots.id, first.id),
+  });
+  const retriedSecond = await db.query.auctionLots.findFirst({
+    where: eq(auctionLots.id, second.id),
+  });
+  expect(retriedFirst?.sourceDetailsRequestedAt).toEqual(
+    new Date(previousRequest.getTime() + 1),
+  );
+  expect(
+    retriedSecond?.sourceDetailsRequestedAt?.getTime(),
+  ).toBeGreaterThanOrEqual(beforeRetry);
+  expect(
+    retriedSecond?.sourceDetailsRequestedAt?.getTime(),
+  ).toBeLessThanOrEqual(Date.now());
+  expect(
+    await db.query.auctionLots.findFirst({
+      where: eq(auctionLots.id, skipped.id),
+    }),
+  ).toEqual(ignored);
+});
+
 test("requested live lots are checked before older closed lots", async ({
   fixtures,
 }) => {
