@@ -4,14 +4,17 @@ import { db } from "@peated/server/db";
 import {
   auctionLots,
   externalSiteRuns,
+  externalSites,
   type AuctionLot,
 } from "@peated/server/db/schema";
+import { auctionLotCheckKey } from "@peated/server/lib/auctionMatchEvidence";
 import { resolveAuctionLot } from "@peated/server/lib/auctionMatching";
 import {
   assignAuctionLot,
   saveAuctionLotDetails,
   upsertAuctionObservation,
 } from "@peated/server/lib/auctions";
+import { createBottleCheck } from "@peated/server/lib/bottleChecks";
 import { getBottleCandidateById } from "@peated/server/lib/bottleReferenceCandidates";
 import { pushUniqueJob } from "@peated/server/lib/test/workerDispatch";
 import { routerClient } from "@peated/server/orpc/router";
@@ -87,7 +90,7 @@ async function requestReview(lot: AuctionLot) {
 
 afterEach(() => vi.restoreAllMocks());
 
-test("unresolved text match reads bounded details and keeps prior checks and price history", async ({
+test("new unmapped lot reads bounded details before its first model check and keeps price history", async ({
   fixtures,
 }) => {
   const site = await fixtures.ExternalSite({
@@ -107,21 +110,6 @@ test("unresolved text match reads bounded details and keeps prior checks and pri
     .mockResolvedValueOnce({
       result: createDecidedBottleClassification({
         decision: {
-          action: "no_match",
-          rationale: "More detail needed.",
-          candidateBottleIds: [],
-          matchedBottleId: null,
-          identityScope: "exact_cask",
-          observation: null,
-          proposedBottle: null,
-        },
-        artifacts: {},
-      }),
-      modelMetadata,
-    })
-    .mockResolvedValueOnce({
-      result: createDecidedBottleClassification({
-        decision: {
           action: "match",
           rationale: "Cask facts agree.",
           candidateBottleIds: [bottle.id],
@@ -137,7 +125,13 @@ test("unresolved text match reads bounded details and keeps prior checks and pri
       modelMetadata,
     });
   await resolveAuctionLot(lot.id, lot.sourceFingerprint);
-  const firstCheck = (await db.query.bottleChecks.findFirst())!;
+  expect(model).not.toHaveBeenCalled();
+  expect(await db.query.bottleChecks.findMany()).toHaveLength(0);
+  const requested = (await db.query.auctionLots.findFirst())!;
+  await resolveAuctionLot(lot.id, lot.sourceFingerprint);
+  expect(
+    (await db.query.auctionLots.findFirst())?.sourceDetailsRequestedAt,
+  ).toEqual(requested.sourceDetailsRequestedAt);
   expect(
     (await db.query.auctionLots.findFirst())?.sourceDetailsRequestedAt,
   ).not.toBeNull();
@@ -186,22 +180,17 @@ test("unresolved text match reads bounded details and keeps prior checks and pri
     matchStatus: "pending",
     matchCheckId: null,
     lastCheckedAt: lot.lastCheckedAt,
-    lastSeenAt: lot.lastSeenAt,
     state: "closed",
     sourceBottleIdentity: { cask_number: "3771", abv: 59, outturn: 633 },
   });
   await resolveAuctionLot(lot.id, enriched.sourceFingerprint);
-  expect(model.mock.calls[1][0]).toMatchObject({
+  expect(model.mock.calls[0][0]).toMatchObject({
     readCandidateImages: false,
     extractedIdentitySource: "structured",
     extractedIdentity: { cask_number: "3771", abv: 59 },
   });
-  expect(await db.query.bottleChecks.findMany()).toHaveLength(2);
-  expect(
-    (await db.query.bottleChecks.findMany()).some(
-      ({ id }) => id === firstCheck.id,
-    ),
-  ).toBe(true);
+  expect(model).toHaveBeenCalledOnce();
+  expect(await db.query.bottleChecks.findMany()).toHaveLength(1);
   expect(await db.query.auctionLotResults.findMany()).toHaveLength(1);
   expect(await db.query.auctionLots.findFirst()).toMatchObject({
     bottleId: bottle.id,
@@ -209,6 +198,54 @@ test("unresolved text match reads bounded details and keeps prior checks and pri
   });
   await lifecycle.queueRequestedAuctionLotDetails();
   expect(enqueue).toHaveBeenCalledOnce();
+});
+
+test("enriching a previously reviewed lot preserves its saved check and result", async ({
+  fixtures,
+}) => {
+  const site = await fixtures.ExternalSite({ type: "scotchwhiskyauctions" });
+  const lot = await importedLot(site.id);
+  const { check } = await createBottleCheck({
+    intent: "resolve_reference",
+    sourceKind: "auction_lot",
+    sourceId: lot.id,
+    backgroundEventKey: auctionLotCheckKey(lot.id, lot.sourceFingerprint),
+    input: { reference: { id: lot.id, name: lot.name, url: lot.url } },
+    result: createDecidedBottleClassification({
+      decision: {
+        action: "no_match",
+        rationale: "More detail needed.",
+        candidateBottleIds: [],
+        matchedBottleId: null,
+        identityScope: "exact_cask",
+        observation: null,
+        proposedBottle: null,
+      },
+      artifacts: {},
+    }),
+  });
+  const savedChecks = await db.query.bottleChecks.findMany();
+  const model = vi.spyOn(classifier, "runScrapedBottleReference");
+  await resolveAuctionLot(lot.id, lot.sourceFingerprint);
+  expect(model).not.toHaveBeenCalled();
+  const lifecycle = createScraperLifecycle({
+    registry: scraperRegistry,
+    enqueue: async () => undefined,
+  });
+  const run = (await lifecycle.queueAuctionDetailsRun(site.id))!;
+  const request = ScotchWhiskyAuctionDetailsCursorSchema.parse(run.cursor)
+    .lots[0];
+  expect(request.expectedCheckId).toBe(check.id);
+  expect(
+    await saveAuctionLotDetails(site.id, {
+      kind: "details",
+      request,
+      ...parseScotchWhiskyAuctionDetails(detailHtml),
+      checkedAt: new Date().toISOString(),
+    }),
+  ).toMatchObject({ matchStatus: "pending", matchCheckId: null });
+  expect(await db.query.bottleChecks.findMany()).toEqual(savedChecks);
+  expect(await db.query.auctionLotResults.findMany()).toHaveLength(1);
 });
 
 test("detail cursor resumes after a request-budget wait and removed pages stay reviewable", async ({
@@ -477,4 +514,173 @@ test("explicit detail retry is admin-only, versioned, and invalidates an earlier
     sourceDetailsRunId: null,
     sourceDetailsCheckedAt: null,
   });
+});
+
+test("requested live lots are checked before older closed lots", async ({
+  fixtures,
+}) => {
+  const site = await fixtures.ExternalSite({ type: "scotchwhiskyauctions" });
+  const closed = await importedLot(site.id);
+  const live = await importedLot(site.id, "893369");
+  await db
+    .update(auctionLots)
+    .set({ state: "live" })
+    .where(eq(auctionLots.id, live.id));
+  await requestReview(closed);
+  await requestReview(live);
+  const lifecycle = createScraperLifecycle({
+    registry: scraperRegistry,
+    enqueue: async () => undefined,
+  });
+  const run = (await lifecycle.queueAuctionDetailsRun(site.id))!;
+  expect(run.purpose).toBe("details");
+  expect(
+    ScotchWhiskyAuctionDetailsCursorSchema.parse(run.cursor).lots.map(
+      (lot) => lot.lotId,
+    ),
+  ).toEqual([live.id, closed.id]);
+});
+
+test.for(["success", "failure", "expired"] as const)(
+  "detail run %s preserves the site's last listing refresh",
+  async (outcome, { fixtures }) => {
+    const site = await fixtures.ExternalSite({
+      type: "scotchwhiskyauctions",
+      runEvery: null,
+    });
+    const lot = await importedLot(site.id);
+    await requestReview(lot);
+    const completedAt = new Date(Date.now() - 30_000);
+    const [collection] = await db
+      .insert(externalSiteRuns)
+      .values({
+        externalSiteId: site.id,
+        trigger: "manual",
+        status: "failed",
+        completedAt,
+      })
+      .returning();
+    await db
+      .update(externalSites)
+      .set({ lastRunAt: completedAt, lastRunId: collection.id })
+      .where(eq(externalSites.id, site.id));
+    const lifecycle = createScraperLifecycle({
+      registry: scraperRegistry,
+      enqueue: async () => undefined,
+    });
+    const run = (await lifecycle.queueAuctionDetailsRun(site.id))!;
+    if (outcome === "expired")
+      await db
+        .update(externalSiteRuns)
+        .set({ createdAt: new Date(Date.now() - 7 * 24 * 60 * 60_000) })
+        .where(eq(externalSiteRuns.id, run.id));
+    await syncScraperDefinitions(scraperRegistry);
+    let now = new Date();
+    const execute = executeScraperRun(
+      { runId: run.id },
+      {
+        registry: scraperRegistry,
+        fetchImpl: async (input) =>
+          new Response(
+            (input instanceof Request ? input.url : input.toString()).endsWith(
+              "/robots.txt",
+            )
+              ? "User-agent: *\nAllow: /"
+              : outcome === "success"
+                ? detailHtml
+                : "Unexpected page",
+          ),
+        clock: {
+          now: () => now,
+          sleep: async (ms) => {
+            now = new Date(now.getTime() + ms);
+          },
+          random: () => 0,
+        },
+      },
+    );
+    if (outcome !== "failure")
+      await expect(execute).resolves.toMatchObject({ status: "completed" });
+    else await expect(execute).rejects.toThrow();
+    expect(await db.query.externalSites.findFirst()).toMatchObject({
+      lastRunAt: completedAt,
+      lastRunId: collection.id,
+    });
+  },
+);
+
+test("scheduled auction runs save current scope while manual runs keep recent collection", async ({
+  fixtures,
+}) => {
+  const site = await fixtures.ExternalSite({
+    type: "scotchwhiskyauctions",
+    runEvery: 240,
+    nextRunAt: null,
+  });
+  const admin = await fixtures.User({ admin: true });
+  const lifecycle = createScraperLifecycle({
+    registry: scraperRegistry,
+    enqueue: async () => undefined,
+  });
+  const scheduled = (await lifecycle.queueScheduledExternalSiteRun(site.id))!;
+  expect(scheduled).toMatchObject({
+    purpose: "collect",
+    cursor: { scope: "current", auctions: [] },
+  });
+  await db
+    .update(externalSiteRuns)
+    .set({ status: "succeeded", completedAt: new Date() })
+    .where(eq(externalSiteRuns.id, scheduled.id));
+  const manual = await lifecycle.queueManualExternalSiteRun({
+    site,
+    requestedById: admin.id,
+  });
+  expect(manual).toMatchObject({ purpose: "collect", cursor: null });
+});
+
+test("a removed detail page still allows a new lot's normal title check", async ({
+  fixtures,
+}) => {
+  const site = await fixtures.ExternalSite({ type: "scotchwhiskyauctions" });
+  const lot = await importedLot(site.id);
+  const model = vi
+    .spyOn(classifier, "runScrapedBottleReference")
+    .mockResolvedValue({
+      result: createDecidedBottleClassification({
+        decision: {
+          action: "no_match",
+          rationale: "The title does not establish an exact match.",
+          candidateBottleIds: [],
+          matchedBottleId: null,
+          identityScope: "exact_cask",
+          observation: null,
+          proposedBottle: null,
+        },
+        artifacts: {},
+      }),
+      modelMetadata,
+    });
+  await resolveAuctionLot(lot.id, lot.sourceFingerprint);
+  const lifecycle = createScraperLifecycle({
+    registry: scraperRegistry,
+    enqueue: async () => undefined,
+  });
+  const run = (await lifecycle.queueAuctionDetailsRun(site.id))!;
+  const request = ScotchWhiskyAuctionDetailsCursorSchema.parse(run.cursor)
+    .lots[0];
+  await saveAuctionLotDetails(site.id, {
+    kind: "details",
+    request,
+    name: null,
+    volume: null,
+    sourceBottleIdentity: null,
+    checkedAt: new Date().toISOString(),
+  });
+  await resolveAuctionLot(lot.id, lot.sourceFingerprint);
+  expect(model).toHaveBeenCalledOnce();
+  expect(await db.query.auctionLots.findFirst()).toMatchObject({
+    matchStatus: "review",
+    bottleId: null,
+  });
+  expect(await lifecycle.queueAuctionDetailsRun(site.id)).toBeNull();
 });

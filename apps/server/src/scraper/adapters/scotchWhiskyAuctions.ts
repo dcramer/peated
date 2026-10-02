@@ -9,6 +9,7 @@ import { load } from "cheerio";
 import { z } from "zod";
 import { ScraperHttpStatusError } from "../http";
 import type { ScraperAdapter } from "../types";
+import { parseDate } from "./dates";
 import { parseScotchWhiskyAuctionDetails } from "./scotchWhiskyAuctionDetails";
 
 const ORIGIN = "https://www.scotchwhiskyauctions.com";
@@ -16,6 +17,7 @@ const IMAGE_ORIGIN = "https://d3suvtcq00dftb.cloudfront.net";
 const TARGET = "scotchwhiskyauctions";
 const IndexCursorSchema = z
   .object({
+    scope: z.enum(["recent", "current"]).default("recent"),
     auctions: z.array(AuctionSourceSchema).max(2),
     auctionIndex: z.number().int().nonnegative(),
     page: z.number().int().min(1).max(500),
@@ -77,20 +79,43 @@ function lotImageUrl(style: string | undefined) {
   return undefined;
 }
 
-export function parseScotchWhiskyAuctionsIndex(html: string) {
+export function parseScotchWhiskyAuctionsIndex(
+  html: string,
+  scope: "recent" | "current" = "recent",
+) {
   const $ = load(html);
-  // Initial collection covers the current/recent auction window, not the full archive.
-  return $(".auctions a.auction")
-    .toArray()
-    .slice(0, 2)
-    .map((element) => {
-      const url = sourceUrl($(element).attr("href") ?? "");
-      return AuctionSourceSchema.parse({
-        sourceKey: url.pathname.split("/")[2].split("-")[0],
-        name: $(element).find("h4").text().trim(),
-        url: url.toString(),
-      });
+  const links = $(".auctions a.auction").toArray();
+  let selected = links.slice(0, 2);
+  if (scope === "current") {
+    const open = links.filter((element) =>
+      /^Ends\b/i.test($(element).find("h5").text().trim()),
+    );
+    if (open.length > 2)
+      throw new Error("Auction discovery exceeds the open-auction limit.");
+    const ended = links
+      .map((element) => {
+        const heading = $(element).find("h5").text().trim();
+        return {
+          element,
+          date: /^Ended\b/i.test(heading)
+            ? parseDate(heading.replace(/^Ended\s+/i, ""))
+            : null,
+        };
+      })
+      .filter(({ date }) => date !== null)
+      .sort((a, b) => b.date!.getTime() - a.date!.getTime())[0]?.element;
+    selected = open.length ? open : ended ? [ended] : [];
+    if (!selected.length)
+      throw new Error("Auction discovery has no recognized auction states.");
+  }
+  return selected.map((element) => {
+    const url = sourceUrl($(element).attr("href") ?? "");
+    return AuctionSourceSchema.parse({
+      sourceKey: url.pathname.split("/")[2].split("-")[0],
+      name: $(element).find("h4").text().trim(),
+      url: url.toString(),
     });
+  });
 }
 
 export function parseScotchWhiskyAuctionPage(
@@ -119,7 +144,10 @@ export function parseScotchWhiskyAuctionPage(
     const url = sourceUrl(tile.attr("href") ?? "");
     const info = tile.find('[id^="info_"]').text().trim();
     const sold = info.match(/^Sold for £([\d,]+(?:\.\d{1,2})?)\b/i);
-    const unsold = /\b(?:unsold|not sold|reserve not met)\b/i.test(info);
+    // SWA results need closure before an unmet reserve becomes a final outcome.
+    const unsold =
+      /\b(?:unsold|not sold)\b/i.test(info) ||
+      (ended && /\breserve not met\b/i.test(info));
     const withdrawn = /\bwithdrawn\b/i.test(info);
     const bid = info.match(
       /\b(?:current|highest|winning) bid:?\s*£([\d,]+(?:\.\d{1,2})?)/i,
@@ -238,13 +266,15 @@ export const scotchWhiskyAuctionsAdapter: ScraperAdapter<
     return;
   }
   let state = cursor;
-  if (!state) {
+  if (!state || state.auctions.length === 0) {
+    const scope = state?.scope ?? "recent";
     const response = await session.request({
       target: TARGET,
       url: new URL("/auctions/", ORIGIN),
     });
     state = {
-      auctions: parseScotchWhiskyAuctionsIndex(response.body),
+      scope,
+      auctions: parseScotchWhiskyAuctionsIndex(response.body, scope),
       auctionIndex: 0,
       page: 1,
     };

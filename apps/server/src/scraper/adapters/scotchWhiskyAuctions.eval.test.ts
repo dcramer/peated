@@ -1,5 +1,5 @@
 import { db } from "@peated/server/db";
-import { auctionLots } from "@peated/server/db/schema";
+import { auctionLots, externalSiteRuns } from "@peated/server/db/schema";
 import { upsertAuctionObservation } from "@peated/server/lib/auctions";
 import { requestAuctionLotDetails } from "@peated/server/scraper";
 import { eq } from "drizzle-orm";
@@ -8,24 +8,25 @@ import { scraperRegistry as registeredScrapers } from "../registry";
 import { executeScraperRun } from "../runs";
 import { syncScraperDefinitions } from "../syncDefinitions";
 
+const registry = {
+  sources: new Map([
+    [
+      "scotchwhiskyauctions",
+      registeredScrapers.sources.get("scotchwhiskyauctions")!,
+    ],
+  ]),
+  targets: new Map([
+    [
+      "scotchwhiskyauctions",
+      registeredScrapers.targets.get("scotchwhiskyauctions")!,
+    ],
+  ]),
+};
+
 // Explicit live checks stay separate from deterministic tests and never touch production data.
 test("collects published Ardbeg cask facts through the real paced source runtime", async ({
   fixtures,
 }) => {
-  const registry = {
-    sources: new Map([
-      [
-        "scotchwhiskyauctions",
-        registeredScrapers.sources.get("scotchwhiskyauctions")!,
-      ],
-    ]),
-    targets: new Map([
-      [
-        "scotchwhiskyauctions",
-        registeredScrapers.targets.get("scotchwhiskyauctions")!,
-      ],
-    ]),
-  };
   const site = await fixtures.ExternalSite({
     type: "scotchwhiskyauctions",
     runEvery: null,
@@ -99,4 +100,41 @@ test("collects published Ardbeg cask facts through the real paced source runtime
     expect(saved?.sourceDetailsCheckedAt).not.toBeNull();
   }
   expect(lots[0].id).not.toBe(lots[1].id);
+}, 180_000);
+
+test("checks scheduled discovery and the first real listing page within a three-request budget", async ({
+  fixtures,
+}) => {
+  const site = await fixtures.ExternalSite({
+    type: "scotchwhiskyauctions",
+    runEvery: 240,
+    nextRunAt: null,
+  });
+  await syncScraperDefinitions(registry);
+  const lifecycle = createScraperLifecycle({
+    registry,
+    enqueue: async () => undefined,
+  });
+  const run = (await lifecycle.queueScheduledExternalSiteRun(site.id))!;
+  await db
+    .update(externalSiteRuns)
+    .set({ requestLimit: 3 })
+    .where(eq(externalSiteRuns.id, run.id));
+  const outcome = await executeScraperRun({ runId: run.id }, { registry });
+  expect(["completed", "waiting"]).toContain(outcome.status);
+  const saved = (await db.query.externalSiteRuns.findFirst())!;
+  expect(saved.cursor).toMatchObject({ scope: "current" });
+  expect(saved.requestCount).toBeLessThanOrEqual(3);
+  const lots = await db.query.auctionLots.findMany();
+  expect(lots.length).toBeGreaterThan(0);
+  expect(
+    lots.every(
+      (lot) =>
+        lot.state === "live" ||
+        lot.state === "closed" ||
+        lot.state === "withdrawn",
+    ),
+  ).toBe(true);
+  if (outcome.status === "waiting")
+    expect(saved.cursor).toMatchObject({ page: 2, auctionIndex: 0 });
 }, 180_000);

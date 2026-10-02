@@ -117,7 +117,6 @@ export const auctionLots = pgTable(
     currentBid: bigint("current_bid", { mode: "number" }),
     bidCurrency: text("bid_currency"),
     firstSeenAt: timestamp("first_seen_at", { withTimezone: true }).notNull(),
-    lastSeenAt: timestamp("last_seen_at", { withTimezone: true }).notNull(),
     lastCheckedAt: timestamp("last_checked_at", {
       withTimezone: true,
     }).notNull(),

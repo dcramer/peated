@@ -21,6 +21,7 @@ import {
   isNull,
   lte,
   or,
+  sql,
 } from "drizzle-orm";
 import { z } from "zod";
 import { ScotchWhiskyAuctionDetailsCursorSchema } from "./adapters/scotchWhiskyAuctions";
@@ -137,6 +138,17 @@ async function insertRun(
     initialCursor === undefined
       ? null
       : source.cursorSchema.parse(initialCursor);
+  if (
+    initialCursor === undefined &&
+    site.type === "scotchwhiskyauctions" &&
+    trigger === "scheduled"
+  )
+    cursor = source.cursorSchema.parse({
+      scope: "current",
+      auctions: [],
+      auctionIndex: 0,
+      page: 1,
+    });
   const restartForMissingReviewText =
     trigger === "manual" &&
     source.recordType === "review" &&
@@ -167,7 +179,7 @@ async function insertRun(
     .values({
       externalSiteId: site.id,
       trigger,
-      purpose: "collect",
+      purpose: initialCursor ? "details" : "collect",
       requestedById,
       requestLimit: REQUESTS_BEFORE_PAUSE,
       requestErrorCount: 0,
@@ -370,14 +382,18 @@ async function queueAuctionDetailsRun(
       .where(
         and(
           eq(auctions.externalSiteId, site.id),
-          eq(auctionLots.matchStatus, "review"),
+          inArray(auctionLots.matchStatus, ["pending", "review"]),
           isNotNull(auctionLots.sourceDetailsRequestedAt),
           isNull(auctionLots.sourceDetailsCheckedAt),
           isNull(auctionLots.sourceDetailsRunId),
           isNull(auctionLots.bottleId),
         ),
       )
-      .orderBy(asc(auctionLots.sourceDetailsRequestedAt), asc(auctionLots.id))
+      .orderBy(
+        sql`CASE ${auctionLots.state} WHEN 'live' THEN 0 WHEN 'upcoming' THEN 1 WHEN 'aftersale' THEN 2 ELSE 3 END`,
+        asc(auctionLots.sourceDetailsRequestedAt),
+        asc(auctionLots.id),
+      )
       .limit(25)
       .for("update", { of: auctionLots });
     if (!pending.length) return null;
@@ -428,7 +444,7 @@ async function dispatchRequestedAuctionDetails(
     .innerJoin(auctions, eq(auctions.id, auctionLots.auctionId))
     .where(
       and(
-        eq(auctionLots.matchStatus, "review"),
+        inArray(auctionLots.matchStatus, ["pending", "review"]),
         isNotNull(auctionLots.sourceDetailsRequestedAt),
         isNull(auctionLots.sourceDetailsCheckedAt),
         isNull(auctionLots.sourceDetailsRunId),

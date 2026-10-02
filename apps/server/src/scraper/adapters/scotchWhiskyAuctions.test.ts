@@ -6,6 +6,7 @@ import type {
   ScotchWhiskyAuctionsObservation,
 } from "./scotchWhiskyAuctions";
 import {
+  ScotchWhiskyAuctionsCursorSchema as CursorSchema,
   parseScotchWhiskyAuctionPage,
   parseScotchWhiskyAuctionsIndex,
   scotchWhiskyAuctionsAdapter,
@@ -98,6 +99,71 @@ test("an explicitly open auction includes lots with no bid yet", () => {
   expect(parsed.items[0].lot.result).toBeUndefined();
 });
 
+test("an unmet reserve during bidding is not a final unsold result", () => {
+  const lot = parseScotchWhiskyAuctionPage(
+    page("Current highest bid: £90 Reserve not met", "Ends October 11, 2026"),
+    auction,
+  ).items[0].lot;
+  expect(lot).toMatchObject({ state: "live", currentBid: 9000 });
+  expect(lot.result).toBeUndefined();
+});
+
+test("scheduled discovery follows open headings rather than link position", () => {
+  const html = `<div class="auctions">
+    <a class="auction" href="/auctions/232-the-183rd-auction/"><h4>The 183rd Auction</h4><h5>Ended September 13, 2026</h5></a>
+    <a class="auction" href="/auctions/233-the-184th-auction/"><h4>The 184th Auction</h4><h5>Ends October 11, 2026</h5></a>
+    <a class="auction" href="/auctions/231-the-182nd-auction/"><h4>The 182nd Auction</h4><h5>Ended August 9, 2026</h5></a>
+  </div>`;
+  expect(
+    parseScotchWhiskyAuctionsIndex(html, "current").map((a) => a.sourceKey),
+  ).toEqual(["233"]);
+  expect(parseScotchWhiskyAuctionsIndex(html).map((a) => a.sourceKey)).toEqual([
+    "232",
+    "233",
+  ]);
+  expect(
+    parseScotchWhiskyAuctionsIndex(
+      html.replace("Ends October 11, 2026", "Ended October 11, 2026"),
+      "current",
+    ).map((a) => a.sourceKey),
+  ).toEqual(["233"]);
+  expect(() =>
+    parseScotchWhiskyAuctionsIndex(
+      html.replace(/<h5>.*?<\/h5>/g, ""),
+      "current",
+    ),
+  ).toThrow(/recognized auction states/);
+  expect(
+    CursorSchema.parse({ auctions: [auction], auctionIndex: 0, page: 2 }),
+  ).toMatchObject({ scope: "recent", page: 2 });
+});
+
+test("current collection discovers once and checkpoints the same scope for pagination", async () => {
+  const emit = vi.fn();
+  const checkpoint = vi.fn();
+  const request = vi
+    .fn()
+    .mockResolvedValueOnce({
+      body: `<div class="auctions"><a class="auction" href="/auctions/232-the-183rd-auction/"><h4>Auction</h4><h5>Ends October 11, 2026</h5></a></div>`,
+    })
+    .mockResolvedValueOnce({
+      body: page("Current highest bid: £90", "Ends October 11, 2026"),
+    });
+  await scotchWhiskyAuctionsAdapter({
+    cursor: { scope: "current", auctions: [], auctionIndex: 0, page: 1 },
+    session: { request, emit, checkpoint, remainingRequests: () => 100 },
+  });
+  expect(request).toHaveBeenCalledTimes(2);
+  expect(checkpoint.mock.calls[0][0]).toMatchObject({
+    scope: "current",
+    auctionIndex: 0,
+  });
+  expect(emit.mock.calls[0][0].value[0].lot).toMatchObject({
+    state: "live",
+    currentBid: 9000,
+  });
+});
+
 test("preserves unknown state, explicit unsold outcomes, and skips explicit sets", () => {
   expect(
     parseScotchWhiskyAuctionPage(page("", "Auction"), auction).items[0].lot
@@ -157,7 +223,7 @@ test("pagination remains complete and resumes without replaying discovery", asyn
     remainingRequests: () => 100,
   };
   await scotchWhiskyAuctionsAdapter({
-    cursor: { auctions: [auction], auctionIndex: 0, page: 1 },
+    cursor: { scope: "recent", auctions: [auction], auctionIndex: 0, page: 1 },
     session,
   });
   expect(request).toHaveBeenCalledTimes(2);

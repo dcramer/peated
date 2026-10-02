@@ -10,7 +10,7 @@ overwriting history. Sets and multipacks are outside the initial scope.
 - `auction`: an auction house's event, unique by external site and source key.
 - `auction_lot`: an occurrence, unique by auction and source lot key. It keeps
   the source URL, lot number, title, available size and condition, source identity
-  facts, matching fingerprint, assignment, source state, and successful check times.
+  facts, matching fingerprint, assignment, source state, and one availability check time.
 - `auction_lot_result`: append-only reported outcomes and price corrections.
   Public lists select one latest result per lot, not one sale per revision.
 - `auction_watch`: a private member subscription to one exact Bottle.
@@ -62,13 +62,19 @@ read catalog photos or load their saved label readings. Published thumbnails
 remain moderator review links, not extraction inputs. Missing batch or cask
 evidence still requires review; a generic candidate's photo cannot fill that gap.
 
-When a Scotch Whisky Auctions lot remains unresolved, matching requests one
-detail-page check for that source identity. The scraper scheduler batches at
-most 25 requested lots per run, using the same robots rules, 30-second spacing,
-and saved progress as index collection. It reads explicit cask numbers, strength,
-volume, distillation and bottling years, cask-strength wording, and bottle counts.
-An individual bottle number is not a release identifier. Descriptions and price
-graphs are not saved. Removed pages and pages without useful facts stay in review.
+For a new Scotch Whisky Auctions lot without an accepted reference, a saved check,
+or structured source facts, matching requests one detail-page read before the
+first classification. The lot stays pending while those facts are collected.
+Existing references and checks still reuse their evidence without another read.
+The scheduler batches at most 25 requested lots per run and puts live lots before
+historical lots. Index refreshes run first. All requests share the same robots
+rules, 30-second spacing, and saved progress.
+
+Details supply explicit cask numbers, strength, volume, distillation and bottling
+years, cask-strength wording, and bottle counts. An individual bottle number is
+not a release identifier. Descriptions and price graphs are not saved. A completed
+read without useful facts, including a removed page, allows the normal title-based
+check; missing identity evidence still requires review.
 
 Detail facts never refresh availability or change prices. Changed facts produce
 a new matching fingerprint and check; earlier checks and results stay saved.
@@ -96,8 +102,8 @@ Administrators can recheck 1–100 explicit imported lots with expected source,
 Bottle, and check versions. The whole batch is validated before work is saved;
 matched and ignored lots are skipped. Workers reuse references and saved checks
 on the default queue through `ApplyAuctionLotMatch`, so this work does not wait
-behind new classifications. Only missing checks queue `ResolveAuctionLot` on
-the models queue. Dispatch failures leave pending work that can be submitted
+behind new classifications. Missing checks wait for requested source facts or
+queue `ResolveAuctionLot` on the models queue. Dispatch failures leave pending work that can be submitted
 again. Rechecks do not collect auction indexes. Setting `refreshSourceDetails`
 explicitly requests fresh Scotch Whisky Auctions details instead of applying
 the old check. This also retries a terminally failed detail run for the selected
@@ -129,10 +135,16 @@ promise that a lot remains open. Email alerts are not included.
 ## Initial collection and activation
 
 `scotchwhiskyauctions` uses the shared scraper runtime, robots checks, request
-limits, retry rules, and resumable page checkpoints. Each run traverses every
-page of the 2 most recent numeric auction links, revisiting those auctions for
-published closing results and corrections. Repeating a saved page is safe.
-This is a recent-window collector, not a complete archive backfill.
+limits, retry rules, and resumable page checkpoints. Manual runs traverse every
+page of the two recent auction links. Scheduled runs select open auctions from
+their explicit headings; when none is open, they check the latest ended event
+by its reported date for final results. Repeating a saved page is safe. This is
+recent collection, not a complete archive backfill.
+
+Detail runs use purpose `details` in the existing run history. They cannot
+replace the site's latest collection status or success time. The lot's separate
+detail-request time, completion time, and run link prevent stale saves and endless
+retries; they are not extra availability dates.
 
 Auction collection follows the scraper's
 [responsible public-facts collection policy](../../apps/server/src/scraper/README.md#responsible-collection-of-public-facts).
@@ -152,8 +164,10 @@ the checked public evidence and limits.
 
 The adapter does not infer precise closing times from a date-only
 heading, fetch detail-page condition descriptions, or implement prioritized
-hourly watched-lot checks. Full repeat runs reconcile the recent window;
-late corrections beyond that window require an explicitly scoped collection.
+hourly watched-lot checks. An unmet reserve during live bidding is not an unsold
+result. Closing confirmation is required for that outcome. Sites may extend
+the whole auction or individual lots, so a scheduled deadline never proves a sale.
+Late corrections outside the selected event require an explicitly scoped collection.
 Choose a repeat interval within the 6-hour freshness window only after
 measuring a complete run. Automated activation is a separate operator decision.
 

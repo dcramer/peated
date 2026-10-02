@@ -95,6 +95,12 @@ async function resolveAuctionLotMatch(
     where: eq(bottleChecks.backgroundEventKey, backgroundEventKey),
   });
   if (!check) {
+    // Auction matching gathers a new listing's source facts before its first classification.
+    if (
+      !lot.sourceBottleIdentity &&
+      (await requestAuctionLotDetails(lotId, fingerprint))
+    )
+      return true;
     if (!allowClassification) return false;
     const auction = await db.query.auctions.findFirst({
       where: eq(auctions.id, lot.auctionId),

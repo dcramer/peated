@@ -133,7 +133,7 @@ export async function saveAuctionLotDetails(
       lot.sourceFingerprint !== input.request.fingerprint ||
       lot.url !== input.request.url ||
       lot.matchCheckId !== input.request.expectedCheckId ||
-      lot.matchStatus !== "review" ||
+      (lot.matchStatus !== "review" && lot.matchStatus !== "pending") ||
       lot.bottleId !== null ||
       !lot.sourceDetailsRequestedAt ||
       lot.sourceDetailsCheckedAt ||
@@ -302,7 +302,6 @@ export async function upsertAuctionObservation(
         input.lot.bidCurrency === undefined
           ? (existing?.bidCurrency ?? null)
           : input.lot.bidCurrency,
-      lastSeenAt: observedAt,
       lastCheckedAt: observedAt,
     };
     if (changed) {

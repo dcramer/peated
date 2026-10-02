@@ -41,6 +41,11 @@ Do not trigger a full archive backfill as part of this rollout.
 
 ## Repeat collection
 
+Scheduled runs check open auctions first. When none is open, they check the
+latest ended auction for final results. Manual runs retain the two-auction
+window. Detail batches put requested live lots ahead of closed lots and wait
+behind index collection; all work shares the same request limits.
+
 Before setting an automatic interval, verify a currently open auction with the
 real parser and measure a completed run. Check that page ordering, bids, closed
 results, and pagination still match the source. The repeat interval must keep
@@ -84,19 +89,34 @@ Deploy migration `0307` (the `auction_lot` decision-history enum value), the API
 worker, and review UI together. Scheduling and existing assignments do not
 change during deployment.
 
-For detail fallback, apply migrations `0310` and `0311` before deploying the API
+For source details, apply migrations `0310` and `0311` before deploying the API
 and worker. They add requested/checked timestamps and a scraper-run pointer,
-without changing existing identities or assignments. New unresolved SWA checks
-request details automatically; the five-minute scraper scheduler dispatches
+without changing existing identities or assignments. New unmapped SWA lots
+without structured facts request details before their first model check; accepted
+references and saved checks still reuse their evidence. The five-minute scheduler dispatches
 at most 25 requested lots per run. Requests share the source's robots checks
 and rate limit with index collection. Failed runs retain their pointers rather
-than starting endless retries.
+than starting endless retries. A detail run appears as `details` in run history,
+not as a successful auction refresh in source health.
+
+Migration `0312` removes the duplicate lot `last_seen_at` and adds the `details`
+run purpose. The retained `last_checked_at` already stores the same successful
+listing-check time; IDs, assignments, result history, watches, and alerts stay.
+Coordinate this deployment: stop old API and worker processes before applying
+the migration, then start the updated processes. Do not run old code against the
+removed column. This cleanup does not change the automatic schedule.
 
 A local live detail-run check on October 1, 2026 passed for the 157th and 183rd
 auction's Ardbeg cask 3771 lots, using the real registered scraper, robots rules,
 and request pacing. It verified cask, strength, volume, bottle count, and years
 without refreshing lot availability. This does not verify current live-auction
 availability or activate a production schedule.
+
+A local live check on October 2, 2026 also passed discovery of the open 184th
+auction and collection of its first listing page through the real registered
+scraper. The bounded run saved its progress for the next page. This checks the
+current page structure, not a complete refresh, final hammer prices, or the
+automatic schedule. A completed current-auction run still needs to be measured.
 
 For a small pilot, choose up to 100 unresolved lots from
 `GET /auction-lots/match-queue`. Read each through `GET /auction-lots/{lot}` and
@@ -146,10 +166,13 @@ that job. Re-fetch unresolved pilot lots after deployment and submit their
 current versions; no collection run is needed.
 
 Stop the pilot by not submitting more lots. For rollback, pause the default and
-models queues while deploying the previous API, worker, and UI together. Keep
-migration `0307` and all saved records. Correct confirmed errors through lot
+models queues and stop source collection. Do not start code that expects
+`last_seen_at` after migration `0312`; any rollback must first restore that
+column from `last_checked_at` through a generated migration. Deploy compatible
+API, worker, and UI versions together. Keep all saved records and enum values.
+Correct confirmed errors through lot
 assignment or the reference-correction API, not SQL or evidence deletion. This release does not add
 automatic Bottle creation, global reprocessing, or an auction-index schedule.
-Detail fallback runs only for newly requested unresolved lots. To stop all source
+Detail collection runs only for requested unresolved lots. To stop all source
 requests, disable the target and deploy both processes; a null index schedule
 alone does not stop requested detail work.
