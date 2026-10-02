@@ -127,6 +127,19 @@ describe("GET /admin/scrapers/activity", () => {
         startedAt,
         completedAt,
       },
+      {
+        externalSiteId: reviewSite.id,
+        status: "succeeded",
+        trigger: "manual",
+        purpose: "details",
+        recordType: "auction",
+        requestCount: 25,
+        emittedItemCount: 25,
+        existingItemCount: 25,
+        createdAt: failedAt,
+        startedAt: failedAt,
+        completedAt: failedAt,
+      },
     ]);
     const [suggestionRun] = await db
       .insert(externalSiteRuns)

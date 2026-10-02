@@ -156,7 +156,20 @@ is not limited to the first assignment.
 
 ## Resolution Pipeline
 
-All source-reference workflows follow the same conceptual pipeline:
+All source-reference workflows use the Bottle classifier, then
+`assessBottleResolution` in `apps/server/src/lib/bottleMatchingAutomation.ts`.
+There is no separate identity policy for prices, auctions, reviews, or photos.
+The shared assessment checks retrieved targets, source-field conflicts, evidence,
+unresolved risks, and automatic assignment replacement. A moderator correction
+can explicitly authorize replacement but still needs supporting identity evidence.
+Photos still require user confirmation.
+
+`buildClassifierBottleInput` converts every creation proposal into canonical
+Bottle input. `createOrReuseBottleInTransaction` owns duplicate-safe creation;
+`finalizeCreatedBottle` owns post-commit work. Source code owns its freshness,
+permissions, evidence records, attachment transaction, and history.
+
+The path is:
 
 1. Keep the source name and available source facts for review.
 2. Build the workflow's identity-preserving reference key.

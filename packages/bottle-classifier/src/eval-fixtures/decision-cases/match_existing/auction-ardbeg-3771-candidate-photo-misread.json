@@ -1,0 +1,138 @@
+{
+  "id": "auction-ardbeg-3771-candidate-photo-misread",
+  "name": "auction cask title matches correct catalog facts without a faulty candidate-photo reading",
+  "input": {
+    "reference": {
+      "id": 100,
+      "url": "https://www.scotchwhiskyauctions.com/auctions/232-the-183rd-auction/893368-ardbeg-2009-14-year-old-single-cask-3771-feis-ile-2024/",
+      "name": "Ardbeg 2009 14 Year Old Single Cask #3771 Feis Ile 2024",
+      "imageUrl": null,
+      "externalSiteId": 28097,
+      "currentBottleId": null
+    },
+    "candidateExpansion": "open",
+    "readCandidateImages": false,
+    "extractedIdentity": {
+      "abv": null,
+      "brand": "Ardbeg",
+      "series": null,
+      "bottler": null,
+      "edition": "Cask #3771",
+      "outturn": null,
+      "category": "single_malt",
+      "distillery": ["Ardbeg"],
+      "expression": "Feis Ile",
+      "maturation": null,
+      "stated_age": 14,
+      "cask_number": "#3771",
+      "release_day": null,
+      "single_cask": true,
+      "release_year": 2024,
+      "vintage_year": 2009,
+      "bottling_year": null,
+      "cask_strength": null,
+      "release_month": null
+    },
+    "initialCandidates": [
+      {
+        "bottleId": 52159,
+        "fullName": "Ardbeg Single Cask - Cask 3771 · Fèis Ìle 2024",
+        "brand": "Ardbeg",
+        "distillery": ["Ardbeg"],
+        "category": "single_malt",
+        "edition": "Cask 3771 · Fèis Ìle 2024",
+        "statedAge": 14,
+        "abv": 59,
+        "caskNumber": "3771",
+        "outturn": 633,
+        "vintageYear": 2009,
+        "bottlingYear": 2023,
+        "releaseYear": 2024,
+        "singleCask": true,
+        "caskStrength": true,
+        "maturation": "Second-fill Pedro Ximénez sherry butt",
+        "source": ["text", "brand_coverage"]
+      },
+      {
+        "bottleId": 52161,
+        "fullName": "Ardbeg Single Cask - Cask 3918 · Fèis Ìle 2025",
+        "brand": "Ardbeg",
+        "distillery": ["Ardbeg"],
+        "category": "single_malt",
+        "edition": "Cask 3918 · Fèis Ìle 2025",
+        "statedAge": 14,
+        "abv": 57.9,
+        "caskNumber": "3918",
+        "outturn": 268,
+        "vintageYear": 2009,
+        "bottlingYear": 2024,
+        "releaseYear": 2025,
+        "singleCask": true,
+        "caskStrength": true,
+        "source": ["text", "brand_coverage"]
+      }
+    ]
+  },
+  "context": {
+    "inspectedBottleIds": [52159],
+    "bottleContexts": [
+      {
+        "bottleId": 52159,
+        "fullName": "Ardbeg Single Cask - Cask 3771 · Fèis Ìle 2024",
+        "groupId": 25119,
+        "shared": {
+          "name": "Single Cask",
+          "brand": { "entityId": 28, "name": "Ardbeg" },
+          "distillers": [{ "entityId": 28, "name": "Ardbeg" }],
+          "bottler": null,
+          "category": "single_malt",
+          "series": { "seriesId": 463, "name": "Fèis Ìle & Ardbeg Day" },
+          "statedAge": null
+        },
+        "exact": {
+          "edition": "Cask 3771 · Fèis Ìle 2024",
+          "statedAge": 14,
+          "abv": 59,
+          "caskNumber": "3771",
+          "outturn": 633,
+          "vintageYear": 2009,
+          "bottlingYear": 2023,
+          "releaseYear": 2024,
+          "singleCask": true,
+          "caskStrength": true,
+          "maturation": "Second-fill Pedro Ximénez sherry butt"
+        },
+        "siblings": [],
+        "references": [],
+        "observations": [],
+        "imageSources": [
+          {
+            "source": { "kind": "bottle" },
+            "url": "https://api.peated.com/uploads/bottles-nxl0jclm53pzsvvhizu0hvlw.webp",
+            "sourceUrl": "https://whiskygospel.com/2024/03/12/islay-feis-ile-festival-2024-bottles/"
+          }
+        ]
+      }
+    ]
+  },
+  "provenance": {
+    "source": "production_miss",
+    "verifiedSourceUrls": [
+      "https://www.scotchwhiskyauctions.com/auctions/205-the-157th-auction/751232-ardbeg-2009-14-year-old-single-cask-3771-feis-ile-2024/",
+      "https://www.whiskyfun.com/2024/Ardbeg-from-2009-to-1989.html"
+    ],
+    "dbOutcome": {
+      "bottleId": null,
+      "createsBottle": false,
+      "summary": "Saved run 18756 returned no_match and left lot 100 in review. Candidate 52159 had correct cask 3771 and outturn 633, but its automatic label reading said cask 3773 and outturn 623. A moderator later assigned the independently verified Bottle without changing its facts."
+    },
+    "notes": "The observed source reference is preserved exactly. The fixture supplies the relevant captured candidate and competing cask, without the unrelated broad search results or derived comparison fields. The catalog context is captured from the saved run. Checked 2026-10-01: exact auction text and independent tasting identify 2009/2023, 59%, cask 3771, 633 bottles. The fixed evidence pack reproduces the faulty saved image reading, not corrected label facts. The text-first workflow adds readCandidateImages:false to this request; it must not fabricate a catalog repair or an automatic approval."
+  },
+  "expected": {
+    "status": "classified",
+    "action": "match",
+    "identityScope": "exact_cask",
+    "matchedBottleId": 52159,
+    "summary": "Match cask 3771 rather than the competing 2025 cask. Do not treat the incorrect candidate-photo extraction as a catalog fact."
+  }
+}

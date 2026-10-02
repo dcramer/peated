@@ -22,7 +22,8 @@
         "source": ["text"]
       }
     ],
-    "candidateExpansion": "initial_only"
+    "candidateExpansion": "initial_only",
+    "readCandidateImages": false
   },
   "provenance": {
     "source": "synthetic",

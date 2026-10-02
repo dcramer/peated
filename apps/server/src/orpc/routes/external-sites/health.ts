@@ -30,7 +30,7 @@ import {
   serializeExternalSite,
   serializeExternalSiteRun,
 } from "@peated/server/serializers/externalSite";
-import { and, asc, desc, eq, ilike, inArray, sql } from "drizzle-orm";
+import { and, asc, desc, eq, ilike, inArray, ne, sql } from "drizzle-orm";
 import { z } from "zod";
 
 async function getHealthForSites(
@@ -91,7 +91,12 @@ async function getHealthForSites(
     db
       .selectDistinctOn([externalSiteRuns.externalSiteId])
       .from(externalSiteRuns)
-      .where(inArray(externalSiteRuns.externalSiteId, siteIds))
+      .where(
+        and(
+          inArray(externalSiteRuns.externalSiteId, siteIds),
+          ne(externalSiteRuns.purpose, "details"),
+        ),
+      )
       .orderBy(
         asc(externalSiteRuns.externalSiteId),
         desc(externalSiteRuns.createdAt),
@@ -106,6 +111,7 @@ async function getHealthForSites(
         and(
           inArray(externalSiteRuns.externalSiteId, siteIds),
           eq(externalSiteRuns.status, "succeeded"),
+          ne(externalSiteRuns.purpose, "details"),
         ),
       )
       .orderBy(
@@ -286,6 +292,7 @@ async function getHealthSummary() {
         status: externalSiteRuns.status,
       })
       .from(externalSiteRuns)
+      .where(ne(externalSiteRuns.purpose, "details"))
       .orderBy(
         asc(externalSiteRuns.externalSiteId),
         desc(externalSiteRuns.createdAt),

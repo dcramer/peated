@@ -1,0 +1,53 @@
+{
+  "name": "Auction text-first matching comparison",
+  "reviewedAt": "2026-10-01",
+  "notes": "The release facts are independently checked. The image result is deliberately the incorrect extraction captured in saved production run 18756. It reproduces the failure and must not be used to change catalog facts. Both comparison runs receive this same evidence pack.",
+  "sources": [
+    "https://www.scotchwhiskyauctions.com/auctions/205-the-157th-auction/751232-ardbeg-2009-14-year-old-single-cask-3771-feis-ile-2024/",
+    "https://www.whiskyfun.com/2024/Ardbeg-from-2009-to-1989.html"
+  ],
+  "cases": {
+    "auction-ardbeg-3771-candidate-photo-misread": {
+      "searchResult": {
+        "evidence": [
+          {
+            "provider": "firecrawl",
+            "query": "Reviewed exact release evidence",
+            "summary": "An exact 2024 auction lot and an independent tasting identify the Fèis Ìle 2024 Ardbeg single cask: distilled 2 July 2009, bottled 18 October 2023, age 14, second-fill PX sherry butt, cask 3771, 59% ABV, 633 bottles.",
+            "results": [
+              {
+                "title": "Ardbeg 2009 14 Year Old Single Cask 3771 Fèis Ìle 2024",
+                "url": "https://www.scotchwhiskyauctions.com/auctions/205-the-157th-auction/751232-ardbeg-2009-14-year-old-single-cask-3771-feis-ile-2024/",
+                "description": "Distilled 02.07.2009; bottled 18.10.2023; second-fill PX sherry butt; cask 3771; 59%; 633 bottles."
+              },
+              {
+                "title": "Ardbeg from 2009 to 1989",
+                "url": "https://www.whiskyfun.com/2024/Ardbeg-from-2009-to-1989.html",
+                "description": "A December 2024 tasting independently identifies the official Fèis Ìle release as 2009/2023, 59%, second-fill PX sherry butt, cask 3771, 633 bottles."
+              }
+            ]
+          }
+        ],
+        "errors": []
+      },
+      "imageResults": [
+        {
+          "url": "https://api.peated.com/uploads/bottles-nxl0jclm53pzsvvhizu0hvlw.webp",
+          "result": {
+            "abv": 59,
+            "brand": "Ardbeg",
+            "expression": "Single Cask The Ultimate",
+            "category": "single_malt",
+            "distillery": ["Ardbeg"],
+            "edition": "Cask No. 3773",
+            "cask_number": "3773",
+            "outturn": 623,
+            "bottling_year": 2023,
+            "single_cask": true,
+            "cask_strength": true
+          }
+        }
+      ]
+    }
+  }
+}

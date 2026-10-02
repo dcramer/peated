@@ -1,4 +1,5 @@
 import { BottleExtractedDetailsSchema } from "@peated/bottle-classifier/contract";
+import { getBottleFieldConflicts } from "@peated/bottle-classifier/fieldConflicts";
 import { db } from "@peated/server/db";
 import {
   auctionAlerts,
@@ -16,7 +17,6 @@ import {
   assignAuctionLot,
   auctionAvailability,
   AuctionLotMatchChangedError,
-  hasAuctionIdentityConflict,
   notifyAuctionLot,
   upsertAuctionObservation,
 } from "./auctions";
@@ -72,6 +72,62 @@ test("a relisting in another auction is a separate occurrence", async ({
   const second = await upsertAuctionObservation(site.id, input);
   expect(second.lot.id).not.toBe(first.lot.id);
   expect(await db.query.auctionLots.findMany()).toHaveLength(2);
+});
+
+test("photo and listing links do not reset an accepted assignment or duplicate its result", async ({
+  fixtures,
+}) => {
+  const site = await fixtures.ExternalSite();
+  const bottle = await fixtures.Bottle();
+  const facts = {
+    state: "closed",
+    result: {
+      outcome: "sold",
+      amount: 10000,
+      currency: "gbp",
+      priceKind: "hammer",
+      soldAt: null,
+    },
+  } as const;
+  const { lot } = await upsertAuctionObservation(
+    site.id,
+    observation(facts, Date.now() - 5000),
+  );
+  await assignAuctionLot({
+    lotId: lot.id,
+    bottleId: bottle.id,
+    fingerprint: lot.sourceFingerprint,
+    expectedBottleId: null,
+  });
+  const imageUrl = "https://example.com/thumbnail.jpg";
+  const updated = await upsertAuctionObservation(
+    site.id,
+    observation({ ...facts, imageUrl }, Date.now() - 3000),
+  );
+  expect(updated.lot).toMatchObject({
+    id: lot.id,
+    bottleId: bottle.id,
+    matchStatus: "matched",
+    sourceFingerprint: lot.sourceFingerprint,
+    imageUrl,
+  });
+  const repeated = await upsertAuctionObservation(
+    site.id,
+    observation({
+      ...facts,
+      url: "https://example.com/auction-1/corrected-lot-1",
+    }),
+  );
+  expect(repeated.lot.imageUrl).toBe(imageUrl);
+  expect(repeated.lot).toMatchObject({
+    id: lot.id,
+    bottleId: bottle.id,
+    matchStatus: "matched",
+    matchedAt: updated.lot.matchedAt,
+    sourceFingerprint: lot.sourceFingerprint,
+  });
+  expect(await db.query.auctionLotResults.findMany()).toHaveLength(1);
+  expect(await db.query.incomingBottleDecisionLogs.findMany()).toHaveLength(1);
 });
 
 test("confirmed results are revised without overwriting history", async ({
@@ -191,26 +247,26 @@ test("conflicting cask and bottling fields cannot reuse a reference", async ({
     bottlingYear: 2020,
   });
   expect(
-    hasAuctionIdentityConflict(
+    getBottleFieldConflicts(
       BottleExtractedDetailsSchema.parse({ cask_number: "124" }),
       bottle,
     ),
-  ).toBe(true);
+  ).toEqual(["caskNumber"]);
   expect(
-    hasAuctionIdentityConflict(
+    getBottleFieldConflicts(
       BottleExtractedDetailsSchema.parse({ bottling_year: 2021 }),
       bottle,
     ),
-  ).toBe(true);
+  ).toEqual(["bottlingYear"]);
   expect(
-    hasAuctionIdentityConflict(
+    getBottleFieldConflicts(
       BottleExtractedDetailsSchema.parse({
         cask_number: "123",
         bottling_year: 2020,
       }),
       bottle,
     ),
-  ).toBe(false);
+  ).toEqual([]);
 });
 
 test("an auction deadline bounds a lot unless the source explicitly extends the lot", async ({

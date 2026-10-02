@@ -1,14 +1,20 @@
 import { db } from "@peated/server/db";
-import { auctionLots, bottleChecks } from "@peated/server/db/schema";
+import {
+  auctionLots,
+  auctions,
+  bottleChecks,
+  externalSites,
+} from "@peated/server/db/schema";
 import { auctionLotCheckKey } from "@peated/server/lib/auctionMatchEvidence";
 import { procedure } from "@peated/server/orpc";
 import { requireAdmin } from "@peated/server/orpc/middleware";
 import { pushUniqueJob } from "@peated/server/worker/client";
-import { asc, eq, inArray } from "drizzle-orm";
+import { asc, eq, inArray, sql } from "drizzle-orm";
 import { z } from "zod";
 
 const InputSchema = z
   .object({
+    refreshSourceDetails: z.boolean().default(false),
     lots: z
       .array(
         z
@@ -36,7 +42,7 @@ export default procedure
     path: "/auction-lots/recheck",
     summary: "Recheck imported auction lots",
     description:
-      "Recheck up to 100 unresolved lots with observed source, assignment, and saved-check versions. Reuse current evidence; skip matched or ignored lots. Requires an administrator.",
+      "Recheck up to 100 unresolved lots with observed source, assignment, and saved-check versions. Reuse current evidence or explicitly refresh Scotch Whisky Auctions detail facts; skip matched or ignored lots. Requires an administrator.",
     operationId: "recheckAuctionLots",
   })
   .input(InputSchema)
@@ -48,8 +54,10 @@ export default procedure
   .handler(async ({ input, errors }) => {
     const result = await db.transaction(async (tx) => {
       const lots = await tx
-        .select()
+        .select({ lot: auctionLots, sourceType: externalSites.type })
         .from(auctionLots)
+        .innerJoin(auctions, eq(auctions.id, auctionLots.auctionId))
+        .innerJoin(externalSites, eq(externalSites.id, auctions.externalSiteId))
         .where(
           inArray(
             auctionLots.id,
@@ -57,11 +65,12 @@ export default procedure
           ),
         )
         .orderBy(asc(auctionLots.id))
-        .for("update");
+        .for("update", { of: auctionLots });
       const queued: { lotId: number; fingerprint: string }[] = [];
       const skipped: number[] = [];
       for (const expected of input.lots) {
-        const lot = lots.find(({ id }) => id === expected.lotId);
+        const row = lots.find(({ lot }) => lot.id === expected.lotId);
+        const lot = row?.lot;
         if (
           !lot ||
           lot.sourceFingerprint !== expected.fingerprint ||
@@ -91,12 +100,32 @@ export default procedure
         }
         if (lot.matchStatus === "matched" || lot.matchStatus === "ignored")
           skipped.push(lot.id);
-        else queued.push({ lotId: lot.id, fingerprint: lot.sourceFingerprint });
+        else {
+          if (
+            input.refreshSourceDetails &&
+            row?.sourceType !== "scotchwhiskyauctions"
+          )
+            throw errors.BAD_REQUEST({
+              message:
+                "Detail refresh is not supported for this auction source.",
+            });
+          queued.push({ lotId: lot.id, fingerprint: lot.sourceFingerprint });
+        }
       }
       if (queued.length)
         await tx
           .update(auctionLots)
-          .set({ matchStatus: "pending" })
+          .set(
+            input.refreshSourceDetails
+              ? {
+                  matchStatus: "review",
+                  // Auction detail retries must advance each lot's own request, not another lot's.
+                  sourceDetailsRequestedAt: sql`GREATEST(clock_timestamp(), ${auctionLots.sourceDetailsRequestedAt} + INTERVAL '1 millisecond')`,
+                  sourceDetailsCheckedAt: null,
+                  sourceDetailsRunId: null,
+                }
+              : { matchStatus: "pending" },
+          )
           .where(
             inArray(
               auctionLots.id,
@@ -105,8 +134,10 @@ export default procedure
           );
       return { queued, skipped };
     });
-    for (const args of result.queued)
-      await pushUniqueJob("ApplyAuctionLotMatch", args);
+    if (!input.refreshSourceDetails) {
+      for (const args of result.queued)
+        await pushUniqueJob("ApplyAuctionLotMatch", args);
+    }
     return {
       queued: result.queued.map(({ lotId }) => lotId),
       skipped: result.skipped,

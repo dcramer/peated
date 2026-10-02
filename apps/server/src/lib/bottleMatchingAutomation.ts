@@ -1,38 +1,35 @@
-import {
-  deriveAutomationTier,
-  type WebEvidenceJudgment,
-} from "@peated/bottle-classifier/automationTier";
+import { deriveAutomationTier } from "@peated/bottle-classifier/automationTier";
 import { getBottleFieldConflicts } from "@peated/bottle-classifier/fieldConflicts";
 import type {
   BottleCandidate,
+  BottleClassificationDecision,
   BottleExtractedDetails,
 } from "@peated/bottle-classifier/internal/types";
 
-/** Matching owns this gate: code may reject a model's choice, never choose another Bottle. */
-export function assessExistingBottleMatch({
-  currentBottleId,
-  suggestedBottleId,
-  candidates,
-  identityScope,
-  sourceBottleIdentity,
-  hasUnresolvedRisks,
-  webEvidence,
-  readListingImage,
-  sourceLabel,
+/** Bottle resolution owns these rules for every source; callers own permissions and saved state. */
+export function assessBottleResolution({
+  decision,
+  candidates = [],
+  currentBottleId = null,
+  sourceBottleIdentity = null,
+  readListingImage = false,
+  allowReplacement = false,
 }: {
-  currentBottleId: number | null;
-  suggestedBottleId: number | null;
-  candidates: BottleCandidate[];
-  identityScope: "product" | "exact_cask";
-  sourceBottleIdentity: BottleExtractedDetails | null;
-  hasUnresolvedRisks: boolean;
-  webEvidence: WebEvidenceJudgment;
-  readListingImage: boolean;
-  sourceLabel: string;
+  decision: BottleClassificationDecision;
+  candidates?: BottleCandidate[];
+  currentBottleId?: number | null;
+  sourceBottleIdentity?: BottleExtractedDetails | null;
+  readListingImage?: boolean;
+  // An explicit moderator correction can replace an assignment; ingestion cannot.
+  allowReplacement?: boolean;
 }) {
-  const target = candidates.find(
-    ({ bottleId }) => bottleId === suggestedBottleId,
-  );
+  if (decision.action === "no_match")
+    return { automationEligible: false, automationBlockers: [] };
+
+  const target =
+    decision.action === "match"
+      ? candidates.find(({ bottleId }) => bottleId === decision.matchedBottleId)
+      : decision.proposedBottle;
   if (!target)
     return {
       automationEligible: false,
@@ -44,19 +41,33 @@ export function assessExistingBottleMatch({
   const conflicts = getBottleFieldConflicts(sourceBottleIdentity, target);
   if (conflicts.length)
     automationBlockers.push(
-      `conflicts with ${sourceLabel} (${conflicts.join(", ")})`,
+      `conflicts with the source's bottle facts (${conflicts.join(", ")})`,
     );
   const replacesCurrentAssignment =
-    currentBottleId !== null && currentBottleId !== suggestedBottleId;
+    decision.action === "match" &&
+    currentBottleId !== null &&
+    currentBottleId !== decision.matchedBottleId &&
+    !allowReplacement;
+  const hasUnresolvedRisks =
+    (decision.confidenceBasis?.unresolvedRisks.length ?? 0) > 0;
   const tier = deriveAutomationTier({
-    actionRiskClass: "match",
+    actionRiskClass: decision.action === "match" ? "match" : "create",
     hasUnresolvedRisks,
-    webEvidence: webEvidence ?? null,
+    webEvidence: decision.confidenceBasis?.webEvidence,
     hasMatchTarget: true,
     reaffirmsCurrentAssignment:
-      currentBottleId !== null && currentBottleId === suggestedBottleId,
+      decision.action === "match" &&
+      currentBottleId === decision.matchedBottleId,
     replacesCurrentAssignment,
-    hasDeterministicAnchor: identityScope === "exact_cask",
+    hasDeterministicAnchor:
+      decision.identityScope === "exact_cask" ||
+      (decision.action === "create_bottle" &&
+        Boolean(
+          sourceBottleIdentity?.brand?.trim() &&
+          sourceBottleIdentity.expression?.trim() &&
+          sourceBottleIdentity.category &&
+          !conflicts.length,
+        )),
     hasPrimaryLabelOrImageEvidence: readListingImage,
   });
   if (tier === "review")

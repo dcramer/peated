@@ -46,6 +46,7 @@ async function reviewedLot(
       sourceKey: "1",
       name: "Example 12 Year Old",
       url: "https://example.com/lot",
+      imageUrl: "https://example.com/thumbnail.jpg",
       state: "closed" as const,
     },
     observedAt: new Date().toISOString(),
@@ -319,9 +320,16 @@ describe("PUT /auction-lots/{lot}/bottle", () => {
     );
     expect(details).toMatchObject({
       matchCheckId: data.check.id,
+      sourceImageUrl: "https://example.com/thumbnail.jpg",
       suggestedBottle: { id: data.bottle.id },
       canRememberReference: true,
     });
+    await routerClient.auctions.match(data.input, { context: data.context });
+    const publicLots = await routerClient.auctions.list({
+      bottle: data.bottle.id,
+    });
+    expect(publicLots.results).toHaveLength(1);
+    expect(JSON.stringify(publicLots)).not.toContain("thumbnail.jpg");
     const { results } = await routerClient.audits.runs(
       { sourceKind: "auction_lot", sourceId: data.lot.id },
       { context: data.context },

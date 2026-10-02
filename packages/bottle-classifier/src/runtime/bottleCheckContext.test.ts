@@ -87,6 +87,49 @@ function buildClient() {
 }
 
 describe("createBottleContextLoader", () => {
+  test("keeps catalog facts without fetching or reading candidate images when disabled", async () => {
+    const source = buildContextSource();
+    source.references = [{ name: "Example Ten", ignored: false }];
+    source.observations = [
+      {
+        sourceType: "store_price",
+        sourceKey: "product-1",
+        sourceName: "Example 10-year-old",
+        sourceUrl: "https://example.com/product",
+        rawText: "10 years old; 46% ABV",
+        parsedIdentity: { stated_age: 10, abv: 46 },
+        facts: null,
+      },
+    ];
+    const readImageLabel = vi.fn<ReadImageLabel>();
+    const getBottleContextImageInput = vi.fn(async (url: string) => url);
+    const { client, create } = buildClient();
+    const loadBottleContext = createBottleContextLoader({
+      dataSource: {
+        getBottleContext: async () => source,
+        getBottleContextImageInput,
+        readImageLabel,
+      },
+      options: { client, model: "test-model" },
+      readImages: false,
+    })!;
+
+    const context = await loadBottleContext(1);
+
+    expect(context).toMatchObject({
+      bottleId: source.bottleId,
+      shared: source.shared,
+      exact: source.exact,
+      references: source.references,
+      observations: source.observations,
+      siblings: source.siblings,
+      publicImages: [],
+    });
+    expect(getBottleContextImageInput).not.toHaveBeenCalled();
+    expect(readImageLabel).not.toHaveBeenCalled();
+    expect(create).not.toHaveBeenCalled();
+  });
+
   test("reads each image label once and reuses the saved reading", async () => {
     const saved = new Map<string, ImageLabelReading>();
     const readImageLabel = vi.fn<ReadImageLabel>(

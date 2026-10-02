@@ -46,6 +46,42 @@ async function waitForSessionBlockedBy(
 }
 
 describe("POST /external-sites/:site/prices", () => {
+  test("an accepted title cannot override contradictory source cask facts", async ({
+    fixtures,
+  }) => {
+    const site = await fixtures.ExternalSiteOrExisting();
+    const bottle = await fixtures.Bottle({
+      name: "Single Cask",
+      caskNumber: "123",
+    });
+    const reference = await fixtures.BottleReference({
+      name: "Verified single cask",
+      bottleId: bottle.id,
+    });
+    const url = "https://example.com/different-cask";
+    await createStorePricesAsPeated({
+      site: site.type,
+      prices: [
+        {
+          name: reference.name,
+          url,
+          price: 1000,
+          currency: "gbp",
+          volume: 700,
+          sourceBottleIdentity: { cask_number: "124" },
+        },
+      ],
+    });
+    expect(
+      await db.query.storePrices.findFirst({ where: eq(storePrices.url, url) }),
+    ).toMatchObject({ bottleId: null, matchedReferenceId: null });
+    expect(
+      await db.query.bottleReferences.findFirst({
+        where: eq(bottleReferences.id, reference.id),
+      }),
+    ).toMatchObject({ bottleId: bottle.id });
+  });
+
   test("records reference dependency without replacing its human approval", async ({
     fixtures,
   }) => {

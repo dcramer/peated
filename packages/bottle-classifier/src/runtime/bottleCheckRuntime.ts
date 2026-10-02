@@ -411,6 +411,7 @@ export function getAgentFinalOutput(result: ToolOutputInput) {
 
 export function createBottleCheckTools({
   allowCandidateExpansion,
+  readCandidateImages = true,
   dataSource,
   options,
   proposalCollector,
@@ -418,6 +419,7 @@ export function createBottleCheckTools({
   webSearchBudget,
 }: {
   allowCandidateExpansion: boolean;
+  readCandidateImages?: boolean;
   dataSource: BottleClassifierDataSource;
   options: BottleCheckRuntimeOptions;
   proposalCollector: BottleProposalCollector | null;
@@ -430,6 +432,7 @@ export function createBottleCheckTools({
   const loadBottleContext = createBottleContextLoader({
     dataSource,
     options,
+    readImages: readCandidateImages,
   });
   return [
     ...(allowCandidateExpansion

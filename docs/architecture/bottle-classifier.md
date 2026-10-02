@@ -115,7 +115,13 @@ conflict-free identity.
 Image extraction must read the whole visible label, including subtitles, neck
 tags, and smaller bands. It should omit unreadable facts instead of guessing.
 
-When the agent inspects a candidate Bottle, each of its public images is read
+Reference callers can set `readCandidateImages` to `false` to inspect catalog
+text, fields, references, and observations without fetching photos or loading
+saved label readings. The request records this choice. Omission keeps the
+existing photo-assisted behavior. This choice does not change source-image
+extraction or catalog audits.
+
+When candidate-photo reading is enabled, each public image is read
 once per extractor version and saved (`image_label_extraction`). Each upload
 gets a new file name, so an image URL always shows the same image and later
 inspections reuse the saved reading. A change to the
@@ -173,7 +179,7 @@ tier.
 When a matched candidate's populated typed field contradicts the extracted
 facts, code adds a conflict risk and the Match goes to review
 (`getBottleFieldConflicts`). The typed fields are category, age, ABV, vintage
-year, release year, the cask-strength and single-cask flags, and edition. Code
+year, bottling year, release date, cask number, the cask-strength and single-cask flags, and edition. Code
 never turns that Match into No Match, and it never compares Brands, names, or
 other free text; the agent owns those judgments.
 

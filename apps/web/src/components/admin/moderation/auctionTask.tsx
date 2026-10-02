@@ -184,6 +184,10 @@ export default function AuctionTask({
             {
               volume: item.lot.volume,
               condition: item.lot.condition,
+              imageUrl: item.sourceImageUrl,
+              detailsRequestedAt: item.sourceDetailsRequestedAt,
+              detailsCheckedAt: item.sourceDetailsCheckedAt,
+              detailsRunId: item.sourceDetailsRunId,
               identity: item.sourceBottleIdentity,
             },
             null,

@@ -81,9 +81,11 @@ export function bottleContextToCandidate(
 export function createBottleContextLoader({
   dataSource,
   options,
+  readImages = true,
 }: {
   dataSource: BottleContextLoaderDataSource;
   options: BottleContextLoaderOptions;
+  readImages?: boolean;
 }) {
   if (!dataSource.getBottleContext) {
     return null;
@@ -138,6 +140,9 @@ export function createBottleContextLoader({
     }
     const { imageSources, ...context } =
       BottleContextSourceSchema.parse(rawContext);
+    if (!readImages) {
+      return BottleContextSchema.parse({ ...context, publicImages: [] });
+    }
     const publicImages = await Promise.all(
       imageSources.map(async (imageSource) => {
         let extractedIdentity: BottleExtractedDetails | null = null;

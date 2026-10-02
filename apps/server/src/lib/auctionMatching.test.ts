@@ -14,11 +14,15 @@ import {
   bottles,
   type AuctionLot,
 } from "@peated/server/db/schema";
+import * as scraper from "@peated/server/scraper";
 import { eq } from "drizzle-orm";
 import { afterEach, vi } from "vitest";
 import applyAuctionLotMatchJob from "../worker/jobs/applyAuctionLotMatch";
 import { auctionLotCheckKey } from "./auctionMatchEvidence";
-import { resolveAuctionLot } from "./auctionMatching";
+import {
+  applySavedAuctionLotMatch,
+  resolveAuctionLot,
+} from "./auctionMatching";
 import { assignAuctionLot, upsertAuctionObservation } from "./auctions";
 import { createBottleCheck } from "./bottleChecks";
 import { getBottleCandidateById } from "./bottleReferenceCandidates";
@@ -106,7 +110,7 @@ test("reuses an accepted reference without a new model decision", async ({
     name: normalizeBottleReferenceKey("Example 12 Year Old"),
     bottleId: bottle.id,
   });
-  const site = await fixtures.ExternalSite();
+  const site = await fixtures.ExternalSite({ type: "masterofmalt" });
   const { lot } = await upsertAuctionObservation(site.id, {
     auction: {
       sourceKey: "1",
@@ -142,7 +146,7 @@ test("reuses an accepted reference without a new model decision", async ({
 test("unresolved classifier output remains reviewable and repeat-safe", async ({
   fixtures,
 }) => {
-  const site = await fixtures.ExternalSite();
+  const site = await fixtures.ExternalSite({ type: "masterofmalt" });
   const { lot } = await upsertAuctionObservation(site.id, {
     auction: {
       sourceKey: "1",
@@ -153,6 +157,7 @@ test("unresolved classifier output remains reviewable and repeat-safe", async ({
       sourceKey: "1",
       name: "Unknown whisky",
       url: "https://example.com/lot",
+      imageUrl: "https://example.com/thumbnail.jpg",
       state: "closed",
     },
     observedAt: new Date().toISOString(),
@@ -180,6 +185,14 @@ test("unresolved classifier output remains reviewable and repeat-safe", async ({
       },
     });
   await resolveAuctionLot(lot.id, lot.sourceFingerprint);
+  expect(run).toHaveBeenCalledWith({
+    readCandidateImages: false,
+    reference: expect.objectContaining({
+      id: lot.id,
+      name: "Unknown whisky",
+      imageUrl: null,
+    }),
+  });
   expect(await db.query.auctionLots.findFirst()).toMatchObject({
     bottleId: null,
     matchStatus: "review",
@@ -191,12 +204,17 @@ test("unresolved classifier output remains reviewable and repeat-safe", async ({
   await resolveAuctionLot(lot.id, lot.sourceFingerprint);
   expect(run).toHaveBeenCalledTimes(1);
   expect(await db.query.bottleChecks.findMany()).toHaveLength(1);
+  expect(
+    (await db.query.bottleChecks.findFirst())?.inputSnapshot,
+  ).toMatchObject({
+    readCandidateImages: false,
+  });
 });
 
 test("ignored classifier output stays ignored after a retry", async ({
   fixtures,
 }) => {
-  const site = await fixtures.ExternalSite();
+  const site = await fixtures.ExternalSite({ type: "masterofmalt" });
   const { lot } = await upsertAuctionObservation(site.id, {
     auction: {
       sourceKey: "1",
@@ -242,7 +260,7 @@ test("ignored classifier output stays ignored after a retry", async ({
 test("a supported saved match applies without a model call or new reference", async ({
   fixtures,
 }) => {
-  const site = await fixtures.ExternalSite();
+  const site = await fixtures.ExternalSite({ type: "masterofmalt" });
   const bottle = await fixtures.Bottle();
   const lot = await importedLot(site.id);
   const check = await saveMatch(lot, await matchResult(bottle.id));
@@ -279,11 +297,12 @@ test("a supported saved match applies without a model call or new reference", as
   expect(await db.query.auctionAlerts.findMany()).toHaveLength(0);
 });
 
-test("a saved creation proposal stays in review without catalog writes", async ({
+test("a supported saved creation uses canonical creation and keeps its decision history", async ({
   fixtures,
 }) => {
-  const site = await fixtures.ExternalSite();
+  const site = await fixtures.ExternalSite({ type: "masterofmalt" });
   const lot = await importedLot(site.id);
+  const brand = await fixtures.Entity({ name: "Example", kind: "brand" });
   const before = await db.query.bottles.findMany();
   const result = createDecidedBottleClassification({
     decision: {
@@ -297,8 +316,8 @@ test("a saved creation proposal stays in review without catalog writes", async (
       observation: null,
       proposedBottle: {
         name: "12 Year Old",
-        brand: { id: null, name: "Example" },
-        distillers: [{ id: null, name: "Example" }],
+        brand: { id: brand.id, name: brand.name },
+        distillers: [],
         bottler: null,
         series: null,
         category: "single_malt",
@@ -316,25 +335,158 @@ test("a saved creation proposal stays in review without catalog writes", async (
     },
     artifacts: {},
   });
-  await saveMatch(lot, result);
+  const check = await saveMatch(lot, result);
   const run = vi.spyOn(classifier, "runScrapedBottleReference");
   await applyAuctionLotMatchJob({
     lotId: lot.id,
     fingerprint: lot.sourceFingerprint,
   });
   expect(run).not.toHaveBeenCalled();
-  expect(await db.query.auctionLots.findFirst()).toMatchObject({
-    bottleId: null,
-    matchStatus: "review",
+  const saved = await db.query.auctionLots.findFirst();
+  expect(saved).toMatchObject({
+    bottleId: expect.any(Number),
+    matchStatus: "matched",
+    matchCheckId: check.id,
+    matchedReferenceId: null,
   });
-  expect(await db.query.bottles.findMany()).toEqual(before);
-  expect(await db.query.incomingBottleDecisionLogs.findMany()).toHaveLength(0);
+  expect(await db.query.bottles.findMany()).toHaveLength(before.length + 1);
+  const bottle = await db.query.bottles.findFirst({
+    where: eq(bottles.id, saved!.bottleId!),
+  });
+  expect(bottle).toMatchObject({
+    name: "12-year-old",
+    groupId: expect.any(Number),
+    brandId: brand.id,
+    statedAge: 12,
+    abv: 46,
+  });
+  expect(
+    await db.query.bottleReferences.findFirst({
+      where: eq(bottleReferences.name, normalizeBottleReferenceKey(lot.name)),
+    }),
+  ).toBeUndefined();
+  expect(await db.query.incomingBottleDecisionLogs.findMany()).toMatchObject([
+    {
+      decision: "create_bottle",
+      bottleId: bottle!.id,
+      createdBottle: true,
+      metadata: { classifierEvidence: { checkId: check.id } },
+    },
+  ]);
+  await applySavedAuctionLotMatch(lot.id, lot.sourceFingerprint);
+  expect(await db.query.bottles.findMany()).toHaveLength(before.length + 1);
+  expect(await db.query.incomingBottleDecisionLogs.findMany()).toHaveLength(1);
 });
+
+test.for(["unsupported", "reuse", "concurrent", "stale", "changed check"])(
+  "creation is safe when %s",
+  async (scenario, { fixtures }) => {
+    const site = await fixtures.ExternalSite({ type: "masterofmalt" });
+    const brand = await fixtures.Entity({ name: "Example", kind: "brand" });
+    const lot = await importedLot(site.id);
+    const result = createDecidedBottleClassification({
+      decision: {
+        action: "create_bottle",
+        matchedBottleId: null,
+        candidateBottleIds: [],
+        identityScope: "product",
+        referenceScope: "none",
+        rationale: "A missing marketed release.",
+        observation: null,
+        confidenceBasis: {
+          webEvidence: scenario === "unsupported" ? "not_used" : "supportive",
+          unresolvedRisks: [],
+        },
+        proposedBottle: {
+          name: "12-year-old",
+          brand: { id: brand.id, name: brand.name },
+          distillers: [],
+          bottler: null,
+          series: null,
+          category: "single_malt",
+          statedAge: 12,
+          abv: 46,
+          edition: null,
+          caskStrength: null,
+          singleCask: null,
+          vintageYear: null,
+          releaseYear: null,
+          maturation: null,
+          caskNumber: null,
+          outturn: null,
+        },
+      },
+      artifacts: {},
+    });
+    const existing =
+      scenario === "reuse"
+        ? await fixtures.Bottle({
+            name: "12-year-old",
+            brandId: brand.id,
+            category: "single_malt",
+            statedAge: 12,
+            abv: 46,
+          })
+        : null;
+    const check = await saveMatch(lot, result);
+    if (scenario === "stale" || scenario === "changed check") {
+      if (scenario === "stale")
+        await db
+          .update(auctionLots)
+          .set({ sourceFingerprint: "changed" })
+          .where(eq(auctionLots.id, lot.id));
+      else
+        await db
+          .update(auctionLots)
+          .set({ matchCheckId: check.id })
+          .where(eq(auctionLots.id, lot.id));
+      await expect(
+        assignAuctionLot({
+          lotId: lot.id,
+          fingerprint: lot.sourceFingerprint,
+          expectedBottleId: null,
+          createBottle: true,
+          checkId: check.id,
+          automatic: true,
+          expectedCheckId:
+            scenario === "changed check" ? check.id + 1 : undefined,
+        }),
+      ).rejects.toThrow("Auction lot identity or assignment changed");
+    } else {
+      await Promise.all(
+        Array.from({ length: scenario === "concurrent" ? 2 : 1 }, () =>
+          applySavedAuctionLotMatch(lot.id, lot.sourceFingerprint),
+        ),
+      );
+    }
+    const saved = await db.query.auctionLots.findFirst();
+    const shouldApply = scenario === "reuse" || scenario === "concurrent";
+    expect(saved).toMatchObject({
+      bottleId: shouldApply ? (existing?.id ?? expect.any(Number)) : null,
+      matchStatus: shouldApply
+        ? "matched"
+        : scenario === "unsupported"
+          ? "review"
+          : "pending",
+    });
+    expect(await db.query.bottles.findMany()).toHaveLength(shouldApply ? 1 : 0);
+    expect(await db.query.bottleGroups.findMany()).toHaveLength(
+      shouldApply ? 1 : 0,
+    );
+    const logs = await db.query.incomingBottleDecisionLogs.findMany();
+    expect(logs).toHaveLength(shouldApply ? 1 : 0);
+    if (shouldApply)
+      expect(logs[0]).toMatchObject({
+        decision: existing ? "match" : "create_bottle",
+        createdBottle: !existing,
+      });
+  },
+);
 
 test("unsupported saved check schemas stay in review rather than calling the model again", async ({
   fixtures,
 }) => {
-  const site = await fixtures.ExternalSite();
+  const site = await fixtures.ExternalSite({ type: "masterofmalt" });
   const bottle = await fixtures.Bottle();
   const lot = await importedLot(site.id);
   const check = await saveMatch(lot, await matchResult(bottle.id));
@@ -374,7 +526,7 @@ test.for([
     },
   },
 ])("$name stays reviewable", async ({ confidenceBasis }, { fixtures }) => {
-  const site = await fixtures.ExternalSite();
+  const site = await fixtures.ExternalSite({ type: "masterofmalt" });
   const bottle = await fixtures.Bottle();
   const lot = await importedLot(site.id);
   await saveMatch(lot, await matchResult(bottle.id, { confidenceBasis }));
@@ -397,7 +549,7 @@ test.for([
 test("populated source conflicts and changed target facts block a saved match", async ({
   fixtures,
 }) => {
-  const site = await fixtures.ExternalSite();
+  const site = await fixtures.ExternalSite({ type: "masterofmalt" });
   const bottle = await fixtures.Bottle({ statedAge: 12, abv: 46 });
   const lot = await importedLot(site.id, { stated_age: 12, abv: 46 });
   await saveMatch(lot, await matchResult(bottle.id));
@@ -415,27 +567,38 @@ test("populated source conflicts and changed target facts block a saved match", 
   });
 });
 
-test("a recheck without saved evidence queues model work instead of running it", async ({
-  fixtures,
-}) => {
-  const site = await fixtures.ExternalSite();
-  const lot = await importedLot(site.id);
-  const args = { lotId: lot.id, fingerprint: lot.sourceFingerprint };
-  const run = vi.spyOn(classifier, "runScrapedBottleReference");
-  await applyAuctionLotMatchJob(args);
-  expect(run).not.toHaveBeenCalled();
-  expect(pushUniqueJob).toHaveBeenCalledWith("ResolveAuctionLot", args);
-  expect(await db.query.bottleChecks.findMany()).toHaveLength(0);
-  expect(await db.query.auctionLots.findFirst()).toMatchObject({
-    bottleId: null,
-    matchStatus: "pending",
-  });
-});
+test.for(["masterofmalt", "scotchwhiskyauctions"] as const)(
+  "a recheck without saved evidence queues source work for %s without running the model",
+  async (type, { fixtures }) => {
+    const site = await fixtures.ExternalSite({ type });
+    const lot = await importedLot(site.id);
+    const args = { lotId: lot.id, fingerprint: lot.sourceFingerprint };
+    const run = vi.spyOn(classifier, "runScrapedBottleReference");
+    await applyAuctionLotMatchJob(args);
+    expect(run).not.toHaveBeenCalled();
+    if (type === "scotchwhiskyauctions") {
+      expect(pushUniqueJob).not.toHaveBeenCalled();
+      expect(
+        (await db.query.auctionLots.findFirst())?.sourceDetailsRequestedAt,
+      ).toBeInstanceOf(Date);
+    } else {
+      expect(pushUniqueJob).toHaveBeenCalledWith("ResolveAuctionLot", args);
+      expect(
+        (await db.query.auctionLots.findFirst())?.sourceDetailsRequestedAt,
+      ).toBeNull();
+    }
+    expect(await db.query.bottleChecks.findMany()).toHaveLength(0);
+    expect(await db.query.auctionLots.findFirst()).toMatchObject({
+      bottleId: null,
+      matchStatus: "pending",
+    });
+  },
+);
 
 test("a conflicting accepted name cannot bypass source facts on the fast queue", async ({
   fixtures,
 }) => {
-  const site = await fixtures.ExternalSite();
+  const site = await fixtures.ExternalSite({ type: "masterofmalt" });
   const bottle = await fixtures.Bottle({ statedAge: 18 });
   const lot = await importedLot(site.id, { stated_age: 12 });
   await fixtures.BottleReference({
@@ -458,7 +621,7 @@ test("a conflicting accepted name cannot bypass source facts on the fast queue",
 test("failed model dispatch stays pending and can be retried without classifying inline", async ({
   fixtures,
 }) => {
-  const site = await fixtures.ExternalSite();
+  const site = await fixtures.ExternalSite({ type: "masterofmalt" });
   const lot = await importedLot(site.id);
   const args = { lotId: lot.id, fingerprint: lot.sourceFingerprint };
   const run = vi.spyOn(classifier, "runScrapedBottleReference");
@@ -479,7 +642,7 @@ test("failed model dispatch stays pending and can be retried without classifying
 test("stale or already reviewed rechecks do not dispatch model work", async ({
   fixtures,
 }) => {
-  const site = await fixtures.ExternalSite();
+  const site = await fixtures.ExternalSite({ type: "masterofmalt" });
   const lot = await importedLot(site.id);
   const run = vi.spyOn(classifier, "runScrapedBottleReference");
   await applyAuctionLotMatchJob({ lotId: lot.id, fingerprint: "stale" });
@@ -501,7 +664,7 @@ test("stale or already reviewed rechecks do not dispatch model work", async ({
 test("saved-match jobs reject unowned payload fields before making changes", async ({
   fixtures,
 }) => {
-  const site = await fixtures.ExternalSite();
+  const site = await fixtures.ExternalSite({ type: "masterofmalt" });
   const lot = await importedLot(site.id);
   const run = vi.spyOn(classifier, "runScrapedBottleReference");
   await expect(
@@ -519,10 +682,59 @@ test("saved-match jobs reject unowned payload fields before making changes", asy
   expect(pushUniqueJob).not.toHaveBeenCalled();
 });
 
+test.for(["changed", "review", "matched"] as const)(
+  "a lot changed to %s while requesting details does not start stale classification",
+  async (change, { fixtures }) => {
+    const site = await fixtures.ExternalSite({ type: "scotchwhiskyauctions" });
+    const lot = await importedLot(site.id);
+    const bottle = await fixtures.Bottle();
+    const mod = await fixtures.User({ mod: true });
+    const run = vi
+      .spyOn(classifier, "runScrapedBottleReference")
+      .mockResolvedValue({
+        result: await matchResult(bottle.id),
+        modelMetadata: null,
+      });
+    vi.spyOn(scraper, "requestAuctionLotDetails").mockImplementation(
+      async () => {
+        if (change === "matched") {
+          await assignAuctionLot({
+            lotId: lot.id,
+            bottleId: bottle.id,
+            fingerprint: lot.sourceFingerprint,
+            expectedBottleId: null,
+            userId: mod.id,
+          });
+        } else {
+          await db
+            .update(auctionLots)
+            .set(
+              change === "changed"
+                ? { sourceFingerprint: "changed" }
+                : { matchStatus: "review" },
+            )
+            .where(eq(auctionLots.id, lot.id));
+        }
+        return false;
+      },
+    );
+    await resolveAuctionLot(lot.id, lot.sourceFingerprint);
+    expect(run).not.toHaveBeenCalled();
+    expect(await db.query.bottleChecks.findMany()).toHaveLength(0);
+    expect(await db.query.auctionLots.findFirst()).toMatchObject(
+      change === "changed"
+        ? { sourceFingerprint: "changed", matchCheckId: null }
+        : change === "matched"
+          ? { bottleId: bottle.id, matchedById: mod.id, matchStatus: "matched" }
+          : { matchStatus: "review", matchCheckId: null },
+    );
+  },
+);
+
 test("a source identity change during classification cannot apply the old decision", async ({
   fixtures,
 }) => {
-  const site = await fixtures.ExternalSite();
+  const site = await fixtures.ExternalSite({ type: "masterofmalt" });
   const bottle = await fixtures.Bottle();
   const lot = await importedLot(site.id);
   const result = await matchResult(bottle.id);
@@ -546,7 +758,7 @@ test("a source identity change during classification cannot apply the old decisi
 test("an exact-reference classifier preflight keeps its dependency", async ({
   fixtures,
 }) => {
-  const site = await fixtures.ExternalSite();
+  const site = await fixtures.ExternalSite({ type: "masterofmalt" });
   const bottle = await fixtures.Bottle();
   const lot = await importedLot(site.id);
   const result = await matchResult(bottle.id);
@@ -575,7 +787,7 @@ test("an exact-reference classifier preflight keeps its dependency", async ({
 test("a new supported match applies and a concurrent reviewed assignment wins", async ({
   fixtures,
 }) => {
-  const site = await fixtures.ExternalSite();
+  const site = await fixtures.ExternalSite({ type: "masterofmalt" });
   const bottle = await fixtures.Bottle();
   const other = await fixtures.Bottle();
   const mod = await fixtures.User({ mod: true });
@@ -626,7 +838,7 @@ test("a new supported match applies and a concurrent reviewed assignment wins", 
 test("unknown and inactive targets cannot auto-assign", async ({
   fixtures,
 }) => {
-  const site = await fixtures.ExternalSite();
+  const site = await fixtures.ExternalSite({ type: "masterofmalt" });
   const bottle = await fixtures.Bottle();
   const lot = await importedLot(site.id);
   const result = await matchResult(bottle.id);

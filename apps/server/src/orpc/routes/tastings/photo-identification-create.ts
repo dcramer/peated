@@ -6,6 +6,7 @@
 import { db } from "@peated/server/db";
 import { bottleImages, bottles } from "@peated/server/db/schema";
 import { getUserActor } from "@peated/server/lib/actors";
+import { assessBottleResolution } from "@peated/server/lib/bottleMatchingAutomation";
 import { applyClassifierCreateDecision } from "@peated/server/lib/bottleReferenceResolution";
 import { reconcileBottleSeriesRepresentativesForBottles } from "@peated/server/lib/bottleSeriesRepresentatives";
 import { BottleAlreadyExistsError } from "@peated/server/lib/createBottle";
@@ -27,7 +28,6 @@ import { serialize } from "@peated/server/serializers";
 import { BottleSerializer } from "@peated/server/serializers/bottle";
 import { and, eq, isNull } from "drizzle-orm";
 import { z } from "zod";
-import { isPhotoIdentificationCreateDecisionAutoCreatable } from "./photo-identification";
 
 const CatalogImageWarningSchema = z.object({
   code: z.literal("CATALOG_IMAGE_COPY_FAILED"),
@@ -262,7 +262,10 @@ export function createPhotoIdentificationCreateProcedure(
           message: "Photo identification result is not a create proposal.",
         });
       }
-      if (!isPhotoIdentificationCreateDecisionAutoCreatable(decision)) {
+      if (
+        !assessBottleResolution({ decision, readListingImage: true })
+          .automationEligible
+      ) {
         throw errors.BAD_REQUEST({
           message:
             "Photo identification result needs review before creating a bottle.",

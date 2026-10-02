@@ -1,7 +1,6 @@
 # Scraper Runtime
 
-This module controls Peated's scraper requests and saved progress. It keeps four
-jobs separate:
+This module controls Peated's scraper requests and saved progress. It separates:
 
 - definitions list which websites each source may request;
 - runs limit work and save enough progress to resume;

@@ -4,12 +4,10 @@ Store price matching links each retailer listing to one complete Bottle. It
 uses the shared [Bottle Classifier](./bottle-classifier.md) and adds saved
 proposals, review, and automation rules.
 
-Existing-Bottle automation is assessed by
-`apps/server/src/lib/bottleMatchingAutomation.ts`, shared with auctions. It
-checks the classifier's retrieved target, populated source conflicts, assignment
-replacement, evidence, and unresolved risks. Price creation keeps its separate
-assessment in `priceMatchingAutomation.ts`; auction matching never creates
-Bottles or automatically accepts names.
+`assessBottleResolution` in `apps/server/src/lib/bottleMatchingAutomation.ts`
+checks matches and creation for prices, auctions, reviews, and photos. Source
+type does not select identity rules. Prices own their saved proposals, review
+permissions, listing attachment, and history.
 
 Read these identity rules first:
 
@@ -143,7 +141,7 @@ site, listing name, and volume.
 
 The classifier decides identity. Code decides only whether that decision may
 apply without a moderator, using the same `deriveAutomationTier` rule as photo
-creation (`assessStorePriceMatch`). It never uses a model-written confidence
+creation (`assessBottleResolution`). It never uses a model-written confidence
 number.
 
 - Every unresolved risk forces review.
@@ -177,7 +175,7 @@ reuse an image URL that a moderator rejected for that Bottle.
 - ingestion: `apps/server/src/lib/createStorePrices.ts`
 - resolution: `apps/server/src/lib/priceMatching.ts`
 - proposals and review: `apps/server/src/lib/priceMatchingProposals.ts`
-- automation checks: `apps/server/src/lib/priceMatchingAutomation.ts`
+- shared identity checks: `apps/server/src/lib/bottleMatchingAutomation.ts`
 - API: `apps/server/src/orpc/routes/prices/matchQueue/`
 
 Scraper model and search calls can use the `SCRAPER_*` credentials. Other

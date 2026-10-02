@@ -1,9 +1,12 @@
-import type { AuctionObservation } from "@peated/server/schemas/auctions";
 import { vi } from "vitest";
 import type { z } from "zod";
 import type { ScraperSession } from "../types";
-import type { ScotchWhiskyAuctionsCursorSchema } from "./scotchWhiskyAuctions";
+import type {
+  ScotchWhiskyAuctionsCursorSchema,
+  ScotchWhiskyAuctionsObservation,
+} from "./scotchWhiskyAuctions";
 import {
+  ScotchWhiskyAuctionsCursorSchema as CursorSchema,
   parseScotchWhiskyAuctionPage,
   parseScotchWhiskyAuctionsIndex,
   scotchWhiskyAuctionsAdapter,
@@ -48,6 +51,44 @@ test("an ended auction or bid alone does not prove a sale", () => {
   expect(parsed.items[0].lot.result).toBeUndefined();
 });
 
+test("retains the exact published photo link without inventing a larger image URL", () => {
+  const imageUrl =
+    "https://d3suvtcq00dftb.cloudfront.net/images/3245b62843e278810e3789a39f58a216-med.jpg";
+  const html = page("Sold for £240").replace(
+    "<h4>",
+    `<div class="aucimg hasretina" style="background-image: url('${imageUrl}');" rel="orig224"></div><h4>`,
+  );
+  expect(
+    parseScotchWhiskyAuctionPage(html, auction).items[0].lot,
+  ).toMatchObject({
+    imageUrl,
+    result: { amount: 24000 },
+  });
+  expect(
+    parseScotchWhiskyAuctionPage(
+      html.replace(imageUrl, "/images/example-med.jpg"),
+      auction,
+    ).items[0].lot.imageUrl,
+  ).toBe("https://www.scotchwhiskyauctions.com/images/example-med.jpg");
+});
+
+test.each([
+  "",
+  "background-image: none;",
+  "background-image: url('https://example.com/other-site.jpg');",
+  "background-image: url('javascript:alert(1)');",
+  "background-image: url('http://d3suvtcq00dftb.cloudfront.net/image.jpg');",
+  "background-image: url('https://user:password@d3suvtcq00dftb.cloudfront.net/image.jpg');",
+])("ignores missing or unsupported photo links: %s", (style) => {
+  const html = page("Sold for £240").replace(
+    "<h4>",
+    `<div class="aucimg" style="${style}"></div><h4>`,
+  );
+  const lot = parseScotchWhiskyAuctionPage(html, auction).items[0].lot;
+  expect(lot.imageUrl).toBeUndefined();
+  expect(lot.result?.amount).toBe(24000);
+});
+
 test("an explicitly open auction includes lots with no bid yet", () => {
   const parsed = parseScotchWhiskyAuctionPage(
     page("", "Ends October 10, 2026"),
@@ -56,6 +97,83 @@ test("an explicitly open auction includes lots with no bid yet", () => {
   expect(parsed.items[0].lot.state).toBe("live");
   expect(parsed.items[0].lot.currentBid).toBeUndefined();
   expect(parsed.items[0].lot.result).toBeUndefined();
+});
+
+test("an unmet reserve during bidding is not a final unsold result", () => {
+  const lot = parseScotchWhiskyAuctionPage(
+    page("Current highest bid: £90 Reserve not met", "Ends October 11, 2026"),
+    auction,
+  ).items[0].lot;
+  expect(lot).toMatchObject({ state: "live", currentBid: 9000 });
+  expect(lot.result).toBeUndefined();
+});
+
+test("scheduled discovery follows open headings rather than link position", () => {
+  const html = `<div class="auctions">
+    <a class="auction" href="/auctions/232-the-183rd-auction/"><h4>The 183rd Auction</h4><h5>Ended September 13, 2026</h5></a>
+    <a class="auction" href="/auctions/233-the-184th-auction/"><h4>The 184th Auction</h4><h5>Ends October 11, 2026</h5></a>
+    <a class="auction" href="/auctions/231-the-182nd-auction/"><h4>The 182nd Auction</h4><h5>Ended August 9, 2026</h5></a>
+  </div>`;
+  expect(
+    parseScotchWhiskyAuctionsIndex(html, "current").map((a) => a.sourceKey),
+  ).toEqual(["233"]);
+  expect(parseScotchWhiskyAuctionsIndex(html).map((a) => a.sourceKey)).toEqual([
+    "232",
+    "233",
+  ]);
+  expect(
+    parseScotchWhiskyAuctionsIndex(
+      html.replace("Ends October 11, 2026", "Ended October 11, 2026"),
+      "current",
+    ).map((a) => a.sourceKey),
+  ).toEqual(["233"]);
+  expect(() =>
+    parseScotchWhiskyAuctionsIndex(
+      html.replace("Ends October", "Ended October").replaceAll(", 2026", ""),
+      "current",
+    ),
+  ).toThrow(/recognized auction states/);
+  expect(() =>
+    parseScotchWhiskyAuctionsIndex(
+      '<div class="auctions"><a class="auction" href="/auctions/232-the-183rd-auction/"><h4>The 183rd Auction</h4><h5>Ended 7th June</h5></a></div>',
+      "current",
+    ),
+  ).toThrow(/recognized auction states/);
+  expect(() =>
+    parseScotchWhiskyAuctionsIndex(
+      html.replace(/<h5>.*?<\/h5>/g, ""),
+      "current",
+    ),
+  ).toThrow(/recognized auction states/);
+  expect(
+    CursorSchema.parse({ auctions: [auction], auctionIndex: 0, page: 2 }),
+  ).toMatchObject({ scope: "recent", page: 2 });
+});
+
+test("current collection discovers once and checkpoints the same scope for pagination", async () => {
+  const emit = vi.fn();
+  const checkpoint = vi.fn();
+  const request = vi
+    .fn()
+    .mockResolvedValueOnce({
+      body: `<div class="auctions"><a class="auction" href="/auctions/232-the-183rd-auction/"><h4>Auction</h4><h5>Ends October 11, 2026</h5></a></div>`,
+    })
+    .mockResolvedValueOnce({
+      body: page("Current highest bid: £90", "Ends October 11, 2026"),
+    });
+  await scotchWhiskyAuctionsAdapter({
+    cursor: { scope: "current", auctions: [], auctionIndex: 0, page: 1 },
+    session: { request, emit, checkpoint, remainingRequests: () => 100 },
+  });
+  expect(request).toHaveBeenCalledTimes(2);
+  expect(checkpoint.mock.calls[0][0]).toMatchObject({
+    scope: "current",
+    auctionIndex: 0,
+  });
+  expect(emit.mock.calls[0][0].value[0].lot).toMatchObject({
+    state: "live",
+    currentBid: 9000,
+  });
 });
 
 test("preserves unknown state, explicit unsold outcomes, and skips explicit sets", () => {
@@ -88,7 +206,7 @@ test("pagination remains complete and resumes without replaying discovery", asyn
     .fn<
       ScraperSession<
         z.infer<typeof ScotchWhiskyAuctionsCursorSchema>,
-        AuctionObservation[]
+        ScotchWhiskyAuctionsObservation
       >["request"]
     >()
     .mockResolvedValueOnce({
@@ -109,7 +227,7 @@ test("pagination remains complete and resumes without replaying discovery", asyn
     });
   const session: ScraperSession<
     z.infer<typeof ScotchWhiskyAuctionsCursorSchema>,
-    AuctionObservation[]
+    ScotchWhiskyAuctionsObservation
   > = {
     request,
     emit,
@@ -117,7 +235,7 @@ test("pagination remains complete and resumes without replaying discovery", asyn
     remainingRequests: () => 100,
   };
   await scotchWhiskyAuctionsAdapter({
-    cursor: { auctions: [auction], auctionIndex: 0, page: 1 },
+    cursor: { scope: "recent", auctions: [auction], auctionIndex: 0, page: 1 },
     session,
   });
   expect(request).toHaveBeenCalledTimes(2);

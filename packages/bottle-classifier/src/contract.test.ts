@@ -22,6 +22,16 @@ describe("bottle-classifier contract", () => {
 
     expect(parsed.reference.name).toBe("Glenmorangie Quinta Ruban 14-year-old");
     expect(parsed.candidateExpansion).toBe("open");
+    expect(parsed.readCandidateImages).toBe(true);
+  });
+
+  test("records text-only candidate inspection on a reference request", () => {
+    const parsed = ClassifyBottleReferenceInputSchema.parse({
+      reference: { name: "Example 10-year-old" },
+      readCandidateImages: false,
+    });
+
+    expect(parsed.readCandidateImages).toBe(false);
   });
 
   test("parses closed-set candidate expansion mode", () => {
