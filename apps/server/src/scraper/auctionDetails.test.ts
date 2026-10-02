@@ -20,10 +20,10 @@ import { pushUniqueJob } from "@peated/server/lib/test/workerDispatch";
 import { routerClient } from "@peated/server/orpc/router";
 import { requestAuctionLotDetails } from "@peated/server/scraper";
 import { eq } from "drizzle-orm";
-import { afterEach, vi } from "vitest";
+import { afterEach, beforeEach, vi } from "vitest";
 import { parseScotchWhiskyAuctionDetails } from "./adapters/scotchWhiskyAuctionDetails";
 import { ScotchWhiskyAuctionDetailsCursorSchema } from "./adapters/scotchWhiskyAuctions";
-import { createScraperLifecycle } from "./lifecycle";
+import { createScraperLifecycle, type ScraperEnqueue } from "./lifecycle";
 import { scraperRegistry as registeredScrapers } from "./registry";
 import { executeScraperRun } from "./runs";
 import { auctionSink } from "./sinks/auctions";
@@ -53,6 +53,48 @@ const modelMetadata = {
   usage: { requests: 0, inputTokens: 0, outputTokens: 0, totalTokens: 0 },
   toolCalls: { count: 0, names: [] },
 };
+
+const enqueue = vi.fn<ScraperEnqueue>().mockResolvedValue(undefined);
+const lifecycle = createScraperLifecycle({
+  registry: scraperRegistry,
+  enqueue,
+});
+
+beforeEach(() => {
+  enqueue.mockClear();
+});
+
+async function queueDetails() {
+  const nextDispatch = enqueue.mock.calls.length;
+  await lifecycle.queueRequestedAuctionLotDetails();
+  const dispatch = enqueue.mock.calls[nextDispatch];
+  if (!dispatch) return null;
+  return db.query.externalSiteRuns.findFirst({
+    where: eq(externalSiteRuns.id, dispatch[1].runId),
+  });
+}
+
+function testClock() {
+  let now = new Date();
+  return {
+    now: () => now,
+    sleep: async (ms: number) => {
+      now = new Date(now.getTime() + ms);
+    },
+    random: () => 0,
+  };
+}
+
+function sourceResponse(body = detailHtml): typeof fetch {
+  return async (input) =>
+    new Response(
+      (input instanceof Request ? input.url : input.toString()).endsWith(
+        "/robots.txt",
+      )
+        ? "User-agent: *\nAllow: /"
+        : body,
+    );
+}
 
 async function importedLot(siteId: number, sourceKey = "893368") {
   return (
@@ -96,11 +138,7 @@ test.for(["pending", "review", "matched", "ignored"] as const)(
     const site = await fixtures.ExternalSite({ type: "scotchwhiskyauctions" });
     const lot = await importedLot(site.id);
     await requestReview(lot);
-    const lifecycle = createScraperLifecycle({
-      registry: scraperRegistry,
-      enqueue: async () => undefined,
-    });
-    const run = (await lifecycle.queueAuctionDetailsRun(site.id))!;
+    const run = (await queueDetails())!;
     const request = ScotchWhiskyAuctionDetailsCursorSchema.parse(run.cursor)
       .lots[0];
     const observation = {
@@ -155,11 +193,7 @@ test("a listing URL change allows fresh details without changing the lot identit
   const site = await fixtures.ExternalSite({ type: "scotchwhiskyauctions" });
   const lot = await importedLot(site.id);
   await requestReview(lot);
-  const lifecycle = createScraperLifecycle({
-    registry: scraperRegistry,
-    enqueue: async () => undefined,
-  });
-  const run = (await lifecycle.queueAuctionDetailsRun(site.id))!;
+  const run = (await queueDetails())!;
   const request = ScotchWhiskyAuctionDetailsCursorSchema.parse(run.cursor)
     .lots[0];
   const newUrl = lot.url.replace(/\/$/, "-corrected/");
@@ -208,7 +242,7 @@ test("a listing URL change allows fresh details without changing the lot identit
     .update(externalSiteRuns)
     .set({ status: "succeeded", completedAt: new Date() })
     .where(eq(externalSiteRuns.id, run.id));
-  const next = (await lifecycle.queueAuctionDetailsRun(site.id))!;
+  const next = (await queueDetails())!;
   expect(next.id).not.toBe(run.id);
   expect(
     ScotchWhiskyAuctionDetailsCursorSchema.parse(next.cursor).lots[0],
@@ -265,41 +299,20 @@ test("new unmapped lot reads bounded details before its first model check and ke
   expect(
     (await db.query.auctionLots.findFirst())?.sourceDetailsRequestedAt,
   ).not.toBeNull();
-  const enqueue = vi.fn(async () => undefined);
-  const lifecycle = createScraperLifecycle({
-    registry: scraperRegistry,
-    enqueue,
-  });
   await lifecycle.queueRequestedAuctionLotDetails();
   const run = (await db.query.externalSiteRuns.findFirst())!;
   expect(
     ScotchWhiskyAuctionDetailsCursorSchema.parse(run.cursor).lots,
   ).toHaveLength(1);
   await syncScraperDefinitions(scraperRegistry);
-  const fetchImpl = vi.fn<typeof fetch>(
-    async (input) =>
-      new Response(
-        (input instanceof Request ? input.url : input.toString()).endsWith(
-          "/robots.txt",
-        )
-          ? "User-agent: *\nAllow: /"
-          : detailHtml,
-      ),
-  );
-  let now = new Date();
+  const fetchImpl = vi.fn(sourceResponse());
   await expect(
     executeScraperRun(
       { runId: run.id },
       {
         registry: scraperRegistry,
         fetchImpl,
-        clock: {
-          now: () => now,
-          sleep: async (ms) => {
-            now = new Date(now.getTime() + ms);
-          },
-          random: () => 0,
-        },
+        clock: testClock(),
       },
     ),
   ).resolves.toMatchObject({ status: "completed" });
@@ -358,11 +371,7 @@ test("enriching a previously reviewed lot preserves its saved check and result",
   const model = vi.spyOn(classifier, "runScrapedBottleReference");
   await resolveAuctionLot(lot.id, lot.sourceFingerprint);
   expect(model).not.toHaveBeenCalled();
-  const lifecycle = createScraperLifecycle({
-    registry: scraperRegistry,
-    enqueue: async () => undefined,
-  });
-  const run = (await lifecycle.queueAuctionDetailsRun(site.id))!;
+  const run = (await queueDetails())!;
   const request = ScotchWhiskyAuctionDetailsCursorSchema.parse(run.cursor)
     .lots[0];
   expect(request.expectedCheckId).toBe(check.id);
@@ -387,11 +396,7 @@ test("detail cursor resumes after a request-budget wait and removed pages stay r
   await requestReview(first);
   await requestReview(second);
   await syncScraperDefinitions(scraperRegistry);
-  const lifecycle = createScraperLifecycle({
-    registry: scraperRegistry,
-    enqueue: async () => undefined,
-  });
-  const run = (await lifecycle.queueAuctionDetailsRun(site.id))!;
+  const run = (await queueDetails())!;
   await db
     .update(externalSiteRuns)
     .set({ requestLimit: 2 })
@@ -406,14 +411,7 @@ test("detail cursor resumes after a request-budget wait and removed pages stay r
       return new Response("Removed", { status: 404 });
     return new Response(detailHtml);
   };
-  let now = new Date();
-  const clock = {
-    now: () => now,
-    sleep: async (ms: number) => {
-      now = new Date(now.getTime() + ms);
-    },
-    random: () => 0,
-  };
+  const clock = testClock();
   const waiting = await executeScraperRun(
     { runId: run.id },
     { registry: scraperRegistry, fetchImpl, clock },
@@ -426,7 +424,7 @@ test("detail cursor resumes after a request-budget wait and removed pages stay r
   await lifecycle.queueRequestedAuctionLotDetails();
   expect(await db.query.externalSiteRuns.findMany()).toHaveLength(1);
   if (waiting.status !== "waiting") throw new Error("Expected a planned wait.");
-  now = waiting.nextAttemptAt;
+  await clock.sleep(waiting.nextAttemptAt.getTime() - clock.now().getTime());
   expect(
     await executeScraperRun(
       { runId: run.id },
@@ -466,24 +464,17 @@ test("only requested unresolved lots are batched, with at most 25 and no new run
     .update(auctionLots)
     .set({ matchStatus: "review" })
     .where(eq(auctionLots.id, untouched.id));
-  const lifecycle = createScraperLifecycle({
-    registry: scraperRegistry,
-    enqueue: async () => undefined,
-  });
-  const run = (await lifecycle.queueAuctionDetailsRun(site.id))!;
+  const run = (await queueDetails())!;
   const cursor = ScotchWhiskyAuctionDetailsCursorSchema.parse(run.cursor);
   expect(cursor.lots).toHaveLength(25);
   expect(cursor.lots.some(({ lotId }) => lotId === untouched.id)).toBe(false);
-  await expect(lifecycle.queueAuctionDetailsRun(site.id)).rejects.toThrow(
-    /already queued/,
-  );
-  await lifecycle.queueRequestedAuctionLotDetails();
+  expect(await queueDetails()).toBeNull();
   expect(await db.query.externalSiteRuns.findMany()).toHaveLength(1);
   await db
     .update(externalSiteRuns)
     .set({ status: "failed", completedAt: new Date() })
     .where(eq(externalSiteRuns.id, run.id));
-  const second = (await lifecycle.queueAuctionDetailsRun(site.id))!;
+  const second = (await queueDetails())!;
   expect(
     ScotchWhiskyAuctionDetailsCursorSchema.parse(second.cursor).lots,
   ).toHaveLength(2);
@@ -491,8 +482,7 @@ test("only requested unresolved lots are batched, with at most 25 and no new run
     .update(externalSiteRuns)
     .set({ status: "failed", completedAt: new Date() })
     .where(eq(externalSiteRuns.id, second.id));
-  expect(await lifecycle.queueAuctionDetailsRun(site.id)).toBeNull();
-  await lifecycle.queueRequestedAuctionLotDetails();
+  expect(await queueDetails()).toBeNull();
   expect(await db.query.externalSiteRuns.findMany()).toHaveLength(2);
 });
 
@@ -500,14 +490,10 @@ test("detail requests preserve assignments made while fetching and reject anothe
   fixtures,
 }) => {
   const site = await fixtures.ExternalSite({ type: "scotchwhiskyauctions" });
-  const foreign = await fixtures.ExternalSite();
+  const foreign = await fixtures.ExternalSite({ type: "other-auction" });
   const lot = await importedLot(site.id);
   await requestReview(lot);
-  const lifecycle = createScraperLifecycle({
-    registry: scraperRegistry,
-    enqueue: async () => undefined,
-  });
-  const run = (await lifecycle.queueAuctionDetailsRun(site.id))!;
+  const run = (await queueDetails())!;
   const request = ScotchWhiskyAuctionDetailsCursorSchema.parse(run.cursor)
     .lots[0];
   const input = {
@@ -559,11 +545,7 @@ test("detail replay recovers matching dispatch but cannot reuse a changed listin
   const site = await fixtures.ExternalSite({ type: "scotchwhiskyauctions" });
   const lot = await importedLot(site.id);
   await requestReview(lot);
-  const lifecycle = createScraperLifecycle({
-    registry: scraperRegistry,
-    enqueue: async () => undefined,
-  });
-  const run = (await lifecycle.queueAuctionDetailsRun(site.id))!;
+  const run = (await queueDetails())!;
   const request = ScotchWhiskyAuctionDetailsCursorSchema.parse(run.cursor)
     .lots[0];
   const observation = {
@@ -603,7 +585,7 @@ test("detail replay recovers matching dispatch but cannot reuse a changed listin
   expect(await requestAuctionLotDetails(lot.id, saved.sourceFingerprint)).toBe(
     false,
   );
-  expect(await lifecycle.queueAuctionDetailsRun(site.id)).toBeNull();
+  expect(await queueDetails()).toBeNull();
   expect(await db.query.auctionLots.findFirst()).toEqual(saved);
 
   const { lot: changed } = await upsertAuctionObservation(site.id, {
@@ -644,7 +626,7 @@ test("detail replay recovers matching dispatch but cannot reuse a changed listin
   expect(await db.query.auctionLots.findFirst()).toEqual(requested);
   expect(await db.query.auctionLotResults.findMany()).toHaveLength(1);
 
-  const next = (await lifecycle.queueAuctionDetailsRun(site.id))!;
+  const next = (await queueDetails())!;
   expect(next.id).not.toBe(run.id);
   const nextRequests = ScotchWhiskyAuctionDetailsCursorSchema.parse(
     next.cursor,
@@ -685,11 +667,7 @@ test("explicit detail retry is admin-only, versioned, and invalidates an earlier
   const site = await fixtures.ExternalSite({ type: "scotchwhiskyauctions" });
   const lot = await importedLot(site.id);
   await requestReview(lot);
-  const lifecycle = createScraperLifecycle({
-    registry: scraperRegistry,
-    enqueue: async () => undefined,
-  });
-  const run = (await lifecycle.queueAuctionDetailsRun(site.id))!;
+  const run = (await queueDetails())!;
   const request = ScotchWhiskyAuctionDetailsCursorSchema.parse(run.cursor)
     .lots[0];
   const input = {
@@ -792,6 +770,46 @@ test("detail retries advance each queued lot's own request and leave skipped lot
   ).toEqual(ignored);
 });
 
+test("detail retry rejects mixed-source batches without changing any lot and skips ignored lots", async ({
+  fixtures,
+}) => {
+  const site = await fixtures.ExternalSite({ type: "scotchwhiskyauctions" });
+  const otherSite = await fixtures.ExternalSite({
+    type: "unsupported-auction",
+  });
+  const lot = await importedLot(site.id);
+  const otherLot = await importedLot(otherSite.id);
+  const admin = await fixtures.User({ admin: true });
+  const input = {
+    refreshSourceDetails: true,
+    lots: [lot, otherLot].map((item) => ({
+      lotId: item.id,
+      fingerprint: item.sourceFingerprint,
+      expectedBottleId: item.bottleId,
+      expectedCheckId: item.matchCheckId,
+    })),
+  };
+  await expect(
+    routerClient.auctions.recheck(input, { context: { user: admin } }),
+  ).rejects.toThrow(/not supported/);
+  expect(
+    await db.query.auctionLots.findMany({ orderBy: auctionLots.id }),
+  ).toEqual([lot, otherLot]);
+  const [ignored] = await db
+    .update(auctionLots)
+    .set({ matchStatus: "ignored" })
+    .where(eq(auctionLots.id, otherLot.id))
+    .returning();
+  expect(
+    await routerClient.auctions.recheck(input, { context: { user: admin } }),
+  ).toEqual({ queued: [lot.id], skipped: [otherLot.id] });
+  expect(
+    await db.query.auctionLots.findFirst({
+      where: eq(auctionLots.id, otherLot.id),
+    }),
+  ).toEqual(ignored);
+});
+
 test("requested live lots are checked before older closed lots", async ({
   fixtures,
 }) => {
@@ -804,11 +822,7 @@ test("requested live lots are checked before older closed lots", async ({
     .where(eq(auctionLots.id, live.id));
   await requestReview(closed);
   await requestReview(live);
-  const lifecycle = createScraperLifecycle({
-    registry: scraperRegistry,
-    enqueue: async () => undefined,
-  });
-  const run = (await lifecycle.queueAuctionDetailsRun(site.id))!;
+  const run = (await queueDetails())!;
   expect(run.purpose).toBe("details");
   expect(
     ScotchWhiskyAuctionDetailsCursorSchema.parse(run.cursor).lots.map(
@@ -840,39 +854,21 @@ test.for(["success", "failure", "expired"] as const)(
       .update(externalSites)
       .set({ lastRunAt: completedAt, lastRunId: collection.id })
       .where(eq(externalSites.id, site.id));
-    const lifecycle = createScraperLifecycle({
-      registry: scraperRegistry,
-      enqueue: async () => undefined,
-    });
-    const run = (await lifecycle.queueAuctionDetailsRun(site.id))!;
+    const run = (await queueDetails())!;
     if (outcome === "expired")
       await db
         .update(externalSiteRuns)
         .set({ createdAt: new Date(Date.now() - 7 * 24 * 60 * 60_000) })
         .where(eq(externalSiteRuns.id, run.id));
     await syncScraperDefinitions(scraperRegistry);
-    let now = new Date();
     const execute = executeScraperRun(
       { runId: run.id },
       {
         registry: scraperRegistry,
-        fetchImpl: async (input) =>
-          new Response(
-            (input instanceof Request ? input.url : input.toString()).endsWith(
-              "/robots.txt",
-            )
-              ? "User-agent: *\nAllow: /"
-              : outcome === "success"
-                ? detailHtml
-                : "Unexpected page",
-          ),
-        clock: {
-          now: () => now,
-          sleep: async (ms) => {
-            now = new Date(now.getTime() + ms);
-          },
-          random: () => 0,
-        },
+        fetchImpl: sourceResponse(
+          outcome === "success" ? detailHtml : "Unexpected page",
+        ),
+        clock: testClock(),
       },
     );
     if (outcome !== "failure")
@@ -894,10 +890,6 @@ test("scheduled auction runs save current scope while manual runs keep recent co
     nextRunAt: null,
   });
   const admin = await fixtures.User({ admin: true });
-  const lifecycle = createScraperLifecycle({
-    registry: scraperRegistry,
-    enqueue: async () => undefined,
-  });
   const scheduled = (await lifecycle.queueScheduledExternalSiteRun(site.id))!;
   expect(scheduled).toMatchObject({
     purpose: "collect",
@@ -937,11 +929,7 @@ test("a removed detail page still allows a new lot's normal title check", async 
       modelMetadata,
     });
   await resolveAuctionLot(lot.id, lot.sourceFingerprint);
-  const lifecycle = createScraperLifecycle({
-    registry: scraperRegistry,
-    enqueue: async () => undefined,
-  });
-  const run = (await lifecycle.queueAuctionDetailsRun(site.id))!;
+  const run = (await queueDetails())!;
   const request = ScotchWhiskyAuctionDetailsCursorSchema.parse(run.cursor)
     .lots[0];
   await saveAuctionLotDetails(site.id, {
@@ -958,5 +946,5 @@ test("a removed detail page still allows a new lot's normal title check", async 
     matchStatus: "review",
     bottleId: null,
   });
-  expect(await lifecycle.queueAuctionDetailsRun(site.id)).toBeNull();
+  expect(await queueDetails()).toBeNull();
 });

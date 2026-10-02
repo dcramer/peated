@@ -66,7 +66,8 @@ test("collects published Ardbeg cask facts through the real paced source runtime
     registry,
     enqueue: async () => undefined,
   });
-  const run = (await lifecycle.queueAuctionDetailsRun(site.id))!;
+  await lifecycle.queueRequestedAuctionLotDetails();
+  const run = (await db.query.externalSiteRuns.findFirst())!;
   for (let attempt = 0; attempt < 6; attempt++) {
     const outcome = await executeScraperRun({ runId: run.id }, { registry });
     if (outcome.status === "completed") break;

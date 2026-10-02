@@ -18,45 +18,33 @@ updated worker before the API accepts requests; it must know the
 Deployment preserves saved checks, assignments, results, and the source schedule.
 It does not rerun the matching backlog.
 
-## First production run
+## Collection checks and scheduling
 
-1. Deploy both the API and worker with the enabled target. Their startup sync
-   applies the registry settings; changing the schedule does not enable a target.
-2. Check authenticated API access and source health:
+The first completed production run on October 1, 2026 took 3 hours 51 minutes,
+made 458 requests, and collected 8,965 one-Bottle lots. Automatic collection
+remains off. After deployment, check source health and recent runs:
 
-   ```sh
-   pnpm cli auth status
-   pnpm cli api get /admin/external-sites/scotchwhiskyauctions/health
-   ```
+```sh
+pnpm cli auth status
+pnpm cli api get /admin/external-sites/scotchwhiskyauctions/health
+pnpm cli api get '/admin/external-sites/scotchwhiskyauctions/runs?limit=5'
+```
 
-   Confirm the target is enabled and the schedule remains null.
-
-3. Trigger one manual run:
-
-   ```sh
-   pnpm cli api post /external-sites/scotchwhiskyauctions/trigger
-   pnpm cli api get '/admin/external-sites/scotchwhiskyauctions/runs?limit=5'
-   ```
-
-   Keep the returned run ID. An active run is a conflict, not a reason to queue
-   another. Rate-limit waits and saved-page resumes are expected.
-
-4. Wait for that run to succeed. Check its duration, request and item counts,
-   errors, and saved sold/unsold outcomes. Check a few source links and hammer
-   prices, and review Bottle matches before relying on public history. A closed
-   auction must not produce live-lot alerts.
-
-The collector visits all pages of the two most recent auctions. The first
-completed production run on October 1, 2026 took 3 hours 51 minutes, made 458
-requests, and collected 8,965 one-Bottle lots. Matching also queues work.
-Do not trigger a full archive backfill as part of this rollout.
-
-## Repeat collection
+Verify the target is enabled and its schedule remains null. Startup sync applies
+registry settings; changing the schedule does not enable a disabled target.
+Check saved outcomes, source links, hammer prices, and Bottle matches. Closed
+lots must not send live-lot alerts.
 
 Scheduled runs check open auctions first. When none is open, they check the
 latest ended auction for final results. Manual runs retain the two-auction
 window. Detail batches put requested live lots ahead of closed lots and wait
 behind index collection; all work shares the same request limits.
+
+For a manual run, submit
+`pnpm cli api post /external-sites/scotchwhiskyauctions/trigger` and track the
+returned run ID. An active run is a conflict, not a reason to queue another.
+Rate-limit waits and saved-page resumes are expected. Do not start an archive
+backfill as part of this rollout.
 
 Before setting an automatic interval, verify a currently open auction with the
 real parser and measure a completed run. Check that page ordering, bids, closed

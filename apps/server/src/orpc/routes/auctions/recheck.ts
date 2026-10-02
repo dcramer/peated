@@ -54,8 +54,10 @@ export default procedure
   .handler(async ({ input, errors }) => {
     const result = await db.transaction(async (tx) => {
       const lots = await tx
-        .select()
+        .select({ lot: auctionLots, sourceType: externalSites.type })
         .from(auctionLots)
+        .innerJoin(auctions, eq(auctions.id, auctionLots.auctionId))
+        .innerJoin(externalSites, eq(externalSites.id, auctions.externalSiteId))
         .where(
           inArray(
             auctionLots.id,
@@ -63,11 +65,12 @@ export default procedure
           ),
         )
         .orderBy(asc(auctionLots.id))
-        .for("update");
+        .for("update", { of: auctionLots });
       const queued: { lotId: number; fingerprint: string }[] = [];
       const skipped: number[] = [];
       for (const expected of input.lots) {
-        const lot = lots.find(({ id }) => id === expected.lotId);
+        const row = lots.find(({ lot }) => lot.id === expected.lotId);
+        const lot = row?.lot;
         if (
           !lot ||
           lot.sourceFingerprint !== expected.fingerprint ||
@@ -98,21 +101,14 @@ export default procedure
         if (lot.matchStatus === "matched" || lot.matchStatus === "ignored")
           skipped.push(lot.id);
         else {
-          if (input.refreshSourceDetails) {
-            const [source] = await tx
-              .select({ type: externalSites.type })
-              .from(auctions)
-              .innerJoin(
-                externalSites,
-                eq(externalSites.id, auctions.externalSiteId),
-              )
-              .where(eq(auctions.id, lot.auctionId));
-            if (source?.type !== "scotchwhiskyauctions")
-              throw errors.BAD_REQUEST({
-                message:
-                  "Detail refresh is not supported for this auction source.",
-              });
-          }
+          if (
+            input.refreshSourceDetails &&
+            row?.sourceType !== "scotchwhiskyauctions"
+          )
+            throw errors.BAD_REQUEST({
+              message:
+                "Detail refresh is not supported for this auction source.",
+            });
           queued.push({ lotId: lot.id, fingerprint: lot.sourceFingerprint });
         }
       }

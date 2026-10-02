@@ -151,9 +151,9 @@ We do not seek explicit permission to index these public facts. We do not copy
 the source's photographs, descriptions, or editorial content.
 
 The target is enabled for manual runs and its initial automatic schedule is
-null. Deploy the API and worker before triggering the first production run.
-The [rollout procedure](../operations/auctions.md) covers that run and checks
-before scheduling repeat collection. A closed-auction run can verify history;
+null. Deploy the API and worker together.
+The [rollout procedure](../operations/auctions.md) covers deployment, manual
+checks, and scheduling repeat collection. A closed-auction run can verify history;
 live availability still needs a currently open auction's markup and measured
 refresh capacity.
 The dated [source audit](../research/2026-09-30-whisky-auction-sources.md) records

@@ -538,8 +538,6 @@ export function createScraperLifecycle({
   enqueue: ScraperEnqueue;
 }) {
   return {
-    queueAuctionDetailsRun: (siteId: number) =>
-      queueAuctionDetailsRun(siteId, registry, enqueue),
     queueRequestedAuctionLotDetails: () =>
       queueRequestedAuctionLotDetails(registry, enqueue),
     queueManualExternalSiteRun: (input: {
