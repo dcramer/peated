@@ -44,7 +44,7 @@
     "@sentry/node": "catalog:",
     "@simplewebauthn/server": "^13.3.0",
     "@sindresorhus/slugify": "^2.2.1",
-    "axios": "~1.19.0",
+    "axios": "~1.20.0",
     "bcrypt": "^6.0.0",
     "bullmq": "^5.40.3",
     "cheerio": "1.2.0",
