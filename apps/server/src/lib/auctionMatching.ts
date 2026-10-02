@@ -95,7 +95,7 @@ async function resolveAuctionLotMatch(
     where: eq(bottleChecks.backgroundEventKey, backgroundEventKey),
   });
   if (!check) {
-    // Auction matching gathers a new listing's source facts before its first classification.
+    // Auction matching collects listing facts before the first model call.
     if (
       !lot.sourceBottleIdentity &&
       (await requestAuctionLotDetails(lotId, fingerprint))
@@ -106,7 +106,7 @@ async function resolveAuctionLotMatch(
       where: eq(auctions.id, lot.auctionId),
     });
     if (!auction) throw new Error("Auction lot has no auction.");
-    // Auction matching skips work changed during preflight; the final save still guards changes during the model call.
+    // Auction matching skips changed lots before a model call and checks again when saving.
     lot = await db.query.auctionLots.findFirst({
       where: and(
         eq(auctionLots.id, lotId),
@@ -116,15 +116,14 @@ async function resolveAuctionLotMatch(
       ),
     });
     if (!lot) return true;
+    // Auction matching uses listing text and facts; photos remain review links.
     const input: ClassifyBottleReferenceInput = {
-      // Auction matching owns text-first inspection: automatic label readings are not source facts.
       readCandidateImages: false,
       reference: {
         id: lot.id,
         externalSiteId: auction.externalSiteId,
         name: lot.name,
         url: lot.url,
-        // Auction matching owns this limit: source thumbnails are review links, not label evidence.
         imageUrl: null,
         currentBottleId: null,
       },

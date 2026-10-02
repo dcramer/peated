@@ -10,7 +10,8 @@ overwriting history. Sets and multipacks are outside the initial scope.
 - `auction`: an auction house's event, unique by external site and source key.
 - `auction_lot`: an occurrence, unique by auction and source lot key. It keeps
   the source URL, lot number, title, available size and condition, source identity
-  facts, matching fingerprint, assignment, source state, and one availability check time.
+  facts, matching fingerprint, assignment, source state, and one availability
+  check time.
 - `auction_lot_result`: append-only reported outcomes and price corrections.
   Public lists select one latest result per lot, not one sale per revision.
 - `auction_watch`: a private member subscription to one exact Bottle.
@@ -78,11 +79,11 @@ check; missing identity evidence still requires review.
 
 Detail facts never refresh availability or change prices. Changed facts produce
 a new matching fingerprint and check; earlier checks and results stay saved.
-Pinned fingerprints, check IDs, request times, and source URLs reject stale work.
-Assignments made while a page is being read remain intact. A saved run pointer
-lets normal scraper recovery resume interrupted work and prevents terminal
-failures from silently starting more runs. Existing review lots are not requested
-on deployment.
+Each request records the lot version, check ID, request time, and source URL to
+reject old responses. Assignments made during a read stay intact. The saved
+`details` run can resume interrupted work; a failed run requires an explicit
+admin retry. Detail runs do not count as listing refreshes in source health.
+Deployment does not request details for existing review lots.
 
 Moderators review unresolved lots, including ended lots, in the Inbox. Protected
 lot details and saved-run APIs provide source facts and evidence. The UI sends
@@ -103,9 +104,10 @@ Bottle, and check versions. The whole batch is validated before work is saved;
 matched and ignored lots are skipped. Workers reuse references and saved checks
 on the default queue through `ApplyAuctionLotMatch`, so this work does not wait
 behind new classifications. Missing checks wait for requested source facts or
-queue `ResolveAuctionLot` on the models queue. Dispatch failures leave pending work that can be submitted
-again. Rechecks do not collect auction indexes. Setting `refreshSourceDetails`
-explicitly requests fresh Scotch Whisky Auctions details instead of applying
+queue `ResolveAuctionLot` on the models queue. Dispatch failures leave pending
+work that can be submitted again. Rechecks do not collect auction indexes.
+Setting `refreshSourceDetails` requests fresh Scotch Whisky Auctions details
+instead of applying
 the old check. This also retries a terminally failed detail run for the selected
 unresolved lots. The same batch versions and administrator access are required.
 
@@ -140,11 +142,6 @@ page of the two recent auction links. Scheduled runs select open auctions from
 their explicit headings; when none is open, they check the latest ended event
 by its reported date for final results. Repeating a saved page is safe. This is
 recent collection, not a complete archive backfill.
-
-Detail runs use purpose `details` in the existing run history. They cannot
-replace the site's latest collection status or success time. The lot's separate
-detail-request time, completion time, and run link prevent stale saves and endless
-retries; they are not extra availability dates.
 
 Auction collection follows the scraper's
 [responsible public-facts collection policy](../../apps/server/src/scraper/README.md#responsible-collection-of-public-facts).

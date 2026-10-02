@@ -65,7 +65,7 @@ function lotImageUrl(style: string | undefined) {
   if (!value) return undefined;
   try {
     const url = new URL(value, ORIGIN);
-    // The auction collector keeps published photo links for matching, not catalog image reuse.
+    // Auction collection keeps photo links for review, not catalog image reuse.
     if (
       (url.origin === ORIGIN || url.origin === IMAGE_ORIGIN) &&
       !url.username &&
@@ -97,7 +97,7 @@ export function parseScotchWhiskyAuctionsIndex(
         const heading = $(element).find("h5").text().trim();
         return {
           element,
-          // SWA discovery requires a published year; generic date parsing can infer one from a partial date.
+          // SWA discovery needs a published year; the shared parser can guess one from a partial date.
           date:
             /^Ended\b/i.test(heading) && /\b\d{4}\b/.test(heading)
               ? parseDate(heading.replace(/^Ended\s+/i, ""))
@@ -132,7 +132,7 @@ export function parseScotchWhiskyAuctionPage(
   for (const element of $("#lots a.lot").toArray()) {
     const tile = $(element);
     const name = tile.find("h4").text().trim();
-    // Auction collector owns one-Bottle lots; explicit source set/quantity wording excludes bundles.
+    // Auction collection supports single-bottle lots; skip explicit set and quantity titles.
     const quantity = name.match(
       /\b(\d+)\s*(?:bottles?|[x×]\s*\d+\s*(?:ml|cl|l))\b/i,
     );

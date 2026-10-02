@@ -477,6 +477,8 @@ test("only requested unresolved lots are batched, with at most 25 and no new run
   await expect(lifecycle.queueAuctionDetailsRun(site.id)).rejects.toThrow(
     /already queued/,
   );
+  await lifecycle.queueRequestedAuctionLotDetails();
+  expect(await db.query.externalSiteRuns.findMany()).toHaveLength(1);
   await db
     .update(externalSiteRuns)
     .set({ status: "failed", completedAt: new Date() })
@@ -490,6 +492,7 @@ test("only requested unresolved lots are batched, with at most 25 and no new run
     .set({ status: "failed", completedAt: new Date() })
     .where(eq(externalSiteRuns.id, second.id));
   expect(await lifecycle.queueAuctionDetailsRun(site.id)).toBeNull();
+  await lifecycle.queueRequestedAuctionLotDetails();
   expect(await db.query.externalSiteRuns.findMany()).toHaveLength(2);
 });
 

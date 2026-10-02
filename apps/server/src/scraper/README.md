@@ -1,7 +1,6 @@
 # Scraper Runtime
 
-This module controls Peated's scraper requests and saved progress. It keeps four
-jobs separate:
+This module controls Peated's scraper requests and saved progress. It separates:
 
 - definitions list which websites each source may request;
 - runs limit work and save enough progress to resume;
@@ -65,13 +64,6 @@ Auction collection follows the [auction model and activation limits](../../../..
 Scotch Whisky Auctions is enabled for manual runs, with no automatic schedule.
 Follow the [auction rollout procedure](../../../../docs/operations/auctions.md)
 after deploying the API and worker.
-New unmapped SWA lots request detail facts before their first model check, without
-starting an index scan. The scheduler batches at most 25 requested lots into a
-saved `details` run, with live lots first and the same request target. Detail runs
-do not replace listing collection in source health. Scheduled SWA collection
-checks open auctions, or the latest ended event when none is open; manual runs
-retain the two-event window. A failed detail run stays linked to its lots; an admin
-must explicitly retry those lots through the version-checked recheck API.
 
 ## Registering a source
 

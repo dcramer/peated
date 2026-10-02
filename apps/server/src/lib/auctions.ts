@@ -100,7 +100,7 @@ function identityFingerprint(
     .digest("hex");
 }
 
-/** Auction evidence enrichment never refreshes availability, prices, or an intervening assignment. */
+/** Auction detail reads never change availability, prices, or a match made during the read. */
 export async function saveAuctionLotDetails(
   externalSiteId: number,
   raw: AuctionLotDetailObservation,
@@ -120,8 +120,8 @@ export async function saveAuctionLotDetails(
       where: eq(auctions.id, lot.auctionId),
     });
     if (!auction || auction.externalSiteId !== externalSiteId) return null;
-    // Auction details acknowledge the same completed request even after matching finishes.
-    // Saving facts changes the fingerprint; listing changes and explicit retries invalidate the request.
+    // Auction detail facts can change the fingerprint; replay follows the completed request.
+    // Listing changes and admin retries clear or replace that request.
     if (
       lot.sourceDetailsCheckedAt &&
       lot.url === input.request.url &&

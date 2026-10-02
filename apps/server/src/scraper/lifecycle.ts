@@ -105,7 +105,7 @@ async function insertRun(
   trigger: RunTrigger,
   registry: ScraperRegistry,
   requestedById?: number,
-  initialCursor?: z.infer<typeof ScotchWhiskyAuctionDetailsCursorSchema>,
+  detailsCursor?: z.infer<typeof ScotchWhiskyAuctionDetailsCursorSchema>,
 ) {
   // Lifecycle holds the site lock. Reject active work before an insert can wait
   // on a completing run that needs that same site lock to finish.
@@ -121,7 +121,7 @@ async function insertRun(
   // Scraper lifecycle chooses the scraper. A migrated site's paused or
   // unfinished rules must never restart its old scraper.
   if (configuredSource || !source) {
-    if (initialCursor !== undefined)
+    if (detailsCursor)
       throw new ScrapeSourceValidationError(
         "Auction detail collection requires its built-in source.",
       );
@@ -134,12 +134,9 @@ async function insertRun(
     return configured.run;
   }
   requireEnabledScraperTargets(registry, source);
-  let cursor =
-    initialCursor === undefined
-      ? null
-      : source.cursorSchema.parse(initialCursor);
+  let cursor = detailsCursor ? source.cursorSchema.parse(detailsCursor) : null;
   if (
-    initialCursor === undefined &&
+    !detailsCursor &&
     site.type === "scotchwhiskyauctions" &&
     trigger === "scheduled"
   )
@@ -154,7 +151,7 @@ async function insertRun(
     source.recordType === "review" &&
     (await hasReviewsWithoutSavedText(connection, site.id));
   if (
-    initialCursor === undefined &&
+    !detailsCursor &&
     source.resumeFromLastRun &&
     !restartForMissingReviewText
   ) {
@@ -179,7 +176,7 @@ async function insertRun(
     .values({
       externalSiteId: site.id,
       trigger,
-      purpose: initialCursor ? "details" : "collect",
+      purpose: detailsCursor ? "details" : "collect",
       requestedById,
       requestLimit: REQUESTS_BEFORE_PAUSE,
       requestErrorCount: 0,
@@ -368,7 +365,7 @@ async function queueAuctionDetailsRun(
   enqueue: ScraperEnqueue,
 ) {
   const result = await db.transaction(async (tx) => {
-    // Auction detail dispatch uses the same site-first lock order and active run limit as collection.
+    // Auction details lock the site before its lots, like listing collection.
     const [site] = await tx
       .select()
       .from(externalSites)
@@ -428,42 +425,32 @@ async function queueAuctionDetailsRun(
     return { site, run };
   });
   if (!result) return null;
-  // A failed run retains its lot pointers. Scheduler recovery must not create an endless series of new attempts.
+  // Auction details keep failed run links so the scheduler cannot start repeated runs.
   await dispatchExternalSiteRun(result.run, result.site, enqueue, {
     completeOnFailure: false,
   });
   return result.run;
 }
 
-async function dispatchRequestedAuctionDetails(
-  queue: (siteId: number) => Promise<ExternalSiteRun | null>,
+async function queueRequestedAuctionLotDetails(
+  registry: ScraperRegistry,
+  enqueue: ScraperEnqueue,
 ) {
-  const sites = await db
-    .selectDistinct({ siteId: auctions.externalSiteId })
-    .from(auctionLots)
-    .innerJoin(auctions, eq(auctions.id, auctionLots.auctionId))
-    .where(
-      and(
-        inArray(auctionLots.matchStatus, ["pending", "review"]),
-        isNotNull(auctionLots.sourceDetailsRequestedAt),
-        isNull(auctionLots.sourceDetailsCheckedAt),
-        isNull(auctionLots.sourceDetailsRunId),
-      ),
+  const [site] = await db
+    .select({ id: externalSites.id })
+    .from(externalSites)
+    .where(eq(externalSites.type, "scotchwhiskyauctions"));
+  if (!site) return;
+  try {
+    await queueAuctionDetailsRun(site.id, registry, enqueue);
+  } catch (error) {
+    // Scraper scheduling leaves requests saved while the source is busy, disabled, or using saved rules.
+    if (
+      !(error instanceof ExternalSiteRunActiveError) &&
+      !(error instanceof ScraperTargetDisabledError) &&
+      !(error instanceof ScrapeSourceValidationError)
     )
-    .orderBy(asc(auctions.externalSiteId))
-    .limit(10);
-  for (const { siteId } of sites) {
-    try {
-      await queue(siteId);
-    } catch (error) {
-      if (
-        !(error instanceof ExternalSiteRunActiveError) &&
-        !(error instanceof ScraperTargetDisabledError) &&
-        !(error instanceof ScrapeSourceValidationError)
-      )
-        throw error;
-      // Scraper scheduler leaves requested work saved while a site is busy, paused, or using different rules.
-    }
+      throw error;
   }
 }
 
@@ -554,9 +541,7 @@ export function createScraperLifecycle({
     queueAuctionDetailsRun: (siteId: number) =>
       queueAuctionDetailsRun(siteId, registry, enqueue),
     queueRequestedAuctionLotDetails: () =>
-      dispatchRequestedAuctionDetails((siteId) =>
-        queueAuctionDetailsRun(siteId, registry, enqueue),
-      ),
+      queueRequestedAuctionLotDetails(registry, enqueue),
     queueManualExternalSiteRun: (input: {
       site: ExternalSite;
       requestedById: number;
