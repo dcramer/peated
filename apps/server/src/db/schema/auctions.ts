@@ -15,7 +15,7 @@ import {
 } from "drizzle-orm/pg-core";
 import { bottleChecks } from "./bottleChecks";
 import { bottleReferences, bottles } from "./bottles";
-import { externalSites } from "./externalSites";
+import { externalSiteRuns, externalSites } from "./externalSites";
 import { users } from "./users";
 
 export const auctionLotStateEnum = pgEnum("auction_lot_state", [
@@ -85,6 +85,15 @@ export const auctionLots = pgTable(
       "source_bottle_identity",
     ).$type<BottleExtractedDetails>(),
     sourceFingerprint: text("source_fingerprint").notNull(),
+    sourceDetailsRequestedAt: timestamp("source_details_requested_at", {
+      withTimezone: true,
+    }),
+    sourceDetailsCheckedAt: timestamp("source_details_checked_at", {
+      withTimezone: true,
+    }),
+    sourceDetailsRunId: bigint("source_details_run_id", {
+      mode: "number",
+    }).references(() => externalSiteRuns.id),
     bottleId: bigint("bottle_id", { mode: "number" }).references(
       () => bottles.id,
     ),

@@ -1,5 +1,7 @@
 import { db, type AnyDatabase } from "@peated/server/db";
 import {
+  auctionLots,
+  auctions,
   externalReviewArticles,
   externalReviewBodies,
   externalReviews,
@@ -21,11 +23,13 @@ import {
   or,
 } from "drizzle-orm";
 import { z } from "zod";
+import { ScotchWhiskyAuctionDetailsCursorSchema } from "./adapters/scotchWhiskyAuctions";
 import { createPinnedScrapeSourceRun } from "./configured/runs";
 import { ScrapeSourceValidationError } from "./configured/service";
 import {
   findScraperSourceBySiteKey,
   requireEnabledScraperTargets,
+  ScraperTargetDisabledError,
 } from "./definitions";
 import type { ScraperRegistry } from "./types";
 
@@ -100,6 +104,7 @@ async function insertRun(
   trigger: RunTrigger,
   registry: ScraperRegistry,
   requestedById?: number,
+  initialCursor?: z.infer<typeof ScotchWhiskyAuctionDetailsCursorSchema>,
 ) {
   // Lifecycle holds the site lock. Reject active work before an insert can wait
   // on a completing run that needs that same site lock to finish.
@@ -115,6 +120,10 @@ async function insertRun(
   // Scraper lifecycle chooses the scraper. A migrated site's paused or
   // unfinished rules must never restart its old scraper.
   if (configuredSource || !source) {
+    if (initialCursor !== undefined)
+      throw new ScrapeSourceValidationError(
+        "Auction detail collection requires its built-in source.",
+      );
     const configured = await createPinnedScrapeSourceRun(connection, {
       externalSiteId: site.id,
       requestedById,
@@ -124,12 +133,19 @@ async function insertRun(
     return configured.run;
   }
   requireEnabledScraperTargets(registry, source);
-  let cursor = null;
+  let cursor =
+    initialCursor === undefined
+      ? null
+      : source.cursorSchema.parse(initialCursor);
   const restartForMissingReviewText =
     trigger === "manual" &&
     source.recordType === "review" &&
     (await hasReviewsWithoutSavedText(connection, site.id));
-  if (source.resumeFromLastRun && !restartForMissingReviewText) {
+  if (
+    initialCursor === undefined &&
+    source.resumeFromLastRun &&
+    !restartForMissingReviewText
+  ) {
     // Every checkpoint is a safe place to continue, so a failed run's progress
     // counts too.
     const [priorRun] = await connection
@@ -334,6 +350,107 @@ async function queueManualExternalSiteRun({
   return run;
 }
 
+async function queueAuctionDetailsRun(
+  siteId: number,
+  registry: ScraperRegistry,
+  enqueue: ScraperEnqueue,
+) {
+  const result = await db.transaction(async (tx) => {
+    // Auction detail dispatch uses the same site-first lock order and active run limit as collection.
+    const [site] = await tx
+      .select()
+      .from(externalSites)
+      .where(eq(externalSites.id, siteId))
+      .for("no key update");
+    if (!site || site.type !== "scotchwhiskyauctions") return null;
+    const pending = await tx
+      .select({ lot: auctionLots })
+      .from(auctionLots)
+      .innerJoin(auctions, eq(auctions.id, auctionLots.auctionId))
+      .where(
+        and(
+          eq(auctions.externalSiteId, site.id),
+          eq(auctionLots.matchStatus, "review"),
+          isNotNull(auctionLots.sourceDetailsRequestedAt),
+          isNull(auctionLots.sourceDetailsCheckedAt),
+          isNull(auctionLots.sourceDetailsRunId),
+          isNull(auctionLots.bottleId),
+        ),
+      )
+      .orderBy(asc(auctionLots.sourceDetailsRequestedAt), asc(auctionLots.id))
+      .limit(25)
+      .for("update", { of: auctionLots });
+    if (!pending.length) return null;
+    const cursor = ScotchWhiskyAuctionDetailsCursorSchema.parse({
+      kind: "details",
+      lotIndex: 0,
+      lots: pending.map(({ lot }) => ({
+        lotId: lot.id,
+        fingerprint: lot.sourceFingerprint,
+        expectedCheckId: lot.matchCheckId,
+        requestedAt: lot.sourceDetailsRequestedAt!.toISOString(),
+        url: lot.url,
+      })),
+    });
+    const run = await insertRun(
+      tx,
+      site,
+      "manual",
+      registry,
+      undefined,
+      cursor,
+    );
+    await tx
+      .update(auctionLots)
+      .set({ sourceDetailsRunId: run.id })
+      .where(
+        inArray(
+          auctionLots.id,
+          pending.map(({ lot }) => lot.id),
+        ),
+      );
+    return { site, run };
+  });
+  if (!result) return null;
+  // A failed run retains its lot pointers. Scheduler recovery must not create an endless series of new attempts.
+  await dispatchExternalSiteRun(result.run, result.site, enqueue, {
+    completeOnFailure: false,
+  });
+  return result.run;
+}
+
+async function dispatchRequestedAuctionDetails(
+  queue: (siteId: number) => Promise<ExternalSiteRun | null>,
+) {
+  const sites = await db
+    .selectDistinct({ siteId: auctions.externalSiteId })
+    .from(auctionLots)
+    .innerJoin(auctions, eq(auctions.id, auctionLots.auctionId))
+    .where(
+      and(
+        eq(auctionLots.matchStatus, "review"),
+        isNotNull(auctionLots.sourceDetailsRequestedAt),
+        isNull(auctionLots.sourceDetailsCheckedAt),
+        isNull(auctionLots.sourceDetailsRunId),
+      ),
+    )
+    .orderBy(asc(auctions.externalSiteId))
+    .limit(10);
+  for (const { siteId } of sites) {
+    try {
+      await queue(siteId);
+    } catch (error) {
+      if (
+        !(error instanceof ExternalSiteRunActiveError) &&
+        !(error instanceof ScraperTargetDisabledError) &&
+        !(error instanceof ScrapeSourceValidationError)
+      )
+        throw error;
+      // Scraper scheduler leaves requested work saved while a site is busy, paused, or using different rules.
+    }
+  }
+}
+
 async function queueScrapeSourcePreview({
   site,
   scrapeSourceId,
@@ -418,6 +535,12 @@ export function createScraperLifecycle({
   enqueue: ScraperEnqueue;
 }) {
   return {
+    queueAuctionDetailsRun: (siteId: number) =>
+      queueAuctionDetailsRun(siteId, registry, enqueue),
+    queueRequestedAuctionLotDetails: () =>
+      dispatchRequestedAuctionDetails((siteId) =>
+        queueAuctionDetailsRun(siteId, registry, enqueue),
+      ),
     queueManualExternalSiteRun: (input: {
       site: ExternalSite;
       requestedById: number;

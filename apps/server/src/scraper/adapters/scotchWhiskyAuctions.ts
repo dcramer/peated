@@ -1,37 +1,80 @@
 import {
+  AuctionLotDetailObservationSchema,
+  AuctionLotDetailRequestSchema,
   AuctionObservationSchema,
   AuctionSourceSchema,
   type AuctionObservation,
 } from "@peated/server/schemas/auctions";
 import { load } from "cheerio";
 import { z } from "zod";
+import { ScraperHttpStatusError } from "../http";
 import type { ScraperAdapter } from "../types";
+import { parseScotchWhiskyAuctionDetails } from "./scotchWhiskyAuctionDetails";
 
 const ORIGIN = "https://www.scotchwhiskyauctions.com";
+const IMAGE_ORIGIN = "https://d3suvtcq00dftb.cloudfront.net";
 const TARGET = "scotchwhiskyauctions";
-export const ScotchWhiskyAuctionsCursorSchema = z
+const IndexCursorSchema = z
   .object({
     auctions: z.array(AuctionSourceSchema).max(2),
     auctionIndex: z.number().int().nonnegative(),
     page: z.number().int().min(1).max(500),
   })
   .strict();
-export const ScotchWhiskyAuctionsObservationSchema = z
-  .array(AuctionObservationSchema)
-  .min(1)
-  .max(500);
+export const ScotchWhiskyAuctionDetailsCursorSchema = z
+  .object({
+    kind: z.literal("details"),
+    lots: z.array(AuctionLotDetailRequestSchema).min(1).max(25),
+    lotIndex: z.number().int().min(0).max(25),
+  })
+  .strict();
+export const ScotchWhiskyAuctionsCursorSchema = z.union([
+  IndexCursorSchema,
+  ScotchWhiskyAuctionDetailsCursorSchema,
+]);
+export const ScotchWhiskyAuctionsObservationSchema = z.union([
+  z.array(AuctionObservationSchema).min(1).max(500),
+  AuctionLotDetailObservationSchema,
+]);
+export type ScotchWhiskyAuctionsObservation = z.infer<
+  typeof ScotchWhiskyAuctionsObservationSchema
+>;
 type Cursor = z.infer<typeof ScotchWhiskyAuctionsCursorSchema>;
 
 function sourceUrl(path: string) {
   const url = new URL(path, ORIGIN);
   if (
     url.origin !== ORIGIN ||
+    url.username ||
+    url.password ||
     !/^\/auctions\/\d+-[^/]+\/(?:\d+-[^/]+\/)?$/.test(url.pathname)
   )
     throw new Error("Unexpected Scotch Whisky Auctions URL.");
   url.hash = "";
   url.search = "";
   return url;
+}
+
+function lotImageUrl(style: string | undefined) {
+  const path = style?.match(
+    /background-image\s*:\s*url\(\s*(?:'([^']+)'|"([^"]+)"|([^\s)]+))\s*\)/i,
+  );
+  const value = path?.[1] ?? path?.[2] ?? path?.[3];
+  if (!value) return undefined;
+  try {
+    const url = new URL(value, ORIGIN);
+    // The auction collector keeps published photo links for matching, not catalog image reuse.
+    if (
+      (url.origin === ORIGIN || url.origin === IMAGE_ORIGIN) &&
+      !url.username &&
+      !url.password
+    )
+      return url.toString();
+  } catch (error) {
+    if (!(error instanceof TypeError)) throw error;
+    // Missing or invalid optional photo links do not discard lot and price facts.
+  }
+  return undefined;
 }
 
 export function parseScotchWhiskyAuctionsIndex(html: string) {
@@ -58,7 +101,7 @@ export function parseScotchWhiskyAuctionPage(
   const $ = load(html);
   const heading = $("#lotswrap > h3").first().text().trim();
   const ended = /^Ended\b/i.test(heading);
-  const items: AuctionObservation[] = [];
+  const items: z.output<typeof AuctionObservationSchema>[] = [];
   for (const element of $("#lots a.lot").toArray()) {
     const tile = $(element);
     const name = tile.find("h4").text().trim();
@@ -103,6 +146,8 @@ export function parseScotchWhiskyAuctionPage(
       url: url.toString(),
       state,
     };
+    const imageUrl = lotImageUrl(tile.find(".aucimg").attr("style"));
+    if (imageUrl) lot.imageUrl = imageUrl;
     if (volume)
       lot.volume = Math.round(
         Number(volume[1]) *
@@ -154,8 +199,44 @@ export function parseScotchWhiskyAuctionPage(
 
 export const scotchWhiskyAuctionsAdapter: ScraperAdapter<
   Cursor,
-  AuctionObservation[]
+  ScotchWhiskyAuctionsObservation
 > = async ({ cursor, session }) => {
+  if (cursor && "kind" in cursor) {
+    let state = cursor;
+    while (state.lotIndex < state.lots.length) {
+      const request = state.lots[state.lotIndex];
+      const url = sourceUrl(request.url);
+      if (!/^\/auctions\/\d+-[^/]+\/\d+-[^/]+\/$/.test(url.pathname))
+        throw new Error("Auction detail URL must identify a lot.");
+      let facts: ReturnType<typeof parseScotchWhiskyAuctionDetails> | null =
+        null;
+      try {
+        const response = await session.request({ target: TARGET, url });
+        facts = parseScotchWhiskyAuctionDetails(response.body);
+      } catch (error) {
+        if (
+          !(error instanceof ScraperHttpStatusError) ||
+          ![404, 410].includes(error.status)
+        )
+          throw error;
+        // Auction collector treats removed pages as checked, not as a new sale or availability observation.
+      }
+      await session.emit({
+        sourceKey: `details:${request.lotId}:${request.fingerprint}`,
+        value: {
+          kind: "details",
+          request,
+          name: facts?.name ?? null,
+          sourceBottleIdentity: facts?.sourceBottleIdentity ?? null,
+          volume: facts?.volume ?? null,
+          checkedAt: new Date().toISOString(),
+        },
+      });
+      state = { ...state, lotIndex: state.lotIndex + 1 };
+      await session.checkpoint(state);
+    }
+    return;
+  }
   let state = cursor;
   if (!state) {
     const response = await session.request({

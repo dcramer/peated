@@ -115,7 +115,13 @@ conflict-free identity.
 Image extraction must read the whole visible label, including subtitles, neck
 tags, and smaller bands. It should omit unreadable facts instead of guessing.
 
-When the agent inspects a candidate Bottle, each of its public images is read
+Reference callers can set `readCandidateImages` to `false` to inspect catalog
+text, fields, references, and observations without fetching photos or loading
+saved label readings. The request records this choice. Omission keeps the
+existing photo-assisted behavior. This choice does not change source-image
+extraction or catalog audits.
+
+When candidate-photo reading is enabled, each public image is read
 once per extractor version and saved (`image_label_extraction`). Each upload
 gets a new file name, so an image URL always shows the same image and later
 inspections reuse the saved reading. A change to the

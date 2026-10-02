@@ -1,5 +1,10 @@
 import { db } from "@peated/server/db";
-import { auctionLots, bottleChecks } from "@peated/server/db/schema";
+import {
+  auctionLots,
+  auctions,
+  bottleChecks,
+  externalSites,
+} from "@peated/server/db/schema";
 import { auctionLotCheckKey } from "@peated/server/lib/auctionMatchEvidence";
 import { procedure } from "@peated/server/orpc";
 import { requireAdmin } from "@peated/server/orpc/middleware";
@@ -9,6 +14,7 @@ import { z } from "zod";
 
 const InputSchema = z
   .object({
+    refreshSourceDetails: z.boolean().default(false),
     lots: z
       .array(
         z
@@ -36,7 +42,7 @@ export default procedure
     path: "/auction-lots/recheck",
     summary: "Recheck imported auction lots",
     description:
-      "Recheck up to 100 unresolved lots with observed source, assignment, and saved-check versions. Reuse current evidence; skip matched or ignored lots. Requires an administrator.",
+      "Recheck up to 100 unresolved lots with observed source, assignment, and saved-check versions. Reuse current evidence or explicitly refresh Scotch Whisky Auctions detail facts; skip matched or ignored lots. Requires an administrator.",
     operationId: "recheckAuctionLots",
   })
   .input(InputSchema)
@@ -91,12 +97,46 @@ export default procedure
         }
         if (lot.matchStatus === "matched" || lot.matchStatus === "ignored")
           skipped.push(lot.id);
-        else queued.push({ lotId: lot.id, fingerprint: lot.sourceFingerprint });
+        else {
+          if (input.refreshSourceDetails) {
+            const [source] = await tx
+              .select({ type: externalSites.type })
+              .from(auctions)
+              .innerJoin(
+                externalSites,
+                eq(externalSites.id, auctions.externalSiteId),
+              )
+              .where(eq(auctions.id, lot.auctionId));
+            if (source?.type !== "scotchwhiskyauctions")
+              throw errors.BAD_REQUEST({
+                message:
+                  "Detail refresh is not supported for this auction source.",
+              });
+          }
+          queued.push({ lotId: lot.id, fingerprint: lot.sourceFingerprint });
+        }
       }
       if (queued.length)
         await tx
           .update(auctionLots)
-          .set({ matchStatus: "pending" })
+          .set(
+            input.refreshSourceDetails
+              ? {
+                  matchStatus: "review",
+                  sourceDetailsRequestedAt: new Date(
+                    Math.max(
+                      Date.now(),
+                      ...lots.map(
+                        (lot) =>
+                          (lot.sourceDetailsRequestedAt?.getTime() ?? 0) + 1,
+                      ),
+                    ),
+                  ),
+                  sourceDetailsCheckedAt: null,
+                  sourceDetailsRunId: null,
+                }
+              : { matchStatus: "pending" },
+          )
           .where(
             inArray(
               auctionLots.id,
@@ -105,8 +145,10 @@ export default procedure
           );
       return { queued, skipped };
     });
-    for (const args of result.queued)
-      await pushUniqueJob("ApplyAuctionLotMatch", args);
+    if (!input.refreshSourceDetails) {
+      for (const args of result.queued)
+        await pushUniqueJob("ApplyAuctionLotMatch", args);
+    }
     return {
       queued: result.queued.map(({ lotId }) => lotId),
       skipped: result.skipped,

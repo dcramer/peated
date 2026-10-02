@@ -225,6 +225,12 @@ export const ClassifyBottleReferenceInputSchema = z
     imageEvidence: ImageBottleEvidenceSchema.nullable().optional(),
     initialCandidates: z.array(BottleCandidateSchema).optional(),
     candidateExpansion: CandidateExpansionModeSchema.default("open"),
+    readCandidateImages: z
+      .boolean()
+      .default(true)
+      .describe(
+        "Read public candidate photos during catalog inspection. False keeps text and catalog facts only; omission preserves photo-assisted inspection.",
+      ),
   })
   .strict();
 
@@ -339,6 +345,7 @@ export type ClassifyBottleReferenceInput = {
   imageEvidence?: null | z.infer<typeof ImageBottleEvidenceSchema>;
   initialCandidates?: z.infer<typeof BottleCandidateSchema>[];
   candidateExpansion?: CandidateExpansionMode;
+  readCandidateImages?: boolean;
 };
 export type IgnoredBottleClassificationResult = z.infer<
   typeof IgnoredBottleClassificationResultSchema

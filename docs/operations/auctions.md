@@ -34,9 +34,9 @@ seconds apart. Collection follows the scraper's
    prices, and review Bottle matches before relying on public history. A closed
    auction must not produce live-lot alerts.
 
-The collector visits all pages of the two most recent auctions. The September
-2026 sample suggests roughly four hours per full run at this request limit;
-that estimate is not a measured production duration. Matching also queues work.
+The collector visits all pages of the two most recent auctions. The first
+completed production run on October 1, 2026 took 3 hours 51 minutes, made 458
+requests, and collected 8,965 one-Bottle lots. Matching also queues work.
 Do not trigger a full archive backfill as part of this rollout.
 
 ## Repeat collection
@@ -61,9 +61,42 @@ result history, and notification rules.
 
 ## Matching rollout
 
+The collector retains photo URLs already published on auction index pages. It
+does not guess larger image URLs. These links appear
+in the moderator-only lot response as `sourceImageUrl`, and in Source facts in
+the review workspace. They are not published as Peated bottle images.
+
+Auction matching uses the title or reviewed structured source facts for
+extraction. It saves `readCandidateImages: false` and skips automatic catalog-photo
+readings, including cached readings. Thumbnails do not replace the title or count
+as label evidence for automatic approval. The first pilot found incorrect numeric
+readings of otherwise correct catalog photos. Text-first inspection removes those
+readings from new runs; it does not relax conflict or review rules.
+Adding a photo link does not invalidate an accepted assignment or replace a
+saved check. This is review evidence, not a new Bottle identity.
+
+Existing checks keep their original input and evidence. Deploying text-first
+inspection does not erase them, rerun the backlog, or upgrade their decisions.
+The current recheck operation reuses saved evidence; it does not request a fresh
+classification merely because this policy changed.
+
 Deploy migration `0307` (the `auction_lot` decision-history enum value), the API,
 worker, and review UI together. Scheduling and existing assignments do not
 change during deployment.
+
+For detail fallback, apply migrations `0310` and `0311` before deploying the API
+and worker. They add requested/checked timestamps and a scraper-run pointer,
+without changing existing identities or assignments. New unresolved SWA checks
+request details automatically; the five-minute scraper scheduler dispatches
+at most 25 requested lots per run. Requests share the source's robots checks
+and rate limit with index collection. Failed runs retain their pointers rather
+than starting endless retries.
+
+A local live detail-run check on October 1, 2026 passed for the 157th and 183rd
+auction's Ardbeg cask 3771 lots, using the real registered scraper, robots rules,
+and request pacing. It verified cask, strength, volume, bottle count, and years
+without refreshing lot availability. This does not verify current live-auction
+availability or activate a production schedule.
 
 For a small pilot, choose up to 100 unresolved lots from
 `GET /auction-lots/match-queue`. Read each through `GET /auction-lots/{lot}` and
@@ -83,6 +116,17 @@ requests. Put their observed versions in a temporary JSON file:
   ]
 }
 ```
+
+For the detail-page pilot, add `"refreshSourceDetails": true` to this object
+and choose only a few unresolved Scotch Whisky Auctions lots. This requests
+fresh details even when a previous check or failed detail run exists. It skips
+matched and ignored lots. The scheduler waits for any active source run to
+finish before starting the bounded detail run; it does not scan auction indexes.
+Read each lot's `sourceDetailsRequestedAt`, `sourceDetailsCheckedAt`, and
+`sourceDetailsRunId` from the protected details response, then inspect that run
+through the source's run API. Verify extracted facts against its source link.
+Earlier checks stay saved. New facts can trigger a new match check, but a
+detail read never refreshes availability or replaces hammer-price history.
 
 The IDs above are examples. An administrator submits the real file with
 `pnpm cli api post /auction-lots/recheck --input PATH`. A stale batch queues
@@ -105,4 +149,7 @@ Stop the pilot by not submitting more lots. For rollback, pause the default and
 models queues while deploying the previous API, worker, and UI together. Keep
 migration `0307` and all saved records. Correct confirmed errors through lot
 assignment or the reference-correction API, not SQL or evidence deletion. This release does not add
-detail collection, automatic Bottle creation, global reprocessing, or scheduling.
+automatic Bottle creation, global reprocessing, or an auction-index schedule.
+Detail fallback runs only for newly requested unresolved lots. To stop all source
+requests, disable the target and deploy both processes; a null index schedule
+alone does not stop requested detail work.

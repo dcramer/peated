@@ -1,8 +1,10 @@
-import type { AuctionObservation } from "@peated/server/schemas/auctions";
 import { vi } from "vitest";
 import type { z } from "zod";
 import type { ScraperSession } from "../types";
-import type { ScotchWhiskyAuctionsCursorSchema } from "./scotchWhiskyAuctions";
+import type {
+  ScotchWhiskyAuctionsCursorSchema,
+  ScotchWhiskyAuctionsObservation,
+} from "./scotchWhiskyAuctions";
 import {
   parseScotchWhiskyAuctionPage,
   parseScotchWhiskyAuctionsIndex,
@@ -48,6 +50,44 @@ test("an ended auction or bid alone does not prove a sale", () => {
   expect(parsed.items[0].lot.result).toBeUndefined();
 });
 
+test("retains the exact published photo link without inventing a larger image URL", () => {
+  const imageUrl =
+    "https://d3suvtcq00dftb.cloudfront.net/images/3245b62843e278810e3789a39f58a216-med.jpg";
+  const html = page("Sold for £240").replace(
+    "<h4>",
+    `<div class="aucimg hasretina" style="background-image: url('${imageUrl}');" rel="orig224"></div><h4>`,
+  );
+  expect(
+    parseScotchWhiskyAuctionPage(html, auction).items[0].lot,
+  ).toMatchObject({
+    imageUrl,
+    result: { amount: 24000 },
+  });
+  expect(
+    parseScotchWhiskyAuctionPage(
+      html.replace(imageUrl, "/images/example-med.jpg"),
+      auction,
+    ).items[0].lot.imageUrl,
+  ).toBe("https://www.scotchwhiskyauctions.com/images/example-med.jpg");
+});
+
+test.each([
+  "",
+  "background-image: none;",
+  "background-image: url('https://example.com/other-site.jpg');",
+  "background-image: url('javascript:alert(1)');",
+  "background-image: url('http://d3suvtcq00dftb.cloudfront.net/image.jpg');",
+  "background-image: url('https://user:password@d3suvtcq00dftb.cloudfront.net/image.jpg');",
+])("ignores missing or unsupported photo links: %s", (style) => {
+  const html = page("Sold for £240").replace(
+    "<h4>",
+    `<div class="aucimg" style="${style}"></div><h4>`,
+  );
+  const lot = parseScotchWhiskyAuctionPage(html, auction).items[0].lot;
+  expect(lot.imageUrl).toBeUndefined();
+  expect(lot.result?.amount).toBe(24000);
+});
+
 test("an explicitly open auction includes lots with no bid yet", () => {
   const parsed = parseScotchWhiskyAuctionPage(
     page("", "Ends October 10, 2026"),
@@ -88,7 +128,7 @@ test("pagination remains complete and resumes without replaying discovery", asyn
     .fn<
       ScraperSession<
         z.infer<typeof ScotchWhiskyAuctionsCursorSchema>,
-        AuctionObservation[]
+        ScotchWhiskyAuctionsObservation
       >["request"]
     >()
     .mockResolvedValueOnce({
@@ -109,7 +149,7 @@ test("pagination remains complete and resumes without replaying discovery", asyn
     });
   const session: ScraperSession<
     z.infer<typeof ScotchWhiskyAuctionsCursorSchema>,
-    AuctionObservation[]
+    ScotchWhiskyAuctionsObservation
   > = {
     request,
     emit,

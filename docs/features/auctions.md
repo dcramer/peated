@@ -55,6 +55,29 @@ retrieved, active candidate, supporting evidence must justify the match, and
 populated facts must not conflict. Missing evidence or unresolved risks require
 review. Exact-reference classifier shortcuts keep their reference dependency.
 
+Auction classification sets `readCandidateImages: false` in its saved request.
+It uses the listing title, supplied structured source facts, catalog fields,
+references, observations, and bounded source research. It does not automatically
+read catalog photos or load their saved label readings. Published thumbnails
+remain moderator review links, not extraction inputs. Missing batch or cask
+evidence still requires review; a generic candidate's photo cannot fill that gap.
+
+When a Scotch Whisky Auctions lot remains unresolved, matching requests one
+detail-page check for that source identity. The scraper scheduler batches at
+most 25 requested lots per run, using the same robots rules, 30-second spacing,
+and saved progress as index collection. It reads explicit cask numbers, strength,
+volume, distillation and bottling years, cask-strength wording, and bottle counts.
+An individual bottle number is not a release identifier. Descriptions and price
+graphs are not saved. Removed pages and pages without useful facts stay in review.
+
+Detail facts never refresh availability or change prices. Changed facts produce
+a new matching fingerprint and check; earlier checks and results stay saved.
+Pinned fingerprints, check IDs, request times, and source URLs reject stale work.
+Assignments made while a page is being read remain intact. A saved run pointer
+lets normal scraper recovery resume interrupted work and prevents terminal
+failures from silently starting more runs. Existing review lots are not requested
+on deployment.
+
 Moderators review unresolved lots, including ended lots, in the Inbox. Protected
 lot details and saved-run APIs provide source facts and evidence. The UI sends
 the observed fingerprint, previous Bottle ID, and check ID. "Assign this lot"
@@ -75,7 +98,10 @@ matched and ignored lots are skipped. Workers reuse references and saved checks
 on the default queue through `ApplyAuctionLotMatch`, so this work does not wait
 behind new classifications. Only missing checks queue `ResolveAuctionLot` on
 the models queue. Dispatch failures leave pending work that can be submitted
-again. Rechecks do not collect auctions or crawl detail pages.
+again. Rechecks do not collect auction indexes. Setting `refreshSourceDetails`
+explicitly requests fresh Scotch Whisky Auctions details instead of applying
+the old check. This also retries a terminally failed detail run for the selected
+unresolved lots. The same batch versions and administrator access are required.
 
 Auction matching never creates Bottles, edits catalog facts, or automatically
 accepts new references. Creation proposals need separate catalog review; ignored
@@ -124,8 +150,8 @@ refresh capacity.
 The dated [source audit](../research/2026-09-30-whisky-auction-sources.md) records
 the checked public evidence and limits.
 
-The initial adapter does not infer precise closing times from a date-only
-heading, fetch detail-page condition or identity facts, or implement prioritized
+The adapter does not infer precise closing times from a date-only
+heading, fetch detail-page condition descriptions, or implement prioritized
 hourly watched-lot checks. Full repeat runs reconcile the recent window;
 late corrections beyond that window require an explicitly scoped collection.
 Choose a repeat interval within the 6-hour freshness window only after

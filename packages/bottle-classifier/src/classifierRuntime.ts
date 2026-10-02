@@ -266,6 +266,7 @@ export type RunBottleClassifierAgentInput = {
   imageEvidence?: ImageBottleEvidence | null;
   initialCandidates?: BottleCandidate[];
   candidateExpansion?: CandidateExpansionMode;
+  readCandidateImages?: boolean;
   searchEvidence?: BottleSearchEvidence[];
   resolvedEntities?: EntityResolution[];
   identityAnchor?: BottleClassificationDecision | null;
@@ -595,6 +596,7 @@ export async function prepareBottleClassifierAgentRun(
     imageEvidence,
     initialCandidates = [],
     candidateExpansion = "open",
+    readCandidateImages = true,
     searchEvidence = [],
     resolvedEntities = [],
     identityAnchor = null,
@@ -653,6 +655,7 @@ export async function prepareBottleClassifierAgentRun(
   const instructions = buildBottleClassifierInstructions();
   const tools = createBottleCheckTools({
     allowCandidateExpansion,
+    readCandidateImages,
     dataSource,
     options,
     proposalCollector: null,
@@ -1241,6 +1244,7 @@ export function createBottleClassifier(
     imageEvidence,
     initialCandidates = [],
     candidateExpansion = "open",
+    readCandidateImages = true,
     searchEvidence = [],
     resolvedEntities = [],
     identityAnchor = null,
@@ -1260,6 +1264,7 @@ export function createBottleClassifier(
         imageEvidence,
         initialCandidates,
         candidateExpansion,
+        readCandidateImages,
         searchEvidence,
         resolvedEntities,
         identityAnchor,
@@ -1293,6 +1298,7 @@ export function createBottleClassifier(
       extractedIdentity,
       imageEvidence,
       candidateExpansion,
+      readCandidateImages,
       searchEvidence,
       resolvedEntities,
       identityAnchor,
@@ -1516,6 +1522,7 @@ export function createBottleClassifier(
         imageEvidence: artifacts.imageEvidence,
         initialCandidates: artifacts.candidates,
         candidateExpansion: parsedInput.candidateExpansion,
+        readCandidateImages: parsedInput.readCandidateImages,
         searchEvidence: artifacts.searchEvidence,
         resolvedEntities: artifacts.resolvedEntities,
         identityAnchor: preparedEvidence.deterministicDecision,

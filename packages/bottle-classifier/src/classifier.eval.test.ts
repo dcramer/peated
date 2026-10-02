@@ -389,6 +389,15 @@ function evaluateDecisionContract(
   const expected = testCase.expected;
   const failures: string[] = [];
 
+  if (
+    testCase.input.readCandidateImages === false &&
+    result.artifacts.bottleContexts.some(
+      (context) => context.publicImages.length > 0,
+    )
+  ) {
+    failures.push("text-only candidate inspection returned image evidence");
+  }
+
   if (result.status !== expected.status) {
     failures.push(
       `status expected ${expected.status} but got ${result.status}`,

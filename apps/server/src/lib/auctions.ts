@@ -1,4 +1,7 @@
-import type { BottleExtractedDetails } from "@peated/bottle-classifier/contract";
+import {
+  BottleExtractedDetailsSchema,
+  type BottleExtractedDetails,
+} from "@peated/bottle-classifier/contract";
 import { getBottleFieldConflicts } from "@peated/bottle-classifier/fieldConflicts";
 import { normalizeBottleReferenceKey } from "@peated/bottle-classifier/normalize";
 import { db } from "@peated/server/db";
@@ -18,7 +21,9 @@ import {
   type BottleCheck,
 } from "@peated/server/db/schema";
 import {
+  AuctionLotDetailObservationSchema,
   AuctionObservationSchema,
+  type AuctionLotDetailObservation,
   type AuctionObservation,
 } from "@peated/server/schemas/auctions";
 import { and, desc, eq, lte, sql } from "drizzle-orm";
@@ -93,6 +98,87 @@ function identityFingerprint(
       ]),
     )
     .digest("hex");
+}
+
+/** Auction evidence enrichment never refreshes availability, prices, or an intervening assignment. */
+export async function saveAuctionLotDetails(
+  externalSiteId: number,
+  raw: AuctionLotDetailObservation,
+) {
+  const input = AuctionLotDetailObservationSchema.parse(raw);
+  const checkedAt = new Date(input.checkedAt);
+  if (checkedAt.getTime() > Date.now() + 60_000)
+    throw new Error("Auction detail observation is in the future.");
+  return db.transaction(async (tx) => {
+    const [lot] = await tx
+      .select()
+      .from(auctionLots)
+      .where(eq(auctionLots.id, input.request.lotId))
+      .for("update");
+    if (!lot) return null;
+    const auction = await tx.query.auctions.findFirst({
+      where: eq(auctions.id, lot.auctionId),
+    });
+    if (!auction || auction.externalSiteId !== externalSiteId) return null;
+    // Auction detail replay recovers a lost matching dispatch after facts committed but before checkpointing.
+    if (
+      lot.sourceDetailsCheckedAt &&
+      lot.matchStatus === "pending" &&
+      lot.bottleId === null &&
+      lot.url === input.request.url &&
+      lot.sourceDetailsRequestedAt?.toISOString() === input.request.requestedAt
+    )
+      return lot;
+    if (
+      lot.sourceFingerprint !== input.request.fingerprint ||
+      lot.url !== input.request.url ||
+      lot.matchCheckId !== input.request.expectedCheckId ||
+      lot.matchStatus !== "review" ||
+      lot.bottleId !== null ||
+      !lot.sourceDetailsRequestedAt ||
+      lot.sourceDetailsCheckedAt ||
+      lot.sourceDetailsRequestedAt.toISOString() !==
+        input.request.requestedAt ||
+      checkedAt < lot.sourceDetailsRequestedAt
+    )
+      return null;
+    const sameTitle =
+      input.name !== null &&
+      normalizeBottleReferenceKey(input.name) ===
+        normalizeBottleReferenceKey(lot.name);
+    const facts =
+      sameTitle && input.sourceBottleIdentity
+        ? {
+            ...lot.sourceBottleIdentity,
+            ...Object.fromEntries(
+              Object.entries(input.sourceBottleIdentity).filter(
+                ([, value]) => value != null,
+              ),
+            ),
+          }
+        : lot.sourceBottleIdentity;
+    const identity = {
+      name: lot.name,
+      volume: sameTitle ? (input.volume ?? lot.volume) : lot.volume,
+      sourceBottleIdentity: facts
+        ? BottleExtractedDetailsSchema.parse(facts)
+        : null,
+    };
+    const fingerprint = identityFingerprint(identity);
+    const changed = fingerprint !== lot.sourceFingerprint;
+    const [saved] = await tx
+      .update(auctionLots)
+      .set({
+        ...identity,
+        sourceDetailsCheckedAt: checkedAt,
+        sourceFingerprint: fingerprint,
+        matchStatus: changed ? "pending" : lot.matchStatus,
+        matchCheckId: changed ? null : lot.matchCheckId,
+      })
+      .where(eq(auctionLots.id, lot.id))
+      .returning();
+    return saved ?? null;
+  });
 }
 
 /** Auction ingestion owns occurrence identity; missing optional facts do not erase evidence. */
@@ -220,6 +306,9 @@ export async function upsertAuctionObservation(
       lastCheckedAt: observedAt,
     };
     if (changed) {
+      values.sourceDetailsRequestedAt = null;
+      values.sourceDetailsCheckedAt = null;
+      values.sourceDetailsRunId = null;
       values.bottleId = null;
       values.matchStatus = "pending";
       values.matchCheckId = null;

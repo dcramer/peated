@@ -65,6 +65,10 @@ Auction collection follows the [auction model and activation limits](../../../..
 Scotch Whisky Auctions is enabled for manual runs, with no automatic schedule.
 Follow the [auction rollout procedure](../../../../docs/operations/auctions.md)
 after deploying the API and worker.
+Unresolved auction matches can request detail facts without starting an index
+scan. The scheduler batches at most 25 requested lots into a saved detail run
+using the same target. A failed detail run stays linked to its lots; an admin
+must explicitly retry those lots through the version-checked recheck API.
 
 ## Registering a source
 

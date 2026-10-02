@@ -36,6 +36,10 @@ export default procedure
         matchCheckId: z.number().nullable(),
         matchStatus: z.enum(["pending", "review", "matched", "ignored"]),
         sourceBottleIdentity: BottleExtractedDetailsSchema.nullable(),
+        sourceImageUrl: z.url().nullable(),
+        sourceDetailsRequestedAt: z.iso.datetime().nullable(),
+        sourceDetailsCheckedAt: z.iso.datetime().nullable(),
+        sourceDetailsRunId: z.number().nullable(),
         currentBottle: BottleSchema.nullable(),
         suggestedBottle: BottleSchema.nullable(),
         decision: BottleClassificationDecisionSchema.nullable(),
@@ -79,6 +83,11 @@ export default procedure
       matchCheckId: lot.matchCheckId,
       matchStatus: lot.matchStatus,
       sourceBottleIdentity: lot.sourceBottleIdentity,
+      sourceImageUrl: lot.imageUrl,
+      sourceDetailsRequestedAt:
+        lot.sourceDetailsRequestedAt?.toISOString() ?? null,
+      sourceDetailsCheckedAt: lot.sourceDetailsCheckedAt?.toISOString() ?? null,
+      sourceDetailsRunId: lot.sourceDetailsRunId,
       currentBottle: current
         ? await serialize(BottleSerializer, current, context.user)
         : null,

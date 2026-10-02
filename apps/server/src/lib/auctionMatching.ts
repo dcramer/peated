@@ -8,6 +8,7 @@ import {
   bottleChecks,
   bottles,
 } from "@peated/server/db/schema";
+import { requestAuctionLotDetails } from "@peated/server/scraper";
 import { and, eq, isNull } from "drizzle-orm";
 import {
   assessAuctionMatch,
@@ -100,12 +101,15 @@ async function resolveAuctionLotMatch(
     });
     if (!auction) throw new Error("Auction lot has no auction.");
     const input: ClassifyBottleReferenceInput = {
+      // Auction matching owns text-first inspection: automatic label readings are not source facts.
+      readCandidateImages: false,
       reference: {
         id: lot.id,
         externalSiteId: auction.externalSiteId,
         name: lot.name,
         url: lot.url,
-        imageUrl: lot.imageUrl,
+        // Auction matching owns this limit: source thumbnails are review links, not label evidence.
+        imageUrl: null,
         currentBottleId: null,
       },
     };
@@ -176,5 +180,6 @@ async function resolveAuctionLotMatch(
         isNull(auctionLots.bottleId),
       ),
     );
+  await requestAuctionLotDetails(lotId, fingerprint);
   return true;
 }

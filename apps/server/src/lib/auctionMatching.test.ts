@@ -153,6 +153,7 @@ test("unresolved classifier output remains reviewable and repeat-safe", async ({
       sourceKey: "1",
       name: "Unknown whisky",
       url: "https://example.com/lot",
+      imageUrl: "https://example.com/thumbnail.jpg",
       state: "closed",
     },
     observedAt: new Date().toISOString(),
@@ -180,6 +181,14 @@ test("unresolved classifier output remains reviewable and repeat-safe", async ({
       },
     });
   await resolveAuctionLot(lot.id, lot.sourceFingerprint);
+  expect(run).toHaveBeenCalledWith({
+    readCandidateImages: false,
+    reference: expect.objectContaining({
+      id: lot.id,
+      name: "Unknown whisky",
+      imageUrl: null,
+    }),
+  });
   expect(await db.query.auctionLots.findFirst()).toMatchObject({
     bottleId: null,
     matchStatus: "review",
@@ -191,6 +200,11 @@ test("unresolved classifier output remains reviewable and repeat-safe", async ({
   await resolveAuctionLot(lot.id, lot.sourceFingerprint);
   expect(run).toHaveBeenCalledTimes(1);
   expect(await db.query.bottleChecks.findMany()).toHaveLength(1);
+  expect(
+    (await db.query.bottleChecks.findFirst())?.inputSnapshot,
+  ).toMatchObject({
+    readCandidateImages: false,
+  });
 });
 
 test("ignored classifier output stays ignored after a retry", async ({
