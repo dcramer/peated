@@ -42,7 +42,7 @@ async function resolveAuctionLotMatch(
   fingerprint: string,
   allowClassification: boolean,
 ) {
-  const lot = await db.query.auctionLots.findFirst({
+  let lot = await db.query.auctionLots.findFirst({
     where: eq(auctionLots.id, lotId),
   });
   if (
@@ -106,6 +106,16 @@ async function resolveAuctionLotMatch(
       where: eq(auctions.id, lot.auctionId),
     });
     if (!auction) throw new Error("Auction lot has no auction.");
+    // Auction matching skips work changed during preflight; the final save still guards changes during the model call.
+    lot = await db.query.auctionLots.findFirst({
+      where: and(
+        eq(auctionLots.id, lotId),
+        eq(auctionLots.sourceFingerprint, fingerprint),
+        eq(auctionLots.matchStatus, "pending"),
+        isNull(auctionLots.bottleId),
+      ),
+    });
+    if (!lot) return true;
     const input: ClassifyBottleReferenceInput = {
       // Auction matching owns text-first inspection: automatic label readings are not source facts.
       readCandidateImages: false,

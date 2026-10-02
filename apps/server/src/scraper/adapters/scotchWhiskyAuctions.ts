@@ -97,9 +97,11 @@ export function parseScotchWhiskyAuctionsIndex(
         const heading = $(element).find("h5").text().trim();
         return {
           element,
-          date: /^Ended\b/i.test(heading)
-            ? parseDate(heading.replace(/^Ended\s+/i, ""))
-            : null,
+          // SWA discovery requires a published year; generic date parsing can infer one from a partial date.
+          date:
+            /^Ended\b/i.test(heading) && /\b\d{4}\b/.test(heading)
+              ? parseDate(heading.replace(/^Ended\s+/i, ""))
+              : null,
         };
       })
       .filter(({ date }) => date !== null)

@@ -14,6 +14,7 @@ import {
   bottles,
   type AuctionLot,
 } from "@peated/server/db/schema";
+import * as scraper from "@peated/server/scraper";
 import { eq } from "drizzle-orm";
 import { afterEach, vi } from "vitest";
 import applyAuctionLotMatchJob from "../worker/jobs/applyAuctionLotMatch";
@@ -543,6 +544,55 @@ test("saved-match jobs reject unowned payload fields before making changes", asy
   expect(run).not.toHaveBeenCalled();
   expect(pushUniqueJob).not.toHaveBeenCalled();
 });
+
+test.for(["changed", "review", "matched"] as const)(
+  "a lot changed to %s while requesting details does not start stale classification",
+  async (change, { fixtures }) => {
+    const site = await fixtures.ExternalSite({ type: "scotchwhiskyauctions" });
+    const lot = await importedLot(site.id);
+    const bottle = await fixtures.Bottle();
+    const mod = await fixtures.User({ mod: true });
+    const run = vi
+      .spyOn(classifier, "runScrapedBottleReference")
+      .mockResolvedValue({
+        result: await matchResult(bottle.id),
+        modelMetadata: null,
+      });
+    vi.spyOn(scraper, "requestAuctionLotDetails").mockImplementation(
+      async () => {
+        if (change === "matched") {
+          await assignAuctionLot({
+            lotId: lot.id,
+            bottleId: bottle.id,
+            fingerprint: lot.sourceFingerprint,
+            expectedBottleId: null,
+            userId: mod.id,
+          });
+        } else {
+          await db
+            .update(auctionLots)
+            .set(
+              change === "changed"
+                ? { sourceFingerprint: "changed" }
+                : { matchStatus: "review" },
+            )
+            .where(eq(auctionLots.id, lot.id));
+        }
+        return false;
+      },
+    );
+    await resolveAuctionLot(lot.id, lot.sourceFingerprint);
+    expect(run).not.toHaveBeenCalled();
+    expect(await db.query.bottleChecks.findMany()).toHaveLength(0);
+    expect(await db.query.auctionLots.findFirst()).toMatchObject(
+      change === "changed"
+        ? { sourceFingerprint: "changed", matchCheckId: null }
+        : change === "matched"
+          ? { bottleId: bottle.id, matchedById: mod.id, matchStatus: "matched" }
+          : { matchStatus: "review", matchCheckId: null },
+    );
+  },
+);
 
 test("a source identity change during classification cannot apply the old decision", async ({
   fixtures,

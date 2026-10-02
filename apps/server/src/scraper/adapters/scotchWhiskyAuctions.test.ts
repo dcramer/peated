@@ -129,6 +129,18 @@ test("scheduled discovery follows open headings rather than link position", () =
   ).toEqual(["233"]);
   expect(() =>
     parseScotchWhiskyAuctionsIndex(
+      html.replace("Ends October", "Ended October").replaceAll(", 2026", ""),
+      "current",
+    ),
+  ).toThrow(/recognized auction states/);
+  expect(() =>
+    parseScotchWhiskyAuctionsIndex(
+      '<div class="auctions"><a class="auction" href="/auctions/232-the-183rd-auction/"><h4>The 183rd Auction</h4><h5>Ended 7th June</h5></a></div>',
+      "current",
+    ),
+  ).toThrow(/recognized auction states/);
+  expect(() =>
+    parseScotchWhiskyAuctionsIndex(
       html.replace(/<h5>.*?<\/h5>/g, ""),
       "current",
     ),
