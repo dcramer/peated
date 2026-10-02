@@ -1,7 +1,4 @@
-import {
-  BottleExtractedDetailsSchema,
-  type BottleExtractedDetails,
-} from "@peated/bottle-classifier/contract";
+import { BottleExtractedDetailsSchema } from "@peated/bottle-classifier/contract";
 import { getBottleFieldConflicts } from "@peated/bottle-classifier/fieldConflicts";
 import { normalizeBottleReferenceKey } from "@peated/bottle-classifier/normalize";
 import { db } from "@peated/server/db";
@@ -17,7 +14,6 @@ import {
   notifications,
   users,
   type AuctionLot,
-  type Bottle,
   type BottleCheck,
 } from "@peated/server/db/schema";
 import {
@@ -41,33 +37,18 @@ import {
   finalizeBottleReferenceAssignment,
   type BottleReferenceAssignmentResult,
 } from "./bottleReferences";
-import { recordIncomingBottleDecisionInTransaction } from "./incomingBottleDecisionLog";
+import { buildClassifierBottleInput } from "./classifierDecisionCreateInputs";
+import {
+  createOrReuseBottleInTransaction,
+  finalizeCreatedBottle,
+} from "./createBottle";
+import {
+  recordIncomingBottleDecisionInTransaction,
+  type IncomingBottleDecisionMetadata,
+} from "./incomingBottleDecisionLog";
 import { resolveActiveBottleIds } from "./resolveActiveBottleIds";
 
 export const AUCTION_FRESHNESS_MS = 6 * 60 * 60_000;
-
-/** Auction matching rejects direct conflicts in populated fields, never free-text similarity. */
-export function hasAuctionIdentityConflict(
-  facts: BottleExtractedDetails | null,
-  bottle: Bottle,
-) {
-  if (!facts) return false;
-  return (
-    getBottleFieldConflicts(facts, bottle).length > 0 ||
-    (facts.cask_number != null &&
-      bottle.caskNumber != null &&
-      facts.cask_number !== bottle.caskNumber) ||
-    (facts.bottling_year != null &&
-      bottle.bottlingYear != null &&
-      facts.bottling_year !== bottle.bottlingYear) ||
-    (facts.release_month != null &&
-      bottle.releaseMonth != null &&
-      facts.release_month !== bottle.releaseMonth) ||
-    (facts.release_day != null &&
-      bottle.releaseDay != null &&
-      facts.release_day !== bottle.releaseDay)
-  );
-}
 
 export function auctionAvailability(
   lot: Pick<AuctionLot, "state" | "endsAt" | "lastCheckedAt">,
@@ -398,9 +379,9 @@ export async function assignAuctionLot({
   automatic = false,
   rememberReference = false,
   expectedCheckId,
+  createBottle,
 }: {
   lotId: number;
-  bottleId: number;
   fingerprint: string;
   expectedBottleId: number | null;
   userId?: number;
@@ -409,7 +390,10 @@ export async function assignAuctionLot({
   automatic?: boolean;
   rememberReference?: boolean;
   expectedCheckId?: number | null;
-}) {
+} & (
+  | { bottleId: number; createBottle?: never }
+  | { bottleId?: never; createBottle: true; automatic: true; checkId: number }
+)) {
   const result = await db.transaction(async (tx) => {
     if (userId !== undefined) {
       const user = await tx.query.users.findFirst({
@@ -420,13 +404,53 @@ export async function assignAuctionLot({
     }
     if (rememberReference && (userId === undefined || expectedCheckId == null))
       throw new AuctionLotMatchChangedError();
-    await resolveActiveBottleIds(tx, [bottleId], {
-      lock: rememberReference ? "update" : "share",
-    });
     const actor =
       userId === undefined
         ? await getPeatedSystemActorForDatabase(tx)
         : await getUserActorByIdForDatabase(tx, userId);
+    let creation: Awaited<
+      ReturnType<typeof createOrReuseBottleInTransaction>
+    > | null = null;
+    if (createBottle) {
+      if (!automatic || checkId === undefined || userId !== undefined)
+        throw new AuctionLotMatchChangedError();
+      const snapshot = await tx.query.auctionLots.findFirst({
+        where: eq(auctionLots.id, lotId),
+      });
+      const savedCheck = await tx.query.bottleChecks.findFirst({
+        where: eq(bottleChecks.id, checkId),
+      });
+      const evidence =
+        snapshot && readAuctionMatchEvidence(snapshot, savedCheck);
+      if (
+        !snapshot ||
+        snapshot.sourceFingerprint !== fingerprint ||
+        snapshot.bottleId !== null ||
+        expectedBottleId !== null ||
+        snapshot.matchStatus !== "pending" ||
+        snapshot.matchCheckId !== checkId ||
+        !savedCheck ||
+        evidence?.output.status !== "classified" ||
+        evidence.output.decision.action !== "create_bottle" ||
+        !assessAuctionMatch(snapshot, savedCheck)?.automationEligible ||
+        referenceName ||
+        rememberReference
+      )
+        throw new AuctionLotMatchChangedError();
+      // Auction matching creates before locking the lot: all assignment paths lock Bottle first.
+      creation = await createOrReuseBottleInTransaction(tx, {
+        creationSource: "bottle_classifier",
+        createdByActorId: actor.id,
+        input: buildClassifierBottleInput(
+          evidence.output.decision.proposedBottle,
+        ),
+      });
+      bottleId = creation.bottle.id;
+    }
+    if (bottleId === undefined) throw new AuctionLotMatchChangedError();
+    await resolveActiveBottleIds(tx, [bottleId], {
+      lock: rememberReference ? "update" : "share",
+    });
     let remembered: BottleReferenceAssignmentResult | null = null;
     let check: BottleCheck | undefined;
     if (rememberReference) {
@@ -512,7 +536,10 @@ export async function assignAuctionLot({
       const assessment = check && assessAuctionMatch(lot, check);
       if (
         !assessment?.automationEligible ||
-        assessment.bottleId !== bottleId ||
+        (createBottle
+          ? evidence?.output.status !== "classified" ||
+            evidence.output.decision.action !== "create_bottle"
+          : assessment.bottleId !== bottleId) ||
         (assessment.referenceName ?? undefined) !== referenceName
       )
         throw new AuctionLotMatchChangedError();
@@ -523,7 +550,7 @@ export async function assignAuctionLot({
       });
       if (
         !bottle ||
-        hasAuctionIdentityConflict(lot.sourceBottleIdentity, bottle)
+        getBottleFieldConflicts(lot.sourceBottleIdentity, bottle).length > 0
       )
         throw new AuctionLotMatchChangedError();
     }
@@ -550,32 +577,39 @@ export async function assignAuctionLot({
         where: eq(auctions.id, lot.auctionId),
       });
       if (!auction) throw new Error("Auction lot has no auction.");
+      const metadata: IncomingBottleDecisionMetadata = {
+        resolutionSource: userId === undefined ? "automatic" : "moderator",
+        matchingBasis: reference
+          ? "accepted_reference"
+          : "classifier_or_review",
+        referenceScope: rememberReference ? "global_alias" : "none",
+        classifierEvidence: check ? { checkId: check.id } : null,
+      };
+      if (creation) metadata.reusedExistingBottle = !creation.createResult;
       await recordIncomingBottleDecisionInTransaction(tx, {
         sourceKind: "auction_lot",
         sourceId: lot.id,
         externalSiteId: auction.externalSiteId,
         name: lot.name,
         url: lot.url,
-        decision: "match",
+        decision: creation?.createResult ? "create_bottle" : "match",
         actor,
         bottleId,
+        createdBottle: creation?.createResult != null,
         model: check?.model ?? null,
         rationale:
           evidence?.output.status === "classified"
             ? evidence.output.decision.rationale
             : null,
-        metadata: {
-          resolutionSource: userId === undefined ? "automatic" : "moderator",
-          matchingBasis: reference
-            ? "accepted_reference"
-            : "classifier_or_review",
-          referenceScope: rememberReference ? "global_alias" : "none",
-          classifierEvidence: check ? { checkId: check.id } : null,
-        },
+        metadata,
       });
     }
-    return { lot: updated, remembered };
+    return { lot: updated, remembered, creation };
   });
+  if (result.creation?.createResult)
+    await finalizeCreatedBottle(result.creation.createResult, {
+      creationSource: "bottle_classifier",
+    });
   // Auction matching owns assignments, not catalog images, even when remembering a name.
   if (result.remembered)
     await finalizeBottleReferenceAssignment({

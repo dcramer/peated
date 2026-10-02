@@ -58,6 +58,7 @@ function buildClassification(
       identityScope: "product",
       observation: null,
       referenceScope: "global_alias",
+      confidenceBasis: { webEvidence: "supportive", unresolvedRisks: [] },
       ...decision,
     },
     artifacts: {

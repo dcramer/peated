@@ -75,9 +75,11 @@ Bottle classifier may propose a match or creation, while server code owns:
 
 Existing-Bottle matches may use strong local evidence without web research.
 An exact reference produces a deterministic Match without a classifier model call.
-Creation requires the classifier's complete `create_bottle` proposal and the
-approved automation result. Otherwise the flow falls back to search or manual
-creation.
+Matches and creation use `assessBottleResolution`, the same server assessment
+as prices, auctions, and reviews. Creation requires the classifier's complete
+`create_bottle` proposal and supporting evidence. Otherwise the flow falls back
+to search or manual creation. Photo confirmation, signed tokens, and upload
+ownership remain photo-specific permissions, not different identity rules.
 
 ## Pending Images
 

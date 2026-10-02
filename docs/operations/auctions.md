@@ -97,7 +97,9 @@ The IDs are examples. An administrator submits the real file with
 `pnpm cli api post /auction-lots/recheck --input PATH`. A changed lot rejects
 the whole batch. Matched and ignored lots are skipped. Default rechecks reuse
 current references and saved checks; missing evidence may need a model call.
-They do not scan auction indexes or create Bottles.
+They do not scan auction indexes. A supported saved creation proposal can create
+or safely reuse a Bottle through the shared resolution rules, in the same
+transaction as its lot assignment. Unsupported proposals stay in review.
 
 To read fresh details or retry a failed detail run, select a few unresolved
 Scotch Whisky Auctions lots and add `"refreshSourceDetails": true`. The scheduler

@@ -1,3 +1,4 @@
+import { BottleExtractedDetailsSchema } from "@peated/bottle-classifier/contract";
 import {
   findExactReferenceBottleCandidate,
   resolveExactReferenceBottleRun,
@@ -142,5 +143,23 @@ describe("findExactReferenceBottleCandidate", () => {
     await expect(
       findExactReferenceBottleCandidate("No Stored Bottle Reference"),
     ).resolves.toBeNull();
+  });
+
+  test("does not skip classification when facts contradict an accepted name", async ({
+    fixtures,
+  }) => {
+    const bottle = await fixtures.Bottle({
+      name: "Single Cask",
+      caskNumber: "123",
+      abv: 46,
+    });
+    expect(
+      await resolveExactReferenceBottleRun({
+        reference: { name: bottle.fullName },
+        extractedIdentity: BottleExtractedDetailsSchema.parse({
+          cask_number: "124",
+        }),
+      }),
+    ).toBeNull();
   });
 });

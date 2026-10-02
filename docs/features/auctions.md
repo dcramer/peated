@@ -1,7 +1,7 @@
 # Whisky auctions
 
 Auction listings belong to a sale occurrence, not a physical bottle. Peated
-links each supported single-bottle lot to one existing Bottle. The same release
+links each supported single-bottle lot to one Bottle. The same release
 can have several simultaneous lots or return in a later auction without
 overwriting history. Sets and multipacks are outside the initial scope.
 
@@ -51,7 +51,7 @@ not a sale time. Missing prices and dates remain null.
 The collector queues unresolved lots through `ResolveAuctionLot`. Matching first
 reuses an exact accepted Bottle reference unless source facts conflict. Otherwise
 it saves the classifier decision as a Bottle check. A match can apply automatically
-under the same evidence rules as store prices: the chosen Bottle must be a
+under the shared Bottle-resolution rules used by prices, reviews, and photos: the chosen Bottle must be a
 retrieved, active candidate, supporting evidence must justify the match, and
 populated facts must not conflict. Missing evidence or unresolved risks require
 review. Exact-reference classifier shortcuts keep their reference dependency.
@@ -111,9 +111,12 @@ instead of applying
 the old check. This also retries a terminally failed detail run for the selected
 unresolved lots. The same batch versions and administrator access are required.
 
-Auction matching never creates Bottles, edits catalog facts, or automatically
-accepts new references. Creation proposals need separate catalog review; ignored
-classifications stay out of the Inbox.
+An evidence-backed creation proposal uses the same canonical Bottle creation
+as other sources. Creation and lot assignment commit together; an exact duplicate
+may reuse its existing Bottle. The saved check and attributed decision remain
+in history. Unsupported proposals stay in review. Auction matching never edits
+existing catalog facts, copies source images, or automatically accepts new
+references. Ignored classifications stay out of the Inbox.
 
 Bottle merges move lots, alert references, and watches to the replacement Bottle;
 duplicate member watches collapse, preserving the earlier subscription time.

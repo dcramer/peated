@@ -1,4 +1,5 @@
 import { BottleExtractedDetailsSchema } from "@peated/bottle-classifier/contract";
+import { getBottleFieldConflicts } from "@peated/bottle-classifier/fieldConflicts";
 import { db } from "@peated/server/db";
 import {
   auctionAlerts,
@@ -16,7 +17,6 @@ import {
   assignAuctionLot,
   auctionAvailability,
   AuctionLotMatchChangedError,
-  hasAuctionIdentityConflict,
   notifyAuctionLot,
   upsertAuctionObservation,
 } from "./auctions";
@@ -247,26 +247,26 @@ test("conflicting cask and bottling fields cannot reuse a reference", async ({
     bottlingYear: 2020,
   });
   expect(
-    hasAuctionIdentityConflict(
+    getBottleFieldConflicts(
       BottleExtractedDetailsSchema.parse({ cask_number: "124" }),
       bottle,
     ),
-  ).toBe(true);
+  ).toEqual(["caskNumber"]);
   expect(
-    hasAuctionIdentityConflict(
+    getBottleFieldConflicts(
       BottleExtractedDetailsSchema.parse({ bottling_year: 2021 }),
       bottle,
     ),
-  ).toBe(true);
+  ).toEqual(["bottlingYear"]);
   expect(
-    hasAuctionIdentityConflict(
+    getBottleFieldConflicts(
       BottleExtractedDetailsSchema.parse({
         cask_number: "123",
         bottling_year: 2020,
       }),
       bottle,
     ),
-  ).toBe(false);
+  ).toEqual([]);
 });
 
 test("an auction deadline bounds a lot unless the source explicitly extends the lot", async ({

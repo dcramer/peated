@@ -23,6 +23,7 @@ import {
 } from "@peated/server/lib/createBottle";
 import { logTelemetryError } from "@peated/server/lib/log";
 import { eq } from "drizzle-orm";
+import { assessBottleResolution } from "./bottleMatchingAutomation";
 import {
   assertExpectedReviewIdentity,
   assignBottleReferenceInTransaction,
@@ -257,6 +258,7 @@ type ResolveBottleReferenceTargetInput = {
   reference: BottleReferenceInput;
   referenceLookupNames?: string[];
   createdByActorId: number;
+  allowReplacement?: boolean;
 };
 
 async function resolveBottleReferenceTargetWithClassifier(
@@ -264,6 +266,7 @@ async function resolveBottleReferenceTargetWithClassifier(
     reference,
     referenceLookupNames = [],
     createdByActorId,
+    allowReplacement,
   }: ResolveBottleReferenceTargetInput,
   classify: typeof classifyBottleReference,
 ): Promise<BottleReferenceResolution> {
@@ -337,14 +340,24 @@ async function resolveBottleReferenceTargetWithClassifier(
       classification.decision,
     );
 
-    if (classification.decision.action === "match") {
-      const bottleId = classification.decision.matchedBottleId;
+    if (
+      classification.decision.action === "no_match" ||
+      !assessBottleResolution({
+        decision: classification.decision,
+        candidates: classification.artifacts.candidates,
+        currentBottleId: reference.currentBottleId ?? null,
+        allowReplacement,
+        sourceBottleIdentity:
+          classification.artifacts.extractedIdentitySource === "image"
+            ? classification.artifacts.extractedIdentity
+            : null,
+        readListingImage:
+          classification.artifacts.extractedIdentitySource === "image",
+      }).automationEligible
+    ) {
       return {
-        assignment: {
-          kind: "direct_bottle",
-          bottleId,
-        },
-        source: "classifier_match",
+        assignment: null,
+        source: "unresolved",
         error: null,
         confidence: decisionConfidence,
         model: config.BOTTLE_CLASSIFIER_MODEL,
@@ -355,10 +368,14 @@ async function resolveBottleReferenceTargetWithClassifier(
       };
     }
 
-    if (classification.decision.action === "no_match") {
+    if (classification.decision.action === "match") {
+      const bottleId = classification.decision.matchedBottleId;
       return {
-        assignment: null,
-        source: "unresolved",
+        assignment: {
+          kind: "direct_bottle",
+          bottleId,
+        },
+        source: "classifier_match",
         error: null,
         confidence: decisionConfidence,
         model: config.BOTTLE_CLASSIFIER_MODEL,

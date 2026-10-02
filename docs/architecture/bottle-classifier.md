@@ -179,7 +179,7 @@ tier.
 When a matched candidate's populated typed field contradicts the extracted
 facts, code adds a conflict risk and the Match goes to review
 (`getBottleFieldConflicts`). The typed fields are category, age, ABV, vintage
-year, release year, the cask-strength and single-cask flags, and edition. Code
+year, bottling year, release date, cask number, the cask-strength and single-cask flags, and edition. Code
 never turns that Match into No Match, and it never compares Brands, names, or
 other free text; the agent owns those judgments.
 

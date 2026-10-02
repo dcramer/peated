@@ -70,4 +70,33 @@ describe("getBottleFieldConflicts", () => {
   test("has nothing to compare without facts", () => {
     expect(getBottleFieldConflicts(null, bottle)).toEqual([]);
   });
+
+  test("checks cask and date facts for every caller without inventing missing values", () => {
+    const target = {
+      ...bottle,
+      caskNumber: "123",
+      bottlingYear: 2020,
+      releaseMonth: 9,
+      releaseDay: 1,
+    };
+    expect(getBottleFieldConflicts(facts, target)).toEqual([]);
+    expect(
+      getBottleFieldConflicts(
+        {
+          ...facts,
+          cask_number: "124",
+          bottling_year: 2021,
+          release_month: 10,
+          release_day: 2,
+        },
+        target,
+      ),
+    ).toEqual(["caskNumber", "bottlingYear", "releaseMonth", "releaseDay"]);
+    expect(
+      getBottleFieldConflicts(
+        { ...facts, cask_number: "123", bottling_year: 2020 },
+        target,
+      ),
+    ).toEqual([]);
+  });
 });

@@ -19,7 +19,10 @@ import { eq } from "drizzle-orm";
 import { afterEach, vi } from "vitest";
 import applyAuctionLotMatchJob from "../worker/jobs/applyAuctionLotMatch";
 import { auctionLotCheckKey } from "./auctionMatchEvidence";
-import { resolveAuctionLot } from "./auctionMatching";
+import {
+  applySavedAuctionLotMatch,
+  resolveAuctionLot,
+} from "./auctionMatching";
 import { assignAuctionLot, upsertAuctionObservation } from "./auctions";
 import { createBottleCheck } from "./bottleChecks";
 import { getBottleCandidateById } from "./bottleReferenceCandidates";
@@ -294,11 +297,12 @@ test("a supported saved match applies without a model call or new reference", as
   expect(await db.query.auctionAlerts.findMany()).toHaveLength(0);
 });
 
-test("a saved creation proposal stays in review without catalog writes", async ({
+test("a supported saved creation uses canonical creation and keeps its decision history", async ({
   fixtures,
 }) => {
   const site = await fixtures.ExternalSite({ type: "masterofmalt" });
   const lot = await importedLot(site.id);
+  const brand = await fixtures.Entity({ name: "Example", kind: "brand" });
   const before = await db.query.bottles.findMany();
   const result = createDecidedBottleClassification({
     decision: {
@@ -312,8 +316,8 @@ test("a saved creation proposal stays in review without catalog writes", async (
       observation: null,
       proposedBottle: {
         name: "12 Year Old",
-        brand: { id: null, name: "Example" },
-        distillers: [{ id: null, name: "Example" }],
+        brand: { id: brand.id, name: brand.name },
+        distillers: [],
         bottler: null,
         series: null,
         category: "single_malt",
@@ -331,20 +335,153 @@ test("a saved creation proposal stays in review without catalog writes", async (
     },
     artifacts: {},
   });
-  await saveMatch(lot, result);
+  const check = await saveMatch(lot, result);
   const run = vi.spyOn(classifier, "runScrapedBottleReference");
   await applyAuctionLotMatchJob({
     lotId: lot.id,
     fingerprint: lot.sourceFingerprint,
   });
   expect(run).not.toHaveBeenCalled();
-  expect(await db.query.auctionLots.findFirst()).toMatchObject({
-    bottleId: null,
-    matchStatus: "review",
+  const saved = await db.query.auctionLots.findFirst();
+  expect(saved).toMatchObject({
+    bottleId: expect.any(Number),
+    matchStatus: "matched",
+    matchCheckId: check.id,
+    matchedReferenceId: null,
   });
-  expect(await db.query.bottles.findMany()).toEqual(before);
-  expect(await db.query.incomingBottleDecisionLogs.findMany()).toHaveLength(0);
+  expect(await db.query.bottles.findMany()).toHaveLength(before.length + 1);
+  const bottle = await db.query.bottles.findFirst({
+    where: eq(bottles.id, saved!.bottleId!),
+  });
+  expect(bottle).toMatchObject({
+    name: "12-year-old",
+    groupId: expect.any(Number),
+    brandId: brand.id,
+    statedAge: 12,
+    abv: 46,
+  });
+  expect(
+    await db.query.bottleReferences.findFirst({
+      where: eq(bottleReferences.name, normalizeBottleReferenceKey(lot.name)),
+    }),
+  ).toBeUndefined();
+  expect(await db.query.incomingBottleDecisionLogs.findMany()).toMatchObject([
+    {
+      decision: "create_bottle",
+      bottleId: bottle!.id,
+      createdBottle: true,
+      metadata: { classifierEvidence: { checkId: check.id } },
+    },
+  ]);
+  await applySavedAuctionLotMatch(lot.id, lot.sourceFingerprint);
+  expect(await db.query.bottles.findMany()).toHaveLength(before.length + 1);
+  expect(await db.query.incomingBottleDecisionLogs.findMany()).toHaveLength(1);
 });
+
+test.for(["unsupported", "reuse", "concurrent", "stale", "changed check"])(
+  "creation is safe when %s",
+  async (scenario, { fixtures }) => {
+    const site = await fixtures.ExternalSite({ type: "masterofmalt" });
+    const brand = await fixtures.Entity({ name: "Example", kind: "brand" });
+    const lot = await importedLot(site.id);
+    const result = createDecidedBottleClassification({
+      decision: {
+        action: "create_bottle",
+        matchedBottleId: null,
+        candidateBottleIds: [],
+        identityScope: "product",
+        referenceScope: "none",
+        rationale: "A missing marketed release.",
+        observation: null,
+        confidenceBasis: {
+          webEvidence: scenario === "unsupported" ? "not_used" : "supportive",
+          unresolvedRisks: [],
+        },
+        proposedBottle: {
+          name: "12-year-old",
+          brand: { id: brand.id, name: brand.name },
+          distillers: [],
+          bottler: null,
+          series: null,
+          category: "single_malt",
+          statedAge: 12,
+          abv: 46,
+          edition: null,
+          caskStrength: null,
+          singleCask: null,
+          vintageYear: null,
+          releaseYear: null,
+          maturation: null,
+          caskNumber: null,
+          outturn: null,
+        },
+      },
+      artifacts: {},
+    });
+    const existing =
+      scenario === "reuse"
+        ? await fixtures.Bottle({
+            name: "12-year-old",
+            brandId: brand.id,
+            category: "single_malt",
+            statedAge: 12,
+            abv: 46,
+          })
+        : null;
+    const check = await saveMatch(lot, result);
+    if (scenario === "stale" || scenario === "changed check") {
+      if (scenario === "stale")
+        await db
+          .update(auctionLots)
+          .set({ sourceFingerprint: "changed" })
+          .where(eq(auctionLots.id, lot.id));
+      else
+        await db
+          .update(auctionLots)
+          .set({ matchCheckId: check.id })
+          .where(eq(auctionLots.id, lot.id));
+      await expect(
+        assignAuctionLot({
+          lotId: lot.id,
+          fingerprint: lot.sourceFingerprint,
+          expectedBottleId: null,
+          createBottle: true,
+          checkId: check.id,
+          automatic: true,
+          expectedCheckId:
+            scenario === "changed check" ? check.id + 1 : undefined,
+        }),
+      ).rejects.toThrow("Auction lot identity or assignment changed");
+    } else {
+      await Promise.all(
+        Array.from({ length: scenario === "concurrent" ? 2 : 1 }, () =>
+          applySavedAuctionLotMatch(lot.id, lot.sourceFingerprint),
+        ),
+      );
+    }
+    const saved = await db.query.auctionLots.findFirst();
+    const shouldApply = scenario === "reuse" || scenario === "concurrent";
+    expect(saved).toMatchObject({
+      bottleId: shouldApply ? (existing?.id ?? expect.any(Number)) : null,
+      matchStatus: shouldApply
+        ? "matched"
+        : scenario === "unsupported"
+          ? "review"
+          : "pending",
+    });
+    expect(await db.query.bottles.findMany()).toHaveLength(shouldApply ? 1 : 0);
+    expect(await db.query.bottleGroups.findMany()).toHaveLength(
+      shouldApply ? 1 : 0,
+    );
+    const logs = await db.query.incomingBottleDecisionLogs.findMany();
+    expect(logs).toHaveLength(shouldApply ? 1 : 0);
+    if (shouldApply)
+      expect(logs[0]).toMatchObject({
+        decision: existing ? "match" : "create_bottle",
+        createdBottle: !existing,
+      });
+  },
+);
 
 test("unsupported saved check schemas stay in review rather than calling the model again", async ({
   fixtures,

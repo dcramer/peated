@@ -34,6 +34,7 @@ import {
 } from "@peated/server/db/schema";
 import { getPeatedSystemActor } from "@peated/server/lib/actors";
 import { createBottleCheck } from "@peated/server/lib/bottleChecks";
+import { assessBottleResolution } from "@peated/server/lib/bottleMatchingAutomation";
 import {
   assignBottleReferenceInTransaction,
   fillMissingBottleImage,
@@ -56,10 +57,6 @@ import { logError, logInfo } from "@peated/server/lib/log";
 import { normalizeBottleReferenceKey } from "@peated/server/lib/normalize";
 import { isModelServiceUnavailable } from "@peated/server/lib/openaiClient";
 import {
-  assessStorePriceMatch,
-  type StorePriceMatchAutomationAssessment,
-} from "@peated/server/lib/priceMatchingAutomation";
-import {
   hasActiveStorePriceMatchProposalProcessingLease,
   refreshStorePriceMatchProposalProcessingLease,
   releaseStorePriceMatchProposalProcessingLease,
@@ -73,7 +70,10 @@ import { resolveActiveBottleIds } from "@peated/server/lib/resolveActiveBottleId
 import { resolveStorePriceBottleMatchInTransaction } from "@peated/server/lib/storePriceBottleMatching";
 import { currentStorePriceCondition } from "@peated/server/lib/storePriceValidity";
 import { getAutomationModeratorUser } from "@peated/server/lib/systemUser";
-import type { PriceMatchSearchEvidenceSchema } from "@peated/server/schemas";
+import type {
+  PriceMatchSearchEvidenceSchema,
+  StorePriceMatchAutomationAssessment,
+} from "@peated/server/schemas";
 import {
   ProposedBottleSchema,
   StorePriceMatchDecisionSchema,
@@ -1186,19 +1186,13 @@ export function createStorePriceMatchResolver({
         price,
         decision: classification.decision,
       });
-      const confidenceBasis = classification.decision.confidenceBasis;
-      const automationAssessment = assessStorePriceMatch({
-        action: decision.action,
-        price,
-        suggestedBottleId: decision.suggestedBottleId,
+      const automationAssessment = assessBottleResolution({
+        decision: classification.decision,
+        currentBottleId: price.bottleId,
         candidates,
-        proposedBottle: decision.proposedBottle,
-        identityScope: decision.identityScope,
         sourceBottleIdentity: price.sourceBottleIdentity
           ? BottleExtractedDetailsSchema.parse(price.sourceBottleIdentity)
           : null,
-        hasUnresolvedRisks: (confidenceBasis?.unresolvedRisks.length ?? 0) > 0,
-        webEvidence: confidenceBasis?.webEvidence ?? null,
         readListingImage:
           classification.artifacts.extractedIdentitySource === "image",
       });
