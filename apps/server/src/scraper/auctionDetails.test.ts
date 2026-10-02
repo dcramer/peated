@@ -420,7 +420,7 @@ test("detail requests preserve assignments made while fetching and reject anothe
   ).toMatchObject({ volume: null, matchStatus: "review" });
 });
 
-test("replaying saved detail facts recovers a failed matching dispatch without changing facts again", async ({
+test("detail replay recovers matching dispatch but cannot reuse a changed listing's request", async ({
   fixtures,
 }) => {
   const site = await fixtures.ExternalSite({ type: "scotchwhiskyauctions" });
@@ -459,6 +459,82 @@ test("replaying saved detail facts recovers a failed matching dispatch without c
     fingerprint: saved.sourceFingerprint,
   });
   expect(await db.query.auctionLotResults.findMany()).toHaveLength(1);
+
+  await db
+    .update(externalSiteRuns)
+    .set({ status: "succeeded", completedAt: new Date() })
+    .where(eq(externalSiteRuns.id, run.id));
+  expect(await requestAuctionLotDetails(lot.id, saved.sourceFingerprint)).toBe(
+    false,
+  );
+  expect(await lifecycle.queueAuctionDetailsRun(site.id)).toBeNull();
+  expect(await db.query.auctionLots.findFirst()).toEqual(saved);
+
+  const { lot: changed } = await upsertAuctionObservation(site.id, {
+    auction: {
+      sourceKey: "232",
+      name: "The 183rd auction",
+      url: "https://www.scotchwhiskyauctions.com/auctions/232-the-183rd-auction/",
+    },
+    lot: {
+      sourceKey: lot.sourceKey,
+      name: "Ardbeg 2009 14 Year Old Single Cask #3918 Feis Ile 2025",
+      url: lot.url,
+      state: "closed",
+    },
+    observedAt: new Date().toISOString(),
+  });
+  expect(changed.sourceFingerprint).not.toBe(saved.sourceFingerprint);
+  expect(changed).toMatchObject({
+    sourceDetailsRequestedAt: null,
+    sourceDetailsCheckedAt: null,
+    sourceDetailsRunId: null,
+    sourceBottleIdentity: null,
+  });
+  expect(
+    await requestAuctionLotDetails(lot.id, changed.sourceFingerprint),
+  ).toBe(true);
+  const requested = (await db.query.auctionLots.findFirst())!;
+  expect(requested.sourceDetailsRequestedAt?.toISOString()).not.toBe(
+    request.requestedAt,
+  );
+  expect(await saveAuctionLotDetails(site.id, observation.value)).toBeNull();
+  const dispatchCount = pushUniqueJob.mock.calls.length;
+  await auctionSink({ externalSiteId: site.id, observation });
+  expect(pushUniqueJob).toHaveBeenCalledTimes(dispatchCount);
+  expect(await db.query.auctionLots.findFirst()).toEqual(requested);
+  expect(await db.query.auctionLotResults.findMany()).toHaveLength(1);
+
+  const next = (await lifecycle.queueAuctionDetailsRun(site.id))!;
+  expect(next.id).not.toBe(run.id);
+  const nextRequests = ScotchWhiskyAuctionDetailsCursorSchema.parse(
+    next.cursor,
+  ).lots;
+  expect(nextRequests).toEqual([
+    {
+      lotId: lot.id,
+      fingerprint: changed.sourceFingerprint,
+      expectedCheckId: null,
+      requestedAt: requested.sourceDetailsRequestedAt!.toISOString(),
+      url: lot.url,
+    },
+  ]);
+  const refreshed = await saveAuctionLotDetails(site.id, {
+    ...observation.value,
+    request: nextRequests[0],
+    name: changed.name,
+    sourceBottleIdentity: null,
+    checkedAt: new Date().toISOString(),
+  });
+  expect(refreshed).toMatchObject({
+    matchStatus: "pending",
+    sourceDetailsRunId: next.id,
+  });
+  expect(refreshed?.sourceDetailsCheckedAt).not.toBeNull();
+  expect(await saveAuctionLotDetails(site.id, observation.value)).toBeNull();
+  await auctionSink({ externalSiteId: site.id, observation });
+  expect(pushUniqueJob).toHaveBeenCalledTimes(dispatchCount);
+  expect(await db.query.auctionLots.findFirst()).toEqual(refreshed);
 });
 
 test("explicit detail retry is admin-only, versioned, and invalidates an earlier in-flight request", async ({

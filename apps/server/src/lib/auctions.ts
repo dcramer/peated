@@ -120,7 +120,8 @@ export async function saveAuctionLotDetails(
       where: eq(auctions.id, lot.auctionId),
     });
     if (!auction || auction.externalSiteId !== externalSiteId) return null;
-    // Auction detail replay recovers a lost matching dispatch after facts committed but before checkpointing.
+    // Auction detail replay uses the request time: saving facts changes the fingerprint.
+    // Listing changes and explicit retries invalidate that request. Replay only queues matching again.
     if (
       lot.sourceDetailsCheckedAt &&
       lot.matchStatus === "pending" &&
