@@ -1,2 +1,0 @@
-ALTER TABLE "auction_lot" ADD COLUMN "source_details_run_id" bigint;
-ALTER TABLE "auction_lot" ADD CONSTRAINT "auction_lot_source_details_run_id_external_site_run_id_fk" FOREIGN KEY ("source_details_run_id") REFERENCES "public"."external_site_run"("id") ON DELETE no action ON UPDATE no action;

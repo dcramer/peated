@@ -8,11 +8,11 @@ seconds apart. Collection follows the scraper's
 
 ## Deploying this change
 
-Apply generated migrations `0310`–`0312` with the API and worker deployment.
-They add detail-request tracking and remove the duplicate `last_seen_at` column.
+Apply generated migration `0310_auction_details` with the API and worker deployment.
+It adds detail-request tracking and removes the duplicate `last_seen_at` column.
 The retained `last_checked_at` stores the same listing-check time.
 
-Stop old API and worker processes before applying the migrations. Start the
+Stop old API and worker processes before applying the migration. Start the
 updated worker before the API accepts requests; it must know the
 `ApplyAuctionLotMatch` job. Do not run old code against the removed column.
 Deployment preserves saved checks, assignments, results, and the source schedule.

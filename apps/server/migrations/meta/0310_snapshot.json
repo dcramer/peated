@@ -1,5 +1,5 @@
 {
-  "id": "829e95fa-0bf2-4d4f-b243-4096933ac3b2",
+  "id": "17545d83-6e04-457c-9197-d3cbe0d0a3dd",
   "prevId": "2883c22b-abe6-4564-93af-a86195bc0f3c",
   "version": "7",
   "dialect": "postgresql",
@@ -448,6 +448,12 @@
           "primaryKey": false,
           "notNull": false
         },
+        "source_details_run_id": {
+          "name": "source_details_run_id",
+          "type": "bigint",
+          "primaryKey": false,
+          "notNull": false
+        },
         "bottle_id": {
           "name": "bottle_id",
           "type": "bigint",
@@ -520,12 +526,6 @@
         },
         "first_seen_at": {
           "name": "first_seen_at",
-          "type": "timestamp with time zone",
-          "primaryKey": false,
-          "notNull": true
-        },
-        "last_seen_at": {
-          "name": "last_seen_at",
           "type": "timestamp with time zone",
           "primaryKey": false,
           "notNull": true
@@ -603,6 +603,19 @@
           "tableTo": "auction",
           "columnsFrom": [
             "auction_id"
+          ],
+          "columnsTo": [
+            "id"
+          ],
+          "onDelete": "no action",
+          "onUpdate": "no action"
+        },
+        "auction_lot_source_details_run_id_external_site_run_id_fk": {
+          "name": "auction_lot_source_details_run_id_external_site_run_id_fk",
+          "tableFrom": "auction_lot",
+          "tableTo": "external_site_run",
+          "columnsFrom": [
+            "source_details_run_id"
           ],
           "columnsTo": [
             "id"
@@ -12434,7 +12447,8 @@
       "values": [
         "collect",
         "preview",
-        "suggest"
+        "suggest",
+        "details"
       ]
     },
     "public.follow_status": {
