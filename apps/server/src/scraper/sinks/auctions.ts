@@ -17,7 +17,7 @@ export const auctionSink: ScraperSink<
         lotId: lot.id,
         fingerprint: lot.sourceFingerprint,
       });
-    return { newItemCount: 0, existingItemCount: 1 };
+    return { newItemCount: 0, existingItemCount: lot ? 1 : 0 };
   }
   let newItemCount = 0;
   for (const item of observation.value) {

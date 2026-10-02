@@ -120,12 +120,10 @@ export async function saveAuctionLotDetails(
       where: eq(auctions.id, lot.auctionId),
     });
     if (!auction || auction.externalSiteId !== externalSiteId) return null;
-    // Auction detail replay uses the request time: saving facts changes the fingerprint.
-    // Listing changes and explicit retries invalidate that request. Replay only queues matching again.
+    // Auction details acknowledge the same completed request even after matching finishes.
+    // Saving facts changes the fingerprint; listing changes and explicit retries invalidate the request.
     if (
       lot.sourceDetailsCheckedAt &&
-      lot.matchStatus === "pending" &&
-      lot.bottleId === null &&
       lot.url === input.request.url &&
       lot.sourceDetailsRequestedAt?.toISOString() === input.request.requestedAt
     )
@@ -305,10 +303,13 @@ export async function upsertAuctionObservation(
           : input.lot.bidCurrency,
       lastCheckedAt: observedAt,
     };
-    if (changed) {
+    // Auction detail requests are pinned to their URL as well as the bottle facts.
+    if (existing && (changed || existing.url !== input.lot.url)) {
       values.sourceDetailsRequestedAt = null;
       values.sourceDetailsCheckedAt = null;
       values.sourceDetailsRunId = null;
+    }
+    if (changed) {
       values.bottleId = null;
       values.matchStatus = "pending";
       values.matchCheckId = null;

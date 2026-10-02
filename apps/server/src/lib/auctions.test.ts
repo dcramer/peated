@@ -74,7 +74,7 @@ test("a relisting in another auction is a separate occurrence", async ({
   expect(await db.query.auctionLots.findMany()).toHaveLength(2);
 });
 
-test("a photo link does not reset an accepted assignment or duplicate its result", async ({
+test("photo and listing links do not reset an accepted assignment or duplicate its result", async ({
   fixtures,
 }) => {
   const site = await fixtures.ExternalSite();
@@ -111,8 +111,21 @@ test("a photo link does not reset an accepted assignment or duplicate its result
     sourceFingerprint: lot.sourceFingerprint,
     imageUrl,
   });
-  const repeated = await upsertAuctionObservation(site.id, observation(facts));
+  const repeated = await upsertAuctionObservation(
+    site.id,
+    observation({
+      ...facts,
+      url: "https://example.com/auction-1/corrected-lot-1",
+    }),
+  );
   expect(repeated.lot.imageUrl).toBe(imageUrl);
+  expect(repeated.lot).toMatchObject({
+    id: lot.id,
+    bottleId: bottle.id,
+    matchStatus: "matched",
+    matchedAt: updated.lot.matchedAt,
+    sourceFingerprint: lot.sourceFingerprint,
+  });
   expect(await db.query.auctionLotResults.findMany()).toHaveLength(1);
   expect(await db.query.incomingBottleDecisionLogs.findMany()).toHaveLength(1);
 });

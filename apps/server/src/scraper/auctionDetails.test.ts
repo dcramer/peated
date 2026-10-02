@@ -90,6 +90,136 @@ async function requestReview(lot: AuctionLot) {
 
 afterEach(() => vi.restoreAllMocks());
 
+test.for(["pending", "review", "matched", "ignored"] as const)(
+  "a completed detail read is counted on replay in %s without rewriting the lot",
+  async (status, { fixtures }) => {
+    const site = await fixtures.ExternalSite({ type: "scotchwhiskyauctions" });
+    const lot = await importedLot(site.id);
+    await requestReview(lot);
+    const lifecycle = createScraperLifecycle({
+      registry: scraperRegistry,
+      enqueue: async () => undefined,
+    });
+    const run = (await lifecycle.queueAuctionDetailsRun(site.id))!;
+    const request = ScotchWhiskyAuctionDetailsCursorSchema.parse(run.cursor)
+      .lots[0];
+    const observation = {
+      sourceKey: `details:${lot.id}:${lot.sourceFingerprint}`,
+      value: {
+        kind: "details" as const,
+        request,
+        ...parseScotchWhiskyAuctionDetails(detailHtml),
+        checkedAt: new Date().toISOString(),
+      },
+    };
+    const saved = (await saveAuctionLotDetails(site.id, observation.value))!;
+    if (status === "matched") {
+      const bottle = await fixtures.Bottle({
+        abv: 59,
+        caskNumber: "3771",
+        outturn: 633,
+        bottlingYear: 2023,
+      });
+      await assignAuctionLot({
+        lotId: lot.id,
+        fingerprint: saved.sourceFingerprint,
+        bottleId: bottle.id,
+        expectedBottleId: null,
+      });
+    } else if (status !== "pending")
+      await db
+        .update(auctionLots)
+        .set({ matchStatus: status })
+        .where(eq(auctionLots.id, lot.id));
+    const current = (await db.query.auctionLots.findFirst())!;
+    expect(await auctionSink({ externalSiteId: site.id, observation })).toEqual(
+      {
+        newItemCount: 0,
+        existingItemCount: 1,
+      },
+    );
+    expect(await db.query.auctionLots.findFirst()).toEqual(current);
+    expect(await db.query.auctionLotResults.findMany()).toHaveLength(1);
+    if (status === "pending")
+      expect(pushUniqueJob).toHaveBeenCalledWith("ApplyAuctionLotMatch", {
+        lotId: lot.id,
+        fingerprint: saved.sourceFingerprint,
+      });
+    else expect(pushUniqueJob).not.toHaveBeenCalled();
+  },
+);
+
+test("a listing URL change allows fresh details without changing the lot identity", async ({
+  fixtures,
+}) => {
+  const site = await fixtures.ExternalSite({ type: "scotchwhiskyauctions" });
+  const lot = await importedLot(site.id);
+  await requestReview(lot);
+  const lifecycle = createScraperLifecycle({
+    registry: scraperRegistry,
+    enqueue: async () => undefined,
+  });
+  const run = (await lifecycle.queueAuctionDetailsRun(site.id))!;
+  const request = ScotchWhiskyAuctionDetailsCursorSchema.parse(run.cursor)
+    .lots[0];
+  const newUrl = lot.url.replace(/\/$/, "-corrected/");
+  const { lot: updated } = await upsertAuctionObservation(site.id, {
+    auction: {
+      sourceKey: "232",
+      name: "The 183rd auction",
+      url: "https://www.scotchwhiskyauctions.com/auctions/232-the-183rd-auction/",
+    },
+    lot: {
+      sourceKey: lot.sourceKey,
+      name: lot.name,
+      url: newUrl,
+      state: "closed",
+    },
+    observedAt: new Date().toISOString(),
+  });
+  expect(updated).toMatchObject({
+    id: lot.id,
+    sourceFingerprint: lot.sourceFingerprint,
+    matchStatus: "review",
+    sourceDetailsRequestedAt: null,
+    sourceDetailsCheckedAt: null,
+    sourceDetailsRunId: null,
+  });
+  expect(
+    await auctionSink({
+      externalSiteId: site.id,
+      observation: {
+        sourceKey: `details:${lot.id}:${lot.sourceFingerprint}`,
+        value: {
+          kind: "details",
+          request,
+          ...parseScotchWhiskyAuctionDetails(detailHtml),
+          checkedAt: new Date().toISOString(),
+        },
+      },
+    }),
+  ).toEqual({ newItemCount: 0, existingItemCount: 0 });
+  expect(await db.query.auctionLots.findFirst()).toEqual(updated);
+  expect(pushUniqueJob).not.toHaveBeenCalled();
+  expect(
+    await requestAuctionLotDetails(lot.id, updated.sourceFingerprint),
+  ).toBe(true);
+  await db
+    .update(externalSiteRuns)
+    .set({ status: "succeeded", completedAt: new Date() })
+    .where(eq(externalSiteRuns.id, run.id));
+  const next = (await lifecycle.queueAuctionDetailsRun(site.id))!;
+  expect(next.id).not.toBe(run.id);
+  expect(
+    ScotchWhiskyAuctionDetailsCursorSchema.parse(next.cursor).lots[0],
+  ).toMatchObject({
+    lotId: lot.id,
+    fingerprint: lot.sourceFingerprint,
+    url: newUrl,
+  });
+  expect(await db.query.auctionLotResults.findMany()).toHaveLength(1);
+});
+
 test("new unmapped lot reads bounded details before its first model check and keeps price history", async ({
   fixtures,
 }) => {
@@ -452,7 +582,10 @@ test("detail replay recovers matching dispatch but cannot reuse a changed listin
     sourceDetailsRunId: run.id,
   });
   expect(saved.sourceFingerprint).not.toBe(lot.sourceFingerprint);
-  await auctionSink({ externalSiteId: site.id, observation });
+  expect(await auctionSink({ externalSiteId: site.id, observation })).toEqual({
+    newItemCount: 0,
+    existingItemCount: 1,
+  });
   expect(await db.query.auctionLots.findFirst()).toEqual(saved);
   expect(pushUniqueJob).toHaveBeenLastCalledWith("ApplyAuctionLotMatch", {
     lotId: lot.id,
@@ -500,7 +633,10 @@ test("detail replay recovers matching dispatch but cannot reuse a changed listin
   );
   expect(await saveAuctionLotDetails(site.id, observation.value)).toBeNull();
   const dispatchCount = pushUniqueJob.mock.calls.length;
-  await auctionSink({ externalSiteId: site.id, observation });
+  expect(await auctionSink({ externalSiteId: site.id, observation })).toEqual({
+    newItemCount: 0,
+    existingItemCount: 0,
+  });
   expect(pushUniqueJob).toHaveBeenCalledTimes(dispatchCount);
   expect(await db.query.auctionLots.findFirst()).toEqual(requested);
   expect(await db.query.auctionLotResults.findMany()).toHaveLength(1);
@@ -532,7 +668,10 @@ test("detail replay recovers matching dispatch but cannot reuse a changed listin
   });
   expect(refreshed?.sourceDetailsCheckedAt).not.toBeNull();
   expect(await saveAuctionLotDetails(site.id, observation.value)).toBeNull();
-  await auctionSink({ externalSiteId: site.id, observation });
+  expect(await auctionSink({ externalSiteId: site.id, observation })).toEqual({
+    newItemCount: 0,
+    existingItemCount: 0,
+  });
   expect(pushUniqueJob).toHaveBeenCalledTimes(dispatchCount);
   expect(await db.query.auctionLots.findFirst()).toEqual(refreshed);
 });
