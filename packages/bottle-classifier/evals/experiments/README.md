@@ -77,9 +77,10 @@ below make comparisons more accurate and repeatable.
 
 ## Model comparisons
 
-| Comparison                                                 | Change                                         | Decision                                                                    |
-| ---------------------------------------------------------- | ---------------------------------------------- | --------------------------------------------------------------------------- |
-| [GPT-6 Luna, 2026-09-22](./model-gpt-6-luna-2026-09-22.md) | Replace GPT 5.6 Luna high with GPT-6 Luna high | Accepted: same 79/105, 30.8% lower model cost, slower cases, more web calls |
+| Comparison                                                             | Change                                             | Decision                                                                             |
+| ---------------------------------------------------------------------- | -------------------------------------------------- | ------------------------------------------------------------------------------------ |
+| [GPT-6 Luna, 2026-09-22](./model-gpt-6-luna-2026-09-22.md)             | Replace GPT 5.6 Luna high with GPT-6 Luna high     | Accepted: same 79/105, 30.8% lower model cost, slower cases, more web calls          |
+| [Claude Haiku 5.5, 2026-10-10](./model-claude-haiku-5-5-2026-10-10.md) | Replace GPT-6 Luna high with Claude Haiku 5.5 high | Rejected: 48/115 against 90/115, 17 run errors, 21.4% higher cost per completed case |
 
 ## Measurement changes
 
