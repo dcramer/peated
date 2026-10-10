@@ -55,6 +55,23 @@ Match body:
 { "proposal": 123, "action": "match", "bottle": 456 }
 ```
 
+The server compares the Bottle with the listing's saved facts. A `400` that
+names fields such as `abv` or `edition` means they differ. Check the label
+image and the store page. If the Bottle is still right, send the match again
+with what you checked:
+
+```json
+{
+  "proposal": 123,
+  "action": "match",
+  "bottle": 456,
+  "reason": "Store page states 62.5% (125 proof); the label read of 62.9% is wrong."
+}
+```
+
+A reason is saved on the decision even when nothing differs, so send one
+whenever the evidence is not obvious from the listing.
+
 Ignore body:
 
 ```json
@@ -75,3 +92,23 @@ pnpm cli api post /prices/match-queue/123/create-bottle --input /tmp/peated-requ
 
 Stop on `409`. Verify proposal status, the assigned or created Bottle, and
 moderation history after success.
+
+Undo a wrong match. Read the proposal first and send what you observed:
+
+```json
+{
+  "proposal": 123,
+  "expectedUpdatedAt": "2026-10-10T20:00:00.000Z",
+  "expectedSourceFingerprint": "observed-fingerprint",
+  "expectedBottleId": 456,
+  "reason": "The label image shows a different release."
+}
+```
+
+```bash
+pnpm cli api post /prices/match-queue/123/reopen --input /tmp/peated-request.json --yes
+```
+
+The listing loses its Bottle and returns to review. A `409` that names a saved
+name means a Bottle reference would assign the same Bottle again; correct the
+reference first. A Bottle made by `create-bottle` is not removed.

@@ -56,6 +56,8 @@ type ProposedBottleField = NonNullable<
   QueueItem["proposedBottle"]
 >[keyof NonNullable<QueueItem["proposedBottle"]>];
 
+const MatchNeedsReasonSchema = z.object({ code: z.literal("BAD_REQUEST") });
+
 function errorMessage(error: Error): string {
   return error instanceof Error
     ? error.message
@@ -119,11 +121,17 @@ function ListingTask({
     "idle",
   );
   const [error, setError] = useState<string | null>(null);
+  // The Bottle the server asked a reason for, kept so the moderator can retry.
+  const [bottleNeedingReason, setBottleNeedingReason] = useState<Bottle | null>(
+    null,
+  );
+  const [reason, setReason] = useState("");
   const busy = resolve.isPending || createBottle.isPending || retry.isPending;
 
   async function finish<TResult>(
     action: () => Promise<TResult>,
     message: string,
+    onError?: (cause: unknown) => void,
   ): Promise<boolean> {
     setError(null);
     try {
@@ -134,6 +142,7 @@ function ListingTask({
       await onComplete(message);
       return true;
     } catch (cause) {
+      onError?.(cause);
       setError(
         errorMessage(
           cause instanceof Error ? cause : new Error("Non-Error thrown"),
@@ -143,17 +152,33 @@ function ListingTask({
     }
   }
 
-  async function selectBottle(bottle: Bottle) {
+  async function matchBottle(bottle: Bottle, message: string) {
     const saved = await finish(
       () =>
         resolve.mutateAsync({
           proposal: item.id,
           action: "match",
           bottle: bottle.id,
+          reason: reason.trim() || undefined,
         }),
-      `Assigned ${item.price.name} to ${formatBottleDisplayName(bottle)}.`,
+      message,
+      (cause) => {
+        // The server refuses a Bottle that differs from the listing's saved
+        // facts until the moderator says why it is still the right one.
+        if (MatchNeedsReasonSchema.safeParse(cause).success) {
+          setBottleNeedingReason(bottle);
+          setSelecting(false);
+        }
+      },
     );
     if (saved) setSelecting(false);
+  }
+
+  function selectBottle(bottle: Bottle) {
+    return matchBottle(
+      bottle,
+      `Assigned ${item.price.name} to ${formatBottleDisplayName(bottle)}.`,
+    );
   }
 
   async function copyDetails() {
@@ -201,15 +226,7 @@ function ListingTask({
           disabled={busy}
           loading={resolve.isPending}
           onClick={() =>
-            void finish(
-              () =>
-                resolve.mutateAsync({
-                  proposal: item.id,
-                  action: "match",
-                  bottle: item.suggestedBottle!.id,
-                }),
-              "Bottle match approved.",
-            )
+            void matchBottle(item.suggestedBottle!, "Bottle match approved.")
           }
         >
           Approve match
@@ -310,6 +327,36 @@ function ListingTask({
         </AdminSection>
       ) : null}
       {error ? <Alert type="error">{error}</Alert> : null}
+      {bottleNeedingReason ? (
+        <AdminSection title="Reason for this match">
+          <ModerationStack>
+            <BottleIdentityRow {...toBottleListItem(bottleNeedingReason)} />
+            <AdminTextareaField
+              helpText="Say what you checked, such as the label or the store page."
+              label="Reason"
+              name="match-reason"
+              onChange={(event) => setReason(event.currentTarget.value)}
+              required
+              value={reason}
+            />
+            <ModerationActions>
+              <Button
+                variant="accent"
+                disabled={busy || !reason.trim()}
+                loading={resolve.isPending}
+                onClick={() =>
+                  void matchBottle(
+                    bottleNeedingReason,
+                    `Assigned ${item.price.name} to ${formatBottleDisplayName(bottleNeedingReason)}.`,
+                  )
+                }
+              >
+                Match with this reason
+              </Button>
+            </ModerationActions>
+          </ModerationStack>
+        </AdminSection>
+      ) : null}
 
       <ModerationActions>
         {primary}
