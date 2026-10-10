@@ -371,6 +371,12 @@ pnpm cli api delete /bottles/123/aliases/789
   that scope. Summarize the bounded scope and planned counts before writing.
   Get separate explicit authorization before merges, deletes, uncertain
   identity changes, or changes that affect records outside the named scope.
+- A direct request to moderate the store-price queue also authorizes a merge
+  of a duplicate Bottle and a correction to a Bottle when a listing decision
+  depends on it. Each one needs evidence that it is correct: the label image,
+  a producer source, or the store's own statement that two listings hold the
+  same whisky. Record that evidence in the research record. Deletes and
+  uncertain identity changes still need separate authorization.
 - Read every Bottle immediately before changing it. Stop if an ID, identifying
   fact, or current value differs from the work list.
 - Read the Bottle edit context before every shared rename. Confirm the shared
