@@ -58,6 +58,25 @@ type ProposedBottleField = NonNullable<
 
 const MatchNeedsReasonSchema = z.object({ code: z.literal("BAD_REQUEST") });
 
+/**
+ * Builds a listing match request. A reason belongs to the Bottle the server
+ * asked about; choosing another Bottle must not carry it along, or that
+ * Bottle would skip the server's check with someone else's explanation.
+ */
+export function listingMatchInput(
+  proposalId: number,
+  bottleId: number,
+  asked: { bottleId: number; reason: string } | null,
+) {
+  const reason = asked?.bottleId === bottleId ? asked.reason.trim() : "";
+  return {
+    proposal: proposalId,
+    action: "match" as const,
+    bottle: bottleId,
+    reason: reason || undefined,
+  };
+}
+
 function errorMessage(error: Error): string {
   return error instanceof Error
     ? error.message
@@ -153,14 +172,17 @@ function ListingTask({
   }
 
   async function matchBottle(bottle: Bottle, message: string) {
+    const input = listingMatchInput(
+      item.id,
+      bottle.id,
+      bottleNeedingReason ? { bottleId: bottleNeedingReason.id, reason } : null,
+    );
+    if (bottleNeedingReason && bottleNeedingReason.id !== bottle.id) {
+      setBottleNeedingReason(null);
+      setReason("");
+    }
     const saved = await finish(
-      () =>
-        resolve.mutateAsync({
-          proposal: item.id,
-          action: "match",
-          bottle: bottle.id,
-          reason: reason.trim() || undefined,
-        }),
+      () => resolve.mutateAsync(input),
       message,
       (cause) => {
         // The server refuses a Bottle that differs from the listing's saved
@@ -655,11 +677,13 @@ export default function TaskDetail({
     return <ModerationLoading>Loading decision…</ModerationLoading>;
   if (locator.isError || !locator.data) return <UnavailableTask />;
   const task = locator.data.task;
+  // Each task gets its own component state. Without the key, a cached next
+  // task would inherit the last one's reason, note, error, and chosen Bottle.
   if (task.source.kind === "auction_lot")
-    return <AuctionTask onComplete={onComplete} task={task} />;
+    return <AuctionTask key={taskKey} onComplete={onComplete} task={task} />;
   if (task.source.kind === "listing")
-    return <ListingTask onComplete={onComplete} task={task} />;
+    return <ListingTask key={taskKey} onComplete={onComplete} task={task} />;
   if (task.source.kind === "report")
-    return <ReportTask onComplete={onComplete} task={task} />;
-  return <AuditTask onComplete={onComplete} task={task} />;
+    return <ReportTask key={taskKey} onComplete={onComplete} task={task} />;
+  return <AuditTask key={taskKey} onComplete={onComplete} task={task} />;
 }
