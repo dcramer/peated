@@ -4,6 +4,7 @@ import {
   type CandidateExpansionMode,
   type ClassifyBottleReferenceInput,
 } from "@peated/bottle-classifier/contract";
+import { getBottleFieldConflicts } from "@peated/bottle-classifier/fieldConflicts";
 import {
   BottleCandidateSchema,
   BottleExtractedDetailsSchema,
@@ -34,6 +35,7 @@ import {
 } from "@peated/server/db/schema";
 import { getPeatedSystemActor } from "@peated/server/lib/actors";
 import { createBottleCheck } from "@peated/server/lib/bottleChecks";
+import { getBottleCandidateById } from "@peated/server/lib/bottleReferenceCandidates";
 import {
   assignBottleReferenceInTransaction,
   fillMissingBottleImage,
@@ -164,6 +166,18 @@ function parseStoredExtractedLabel(
   return parsed.success ? parsed.data : null;
 }
 
+/** A scraper's structured facts outrank the label read saved with the proposal. */
+function readListingFacts(
+  proposal: StorePriceMatchProposalForReview,
+): ExtractedBottleDetails | null {
+  const structured = BottleExtractedDetailsSchema.safeParse(
+    proposal.price.sourceBottleIdentity,
+  );
+  return structured.success
+    ? structured.data
+    : parseStoredExtractedLabel(proposal);
+}
+
 export class UnknownStorePriceMatchProposalError extends Error {
   constructor(proposalId: number) {
     super(`Price match proposal not found (${proposalId}).`);
@@ -178,6 +192,15 @@ export class StorePriceMatchProposalNotReviewableError extends Error {
   ) {
     super(`Price match proposal is not reviewable (${proposalId}, ${status}).`);
     this.name = "StorePriceMatchProposalNotReviewableError";
+  }
+}
+
+export class StorePriceMatchNeedsReasonError extends Error {
+  constructor(readonly conflicts: string[]) {
+    super(
+      `That Bottle differs from the listing's saved facts (${conflicts.join(", ")}). Check the label and the store page, then give a reason to match it anyway.`,
+    );
+    this.name = "StorePriceMatchNeedsReasonError";
   }
 }
 
@@ -1712,6 +1735,7 @@ export async function applyApprovedStorePriceMatchInTransaction(
     actor,
     allowSystemActor = false,
     expectedProcessingToken,
+    review,
   }: {
     proposalId: number;
     bottleId: number;
@@ -1719,6 +1743,8 @@ export async function applyApprovedStorePriceMatchInTransaction(
     actor: IncomingBottleDecisionActor;
     allowSystemActor?: boolean;
     expectedProcessingToken?: string;
+    // Set for a moderator's choice. Automatic matches are checked before this.
+    review?: { reason?: string };
   },
 ) {
   await resolveActiveBottleIds(tx, [bottleId], { lock: "update" });
@@ -1727,6 +1753,20 @@ export async function applyApprovedStorePriceMatchInTransaction(
     proposalId,
     expectedProcessingToken,
   });
+
+  // Store price matching owns this rule: a moderator's Bottle agrees with the
+  // listing's saved facts, or the moderator records why it is still the Bottle.
+  const metadata: IncomingBottleDecisionMetadata = {};
+  if (review) {
+    const candidate = await getBottleCandidateById(bottleId, tx);
+    const conflicts = candidate
+      ? getBottleFieldConflicts(readListingFacts(proposal), candidate)
+      : [];
+    if (conflicts.length && !review.reason)
+      throw new StorePriceMatchNeedsReasonError(conflicts);
+    if (conflicts.length) metadata.sourceConflicts = conflicts;
+    if (review.reason) metadata.reviewReason = review.reason;
+  }
 
   return {
     approval: await applyApprovedStorePriceMatchProposalInTransaction(tx, {
@@ -1737,6 +1777,7 @@ export async function applyApprovedStorePriceMatchInTransaction(
       decisionLog: {
         actor,
         decision: "match",
+        metadata,
       },
     }),
     bottleId,
@@ -1750,6 +1791,7 @@ export async function applyApprovedStorePriceMatch({
   actor,
   allowSystemActor = false,
   expectedProcessingToken,
+  review,
 }: {
   proposalId: number;
   bottleId: number;
@@ -1757,6 +1799,7 @@ export async function applyApprovedStorePriceMatch({
   actor: IncomingBottleDecisionActor;
   allowSystemActor?: boolean;
   expectedProcessingToken?: string;
+  review?: { reason?: string };
 }) {
   const { approval } = await db.transaction(async (tx) =>
     applyApprovedStorePriceMatchInTransaction(tx, {
@@ -1766,6 +1809,7 @@ export async function applyApprovedStorePriceMatch({
       actor,
       allowSystemActor,
       expectedProcessingToken,
+      review,
     }),
   );
 

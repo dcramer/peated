@@ -1749,6 +1749,63 @@ describe("price match queue", () => {
     ).resolves.toBeUndefined();
   });
 
+  test("needs a reason to match a Bottle that differs from the listing's saved facts", async ({
+    fixtures,
+  }) => {
+    const user = await fixtures.User({ mod: true });
+    const bottle = await fixtures.Bottle({ name: "Cask Strength", abv: 62.8 });
+    const price = await fixtures.StorePrice({
+      bottleId: null,
+      name: "A Cask Strength Listing",
+    });
+    const [proposal] = await db
+      .insert(storePriceMatchProposals)
+      .values({
+        priceId: price.id,
+        status: "pending_review",
+        proposalType: "no_match",
+        extractedLabel: {
+          brand: "Any Brand",
+          expression: "Cask Strength",
+          abv: 61.8,
+        },
+      })
+      .returning();
+    const input = {
+      proposal: proposal.id,
+      action: "match" as const,
+      bottle: bottle.id,
+    };
+
+    expect(
+      await waitError(
+        routerClient.prices.matchQueue.resolve(input, { context: { user } }),
+      ),
+    ).toMatchObject({ status: 400, message: expect.stringContaining("abv") });
+    await expect(
+      db.query.storePrices.findFirst({ where: eq(storePrices.id, price.id) }),
+    ).resolves.toMatchObject({ bottleId: null });
+
+    const reason = "The store page states 62.8%; the label read is wrong.";
+    await routerClient.prices.matchQueue.resolve(
+      { ...input, reason },
+      { context: { user } },
+    );
+
+    await expect(
+      db.query.storePrices.findFirst({ where: eq(storePrices.id, price.id) }),
+    ).resolves.toMatchObject({ bottleId: bottle.id });
+    await expect(
+      db.query.incomingBottleDecisionLogs.findFirst({
+        where: eq(incomingBottleDecisionLogs.sourceId, price.id),
+      }),
+    ).resolves.toMatchObject({
+      decision: "match",
+      bottleId: bottle.id,
+      metadata: { reviewReason: reason, sourceConflicts: ["abv"] },
+    });
+  });
+
   test("creates a bottle from a proposal and approves it atomically", async ({
     fixtures,
   }) => {
