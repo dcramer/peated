@@ -1,0 +1,157 @@
+{
+  "item": "model-claude-haiku-5-5-2026-10-10",
+  "decision": "rejected",
+  "classifierChanged": false,
+  "layer": "model",
+  "date": "2026-10-10",
+  "sourceCommit": "aee689069",
+  "testedPatch": "model-claude-haiku-5-5-2026-10-10.patch",
+  "patchReverted": true,
+  "control": {
+    "model": "gpt-6-luna",
+    "reasoningEffort": "high",
+    "imageExtractionModel": "gpt-6-luna",
+    "imageExtractionReasoningEffort": "high"
+  },
+  "treatment": {
+    "model": "anthropic/claude-haiku-5.5",
+    "reasoningEffort": "high",
+    "imageExtractionModel": "gpt-6-luna",
+    "imageExtractionReasoningEffort": "high"
+  },
+  "sharedSettings": {
+    "judgeModel": "gpt-5.6-luna",
+    "judgeReasoningEffort": "medium",
+    "provider": "Vercel AI Gateway",
+    "gatewayCaching": "auto",
+    "webEnabled": true,
+    "maxSearchQueries": 2,
+    "maxAgentTurns": 18,
+    "configuredTimeoutMs": 300000,
+    "fixedEvidence": false,
+    "concurrentSuites": true
+  },
+  "pricingUsdPerMillion": {
+    "gpt-6-luna": {
+      "input": 0.1,
+      "cacheRead": 0.01,
+      "cacheWrite": 0.125,
+      "output": 0.5
+    },
+    "claude-haiku-5.5": {
+      "input": 0.1,
+      "cacheRead": 0.01,
+      "cacheWrite": 0.125,
+      "output": 0.5
+    }
+  },
+  "pricingSource": "https://ai-gateway.vercel.sh/v1/models",
+  "fullSuite": {
+    "checks": 115,
+    "control": {
+      "rawReportSha256": "a3bec98ddc51d75dd28286af7001036b5ac87ba1fe195d8476c1b1960f0e6f60",
+      "passed": 90,
+      "failed": 25,
+      "runErrors": 0,
+      "timedOut": 0,
+      "incorrectExistingBottleMatches": 1,
+      "falsePositiveAcceptedResults": 0,
+      "falseNoMatchResults": 8,
+      "groups": {
+        "new bottles": "34/48",
+        "match existing": "35/41",
+        "corrections": "1/1",
+        "ignored / no match": "12/13",
+        "bottle audits": "8/12"
+      },
+      "measuredUsageChecks": 111,
+      "zeroReasoningTokenChecks": 0,
+      "inputTokensMeasured": 4731058,
+      "cachedInputTokensMeasured": 4254480,
+      "cacheWriteTokensMeasured": 474913,
+      "outputTokensMeasured": 326523,
+      "reasoningTokensMeasured": 261181,
+      "totalTokensMeasured": 5057581,
+      "modelRequestsMeasured": 555,
+      "estimatedModelCostUsdMeasured": 0.265337,
+      "estimatedModelCostUsdWithoutCaching": 0.636367,
+      "totalCaseTimeMs": 4256239,
+      "medianCaseTimeMs": 35198,
+      "p95NearestRankCaseTimeMs": 78707,
+      "firecrawlToolCalls": 214,
+      "otherToolCalls": 193
+    },
+    "treatment": {
+      "rawReportSha256": "22b5d46d89435ed8b3040ea7f0db203f530b66a0adda0bef2116ffe0578f9128",
+      "passed": 48,
+      "failed": 67,
+      "runErrors": 17,
+      "runErrorKinds": {
+        "resultOutsideOutputSchema": 15,
+        "maxTurnsExceeded": 2
+      },
+      "timedOut": 0,
+      "incorrectExistingBottleMatches": 5,
+      "falsePositiveAcceptedResults": 2,
+      "falseNoMatchResults": 17,
+      "groups": {
+        "new bottles": "14/48",
+        "match existing": "18/41",
+        "corrections": "1/1",
+        "ignored / no match": "10/13",
+        "bottle audits": "5/12"
+      },
+      "measuredUsageChecks": 94,
+      "zeroReasoningTokenChecks": 78,
+      "inputTokensMeasured": 5908197,
+      "cachedInputTokensMeasured": 5082529,
+      "cacheWriteTokensMeasured": 583762,
+      "outputTokensMeasured": 199775,
+      "reasoningTokensMeasured": 45046,
+      "totalTokensMeasured": 6107972,
+      "modelRequestsMeasured": 382,
+      "estimatedModelCostUsdMeasured": 0.247874,
+      "estimatedModelCostUsdWithoutCaching": 0.690707,
+      "totalCaseTimeMs": 1822335,
+      "medianCaseTimeMs": 13519,
+      "p95NearestRankCaseTimeMs": 36692,
+      "firecrawlToolCalls": 116,
+      "otherToolCalls": 206
+    },
+    "sameCaseComparison": {
+      "checksWithUsageInBoth": 94,
+      "controlEstimatedModelCostUsd": 0.204256,
+      "treatmentEstimatedModelCostUsd": 0.247874
+    },
+    "changedOutcomes": {
+      "passedByBoth": 42,
+      "failedByBoth": 19,
+      "gainedByTreatment": [
+        "new bottles: Lagavulin Distillers Edition",
+        "new bottles: Woodford Reserve Double Double Oaked",
+        "new bottles: store listing resolves Black Label with 12-year-old wording",
+        "match existing: Glenlivet Caribbean Reserve store listing",
+        "ignored / no match: age mismatch keeps product identity scope",
+        "bottle audits: retire the malformed Laphroaig record"
+      ],
+      "lostByTreatmentCount": 48,
+      "lostByTreatmentReasons": {
+        "runErrorResultOutsideOutputSchema": 12,
+        "runErrorMaxTurnsExceeded": 2,
+        "createBottleExpectedReturnedNoMatch": 7,
+        "newBottleIdentityNotFinalized": 3,
+        "matchExpectedReturnedNoMatch": 3,
+        "matchExpectedReturnedCreateBottle": 1,
+        "createBottleExpectedMatchedExistingBottle": 1,
+        "noMatchExpectedMatchedExistingBottle": 2,
+        "matchedDifferentBottleId": 1,
+        "correctMatchWrongTierOrNextStep": 7,
+        "wrongNameCategoryOrScopeField": 5,
+        "auditOperationsOrFindings": 4
+      }
+    }
+  },
+  "focusedRepeat": null,
+  "focusedRepeatSkippedReason": "A 42-case gap with four more incorrect existing matches does not depend on one flaky case.",
+  "rawArtifacts": ".cache/classifier-haiku-comparison-2026-10-10/ (local, not committed)"
+}
