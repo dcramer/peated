@@ -1,3 +1,4 @@
+import { COLOR_SCALE } from "@peated/server/constants";
 import { TastingContentInputSchema } from "@peated/server/schemas";
 import type { SuggestedTag, Tag } from "@peated/server/types";
 import { z } from "zod";
@@ -52,6 +53,14 @@ export function buildTastingEditFormSubmission({
   image: ImageUploadValue;
 }): TastingEditFormSubmitData {
   return { ...fields, image };
+}
+
+/** Resolves the recorded pour color to Peated's reference hex for previews. */
+export function pourColorToHex(
+  color: number | null | undefined,
+): string | null {
+  if (color == null) return null;
+  return COLOR_SCALE.find(([number]) => number === color)?.[2] ?? null;
 }
 
 export type TastingTagSuggestion = SuggestedTag | string;

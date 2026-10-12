@@ -18,6 +18,8 @@ export type BottleIdentityRowProps = {
   end?: ReactNode;
   hasTasted?: boolean;
   href?: string;
+  /** Tints the thumbnail frame, for example with a selected pour color. */
+  imageFillColor?: string | null;
   imageFit?: BottleVisualFit;
   imageUrl?: string | null;
   isLibrary?: boolean;
@@ -64,6 +66,7 @@ export function BottleIdentityRow({
   end,
   hasTasted = false,
   href,
+  imageFillColor,
   imageFit,
   imageUrl,
   isLibrary = false,
@@ -211,6 +214,7 @@ export function BottleIdentityRow({
       )}
     >
       <BottleVisual
+        fillColor={imageFillColor}
         fit={imageFit}
         imageUrl={imageUrl}
         size={compact ? "xs" : sidebar ? "sm" : activity ? "activity" : "md"}

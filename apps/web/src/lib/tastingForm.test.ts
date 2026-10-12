@@ -4,6 +4,7 @@ import {
   buildTastingCreateFormSubmission,
   buildTastingEditFormSubmission,
   buildTastingTagOptions,
+  pourColorToHex,
   TastingCreateFormFieldsSchema,
   type TastingFormFields,
 } from "./tastingForm";
@@ -70,5 +71,19 @@ describe("tasting tag options", () => {
       { id: "orchard-fruit", count: 0 },
       { id: "old-current-tag", count: 0 },
     ]);
+  });
+});
+
+describe("pour color preview", () => {
+  it("maps known pour colors to their reference hex", () => {
+    expect(pourColorToHex(0)).toBe("#ffffff");
+    expect(pourColorToHex(6)).toBe("#f5d863");
+    expect(pourColorToHex(14)).toBe("#cf7831");
+    expect(pourColorToHex(20)).toBe("#3b1d12");
+  });
+
+  it("returns null when the pour color is unknown or unset", () => {
+    expect(pourColorToHex(null)).toBeNull();
+    expect(pourColorToHex(21)).toBeNull();
   });
 });

@@ -61,6 +61,17 @@ export const Overview: Story = {
   ),
 };
 
+export const FillColor: Story = {
+  render: (args) => (
+    <StoryRow>
+      <BottleVisual {...args} fillColor="#f5db6d" imageUrl={null} />
+      <BottleVisual {...args} fillColor="#cf7831" imageUrl={null} />
+      <BottleVisual {...args} fillColor="#6a3022" imageUrl={null} />
+      <BottleVisual {...args} fillColor="#cf7831" />
+    </StoryRow>
+  ),
+};
+
 export const Expandable: Story = {
   args: { expandable: true, size: "lg" },
 };
