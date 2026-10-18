@@ -46,7 +46,7 @@ export function textSearchQuery(
   input: string,
   { any = false, fuzzy = false, prefix = false } = {},
 ) {
-  const allTokens = [
+  const words = [
     ...new Set(
       input
         .normalize("NFKC")
@@ -55,7 +55,13 @@ export function textSearchQuery(
           /[\p{Letter}\p{Number}]+(?:[.'’/-][\p{Letter}\p{Number}]+)*/gu,
         ) ?? [],
     ),
-  ].filter((token) => !["and", "or", "not"].includes(token));
+  ];
+  // Treat typed operator words as filler, unless they are the whole query:
+  // "Or" is the start of names like "Ord" and "Orkney".
+  const nonOperatorWords = words.filter(
+    (token) => !["and", "or", "not"].includes(token),
+  );
+  const allTokens = nonOperatorWords.length ? nonOperatorWords : words;
   const distinctiveTokens = any
     ? allTokens.filter((token) => !BROAD_QUERY_STOP_TOKENS.has(token))
     : allTokens;
@@ -67,7 +73,7 @@ export function textSearchQuery(
       const literal = `"${token}"`;
       // Numeric release identifiers must never expand to neighboring identifiers.
       if (fuzzy && /^\p{Letter}{5,}$/u.test(token)) return `${token}~1`;
-      if (prefix && /^\p{Letter}{3,}$/u.test(token)) return `${token}*`;
+      if (prefix && /^\p{Letter}{2,}$/u.test(token)) return `${token}*`;
       return literal;
     })
     .join(any ? " OR " : " AND ");
