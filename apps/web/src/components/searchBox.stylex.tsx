@@ -35,11 +35,15 @@ export type SearchBoxProps = Pick<
   SearchResultsProps,
   "contribution" | "emptyText" | "onRetry" | "status" | "statusText"
 > & {
+  /** Accessible name for the search field. */
+  ariaLabel?: string;
   autoFocus?: boolean;
   browseHeader?: ReactNode;
   defaultOpen?: boolean;
   disabled?: boolean;
   fluid?: boolean;
+  /** Focuses this field when someone presses `/`. Keep one per page. */
+  focusShortcut?: boolean;
   groups: readonly SearchResultGroup[];
   onClose?: () => void;
   onQueryChange: (query: string) => void;
@@ -59,6 +63,7 @@ export type SearchBoxProps = Pick<
 
 /** Owns the keyboard and disclosure behavior for Peated's scoped search UI. */
 export function SearchBox({
+  ariaLabel,
   autoFocus = false,
   browseHeader,
   contribution,
@@ -66,6 +71,7 @@ export function SearchBox({
   disabled = false,
   emptyText,
   fluid = false,
+  focusShortcut = true,
   groups,
   onClose,
   onQueryChange,
@@ -107,6 +113,8 @@ export function SearchBox({
     hasPanelContent;
 
   useEffect(() => {
+    if (!focusShortcut) return;
+
     function focusSearch(event: KeyboardEvent) {
       if (event.key !== "/" || event.metaKey || event.ctrlKey || event.altKey) {
         return;
@@ -125,7 +133,7 @@ export function SearchBox({
 
     document.addEventListener("keydown", focusSearch);
     return () => document.removeEventListener("keydown", focusSearch);
-  }, []);
+  }, [focusShortcut]);
 
   useEffect(() => {
     if (!activeId) return;
@@ -184,6 +192,7 @@ export function SearchBox({
       if (activeItem) {
         selectResult(activeItem);
       } else {
+        if (placement === "overlay") setOpen(false);
         onSubmit?.(query);
       }
       return;
@@ -212,6 +221,7 @@ export function SearchBox({
 
   const searchControl = (
     <ScopedSearch
+      aria-label={ariaLabel}
       aria-activedescendant={
         typeaheadNavigation && activeId
           ? `${panelId}-${encodeURIComponent(activeId)}`

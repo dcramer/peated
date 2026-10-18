@@ -1,5 +1,10 @@
 import { bottleHrefSelector } from "./assertions";
-import { existingBottle, testAccessToken, testUser } from "./rpc-fixtures.mjs";
+import {
+  existingBottle,
+  testAccessToken,
+  testBrand,
+  testUser,
+} from "./rpc-fixtures.mjs";
 import { signIn } from "./session";
 import { expect, type Page, test, type TestInfo } from "./test";
 
@@ -23,7 +28,7 @@ test.describe("profile Library", () => {
     await expect(libraryBottleRow(page).getByText("Sealed")).toBeVisible();
   });
 
-  test("sorts the Library and keeps its Bottle results", async ({
+  test("sorts the Library and filters it by a suggested producer", async ({
     context,
     page,
   }, testInfo) => {
@@ -40,6 +45,22 @@ test.describe("profile Library", () => {
       `/users/${testUser.username}/library?sort=-created`,
     );
     await expect(sort).toHaveValue("-created");
+    await expect(libraryBottleLink(page)).toBeVisible();
+
+    const search = page
+      .getByRole("searchbox", { name: "Find in this library" })
+      .filter({ visible: true });
+    await search.fill(testBrand.name.slice(0, 4));
+    await expect(
+      page
+        .getByRole("region", { name: "Search results" })
+        .getByRole("link", { name: testBrand.name, exact: true }),
+    ).toBeVisible();
+    await search.press("Enter");
+
+    await expect(page).toHaveURL(
+      `/users/${testUser.username}/library?sort=-created&entity=${testBrand.id}`,
+    );
     await expect(libraryBottleLink(page)).toBeVisible();
   });
 
