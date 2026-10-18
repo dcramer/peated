@@ -39,10 +39,12 @@ documents, and creation writes initial documents.
 
 Every text read uses TIN.
 
-User input is compiled into bounded literal TINQL. Catalog search supports
-alphabetic prefixes. Candidate discovery uses a broad word query and, on an empty
-text result, one spelling fallback with edit distance one. Numeric and mixed
-letter/number identifiers never receive fuzzy or prefix expansion.
+User input is compiled into bounded literal TINQL. Catalog search matches
+alphabetic prefixes of two or more letters, so "or" finds "Glen Ord". Typed
+"and", "or", and "not" are ignored unless they are the whole query; they are
+never search operators. Candidate discovery uses a broad word query and, on an
+empty text result, one spelling fallback with edit distance one. Numeric and
+mixed letter/number identifiers never receive fuzzy or prefix expansion.
 
 Broad word queries drop words that describe almost every whisky, such as
 "single", "malt", "scotch", and "year", when any other word remains. An OR over

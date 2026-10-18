@@ -541,6 +541,18 @@ test("finds an Entity by a display alias without exact-match authority", async (
   ]);
 });
 
+test("finds an Entity by a short name prefix that is also a stop word", async ({
+  fixtures,
+}) => {
+  const entity = await fixtures.Entity({ name: "Glen Ord", kind: "brand" });
+
+  const data = await routerClient.search({ query: "or", scopes: ["brands"] });
+
+  expect(data.groups).toMatchObject([
+    { type: "brands", results: [{ id: entity.id }] },
+  ]);
+});
+
 test("rejects unknown scopes", async () => {
   const error = await waitError(() =>
     routerClient.search({
