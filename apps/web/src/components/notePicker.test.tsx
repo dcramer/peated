@@ -73,4 +73,33 @@ describe("NotePickerField", () => {
       container.querySelector('button[aria-label="Browse nose notes"]'),
     ).not.toBeNull();
   });
+
+  it("adds a suggested note from a tap that does not move focus", () => {
+    act(() => root.render(<NotePickerHarness />));
+    const input = container.querySelector<HTMLInputElement>("input")!;
+    act(() => {
+      input.focus();
+      Object.getOwnPropertyDescriptor(
+        HTMLInputElement.prototype,
+        "value",
+      )?.set?.call(input, "bon");
+      input.dispatchEvent(new Event("input", { bubbles: true }));
+    });
+    const option =
+      container.querySelector<HTMLButtonElement>('[role="option"]')!;
+
+    // Safari does not focus a tapped button, so the input blurs with no
+    // new focus target unless the mousedown is cancelled.
+    act(() => {
+      const keepsFocus = !option.dispatchEvent(
+        new MouseEvent("mousedown", { bubbles: true, cancelable: true }),
+      );
+      if (!keepsFocus) input.blur();
+    });
+    act(() => option.click());
+
+    expect(
+      container.querySelector('[aria-label="Remove Bonfire"]'),
+    ).not.toBeNull();
+  });
 });

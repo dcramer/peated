@@ -162,7 +162,12 @@ export function NotePickerField({
       </div>
 
       {suggestionsOpen ? (
-        <FloatingPanel style={styles.suggestionOverlay}>
+        <FloatingPanel
+          // Keep focus in the input. Safari does not focus tapped buttons,
+          // so the blur would clear the query before the tap selects.
+          onMouseDown={(event) => event.preventDefault()}
+          style={styles.suggestionOverlay}
+        >
           <div id={listboxId} role="listbox">
             {matches.length ? (
               matches.map((note, index) => (
