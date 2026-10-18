@@ -115,4 +115,51 @@ describe("SearchSelect", () => {
     expect(container.querySelectorAll('[role="option"]')).toHaveLength(0);
     expect(onChange).not.toHaveBeenCalled();
   });
+
+  it("adds a new value from a tap that does not move focus", () => {
+    const onCreate = vi.fn();
+    act(() =>
+      root.render(
+        <SearchSelect
+          label="Brand"
+          onChange={() => undefined}
+          onCreate={onCreate}
+          options={options}
+          placeholder="Search brands"
+          value={null}
+        />,
+      ),
+    );
+    const input = container.querySelector<HTMLInputElement>("input")!;
+    act(() => {
+      input.focus();
+      typeInto(input, "Yamazaki");
+    });
+    const create = Array.from(
+      container.querySelectorAll<HTMLButtonElement>("button"),
+    ).find((button) => button.textContent?.includes("Yamazaki"))!;
+
+    tapWithoutFocus(input, create);
+
+    expect(onCreate).toHaveBeenCalledWith("Yamazaki");
+  });
 });
+
+function typeInto(input: HTMLInputElement, value: string) {
+  Object.getOwnPropertyDescriptor(
+    HTMLInputElement.prototype,
+    "value",
+  )?.set?.call(input, value);
+  input.dispatchEvent(new Event("input", { bubbles: true }));
+}
+
+/** Replays Safari's tap order: mousedown, blur with no new focus, click. */
+function tapWithoutFocus(input: HTMLInputElement, target: HTMLElement) {
+  act(() => {
+    const keepsFocus = !target.dispatchEvent(
+      new MouseEvent("mousedown", { bubbles: true, cancelable: true }),
+    );
+    if (!keepsFocus) input.blur();
+  });
+  act(() => target.click());
+}

@@ -381,7 +381,12 @@ function PickerControl({
             )}
           />
           {isOpen && !disabled ? (
-            <FloatingPanel style={styles.overlay}>
+            <FloatingPanel
+              // Keep focus in the input. Safari does not focus tapped buttons,
+              // so the blur would close this panel before the tap selects.
+              onMouseDown={(event) => event.preventDefault()}
+              style={styles.overlay}
+            >
               <div
                 aria-label={`${label} results`}
                 id={listboxId}
