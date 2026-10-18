@@ -10,13 +10,16 @@ import {
   getReservedCollection,
   isReservedCollectionSlug,
 } from "@peated/server/lib/db";
-import { plainTextSearchQuery } from "@peated/server/lib/search";
+import {
+  plainTextSearchQuery,
+  prefixTextSearchQuery,
+} from "@peated/server/lib/search";
 import { implement } from "@peated/server/orpc";
 import collectionBottleListContract from "@peated/server/orpc/contracts/collections/bottles/list";
 import { serialize } from "@peated/server/serializers";
 import { CollectionBottleSerializer } from "@peated/server/serializers/collectionBottle";
 import type { SQL } from "drizzle-orm";
-import { and, asc, desc, eq, isNull, sql } from "drizzle-orm";
+import { and, asc, desc, eq, isNull, or, sql } from "drizzle-orm";
 import { z } from "zod";
 import { isLibraryCollection } from "./collectionBottleHelpers";
 
@@ -48,6 +51,7 @@ export default implement(collectionBottleListContract).handler(async function ({
     (input.query ||
       input.brand ||
       input.distiller ||
+      input.entity ||
       (reservedCollection && input.status))
   ) {
     throw errors.BAD_REQUEST({
@@ -91,17 +95,36 @@ export default implement(collectionBottleListContract).handler(async function ({
     eq(collectionBottles.collectionId, collection.id),
   ];
   if (input.query) {
+    // Keep these alternatives inside or(); a bare OR would escape the
+    // collection filter and return other members' Library rows.
     baseWhere.push(
-      sql`EXISTS(
+      or(
+        sql`EXISTS(
           SELECT FROM ${bottleReferences}
           WHERE ${bottleReferences.bottleId} = ${collectionBottles.bottleId}
             AND LOWER(${bottleReferences.name}) = ${input.query.toLowerCase()}
             AND ${bottleReferences.ignored} IS NOT TRUE
-        ) OR ${bottles.searchVector} @@ ${plainTextSearchQuery(input.query)}`,
+        )`,
+        sql`${bottles.searchVector} @@ ${plainTextSearchQuery(input.query)}`,
+        sql`${bottles.searchVector} @@ ${prefixTextSearchQuery(input.query)}`,
+      ),
     );
   }
   if (input.brand) {
     baseWhere.push(eq(bottles.brandId, input.brand));
+  }
+  if (input.entity) {
+    baseWhere.push(
+      or(
+        eq(bottles.brandId, input.entity),
+        eq(bottles.bottlerId, input.entity),
+        sql`EXISTS(
+          SELECT FROM ${bottlesToDistillers}
+          WHERE ${bottlesToDistillers.distillerId} = ${input.entity}
+            AND ${bottlesToDistillers.bottleId} = ${collectionBottles.bottleId}
+        )`,
+      ),
+    );
   }
   if (input.distiller) {
     baseWhere.push(sql`EXISTS(

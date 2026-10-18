@@ -226,6 +226,97 @@ describe("GET /users/:user/collections/:collection/bottles", () => {
     expect(response.results).toHaveLength(0);
   });
 
+  test("searches only the requested member's Library", async ({
+    defaults,
+    fixtures,
+  }) => {
+    const brand = await fixtures.Entity({ name: "Laphroaig" });
+    const owned = await fixtures.Bottle({ brandId: brand.id, name: "10" });
+    const otherBottle = await fixtures.Bottle({
+      brandId: brand.id,
+      name: "Quarter Cask",
+    });
+    const otherUser = await fixtures.User();
+    const library = await fixtures.Collection({
+      name: "Library",
+      createdById: defaults.user.id,
+    });
+    const otherLibrary = await fixtures.Collection({
+      name: "Library",
+      createdById: otherUser.id,
+    });
+    await db.insert(collectionBottles).values([
+      { collectionId: library.id, bottleId: owned.id },
+      { collectionId: otherLibrary.id, bottleId: otherBottle.id },
+    ]);
+
+    const response = await routerClient.collections.bottles.list(
+      { user: "me", collection: "library", query: "laphroaig" },
+      { context: { user: defaults.user } },
+    );
+
+    expect(response.results.map((entry) => entry.bottle.id)).toEqual([
+      owned.id,
+    ]);
+  });
+
+  test("matches the start of a word in Library", async ({
+    defaults,
+    fixtures,
+  }) => {
+    const brand = await fixtures.Entity({ name: "Laphroaig" });
+    const bottle = await fixtures.Bottle({ brandId: brand.id, name: "10" });
+    const library = await fixtures.Collection({
+      name: "Library",
+      createdById: defaults.user.id,
+    });
+    await db
+      .insert(collectionBottles)
+      .values({ collectionId: library.id, bottleId: bottle.id });
+
+    const response = await routerClient.collections.bottles.list(
+      { user: "me", collection: "library", query: "laph" },
+      { context: { user: defaults.user } },
+    );
+
+    expect(response.results.map((entry) => entry.bottle.id)).toEqual([
+      bottle.id,
+    ]);
+  });
+
+  test("filters Library by an Entity in any producer role", async ({
+    defaults,
+    fixtures,
+  }) => {
+    const entity = await fixtures.Entity({
+      name: "Role Producer",
+      kind: "distillery",
+    });
+    const asBrand = await fixtures.Bottle({ brandId: entity.id });
+    const asDistiller = await fixtures.Bottle({ distillerIds: [entity.id] });
+    const asBottler = await fixtures.Bottle({ bottlerId: entity.id });
+    const unrelated = await fixtures.Bottle();
+    const library = await fixtures.Collection({
+      name: "Library",
+      createdById: defaults.user.id,
+    });
+    await db.insert(collectionBottles).values(
+      [asBrand, asDistiller, asBottler, unrelated].map((bottle) => ({
+        collectionId: library.id,
+        bottleId: bottle.id,
+      })),
+    );
+
+    const response = await routerClient.collections.bottles.list(
+      { user: "me", collection: "library", entity: entity.id },
+      { context: { user: defaults.user } },
+    );
+
+    expect(
+      response.results.map((entry) => entry.bottle.id).sort((a, b) => a - b),
+    ).toEqual([asBrand.id, asDistiller.id, asBottler.id].sort((a, b) => a - b));
+  });
+
   test("rejects the removed target filter", async ({ defaults, fixtures }) => {
     const error = await waitError(() =>
       routerClient.collections.bottles.list(

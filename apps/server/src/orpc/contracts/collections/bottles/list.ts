@@ -29,6 +29,12 @@ export default contract
           .describe("Search text only. Search operators are not supported."),
         brand: z.coerce.number().nullish(),
         distiller: z.coerce.number().nullish(),
+        entity: z.coerce
+          .number()
+          .nullish()
+          .describe(
+            "Filter by an Entity ID that is the brand, a distiller, or the bottler. Library only.",
+          ),
         bottle: z.number().int().positive().optional(),
         status: z
           .union([CollectionBottleStatusSchema, z.literal("unset")])
