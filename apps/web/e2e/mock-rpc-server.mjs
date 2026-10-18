@@ -1482,6 +1482,9 @@ async function handleRpcRequest({ request, response, url }) {
     case "users/libraryStats":
       sendRpcResponse(response, libraryInsightsStats);
       return true;
+    case "users/librarySearch":
+      sendRpcResponse(response, searchLibrary(request, input));
+      return true;
     case "users/tastingStats":
       sendRpcResponse(response, {
         total: 0,
@@ -2701,6 +2704,41 @@ function buildBottleForId(id) {
   });
 }
 
+function getBottleEntities(bottle) {
+  const entities = new Map();
+  for (const entity of [bottle.brand, bottle.bottler, ...bottle.distillers]) {
+    if (entity) entities.set(entity.id, entity);
+  }
+  return Array.from(entities.values());
+}
+
+function searchLibrary(request, input) {
+  const query = String(input?.query ?? "")
+    .trim()
+    .toLowerCase();
+  if (!query) return { entities: [], bottles: [] };
+
+  const bottles = Array.from(getCollectionState(request).library.values()).map(
+    (entry) => entry.bottle,
+  );
+  const counts = new Map();
+  for (const bottle of bottles) {
+    for (const entity of getBottleEntities(bottle)) {
+      const current = counts.get(entity.id);
+      counts.set(entity.id, { entity, count: (current?.count ?? 0) + 1 });
+    }
+  }
+
+  return {
+    entities: Array.from(counts.values()).filter(({ entity }) =>
+      entity.name.toLowerCase().startsWith(query),
+    ),
+    bottles: bottles.filter((bottle) =>
+      bottle.fullName.toLowerCase().includes(query),
+    ),
+  };
+}
+
 function listCollectionBottles(request, input) {
   const state = getCollectionState(request);
   const collection = getCollection(input);
@@ -2720,6 +2758,13 @@ function listCollectionBottles(request, input) {
     const query = String(input.query).toLowerCase();
     results = results.filter((entry) =>
       entry.bottle.fullName.toLowerCase().includes(query),
+    );
+  }
+
+  if (collection === "library" && input?.entity) {
+    const entityId = Number(input.entity);
+    results = results.filter((entry) =>
+      getBottleEntities(entry.bottle).some((entity) => entity.id === entityId),
     );
   }
 
