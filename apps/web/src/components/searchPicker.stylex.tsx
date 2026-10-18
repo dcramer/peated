@@ -367,6 +367,8 @@ function PickerControl({
               resetNavigation();
               setIsOpen(true);
             }}
+            // Focus stays here after a pick, so a click must reopen too.
+            onClick={() => !disabled && setIsOpen(true)}
             onFocus={() => !disabled && setIsOpen(true)}
             onKeyDown={handleKeyDown}
             placeholder={placeholder}

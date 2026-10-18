@@ -3,7 +3,11 @@
 import { act, useState } from "react";
 import { createRoot, type Root } from "react-dom/client";
 import { afterEach, beforeEach, describe, expect, it, vi } from "vitest";
-import { SearchSelect, type SearchPickerOption } from "./searchPicker.stylex";
+import {
+  SearchPicker,
+  SearchSelect,
+  type SearchPickerOption,
+} from "./searchPicker.stylex";
 
 const options: SearchPickerOption[] = [
   { id: 1, label: "Lagavulin" },
@@ -142,6 +146,30 @@ describe("SearchSelect", () => {
     tapWithoutFocus(input, create);
 
     expect(onCreate).toHaveBeenCalledWith("Yamazaki");
+  });
+
+  it("reopens the list when the input is clicked after a pick", () => {
+    function MultiHarness() {
+      const [value, setValue] = useState<readonly SearchPickerOption[]>([]);
+      return (
+        <SearchPicker
+          label="Distillers"
+          onChange={setValue}
+          options={options}
+          placeholder="Search distillers"
+          value={value}
+        />
+      );
+    }
+    act(() => root.render(<MultiHarness />));
+    const input = container.querySelector<HTMLInputElement>("input")!;
+    act(() => input.focus());
+
+    tapWithoutFocus(input, container.querySelector('[role="option"]')!);
+    expect(container.querySelector('[role="listbox"]')).toBeNull();
+
+    act(() => input.click());
+    expect(container.querySelectorAll('[role="option"]')).toHaveLength(1);
   });
 });
 
