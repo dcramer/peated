@@ -1,5 +1,6 @@
 import { db } from "@peated/server/db";
 import { bottleTombstones, memberReviews } from "@peated/server/db/schema";
+import { setTestTimeZone } from "@peated/server/lib/test/timeZone";
 import { routerClient } from "@peated/server/orpc/router";
 
 describe("GET /reviews-and-tastings", () => {
@@ -146,6 +147,44 @@ describe("GET /reviews-and-tastings", () => {
       { type: "tasting", tasting: { id: second.id } },
     ]);
     expect(thirdPage.rel.nextCursor).toBeNull();
+  });
+
+  // Behind UTC, a local-time snapshot skips recent posts and a local-time
+  // cursor repeats them. Keyset paging already hides posts made after page one.
+  test("keeps the snapshot and cursor in UTC when the server is behind UTC", async ({
+    fixtures,
+  }) => {
+    setTestTimeZone("America/Los_Angeles");
+    const bottle = await fixtures.Bottle();
+    const user = await fixtures.User();
+    const older = await fixtures.Tasting({
+      bottleId: bottle.id,
+      createdById: user.id,
+      createdAt: new Date("2026-01-01T12:00:00Z"),
+    });
+    const recent = await fixtures.Tasting({
+      bottleId: bottle.id,
+      createdById: user.id,
+      createdAt: new Date(Date.now() - 4 * 60 * 60 * 1000),
+    });
+
+    const firstPage = await routerClient.activity.reviewsAndTastings({
+      bottle: bottle.id,
+      limit: 1,
+    });
+    expect(firstPage.results).toMatchObject([
+      { type: "tasting", tasting: { id: recent.id } },
+    ]);
+
+    const secondPage = await routerClient.activity.reviewsAndTastings({
+      bottle: bottle.id,
+      limit: 1,
+      cursor: firstPage.rel.nextCursor!,
+    });
+    expect(secondPage.results).toMatchObject([
+      { type: "tasting", tasting: { id: older.id } },
+    ]);
+    expect(secondPage.rel.nextCursor).toBeNull();
   });
 
   test("includes Bottles connected through brand, bottler, or distiller", async ({

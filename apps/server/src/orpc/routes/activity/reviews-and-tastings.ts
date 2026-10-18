@@ -16,6 +16,10 @@ import {
   users,
 } from "@peated/server/db/schema";
 import { visibleExternalReviewWhere } from "@peated/server/externalReviews/visibility";
+import {
+  coerceActivityDate,
+  utcTimestamp,
+} from "@peated/server/lib/activityFeed";
 import { viewerVisibleUserCondition } from "@peated/server/lib/activityVisibility";
 import { bottleIdsForEntity } from "@peated/server/lib/entityBottleIds";
 import {
@@ -117,15 +121,18 @@ export default implement(contract).handler(
       input.bottle
         ? sql`${bottleId} = ${input.bottle}`
         : sql`${bottleId} IN (SELECT bottle_id FROM scoped_bottles)`;
+    const cursorOccurredAt = parsedCursor
+      ? utcTimestamp(new Date(parsedCursor.occurredAt))
+      : null;
     const after = parsedCursor
       ? sql`AND (
-        activity.occurred_at < ${new Date(parsedCursor.occurredAt)}
+        activity.occurred_at < ${cursorOccurredAt}
         OR (
-          activity.occurred_at = ${new Date(parsedCursor.occurredAt)}
+          activity.occurred_at = ${cursorOccurredAt}
           AND activity.kind_rank < ${parsedCursor.kindRank}
         )
         OR (
-          activity.occurred_at = ${new Date(parsedCursor.occurredAt)}
+          activity.occurred_at = ${cursorOccurredAt}
           AND activity.kind_rank = ${parsedCursor.kindRank}
           AND activity.id < ${parsedCursor.id}
         )
@@ -145,7 +152,7 @@ export default implement(contract).handler(
       WHERE ${userCondition}
         AND ${scope(sql`${tastings.bottleId}`)}
         AND ${tastings.removedAt} IS NULL
-        AND ${tastings.createdAt} <= ${snapshotAt}
+        AND ${tastings.createdAt} <= ${utcTimestamp(snapshotAt)}
 
       UNION ALL
 
@@ -157,7 +164,7 @@ export default implement(contract).handler(
       WHERE ${userCondition}
         AND ${scope(sql`${memberReviews.bottleId}`)}
         AND ${memberReviews.removedAt} IS NULL
-        AND ${memberReviews.createdAt} <= ${snapshotAt}
+        AND ${memberReviews.createdAt} <= ${utcTimestamp(snapshotAt)}
 
       UNION ALL
 
@@ -174,7 +181,7 @@ export default implement(contract).handler(
       WHERE ${visibleExternalReviewWhere()}
         AND ${scope(sql`${externalReviews.bottleId}`)}
         AND COALESCE(${externalReviewArticles.publishedAt}, ${externalReviews.createdAt})
-          <= ${snapshotAt}
+          <= ${utcTimestamp(snapshotAt)}
     ) activity
     WHERE TRUE ${after}
     ORDER BY activity.occurred_at DESC, activity.kind_rank DESC, activity.id DESC
@@ -264,7 +271,7 @@ export default implement(contract).handler(
           result.rows.length > input.limit && last
             ? encodeCursor({
                 snapshotAt: snapshotAt.toISOString(),
-                occurredAt: new Date(last.occurredAt).toISOString(),
+                occurredAt: coerceActivityDate(last.occurredAt).toISOString(),
                 kindRank: Number(last.kindRank),
                 id: Number(last.id),
               })
