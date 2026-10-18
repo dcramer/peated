@@ -932,6 +932,7 @@ export function buildTasting({
     comments: 0,
     toasts: 0,
     hasToasted: false,
+    tastedAt: timestamp,
     createdAt: timestamp,
     createdBy: testUser,
   };

@@ -37,7 +37,8 @@ function tastingFeedItem(tasting: Tasting, id = String(tasting.id)) {
     actorHref: `/users/${tasting.createdBy.username}`,
     actorImageUrl: tasting.createdBy.pictureUrl,
     action: "tasted",
-    date: tasting.createdAt,
+    // Feeds order tastings by when they were posted but show when they were had.
+    date: tasting.tastedAt,
     href: getTastingUrl(tasting),
     bottles: [
       {

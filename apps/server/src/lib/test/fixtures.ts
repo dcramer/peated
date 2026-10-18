@@ -888,13 +888,15 @@ export const Tasting = async (
     if (bottleId === null) {
       throw new Error("Tasting fixture requires a Bottle");
     }
+    const createdAt = data.createdAt ?? new Date();
     const [result] = await tx
       .insert(tastings)
       .values({
         notes: faker.lorem.sentence(),
         ratingBand: faker.helpers.arrayElement(RATING_BAND_IDS),
         tags: tags,
-        createdAt: new Date(),
+        createdAt,
+        tastedAt: createdAt,
         ...data,
         bottleId,
         createdById: data.createdById || (await User({}, tx)).id,

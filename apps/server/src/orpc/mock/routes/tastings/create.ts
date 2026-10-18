@@ -36,7 +36,8 @@ export default mockOS.tastings.create.handler(
       comments: 0,
       toasts: 0,
       hasToasted: false,
-      createdAt: input.createdAt ?? mockTasting.createdAt,
+      tastedAt: input.tastedAt ?? mockTasting.tastedAt,
+      createdAt: mockTasting.createdAt,
       createdBy: context.user,
     };
 

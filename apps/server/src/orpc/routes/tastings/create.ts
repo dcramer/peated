@@ -36,6 +36,26 @@ export default implement(tastingCreateContract)
   .use(requireAuth)
   .use(requireTosAccepted)
   .handler(async function ({ input, context, errors }) {
+    // A retried post returns the tasting it already created. Check this first
+    // so a retry still succeeds after its pending photo expires.
+    if (input.idempotencyKey) {
+      const [existing] = await db
+        .select()
+        .from(tastings)
+        .where(
+          and(
+            eq(tastings.createdById, context.user.id),
+            eq(tastings.idempotencyKey, input.idempotencyKey),
+          ),
+        );
+      if (existing) {
+        return {
+          tasting: await serialize(TastingSerializer, existing, context.user),
+          awards: [],
+        };
+      }
+    }
+
     if (input.pendingImageId) {
       try {
         const pendingUpload = await getUsablePendingUpload({
@@ -55,6 +75,7 @@ export default implement(tastingCreateContract)
       }
     }
 
+    const createdAt = new Date();
     const data: Omit<NewTasting, "bottleId"> = {
       notes: input.notes || null,
       ratingBand: input.ratingBand ?? null,
@@ -62,10 +83,10 @@ export default implement(tastingCreateContract)
       color: input.color || null,
       tags: input.tags ? await validateTags(input.tags) : [],
       createdById: context.user.id,
+      createdAt,
+      tastedAt: input.tastedAt ? new Date(input.tastedAt) : createdAt,
+      idempotencyKey: input.idempotencyKey ?? null,
     };
-    if (input.createdAt) {
-      data.createdAt = new Date(input.createdAt);
-    }
 
     if (input.friends && input.friends.length) {
       const friendUserIds = Array.from(new Set(input.friends));
@@ -129,6 +150,9 @@ export default implement(tastingCreateContract)
             bottleId,
             flightId: flight?.id ?? null,
           })
+          .onConflictDoNothing({
+            target: [tastings.createdById, tastings.idempotencyKey],
+          })
           .returning();
       } catch (error) {
         if (error instanceof Error && isTastingIdentityConflict(error)) {
@@ -139,7 +163,20 @@ export default implement(tastingCreateContract)
         }
         throw error;
       }
-      if (!tasting) return null;
+      if (!tasting) {
+        // A concurrent request with the same key created the tasting first.
+        if (!input.idempotencyKey) return null;
+        const [existing] = await tx
+          .select()
+          .from(tastings)
+          .where(
+            and(
+              eq(tastings.createdById, context.user.id),
+              eq(tastings.idempotencyKey, input.idempotencyKey),
+            ),
+          );
+        return existing ? { tasting: existing, replayed: true as const } : null;
+      }
 
       const awards = await awardAllBadgeXp(tx, tasting);
 
@@ -149,13 +186,23 @@ export default implement(tastingCreateContract)
         });
       }
 
-      return { tasting, awards, bottleId };
+      return { tasting, awards, bottleId, replayed: false as const };
     });
 
     if (!created) {
       throw errors.INTERNAL_SERVER_ERROR({
         message: "Unable to create tasting.",
       });
+    }
+    if (created.replayed) {
+      return {
+        tasting: await serialize(
+          TastingSerializer,
+          created.tasting,
+          context.user,
+        ),
+        awards: [],
+      };
     }
     let { tasting } = created;
     const { awards, bottleId } = created;
