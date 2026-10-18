@@ -63,6 +63,7 @@ import userActivityList from "./routes/users/activity/list";
 import userBadgeList from "./routes/users/badge-list";
 import userDetails from "./routes/users/details";
 import userFlavorList from "./routes/users/flavor-list";
+import userLibrarySearch from "./routes/users/library-search";
 import userLibraryStats from "./routes/users/library-stats";
 import userRegionList from "./routes/users/region-list";
 import userTastingStats from "./routes/users/tasting-stats";
@@ -182,6 +183,7 @@ export const mockRouter = mockOS.router({
     badgeList: userBadgeList,
     details: userDetails,
     flavorList: userFlavorList,
+    librarySearch: userLibrarySearch,
     libraryStats: userLibraryStats,
     regionList: userRegionList,
     tastingStats: userTastingStats,

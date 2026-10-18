@@ -25,6 +25,7 @@ import { colors, space } from "../../../../../styles/tokens.stylex";
 import { useProfile } from "../profileContext";
 import { getProfileLibraryInput, profileQueries } from "../profileQueries";
 import { ProfileLibraryLayout } from "./profileLibraryLayout.stylex";
+import { ProfileLibrarySearch } from "./profileLibrarySearch.stylex";
 
 type LibraryEntry =
   Outputs["collections"]["bottles"]["list"]["results"][number];
@@ -52,16 +53,18 @@ export function ProfileLibraryPageClient() {
   const [mutationError, setMutationError] = useState(false);
   const input = getProfileLibraryInput(searchParams, user.id);
   const { cursor } = input;
-  const { brand, distiller, query, sort, status } = getProfileLibraryInput(
-    new URLSearchParams(displayedParams),
-    user.id,
-  );
+  const { brand, distiller, entity, query, sort, status } =
+    getProfileLibraryInput(new URLSearchParams(displayedParams), user.id);
   const libraryQueryOptions = profileQueries.library(orpc, input);
   const libraryListQueryKey = orpc.collections.bottles.list.key({
     type: "query",
   });
   const libraryQuery = useQuery(libraryQueryOptions);
   const statsQuery = useQuery(profileQueries.libraryStats(orpc, user.id));
+  const entityQuery = useQuery({
+    ...orpc.entities.details.queryOptions({ input: { entity: entity ?? 0 } }),
+    enabled: entity !== undefined,
+  });
   const updateMutation = useMutation(
     orpc.collections.bottles.update.mutationOptions(),
   );
@@ -72,6 +75,10 @@ export function ProfileLibraryPageClient() {
   const filters = getFilterGroups({
     brand,
     distiller,
+    entity:
+      entity === undefined
+        ? undefined
+        : { id: entity, name: entityQuery.data?.name },
     stats: statsQuery.data,
     status: status ?? "",
   });
@@ -88,7 +95,7 @@ export function ProfileLibraryPageClient() {
   }
 
   function setFilter(
-    name: "brand" | "distiller" | "status" | "sort",
+    name: "brand" | "distiller" | "entity" | "status" | "sort",
     value: string,
   ) {
     const next = new URLSearchParams(displayedParams);
@@ -108,8 +115,8 @@ export function ProfileLibraryPageClient() {
 
   function clearFilters() {
     const next = new URLSearchParams(displayedParams);
-    ["brand", "cursor", "distiller", "query", "status"].forEach((name) =>
-      next.delete(name),
+    ["brand", "cursor", "distiller", "entity", "query", "status"].forEach(
+      (name) => next.delete(name),
     );
     navigate(next);
   }
@@ -182,14 +189,32 @@ export function ProfileLibraryPageClient() {
     }
   }
 
+  function selectEntity(entityId: number) {
+    // One Entity filter replaces the query and role filters it overlaps.
+    const next = new URLSearchParams(displayedParams);
+    ["brand", "cursor", "distiller", "query"].forEach((name) =>
+      next.delete(name),
+    );
+    next.set("entity", String(entityId));
+    navigate(next);
+  }
+
+  const search = (
+    <ProfileLibrarySearch
+      onEntitySelect={selectEntity}
+      onSubmit={setQuery}
+      query={query}
+      userId={user.id}
+    />
+  );
   const filterPanel = (
     <MemberLibraryFilters
       groups={filters}
       mode="rail"
       onChange={setFilter}
       onClear={clearFilters}
-      onQuerySubmit={setQuery}
       query={query}
+      search={search}
       total={statsQuery.data?.total}
     />
   );
@@ -202,8 +227,8 @@ export function ProfileLibraryPageClient() {
           mode="mobile"
           onChange={setFilter}
           onClear={clearFilters}
-          onQuerySubmit={setQuery}
           query={query}
+          search={search}
           total={statsQuery.data?.total}
         />
       }
@@ -232,7 +257,7 @@ export function ProfileLibraryPageClient() {
           <MemberLibraryList
             emptyAction={
               isCurrentUser &&
-              !hasActiveFilters({ brand, distiller, query, status }) ? (
+              !hasActiveFilters({ brand, distiller, entity, query, status }) ? (
                 <ButtonLink
                   href="/addBottle?intent=library"
                   size="sm"
@@ -243,14 +268,14 @@ export function ProfileLibraryPageClient() {
               ) : undefined
             }
             emptyDescription={
-              hasActiveFilters({ brand, distiller, query, status })
+              hasActiveFilters({ brand, distiller, entity, query, status })
                 ? "No library bottles match these filters."
                 : isCurrentUser
                   ? "Track what you own, what you have finished, and what you want to open next."
                   : `${user.username} has not added any bottles to their Library.`
             }
             emptyHeading={
-              hasActiveFilters({ brand, distiller, query, status })
+              hasActiveFilters({ brand, distiller, entity, query, status })
                 ? "No matching bottles"
                 : "No library bottles yet"
             }
@@ -362,16 +387,33 @@ function toLibraryItem(
 function getFilterGroups({
   brand,
   distiller,
+  entity,
   stats,
   status,
 }: {
   brand?: number;
   distiller?: number;
+  entity?: { id: number; name?: string };
   stats?: Outputs["users"]["libraryStats"];
   status: string;
 }): MemberLibraryFilterGroup[] {
   const total = stats?.total ?? 0;
   const groups: MemberLibraryFilterGroup[] = [
+    ...(entity
+      ? [
+          {
+            filters: [
+              {
+                label: entity.name ?? "Loading…",
+                selected: true,
+                value: String(entity.id),
+              },
+            ],
+            label: "Brand or producer",
+            name: "entity" as const,
+          },
+        ]
+      : []),
     {
       filters: [
         {
@@ -419,18 +461,27 @@ function getFilterGroups({
     },
   ];
   return groups.filter(
-    (group) => group.name === "status" || group.filters.length || total === 0,
+    (group) =>
+      group.name === "status" ||
+      group.name === "entity" ||
+      group.filters.length ||
+      total === 0,
   );
 }
 
 function hasActiveFilters(values: {
   brand?: number;
   distiller?: number;
+  entity?: number;
   query: string;
   status?: string;
 }) {
   return Boolean(
-    values.brand || values.distiller || values.query || values.status,
+    values.brand ||
+    values.distiller ||
+    values.entity ||
+    values.query ||
+    values.status,
   );
 }
 
