@@ -8,6 +8,7 @@ import BottleResolver, {
   type BottleResolverResult,
   type PendingImageRef,
 } from "@peated/web/components/bottleResolver";
+import { createIdempotencyKey } from "@peated/web/components/bottleResolver/helpers";
 import { PhotoIdentificationTraceFootnote } from "@peated/web/components/bottleResolver/panels";
 import { Button, ButtonLink } from "@peated/web/components/button.stylex";
 import {
@@ -59,7 +60,9 @@ type AddBottleIntent = "catalog" | "choose" | "library" | "tasting" | "view";
 type CollectionBottle = Outputs["collections"]["bottles"]["create"];
 type RatingDraft = BottleResolverResult & {
   suggestedTags: { results: TastingTagSuggestion[] };
-  createdAt: string;
+  tastedAt: string;
+  // One key per draft, so a repeated save cannot post the tasting twice.
+  idempotencyKey: string;
 };
 
 function getIntent(value: string | null): AddBottleIntent {
@@ -589,7 +592,8 @@ function AddBottleFlowContent() {
             setRatingDraft({
               ...selection,
               suggestedTags,
-              createdAt: new Date().toISOString(),
+              tastedAt: new Date().toISOString(),
+              idempotencyKey: createIdempotencyKey(),
             });
           } catch (err) {
             logError(err);
@@ -662,7 +666,8 @@ function AddBottleFlowContent() {
       setRatingDraft({
         ...selection,
         suggestedTags,
-        createdAt: new Date().toISOString(),
+        tastedAt: new Date().toISOString(),
+        idempotencyKey: createIdempotencyKey(),
       });
       revokeBlobPreviewUrl(selection);
     } catch (err) {
@@ -806,7 +811,8 @@ function AddBottleFlowContent() {
     const { tasting, awards } = await tastingCreateMutation.mutateAsync({
       ...data,
       flight: requestedFlightId,
-      createdAt: ratingDraft.createdAt,
+      tastedAt: ratingDraft.tastedAt,
+      idempotencyKey: ratingDraft.idempotencyKey,
       pendingImageId,
     });
 

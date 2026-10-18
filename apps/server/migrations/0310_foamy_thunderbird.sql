@@ -1,0 +1,1 @@
+ALTER TABLE "tasting" ADD COLUMN "tasted_at" timestamp;

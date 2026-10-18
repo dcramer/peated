@@ -117,7 +117,7 @@ export function TastingReviewRail({
               <TastingRating band={tasting.ratingBand} size="sm" />
             ) : null}
             <Timestamp
-              date={tasting.createdAt}
+              date={tasting.tastedAt}
               format="date"
               {...stylex.props(foundationStyles.metadata, styles.tastingDate)}
             />

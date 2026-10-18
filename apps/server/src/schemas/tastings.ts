@@ -5,9 +5,10 @@ import {
 } from "@peated/bottle-classifier/contract";
 import { z } from "zod";
 import { RATING_BAND_IDS, SIMPLE_RATING_VALUES } from "../constants";
+import { isDistantFuture } from "../lib/dates";
 import { BadgeAwardSchema } from "./badges";
 import { BottleSchema } from "./bottles";
-import { CategoryEnum, ServingStyleEnum, zDatetime } from "./common";
+import { CategoryEnum, ServingStyleEnum } from "./common";
 import { PendingUploadSchema } from "./pendingUploads";
 import { TagCategoriesSchema } from "./tags";
 import { UserSchema } from "./users";
@@ -97,13 +98,27 @@ export const TastingSchema = z.object({
     .readonly()
     .describe("Whether the current user has toasted this tasting"),
 
+  tastedAt: z
+    .string()
+    .datetime()
+    .readonly()
+    .describe("When the member had the dram"),
   createdAt: z
     .string()
     .datetime()
     .readonly()
-    .describe("Timestamp when the tasting was created"),
+    .describe("When the tasting was posted. Feeds sort by this time"),
   createdBy: UserSchema.readonly().describe("User who created this tasting"),
 });
+
+// Any past time is allowed so people can post drams they had long ago.
+// Feeds sort by post time, so backdating cannot move a tasting up the feed.
+const TastedAtInputSchema = z
+  .string()
+  .datetime()
+  .refine((value) => !isDistantFuture(new Date(value), 60 * 5), {
+    message: "Value too far in future.",
+  });
 
 export const TastingContentInputSchema = TastingSchema.omit({
   id: true,
@@ -113,6 +128,7 @@ export const TastingContentInputSchema = TastingSchema.omit({
   toasts: true,
   hasToasted: true,
   createdBy: true,
+  createdAt: true,
   legacySimpleRating: true,
   legacyStarRating: true,
   tagCategories: true,
@@ -121,9 +137,18 @@ export const TastingContentInputSchema = TastingSchema.omit({
     .string()
     .nullish()
     .describe("Flight ID if this tasting is part of a flight"),
-  createdAt: zDatetime
-    .nullish()
-    .describe("Custom creation timestamp for the tasting"),
+  tastedAt: TastedAtInputSchema.nullish().describe(
+    "When the member had the dram. Defaults to the time of posting",
+  ),
+  idempotencyKey: z
+    .string()
+    .trim()
+    .min(1)
+    .max(128)
+    .optional()
+    .describe(
+      "Key chosen by the client for this post. Sending the same key again returns the tasting it created instead of a new one",
+    ),
   image: TastingImageInputSchema,
   pendingImageId: z
     .string()

@@ -160,7 +160,7 @@ describe("getTastingFeedItems", () => {
       actorHref: `/users/${mockTasting.createdBy.username}`,
       actorImageUrl: mockTasting.createdBy.pictureUrl,
       action: "tasted",
-      date: mockTasting.createdAt,
+      date: mockTasting.tastedAt,
       href: getTastingUrl(mockTasting),
       bottles: [
         {
@@ -171,6 +171,18 @@ describe("getTastingFeedItems", () => {
         },
       ],
     });
+  });
+
+  test("shows when a late-posted dram was had", () => {
+    const [item] = getTastingFeedItems([
+      {
+        ...mockTasting,
+        tastedAt: "2026-08-01T20:00:00.000Z",
+        createdAt: "2026-08-05T09:00:00.000Z",
+      },
+    ]);
+
+    expect(item?.date).toBe("2026-08-01T20:00:00.000Z");
   });
 
   test("covers tasting photos and catalog fallbacks", () => {
