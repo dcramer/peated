@@ -191,6 +191,7 @@ export const BottleMergePreviewSchema = z
     consumers: z
       .object({
         tastings: z.number().int().nonnegative(),
+        tastingDrafts: z.number().int().nonnegative(),
         externalReviews: z.number().int().nonnegative(),
         storePrices: z.number().int().nonnegative(),
         observations: z.number().int().nonnegative(),

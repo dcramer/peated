@@ -96,7 +96,9 @@ Their current lifecycle is:
 
 The pending record is the authorization boundary. Clients pass its id, never an
 arbitrary permanent object URL. Permanent images are server-side copies in the
-owning namespace, including `tastings/`, `collection-bottles/`, or `bottles/`.
+owning namespace, including `tastings/`, `tasting-drafts/`,
+`collection-bottles/`, or `bottles/`. Tasting drafts keep their copy until the
+draft is posted or deleted; see [Tasting Drafts](./tasting-drafts.md).
 
 Image processing must strip embedded metadata before storage or model use. Do
 not retain original camera uploads or send unrelated tasting, friend, or user

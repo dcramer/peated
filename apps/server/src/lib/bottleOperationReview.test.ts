@@ -452,6 +452,7 @@ describe("Bottle operation review preparation", () => {
       { collectionId: collection.id, bottleId: destination.id },
     ]);
     await fixtures.Flight({ bottles: [source.id, destination.id] });
+    await fixtures.TastingDraft({ bottleId: source.id });
 
     const sourceEntity = await fixtures.Entity({
       name: "Old Collision Brand",
@@ -520,6 +521,7 @@ describe("Bottle operation review preparation", () => {
     expect(result[0]).toMatchObject({
       type: "merge_bottles",
       preview: {
+        consumers: expect.objectContaining({ tastingDrafts: 1 }),
         membershipCollisions: { collections: 1, flights: 1 },
         warnings: [
           expect.objectContaining({ code: "consumer_memberships_collapse" }),

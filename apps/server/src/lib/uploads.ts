@@ -74,6 +74,21 @@ export async function deleteUploadByUrl(imageUrl: string): Promise<boolean> {
   return true;
 }
 
+/**
+ * Copies a stored upload, named by its `/uploads/...` URL, to `output` and
+ * returns the copy's URL. An existing file at `output` is replaced.
+ */
+export async function copyUploadByUrl(
+  imageUrl: string,
+  output: string,
+): Promise<string> {
+  return await copyFile({
+    input: filenameFromUploadUrl(imageUrl),
+    output,
+    urlPrefix: "/uploads",
+  });
+}
+
 /** Reads one server-owned upload into the model image-input format. */
 export async function getUploadImageDataUrl(imageUrl: string) {
   const filename = filenameFromUploadUrl(imageUrl);

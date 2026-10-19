@@ -32,6 +32,7 @@ export * from "./scraper";
 export * from "./scrapeSources";
 export * from "./stores";
 export * from "./tags";
+export * from "./tastingDrafts";
 export * from "./tastings";
 export * from "./toasts";
 export * from "./userBlocks";

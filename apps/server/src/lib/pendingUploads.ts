@@ -14,6 +14,7 @@ import { Readable } from "node:stream";
 export const PENDING_UPLOAD_NAMESPACE = "pending-uploads";
 export const PERMANENT_UPLOAD_NAMESPACES = [
   "tastings",
+  "tasting-drafts",
   "member-reviews",
   "collection-bottles",
   "bottles",
@@ -209,7 +210,7 @@ async function copyPendingImageToPermanentDestination({
   purpose: NewPendingUpload["purpose"];
   destinationNamespace: (typeof PERMANENT_UPLOAD_NAMESPACES)[number];
   destinationType: string;
-  destinationId: number;
+  destinationId: number | string;
 }): Promise<string> {
   if (!isPermanentUploadNamespace(destinationNamespace)) {
     throw new PendingUploadError("Invalid permanent upload namespace.");
@@ -259,6 +260,23 @@ export async function copyPendingImageToTasting({
     destinationNamespace: "tastings",
     destinationType: "tasting",
     destinationId: tastingId,
+  });
+}
+
+/** Copies an approved pending image to a tasting draft's photo slot. */
+export async function copyPendingImageToTastingDraft({
+  id,
+  userId,
+  purpose,
+  tastingDraftId,
+}: PendingImageCopyInput & { tastingDraftId: string }): Promise<string> {
+  return await copyPendingImageToPermanentDestination({
+    id,
+    userId,
+    purpose,
+    destinationNamespace: "tasting-drafts",
+    destinationType: "tasting_draft",
+    destinationId: tastingDraftId,
   });
 }
 

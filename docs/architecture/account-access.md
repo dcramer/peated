@@ -147,9 +147,9 @@ transaction:
   are removed.
 - Everything else the member owns is deleted: comments and toasts left on
   tastings (with counters adjusted), collections, flights, follows, blocks,
-  badge awards, notifications, pending uploads, sign-in identities, passkeys, and
-  OAuth grants. Friend tags naming the member are cleared from other members'
-  tastings and reviews. Other members' tastings that used one of the member's
+  badge awards, notifications, pending uploads, tasting drafts, sign-in
+  identities, passkeys, and OAuth grants. Friend tags naming the member are
+  cleared from other members' tastings, reviews, and tasting drafts. Other members' tastings that used one of the member's
   flights keep the tasting and lose the flight link.
 - Staff references without a database rule (Bottle observations, store-price
   reviews and retry runs, and site scrape requests) are cleared.

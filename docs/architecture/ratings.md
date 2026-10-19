@@ -89,6 +89,13 @@ created and no badge awards; it does not create another tasting. Clients that
 retry a post, such as after a lost response, should send the same key each
 time.
 
+## Tasting drafts
+
+A member can save a tasting as a draft and post it later. Drafts live in their
+own table, so they never count toward feeds, stats, or badges. Publishing a
+draft creates the tasting with the draft's `tastedAt` and uses the draft ID as
+its `idempotencyKey`. See [Tasting Drafts](../features/tasting-drafts.md).
+
 ## Public tasting pages
 
 Tasting details use the same privacy rules as tasting lists: public members'

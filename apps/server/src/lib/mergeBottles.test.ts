@@ -25,6 +25,7 @@ import {
   storePriceMatchAttempts,
   storePriceMatchProposals,
   storePrices,
+  tastingDrafts,
   tastings,
 } from "@peated/server/db/schema";
 import { getUserActor } from "@peated/server/lib/actors";
@@ -174,6 +175,7 @@ describe("exact Bottle merges", () => {
         legacyParentBottleId: source.id,
       })
       .returning();
+    const sourceDraft = await fixtures.TastingDraft({ bottleId: source.id });
     const [decisionLog] = await db
       .insert(incomingBottleDecisionLogs)
       .values({
@@ -290,6 +292,11 @@ describe("exact Bottle merges", () => {
     expect(
       await db.query.incomingBottleDecisionLogs.findFirst({
         where: eq(incomingBottleDecisionLogs.id, decisionLog!.id),
+      }),
+    ).toMatchObject({ bottleId: destination.id });
+    expect(
+      await db.query.tastingDrafts.findFirst({
+        where: eq(tastingDrafts.id, sourceDraft.id),
       }),
     ).toMatchObject({ bottleId: destination.id });
     expect(
@@ -413,6 +420,7 @@ describe("exact Bottle merges", () => {
             updateScope: "exact_merge",
             consumerCounts: expect.objectContaining({
               tastings: 1,
+              tastingDrafts: 1,
               storePrices: 1,
               collectionMembershipsCollapsed: 1,
               flightMembershipsCollapsed: 1,

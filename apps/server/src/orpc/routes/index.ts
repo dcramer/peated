@@ -39,6 +39,7 @@ import search from "./search";
 import smws from "./smws";
 import stats from "./stats";
 import tags from "./tags";
+import tastingDrafts from "./tastingDrafts";
 import tastings from "./tastings";
 import toasts from "./toasts";
 import users from "./users";
@@ -85,6 +86,7 @@ export interface Router {
   smws: typeof smws;
   stats: typeof stats;
   tags: typeof tags;
+  tastingDrafts: typeof tastingDrafts;
   tastings: typeof tastings;
   toasts: typeof toasts;
   users: typeof users;
@@ -132,6 +134,7 @@ export default api.router({
   search,
   stats,
   tags,
+  tastingDrafts,
   tastings,
   toasts,
   users,
