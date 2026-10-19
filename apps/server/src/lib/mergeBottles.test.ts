@@ -991,16 +991,16 @@ describe("exact Bottle merges", () => {
       name: "Collision Destination",
     });
     const user = await fixtures.User();
-    const createdAt = new Date("2026-03-01T00:00:00.000Z");
+    const tastedAt = new Date("2026-03-01T00:00:00.000Z");
     await fixtures.Tasting({
       bottleId: source.id,
       createdById: user.id,
-      createdAt,
+      tastedAt,
     });
     await fixtures.Tasting({
       bottleId: destination.id,
       createdById: user.id,
-      createdAt,
+      tastedAt,
     });
 
     await expect(

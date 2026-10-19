@@ -35,39 +35,50 @@ describe("GET /bottles/{bottle}/flavor-profile", () => {
       {
         bottleId: bottle.id,
         createdById: defaults.user.id,
+        tastedAt: new Date("2026-01-01"),
         tags: ["smoke", "smoke", "ash", "bonfire", "vanilla"],
         createdAt: new Date("2026-01-01"),
       },
       {
         bottleId: bottle.id,
         createdById: defaults.user.id,
+        tastedAt: new Date("2026-01-02"),
         tags: ["smoke"],
         createdAt: new Date("2026-01-02"),
       },
       {
         bottleId: bottle.id,
         createdById: defaults.user.id,
+        tastedAt: new Date("2026-01-03"),
         tags: ["vanilla"],
         createdAt: new Date("2026-01-03"),
       },
       {
         bottleId: bottle.id,
         createdById: defaults.user.id,
+        tastedAt: new Date("2026-01-04"),
         tags: [],
         createdAt: new Date("2026-01-04"),
       },
       {
         bottleId: bottle.id,
         createdById: defaults.user.id,
+        tastedAt: new Date("2026-01-05"),
         tags: ["unrecognized"],
         createdAt: new Date("2026-01-05"),
       },
       {
         bottleId: bottle.id,
         createdById: privateUser.id,
+        tastedAt: new Date(),
         tags: ["iodine", "oak"],
       },
-      { bottleId: sibling.id, createdById: defaults.user.id, tags: ["oak"] },
+      {
+        bottleId: sibling.id,
+        createdById: defaults.user.id,
+        tags: ["oak"],
+        tastedAt: new Date(),
+      },
     ]);
     await recomputeBottleStats(bottle.id);
 
@@ -117,10 +128,16 @@ describe("GET /bottles/{bottle}/flavor-profile", () => {
     const privateUser = await fixtures.User({ private: true });
     await fixtures.Tag({ name: "smoke", tagCategory: "smoke" });
     await db.insert(tastings).values([
-      { bottleId: bottle.id, createdById: privateUser.id, tags: ["smoke"] },
+      {
+        bottleId: bottle.id,
+        createdById: privateUser.id,
+        tags: ["smoke"],
+        tastedAt: new Date(),
+      },
       {
         bottleId: bottle.id,
         createdById: defaults.user.id,
+        tastedAt: new Date(),
         tags: ["unrecognized"],
       },
     ]);

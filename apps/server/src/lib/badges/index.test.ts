@@ -74,6 +74,7 @@ describe("direct-Bottle badge awarding", () => {
       batchUsers.map(({ id }, index) => ({
         bottleId: bottle.id,
         createdById: id,
+        tastedAt: new Date(startedAt + index),
         createdAt: new Date(startedAt + index),
       })),
     );

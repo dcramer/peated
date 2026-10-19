@@ -149,7 +149,7 @@ async function bottleMergeConsumerPreview(
             FROM tasting destination_tasting
             WHERE destination_tasting.bottle_id = ${destinationBottleId}
               AND destination_tasting.created_by_id = ${tastings.createdById}
-              AND destination_tasting.created_at = ${tastings.createdAt}
+              AND destination_tasting.tasted_at = ${tastings.tastedAt}
           )`,
       ),
     )
