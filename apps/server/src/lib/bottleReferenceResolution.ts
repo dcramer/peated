@@ -359,7 +359,7 @@ async function resolveBottleReferenceTargetWithClassifier(
         reference.currentBottleId !== decision.matchedBottleId,
       hasDeterministicAnchor: decision.identityScope === "exact_cask",
       hasPrimaryLabelOrImageEvidence:
-        classification.artifacts.imageEvidence !== null,
+        classification.artifacts.imageEvidence != null,
     });
     if (tier === "review") {
       return {
