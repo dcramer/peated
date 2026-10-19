@@ -75,9 +75,11 @@ Feeds and tasting lists sort by `createdAt`, so a dram posted days later still
 appears with recent activity. Pages and feed entries show `tastedAt`.
 Backdating cannot move a tasting up a feed.
 
-Tastings posted before `tastedAt` existed use their `createdAt`, which held the
-time the member chose. Until `tasted_at` is required in the database, readers
-fall back to `createdAt` when it is empty.
+Tastings posted before `tastedAt` existed took their `createdAt` as the tasted
+time, because `createdAt` held the time the member chose.
+
+One member cannot record the same Bottle twice at the same `tastedAt`. Bottle
+merges check the same rule before they move tastings.
 
 ## Repeated posts
 

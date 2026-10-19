@@ -300,15 +300,16 @@ async function assertNoTastingCollision(
     .select({
       bottleId: tastings.bottleId,
       createdById: tastings.createdById,
-      createdAt: tastings.createdAt,
+      tastedAt: tastings.tastedAt,
     })
     .from(tastings)
     .where(inArray(tastings.bottleId, [sourceBottleId, destinationBottleId]))
-    .orderBy(asc(tastings.createdById), asc(tastings.createdAt))
+    .orderBy(asc(tastings.createdById), asc(tastings.tastedAt))
     .for("update");
+  // Mirrors the tasting_unq constraint (Bottle, member, tasted time).
   const projectedKeys = new Set<string>();
-  for (const { createdById, createdAt } of rows) {
-    const key = `${createdById}:${createdAt.getTime()}`;
+  for (const { createdById, tastedAt } of rows) {
+    const key = `${createdById}:${tastedAt.getTime()}`;
     if (projectedKeys.has(key)) {
       throw new BottleMergeConflictError("consumer_conflict");
     }

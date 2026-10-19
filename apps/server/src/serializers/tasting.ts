@@ -191,9 +191,7 @@ export const TastingSerializer = serializer({
       servingStyle: item.servingStyle,
       friends: attrs.friends,
 
-      // Tastings posted while the tasted_at backfill rolls out have no value;
-      // createdAt held the tasted time before then.
-      tastedAt: (item.tastedAt ?? item.createdAt).toISOString(),
+      tastedAt: item.tastedAt.toISOString(),
       createdAt: item.createdAt.toISOString(),
 
       comments: item.comments,

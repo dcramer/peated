@@ -72,6 +72,7 @@ async function createTasting(
     bottleId,
     ratingBand,
     createdById,
+    tastedAt: new Date(Date.UTC(2026, 0, 1, 0, 0, sequence)),
     createdAt: new Date(Date.UTC(2026, 0, 1, 0, 0, sequence)),
   });
 }

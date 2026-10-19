@@ -69,9 +69,7 @@ export const tastings = pgTable(
 
     // When the member had the dram. Feeds sort by createdAt (when it was
     // posted), so backdating cannot move a tasting up the feed.
-    // TODO(tastings): Make this NOT NULL once rows posted during the rollout
-    // are backfilled; until then readers fall back to createdAt.
-    tastedAt: timestamp("tasted_at"),
+    tastedAt: timestamp("tasted_at").notNull(),
     // Client-chosen key so a retried post returns the first tasting.
     idempotencyKey: varchar("idempotency_key", { length: 128 }),
     createdAt: timestamp("created_at").defaultNow().notNull(),
@@ -85,11 +83,8 @@ export const tastings = pgTable(
     removalReason: text("removal_reason"),
   },
   (table) => [
-    unique("tasting_unq").on(
-      table.bottleId,
-      table.createdById,
-      table.createdAt,
-    ),
+    // One member cannot record the same Bottle twice at the same tasted time.
+    unique("tasting_unq").on(table.bottleId, table.createdById, table.tastedAt),
     unique("tasting_idempotency_key").on(
       table.createdById,
       table.idempotencyKey,
