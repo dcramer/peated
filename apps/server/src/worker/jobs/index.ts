@@ -10,6 +10,7 @@ import generateRegionDetails from "./generateRegionDetails";
 import geocodeCountryLocation from "./geocodeCountryLocation";
 import geocodeEntityLocation from "./geocodeEntityLocation";
 import geocodeRegionLocation from "./geocodeRegionLocation";
+import identifyTastingDraft from "./identifyTastingDraft";
 import indexBottleReference from "./indexBottleReference";
 import indexBottleSearch from "./indexBottleSearch";
 import indexBottleSeriesSearch from "./indexBottleSeriesSearch";
@@ -31,6 +32,7 @@ import repairEntityBottleCounts from "./repairEntityBottleCounts";
 import repairLocationBottleCounts from "./repairLocationBottleCounts";
 import resolveAuctionLot from "./resolveAuctionLot";
 import resolveStorePriceBottle from "./resolveStorePriceBottle";
+import retryTastingDraftIdentifications from "./retryTastingDraftIdentifications";
 import runScraper from "./runScraper";
 import updateBottleStats from "./updateBottleStats";
 import updateCountryStats from "./updateCountryStats";
@@ -63,6 +65,9 @@ registry.add("GenerateRegionDetails", generateRegionDetails, {
 registry.add("GeocodeCountryLocation", geocodeCountryLocation);
 registry.add("GeocodeRegionLocation", geocodeRegionLocation);
 registry.add("GeocodeEntityLocation", geocodeEntityLocation);
+registry.add("IdentifyTastingDraft", identifyTastingDraft, {
+  queueName: "models",
+});
 registry.add("IndexBottleReference", indexBottleReference);
 registry.add("IndexBottleSearch", indexBottleSearch);
 registry.add("IndexBottleSeriesSearch", indexBottleSeriesSearch);
@@ -93,6 +98,10 @@ registry.add(
 registry.add("ResolveStorePriceBottle", resolveStorePriceBottle, {
   queueName: "models",
 });
+registry.add(
+  "RetryTastingDraftIdentifications",
+  retryTastingDraftIdentifications,
+);
 registry.add("RunScraper", runScraper, { queueName: "scrapers" });
 registry.add("CreateMissingBottles", createMissingBottles, {
   queueName: "models",

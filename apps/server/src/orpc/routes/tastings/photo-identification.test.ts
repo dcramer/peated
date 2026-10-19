@@ -21,16 +21,18 @@ import {
   copyPendingImageToBottle,
   createPendingImageUpload,
 } from "@peated/server/lib/pendingUploads";
+import {
+  identifyBottlePhoto,
+  type IdentifyBottlePhotoServices,
+  type PhotoIdentificationSpan,
+  type PhotoIdentificationStartSpan,
+} from "@peated/server/lib/photoIdentification";
 import { verifyPhotoIdentificationCreateToken } from "@peated/server/lib/photoIdentificationCreateToken";
 import waitError from "@peated/server/lib/test/waitError";
 import type { Context } from "@peated/server/orpc/context";
 import {
   createPhotoIdentificationProcedure,
-  identifyPendingImage,
-  type IdentifyPendingImageServices,
   type PhotoIdentificationProcedureServices,
-  type PhotoIdentificationSpan,
-  type PhotoIdentificationStartSpan,
 } from "@peated/server/orpc/routes/tastings/photo-identification";
 import { createPhotoIdentificationCreateProcedure } from "@peated/server/orpc/routes/tastings/photo-identification-create";
 import type { PhotoIdentificationInputSchema } from "@peated/server/schemas";
@@ -39,7 +41,7 @@ import OpenAI from "openai";
 import { afterEach, beforeEach, vi } from "vitest";
 import type { z } from "zod";
 
-type RunReference = IdentifyPendingImageServices["runReference"];
+type RunReference = IdentifyBottlePhotoServices["runReference"];
 const classifyBottleReferenceMock =
   vi.fn<
     (
@@ -48,7 +50,7 @@ const classifyBottleReferenceMock =
   >();
 const runBottleReferenceMock = vi.fn<RunReference>();
 const extractPhotoBottleEvidenceMock =
-  vi.fn<IdentifyPendingImageServices["extractEvidence"]>();
+  vi.fn<IdentifyBottlePhotoServices["extractEvidence"]>();
 const copyPendingImageToBottleMock = vi.fn<typeof copyPendingImageToBottle>();
 const sentrySpanSetAttributeMock = vi.fn();
 const startSpanCallMock = vi.fn();
@@ -92,7 +94,7 @@ type MockCreateBottleDecision = Omit<
 const identifyImage: PhotoIdentificationProcedureServices["identifyImage"] = (
   input,
 ) =>
-  identifyPendingImage(input, {
+  identifyBottlePhoto(input, {
     extractEvidence: extractPhotoBottleEvidenceMock,
     runReference: runBottleReferenceMock,
     startSpan,

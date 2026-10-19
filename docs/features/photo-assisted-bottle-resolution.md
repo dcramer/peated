@@ -136,6 +136,24 @@ Bottle or tasting.
 Catalog-image copy failure is a non-fatal warning after Bottle creation. The
 route does not rerun extraction or classification.
 
+### Background Identification For Drafts
+
+A [tasting draft](./tasting-drafts.md#identifying-the-bottle) with a new photo
+runs the same label reading and classifier in the background job
+`IdentifyTastingDraft`, instead of in the request:
+
+- the draft's own photo, already copied to `tasting-drafts/`, is the input, so
+  no pending upload is needed;
+- only the photo goes to the model, never the bottle hint, notes, or friends;
+- it uses the same per-member budget of 30 photo identifications per hour as
+  `POST /tastings/photo-identification`;
+- the result is saved on the draft only if the draft still has the same photo;
+- it never chooses the draft's Bottle and never creates a Bottle; and
+- the member confirms a proposed Bottle with
+  `POST /tasting-drafts/{draft}/create-bottle`, which uses the saved proposal
+  in place of a signed token and follows the same creation, conflict, and
+  catalog image rules as the route below.
+
 ### Create Tasting
 
 Normal tasting creation accepts an optional owned `pendingImageId` alongside
@@ -175,6 +193,10 @@ Primary owners:
 - UI resolver: `apps/web/src/components/bottleResolver/`
 - shared continuation: `apps/web/src/app/(layout-free)/addBottle/`
 - identification routes: `apps/server/src/orpc/routes/tastings/photo-identification*.ts`
+- label reading and classification shared by the route and draft job:
+  `apps/server/src/lib/photoIdentification.ts`
+- catalog image rules: `apps/server/src/lib/photoCatalogImage.ts`
+- draft identification: `apps/server/src/lib/tastingDraftIdentification.ts`
 - pending image lifecycle: `apps/server/src/lib/pendingUploads.ts`
 - pending image schema: `apps/server/src/db/schema/pendingUploads.ts`
 - image evidence: `packages/bottle-classifier/src/imageEvidence.ts`

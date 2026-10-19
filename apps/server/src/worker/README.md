@@ -44,6 +44,13 @@ cannot starve indexing. A default-queue job that needs model work queues it
 instead of running it inline, and every outbound request on the default queue
 carries a timeout.
 
+`IdentifyTastingDraft` runs on `models` too. It reads a tasting draft's photo
+and saves the identified Bottle on the draft. Over the member's hourly photo
+budget, it queues itself again with a delay. The hourly
+`RetryTastingDraftIdentifications` job queues drafts whose identification was
+lost or failed, and marks a draft failed after three tries. See
+[Tasting Drafts](../../../../docs/features/tasting-drafts.md#identifying-the-bottle).
+
 When the AI service is out of budget, rate limited, down, or unreachable
 (`isModelServiceUnavailable`), the models queue pauses for 15 minutes and puts
 the job back without using an attempt. A model job must let that error throw

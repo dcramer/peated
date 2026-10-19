@@ -1,9 +1,13 @@
+import type { StoredTastingDraftIdentification } from "@peated/server/schemas/tastingDrafts";
 import { relations, sql } from "drizzle-orm";
 import {
   bigint,
   index,
   integer,
+  jsonb,
+  pgEnum,
   pgTable,
+  smallint,
   text,
   timestamp,
   uuid,
@@ -15,6 +19,18 @@ import { ratingBandEnum, servingStyleEnum } from "./tastings";
 import { users } from "./users";
 
 export const TASTING_DRAFT_BOTTLE_HINT_MAX_LENGTH = 255;
+
+export const TASTING_DRAFT_IDENTIFICATION_STATUS_LIST = [
+  "none",
+  "pending",
+  "done",
+  "failed",
+] as const;
+
+export const tastingDraftIdentificationStatusEnum = pgEnum(
+  "tasting_draft_identification_status",
+  TASTING_DRAFT_IDENTIFICATION_STATUS_LIST,
+);
 
 /**
  * A tasting a member has started but not posted. Drafts are private to their
@@ -42,6 +58,23 @@ export const tastingDrafts = pgTable(
       { onDelete: "set null" },
     ),
     imageUrl: text("image_url"),
+    // Identifying the Bottle from the photo runs in the background. `none`
+    // means there is no photo. A new photo resets these fields. See
+    // docs/features/tasting-drafts.md.
+    identificationStatus: tastingDraftIdentificationStatusEnum(
+      "identification_status",
+    )
+      .default("none")
+      .notNull(),
+    identificationAttempts: smallint("identification_attempts")
+      .default(0)
+      .notNull(),
+    // When identification was last queued. The sweep queues a pending draft
+    // again only after this is old enough that its job must have been lost.
+    identificationQueuedAt: timestamp("identification_queued_at"),
+    // Checked by StoredTastingDraftIdentificationSchema on every read.
+    identification:
+      jsonb("identification").$type<StoredTastingDraftIdentification>(),
     ratingBand: ratingBandEnum("rating_band"),
     notes: text("notes"),
     tags: varchar("tags", { length: 64 })
@@ -62,6 +95,9 @@ export const tastingDrafts = pgTable(
       table.createdById,
       table.updatedAt,
     ),
+    index("tasting_draft_identification_pending_idx")
+      .on(table.identificationQueuedAt)
+      .where(sql`${table.identificationStatus} = 'pending'`),
   ],
 );
 
