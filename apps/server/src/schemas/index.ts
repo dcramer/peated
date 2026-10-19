@@ -38,6 +38,7 @@ export * from "./scrapeSources";
 export * from "./shared";
 export * from "./stores";
 export * from "./tags";
+export * from "./tastingDrafts";
 export * from "./tastings";
 export * from "./userBlocks";
 export * from "./users";

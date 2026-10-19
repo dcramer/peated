@@ -113,7 +113,7 @@ export const TastingSchema = z.object({
 
 // Any past time is allowed so people can post drams they had long ago.
 // Feeds sort by post time, so backdating cannot move a tasting up the feed.
-const TastedAtInputSchema = z
+export const TastedAtInputSchema = z
   .string()
   .datetime()
   .refine((value) => !isDistantFuture(new Date(value), 60 * 5), {

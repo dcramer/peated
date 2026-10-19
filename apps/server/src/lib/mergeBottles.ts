@@ -28,6 +28,7 @@ import {
   storePriceMatchAttempts,
   storePriceMatchProposals,
   storePrices,
+  tastingDrafts,
   tastings,
 } from "@peated/server/db/schema";
 import { getUserActor } from "@peated/server/lib/actors";
@@ -436,6 +437,8 @@ async function repointBottleConsumers(
   if (sourceWatches.length) counts.auctionWatches = sourceWatches.length;
   for (const [name, table, column] of [
     ["tastings", tastings, tastings.bottleId],
+    // Drafts follow the Bottle so publishing posts to the survivor.
+    ["tastingDrafts", tastingDrafts, tastingDrafts.bottleId],
     ["reviews", externalReviews, externalReviews.bottleId],
     ["storePrices", storePrices, storePrices.bottleId],
     ["bottleObservations", bottleObservations, bottleObservations.bottleId],

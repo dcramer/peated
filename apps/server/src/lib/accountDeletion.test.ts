@@ -14,6 +14,7 @@ import {
   passkeys,
   reports,
   tastingBadgeAwards,
+  tastingDrafts,
   tastings,
   toasts,
   users,
@@ -122,6 +123,14 @@ describe("deleteUserAccount", () => {
       userId: user.id,
     });
     await fixtures.Passkey({ userId: user.id });
+    await fixtures.TastingDraft({
+      createdById: user.id,
+      imageUrl: "/uploads/tasting-drafts/deleted-member.webp",
+    });
+    const otherDraft = await fixtures.TastingDraft({
+      createdById: other.id,
+      friends: [user.id],
+    });
     const [review] = await db
       .insert(memberReviews)
       .values({ bottleId: bottle.id, createdById: user.id, score: 80 })
@@ -187,6 +196,11 @@ describe("deleteUserAccount", () => {
         where: eq(comments.id, otherComment.id),
       }),
     ).toBeDefined();
+    expect(
+      await db.query.tastingDrafts.findFirst({
+        where: eq(tastingDrafts.id, otherDraft.id),
+      }),
+    ).toMatchObject({ friends: [] });
     expect(await findUser(other.id)).toMatchObject({ deletedAt: null });
 
     // Everything else the member owned is gone.
@@ -230,6 +244,12 @@ describe("deleteUserAccount", () => {
     ).toHaveLength(0);
     expect(
       await db.select().from(passkeys).where(eq(passkeys.userId, user.id)),
+    ).toHaveLength(0);
+    expect(
+      await db
+        .select()
+        .from(tastingDrafts)
+        .where(eq(tastingDrafts.createdById, user.id)),
     ).toHaveLength(0);
 
     expect(workerClient.pushJob).toHaveBeenCalledWith(

@@ -1371,6 +1371,24 @@ export const AuthenticatedHeaders = async (
   };
 };
 
+export const TastingDraft = async (
+  { ...data }: Partial<dbSchema.NewTastingDraft> = {},
+  db: AnyDatabase = dbConn,
+): Promise<dbSchema.TastingDraft> => {
+  const [result] = await db
+    .insert(dbSchema.tastingDrafts)
+    .values({
+      id: faker.string.uuid(),
+      tastedAt: new Date(),
+      notes: faker.lorem.sentence(),
+      ...data,
+      createdById: data.createdById || (await User({}, db)).id,
+    })
+    .returning();
+  if (!result) throw new Error("Unable to create TastingDraft fixture");
+  return result;
+};
+
 export const SampleSquareImage = async () => {
   return new File(
     [await readFile(await SampleSquareImagePath())],
