@@ -83,12 +83,14 @@ commits. A failed file delete is logged and does not fail the save.
    Clients retry a publish with the same draft ID after a lost response.
 2. The draft needs a Bottle. Merged Bottles are resolved, and tags and friends
    are checked again, as `POST /tastings` does.
-3. The photo is copied to `tastings/draft-<draft ID>.<ext>` before the
-   database work. The path is fixed, so a retry overwrites the same file.
-4. In one transaction the server locks the draft, inserts the tasting with the
-   draft's `tastedAt`, the draft ID as its `idempotencyKey`, and the photo,
-   awards badges, and deletes the draft. A posted tasting always has its photo.
-5. After the commit it queues the Bottle stats update, as `POST /tastings`
+3. In one transaction the server locks the draft, copies the photo to
+   `tastings/draft-<draft ID>.<ext>`, inserts the tasting with the draft's
+   `tastedAt`, the draft ID as its `idempotencyKey`, and the photo, awards
+   badges, and deletes the draft. A posted tasting always has its photo. The
+   path is fixed, so a retry overwrites the same file. If posting fails, the
+   copy is deleted before the lock is released, so it cannot remove the file
+   of another publish of the same draft.
+4. After the commit it queues the Bottle stats update, as `POST /tastings`
    does, then deletes the draft's photo file.
 
 The bottle hint is not kept on the tasting. Peated has no use for it after the

@@ -1,7 +1,11 @@
 import { faker } from "@faker-js/faker";
 import config from "@peated/server/config";
 import { db } from "@peated/server/db";
-import { tastingDrafts, tastings } from "@peated/server/db/schema";
+import {
+  bottleTombstones,
+  tastingDrafts,
+  tastings,
+} from "@peated/server/db/schema";
 import { createPendingImageUpload } from "@peated/server/lib/pendingUploads";
 import waitError from "@peated/server/lib/test/waitError";
 import * as workerClient from "@peated/server/lib/test/workerDispatch";
@@ -174,6 +178,55 @@ describe("POST /tasting-drafts/{draft}/publish", () => {
         .where(eq(tastingDrafts.id, draft.id)),
     ).toHaveLength(1);
     expect(await db.select().from(tastings)).toEqual([]);
+  });
+
+  test("removes the photo copy when posting fails", async ({
+    defaults,
+    fixtures,
+  }) => {
+    const retired = await fixtures.Bottle();
+    const replacement = await fixtures.Bottle();
+    const upload = await createPendingImageUpload({
+      file: await fixtures.SampleSquareImage(),
+      createdById: defaults.user.id,
+      purpose: "photo_tasting_entry",
+    });
+    const draftId = faker.string.uuid();
+    await routerClient.tastingDrafts.upsert(
+      {
+        draft: draftId,
+        tastedAt: new Date().toISOString(),
+        bottle: retired.id,
+        pendingImageId: upload.id,
+      },
+      { context: { user: defaults.user } },
+    );
+    await db.insert(bottleTombstones).values({
+      bottleId: retired.id,
+      newBottleId: replacement.id,
+    });
+    const [draft] = await db
+      .select()
+      .from(tastingDrafts)
+      .where(eq(tastingDrafts.id, draftId));
+
+    const error = await waitError(() =>
+      routerClient.tastingDrafts.publish(
+        { draft: draftId },
+        { context: { user: defaults.user } },
+      ),
+    );
+
+    expect(error).toMatchInlineSnapshot(`[Error: Cannot identify bottle.]`);
+    expect(await db.select().from(tastings)).toEqual([]);
+    expect(
+      existsSync(
+        storedFile(
+          `/uploads/tastings/draft-${draftId}${path.posix.extname(draft.imageUrl!)}`,
+        ),
+      ),
+    ).toBe(false);
+    expect(existsSync(storedFile(draft.imageUrl!))).toBe(true);
   });
 
   test("rejects friends the member no longer follows", async ({

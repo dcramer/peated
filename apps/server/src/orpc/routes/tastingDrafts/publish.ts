@@ -78,15 +78,6 @@ export default procedure
     const tags = await validateTags(draft.tags);
     await validateFriends(userId, draft.friends);
 
-    // Copy outside the transaction to a path fixed by the draft ID, so a
-    // retry overwrites the same file instead of leaving another copy.
-    const imageUrl = draft.imageUrl
-      ? await copyUploadByUrl(
-          draft.imageUrl,
-          `tastings/draft-${draft.id}${path.posix.extname(draft.imageUrl)}`,
-        )
-      : null;
-
     const published = await db.transaction(async (tx) => {
       await lockMemberTastingDrafts(tx, userId);
 
@@ -108,31 +99,47 @@ export default procedure
         });
       }
 
-      const createdAt = new Date();
-      const result = await insertTasting(
-        tx,
-        {
-          bottleId,
-          createdById: userId,
-          createdAt,
-          tastedAt: locked.tastedAt,
-          idempotencyKey: locked.id,
-          imageUrl,
-          notes: locked.notes,
-          ratingBand: locked.ratingBand,
-          servingStyle: locked.servingStyle,
-          color: locked.color,
-          tags,
-          friends: locked.friends,
-        },
-        context.user,
-      );
-      // A tasting already used this draft's ID, so the draft was not posted
-      // here. Keep it rather than delete what the member wrote.
-      if (result.replayed) return result;
+      // Copy to a path fixed by the draft ID, so a retry overwrites the same
+      // file. Copying and cleaning up under the member lock keeps a failed
+      // publish from deleting the file of another publish of this draft.
+      const imageUrl = locked.imageUrl
+        ? await copyUploadByUrl(
+            locked.imageUrl,
+            `tastings/draft-${locked.id}${path.posix.extname(locked.imageUrl)}`,
+          )
+        : null;
+      try {
+        const result = await insertTasting(
+          tx,
+          {
+            bottleId,
+            createdById: userId,
+            createdAt: new Date(),
+            tastedAt: locked.tastedAt,
+            idempotencyKey: locked.id,
+            imageUrl,
+            notes: locked.notes,
+            ratingBand: locked.ratingBand,
+            servingStyle: locked.servingStyle,
+            color: locked.color,
+            tags,
+            friends: locked.friends,
+          },
+          context.user,
+        );
+        // A tasting already used this draft's ID, so the draft was not posted
+        // here. Keep it rather than delete what the member wrote.
+        if (result.replayed) {
+          if (imageUrl) await removeTastingDraftPhoto(imageUrl, locked.id);
+          return result;
+        }
 
-      await tx.delete(tastingDrafts).where(eq(tastingDrafts.id, locked.id));
-      return result;
+        await tx.delete(tastingDrafts).where(eq(tastingDrafts.id, locked.id));
+        return result;
+      } catch (err) {
+        if (imageUrl) await removeTastingDraftPhoto(imageUrl, locked.id);
+        throw err;
+      }
     });
 
     if (!published) return await replay();
