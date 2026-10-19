@@ -28,6 +28,7 @@ export * from "./magicLink";
 export * from "./memberReviews";
 export * from "./notifications";
 export * from "./oauth";
+export * from "./passkeys";
 export * from "./pendingUploads";
 export * from "./priceMatches";
 export * from "./profileActivity";

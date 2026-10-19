@@ -3,6 +3,7 @@ import type { AnyDatabase } from "@peated/server/db";
 import { db } from "@peated/server/db";
 import { passkeys } from "@peated/server/db/schema";
 import { signChallenge, verifyChallenge } from "@peated/server/lib/auth";
+import { PasskeyTransportSchema } from "@peated/server/schemas";
 import {
   generateRegistrationOptions,
   verifyRegistrationResponse,
@@ -30,9 +31,7 @@ export const ClientDataJSONSchema = z.object({
   origin: z.string(),
   crossOrigin: z.boolean().optional(),
 });
-export const AuthenticatorTransportsSchema = z.array(
-  z.enum(["ble", "cable", "hybrid", "internal", "nfc", "smart-card", "usb"]),
-);
+export const AuthenticatorTransportsSchema = z.array(PasskeyTransportSchema);
 
 // Type for credentials to exclude during registration (string-based IDs from our database)
 export interface ExcludeCredential {
