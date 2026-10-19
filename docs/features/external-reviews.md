@@ -32,6 +32,23 @@ again while its name stays the same. A later accepted reference for that name
 still matches the review on its next import. A classifier failure records
 nothing, so the review is tried again.
 
+Automatic matches and creates must pass the classifier's evidence-derived
+automation tier before assigning a review or creating a Bottle. A decision
+that needs review leaves the source unresolved and keeps its saved proposal.
+Completed unresolved attempts, including ignored inputs, appear in the
+Moderation Inbox. A moderator can read the saved evidence, assign an existing
+Bottle, or request a new check. A missing Bottle can be added through the
+catalog form before assignment. Assignment publishes a staged review only
+when its source is approved; it never restores removed content.
+
+`GET /external-reviews/{externalReview}/resolution` exposes the latest saved
+decision to moderators. `POST /external-reviews/recheck` accepts at most 100
+explicit reviews with the name and attempt timestamp observed by the caller.
+A changed, assigned, removed, or already-pending review rejects the batch.
+The worker processes only the requested review IDs. Failed queue dispatch
+restores unqueued unresolved tasks to the Inbox. Pending rechecks belong to
+Background work until a completed decision needs a person.
+
 Stopping publication hides its reviews without deleting them or stopping
 collection. Only a moderator can change publication. Peated records the change
 in the audit log.

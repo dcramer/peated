@@ -6,6 +6,8 @@ import {
   auctions,
   bottleChecks,
   bottleOperations,
+  externalReviewArticles,
+  externalReviews,
   externalSites,
   reports,
   storePriceMatchProposals,
@@ -29,10 +31,64 @@ import {
 import { currentStorePriceCondition } from "@peated/server/lib/storePriceValidity";
 import type { ModerationTaskSummary } from "@peated/server/orpc/routes/admin/moderation/schemas";
 import { REPORT_REASON_LABELS } from "@peated/server/schemas/reports";
-import { and, asc, eq, inArray, isNull, lte, or, sql } from "drizzle-orm";
+import {
+  and,
+  asc,
+  eq,
+  inArray,
+  isNotNull,
+  isNull,
+  lte,
+  or,
+  sql,
+} from "drizzle-orm";
 
 const MAX_PROJECTED_SOURCE_ROWS = 10_000;
 const OPERATIONAL_STATUSES = new Set(["applying", "stale", "failed"]);
+
+async function reviewTasks(
+  reviewId?: number,
+): Promise<ModerationTaskSummary[]> {
+  const reviews = await db
+    .select({
+      id: externalReviews.id,
+      name: externalReviews.name,
+      attemptedAt: externalReviews.bottleNoMatchAt,
+      siteName: externalSites.name,
+    })
+    .from(externalReviews)
+    .innerJoin(
+      externalReviewArticles,
+      eq(externalReviewArticles.id, externalReviews.articleId),
+    )
+    .innerJoin(
+      externalSites,
+      eq(externalSites.id, externalReviewArticles.externalSiteId),
+    )
+    .where(
+      and(
+        isNull(externalReviews.bottleId),
+        isNull(externalReviews.removedAt),
+        isNotNull(externalReviews.bottleNoMatchAt),
+        reviewId === undefined ? undefined : eq(externalReviews.id, reviewId),
+      ),
+    )
+    .orderBy(asc(externalReviews.bottleNoMatchAt), asc(externalReviews.id))
+    .limit(MAX_PROJECTED_SOURCE_ROWS);
+  return reviews.map((review) => ({
+    key: `external_review:${review.id}`,
+    kind: "external_review",
+    category: "listing",
+    state: "ready",
+    inconclusive: true,
+    title: review.name,
+    sourceLabel: review.siteName,
+    question: "Which bottle should this review use?",
+    statusLabel: "Unresolved review",
+    attentionAt: review.attemptedAt!.toISOString(),
+    source: { kind: "external_review", reviewId: review.id },
+  }));
+}
 
 async function auctionTasks(lotId?: number): Promise<ModerationTaskSummary[]> {
   const rows = await db
@@ -369,13 +425,21 @@ async function catalogTasks(): Promise<ModerationTaskSummary[]> {
 export async function projectModerationTasks(): Promise<
   ModerationTaskSummary[]
 > {
-  const [listings, catalog, reportList, auctionList] = await Promise.all([
-    listingTasks(),
-    catalogTasks(),
-    reportTasks(),
-    auctionTasks(),
-  ]);
-  const tasks = [...listings, ...catalog, ...reportList, ...auctionList];
+  const [listings, catalog, reportList, auctionList, reviewList] =
+    await Promise.all([
+      listingTasks(),
+      catalogTasks(),
+      reportTasks(),
+      auctionTasks(),
+      reviewTasks(),
+    ]);
+  const tasks = [
+    ...listings,
+    ...catalog,
+    ...reportList,
+    ...auctionList,
+    ...reviewList,
+  ];
   return tasks.sort(
     (left, right) =>
       left.attentionAt.localeCompare(right.attentionAt) ||
@@ -388,6 +452,7 @@ export async function locateModerationTask(
 ): Promise<ModerationTaskSummary | null> {
   const [kind, rawId] = key.split(":");
   const id = Number(rawId);
+  if (kind === "external_review") return (await reviewTasks(id)).at(0) ?? null;
   if (kind === "auction_lot") return (await auctionTasks(id)).at(0) ?? null;
   if (kind === "listing") return (await listingTasks(id)).at(0) ?? null;
   if (kind === "report") return (await reportTasks(id)).at(0) ?? null;

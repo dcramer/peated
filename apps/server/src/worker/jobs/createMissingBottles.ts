@@ -34,6 +34,7 @@ import type { JobPayload } from "../types";
 const InputSchema = z
   .object({
     articleId: z.number().int().positive().optional(),
+    reviewId: z.number().int().positive().optional(),
   })
   .strict();
 
@@ -47,7 +48,7 @@ export async function createMissingBottles(
   rawInput?: JobPayload,
   services?: CreateMissingBottlesServices,
 ) {
-  const { articleId } = InputSchema.parse(rawInput ?? {});
+  const { articleId, reviewId } = InputSchema.parse(rawInput ?? {});
   const systemActor = await getPeatedSystemActor();
 
   // Advance by id so unresolved reviews are visited once per run instead of
@@ -66,6 +67,8 @@ export async function createMissingBottles(
         and(
           isNull(externalReviews.bottleId),
           isNull(externalReviews.bottleNoMatchAt),
+          isNull(externalReviews.removedAt),
+          reviewId === undefined ? undefined : eq(externalReviews.id, reviewId),
           gt(externalReviews.id, cursor),
           articleId === undefined
             ? undefined
@@ -135,11 +138,14 @@ export async function createMissingBottles(
           // same question. A later accepted reference still matches the review.
           await db
             .update(externalReviews)
-            .set({ bottleNoMatchAt: sql`NOW()` })
+            .set({ bottleNoMatchAt: sql`NOW()`, updatedAt: sql`NOW()` })
             .where(
               and(
                 eq(externalReviews.id, review.id),
                 isNull(externalReviews.bottleId),
+                isNull(externalReviews.removedAt),
+                eq(externalReviews.name, review.name),
+                eq(externalReviews.articleId, review.articleId),
               ),
             );
         }

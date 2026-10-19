@@ -4,6 +4,7 @@ import { db } from "@peated/server/db";
 import {
   bottleChecks,
   bottleReferences,
+  bottles,
   externalReviews,
   incomingBottleDecisionLogs,
   storePrices,
@@ -12,6 +13,7 @@ import { getPeatedSystemActor } from "@peated/server/lib/actors";
 import { listActionableBottleChecks } from "@peated/server/lib/bottleChecks";
 import { normalizeBottleReferenceKey } from "@peated/server/lib/normalize";
 import * as workerClient from "@peated/server/lib/test/workerDispatch";
+import { routerClient } from "@peated/server/orpc/router";
 import {
   createMissingBottles as createMissingBottlesWithServices,
   type CreateMissingBottlesServices,
@@ -63,6 +65,7 @@ function buildClassification(
     status: "classified" as const,
     decision: {
       rationale: "test fixture",
+      confidenceBasis: { webEvidence: "supportive", unresolvedRisks: [] },
       candidateBottleIds: [],
       identityScope: "product",
       observation: null,
@@ -83,6 +86,74 @@ function buildClassification(
 }
 
 describe("createMissingBottles", () => {
+  test.for(["match", "create_bottle"] as const)(
+    "sends a %s with unresolved risks to moderation before any assignment or creation",
+    async (action, { fixtures }) => {
+      const brand = await fixtures.Entity({ name: "Evidence Bottler" });
+      const candidate = await fixtures.Bottle({ brandId: brand.id });
+      const review = await fixtures.ExternalReview({
+        bottleId: null,
+        name: "Uncertain review",
+      });
+      const classification = BottleClassificationResultSchema.parse({
+        status: "classified",
+        decision: {
+          action,
+          matchedBottleId: action === "match" ? candidate.id : null,
+          candidateBottleIds: [candidate.id],
+          proposedBottle:
+            action === "create_bottle"
+              ? {
+                  name: "New release",
+                  brand: { id: brand.id, name: brand.name },
+                  distillers: [],
+                  category: "single_malt",
+                }
+              : null,
+          rationale: "The label identity is still uncertain.",
+          identityScope: "product",
+          observation: null,
+          referenceScope: "none",
+          confidenceBasis: {
+            webEvidence: "supportive",
+            unresolvedRisks: [
+              {
+                category: "identity_ambiguity",
+                note: "The product label is unclear.",
+              },
+            ],
+          },
+        },
+        artifacts: {
+          candidates: [
+            { bottleId: candidate.id, fullName: candidate.fullName },
+          ],
+          extractedIdentity: null,
+          searchEvidence: [],
+          resolvedEntities: [],
+        },
+      });
+      classifyBottleReferenceMock.mockResolvedValueOnce(classification);
+      await createMissingBottles({ reviewId: review.id });
+      expect(
+        await db.query.externalReviews.findFirst({
+          where: eq(externalReviews.id, review.id),
+        }),
+      ).toMatchObject({ bottleId: null, bottleNoMatchAt: expect.any(Date) });
+      const mod = await fixtures.User({ mod: true });
+      expect(
+        (
+          await routerClient.admin.moderation.listTasks(undefined, {
+            context: { user: mod },
+          })
+        ).results,
+      ).toEqual([
+        expect.objectContaining({ key: `external_review:${review.id}` }),
+      ]);
+      expect(await db.select().from(bottles)).toHaveLength(1);
+      expect(await findReviewBottleCheck(review.id)).toBeDefined();
+    },
+  );
   test("assigns only the review when source context cannot support a global alias", async ({
     fixtures,
   }) => {
@@ -237,7 +308,7 @@ describe("createMissingBottles", () => {
           action: "create_bottle",
           identityScope: "product",
           observation: null,
-          confidenceBasis: null,
+          confidenceBasis: { webEvidence: "supportive", unresolvedRisks: [] },
         },
         resolutionSource: "classifier_create_bottle",
         issue,
@@ -355,7 +426,7 @@ describe("createMissingBottles", () => {
           action: "create_bottle",
           identityScope: "product",
           observation: null,
-          confidenceBasis: null,
+          confidenceBasis: { webEvidence: "supportive", unresolvedRisks: [] },
         },
         resolutionSource: "classifier_create_bottle",
         issue,

@@ -318,8 +318,7 @@ export const classifierEvalFixtureSchema = z
 
     if (
       value.localCatalog === undefined &&
-      (value.input.initialCandidates === undefined ||
-        value.input.initialCandidates.length === 0)
+      value.input.initialCandidates === undefined
     ) {
       ctx.addIssue({
         code: z.ZodIssueCode.custom,

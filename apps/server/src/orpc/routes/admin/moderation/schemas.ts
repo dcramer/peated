@@ -3,6 +3,7 @@ import { z } from "zod";
 export const ModerationTaskKindSchema = z.enum([
   "listing",
   "auction_lot",
+  "external_review",
   "operation",
   "finding",
   "report",
@@ -16,9 +17,17 @@ export const ModerationTaskStateSchema = z.enum(["ready", "blocked"]);
 
 export const ModerationTaskKeySchema = z
   .string()
-  .regex(/^(listing|auction_lot|operation|finding|report):\d+$/);
+  .regex(
+    /^(listing|auction_lot|external_review|operation|finding|report):\d+$/,
+  );
 
 export const ModerationTaskSourceSchema = z.discriminatedUnion("kind", [
+  z
+    .object({
+      kind: z.literal("external_review"),
+      reviewId: z.number().int().positive(),
+    })
+    .strict(),
   z
     .object({
       kind: z.literal("auction_lot"),

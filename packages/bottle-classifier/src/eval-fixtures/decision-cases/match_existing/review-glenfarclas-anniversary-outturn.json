@@ -1,0 +1,96 @@
+{
+  "id": "review-glenfarclas-anniversary-outturn",
+  "name": "review glenfarclas anniversary outturn",
+  "input": {
+    "reference": {
+      "id": 18875,
+      "url": "https://www.whiskyfun.com/2026/A-very-lovely-trio-of-Glenfarclas.html",
+      "name": "Glenfarclas ‘190 Anniversary’ (90° proof, OB, 15,000 bottles, 2026)",
+      "imageUrl": null,
+      "externalSiteId": 5785,
+      "currentBottleId": null
+    },
+    "extractedIdentity": null,
+    "imageEvidence": null
+  },
+  "context": {
+    "inspectedBottleIds": [],
+    "bottleContexts": [],
+    "inspectedEntities": [
+      {
+        "kind": "distillery",
+        "name": "Glenfarclas",
+        "score": 1,
+        "source": ["exact", "text", "prefix", "contained"],
+        "entityId": 976,
+        "reference": "Glenfarclas",
+        "shortName": null,
+        "retrievedFor": [
+          {
+            "exact": true,
+            "query": "Glenfarclas"
+          }
+        ]
+      },
+      {
+        "kind": "brand",
+        "name": "Scott's Selection",
+        "score": 1,
+        "source": ["exact", "text", "prefix", "contained"],
+        "entityId": 5710,
+        "reference": "Scott's Selection",
+        "shortName": null,
+        "retrievedFor": [
+          {
+            "exact": true,
+            "query": "Scott's Selection"
+          }
+        ]
+      }
+    ],
+    "inspectedSeries": []
+  },
+  "provenance": {
+    "source": "production_miss",
+    "verifiedSourceUrls": [
+      "https://glenfarclas.com/190th-anniversary-limited-edition/",
+      "https://www.whiskyfun.com/2026/A-very-lovely-trio-of-Glenfarclas.html"
+    ],
+    "dbOutcome": {
+      "bottleId": null,
+      "createsBottle": false,
+      "summary": "Production saved an ignored result before extraction because a release outturn was mistaken for a multi-bottle listing; the review remained unassigned."
+    },
+    "notes": "Captured from saved classifier run 27203 (review 18875, model openai/gpt-6-luna, 2026-10-16T18:45:00.483Z). Production rationale: none Verified independently on 2026-10-19. Existing Glenfarclas and Scott's Selection Entity context comes from the same article's saved run 27205; no new matching Bottle is injected. Follow-up relationship inventory found pre-existing Bottle 63382, omitted by the name search. The production guard returned before retrieving any candidates. localCatalog rehydrates the independently fetched pre-existing target so the regression exercises actual retrieval."
+  },
+  "expected": {
+    "status": "classified",
+    "action": "match",
+    "identityScope": "product",
+    "matchedBottleId": 63382,
+    "expectedTier": "auto",
+    "summary": "Match the existing official anniversary release. Its 15,000-bottle outturn is not a multipack and the 90 British proof equals 51.4% ABV. Missing outturn on the catalog candidate does not require a duplicate."
+  },
+  "localCatalog": {
+    "entities": [
+      {
+        "id": 976,
+        "name": "Glenfarclas",
+        "kind": "distillery"
+      }
+    ],
+    "bottles": [
+      {
+        "id": 63382,
+        "name": "190th Anniversary Edition",
+        "fullName": "Glenfarclas 190th Anniversary Edition",
+        "brandId": 976,
+        "distillerIds": [976],
+        "category": "single_malt",
+        "abv": 51.4,
+        "releaseYear": 2026
+      }
+    ],
+    "references": []
+  }
+}
