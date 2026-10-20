@@ -16,7 +16,7 @@ describe("reviewAssignment", () => {
       },
     });
   });
-  test("does not assign a review while a recheck is pending", () => {
+  test("does not assign a review before its first unresolved attempt completes", () => {
     expect(() => reviewAssignment({ ...item, attemptedAt: null }, 42)).toThrow(
       "no longer waiting",
     );

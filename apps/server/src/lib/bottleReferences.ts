@@ -182,7 +182,7 @@ export class CanonicalBottleReferenceCorrectionError extends Error {
 
 export type BottleReferenceReviewIdentitySnapshot = Pick<
   typeof externalReviews.$inferSelect,
-  "id" | "name" | "bottleId"
+  "id" | "name" | "bottleId" | "articleId" | "bottleNoMatchAt" | "removedAt"
 >;
 
 export type BottleReferenceAssignmentInput = {
@@ -527,6 +527,7 @@ export async function reserveExactBottleReferenceInTransaction(
   });
 }
 
+// Review matching owns concurrency: observed attempts and removal state must still match.
 export async function assertExpectedReviewIdentity(
   tx: AnyTransaction,
   expectedReview: BottleReferenceReviewIdentitySnapshot,
@@ -536,6 +537,9 @@ export async function assertExpectedReviewIdentity(
       id: externalReviews.id,
       name: externalReviews.name,
       bottleId: externalReviews.bottleId,
+      articleId: externalReviews.articleId,
+      bottleNoMatchAt: externalReviews.bottleNoMatchAt,
+      removedAt: externalReviews.removedAt,
     })
     .from(externalReviews)
     .where(eq(externalReviews.id, expectedReview.id))
@@ -544,7 +548,11 @@ export async function assertExpectedReviewIdentity(
   if (
     !lockedReview ||
     lockedReview.name !== expectedReview.name ||
-    lockedReview.bottleId !== expectedReview.bottleId
+    lockedReview.bottleId !== expectedReview.bottleId ||
+    lockedReview.articleId !== expectedReview.articleId ||
+    lockedReview.bottleNoMatchAt?.getTime() !==
+      expectedReview.bottleNoMatchAt?.getTime() ||
+    lockedReview.removedAt?.getTime() !== expectedReview.removedAt?.getTime()
   ) {
     throw new StaleBottleReferenceReviewIdentityError(expectedReview.id);
   }

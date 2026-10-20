@@ -169,7 +169,7 @@ describe("external review resolution", () => {
     ).rejects.toThrow("no longer needs attention");
   });
 
-  test("rechecks only explicit reviews and rejects stale batches before clearing any state", async ({
+  test("rechecks only explicit versions without hiding unresolved reviews", async ({
     fixtures,
   }) => {
     const mod = await fixtures.User({ mod: true });
@@ -211,7 +211,13 @@ describe("external review resolution", () => {
     ).resolves.toEqual({ queued: [first.id] });
     expect(workerDispatch.pushUniqueJob).toHaveBeenCalledWith(
       "CreateMissingBottles",
-      { reviewId: first.id },
+      {
+        reviewId: first.id,
+        expectedResolution: {
+          name: first.name,
+          attemptedAt: attemptedAt.toISOString(),
+        },
+      },
     );
     expect(
       (
@@ -219,7 +225,7 @@ describe("external review resolution", () => {
           where: eq(externalReviews.id, first.id),
         })
       )?.bottleNoMatchAt,
-    ).toBeNull();
+    ).toEqual(attemptedAt);
     expect(
       (
         await db.query.externalReviews.findFirst({
@@ -239,10 +245,10 @@ describe("external review resolution", () => {
         },
         { context: { user: mod } },
       ),
-    ).rejects.toThrow("review changed");
+    ).resolves.toMatchObject({ bottle: { id: expect.any(Number) } });
   });
 
-  test("dispatch failures restore unresolved tasks without undoing a concurrent assignment", async ({
+  test("dispatch failures leave unresolved tasks visible without undoing a concurrent assignment", async ({
     fixtures,
   }) => {
     const mod = await fixtures.User({ mod: true });
@@ -257,7 +263,7 @@ describe("external review resolution", () => {
     workerDispatch.pushUniqueJob.mockImplementationOnce(async () => {
       await db
         .update(externalReviews)
-        .set({ bottleId: bottle.id })
+        .set({ bottleId: bottle.id, bottleNoMatchAt: null })
         .where(eq(externalReviews.id, second.id));
       throw new Error("Queue unavailable");
     });
@@ -279,7 +285,7 @@ describe("external review resolution", () => {
           where: eq(externalReviews.id, first.id),
         })
       )?.bottleNoMatchAt,
-    ).not.toBeNull();
+    ).toEqual(attemptedAt);
     expect(
       await db.query.externalReviews.findFirst({
         where: eq(externalReviews.id, second.id),

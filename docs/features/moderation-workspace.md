@@ -36,7 +36,9 @@ facts. See [Whisky auctions](./auctions.md).
 Critic-review tasks are keyed by the review ID. Their saved classifier check
 is evidence, not a second task. Assignment and recheck actions validate the
 observed name and completed-attempt timestamp, and assigned or removed reviews
-leave the Inbox. Staged sources can still be matched before publication.
+leave the Inbox. Rechecks preserve the last unresolved task while the worker
+runs or retries; a failure cannot hide it. Staged sources can still be matched
+before publication.
 
 A catalog task reads its saved Bottle check through
 `apps/server/src/lib/bottleCheckEvidence.ts`, which keeps only the IDs, links,

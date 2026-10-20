@@ -19,7 +19,7 @@ import {
   type CreateMissingBottlesServices,
 } from "@peated/server/worker/jobs/createMissingBottles";
 import type { JobPayload } from "@peated/server/worker/types";
-import { and, eq } from "drizzle-orm";
+import { and, eq, sql } from "drizzle-orm";
 import { beforeEach, describe, expect, test, vi } from "vitest";
 
 const classifyBottleReferenceMock =
@@ -493,7 +493,9 @@ describe("createMissingBottles", () => {
       new Error("The AI service is unavailable."),
     );
 
-    await createMissingBottles();
+    await expect(createMissingBottles()).rejects.toThrow(
+      "The AI service is unavailable.",
+    );
     expect(
       await db.query.externalReviews.findFirst({
         where: eq(externalReviews.id, review.id),
@@ -503,6 +505,301 @@ describe("createMissingBottles", () => {
     await createMissingBottles();
     expect(classifyBottleReferenceMock).toHaveBeenCalledTimes(2);
   });
+
+  test("rechecks legacy attempt timestamps with PostgreSQL microsecond precision", async ({
+    fixtures,
+  }) => {
+    const review = await fixtures.ExternalReview({ bottleId: null });
+    await db
+      .update(externalReviews)
+      .set({ bottleNoMatchAt: sql`'2026-10-16 18:45:00.123456'::timestamp` })
+      .where(eq(externalReviews.id, review.id));
+    const mod = await fixtures.User({ mod: true });
+    await routerClient.externalReviews.recheck(
+      {
+        reviews: [
+          {
+            reviewId: review.id,
+            name: review.name,
+            attemptedAt: "2026-10-16T18:45:00.123Z",
+          },
+        ],
+      },
+      { context: { user: mod } },
+    );
+    await createMissingBottles(
+      workerClient.pushUniqueJob.mock.calls.at(-1)![1],
+    );
+    expect(classifyBottleReferenceMock).toHaveBeenCalledTimes(1);
+    const completed = await db.query.externalReviews.findFirst({
+      where: eq(externalReviews.id, review.id),
+    });
+    expect(completed?.bottleNoMatchAt?.getTime()).toBeGreaterThan(
+      new Date("2026-10-16T18:45:00.123Z").getTime(),
+    );
+  });
+
+  test("failed rechecks remain in moderation and can be requeued without another import", async ({
+    fixtures,
+  }) => {
+    const mod = await fixtures.User({ mod: true });
+    const review = await fixtures.ExternalReview({ bottleId: null });
+    const attemptedAt = new Date("2026-10-16T18:45:00.000Z");
+    await db
+      .update(externalReviews)
+      .set({ bottleNoMatchAt: attemptedAt })
+      .where(eq(externalReviews.id, review.id));
+    const input = {
+      reviews: [
+        {
+          reviewId: review.id,
+          name: review.name,
+          attemptedAt: attemptedAt.toISOString(),
+        },
+      ],
+    };
+    await routerClient.externalReviews.recheck(input, {
+      context: { user: mod },
+    });
+    const payload = workerClient.pushUniqueJob.mock.calls.at(-1)![1];
+    const assertVisible = async () => {
+      await expect(
+        routerClient.admin.moderation.task(
+          { key: `external_review:${review.id}` },
+          { context: { user: mod } },
+        ),
+      ).resolves.toMatchObject({
+        task: { key: `external_review:${review.id}` },
+      });
+      expect(
+        await db.query.externalReviews.findFirst({
+          where: eq(externalReviews.id, review.id),
+        }),
+      ).toMatchObject({ bottleId: null, bottleNoMatchAt: attemptedAt });
+    };
+    await assertVisible();
+    classifyBottleReferenceMock.mockRejectedValueOnce(
+      new Error("Classifier unavailable"),
+    );
+    await expect(createMissingBottles(payload)).rejects.toThrow(
+      "Classifier unavailable",
+    );
+    await assertVisible();
+    expect(await findReviewBottleCheck(review.id)).toBeUndefined();
+    await routerClient.externalReviews.recheck(input, {
+      context: { user: mod },
+    });
+    await createMissingBottles(
+      workerClient.pushUniqueJob.mock.calls.at(-1)![1],
+    );
+    const completed = await db.query.externalReviews.findFirst({
+      where: eq(externalReviews.id, review.id),
+    });
+    expect(completed?.bottleNoMatchAt?.getTime()).toBeGreaterThan(
+      attemptedAt.getTime(),
+    );
+    expect(await findReviewBottleCheck(review.id)).toBeDefined();
+    await createMissingBottles(payload);
+    expect(classifyBottleReferenceMock).toHaveBeenCalledTimes(2);
+    await expect(
+      routerClient.externalReviews.recheck(input, { context: { user: mod } }),
+    ).rejects.toThrow("review changed");
+  });
+
+  test("a queued recheck can match a review and safely replay after success", async ({
+    fixtures,
+  }) => {
+    const mod = await fixtures.User({ mod: true, admin: true });
+    const review = await fixtures.ExternalReview({ bottleId: null });
+    const attemptedAt = new Date("2026-10-16T18:45:00.000Z");
+    await db
+      .update(externalReviews)
+      .set({ bottleNoMatchAt: attemptedAt })
+      .where(eq(externalReviews.id, review.id));
+    const bottle = await fixtures.Bottle();
+    classifyBottleReferenceMock.mockResolvedValueOnce(
+      buildClassification(
+        {
+          action: "match",
+          matchedBottleId: bottle.id,
+          candidateBottleIds: [bottle.id],
+          referenceScope: "none",
+        },
+        { candidates: [{ bottleId: bottle.id }] },
+      ),
+    );
+    await routerClient.externalReviews.recheck(
+      {
+        reviews: [
+          {
+            reviewId: review.id,
+            name: review.name,
+            attemptedAt: attemptedAt.toISOString(),
+          },
+        ],
+      },
+      { context: { user: mod } },
+    );
+    const payload = workerClient.pushUniqueJob.mock.calls.at(-1)![1];
+    await createMissingBottles(payload);
+    expect(
+      await db.query.externalReviews.findFirst({
+        where: eq(externalReviews.id, review.id),
+      }),
+    ).toMatchObject({ bottleId: bottle.id, bottleNoMatchAt: null });
+    await expect(
+      routerClient.admin.moderation.task(
+        { key: `external_review:${review.id}` },
+        { context: { user: mod } },
+      ),
+    ).rejects.toThrow("no longer needs attention");
+    await createMissingBottles(payload);
+    expect(classifyBottleReferenceMock).toHaveBeenCalledTimes(1);
+  });
+
+  test.for(["assigned", "removed", "renamed", "new_attempt"] as const)(
+    "skips a queued recheck after the review is %s",
+    async (change, { fixtures }) => {
+      const review = await fixtures.ExternalReview({ bottleId: null });
+      const attemptedAt = new Date("2026-10-16T18:45:00.000Z");
+      await db
+        .update(externalReviews)
+        .set({ bottleNoMatchAt: attemptedAt })
+        .where(eq(externalReviews.id, review.id));
+      const mod = await fixtures.User({ mod: true, admin: true });
+      await routerClient.externalReviews.recheck(
+        {
+          reviews: [
+            {
+              reviewId: review.id,
+              name: review.name,
+              attemptedAt: attemptedAt.toISOString(),
+            },
+          ],
+        },
+        { context: { user: mod } },
+      );
+      if (change === "removed") {
+        await routerClient.admin.content.moderate(
+          {
+            kind: "external_review",
+            id: review.id,
+            removed: true,
+            reason: "Not a review.",
+          },
+          { context: { user: mod } },
+        );
+      } else
+        await db
+          .update(externalReviews)
+          .set(
+            change === "assigned"
+              ? {
+                  bottleId: (await fixtures.Bottle()).id,
+                  bottleNoMatchAt: null,
+                }
+              : change === "renamed"
+                ? { name: "Changed review" }
+                : { bottleNoMatchAt: new Date() },
+          )
+          .where(eq(externalReviews.id, review.id));
+      const changed = await db.query.externalReviews.findFirst({
+        where: eq(externalReviews.id, review.id),
+      });
+      await createMissingBottles(
+        workerClient.pushUniqueJob.mock.calls.at(-1)![1],
+      );
+      expect(classifyBottleReferenceMock).not.toHaveBeenCalled();
+      expect(
+        await db.query.externalReviews.findFirst({
+          where: eq(externalReviews.id, review.id),
+        }),
+      ).toEqual(changed);
+    },
+  );
+
+  test.for([
+    ["assigned", "match"],
+    ["removed", "match"],
+    ["renamed", "match"],
+    ["new_attempt", "match"],
+    ["assigned", "no_match"],
+    ["removed", "no_match"],
+    ["renamed", "no_match"],
+    ["new_attempt", "no_match"],
+  ] as const)(
+    "does not overwrite concurrent %s changes with a %s result",
+    async ([change, action], { fixtures }) => {
+      const review = await fixtures.ExternalReview({ bottleId: null });
+      const attemptedAt = new Date("2026-10-16T18:45:00.000Z");
+      await db
+        .update(externalReviews)
+        .set({ bottleNoMatchAt: attemptedAt })
+        .where(eq(externalReviews.id, review.id));
+      const bottle = await fixtures.Bottle();
+      const mod = await fixtures.User({ mod: true, admin: true });
+      await routerClient.externalReviews.recheck(
+        {
+          reviews: [
+            {
+              reviewId: review.id,
+              name: review.name,
+              attemptedAt: attemptedAt.toISOString(),
+            },
+          ],
+        },
+        { context: { user: mod } },
+      );
+      let changed: typeof review | undefined;
+      classifyBottleReferenceMock.mockImplementationOnce(async () => {
+        if (change === "removed") {
+          await routerClient.admin.content.moderate(
+            {
+              kind: "external_review",
+              id: review.id,
+              removed: true,
+              reason: "Not a review.",
+            },
+            { context: { user: mod } },
+          );
+        } else
+          await db
+            .update(externalReviews)
+            .set(
+              change === "assigned"
+                ? { bottleId: bottle.id, bottleNoMatchAt: null }
+                : change === "renamed"
+                  ? { name: "Changed review" }
+                  : { bottleNoMatchAt: new Date() },
+            )
+            .where(eq(externalReviews.id, review.id));
+        changed = await db.query.externalReviews.findFirst({
+          where: eq(externalReviews.id, review.id),
+        });
+        return buildClassification(
+          {
+            action,
+            matchedBottleId: action === "match" ? bottle.id : undefined,
+            candidateBottleIds: [bottle.id],
+            referenceScope: "none",
+          },
+          { candidates: [{ bottleId: bottle.id }] },
+        );
+      });
+      await createMissingBottles(
+        workerClient.pushUniqueJob.mock.calls.at(-1)![1],
+      );
+      expect(classifyBottleReferenceMock).toHaveBeenCalledTimes(1);
+      expect(
+        await db.query.externalReviews.findFirst({
+          where: eq(externalReviews.id, review.id),
+        }),
+      ).toEqual(changed);
+      expect(await db.select().from(incomingBottleDecisionLogs)).toHaveLength(
+        0,
+      );
+    },
+  );
 
   test("limits queued work to one review article", async ({ fixtures }) => {
     const site = await fixtures.ExternalSiteOrExisting();

@@ -30,7 +30,7 @@ name, then asks the Bottle classifier once. When the classifier finds no
 Bottle, the review records that answer and is not sent to the classifier
 again while its name stays the same. A later accepted reference for that name
 still matches the review on its next import. A classifier failure records
-nothing, so the review is tried again.
+no completed answer and fails the worker job, so a retry can ask again.
 
 Initial automatic matches and creates must pass the classifier's evidence-derived
 automation tier before assigning a review or creating a Bottle. A decision
@@ -45,10 +45,17 @@ when its source is approved; it never restores removed content.
 `GET /external-reviews/{externalReview}/resolution` exposes the latest saved
 decision to moderators. `POST /external-reviews/recheck` accepts at most 100
 explicit reviews with the name and attempt timestamp observed by the caller.
-A changed, assigned, removed, or already-pending review rejects the batch.
-The worker processes only the requested review IDs. Failed queue dispatch
-restores unqueued unresolved tasks to the Inbox. Pending rechecks belong to
-Background work until a completed decision needs a person.
+A changed, assigned, removed, or never-completed review rejects the batch.
+Rechecks preserve the last unresolved result and its Inbox task while work is
+queued or running, including after dispatch or classifier failures. The worker
+processes only the requested review version and checks it again before applying
+a result. A moderator can still assign or remove the review during a recheck;
+a stale result cannot overwrite that change. A completed unresolved answer
+advances the attempt timestamp, and a successful assignment clears it.
+Classifier failures reach the worker's error handler. Temporary provider outages
+use the model queue's existing pause and retry handling; other errors fail the
+job. Failed rechecks remain visible for manual resolution or rechecking and do
+not depend on another scraper import to recover.
 
 Stopping publication hides its reviews without deleting them or stopping
 collection. Only a moderator can change publication. Peated records the change

@@ -7,7 +7,7 @@ import {
 import { procedure } from "@peated/server/orpc";
 import { requireMod } from "@peated/server/orpc/middleware";
 import { pushUniqueJob } from "@peated/server/worker/client";
-import { and, asc, eq, inArray, isNull } from "drizzle-orm";
+import { asc, inArray } from "drizzle-orm";
 import { z } from "zod";
 
 export default procedure
@@ -42,7 +42,6 @@ export default procedure
   )
   .output(z.object({ queued: z.array(z.number()) }).strict())
   .handler(async ({ input, errors }) => {
-    const queuedAt = new Date();
     await db.transaction(async (tx) => {
       const reviews = await tx
         .select()
@@ -62,40 +61,13 @@ export default procedure
             message: "A review changed. Refresh the batch before rechecking.",
           });
       }
-      await tx
-        .update(externalReviews)
-        .set({ bottleNoMatchAt: null, updatedAt: queuedAt })
-        .where(
-          inArray(
-            externalReviews.id,
-            reviews.map(({ id }) => id),
-          ),
-        );
     });
-    for (const [index, expected] of input.reviews.entries()) {
-      try {
-        await pushUniqueJob("CreateMissingBottles", {
-          reviewId: expected.reviewId,
-        });
-      } catch (error) {
-        // Review matching owns recovery: a dispatch failure must leave a visible Inbox task.
-        for (const pending of input.reviews.slice(index)) {
-          await db
-            .update(externalReviews)
-            .set({ bottleNoMatchAt: new Date() })
-            .where(
-              and(
-                eq(externalReviews.id, pending.reviewId),
-                eq(externalReviews.name, pending.name),
-                eq(externalReviews.updatedAt, queuedAt),
-                isNull(externalReviews.bottleId),
-                isNull(externalReviews.bottleNoMatchAt),
-                isNull(externalReviews.removedAt),
-              ),
-            );
-        }
-        throw error;
-      }
+    // Review matching owns this state: queueing work must not erase an unresolved result.
+    for (const { reviewId, ...expectedResolution } of input.reviews) {
+      await pushUniqueJob("CreateMissingBottles", {
+        reviewId,
+        expectedResolution,
+      });
     }
     return { queued: input.reviews.map(({ reviewId }) => reviewId) };
   });
