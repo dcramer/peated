@@ -2,11 +2,7 @@ import { expect, test, type Page } from "@playwright/test";
 import fs from "node:fs/promises";
 import path from "node:path";
 
-import {
-  replaceStorybookScreenshotsInManifest,
-  screenshotFile,
-  storiesFromIndex,
-} from "./storybook-screenshots.mjs";
+import { screenshotFile, storiesFromIndex } from "./storybook-screenshots.mjs";
 
 const capturePageCount = 4;
 const defaultViewport = { height: 900, width: 1440 };
@@ -16,9 +12,16 @@ test("capture Storybook stories", async ({ page, request }) => {
   expect(indexResponse.ok()).toBe(true);
   const stories = storiesFromIndex(await indexResponse.json());
   expect(stories.length).toBeGreaterThan(0);
+  const files = new Set<string>();
+  for (const story of stories) {
+    const file = screenshotFile(story);
+    if (files.has(file)) {
+      throw new Error(`Duplicate visual screenshot: ${file}`);
+    }
+    files.add(file);
+  }
 
   const output = visualOutputRoot();
-  const screenshots: Array<{ file: string; label: string }> = [];
   const extraPages = await Promise.all(
     Array.from({ length: Math.min(capturePageCount, stories.length) - 1 }, () =>
       page.context().newPage(),
@@ -32,23 +35,10 @@ test("capture Storybook stories", async ({ page, request }) => {
       while (nextStory < stories.length) {
         const story = stories[nextStory++];
         const label = `${story.title} / ${story.name}`;
-        const screenshot = await test.step(label, () =>
-          captureStory(capturePage, story, output),
-        );
-        screenshots.push(screenshot);
+        await test.step(label, () => captureStory(capturePage, story, output));
       }
     }),
   );
-
-  const browserVersion = page.context().browser()?.version();
-  if (!browserVersion) {
-    throw new Error("Storybook screenshot browser version is unavailable.");
-  }
-  await replaceStorybookScreenshotsInManifest({
-    browserVersion,
-    output,
-    screenshots,
-  });
 });
 
 type Story = ReturnType<typeof storiesFromIndex>[number];
@@ -141,10 +131,6 @@ async function captureStory(page: Page, story: Story, output: string) {
     path: path.join(output, file),
     type: "png",
   });
-  return {
-    file,
-    label: `${story.title} / ${story.name}`,
-  };
 }
 
 async function openStory(page: Page, href: string, storyId: string) {
