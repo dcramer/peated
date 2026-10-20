@@ -20,6 +20,11 @@ the [Catalog Maintenance](../operations/catalog-maintenance.md) workflow.
   name, or submit authority for a group.
 - Deterministic reference duplicate checks remain in the request path. Slow catalog
   verification, review, indexing, and similar work run after persistence.
+- While the user fills the form, an advisory check lists existing Bottles that
+  may match. It sends only the facts that Bottle search uses to match, so
+  editing other fields does not start a new check. Save is never disabled by
+  the check. If one is running, Save waits for it and then opens the review. If
+  the check fails, the Bottle saves anyway.
 - “Add a similar bottle” only prefills the same independent creation form from
   the selected Bottle. It does not reuse or join the source BottleGroup.
 - A created Bottle id continues directly into Library, tasting, image, proposal,
