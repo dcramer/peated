@@ -116,7 +116,7 @@ test("stores exact references and queues model resolution after storage", async 
   expect(pushUniqueJobMock).toHaveBeenCalledWith(
     "CreateMissingBottles",
     { articleId: result.articleId },
-    { removeOnComplete: true, removeOnFail: true },
+    { removeOnComplete: true, removeOnFail: false },
   );
 });
 

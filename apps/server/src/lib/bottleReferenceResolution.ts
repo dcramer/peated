@@ -4,6 +4,10 @@ import {
   type BottleReferenceInput,
   type ClassifyBottleReferenceInput,
 } from "@peated/bottle-classifier";
+import {
+  agentActionRiskClass,
+  deriveAutomationTier,
+} from "@peated/bottle-classifier/automationTier";
 import type {
   BottleClassificationDecision,
   BottleConfidenceBasis,
@@ -336,6 +340,40 @@ async function resolveBottleReferenceTargetWithClassifier(
     const classifierEvidence = projectClassifierEvidence(
       classification.decision,
     );
+
+    // Review ingestion owns initial assignment; existing-assignment repairs use their own workflow.
+    const decision = classification.decision;
+    const tier = deriveAutomationTier({
+      actionRiskClass: agentActionRiskClass(decision.action),
+      hasUnresolvedRisks: Boolean(
+        decision.confidenceBasis?.unresolvedRisks.length,
+      ),
+      webEvidence: decision.confidenceBasis?.webEvidence,
+      hasMatchTarget: decision.action === "match",
+      reaffirmsCurrentAssignment:
+        decision.action === "match" &&
+        reference.currentBottleId === decision.matchedBottleId,
+      replacesCurrentAssignment:
+        decision.action === "match" &&
+        reference.currentBottleId != null &&
+        reference.currentBottleId !== decision.matchedBottleId,
+      hasDeterministicAnchor: decision.identityScope === "exact_cask",
+      hasPrimaryLabelOrImageEvidence:
+        classification.artifacts.imageEvidence != null,
+    });
+    if (reference.currentBottleId == null && tier === "review") {
+      return {
+        assignment: null,
+        source: "unresolved",
+        error: null,
+        confidence: null,
+        model: config.BOTTLE_CLASSIFIER_MODEL,
+        rationale: decisionRationale,
+        classifierEvidence,
+        createdBottle: false,
+        classification: classificationRun,
+      };
+    }
 
     if (classification.decision.action === "match") {
       const bottleId = classification.decision.matchedBottleId;

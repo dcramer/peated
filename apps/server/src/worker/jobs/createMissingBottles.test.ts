@@ -4,6 +4,7 @@ import { db } from "@peated/server/db";
 import {
   bottleChecks,
   bottleReferences,
+  bottles,
   externalReviews,
   incomingBottleDecisionLogs,
   storePrices,
@@ -12,12 +13,13 @@ import { getPeatedSystemActor } from "@peated/server/lib/actors";
 import { listActionableBottleChecks } from "@peated/server/lib/bottleChecks";
 import { normalizeBottleReferenceKey } from "@peated/server/lib/normalize";
 import * as workerClient from "@peated/server/lib/test/workerDispatch";
+import { routerClient } from "@peated/server/orpc/router";
 import {
   createMissingBottles as createMissingBottlesWithServices,
   type CreateMissingBottlesServices,
 } from "@peated/server/worker/jobs/createMissingBottles";
 import type { JobPayload } from "@peated/server/worker/types";
-import { and, eq } from "drizzle-orm";
+import { and, eq, sql } from "drizzle-orm";
 import { beforeEach, describe, expect, test, vi } from "vitest";
 
 const classifyBottleReferenceMock =
@@ -63,6 +65,7 @@ function buildClassification(
     status: "classified" as const,
     decision: {
       rationale: "test fixture",
+      confidenceBasis: { webEvidence: "supportive", unresolvedRisks: [] },
       candidateBottleIds: [],
       identityScope: "product",
       observation: null,
@@ -83,6 +86,74 @@ function buildClassification(
 }
 
 describe("createMissingBottles", () => {
+  test.for(["match", "create_bottle"] as const)(
+    "sends a %s with unresolved risks to moderation before any assignment or creation",
+    async (action, { fixtures }) => {
+      const brand = await fixtures.Entity({ name: "Evidence Bottler" });
+      const candidate = await fixtures.Bottle({ brandId: brand.id });
+      const review = await fixtures.ExternalReview({
+        bottleId: null,
+        name: "Uncertain review",
+      });
+      const classification = BottleClassificationResultSchema.parse({
+        status: "classified",
+        decision: {
+          action,
+          matchedBottleId: action === "match" ? candidate.id : null,
+          candidateBottleIds: [candidate.id],
+          proposedBottle:
+            action === "create_bottle"
+              ? {
+                  name: "New release",
+                  brand: { id: brand.id, name: brand.name },
+                  distillers: [],
+                  category: "single_malt",
+                }
+              : null,
+          rationale: "The label identity is still uncertain.",
+          identityScope: "product",
+          observation: null,
+          referenceScope: "none",
+          confidenceBasis: {
+            webEvidence: "supportive",
+            unresolvedRisks: [
+              {
+                category: "identity_ambiguity",
+                note: "The product label is unclear.",
+              },
+            ],
+          },
+        },
+        artifacts: {
+          candidates: [
+            { bottleId: candidate.id, fullName: candidate.fullName },
+          ],
+          extractedIdentity: null,
+          searchEvidence: [],
+          resolvedEntities: [],
+        },
+      });
+      classifyBottleReferenceMock.mockResolvedValueOnce(classification);
+      await createMissingBottles({ reviewId: review.id });
+      expect(
+        await db.query.externalReviews.findFirst({
+          where: eq(externalReviews.id, review.id),
+        }),
+      ).toMatchObject({ bottleId: null, bottleNoMatchAt: expect.any(Date) });
+      const mod = await fixtures.User({ mod: true });
+      expect(
+        (
+          await routerClient.admin.moderation.listTasks(undefined, {
+            context: { user: mod },
+          })
+        ).results,
+      ).toEqual([
+        expect.objectContaining({ key: `external_review:${review.id}` }),
+      ]);
+      expect(await db.select().from(bottles)).toHaveLength(1);
+      expect(await findReviewBottleCheck(review.id)).toBeDefined();
+    },
+  );
   test("assigns only the review when source context cannot support a global alias", async ({
     fixtures,
   }) => {
@@ -107,7 +178,7 @@ describe("createMissingBottles", () => {
         { candidates: [{ bottleId: bottle.id }] },
       ),
     );
-    await createMissingBottles({ articleId: review.articleId });
+    await createMissingBottles({ reviewId: review.id });
     expect(
       await db.query.externalReviews.findFirst({
         where: eq(externalReviews.id, review.id),
@@ -182,7 +253,7 @@ describe("createMissingBottles", () => {
       }),
     );
 
-    await createMissingBottles();
+    await createMissingBottles({ reviewId: review.id });
 
     const updatedReview = await db.query.externalReviews.findFirst({
       where: eq(externalReviews.id, review.id),
@@ -237,7 +308,7 @@ describe("createMissingBottles", () => {
           action: "create_bottle",
           identityScope: "product",
           observation: null,
-          confidenceBasis: null,
+          confidenceBasis: { webEvidence: "supportive", unresolvedRisks: [] },
         },
         resolutionSource: "classifier_create_bottle",
         issue,
@@ -330,7 +401,7 @@ describe("createMissingBottles", () => {
       }),
     );
 
-    await createMissingBottles();
+    await createMissingBottles({ reviewId: review.id });
 
     const updatedReview = await db.query.externalReviews.findFirst({
       where: eq(externalReviews.id, review.id),
@@ -355,7 +426,7 @@ describe("createMissingBottles", () => {
           action: "create_bottle",
           identityScope: "product",
           observation: null,
-          confidenceBasis: null,
+          confidenceBasis: { webEvidence: "supportive", unresolvedRisks: [] },
         },
         resolutionSource: "classifier_create_bottle",
         issue,
@@ -363,7 +434,78 @@ describe("createMissingBottles", () => {
     });
   });
 
-  test("only visits unresolved reviews once per run", async ({ fixtures }) => {
+  test.for(["global", "article"] as const)(
+    "%s batches isolate a persistently failing review",
+    async (scope, { fixtures }) => {
+      const failed = await fixtures.ExternalReview({
+        bottleId: null,
+        name: "Invalid proposal",
+      });
+      const healthy = await fixtures.ExternalReview({
+        bottleId: null,
+        articleId: failed.articleId,
+        name: "Supported review",
+      });
+      const bottle = await fixtures.Bottle();
+      classifyBottleReferenceMock.mockImplementation(async ({ reference }) =>
+        reference.id === failed.id
+          ? buildClassification({
+              action: "match",
+              matchedBottleId: bottle.id,
+              candidateBottleIds: [bottle.id],
+            })
+          : buildClassification(
+              {
+                action: "match",
+                matchedBottleId: bottle.id,
+                referenceScope: "none",
+                candidateBottleIds: [bottle.id],
+              },
+              { candidates: [{ bottleId: bottle.id }] },
+            ),
+      );
+      await createMissingBottles(
+        scope === "article" ? { articleId: failed.articleId } : undefined,
+      );
+      const jobs = workerClient.pushUniqueJob.mock.calls.filter(
+        ([name]) => name === "CreateMissingBottles",
+      );
+      expect(jobs.map(([, input]) => input)).toEqual([
+        { reviewId: failed.id },
+        { reviewId: healthy.id },
+      ]);
+      expect(classifyBottleReferenceMock).not.toHaveBeenCalled();
+      // Queue execution owns failures independently; the second job still runs.
+      await expect(createMissingBottles(jobs[0]![1])).rejects.toThrow(
+        "unknown matched bottle id",
+      );
+      await createMissingBottles(jobs[1]![1]);
+      await expect(createMissingBottles(jobs[0]![1])).rejects.toThrow(
+        "unknown matched bottle id",
+      );
+      expect(
+        await db.query.externalReviews.findFirst({
+          where: eq(externalReviews.id, failed.id),
+        }),
+      ).toMatchObject({ bottleId: null, bottleNoMatchAt: null });
+      expect(
+        await db.query.externalReviews.findFirst({
+          where: eq(externalReviews.id, healthy.id),
+        }),
+      ).toMatchObject({ bottleId: bottle.id });
+      await createMissingBottles(
+        scope === "article" ? { articleId: failed.articleId } : undefined,
+      );
+      expect(
+        workerClient.pushUniqueJob.mock.calls
+          .filter(([name]) => name === "CreateMissingBottles")
+          .slice(2),
+      ).toEqual([["CreateMissingBottles", { reviewId: failed.id }]]);
+      expect(classifyBottleReferenceMock).toHaveBeenCalledTimes(3);
+    },
+  );
+
+  test("queues each unresolved review once per batch", async ({ fixtures }) => {
     const site = await fixtures.ExternalSiteOrExisting();
     const review = await fixtures.ExternalReview({
       externalSiteId: site.id,
@@ -375,12 +517,62 @@ describe("createMissingBottles", () => {
 
     await createMissingBottles();
 
-    expect(classifyBottleReferenceMock).toHaveBeenCalledTimes(1);
+    expect(classifyBottleReferenceMock).not.toHaveBeenCalled();
+    expect(workerClient.pushUniqueJob.mock.calls).toEqual([
+      ["CreateMissingBottles", { reviewId: review.id }],
+    ]);
 
     const unchangedReview = await db.query.externalReviews.findFirst({
       where: eq(externalReviews.id, review.id),
     });
     expect(unchangedReview?.bottleId).toBeNull();
+  });
+
+  test("a failed dispatch leaves pending reviews available for another batch", async ({
+    fixtures,
+  }) => {
+    const review = await fixtures.ExternalReview({ bottleId: null });
+    const error = new Error("Queue unavailable");
+    workerClient.pushUniqueJob.mockRejectedValueOnce(error);
+    await expect(
+      createMissingBottles({ articleId: review.articleId }),
+    ).rejects.toBe(error);
+    expect(
+      await db.query.externalReviews.findFirst({
+        where: eq(externalReviews.id, review.id),
+      }),
+    ).toMatchObject({ bottleId: null, bottleNoMatchAt: null });
+    await createMissingBottles({ articleId: review.articleId });
+    expect(workerClient.pushUniqueJob).toHaveBeenLastCalledWith(
+      "CreateMissingBottles",
+      { reviewId: review.id },
+    );
+    expect(classifyBottleReferenceMock).not.toHaveBeenCalled();
+  });
+
+  test("queues every page without revisiting pending reviews", async ({
+    fixtures,
+  }) => {
+    const first = await fixtures.ExternalReview({ bottleId: null });
+    const rest = await db
+      .insert(externalReviews)
+      .values(
+        Array.from({ length: 100 }, (_, index) => ({
+          articleId: first.articleId,
+          name: `Pending review ${index}`,
+          sourceKey: `pending-${index}`,
+          bottleId: null,
+        })),
+      )
+      .returning({ id: externalReviews.id });
+    await createMissingBottles();
+    expect(classifyBottleReferenceMock).not.toHaveBeenCalled();
+    expect(workerClient.pushUniqueJob.mock.calls).toEqual(
+      [first, ...rest].map(({ id }) => [
+        "CreateMissingBottles",
+        { reviewId: id },
+      ]),
+    );
   });
 
   test("records a no-match answer and does not ask again", async ({
@@ -394,8 +586,8 @@ describe("createMissingBottles", () => {
       url: "https://example.com/no-match-review",
     });
 
-    await createMissingBottles();
-    await createMissingBottles();
+    await createMissingBottles({ reviewId: review.id });
+    await createMissingBottles({ reviewId: review.id });
 
     expect(classifyBottleReferenceMock).toHaveBeenCalledTimes(1);
     const marked = await db.query.externalReviews.findFirst({
@@ -422,16 +614,313 @@ describe("createMissingBottles", () => {
       new Error("The AI service is unavailable."),
     );
 
-    await createMissingBottles();
+    await expect(createMissingBottles({ reviewId: review.id })).rejects.toThrow(
+      "The AI service is unavailable.",
+    );
     expect(
       await db.query.externalReviews.findFirst({
         where: eq(externalReviews.id, review.id),
       }),
     ).toMatchObject({ bottleNoMatchAt: null });
 
-    await createMissingBottles();
+    await createMissingBottles({ reviewId: review.id });
     expect(classifyBottleReferenceMock).toHaveBeenCalledTimes(2);
   });
+
+  test("rechecks legacy attempt timestamps with PostgreSQL microsecond precision", async ({
+    fixtures,
+  }) => {
+    const review = await fixtures.ExternalReview({ bottleId: null });
+    await db
+      .update(externalReviews)
+      .set({ bottleNoMatchAt: sql`'2026-10-16 18:45:00.123456'::timestamp` })
+      .where(eq(externalReviews.id, review.id));
+    const mod = await fixtures.User({ mod: true });
+    await routerClient.externalReviews.recheck(
+      {
+        reviews: [
+          {
+            reviewId: review.id,
+            name: review.name,
+            attemptedAt: "2026-10-16T18:45:00.123Z",
+          },
+        ],
+      },
+      { context: { user: mod } },
+    );
+    await createMissingBottles(
+      workerClient.pushUniqueJob.mock.calls.at(-1)![1],
+    );
+    expect(classifyBottleReferenceMock).toHaveBeenCalledTimes(1);
+    const completed = await db.query.externalReviews.findFirst({
+      where: eq(externalReviews.id, review.id),
+    });
+    expect(completed?.bottleNoMatchAt?.getTime()).toBeGreaterThan(
+      new Date("2026-10-16T18:45:00.123Z").getTime(),
+    );
+  });
+
+  test("failed rechecks remain in moderation and can be requeued without another import", async ({
+    fixtures,
+  }) => {
+    const mod = await fixtures.User({ mod: true });
+    const review = await fixtures.ExternalReview({ bottleId: null });
+    const attemptedAt = new Date("2026-10-16T18:45:00.000Z");
+    await db
+      .update(externalReviews)
+      .set({ bottleNoMatchAt: attemptedAt })
+      .where(eq(externalReviews.id, review.id));
+    const input = {
+      reviews: [
+        {
+          reviewId: review.id,
+          name: review.name,
+          attemptedAt: attemptedAt.toISOString(),
+        },
+      ],
+    };
+    await routerClient.externalReviews.recheck(input, {
+      context: { user: mod },
+    });
+    const payload = workerClient.pushUniqueJob.mock.calls.at(-1)![1];
+    const assertVisible = async () => {
+      await expect(
+        routerClient.admin.moderation.task(
+          { key: `external_review:${review.id}` },
+          { context: { user: mod } },
+        ),
+      ).resolves.toMatchObject({
+        task: { key: `external_review:${review.id}` },
+      });
+      expect(
+        await db.query.externalReviews.findFirst({
+          where: eq(externalReviews.id, review.id),
+        }),
+      ).toMatchObject({ bottleId: null, bottleNoMatchAt: attemptedAt });
+    };
+    await assertVisible();
+    classifyBottleReferenceMock.mockRejectedValueOnce(
+      new Error("Classifier unavailable"),
+    );
+    await expect(createMissingBottles(payload)).rejects.toThrow(
+      "Classifier unavailable",
+    );
+    await assertVisible();
+    expect(await findReviewBottleCheck(review.id)).toBeUndefined();
+    await routerClient.externalReviews.recheck(input, {
+      context: { user: mod },
+    });
+    await createMissingBottles(
+      workerClient.pushUniqueJob.mock.calls.at(-1)![1],
+    );
+    const completed = await db.query.externalReviews.findFirst({
+      where: eq(externalReviews.id, review.id),
+    });
+    expect(completed?.bottleNoMatchAt?.getTime()).toBeGreaterThan(
+      attemptedAt.getTime(),
+    );
+    expect(await findReviewBottleCheck(review.id)).toBeDefined();
+    await createMissingBottles(payload);
+    expect(classifyBottleReferenceMock).toHaveBeenCalledTimes(2);
+    await expect(
+      routerClient.externalReviews.recheck(input, { context: { user: mod } }),
+    ).rejects.toThrow("review changed");
+  });
+
+  test("a queued recheck can match a review and safely replay after success", async ({
+    fixtures,
+  }) => {
+    const mod = await fixtures.User({ mod: true, admin: true });
+    const review = await fixtures.ExternalReview({ bottleId: null });
+    const attemptedAt = new Date("2026-10-16T18:45:00.000Z");
+    await db
+      .update(externalReviews)
+      .set({ bottleNoMatchAt: attemptedAt })
+      .where(eq(externalReviews.id, review.id));
+    const bottle = await fixtures.Bottle();
+    classifyBottleReferenceMock.mockResolvedValueOnce(
+      buildClassification(
+        {
+          action: "match",
+          matchedBottleId: bottle.id,
+          candidateBottleIds: [bottle.id],
+          referenceScope: "none",
+        },
+        { candidates: [{ bottleId: bottle.id }] },
+      ),
+    );
+    await routerClient.externalReviews.recheck(
+      {
+        reviews: [
+          {
+            reviewId: review.id,
+            name: review.name,
+            attemptedAt: attemptedAt.toISOString(),
+          },
+        ],
+      },
+      { context: { user: mod } },
+    );
+    const payload = workerClient.pushUniqueJob.mock.calls.at(-1)![1];
+    await createMissingBottles(payload);
+    expect(
+      await db.query.externalReviews.findFirst({
+        where: eq(externalReviews.id, review.id),
+      }),
+    ).toMatchObject({ bottleId: bottle.id, bottleNoMatchAt: null });
+    await expect(
+      routerClient.admin.moderation.task(
+        { key: `external_review:${review.id}` },
+        { context: { user: mod } },
+      ),
+    ).rejects.toThrow("no longer needs attention");
+    await createMissingBottles(payload);
+    expect(classifyBottleReferenceMock).toHaveBeenCalledTimes(1);
+  });
+
+  test.for(["assigned", "removed", "renamed", "new_attempt"] as const)(
+    "skips a queued recheck after the review is %s",
+    async (change, { fixtures }) => {
+      const review = await fixtures.ExternalReview({ bottleId: null });
+      const attemptedAt = new Date("2026-10-16T18:45:00.000Z");
+      await db
+        .update(externalReviews)
+        .set({ bottleNoMatchAt: attemptedAt })
+        .where(eq(externalReviews.id, review.id));
+      const mod = await fixtures.User({ mod: true, admin: true });
+      await routerClient.externalReviews.recheck(
+        {
+          reviews: [
+            {
+              reviewId: review.id,
+              name: review.name,
+              attemptedAt: attemptedAt.toISOString(),
+            },
+          ],
+        },
+        { context: { user: mod } },
+      );
+      if (change === "removed") {
+        await routerClient.admin.content.moderate(
+          {
+            kind: "external_review",
+            id: review.id,
+            removed: true,
+            reason: "Not a review.",
+          },
+          { context: { user: mod } },
+        );
+      } else
+        await db
+          .update(externalReviews)
+          .set(
+            change === "assigned"
+              ? {
+                  bottleId: (await fixtures.Bottle()).id,
+                  bottleNoMatchAt: null,
+                }
+              : change === "renamed"
+                ? { name: "Changed review" }
+                : { bottleNoMatchAt: new Date() },
+          )
+          .where(eq(externalReviews.id, review.id));
+      const changed = await db.query.externalReviews.findFirst({
+        where: eq(externalReviews.id, review.id),
+      });
+      await createMissingBottles(
+        workerClient.pushUniqueJob.mock.calls.at(-1)![1],
+      );
+      expect(classifyBottleReferenceMock).not.toHaveBeenCalled();
+      expect(
+        await db.query.externalReviews.findFirst({
+          where: eq(externalReviews.id, review.id),
+        }),
+      ).toEqual(changed);
+    },
+  );
+
+  test.for([
+    ["assigned", "match"],
+    ["removed", "match"],
+    ["renamed", "match"],
+    ["new_attempt", "match"],
+    ["assigned", "no_match"],
+    ["removed", "no_match"],
+    ["renamed", "no_match"],
+    ["new_attempt", "no_match"],
+  ] as const)(
+    "does not overwrite concurrent %s changes with a %s result",
+    async ([change, action], { fixtures }) => {
+      const review = await fixtures.ExternalReview({ bottleId: null });
+      const attemptedAt = new Date("2026-10-16T18:45:00.000Z");
+      await db
+        .update(externalReviews)
+        .set({ bottleNoMatchAt: attemptedAt })
+        .where(eq(externalReviews.id, review.id));
+      const bottle = await fixtures.Bottle();
+      const mod = await fixtures.User({ mod: true, admin: true });
+      await routerClient.externalReviews.recheck(
+        {
+          reviews: [
+            {
+              reviewId: review.id,
+              name: review.name,
+              attemptedAt: attemptedAt.toISOString(),
+            },
+          ],
+        },
+        { context: { user: mod } },
+      );
+      let changed: typeof review | undefined;
+      classifyBottleReferenceMock.mockImplementationOnce(async () => {
+        if (change === "removed") {
+          await routerClient.admin.content.moderate(
+            {
+              kind: "external_review",
+              id: review.id,
+              removed: true,
+              reason: "Not a review.",
+            },
+            { context: { user: mod } },
+          );
+        } else
+          await db
+            .update(externalReviews)
+            .set(
+              change === "assigned"
+                ? { bottleId: bottle.id, bottleNoMatchAt: null }
+                : change === "renamed"
+                  ? { name: "Changed review" }
+                  : { bottleNoMatchAt: new Date() },
+            )
+            .where(eq(externalReviews.id, review.id));
+        changed = await db.query.externalReviews.findFirst({
+          where: eq(externalReviews.id, review.id),
+        });
+        return buildClassification(
+          {
+            action,
+            matchedBottleId: action === "match" ? bottle.id : undefined,
+            candidateBottleIds: [bottle.id],
+            referenceScope: "none",
+          },
+          { candidates: [{ bottleId: bottle.id }] },
+        );
+      });
+      await createMissingBottles(
+        workerClient.pushUniqueJob.mock.calls.at(-1)![1],
+      );
+      expect(classifyBottleReferenceMock).toHaveBeenCalledTimes(1);
+      expect(
+        await db.query.externalReviews.findFirst({
+          where: eq(externalReviews.id, review.id),
+        }),
+      ).toEqual(changed);
+      expect(await db.select().from(incomingBottleDecisionLogs)).toHaveLength(
+        0,
+      );
+    },
+  );
 
   test("limits queued work to one review article", async ({ fixtures }) => {
     const site = await fixtures.ExternalSiteOrExisting();
@@ -451,6 +940,11 @@ describe("createMissingBottles", () => {
 
     await createMissingBottles({ articleId: selected.articleId });
 
+    expect(classifyBottleReferenceMock).not.toHaveBeenCalled();
+    expect(workerClient.pushUniqueJob.mock.calls).toEqual([
+      ["CreateMissingBottles", { reviewId: selected.id }],
+    ]);
+    await createMissingBottles(workerClient.pushUniqueJob.mock.calls[0]![1]);
     expect(classifyBottleReferenceMock).toHaveBeenCalledTimes(1);
     expect(classifyBottleReferenceMock).toHaveBeenCalledWith(
       expect.objectContaining({
@@ -493,7 +987,7 @@ describe("createMissingBottles", () => {
       ),
     );
 
-    await createMissingBottles();
+    await createMissingBottles({ reviewId: review.id });
 
     expect(
       await db.query.externalReviews.findFirst({
@@ -553,7 +1047,7 @@ describe("createMissingBottles", () => {
       ),
     );
 
-    await createMissingBottles({ articleId: review.articleId });
+    await createMissingBottles({ reviewId: review.id });
 
     expect(
       await db.query.externalReviews.findFirst({
@@ -572,7 +1066,7 @@ describe("createMissingBottles", () => {
       url: "https://example.com/generic-review",
     });
 
-    await createMissingBottles();
+    await createMissingBottles({ reviewId: review.id });
 
     expect(classifyBottleReferenceMock).toHaveBeenCalledTimes(1);
     expect(
@@ -618,7 +1112,7 @@ describe("createMissingBottles", () => {
       );
     });
 
-    await createMissingBottles();
+    await createMissingBottles({ reviewId: review.id });
 
     const preserved = await db.query.externalReviews.findFirst({
       where: eq(externalReviews.id, review.id),

@@ -20,22 +20,36 @@ import {
 } from "@peated/server/lib/bottleReferences";
 import { dispatchBottleStatsRecompute } from "@peated/server/lib/dispatchBottleStatsRecompute";
 import {
+  ExternalReviewResolutionVersionSchema,
+  reviewResolutionAttemptCondition,
+} from "@peated/server/lib/externalReviewResolution";
+import {
   getIncomingBottleDecisionFromResolutionSource,
   recordIncomingBottleDecisionInTransaction,
   shouldRecordIncomingBottleDecision,
   type IncomingBottleDecisionMetadata,
 } from "@peated/server/lib/incomingBottleDecisionLog";
-import { logInfo, logTelemetryError } from "@peated/server/lib/log";
+import { logInfo } from "@peated/server/lib/log";
 import { normalizeBottleReferenceKey } from "@peated/server/lib/normalize";
-import { and, asc, eq, gt, isNull, sql } from "drizzle-orm";
+import { and, asc, eq, gt, isNull } from "drizzle-orm";
 import { z } from "zod";
+import { pushUniqueJob } from "../dispatch";
 import type { JobPayload } from "../types";
 
 const InputSchema = z
   .object({
     articleId: z.number().int().positive().optional(),
+    reviewId: z.number().int().positive().optional(),
+    expectedResolution: ExternalReviewResolutionVersionSchema.optional(),
   })
-  .strict();
+  .strict()
+  .refine(
+    ({ reviewId, expectedResolution }) =>
+      !expectedResolution || reviewId !== undefined,
+    {
+      message: "A recheck version requires a review ID.",
+    },
+  );
 
 export type CreateMissingBottlesServices = {
   classifyReference: NonNullable<
@@ -47,11 +61,13 @@ export async function createMissingBottles(
   rawInput?: JobPayload,
   services?: CreateMissingBottlesServices,
 ) {
-  const { articleId } = InputSchema.parse(rawInput ?? {});
+  const { articleId, reviewId, expectedResolution } = InputSchema.parse(
+    rawInput ?? {},
+  );
   const systemActor = await getPeatedSystemActor();
 
-  // Advance by id so unresolved reviews are visited once per run instead of
-  // hot-looping forever on the same null bottle assignments.
+  // Review matching owns batch isolation: advance by ID even though dispatch
+  // leaves reviews pending until their individual jobs finish.
   let cursor = 0;
   let hasMore = true;
   while (hasMore) {
@@ -65,7 +81,16 @@ export async function createMissingBottles(
       .where(
         and(
           isNull(externalReviews.bottleId),
-          isNull(externalReviews.bottleNoMatchAt),
+          expectedResolution
+            ? and(
+                eq(externalReviews.name, expectedResolution.name),
+                reviewResolutionAttemptCondition(
+                  new Date(expectedResolution.attemptedAt),
+                ),
+              )
+            : isNull(externalReviews.bottleNoMatchAt),
+          isNull(externalReviews.removedAt),
+          reviewId === undefined ? undefined : eq(externalReviews.id, reviewId),
           gt(externalReviews.id, cursor),
           articleId === undefined
             ? undefined
@@ -80,6 +105,10 @@ export async function createMissingBottles(
 
     for (const { article, review } of missingInReviews) {
       cursor = review.id;
+      if (reviewId === undefined) {
+        await pushUniqueJob("CreateMissingBottles", { reviewId: review.id });
+        continue;
+      }
       const referenceKey = normalizeBottleReferenceKey(review.name);
 
       const resolution = await resolveScrapedBottleReferenceTarget(
@@ -124,25 +153,21 @@ export async function createMissingBottles(
             source: resolution.source,
           },
         });
-        if (resolution.error) {
-          logTelemetryError(resolution.error, {
-            extra: {
-              reviewId: review.id,
-            },
-          });
-        } else {
-          // Keep the classifier's answer so the next import does not ask the
-          // same question. A later accepted reference still matches the review.
-          await db
-            .update(externalReviews)
-            .set({ bottleNoMatchAt: sql`NOW()` })
-            .where(
-              and(
-                eq(externalReviews.id, review.id),
-                isNull(externalReviews.bottleId),
-              ),
-            );
-        }
+        if (resolution.error) throw resolution.error;
+        // Review matching owns the result version. A stale run must not advance a newer attempt.
+        await db
+          .update(externalReviews)
+          .set({ bottleNoMatchAt: new Date(), updatedAt: new Date() })
+          .where(
+            and(
+              eq(externalReviews.id, review.id),
+              isNull(externalReviews.bottleId),
+              isNull(externalReviews.removedAt),
+              eq(externalReviews.name, review.name),
+              eq(externalReviews.articleId, review.articleId),
+              reviewResolutionAttemptCondition(review.bottleNoMatchAt),
+            ),
+          );
         continue;
       }
 

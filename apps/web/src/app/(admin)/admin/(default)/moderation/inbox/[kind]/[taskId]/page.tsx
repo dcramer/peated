@@ -4,6 +4,7 @@ import { z } from "zod";
 const InboxKindSchema = z.enum([
   "listing",
   "auction_lot",
+  "external_review",
   "operation",
   "finding",
   "report",

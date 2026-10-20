@@ -12,8 +12,11 @@ import { webEvidenceUrlsMatch } from "./webEvidenceUrl";
 
 const FixedWebSearchResultSchema = z
   .object({
-    evidence: z.array(BottleSearchEvidenceSchema).min(1),
-    errors: z.array(z.object({ query: z.string(), error: z.string() })),
+    // Controlled evals may deliberately use only their captured local input.
+    evidence: z.array(BottleSearchEvidenceSchema),
+    errors: z
+      .array(z.object({ query: z.string(), error: z.string() }))
+      .length(0),
   })
   .strict();
 

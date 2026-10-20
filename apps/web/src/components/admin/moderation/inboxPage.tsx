@@ -41,18 +41,25 @@ export function nextTaskAfterCompletion<Task extends { key: string }>(
 
 export function selectedInboxTask(pathname: string):
   | {
-      kind: "listing" | "auction_lot" | "operation" | "finding" | "report";
+      kind:
+        | "listing"
+        | "auction_lot"
+        | "external_review"
+        | "operation"
+        | "finding"
+        | "report";
       id: number;
     }
   | undefined {
   const match = pathname.match(
-    /^\/admin\/moderation\/inbox\/(listing|auction_lot|operation|finding|report)\/(\d+)\/?$/,
+    /^\/admin\/moderation\/inbox\/(listing|auction_lot|external_review|operation|finding|report)\/(\d+)\/?$/,
   );
   if (!match) return undefined;
   const kind = match[1];
   if (
     kind !== "listing" &&
     kind !== "auction_lot" &&
+    kind !== "external_review" &&
     kind !== "operation" &&
     kind !== "finding" &&
     kind !== "report"

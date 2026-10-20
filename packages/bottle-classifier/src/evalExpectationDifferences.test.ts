@@ -5,6 +5,29 @@ import {
 } from "./evalExpectationDifferences";
 
 describe("findJsonSubsetDifferences", () => {
+  it("compares exact cask identifiers independently of an optional number sign", () => {
+    expect(
+      findJsonSubsetDifferences(
+        { caskNumber: "#AB-12" },
+        { caskNumber: "AB-12" },
+        "proposedBottle",
+      ),
+    ).toEqual([]);
+    expect(
+      findJsonSubsetDifferences(
+        { caskNumber: "#AB-13" },
+        { caskNumber: "AB-12" },
+        "proposedBottle",
+      ),
+    ).toHaveLength(1);
+    expect(
+      findJsonSubsetDifferences(
+        { caskNumber: "AB12" },
+        { caskNumber: "AB-12" },
+        "proposedBottle",
+      ),
+    ).toHaveLength(1);
+  });
   it("accepts matching subsets and ignores extra actual fields", () => {
     expect(
       findJsonSubsetDifferences(

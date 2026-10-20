@@ -482,7 +482,7 @@ function evaluateDecisionContract(
       )
     ) {
       failures.push(
-        `proposedBottle.name expected one of ${expected.proposedBottleNameOneOf.join(", ")}`,
+        `proposedBottle.name expected one of ${expected.proposedBottleNameOneOf.join(", ")} but got ${JSON.stringify(proposedBottleName)}`,
       );
     }
   }
@@ -718,21 +718,26 @@ function createClassifierOptions(testCase: ClassifierScenarioEvalCase) {
   return createEvalClassifierOptions(buildClassifierAdapters(testCase));
 }
 
-function createEvalRuntime(fixtureId: string) {
+function createEvalRuntime(fixtureId: string, webEvidenceFile?: string) {
   const toolEvents: TranscriptEvent[] = [];
   const fixedEvidenceFile =
-    process.env.BOTTLE_CLASSIFIER_EVAL_FIXED_EVIDENCE_FILE;
+    process.env.BOTTLE_CLASSIFIER_EVAL_FIXED_EVIDENCE_FILE ?? webEvidenceFile;
   const fixedEvidence = fixedEvidenceFile
     ? loadFixedWebEvidenceCase(fixedEvidenceFile, fixtureId)
     : null;
   const options: Pick<
     CreateBottleClassifierOptions,
     | "executeWebSearch"
+    | "firecrawlApiKey"
     | "initialSearchEvidence"
     | "observeReferenceAgentDecision"
     | "observeToolEvent"
     | "overrides"
   > = {
+    // Controlled evals own web I/O. Enable the normal tool schemas; the fixed executor never calls a provider.
+    firecrawlApiKey: fixedEvidence
+      ? "fixed-evidence"
+      : process.env.FIRECRAWL_API_KEY,
     initialSearchEvidence: fixedEvidence?.searchResult.evidence,
     executeWebSearch: fixedEvidence
       ? createFixedWebSearchExecutor(fixedEvidence)
@@ -747,10 +752,9 @@ function createEvalRuntime(fixtureId: string) {
           assertSuccessfulWebSearchReplay(result);
           return result;
         },
-    overrides:
-      fixedEvidence && fixedEvidence.imageResults.length > 0
-        ? { extractFromImage: createFixedImageExtractor(fixedEvidence) }
-        : undefined,
+    overrides: fixedEvidence
+      ? { extractFromImage: createFixedImageExtractor(fixedEvidence) }
+      : undefined,
     observeReferenceAgentDecision: (decision) => {
       toolEvents.push({
         type: "message",
@@ -796,7 +800,10 @@ const classifierHarness = createHarness<ClassifierScenarioEvalCase, JsonValue>({
   name: "bottle-classifier",
   run: async ({ input }) => {
     const startedAt = performance.now();
-    const evalRuntime = createEvalRuntime(input.testCase.fixtureId);
+    const evalRuntime = createEvalRuntime(
+      input.testCase.fixtureId,
+      input.kind === "decision" ? input.testCase.webEvidenceFile : undefined,
+    );
     const {
       result: { result, modelMetadata },
       modelCalls,

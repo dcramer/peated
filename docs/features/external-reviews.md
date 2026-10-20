@@ -30,7 +30,34 @@ name, then asks the Bottle classifier once. When the classifier finds no
 Bottle, the review records that answer and is not sent to the classifier
 again while its name stays the same. A later accepted reference for that name
 still matches the review on its next import. A classifier failure records
-nothing, so the review is tried again.
+no completed answer and fails the worker job, so a retry can ask again.
+
+Initial automatic matches and creates must pass the classifier's evidence-derived
+automation tier before assigning a review or creating a Bottle. A decision
+that needs review leaves the source unresolved and keeps its saved proposal.
+The existing workflow for repairing an already assigned review is separate.
+Completed unresolved attempts, including ignored inputs, appear in the
+Moderation Inbox. A moderator can read the saved evidence, assign an existing
+Bottle, or request a new check. A missing Bottle can be added through the
+catalog form before assignment. Assignment publishes a staged review only
+when its source is approved; it never restores removed content.
+
+`GET /external-reviews/{externalReview}/resolution` exposes the latest saved
+decision to moderators. `POST /external-reviews/recheck` accepts at most 100
+explicit reviews with the name and attempt timestamp observed by the caller.
+A changed, assigned, removed, or never-completed review rejects the batch.
+Rechecks preserve the last unresolved result and its Inbox task while work is
+queued or running, including after dispatch or classifier failures. The worker
+processes only the requested review version and checks it again before applying
+a result. A moderator can still assign or remove the review during a recheck;
+a stale result cannot overwrite that change. A completed unresolved answer
+advances the attempt timestamp, and a successful assignment clears it.
+Article and global batch runs queue one job per pending review. A failed review
+does not block the remaining reviews in the batch.
+Classifier failures reach the worker's error handler. Temporary provider outages
+use the model queue's existing pause and retry handling; other errors fail the
+job. Failed rechecks remain visible for manual resolution or rechecking and do
+not depend on another scraper import to recover.
 
 Stopping publication hides its reviews without deleting them or stopping
 collection. Only a moderator can change publication. Peated records the change

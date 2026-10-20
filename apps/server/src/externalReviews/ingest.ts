@@ -119,7 +119,7 @@ export async function ingestExternalReviewArticle(
       await services.queueMissingBottles(
         "CreateMissingBottles",
         { articleId: result.articleId },
-        { removeOnComplete: true, removeOnFail: true },
+        { removeOnComplete: true, removeOnFail: false },
       );
     } catch (error) {
       // The stored external reviews are durable. A later ingestion or

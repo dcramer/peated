@@ -83,6 +83,7 @@ function buildClassification(
     status: "classified" as const,
     decision: {
       rationale: "test fixture",
+      confidenceBasis: { webEvidence: "supportive", unresolvedRisks: [] },
       candidateBottleIds: [],
       identityScope: "product",
       observation: null,
@@ -191,6 +192,52 @@ test("rejects every inactive Bottle before persisting a resolution", async ({
 });
 
 describe("resolveBottleReferenceTarget", () => {
+  test.for([
+    { action: "match", imageEvidence: undefined },
+    { action: "match", imageEvidence: null },
+    { action: "create_bottle", imageEvidence: undefined },
+    { action: "create_bottle", imageEvidence: null },
+  ] as const)(
+    "leaves $action unresolved without supporting evidence when imageEvidence is $imageEvidence",
+    async ({ action, imageEvidence }, { fixtures }) => {
+      const bottle = await fixtures.Bottle();
+      const classification = buildClassification(
+        action === "match"
+          ? {
+              action,
+              matchedBottleId: bottle.id,
+              confidenceBasis: { webEvidence: "not_used", unresolvedRisks: [] },
+            }
+          : {
+              action,
+              proposedBottle: {
+                name: "Unsupported release",
+                brand: { id: bottle.brandId, name: "Brand" },
+                distillers: [],
+              },
+              confidenceBasis: { webEvidence: "not_used", unresolvedRisks: [] },
+            },
+        [{ bottleId: bottle.id }],
+      );
+      classification.artifacts.imageEvidence = imageEvidence;
+      classifyBottleReferenceMock.mockResolvedValueOnce(classification);
+
+      const resolution = await resolveBottleReferenceTarget({
+        reference: { name: "Unsupported review" },
+        createdByActorId: bottle.createdByActorId,
+      });
+
+      expect(resolution).toMatchObject({
+        assignment: null,
+        source: "unresolved",
+        error: null,
+        createdBottle: false,
+        classification: { result: classification },
+      });
+      expect(await db.select().from(bottles)).toHaveLength(1);
+    },
+  );
+
   beforeEach(() => {
     classifyBottleReferenceMock.mockReset();
     classifyBottleReferenceMock.mockResolvedValue(
@@ -474,7 +521,7 @@ describe("resolveBottleReferenceTarget", () => {
         rationale: "The exact marketed Bottle is missing.",
         identityScope: "product",
         observation: null,
-        confidenceBasis: null,
+        confidenceBasis: { webEvidence: "supportive", unresolvedRisks: [] },
         matchedBottleId: null,
         proposedBottle: {
           name: "Independent Expression",
