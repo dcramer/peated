@@ -16,6 +16,7 @@ import {
   FormNotice,
   FormStack,
 } from "@peated/web/components/formLayout.stylex";
+import { getCreateBottleHref } from "@peated/web/components/search/createBottleHref";
 import { Search as BottleSearch } from "@peated/web/components/search/search.stylex";
 import { SelectedBottleSummary } from "@peated/web/components/selectedBottleSummary.stylex";
 import { Timestamp } from "@peated/web/components/timestamp";
@@ -32,6 +33,7 @@ import { isORPCAccountRedirectError } from "@peated/web/lib/orpc/link";
 import {
   buildTastingDraftSaveInput,
   getExistingBottleConflictId,
+  getTastingDraftBottleHref,
   getTastingDraftHref,
   getTastingDraftPhotoChange,
   getTastingDraftSuggestion,
@@ -287,7 +289,9 @@ function TastingDraftFlowContent({ draftId }: { draftId: string }) {
       creating={createBottleMutation.isPending}
       draft={draft}
       error={bottleError}
-      getBottleHref={(bottle) => `${draftHref}?bottle=${bottle.id}`}
+      getBottleHref={(bottle) =>
+        getTastingDraftBottleHref({ id: draftId }, bottle.id)
+      }
       onAddProposedBottle={() => void addProposedBottle()}
       onChooseBottle={(bottleId) => void chooseBottle(draft, bottleId)}
       onClose={() => router.push("/drafts")}
@@ -482,6 +486,9 @@ function TastingDraftBottleStep({
         >
           <BottleSearch
             getBottleHref={getBottleHref}
+            getContributionHref={(query) =>
+              getCreateBottleHref({ query, returnDraftId: draft.id })
+            }
             // The hint starts a search only when nothing else is offered, so
             // its results don't crowd out a suggestion.
             initialQuery={offersBottle ? "" : (draft.bottleHint ?? "")}

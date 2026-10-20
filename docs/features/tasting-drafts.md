@@ -178,6 +178,10 @@ its draft after the member confirms.
    - **Use this bottle** saves the Bottle on the draft.
    - **Add this bottle** calls `create-bottle`. If Peated already has that
      Bottle, the page offers the existing one instead.
+   - **Add a new bottle** in search opens the bottle form with the draft ID
+     (`/bottles/new?draft={draft}`). Saving the new Bottle, or picking
+     **Use existing bottle** there, returns to `/drafts/{draft}?bottle={id}`.
+     Closing the form returns to the draft.
 2. **Details.** The tasting form's Notes, The pour, and Rating steps. Each
    **Continue** saves the draft, so a member can stop and come back. A new
    photo is uploaded once, as a pending upload, and sent as `pendingImageId`.
