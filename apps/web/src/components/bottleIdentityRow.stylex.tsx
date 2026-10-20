@@ -25,6 +25,8 @@ export type BottleIdentityRowProps = {
   /** Links only the bottle title when the surrounding card is also clickable. */
   linkArea?: "row" | "title";
   metadata?: readonly string[];
+  /** Compact rows show ABV after the name because they omit the metadata line. */
+  abv?: string | null;
   name: string;
   onClick?: MouseEventHandler<HTMLAnchorElement>;
   query?: string;
@@ -56,10 +58,12 @@ export type BottleIdentityRowProps = {
  * Use layout="cell" inside an existing row/selection control. Linked cells keep
  * their link inside the bottle identity. Use linkArea="title" when the
  * surrounding card is also clickable. Compact omits provenance, metadata,
- * subtitle, status, and related releases; end remains available. Activity may
+ * subtitle, status, and related releases, but keep ABV after the name;
+ * end remains available. Activity may
  * add review text below the bottle details without forcing it beneath the image.
  */
 export function BottleIdentityRow({
+  abv,
   align = "center",
   end,
   hasTasted = false,
@@ -102,6 +106,7 @@ export function BottleIdentityRow({
           foundationStyles.rowTitle,
           compactTitle && foundationStyles.compactRowTitle,
           styles.nameLine,
+          compact && styles.compactNameLine,
         )}
       >
         {href ? (
@@ -132,6 +137,11 @@ export function BottleIdentityRow({
             <MatchedText query={query} text={name} />
           </span>
         )}
+        {compact && abv ? (
+          <span {...stylex.props(foundationStyles.metadata, styles.compactAbv)}>
+            {abv}
+          </span>
+        ) : null}
         {!compact && !sidebar && isLibrary ? (
           <MemberStatus kind="library" />
         ) : null}
@@ -314,11 +324,22 @@ const styles = stylex.create({
     paddingTop: space.x1,
     paddingBottom: space.x1,
   },
+  compactNameLine: {
+    display: "flex",
+    alignItems: "baseline",
+    gap: "6px",
+  },
   compactName: {
     display: "block",
+    minWidth: 0,
     overflow: "hidden",
     fontWeight: 400,
     textOverflow: "ellipsis",
+    whiteSpace: "nowrap",
+  },
+  compactAbv: {
+    flexShrink: 0,
+    color: colors.inkMuted,
     whiteSpace: "nowrap",
   },
   cellLayout: {

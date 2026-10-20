@@ -1,4 +1,7 @@
-import { formatBottleDisplayName } from "@peated/server/lib/bottleDisplayName";
+import {
+  formatAbv,
+  formatBottleDisplayName,
+} from "@peated/server/lib/bottleDisplayName";
 import { formatColor, formatServingStyle } from "@peated/server/lib/format";
 import type { Outputs } from "@peated/server/orpc/router";
 import type { TagCategory } from "@peated/server/types";
@@ -108,6 +111,12 @@ export function TastingReviewDetail({
       {rating.kind === "review" ? "Review" : "Tasting"}{" "}
       <span aria-hidden="true">· </span>
       <Timestamp date={createdAt} format="dateLong" />
+      {bottle.abv === null ? null : (
+        <>
+          <span aria-hidden="true"> · </span>
+          {formatAbv(bottle.abv)}
+        </>
+      )}
     </>
   );
   const facts = [

@@ -6,7 +6,7 @@ import { useMutation } from "@tanstack/react-query";
 import { X } from "lucide-react";
 import { useState } from "react";
 
-import { formatBottleDisplayName } from "@peated/server/lib/bottleDisplayName";
+import { formatBottleLabel } from "@peated/server/lib/bottleDisplayName";
 import { Avatar } from "@peated/web/components/avatar.stylex";
 import { Button, IconButton } from "@peated/web/components/button.stylex";
 import {
@@ -263,17 +263,17 @@ function getNotificationMessage(notification: Notification) {
   switch (notification.type) {
     case "auction_available":
       return notification.ref
-        ? `${formatBottleDisplayName(notification.ref.bottle)} was listed at ${notification.ref.sourceName}`
+        ? `${formatBottleLabel(notification.ref.bottle)} was listed at ${notification.ref.sourceName}`
         : "An auction listing is no longer available";
     case "friend_request":
       return "sent you a friend request";
     case "toast":
       return notification.ref
-        ? `toasted ${formatBottleDisplayName(notification.ref.bottle)}`
+        ? `toasted ${formatBottleLabel(notification.ref.bottle)}`
         : "toasted an unavailable tasting";
     case "comment":
       return notification.ref
-        ? `commented on ${formatBottleDisplayName(notification.ref.bottle)}`
+        ? `commented on ${formatBottleLabel(notification.ref.bottle)}`
         : "commented on an unavailable tasting";
   }
 }

@@ -1,3 +1,4 @@
+import { formatAbv } from "@peated/server/lib/bottleDisplayName";
 import type { Outputs } from "@peated/server/orpc/router";
 import * as stylex from "@stylexjs/stylex";
 import type { ReactNode } from "react";
@@ -110,7 +111,8 @@ export function TastingReviewRail({
         ...toBottleListItem(tasting.bottle),
         id: String(tasting.id),
         provenance: [],
-        metadata: [],
+        metadata:
+          tasting.bottle.abv === null ? [] : [formatAbv(tasting.bottle.abv)],
         end: (
           <div {...stylex.props(styles.tastingMeta)}>
             {tasting.ratingBand ? (

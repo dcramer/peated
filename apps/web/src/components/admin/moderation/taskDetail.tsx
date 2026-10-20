@@ -1,6 +1,6 @@
 "use client";
 
-import { formatBottleDisplayName } from "@peated/server/lib/bottleDisplayName";
+import { formatBottleLabel } from "@peated/server/lib/bottleDisplayName";
 import { BottleCreateInputSchema } from "@peated/server/lib/bottleSchemas";
 import type { Inputs, Outputs } from "@peated/server/orpc/router";
 import type { Bottle } from "@peated/server/types";
@@ -200,7 +200,7 @@ function ListingTask({
   function selectBottle(bottle: Bottle) {
     return matchBottle(
       bottle,
-      `Assigned ${item.price.name} to ${formatBottleDisplayName(bottle)}.`,
+      `Assigned ${item.price.name} to ${formatBottleLabel(bottle)}.`,
     );
   }
 
@@ -370,7 +370,7 @@ function ListingTask({
                 onClick={() =>
                   void matchBottle(
                     bottleNeedingReason,
-                    `Assigned ${item.price.name} to ${formatBottleDisplayName(bottleNeedingReason)}.`,
+                    `Assigned ${item.price.name} to ${formatBottleLabel(bottleNeedingReason)}.`,
                   )
                 }
               >

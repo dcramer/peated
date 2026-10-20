@@ -2,6 +2,7 @@ import { describe, expect, it } from "vitest";
 
 import {
   formatBottleDisplayName,
+  formatBottleLabel,
   getBottleReleaseMetadata,
 } from "./bottleDisplayName";
 
@@ -142,5 +143,29 @@ describe("formatBottleDisplayName", () => {
         vintageYear: 1988,
       }),
     ).toBeNull();
+  });
+});
+
+describe("formatBottleLabel", () => {
+  it("adds ABV so releases with the same name stay distinct", () => {
+    expect(formatBottleLabel({ ...bottle, abv: 41.2 })).toBe(
+      "Decadent Drinks Whiskyland Glenburgie 38-year-old - Chapter Thirty Two · 41.2%",
+    );
+  });
+
+  it("shows the name alone when ABV is unknown", () => {
+    expect(formatBottleLabel({ ...bottle, abv: null })).toBe(
+      "Decadent Drinks Whiskyland Glenburgie 38-year-old - Chapter Thirty Two",
+    );
+  });
+
+  it("does not repeat ABV already in the marketed name", () => {
+    expect(
+      formatBottleLabel({
+        name: "Strength 57.1% ABV Edition",
+        brand: { name: "Example" },
+        abv: 57.1,
+      }),
+    ).toBe("Example Strength 57.1% ABV Edition");
   });
 });

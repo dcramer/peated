@@ -8,7 +8,7 @@ import {
   externalSites,
 } from "@peated/server/db/schema";
 import { visibleExternalReviewWhere } from "@peated/server/externalReviews/visibility";
-import { formatBottleDisplayName } from "@peated/server/lib/bottleDisplayName";
+import { formatBottleLabel } from "@peated/server/lib/bottleDisplayName";
 import { implement } from "@peated/server/orpc";
 import activeCriticsContract from "@peated/server/orpc/contracts/externalReviews/active-critics";
 import { serializeExternalSite } from "@peated/server/serializers/externalSite";
@@ -93,7 +93,7 @@ export default implement(activeCriticsContract).handler(async function ({
         imageUrl: serializedSite.imageUrl,
       },
       latestReview: {
-        bottleName: formatBottleDisplayName(bottle),
+        bottleName: formatBottleLabel(bottle),
         publishedAt: publishedAt!.toISOString(),
         url: reviewUrl,
       },
