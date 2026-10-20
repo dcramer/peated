@@ -14,7 +14,9 @@ agreements, missing facts, and conflicts.
 
 The shared comparator orders release evidence before name similarity. Stored
 relationship IDs take precedence over names. Cask punctuation and small ABV
-differences remain conflicts. Missing facts are not contradictions. Maturation
+differences remain conflicts. Missing facts are not contradictions. Creation
+candidates leave out a Bottle that shares none of the entered distilleries; a
+Bottle with no stored distillery stays. Maturation
 wording and outturn do not determine identity. Bottling year remains contextual
 evidence, not an independent reason to create another Bottle.
 
