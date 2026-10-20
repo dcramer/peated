@@ -368,8 +368,6 @@ describe("PUT /tasting-drafts/{draft}", () => {
       });
       expect(await getDraftRow(draftId)).toMatchObject({
         identificationStatus: "pending",
-        identificationAttempts: 0,
-        identificationQueuedAt: expect.any(Date),
       });
 
       // A finished result stays while the photo stays.

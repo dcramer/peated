@@ -4,7 +4,7 @@ import { serialize, serializer } from ".";
 import config from "../config";
 import { db } from "../db";
 import type { TastingDraft, User } from "../db/schema";
-import { bottles, bottleTombstones, users } from "../db/schema";
+import { bottles, users } from "../db/schema";
 import { notEmpty } from "../lib/filter";
 import { serializeProposedBottle } from "../lib/photoIdentification";
 import { absoluteUrl } from "../lib/urls";
@@ -40,26 +40,11 @@ export const TastingDraftSerializer = serializer({
     const matchedIds = [...identifications.values()].flatMap((result) =>
       result?.action === "match" ? [result.bottleId] : [],
     );
-    // A matched Bottle may have been merged since; follow it to the Bottle
-    // it was merged into.
-    const tombstoneList = matchedIds.length
-      ? await db
-          .select()
-          .from(bottleTombstones)
-          .where(inArray(bottleTombstones.bottleId, matchedIds))
-      : [];
-    const replacements = new Map(
-      tombstoneList.map((row) => [row.bottleId, row.newBottleId]),
-    );
-    const matchedBottleId = (bottleId: number) =>
-      replacements.has(bottleId) ? replacements.get(bottleId)! : bottleId;
-
     const bottleIds = [
       ...new Set(
-        [
-          ...itemList.map(({ bottleId }) => bottleId),
-          ...matchedIds.map(matchedBottleId),
-        ].filter(notEmpty),
+        [...itemList.map(({ bottleId }) => bottleId), ...matchedIds].filter(
+          notEmpty,
+        ),
       ),
     ];
     const friendIds = [...new Set(itemList.flatMap(({ friends }) => friends))];
@@ -93,9 +78,8 @@ export const TastingDraftSerializer = serializer({
         case undefined:
           return null;
         case "match": {
-          const bottleId = matchedBottleId(result.bottleId);
-          const bottle = bottleId ? bottlesById.get(bottleId) : undefined;
-          // The matched Bottle was deleted, so there is nothing to confirm.
+          const bottle = bottlesById.get(result.bottleId);
+          // The matched Bottle was merged or deleted since; search instead.
           return bottle ? { action: "match", bottle } : { action: "no_match" };
         }
         case "create_bottle":

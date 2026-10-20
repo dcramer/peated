@@ -274,13 +274,6 @@ export async function runWorker() {
     scheduledJob("7 * * * *", "process-account-deletions", async () => {
       await runJob("ProcessAccountDeletions");
     });
-    scheduledJob(
-      "23 * * * *",
-      "retry-tasting-draft-identifications",
-      async () => {
-        await runJob("RetryTastingDraftIdentifications");
-      },
-    );
     scheduledJob("27 * * * *", "update-external-reviews", async () => {
       await pushUniqueJob(
         "UpdateExternalReviews",

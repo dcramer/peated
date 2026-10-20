@@ -5,14 +5,9 @@ import { db } from "@peated/server/db";
 import { bottles, tastingDrafts } from "@peated/server/db/schema";
 import { createPendingImageUpload } from "@peated/server/lib/pendingUploads";
 import type { IdentifyBottlePhotoServices } from "@peated/server/lib/photoIdentification";
-import {
-  identifyTastingDraft,
-  MAX_TASTING_DRAFT_IDENTIFICATION_ATTEMPTS,
-  retryStaleTastingDraftIdentifications,
-  STALE_TASTING_DRAFT_IDENTIFICATION_MS,
-} from "@peated/server/lib/tastingDraftIdentification";
+import { identifyTastingDraft } from "@peated/server/lib/tastingDraftIdentification";
 import waitError from "@peated/server/lib/test/waitError";
-import { pushJob, pushUniqueJob } from "@peated/server/lib/test/workerDispatch";
+import { pushJob } from "@peated/server/lib/test/workerDispatch";
 import type { Context } from "@peated/server/orpc/context";
 import { routerClient } from "@peated/server/orpc/router";
 import { getConnection } from "@peated/server/worker/redis";
@@ -168,7 +163,6 @@ describe("identifyTastingDraft", () => {
     expect(await getDraft(draft.id)).toMatchObject({
       bottleId: null,
       identificationStatus: "done",
-      identificationAttempts: 1,
       identification: { action: "match", bottleId: bottle.id },
     });
     const serialized = await routerClient.tastingDrafts.details(
@@ -276,12 +270,11 @@ describe("identifyTastingDraft", () => {
     expect(after.imageUrl).not.toEqual(draft.imageUrl);
     expect(after).toMatchObject({
       identificationStatus: "pending",
-      identificationAttempts: 0,
       identification: null,
     });
   });
 
-  test("marks the draft failed after its last attempt", async ({
+  test("marks the draft failed when identification breaks", async ({
     defaults,
     fixtures,
   }) => {
@@ -291,29 +284,21 @@ describe("identifyTastingDraft", () => {
     );
     runReference.mockRejectedValue(new Error("Classifier broke"));
 
-    for (
-      let attempt = 1;
-      attempt <= MAX_TASTING_DRAFT_IDENTIFICATION_ATTEMPTS;
-      attempt++
-    ) {
-      await expect(identifyTastingDraft(draft.id, services)).rejects.toThrow(
-        "Classifier broke",
-      );
-      expect(await getDraft(draft.id)).toMatchObject({
-        identificationAttempts: attempt,
-        identificationStatus:
-          attempt < MAX_TASTING_DRAFT_IDENTIFICATION_ATTEMPTS
-            ? "pending"
-            : "failed",
-      });
-    }
+    await expect(identifyTastingDraft(draft.id, services)).rejects.toThrow(
+      "Classifier broke",
+    );
 
+    expect(await getDraft(draft.id)).toMatchObject({
+      identificationStatus: "failed",
+      identification: null,
+    });
+    // A failed draft is not tried again.
     runReference.mockClear();
     await identifyTastingDraft(draft.id, services);
     expect(runReference).not.toHaveBeenCalled();
   });
 
-  test("does not use an attempt when the AI service is unavailable", async ({
+  test("stays pending when the AI service is unavailable", async ({
     defaults,
     fixtures,
   }) => {
@@ -332,11 +317,10 @@ describe("identifyTastingDraft", () => {
     expect(error).toMatchObject({ message: "Classification failed" });
     expect(await getDraft(draft.id)).toMatchObject({
       identificationStatus: "pending",
-      identificationAttempts: 0,
     });
   });
 
-  test("waits without an attempt when the member is over the photo budget", async ({
+  test("waits when the member is over the photo budget", async ({
     defaults,
     fixtures,
   }) => {
@@ -367,7 +351,6 @@ describe("identifyTastingDraft", () => {
     expect(delay).toBeLessThanOrEqual(10 * 60 * 1000);
     expect(await getDraft(draft.id)).toMatchObject({
       identificationStatus: "pending",
-      identificationAttempts: 0,
     });
   });
 
@@ -407,69 +390,5 @@ describe("identifyTastingDraft", () => {
       code: "FORBIDDEN",
       message: "Too many requests. Please try again later.",
     });
-  });
-});
-
-describe("retryStaleTastingDraftIdentifications", () => {
-  test("queues stale pending drafts again and fails spent ones", async ({
-    defaults,
-    fixtures,
-  }) => {
-    const now = new Date();
-    const stale = new Date(
-      now.getTime() - STALE_TASTING_DRAFT_IDENTIFICATION_MS - 1000,
-    );
-    const pendingFields = {
-      createdById: defaults.user.id,
-      imageUrl: "/uploads/tasting-drafts/sweep.webp",
-      identificationStatus: "pending" as const,
-    };
-    const lost = await fixtures.TastingDraft({
-      ...pendingFields,
-      identificationAttempts: 1,
-      identificationQueuedAt: stale,
-    });
-    const spent = await fixtures.TastingDraft({
-      ...pendingFields,
-      identificationAttempts: MAX_TASTING_DRAFT_IDENTIFICATION_ATTEMPTS,
-      identificationQueuedAt: stale,
-    });
-    const recent = await fixtures.TastingDraft({
-      ...pendingFields,
-      identificationQueuedAt: new Date(now.getTime() - 60_000),
-    });
-    const done = await fixtures.TastingDraft({
-      ...pendingFields,
-      identificationStatus: "done",
-      identification: { action: "no_match" },
-      identificationQueuedAt: stale,
-    });
-
-    const result = await retryStaleTastingDraftIdentifications({ now });
-
-    expect(result).toEqual({ queued: 1, failed: 1 });
-    expect(pushUniqueJob).toHaveBeenCalledTimes(1);
-    expect(pushUniqueJob).toHaveBeenCalledWith("IdentifyTastingDraft", {
-      draftId: lost.id,
-    });
-    expect(await getDraft(lost.id)).toMatchObject({
-      identificationStatus: "pending",
-      identificationQueuedAt: now,
-    });
-    expect(await getDraft(spent.id)).toMatchObject({
-      identificationStatus: "failed",
-    });
-    expect(await getDraft(recent.id)).toMatchObject({
-      identificationStatus: "pending",
-      identificationQueuedAt: recent.identificationQueuedAt,
-    });
-    expect(await getDraft(done.id)).toMatchObject({
-      identificationStatus: "done",
-    });
-
-    // A queued draft is not stale again until the threshold passes.
-    pushUniqueJob.mockClear();
-    await retryStaleTastingDraftIdentifications({ now });
-    expect(pushUniqueJob).not.toHaveBeenCalled();
   });
 });

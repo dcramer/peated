@@ -46,9 +46,8 @@ carries a timeout.
 
 `IdentifyTastingDraft` runs on `models` too. It reads a tasting draft's photo
 and saves the identified Bottle on the draft. Over the member's hourly photo
-budget, it queues itself again with a delay. The hourly
-`RetryTastingDraftIdentifications` job queues drafts whose identification was
-lost or failed, and marks a draft failed after three tries. See
+budget, it queues itself again with a delay. Any other error marks the draft
+`failed` without a retry. See
 [Tasting Drafts](../../../../docs/features/tasting-drafts.md#identifying-the-bottle).
 
 When the AI service is out of budget, rate limited, down, or unreachable

@@ -9,25 +9,13 @@ import {
 } from "@peated/server/lib/photoIdentification";
 import { takeRateLimit } from "@peated/server/orpc/middleware/rateLimit";
 import { type StoredTastingDraftIdentification } from "@peated/server/schemas/tastingDrafts";
-import { pushJob, pushUniqueJob } from "@peated/server/worker/dispatch";
-import { and, eq, gte, inArray, isNull, lt, or, sql } from "drizzle-orm";
-
-/** Attempts before a draft's identification is marked failed. */
-export const MAX_TASTING_DRAFT_IDENTIFICATION_ATTEMPTS = 3;
+import { pushJob } from "@peated/server/worker/dispatch";
+import { and, eq } from "drizzle-orm";
 
 /**
- * How long a pending draft waits before the sweep queues it again. It is
- * longer than the photo budget window, the longest delay a job puts on
- * itself, so the sweep only picks up jobs that were lost or failed.
- */
-export const STALE_TASTING_DRAFT_IDENTIFICATION_MS = 2 * 60 * 60 * 1000;
-
-const SWEEP_LIMIT = 500;
-
-/**
- * Queues identification after a draft with a new photo is saved. The draft
- * is already `pending`, so a failed push is logged and the sweep queues it
- * later.
+ * Queues identification after a draft with a new photo is saved. The save
+ * already committed, so a failed push is logged. The draft stays `pending`
+ * until the member saves a new photo, and can still be finished by search.
  */
 export async function queueTastingDraftIdentification(draftId: string) {
   try {
@@ -79,13 +67,6 @@ function samePendingPhoto(draft: Pick<TastingDraft, "id" | "imageUrl">) {
   );
 }
 
-async function markFailed(draft: Pick<TastingDraft, "id" | "imageUrl">) {
-  await db
-    .update(tastingDrafts)
-    .set({ identificationStatus: "failed" })
-    .where(samePendingPhoto(draft));
-}
-
 /**
  * Identifies the Bottle in a draft's photo and saves the result on the draft.
  *
@@ -106,44 +87,16 @@ export async function identifyTastingDraft(
   }
   const imageUrl = draft.imageUrl;
 
-  if (
-    draft.identificationAttempts >= MAX_TASTING_DRAFT_IDENTIFICATION_ATTEMPTS
-  ) {
-    await markFailed(draft);
-    return;
-  }
-
   // Photo budget rule: drafts share the member's photo identification budget.
-  // Over budget, wait for the window to reset without using an attempt.
+  // Over budget, wait for the window to reset.
   const retryAfterMs = await takeRateLimit(
     PHOTO_IDENTIFICATION_RATE_LIMIT,
     String(draft.createdById),
   );
   if (retryAfterMs !== null) {
-    await db
-      .update(tastingDrafts)
-      .set({ identificationQueuedAt: new Date() })
-      .where(samePendingPhoto(draft));
     await pushJob("IdentifyTastingDraft", { draftId }, { delay: retryAfterMs });
     return;
   }
-
-  const [claimed] = await db
-    .update(tastingDrafts)
-    .set({
-      identificationAttempts: sql`${tastingDrafts.identificationAttempts} + 1`,
-    })
-    .where(
-      and(
-        samePendingPhoto(draft),
-        lt(
-          tastingDrafts.identificationAttempts,
-          MAX_TASTING_DRAFT_IDENTIFICATION_ATTEMPTS,
-        ),
-      ),
-    )
-    .returning({ attempts: tastingDrafts.identificationAttempts });
-  if (!claimed) return;
 
   let identification: Awaited<ReturnType<typeof identifyBottlePhoto>>;
   try {
@@ -155,21 +108,13 @@ export async function identifyTastingDraft(
       services,
     );
   } catch (error) {
-    if (error instanceof Error && isModelServiceUnavailable(error)) {
-      // The models queue puts this job back; an outage is not an attempt.
+    // The models queue puts the job back during an AI service outage. Any
+    // other error is final: it is reported, and the member searches instead.
+    if (!(error instanceof Error && isModelServiceUnavailable(error))) {
       await db
         .update(tastingDrafts)
-        .set({
-          identificationAttempts: sql`${tastingDrafts.identificationAttempts} - 1`,
-        })
-        .where(
-          and(
-            samePendingPhoto(draft),
-            gte(tastingDrafts.identificationAttempts, 1),
-          ),
-        );
-    } else if (claimed.attempts >= MAX_TASTING_DRAFT_IDENTIFICATION_ATTEMPTS) {
-      await markFailed(draft);
+        .set({ identificationStatus: "failed" })
+        .where(samePendingPhoto(draft));
     }
     throw error;
   }
@@ -187,62 +132,4 @@ export async function identifyTastingDraft(
       extra: { tastingDraftId: draft.id },
     });
   }
-}
-
-/**
- * Queues pending drafts whose identification job was lost or failed, and
- * marks drafts that used every attempt as failed. Runs hourly.
- */
-export async function retryStaleTastingDraftIdentifications({
-  now = new Date(),
-}: { now?: Date } = {}): Promise<{ queued: number; failed: number }> {
-  const staleBefore = new Date(
-    now.getTime() - STALE_TASTING_DRAFT_IDENTIFICATION_MS,
-  );
-  const stale = and(
-    eq(tastingDrafts.identificationStatus, "pending"),
-    or(
-      isNull(tastingDrafts.identificationQueuedAt),
-      lt(tastingDrafts.identificationQueuedAt, staleBefore),
-    ),
-  );
-
-  const failed = await db
-    .update(tastingDrafts)
-    .set({ identificationStatus: "failed" })
-    .where(
-      and(
-        stale,
-        gte(
-          tastingDrafts.identificationAttempts,
-          MAX_TASTING_DRAFT_IDENTIFICATION_ATTEMPTS,
-        ),
-      ),
-    )
-    .returning({ id: tastingDrafts.id });
-
-  const due = db
-    .select({ id: tastingDrafts.id })
-    .from(tastingDrafts)
-    .where(stale)
-    .orderBy(tastingDrafts.identificationQueuedAt)
-    .limit(SWEEP_LIMIT);
-  const queued = await db
-    .update(tastingDrafts)
-    .set({ identificationQueuedAt: now })
-    .where(and(stale, inArray(tastingDrafts.id, due)))
-    .returning({ id: tastingDrafts.id });
-
-  for (const { id } of queued) {
-    try {
-      await pushUniqueJob("IdentifyTastingDraft", { draftId: id });
-    } catch (error) {
-      // The draft stays pending and becomes stale again.
-      logError(error, {
-        extra: { tastingDraftId: id, operation: "tastingDraft.identify" },
-      });
-    }
-  }
-
-  return { queued: queued.length, failed: failed.length };
 }

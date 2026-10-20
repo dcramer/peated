@@ -32,7 +32,6 @@ import repairEntityBottleCounts from "./repairEntityBottleCounts";
 import repairLocationBottleCounts from "./repairLocationBottleCounts";
 import resolveAuctionLot from "./resolveAuctionLot";
 import resolveStorePriceBottle from "./resolveStorePriceBottle";
-import retryTastingDraftIdentifications from "./retryTastingDraftIdentifications";
 import runScraper from "./runScraper";
 import updateBottleStats from "./updateBottleStats";
 import updateCountryStats from "./updateCountryStats";
@@ -98,10 +97,6 @@ registry.add(
 registry.add("ResolveStorePriceBottle", resolveStorePriceBottle, {
   queueName: "models",
 });
-registry.add(
-  "RetryTastingDraftIdentifications",
-  retryTastingDraftIdentifications,
-);
 registry.add("RunScraper", runScraper, { queueName: "scrapers" });
 registry.add("CreateMissingBottles", createMissingBottles, {
   queueName: "models",

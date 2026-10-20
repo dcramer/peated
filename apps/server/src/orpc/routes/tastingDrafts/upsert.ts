@@ -148,8 +148,6 @@ export default procedure
         photoChanged = imageUrl !== undefined && imageUrl !== previousImageUrl;
         if (photoChanged) {
           values.identificationStatus = imageUrl ? "pending" : "none";
-          values.identificationAttempts = 0;
-          values.identificationQueuedAt = imageUrl ? now : null;
           values.identification = null;
         }
         const [draft] = await tx

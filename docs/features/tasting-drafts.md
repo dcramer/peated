@@ -87,7 +87,8 @@ The draft's `identification` shows the progress:
   - `match`: an existing Bottle the member can choose;
   - `create_bottle`: a proposed new Bottle the member can create; or
   - `no_match`: the member searches for the Bottle.
-- `failed`: identification gave up. The member searches for the Bottle.
+- `failed`: identification broke. The error is reported, it is not tried
+  again, and the member searches for the Bottle.
 
 Identification never chooses the draft's Bottle and never creates a Bottle.
 The member always confirms. Only results the member can act on are kept: a
@@ -99,8 +100,10 @@ that finishes after the photo changed is thrown away.
 
 Identification shares the member's hourly photo budget with
 `POST /tastings/photo-identification`. Over budget, the draft stays `pending`
-and identification waits until the budget resets. It tries at most three
-times. A model service outage does not count as a try.
+and identification waits until the budget resets. During a model service
+outage the job waits and runs again. Nothing else retries it: if the job is
+lost, the draft stays `pending` until the member saves a new photo. Search
+always works.
 
 ### Creating a proposed Bottle
 
@@ -160,5 +163,4 @@ deleted.
 - routes: `apps/server/src/orpc/routes/tastingDrafts/`
 - shared tasting insert: `apps/server/src/orpc/routes/tastings/insertTasting.ts`
 - photo copy: `apps/server/src/lib/pendingUploads.ts`
-- identification job and retry sweep:
-  `apps/server/src/lib/tastingDraftIdentification.ts`
+- identification job: `apps/server/src/lib/tastingDraftIdentification.ts`

@@ -33,7 +33,6 @@ export type JobName =
   | "RepairLocationBottleCounts"
   | "ReconcileStorePriceMatchProposals"
   | "ResolveStorePriceBottle"
-  | "RetryTastingDraftIdentifications"
   | "RunScraper"
   | "CreateMissingBottles"
   | "UpdateBottleStats"

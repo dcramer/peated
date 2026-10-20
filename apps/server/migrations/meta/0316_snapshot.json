@@ -1,5 +1,5 @@
 {
-  "id": "e78e4805-8139-4543-b6af-cb3d6e7fe40e",
+  "id": "dd34bfdb-4560-457b-a448-7a00a77ff8f7",
   "prevId": "b4ee8020-3710-4cae-a9e2-965a682d1cbf",
   "version": "7",
   "dialect": "postgresql",
@@ -11403,19 +11403,6 @@
           "notNull": true,
           "default": "'none'"
         },
-        "identification_attempts": {
-          "name": "identification_attempts",
-          "type": "smallint",
-          "primaryKey": false,
-          "notNull": true,
-          "default": 0
-        },
-        "identification_queued_at": {
-          "name": "identification_queued_at",
-          "type": "timestamp",
-          "primaryKey": false,
-          "notNull": false
-        },
         "identification": {
           "name": "identification",
           "type": "jsonb",
@@ -11495,22 +11482,6 @@
             }
           ],
           "isUnique": false,
-          "concurrently": false,
-          "method": "btree",
-          "with": {}
-        },
-        "tasting_draft_identification_pending_idx": {
-          "name": "tasting_draft_identification_pending_idx",
-          "columns": [
-            {
-              "expression": "identification_queued_at",
-              "isExpression": false,
-              "asc": true,
-              "nulls": "last"
-            }
-          ],
-          "isUnique": false,
-          "where": "\"tasting_draft\".\"identification_status\" = 'pending'",
           "concurrently": false,
           "method": "btree",
           "with": {}
