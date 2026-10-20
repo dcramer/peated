@@ -4,6 +4,7 @@ import { db } from "@peated/server/db";
 import { bottleTombstones, tastingDrafts } from "@peated/server/db/schema";
 import { createPendingImageUpload } from "@peated/server/lib/pendingUploads";
 import waitError from "@peated/server/lib/test/waitError";
+import { pushJob } from "@peated/server/lib/test/workerDispatch";
 import { routerClient } from "@peated/server/orpc/router";
 import { eq } from "drizzle-orm";
 import { existsSync } from "node:fs";
@@ -344,6 +345,59 @@ describe("PUT /tasting-drafts/{draft}", () => {
       expect(removed.imageUrl).toBeNull();
       expect((await getDraftRow(draftId))!.imageUrl).toBeNull();
       expect(existsSync(storedFile(secondUrl))).toBe(false);
+    });
+
+    test("identifies the Bottle again only when the photo changes", async ({
+      defaults,
+      fixtures,
+    }) => {
+      const draftId = faker.string.uuid();
+      const user = defaults.user;
+      const tastedAt = new Date().toISOString();
+      const upload = await pendingPhoto(user.id, fixtures.SampleSquareImage);
+
+      const saved = await routerClient.tastingDrafts.upsert(
+        { draft: draftId, tastedAt, pendingImageId: upload.id },
+        { context: { user } },
+      );
+
+      expect(saved.identification).toEqual({ status: "pending", result: null });
+      expect(pushJob).toHaveBeenCalledTimes(1);
+      expect(pushJob).toHaveBeenCalledWith("IdentifyTastingDraft", {
+        draftId,
+      });
+      expect(await getDraftRow(draftId)).toMatchObject({
+        identificationStatus: "pending",
+      });
+
+      // A finished result stays while the photo stays.
+      await db
+        .update(tastingDrafts)
+        .set({
+          identificationStatus: "done",
+          identification: { action: "no_match" },
+        })
+        .where(eq(tastingDrafts.id, draftId));
+      pushJob.mockClear();
+      for (const pendingImageId of [undefined, upload.id]) {
+        const kept = await routerClient.tastingDrafts.upsert(
+          { draft: draftId, tastedAt, notes: "kept", pendingImageId },
+          { context: { user } },
+        );
+        expect(kept.identification).toEqual({
+          status: "done",
+          result: { action: "no_match" },
+        });
+      }
+      expect(pushJob).not.toHaveBeenCalled();
+
+      // Removing the photo clears the result.
+      const removed = await routerClient.tastingDrafts.upsert(
+        { draft: draftId, tastedAt, pendingImageId: null },
+        { context: { user } },
+      );
+      expect(removed.identification).toEqual({ status: "none", result: null });
+      expect(pushJob).not.toHaveBeenCalled();
     });
 
     test("rejects another member's pending upload", async ({

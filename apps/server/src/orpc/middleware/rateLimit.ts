@@ -32,6 +32,24 @@ async function incrementRateLimitCounter(key: string, windowMs: number) {
 }
 
 /**
+ * Counts one use of a rate limit outside a request, such as background work
+ * that shares a route's per-user limit. Returns how long to wait before
+ * trying again when the limit is reached, or null when this use is allowed.
+ */
+export async function consumeRateLimit(
+  { windowMs, maxRequests, keyPrefix = "rl" }: RateLimitOptions,
+  identifier: string,
+): Promise<number | null> {
+  const key = `${keyPrefix}:${identifier}`;
+  const count = await incrementRateLimitCounter(key, windowMs);
+  if (count <= maxRequests) return null;
+
+  const redis = await getConnection();
+  const remainingMs = await redis.pttl(key);
+  return remainingMs > 0 ? remainingMs : windowMs;
+}
+
+/**
  * Builds reusable rate-limit middleware while preserving any route-specific
  * context narrowing applied before this middleware runs.
  */

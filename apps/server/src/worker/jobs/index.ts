@@ -10,6 +10,7 @@ import generateRegionDetails from "./generateRegionDetails";
 import geocodeCountryLocation from "./geocodeCountryLocation";
 import geocodeEntityLocation from "./geocodeEntityLocation";
 import geocodeRegionLocation from "./geocodeRegionLocation";
+import identifyTastingDraft from "./identifyTastingDraft";
 import indexBottleReference from "./indexBottleReference";
 import indexBottleSearch from "./indexBottleSearch";
 import indexBottleSeriesSearch from "./indexBottleSeriesSearch";
@@ -63,6 +64,9 @@ registry.add("GenerateRegionDetails", generateRegionDetails, {
 registry.add("GeocodeCountryLocation", geocodeCountryLocation);
 registry.add("GeocodeRegionLocation", geocodeRegionLocation);
 registry.add("GeocodeEntityLocation", geocodeEntityLocation);
+registry.add("IdentifyTastingDraft", identifyTastingDraft, {
+  queueName: "models",
+});
 registry.add("IndexBottleReference", indexBottleReference);
 registry.add("IndexBottleSearch", indexBottleSearch);
 registry.add("IndexBottleSeriesSearch", indexBottleSeriesSearch);

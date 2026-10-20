@@ -221,7 +221,7 @@ const PhotoIdentificationCandidateSchema = BottleCandidateSchema.pick({
   fullName: true,
 });
 
-const PhotoIdentificationProposedBottleSchema = z.object({
+export const PhotoIdentificationProposedBottleSchema = z.object({
   name: z.string().trim().min(1),
   series: z
     .object({

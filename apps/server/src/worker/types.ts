@@ -12,6 +12,7 @@ export type JobName =
   | "GeocodeCountryLocation"
   | "GeocodeRegionLocation"
   | "GeocodeEntityLocation"
+  | "IdentifyTastingDraft"
   | "IndexBottleReference"
   | "IndexBottleSearch"
   | "IndexBottleSeriesSearch"

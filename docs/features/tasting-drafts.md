@@ -74,6 +74,53 @@ server copies the photo to `tasting-drafts/`, so it no longer expires with the
 pending upload. A replaced or removed photo's file is deleted after the save
 commits. A failed file delete is logged and does not fail the save.
 
+## Identifying the Bottle
+
+A new photo starts identifying its Bottle in the background, using the same
+label reading and classifier as
+[Photo-Assisted Bottle Resolution](./photo-assisted-bottle-resolution.md#background-identification-for-drafts).
+The draft's `identification` shows the progress:
+
+- `none`: the draft has no photo.
+- `pending`: identification is queued or running.
+- `done`: `result` holds one of:
+  - `match`: an existing Bottle the member can choose;
+  - `create_bottle`: a proposed new Bottle the member can create; or
+  - `no_match`: the member searches for the Bottle.
+- `failed`: identification broke. The error is reported, it is not tried
+  again, and the member searches for the Bottle.
+
+Identification never chooses the draft's Bottle and never creates a Bottle.
+The member always confirms. Only results the member can act on are kept: a
+match or proposal that needs review is saved as `no_match`.
+
+Replacing the photo starts over and drops the old result. Removing the photo
+sets `none`. Saving without changing the photo keeps the result. A result
+that finishes after the photo changed is thrown away.
+
+Identification shares the member's hourly photo identification limit with
+`POST /tastings/photo-identification`. Over the limit, the draft stays
+`pending` and identification waits until the limit resets. During a model service
+outage the job waits and runs again. Nothing else retries it: if the job is
+lost, the draft stays `pending` until the member saves a new photo. Search
+always works.
+
+### Creating a proposed Bottle
+
+`POST /tasting-drafts/{draft}/create-bottle` creates the Bottle from a
+`create_bottle` result and chooses it for the draft. It needs a verified
+member who has accepted the Terms of Service.
+
+- The server uses the proposal it saved, so the client sends only the draft
+  ID. It checks again that the proposal can still be created without review.
+- Repeating the request returns the same Bottle.
+- If a different Bottle with the same identity already exists, it returns
+  `409 CONFLICT` with that Bottle's ID in `data.bottle`, so the member can
+  choose it instead.
+- If the photo is suitable for the catalog and the Bottle is new, the photo
+  becomes the Bottle's catalog image, as with photo identification. A copy
+  failure is a warning and does not undo the Bottle.
+
 ## Publishing
 
 `POST /tasting-drafts/{draft}/publish` posts the draft:
@@ -108,8 +155,6 @@ deleted.
 
 ## Not yet built
 
-- Identifying the Bottle from the draft's photo in the background, and
-  creating a proposed Bottle from a draft.
 - The web drafts inbox.
 
 ## Ownership in code
@@ -118,3 +163,4 @@ deleted.
 - routes: `apps/server/src/orpc/routes/tastingDrafts/`
 - shared tasting insert: `apps/server/src/orpc/routes/tastings/insertTasting.ts`
 - photo copy: `apps/server/src/lib/pendingUploads.ts`
+- identification job: `apps/server/src/lib/tastingDraftIdentification.ts`

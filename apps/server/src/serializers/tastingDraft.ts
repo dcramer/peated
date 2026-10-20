@@ -6,14 +6,21 @@ import { db } from "../db";
 import type { TastingDraft, User } from "../db/schema";
 import { bottles, users } from "../db/schema";
 import { notEmpty } from "../lib/filter";
+import { serializeProposedBottle } from "../lib/photoIdentification";
 import { absoluteUrl } from "../lib/urls";
-import { type TastingDraftSchema } from "../schemas";
-import { BottleSerializer, bottleRowColumns } from "./bottle";
+import {
+  PersistedTastingDraftIdentificationSchema,
+  type TastingDraftSchema,
+} from "../schemas";
+import { bottleRowColumns, BottleSerializer } from "./bottle";
 import { UserSerializer } from "./user";
 
 type TastingDraftAttrs = {
   bottle: ReturnType<(typeof BottleSerializer)["item"]> | null;
   friends: ReturnType<(typeof UserSerializer)["item"]>[];
+  identificationResult: z.infer<
+    typeof TastingDraftSchema
+  >["identification"]["result"];
 };
 
 export const TastingDraftSerializer = serializer({
@@ -22,8 +29,23 @@ export const TastingDraftSerializer = serializer({
     itemList: TastingDraft[],
     currentUser?: User,
   ): Promise<Record<string, TastingDraftAttrs>> => {
+    const identifications = new Map(
+      itemList.map((item) => [
+        item.id,
+        item.identificationStatus === "done"
+          ? PersistedTastingDraftIdentificationSchema.parse(item.identification)
+          : null,
+      ]),
+    );
+    const matchedIds = [...identifications.values()].flatMap((result) =>
+      result?.action === "match" ? [result.bottleId] : [],
+    );
     const bottleIds = [
-      ...new Set(itemList.map(({ bottleId }) => bottleId).filter(notEmpty)),
+      ...new Set(
+        [...itemList.map(({ bottleId }) => bottleId), ...matchedIds].filter(
+          notEmpty,
+        ),
+      ),
     ];
     const friendIds = [...new Set(itemList.flatMap(({ friends }) => friends))];
 
@@ -49,6 +71,29 @@ export const TastingDraftSerializer = serializer({
       friendList.map((user, index) => [user.id, serializedFriends[index]]),
     );
 
+    const serializeResult = (
+      result: z.infer<typeof PersistedTastingDraftIdentificationSchema> | null,
+    ): TastingDraftAttrs["identificationResult"] => {
+      switch (result?.action) {
+        case undefined:
+          return null;
+        case "match": {
+          const bottle = bottlesById.get(result.bottleId);
+          // The matched Bottle was merged or deleted since; search instead.
+          return bottle ? { action: "match", bottle } : { action: "no_match" };
+        }
+        case "create_bottle":
+          return {
+            action: "create_bottle",
+            proposedBottle: serializeProposedBottle(
+              result.decision.proposedBottle,
+            ),
+          };
+        case "no_match":
+          return { action: "no_match" };
+      }
+    };
+
     return Object.fromEntries(
       itemList.map((item) => [
         item.id,
@@ -59,6 +104,9 @@ export const TastingDraftSerializer = serializer({
           friends: item.friends
             .map((id) => friendsById.get(id))
             .filter(notEmpty),
+          identificationResult: serializeResult(
+            identifications.get(item.id) ?? null,
+          ),
         },
       ]),
     );
@@ -76,6 +124,10 @@ export const TastingDraftSerializer = serializer({
       imageUrl: item.imageUrl
         ? absoluteUrl(config.API_SERVER, item.imageUrl)
         : null,
+      identification: {
+        status: item.identificationStatus,
+        result: attrs.identificationResult,
+      },
       notes: item.notes,
       ratingBand: item.ratingBand,
       tags: item.tags,

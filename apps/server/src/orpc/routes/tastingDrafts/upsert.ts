@@ -12,6 +12,7 @@ import {
   ActiveBottleSelectionError,
   resolveActiveBottleIds,
 } from "@peated/server/lib/resolveActiveBottleIds";
+import { queueTastingDraftIdentification } from "@peated/server/lib/tastingDraftIdentification";
 import { procedure } from "@peated/server/orpc";
 import {
   requireAuth,
@@ -41,7 +42,7 @@ export default procedure
     path: "/tasting-drafts/{draft}",
     summary: "Save tasting draft",
     description:
-      "Create or replace one of your tasting drafts by its client-chosen ID. The latest save wins. Omitted fields are cleared, except `pendingImageId`: omit it to keep the current photo. Returns `409 CONFLICT` when the ID belongs to another member's draft, or when the draft was already posted; then `data.tasting` holds the posted tasting's ID.",
+      "Create or replace one of your tasting drafts by its client-chosen ID. The latest save wins. Omitted fields are cleared, except `pendingImageId`: omit it to keep the current photo. A new photo starts identifying its Bottle in the background; see `identification`. Returns `409 CONFLICT` when the ID belongs to another member's draft, or when the draft was already posted; then `data.tasting` holds the posted tasting's ID.",
     operationId: "upsertTastingDraft",
   })
   .input(TastingDraftInputSchema)
@@ -75,6 +76,7 @@ export default procedure
 
     // The draft's photo before this save. undefined until the draft is read.
     let previousImageUrl: string | null | undefined;
+    let photoChanged = false;
     let saved: TastingDraft;
     try {
       saved = await db.transaction(async (tx) => {
@@ -141,6 +143,13 @@ export default procedure
           updatedAt: now,
         };
         if (imageUrl !== undefined) values.imageUrl = imageUrl;
+        // A new photo starts identification over; the old result was for
+        // another photo.
+        photoChanged = imageUrl !== undefined && imageUrl !== previousImageUrl;
+        if (photoChanged) {
+          values.identificationStatus = imageUrl ? "pending" : "none";
+          values.identification = null;
+        }
         const [draft] = await tx
           .insert(tastingDrafts)
           .values({
@@ -176,6 +185,9 @@ export default procedure
 
     if (previousImageUrl && previousImageUrl !== saved.imageUrl) {
       await removeTastingDraftPhoto(previousImageUrl, saved.id);
+    }
+    if (photoChanged && saved.imageUrl) {
+      await queueTastingDraftIdentification(saved.id);
     }
 
     return await serialize(TastingDraftSerializer, saved, context.user);

@@ -1,8 +1,11 @@
+import type { PersistedTastingDraftIdentification } from "@peated/server/schemas/tastingDrafts";
 import { relations, sql } from "drizzle-orm";
 import {
   bigint,
   index,
   integer,
+  jsonb,
+  pgEnum,
   pgTable,
   text,
   timestamp,
@@ -15,6 +18,18 @@ import { ratingBandEnum, servingStyleEnum } from "./tastings";
 import { users } from "./users";
 
 export const TASTING_DRAFT_BOTTLE_HINT_MAX_LENGTH = 255;
+
+export const TASTING_DRAFT_IDENTIFICATION_STATUS_LIST = [
+  "none",
+  "pending",
+  "done",
+  "failed",
+] as const;
+
+export const tastingDraftIdentificationStatusEnum = pgEnum(
+  "tasting_draft_identification_status",
+  TASTING_DRAFT_IDENTIFICATION_STATUS_LIST,
+);
 
 /**
  * A tasting a member has started but not posted. Drafts are private to their
@@ -42,6 +57,17 @@ export const tastingDrafts = pgTable(
       { onDelete: "set null" },
     ),
     imageUrl: text("image_url"),
+    // Identifying the Bottle from the photo runs in the background. `none`
+    // means there is no photo. A new photo resets both fields. See
+    // docs/features/tasting-drafts.md.
+    identificationStatus: tastingDraftIdentificationStatusEnum(
+      "identification_status",
+    )
+      .default("none")
+      .notNull(),
+    // Checked by PersistedTastingDraftIdentificationSchema on every read.
+    identification:
+      jsonb("identification").$type<PersistedTastingDraftIdentification>(),
     ratingBand: ratingBandEnum("rating_band"),
     notes: text("notes"),
     tags: varchar("tags", { length: 64 })
