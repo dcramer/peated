@@ -1,0 +1,7 @@
+# The Ultimate Glen Ord review
+
+Reviewed all 16 known records, including newly created cask800298. The [producer history](https://www.ultimatewhisky.com/ult_hist.pdf) covers 14 Glen Ord releases between2018 and2022; exact auction evidence supplies800296 and current retailers supply the2026 two-cask release. This is not proof of a complete historical run. Exact-code, producer, auction and general searches for800295 and800303 produced discovery leads without independent corroboration; neither was created.
+
+Per-record facts, sources, image findings, aliases and references are in [release-review.csv](release-review.csv). Changes are recorded in [changes.csv](changes.csv). Cask800316 has a material date conflict and remains unresolved. Producer archive dates identify releases, not bottling days. The2026 retailer dates August as bottling month; the existing release month was preserved, not newly substantiated. Producer no-chill-filtration policy is supported; neither natural colour nor dilution to46% was generalized without evidence.
+
+Only1728 has a stored image; it was visually checked against its exact FineDrams page. Other exact retailer and auction images lack established reuse permission, so none was uploaded. No Series applies beyond the existing Ultimate Brand. No duplicate, alias addition or merge was established. Ambiguous reference12685 was unassigned and verified earlier in this operation.

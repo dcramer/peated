@@ -1,0 +1,5 @@
+# Smaller independent bottlers: third group
+
+Reviewed 24 releases from Decadent Drinks, Deerstalker, Dram Way, Duncan Taylor, Rare Find, Goldfinch, Highland Laird, Longvalley, Robert Graham, Robertsons, Alba Trail, Good Spirits, Maltman, Old Friends, Whisky Chamber, Whiskybroker and Whiskyfacile. Twenty additional updates were applied and verified. Exact labels and producer documentation resolved the Duncan Taylor 2026 bottling year and Whisky Chamber outturn: bottle 320 of 330 is not a 320-bottle release.
+
+The twelve-versus-thirteen-year Dram Way conflict remains open. The Whiskybase-exclusive Decadent release lacks exact independent corroboration; existing identity facts remain preserved and its review status is unresolved. Exact-source searches included producer archives, auction catalogues, owner reviews and English/German/Dutch name and decimal variants. Unknown flags were not inferred from strength or neighbouring releases. Stored images were inspected where useful; no new image reuse permission was established.

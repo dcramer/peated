@@ -1,0 +1,6 @@
+id,name,previousBottle,bottle,verified,reason,consumerVerification
+12685,Glen Ord 2011 vW The Ultimate,1728,,True,"The full reference text fits multiple Glen Ord releases without specifying cask, strength or edition.",No exact-name prices or external reviews found.
+19355,Singleton of Glen Ord 38-year-old,61162,,True,"The full reference text fits multiple Glen Ord releases without specifying cask, strength or edition.",API kept exact-name price 12034041 assigned to 61162 after unassignment. Product URL confirms the 38-year 49.6% Epicurean release; leave the supported retailer match. The more specific Epicurean price 12057290 also remained assigned.
+28293,The Singleton 40-year-old,61013,,True,"The full reference text fits multiple Glen Ord releases without specifying cask, strength or edition.",No exact-name prices or external reviews found.
+19778,Singleton of Glen Ord 15-year-old,65161,,True,"The full reference text fits multiple Glen Ord releases without specifying cask, strength or edition.",No exact-name prices or external reviews found.
+19779,Singleton of Glen Ord 18-year-old,65162,,True,"The full reference text fits multiple Glen Ord releases without specifying cask, strength or edition.",No exact-name prices or external reviews found.

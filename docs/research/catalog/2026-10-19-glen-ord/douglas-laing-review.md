@@ -1,0 +1,9 @@
+# Douglas Laing family review
+
+Reviewed27 existing releases:12 Old Malt Cask,8 Provenance,4 Old Particular,2 Douglas of Drumlanrig and1 Directors’ Cut. Sources span1967–2014 vintages and2002–2024 bottlings, with contemporary retailer archives, auctions, owner photographs and producer range policies. The former Douglas Laing and later Hunter Laing bottler relationships are preserved. Range identities already exist as Brands; no duplicate Series was created.
+
+Exact release findings are in [release-review.csv](release-review.csv). Historical imports distinguish Douglas McGibbon, Douglas Laing and Langside; a physical bottler line or modern retailer parent name alone was not used to change those relationships. Whiskyfun’s1260 cask typo conflicts with TWE’s exact12060. MoM’s2006 table vintage conflicts with its2004 title for eight-year Provenance. A Japanese bar’s2014 heading conflicts with its2013 Special Cask Strength label. Stronger exact evidence was used and other facts stayed unknown.
+
+Possible additional Provenance casks4243,5207,7188 and OMC15637 remain discovery leads. Searches using quoted cask IDs, brand names, vintages, auctions and alternate forms did not supply independent exact evidence; no creates were made. These archives do not prove the full historical set.
+
+The stored Old Particular46656 image was visually inspected against its exact2014/2024 label. Bar-owned Drumlanrig9035 and Japanese Special Cask Strength photos were read for facts. No reuse permission was established, so no new image was uploaded. Retailer original-page403/429 responses were respected; indexed public descriptions and other independent sources supplied evidence. Colour/filtration flags were added only where supported by a producer policy or exact label. No cask strength was inferred solely from an unusual ABV.

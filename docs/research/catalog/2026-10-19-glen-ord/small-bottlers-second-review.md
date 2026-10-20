@@ -1,0 +1,7 @@
+# Smaller independent bottlers: second group
+
+Reviewed fourteen Bladnoch Forum, Cooper’s Choice, C&S, Daily Dram and Creative Whisky Company records. Twelve additional updates were applied and verified. Coverage includes 1990–2012 vintages, 2008–2024 bottlings, older Exclusive Range/Exclusive Casks products, the Norwegian export market and the Daily Dram–Signatory collaboration.
+
+Exact auctions, contemporary importer price lists, producer range archives, merchant product pages and independent owner reviews were compared. The Daily Dram label confirms 2024 bottling and its range; conflicting retailer prose about its cask and outturn was rejected. Bladnoch 1160 retains 653 bottles from its exact auction label rather than the owner-list figure 652. Unknown bottling years and flags were not calculated from age or strength.
+
+The eight-year Cooper’s Choice 1999/2007 remains an unverified missing-release lead: an owner list and Zotte Lemke bar menu mention it, but the exact label is needed to distinguish it from the established nine-year 1999/2008 release. Creative Whisky GO002 and the menu-only Exclusive Regions cask 223 (eight years, 50%) remain discovery leads needing exact independent identification. Searches covered producer archives, exact cask/strength combinations, German C&S terms, and auction catalogues. Producer and Whisky.de requests returned 403; access restrictions were respected. No images were uploaded because exact-source availability did not establish reproduction rights.
