@@ -30,6 +30,8 @@ jobs:
       actions: read
       contents: read
       pull-requests: read
+    outputs:
+      frameshift-mode: ${{ steps.frameshift.outputs.mode }}
     steps:
       - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
         with:
@@ -62,7 +64,6 @@ jobs:
         run: pnpm --dir apps/web exec playwright install --with-deps chromium
       - name: Run end-to-end tests and capture snapshots
         env:
-          VISUAL_SOURCE_SHA: ${{ github.sha }}
           VISUAL_OUTPUT_DIR: ${{ github.workspace }}/visual-output/candidate
         run: pnpm test:e2e
       - name: Build Storybook for screenshots
@@ -71,57 +72,37 @@ jobs:
         env:
           VISUAL_OUTPUT_DIR: ${{ github.workspace }}/visual-output/candidate
         run: pnpm storybook:screenshots
-      # Every main commit can become a pull request base, so each gets an exact artifact.
-      - name: Store baseline by source revision
-        if: github.event_name != 'pull_request'
-        uses: dcramer/frameshift/baseline/upload@v0
-        with:
-          name: peated-web-screenshots-v1
-          sha: ${{ github.sha }}
-          path: visual-output/candidate
-          retention-days: 30
-      - name: Restore exact baseline artifact
+      # The merge commit's first parent is the base GitHub tested. Without a
+      # saved set for that commit, there is nothing to compare against.
+      - name: Find Frameshift baseline
         if: github.event_name == 'pull_request'
-        uses: dcramer/frameshift/baseline@v0
-        with:
-          name: peated-web-screenshots-v1
-          sha: ${{ steps.revision.outputs.base_sha }}
-          path: ${{ github.workspace }}/visual-output/baseline
-          github-token: ${{ secrets.GITHUB_TOKEN }}
-      - name: Validate baseline snapshots
-        if: github.event_name == 'pull_request'
-        run: >-
-          node apps/web/visual/validate-baseline.mjs
-          --baseline visual-output/baseline/manifest.json
-          --candidate visual-output/candidate/manifest.json
-          --sha "${{ steps.revision.outputs.base_sha }}"
-      - name: Compare screenshots
-        if: github.event_name == 'pull_request'
-        uses: dcramer/frameshift@v0
-        with:
-          baseline: ${{ github.workspace }}/visual-output/baseline
-          candidate: ${{ github.workspace }}/visual-output/candidate
-          output: ${{ github.workspace }}/visual-output/report
-      - name: Check screenshot report
-        if: github.event_name == 'pull_request'
+        id: frameshift-baseline
+        env:
+          BASE_SHA: ${{ steps.revision.outputs.base_sha }}
+          GH_TOKEN: ${{ github.token }}
         run: |
           set -euo pipefail
-          test -f visual-output/baseline/manifest.json
-          test -f visual-output/candidate/manifest.json
-          test -f visual-output/report/report.json
-      - name: Upload screenshot report
-        if: github.event_name == 'pull_request'
-        uses: actions/upload-artifact@043fb46d1a93c77aae656e7c1c64a875d1fc6a0a # v7.0.1
+          artifact="peated-web-screenshots-v1-${BASE_SHA}"
+          found="$(gh api "repos/${GITHUB_REPOSITORY}/actions/artifacts?name=${artifact}" --jq '.artifacts | any(.expired == false)')"
+          echo "found=${found}" >> "$GITHUB_OUTPUT"
+          if [[ "$found" != "true" ]]; then
+            echo "No baseline exists for ${BASE_SHA}. The next main run will create it."
+          fi
+      - name: Record screenshots
+        if: >-
+          github.event_name != 'pull_request' ||
+          steps.frameshift-baseline.outputs.found == 'true'
+        id: frameshift
+        uses: dcramer/frameshift/ci@57ef8e4fa0147a7da4601d5e42bf5628e408fe82 # v0.2.0
         with:
-          name: frameshift-report
-          path: visual-output/report
-          if-no-files-found: error
-          retention-days: 7
+          screenshots: visual-output/candidate
+          saved-name: peated-web-screenshots-v1
 
   frameshift:
     name: screenshots / report
     needs: capture
     if: >-
+      needs.capture.outputs.frameshift-mode == 'report' &&
       github.event_name == 'pull_request' &&
       github.event.pull_request.head.repo.full_name == github.repository
     runs-on: ubuntu-latest
@@ -133,6 +114,4 @@ jobs:
       statuses: write
     steps:
       # This job never checks out or runs pull request code.
-      - uses: dcramer/frameshift/publish/workflow@v0
-        with:
-          retention-days: 30
+      - uses: dcramer/frameshift/publish/workflow@57ef8e4fa0147a7da4601d5e42bf5628e408fe82 # v0.2.0
