@@ -57,7 +57,8 @@ photo (see below).
   publish sees the posted tasting.
 
 `GET /tasting-drafts` lists the member's drafts, most recently saved first.
-`GET /tasting-drafts/{draft}` returns one draft.
+`GET /tasting-drafts/count` counts them. `GET /tasting-drafts/{draft}` returns
+one draft.
 
 ## Photos
 
@@ -153,9 +154,40 @@ runaway client; it is not a product limit. Saving a new draft past the cap
 returns `400 BAD_REQUEST`. Existing drafts can still be saved, posted, and
 deleted.
 
-## Not yet built
+## Web inbox
 
-- The web drafts inbox.
+The web finishes drafts; it does not create them. When a member has drafts,
+the account menu shows **Drafts** with their count. It links to `/drafts`, the
+inbox.
+
+The inbox lists drafts, most recently saved first, a page at a time. Each row
+shows the photo, the Bottle name or the bottle hint, when the member had the
+dram, and where finding the Bottle stands: Bottle chosen, a suggested Bottle,
+a new Bottle to add, couldn't tell, or still identifying. Each row can delete
+its draft after the member confirms.
+
+`/drafts/{draft}` finishes one draft:
+
+1. **Bottle.** A draft without a Bottle starts here. The page shows the
+   identification result: a suggested Bottle with **Use this bottle**, a
+   proposed new Bottle with **Add this bottle**, or a note that the photo
+   couldn't be matched. While identification is pending, the page checks
+   again every few seconds. Search is always there; a search result opens a
+   confirm step. The bottle hint fills the search only when nothing is
+   suggested.
+   - **Use this bottle** saves the Bottle on the draft.
+   - **Add this bottle** calls `create-bottle`. If Peated already has that
+     Bottle, the page offers the existing one instead.
+2. **Details.** The tasting form's Notes, The pour, and Rating steps. Each
+   **Continue** saves the draft, so a member can stop and come back. A new
+   photo is uploaded once, as a pending upload, and sent as `pendingImageId`.
+   **Change bottle** returns to the Bottle step.
+3. **Post.** Saves the draft, then publishes it and opens the new tasting. If
+   the save reports the draft as already posted, the page publishes again to
+   get that tasting.
+
+Nothing is chosen or posted without the member pressing the button. Every save
+sends the whole draft, because a save replaces every field.
 
 ## Ownership in code
 
@@ -164,3 +196,6 @@ deleted.
 - shared tasting insert: `apps/server/src/orpc/routes/tastings/insertTasting.ts`
 - photo copy: `apps/server/src/lib/pendingUploads.ts`
 - identification job: `apps/server/src/lib/tastingDraftIdentification.ts`
+- web inbox: `apps/web/src/app/(app)/drafts/`
+- web finish flow: `apps/web/src/app/(layout-free)/drafts/[draftId]/`
+- web draft helpers: `apps/web/src/lib/tastingDrafts.ts`

@@ -2,6 +2,7 @@ import http from "node:http";
 import { z } from "zod";
 
 import { createBottleCheckMock } from "./mock-rpc/bottle-checks.mjs";
+import { createTastingDraftMock } from "./mock-rpc/tasting-drafts.mjs";
 import {
   activityReview,
   addAnotherReleaseSourceBottle,
@@ -20,6 +21,7 @@ import {
   buildCommunityActivity,
   buildFavoriteActivity,
   buildTasting,
+  buildTastingDraft,
   createdBottleId,
   createdBottleName,
   createdFlightBottleFixtureId,
@@ -111,6 +113,11 @@ const bottleCheckMock = createBottleCheckMock({
   existingBottle,
   testBrand,
   testUser,
+});
+
+const tastingDraftMock = createTastingDraftMock({
+  buildTasting,
+  buildTastingDraft,
 });
 
 const visualCreateCandidates = [
@@ -232,6 +239,24 @@ async function handleRpcRequest({ request, response, url }) {
   }
   if (bottleCheckResult?.type === "response") {
     sendRpcResponse(response, bottleCheckResult.value);
+    return true;
+  }
+  const tastingDraftResult = tastingDraftMock.handleRpcRequest({
+    path,
+    input,
+    token: getAccessToken(request),
+    getBottle: (bottleId) => getMockBottle(request, bottleId),
+  });
+  if (tastingDraftResult?.type === "error") {
+    sendRpcError(response, tastingDraftResult.message);
+    return true;
+  }
+  if (tastingDraftResult?.type === "notFound") {
+    sendRpcNotFound(response, tastingDraftResult.message);
+    return true;
+  }
+  if (tastingDraftResult?.type === "response") {
+    sendRpcResponse(response, tastingDraftResult.value);
     return true;
   }
 

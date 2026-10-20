@@ -9,7 +9,7 @@ import { signIn } from "./session";
 import { expect, type Page, test, type TestInfo } from "./test";
 
 test.describe("profile Library", () => {
-  test("saves a Bottle and updates its status", async ({
+  test("saves a Bottle, updates its status, and removes it", async ({
     context,
     page,
   }, testInfo) => {
@@ -25,7 +25,13 @@ test.describe("profile Library", () => {
 
     await expect(bottle.getByText("Sealed")).toBeVisible();
     await page.reload();
-    await expect(libraryBottleRow(page).getByText("Sealed")).toBeVisible();
+    const savedBottle = libraryBottleRow(page);
+    await expect(savedBottle.getByText("Sealed")).toBeVisible();
+
+    await savedBottle.getByRole("button", { name: /^Actions for / }).click();
+    await page.getByRole("menuitem", { name: "Remove from library" }).click();
+
+    await expect(savedBottle).toHaveCount(0);
   });
 
   test("sorts the Library and filters it by a suggested producer", async ({
@@ -62,23 +68,6 @@ test.describe("profile Library", () => {
       `/users/${testUser.username}/library?sort=-created&entity=${testBrand.id}`,
     );
     await expect(libraryBottleLink(page)).toBeVisible();
-  });
-
-  test("removes a Bottle from the owner's Library", async ({
-    context,
-    page,
-  }, testInfo) => {
-    await signIn(context, {
-      accessToken: uniqueAccessToken(testInfo, "library-remove"),
-    });
-    await addBottleToLibrary(page);
-    await page.goto(`/users/${testUser.username}/library`);
-
-    const bottle = libraryBottleRow(page);
-    await bottle.getByRole("button", { name: /^Actions for / }).click();
-    await page.getByRole("menuitem", { name: "Remove from library" }).click();
-
-    await expect(bottle).toHaveCount(0);
   });
 });
 
