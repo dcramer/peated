@@ -29,7 +29,7 @@ const items: BottleListProps["items"] = [
   {
     href: "/bottles/2",
     id: "2",
-    metadata: ["Single Malt", "NAS", "54.2% ABV"],
+    metadata: ["Single Malt", "NAS", "54.2%"],
     name: "Ardbeg Uigeadail",
     ratings: {
       maxScore: 97,
@@ -60,7 +60,7 @@ const items: BottleListProps["items"] = [
     align: "start",
     href: "/bottles/4",
     id: "4",
-    metadata: ["2026 release", "15 years", "51.4% ABV"],
+    metadata: ["2026 release", "15 years", "51.4%"],
     name: "A deliberately long independent bottle name that tests the shared row",
     subtitle: "Highland · Single Malt",
   },

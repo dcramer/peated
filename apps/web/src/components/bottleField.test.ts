@@ -19,8 +19,8 @@ describe("formatBottleOptionWithId", () => {
       statedAge: 16,
     });
 
-    expect(first).toBe("Lagavulin 16-year-old (43.0% ABV) · Bottle 41");
-    expect(second).toBe("Lagavulin 16-year-old (43.0% ABV) · Bottle 42");
+    expect(first).toBe("Lagavulin 16-year-old · 43% · Bottle 41");
+    expect(second).toBe("Lagavulin 16-year-old · 43% · Bottle 42");
     expect(first).not.toBe(second);
   });
 });

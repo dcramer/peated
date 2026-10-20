@@ -149,7 +149,7 @@ describe("formatBottleDisplayName", () => {
 describe("formatBottleLabel", () => {
   it("adds ABV so releases with the same name stay distinct", () => {
     expect(formatBottleLabel({ ...bottle, abv: 41.2 })).toBe(
-      "Decadent Drinks Whiskyland Glenburgie 38-year-old - Chapter Thirty Two (41.2% ABV)",
+      "Decadent Drinks Whiskyland Glenburgie 38-year-old - Chapter Thirty Two · 41.2%",
     );
   });
 

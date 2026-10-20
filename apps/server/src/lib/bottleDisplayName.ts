@@ -29,8 +29,9 @@ export type BottleDisplayNameOptions = {
   includeSeries?: boolean;
 };
 
+/** Short strength label, such as `43%` or `52.2%`. */
 export function formatAbv(abv: number) {
-  return `${abv.toFixed(1)}% ABV`;
+  return `${abv.toFixed(1).replace(/\.0$/u, "")}%`;
 }
 
 function includesIdentityText(value: string, candidate: string) {
@@ -82,7 +83,7 @@ function getExpressionName(bottle: BottleDisplayNameSource) {
         ? `${bottle.vintageYear} Vintage`
         : undefined,
       bottle.abv !== null && bottle.abv !== undefined
-        ? formatAbv(bottle.abv)
+        ? `${bottle.abv.toFixed(1)}% ABV`
         : undefined,
       bottle.singleCask ? "Single Cask" : undefined,
       bottle.caskStrength ? "Cask Strength" : undefined,
@@ -149,7 +150,7 @@ export function appendAbv(name: string, abv: number | null | undefined) {
   if (abv === null || abv === undefined) return name;
 
   const abvText = formatAbv(abv);
-  return includesIdentityText(name, abvText) ? name : `${name} (${abvText})`;
+  return includesIdentityText(name, abvText) ? name : `${name} · ${abvText}`;
 }
 
 /** Formats the bottle name with its ABV; see `appendAbv`. */

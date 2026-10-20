@@ -36,7 +36,7 @@ const meta = {
         bottle: {
           name: "Ardbeg Uigeadail",
           provenance: [{ name: "Single Malt" }],
-          metadata: ["NAS", "54.2% ABV"],
+          metadata: ["NAS", "54.2%"],
         },
         ratingBand: "good",
         tags: ["Tar", "Raisin", "Espresso"],

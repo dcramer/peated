@@ -24,7 +24,7 @@ describe("flight form membership", () => {
     expect(getFlightBottleIds([bottle, relatedBottle])).toEqual([7, 8]);
     expect(bottleToFlightOption(bottle)).toEqual({
       id: 7,
-      name: "Springbank 12 Batch 24 (50.0% ABV)",
+      name: "Springbank 12 Batch 24 · 50%",
     });
   });
 

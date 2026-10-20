@@ -14,7 +14,7 @@ describe("toBottleListItem", () => {
     expect(toBottleListItem(mockBottle)).toMatchObject({
       name: "Lagavulin 16-year-old",
       provenance: [{ name: "Single Malt" }],
-      metadata: ["16 years", "43.0% ABV"],
+      metadata: ["16 years", "43%"],
     });
   });
 
@@ -105,12 +105,12 @@ describe("toBottleListItem", () => {
     });
 
     expect(option.id).toBe(mockBottle.id);
-    expect(option.label).toBe(`${option.bottle.name} (43.0% ABV)`);
+    expect(option.label).toBe(`${option.bottle.name} · 43%`);
     expect(option.bottle.provenance).toEqual([
       { name: "Lagavulin" },
       { name: "Single Malt" },
     ]);
-    expect(option.bottle.metadata).toEqual(["16 years", "43.0% ABV"]);
+    expect(option.bottle.metadata).toEqual(["16 years", "43%"]);
   });
 
   test("can omit the brand from a list owned by that brand", () => {

@@ -127,9 +127,11 @@ should not add that label even when ABV is unavailable.
 Releases often share a name and differ only in strength, so every bottle label
 shows ABV when it is known: rows, compact rows, picker and selection text, page
 and share titles, notifications, and emails. Text labels use
-`formatBottleLabel`, which adds `(46.0% ABV)` after the name. Labels built from
-a stored `fullName` use `appendAbv`. Neither repeats ABV the name already
-states. URL slugs keep the plain name so links stay stable.
+`formatBottleLabel`, which writes `Lagavulin 16-year-old · 43%`. Labels built
+from a stored `fullName` use `appendAbv`. Neither repeats ABV the name already
+states. Rows show the same short `43%` or `52.2%` with their other facts; the
+percent sign makes the meaning clear without the word ABV. URL slugs keep the
+plain name so links stay stable.
 
 ### Treat category as taxonomy
 

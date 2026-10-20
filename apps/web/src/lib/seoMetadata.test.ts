@@ -112,18 +112,18 @@ describe("SEO metadata", () => {
     );
 
     expect(metadata).toMatchObject({
-      title: "Lagavulin 16-year-old (43.0% ABV)",
+      title: "Lagavulin 16-year-old · 43%",
       description: "A smoky Islay single malt.",
       alternates: { canonical: "/bottles/42-lagavulin-16-year-old" },
       openGraph: {
         locale: "en_US",
         siteName: "Peated",
-        title: "Lagavulin 16-year-old (43.0% ABV)",
+        title: "Lagavulin 16-year-old · 43%",
         url: "/bottles/42-lagavulin-16-year-old",
         images: [
           {
             url: "https://images.peated.com/lagavulin.jpg",
-            alt: "Lagavulin 16-year-old (43.0% ABV) bottle",
+            alt: "Lagavulin 16-year-old · 43% bottle",
           },
         ],
       },
