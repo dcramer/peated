@@ -728,11 +728,16 @@ function createEvalRuntime(fixtureId: string, webEvidenceFile?: string) {
   const options: Pick<
     CreateBottleClassifierOptions,
     | "executeWebSearch"
+    | "firecrawlApiKey"
     | "initialSearchEvidence"
     | "observeReferenceAgentDecision"
     | "observeToolEvent"
     | "overrides"
   > = {
+    // Controlled evals own web I/O. Enable the normal tool schemas; the fixed executor never calls a provider.
+    firecrawlApiKey: fixedEvidence
+      ? "fixed-evidence"
+      : process.env.FIRECRAWL_API_KEY,
     initialSearchEvidence: fixedEvidence?.searchResult.evidence,
     executeWebSearch: fixedEvidence
       ? createFixedWebSearchExecutor(fixedEvidence)
@@ -747,10 +752,9 @@ function createEvalRuntime(fixtureId: string, webEvidenceFile?: string) {
           assertSuccessfulWebSearchReplay(result);
           return result;
         },
-    overrides:
-      fixedEvidence && fixedEvidence.imageResults.length > 0
-        ? { extractFromImage: createFixedImageExtractor(fixedEvidence) }
-        : undefined,
+    overrides: fixedEvidence
+      ? { extractFromImage: createFixedImageExtractor(fixedEvidence) }
+      : undefined,
     observeReferenceAgentDecision: (decision) => {
       toolEvents.push({
         type: "message",

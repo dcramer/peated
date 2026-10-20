@@ -115,7 +115,8 @@ jobs:
       checks: write
     env:
       AI_GATEWAY_API_KEY: ${{ secrets.AI_GATEWAY_API_KEY }}
-      BRAVE_API_KEY: ${{ secrets.BRAVE_API_KEY }}
+      BOTTLE_CLASSIFIER_EVAL_FIXED_EVIDENCE_FILE: evals/evidence/ci.json
+      FIRECRAWL_API_KEY: ""
     steps:
       - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
         with:
@@ -131,6 +132,10 @@ jobs:
           cache: "pnpm"
 
       - run: pnpm install --frozen-lockfile
+      - name: Validate reviewed classifier evidence
+        run: >-
+          pnpm --filter @peated/bottle-classifier test
+          src/evalFixtures.validate.test.ts
       - name: Run classifier evals
         id: run
         continue-on-error: true

@@ -55,6 +55,21 @@ long inputs and tool outputs.
 ## Pull request checks
 
 - Add `trigger-evals` to run classifier model checks.
+- Classifier CI sets `BOTTLE_CLASSIFIER_EVAL_FIXED_EVIDENCE_FILE` to
+  `evals/evidence/ci.json`. This reviewed snapshot covers every classifier and
+  audit case. Missing case or image coverage fails validation before model
+  calls. Web search and page reads use only that case's saved evidence; image
+  reads use its saved extraction. Unreviewed pages and images never fall
+  through to a live provider.
+- Empty search evidence explicitly marks a local-input-only case. Saved
+  upstream extractions may preserve known errors from the captured run; they
+  are inputs for classifier judgment, not assertions about the correct result.
+  The separate label-extraction model checks still read checked-in image bytes
+  through the live extraction model.
+- To run the same controlled suite locally, set the fixed-evidence variable to
+  `evals/evidence/ci.json` and run `pnpm evals:classifier`. For a separate
+  live-web check, set it to an empty string and supply Firecrawl credentials.
+  This disables both the CI snapshot and individual fixture evidence defaults.
 - Add `trigger-evals-scraper` to run scraper model checks.
 - Scraper model checks also run automatically when files under
   `apps/server/src/scraper/configured/` change in an internal pull request.
