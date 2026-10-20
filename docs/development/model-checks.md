@@ -28,6 +28,9 @@ judgment that a repeatable code test cannot prove.
 - For a controlled classifier comparison, give both variants the same reviewed
   evidence pack keyed by test case ID. Query-keyed replay is insufficient when a
   prompt change can alter the query. Run current live web behavior separately.
+- A decision fixture may set `webEvidenceFile` to a package-relative reviewed
+  evidence pack. This makes its evidence available in CI without web credentials.
+  `BOTTLE_CLASSIFIER_EVAL_FIXED_EVIDENCE_FILE` overrides that fixture default.
 - Run focused model checks while changing model behavior. Run the full suite
   once at a deliberate full-suite run.
 

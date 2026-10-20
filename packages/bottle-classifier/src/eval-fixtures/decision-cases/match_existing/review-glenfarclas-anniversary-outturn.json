@@ -1,6 +1,7 @@
 {
   "id": "review-glenfarclas-anniversary-outturn",
   "name": "review glenfarclas anniversary outturn",
+  "webEvidenceFile": "src/eval-fixtures/glenfarclas-review.evidence.json",
   "input": {
     "reference": {
       "id": 18875,

@@ -240,6 +240,7 @@ export const classifierEvalFixtureSchema = z
       .strict(),
     searchResponses: z.array(searchResponseFixtureSchema).optional(),
     localCatalog: LocalCatalogSchema.optional(),
+    webEvidenceFile: z.string().min(1).optional(),
     context: classifierEvalContextSchema.default({
       inspectedBottleIds: [],
       inspectedEntities: [],

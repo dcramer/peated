@@ -32,9 +32,10 @@ again while its name stays the same. A later accepted reference for that name
 still matches the review on its next import. A classifier failure records
 nothing, so the review is tried again.
 
-Automatic matches and creates must pass the classifier's evidence-derived
+Initial automatic matches and creates must pass the classifier's evidence-derived
 automation tier before assigning a review or creating a Bottle. A decision
 that needs review leaves the source unresolved and keeps its saved proposal.
+The existing workflow for repairing an already assigned review is separate.
 Completed unresolved attempts, including ignored inputs, appear in the
 Moderation Inbox. A moderator can read the saved evidence, assign an existing
 Bottle, or request a new check. A missing Bottle can be added through the

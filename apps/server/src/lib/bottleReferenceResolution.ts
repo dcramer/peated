@@ -341,7 +341,7 @@ async function resolveBottleReferenceTargetWithClassifier(
       classification.decision,
     );
 
-    // Review ingestion owns automatic assignment: a saved proposal is not approval.
+    // Review ingestion owns initial assignment; existing-assignment repairs use their own workflow.
     const decision = classification.decision;
     const tier = deriveAutomationTier({
       actionRiskClass: agentActionRiskClass(decision.action),
@@ -361,7 +361,7 @@ async function resolveBottleReferenceTargetWithClassifier(
       hasPrimaryLabelOrImageEvidence:
         classification.artifacts.imageEvidence != null,
     });
-    if (tier === "review") {
+    if (reference.currentBottleId == null && tier === "review") {
       return {
         assignment: null,
         source: "unresolved",

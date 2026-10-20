@@ -3,6 +3,7 @@ import path from "node:path";
 import { fileURLToPath } from "node:url";
 import { describe, expect, test } from "vitest";
 import { AUDIT_BOTTLE_EVAL_CASES } from "./auditBottle.eval.fixtures";
+import { loadFixedWebEvidenceCase } from "./evalFixedWebEvidence";
 import {
   auditBottleEvalFixtureSchema,
   classifierEvalFixtureSchema,
@@ -70,6 +71,12 @@ describe("eval fixture validation", () => {
       );
 
       ids.push(fixture.id);
+      if (fixture.webEvidenceFile) {
+        expect(
+          loadFixedWebEvidenceCase(fixture.webEvidenceFile, fixture.id)
+            .searchResult.errors,
+        ).toEqual([]);
+      }
       expect(path.basename(path.dirname(filename))).toBe(
         inferDecisionScenario(fixture),
       );

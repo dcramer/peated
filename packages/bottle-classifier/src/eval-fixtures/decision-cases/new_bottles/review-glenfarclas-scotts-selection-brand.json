@@ -1,6 +1,7 @@
 {
   "id": "review-glenfarclas-scotts-selection-brand",
   "name": "review glenfarclas scotts selection brand",
+  "webEvidenceFile": "src/eval-fixtures/glenfarclas-review.evidence.json",
   "input": {
     "reference": {
       "id": 18877,

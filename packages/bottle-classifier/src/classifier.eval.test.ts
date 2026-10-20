@@ -482,7 +482,7 @@ function evaluateDecisionContract(
       )
     ) {
       failures.push(
-        `proposedBottle.name expected one of ${expected.proposedBottleNameOneOf.join(", ")}`,
+        `proposedBottle.name expected one of ${expected.proposedBottleNameOneOf.join(", ")} but got ${JSON.stringify(proposedBottleName)}`,
       );
     }
   }
@@ -718,10 +718,10 @@ function createClassifierOptions(testCase: ClassifierScenarioEvalCase) {
   return createEvalClassifierOptions(buildClassifierAdapters(testCase));
 }
 
-function createEvalRuntime(fixtureId: string) {
+function createEvalRuntime(fixtureId: string, webEvidenceFile?: string) {
   const toolEvents: TranscriptEvent[] = [];
   const fixedEvidenceFile =
-    process.env.BOTTLE_CLASSIFIER_EVAL_FIXED_EVIDENCE_FILE;
+    process.env.BOTTLE_CLASSIFIER_EVAL_FIXED_EVIDENCE_FILE ?? webEvidenceFile;
   const fixedEvidence = fixedEvidenceFile
     ? loadFixedWebEvidenceCase(fixedEvidenceFile, fixtureId)
     : null;
@@ -796,7 +796,10 @@ const classifierHarness = createHarness<ClassifierScenarioEvalCase, JsonValue>({
   name: "bottle-classifier",
   run: async ({ input }) => {
     const startedAt = performance.now();
-    const evalRuntime = createEvalRuntime(input.testCase.fixtureId);
+    const evalRuntime = createEvalRuntime(
+      input.testCase.fixtureId,
+      input.kind === "decision" ? input.testCase.webEvidenceFile : undefined,
+    );
     const {
       result: { result, modelMetadata },
       modelCalls,

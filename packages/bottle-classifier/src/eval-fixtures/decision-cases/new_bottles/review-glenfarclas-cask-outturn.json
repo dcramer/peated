@@ -1,6 +1,7 @@
 {
   "id": "review-glenfarclas-cask-outturn",
   "name": "review glenfarclas cask outturn",
+  "webEvidenceFile": "src/eval-fixtures/glenfarclas-review.evidence.json",
   "input": {
     "reference": {
       "id": 18876,
