@@ -1,0 +1,29 @@
+recordId,field,before,after,sourceUrl,evidence,verification
+B49666,name,"""Blair Athol 1975 27-year-old""","""Blair Athol""",https://www.whiskyshop.com/auctions/a14033-blair-athol-1975-27-year-old-rare-malts,readable marketed label,passed
+B5428,name,"""Clynelish 1972 22-year-old""","""Clynelish""",https://www.scotchwhiskyauctions.com/auctions/126-the-88th-auction/232404-rare-malts-clynelish-1972-22-year-old-75cl/,readable marketed label,passed
+B49682,name,"""Clynelish 1972 22-year-old""","""Clynelish""",https://www.sothebys.com/en/buy/auction/2023/finest-whisky-whiskey-2/clynelish-rare-malts-22-year-old-58-64-abv-1972-1,readable marketed label,passed
+B49683,name,"""Clynelish 1972 23-year-old""","""Clynelish""",https://whisky.auction/auctions/lot/121701/clynelish-1972-23-year-old,readable marketed label,passed
+B49684,name,"""Clynelish 1972 23-year-old""","""Clynelish""",https://www.sothebys.com/en/buy/auction/2026/finest-rarest-whisky-2/clynelish-rare-malts-23-year-old-57-1-abv-1972-1,readable marketed label,passed
+B49685,name,"""Clynelish 1972 24-year-old""","""Clynelish""",https://whisky.auction/auctions/lot/189497/clynelish-1972-24-year-old,readable marketed label,passed
+B5412,name,"""Clynelish 1974 23-year-old""","""Clynelish""",https://www.australianwhiskyauctions.com.au/lot-191007/clynelish-1974-23-year-old-rare-malts-selection,readable marketed label,passed
+B5443,name,"""Hillside""","""Hillside""",https://www.scotchwhiskyauctions.com/auctions/151-the-110th-auction/393258-rare-malts-hillside-1970-25-year-old-75cl/,readable marketed label,passed
+B49707,name,"""Hillside""","""Hillside""",https://onlineonly.christies.com/s/christies-wine-online-nyc-collection-rare-whisky/hillside-glenesk-distillery-25-year-old-1969-92/25942,readable marketed label,passed
+B49708,name,"""Hillside""","""Hillside""",https://whisky.auction/auctions/lot/103197/hillside-1970-25-year-old,readable marketed label,passed
+B49709,name,"""Hillside""","""Hillside""",https://images1.bonhams.com/original?src=Images%2Flive%2F2017-11%2F24%2FS-24095-0-1.pdf,readable marketed label,passed
+B49692,name,"""Dufftown""","""Dufftown-Glenlivet""",https://whisky.auction/auctions/lot/189496/dufftown-glenlivet-1975-21-year-old,readable marketed label,passed
+B63827,name,"""Dufftown-Glenlivet 21-year-old""","""Dufftown-Glenlivet""",https://whisky.auction/auctions/lot/189496/dufftown-glenlivet-1975-21-year-old,readable marketed label,passed
+B63827,bottlingYear,null,1997,https://whisky.auction/auctions/lot/189496/dufftown-glenlivet-1975-21-year-old,exact lot and release chronology,passed
+B63827,releaseYear,null,1997,https://whisky.auction/auctions/lot/189496/dufftown-glenlivet-1975-21-year-old,exact lot and release chronology,passed
+B5256,releaseMonth,4,10,https://www.buxrud.se/raremalt.htm,contemporary UK release note distinguishes release from bottling,passed
+B5272,releaseMonth,4,10,https://www.buxrud.se/raremalt.htm,contemporary UK release note distinguishes release from bottling,passed
+B49729,releaseMonth,4,10,https://www.buxrud.se/raremalt.htm,contemporary UK release note distinguishes release from bottling,passed
+B49733,releaseMonth,4,10,https://www.buxrud.se/raremalt.htm,contemporary UK release note distinguishes release from bottling,passed
+B5220,releaseMonth,4,10,https://www.buxrud.se/raremalt.htm,contemporary UK release note distinguishes release from bottling,passed
+B5218,releaseMonth,4,10,https://www.buxrud.se/raremalt.htm,contemporary UK release note distinguishes release from bottling,passed
+B49713,releaseMonth,4,10,https://www.buxrud.se/raremalt.htm,contemporary UK release note distinguishes release from bottling,passed
+B5232,releaseMonth,4,10,https://www.buxrud.se/raremalt.htm,contemporary UK release note distinguishes release from bottling,passed
+B49715,bottlingYear,1995,null,https://www.buxrud.se/raremalt.htm,source states bottled before 1995; exact earlier year unproven,passed
+B5455,bottlingYear,1995,null,https://www.buxrud.se/raremalt.htm,source states bottled before 1995; exact earlier year unproven,passed
+B49734,bottlingYear,1995,null,https://www.buxrud.se/raremalt.htm,source states bottled before 1995; exact earlier year unproven,passed
+E366603,status,null,"""discontinued""",https://whiskyauctioneer.com/learn/explore-whisky/brands/rare-malts-selection,official range ended in 2005,passed
+B63827,mergedInto,B63827,B49692,https://whisky.auction/auctions/lot/189496/dufftown-glenlivet-1975-21-year-old,same labeled release; explicit user approval; retailer listing preserved,"survivor, old-ID resolution, listing and Brand count passed"
