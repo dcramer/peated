@@ -8,6 +8,7 @@ import {
   getExistingBottleConflictId,
   getTastingDraftPhotoChange,
   getTastingDraftSuggestion,
+  parseTastingDraftId,
   postTastingDraft,
   type TastingDraft,
 } from "./tastingDrafts";
@@ -339,5 +340,15 @@ describe("postTastingDraft", () => {
       }),
     ).rejects.toBe(error);
     expect(publish).not.toHaveBeenCalled();
+  });
+});
+
+describe("parseTastingDraftId", () => {
+  it("accepts only a draft UUID", () => {
+    const draftId = "5f0c6b8e-3c1d-4a5e-9b7f-2d4e6a8c0b1d";
+    expect(parseTastingDraftId(draftId)).toBe(draftId);
+    expect(parseTastingDraftId("../admin")).toBeNull();
+    expect(parseTastingDraftId("")).toBeNull();
+    expect(parseTastingDraftId(null)).toBeNull();
   });
 });

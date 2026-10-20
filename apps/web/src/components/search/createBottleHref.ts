@@ -158,11 +158,14 @@ export function parseCreateBottlePrefill(
 export function getCreateBottleHref({
   query,
   returnAction,
+  returnDraftId,
   prefill,
   pendingImage,
 }: {
   query: string;
   returnAction?: CreateBottleReturnAction;
+  /** Returns to this tasting draft's confirm step with the Bottle. */
+  returnDraftId?: string;
   prefill?: CreateBottlePrefill;
   pendingImage?: PendingImageRouteState | null;
 }) {
@@ -173,6 +176,7 @@ export function getCreateBottleHref({
   if (returnAction) {
     params.set("returnAction", returnAction);
   }
+  if (returnDraftId) params.set("draft", returnDraftId);
 
   if (parsedPrefill.brandId) {
     params.set("brand", String(parsedPrefill.brandId));

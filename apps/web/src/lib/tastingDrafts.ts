@@ -23,6 +23,23 @@ export function getTastingDraftHref(draft: { id: string }) {
   return `/drafts/${draft.id}`;
 }
 
+/**
+ * Opens a draft's confirm step for a Bottle. The member still presses
+ * **Use this bottle**; this never saves the Bottle on the draft.
+ */
+export function getTastingDraftBottleHref(
+  draft: { id: string },
+  bottleId: number,
+) {
+  return `${getTastingDraftHref(draft)}?bottle=${bottleId}`;
+}
+
+/** Reads a draft ID from a URL. Draft IDs are UUIDs. */
+export function parseTastingDraftId(value: string | null) {
+  const parsed = z.string().uuid().safeParse(value);
+  return parsed.success ? parsed.data : null;
+}
+
 export function getTastingDraftSuggestion(
   draft: Pick<TastingDraft, "identification">,
 ): TastingDraftSuggestion {

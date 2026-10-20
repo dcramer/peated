@@ -12,6 +12,11 @@ import { VerifiedRequired } from "@peated/web/hooks/useAuthRequired";
 import { getAddBottleHref } from "@peated/web/lib/addBottle";
 import { logError } from "@peated/web/lib/log";
 import { useORPC } from "@peated/web/lib/orpc/context";
+import {
+  getTastingDraftBottleHref,
+  getTastingDraftHref,
+  parseTastingDraftId,
+} from "@peated/web/lib/tastingDrafts";
 import { getBottleUrl } from "@peated/web/lib/urls";
 import { useMutation, useQueries, useQuery } from "@tanstack/react-query";
 import { redirect, useRouter, useSearchParams } from "next/navigation";
@@ -68,7 +73,12 @@ function CreateBottleForm() {
   const orpc = useORPC();
   const searchParams = useSearchParams();
   const name = toTitleCase(searchParams.get("name") || "");
-  const returnTo = searchParams.get("returnTo");
+  // Started from a tasting draft: go back to its confirm step, where the
+  // member still chooses the Bottle. See docs/features/tasting-drafts.md.
+  const returnDraftId = parseTastingDraftId(searchParams.get("draft"));
+  const returnTo = returnDraftId
+    ? getTastingDraftHref({ id: returnDraftId })
+    : searchParams.get("returnTo");
   const returnAction = getReturnAction(
     searchParams.get("returnAction") || searchParams.get("intent"),
   );
@@ -234,6 +244,12 @@ function CreateBottleForm() {
     <BottleForm
       mode="create"
       onUseExistingBottle={(bottle) => {
+        if (returnDraftId) {
+          router.replace(
+            getTastingDraftBottleHref({ id: returnDraftId }, bottle.id),
+          );
+          return;
+        }
         if (returnAction === "view" || !returnAction) {
           router.replace(getBottleUrl(bottle));
           return;
@@ -280,7 +296,11 @@ function CreateBottleForm() {
           }
         }
 
-        if (returnAction === "library") {
+        if (returnDraftId) {
+          router.replace(
+            getTastingDraftBottleHref({ id: returnDraftId }, createdBottle.id),
+          );
+        } else if (returnAction === "library") {
           try {
             await libraryCreateMutation.mutateAsync({
               bottle: createdBottle.id,
