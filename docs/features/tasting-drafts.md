@@ -98,9 +98,9 @@ Replacing the photo starts over and drops the old result. Removing the photo
 sets `none`. Saving without changing the photo keeps the result. A result
 that finishes after the photo changed is thrown away.
 
-Identification shares the member's hourly photo budget with
-`POST /tastings/photo-identification`. Over budget, the draft stays `pending`
-and identification waits until the budget resets. During a model service
+Identification shares the member's hourly photo identification limit with
+`POST /tastings/photo-identification`. Over the limit, the draft stays
+`pending` and identification waits until the limit resets. During a model service
 outage the job waits and runs again. Nothing else retries it: if the job is
 lost, the draft stays `pending` until the member saves a new photo. Search
 always works.
@@ -118,7 +118,7 @@ member who has accepted the Terms of Service.
   `409 CONFLICT` with that Bottle's ID in `data.bottle`, so the member can
   choose it instead.
 - If the photo is suitable for the catalog and the Bottle is new, the photo
-  becomes the Bottle's public image, as with photo identification. A copy
+  becomes the Bottle's catalog image, as with photo identification. A copy
   failure is a warning and does not undo the Bottle.
 
 ## Publishing

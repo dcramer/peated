@@ -33,10 +33,10 @@ async function incrementRateLimitCounter(key: string, windowMs: number) {
 
 /**
  * Counts one use of a rate limit outside a request, such as background work
- * that shares a route's per-user budget. Returns how long to wait before
- * trying again when the budget is spent, or null when this use is allowed.
+ * that shares a route's per-user limit. Returns how long to wait before
+ * trying again when the limit is reached, or null when this use is allowed.
  */
-export async function takeRateLimit(
+export async function consumeRateLimit(
   { windowMs, maxRequests, keyPrefix = "rl" }: RateLimitOptions,
   identifier: string,
 ): Promise<number | null> {

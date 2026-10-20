@@ -145,7 +145,7 @@ runs the same label reading and classifier in the background job
 - the draft's own photo, already copied to `tasting-drafts/`, is the input, so
   no pending upload is needed;
 - only the photo goes to the model, never the bottle hint, notes, or friends;
-- it uses the same per-member budget of 30 photo identifications per hour as
+- it uses the same per-member limit of 30 photo identifications per hour as
   `POST /tastings/photo-identification`;
 - the result is saved on the draft only if the draft still has the same photo;
 - it never chooses the draft's Bottle and never creates a Bottle; and

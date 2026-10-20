@@ -9,7 +9,7 @@ import { notEmpty } from "../lib/filter";
 import { serializeProposedBottle } from "../lib/photoIdentification";
 import { absoluteUrl } from "../lib/urls";
 import {
-  StoredTastingDraftIdentificationSchema,
+  PersistedTastingDraftIdentificationSchema,
   type TastingDraftSchema,
 } from "../schemas";
 import { bottleRowColumns, BottleSerializer } from "./bottle";
@@ -33,7 +33,7 @@ export const TastingDraftSerializer = serializer({
       itemList.map((item) => [
         item.id,
         item.identificationStatus === "done"
-          ? StoredTastingDraftIdentificationSchema.parse(item.identification)
+          ? PersistedTastingDraftIdentificationSchema.parse(item.identification)
           : null,
       ]),
     );
@@ -72,7 +72,7 @@ export const TastingDraftSerializer = serializer({
     );
 
     const serializeResult = (
-      result: z.infer<typeof StoredTastingDraftIdentificationSchema> | null,
+      result: z.infer<typeof PersistedTastingDraftIdentificationSchema> | null,
     ): TastingDraftAttrs["identificationResult"] => {
       switch (result?.action) {
         case undefined:

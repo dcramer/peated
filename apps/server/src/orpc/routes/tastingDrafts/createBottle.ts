@@ -18,7 +18,7 @@ import {
   requireVerified,
 } from "@peated/server/orpc/middleware";
 import {
-  StoredTastingDraftIdentificationSchema,
+  PersistedTastingDraftIdentificationSchema,
   TastingDraftIdInputSchema,
   TastingDraftSchema,
 } from "@peated/server/schemas";
@@ -70,7 +70,7 @@ export default procedure
     }
     const result =
       draft.identificationStatus === "done" && draft.imageUrl
-        ? StoredTastingDraftIdentificationSchema.parse(draft.identification)
+        ? PersistedTastingDraftIdentificationSchema.parse(draft.identification)
         : null;
     if (result?.action !== "create_bottle") {
       throw errors.BAD_REQUEST({

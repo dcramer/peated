@@ -45,7 +45,7 @@ const BottleHintSchema = z
  * confirmable match or an auto-creatable Bottle proposal. Everything else is
  * `no_match`. See docs/features/tasting-drafts.md.
  */
-export const StoredTastingDraftIdentificationSchema = z.discriminatedUnion(
+export const PersistedTastingDraftIdentificationSchema = z.discriminatedUnion(
   "action",
   [
     z
@@ -68,14 +68,14 @@ export const StoredTastingDraftIdentificationSchema = z.discriminatedUnion(
   ],
 );
 
-export type StoredTastingDraftIdentification = z.infer<
-  typeof StoredTastingDraftIdentificationSchema
+export type PersistedTastingDraftIdentification = z.infer<
+  typeof PersistedTastingDraftIdentificationSchema
 >;
 
 export const TastingDraftIdentificationStatusEnum = z
   .enum(TASTING_DRAFT_IDENTIFICATION_STATUS_LIST)
   .describe(
-    "`none`: no photo. `pending`: the Bottle is being identified from the photo. `done`: see `result`. `failed`: identification gave up; search for the Bottle instead",
+    "`none`: no photo. `pending`: the Bottle is being identified from the photo. `done`: see `result`. `failed`: identification broke and is not tried again; search for the Bottle instead",
   );
 
 const TastingDraftIdentificationSchema = z.object({

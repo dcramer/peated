@@ -12,7 +12,7 @@ import { compressAndResizeImage } from "@peated/server/lib/uploads";
 describe("photo identification", () => {
   test("preserves raw label text as image evidence", () => {
     const imageEvidence = buildPhotoEvidenceFromExtractedIdentity({
-      pendingUpload: {
+      photo: {
         id: "pending-image",
         imageUrl: "https://example.com/bottle.jpg",
       },
@@ -44,7 +44,9 @@ describe("photo identification", () => {
       onProcess: (...args) => compressAndResizeImage(...args, 1600, 1600),
     });
 
-    const imageInput = await getPhotoExtractionImageInput({ pendingUpload });
+    const imageInput = await getPhotoExtractionImageInput({
+      photo: pendingUpload,
+    });
 
     expect(pendingUpload.imageUrl).toContain(
       `/uploads/${PENDING_UPLOAD_NAMESPACE}/`,

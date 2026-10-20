@@ -7,8 +7,8 @@ import {
   PHOTO_IDENTIFICATION_RATE_LIMIT,
   type IdentifyBottlePhotoServices,
 } from "@peated/server/lib/photoIdentification";
-import { takeRateLimit } from "@peated/server/orpc/middleware/rateLimit";
-import { type StoredTastingDraftIdentification } from "@peated/server/schemas/tastingDrafts";
+import { consumeRateLimit } from "@peated/server/orpc/middleware/rateLimit";
+import { type PersistedTastingDraftIdentification } from "@peated/server/schemas/tastingDrafts";
 import { pushJob } from "@peated/server/worker/dispatch";
 import { and, eq } from "drizzle-orm";
 
@@ -38,7 +38,7 @@ function buildStoredIdentification({
   suggestedNextStep,
 }: Awaited<
   ReturnType<typeof identifyBottlePhoto>
->): StoredTastingDraftIdentification {
+>): PersistedTastingDraftIdentification {
   if (classification.status === "classified") {
     const { decision } = classification;
     if (suggestedNextStep === "confirm_match" && decision.action === "match") {
@@ -87,9 +87,9 @@ export async function identifyTastingDraft(
   }
   const imageUrl = draft.imageUrl;
 
-  // Photo budget rule: drafts share the member's photo identification budget.
-  // Over budget, wait for the window to reset.
-  const retryAfterMs = await takeRateLimit(
+  // Photo identification limit rule: drafts share the member's hourly limit
+  // with the photo route. Over the limit, wait for the window to reset.
+  const retryAfterMs = await consumeRateLimit(
     PHOTO_IDENTIFICATION_RATE_LIMIT,
     String(draft.createdById),
   );

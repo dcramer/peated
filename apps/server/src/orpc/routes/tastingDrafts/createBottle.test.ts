@@ -6,7 +6,7 @@ import { createPendingImageUpload } from "@peated/server/lib/pendingUploads";
 import waitError from "@peated/server/lib/test/waitError";
 import type { Context } from "@peated/server/orpc/context";
 import { routerClient } from "@peated/server/orpc/router";
-import type { StoredTastingDraftIdentification } from "@peated/server/schemas";
+import type { PersistedTastingDraftIdentification } from "@peated/server/schemas";
 import { eq } from "drizzle-orm";
 import { describe, expect, test } from "vitest";
 
@@ -16,7 +16,7 @@ function createProposal(
   brandName: string,
   bottleName: string,
   suitableAsBottleImage = true,
-): StoredTastingDraftIdentification {
+): PersistedTastingDraftIdentification {
   const decision = BottleClassificationDecisionSchema.parse({
     action: "create_bottle",
     rationale: "Reliable photo evidence supports creating the bottle.",
@@ -54,7 +54,7 @@ function createProposal(
 async function identifiedDraft(
   user: User,
   sampleImage: () => Promise<File>,
-  identification: StoredTastingDraftIdentification,
+  identification: PersistedTastingDraftIdentification,
 ) {
   const draftId = faker.string.uuid();
   const upload = await createPendingImageUpload({

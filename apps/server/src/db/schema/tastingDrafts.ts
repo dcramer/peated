@@ -1,4 +1,4 @@
-import type { StoredTastingDraftIdentification } from "@peated/server/schemas/tastingDrafts";
+import type { PersistedTastingDraftIdentification } from "@peated/server/schemas/tastingDrafts";
 import { relations, sql } from "drizzle-orm";
 import {
   bigint,
@@ -65,9 +65,9 @@ export const tastingDrafts = pgTable(
     )
       .default("none")
       .notNull(),
-    // Checked by StoredTastingDraftIdentificationSchema on every read.
+    // Checked by PersistedTastingDraftIdentificationSchema on every read.
     identification:
-      jsonb("identification").$type<StoredTastingDraftIdentification>(),
+      jsonb("identification").$type<PersistedTastingDraftIdentification>(),
     ratingBand: ratingBandEnum("rating_band"),
     notes: text("notes"),
     tags: varchar("tags", { length: 64 })

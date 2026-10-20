@@ -30,7 +30,7 @@ import * as Sentry from "@sentry/node";
 import { z } from "zod";
 
 /**
- * Per-member budget for identifying Bottle photos. The photo route and
+ * Per-member limit for identifying Bottle photos. The photo route and
  * background tasting draft identification share it, so drafts cannot be used
  * to get around the route's limit.
  */
@@ -47,11 +47,11 @@ type PhotoIdentificationImage = {
 };
 
 export async function getPhotoExtractionImageInput({
-  pendingUpload,
+  photo,
 }: {
-  pendingUpload: PhotoIdentificationImage;
+  photo: PhotoIdentificationImage;
 }) {
-  return await getUploadImageDataUrl(pendingUpload.imageUrl);
+  return await getUploadImageDataUrl(photo.imageUrl);
 }
 
 function maybeField<T extends boolean | number | string | string[]>(
@@ -79,11 +79,11 @@ function maybeField<T extends boolean | number | string | string[]>(
  * consumed by the bottle classifier and returned by photo identification.
  */
 export function buildPhotoEvidenceFromExtractedIdentity({
-  pendingUpload,
+  photo,
   extractedIdentity,
   rawLabelText = null,
 }: {
-  pendingUpload: PhotoIdentificationImage;
+  photo: PhotoIdentificationImage;
   extractedIdentity: BottleExtractedDetails | null;
   rawLabelText?: string | null;
 }): ImageBottleEvidence {
@@ -110,7 +110,7 @@ export function buildPhotoEvidenceFromExtractedIdentity({
   ].filter(Boolean);
 
   return ImageBottleEvidenceSchema.parse({
-    sourceImageId: pendingUpload.id,
+    sourceImageId: photo.id,
     extractors: [
       {
         kind: "vision",
@@ -163,9 +163,9 @@ export function buildPhotoEvidenceFromExtractedIdentity({
  * Runs the server-owned whisky label extraction boundary for a pending image.
  */
 export async function extractPhotoBottleEvidence({
-  pendingUpload,
+  photo,
 }: {
-  pendingUpload: PhotoIdentificationImage;
+  photo: PhotoIdentificationImage;
 }): Promise<{
   extractedIdentity: BottleExtractedDetails | null;
   imageEvidence: ImageBottleEvidence;
@@ -174,13 +174,13 @@ export async function extractPhotoBottleEvidence({
     return {
       extractedIdentity: null,
       imageEvidence: buildPhotoEvidenceFromExtractedIdentity({
-        pendingUpload,
+        photo,
         extractedIdentity: null,
       }),
     };
   }
 
-  const conversationId = `photo_identification:${pendingUpload.id}`;
+  const conversationId = `photo_identification:${photo.id}`;
   const extraction = await withSentryConversation(conversationId, async () => {
     return await instrumentOpenAIResponsesCall({
       baseURL: config.AI_GATEWAY_HOST,
@@ -202,7 +202,7 @@ export async function extractPhotoBottleEvidence({
           onImageExtractionMetadata: reportResponse,
         });
         const extraction = await extractor.extractFromImageWithMetadata(
-          await getPhotoExtractionImageInput({ pendingUpload }),
+          await getPhotoExtractionImageInput({ photo }),
         );
         return {
           extractedIdentity: BottleExtractedDetailsSchema.nullable().parse(
@@ -217,7 +217,7 @@ export async function extractPhotoBottleEvidence({
   return {
     extractedIdentity: extraction.extractedIdentity,
     imageEvidence: buildPhotoEvidenceFromExtractedIdentity({
-      pendingUpload,
+      photo,
       extractedIdentity: extraction.extractedIdentity,
       rawLabelText: extraction.rawLabelText,
     }),
@@ -539,7 +539,7 @@ export async function identifyBottlePhoto(
       span.setAttribute("photo_identification.stage", "extraction");
       const { extractedIdentity, imageEvidence } =
         await services.extractEvidence({
-          pendingUpload: photo,
+          photo,
         });
 
       const classificationInput = {

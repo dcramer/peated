@@ -46,7 +46,7 @@ carries a timeout.
 
 `IdentifyTastingDraft` runs on `models` too. It reads a tasting draft's photo
 and saves the identified Bottle on the draft. Over the member's hourly photo
-budget, it queues itself again with a delay. Any other error marks the draft
+identification limit, it queues itself again with a delay. Any other error marks the draft
 `failed` without a retry. See
 [Tasting Drafts](../../../../docs/features/tasting-drafts.md#identifying-the-bottle).
 

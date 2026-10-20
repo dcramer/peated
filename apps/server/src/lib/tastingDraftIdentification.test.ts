@@ -139,9 +139,9 @@ async function getDraft(id: string) {
 
 beforeEach(() => {
   extractEvidence.mockReset();
-  extractEvidence.mockImplementation(async ({ pendingUpload }) => ({
+  extractEvidence.mockImplementation(async ({ photo }) => ({
     extractedIdentity: null,
-    imageEvidence: imageEvidence(pendingUpload.id),
+    imageEvidence: imageEvidence(photo.id),
   }));
   runReference.mockReset();
 });
@@ -320,7 +320,7 @@ describe("identifyTastingDraft", () => {
     });
   });
 
-  test("waits when the member is over the photo budget", async ({
+  test("waits when the member is over the photo identification limit", async ({
     defaults,
     fixtures,
   }) => {
@@ -328,7 +328,7 @@ describe("identifyTastingDraft", () => {
       defaults.user,
       fixtures.SampleSquareImage,
     );
-    // The member used the whole hourly budget on the photo route.
+    // The member used the whole hourly limit on the photo route.
     const redis = await getConnection();
     await redis.set(
       `photo-identification:${defaults.user.id}`,
@@ -354,12 +354,12 @@ describe("identifyTastingDraft", () => {
     });
   });
 
-  test("counts against the photo route's budget", async ({
+  test("counts against the photo route's limit", async ({
     defaults,
     fixtures,
   }) => {
     const redis = await getConnection();
-    // One identification left in the member's hourly budget.
+    // One identification left in the member's hourly limit.
     await redis.set(
       `photo-identification:${defaults.user.id}`,
       29,
@@ -381,7 +381,7 @@ describe("identifyTastingDraft", () => {
       routerClient.tastings.photoIdentification(
         {
           file: await fixtures.SampleSquareImage(),
-          idempotencyKey: "after-draft-budget",
+          idempotencyKey: "after-draft-limit",
         },
         { context: { user: defaults.user } },
       ),
