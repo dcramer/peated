@@ -23,7 +23,7 @@ import {
 } from "../db/schema";
 import type { EmailVerifySchema, PasswordResetSchema } from "../schemas";
 import { generateMagicLink, signToken } from "./auth";
-import { formatBottleDisplayName } from "./bottleDisplayName";
+import { formatBottleLabel } from "./bottleDisplayName";
 import { logError, logInfo } from "./log";
 import { resolveActiveBottleIds } from "./resolveActiveBottleIds";
 
@@ -110,7 +110,7 @@ export async function notifyComment({
       `Tasting ${comment.tasting.id} references missing Bottle ${comment.tasting.bottleId}`,
     );
   }
-  const bottleName = formatBottleDisplayName(bottle);
+  const bottleName = formatBottleLabel(bottle);
 
   const userIds =
     comment.createdById === comment.tasting.createdById

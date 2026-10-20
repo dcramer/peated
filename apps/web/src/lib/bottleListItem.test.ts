@@ -105,6 +105,7 @@ describe("toBottleListItem", () => {
     });
 
     expect(option.id).toBe(mockBottle.id);
+    expect(option.label).toBe(`${option.bottle.name} (43.0% ABV)`);
     expect(option.bottle.provenance).toEqual([
       { name: "Lagavulin" },
       { name: "Single Malt" },

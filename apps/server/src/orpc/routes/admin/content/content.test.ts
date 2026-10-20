@@ -74,7 +74,10 @@ describe("admin content moderation", () => {
   }) => {
     const admin = await fixtures.User({ admin: true });
     const member = await fixtures.User();
-    const bottle = await fixtures.Bottle({ name: "Searchable Bottle" });
+    const bottle = await fixtures.Bottle({
+      abv: 46.3,
+      name: "Searchable Bottle",
+    });
     const older = await fixtures.Tasting({
       bottleId: bottle.id,
       createdAt: new Date("2026-01-01T00:00:00.000Z"),
@@ -101,6 +104,12 @@ describe("admin content moderation", () => {
     );
 
     expect(first.results.map(({ id }) => id)).toEqual([newer.id]);
+    // Releases can share a name, so moderators see the ABV with the bottle.
+    expect(first.results[0]?.bottle).toEqual({
+      id: bottle.id,
+      fullName: bottle.fullName,
+      abv: 46.3,
+    });
     expect(first.rel).toEqual({ nextCursor: 2, prevCursor: null });
     expect(second.results.map(({ id }) => id)).toEqual([older.id]);
     expect(second.rel).toEqual({ nextCursor: null, prevCursor: 1 });

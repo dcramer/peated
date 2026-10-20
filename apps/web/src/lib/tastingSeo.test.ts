@@ -16,6 +16,7 @@ const tasting = {
   bottle: {
     id: 42,
     name: "16-year-old",
+    abv: 43,
     brand: { name: "Lagavulin" },
     imageUrl: "https://images.peated.com/bottle.jpg",
   },
@@ -24,7 +25,7 @@ const tasting = {
 describe("tasting SEO", () => {
   it("uses the tasting URL and consistent search and social descriptions", () => {
     const metadata = getTastingSeoMetadata(tasting);
-    const title = "Lagavulin 16-year-old — tasting by alice";
+    const title = "Lagavulin 16-year-old (43.0% ABV) — tasting by alice";
     const description = "Smoke and honey. A long finish.";
 
     expect(metadata).toMatchObject({
@@ -65,12 +66,12 @@ describe("tasting SEO", () => {
       });
       expect(metadata).toMatchObject({
         description:
-          "Whisky tasting of Lagavulin 16-year-old by alice. Rated Very good.",
+          "Whisky tasting of Lagavulin 16-year-old (43.0% ABV) by alice. Rated Very good.",
         openGraph: {
           images: [
             {
               url: tasting.bottle.imageUrl,
-              alt: "Lagavulin 16-year-old bottle",
+              alt: "Lagavulin 16-year-old (43.0% ABV) bottle",
             },
           ],
         },
@@ -88,7 +89,7 @@ describe("tasting SEO", () => {
       bottle: { ...tasting.bottle, imageUrl: null },
     });
     expect(metadata.description).toBe(
-      "Whisky tasting of Lagavulin 16-year-old by alice.",
+      "Whisky tasting of Lagavulin 16-year-old (43.0% ABV) by alice.",
     );
     expect(metadata.openGraph).toHaveProperty("images", undefined);
     expect(metadata.twitter).toMatchObject({ card: "summary" });
@@ -110,7 +111,7 @@ describe("tasting SEO", () => {
       image: tasting.imageUrl,
       itemReviewed: {
         "@type": "Product",
-        name: "Lagavulin 16-year-old",
+        name: "Lagavulin 16-year-old (43.0% ABV)",
         image: tasting.bottle.imageUrl,
         url: `${config.URL_PREFIX}/bottles/42-lagavulin-16-year-old`,
         brand: { "@type": "Brand", name: "Lagavulin" },

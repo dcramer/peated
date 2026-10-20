@@ -1,4 +1,4 @@
-import { formatBottleDisplayName } from "@peated/server/lib/bottleDisplayName";
+import { formatBottleLabel } from "@peated/server/lib/bottleDisplayName";
 import { formatColor, formatServingStyle } from "@peated/server/lib/format";
 import type { Outputs } from "@peated/server/orpc/router";
 import type { TagCategory } from "@peated/server/types";
@@ -101,7 +101,7 @@ export function TastingReviewDetail({
   tags: readonly string[];
   tagCategories: Readonly<Record<string, TagCategory>>;
 }) {
-  const bottleName = formatBottleDisplayName(bottle);
+  const bottleName = formatBottleLabel(bottle);
   const bottleTitle = bottleName.replaceAll(" - ", "\u00a0- ");
   const metadata = (
     <>

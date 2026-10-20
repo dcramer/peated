@@ -19,10 +19,19 @@ export type BottleDisplayNameSource = {
   } | null;
 };
 
+/** Requires ABV so a caller cannot drop it by reading a partial Bottle. */
+export type BottleLabelSource = BottleDisplayNameSource & {
+  abv: number | null;
+};
+
 export type BottleDisplayNameOptions = {
   includeBrand?: boolean;
   includeSeries?: boolean;
 };
+
+export function formatAbv(abv: number) {
+  return `${abv.toFixed(1)}% ABV`;
+}
 
 function includesIdentityText(value: string, candidate: string) {
   return value.toLocaleLowerCase().includes(candidate.toLocaleLowerCase());
@@ -73,7 +82,7 @@ function getExpressionName(bottle: BottleDisplayNameSource) {
         ? `${bottle.vintageYear} Vintage`
         : undefined,
       bottle.abv !== null && bottle.abv !== undefined
-        ? `${bottle.abv.toFixed(1)}% ABV`
+        ? formatAbv(bottle.abv)
         : undefined,
       bottle.singleCask ? "Single Cask" : undefined,
       bottle.caskStrength ? "Cask Strength" : undefined,
@@ -129,4 +138,24 @@ export function formatBottleDisplayName(
   ]
     .filter(Boolean)
     .join(" ");
+}
+
+/**
+ * Releases often share a name and differ only in strength, so bottle labels
+ * show ABV whenever it is known. Use this for names that are not structured,
+ * such as a stored `fullName`.
+ */
+export function appendAbv(name: string, abv: number | null | undefined) {
+  if (abv === null || abv === undefined) return name;
+
+  const abvText = formatAbv(abv);
+  return includesIdentityText(name, abvText) ? name : `${name} (${abvText})`;
+}
+
+/** Formats the bottle name with its ABV; see `appendAbv`. */
+export function formatBottleLabel(
+  bottle: BottleLabelSource,
+  options?: BottleDisplayNameOptions,
+) {
+  return appendAbv(formatBottleDisplayName(bottle, options), bottle.abv);
 }

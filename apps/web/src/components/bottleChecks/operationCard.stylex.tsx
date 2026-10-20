@@ -1,5 +1,6 @@
 "use client";
 
+import { appendAbv } from "@peated/server/lib/bottleDisplayName";
 import type { Inputs, Outputs } from "@peated/server/orpc/router";
 import { BottleOperationFieldPathSchema } from "@peated/server/schemas/bottleOperationFields";
 import { AdminButton as Button } from "@peated/web/components/admin/adminButton.stylex";
@@ -376,11 +377,17 @@ function Preview({
           <div {...stylex.props(foundationStyles.body, styles.copy)}>
             Retire{" "}
             <strong {...stylex.props(styles.strong)}>
-              {review.preview.source.fullName}
+              {appendAbv(
+                review.preview.source.fullName,
+                review.preview.source.exact.abv,
+              )}
             </strong>{" "}
             into{" "}
             <strong {...stylex.props(styles.strong)}>
-              {review.preview.destination.fullName}
+              {appendAbv(
+                review.preview.destination.fullName,
+                review.preview.destination.exact.abv,
+              )}
             </strong>
             .
           </div>

@@ -1,5 +1,7 @@
 import {
+  formatAbv,
   formatBottleDisplayName,
+  formatBottleLabel,
   getBottleReleaseMetadata,
   type BottleDisplayNameSource,
 } from "@peated/server/lib/bottleDisplayName";
@@ -37,7 +39,7 @@ export function toBottlePickerOption(
   const identity = getBottleIdentityProps(bottle);
   return {
     id: bottle.id,
-    label: identity.name,
+    label: formatBottleLabel(bottle),
     bottle: {
       ...identity,
       imageUrl: bottle.imageUrl,
@@ -59,8 +61,9 @@ export function getBottleIdentityProps(
     BottleListItemOptions,
     "includeBottler" | "includeBrandInName" | "includeSeriesInName"
   > = {},
-): Pick<BottleIdentityRowProps, "name" | "provenance" | "metadata"> {
+): Pick<BottleIdentityRowProps, "abv" | "name" | "provenance" | "metadata"> {
   const releaseFact = getBottleReleaseMetadata(bottle);
+  const abv = bottle.abv !== null ? formatAbv(bottle.abv) : null;
   const releaseYear =
     bottle.releaseYear == null ? null : `${bottle.releaseYear} release`;
   const distillers = bottle.distillers ?? [];
@@ -108,8 +111,9 @@ export function getBottleIdentityProps(
         : bottle.noAgeStatement
           ? "NAS"
           : null,
-      bottle.abv !== null ? `${bottle.abv.toFixed(1)}% ABV` : null,
+      abv,
     ].filter((value): value is string => value !== null),
+    abv,
   };
 }
 

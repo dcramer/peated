@@ -103,6 +103,7 @@ describe("SEO metadata", () => {
       {
         id: 42,
         name: "16-year-old",
+        abv: 43,
         brand: { name: "Lagavulin" },
         description: "A smoky Islay single malt.",
         imageUrl: "https://images.peated.com/lagavulin.jpg",
@@ -111,18 +112,18 @@ describe("SEO metadata", () => {
     );
 
     expect(metadata).toMatchObject({
-      title: "Lagavulin 16-year-old",
+      title: "Lagavulin 16-year-old (43.0% ABV)",
       description: "A smoky Islay single malt.",
       alternates: { canonical: "/bottles/42-lagavulin-16-year-old" },
       openGraph: {
         locale: "en_US",
         siteName: "Peated",
-        title: "Lagavulin 16-year-old",
+        title: "Lagavulin 16-year-old (43.0% ABV)",
         url: "/bottles/42-lagavulin-16-year-old",
         images: [
           {
             url: "https://images.peated.com/lagavulin.jpg",
-            alt: "Lagavulin 16-year-old bottle",
+            alt: "Lagavulin 16-year-old (43.0% ABV) bottle",
           },
         ],
       },
@@ -134,6 +135,7 @@ describe("SEO metadata", () => {
     const metadata = getBottleSeoMetadata({
       id: 42,
       name: "16-year-old",
+      abv: null,
       brand: { name: "Lagavulin" },
       description: null,
       imageUrl: null,

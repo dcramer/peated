@@ -6,7 +6,7 @@ import {
   entities,
 } from "@peated/server/db/schema";
 import { getUserFromId, profileVisible } from "@peated/server/lib/api";
-import { formatBottleDisplayName } from "@peated/server/lib/bottleDisplayName";
+import { formatBottleLabel } from "@peated/server/lib/bottleDisplayName";
 import { implement } from "@peated/server/orpc";
 import userTastingStatsContract from "@peated/server/orpc/contracts/users/tasting-stats";
 import type { Entity } from "@peated/server/types";
@@ -156,7 +156,7 @@ export default implement(userTastingStatsContract).handler(async function ({
     mostTastedBottle: mostTastedBottle
       ? {
           id: mostTastedBottle.id,
-          name: formatBottleDisplayName(mostTastedBottle),
+          name: formatBottleLabel(mostTastedBottle),
           count: mostTastedCount,
         }
       : null,

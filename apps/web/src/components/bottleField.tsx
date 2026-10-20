@@ -1,8 +1,8 @@
 "use client";
 
 import {
-  formatBottleDisplayName,
-  type BottleDisplayNameSource,
+  formatBottleLabel,
+  type BottleLabelSource,
 } from "@peated/server/lib/bottleDisplayName";
 import type { Outputs } from "@peated/server/orpc/router";
 import { toBottlePickerOption } from "@peated/web/lib/bottleListItem";
@@ -18,9 +18,9 @@ export type BottleOption = Pick<BottleListItem, "id"> & {
 };
 
 export function formatBottleOptionWithId(
-  bottle: BottleDisplayNameSource & Pick<BottleListItem, "id">,
+  bottle: BottleLabelSource & Pick<BottleListItem, "id">,
 ): string {
-  return `${formatBottleDisplayName(bottle)} · Bottle ${bottle.id}`;
+  return `${formatBottleLabel(bottle)} · Bottle ${bottle.id}`;
 }
 
 export default function BottleField({
@@ -36,8 +36,12 @@ export default function BottleField({
         const { results } = await orpc.bottles.list.call({ query });
         return results.map((r) => {
           const option = toBottlePickerOption(r);
-          const name = formatOptionName?.(r) ?? option.label;
-          return { name, id: r.id, bottle: { ...option.bottle, name } };
+          const name = formatOptionName?.(r);
+          return {
+            name: name ?? option.label,
+            id: r.id,
+            bottle: { ...option.bottle, name: name ?? option.bottle.name },
+          };
         });
       }}
       {...props}

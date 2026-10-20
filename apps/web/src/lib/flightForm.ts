@@ -1,8 +1,8 @@
 import type { Bottle } from "@peated/server/types";
 
 import {
-  formatBottleDisplayName,
-  type BottleDisplayNameSource,
+  formatBottleLabel,
+  type BottleLabelSource,
 } from "@peated/server/lib/bottleDisplayName";
 
 export type FlightBottleOption = {
@@ -17,11 +17,11 @@ export function getFlightBottleIds(
 }
 
 export function bottleToFlightOption(
-  bottle: BottleDisplayNameSource & Pick<Bottle, "id">,
+  bottle: BottleLabelSource & Pick<Bottle, "id">,
 ): FlightBottleOption {
   return {
     id: bottle.id,
-    name: formatBottleDisplayName(bottle),
+    name: formatBottleLabel(bottle),
   };
 }
 

@@ -124,6 +124,13 @@ ABV is the useful technical strength fact for a bottle header or metadata row.
 When ABV is visible, do not add a derived cask-strength label. Ordinary headers
 should not add that label even when ABV is unavailable.
 
+Releases often share a name and differ only in strength, so every bottle label
+shows ABV when it is known: rows, compact rows, picker and selection text, page
+and share titles, notifications, and emails. Text labels use
+`formatBottleLabel`, which adds `(46.0% ABV)` after the name. Labels built from
+a stored `fullName` use `appendAbv`. Neither repeats ABV the name already
+states. URL slugs keep the plain name so links stay stable.
+
 ### Treat category as taxonomy
 
 Category supports filtering, editing, and verification. It is not part of a
@@ -224,8 +231,8 @@ Missing facts do not create placeholder lines. Activity context, Library status,
 personal images, and actions belong to their owning view, not a competing bottle
 identity layout. Sidebar bottle lists use the shared sidebar variant with
 compact titles, smaller thumbnails, and trailing content below the identity.
-Recent tastings show the tasting date and rating instead of catalog facts.
-Primary page headings remain a separate display context.
+Recent tastings show the tasting date and rating instead of catalog facts,
+except ABV. Primary page headings remain a separate display context.
 
 Picker options and selected bottles also use `BottleIdentityRow`. Build them
 with `toBottlePickerOption`; it retains the numeric database ID and removes
@@ -237,7 +244,7 @@ they must not fall back to a separate name-and-metadata format.
   outside its detail page.
 - Include a named release marker in the title.
 - Put an exact batch marker or optional year in secondary metadata.
-- Include age or ABV when the component's density makes them useful.
+- Include ABV when known. Include age when the component's density allows.
 - Do not let a year crowd out a more meaningful release marker or ABV.
 - Do not add single-cask or cask-strength labels.
 
@@ -254,7 +261,8 @@ places that cannot support a metadata row.
 - Omit exact batch markers when the surface has no supporting metadata.
 - Include series when it is essential to recognizing the product and is not
   already represented; secondary context may otherwise be omitted.
-- Omit ABV, general production details, and years that are not needed.
+- Keep ABV after the name when known.
+- Omit general production details and years that are not needed.
 
 ### Family-relative identity
 
@@ -300,7 +308,8 @@ Open Graph metadata, share text, accessible labels, and some exports.
 - Omit an exact batch marker unless the text must distinguish releases that
   otherwise have the same name.
 - Include a year only when it is a necessary part of that marketed identity.
-- Omit generic single-cask and cask-strength flags and normally omit ABV.
+- Omit generic single-cask and cask-strength flags.
+- Include ABV when known.
 - Do not assume the stored `fullName` is the ideal text for every consumer.
 
 Family-level SEO uses the shared expression identity. Exact Bottle SEO uses the
@@ -336,7 +345,7 @@ particular result component omits some of them visually.
 | Named edition             | Prominent                | In title          | In title           | Primary          | Yes               | Yes          |
 | Exact batch marker        | Supporting fact          | Metadata          | Rarely             | Metadata         | Conditional       | Yes          |
 | Stated age                | Once                     | Optional          | Only when integral | Exact override   | If integral       | Yes          |
-| ABV                       | Yes when known           | Optional          | No                 | Optional support | Normally no       | Yes          |
+| ABV                       | Yes when known           | Yes when known    | Yes when known     | Optional support | Yes when known    | Yes          |
 | Distillation year         | Conditional              | Conditional       | Rarely             | When useful      | Conditional       | Yes          |
 | Bottling year             | Conditional              | Conditional       | Rarely             | When useful      | Conditional       | Yes          |
 | Release year              | Conditional              | Conditional       | Rarely             | When useful      | Conditional       | Yes          |
@@ -377,7 +386,7 @@ shared visual reference for desktop and phone layouts.
 | Need                        | Component                             | Responsibility                                                                                                                                                                                                                                |
 | --------------------------- | ------------------------------------- | --------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
 | One standard bottle row     | `BottleIdentityRow`                   | Full marketed name, provenance, release facts, thumbnail, and linked hit area.                                                                                                                                                                |
-| One-line library addition   | `BottleIdentityRow variant="compact"` | Same name, smaller thumbnail, and a 44px hit area; long names truncate visually.                                                                                                                                                              |
+| One-line library addition   | `BottleIdentityRow variant="compact"` | Same name with ABV after it, smaller thumbnail, and a 44px hit area; long names truncate visually and keep the ABV visible.                                                                                                                   |
 | Catalog list                | `BottleList`                          | List semantics and optional ratings or row actions.                                                                                                                                                                                           |
 | Member Library              | `pages/MemberLibraryList`             | Standard bottle rows and Library actions. Personal photos cover the thumbnail; catalog bottle images remain contained.                                                                                                                        |
 | Mixed activity              | `CommunityFeed`                       | Author, action, date, grouped bottles, scores, and review links; covers real images in fixed feed thumbnails, gives missing images a neutral frame, uses the usual image size in sidebars and on mobile, and keeps library additions compact. |
@@ -400,9 +409,9 @@ const item = toBottleListItem(bottle);
 All variants accept the full marketed name, including brand context. Sidebar
 rows use compact two-line titles and smaller thumbnails, omit membership icons,
 and place trailing dates, ratings, or actions below the identity. Recent tasting
-rows show tasting dates and ratings instead of catalog provenance and facts. Compact
-rows omit provenance, metadata, subtitles, membership status, and related-release
-links. The optional `end` slot remains available. `layout="cell"` fits the identity
+rows show tasting dates and ratings instead of catalog provenance and facts,
+except ABV. Compact rows omit provenance, metadata, subtitles, membership status,
+and related-release links, but keep ABV after the name. The optional `end` slot remains available. `layout="cell"` fits the identity
 inside an existing table or selection control; it does not change content density.
 The row owns thumbnail size, so callers do not build a second image/name layout.
 

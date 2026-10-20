@@ -1,6 +1,9 @@
 "use client";
 
-import { formatBottleDisplayName } from "@peated/server/lib/bottleDisplayName";
+import {
+  formatBottleDisplayName,
+  formatBottleLabel,
+} from "@peated/server/lib/bottleDisplayName";
 import { formatCategoryName } from "@peated/server/lib/format";
 import type { Outputs } from "@peated/server/orpc/router";
 import * as stylex from "@stylexjs/stylex";
@@ -276,7 +279,7 @@ function BottleActions({ bottle }: { bottle: Bottle }) {
           if (navigator.share) {
             navigator
               .share({
-                title: formatBottleDisplayName(bottle),
+                title: formatBottleLabel(bottle),
                 url: window.location.href,
               })
               .catch((error) => logTelemetryError(error, {}));
