@@ -59,6 +59,23 @@ describe("Bottle create candidate discovery", () => {
     expect(results.map(({ id }) => id)).toEqual([2, 3]);
   });
 
+  test("leaves out Bottles that share none of the entered distilleries", () => {
+    const results = rankBottleCreateCandidates(
+      regressionInput,
+      [
+        candidate({ id: 2, distillers: [{ id: 9, name: "Hakushu" }] }),
+        candidate({ id: 3, distillers: [] }),
+        candidate({
+          id: 4,
+          distillers: [{ id: 9, name: "Hakushu" }, yamazaki],
+        }),
+      ],
+      3,
+    );
+
+    expect(results.map(({ id }) => id).sort((a, b) => a - b)).toEqual([3, 4]);
+  });
+
   test("deduplicates candidates returned by several discovery queries", () => {
     const duplicate = candidate();
     expect(
