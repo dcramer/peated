@@ -178,7 +178,7 @@ describe("createMissingBottles", () => {
         { candidates: [{ bottleId: bottle.id }] },
       ),
     );
-    await createMissingBottles({ articleId: review.articleId });
+    await createMissingBottles({ reviewId: review.id });
     expect(
       await db.query.externalReviews.findFirst({
         where: eq(externalReviews.id, review.id),
@@ -253,7 +253,7 @@ describe("createMissingBottles", () => {
       }),
     );
 
-    await createMissingBottles();
+    await createMissingBottles({ reviewId: review.id });
 
     const updatedReview = await db.query.externalReviews.findFirst({
       where: eq(externalReviews.id, review.id),
@@ -401,7 +401,7 @@ describe("createMissingBottles", () => {
       }),
     );
 
-    await createMissingBottles();
+    await createMissingBottles({ reviewId: review.id });
 
     const updatedReview = await db.query.externalReviews.findFirst({
       where: eq(externalReviews.id, review.id),
@@ -434,7 +434,78 @@ describe("createMissingBottles", () => {
     });
   });
 
-  test("only visits unresolved reviews once per run", async ({ fixtures }) => {
+  test.for(["global", "article"] as const)(
+    "%s batches isolate a persistently failing review",
+    async (scope, { fixtures }) => {
+      const failed = await fixtures.ExternalReview({
+        bottleId: null,
+        name: "Invalid proposal",
+      });
+      const healthy = await fixtures.ExternalReview({
+        bottleId: null,
+        articleId: failed.articleId,
+        name: "Supported review",
+      });
+      const bottle = await fixtures.Bottle();
+      classifyBottleReferenceMock.mockImplementation(async ({ reference }) =>
+        reference.id === failed.id
+          ? buildClassification({
+              action: "match",
+              matchedBottleId: bottle.id,
+              candidateBottleIds: [bottle.id],
+            })
+          : buildClassification(
+              {
+                action: "match",
+                matchedBottleId: bottle.id,
+                referenceScope: "none",
+                candidateBottleIds: [bottle.id],
+              },
+              { candidates: [{ bottleId: bottle.id }] },
+            ),
+      );
+      await createMissingBottles(
+        scope === "article" ? { articleId: failed.articleId } : undefined,
+      );
+      const jobs = workerClient.pushUniqueJob.mock.calls.filter(
+        ([name]) => name === "CreateMissingBottles",
+      );
+      expect(jobs.map(([, input]) => input)).toEqual([
+        { reviewId: failed.id },
+        { reviewId: healthy.id },
+      ]);
+      expect(classifyBottleReferenceMock).not.toHaveBeenCalled();
+      // Queue execution owns failures independently; the second job still runs.
+      await expect(createMissingBottles(jobs[0]![1])).rejects.toThrow(
+        "unknown matched bottle id",
+      );
+      await createMissingBottles(jobs[1]![1]);
+      await expect(createMissingBottles(jobs[0]![1])).rejects.toThrow(
+        "unknown matched bottle id",
+      );
+      expect(
+        await db.query.externalReviews.findFirst({
+          where: eq(externalReviews.id, failed.id),
+        }),
+      ).toMatchObject({ bottleId: null, bottleNoMatchAt: null });
+      expect(
+        await db.query.externalReviews.findFirst({
+          where: eq(externalReviews.id, healthy.id),
+        }),
+      ).toMatchObject({ bottleId: bottle.id });
+      await createMissingBottles(
+        scope === "article" ? { articleId: failed.articleId } : undefined,
+      );
+      expect(
+        workerClient.pushUniqueJob.mock.calls
+          .filter(([name]) => name === "CreateMissingBottles")
+          .slice(2),
+      ).toEqual([["CreateMissingBottles", { reviewId: failed.id }]]);
+      expect(classifyBottleReferenceMock).toHaveBeenCalledTimes(3);
+    },
+  );
+
+  test("queues each unresolved review once per batch", async ({ fixtures }) => {
     const site = await fixtures.ExternalSiteOrExisting();
     const review = await fixtures.ExternalReview({
       externalSiteId: site.id,
@@ -446,12 +517,62 @@ describe("createMissingBottles", () => {
 
     await createMissingBottles();
 
-    expect(classifyBottleReferenceMock).toHaveBeenCalledTimes(1);
+    expect(classifyBottleReferenceMock).not.toHaveBeenCalled();
+    expect(workerClient.pushUniqueJob.mock.calls).toEqual([
+      ["CreateMissingBottles", { reviewId: review.id }],
+    ]);
 
     const unchangedReview = await db.query.externalReviews.findFirst({
       where: eq(externalReviews.id, review.id),
     });
     expect(unchangedReview?.bottleId).toBeNull();
+  });
+
+  test("a failed dispatch leaves pending reviews available for another batch", async ({
+    fixtures,
+  }) => {
+    const review = await fixtures.ExternalReview({ bottleId: null });
+    const error = new Error("Queue unavailable");
+    workerClient.pushUniqueJob.mockRejectedValueOnce(error);
+    await expect(
+      createMissingBottles({ articleId: review.articleId }),
+    ).rejects.toBe(error);
+    expect(
+      await db.query.externalReviews.findFirst({
+        where: eq(externalReviews.id, review.id),
+      }),
+    ).toMatchObject({ bottleId: null, bottleNoMatchAt: null });
+    await createMissingBottles({ articleId: review.articleId });
+    expect(workerClient.pushUniqueJob).toHaveBeenLastCalledWith(
+      "CreateMissingBottles",
+      { reviewId: review.id },
+    );
+    expect(classifyBottleReferenceMock).not.toHaveBeenCalled();
+  });
+
+  test("queues every page without revisiting pending reviews", async ({
+    fixtures,
+  }) => {
+    const first = await fixtures.ExternalReview({ bottleId: null });
+    const rest = await db
+      .insert(externalReviews)
+      .values(
+        Array.from({ length: 100 }, (_, index) => ({
+          articleId: first.articleId,
+          name: `Pending review ${index}`,
+          sourceKey: `pending-${index}`,
+          bottleId: null,
+        })),
+      )
+      .returning({ id: externalReviews.id });
+    await createMissingBottles();
+    expect(classifyBottleReferenceMock).not.toHaveBeenCalled();
+    expect(workerClient.pushUniqueJob.mock.calls).toEqual(
+      [first, ...rest].map(({ id }) => [
+        "CreateMissingBottles",
+        { reviewId: id },
+      ]),
+    );
   });
 
   test("records a no-match answer and does not ask again", async ({
@@ -465,8 +586,8 @@ describe("createMissingBottles", () => {
       url: "https://example.com/no-match-review",
     });
 
-    await createMissingBottles();
-    await createMissingBottles();
+    await createMissingBottles({ reviewId: review.id });
+    await createMissingBottles({ reviewId: review.id });
 
     expect(classifyBottleReferenceMock).toHaveBeenCalledTimes(1);
     const marked = await db.query.externalReviews.findFirst({
@@ -493,7 +614,7 @@ describe("createMissingBottles", () => {
       new Error("The AI service is unavailable."),
     );
 
-    await expect(createMissingBottles()).rejects.toThrow(
+    await expect(createMissingBottles({ reviewId: review.id })).rejects.toThrow(
       "The AI service is unavailable.",
     );
     expect(
@@ -502,7 +623,7 @@ describe("createMissingBottles", () => {
       }),
     ).toMatchObject({ bottleNoMatchAt: null });
 
-    await createMissingBottles();
+    await createMissingBottles({ reviewId: review.id });
     expect(classifyBottleReferenceMock).toHaveBeenCalledTimes(2);
   });
 
@@ -819,6 +940,11 @@ describe("createMissingBottles", () => {
 
     await createMissingBottles({ articleId: selected.articleId });
 
+    expect(classifyBottleReferenceMock).not.toHaveBeenCalled();
+    expect(workerClient.pushUniqueJob.mock.calls).toEqual([
+      ["CreateMissingBottles", { reviewId: selected.id }],
+    ]);
+    await createMissingBottles(workerClient.pushUniqueJob.mock.calls[0]![1]);
     expect(classifyBottleReferenceMock).toHaveBeenCalledTimes(1);
     expect(classifyBottleReferenceMock).toHaveBeenCalledWith(
       expect.objectContaining({
@@ -861,7 +987,7 @@ describe("createMissingBottles", () => {
       ),
     );
 
-    await createMissingBottles();
+    await createMissingBottles({ reviewId: review.id });
 
     expect(
       await db.query.externalReviews.findFirst({
@@ -921,7 +1047,7 @@ describe("createMissingBottles", () => {
       ),
     );
 
-    await createMissingBottles({ articleId: review.articleId });
+    await createMissingBottles({ reviewId: review.id });
 
     expect(
       await db.query.externalReviews.findFirst({
@@ -940,7 +1066,7 @@ describe("createMissingBottles", () => {
       url: "https://example.com/generic-review",
     });
 
-    await createMissingBottles();
+    await createMissingBottles({ reviewId: review.id });
 
     expect(classifyBottleReferenceMock).toHaveBeenCalledTimes(1);
     expect(
@@ -986,7 +1112,7 @@ describe("createMissingBottles", () => {
       );
     });
 
-    await createMissingBottles();
+    await createMissingBottles({ reviewId: review.id });
 
     const preserved = await db.query.externalReviews.findFirst({
       where: eq(externalReviews.id, review.id),

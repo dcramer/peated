@@ -79,20 +79,20 @@ export default function ReviewTask({
     message: string,
   ) {
     setError(null);
-    try {
-      await action();
-      await queryClient.invalidateQueries({
-        queryKey: orpc.externalReviews.key(),
-      });
-      await onComplete(message);
-      setSelecting(false);
-    } catch (cause) {
-      setError(
-        cause instanceof Error
-          ? cause.message
-          : "The decision could not be saved. Try again.",
-      );
-    }
+    await action();
+    await queryClient.invalidateQueries({
+      queryKey: orpc.externalReviews.key(),
+    });
+    await onComplete(message);
+    setSelecting(false);
+  }
+
+  function showError(cause: unknown) {
+    setError(
+      cause instanceof Error
+        ? cause.message
+        : "The decision could not be saved. Try again.",
+    );
   }
 
   return (
@@ -171,7 +171,7 @@ export default function ReviewTask({
                   },
                 ],
               });
-            }, "Review queued for matching.")
+            }, "Review queued for matching.").catch(showError)
           }
         >
           Check match again
@@ -198,7 +198,7 @@ export default function ReviewTask({
                       reason: reason.trim(),
                     }),
                   "Review removed.",
-                )
+                ).catch(showError)
               }
             >
               Remove review

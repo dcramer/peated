@@ -41,6 +41,7 @@ export default function ModerationBottlePicker({
 }: {
   name?: string | null;
   onClose: () => void;
+  /** Assign the selection. Reject to show the error inside this dialog. */
   onSelect?: (value: Bottle) => Promise<void>;
   open: boolean;
   returnTo?: string;
@@ -104,9 +105,11 @@ export default function ModerationBottlePicker({
     setError(null);
     try {
       await onSelect(bottle);
-    } catch {
+    } catch (cause) {
       setError(
-        "Unable to assign this bottle. Check your connection and try again.",
+        cause instanceof Error
+          ? cause.message
+          : "Unable to assign this bottle. Try again.",
       );
     } finally {
       setLoading(false);

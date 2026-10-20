@@ -33,6 +33,7 @@ import { logInfo } from "@peated/server/lib/log";
 import { normalizeBottleReferenceKey } from "@peated/server/lib/normalize";
 import { and, asc, eq, gt, isNull } from "drizzle-orm";
 import { z } from "zod";
+import { pushUniqueJob } from "../dispatch";
 import type { JobPayload } from "../types";
 
 const InputSchema = z
@@ -65,8 +66,8 @@ export async function createMissingBottles(
   );
   const systemActor = await getPeatedSystemActor();
 
-  // Advance by id so unresolved reviews are visited once per run instead of
-  // hot-looping forever on the same null bottle assignments.
+  // Review matching owns batch isolation: advance by ID even though dispatch
+  // leaves reviews pending until their individual jobs finish.
   let cursor = 0;
   let hasMore = true;
   while (hasMore) {
@@ -104,6 +105,10 @@ export async function createMissingBottles(
 
     for (const { article, review } of missingInReviews) {
       cursor = review.id;
+      if (reviewId === undefined) {
+        await pushUniqueJob("CreateMissingBottles", { reviewId: review.id });
+        continue;
+      }
       const referenceKey = normalizeBottleReferenceKey(review.name);
 
       const resolution = await resolveScrapedBottleReferenceTarget(

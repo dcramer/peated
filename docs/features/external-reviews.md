@@ -52,6 +52,8 @@ processes only the requested review version and checks it again before applying
 a result. A moderator can still assign or remove the review during a recheck;
 a stale result cannot overwrite that change. A completed unresolved answer
 advances the attempt timestamp, and a successful assignment clears it.
+Article and global batch runs queue one job per pending review. A failed review
+does not block the remaining reviews in the batch.
 Classifier failures reach the worker's error handler. Temporary provider outages
 use the model queue's existing pause and retry handling; other errors fail the
 job. Failed rechecks remain visible for manual resolution or rechecking and do
