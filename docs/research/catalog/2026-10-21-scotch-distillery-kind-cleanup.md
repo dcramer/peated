@@ -6,7 +6,7 @@ Date: 2026-10-21
 
 The [pronunciation backfill](./2026-10-21-scotch-distillery-pronunciations.md) found 116 production Entities stored with kind `distillery` and country Scotland that are not Scottish whisky production sites. A read-only dry run proposed an action for each one from its Bottle use (live `GET /v1/bottles?brand=|distiller=|bottler=` counts) and web evidence. The owner approved the changes in two rounds: first the high- and medium-confidence groups, then low-confidence items after the operator checked their evidence directly.
 
-Result: 62 kind or country changes, 6 merges (5 complete, 1 pending), 31 deletes, and 17 records held.
+Result: 62 kind or country changes, 6 merges, 31 deletes, and 17 records held.
 
 Bottles columns are counts of Bottles that use the Entity as brand / distiller / bottler.
 
@@ -95,14 +95,14 @@ Evidence links are per row. Bottler and brand judgments rely mostly on producer 
 
 ### Merged
 
-| Retired                    | Survivor | Status  | Reason                                                                                                                            |
-| -------------------------- | -------- | ------- | --------------------------------------------------------------------------------------------------------------------------------- |
-| E203044 Mc'nean Distillery | E1198    | done    | Misspelling of Nc'nean; same website, description says it is Nc'nean. 1198 is older and used as Brand on 22 Bottles.              |
-| E5758 Chivas Brothers Ltd. | E0316    | pending | Same organization as Chivas Brothers (316, company, Pernod Ricard's Scotch arm). 316 is older and already used as a Brand.        |
-| E6074 Kirker Greer Brands  | E3256    | done    | Same Belfast business as Kirker Greer (3256, company, Brand on 4 Bottles).                                                        |
-| E6054 Pointers of London   | E1266    | done    | Same firm as Pointers (1266): Pointers of London & Edinburgh, a ceramics company that filled decanters with Scotch.               |
-| E6094 Lucky Seven Spirits  | E1154    | done    | Same website (luckysevenspirits.com) as Lucky Seven (1154), a US whiskey brand; this record is generated filler.                  |
-| E6087 Frank-Lin            | E366736  | done    | Same name as Frank-Lin Distillers (366736, US bottler, bottler on Black Saddle). This record is generated filler set in Scotland. |
+| Retired                    | Survivor | Status | Reason                                                                                                                            |
+| -------------------------- | -------- | ------ | --------------------------------------------------------------------------------------------------------------------------------- |
+| E203044 Mc'nean Distillery | E1198    | done   | Misspelling of Nc'nean; same website, description says it is Nc'nean. 1198 is older and used as Brand on 22 Bottles.              |
+| E5758 Chivas Brothers Ltd. | E0316    | done   | Same organization as Chivas Brothers (316, company, Pernod Ricard's Scotch arm). 316 is older and already used as a Brand.        |
+| E6074 Kirker Greer Brands  | E3256    | done   | Same Belfast business as Kirker Greer (3256, company, Brand on 4 Bottles).                                                        |
+| E6054 Pointers of London   | E1266    | done   | Same firm as Pointers (1266): Pointers of London & Edinburgh, a ceramics company that filled decanters with Scotch.               |
+| E6094 Lucky Seven Spirits  | E1154    | done   | Same website (luckysevenspirits.com) as Lucky Seven (1154), a US whiskey brand; this record is generated filler.                  |
+| E6087 Frank-Lin            | E366736  | done   | Same name as Frank-Lin Distillers (366736, US bottler, bottler on Black Saddle). This record is generated filler set in Scotland. |
 
 ### Deleted
 
@@ -166,7 +166,7 @@ These need owner approval, stronger evidence, or Bottle-level work.
 
 ## Follow-ups found during the dry run
 
-- The Chivas Brothers Ltd. merge (E5758 → E316) was queued but did not run within 30 minutes, while later merges finished in minutes. Its three Bottles (2392, 2750, 9728) are official Chivas Regal releases that should have no bottler; clearing that bottler first may let the merge finish. Check the MergeEntity job in Sentry.
+- The Chivas Brothers Ltd. merge (E5758 → E316) first failed because Bottle 2392 (Chivas Regal 18-year-old Gold Signature) and Bottle 42432 (Chivas Regal 18-year-old) shared BottleGroup 10524 and became identical once the bottler changed. [Spirits Review](https://spiritsreview.com/reviews/chivas-regal-18-gold-signature/), [Difford's Guide](https://www.diffordsguide.com/beer-wine-spirits/765/chivas-regal-18-year-old), and [The Spirits Business](https://www.thespiritsbusiness.com/2024/10/chivas-regal-18-reveals-25-lighter-bottle/) show Gold Signature was packaging for the same 18-year-old blend. With owner approval, 42432 was merged into 2392 (the older ID); 2392 now uses the producer name `18-year-old`, category blend, 40% ABV, no bottler, and the public alias "Chivas Regal 18-year-old Gold Signature". The bottler was also cleared on official Chivas Regal Bottles 2750 and 9728. The Entity merge then completed. The MergeEntity job now names colliding Bottles instead of failing with a bare identity error.
 - Compass Box product names stored as Entities (The Circus, Enlightenment, Magic Cask, Menagerie, Phenomenology, Rogues' Banquet, The General) each carry a Bottle that likely duplicates a Compass Box Bottle. Cladach and Velvet Fig have the same pattern under Special Releases and Wemyss Malts.
 - The Single Cask Ltd. (E6078) is Brand on 33 Bottles while its Brand Entity E366640 is Brand on 33 others.
 - Williamson (E478) and Speybridge (E4022) are stored as distiller on Bottles, but they are label names, not producers. James Eadie (E5972) is a second distiller on Bottle 44308.
@@ -178,4 +178,4 @@ These need owner approval, stronger evidence, or Bottle-level work.
 
 ## Verification
 
-Each change read the Entity before and after its write and confirmed the name, kind, country, and Bottle count. Each completed merge ID now resolves to its survivor, with survivor Bottle counts equal to the sum of both records. Each deleted ID returns 404.
+Each change read the Entity before and after its write and confirmed the name, kind, country, and Bottle count. Each merged ID now resolves to its survivor, with survivor Bottle counts equal to the sum of both records. Each deleted ID returns 404.
