@@ -6,7 +6,6 @@ import type { ReactNode } from "react";
 
 import { FactList } from "@peated/web/components/factList.stylex";
 import { LoadingPlaceholder } from "@peated/web/components/feedback.stylex";
-import Join from "@peated/web/components/join";
 import { MemberAvatar } from "@peated/web/components/memberAvatar";
 import {
   ReviewScore,
@@ -16,7 +15,6 @@ import {
 import { TextLink } from "@peated/web/components/textLink.stylex";
 import { Timestamp } from "@peated/web/components/timestamp";
 import { TastingNoteTag } from "@peated/web/features/tastingWheel/tastingNoteTag.stylex";
-import { getBottleIdentityProps } from "@peated/web/lib/bottleListItem";
 import { getBottleUrl } from "@peated/web/lib/urls";
 import { foundationStyles } from "../../styles/foundations.stylex";
 import { colors, space } from "../../styles/tokens.stylex";
@@ -105,23 +103,6 @@ export function TastingReviewDetail({
   tags: readonly string[];
   tagCategories: Readonly<Record<string, TagCategory>>;
 }) {
-  // The header carries only Bottle facts; the byline carries the member and date.
-  const { metadata: releaseFacts = [], provenance = [] } =
-    getBottleIdentityProps(bottle);
-  const bottleFacts = [
-    ...provenance.map((item, index) =>
-      item.href ? (
-        <TextLink href={item.href} key={index} title={item.title}>
-          {item.name}
-        </TextLink>
-      ) : (
-        <span key={index} title={item.title}>
-          {item.name}
-        </span>
-      ),
-    ),
-    ...releaseFacts,
-  ];
   const facts = [
     servingStyle
       ? { label: "Serving", value: formatServingStyle(servingStyle) }
@@ -163,9 +144,6 @@ export function TastingReviewDetail({
             ) : rating.ratingBand ? (
               <TastingRating band={rating.ratingBand} size="lg" />
             ) : null
-          }
-          metadata={
-            bottleFacts.length ? <Join divider=" · ">{bottleFacts}</Join> : null
           }
           nameHref={getBottleUrl(bottle)}
         />

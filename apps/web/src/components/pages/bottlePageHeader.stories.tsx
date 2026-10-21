@@ -128,7 +128,6 @@ export const MemberRating: Story = {
     actions: null,
     aside: <TastingRating band="very_good" size="lg" />,
     menu: null,
-    metadata: "Single Malt · NAS · 50.1%",
     nameHref: "/bottles/1-laphroaig-elements-l-2-0",
     rating: null,
   },
