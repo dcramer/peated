@@ -1157,7 +1157,7 @@ export const testSeries = {
   updatedAt: timestamp,
 };
 
-export const tastingDraftId = "4f6c1a52-7a0b-4d1e-9f3e-2b8c5d7e9a10";
+const tastingDraftId = "4f6c1a52-7a0b-4d1e-9f3e-2b8c5d7e9a10";
 export const tastingDraftHint = "The smoky one from the festival";
 export const tastingDraftNotes = "Draft flow: peat smoke and lemon.";
 

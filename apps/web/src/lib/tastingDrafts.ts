@@ -5,14 +5,14 @@ import type { Bottle } from "@peated/server/types";
 import { z } from "zod";
 
 export type TastingDraft = Outputs["tastingDrafts"]["details"];
-export type TastingDraftSaveInput = Inputs["tastingDrafts"]["upsert"];
+type TastingDraftSaveInput = Inputs["tastingDrafts"]["upsert"];
 type ClientErrorCandidate = Parameters<typeof isORPCClientError>[0];
 
 /**
  * What the draft's photo says about its Bottle. Identification only suggests;
  * the member always confirms. See docs/features/tasting-drafts.md.
  */
-export type TastingDraftSuggestion =
+type TastingDraftSuggestion =
   | { kind: "identifying" }
   | { kind: "match"; bottle: Bottle }
   | { kind: "proposal"; name: string }
@@ -59,15 +59,15 @@ export function getTastingDraftSuggestion(
   return { kind: "unknown" };
 }
 
-/**
- * The name and status line an inbox row shows for a draft. `name` is null
- * when the draft has neither a Bottle nor a hint; the row then shows the date.
- */
-export type TastingDraftDescription = {
+type TastingDraftDescription = {
   name: string | null;
   status: string;
 };
 
+/**
+ * The name and status line an inbox row shows for a draft. `name` is null
+ * when the draft has neither a Bottle nor a hint; the row then shows the date.
+ */
 export function describeTastingDraft(
   draft: Pick<TastingDraft, "bottle" | "bottleHint" | "identification">,
 ): TastingDraftDescription {
@@ -148,7 +148,8 @@ export async function postTastingDraft<TResult>({
   try {
     await save();
   } catch (error) {
-    if (!isPostedDraftConflict(error)) throw error;
+    // A save of a posted draft returns CONFLICT with the tasting's ID.
+    if (getConflictId(error, "tasting") === null) throw error;
   }
   return await publish();
 }
@@ -161,14 +162,6 @@ export function getExistingBottleConflictId(
   error: ClientErrorCandidate,
 ): number | null {
   return getConflictId(error, "bottle");
-}
-
-/**
- * True when a save failed because the draft was already posted, for example
- * after a lost publish response. Publishing again returns that tasting.
- */
-export function isPostedDraftConflict(error: ClientErrorCandidate) {
-  return getConflictId(error, "tasting") !== null;
 }
 
 const ConflictDataSchema = z.object({

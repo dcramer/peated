@@ -21,6 +21,7 @@ import { Search as BottleSearch } from "@peated/web/components/search/search.sty
 import { SelectedBottleSummary } from "@peated/web/components/selectedBottleSummary.stylex";
 import { Timestamp } from "@peated/web/components/timestamp";
 import { WorkflowScreen } from "@peated/web/components/workflowScreen.stylex";
+import { flashBadgeAwards } from "@peated/web/features/tastings/badgeAwardMessage.stylex";
 import TastingForm, {
   type TastingEditFormSubmitData,
 } from "@peated/web/features/tastings/tastingForm";
@@ -45,7 +46,6 @@ import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
 import { Plus } from "lucide-react";
 import { useRouter, useSearchParams } from "next/navigation";
 import { useRef, useState } from "react";
-import { BadgeAwardMessage } from "../../addBottle/badgeAwardMessage.stylex";
 
 const TITLE = "Finish tasting";
 // Identification runs in the background; check back while it is pending.
@@ -203,14 +203,7 @@ function TastingDraftFlowContent({ draftId }: { draftId: string }) {
       save: () => saveDetails(draft, data),
       publish: () => publishMutation.mutateAsync({ draft: draftId }),
     });
-    for (const award of awards) {
-      if (award.level != award.prevLevel && award.level) {
-        flash(
-          <BadgeAwardMessage badge={award.badge} level={award.level} />,
-          "info",
-        );
-      }
-    }
+    flashBadgeAwards(flash, awards);
     // Every mutation refreshes all queries, and the posted draft no longer
     // exists, so stop showing it while the tasting opens.
     setPosted(true);
@@ -322,8 +315,6 @@ function TastingDraftDetails({
   // swapping the form for a loading screen would reset its step.
   return (
     <TastingForm
-      // Remount when the Bottle changes so its suggestions reset.
-      key={bottle.id}
       initialData={{
         bottle,
         color: draft.color,
