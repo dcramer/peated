@@ -1,3 +1,5 @@
+import { formatBottleDisplayName } from "@peated/server/lib/bottleDisplayName";
+import type { Outputs } from "@peated/server/orpc/router";
 import * as stylex from "@stylexjs/stylex";
 import type { ReactNode } from "react";
 
@@ -7,37 +9,74 @@ import {
   hasVisibleKeyFacts,
   type KeyFactList,
 } from "@peated/web/components/catalogDetails.stylex";
+import { EntityLinks } from "@peated/web/components/entityLinks";
 import type { BottleRatingSummaryProps } from "@peated/web/components/scoring.stylex";
 import { BottleRatingSummary } from "@peated/web/components/scoring.stylex";
+import { getBottleHeaderSpecs } from "@peated/web/lib/bottleMetadata";
+import { getEntityUrl } from "@peated/web/lib/urls";
 import { colors, effects, space } from "../../styles/tokens.stylex";
 import { PageHeader } from "./pageLayout.stylex";
 
 const NARROW = "@media (max-width: 900px)";
 const PHONE = "@media (max-width: 480px)";
 
+type Bottle = Outputs["tastings"]["details"]["bottle"];
+
 export type BottlePageHeaderProps = {
   actions?: ReactNode;
+  /** Fills the ratings column when a page rates the bottle another way, such as one member's tasting. */
+  aside?: ReactNode;
   brand: string;
   brandHref?: string;
   metadata?: ReactNode;
   menu?: ReactNode;
   name: string;
+  /** Links the name to the bottle page when the header appears on another page. */
+  nameHref?: string;
   rating?: BottleRatingSummaryProps | null;
   specs?: KeyFactList | null;
 };
 
+/** Derives the brand, name, distillers, and key facts every bottle header shows. */
+export function getBottleHeaderIdentity(
+  bottle: Bottle,
+): Pick<
+  BottlePageHeaderProps,
+  "brand" | "brandHref" | "metadata" | "name" | "specs"
+> {
+  const name = formatBottleDisplayName(bottle, { includeBrand: false });
+  return {
+    brand: bottle.brand.shortName || bottle.brand.name,
+    brandHref: getEntityUrl(bottle.brand),
+    metadata: bottle.distillers.length ? (
+      <EntityLinks entities={bottle.distillers} />
+    ) : null,
+    name,
+    specs: getBottleHeaderSpecs(bottle, name),
+  };
+}
+
 /** Presents a bottle's catalog identity, member actions, and community ratings. */
 export function BottlePageHeader({
   actions,
+  aside,
   brand,
   brandHref,
   metadata,
   menu,
   name,
+  nameHref,
   rating,
   specs,
 }: BottlePageHeaderProps) {
-  const hasRatings = Boolean(rating);
+  // The wrapper shrinks to its content so an aside's own auto margins cannot
+  // override the column's alignment.
+  const ratings = rating ? (
+    <BottleRatingSummary {...rating} />
+  ) : aside ? (
+    <div {...stylex.props(styles.aside)}>{aside}</div>
+  ) : null;
+  const hasRatings = Boolean(ratings);
 
   return (
     <div {...stylex.props(styles.root, hasRatings && styles.rootWithRatings)}>
@@ -57,22 +96,24 @@ export function BottlePageHeader({
               <AppLink
                 href={brandHref}
                 title={brand}
-                {...stylex.props(styles.brand)}
+                {...stylex.props(styles.titleLink)}
               >
                 {brand}
               </AppLink>
             ) : (
               <span title={brand}>{brand}</span>
             )}{" "}
-            {name}
+            {nameHref ? (
+              <AppLink href={nameHref} {...stylex.props(styles.titleLink)}>
+                {name}
+              </AppLink>
+            ) : (
+              name
+            )}
           </>
         }
       />
-      {rating ? (
-        <div {...stylex.props(styles.ratings)}>
-          <BottleRatingSummary {...rating} />
-        </div>
-      ) : null}
+      {ratings ? <div {...stylex.props(styles.ratings)}>{ratings}</div> : null}
     </div>
   );
 }
@@ -92,15 +133,19 @@ const styles = stylex.create({
     },
     columnGap: space.x6,
   },
-  brand: {
+  titleLink: {
     outline: "none",
     color: {
       default: "inherit",
       ":hover": colors.accentDeep,
+      ":active": colors.accentDeep,
+      ":focus-visible": colors.accentDeep,
     },
     textDecorationLine: {
       default: "none",
       ":hover": "underline",
+      ":active": "underline",
+      ":focus-visible": "underline",
     },
     textDecorationThickness: "1px",
     textUnderlineOffset: "3px",
@@ -119,5 +164,9 @@ const styles = stylex.create({
     justifyItems: { default: "stretch", [PHONE]: "center" },
     paddingTop: { default: space.x4, [NARROW]: 0 },
     paddingBottom: { default: space.x4, [NARROW]: 0 },
+  },
+  aside: {
+    display: "flex",
+    justifySelf: { default: "end", [PHONE]: "center" },
   },
 });
