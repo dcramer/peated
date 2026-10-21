@@ -163,6 +163,15 @@ describe("bottle metadata", () => {
     ).toBeNull();
   });
 
+  it("falls back to the cask number when the name prints the batch", () => {
+    expect(
+      getBottleHeaderSpecs(
+        { ...headerBottle, caskNumber: "77", edition: "Batch 3" },
+        "Single Cask Batch 3",
+      ),
+    ).toEqual([{ label: "Cask", value: "77" }]);
+  });
+
   it("matches a printed year only as a whole number", () => {
     expect(
       getBottleHeaderSpecs(

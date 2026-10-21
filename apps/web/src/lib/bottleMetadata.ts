@@ -50,21 +50,21 @@ function getReleaseMarkerFact(
   bottle: BottleHeaderSpecs,
   name: string,
 ): KeyFact | null {
-  if (bottle.edition && isBatchEdition(bottle.edition)) {
-    return nameIncludes(name, bottle.edition)
-      ? null
-      : {
-          label: "Batch",
-          value: bottle.edition.replace(
-            /^batch(?:\s+(?:no\.?|number))?\s+/iu,
-            "",
-          ),
-        };
+  if (
+    bottle.edition &&
+    isBatchEdition(bottle.edition) &&
+    !nameIncludes(name, bottle.edition)
+  ) {
+    return {
+      label: "Batch",
+      value: bottle.edition.replace(/^batch(?:\s+(?:no\.?|number))?\s+/iu, ""),
+    };
   }
-  if (bottle.caskNumber) {
-    return nameIncludes(name, bottle.caskNumber, CASK_PREFIX)
-      ? null
-      : { label: "Cask", value: bottle.caskNumber };
+  if (
+    bottle.caskNumber &&
+    !nameIncludes(name, bottle.caskNumber, CASK_PREFIX)
+  ) {
+    return { label: "Cask", value: bottle.caskNumber };
   }
   return null;
 }
