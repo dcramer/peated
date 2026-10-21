@@ -172,8 +172,11 @@ export async function classifyBottleReference(
   return (await runBottleReference(input)).result;
 }
 
-export async function runBottleReference(input: ClassifyBottleReferenceInput) {
-  return await runBottleReferenceForWorkload(input, "application");
+export async function runBottleReference(
+  input: ClassifyBottleReferenceInput,
+  options?: BottleClassifierRunOptions,
+) {
+  return await runBottleReferenceForWorkload(input, "application", options);
 }
 
 export async function runScrapedBottleReference(

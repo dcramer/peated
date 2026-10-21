@@ -175,6 +175,7 @@ best-effort attachment.
   keeps the local preview and offers search or retry.
 - Low-confidence, review-only, and `no_match` outcomes route to manual search or
   manual creation rather than forcing a semantic decision.
+- A bottle lookup that runs out of time returns the label facts with no match.
 - An expired or foreign pending image is rejected before durable creation.
 - Catalog-image promotion never overwrites an existing Bottle image.
 - A tasting-image copy failure leaves a valid tasting and produces an
@@ -221,6 +222,12 @@ a spent AI budget, connection failures, timeouts, and rate limits return
 `SERVICE_UNAVAILABLE`.
 Other failures remain server errors. Uploaded photos keep their normal expiry.
 
+The bottle lookup after label reading may run for 3 minutes. This bounds the
+model cost of one photo. When it runs out of time, the result has no match and
+keeps the label facts, so the form shows what it read and offers search or a
+new bottle. The trace marks it with `photo_identification.lookup_timed_out`.
+
 The form stops waiting after 10 minutes and offers search or another upload.
-Starting over or leaving cancels the browser request and ignores late results;
-work already running on the server may continue.
+Starting over or leaving cancels the browser request and ignores late results.
+The server stops the bottle lookup when the request closes; label reading
+already running may still finish.
