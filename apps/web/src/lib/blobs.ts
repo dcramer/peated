@@ -4,6 +4,8 @@ const IMAGE_BLOB_TYPE = "image/webp";
 const IMAGE_BLOB_QUALITY = 0.9;
 const MAX_IMAGE_EDGE = 1600;
 const UPLOAD_PHOTO_TYPE = "image/jpeg";
+// JPEG drops transparency and animation, so these upload unchanged.
+const KEEP_FORMAT_TYPES = new Set(["image/gif", "image/png", "image/webp"]);
 const UPLOAD_PHOTO_QUALITY = 0.9;
 
 type ImageProcessor = {
@@ -65,10 +67,12 @@ async function loadImage(file: Blob): Promise<HTMLImageElement> {
 /**
  * Shrinks a photo to fit within 1600 × 1600 before upload, so a full-size phone
  * photo uploads quickly on a slow connection. The server keeps the same bounds,
- * so the label reader loses nothing. Best-effort: a photo the browser cannot
- * draw uploads unchanged, and the server decides whether it is usable.
+ * so the label reader loses nothing. Best-effort: a PNG, GIF, or WebP file, or
+ * a photo the browser cannot draw, uploads unchanged and the server decides
+ * whether it is usable.
  */
 export async function shrinkPhotoForUpload(file: File): Promise<File> {
+  if (KEEP_FORMAT_TYPES.has(file.type)) return file;
   const image = await loadImage(file).catch(() => null);
   if (!image) return file;
 
