@@ -28,7 +28,7 @@ pnpm cli users create qa@example.com password123 --verified --accept-terms --if-
 ```
 
 Add `--admin` for administrator or moderator checks. Use the normal login flow:
-`/login?redirectTo=/addBottle` → `Sign in with Email` →
+`/login?redirectTo=/addBottle` → `Continue with email` →
 `Or sign in with a password`.
 
 Do not build session cookies by hand. Use a real local user so permission and
