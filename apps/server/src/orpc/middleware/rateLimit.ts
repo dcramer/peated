@@ -1,3 +1,4 @@
+import { AuditEvent, auditLog } from "@peated/server/lib/auditLog";
 import { z } from "zod";
 import { base } from "..";
 import { getConnection } from "../../worker/redis";
@@ -78,6 +79,17 @@ export function createRateLimit<TContext extends Context = Context>(
       const count = await incrementCounter(key, windowMs);
 
       if (count > maxRequests) {
+        // Audit only the first blocked request in each window so a flood of
+        // retries cannot flood the audit log.
+        if (count === maxRequests + 1) {
+          auditLog({
+            event: AuditEvent.RATE_LIMIT_EXCEEDED,
+            userId: context.user?.id,
+            ip: context.ip,
+            userAgent: context.userAgent,
+            metadata: { limit: keyPrefix },
+          });
+        }
         throw errors.FORBIDDEN({
           message: "Too many requests. Please try again later.",
         });
