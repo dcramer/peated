@@ -121,7 +121,11 @@ export default function BottleResolver({
   const photoIdentificationCreateMutation = useMutation(
     orpc.tastings.photoIdentificationCreate.mutationOptions(),
   );
-  const isIdentifying = photoIdentificationMutation.isPending;
+  // Shrinking the photo happens before the request starts, so it counts as
+  // identifying too; otherwise the resolver shows nothing until the upload.
+  const [isPreparingPhoto, setIsPreparingPhoto] = useState(false);
+  const isIdentifying =
+    isPreparingPhoto || photoIdentificationMutation.isPending;
 
   useEffect(() => {
     previewUrlRef.current = previewUrl;
@@ -274,6 +278,7 @@ export default function BottleResolver({
     setPhotoResult(null);
     setPhotoIdentificationTraceId(null);
     setPhotoFailureTrace(null);
+    setIsPreparingPhoto(true);
 
     const nextPreviewUrl = URL.createObjectURL(file);
     replacePreviewUrl(nextPreviewUrl);
@@ -344,8 +349,10 @@ export default function BottleResolver({
       }
     } finally {
       clearTimeout(timeout);
-      if (photoRequestRef.current === controller)
+      if (photoRequestRef.current === controller) {
         photoRequestRef.current = null;
+        setIsPreparingPhoto(false);
+      }
       logInfo("Bottle photo submission finished", {
         extra: {
           "photo_identification.idempotency_key": idempotencyKey,
@@ -376,6 +383,7 @@ export default function BottleResolver({
     photoRequestRef.current?.abort();
     photoRequestRef.current = null;
     photoIdentificationMutation.reset();
+    setIsPreparingPhoto(false);
     setError(null);
     setPhotoError(null);
     setPhotoResult(null);
