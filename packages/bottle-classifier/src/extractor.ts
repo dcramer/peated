@@ -2,7 +2,10 @@ import { createHash } from "node:crypto";
 import type OpenAI from "openai";
 import { zodTextFormat } from "openai/helpers/zod";
 import { z } from "zod";
-import { BottleExtractedDetailsSchema } from "./classifierTypes";
+import {
+  BottleExtractedDetailsSchema,
+  hasValidReleaseDate,
+} from "./classifierTypes";
 import { buildWhiskyLabelExtractorInstructions } from "./extractorInstructions";
 import {
   getStableOpenAISettings,
@@ -79,6 +82,26 @@ export function getImageLabelExtractionVersion({
       }),
     )
     .digest("hex");
+}
+
+function parseResponse(outputText: string) {
+  const output = JSON.parse(outputText);
+  const result = output?.result;
+  // Release month and day stay unknown unless they form a real date with the
+  // release year. Models sometimes copy a bottling date into them; drop that
+  // date instead of failing the whole label reading.
+  if (
+    result &&
+    !hasValidReleaseDate(
+      result.release_year,
+      result.release_month,
+      result.release_day,
+    )
+  ) {
+    result.release_month = null;
+    result.release_day = null;
+  }
+  return ResponseSchema.parse(output);
 }
 
 export function createWhiskyLabelExtractor({
@@ -202,9 +225,7 @@ export async function extractFromImageWithMetadata({
   };
   onMetadata?.(metadata);
 
-  const { result, rawLabelText } = ResponseSchema.parse(
-    JSON.parse(response.output_text),
-  );
+  const { result, rawLabelText } = parseResponse(response.output_text);
   return {
     result,
     rawLabelText,
@@ -243,6 +264,6 @@ export async function extractFromText({
     ...getStableOpenAISettings(model, reasoningEffort),
   });
 
-  const { result } = ResponseSchema.parse(JSON.parse(response.output_text));
+  const { result } = parseResponse(response.output_text);
   return result;
 }
