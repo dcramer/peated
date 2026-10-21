@@ -48,8 +48,11 @@ a draft's Bottle.
 wins. Every field is replaced, and an omitted field is cleared, except the
 photo (see below).
 
-- Tags and friends are checked the same way as for a tasting. A chosen Bottle
-  must be active.
+- Tags are checked the same way as for a tasting. A chosen Bottle must be
+  active.
+- Friends the member no longer follows are dropped instead of rejected. A
+  draft can wait for weeks, and a friendship that ends meanwhile must not stop
+  the member from saving or posting it. `POST /tastings` still rejects them.
 - If the member already posted this draft, the save returns `409 CONFLICT`
   with the tasting's ID in `data.tasting`. A stale retry from another device
   cannot bring a posted draft back.
@@ -129,8 +132,9 @@ member who has accepted the Terms of Service.
 1. If the draft is gone, the server returns the member's tasting that was
    posted from it, with no awards. If there is none, it returns not found.
    Clients retry a publish with the same draft ID after a lost response.
-2. The draft needs a Bottle. Merged Bottles are resolved, and tags and friends
-   are checked again, as `POST /tastings` does.
+2. The draft needs a Bottle. Merged Bottles are resolved and tags are checked
+   again, as `POST /tastings` does. Friends the member no longer follows are
+   left off the tasting.
 3. In one transaction the server locks the draft, copies the photo to
    `tastings/draft-<draft ID>.<ext>`, inserts the tasting with the draft's
    `tastedAt`, the draft ID as its `idempotencyKey`, and the photo, awards

@@ -229,29 +229,30 @@ describe("POST /tasting-drafts/{draft}/publish", () => {
     expect(existsSync(storedFile(draft.imageUrl!))).toBe(true);
   });
 
-  test("rejects friends the member no longer follows", async ({
+  test("leaves off friends the member no longer follows", async ({
     defaults,
     fixtures,
   }) => {
     const bottle = await fixtures.Bottle();
-    const stranger = await fixtures.User();
+    const friend = await fixtures.User();
+    await fixtures.Follow({
+      fromUserId: defaults.user.id,
+      toUserId: friend.id,
+    });
+    // Saved while followed; the friendship ended before posting.
+    const former = await fixtures.User();
     const draft = await fixtures.TastingDraft({
       createdById: defaults.user.id,
       bottleId: bottle.id,
-      friends: [stranger.id],
+      friends: [former.id, friend.id],
     });
 
-    const error = await waitError(() =>
-      routerClient.tastingDrafts.publish(
-        { draft: draft.id },
-        { context: { user: defaults.user } },
-      ),
+    const { tasting } = await routerClient.tastingDrafts.publish(
+      { draft: draft.id },
+      { context: { user: defaults.user } },
     );
 
-    expect(error).toMatchInlineSnapshot(
-      `[Error: Friends must all be active relationships.]`,
-    );
-    expect(await db.select().from(tastings)).toEqual([]);
+    expect(tasting.friends.map(({ id }) => id)).toEqual([friend.id]);
   });
 
   test("returns not found for a draft that was never posted", async ({

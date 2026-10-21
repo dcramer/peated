@@ -11,7 +11,7 @@ import {
   findTastingByIdempotencyKey,
   insertTasting,
 } from "@peated/server/orpc/routes/tastings/insertTasting";
-import { validateFriends } from "@peated/server/orpc/validators/friends";
+import { keepFollowedFriends } from "@peated/server/orpc/validators/friends";
 import { validateTags } from "@peated/server/orpc/validators/tags";
 import {
   BadgeAwardSchema,
@@ -34,7 +34,7 @@ export default procedure
     path: "/tasting-drafts/{draft}/publish",
     summary: "Publish tasting draft",
     description:
-      "Post one of your tasting drafts as a tasting and delete the draft. The draft needs a Bottle. The bottle hint is not kept. Repeating the request after it succeeded returns the same tasting with no awards; a draft that was never posted returns not found.",
+      "Post one of your tasting drafts as a tasting and delete the draft. The draft needs a Bottle. The bottle hint is not kept, and friends you no longer follow are left off the tasting. Repeating the request after it succeeded returns the same tasting with no awards; a draft that was never posted returns not found.",
     operationId: "publishTastingDraft",
   })
   .input(TastingDraftIdInputSchema)
@@ -76,7 +76,9 @@ export default procedure
       });
     }
     const tags = await validateTags(draft.tags);
-    await validateFriends(userId, draft.friends);
+    // Friends the member stopped following are dropped, not rejected; see
+    // keepFollowedFriends.
+    const friends = await keepFollowedFriends(userId, draft.friends);
 
     const published = await db.transaction(async (tx) => {
       await lockMemberTastingDrafts(tx, userId);
@@ -123,7 +125,7 @@ export default procedure
             servingStyle: locked.servingStyle,
             color: locked.color,
             tags,
-            friends: locked.friends,
+            friends,
           },
           context.user,
         );
