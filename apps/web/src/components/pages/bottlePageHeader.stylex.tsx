@@ -69,7 +69,13 @@ export function BottlePageHeader({
   rating,
   specs,
 }: BottlePageHeaderProps) {
-  const ratings = rating ? <BottleRatingSummary {...rating} /> : aside;
+  // The wrapper shrinks to its content so an aside's own auto margins cannot
+  // override the column's alignment.
+  const ratings = rating ? (
+    <BottleRatingSummary {...rating} />
+  ) : aside ? (
+    <div {...stylex.props(styles.aside)}>{aside}</div>
+  ) : null;
   const hasRatings = Boolean(ratings);
 
   return (
@@ -132,10 +138,14 @@ const styles = stylex.create({
     color: {
       default: "inherit",
       ":hover": colors.accentDeep,
+      ":active": colors.accentDeep,
+      ":focus-visible": colors.accentDeep,
     },
     textDecorationLine: {
       default: "none",
       ":hover": "underline",
+      ":active": "underline",
+      ":focus-visible": "underline",
     },
     textDecorationThickness: "1px",
     textUnderlineOffset: "3px",
@@ -154,5 +164,9 @@ const styles = stylex.create({
     justifyItems: { default: "stretch", [PHONE]: "center" },
     paddingTop: { default: space.x4, [NARROW]: 0 },
     paddingBottom: { default: space.x4, [NARROW]: 0 },
+  },
+  aside: {
+    display: "flex",
+    justifySelf: { default: "end", [PHONE]: "center" },
   },
 });
