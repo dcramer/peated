@@ -11,6 +11,8 @@ const brand = {
   peatedId: "E0007",
   name: "Springbank",
   shortName: null,
+  pronunciation: null,
+  pronunciationIpa: null,
   kind: "brand",
   status: null,
   ownerId: null,

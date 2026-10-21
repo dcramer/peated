@@ -26,6 +26,8 @@ function buildBottleEntityInput(
       ownerId: null,
       description: null,
       shortName: null,
+      pronunciation: null,
+      pronunciationIpa: null,
       location: null,
       address: null,
       yearEstablished: null,

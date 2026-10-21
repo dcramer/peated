@@ -83,6 +83,46 @@ describe("POST /entities", () => {
     expect(error).toMatchObject({ status: 400 });
   });
 
+  test("creates an entity with a pronunciation", async ({ defaults }) => {
+    const data = await routerClient.entities.create(
+      {
+        name: "Glen Garioch",
+        kind: "distillery",
+        pronunciation: "glen GEER-ee",
+        pronunciationIpa: "ɡlɛn ˈɡɪəri",
+      },
+      { context: { user: defaults.user } },
+    );
+
+    expect(data).toMatchObject({
+      pronunciation: "glen GEER-ee",
+      pronunciationIpa: "ɡlɛn ˈɡɪəri",
+    });
+    await expect(
+      db.query.entities.findFirst({ where: eq(entities.id, data.id) }),
+    ).resolves.toMatchObject({
+      pronunciation: "glen GEER-ee",
+      pronunciationIpa: "ɡlɛn ˈɡɪəri",
+    });
+  });
+
+  test("rejects a pronunciation without a stressed syllable", async ({
+    defaults,
+  }) => {
+    const error = await waitError(
+      routerClient.entities.create(
+        {
+          name: "Glen Garioch",
+          kind: "distillery",
+          pronunciation: "glen geer-ee",
+        },
+        { context: { user: defaults.user } },
+      ),
+    );
+
+    expect(error).toMatchObject({ status: 400 });
+  });
+
   test("creates an entity with a current owner", async ({
     fixtures,
     defaults,
