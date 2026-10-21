@@ -52,6 +52,19 @@ function getEntityFacts(entity: Entity): [FactListItem, ...FactListItem[]] {
       ) : null,
     },
     { label: "Short name", value: entity.shortName },
+    {
+      label: "Pronunciation",
+      value:
+        entity.pronunciation || entity.pronunciationIpa ? (
+          <>
+            {entity.pronunciation}
+            {entity.pronunciation && entity.pronunciationIpa ? " " : null}
+            {entity.pronunciationIpa ? (
+              <span lang="und-fonipa">/{entity.pronunciationIpa}/</span>
+            ) : null}
+          </>
+        ) : null,
+    },
   ];
 }
 

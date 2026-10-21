@@ -48,6 +48,8 @@ export const entities = pgTable(
     normalizedShortName: text("normalized_short_name").generatedAlwaysAs(
       sql`regexp_replace(lower(coalesce(short_name, '')), '[^a-z0-9]+', '', 'g')`,
     ),
+    pronunciation: text("pronunciation"),
+    pronunciationIpa: text("pronunciation_ipa"),
 
     ownerId: bigint("owner_id", { mode: "number" }),
 
