@@ -76,7 +76,7 @@ function getAgeFact(bottle: BottleHeaderSpecs, name: string): KeyFact | null {
 // fact to the back of the line, so this stays simple.
 function nameIncludes(name: string, text: string) {
   const escaped = text
-    .replace(/^(?:cask\s*)?(?:no\.?\s*|#\s*)?/iu, "")
+    .replace(/^(?:cask\s*)?(?:no\.?|#)?\s*(?=\d)/iu, "")
     .replace(/[.*+?^${}()|[\]\\]/gu, "\\$&");
   return new RegExp(
     `(?:^|[^\\p{L}\\p{N}])${escaped}(?![\\p{L}\\p{N}])`,

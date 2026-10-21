@@ -169,6 +169,18 @@ describe("bottle metadata", () => {
     ]);
   });
 
+  it("strips a cask marker only before a number", () => {
+    expect(
+      getBottleHeaderSpecs(
+        { ...headerBottle, caskNumber: "Nordic 5", category: "rye" },
+        "Rdic 5",
+      ),
+    ).toEqual([
+      { label: "Cask", value: "Nordic 5" },
+      { label: "Category", value: "Rye" },
+    ]);
+  });
+
   it("matches the name by whole words only", () => {
     expect(
       getBottleHeaderSpecs(
