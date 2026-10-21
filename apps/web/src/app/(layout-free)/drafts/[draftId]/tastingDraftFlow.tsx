@@ -31,6 +31,7 @@ import { getFormErrorMessage } from "@peated/web/lib/formHelpers";
 import type { ImageUploadValue } from "@peated/web/lib/imageUpload";
 import { useORPC } from "@peated/web/lib/orpc/context";
 import { isORPCAccountRedirectError } from "@peated/web/lib/orpc/link";
+import { formQueryOptions } from "@peated/web/lib/orpc/query";
 import {
   buildTastingDraftSaveInput,
   getExistingBottleConflictId,
@@ -76,13 +77,14 @@ function TastingDraftFlowContent({ draftId }: { draftId: string }) {
   const queryClient = useQueryClient();
   const { flash } = useFlashMessages();
   const draftHref = getTastingDraftHref({ id: draftId });
-  const draftQueryOptions = orpc.tastingDrafts.details.queryOptions({
-    input: { draft: draftId },
-  });
+  // Load a fresh copy on every visit and keep it while the member edits: the
+  // app refreshes all queries after any change, and a stale cached draft
+  // would be saved back over newer edits, or recreate a deleted draft.
+  const draftQueryOptions = formQueryOptions(
+    orpc.tastingDrafts.details.queryOptions({ input: { draft: draftId } }),
+  );
   const draftQuery = useQuery({
     ...draftQueryOptions,
-    retry: false,
-    refetchOnWindowFocus: false,
     refetchInterval: (query) => {
       const draft = query.state.data;
       return draft && !draft.bottle && draft.identification.status === "pending"
@@ -204,8 +206,7 @@ function TastingDraftFlowContent({ draftId }: { draftId: string }) {
       publish: () => publishMutation.mutateAsync({ draft: draftId }),
     });
     flashBadgeAwards(flash, awards);
-    // Every mutation refreshes all queries, and the posted draft no longer
-    // exists, so stop showing it while the tasting opens.
+    // The draft no longer exists; stop showing its form while the tasting opens.
     setPosted(true);
     router.push(getTastingUrl(tasting));
   }
@@ -226,7 +227,11 @@ function TastingDraftFlowContent({ draftId }: { draftId: string }) {
     );
   }
 
-  if (draftQuery.isError) {
+  const draft = draftQuery.data;
+
+  // Only a failed first load shows this. A failed refresh, such as one check
+  // while identifying, keeps the draft on screen so no edits are lost.
+  if (!draft) {
     const gone = isORPCNotFoundError(draftQuery.error);
     return (
       <WorkflowScreen onClose={() => router.push("/drafts")} title={TITLE}>
@@ -252,8 +257,6 @@ function TastingDraftFlowContent({ draftId }: { draftId: string }) {
       </WorkflowScreen>
     );
   }
-
-  const draft = draftQuery.data;
 
   if (draft.bottle && !changingBottle && choiceBottleId === null) {
     return (

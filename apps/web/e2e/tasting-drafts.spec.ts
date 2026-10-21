@@ -32,6 +32,10 @@ test("finishes a draft by confirming its Bottle and posting it", async ({
 
   const notes = page.getByLabel("What stood out?");
   await notes.fill(tastingDraftNotes);
+  // Changing the Bottle saves the form first, so nothing typed is lost.
+  await page.getByRole("button", { name: "Change bottle" }).click();
+  await page.getByRole("button", { name: "Keep this bottle" }).click();
+  await expect(notes).toHaveValue(tastingDraftNotes);
   await page.getByRole("button", { name: "Continue" }).click();
   await page.getByRole("button", { name: "Continue" }).click();
   const rating = page

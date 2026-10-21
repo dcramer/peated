@@ -299,6 +299,12 @@ export default function TastingForm(
     }
   }
 
+  // Leaving the form drops what it holds, so save the draft first.
+  async function changeDraftBottle() {
+    if (props.mode !== "draft") return;
+    if (await saveDraft()) props.onChangeBottle();
+  }
+
   const submitReview: SubmitHandler<MemberReviewFormFields> = async (
     fields,
   ) => {
@@ -431,7 +437,7 @@ export default function TastingForm(
             imageUrl={photoPreview ?? initialData.bottle.imageUrl}
             onChange={
               props.mode === "draft" && !saving
-                ? props.onChangeBottle
+                ? () => void changeDraftBottle()
                 : undefined
             }
           />
