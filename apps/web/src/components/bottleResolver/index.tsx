@@ -8,6 +8,7 @@ import {
   FormStack,
 } from "@peated/web/components/formLayout.stylex";
 import { WorkflowScreen } from "@peated/web/components/workflowScreen.stylex";
+import { shrinkPhotoForUpload } from "@peated/web/lib/blobs";
 import { logError, logInfo } from "@peated/web/lib/log";
 import { useORPC } from "@peated/web/lib/orpc/context";
 import {
@@ -120,7 +121,11 @@ export default function BottleResolver({
   const photoIdentificationCreateMutation = useMutation(
     orpc.tastings.photoIdentificationCreate.mutationOptions(),
   );
-  const isIdentifying = photoIdentificationMutation.isPending;
+  // Shrinking the photo happens before the request starts, so it counts as
+  // identifying too; otherwise the resolver shows nothing until the upload.
+  const [isPreparingPhoto, setIsPreparingPhoto] = useState(false);
+  const isIdentifying =
+    isPreparingPhoto || photoIdentificationMutation.isPending;
 
   useEffect(() => {
     previewUrlRef.current = previewUrl;
@@ -262,6 +267,7 @@ export default function BottleResolver({
     let timedOut = false;
     let errorCode: string | null = null;
     let suggestedNextStep: string | null = null;
+    let uploadSize: number | null = null;
     // Stop waiting after two minutes, including the upload and bottle lookup.
     const timeout = setTimeout(() => {
       timedOut = true;
@@ -272,6 +278,7 @@ export default function BottleResolver({
     setPhotoResult(null);
     setPhotoIdentificationTraceId(null);
     setPhotoFailureTrace(null);
+    setIsPreparingPhoto(true);
 
     const nextPreviewUrl = URL.createObjectURL(file);
     replacePreviewUrl(nextPreviewUrl);
@@ -286,8 +293,10 @@ export default function BottleResolver({
       },
     });
     try {
+      const upload = await shrinkPhotoForUpload(file, 1600);
+      uploadSize = upload.size;
       const result = await photoIdentificationMutation.mutateAsync({
-        file,
+        file: upload,
         idempotencyKey,
         responseTraceContext,
         signal: controller.signal,
@@ -340,8 +349,10 @@ export default function BottleResolver({
       }
     } finally {
       clearTimeout(timeout);
-      if (photoRequestRef.current === controller)
+      if (photoRequestRef.current === controller) {
         photoRequestRef.current = null;
+        setIsPreparingPhoto(false);
+      }
       logInfo("Bottle photo submission finished", {
         extra: {
           "photo_identification.idempotency_key": idempotencyKey,
@@ -355,6 +366,7 @@ export default function BottleResolver({
             responseTraceContext.sentryTraceId,
           "photo_identification.file_size": file.size,
           "photo_identification.file_type": file.type || "unknown",
+          "photo_identification.upload_size": uploadSize,
         },
       });
     }
@@ -371,6 +383,7 @@ export default function BottleResolver({
     photoRequestRef.current?.abort();
     photoRequestRef.current = null;
     photoIdentificationMutation.reset();
+    setIsPreparingPhoto(false);
     setError(null);
     setPhotoError(null);
     setPhotoResult(null);
