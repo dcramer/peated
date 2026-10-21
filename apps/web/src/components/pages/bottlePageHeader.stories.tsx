@@ -47,6 +47,10 @@ const meta = {
         very_good: 12,
       },
     },
+    specs: [
+      { label: "ABV", value: "52%" },
+      { label: "Category", value: "Single Malt" },
+    ],
   },
   argTypes: {
     actions: { control: false },
@@ -72,9 +76,27 @@ export const TastingOnly: Story = {
     brandHref: "/entities/1697",
     metadata: "New Riff Distilling",
     name: "6-year-old Malted Rye",
+    specs: [
+      { label: "ABV", value: "50%" },
+      { label: "Category", value: "Rye" },
+    ],
     rating: {
       tastingCounts: { very_good: 2 },
     },
+  },
+};
+
+export const ReleaseFacts: Story = {
+  args: {
+    brand: "Elijah Craig",
+    brandHref: "/entities/1200",
+    metadata: "Heaven Hill Distillery",
+    name: "Barrel Proof",
+    specs: [
+      { label: "ABV", value: "68.3%" },
+      { label: "Batch", value: "C923" },
+      { label: "Age", value: "12 years" },
+    ],
   },
 };
 
@@ -96,5 +118,6 @@ export const ThinData: Story = {
     menu: null,
     name: "Independent bottling",
     rating: null,
+    specs: undefined,
   },
 };
