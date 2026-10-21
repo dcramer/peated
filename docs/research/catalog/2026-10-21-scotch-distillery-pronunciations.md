@@ -232,7 +232,7 @@ Several guides could not be read here: Wine Enthusiast, The Scotsman, whisky.com
 
 ## Records stored as distilleries that are not production sites
 
-These need a kind review or cleanup. Nothing was changed. Mc'nean Distillery (E203044) looks like a misspelled duplicate of Nc'nean (E1198), and Harris Whisky looks like a duplicate of Isle of Harris Distillery (E203043).
+The [kind cleanup](./2026-10-21-scotch-distillery-kind-cleanup.md) changed, merged, or deleted most of these records and lists the rest.
 
 | Entity  | Name                             | Reason                                                                                                                                                                               |
 | ------- | -------------------------------- | ------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------ |
