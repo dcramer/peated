@@ -22,6 +22,16 @@ describe("EntityPronunciation", () => {
     expect(html).toContain('lang="und-fonipa"');
   });
 
+  test("reads a respelling without stress as written", () => {
+    const html = renderToStaticMarkup(
+      <EntityPronunciation
+        entity={{ pronunciation: "mort-lack", pronunciationIpa: null }}
+      />,
+    );
+
+    expect(textOf(html)).toBe("Pronounced mort-lack");
+  });
+
   test("shows IPA alone when there is no respelling", () => {
     const html = renderToStaticMarkup(
       <EntityPronunciation

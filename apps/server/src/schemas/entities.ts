@@ -21,14 +21,14 @@ const EntityShortNameSchema = z
   .describe("Abbreviated or short name for the entity");
 // Pronunciation rule (Entity schema): words are split by spaces and syllables
 // by hyphens. Each syllable is all lowercase or, when stressed, all capitals.
+// Stress is optional because many sources give the sounds without it.
 const RESPELLING_SYLLABLE_PATTERN =
   /^(?:[a-z']*[a-z][a-z']*|[A-Z']*[A-Z][A-Z']*)$/;
 
 export function isPronunciationRespelling(value: string) {
   const syllables = value.split(/[ -]/);
-  return (
-    syllables.every((syllable) => RESPELLING_SYLLABLE_PATTERN.test(syllable)) &&
-    syllables.some((syllable) => /[A-Z]/.test(syllable))
+  return syllables.every((syllable) =>
+    RESPELLING_SYLLABLE_PATTERN.test(syllable),
   );
 }
 
@@ -46,12 +46,12 @@ export const EntityPronunciationSchema = z
   .max(100)
   .refine(isPronunciationRespelling, {
     message:
-      'Use lowercase syllables with the stressed one in capitals, like "glen GEER-ee".',
+      'Use lowercase syllables, with a stressed syllable in capitals when known, like "glen GEER-ee".',
   })
   .nullable()
   .default(null)
   .describe(
-    'How to say the name in plain English: lowercase syllables joined by hyphens, with the stressed syllable in capitals, like "glen GEER-ee"',
+    'How to say the name in plain English: lowercase syllables joined by hyphens, with a stressed syllable in capitals when known, like "glen GEER-ee"',
   );
 
 export const EntityPronunciationIpaSchema = z

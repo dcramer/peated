@@ -106,7 +106,7 @@ describe("POST /entities", () => {
     });
   });
 
-  test("rejects a pronunciation without a stressed syllable", async ({
+  test("rejects a pronunciation with a mixed-case syllable", async ({
     defaults,
   }) => {
     const error = await waitError(
@@ -114,7 +114,7 @@ describe("POST /entities", () => {
         {
           name: "Glen Garioch",
           kind: "distillery",
-          pronunciation: "glen geer-ee",
+          pronunciation: "Glen Geer-ee",
         },
         { context: { user: defaults.user } },
       ),
