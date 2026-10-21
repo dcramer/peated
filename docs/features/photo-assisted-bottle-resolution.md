@@ -221,6 +221,6 @@ a spent AI budget, connection failures, timeouts, and rate limits return
 `SERVICE_UNAVAILABLE`.
 Other failures remain server errors. Uploaded photos keep their normal expiry.
 
-The form stops waiting after two minutes and offers search or another upload.
+The form stops waiting after 10 minutes and offers search or another upload.
 Starting over or leaving cancels the browser request and ignores late results;
 work already running on the server may continue.

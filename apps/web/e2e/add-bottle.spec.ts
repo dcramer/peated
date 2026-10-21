@@ -166,7 +166,7 @@ test.describe("Add Bottle", () => {
         exact: true,
       }),
     ).toBeVisible();
-    await page.clock.fastForward(120_001);
+    await page.clock.fastForward(600_001);
     await expect(
       page.getByText(
         "This is taking too long. Search by name or try again later.",

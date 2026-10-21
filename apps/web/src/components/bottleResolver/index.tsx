@@ -268,11 +268,11 @@ export default function BottleResolver({
     let errorCode: string | null = null;
     let suggestedNextStep: string | null = null;
     let uploadSize: number | null = null;
-    // Stop waiting after two minutes, including the upload and bottle lookup.
+    // Stop waiting after 10 minutes, including the upload and bottle lookup.
     const timeout = setTimeout(() => {
       timedOut = true;
       controller.abort();
-    }, 120_000);
+    }, 600_000);
     setError(null);
     setPhotoError(null);
     setPhotoResult(null);
