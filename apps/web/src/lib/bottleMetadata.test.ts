@@ -133,13 +133,13 @@ describe("bottle metadata", () => {
     ).toEqual([{ label: "Vintage", value: "1975" }]);
   });
 
-  it("keeps a labeled year and cask even when the name repeats them", () => {
+  it("moves a year or cask the name prints behind the other facts", () => {
     expect(
       getBottleHeaderSpecs(
         {
           ...headerBottle,
           abv: 43,
-          bottlingYear: 2003,
+          category: "single_malt",
           statedAge: 35,
           vintageYear: 1968,
         },
@@ -147,14 +147,38 @@ describe("bottle metadata", () => {
       ),
     ).toEqual([
       { label: "ABV", value: "43%" },
+      { label: "Category", value: "Single Malt" },
       { label: "Vintage", value: "1968" },
     ]);
     expect(
       getBottleHeaderSpecs(
-        { ...headerBottle, caskNumber: "1841", statedAge: 7 },
-        "Single Cask 2014 No.1841 7-year-old",
+        {
+          ...headerBottle,
+          abv: 56.1,
+          caskNumber: "#1841",
+          category: "single_malt",
+          noAgeStatement: true,
+          vintageYear: 2014,
+        },
+        "Single Cask 2014 No.1841",
       ),
-    ).toEqual([{ label: "Cask", value: "1841" }]);
+    ).toEqual([
+      { label: "ABV", value: "56.1%" },
+      { label: "Age", value: "NAS" },
+      { label: "Category", value: "Single Malt" },
+    ]);
+  });
+
+  it("matches the name by whole words only", () => {
+    expect(
+      getBottleHeaderSpecs(
+        { ...headerBottle, caskNumber: "12", vintageYear: 1984 },
+        "Cask 120 19841",
+      ),
+    ).toEqual([
+      { label: "Cask", value: "12" },
+      { label: "Vintage", value: "1984" },
+    ]);
   });
 
   it("returns nothing when no facts are known", () => {

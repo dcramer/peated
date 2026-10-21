@@ -72,25 +72,42 @@ function getAgeFact(bottle: BottleHeaderSpecs, name: string): KeyFact | null {
     : { label: "Age", value: `${bottle.statedAge} years` };
 }
 
+// Whole words only, so `12` is not found in `120`. A wrong match only moves a
+// fact to the back of the line, so this stays simple.
+function nameIncludes(name: string, text: string) {
+  const escaped = text
+    .replace(/^(?:cask\s*)?(?:no\.?\s*|#\s*)?/iu, "")
+    .replace(/[.*+?^${}()|[\]\\]/gu, "\\$&");
+  return new RegExp(
+    `(?:^|[^\\p{L}\\p{N}])${escaped}(?![\\p{L}\\p{N}])`,
+    "iu",
+  ).test(name);
+}
+
 /**
  * Bottle Presentation: the detailed header shows up to three facts, ranked by
  * how precisely they identify the release: ABV, batch or cask, age, one year,
- * then category to fill a spare slot. Missing facts leave no placeholder.
- * A batch, cask, or year the name repeats still shows: its label says what
- * the number means.
+ * then category to fill a spare slot. A batch, cask, or year the name already
+ * prints moves behind category, and missing facts leave no placeholder.
  */
 export function getBottleHeaderSpecs(
   bottle: BottleHeaderSpecs,
   name: string,
 ): KeyFactList | null {
+  const releaseMarker = getReleaseMarkerFact(bottle);
+  const year = getYearFact(bottle);
+  const inName = (fact: KeyFact | null) =>
+    fact !== null && nameIncludes(name, String(fact.value));
   const [first, second, third] = [
     bottle.abv === null ? null : { label: "ABV", value: formatAbv(bottle.abv) },
-    getReleaseMarkerFact(bottle),
+    inName(releaseMarker) ? null : releaseMarker,
     getAgeFact(bottle, name),
-    getYearFact(bottle),
+    inName(year) ? null : year,
     bottle.category
       ? { label: "Category", value: formatCategoryName(bottle.category) }
       : null,
+    inName(releaseMarker) ? releaseMarker : null,
+    inName(year) ? year : null,
   ].filter((fact): fact is KeyFact => fact !== null);
 
   if (!first) return null;
