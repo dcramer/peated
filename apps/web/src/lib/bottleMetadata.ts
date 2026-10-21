@@ -1,6 +1,5 @@
 import {
   formatAbv,
-  getBottleReleaseMetadata,
   isBatchEdition,
 } from "@peated/server/lib/bottleDisplayName";
 import { formatReleaseDate } from "@peated/server/lib/bottleRelease";
@@ -10,11 +9,6 @@ import type {
   KeyFact,
   KeyFactList,
 } from "@peated/web/components/catalogDetails.stylex";
-
-export type BottleReviewMetadata = Pick<
-  Bottle,
-  "abv" | "edition" | "releaseYear" | "statedAge" | "vintageYear"
->;
 
 type BottleReleasePlacement = Pick<
   Bottle,
@@ -122,15 +116,4 @@ export function getBottleReleasePlacement(bottle: BottleReleasePlacement) {
   return isBatchEdition(bottle.edition)
     ? { header: bottle.edition, details: releaseDate }
     : { header: releaseDate, details: null };
-}
-
-/** Returns the compact facts that distinguish one reviewed release from another. */
-export function getBottleReviewMetadata(bottle: BottleReviewMetadata) {
-  return [
-    bottle.statedAge === null ? null : `${bottle.statedAge} years`,
-    bottle.abv === null
-      ? null
-      : `${bottle.abv.toFixed(1).replace(/\.0$/, "")}% ABV`,
-    getBottleReleaseMetadata(bottle),
-  ].filter((value): value is string => Boolean(value));
 }

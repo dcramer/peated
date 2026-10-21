@@ -10,9 +10,9 @@ import {
 } from "@tanstack/react-query";
 import { useState, type FormEvent, type ReactNode } from "react";
 
-import { TextLink } from "..";
 import { useORPC } from "../../lib/orpc/context";
 import { getBottleUrlFromFullName } from "../../lib/urls";
+import { TextLink } from "../textLink.stylex";
 import { Timestamp } from "../timestamp";
 import { AdminButton } from "./adminButton.stylex";
 import {

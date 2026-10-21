@@ -1,6 +1,7 @@
 "use client";
 
 import {
+  formatAbv,
   formatBottleDisplayName,
   formatBottleLabel,
 } from "@peated/server/lib/bottleDisplayName";
@@ -91,7 +92,7 @@ function getDeclaredFacts(bottle: Bottle): [FactListItem, ...FactListItem[]] {
     },
     {
       label: "ABV",
-      value: bottle.abv === null ? null : `${bottle.abv.toFixed(1)}%`,
+      value: bottle.abv === null ? null : formatAbv(bottle.abv),
     },
     {
       label: "Age",
