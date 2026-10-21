@@ -7,7 +7,7 @@ import {
   unlink,
 } from "node:fs/promises";
 import path from "node:path";
-import sharp from "sharp";
+import sharp, { type ResizeOptions } from "sharp";
 
 import { startSpan } from "@sentry/node";
 import { lookup } from "mime-types";
@@ -101,24 +101,10 @@ export async function getUploadImageDataUrl(imageUrl: string) {
   return `data:${mediaType};base64,${image.toString("base64")}`;
 }
 
-/**
- * Normalizes EXIF orientation, resizes the image, and emits a WebP stream.
- */
-export const compressAndResizeImage = (
-  stream: Readable,
-  filename: string,
-  maxWidth?: number,
-  maxHeight?: number,
-) => {
+function toWebp(stream: Readable, filename: string, resize: ResizeOptions) {
   const transformer = sharp()
     .rotate()
-    .resize({
-      width: maxWidth,
-      height: maxHeight,
-      fit: sharp.fit.cover,
-      position: sharp.strategy.entropy,
-      withoutEnlargement: true,
-    })
+    .resize({ ...resize, withoutEnlargement: true })
     .trim()
     .unflatten()
     .webp({ quality: 80 });
@@ -129,7 +115,40 @@ export const compressAndResizeImage = (
       filename.substring(0, filename.lastIndexOf(".")) || filename
     }.webp`,
   };
-};
+}
+
+/**
+ * Normalizes EXIF orientation, shrinks the image to fit within the given
+ * bounds, and emits a WebP stream. It keeps the whole image: bottle photos and
+ * catalog images must not lose label text to a crop (DESIGN.md).
+ */
+export const compressAndResizeImage = (
+  stream: Readable,
+  filename: string,
+  maxWidth?: number,
+  maxHeight?: number,
+) =>
+  toWebp(stream, filename, {
+    width: maxWidth,
+    height: maxHeight,
+    fit: sharp.fit.inside,
+  });
+
+/**
+ * Normalizes EXIF orientation, crops the busiest part of the image to a
+ * square, and emits a WebP stream. Only for avatars and badges.
+ */
+export const compressAndCropSquareImage = (
+  stream: Readable,
+  filename: string,
+  size: number,
+) =>
+  toWebp(stream, filename, {
+    width: size,
+    height: size,
+    fit: sharp.fit.cover,
+    position: sharp.strategy.entropy,
+  });
 
 type ProcessCallback = (
   stream: Readable,
