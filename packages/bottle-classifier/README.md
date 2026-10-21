@@ -105,7 +105,7 @@ The server and eval runner read these settings:
 | -------------------------------------------- | ------------------------------------------------ | ----------------- |
 | `AI_GATEWAY_API_KEY`                         | Required hosted model access                     | none              |
 | `BOTTLE_CLASSIFIER_MODEL`                    | Reference and audit model                        | `gpt-6-luna`      |
-| `BOTTLE_CLASSIFIER_REASONING_EFFORT`         | Classifier reasoning effort                      | `high`            |
+| `BOTTLE_CLASSIFIER_REASONING_EFFORT`         | Classifier reasoning effort                      | `medium`          |
 | `OPENAI_IMAGE_EXTRACTION_MODEL`              | Label extraction model                           | `gpt-6-luna`      |
 | `OPENAI_IMAGE_EXTRACTION_REASONING_EFFORT`   | Label extraction reasoning effort                | `high`            |
 | `OPENAI_EVAL_MODEL`                          | Eval judge model                                 | `gpt-5.6-luna`    |
