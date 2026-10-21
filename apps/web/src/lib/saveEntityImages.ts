@@ -1,5 +1,6 @@
 import type { Inputs, Outputs } from "@peated/server/orpc/router";
 import type { EntityImageDraft } from "@peated/web/components/entityImageEditor.stylex";
+import { shrinkPhotoForUpload } from "@peated/web/lib/blobs";
 
 type EntityImage = Outputs["entities"]["details"]["images"][number];
 
@@ -50,7 +51,7 @@ export async function saveEntityImages({
   for (const image of newImages) {
     await create({
       entity: entityId,
-      file: image.file,
+      file: await shrinkPhotoForUpload(image.file),
       caption: caption(image.caption),
       sourceUrl: optionalText(image.sourceUrl),
       license: optionalText(image.license),

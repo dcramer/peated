@@ -7,7 +7,7 @@ import TastingForm, {
   type TastingEditFormSubmitData,
 } from "@peated/web/features/tastings/tastingForm";
 import { AuthRequired } from "@peated/web/hooks/useAuthRequired";
-import { toBlob } from "@peated/web/lib/blobs";
+import { shrinkPhotoForUpload, toBlob } from "@peated/web/lib/blobs";
 import { parseCatalogRouteId } from "@peated/web/lib/catalogRoute";
 import { logError } from "@peated/web/lib/log";
 import { useORPC } from "@peated/web/lib/orpc/context";
@@ -65,7 +65,10 @@ function TastingEditForm({ tastingId }: { tastingId: string }) {
       try {
         await tastingImageUpdateMutation.mutateAsync({
           tasting: tasting.id,
-          file: image instanceof File ? image : await toBlob(image),
+          file:
+            image instanceof File
+              ? await shrinkPhotoForUpload(image)
+              : await toBlob(image),
         });
       } catch (err) {
         logError(err);
