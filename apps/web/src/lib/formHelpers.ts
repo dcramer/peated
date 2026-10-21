@@ -36,12 +36,6 @@ export function toOption(value: OptionInput): Option | undefined {
   };
 }
 
-export function toOptionList(
-  values: OptionInput[] | null | undefined,
-): Option[] {
-  return values?.map((value) => toOption(value)).filter(isOption) ?? [];
-}
-
 export function toChoiceValue<
   TValue extends ChoiceValue,
   TOption extends OptionLike<TValue>,

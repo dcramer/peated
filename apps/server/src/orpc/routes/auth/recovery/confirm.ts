@@ -1,19 +1,17 @@
 import { db } from "@peated/server/db";
 import { users } from "@peated/server/db/schema";
+import { findRecoveryTokenUser } from "@peated/server/lib/accountRecovery";
 import { AuditEvent, auditLog } from "@peated/server/lib/auditLog";
 import {
   createAccessToken,
   generatePasswordHash,
-  TOKEN_LIFETIME_SECONDS,
-  verifyToken,
 } from "@peated/server/lib/auth";
 import { procedure } from "@peated/server/orpc";
 import { authRateLimit } from "@peated/server/orpc/middleware";
-import { AuthSchema, PasswordResetSchema } from "@peated/server/schemas";
+import { AuthSchema } from "@peated/server/schemas";
 import { serialize } from "@peated/server/serializers";
 import { UserSerializer } from "@peated/server/serializers/user";
-import { createHash, timingSafeEqual } from "crypto";
-import { and, eq, sql } from "drizzle-orm";
+import { eq } from "drizzle-orm";
 import { z } from "zod";
 
 export default procedure
@@ -36,55 +34,12 @@ export default procedure
     }),
   )
   .output(AuthSchema)
-  .handler(async function ({ input, context, errors }) {
-    let payload;
-    try {
-      payload = await verifyToken(input.token, "recovery");
-    } catch (err) {
-      throw errors.BAD_REQUEST({
-        message: "Invalid verification token.",
-      });
-    }
-
-    const token = PasswordResetSchema.parse(payload);
-    if (
-      new Date(token.createdAt).getTime() <
-      Date.now() - TOKEN_LIFETIME_SECONDS["recovery"] * 1000
-    ) {
-      throw errors.BAD_REQUEST({
-        message: "Token has expired.",
-      });
-    }
-
-    const [user] = await db
-      .select()
-      .from(users)
-      .where(
-        and(
-          eq(users.id, token.id),
-          eq(sql`LOWER(${users.email})`, token.email.toLowerCase()),
-        ),
-      );
-    if (!user) {
-      throw errors.BAD_REQUEST({
-        message: "Invalid verification token.",
-      });
-    }
-
-    // Verify password hash digest using SHA-256 and constant-time comparison
-    const expectedDigest = createHash("sha256")
-      .update(user.passwordHash || "")
-      .digest();
-    const providedDigest = Buffer.from(token.digest, "hex");
-
-    if (
-      expectedDigest.length !== providedDigest.length ||
-      !timingSafeEqual(expectedDigest, providedDigest)
-    ) {
-      throw errors.BAD_REQUEST({
-        message: "Invalid verification token.",
-      });
-    }
+  .handler(async function ({ input, context }) {
+    const user = await findRecoveryTokenUser(input.token, {
+      flow: "password_reset",
+      ip: context.ip,
+      userAgent: context.userAgent,
+    });
 
     const [newUser] = await db
       .update(users)

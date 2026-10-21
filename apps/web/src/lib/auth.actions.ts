@@ -130,15 +130,6 @@ export async function authenticate(
   redirectAfterAuth(result.data.user, redirectTo);
 }
 
-export async function registerForm(
-  prevState: GenericResult | undefined,
-  formData: FormData,
-) {
-  "use server";
-
-  return await register(formData);
-}
-
 export async function register(formData: FormData) {
   "use server";
 

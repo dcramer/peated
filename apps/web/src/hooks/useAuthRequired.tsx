@@ -47,28 +47,6 @@ export function useModRequired() {
 }
 
 /**
- * Redirects anonymous users to auth and non-admins to the forbidden page.
- */
-export function useAdminRequired() {
-  const { isLoading, user } = useAuth();
-  const pathname = usePathname();
-  const searchParams = useSearchParams();
-
-  if (isLoading) return false;
-
-  if (!user) {
-    redirectToAuth({
-      pathname,
-      searchParams,
-    });
-  }
-
-  if (!user?.admin) {
-    redirect("/errors/unauthorized");
-  }
-}
-
-/**
  * Redirects anonymous users to auth and unverified users to verification.
  */
 export function useVerifiedRequired() {

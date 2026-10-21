@@ -42,8 +42,10 @@ before publication.
 
 A catalog task reads its saved Bottle check through
 `apps/server/src/lib/bottleCheckEvidence.ts`, which keeps only the IDs, links,
-and field names that review needs. A check saved before a classifier schema
-change still opens and can be reviewed.
+and field names that review needs. A check on an older schema version, or
+with a saved proposal that no longer parses, opens as unsupported. It shows no
+operations and can only be closed (`isSupportedBottleCheck` in
+`apps/server/src/lib/bottleCheckSchemaVersion.ts`).
 
 A report task shows who sent the report, who it is about (when a member is
 named), the reason, and a link to the live content. Its actions remove the

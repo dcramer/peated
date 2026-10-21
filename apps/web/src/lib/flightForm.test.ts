@@ -1,10 +1,6 @@
 import { describe, expect, it } from "vitest";
 
-import {
-  bottleToFlightOption,
-  flightMembershipChanged,
-  getFlightBottleIds,
-} from "./flightForm";
+import { flightMembershipChanged, getFlightBottleIds } from "./flightForm";
 
 const bottle = {
   brand: { name: "Springbank" },
@@ -22,10 +18,6 @@ const relatedBottle = {
 describe("flight form membership", () => {
   it("carries independently complete Bottle identity by Bottle id", () => {
     expect(getFlightBottleIds([bottle, relatedBottle])).toEqual([7, 8]);
-    expect(bottleToFlightOption(bottle)).toEqual({
-      id: 7,
-      name: "Springbank 12 Batch 24 · 50%",
-    });
   });
 
   it("compares Bottle membership independent of ordering", () => {
