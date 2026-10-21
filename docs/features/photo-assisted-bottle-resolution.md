@@ -14,9 +14,11 @@ action.
 ## User Flow
 
 1. The user takes or uploads one Bottle photo, or chooses manual search.
-2. The browser shows a local preview immediately and sends the photo to
+2. The browser shows a local preview immediately, shrinks the photo to fit
+   within 1600 × 1600 (the size the server keeps), and sends it to
    `POST /tastings/photo-identification` with a key that prevents a repeated
-   request from creating another pending image.
+   request from creating another pending image. A photo the browser cannot
+   read is sent unchanged.
 3. The server processes the image, creates an owned pending upload, and extracts
    label evidence. One literal stored reference resolves directly. All other
    references run the Bottle classifier once.
@@ -209,7 +211,8 @@ of this flow.
 ## Errors and logs
 
 The form logs each attempt's start, result, duration, request key, file size and
-format, next step, and server trace ID. It never logs filenames or photo contents.
+format, uploaded size, next step, and server trace ID. It never logs filenames
+or photo contents.
 Server traces show whether a failure happened while reading the label or looking
 up the bottle. The RPC layer reports errors to Sentry.
 

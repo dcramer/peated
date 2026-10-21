@@ -8,6 +8,7 @@ import {
   FormStack,
 } from "@peated/web/components/formLayout.stylex";
 import { WorkflowScreen } from "@peated/web/components/workflowScreen.stylex";
+import { shrinkPhotoForUpload } from "@peated/web/lib/blobs";
 import { logError, logInfo } from "@peated/web/lib/log";
 import { useORPC } from "@peated/web/lib/orpc/context";
 import {
@@ -262,6 +263,7 @@ export default function BottleResolver({
     let timedOut = false;
     let errorCode: string | null = null;
     let suggestedNextStep: string | null = null;
+    let uploadSize: number | null = null;
     // Stop waiting after two minutes, including the upload and bottle lookup.
     const timeout = setTimeout(() => {
       timedOut = true;
@@ -286,8 +288,10 @@ export default function BottleResolver({
       },
     });
     try {
+      const upload = await shrinkPhotoForUpload(file);
+      uploadSize = upload.size;
       const result = await photoIdentificationMutation.mutateAsync({
-        file,
+        file: upload,
         idempotencyKey,
         responseTraceContext,
         signal: controller.signal,
@@ -355,6 +359,7 @@ export default function BottleResolver({
             responseTraceContext.sentryTraceId,
           "photo_identification.file_size": file.size,
           "photo_identification.file_type": file.type || "unknown",
+          "photo_identification.upload_size": uploadSize,
         },
       });
     }
