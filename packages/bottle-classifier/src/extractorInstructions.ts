@@ -132,13 +132,15 @@ export const WHISKY_LABEL_COMPONENTS: WhiskyLabelComponent[] = [
   {
     id: "technical",
     label: "Technical details",
-    outputField: "`abv`, `vintage_year`, `bottling_year`, `release_year`",
+    outputField:
+      "`abv`, `vintage_year`, `bottling_year`, `release_year`, `release_month`, `release_day`",
     guidance: [
       "ABV is the numeric alcohol percentage.",
       "If the source gives proof instead of ABV, convert proof to ABV by dividing by 2. Never copy a proof number directly into `abv`.",
       "Use `vintage_year` only for the distillation year.",
       "Use `bottling_year` only when the source identifies the year the whisky was bottled.",
       "Use `release_year` for the year the marketed release became available.",
+      "Set `release_month` and `release_day` only with `release_year`, when the source gives the release date. Never fill them from a bottling or fill date.",
       "Leave all three year fields null when the source gives a year without showing what it means.",
     ],
   },
@@ -628,7 +630,7 @@ export function buildWhiskyLabelExtractorInstructions({
         : "Return `rawLabelText: null` for text input.",
       "Use `null` for missing scalar values.",
       "Use an array for `distillery`; prefer `[]` when the distillery is unknown.",
-      "The object fields are `brand`, `bottler`, `expression`, `series`, `distillery`, `category`, `stated_age`, `abv`, `vintage_year`, `bottling_year`, `release_year`, `cask_strength`, `single_cask`, `maturation`, `cask_number`, `outturn`, and `edition`.",
+      "The object fields are `brand`, `bottler`, `expression`, `series`, `distillery`, `category`, `stated_age`, `abv`, `vintage_year`, `bottling_year`, `release_year`, `release_month`, `release_day`, `cask_strength`, `single_cask`, `maturation`, `cask_number`, `outturn`, and `edition`.",
     ]),
     "",
     "Examples:",
