@@ -2,6 +2,7 @@ import type { Meta, StoryObj } from "@storybook/nextjs-vite";
 
 import { Button, ButtonLink } from "@peated/web/components/button.stylex";
 import { RowMenu } from "@peated/web/components/rowMenu.stylex";
+import { TastingRating } from "@peated/web/components/scoring.stylex";
 import { StoryCanvas } from "../storyFixtures.stylex";
 import { BottlePageHeader } from "./bottlePageHeader.stylex";
 
@@ -119,5 +120,16 @@ export const ThinData: Story = {
     name: "Independent bottling",
     rating: null,
     specs: undefined,
+  },
+};
+
+export const MemberRating: Story = {
+  args: {
+    actions: null,
+    aside: <TastingRating band="very_good" size="lg" />,
+    menu: null,
+    metadata: "Single Malt · NAS · 50.1%",
+    nameHref: "/bottles/1-laphroaig-elements-l-2-0",
+    rating: null,
   },
 };

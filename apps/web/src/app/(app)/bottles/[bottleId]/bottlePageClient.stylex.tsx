@@ -22,7 +22,10 @@ import {
 } from "@peated/web/components/feedback.stylex";
 import { useFlashMessages } from "@peated/web/components/flashMessages.stylex";
 import { BottleOverview } from "@peated/web/components/pages/bottleOverview.stylex";
-import { BottlePageHeader } from "@peated/web/components/pages/bottlePageHeader.stylex";
+import {
+  BottlePageHeader,
+  getBottleHeaderIdentity,
+} from "@peated/web/components/pages/bottlePageHeader.stylex";
 import { BottleRailSection } from "@peated/web/components/pages/bottleRailSection.stylex";
 import {
   PageTabs,
@@ -41,19 +44,12 @@ import {
   getAddSimilarBottlePath,
 } from "@peated/web/lib/addBottle";
 import { toBottleListItem } from "@peated/web/lib/bottleListItem";
-import {
-  getBottleHeaderSpecs,
-  getBottleReleasePlacement,
-} from "@peated/web/lib/bottleMetadata";
+import { getBottleReleasePlacement } from "@peated/web/lib/bottleMetadata";
 import { getReviewAndTastingFeedItems } from "@peated/web/lib/communityFeed";
 import { logTelemetryError } from "@peated/web/lib/log";
 import { useORPC } from "@peated/web/lib/orpc/context";
 import { selectOtherSeriesBottles } from "@peated/web/lib/seriesBottleRail";
-import {
-  getBottleSeriesUrl,
-  getBottleUrl,
-  getEntityUrl,
-} from "@peated/web/lib/urls";
+import { getBottleSeriesUrl, getBottleUrl } from "@peated/web/lib/urls";
 import { colors, space } from "../../../../styles/tokens.stylex";
 
 import { foundationStyles } from "../../../../styles/foundations.stylex";
@@ -64,12 +60,6 @@ type Bottle = Outputs["bottles"]["details"];
 const BottlePageContext = createContext<Bottle | null>(null);
 
 const PHONE = "@media (max-width: 480px)";
-
-function getBottleDistillers(bottle: Bottle) {
-  return bottle.distillers.length ? (
-    <EntityLinks entities={bottle.distillers} />
-  ) : null;
-}
 
 function getDeclaredFacts(bottle: Bottle): [FactListItem, ...FactListItem[]] {
   return [
@@ -384,7 +374,6 @@ export function BottlePageFrameClient({
   }
 
   const bottle = bottleQuery.data;
-  const name = formatBottleDisplayName(bottle, { includeBrand: false });
   const currentHref =
     pathname === `/${bottle.peatedId}` ? getBottleUrl(bottle) : pathname;
 
@@ -407,12 +396,8 @@ export function BottlePageFrameClient({
               <BottleLibraryAction bottle={bottle} />
             </>
           }
-          brand={bottle.brand.shortName || bottle.brand.name}
-          brandHref={getEntityUrl(bottle.brand)}
-          metadata={getBottleDistillers(bottle)}
+          {...getBottleHeaderIdentity(bottle)}
           menu={<BottleActions bottle={bottle} />}
-          name={name}
-          specs={getBottleHeaderSpecs(bottle, name)}
           rating={
             bottle.scoreCount === 0 &&
             !Object.values(bottle.tastingBandCounts).some((count) => count > 0)
