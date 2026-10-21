@@ -75,6 +75,7 @@ export function PageHeader({
   actions,
   actionsPosition = "end",
   description,
+  facts,
   metadata,
   identity,
   menu,
@@ -85,6 +86,8 @@ export function PageHeader({
   /** Inline actions stay beside the title and wrap to the right when space runs out. */
   actionsPosition?: "end" | "start" | "inline";
   description?: ReactNode;
+  /** Key facts sit with the identity, above the actions. */
+  facts?: ReactNode;
   metadata?: ReactNode;
   identity?: ReactNode;
   menu?: ReactNode;
@@ -118,6 +121,7 @@ export function PageHeader({
               {metadata}
             </div>
           ) : null}
+          {facts ? <div {...stylex.props(styles.facts)}>{facts}</div> : null}
           {description ? (
             <div {...stylex.props(foundationStyles.body, styles.description)}>
               {description}
@@ -334,6 +338,9 @@ const styles = stylex.create({
     marginBottom: space.x1,
     color: colors.accentDeep,
     fontWeight: 600,
+  },
+  facts: {
+    marginTop: space.x4,
   },
   description: {
     maxWidth: "680px",

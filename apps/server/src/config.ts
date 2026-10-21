@@ -103,11 +103,6 @@ export default {
       process.env.PRICE_MATCH_MAX_SEARCH_QUERIES ||
       "2",
   ),
-  PRICE_MATCH_MAX_SEARCH_QUERIES: Number(
-    process.env.PRICE_MATCH_MAX_SEARCH_QUERIES ||
-      process.env.BOTTLE_CLASSIFIER_MAX_SEARCH_QUERIES ||
-      "2",
-  ),
   PRICE_MATCH_RETRY_RUN_BATCH_SIZE: Number(
     process.env.PRICE_MATCH_RETRY_RUN_BATCH_SIZE || "10",
   ),

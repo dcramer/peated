@@ -104,17 +104,3 @@ function isTastingTagName(
 ): suggestion is string {
   return z.string().safeParse(suggestion).success;
 }
-
-export function filterTastingTagOptions<T extends TastingTagOptionData>(
-  query: string,
-  options: T[],
-): T[] {
-  const normalizedQuery = query.trim().toLowerCase();
-  if (!normalizedQuery) return options;
-
-  return options.filter((option) =>
-    [option.id, option.tag?.tagCategory, ...(option.tag?.synonyms ?? [])].some(
-      (value) => value?.toLowerCase().includes(normalizedQuery),
-    ),
-  );
-}

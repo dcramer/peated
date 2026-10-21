@@ -205,6 +205,13 @@ subject.
 - Show a meaningful release marker prominently.
 - Show an exact batch marker in the supporting release facts.
 - Show stated age once and show ABV when known.
+- Put up to three key facts under the title, above the actions. Rank them by
+  how exactly they identify the release: ABV, then an exact batch or cask
+  number, then stated age, then one year (vintage, then bottling, then
+  release), then category to fill a spare slot. A batch, cask, or year the
+  name already prints moves behind category, so it shows only when a slot is
+  free. Leave out a stated age the name already prints. Series stays in the
+  title.
 - Show a year only when it is part of, or necessary to understand, the release
   identity.
 - Do not add single-cask or cask-strength badges.
@@ -355,7 +362,7 @@ particular result component omits some of them visually.
 | Cask-strength flag        | No                       | No                | No                 | No               | No                | Yes          |
 | Marketed cask/barrel code | As release marker        | As release marker | If needed          | Primary          | If needed         | Yes          |
 | Cask type/size/fill       | No                       | Normally no       | No                 | No               | No                | Yes          |
-| Category                  | No                       | Optional          | No                 | No               | No                | Yes          |
+| Category                  | Spare key fact slot      | Optional          | No                 | No               | No                | Yes          |
 
 “No” for a derived flag does not remove identical wording that belongs to the
 marketed expression or edition.
@@ -432,8 +439,8 @@ The contract is applied at the presentation site that owns each branch:
   general cask labels.
 - SEO, sharing, notifications, and other unstructured consumers use concise
   plain-text identity helpers.
-- Search-vector construction indexes series independently of whether a result
-  surface has room to display it.
+- Bottle search documents (`buildBottleSearchDocuments`) include the Series
+  even when a result surface has no room to show it.
 - Additional Details remains the complete home for years, cask flags, and cask
   details omitted from the usual Bottle display. The cask statement shows at
   most two lines; when it is cut off, the full text is available as a tooltip.

@@ -2220,6 +2220,13 @@
       "when": 1792462862552,
       "tag": "0316_nebulous_tattoo",
       "breakpoints": false
+    },
+    {
+      "idx": 317,
+      "version": "7",
+      "when": 1792578451326,
+      "tag": "0317_parched_morg",
+      "breakpoints": false
     }
   ]
 }

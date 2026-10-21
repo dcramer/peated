@@ -125,14 +125,6 @@ export function AdminAlert({
   );
 }
 
-export function AdminMarkdown({ content }: { content: string }) {
-  return (
-    <div {...stylex.props(foundationStyles.prose, styles.markdown)}>
-      {content}
-    </div>
-  );
-}
-
 const styles = stylex.create({
   definitionList: {
     display: "grid",
@@ -206,10 +198,6 @@ const styles = stylex.create({
   alertWarn: {
     borderColor: colors.accent,
     backgroundColor: colors.accentTint,
-  },
-  markdown: {
-    color: colors.inkMuted,
-    whiteSpace: "pre-wrap",
   },
 });
 const alertToneStyles = {

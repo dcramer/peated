@@ -112,4 +112,49 @@ describe("createWhiskyLabelExtractor", () => {
 
     expect(create).toHaveBeenCalledWith(expect.any(Object), { signal });
   });
+
+  test("keeps the label reading when the release date is incomplete", async () => {
+    // A Gordon & MacPhail label printing `Bottled 05.03.2025` and no release
+    // year, read as a release month and day.
+    const result = {
+      brand: "Gordon & MacPhail",
+      bottler: "Gordon & MacPhail",
+      expression: "Connoisseurs Choice Aultmore",
+      series: "Connoisseurs Choice",
+      distillery: ["Aultmore"],
+      category: "single_malt",
+      stated_age: 15,
+      abv: 57.3,
+      release_year: null,
+      release_month: 3,
+      release_day: 5,
+      vintage_year: 2009,
+      bottling_year: 2025,
+      cask_strength: true,
+      single_cask: true,
+      maturation: "First fill bourbon barrel",
+      cask_number: "4679",
+      outturn: 200,
+      edition: null,
+    };
+    const create = vi.fn().mockResolvedValue({
+      id: "resp_123",
+      model: "gpt-5.6-luna",
+      output_text: JSON.stringify({ result, rawLabelText: "AULTMORE" }),
+    });
+    const extractor = createWhiskyLabelExtractor({
+      client: { responses: { create } },
+      model: "gpt-5.6-luna",
+    });
+
+    const extraction = await extractor.extractFromImageWithMetadata(
+      "data:image/jpeg;base64,dGVzdA==",
+    );
+
+    expect(extraction.result).toEqual({
+      ...result,
+      release_month: null,
+      release_day: null,
+    });
+  });
 });

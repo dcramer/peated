@@ -199,6 +199,7 @@ export default function TastingForm(
     category: option.tag ? toTitleCase(option.tag.tagCategory) : "Other notes",
     common: option.count > 0,
     name: option.id,
+    synonyms: option.tag?.synonyms,
     usageCount: option.count,
   }));
 

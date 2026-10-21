@@ -101,6 +101,7 @@ behavior; research cannot override them.
 - `docs/architecture/bottle-classifier.md` — Bottle classification.
 - `docs/architecture/bottle-reference-normalization.md` — Safe reference-name cleanup.
 - `docs/architecture/bottle-reference-resolution.md` — Bottle lookup and assignment.
+- `docs/architecture/bottle-search.md` — Bottle, Entity, and Series search documents and queries.
 - `docs/architecture/entity-classifier.md` — Entity classification.
 - `docs/architecture/oauth-clients.md` — OAuth client and token flow.
 - `docs/architecture/peated-ids.md` — Public IDs.
@@ -108,9 +109,11 @@ behavior; research cannot override them.
 - `docs/architecture/store-price-matching.md` — Store-price matching and review.
 - `docs/architecture/web-caching.md` — Public and signed-in caching.
 - `docs/architecture/whisky-identity-model.md` — Bottle and Entity identity rules.
+- `docs/features/auctions.md` — Auction lots, results, Bottle matching, and watches.
 - `docs/features/bottle-entry-workflow.md` — Bottle creation and editing.
 - `docs/features/bottle-presentation.md` — Bottle display rules.
 - `docs/features/catalog-page-seo.md` — Public search pages, metadata, canonical URLs, and sitemaps.
+- `docs/features/content-moderation.md` — Admin removal and restore of reviews and tastings.
 - `docs/features/external-reviews.md` — External review storage and publication.
 - `docs/features/moderation-workspace.md` — Moderation inbox, history, and automation.
 - `docs/features/photo-assisted-bottle-resolution.md` — Bottle lookup from a photo.
@@ -155,6 +158,7 @@ behavior; research cannot override them.
 - `apps/server/src/scraper/README.md` — Add and run scraper sources.
 - `apps/server/src/worker/README.md` — Add and run worker jobs.
 - `docs/development/local-web-checks.md` — Local browser checks.
+- `docs/operations/auctions.md` — Run and roll out auction collection and matching.
 - `docs/operations/bottle-reference-migrations-0253-0255.md` — Bottle Reference migration and rollback.
 - `docs/operations/catalog-maintenance.md` — Research, merge, and edit production Bottles.
 - `docs/operations/catalog-research.md` — Find and assess catalog evidence.
@@ -162,4 +166,5 @@ behavior; research cannot override them.
 - `docs/operations/entity-images.md` — Add or replace production Entity images.
 - `docs/operations/events.md` — Add, fix, or retire whisky events.
 - `docs/operations/external-review-sources.md` — Add, publish, stop, or remove a review source.
+- `docs/operations/peated-bot.md` — Create, register, and rotate the PeatedBot signing key.
 - `docs/operations/production-debugging.md` — Production diagnosis.

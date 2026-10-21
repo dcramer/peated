@@ -46,7 +46,14 @@ export function hasVisibleKeyFacts(facts: KeyFactList) {
   return facts.some(hasKeyFactValue);
 }
 
-export function KeyFacts({ facts }: { facts: KeyFactList }) {
+export function KeyFacts({
+  facts,
+  inline = false,
+}: {
+  facts: KeyFactList;
+  /** Sizes facts to their content, as in a page header, instead of filling the row. */
+  inline?: boolean;
+}) {
   const visibleFacts = facts.filter(hasKeyFactValue);
 
   if (!visibleFacts.length) return null;
@@ -55,7 +62,9 @@ export function KeyFacts({ facts }: { facts: KeyFactList }) {
     <dl
       {...stylex.props(
         styles.keyFacts,
-        getKeyFactsColumnStyle(visibleFacts.length),
+        inline
+          ? styles.keyFactsInline
+          : getKeyFactsColumnStyle(visibleFacts.length),
       )}
     >
       {visibleFacts.map((fact, index) => (
@@ -64,10 +73,13 @@ export function KeyFacts({ facts }: { facts: KeyFactList }) {
           key={`${fact.label}-${index}`}
           {...stylex.props(
             styles.keyFact,
-            visibleFacts.length >= 3 &&
+            inline && styles.keyFactInline,
+            !inline &&
+              visibleFacts.length >= 3 &&
               index % 2 === 0 &&
               styles.keyFactPhoneOdd,
-            visibleFacts.length >= 3 &&
+            !inline &&
+              visibleFacts.length >= 3 &&
               index % 2 === 1 &&
               styles.keyFactPhoneEven,
           )}
@@ -120,6 +132,14 @@ const styles = stylex.create({
     paddingTop: "20px",
     paddingBottom: "20px",
   },
+  keyFactsInline: {
+    display: "flex",
+    flexWrap: "wrap",
+    columnGap: space.x8,
+    rowGap: space.x4,
+    paddingTop: 0,
+    paddingBottom: 0,
+  },
   keyFactsOne: {
     gridTemplateColumns: "minmax(0, 1fr)",
   },
@@ -145,6 +165,10 @@ const styles = stylex.create({
     display: "flex",
     flexDirection: "column",
     paddingRight: space.x6,
+  },
+  keyFactInline: {
+    flex: "0 1 auto",
+    paddingRight: 0,
   },
   keyFactPhoneOdd: {
     paddingLeft: 0,

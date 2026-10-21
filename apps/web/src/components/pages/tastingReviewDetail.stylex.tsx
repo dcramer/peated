@@ -1,7 +1,3 @@
-import {
-  formatAbv,
-  formatBottleDisplayName,
-} from "@peated/server/lib/bottleDisplayName";
 import { formatColor, formatServingStyle } from "@peated/server/lib/format";
 import type { Outputs } from "@peated/server/orpc/router";
 import type { TagCategory } from "@peated/server/types";
@@ -19,8 +15,13 @@ import {
 import { TextLink } from "@peated/web/components/textLink.stylex";
 import { Timestamp } from "@peated/web/components/timestamp";
 import { TastingNoteTag } from "@peated/web/features/tastingWheel/tastingNoteTag.stylex";
+import { getBottleUrl } from "@peated/web/lib/urls";
 import { foundationStyles } from "../../styles/foundations.stylex";
 import { colors, space } from "../../styles/tokens.stylex";
+import {
+  BottlePageHeader,
+  getBottleHeaderIdentity,
+} from "./bottlePageHeader.stylex";
 import { PageHeader } from "./pageLayout.stylex";
 import {
   TastingReviewBottleSummary,
@@ -36,27 +37,25 @@ type Rating =
   | { kind: "tasting"; ratingBand: RatingBand | null };
 
 function TastingReviewDetailLayout({
-  author,
+  byline,
   children,
+  header,
   loadingLabel,
-  metadata,
-  rating,
-  title,
+  menu,
 }: {
-  author: ReactNode;
+  byline: ReactNode;
   children: ReactNode;
+  header: ReactNode;
   loadingLabel?: string;
-  metadata: ReactNode;
-  rating: ReactNode;
-  title: ReactNode;
+  menu?: ReactNode;
 }) {
   const content = (
     <>
-      <PageHeader metadata={metadata} title={title} />
+      {header}
       <div {...stylex.props(styles.body)}>
         <header {...stylex.props(styles.recordHeader)}>
-          <div {...stylex.props(styles.authorLine)}>{author}</div>
-          {rating}
+          <div {...stylex.props(styles.authorLine)}>{byline}</div>
+          {menu}
         </header>
         {children}
       </div>
@@ -104,21 +103,6 @@ export function TastingReviewDetail({
   tags: readonly string[];
   tagCategories: Readonly<Record<string, TagCategory>>;
 }) {
-  const bottleName = formatBottleDisplayName(bottle);
-  const bottleTitle = bottleName.replaceAll(" - ", "\u00a0- ");
-  const metadata = (
-    <>
-      {rating.kind === "review" ? "Review" : "Tasting"}{" "}
-      <span aria-hidden="true">· </span>
-      <Timestamp date={createdAt} format="dateLong" />
-      {bottle.abv === null ? null : (
-        <>
-          <span aria-hidden="true"> · </span>
-          {formatAbv(bottle.abv)}
-        </>
-      )}
-    </>
-  );
   const facts = [
     servingStyle
       ? { label: "Serving", value: formatServingStyle(servingStyle) }
@@ -128,7 +112,7 @@ export function TastingReviewDetail({
 
   return (
     <TastingReviewDetailLayout
-      author={
+      byline={
         <>
           <MemberAvatar
             pictureUrl={author.pictureUrl}
@@ -145,33 +129,26 @@ export function TastingReviewDetail({
                 styles.authorMetadata,
               )}
             >
-              {rating.kind === "review" ? "Member review" : "Tasting note"}
+              {rating.kind === "review" ? "Reviewed" : "Tasted"}{" "}
+              <Timestamp date={createdAt} format="dateLong" />
             </span>
           </div>
         </>
       }
-      metadata={
-        menu ? (
-          <div {...stylex.props(styles.metadataRow)}>
-            <span>{metadata}</span>
-            {menu}
-          </div>
-        ) : (
-          metadata
-        )
+      header={
+        <BottlePageHeader
+          {...getBottleHeaderIdentity(bottle)}
+          aside={
+            rating.kind === "review" ? (
+              <ReviewScore score={rating.score} size="lg" />
+            ) : rating.ratingBand ? (
+              <TastingRating band={rating.ratingBand} size="lg" />
+            ) : null
+          }
+          nameHref={getBottleUrl(bottle)}
+        />
       }
-      rating={
-        rating.kind === "review" ? (
-          <ReviewScore score={rating.score} size="lg" />
-        ) : rating.ratingBand ? (
-          <TastingRating band={rating.ratingBand} size="lg" />
-        ) : (
-          <span {...stylex.props(foundationStyles.metadata, styles.unrated)}>
-            Not rated
-          </span>
-        )
-      }
-      title={bottleTitle}
+      menu={menu}
     >
       <TastingReviewBottleSummary
         bottle={bottle}
@@ -229,7 +206,7 @@ export function TastingReviewDetail({
 export function TastingReviewDetailLoading({ label }: { label: string }) {
   return (
     <TastingReviewDetailLayout
-      author={
+      byline={
         <>
           <span {...stylex.props(styles.loadingAvatar)} />
           <div {...stylex.props(styles.authorCopy, styles.loadingAuthor)}>
@@ -238,10 +215,13 @@ export function TastingReviewDetailLoading({ label }: { label: string }) {
           </div>
         </>
       }
+      header={
+        <PageHeader
+          metadata={<LoadingPlaceholder preset="pageMetadata" />}
+          title={<LoadingPlaceholder preset="recordTitle" />}
+        />
+      }
       loadingLabel={label}
-      metadata={<LoadingPlaceholder preset="pageMetadata" />}
-      rating={<LoadingPlaceholder delay={2} preset="score" />}
-      title={<LoadingPlaceholder preset="recordTitle" />}
     >
       <TastingReviewBottleSummaryLoading placement="mobile" />
 
@@ -290,12 +270,6 @@ const styles = stylex.create({
   body: {
     paddingTop: space.x4,
   },
-  metadataRow: {
-    display: "flex",
-    flexWrap: "wrap",
-    alignItems: "center",
-    gap: space.x3,
-  },
   recordHeader: {
     display: "flex",
     minWidth: 0,
@@ -316,10 +290,6 @@ const styles = stylex.create({
     gap: "2px",
   },
   authorMetadata: {
-    color: colors.inkMuted,
-  },
-  unrated: {
-    flexShrink: 0,
     color: colors.inkMuted,
   },
   facts: {

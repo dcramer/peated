@@ -3,7 +3,10 @@ import {
   agentActionRiskClass,
   deriveAutomationTier,
 } from "@peated/bottle-classifier/automationTier";
-import { createDecidedBottleClassification } from "@peated/bottle-classifier/contract";
+import {
+  createDecidedBottleClassification,
+  createIgnoredBottleClassification,
+} from "@peated/bottle-classifier/contract";
 import type { BottleClassifierProgressEvent } from "@peated/bottle-classifier/internal/runtime";
 import type { BottleCandidate } from "@peated/bottle-classifier/internal/types";
 import {
@@ -12,8 +15,8 @@ import {
   type BottleExtractedDetails,
   type ImageBottleEvidence,
 } from "@peated/server/agents/bottleClassifier";
+import { runBottleReference } from "@peated/server/agents/bottleClassifier/classifyBottleReference";
 import { findExactReferenceBottleCandidate } from "@peated/server/agents/bottleClassifier/findExactReferenceBottleCandidate";
-import { runBottleReference } from "@peated/server/agents/bottleClassifier/service";
 import config from "@peated/server/config";
 import {
   createOpenAIClient,
@@ -42,6 +45,13 @@ export const PHOTO_IDENTIFICATION_RATE_LIMIT = {
   maxRequests: 30,
   keyPrefix: "photo-identification",
 };
+
+/**
+ * Longest a photo's bottle lookup may run after the label is read. It bounds
+ * the model cost of one photo; past it, the member gets the label facts
+ * instead of a match.
+ */
+export const PHOTO_LOOKUP_TIME_LIMIT_MS = 3 * 60 * 1000;
 
 /** A stored Bottle photo: a pending upload or a tasting draft's photo. */
 type PhotoIdentificationImage = {
@@ -311,12 +321,14 @@ export type IdentifyBottlePhotoServices = {
   extractEvidence: typeof extractPhotoBottleEvidence;
   runReference: typeof runBottleReference;
   startSpan: PhotoIdentificationStartSpan;
+  lookupTimeLimitMs: number;
 };
 
 const identifyBottlePhotoServices: IdentifyBottlePhotoServices = {
   extractEvidence: extractPhotoBottleEvidence,
   runReference: runBottleReference,
   startSpan: (context, callback) => Sentry.startSpan(context, callback),
+  lookupTimeLimitMs: PHOTO_LOOKUP_TIME_LIMIT_MS,
 };
 
 export type PhotoIdentificationDecision = Extract<
@@ -539,10 +551,54 @@ function setSpanAttributes(
 }
 
 /**
+ * Runs the bottle lookup until it finishes, `signal` aborts, or the time limit
+ * passes.
+ */
+async function runReferenceWithinTimeLimit({
+  input,
+  services,
+  signal,
+  span,
+  onProgress,
+}: {
+  input: Parameters<typeof runBottleReference>[0];
+  services: IdentifyBottlePhotoServices;
+  signal?: AbortSignal;
+  span: PhotoIdentificationSpan;
+  onProgress?: (event: BottleClassifierProgressEvent) => void;
+}): ReturnType<typeof runBottleReference> {
+  const timeLimit = AbortSignal.timeout(services.lookupTimeLimitMs);
+  try {
+    return await services.runReference(input, {
+      signal: signal ? AbortSignal.any([signal, timeLimit]) : timeLimit,
+      onProgress,
+    });
+  } catch (err) {
+    // Photo lookup cost rule: a lookup past its time limit stops and returns
+    // the label facts already read. Other failures still fail.
+    if (!timeLimit.aborted) throw err;
+    span.setAttribute("photo_identification.lookup_timed_out", true);
+    return {
+      result: createIgnoredBottleClassification({
+        reason: "The bottle lookup ran out of time.",
+        artifacts: {
+          extractedIdentity: input.extractedIdentity,
+          imageEvidence: input.imageEvidence,
+        },
+      }),
+      modelMetadata: null,
+    };
+  }
+}
+
+/**
  * Runs label extraction and local candidate discovery for a stored Bottle
  * photo. A literal accepted reference resolves directly; all other inputs run
- * the full classifier once. Callers own the photo's ownership checks and pass
- * the attribute that names it, such as its pending upload or tasting draft.
+ * the full classifier once, within `lookupTimeLimitMs`. A lookup that runs out
+ * of time returns the label facts with no match. `signal` stops the lookup
+ * when the caller no longer wants it, such as a closed request. Callers own the
+ * photo's ownership checks and pass the attribute that names it, such as its
+ * pending upload or tasting draft.
  *
  * This is the shared Photo Identification workflow span boundary for all callers.
  */
@@ -628,8 +684,11 @@ export async function identifyBottlePhoto(
             }),
             modelMetadata: null,
           }
-        : await services.runReference(classificationInput, {
+        : await runReferenceWithinTimeLimit({
+            input: classificationInput,
+            services,
             signal,
+            span,
             onProgress: onProgress
               ? (event) => onProgress(toPhotoIdentificationProgress(event))
               : undefined,

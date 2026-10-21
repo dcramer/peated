@@ -28,6 +28,8 @@ function TastingReviewBottleSummaryLayout({
   image?: ReactNode;
   placement: "desktop" | "mobile";
 }) {
+  if (!image && !bottle) return null;
+
   return (
     <div
       {...stylex.props(
@@ -41,7 +43,10 @@ function TastingReviewBottleSummaryLayout({
   );
 }
 
-/** Uses the tasting or review photo when present; otherwise uses the Bottle image. */
+/**
+ * Uses the tasting or review photo when present; otherwise uses the Bottle image.
+ * The mobile placement shows only the image because the page header already names the Bottle.
+ */
 export function TastingReviewBottleSummary({
   bottle,
   photoUrl,
@@ -53,10 +58,12 @@ export function TastingReviewBottleSummary({
   return (
     <TastingReviewBottleSummaryLayout
       bottle={
-        <BottleList
-          ariaLabel="Bottle"
-          items={[{ ...toBottleListItem(bottle), variant: "sidebar" }]}
-        />
+        placement === "desktop" ? (
+          <BottleList
+            ariaLabel="Bottle"
+            items={[{ ...toBottleListItem(bottle), variant: "sidebar" }]}
+          />
+        ) : null
       }
       image={
         imageUrl ? (
@@ -81,7 +88,11 @@ export function TastingReviewBottleSummaryLoading({
 }) {
   return (
     <TastingReviewBottleSummaryLayout
-      bottle={<LoadingList label="Loading bottle" rows={1} variant="sidebar" />}
+      bottle={
+        placement === "desktop" ? (
+          <LoadingList label="Loading bottle" rows={1} variant="sidebar" />
+        ) : null
+      }
       image={<span {...stylex.props(styles.loadingPhoto)} />}
       placement={placement}
     />

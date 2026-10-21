@@ -32,6 +32,7 @@ import {
   type CompanyPageCounts,
   type Entity,
 } from "./entityPageData";
+import { EntityPronunciation } from "./entityPronunciation.stylex";
 
 const EntityPageContext = createContext<Entity | null>(null);
 
@@ -226,7 +227,17 @@ export function EntityPageFrameClient({
               <ExpandableDescription content={entity.description} />
             ) : null
           }
-          metadata={getEntityClassification(entity)}
+          metadata={
+            entity.pronunciation || entity.pronunciationIpa ? (
+              <>
+                {getEntityClassification(entity)}
+                {" · "}
+                <EntityPronunciation entity={entity} />
+              </>
+            ) : (
+              getEntityClassification(entity)
+            )
+          }
           menu={<EntityActions entity={entity} />}
           title={entity.name}
         />

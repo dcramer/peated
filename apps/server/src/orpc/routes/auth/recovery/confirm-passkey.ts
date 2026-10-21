@@ -1,11 +1,14 @@
 import { ORPCError } from "@orpc/server";
 import { db } from "@peated/server/db";
 import { passkeys, users } from "@peated/server/db/schema";
+import {
+  auditRecoveryFailure,
+  findRecoveryTokenUser,
+} from "@peated/server/lib/accountRecovery";
 import { AuditEvent, auditLog } from "@peated/server/lib/auditLog";
 import {
   createAccessToken,
   generatePasswordHash,
-  TOKEN_LIFETIME_SECONDS,
   verifyToken,
 } from "@peated/server/lib/auth";
 import { logError } from "@peated/server/lib/log";
@@ -18,12 +21,11 @@ import { authRateLimit } from "@peated/server/orpc/middleware";
 import {
   AuthSchema,
   PasskeyRegistrationResponseSchema,
-  PasswordResetSchema,
 } from "@peated/server/schemas";
 import { serialize } from "@peated/server/serializers";
 import { UserSerializer } from "@peated/server/serializers/user";
-import { createHash, randomBytes, timingSafeEqual } from "crypto";
-import { and, eq, sql } from "drizzle-orm";
+import { randomBytes } from "crypto";
+import { eq } from "drizzle-orm";
 import { z } from "zod";
 
 export type RecoveryPasskeyServices = {
@@ -62,57 +64,18 @@ export function createRecoveryPasskeyConfirmProcedure(
       }),
     )
     .output(AuthSchema)
-    .handler(async function ({ input, errors }) {
+    .handler(async function ({ input, context, errors }) {
       try {
-        // Verify the recovery token
-        let payload;
-        try {
-          payload = await services.verifyToken(input.token, "recovery");
-        } catch (err) {
-          throw errors.BAD_REQUEST({
-            message: "Invalid verification token.",
-          });
-        }
-
-        const token = PasswordResetSchema.parse(payload);
-        if (
-          new Date(token.createdAt).getTime() <
-          Date.now() - TOKEN_LIFETIME_SECONDS["recovery"] * 1000
-        ) {
-          throw errors.BAD_REQUEST({
-            message: "Token has expired.",
-          });
-        }
-
-        const [user] = await db
-          .select()
-          .from(users)
-          .where(
-            and(
-              eq(users.id, token.id),
-              eq(sql`LOWER(${users.email})`, token.email.toLowerCase()),
-            ),
-          );
-        if (!user) {
-          throw errors.BAD_REQUEST({
-            message: "Invalid verification token.",
-          });
-        }
-
-        // Verify password hash digest using SHA-256 and constant-time comparison
-        const expectedDigest = createHash("sha256")
-          .update(user.passwordHash || "")
-          .digest();
-        const providedDigest = Buffer.from(token.digest, "hex");
-
-        if (
-          expectedDigest.length !== providedDigest.length ||
-          !timingSafeEqual(expectedDigest, providedDigest)
-        ) {
-          throw errors.BAD_REQUEST({
-            message: "Invalid verification token.",
-          });
-        }
+        const request = {
+          flow: "passkey" as const,
+          ip: context.ip,
+          userAgent: context.userAgent,
+        };
+        const user = await findRecoveryTokenUser(
+          input.token,
+          request,
+          services.verifyToken,
+        );
 
         // Verify the passkey registration response
         let verification;
@@ -122,6 +85,7 @@ export function createRecoveryPasskeyConfirmProcedure(
             input.signedChallenge,
           );
         } catch (err: any) {
+          auditRecoveryFailure(request, "passkey_verification_failed", user.id);
           throw errors.UNAUTHORIZED({
             message: err.message || "Failed to verify passkey registration",
           });
@@ -176,7 +140,9 @@ export function createRecoveryPasskeyConfirmProcedure(
         auditLog({
           event: AuditEvent.RECOVERY_SUCCESS,
           userId: user.id,
-          metadata: { passkeyId: passkey.id },
+          ip: context.ip,
+          userAgent: context.userAgent,
+          metadata: { flow: "passkey", passkeyId: passkey.id },
         });
 
         auditLog({

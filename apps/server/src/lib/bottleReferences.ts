@@ -505,17 +505,6 @@ async function reserveExactBottleReferenceNameInTransaction(
   return { name: result.reference.name, changed: result.changed };
 }
 
-/** Reserves the literal trimmed canonical name already persisted on a Bottle. */
-export async function reserveLiteralCanonicalBottleReferenceInTransaction(
-  tx: AnyTransaction,
-  input: ExactBottleReferenceReservationInput,
-): Promise<{ name: string; changed: boolean }> {
-  return reserveExactBottleReferenceNameInTransaction(tx, {
-    ...input,
-    name: input.name.trim(),
-  });
-}
-
 /** Reserves a normalized canonical reference without migrating other references. */
 export async function reserveExactBottleReferenceInTransaction(
   tx: AnyTransaction,

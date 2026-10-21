@@ -44,5 +44,10 @@ export const RequiresReason: Story = {
       screen.getByRole("button", { name: "Suspend member" }),
     );
     await expect(args.onSubmit).toHaveBeenCalledWith("Repeated spam.");
+    // Wait for the send to finish so the screenshot never catches the
+    // pending label.
+    await expect(
+      await screen.findByRole("button", { name: "Suspend member" }),
+    ).toBeEnabled();
   },
 };

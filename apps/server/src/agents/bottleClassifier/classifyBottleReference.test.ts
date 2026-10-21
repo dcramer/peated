@@ -60,8 +60,8 @@ describe("server bottleClassifier wrapper", () => {
     const input = { reference: { name: "Wild Turkey Rare Breed Rye" } };
 
     await expect(
-      runBottleReference(input, runBottleReferenceInService),
+      runBottleReference(input, undefined, runBottleReferenceInService),
     ).resolves.toBe(run);
-    expect(runBottleReferenceInService).toHaveBeenCalledWith(input);
+    expect(runBottleReferenceInService).toHaveBeenCalledWith(input, undefined);
   });
 });
