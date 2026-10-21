@@ -60,6 +60,23 @@ describe("POST /bottle-series", () => {
     });
   });
 
+  it("makes the new series searchable before indexing runs", async function ({
+    fixtures,
+    defaults,
+  }) {
+    const brand = await fixtures.Entity({ name: "Ardbeg" });
+
+    const series = await routerClient.bottleSeries.create(
+      { name: "Supernova", brand: brand.id },
+      { context: { user: defaults.user } },
+    );
+
+    const { results } = await routerClient.bottleSeries.list({
+      query: "supernova",
+    });
+    expect(results.map(({ id }) => id)).toEqual([series.id]);
+  });
+
   it("requires authentication", async function ({ fixtures }) {
     const brand = await fixtures.Entity({ name: "Ardbeg" });
 

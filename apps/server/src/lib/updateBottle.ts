@@ -868,7 +868,7 @@ async function resolveStableState(
   let seriesId = group.seriesId;
   if (patch?.series !== undefined) {
     try {
-      [seriesId] = await processSeries({
+      seriesId = await processSeries({
         tx,
         series: patch.series,
         brand,
@@ -957,7 +957,7 @@ async function resolveStableState(
         });
       } else {
         try {
-          [seriesId] = await processSeries({
+          seriesId = await processSeries({
             tx,
             series: {
               name: currentSeries.name,

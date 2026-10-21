@@ -94,7 +94,6 @@ export class BottleAlreadyExistsError extends Error {
 type PersistedBottleResult = {
   bottle: Bottle;
   newEntityIds: number[];
-  seriesCreated: boolean;
 };
 
 type PreparedBottleCreate = {
@@ -103,7 +102,6 @@ type PreparedBottleCreate = {
   createdByActorId: number;
   distillerIds: number[];
   newEntityIds: number[];
-  seriesCreated: boolean;
   groupFullName: string;
   groupName: string;
 };
@@ -241,7 +239,6 @@ async function prepareBottleCreateInTransaction(
   }
 
   const newEntityIds: Set<number> = new Set();
-  let seriesCreated = false;
 
   const attemptedSmwsIdentity = {
     name: bottleData.name,
@@ -298,7 +295,7 @@ async function prepareBottleCreateInTransaction(
 
   let seriesId: number | null = null;
   if (input.series) {
-    [seriesId, seriesCreated] = await processSeries({
+    seriesId = await processSeries({
       series: input.series,
       brand,
       createdByActorId: actorId,
@@ -380,7 +377,6 @@ async function prepareBottleCreateInTransaction(
     createdByActorId: actorId,
     distillerIds,
     newEntityIds: Array.from(newEntityIds),
-    seriesCreated,
     groupFullName,
     groupName,
   };
@@ -436,7 +432,6 @@ async function insertPreparedBottleInTransaction(
     createdByActorId,
     distillerIds,
     newEntityIds,
-    seriesCreated,
   } = prepared;
 
   const [bottle] = await tx
@@ -475,7 +470,6 @@ async function insertPreparedBottleInTransaction(
   return {
     bottle,
     newEntityIds,
-    seriesCreated,
   };
 }
 
@@ -733,7 +727,7 @@ export async function createOrReuseBottleInTransaction(
 
 /** Dispatches unique, best-effort work only after the Bottle transaction commits. */
 export async function finalizeCreatedBottle(
-  { bottle, seriesCreated, newEntityIds }: BottleCreateResult,
+  { bottle, newEntityIds }: BottleCreateResult,
   {
     creationSource = "manual_entry",
     generateDetails = true,
@@ -766,23 +760,6 @@ export async function finalizeCreatedBottle(
         id: bottle.id,
       },
     });
-  }
-
-  if (bottle.seriesId && seriesCreated) {
-    try {
-      await pushUniqueJob("IndexBottleSeriesSearch", {
-        seriesId: bottle.seriesId,
-      });
-    } catch (err) {
-      logError(err, {
-        bottle: {
-          id: bottle.id,
-        },
-        series: {
-          id: bottle.seriesId,
-        },
-      });
-    }
   }
 
   for (const entityId of newEntityIds) {
