@@ -6,7 +6,7 @@ Date: 2026-10-21
 
 This pass filled the Entity `pronunciation` and `pronunciationIpa` fields for production Entities with kind `distillery` and country Scotland. It started with 294 such records, none of which had a pronunciation. 178 records are real Scottish whisky production sites (operating, closed, demolished, or mothballed). The other 116 are bottlers, merchants, brands, anonymous label wording, non-Scottish producers, or junk records stored with the wrong kind. They were left unchanged and are listed below for a separate kind review.
 
-120 production sites were written: 107 in the first pass and 13 in a second pass. 58 were left unknown: 13 because credible sources still conflict and 45 because no acceptable source was found.
+123 production sites were written: 107 in the first pass, 13 in a second pass, and 3 from the owner. 55 were left unknown: 10 because credible sources still conflict and 45 because no acceptable source was found.
 
 ## Sources
 
@@ -30,6 +30,7 @@ Several guides could not be read here: Wine Enthusiast, The Scotsman, whisky.com
 - A conflict was settled only when at least two independent checked sources agree on the whole name and stress, and the disagreeing source is not the producer. Pittyvaich follows The Spirits Business and Whisky for Everyone over Difford's Guide. Pulteney follows the Summerton guide and Whiskipedia.
 - The Glenlivet FAQ and the Whisky for Everyone guide returned 403 during the check. The Glenlivet's stress is confirmed by the Summerton guide. Glenugie rests on Whisky for Everyone alone.
 - Girvan, Glengoyne, Glengyle, Glendullan, Glen Ord, and Glen Spey use stress that the operator inferred because the source gives no stress. The owner approved these as borderline values.
+- The owner settled three split names directly: Caol Ila "cull-EE-luh", Ardbeg "ARD-beg", and Clynelish "KLINE-leesh". Each agrees with at least one checked guide.
 - Each update also queued the Entity's normal derived jobs, including generated details for empty fields. The owner accepted that.
 
 ## Written
@@ -158,6 +159,10 @@ Several guides could not be read here: Wine Enthusiast, The Scotsman, whisky.com
 | E1878 | Pulteney Distillery | PULT-nee dis-TIL-uh-ree | ˈpʌltni dɪˈstɪləri | second pass | [source](https://summertonclub.com/distillery-pronunciation/), [second](https://whiskipedia.com/distillery-names/) |
 | E4181 | The Clydeside Distillery | thuh KLYDE-side dis-TIL-uh-ree | ðə ˈklaɪdˌsaɪd dɪˈstɪləri | second pass | [source](https://www.merriam-webster.com/dictionary/Clydeside), [second](https://en.wiktionary.org/wiki/distillery) |
 
+| E0028 | Ardbeg | ARD-beg | ˈɑːdbɛɡ | owner | [Summerton](https://summertonclub.com/distillery-pronunciation/) agrees |
+| E0366 | Caol Ila | cull-EE-luh | kʌlˈiːlə | owner | [Summerton](https://summertonclub.com/distillery-pronunciation/) agrees |
+| E0843 | Clynelish | KLINE-leesh | ˈklaɪnliːʃ | owner | owner |
+
 ## Left unknown
 
 ### Conflicting sources
@@ -165,10 +170,7 @@ Several guides could not be read here: Wine Enthusiast, The Scotsman, whisky.com
 | Entity | Name            | What the sources say                                                                                                                                                                                                                                                                                                                             |
 | ------ | --------------- | ------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------ |
 | E0015  | Allt-a-Bhainne  | Sources disagree on the ending and first vowel: Whiskipedia factsheet 'alt a\*vain'; Whiskipedia names page 'altà VANJA' (stress on final word, used for stress here); Whisky for Everyone 'olt–a–vane'; Michael Jackson via dcs.ed.ac.uk 'Alt-a-Bane'; The Casks 'allt-a-vanya' or 'allt-a-vane'. Wikipedia gives only Gaelic IPA [al̪ˠt̪əˈvaɲə]. |
-| E0028  | Ardbeg          | Wikipedia Islay single malts table and Whiskipedia ('ardBEG') stress the second syllable; Wikipedia Ardbeg distillery article gives /ˈɑːrdbɛɡ/ (first-syllable stress). Conflict on stress only.                                                                                                                                                 |
 | E0070  | Balmenach       | Only Whiskipedia: names page 'balMEAHRnach' (stress on second syllable) and its own factsheet 'bal*may*nack' (vowel used here). The two disagree slightly; no other source found.                                                                                                                                                                |
-| E0366  | Caol Ila        | Producer (Diageo malts.com FAQ) sounds; stress from Wikipedia. Wikipedia distillery article gives /kʊˈliːlə/ and Islay single malts table /kʌlˈiːlə/ kuul-EE-lə; Gordon & MacPhail 'cull-eela'. Conflict on the second vowel (ell vs eel).                                                                                                       |
-| E0843  | Clynelish       | Difford's Guide and Whisky for Everyone 'kline–leesh' give sounds; stress from Whiskipedia 'cleinLISH'. The Casks says either KLYNE-leesh or klein-LEESH is used, so stress is disputed.                                                                                                                                                         |
 | E0410  | Dailuaine       | Whisky for Everyone sounds; stress from Wikipedia's Gaelic IPA [t̪alˈuəɲə] and Whiskipedia 'dal-HOOànjeh'. Gordon & MacPhail gives 'dal-u-ayn' (different last syllable), so sources conflict.                                                                                                                                                    |
 | E0255  | Glenglassaugh   | Conflict on the ending: Whisky for Everyone 'glen–glassoff'; Whiskipedia 'glen GLASSòch' / 'glen*glass*ock'. Stress agrees.                                                                                                                                                                                                                      |
 | E2900  | GlenWyvis       | Conflict: distilando.com says 'GlenWyvis (pronounced glen-wiv-is)'. Producer site blocked; Ben Wyvis Wikipedia gives only Gaelic IPA. Needs a better source.                                                                                                                                                                                     |
