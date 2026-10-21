@@ -33,6 +33,9 @@ export default async function TastingDraftsPage(props: {
   return (
     <TastingDraftsPageFrame>
       <TastingDraftList
+        // Next keeps client state when only the cursor changes; start each
+        // page with its own rows.
+        key={page}
         drafts={draftList.results}
         nextHref={getCursorHref(
           "/drafts",
