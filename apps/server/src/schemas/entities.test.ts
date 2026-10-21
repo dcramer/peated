@@ -31,7 +31,8 @@ describe("EntityPronunciationSchema", () => {
     ["an empty syllable", "glen GEER--ee"],
     ["an empty value", " "],
   ])("rejects %s", (_reason, pronunciation) => {
-    expect(() => EntityPronunciationSchema.parse(pronunciation)).toThrow(
+    const result = EntityPronunciationSchema.safeParse(pronunciation);
+    expect(result.error?.issues[0]?.message).toBe(
       'Use lowercase syllables with the stressed one in capitals, like "glen GEER-ee".',
     );
   });
@@ -64,7 +65,8 @@ describe("EntityPronunciationIpaSchema", () => {
     ["digits", "ɡlɛn 2"],
     ["an empty value", " "],
   ])("rejects %s", (_reason, pronunciation) => {
-    expect(() => EntityPronunciationIpaSchema.parse(pronunciation)).toThrow(
+    const result = EntityPronunciationIpaSchema.safeParse(pronunciation);
+    expect(result.error?.issues[0]?.message).toBe(
       'Use IPA symbols without slashes, like "ɡlɛn ˈɡɪəri".',
     );
   });
