@@ -208,8 +208,9 @@ subject.
 - Put up to three key facts under the title, above the actions. Rank them by
   how exactly they identify the release: ABV, then an exact batch or cask
   number, then stated age, then one year (vintage, then bottling, then
-  release), then category to fill a spare slot. Leave out facts the name
-  already prints. Series stays in the title.
+  release), then category to fill a spare slot. Leave out a stated age the
+  name already prints. A batch, cask, or year still shows when the name repeats
+  it, because its label says what the number means. Series stays in the title.
 - Show a year only when it is part of, or necessary to understand, the release
   identity.
 - Do not add single-cask or cask-strength badges.

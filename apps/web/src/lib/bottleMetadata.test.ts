@@ -133,67 +133,28 @@ describe("bottle metadata", () => {
     ).toEqual([{ label: "Vintage", value: "1975" }]);
   });
 
-  it("skips a year the name already prints", () => {
+  it("keeps a labeled year and cask even when the name repeats them", () => {
     expect(
       getBottleHeaderSpecs(
-        { ...headerBottle, abv: 43, bottlingYear: 2003, vintageYear: 1968 },
+        {
+          ...headerBottle,
+          abv: 43,
+          bottlingYear: 2003,
+          statedAge: 35,
+          vintageYear: 1968,
+        },
         "1968 35-year-old",
       ),
-    ).toEqual([{ label: "ABV", value: "43%" }]);
-  });
-
-  it("skips a cask number only when the name prints it as a cask", () => {
-    expect(
-      getBottleHeaderSpecs(
-        { ...headerBottle, caskNumber: "12", statedAge: 12 },
-        "12-year-old",
-      ),
-    ).toEqual([{ label: "Cask", value: "12" }]);
+    ).toEqual([
+      { label: "ABV", value: "43%" },
+      { label: "Vintage", value: "1968" },
+    ]);
     expect(
       getBottleHeaderSpecs(
         { ...headerBottle, caskNumber: "1841", statedAge: 7 },
         "Single Cask 2014 No.1841 7-year-old",
       ),
-    ).toBeNull();
-    expect(
-      getBottleHeaderSpecs(
-        { ...headerBottle, caskNumber: "84" },
-        "1984 Cask #84",
-      ),
-    ).toBeNull();
-  });
-
-  it("skips a cask number stored with its own marker", () => {
-    expect(
-      getBottleHeaderSpecs(
-        { ...headerBottle, caskNumber: "#1964" },
-        "Single Cask #1964",
-      ),
-    ).toBeNull();
-    expect(
-      getBottleHeaderSpecs(
-        { ...headerBottle, caskNumber: "No. 12" },
-        "Cask No.12",
-      ),
-    ).toBeNull();
-  });
-
-  it("falls back to the cask number when the name prints the batch", () => {
-    expect(
-      getBottleHeaderSpecs(
-        { ...headerBottle, caskNumber: "77", edition: "Batch 3" },
-        "Single Cask Batch 3",
-      ),
-    ).toEqual([{ label: "Cask", value: "77" }]);
-  });
-
-  it("matches a printed year only as a whole number", () => {
-    expect(
-      getBottleHeaderSpecs(
-        { ...headerBottle, vintageYear: 1984 },
-        "Cask 19841",
-      ),
-    ).toEqual([{ label: "Vintage", value: "1984" }]);
+    ).toEqual([{ label: "Cask", value: "1841" }]);
   });
 
   it("returns nothing when no facts are known", () => {

@@ -34,59 +34,31 @@ type BottleHeaderSpecs = Pick<
   | "vintageYear"
 >;
 
-// Matches whole words and numbers only, so cask `12` is not found in
-// `12-year-old` and year `1984` is not found in `19841`.
-const CASK_PREFIX = String.raw`(?:cask\s*(?:no\.?\s*)?|no\.?\s*|#\s*)`;
-
-function nameIncludes(name: string, text: string, prefix = "") {
-  const escaped = text.replace(/[.*+?^${}()|[\]\\]/gu, "\\$&");
-  return new RegExp(
-    `(?:^|[^\\p{L}\\p{N}])${prefix}${escaped}(?![\\p{L}\\p{N}])`,
-    "iu",
-  ).test(name);
-}
-
-function getReleaseMarkerFact(
-  bottle: BottleHeaderSpecs,
-  name: string,
-): KeyFact | null {
-  if (
-    bottle.edition &&
-    isBatchEdition(bottle.edition) &&
-    !nameIncludes(name, bottle.edition)
-  ) {
+function getReleaseMarkerFact(bottle: BottleHeaderSpecs): KeyFact | null {
+  if (bottle.edition && isBatchEdition(bottle.edition)) {
     return {
       label: "Batch",
       value: bottle.edition.replace(/^batch(?:\s+(?:no\.?|number))?\s+/iu, ""),
     };
   }
-  if (
-    bottle.caskNumber &&
-    !nameIncludes(
-      name,
-      bottle.caskNumber.replace(new RegExp(`^${CASK_PREFIX}`, "iu"), ""),
-      CASK_PREFIX,
-    )
-  ) {
-    return { label: "Cask", value: bottle.caskNumber };
+  return bottle.caskNumber ? { label: "Cask", value: bottle.caskNumber } : null;
+}
+
+function getYearFact(bottle: BottleHeaderSpecs): KeyFact | null {
+  if (bottle.vintageYear !== null) {
+    return { label: "Vintage", value: String(bottle.vintageYear) };
+  }
+  if (bottle.bottlingYear !== null) {
+    return { label: "Bottled", value: String(bottle.bottlingYear) };
+  }
+  if (bottle.releaseYear !== null) {
+    return { label: "Released", value: String(bottle.releaseYear) };
   }
   return null;
 }
 
-function getYearFact(bottle: BottleHeaderSpecs, name: string): KeyFact | null {
-  const year =
-    bottle.vintageYear !== null
-      ? { label: "Vintage", value: bottle.vintageYear }
-      : bottle.bottlingYear !== null
-        ? { label: "Bottled", value: bottle.bottlingYear }
-        : bottle.releaseYear !== null
-          ? { label: "Released", value: bottle.releaseYear }
-          : null;
-  return year && !nameIncludes(name, String(year.value))
-    ? { label: year.label, value: String(year.value) }
-    : null;
-}
-
+// Bottle Presentation: show stated age once, so an age the name prints stays
+// out of the key facts.
 function getAgeFact(bottle: BottleHeaderSpecs, name: string): KeyFact | null {
   if (bottle.statedAge === null) {
     return bottle.noAgeStatement ? { label: "Age", value: "NAS" } : null;
@@ -103,8 +75,9 @@ function getAgeFact(bottle: BottleHeaderSpecs, name: string): KeyFact | null {
 /**
  * Bottle Presentation: the detailed header shows up to three facts, ranked by
  * how precisely they identify the release: ABV, batch or cask, age, one year,
- * then category to fill a spare slot. Facts the name already prints are left
- * out, and missing facts leave no placeholder.
+ * then category to fill a spare slot. Missing facts leave no placeholder.
+ * A batch, cask, or year the name repeats still shows: its label says what
+ * the number means.
  */
 export function getBottleHeaderSpecs(
   bottle: BottleHeaderSpecs,
@@ -112,9 +85,9 @@ export function getBottleHeaderSpecs(
 ): KeyFactList | null {
   const [first, second, third] = [
     bottle.abv === null ? null : { label: "ABV", value: formatAbv(bottle.abv) },
-    getReleaseMarkerFact(bottle, name),
+    getReleaseMarkerFact(bottle),
     getAgeFact(bottle, name),
-    getYearFact(bottle, name),
+    getYearFact(bottle),
     bottle.category
       ? { label: "Category", value: formatCategoryName(bottle.category) }
       : null,
