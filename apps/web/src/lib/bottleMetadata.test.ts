@@ -163,6 +163,21 @@ describe("bottle metadata", () => {
     ).toBeNull();
   });
 
+  it("skips a cask number stored with its own marker", () => {
+    expect(
+      getBottleHeaderSpecs(
+        { ...headerBottle, caskNumber: "#1964" },
+        "Single Cask #1964",
+      ),
+    ).toBeNull();
+    expect(
+      getBottleHeaderSpecs(
+        { ...headerBottle, caskNumber: "No. 12" },
+        "Cask No.12",
+      ),
+    ).toBeNull();
+  });
+
   it("falls back to the cask number when the name prints the batch", () => {
     expect(
       getBottleHeaderSpecs(

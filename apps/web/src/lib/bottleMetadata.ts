@@ -62,7 +62,11 @@ function getReleaseMarkerFact(
   }
   if (
     bottle.caskNumber &&
-    !nameIncludes(name, bottle.caskNumber, CASK_PREFIX)
+    !nameIncludes(
+      name,
+      bottle.caskNumber.replace(new RegExp(`^${CASK_PREFIX}`, "iu"), ""),
+      CASK_PREFIX,
+    )
   ) {
     return { label: "Cask", value: bottle.caskNumber };
   }
