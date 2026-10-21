@@ -1246,6 +1246,7 @@ export function createBottleClassifier(
     identityAnchor = null,
     webSearchBudget,
     conversationId,
+    signal,
   }: RunBottleClassifierAgentInput): Promise<BottleClassifierAgentRun> => {
     const resolvedConversationId = buildClassifierConversationId(
       reference,
@@ -1297,6 +1298,7 @@ export function createBottleClassifier(
       resolvedEntities,
       identityAnchor,
       webSearchBudget,
+      signal,
     });
 
     const run = await runPreparedBottleClassifierAgent(preparedRun);

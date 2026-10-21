@@ -2357,6 +2357,35 @@ describe("createBottleClassifier", () => {
     }
   });
 
+  test("passes the stop signal to the agent run", async () => {
+    const signal = new AbortController().signal;
+    const runAgent = vi.fn(
+      async (preparedRun: PreparedBottleClassifierAgentRun) => {
+        expect(preparedRun.runOptions.signal).toBe(signal);
+        return nativeAgentResult({
+          finalOutput: noMatchAgentDecision(),
+          inputTokens: 20,
+          outputTokens: 5,
+        });
+      },
+    );
+    const { classifier } = createTestClassifier({
+      maxSearchQueries: 0,
+      runPreparedBottleClassifierAgent: runAgent,
+    });
+
+    await classifier.runBottleReference(
+      {
+        reference: { name: "Example Single Malt Whisky" },
+        extractedIdentity: null,
+        initialCandidates: [],
+      },
+      { signal },
+    );
+
+    expect(runAgent).toHaveBeenCalledOnce();
+  });
+
   test("returns null metadata for an override-only reference run", async () => {
     const { classifier } = createTestClassifier({
       runBottleClassifierAgent: async () => ({
