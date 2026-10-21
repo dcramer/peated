@@ -68,7 +68,7 @@ function generatePrompt(entity: InputEntity) {
       "'kind' must be the best single identity from: brand, distillery, bottler, company.",
     ].join(" "),
     [
-      `'pronunciation' should say how people say ${entity.name} in plain English respelling: lowercase syllables joined by hyphens, words split by spaces, and the stressed syllable in capitals, like "glen GEER-ee" for Glen Garioch.`,
+      `'pronunciation' should say how people say ${entity.name} in plain English respelling: lowercase syllables joined by hyphens, words split by spaces, and the stressed syllable in capitals when it is confidently known, like "glen GEER-ee" for Glen Garioch.`,
       "Use only letters, spaces, hyphens, and apostrophes.",
       "'pronunciationIpa' should give the same pronunciation in the International Phonetic Alphabet without slashes or brackets, like \"ɡlɛn ˈɡɪəri\".",
       "Follow how the producer and local speakers say the name. Return null for either field when the pronunciation is not confidently known.",
