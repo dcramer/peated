@@ -489,9 +489,6 @@ function TastingDraftBottleStep({
             getContributionHref={(query) =>
               getCreateBottleHref({ query, returnDraftId: draft.id })
             }
-            // The hint starts a search only when nothing else is offered, so
-            // its results don't crowd out a suggestion.
-            initialQuery={offersBottle ? "" : (draft.bottleHint ?? "")}
             initialScope="bottles"
             placement="page"
             placeholder="Search by bottle, brand, or distiller…"

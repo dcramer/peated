@@ -59,10 +59,18 @@ export function getTastingDraftSuggestion(
   return { kind: "unknown" };
 }
 
-/** The name and status line an inbox row shows for a draft. */
+/**
+ * The name and status line an inbox row shows for a draft. `name` is null
+ * when the draft has neither a Bottle nor a hint; the row then shows the date.
+ */
+export type TastingDraftDescription = {
+  name: string | null;
+  status: string;
+};
+
 export function describeTastingDraft(
   draft: Pick<TastingDraft, "bottle" | "bottleHint" | "identification">,
-) {
+): TastingDraftDescription {
   if (draft.bottle) {
     return {
       name: formatBottleDisplayName(draft.bottle),
@@ -70,7 +78,7 @@ export function describeTastingDraft(
     };
   }
 
-  const name = draft.bottleHint || "No name yet";
+  const name = draft.bottleHint || null;
   const suggestion = getTastingDraftSuggestion(draft);
   switch (suggestion.kind) {
     case "identifying":

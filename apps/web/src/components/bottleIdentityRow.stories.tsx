@@ -181,7 +181,7 @@ export const RowLayouts: Story = {
     docs: {
       description: {
         story:
-          "Compare the actual bottle, sidebar, activity, tasting, search, selection, and loading components at wide and phone widths. Standard rows use three identity lines and a medium thumbnail; activity makes that image larger in wide feed columns. Sidebars use a small thumbnail, compact two-line titles, and trailing details below the identity. Compact library additions use the extra-small thumbnail.",
+          "Compare the actual bottle, sidebar, activity, tasting, search, selection, and loading components at wide and phone widths. Standard rows use three identity lines and a medium thumbnail; activity makes that image larger in wide feed columns. Sidebars use a small thumbnail, compact two-line titles, and trailing details below the identity. Compact library additions use the extra-small thumbnail. Tasting drafts let their status wrap so it is never cut off.",
       },
     },
   },
@@ -202,6 +202,18 @@ export const RowLayouts: Story = {
               },
               { name: "Blended Malt" },
             ]}
+          />
+        </section>
+        <section aria-label="Tasting draft">
+          <SectionHeading level={3}>Tasting draft</SectionHeading>
+          <BottleIdentityRow
+            href="/drafts/example"
+            imageUrl={null}
+            metadata={[
+              "New to Peated: Pappy Van Winkle's Family Reserve 15-year-old",
+            ]}
+            name="Oct 18, 2026"
+            wrapDetails
           />
         </section>
         <section aria-label="Library addition">

@@ -17,7 +17,11 @@ import { useFlashMessages } from "@peated/web/components/flashMessages.stylex";
 import { ItemList, ItemListItem } from "@peated/web/components/itemList.stylex";
 import { CursorPager } from "@peated/web/components/lists.stylex";
 import { PageHeader } from "@peated/web/components/pages/pageLayout.stylex";
-import { Timestamp } from "@peated/web/components/timestamp";
+import {
+  formatTimestamp,
+  Timestamp,
+  useViewerTimeZone,
+} from "@peated/web/components/timestamp";
 import { getFormErrorMessage } from "@peated/web/lib/formHelpers";
 import { useORPC } from "@peated/web/lib/orpc/context";
 import {
@@ -53,6 +57,7 @@ export function TastingDraftList({
   const orpc = useORPC();
   const queryClient = useQueryClient();
   const { flash } = useFlashMessages();
+  const timeZone = useViewerTimeZone();
   const [drafts, setDrafts] = useState(initialDrafts);
   const [deleting, setDeleting] = useState<TastingDraft | null>(null);
   const [deleteError, setDeleteError] = useState<string>();
@@ -97,7 +102,11 @@ export function TastingDraftList({
     <>
       <ItemList ariaLabel="Drafts">
         {drafts.map((draft) => {
-          const { name, status } = describeTastingDraft(draft);
+          const description = describeTastingDraft(draft);
+          // A draft with no Bottle or hint is named by when it was had.
+          const name =
+            description.name ??
+            formatTimestamp(draft.tastedAt, "date", timeZone);
           return (
             <ItemListItem key={draft.id}>
               <BottleIdentityRow
@@ -117,13 +126,16 @@ export function TastingDraftList({
                 href={getTastingDraftHref(draft)}
                 imageFit={draft.imageUrl ? "cover" : undefined}
                 imageUrl={draft.imageUrl ?? draft.bottle?.imageUrl}
-                metadata={[status]}
+                metadata={[description.status]}
                 name={name}
                 subtitle={
-                  <>
-                    Had <Timestamp date={draft.tastedAt} format="date" />
-                  </>
+                  description.name ? (
+                    <>
+                      Had <Timestamp date={draft.tastedAt} format="date" />
+                    </>
+                  ) : undefined
                 }
+                wrapDetails
               />
             </ItemListItem>
           );

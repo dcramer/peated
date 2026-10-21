@@ -216,7 +216,7 @@ describe("describeTastingDraft", () => {
     });
   });
 
-  it("falls back when there is no hint", () => {
+  it("leaves the name empty when there is no Bottle or hint", () => {
     expect(
       describeTastingDraft(
         makeDraft({
@@ -225,7 +225,7 @@ describe("describeTastingDraft", () => {
           identification: { status: "none", result: null },
         }),
       ),
-    ).toEqual({ name: "No name yet", status: "Needs a bottle" });
+    ).toEqual({ name: null, status: "Needs a bottle" });
   });
 });
 

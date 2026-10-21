@@ -163,8 +163,10 @@ inbox.
 The inbox lists drafts, most recently saved first, a page at a time. Each row
 shows the photo, the Bottle name or the bottle hint, when the member had the
 dram, and where finding the Bottle stands: Bottle chosen, a suggested Bottle,
-a new Bottle to add, couldn't tell, or still identifying. Each row can delete
-its draft after the member confirms.
+a new Bottle to add, couldn't tell, or still identifying. A draft with no
+Bottle and no hint is named by the date the member had it. The status line
+wraps instead of being cut off. Each row can delete its draft after the member
+confirms.
 
 `/drafts/{draft}` finishes one draft:
 
@@ -173,8 +175,8 @@ its draft after the member confirms.
    proposed new Bottle with **Add this bottle**, or a note that the photo
    couldn't be matched. While identification is pending, the page checks
    again every few seconds. Search is always there; a search result opens a
-   confirm step. The bottle hint fills the search only when nothing is
-   suggested.
+   confirm step. The search starts empty: hints are notes, such as "the
+   smoky one Jo poured", not search terms. The intro quotes the hint instead.
    - **Use this bottle** saves the Bottle on the draft.
    - **Add this bottle** calls `create-bottle`. If Peated already has that
      Bottle, the page offers the existing one instead.
