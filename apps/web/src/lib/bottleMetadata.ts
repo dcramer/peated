@@ -41,7 +41,7 @@ const CASK_PREFIX = String.raw`(?:cask\s*(?:no\.?\s*)?|no\.?\s*|#\s*)`;
 function nameIncludes(name: string, text: string, prefix = "") {
   const escaped = text.replace(/[.*+?^${}()|[\]\\]/gu, "\\$&");
   return new RegExp(
-    `(?<![\\p{L}\\p{N}])${prefix}${escaped}(?![\\p{L}\\p{N}])`,
+    `(?:^|[^\\p{L}\\p{N}])${prefix}${escaped}(?![\\p{L}\\p{N}])`,
     "iu",
   ).test(name);
 }
