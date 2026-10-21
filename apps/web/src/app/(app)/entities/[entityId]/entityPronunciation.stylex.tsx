@@ -36,7 +36,9 @@ export function EntityPronunciation({
       ) : null}
       {pronunciation && pronunciationIpa ? " " : null}
       {pronunciationIpa ? (
-        <span lang="und-fonipa">/{pronunciationIpa}/</span>
+        <span lang="und-fonipa" {...stylex.props(styles.ipa)}>
+          /{pronunciationIpa}/
+        </span>
       ) : null}
     </span>
   );
@@ -52,6 +54,11 @@ const styles = stylex.create({
   stressed: {
     fontWeight: 600,
     textTransform: "uppercase",
+  },
+  // Karla has no IPA symbols. Use one system face for the whole value so a
+  // word is not drawn half in Karla and half in a fallback font.
+  ipa: {
+    fontFamily: "system-ui, sans-serif",
   },
   visuallyHidden: {
     position: "absolute",
