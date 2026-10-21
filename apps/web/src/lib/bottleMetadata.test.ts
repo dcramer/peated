@@ -1,6 +1,7 @@
 import { describe, expect, it } from "vitest";
 
 import {
+  getBottleHeaderSpecs,
   getBottleReleasePlacement,
   getBottleReviewMetadata,
 } from "./bottleMetadata";
@@ -60,5 +61,88 @@ describe("bottle metadata", () => {
         vintageYear: null,
       }),
     ).toEqual(["43% ABV"]);
+  });
+
+  const headerBottle = {
+    abv: null,
+    bottlingYear: null,
+    caskNumber: null,
+    category: null,
+    edition: null,
+    noAgeStatement: null,
+    releaseYear: null,
+    statedAge: null,
+    vintageYear: null,
+  };
+
+  it("leads header specs with ABV and skips an age the name prints", () => {
+    expect(
+      getBottleHeaderSpecs(
+        { ...headerBottle, abv: 52, category: "single_malt", statedAge: 12 },
+        "12-year-old",
+      ),
+    ).toEqual([
+      { label: "ABV", value: "52%" },
+      { label: "Category", value: "Single Malt" },
+    ]);
+  });
+
+  it("keeps the three facts that best identify the release", () => {
+    expect(
+      getBottleHeaderSpecs(
+        {
+          ...headerBottle,
+          abv: 68.3,
+          bottlingYear: 2023,
+          category: "bourbon",
+          edition: "Batch C923",
+          statedAge: 12,
+        },
+        "Elijah Craig Barrel Proof",
+      ),
+    ).toEqual([
+      { label: "ABV", value: "68.3%" },
+      { label: "Batch", value: "C923" },
+      { label: "Age", value: "12 years" },
+    ]);
+  });
+
+  it("shows a cask number and one year, preferring vintage", () => {
+    expect(
+      getBottleHeaderSpecs(
+        {
+          ...headerBottle,
+          abv: 48.2,
+          bottlingYear: 2003,
+          caskNumber: "1234",
+          noAgeStatement: true,
+          vintageYear: 1985,
+        },
+        "Single Cask",
+      ),
+    ).toEqual([
+      { label: "ABV", value: "48.2%" },
+      { label: "Cask", value: "1234" },
+      { label: "Age", value: "NAS" },
+    ]);
+    expect(
+      getBottleHeaderSpecs(
+        { ...headerBottle, bottlingYear: 1988, vintageYear: 1975 },
+        "Old Bottling",
+      ),
+    ).toEqual([{ label: "Vintage", value: "1975" }]);
+  });
+
+  it("skips a year the name already prints", () => {
+    expect(
+      getBottleHeaderSpecs(
+        { ...headerBottle, abv: 43, bottlingYear: 2003, vintageYear: 1968 },
+        "1968 35-year-old",
+      ),
+    ).toEqual([{ label: "ABV", value: "43%" }]);
+  });
+
+  it("returns nothing when no facts are known", () => {
+    expect(getBottleHeaderSpecs(headerBottle, "Uigeadail")).toBeNull();
   });
 });

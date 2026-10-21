@@ -2,6 +2,11 @@ import * as stylex from "@stylexjs/stylex";
 import type { ReactNode } from "react";
 
 import { AppLink } from "@peated/web/components/appLink";
+import {
+  KeyFacts,
+  hasVisibleKeyFacts,
+  type KeyFactList,
+} from "@peated/web/components/catalogDetails.stylex";
 import type { BottleRatingSummaryProps } from "@peated/web/components/scoring.stylex";
 import { BottleRatingSummary } from "@peated/web/components/scoring.stylex";
 import { colors, effects, space } from "../../styles/tokens.stylex";
@@ -18,6 +23,7 @@ export type BottlePageHeaderProps = {
   menu?: ReactNode;
   name: string;
   rating?: BottleRatingSummaryProps | null;
+  specs?: KeyFactList | null;
 };
 
 /** Presents a bottle's catalog identity, member actions, and community ratings. */
@@ -29,6 +35,7 @@ export function BottlePageHeader({
   menu,
   name,
   rating,
+  specs,
 }: BottlePageHeaderProps) {
   const hasRatings = Boolean(rating);
 
@@ -37,6 +44,11 @@ export function BottlePageHeader({
       <PageHeader
         actions={actions}
         actionsPosition="start"
+        facts={
+          specs && hasVisibleKeyFacts(specs) ? (
+            <KeyFacts facts={specs} inline />
+          ) : null
+        }
         metadata={metadata}
         menu={menu}
         title={

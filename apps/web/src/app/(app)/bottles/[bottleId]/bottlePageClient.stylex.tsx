@@ -41,7 +41,10 @@ import {
   getAddSimilarBottlePath,
 } from "@peated/web/lib/addBottle";
 import { toBottleListItem } from "@peated/web/lib/bottleListItem";
-import { getBottleReleasePlacement } from "@peated/web/lib/bottleMetadata";
+import {
+  getBottleHeaderSpecs,
+  getBottleReleasePlacement,
+} from "@peated/web/lib/bottleMetadata";
 import { getReviewAndTastingFeedItems } from "@peated/web/lib/communityFeed";
 import { logTelemetryError } from "@peated/web/lib/log";
 import { useORPC } from "@peated/web/lib/orpc/context";
@@ -381,6 +384,7 @@ export function BottlePageFrameClient({
   }
 
   const bottle = bottleQuery.data;
+  const name = formatBottleDisplayName(bottle, { includeBrand: false });
   const currentHref =
     pathname === `/${bottle.peatedId}` ? getBottleUrl(bottle) : pathname;
 
@@ -407,7 +411,8 @@ export function BottlePageFrameClient({
           brandHref={getEntityUrl(bottle.brand)}
           metadata={getBottleDistillers(bottle)}
           menu={<BottleActions bottle={bottle} />}
-          name={formatBottleDisplayName(bottle, { includeBrand: false })}
+          name={name}
+          specs={getBottleHeaderSpecs(bottle, name)}
           rating={
             bottle.scoreCount === 0 &&
             !Object.values(bottle.tastingBandCounts).some((count) => count > 0)
