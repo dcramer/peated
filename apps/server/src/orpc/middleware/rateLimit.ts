@@ -102,9 +102,3 @@ export function createAuthRateLimit(
 }
 
 export const authRateLimit = createAuthRateLimit();
-
-export const strictAuthRateLimit = createRateLimit({
-  windowMs: 60 * 60 * 1000, // 1 hour
-  maxRequests: 10, // 10 attempts per hour
-  keyPrefix: "auth-strict",
-});

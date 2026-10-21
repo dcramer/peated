@@ -343,16 +343,6 @@ export async function getAdminContent(kind: AdminContentKind, id: number) {
   });
 }
 
-export function contentTable(kind: AdminContentKind) {
-  if (kind === "member_review") return memberReviews;
-  if (kind === "external_review") return externalReviews;
-  return tastings;
-}
-
-export function contentObjectType(kind: AdminContentKind) {
-  return kind;
-}
-
 export function contentDisplayName(kind: AdminContentKind, id: number) {
   const name =
     kind === "member_review"

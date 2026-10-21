@@ -472,13 +472,6 @@ export const PreparedEntityMergeDataSchema = ReviewEntityMergeSchema.omit({
   status: true,
 });
 
-export const PreparedOperationDataSchema = z.discriminatedUnion("type", [
-  PreparedBottleUpdateDataSchema,
-  PreparedBottleMergeDataSchema,
-  PreparedEntityUpdateDataSchema,
-  PreparedEntityMergeDataSchema,
-]);
-
 const PreparedBottleUpdateProposalSchema = z
   .object({
     status: z.literal("pending_review"),

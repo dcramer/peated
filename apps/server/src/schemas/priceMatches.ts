@@ -29,7 +29,6 @@ export const ExtractedBottleDetailsSchema = z.object({
   single_cask: z.boolean().nullable().default(null),
   edition: z.string().nullable().default(null),
 });
-export const BottleReferenceIdentitySchema = ExtractedBottleDetailsSchema;
 
 export const PriceMatchCandidateSchema = ClassifierBottleCandidateSchema;
 export const BottleCandidateSchema = ClassifierBottleCandidateSchema;
@@ -82,11 +81,6 @@ export const StorePriceMatchProposalTypeEnum = z.enum([
   "no_match",
 ]);
 export const BottleIdentityScopeEnum = z.enum(["product", "exact_cask"]);
-
-export const StorePriceMatchQueueStateEnum = z.enum([
-  "actionable",
-  "processing",
-]);
 
 export const ProposedEntityChoiceSchema = z.object({
   id: z.number().int().nullable().default(null),
