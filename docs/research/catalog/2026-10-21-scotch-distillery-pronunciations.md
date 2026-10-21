@@ -6,7 +6,7 @@ Date: 2026-10-21
 
 This pass filled the Entity `pronunciation` and `pronunciationIpa` fields for production Entities with kind `distillery` and country Scotland. It started with 294 such records, none of which had a pronunciation. 178 records are real Scottish whisky production sites (operating, closed, demolished, or mothballed). The other 116 are bottlers, merchants, brands, anonymous label wording, non-Scottish producers, or junk records stored with the wrong kind. They were left unchanged and are listed below for a separate kind review.
 
-129 production sites were written: 107 in the first pass, 13 in a second pass, 3 from the owner, and 6 without stress after stress became optional. 49 were left unknown: 9 because credible sources still conflict and 40 because no acceptable source was found.
+129 production sites were written: 107 in the first pass, 13 in a second pass, 3 from the owner, and 6 without stress after stress became optional. 49 were left unknown: 10 because credible sources still conflict and 39 because no acceptable source was found.
 
 ## Sources
 
