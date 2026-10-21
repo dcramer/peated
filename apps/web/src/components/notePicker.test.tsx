@@ -9,6 +9,12 @@ import { NotePickerField, type NotePickerOption } from "./notePicker.stylex";
 const notes: NotePickerOption[] = [
   { category: "Smoke", name: "Bonfire", usageCount: 12 },
   { category: "Fruit", name: "Apple", usageCount: 8 },
+  {
+    category: "Spice",
+    name: "Black pepper",
+    synonyms: ["peppery"],
+    usageCount: 4,
+  },
 ];
 
 function NotePickerHarness() {
@@ -72,6 +78,23 @@ describe("NotePickerField", () => {
     expect(
       container.querySelector('button[aria-label="Browse nose notes"]'),
     ).not.toBeNull();
+  });
+
+  it("suggests a note when the query matches one of its synonyms", () => {
+    act(() => root.render(<NotePickerHarness />));
+    const input = container.querySelector<HTMLInputElement>("input")!;
+    act(() => {
+      input.focus();
+      Object.getOwnPropertyDescriptor(
+        HTMLInputElement.prototype,
+        "value",
+      )?.set?.call(input, "peppery");
+      input.dispatchEvent(new Event("input", { bubbles: true }));
+    });
+
+    expect(container.querySelector('[role="option"]')?.textContent).toContain(
+      "Black pepper",
+    );
   });
 
   it("adds a suggested note from a tap that does not move focus", () => {

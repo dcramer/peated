@@ -26,8 +26,16 @@ export type NotePickerOption = {
   category: string;
   common?: boolean;
   name: string;
+  /** Other words for the note, such as "peppery" for Pepper, that also find it. */
+  synonyms?: readonly string[];
   usageCount: number;
 };
+
+function noteMatchesQuery(note: NotePickerOption, normalizedQuery: string) {
+  return [note.name, ...(note.synonyms ?? [])].some((text) =>
+    text.toLocaleLowerCase().includes(normalizedQuery),
+  );
+}
 
 export type NotePickerProps = {
   notes: readonly NotePickerOption[];
@@ -65,8 +73,7 @@ export function NotePickerField({
     return notes
       .filter(
         (note) =>
-          !value.includes(note.name) &&
-          note.name.toLocaleLowerCase().includes(normalizedQuery),
+          !value.includes(note.name) && noteMatchesQuery(note, normalizedQuery),
       )
       .sort(
         (left, right) =>
@@ -272,7 +279,7 @@ export function NotePicker({
     const normalizedQuery = trimmedQuery.toLocaleLowerCase();
     const filtered = notes.filter((note) =>
       normalizedQuery
-        ? note.name.toLocaleLowerCase().includes(normalizedQuery)
+        ? noteMatchesQuery(note, normalizedQuery)
         : note.category === activeCategory,
     );
 
