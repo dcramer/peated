@@ -25,7 +25,11 @@ export type PhotoFailureTrace = {
   error: string;
 };
 
-export function LabelFacts({ result }: { result: PhotoIdentification | null }) {
+export function LabelFacts({
+  result,
+}: {
+  result: Pick<PhotoIdentification, "imageEvidence"> | null;
+}) {
   const fields = [
     ["Brand", getFieldValue(result, "brand")],
     ["Name", getFieldValue(result, "expression")],

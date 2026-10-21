@@ -1,16 +1,52 @@
+import { mockBottle } from "@peated/server/orpc/mock/fixtures";
 import type { Meta, StoryObj } from "@storybook/nextjs-vite";
 import { useState } from "react";
 
 import { SearchBox } from "@peated/web/components/searchBox.stylex";
 import BottleImage from "../../../../../packages/bottle-classifier/src/eval-fixtures/assets/photo-add-bottle-misses/laphroaig-elements-l2.0.webp";
 import { StoryCanvas } from "../storyFixtures.stylex";
+import { EMPTY_PHOTO_PROGRESS, type PhotoProgress } from "./helpers";
 import {
   PhotoLoadingState,
   PhotoReadFailureState,
   PhotoUploadState,
 } from "./states";
 
-type ResolverState = "ready" | "reading" | "failure";
+type ResolverState = "ready" | "reading" | "matches" | "failure";
+
+const progressWithMatches: PhotoProgress = {
+  pendingImage: {
+    id: "story-pending-image",
+    imageUrl: BottleImage.src,
+    expiresAt: "2099-01-01T00:00:00.000Z",
+  },
+  imageEvidence: {
+    sourceImageId: "story-pending-image",
+    extractors: [],
+    fieldCandidates: {
+      brand: {
+        value: "Laphroaig",
+        confidence: 0.75,
+        sourceExtractorIndexes: [0],
+      },
+      expression: {
+        value: "Elements L2.0",
+        confidence: 0.75,
+        sourceExtractorIndexes: [0],
+      },
+      abv: { value: 58.4, confidence: 0.75, sourceExtractorIndexes: [0] },
+    },
+    photoSuitability: {
+      isSingleBottlePhoto: true,
+      labelReadable: true,
+      suitableAsTastingImage: true,
+      suitableAsBottleImage: true,
+    },
+    conflicts: [],
+  },
+  candidates: [{ ...mockBottle, imageUrl: BottleImage.src }],
+  step: "checking_web",
+};
 
 function BottleSearch() {
   const [query, setQuery] = useState("");
@@ -65,13 +101,20 @@ function BottleSearch() {
 function BottleResolverState({ state }: { state: ResolverState }) {
   const search = <BottleSearch />;
 
-  if (state === "reading") {
+  if (state === "reading" || state === "matches") {
     return (
       <PhotoLoadingState
+        identifying
+        onPickMatch={() => undefined}
         onStartOver={() => undefined}
+        pickingBottleId={null}
         previewUrl={BottleImage.src}
+        progress={
+          state === "matches" ? progressWithMatches : EMPTY_PHOTO_PROGRESS
+        }
         search={search}
         searchHref="#search"
+        slow={state === "matches"}
       />
     );
   }
@@ -107,7 +150,7 @@ const meta = {
   argTypes: {
     state: {
       control: "select",
-      options: ["ready", "reading", "failure"],
+      options: ["ready", "reading", "matches", "failure"],
     },
   },
   decorators: [

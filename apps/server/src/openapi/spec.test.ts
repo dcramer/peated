@@ -252,6 +252,17 @@ describe("Published OpenAPI metadata", () => {
     }
   });
 
+  it("publishes photo identification as an event stream", async () => {
+    const response = await app.request("/spec-full.json");
+    // SAFETY: A successful spec response is serialized directly from OpenAPIGenerator.
+    const spec = (await response.json()) as OpenAPI.Document;
+    const success =
+      spec.paths?.["/tastings/photo-identification"]?.post?.responses?.["200"];
+    const content = success && "content" in success ? success.content : {};
+
+    expect(Object.keys(content ?? {})).toEqual(["text/event-stream"]);
+  });
+
   it("documents and groups every operation with a unique operation ID", async () => {
     const response = await app.request("/spec-full.json");
     expect(response.status).toBe(200);

@@ -1,5 +1,9 @@
 import type { Outputs } from "@peated/server/orpc/router";
-import { getBottleIdentityProps } from "@peated/web/lib/bottleListItem";
+import type { Bottle } from "@peated/server/types";
+import {
+  type BottleIdentitySource,
+  getBottleIdentityProps,
+} from "@peated/web/lib/bottleListItem";
 import * as stylex from "@stylexjs/stylex";
 import { foundationStyles } from "../styles/foundations.stylex";
 import { colors, controlMetrics, space } from "../styles/tokens.stylex";
@@ -89,30 +93,7 @@ export function BottleCreateCandidates({
             If one of these is the same bottle, use it instead of adding
             another.
           </p>
-          <ul {...stylex.props(styles.list)}>
-            {results.map((bottle) => (
-              <li key={bottle.id} {...stylex.props(styles.row)}>
-                <BottleIdentityRow
-                  {...getBottleIdentityProps(bottle, { includeBottler: true })}
-                  end={
-                    <Button
-                      aria-label={`Use this bottle: ${bottle.fullName}`}
-                      onClick={() => onUse(bottle)}
-                      size="sm"
-                      type="button"
-                      variant="tonal"
-                    >
-                      Use this bottle
-                    </Button>
-                  }
-                  imageUrl={bottle.imageUrl}
-                  layout="cell"
-                  variant="search"
-                  verticalPadding="sm"
-                />
-              </li>
-            ))}
-          </ul>
+          <BottleMatchList bottles={results} onUse={onUse} />
         </>
       ) : (
         <p
@@ -123,6 +104,49 @@ export function BottleCreateCandidates({
         </p>
       )}
     </section>
+  );
+}
+
+type BottleMatchListItem = BottleIdentitySource &
+  Pick<Bottle, "id" | "fullName" | "imageUrl">;
+
+/** Bottles a member may pick instead, each with a "Use this bottle" action. */
+export function BottleMatchList<TBottle extends BottleMatchListItem>({
+  bottles,
+  onUse,
+  pendingBottleId = null,
+}: {
+  bottles: readonly TBottle[];
+  onUse: (bottle: TBottle) => void;
+  pendingBottleId?: number | null;
+}) {
+  return (
+    <ul {...stylex.props(styles.list)}>
+      {bottles.map((bottle) => (
+        <li key={bottle.id} {...stylex.props(styles.row)}>
+          <BottleIdentityRow
+            {...getBottleIdentityProps(bottle, { includeBottler: true })}
+            end={
+              <Button
+                aria-label={`Use this bottle: ${bottle.fullName}`}
+                disabled={pendingBottleId !== null}
+                loading={pendingBottleId === bottle.id}
+                onClick={() => onUse(bottle)}
+                size="sm"
+                type="button"
+                variant="tonal"
+              >
+                Use this bottle
+              </Button>
+            }
+            imageUrl={bottle.imageUrl}
+            layout="cell"
+            variant="search"
+            verticalPadding="sm"
+          />
+        </li>
+      ))}
+    </ul>
   );
 }
 

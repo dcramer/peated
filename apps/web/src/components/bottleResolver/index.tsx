@@ -19,7 +19,9 @@ import { useMutation } from "@tanstack/react-query";
 import { useEffect, useRef, useState, type ChangeEvent } from "react";
 
 import {
+  applyPhotoProgress,
   createIdempotencyKey,
+  EMPTY_PHOTO_PROGRESS,
   getCreateBottlePrefill,
   getCreateDecision,
   getCreateNameSeed,
@@ -28,8 +30,12 @@ import {
   getMatchedBottle,
   getProposedName,
   getSearchSeed,
+  SLOW_PHOTO_IDENTIFICATION_MS,
   type PhotoIdentification,
   type PhotoIdentificationCreateInput,
+  type PhotoIdentificationProgressEvent,
+  type PhotoMatchCandidate,
+  type PhotoProgress,
 } from "./helpers";
 import { BottleResolverColumn } from "./layout.stylex";
 import {
@@ -83,6 +89,11 @@ export default function BottleResolver({
   const [photoResult, setPhotoResult] = useState<PhotoIdentification | null>(
     null,
   );
+  const [photoProgress, setPhotoProgress] = useState<PhotoProgress | null>(
+    null,
+  );
+  const [photoSlow, setPhotoSlow] = useState(false);
+  const [pickingBottleId, setPickingBottleId] = useState<number | null>(null);
   const [photoIdentificationTraceId, setPhotoIdentificationTraceId] = useState<
     string | null
   >(null);
@@ -104,17 +115,24 @@ export default function BottleResolver({
     mutationFn: async ({
       responseTraceContext,
       signal,
+      onProgress,
       ...input
     }: {
       file: File;
       idempotencyKey: string;
       responseTraceContext: ORPCResponseTraceContext;
       signal: AbortSignal;
+      onProgress: (event: PhotoIdentificationProgressEvent) => void;
     }) => {
-      return orpc.tastings.photoIdentification.call(input, {
+      const stream = await orpc.tastings.photoIdentification.call(input, {
         context: { responseTraceContext },
         signal,
       });
+      while (true) {
+        const step = await stream.next();
+        if (step.done) return step.value;
+        onProgress(step.value);
+      }
     },
   });
   const photoIdentificationCreateMutation = useMutation(
@@ -164,7 +182,8 @@ export default function BottleResolver({
     await onResolve(
       {
         ...bottle,
-        pendingImage: photoResult?.pendingImage ?? null,
+        pendingImage:
+          photoResult?.pendingImage ?? photoProgress?.pendingImage ?? null,
         previewUrl: currentPreviewUrl,
         photoTrace,
       },
@@ -262,14 +281,20 @@ export default function BottleResolver({
     let timedOut = false;
     let errorCode: string | null = null;
     let suggestedNextStep: string | null = null;
-    // Stop waiting after two minutes, including the upload and bottle lookup.
+    // Stop waiting after four minutes, including the upload and bottle
+    // lookup. Rare bottles can take a while; the ways out stay visible.
     const timeout = setTimeout(() => {
       timedOut = true;
       controller.abort();
-    }, 120_000);
+    }, 240_000);
+    const slowTimeout = setTimeout(() => {
+      if (photoRequestRef.current === controller) setPhotoSlow(true);
+    }, SLOW_PHOTO_IDENTIFICATION_MS);
     setError(null);
     setPhotoError(null);
     setPhotoResult(null);
+    setPhotoProgress(EMPTY_PHOTO_PROGRESS);
+    setPhotoSlow(false);
     setPhotoIdentificationTraceId(null);
     setPhotoFailureTrace(null);
 
@@ -291,6 +316,12 @@ export default function BottleResolver({
         idempotencyKey,
         responseTraceContext,
         signal: controller.signal,
+        onProgress: (event) => {
+          if (photoRequestRef.current !== controller) return;
+          setPhotoProgress((progress) =>
+            applyPhotoProgress(progress ?? EMPTY_PHOTO_PROGRESS, event),
+          );
+        },
       });
       if (photoRequestRef.current !== controller) {
         outcome = "cancelled";
@@ -340,6 +371,7 @@ export default function BottleResolver({
       }
     } finally {
       clearTimeout(timeout);
+      clearTimeout(slowTimeout);
       if (photoRequestRef.current === controller)
         photoRequestRef.current = null;
       logInfo("Bottle photo submission finished", {
@@ -367,6 +399,18 @@ export default function BottleResolver({
     event.target.value = "";
   }
 
+  /** Uses a likely match before the classifier finishes, and stops it. */
+  async function pickLikelyMatch(bottle: PhotoMatchCandidate) {
+    photoRequestRef.current?.abort();
+    photoRequestRef.current = null;
+    setPickingBottleId(bottle.id);
+    try {
+      await loadBottle(bottle);
+    } finally {
+      setPickingBottleId(null);
+    }
+  }
+
   function startOver() {
     photoRequestRef.current?.abort();
     photoRequestRef.current = null;
@@ -374,6 +418,8 @@ export default function BottleResolver({
     setError(null);
     setPhotoError(null);
     setPhotoResult(null);
+    setPhotoProgress(null);
+    setPhotoSlow(false);
     setPhotoIdentificationTraceId(null);
     setPhotoFailureTrace(null);
     setMatchedBottleStatus(null);
@@ -487,11 +533,18 @@ export default function BottleResolver({
           />
         )}
 
-        {isIdentifying && (
+        {(isIdentifying || (photoProgress && !photoResult && !photoError)) && (
           <PhotoLoadingState
             previewUrl={previewUrl}
+            progress={photoProgress ?? EMPTY_PHOTO_PROGRESS}
+            identifying={isIdentifying}
+            slow={photoSlow}
+            pickingBottleId={pickingBottleId}
             search={search}
             searchHref={defaultSearchHref}
+            onPickMatch={(bottle) => {
+              void pickLikelyMatch(bottle);
+            }}
             onStartOver={startOver}
           />
         )}

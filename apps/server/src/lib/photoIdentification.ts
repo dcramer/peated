@@ -4,14 +4,16 @@ import {
   deriveAutomationTier,
 } from "@peated/bottle-classifier/automationTier";
 import { createDecidedBottleClassification } from "@peated/bottle-classifier/contract";
+import type { BottleClassifierProgressEvent } from "@peated/bottle-classifier/internal/runtime";
+import type { BottleCandidate } from "@peated/bottle-classifier/internal/types";
 import {
   BottleExtractedDetailsSchema,
   ImageBottleEvidenceSchema,
   type BottleExtractedDetails,
   type ImageBottleEvidence,
 } from "@peated/server/agents/bottleClassifier";
-import { runBottleReference } from "@peated/server/agents/bottleClassifier/classifyBottleReference";
 import { findExactReferenceBottleCandidate } from "@peated/server/agents/bottleClassifier/findExactReferenceBottleCandidate";
+import { runBottleReference } from "@peated/server/agents/bottleClassifier/service";
 import config from "@peated/server/config";
 import {
   createOpenAIClient,
@@ -24,6 +26,7 @@ import {
   type PhotoIdentificationDiagnosticsSchema,
   type PhotoIdentificationProposedBottleSchema,
   type PhotoIdentificationSchema,
+  type PhotoIdentificationStepEnum,
   type PhotoIdentificationSuggestedNextStepEnum,
 } from "@peated/server/schemas";
 import * as Sentry from "@sentry/node";
@@ -164,8 +167,10 @@ export function buildPhotoEvidenceFromExtractedIdentity({
  */
 export async function extractPhotoBottleEvidence({
   photo,
+  signal,
 }: {
   photo: PhotoIdentificationImage;
+  signal?: AbortSignal;
 }): Promise<{
   extractedIdentity: BottleExtractedDetails | null;
   imageEvidence: ImageBottleEvidence;
@@ -203,6 +208,7 @@ export async function extractPhotoBottleEvidence({
         });
         const extraction = await extractor.extractFromImageWithMetadata(
           await getPhotoExtractionImageInput({ photo }),
+          { signal },
         );
         return {
           extractedIdentity: BottleExtractedDetailsSchema.nullable().parse(
@@ -266,6 +272,40 @@ export type PhotoIdentificationStartSpan = <Result>(
   context: Parameters<typeof Sentry.startSpan>[0],
   callback: (span: PhotoIdentificationSpan) => Promise<Result>,
 ) => Promise<Result>;
+
+type PhotoIdentificationStep = z.infer<typeof PhotoIdentificationStepEnum>;
+
+/**
+ * Progress from one photo identification, sent while it runs. Candidates are
+ * Peated's own likely matches, found before the classifier model starts.
+ */
+export type PhotoIdentificationProgress =
+  | { type: "label"; imageEvidence: ImageBottleEvidence }
+  | { type: "candidates"; candidates: BottleCandidate[] }
+  | { type: "step"; step: PhotoIdentificationStep };
+
+const PEATED_LOOKUP_TOOLS = new Set([
+  "search_bottles",
+  "search_entities",
+  "get_bottle_context",
+  "get_entity_context",
+]);
+
+// Members see generic steps only. Web queries and site names stay on the
+// server (product decision, photo-assisted-bottle-resolution.md).
+function toPhotoIdentificationProgress(
+  event: BottleClassifierProgressEvent,
+): PhotoIdentificationProgress {
+  if (event.type === "candidates") return event;
+  if (event.status === "finished") return { type: "step", step: "comparing" };
+  if (PEATED_LOOKUP_TOOLS.has(event.name)) {
+    return { type: "step", step: "checking_peated" };
+  }
+  if (event.name.startsWith("firecrawl_")) {
+    return { type: "step", step: "checking_web" };
+  }
+  return { type: "step", step: "comparing" };
+}
 
 export type IdentifyBottlePhotoServices = {
   extractEvidence: typeof extractPhotoBottleEvidence;
@@ -510,9 +550,13 @@ export async function identifyBottlePhoto(
   {
     photo,
     traceAttributes,
+    signal,
+    onProgress,
   }: {
     photo: PhotoIdentificationImage;
     traceAttributes: PhotoIdentificationAttributes;
+    signal?: AbortSignal;
+    onProgress?: (progress: PhotoIdentificationProgress) => void;
   },
   services: IdentifyBottlePhotoServices = identifyBottlePhotoServices,
 ) {
@@ -540,7 +584,9 @@ export async function identifyBottlePhoto(
       const { extractedIdentity, imageEvidence } =
         await services.extractEvidence({
           photo,
+          signal,
         });
+      onProgress?.({ type: "label", imageEvidence });
 
       const classificationInput = {
         reference: {
@@ -582,7 +628,12 @@ export async function identifyBottlePhoto(
             }),
             modelMetadata: null,
           }
-        : await services.runReference(classificationInput);
+        : await services.runReference(classificationInput, {
+            signal,
+            onProgress: onProgress
+              ? (event) => onProgress(toPhotoIdentificationProgress(event))
+              : undefined,
+          });
       const classification = classificationRun.result;
       const referenceName = classificationInput.reference.name;
       const diagnostics = buildPhotoIdentificationDiagnostics({

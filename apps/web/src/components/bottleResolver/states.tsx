@@ -9,7 +9,16 @@ import { SelectedBottleSummary } from "@peated/web/components/selectedBottleSumm
 import { Plus, Search } from "lucide-react";
 import type { ReactNode } from "react";
 
-import type { PhotoIdentification } from "./helpers";
+import { BottleMatchList } from "@peated/web/components/bottleCreateCandidates.stylex";
+import { foundationStyles } from "@peated/web/styles/foundations.stylex";
+import * as stylex from "@stylexjs/stylex";
+
+import {
+  getPhotoProgressStatus,
+  type PhotoIdentification,
+  type PhotoMatchCandidate,
+  type PhotoProgress,
+} from "./helpers";
 import {
   BottlePhotoAction,
   BottleResolverColumn,
@@ -101,13 +110,23 @@ export function PhotoReadFailureState({
 
 export function PhotoLoadingState({
   previewUrl,
+  progress,
+  identifying,
+  slow,
+  pickingBottleId,
   search,
   searchHref,
+  onPickMatch,
   onStartOver,
 }: {
   previewUrl: string | null;
+  progress: PhotoProgress;
+  identifying: boolean;
+  slow: boolean;
+  pickingBottleId: number | null;
   search?: ReactNode;
   searchHref: string;
+  onPickMatch: (bottle: PhotoMatchCandidate) => void;
   onStartOver: () => void;
 }) {
   return (
@@ -119,11 +138,38 @@ export function PhotoLoadingState({
       </BottleResolverInlineAction>
       {previewUrl ? (
         <PhotoPreview
-          loading
-          metadata="Reading the label and checking Peated for a match."
+          loading={identifying}
+          metadata="We'll show what we read and any likely matches as we go."
           src={previewUrl}
           title="Reading the label"
         />
+      ) : null}
+      <p role="status" {...stylex.props(foundationStyles.metadata)}>
+        {identifying ? getPhotoProgressStatus(progress) : "Stopped looking."}
+      </p>
+      {slow && identifying ? (
+        <FormNotice>
+          {progress.candidates.length
+            ? "This one is taking a while. Pick a match below or search by name if you'd rather not wait."
+            : "This one is taking a while. Search by name if you'd rather not wait."}
+        </FormNotice>
+      ) : null}
+      {progress.candidates.length ? (
+        <BottleResolverSection
+          description="If one of these is your bottle, use it and we'll stop looking."
+          title="Possible matches"
+        >
+          <BottleMatchList
+            bottles={progress.candidates}
+            onUse={onPickMatch}
+            pendingBottleId={pickingBottleId}
+          />
+        </BottleResolverSection>
+      ) : null}
+      {progress.imageEvidence ? (
+        <FormDetails compact defaultOpen title="Label details">
+          <LabelFacts result={{ imageEvidence: progress.imageEvidence }} />
+        </FormDetails>
       ) : null}
       <BottleResolverSection
         description="You can keep looking while we read the photo."
