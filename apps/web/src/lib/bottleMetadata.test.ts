@@ -142,6 +142,36 @@ describe("bottle metadata", () => {
     ).toEqual([{ label: "ABV", value: "43%" }]);
   });
 
+  it("skips a cask number only when the name prints it as a cask", () => {
+    expect(
+      getBottleHeaderSpecs(
+        { ...headerBottle, caskNumber: "12", statedAge: 12 },
+        "12-year-old",
+      ),
+    ).toEqual([{ label: "Cask", value: "12" }]);
+    expect(
+      getBottleHeaderSpecs(
+        { ...headerBottle, caskNumber: "1841", statedAge: 7 },
+        "Single Cask 2014 No.1841 7-year-old",
+      ),
+    ).toBeNull();
+    expect(
+      getBottleHeaderSpecs(
+        { ...headerBottle, caskNumber: "84" },
+        "1984 Cask #84",
+      ),
+    ).toBeNull();
+  });
+
+  it("matches a printed year only as a whole number", () => {
+    expect(
+      getBottleHeaderSpecs(
+        { ...headerBottle, vintageYear: 1984 },
+        "Cask 19841",
+      ),
+    ).toEqual([{ label: "Vintage", value: "1984" }]);
+  });
+
   it("returns nothing when no facts are known", () => {
     expect(getBottleHeaderSpecs(headerBottle, "Uigeadail")).toBeNull();
   });

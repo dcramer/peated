@@ -34,12 +34,24 @@ type BottleHeaderSpecs = Pick<
   | "vintageYear"
 >;
 
+// Matches whole words and numbers only, so cask `12` is not found in
+// `12-year-old` and year `1984` is not found in `19841`.
+const CASK_PREFIX = String.raw`(?:cask\s*(?:no\.?\s*)?|no\.?\s*|#\s*)`;
+
+function nameIncludes(name: string, text: string, prefix = "") {
+  const escaped = text.replace(/[.*+?^${}()|[\]\\]/gu, "\\$&");
+  return new RegExp(
+    `(?<![\\p{L}\\p{N}])${prefix}${escaped}(?![\\p{L}\\p{N}])`,
+    "iu",
+  ).test(name);
+}
+
 function getReleaseMarkerFact(
   bottle: BottleHeaderSpecs,
-  inName: (text: string) => boolean,
+  name: string,
 ): KeyFact | null {
   if (bottle.edition && isBatchEdition(bottle.edition)) {
-    return inName(bottle.edition)
+    return nameIncludes(name, bottle.edition)
       ? null
       : {
           label: "Batch",
@@ -50,17 +62,14 @@ function getReleaseMarkerFact(
         };
   }
   if (bottle.caskNumber) {
-    return inName(bottle.caskNumber)
+    return nameIncludes(name, bottle.caskNumber, CASK_PREFIX)
       ? null
       : { label: "Cask", value: bottle.caskNumber };
   }
   return null;
 }
 
-function getYearFact(
-  bottle: BottleHeaderSpecs,
-  inName: (text: string) => boolean,
-): KeyFact | null {
+function getYearFact(bottle: BottleHeaderSpecs, name: string): KeyFact | null {
   const year =
     bottle.vintageYear !== null
       ? { label: "Vintage", value: bottle.vintageYear }
@@ -69,7 +78,7 @@ function getYearFact(
         : bottle.releaseYear !== null
           ? { label: "Released", value: bottle.releaseYear }
           : null;
-  return year && !inName(String(year.value))
+  return year && !nameIncludes(name, String(year.value))
     ? { label: year.label, value: String(year.value) }
     : null;
 }
@@ -97,13 +106,11 @@ export function getBottleHeaderSpecs(
   bottle: BottleHeaderSpecs,
   name: string,
 ): KeyFactList | null {
-  const inName = (text: string) =>
-    name.toLocaleLowerCase().includes(text.toLocaleLowerCase());
   const [first, second, third] = [
     bottle.abv === null ? null : { label: "ABV", value: formatAbv(bottle.abv) },
-    getReleaseMarkerFact(bottle, inName),
+    getReleaseMarkerFact(bottle, name),
     getAgeFact(bottle, name),
-    getYearFact(bottle, inName),
+    getYearFact(bottle, name),
     bottle.category
       ? { label: "Category", value: formatCategoryName(bottle.category) }
       : null,
