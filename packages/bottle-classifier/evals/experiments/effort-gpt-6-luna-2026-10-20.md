@@ -24,9 +24,9 @@ same. Source commit `7204701b8`.
    setting runs first: high, medium, low; then medium, low, high; then low,
    high, medium.
 2. **Classifier:** `BOTTLE_CLASSIFIER_REASONING_EFFORT` high (control) and
-   medium on the full eval suite in pull request CI, one run each. The control
-   run uses the unchanged default; the next commit changes only the default
-   classifier effort to medium. Label reading stays on high for both. Both
+   medium on the full eval suite in pull request CI, one run each, at the same
+   time. The control pull request (#1402) adds only this record; the change
+   pull request (#1403) also sets the default classifier effort to medium. Label reading stays on high for both. Both
    runs use the same CI environment, web tools, and replay recordings. The
    eval judge stays on GPT 5.6 Luna medium. A first local attempt was void: the test computer
    slept and 88 of 115 cases failed with connection errors.
