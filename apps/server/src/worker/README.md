@@ -83,4 +83,4 @@ Handlers should let unexpected errors throw so BullMQ can record and retry them.
 
 Waiting jobs live only in Redis. A Redis reset drops them without a failure
 record, so bulk work needs a repair path that finds what is still undone from
-the database, such as `missingOnly` on the Bottle search rebuild endpoint.
+the database, such as `missingOnly` on `/admin/catalog/rebuild-search`.

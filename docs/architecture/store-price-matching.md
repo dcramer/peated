@@ -97,8 +97,8 @@ Proposal types use the classifier's action names: `match`, `create_bottle`,
 and `no_match`. A `match` whose `currentBottleId` differs from its suggested
 Bottle would replace the listing's current Bottle. Status values are
 `pending_review`, `approved`, `ignored`, and `errored`. A decision that may
-apply automatically is applied as soon as it is saved; it stays
-`pending_review` only if applying fails.
+apply automatically is applied as soon as it is saved; if applying fails, it
+becomes `errored`.
 
 Moderators can:
 

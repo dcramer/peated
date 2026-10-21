@@ -439,8 +439,8 @@ The contract is applied at the presentation site that owns each branch:
   general cask labels.
 - SEO, sharing, notifications, and other unstructured consumers use concise
   plain-text identity helpers.
-- Search-vector construction indexes series independently of whether a result
-  surface has room to display it.
+- Bottle search documents (`buildBottleSearchDocuments`) include the Series
+  even when a result surface has no room to show it.
 - Additional Details remains the complete home for years, cask flags, and cask
   details omitted from the usual Bottle display. The cask statement shows at
   most two lines; when it is cut off, the full text is available as a tooltip.
