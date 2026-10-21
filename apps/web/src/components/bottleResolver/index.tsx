@@ -293,7 +293,7 @@ export default function BottleResolver({
       },
     });
     try {
-      const upload = await shrinkPhotoForUpload(file);
+      const upload = await shrinkPhotoForUpload(file, 1600);
       uploadSize = upload.size;
       const result = await photoIdentificationMutation.mutateAsync({
         file: upload,
