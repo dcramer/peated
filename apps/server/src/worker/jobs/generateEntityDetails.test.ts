@@ -69,6 +69,29 @@ test("fills a missing pronunciation", async ({ fixtures }) => {
   );
 });
 
+test("keeps generated details when the audio job cannot be queued", async ({
+  fixtures,
+}) => {
+  const entity = await fixtures.Entity({
+    name: "Glen Garioch",
+    kind: "distillery",
+    description: "A Highland distillery in Oldmeldrum.",
+    descriptionSrc: "user",
+    yearEstablished: 1797,
+    website: "https://www.glengarioch.com",
+  });
+  const model = vi.fn<EntityDetailsModel>(async () => generatedDetails());
+  vi.mocked(pushUniqueJob).mockRejectedValueOnce(new Error("Redis is down"));
+
+  await expect(generateEntityDetails(entity.id, model)).resolves.toBe(
+    undefined,
+  );
+
+  await expect(readEntity(entity.id)).resolves.toMatchObject({
+    pronunciationIpa: "ɡlɛn ˈɡɪəri",
+  });
+});
+
 test("keeps an existing pronunciation", async ({ fixtures }) => {
   const entity = await fixtures.Entity({
     name: "Glen Garioch",
