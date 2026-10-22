@@ -91,6 +91,11 @@ export function createFixedWebSearchExecutor(
     if (toolName === "firecrawl_web_search") {
       return evidence.searchResult;
     }
+    // Reviewed packs hold pages, not Whiskybase search results. A Whiskybase
+    // lookup reads one page and is matched by its URL below.
+    if (toolName === "whiskybase_search") {
+      return { error: "No reviewed fixed Whiskybase search evidence." };
+    }
 
     if (!("url" in args)) {
       return { error: "Fixed page evidence requires a URL." };

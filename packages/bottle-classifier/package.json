@@ -55,6 +55,10 @@
       "types": "./src/smws.ts",
       "default": "./src/smws.ts"
     },
+    "./whiskybase": {
+      "types": "./src/tools/whiskybasePages.ts",
+      "default": "./src/tools/whiskybasePages.ts"
+    },
     "./internal/runtime": {
       "types": "./src/internal/runtime.ts",
       "default": "./src/internal/runtime.ts"
@@ -94,6 +98,7 @@
     "@openai/agents": "^0.8.5",
     "@peated/tsconfig": "workspace:*",
     "@sentry/core": "catalog:",
+    "cheerio": "1.2.0",
     "openai": "^6.27.0",
     "zod": "catalog:"
   },

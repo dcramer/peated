@@ -75,6 +75,8 @@ Other supported subpaths include:
 - `imageEvidence`
 - `openaiCompatibleConfig`
 - `smws`
+- `whiskybase` — Whiskybase page readers that the server's moderator routes
+  share with the classifier's Whiskybase tools
 
 Server integrations may use only the explicit `internal/*` exports. These are not
 general package API.

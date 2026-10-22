@@ -215,6 +215,17 @@ Entities, run focused web searches, and read a promising page. When web tools
 are unavailable, the classifier does not silently substitute another model or
 provider.
 
+The package also defines Whiskybase tools: `whiskybase_lookup` reads one entry
+by Whiskybase ID or URL, and `whiskybase_search` reads the first page of
+Whiskybase search results. The agent does not get them yet. The owner approved
+on-demand Whiskybase lookups for moderators on 2026-10-22, but the classifier
+also runs on its own for store listings. See
+[Whiskybase Lookups](../operations/catalog-research.md#whiskybase-lookups).
+When they are given to the agent, each call uses one web search allowance.
+The tools return Bottle facts only, never ratings, reviews, prices, or member
+names. They mark Whiskybase's `Calculated age` as arithmetic, never a stated
+age.
+
 For a title-derived deterministic creation with a source URL and no supplied
 web evidence, the classifier may read that exact page before the agent runs. This
 fills supported creation facts after local code has settled Bottle identity. It

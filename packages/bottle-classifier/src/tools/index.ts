@@ -26,5 +26,11 @@ export {
   hydrateBottleSearchEvidence,
   type BottleWebSearchBatchResult,
   type BottleWebSearchExecutor,
+  type BottleWebToolName,
   type BottleWebToolResult,
 } from "./sharedWebSearch";
+export {
+  createWhiskybaseTools,
+  runWhiskybaseLookup,
+  runWhiskybaseSearch,
+} from "./whiskybase";
