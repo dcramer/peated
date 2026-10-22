@@ -3,9 +3,16 @@ import { CategoryEnum } from "@peated/server/schemas";
 import type { CreateBottlePrefill } from "@peated/web/components/search/createBottleHref";
 import { z } from "zod";
 
-import { getFieldValue, type PhotoIdentification } from "./fieldValues";
+import {
+  getFieldValue,
+  type PhotoIdentification,
+  type PhotoIdentificationProgressEvent,
+} from "./fieldValues";
 
-export type { PhotoIdentification } from "./fieldValues";
+export type {
+  PhotoIdentification,
+  PhotoIdentificationProgressEvent,
+} from "./fieldValues";
 export type PhotoIdentificationCreateInput =
   Inputs["tastings"]["photoIdentificationCreate"];
 
@@ -275,4 +282,78 @@ export function getManualResultCopy(
     createLabel: "Add a new bottle",
     primaryAction: "search" as const,
   };
+}
+
+type PhotoIdentificationStep = Extract<
+  PhotoIdentificationProgressEvent,
+  { type: "step" }
+>["step"];
+
+export type PhotoMatchCandidate = Extract<
+  PhotoIdentificationProgressEvent,
+  { type: "candidates" }
+>["bottles"][number];
+
+/** What a member has seen so far while a photo is identified. */
+export type PhotoProgress = {
+  pendingImage: PhotoIdentification["pendingImage"] | null;
+  imageEvidence: PhotoIdentification["imageEvidence"] | null;
+  candidates: PhotoMatchCandidate[];
+  step: PhotoIdentificationStep | null;
+};
+
+export const EMPTY_PHOTO_PROGRESS: PhotoProgress = {
+  pendingImage: null,
+  imageEvidence: null,
+  candidates: [],
+  step: null,
+};
+
+export function applyPhotoProgress(
+  progress: PhotoProgress,
+  event: PhotoIdentificationProgressEvent,
+): PhotoProgress {
+  switch (event.type) {
+    case "photo":
+      return { ...progress, pendingImage: event.pendingImage };
+    case "label":
+      return { ...progress, imageEvidence: event.imageEvidence };
+    case "candidates":
+      return { ...progress, candidates: event.bottles };
+    case "step":
+      return { ...progress, step: event.step };
+  }
+}
+
+const STEP_STATUS = {
+  checking_peated: "Checking Peated…",
+  checking_web: "Checking the web…",
+  comparing: "Comparing details…",
+} satisfies Record<PhotoIdentificationStep, string>;
+
+/** One plain line naming the current step, readable without animation. */
+export function getPhotoProgressStatus(progress: PhotoProgress) {
+  if (progress.step) return STEP_STATUS[progress.step];
+  if (progress.imageEvidence) return "Checking Peated…";
+  return "Reading the label…";
+}
+
+/** After this long, point the member to the ways out. */
+export const SLOW_PHOTO_IDENTIFICATION_MS = 45_000;
+
+/** One line naming what the label reading found, such as brand, name, age, and ABV. */
+export function getLabelSummary(
+  imageEvidence: PhotoIdentification["imageEvidence"],
+) {
+  const result = { imageEvidence };
+  return (
+    [
+      getFieldValue(result, "brand"),
+      getFieldValue(result, "expression"),
+      getFieldValue(result, "statedAge"),
+      getFieldValue(result, "abv"),
+    ]
+      .filter(Boolean)
+      .join(" · ") || null
+  );
 }

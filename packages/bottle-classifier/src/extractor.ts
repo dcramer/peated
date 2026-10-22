@@ -37,6 +37,7 @@ export interface WhiskyLabelClient {
   responses: {
     create(
       input: Parameters<OpenAI["responses"]["create"]>[0],
+      options?: { signal?: AbortSignal },
     ): PromiseLike<WhiskyLabelProviderResponse>;
   };
 }
@@ -128,13 +129,17 @@ export function createWhiskyLabelExtractor({
         imageUrlOrBase64,
         onMetadata: onImageExtractionMetadata,
       }),
-    extractFromImageWithMetadata: async (imageUrlOrBase64: string) =>
+    extractFromImageWithMetadata: async (
+      imageUrlOrBase64: string,
+      { signal }: { signal?: AbortSignal } = {},
+    ) =>
       extractFromImageWithMetadata({
         client,
         model: imageModel,
         reasoningEffort: imageReasoningEffort,
         imageUrlOrBase64,
         onMetadata: onImageExtractionMetadata,
+        signal,
       }),
     extractFromText: async (label: string) =>
       extractFromText({
@@ -176,34 +181,39 @@ export async function extractFromImageWithMetadata({
   reasoningEffort,
   imageUrlOrBase64,
   onMetadata,
+  signal,
 }: {
   client: WhiskyLabelClient;
   model: string;
   reasoningEffort?: OpenAIReasoningEffort;
   imageUrlOrBase64: string;
   onMetadata?: (metadata: WhiskyLabelExtractionMetadata) => void;
+  signal?: AbortSignal;
 }): Promise<WhiskyLabelExtractionResult> {
   const startedAt = performance.now();
-  const response = await client.responses.create({
-    model,
-    instructions: buildWhiskyLabelExtractorInstructions({ mode: "image" }),
-    input: [
-      {
-        role: "user",
-        content: [
-          {
-            type: "input_image",
-            image_url: imageUrlOrBase64,
-            detail: IMAGE_DETAIL,
-          },
-        ],
+  const response = await client.responses.create(
+    {
+      model,
+      instructions: buildWhiskyLabelExtractorInstructions({ mode: "image" }),
+      input: [
+        {
+          role: "user",
+          content: [
+            {
+              type: "input_image",
+              image_url: imageUrlOrBase64,
+              detail: IMAGE_DETAIL,
+            },
+          ],
+        },
+      ],
+      text: {
+        format: ResponseFormat,
       },
-    ],
-    text: {
-      format: ResponseFormat,
+      ...getStableOpenAISettings(model, reasoningEffort),
     },
-    ...getStableOpenAISettings(model, reasoningEffort),
-  });
+    signal ? { signal } : undefined,
+  );
 
   const metadata = {
     durationMs: performance.now() - startedAt,

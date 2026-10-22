@@ -4,6 +4,7 @@
 import config from "@peated/server/config";
 import { MAX_FILESIZE } from "@peated/server/constants";
 import { db } from "@peated/server/db";
+import { logError } from "@peated/server/lib/log";
 import { isModelServiceUnavailable } from "@peated/server/lib/openaiClient";
 import { createPendingImageUpload } from "@peated/server/lib/pendingUploads";
 import {
@@ -16,6 +17,7 @@ import {
   type PhotoIdentificationAttributes,
   type PhotoIdentificationClassification,
   type PhotoIdentificationModelMetadata,
+  type PhotoIdentificationProgress,
 } from "@peated/server/lib/photoIdentification";
 import { signPhotoIdentificationCreateToken } from "@peated/server/lib/photoIdentificationCreateToken";
 import { humanizeBytes } from "@peated/server/lib/strings";
@@ -32,6 +34,7 @@ import {
 } from "@peated/server/orpc/middleware";
 import {
   type PhotoIdentificationDiagnosticsSchema,
+  type PhotoIdentificationProgressSchema,
   type PhotoIdentificationSchema,
   type PhotoIdentificationSuggestedNextStepEnum,
 } from "@peated/server/schemas";
@@ -42,7 +45,13 @@ import type { z } from "zod";
 type AuthenticatedContext = Context & {
   user: NonNullable<Context["user"]>;
 };
+/** Writes one photo lookup outcome log line. */
+type PhotoIdentificationLog = (
+  attributes: PhotoIdentificationAttributes,
+) => void;
+
 export type PhotoIdentificationProcedureServices = {
+  logOutcome: PhotoIdentificationLog;
   createPendingImage: typeof createPendingImageUpload;
   identifyImage: typeof identifyBottlePhoto;
 };
@@ -171,6 +180,7 @@ function getSearchResultDomain({
  * production misses can be debugged without reconstructing classifier spans.
  */
 function logPhotoIdentificationOutcome({
+  log,
   context,
   pendingImage,
   idempotencyKey,
@@ -182,6 +192,7 @@ function logPhotoIdentificationOutcome({
   diagnostics,
   suggestedNextStep,
 }: {
+  log: PhotoIdentificationLog;
   context: AuthenticatedContext;
   pendingImage: Awaited<ReturnType<typeof createPendingImageUpload>>;
   idempotencyKey: string;
@@ -230,23 +241,25 @@ function logPhotoIdentificationOutcome({
 
   Object.assign(attrs, getImageEvidenceFieldAttributes(imageEvidence));
 
-  logInfo(PHOTO_IDENTIFICATION_LOG_MESSAGE, attrs);
+  log(attrs);
 }
 
 function logPhotoIdentificationRejected({
+  log,
   context,
   idempotencyKey,
   file,
   outcome,
   reason,
 }: {
+  log: PhotoIdentificationLog;
   context: AuthenticatedContext;
   idempotencyKey: string;
   file: Blob;
   outcome: string;
   reason: string;
 }) {
-  logInfo(PHOTO_IDENTIFICATION_LOG_MESSAGE, {
+  log({
     "photo_identification.user_id": context.user.id,
     "photo_identification.idempotency_key": idempotencyKey,
     "photo_identification.outcome": outcome,
@@ -256,13 +269,38 @@ function logPhotoIdentificationRejected({
   });
 }
 
+function logPhotoIdentificationCancelled({
+  log,
+  context,
+  pendingImage,
+  idempotencyKey,
+  file,
+}: {
+  log: PhotoIdentificationLog;
+  context: AuthenticatedContext;
+  pendingImage: PendingImage;
+  idempotencyKey: string;
+  file: Blob;
+}) {
+  log({
+    "photo_identification.user_id": context.user.id,
+    "photo_identification.pending_image_id": pendingImage.id,
+    "photo_identification.idempotency_key": idempotencyKey,
+    "photo_identification.outcome": "cancelled",
+    "photo_identification.file_size": file.size,
+    "photo_identification.file_type": file.type || "unknown",
+  });
+}
+
 function logPhotoIdentificationFailure({
+  log,
   context,
   pendingImage,
   idempotencyKey,
   file,
   err,
 }: {
+  log: PhotoIdentificationLog;
   context: AuthenticatedContext;
   pendingImage: Awaited<ReturnType<typeof createPendingImageUpload>>;
   idempotencyKey: string;
@@ -270,7 +308,7 @@ function logPhotoIdentificationFailure({
   err: unknown;
 }) {
   const error = err instanceof Error ? err : null;
-  logInfo(PHOTO_IDENTIFICATION_LOG_MESSAGE, {
+  log({
     "photo_identification.user_id": context.user.id,
     "photo_identification.pending_image_id": pendingImage.id,
     "photo_identification.idempotency_key": idempotencyKey,
@@ -281,13 +319,14 @@ function logPhotoIdentificationFailure({
     "photo_identification.retryable":
       error !== null && isModelServiceUnavailable(error),
   });
-  // Global RPC middleware reports the error to Sentry.
 }
 
 const photoIdentificationProcedureServices: PhotoIdentificationProcedureServices =
   {
     createPendingImage: createPendingImageUpload,
     identifyImage: identifyBottlePhoto,
+    logOutcome: (attributes) =>
+      logInfo(PHOTO_IDENTIFICATION_LOG_MESSAGE, attributes),
   };
 
 export function createPhotoIdentificationProcedure(
@@ -297,11 +336,17 @@ export function createPhotoIdentificationProcedure(
     .use(requireAuth)
     .use(requireTosAccepted)
     .use(photoIdentificationRateLimit)
-    .handler(async function ({ input, context, errors, signal }) {
+    .handler(async function ({
+      input,
+      context,
+      errors,
+      signal: requestSignal,
+    }) {
       const { file, idempotencyKey } = input;
 
       if (file.size > MAX_FILESIZE) {
         logPhotoIdentificationRejected({
+          log: services.logOutcome,
           context,
           idempotencyKey,
           file,
@@ -313,7 +358,7 @@ export function createPhotoIdentificationProcedure(
         });
       }
 
-      let pendingImage: Awaited<ReturnType<typeof createPendingImageUpload>>;
+      let pendingImage: PendingImage;
       try {
         pendingImage = await services.createPendingImage({
           file,
@@ -325,6 +370,7 @@ export function createPhotoIdentificationProcedure(
       } catch (err) {
         const error = err instanceof Error ? err : null;
         logPhotoIdentificationRejected({
+          log: services.logOutcome,
           context,
           idempotencyKey,
           file,
@@ -339,82 +385,244 @@ export function createPhotoIdentificationProcedure(
         });
       }
 
-      let identification: Awaited<ReturnType<typeof identifyBottlePhoto>>;
-      try {
-        identification = await services.identifyImage({
-          photo: pendingImage,
-          traceAttributes: {
-            "photo_identification.pending_image_id": pendingImage.id,
-          },
-          // Stop paying for the bottle lookup once the member has gone.
-          signal,
-        });
-      } catch (err) {
-        logPhotoIdentificationFailure({
-          context,
-          pendingImage,
-          idempotencyKey,
-          file,
-          err,
-        });
-        if (err instanceof Error && isModelServiceUnavailable(err)) {
-          throw errors.SERVICE_UNAVAILABLE({ cause: err });
-        }
-        throw errors.INTERNAL_SERVER_ERROR({
-          message: "Unable to identify bottle from photo.",
-          cause: err,
-        });
-      }
+      // Errors above are ordinary responses. Everything below runs while the
+      // response streams, where the RPC error middleware can no longer see it.
+      return streamPhotoIdentification({
+        services,
+        context,
+        toIdentificationError: (err) =>
+          isModelServiceUnavailable(err)
+            ? errors.SERVICE_UNAVAILABLE({ cause: err })
+            : errors.INTERNAL_SERVER_ERROR({
+                message: "Unable to identify bottle from photo.",
+                cause: err,
+              }),
+        requestSignal,
+        pendingImage,
+        idempotencyKey,
+        file,
+      });
+    });
+}
 
-      const {
-        imageEvidence,
-        classification,
-        modelMetadata,
-        referenceName,
-        diagnostics,
-        suggestedNextStep,
-      } = identification;
-      logPhotoIdentificationOutcome({
+type PendingImage = Awaited<ReturnType<typeof createPendingImageUpload>>;
+
+type PhotoIdentificationCandidates = Extract<
+  PhotoIdentificationProgress,
+  { type: "candidates" }
+>["candidates"];
+
+/**
+ * Runs label reading and classification for one stored photo, yielding
+ * progress as it happens and returning the full result. Ending the stream
+ * early, by a member picking a match or leaving, stops the remaining work.
+ */
+async function* streamPhotoIdentification({
+  services,
+  context,
+  toIdentificationError,
+  requestSignal,
+  pendingImage,
+  idempotencyKey,
+  file,
+}: {
+  services: PhotoIdentificationProcedureServices;
+  context: AuthenticatedContext;
+  toIdentificationError: (err: Error) => Error;
+  requestSignal: AbortSignal | undefined;
+  pendingImage: PendingImage;
+  idempotencyKey: string;
+  file: Blob;
+}): AsyncGenerator<
+  z.infer<typeof PhotoIdentificationProgressSchema>,
+  z.infer<typeof PhotoIdentificationSchema>
+> {
+  const serializedPendingImage = {
+    id: pendingImage.id,
+    imageUrl: absoluteUrl(config.API_SERVER, pendingImage.imageUrl),
+    expiresAt: pendingImage.expiresAt.toISOString(),
+  };
+  const stop = new AbortController();
+  const stopOnDisconnect = () => stop.abort();
+  requestSignal?.addEventListener("abort", stopOnDisconnect, { once: true });
+  const progress = createProgressQueue<PhotoIdentificationProgress>();
+  const identification = services.identifyImage({
+    photo: pendingImage,
+    traceAttributes: {
+      "photo_identification.pending_image_id": pendingImage.id,
+    },
+    signal: stop.signal,
+    onProgress: progress.push,
+  });
+  identification.then(progress.close, progress.close);
+  // True once identification finished or failed on its own; anything else that
+  // ends the stream is a cancellation.
+  let settled = false;
+
+  try {
+    yield { type: "photo", pendingImage: serializedPendingImage };
+    for await (const event of progress) {
+      yield await serializePhotoIdentificationProgress(event);
+    }
+
+    let result: Awaited<ReturnType<typeof identifyBottlePhoto>>;
+    try {
+      result = await identification;
+    } catch (err) {
+      if (stop.signal.aborted) throw err;
+      settled = true;
+      logPhotoIdentificationFailure({
+        log: services.logOutcome,
         context,
         pendingImage,
         idempotencyKey,
         file,
-        referenceName,
-        imageEvidence,
-        classification,
-        modelMetadata,
-        diagnostics,
-        suggestedNextStep,
+        err,
       });
-      const createToken =
-        classification.status === "classified" &&
-        suggestedNextStep === "confirm_create" &&
-        isPhotoIdentificationCreateDecisionAutoCreatable(
-          classification.decision,
-        )
-          ? await signPhotoIdentificationCreateToken({
-              type: "photo_identification_create",
-              userId: context.user.id,
-              pendingImageId: pendingImage.id,
-              decision: classification.decision,
-              photoSuitability: imageEvidence.photoSuitability,
-            })
-          : null;
+      const error =
+        err instanceof Error
+          ? err
+          : new Error("Photo identification failed.", { cause: err });
+      // The RPC error middleware cannot see errors raised mid-stream.
+      logError(error);
+      throw toIdentificationError(error);
+    }
+    settled = true;
 
-      return {
-        pendingImage: {
-          id: pendingImage.id,
-          imageUrl: absoluteUrl(config.API_SERVER, pendingImage.imageUrl),
-          expiresAt: pendingImage.expiresAt.toISOString(),
-        },
-        imageEvidence,
-        classification:
-          await serializePhotoIdentificationClassification(classification),
-        suggestedNextStep,
-        diagnostics,
-        createToken,
-      };
+    const {
+      imageEvidence,
+      classification,
+      modelMetadata,
+      referenceName,
+      diagnostics,
+      suggestedNextStep,
+    } = result;
+    logPhotoIdentificationOutcome({
+      log: services.logOutcome,
+      context,
+      pendingImage,
+      idempotencyKey,
+      file,
+      referenceName,
+      imageEvidence,
+      classification,
+      modelMetadata,
+      diagnostics,
+      suggestedNextStep,
     });
+    const createToken =
+      classification.status === "classified" &&
+      suggestedNextStep === "confirm_create" &&
+      isPhotoIdentificationCreateDecisionAutoCreatable(classification.decision)
+        ? await signPhotoIdentificationCreateToken({
+            type: "photo_identification_create",
+            userId: context.user.id,
+            pendingImageId: pendingImage.id,
+            decision: classification.decision,
+            photoSuitability: imageEvidence.photoSuitability,
+          })
+        : null;
+
+    return {
+      pendingImage: serializedPendingImage,
+      imageEvidence,
+      classification:
+        await serializePhotoIdentificationClassification(classification),
+      suggestedNextStep,
+      diagnostics,
+      createToken,
+    };
+  } finally {
+    requestSignal?.removeEventListener("abort", stopOnDisconnect);
+    if (!settled) {
+      stop.abort();
+      logPhotoIdentificationCancelled({
+        log: services.logOutcome,
+        context,
+        pendingImage,
+        idempotencyKey,
+        file,
+      });
+    }
+  }
+}
+
+/**
+ * Turns callbacks into an async iterable that ends once `close` is called and
+ * every pushed item has been read.
+ */
+function createProgressQueue<T>() {
+  const items: T[] = [];
+  let closed = false;
+  let wake: (() => void) | null = null;
+
+  return {
+    push: (item: T) => {
+      items.push(item);
+      wake?.();
+    },
+    close: () => {
+      closed = true;
+      wake?.();
+    },
+    async *[Symbol.asyncIterator]() {
+      while (true) {
+        const item = items.shift();
+        if (item !== undefined) {
+          yield item;
+          continue;
+        }
+        if (closed) return;
+        await new Promise<void>((resolve) => {
+          wake = resolve;
+        });
+        wake = null;
+      }
+    },
+  };
+}
+
+async function serializePhotoIdentificationProgress(
+  event: PhotoIdentificationProgress,
+): Promise<z.infer<typeof PhotoIdentificationProgressSchema>> {
+  if (event.type !== "candidates") return event;
+  return {
+    type: "candidates",
+    bottles: await serializeActiveCandidateBottles(event.candidates),
+  };
+}
+
+const MAX_PROGRESS_CANDIDATES = 5;
+
+/** Serializes Peated's likely matches in their given order, skipping removed Bottles. */
+async function serializeActiveCandidateBottles(
+  candidates: PhotoIdentificationCandidates,
+) {
+  const bottleIds = Array.from(
+    new Set(candidates.map((candidate) => candidate.bottleId)),
+  ).slice(0, MAX_PROGRESS_CANDIDATES);
+  if (bottleIds.length === 0) return [];
+
+  const [bottleRows, tombstones] = await Promise.all([
+    db.query.bottles.findMany({
+      where: (bottles, { inArray }) => inArray(bottles.id, bottleIds),
+    }),
+    db.query.bottleTombstones.findMany({
+      columns: { bottleId: true },
+      where: (tombstones, { inArray }) =>
+        inArray(tombstones.bottleId, bottleIds),
+    }),
+  ]);
+  const removed = new Set(tombstones.map((row) => row.bottleId));
+  const byId = new Map(bottleRows.map((bottle) => [bottle.id, bottle]));
+  const activeBottles = bottleIds.flatMap((id) => {
+    const bottle = byId.get(id);
+    return bottle && !removed.has(id) ? [bottle] : [];
+  });
+
+  return await serialize(BottleSerializer, activeBottles, undefined, [], {
+    includeGroupSummary: true,
+  });
 }
 
 export default createPhotoIdentificationProcedure();

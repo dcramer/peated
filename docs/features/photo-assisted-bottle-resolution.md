@@ -22,19 +22,23 @@ action.
 3. The server processes the image, creates an owned pending upload, and extracts
    label evidence. One literal stored reference resolves directly. All other
    references run the Bottle classifier once.
-4. The resolver presents one of three outcomes:
+4. While that runs, the title under the photo names the current step, and the
+   form adds Peated's likely matches and a one-line summary of the label as
+   they arrive. Tapping a likely match stops the classifier and continues with
+   that Bottle and the same pending photo.
+5. Otherwise, the resolver presents one of three outcomes:
    - an existing Bottle match;
    - an approved proposal for one new, independently complete Bottle; or
    - manual search when the evidence is insufficient or conflicting.
-5. After resolving a Bottle, the main choices are **Rate this bottle** and
+6. After resolving a Bottle, the main choices are **Rate this bottle** and
    **Add to Library**. View bottle and Change bottle remain secondary. Photo
    matches keep extracted label details and correction options collapsed.
    Adding to Library saves immediately, then offers an optional Sealed / Open /
    Empty status selector. Selecting a status saves it. From there, the member
    can rate or view the same Bottle, or find another one.
-6. **Rate this bottle** opens a choice between **Log a tasting** and **Write a
+7. **Rate this bottle** opens a choice between **Log a tasting** and **Write a
    review**, with the selected Bottle fixed and the pending photo attached.
-7. Both forms follow **Notes → The pour → Rating/Score**. Notes capture the
+8. Both forms follow **Notes → The pour → Rating/Score**. Notes capture the
    member's words and flavors first. The pour contains serving style, color,
    and separate photo and friend pickers. Back preserves the draft; saving is
    available only on the final step. New reviews start without a score.
@@ -47,6 +51,13 @@ the Bottle and action before any tasting is saved.
 - Photo upload is an accelerator, not a requirement. Manual Bottle search is
   available from the initial, failure, and result states.
 - Keep the local preview visible while identification runs and when it fails.
+- Progress names only generic steps: reading the label, checking Peated,
+  checking the web, and comparing details. Web queries and site names stay on
+  the server. Each step stays on screen for at least 1.2 seconds so quick
+  steps don't flicker.
+- After 45 seconds, add "This one is taking a while." under the step.
+- Keep progress copy to the step itself. Don't explain what tapping or
+  searching will do.
 - Progress and error states must be readable without relying on animation,
   color, or camera access.
 - A failed or uncertain identification must preserve a path to search or retry.
@@ -115,9 +126,26 @@ context to the extraction provider.
 - requires an authenticated user who has accepted the Terms of Service;
 - rejects oversized files before model work;
 - creates a `photo_tasting_entry` pending upload;
-- returns bounded image evidence, classifier output, diagnostics, a suggested
-  next step, and the pending image reference; and
-- returns a signed creation token only for an auto-approved creation decision.
+- streams progress events (`text/event-stream`), then ends with bounded image
+  evidence, classifier output, diagnostics, a suggested next step, and the
+  pending image reference;
+- returns a signed creation token only for an auto-approved creation decision;
+  and
+- stops label reading and classification when the client closes the stream.
+
+The progress events, in order:
+
+| Event        | Sent                                    | Contains                                          |
+| ------------ | --------------------------------------- | ------------------------------------------------- |
+| `photo`      | First, once the pending upload exists   | The pending image reference                       |
+| `label`      | When the label has been read            | The image evidence                                |
+| `candidates` | Before the classifier model starts      | Up to 5 active Bottles Peated already holds       |
+| `step`       | As the classifier starts or ends a tool | `checking_peated`, `checking_web`, or `comparing` |
+
+An exact stored reference skips the classifier, so it sends no `candidates`
+or `step` events. Errors before the stream starts, such as an oversized file,
+are ordinary error responses. Errors after it starts arrive as a stream error
+with the same codes.
 
 The route's only saved product change is the pending upload. A trace may record
 safe diagnostic fields, but it is not product data. The route does not create a
@@ -215,7 +243,8 @@ The form logs each attempt's start, result, duration, request key, file size and
 format, uploaded size, next step, and server trace ID. It never logs filenames
 or photo contents.
 Server traces show whether a failure happened while reading the label or looking
-up the bottle. The RPC layer reports errors to Sentry.
+up the bottle. The RPC layer reports errors raised before the stream starts to Sentry; the
+route reports errors raised while it streams.
 
 Label reading stops after 45 seconds without automatic retries. Provider outages,
 a spent AI budget, connection failures, timeouts, and rate limits return
@@ -228,6 +257,6 @@ keeps the label facts, so the form shows what it read and offers search or a
 new bottle. The trace marks it with `photo_identification.lookup_timed_out`.
 
 The form stops waiting after 10 minutes and offers search or another upload.
-Starting over or leaving cancels the browser request and ignores late results.
-The server stops the bottle lookup when the request closes; label reading
-already running may still finish.
+Using a likely match, starting over, or leaving closes the stream. The server
+then stops label reading and the bottle lookup and logs the outcome as
+`cancelled`.

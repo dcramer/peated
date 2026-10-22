@@ -1326,12 +1326,12 @@ async function handleRpcRequest({ request, response, url }) {
       }
 
       if (getAccessToken(request).includes("photo-create-warning")) {
-        sendRpcResponse(response, buildCreateProposalPhotoIdentification());
+        sendRpcPhotoStream(response, buildCreateProposalPhotoIdentification());
         return true;
       }
 
       if (getAccessToken(request).includes("photo-create-existing")) {
-        sendRpcResponse(
+        sendRpcPhotoStream(
           response,
           buildCreateProposalPhotoIdentification(),
           "77777777777777777777777777777777",
@@ -1340,7 +1340,7 @@ async function handleRpcRequest({ request, response, url }) {
       }
 
       if (getAccessToken(request).includes("photo-create-unsuitable")) {
-        sendRpcResponse(
+        sendRpcPhotoStream(
           response,
           buildCreateProposalPhotoIdentification({
             suitableAsBottleImage: false,
@@ -1351,7 +1351,7 @@ async function handleRpcRequest({ request, response, url }) {
       }
 
       if (getAccessToken(request).includes("photo-create-complete-bottle")) {
-        sendRpcResponse(
+        sendRpcPhotoStream(
           response,
           buildCreateProposalPhotoIdentification({
             includeExactBottleDetails: true,
@@ -1362,7 +1362,7 @@ async function handleRpcRequest({ request, response, url }) {
       }
 
       if (getAccessToken(request).includes("photo-create-prefilled-bottle")) {
-        sendRpcResponse(
+        sendRpcPhotoStream(
           response,
           buildCreateProposalPhotoIdentification({
             includeExactBottleDetails: true,
@@ -1375,7 +1375,7 @@ async function handleRpcRequest({ request, response, url }) {
       if (
         getAccessToken(request).includes("photo-create-bottle-default-image")
       ) {
-        sendRpcResponse(
+        sendRpcPhotoStream(
           response,
           buildCreateProposalPhotoIdentification(),
           "44444444444444444444444444444444",
@@ -1384,7 +1384,7 @@ async function handleRpcRequest({ request, response, url }) {
       }
 
       if (getAccessToken(request).includes("photo-no-match")) {
-        sendRpcResponse(
+        sendRpcPhotoStream(
           response,
           buildNoMatchPhotoIdentification(),
           "55555555555555555555555555555555",
@@ -1393,7 +1393,7 @@ async function handleRpcRequest({ request, response, url }) {
       }
 
       if (getAccessToken(request).includes("photo-manual-match")) {
-        sendRpcResponse(
+        sendRpcPhotoStream(
           response,
           buildManualSearchMatchPhotoIdentification(),
           "413c334005c60d8dcc8dbf109761c5e3",
@@ -1402,7 +1402,7 @@ async function handleRpcRequest({ request, response, url }) {
       }
 
       if (getAccessToken(request).includes("photo-needs-review")) {
-        sendRpcResponse(
+        sendRpcPhotoStream(
           response,
           buildManualReviewPhotoIdentification(),
           "66666666666666666666666666666666",
@@ -1410,7 +1410,7 @@ async function handleRpcRequest({ request, response, url }) {
         return true;
       }
 
-      sendRpcResponse(
+      sendRpcPhotoStream(
         response,
         {
           pendingImage: {
@@ -3018,6 +3018,29 @@ function sendRpcResponse(response, data, sentryTraceId = null) {
   };
   if (sentryTraceId) headers["x-sentry-trace-id"] = sentryTraceId;
   response.writeHead(200, headers).end(JSON.stringify({ json: data }));
+}
+
+/**
+ * Photo identification streams progress as server-sent events: the stored
+ * photo and the label reading, then the full result as the final `done` event.
+ */
+function sendRpcPhotoStream(response, result, sentryTraceId = null) {
+  const headers = {
+    ...corsHeaders,
+    "Content-Type": "text/event-stream",
+    "Cache-Control": "no-cache",
+  };
+  if (sentryTraceId) headers["x-sentry-trace-id"] = sentryTraceId;
+  const event = (name, data) =>
+    `event: ${name}\ndata: ${JSON.stringify({ json: data })}\n\n`;
+  response.writeHead(200, headers).end(
+    event("message", { type: "photo", pendingImage: result.pendingImage }) +
+      event("message", {
+        type: "label",
+        imageEvidence: result.imageEvidence,
+      }) +
+      event("done", result),
+  );
 }
 
 function sendRpcError(response, message) {

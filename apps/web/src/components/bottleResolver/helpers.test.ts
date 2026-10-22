@@ -1,9 +1,15 @@
+import { mockBottle } from "@peated/server/orpc/mock/fixtures";
 import { describe, expect, test } from "vitest";
 import {
+  applyPhotoProgress,
+  EMPTY_PHOTO_PROGRESS,
   getCreateBottlePrefill,
   getCreateNameSeed,
+  getLabelSummary,
   getManualResultCopy,
+  getPhotoProgressStatus,
   type PhotoIdentification,
+  type PhotoIdentificationProgressEvent,
 } from "./helpers";
 
 function buildPhotoResult(): PhotoIdentification {
@@ -181,5 +187,56 @@ describe("photo create prefill", () => {
       maturation: "First-fill sherry butt",
       outturn: 612,
     });
+  });
+});
+
+describe("photo identification progress", () => {
+  test("collects each event and names the current step", () => {
+    const result = buildPhotoResult();
+    const events: PhotoIdentificationProgressEvent[] = [
+      { type: "photo", pendingImage: result.pendingImage },
+      { type: "label", imageEvidence: result.imageEvidence },
+      { type: "candidates", bottles: [mockBottle] },
+      { type: "step", step: "checking_web" },
+    ];
+    const statuses = [getPhotoProgressStatus(EMPTY_PHOTO_PROGRESS)];
+    let progress = EMPTY_PHOTO_PROGRESS;
+    for (const event of events) {
+      progress = applyPhotoProgress(progress, event);
+      statuses.push(getPhotoProgressStatus(progress));
+    }
+
+    expect(progress).toEqual({
+      pendingImage: result.pendingImage,
+      imageEvidence: result.imageEvidence,
+      candidates: [mockBottle],
+      step: "checking_web",
+    });
+    expect(statuses).toEqual([
+      "Reading the label…",
+      "Reading the label…",
+      "Checking Peated…",
+      "Checking Peated…",
+      "Checking the web…",
+    ]);
+  });
+});
+
+describe("getLabelSummary", () => {
+  test("joins the brand, name, age, and strength that were read", () => {
+    const { imageEvidence } = buildPhotoResult();
+    expect(
+      getLabelSummary({
+        ...imageEvidence,
+        fieldCandidates: {
+          brand: { value: "Beauchamp", confidence: 0.75 },
+          expression: { value: "Single Malt", confidence: 0.75 },
+          abv: { value: 46, confidence: 0.75 },
+        },
+      }),
+    ).toBe("Beauchamp · Single Malt · 46% ABV");
+    expect(
+      getLabelSummary({ ...imageEvidence, fieldCandidates: {} }),
+    ).toBeNull();
   });
 });

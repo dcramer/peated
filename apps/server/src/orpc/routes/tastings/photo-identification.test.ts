@@ -50,6 +50,15 @@ const classifyBottleReferenceMock =
     ) => Promise<Awaited<ReturnType<RunReference>>["result"]>
   >();
 const runBottleReferenceMock = vi.fn<RunReference>();
+const logOutcomeMock =
+  vi.fn<PhotoIdentificationProcedureServices["logOutcome"]>();
+
+/** The outcome of each logged photo lookup, in order. */
+function loggedOutcomes() {
+  return logOutcomeMock.mock.calls.map(
+    ([attributes]) => attributes["photo_identification.outcome"],
+  );
+}
 const extractPhotoBottleEvidenceMock =
   vi.fn<IdentifyBottlePhotoServices["extractEvidence"]>();
 const copyPendingImageToBottleMock = vi.fn<typeof copyPendingImageToBottle>();
@@ -105,20 +114,44 @@ const identifyImage: PhotoIdentificationProcedureServices["identifyImage"] = (
 const photoIdentificationProcedure = createPhotoIdentificationProcedure({
   createPendingImage: createPendingImageUpload,
   identifyImage,
+  logOutcome: logOutcomeMock,
 });
 const photoIdentificationCreateProcedure =
   createPhotoIdentificationCreateProcedure(copyPendingImageToBottleMock);
 
+function streamPhotoIdentification(
+  input: z.input<typeof PhotoIdentificationInputSchema>,
+  options?: { context: Context },
+) {
+  return createRouterClient(
+    { photoIdentification: photoIdentificationProcedure },
+    { context: options?.context ?? { user: null } },
+  ).photoIdentification(input);
+}
+
+/** Reads a photo identification stream to its end. */
+async function readPhotoIdentification(
+  stream: Awaited<ReturnType<typeof streamPhotoIdentification>>,
+) {
+  const events = [];
+  while (true) {
+    const step = await stream.next();
+    if (step.done) return { events, result: step.value };
+    events.push(step.value);
+  }
+}
+
 const routerClient = {
   tastings: {
-    photoIdentification: (
+    photoIdentification: async (
       input: z.input<typeof PhotoIdentificationInputSchema>,
       options?: { context: Context },
     ) =>
-      createRouterClient(
-        { photoIdentification: photoIdentificationProcedure },
-        { context: options?.context ?? { user: null } },
-      ).photoIdentification(input),
+      (
+        await readPhotoIdentification(
+          await streamPhotoIdentification(input, options),
+        )
+      ).result,
     photoIdentificationCreate: (
       input: { createToken: string },
       options?: { context: Context },
@@ -339,6 +372,30 @@ async function countCatalogRows() {
   };
 }
 
+function mockArdbegLabelReading() {
+  extractPhotoBottleEvidenceMock.mockImplementation(async ({ photo }) => ({
+    extractedIdentity: {
+      brand: "Ardbeg",
+      bottler: null,
+      expression: "Uigeadail",
+      series: null,
+      distillery: null,
+      category: "single_malt",
+      stated_age: null,
+      abv: null,
+      release_year: null,
+      vintage_year: null,
+      maturation: null,
+      cask_number: null,
+      outturn: null,
+      cask_strength: null,
+      single_cask: null,
+      edition: null,
+    },
+    imageEvidence: buildImageEvidence(photo.id),
+  }));
+}
+
 describe("POST /tastings/photo-identification", () => {
   beforeEach(() => {
     config.AI_GATEWAY_API_KEY = undefined;
@@ -354,6 +411,7 @@ describe("POST /tastings/photo-identification", () => {
     copyPendingImageToBottleMock.mockImplementation(copyPendingImageToBottle);
     startSpanCallMock.mockReset();
     sentrySpanSetAttributeMock.mockClear();
+    logOutcomeMock.mockClear();
   });
 
   afterEach(() => {
@@ -519,6 +577,146 @@ describe("POST /tastings/photo-identification", () => {
         abv: null,
       }),
     );
+  });
+
+  test("streams the photo, label, likely matches, and steps before the result", async ({
+    fixtures,
+    defaults,
+  }) => {
+    const matchedBottle = await fixtures.Bottle({ name: "Uigeadail" });
+    mockArdbegLabelReading();
+    const classification = buildClassification(
+      { action: "match", matchedBottleId: matchedBottle.id },
+      {
+        candidates: [
+          {
+            bottleId: matchedBottle.id,
+            fullName: matchedBottle.fullName,
+            brand: "Ardbeg",
+            score: 0.9,
+            source: ["text"],
+          },
+        ],
+      },
+    );
+    runBottleReferenceMock.mockImplementation(async (_input, options) => {
+      options?.onProgress?.({
+        type: "candidates",
+        candidates: classification.artifacts.candidates,
+      });
+      options?.onProgress?.({
+        type: "tool",
+        name: "firecrawl_web_search",
+        status: "started",
+      });
+      options?.onProgress?.({
+        type: "tool",
+        name: "firecrawl_web_search",
+        status: "finished",
+      });
+      return { result: classification, modelMetadata: null };
+    });
+
+    const { events, result } = await readPhotoIdentification(
+      await streamPhotoIdentification(
+        {
+          file: await fixtures.SampleSquareImage(),
+          idempotencyKey: "photo-identification-progress",
+        },
+        { context: { user: defaults.user } },
+      ),
+    );
+
+    expect(events.map((event) => event.type)).toEqual([
+      "photo",
+      "label",
+      "candidates",
+      "step",
+      "step",
+    ]);
+    expect(events[0]).toEqual({
+      type: "photo",
+      pendingImage: result.pendingImage,
+    });
+    expect(events[1]).toEqual({
+      type: "label",
+      imageEvidence: result.imageEvidence,
+    });
+    expect(events[2]).toMatchObject({
+      type: "candidates",
+      bottles: [{ id: matchedBottle.id }],
+    });
+    expect(events.slice(3)).toEqual([
+      { type: "step", step: "checking_web" },
+      { type: "step", step: "comparing" },
+    ]);
+    expect(result.classification).toMatchObject({
+      status: "classified",
+      decision: { action: "match", matchedBottle: { id: matchedBottle.id } },
+    });
+  });
+
+  test("stops identification when the stream is closed early", async ({
+    fixtures,
+    defaults,
+  }) => {
+    mockArdbegLabelReading();
+    let runSignal: AbortSignal | undefined;
+    runBottleReferenceMock.mockImplementation(async (_input, options) => {
+      runSignal = options?.signal;
+      options?.onProgress?.({
+        type: "tool",
+        name: "search_bottles",
+        status: "started",
+      });
+      return await new Promise((_resolve, reject) => {
+        options?.signal?.addEventListener(
+          "abort",
+          () => reject(new Error("Stopped.")),
+          { once: true },
+        );
+      });
+    });
+
+    const stream = await streamPhotoIdentification(
+      {
+        file: await fixtures.SampleSquareImage(),
+        idempotencyKey: "photo-identification-stop",
+      },
+      { context: { user: defaults.user } },
+    );
+    const seen = [];
+    for await (const event of stream) {
+      seen.push(event.type);
+      if (event.type === "step") break;
+    }
+
+    expect(seen).toEqual(["photo", "label", "step"]);
+    expect(runSignal?.aborted).toBe(true);
+    expect(loggedOutcomes()).toEqual(["cancelled"]);
+  });
+
+  test("logs a lookup that fails mid-stream once, as failed", async ({
+    fixtures,
+    defaults,
+  }) => {
+    mockArdbegLabelReading();
+    runBottleReferenceMock.mockRejectedValue(new Error("Classifier broke"));
+
+    const err = await waitError(
+      routerClient.tastings.photoIdentification(
+        {
+          file: await fixtures.SampleSquareImage(),
+          idempotencyKey: "photo-identification-mid-stream-failure",
+        },
+        { context: { user: defaults.user } },
+      ),
+    );
+
+    expect(err).toMatchInlineSnapshot(
+      `[Error: Unable to identify bottle from photo.]`,
+    );
+    expect(loggedOutcomes()).toEqual(["failed"]);
   });
 
   test("reuses pending upload for idempotent retries", async ({
