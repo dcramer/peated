@@ -83,3 +83,18 @@ The web app MUST render main activity entries using the same mixed activity pres
 
 - **WHEN** the main activity API returns a `tasting` entry
 - **THEN** the web feed renders it with the existing tasting list item behavior and supported interactions
+
+### Requirement: Main activity orders tastings by when they were posted
+
+The system SHALL order and group main-feed tastings by their post time (`createdAt`) and SHALL show each tasting's tasted time (`tastedAt`). Unposted tasting drafts never appear in the feed.
+
+#### Scenario: A late-posted dram appears with recent activity
+
+- **WHEN** a visible user posts a tasting whose `tastedAt` is days before its `createdAt`
+- **THEN** the main activity feed places it by `createdAt`, alongside other recent activity
+- **AND** the web feed shows its `tastedAt`
+
+#### Scenario: Backdating does not move a tasting up the feed
+
+- **WHEN** a tasting's `tastedAt` is set to an earlier time
+- **THEN** its position in the main activity feed does not change

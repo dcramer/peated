@@ -92,3 +92,13 @@ The system MUST continue rendering tasting activity normally after the profile A
 
 - **WHEN** the profile activity feed includes a `tasting` entry
 - **THEN** the web UI renders it with the existing tasting list item behavior and supported interactions
+
+### Requirement: Profile activity orders tastings by when they were posted
+
+The system SHALL order and group profile tastings by their post time (`createdAt`) and SHALL show each tasting's tasted time (`tastedAt`). Unposted tasting drafts never appear in profile activity.
+
+#### Scenario: A late-posted dram appears with recent profile activity
+
+- **WHEN** a visible user posts a tasting whose `tastedAt` is days before its `createdAt`
+- **THEN** the profile activity feed places it by `createdAt`, alongside the user's other recent activity
+- **AND** the web feed shows its `tastedAt`
