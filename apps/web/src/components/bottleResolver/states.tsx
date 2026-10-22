@@ -13,28 +13,24 @@ import type { ReactNode } from "react";
 import {
   getLabelSummary,
   getPhotoProgressStatus,
+  hasRecognizedLabelDetails,
   type PhotoIdentification,
   type PhotoMatchCandidate,
   type PhotoProgress,
 } from "./helpers";
 import {
   BottlePhotoAction,
+  BottleResolverActionGrid,
   BottleResolverColumn,
   BottleResolverInlineAction,
   BottleResolverIntroduction,
   BottleResolverSection,
+  BottleResolverTextActions,
 } from "./layout.stylex";
-import {
-  getPhotoFailureCopyPayload,
-  LabelFacts,
-  PhotoFailurePanel,
-  type PhotoFailureTrace,
-  PhotoIdentificationTraceFootnote,
-} from "./panels";
+import { LabelFacts } from "./panels";
 import { PhotoPreview } from "./photoPreview.stylex";
 import type {
   BottleResolverAction,
-  BottleResolverCreateProposalActionsProps,
   BottleResolverMatchedAction,
   BottleResolverMatchedActionsProps,
 } from "./types";
@@ -64,45 +60,6 @@ export function PhotoUploadState({
       )}
       <BottlePhotoAction onSelectPhoto={onSelectPhoto} />
     </BottleResolverColumn>
-  );
-}
-
-export function PhotoReadFailureState({
-  previewUrl,
-  photoError,
-  searchHref,
-  searchLabel,
-  createBottleHref,
-  trace,
-  onStartOver,
-}: {
-  previewUrl: string;
-  photoError: string;
-  searchHref: string;
-  searchLabel: string;
-  createBottleHref: string | null;
-  trace: PhotoFailureTrace | null;
-  onStartOver: () => void;
-}) {
-  return (
-    <>
-      <PhotoFailurePanel
-        previewUrl={previewUrl}
-        title="We couldn't identify that bottle"
-        description={photoError}
-        searchHref={searchHref}
-        searchLabel={searchLabel}
-        createBottleHref={createBottleHref}
-        onStartOver={onStartOver}
-        variant="error"
-      />
-      {trace && (
-        <PhotoIdentificationTraceFootnote
-          traceId={trace.traceId}
-          copyPayload={getPhotoFailureCopyPayload(trace)}
-        />
-      )}
-    </>
   );
 }
 
@@ -181,184 +138,246 @@ export function PhotoLoadingState({
   );
 }
 
-export function PhotoNoMatchState({
-  result,
-  previewUrl,
-  title,
-  description,
-  searchHref,
-  searchLabel,
-  createBottleHref,
-  createBottleLabel,
-  primaryAction,
-  onStartOver,
-}: {
-  result: PhotoIdentification;
-  previewUrl: string | null;
-  title: string;
-  description: string;
-  searchHref: string;
-  searchLabel: string;
-  createBottleHref: string | null;
-  createBottleLabel?: string;
-  primaryAction?: "search" | "create";
-  onStartOver: () => void;
-}) {
-  return (
-    <PhotoFailurePanel
-      previewUrl={previewUrl}
-      title={title}
-      description={description}
-      searchHref={searchHref}
-      searchLabel={searchLabel}
-      createBottleHref={createBottleHref}
-      createBottleLabel={createBottleLabel}
-      primaryAction={primaryAction}
-      onStartOver={onStartOver}
-      variant="no-match"
-    >
-      <LabelFacts result={result} />
-    </PhotoFailurePanel>
-  );
-}
-
-export function PhotoMatchCreateState({
+export function PhotoMatchState({
   result,
   previewUrl,
   matchedBottle,
   renderMatchedResultActions,
-  renderCreateProposalActions,
-  createProposalLabel,
-  hasCreateDecision,
-  proposedName,
-  createPending,
-  createActionLabel,
   resolvingAction,
   hasLibraryEntry,
   libraryEntryImageUrl,
   pendingImage,
   loadingExactLibraryStatus,
   onLoadBottle,
-  onAcceptCreateProposal,
-  onStartOver,
+  reportingWrongMatch = false,
+  onWrongMatch,
 }: {
   result: PhotoIdentification;
   previewUrl: string | null;
-  matchedBottle: Bottle | null;
+  matchedBottle: Bottle;
   renderMatchedResultActions?: (
     props: BottleResolverMatchedActionsProps,
   ) => ReactNode;
-  renderCreateProposalActions?: (
-    props: BottleResolverCreateProposalActionsProps,
-  ) => ReactNode;
-  createProposalLabel: { title: string; description: string } | null;
-  hasCreateDecision: boolean;
-  proposedName: string | null;
-  createPending: boolean;
-  createActionLabel: string;
   resolvingAction: BottleResolverAction | null;
   hasLibraryEntry: boolean;
   libraryEntryImageUrl?: string | null;
   pendingImage: PhotoIdentification["pendingImage"] | null;
   loadingExactLibraryStatus: boolean;
   onLoadBottle: (bottle: Bottle, action?: BottleResolverMatchedAction) => void;
-  onAcceptCreateProposal: (
-    result: PhotoIdentification,
-    action: BottleResolverAction,
-  ) => void;
+  reportingWrongMatch?: boolean;
+  /** Reports the matched Bottle as wrong and opens the fallback screen. */
+  onWrongMatch?: () => void;
+}) {
+  return (
+    <BottleResolverColumn>
+      <BottleResolverSection>
+        <SelectedBottleSummary bottle={matchedBottle} />
+        <FormNotice>
+          Check the edition and strength against your label.
+        </FormNotice>
+        {renderMatchedResultActions ? (
+          renderMatchedResultActions({
+            bottle: matchedBottle,
+            hasLibraryEntry,
+            libraryEntryImageUrl,
+            pendingImage,
+            loadingExactLibraryStatus,
+            resolvingAction:
+              resolvingAction === "create" ? null : resolvingAction,
+            // The member just rejected this Bottle; don't continue with it.
+            disabled: reportingWrongMatch,
+            onResolve: (action) => {
+              onLoadBottle(matchedBottle, action);
+            },
+          })
+        ) : (
+          <Button
+            disabled={Boolean(resolvingAction) || reportingWrongMatch}
+            fullWidth
+            onClick={() => onLoadBottle(matchedBottle)}
+            variant="accent"
+          >
+            Continue
+          </Button>
+        )}
+        {onWrongMatch ? (
+          <Button
+            disabled={Boolean(resolvingAction) || reportingWrongMatch}
+            fullWidth
+            loading={reportingWrongMatch}
+            onClick={onWrongMatch}
+            variant="text"
+          >
+            Not my bottle
+          </Button>
+        ) : null}
+        <LabelDetails previewUrl={previewUrl} result={result} />
+      </BottleResolverSection>
+    </BottleResolverColumn>
+  );
+}
+
+/**
+ * The one screen for every photo that did not lead straight to a Bottle:
+ * a wrong match, no match, a new Bottle, or a photo we could not check.
+ * Only the reason line, the suggestions, and the main action change.
+ */
+export function PhotoFallbackState({
+  result,
+  previewUrl,
+  reason,
+  alert = false,
+  suggestions,
+  pickingBottleId = null,
+  onPickSuggestion,
+  proposal = null,
+  createBottleHref,
+  searchHref,
+  searchLabel,
+  onStartOver,
+}: {
+  result: PhotoIdentification | null;
+  previewUrl: string | null;
+  reason: string;
+  /** Announces the reason when the lookup itself failed. */
+  alert?: boolean;
+  /** Other Bottles the lookup considered; picking one continues with it. */
+  suggestions: readonly PhotoMatchCandidate[];
+  pickingBottleId?: number | null;
+  onPickSuggestion: (bottle: PhotoMatchCandidate) => void;
+  /** An approved new Bottle: its name and the actions that add it. */
+  proposal?: { name: string; actions: ReactNode } | null;
+  createBottleHref: string | null;
+  searchHref: string;
+  searchLabel: string;
   onStartOver: () => void;
 }) {
-  if (matchedBottle) {
+  const reasonLine = alert ? <span role="alert">{reason}</span> : reason;
+  const startOver = (
+    <Button onClick={onStartOver} variant="text">
+      Start over
+    </Button>
+  );
+  const searchLink = (variant: "accent" | "tonal" | "text") => (
+    <ButtonLink
+      fullWidth={variant !== "text"}
+      href={searchHref}
+      variant={variant}
+    >
+      {variant === "text" ? null : <Search aria-hidden="true" size={16} />}
+      {searchLabel}
+    </ButtonLink>
+  );
+  const createLink = (variant: "accent" | "tonal") =>
+    createBottleHref ? (
+      <ButtonLink fullWidth href={createBottleHref} variant={variant}>
+        <Plus aria-hidden="true" size={16} />
+        Add a new bottle
+      </ButtonLink>
+    ) : null;
+  const suggestionList = (
+    <BottleMatchList
+      bottles={suggestions}
+      onUse={onPickSuggestion}
+      pendingBottleId={pickingBottleId}
+    />
+  );
+
+  // One accent action per view (DESIGN.md), and one heading that says what to
+  // do next: add the approved new Bottle, pick a suggestion, or find it.
+  if (proposal) {
     return (
       <BottleResolverColumn>
-        <BottleResolverSection>
-          <SelectedBottleSummary bottle={matchedBottle} />
-          <FormNotice>
-            Check the edition and strength against your label.
-          </FormNotice>
-          {renderMatchedResultActions ? (
-            renderMatchedResultActions({
-              bottle: matchedBottle,
-              hasLibraryEntry,
-              libraryEntryImageUrl,
-              pendingImage,
-              loadingExactLibraryStatus,
-              resolvingAction:
-                resolvingAction === "create" ? null : resolvingAction,
-              onResolve: (action) => {
-                onLoadBottle(matchedBottle, action);
-              },
-            })
-          ) : (
-            <Button
-              disabled={Boolean(resolvingAction)}
-              fullWidth
-              onClick={() => onLoadBottle(matchedBottle)}
-              variant="accent"
-            >
-              Continue
-            </Button>
-          )}
-          <FormDetails compact title="Label details">
-            {previewUrl ? (
-              <PhotoPreview
-                metadata="Details read from your photo"
-                src={previewUrl}
-                title="Label photo"
-              />
-            ) : null}
-            <LabelFacts result={result} />
-          </FormDetails>
+        {/* One tap adds this Bottle, so what we read stays in view. */}
+        <BottleResolverSection description={reasonLine} title={proposal.name}>
+          {previewUrl ? (
+            <PhotoPreview
+              metadata="Details read from your photo"
+              src={previewUrl}
+              title="Label photo"
+            />
+          ) : null}
+          <LabelFacts result={result} />
+          {proposal.actions}
         </BottleResolverSection>
+        {suggestions.length ? (
+          <BottleResolverSection title="Or is it one of these?">
+            {suggestionList}
+          </BottleResolverSection>
+        ) : null}
+        <BottleResolverTextActions>
+          {searchLink("text")}
+          {startOver}
+        </BottleResolverTextActions>
       </BottleResolverColumn>
     );
   }
 
+  if (suggestions.length) {
+    return (
+      <BottleResolverColumn>
+        <BottleResolverSection
+          description={reasonLine}
+          title="Is it one of these?"
+        >
+          {suggestionList}
+        </BottleResolverSection>
+        <FormStack>
+          <BottleResolverActionGrid>
+            {searchLink("tonal")}
+            {createLink("tonal")}
+          </BottleResolverActionGrid>
+          <BottleResolverTextActions>{startOver}</BottleResolverTextActions>
+        </FormStack>
+        <LabelDetails previewUrl={previewUrl} result={result} />
+      </BottleResolverColumn>
+    );
+  }
+
+  // Nothing to suggest: add the Bottle when the label was read, else search.
+  const createFirst = Boolean(
+    createBottleHref && hasRecognizedLabelDetails(result),
+  );
   return (
     <BottleResolverColumn>
-      <BottleResolverInlineAction>
-        <Button onClick={onStartOver} variant="text">
-          Use a different photo
-        </Button>
-      </BottleResolverInlineAction>
-      <BottleResolverSection
-        description={
-          createProposalLabel?.description ??
-          "Add a new bottle using this label."
-        }
-        title={proposedName ?? createProposalLabel?.title ?? "New bottle found"}
-      >
-        {previewUrl ? (
+      <BottleResolverSection description={reasonLine} title="Find your bottle">
+        {/* A failed lookup keeps the photo in view (feature doc rule). */}
+        {alert && previewUrl ? (
           <PhotoPreview
-            metadata="Details read from this photo"
+            metadata="We couldn't check this photo"
             src={previewUrl}
-            title={proposedName ?? "Label photo"}
+            title="Label photo"
           />
         ) : null}
-        <LabelFacts result={result} />
-        {hasCreateDecision && (
-          <FormStack>
-            {renderCreateProposalActions ? (
-              renderCreateProposalActions({
-                createPending,
-                resolvingAction,
-                onResolve: (action) => onAcceptCreateProposal(result, action),
-              })
-            ) : (
-              <Button
-                disabled={createPending}
-                fullWidth
-                loading={createPending}
-                onClick={() => onAcceptCreateProposal(result, "create")}
-                variant="accent"
-              >
-                <Plus aria-hidden="true" size={16} />
-                {createActionLabel}
-              </Button>
-            )}
-          </FormStack>
-        )}
+        <FormStack>
+          {createFirst ? createLink("accent") : searchLink("accent")}
+          {createFirst ? searchLink("tonal") : createLink("tonal")}
+          <BottleResolverTextActions>{startOver}</BottleResolverTextActions>
+        </FormStack>
       </BottleResolverSection>
+      {alert ? null : <LabelDetails previewUrl={previewUrl} result={result} />}
     </BottleResolverColumn>
+  );
+}
+
+function LabelDetails({
+  previewUrl,
+  result,
+}: {
+  previewUrl: string | null;
+  result: PhotoIdentification | null;
+}) {
+  if (!previewUrl && !hasRecognizedLabelDetails(result)) return null;
+  return (
+    <FormDetails compact title="Label details">
+      {previewUrl ? (
+        <PhotoPreview
+          metadata="Details read from your photo"
+          src={previewUrl}
+          title="Label photo"
+        />
+      ) : null}
+      <LabelFacts result={result} />
+    </FormDetails>
   );
 }

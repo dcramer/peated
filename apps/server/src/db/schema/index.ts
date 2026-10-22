@@ -37,3 +37,4 @@ export * from "./tastings";
 export * from "./toasts";
 export * from "./userBlocks";
 export * from "./users";
+export * from "./wrongPhotoMatches";

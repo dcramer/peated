@@ -8,6 +8,7 @@ import rebuildPronunciationAudio from "./rebuild-pronunciation-audio";
 import rebuildSearch from "./rebuild-search";
 import reports from "./reports";
 import scraperActivity from "./scraper-activity";
+import wrongPhotoMatches from "./wrongPhotoMatches";
 
 export default base.tag("admin").router({
   catalogCoverage,
@@ -19,4 +20,5 @@ export default base.tag("admin").router({
   rebuildPronunciationAudio,
   reports,
   scraperActivity,
+  wrongPhotoMatches,
 });

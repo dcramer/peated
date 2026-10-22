@@ -26,13 +26,13 @@ action.
    form adds Peated's likely matches and a one-line summary of the label as
    they arrive. Tapping a likely match stops the classifier and continues with
    that Bottle and the same pending photo.
-5. Otherwise, the resolver presents one of three outcomes:
-   - an existing Bottle match;
-   - an approved proposal for one new, independently complete Bottle; or
-   - manual search when the evidence is insufficient or conflicting.
+5. Otherwise, the resolver presents either an existing Bottle match or the
+   [fallback screen](#fallback-screen).
 6. After resolving a Bottle, the main choices are **Rate this bottle** and
-   **Add to Library**. View bottle and Change bottle remain secondary. Photo
-   matches keep extracted label details and correction options collapsed.
+   **Add to Library**. View bottle remains secondary. A photo match also shows
+   **Not my bottle**, which records the wrong match and opens the fallback
+   screen; see [Wrong Matches](#wrong-matches). Extracted label details stay
+   collapsed.
    Adding to Library saves immediately, then offers an optional Sealed / Open /
    Empty status selector. Selecting a status saves it. From there, the member
    can rate or view the same Bottle, or find another one.
@@ -62,6 +62,31 @@ the Bottle and action before any tasting is saved.
   color, or camera access.
 - A failed or uncertain identification must preserve a path to search or retry.
 - Multiple-Bottle or ambiguous evidence must not silently select a Bottle.
+
+### Fallback Screen
+
+Every photo that does not lead straight to a Bottle uses one screen: a wrong
+match, no match, an approved new Bottle, or a photo we could not check. Only
+these parts change:
+
+- **Heading and reason.** The heading says what to do next: the approved new
+  Bottle's name, "Is it one of these?" when there are suggestions, or "Find
+  your bottle." One line under it says why.
+- **Suggestions.** Up to 3 of the likely matches from the `candidates` event,
+  minus the matched Bottle. Each row continues with that Bottle in place,
+  keeping the photo, and saves it on any wrong-match record. Search is not run
+  to fill the list, so every suggestion is one the lookup considered.
+- **Main action.** One accent action per screen: the new Bottle's actions when
+  one was approved; otherwise the suggestions lead, with **Search bottles** and
+  **Add a new bottle** paired below. With nothing to suggest, **Add a new
+  bottle** leads when the label was read, and **Search bottles** leads when it
+  was not.
+
+**Start over** is always a quiet text action. Label details stay collapsed,
+with two exceptions: an approved new Bottle shows the photo and label facts
+above its actions, because one tap adds it, and a failed lookup keeps the
+photo in view.
+
 - The user may remove or replace the pending image before tasting save.
 - General tasting entry uses the shared bottle resolver. Existing
   Bottle-scoped tasting links may continue directly with their known Bottle.
@@ -110,7 +135,7 @@ Their current lifecycle is:
 The pending record is the authorization boundary. Clients pass its id, never an
 arbitrary permanent object URL. Permanent images are server-side copies in the
 owning namespace, including `tastings/`, `tasting-drafts/`,
-`collection-bottles/`, or `bottles/`. Tasting drafts keep their copy until the
+`collection-bottles/`, `bottles/`, or `wrong-photo-matches/`. Tasting drafts keep their copy until the
 draft is posted or deleted; see [Tasting Drafts](./tasting-drafts.md).
 
 Image processing must strip embedded metadata before storage or model use. Do
@@ -129,8 +154,8 @@ context to the extraction provider.
 - streams progress events (`text/event-stream`), then ends with bounded image
   evidence, classifier output, diagnostics, a suggested next step, and the
   pending image reference;
-- returns a signed creation token only for an auto-approved creation decision;
-  and
+- returns a signed creation token only for an auto-approved creation decision,
+  and a signed wrong-match token only for a match; and
 - stops label reading and classification when the client closes the stream.
 
 The progress events, in order:
@@ -184,6 +209,43 @@ runs the same label reading and classifier in the background job
   in place of a signed token and follows the same creation, conflict, and
   catalog image rules as the route below.
 
+### Wrong Matches
+
+When the photo matches an existing Bottle, the identification response
+includes a signed `wrongMatchToken`. It names the member, pending image, matched
+Bottle, and label facts, so a member can only report a match Peated really made.
+
+`POST /wrong-photo-matches`:
+
+- requires an authenticated user who has accepted the Terms of Service;
+- verifies the token and that the pending image is still usable;
+- copies the photo to `wrong-photo-matches/` and saves the label facts, the
+  matched Bottle, and the request's Sentry trace ID; and
+- returns the existing record when the same photo is reported again.
+
+The member then picks a suggestion, searches, or creates a Bottle.
+`PATCH /wrong-photo-matches/{wrongPhotoMatch}` saves the Bottle they choose. A
+suggestion saves it directly; search and creation carry the record's ID in the
+URL, and so does **Change bottle** afterward, so the last pick is the one kept.
+Only the reporting member can set it. A failed report or update never blocks
+search, creation, or the member's next action.
+
+Access and retention:
+
+- Only administrators can list records, through `GET /admin/wrong-photo-matches`.
+  Records exist to build classifier checks. They are not shown publicly.
+- The saved label facts are the bounded `imageEvidence` the photo route already
+  returns; no prompts, raw model responses, or account details are saved.
+- The photo copy is deleted 30 days after the report by the hourly
+  `CleanupWrongPhotoMatchPhotos` job. The record, its label facts, and both
+  Bottles stay.
+- Account deletion deletes the member's records and any remaining photo copies.
+- The member is told the wrong match was noted, so they know not to report it
+  elsewhere, but not that the photo is kept. The note appears only when the
+  report saved.
+- Bottle merges move both the matched and the chosen Bottle to the survivor.
+  Deleting a Bottle clears that reference.
+
 ### Create Tasting
 
 Normal tasting creation accepts an optional owned `pendingImageId` alongside
@@ -201,8 +263,9 @@ best-effort attachment.
 
 - Extraction or classification failure returns an identification error; the UI
   keeps the local preview and offers search or retry.
-- Low-confidence, review-only, and `no_match` outcomes route to manual search or
-  manual creation rather than forcing a semantic decision.
+- Low-confidence, review-only, and `no_match` outcomes open the fallback screen
+  with suggestions, search, and manual creation rather than forcing a semantic
+  decision.
 - A bottle lookup that runs out of time returns the label facts with no match.
 - An expired or foreign pending image is rejected before durable creation.
 - Catalog-image promotion never overwrites an existing Bottle image.
@@ -228,6 +291,7 @@ Primary owners:
   `apps/server/src/lib/photoIdentification.ts`
 - catalog image rules: `apps/server/src/lib/photoCatalogImage.ts`
 - draft identification: `apps/server/src/lib/tastingDraftIdentification.ts`
+- wrong match records: `apps/server/src/orpc/routes/wrongPhotoMatches/`
 - pending image lifecycle: `apps/server/src/lib/pendingUploads.ts`
 - pending image schema: `apps/server/src/db/schema/pendingUploads.ts`
 - image evidence: `packages/bottle-classifier/src/imageEvidence.ts`

@@ -26,6 +26,7 @@ import {
   toasts,
   userBlocks,
   users,
+  wrongPhotoMatches,
   type User,
 } from "@peated/server/db/schema";
 import { getUserActorForDatabase } from "@peated/server/lib/actors";
@@ -206,6 +207,10 @@ export async function deleteUserAccount(
       .select({ imageUrl: tastingDrafts.imageUrl })
       .from(tastingDrafts)
       .where(eq(tastingDrafts.createdById, userId));
+    const wrongPhotoMatchRows = await tx
+      .select({ imageUrl: wrongPhotoMatches.imageUrl })
+      .from(wrongPhotoMatches)
+      .where(eq(wrongPhotoMatches.createdById, userId));
 
     // Notifications sent to the member, sent by the member, or about the
     // member's comments and toasts.
@@ -317,6 +322,9 @@ export async function deleteUserAccount(
       .delete(pendingUploads)
       .where(eq(pendingUploads.createdById, userId));
     await tx.delete(tastingDrafts).where(eq(tastingDrafts.createdById, userId));
+    await tx
+      .delete(wrongPhotoMatches)
+      .where(eq(wrongPhotoMatches.createdById, userId));
     await tx.delete(identities).where(eq(identities.userId, userId));
     await tx.delete(passkeys).where(eq(passkeys.userId, userId));
     await tx
@@ -394,6 +402,7 @@ export async function deleteUserAccount(
         ...collectionRows.map((row) => row.imageUrl),
         ...pendingRows.map((row) => row.imageUrl),
         ...draftRows.map((row) => row.imageUrl),
+        ...wrongPhotoMatchRows.map((row) => row.imageUrl),
       ].filter((url): url is string => Boolean(url)),
     };
   });

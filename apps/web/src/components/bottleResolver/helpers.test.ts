@@ -5,8 +5,8 @@ import {
   EMPTY_PHOTO_PROGRESS,
   getCreateBottlePrefill,
   getCreateNameSeed,
+  getFallbackReason,
   getLabelSummary,
-  getManualResultCopy,
   getPhotoProgressStatus,
   type PhotoIdentification,
   type PhotoIdentificationProgressEvent,
@@ -109,6 +109,7 @@ function buildPhotoResult(): PhotoIdentification {
       },
     },
     createToken: null,
+    wrongMatchToken: null,
   };
 }
 
@@ -149,11 +150,9 @@ describe("photo create prefill", () => {
       },
     };
 
-    expect(getManualResultCopy(result)).toMatchObject({
-      title: "We couldn't find this bottle",
-      createLabel: "Add a new bottle",
-      primaryAction: "create",
-    });
+    expect(getFallbackReason(result)).toBe(
+      "We read the label but couldn't match it to a bottle.",
+    );
     expect(getCreateBottlePrefill(result)).toMatchObject({
       brandName: "Raw Label Brand",
       category: "single_malt",

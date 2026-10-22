@@ -1,6 +1,10 @@
 import { describe, expect, it } from "vitest";
 
-import { getAddBottleHref, getAddSimilarBottlePath } from "./addBottle";
+import {
+  getAddBottleHref,
+  getAddSimilarBottlePath,
+  getWrongPhotoMatchFromParams,
+} from "./addBottle";
 
 describe("getAddSimilarBottlePath", () => {
   it("builds the independent similar-Bottle path", () => {
@@ -49,5 +53,29 @@ describe("getAddBottleHref", () => {
     expect(getAddBottleHref(options)).toBe(
       "/addBottle?bottle=42&flight=flight-qa&intent=tasting",
     );
+  });
+});
+
+describe("wrong photo match route state", () => {
+  it("carries the reported match to the chosen Bottle", () => {
+    const href = getAddBottleHref({
+      bottleId: 42,
+      pendingImageId: "upload-1",
+      wrongPhotoMatchId: 7,
+      intent: "tasting",
+    });
+
+    expect(
+      getWrongPhotoMatchFromParams(
+        new URL(href, "https://peated.com").searchParams,
+      ),
+    ).toBe(7);
+  });
+
+  it("ignores a missing or invalid match", () => {
+    expect(getWrongPhotoMatchFromParams(new URLSearchParams())).toBeNull();
+    expect(
+      getWrongPhotoMatchFromParams(new URLSearchParams("wrongPhotoMatch=abc")),
+    ).toBeNull();
   });
 });

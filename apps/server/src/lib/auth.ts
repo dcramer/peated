@@ -31,6 +31,8 @@ export const TOKEN_LIFETIME_SECONDS = {
   "email-verification": 7 * 24 * 60 * 60,
   "webauthn-challenge": 10 * 60,
   "photo-identification-create": 7 * 24 * 60 * 60,
+  // Matches the pending photo's 48-hour lifetime.
+  "wrong-photo-match": 48 * 60 * 60,
 } as const;
 
 type TokenPurpose = keyof typeof TOKEN_LIFETIME_SECONDS;

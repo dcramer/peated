@@ -42,3 +42,4 @@ export * from "./tastingDrafts";
 export * from "./tastings";
 export * from "./userBlocks";
 export * from "./users";
+export * from "./wrongPhotoMatches";
