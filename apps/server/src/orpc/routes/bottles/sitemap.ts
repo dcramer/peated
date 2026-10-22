@@ -1,5 +1,9 @@
 import { db } from "@peated/server/db";
 import { bottles, bottleTombstones } from "@peated/server/db/schema";
+import {
+  bottleDisplayNameColumns,
+  toBottleDisplayNameSource,
+} from "@peated/server/lib/bottleDisplayNameColumns";
 import { implement } from "@peated/server/orpc";
 import bottleSitemapContract from "@peated/server/orpc/contracts/bottles/sitemap";
 import { and, asc, isNotNull, sql } from "drizzle-orm";
@@ -10,8 +14,8 @@ export default implement(bottleSitemapContract).handler(async ({ input }) => {
   const results = await db
     .select({
       id: bottles.id,
-      fullName: bottles.fullName,
       updatedAt: bottles.updatedAt,
+      bottle: bottleDisplayNameColumns,
     })
     .from(bottles)
     .where(
@@ -25,9 +29,10 @@ export default implement(bottleSitemapContract).handler(async ({ input }) => {
     .offset((input.page - 1) * PAGE_LIMIT);
 
   return {
-    results: results.map((bottle) => ({
-      ...bottle,
-      updatedAt: bottle.updatedAt.toISOString(),
+    results: results.map(({ id, updatedAt, bottle }) => ({
+      id,
+      ...toBottleDisplayNameSource(bottle),
+      updatedAt: updatedAt.toISOString(),
     })),
   };
 });
