@@ -671,6 +671,10 @@ async function performEntityMerge({
           // An Entity merge changes the record ID, not the Bottle itself.
           // Keep the Bottle's existing generated content.
           invalidateGeneratedDetails: false,
+          // Whisky Identity Model, "Bottle Name, Edition, And Cask Number":
+          // a merge carries existing names and does not choose them, so a
+          // title clash it creates is left for a catalog repair to fix.
+          enforceNamingRules: false,
         }),
       );
     }

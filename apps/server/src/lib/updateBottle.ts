@@ -1208,6 +1208,7 @@ export async function updateBottleInTransaction(
     actorId,
     creationSource,
     invalidateGeneratedDetails = true,
+    enforceNamingRules = true,
     recordChange = true,
   }: {
     bottleId: number;
@@ -1217,6 +1218,10 @@ export async function updateBottleInTransaction(
     actorId: number;
     creationSource: CatalogVerificationCreationSource;
     invalidateGeneratedDetails?: boolean;
+    // False only for jobs that move existing Bottles to another Entity or
+    // Series without editing them; fixing names they collide with is catalog
+    // work, not a reason to fail the move.
+    enforceNamingRules?: boolean;
     // False only for derived content, such as generated details, that no
     // person or source asserted; it is not a catalog edit.
     recordChange?: boolean;
@@ -1466,14 +1471,16 @@ export async function updateBottleInTransaction(
     ? members
     : members.filter(({ id }) => id === bottleId);
   const affectedIds = affectedMembers.map(({ id }) => id).sort((a, b) => a - b);
-  await assertBottleNamingRules(tx, {
-    group,
-    stable,
-    lockedBottle,
-    selectedDesired,
-    affectedMembers,
-    desiredByBottleId,
-  });
+  if (enforceNamingRules) {
+    await assertBottleNamingRules(tx, {
+      group,
+      stable,
+      lockedBottle,
+      selectedDesired,
+      affectedMembers,
+      desiredByBottleId,
+    });
+  }
   const memberSeriesChanged =
     sharedChanged &&
     affectedMembers.some(

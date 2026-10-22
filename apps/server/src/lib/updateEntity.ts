@@ -490,6 +490,8 @@ export async function updateEntityInTransaction(
             input: { brand: newEntity.id },
             actorId,
             creationSource: "manual_entry",
+            // Moving Bottles to the new Entity does not edit their names.
+            enforceNamingRules: false,
           }),
         );
       }
