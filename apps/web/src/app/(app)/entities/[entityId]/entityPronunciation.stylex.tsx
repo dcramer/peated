@@ -1,21 +1,44 @@
-import * as stylex from "@stylexjs/stylex";
+"use client";
 
-import { colors } from "../../../../styles/tokens.stylex";
+import * as stylex from "@stylexjs/stylex";
+import { Volume2 } from "lucide-react";
+
+import { IconButton } from "../../../../components/button.stylex";
+import { colors, space } from "../../../../styles/tokens.stylex";
 
 import type { Entity } from "./entityPageData";
+
+// One player for the page, so a second press restarts the sound instead of
+// overlapping it. It is created on the first press; nothing plays on load.
+let player: HTMLAudioElement | null = null;
+
+function playPronunciation(audioUrl: string) {
+  player ??= new Audio();
+  if (player.src !== audioUrl) player.src = audioUrl;
+  player.currentTime = 0;
+  player.play().catch((error) => {
+    // A newer press interrupted this one; that press plays instead.
+    if (error instanceof DOMException && error.name === "AbortError") return;
+    throw error;
+  });
+}
 
 /**
  * Shows how to say a brand or producer name, like a dictionary entry:
  * `glen GEER-ee /ɡlɛn ˈɡɪəri/`. Stressed syllables are stored in capitals;
  * they render lowercase with a CSS transform so screen readers say the
- * syllable instead of spelling out its letters.
+ * syllable instead of spelling out its letters. When Peated has audio for the
+ * IPA, a play button reads it aloud.
  */
 export function EntityPronunciation({
   entity,
 }: {
-  entity: Pick<Entity, "pronunciation" | "pronunciationIpa">;
+  entity: Pick<
+    Entity,
+    "name" | "pronunciation" | "pronunciationIpa" | "pronunciationAudioUrl"
+  >;
 }) {
-  const { pronunciation, pronunciationIpa } = entity;
+  const { pronunciation, pronunciationIpa, pronunciationAudioUrl } = entity;
   if (!pronunciation && !pronunciationIpa) return null;
 
   return (
@@ -40,6 +63,17 @@ export function EntityPronunciation({
           /{pronunciationIpa}/
         </span>
       ) : null}
+      {pronunciationIpa && pronunciationAudioUrl ? (
+        <span {...stylex.props(styles.play)}>
+          <IconButton
+            icon={<Volume2 aria-hidden size={14} />}
+            label={`Play pronunciation of ${entity.name}`}
+            onClick={() => playPronunciation(pronunciationAudioUrl)}
+            size="sm"
+            variant="text"
+          />
+        </span>
+      ) : null}
     </span>
   );
 }
@@ -59,6 +93,14 @@ const styles = stylex.create({
   // word is not drawn half in Karla and half in a fallback font.
   ipa: {
     fontFamily: "system-ui, sans-serif",
+  },
+  // The button keeps its full touch target without making the metadata line
+  // taller.
+  play: {
+    display: "inline-flex",
+    verticalAlign: "middle",
+    marginBlock: "-12px",
+    marginInlineStart: space.x1,
   },
   visuallyHidden: {
     position: "absolute",
