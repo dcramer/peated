@@ -130,6 +130,14 @@ producer, auction, or retailer evidence.
   coordinates.
 - A shared Bottle rename fans out to every Bottle in its group. Read the edit
   context first and give each member its own edition in the same pass.
+- Sending `statedAge: null` can expose an older age stored on the Bottle's
+  group. Check the age in the PATCH response and send `null` again if it
+  is not empty.
+- A Bottle merge returns 409 when the retired Bottle's full name matches
+  another Bottle's reference (a bare `Benromach Organic` beside the no-age
+  Organic). Rename the retired Bottle to its exact name first, then merge.
+- Whisky Auctioneer lot text can give the wrong bottling year. Zoom the lot
+  photo and trust the label.
 - A direct image URL does not record its source page or license. Count image
   identity, source-page provenance, and reuse status separately in the final
   audit.
