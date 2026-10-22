@@ -44,6 +44,7 @@ import tastings from "./tastings";
 import toasts from "./toasts";
 import users from "./users";
 import version from "./version";
+import wrongPhotoMatches from "./wrongPhotoMatches";
 
 export interface Router {
   activity: typeof activity;
@@ -91,6 +92,7 @@ export interface Router {
   toasts: typeof toasts;
   users: typeof users;
   version: typeof version;
+  wrongPhotoMatches: typeof wrongPhotoMatches;
 }
 
 export default api.router({
@@ -139,4 +141,5 @@ export default api.router({
   toasts,
   users,
   version,
+  wrongPhotoMatches,
 });

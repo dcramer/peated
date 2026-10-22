@@ -312,6 +312,12 @@ export const PhotoIdentificationSchema = z.object({
     .string()
     .nullable()
     .describe("Signed token for creating an auto-approved photo proposal"),
+  wrongMatchToken: z
+    .string()
+    .nullable()
+    .describe(
+      "Signed token for reporting a matched Bottle as wrong, or `null` when there is no match",
+    ),
 });
 
 /** The generic steps a member sees while the classifier works. */

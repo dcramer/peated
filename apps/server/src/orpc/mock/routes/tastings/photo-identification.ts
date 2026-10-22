@@ -104,6 +104,7 @@ export default mockOS.tastings.photoIdentification.handler(
         },
       },
       createToken: null,
+      wrongMatchToken: null,
     };
 
     return (async function* () {

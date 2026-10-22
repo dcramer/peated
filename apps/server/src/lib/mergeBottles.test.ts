@@ -27,6 +27,7 @@ import {
   storePrices,
   tastingDrafts,
   tastings,
+  wrongPhotoMatches,
 } from "@peated/server/db/schema";
 import { getUserActor } from "@peated/server/lib/actors";
 import { reconcileBottleSeriesRepresentatives } from "@peated/server/lib/bottleSeriesRepresentatives";
@@ -176,6 +177,10 @@ describe("exact Bottle merges", () => {
       })
       .returning();
     const sourceDraft = await fixtures.TastingDraft({ bottleId: source.id });
+    const wrongPhotoMatch = await fixtures.WrongPhotoMatch({
+      wrongBottleId: source.id,
+      correctBottleId: source.id,
+    });
     const [decisionLog] = await db
       .insert(incomingBottleDecisionLogs)
       .values({
@@ -299,6 +304,14 @@ describe("exact Bottle merges", () => {
         where: eq(tastingDrafts.id, sourceDraft.id),
       }),
     ).toMatchObject({ bottleId: destination.id });
+    expect(
+      await db.query.wrongPhotoMatches.findFirst({
+        where: eq(wrongPhotoMatches.id, wrongPhotoMatch.id),
+      }),
+    ).toMatchObject({
+      wrongBottleId: destination.id,
+      correctBottleId: destination.id,
+    });
     expect(
       await db.query.storePriceMatchProposals.findFirst({
         where: eq(storePriceMatchProposals.id, proposal!.id),

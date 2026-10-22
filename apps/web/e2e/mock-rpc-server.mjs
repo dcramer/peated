@@ -97,6 +97,8 @@ const mockUploadImage = Buffer.from(
 const collectionStateByToken = new Map();
 const auctionWatchStateByToken = new Map();
 const pendingUploadStateByToken = new Map();
+const playwrightWrongMatchToken = "playwright-wrong-match-token";
+const playwrightWrongPhotoMatchId = 9001;
 const userModeratorStateByToken = new Map();
 const appliedQueueProposalTokens = new Set();
 const ignoredInconclusiveProposalTokens = new Set();
@@ -1493,9 +1495,29 @@ async function handleRpcRequest({ request, response, url }) {
               reason: "Matched the fixture bottle.",
             },
           },
+          wrongMatchToken: playwrightWrongMatchToken,
         },
         "11111111111111111111111111111111",
+        // Peated's likely matches: the one it picks, plus one other.
+        [existingBottle, exactSearchBottle],
       );
+      return true;
+    case "wrongPhotoMatches/create":
+      if (input?.token !== playwrightWrongMatchToken) {
+        sendRpcError(response, "Unexpected wrong photo match token.");
+        return true;
+      }
+      sendRpcResponse(response, { id: playwrightWrongPhotoMatchId });
+      return true;
+    case "wrongPhotoMatches/update":
+      if (input?.wrongPhotoMatch !== playwrightWrongPhotoMatchId) {
+        sendRpcError(response, "Unexpected wrong photo match.");
+        return true;
+      }
+      sendRpcResponse(response, {
+        id: playwrightWrongPhotoMatchId,
+        withdrawn: false,
+      });
       return true;
     case "tastings/photoIdentificationCreate":
       sendRpcResponse(
@@ -3022,9 +3044,15 @@ function sendRpcResponse(response, data, sentryTraceId = null) {
 
 /**
  * Photo identification streams progress as server-sent events: the stored
- * photo and the label reading, then the full result as the final `done` event.
+ * photo, the label reading, any likely matches, then the full result as the
+ * final `done` event.
  */
-function sendRpcPhotoStream(response, result, sentryTraceId = null) {
+function sendRpcPhotoStream(
+  response,
+  result,
+  sentryTraceId = null,
+  likelyMatches = [],
+) {
   const headers = {
     ...corsHeaders,
     "Content-Type": "text/event-stream",
@@ -3039,6 +3067,9 @@ function sendRpcPhotoStream(response, result, sentryTraceId = null) {
         type: "label",
         imageEvidence: result.imageEvidence,
       }) +
+      (likelyMatches.length
+        ? event("message", { type: "candidates", bottles: likelyMatches })
+        : "") +
       event("done", result),
   );
 }

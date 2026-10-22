@@ -161,6 +161,7 @@ export function getCreateBottleHref({
   returnDraftId,
   prefill,
   pendingImage,
+  wrongPhotoMatchId,
 }: {
   query: string;
   returnAction?: CreateBottleReturnAction;
@@ -168,6 +169,7 @@ export function getCreateBottleHref({
   returnDraftId?: string;
   prefill?: CreateBottlePrefill;
   pendingImage?: PendingImageRouteState | null;
+  wrongPhotoMatchId?: number | null;
 }) {
   const parsedPrefill = prefill ?? {};
   const params = new URLSearchParams({
@@ -256,6 +258,9 @@ export function getCreateBottleHref({
   if (pendingImage?.id) params.set("pendingImageId", pendingImage.id);
   if (pendingImage?.imageUrl) {
     params.set("pendingImageUrl", pendingImage.imageUrl);
+  }
+  if (wrongPhotoMatchId) {
+    params.set("wrongPhotoMatch", String(wrongPhotoMatchId));
   }
   return `/bottles/new?${params.toString()}`;
 }

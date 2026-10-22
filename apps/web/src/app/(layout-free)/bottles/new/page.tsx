@@ -9,7 +9,10 @@ import { parseCreateBottlePrefill } from "@peated/web/components/search/createBo
 import { WorkflowLoading } from "@peated/web/components/workflowScreen.stylex";
 import useAuth from "@peated/web/hooks/useAuth";
 import { VerifiedRequired } from "@peated/web/hooks/useAuthRequired";
-import { getAddBottleHref } from "@peated/web/lib/addBottle";
+import {
+  getAddBottleHref,
+  getWrongPhotoMatchFromParams,
+} from "@peated/web/lib/addBottle";
 import { shrinkPhotoForUpload } from "@peated/web/lib/blobs";
 import { logError } from "@peated/web/lib/log";
 import { useORPC } from "@peated/web/lib/orpc/context";
@@ -19,6 +22,7 @@ import {
   parseTastingDraftId,
 } from "@peated/web/lib/tastingDrafts";
 import { getBottleUrl } from "@peated/web/lib/urls";
+import { saveWrongPhotoMatchPick } from "@peated/web/lib/wrongPhotoMatches";
 import { useMutation, useQueries, useQuery } from "@tanstack/react-query";
 import { redirect, useRouter, useSearchParams } from "next/navigation";
 import {
@@ -86,6 +90,7 @@ function CreateBottleForm() {
   const proposalId = searchParams.get("proposal");
   const pendingImageId = searchParams.get("pendingImageId")?.trim() || null;
   const pendingImageUrl = searchParams.get("pendingImageUrl") || null;
+  const wrongPhotoMatchId = getWrongPhotoMatchFromParams(searchParams);
 
   const prefill = parseCreateBottlePrefill(searchParams);
   const distiller =
@@ -126,6 +131,16 @@ function CreateBottleForm() {
 
   if (proposalId && user && !canReviewProposal) {
     redirect("/errors/unauthorized");
+  }
+
+  // Saves the member's pick after they reported a wrong photo match.
+  async function saveWrongPhotoMatchBottle(bottleId: number) {
+    if (!wrongPhotoMatchId) return;
+    await saveWrongPhotoMatchPick(
+      orpc.wrongPhotoMatches.update.call,
+      wrongPhotoMatchId,
+      bottleId,
+    );
   }
 
   const initialFormData: BottleFormInitialData = { name };
@@ -247,6 +262,7 @@ function CreateBottleForm() {
     <BottleForm
       mode="create"
       onUseExistingBottle={(bottle) => {
+        void saveWrongPhotoMatchBottle(bottle.id);
         if (returnDraftId) {
           router.replace(
             getTastingDraftBottleHref({ id: returnDraftId }, bottle.id),
@@ -273,6 +289,7 @@ function CreateBottleForm() {
               independentBottle: data,
             })
           : await bottleCreateMutation.mutateAsync(data);
+        await saveWrongPhotoMatchBottle(createdBottle.id);
         const nextPendingImageId = image === undefined ? pendingImageId : null;
         const nextPendingImageUrl =
           image === undefined ? pendingImageUrl : null;

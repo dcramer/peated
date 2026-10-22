@@ -21,6 +21,7 @@ export const PERMANENT_UPLOAD_NAMESPACES = [
   "bottle-releases",
   "badges",
   "avatars",
+  "wrong-photo-matches",
 ] as const;
 export const DEFAULT_PENDING_UPLOAD_TTL_MS = 1000 * 60 * 60 * 48;
 
@@ -328,6 +329,24 @@ export async function copyPendingImageToBottle({
     destinationNamespace: "bottles",
     destinationType: "bottle",
     destinationId: bottleId,
+  });
+}
+
+/** Copies a label photo to a private wrong-photo-match record. */
+export async function copyPendingImageToWrongPhotoMatch({
+  id,
+  userId,
+}: {
+  id: string;
+  userId: number;
+}): Promise<string> {
+  return await copyPendingImageToPermanentDestination({
+    id,
+    userId,
+    purpose: "photo_tasting_entry",
+    destinationNamespace: "wrong-photo-matches",
+    destinationType: "wrong_photo_match",
+    destinationId: id,
   });
 }
 

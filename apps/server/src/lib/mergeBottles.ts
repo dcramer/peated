@@ -30,6 +30,7 @@ import {
   storePrices,
   tastingDrafts,
   tastings,
+  wrongPhotoMatches,
 } from "@peated/server/db/schema";
 import { getUserActor } from "@peated/server/lib/actors";
 import { moveBottleAliasesForMergeInTransaction } from "@peated/server/lib/bottleAliases";
@@ -457,6 +458,22 @@ async function repointBottleConsumers(
     counts[name] = updated.length;
   }
 
+  // Wrong photo matches point at both Bottles in a match; follow either one.
+  const movedWrongPhotoMatches = await tx
+    .update(wrongPhotoMatches)
+    .set({
+      wrongBottleId: sql`CASE WHEN ${wrongPhotoMatches.wrongBottleId} = ${sourceBottleId} THEN ${destinationBottleId} ELSE ${wrongPhotoMatches.wrongBottleId} END`,
+      correctBottleId: sql`CASE WHEN ${wrongPhotoMatches.correctBottleId} = ${sourceBottleId} THEN ${destinationBottleId} ELSE ${wrongPhotoMatches.correctBottleId} END`,
+    })
+    .where(
+      or(
+        eq(wrongPhotoMatches.wrongBottleId, sourceBottleId),
+        eq(wrongPhotoMatches.correctBottleId, sourceBottleId),
+      ),
+    )
+    .returning({ id: wrongPhotoMatches.id });
+  counts.wrongPhotoMatches = movedWrongPhotoMatches.length;
+
   for (const [name, table] of [
     ["storePriceMatchProposals", storePriceMatchProposals],
     ["storePriceMatchAttempts", storePriceMatchAttempts],
@@ -611,6 +628,17 @@ export async function lockBottleMergeDependencies(
     .from(incomingBottleDecisionLogs)
     .where(inArray(incomingBottleDecisionLogs.bottleId, bottleIds))
     .orderBy(asc(incomingBottleDecisionLogs.id))
+    .for("update");
+  await tx
+    .select()
+    .from(wrongPhotoMatches)
+    .where(
+      or(
+        inArray(wrongPhotoMatches.wrongBottleId, bottleIds),
+        inArray(wrongPhotoMatches.correctBottleId, bottleIds),
+      ),
+    )
+    .orderBy(asc(wrongPhotoMatches.id))
     .for("update");
   await tx
     .select()

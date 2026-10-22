@@ -1,5 +1,7 @@
 import type { Inputs } from "@peated/server/orpc/router";
-import { CategoryEnum } from "@peated/server/schemas";
+// The schemas barrel loads server-only modules (OAuth uses node:crypto), which
+// breaks this file in Storybook's browser bundle; import the enum directly.
+import { CategoryEnum } from "@peated/server/schemas/common";
 import type { CreateBottlePrefill } from "@peated/web/components/search/createBottleHref";
 import { z } from "zod";
 
@@ -15,13 +17,6 @@ export type {
 } from "./fieldValues";
 export type PhotoIdentificationCreateInput =
   Inputs["tastings"]["photoIdentificationCreate"];
-
-type ManualResultCopy = {
-  title: string;
-  description: string;
-  createLabel?: string;
-  primaryAction?: "search" | "create";
-};
 
 export function createIdempotencyKey() {
   const randomId = globalThis.crypto?.randomUUID?.();
@@ -164,7 +159,7 @@ export function getCreateBottlePrefill(
   };
 }
 
-function hasRecognizedLabelDetails(result: PhotoIdentification | null) {
+export function hasRecognizedLabelDetails(result: PhotoIdentification | null) {
   return Boolean(
     getFieldValue(result, "brand") ||
     getFieldValue(result, "expression") ||
@@ -218,70 +213,15 @@ export function getProposedName(result: PhotoIdentification | null) {
     .join(" ");
 }
 
-export function getCreateProposalLabel(result: PhotoIdentification | null) {
-  const decision = getCreateDecision(result);
-  if (!decision) return null;
-
-  return {
-    title: "Bottle not in Peated",
-    description: "Add a new bottle using this label.",
-  };
-}
-
-export function getManualResultCopy(
-  result: PhotoIdentification | null,
-): ManualResultCopy {
-  const action =
-    result?.classification.status === "classified"
-      ? result.classification.decision.action
-      : null;
-
-  if (action === "match") {
-    return {
-      title: "We couldn't confirm the match",
-      description:
-        "We found a possible match, but it was not reliable enough to use automatically.",
-      createLabel: undefined,
-    };
+/** Says in one line why the photo did not lead straight to a Bottle. */
+export function getFallbackReason(result: PhotoIdentification | null) {
+  if (getCreateDecision(result)) {
+    return "This label looks new to Peated. Check the details before you add it.";
   }
-
-  if (action === "no_match") {
-    if (hasRecognizedLabelDetails(result)) {
-      return {
-        title: "We couldn't find this bottle",
-        description:
-          "We found label details, but not enough to choose an existing bottle automatically. Review them before creating it in Peated.",
-        createLabel: "Add a new bottle",
-        primaryAction: "create" as const,
-      };
-    }
-
-    return {
-      title: "We couldn't identify the bottle",
-      description:
-        "Search can still find it, or you can start over with a clearer photo.",
-      createLabel: "Add a new bottle",
-      primaryAction: "search" as const,
-    };
+  if (hasRecognizedLabelDetails(result)) {
+    return "We read the label but couldn't match it to a bottle.";
   }
-
-  if (action === "create_bottle") {
-    return {
-      title: "We couldn't find this bottle",
-      description:
-        "We found label details, but not enough to choose an existing bottle automatically. Review them before creating it in Peated.",
-      createLabel: "Add a new bottle",
-      primaryAction: "create" as const,
-    };
-  }
-
-  return {
-    title: "We couldn't identify the bottle",
-    description:
-      "Search can still find it, or you can start over with another photo.",
-    createLabel: "Add a new bottle",
-    primaryAction: "search" as const,
-  };
+  return "We couldn't read enough from this label.";
 }
 
 type PhotoIdentificationStep = Extract<

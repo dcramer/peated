@@ -30,6 +30,7 @@ import {
 } from "@peated/server/lib/photoIdentification";
 import { verifyPhotoIdentificationCreateToken } from "@peated/server/lib/photoIdentificationCreateToken";
 import waitError from "@peated/server/lib/test/waitError";
+import { verifyWrongPhotoMatchToken } from "@peated/server/lib/wrongPhotoMatchToken";
 import type { Context } from "@peated/server/orpc/context";
 import {
   createPhotoIdentificationProcedure,
@@ -520,6 +521,16 @@ describe("POST /tastings/photo-identification", () => {
     expect(response.classification.artifacts.candidates[0]).not.toHaveProperty(
       "bottleId",
     );
+    // A match can be reported as wrong without trusting the browser's copy.
+    expect(response.createToken).toBeNull();
+    await expect(
+      verifyWrongPhotoMatchToken(response.wrongMatchToken!),
+    ).resolves.toMatchObject({
+      userId: defaults.user.id,
+      pendingImageId: response.pendingImage.id,
+      bottleId: matchedBottleId,
+      imageEvidence: response.imageEvidence,
+    });
 
     expect(classifyBottleReferenceMock).toHaveBeenCalledTimes(1);
     expect(runBottleReferenceMock).toHaveBeenCalledTimes(1);
@@ -1214,6 +1225,7 @@ describe("POST /tastings/photo-identification", () => {
 
     expect(identification.suggestedNextStep).toBe("manual_search");
     expect(identification.createToken).toBeNull();
+    expect(identification.wrongMatchToken).toBeNull();
     expect(identification.classification).toMatchObject({
       status: "classified",
       decision: {

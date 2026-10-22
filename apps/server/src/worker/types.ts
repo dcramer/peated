@@ -5,6 +5,7 @@ export type JobName =
   | "ApplyAuctionLotMatch"
   | "CapturePriceImage"
   | "CleanupPendingUploads"
+  | "CleanupWrongPhotoMatchPhotos"
   | "GenerateBottleDetails"
   | "GenerateCountryDetails"
   | "GenerateEntityDetails"

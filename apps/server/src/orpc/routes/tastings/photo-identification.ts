@@ -24,6 +24,7 @@ import { humanizeBytes } from "@peated/server/lib/strings";
 import { logInfo } from "@peated/server/lib/structuredLog";
 import { compressAndResizeImage } from "@peated/server/lib/uploads";
 import { absoluteUrl } from "@peated/server/lib/urls";
+import { signWrongPhotoMatchToken } from "@peated/server/lib/wrongPhotoMatchToken";
 import { implement } from "@peated/server/orpc";
 import type { Context } from "@peated/server/orpc/context";
 import photoIdentificationContract from "@peated/server/orpc/contracts/tastings/photo-identification";
@@ -522,6 +523,17 @@ async function* streamPhotoIdentification({
             photoSuitability: imageEvidence.photoSuitability,
           })
         : null;
+    const wrongMatchToken =
+      classification.status === "classified" &&
+      classification.decision.action === "match"
+        ? await signWrongPhotoMatchToken({
+            type: "wrong_photo_match",
+            userId: context.user.id,
+            pendingImageId: pendingImage.id,
+            bottleId: classification.decision.matchedBottleId,
+            imageEvidence,
+          })
+        : null;
 
     return {
       pendingImage: serializedPendingImage,
@@ -531,6 +543,7 @@ async function* streamPhotoIdentification({
       suggestedNextStep,
       diagnostics,
       createToken,
+      wrongMatchToken,
     };
   } finally {
     requestSignal?.removeEventListener("abort", stopOnDisconnect);
