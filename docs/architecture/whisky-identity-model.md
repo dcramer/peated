@@ -211,6 +211,13 @@ consumer rows, assigned references, release-promotion mappings, and tombstones
 converge on that Bottle in one canonical operation. BottleGroup is never the
 merge destination and a representative Bottle is never selected implicitly.
 
+An Entity merge that changes a Bottle's brand runs this merge only when the
+destination brand already has a Bottle with the same full structured identity:
+full name, Series, edition, age, vintage, bottling and release dates, ABV,
+single cask, cask strength, cask number, and outturn. A Bottle with the same
+name but different release fields moves to the destination brand as its own
+Bottle.
+
 ## BottleGroup Versus BottleSeries
 
 BottleGroup membership means “marketed releases of the same expression.”

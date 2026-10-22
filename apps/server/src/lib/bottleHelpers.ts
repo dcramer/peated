@@ -5,7 +5,21 @@ import { buildBottleSeriesSearchDocument } from "@peated/server/lib/search";
 import { BottleSeriesInputSchema } from "@peated/server/schemas";
 import { eq, sql } from "drizzle-orm";
 import { z } from "zod";
-import type { AnyTransaction } from "../db";
+import type { AnyDatabase, AnyTransaction } from "../db";
+
+/** Finds the Series that `processSeries` reuses for a Series name under a brand. */
+export async function findSeriesIdByName(
+  database: AnyDatabase,
+  { brand, name }: { brand: Pick<Entity, "name">; name: string },
+): Promise<number | null> {
+  const fullName = `${brand.name} ${name}`;
+  const [existingSeries] = await database
+    .select({ id: bottleSeries.id })
+    .from(bottleSeries)
+    .where(eq(sql`LOWER(${bottleSeries.fullName})`, fullName.toLowerCase()))
+    .limit(1);
+  return existingSeries?.id ?? null;
+}
 
 /**
  * Resolves or creates a bottle series using the caller-provided actor for
@@ -48,15 +62,12 @@ export async function processSeries({
   );
   const fullName = `${brand.name} ${seriesDraft.name}`;
 
-  // Check for existing series
-  const [existingSeries] = await tx
-    .select()
-    .from(bottleSeries)
-    .where(eq(sql`LOWER(${bottleSeries.fullName})`, fullName.toLowerCase()))
-    .limit(1);
-
-  if (existingSeries) {
-    return existingSeries.id;
+  const existingSeriesId = await findSeriesIdByName(tx, {
+    brand,
+    name: seriesDraft.name,
+  });
+  if (existingSeriesId !== null) {
+    return existingSeriesId;
   }
 
   const actorId = createdByActorId;
