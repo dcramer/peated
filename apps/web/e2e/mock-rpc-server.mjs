@@ -1514,7 +1514,10 @@ async function handleRpcRequest({ request, response, url }) {
         sendRpcError(response, "Unexpected wrong photo match.");
         return true;
       }
-      sendRpcResponse(response, { id: playwrightWrongPhotoMatchId });
+      sendRpcResponse(response, {
+        id: playwrightWrongPhotoMatchId,
+        withdrawn: false,
+      });
       return true;
     case "tastings/photoIdentificationCreate":
       sendRpcResponse(
