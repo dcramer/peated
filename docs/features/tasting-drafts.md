@@ -48,8 +48,13 @@ a draft's Bottle.
 wins. Every field is replaced, and an omitted field is cleared, except the
 photo (see below).
 
-- Tags and friends are checked the same way as for a tasting. A chosen Bottle
-  must be active.
+- Tags are checked the same way as for a tasting. A chosen Bottle must be
+  active.
+- Friends the member no longer follows are dropped instead of rejected. A
+  draft can wait for weeks, and a friendship that ends meanwhile must not stop
+  the member from saving or posting it. `POST /tastings` still rejects them.
+  Reading a draft lists only friends the member still follows, so clients do
+  not show a tag the next save would drop.
 - If the member already posted this draft, the save returns `409 CONFLICT`
   with the tasting's ID in `data.tasting`. A stale retry from another device
   cannot bring a posted draft back.
@@ -57,7 +62,8 @@ photo (see below).
   publish sees the posted tasting.
 
 `GET /tasting-drafts` lists the member's drafts, most recently saved first.
-`GET /tasting-drafts/{draft}` returns one draft.
+`GET /tasting-drafts/count` counts them. `GET /tasting-drafts/{draft}` returns
+one draft.
 
 ## Photos
 
@@ -128,8 +134,9 @@ member who has accepted the Terms of Service.
 1. If the draft is gone, the server returns the member's tasting that was
    posted from it, with no awards. If there is none, it returns not found.
    Clients retry a publish with the same draft ID after a lost response.
-2. The draft needs a Bottle. Merged Bottles are resolved, and tags and friends
-   are checked again, as `POST /tastings` does.
+2. The draft needs a Bottle. Merged Bottles are resolved and tags are checked
+   again, as `POST /tastings` does. Friends the member no longer follows are
+   left off the tasting.
 3. In one transaction the server locks the draft, copies the photo to
    `tastings/draft-<draft ID>.<ext>`, inserts the tasting with the draft's
    `tastedAt`, the draft ID as its `idempotencyKey`, and the photo, awards
@@ -153,9 +160,49 @@ runaway client; it is not a product limit. Saving a new draft past the cap
 returns `400 BAD_REQUEST`. Existing drafts can still be saved, posted, and
 deleted.
 
-## Not yet built
+## Web inbox
 
-- The web drafts inbox.
+The web finishes drafts; it does not create them. When a member has drafts,
+the account menu shows **Drafts** with their count. It links to `/drafts`, the
+inbox.
+
+The inbox lists drafts, most recently saved first, a page at a time. Each row
+shows the photo, the Bottle name or the bottle hint, when the member had the
+dram, and where finding the Bottle stands: Bottle chosen, a suggested Bottle,
+a new Bottle to add, couldn't tell, or still identifying. A draft with no
+Bottle and no hint is named by the date the member had it. The status line
+wraps instead of being cut off. Each row can delete its draft after the member
+confirms; the page then reloads, so later drafts move up, and a page left
+empty sends the member back to the first page.
+
+`/drafts/{draft}` finishes one draft:
+
+1. **Bottle.** A draft without a Bottle starts here. The page shows the
+   identification result: a suggested Bottle with **Use this bottle**, a
+   proposed new Bottle with **Add this bottle**, or a note that the photo
+   couldn't be matched. While identification is pending, the page checks
+   again every 5 seconds for 2 minutes, then once a minute: over the hourly
+   photo limit, a result can take until the limit resets. Search is always
+   there; a search result opens a
+   confirm step. The search starts empty: hints are notes, such as "the
+   smoky one Jo poured", not search terms. The intro quotes the hint instead.
+   - **Use this bottle** saves the Bottle on the draft.
+   - **Add this bottle** calls `create-bottle`. If Peated already has that
+     Bottle, the page offers the existing one instead.
+   - **Add a new bottle** in search opens the bottle form with the draft ID
+     (`/bottles/new?draft={draft}`). Saving the new Bottle, or picking
+     **Use existing bottle** there, returns to `/drafts/{draft}?bottle={id}`.
+     Closing the form returns to the draft.
+2. **Details.** The tasting form's Notes, The pour, and Rating steps. Each
+   **Continue** saves the draft, so a member can stop and come back. A new
+   photo is uploaded once, as a pending upload, and sent as `pendingImageId`.
+   **Change bottle** returns to the Bottle step.
+3. **Post.** Saves the draft, then publishes it and opens the new tasting. If
+   the save reports the draft as already posted, the page publishes again to
+   get that tasting.
+
+Nothing is chosen or posted without the member pressing the button. Every save
+sends the whole draft, because a save replaces every field.
 
 ## Ownership in code
 
@@ -164,3 +211,6 @@ deleted.
 - shared tasting insert: `apps/server/src/orpc/routes/tastings/insertTasting.ts`
 - photo copy: `apps/server/src/lib/pendingUploads.ts`
 - identification job: `apps/server/src/lib/tastingDraftIdentification.ts`
+- web inbox: `apps/web/src/app/(app)/drafts/`
+- web finish flow: `apps/web/src/app/(layout-free)/drafts/[draftId]/`
+- web draft helpers: `apps/web/src/lib/tastingDrafts.ts`

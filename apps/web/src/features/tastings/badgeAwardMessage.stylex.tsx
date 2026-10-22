@@ -1,10 +1,26 @@
-import type { Badge } from "@peated/server/types";
+import type { Badge, BadgeAward } from "@peated/server/types";
 import { BadgeImage } from "@peated/web/components/badgeImage.stylex";
+import type { useFlashMessages } from "@peated/web/components/flashMessages.stylex";
 import * as stylex from "@stylexjs/stylex";
 import Link from "next/link";
 
-import { foundationStyles } from "../../../styles/foundations.stylex";
-import { colors, effects, space } from "../../../styles/tokens.stylex";
+import { foundationStyles } from "../../styles/foundations.stylex";
+import { colors, effects, space } from "../../styles/tokens.stylex";
+
+/** Shows a message for each badge that reached a new level from a tasting. */
+export function flashBadgeAwards(
+  flash: ReturnType<typeof useFlashMessages>["flash"],
+  awards: BadgeAward[],
+) {
+  for (const award of awards) {
+    if (award.level != award.prevLevel && award.level) {
+      flash(
+        <BadgeAwardMessage badge={award.badge} level={award.level} />,
+        "info",
+      );
+    }
+  }
+}
 
 export function BadgeAwardMessage({
   badge,

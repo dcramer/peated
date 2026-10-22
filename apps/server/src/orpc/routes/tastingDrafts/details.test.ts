@@ -31,6 +31,27 @@ describe("GET /tasting-drafts/{draft}", () => {
     });
   });
 
+  test("lists only friends I still follow", async ({ defaults, fixtures }) => {
+    const friend = await fixtures.User();
+    await fixtures.Follow({
+      fromUserId: defaults.user.id,
+      toUserId: friend.id,
+    });
+    // Tagged while followed; the friendship ended since.
+    const former = await fixtures.User();
+    const draft = await fixtures.TastingDraft({
+      createdById: defaults.user.id,
+      friends: [former.id, friend.id],
+    });
+
+    const result = await routerClient.tastingDrafts.details(
+      { draft: draft.id },
+      { context: { user: defaults.user } },
+    );
+
+    expect(result.friends.map(({ id }) => id)).toEqual([friend.id]);
+  });
+
   test("hides another member's draft", async ({ defaults, fixtures }) => {
     const draft = await fixtures.TastingDraft();
 
