@@ -17,7 +17,7 @@ function textOf(html: string) {
 }
 
 describe("EntityPronunciation", () => {
-  test("reads stressed syllables as words and marks IPA", () => {
+  test("reads stressed syllables as words and puts IPA in a tooltip", () => {
     const html = renderToStaticMarkup(
       <EntityPronunciation
         entity={{
@@ -29,8 +29,8 @@ describe("EntityPronunciation", () => {
       />,
     );
 
-    expect(textOf(html)).toBe("Pronounced glen geer-ee /ɡlɛn ˈɡɪəri/");
-    expect(html).toContain('lang="und-fonipa"');
+    expect(textOf(html)).toBe("Pronounced glen geer-ee");
+    expect(html).toContain('title="/ɡlɛn ˈɡɪəri/"');
   });
 
   test("reads a respelling without stress as written", () => {
@@ -46,6 +46,7 @@ describe("EntityPronunciation", () => {
     );
 
     expect(textOf(html)).toBe("Pronounced mort-lack");
+    expect(html).not.toContain("title=");
   });
 
   test("shows IPA alone when there is no respelling", () => {
@@ -61,6 +62,7 @@ describe("EntityPronunciation", () => {
     );
 
     expect(textOf(html)).toBe("Pronounced /ɡlɛn ˈɡɪəri/");
+    expect(html).toContain('lang="und-fonipa"');
   });
 
   test("renders nothing without a pronunciation", () => {
