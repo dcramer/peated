@@ -1,5 +1,7 @@
 import type { Inputs } from "@peated/server/orpc/router";
-import { CategoryEnum } from "@peated/server/schemas";
+// The schemas barrel loads server-only modules (OAuth uses node:crypto), which
+// breaks this file in Storybook's browser bundle; import the enum directly.
+import { CategoryEnum } from "@peated/server/schemas/common";
 import type { CreateBottlePrefill } from "@peated/web/components/search/createBottleHref";
 import { z } from "zod";
 
