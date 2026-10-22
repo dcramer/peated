@@ -1,31 +1,8 @@
 import { describe, expect, it } from "vitest";
 
-import {
-  getBottleHeaderSpecs,
-  getBottleReleasePlacement,
-} from "./bottleMetadata";
+import { getBottleHeaderSpecs } from "./bottleMetadata";
 
 describe("bottle metadata", () => {
-  it("places a release date once on the bottle page", () => {
-    expect(
-      getBottleReleasePlacement({
-        edition: null,
-        releaseYear: 2026,
-        releaseMonth: 8,
-        releaseDay: 30,
-      }),
-    ).toEqual({ header: "Aug 30, 2026", details: null });
-
-    expect(
-      getBottleReleasePlacement({
-        edition: "Batch 24",
-        releaseYear: 2026,
-        releaseMonth: null,
-        releaseDay: null,
-      }),
-    ).toEqual({ header: "Batch 24", details: "2026" });
-  });
-
   const headerBottle = {
     abv: null,
     bottlingYear: null,
@@ -123,6 +100,35 @@ describe("bottle metadata", () => {
       { label: "ABV", value: "68.3%" },
       { label: "Batch", value: "C923" },
       { label: "Category", value: "Bourbon" },
+    ]);
+  });
+
+  it("shows a selection edition after age and ahead of a cask", () => {
+    const selectedCask = {
+      ...headerBottle,
+      abv: 58.9,
+      bottlingYear: 2010,
+      caskNumber: "14300",
+      category: "single_malt" as const,
+      edition: "for La Maison du Whisky",
+      statedAge: 37,
+      vintageYear: 1972,
+    };
+
+    expect(getBottleHeaderSpecs(selectedCask, "Clynelish 1972")).toEqual([
+      { label: "ABV", value: "58.9%" },
+      { label: "Age", value: "37 years" },
+      { label: "Edition", value: "for La Maison du Whisky", text: true },
+    ]);
+    expect(
+      getBottleHeaderSpecs(
+        { ...selectedCask, caskNumber: null, statedAge: null },
+        "Clynelish 1972",
+      ),
+    ).toEqual([
+      { label: "ABV", value: "58.9%" },
+      { label: "Edition", value: "for La Maison du Whisky", text: true },
+      { label: "Category", value: "Single Malt" },
     ]);
   });
 

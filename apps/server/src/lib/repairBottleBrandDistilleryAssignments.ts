@@ -327,6 +327,8 @@ export async function repairBottleBrandDistilleryAssignments({
           input,
           actorId: actor.id,
           creationSource: "repair_workflow",
+          // A Brand repair moves the Bottle without editing its name.
+          enforceNamingRules: false,
         });
       });
       await finalizeBottleUpdate(manifest);

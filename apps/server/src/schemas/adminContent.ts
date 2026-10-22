@@ -1,5 +1,6 @@
 import { z } from "zod";
 import { RATING_BAND_IDS } from "../constants";
+import { BottleDisplayNameSourceSchema } from "./bottles";
 import { ServingStyleEnum } from "./common";
 
 const RatingBandEnum = z.enum(RATING_BAND_IDS);
@@ -15,10 +16,9 @@ export const AdminContentStatusSchema = z.enum(["active", "removed", "all"]);
 export type AdminContentKind = z.infer<typeof AdminContentKindSchema>;
 export type AdminContentStatus = z.infer<typeof AdminContentStatusSchema>;
 
-const AdminContentBottleSchema = z.object({
+const AdminContentBottleSchema = BottleDisplayNameSourceSchema.extend({
   id: z.number().int().positive(),
   fullName: z.string(),
-  abv: z.number().nullable(),
 });
 
 const AdminContentMemberSchema = z.object({

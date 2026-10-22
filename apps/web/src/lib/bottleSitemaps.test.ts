@@ -8,13 +8,23 @@ import {
 type ListResult = Awaited<ReturnType<ListSitemapBottles>>;
 
 describe("Bottle sitemaps", () => {
-  it("loads one dedicated API page for a sitemap", async () => {
+  it("lists each Bottle at its canonical page URL", async () => {
     const listBottles = vi.fn(
       async (): Promise<ListResult> => ({
         results: [
           {
             id: 11,
-            fullName: "Example Distillery Release 11",
+            name: "Supernova",
+            edition: null,
+            statedAge: null,
+            vintageYear: null,
+            releaseYear: null,
+            abv: null,
+            singleCask: null,
+            caskStrength: null,
+            brand: { name: "Example Distillery", shortName: "Example" },
+            series: { name: "Committee Release" },
+            group: { name: "Supernova" },
             updatedAt: "2026-09-01T12:00:00.000Z",
           },
         ],
@@ -23,7 +33,7 @@ describe("Bottle sitemaps", () => {
 
     await expect(loadBottleSitemapPage(2, listBottles)).resolves.toEqual([
       {
-        url: "/bottles/11-example-distillery-release-11",
+        url: "/bottles/11-example-committee-release-supernova",
         lastModified: "2026-09-01T12:00:00.000Z",
       },
     ]);

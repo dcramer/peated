@@ -1,0 +1,766 @@
+bottle_id,status,brand_id,bottler_id,name,series_id,series,decision
+17389,unresolved,110,,"1993, Gordon & MacPhail Connoisseurs' Choice range",,,"Bladnoch-branded record named 1993 Gordon & MacPhail Connoisseurs Choice lacks age, strength, bottler and distiller relationships. Cannot identify an exact G&M release safely."
+17395,unresolved,843,,"1993, Gordon & MacPhail Connoisseurs' Choice range",,,"Clynelish-branded record named 1993 Gordon & MacPhail Connoisseurs Choice lacks age, strength, bottler and distiller relationships. Cannot identify an exact G&M release safely."
+34647,update,5645,5645,Glen Grant - Fourth Edition,1327,Mr George Legacy,Updated and re-fetched; details in changes.csv.
+45364,no change,5645,5645,Glenturret - 18-year-old - 2025 Release - 2007 Vintage - 59.8% ABV - Single Cask - Cask Strength,97,Connoisseurs Choice,Retained existing named-range relationship; no contradictory Series evidence found in this audit.
+45365,no change,5645,5645,Linkwood - 15-year-old - 46.0% ABV,98,Distillery Labels,Retained existing named-range relationship; no contradictory Series evidence found in this audit.
+45598,no change,5645,5645,GlenAllachie - 14-year-old - 43.0% ABV - Bourbon Cask,144,Discovery,Retained existing named-range relationship; no contradictory Series evidence found in this audit.
+45603,no change,5645,5645,Linkwood - 15-year-old - 43.0% ABV,98,Distillery Labels,Retained existing named-range relationship; no contradictory Series evidence found in this audit.
+45743,no change,5645,5645,Caol Ila - 13-year-old - 43.0% ABV - Bourbon Cask,144,Discovery,Retained existing named-range relationship; no contradictory Series evidence found in this audit.
+45846,no change,1165,5645,Speyside Single Malt Scotch Whisky - 12-year-old - 40.0% ABV,,,No supported named-range reassignment identified; existing Series remains unknown. This is not a full release-facts certification.
+45885,no change,5645,5645,Auchroisk - 10-year-old - 43.0% ABV - Bourbon Cask,144,Discovery,Retained existing named-range relationship; no contradictory Series evidence found in this audit.
+46109,out of scope,365874,365875,Blended Malt - 18-year-old - 43.0% ABV,,,CRN57°/The Cairn release found by name search; separate brand and bottler.
+46226,no change,1027,5645,5-year-old - 40.0% ABV,,,No supported named-range reassignment identified; existing Series remains unknown. This is not a full release-facts certification.
+46316,no change,5645,5645,Caol Ila - Cask #306193 - 17-year-old - 2024 Release - 2006 Vintage - 58.3% ABV - Single Cask - Cask Strength - Other Cask - Puncheon - 1st Fill,97,Connoisseurs Choice,Retained existing named-range relationship; no contradictory Series evidence found in this audit.
+46379,no change,5645,5645,Glentauchers - 2023 Release - 2008 Vintage - 46.0% ABV,98,Distillery Labels,Retained existing named-range relationship; no contradictory Series evidence found in this audit.
+46432,no change,5645,5645,Glen Grant - Cask No. 903212 - 15-year-old - 2026 Release - 2010 Vintage - 60.4% ABV - Single Cask - Cask Strength - Other Cask - Butt - 1st Fill,299,Spirit of Scotland,Retained existing named-range relationship; no contradictory Series evidence found in this audit.
+46539,no change,1165,5645,Speyside Single Malt Scotch Whisky - 15-year-old - 40.0% ABV,,,No supported named-range reassignment identified; existing Series remains unknown. This is not a full release-facts certification.
+46954,no change,5645,5645,Allt-a-Bhainne - Cask No. 1031759 - 8-year-old - 2025 Release - 2016 Vintage - 63.5% ABV - Single Cask - Bourbon Cask - Barrel - Refill,299,Spirit of Scotland,Retained existing named-range relationship; no contradictory Series evidence found in this audit.
+46986,no change,5645,5645,Tomatin - 2023 Release - 2011 Vintage - 43.0% ABV - Bourbon Cask,144,Discovery,Retained existing named-range relationship; no contradictory Series evidence found in this audit.
+47091,no change,5645,5645,Longmorn - Cask No. 3240 - 2003 Release - 1973 Vintage - 55.8% ABV - Single Cask - Other Cask - Hogshead - 1st Fill,356,Cask,Retained existing named-range relationship; no contradictory Series evidence found in this audit.
+47107,update,5645,5645,Talisker,361,Connoisseurs Choice Heritage,Updated and re-fetched; details in changes.csv.
+47124,update,5645,5645,Rosebank,405,Connoisseurs Choice Heritage Collection,Updated and re-fetched; details in changes.csv.
+47125,update,5645,5645,Port Ellen,405,Connoisseurs Choice Heritage Collection,Updated and re-fetched; details in changes.csv.
+47141,no change,5645,5645,Balblair 1996 28-year-old - Batch 24/070,97,Connoisseurs Choice,Retained existing named-range relationship; no contradictory Series evidence found in this audit.
+47147,no change,5645,5645,Glentauchers - Cask No. 900601 - 14-year-old - 2025 Release - 2010 Vintage - 64.4% ABV - Single Cask - Other Cask - Butt - Refill,299,Spirit of Scotland,Retained existing named-range relationship; no contradictory Series evidence found in this audit.
+47149,no change,5645,5645,Glen Moray - Cask No. 12027 - 14-year-old - 2026 Release - 2011 Vintage - 60.0% ABV - Single Cask - Cask Strength - Other Cask - Hogshead - Refill,299,Spirit of Scotland,Retained existing named-range relationship; no contradictory Series evidence found in this audit.
+47153,no change,5645,5645,Miltonduff - 10-year-old - 43.0% ABV - Other Cask,144,Discovery,Retained existing named-range relationship; no contradictory Series evidence found in this audit.
+47288,out of scope,365874,365875,25-year-old,,,CRN57°/The Cairn release found by name search; separate brand and bottler.
+47295,no change,5645,5645,Scapa - Cask No. 4745 - 31-year-old - 2022 Release - 1990 Vintage - 60.3% ABV - Single Cask - Cask Strength - Other Cask - Hogshead - Refill,97,Connoisseurs Choice,Retained existing named-range relationship; no contradictory Series evidence found in this audit.
+47468,update,5645,5645,Glenlochy,405,Connoisseurs Choice Heritage Collection,Updated and re-fetched; details in changes.csv.
+47477,update,5645,5645,Benromach,405,Connoisseurs Choice Heritage Collection,Updated and re-fetched; details in changes.csv.
+47491,update,5645,5645,Dallas Dhu,405,Connoisseurs Choice Heritage Collection,Updated and re-fetched; details in changes.csv.
+47551,no change,192,5645,15-year-old - 1969 Vintage - 54.0% ABV,,,No supported named-range reassignment identified; existing Series remains unknown. This is not a full release-facts certification.
+47586,update,5645,5645,Benriach,427,The Dram Takers,Updated and re-fetched; details in changes.csv.
+47621,no change,5645,5645,Longmorn - 50-year-old - 1964 Vintage - 43.0% ABV - Single Cask,98,Distillery Labels,Retained existing named-range relationship; no contradictory Series evidence found in this audit.
+52286,no change,5645,5645,Banff,97,Connoisseurs Choice,Retained existing named-range relationship; no contradictory Series evidence found in this audit.
+52288,no change,5645,5645,Brora,97,Connoisseurs Choice,Retained existing named-range relationship; no contradictory Series evidence found in this audit.
+52290,no change,5645,5645,Caperdonich,97,Connoisseurs Choice,Retained existing named-range relationship; no contradictory Series evidence found in this audit.
+52292,no change,5645,5645,Glencadam,97,Connoisseurs Choice,Retained existing named-range relationship; no contradictory Series evidence found in this audit.
+52293,no change,5645,5645,Exclusive,,,No supported named-range reassignment identified; existing Series remains unknown. This is not a full release-facts certification.
+52294,no change,5645,5645,Inchgower,97,Connoisseurs Choice,Retained existing named-range relationship; no contradictory Series evidence found in this audit.
+52300,update,5645,5645,Pittyvaich - #1,1009,Recollection Series,Updated and re-fetched; details in changes.csv.
+52309,no change,5645,5645,Tomatin,144,Discovery,Retained existing named-range relationship; no contradictory Series evidence found in this audit.
+52339,no change,5645,5645,Caol Ila - Batch 19/004,97,Connoisseurs Choice,Retained existing named-range relationship; no contradictory Series evidence found in this audit.
+52349,no change,5645,5645,Aberfeldy,97,Connoisseurs Choice,Retained existing named-range relationship; no contradictory Series evidence found in this audit.
+52352,no change,5645,5645,Caperdonich,97,Connoisseurs Choice,Retained existing named-range relationship; no contradictory Series evidence found in this audit.
+52356,no change,5645,5645,Dalwhinnie,97,Connoisseurs Choice,Retained existing named-range relationship; no contradictory Series evidence found in this audit.
+52362,no change,5645,5645,Millburn,97,Connoisseurs Choice,Retained existing named-range relationship; no contradictory Series evidence found in this audit.
+52365,no change,5645,5645,Royal Brackla,97,Connoisseurs Choice,Retained existing named-range relationship; no contradictory Series evidence found in this audit.
+52399,no change,5645,5645,Glenburgie 1990 31-year-old - Batch 22/006,97,Connoisseurs Choice,Retained existing named-range relationship; no contradictory Series evidence found in this audit.
+52418,unresolved,5645,5645,Book of Kells,,,"Strathisla 1977 40 years 46.6%, Japan Import System, cask 389: Book of Kells artwork is documented; a producer range assignment to modern The Dram Takers is not established."
+52419,no change,5645,5645,Strathisla - HNWS 19th Anniversary,97,Connoisseurs Choice,Retained existing named-range relationship; no contradictory Series evidence found in this audit.
+52641,update,5645,5645,Longmorn,361,Connoisseurs Choice Heritage,Updated and re-fetched; details in changes.csv.
+52660,no change,5645,5645,Glentauchers - Batch 22/009,97,Connoisseurs Choice,Retained existing named-range relationship; no contradictory Series evidence found in this audit.
+52721,no change,5645,5645,Highland Park,,,No supported named-range reassignment identified; existing Series remains unknown. This is not a full release-facts certification.
+52733,no change,5645,5645,Caol Ila,,,No supported named-range reassignment identified; existing Series remains unknown. This is not a full release-facts certification.
+52817,no change,5645,5645,Caol Ila 2004,1096,Cask Strength,Retained existing named-range relationship; no contradictory Series evidence found in this audit.
+52818,no change,5645,5645,Caol Ila 2005,1096,Cask Strength,Retained existing named-range relationship; no contradictory Series evidence found in this audit.
+53208,no change,5645,5645,Port Ellen,97,Connoisseurs Choice,Retained existing named-range relationship; no contradictory Series evidence found in this audit.
+54709,no change,5645,5645,Tomatin,97,Connoisseurs Choice,Retained existing named-range relationship; no contradictory Series evidence found in this audit.
+55076,no change,5645,5645,Linkwood,98,Distillery Labels,Retained existing named-range relationship; no contradictory Series evidence found in this audit.
+55138,no change,5645,5645,Glenburgie 2004,98,Distillery Labels,Retained existing named-range relationship; no contradictory Series evidence found in this audit.
+55139,no change,5645,5645,Glenburgie 2000 23-year-old - Batch 24/185,97,Connoisseurs Choice,Retained existing named-range relationship; no contradictory Series evidence found in this audit.
+55140,no change,5645,5645,Glenburgie 1995 26-year-old - Batch 22/090,97,Connoisseurs Choice,Retained existing named-range relationship; no contradictory Series evidence found in this audit.
+55141,no change,5645,5645,Glenburgie 2008 15-year-old - Batch 24/127,97,Connoisseurs Choice,Retained existing named-range relationship; no contradictory Series evidence found in this audit.
+55142,no change,5645,5645,Dailuaine,97,Connoisseurs Choice,Retained existing named-range relationship; no contradictory Series evidence found in this audit.
+55805,no change,5645,5645,Brora,97,Connoisseurs Choice,Retained existing named-range relationship; no contradictory Series evidence found in this audit.
+55809,no change,5645,5645,Brora,807,Rare Old,Retained existing named-range relationship; no contradictory Series evidence found in this audit.
+55810,no change,5645,5645,Brora,97,Connoisseurs Choice,Retained existing named-range relationship; no contradictory Series evidence found in this audit.
+55812,no change,5645,5645,Brora,97,Connoisseurs Choice,Retained existing named-range relationship; no contradictory Series evidence found in this audit.
+55813,no change,5645,5645,Brora,808,Reserve,Retained existing named-range relationship; no contradictory Series evidence found in this audit.
+55814,no change,5645,5645,Brora,807,Rare Old,Retained existing named-range relationship; no contradictory Series evidence found in this audit.
+55930,no change,5645,5645,Brora,97,Connoisseurs Choice,Retained existing named-range relationship; no contradictory Series evidence found in this audit.
+55931,no change,5645,5645,Brora,97,Connoisseurs Choice,Retained existing named-range relationship; no contradictory Series evidence found in this audit.
+55932,no change,5645,5645,Brora,97,Connoisseurs Choice,Retained existing named-range relationship; no contradictory Series evidence found in this audit.
+55933,no change,5645,5645,Brora,97,Connoisseurs Choice,Retained existing named-range relationship; no contradictory Series evidence found in this audit.
+55934,no change,5645,5645,Brora,97,Connoisseurs Choice,Retained existing named-range relationship; no contradictory Series evidence found in this audit.
+55935,no change,5645,5645,Brora,299,Spirit of Scotland,Retained existing named-range relationship; no contradictory Series evidence found in this audit.
+55936,no change,5645,5645,Brora,97,Connoisseurs Choice,Retained existing named-range relationship; no contradictory Series evidence found in this audit.
+55937,no change,5645,5645,Brora,299,Spirit of Scotland,Retained existing named-range relationship; no contradictory Series evidence found in this audit.
+55938,no change,5645,5645,Brora,97,Connoisseurs Choice,Retained existing named-range relationship; no contradictory Series evidence found in this audit.
+55986,no change,5645,5645,Brora,807,Rare Old,Retained existing named-range relationship; no contradictory Series evidence found in this audit.
+55988,no change,5645,5645,Brora,299,Spirit of Scotland,Retained existing named-range relationship; no contradictory Series evidence found in this audit.
+56020,update,5645,5645,Glenlivet,831,Artistry in Oak,Updated and re-fetched; details in changes.csv.
+56164,no change,5645,5645,Tamdhu - Cask #3230,808,Reserve,Retained existing named-range relationship; no contradictory Series evidence found in this audit.
+56355,no change,5645,5645,Tomatin,144,Discovery,Retained existing named-range relationship; no contradictory Series evidence found in this audit.
+56384,no change,5645,5645,BenRiach - Cask #63204,97,Connoisseurs Choice,Retained existing named-range relationship; no contradictory Series evidence found in this audit.
+56390,no change,5645,5645,Ardmore 2003,98,Distillery Labels,Retained existing named-range relationship; no contradictory Series evidence found in this audit.
+56391,no change,5645,5645,Ardmore 2008,98,Distillery Labels,Retained existing named-range relationship; no contradictory Series evidence found in this audit.
+56392,no change,5645,5645,Ardmore 2000,98,Distillery Labels,Retained existing named-range relationship; no contradictory Series evidence found in this audit.
+56401,no change,5645,5645,Glentauchers - Cask #21607202,97,Connoisseurs Choice,Retained existing named-range relationship; no contradictory Series evidence found in this audit.
+56458,no change,5645,5645,Bunnahabhain,97,Connoisseurs Choice,Retained existing named-range relationship; no contradictory Series evidence found in this audit.
+56534,no change,5645,5645,Caol Ila,97,Connoisseurs Choice,Retained existing named-range relationship; no contradictory Series evidence found in this audit.
+56536,no change,5645,5645,Tomatin,144,Discovery,Retained existing named-range relationship; no contradictory Series evidence found in this audit.
+58029,no change,5645,5645,Glenburgie 25-year-old,98,Distillery Labels,Retained existing named-range relationship; no contradictory Series evidence found in this audit.
+58061,update,5645,5645,Glen Grant - Fifth Edition,1327,Mr George Legacy,Updated and re-fetched; details in changes.csv.
+58106,no change,5645,5645,Tamnavulin - Cask 700370,97,Connoisseurs Choice,Retained existing named-range relationship; no contradictory Series evidence found in this audit.
+58107,no change,5645,5645,Aultmore 2009 15-year-old - Batch 24/079,97,Connoisseurs Choice,Retained existing named-range relationship; no contradictory Series evidence found in this audit.
+58108,no change,5645,5645,Glenrothes 2009 14-year-old - Batch 24/094,97,Connoisseurs Choice,Retained existing named-range relationship; no contradictory Series evidence found in this audit.
+58213,no change,5645,5645,Rosebank 1991 - #3,1009,Recollection Series,Retained existing named-range relationship; no contradictory Series evidence found in this audit.
+58243,no change,5645,5645,Speyburn - Cask 552,97,Connoisseurs Choice,Retained existing named-range relationship; no contradictory Series evidence found in this audit.
+58271,no change,5645,5645,Benriach - Cask 121,97,Connoisseurs Choice,Retained existing named-range relationship; no contradictory Series evidence found in this audit.
+58274,no change,5645,5645,Mortlach 15-year-old,98,Distillery Labels,Retained existing named-range relationship; no contradictory Series evidence found in this audit.
+58294,no change,5645,5645,Glen Spey - Cask 16601503,97,Connoisseurs Choice,Retained existing named-range relationship; no contradictory Series evidence found in this audit.
+58300,no change,5645,5645,Glen Spey - Cask 16601701,97,Connoisseurs Choice,Retained existing named-range relationship; no contradictory Series evidence found in this audit.
+58407,no change,5645,5645,Macallan 2005 - Cask 6867,1030,Speymalt,Retained existing named-range relationship; no contradictory Series evidence found in this audit.
+58433,no change,1165,5645,30-year-old,,,No supported named-range reassignment identified; existing Series remains unknown. This is not a full release-facts certification.
+58441,no change,5645,5645,Tomintoul 24-year-old - Cask 6273,97,Connoisseurs Choice,Retained existing named-range relationship; no contradictory Series evidence found in this audit.
+58446,no change,5645,5645,Tormore 28-year-old - Cask 5391,97,Connoisseurs Choice,Retained existing named-range relationship; no contradictory Series evidence found in this audit.
+58452,no change,5645,5645,Ardmore 1994 28-year-old - UK Exclusive - Cask 10894,97,Connoisseurs Choice,Retained existing named-range relationship; no contradictory Series evidence found in this audit.
+58494,no change,5645,5645,Dailuaine - Cask 10490,97,Connoisseurs Choice,Retained existing named-range relationship; no contradictory Series evidence found in this audit.
+58499,no change,5645,5645,Inchgower - Cask 11274,97,Connoisseurs Choice,Retained existing named-range relationship; no contradictory Series evidence found in this audit.
+58610,no change,5645,5645,Millburn,,,No supported named-range reassignment identified; existing Series remains unknown. This is not a full release-facts certification.
+58611,no change,5645,5645,Talisker 70° Proof,,,No supported named-range reassignment identified; existing Series remains unknown. This is not a full release-facts certification.
+58612,no change,5645,5645,Talisker 80° Proof,,,No supported named-range reassignment identified; existing Series remains unknown. This is not a full release-facts certification.
+58613,no change,5645,5645,Talisker 100° Proof,,,No supported named-range reassignment identified; existing Series remains unknown. This is not a full release-facts certification.
+58614,no change,5645,5645,Talisker 1947,,,No supported named-range reassignment identified; existing Series remains unknown. This is not a full release-facts certification.
+58615,no change,5645,5645,Talisker 1953,,,No supported named-range reassignment identified; existing Series remains unknown. This is not a full release-facts certification.
+58616,no change,5645,5645,Talisker 1956,,,No supported named-range reassignment identified; existing Series remains unknown. This is not a full release-facts certification.
+58617,no change,5645,5645,Talisker 1957,,,No supported named-range reassignment identified; existing Series remains unknown. This is not a full release-facts certification.
+58618,no change,5645,5645,Talisker 1957,,,No supported named-range reassignment identified; existing Series remains unknown. This is not a full release-facts certification.
+58619,no change,5645,5645,Talisker 1958,,,No supported named-range reassignment identified; existing Series remains unknown. This is not a full release-facts certification.
+58620,no change,5645,5645,Talisker 1959,,,No supported named-range reassignment identified; existing Series remains unknown. This is not a full release-facts certification.
+58621,no change,5645,5645,Talisker 1964,,,No supported named-range reassignment identified; existing Series remains unknown. This is not a full release-facts certification.
+58622,no change,5645,5645,Talisker 1969,,,No supported named-range reassignment identified; existing Series remains unknown. This is not a full release-facts certification.
+58623,no change,5645,5645,Talisker 1970,,,No supported named-range reassignment identified; existing Series remains unknown. This is not a full release-facts certification.
+58624,no change,5645,5645,Talisker 1970,,,No supported named-range reassignment identified; existing Series remains unknown. This is not a full release-facts certification.
+58625,no change,5645,5645,Talisker 1972,,,No supported named-range reassignment identified; existing Series remains unknown. This is not a full release-facts certification.
+58626,no change,5645,5645,Talisker 1972,,,No supported named-range reassignment identified; existing Series remains unknown. This is not a full release-facts certification.
+58627,no change,5645,5645,Talisker 1974,,,No supported named-range reassignment identified; existing Series remains unknown. This is not a full release-facts certification.
+58628,no change,5645,5645,Talisker 25-year-old - The Queen's Silver Jubilee,,,No supported named-range reassignment identified; existing Series remains unknown. This is not a full release-facts certification.
+58629,no change,5645,5645,"Talisker 1955 - Cask 1257, 1310, 1311",356,Cask,Retained existing named-range relationship; no contradictory Series evidence found in this audit.
+58630,no change,5645,5645,Talisker 1955 - Cask 1315,356,Cask,Retained existing named-range relationship; no contradictory Series evidence found in this audit.
+58631,no change,5645,5645,Talisker 1953 24-year-old,97,Connoisseurs Choice,Retained existing named-range relationship; no contradictory Series evidence found in this audit.
+58632,no change,5645,5645,Talisker 1951 21-year-old,97,Connoisseurs Choice,Retained existing named-range relationship; no contradictory Series evidence found in this audit.
+58633,no change,5645,5645,Talisker 1953 30-year-old,,,No supported named-range reassignment identified; existing Series remains unknown. This is not a full release-facts certification.
+58634,no change,5645,5645,Talisker 1957,,,No supported named-range reassignment identified; existing Series remains unknown. This is not a full release-facts certification.
+58636,no change,5645,5645,Macallan 2005,1030,Speymalt,Retained existing named-range relationship; no contradictory Series evidence found in this audit.
+58638,no change,5645,5645,Lochside 1991,97,Connoisseurs Choice,Retained existing named-range relationship; no contradictory Series evidence found in this audit.
+58721,no change,5645,5645,Talisker 1952 21-year-old,97,Connoisseurs Choice,Retained existing named-range relationship; no contradictory Series evidence found in this audit.
+58722,no change,5645,5645,Talisker 1957,,,No supported named-range reassignment identified; existing Series remains unknown. This is not a full release-facts certification.
+58723,no change,5645,5645,Talisker 1956,,,No supported named-range reassignment identified; existing Series remains unknown. This is not a full release-facts certification.
+58729,no change,5645,5645,Dallas Dhu 1971,97,Connoisseurs Choice,Retained existing named-range relationship; no contradictory Series evidence found in this audit.
+58741,no change,5645,5645,Glenlochy 1977,97,Connoisseurs Choice,Retained existing named-range relationship; no contradictory Series evidence found in this audit.
+58742,no change,5645,5645,Lochside 1991,97,Connoisseurs Choice,Retained existing named-range relationship; no contradictory Series evidence found in this audit.
+58743,no change,5645,5645,Glenesk 1985,97,Connoisseurs Choice,Retained existing named-range relationship; no contradictory Series evidence found in this audit.
+58744,no change,5645,5645,Dallas Dhu 10-year-old,,,No supported named-range reassignment identified; existing Series remains unknown. This is not a full release-facts certification.
+58755,no change,5645,5645,Talisker 1957,,,No supported named-range reassignment identified; existing Series remains unknown. This is not a full release-facts certification.
+58760,no change,5645,5645,Macallan 2005 - Cask 22606308,1030,Speymalt,Retained existing named-range relationship; no contradictory Series evidence found in this audit.
+58762,no change,5645,5645,Littlemill 1991,97,Connoisseurs Choice,Retained existing named-range relationship; no contradictory Series evidence found in this audit.
+58764,no change,5645,5645,Pittyvaich 1993,97,Connoisseurs Choice,Retained existing named-range relationship; no contradictory Series evidence found in this audit.
+58771,no change,5645,5645,Glen Mhor 1979,,,No supported named-range reassignment identified; existing Series remains unknown. This is not a full release-facts certification.
+58772,no change,5645,5645,Imperial 1990,,,No supported named-range reassignment identified; existing Series remains unknown. This is not a full release-facts certification.
+58773,no change,5645,5645,Ardbeg 1991,97,Connoisseurs Choice,Retained existing named-range relationship; no contradictory Series evidence found in this audit.
+59467,no change,5645,5645,Balblair 1991 31-year-old - Batch 23/003,97,Connoisseurs Choice,Retained existing named-range relationship; no contradictory Series evidence found in this audit.
+59470,no change,5645,5645,Ledaig,97,Connoisseurs Choice,Retained existing named-range relationship; no contradictory Series evidence found in this audit.
+59704,no change,5645,5645,Linkwood,97,Connoisseurs Choice,Retained existing named-range relationship; no contradictory Series evidence found in this audit.
+60645,no change,5645,5645,Tormore,97,Connoisseurs Choice,Retained existing named-range relationship; no contradictory Series evidence found in this audit.
+60712,no change,5645,5645,Glenury Royal - Lot RO/12/05,807,Rare Old,Retained existing named-range relationship; no contradictory Series evidence found in this audit.
+60715,no change,5645,5645,Port Ellen,97,Connoisseurs Choice,Retained existing named-range relationship; no contradictory Series evidence found in this audit.
+60717,no change,5645,5645,Glenury Royal,807,Rare Old,Retained existing named-range relationship; no contradictory Series evidence found in this audit.
+60727,no change,5645,5645,Glenlochy - Lot RO/15/02,807,Rare Old,Retained existing named-range relationship; no contradictory Series evidence found in this audit.
+60758,no change,5645,5645,Millburn,97,Connoisseurs Choice,Retained existing named-range relationship; no contradictory Series evidence found in this audit.
+60764,no change,5645,5645,Oban,97,Connoisseurs Choice,Retained existing named-range relationship; no contradictory Series evidence found in this audit.
+60766,no change,5645,5645,Balmenach,97,Connoisseurs Choice,Retained existing named-range relationship; no contradictory Series evidence found in this audit.
+60777,no change,5645,5645,Ardbeg 1978,97,Connoisseurs Choice,Retained existing named-range relationship; no contradictory Series evidence found in this audit.
+60793,no change,5645,5645,Glenburgie 1989 33-year-old - Batch 23/015,97,Connoisseurs Choice,Retained existing named-range relationship; no contradictory Series evidence found in this audit.
+60824,no change,5645,5645,Isle of Jura,97,Connoisseurs Choice,Retained existing named-range relationship; no contradictory Series evidence found in this audit.
+60825,no change,5645,5645,Aberfeldy,97,Connoisseurs Choice,Retained existing named-range relationship; no contradictory Series evidence found in this audit.
+60830,no change,5645,5645,Balblair 1993 31-year-old - Batch 24/020,97,Connoisseurs Choice,Retained existing named-range relationship; no contradictory Series evidence found in this audit.
+60858,no change,5645,5645,Dalmore 2001,97,Connoisseurs Choice,Retained existing named-range relationship; no contradictory Series evidence found in this audit.
+60956,no change,5645,5645,Ledaig 2006,97,Connoisseurs Choice,Retained existing named-range relationship; no contradictory Series evidence found in this audit.
+60957,no change,5645,5645,Ledaig 2001,97,Connoisseurs Choice,Retained existing named-range relationship; no contradictory Series evidence found in this audit.
+60958,no change,5645,5645,Ledaig 2001,97,Connoisseurs Choice,Retained existing named-range relationship; no contradictory Series evidence found in this audit.
+60959,no change,5645,5645,Ledaig 1996,97,Connoisseurs Choice,Retained existing named-range relationship; no contradictory Series evidence found in this audit.
+60960,no change,5645,5645,Ledaig 2006,97,Connoisseurs Choice,Retained existing named-range relationship; no contradictory Series evidence found in this audit.
+60961,no change,5645,5645,Ledaig 12-year-old,144,Discovery,Retained existing named-range relationship; no contradictory Series evidence found in this audit.
+60962,no change,5645,5645,Ledaig 1993,97,Connoisseurs Choice,Retained existing named-range relationship; no contradictory Series evidence found in this audit.
+60998,no change,5645,5645,Ledaig 10-year-old 1972,97,Connoisseurs Choice,Retained existing named-range relationship; no contradictory Series evidence found in this audit.
+60999,no change,5645,5645,Ledaig 11-year-old 1972,97,Connoisseurs Choice,Retained existing named-range relationship; no contradictory Series evidence found in this audit.
+61000,no change,5645,5645,Ledaig 13-year-old 1972,97,Connoisseurs Choice,Retained existing named-range relationship; no contradictory Series evidence found in this audit.
+61001,no change,5645,5645,Ledaig 1973,97,Connoisseurs Choice,Retained existing named-range relationship; no contradictory Series evidence found in this audit.
+61002,no change,5645,5645,Ledaig 1990,97,Connoisseurs Choice,Retained existing named-range relationship; no contradictory Series evidence found in this audit.
+61003,no change,5645,5645,Ledaig 1990,97,Connoisseurs Choice,Retained existing named-range relationship; no contradictory Series evidence found in this audit.
+61004,no change,5645,5645,Ledaig 1997,808,Reserve,Retained existing named-range relationship; no contradictory Series evidence found in this audit.
+61005,no change,5645,5645,Ledaig 1997,,,No supported named-range reassignment identified; existing Series remains unknown. This is not a full release-facts certification.
+61006,no change,5645,5645,Ledaig 1999,97,Connoisseurs Choice,Retained existing named-range relationship; no contradictory Series evidence found in this audit.
+61007,no change,5645,5645,Ledaig 20-year-old 2001,97,Connoisseurs Choice,Retained existing named-range relationship; no contradictory Series evidence found in this audit.
+61008,no change,5645,5645,Ledaig 2004,,,No supported named-range reassignment identified; existing Series remains unknown. This is not a full release-facts certification.
+61009,no change,5645,5645,Ledaig 2004,97,Connoisseurs Choice,Retained existing named-range relationship; no contradictory Series evidence found in this audit.
+61109,no change,5645,5645,Ledaig 2001,97,Connoisseurs Choice,Retained existing named-range relationship; no contradictory Series evidence found in this audit.
+61129,no change,5645,5645,Ledaig 2005 Hermitage Finish,1088,Private Collection,Retained existing named-range relationship; no contradictory Series evidence found in this audit.
+61183,no change,5645,5645,Dalmore 2008,97,Connoisseurs Choice,Retained existing named-range relationship; no contradictory Series evidence found in this audit.
+61184,no change,5645,5645,Dalmore 2005,97,Connoisseurs Choice,Retained existing named-range relationship; no contradictory Series evidence found in this audit.
+61185,no change,5645,5645,Dalmore 2005,97,Connoisseurs Choice,Retained existing named-range relationship; no contradictory Series evidence found in this audit.
+61186,no change,5645,5645,Dalmore 2005,97,Connoisseurs Choice,Retained existing named-range relationship; no contradictory Series evidence found in this audit.
+61187,no change,5645,5645,Dalmore 2005,97,Connoisseurs Choice,Retained existing named-range relationship; no contradictory Series evidence found in this audit.
+61188,no change,5645,5645,Dalmore 2005,97,Connoisseurs Choice,Retained existing named-range relationship; no contradictory Series evidence found in this audit.
+61189,no change,5645,5645,Dalmore 2005,97,Connoisseurs Choice,Retained existing named-range relationship; no contradictory Series evidence found in this audit.
+61190,no change,5645,5645,Dalmore 2005,97,Connoisseurs Choice,Retained existing named-range relationship; no contradictory Series evidence found in this audit.
+61191,no change,5645,5645,Dalmore 2008,97,Connoisseurs Choice,Retained existing named-range relationship; no contradictory Series evidence found in this audit.
+61192,no change,5645,5645,Dalmore 2005,97,Connoisseurs Choice,Retained existing named-range relationship; no contradictory Series evidence found in this audit.
+61193,no change,5645,5645,Dalmore 2008,97,Connoisseurs Choice,Retained existing named-range relationship; no contradictory Series evidence found in this audit.
+61194,no change,5645,5645,Dalmore 2005,97,Connoisseurs Choice,Retained existing named-range relationship; no contradictory Series evidence found in this audit.
+61195,no change,5645,5645,Dalmore 2008 - UK Exclusive,97,Connoisseurs Choice,Retained existing named-range relationship; no contradictory Series evidence found in this audit.
+61196,no change,5645,5645,Dalmore 2005,97,Connoisseurs Choice,Retained existing named-range relationship; no contradictory Series evidence found in this audit.
+61197,no change,5645,5645,Dalmore 1992,97,Connoisseurs Choice,Retained existing named-range relationship; no contradictory Series evidence found in this audit.
+61198,no change,5645,5645,Dalmore 1996,97,Connoisseurs Choice,Retained existing named-range relationship; no contradictory Series evidence found in this audit.
+61199,no change,5645,5645,Dalmore 2005 - UK Exclusive,97,Connoisseurs Choice,Retained existing named-range relationship; no contradictory Series evidence found in this audit.
+61200,no change,5645,5645,Dalmore 1999,97,Connoisseurs Choice,Retained existing named-range relationship; no contradictory Series evidence found in this audit.
+61201,no change,5645,5645,Dalmore 1999,97,Connoisseurs Choice,Retained existing named-range relationship; no contradictory Series evidence found in this audit.
+61312,no change,5645,5645,Glenlochy 1979 - #3,1009,Recollection Series,Retained existing named-range relationship; no contradictory Series evidence found in this audit.
+61313,no change,5645,5645,Ardmore 1985,1088,Private Collection,Retained existing named-range relationship; no contradictory Series evidence found in this audit.
+61314,no change,5645,5645,Banff 1976 - #2,1009,Recollection Series,Retained existing named-range relationship; no contradictory Series evidence found in this audit.
+61315,no change,5645,5645,Benrinnes 1978,1088,Private Collection,Retained existing named-range relationship; no contradictory Series evidence found in this audit.
+61316,no change,5645,5645,Braes of Glenlivet 1975,1088,Private Collection,Retained existing named-range relationship; no contradictory Series evidence found in this audit.
+61317,no change,5645,5645,Caol Ila 1968,1088,Private Collection,Retained existing named-range relationship; no contradictory Series evidence found in this audit.
+61318,no change,5645,5645,Caol Ila 1976,1088,Private Collection,Retained existing named-range relationship; no contradictory Series evidence found in this audit.
+61319,no change,5645,5645,Caperdonich 1979 - #2,1009,Recollection Series,Retained existing named-range relationship; no contradictory Series evidence found in this audit.
+61320,no change,5645,5645,Caperdonich 1982,1088,Private Collection,Retained existing named-range relationship; no contradictory Series evidence found in this audit.
+61321,no change,5645,5645,Glen Albyn 1979 - #2,1009,Recollection Series,Retained existing named-range relationship; no contradictory Series evidence found in this audit.
+61322,no change,5645,5645,Glen Grant 1948,1088,Private Collection,Retained existing named-range relationship; no contradictory Series evidence found in this audit.
+61323,no change,5645,5645,Glenburgie 1984,1088,Private Collection,Retained existing named-range relationship; no contradictory Series evidence found in this audit.
+61324,no change,5645,5645,Glenlivet 1976,1088,Private Collection,Retained existing named-range relationship; no contradictory Series evidence found in this audit.
+61325,no change,5645,5645,Glenlivet 1979,1088,Private Collection,Retained existing named-range relationship; no contradictory Series evidence found in this audit.
+61326,no change,5645,5645,Imperial 1979 - #2,1009,Recollection Series,Retained existing named-range relationship; no contradictory Series evidence found in this audit.
+61327,no change,5645,5645,Imperial 1979,1088,Private Collection,Retained existing named-range relationship; no contradictory Series evidence found in this audit.
+61328,no change,5645,5645,Longmorn,1088,Private Collection,Retained existing named-range relationship; no contradictory Series evidence found in this audit.
+61329,no change,5645,5645,Longmorn,1088,Private Collection,Retained existing named-range relationship; no contradictory Series evidence found in this audit.
+61330,no change,5645,5645,Mortlach 1954,1088,Private Collection,Retained existing named-range relationship; no contradictory Series evidence found in this audit.
+61331,no change,5645,5645,Mortlach 1961,1088,Private Collection,Retained existing named-range relationship; no contradictory Series evidence found in this audit.
+61332,no change,5645,5645,Convalmore 1984 - #3,1009,Recollection Series,Retained existing named-range relationship; no contradictory Series evidence found in this audit.
+61333,no change,5645,5645,Imperial 1990 - #3,1009,Recollection Series,Retained existing named-range relationship; no contradictory Series evidence found in this audit.
+61334,no change,5645,5645,North Port 1981 - #3,1009,Recollection Series,Retained existing named-range relationship; no contradictory Series evidence found in this audit.
+61335,update,5645,5645,Convalmore - #1,1009,Recollection Series,Updated and re-fetched; details in changes.csv.
+61336,no change,5645,5645,Convalmore 1982,1009,Recollection Series,Retained existing named-range relationship; no contradictory Series evidence found in this audit.
+61337,no change,5645,5645,Convalmore 1969 12-year-old,97,Connoisseurs Choice,Retained existing named-range relationship; no contradictory Series evidence found in this audit.
+61338,no change,5645,5645,Convalmore 1975,807,Rare Old,Retained existing named-range relationship; no contradictory Series evidence found in this audit.
+61339,no change,5645,5645,Convalmore 1969,97,Connoisseurs Choice,Retained existing named-range relationship; no contradictory Series evidence found in this audit.
+61340,no change,5645,5645,Convalmore 1984,97,Connoisseurs Choice,Retained existing named-range relationship; no contradictory Series evidence found in this audit.
+61341,no change,5645,5645,Convalmore 1975,807,Rare Old,Retained existing named-range relationship; no contradictory Series evidence found in this audit.
+61344,no change,5645,5645,Convalmore 1960,807,Rare Old,Retained existing named-range relationship; no contradictory Series evidence found in this audit.
+61351,no change,5645,5645,Convalmore 1969 13-year-old,97,Connoisseurs Choice,Retained existing named-range relationship; no contradictory Series evidence found in this audit.
+61355,no change,5645,5645,Convalmore 1984,808,Reserve,Retained existing named-range relationship; no contradictory Series evidence found in this audit.
+61356,no change,5645,5645,Convalmore 1969,97,Connoisseurs Choice,Retained existing named-range relationship; no contradictory Series evidence found in this audit.
+61357,no change,5645,5645,Convalmore 1969,97,Connoisseurs Choice,Retained existing named-range relationship; no contradictory Series evidence found in this audit.
+61358,no change,5645,5645,Convalmore 1981,97,Connoisseurs Choice,Retained existing named-range relationship; no contradictory Series evidence found in this audit.
+61359,no change,5645,5645,Convalmore 1984,97,Connoisseurs Choice,Retained existing named-range relationship; no contradictory Series evidence found in this audit.
+61360,no change,5645,5645,Convalmore 1960,807,Rare Old,Retained existing named-range relationship; no contradictory Series evidence found in this audit.
+61734,update,5645,5645,Glendullan,97,Connoisseurs Choice,Updated and re-fetched; details in changes.csv.
+61735,no change,5645,5645,Glenlossie 2008 16-year-old - UK Exclusive - Batch 24/112,97,Connoisseurs Choice,Retained existing named-range relationship; no contradictory Series evidence found in this audit.
+61736,unresolved,5645,5645,Glenlivet 1943 - Private Collection,,,"The 1943 40% Glenlivet is labelled Private Collection by its retailer, but is not the producer’s 70-year-old 49.1% Private Collection release. Confirm its original label before assigning a range."
+61755,update,5645,5645,Linkwood,1088,Private Collection,Updated and re-fetched; details in changes.csv.
+61801,update,5645,5645,Tormore,97,Connoisseurs Choice,Updated and re-fetched; details in changes.csv.
+62025,update,5645,5645,Caol Ila,97,Connoisseurs Choice,Updated and re-fetched; details in changes.csv.
+62038,update,5645,5645,Highland Park,97,Connoisseurs Choice,Updated and re-fetched; details in changes.csv.
+62043,update,5645,5645,Tamnavulin,97,Connoisseurs Choice,Updated and re-fetched; details in changes.csv.
+62052,no change,5645,5645,Glenlossie 1997 24-year-old - Batch 22/091,97,Connoisseurs Choice,Retained existing named-range relationship; no contradictory Series evidence found in this audit.
+62059,update,5645,5645,Tormore,97,Connoisseurs Choice,Updated and re-fetched; details in changes.csv.
+62060,update,5645,5645,Glenburgie,97,Connoisseurs Choice,Updated and re-fetched; details in changes.csv.
+62065,update,5645,5645,Tormore,97,Connoisseurs Choice,Updated and re-fetched; details in changes.csv.
+62068,update,5645,5645,Benriach,97,Connoisseurs Choice,Updated and re-fetched; details in changes.csv.
+62075,no change,5645,5645,Glenrothes 11-year-old,144,Discovery,Retained existing named-range relationship; no contradictory Series evidence found in this audit.
+62134,no change,5645,5645,Balblair 1990 29-year-old - Batch 20/017,97,Connoisseurs Choice,Retained existing named-range relationship; no contradictory Series evidence found in this audit.
+62136,update,5645,5645,Balblair,97,Connoisseurs Choice,Updated and re-fetched; details in changes.csv.
+62225,update,5645,5645,Bunnahabhain,97,Connoisseurs Choice,Updated and re-fetched; details in changes.csv.
+62238,update,5645,5645,Caol Ila,97,Connoisseurs Choice,Updated and re-fetched; details in changes.csv.
+62269,update,5645,5645,Dallas Dhu - #2,1009,Recollection Series,Updated and re-fetched; details in changes.csv.
+62321,no change,5645,5645,Glen Grant 64-year-old,,,No supported named-range reassignment identified; existing Series remains unknown. This is not a full release-facts certification.
+62322,update,5645,5645,Glen Grant - King Charles III Coronation Release,1088,Private Collection,Updated and re-fetched; details in changes.csv.
+62323,no change,5645,5645,Glen Grant 65-year-old,,,No supported named-range reassignment identified; existing Series remains unknown. This is not a full release-facts certification.
+62324,no change,5645,5645,Glen Grant 59-year-old,,,No supported named-range reassignment identified; existing Series remains unknown. This is not a full release-facts certification.
+62325,no change,5645,5645,Glen Grant 70-year-old - Platinum Jubilee Edition,,,No supported named-range reassignment identified; existing Series remains unknown. This is not a full release-facts certification.
+62326,no change,5645,5645,Glen Grant 61-year-old,,,No supported named-range reassignment identified; existing Series remains unknown. This is not a full release-facts certification.
+62327,update,5645,5645,Glen Grant,1329,Archive Exclusive,Updated and re-fetched; details in changes.csv.
+62328,update,5645,5645,Glen Grant,1088,Private Collection,Updated and re-fetched; details in changes.csv.
+62329,update,5645,5645,Glen Grant,1088,Private Collection,Updated and re-fetched; details in changes.csv.
+62330,update,5645,5645,Glen Grant - Third Edition,1327,Mr George Legacy,Updated and re-fetched; details in changes.csv.
+62331,no change,5645,5645,Glen Grant 1957,,,No supported named-range reassignment identified; existing Series remains unknown. This is not a full release-facts certification.
+62337,update,5645,5645,Glen Grant,97,Connoisseurs Choice,Updated and re-fetched; details in changes.csv.
+62339,update,5645,5645,Glen Mhor - #2,1009,Recollection Series,Updated and re-fetched; details in changes.csv.
+62361,update,5645,5645,GlenAllachie,97,Connoisseurs Choice,Updated and re-fetched; details in changes.csv.
+62372,update,5645,5645,Glenburgie,97,Connoisseurs Choice,Updated and re-fetched; details in changes.csv.
+62374,update,5645,5645,Glenburgie,98,Distillery Labels,Updated and re-fetched; details in changes.csv.
+62497,no change,5645,5645,Linkwood 1946,,,No supported named-range reassignment identified; existing Series remains unknown. This is not a full release-facts certification.
+62498,update,5645,5645,Linkwood,1088,Private Collection,Updated and re-fetched; details in changes.csv.
+62499,update,5645,5645,Linkwood,97,Connoisseurs Choice,Updated and re-fetched; details in changes.csv.
+62500,update,5645,5645,Linkwood,97,Connoisseurs Choice,Updated and re-fetched; details in changes.csv.
+62510,update,5645,5645,Littlemill - #2,1009,Recollection Series,Updated and re-fetched; details in changes.csv.
+62524,unresolved,5645,5645,Longmorn 1966 - Private Collection,,,"Possible duplicate of B61328, Longmorn 1966 46% Private Collection, cask 610. This record has no cask or bottling year. No merge performed; do not confuse it with the separately marketed Anniversary release."
+62528,update,5645,5645,Longmorn,98,Distillery Labels,Updated and re-fetched; details in changes.csv.
+62531,update,5645,5645,Macallan,1030,Speymalt,Updated and re-fetched; details in changes.csv.
+62533,update,5645,5645,Macallan,1030,Speymalt,Updated and re-fetched; details in changes.csv.
+62545,update,5645,5645,Macduff,97,Connoisseurs Choice,Updated and re-fetched; details in changes.csv.
+62547,no change,1165,5645,21-year-old,,,No supported named-range reassignment identified; existing Series remains unknown. This is not a full release-facts certification.
+62557,no change,5645,5645,Glenlivet 1949,,,No supported named-range reassignment identified; existing Series remains unknown. This is not a full release-facts certification.
+62558,update,5645,5645,Glenlivet,1329,Archive Exclusive,Updated and re-fetched; details in changes.csv.
+62559,update,5645,5645,Glenlivet,1329,Archive Exclusive,Updated and re-fetched; details in changes.csv.
+62587,no change,5645,5645,Glenrothes 1988 32-year-old - Batch 21/010,97,Connoisseurs Choice,Retained existing named-range relationship; no contradictory Series evidence found in this audit.
+62592,no change,5645,5645,Glenrothes 14-year-old - The Whisky World Exclusive,,,No supported named-range reassignment identified; existing Series remains unknown. This is not a full release-facts certification.
+62614,no change,1165,5645,50-year-old - 2024 Release,,,No supported named-range reassignment identified; existing Series remains unknown. This is not a full release-facts certification.
+62616,no change,1165,5645,40-year-old,,,No supported named-range reassignment identified; existing Series remains unknown. This is not a full release-facts certification.
+62617,update,5645,5645,Mannochmore,97,Connoisseurs Choice,Updated and re-fetched; details in changes.csv.
+62631,update,5645,5645,Milton,1088,Private Collection,Updated and re-fetched; details in changes.csv.
+62632,update,5645,5645,Miltonduff,97,Connoisseurs Choice,Updated and re-fetched; details in changes.csv.
+62633,update,5645,5645,Miltonduff,97,Connoisseurs Choice,Updated and re-fetched; details in changes.csv.
+62644,update,5645,5645,Mortlach,1211,Generations,Updated and re-fetched; details in changes.csv.
+62646,no change,5645,5645,Mortlach 25-year-old,,,No supported named-range reassignment identified; existing Series remains unknown. This is not a full release-facts certification.
+62660,unresolved,5645,5645,North Port-Brechin 42-year-old - Private Collection,,,"Possible duplicate of B61334, North Port 1981 42 years 50.9%, Recollection #3. This record lacks the cask and bottling year needed to prove exact identity. No merge performed."
+62728,update,5645,5645,St. Magdalene - #2,1009,Recollection Series,Updated and re-fetched; details in changes.csv.
+62733,update,5645,5645,Strathisla,1088,Private Collection,Updated and re-fetched; details in changes.csv.
+62735,update,5645,5645,Strathmill,97,Connoisseurs Choice,Updated and re-fetched; details in changes.csv.
+62736,update,5645,5645,Strathmill,97,Connoisseurs Choice,Updated and re-fetched; details in changes.csv.
+62752,update,5645,5645,Tamnavulin,97,Connoisseurs Choice,Updated and re-fetched; details in changes.csv.
+62783,update,5645,5645,Tormore,97,Connoisseurs Choice,Updated and re-fetched; details in changes.csv.
+62785,update,5645,5645,Tormore,97,Connoisseurs Choice,Updated and re-fetched; details in changes.csv.
+62822,no change,1165,5645,40-year-old - 2025 Release,,,No supported named-range reassignment identified; existing Series remains unknown. This is not a full release-facts certification.
+62823,update,5645,5645,Mortlach,98,Distillery Labels,Updated and re-fetched; details in changes.csv.
+62846,update,5645,5645,Tomatin,97,Connoisseurs Choice,Updated and re-fetched; details in changes.csv.
+62847,update,5645,5645,Tomatin,97,Connoisseurs Choice,Updated and re-fetched; details in changes.csv.
+62879,update,5645,5645,Glenury Royal,1135,125th Anniversary,Updated and re-fetched; details in changes.csv.
+63565,update,5645,5645,Tomatin,97,Connoisseurs Choice,Updated and re-fetched; details in changes.csv.
+63579,update,5645,5645,Glenburgie,97,Connoisseurs Choice,Updated and re-fetched; details in changes.csv.
+63584,update,5645,5645,Highland Park,97,Connoisseurs Choice,Updated and re-fetched; details in changes.csv.
+63653,update,5645,5645,Mannochmore,97,Connoisseurs Choice,Updated and re-fetched; details in changes.csv.
+63654,update,5645,5645,Dallas Dhu,97,Connoisseurs Choice,Updated and re-fetched; details in changes.csv.
+63668,update,5645,5645,Caol Ila,97,Connoisseurs Choice,Updated and re-fetched; details in changes.csv.
+63672,no change,5645,5645,Avonside-Glenlivet 33-year-old,,,No supported named-range reassignment identified; existing Series remains unknown. This is not a full release-facts certification.
+63684,update,5645,5645,Port Ellen,97,Connoisseurs Choice,Updated and re-fetched; details in changes.csv.
+63852,no change,5645,5645,Avonside-Glenlivet 35-year-old,,,No supported named-range reassignment identified; existing Series remains unknown. This is not a full release-facts certification.
+64035,no change,5645,5645,Mortlach,,,No supported named-range reassignment identified; existing Series remains unknown. This is not a full release-facts certification.
+64134,update,5645,5645,Coleburn,1135,125th Anniversary,Updated and re-fetched; details in changes.csv.
+64237,unresolved,5645,5645,Port Ellen 1981 42-year-old - #3,1009,Recollection Series,"Moved from S1144 to S1009 by the approved Series merge. Port Ellen 1981 cask 290 is in the producer’s 2023 second-series announcement and its current third-series presentation. The stored edition is #3, release year 2023 and outturn 181; the current producer product page says 60. Do not duplicate it, change its edition, or replace the outturn until the marketed-release boundary is settled."
+64240,no change,5645,5645,Glenlivet 1949 74-year-old,1088,Private Collection,Retained existing named-range relationship; no contradictory Series evidence found in this audit.
+64340,update,5645,5645,Lochside - #1,1009,Recollection Series,Updated and re-fetched; details in changes.csv.
+64379,update,5645,5645,Glen Mhor - #1,1009,Recollection Series,Updated and re-fetched; details in changes.csv.
+64381,update,5645,5645,St. Magdalene - #1,1009,Recollection Series,Updated and re-fetched; details in changes.csv.
+64556,update,5645,5645,Glenlivet,1211,Generations,Updated and re-fetched; details in changes.csv.
+64719,update,5645,5645,Glencraig,1135,125th Anniversary,Updated and re-fetched; details in changes.csv.
+64720,update,5645,5645,Mosstowie,1135,125th Anniversary,Updated and re-fetched; details in changes.csv.
+64738,no change,5645,5645,Glenturret 2005 - Cask No. 1760,97,Connoisseurs Choice,Retained existing named-range relationship; no contradictory Series evidence found in this audit.
+64739,no change,5645,5645,Hermitage Wood Finish - Batch 18/002,97,Connoisseurs Choice,Retained existing named-range relationship; no contradictory Series evidence found in this audit.
+64840,no change,5645,5645,Glenlivet 1954,1088,Private Collection,Retained existing named-range relationship; no contradictory Series evidence found in this audit.
+64997,unresolved,5645,5645,Strathisla 1977,,,"Strathisla 1977 40 years 48.5%, TWE exclusive, cask 387: retailer confirms Book of Kells label, not a distinct modern Dram Takers range identity. Preserve unknown Series."
+65047,no change,5645,5645,Glen Grant 1954,,,No supported named-range reassignment identified; existing Series remains unknown. This is not a full release-facts certification.
+65057,no change,5645,5645,Glen Grant 10-year-old,,,No supported named-range reassignment identified; existing Series remains unknown. This is not a full release-facts certification.
+65059,no change,5645,5645,Scapa 10-year-old,98,Distillery Labels,Retained existing named-range relationship; no contradictory Series evidence found in this audit.
+65076,no change,5645,5645,Strathisla 1967,1185,Rare Vintage,Retained existing named-range relationship; no contradictory Series evidence found in this audit.
+65082,update,5645,5645,Bunnahabhain,1225,The MacPhail's Collection,Updated and re-fetched; details in changes.csv.
+65138,no change,5645,5645,Tomatin 1997,97,Connoisseurs Choice,Retained existing named-range relationship; no contradictory Series evidence found in this audit.
+65164,unresolved,5645,5645,Balblair 10-year-old,98,Distillery Labels,Balblair 10 years 43% is explicitly assigned to Distillery Labels by its existing references and retailer. A MacPhail’s Collection version is also documented. Leave the existing identity and do not create another generic record until the release boundary is clear.
+65178,no change,5645,5645,Pulteney 8-year-old,98,Distillery Labels,Retained existing named-range relationship; no contradictory Series evidence found in this audit.
+65246,no change,5645,5645,Arran 2006,97,Connoisseurs Choice,Retained existing named-range relationship; no contradictory Series evidence found in this audit.
+65253,no change,5645,5645,Glentauchers 11-year-old,,,No supported named-range reassignment identified; existing Series remains unknown. This is not a full release-facts certification.
+65339,no change,5645,5645,Ledaig,97,Connoisseurs Choice,Retained existing named-range relationship; no contradictory Series evidence found in this audit.
+65345,no change,5645,5645,Aberfeldy 1995,1096,Cask Strength,Retained existing named-range relationship; no contradictory Series evidence found in this audit.
+65413,no change,5645,5645,Clynelish 1996,97,Connoisseurs Choice,Retained existing named-range relationship; no contradictory Series evidence found in this audit.
+65415,no change,5645,5645,Macduff 2000,97,Connoisseurs Choice,Retained existing named-range relationship; no contradictory Series evidence found in this audit.
+65493,no change,5645,5645,Glenugie 1970,807,Rare Old,Retained existing named-range relationship; no contradictory Series evidence found in this audit.
+65538,no change,5645,5645,Ledaig 1993 St-Joseph Wood Finish,1088,Private Collection,Retained existing named-range relationship; no contradictory Series evidence found in this audit.
+65546,no change,5645,5645,Balblair 1991 Crozes-Hermitage Finish,1088,Private Collection,Retained existing named-range relationship; no contradictory Series evidence found in this audit.
+65561,no change,5645,5645,Miltonduff - Cask No. 9461,,,No supported named-range reassignment identified; existing Series remains unknown. This is not a full release-facts certification.
+65580,no change,5645,5645,Glen Grant 60-year-old,,,No supported named-range reassignment identified; existing Series remains unknown. This is not a full release-facts certification.
+65613,no change,5645,5645,Glenburgie 1990 21-year-old,,,No supported named-range reassignment identified; existing Series remains unknown. This is not a full release-facts certification.
+65626,no change,5645,5645,Old Pulteney 21-year-old,,,No supported named-range reassignment identified; existing Series remains unknown. This is not a full release-facts certification.
+65628,no change,5645,5645,Macallan 1970 41-year-old,1030,Speymalt,Retained existing named-range relationship; no contradictory Series evidence found in this audit.
+65649,no change,5645,5645,Glenlivet Decades 1974,1088,Private Collection,Retained existing named-range relationship; no contradictory Series evidence found in this audit.
+65650,no change,5645,5645,Decades,1088,Private Collection,Retained existing named-range relationship; no contradictory Series evidence found in this audit.
+65651,no change,5645,5645,Glenlivet Decades 1954,1088,Private Collection,Retained existing named-range relationship; no contradictory Series evidence found in this audit.
+65652,no change,5645,5645,Glenlivet Decades 1980,1088,Private Collection,Retained existing named-range relationship; no contradictory Series evidence found in this audit.
+65653,no change,5645,5645,Glenlivet Decades 1991,1088,Private Collection,Retained existing named-range relationship; no contradictory Series evidence found in this audit.
+65654,update,5645,5645,Glenlivet,1211,Generations,Updated and re-fetched; details in changes.csv.
+65658,no change,5645,5645,Port Wood Finish 10-year-old,1088,Private Collection,Retained existing named-range relationship; no contradictory Series evidence found in this audit.
+65659,no change,5645,5645,Madeira Wood Finish 10-year-old,1088,Private Collection,Retained existing named-range relationship; no contradictory Series evidence found in this audit.
+65691,no change,5645,5645,Glen Grant 1966 41-year-old,,,No supported named-range reassignment identified; existing Series remains unknown. This is not a full release-facts certification.
+65704,no change,5645,5645,21-year-old Smith's Glenlivet,,,No supported named-range reassignment identified; existing Series remains unknown. This is not a full release-facts certification.
+65711,no change,5645,5645,Rosebank 1991 13-year-old - Cask #1536,,,No supported named-range reassignment identified; existing Series remains unknown. This is not a full release-facts certification.
+65712,no change,5645,5645,Ledaig 1994 12-year-old - Cask #2,,,No supported named-range reassignment identified; existing Series remains unknown. This is not a full release-facts certification.
+65713,no change,5645,5645,Mortlach 1994 13-year-old - Cask #8173,,,No supported named-range reassignment identified; existing Series remains unknown. This is not a full release-facts certification.
+65714,no change,5645,5645,Caol Ila 1998 8-year-old - Cask #12903,,,No supported named-range reassignment identified; existing Series remains unknown. This is not a full release-facts certification.
+65715,no change,5645,5645,Port Ellen 1982 24-year-old,,,No supported named-range reassignment identified; existing Series remains unknown. This is not a full release-facts certification.
+65721,no change,5645,5645,Old Pulteney 1994 - Cask #06/125,1088,Private Collection,Retained existing named-range relationship; no contradictory Series evidence found in this audit.
+65726,no change,5645,5645,Tomintoul 1967 40-year-old - Cask 644,808,Reserve,Retained existing named-range relationship; no contradictory Series evidence found in this audit.
+65732,no change,5645,5645,Strathisla 25-year-old - Cask #8510,,,No supported named-range reassignment identified; existing Series remains unknown. This is not a full release-facts certification.
+65734,no change,5645,5645,Mortlach 1970 36-year-old,,,No supported named-range reassignment identified; existing Series remains unknown. This is not a full release-facts certification.
+65739,no change,5645,5645,Caol Ila 1991 15-year-old - Cask #00/3454,,,No supported named-range reassignment identified; existing Series remains unknown. This is not a full release-facts certification.
+65750,no change,5645,5645,Mannochmore 1990 15-year-old,97,Connoisseurs Choice,Retained existing named-range relationship; no contradictory Series evidence found in this audit.
+65753,unresolved,1165,5645,Glenturret 15-year-old,1215,The MacPhail's Collection,"MacPhail’s Collection Glenturret 15 years 46% is asserted by import references, but exact-label searches found only other vintages/strengths. Its Series S1215 is under MacPhail’s E1165, while the named-distillery collection is represented under G&M S1225. Confirm the release before moving brand/Series or proposing a merge."
+65759,no change,5645,5645,Old Pulteney 1969 35-year-old,,,No supported named-range reassignment identified; existing Series remains unknown. This is not a full release-facts certification.
+65761,no change,5645,5645,Glenlossie 1978 27-year-old - Cask #1815,,,No supported named-range reassignment identified; existing Series remains unknown. This is not a full release-facts certification.
+65771,no change,5645,5645,Glencadam 1974 31-year-old,,,No supported named-range reassignment identified; existing Series remains unknown. This is not a full release-facts certification.
+65777,no change,5645,5645,Caol Ila 1996 8-year-old,,,No supported named-range reassignment identified; existing Series remains unknown. This is not a full release-facts certification.
+65784,no change,5645,5645,Mortlach 1993 11-year-old,1096,Cask Strength,Retained existing named-range relationship; no contradictory Series evidence found in this audit.
+65785,no change,5645,5645,Caol Ila 1991 14-year-old,,,No supported named-range reassignment identified; existing Series remains unknown. This is not a full release-facts certification.
+65793,no change,5645,5645,Glentauchers 14-year-old,,,No supported named-range reassignment identified; existing Series remains unknown. This is not a full release-facts certification.
+65798,no change,5645,5645,Highland Park 1992 12-year-old,,,No supported named-range reassignment identified; existing Series remains unknown. This is not a full release-facts certification.
+65800,no change,5645,5645,Longmorn 1989 15-year-old,,,No supported named-range reassignment identified; existing Series remains unknown. This is not a full release-facts certification.
+65807,no change,5645,5645,Caol Ila 1991 13-year-old,97,Connoisseurs Choice,Retained existing named-range relationship; no contradictory Series evidence found in this audit.
+65812,no change,5645,5645,Glenrothes 1986 18-year-old,808,Reserve,Retained existing named-range relationship; no contradictory Series evidence found in this audit.
+65814,no change,5645,5645,Caol Ila 1991 12-year-old,,,No supported named-range reassignment identified; existing Series remains unknown. This is not a full release-facts certification.
+65817,no change,5645,5645,Tamnavulin 1989,97,Connoisseurs Choice,Retained existing named-range relationship; no contradictory Series evidence found in this audit.
+65820,no change,5645,5645,Bladnoch 1991 13-year-old,97,Connoisseurs Choice,Retained existing named-range relationship; no contradictory Series evidence found in this audit.
+65834,no change,5645,5645,Rosebank 1991 - Cask #1535,,,No supported named-range reassignment identified; existing Series remains unknown. This is not a full release-facts certification.
+65835,no change,5645,5645,Glen Grant 1990 - Cask #5054,,,No supported named-range reassignment identified; existing Series remains unknown. This is not a full release-facts certification.
+65836,no change,5645,5645,Ardmore 1990 - Cask #12274,,,No supported named-range reassignment identified; existing Series remains unknown. This is not a full release-facts certification.
+65837,no change,5645,5645,Bruichladdich 1989 - Cask #1961,,,No supported named-range reassignment identified; existing Series remains unknown. This is not a full release-facts certification.
+65842,no change,5645,5645,Rosebank 1989 10-year-old,807,Rare Old,Retained existing named-range relationship; no contradictory Series evidence found in this audit.
+65849,no change,5645,5645,Convalmore 1984 22-year-old,1096,Cask Strength,Retained existing named-range relationship; no contradictory Series evidence found in this audit.
+65850,no change,5645,5645,Convalmore 1969,97,Connoisseurs Choice,Retained existing named-range relationship; no contradictory Series evidence found in this audit.
+65851,no change,5645,5645,Convalmore 1969,97,Connoisseurs Choice,Retained existing named-range relationship; no contradictory Series evidence found in this audit.
+65852,no change,5645,5645,Bunnahabhain 11-year-old,144,Discovery,Retained existing named-range relationship; no contradictory Series evidence found in this audit.
+65853,no change,5645,5645,Tormore 13-year-old,144,Discovery,Retained existing named-range relationship; no contradictory Series evidence found in this audit.
+65854,no change,5645,5645,Balblair 12-year-old,144,Discovery,Retained existing named-range relationship; no contradictory Series evidence found in this audit.
+65856,no change,5645,5645,Bunnahabhain 10-year-old,144,Discovery,Retained existing named-range relationship; no contradictory Series evidence found in this audit.
+65862,no change,5645,5645,Tomatin 2007,144,Discovery,Retained existing named-range relationship; no contradictory Series evidence found in this audit.
+65874,no change,5645,5645,Glenrothes 1969,1088,Private Collection,Retained existing named-range relationship; no contradictory Series evidence found in this audit.
+65878,no change,5645,5645,Glenrothes 2009 15-year-old - Batch 24/095,97,Connoisseurs Choice,Retained existing named-range relationship; no contradictory Series evidence found in this audit.
+65884,no change,5645,5645,Glenrothes 2007 16-year-old - Batch 24/135,97,Connoisseurs Choice,Retained existing named-range relationship; no contradictory Series evidence found in this audit.
+65887,no change,5645,5645,Glenrothes 1988 35-year-old - Batch 24/013,97,Connoisseurs Choice,Retained existing named-range relationship; no contradictory Series evidence found in this audit.
+65890,no change,5645,5645,Glenrothes 2007 16-year-old - Batch 23/136,97,Connoisseurs Choice,Retained existing named-range relationship; no contradictory Series evidence found in this audit.
+65894,no change,5645,5645,Glenrothes 1988 30-year-old - Batch 19/002,97,Connoisseurs Choice,Retained existing named-range relationship; no contradictory Series evidence found in this audit.
+65898,no change,5645,5645,Glenrothes 1974,1088,Private Collection,Retained existing named-range relationship; no contradictory Series evidence found in this audit.
+65910,no change,5645,5645,Glenrothes 1956,97,Connoisseurs Choice,Retained existing named-range relationship; no contradictory Series evidence found in this audit.
+65913,unresolved,5645,5645,Glenrothes-Glenlivet 8-year-old,,,Glenrothes-Glenlivet 8 years 40% is an older white-label release. A later MacPhail’s Collection 8 years 40% is documented. Do not reassign or duplicate the generic record solely from age and strength.
+65914,no change,5645,5645,Glenrothes 1978,1217,Centenary Reserve,Retained existing named-range relationship; no contradictory Series evidence found in this audit.
+65915,no change,5645,5645,Benrinnes 1978,1217,Centenary Reserve,Retained existing named-range relationship; no contradictory Series evidence found in this audit.
+65918,no change,5645,5645,Balblair 1973,1217,Centenary Reserve,Retained existing named-range relationship; no contradictory Series evidence found in this audit.
+65919,no change,5645,5645,Mortlach 1984,1217,Centenary Reserve,Retained existing named-range relationship; no contradictory Series evidence found in this audit.
+65921,no change,5645,5645,St. Magdalene 1980,1217,Centenary Reserve,Retained existing named-range relationship; no contradictory Series evidence found in this audit.
+65924,no change,5645,5645,Caol Ila 1966,1217,Centenary Reserve,Retained existing named-range relationship; no contradictory Series evidence found in this audit.
+65927,no change,5645,5645,Highland Park 1970,1217,Centenary Reserve,Retained existing named-range relationship; no contradictory Series evidence found in this audit.
+65940,no change,5645,5645,Glenburgie 1948,1217,Centenary Reserve,Retained existing named-range relationship; no contradictory Series evidence found in this audit.
+65943,no change,5645,5645,Glenburgie 1995 27-year-old - Batch 23/206,97,Connoisseurs Choice,Retained existing named-range relationship; no contradictory Series evidence found in this audit.
+65944,no change,5645,5645,Glenburgie 2008 13-year-old - Batch 21/112,97,Connoisseurs Choice,Retained existing named-range relationship; no contradictory Series evidence found in this audit.
+65945,no change,5645,5645,Glenburgie 1995 26-year-old - Batch 21/199,97,Connoisseurs Choice,Retained existing named-range relationship; no contradictory Series evidence found in this audit.
+65946,no change,5645,5645,Glenburgie 1988 32-year-old - Batch 21/003,97,Connoisseurs Choice,Retained existing named-range relationship; no contradictory Series evidence found in this audit.
+65947,no change,5645,5645,Glenburgie 1989 30-year-old - Batch 19/011,97,Connoisseurs Choice,Retained existing named-range relationship; no contradictory Series evidence found in this audit.
+65948,no change,5645,5645,Glenburgie 1990 29-year-old - Batch 20/051,97,Connoisseurs Choice,Retained existing named-range relationship; no contradictory Series evidence found in this audit.
+65949,no change,5645,5645,Glenburgie 1989 30-year-old - Batch 19/010,97,Connoisseurs Choice,Retained existing named-range relationship; no contradictory Series evidence found in this audit.
+65951,no change,5645,5645,Glenburgie 1988 30-year-old - Batch 18/066,97,Connoisseurs Choice,Retained existing named-range relationship; no contradictory Series evidence found in this audit.
+65954,no change,5645,5645,Glenburgie 1986 38-year-old - Batch 24/016,97,Connoisseurs Choice,Retained existing named-range relationship; no contradictory Series evidence found in this audit.
+65960,no change,5645,5645,Glenburgie 1994 27-year-old - Batch 21/183,97,Connoisseurs Choice,Retained existing named-range relationship; no contradictory Series evidence found in this audit.
+65963,no change,5645,5645,Glenburgie 1994 27-year-old - Batch 21/207,97,Connoisseurs Choice,Retained existing named-range relationship; no contradictory Series evidence found in this audit.
+65966,no change,5645,5645,Glenburgie 1994 25-year-old - Batch 20/021,97,Connoisseurs Choice,Retained existing named-range relationship; no contradictory Series evidence found in this audit.
+65970,unresolved,5645,5645,Clynelish 1972 36-year-old - 14301,,,"Clynelish 1972 36 years 59.4%, cask 14301: historical Book of Kells label documented; relationship to modern Dram Takers is not established by artwork alone."
+65971,no change,5645,5645,Glenburgie 1998 20-year-old - Batch 19/026,97,Connoisseurs Choice,Retained existing named-range relationship; no contradictory Series evidence found in this audit.
+65972,no change,5645,5645,Clynelish 1972 - RO/16/07,807,Rare Old,Retained existing named-range relationship; no contradictory Series evidence found in this audit.
+65973,no change,5645,5645,Clynelish 1989 28-year-old - 8204,97,Connoisseurs Choice,Retained existing named-range relationship; no contradictory Series evidence found in this audit.
+65974,no change,5645,5645,Glenburgie 1997 21-year-old - Batch 19/023,97,Connoisseurs Choice,Retained existing named-range relationship; no contradictory Series evidence found in this audit.
+65975,no change,5645,5645,Clynelish 1990 - 11628,,,No supported named-range reassignment identified; existing Series remains unknown. This is not a full release-facts certification.
+65976,no change,5645,5645,Clynelish 1995 - 5831-5832,,,No supported named-range reassignment identified; existing Series remains unknown. This is not a full release-facts certification.
+65977,no change,5645,5645,Glenburgie 1997 20-year-old - Batch 18/095,97,Connoisseurs Choice,Retained existing named-range relationship; no contradictory Series evidence found in this audit.
+65978,no change,5645,5645,Clynelish 1997,97,Connoisseurs Choice,Retained existing named-range relationship; no contradictory Series evidence found in this audit.
+65979,no change,5645,5645,Clynelish 1998 - 17064-17065,1096,Cask Strength,Retained existing named-range relationship; no contradictory Series evidence found in this audit.
+65980,no change,5645,5645,Clynelish 2001 - 307849-307850,1096,Cask Strength,Retained existing named-range relationship; no contradictory Series evidence found in this audit.
+65981,no change,5645,5645,Glenburgie 1998 22-year-old - Batch 21/055,97,Connoisseurs Choice,Retained existing named-range relationship; no contradictory Series evidence found in this audit.
+65982,no change,5645,5645,Clynelish 2004,97,Connoisseurs Choice,Retained existing named-range relationship; no contradictory Series evidence found in this audit.
+65983,no change,5645,5645,Glenburgie 1995 25-year-old - Batch 21/148,97,Connoisseurs Choice,Retained existing named-range relationship; no contradictory Series evidence found in this audit.
+65984,no change,5645,5645,Clynelish 2005 12-year-old - 18/012,97,Connoisseurs Choice,Retained existing named-range relationship; no contradictory Series evidence found in this audit.
+65985,no change,5645,5645,Clynelish 2008 17-year-old - Itinéraires,97,Connoisseurs Choice,Retained existing named-range relationship; no contradictory Series evidence found in this audit.
+65986,no change,5645,5645,Glenburgie 1996 24-year-old - Batch 21/047,97,Connoisseurs Choice,Retained existing named-range relationship; no contradictory Series evidence found in this audit.
+65989,no change,5645,5645,Glenburgie 1996 25-year-old - Batch 21/208,97,Connoisseurs Choice,Retained existing named-range relationship; no contradictory Series evidence found in this audit.
+65998,no change,5645,5645,Glenburgie 1994 28-year-old - Batch 23/211,97,Connoisseurs Choice,Retained existing named-range relationship; no contradictory Series evidence found in this audit.
+66003,no change,5645,5645,Glenburgie 2004 14-year-old - Batch 18/104,97,Connoisseurs Choice,Retained existing named-range relationship; no contradictory Series evidence found in this audit.
+66070,no change,5645,5645,Benrinnes 2001 17-year-old - Batch 18/093,97,Connoisseurs Choice,Retained existing named-range relationship; no contradictory Series evidence found in this audit.
+66074,no change,5645,5645,Benrinnes 1990 30-year-old - Batch 20/053,97,Connoisseurs Choice,Retained existing named-range relationship; no contradictory Series evidence found in this audit.
+66077,no change,5645,5645,Benrinnes 1994 29-year-old - Batch 24/014,97,Connoisseurs Choice,Retained existing named-range relationship; no contradictory Series evidence found in this audit.
+66082,no change,5645,5645,Benrinnes 2004 14-year-old - Batch 19/108,97,Connoisseurs Choice,Retained existing named-range relationship; no contradictory Series evidence found in this audit.
+66086,no change,5645,5645,Benrinnes 1994 25-year-old - Symposion 25th Anniversary - Batch 19/122,97,Connoisseurs Choice,Retained existing named-range relationship; no contradictory Series evidence found in this audit.
+66095,no change,5645,5645,Clynelish 1969 - 5893,1088,Private Collection,Retained existing named-range relationship; no contradictory Series evidence found in this audit.
+66097,no change,5645,5645,Balblair 1995 25-year-old - Batch 20/058,97,Connoisseurs Choice,Retained existing named-range relationship; no contradictory Series evidence found in this audit.
+66102,no change,5645,5645,Balblair 1997 25-year-old - Batch 23/188,97,Connoisseurs Choice,Retained existing named-range relationship; no contradictory Series evidence found in this audit.
+66108,no change,5645,5645,Balblair 1998 23-year-old - Batch 21/195,97,Connoisseurs Choice,Retained existing named-range relationship; no contradictory Series evidence found in this audit.
+66112,no change,5645,5645,Balblair 1989 30-year-old - Batch 19/007,97,Connoisseurs Choice,Retained existing named-range relationship; no contradictory Series evidence found in this audit.
+66115,no change,5645,5645,Balblair 1993 26-year-old - Batch 19/078,97,Connoisseurs Choice,Retained existing named-range relationship; no contradictory Series evidence found in this audit.
+66119,no change,5645,5645,Balblair 1990 30-year-old - Batch 21/066,97,Connoisseurs Choice,Retained existing named-range relationship; no contradictory Series evidence found in this audit.
+66122,no change,5645,5645,Balblair 1994 27-year-old - Batch 21/170,97,Connoisseurs Choice,Retained existing named-range relationship; no contradictory Series evidence found in this audit.
+66127,no change,5645,5645,Balblair 1989 31-year-old - Batch 21/011,97,Connoisseurs Choice,Retained existing named-range relationship; no contradictory Series evidence found in this audit.
+66130,no change,5645,5645,Balblair 1993 30-year-old - Batch 24/021,97,Connoisseurs Choice,Retained existing named-range relationship; no contradictory Series evidence found in this audit.
+66134,no change,5645,5645,Balblair 1994 29-year-old - Batch 23/214,97,Connoisseurs Choice,Retained existing named-range relationship; no contradictory Series evidence found in this audit.
+66137,no change,5645,5645,Balblair 1998 23-year-old - Batch 21/201,97,Connoisseurs Choice,Retained existing named-range relationship; no contradictory Series evidence found in this audit.
+66140,no change,5645,5645,Balblair 1993 24-year-old - Batch 18/006,97,Connoisseurs Choice,Retained existing named-range relationship; no contradictory Series evidence found in this audit.
+66158,no change,5645,5645,Balblair 1964 17-year-old,97,Connoisseurs Choice,Retained existing named-range relationship; no contradictory Series evidence found in this audit.
+66163,no change,5645,5645,Balblair 1964 18-year-old,97,Connoisseurs Choice,Retained existing named-range relationship; no contradictory Series evidence found in this audit.
+66168,no change,5645,5645,Balblair 1964 20-year-old,97,Connoisseurs Choice,Retained existing named-range relationship; no contradictory Series evidence found in this audit.
+66173,no change,5645,5645,Balblair 1964 15-year-old,97,Connoisseurs Choice,Retained existing named-range relationship; no contradictory Series evidence found in this audit.
+66183,no change,5645,5645,Balblair 1973 32-year-old,1088,Private Collection,Retained existing named-range relationship; no contradictory Series evidence found in this audit.
+66188,no change,5645,5645,Balblair 1966,,,No supported named-range reassignment identified; existing Series remains unknown. This is not a full release-facts certification.
+66217,no change,5645,5645,Balblair 1964,,,No supported named-range reassignment identified; existing Series remains unknown. This is not a full release-facts certification.
+66223,no change,5645,5645,Balblair 1986 - Whisky Show: Old & Rare 2017,1096,Cask Strength,Retained existing named-range relationship; no contradictory Series evidence found in this audit.
+66232,no change,5645,5645,Balblair 1993,1096,Cask Strength,Retained existing named-range relationship; no contradictory Series evidence found in this audit.
+66243,no change,5645,5645,Balblair 1993,1096,Cask Strength,Retained existing named-range relationship; no contradictory Series evidence found in this audit.
+66248,no change,5645,5645,Balblair 1997 26-year-old - Kirsch Import - Batch 23/190,97,Connoisseurs Choice,Retained existing named-range relationship; no contradictory Series evidence found in this audit.
+66261,no change,5645,5645,Balblair 21-year-old,1225,The MacPhail's Collection,Retained existing named-range relationship; no contradictory Series evidence found in this audit.
+66271,no change,5645,5645,Arran 1996 22-year-old - Batch 18/023,97,Connoisseurs Choice,Retained existing named-range relationship; no contradictory Series evidence found in this audit.
+66272,no change,5645,5645,Arran 1999 19-year-old - Batch 19/047,97,Connoisseurs Choice,Retained existing named-range relationship; no contradictory Series evidence found in this audit.
+66273,no change,5645,5645,Arran 2009 15-year-old - Batch 25/004,97,Connoisseurs Choice,Retained existing named-range relationship; no contradictory Series evidence found in this audit.
+66286,no change,5645,5645,Arran 2000,97,Connoisseurs Choice,Retained existing named-range relationship; no contradictory Series evidence found in this audit.
+66289,no change,5645,5645,Arran 1998 8-year-old,97,Connoisseurs Choice,Retained existing named-range relationship; no contradictory Series evidence found in this audit.
+66293,no change,5645,5645,Arran 1998,97,Connoisseurs Choice,Retained existing named-range relationship; no contradictory Series evidence found in this audit.
+66299,no change,5645,5645,Arran 1998,97,Connoisseurs Choice,Retained existing named-range relationship; no contradictory Series evidence found in this audit.
+66301,no change,5645,5645,Arran 2009 15-year-old - Nemoto - Batch 24/083,97,Connoisseurs Choice,Retained existing named-range relationship; no contradictory Series evidence found in this audit.
+66314,no change,5645,5645,Blair Athol 1997 20-year-old - Batch 18/010,97,Connoisseurs Choice,Retained existing named-range relationship; no contradictory Series evidence found in this audit.
+66317,no change,5645,5645,Blair Athol 2008 16-year-old - UK Exclusive - Batch 24/104,97,Connoisseurs Choice,Retained existing named-range relationship; no contradictory Series evidence found in this audit.
+66319,no change,5645,5645,Blair Athol 1997 21-year-old - Batch 18/073,97,Connoisseurs Choice,Retained existing named-range relationship; no contradictory Series evidence found in this audit.
+66320,no change,5645,5645,Blair Athol 1995 25-year-old - Batch 20/097,97,Connoisseurs Choice,Retained existing named-range relationship; no contradictory Series evidence found in this audit.
+66321,no change,5645,5645,Blair Athol 2006,97,Connoisseurs Choice,Retained existing named-range relationship; no contradictory Series evidence found in this audit.
+66322,no change,5645,5645,Blair Athol 2005,97,Connoisseurs Choice,Retained existing named-range relationship; no contradictory Series evidence found in this audit.
+66323,no change,5645,5645,Blair Athol 2008,97,Connoisseurs Choice,Retained existing named-range relationship; no contradictory Series evidence found in this audit.
+66324,no change,5645,5645,Blair Athol 1993,97,Connoisseurs Choice,Retained existing named-range relationship; no contradictory Series evidence found in this audit.
+66325,no change,5645,5645,Blair Athol 2008 14-year-old - UK Exclusive - Batch 23/095,97,Connoisseurs Choice,Retained existing named-range relationship; no contradictory Series evidence found in this audit.
+66329,no change,5645,5645,Blair Athol 2007,97,Connoisseurs Choice,Retained existing named-range relationship; no contradictory Series evidence found in this audit.
+66330,no change,5645,5645,Blair Athol 1997,97,Connoisseurs Choice,Retained existing named-range relationship; no contradictory Series evidence found in this audit.
+66331,no change,5645,5645,Blair Athol 1995,97,Connoisseurs Choice,Retained existing named-range relationship; no contradictory Series evidence found in this audit.
+66333,no change,5645,5645,Blair Athol 1997,97,Connoisseurs Choice,Retained existing named-range relationship; no contradictory Series evidence found in this audit.
+66337,no change,5645,5645,Aultmore 2005 13-year-old - Batch 19/050,97,Connoisseurs Choice,Retained existing named-range relationship; no contradictory Series evidence found in this audit.
+66338,no change,5645,5645,Aultmore 2005 15-year-old - Batch 21/191,97,Connoisseurs Choice,Retained existing named-range relationship; no contradictory Series evidence found in this audit.
+66339,no change,5645,5645,Aultmore 2005 13-year-old - Batch 19/094,97,Connoisseurs Choice,Retained existing named-range relationship; no contradictory Series evidence found in this audit.
+66340,no change,5645,5645,Aultmore 2005 15-year-old - Batch 21/025,97,Connoisseurs Choice,Retained existing named-range relationship; no contradictory Series evidence found in this audit.
+66341,no change,5645,5645,Aultmore 2005 16-year-old - Batch 21/198,97,Connoisseurs Choice,Retained existing named-range relationship; no contradictory Series evidence found in this audit.
+66342,no change,5645,5645,Aultmore 2000 18-year-old - Batch 18/072,97,Connoisseurs Choice,Retained existing named-range relationship; no contradictory Series evidence found in this audit.
+66343,no change,5645,5645,Aultmore 2005 13-year-old - Batch 19/036,97,Connoisseurs Choice,Retained existing named-range relationship; no contradictory Series evidence found in this audit.
+66344,no change,5645,5645,Aultmore 1989,97,Connoisseurs Choice,Retained existing named-range relationship; no contradictory Series evidence found in this audit.
+66345,no change,5645,5645,Aultmore 2005,97,Connoisseurs Choice,Retained existing named-range relationship; no contradictory Series evidence found in this audit.
+66350,no change,5645,5645,Aultmore 2000,97,Connoisseurs Choice,Retained existing named-range relationship; no contradictory Series evidence found in this audit.
+66354,no change,5645,5645,Aultmore 2000,97,Connoisseurs Choice,Retained existing named-range relationship; no contradictory Series evidence found in this audit.
+66363,no change,5645,5645,Aultmore 1995,97,Connoisseurs Choice,Retained existing named-range relationship; no contradictory Series evidence found in this audit.
+66364,no change,5645,5645,Aultmore 10-year-old,144,Discovery,Retained existing named-range relationship; no contradictory Series evidence found in this audit.
+66366,no change,5645,5645,Aultmore 1997,97,Connoisseurs Choice,Retained existing named-range relationship; no contradictory Series evidence found in this audit.
+66367,no change,5645,5645,Aultmore 2000,97,Connoisseurs Choice,Retained existing named-range relationship; no contradictory Series evidence found in this audit.
+66373,no change,5645,5645,Aultmore 2000 18-year-old - Batch 18/032,97,Connoisseurs Choice,Retained existing named-range relationship; no contradictory Series evidence found in this audit.
+66374,no change,5645,5645,Aultmore 2005 15-year-old - UK Exclusive - Batch 21/139,97,Connoisseurs Choice,Retained existing named-range relationship; no contradictory Series evidence found in this audit.
+66375,no change,5645,5645,Aultmore 2005 17-year-old - Kirsch Import - Batch 22/115,97,Connoisseurs Choice,Retained existing named-range relationship; no contradictory Series evidence found in this audit.
+66376,no change,5645,5645,Aultmore 2009 13-year-old St Joseph Wine Finish - Batch 23/065,97,Connoisseurs Choice,Retained existing named-range relationship; no contradictory Series evidence found in this audit.
+66383,no change,5645,5645,Aultmore 1989,97,Connoisseurs Choice,Retained existing named-range relationship; no contradictory Series evidence found in this audit.
+66388,no change,5645,5645,Aultmore 2005 - Gordon & MacPhail Elgin Shop,1232,Exclusive,Retained existing named-range relationship; no contradictory Series evidence found in this audit.
+66389,no change,5645,5645,Aultmore 1989,808,Reserve,Retained existing named-range relationship; no contradictory Series evidence found in this audit.
+66390,no change,5645,5645,Aultmore 2000 - The Kuva,1232,Exclusive,Retained existing named-range relationship; no contradictory Series evidence found in this audit.
+66395,no change,5645,5645,Clynelish 1972,427,The Dram Takers,Retained existing named-range relationship; no contradictory Series evidence found in this audit.
+66396,no change,5645,5645,Bladnoch 1988 32-year-old - Batch 21/062,97,Connoisseurs Choice,Retained existing named-range relationship; no contradictory Series evidence found in this audit.
+66397,no change,5645,5645,Clynelish 1984,427,The Dram Takers,Retained existing named-range relationship; no contradictory Series evidence found in this audit.
+66398,no change,5645,5645,Clynelish 1991,97,Connoisseurs Choice,Retained existing named-range relationship; no contradictory Series evidence found in this audit.
+66399,no change,5645,5645,Clynelish 1993 - for Glu Glu 2000,808,Reserve,Retained existing named-range relationship; no contradictory Series evidence found in this audit.
+66400,no change,5645,5645,Bladnoch 1990 28-year-old - Batch 19/140,97,Connoisseurs Choice,Retained existing named-range relationship; no contradictory Series evidence found in this audit.
+66401,no change,5645,5645,Clynelish 1993 25-year-old - 19/079,97,Connoisseurs Choice,Retained existing named-range relationship; no contradictory Series evidence found in this audit.
+66402,no change,5645,5645,Bladnoch 1991 28-year-old - Germany Exclusive - Batch 19/080,97,Connoisseurs Choice,Retained existing named-range relationship; no contradictory Series evidence found in this audit.
+66403,no change,5645,5645,Clynelish 2005 14-year-old - 19/090 - The Whisky Exchange 20th Anniversary,97,Connoisseurs Choice,Retained existing named-range relationship; no contradictory Series evidence found in this audit.
+66404,no change,5645,5645,Bladnoch 1990 28-year-old - Batch 19/014,97,Connoisseurs Choice,Retained existing named-range relationship; no contradictory Series evidence found in this audit.
+66405,no change,5645,5645,Bladnoch 1990 30-year-old - Batch 21/069,97,Connoisseurs Choice,Retained existing named-range relationship; no contradictory Series evidence found in this audit.
+66408,no change,5645,5645,Bladnoch 1988 30-year-old - Batch 19/006,97,Connoisseurs Choice,Retained existing named-range relationship; no contradictory Series evidence found in this audit.
+66415,no change,5645,5645,Bladnoch 1967 15-year-old,97,Connoisseurs Choice,Retained existing named-range relationship; no contradictory Series evidence found in this audit.
+66416,no change,5645,5645,Bladnoch 1975 16-year-old,97,Connoisseurs Choice,Retained existing named-range relationship; no contradictory Series evidence found in this audit.
+66418,no change,5645,5645,Bladnoch 1988 33-year-old - Kensington Wine Market - Batch 22/014,97,Connoisseurs Choice,Retained existing named-range relationship; no contradictory Series evidence found in this audit.
+66419,no change,5645,5645,Bladnoch 1985,356,Cask,Retained existing named-range relationship; no contradictory Series evidence found in this audit.
+66421,no change,5645,5645,Bladnoch 1987,97,Connoisseurs Choice,Retained existing named-range relationship; no contradictory Series evidence found in this audit.
+66422,no change,5645,5645,Bladnoch 1988,97,Connoisseurs Choice,Retained existing named-range relationship; no contradictory Series evidence found in this audit.
+66423,no change,5645,5645,Bladnoch 1988,356,Cask,Retained existing named-range relationship; no contradictory Series evidence found in this audit.
+66424,no change,5645,5645,Bladnoch 1989,97,Connoisseurs Choice,Retained existing named-range relationship; no contradictory Series evidence found in this audit.
+66425,no change,5645,5645,Bladnoch 1988,97,Connoisseurs Choice,Retained existing named-range relationship; no contradictory Series evidence found in this audit.
+66426,no change,5645,5645,Bladnoch 1984,97,Connoisseurs Choice,Retained existing named-range relationship; no contradictory Series evidence found in this audit.
+66427,no change,5645,5645,Bladnoch 1986,97,Connoisseurs Choice,Retained existing named-range relationship; no contradictory Series evidence found in this audit.
+66429,no change,5645,5645,Bladnoch 1984,97,Connoisseurs Choice,Retained existing named-range relationship; no contradictory Series evidence found in this audit.
+66430,no change,5645,5645,Bladnoch 1986,97,Connoisseurs Choice,Retained existing named-range relationship; no contradictory Series evidence found in this audit.
+66433,no change,5645,5645,Bladnoch 1987,356,Cask,Retained existing named-range relationship; no contradictory Series evidence found in this audit.
+66434,no change,5645,5645,Bladnoch 1991,808,Reserve,Retained existing named-range relationship; no contradictory Series evidence found in this audit.
+66435,no change,5645,5645,Bladnoch 1987,356,Cask,Retained existing named-range relationship; no contradictory Series evidence found in this audit.
+66436,no change,5645,5645,Bladnoch 1991,356,Cask,Retained existing named-range relationship; no contradictory Series evidence found in this audit.
+66437,no change,5645,5645,Bladnoch 1989 - Kirsch Whisky Import,808,Reserve,Retained existing named-range relationship; no contradictory Series evidence found in this audit.
+66440,no change,5645,5645,Bladnoch 1993 - Van Wees,808,Reserve,Retained existing named-range relationship; no contradictory Series evidence found in this audit.
+66443,no change,5645,5645,Bladnoch 1986,299,Spirit of Scotland,Retained existing named-range relationship; no contradictory Series evidence found in this audit.
+66447,no change,5645,5645,Bladnoch 1987,97,Connoisseurs Choice,Retained existing named-range relationship; no contradictory Series evidence found in this audit.
+66450,no change,5645,5645,Bladnoch 1988,97,Connoisseurs Choice,Retained existing named-range relationship; no contradictory Series evidence found in this audit.
+66451,no change,5645,5645,Bladnoch 1991,97,Connoisseurs Choice,Retained existing named-range relationship; no contradictory Series evidence found in this audit.
+66452,no change,5645,5645,Bladnoch 1991,97,Connoisseurs Choice,Retained existing named-range relationship; no contradictory Series evidence found in this audit.
+66453,no change,5645,5645,Bladnoch 1991,97,Connoisseurs Choice,Retained existing named-range relationship; no contradictory Series evidence found in this audit.
+66454,no change,5645,5645,Bladnoch 1984,97,Connoisseurs Choice,Retained existing named-range relationship; no contradictory Series evidence found in this audit.
+66455,no change,5645,5645,Bladnoch 1985,356,Cask,Retained existing named-range relationship; no contradictory Series evidence found in this audit.
+66459,no change,5645,5645,Bladnoch 1975 13-year-old,97,Connoisseurs Choice,Retained existing named-range relationship; no contradictory Series evidence found in this audit.
+66460,no change,5645,5645,Ardmore 1997 21-year-old - Batch 19/021,97,Connoisseurs Choice,Retained existing named-range relationship; no contradictory Series evidence found in this audit.
+66469,no change,5645,5645,Ardmore 1995 26-year-old - Batch 21/132,97,Connoisseurs Choice,Retained existing named-range relationship; no contradictory Series evidence found in this audit.
+66471,no change,5645,5645,Ardmore 1994 26-year-old - Batch 21/031,97,Connoisseurs Choice,Retained existing named-range relationship; no contradictory Series evidence found in this audit.
+66472,no change,5645,5645,Ardmore 1997 21-year-old - Batch 19/073,97,Connoisseurs Choice,Retained existing named-range relationship; no contradictory Series evidence found in this audit.
+66473,no change,5645,5645,Ardmore 1987 30-year-old - Batch 18/065,97,Connoisseurs Choice,Retained existing named-range relationship; no contradictory Series evidence found in this audit.
+66477,no change,5645,5645,Ardmore 1998 22-year-old - Batch 21/044,97,Connoisseurs Choice,Retained existing named-range relationship; no contradictory Series evidence found in this audit.
+66478,no change,5645,5645,Ardmore 1997 24-year-old - Batch 21/222,97,Connoisseurs Choice,Retained existing named-range relationship; no contradictory Series evidence found in this audit.
+66479,no change,5645,5645,Ardmore 1994 26-year-old - Batch 21/147,97,Connoisseurs Choice,Retained existing named-range relationship; no contradictory Series evidence found in this audit.
+66480,no change,5645,5645,Ardmore 1997 21-year-old - T.S.M.C. 9th Anniversary - Batch 19/074,97,Connoisseurs Choice,Retained existing named-range relationship; no contradictory Series evidence found in this audit.
+66481,no change,5645,5645,Ardmore 1990 27-year-old - Batch 18/098,97,Connoisseurs Choice,Retained existing named-range relationship; no contradictory Series evidence found in this audit.
+66483,no change,5645,5645,Ardmore 1999,98,Distillery Labels,Retained existing named-range relationship; no contradictory Series evidence found in this audit.
+66484,no change,5645,5645,Ardmore 2000,98,Distillery Labels,Retained existing named-range relationship; no contradictory Series evidence found in this audit.
+66488,no change,5645,5645,Ardmore 1996 24-year-old - Spiritual Home Exclusive 6th Release - Batch 21/077,97,Connoisseurs Choice,Retained existing named-range relationship; no contradictory Series evidence found in this audit.
+66489,no change,5645,5645,Ardmore 1991,808,Reserve,Retained existing named-range relationship; no contradictory Series evidence found in this audit.
+66490,no change,5645,5645,Ardmore 1999,98,Distillery Labels,Retained existing named-range relationship; no contradictory Series evidence found in this audit.
+66492,no change,5645,5645,Ardmore 1981,,,No supported named-range reassignment identified; existing Series remains unknown. This is not a full release-facts certification.
+66494,no change,5645,5645,Ardmore 1981,,,No supported named-range reassignment identified; existing Series remains unknown. This is not a full release-facts certification.
+66495,no change,5645,5645,Clynelish 2009 13-year-old - Batch 23/076,97,Connoisseurs Choice,Retained existing named-range relationship; no contradictory Series evidence found in this audit.
+66498,no change,5645,5645,Ardmore 2008 13-year-old - Spiritual Home Exclusive 11th Release,97,Connoisseurs Choice,Retained existing named-range relationship; no contradictory Series evidence found in this audit.
+66499,no change,5645,5645,Ardmore 1987,,,No supported named-range reassignment identified; existing Series remains unknown. This is not a full release-facts certification.
+66500,no change,5645,5645,Ardmore 1981,,,No supported named-range reassignment identified; existing Series remains unknown. This is not a full release-facts certification.
+66501,no change,5645,5645,Ardmore 1985,,,No supported named-range reassignment identified; existing Series remains unknown. This is not a full release-facts certification.
+66502,no change,5645,5645,Ardmore 1985,,,No supported named-range reassignment identified; existing Series remains unknown. This is not a full release-facts certification.
+66503,no change,5645,5645,Ardmore 1996,98,Distillery Labels,Retained existing named-range relationship; no contradictory Series evidence found in this audit.
+66504,no change,5645,5645,Ardmore 1995,98,Distillery Labels,Retained existing named-range relationship; no contradictory Series evidence found in this audit.
+66505,no change,5645,5645,Ardmore 1996,98,Distillery Labels,Retained existing named-range relationship; no contradictory Series evidence found in this audit.
+66510,no change,5645,5645,Ardmore 1995 - Kirsch Whisky 40th Anniversary,1232,Exclusive,Retained existing named-range relationship; no contradictory Series evidence found in this audit.
+66511,no change,5645,5645,Ardmore 1990,356,Cask,Retained existing named-range relationship; no contradictory Series evidence found in this audit.
+66512,no change,5645,5645,Ardmore 1998,98,Distillery Labels,Retained existing named-range relationship; no contradictory Series evidence found in this audit.
+66513,no change,5645,5645,Ardmore 1991,356,Cask,Retained existing named-range relationship; no contradictory Series evidence found in this audit.
+66515,no change,5645,5645,Ardmore 2002,1096,Cask Strength,Retained existing named-range relationship; no contradictory Series evidence found in this audit.
+66519,no change,5645,5645,Ardmore 1991,356,Cask,Retained existing named-range relationship; no contradictory Series evidence found in this audit.
+66523,no change,5645,5645,Ardmore 1990,356,Cask,Retained existing named-range relationship; no contradictory Series evidence found in this audit.
+66524,no change,5645,5645,Ardmore 1997 - Van Wees,808,Reserve,Retained existing named-range relationship; no contradictory Series evidence found in this audit.
+66527,no change,5645,5645,Ardmore 1993 - Van Wees,808,Reserve,Retained existing named-range relationship; no contradictory Series evidence found in this audit.
+66528,no change,5645,5645,Ardmore 1997 - Van Wees,808,Reserve,Retained existing named-range relationship; no contradictory Series evidence found in this audit.
+66530,no change,5645,5645,Ardmore 2009,97,Connoisseurs Choice,Retained existing named-range relationship; no contradictory Series evidence found in this audit.
+66531,no change,5645,5645,Ardmore 2000 21-year-old - La Maison du Whisky - Batch 21/130,97,Connoisseurs Choice,Retained existing named-range relationship; no contradictory Series evidence found in this audit.
+66532,no change,5645,5645,Ardmore 1999 - HNWS Taiwan,1232,Exclusive,Retained existing named-range relationship; no contradictory Series evidence found in this audit.
+66542,no change,5645,5645,Ardmore 1993 - Whisky-Online,1232,Exclusive,Retained existing named-range relationship; no contradictory Series evidence found in this audit.
+66545,no change,5645,5645,Ardmore 1997 25-year-old - Kensington Wine Market - Batch 23/185,97,Connoisseurs Choice,Retained existing named-range relationship; no contradictory Series evidence found in this audit.
+66546,no change,5645,5645,Ardmore 1998,98,Distillery Labels,Retained existing named-range relationship; no contradictory Series evidence found in this audit.
+66547,no change,5645,5645,Ardmore 1991,808,Reserve,Retained existing named-range relationship; no contradictory Series evidence found in this audit.
+66548,no change,5645,5645,Ardmore 1998 - Van Wees,808,Reserve,Retained existing named-range relationship; no contradictory Series evidence found in this audit.
+66549,no change,5645,5645,Ardmore 1997 - Maltclan - Clubbotteling 6,1232,Exclusive,Retained existing named-range relationship; no contradictory Series evidence found in this audit.
+66550,no change,5645,5645,Ardmore 1997 - Germany,1232,Exclusive,Retained existing named-range relationship; no contradictory Series evidence found in this audit.
+66553,no change,5645,5645,Ardmore 1998 - Viking Line,1232,Exclusive,Retained existing named-range relationship; no contradictory Series evidence found in this audit.
+66557,no change,5645,5645,Ardmore 1998 16-year-old - Binny's,1232,Exclusive,Retained existing named-range relationship; no contradictory Series evidence found in this audit.
+66559,no change,5645,5645,Ardmore 1997 25-year-old - Batch 23/186,97,Connoisseurs Choice,Retained existing named-range relationship; no contradictory Series evidence found in this audit.
+66563,no change,5645,5645,Ardmore 1998,1096,Cask Strength,Retained existing named-range relationship; no contradictory Series evidence found in this audit.
+66564,no change,5645,5645,Ardmore 1997 23-year-old - Batch 21/039,97,Connoisseurs Choice,Retained existing named-range relationship; no contradictory Series evidence found in this audit.
+66566,no change,5645,5645,Ardmore 1990,98,Distillery Labels,Retained existing named-range relationship; no contradictory Series evidence found in this audit.
+66567,no change,5645,5645,Ardmore 1991,98,Distillery Labels,Retained existing named-range relationship; no contradictory Series evidence found in this audit.
+66568,no change,5645,5645,Ardmore 1981,,,No supported named-range reassignment identified; existing Series remains unknown. This is not a full release-facts certification.
+66569,no change,5645,5645,Ardmore 1990,98,Distillery Labels,Retained existing named-range relationship; no contradictory Series evidence found in this audit.
+66570,no change,5645,5645,Ardmore 1987,98,Distillery Labels,Retained existing named-range relationship; no contradictory Series evidence found in this audit.
+66571,no change,5645,5645,Ardmore 1987 - La Maison du Whisky,,,No supported named-range reassignment identified; existing Series remains unknown. This is not a full release-facts certification.
+66572,no change,5645,5645,Ardmore 1977,,,No supported named-range reassignment identified; existing Series remains unknown. This is not a full release-facts certification.
+66573,no change,5645,5645,Ardmore 1993,98,Distillery Labels,Retained existing named-range relationship; no contradictory Series evidence found in this audit.
+66574,no change,5645,5645,Ardmore 2002,1096,Cask Strength,Retained existing named-range relationship; no contradictory Series evidence found in this audit.
+66575,no change,5645,5645,Ardmore 1993 - Van Wees,808,Reserve,Retained existing named-range relationship; no contradictory Series evidence found in this audit.
+66576,no change,5645,5645,Ardmore 1993,98,Distillery Labels,Retained existing named-range relationship; no contradictory Series evidence found in this audit.
+66577,no change,5645,5645,Ardmore 1991 16-year-old,,,No supported named-range reassignment identified; existing Series remains unknown. This is not a full release-facts certification.
+66578,no change,5645,5645,Ardmore 2003 19-year-old - The Strath's 20th Anniversary - Batch 22/187,97,Connoisseurs Choice,Retained existing named-range relationship; no contradictory Series evidence found in this audit.
+66579,no change,5645,5645,Ardmore 2003 17-year-old - K&L Wine Merchants - Batch 21/178,97,Connoisseurs Choice,Retained existing named-range relationship; no contradictory Series evidence found in this audit.
+66580,no change,5645,5645,Ardmore 1987 35-year-old - Batch 23/018,97,Connoisseurs Choice,Retained existing named-range relationship; no contradictory Series evidence found in this audit.
+66581,no change,5645,5645,Glenlossie 1982,1088,Private Collection,Retained existing named-range relationship; no contradictory Series evidence found in this audit.
+66582,no change,5645,5645,Glenlossie 1975,1088,Private Collection,Retained existing named-range relationship; no contradictory Series evidence found in this audit.
+66583,no change,5645,5645,Glenlossie 1988 32-year-old - Batch 21/007,97,Connoisseurs Choice,Retained existing named-range relationship; no contradictory Series evidence found in this audit.
+66584,no change,5645,5645,Glenlossie 1998 20-year-old - Batch 19/136,97,Connoisseurs Choice,Retained existing named-range relationship; no contradictory Series evidence found in this audit.
+66589,no change,5645,5645,Glenlossie 1968 12-year-old,97,Connoisseurs Choice,Retained existing named-range relationship; no contradictory Series evidence found in this audit.
+66590,no change,5645,5645,Glenlossie 1968 14-year-old,97,Connoisseurs Choice,Retained existing named-range relationship; no contradictory Series evidence found in this audit.
+66591,no change,5645,5645,Glenlossie 1968 17-year-old,97,Connoisseurs Choice,Retained existing named-range relationship; no contradictory Series evidence found in this audit.
+66592,no change,5645,5645,Glenlossie 1961,807,Rare Old,Retained existing named-range relationship; no contradictory Series evidence found in this audit.
+66593,no change,5645,5645,Glenlossie 1961,807,Rare Old,Retained existing named-range relationship; no contradictory Series evidence found in this audit.
+66594,no change,5645,5645,Glenlossie 1961,807,Rare Old,Retained existing named-range relationship; no contradictory Series evidence found in this audit.
+66595,no change,5645,5645,Glenlossie 1961,807,Rare Old,Retained existing named-range relationship; no contradictory Series evidence found in this audit.
+66596,no change,5645,5645,Glenlossie 1968 11-year-old,97,Connoisseurs Choice,Retained existing named-range relationship; no contradictory Series evidence found in this audit.
+66597,no change,5645,5645,Glenlossie 1938 43-year-old,97,Connoisseurs Choice,Retained existing named-range relationship; no contradictory Series evidence found in this audit.
+66598,no change,5645,5645,Glenlossie 1974,97,Connoisseurs Choice,Retained existing named-range relationship; no contradictory Series evidence found in this audit.
+66599,no change,5645,5645,Glenlossie 1974,97,Connoisseurs Choice,Retained existing named-range relationship; no contradictory Series evidence found in this audit.
+66600,no change,5645,5645,Glenlossie 1975,97,Connoisseurs Choice,Retained existing named-range relationship; no contradictory Series evidence found in this audit.
+66601,no change,5645,5645,Glenlossie 1978,97,Connoisseurs Choice,Retained existing named-range relationship; no contradictory Series evidence found in this audit.
+66602,no change,5645,5645,Glenlossie 2008,1096,Cask Strength,Retained existing named-range relationship; no contradictory Series evidence found in this audit.
+66603,no change,5645,5645,Glenlossie 1978,97,Connoisseurs Choice,Retained existing named-range relationship; no contradictory Series evidence found in this audit.
+66604,no change,5645,5645,Glenlossie 1978,808,Reserve,Retained existing named-range relationship; no contradictory Series evidence found in this audit.
+66605,no change,5645,5645,Glenlossie 1973,1088,Private Collection,Retained existing named-range relationship; no contradictory Series evidence found in this audit.
+66606,no change,5645,5645,Glenlossie 1998,97,Connoisseurs Choice,Retained existing named-range relationship; no contradictory Series evidence found in this audit.
+66607,no change,5645,5645,Glenlossie 1995,97,Connoisseurs Choice,Retained existing named-range relationship; no contradictory Series evidence found in this audit.
+66608,no change,5645,5645,Glenlossie 1997,97,Connoisseurs Choice,Retained existing named-range relationship; no contradictory Series evidence found in this audit.
+66609,no change,5645,5645,Glenlossie 2004,97,Connoisseurs Choice,Retained existing named-range relationship; no contradictory Series evidence found in this audit.
+66610,no change,5645,5645,Glenlossie 1982,97,Connoisseurs Choice,Retained existing named-range relationship; no contradictory Series evidence found in this audit.
+66611,no change,5645,5645,Glenlossie 1993,97,Connoisseurs Choice,Retained existing named-range relationship; no contradictory Series evidence found in this audit.
+66612,no change,5645,5645,Glenlossie 1969 18-year-old,97,Connoisseurs Choice,Retained existing named-range relationship; no contradictory Series evidence found in this audit.
+66613,no change,5645,5645,Glenlossie 1988 - Van Wees,808,Reserve,Retained existing named-range relationship; no contradictory Series evidence found in this audit.
+66614,no change,5645,5645,Glenlossie 1972,97,Connoisseurs Choice,Retained existing named-range relationship; no contradictory Series evidence found in this audit.
+66615,no change,5645,5645,Glenlossie 1974,97,Connoisseurs Choice,Retained existing named-range relationship; no contradictory Series evidence found in this audit.
+66616,no change,5645,5645,Glenlossie 1975,808,Reserve,Retained existing named-range relationship; no contradictory Series evidence found in this audit.
+66617,no change,5645,5645,Glenlossie 1988 - D&M Wines,808,Reserve,Retained existing named-range relationship; no contradictory Series evidence found in this audit.
+66925,no change,5645,5645,Longmorn 25-year-old,808,Reserve,Retained existing named-range relationship; no contradictory Series evidence found in this audit.
+66926,update,5645,5645,Longmorn - Into the Lion’s Den,1259,Vintage Moments,Updated and re-fetched; details in changes.csv.
+67004,no change,5645,5645,Auchroisk 2009 13-year-old - Batch 22/030,97,Connoisseurs Choice,Retained existing named-range relationship; no contradictory Series evidence found in this audit.
+67024,no change,5645,5645,Port Ellen 1980,97,Connoisseurs Choice,Retained existing named-range relationship; no contradictory Series evidence found in this audit.
+67027,no change,5645,5645,Port Ellen 1981,97,Connoisseurs Choice,Retained existing named-range relationship; no contradictory Series evidence found in this audit.
+67028,no change,5645,5645,Ardbeg 1973,97,Connoisseurs Choice,Retained existing named-range relationship; no contradictory Series evidence found in this audit.
+67029,no change,5645,5645,Ardbeg 1974,97,Connoisseurs Choice,Retained existing named-range relationship; no contradictory Series evidence found in this audit.
+67030,no change,5645,5645,Ardbeg 1978,97,Connoisseurs Choice,Retained existing named-range relationship; no contradictory Series evidence found in this audit.
+67060,update,5645,5645,Glen Grant,1274,Anniversary Releases,Updated and re-fetched; details in changes.csv.
+67061,update,5645,5645,Miltonduff,1274,Anniversary Releases,Updated and re-fetched; details in changes.csv.
+67078,update,5645,5645,Glen Grant - Debut Appearance,1259,Vintage Moments,Updated and re-fetched; details in changes.csv.
+67239,no change,5645,5645,Laphroaig 1968 15-year-old,97,Connoisseurs Choice,Retained existing named-range relationship; no contradictory Series evidence found in this audit.
+67241,no change,5645,5645,Laphroaig 1970 15-year-old,97,Connoisseurs Choice,Retained existing named-range relationship; no contradictory Series evidence found in this audit.
+67242,no change,5645,5645,Laphroaig 1967 17-year-old,97,Connoisseurs Choice,Retained existing named-range relationship; no contradictory Series evidence found in this audit.
+67243,no change,5645,5645,Laphroaig 1973 14-year-old,97,Connoisseurs Choice,Retained existing named-range relationship; no contradictory Series evidence found in this audit.
+67244,no change,5645,5645,Laphroaig 1969 10-year-old,97,Connoisseurs Choice,Retained existing named-range relationship; no contradictory Series evidence found in this audit.
+67278,no change,5645,5645,Laphroaig 1969 16-year-old,97,Connoisseurs Choice,Retained existing named-range relationship; no contradictory Series evidence found in this audit.
+67291,no change,5645,5645,Laphroaig 1970,,,No supported named-range reassignment identified; existing Series remains unknown. This is not a full release-facts certification.
+67292,no change,5645,5645,Laphroaig 1969,,,No supported named-range reassignment identified; existing Series remains unknown. This is not a full release-facts certification.
+67321,no change,5645,5645,Laphroaig 1969,,,No supported named-range reassignment identified; existing Series remains unknown. This is not a full release-facts certification.
+67652,no change,5645,5645,Oban 1972 14-year-old,97,Connoisseurs Choice,Retained existing named-range relationship; no contradictory Series evidence found in this audit.
+67653,no change,5645,5645,Oban 1972 17-year-old,97,Connoisseurs Choice,Retained existing named-range relationship; no contradictory Series evidence found in this audit.
+67656,no change,5645,5645,Oban 1972,97,Connoisseurs Choice,Retained existing named-range relationship; no contradictory Series evidence found in this audit.
+67660,no change,5645,5645,Oban 1961 20-year-old,97,Connoisseurs Choice,Retained existing named-range relationship; no contradictory Series evidence found in this audit.
+67661,no change,5645,5645,Oban 1968 17-year-old,97,Connoisseurs Choice,Retained existing named-range relationship; no contradictory Series evidence found in this audit.
+67868,no change,5645,5645,Brora,97,Connoisseurs Choice,Retained existing named-range relationship; no contradictory Series evidence found in this audit.
+67869,no change,5645,5645,Brora,97,Connoisseurs Choice,Retained existing named-range relationship; no contradictory Series evidence found in this audit.
+67888,no change,5645,5645,Benromach 1982,1088,Private Collection,Retained existing named-range relationship; no contradictory Series evidence found in this audit.
+67890,no change,5645,5645,Longmorn,1088,Private Collection,Retained existing named-range relationship; no contradictory Series evidence found in this audit.
+67891,no change,5645,5645,Longmorn,1088,Private Collection,Retained existing named-range relationship; no contradictory Series evidence found in this audit.
+67892,no change,5645,5645,Longmorn,98,Distillery Labels,Retained existing named-range relationship; no contradictory Series evidence found in this audit.
+67893,no change,5645,5645,Longmorn,98,Distillery Labels,Retained existing named-range relationship; no contradictory Series evidence found in this audit.
+67903,no change,5645,5645,Dallas Dhu 1979 - Series 25,1088,Private Collection,Retained existing named-range relationship; no contradictory Series evidence found in this audit.
+67912,no change,5645,5645,Longmorn,97,Connoisseurs Choice,Retained existing named-range relationship; no contradictory Series evidence found in this audit.
+67913,no change,5645,5645,Longmorn,97,Connoisseurs Choice,Retained existing named-range relationship; no contradictory Series evidence found in this audit.
+67914,no change,5645,5645,Longmorn,97,Connoisseurs Choice,Retained existing named-range relationship; no contradictory Series evidence found in this audit.
+67915,no change,5645,5645,Longmorn,97,Connoisseurs Choice,Retained existing named-range relationship; no contradictory Series evidence found in this audit.
+67916,no change,5645,5645,Longmorn,97,Connoisseurs Choice,Retained existing named-range relationship; no contradictory Series evidence found in this audit.
+67917,update,5645,5645,Strathmill,427,The Dram Takers,Updated and re-fetched; details in changes.csv.
+67938,create,5645,5645,Glen Grant - Volume 2,427,The Dram Takers,Created and re-fetched; details in changes.csv.
+67939,create,5645,5645,Glenlivet - Volume 2,427,The Dram Takers,Created and re-fetched; details in changes.csv.
+67940,create,5645,5645,Glenburgie - Volume 2,427,The Dram Takers,Created and re-fetched; details in changes.csv.
+67941,create,5645,5645,Longmorn - Volume 2,427,The Dram Takers,Created and re-fetched; details in changes.csv.
+67942,create,5645,5645,Teaninich - Volume 2,427,The Dram Takers,Created and re-fetched; details in changes.csv.
+67943,create,5645,5645,Speyburn - Volume 2,427,The Dram Takers,Created and re-fetched; details in changes.csv.
+67944,create,5645,5645,Glenlivet - Volume 1,427,The Dram Takers,Created and re-fetched; details in changes.csv.
+67945,create,5645,5645,Longmorn - Volume 1,427,The Dram Takers,Created and re-fetched; details in changes.csv.
+67946,create,5645,5645,Linkwood - Volume 1,427,The Dram Takers,Created and re-fetched; details in changes.csv.
+67947,create,5645,5645,Glenrothes - Volume 1,427,The Dram Takers,Created and re-fetched; details in changes.csv.
+67948,create,5645,5645,Mortlach - Volume 1,427,The Dram Takers,Created and re-fetched; details in changes.csv.
+67949,create,5645,5645,Strathisla - Volume 1,427,The Dram Takers,Created and re-fetched; details in changes.csv.
+67950,create,5645,5645,Glen Grant,427,The Dram Takers,Created and re-fetched; details in changes.csv.
+67951,create,5645,5645,Glen Grant,427,The Dram Takers,Created and re-fetched; details in changes.csv.
+67952,create,5645,5645,Mortlach,427,The Dram Takers,Created and re-fetched; details in changes.csv.
+67953,create,5645,5645,Linkwood,427,The Dram Takers,Created and re-fetched; details in changes.csv.
+67954,create,5645,5645,Glen Grant,427,The Dram Takers,Created and re-fetched; details in changes.csv.
+67955,create,5645,5645,Strathmill,427,The Dram Takers,Created and re-fetched; details in changes.csv.
+67956,create,5645,5645,Glen Grant,427,The Dram Takers,Created and re-fetched; details in changes.csv.
+67957,create,5645,5645,Glen Albyn,427,The Dram Takers,Created and re-fetched; details in changes.csv.
+67958,create,5645,5645,Longmorn,1274,Anniversary Releases,Created and re-fetched; details in changes.csv.
+67959,create,5645,5645,Linkwood,1274,Anniversary Releases,Created and re-fetched; details in changes.csv.
+67960,create,5645,5645,Strathisla - Teammates for Life,1259,Vintage Moments,Created and re-fetched; details in changes.csv.
+67961,create,5645,5645,Benromach - It’s Not a Rehearsal,1259,Vintage Moments,Created and re-fetched; details in changes.csv.
+67962,create,5645,5645,Glentauchers - The Fairytale,1259,Vintage Moments,Created and re-fetched; details in changes.csv.
+67963,create,5645,5645,Glen Grant - First Edition,1327,Mr George Legacy,Created and re-fetched; details in changes.csv.
+67964,create,5645,5645,Glen Grant - Second Edition,1327,Mr George Legacy,Created and re-fetched; details in changes.csv.
+67965,create,5645,5645,Mortlach,1211,Generations,Created and re-fetched; details in changes.csv.
+67966,create,5645,5645,Linkwood,1328,Private Collection Ultra,Created and re-fetched; details in changes.csv.
+67967,create,5645,5645,Glenlivet,1328,Private Collection Ultra,Created and re-fetched; details in changes.csv.
+67968,create,5645,5645,Mortlach,1328,Private Collection Ultra,Created and re-fetched; details in changes.csv.
+67969,create,5645,5645,Strathisla,1328,Private Collection Ultra,Created and re-fetched; details in changes.csv.
+67970,create,5645,5645,Glenlivet - Release 2,1211,Generations,Created and re-fetched; details in changes.csv.
+67971,create,5645,5645,Glenlochy - #2,1009,Recollection Series,Created and re-fetched; details in changes.csv.
+67972,create,5645,5645,Lochside - #2,1009,Recollection Series,Created and re-fetched; details in changes.csv.
+67973,create,5645,5645,Glenesk - #2,1009,Recollection Series,Created and re-fetched; details in changes.csv.
+67974,create,5645,5645,Inverleven - #2,1009,Recollection Series,Created and re-fetched; details in changes.csv.
+67975,create,5645,5645,Lochside - #2,1009,Recollection Series,Created and re-fetched; details in changes.csv.
+67976,create,5645,5645,Rosebank - #2,1009,Recollection Series,Created and re-fetched; details in changes.csv.
+67977,create,5645,5645,Pittyvaich - #2,1009,Recollection Series,Created and re-fetched; details in changes.csv.
+67978,create,5645,5645,Imperial - #2,1009,Recollection Series,Created and re-fetched; details in changes.csv.
+67979,create,5645,5645,Imperial - #2,1009,Recollection Series,Created and re-fetched; details in changes.csv.
+67980,no change,5645,5645,Scapa 1988,97,Connoisseurs Choice,Retained existing named-range relationship; no contradictory Series evidence found in this audit.
+67981,create,5645,5645,Glen Grant,427,The Dram Takers,Created and re-fetched; details in changes.csv.
+67982,create,5645,5645,Glenlivet,1088,Private Collection,Created and re-fetched; details in changes.csv.
+67983,create,5645,5645,Tamdhu,1225,The MacPhail's Collection,Created and re-fetched; details in changes.csv.
+67984,create,5645,5645,Tamdhu,1225,The MacPhail's Collection,Created and re-fetched; details in changes.csv.
+67985,create,5645,5645,Highland Park,1225,The MacPhail's Collection,Created and re-fetched; details in changes.csv.
+67986,create,5645,5645,Glenrothes,1225,The MacPhail's Collection,Created and re-fetched; details in changes.csv.
+67987,create,5645,5645,Glen Scotia,1225,The MacPhail's Collection,Created and re-fetched; details in changes.csv.

@@ -467,3 +467,18 @@ export const BottleReferenceSchema = z.object({
     .describe("ID of the Bottle this exact reference resolves to"),
   name: z.string().describe("Exact source reference for the Bottle"),
 });
+
+/** Fields `formatBottleDisplayName` reads, for lists that skip the full Bottle. */
+export const BottleDisplayNameSourceSchema = z.object({
+  name: z.string(),
+  edition: z.string().nullable(),
+  statedAge: z.number().int().nullable(),
+  vintageYear: z.number().int().nullable(),
+  releaseYear: z.number().int().nullable(),
+  abv: z.number().nullable(),
+  singleCask: z.boolean().nullable(),
+  caskStrength: z.boolean().nullable(),
+  brand: z.object({ name: z.string(), shortName: z.string().nullable() }),
+  series: z.object({ name: z.string() }).nullable(),
+  group: z.object({ name: z.string() }).nullable(),
+});

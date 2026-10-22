@@ -105,10 +105,14 @@ describe("admin content moderation", () => {
 
     expect(first.results.map(({ id }) => id)).toEqual([newer.id]);
     // Releases can share a name, so moderators see the ABV with the bottle.
-    expect(first.results[0]?.bottle).toEqual({
+    // Bottle links use the display name, so the Bottle's name fields come too.
+    expect(first.results[0]?.bottle).toMatchObject({
       id: bottle.id,
       fullName: bottle.fullName,
       abv: 46.3,
+      name: bottle.name,
+      brand: { name: expect.any(String) },
+      group: { name: expect.any(String) },
     });
     expect(first.rel).toEqual({ nextCursor: 2, prevCursor: null });
     expect(second.results.map(({ id }) => id)).toEqual([older.id]);
@@ -314,6 +318,7 @@ describe("admin content moderation", () => {
     );
     expect(detail).toMatchObject({
       hidden: false,
+      bottle: { id: bottle.id, name: bottle.name },
       moderation: { removed: true, reason: "Source asked for removal." },
     });
     expect(
@@ -324,5 +329,19 @@ describe("admin content moderation", () => {
         })
       ).results.map(({ id }) => id),
     ).not.toContain(review.id);
+  });
+
+  test("shows no Bottle for an unmatched critic review", async ({
+    fixtures,
+  }) => {
+    const admin = await fixtures.User({ admin: true });
+    const review = await fixtures.ExternalReview({ bottleId: null });
+
+    const detail = await routerClient.admin.content.details(
+      { id: review.id, kind: "external_review" },
+      { context: { user: admin } },
+    );
+
+    expect(detail.bottle).toBeNull();
   });
 });

@@ -31,8 +31,13 @@ import {
 import { prepareOperation } from "@peated/server/lib/bottleOperationReview";
 import { createBottle } from "@peated/server/lib/createBottle";
 import { loadEntityMergeOperation } from "@peated/server/lib/entityMergeOperation";
+import {
+  getPronunciationAudioUrl,
+  storePronunciationAudio,
+} from "@peated/server/lib/entityPronunciationAudio";
 import { createLegacyStorePriceReviewCheck } from "@peated/server/lib/test/legacyBottleChecks";
 import { pushUniqueJob } from "@peated/server/lib/test/workerDispatch";
+import { readFile } from "@peated/server/lib/uploads";
 import type { Context } from "@peated/server/orpc/context";
 import { and, eq, inArray } from "drizzle-orm";
 import pg from "pg";
@@ -220,6 +225,38 @@ test("keeps images when Entities merge", async ({ fixtures }) => {
       }),
     ]),
   );
+});
+
+test("removes pronunciation audio from merged-away Entities", async ({
+  fixtures,
+}) => {
+  const source = await fixtures.Entity({ pronunciationIpa: "ɡlɛn" });
+  const destination = await fixtures.Entity({ pronunciationIpa: "ɡlɛm" });
+  const sourceAudioUrl = getPronunciationAudioUrl(source.id, "ɡlɛn");
+  const destinationAudioUrl = getPronunciationAudioUrl(destination.id, "ɡlɛm");
+  for (const [entityId, audioUrl] of [
+    [source.id, sourceAudioUrl],
+    [destination.id, destinationAudioUrl],
+  ] as const) {
+    await storePronunciationAudio(audioUrl, Buffer.from("audio"));
+    await db
+      .update(entities)
+      .set({ pronunciationAudioUrl: audioUrl })
+      .where(eq(entities.id, entityId));
+  }
+
+  await mergeEntity({
+    fromEntityIds: [source.id],
+    toEntityId: destination.id,
+  });
+
+  const filename = (audioUrl: string) => audioUrl.slice("/uploads/".length);
+  await expect(
+    readFile({ filename: filename(sourceAudioUrl) }),
+  ).rejects.toThrow();
+  await expect(
+    readFile({ filename: filename(destinationAudioUrl) }),
+  ).resolves.toBeDefined();
 });
 
 test("rejects a merge with conflicting current owners", async ({
@@ -1182,6 +1219,209 @@ test("merge duplicate bottle", async ({ fixtures }) => {
   expect(newBottleB).toBeDefined();
   expect(newBottleB.name).toEqual("Duplicate");
 });
+
+test("merges a moved Bottle into an exact release duplicate", async ({
+  fixtures,
+}) => {
+  const release = { vintageYear: 2010, statedAge: 12, caskNumber: "42" };
+  const sourceEntity = await fixtures.Entity({ name: "Exact Source" });
+  const destinationEntity = await fixtures.Entity({
+    name: "Exact Destination",
+  });
+  const source = await fixtures.Bottle({
+    brandId: sourceEntity.id,
+    name: "Single Cask",
+    ...release,
+  });
+  const destination = await fixtures.Bottle({
+    brandId: destinationEntity.id,
+    name: "Single Cask",
+    ...release,
+  });
+
+  await mergeEntity({
+    fromEntityIds: [sourceEntity.id],
+    toEntityId: destinationEntity.id,
+  });
+
+  expect(
+    await db.query.bottles.findFirst({ where: eq(bottles.id, source.id) }),
+  ).toBeUndefined();
+  expect(
+    await db.query.bottles.findFirst({
+      where: eq(bottles.id, destination.id),
+    }),
+  ).toMatchObject({ brandId: destinationEntity.id, ...release });
+});
+
+test("merges an exact duplicate whose name repeats the destination brand", async ({
+  fixtures,
+}) => {
+  const sourceEntity = await fixtures.Entity({ name: "Kilnhouse Distillery" });
+  const destinationEntity = await fixtures.Entity({ name: "Kilnhouse" });
+  const source = await fixtures.Bottle({
+    brandId: sourceEntity.id,
+    name: "Kilnhouse Twelve",
+  });
+  const destination = await fixtures.Bottle({
+    brandId: destinationEntity.id,
+    name: "Twelve",
+  });
+
+  await mergeEntity({
+    fromEntityIds: [sourceEntity.id],
+    toEntityId: destinationEntity.id,
+  });
+
+  expect(
+    await db.query.bottles.findFirst({ where: eq(bottles.id, source.id) }),
+  ).toBeUndefined();
+  expect(
+    await db.query.bottles.findFirst({
+      where: eq(bottles.id, destination.id),
+    }),
+  ).toMatchObject({ name: "Twelve", fullName: "Kilnhouse Twelve" });
+});
+
+test("merges source groups that become exact duplicates in a new Series", async ({
+  fixtures,
+}) => {
+  const sourceEntity = await fixtures.Entity({ name: "Kilnhouse Distillery" });
+  const destinationEntity = await fixtures.Entity({ name: "Kilnhouse" });
+  const sourceSeries = await fixtures.BottleSeries({
+    brandId: sourceEntity.id,
+    name: "Cask Range",
+  });
+  const first = await fixtures.Bottle({
+    brandId: sourceEntity.id,
+    seriesId: sourceSeries.id,
+    name: "Kilnhouse Twelve",
+  });
+  const second = await fixtures.Bottle({
+    brandId: sourceEntity.id,
+    seriesId: sourceSeries.id,
+    name: "Twelve",
+  });
+
+  await mergeEntity({
+    fromEntityIds: [sourceEntity.id],
+    toEntityId: destinationEntity.id,
+  });
+
+  const remaining = await db
+    .select()
+    .from(bottles)
+    .where(inArray(bottles.id, [first.id, second.id]));
+  expect(remaining).toHaveLength(1);
+  expect(remaining[0]).toMatchObject({
+    brandId: destinationEntity.id,
+    fullName: "Kilnhouse Twelve",
+  });
+});
+
+test("merges an exact duplicate in the destination Series with the same name", async ({
+  fixtures,
+}) => {
+  const sourceEntity = await fixtures.Entity({ name: "Series Source" });
+  const destinationEntity = await fixtures.Entity({
+    name: "Series Destination",
+  });
+  const sourceSeries = await fixtures.BottleSeries({
+    brandId: sourceEntity.id,
+    name: "Cask Range",
+  });
+  const destinationSeries = await fixtures.BottleSeries({
+    brandId: destinationEntity.id,
+    name: "Cask Range",
+  });
+  const source = await fixtures.Bottle({
+    brandId: sourceEntity.id,
+    seriesId: sourceSeries.id,
+    name: "Single Cask",
+    vintageYear: 2010,
+  });
+  const destination = await fixtures.Bottle({
+    brandId: destinationEntity.id,
+    seriesId: destinationSeries.id,
+    name: "Single Cask",
+    vintageYear: 2010,
+  });
+
+  await mergeEntity({
+    fromEntityIds: [sourceEntity.id],
+    toEntityId: destinationEntity.id,
+  });
+
+  expect(
+    await db.query.bottles.findFirst({ where: eq(bottles.id, source.id) }),
+  ).toBeUndefined();
+  expect(
+    await db.query.bottles.findFirst({
+      where: eq(bottles.id, destination.id),
+    }),
+  ).toMatchObject({ seriesId: destinationSeries.id, vintageYear: 2010 });
+});
+
+test.for([
+  {
+    field: "vintage",
+    source: { vintageYear: 2010 },
+    destination: { vintageYear: 2012 },
+  },
+  {
+    field: "stated age",
+    source: { statedAge: 12 },
+    destination: { statedAge: 18 },
+  },
+  {
+    field: "cask number",
+    source: { caskNumber: "42" },
+    destination: { caskNumber: "43" },
+  },
+])(
+  "moves a same-named Bottle with a different $field without merging",
+  async (
+    { source: sourceRelease, destination: destinationRelease },
+    { fixtures },
+  ) => {
+    const sourceEntity = await fixtures.Entity({ name: "Release Source" });
+    const destinationEntity = await fixtures.Entity({
+      name: "Release Destination",
+    });
+    const source = await fixtures.Bottle({
+      brandId: sourceEntity.id,
+      name: "Single Cask",
+      ...sourceRelease,
+    });
+    const destination = await fixtures.Bottle({
+      brandId: destinationEntity.id,
+      name: "Single Cask",
+      ...destinationRelease,
+    });
+
+    await mergeEntity({
+      fromEntityIds: [sourceEntity.id],
+      toEntityId: destinationEntity.id,
+    });
+
+    expect(
+      await db.query.bottles.findFirst({ where: eq(bottles.id, source.id) }),
+    ).toMatchObject({
+      brandId: destinationEntity.id,
+      fullName: "Release Destination Single Cask",
+      ...sourceRelease,
+    });
+    expect(
+      await db.query.bottles.findFirst({
+        where: eq(bottles.id, destination.id),
+      }),
+    ).toMatchObject({
+      brandId: destinationEntity.id,
+      fullName: "Release Destination Single Cask",
+      ...destinationRelease,
+    });
+  },
+);
 
 test("preflights exact batch duplicates from BottleGroup authority", async ({
   defaults,

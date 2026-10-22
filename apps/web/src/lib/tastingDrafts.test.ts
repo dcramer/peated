@@ -36,6 +36,7 @@ const bottle: Bottle = {
     shortName: null,
     pronunciation: null,
     pronunciationIpa: null,
+    pronunciationAudioUrl: null,
     kind: "brand",
     status: null,
     ownerId: null,

@@ -66,6 +66,7 @@ describe("createWhiskyLabelExtractor", () => {
           }),
         },
       }),
+      undefined,
     );
     expect(extraction).toMatchObject({
       result: null,
@@ -90,6 +91,26 @@ describe("createWhiskyLabelExtractor", () => {
       }),
     );
     expect(extraction.durationMs).toBeGreaterThanOrEqual(0);
+  });
+
+  test("passes a stop signal to the provider request", async () => {
+    const create = vi.fn().mockResolvedValue({
+      id: "resp_123",
+      model: "gpt-5.6-luna",
+      output_text: JSON.stringify({ result: null, rawLabelText: null }),
+    });
+    const extractor = createWhiskyLabelExtractor({
+      client: { responses: { create } } satisfies WhiskyLabelClient,
+      model: "gpt-5.4",
+    });
+    const signal = new AbortController().signal;
+
+    await extractor.extractFromImageWithMetadata(
+      "data:image/jpeg;base64,dGVzdA==",
+      { signal },
+    );
+
+    expect(create).toHaveBeenCalledWith(expect.any(Object), { signal });
   });
 
   test("keeps the label reading when the release date is incomplete", async () => {

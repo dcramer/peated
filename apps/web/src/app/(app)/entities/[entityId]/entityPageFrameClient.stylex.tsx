@@ -21,6 +21,7 @@ import useEntityFollowing from "@peated/web/hooks/useEntityFollowing";
 import { getEntityBottleCreateHref } from "@peated/web/lib/entityBottleCreateHref";
 import { logTelemetryError } from "@peated/web/lib/log";
 import { useORPC } from "@peated/web/lib/orpc/context";
+import { serverDataQueryOptions } from "@peated/web/lib/orpc/query";
 import { getEntityUrl } from "@peated/web/lib/urls";
 import { space } from "../../../../styles/tokens.stylex";
 
@@ -174,12 +175,14 @@ export function EntityPageFrameClient({
 }) {
   const orpc = useORPC();
   const pathname = usePathname();
-  const entityQuery = useQuery({
-    ...orpc.entities.details.queryOptions({
-      input: { entity: initialEntity.id },
-    }),
-    initialData: initialEntity,
-  });
+  const entityQuery = useQuery(
+    serverDataQueryOptions(
+      orpc.entities.details.queryOptions({
+        input: { entity: initialEntity.id },
+      }),
+      initialEntity,
+    ),
+  );
 
   if (entityQuery.error) {
     return (

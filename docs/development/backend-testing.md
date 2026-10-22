@@ -134,3 +134,18 @@ test before opening a PR.
 services are published on different host ports, add an untracked
 `apps/server/.env.test.local` to override `DATABASE_URL` and `REDIS_URL` for
 local test runs.
+
+Worktrees on different branches share `test_peated` by default, so one branch's
+migrations can break another's test run. To give a worktree its own database,
+set a different database name in that worktree's `apps/server/.env.test.local`:
+
+```shell
+DATABASE_URL=postgresql://postgres:postgres@localhost:15432/test_peated_drafts
+```
+
+Test setup creates and migrates the database if it does not exist. Use
+lowercase letters, digits, and underscores in the name.
+
+Values set in your shell win over both files, and `.env.test.local` wins over
+`.env.test`. The `test`, `test:watch`, `test:ci`, and `evals` scripts load the
+files in that order.

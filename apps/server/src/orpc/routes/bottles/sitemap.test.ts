@@ -19,16 +19,46 @@ describe("GET /bottles/sitemap", () => {
 
     const { results } = await routerClient.bottles.sitemap({ page: 1 });
 
+    expect(results.map(({ id }) => id)).toEqual([first.id, replacement.id]);
+  });
+
+  test("returns the fields used for the Bottle display name", async ({
+    fixtures,
+  }) => {
+    const brand = await fixtures.Entity({
+      name: "Sitemap Distillery",
+      shortName: "Sitemap",
+    });
+    const series = await fixtures.BottleSeries({
+      brandId: brand.id,
+      name: "Committee Release",
+    });
+    const bottle = await fixtures.Bottle({
+      brandId: brand.id,
+      seriesId: series.id,
+      name: "Supernova",
+      edition: "SN2019",
+      statedAge: 12,
+      abv: 53.8,
+    });
+
+    const { results } = await routerClient.bottles.sitemap({ page: 1 });
+
     expect(results).toEqual([
       {
-        id: first.id,
-        fullName: first.fullName,
-        updatedAt: first.updatedAt.toISOString(),
-      },
-      {
-        id: replacement.id,
-        fullName: replacement.fullName,
-        updatedAt: replacement.updatedAt.toISOString(),
+        id: bottle.id,
+        name: bottle.name,
+        edition: "SN2019",
+        statedAge: 12,
+        vintageYear: null,
+        releaseYear: null,
+        abv: 53.8,
+        singleCask: bottle.singleCask,
+        caskStrength: bottle.caskStrength,
+        brand: { name: "Sitemap Distillery", shortName: "Sitemap" },
+        series: { name: "Committee Release" },
+        group: { name: expect.any(String) },
+        updatedAt: bottle.updatedAt.toISOString(),
       },
     ]);
   });

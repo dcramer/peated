@@ -13,6 +13,10 @@ import {
   users,
 } from "@peated/server/db/schema";
 import type { ChangeData } from "@peated/server/db/schema/changes";
+import {
+  bottleDisplayNameColumns,
+  toBottleDisplayNameSource,
+} from "@peated/server/lib/bottleDisplayNameColumns";
 import { absoluteUrl } from "@peated/server/lib/urls";
 import {
   AdminContentItemSchema,
@@ -99,7 +103,7 @@ export async function listAdminContent(
         review: memberReviews,
         bottleId: bottles.id,
         bottleFullName: bottles.fullName,
-        bottleAbv: bottles.abv,
+        bottle: bottleDisplayNameColumns,
         memberId: users.id,
         memberUsername: users.username,
         memberPrivate: users.private,
@@ -123,7 +127,7 @@ export async function listAdminContent(
         bottle: {
           id: row.bottleId,
           fullName: row.bottleFullName,
-          abv: row.bottleAbv,
+          ...toBottleDisplayNameSource(row.bottle),
         },
         member: {
           id: row.memberId,
@@ -164,7 +168,7 @@ export async function listAdminContent(
         tasting: tastings,
         bottleId: bottles.id,
         bottleFullName: bottles.fullName,
-        bottleAbv: bottles.abv,
+        bottle: bottleDisplayNameColumns,
         memberId: users.id,
         memberUsername: users.username,
         memberPrivate: users.private,
@@ -186,7 +190,7 @@ export async function listAdminContent(
         bottle: {
           id: row.bottleId,
           fullName: row.bottleFullName,
-          abv: row.bottleAbv,
+          ...toBottleDisplayNameSource(row.bottle),
         },
         member: {
           id: row.memberId,
@@ -227,7 +231,7 @@ export async function listAdminContent(
       article: externalReviewArticles,
       bottleId: bottles.id,
       bottleFullName: bottles.fullName,
-      bottleAbv: bottles.abv,
+      bottle: bottleDisplayNameColumns,
       siteId: externalSites.id,
       siteName: externalSites.name,
       siteKey: externalSites.type,
@@ -262,11 +266,11 @@ export async function listAdminContent(
       id: row.review.id,
       name: row.review.name,
       bottle:
-        row.bottleId && row.bottleFullName
+        row.bottleId && row.bottleFullName && row.bottle
           ? {
               id: row.bottleId,
               fullName: row.bottleFullName,
-              abv: row.bottleAbv,
+              ...toBottleDisplayNameSource(row.bottle),
             }
           : null,
       site: { id: row.siteId, name: row.siteName, key: row.siteKey },

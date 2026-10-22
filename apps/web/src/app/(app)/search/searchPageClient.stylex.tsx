@@ -17,6 +17,7 @@ import {
 import {
   getAddBottleHref,
   getPendingImageFromParams,
+  getWrongPhotoMatchFromParams,
   type AddBottleRouteIntent,
 } from "@peated/web/lib/addBottle";
 import { getBottleUrl } from "@peated/web/lib/urls";
@@ -126,6 +127,7 @@ export function SearchPageClient({
   const bottleSelection = Boolean(intent) || directToTasting;
   const databaseSearch = !memberSearch && !bottleSelection;
   const pendingImage = getPendingImageFromParams(searchParams);
+  const wrongPhotoMatchId = getWrongPhotoMatchFromParams(searchParams);
   const initialScope: SearchScope = memberSearch
     ? "members"
     : bottleSelection
@@ -147,6 +149,7 @@ export function SearchPageClient({
           intent,
           pendingImageId: pendingImage?.id,
           pendingImageUrl: pendingImage?.imageUrl,
+          wrongPhotoMatchId,
         });
       }
       if (directToTasting) {
@@ -154,7 +157,13 @@ export function SearchPageClient({
       }
       return getBottleUrl(bottle);
     },
-    [directToTasting, intent, pendingImage?.id, pendingImage?.imageUrl],
+    [
+      directToTasting,
+      intent,
+      pendingImage?.id,
+      pendingImage?.imageUrl,
+      wrongPhotoMatchId,
+    ],
   );
 
   const getContributionHref = useCallback(
@@ -163,8 +172,9 @@ export function SearchPageClient({
         pendingImage,
         query: nextQuery,
         returnAction: createReturnAction,
+        wrongPhotoMatchId,
       }),
-    [createReturnAction, pendingImage],
+    [createReturnAction, pendingImage, wrongPhotoMatchId],
   );
 
   function submitSearch(nextQuery: string) {

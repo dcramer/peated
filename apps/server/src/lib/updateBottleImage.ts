@@ -24,8 +24,8 @@ export class BottleImageBottleNotFoundError extends Error {
 }
 
 export class BottleImageForbiddenError extends Error {
-  constructor() {
-    super("You don't have permission to update this bottle.");
+  constructor(message = "You don't have permission to update this bottle.") {
+    super(message);
     this.name = "BottleImageForbiddenError";
   }
 }
@@ -189,6 +189,17 @@ export async function updateBottleImageForUser({
     targetBottle.createdByActorId !== userActor.id
   ) {
     throw new BottleImageForbiddenError();
+  }
+  // Image source and license are moderator-only catalog fields, set by
+  // moderators and our scraping tools. Bottle creators may only upload photos.
+  if (
+    !user.admin &&
+    !user.mod &&
+    (sourceUrl !== undefined || license !== undefined)
+  ) {
+    throw new BottleImageForbiddenError(
+      "Only moderators can set an image source or license.",
+    );
   }
 
   return persistBottleImage({

@@ -1,9 +1,8 @@
 import type { Outputs } from "@peated/server/orpc/router";
-import { getBottleIdentityProps } from "@peated/web/lib/bottleListItem";
 import * as stylex from "@stylexjs/stylex";
 import { foundationStyles } from "../styles/foundations.stylex";
 import { colors, controlMetrics, space } from "../styles/tokens.stylex";
-import { BottleIdentityRow } from "./bottleIdentityRow.stylex";
+import { BottleMatchList } from "./bottleMatchList.stylex";
 import { Button } from "./button.stylex";
 
 export type BottleCreateCandidate =
@@ -89,30 +88,7 @@ export function BottleCreateCandidates({
             If one of these is the same bottle, use it instead of adding
             another.
           </p>
-          <ul {...stylex.props(styles.list)}>
-            {results.map((bottle) => (
-              <li key={bottle.id} {...stylex.props(styles.row)}>
-                <BottleIdentityRow
-                  {...getBottleIdentityProps(bottle, { includeBottler: true })}
-                  end={
-                    <Button
-                      aria-label={`Use this bottle: ${bottle.fullName}`}
-                      onClick={() => onUse(bottle)}
-                      size="sm"
-                      type="button"
-                      variant="tonal"
-                    >
-                      Use this bottle
-                    </Button>
-                  }
-                  imageUrl={bottle.imageUrl}
-                  layout="cell"
-                  variant="search"
-                  verticalPadding="sm"
-                />
-              </li>
-            ))}
-          </ul>
+          <BottleMatchList bottles={results} onUse={onUse} />
         </>
       ) : (
         <p
@@ -157,25 +133,4 @@ const styles = stylex.create({
   },
   instructions: { margin: 0, color: colors.inkMuted },
   status: { minHeight: "20px", margin: 0, color: colors.inkMuted },
-  list: {
-    display: "flex",
-    minWidth: 0,
-    margin: 0,
-    padding: 0,
-    flexDirection: "column",
-    borderTopWidth: "1px",
-    borderTopStyle: "solid",
-    borderTopColor: colors.hairline,
-    borderBottomWidth: "1px",
-    borderBottomStyle: "solid",
-    borderBottomColor: colors.hairline,
-    listStyle: "none",
-  },
-  row: {
-    minWidth: 0,
-    borderBottomWidth: "1px",
-    borderBottomStyle: "solid",
-    borderBottomColor: colors.hairline,
-    ":last-child": { borderBottomWidth: 0 },
-  },
 });

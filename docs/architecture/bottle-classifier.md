@@ -39,16 +39,16 @@ reference identifies.
 Follow the [Whisky Identity Model](./whisky-identity-model.md). Each marketed
 version must be a complete Bottle on its own.
 
-A `create_bottle` result proposes one complete Bottle. `proposedBottle.name` is
-the Bottle's common name without the Brand, following the identity model: it
-keeps the age, vintage, cask number, and strength wording that the product
-title prints, and adds none the title omits. A title that is only the Brand, an
-age, and style words gets a name such as `12-year-old`. An independent
-bottling named for a distillery gets the distillery, then the printed vintage,
-then the printed age, such as `Glenlivet 1968 35-year-old`. A style phrase is
-the name only when nothing else names the Bottle. The server adds an explicit
-edition without repeating it and stores supported facts such as age, ABV, years,
-and cask flags in their fields as well.
+A `create_bottle` result proposes one complete Bottle. `proposedBottle.name`,
+`edition`, and `caskNumber` follow "Bottle Name, Edition, And Cask Number" in
+the [Whisky Identity Model](./whisky-identity-model.md). A title that is only
+the Brand, an age, and style words gets a name such as `12-year-old`. A Bottle
+named for its distillery gets the distillery and printed vintage, such as
+`Glenlivet 1968`, and adds the age only when another Bottle of the same Brand
+has that distillery and vintage. A style phrase is the name only when nothing
+else names the Bottle. A cask number goes in `caskNumber`, never in `edition`.
+The server stores supported facts such as age, ABV, years, and cask flags in
+their fields as well.
 
 `maturation` is the producer's cask statement as one short phrase, at most 120
 characters, following the [Whisky Identity Model](./whisky-identity-model.md).

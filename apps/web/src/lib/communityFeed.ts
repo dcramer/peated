@@ -49,6 +49,7 @@ function tastingFeedItem(tasting: Tasting, id = String(tasting.id)) {
     action: "tasted",
     // Feeds order tastings by when they were posted but show when they were had.
     date: tasting.tastedAt,
+    postedAt: tasting.createdAt,
     href: getTastingUrl(tasting),
     bottles: [
       {
@@ -83,6 +84,7 @@ export function getMemberReviewFeedItems(
     actorImageUrl: review.createdBy.pictureUrl,
     action: "reviewed",
     date: review.createdAt,
+    postedAt: review.createdAt,
     href: getMemberReviewUrl(review),
     bottles: [
       {
@@ -102,6 +104,7 @@ function criticReviewFeedItem(
 ): CommunityFeedItem | null {
   if (!review.bottle) return null;
   const source = review.site?.name ?? review.reviewerName ?? "Critic";
+  const date = review.article.publishedAt ?? review.createdAt;
   return {
     id,
     kind: "critic_review",
@@ -109,7 +112,8 @@ function criticReviewFeedItem(
     actorHref: review.url,
     actorImageUrl: review.site?.imageUrl,
     action: "published a review",
-    date: review.article.publishedAt ?? review.createdAt,
+    date,
+    postedAt: date,
     href: review.url,
     bottles: [
       {
@@ -157,7 +161,9 @@ export function getCommunityFeedItems({
     if (entry.type === "critic_review") {
       const review = entry.review;
       const item = criticReviewFeedItem(review, entry.id);
-      return item ? [{ ...item, date: entry.createdAt }] : [];
+      return item
+        ? [{ ...item, date: entry.createdAt, postedAt: entry.createdAt }]
+        : [];
     }
     const actor = {
       actor: entry.createdBy.username,
@@ -177,6 +183,7 @@ export function getCommunityFeedItems({
           kind: "member_review",
           action: "reviewed",
           date: entry.createdAt,
+          postedAt: entry.createdAt,
           href: getMemberReviewUrl(entry.review),
           bottles: [
             {
@@ -203,6 +210,7 @@ export function getCommunityFeedItems({
         id: entry.id,
         kind: "collection_add",
         date: entry.createdAt,
+        postedAt: entry.createdAt,
         href: entry.collection.href ?? undefined,
         action: `added ${count === 1 ? "a bottle" : `${count} bottles`} to${entry.collection.href ? "" : ` ${destinationLabel}`}`,
         destination: entry.collection.href
@@ -224,7 +232,7 @@ export function getCommunityFeedItems({
     ];
   });
   return [...criticItems, ...memberItems].sort(
-    (left, right) => Date.parse(right.date) - Date.parse(left.date),
+    (left, right) => Date.parse(right.postedAt) - Date.parse(left.postedAt),
   );
 }
 

@@ -97,19 +97,24 @@ Then apply these rules:
   [Who Is The Brand, Series, And Bottler](../architecture/whisky-identity-model.md#who-is-the-brand-series-and-bottler).
   An official Brand or distillery release has no bottler. Do not infer one
   from an owner, importer, distributor, or physical packer.
-- `name` is the common name of the bottle: the expression as the producer's
-  product title, the label, and the trade name it, without the Brand. Keep any
-  age, vintage, cask number, or strength wording that the title or label
-  prints, because that wording is how people know the bottle. Also store those
-  facts in their fields. Do not add age, year, ABV, cask number, outturn, or
-  package text that the producer does not print, and never build a name from
-  fields to make it unique. A generic word such as `Single Malt` is a name
-  only when the marketed name is exactly that. Use `edition` for an explicit
-  marketed release descriptor such as `2022 Edition`, `Batch 24`, or a
-  numbered collection entry. Copy its wording from the producer's product
-  title or visible label. Narrative prose can prove that a code identifies a
-  release, but it cannot add generic words such as `Release`, `Edition`,
-  `Batch`, or `Volume` that the title and label omit.
+- Set `name`, `edition`, and `caskNumber` with the table in
+  [Bottle Name, Edition, And Cask Number](../architecture/whisky-identity-model.md#bottle-name-edition-and-cask-number).
+  `name` is what people call the bottle. A Bottle named for its distillery is
+  the distillery and vintage, such as `Clynelish 1972`; add the age only when
+  the same Brand has another Bottle of that distillery and vintage, and then
+  add it to both. `edition` holds a batch, selection, or market the label
+  prints, such as `Batch 24` or `for La Maison du Whisky`; it shows beside the
+  title, not in it. Every cask number goes in `caskNumber`, never in
+  `edition`. Copy edition wording from the producer's product title or visible
+  label; narrative prose cannot add words such as `Release`, `Edition`,
+  `Batch`, or `Volume`.
+- The API rejects an `edition` that repeats the `caskNumber`, and a name,
+  Brand, Series, edition, vintage, or age change that leaves two Bottles in
+  different groups with the same title and edition but different vintages or
+  ages. Fix the names instead of working around the check. Bottles in one
+  group share a name, so the check does not compare them with each other.
+  Entity and Series merges and Brand repairs move Bottles without the check,
+  so review same-named releases after a merge.
 - The server normalizes `name` on create and update: age wording such as
   `22 Years` or `Aged 7 Years` becomes `22-year-old` or `Aged 7-year-old`, so
   write `7-year-old` rather than `Aged 7 Years`. See
@@ -117,8 +122,8 @@ Then apply these rules:
   before writing names with ages or batch codes.
 - Before changing a name, read the Bottle edit context. A name change is
   shared and updates every Bottle in the group. When a group has more than one
-  member, give each member its own `edition` in the same pass so no sibling
-  is left with a bare shared name.
+  member, give each member its own `edition` in the same pass so every sibling
+  shows a release fact beside the shared title.
 - Store only known date parts. Use `releaseYear`, then `releaseMonth`, then
   `releaseDay`. A month needs a year, and a day needs a month. Do not invent the
   first day of a month. Do not copy a distillation or bottling date into release
@@ -186,6 +191,12 @@ using a similar release.
 - Check the source site's reuse terms. Record the canonical source page in
   `sourceUrl` and the license or reuse terms in `license`. A direct image URL is
   not enough provenance.
+- The producer's own official image of the exact Bottle may be stored even
+  when its site terms grant no reuse license (maintainer decision, October
+  2026). Use a page the producer runs, or a Wayback capture of one, as
+  `sourceUrl`, and name the owner and the missing grant in `license`, such as
+  `© Diageo. Official product image; Diageo site terms grant no reuse
+license.` Retailer, auction, and collector photos still need a reuse grant.
 - Record why no usable image was found when a Bottle remains without one.
 - After upload, fetch and inspect the stored image and confirm its `sourceUrl`
   and `license` survived processing.

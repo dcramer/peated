@@ -97,6 +97,8 @@ const mockUploadImage = Buffer.from(
 const collectionStateByToken = new Map();
 const auctionWatchStateByToken = new Map();
 const pendingUploadStateByToken = new Map();
+const playwrightWrongMatchToken = "playwright-wrong-match-token";
+const playwrightWrongPhotoMatchId = 9001;
 const userModeratorStateByToken = new Map();
 const appliedQueueProposalTokens = new Set();
 const ignoredInconclusiveProposalTokens = new Set();
@@ -732,7 +734,7 @@ async function handleRpcRequest({ request, response, url }) {
           caskStrength: true,
           outturn: 240,
           maturation: "Oloroso hogshead",
-          caskNumber: "#5678",
+          caskNumber: "5678",
         };
         sendRpcResponse(response, bottle);
         return true;
@@ -1326,12 +1328,12 @@ async function handleRpcRequest({ request, response, url }) {
       }
 
       if (getAccessToken(request).includes("photo-create-warning")) {
-        sendRpcResponse(response, buildCreateProposalPhotoIdentification());
+        sendRpcPhotoStream(response, buildCreateProposalPhotoIdentification());
         return true;
       }
 
       if (getAccessToken(request).includes("photo-create-existing")) {
-        sendRpcResponse(
+        sendRpcPhotoStream(
           response,
           buildCreateProposalPhotoIdentification(),
           "77777777777777777777777777777777",
@@ -1340,7 +1342,7 @@ async function handleRpcRequest({ request, response, url }) {
       }
 
       if (getAccessToken(request).includes("photo-create-unsuitable")) {
-        sendRpcResponse(
+        sendRpcPhotoStream(
           response,
           buildCreateProposalPhotoIdentification({
             suitableAsBottleImage: false,
@@ -1351,7 +1353,7 @@ async function handleRpcRequest({ request, response, url }) {
       }
 
       if (getAccessToken(request).includes("photo-create-complete-bottle")) {
-        sendRpcResponse(
+        sendRpcPhotoStream(
           response,
           buildCreateProposalPhotoIdentification({
             includeExactBottleDetails: true,
@@ -1362,7 +1364,7 @@ async function handleRpcRequest({ request, response, url }) {
       }
 
       if (getAccessToken(request).includes("photo-create-prefilled-bottle")) {
-        sendRpcResponse(
+        sendRpcPhotoStream(
           response,
           buildCreateProposalPhotoIdentification({
             includeExactBottleDetails: true,
@@ -1375,7 +1377,7 @@ async function handleRpcRequest({ request, response, url }) {
       if (
         getAccessToken(request).includes("photo-create-bottle-default-image")
       ) {
-        sendRpcResponse(
+        sendRpcPhotoStream(
           response,
           buildCreateProposalPhotoIdentification(),
           "44444444444444444444444444444444",
@@ -1384,7 +1386,7 @@ async function handleRpcRequest({ request, response, url }) {
       }
 
       if (getAccessToken(request).includes("photo-no-match")) {
-        sendRpcResponse(
+        sendRpcPhotoStream(
           response,
           buildNoMatchPhotoIdentification(),
           "55555555555555555555555555555555",
@@ -1393,7 +1395,7 @@ async function handleRpcRequest({ request, response, url }) {
       }
 
       if (getAccessToken(request).includes("photo-manual-match")) {
-        sendRpcResponse(
+        sendRpcPhotoStream(
           response,
           buildManualSearchMatchPhotoIdentification(),
           "413c334005c60d8dcc8dbf109761c5e3",
@@ -1402,7 +1404,7 @@ async function handleRpcRequest({ request, response, url }) {
       }
 
       if (getAccessToken(request).includes("photo-needs-review")) {
-        sendRpcResponse(
+        sendRpcPhotoStream(
           response,
           buildManualReviewPhotoIdentification(),
           "66666666666666666666666666666666",
@@ -1410,7 +1412,7 @@ async function handleRpcRequest({ request, response, url }) {
         return true;
       }
 
-      sendRpcResponse(
+      sendRpcPhotoStream(
         response,
         {
           pendingImage: {
@@ -1493,9 +1495,29 @@ async function handleRpcRequest({ request, response, url }) {
               reason: "Matched the fixture bottle.",
             },
           },
+          wrongMatchToken: playwrightWrongMatchToken,
         },
         "11111111111111111111111111111111",
+        // Peated's likely matches: the one it picks, plus one other.
+        [existingBottle, exactSearchBottle],
       );
+      return true;
+    case "wrongPhotoMatches/create":
+      if (input?.token !== playwrightWrongMatchToken) {
+        sendRpcError(response, "Unexpected wrong photo match token.");
+        return true;
+      }
+      sendRpcResponse(response, { id: playwrightWrongPhotoMatchId });
+      return true;
+    case "wrongPhotoMatches/update":
+      if (input?.wrongPhotoMatch !== playwrightWrongPhotoMatchId) {
+        sendRpcError(response, "Unexpected wrong photo match.");
+        return true;
+      }
+      sendRpcResponse(response, {
+        id: playwrightWrongPhotoMatchId,
+        withdrawn: false,
+      });
       return true;
     case "tastings/photoIdentificationCreate":
       sendRpcResponse(
@@ -2310,7 +2332,7 @@ function buildDirectBottleQueueProposal() {
       vintageYear: 2008,
       releaseYear: 2025,
       maturation: "Oloroso hogshead",
-      caskNumber: "#5678",
+      caskNumber: "5678",
       outturn: 240,
     },
     price: {
@@ -2382,7 +2404,7 @@ function isExpectedDirectBottleQueueCreateInput(input) {
     bottle?.releaseYear === 2025 &&
     bottle?.maturation === "Oloroso hogshead" &&
     bottle?.outturn === 240 &&
-    bottle?.caskNumber === "#5678" &&
+    bottle?.caskNumber === "5678" &&
     bottle?.description === null &&
     bottle?.descriptionSrc === null &&
     bottle?.tastingNotes == null &&
@@ -2415,7 +2437,7 @@ function isExpectedOrdinaryExactBottleCreateInput(input) {
     input?.caskStrength === true &&
     input?.outturn === 240 &&
     input?.maturation === "Oloroso hogshead" &&
-    input?.caskNumber === "#5678"
+    input?.caskNumber === "5678"
   );
 }
 
@@ -3018,6 +3040,38 @@ function sendRpcResponse(response, data, sentryTraceId = null) {
   };
   if (sentryTraceId) headers["x-sentry-trace-id"] = sentryTraceId;
   response.writeHead(200, headers).end(JSON.stringify({ json: data }));
+}
+
+/**
+ * Photo identification streams progress as server-sent events: the stored
+ * photo, the label reading, any likely matches, then the full result as the
+ * final `done` event.
+ */
+function sendRpcPhotoStream(
+  response,
+  result,
+  sentryTraceId = null,
+  likelyMatches = [],
+) {
+  const headers = {
+    ...corsHeaders,
+    "Content-Type": "text/event-stream",
+    "Cache-Control": "no-cache",
+  };
+  if (sentryTraceId) headers["x-sentry-trace-id"] = sentryTraceId;
+  const event = (name, data) =>
+    `event: ${name}\ndata: ${JSON.stringify({ json: data })}\n\n`;
+  response.writeHead(200, headers).end(
+    event("message", { type: "photo", pendingImage: result.pendingImage }) +
+      event("message", {
+        type: "label",
+        imageEvidence: result.imageEvidence,
+      }) +
+      (likelyMatches.length
+        ? event("message", { type: "candidates", bottles: likelyMatches })
+        : "") +
+      event("done", result),
+  );
 }
 
 function sendRpcError(response, message) {

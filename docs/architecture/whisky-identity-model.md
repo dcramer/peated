@@ -159,10 +159,10 @@ product evidence shows the assignment is wrong. Leave `bottler` null when
 classifying a product whose evidence does not establish the relationship.
 
 Observation-only facts by default include bottle number, non-marketed
-production lot codes, retailer-exclusive wording, and label notes. Store a
-producer-stated cask identifier, maturation statement, or outturn on the Bottle.
-Use the cask identifier for identity only when it is part of the marketed
-release.
+production lot codes, retailer-exclusive wording that the label does not
+print, and label notes. Store a producer-stated cask identifier, maturation
+statement, or outturn on the Bottle. Use the cask identifier for identity only
+when it is part of the marketed release.
 
 A fact about one component of a blend does not become a field on the complete
 Bottle. Set the Bottle's age, year, ABV, or other exact trait only when evidence
@@ -211,6 +211,13 @@ consumer rows, assigned references, release-promotion mappings, and tombstones
 converge on that Bottle in one canonical operation. BottleGroup is never the
 merge destination and a representative Bottle is never selected implicitly.
 
+An Entity merge that changes a Bottle's brand runs this merge only when the
+destination brand already has a Bottle with the same full structured identity:
+full name, Series, edition, age, vintage, bottling and release dates, ABV,
+single cask, cask strength, cask number, and outturn. A Bottle with the same
+name but different release fields moves to the destination brand as its own
+Bottle.
+
 ## BottleGroup Versus BottleSeries
 
 BottleGroup membership means “marketed releases of the same expression.”
@@ -241,6 +248,24 @@ International Phonetic Alphabet (IPA), without slashes, such as `ɡlɛn ˈɡɪə
 Both are optional, and the Entity schema checks their format. Generated details
 fill only empty values and drop values in the wrong format.
 
+`pronunciationAudioUrl` is an MP3 that reads the IPA aloud. Clients cannot set
+it. The `GenerateEntityPronunciationAudio` worker job makes it once with Google
+Cloud Text-to-Speech, using one British English voice and the IPA in an SSML
+`<phoneme>` tag. The file name holds the Entity ID and a hash of the voice and
+IPA, so the same IPA never makes new audio, and a changed IPA or voice gets a
+new file. The job runs after each Entity change and after generated details add
+IPA. It saves the new URL with a Peated system change, then deletes the old
+file. When the IPA is cleared, or the Entity is deleted or merged away, the
+file is deleted too. Because a URL never changes meaning, the API serves these
+files with a one-year `immutable` cache.
+
+Audio needs `GCP_CREDENTIALS` and the Cloud Text-to-Speech API enabled on that
+Google Cloud project. Without credentials the job does nothing. To fill missing
+or outdated audio, POST `/admin/catalog/rebuild-pronunciation-audio` with
+`{"afterId":0}` through the authenticated API client, and repeat with each
+returned `nextAfterId` until it is null. Each call checks up to 500 Entities and
+queues only those whose audio is missing or does not match their IPA.
+
 Peated keeps references for the Entity name, short name, and the name without a
 leading “The.” A moderator can add more references. Adding or deleting an alias
 does not change these references. The same alias can belong to more than one
@@ -254,38 +279,8 @@ Entity.
 - `series` is a named range that the Brand markets for its own products, not
   a batch code, a release year, or a customer's program name. See "Who Is
   The Brand, Series, And Bottler" below.
-- `edition` is the exact human-facing release descriptor shown in the
-  producer's product title or on the label, such as `Batch 24`, `2024 Release`,
-  or `S2B13`. Preserve descriptor words that appear there. Narrative prose can
-  confirm that a code identifies a marketed release, but it cannot add a word
-  to the edition. If the title and label show `4.2` while prose calls it
-  "release 4.2," store `4.2`. A printed batch or lot code is not an edition
-  when the producer sells one ongoing product without batch-specific
-  marketing.
-- Bottle names combine the common name of the bottle with an explicit marketed
-  edition. The common name is the expression as the producer's title, the
-  label, and the trade name it, without the Brand. It keeps printed age,
-  vintage, cask number, or strength wording, because that wording is how
-  people recognize the bottle: `22-year-old`, `Single Cask 2014 No.1841
-7-year-old`, `1986 30-year-old`. Age, vintage year, bottling year, release
-  year, ABV, cask strength, cask number, and outturn are always stored as
-  structured facts as well. Never generate a name suffix from those fields to
-  make a Bottle look unique, and do not use a generic category word such as
-  `Single Malt` as the name unless the marketed name is exactly that.
-- For a uniform multi-distillery label with no separate expression name, such
-  as an independent bottler's single cask, use the featured distillery as the
-  Bottle name, followed by the vintage and then the age the label prints:
-  `Glenury Royal 1970 55-year-old` for the Rare Series release and
-  `Glenlivet 1968 35-year-old` for a Duncan Taylor cask. Retailers, auction
-  houses, and Whiskybase name these bottles the same way, and the vintage is
-  often what tells two casks of the same age apart. Write the year alone,
-  without the word `vintage`, unless the producer's title uses `Vintage` as
-  part of the name.
-  Include only a vintage or age that the label prints; a source title that
-  omits one does not remove it from the label, and a stored field does not add
-  it. Store the age, vintage, release year, and ABV in their fields as well,
-  put a printed cask number in `edition`, and leave release year and ABV out
-  of the name.
+- `name`, `edition`, and `caskNumber` follow "Bottle Name, Edition, And Cask
+  Number" below.
 - `vintageYear` is the distillation year. `bottlingYear` is the year the whisky
   was bottled. `releaseYear` is the known year the marketed release became
   available. Store `releaseMonth` and `releaseDay` only when the source gives
@@ -300,6 +295,79 @@ Entity.
   independently proves a separate marketed release; creation still requires
   release evidence, and uncertain values remain unknown.
 - Do not infer `statedAge` from year fields unless the source states the age.
+
+### Bottle Name, Edition, And Cask Number
+
+This section is the only statement of the Bottle naming rule. The classifier
+prompt, Catalog Maintenance, and the catalog skill point here instead of
+restating it.
+
+| Field        | Holds                                                                         | Shown                      |
+| ------------ | ----------------------------------------------------------------------------- | -------------------------- |
+| `name`       | What people call the bottle, without the Brand.                               | In the title               |
+| `edition`    | A release fact that is not part of that name: a batch, a selection, a market. | As a fact beside the title |
+| `caskNumber` | Every printed cask or barrel identifier, including the SMWS code.             | As a fact beside the title |
+
+**`name`** is the common name of the bottle: the expression as the producer's
+title, the label, and the trade name it.
+
+- Keep printed age, vintage, and strength wording that is part of that name:
+  `12-year-old`, `1986 30-year-old`, `Barrel Proof`.
+- Keep a release name that people use as the title, such as
+  `Chapter Thirty Two`, `Act 12 Scene 9`, `4th Release`, or `2017 Release`
+  when the producer markets annual releases by year. Keep a marketed cask
+  name, such as `Leo` or `Wasted Degrees`.
+- Do not put a cask number, batch code, selection, ABV, or outturn in the name.
+  The one exception is an SMWS Bottle, named
+  `<distillery number>.<cask number> <subtitle>` (see "Matching And
+  Canonicalization").
+- Do not use a generic category phrase such as `Single Malt` as the name unless
+  the marketed name is exactly that.
+
+A Bottle named for its distillery, such as an independent bottler's single
+cask or an owner's collection release, uses the distillery name, then the
+vintage: `Clynelish 1972`, `BenRiach 1966`. Add the age after the vintage only
+when another Bottle of the same Brand has the same distillery and vintage, and
+then give each of those Bottles its age: Rare Malts Selection
+`Clynelish 1972 22-year-old` and `Clynelish 1972 24-year-old`. With no
+printed vintage, use the age: `Clynelish 21-year-old`. Write the year without
+the word `vintage` unless the producer's title uses `Vintage` as part of the
+name. Whiskybase titles these bottles the same way and keeps the age, cask,
+and selection in separate fields.
+
+A vintage in an expression name follows the printed title. When the label
+prints the vintage apart from the title, put the year after the expression:
+`Peat Smoke 2008`, `Cask Strength 2012`, not `2008 Peat Smoke`.
+
+Use only a vintage or age that the label prints, including a `Distilled 1972`
+line. A source title that omits it does not remove it, and a stored field
+alone does not add it.
+
+**`edition`** is a release fact as the producer's title or label prints it:
+`Batch 24`, `Batch 22/030`, `S2B13`, `for La Maison du Whisky`,
+`K&L Exclusive`. Preserve the printed words. Narrative prose can confirm that
+a code identifies a marketed release, but it cannot add a word to the edition:
+when the title and label show `4.2` and prose calls it "release 4.2," store
+`4.2`.
+A printed batch or lot code is not an edition when the producer sells one
+ongoing product without batch-specific marketing. A selection that only a
+retailer listing states, and the label does not, is source evidence, not an
+edition.
+
+**`caskNumber`** holds a printed cask or barrel identifier without words such
+as `Cask No.` or `Barrel No.`: `14300`, `3448+3450`, or the SMWS code `1.302`.
+Never put it in `edition`.
+
+Age, vintage year, bottling year, release year, ABV, cask strength, cask
+number, edition, and outturn are always stored in their fields. Do not
+generate a name suffix from those fields to make a Bottle look unique; the
+age added under the same-vintage rule above is printed label wording, not a
+generated suffix.
+
+The stored `Bottle.name` and `fullName` still append the edition (see "Core
+Invariants"); exact matching, merges, and references depend on that key.
+People see the title from `formatBottleDisplayName`, which leaves the edition
+out (see [Bottle Presentation](../features/bottle-presentation.md)).
 
 ### Who Is The Brand, Series, And Bottler
 
@@ -326,7 +394,7 @@ distillery. Brand answers one question only: the name people buy under.
 3. **An owner's collection across its distilleries.** When one owner markets
    a named collection whose releases come from more than one of its
    distilleries, the collection is the Brand, the distillery is the Bottle
-   name and the distiller, the release descriptor is the `edition`, and there
+   name and the distiller, a release fact goes in `edition`, and there
    is no bottler. This holds even when the distillery is also a consumer
    brand on its own: Prima & Ultima Talisker 1988 has Brand Prima & Ultima,
    name `Talisker 1988`, and distiller Talisker. Rare Malts Selection,
@@ -339,11 +407,12 @@ distillery. Brand answers one question only: the name people buy under.
 4. **An independent bottler's label.** When a business other than the
    producer selects whisky and releases it under its own label, that label is
    the Brand, the business is the `bottler`, the distillery is the Bottle
-   name and the distiller, and the bottler's number or code is the `edition`.
-   The bottler's own ranges are Series under that Brand. The Scotch Malt
-   Whisky Society, The Heart Cut, Gordon & MacPhail, Old Particular, and The
-   Ghost Series follow this rule. A bottler Entity may be owned by a company
-   Entity.
+   name and the distiller, the cask number is `caskNumber`, and a batch
+   code or a selection the label prints (`for La Maison du Whisky`) is the
+   `edition`. The bottler's own ranges are Series under that Brand. The
+   Scotch Malt Whisky Society, The Heart Cut, Gordon & MacPhail, Old
+   Particular, and The Ghost Series follow this rule. A bottler Entity may be
+   owned by a company Entity.
 5. **A selection of an official bottling.** When a retailer, importer,
    distributor, festival, bar, hotel, or private buyer selects a cask or
    batch that the producer bottles under the producer's label, the Brand

@@ -262,6 +262,7 @@ export const RowLayouts: Story = {
                 action: "published a review",
                 kind: "critic_review",
                 date: "2026-08-24T12:00:00.000Z",
+                postedAt: "2026-08-24T12:00:00.000Z",
                 id: "review",
                 bottles: [
                   {
@@ -277,6 +278,7 @@ export const RowLayouts: Story = {
                 action: "tasted",
                 kind: "tasting",
                 date: "2026-08-24T12:00:00.000Z",
+                postedAt: "2026-08-24T12:00:00.000Z",
                 id: "tasting",
                 bottles: [
                   {

@@ -129,11 +129,41 @@ describe("POST /bottles/:bottle/image", () => {
     expect(metadata.width).toBeLessThanOrEqual(1024);
   });
 
-  test("updates the source and license without replacing the image", async ({
+  test("bottle creator cannot set the source or license", async ({
     fixtures,
     defaults,
   }) => {
     const actor = await getUserActor(defaults.user);
+    const bottle = await fixtures.Bottle({
+      createdByActorId: actor.id,
+    });
+
+    const err = await waitError(
+      routerClient.bottles.imageUpdate(
+        {
+          bottle: bottle.id,
+          file: await fixtures.SampleSquareImage(),
+          sourceUrl: "https://example.com/bottle-photo",
+          license: "CC BY 4.0",
+        },
+        { context: { user: defaults.user } },
+      ),
+    );
+    expect(err).toMatchInlineSnapshot(
+      `[Error: Only moderators can set an image source or license.]`,
+    );
+    await expect(
+      db.query.bottleImages.findFirst({
+        where: eq(bottleImages.bottleId, bottle.id),
+      }),
+    ).resolves.toBeUndefined();
+  });
+
+  test("updates the source and license without replacing the image", async ({
+    fixtures,
+  }) => {
+    const user = await fixtures.User({ mod: true });
+    const actor = await getUserActor(user);
     const bottle = await fixtures.Bottle({
       createdByActorId: actor.id,
       imageUrl: "https://example.com/current-photo.jpg",
@@ -154,7 +184,7 @@ describe("POST /bottles/:bottle/image", () => {
         sourceUrl: "https://example.com/current-photo",
         license: "Used with permission",
       },
-      { context: { user: defaults.user } },
+      { context: { user } },
     );
 
     expect(response).toMatchObject({
@@ -174,7 +204,7 @@ describe("POST /bottles/:bottle/image", () => {
 
     const clearedLicense = await routerClient.bottles.imageUpdate(
       { bottle: bottle.id, license: null },
-      { context: { user: defaults.user } },
+      { context: { user } },
     );
     expect(clearedLicense).toMatchObject({
       sourceUrl: "https://example.com/current-photo",

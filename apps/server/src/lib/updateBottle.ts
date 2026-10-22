@@ -9,7 +9,6 @@ import {
   bottleNameDuplicatesBrand,
   normalizeBottleAge,
   normalizeBottleReferenceKey,
-  stripDuplicateBrandPrefixFromBottleName,
 } from "@peated/bottle-classifier/normalize";
 import type { CatalogVerificationCreationSource } from "@peated/catalog-verifier";
 import { db, type AnyTransaction } from "@peated/server/db";
@@ -39,8 +38,14 @@ import { processSeries } from "@peated/server/lib/bottleHelpers";
 import {
   getBottleExactIdentity,
   getBottleExactStatedAge,
+  getBottleGroupNameForBrand,
   materializeBottleForGroup,
 } from "@peated/server/lib/bottleIdentity";
+import {
+  findBottleWithSameTitle,
+  formatSameTitleProblem,
+  getEditionCaskNumberProblem,
+} from "@peated/server/lib/bottleNamingRules";
 import { isValidReleaseDate } from "@peated/server/lib/bottleRelease";
 import {
   BottlePatchSchema,
@@ -58,7 +63,6 @@ import {
   getBottleEntityLinks,
   updateEntityBottleCounts,
 } from "@peated/server/lib/entityBottleCounts";
-import { formatBottleName } from "@peated/server/lib/format";
 import {
   getBottleProductionLocations,
   updateLocationBottleCounts,
@@ -858,7 +862,8 @@ async function resolveStableState(
     name = normalized.name;
     if (patch.statedAge === undefined) statedAge = normalized.statedAge;
   }
-  name = stripDuplicateBrandPrefixFromBottleName(name, brand.name);
+  const brandedName = getBottleGroupNameForBrand({ name, brand });
+  name = brandedName.name;
   if (!name || bottleNameDuplicatesBrand(name, brand.name)) {
     throw new BottleUpdateInputError(
       "Bottle name must identify an expression distinct from the brand.",
@@ -1000,9 +1005,7 @@ async function resolveStableState(
 
   return {
     name,
-    fullName: formatBottleName({
-      name: `${brand.shortName || brand.name} ${name}`,
-    }),
+    fullName: brandedName.fullName,
     statedAge,
     brandId: brand.id,
     bottlerId: bottler?.id ?? null,
@@ -1013,6 +1016,75 @@ async function resolveStableState(
     bottler,
     distillerIds: normalizedDistillerIds,
   };
+}
+
+/**
+ * Whisky Identity Model, "Bottle Name, Edition, And Cask Number". Runs only
+ * when an edit touches the checked fields, so unrelated edits to existing
+ * records are not blocked.
+ */
+async function assertBottleNamingRules(
+  tx: AnyTransaction,
+  {
+    group,
+    stable,
+    lockedBottle,
+    selectedDesired,
+    affectedMembers,
+    desiredByBottleId,
+  }: {
+    group: BottleGroup;
+    stable: StableState;
+    lockedBottle: Bottle;
+    selectedDesired: DesiredBottle;
+    affectedMembers: Bottle[];
+    desiredByBottleId: Map<number, DesiredBottle>;
+  },
+) {
+  if (
+    lockedBottle.edition !== (selectedDesired.edition ?? null) ||
+    lockedBottle.caskNumber !== (selectedDesired.caskNumber ?? null)
+  ) {
+    const editionProblem = getEditionCaskNumberProblem(selectedDesired);
+    if (editionProblem) throw new BottleUpdateInputError(editionProblem);
+  }
+
+  const titleChanged =
+    group.fullName.toLocaleLowerCase() !==
+      stable.fullName.toLocaleLowerCase() ||
+    group.brandId !== stable.brandId ||
+    group.seriesId !== stable.seriesId;
+  const checkedMembers = affectedMembers.filter((member) => {
+    const desired = desiredByBottleId.get(member.id)!;
+    return (
+      titleChanged ||
+      member.edition !== (desired.edition ?? null) ||
+      member.vintageYear !== (desired.vintageYear ?? null) ||
+      member.statedAge !== (desired.statedAge ?? null)
+    );
+  });
+  for (const member of checkedMembers) {
+    const desired = desiredByBottleId.get(member.id)!;
+    const conflict = await findBottleWithSameTitle(
+      tx,
+      {
+        brandId: stable.brandId,
+        seriesId: stable.seriesId,
+        titleFullName: stable.fullName,
+        edition: desired.edition ?? null,
+        vintageYear: desired.vintageYear ?? null,
+        statedAge: desired.statedAge ?? null,
+      },
+      // Group members share one name, so a rename cannot tell them apart
+      // and their facts show beside the title. Compare only other groups.
+      group.id,
+    );
+    if (conflict) {
+      throw new BottleUpdateInputError(
+        formatSameTitleProblem(stable.fullName, conflict),
+      );
+    }
+  }
 }
 
 function stableDiff(group: BottleGroup, stable: StableState) {
@@ -1136,6 +1208,7 @@ export async function updateBottleInTransaction(
     actorId,
     creationSource,
     invalidateGeneratedDetails = true,
+    enforceNamingRules = true,
     recordChange = true,
   }: {
     bottleId: number;
@@ -1145,6 +1218,10 @@ export async function updateBottleInTransaction(
     actorId: number;
     creationSource: CatalogVerificationCreationSource;
     invalidateGeneratedDetails?: boolean;
+    // False only for jobs that move existing Bottles to another Entity or
+    // Series without editing them; fixing names they collide with is catalog
+    // work, not a reason to fail the move.
+    enforceNamingRules?: boolean;
     // False only for derived content, such as generated details, that no
     // person or source asserted; it is not a catalog edit.
     recordChange?: boolean;
@@ -1394,6 +1471,16 @@ export async function updateBottleInTransaction(
     ? members
     : members.filter(({ id }) => id === bottleId);
   const affectedIds = affectedMembers.map(({ id }) => id).sort((a, b) => a - b);
+  if (enforceNamingRules) {
+    await assertBottleNamingRules(tx, {
+      group,
+      stable,
+      lockedBottle,
+      selectedDesired,
+      affectedMembers,
+      desiredByBottleId,
+    });
+  }
   const memberSeriesChanged =
     sharedChanged &&
     affectedMembers.some(

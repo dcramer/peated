@@ -18,6 +18,7 @@ import {
   tastings,
   toasts,
   users,
+  wrongPhotoMatches,
 } from "@peated/server/db/schema";
 import {
   ACCOUNT_DELETED_REASON,
@@ -130,6 +131,10 @@ describe("deleteUserAccount", () => {
     const otherDraft = await fixtures.TastingDraft({
       createdById: other.id,
       friends: [user.id],
+    });
+    await fixtures.WrongPhotoMatch({ createdById: user.id });
+    const otherWrongPhotoMatch = await fixtures.WrongPhotoMatch({
+      createdById: other.id,
     });
     const [review] = await db
       .insert(memberReviews)
@@ -251,6 +256,12 @@ describe("deleteUserAccount", () => {
         .from(tastingDrafts)
         .where(eq(tastingDrafts.createdById, user.id)),
     ).toHaveLength(0);
+    expect(
+      await db
+        .select({ id: wrongPhotoMatches.id })
+        .from(wrongPhotoMatches)
+        .where(inArray(wrongPhotoMatches.createdById, [user.id, other.id])),
+    ).toEqual([{ id: otherWrongPhotoMatch.id }]);
 
     expect(workerClient.pushJob).toHaveBeenCalledWith(
       "UpdateBottleStats",

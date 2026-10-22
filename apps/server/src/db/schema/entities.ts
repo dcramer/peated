@@ -50,6 +50,8 @@ export const entities = pgTable(
     ),
     pronunciation: text("pronunciation"),
     pronunciationIpa: text("pronunciation_ipa"),
+    // Owned by GenerateEntityPronunciationAudio; clients never write it.
+    pronunciationAudioUrl: text("pronunciation_audio_url"),
 
     ownerId: bigint("owner_id", { mode: "number" }),
 

@@ -65,8 +65,11 @@ unresolved.
 The Bottle name stores the stable marketed expression relative to its brand.
 Bottle fields store edition, distillation year, bottling year, release year,
 effective stated age, ABV, single-cask and cask-strength flags, and cask
-details. Bottle creation appends an explicit edition to the stable expression.
-It does not generate name suffixes from age, year, ABV, or production flags.
+details. Bottle creation appends an explicit edition to the stored name and
+`fullName`; the title people see leaves it out. See "Bottle Name, Edition, And
+Cask Number" in the [Whisky Identity Model](./whisky-identity-model.md).
+Creation does not generate name suffixes from age, year, ABV, or production
+flags.
 Wording already marketed in the expression remains there. Bottling year is only
 a detail unless the producer markets that bottling as a separate release.
 
