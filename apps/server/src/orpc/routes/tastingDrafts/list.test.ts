@@ -57,4 +57,15 @@ describe("GET /tasting-drafts", () => {
     expect(second.results).toHaveLength(1);
     expect(second.rel).toEqual({ nextCursor: null, prevCursor: 1 });
   });
+
+  test("rejects a page too large to look up", async ({ defaults }) => {
+    const error = await waitError(() =>
+      routerClient.tastingDrafts.list(
+        { cursor: 1e21 },
+        { context: { user: defaults.user } },
+      ),
+    );
+
+    expect(error).toMatchObject({ code: "BAD_REQUEST" });
+  });
 });

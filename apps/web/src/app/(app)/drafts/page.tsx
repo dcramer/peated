@@ -26,7 +26,7 @@ export default async function TastingDraftsPage(props: {
 
   const searchParams = await props.searchParams;
   const cursor = Number(searchParams.cursor);
-  const page = Number.isInteger(cursor) && cursor > 0 ? cursor : 1;
+  const page = Number.isSafeInteger(cursor) && cursor > 0 ? cursor : 1;
   const { client } = await getServerClient();
   const draftList = await client.tastingDrafts.list({ cursor: page });
   // Past the last page, for example after deleting its last draft.
