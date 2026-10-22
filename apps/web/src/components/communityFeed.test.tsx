@@ -29,6 +29,7 @@ describe("CommunityFeed", () => {
       actorHref: "/users/alice",
       action: "tasted",
       date: "2026-09-04T12:00:00.000Z",
+      postedAt: "2026-09-04T12:00:00.000Z",
       href: "/tastings/1-example-bottle",
       bottles: [
         {
@@ -70,6 +71,7 @@ describe("CommunityFeed", () => {
       actor: "alice",
       action: "added 2 bottles to",
       date: "2026-09-04T12:00:00.000Z",
+      postedAt: "2026-09-04T12:00:00.000Z",
       href: "/users/alice/library",
       destination: {
         href: "/users/alice/library",
@@ -104,6 +106,7 @@ describe("CommunityFeed", () => {
       actor: "alice",
       action: "reviewed",
       date: "2026-09-04T12:00:00.000Z",
+      postedAt: "2026-09-04T12:00:00.000Z",
       bottles: [
         {
           id: "1",

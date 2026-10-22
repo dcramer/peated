@@ -32,7 +32,10 @@ export type CommunityFeedItem = {
   actorHref?: string;
   actorImageUrl?: string | null;
   action: string;
+  /** The time the row shows. For a tasting, when the dram was had. */
   date: string;
+  /** Orders the feed: when the entry was posted, so late posts stay recent. */
+  postedAt: string;
   href?: string;
   bottles: readonly CommunityFeedBottle[];
   destination?: { href: string; label: string };
