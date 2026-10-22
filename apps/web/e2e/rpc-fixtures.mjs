@@ -375,9 +375,9 @@ export const exactSearchBottle = {
     id: exactSearchBottleId,
     name: "21-year-old",
   }),
-  fullName: `${testBrand.name} 21-year-old - Cask 42`,
+  fullName: `${testBrand.name} 21-year-old - Batch 42`,
   statedAge: 21,
-  edition: "Cask 42",
+  edition: "Batch 42",
   abv: 55.1,
   vintageYear: 2004,
   releaseYear: 2025,
@@ -385,7 +385,7 @@ export const exactSearchBottle = {
   caskStrength: true,
   outturn: 240,
   maturation: "Oloroso hogshead",
-  caskNumber: "#5678",
+  caskNumber: "5678",
 };
 
 export const anotherReleaseSourceBottle = {
@@ -420,7 +420,7 @@ export const unifiedBottleEditContext = {
     flavorProfile: "peated",
   },
   exact: {
-    edition: "Cask 42",
+    edition: "Batch 42",
     statedAge: 21,
     abv: 55.1,
     singleCask: true,
@@ -434,7 +434,7 @@ export const unifiedBottleEditContext = {
     releaseYear: 2023,
     releaseMonth: null,
     releaseDay: null,
-    caskNumber: "#5678",
+    caskNumber: "5678",
     maturation: "Oloroso hogshead",
     outturn: 240,
     description: "A fixture exact Bottle description.",
@@ -582,12 +582,12 @@ export const destinationBottleGroupId = 50_002;
 export const bottleGroupRepresentative = {
   ...buildBottle({
     id: 50_101,
-    name: "16-year-old Cask 42 (2022)",
+    name: "16-year-old Batch 42 (2022)",
     totalTastings: 12,
   }),
   imageUrl: bottleImageUrl,
-  fullName: "Lagavulin 16-year-old Cask 42 (2022)",
-  edition: "Cask 42",
+  fullName: "Lagavulin 16-year-old Batch 42 (2022)",
+  edition: "Batch 42",
   statedAge: 16,
   abv: 55.1,
   vintageYear: 2005,
@@ -596,7 +596,7 @@ export const bottleGroupRepresentative = {
   caskStrength: true,
   outturn: 240,
   maturation: "Oloroso hogshead",
-  caskNumber: "#5678",
+  caskNumber: "5678",
 };
 
 /** @type {CatalogFixtureBottle} */
