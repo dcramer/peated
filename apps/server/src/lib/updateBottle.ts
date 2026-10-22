@@ -9,7 +9,6 @@ import {
   bottleNameDuplicatesBrand,
   normalizeBottleAge,
   normalizeBottleReferenceKey,
-  stripDuplicateBrandPrefixFromBottleName,
 } from "@peated/bottle-classifier/normalize";
 import type { CatalogVerificationCreationSource } from "@peated/catalog-verifier";
 import { db, type AnyTransaction } from "@peated/server/db";
@@ -39,6 +38,7 @@ import { processSeries } from "@peated/server/lib/bottleHelpers";
 import {
   getBottleExactIdentity,
   getBottleExactStatedAge,
+  getBottleGroupNameForBrand,
   materializeBottleForGroup,
 } from "@peated/server/lib/bottleIdentity";
 import {
@@ -63,7 +63,6 @@ import {
   getBottleEntityLinks,
   updateEntityBottleCounts,
 } from "@peated/server/lib/entityBottleCounts";
-import { formatBottleName } from "@peated/server/lib/format";
 import {
   getBottleProductionLocations,
   updateLocationBottleCounts,
@@ -863,7 +862,8 @@ async function resolveStableState(
     name = normalized.name;
     if (patch.statedAge === undefined) statedAge = normalized.statedAge;
   }
-  name = stripDuplicateBrandPrefixFromBottleName(name, brand.name);
+  const brandedName = getBottleGroupNameForBrand({ name, brand });
+  name = brandedName.name;
   if (!name || bottleNameDuplicatesBrand(name, brand.name)) {
     throw new BottleUpdateInputError(
       "Bottle name must identify an expression distinct from the brand.",
@@ -1005,9 +1005,7 @@ async function resolveStableState(
 
   return {
     name,
-    fullName: formatBottleName({
-      name: `${brand.shortName || brand.name} ${name}`,
-    }),
+    fullName: brandedName.fullName,
     statedAge,
     brandId: brand.id,
     bottlerId: bottler?.id ?? null,

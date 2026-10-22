@@ -4,7 +4,7 @@ import { db } from "@peated/server/db";
 import type { Entity } from "@peated/server/db/schema";
 import { changes, entities } from "@peated/server/db/schema";
 import { getPeatedSystemActor } from "@peated/server/lib/actors";
-import { logTelemetryError, logWarn } from "@peated/server/lib/log";
+import { logError, logTelemetryError, logWarn } from "@peated/server/lib/log";
 import { getStructuredResponse } from "@peated/server/lib/openai";
 import { withSentryConversation } from "@peated/server/lib/openaiClient";
 import { EntityKindEnum } from "@peated/server/schemas";
@@ -12,6 +12,7 @@ import {
   EntityPronunciationIpaSchema,
   EntityPronunciationSchema,
 } from "@peated/server/schemas/entities";
+import { pushUniqueJob } from "@peated/server/worker/dispatch";
 import type { JobPayload } from "@peated/server/worker/types";
 import { eq } from "drizzle-orm";
 import { z } from "zod";
@@ -275,6 +276,17 @@ export async function generateEntityDetails(
       },
     });
   });
+
+  // Generated IPA skips OnEntityChange, so it queues its own audio. The
+  // details are already saved, so a queue failure must not fail this job;
+  // the pronunciation audio backfill route repairs a missed job.
+  if (data.pronunciationIpa) {
+    try {
+      await pushUniqueJob("GenerateEntityPronunciationAudio", { entityId });
+    } catch (err) {
+      logError(err, { entity: { id: entityId } });
+    }
+  }
 }
 
 export default async function generateEntityDetailsJob(input: JobPayload) {

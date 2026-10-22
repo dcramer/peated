@@ -5,6 +5,7 @@ import {
   prepareBottleClassifierAgentRun,
   type BottleAgentRunResult,
   type BottleClassifierDataSource,
+  type BottleClassifierProgressEvent,
   type BottleClassifierToolEvent,
   type CreateBottleClassifierOptions,
   type PreparedBottleClassifierAgentRun,
@@ -2384,6 +2385,60 @@ describe("createBottleClassifier", () => {
     );
 
     expect(runAgent).toHaveBeenCalledOnce();
+  });
+
+  test("reports progress from one reference run", async () => {
+    const progress: BottleClassifierProgressEvent[] = [];
+    const runAgent = vi.fn(
+      async (preparedRun: PreparedBottleClassifierAgentRun) => {
+        expect(progress).toEqual([
+          { type: "candidates", candidates: [macallanSherryOakCandidate] },
+        ]);
+        // SAFETY: observeRunnerTools reads only the tool name and call ID, so
+        // the runner context, agent, and tool can be partial stand-ins here.
+        preparedRun.runner.emit(
+          "agent_tool_start",
+          {} as never,
+          {} as never,
+          { name: "search_bottles" } as never,
+          { toolCall: { callId: "call-1", arguments: "{}" } } as never,
+        );
+        // SAFETY: Same stand-ins as the start event above.
+        preparedRun.runner.emit(
+          "agent_tool_end",
+          {} as never,
+          {} as never,
+          { name: "search_bottles" } as never,
+          "[]",
+          { toolCall: { callId: "call-1", arguments: "{}" } } as never,
+        );
+        return nativeAgentResult({
+          finalOutput: noMatchAgentDecision(),
+          inputTokens: 1,
+          outputTokens: 1,
+        });
+      },
+    );
+    const { classifier } = createTestClassifier({
+      maxSearchQueries: 0,
+      runPreparedBottleClassifierAgent: runAgent,
+    });
+
+    await classifier.runBottleReference(
+      {
+        reference: { name: "Macallan 12 Sherry Oak" },
+        extractedIdentity: null,
+        initialCandidates: [macallanSherryOakCandidate],
+      },
+      { onProgress: (event) => progress.push(event) },
+    );
+
+    expect(runAgent).toHaveBeenCalledOnce();
+    expect(progress).toEqual([
+      { type: "candidates", candidates: [macallanSherryOakCandidate] },
+      { type: "tool", name: "search_bottles", status: "started" },
+      { type: "tool", name: "search_bottles", status: "finished" },
+    ]);
   });
 
   test("returns null metadata for an override-only reference run", async () => {

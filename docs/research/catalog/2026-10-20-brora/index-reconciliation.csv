@@ -1,0 +1,426 @@
+source,entry_order,source_text_line,bottle_ids,status,basis
+Whiskybase,1,146,B49847,no change,Brand/range and exact release fields correspond to the inventory; evidence and retained facts are in bottles.csv.
+Whiskybase,2,147,B49848,no change,Brand/range and exact release fields correspond to the inventory; evidence and retained facts are in bottles.csv.
+Whiskybase,3,148,B4222,no change,Brand/range and exact release fields correspond to the inventory; evidence and retained facts are in bottles.csv.
+Whiskybase,4,149,B16540,no change,Brand/range and exact release fields correspond to the inventory; evidence and retained facts are in bottles.csv.
+Whiskybase,5,150,B16115,no change,Brand/range and exact release fields correspond to the inventory; evidence and retained facts are in bottles.csv.
+Whiskybase,6,151,B49856,no change,Brand/range and exact release fields correspond to the inventory; evidence and retained facts are in bottles.csv.
+Whiskybase,7,152,B3078,no change,Brand/range and exact release fields correspond to the inventory; evidence and retained facts are in bottles.csv.
+Whiskybase,8,153,B49668,no change,Brand/range and exact release fields correspond to the inventory; evidence and retained facts are in bottles.csv.
+Whiskybase,9,154,B55110,no change,Brand/range and exact release fields correspond to the inventory; evidence and retained facts are in bottles.csv.
+Whiskybase,10,155,B55114,no change,Producer and Distillers One of One catalogue support the stored strength; index discrepancy rejected.
+Whiskybase,11,156,B49667,no change,Brand/range and exact release fields correspond to the inventory; evidence and retained facts are in bottles.csv.
+Whiskybase,12,157,B55099,no change,Brand/range and exact release fields correspond to the inventory; evidence and retained facts are in bottles.csv.
+Whiskybase,13,158,B16696,no change,Brand/range and exact release fields correspond to the inventory; evidence and retained facts are in bottles.csv.
+Whiskybase,14,159,B5448,no change,Brand/range and exact release fields correspond to the inventory; evidence and retained facts are in bottles.csv.
+Whiskybase,15,160,B49670,unresolved,"Dated entry maps to this preserved Rare Malts record, but the separate-release versus label-variant question for B49670/B49739 remains unresolved; see README."
+Whiskybase,16,161,B49669,no change,Brand/range and exact release fields correspond to the inventory; evidence and retained facts are in bottles.csv.
+Whiskybase,17,162,B49670;B49739,unresolved,Undated source cannot distinguish the two preserved Rare Malts identities; dated label or batch proof required.
+Whiskybase,18,163,B49670,unresolved,"Dated entry maps to this preserved Rare Malts record, but the separate-release versus label-variant question for B49670/B49739 remains unresolved; see README."
+Whiskybase,19,164,B5438,no change,Brand/range and exact release fields correspond to the inventory; evidence and retained facts are in bottles.csv.
+Whiskybase,20,165,B55105,no change,Brand/range and exact release fields correspond to the inventory; evidence and retained facts are in bottles.csv.
+Whiskybase,21,166,B49672,no change,Brand/range and exact release fields correspond to the inventory; evidence and retained facts are in bottles.csv.
+Whiskybase,22,167,B55100,no change,Brand/range and exact release fields correspond to the inventory; evidence and retained facts are in bottles.csv.
+Whiskybase,23,168,B5345,no change,Brand/range and exact release fields correspond to the inventory; evidence and retained facts are in bottles.csv.
+Whiskybase,24,169,B49805,no change,Brand/range and exact release fields correspond to the inventory; evidence and retained facts are in bottles.csv.
+Whiskybase,25,170,B55102,no change,Brand/range and exact release fields correspond to the inventory; evidence and retained facts are in bottles.csv.
+Whiskybase,26,171,B55111,no change,Brand/range and exact release fields correspond to the inventory; evidence and retained facts are in bottles.csv.
+Whiskybase,27,172,B55104,no change,Brand/range and exact release fields correspond to the inventory; evidence and retained facts are in bottles.csv.
+Whiskybase,28,173,B55112,no change,Brand/range and exact release fields correspond to the inventory; evidence and retained facts are in bottles.csv.
+Whiskybase,29,174,B55108,no change,Brand/range and exact release fields correspond to the inventory; evidence and retained facts are in bottles.csv.
+Whiskybase,30,175,,unresolved,"Private-cask lead; exact marketed-bottle evidence still missing. See README, cask 2704."
+Whiskybase,31,176,B55109,no change,Brand/range and exact release fields correspond to the inventory; evidence and retained facts are in bottles.csv.
+Whiskybase,32,177,B52327,no change,Brand/range and exact release fields correspond to the inventory; evidence and retained facts are in bottles.csv.
+Whiskybase,33,178,B49794,no change,Brand/range and exact release fields correspond to the inventory; evidence and retained facts are in bottles.csv.
+Whiskybase,34,179,B49800,no change,Brand/range and exact release fields correspond to the inventory; evidence and retained facts are in bottles.csv.
+Whiskybase,35,180,B55101,no change,Brand/range and exact release fields correspond to the inventory; evidence and retained facts are in bottles.csv.
+Whiskybase,36,181,B5294,no change,Brand/range and exact release fields correspond to the inventory; evidence and retained facts are in bottles.csv.
+Whiskybase,37,182,B55113,no change,Brand/range and exact release fields correspond to the inventory; evidence and retained facts are in bottles.csv.
+Whiskybase,38,183,B55262,no change,Brand/range and exact release fields correspond to the inventory; evidence and retained facts are in bottles.csv.
+Whiskybase,39,184,B55103,no change,Brand/range and exact release fields correspond to the inventory; evidence and retained facts are in bottles.csv.
+Whiskybase,40,185,,unresolved,"Private-cask lead; exact marketed-bottle evidence still missing. See README, cask 573."
+Whiskybase,41,186,B5321,no change,Brand/range and exact release fields correspond to the inventory; evidence and retained facts are in bottles.csv.
+Whiskybase,42,187,B5292,no change,Brand/range and exact release fields correspond to the inventory; evidence and retained facts are in bottles.csv.
+Whiskybase,43,188,B55124,no change,Brand/range and exact release fields correspond to the inventory; evidence and retained facts are in bottles.csv.
+Whiskybase,44,189,B5260,no change,Brand/range and exact release fields correspond to the inventory; evidence and retained facts are in bottles.csv.
+Whiskybase,45,190,B5207,no change,Brand/range and exact release fields correspond to the inventory; evidence and retained facts are in bottles.csv.
+Whiskybase,46,191,B5145,no change,Brand/range and exact release fields correspond to the inventory; evidence and retained facts are in bottles.csv.
+Whiskybase,47,192,B5055,no change,Brand/range and exact release fields correspond to the inventory; evidence and retained facts are in bottles.csv.
+Whiskybase,48,193,B49839,no change,Brand/range and exact release fields correspond to the inventory; evidence and retained facts are in bottles.csv.
+Whiskybase,49,194,B4878,no change,Brand/range and exact release fields correspond to the inventory; evidence and retained facts are in bottles.csv.
+Whiskybase,50,195,B4749,no change,Brand/range and exact release fields correspond to the inventory; evidence and retained facts are in bottles.csv.
+Whiskybase,51,197,B55617,no change,Acredyke release; a similarly worded range does not make this Douglas Laing.
+Whiskybase,52,199,B55608,no change,Brand/range and exact release fields correspond to the inventory; evidence and retained facts are in bottles.csv.
+Whiskybase,53,201,B55596,no change,Brand/range and exact release fields correspond to the inventory; evidence and retained facts are in bottles.csv.
+Whiskybase,54,202,B55599,no change,Brand/range and exact release fields correspond to the inventory; evidence and retained facts are in bottles.csv.
+Whiskybase,55,203,B55602,no change,Brand/range and exact release fields correspond to the inventory; evidence and retained facts are in bottles.csv.
+Whiskybase,56,204,B55604,no change,Brand/range and exact release fields correspond to the inventory; evidence and retained facts are in bottles.csv.
+Whiskybase,57,205,B55603,no change,Brand/range and exact release fields correspond to the inventory; evidence and retained facts are in bottles.csv.
+Whiskybase,58,207,B55627,no change,Brand/range and exact release fields correspond to the inventory; evidence and retained facts are in bottles.csv.
+Whiskybase,59,209,,out of scope,Blend containing Brora; outside single-malt scope.
+Whiskybase,60,211,B55828,no change,Brand/range and exact release fields correspond to the inventory; evidence and retained facts are in bottles.csv.
+Whiskybase,61,212,B55829,no change,Brand/range and exact release fields correspond to the inventory; evidence and retained facts are in bottles.csv.
+Whiskybase,62,213,B55989,no change,Exact detail establishes the distinct 285-bottle release.
+Whiskybase,63,214,B55844,no change,Brand/range and exact release fields correspond to the inventory; evidence and retained facts are in bottles.csv.
+Whiskybase,64,215,B55845;B55846,unresolved,Known distinct 274- and 210-bottle releases exist; inaccessible source detail prevents a unique row mapping.
+Whiskybase,65,216,B55830,no change,Brand/range and exact release fields correspond to the inventory; evidence and retained facts are in bottles.csv.
+Whiskybase,66,217,B55845;B55846,unresolved,Known distinct 274- and 210-bottle releases exist; inaccessible source detail prevents a unique row mapping.
+Whiskybase,67,218,B55847,no change,Brand/range and exact release fields correspond to the inventory; evidence and retained facts are in bottles.csv.
+Whiskybase,68,219,B55873,no change,Brand/range and exact release fields correspond to the inventory; evidence and retained facts are in bottles.csv.
+Whiskybase,69,220,B55832,no change,Brand/range and exact release fields correspond to the inventory; evidence and retained facts are in bottles.csv.
+Whiskybase,70,221,B55831,no change,Brand/range and exact release fields correspond to the inventory; evidence and retained facts are in bottles.csv.
+Whiskybase,71,222,B55848,no change,Brand/range and exact release fields correspond to the inventory; evidence and retained facts are in bottles.csv.
+Whiskybase,72,223,B55834,no change,Brand/range and exact release fields correspond to the inventory; evidence and retained facts are in bottles.csv.
+Whiskybase,73,224,B55833,no change,Brand/range and exact release fields correspond to the inventory; evidence and retained facts are in bottles.csv.
+Whiskybase,74,225,B55849,no change,Brand/range and exact release fields correspond to the inventory; evidence and retained facts are in bottles.csv.
+Whiskybase,75,226,B55850,no change,Brand/range and exact release fields correspond to the inventory; evidence and retained facts are in bottles.csv.
+Whiskybase,76,227,B55835,no change,Brand/range and exact release fields correspond to the inventory; evidence and retained facts are in bottles.csv.
+Whiskybase,77,228,B55836,no change,Brand/range and exact release fields correspond to the inventory; evidence and retained facts are in bottles.csv.
+Whiskybase,78,229,B55837,no change,Brand/range and exact release fields correspond to the inventory; evidence and retained facts are in bottles.csv.
+Whiskybase,79,230,B55851,no change,Exact detail establishes the 581-bottle release.
+Whiskybase,80,231,B55852,no change,Brand/range and exact release fields correspond to the inventory; evidence and retained facts are in bottles.csv.
+Whiskybase,81,232,B55838,no change,Brand/range and exact release fields correspond to the inventory; evidence and retained facts are in bottles.csv.
+Whiskybase,82,233,B55854,no change,Exact detail establishes the 564-bottle release.
+Whiskybase,83,234,B55853,no change,Exact detail establishes the 263-bottle release.
+Whiskybase,84,235,B55839,no change,Brand/range and exact release fields correspond to the inventory; evidence and retained facts are in bottles.csv.
+Whiskybase,85,236,B55855,no change,Brand/range and exact release fields correspond to the inventory; evidence and retained facts are in bottles.csv.
+Whiskybase,86,237,B55856,no change,Exact detail establishes the 335-bottle release.
+Whiskybase,87,238,B55990,no change,Exact detail establishes the 291-bottle release.
+Whiskybase,88,239,B55939,no change,Brand/range and exact release fields correspond to the inventory; evidence and retained facts are in bottles.csv.
+Whiskybase,89,240,B55868,no change,Brand/range and exact release fields correspond to the inventory; evidence and retained facts are in bottles.csv.
+Whiskybase,90,241,B55857,no change,Brand/range and exact release fields correspond to the inventory; evidence and retained facts are in bottles.csv.
+Whiskybase,91,242,B55858,no change,Exact detail establishes the 744-bottle release.
+Whiskybase,92,243,B55862,no change,Brand/range and exact release fields correspond to the inventory; evidence and retained facts are in bottles.csv.
+Whiskybase,93,244,B55861,no change,Brand/range and exact release fields correspond to the inventory; evidence and retained facts are in bottles.csv.
+Whiskybase,94,245,,out of scope,"Advance sample, not an independently marketed finished release."
+Whiskybase,95,246,,out of scope,"Advance sample, not an independently marketed finished release."
+Whiskybase,96,247,B55863,no change,Brand/range and exact release fields correspond to the inventory; evidence and retained facts are in bottles.csv.
+Whiskybase,97,248,B55991,no change,Exact detail establishes the 732-bottle release.
+Whiskybase,98,249,B55864,no change,Brand/range and exact release fields correspond to the inventory; evidence and retained facts are in bottles.csv.
+Whiskybase,99,250,,out of scope,"Advance sample, not an independently marketed finished release."
+Whiskybase,100,251,B55865,no change,Brand/range and exact release fields correspond to the inventory; evidence and retained facts are in bottles.csv.
+Whiskybase,101,252,B55867,no change,Brand/range and exact release fields correspond to the inventory; evidence and retained facts are in bottles.csv.
+Whiskybase,102,253,B55869,no change,Explicit Final Vintage descriptor distinguishes the release.
+Whiskybase,103,254,B55870,no change,Brand/range and exact release fields correspond to the inventory; evidence and retained facts are in bottles.csv.
+Whiskybase,104,255,B55871,no change,Brand/range and exact release fields correspond to the inventory; evidence and retained facts are in bottles.csv.
+Whiskybase,105,256,B55872,no change,Brand/range and exact release fields correspond to the inventory; evidence and retained facts are in bottles.csv.
+Whiskybase,106,257,B55874,no change,Brand/range and exact release fields correspond to the inventory; evidence and retained facts are in bottles.csv.
+Whiskybase,107,258,,unresolved,Generic miniature listing lacks enough dated release detail; package size alone cannot identify a release.
+Whiskybase,108,260,B55818,no change,Brand/range and exact release fields correspond to the inventory; evidence and retained facts are in bottles.csv.
+Whiskybase,109,261,B55819,no change,Brand/range and exact release fields correspond to the inventory; evidence and retained facts are in bottles.csv.
+Whiskybase,110,262,B55820,no change,Brand/range and exact release fields correspond to the inventory; evidence and retained facts are in bottles.csv.
+Whiskybase,111,264,B55660,no change,Brand/range and exact release fields correspond to the inventory; evidence and retained facts are in bottles.csv.
+Whiskybase,112,266,B55693,no change,Brand/range and exact release fields correspond to the inventory; evidence and retained facts are in bottles.csv.
+Whiskybase,113,267,B55695,no change,Brand/range and exact release fields correspond to the inventory; evidence and retained facts are in bottles.csv.
+Whiskybase,114,268,B55694,no change,Brand/range and exact release fields correspond to the inventory; evidence and retained facts are in bottles.csv.
+Whiskybase,115,269,B55692,no change,Brand/range and exact release fields correspond to the inventory; evidence and retained facts are in bottles.csv.
+Whiskybase,116,270,B55691,no change,Brand/range and exact release fields correspond to the inventory; evidence and retained facts are in bottles.csv.
+Whiskybase,117,271,B67880,create,Auction and label establish a separate 23-year release; do not substitute the 22-year bottle.
+Whiskybase,118,272,B55696,no change,Brand/range and exact release fields correspond to the inventory; evidence and retained facts are in bottles.csv.
+Whiskybase,119,274,B55647,no change,The First Editions release matches Hunter Laing in Peated; source uses Edition Spirits.
+Whiskybase,120,276,B55649,no change,Brand/range and exact release fields correspond to the inventory; evidence and retained facts are in bottles.csv.
+Whiskybase,121,277,B55650,no change,Brand/range and exact release fields correspond to the inventory; evidence and retained facts are in bottles.csv.
+Whiskybase,122,278,B55659,no change,Brand/range and exact release fields correspond to the inventory; evidence and retained facts are in bottles.csv.
+Whiskybase,123,279,B55651,no change,Brand/range and exact release fields correspond to the inventory; evidence and retained facts are in bottles.csv.
+Whiskybase,124,280,B55657,no change,Brand/range and exact release fields correspond to the inventory; evidence and retained facts are in bottles.csv.
+Whiskybase,125,281,B55656,no change,Brand/range and exact release fields correspond to the inventory; evidence and retained facts are in bottles.csv.
+Whiskybase,126,282,B55652,no change,Brand/range and exact release fields correspond to the inventory; evidence and retained facts are in bottles.csv.
+Whiskybase,127,283,B55658,update,Brand/range and exact release fields correspond to the inventory; evidence and retained facts are in bottles.csv.
+Whiskybase,128,284,B55655,no change,Brand/range and exact release fields correspond to the inventory; evidence and retained facts are in bottles.csv.
+Whiskybase,129,285,B55654,no change,Brand/range and exact release fields correspond to the inventory; evidence and retained facts are in bottles.csv.
+Whiskybase,130,286,B55653,no change,Brand/range and exact release fields correspond to the inventory; evidence and retained facts are in bottles.csv.
+Whiskybase,131,288,B55805,no change,Brand/range and exact release fields correspond to the inventory; evidence and retained facts are in bottles.csv.
+Whiskybase,132,289,B55930,no change,Brand/range and exact release fields correspond to the inventory; evidence and retained facts are in bottles.csv.
+Whiskybase,133,290,,unresolved,Generic miniature listing lacks bottling year; several annual Connoisseurs Choice releases exist.
+Whiskybase,134,291,B55931,no change,Brand/range and exact release fields correspond to the inventory; evidence and retained facts are in bottles.csv.
+Whiskybase,135,292,B55930,no change,Brand/range and exact release fields correspond to the inventory; evidence and retained facts are in bottles.csv.
+Whiskybase,136,293,B55932,no change,Brand/range and exact release fields correspond to the inventory; evidence and retained facts are in bottles.csv.
+Whiskybase,137,294,B55935,no change,Brand/range and exact release fields correspond to the inventory; evidence and retained facts are in bottles.csv.
+Whiskybase,138,295,B55932,no change,Brand/range and exact release fields correspond to the inventory; evidence and retained facts are in bottles.csv.
+Whiskybase,139,296,B55933,no change,Brand/range and exact release fields correspond to the inventory; evidence and retained facts are in bottles.csv.
+Whiskybase,140,297,B55934,no change,Brand/range and exact release fields correspond to the inventory; evidence and retained facts are in bottles.csv.
+Whiskybase,141,298,B55986,no change,Brand/range and exact release fields correspond to the inventory; evidence and retained facts are in bottles.csv.
+Whiskybase,142,299,B55809,no change,Brand/range and exact release fields correspond to the inventory; evidence and retained facts are in bottles.csv.
+Whiskybase,143,300,B52288,no change,Brand/range and exact release fields correspond to the inventory; evidence and retained facts are in bottles.csv.
+Whiskybase,144,301,B55988,no change,Brand/range and exact release fields correspond to the inventory; evidence and retained facts are in bottles.csv.
+Whiskybase,145,302,B55812,no change,Brand/range and exact release fields correspond to the inventory; evidence and retained facts are in bottles.csv.
+Whiskybase,146,303,B55936,no change,Brand/range and exact release fields correspond to the inventory; evidence and retained facts are in bottles.csv.
+Whiskybase,147,304,B55813,no change,Brand/range and exact release fields correspond to the inventory; evidence and retained facts are in bottles.csv.
+Whiskybase,148,305,B55814,no change,Brand/range and exact release fields correspond to the inventory; evidence and retained facts are in bottles.csv.
+Whiskybase,149,306,B55937,no change,Brand/range and exact release fields correspond to the inventory; evidence and retained facts are in bottles.csv.
+Whiskybase,150,307,B55938,no change,Brand/range and exact release fields correspond to the inventory; evidence and retained facts are in bottles.csv.
+Whiskybase,151,308,B67869,create,Brand/range and exact release fields correspond to the inventory; evidence and retained facts are in bottles.csv.
+Whiskybase,152,309,B55810,no change,Brand/range and exact release fields correspond to the inventory; evidence and retained facts are in bottles.csv.
+Whiskybase,153,311,,unresolved,H.P. de Vreng lead lacks a readable exact label or independent exact auction record; see README.
+Whiskybase,154,313,B55648,no change,Brand/range and exact release fields correspond to the inventory; evidence and retained facts are in bottles.csv.
+Whiskybase,155,315,B55705,no change,Brand/range and exact release fields correspond to the inventory; evidence and retained facts are in bottles.csv.
+Whiskybase,156,316,B67867,create,Brand/range and exact release fields correspond to the inventory; evidence and retained facts are in bottles.csv.
+Whiskybase,157,317,B67865,create,Brand/range and exact release fields correspond to the inventory; evidence and retained facts are in bottles.csv.
+Whiskybase,158,318,B55717,no change,Brand/range and exact release fields correspond to the inventory; evidence and retained facts are in bottles.csv.
+Whiskybase,159,319,B55716,no change,Brand/range and exact release fields correspond to the inventory; evidence and retained facts are in bottles.csv.
+Whiskybase,160,320,B55706,no change,Brand/range and exact release fields correspond to the inventory; evidence and retained facts are in bottles.csv.
+Whiskybase,161,321,B55712,no change,Brand/range and exact release fields correspond to the inventory; evidence and retained facts are in bottles.csv.
+Whiskybase,162,322,B55711,no change,Brand/range and exact release fields correspond to the inventory; evidence and retained facts are in bottles.csv.
+Whiskybase,163,323,B55718,no change,Brand/range and exact release fields correspond to the inventory; evidence and retained facts are in bottles.csv.
+Whiskybase,164,324,B55708,no change,Brand/range and exact release fields correspond to the inventory; evidence and retained facts are in bottles.csv.
+Whiskybase,165,325,B55707,no change,Brand/range and exact release fields correspond to the inventory; evidence and retained facts are in bottles.csv.
+Whiskybase,166,326,B55715,no change,Brand/range and exact release fields correspond to the inventory; evidence and retained facts are in bottles.csv.
+Whiskybase,167,327,B55713,no change,Brand/range and exact release fields correspond to the inventory; evidence and retained facts are in bottles.csv.
+Whiskybase,168,328,B55714,no change,Brand/range and exact release fields correspond to the inventory; evidence and retained facts are in bottles.csv.
+Whiskybase,169,329,B55728,no change,Brand/range and exact release fields correspond to the inventory; evidence and retained facts are in bottles.csv.
+Whiskybase,170,330,B55727,no change,Brand/range and exact release fields correspond to the inventory; evidence and retained facts are in bottles.csv.
+Whiskybase,171,331,B55726,no change,Brand/range and exact release fields correspond to the inventory; evidence and retained facts are in bottles.csv.
+Whiskybase,172,332,B55725,no change,Brand/range and exact release fields correspond to the inventory; evidence and retained facts are in bottles.csv.
+Whiskybase,173,334,B67875,create,Exact auction and label establish the newly created release; see README.
+Whiskybase,174,335,B67876,create,Exact auction and label establish the newly created release; see README.
+Whiskybase,175,337,,out of scope,Blend containing Brora; outside single-malt scope.
+Whiskybase,176,338,,out of scope,Blend containing Brora; outside single-malt scope.
+Whiskybase,177,339,,out of scope,Blend containing Brora; outside single-malt scope.
+Whiskybase,178,340,,out of scope,Blend containing Brora; outside single-malt scope.
+Whiskybase,179,341,,out of scope,Blend containing Brora; outside single-malt scope.
+Whiskybase,180,343,,out of scope,Blend containing Brora; outside single-malt scope.
+Whiskybase,181,344,,out of scope,Blend containing Brora; outside single-malt scope.
+Whiskybase,182,346,B55736,no change,Brand/range and exact release fields correspond to the inventory; evidence and retained facts are in bottles.csv.
+Whiskybase,183,347,B55739,no change,Brand/range and exact release fields correspond to the inventory; evidence and retained facts are in bottles.csv.
+Whiskybase,184,348,B55737,no change,Brand/range and exact release fields correspond to the inventory; evidence and retained facts are in bottles.csv.
+Whiskybase,185,349,B17700,no change,Brand/range and exact release fields correspond to the inventory; evidence and retained facts are in bottles.csv.
+Whiskybase,186,350,B55740,no change,Brand/range and exact release fields correspond to the inventory; evidence and retained facts are in bottles.csv.
+Whiskybase,187,351,B55738,no change,Brand/range and exact release fields correspond to the inventory; evidence and retained facts are in bottles.csv.
+Whiskybase,188,353,,out of scope,Blend containing Brora; outside single-malt scope.
+Whiskybase,189,354,,out of scope,Blend containing Brora; outside single-malt scope.
+Whiskybase,190,355,,out of scope,Blend containing Brora; outside single-malt scope.
+Whiskybase,191,357,B55671,no change,Brand/range and exact release fields correspond to the inventory; evidence and retained facts are in bottles.csv.
+Whiskybase,192,358,B55673,no change,Brand/range and exact release fields correspond to the inventory; evidence and retained facts are in bottles.csv.
+Whiskybase,193,359,B55672,no change,Brand/range and exact release fields correspond to the inventory; evidence and retained facts are in bottles.csv.
+Whiskybase,194,361,B55788,no change,Brand/range and exact release fields correspond to the inventory; evidence and retained facts are in bottles.csv.
+Whiskybase,195,362,B55772,no change,Brand/range and exact release fields correspond to the inventory; evidence and retained facts are in bottles.csv.
+Whiskybase,196,363,B55784,no change,Brand/range and exact release fields correspond to the inventory; evidence and retained facts are in bottles.csv.
+Whiskybase,197,364,B55764,no change,Brand/range and exact release fields correspond to the inventory; evidence and retained facts are in bottles.csv.
+Whiskybase,198,365,B55783,no change,Brand/range and exact release fields correspond to the inventory; evidence and retained facts are in bottles.csv.
+Whiskybase,199,366,B55753,no change,Brand/range and exact release fields correspond to the inventory; evidence and retained facts are in bottles.csv.
+Whiskybase,200,367,B55759,no change,Brand/range and exact release fields correspond to the inventory; evidence and retained facts are in bottles.csv.
+Whiskybase,201,368,B55762,no change,Brand/range and exact release fields correspond to the inventory; evidence and retained facts are in bottles.csv.
+Whiskybase,202,369,B55768,no change,Brand/range and exact release fields correspond to the inventory; evidence and retained facts are in bottles.csv.
+Whiskybase,203,370,B55760,no change,Brand/range and exact release fields correspond to the inventory; evidence and retained facts are in bottles.csv.
+Whiskybase,204,371,B55761,no change,Brand/range and exact release fields correspond to the inventory; evidence and retained facts are in bottles.csv.
+Whiskybase,205,372,B55765,no change,Brand/range and exact release fields correspond to the inventory; evidence and retained facts are in bottles.csv.
+Whiskybase,206,373,B55780,no change,Brand/range and exact release fields correspond to the inventory; evidence and retained facts are in bottles.csv.
+Whiskybase,207,374,B55766,no change,Brand/range and exact release fields correspond to the inventory; evidence and retained facts are in bottles.csv.
+Whiskybase,208,375,B55776,no change,Brand/range and exact release fields correspond to the inventory; evidence and retained facts are in bottles.csv.
+Whiskybase,209,376,B55770,no change,Brand/range and exact release fields correspond to the inventory; evidence and retained facts are in bottles.csv.
+Whiskybase,210,377,B55786,no change,Brand/range and exact release fields correspond to the inventory; evidence and retained facts are in bottles.csv.
+Whiskybase,211,378,B55767,no change,Brand/range and exact release fields correspond to the inventory; evidence and retained facts are in bottles.csv.
+Whiskybase,212,379,B55771,no change,Brand/range and exact release fields correspond to the inventory; evidence and retained facts are in bottles.csv.
+Whiskybase,213,380,B55790,no change,Brand/range and exact release fields correspond to the inventory; evidence and retained facts are in bottles.csv.
+Whiskybase,214,381,B55782,no change,Brand/range and exact release fields correspond to the inventory; evidence and retained facts are in bottles.csv.
+Whiskybase,215,382,B55777,no change,Brand/range and exact release fields correspond to the inventory; evidence and retained facts are in bottles.csv.
+Whiskybase,216,383,B55779,no change,Brand/range and exact release fields correspond to the inventory; evidence and retained facts are in bottles.csv.
+Whiskybase,217,384,B55789,no change,Brand/range and exact release fields correspond to the inventory; evidence and retained facts are in bottles.csv.
+Whiskybase,218,385,B55763,no change,Brand/range and exact release fields correspond to the inventory; evidence and retained facts are in bottles.csv.
+Whiskybase,219,386,B55787,no change,Brand/range and exact release fields correspond to the inventory; evidence and retained facts are in bottles.csv.
+Whiskybase,220,387,B55778,no change,Brand/range and exact release fields correspond to the inventory; evidence and retained facts are in bottles.csv.
+Whiskybase,221,388,B55769,no change,Brand/range and exact release fields correspond to the inventory; evidence and retained facts are in bottles.csv.
+Whiskybase,222,389,B55775,no change,Brand/range and exact release fields correspond to the inventory; evidence and retained facts are in bottles.csv.
+Whiskybase,223,390,B55781,no change,Brand/range and exact release fields correspond to the inventory; evidence and retained facts are in bottles.csv.
+Whiskybase,224,391,B55773,no change,Brand/range and exact release fields correspond to the inventory; evidence and retained facts are in bottles.csv.
+Whiskybase,225,392,B55785,no change,Brand/range and exact release fields correspond to the inventory; evidence and retained facts are in bottles.csv.
+Whiskybase,226,393,B55774,no change,Brand/range and exact release fields correspond to the inventory; evidence and retained facts are in bottles.csv.
+Whiskybase,227,394,B55792,no change,Brand/range and exact release fields correspond to the inventory; evidence and retained facts are in bottles.csv.
+Whiskybase,228,395,B55791,no change,Brand/range and exact release fields correspond to the inventory; evidence and retained facts are in bottles.csv.
+Whiskybase,229,396,B55795,no change,Brand/range and exact release fields correspond to the inventory; evidence and retained facts are in bottles.csv.
+Whiskybase,230,397,B55794,no change,Brand/range and exact release fields correspond to the inventory; evidence and retained facts are in bottles.csv.
+Whiskybase,231,398,B55793,no change,Brand/range and exact release fields correspond to the inventory; evidence and retained facts are in bottles.csv.
+Whiskybase,232,400,B55875,no change,First bottling; 240-bottle release.
+Whiskybase,233,401,B55876,no change,Single Barrel; 280-bottle release.
+Whiskybase,234,402,B55877,no change,Brand/range and exact release fields correspond to the inventory; evidence and retained facts are in bottles.csv.
+Whiskybase,235,404,B55642,no change,Brand/range and exact release fields correspond to the inventory; evidence and retained facts are in bottles.csv.
+Whiskybase,236,406,B55641,no change,Brand/range and exact release fields correspond to the inventory; evidence and retained facts are in bottles.csv.
+Whiskybase,237,408,B55635,no change,Brand/range and exact release fields correspond to the inventory; evidence and retained facts are in bottles.csv.
+Whiskybase,238,409,B55639,no change,Brand/range and exact release fields correspond to the inventory; evidence and retained facts are in bottles.csv.
+Whiskybase,239,411,,out of scope,Blend containing Brora; outside single-malt scope.
+Whiskybase,240,412,,out of scope,Blend containing Brora; outside single-malt scope.
+Whiskybase,241,413,,out of scope,Blend containing Brora; outside single-malt scope.
+Whiskybase,242,415,B55591,no change,Brand/range and exact release fields correspond to the inventory; evidence and retained facts are in bottles.csv.
+Whiskybase,243,416,B55590,no change,Brand/range and exact release fields correspond to the inventory; evidence and retained facts are in bottles.csv.
+Whiskybase,244,418,B55640,no change,Brand/range and exact release fields correspond to the inventory; evidence and retained facts are in bottles.csv.
+Whiskybase,245,420,B55884,no change,Brand/range and exact release fields correspond to the inventory; evidence and retained facts are in bottles.csv.
+Whiskybase,246,421,B55885,no change,Brand/range and exact release fields correspond to the inventory; evidence and retained facts are in bottles.csv.
+Whiskybase,247,422,B55886,no change,Brand/range and exact release fields correspond to the inventory; evidence and retained facts are in bottles.csv.
+Whiskybase,248,423,B55887,no change,Brand/range and exact release fields correspond to the inventory; evidence and retained facts are in bottles.csv.
+Whiskybase,249,424,B55888,no change,Brand/range and exact release fields correspond to the inventory; evidence and retained facts are in bottles.csv.
+Whiskybase,250,425,B55889,no change,Brand/range and exact release fields correspond to the inventory; evidence and retained facts are in bottles.csv.
+Whiskybase,251,426,B55890,no change,Brand/range and exact release fields correspond to the inventory; evidence and retained facts are in bottles.csv.
+Whiskybase,252,427,B55891,no change,Brand/range and exact release fields correspond to the inventory; evidence and retained facts are in bottles.csv.
+Whiskybase,253,428,B55892,no change,Brand/range and exact release fields correspond to the inventory; evidence and retained facts are in bottles.csv.
+Whiskybase,254,429,B55893,no change,Brand/range and exact release fields correspond to the inventory; evidence and retained facts are in bottles.csv.
+Whiskybase,255,430,B55894,no change,Brand/range and exact release fields correspond to the inventory; evidence and retained facts are in bottles.csv.
+Whiskybase,256,431,B55895,no change,Brand/range and exact release fields correspond to the inventory; evidence and retained facts are in bottles.csv.
+Whiskybase,257,432,B55896,no change,Brand/range and exact release fields correspond to the inventory; evidence and retained facts are in bottles.csv.
+Whiskybase,258,433,B55897,no change,Brand/range and exact release fields correspond to the inventory; evidence and retained facts are in bottles.csv.
+Whiskybase,259,434,B55898,no change,Brand/range and exact release fields correspond to the inventory; evidence and retained facts are in bottles.csv.
+Whiskybase,260,435,B55899,no change,Brand/range and exact release fields correspond to the inventory; evidence and retained facts are in bottles.csv.
+Whiskybase,261,436,B55900,no change,Brand/range and exact release fields correspond to the inventory; evidence and retained facts are in bottles.csv.
+Whiskybase,262,437,B55901,no change,Brand/range and exact release fields correspond to the inventory; evidence and retained facts are in bottles.csv.
+Whiskybase,263,438,B55902,no change,Brand/range and exact release fields correspond to the inventory; evidence and retained facts are in bottles.csv.
+Whiskybase,264,439,B55903,no change,Brand/range and exact release fields correspond to the inventory; evidence and retained facts are in bottles.csv.
+Whiskybase,265,440,B55904,no change,Brand/range and exact release fields correspond to the inventory; evidence and retained facts are in bottles.csv.
+Whiskybase,266,441,B55905,no change,Brand/range and exact release fields correspond to the inventory; evidence and retained facts are in bottles.csv.
+Whiskybase,267,442,B55906,no change,Brand/range and exact release fields correspond to the inventory; evidence and retained facts are in bottles.csv.
+Whiskybase,268,444,B55646,no change,Brand/range and exact release fields correspond to the inventory; evidence and retained facts are in bottles.csv.
+Whiskybase,269,446,B55643,no change,Brand/range and exact release fields correspond to the inventory; evidence and retained facts are in bottles.csv.
+Whiskybase,270,447,B55644,no change,Brand/range and exact release fields correspond to the inventory; evidence and retained facts are in bottles.csv.
+Whiskybase,271,449,B67877,create,Exact auction and label establish the newly created release; see README.
+Whiskybase,272,450,B67878,create,Exact auction and label establish the newly created release; see README.
+Whiskybase,273,452,B55641,no change,Brand/range and exact release fields correspond to the inventory; evidence and retained facts are in bottles.csv.
+Whiskybase,274,454,,unresolved,Murgatroyd private-cask lead has no independent exact-release evidence; see README.
+Whiskybase,275,456,B55645,no change,Brand/range and exact release fields correspond to the inventory; evidence and retained facts are in bottles.csv.
+Whisky Monitor,1,21,B49739,unresolved,"Dated entry maps to this preserved Rare Malts record, but the separate-release versus label-variant question for B49670/B49739 remains unresolved; see README."
+Whisky Monitor,2,27,B49669,no change,Brand/range and exact release fields correspond to the inventory; evidence and retained facts are in bottles.csv.
+Whisky Monitor,3,33,B5438,no change,Brand/range and exact release fields correspond to the inventory; evidence and retained facts are in bottles.csv.
+Whisky Monitor,4,38,B5294,no change,Brand/range and exact release fields correspond to the inventory; evidence and retained facts are in bottles.csv.
+Whisky Monitor,5,44,B5345,no change,Brand/range and exact release fields correspond to the inventory; evidence and retained facts are in bottles.csv.
+Whisky Monitor,6,50,B5448,no change,Brand/range and exact release fields correspond to the inventory; evidence and retained facts are in bottles.csv.
+Whisky Monitor,7,56,B49668,no change,Brand/range and exact release fields correspond to the inventory; evidence and retained facts are in bottles.csv.
+Whisky Monitor,8,62,B49672,no change,Brand/range and exact release fields correspond to the inventory; evidence and retained facts are in bottles.csv.
+Whisky Monitor,9,67,B49839,no change,Brand/range and exact release fields correspond to the inventory; evidence and retained facts are in bottles.csv.
+Whisky Monitor,10,73,B5321,no change,Brand/range and exact release fields correspond to the inventory; evidence and retained facts are in bottles.csv.
+Whisky Monitor,11,79,B5292,no change,"Matched using brand/range and cask, outturn or dated release, as applicable; not age/ABV alone."
+Whisky Monitor,12,85,B5260,no change,"Matched using brand/range and cask, outturn or dated release, as applicable; not age/ABV alone."
+Whisky Monitor,13,91,B5207,no change,Brand/range and exact release fields correspond to the inventory; evidence and retained facts are in bottles.csv.
+Whisky Monitor,14,97,B5145,no change,"Matched using brand/range and cask, outturn or dated release, as applicable; not age/ABV alone."
+Whisky Monitor,15,102,B5055,no change,"Matched using brand/range and cask, outturn or dated release, as applicable; not age/ABV alone."
+Whisky Monitor,16,108,B4878,no change,Brand/range and exact release fields correspond to the inventory; evidence and retained facts are in bottles.csv.
+Whisky Monitor,17,114,B4749,no change,Brand/range and exact release fields correspond to the inventory; evidence and retained facts are in bottles.csv.
+Whisky Monitor,18,120,B49847,no change,Brand/range and exact release fields correspond to the inventory; evidence and retained facts are in bottles.csv.
+Whisky Monitor,19,126,B49848,no change,Brand/range and exact release fields correspond to the inventory; evidence and retained facts are in bottles.csv.
+Whisky Monitor,20,143,B55608,no change,Brand/range and exact release fields correspond to the inventory; evidence and retained facts are in bottles.csv.
+Whisky Monitor,21,161,B55599,no change,Brand/range and exact release fields correspond to the inventory; evidence and retained facts are in bottles.csv.
+Whisky Monitor,22,167,,unresolved,Chronology is inconsistent and no exact Cadenhead label/auction corroborates this combination; see README.
+Whisky Monitor,23,173,B55604,no change,Brand/range and exact release fields correspond to the inventory; evidence and retained facts are in bottles.csv.
+Whisky Monitor,24,190,B55725,no change,Brand/range and exact release fields correspond to the inventory; evidence and retained facts are in bottles.csv.
+Whisky Monitor,25,196,B55726,no change,Brand/range and exact release fields correspond to the inventory; evidence and retained facts are in bottles.csv.
+Whisky Monitor,26,202,B55728,no change,"Matched using brand/range and cask, outturn or dated release, as applicable; not age/ABV alone."
+Whisky Monitor,27,208,B55712,no change,Brand/range and exact release fields correspond to the inventory; evidence and retained facts are in bottles.csv.
+Whisky Monitor,28,214,B55714,no change,"Matched using brand/range and cask, outturn or dated release, as applicable; not age/ABV alone."
+Whisky Monitor,29,219,B55713,no change,"Matched using brand/range and cask, outturn or dated release, as applicable; not age/ABV alone."
+Whisky Monitor,30,225,B55715,no change,Brand/range and exact release fields correspond to the inventory; evidence and retained facts are in bottles.csv.
+Whisky Monitor,31,231,,unresolved,Claimed earlier cask 1523 draw is uncorroborated; do not substitute cask 1522 or the later 30-year release.
+Whisky Monitor,32,237,B55716,no change,Brand/range and exact release fields correspond to the inventory; evidence and retained facts are in bottles.csv.
+Whisky Monitor,33,242,B55718,no change,Brand/range and exact release fields correspond to the inventory; evidence and retained facts are in bottles.csv.
+Whisky Monitor,34,248,B55717,no change,Brand/range and exact release fields correspond to the inventory; evidence and retained facts are in bottles.csv.
+Whisky Monitor,35,266,B55856,no change,"Matched using brand/range and cask, outturn or dated release, as applicable; not age/ABV alone."
+Whisky Monitor,36,272,B55939,no change,Brand/range and exact release fields correspond to the inventory; evidence and retained facts are in bottles.csv.
+Whisky Monitor,37,277,,unresolved,Uncorroborated vintage differs from the documented 1981 release; exact label needed.
+Whisky Monitor,38,283,B55854,no change,"Matched using brand/range and cask, outturn or dated release, as applicable; not age/ABV alone."
+Whisky Monitor,39,289,B55858,no change,"Matched using brand/range and cask, outturn or dated release, as applicable; not age/ABV alone."
+Whisky Monitor,40,295,B55855,no change,Brand/range and exact release fields correspond to the inventory; evidence and retained facts are in bottles.csv.
+Whisky Monitor,41,300,B55862,no change,Brand/range and exact release fields correspond to the inventory; evidence and retained facts are in bottles.csv.
+Whisky Monitor,42,306,B55852,no change,Brand/range and exact release fields correspond to the inventory; evidence and retained facts are in bottles.csv.
+Whisky Monitor,43,312,,unresolved,Uncorroborated bottling year and outturn differ from the documented 2002/360-bottle release.
+Whisky Monitor,44,318,B55864,no change,Exact retailer/auction evidence supports cask DL1186; conflicting index cask 386 rejected.
+Whisky Monitor,45,323,B55863,no change,Brand/range and exact release fields correspond to the inventory; evidence and retained facts are in bottles.csv.
+Whisky Monitor,46,329,B55863,no change,Brand/range and exact release fields correspond to the inventory; evidence and retained facts are in bottles.csv.
+Whisky Monitor,47,335,B55865,no change,"Matched using brand/range and cask, outturn or dated release, as applicable; not age/ABV alone."
+Whisky Monitor,48,341,B55861,no change,Brand/range and exact release fields correspond to the inventory; evidence and retained facts are in bottles.csv.
+Whisky Monitor,49,346,B55871,no change,"Matched using brand/range and cask, outturn or dated release, as applicable; not age/ABV alone."
+Whisky Monitor,50,352,B55872,no change,"Matched using brand/range and cask, outturn or dated release, as applicable; not age/ABV alone."
+Whisky Monitor,51,358,B55868,no change,Brand/range and exact release fields correspond to the inventory; evidence and retained facts are in bottles.csv.
+Whisky Monitor,52,364,B55874,no change,Premier Barrel release retained; inferred source dates were not promoted to Bottle facts.
+Whisky Monitor,53,369,B55867,no change,Brand/range and exact release fields correspond to the inventory; evidence and retained facts are in bottles.csv.
+Whisky Monitor,54,375,B55819,no change,Exact records support 43%; conflicting index 46% was not treated as a second release.
+Whisky Monitor,55,381,B55850,no change,Brand/range and exact release fields correspond to the inventory; evidence and retained facts are in bottles.csv.
+Whisky Monitor,56,387,B55820,no change,Brand/range and exact release fields correspond to the inventory; evidence and retained facts are in bottles.csv.
+Whisky Monitor,57,392,,unresolved,Claimed 1976/Japan/288-bottle release lacks independent exact evidence; known release is 1977/228 bottles.
+Whisky Monitor,58,398,B55837,no change,Brand/range and exact release fields correspond to the inventory; evidence and retained facts are in bottles.csv.
+Whisky Monitor,59,404,B55847,no change,Brand/range and exact release fields correspond to the inventory; evidence and retained facts are in bottles.csv.
+Whisky Monitor,60,410,B55838,no change,Brand/range and exact release fields correspond to the inventory; evidence and retained facts are in bottles.csv.
+Whisky Monitor,61,415,B55846,no change,"Matched using brand/range and cask, outturn or dated release, as applicable; not age/ABV alone."
+Whisky Monitor,62,421,B55845,no change,"Matched using brand/range and cask, outturn or dated release, as applicable; not age/ABV alone."
+Whisky Monitor,63,427,B55844,no change,Brand/range and exact release fields correspond to the inventory; evidence and retained facts are in bottles.csv.
+Whisky Monitor,64,433,B55834,no change,Brand/range and exact release fields correspond to the inventory; evidence and retained facts are in bottles.csv.
+Whisky Monitor,65,438,B55832,no change,Brand/range and exact release fields correspond to the inventory; evidence and retained facts are in bottles.csv.
+Whisky Monitor,66,444,B55830,no change,Brand/range and exact release fields correspond to the inventory; evidence and retained facts are in bottles.csv.
+Whisky Monitor,67,450,B55848,no change,Brand/range and exact release fields correspond to the inventory; evidence and retained facts are in bottles.csv.
+Whisky Monitor,68,456,B55873,no change,Brand/range and exact release fields correspond to the inventory; evidence and retained facts are in bottles.csv.
+Whisky Monitor,69,461,B55831,no change,Brand/range and exact release fields correspond to the inventory; evidence and retained facts are in bottles.csv.
+Whisky Monitor,70,467,B55849,no change,Brorageddon identity uses cask DL983 and its named selection; malformed source ABV is not a new release.
+Whisky Monitor,71,473,B55835,no change,Brand/range and exact release fields correspond to the inventory; evidence and retained facts are in bottles.csv.
+Whisky Monitor,72,478,B55836,no change,Brand/range and exact release fields correspond to the inventory; evidence and retained facts are in bottles.csv.
+Whisky Monitor,73,484,B55833,no change,Brand/range and exact release fields correspond to the inventory; evidence and retained facts are in bottles.csv.
+Whisky Monitor,74,490,B55829,no change,Brand/range and exact release fields correspond to the inventory; evidence and retained facts are in bottles.csv.
+Whisky Monitor,75,496,B55828,no change,Brand/range and exact release fields correspond to the inventory; evidence and retained facts are in bottles.csv.
+Whisky Monitor,76,513,B55705,no change,Brand/range and exact release fields correspond to the inventory; evidence and retained facts are in bottles.csv.
+Whisky Monitor,77,519,B67867,create,Readable label establishes 2004; source 2003 date rejected.
+Whisky Monitor,78,525,B55706,no change,Brand/range and exact release fields correspond to the inventory; evidence and retained facts are in bottles.csv.
+Whisky Monitor,79,531,B55707,no change,Brand/range and exact release fields correspond to the inventory; evidence and retained facts are in bottles.csv.
+Whisky Monitor,80,536,B55708,no change,Brand/range and exact release fields correspond to the inventory; evidence and retained facts are in bottles.csv.
+Whisky Monitor,81,542,B55711,no change,Cask 1526 exact auctions support 46%; source 48% would incorrectly select a different Chieftain release.
+Whisky Monitor,82,560,B55691,no change,Brand/range and exact release fields correspond to the inventory; evidence and retained facts are in bottles.csv.
+Whisky Monitor,83,565,B55692,no change,Brand/range and exact release fields correspond to the inventory; evidence and retained facts are in bottles.csv.
+Whisky Monitor,84,571,B55693,no change,Brand/range and exact release fields correspond to the inventory; evidence and retained facts are in bottles.csv.
+Whisky Monitor,85,577,B55694,no change,Brand/range and exact release fields correspond to the inventory; evidence and retained facts are in bottles.csv.
+Whisky Monitor,86,583,B55695,no change,Brand/range and exact release fields correspond to the inventory; evidence and retained facts are in bottles.csv.
+Whisky Monitor,87,588,B55696,no change,Brand/range and exact release fields correspond to the inventory; evidence and retained facts are in bottles.csv.
+Whisky Monitor,88,606,B67868,create,"Connoisseurs Choice, not the same-vintage Spirit of Scotland release."
+Whisky Monitor,89,612,B55805,no change,Brand/range and exact release fields correspond to the inventory; evidence and retained facts are in bottles.csv.
+Whisky Monitor,90,618,B55938,no change,"Connoisseurs Choice, not the private Reserve release."
+Whisky Monitor,91,623,B55813,no change,"Private Reserve cask 43, not Connoisseurs Choice."
+Whisky Monitor,92,629,B67869,create,Source title says 2002 but issued field says 2010; exact 2010 auction resolves the entry.
+Whisky Monitor,93,635,B55930,no change,Brand/range and exact release fields correspond to the inventory; evidence and retained facts are in bottles.csv.
+Whisky Monitor,94,641,B55933,no change,Brand/range and exact release fields correspond to the inventory; evidence and retained facts are in bottles.csv.
+Whisky Monitor,95,646,B55810,no change,Brand/range and exact release fields correspond to the inventory; evidence and retained facts are in bottles.csv.
+Whisky Monitor,96,652,B55934,no change,"Matched using brand/range and cask, outturn or dated release, as applicable; not age/ABV alone."
+Whisky Monitor,97,658,B55986,no change,Rare Old release retained; calculated age not added as stated age.
+Whisky Monitor,98,664,B55812,no change,Brand/range and exact release fields correspond to the inventory; evidence and retained facts are in bottles.csv.
+Whisky Monitor,99,681,B67876,create,James MacArthur exact auction/label establishes the identity; do not match Rare Malts with the same age and ABV.
+Whisky Monitor,100,699,B55736,no change,"Matched using brand/range and cask, outturn or dated release, as applicable; not age/ABV alone."
+Whisky Monitor,101,705,B55739,no change,"Matched using brand/range and cask, outturn or dated release, as applicable; not age/ABV alone."
+Whisky Monitor,102,711,B17700,no change,"Matched using brand/range and cask, outturn or dated release, as applicable; not age/ABV alone."
+Whisky Monitor,103,728,B55790,no change,Brand/range and exact release fields correspond to the inventory; evidence and retained facts are in bottles.csv.
+Whisky Monitor,104,746,B55896,no change,Brand/range and exact release fields correspond to the inventory; evidence and retained facts are in bottles.csv.
+Whisky Monitor,105,752,B55902,no change,"Matched using brand/range and cask, outturn or dated release, as applicable; not age/ABV alone."
+Whisky Monitor,106,758,B55891,no change,Brand/range and exact release fields correspond to the inventory; evidence and retained facts are in bottles.csv.
+Whisky Monitor,107,763,B55904,no change,SMWS code identifies the release; stored 2003 bottling year retained over conflicting index year.
+Whisky Monitor,108,769,B55905,no change,Brand/range and exact release fields correspond to the inventory; evidence and retained facts are in bottles.csv.
+Whisky Monitor,109,775,B55887,no change,Brand/range and exact release fields correspond to the inventory; evidence and retained facts are in bottles.csv.
+Whisky Monitor,110,781,B55894,no change,Brand/range and exact release fields correspond to the inventory; evidence and retained facts are in bottles.csv.
+Whisky Monitor,111,786,B55888,no change,Brand/range and exact release fields correspond to the inventory; evidence and retained facts are in bottles.csv.
+Whisky Monitor,112,792,B55895,no change,Brand/range and exact release fields correspond to the inventory; evidence and retained facts are in bottles.csv.
+Whisky Monitor,113,810,B55761,no change,Brand/range and exact release fields correspond to the inventory; evidence and retained facts are in bottles.csv.
+Whisky Monitor,114,816,B55760,no change,Cask 570 exact evidence supports 1999; source 2001 date rejected.
+Whisky Monitor,115,821,B55793,no change,Brand/range and exact release fields correspond to the inventory; evidence and retained facts are in bottles.csv.
+Whisky Monitor,116,827,B55794,no change,Brand/range and exact release fields correspond to the inventory; evidence and retained facts are in bottles.csv.
+Whisky Monitor,117,833,B55795,no change,Brand/range and exact release fields correspond to the inventory; evidence and retained facts are in bottles.csv.
+Whisky Monitor,118,839,B55765,no change,"Matched using brand/range and cask, outturn or dated release, as applicable; not age/ABV alone."
+Whisky Monitor,119,845,B55766,no change,"Matched using brand/range and cask, outturn or dated release, as applicable; not age/ABV alone."
+Whisky Monitor,120,850,B55767,no change,"Matched using brand/range and cask, outturn or dated release, as applicable; not age/ABV alone."
+Whisky Monitor,121,856,B55769,no change,Brand/range and exact release fields correspond to the inventory; evidence and retained facts are in bottles.csv.
+Whisky Monitor,122,862,B55791,no change,Brand/range and exact release fields correspond to the inventory; evidence and retained facts are in bottles.csv.
+Whisky Monitor,123,868,B55770,no change,Brand/range and exact release fields correspond to the inventory; evidence and retained facts are in bottles.csv.
+Whisky Monitor,124,874,B55772,no change,"Matched using brand/range and cask, outturn or dated release, as applicable; not age/ABV alone."
+Whisky Monitor,125,879,B55773,no change,"Matched using brand/range and cask, outturn or dated release, as applicable; not age/ABV alone."
+Whisky Monitor,126,885,B55771,no change,"Matched using brand/range and cask, outturn or dated release, as applicable; not age/ABV alone."
+Whisky Monitor,127,891,B55774,no change,Brand/range and exact release fields correspond to the inventory; evidence and retained facts are in bottles.csv.
+Whisky Monitor,128,897,B55792,no change,Brand/range and exact release fields correspond to the inventory; evidence and retained facts are in bottles.csv.
+Whisky Monitor,129,902,B55775,no change,Brand/range and exact release fields correspond to the inventory; evidence and retained facts are in bottles.csv.
+Whisky Monitor,130,908,B55777,no change,Brand/range and exact release fields correspond to the inventory; evidence and retained facts are in bottles.csv.
+Whisky Monitor,131,914,B55776,no change,Brand/range and exact release fields correspond to the inventory; evidence and retained facts are in bottles.csv.
+Whisky Monitor,132,920,B55780,no change,"Matched using brand/range and cask, outturn or dated release, as applicable; not age/ABV alone."
+Whisky Monitor,133,926,B55778,no change,"Matched using brand/range and cask, outturn or dated release, as applicable; not age/ABV alone."
+Whisky Monitor,134,931,B55783,no change,Brand/range and exact release fields correspond to the inventory; evidence and retained facts are in bottles.csv.
+Whisky Monitor,135,937,B55782,no change,Cask 1557 exact evidence supports 53.7%; index mixes in cask 1559 strength.
+Whisky Monitor,136,943,B55781,no change,Brand/range and exact release fields correspond to the inventory; evidence and retained facts are in bottles.csv.
+Whisky Monitor,137,949,B55784,no change,Brand/range and exact release fields correspond to the inventory; evidence and retained facts are in bottles.csv.
+Whisky Monitor,138,954,B55786,no change,Brand/range and exact release fields correspond to the inventory; evidence and retained facts are in bottles.csv.
+Whisky Monitor,139,960,B55785,no change,Cask 06/656 exact evidence states 24 years; conflicting index age rejected.
+Whisky Monitor,140,966,B55788,no change,Brand/range and exact release fields correspond to the inventory; evidence and retained facts are in bottles.csv.
+Whisky Monitor,141,972,B55787,no change,Brand/range and exact release fields correspond to the inventory; evidence and retained facts are in bottles.csv.
+Whisky Monitor,142,977,B55789,no change,Brand/range and exact release fields correspond to the inventory; evidence and retained facts are in bottles.csv.
+Whisky Monitor,143,995,B55876,no change,"Matched using brand/range and cask, outturn or dated release, as applicable; not age/ABV alone."
+Whisky Monitor,144,1001,B55875,no change,"Matched using brand/range and cask, outturn or dated release, as applicable; not age/ABV alone."
+Whisky Monitor,145,1018,B55591,no change,Brand/range and exact release fields correspond to the inventory; evidence and retained facts are in bottles.csv.
+Whisky Monitor,146,1024,B55590,no change,Brand/range and exact release fields correspond to the inventory; evidence and retained facts are in bottles.csv.
+Whisky Monitor,147,1042,B55627,no change,Nectar brand release retained; equal strength and vintage do not make it the Whisky Agency release.
+Whisky Monitor,148,1059,B55641,no change,Brand/range and exact release fields correspond to the inventory; evidence and retained facts are in bottles.csv.
+Whisky Monitor,149,1077,B55645,no change,Brand/range and exact release fields correspond to the inventory; evidence and retained facts are in bottles.csv.
+Whisky Monitor,150,1095,B67865,create,Brand/range and exact release fields correspond to the inventory; evidence and retained facts are in bottles.csv.

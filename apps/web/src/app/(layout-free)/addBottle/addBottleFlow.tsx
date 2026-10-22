@@ -9,6 +9,7 @@ import BottleResolver, {
   type PendingImageRef,
 } from "@peated/web/components/bottleResolver";
 import { createIdempotencyKey } from "@peated/web/components/bottleResolver/helpers";
+import { BottleResolverActionGrid } from "@peated/web/components/bottleResolver/layout.stylex";
 import { PhotoIdentificationTraceFootnote } from "@peated/web/components/bottleResolver/panels";
 import { Button, ButtonLink } from "@peated/web/components/button.stylex";
 import {
@@ -39,6 +40,7 @@ import { AuthRequired } from "@peated/web/hooks/useAuthRequired";
 import {
   getAddBottleHref,
   getPendingImageFromParams,
+  getWrongPhotoMatchFromParams,
 } from "@peated/web/lib/addBottle";
 import { shrinkPhotoForUpload, toBlob } from "@peated/web/lib/blobs";
 import { getFormErrorMessage } from "@peated/web/lib/formHelpers";
@@ -51,6 +53,7 @@ import {
   getMemberReviewUrl,
   getTastingUrl,
 } from "@peated/web/lib/urls";
+import { saveWrongPhotoMatchPick } from "@peated/web/lib/wrongPhotoMatches";
 import { useMutation, useQueryClient } from "@tanstack/react-query";
 import { BookOpen, Eye, Plus, RotateCcw, Search, Wine } from "lucide-react";
 import { useRouter, useSearchParams } from "next/navigation";
@@ -94,6 +97,7 @@ function getSearchHref(
   query = "",
   intent: AddBottleIntent = "choose",
   pendingImage?: PendingImageRef | null,
+  wrongPhotoMatchId?: number | null,
 ) {
   const params = new URLSearchParams({
     intent,
@@ -102,6 +106,9 @@ function getSearchHref(
   if (pendingImage?.id) params.set("pendingImageId", pendingImage.id);
   if (pendingImage?.imageUrl) {
     params.set("pendingImageUrl", pendingImage.imageUrl);
+  }
+  if (wrongPhotoMatchId) {
+    params.set("wrongPhotoMatch", String(wrongPhotoMatchId));
   }
   return `/search?${params.toString()}`;
 }
@@ -180,6 +187,7 @@ function BottleResultActions({
   pendingImage,
   loadingExactLibraryStatus,
   resolvingAction,
+  disabled = false,
   intent,
   changeBottleHref,
   onResolve,
@@ -203,6 +211,7 @@ function BottleResultActions({
       onClick={() => onResolve("library")}
       variant={primaryAction === "library" ? "accent" : "tonal"}
       disabled={
+        disabled ||
         Boolean(resolvingAction) ||
         loadingExactLibraryStatus ||
         (hasLibraryEntry && !canSaveLibraryPhoto)
@@ -219,7 +228,7 @@ function BottleResultActions({
       key="tasting"
       onClick={() => onResolve("tasting")}
       variant={primaryAction === "tasting" ? "accent" : "tonal"}
-      disabled={Boolean(resolvingAction)}
+      disabled={disabled || Boolean(resolvingAction)}
       loading={resolvingAction === "tasting"}
     >
       <Wine aria-hidden="true" size={16} />
@@ -324,7 +333,7 @@ function BottleCreationActions({
   return (
     <FormStack>
       {primaryButton}
-      <FormGrid>{secondaryButtons}</FormGrid>
+      <BottleResolverActionGrid>{secondaryButtons}</BottleResolverActionGrid>
     </FormStack>
   );
 }
@@ -369,7 +378,12 @@ function BottleResultScreen({
         <BottleResultActions
           {...selection}
           intent={intent}
-          changeBottleHref={getSearchHref("", intent, selection.pendingImage)}
+          changeBottleHref={getSearchHref(
+            "",
+            intent,
+            selection.pendingImage,
+            selection.wrongPhotoMatchId,
+          )}
           loadingExactLibraryStatus={false}
           resolvingAction={
             addingToLibrary ? "library" : loadingRatingForm ? "tasting" : null
@@ -473,6 +487,7 @@ function AddBottleFlowContent() {
     () => getPendingImageFromParams(new URLSearchParams(searchParams)),
     [searchParams],
   );
+  const requestedWrongPhotoMatchId = getWrongPhotoMatchFromParams(searchParams);
   const requestedBottleKey = useMemo(() => {
     const pendingImageKey = requestedPendingImage?.id ?? "no-image";
     if (requestedBottleId) {
@@ -565,13 +580,27 @@ function AddBottleFlowContent() {
         const bottle = await orpc.bottles.details.call({
           bottle: bottleId,
         });
-        const collectionStatus = await orpc.collections.bottles.list.call({
-          user: "me",
-          collection: "library",
-          bottle: bottle.id,
-        });
+        const [collectionStatus, reportGone] = await Promise.all([
+          orpc.collections.bottles.list.call({
+            user: "me",
+            collection: "library",
+            bottle: bottle.id,
+          }),
+          // The member reported the photo match as wrong; this is their pick.
+          requestedWrongPhotoMatchId
+            ? saveWrongPhotoMatchPick(
+                orpc.wrongPhotoMatches.update.call,
+                requestedWrongPhotoMatchId,
+                bottle.id,
+              )
+            : false,
+        ]);
 
         if (cancelled) return;
+        // Picking the matched Bottle withdrew the report; stop sending its ID.
+        const wrongPhotoMatchId = reportGone
+          ? null
+          : requestedWrongPhotoMatchId;
         const libraryEntry = collectionStatus.results[0] ?? null;
         const selection: BottleResolverResult = {
           bottle,
@@ -580,6 +609,7 @@ function AddBottleFlowContent() {
           pendingImage: requestedPendingImage,
           previewUrl: requestedPendingImage?.imageUrl || null,
           resultSource: requestedResultSource,
+          wrongPhotoMatchId,
         };
 
         if (intent === "tasting") {
@@ -607,6 +637,11 @@ function AddBottleFlowContent() {
           setSelectedBottle(selection);
         }
         setHandledBottleKey(requestedBottleKey);
+        if (requestedWrongPhotoMatchId && !wrongPhotoMatchId) {
+          const params = new URLSearchParams(searchParams);
+          params.delete("wrongPhotoMatch");
+          router.replace(`/addBottle?${params}`, { scroll: false });
+        }
       } catch (err) {
         logError(err);
         if (cancelled) return;
@@ -633,6 +668,9 @@ function AddBottleFlowContent() {
     requestedPendingImage,
     requestedBottleKey,
     requestedResultSource,
+    requestedWrongPhotoMatchId,
+    router,
+    searchParams,
   ]);
 
   function resetFlow(nextIntent: AddBottleIntent) {
@@ -991,19 +1029,21 @@ function AddBottleFlowContent() {
           showBottleRatings={false}
         />
       }
-      searchHrefForQuery={(query, pendingImage) =>
-        getSearchHref(query, intent, pendingImage)
+      searchHrefForQuery={(query, pendingImage, wrongPhotoMatchId) =>
+        getSearchHref(query, intent, pendingImage, wrongPhotoMatchId)
       }
       createBottleHrefForResult={(
         query: string,
         prefill?: CreateBottlePrefill,
         pendingImage?: PendingImageRef | null,
+        wrongPhotoMatchId?: number | null,
       ) =>
         getCreateBottleHref({
           query,
           returnAction: intent,
           prefill,
           pendingImage,
+          wrongPhotoMatchId,
         })
       }
       createProposalActionLabel="Add a bottle"

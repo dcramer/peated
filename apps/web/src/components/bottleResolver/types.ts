@@ -22,6 +22,8 @@ export type BottleResolverResult = {
     copyPayload: string;
   };
   warnings?: string[];
+  /** The member's "Not my bottle" report, kept so a later change still saves. */
+  wrongPhotoMatchId?: number | null;
 };
 
 export type BottleResolverAction = "library" | "tasting" | "create";
@@ -37,6 +39,8 @@ export type BottleResolverMatchedActionsProps = {
   pendingImage: PendingImageRef | null;
   loadingExactLibraryStatus: boolean;
   resolvingAction: BottleResolverMatchedAction | null;
+  /** True while the member's "Not my bottle" report is saving. */
+  disabled?: boolean;
   onResolve: (action: BottleResolverMatchedAction) => void;
 };
 
@@ -51,14 +55,17 @@ export type BottleResolverProps = {
     result: BottleResolverResult,
     action?: BottleResolverAction,
   ) => Promise<void> | void;
+  /** `wrongPhotoMatchId` names the reported match to complete with the chosen Bottle. */
   searchHrefForQuery: (
     query?: string,
     pendingImage?: PendingImageRef | null,
+    wrongPhotoMatchId?: number | null,
   ) => string;
   createBottleHrefForResult?: (
     query: string,
     prefill?: CreateBottlePrefill,
     pendingImage?: PendingImageRef | null,
+    wrongPhotoMatchId?: number | null,
   ) => string;
   title: string;
   renderMatchedResultActions?: (

@@ -17,9 +17,14 @@ import {
   getPeatedSystemActorForDatabase,
   getUserActorForDatabase,
 } from "@peated/server/lib/actors";
-import { findConflictingSmwsBottleId } from "@peated/server/lib/bottleConflicts";
+import {
+  findConflictingSmwsBottleId,
+  getBottleStructuredIdentityKey,
+} from "@peated/server/lib/bottleConflicts";
+import { findSeriesIdByName } from "@peated/server/lib/bottleHelpers";
 import {
   getBottleExactIdentity,
+  getBottleGroupNameForBrand,
   materializeBottleForGroup,
 } from "@peated/server/lib/bottleIdentity";
 import type { SystemBottlePatch } from "@peated/server/lib/bottleSchemas";
@@ -36,7 +41,7 @@ import {
   assertValidEntityOwner,
   EntityOwnershipConflictError,
 } from "@peated/server/lib/entityOwnership";
-import { formatBottleName } from "@peated/server/lib/format";
+import { deleteOwnedPronunciationAudio } from "@peated/server/lib/entityPronunciationAudio";
 import { logError, logInfo, logWarn } from "@peated/server/lib/log";
 import {
   finalizeBottleMerge,
@@ -195,6 +200,7 @@ async function performEntityMerge({
   let completedOperationResult: ReturnType<typeof buildOperationResult> | null =
     null;
   let performedMutation = false;
+  let sourceAudioUrls: (string | null)[] = [];
 
   await db.transaction(async (tx) => {
     if (operation) {
@@ -307,6 +313,9 @@ async function performEntityMerge({
       throw error;
     }
     performedMutation = true;
+    sourceAudioUrls = mergeEntityRows
+      .filter(({ id }) => fromEntityIds.includes(id))
+      .map(({ pronunciationAudioUrl }) => pronunciationAudioUrl);
 
     const mutationUser =
       operation?.approvingModerator ?? (await getAutomationModeratorUser(tx));
@@ -566,23 +575,41 @@ async function performEntityMerge({
             sql`CASE WHEN ${bottles.id} = ${group.representativeBottleId} THEN 1 ELSE 0 END`,
             asc(bottles.id),
           );
+        // The brand update below moves a source-brand Series to the
+        // destination Series with the same name, or creates one.
+        const movedSeriesId =
+          currentSeries && currentSeries.brandId !== toEntityId
+            ? await findSeriesIdByName(tx, {
+                brand: toEntity,
+                name: currentSeries.name,
+              })
+            : group.seriesId;
+        // A Series created by the move has no Bottles, so nothing can
+        // duplicate the moved Bottles.
+        const seriesWillBeCreated =
+          currentSeries !== null && movedSeriesId === null;
         const targetGroup = {
           ...group,
+          ...getBottleGroupNameForBrand({ name: group.name, brand: toEntity }),
           brandId: toEntity.id,
-          fullName: formatBottleName({
-            name: `${toEntity.shortName || toEntity.name} ${group.name}`,
-          }),
+          seriesId: movedSeriesId,
         };
-        for (const member of members) {
-          const desired = materializeBottleForGroup({
-            group: targetGroup,
-            exact: getBottleExactIdentity({
-              bottle: member,
-              sourceGroupStatedAge: group.statedAge,
-            }),
+        for (const member of seriesWillBeCreated ? [] : members) {
+          const exact = getBottleExactIdentity({
+            bottle: member,
+            sourceGroupStatedAge: group.statedAge,
           });
-          const [duplicate] = await tx
-            .select({ id: bottles.id })
+          const desired = {
+            ...exact,
+            noAgeStatement: member.noAgeStatement,
+            ...materializeBottleForGroup({ group: targetGroup, exact }),
+          };
+          const desiredKey = getBottleStructuredIdentityKey(desired);
+          // Exact Bottle merge (docs/architecture/whisky-identity-model.md)
+          // needs the full structured identity. Same-named Bottles with
+          // different release fields move without merging.
+          const candidates = await tx
+            .select()
             .from(bottles)
             .where(
               and(
@@ -597,8 +624,11 @@ async function performEntityMerge({
                 ),
               ),
             )
-            .orderBy(asc(bottles.id))
-            .limit(1);
+            .orderBy(asc(bottles.id));
+          const duplicate = candidates.find(
+            (candidate) =>
+              getBottleStructuredIdentityKey(candidate) === desiredKey,
+          );
           if (!duplicate) continue;
           bottleMergeManifests.push(
             await mergeBottlesInTransaction(tx, {
@@ -864,6 +894,9 @@ async function performEntityMerge({
   if (!performedMutation) {
     return completedOperationResult;
   }
+
+  // Source Entities are deleted; the destination keeps its own audio.
+  await Promise.all(sourceAudioUrls.map(deleteOwnedPronunciationAudio));
 
   for (const manifest of bottleMergeManifests) {
     await finalizeBottleMerge(manifest);

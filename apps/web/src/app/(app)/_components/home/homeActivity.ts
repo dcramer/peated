@@ -7,7 +7,7 @@ export function selectHomeActivityItems(
   items: readonly CommunityFeedItem[],
 ): CommunityFeedItem[] {
   const ordered = [...items].sort(
-    (left, right) => Date.parse(right.date) - Date.parse(left.date),
+    (left, right) => Date.parse(right.postedAt) - Date.parse(left.postedAt),
   );
   const selected = ordered.slice(0, HOME_ACTIVITY_LIMIT);
 
@@ -22,6 +22,6 @@ export function selectHomeActivityItems(
   if (!missingItem) return selected;
 
   return [...selected.slice(0, -1), missingItem].sort(
-    (left, right) => Date.parse(right.date) - Date.parse(left.date),
+    (left, right) => Date.parse(right.postedAt) - Date.parse(left.postedAt),
   );
 }

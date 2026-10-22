@@ -211,6 +211,13 @@ consumer rows, assigned references, release-promotion mappings, and tombstones
 converge on that Bottle in one canonical operation. BottleGroup is never the
 merge destination and a representative Bottle is never selected implicitly.
 
+An Entity merge that changes a Bottle's brand runs this merge only when the
+destination brand already has a Bottle with the same full structured identity:
+full name, Series, edition, age, vintage, bottling and release dates, ABV,
+single cask, cask strength, cask number, and outturn. A Bottle with the same
+name but different release fields moves to the destination brand as its own
+Bottle.
+
 ## BottleGroup Versus BottleSeries
 
 BottleGroup membership means “marketed releases of the same expression.”
@@ -240,6 +247,24 @@ known, such as `glen GEER-ee` for Glen Garioch or `mort-lack` for Mortlach. `pro
 International Phonetic Alphabet (IPA), without slashes, such as `ɡlɛn ˈɡɪəri`.
 Both are optional, and the Entity schema checks their format. Generated details
 fill only empty values and drop values in the wrong format.
+
+`pronunciationAudioUrl` is an MP3 that reads the IPA aloud. Clients cannot set
+it. The `GenerateEntityPronunciationAudio` worker job makes it once with Google
+Cloud Text-to-Speech, using one British English voice and the IPA in an SSML
+`<phoneme>` tag. The file name holds the Entity ID and a hash of the voice and
+IPA, so the same IPA never makes new audio, and a changed IPA or voice gets a
+new file. The job runs after each Entity change and after generated details add
+IPA. It saves the new URL with a Peated system change, then deletes the old
+file. When the IPA is cleared, or the Entity is deleted or merged away, the
+file is deleted too. Because a URL never changes meaning, the API serves these
+files with a one-year `immutable` cache.
+
+Audio needs `GCP_CREDENTIALS` and the Cloud Text-to-Speech API enabled on that
+Google Cloud project. Without credentials the job does nothing. To fill missing
+or outdated audio, POST `/admin/catalog/rebuild-pronunciation-audio` with
+`{"afterId":0}` through the authenticated API client, and repeat with each
+returned `nextAfterId` until it is null. Each call checks up to 500 Entities and
+queues only those whose audio is missing or does not match their IPA.
 
 Peated keeps references for the Entity name, short name, and the name without a
 leading “The.” A moderator can add more references. Adding or deleting an alias

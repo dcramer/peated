@@ -35,6 +35,39 @@ export type BottleIdentityState = {
   outturn: number | null;
 };
 
+export type BottleStructuredIdentity = Omit<
+  BottleIdentityState,
+  "name" | "brand" | "bottler"
+>;
+
+/**
+ * Keys the structured fields that together prove two Bottles are the same
+ * release. A shared title alone is not enough: releases such as Batch 1 and
+ * Batch 2, or two vintages, can share a full name.
+ */
+export function getBottleStructuredIdentityKey(
+  identity: BottleStructuredIdentity,
+) {
+  return JSON.stringify([
+    identity.brandId,
+    identity.fullName.toLowerCase(),
+    identity.seriesId,
+    identity.edition,
+    identity.statedAge,
+    identity.noAgeStatement,
+    identity.vintageYear,
+    identity.bottlingYear,
+    identity.releaseYear,
+    identity.releaseMonth,
+    identity.releaseDay,
+    identity.abv,
+    identity.singleCask,
+    identity.caskStrength,
+    identity.caskNumber,
+    identity.outturn,
+  ]);
+}
+
 export type BottleIdentityCandidate = {
   bottleId: number;
   current: BottleIdentityState;
@@ -246,24 +279,7 @@ export async function reserveBottleIdentitiesInTransaction(
   const excludedBottleIds = sortedCandidates.map(({ bottleId }) => bottleId);
   const structuredIdentityOwners = new Map<string, number>();
   for (const { bottleId, desired } of sortedCandidates) {
-    const key = JSON.stringify([
-      desired.brandId,
-      desired.fullName.toLowerCase(),
-      desired.seriesId,
-      desired.edition,
-      desired.statedAge,
-      desired.noAgeStatement,
-      desired.vintageYear,
-      desired.bottlingYear,
-      desired.releaseYear,
-      desired.releaseMonth,
-      desired.releaseDay,
-      desired.abv,
-      desired.singleCask,
-      desired.caskStrength,
-      desired.caskNumber,
-      desired.outturn,
-    ]);
+    const key = getBottleStructuredIdentityKey(desired);
     const owner = structuredIdentityOwners.get(key);
     if (owner !== undefined && owner !== bottleId) {
       throw new BottleIdentityConflictError(owner, "structured_identity");

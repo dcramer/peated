@@ -16,6 +16,10 @@ the [Catalog Maintenance](../operations/catalog-maintenance.md) workflow.
 - A release can have only a year, a year and month, or a full date. A month
   requires a year, and a day requires a month. Store only the parts supported
   by evidence. The server rejects invalid combinations.
+- When a new Bottle has a distillation year and a stated age but no bottling
+  year, the form fills bottling year with their sum. It stops once the user
+  types their own. Age counts whole years in the cask, so the real bottling
+  year can be one later; the user checks it against the label.
 - Creation atomically creates a singleton BottleGroup. Users do not select,
   name, or submit authority for a group.
 - Deterministic reference duplicate checks remain in the request path. Slow catalog
@@ -32,7 +36,8 @@ the [Catalog Maintenance](../operations/catalog-maintenance.md) workflow.
   Bottle/BottleRelease pair.
 
 When photo resolution suggests the wrong Bottle, the user can search or open
-manual creation with supported label fields and the pending photo. The
+manual creation with the pending photo and the label fields it read, such as
+cask number, maturation, outturn, and bottling year. The
 [photo-assisted Bottle resolution](./photo-assisted-bottle-resolution.md) owns
 that handoff.
 

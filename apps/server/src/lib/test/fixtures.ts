@@ -993,7 +993,9 @@ export const Badge = async (
   const [result] = await db
     .insert(badges)
     .values({
-      name: faker.word.noun(),
+      // Badge names are unique (case-insensitive), so a bare random word can
+      // collide when one test creates several badges.
+      name: `${faker.word.noun()} ${faker.string.alphanumeric(8)}`,
       tracker: "bottle",
       formula: "default",
       checks: [
@@ -1386,6 +1388,38 @@ export const TastingDraft = async (
     })
     .returning();
   if (!result) throw new Error("Unable to create TastingDraft fixture");
+  return result;
+};
+
+export const WrongPhotoMatch = async (
+  { ...data }: Partial<dbSchema.NewWrongPhotoMatch> = {},
+  db: AnyDatabase = dbConn,
+): Promise<dbSchema.WrongPhotoMatch> => {
+  const pendingUploadId = data.pendingUploadId ?? faker.string.uuid();
+  const [result] = await db
+    .insert(dbSchema.wrongPhotoMatches)
+    .values({
+      pendingUploadId,
+      imageUrl: `/uploads/wrong-photo-matches/wrong_photo_match-${pendingUploadId}-label.jpg`,
+      imageEvidence: {
+        sourceImageId: pendingUploadId,
+        extractors: [
+          { kind: "vision", confidence: 0.9, textSpans: [], observations: [] },
+        ],
+        fieldCandidates: {},
+        photoSuitability: {
+          isSingleBottlePhoto: true,
+          labelReadable: true,
+          suitableAsTastingImage: true,
+          suitableAsBottleImage: false,
+        },
+        conflicts: [],
+      },
+      ...data,
+      createdById: data.createdById || (await User({}, db)).id,
+    })
+    .returning();
+  if (!result) throw new Error("Unable to create WrongPhotoMatch fixture");
   return result;
 };
 

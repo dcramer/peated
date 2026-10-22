@@ -620,6 +620,28 @@ export default function BottleForm({
     };
   }, [imagePreview]);
 
+  // New Bottles default Bottling year to Distillation year plus stated age
+  // until the person types their own. Age counts whole years in the cask, so
+  // the real bottling year can be one later; the field stays editable.
+  const [bottlingYearEdited, setBottlingYearEdited] = useState(
+    () => finiteNumber(initialData.bottlingYear) !== null,
+  );
+  useEffect(() => {
+    if (!isCreate || bottlingYearEdited) return;
+    const vintage = finiteNumber(vintageYear);
+    const age = finiteNumber(statedAge);
+    const next = vintage !== null && age !== null ? vintage + age : null;
+    if (next === finiteNumber(bottlingYear)) return;
+    setValue("bottlingYear", next, { shouldDirty: true });
+  }, [
+    bottlingYear,
+    bottlingYearEdited,
+    isCreate,
+    setValue,
+    statedAge,
+    vintageYear,
+  ]);
+
   const submit: SubmitHandler<FormSchemaType> = async (data) => {
     setSubmitError(undefined);
     try {
@@ -1219,6 +1241,7 @@ export default function BottleForm({
                           id="bottle-bottling-year"
                           label="Bottling year"
                           register={register("bottlingYear", {
+                            onChange: () => setBottlingYearEdited(true),
                             setValueAs: (value) => numberOrNull(value),
                           })}
                         />
@@ -1465,7 +1488,9 @@ export default function BottleForm({
                                 : undefined
                             }
                           />
-                          {user?.mod || user?.admin ? (
+                          {/* Only moderators record photo source and license, and only
+                              when editing; new Bottles start without them. */}
+                          {!isCreate && (user?.mod || user?.admin) ? (
                             <>
                               <Field
                                 error={errors.imageSourceUrl?.message}

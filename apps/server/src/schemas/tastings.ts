@@ -296,12 +296,14 @@ export const PhotoIdentificationClassificationSchema = z.discriminatedUnion(
   ],
 );
 
+const PhotoIdentificationPendingImageSchema = PendingUploadSchema.pick({
+  id: true,
+  imageUrl: true,
+  expiresAt: true,
+});
+
 export const PhotoIdentificationSchema = z.object({
-  pendingImage: PendingUploadSchema.pick({
-    id: true,
-    imageUrl: true,
-    expiresAt: true,
-  }),
+  pendingImage: PhotoIdentificationPendingImageSchema,
   imageEvidence: ImageBottleEvidenceSchema,
   classification: PhotoIdentificationClassificationSchema,
   suggestedNextStep: PhotoIdentificationSuggestedNextStepEnum,
@@ -310,4 +312,40 @@ export const PhotoIdentificationSchema = z.object({
     .string()
     .nullable()
     .describe("Signed token for creating an auto-approved photo proposal"),
+  wrongMatchToken: z
+    .string()
+    .nullable()
+    .describe(
+      "Signed token for reporting a matched Bottle as wrong, or `null` when there is no match",
+    ),
 });
+
+/** The generic steps a member sees while the classifier works. */
+export const PhotoIdentificationStepEnum = z.enum([
+  "checking_peated",
+  "checking_web",
+  "comparing",
+]);
+
+/**
+ * Progress sent while a photo is identified. The stream ends with the full
+ * PhotoIdentificationSchema result.
+ */
+export const PhotoIdentificationProgressSchema = z.discriminatedUnion("type", [
+  z.object({
+    type: z.literal("photo"),
+    pendingImage: PhotoIdentificationPendingImageSchema,
+  }),
+  z.object({
+    type: z.literal("label"),
+    imageEvidence: ImageBottleEvidenceSchema,
+  }),
+  z.object({
+    type: z.literal("candidates"),
+    bottles: z.array(BottleSchema).max(5),
+  }),
+  z.object({
+    type: z.literal("step"),
+    step: PhotoIdentificationStepEnum,
+  }),
+]);

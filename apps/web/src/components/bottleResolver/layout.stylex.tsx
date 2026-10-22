@@ -69,6 +69,27 @@ export function BottleResolverSection({
   );
 }
 
+/**
+ * Pairs secondary actions on wide screens and stacks them on phones, keeping
+ * the same 16px rhythm as the full-width actions around them.
+ */
+export function BottleResolverActionGrid({
+  children,
+}: {
+  children: ReactNode;
+}) {
+  return <div {...stylex.props(styles.actionGrid)}>{children}</div>;
+}
+
+/** Quiet text actions on one centered row, under the main choices. */
+export function BottleResolverTextActions({
+  children,
+}: {
+  children: ReactNode;
+}) {
+  return <div {...stylex.props(styles.textActions)}>{children}</div>;
+}
+
 export function BottlePhotoAction({
   onSelectPhoto,
 }: {
@@ -142,6 +163,22 @@ const styles = stylex.create({
     display: "flex",
     flexDirection: "column",
     gap: space.x2,
+  },
+  actionGrid: {
+    display: "grid",
+    minWidth: 0,
+    gridTemplateColumns: {
+      default: "repeat(2, minmax(0, 1fr))",
+      "@media (max-width: 559px)": "1fr",
+    },
+    gap: space.x4,
+  },
+  textActions: {
+    display: "flex",
+    flexWrap: "wrap",
+    justifyContent: "center",
+    columnGap: space.x6,
+    rowGap: space.x2,
   },
   photoDescription: {
     margin: 0,

@@ -3,7 +3,7 @@ import { renderToStaticMarkup } from "react-dom/server";
 import { describe, expect, it, vi } from "vitest";
 
 import type { PhotoIdentification } from "./helpers";
-import { PhotoMatchCreateState } from "./states";
+import { PhotoFallbackState, PhotoMatchState } from "./states";
 
 function makeBottle(overrides: Partial<Bottle> = {}): Bottle {
   const timestamp = "2026-08-23T00:00:00.000Z";
@@ -20,6 +20,7 @@ function makeBottle(overrides: Partial<Bottle> = {}): Bottle {
       shortName: null,
       pronunciation: null,
       pronunciationIpa: null,
+      pronunciationAudioUrl: null,
       kind: "brand",
       status: null,
       ownerId: null,
@@ -140,35 +141,129 @@ const result: PhotoIdentification = {
     },
   },
   createToken: null,
+  wrongMatchToken: null,
 };
 
-function renderMatchedBottle(bottle: Bottle) {
+function renderMatchedBottle(bottle: Bottle, onWrongMatch?: () => void) {
   return renderToStaticMarkup(
-    <PhotoMatchCreateState
+    <PhotoMatchState
       result={result}
       previewUrl={null}
       matchedBottle={bottle}
-      createProposalLabel={null}
-      hasCreateDecision={false}
-      proposedName={null}
-      createPending={false}
-      createActionLabel="Add a bottle"
       resolvingAction={null}
       hasLibraryEntry={false}
       pendingImage={null}
       loadingExactLibraryStatus={false}
       onLoadBottle={vi.fn()}
-      onAcceptCreateProposal={vi.fn()}
-      onStartOver={vi.fn()}
+      onWrongMatch={onWrongMatch}
     />,
   );
 }
 
-describe("PhotoMatchCreateState", () => {
+function renderFallback(
+  props: Partial<Parameters<typeof PhotoFallbackState>[0]> = {},
+) {
+  return renderToStaticMarkup(
+    <PhotoFallbackState
+      result={result}
+      previewUrl={null}
+      reason="Thanks, we've noted the wrong match."
+      suggestions={[]}
+      onPickSuggestion={vi.fn()}
+      createBottleHref="/bottles/new?name=Batch"
+      searchHref="/search?q=Springbank"
+      searchLabel="Search bottles"
+      onStartOver={vi.fn()}
+      {...props}
+    />,
+  );
+}
+
+describe("PhotoMatchState", () => {
   it("shows the matched bottle release year alongside its edition", () => {
     const html = renderMatchedBottle(makeBottle());
 
     expect(html).toContain("Batch 24");
     expect(html).toContain("2023 release");
+  });
+
+  it("offers a visible way out when the match is wrong", () => {
+    const html = renderMatchedBottle(makeBottle(), vi.fn());
+
+    expect(html).toContain("Not my bottle");
+  });
+
+  it("holds the match actions while the wrong-match report saves", () => {
+    const renderActions = vi.fn(() => null);
+    renderToStaticMarkup(
+      <PhotoMatchState
+        result={result}
+        previewUrl={null}
+        matchedBottle={makeBottle()}
+        renderMatchedResultActions={renderActions}
+        resolvingAction={null}
+        hasLibraryEntry={false}
+        pendingImage={null}
+        loadingExactLibraryStatus={false}
+        onLoadBottle={vi.fn()}
+        reportingWrongMatch
+        onWrongMatch={vi.fn()}
+      />,
+    );
+
+    expect(renderActions).toHaveBeenCalledWith(
+      expect.objectContaining({ disabled: true }),
+    );
+  });
+});
+
+describe("PhotoFallbackState", () => {
+  it("suggests Bottles that continue with the chosen one", () => {
+    const html = renderFallback({
+      suggestions: [
+        makeBottle({ id: 7, fullName: "Springbank 10-year-old" }),
+        makeBottle({ id: 8, fullName: "Springbank 15-year-old" }),
+      ],
+    });
+
+    expect(html).toContain("Thanks, we&#x27;ve noted the wrong match.");
+    expect(html).toContain("Is it one of these?");
+    expect(html).toContain("Use this bottle: Springbank 10-year-old");
+    expect(html).toContain("Use this bottle: Springbank 15-year-old");
+    // Adding a new Bottle stays available after the suggestions.
+    expect(html).toContain('href="/bottles/new?name=Batch"');
+  });
+
+  it("leaves out the suggestion list when there is nothing to suggest", () => {
+    const html = renderFallback();
+
+    expect(html).not.toContain("Is it one of these?");
+    expect(html).toContain('href="/search?q=Springbank"');
+  });
+
+  it("adds an approved new Bottle through its own actions", () => {
+    const html = renderFallback({
+      result: {
+        ...result,
+        imageEvidence: {
+          ...result.imageEvidence,
+          fieldCandidates: {
+            brand: { value: "Springbank", confidence: 0.9 },
+          },
+        },
+      },
+      proposal: {
+        name: "Springbank 12-year-old Batch 25",
+        actions: <button type="button">Add a bottle</button>,
+      },
+    });
+
+    expect(html).toContain("Springbank 12-year-old Batch 25");
+    expect(html).toContain("Add a bottle");
+    // One tap adds it, so the label facts are shown, not collapsed.
+    expect(html).toMatch(/Brand.*Springbank/);
+    expect(html).not.toContain("Label details");
+    // The proposal replaces the blank Add a new bottle form.
+    expect(html).not.toContain("/bottles/new?name=Batch");
   });
 });

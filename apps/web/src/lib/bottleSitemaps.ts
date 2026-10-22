@@ -1,15 +1,10 @@
+import type { Outputs } from "@peated/server/orpc/router";
 import type { Sitemap } from "./sitemaps";
-import { getBottleUrlFromFullName } from "./urls";
-
-type SitemapBottle = {
-  id: number;
-  fullName: string;
-  updatedAt: string;
-};
+import { getBottleUrl } from "./urls";
 
 export type ListSitemapBottles = (input: {
   page: number;
-}) => Promise<{ results: SitemapBottle[] }>;
+}) => Promise<Outputs["bottles"]["sitemap"]>;
 
 export async function loadBottleSitemapPage(
   page: number,
@@ -18,7 +13,7 @@ export async function loadBottleSitemapPage(
   const { results } = await listBottles({ page });
 
   return results.map((bottle) => ({
-    url: getBottleUrlFromFullName(bottle),
+    url: getBottleUrl(bottle),
     lastModified: bottle.updatedAt,
   }));
 }
