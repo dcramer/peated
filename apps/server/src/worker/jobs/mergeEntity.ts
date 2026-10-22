@@ -36,6 +36,7 @@ import {
   assertValidEntityOwner,
   EntityOwnershipConflictError,
 } from "@peated/server/lib/entityOwnership";
+import { deleteOwnedPronunciationAudio } from "@peated/server/lib/entityPronunciationAudio";
 import { formatBottleName } from "@peated/server/lib/format";
 import { logError, logInfo, logWarn } from "@peated/server/lib/log";
 import {
@@ -195,6 +196,7 @@ async function performEntityMerge({
   let completedOperationResult: ReturnType<typeof buildOperationResult> | null =
     null;
   let performedMutation = false;
+  let sourceAudioUrls: (string | null)[] = [];
 
   await db.transaction(async (tx) => {
     if (operation) {
@@ -307,6 +309,9 @@ async function performEntityMerge({
       throw error;
     }
     performedMutation = true;
+    sourceAudioUrls = mergeEntityRows
+      .filter(({ id }) => fromEntityIds.includes(id))
+      .map(({ pronunciationAudioUrl }) => pronunciationAudioUrl);
 
     const mutationUser =
       operation?.approvingModerator ?? (await getAutomationModeratorUser(tx));
@@ -864,6 +869,9 @@ async function performEntityMerge({
   if (!performedMutation) {
     return completedOperationResult;
   }
+
+  // Source Entities are deleted; the destination keeps its own audio.
+  await Promise.all(sourceAudioUrls.map(deleteOwnedPronunciationAudio));
 
   for (const manifest of bottleMergeManifests) {
     await finalizeBottleMerge(manifest);

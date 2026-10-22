@@ -163,6 +163,15 @@ export const EntitySchema = z.object({
   shortName: EntityShortNameSchema,
   pronunciation: EntityPronunciationSchema,
   pronunciationIpa: EntityPronunciationIpaSchema,
+  pronunciationAudioUrl: z
+    .string()
+    .url()
+    .nullable()
+    .default(null)
+    .readonly()
+    .describe(
+      "URL of an MP3 that reads `pronunciationIpa` aloud, or null when no audio exists yet. Peated generates it from the IPA.",
+    ),
   kind: EntityKindSchema,
   status: EntityStatusSchema,
   ownerId: EntityOwnerIdSchema,

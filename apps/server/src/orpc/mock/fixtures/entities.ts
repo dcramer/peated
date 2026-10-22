@@ -20,6 +20,7 @@ const entityDefaults = {
   shortName: null,
   pronunciation: null,
   pronunciationIpa: null,
+  pronunciationAudioUrl: null,
   status: null,
   ownerId: null,
   owner: null,

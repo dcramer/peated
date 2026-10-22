@@ -1,5 +1,6 @@
 import { db } from "@peated/server/db";
 import { entities } from "@peated/server/db/schema";
+import { pushUniqueJob } from "@peated/server/lib/test/workerDispatch";
 import { eq } from "drizzle-orm";
 import { expect, test, vi } from "vitest";
 import {
@@ -62,6 +63,10 @@ test("fills a missing pronunciation", async ({ fixtures }) => {
     pronunciation: "glen GEER-ee",
     pronunciationIpa: "ɡlɛn ˈɡɪəri",
   });
+  expect(pushUniqueJob).toHaveBeenCalledWith(
+    "GenerateEntityPronunciationAudio",
+    { entityId: entity.id },
+  );
 });
 
 test("keeps an existing pronunciation", async ({ fixtures }) => {
@@ -107,6 +112,7 @@ test("drops a generated pronunciation in the wrong format", async ({
     pronunciation: null,
     pronunciationIpa: null,
   });
+  expect(pushUniqueJob).not.toHaveBeenCalled();
 });
 
 test("skips the model when every generated field is filled", async ({

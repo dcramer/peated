@@ -982,6 +982,23 @@ describe("PATCH /entities/:entity", () => {
     });
   });
 
+  test("ignores a client-supplied pronunciation audio URL", async ({
+    fixtures,
+  }) => {
+    const entity = await fixtures.Entity({ pronunciationIpa: "ɡlɛn" });
+    const modUser = await fixtures.User({ mod: true });
+    const input = {
+      entity: entity.id,
+      pronunciationAudioUrl: "https://example.com/other.mp3",
+    };
+
+    const data = await routerClient.entities.update(input, {
+      context: { user: modUser },
+    });
+
+    expect(data.pronunciationAudioUrl).toBeNull();
+  });
+
   test("rejects IPA pronunciation wrapped in slashes", async ({ fixtures }) => {
     const entity = await fixtures.Entity();
     const modUser = await fixtures.User({ mod: true });

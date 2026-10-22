@@ -8,6 +8,7 @@ export type JobName =
   | "GenerateBottleDetails"
   | "GenerateCountryDetails"
   | "GenerateEntityDetails"
+  | "GenerateEntityPronunciationAudio"
   | "GenerateRegionDetails"
   | "GeocodeCountryLocation"
   | "GeocodeRegionLocation"

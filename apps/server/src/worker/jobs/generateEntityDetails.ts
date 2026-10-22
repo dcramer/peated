@@ -12,6 +12,7 @@ import {
   EntityPronunciationIpaSchema,
   EntityPronunciationSchema,
 } from "@peated/server/schemas/entities";
+import { pushUniqueJob } from "@peated/server/worker/dispatch";
 import type { JobPayload } from "@peated/server/worker/types";
 import { eq } from "drizzle-orm";
 import { z } from "zod";
@@ -275,6 +276,11 @@ export async function generateEntityDetails(
       },
     });
   });
+
+  // Generated IPA skips OnEntityChange, so it queues its own audio.
+  if (data.pronunciationIpa) {
+    await pushUniqueJob("GenerateEntityPronunciationAudio", { entityId });
+  }
 }
 
 export default async function generateEntityDetailsJob(input: JobPayload) {

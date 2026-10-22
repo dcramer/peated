@@ -50,6 +50,12 @@ identification limit, it queues itself again with a delay. Any other error marks
 `failed` without a retry. See
 [Tasting Drafts](../../../../docs/features/tasting-drafts.md#identifying-the-bottle).
 
+`GenerateEntityPronunciationAudio` calls Google Cloud Text-to-Speech, not a
+model, so it runs on `default` with a 15-second request timeout. A failed run
+keeps the old audio; `/admin/catalog/rebuild-pronunciation-audio` queues it
+again. See
+[Naming And Entity Boundaries](../../../../docs/architecture/whisky-identity-model.md#naming-and-entity-boundaries).
+
 When the AI service is out of budget, rate limited, down, or unreachable
 (`isModelServiceUnavailable`), the models queue pauses for 15 minutes and puts
 the job back without using an attempt. A model job must let that error throw
