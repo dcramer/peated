@@ -1,9 +1,9 @@
+import { BottleDisplayNameSourceSchema } from "@peated/server/schemas";
 import { z } from "zod";
 import { contract } from "../base";
 
-export const BottleSitemapEntrySchema = z.object({
+export const BottleSitemapEntrySchema = BottleDisplayNameSourceSchema.extend({
   id: z.number().int().positive(),
-  fullName: z.string().min(1),
   updatedAt: z.string().datetime(),
 });
 

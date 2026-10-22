@@ -97,7 +97,9 @@ shared helpers so stored text cannot close the script element.
 The root sitemap lists the preferred Bottle, brand, producer, Series, country,
 region, and static pages. Region sitemaps are split by country. Child sitemaps
 follow API pagination and use `updatedAt` only when the API supplies a reliable
-value. Sitemaps use the public API without a signed-in member.
+value. Sitemaps use the public API without a signed-in member. Each sitemap
+entry is the page's canonical URL, so the Bottle sitemap API returns the fields
+the Bottle display name is built from, not the stored `fullName`.
 
 Tastings, member reviews, and member profiles are not in the sitemap. Search
 engines can still find them through links from public pages. Adding a page to a

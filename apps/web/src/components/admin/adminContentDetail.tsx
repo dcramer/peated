@@ -11,7 +11,7 @@ import {
 import { useState, type FormEvent, type ReactNode } from "react";
 
 import { useORPC } from "../../lib/orpc/context";
-import { getBottleUrlFromFullName } from "../../lib/urls";
+import { getBottleUrl } from "../../lib/urls";
 import { TextLink } from "../textLink.stylex";
 import { Timestamp } from "../timestamp";
 import { AdminButton } from "./adminButton.stylex";
@@ -166,7 +166,7 @@ function ContentFields({ item }: { item: ContentItem }) {
     [
       "Bottle",
       item.bottle ? (
-        <TextLink href={getBottleUrlFromFullName(item.bottle)} key="bottle">
+        <TextLink href={getBottleUrl(item.bottle)} key="bottle">
           {appendAbv(item.bottle.fullName, item.bottle.abv)}
         </TextLink>
       ) : (
