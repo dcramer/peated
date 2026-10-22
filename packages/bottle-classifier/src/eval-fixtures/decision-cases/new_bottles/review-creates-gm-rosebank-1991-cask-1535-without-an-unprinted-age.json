@@ -1384,10 +1384,12 @@
         "id": 5645,
         "name": "Gordon & MacPhail"
       },
-      "vintageYear": 1991
+      "vintageYear": 1991,
+      "caskNumber": "1535",
+      "edition": null
     },
     "proposedBottleNameOneOf": ["Rosebank 1991"],
     "proposedBottleNameExcludes": ["year-old", "Vintage"],
-    "summary": "Create the G&M Cask Strength Rosebank 1991 single cask named Rosebank 1991, with the cask in edition or caskNumber and no age, because neither the title nor the trade listing prints one."
+    "summary": "Create the G&M Cask Strength Rosebank 1991 single cask named Rosebank 1991, with cask 1535 in caskNumber, no edition, and no age, because neither the title nor the trade listing prints one."
   }
 }

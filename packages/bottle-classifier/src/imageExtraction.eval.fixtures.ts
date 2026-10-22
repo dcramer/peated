@@ -14,6 +14,7 @@ export type ExtractedIdentityField =
   | "bottling_year"
   | "cask_strength"
   | "single_cask"
+  | "cask_number"
   | "edition";
 
 type TextExpectation = {
@@ -173,7 +174,8 @@ export const IMAGE_EXTRACTION_EVAL_CASES: ImageExtractionEvalCase[] = [
         release_year: null,
         cask_strength: true,
         single_cask: true,
-        edition: "Cask No. 71",
+        cask_number: "71",
+        edition: null,
       },
     },
   },

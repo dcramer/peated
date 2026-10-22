@@ -38,12 +38,6 @@ function includesIdentityText(value: string, candidate: string) {
   return value.toLocaleLowerCase().includes(candidate.toLocaleLowerCase());
 }
 
-function isCompactEditionCode(edition: string) {
-  return (
-    /\d/u.test(edition) && /^[A-Za-z0-9]+(?:[./-][A-Za-z0-9]+)*$/u.test(edition)
-  );
-}
-
 export function isBatchEdition(edition: string | null | undefined) {
   return edition
     ? /^batch(?:\s+(?:no\.?|number))?\s+\S/iu.test(edition)
@@ -57,8 +51,7 @@ export function getBottleReleaseMetadata(
     "edition" | "releaseYear" | "vintageYear"
   >,
 ) {
-  if (bottle.edition && isBatchEdition(bottle.edition)) return bottle.edition;
-  if (bottle.edition) return null;
+  if (bottle.edition) return bottle.edition;
   if (bottle.vintageYear !== null && bottle.vintageYear !== undefined) {
     return `${bottle.vintageYear} vintage`;
   }
@@ -66,6 +59,16 @@ export function getBottleReleaseMetadata(
     return `${bottle.releaseYear} release`;
   }
   return null;
+}
+
+// Stored Bottle names end in ` - <edition>` (formatCanonicalBottleName).
+function removeStoredEdition(name: string, edition: string | null | undefined) {
+  const suffix = edition ? ` - ${edition.trim()}` : null;
+  return suffix &&
+    name.length > suffix.length &&
+    name.toLocaleLowerCase().endsWith(suffix.toLocaleLowerCase())
+    ? name.slice(0, -suffix.length)
+    : name;
 }
 
 function getExpressionName(bottle: BottleDisplayNameSource) {
@@ -91,7 +94,9 @@ function getExpressionName(bottle: BottleDisplayNameSource) {
       .filter((value): value is string => value !== undefined)
       .map((value) => value.toLocaleLowerCase()),
   );
-  const titleSegments = bottle.name.split(" - ");
+  const titleSegments = removeStoredEdition(bottle.name, bottle.edition).split(
+    " - ",
+  );
 
   while (
     titleSegments.length > 1 &&
@@ -105,27 +110,16 @@ function getExpressionName(bottle: BottleDisplayNameSource) {
   return titleSegments.join(" - ") || bottle.name;
 }
 
-function getReleaseName(bottle: BottleDisplayNameSource) {
-  const expressionName = getExpressionName(bottle);
-
-  if (bottle.edition && !isBatchEdition(bottle.edition)) {
-    if (includesIdentityText(expressionName, bottle.edition)) {
-      return expressionName;
-    }
-
-    const separator = isCompactEditionCode(bottle.edition) ? " " : " - ";
-    return `${expressionName}${separator}${bottle.edition}`;
-  }
-
-  return expressionName;
-}
-
-/** Formats the concise marketed identity used for human-facing bottle names. */
+/**
+ * Formats the concise marketed identity used for human-facing bottle names.
+ * Whisky Identity Model: the edition is a release fact shown beside the
+ * title, never inside it.
+ */
 export function formatBottleDisplayName(
   bottle: BottleDisplayNameSource,
   { includeBrand = true, includeSeries = true }: BottleDisplayNameOptions = {},
 ) {
-  const expressionName = getReleaseName(bottle);
+  const expressionName = getExpressionName(bottle);
   const brandName = bottle.brand.shortName || bottle.brand.name;
   const seriesName =
     bottle.series && !includesIdentityText(expressionName, bottle.series.name)

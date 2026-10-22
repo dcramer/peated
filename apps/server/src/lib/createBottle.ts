@@ -29,6 +29,11 @@ import {
 import { getPeatedSystemActor, getUserActor } from "@peated/server/lib/actors";
 import { processSeries } from "@peated/server/lib/bottleHelpers";
 import {
+  findBottleWithSameTitle,
+  formatSameTitleProblem,
+  getEditionCaskNumberProblem,
+} from "@peated/server/lib/bottleNamingRules";
+import {
   getBottleSeriesMemberships,
   updateBottleSeriesReleaseCounts,
 } from "@peated/server/lib/bottleSeriesReleaseCounts";
@@ -238,6 +243,11 @@ async function prepareBottleCreateInTransaction(
     );
   }
 
+  const editionProblem = getEditionCaskNumberProblem(bottleData);
+  if (editionProblem) {
+    throw new BottleCreateBadRequestError(editionProblem);
+  }
+
   const newEntityIds: Set<number> = new Set();
 
   const attemptedSmwsIdentity = {
@@ -355,6 +365,22 @@ async function prepareBottleCreateInTransaction(
       ...bottleData,
       name: `${brand.shortName || brand.name} ${bottleData.name}`,
     });
+
+  const sameTitleBottle = await findBottleWithSameTitle(tx, {
+    brandId: brand.id,
+    seriesId,
+    titleFullName: groupFullName,
+    edition: bottleData.edition ?? null,
+    vintageYear: bottleData.vintageYear ?? null,
+    statedAge: bottleName
+      ? bottleName.statedAge
+      : (bottleData.statedAge ?? null),
+  });
+  if (sameTitleBottle) {
+    throw new BottleCreateBadRequestError(
+      formatSameTitleProblem(groupFullName, sameTitleBottle),
+    );
+  }
 
   const bottleInsertData: NewBottle = {
     ...bottleData,

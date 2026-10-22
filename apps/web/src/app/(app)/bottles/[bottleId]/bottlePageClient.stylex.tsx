@@ -5,6 +5,7 @@ import {
   formatBottleDisplayName,
   formatBottleLabel,
 } from "@peated/server/lib/bottleDisplayName";
+import { formatReleaseDate } from "@peated/server/lib/bottleRelease";
 import { formatCategoryName } from "@peated/server/lib/format";
 import type { Outputs } from "@peated/server/orpc/router";
 import * as stylex from "@stylexjs/stylex";
@@ -45,7 +46,6 @@ import {
   getAddSimilarBottlePath,
 } from "@peated/web/lib/addBottle";
 import { toBottleListItem } from "@peated/web/lib/bottleListItem";
-import { getBottleReleasePlacement } from "@peated/web/lib/bottleMetadata";
 import { getReviewAndTastingFeedItems } from "@peated/web/lib/communityFeed";
 import { logTelemetryError } from "@peated/web/lib/log";
 import { useORPC } from "@peated/web/lib/orpc/context";
@@ -119,10 +119,7 @@ function getDeclaredFacts(bottle: Bottle): [FactListItem, ...FactListItem[]] {
           ? null
           : `${bottle.outturn.toLocaleString("en-US")} bottles`,
     },
-    {
-      label: "Release",
-      value: getBottleReleasePlacement(bottle).header,
-    },
+    { label: "Edition", value: bottle.edition },
     {
       label: "Vintage",
       value: bottle.vintageYear === null ? null : String(bottle.vintageYear),
@@ -133,7 +130,7 @@ function getDeclaredFacts(bottle: Bottle): [FactListItem, ...FactListItem[]] {
     },
     {
       label: "Released",
-      value: getBottleReleasePlacement(bottle).details,
+      value: formatReleaseDate(bottle),
     },
     {
       label: "Phenols",

@@ -41,6 +41,12 @@ import {
   getBottleExactStatedAge,
   materializeBottleForGroup,
 } from "@peated/server/lib/bottleIdentity";
+import {
+  findBottleWithSameTitle,
+  formatSameTitleProblem,
+  getEditionCaskNumberProblem,
+  getSameTitleDifference,
+} from "@peated/server/lib/bottleNamingRules";
 import { isValidReleaseDate } from "@peated/server/lib/bottleRelease";
 import {
   BottlePatchSchema,
@@ -1015,6 +1021,87 @@ async function resolveStableState(
   };
 }
 
+/**
+ * Whisky Identity Model, "Bottle Name, Edition, And Cask Number". Runs only
+ * when an edit touches the checked fields, so unrelated edits to existing
+ * records are not blocked.
+ */
+async function assertBottleNamingRules(
+  tx: AnyTransaction,
+  {
+    group,
+    stable,
+    lockedBottle,
+    selectedDesired,
+    affectedMembers,
+    desiredByBottleId,
+  }: {
+    group: BottleGroup;
+    stable: StableState;
+    lockedBottle: Bottle;
+    selectedDesired: DesiredBottle;
+    affectedMembers: Bottle[];
+    desiredByBottleId: Map<number, DesiredBottle>;
+  },
+) {
+  if (
+    lockedBottle.edition !== (selectedDesired.edition ?? null) ||
+    lockedBottle.caskNumber !== (selectedDesired.caskNumber ?? null)
+  ) {
+    const editionProblem = getEditionCaskNumberProblem(selectedDesired);
+    if (editionProblem) throw new BottleUpdateInputError(editionProblem);
+  }
+
+  const titleChanged =
+    group.fullName.toLocaleLowerCase() !==
+      stable.fullName.toLocaleLowerCase() ||
+    group.brandId !== stable.brandId ||
+    group.seriesId !== stable.seriesId;
+  const checkedMembers = affectedMembers.filter((member) => {
+    const desired = desiredByBottleId.get(member.id)!;
+    return (
+      titleChanged ||
+      member.vintageYear !== (desired.vintageYear ?? null) ||
+      member.statedAge !== (desired.statedAge ?? null)
+    );
+  });
+  const affectedIds = affectedMembers.map(({ id }) => id);
+
+  for (const member of checkedMembers) {
+    const desired = desiredByBottleId.get(member.id)!;
+    const identity = {
+      brandId: stable.brandId,
+      seriesId: stable.seriesId,
+      titleFullName: stable.fullName,
+      edition: desired.edition ?? null,
+      vintageYear: desired.vintageYear ?? null,
+      statedAge: desired.statedAge ?? null,
+    };
+    let conflict: Awaited<ReturnType<typeof findBottleWithSameTitle>> = null;
+    for (const other of affectedMembers) {
+      const otherDesired = desiredByBottleId.get(other.id)!;
+      const difference =
+        other.id !== member.id &&
+        (otherDesired.edition ?? null) === identity.edition
+          ? getSameTitleDifference(identity, {
+              vintageYear: otherDesired.vintageYear ?? null,
+              statedAge: otherDesired.statedAge ?? null,
+            })
+          : null;
+      if (difference) {
+        conflict = { id: other.id, difference };
+        break;
+      }
+    }
+    conflict ??= await findBottleWithSameTitle(tx, identity, affectedIds);
+    if (conflict) {
+      throw new BottleUpdateInputError(
+        formatSameTitleProblem(stable.fullName, conflict),
+      );
+    }
+  }
+}
+
 function stableDiff(group: BottleGroup, stable: StableState) {
   return (
     group.name !== stable.name ||
@@ -1394,6 +1481,14 @@ export async function updateBottleInTransaction(
     ? members
     : members.filter(({ id }) => id === bottleId);
   const affectedIds = affectedMembers.map(({ id }) => id).sort((a, b) => a - b);
+  await assertBottleNamingRules(tx, {
+    group,
+    stable,
+    lockedBottle,
+    selectedDesired,
+    affectedMembers,
+    desiredByBottleId,
+  });
   const memberSeriesChanged =
     sharedChanged &&
     affectedMembers.some(
