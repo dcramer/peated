@@ -49,6 +49,7 @@ import { getBottleReleasePlacement } from "@peated/web/lib/bottleMetadata";
 import { getReviewAndTastingFeedItems } from "@peated/web/lib/communityFeed";
 import { logTelemetryError } from "@peated/web/lib/log";
 import { useORPC } from "@peated/web/lib/orpc/context";
+import { serverDataQueryOptions } from "@peated/web/lib/orpc/query";
 import { selectOtherSeriesBottles } from "@peated/web/lib/seriesBottleRail";
 import { getBottleSeriesUrl, getBottleUrl } from "@peated/web/lib/urls";
 import { colors, space } from "../../../../styles/tokens.stylex";
@@ -356,12 +357,14 @@ export function BottlePageFrameClient({
 }) {
   const orpc = useORPC();
   const pathname = usePathname();
-  const bottleQuery = useQuery({
-    ...orpc.bottles.details.queryOptions({
-      input: { bottle: initialBottle.id },
-    }),
-    initialData: initialBottle,
-  });
+  const bottleQuery = useQuery(
+    serverDataQueryOptions(
+      orpc.bottles.details.queryOptions({
+        input: { bottle: initialBottle.id },
+      }),
+      initialBottle,
+    ),
+  );
 
   if (bottleQuery.error) {
     return (
