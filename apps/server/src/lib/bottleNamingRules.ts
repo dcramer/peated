@@ -1,6 +1,6 @@
 import type { AnyTransaction } from "@peated/server/db";
 import { bottleGroups, bottles } from "@peated/server/db/schema";
-import { and, asc, eq, notInArray, sql } from "drizzle-orm";
+import { and, asc, eq, ne, sql } from "drizzle-orm";
 
 // Whisky Identity Model, "Bottle Name, Edition, And Cask Number": these checks
 // reject names and editions that break the naming rule. They compare stored
@@ -46,7 +46,7 @@ export type BottleTitleIdentity = {
 type SameTitleDifference = "vintage" | "age";
 
 /** Returns which known fact differs between two Bottles with the same title. */
-export function getSameTitleDifference(
+function getSameTitleDifference(
   left: Pick<BottleTitleIdentity, "vintageYear" | "statedAge">,
   right: Pick<BottleTitleIdentity, "vintageYear" | "statedAge">,
 ): SameTitleDifference | null {
@@ -68,14 +68,15 @@ export function getSameTitleDifference(
 }
 
 /**
- * Finds another Bottle with the same title and edition but a different
- * vintage or age. Nothing people see tells those Bottles apart, so each name
- * must carry its vintage or age.
+ * Finds a Bottle in another group with the same title and edition but a
+ * different vintage or age. Nothing people see tells those Bottles apart, so
+ * each name must carry its vintage or age. Members of one group share a name
+ * by design, so `excludeGroupId` leaves the edited Bottle's group out.
  */
 export async function findBottleWithSameTitle(
   tx: AnyTransaction,
   identity: BottleTitleIdentity,
-  excludeBottleIds: number[] = [],
+  excludeGroupId: number | null = null,
 ): Promise<{ id: number; difference: SameTitleDifference } | null> {
   if (identity.vintageYear === null && identity.statedAge === null) {
     return null;
@@ -91,9 +92,9 @@ export async function findBottleWithSameTitle(
     .innerJoin(bottleGroups, eq(bottleGroups.id, bottles.groupId))
     .where(
       and(
-        excludeBottleIds.length
-          ? notInArray(bottles.id, excludeBottleIds)
-          : undefined,
+        excludeGroupId === null
+          ? undefined
+          : ne(bottles.groupId, excludeGroupId),
         eq(bottleGroups.brandId, identity.brandId),
         sql`${bottleGroups.seriesId} IS NOT DISTINCT FROM ${identity.seriesId}`,
         eq(

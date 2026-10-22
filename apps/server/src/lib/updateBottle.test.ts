@@ -2371,6 +2371,76 @@ describe("Bottle naming rules", () => {
     ).resolves.toBeDefined();
   });
 
+  test("rejects an edition change that leaves two vintages with one title", async ({
+    fixtures,
+  }) => {
+    const mod = await fixtures.User({ mod: true });
+    const brand = await fixtures.Entity({ name: "Edition Rule Bottler" });
+    const older = await createBottle({
+      context: contextFor(mod),
+      input: {
+        name: "Glen Ord",
+        brand: brand.id,
+        edition: "Batch 1",
+        vintageYear: 2011,
+      },
+    });
+    const newer = await createBottle({
+      context: contextFor(mod),
+      input: { name: "Glen Ord", brand: brand.id, vintageYear: 2012 },
+    });
+
+    const error = await waitError(
+      updateBottle({
+        bottleId: newer.bottle.id,
+        input: { edition: "Batch 1" },
+        context: contextFor(mod),
+      }),
+      BottleUpdateInputError,
+    );
+    expect(error.message).toContain(`Bottle ${older.bottle.id}`);
+    expect(error.message).toContain("vintage");
+
+    const [unchanged] = await db
+      .select({ edition: bottles.edition })
+      .from(bottles)
+      .where(eq(bottles.id, newer.bottle.id));
+    expect(unchanged?.edition).toBeNull();
+  });
+
+  test("lets group members with different vintages share the group name", async ({
+    fixtures,
+  }) => {
+    const mod = await fixtures.User({ mod: true });
+    const brand = await fixtures.Entity({ name: "Shared Name Bottler" });
+    const { first, members } = await createGroup({
+      user: mod,
+      stable: { name: "Islay Barley", brand: brand.id },
+      exacts: [{ vintageYear: 2011 }, { vintageYear: 2012 }],
+    });
+
+    await updateBottle({
+      bottleId: members[1].bottle.id,
+      input: { vintageYear: 2013 },
+      context: contextFor(mod),
+    });
+    await updateBottle({
+      bottleId: first.bottle.id,
+      input: { name: "Islay Barley Unpeated" },
+      context: contextFor(mod),
+    });
+
+    expect(
+      (await loadGroupMembers(first.group.id)).map(({ name, vintageYear }) => ({
+        name,
+        vintageYear,
+      })),
+    ).toEqual([
+      { name: "Islay Barley Unpeated", vintageYear: 2011 },
+      { name: "Islay Barley Unpeated", vintageYear: 2013 },
+    ]);
+  });
+
   test("keeps a cask number out of edition", async ({ fixtures }) => {
     const mod = await fixtures.User({ mod: true });
     const brand = await fixtures.Entity({ name: "Cask Edition Bottler" });

@@ -45,7 +45,6 @@ import {
   findBottleWithSameTitle,
   formatSameTitleProblem,
   getEditionCaskNumberProblem,
-  getSameTitleDifference,
 } from "@peated/server/lib/bottleNamingRules";
 import { isValidReleaseDate } from "@peated/server/lib/bottleRelease";
 import {
@@ -1061,39 +1060,27 @@ async function assertBottleNamingRules(
     const desired = desiredByBottleId.get(member.id)!;
     return (
       titleChanged ||
+      member.edition !== (desired.edition ?? null) ||
       member.vintageYear !== (desired.vintageYear ?? null) ||
       member.statedAge !== (desired.statedAge ?? null)
     );
   });
-  const affectedIds = affectedMembers.map(({ id }) => id);
-
   for (const member of checkedMembers) {
     const desired = desiredByBottleId.get(member.id)!;
-    const identity = {
-      brandId: stable.brandId,
-      seriesId: stable.seriesId,
-      titleFullName: stable.fullName,
-      edition: desired.edition ?? null,
-      vintageYear: desired.vintageYear ?? null,
-      statedAge: desired.statedAge ?? null,
-    };
-    let conflict: Awaited<ReturnType<typeof findBottleWithSameTitle>> = null;
-    for (const other of affectedMembers) {
-      const otherDesired = desiredByBottleId.get(other.id)!;
-      const difference =
-        other.id !== member.id &&
-        (otherDesired.edition ?? null) === identity.edition
-          ? getSameTitleDifference(identity, {
-              vintageYear: otherDesired.vintageYear ?? null,
-              statedAge: otherDesired.statedAge ?? null,
-            })
-          : null;
-      if (difference) {
-        conflict = { id: other.id, difference };
-        break;
-      }
-    }
-    conflict ??= await findBottleWithSameTitle(tx, identity, affectedIds);
+    const conflict = await findBottleWithSameTitle(
+      tx,
+      {
+        brandId: stable.brandId,
+        seriesId: stable.seriesId,
+        titleFullName: stable.fullName,
+        edition: desired.edition ?? null,
+        vintageYear: desired.vintageYear ?? null,
+        statedAge: desired.statedAge ?? null,
+      },
+      // Group members share one name, so a rename cannot tell them apart
+      // and their facts show beside the title. Compare only other groups.
+      group.id,
+    );
     if (conflict) {
       throw new BottleUpdateInputError(
         formatSameTitleProblem(stable.fullName, conflict),

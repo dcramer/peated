@@ -85,8 +85,8 @@ the counts and IDs.
   the age added only when the same Brand has another Bottle of that distillery
   and vintage; `edition` holds a batch, selection, or market the label prints;
   every cask number goes in `caskNumber`, never in `edition`. The API rejects
-  an edition that repeats the cask number and a title that matches another
-  Bottle with a different vintage or age.
+  an edition that repeats the cask number and a title and edition that match
+  a Bottle in another group with a different vintage or age.
 - Read the edit context before a shared rename; it changes every Bottle in
   the group.
 - Use `null` for an unknown or disputed fact. Keep an existing value unless a

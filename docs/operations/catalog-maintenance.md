@@ -109,9 +109,10 @@ Then apply these rules:
   label; narrative prose cannot add words such as `Release`, `Edition`,
   `Batch`, or `Volume`.
 - The API rejects an `edition` that repeats the `caskNumber`, and a name,
-  Brand, Series, vintage, or age change that leaves two Bottles with the same
-  title and edition but different vintages or ages. Fix the names instead of
-  working around the check.
+  Brand, Series, edition, vintage, or age change that leaves two Bottles in
+  different groups with the same title and edition but different vintages or
+  ages. Fix the names instead of working around the check. Bottles in one
+  group share a name, so the check does not compare them with each other.
 - The server normalizes `name` on create and update: age wording such as
   `22 Years` or `Aged 7 Years` becomes `22-year-old` or `Aged 7-year-old`, so
   write `7-year-old` rather than `Aged 7 Years`. See
