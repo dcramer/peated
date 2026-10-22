@@ -6,6 +6,7 @@ import createMissingBottles from "./createMissingBottles";
 import generateBottleDetails from "./generateBottleDetails";
 import generateCountryDetails from "./generateCountryDetails";
 import generateEntityDetails from "./generateEntityDetails";
+import generateEntityPronunciationAudio from "./generateEntityPronunciationAudio";
 import generateRegionDetails from "./generateRegionDetails";
 import geocodeCountryLocation from "./geocodeCountryLocation";
 import geocodeEntityLocation from "./geocodeEntityLocation";
@@ -58,6 +59,12 @@ registry.add("GenerateCountryDetails", generateCountryDetails, {
 registry.add("GenerateEntityDetails", generateEntityDetails, {
   queueName: "models",
 });
+// Pronunciation audio calls Cloud Text-to-Speech, not a model, and every
+// request carries a timeout, so it stays on the default queue.
+registry.add(
+  "GenerateEntityPronunciationAudio",
+  generateEntityPronunciationAudio,
+);
 registry.add("GenerateRegionDetails", generateRegionDetails, {
   queueName: "models",
 });

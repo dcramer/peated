@@ -1,3 +1,4 @@
+import config from "@peated/server/config";
 import { db } from "@peated/server/db";
 import {
   entityFollows,
@@ -77,6 +78,24 @@ describe("GET /entities/:entity", () => {
     expect(data.images[0]?.imageUrl).toContain(
       "/uploads/entities/primary.webp",
     );
+  });
+
+  test("returns an absolute pronunciation audio URL", async ({ fixtures }) => {
+    const withAudio = await fixtures.Entity({
+      pronunciationIpa: "ɡlɛn ˈɡɪəri",
+      pronunciationAudioUrl: "/uploads/entity-pronunciations/1-abc.mp3",
+    });
+    const withoutAudio = await fixtures.Entity();
+
+    const data = await routerClient.entities.details({ entity: withAudio.id });
+    const empty = await routerClient.entities.details({
+      entity: withoutAudio.id,
+    });
+
+    expect(data.pronunciationAudioUrl).toBe(
+      `${config.API_SERVER}/uploads/entity-pronunciations/1-abc.mp3`,
+    );
+    expect(empty.pronunciationAudioUrl).toBeNull();
   });
 
   test("returns the current direct owner", async ({ fixtures }) => {

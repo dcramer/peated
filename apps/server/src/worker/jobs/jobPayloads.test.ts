@@ -2,6 +2,7 @@ import { describe, expect, test } from "vitest";
 import { CapturePriceImageJobArgsSchema } from "./capturePriceImage";
 import { GenerateCountryDetailsJobArgsSchema } from "./generateCountryDetails";
 import { GenerateEntityDetailsJobArgsSchema } from "./generateEntityDetails";
+import { GenerateEntityPronunciationAudioJobArgsSchema } from "./generateEntityPronunciationAudio";
 import { GenerateRegionDetailsJobArgsSchema } from "./generateRegionDetails";
 import { GeocodeCountryLocationJobArgsSchema } from "./geocodeCountryLocation";
 import { GeocodeEntityLocationJobArgsSchema } from "./geocodeEntityLocation";
@@ -24,6 +25,7 @@ const jobPayloads = [
   ],
   [GenerateCountryDetailsJobArgsSchema, { countryId: 1 }],
   [GenerateEntityDetailsJobArgsSchema, { entityId: 1 }],
+  [GenerateEntityPronunciationAudioJobArgsSchema, { entityId: 1 }],
   [GenerateRegionDetailsJobArgsSchema, { regionId: 1 }],
   [GeocodeCountryLocationJobArgsSchema, { countryId: 1 }],
   [GeocodeEntityLocationJobArgsSchema, { entityId: 1 }],

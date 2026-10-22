@@ -241,6 +241,24 @@ International Phonetic Alphabet (IPA), without slashes, such as `ɡlɛn ˈɡɪə
 Both are optional, and the Entity schema checks their format. Generated details
 fill only empty values and drop values in the wrong format.
 
+`pronunciationAudioUrl` is an MP3 that reads the IPA aloud. Clients cannot set
+it. The `GenerateEntityPronunciationAudio` worker job makes it once with Google
+Cloud Text-to-Speech, using one British English voice and the IPA in an SSML
+`<phoneme>` tag. The file name holds the Entity ID and a hash of the voice and
+IPA, so the same IPA never makes new audio, and a changed IPA or voice gets a
+new file. The job runs after each Entity change and after generated details add
+IPA. It saves the new URL with a Peated system change, then deletes the old
+file. When the IPA is cleared, or the Entity is deleted or merged away, the
+file is deleted too. Because a URL never changes meaning, the API serves these
+files with a one-year `immutable` cache.
+
+Audio needs `GCP_CREDENTIALS` and the Cloud Text-to-Speech API enabled on that
+Google Cloud project. Without credentials the job does nothing. To fill missing
+or outdated audio, POST `/admin/catalog/rebuild-pronunciation-audio` with
+`{"afterId":0}` through the authenticated API client, and repeat with each
+returned `nextAfterId` until it is null. Each call checks up to 500 Entities and
+queues only those whose audio is missing or does not match their IPA.
+
 Peated keeps references for the Entity name, short name, and the name without a
 leading “The.” A moderator can add more references. Adding or deleting an alias
 does not change these references. The same alias can belong to more than one

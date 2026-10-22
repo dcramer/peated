@@ -31,8 +31,13 @@ import {
 import { prepareOperation } from "@peated/server/lib/bottleOperationReview";
 import { createBottle } from "@peated/server/lib/createBottle";
 import { loadEntityMergeOperation } from "@peated/server/lib/entityMergeOperation";
+import {
+  getPronunciationAudioUrl,
+  storePronunciationAudio,
+} from "@peated/server/lib/entityPronunciationAudio";
 import { createLegacyStorePriceReviewCheck } from "@peated/server/lib/test/legacyBottleChecks";
 import { pushUniqueJob } from "@peated/server/lib/test/workerDispatch";
+import { readFile } from "@peated/server/lib/uploads";
 import type { Context } from "@peated/server/orpc/context";
 import { and, eq, inArray } from "drizzle-orm";
 import pg from "pg";
@@ -220,6 +225,38 @@ test("keeps images when Entities merge", async ({ fixtures }) => {
       }),
     ]),
   );
+});
+
+test("removes pronunciation audio from merged-away Entities", async ({
+  fixtures,
+}) => {
+  const source = await fixtures.Entity({ pronunciationIpa: "ɡlɛn" });
+  const destination = await fixtures.Entity({ pronunciationIpa: "ɡlɛm" });
+  const sourceAudioUrl = getPronunciationAudioUrl(source.id, "ɡlɛn");
+  const destinationAudioUrl = getPronunciationAudioUrl(destination.id, "ɡlɛm");
+  for (const [entityId, audioUrl] of [
+    [source.id, sourceAudioUrl],
+    [destination.id, destinationAudioUrl],
+  ] as const) {
+    await storePronunciationAudio(audioUrl, Buffer.from("audio"));
+    await db
+      .update(entities)
+      .set({ pronunciationAudioUrl: audioUrl })
+      .where(eq(entities.id, entityId));
+  }
+
+  await mergeEntity({
+    fromEntityIds: [source.id],
+    toEntityId: destination.id,
+  });
+
+  const filename = (audioUrl: string) => audioUrl.slice("/uploads/".length);
+  await expect(
+    readFile({ filename: filename(sourceAudioUrl) }),
+  ).rejects.toThrow();
+  await expect(
+    readFile({ filename: filename(destinationAudioUrl) }),
+  ).resolves.toBeDefined();
 });
 
 test("rejects a merge with conflicting current owners", async ({
