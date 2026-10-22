@@ -144,9 +144,16 @@ export function getCreateBottlePrefill(
     singleCask:
       proposedBottle?.singleCask ??
       getRawBooleanFieldValue(result, "singleCask"),
-    maturation: proposedBottle?.maturation ?? null,
-    caskNumber: proposedBottle?.caskNumber ?? null,
-    outturn: proposedBottle?.outturn ?? null,
+    maturation:
+      proposedBottle?.maturation ??
+      getRawStringFieldValue(result, "maturation") ??
+      null,
+    caskNumber:
+      proposedBottle?.caskNumber ??
+      getRawStringFieldValue(result, "caskNumber") ??
+      null,
+    outturn:
+      proposedBottle?.outturn ?? getRawNumberFieldValue(result, "outturn"),
   };
 }
 

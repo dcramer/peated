@@ -117,6 +117,7 @@ function CreateBottleForm() {
   const abv = prefill.abv ?? null;
   const edition = prefill.edition ?? null;
   const vintageYear = prefill.vintageYear ?? null;
+  const bottlingYear = prefill.bottlingYear ?? null;
   const releaseYear = prefill.releaseYear ?? null;
   const category = prefill.category ?? null;
   const canReviewProposal = !!(user?.mod || user?.admin);
@@ -142,6 +143,7 @@ function CreateBottleForm() {
   if (abv !== null) initialFormData.abv = abv;
   if (edition) initialFormData.edition = edition;
   if (vintageYear !== null) initialFormData.vintageYear = vintageYear;
+  if (bottlingYear !== null) initialFormData.bottlingYear = bottlingYear;
   if (releaseYear !== null) initialFormData.releaseYear = releaseYear;
   if (prefill.caskStrength !== null && prefill.caskStrength !== undefined) {
     initialFormData.caskStrength = prefill.caskStrength;
