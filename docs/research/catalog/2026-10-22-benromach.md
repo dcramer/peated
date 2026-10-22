@@ -141,10 +141,14 @@ Release lists from the auction archive (bottling year, ABV):
 
 ## Results of the 22 October 2026 pass (production)
 
-Naming follows the draft rule in `whisky-identity-model.md`, "Bottle Name,
-Edition, And Cask Number" (commit cf88eaa94): the vintage follows the
-expression (`Peat Smoke 2008`), post-2020 releases keep `Contrasts:`, and
-Bottles that share a title carry their vintage. All Contrasts and Contrast
+Naming follows the rule in `whisky-identity-model.md`, "Bottle Name,
+Edition, And Cask Number", as settled in commit fd838c0f0 on branch
+`claude/bottle-naming-review-b97d76` (dcramer/peated#1436, not merged on
+22 October 2026). When the label prints the vintage apart from the title,
+the year follows the expression (`Peat Smoke 2008`, `Cask Strength 2008`);
+a printed title that already ends in the year stays as printed
+(`Hermitage 2007`). Post-2020 releases keep `Contrasts:`, Bottles that
+share a title carry their vintage, and no vintage name adds an age. All Contrasts and Contrast
 Range releases from 2014 on are in Series S0136 "Contrasts".
 
 | Status            | Bottles                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                        |
