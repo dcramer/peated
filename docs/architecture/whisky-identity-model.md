@@ -235,8 +235,8 @@ in Bottle names. The alias list includes `shortName`, but it can be changed only
 by editing the Entity.
 
 `pronunciation` shows how to say the Entity name in plain English: lowercase
-syllables joined by hyphens, with the stressed syllable in capitals, such as
-`glen GEER-ee` for Glen Garioch. `pronunciationIpa` gives the same sound in the
+syllables joined by hyphens, with the stressed syllable in capitals when it is
+known, such as `glen GEER-ee` for Glen Garioch or `mort-lack` for Mortlach. `pronunciationIpa` gives the same sound in the
 International Phonetic Alphabet (IPA), without slashes, such as `ɡlɛn ˈɡɪəri`.
 Both are optional, and the Entity schema checks their format. Generated details
 fill only empty values and drop values in the wrong format.

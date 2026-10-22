@@ -203,26 +203,27 @@ describe("PUT /tasting-drafts/{draft}", () => {
     expect(error).toMatchInlineSnapshot(`[Error: Cannot identify bottle.]`);
   });
 
-  test("rejects friends the member does not follow", async ({
+  test("drops friends the member does not follow", async ({
     defaults,
     fixtures,
   }) => {
+    const friend = await fixtures.User();
+    await fixtures.Follow({
+      fromUserId: defaults.user.id,
+      toUserId: friend.id,
+    });
     const stranger = await fixtures.User();
 
-    const error = await waitError(() =>
-      routerClient.tastingDrafts.upsert(
-        {
-          draft: faker.string.uuid(),
-          tastedAt: new Date().toISOString(),
-          friends: [stranger.id],
-        },
-        { context: { user: defaults.user } },
-      ),
+    const draft = await routerClient.tastingDrafts.upsert(
+      {
+        draft: faker.string.uuid(),
+        tastedAt: new Date().toISOString(),
+        friends: [stranger.id, friend.id],
+      },
+      { context: { user: defaults.user } },
     );
 
-    expect(error).toMatchInlineSnapshot(
-      `[Error: Friends must all be active relationships.]`,
-    );
+    expect(draft.friends.map(({ id }) => id)).toEqual([friend.id]);
   });
 
   test("rejects a new draft past the per-member cap", async ({

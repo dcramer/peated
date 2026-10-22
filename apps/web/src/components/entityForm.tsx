@@ -192,7 +192,7 @@ export default function EntityForm({
             <Field
               error={errors.pronunciation?.message}
               errorId="entity-pronunciation-error"
-              hint="Plain English, with the stressed syllable in capitals."
+              hint="Plain English. Put the stressed syllable in capitals when you know it."
               htmlFor="entity-pronunciation"
               label="Pronunciation"
               optional

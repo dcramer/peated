@@ -22,11 +22,14 @@ export default procedure
     z.object({
       cursor: z.coerce
         .number()
+        // int() also caps it at a safe integer, so the offset fits a bigint.
+        .int()
         .gte(1)
         .default(1)
         .describe("Page number to return"),
       limit: z.coerce
         .number()
+        .int()
         .gte(1)
         .lte(100)
         .default(25)

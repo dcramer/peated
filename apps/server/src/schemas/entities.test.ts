@@ -4,14 +4,15 @@ import {
 } from "./entities";
 
 describe("EntityPronunciationSchema", () => {
-  test.each(["glen GEER-ee", "lag-uh-VOO-lin", "BAYNZ", "boo-nuh-HAH-vun"])(
-    "accepts %s",
-    (pronunciation) => {
-      expect(EntityPronunciationSchema.parse(pronunciation)).toBe(
-        pronunciation,
-      );
-    },
-  );
+  test.each([
+    "glen GEER-ee",
+    "lag-uh-VOO-lin",
+    "BAYNZ",
+    "boo-nuh-HAH-vun",
+    "mort-lack",
+  ])("accepts %s", (pronunciation) => {
+    expect(EntityPronunciationSchema.parse(pronunciation)).toBe(pronunciation);
+  });
 
   test("trims surrounding spaces", () => {
     expect(EntityPronunciationSchema.parse("  glen GEER-ee ")).toBe(
@@ -24,7 +25,6 @@ describe("EntityPronunciationSchema", () => {
   });
 
   test.each([
-    ["no stressed syllable", "glen geer-ee"],
     ["a mixed-case syllable", "Glen GEER-ee"],
     ["digits", "glen GEER-ee 2"],
     ["IPA symbols", "ɡlɛn ˈɡɪəri"],
@@ -33,7 +33,7 @@ describe("EntityPronunciationSchema", () => {
   ])("rejects %s", (_reason, pronunciation) => {
     const result = EntityPronunciationSchema.safeParse(pronunciation);
     expect(result.error?.issues[0]?.message).toBe(
-      'Use lowercase syllables with the stressed one in capitals, like "glen GEER-ee".',
+      'Use lowercase syllables, with a stressed syllable in capitals when known, like "glen GEER-ee".',
     );
   });
 

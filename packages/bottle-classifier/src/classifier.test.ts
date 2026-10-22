@@ -2358,12 +2358,39 @@ describe("createBottleClassifier", () => {
     }
   });
 
-  test("reports progress and passes the stop signal to one reference run", async () => {
+  test("passes the stop signal to the agent run", async () => {
     const signal = new AbortController().signal;
-    const progress: BottleClassifierProgressEvent[] = [];
     const runAgent = vi.fn(
       async (preparedRun: PreparedBottleClassifierAgentRun) => {
         expect(preparedRun.runOptions.signal).toBe(signal);
+        return nativeAgentResult({
+          finalOutput: noMatchAgentDecision(),
+          inputTokens: 20,
+          outputTokens: 5,
+        });
+      },
+    );
+    const { classifier } = createTestClassifier({
+      maxSearchQueries: 0,
+      runPreparedBottleClassifierAgent: runAgent,
+    });
+
+    await classifier.runBottleReference(
+      {
+        reference: { name: "Example Single Malt Whisky" },
+        extractedIdentity: null,
+        initialCandidates: [],
+      },
+      { signal },
+    );
+
+    expect(runAgent).toHaveBeenCalledOnce();
+  });
+
+  test("reports progress from one reference run", async () => {
+    const progress: BottleClassifierProgressEvent[] = [];
+    const runAgent = vi.fn(
+      async (preparedRun: PreparedBottleClassifierAgentRun) => {
         expect(progress).toEqual([
           { type: "candidates", candidates: [macallanSherryOakCandidate] },
         ]);
@@ -2403,7 +2430,7 @@ describe("createBottleClassifier", () => {
         extractedIdentity: null,
         initialCandidates: [macallanSherryOakCandidate],
       },
-      { signal, onProgress: (event) => progress.push(event) },
+      { onProgress: (event) => progress.push(event) },
     );
 
     expect(runAgent).toHaveBeenCalledOnce();

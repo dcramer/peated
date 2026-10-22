@@ -19,7 +19,7 @@ import {
   requireTosAccepted,
 } from "@peated/server/orpc/middleware";
 import { findTastingByIdempotencyKey } from "@peated/server/orpc/routes/tastings/insertTasting";
-import { validateFriends } from "@peated/server/orpc/validators/friends";
+import { keepFollowedFriends } from "@peated/server/orpc/validators/friends";
 import { validateTags } from "@peated/server/orpc/validators/tags";
 import {
   TastingDraftInputSchema,
@@ -42,7 +42,7 @@ export default procedure
     path: "/tasting-drafts/{draft}",
     summary: "Save tasting draft",
     description:
-      "Create or replace one of your tasting drafts by its client-chosen ID. The latest save wins. Omitted fields are cleared, except `pendingImageId`: omit it to keep the current photo. A new photo starts identifying its Bottle in the background; see `identification`. Returns `409 CONFLICT` when the ID belongs to another member's draft, or when the draft was already posted; then `data.tasting` holds the posted tasting's ID.",
+      "Create or replace one of your tasting drafts by its client-chosen ID. The latest save wins. Omitted fields are cleared, except `pendingImageId`: omit it to keep the current photo. Friends you no longer follow are dropped from `friends`. A new photo starts identifying its Bottle in the background; see `identification`. Returns `409 CONFLICT` when the ID belongs to another member's draft, or when the draft was already posted; then `data.tasting` holds the posted tasting's ID.",
     operationId: "upsertTastingDraft",
   })
   .input(TastingDraftInputSchema)
@@ -50,7 +50,9 @@ export default procedure
   .handler(async ({ input, context, errors }) => {
     const userId = context.user.id;
     const tags = await validateTags(input.tags);
-    await validateFriends(userId, input.friends);
+    // Friends the member stopped following are dropped, not rejected; see
+    // keepFollowedFriends.
+    const friends = await keepFollowedFriends(userId, input.friends);
 
     // undefined keeps the current photo.
     let imageUrl: string | null | undefined;
@@ -139,7 +141,7 @@ export default procedure
           tags,
           servingStyle: input.servingStyle,
           color: input.color,
-          friends: input.friends,
+          friends,
           updatedAt: now,
         };
         if (imageUrl !== undefined) values.imageUrl = imageUrl;

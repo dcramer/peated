@@ -1158,3 +1158,30 @@ export const testSeries = {
   createdAt: timestamp,
   updatedAt: timestamp,
 };
+
+const tastingDraftId = "4f6c1a52-7a0b-4d1e-9f3e-2b8c5d7e9a10";
+export const tastingDraftHint = "The smoky one from the festival";
+export const tastingDraftNotes = "Draft flow: peat smoke and lemon.";
+
+/** A draft whose photo matched an existing Bottle the member has not confirmed. */
+export function buildTastingDraft() {
+  return {
+    id: tastingDraftId,
+    tastedAt: timestamp,
+    bottleHint: tastingDraftHint,
+    bottle: null,
+    imageUrl: `${mockApiServer}/uploads/tasting-draft.png`,
+    identification: {
+      status: "done",
+      result: { action: "match", bottle: existingBottle },
+    },
+    notes: null,
+    ratingBand: null,
+    tags: [],
+    servingStyle: null,
+    color: null,
+    friends: [],
+    createdAt: timestamp,
+    updatedAt: timestamp,
+  };
+}

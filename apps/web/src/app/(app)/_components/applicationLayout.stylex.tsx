@@ -45,6 +45,9 @@ export function ApplicationLayout({ children }: { children: ReactNode }) {
   const { user } = useAuth();
   const orpc = useORPC();
   const stats = useQuery(publicHomeQueries.stats(orpc));
+  const draftCount = useQuery(
+    orpc.tastingDrafts.count.queryOptions({ enabled: Boolean(user) }),
+  );
   const [logoutPending, startLogout] = useTransition();
   const isHome = pathname === "/";
   const usesInlineNavigation = isHome || pathname === "/search";
@@ -61,6 +64,10 @@ export function ApplicationLayout({ children }: { children: ReactNode }) {
   const accountItems = user
     ? [
         { href: `/users/${user.username}`, label: "Profile" },
+        // Drafts come from the app, so the item only shows when some wait.
+        ...(draftCount.data?.count
+          ? [{ count: draftCount.data.count, href: "/drafts", label: "Drafts" }]
+          : []),
         { href: "/friends", label: "Friends" },
         { href: "/settings", label: "Settings" },
         ...(user.admin ? [{ href: "/admin", label: "Admin" }] : []),

@@ -1,4 +1,5 @@
 import { base } from "@peated/server/orpc";
+import count from "./count";
 import createBottle from "./createBottle";
 import delete_ from "./delete";
 import details from "./details";
@@ -8,6 +9,7 @@ import upsert from "./upsert";
 
 export default base.tag("tastingDrafts").router({
   list,
+  count,
   details,
   upsert,
   delete: delete_,

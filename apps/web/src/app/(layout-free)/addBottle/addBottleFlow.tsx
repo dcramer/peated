@@ -28,6 +28,7 @@ import { getCreateBottleHref } from "@peated/web/components/search/createBottleH
 import { Search as BottleSearch } from "@peated/web/components/search/search.stylex";
 import { SelectedBottleSummary } from "@peated/web/components/selectedBottleSummary.stylex";
 import { WorkflowScreen } from "@peated/web/components/workflowScreen.stylex";
+import { flashBadgeAwards } from "@peated/web/features/tastings/badgeAwardMessage.stylex";
 import TastingForm, {
   TastingFormLoading,
   type MemberReviewFormSubmitData,
@@ -54,7 +55,6 @@ import { useMutation, useQueryClient } from "@tanstack/react-query";
 import { BookOpen, Eye, Plus, RotateCcw, Search, Wine } from "lucide-react";
 import { useRouter, useSearchParams } from "next/navigation";
 import { useCallback, useEffect, useMemo, useState } from "react";
-import { BadgeAwardMessage } from "./badgeAwardMessage.stylex";
 
 type AddBottleIntent = "catalog" | "choose" | "library" | "tasting" | "view";
 type CollectionBottle = Outputs["collections"]["bottles"]["create"];
@@ -846,14 +846,7 @@ function AddBottleFlowContent() {
       }
     }
 
-    for (const award of awards) {
-      if (award.level != award.prevLevel && award.level) {
-        flash(
-          <BadgeAwardMessage badge={award.badge} level={award.level} />,
-          "info",
-        );
-      }
-    }
+    flashBadgeAwards(flash, awards);
 
     router.push(
       requestedFlightId

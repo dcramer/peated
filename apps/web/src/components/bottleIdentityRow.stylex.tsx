@@ -42,6 +42,11 @@ export type BottleIdentityRowProps = {
   variant?: "standard" | "activity" | "search" | "sidebar" | "compact";
   /** Tightens vertical padding when the row is nested inside another surface. */
   verticalPadding?: "sm" | "md";
+  /**
+   * Lets the subtitle and metadata wrap instead of clipping. Use it when those
+   * lines hold a sentence the member needs in full, such as a draft's status.
+   */
+  wrapDetails?: boolean;
 };
 
 /**
@@ -83,6 +88,7 @@ export function BottleIdentityRow({
   activityDetails,
   variant = "standard",
   verticalPadding = "md",
+  wrapDetails = false,
 }: BottleIdentityRowProps) {
   const compact = variant === "compact";
   const activity = variant === "activity";
@@ -169,7 +175,11 @@ export function BottleIdentityRow({
       {!compact && subtitle ? (
         <div
           title={getTextTitle(subtitle)}
-          {...stylex.props(foundationStyles.metadata, styles.subtitle)}
+          {...stylex.props(
+            foundationStyles.metadata,
+            styles.subtitle,
+            wrapDetails && styles.wrappedDetail,
+          )}
         >
           {subtitle}
         </div>
@@ -177,7 +187,11 @@ export function BottleIdentityRow({
       {!compact && metadata.length ? (
         <div
           title={metadata.join(" · ")}
-          {...stylex.props(foundationStyles.metadata, styles.metadata)}
+          {...stylex.props(
+            foundationStyles.metadata,
+            styles.metadata,
+            wrapDetails && styles.wrappedDetail,
+          )}
         >
           {metadata.map((item, index) => (
             <span key={`${item}-${index}`}>
@@ -406,6 +420,12 @@ const styles = stylex.create({
     color: colors.inkMuted,
     textOverflow: "ellipsis",
     whiteSpace: "nowrap",
+  },
+  wrappedDetail: {
+    overflow: "visible",
+    textOverflow: "clip",
+    whiteSpace: "normal",
+    overflowWrap: "anywhere",
   },
   relatedReleases: {
     marginTop: space.x1,
