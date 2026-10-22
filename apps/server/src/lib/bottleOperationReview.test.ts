@@ -1843,6 +1843,60 @@ describe("Bottle operation review preparation", () => {
     });
   });
 
+  test("counts Entity merge collisions between moved source groups", async ({
+    fixtures,
+  }) => {
+    const source = await fixtures.Entity({
+      name: "Kilnhouse Distillery",
+      kind: "brand",
+    });
+    const destination = await fixtures.Entity({
+      name: "Kilnhouse",
+      kind: "brand",
+    });
+    const sourceSeries = await fixtures.BottleSeries({
+      brandId: source.id,
+      name: "Cask Range",
+    });
+    // Both names become "Twelve" under Kilnhouse, in one new Series.
+    await fixtures.Bottle({
+      brandId: source.id,
+      seriesId: sourceSeries.id,
+      name: "Kilnhouse Twelve",
+    });
+    await fixtures.Bottle({
+      brandId: source.id,
+      seriesId: sourceSeries.id,
+      name: "Twelve",
+    });
+
+    const result = await prepareOperation({
+      operation: {
+        id: 91,
+        proposal: {
+          type: "merge_entities",
+          input: {
+            sourceEntityId: source.id,
+            destinationEntityId: destination.id,
+          },
+          rationale: "The two Brand records identify one producer.",
+          evidenceRefs: [
+            { kind: "entity", entityId: source.id },
+            { kind: "entity", entityId: destination.id },
+          ],
+        },
+      },
+      artifacts: artifacts({ entities: [source, destination] }),
+    });
+
+    expect(result).toMatchObject({
+      type: "merge_entities",
+      preview: {
+        collisions: { bottleIdentities: 1 },
+      },
+    });
+  });
+
   test("prepares id-less proposals for atomic persistence", async ({
     fixtures,
   }) => {
