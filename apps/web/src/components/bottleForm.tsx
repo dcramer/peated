@@ -1465,7 +1465,9 @@ export default function BottleForm({
                                 : undefined
                             }
                           />
-                          {user?.mod || user?.admin ? (
+                          {/* Only moderators record photo source and license, and only
+                              when editing; new Bottles start without them. */}
+                          {!isCreate && (user?.mod || user?.admin) ? (
                             <>
                               <Field
                                 error={errors.imageSourceUrl?.message}

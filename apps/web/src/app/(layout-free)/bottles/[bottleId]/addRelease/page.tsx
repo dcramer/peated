@@ -105,8 +105,6 @@ function AddSimilarBottleForm({ bottleId }: { bottleId: string }) {
             await bottleImageUpdateMutation.mutateAsync({
               bottle: createdBottle.id,
               file: await shrinkPhotoForUpload(image),
-              sourceUrl: imageSourceUrl,
-              license: imageLicense,
             });
           } catch (error) {
             logError(error, {

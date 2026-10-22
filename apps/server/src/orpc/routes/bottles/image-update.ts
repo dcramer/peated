@@ -43,7 +43,7 @@ export default procedure
     path: "/bottles/{bottle}/image",
     summary: "Update bottle image",
     description:
-      "Upload a bottle image or update its source and license. Requires the bottle creator, a moderator, or an administrator.",
+      "Upload a bottle image or update its source and license. Uploading requires the bottle creator, a moderator, or an administrator. Setting the source or license requires a moderator or an administrator.",
     spec: (spec) => ({
       ...imageUploadSpec(spec),
       operationId: "updateBottleImage",
