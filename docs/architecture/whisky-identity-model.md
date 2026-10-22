@@ -310,6 +310,10 @@ the word `vintage` unless the producer's title uses `Vintage` as part of the
 name. Whiskybase titles these bottles the same way and keeps the age, cask,
 and selection in separate fields.
 
+A vintage in an expression name follows the printed title. When the label
+prints the vintage apart from the title, put the year after the expression:
+`Peat Smoke 2008`, `Cask Strength 2012`, not `2008 Peat Smoke`.
+
 Use only a vintage or age that the label prints, including a `Distilled 1972`
 line. A source title that omits it does not remove it, and a stored field
 alone does not add it.
