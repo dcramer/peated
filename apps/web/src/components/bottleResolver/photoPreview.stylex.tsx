@@ -8,7 +8,7 @@ import { ImageViewer } from "../imageViewer.stylex";
 
 export type PhotoPreviewProps = {
   loading?: boolean;
-  metadata: string;
+  metadata?: string;
   src: string;
   title: string;
 };
@@ -66,9 +66,11 @@ export function PhotoPreview({
             title
           )}
         </strong>
-        <span {...stylex.props(foundationStyles.metadata, styles.metadata)}>
-          {metadata}
-        </span>
+        {metadata ? (
+          <span {...stylex.props(foundationStyles.metadata, styles.metadata)}>
+            {metadata}
+          </span>
+        ) : null}
       </span>
     </section>
   );

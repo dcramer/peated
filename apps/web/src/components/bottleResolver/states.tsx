@@ -137,7 +137,6 @@ export function PhotoLoadingState({
       {previewUrl ? (
         <PhotoPreview
           loading={identifying}
-          metadata="We'll show what we read and any likely matches as we go."
           src={previewUrl}
           title={
             identifying ? getPhotoProgressStatus(progress) : "Stopped looking."
@@ -152,10 +151,7 @@ export function PhotoLoadingState({
         </FormNotice>
       ) : null}
       {progress.candidates.length ? (
-        <BottleResolverSection
-          description="If one of these is your bottle, use it and we'll stop looking."
-          title="Possible matches"
-        >
+        <BottleResolverSection title="Possible matches">
           <BottleMatchList
             bottles={progress.candidates}
             onUse={onPickMatch}
