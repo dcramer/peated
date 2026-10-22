@@ -249,7 +249,8 @@ IPA, so the same IPA never makes new audio, and a changed IPA or voice gets a
 new file. The job runs after each Entity change and after generated details add
 IPA. It saves the new URL with a Peated system change, then deletes the old
 file. When the IPA is cleared, or the Entity is deleted or merged away, the
-file is deleted too.
+file is deleted too. Because a URL never changes meaning, the API serves these
+files with a one-year `immutable` cache.
 
 Audio needs `GCP_CREDENTIALS` and the Cloud Text-to-Speech API enabled on that
 Google Cloud project. Without credentials the job does nothing. To fill missing

@@ -99,6 +99,14 @@ export function getPronunciationAudioUrl(entityId: number, ipa: string) {
   return `${AUDIO_URL_PREFIX}${entityId}-${hash}.mp3`;
 }
 
+/**
+ * Whether an upload path is pronunciation audio. Its file name changes
+ * whenever its content does, so it can be cached forever.
+ */
+export function isPronunciationAudioUpload(filename: string) {
+  return filename.startsWith(`${AUDIO_DIRECTORY}/`);
+}
+
 /** Writes audio at the URL from `getPronunciationAudioUrl`. */
 export async function storePronunciationAudio(audioUrl: string, audio: Buffer) {
   const filename = audioUrl.slice(AUDIO_URL_PREFIX.length);
