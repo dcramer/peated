@@ -154,4 +154,32 @@ describe("photo create prefill", () => {
       distillers: [{ id: null, name: "Qualified Existing Distillery Co." }],
     });
   });
+
+  test("keeps cask details read from the label when the proposal leaves them out", () => {
+    const result = buildPhotoResult();
+    result.imageEvidence.fieldCandidates = {
+      ...result.imageEvidence.fieldCandidates,
+      caskNumber: {
+        value: "1234",
+        confidence: 0.9,
+        sourceExtractorIndexes: [0],
+      },
+      maturation: {
+        value: "First-fill sherry butt",
+        confidence: 0.9,
+        sourceExtractorIndexes: [0],
+      },
+      outturn: {
+        value: 612,
+        confidence: 0.9,
+        sourceExtractorIndexes: [0],
+      },
+    };
+
+    expect(getCreateBottlePrefill(result)).toMatchObject({
+      caskNumber: "1234",
+      maturation: "First-fill sherry butt",
+      outturn: 612,
+    });
+  });
 });
