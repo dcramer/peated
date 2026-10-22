@@ -129,6 +129,32 @@ type ApiImageUploadOptions = {
   yes?: boolean;
 };
 
+// Only `/entities/{entity}/images` accepts caption, isPrimary, and
+// idempotencyKey. The Bottle image route has a strict input and answers HTTP
+// 400 for them, so the CLI rejects them before sending.
+const ENTITY_IMAGE_PATH = /^\/entities\/\d+\/images$/;
+
+export function checkImageUploadOptions(
+  path: string,
+  options: Pick<
+    ApiImageUploadOptions,
+    "caption" | "idempotencyKey" | "primary"
+  >,
+) {
+  if (ENTITY_IMAGE_PATH.test(path)) return;
+
+  const flags = [
+    options.caption !== undefined && "--caption",
+    options.primary !== undefined && "--primary",
+    options.idempotencyKey !== undefined && "--idempotency-key",
+  ].filter(Boolean);
+  if (flags.length > 0) {
+    throw new Error(
+      `${path} does not accept ${flags.join(", ")}. Use them only for Entity image uploads (/entities/<id>/images).`,
+    );
+  }
+}
+
 function imageContentType(path: string): string {
   switch (extname(path).toLowerCase()) {
     case ".jpg":
@@ -276,6 +302,7 @@ async function runImageUploadCommand(
   path: string,
   options: ApiImageUploadOptions,
 ): Promise<void> {
+  checkImageUploadOptions(path, options);
   const credentials = await requireCredentials();
   if (!options.yes) await confirmMutation("POST", path);
 
@@ -323,11 +350,14 @@ subcommand
   .description("Upload an image to a multipart Peated API endpoint")
   .argument("<path>", "API path, such as /bottles/123/image")
   .requiredOption("--file <path>", "Local image file")
-  .option("--caption <caption>", "Image caption")
+  .option("--caption <caption>", "Entity image caption")
   .option("--source-url <url>", "Original image source page")
   .option("--license <license>", "Image license or reuse terms")
   .option("--primary", "Make this the primary Entity image")
-  .option("--idempotency-key <key>", "Idempotency key for the upload")
+  .option(
+    "--idempotency-key <key>",
+    "Entity image upload key; retries with the same key return the first image",
+  )
   .option("--yes", "Send the mutation without an interactive confirmation")
   .action(async (path, options) => runImageUploadCommand(path, options));
 

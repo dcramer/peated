@@ -1,6 +1,7 @@
 import { describe, expect, test } from "vitest";
 import {
   ApiBatchRequestError,
+  checkImageUploadOptions,
   parseApiBatchConcurrency,
   parseApiBatchInput,
   parseApiBatchStartIndex,
@@ -135,5 +136,39 @@ describe("parseApiBatchConcurrency", () => {
 
   test.each(["0", "21", "1.5", "nope"])("rejects %s", (value) => {
     expect(() => parseApiBatchConcurrency(value)).toThrow();
+  });
+});
+
+describe("checkImageUploadOptions", () => {
+  test("accepts Entity image fields on Entity image uploads", () => {
+    expect(() =>
+      checkImageUploadOptions("/entities/12/images", {
+        caption: "Ardbeg Distillery",
+        idempotencyKey: "ardbeg-exterior",
+        primary: true,
+      }),
+    ).not.toThrow();
+  });
+
+  test("accepts Bottle image uploads without Entity image fields", () => {
+    expect(() =>
+      checkImageUploadOptions("/bottles/123/image", {}),
+    ).not.toThrow();
+  });
+
+  test("rejects Entity image fields on Bottle image uploads", () => {
+    expect(() =>
+      checkImageUploadOptions("/bottles/123/image", {
+        idempotencyKey: "bottle-123",
+      }),
+    ).toThrow(
+      "/bottles/123/image does not accept --idempotency-key. Use them only for Entity image uploads (/entities/<id>/images).",
+    );
+    expect(() =>
+      checkImageUploadOptions("/bottles/123/image", {
+        caption: "Front label",
+        primary: true,
+      }),
+    ).toThrow("/bottles/123/image does not accept --caption, --primary.");
   });
 });
