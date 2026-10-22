@@ -261,8 +261,31 @@ test("includes all four activity types, makes one card per tasting, and omits li
       true,
     );
   }
-  const dates = items.map((item) => Date.parse(item.date));
-  expect(dates).toEqual([...dates].sort((a, b) => b - a));
+  const postedTimes = items.map((item) => Date.parse(item.postedAt));
+  expect(postedTimes).toEqual([...postedTimes].sort((a, b) => b - a));
+});
+
+test("keeps a late-posted dram above older activity and shows when it was had", () => {
+  const lateTasting = {
+    ...session.tastings[0]!,
+    tastedAt: "2024-03-09T21:30:00.000Z",
+    createdAt: "2026-08-30T12:00:00.000Z",
+  };
+  const items = getCommunityFeedItems({
+    activity: [{ ...session, tastings: [lateTasting] }],
+    criticReviews: [
+      {
+        ...mockExternalReview,
+        article: {
+          ...mockExternalReview.article,
+          publishedAt: "2026-08-29T12:00:00.000Z",
+        },
+      },
+    ],
+  });
+
+  expect(items.map((item) => item.kind)).toEqual(["tasting", "critic_review"]);
+  expect(items[0]?.date).toBe("2024-03-09T21:30:00.000Z");
 });
 
 test.each([null, "Whisky Advocate", "Alex Sample"])(
