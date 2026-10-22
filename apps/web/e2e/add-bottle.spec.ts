@@ -162,9 +162,7 @@ test.describe("Add Bottle", () => {
     await page.clock.install();
     await uploadLabel(page);
     await expect(
-      page.getByText("Reading the label and checking Peated for a match.", {
-        exact: true,
-      }),
+      page.getByRole("status").filter({ hasText: "Reading the label…" }),
     ).toBeVisible();
     await page.clock.fastForward(600_001);
     await expect(

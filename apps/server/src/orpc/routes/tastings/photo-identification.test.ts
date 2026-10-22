@@ -50,6 +50,15 @@ const classifyBottleReferenceMock =
     ) => Promise<Awaited<ReturnType<RunReference>>["result"]>
   >();
 const runBottleReferenceMock = vi.fn<RunReference>();
+const logOutcomeMock =
+  vi.fn<PhotoIdentificationProcedureServices["logOutcome"]>();
+
+/** The outcome of each logged photo lookup, in order. */
+function loggedOutcomes() {
+  return logOutcomeMock.mock.calls.map(
+    ([attributes]) => attributes["photo_identification.outcome"],
+  );
+}
 const extractPhotoBottleEvidenceMock =
   vi.fn<IdentifyBottlePhotoServices["extractEvidence"]>();
 const copyPendingImageToBottleMock = vi.fn<typeof copyPendingImageToBottle>();
@@ -105,6 +114,7 @@ const identifyImage: PhotoIdentificationProcedureServices["identifyImage"] = (
 const photoIdentificationProcedure = createPhotoIdentificationProcedure({
   createPendingImage: createPendingImageUpload,
   identifyImage,
+  logOutcome: logOutcomeMock,
 });
 const photoIdentificationCreateProcedure =
   createPhotoIdentificationCreateProcedure(copyPendingImageToBottleMock);
@@ -401,6 +411,7 @@ describe("POST /tastings/photo-identification", () => {
     copyPendingImageToBottleMock.mockImplementation(copyPendingImageToBottle);
     startSpanCallMock.mockReset();
     sentrySpanSetAttributeMock.mockClear();
+    logOutcomeMock.mockClear();
   });
 
   afterEach(() => {
@@ -682,6 +693,30 @@ describe("POST /tastings/photo-identification", () => {
 
     expect(seen).toEqual(["photo", "label", "step"]);
     expect(runSignal?.aborted).toBe(true);
+    expect(loggedOutcomes()).toEqual(["cancelled"]);
+  });
+
+  test("logs a lookup that fails mid-stream once, as failed", async ({
+    fixtures,
+    defaults,
+  }) => {
+    mockArdbegLabelReading();
+    runBottleReferenceMock.mockRejectedValue(new Error("Classifier broke"));
+
+    const err = await waitError(
+      routerClient.tastings.photoIdentification(
+        {
+          file: await fixtures.SampleSquareImage(),
+          idempotencyKey: "photo-identification-mid-stream-failure",
+        },
+        { context: { user: defaults.user } },
+      ),
+    );
+
+    expect(err).toMatchInlineSnapshot(
+      `[Error: Unable to identify bottle from photo.]`,
+    );
+    expect(loggedOutcomes()).toEqual(["failed"]);
   });
 
   test("reuses pending upload for idempotent retries", async ({

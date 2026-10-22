@@ -1,4 +1,5 @@
 import type { Bottle } from "@peated/server/types";
+import { BottleMatchList } from "@peated/web/components/bottleMatchList.stylex";
 import { Button, ButtonLink } from "@peated/web/components/button.stylex";
 import {
   FormDetails,
@@ -8,8 +9,6 @@ import {
 import { SelectedBottleSummary } from "@peated/web/components/selectedBottleSummary.stylex";
 import { Plus, Search } from "lucide-react";
 import type { ReactNode } from "react";
-
-import { BottleMatchList } from "@peated/web/components/bottleCreateCandidates.stylex";
 
 import {
   getLabelSummary,

@@ -45,7 +45,13 @@ import type { z } from "zod";
 type AuthenticatedContext = Context & {
   user: NonNullable<Context["user"]>;
 };
+/** Writes one photo lookup outcome log line. */
+type PhotoIdentificationLog = (
+  attributes: PhotoIdentificationAttributes,
+) => void;
+
 export type PhotoIdentificationProcedureServices = {
+  logOutcome: PhotoIdentificationLog;
   createPendingImage: typeof createPendingImageUpload;
   identifyImage: typeof identifyBottlePhoto;
 };
@@ -174,6 +180,7 @@ function getSearchResultDomain({
  * production misses can be debugged without reconstructing classifier spans.
  */
 function logPhotoIdentificationOutcome({
+  log,
   context,
   pendingImage,
   idempotencyKey,
@@ -185,6 +192,7 @@ function logPhotoIdentificationOutcome({
   diagnostics,
   suggestedNextStep,
 }: {
+  log: PhotoIdentificationLog;
   context: AuthenticatedContext;
   pendingImage: Awaited<ReturnType<typeof createPendingImageUpload>>;
   idempotencyKey: string;
@@ -233,23 +241,25 @@ function logPhotoIdentificationOutcome({
 
   Object.assign(attrs, getImageEvidenceFieldAttributes(imageEvidence));
 
-  logInfo(PHOTO_IDENTIFICATION_LOG_MESSAGE, attrs);
+  log(attrs);
 }
 
 function logPhotoIdentificationRejected({
+  log,
   context,
   idempotencyKey,
   file,
   outcome,
   reason,
 }: {
+  log: PhotoIdentificationLog;
   context: AuthenticatedContext;
   idempotencyKey: string;
   file: Blob;
   outcome: string;
   reason: string;
 }) {
-  logInfo(PHOTO_IDENTIFICATION_LOG_MESSAGE, {
+  log({
     "photo_identification.user_id": context.user.id,
     "photo_identification.idempotency_key": idempotencyKey,
     "photo_identification.outcome": outcome,
@@ -260,17 +270,19 @@ function logPhotoIdentificationRejected({
 }
 
 function logPhotoIdentificationCancelled({
+  log,
   context,
   pendingImage,
   idempotencyKey,
   file,
 }: {
+  log: PhotoIdentificationLog;
   context: AuthenticatedContext;
   pendingImage: PendingImage;
   idempotencyKey: string;
   file: Blob;
 }) {
-  logInfo(PHOTO_IDENTIFICATION_LOG_MESSAGE, {
+  log({
     "photo_identification.user_id": context.user.id,
     "photo_identification.pending_image_id": pendingImage.id,
     "photo_identification.idempotency_key": idempotencyKey,
@@ -281,12 +293,14 @@ function logPhotoIdentificationCancelled({
 }
 
 function logPhotoIdentificationFailure({
+  log,
   context,
   pendingImage,
   idempotencyKey,
   file,
   err,
 }: {
+  log: PhotoIdentificationLog;
   context: AuthenticatedContext;
   pendingImage: Awaited<ReturnType<typeof createPendingImageUpload>>;
   idempotencyKey: string;
@@ -294,7 +308,7 @@ function logPhotoIdentificationFailure({
   err: unknown;
 }) {
   const error = err instanceof Error ? err : null;
-  logInfo(PHOTO_IDENTIFICATION_LOG_MESSAGE, {
+  log({
     "photo_identification.user_id": context.user.id,
     "photo_identification.pending_image_id": pendingImage.id,
     "photo_identification.idempotency_key": idempotencyKey,
@@ -311,6 +325,8 @@ const photoIdentificationProcedureServices: PhotoIdentificationProcedureServices
   {
     createPendingImage: createPendingImageUpload,
     identifyImage: identifyBottlePhoto,
+    logOutcome: (attributes) =>
+      logInfo(PHOTO_IDENTIFICATION_LOG_MESSAGE, attributes),
   };
 
 export function createPhotoIdentificationProcedure(
@@ -330,6 +346,7 @@ export function createPhotoIdentificationProcedure(
 
       if (file.size > MAX_FILESIZE) {
         logPhotoIdentificationRejected({
+          log: services.logOutcome,
           context,
           idempotencyKey,
           file,
@@ -353,6 +370,7 @@ export function createPhotoIdentificationProcedure(
       } catch (err) {
         const error = err instanceof Error ? err : null;
         logPhotoIdentificationRejected({
+          log: services.logOutcome,
           context,
           idempotencyKey,
           file,
@@ -437,7 +455,9 @@ async function* streamPhotoIdentification({
     onProgress: progress.push,
   });
   identification.then(progress.close, progress.close);
-  let finished = false;
+  // True once identification finished or failed on its own; anything else that
+  // ends the stream is a cancellation.
+  let settled = false;
 
   try {
     yield { type: "photo", pendingImage: serializedPendingImage };
@@ -450,7 +470,9 @@ async function* streamPhotoIdentification({
       result = await identification;
     } catch (err) {
       if (stop.signal.aborted) throw err;
+      settled = true;
       logPhotoIdentificationFailure({
+        log: services.logOutcome,
         context,
         pendingImage,
         idempotencyKey,
@@ -465,7 +487,7 @@ async function* streamPhotoIdentification({
       logError(error);
       throw toIdentificationError(error);
     }
-    finished = true;
+    settled = true;
 
     const {
       imageEvidence,
@@ -476,6 +498,7 @@ async function* streamPhotoIdentification({
       suggestedNextStep,
     } = result;
     logPhotoIdentificationOutcome({
+      log: services.logOutcome,
       context,
       pendingImage,
       idempotencyKey,
@@ -511,9 +534,10 @@ async function* streamPhotoIdentification({
     };
   } finally {
     requestSignal?.removeEventListener("abort", stopOnDisconnect);
-    if (!finished) {
+    if (!settled) {
       stop.abort();
       logPhotoIdentificationCancelled({
+        log: services.logOutcome,
         context,
         pendingImage,
         idempotencyKey,

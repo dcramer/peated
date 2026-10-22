@@ -72,14 +72,20 @@ export type {
 /** Shortest time a classifier step stays on screen, so quick tool calls don't flicker. */
 const MINIMUM_STEP_MS = 1200;
 
-/** Holds each value for at least `minimumMs` before showing the next one. */
-function useSteadyValue<T>(value: T, minimumMs: number): T {
+/**
+ * Holds each value for at least `minimumMs` before showing the next one. A
+ * cleared value (null), such as a new photo starting, shows at once.
+ */
+function useSteadyValue<T>(value: T | null, minimumMs: number): T | null {
   const [shown, setShown] = useState(value);
   const shownAtRef = useRef(0);
 
   useEffect(() => {
     if (Object.is(value, shown)) return;
-    const wait = Math.max(0, shownAtRef.current + minimumMs - Date.now());
+    const wait =
+      value === null
+        ? 0
+        : Math.max(0, shownAtRef.current + minimumMs - Date.now());
     const timer = setTimeout(() => {
       shownAtRef.current = Date.now();
       setShown(value);

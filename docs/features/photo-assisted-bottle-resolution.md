@@ -22,11 +22,10 @@ action.
 3. The server processes the image, creates an owned pending upload, and extracts
    label evidence. One literal stored reference resolves directly. All other
    references run the Bottle classifier once.
-4. While that runs, the form shows each result as it arrives: the label
-   details once read, then Peated's likely matches, then a plain status line
-   for the classifier's current step. The member can use a likely match at any
-   point. That stops the classifier and continues with the chosen Bottle and
-   the same pending photo.
+4. While that runs, the title under the photo names the current step, and the
+   form adds Peated's likely matches and a one-line summary of the label as
+   they arrive. Tapping a likely match stops the classifier and continues with
+   that Bottle and the same pending photo.
 5. Otherwise, the resolver presents one of three outcomes:
    - an existing Bottle match;
    - an approved proposal for one new, independently complete Bottle; or
@@ -54,9 +53,11 @@ the Bottle and action before any tasting is saved.
 - Keep the local preview visible while identification runs and when it fails.
 - Progress names only generic steps: reading the label, checking Peated,
   checking the web, and comparing details. Web queries and site names stay on
-  the server.
-- After 45 seconds, say the lookup is taking a while and point to the likely
-  matches and search.
+  the server. Each step stays on screen for at least 1.2 seconds so quick
+  steps don't flicker.
+- After 45 seconds, add "This one is taking a while." under the step.
+- Keep progress copy to the step itself. Don't explain what tapping or
+  searching will do.
 - Progress and error states must be readable without relying on animation,
   color, or camera access.
 - A failed or uncertain identification must preserve a path to search or retry.
