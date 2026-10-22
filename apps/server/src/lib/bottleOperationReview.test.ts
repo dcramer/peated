@@ -1802,6 +1802,12 @@ describe("Bottle operation review preparation", () => {
       brandId: destination.id,
       name: "Batch Expression 20",
     });
+    // Same name, different release: the merge moves it without merging.
+    await fixtures.Bottle({
+      brandId: destination.id,
+      name: "Batch Expression 1",
+      vintageYear: 2010,
+    });
 
     const result = await prepareOperation({
       operation: {

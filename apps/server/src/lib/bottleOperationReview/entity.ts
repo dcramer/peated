@@ -11,9 +11,11 @@ import {
   entityReferences,
   entityTombstones,
 } from "@peated/server/db/schema";
+import { getBottleStructuredIdentityKey } from "@peated/server/lib/bottleConflicts";
+import { findSeriesIdByName } from "@peated/server/lib/bottleHelpers";
 import {
   getBottleExactIdentity,
-  materializeBottleIdentity,
+  materializeBottleForGroup,
 } from "@peated/server/lib/bottleIdentity";
 import { formatBottleName } from "@peated/server/lib/format";
 import {
@@ -395,9 +397,11 @@ async function entityMergeCollisions(
       .select({
         bottle: bottles,
         group: bottleGroups,
+        series: bottleSeries,
       })
       .from(bottles)
       .innerJoin(bottleGroups, eq(bottleGroups.id, bottles.groupId))
+      .leftJoin(bottleSeries, eq(bottleSeries.id, bottleGroups.seriesId))
       .where(
         and(
           eq(bottleGroups.brandId, source.entity.id),
@@ -408,36 +412,68 @@ async function entityMergeCollisions(
       .limit(MAX_OPERATION_PREVIEW_IDS);
     if (sourceBrandBottles.length === 0) break;
     afterBottleId = sourceBrandBottles.at(-1)!.bottle.id;
-    const desiredNames = sourceBrandBottles.map(({ bottle, group }) => {
-      const stableFullName = formatBottleName({
-        name: `${destination.entity.shortName || destination.entity.name} ${group.name}`,
+    // Mirror the merge job: a source-brand Series moves to the destination
+    // Series with the same name, or a new one with no Bottles yet.
+    const movedSeriesIds = new Map<number, number | null>();
+    for (const { series } of sourceBrandBottles) {
+      if (!series || movedSeriesIds.has(series.id)) continue;
+      movedSeriesIds.set(
+        series.id,
+        series.brandId === destination.entity.id
+          ? series.id
+          : await findSeriesIdByName(database, {
+              brand: destination.entity,
+              name: series.name,
+            }),
+      );
+    }
+    const desiredIdentities = [];
+    for (const { bottle, group, series } of sourceBrandBottles) {
+      const movedSeriesId = series
+        ? movedSeriesIds.get(series.id)!
+        : group.seriesId;
+      if (series && movedSeriesId === null) continue;
+      const exact = getBottleExactIdentity({
+        bottle,
+        sourceGroupStatedAge: group.statedAge,
       });
-      return materializeBottleIdentity({
-        stable: {
-          name: group.name,
-          fullName: stableFullName,
-          statedAge: group.statedAge,
-        },
-        exact: getBottleExactIdentity({
-          bottle,
-          sourceGroupStatedAge: group.statedAge,
+      desiredIdentities.push({
+        ...exact,
+        noAgeStatement: bottle.noAgeStatement,
+        ...materializeBottleForGroup({
+          group: {
+            ...group,
+            brandId: destination.entity.id,
+            fullName: formatBottleName({
+              name: `${destination.entity.shortName || destination.entity.name} ${group.name}`,
+            }),
+            seriesId: movedSeriesId,
+          },
+          exact,
         }),
-      }).fullName.toLowerCase();
-    });
-    const destinationNames = new Set(
-      await database
-        .select({ fullName: sql<string>`LOWER(${bottles.fullName})` })
-        .from(bottles)
-        .where(
-          and(
-            eq(bottles.brandId, destination.entity.id),
-            inArray(sql<string>`LOWER(${bottles.fullName})`, desiredNames),
-          ),
-        )
-        .then((rows) => rows.map(({ fullName }) => fullName)),
+      });
+    }
+    if (desiredIdentities.length === 0) continue;
+    // The merge job folds only exact structured duplicates, so count only
+    // those. Same-named Bottles with different release fields move apart.
+    const destinationKeys = new Set(
+      (
+        await database
+          .select()
+          .from(bottles)
+          .where(
+            and(
+              eq(bottles.brandId, destination.entity.id),
+              inArray(
+                sql<string>`LOWER(${bottles.fullName})`,
+                desiredIdentities.map(({ fullName }) => fullName.toLowerCase()),
+              ),
+            ),
+          )
+      ).map(getBottleStructuredIdentityKey),
     );
-    bottleIdentities += desiredNames.filter((name) =>
-      destinationNames.has(name),
+    bottleIdentities += desiredIdentities.filter((identity) =>
+      destinationKeys.has(getBottleStructuredIdentityKey(identity)),
     ).length;
   }
 
