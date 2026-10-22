@@ -10,8 +10,6 @@ import { Plus, Search } from "lucide-react";
 import type { ReactNode } from "react";
 
 import { BottleMatchList } from "@peated/web/components/bottleCreateCandidates.stylex";
-import { foundationStyles } from "@peated/web/styles/foundations.stylex";
-import * as stylex from "@stylexjs/stylex";
 
 import {
   getPhotoProgressStatus,
@@ -141,12 +139,11 @@ export function PhotoLoadingState({
           loading={identifying}
           metadata="We'll show what we read and any likely matches as we go."
           src={previewUrl}
-          title="Reading the label"
+          title={
+            identifying ? getPhotoProgressStatus(progress) : "Stopped looking."
+          }
         />
       ) : null}
-      <p role="status" {...stylex.props(foundationStyles.metadata)}>
-        {identifying ? getPhotoProgressStatus(progress) : "Stopped looking."}
-      </p>
       {slow && identifying ? (
         <FormNotice>
           {progress.candidates.length
@@ -171,10 +168,7 @@ export function PhotoLoadingState({
           <LabelFacts result={{ imageEvidence: progress.imageEvidence }} />
         </FormDetails>
       ) : null}
-      <BottleResolverSection
-        description="You can keep looking while we read the photo."
-        title="Search by name instead"
-      >
+      <BottleResolverSection title="Search by name instead">
         {search ?? (
           <ButtonLink href={searchHref} variant="tonal">
             <Search aria-hidden="true" size={16} />

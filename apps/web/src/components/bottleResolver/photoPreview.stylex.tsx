@@ -1,56 +1,10 @@
 "use client";
 
 import * as stylex from "@stylexjs/stylex";
-import { useEffect, useState } from "react";
-import { useMediaQuery } from "usehooks-ts";
 
 import { foundationStyles } from "../../styles/foundations.stylex";
 import { colors, controlMetrics, space } from "../../styles/tokens.stylex";
 import { ImageViewer } from "../imageViewer.stylex";
-
-const loadingMessages = [
-  "Searching casks",
-  "Holding it up to the light",
-  "Letting the label breathe",
-  "Checking the dusty shelf",
-  "Asking the tasting room",
-  "Comparing the fine print",
-];
-
-function LoadingTitle({ label }: { label: string }) {
-  const [messageIndex, setMessageIndex] = useState(0);
-  const reducedMotion = useMediaQuery("(prefers-reduced-motion: reduce)", {
-    initializeWithValue: false,
-  });
-
-  useEffect(() => {
-    if (reducedMotion) return;
-    const timer = window.setInterval(() => {
-      setMessageIndex((index) => (index + 1) % loadingMessages.length);
-    }, 2700);
-    return () => window.clearInterval(timer);
-  }, [reducedMotion]);
-
-  return (
-    <>
-      <span {...stylex.props(styles.visuallyHidden)}>{label}</span>
-      <span aria-hidden="true" {...stylex.props(styles.loadingMessages)}>
-        {/* PhotoPreview keeps playful copy out of live announcements and reserves its full height. */}
-        {loadingMessages.map((message, index) => (
-          <span
-            key={message}
-            {...stylex.props(
-              styles.loadingMessage,
-              index === messageIndex && styles.visibleMessage,
-            )}
-          >
-            {reducedMotion ? label : message}
-          </span>
-        ))}
-      </span>
-    </>
-  );
-}
 
 export type PhotoPreviewProps = {
   loading?: boolean;
@@ -68,9 +22,7 @@ export function PhotoPreview({
 }: PhotoPreviewProps) {
   return (
     <section
-      aria-busy={loading || undefined}
       aria-label="Bottle label photo"
-      aria-live={loading ? "polite" : undefined}
       {...stylex.props(styles.preview, loading && styles.loadingPreview)}
     >
       <span
@@ -98,14 +50,21 @@ export function PhotoPreview({
         ) : null}
       </span>
       <span {...stylex.props(styles.copy, loading && styles.loadingCopy)}>
+        {/* While loading, the title names the current step and is the live
+            status, so it must stay readable without the shimmer. */}
         <strong
+          role={loading ? "status" : undefined}
           {...stylex.props(
             foundationStyles.compactRowTitle,
             styles.title,
             loading && foundationStyles.sectionHeading,
           )}
         >
-          {loading ? <LoadingTitle label={title} /> : title}
+          {loading ? (
+            <span {...stylex.props(styles.loadingTitle)}>{title}</span>
+          ) : (
+            title
+          )}
         </strong>
         <span {...stylex.props(foundationStyles.metadata, styles.metadata)}>
           {metadata}
@@ -200,12 +159,8 @@ const styles = stylex.create({
   title: {
     color: colors.ink,
   },
-  loadingMessages: {
-    display: "grid",
-  },
-  loadingMessage: {
-    gridArea: "1 / 1",
-    visibility: "hidden",
+  loadingTitle: {
+    display: "inline-block",
     width: "fit-content",
     maxWidth: "100%",
     color: "transparent",
@@ -225,20 +180,6 @@ const styles = stylex.create({
       backgroundImage: "none",
       color: "CanvasText",
     },
-  },
-  visibleMessage: {
-    visibility: "visible",
-  },
-  visuallyHidden: {
-    position: "absolute",
-    width: "1px",
-    height: "1px",
-    padding: 0,
-    margin: "-1px",
-    overflow: "hidden",
-    clipPath: "inset(50%)",
-    whiteSpace: "nowrap",
-    borderWidth: 0,
   },
   metadata: {
     color: colors.inkMuted,

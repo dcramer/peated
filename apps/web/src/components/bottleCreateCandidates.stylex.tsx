@@ -5,10 +5,12 @@ import {
   getBottleIdentityProps,
 } from "@peated/web/lib/bottleListItem";
 import * as stylex from "@stylexjs/stylex";
+import { ChevronRight } from "lucide-react";
 import { foundationStyles } from "../styles/foundations.stylex";
 import { colors, controlMetrics, space } from "../styles/tokens.stylex";
 import { BottleIdentityRow } from "./bottleIdentityRow.stylex";
 import { Button } from "./button.stylex";
+import { linkedRowStyles } from "./linkedRow.stylex";
 
 export type BottleCreateCandidate =
   Outputs["bottles"]["createCandidates"]["results"][number];
@@ -110,7 +112,10 @@ export function BottleCreateCandidates({
 type BottleMatchListItem = BottleIdentitySource &
   Pick<Bottle, "id" | "fullName" | "imageUrl">;
 
-/** Bottles a member may pick instead, each with a "Use this bottle" action. */
+/**
+ * Bottles a member may pick instead. The whole row is one button; the shared
+ * linked-row styles own its hover, press, and focus states (DESIGN.md).
+ */
 export function BottleMatchList<TBottle extends BottleMatchListItem>({
   bottles,
   onUse,
@@ -123,26 +128,42 @@ export function BottleMatchList<TBottle extends BottleMatchListItem>({
   return (
     <ul {...stylex.props(styles.list)}>
       {bottles.map((bottle) => (
-        <li key={bottle.id} {...stylex.props(styles.row)}>
-          <BottleIdentityRow
-            {...getBottleIdentityProps(bottle, { includeBottler: true })}
-            end={
-              <Button
-                aria-label={`Use this bottle: ${bottle.fullName}`}
-                disabled={pendingBottleId !== null}
-                loading={pendingBottleId === bottle.id}
-                onClick={() => onUse(bottle)}
-                size="sm"
-                type="button"
-                variant="tonal"
-              >
-                Use this bottle
-              </Button>
-            }
-            imageUrl={bottle.imageUrl}
-            layout="cell"
-            variant="search"
-            verticalPadding="sm"
+        <li
+          key={bottle.id}
+          {...stylex.props(
+            styles.row,
+            styles.matchRow,
+            linkedRowStyles.container,
+            linkedRowStyles.onGround,
+          )}
+        >
+          <span {...stylex.props(styles.rowIdentity)}>
+            <BottleIdentityRow
+              {...getBottleIdentityProps(bottle, { includeBottler: true })}
+              imageUrl={bottle.imageUrl}
+              layout="cell"
+              variant="search"
+              verticalPadding="sm"
+            />
+          </span>
+          {pendingBottleId === bottle.id ? (
+            <span {...stylex.props(foundationStyles.metadata, styles.status)}>
+              Opening…
+            </span>
+          ) : (
+            <ChevronRight
+              aria-hidden="true"
+              size={18}
+              {...stylex.props(styles.chevron)}
+            />
+          )}
+          <button
+            aria-busy={pendingBottleId === bottle.id || undefined}
+            aria-label={`Use this bottle: ${bottle.fullName}`}
+            disabled={pendingBottleId !== null}
+            onClick={() => onUse(bottle)}
+            type="button"
+            {...stylex.props(linkedRowStyles.primaryLink, styles.rowButton)}
           />
         </li>
       ))}
@@ -194,6 +215,23 @@ const styles = stylex.create({
     borderBottomStyle: "solid",
     borderBottomColor: colors.hairline,
     listStyle: "none",
+  },
+  rowButton: {
+    position: "absolute",
+    inset: 0,
+    margin: 0,
+    padding: 0,
+    borderWidth: 0,
+    backgroundColor: "transparent",
+    cursor: { default: "pointer", ":disabled": "progress" },
+  },
+  chevron: { flexShrink: 0, color: colors.inkMuted },
+  rowIdentity: { minWidth: 0, flex: 1 },
+  matchRow: {
+    display: "flex",
+    alignItems: "center",
+    gap: space.x2,
+    paddingRight: space.x2,
   },
   row: {
     minWidth: 0,
