@@ -125,7 +125,7 @@ producer, auction, or retailer evidence.
   the exact label against an independent auction, producer, or retailer source
   before creating a Bottle; a plausible old date and name are not evidence.
 - An exact image may still lack permission for Peated to store it. The
-  producer's own official image is the exception; see
+  releasing producer's or bottler's own official image is the exception; see
   [Review Images](./catalog-maintenance.md#review-images).
 - Producer product pages for sold-out releases often drop off live sites. A
   Wayback capture of a producer news page can still hold the full-size image,

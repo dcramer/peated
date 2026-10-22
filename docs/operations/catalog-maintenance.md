@@ -191,9 +191,10 @@ using a similar release.
 - Check the source site's reuse terms. Record the canonical source page in
   `sourceUrl` and the license or reuse terms in `license`. A direct image URL is
   not enough provenance.
-- The producer's own official image of the exact Bottle may be stored even
-  when its site terms grant no reuse license (maintainer decision, October
-  2026). Use a page the producer runs, or a Wayback capture of one, as
+- The official image of the exact Bottle from the company that released it
+  (the producer, or the independent bottler for its own bottlings) may be
+  stored even when its site terms grant no reuse license (maintainer decision,
+  October 2026). Use a page that company runs, or a Wayback capture of one, as
   `sourceUrl`, and name the owner and the missing grant in `license`, such as
   `© Diageo. Official product image; Diageo site terms grant no reuse
 license.` Retailer, auction, and collector photos still need a reuse grant.

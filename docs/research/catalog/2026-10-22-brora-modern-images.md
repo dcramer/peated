@@ -67,13 +67,32 @@ as narrow portraits.
 - **World of Whiskies Exclusive (1972, 40 years, 2014) and the 2018 one-of-one
   35-year-old charity bottle:** no producer page found. Exact photos exist only
   on retailer and auction pages.
-- **Independent bottlings (Boutique-y Batch 2, Hunter Laing, Lombard,
-  Gordon & MacPhail Rare Old):** not searched to completion. Retailer pages
-  have exact photos; bottler pages were not confirmed.
+- **Hunter Laing Old & Rare (1982, 40 years) and The First Editions (1982,
+  37 years):** [hunterlaing.com](https://hunterlaing.com/range/) has range
+  pages only; its search and whisky sitemap list no Brora. No Wayback capture
+  of hunterlaing.com or edition-spirits.com mentions Brora.
+- **Lombard Jewels of Scotland (1982, 32 years):** lombardscotchwhisky.com
+  blocks curl and the in-app browser with Cloudflare; this was not bypassed.
+  Wayback captures of its Jewels of Scotland pages (2013 and July 2026) list
+  no Brora. The only archived Brora page is a 2009 21-year-old.
+- **Gordon & MacPhail Rare Old (1982, 2015, cask RO/15/01):** the current
+  site lists no Brora product. G&M's public
+  [brand asset library](https://brandassets.wearegordonandmacphail.com/web/974b5063f0a03a66/gordon---macphail/)
+  holds about 3,000 recent product images but none for Brora. Archived G&M
+  Brora images date from 2007 and show other bottlings. The press release
+  list has no Brora release.
+
+## Bottler Image Sources
+
+- [That Boutique-y Whisky Company: Brora](https://www.thatboutiqueywhiskycompany.com/whiskies/brora)
+  covers Batch 2 (September 2014, 42 bottles, 52.1%). It has a front-label
+  artwork file and a bottle shot labelled "Batch 2" and "Bottle 11 of 42".
+  The site footer reads "All rights reserved"; no reuse grant. The bottle shot
+  is stored on the Bottle.
+- G&M's brand asset library is public and is worth checking first for any G&M
+  bottling from recent years.
 
 ## Open Questions
 
 - Does Brora Iris have an official ABV? Peated stores 42%; WhiskyFun's tasting
   note reads 41.8%. Not changed in this pass.
-- Do the bottler sites for the independent releases above keep product pages
-  with images?
