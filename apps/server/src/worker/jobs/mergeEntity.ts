@@ -24,6 +24,7 @@ import {
 import { findSeriesIdByName } from "@peated/server/lib/bottleHelpers";
 import {
   getBottleExactIdentity,
+  getBottleGroupNameForBrand,
   materializeBottleForGroup,
 } from "@peated/server/lib/bottleIdentity";
 import type { SystemBottlePatch } from "@peated/server/lib/bottleSchemas";
@@ -41,7 +42,6 @@ import {
   EntityOwnershipConflictError,
 } from "@peated/server/lib/entityOwnership";
 import { deleteOwnedPronunciationAudio } from "@peated/server/lib/entityPronunciationAudio";
-import { formatBottleName } from "@peated/server/lib/format";
 import { logError, logInfo, logWarn } from "@peated/server/lib/log";
 import {
   finalizeBottleMerge,
@@ -590,10 +590,8 @@ async function performEntityMerge({
           currentSeries !== null && movedSeriesId === null;
         const targetGroup = {
           ...group,
+          ...getBottleGroupNameForBrand({ name: group.name, brand: toEntity }),
           brandId: toEntity.id,
-          fullName: formatBottleName({
-            name: `${toEntity.shortName || toEntity.name} ${group.name}`,
-          }),
           seriesId: movedSeriesId,
         };
         for (const member of seriesWillBeCreated ? [] : members) {

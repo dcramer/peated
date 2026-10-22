@@ -1254,6 +1254,35 @@ test("merges a moved Bottle into an exact release duplicate", async ({
   ).toMatchObject({ brandId: destinationEntity.id, ...release });
 });
 
+test("merges an exact duplicate whose name repeats the destination brand", async ({
+  fixtures,
+}) => {
+  const sourceEntity = await fixtures.Entity({ name: "Kilnhouse Distillery" });
+  const destinationEntity = await fixtures.Entity({ name: "Kilnhouse" });
+  const source = await fixtures.Bottle({
+    brandId: sourceEntity.id,
+    name: "Kilnhouse Twelve",
+  });
+  const destination = await fixtures.Bottle({
+    brandId: destinationEntity.id,
+    name: "Twelve",
+  });
+
+  await mergeEntity({
+    fromEntityIds: [sourceEntity.id],
+    toEntityId: destinationEntity.id,
+  });
+
+  expect(
+    await db.query.bottles.findFirst({ where: eq(bottles.id, source.id) }),
+  ).toBeUndefined();
+  expect(
+    await db.query.bottles.findFirst({
+      where: eq(bottles.id, destination.id),
+    }),
+  ).toMatchObject({ name: "Twelve", fullName: "Kilnhouse Twelve" });
+});
+
 test("merges an exact duplicate in the destination Series with the same name", async ({
   fixtures,
 }) => {

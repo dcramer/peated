@@ -15,9 +15,9 @@ import { getBottleStructuredIdentityKey } from "@peated/server/lib/bottleConflic
 import { findSeriesIdByName } from "@peated/server/lib/bottleHelpers";
 import {
   getBottleExactIdentity,
+  getBottleGroupNameForBrand,
   materializeBottleForGroup,
 } from "@peated/server/lib/bottleIdentity";
-import { formatBottleName } from "@peated/server/lib/format";
 import {
   EntityUpdateInputSchema,
   type EntityUpdateInput,
@@ -443,10 +443,11 @@ async function entityMergeCollisions(
         ...materializeBottleForGroup({
           group: {
             ...group,
-            brandId: destination.entity.id,
-            fullName: formatBottleName({
-              name: `${destination.entity.shortName || destination.entity.name} ${group.name}`,
+            ...getBottleGroupNameForBrand({
+              name: group.name,
+              brand: destination.entity,
             }),
+            brandId: destination.entity.id,
             seriesId: movedSeriesId,
           },
           exact,

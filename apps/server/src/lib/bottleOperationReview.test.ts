@@ -1808,6 +1808,12 @@ describe("Bottle operation review preparation", () => {
       name: "Batch Expression 1",
       vintageYear: 2010,
     });
+    // The move drops a repeated destination brand prefix from the name.
+    await fixtures.Bottle({
+      brandId: source.id,
+      name: "Batched Collision Destination Reserve",
+    });
+    await fixtures.Bottle({ brandId: destination.id, name: "Reserve" });
 
     const result = await prepareOperation({
       operation: {
@@ -1832,7 +1838,7 @@ describe("Bottle operation review preparation", () => {
       status: "pending_review",
       type: "merge_entities",
       preview: {
-        collisions: { bottleIdentities: 2 },
+        collisions: { bottleIdentities: 3 },
       },
     });
   });

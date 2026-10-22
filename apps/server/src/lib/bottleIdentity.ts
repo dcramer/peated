@@ -1,5 +1,7 @@
 import { formatCanonicalBottleName } from "@peated/bottle-classifier/bottleIdentity";
-import type { Bottle, BottleGroup } from "@peated/server/db/schema";
+import { stripDuplicateBrandPrefixFromBottleName } from "@peated/bottle-classifier/normalize";
+import type { Bottle, BottleGroup, Entity } from "@peated/server/db/schema";
+import { formatBottleName } from "@peated/server/lib/format";
 
 type StableBottleIdentity = Pick<
   BottleGroup,
@@ -67,6 +69,27 @@ export type MaterializedBottleForGroup = Pick<
 
 function valueOrCurrent<T>(value: T | undefined, current: T): T {
   return value === undefined ? current : value;
+}
+
+/**
+ * Names a BottleGroup under a brand the way Bottle updates store it. A name
+ * that repeats the brand loses that prefix, so "Kilnhouse Twelve" under
+ * Kilnhouse becomes "Twelve".
+ */
+export function getBottleGroupNameForBrand({
+  name,
+  brand,
+}: {
+  name: string;
+  brand: Pick<Entity, "name" | "shortName">;
+}): Pick<BottleGroup, "name" | "fullName"> {
+  const brandedName = stripDuplicateBrandPrefixFromBottleName(name, brand.name);
+  return {
+    name: brandedName,
+    fullName: formatBottleName({
+      name: `${brand.shortName || brand.name} ${brandedName}`,
+    }),
+  };
 }
 
 /** Returns only a non-redundant exact age relative to the shared age. */
