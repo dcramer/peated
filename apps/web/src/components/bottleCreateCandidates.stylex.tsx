@@ -146,17 +146,11 @@ export function BottleMatchList<TBottle extends BottleMatchListItem>({
               verticalPadding="sm"
             />
           </span>
-          {pendingBottleId === bottle.id ? (
-            <span {...stylex.props(foundationStyles.metadata, styles.status)}>
-              Opening…
-            </span>
-          ) : (
-            <ChevronRight
-              aria-hidden="true"
-              size={18}
-              {...stylex.props(styles.chevron)}
-            />
-          )}
+          <ChevronRight
+            aria-hidden="true"
+            size={18}
+            {...stylex.props(styles.chevron)}
+          />
           <button
             aria-busy={pendingBottleId === bottle.id || undefined}
             aria-label={`Use this bottle: ${bottle.fullName}`}

@@ -146,11 +146,9 @@ export function PhotoLoadingState({
           }
           src={previewUrl}
           title={
-            pickingBottle
-              ? `Opening ${pickingBottle.fullName}…`
-              : identifying
-                ? getPhotoProgressStatus(progress)
-                : "Stopped looking."
+            identifying || pickingBottle
+              ? getPhotoProgressStatus(progress)
+              : "Stopped looking."
           }
         />
       ) : null}
