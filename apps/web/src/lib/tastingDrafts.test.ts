@@ -34,6 +34,8 @@ const bottle: Bottle = {
     peatedId: "E0001",
     name: "Ardbeg",
     shortName: null,
+    pronunciation: null,
+    pronunciationIpa: null,
     kind: "brand",
     status: null,
     ownerId: null,
