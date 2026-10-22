@@ -35,6 +35,7 @@ import { formQueryOptions } from "@peated/web/lib/orpc/query";
 import {
   buildTastingDraftSaveInput,
   getExistingBottleConflictId,
+  getIdentificationPollInterval,
   getTastingDraftBottleHref,
   getTastingDraftHref,
   getTastingDraftPhotoChange,
@@ -49,8 +50,6 @@ import { useRouter, useSearchParams } from "next/navigation";
 import { useRef, useState } from "react";
 
 const TITLE = "Finish tasting";
-// Identification runs in the background; check back while it is pending.
-const IDENTIFICATION_POLL_MS = 5_000;
 
 function parseBottleId(value: string | null) {
   if (!value) return null;
@@ -83,14 +82,11 @@ function TastingDraftFlowContent({ draftId }: { draftId: string }) {
   const draftQueryOptions = formQueryOptions(
     orpc.tastingDrafts.details.queryOptions({ input: { draft: draftId } }),
   );
+  const [openedAt] = useState(() => Date.now());
   const draftQuery = useQuery({
     ...draftQueryOptions,
-    refetchInterval: (query) => {
-      const draft = query.state.data;
-      return draft && !draft.bottle && draft.identification.status === "pending"
-        ? IDENTIFICATION_POLL_MS
-        : false;
-    },
+    refetchInterval: (query) =>
+      getIdentificationPollInterval(query.state.data, Date.now() - openedAt),
   });
 
   // A Bottle picked from search arrives as `?bottle=`; one that already

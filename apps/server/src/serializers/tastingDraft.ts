@@ -1,10 +1,10 @@
-import { inArray } from "drizzle-orm";
+import { and, eq, inArray } from "drizzle-orm";
 import { type z } from "zod";
 import { serialize, serializer } from ".";
 import config from "../config";
 import { db } from "../db";
 import type { TastingDraft, User } from "../db/schema";
-import { bottles, users } from "../db/schema";
+import { bottles, follows, users } from "../db/schema";
 import { notEmpty } from "../lib/filter";
 import { serializeProposedBottle } from "../lib/photoIdentification";
 import { absoluteUrl } from "../lib/urls";
@@ -48,8 +48,11 @@ export const TastingDraftSerializer = serializer({
       ),
     ];
     const friendIds = [...new Set(itemList.flatMap(({ friends }) => friends))];
+    const ownerIds = [
+      ...new Set(itemList.map(({ createdById }) => createdById)),
+    ];
 
-    const [bottleList, friendList] = await Promise.all([
+    const [bottleList, friendList, followList] = await Promise.all([
       bottleIds.length
         ? db
             .select(bottleRowColumns)
@@ -59,7 +62,27 @@ export const TastingDraftSerializer = serializer({
       friendIds.length
         ? db.select().from(users).where(inArray(users.id, friendIds))
         : [],
+      friendIds.length
+        ? db
+            .select({
+              fromUserId: follows.fromUserId,
+              toUserId: follows.toUserId,
+            })
+            .from(follows)
+            .where(
+              and(
+                inArray(follows.fromUserId, ownerIds),
+                inArray(follows.toUserId, friendIds),
+                eq(follows.status, "following"),
+              ),
+            )
+        : [],
     ]);
+    // Saving or posting a draft drops friends its owner no longer follows
+    // (keepFollowedFriends), so don't show them either.
+    const followed = new Set(
+      followList.map(({ fromUserId, toUserId }) => `${fromUserId}:${toUserId}`),
+    );
     const [serializedBottles, serializedFriends] = await Promise.all([
       serialize(BottleSerializer, bottleList, currentUser),
       serialize(UserSerializer, friendList, currentUser),
@@ -102,6 +125,7 @@ export const TastingDraftSerializer = serializer({
             ? (bottlesById.get(item.bottleId) ?? null)
             : null,
           friends: item.friends
+            .filter((id) => followed.has(`${item.createdById}:${id}`))
             .map((id) => friendsById.get(id))
             .filter(notEmpty),
           identificationResult: serializeResult(

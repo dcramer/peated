@@ -53,6 +53,8 @@ photo (see below).
 - Friends the member no longer follows are dropped instead of rejected. A
   draft can wait for weeks, and a friendship that ends meanwhile must not stop
   the member from saving or posting it. `POST /tastings` still rejects them.
+  Reading a draft lists only friends the member still follows, so clients do
+  not show a tag the next save would drop.
 - If the member already posted this draft, the save returns `409 CONFLICT`
   with the tasting's ID in `data.tasting`. A stale retry from another device
   cannot bring a posted draft back.
@@ -170,7 +172,8 @@ dram, and where finding the Bottle stands: Bottle chosen, a suggested Bottle,
 a new Bottle to add, couldn't tell, or still identifying. A draft with no
 Bottle and no hint is named by the date the member had it. The status line
 wraps instead of being cut off. Each row can delete its draft after the member
-confirms.
+confirms; the page then reloads, so later drafts move up, and a page left
+empty sends the member back to the first page.
 
 `/drafts/{draft}` finishes one draft:
 
@@ -178,7 +181,9 @@ confirms.
    identification result: a suggested Bottle with **Use this bottle**, a
    proposed new Bottle with **Add this bottle**, or a note that the photo
    couldn't be matched. While identification is pending, the page checks
-   again every few seconds. Search is always there; a search result opens a
+   again every 5 seconds for 2 minutes, then once a minute: over the hourly
+   photo limit, a result can take until the limit resets. Search is always
+   there; a search result opens a
    confirm step. The search starts empty: hints are notes, such as "the
    smoky one Jo poured", not search terms. The intro quotes the hint instead.
    - **Use this bottle** saves the Bottle on the draft.

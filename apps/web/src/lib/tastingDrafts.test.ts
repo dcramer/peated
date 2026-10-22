@@ -6,6 +6,7 @@ import {
   buildTastingDraftSaveInput,
   describeTastingDraft,
   getExistingBottleConflictId,
+  getIdentificationPollInterval,
   getTastingDraftPhotoChange,
   getTastingDraftSuggestion,
   parseTastingDraftId,
@@ -189,6 +190,25 @@ describe("getTastingDraftSuggestion", () => {
         kind: "unknown",
       });
     }
+  });
+});
+
+describe("getIdentificationPollInterval", () => {
+  it("checks often at first, then slows down", () => {
+    const draft = makeDraft({ bottle });
+
+    expect(getIdentificationPollInterval(draft, 0)).toBe(5_000);
+    expect(getIdentificationPollInterval(draft, 3 * 60_000)).toBe(60_000);
+  });
+
+  it("stops once identification is settled", () => {
+    expect(
+      getIdentificationPollInterval(
+        makeDraft({ identification: { status: "failed", result: null } }),
+        0,
+      ),
+    ).toBe(false);
+    expect(getIdentificationPollInterval(undefined, 0)).toBe(false);
   });
 });
 

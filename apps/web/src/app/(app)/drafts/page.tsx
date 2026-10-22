@@ -1,6 +1,6 @@
 import type { Metadata } from "next";
+import { redirect } from "next/navigation";
 
-import { getApiQueryParams } from "@peated/web/lib/apiQueryParams";
 import { redirectToAuth } from "@peated/web/lib/auth";
 import { isLoggedIn } from "@peated/web/lib/auth.server";
 import { getCursorHref } from "@peated/web/lib/cursorHref";
@@ -25,17 +25,16 @@ export default async function TastingDraftsPage(props: {
   }
 
   const searchParams = await props.searchParams;
-  const input = getApiQueryParams(searchParams, { fields: ["cursor"] });
-  const page = Number(input.cursor ?? 1) || 1;
+  const cursor = Number(searchParams.cursor);
+  const page = Number.isInteger(cursor) && cursor > 0 ? cursor : 1;
   const { client } = await getServerClient();
-  const draftList = await client.tastingDrafts.list(input);
+  const draftList = await client.tastingDrafts.list({ cursor: page });
+  // Past the last page, for example after deleting its last draft.
+  if (!draftList.results.length && page > 1) redirect("/drafts");
 
   return (
     <TastingDraftsPageFrame>
       <TastingDraftList
-        // Next keeps client state when only the cursor changes; start each
-        // page with its own rows.
-        key={page}
         drafts={draftList.results}
         nextHref={getCursorHref(
           "/drafts",

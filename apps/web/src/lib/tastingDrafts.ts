@@ -59,6 +59,20 @@ export function getTastingDraftSuggestion(
   return { kind: "unknown" };
 }
 
+/**
+ * How often the finish page checks a draft whose Bottle is still being
+ * identified. A result usually lands within a minute; over the member's hourly
+ * photo limit it can take until the limit resets, so checks slow down rather
+ * than stop.
+ */
+export function getIdentificationPollInterval(
+  draft: Pick<TastingDraft, "identification"> | undefined,
+  elapsedMs: number,
+): number | false {
+  if (draft?.identification.status !== "pending") return false;
+  return elapsedMs < 2 * 60_000 ? 5_000 : 60_000;
+}
+
 type TastingDraftDescription = {
   name: string | null;
   status: string;

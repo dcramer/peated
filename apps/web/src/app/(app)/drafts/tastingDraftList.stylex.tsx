@@ -4,6 +4,7 @@ import { isORPCNotFoundError } from "@peated/orpc/client/errors";
 import * as stylex from "@stylexjs/stylex";
 import { useMutation, useQueryClient } from "@tanstack/react-query";
 import { Trash2 } from "lucide-react";
+import { useRouter } from "next/navigation";
 import { useState, type ReactNode } from "react";
 
 import { BottleIdentityRow } from "@peated/web/components/bottleIdentityRow.stylex";
@@ -44,7 +45,7 @@ export function TastingDraftsPageFrame({ children }: { children: ReactNode }) {
 }
 
 export function TastingDraftList({
-  drafts: initialDrafts,
+  drafts,
   nextHref,
   page,
   previousHref,
@@ -57,8 +58,10 @@ export function TastingDraftList({
   const orpc = useORPC();
   const queryClient = useQueryClient();
   const { flash } = useFlashMessages();
+  const router = useRouter();
   const timeZone = useViewerTimeZone();
-  const [drafts, setDrafts] = useState(initialDrafts);
+  // Hides deleted rows until the refreshed page arrives.
+  const [deletedIds, setDeletedIds] = useState<ReadonlySet<string>>(new Set());
   const [deleting, setDeleting] = useState<TastingDraft | null>(null);
   const [deleteError, setDeleteError] = useState<string>();
   const deleteMutation = useMutation(
@@ -80,9 +83,11 @@ export function TastingDraftList({
         return;
       }
     }
-    setDrafts((values) => values.filter(({ id }) => id !== draft.id));
+    setDeletedIds((ids) => new Set(ids).add(draft.id));
     setDeleting(null);
     flash("Draft deleted.", "info");
+    // Refill the page from the server, so later drafts move up.
+    router.refresh();
     // A failed mutation skips the app's refresh after mutations, so update
     // the header count when the draft was already gone.
     await queryClient.invalidateQueries({
@@ -101,45 +106,47 @@ export function TastingDraftList({
   return (
     <>
       <ItemList ariaLabel="Drafts">
-        {drafts.map((draft) => {
-          const description = describeTastingDraft(draft);
-          // A draft with no Bottle or hint is named by when it was had.
-          const name =
-            description.name ??
-            formatTimestamp(draft.tastedAt, "date", timeZone);
-          return (
-            <ItemListItem key={draft.id}>
-              <BottleIdentityRow
-                end={
-                  <IconButton
-                    disabled={deleteMutation.isPending}
-                    icon={<Trash2 aria-hidden="true" size={16} />}
-                    label={`Delete draft: ${name}`}
-                    onClick={() => {
-                      setDeleteError(undefined);
-                      setDeleting(draft);
-                    }}
-                    size="sm"
-                    variant="text"
-                  />
-                }
-                href={getTastingDraftHref(draft)}
-                imageFit={draft.imageUrl ? "cover" : undefined}
-                imageUrl={draft.imageUrl ?? draft.bottle?.imageUrl}
-                metadata={[description.status]}
-                name={name}
-                subtitle={
-                  description.name ? (
-                    <>
-                      Had <Timestamp date={draft.tastedAt} format="date" />
-                    </>
-                  ) : undefined
-                }
-                wrapDetails
-              />
-            </ItemListItem>
-          );
-        })}
+        {drafts
+          .filter(({ id }) => !deletedIds.has(id))
+          .map((draft) => {
+            const description = describeTastingDraft(draft);
+            // A draft with no Bottle or hint is named by when it was had.
+            const name =
+              description.name ??
+              formatTimestamp(draft.tastedAt, "date", timeZone);
+            return (
+              <ItemListItem key={draft.id}>
+                <BottleIdentityRow
+                  end={
+                    <IconButton
+                      disabled={deleteMutation.isPending}
+                      icon={<Trash2 aria-hidden="true" size={16} />}
+                      label={`Delete draft: ${name}`}
+                      onClick={() => {
+                        setDeleteError(undefined);
+                        setDeleting(draft);
+                      }}
+                      size="sm"
+                      variant="text"
+                    />
+                  }
+                  href={getTastingDraftHref(draft)}
+                  imageFit={draft.imageUrl ? "cover" : undefined}
+                  imageUrl={draft.imageUrl ?? draft.bottle?.imageUrl}
+                  metadata={[description.status]}
+                  name={name}
+                  subtitle={
+                    description.name ? (
+                      <>
+                        Had <Timestamp date={draft.tastedAt} format="date" />
+                      </>
+                    ) : undefined
+                  }
+                  wrapDetails
+                />
+              </ItemListItem>
+            );
+          })}
       </ItemList>
       <CursorPager
         ariaLabel="Draft pages"
