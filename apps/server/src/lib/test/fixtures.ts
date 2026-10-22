@@ -993,7 +993,9 @@ export const Badge = async (
   const [result] = await db
     .insert(badges)
     .values({
-      name: faker.word.noun(),
+      // Badge names are unique (case-insensitive), so a bare random word can
+      // collide when one test creates several badges.
+      name: `${faker.word.noun()} ${faker.string.alphanumeric(8)}`,
       tracker: "bottle",
       formula: "default",
       checks: [
