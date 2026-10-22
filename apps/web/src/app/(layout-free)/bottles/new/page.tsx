@@ -22,6 +22,7 @@ import {
   parseTastingDraftId,
 } from "@peated/web/lib/tastingDrafts";
 import { getBottleUrl } from "@peated/web/lib/urls";
+import { saveWrongPhotoMatchPick } from "@peated/web/lib/wrongPhotoMatches";
 import { useMutation, useQueries, useQuery } from "@tanstack/react-query";
 import { redirect, useRouter, useSearchParams } from "next/navigation";
 import {
@@ -132,18 +133,14 @@ function CreateBottleForm() {
     redirect("/errors/unauthorized");
   }
 
-  // Saves the member's pick after they reported a wrong photo match. A failure
-  // only loses the report detail, so it never blocks the Bottle.
+  // Saves the member's pick after they reported a wrong photo match.
   async function saveWrongPhotoMatchBottle(bottleId: number) {
     if (!wrongPhotoMatchId) return;
-    try {
-      await orpc.wrongPhotoMatches.update.call({
-        wrongPhotoMatch: wrongPhotoMatchId,
-        correctBottle: bottleId,
-      });
-    } catch (err) {
-      logError(err);
-    }
+    await saveWrongPhotoMatchPick(
+      orpc.wrongPhotoMatches.update.call,
+      wrongPhotoMatchId,
+      bottleId,
+    );
   }
 
   const initialFormData: BottleFormInitialData = { name };

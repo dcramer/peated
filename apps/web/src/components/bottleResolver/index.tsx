@@ -15,6 +15,7 @@ import {
   isORPCAccountRedirectError,
   type ORPCResponseTraceContext,
 } from "@peated/web/lib/orpc/link";
+import { saveWrongPhotoMatchPick } from "@peated/web/lib/wrongPhotoMatches";
 import { useMutation } from "@tanstack/react-query";
 import { Plus } from "lucide-react";
 import { useEffect, useRef, useState, type ChangeEvent } from "react";
@@ -474,9 +475,11 @@ export default function BottleResolver({
   /** Continues with a suggested Bottle and saves it on any wrong-match report. */
   async function pickSuggestion(bottle: PhotoMatchCandidate) {
     if (wrongMatch?.id) {
-      orpc.wrongPhotoMatches.update
-        .call({ wrongPhotoMatch: wrongMatch.id, correctBottle: bottle.id })
-        .catch(logError);
+      void saveWrongPhotoMatchPick(
+        orpc.wrongPhotoMatches.update.call,
+        wrongMatch.id,
+        bottle.id,
+      );
     }
     setPickingBottleId(bottle.id);
     try {

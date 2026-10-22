@@ -127,6 +127,38 @@ describe("POST /wrong-photo-matches", () => {
     ).toHaveLength(1);
   });
 
+  test("keeps the photo when two reports for one photo race", async ({
+    defaults,
+    fixtures,
+  }) => {
+    const { token } = await matchPhoto(fixtures, defaults.user);
+
+    const [first, second] = await Promise.all([
+      routerClient.wrongPhotoMatches.create(
+        { token },
+        { context: { user: defaults.user } },
+      ),
+      routerClient.wrongPhotoMatches.create(
+        { token },
+        { context: { user: defaults.user } },
+      ),
+    ]);
+
+    expect(second).toEqual(first);
+    const saved = await db.query.wrongPhotoMatches.findFirst({
+      where: eq(wrongPhotoMatches.id, first.id),
+    });
+    // Both copies land on one path; the loser must not delete the winner's.
+    expect(
+      existsSync(
+        path.join(
+          config.UPLOAD_PATH,
+          saved!.imageUrl!.replace(/^\/uploads\//, ""),
+        ),
+      ),
+    ).toBe(true);
+  });
+
   test("rejects another member's match", async ({ defaults, fixtures }) => {
     const other = await fixtures.User();
     const { token } = await matchPhoto(fixtures, other);

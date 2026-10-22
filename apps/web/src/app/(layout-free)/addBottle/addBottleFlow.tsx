@@ -53,6 +53,7 @@ import {
   getMemberReviewUrl,
   getTastingUrl,
 } from "@peated/web/lib/urls";
+import { saveWrongPhotoMatchPick } from "@peated/web/lib/wrongPhotoMatches";
 import { useMutation, useQueryClient } from "@tanstack/react-query";
 import { BookOpen, Eye, Plus, RotateCcw, Search, Wine } from "lucide-react";
 import { useRouter, useSearchParams } from "next/navigation";
@@ -579,22 +580,27 @@ function AddBottleFlowContent() {
         const bottle = await orpc.bottles.details.call({
           bottle: bottleId,
         });
-        if (requestedWrongPhotoMatchId) {
+        const [collectionStatus, reportGone] = await Promise.all([
+          orpc.collections.bottles.list.call({
+            user: "me",
+            collection: "library",
+            bottle: bottle.id,
+          }),
           // The member reported the photo match as wrong; this is their pick.
-          orpc.wrongPhotoMatches.update
-            .call({
-              wrongPhotoMatch: requestedWrongPhotoMatchId,
-              correctBottle: bottle.id,
-            })
-            .catch(logError);
-        }
-        const collectionStatus = await orpc.collections.bottles.list.call({
-          user: "me",
-          collection: "library",
-          bottle: bottle.id,
-        });
+          requestedWrongPhotoMatchId
+            ? saveWrongPhotoMatchPick(
+                orpc.wrongPhotoMatches.update.call,
+                requestedWrongPhotoMatchId,
+                bottle.id,
+              )
+            : false,
+        ]);
 
         if (cancelled) return;
+        // Picking the matched Bottle withdrew the report; stop sending its ID.
+        const wrongPhotoMatchId = reportGone
+          ? null
+          : requestedWrongPhotoMatchId;
         const libraryEntry = collectionStatus.results[0] ?? null;
         const selection: BottleResolverResult = {
           bottle,
@@ -603,7 +609,7 @@ function AddBottleFlowContent() {
           pendingImage: requestedPendingImage,
           previewUrl: requestedPendingImage?.imageUrl || null,
           resultSource: requestedResultSource,
-          wrongPhotoMatchId: requestedWrongPhotoMatchId,
+          wrongPhotoMatchId,
         };
 
         if (intent === "tasting") {
@@ -631,6 +637,11 @@ function AddBottleFlowContent() {
           setSelectedBottle(selection);
         }
         setHandledBottleKey(requestedBottleKey);
+        if (requestedWrongPhotoMatchId && !wrongPhotoMatchId) {
+          const params = new URLSearchParams(searchParams);
+          params.delete("wrongPhotoMatch");
+          router.replace(`/addBottle?${params}`, { scroll: false });
+        }
       } catch (err) {
         logError(err);
         if (cancelled) return;
@@ -658,6 +669,8 @@ function AddBottleFlowContent() {
     requestedBottleKey,
     requestedResultSource,
     requestedWrongPhotoMatchId,
+    router,
+    searchParams,
   ]);
 
   function resetFlow(nextIntent: AddBottleIntent) {

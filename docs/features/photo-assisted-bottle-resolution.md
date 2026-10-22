@@ -229,7 +229,8 @@ suggestion saves it directly; search and creation carry the record's ID in the
 URL, and so does **Change bottle** afterward, so the last pick is the one kept.
 Picking the Bottle that was matched withdraws the report: the match was right,
 so the record and its photo copy are deleted instead of kept as a false
-example. A later Bottle merge can still make both Bottles the same; that marks
+example. The page then drops the record's ID from the URL, so a reload or a
+later change does not try to update a deleted record. A later Bottle merge can still make both Bottles the same; that marks
 a duplicate, not a withdrawal, and the record stays.
 Only the reporting member can set it. A failed report or update never blocks
 search, creation, or the member's next action.

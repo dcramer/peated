@@ -17,7 +17,7 @@ import { z } from "zod";
 
 async function findExisting(userId: number, pendingImageId: string) {
   return await db.query.wrongPhotoMatches.findFirst({
-    columns: { id: true },
+    columns: { id: true, imageUrl: true },
     where: and(
       eq(wrongPhotoMatches.createdById, userId),
       eq(wrongPhotoMatches.pendingUploadId, pendingImageId),
@@ -110,15 +110,18 @@ export default procedure
       .returning({ id: wrongPhotoMatches.id });
     if (created) return { id: created.id };
 
-    // A repeated request won the race; drop this copy and return its record.
-    try {
-      await deleteUploadByUrl(imageUrl);
-    } catch (err) {
-      logError(err);
-    }
+    // A repeated request won the race; return its record. Copies of one photo
+    // share a path, so delete this copy only if the saved record uses another.
     const raced = await findExisting(context.user.id, payload.pendingImageId);
     if (!raced) {
       throw new Error("Wrong photo match conflict without a saved record.");
+    }
+    if (raced.imageUrl !== imageUrl) {
+      try {
+        await deleteUploadByUrl(imageUrl);
+      } catch (err) {
+        logError(err);
+      }
     }
     return { id: raced.id };
   });
