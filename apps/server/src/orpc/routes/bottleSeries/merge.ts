@@ -101,6 +101,8 @@ export default procedure
               input: { series: destination.id },
               actorId,
               creationSource: "manual_entry",
+              // A Series merge moves Bottles without editing their names.
+              enforceNamingRules: false,
             }),
           );
         } catch (error) {

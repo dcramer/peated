@@ -17,11 +17,13 @@ import { getUserActor } from "@peated/server/lib/actors";
 import { buildClassifierBottleInput } from "@peated/server/lib/classifierDecisionCreateInputs";
 import {
   BottleAlreadyExistsError,
+  BottleCreateBadRequestError,
   BottleCreateInputSchema,
   createBottle,
   createBottleInTransaction,
   createOrReuseBottleInTransaction,
 } from "@peated/server/lib/createBottle";
+import waitError from "@peated/server/lib/test/waitError";
 import * as workerClient from "@peated/server/lib/test/workerDispatch";
 import { and, eq, inArray } from "drizzle-orm";
 import { vi } from "vitest";
@@ -774,5 +776,105 @@ describe("Bottle creation", () => {
       .where(eq(bottles.id, result.bottle.id));
     expect(visibleAtDispatch).toBe(true);
     expect(persisted.groupId).toBe(result.group.id);
+  });
+});
+
+describe("Bottle naming rules", () => {
+  test("keeps a cask number out of edition", async ({ defaults, fixtures }) => {
+    const brand = await fixtures.Entity({ name: "Cask Rule Bottler" });
+
+    await expect(
+      createBottle({
+        context: contextFor(defaults.user),
+        input: {
+          name: "Clynelish 1972",
+          brand: brand.id,
+          edition: "Cask No. 14300",
+          caskNumber: "14300",
+        },
+      }),
+    ).rejects.toThrow(BottleCreateBadRequestError);
+
+    const result = await createBottle({
+      context: contextFor(defaults.user),
+      input: {
+        name: "Clynelish 1972",
+        brand: brand.id,
+        edition: "for La Maison du Whisky",
+        caskNumber: "14300",
+      },
+    });
+    expect(result.bottle).toMatchObject({
+      edition: "for La Maison du Whisky",
+      caskNumber: "14300",
+    });
+  });
+
+  test("requires each name to carry the vintage that tells it apart", async ({
+    defaults,
+    fixtures,
+  }) => {
+    const brand = await fixtures.Entity({ name: "Vintage Rule Bottler" });
+    const first = await createBottle({
+      context: contextFor(defaults.user),
+      input: { name: "Brora", brand: brand.id, vintageYear: 1981 },
+    });
+
+    const error = await waitError(
+      createBottle({
+        context: contextFor(defaults.user),
+        input: { name: "Brora", brand: brand.id, vintageYear: 1982 },
+      }),
+      BottleCreateBadRequestError,
+    );
+    expect(error.message).toContain(`Bottle ${first.bottle.id}`);
+    expect(error.message).toContain("vintage");
+
+    await expect(
+      createBottle({
+        context: contextFor(defaults.user),
+        input: { name: "Brora 1982", brand: brand.id, vintageYear: 1982 },
+      }),
+    ).resolves.toBeDefined();
+  });
+
+  test("requires an age only when the same name and vintage repeat", async ({
+    defaults,
+    fixtures,
+  }) => {
+    const brand = await fixtures.Entity({ name: "Age Rule Collection" });
+    await createBottle({
+      context: contextFor(defaults.user),
+      input: {
+        name: "Clynelish 1972",
+        brand: brand.id,
+        vintageYear: 1972,
+        statedAge: 22,
+      },
+    });
+
+    await expect(
+      createBottle({
+        context: contextFor(defaults.user),
+        input: {
+          name: "Clynelish 1972",
+          brand: brand.id,
+          vintageYear: 1972,
+          statedAge: 24,
+        },
+      }),
+    ).rejects.toThrow(/different age/);
+    await expect(
+      createBottle({
+        context: contextFor(defaults.user),
+        input: {
+          name: "Clynelish 1972",
+          brand: brand.id,
+          vintageYear: 1972,
+          statedAge: 24,
+          edition: "Batch 2",
+        },
+      }),
+    ).resolves.toBeDefined();
   });
 });

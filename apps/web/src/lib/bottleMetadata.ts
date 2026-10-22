@@ -2,18 +2,12 @@ import {
   formatAbv,
   isBatchEdition,
 } from "@peated/server/lib/bottleDisplayName";
-import { formatReleaseDate } from "@peated/server/lib/bottleRelease";
 import { formatCategoryName } from "@peated/server/lib/format";
 import type { Bottle } from "@peated/server/types";
 import type {
   KeyFact,
   KeyFactList,
 } from "@peated/web/components/catalogDetails.stylex";
-
-type BottleReleasePlacement = Pick<
-  Bottle,
-  "edition" | "releaseDay" | "releaseMonth" | "releaseYear"
->;
 
 type BottleHeaderSpecs = Pick<
   Bottle,
@@ -36,6 +30,13 @@ function getReleaseMarkerFact(bottle: BottleHeaderSpecs): KeyFact | null {
     };
   }
   return bottle.caskNumber ? { label: "Cask", value: bottle.caskNumber } : null;
+}
+
+// A selection or other worded edition, such as `for La Maison du Whisky`.
+function getEditionFact(bottle: BottleHeaderSpecs): KeyFact | null {
+  return bottle.edition && !isBatchEdition(bottle.edition)
+    ? { label: "Edition", value: bottle.edition }
+    : null;
 }
 
 function getYearFact(bottle: BottleHeaderSpecs): KeyFact | null {
@@ -80,15 +81,17 @@ function nameIncludes(name: string, text: string) {
 
 /**
  * Bottle Presentation: the detailed header shows up to three facts, ranked by
- * how precisely they identify the release: ABV, batch or cask, age, one year,
- * then category to fill a spare slot. A batch, cask, or year the name already
- * prints moves behind category, and missing facts leave no placeholder.
+ * how precisely they identify the release: ABV, batch or cask, age, any other
+ * edition, one year, then category to fill a spare slot. A batch, cask,
+ * edition, or year the name already prints moves behind category, and missing
+ * facts leave no placeholder.
  */
 export function getBottleHeaderSpecs(
   bottle: BottleHeaderSpecs,
   name: string,
 ): KeyFactList | null {
   const releaseMarker = getReleaseMarkerFact(bottle);
+  const edition = getEditionFact(bottle);
   const year = getYearFact(bottle);
   const inName = (fact: KeyFact | null) =>
     fact !== null && nameIncludes(name, String(fact.value));
@@ -96,11 +99,13 @@ export function getBottleHeaderSpecs(
     bottle.abv === null ? null : { label: "ABV", value: formatAbv(bottle.abv) },
     inName(releaseMarker) ? null : releaseMarker,
     getAgeFact(bottle, name),
+    inName(edition) ? null : edition,
     inName(year) ? null : year,
     bottle.category
       ? { label: "Category", value: formatCategoryName(bottle.category) }
       : null,
     inName(releaseMarker) ? releaseMarker : null,
+    inName(edition) ? edition : null,
     inName(year) ? year : null,
   ].filter((fact): fact is KeyFact => fact !== null);
 
@@ -108,12 +113,4 @@ export function getBottleHeaderSpecs(
   if (!second) return [first];
   if (!third) return [first, second];
   return [first, second, third];
-}
-
-/** Keeps one release date on the page while retaining batch and date context. */
-export function getBottleReleasePlacement(bottle: BottleReleasePlacement) {
-  const releaseDate = formatReleaseDate(bottle);
-  return isBatchEdition(bottle.edition)
-    ? { header: bottle.edition, details: releaseDate }
-    : { header: releaseDate, details: null };
 }

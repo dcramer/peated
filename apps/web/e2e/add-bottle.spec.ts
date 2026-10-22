@@ -343,10 +343,16 @@ test.describe("Add Bottle", () => {
 
     await expect(page.getByText("1 bottle may match this one.")).toBeVisible();
     await page.getByRole("button", { name: "Review" }).click();
-    await expect(
-      page.getByRole("region", { name: "Bottles that may match" }),
-    ).toContainText(exactSearchBottle.fullName);
-    await page.getByRole("button", { name: "Use this bottle" }).click();
+    // Titles leave the edition out, so find the exact Bottle by the button
+    // label, which names its full stored name.
+    const match = page
+      .getByRole("region", { name: "Bottles that may match" })
+      .getByRole("button", {
+        name: `Use this bottle: ${exactSearchBottle.fullName}`,
+        exact: true,
+      });
+    await expect(match).toBeVisible();
+    await match.click();
 
     await expect(page).toHaveURL(
       `/addBottle?bottle=${exactSearchBottle.id}&pendingImageId=playwright-photo-upload&pendingImageUrl=${encodeURIComponent(pendingImageUrl)}&intent=choose`,
@@ -439,7 +445,12 @@ test.describe("Add Bottle", () => {
     const candidates = page.getByRole("region", {
       name: "Bottles that may match",
     });
-    await expect(candidates).not.toContainText(exactSearchBottle.fullName);
+    await expect(
+      candidates.getByRole("button", {
+        name: `Use this bottle: ${exactSearchBottle.fullName}`,
+        exact: true,
+      }),
+    ).toHaveCount(0);
     await expect(
       candidates.getByRole("button", { name: "Use this bottle" }),
     ).toHaveCount(2);

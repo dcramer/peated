@@ -734,7 +734,7 @@ async function handleRpcRequest({ request, response, url }) {
           caskStrength: true,
           outturn: 240,
           maturation: "Oloroso hogshead",
-          caskNumber: "#5678",
+          caskNumber: "5678",
         };
         sendRpcResponse(response, bottle);
         return true;
@@ -2332,7 +2332,7 @@ function buildDirectBottleQueueProposal() {
       vintageYear: 2008,
       releaseYear: 2025,
       maturation: "Oloroso hogshead",
-      caskNumber: "#5678",
+      caskNumber: "5678",
       outturn: 240,
     },
     price: {
@@ -2404,7 +2404,7 @@ function isExpectedDirectBottleQueueCreateInput(input) {
     bottle?.releaseYear === 2025 &&
     bottle?.maturation === "Oloroso hogshead" &&
     bottle?.outturn === 240 &&
-    bottle?.caskNumber === "#5678" &&
+    bottle?.caskNumber === "5678" &&
     bottle?.description === null &&
     bottle?.descriptionSrc === null &&
     bottle?.tastingNotes == null &&
@@ -2437,7 +2437,7 @@ function isExpectedOrdinaryExactBottleCreateInput(input) {
     input?.caskStrength === true &&
     input?.outturn === 240 &&
     input?.maturation === "Oloroso hogshead" &&
-    input?.caskNumber === "#5678"
+    input?.caskNumber === "5678"
   );
 }
 
