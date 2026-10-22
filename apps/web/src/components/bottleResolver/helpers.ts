@@ -333,3 +333,20 @@ export function getPhotoProgressStatus(progress: PhotoProgress) {
 
 /** After this long, point the member to the ways out. */
 export const SLOW_PHOTO_IDENTIFICATION_MS = 45_000;
+
+/** One line naming what the label reading found, such as brand, name, age, and ABV. */
+export function getLabelSummary(
+  imageEvidence: PhotoIdentification["imageEvidence"],
+) {
+  const result = { imageEvidence };
+  return (
+    [
+      getFieldValue(result, "brand"),
+      getFieldValue(result, "expression"),
+      getFieldValue(result, "statedAge"),
+      getFieldValue(result, "abv"),
+    ]
+      .filter(Boolean)
+      .join(" · ") || null
+  );
+}

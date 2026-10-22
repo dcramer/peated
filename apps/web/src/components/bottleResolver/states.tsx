@@ -12,6 +12,7 @@ import type { ReactNode } from "react";
 import { BottleMatchList } from "@peated/web/components/bottleCreateCandidates.stylex";
 
 import {
+  getLabelSummary,
   getPhotoProgressStatus,
   type PhotoIdentification,
   type PhotoMatchCandidate,
@@ -127,6 +128,9 @@ export function PhotoLoadingState({
   onPickMatch: (bottle: PhotoMatchCandidate) => void;
   onStartOver: () => void;
 }) {
+  const pickingBottle = progress.candidates.find(
+    (bottle) => bottle.id === pickingBottleId,
+  );
   return (
     <BottleResolverColumn>
       <BottleResolverInlineAction>
@@ -136,19 +140,19 @@ export function PhotoLoadingState({
       </BottleResolverInlineAction>
       {previewUrl ? (
         <PhotoPreview
-          loading={identifying}
+          loading={identifying || Boolean(pickingBottle)}
+          metadata={
+            slow && identifying ? "This one is taking a while." : undefined
+          }
           src={previewUrl}
           title={
-            identifying ? getPhotoProgressStatus(progress) : "Stopped looking."
+            pickingBottle
+              ? `Opening ${pickingBottle.fullName}…`
+              : identifying
+                ? getPhotoProgressStatus(progress)
+                : "Stopped looking."
           }
         />
-      ) : null}
-      {slow && identifying ? (
-        <FormNotice>
-          {progress.candidates.length
-            ? "This one is taking a while. Pick a match below or search by name if you'd rather not wait."
-            : "This one is taking a while. Search by name if you'd rather not wait."}
-        </FormNotice>
       ) : null}
       {progress.candidates.length ? (
         <BottleResolverSection title="Possible matches">
@@ -160,7 +164,11 @@ export function PhotoLoadingState({
         </BottleResolverSection>
       ) : null}
       {progress.imageEvidence ? (
-        <FormDetails compact defaultOpen title="Label details">
+        <FormDetails
+          compact
+          description={getLabelSummary(progress.imageEvidence)}
+          title="Label details"
+        >
           <LabelFacts result={{ imageEvidence: progress.imageEvidence }} />
         </FormDetails>
       ) : null}

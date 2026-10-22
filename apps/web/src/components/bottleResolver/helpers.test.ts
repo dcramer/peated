@@ -5,6 +5,7 @@ import {
   EMPTY_PHOTO_PROGRESS,
   getCreateBottlePrefill,
   getCreateNameSeed,
+  getLabelSummary,
   getManualResultCopy,
   getPhotoProgressStatus,
   type PhotoIdentification,
@@ -190,5 +191,24 @@ describe("photo identification progress", () => {
       "Checking Peated…",
       "Checking the web…",
     ]);
+  });
+});
+
+describe("getLabelSummary", () => {
+  test("joins the brand, name, age, and strength that were read", () => {
+    const { imageEvidence } = buildPhotoResult();
+    expect(
+      getLabelSummary({
+        ...imageEvidence,
+        fieldCandidates: {
+          brand: { value: "Beauchamp", confidence: 0.75 },
+          expression: { value: "Single Malt", confidence: 0.75 },
+          abv: { value: 46, confidence: 0.75 },
+        },
+      }),
+    ).toBe("Beauchamp · Single Malt · 46% ABV");
+    expect(
+      getLabelSummary({ ...imageEvidence, fieldCandidates: {} }),
+    ).toBeNull();
   });
 });

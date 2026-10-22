@@ -69,6 +69,27 @@ export type {
   PendingImageRef,
 } from "./types";
 
+/** Shortest time a classifier step stays on screen, so quick tool calls don't flicker. */
+const MINIMUM_STEP_MS = 1200;
+
+/** Holds each value for at least `minimumMs` before showing the next one. */
+function useSteadyValue<T>(value: T, minimumMs: number): T {
+  const [shown, setShown] = useState(value);
+  const shownAtRef = useRef(0);
+
+  useEffect(() => {
+    if (Object.is(value, shown)) return;
+    const wait = Math.max(0, shownAtRef.current + minimumMs - Date.now());
+    const timer = setTimeout(() => {
+      shownAtRef.current = Date.now();
+      setShown(value);
+    }, wait);
+    return () => clearTimeout(timer);
+  }, [value, shown, minimumMs]);
+
+  return shown;
+}
+
 export default function BottleResolver({
   onResolve,
   searchHrefForQuery,
@@ -142,6 +163,10 @@ export default function BottleResolver({
   // Shrinking the photo happens before the request starts, so it counts as
   // identifying too; otherwise the resolver shows nothing until the upload.
   const [isPreparingPhoto, setIsPreparingPhoto] = useState(false);
+  const steadyStep = useSteadyValue(
+    photoProgress?.step ?? null,
+    MINIMUM_STEP_MS,
+  );
   const isIdentifying =
     isPreparingPhoto || photoIdentificationMutation.isPending;
 
@@ -549,7 +574,10 @@ export default function BottleResolver({
         {(isIdentifying || (photoProgress && !photoResult && !photoError)) && (
           <PhotoLoadingState
             previewUrl={previewUrl}
-            progress={photoProgress ?? EMPTY_PHOTO_PROGRESS}
+            progress={{
+              ...(photoProgress ?? EMPTY_PHOTO_PROGRESS),
+              step: steadyStep,
+            }}
             identifying={isIdentifying}
             slow={photoSlow}
             pickingBottleId={pickingBottleId}
