@@ -37,14 +37,20 @@ export type BottlePageHeaderProps = {
   specs?: KeyFactList | null;
 };
 
-/** Derives the brand, name, distillers, and key facts every bottle header shows. */
+/**
+ * Derives the brand, name, distillers, and key facts every bottle header shows.
+ * Bottle Presentation: the series moves from the title to the key facts.
+ */
 export function getBottleHeaderIdentity(
   bottle: Bottle,
 ): Pick<
   BottlePageHeaderProps,
   "brand" | "brandHref" | "metadata" | "name" | "specs"
 > {
-  const name = formatBottleDisplayName(bottle, { includeBrand: false });
+  const name = formatBottleDisplayName(bottle, {
+    includeBrand: false,
+    includeSeries: false,
+  });
   return {
     brand: bottle.brand.shortName || bottle.brand.name,
     brandHref: getEntityUrl(bottle.brand),

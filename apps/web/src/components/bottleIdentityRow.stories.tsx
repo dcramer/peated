@@ -106,12 +106,26 @@ export const Overview: Story = {
       </ItemListItem>
       <ItemListItem>
         <BottleIdentityRow
-          provenance={[{ name: "Single Malt" }]}
           href="/bottles/42"
           imageUrl={null}
           metadata={["16 years", "43%", "Distillers Edition"]}
           name="Lagavulin 16-year-old"
           relatedReleases={{ count: 3, href: "/bottles/42/releases" }}
+        />
+      </ItemListItem>
+      <ItemListItem>
+        <BottleIdentityRow
+          provenance={[
+            {
+              name: "Private Collection",
+              href: "/series/1088-gordon-and-mac-phail-private-collection",
+            },
+            { name: "Benromach", href: "/distillers/128-benromach" },
+          ]}
+          href="/bottles/67888"
+          imageUrl={null}
+          metadata={["40 years", "59.9%"]}
+          name="Gordon & MacPhail Benromach 1982"
         />
       </ItemListItem>
       <ItemListItem>
@@ -138,7 +152,6 @@ export const Overview: Story = {
       </ItemListItem>
       <ItemListItem>
         <BottleIdentityRow
-          provenance={[{ name: "Single Malt" }]}
           href="/bottles/18481"
           imageUrl={null}
           metadata={["61.5%", "2024 release", "Islay barley"]}
@@ -300,7 +313,6 @@ export const RowLayouts: Story = {
                   {
                     href: "/bottles/18481",
                     bottle: {
-                      provenance: [{ name: "Single Malt" }],
                       metadata: ["61.5%", "2024 release"],
                     },
                     id: "search-long-name",
