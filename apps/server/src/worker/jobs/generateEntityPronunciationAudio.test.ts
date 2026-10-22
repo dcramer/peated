@@ -109,6 +109,58 @@ test("replaces audio and removes the old file when the IPA changes", async ({
   await expect(readAudio(oldUrl)).rejects.toThrow();
 });
 
+test("uses the newer IPA when it changes while audio is made", async ({
+  fixtures,
+}) => {
+  const entity = await fixtures.Entity({
+    name: "Glen Garioch",
+    pronunciationIpa: IPA,
+  });
+  const synthesize = textToSpeech();
+  synthesize.mockImplementationOnce(async () => {
+    // A second edit lands mid-run; its own job would be blocked by this one.
+    await db
+      .update(entities)
+      .set({ pronunciationIpa: NEW_IPA })
+      .where(eq(entities.id, entity.id));
+    return Buffer.from("old-ipa-audio");
+  });
+
+  await run(entity.id, synthesize);
+
+  expect(synthesize.mock.calls.map(([input]) => input.ipa)).toEqual([
+    IPA,
+    NEW_IPA,
+  ]);
+  expect((await readEntity(entity.id))?.pronunciationAudioUrl).toBe(
+    getPronunciationAudioUrl(entity.id, NEW_IPA),
+  );
+});
+
+test("stops after a few attempts when the IPA keeps changing", async ({
+  fixtures,
+}) => {
+  const entity = await fixtures.Entity({
+    name: "Glen Garioch",
+    pronunciationIpa: IPA,
+  });
+  let edits = 0;
+  const synthesize = textToSpeech();
+  synthesize.mockImplementation(async () => {
+    edits += 1;
+    await db
+      .update(entities)
+      .set({ pronunciationIpa: `${IPA}${"i".repeat(edits)}` })
+      .where(eq(entities.id, entity.id));
+    return Buffer.from("mp3-audio");
+  });
+
+  await run(entity.id, synthesize);
+
+  expect(synthesize).toHaveBeenCalledTimes(3);
+  expect((await readEntity(entity.id))?.pronunciationAudioUrl).toBeNull();
+});
+
 test("removes audio when the IPA is cleared", async ({ fixtures }) => {
   const entity = await fixtures.Entity({ pronunciationIpa: IPA });
   await run(entity.id);
