@@ -40,9 +40,10 @@ pnpm cli api upload-image /bottles/123/image \
 - Put JSON bodies in temporary files.
 - Use `api upload-image` for multipart image endpoints. The CLI sets the file
   name, media type, and multipart boundary.
-- `--caption`, `--primary`, and `--idempotency-key` work only with
-  `/entities/<id>/images`, which requires `--idempotency-key`. The CLI rejects
-  them for other paths, such as Bottle images.
+- `--caption` and `--primary` work only with `/entities/<id>/images`.
+  `--idempotency-key` is required there and on `/pending-uploads` and
+  `/tastings/photo-identification`. The CLI rejects these flags on other paths,
+  such as Bottle images.
 - Use `--yes` non-interactively only after explicit authorization.
 - Re-fetch after success; verify asynchronous effects separately.
 

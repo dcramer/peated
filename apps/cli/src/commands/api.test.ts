@@ -150,19 +150,28 @@ describe("checkImageUploadOptions", () => {
     ).not.toThrow();
   });
 
-  test("accepts Bottle image uploads without Entity image fields", () => {
+  test.each(["/pending-uploads", "/tastings/photo-identification"])(
+    "accepts an idempotency key on %s",
+    (path) => {
+      expect(() =>
+        checkImageUploadOptions(path, { idempotencyKey: "upload-1" }),
+      ).not.toThrow();
+    },
+  );
+
+  test("accepts Bottle image uploads without extra fields", () => {
     expect(() =>
       checkImageUploadOptions("/bottles/123/image", {}),
     ).not.toThrow();
   });
 
-  test("rejects Entity image fields on Bottle image uploads", () => {
+  test("rejects fields the route does not accept", () => {
     expect(() =>
       checkImageUploadOptions("/bottles/123/image", {
         idempotencyKey: "bottle-123",
       }),
     ).toThrow(
-      "/bottles/123/image does not accept --idempotency-key. Use them only for Entity image uploads (/entities/<id>/images).",
+      "/bottles/123/image does not accept --idempotency-key. See `pnpm cli api upload-image --help`.",
     );
     expect(() =>
       checkImageUploadOptions("/bottles/123/image", {
@@ -170,5 +179,11 @@ describe("checkImageUploadOptions", () => {
         primary: true,
       }),
     ).toThrow("/bottles/123/image does not accept --caption, --primary.");
+    expect(() =>
+      checkImageUploadOptions("/pending-uploads", {
+        caption: "Front label",
+        idempotencyKey: "upload-1",
+      }),
+    ).toThrow("/pending-uploads does not accept --caption.");
   });
 });

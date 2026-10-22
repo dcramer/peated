@@ -129,10 +129,14 @@ type ApiImageUploadOptions = {
   yes?: boolean;
 };
 
-// Only `/entities/{entity}/images` accepts caption, isPrimary, and
-// idempotencyKey. The Bottle image route has a strict input and answers HTTP
-// 400 for them, so the CLI rejects them before sending.
+// Multipart routes that accept these optional fields, from their server input
+// schemas. The Bottle image route has a strict input and answers HTTP 400 for
+// extra fields, so the CLI rejects them before sending.
 const ENTITY_IMAGE_PATH = /^\/entities\/\d+\/images$/;
+const IDEMPOTENCY_KEY_PATHS = [
+  "/pending-uploads",
+  "/tastings/photo-identification",
+];
 
 export function checkImageUploadOptions(
   path: string,
@@ -146,11 +150,13 @@ export function checkImageUploadOptions(
   const flags = [
     options.caption !== undefined && "--caption",
     options.primary !== undefined && "--primary",
-    options.idempotencyKey !== undefined && "--idempotency-key",
+    options.idempotencyKey !== undefined &&
+      !IDEMPOTENCY_KEY_PATHS.includes(path) &&
+      "--idempotency-key",
   ].filter(Boolean);
   if (flags.length > 0) {
     throw new Error(
-      `${path} does not accept ${flags.join(", ")}. Use them only for Entity image uploads (/entities/<id>/images).`,
+      `${path} does not accept ${flags.join(", ")}. See \`pnpm cli api upload-image --help\`.`,
     );
   }
 }
@@ -350,13 +356,19 @@ subcommand
   .description("Upload an image to a multipart Peated API endpoint")
   .argument("<path>", "API path, such as /bottles/123/image")
   .requiredOption("--file <path>", "Local image file")
-  .option("--caption <caption>", "Entity image caption")
+  .option(
+    "--caption <caption>",
+    "Entity image caption; only for /entities/<id>/images",
+  )
   .option("--source-url <url>", "Original image source page")
   .option("--license <license>", "Image license or reuse terms")
-  .option("--primary", "Make this the primary Entity image")
+  .option(
+    "--primary",
+    "Make this the primary Entity image; only for /entities/<id>/images",
+  )
   .option(
     "--idempotency-key <key>",
-    "Entity image upload key; retries with the same key return the first image",
+    "Retry key; required by /entities/<id>/images, /pending-uploads, and /tastings/photo-identification",
   )
   .option("--yes", "Send the mutation without an interactive confirmation")
   .action(async (path, options) => runImageUploadCommand(path, options));
