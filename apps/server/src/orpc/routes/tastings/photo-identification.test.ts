@@ -23,6 +23,7 @@ import {
 } from "@peated/server/lib/pendingUploads";
 import {
   identifyBottlePhoto,
+  PHOTO_LOOKUP_TIME_LIMIT_MS,
   type IdentifyBottlePhotoServices,
   type PhotoIdentificationSpan,
   type PhotoIdentificationStartSpan,
@@ -91,6 +92,7 @@ type MockCreateBottleDecision = Omit<
   proposedBottle: CreateDecisionInput["proposedBottle"];
 };
 
+let lookupTimeLimitMs = PHOTO_LOOKUP_TIME_LIMIT_MS;
 const identifyImage: PhotoIdentificationProcedureServices["identifyImage"] = (
   input,
 ) =>
@@ -98,6 +100,7 @@ const identifyImage: PhotoIdentificationProcedureServices["identifyImage"] = (
     extractEvidence: extractPhotoBottleEvidenceMock,
     runReference: runBottleReferenceMock,
     startSpan,
+    lookupTimeLimitMs,
   });
 const photoIdentificationProcedure = createPhotoIdentificationProcedure({
   createPendingImage: createPendingImageUpload,
@@ -339,6 +342,7 @@ async function countCatalogRows() {
 describe("POST /tastings/photo-identification", () => {
   beforeEach(() => {
     config.AI_GATEWAY_API_KEY = undefined;
+    lookupTimeLimitMs = PHOTO_LOOKUP_TIME_LIMIT_MS;
     classifyBottleReferenceMock.mockReset();
     runBottleReferenceMock.mockReset();
     runBottleReferenceMock.mockImplementation(async (input) => ({
@@ -891,6 +895,75 @@ describe("POST /tastings/photo-identification", () => {
     expect(sentrySpanSetAttributeMock).toHaveBeenCalledWith(
       "photo_identification.stage",
       "classification",
+    );
+  });
+
+  test("returns the label facts when the bottle lookup runs out of time", async ({
+    fixtures,
+    defaults,
+  }) => {
+    lookupTimeLimitMs = 10;
+    extractPhotoBottleEvidenceMock.mockImplementation(async ({ photo }) => ({
+      extractedIdentity: null,
+      imageEvidence: buildImageEvidence(photo.id),
+    }));
+    runBottleReferenceMock.mockImplementation(
+      (_input, options) =>
+        new Promise((_resolve, reject) => {
+          options?.signal?.addEventListener("abort", () =>
+            reject(options.signal?.reason),
+          );
+        }),
+    );
+
+    const response = await routerClient.tastings.photoIdentification(
+      {
+        file: await fixtures.SampleSquareImage(),
+        idempotencyKey: "photo-lookup-time-limit",
+      },
+      { context: { user: defaults.user } },
+    );
+
+    expect(response.suggestedNextStep).toBe("manual_search");
+    expect(response.diagnostics.classification).toMatchObject({
+      status: "ignored",
+      reason: "The bottle lookup ran out of time.",
+    });
+    expect(response.imageEvidence.fieldCandidates.brand?.value).toBe("Ardbeg");
+    expect(sentrySpanSetAttributeMock).toHaveBeenCalledWith(
+      "photo_identification.lookup_timed_out",
+      true,
+    );
+  });
+
+  test("stops the bottle lookup when the caller gives up", async () => {
+    const controller = new AbortController();
+    extractPhotoBottleEvidenceMock.mockImplementation(async ({ photo }) => ({
+      extractedIdentity: null,
+      imageEvidence: buildImageEvidence(photo.id),
+    }));
+    runBottleReferenceMock.mockImplementation(
+      (_input, options) =>
+        new Promise((_resolve, reject) => {
+          options?.signal?.addEventListener("abort", () =>
+            reject(options.signal?.reason),
+          );
+          controller.abort(new Error("Request closed."));
+        }),
+    );
+
+    const error = await waitError(
+      identifyImage({
+        photo: { id: "photo-lookup-cancel", imageUrl: "/uploads/missing.webp" },
+        traceAttributes: {},
+        signal: controller.signal,
+      }),
+    );
+
+    expect(error).toMatchObject({ message: "Request closed." });
+    expect(sentrySpanSetAttributeMock).not.toHaveBeenCalledWith(
+      "photo_identification.lookup_timed_out",
+      true,
     );
   });
 

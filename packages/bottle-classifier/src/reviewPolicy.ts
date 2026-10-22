@@ -48,7 +48,6 @@ const MULTI_ITEM_REFERENCE_PATTERNS = [
   /\b(?:sampler|tasting|variety)\s+(?:pack|set|bundle)\b/i,
   /\b(?:dual|duo|trio|trilogy|combo)\s+(?:pack|set|bundle|collection)\b/i,
   /\b\d+\s*(?:-|x)?\s*pack\b/i,
-  /\b\d+\s+bottles?\b/i,
   /\b(?:pack|set|case)\s+of\s+\d+\b/i,
   /\b\d+\s*x\s*\d+(?:\.\d+)?\s?(?:ml|cl|l|oz)\b/i,
 ] as const;

@@ -99,6 +99,7 @@ export async function listAdminContent(
         review: memberReviews,
         bottleId: bottles.id,
         bottleFullName: bottles.fullName,
+        bottleAbv: bottles.abv,
         memberId: users.id,
         memberUsername: users.username,
         memberPrivate: users.private,
@@ -119,7 +120,11 @@ export async function listAdminContent(
       results: rows.slice(0, input.limit).map((row) => ({
         kind: "member_review",
         id: row.review.id,
-        bottle: { id: row.bottleId, fullName: row.bottleFullName },
+        bottle: {
+          id: row.bottleId,
+          fullName: row.bottleFullName,
+          abv: row.bottleAbv,
+        },
         member: {
           id: row.memberId,
           username: row.memberUsername,
@@ -159,6 +164,7 @@ export async function listAdminContent(
         tasting: tastings,
         bottleId: bottles.id,
         bottleFullName: bottles.fullName,
+        bottleAbv: bottles.abv,
         memberId: users.id,
         memberUsername: users.username,
         memberPrivate: users.private,
@@ -177,7 +183,11 @@ export async function listAdminContent(
       results: rows.slice(0, input.limit).map((row) => ({
         kind: "tasting",
         id: row.tasting.id,
-        bottle: { id: row.bottleId, fullName: row.bottleFullName },
+        bottle: {
+          id: row.bottleId,
+          fullName: row.bottleFullName,
+          abv: row.bottleAbv,
+        },
         member: {
           id: row.memberId,
           username: row.memberUsername,
@@ -217,6 +227,7 @@ export async function listAdminContent(
       article: externalReviewArticles,
       bottleId: bottles.id,
       bottleFullName: bottles.fullName,
+      bottleAbv: bottles.abv,
       siteId: externalSites.id,
       siteName: externalSites.name,
       siteKey: externalSites.type,
@@ -252,7 +263,11 @@ export async function listAdminContent(
       name: row.review.name,
       bottle:
         row.bottleId && row.bottleFullName
-          ? { id: row.bottleId, fullName: row.bottleFullName }
+          ? {
+              id: row.bottleId,
+              fullName: row.bottleFullName,
+              abv: row.bottleAbv,
+            }
           : null,
       site: { id: row.siteId, name: row.siteName, key: row.siteKey },
       article: {
@@ -326,16 +341,6 @@ export async function getAdminContent(kind: AdminContentKind, id: number) {
     ...item,
     history: await loadHistory(kind, id),
   });
-}
-
-export function contentTable(kind: AdminContentKind) {
-  if (kind === "member_review") return memberReviews;
-  if (kind === "external_review") return externalReviews;
-  return tastings;
-}
-
-export function contentObjectType(kind: AdminContentKind) {
-  return kind;
 }
 
 export function contentDisplayName(kind: AdminContentKind, id: number) {

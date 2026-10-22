@@ -109,7 +109,7 @@ export const Overview: Story = {
           provenance={[{ name: "Single Malt" }]}
           href="/bottles/42"
           imageUrl={null}
-          metadata={["16 years", "43.0% ABV", "Distillers Edition"]}
+          metadata={["16 years", "43%", "Distillers Edition"]}
           name="Lagavulin 16-year-old"
           relatedReleases={{ count: 3, href: "/bottles/42/releases" }}
         />
@@ -141,7 +141,7 @@ export const Overview: Story = {
           provenance={[{ name: "Single Malt" }]}
           href="/bottles/18481"
           imageUrl={null}
-          metadata={["61.5% ABV", "2024 release", "Islay barley"]}
+          metadata={["61.5%", "2024 release", "Islay barley"]}
           name="Bruichladdich Octomore Edition 15.3 Islay Barley Super Heavily Peated"
         />
       </ItemListItem>
@@ -301,7 +301,7 @@ export const RowLayouts: Story = {
                     href: "/bottles/18481",
                     bottle: {
                       provenance: [{ name: "Single Malt" }],
-                      metadata: ["61.5% ABV", "2024 release"],
+                      metadata: ["61.5%", "2024 release"],
                     },
                     id: "search-long-name",
                     title:

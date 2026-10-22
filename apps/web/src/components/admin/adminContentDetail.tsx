@@ -1,6 +1,7 @@
 "use client";
 
 import { getRatingBandById } from "@peated/server/constants";
+import { appendAbv } from "@peated/server/lib/bottleDisplayName";
 import type { Outputs } from "@peated/server/orpc/router";
 import {
   useMutation,
@@ -9,9 +10,9 @@ import {
 } from "@tanstack/react-query";
 import { useState, type FormEvent, type ReactNode } from "react";
 
-import { TextLink } from "..";
 import { useORPC } from "../../lib/orpc/context";
 import { getBottleUrlFromFullName } from "../../lib/urls";
+import { TextLink } from "../textLink.stylex";
 import { Timestamp } from "../timestamp";
 import { AdminButton } from "./adminButton.stylex";
 import {
@@ -166,7 +167,7 @@ function ContentFields({ item }: { item: ContentItem }) {
       "Bottle",
       item.bottle ? (
         <TextLink href={getBottleUrlFromFullName(item.bottle)} key="bottle">
-          {item.bottle.fullName}
+          {appendAbv(item.bottle.fullName, item.bottle.abv)}
         </TextLink>
       ) : (
         "No bottle"
@@ -318,5 +319,5 @@ function reviewListHref(kind: ContentKind) {
 
 function contentTitle(item: ContentItem) {
   if (item.kind === "external_review") return item.name;
-  return item.bottle.fullName;
+  return appendAbv(item.bottle.fullName, item.bottle.abv);
 }

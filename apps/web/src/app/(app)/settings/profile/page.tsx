@@ -21,6 +21,7 @@ import {
   resendVerificationForm,
   updateSession,
 } from "@peated/web/lib/auth.actions";
+import { shrinkPhotoForUpload } from "@peated/web/lib/blobs";
 import { useORPC } from "@peated/web/lib/orpc/context";
 import { zodResolver } from "@peated/web/lib/zodResolver";
 import { useMutation, useSuspenseQuery } from "@tanstack/react-query";
@@ -79,7 +80,10 @@ export default function ProfileSettingsPage() {
         user: "me",
       });
       const avatar = picture
-        ? await avatarUpdate.mutateAsync({ file: picture, user: "me" })
+        ? await avatarUpdate.mutateAsync({
+            file: await shrinkPhotoForUpload(picture),
+            user: "me",
+          })
         : {};
       await updateSession();
       setUser({ ...updatedUser, ...avatar });

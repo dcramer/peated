@@ -3,7 +3,10 @@ import { MAX_FILESIZE } from "@peated/server/constants";
 import { db } from "@peated/server/db";
 import { badges } from "@peated/server/db/schema";
 import { humanizeBytes } from "@peated/server/lib/strings";
-import { compressAndResizeImage, storeFile } from "@peated/server/lib/uploads";
+import {
+  compressAndCropSquareImage,
+  storeFile,
+} from "@peated/server/lib/uploads";
 import { absoluteUrl } from "@peated/server/lib/urls";
 import { imageUploadSpec } from "@peated/server/openapi/image-upload";
 import { procedure } from "@peated/server/orpc";
@@ -64,7 +67,7 @@ export default procedure
         },
         namespace: `badges`,
         urlPrefix: "/uploads",
-        onProcess: (...args) => compressAndResizeImage(...args, 500, 500),
+        onProcess: (...args) => compressAndCropSquareImage(...args, 500),
       });
     } catch (err) {
       // Check for file size limits

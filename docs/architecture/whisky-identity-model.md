@@ -234,6 +234,13 @@ An Entity `name` is its full catalog name. `shortName` is the compact name used
 in Bottle names. The alias list includes `shortName`, but it can be changed only
 by editing the Entity.
 
+`pronunciation` shows how to say the Entity name in plain English: lowercase
+syllables joined by hyphens, with the stressed syllable in capitals when it is
+known, such as `glen GEER-ee` for Glen Garioch or `mort-lack` for Mortlach. `pronunciationIpa` gives the same sound in the
+International Phonetic Alphabet (IPA), without slashes, such as `ɡlɛn ˈɡɪəri`.
+Both are optional, and the Entity schema checks their format. Generated details
+fill only empty values and drop values in the wrong format.
+
 Peated keeps references for the Entity name, short name, and the name without a
 leading “The.” A moderator can add more references. Adding or deleting an alias
 does not change these references. The same alias can belong to more than one

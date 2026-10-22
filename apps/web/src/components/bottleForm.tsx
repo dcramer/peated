@@ -61,7 +61,12 @@ import {
 } from "@peated/web/lib/formHelpers";
 import { useORPC } from "@peated/web/lib/orpc/context";
 import { zodResolver } from "@peated/web/lib/zodResolver";
-import { keepPreviousData, useMutation, useQuery } from "@tanstack/react-query";
+import {
+  keepPreviousData,
+  useMutation,
+  useQuery,
+  useQueryClient,
+} from "@tanstack/react-query";
 import { WandSparkles } from "lucide-react";
 import {
   useEffect,
@@ -377,6 +382,7 @@ export default function BottleForm({
 }) {
   const { imageUrl, ...initialFormData } = initialData;
   const orpc = useORPC();
+  const queryClient = useQueryClient();
   const { user } = useAuth();
   const [submitError, setSubmitError] = useState<string>();
   const [brandQuery, setBrandQuery] = useState("");
@@ -407,6 +413,7 @@ export default function BottleForm({
   >([]);
   const [submitAfterCandidateReview, setSubmitAfterCandidateReview] =
     useState(false);
+  const [checkingBeforeSave, setCheckingBeforeSave] = useState(false);
   const {
     control,
     formState: { dirtyFields, errors, isSubmitting },
@@ -508,24 +515,20 @@ export default function BottleForm({
     caskNumber,
     caskStrength,
     category,
-    description,
-    descriptionSrc,
     edition,
-    maltPhenolPpm,
-    maturation,
     name,
     naturalColor,
     noAgeStatement,
     nonChillFiltered,
-    outturn,
     releaseDay,
     releaseMonth,
     releaseYear,
     singleCask,
     statedAge,
-    tastingNotes,
     vintageYear,
   } = draft;
+  // Bottle search owns candidate matching. Send only the facts it ranks or
+  // compares, so editing other fields does not restart the check.
   const candidateInput = useMemo<BottleCreateCandidateQuery>(
     () => ({
       name: name ?? "",
@@ -540,9 +543,6 @@ export default function BottleForm({
       noAgeStatement: noAgeStatement ?? null,
       caskStrength: caskStrength ?? null,
       singleCask: singleCask ?? null,
-      naturalColor: naturalColor ?? null,
-      nonChillFiltered: nonChillFiltered ?? null,
-      maltPhenolPpm: finiteNumber(maltPhenolPpm),
       abv: finiteNumber(abv),
       edition: edition || null,
       vintageYear: finiteNumber(vintageYear),
@@ -550,18 +550,7 @@ export default function BottleForm({
       releaseYear: finiteNumber(releaseYear),
       releaseMonth: finiteNumber(releaseMonth),
       releaseDay: finiteNumber(releaseDay),
-      maturation: maturation || null,
       caskNumber: caskNumber || null,
-      outturn: finiteNumber(outturn),
-      description: description || null,
-      descriptionSrc: descriptionSrc ?? null,
-      tastingNotes: tastingNotes
-        ? {
-            nose: tastingNotes.nose ?? "",
-            palate: tastingNotes.palate ?? "",
-            finish: tastingNotes.finish ?? "",
-          }
-        : null,
       limit: 3,
     }),
     [
@@ -572,24 +561,16 @@ export default function BottleForm({
       caskNumber,
       caskStrength,
       category,
-      description,
-      descriptionSrc,
       distillers,
       edition,
-      maltPhenolPpm,
-      maturation,
       name,
-      naturalColor,
       noAgeStatement,
-      nonChillFiltered,
-      outturn,
       releaseDay,
       releaseMonth,
       releaseYear,
       series,
       singleCask,
       statedAge,
-      tastingNotes,
       vintageYear,
     ],
   );
@@ -672,9 +653,12 @@ export default function BottleForm({
     window.scrollTo({ top: 0 });
   }
 
-  function openCandidateReview(submitAfterReview = false) {
-    if (!unreviewedCandidates.length) return;
-    setCandidateReviewResults(unreviewedCandidates);
+  function openCandidateReview(
+    submitAfterReview = false,
+    candidates = unreviewedCandidates,
+  ) {
+    if (!candidates.length) return;
+    setCandidateReviewResults(candidates);
     setCandidateReviewOpen(true);
     setSubmitAfterCandidateReview(submitAfterReview);
     scrollToFormTop();
@@ -754,11 +738,38 @@ export default function BottleForm({
       void continueCreateFlow();
       return;
     }
-    if (hasUnreviewedCandidates) {
-      openCandidateReview(true);
+    void finishCreate();
+  }
+
+  // Save waits for a running duplicate check instead of staying disabled, so
+  // the final review still sees the latest candidates.
+  async function finishCreate() {
+    let candidates = unreviewedCandidates;
+    if (candidateCheckLoading) {
+      setCheckingBeforeSave(true);
+      try {
+        const { results } = await queryClient.fetchQuery({
+          ...orpc.bottles.createCandidates.queryOptions({
+            input: candidateInput,
+          }),
+          staleTime: 5 * 60_000,
+        });
+        candidates = results.filter(
+          (candidate) => !reviewedCandidateIds.has(candidate.id),
+        );
+      } catch {
+        // The duplicate check is advisory (bottle-entry-workflow.md): if it
+        // fails, save anyway. The server still runs its own duplicate checks.
+        candidates = [];
+      } finally {
+        setCheckingBeforeSave(false);
+      }
+    }
+    if (candidates.length) {
+      openCandidateReview(true, candidates);
       return;
     }
-    void handleSubmit(submit)(event);
+    await handleSubmit(submit)();
   }
 
   return (
@@ -776,20 +787,7 @@ export default function BottleForm({
             : undefined
       }
       onSave={handlePrimaryAction}
-      saveDisabled={
-        isCreate &&
-        !reviewingCandidates &&
-        isLastCreateStep &&
-        candidateCheckLoading
-      }
-      saveHint={
-        isCreate &&
-        !reviewingCandidates &&
-        isLastCreateStep &&
-        candidateCheckLoading
-          ? "Checking existing bottles…"
-          : undefined
-      }
+      saveHint={checkingBeforeSave ? "Checking existing bottles…" : undefined}
       saveLabel={
         reviewingCandidates
           ? submitAfterCandidateReview
@@ -803,7 +801,7 @@ export default function BottleForm({
                 }`
               : saveLabel
       }
-      saving={isSubmitting}
+      saving={isSubmitting || checkingBeforeSave}
       title={reviewingCandidates ? "Is it already on Peated?" : title}
     >
       <form onSubmit={handlePrimaryAction}>

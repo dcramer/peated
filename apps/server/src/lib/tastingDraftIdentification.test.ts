@@ -4,7 +4,10 @@ import { BottleClassificationResultSchema } from "@peated/server/agents/bottleCl
 import { db } from "@peated/server/db";
 import { bottles, tastingDrafts } from "@peated/server/db/schema";
 import { createPendingImageUpload } from "@peated/server/lib/pendingUploads";
-import type { IdentifyBottlePhotoServices } from "@peated/server/lib/photoIdentification";
+import {
+  PHOTO_LOOKUP_TIME_LIMIT_MS,
+  type IdentifyBottlePhotoServices,
+} from "@peated/server/lib/photoIdentification";
 import { identifyTastingDraft } from "@peated/server/lib/tastingDraftIdentification";
 import waitError from "@peated/server/lib/test/waitError";
 import { pushJob } from "@peated/server/lib/test/workerDispatch";
@@ -25,6 +28,7 @@ const services: IdentifyBottlePhotoServices = {
   runReference,
   startSpan: async (_context, callback) =>
     await callback({ setAttribute() {} }),
+  lookupTimeLimitMs: PHOTO_LOOKUP_TIME_LIMIT_MS,
 };
 
 function imageEvidence(sourceImageId: string) {

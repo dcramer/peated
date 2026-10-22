@@ -38,8 +38,6 @@ export const test = base.extend<{ snapshot: Snapshot }>({
 
       const outputRoot = visualOutputRoot();
       const imagePath = path.join(outputRoot, file);
-      const metadataFile = snapshotMetadataFile(testInfo, snapshotName);
-      const metadataPath = path.join(outputRoot, ".metadata", metadataFile);
       await fs.mkdir(path.dirname(imagePath), { recursive: true });
       await reserveSnapshot(outputRoot, file, testInfo, snapshotName);
       let captured = false;
@@ -63,20 +61,6 @@ export const test = base.extend<{ snapshot: Snapshot }>({
           "The expected page state changed during visual snapshot capture.",
         );
       }
-
-      await fs.mkdir(path.dirname(metadataPath), { recursive: true });
-      await fs.writeFile(
-        metadataPath,
-        `${JSON.stringify(
-          {
-            browserVersion: page.context().browser()?.version() ?? null,
-            file,
-            label: title,
-          },
-          null,
-          2,
-        )}\n`,
-      );
     });
   },
 });
@@ -96,22 +80,6 @@ export function snapshotFile(title: string) {
     );
   }
   return `${segments.join("/")}.png`;
-}
-
-export function snapshotMetadataFile(testInfo: TestInfo, snapshotName: string) {
-  const specPath = path
-    .relative(testInfo.project.testDir, testInfo.file)
-    .replaceAll(path.sep, "/")
-    .replace(/\.spec\.[cm]?[jt]sx?$/, "")
-    .split("/")
-    .map(slug)
-    .filter(Boolean);
-  const testPath = snapshotTitles(testInfo).map(slug).filter(Boolean);
-  return path.posix.join(
-    ...(specPath.length > 0 ? specPath : ["test"]),
-    ...testPath,
-    `${snapshotName}__${slug(testInfo.project.name) || "project"}.json`,
-  );
 }
 
 async function reserveSnapshot(
@@ -142,11 +110,6 @@ async function reserveSnapshot(
       });
     }
   }
-}
-
-function snapshotTitles(testInfo: Pick<TestInfo, "title" | "titlePath">) {
-  const titles = testInfo.titlePath.slice(1);
-  return titles.length > 0 ? titles : [testInfo.title];
 }
 
 function slug(value: string) {

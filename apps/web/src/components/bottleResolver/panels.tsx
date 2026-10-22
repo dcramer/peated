@@ -91,7 +91,7 @@ export function PhotoFailurePanel({
         <PhotoPreview
           metadata={
             isError
-              ? "We couldn't read enough from this photo"
+              ? "We couldn't check this photo"
               : "Details read from this photo"
           }
           src={previewUrl}

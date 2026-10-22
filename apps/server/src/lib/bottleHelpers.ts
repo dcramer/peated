@@ -1,6 +1,7 @@
 import { ORPCError } from "@orpc/server";
 import type { Entity } from "@peated/server/db/schema";
 import { bottleSeries, changes } from "@peated/server/db/schema";
+import { buildBottleSeriesSearchDocument } from "@peated/server/lib/search";
 import { BottleSeriesInputSchema } from "@peated/server/schemas";
 import { eq, sql } from "drizzle-orm";
 import { z } from "zod";
@@ -8,7 +9,8 @@ import type { AnyTransaction } from "../db";
 
 /**
  * Resolves or creates a bottle series using the caller-provided actor for
- * creation attribution. Returns [seriesId, created].
+ * creation attribution. A new Series gets its search document in the same
+ * transaction so text search finds it before the indexing job runs.
  */
 export async function processSeries({
   tx,
@@ -23,8 +25,8 @@ export async function processSeries({
     | null;
   brand: Entity;
   createdByActorId: number;
-}): Promise<[number | null, boolean]> {
-  if (!series) return [null, false];
+}): Promise<number | null> {
+  if (!series) return null;
 
   // If series is a number, it's an existing series ID
   const seriesId = z.number().safeParse(series);
@@ -37,7 +39,7 @@ export async function processSeries({
         message: "Series not found.",
       });
     }
-    return [seriesId.data, false];
+    return seriesId.data;
   }
 
   // Handle series object input
@@ -54,20 +56,24 @@ export async function processSeries({
     .limit(1);
 
   if (existingSeries) {
-    return [existingSeries.id, false];
+    return existingSeries.id;
   }
 
   const actorId = createdByActorId;
 
   // Create new series
+  const seriesData = {
+    name: seriesDraft.name,
+    description: seriesDraft.description,
+    fullName,
+    brandId: brand.id,
+    createdByActorId: actorId,
+  };
   const [newSeries] = await tx
     .insert(bottleSeries)
     .values({
-      name: seriesDraft.name,
-      description: seriesDraft.description,
-      fullName,
-      brandId: brand.id,
-      createdByActorId: actorId,
+      ...seriesData,
+      ...buildBottleSeriesSearchDocument(seriesData, brand),
     })
     .returning();
 
@@ -85,5 +91,5 @@ export async function processSeries({
     actorId,
   });
 
-  return [newSeries.id, true];
+  return newSeries.id;
 }

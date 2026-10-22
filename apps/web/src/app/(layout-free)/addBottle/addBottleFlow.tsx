@@ -40,7 +40,7 @@ import {
   getAddBottleHref,
   getPendingImageFromParams,
 } from "@peated/web/lib/addBottle";
-import { toBlob } from "@peated/web/lib/blobs";
+import { shrinkPhotoForUpload, toBlob } from "@peated/web/lib/blobs";
 import { getFormErrorMessage } from "@peated/web/lib/formHelpers";
 import { uploadImageAfterSave } from "@peated/web/lib/imageUpload";
 import { logError } from "@peated/web/lib/log";
@@ -824,7 +824,9 @@ function AddBottleFlowContent() {
       try {
         await uploadImageAfterSave({
           prepare: async () =>
-            image instanceof File ? image : await toBlob(image),
+            image instanceof File
+              ? await shrinkPhotoForUpload(image)
+              : await toBlob(image),
           upload: async (imageFile) => {
             await tastingImageUpdateMutation.mutateAsync({
               tasting: tasting.id,
@@ -869,7 +871,9 @@ function AddBottleFlowContent() {
       if (image) {
         await uploadImageAfterSave({
           prepare: async () =>
-            image instanceof File ? image : await toBlob(image),
+            image instanceof File
+              ? await shrinkPhotoForUpload(image)
+              : await toBlob(image),
           upload: async (imageFile) => {
             review = await memberReviewImageUpdateMutation.mutateAsync({
               bottle: review.bottleId,

@@ -41,6 +41,11 @@ export const SendsReasonAndNote: Story = {
       reason: "harassment",
       comment: "Targeted at me.",
     });
+    // Wait for the send to finish so the screenshot never catches the
+    // pending label.
+    await expect(
+      await screen.findByRole("button", { name: "Send report" }),
+    ).toBeEnabled();
   },
 };
 

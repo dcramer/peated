@@ -176,6 +176,8 @@ export const testBrand = {
   peatedId: "E9201",
   name: "Lagavulin",
   shortName: null,
+  pronunciation: null,
+  pronunciationIpa: null,
   kind: "brand",
   status: null,
   ownerId: null,

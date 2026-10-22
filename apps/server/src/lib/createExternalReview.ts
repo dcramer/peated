@@ -3,7 +3,11 @@ import {
   normalizeBottleReferenceKey,
 } from "@peated/bottle-classifier/normalize";
 import { db } from "@peated/server/db";
-import { bottleReferences, externalSites } from "@peated/server/db/schema";
+import {
+  bottleReferences,
+  externalReviews,
+  externalSites,
+} from "@peated/server/db/schema";
 import { storeExternalReviewArticleInTransaction } from "@peated/server/externalReviews/store";
 import { getPeatedSystemActor } from "@peated/server/lib/actors";
 import {
@@ -255,6 +259,20 @@ export async function createExternalReview(
       reviewId: stored.externalReview.id,
       classification: resolution.classification,
     });
+  }
+
+  if (bottleId === null && !resolution.error) {
+    await db
+      .update(externalReviews)
+      .set({ bottleNoMatchAt: sql`NOW()`, updatedAt: sql`NOW()` })
+      .where(
+        and(
+          eq(externalReviews.id, stored.externalReview.id),
+          eq(externalReviews.name, reviewName),
+          sql`${externalReviews.bottleId} IS NULL`,
+          sql`${externalReviews.removedAt} IS NULL`,
+        ),
+      );
   }
 
   if (stored.referenceAssignment) {

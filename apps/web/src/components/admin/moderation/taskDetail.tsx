@@ -1,6 +1,6 @@
 "use client";
 
-import { formatBottleDisplayName } from "@peated/server/lib/bottleDisplayName";
+import { formatBottleLabel } from "@peated/server/lib/bottleDisplayName";
 import { BottleCreateInputSchema } from "@peated/server/lib/bottleSchemas";
 import type { Inputs, Outputs } from "@peated/server/orpc/router";
 import type { Bottle } from "@peated/server/types";
@@ -47,6 +47,7 @@ import {
   ModerationTaskHeader,
 } from "./moderationDetail.stylex";
 import { ReportTask } from "./reportTask";
+import ReviewTask from "./reviewTask";
 
 type Task = Outputs["admin"]["moderation"]["listTasks"]["results"][number];
 type QueueItem = Outputs["prices"]["matchQueue"]["details"];
@@ -199,7 +200,7 @@ function ListingTask({
   function selectBottle(bottle: Bottle) {
     return matchBottle(
       bottle,
-      `Assigned ${item.price.name} to ${formatBottleDisplayName(bottle)}.`,
+      `Assigned ${item.price.name} to ${formatBottleLabel(bottle)}.`,
     );
   }
 
@@ -369,7 +370,7 @@ function ListingTask({
                 onClick={() =>
                   void matchBottle(
                     bottleNeedingReason,
-                    `Assigned ${item.price.name} to ${formatBottleDisplayName(bottleNeedingReason)}.`,
+                    `Assigned ${item.price.name} to ${formatBottleLabel(bottleNeedingReason)}.`,
                   )
                 }
               >
@@ -479,7 +480,8 @@ function AuditTask({
   const checkId =
     source.kind === "listing" ||
     source.kind === "report" ||
-    source.kind === "auction_lot"
+    source.kind === "auction_lot" ||
+    source.kind === "external_review"
       ? 0
       : source.checkId;
   const orpc = useORPC();
@@ -681,6 +683,8 @@ export default function TaskDetail({
   // task would inherit the last one's reason, note, error, and chosen Bottle.
   if (task.source.kind === "auction_lot")
     return <AuctionTask key={taskKey} onComplete={onComplete} task={task} />;
+  if (task.source.kind === "external_review")
+    return <ReviewTask key={taskKey} onComplete={onComplete} task={task} />;
   if (task.source.kind === "listing")
     return <ListingTask key={taskKey} onComplete={onComplete} task={task} />;
   if (task.source.kind === "report")

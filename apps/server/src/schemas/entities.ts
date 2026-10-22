@@ -19,6 +19,54 @@ const EntityShortNameSchema = z
   .nullable()
   .default(null)
   .describe("Abbreviated or short name for the entity");
+// Pronunciation rule (Entity schema): words are split by spaces and syllables
+// by hyphens. Each syllable is all lowercase or, when stressed, all capitals.
+// Stress is optional because many sources give the sounds without it.
+const RESPELLING_SYLLABLE_PATTERN =
+  /^(?:[a-z']*[a-z][a-z']*|[A-Z']*[A-Z][A-Z']*)$/;
+
+export function isPronunciationRespelling(value: string) {
+  const syllables = value.split(/[ -]/);
+  return syllables.every((syllable) =>
+    RESPELLING_SYLLABLE_PATTERN.test(syllable),
+  );
+}
+
+// Pronunciation rule (Entity schema): IPA letters, stress and length marks,
+// and diacritics only. Slashes and brackets are display marks, not stored.
+const IPA_PATTERN = /^[a-zæçðøħŋœɐ-ͯβθχ .]+$/u;
+
+export function isPronunciationIpa(value: string) {
+  return IPA_PATTERN.test(value) && /\S/.test(value);
+}
+
+export const EntityPronunciationSchema = z
+  .string()
+  .trim()
+  .max(100)
+  .refine(isPronunciationRespelling, {
+    message:
+      'Use lowercase syllables, with a stressed syllable in capitals when known, like "glen GEER-ee".',
+  })
+  .nullable()
+  .default(null)
+  .describe(
+    'How to say the name in plain English: lowercase syllables joined by hyphens, with a stressed syllable in capitals when known, like "glen GEER-ee"',
+  );
+
+export const EntityPronunciationIpaSchema = z
+  .string()
+  .trim()
+  .max(100)
+  .refine(isPronunciationIpa, {
+    message: 'Use IPA symbols without slashes, like "ɡlɛn ˈɡɪəri".',
+  })
+  .nullable()
+  .default(null)
+  .describe(
+    'How to say the name in the International Phonetic Alphabet, without slashes, like "ɡlɛn ˈɡɪəri"',
+  );
+
 const EntityKindSchema = EntityKindEnum.describe(
   "Best short description of what this entity is",
 );
@@ -113,6 +161,8 @@ export const EntitySchema = z.object({
     .describe("Permanent Peated ID for the entity"),
   name: EntityNameSchema,
   shortName: EntityShortNameSchema,
+  pronunciation: EntityPronunciationSchema,
+  pronunciationIpa: EntityPronunciationIpaSchema,
   kind: EntityKindSchema,
   status: EntityStatusSchema,
   ownerId: EntityOwnerIdSchema,
@@ -176,6 +226,8 @@ export const EntityDetailsSchema = EntitySchema.extend({
 export const EntityInputFields = {
   name: EntityNameSchema,
   shortName: EntityShortNameSchema,
+  pronunciation: EntityPronunciationSchema,
+  pronunciationIpa: EntityPronunciationIpaSchema,
   kind: EntityKindSchema,
   status: EntityStatusSchema,
   ownerId: EntityOwnerIdSchema,

@@ -10,6 +10,7 @@ import { WorkflowLoading } from "@peated/web/components/workflowScreen.stylex";
 import useAuth from "@peated/web/hooks/useAuth";
 import { VerifiedRequired } from "@peated/web/hooks/useAuthRequired";
 import { getAddBottleHref } from "@peated/web/lib/addBottle";
+import { shrinkPhotoForUpload } from "@peated/web/lib/blobs";
 import { logError } from "@peated/web/lib/log";
 import { useORPC } from "@peated/web/lib/orpc/context";
 import {
@@ -278,7 +279,7 @@ function CreateBottleForm() {
           try {
             await bottleImageUpdateMutation.mutateAsync({
               bottle: createdBottle.id,
-              file: image,
+              file: await shrinkPhotoForUpload(image),
               sourceUrl: imageSourceUrl,
               license: imageLicense,
             });

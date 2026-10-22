@@ -166,7 +166,7 @@ test.describe("Add Bottle", () => {
         exact: true,
       }),
     ).toBeVisible();
-    await page.clock.fastForward(120_001);
+    await page.clock.fastForward(600_001);
     await expect(
       page.getByText(
         "This is taking too long. Search by name or try again later.",
@@ -294,21 +294,25 @@ test.describe("Add Bottle", () => {
     await signIn(context, {
       accessToken: uniqueAccessToken(testInfo, "distinct-release"),
     });
+    let releaseCandidates!: () => void;
+    const candidatesReady = new Promise<void>((resolve) => {
+      releaseCandidates = resolve;
+    });
+    await page.route("**/rpc/bottles/createCandidates*", async (route) => {
+      await candidatesReady;
+      await route.continue();
+    });
     await page.goto(
       `/bottles/new?name=21-year-old&brand=${testBrand.id}&returnAction=view`,
     );
 
-    await expect(page.getByText("1 bottle may match this one.")).toBeVisible();
+    // Save stays usable during the duplicate check and opens the review once
+    // the check returns.
     await reachFinalCreateStep(page);
-    const finalReview = page.getByRole("button", {
-      name: "Review 1 bottle",
-      exact: true,
-    });
-    await snapshot("Add bottle / Final duplicate gate / Desktop", {
-      fullPage: false,
-      ready: finalReview,
-    });
-    await finalReview.click();
+    await page
+      .getByRole("button", { name: "Add a bottle", exact: true })
+      .click();
+    releaseCandidates();
     await expect(
       page.getByRole("button", { name: "Use this bottle" }),
     ).toBeVisible();

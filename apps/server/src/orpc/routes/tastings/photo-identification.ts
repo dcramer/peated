@@ -297,7 +297,7 @@ export function createPhotoIdentificationProcedure(
     .use(requireAuth)
     .use(requireTosAccepted)
     .use(photoIdentificationRateLimit)
-    .handler(async function ({ input, context, errors }) {
+    .handler(async function ({ input, context, errors, signal }) {
       const { file, idempotencyKey } = input;
 
       if (file.size > MAX_FILESIZE) {
@@ -346,6 +346,8 @@ export function createPhotoIdentificationProcedure(
           traceAttributes: {
             "photo_identification.pending_image_id": pendingImage.id,
           },
+          // Stop paying for the bottle lookup once the member has gone.
+          signal,
         });
       } catch (err) {
         logPhotoIdentificationFailure({

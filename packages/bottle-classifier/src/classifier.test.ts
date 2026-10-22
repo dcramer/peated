@@ -1183,7 +1183,7 @@ describe("createBottleClassifier", () => {
   });
 
   test.each([
-    "Buffalo Trace Full Collection - 8 Bottles",
+    "Buffalo Trace Full Collection - Pack of 8",
     "Buffalo Trace and Eagle Rare Combo Pack",
     "Buffalo Trace Trilogy Set",
   ])("auto ignores explicit multi-bottle listing %s", async (name) => {
@@ -1215,6 +1215,9 @@ describe("createBottleClassifier", () => {
   test.each([
     "Garrison Brothers Bottled in Bond Bourbon",
     "Orphan Barrel The Gifted Horse",
+    "Glenfarclas 1979/2014 (50.8%, OB, Family Casks for Bow Bar & Shinanoya, Japan, hogshead, cask #8801, 212 bottles)",
+    "Glenfarclas ‘190 Anniversary’ (90° proof, OB, 15,000 bottles, 2026)",
+    "Clynelish 1997 (55.2%, independent bottling, cask #42, 198 bottles)",
   ])(
     "does not treat nearby product wording as a multi-item listing: %s",
     async (name) => {
@@ -2352,6 +2355,35 @@ describe("createBottleClassifier", () => {
     } finally {
       expect(runAgent).toHaveBeenCalledOnce();
     }
+  });
+
+  test("passes the stop signal to the agent run", async () => {
+    const signal = new AbortController().signal;
+    const runAgent = vi.fn(
+      async (preparedRun: PreparedBottleClassifierAgentRun) => {
+        expect(preparedRun.runOptions.signal).toBe(signal);
+        return nativeAgentResult({
+          finalOutput: noMatchAgentDecision(),
+          inputTokens: 20,
+          outputTokens: 5,
+        });
+      },
+    );
+    const { classifier } = createTestClassifier({
+      maxSearchQueries: 0,
+      runPreparedBottleClassifierAgent: runAgent,
+    });
+
+    await classifier.runBottleReference(
+      {
+        reference: { name: "Example Single Malt Whisky" },
+        extractedIdentity: null,
+        initialCandidates: [],
+      },
+      { signal },
+    );
+
+    expect(runAgent).toHaveBeenCalledOnce();
   });
 
   test("returns null metadata for an override-only reference run", async () => {

@@ -2,7 +2,7 @@
 
 import { parseCatalogRouteId } from "@peated/web/lib/catalogRoute";
 
-import { formatBottleDisplayName } from "@peated/server/lib/bottleDisplayName";
+import { formatBottleLabel } from "@peated/server/lib/bottleDisplayName";
 import { formatPeatedId } from "@peated/server/lib/peatedId";
 import { BottleMergeSchema } from "@peated/server/schemas";
 import { FieldGroup } from "@peated/web/components/field.stylex";
@@ -181,11 +181,11 @@ function MergeBottleForm({ bottleId }: { bottleId: string }) {
                       description: other
                         ? `Retire ${other.label} (${formatPeatedId("bottle", Number(other.id))}).`
                         : "Retire the selected duplicate.",
-                      label: `Keep ${formatBottleDisplayName(bottle)} (${bottle.peatedId})`,
+                      label: `Keep ${formatBottleLabel(bottle)} (${bottle.peatedId})`,
                       value: "mergeFrom",
                     },
                     {
-                      description: `Retire ${formatBottleDisplayName(bottle)} (${bottle.peatedId}).`,
+                      description: `Retire ${formatBottleLabel(bottle)} (${bottle.peatedId}).`,
                       label: other
                         ? `Keep ${other.label} (${formatPeatedId("bottle", Number(other.id))})`
                         : "Keep the duplicate",

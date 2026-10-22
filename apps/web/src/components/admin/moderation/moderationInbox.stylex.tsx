@@ -45,11 +45,13 @@ export function inboxTaskHref(
       ? task.source.proposalId
       : task.source.kind === "auction_lot"
         ? task.source.lotId
-        : task.source.kind === "operation"
-          ? task.source.operationId
-          : task.source.kind === "report"
-            ? task.source.reportId
-            : task.source.checkId;
+        : task.source.kind === "external_review"
+          ? task.source.reviewId
+          : task.source.kind === "operation"
+            ? task.source.operationId
+            : task.source.kind === "report"
+              ? task.source.reportId
+              : task.source.checkId;
   const href = `/admin/moderation/inbox/${task.kind}/${id}`;
   return query ? `${href}?${query}` : href;
 }

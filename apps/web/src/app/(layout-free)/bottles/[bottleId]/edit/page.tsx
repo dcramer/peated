@@ -6,6 +6,7 @@ import { use } from "react";
 import BottleForm from "@peated/web/components/bottleForm";
 import { useFlashMessages } from "@peated/web/components/flashMessages.stylex";
 import { ModRequired } from "@peated/web/hooks/useAuthRequired";
+import { shrinkPhotoForUpload } from "@peated/web/lib/blobs";
 import { logError } from "@peated/web/lib/log";
 import { useORPC } from "@peated/web/lib/orpc/context";
 import { formQueryOptions } from "@peated/web/lib/orpc/query";
@@ -66,7 +67,7 @@ function BottleEditForm({ bottleId }: { bottleId: string }) {
           try {
             await bottleImageUpdateMutation.mutateAsync({
               bottle: context.bottleId,
-              file: image || undefined,
+              file: image ? await shrinkPhotoForUpload(image) : undefined,
               sourceUrl: value.imageSourceUrl,
               license: value.imageLicense,
             });

@@ -190,8 +190,9 @@ member removes it in their Apple ID settings. Revocation needs
 - web interstitial: `apps/web/src/app/(layout-free)/auth/suspended/`
 - acceptance route: `apps/server/src/orpc/routes/auth/tos/accept.ts`
 - registration and authentication: `apps/server/src/orpc/routes/auth/`
-- web acceptance prompts: `apps/web/src/components/pendingTosAlert.tsx` and the
-  ToS-required authentication page
+- web acceptance page: `apps/web/src/app/(layout-free)/auth/tos-required/`,
+  reached by redirects in `apps/web/src/lib/auth.actions.ts` and
+  `apps/web/src/app/(layout-free)/auth/magic-link/route.ts`
 
 When changing this policy, update the owning middleware and representative
 integration tests in the same change. Test fixtures may default to an accepted,

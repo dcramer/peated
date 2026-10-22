@@ -62,6 +62,17 @@ export function findJsonSubsetDifferences(
     );
   }
 
+  // Eval cask identity checks ignore the number sign, not identifier punctuation or digits.
+  if (path.endsWith(".caskNumber")) {
+    const actualCask = z.string().safeParse(actual);
+    const expectedCask = z.string().safeParse(expected);
+    if (actualCask.success && expectedCask.success) {
+      return actualCask.data.replace(/^#\s*/, "") ===
+        expectedCask.data.replace(/^#\s*/, "")
+        ? []
+        : [{ path, expected, actual }];
+    }
+  }
   return Object.is(actual, expected) ? [] : [{ path, expected, actual }];
 }
 

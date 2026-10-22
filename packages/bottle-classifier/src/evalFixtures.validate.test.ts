@@ -3,12 +3,19 @@ import path from "node:path";
 import { fileURLToPath } from "node:url";
 import { describe, expect, test } from "vitest";
 import { AUDIT_BOTTLE_EVAL_CASES } from "./auditBottle.eval.fixtures";
+import { EVAL_CASES } from "./classifier.eval.fixtures";
+import {
+  loadFixedWebEvidenceCase,
+  parseFixedWebEvidencePack,
+} from "./evalFixedWebEvidence";
 import {
   auditBottleEvalFixtureSchema,
   classifierEvalFixtureSchema,
   listFixtureFiles,
   realWorldNewBottleFixtureSchema,
 } from "./evalFixtureSchemas";
+import { REAL_WORLD_NEW_BOTTLE_EVAL_CASES } from "./realWorldNewBottleEval.fixtures";
+import { webEvidenceUrlsMatch } from "./webEvidenceUrl";
 
 const fixtureRootDir = fileURLToPath(
   new URL("./eval-fixtures/", import.meta.url),
@@ -61,6 +68,54 @@ function inferDecisionScenario(
 }
 
 describe("eval fixture validation", () => {
+  test("CI evidence covers every classifier and audit case and its captured image URLs", () => {
+    const pack = parseFixedWebEvidencePack(
+      JSON.parse(
+        readFileSync(
+          new URL("../evals/evidence/ci.json", import.meta.url),
+          "utf8",
+        ),
+      ),
+    );
+    const ids = [
+      ...EVAL_CASES.map(({ fixtureId }) => fixtureId),
+      ...REAL_WORLD_NEW_BOTTLE_EVAL_CASES.map(({ fixtureId }) => fixtureId),
+      ...AUDIT_BOTTLE_EVAL_CASES.map(({ id }) => id),
+    ];
+    expect(Object.keys(pack.cases).sort()).toEqual(ids.sort());
+
+    for (const testCase of EVAL_CASES) {
+      const evidence = pack.cases[testCase.fixtureId]!;
+      const imageUrls = [
+        testCase.input.reference.imageUrl,
+        ...(testCase.context.bottleContexts?.flatMap((context) =>
+          context.imageSources.map(({ url }) => url),
+        ) ?? []),
+      ].filter((url): url is string => Boolean(url));
+      for (const url of imageUrls) {
+        expect(
+          evidence.imageResults.some((image) =>
+            webEvidenceUrlsMatch(image.url, url),
+          ),
+          `${testCase.fixtureId}: no fixed image evidence for ${url}`,
+        ).toBe(true);
+      }
+    }
+    for (const testCase of AUDIT_BOTTLE_EVAL_CASES) {
+      const evidence = pack.cases[testCase.id]!;
+      for (const context of testCase.input.context.bottleContexts) {
+        for (const { url } of context.imageSources) {
+          expect(
+            evidence.imageResults.some((image) =>
+              webEvidenceUrlsMatch(image.url, url),
+            ),
+            `${testCase.id}: no fixed image evidence for ${url}`,
+          ).toBe(true);
+        }
+      }
+    }
+  });
+
   test("keeps decision fixtures aligned with their scenario directories", () => {
     const ids: string[] = [];
 
@@ -70,6 +125,12 @@ describe("eval fixture validation", () => {
       );
 
       ids.push(fixture.id);
+      if (fixture.webEvidenceFile) {
+        expect(
+          loadFixedWebEvidenceCase(fixture.webEvidenceFile, fixture.id)
+            .searchResult.errors,
+        ).toEqual([]);
+      }
       expect(path.basename(path.dirname(filename))).toBe(
         inferDecisionScenario(fixture),
       );

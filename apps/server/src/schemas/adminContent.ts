@@ -18,6 +18,7 @@ export type AdminContentStatus = z.infer<typeof AdminContentStatusSchema>;
 const AdminContentBottleSchema = z.object({
   id: z.number().int().positive(),
   fullName: z.string(),
+  abv: z.number().nullable(),
 });
 
 const AdminContentMemberSchema = z.object({

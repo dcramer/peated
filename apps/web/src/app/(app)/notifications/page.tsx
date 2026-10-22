@@ -24,6 +24,9 @@ export default async function UnreadNotificationsPage(props: {
 
   return (
     <NotificationList
+      // Next keeps client state when only the cursor changes; start each
+      // page with its own rows.
+      key={page}
       emptyHeading="No unread notifications"
       initialNotifications={notificationList.results}
       nextHref={getCursorHref(

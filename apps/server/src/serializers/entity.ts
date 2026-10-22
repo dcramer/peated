@@ -133,6 +133,8 @@ export const EntitySerializer = serializer({
       peatedId: formatPeatedId("entity", item.id),
       name: item.name,
       shortName: item.shortName,
+      pronunciation: item.pronunciation,
+      pronunciationIpa: item.pronunciationIpa,
       kind: item.kind,
       status: item.status,
       ownerId: item.ownerId,

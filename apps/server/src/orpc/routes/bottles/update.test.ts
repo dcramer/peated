@@ -369,6 +369,25 @@ describe("PATCH /bottles/{bottle}", () => {
     });
   });
 
+  test("makes a Series created by an edit searchable before indexing runs", async ({
+    fixtures,
+  }) => {
+    const mod = await fixtures.User({ mod: true });
+    const bottle = await fixtures.Bottle({ name: "Series Edit" });
+
+    const result = await routerClient.bottles.update(
+      { bottle: bottle.id, series: { name: "Committee Release" } },
+      { context: { user: mod } },
+    );
+
+    // Indexing jobs do not run in tests, so this proves the edit wrote the
+    // search document.
+    const { results } = await routerClient.bottleSeries.list({
+      query: "committee release",
+    });
+    expect(results.map(({ id }) => id)).toEqual([result.series!.id]);
+  });
+
   test("fans shared edits out durably and maps a mixed selected edit", async ({
     fixtures,
   }) => {

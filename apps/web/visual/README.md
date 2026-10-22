@@ -58,7 +58,7 @@ pnpm storybook:screenshots:build
 pnpm storybook:screenshots
 ```
 
-Images and `manifest.json` go to `apps/web/.playwright/visual/`. The E2E suite
+Images go to `apps/web/.playwright/visual/`. The E2E suite
 resets the directory, and the Storybook command adds its screenshots from the
 static build.
 
@@ -73,26 +73,31 @@ storybook/components/layout/workflow-screen__saving.png
 
 ## Frameshift flow
 
-The web screenshot workflow runs the normal E2E suite for both `main` and pull
-request revisions. Each `main` run uploads all E2E snapshots in an artifact
-keyed by the full commit SHA. A pull request run restores the artifact for the
-merge commit's first parent and compares it with the candidate snapshots:
+The web screenshot workflow runs the normal E2E suite and Storybook capture
+for both `main` and pull request revisions, then hands the images to the
+`dcramer/frameshift/ci` Action. Each `main` run saves the images in an artifact
+named for its full commit ID. A pull request run compares its images with the
+artifact for the merge commit's first parent:
 
 ```text
-main commit --run E2E--> revision-keyed baseline artifact
-                                      |
-pull request --run E2E + Storybook----+--> Frameshift report
+main commit --run E2E + Storybook--> artifact for that commit
+                                              |
+pull request --run E2E + Storybook------------+--> Frameshift report
 ```
 
-Before comparison, CI checks the source SHA, capture contract, platform,
-runner image, and exact Chromium version. An incompatible or missing baseline
-fails with an instruction to generate the exact baseline. CI does not silently
-capture the base with pull request code.
+If the base commit has no saved images, the pull request run skips the report.
+The next `main` run saves them. CI does not capture the base with pull request
+code.
 
-The capture job has read-only permissions. It uploads only the Frameshift
-report for pull requests. A dependent job does not check out pull request code;
-it publishes the validated report and adds the pull request link. Published
-reports and baseline artifacts expire after 30 days.
+The capture job has read-only permissions. It saves only the Frameshift report
+for pull requests. A dependent job does not check out pull request code; it
+publishes the report and adds the pull request link. Saved `main` images expire
+after 30 days.
+
+Frameshift publishes each report as a `frameshift-report/*` Git tag. The
+nightly `frameshift-cleanup.yml` workflow deletes reports older than 7 days. It
+keeps the report for the current head of each open pull request. It also
+deletes the `web-screenshots/*` branches left by the old screenshot workflow.
 
 Snapshot paths identify the same state across revisions. Renaming a snapshot
 title intentionally removes the old path and adds a new one.

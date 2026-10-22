@@ -53,6 +53,33 @@ function fixedEvidence() {
 }
 
 describe("fixed web evidence", () => {
+  test("allows an explicit local-input-only case but rejects recorded provider failures", () => {
+    const pack = {
+      name: "Local input control",
+      reviewedAt: "2026-10-20",
+      sources: [officialUrl],
+      cases: {
+        local: { searchResult: { evidence: [], errors: [] } },
+      },
+    };
+    expect(
+      parseFixedWebEvidencePack(pack).cases.local?.searchResult.evidence,
+    ).toEqual([]);
+    expect(() =>
+      parseFixedWebEvidencePack({
+        ...pack,
+        cases: {
+          local: {
+            searchResult: {
+              evidence: [],
+              errors: [{ query: "Product", error: "Provider unavailable" }],
+            },
+          },
+        },
+      }),
+    ).toThrow();
+  });
+
   test("returns the same reviewed search evidence for different model queries", async () => {
     const execute = vi.fn();
     const executor = createFixedWebSearchExecutor(fixedEvidence());
