@@ -1,0 +1,162 @@
+import {
+  ENTITY_ABOUT_EVENT_KIND_LIST,
+  ENTITY_ABOUT_SOURCE_KIND_LIST,
+} from "@peated/server/constants";
+import { ABOUT_FACT_FIELD_LIST } from "@peated/server/lib/entityAbout/aboutFactFields";
+import {
+  AboutEventSchema,
+  AboutSectionSchema,
+  AboutSiteFactsSchema,
+  AboutSourceSchema,
+  type EntityAboutDocument,
+} from "@peated/server/schemas/entityAbout";
+import { z } from "zod";
+
+// The writer's output. Every field is required and nullable so the model
+// returns one fixed shape; the job converts it to a stored document.
+
+const DateSchema = z
+  .string()
+  .describe(
+    "YYYY, YYYY-MM, or YYYY-MM-DD. Use only the precision the source gives.",
+  );
+
+const CitationSchema = z.object({
+  sourceId: z.string().describe("The `id` of a source in `sources`."),
+  statedValue: z
+    .string()
+    .nullable()
+    .describe(
+      "The value this source states for the fact: a date in the same format as `date`, or the number or text. Null when the source supports the fact without stating a value.",
+    ),
+  quote: z
+    .string()
+    .describe(
+      "A passage copied exactly from the page text you read, at most 300 characters. It must contain the fact.",
+    ),
+});
+
+export const AboutDraftSchema = z.object({
+  sources: z.array(
+    z.object({
+      id: z.string().describe("Short ID such as `wp` or `official`."),
+      url: z.string().describe("The exact URL you read."),
+      title: z.string(),
+      publisher: z.string().nullable(),
+      publishedOn: DateSchema.nullable(),
+      kind: z.enum(ENTITY_ABOUT_SOURCE_KIND_LIST),
+    }),
+  ),
+  events: z.array(
+    z.object({
+      id: z.number().int().positive(),
+      kind: z.enum(ENTITY_ABOUT_EVENT_KIND_LIST),
+      date: DateSchema,
+      endDate: DateSchema.nullable().describe("Only for an `era`."),
+      continuing: z.boolean().describe("Only for an `era` that has not ended."),
+      name: z
+        .string()
+        .nullable()
+        .describe(
+          "For `renamed`, the new name. For `opened`, the first name when it differs from today's.",
+        ),
+      title: z.string().nullable().describe("For an `era`, a short title."),
+      text: z.string().nullable().describe("One plain sentence, or null."),
+      newOwnerName: z
+        .string()
+        .nullable()
+        .describe("For `acquired`, the new owner's name."),
+      citations: z.array(CitationSchema),
+    }),
+  ),
+  siteFacts: z.array(
+    z.object({
+      field: z.enum(ABOUT_FACT_FIELD_LIST),
+      value: z.union([z.number(), z.string()]),
+      asOf: DateSchema.nullable(),
+      citations: z.array(CitationSchema),
+    }),
+  ),
+  sections: z.array(
+    z.object({
+      key: z
+        .string()
+        .describe("`lead` for the opening, then short lowercase keys."),
+      heading: z.string().nullable().describe("Null for the lead."),
+      eraEventId: z.number().int().nullable(),
+      sentences: z.array(
+        z.object({
+          text: z.string(),
+          factIds: z
+            .array(z.string())
+            .describe(
+              "`event:<id>` or `site:<field>` for every fact the sentence states.",
+            ),
+        }),
+      ),
+    }),
+  ),
+});
+
+export type AboutDraft = z.infer<typeof AboutDraftSchema>;
+
+/**
+ * Converts the writer's draft into a stored document, marked as written by
+ * the pipeline. Items the schema rejects are dropped, not repaired.
+ */
+export function draftToDocument(draft: AboutDraft, now: string) {
+  const dropped: string[] = [];
+
+  const sources = draft.sources.flatMap((source) => {
+    const parsed = AboutSourceSchema.safeParse({
+      ...source,
+      status: "available",
+    });
+    if (!parsed.success) dropped.push(`source ${source.id}`);
+    return parsed.success ? [parsed.data] : [];
+  });
+
+  const events = draft.events.flatMap((event) => {
+    const parsed = AboutEventSchema.safeParse({
+      ...event,
+      relatedEntityId: null,
+      newOwnerId: null,
+      writtenBy: "pipeline",
+      createdAt: now,
+      updatedAt: now,
+    });
+    if (!parsed.success) dropped.push(`event ${event.id}`);
+    return parsed.success ? [parsed.data] : [];
+  });
+
+  const siteFacts: EntityAboutDocument["siteFacts"] = {};
+  for (const fact of draft.siteFacts) {
+    const parsed = AboutSiteFactsSchema.safeParse({
+      [fact.field]: {
+        value: fact.value,
+        asOf: fact.asOf,
+        citations: fact.citations,
+        writtenBy: "pipeline",
+      },
+    });
+    if (parsed.success) Object.assign(siteFacts, parsed.data);
+    else dropped.push(`site fact ${fact.field}`);
+  }
+
+  const sections = draft.sections.flatMap((section) => {
+    const parsed = AboutSectionSchema.safeParse({
+      ...section,
+      writtenBy: "pipeline",
+    });
+    if (!parsed.success) dropped.push(`section ${section.key}`);
+    return parsed.success ? [parsed.data] : [];
+  });
+
+  const document: EntityAboutDocument = {
+    sources,
+    events,
+    siteFacts,
+    sections,
+  };
+  return { document, dropped };
+}

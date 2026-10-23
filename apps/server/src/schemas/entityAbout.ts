@@ -5,7 +5,6 @@ import {
 import {
   ABOUT_FACT_FIELD_LIST,
   ABOUT_FACT_FIELDS,
-  type AboutFactField,
 } from "@peated/server/lib/entityAbout/aboutFactFields";
 import { z } from "zod";
 
@@ -125,27 +124,26 @@ const AboutSiteFactSchema = z.object({
   writtenBy: AboutWrittenByEnum,
 });
 
-function siteFactSchemaFor(field: AboutFactField) {
-  const value =
-    ABOUT_FACT_FIELDS[field].type === "number"
-      ? z.number().nonnegative()
-      : z.string().trim().min(1).max(200);
-  return AboutSiteFactSchema.extend({ value });
-}
-
-// Built from the field list; each field checks its own value type.
+// Built from the field list. Each value must match its field's type.
 export const AboutSiteFactsSchema = z
-  .object(
-    Object.fromEntries(
-      ABOUT_FACT_FIELD_LIST.map((field) => [
-        field,
-        siteFactSchemaFor(field).optional(),
-      ]),
-    ) as unknown as {
-      [Field in AboutFactField]: z.ZodOptional<typeof AboutSiteFactSchema>;
-    },
-  )
-  .strict();
+  .partialRecord(z.enum(ABOUT_FACT_FIELD_LIST), AboutSiteFactSchema)
+  .superRefine((facts, context) => {
+    for (const field of ABOUT_FACT_FIELD_LIST) {
+      const fact = facts[field];
+      if (!fact) continue;
+      const number = ABOUT_FACT_FIELDS[field].type === "number";
+      const valueSchema = number
+        ? z.number().nonnegative()
+        : z.string().trim().min(1).max(200);
+      if (!valueSchema.safeParse(fact.value).success) {
+        context.addIssue({
+          code: "custom",
+          path: [field, "value"],
+          message: `${field} needs a ${number ? "number" : "text"} value.`,
+        });
+      }
+    }
+  });
 
 export const AboutSentenceSchema = z.object({
   text: z.string().trim().min(1).max(400),

@@ -1,10 +1,11 @@
 import { EntityAboutDocumentSchema } from "@peated/server/schemas/entityAbout";
+import type { z } from "zod";
 
 import { mergePipelineDraft } from "./document";
 
 const now = "2026-10-23T00:00:00.000Z";
 
-function document(input: object) {
+function document(input: Partial<z.input<typeof EntityAboutDocumentSchema>>) {
   return EntityAboutDocumentSchema.parse({
     sources: [
       {

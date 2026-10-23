@@ -1,8 +1,20 @@
 import type { EntityKind } from "@peated/server/db/schema";
 
+export const ABOUT_FACT_FIELD_LIST = [
+  "washStills",
+  "spiritStills",
+  "otherStills",
+  "capacityLitres",
+  "waterSource",
+  "heating",
+  "listing",
+] as const;
+
+export type AboutFactField = (typeof ABOUT_FACT_FIELD_LIST)[number];
+
 /**
- * Site facts an About document may hold. Adding a fact is one entry here; the
- * document schema is built from this list. Removing or renaming an entry
+ * Site facts an About document may hold. Adding a fact is one entry in each list;
+ * the document schema is built from them. Removing or renaming an entry
  * breaks stored documents, so follow the About schema rule in
  * `schemas/entityAbout.ts`.
  */
@@ -50,7 +62,7 @@ export const ABOUT_FACT_FIELDS = {
     kinds: ["distillery"],
   },
 } as const satisfies Record<
-  string,
+  AboutFactField,
   {
     label: string;
     type: "number" | "text";
@@ -59,17 +71,9 @@ export const ABOUT_FACT_FIELDS = {
   }
 >;
 
-export type AboutFactField = keyof typeof ABOUT_FACT_FIELDS;
-
-export const ABOUT_FACT_FIELD_LIST = Object.keys(
-  ABOUT_FACT_FIELDS,
-) as AboutFactField[];
-
 export function aboutFactFieldAppliesTo(
   field: AboutFactField,
   kind: EntityKind,
 ) {
-  return (ABOUT_FACT_FIELDS[field].kinds as readonly EntityKind[]).includes(
-    kind,
-  );
+  return ABOUT_FACT_FIELDS[field].kinds.some((fieldKind) => fieldKind === kind);
 }

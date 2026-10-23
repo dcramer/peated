@@ -23,7 +23,7 @@ type LegacyKind = (typeof ENTITY_EVENT_KIND_LIST)[number];
 type LegacyEvent = z.infer<typeof EntityEventSchema>;
 
 export function isLegacyKind(kind: string): kind is LegacyKind {
-  return (ENTITY_EVENT_KIND_LIST as readonly string[]).includes(kind);
+  return ENTITY_EVENT_KIND_LIST.some((legacyKind) => legacyKind === kind);
 }
 
 export function toLegacyEvent(
@@ -48,10 +48,7 @@ export function toLegacyEvent(
 }
 
 /** Finds or adds a moderator-supplied source and returns its ID. */
-export function ensureSource(
-  document: EntityAboutDocument,
-  url: string,
-): { document: EntityAboutDocument; sourceId: string } {
+export function ensureSource(document: EntityAboutDocument, url: string) {
   const normalized = normalizeSourceUrl(url);
   const existing = document.sources.find(
     (source) => normalizeSourceUrl(source.url) === normalized,

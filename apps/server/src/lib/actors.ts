@@ -8,9 +8,11 @@ import { and, eq } from "drizzle-orm";
  * the only possible actor type.
  */
 export const PEATED_SYSTEM_ACTOR_KEY = "peated";
+export const ABOUT_WRITER_SYSTEM_ACTOR_KEY = "aboutPipeline";
 
 const SYSTEM_ACTOR_DISPLAY_NAMES = {
   [PEATED_SYSTEM_ACTOR_KEY]: "Peated",
+  [ABOUT_WRITER_SYSTEM_ACTOR_KEY]: "Peated About writer",
 } as const;
 
 export type SystemActorKey = keyof typeof SYSTEM_ACTOR_DISPLAY_NAMES;

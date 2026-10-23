@@ -404,22 +404,6 @@ const BRORA_ABOUT_INPUT = {
       asOf: "2021",
       citations: [{ sourceId: "wp", statedValue: "1" }],
     },
-    capacityLitres: {
-      value: 800000,
-      asOf: "2021",
-      citations: [
-        {
-          sourceId: "dg21",
-          statedValue: "800000",
-          quote: "capable of producing 800,000 litres of spirit each year",
-        },
-        {
-          sourceId: "snd",
-          statedValue: "800000",
-          quote: "capacity of 800,000 liters of spirit annually",
-        },
-      ],
-    },
     waterSource: {
       value: "Clynemilton Burn",
       citations: [
@@ -563,10 +547,6 @@ const BRORA_ABOUT_INPUT = {
         {
           text: "Brora has 1 wash still and 1 spirit still.",
           factIds: ["site:washStills", "site:spiritStills"],
-        },
-        {
-          text: "It can make 800,000 litres of spirit a year.",
-          factIds: ["site:capacityLitres"],
         },
         {
           text: "Its water comes from a weir on the Clynemilton Burn.",

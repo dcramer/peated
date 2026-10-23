@@ -2,6 +2,7 @@ import {
   EntityAboutDocumentSchema,
   type EntityAboutDocument,
 } from "@peated/server/schemas/entityAbout";
+import type { z } from "zod";
 
 import {
   checkAboutProse,
@@ -13,19 +14,21 @@ const source = {
   id: "wp",
   url: "https://en.wikipedia.org/wiki/Brora_distillery",
   title: "Brora distillery",
-  kind: "reference",
+  kind: "reference" as const,
 };
 
-function draft(input: object): EntityAboutDocument {
+function draft(
+  input: Partial<z.input<typeof EntityAboutDocumentSchema>>,
+): EntityAboutDocument {
   return EntityAboutDocumentSchema.parse({ sources: [source], ...input });
 }
 
 function event(id: number, date: string, quote: string) {
   return {
     id,
-    kind: "closed",
+    kind: "closed" as const,
     date,
-    writtenBy: "pipeline",
+    writtenBy: "pipeline" as const,
     citations: [{ sourceId: "wp", statedValue: date, quote }],
   };
 }
@@ -70,8 +73,8 @@ describe("checkAboutProse", () => {
     event(1, "1983", "Brora closed in 1983."),
     event(2, "2021", "rebuilt in 2021"),
   ];
-  const lead = (sentences: object[]) => [
-    { key: "lead", writtenBy: "pipeline", sentences },
+  const lead = (sentences: { text: string; factIds: string[] }[]) => [
+    { key: "lead", writtenBy: "pipeline" as const, sentences },
   ];
 
   test("accepts sentences that state their facts", () => {
@@ -142,7 +145,7 @@ describe("checkAboutProse", () => {
           {
             key: "history",
             heading: "History",
-            writtenBy: "pipeline",
+            writtenBy: "pipeline" as const,
             sentences: [
               { text: "It was rebuilt in 2021.", factIds: ["event:2"] },
             ],

@@ -99,7 +99,12 @@ export function toPublicEntityAbout(
         unit: ABOUT_FACT_FIELDS[field].unit,
         asOf: fact.asOf,
         citations: publicCitations(fact.citations),
-        disagreement: getDisagreement(fact.citations),
+        // Text facts are worded differently by each source; only numbers
+        // can disagree.
+        disagreement:
+          ABOUT_FACT_FIELDS[field].type === "number"
+            ? getDisagreement(fact.citations)
+            : null,
       },
     ];
   });

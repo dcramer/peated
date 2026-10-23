@@ -19,10 +19,7 @@ import {
 // Counting rule: About charts count the same active Bottles as the Bottles
 // tab (grouped, not tombstoned), so their numbers agree.
 function activeBottle(): SQL<unknown> {
-  return and(
-    isNotNull(bottles.groupId),
-    sql`${bottles.id} NOT IN (SELECT ${bottleTombstones.bottleId} FROM ${bottleTombstones})`,
-  ) as SQL<unknown>;
+  return sql`${bottles.groupId} IS NOT NULL AND ${bottles.id} NOT IN (SELECT ${bottleTombstones.bottleId} FROM ${bottleTombstones})`;
 }
 
 function distilledAt(entityId: number): SQL<unknown> {
