@@ -4,7 +4,8 @@
 
 The system SHALL store each Entity's sources, citations, history events, site
 facts, and About sections in one About document. Every read and write SHALL
-check the document against the About schema in code. A write SHALL include
+check the document against the About schema in code. Each event, site fact,
+and section SHALL record whether a person or the pipeline wrote it. A write SHALL include
 the document version it read, and the system SHALL reject a write based on an
 older version.
 
@@ -76,61 +77,30 @@ of public API responses.
 - **THEN** the response includes each citation's source and stated value but
   not its quote
 
-### Requirement: Source sites have reviewed tiers
+### Requirement: Retailer-only facts are not published
 
-The system SHALL keep a reviewed list of source sites in a typed file in code,
-each with a tier: `primary` (the producer, official records, government and
-heritage registers), `reference` (archive-based histories and encyclopedias),
-`press` (trade press), or `finder` (retailers, auctions, and forums). The list
-SHALL change only through code review, never through the pipeline. A page from
-a site not on the list SHALL NOT support a published fact. Publishing rules
-SHALL run on read, so a tier change applies without rewriting documents.
+Each source SHALL have a kind: `official` (the producer, government, or
+heritage records), `reference` (histories and encyclopedias), `press`, or
+`retailer` (shops, auctions, and forums). A fact whose only citations are
+`retailer` sources SHALL be stored but not shown.
 
-#### Scenario: Unlisted site
+#### Scenario: Retailer blog only
 
-- **WHEN** the pipeline finds a fact only on a site that is not on the list
-- **THEN** the fact is stored as unpublished
-
-#### Scenario: Finder site
-
-- **WHEN** a fact's only support is a retailer page
-- **THEN** the fact is stored as unpublished
-
-### Requirement: Published facts need enough support
-
-A fact SHALL be published only when it has at least one citation from a
-`primary` site, or citations from at least two different sites at the
-`reference` or `press` tier. Citations from the same site SHALL count once.
-
-#### Scenario: One primary source
-
-- **WHEN** a listing date is cited only from the heritage register
-- **THEN** the fact is published
-
-#### Scenario: One reference source
-
-- **WHEN** a closing year is cited only from one encyclopedia page
-- **THEN** the fact is stored as unpublished
+- **WHEN** a closing month is cited only from a shop's blog
+- **THEN** the fact is not shown on the page
 
 ### Requirement: Conflicting sources stay visible
 
-When citations for a fact state different values, the system SHALL publish the
-value supported by the higher tier, or by more sites at the same tier. When
-neither value has more support, the system SHALL leave the fact unknown. In
-both cases the system SHALL keep every stated value and its sources available
-for a "Sources disagree" note.
+When citations for a fact state different values, the document SHALL store the
+best-supported value, which SHALL be one of the stated values, and the page
+SHALL show a "Sources disagree" note listing every stated value and its
+sources.
 
-#### Scenario: Stronger support
+#### Scenario: Disputed rename year
 
-- **WHEN** two reference sites state 1969 and one press site states 1975
-- **THEN** the published year is 1969 and the note lists both values and their
+- **WHEN** citations state 1968, 1969, and 1975 for a rename
+- **THEN** the page shows 1969 and a note listing all three years with their
   sources
-
-#### Scenario: Even support
-
-- **WHEN** one reference site states March 1983 and another states May 1983
-- **THEN** the month is unknown, the year 1983 is published if all citations
-  agree on it, and the note lists both months
 
 ### Requirement: Entity history events
 
@@ -186,31 +156,6 @@ kind its field does not apply to.
 
 - **WHEN** a write tries to add site facts to a Brand
 - **THEN** the system rejects the write
-
-### Requirement: People's edits outrank automated updates
-
-Each site fact, event, and About section SHALL record whether a person or the
-pipeline wrote it. The pipeline SHALL NOT change or delete anything a
-person wrote. When the pipeline finds a conflict with a person's edit, it SHALL
-create a moderation finding instead.
-
-#### Scenario: Moderator fixed a date
-
-- **WHEN** a moderator has corrected an event's year and a refresh finds a
-  source with the old year
-- **THEN** the event keeps the moderator's year and the Inbox gets a finding
-
-### Requirement: Automated writes do not change identity
-
-The pipeline SHALL NOT change an Entity's name, kind, owner, status, or
-relationships to Bottles. When its facts suggest such a change, it SHALL
-create a moderation finding.
-
-#### Scenario: Owner looks out of date
-
-- **WHEN** sourced events show a new owner that differs from the Entity's
-  stored owner
-- **THEN** the stored owner is unchanged and the Inbox gets a finding
 
 ### Requirement: Fact changes are recorded
 

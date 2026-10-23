@@ -16,7 +16,7 @@ chart by reading up to 1,000 Bottles. The research behind it is in
 Decisions already made:
 
 - Cover every distillery and brand, about 3,900 Entities.
-- Publish without approval, with safety nets.
+- Publish without approval.
 - Pages must not read like generated filler.
 - Pages show sources and a checked date, with no other statement about how
   the text was written.
@@ -41,8 +41,8 @@ facts), `docs/policies/agent-design.md`, `docs/policies/background-work.md`,
   fact traces to a quoted passage on a fetched page.
 - Make the bottle catalog the base layer, so every Entity gets useful numbers
   without research.
-- Make low-quality text hard to publish by enforcing rules in code and with a
-  separate scoring model.
+- Make low-quality text hard to publish with a few exact checks in code.
+- Keep the pipeline small: one job, one model call, no new review queues.
 - Keep layout in code so 3,900 pages stay consistent and change together.
 - Keep people's edits authoritative.
 
@@ -54,6 +54,8 @@ facts), `docs/policies/agent-design.md`, `docs/policies/background-work.md`,
 - Member-written articles or a rich-text editor.
 - Showing source quotes publicly.
 - Changing Entity identity, ownership, or status automatically.
+- Scheduled refreshes, scoring models, spot-check queues, run tracking, and
+  quality dashboards. Add them only if real errors show they are needed.
 
 ## Decisions
 
@@ -71,10 +73,10 @@ editing 3,900 documents.
 ### 2. Data model: one typed document per Entity
 
 Each Entity's About data is one JSON document, checked by a schema in code.
-This keeps storage to two small tables and puts the shape of the data in one
+This keeps storage to one table and puts the shape of the data in one
 reviewed place.
 
-**Tables**
+**Table**
 
 - `entity_about`
   - `entityId`: primary key.
@@ -83,16 +85,10 @@ reviewed place.
   - `version`: for saved-version checks on every write.
   - `status`: `published` or `hidden`.
   - `checkedOn`, `updatedAt`.
-- `entity_about_run`
-  - `id`, `entityId`.
-  - `step`: `research`, `extract`, `write`, `score`, or `publish`.
-  - `status`, `attempts`, `failureReason`, `startedAt`, `finishedAt`.
-  - Usage counts: `searches`, `fetches`, `modelCalls`, `costMicros`.
-  - Run state is operational, so it stays out of the document.
+    **The document**
 
-**The document**
-
-- `sources`: list of `{ id, url, title, publisher, publishedOn, status }`.
+- `sources`: list of `{ id, url, title, publisher, publishedOn, kind }`.
+  `kind` is `official`, `reference`, `press`, or `retailer`.
   `url` is unique within the document.
 - `events`: list of `{ id, kind, date, endDate, continuing, name, title,
 text, relatedEntityId, newOwnerId, citations, writtenBy }`.
@@ -116,12 +112,8 @@ review):
   stills, capacity in litres of alcohol a year, water source, heating,
   building listing). The document schema is built from this list. Adding a
   fact is one entry, not a migration.
-- `sourceSites.ts` lists reviewed source sites with domain, name, tier, and
-  notes. Its first contents come from a dated source-site audit in
-  `docs/research/`.
-
-**Schema rules** (the schema module states this in a comment beside the
-schema):
+  **Schema rules** (the schema module states this in a comment beside the
+  schema):
 
 - Changes to the document schema should be rare and backward compatible: add
   optional fields, never rename or remove one, and never change a field's
@@ -193,99 +185,66 @@ instead of removing it. That keeps the backward-compatibility rule.
 Facts Peated already stores as Entity columns stay there: owner, status,
 location, founding year, and website. When the document's history disagrees
 with one, such as an `opened` event in 1820 and a founding year of 1819, the
-pipeline creates an Inbox finding and does not change the column.
+pipeline leaves the column alone. A moderator fixes whichever is wrong.
 
-### 3. Publishing rules live in code
+### 3. Display rules live in code
 
-`isFactPublishable(citations, sourceSites)` applies the support rule: one
-`primary` site, or two different `reference` or `press` sites.
-`chooseFactValue` applies the conflict rule. Both are plain functions with
-unit tests. The public serializer runs them on every read, so a change to
-`sourceSites.ts` takes effect without rewriting documents.
+Two plain functions run in the public serializer on every read:
 
-The model proposes values but never decides what publishes. This follows "code
-owns permissions, approval, saved state" in the agent-design policy.
+- `isFactShown(citations)` hides a fact whose only sources are `retailer`.
+- `getDisagreement(citations)` returns every stated value when citations
+  disagree, for the "Sources disagree" note.
 
-### 4. Pipeline: a fixed workflow with three model steps
+The model picks the best-supported value when sources conflict. Code checks
+that the pick is one of the stated values.
 
-A fixed workflow, not a multi-agent system. Each run is one
-`entity_about_run`. Worker jobs pass only `entityId` and `runId`, and store
-their state before work, per the background-work policy.
+### 4. Pipeline: one job, one model call
 
-**Research** (one model with tools)
+`writeEntityAbout(entityId)` is one worker job, with arguments checked as
+`docs/policies/background-work.md` requires.
 
-- Goal: find candidate pages about this Entity.
-- Input: Entity name, kind, location, owner, aliases, and existing sources.
-- Tools: web search, then page fetch, using the Firecrawl tooling from
-  `packages/bottle-classifier`.
-- Output: a list of URLs with reasons.
-- Rules: no writes; stop when the search or fetch budget is used, or two
-  searches in a row find nothing new.
-- Code keeps only pages on listed source sites.
+1. **One model call with tools.**
+   - Tools: the existing web search and page-fetch tools from
+     `packages/bottle-classifier`, with a fixed limit of searches and page
+     reads.
+   - Input: the Entity's name, kind, location, owner, aliases, the field list,
+     the style rules, and two examples written by people (Brora and one
+     brand).
+   - Output: a complete About document draft, parsed with the document
+     schema.
+   - Page text is data, not instructions. The model has no write tools.
+2. **Checks in code.** Each check works on exact text:
+   - Drop citations whose quote is not in a page read during this run, then
+     drop facts with no citations left.
+   - Every sentence lists facts in the draft, and every year or number in it
+     appears in those facts.
+   - Length limits match the number of shown facts.
+   - No banned phrases, and no sentence over 30 words.
+3. **Retry.** A draft that fails gets one retry with the failure reasons.
+   After that, the job logs the reason and saves nothing.
+4. **Save.**
+   - Merge into the stored document: keep every item a person wrote and
+     replace items the pipeline wrote.
+   - Save with a version check and record the change.
+   - Update the Entity description from the lead unless a person wrote it.
 
-**Extract** (one model call per fetched page)
+The job writes as a new system actor, `aboutPipeline`. It never changes the
+Entity's name, kind, owner, status, or Bottles.
 
-- Input: Entity identity and one page's text.
-- Output: structured fact proposals (events, site facts), each with a quote
-  and a stated value.
-- Code checks:
-  - The quote is on the page, after normalizing whitespace and punctuation.
-  - The value has a valid type and date format.
-  - The Entity link is the run's Entity.
-  - Proposals match existing facts by kind and date, never by name.
-- Code then runs the publishing rules.
-- Forbidden: changing identity, owner, status, or anything a person wrote.
-  Those become Inbox findings.
+An administrator queues runs for one Entity or for a batch ordered by
+`publicReviewAndTastingCount`. There is no schedule. A configuration switch
+stops new runs.
 
-**Write** (one model call)
+Alternatives considered:
 
-- Input: published facts with IDs, catalog numbers, source titles, the
-  template's section slots for the kind, the length limits, and the style
-  guide.
-- Output: a lead and sections, each a list of sentences with fact IDs.
-- Code checks:
-  - Every sentence cites facts it was given.
-  - Every year and number appears in its cited facts.
-  - Sentence count limits and the 30-word sentence limit.
-  - The banned-phrase list.
-- Code checks only exact text. Tone and meaning go to scoring, per the policy
-  rule against keyword lists deciding meaning.
+- **Separate research, extract, write, and score steps with run tracking.**
+  Rejected for now. It adds a table, a state machine, and a second model for
+  a quality problem we have not measured. Revisit if the checks above let
+  bad pages through.
+- **No quote check.** Rejected. It is the one cheap guard against a model
+  inventing facts, and it is exact string matching.
 
-**Score** (a separate model call)
-
-- A checklist plus 3 articles written by people, chosen by kind.
-- Returns pass or fail per checklist item, and the sentences that fail.
-- One rewrite at most; a second failure publishes no prose.
-
-**Publish** (code)
-
-- Writes inside one transaction.
-- Keeps unchanged sentences: the writer receives the previous section and the
-  list of facts that changed, and sections whose `factsVersion` hash is
-  unchanged are skipped.
-- Updates the Entity description from the lead unless a person wrote the
-  description.
-
-Runs have limits on searches, fetches, model calls, and spend, plus a daily
-limit across all runs. A run that hits a limit stores the facts it accepted
-and stops before writing.
-
-Alternative: one agent that researches and writes in one pass. Rejected: it
-cannot be checked step by step, and it mixes memory with evidence.
-
-### 5. Triggers and refresh
-
-- **Backfill:** a scheduled job queues Entities with no completed run, most
-  active first (`publicReviewAndTastingCount`), within the daily budget.
-- **Fact change:** a moderator edit to a cited fact queues a write-only run
-  for that Entity.
-- **Slow refresh:** sources are fetched again every 12 months, with fresher
-  checks for Entities that are open or under construction. Sources that stop
-  loading are marked `unavailable`. A fact that loses its support is
-  unpublished.
-- **Catalog numbers** need no runs.
-
-### 6. Catalog numbers routes
+### 5. Catalog numbers routes
 
 One route file per operation under
 `apps/server/src/orpc/routes/entities/about/`, following
@@ -304,7 +263,7 @@ All are public reads, cached per `docs/architecture/web-caching.md`, and count
 active Bottles with the same rules as the Entity Bottles tab. `bottles.list`
 gains a `vintageYear` filter.
 
-### 7. Web: widgets with display rules
+### 6. Web: widgets with display rules
 
 `apps/web/src/features/entityAbout/` holds:
 
@@ -322,43 +281,21 @@ About exists. Bottle pages get `BottleEraNote`, fed by the Bottle's single
 distiller and vintage from `entities.about.details`. Each component gets one
 Storybook Overview story, per `apps/web/AGENTS.md`.
 
-### 8. Writing quality: people's articles set the standard
+### 7. Writing quality
 
-People write 12 articles by hand before any automated publishing, from the
-Brora pattern:
+- The banned-phrase list and the About style rules go into the
+  `peated-writing` skill. The code check imports the same list.
+- The prompt uses two examples written by people: the Brora article and one
+  brand.
+- `pnpm evals` gets a model check with 5 Entities: Brora, a famous distillery,
+  a recent craft distillery, a brand with many distilleries, and a thin
+  record. It checks quotes, citations, and length limits, per
+  `docs/development/model-checks.md`.
+- Problems on live pages arrive through the existing Entity reports. A
+  moderator edits the document, the edit is marked as written by a person,
+  and later runs keep it.
 
-- famous distilleries: Springbank, Bowmore
-- lost: Port Ellen, St Magdalene
-- revived: Brora
-- huge: Glenlivet
-- recent craft: Kingsbarns
-- single-distillery brands: Ardbeg, Yamazaki
-- a brand with many distilleries: Johnnie Walker
-- a house label: Compass Box
-- a thin record: a recent Indian single malt
-
-They serve as the scoring model's examples, the model-check fixtures under
-`pnpm evals`, and the bar for spot checks. The banned-phrase list and the
-style rules go into the `peated-writing` skill, and the code check imports
-the same list.
-
-### 9. Safety nets
-
-- **Spot checks:** a random 2% of new pages are sent to the Inbox as spot
-  checks. They don't block publishing.
-- **Corrections:** member reports reach the Inbox, and corrections become
-  person-written facts.
-- **Health view:** in Background work, showing:
-  - accepted and rejected facts by reason,
-  - drafts rejected by check,
-  - spot-check error rates,
-  - corrections per 1,000 views.
-- **Pause:** an administrator switch stops runs and publishing; moderators can
-  hide one Entity's generated content.
-- **Stop rule:** if spot checks find wrong facts on more than 2% of checked
-  pages in a week, the backfill pauses until the cause is fixed.
-
-### 10. Brand and distillery split
+### 8. Brand and distillery split
 
 Under the identity model, a distillery's own line is the same Entity, so
 Ardbeg gets one About page. Separate Brand Entities, such as house labels and
@@ -372,67 +309,45 @@ on the Brand.
 ## Risks / Trade-offs
 
 - **Wrong facts published without review.**
-  - Quotes are checked against the fetched page.
-  - Support rules require a primary source or two independent ones.
-  - People's edits are never overwritten.
-  - Spot checks and corrections catch the rest, with a stop rule.
+  - Quotes are checked against pages read in the run.
+  - Retailer-only facts are hidden.
+  - People's edits are kept.
+  - Reports and moderator edits fix the rest.
+  - If errors are common, add a review step then.
 - **Bland but correct text.**
-  - The scoring model and 12 human-written articles set the bar.
-  - Thin records get no prose instead of padding.
-- **Source sites change terms or block fetching.**
-  - Tiers and access rules live in `sourceSites.ts`.
-  - Only short private quotes are stored, never whole pages.
-  - Fetching follows each site's terms, recorded in the audit.
-- **Cost of 3,900 runs.**
-  - Per-run and daily limits.
-  - Phase 2 measures cost on 50 Entities before the backfill is sized.
+  - Every sentence must carry a fact.
+  - Thin records get no prose.
+  - Banned phrases are rejected.
+- **Pages stay out of date because nothing refreshes them.** An administrator
+  reruns a batch when needed.
 - **A document schema change breaks stored documents.**
   - Changes are rare and backward compatible by rule.
-  - Every saved document is parsed in a test against a sample of production
-    shapes.
-  - A breaking change needs a version bump, an upgrade function, and a
-    checked migration.
-- **Text churn.**
-  - Unchanged sections are not rewritten; a section is rewritten only when
-    its cited facts change.
-- **Prompt injection from fetched pages.**
-  - Page text is data. Models have no write tools.
-  - Code validates every proposal against schemas and the run's Entity.
-- **Copyright of prose.**
-  - The writer sees facts and titles, not page text, so it cannot copy
-    sentences.
-- **Two sources that copy each other count as independent.**
-  - Sources on the same site count once.
-  - Pages a site's reviewed notes say copy another source count once.
-  - Spot checks watch for the rest.
+  - A test parses sample documents.
+- **Copying source text.** Quotes are private and short. The style rules and
+  the sentence-per-fact rule keep prose in Peated's own words.
 
 ## Migration Plan
 
-1. Add `entity_about` and `entity_about_run`, and the `entity_about` change
-   object type. Generate migrations with `pnpm db:generate`.
-2. Backfill a document for each Entity with events:
-   - copy events and their `sourceUrl` as sources and citations;
-   - mark each event `person` when a user created it;
-   - check that the event count matches, Entity by Entity.
+1. Add `entity_about` and the `entity_about` change object type. Generate the
+   migration with `pnpm db:generate`.
+2. Backfill a document for each Entity with `entity_event` rows. Copy each
+   `sourceUrl` as a source, and check event counts for each Entity.
 3. Point Overview history, owner acquisitions, and moderator event routes at
    the document. Stop writing `entity_event`.
-4. Add `sourceSites.ts` from the dated audit.
-5. Enter Brora's facts and article through the API, following the catalog
-   maintenance approval and checks. Delete the code file.
-6. Ship the catalog-numbers routes and the About tab with publishing paused.
-7. Run the pipeline with publishing paused on the 12 human-written-article
-   Entities plus 38 more, and compare the results.
-8. Turn on publishing and start the backfill.
-9. Drop `entity_event` after a release with no reads from it.
+4. Enter Brora's document through the API, following the catalog maintenance
+   approval and checks. Delete the code file.
+5. Ship the catalog-numbers routes and the About tab.
+6. Run the job on 20 Entities, read every result, and fix the prompt or
+   checks.
+7. Queue batches by activity.
+8. Drop `entity_event` after a release with no reads from it.
 
 Rollback:
 
-- Pause the pipeline, then hide About pages.
+- Turn off the job switch.
+- Hide About pages.
 - Restore any document from change history.
-- Until step 9, `entity_event` still holds the original history.
 
 ## Open Questions
 
-- The first source-site list and tiers. A dated audit is needed before phase 6.
-- The passing score for the scoring model, set from the human-written
-  articles in phase 6.
+None.

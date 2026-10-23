@@ -19,7 +19,7 @@ description a moderator wrote SHALL NOT be replaced by the pipeline.
 
 - **WHEN** the pipeline publishes a lead for a brand whose description a
   moderator wrote
-- **THEN** the description is unchanged and the Inbox gets a finding
+- **THEN** the description is unchanged
 
 #### Scenario: Details job
 
