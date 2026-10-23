@@ -93,8 +93,9 @@ export function BottlePageHeader({
         actionsPosition="start"
         facts={
           // Phones show the rating above the key facts instead of in its own
-          // block below the actions; the column copy is hidden there.
-          ratings || keyFacts ? (
+          // block below the actions; the column copy is hidden there. Without
+          // key facts the rating stays in its column.
+          keyFacts ? (
             <>
               {ratings ? (
                 <div {...stylex.props(styles.phoneRatings)}>{ratings}</div>
@@ -128,7 +129,16 @@ export function BottlePageHeader({
           </>
         }
       />
-      {ratings ? <div {...stylex.props(styles.ratings)}>{ratings}</div> : null}
+      {ratings ? (
+        <div
+          {...stylex.props(
+            styles.ratings,
+            keyFacts && styles.ratingsBesideFacts,
+          )}
+        >
+          {ratings}
+        </div>
+      ) : null}
     </div>
   );
 }
@@ -171,7 +181,7 @@ const styles = stylex.create({
   },
   ratings: {
     boxSizing: "border-box",
-    display: { default: "grid", [PHONE]: "none" },
+    display: "grid",
     minWidth: 0,
     gridColumn: { default: "2", [NARROW]: "1" },
     gridRow: { default: "1", [NARROW]: "auto" },
@@ -183,6 +193,9 @@ const styles = stylex.create({
   aside: {
     display: "flex",
     justifySelf: { default: "end", [PHONE]: "start" },
+  },
+  ratingsBesideFacts: {
+    display: { default: "grid", [PHONE]: "none" },
   },
   phoneRatings: {
     display: { default: "none", [PHONE]: "block" },
