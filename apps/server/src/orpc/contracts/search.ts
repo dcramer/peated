@@ -57,7 +57,8 @@ const BottleResultSchema = BottleSchema.pick({
   scoreCount: true,
   tastingBandCounts: true,
 }).extend({
-  brand: EntitySchema.pick({ name: true, shortName: true }),
+  brand: EntitySchema.pick({ id: true, name: true, shortName: true }),
+  distillers: z.array(EntitySchema.pick({ id: true, name: true, kind: true })),
   series: z.object({ name: z.string() }).nullable(),
   group: z.object({ name: z.string() }).optional(),
 });

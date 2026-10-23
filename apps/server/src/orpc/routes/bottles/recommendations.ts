@@ -117,10 +117,13 @@ export default implement(bottleRecommendationsContract).handler(
 
     return {
       reason: BOTTLE_RECOMMENDATION_REASON,
-      results: await serialize(BottleSerializer, results, context.user, [
-        "description",
-        "tastingNotes",
-      ]),
+      results: await serialize(
+        BottleSerializer,
+        results,
+        context.user,
+        ["description", "tastingNotes"],
+        { includeGroupSummary: true },
+      ),
     };
   },
 );

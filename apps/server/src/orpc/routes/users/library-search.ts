@@ -145,6 +145,8 @@ export default implement(librarySearchContract).handler(async function ({
       BottleSerializer,
       bottleRows.map(({ bottle }) => bottle),
       context.user,
+      [],
+      { includeGroupSummary: true },
     ),
   ]);
 
