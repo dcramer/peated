@@ -606,7 +606,6 @@ export default function BottleForm({
   const draftIdentityProps = getBottleIdentityProps({
     name: name || "Bottle preview",
     brand: { name: brand?.name ?? "" },
-    category: category ?? null,
     statedAge: statedAge ?? null,
     noAgeStatement: noAgeStatement ?? null,
     abv: abv ?? null,

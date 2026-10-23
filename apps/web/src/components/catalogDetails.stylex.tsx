@@ -29,6 +29,8 @@ export function PeatedId({ detail, id }: PeatedIdProps) {
 
 export type KeyFact = {
   label: string;
+  /** Marks a value made of words, such as a series name, which uses smaller type on phones so more of it fits. */
+  text?: boolean;
   value?: number | string | null;
 };
 
@@ -90,7 +92,13 @@ export function KeyFacts({
           >
             {fact.label}
           </dt>
-          <dd title={String(fact.value)} {...stylex.props(styles.keyFactValue)}>
+          <dd
+            title={String(fact.value)}
+            {...stylex.props(
+              styles.keyFactValue,
+              fact.text && styles.keyFactValueText,
+            )}
+          >
             {fact.value}
           </dd>
         </div>
@@ -135,6 +143,8 @@ const styles = stylex.create({
   keyFactsInline: {
     display: "flex",
     flexWrap: "wrap",
+    // Keeps labels on one line when a smaller text value shares the row.
+    alignItems: "flex-end",
     columnGap: space.x8,
     rowGap: space.x4,
     paddingTop: 0,
@@ -197,6 +207,9 @@ const styles = stylex.create({
     lineHeight: 1,
     textOverflow: "ellipsis",
     whiteSpace: "nowrap",
+  },
+  keyFactValueText: {
+    fontSize: { default: "28px", [PHONE]: "20px" },
   },
 });
 const keyFactsColumnStyles = {

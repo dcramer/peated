@@ -95,8 +95,26 @@ export const ReleaseFacts: Story = {
     name: "Barrel Proof",
     specs: [
       { label: "ABV", value: "68.3%" },
-      { label: "Batch", value: "C923" },
       { label: "Age", value: "12 years" },
+      { label: "Batch", value: "C923" },
+    ],
+  },
+};
+
+export const SeriesFact: Story = {
+  args: {
+    brand: "Gordon & MacPhail",
+    brandHref: "/entities/1500",
+    metadata: "Clynelish",
+    name: "Clynelish 1972",
+    specs: [
+      {
+        label: "Series",
+        value: "Connoisseurs Choice Cask Strength",
+        text: true,
+      },
+      { label: "ABV", value: "58.9%" },
+      { label: "Age", value: "37 years" },
     ],
   },
 };

@@ -173,7 +173,7 @@ export function SeriesPageClient({
                     includeBrandInName: false,
                     includeRatings: true,
                     includeRelatedReleases: true,
-                    includeSeriesInName: false,
+                    seriesPlacement: "none",
                   }),
                 }),
               )}

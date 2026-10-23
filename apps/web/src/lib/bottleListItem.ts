@@ -5,14 +5,13 @@ import {
   getBottleReleaseMetadata,
   type BottleDisplayNameSource,
 } from "@peated/server/lib/bottleDisplayName";
-import { formatCategoryName } from "@peated/server/lib/format";
 import type { Outputs } from "@peated/server/orpc/router";
 import type { BottleIdentityRowProps } from "@peated/web/components/bottleIdentityRow.stylex";
 import type { BottleListItem } from "@peated/web/components/bottleList.stylex";
 import type { SearchPickerOption } from "@peated/web/components/searchPicker.stylex";
 
 import { getReleaseFamilyHref } from "./releaseFamily";
-import { getBottleUrl, getEntityUrl } from "./urls";
+import { getBottleSeriesUrl, getBottleUrl, getEntityUrl } from "./urls";
 
 type Bottle = Outputs["bottles"]["list"]["results"][number];
 
@@ -21,13 +20,26 @@ export type BottleListItemOptions = {
   includeBrandInName?: boolean;
   includeRatings?: boolean;
   includeRelatedReleases?: boolean;
-  includeSeriesInName?: boolean;
+  /**
+   * Where the series shows: first on the provenance line (the default), in the
+   * name for rows that hide provenance, or nowhere when the page is the series.
+   */
+  seriesPlacement?: "provenance" | "name" | "none";
 };
 
-export type BottleIdentitySource = BottleDisplayNameSource & {
+export type BottleIdentitySource = Omit<BottleDisplayNameSource, "series"> & {
   brand: BottleDisplayNameSource["brand"] & { id?: number };
-} & Pick<Bottle, "abv" | "category" | "noAgeStatement" | "statedAge"> &
+  /** A draft series may not have a page yet, so the link is optional. */
+  series?: { name: string; id?: number; fullName?: string } | null;
+} & Pick<Bottle, "abv" | "noAgeStatement" | "statedAge"> &
   Partial<Pick<Bottle, "bottler" | "distillers">>;
+
+// Whole numbers only, so `1982` is not found in `19821`.
+function nameIncludesYear(name: string, year: number) {
+  return new RegExp(`(?<![\\p{L}\\p{N}])${year}(?![\\p{L}\\p{N}])`, "u").test(
+    name,
+  );
+}
 
 /** Selection controls own navigation; bottle content must not contain nested links. */
 export function toBottlePickerOption(
@@ -56,16 +68,33 @@ export function getBottleIdentityProps(
   {
     includeBottler = false,
     includeBrandInName = true,
-    includeSeriesInName = true,
+    seriesPlacement = "provenance",
   }: Pick<
     BottleListItemOptions,
-    "includeBottler" | "includeBrandInName" | "includeSeriesInName"
+    "includeBottler" | "includeBrandInName" | "seriesPlacement"
   > = {},
 ): Pick<BottleIdentityRowProps, "abv" | "name" | "provenance" | "metadata"> {
-  const releaseFact = getBottleReleaseMetadata(bottle);
+  const name = formatBottleDisplayName(bottle, {
+    includeBrand: includeBrandInName,
+    includeSeries: seriesPlacement === "name",
+  });
+  const series =
+    seriesPlacement === "provenance" &&
+    bottle.series &&
+    !name.toLocaleLowerCase().includes(bottle.series.name.toLocaleLowerCase())
+      ? bottle.series
+      : null;
+  // Bottle Presentation: a year the name already prints is not repeated.
+  const yearNotInName = (year: number | null | undefined) =>
+    year != null && !nameIncludesYear(name, year);
+  const releaseFact =
+    bottle.edition || yearNotInName(bottle.vintageYear ?? bottle.releaseYear)
+      ? getBottleReleaseMetadata(bottle)
+      : null;
   const abv = bottle.abv !== null ? formatAbv(bottle.abv) : null;
-  const releaseYear =
-    bottle.releaseYear == null ? null : `${bottle.releaseYear} release`;
+  const releaseYear = yearNotInName(bottle.releaseYear)
+    ? `${bottle.releaseYear} release`
+    : null;
   const distillers = bottle.distillers ?? [];
   const distillerProvenance =
     distillers.length > 3
@@ -83,11 +112,23 @@ export function getBottleIdentityProps(
           }));
 
   return {
-    name: formatBottleDisplayName(bottle, {
-      includeBrand: includeBrandInName,
-      includeSeries: includeSeriesInName,
-    }),
+    name,
+    // Bottle Presentation: series leads the provenance line, as whisky
+    // drinkers name a bottler's range before its distillery.
     provenance: [
+      ...(series
+        ? [
+            series.id !== undefined && series.fullName !== undefined
+              ? {
+                  name: series.name,
+                  href: getBottleSeriesUrl({
+                    id: series.id,
+                    fullName: series.fullName,
+                  }),
+                }
+              : { name: series.name },
+          ]
+        : []),
       ...distillerProvenance,
       ...(includeBottler &&
       bottle.bottler &&
@@ -98,9 +139,6 @@ export function getBottleIdentityProps(
               href: getEntityUrl(bottle.bottler),
             },
           ]
-        : []),
-      ...(bottle.category
-        ? [{ name: formatCategoryName(bottle.category) }]
         : []),
     ],
     metadata: [
@@ -125,7 +163,7 @@ export function toBottleListItem(
     includeBrandInName = true,
     includeRatings = false,
     includeRelatedReleases = false,
-    includeSeriesInName = true,
+    seriesPlacement = "provenance",
   }: BottleListItemOptions = {},
 ): BottleListItem {
   const relatedReleaseCount = bottle.group?.totalBottles ?? 1;
@@ -134,7 +172,7 @@ export function toBottleListItem(
     ...getBottleIdentityProps(bottle, {
       includeBottler,
       includeBrandInName,
-      includeSeriesInName,
+      seriesPlacement,
     }),
     hasTasted: bottle.hasTasted,
     href: getBottleUrl(bottle),

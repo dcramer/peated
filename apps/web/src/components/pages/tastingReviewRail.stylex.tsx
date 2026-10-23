@@ -108,7 +108,8 @@ export function TastingReviewRail({
       }
       memberHeading={`More from ${author.username}`}
       memberItems={moreFromMember.map((tasting) => ({
-        ...toBottleListItem(tasting.bottle),
+        // These rows hide provenance, so the series stays in the name.
+        ...toBottleListItem(tasting.bottle, { seriesPlacement: "name" }),
         id: String(tasting.id),
         provenance: [],
         metadata:

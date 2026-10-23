@@ -20,7 +20,7 @@ type BottleHeaderSpecs = Pick<
   | "releaseYear"
   | "statedAge"
   | "vintageYear"
->;
+> & { series: { name: string } | null };
 
 function getReleaseMarkerFact(bottle: BottleHeaderSpecs): KeyFact | null {
   if (bottle.edition && isBatchEdition(bottle.edition)) {
@@ -35,7 +35,7 @@ function getReleaseMarkerFact(bottle: BottleHeaderSpecs): KeyFact | null {
 // A selection or other worded edition, such as `for La Maison du Whisky`.
 function getEditionFact(bottle: BottleHeaderSpecs): KeyFact | null {
   return bottle.edition && !isBatchEdition(bottle.edition)
-    ? { label: "Edition", value: bottle.edition }
+    ? { label: "Edition", value: bottle.edition, text: true }
     : null;
 }
 
@@ -67,8 +67,8 @@ function getAgeFact(bottle: BottleHeaderSpecs, name: string): KeyFact | null {
     : { label: "Age", value: `${bottle.statedAge} years` };
 }
 
-// Whole words only, so `12` is not found in `120`. A wrong match only moves a
-// fact to the back of the line, so this stays simple.
+// Whole words only, so `12` is not found in `120`. A wrong match only drops
+// or moves one header fact, so this stays simple.
 function nameIncludes(name: string, text: string) {
   const escaped = text
     .replace(/^(?:cask\s*)?(?:no\.?|#)?\s*(?=\d)/iu, "")
@@ -80,11 +80,12 @@ function nameIncludes(name: string, text: string) {
 }
 
 /**
- * Bottle Presentation: the detailed header shows up to three facts, ranked by
- * how precisely they identify the release: ABV, batch or cask, age, any other
- * edition, one year, then category to fill a spare slot. A batch, cask,
- * edition, or year the name already prints moves behind category, and missing
- * facts leave no placeholder.
+ * Bottle Presentation: the detailed header shows up to three facts. Series
+ * leads, since the header title leaves it out. Then come ABV, age, any other
+ * edition, one year, batch or cask, and category to fill a spare slot. ABV,
+ * age, or series the name already prints is left out. An edition, year, batch,
+ * or cask the name prints moves behind category, and missing facts leave no
+ * placeholder.
  */
 export function getBottleHeaderSpecs(
   bottle: BottleHeaderSpecs,
@@ -95,18 +96,24 @@ export function getBottleHeaderSpecs(
   const year = getYearFact(bottle);
   const inName = (fact: KeyFact | null) =>
     fact !== null && nameIncludes(name, String(fact.value));
+  const abv =
+    bottle.abv === null ? null : { label: "ABV", value: formatAbv(bottle.abv) };
+  const series = bottle.series
+    ? { label: "Series", value: bottle.series.name, text: true }
+    : null;
   const [first, second, third] = [
-    bottle.abv === null ? null : { label: "ABV", value: formatAbv(bottle.abv) },
-    inName(releaseMarker) ? null : releaseMarker,
+    inName(series) ? null : series,
+    inName(abv) ? null : abv,
     getAgeFact(bottle, name),
     inName(edition) ? null : edition,
     inName(year) ? null : year,
+    inName(releaseMarker) ? null : releaseMarker,
     bottle.category
       ? { label: "Category", value: formatCategoryName(bottle.category) }
       : null,
-    inName(releaseMarker) ? releaseMarker : null,
     inName(edition) ? edition : null,
     inName(year) ? year : null,
+    inName(releaseMarker) ? releaseMarker : null,
   ].filter((fact): fact is KeyFact => fact !== null);
 
   if (!first) return null;

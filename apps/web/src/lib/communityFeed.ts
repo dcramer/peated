@@ -3,7 +3,10 @@ import type {
   CommunityFeedBottle,
   CommunityFeedItem,
 } from "@peated/web/components/communityFeed.stylex";
-import { getBottleIdentityProps } from "@peated/web/lib/bottleListItem";
+import {
+  getBottleIdentityProps,
+  type BottleListItemOptions,
+} from "@peated/web/lib/bottleListItem";
 import {
   getBottleUrl,
   getMemberReviewUrl,
@@ -18,11 +21,18 @@ type Bottle = Outputs["bottles"]["list"]["results"][number];
 type MemberReview = Outputs["memberReviews"]["list"]["results"][number];
 type Tasting = Outputs["tastings"]["list"]["results"][number];
 
-/** Activity feed rule: real images crop to fill their fixed thumbnail frame. */
-function feedBottle(bottle: Bottle): CommunityFeedBottle {
+/**
+ * Activity feed rule: real images crop to fill their fixed thumbnail frame.
+ * Library additions use compact rows, which hide provenance, so their series
+ * stays in the name.
+ */
+function feedBottle(
+  bottle: Bottle,
+  seriesPlacement?: BottleListItemOptions["seriesPlacement"],
+): CommunityFeedBottle {
   return {
     id: bottle.peatedId,
-    ...getBottleIdentityProps(bottle),
+    ...getBottleIdentityProps(bottle, { seriesPlacement }),
     href: getBottleUrl(bottle),
     imageFit: "cover",
     imageUrl: bottle.imageUrl,
@@ -207,7 +217,7 @@ export function getCommunityFeedItems({
           ? { href: entry.collection.href, label: destinationLabel }
           : undefined,
         bottles: entry.items.map((item) => ({
-          ...feedBottle(item.bottle),
+          ...feedBottle(item.bottle, "name"),
           id: String(item.id),
           imageUrl: item.imageUrl ?? item.bottle.imageUrl,
         })),

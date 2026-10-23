@@ -11,6 +11,7 @@ describe("bottle metadata", () => {
     edition: null,
     noAgeStatement: null,
     releaseYear: null,
+    series: null,
     statedAge: null,
     vintageYear: null,
   };
@@ -27,7 +28,47 @@ describe("bottle metadata", () => {
     ]);
   });
 
-  it("keeps the three facts that best identify the release", () => {
+  it("leads with the series, then ABV and age ahead of a cask", () => {
+    expect(
+      getBottleHeaderSpecs(
+        {
+          ...headerBottle,
+          abv: 58.9,
+          bottlingYear: 2010,
+          caskNumber: "14300",
+          category: "single_malt",
+          series: { name: "The Dram Takers" },
+          statedAge: 37,
+          vintageYear: 1972,
+        },
+        "Clynelish 1972",
+      ),
+    ).toEqual([
+      { label: "Series", value: "The Dram Takers", text: true },
+      { label: "ABV", value: "58.9%" },
+      { label: "Age", value: "37 years" },
+    ]);
+  });
+
+  it("leaves out a series or ABV the name prints", () => {
+    expect(
+      getBottleHeaderSpecs(
+        {
+          ...headerBottle,
+          abv: 59.5,
+          category: "single_malt",
+          series: { name: "Exploration Series" },
+          statedAge: 10,
+        },
+        "Exploration Series No. 1 59.5%",
+      ),
+    ).toEqual([
+      { label: "Age", value: "10 years" },
+      { label: "Category", value: "Single Malt" },
+    ]);
+  });
+
+  it("puts a year ahead of a batch or cask", () => {
     expect(
       getBottleHeaderSpecs(
         {
@@ -38,16 +79,31 @@ describe("bottle metadata", () => {
           edition: "Batch C923",
           statedAge: 12,
         },
-        "Elijah Craig Barrel Proof",
+        "Barrel Proof",
+      ),
+    ).toEqual([
+      { label: "ABV", value: "68.3%" },
+      { label: "Age", value: "12 years" },
+      { label: "Bottled", value: "2023" },
+    ]);
+    expect(
+      getBottleHeaderSpecs(
+        {
+          ...headerBottle,
+          abv: 68.3,
+          category: "bourbon",
+          edition: "Batch C923",
+        },
+        "Barrel Proof",
       ),
     ).toEqual([
       { label: "ABV", value: "68.3%" },
       { label: "Batch", value: "C923" },
-      { label: "Age", value: "12 years" },
+      { label: "Category", value: "Bourbon" },
     ]);
   });
 
-  it("shows a selection edition after cask and age", () => {
+  it("shows a selection edition after age and ahead of a cask", () => {
     const selectedCask = {
       ...headerBottle,
       abv: 58.9,
@@ -61,8 +117,8 @@ describe("bottle metadata", () => {
 
     expect(getBottleHeaderSpecs(selectedCask, "Clynelish 1972")).toEqual([
       { label: "ABV", value: "58.9%" },
-      { label: "Cask", value: "14300" },
       { label: "Age", value: "37 years" },
+      { label: "Edition", value: "for La Maison du Whisky", text: true },
     ]);
     expect(
       getBottleHeaderSpecs(
@@ -71,12 +127,12 @@ describe("bottle metadata", () => {
       ),
     ).toEqual([
       { label: "ABV", value: "58.9%" },
-      { label: "Edition", value: "for La Maison du Whisky" },
+      { label: "Edition", value: "for La Maison du Whisky", text: true },
       { label: "Category", value: "Single Malt" },
     ]);
   });
 
-  it("shows a cask number and one year, preferring vintage", () => {
+  it("shows one year, preferring vintage, and a cask when a slot is free", () => {
     expect(
       getBottleHeaderSpecs(
         {
@@ -91,15 +147,18 @@ describe("bottle metadata", () => {
       ),
     ).toEqual([
       { label: "ABV", value: "48.2%" },
-      { label: "Cask", value: "1234" },
       { label: "Age", value: "NAS" },
+      { label: "Vintage", value: "1985" },
     ]);
     expect(
       getBottleHeaderSpecs(
-        { ...headerBottle, bottlingYear: 1988, vintageYear: 1975 },
+        { ...headerBottle, caskNumber: "1234", vintageYear: 1975 },
         "Old Bottling",
       ),
-    ).toEqual([{ label: "Vintage", value: "1975" }]);
+    ).toEqual([
+      { label: "Vintage", value: "1975" },
+      { label: "Cask", value: "1234" },
+    ]);
   });
 
   it("moves a year or cask the name prints behind the other facts", () => {
@@ -157,8 +216,8 @@ describe("bottle metadata", () => {
         "Cask 120 19841",
       ),
     ).toEqual([
-      { label: "Cask", value: "12" },
       { label: "Vintage", value: "1984" },
+      { label: "Cask", value: "12" },
     ]);
   });
 

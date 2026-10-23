@@ -201,17 +201,19 @@ section heading, grouping label, or adjacent UI.
 Use for a bottle page or another surface where the Bottle is the primary
 subject.
 
-- Show producer context and nonduplicative series.
+- Show producer context. The title leaves out the series; it shows as the
+  first key fact instead.
 - Make the expression the primary title.
 - Show the edition and cask number as facts, not in the title.
 - Show stated age once and show ABV when known.
-- Put up to three key facts under the title, above the actions. Rank them by
-  how exactly they identify the release: ABV, then a batch or cask number,
-  then stated age, then any other edition, then one year (vintage, then
-  bottling, then release), then category to fill a spare slot. A batch, cask,
-  edition, or year the name already prints moves behind category, so it shows
-  only when a slot is free. Additional Details always lists the edition.
-  Leave out a stated age the name already prints. Series stays in the title.
+- Put up to three key facts under the title, above the actions, in this order:
+  series, ABV, stated age, any other edition, one year (vintage, then bottling,
+  then release), a batch or cask number, then category to fill a spare slot.
+  Leave out a series, ABV, or stated age the name already prints. An edition,
+  year, batch, or cask the name already prints moves behind category, so it
+  shows only when a slot is free. Additional Details always lists the edition.
+  On phones, worded values such as the series or edition use smaller type so
+  more of them fits before they cut off.
 - Show a year only when it is part of, or necessary to understand, the release
   identity.
 - Do not add single-cask or cask-strength badges.
@@ -232,9 +234,19 @@ identity fields; `toBottleListItem` adds links, images, and optional list action
 and ratings.
 Do not rebuild these lines in a page-specific mapper:
 
-1. The marketed bottle name, including brand context.
-2. Distillers not already identified by the brand, followed by the category.
-3. Known release facts, stated age, and ABV.
+1. The marketed bottle name, including brand context. The series is not in
+   the name.
+2. The series, then distillers not already identified by the brand. Whisky
+   drinkers name a bottler's range before its distillery, as in
+   `Gordon & MacPhail Private Collection Benromach 1982`. Category is left out:
+   the name or distillery almost always makes it clear, and the bottle page
+   and filters still show it.
+3. Known release facts, stated age, and ABV. A year the name already prints is
+   not repeated.
+
+Rows that hide the second line keep the series in the name instead: compact
+rows and recent tasting rows. A series page leaves the series out of its own
+rows. `getBottleIdentityProps` takes `seriesPlacement` for these cases.
 
 Missing facts do not create placeholder lines. Activity context, Library status,
 personal images, and actions belong to their owning view, not a competing bottle
@@ -343,23 +355,23 @@ particular result component omits some of them visually.
 
 ## Field Matrix
 
-| Field               | Detailed header          | Standard result   | Compact inline     | Family-relative  | Plain text        | Verification |
-| ------------------- | ------------------------ | ----------------- | ------------------ | ---------------- | ----------------- | ------------ |
-| Brand               | Yes                      | Usually           | Usually            | Context supplies | Yes               | Yes          |
-| Bottler             | When distinct and useful | Optional          | Rarely             | Context supplies | When needed       | Yes          |
-| Series              | If nonduplicative        | If nonduplicative | When essential     | Context supplies | If nonduplicative | Yes          |
-| Expression          | Primary                  | Primary           | Primary            | Context supplies | Primary           | Yes          |
-| Edition             | Key fact                 | Metadata          | No                 | Primary          | Conditional       | Yes          |
-| Stated age          | Once                     | Optional          | Only when integral | Exact override   | If integral       | Yes          |
-| ABV                 | Yes when known           | Yes when known    | Yes when known     | Optional support | Yes when known    | Yes          |
-| Distillation year   | Conditional              | Conditional       | Rarely             | When useful      | Conditional       | Yes          |
-| Bottling year       | Conditional              | Conditional       | Rarely             | When useful      | Conditional       | Yes          |
-| Release year        | Conditional              | Conditional       | Rarely             | When useful      | Conditional       | Yes          |
-| Single-cask flag    | No                       | No                | No                 | No               | No                | Yes          |
-| Cask-strength flag  | No                       | No                | No                 | No               | No                | Yes          |
-| Cask number         | Key fact                 | No                | No                 | When useful      | No                | Yes          |
-| Cask type/size/fill | No                       | Normally no       | No                 | No               | No                | Yes          |
-| Category            | Spare key fact slot      | Optional          | No                 | No               | No                | Yes          |
+| Field               | Detailed header          | Standard result  | Compact inline     | Family-relative  | Plain text        | Verification |
+| ------------------- | ------------------------ | ---------------- | ------------------ | ---------------- | ----------------- | ------------ |
+| Brand               | Yes                      | Usually          | Usually            | Context supplies | Yes               | Yes          |
+| Bottler             | When distinct and useful | Optional         | Rarely             | Context supplies | When needed       | Yes          |
+| Series              | First key fact           | First provenance | When essential     | Context supplies | If nonduplicative | Yes          |
+| Expression          | Primary                  | Primary          | Primary            | Context supplies | Primary           | Yes          |
+| Edition             | Key fact                 | Metadata         | No                 | Primary          | Conditional       | Yes          |
+| Stated age          | Once                     | Optional         | Only when integral | Exact override   | If integral       | Yes          |
+| ABV                 | Yes when known           | Yes when known   | Yes when known     | Optional support | Yes when known    | Yes          |
+| Distillation year   | Conditional              | Conditional      | Rarely             | When useful      | Conditional       | Yes          |
+| Bottling year       | Conditional              | Conditional      | Rarely             | When useful      | Conditional       | Yes          |
+| Release year        | Conditional              | Conditional      | Rarely             | When useful      | Conditional       | Yes          |
+| Single-cask flag    | No                       | No               | No                 | No               | No                | Yes          |
+| Cask-strength flag  | No                       | No               | No                 | No               | No                | Yes          |
+| Cask number         | Key fact                 | No               | No                 | When useful      | No                | Yes          |
+| Cask type/size/fill | No                       | Normally no      | No                 | No               | No                | Yes          |
+| Category            | Spare key fact slot      | No               | No                 | No               | No                | Yes          |
 
 “No” for a derived flag does not remove identical wording that belongs to the
 marketed expression or edition.
@@ -391,7 +403,7 @@ shared visual reference for desktop and phone layouts.
 
 | Need                        | Component                             | Responsibility                                                                                                                                                                                                                                |
 | --------------------------- | ------------------------------------- | --------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
-| One standard bottle row     | `BottleIdentityRow`                   | Full marketed name, provenance, release facts, thumbnail, and linked hit area.                                                                                                                                                                |
+| One standard bottle row     | `BottleIdentityRow`                   | Marketed name, series and distilleries, release facts, thumbnail, and linked hit area.                                                                                                                                                        |
 | One-line library addition   | `BottleIdentityRow variant="compact"` | Same name with ABV after it, smaller thumbnail, and a 44px hit area; long names truncate visually and keep the ABV visible.                                                                                                                   |
 | Catalog list                | `BottleList`                          | List semantics and optional ratings or row actions.                                                                                                                                                                                           |
 | Member Library              | `pages/MemberLibraryList`             | Standard bottle rows and Library actions. Personal photos cover the thumbnail; catalog bottle images remain contained.                                                                                                                        |
