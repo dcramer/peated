@@ -1,10 +1,8 @@
-import {
-  ENTITY_ABOUT_SCHEMA_VERSION,
-  EntityAboutDocumentSchema,
-  type AboutEvent,
-  type AboutSection,
-  type AboutSource,
-  type EntityAboutDocument,
+import type {
+  AboutEvent,
+  AboutSection,
+  AboutSource,
+  EntityAboutDocument,
 } from "@peated/server/schemas/entityAbout";
 
 import { ABOUT_FACT_FIELD_LIST } from "./aboutFactFields";
@@ -16,20 +14,6 @@ export const EMPTY_ABOUT_DOCUMENT: EntityAboutDocument = {
   siteFacts: {},
   sections: [],
 };
-
-/**
- * Parses a stored About document. Version 1 is the only shape; a future
- * breaking change adds its upgrade here (see the About schema rule).
- */
-export function parseEntityAboutDocument(
-  value: unknown,
-  schemaVersion: number = ENTITY_ABOUT_SCHEMA_VERSION,
-): EntityAboutDocument {
-  if (schemaVersion !== ENTITY_ABOUT_SCHEMA_VERSION) {
-    throw new Error(`Unsupported About schema version: ${schemaVersion}`);
-  }
-  return EntityAboutDocumentSchema.parse(value);
-}
 
 export function normalizeSourceUrl(value: string) {
   const url = new URL(value);
@@ -54,7 +38,7 @@ export function pruneSources(
   };
 }
 
-function sameItem(left: unknown, right: unknown) {
+function sameItem<T>(left: T, right: T) {
   return JSON.stringify(left) === JSON.stringify(right);
 }
 

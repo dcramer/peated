@@ -3,7 +3,7 @@ import type {
   EntityAboutDocument,
 } from "@peated/server/schemas/entityAbout";
 
-import { ABOUT_FACT_FIELD_LIST } from "./aboutFactFields";
+import { ABOUT_FACT_FIELD_LIST, ABOUT_FACT_FIELDS } from "./aboutFactFields";
 import { findBannedPhrases } from "./bannedPhrases";
 import {
   eventFactId,
@@ -216,6 +216,8 @@ export function checkConflictPicks(document: EntityAboutDocument) {
   }
   for (const field of ABOUT_FACT_FIELD_LIST) {
     const fact = document.siteFacts[field];
+    // Text facts are worded differently by each source; only numbers conflict.
+    if (ABOUT_FACT_FIELDS[field].type !== "number") continue;
     const disagreement = fact ? getDisagreement(fact.citations) : null;
     if (!fact || !disagreement) continue;
     const stored = stripThousands(String(fact.value)).toLowerCase();
@@ -229,4 +231,19 @@ export function checkConflictPicks(document: EntityAboutDocument) {
     }
   }
   return errors;
+}
+
+/**
+ * Runs every check on a pipeline draft. Returns the draft with unverified
+ * citations removed, and the reasons it cannot be saved.
+ */
+export function reviewAboutDraft(
+  draft: EntityAboutDocument,
+  pages: readonly AboutPageRead[],
+) {
+  const document = keepVerifiedCitations(draft, pages);
+  return {
+    document,
+    errors: [...checkAboutProse(document), ...checkConflictPicks(document)],
+  };
 }

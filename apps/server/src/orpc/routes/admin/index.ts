@@ -9,6 +9,7 @@ import rebuildPronunciationAudio from "./rebuild-pronunciation-audio";
 import rebuildSearch from "./rebuild-search";
 import reports from "./reports";
 import scraperActivity from "./scraper-activity";
+import writeEntityAbout from "./write-entity-about";
 import wrongPhotoMatches from "./wrongPhotoMatches";
 
 export default base.tag("admin").router({
@@ -23,4 +24,5 @@ export default base.tag("admin").router({
   reports,
   scraperActivity,
   wrongPhotoMatches,
+  writeEntityAbout,
 });

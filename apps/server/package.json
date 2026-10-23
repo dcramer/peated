@@ -27,6 +27,7 @@
     "@logtape/hono": "catalog:",
     "@logtape/logtape": "catalog:",
     "@logtape/redaction": "catalog:",
+    "@openai/agents": "^0.6.0",
     "@opentelemetry/api": "catalog:",
     "@orpc/contract": "catalog:",
     "@orpc/openapi": "catalog:",

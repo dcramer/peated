@@ -9,6 +9,7 @@ import {
 } from "@peated/server/db/schema";
 import {
   ENTITY_ABOUT_SCHEMA_VERSION,
+  EntityAboutDocumentSchema,
   type EntityAboutDocument,
 } from "@peated/server/schemas/entityAbout";
 import { eq, inArray, sql } from "drizzle-orm";
@@ -17,7 +18,11 @@ import {
   ABOUT_FACT_FIELD_LIST,
   aboutFactFieldAppliesTo,
 } from "./aboutFactFields";
-import { findAboutWriteErrors, parseEntityAboutDocument } from "./document";
+import { findAboutWriteErrors } from "./document";
+
+function unsupportedSchemaVersion(version: number): never {
+  throw new Error(`Unsupported About schema version: ${version}`);
+}
 
 export type StoredEntityAbout = {
   entityId: number;
@@ -52,7 +57,12 @@ export async function getEntityAbout(
   if (!row) return null;
   return {
     entityId: row.entityId,
-    document: parseEntityAboutDocument(row.document, row.schemaVersion),
+    // About schema rule: version 1 is the only stored shape. A breaking
+    // change adds its upgrade here, before parsing.
+    document:
+      row.schemaVersion === ENTITY_ABOUT_SCHEMA_VERSION
+        ? EntityAboutDocumentSchema.parse(row.document)
+        : unsupportedSchemaVersion(row.schemaVersion),
     version: row.version,
     status: row.status,
     checkedOn: row.checkedOn,
@@ -166,7 +176,7 @@ export async function saveEntityAbout(
     displayName: entity.name,
     actorId: actor.id,
     type: stored ? "update" : "add",
-    data: { version, document } as never,
+    data: { version, document },
   });
 
   return {
