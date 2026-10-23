@@ -1,13 +1,15 @@
-## 1. Facts storage
+## 1. About document storage
 
-- [ ] 1.1 Add `source_site`, `source`, and `citation` tables with unique normalized URLs, quote length limits, and one fact link per citation; generate the migration
-- [ ] 1.2 Extend `entity_event` with `renamed` and `era` kinds, `name`, `title`, `endDate`, `continuing`, `relatedEntityId`, `published`, and `updatedByActorId`, with database checks for each kind
-- [ ] 1.3 Add `distillery_site_fact` with typed values, `asOf`, and a distillery-only check
-- [ ] 1.4 Add `entity_about`, `entity_about_section`, and `entity_about_run`
-- [ ] 1.5 Add the `aboutPipeline` system actor and record every fact write in change history
-- [ ] 1.6 Backfill each event `sourceUrl` into a source and citation; verify counts before and after
-- [ ] 1.7 Write `isFactPublishable` and `chooseFactValue` with integration tests covering one primary source, two reference sites, same-site citations, finder-only sources, and even conflicts
-- [ ] 1.8 Add moderator API routes to create, edit, and delete events, site facts, sources, and citations, with tests for permissions and the rule that the pipeline never overwrites a person's edit
+- [ ] 1.1 Add the About schema module with the document schema, `aboutFactFields.ts`, and a `schemaVersion`; put the backward-compatibility rule in a comment beside the schema
+- [ ] 1.2 Add `sourceSites.ts` with types for domain, name, tier, and notes, starting empty until the audit in 5.1
+- [ ] 1.3 Add `entity_about` and `entity_about_run` tables and the `entity_about` change object type; generate the migration
+- [ ] 1.4 Add read and write functions that parse `unknown`, check the saved version on every write, save the full document to change history, check linked Entities on write, and follow merged Entities on read; integration tests for each
+- [ ] 1.5 Add a test that parses a sample of real document shapes, so schema changes that break stored documents fail CI
+- [ ] 1.6 Add the `aboutPipeline` system actor
+- [ ] 1.7 Write `isFactPublishable` and `chooseFactValue` and run them in the public serializer, with integration tests covering one primary source, two reference sites, same-site citations, finder-only sources, and even conflicts
+- [ ] 1.8 Add moderator API routes to edit events, site facts, sources, and sections in the document, with tests for permissions, stale versions, and the rule that the pipeline never overwrites a person's edit
+- [ ] 1.9 Backfill a document for each Entity with `entity_event` rows, copying `sourceUrl` into sources and citations; check event counts per Entity
+- [ ] 1.10 Point Overview history, owner acquisitions, and existing event routes at the document; stop writing `entity_event`
 
 ## 2. Catalog numbers
 
@@ -71,6 +73,6 @@
 
 - [ ] 9.1 Write `docs/features/entity-about.md` and link it from `CLAUDE.md`
 - [ ] 9.2 Add the Distillery and Brand history rule to `docs/architecture/whisky-identity-model.md`
-- [ ] 9.3 Drop `entity_event.sourceUrl` after the backfill is verified
+- [ ] 9.3 Drop `entity_event` after a release with no reads from it
 - [ ] 9.4 Trim `docs/research/catalog/2026-10-23-brora-about.md` to sources, traps, and unknowns once Brora's facts are stored
 - [ ] 9.5 Run full `pnpm test`, typechecks, and lint

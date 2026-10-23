@@ -1,5 +1,11 @@
 import { broraAbout } from "./articles/brora";
 
+// About schema rule (owner: openspec change add-entity-about): every Entity's
+// About document is stored against this shape. Change it rarely, and only in
+// backward-compatible ways: add optional fields; never rename or remove a
+// field or change its meaning. A breaking change needs a schema version bump,
+// an upgrade that runs on read, and a checked migration of stored documents.
+
 /** A published source the About article cites. */
 export type AboutSource = {
   id: string;
