@@ -25,7 +25,7 @@ const EntityShortNameSchema = z
 const RESPELLING_SYLLABLE_PATTERN =
   /^(?:[a-z']*[a-z][a-z']*|[A-Z']*[A-Z][A-Z']*)$/;
 
-export function isPronunciationRespelling(value: string) {
+function isPronunciationRespelling(value: string) {
   const syllables = value.split(/[ -]/);
   return syllables.every((syllable) =>
     RESPELLING_SYLLABLE_PATTERN.test(syllable),
@@ -36,7 +36,7 @@ export function isPronunciationRespelling(value: string) {
 // and diacritics only. Slashes and brackets are display marks, not stored.
 const IPA_PATTERN = /^[a-zæçðøħŋœɐ-ͯβθχ .]+$/u;
 
-export function isPronunciationIpa(value: string) {
+function isPronunciationIpa(value: string) {
   return IPA_PATTERN.test(value) && /\S/.test(value);
 }
 

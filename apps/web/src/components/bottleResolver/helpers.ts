@@ -18,6 +18,14 @@ export type {
 export type PhotoIdentificationCreateInput =
   Inputs["tastings"]["photoIdentificationCreate"];
 
+/**
+ * The label facts the helpers below read: a full result, or only what a
+ * lookup streamed before it failed. Without a classification they use the
+ * raw label facts.
+ */
+export type PhotoLabelReading = Pick<PhotoIdentification, "imageEvidence"> &
+  Partial<Pick<PhotoIdentification, "classification">>;
+
 export function createIdempotencyKey() {
   const randomId = globalThis.crypto?.randomUUID?.();
   if (randomId) return randomId;
@@ -25,7 +33,7 @@ export function createIdempotencyKey() {
 }
 
 function getRawFieldValue(
-  result: PhotoIdentification | null,
+  result: PhotoLabelReading | null,
   field: keyof PhotoIdentification["imageEvidence"]["fieldCandidates"],
 ) {
   const value = result?.imageEvidence.fieldCandidates[field]?.value;
@@ -34,7 +42,7 @@ function getRawFieldValue(
 }
 
 function getRawStringFieldValue(
-  result: PhotoIdentification | null,
+  result: PhotoLabelReading | null,
   field: keyof PhotoIdentification["imageEvidence"]["fieldCandidates"],
 ) {
   const value = getRawFieldValue(result, field);
@@ -43,7 +51,7 @@ function getRawStringFieldValue(
 }
 
 function getRawNumberFieldValue(
-  result: PhotoIdentification | null,
+  result: PhotoLabelReading | null,
   field: keyof PhotoIdentification["imageEvidence"]["fieldCandidates"],
 ) {
   const value = getRawFieldValue(result, field);
@@ -52,7 +60,7 @@ function getRawNumberFieldValue(
 }
 
 function getRawStringFieldValues(
-  result: PhotoIdentification | null,
+  result: PhotoLabelReading | null,
   field: keyof PhotoIdentification["imageEvidence"]["fieldCandidates"],
 ) {
   const value = getRawFieldValue(result, field);
@@ -68,7 +76,7 @@ function getRawStringFieldValues(
 }
 
 function getRawBooleanFieldValue(
-  result: PhotoIdentification | null,
+  result: PhotoLabelReading | null,
   field: keyof PhotoIdentification["imageEvidence"]["fieldCandidates"],
 ) {
   const value = getRawFieldValue(result, field);
@@ -76,13 +84,13 @@ function getRawBooleanFieldValue(
   return parsed.success ? parsed.data : null;
 }
 
-export function getSearchSeed(result: PhotoIdentification | null) {
+export function getSearchSeed(result: PhotoLabelReading | null) {
   const brand = getFieldValue(result, "brand");
   const expression = getFieldValue(result, "expression");
   return [brand, expression].filter(Boolean).join(" ");
 }
 
-export function getCreateNameSeed(result: PhotoIdentification | null) {
+export function getCreateNameSeed(result: PhotoLabelReading | null) {
   const decision = getCreateDecisionLike(result);
   return (
     decision?.proposedBottle.name ??
@@ -92,7 +100,7 @@ export function getCreateNameSeed(result: PhotoIdentification | null) {
 }
 
 export function getCreateBottlePrefill(
-  result: PhotoIdentification | null,
+  result: PhotoLabelReading | null,
 ): CreateBottlePrefill {
   const decision = getCreateDecisionLike(result);
   const proposedBottle = decision?.proposedBottle ?? null;
@@ -159,7 +167,7 @@ export function getCreateBottlePrefill(
   };
 }
 
-export function hasRecognizedLabelDetails(result: PhotoIdentification | null) {
+export function hasRecognizedLabelDetails(result: PhotoLabelReading | null) {
   return Boolean(
     getFieldValue(result, "brand") ||
     getFieldValue(result, "expression") ||
@@ -194,8 +202,8 @@ export function getCreateDecision(result: PhotoIdentification | null) {
   return getCreateDecisionLike(result);
 }
 
-function getCreateDecisionLike(result: PhotoIdentification | null) {
-  if (result?.classification.status !== "classified") {
+function getCreateDecisionLike(result: PhotoLabelReading | null) {
+  if (result?.classification?.status !== "classified") {
     return null;
   }
 

@@ -1,4 +1,4 @@
-// This route owns the photo lookup boundary for add-tasting. It may create or
+// This route owns the photo lookup boundary for /addBottle. It may create or
 // reuse a pending upload, but it must not create tastings, bottles, or durable
 // classifier trace rows.
 import config from "@peated/server/config";
@@ -34,6 +34,7 @@ import {
   requireTosAccepted,
 } from "@peated/server/orpc/middleware";
 import {
+  PHOTO_IDENTIFICATION_MAX_PROGRESS_CANDIDATES,
   type PhotoIdentificationDiagnosticsSchema,
   type PhotoIdentificationProgressSchema,
   type PhotoIdentificationSchema,
@@ -94,28 +95,16 @@ async function serializePhotoIdentificationClassification(
 
   switch (decision.action) {
     case "match": {
-      const bottleId = decision.matchedBottleId;
-
-      const matchedBottle = await db.query.bottles.findFirst({
-        where: (bottles, { eq }) => eq(bottles.id, bottleId),
-      });
-      const tombstone = await db.query.bottleTombstones.findFirst({
-        columns: { bottleId: true },
-        where: (tombstones, { eq }) => eq(tombstones.bottleId, bottleId),
-      });
-      if (!matchedBottle || tombstone) {
+      const [matchedBottle] = await serializeActiveCandidateBottles([
+        { bottleId: decision.matchedBottleId },
+      ]);
+      if (!matchedBottle) {
         throw new Error("Photo identification match is not an active Bottle.");
       }
 
       serializedDecision = {
         action: "match",
-        matchedBottle: await serialize(
-          BottleSerializer,
-          matchedBottle,
-          undefined,
-          [],
-          { includeGroupSummary: true },
-        ),
+        matchedBottle,
       };
       break;
     }
@@ -408,11 +397,6 @@ export function createPhotoIdentificationProcedure(
 
 type PendingImage = Awaited<ReturnType<typeof createPendingImageUpload>>;
 
-type PhotoIdentificationCandidates = Extract<
-  PhotoIdentificationProgress,
-  { type: "candidates" }
->["candidates"];
-
 /**
  * Runs label reading and classification for one stored photo, yielding
  * progress as it happens and returning the full result. Ending the stream
@@ -605,15 +589,16 @@ async function serializePhotoIdentificationProgress(
   };
 }
 
-const MAX_PROGRESS_CANDIDATES = 5;
-
-/** Serializes Peated's likely matches in their given order, skipping removed Bottles. */
+/**
+ * Serializes candidate Bottles in their given order, skipping removed Bottles.
+ * Keeps at most PHOTO_IDENTIFICATION_MAX_PROGRESS_CANDIDATES.
+ */
 async function serializeActiveCandidateBottles(
-  candidates: PhotoIdentificationCandidates,
+  candidates: { bottleId: number }[],
 ) {
   const bottleIds = Array.from(
     new Set(candidates.map((candidate) => candidate.bottleId)),
-  ).slice(0, MAX_PROGRESS_CANDIDATES);
+  ).slice(0, PHOTO_IDENTIFICATION_MAX_PROGRESS_CANDIDATES);
   if (bottleIds.length === 0) return [];
 
   const [bottleRows, tombstones] = await Promise.all([

@@ -19,6 +19,7 @@ type ResolverState =
   | "reading"
   | "matches"
   | "failure"
+  | "failure-with-matches"
   | "suggestions"
   | "new-bottle";
 
@@ -147,7 +148,6 @@ function BottleResolverState({ state }: { state: ResolverState }) {
       previewUrl: BottleImage.src,
       result: null,
       searchHref: "#search",
-      searchLabel: "Search bottles",
     };
     if (state === "failure") {
       return (
@@ -156,6 +156,21 @@ function BottleResolverState({ state }: { state: ResolverState }) {
           alert
           reason="We can't check photos right now. Search by name or try again later."
           suggestions={[]}
+        />
+      );
+    }
+    if (state === "failure-with-matches") {
+      return (
+        <PhotoFallbackState
+          {...fallback}
+          alert
+          reason="We can't check photos right now. Search by name or try again later."
+          result={
+            progressWithMatches.imageEvidence && {
+              imageEvidence: progressWithMatches.imageEvidence,
+            }
+          }
+          suggestions={progressWithMatches.candidates}
         />
       );
     }
@@ -210,6 +225,7 @@ const meta = {
         "reading",
         "matches",
         "failure",
+        "failure-with-matches",
         "suggestions",
         "new-bottle",
       ],
@@ -237,3 +253,11 @@ export const NewBottle: Story = { args: { state: "new-bottle" } };
 
 /** The photo could not be checked, so there is nothing to suggest. */
 export const Failure: Story = { args: { state: "failure" } };
+
+/**
+ * The lookup failed after it sent likely matches and label facts, so those
+ * stay as suggestions and fill in a new Bottle.
+ */
+export const FailureWithMatches: Story = {
+  args: { state: "failure-with-matches" },
+};

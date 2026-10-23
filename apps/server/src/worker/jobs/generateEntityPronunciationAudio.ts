@@ -3,7 +3,7 @@ import { changes, entities } from "@peated/server/db/schema";
 import { getPeatedSystemActorForDatabase } from "@peated/server/lib/actors";
 import {
   deleteOwnedPronunciationAudio,
-  getPronunciationAudioUrl,
+  getExpectedPronunciationAudioUrl,
   isPronunciationAudioEnabled,
   storePronunciationAudio,
   synthesizePronunciationAudio,
@@ -62,7 +62,7 @@ export async function generateEntityPronunciationAudio(
     if (!entity) return;
 
     const ipa = entity.pronunciationIpa;
-    const audioUrl = ipa ? getPronunciationAudioUrl(entity.id, ipa) : null;
+    const audioUrl = getExpectedPronunciationAudioUrl(entity);
     if (audioUrl === entity.pronunciationAudioUrl) return;
 
     if (attempt === MAX_ATTEMPTS) {

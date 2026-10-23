@@ -8,10 +8,9 @@ const meta = {
   component: KeyFacts,
   args: {
     facts: [
-      { label: "ABV", value: "43.0%" },
+      { label: "Series", value: "Private Collection", text: true },
+      { label: "ABV", value: "43%" },
       { label: "Age", value: "16 years" },
-      { label: "Cask", value: "ex-bourbon" },
-      { label: "Size", value: "700 ml" },
     ],
   },
   argTypes: { facts: { control: "object" } },
@@ -33,17 +32,9 @@ export const Overview: Story = {
       <KeyFacts {...args} />
       <KeyFacts
         facts={[
-          { label: "Founded", value: "1816" },
-          { label: "Capacity", value: "2.4m L" },
-          { label: "Bottles", value: "148" },
-        ]}
-      />
-      <KeyFacts
-        facts={[
-          { label: "ABV", value: "50.0%" },
+          { label: "ABV", value: "50%" },
           { label: "Age", value: null },
-          { label: "Cask", value: null },
-          { label: "Size", value: "700 ml" },
+          { label: "Cask", value: "14300" },
         ]}
       />
     </StoryStack>

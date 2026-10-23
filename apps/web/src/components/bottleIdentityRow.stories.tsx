@@ -99,9 +99,9 @@ export const Overview: Story = {
           align="start"
           href="/bottles/19936"
           imageUrl={BottleImage.src}
-          metadata={["2026 release", "10 years", "50% ABV"]}
+          metadata={["2026 release", "10 years", "50%"]}
           name="SMWS Highland peaty potion"
-          subtitle="Highland · Single Malt"
+          provenance={[{ name: "Ardmore" }]}
         />
       </ItemListItem>
       <ItemListItem>

@@ -1,7 +1,7 @@
 "use client";
 
 import { getRatingBandById } from "@peated/server/constants";
-import { appendAbv } from "@peated/server/lib/bottleDisplayName";
+import { formatBottleLabel } from "@peated/server/lib/bottleDisplayName";
 import type { Outputs } from "@peated/server/orpc/router";
 import {
   useMutation,
@@ -167,7 +167,7 @@ function ContentFields({ item }: { item: ContentItem }) {
       "Bottle",
       item.bottle ? (
         <TextLink href={getBottleUrl(item.bottle)} key="bottle">
-          {appendAbv(item.bottle.fullName, item.bottle.abv)}
+          {formatBottleLabel(item.bottle)}
         </TextLink>
       ) : (
         "No bottle"
@@ -319,5 +319,5 @@ function reviewListHref(kind: ContentKind) {
 
 function contentTitle(item: ContentItem) {
   if (item.kind === "external_review") return item.name;
-  return appendAbv(item.bottle.fullName, item.bottle.abv);
+  return formatBottleLabel(item.bottle);
 }

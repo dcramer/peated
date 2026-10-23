@@ -13,11 +13,7 @@ import {
 } from "@peated/server/db/schema";
 import { getBottleStructuredIdentityKey } from "@peated/server/lib/bottleConflicts";
 import { findSeriesIdByName } from "@peated/server/lib/bottleHelpers";
-import {
-  getBottleExactIdentity,
-  getBottleGroupNameForBrand,
-  materializeBottleForGroup,
-} from "@peated/server/lib/bottleIdentity";
+import { getMovedBottleIdentity } from "@peated/server/lib/bottleIdentity";
 import {
   EntityUpdateInputSchema,
   type EntityUpdateInput,
@@ -437,33 +433,15 @@ async function entityMergeCollisions(
       );
     }
     const desiredIdentities = sourceBrandBottles.map(
-      ({ bottle, group, series }) => {
-        const exact = getBottleExactIdentity({
+      ({ bottle, group, series }) => ({
+        groupId: group.id,
+        identity: getMovedBottleIdentity({
           bottle,
-          sourceGroupStatedAge: group.statedAge,
-        });
-        return {
-          groupId: group.id,
-          identity: {
-            ...exact,
-            noAgeStatement: bottle.noAgeStatement,
-            ...materializeBottleForGroup({
-              group: {
-                ...group,
-                ...getBottleGroupNameForBrand({
-                  name: group.name,
-                  brand: destination.entity,
-                }),
-                brandId: destination.entity.id,
-                seriesId: series
-                  ? movedSeriesIds.get(series.id)!
-                  : group.seriesId,
-              },
-              exact,
-            }),
-          },
-        };
-      },
+          group,
+          brand: destination.entity,
+          seriesId: series ? movedSeriesIds.get(series.id)! : group.seriesId,
+        }),
+      }),
     );
     for (const { groupId, identity } of desiredIdentities) {
       movedBottles.push({

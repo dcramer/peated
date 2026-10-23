@@ -15,6 +15,7 @@ import {
   getPhotoProgressStatus,
   hasRecognizedLabelDetails,
   type PhotoIdentification,
+  type PhotoLabelReading,
   type PhotoMatchCandidate,
   type PhotoProgress,
 } from "./helpers";
@@ -155,7 +156,7 @@ export function PhotoMatchState({
   result: PhotoIdentification;
   previewUrl: string | null;
   matchedBottle: Bottle;
-  renderMatchedResultActions?: (
+  renderMatchedResultActions: (
     props: BottleResolverMatchedActionsProps,
   ) => ReactNode;
   resolvingAction: BottleResolverAction | null;
@@ -175,31 +176,20 @@ export function PhotoMatchState({
         <FormNotice>
           Check the edition and strength against your label.
         </FormNotice>
-        {renderMatchedResultActions ? (
-          renderMatchedResultActions({
-            bottle: matchedBottle,
-            hasLibraryEntry,
-            libraryEntryImageUrl,
-            pendingImage,
-            loadingExactLibraryStatus,
-            resolvingAction:
-              resolvingAction === "create" ? null : resolvingAction,
-            // The member just rejected this Bottle; don't continue with it.
-            disabled: reportingWrongMatch,
-            onResolve: (action) => {
-              onLoadBottle(matchedBottle, action);
-            },
-          })
-        ) : (
-          <Button
-            disabled={Boolean(resolvingAction) || reportingWrongMatch}
-            fullWidth
-            onClick={() => onLoadBottle(matchedBottle)}
-            variant="accent"
-          >
-            Continue
-          </Button>
-        )}
+        {renderMatchedResultActions({
+          bottle: matchedBottle,
+          hasLibraryEntry,
+          libraryEntryImageUrl,
+          pendingImage,
+          loadingExactLibraryStatus,
+          resolvingAction:
+            resolvingAction === "create" ? null : resolvingAction,
+          // The member just rejected this Bottle; don't continue with it.
+          disabled: reportingWrongMatch,
+          onResolve: (action) => {
+            onLoadBottle(matchedBottle, action);
+          },
+        })}
         {onWrongMatch ? (
           <Button
             disabled={Boolean(resolvingAction) || reportingWrongMatch}
@@ -233,10 +223,10 @@ export function PhotoFallbackState({
   proposal = null,
   createBottleHref,
   searchHref,
-  searchLabel,
   onStartOver,
 }: {
-  result: PhotoIdentification | null;
+  /** The full result, or the label facts a failed lookup streamed first. */
+  result: PhotoLabelReading | null;
   previewUrl: string | null;
   reason: string;
   /** Announces the reason when the lookup itself failed. */
@@ -249,7 +239,6 @@ export function PhotoFallbackState({
   proposal?: { name: string; actions: ReactNode } | null;
   createBottleHref: string | null;
   searchHref: string;
-  searchLabel: string;
   onStartOver: () => void;
 }) {
   const reasonLine = alert ? <span role="alert">{reason}</span> : reason;
@@ -265,7 +254,7 @@ export function PhotoFallbackState({
       variant={variant}
     >
       {variant === "text" ? null : <Search aria-hidden="true" size={16} />}
-      {searchLabel}
+      Search bottles
     </ButtonLink>
   );
   const createLink = (variant: "accent" | "tonal") =>
@@ -275,6 +264,19 @@ export function PhotoFallbackState({
         Add a new bottle
       </ButtonLink>
     ) : null;
+  // A failed lookup keeps the photo in view (feature doc rule).
+  const failedPhoto =
+    alert && previewUrl ? (
+      <PhotoPreview
+        metadata="We couldn't check this photo"
+        src={previewUrl}
+        title="Label photo"
+      />
+    ) : null;
+  // The photo is already in view, so only the label facts stay collapsed.
+  const labelDetails = (
+    <LabelDetails previewUrl={alert ? null : previewUrl} result={result} />
+  );
   const suggestionList = (
     <BottleMatchList
       bottles={suggestions}
@@ -320,6 +322,7 @@ export function PhotoFallbackState({
           description={reasonLine}
           title="Is it one of these?"
         >
+          {failedPhoto}
           {suggestionList}
         </BottleResolverSection>
         <FormStack>
@@ -329,7 +332,7 @@ export function PhotoFallbackState({
           </BottleResolverActionGrid>
           <BottleResolverTextActions>{startOver}</BottleResolverTextActions>
         </FormStack>
-        <LabelDetails previewUrl={previewUrl} result={result} />
+        {labelDetails}
       </BottleResolverColumn>
     );
   }
@@ -341,21 +344,14 @@ export function PhotoFallbackState({
   return (
     <BottleResolverColumn>
       <BottleResolverSection description={reasonLine} title="Find your bottle">
-        {/* A failed lookup keeps the photo in view (feature doc rule). */}
-        {alert && previewUrl ? (
-          <PhotoPreview
-            metadata="We couldn't check this photo"
-            src={previewUrl}
-            title="Label photo"
-          />
-        ) : null}
+        {failedPhoto}
         <FormStack>
           {createFirst ? createLink("accent") : searchLink("accent")}
           {createFirst ? searchLink("tonal") : createLink("tonal")}
           <BottleResolverTextActions>{startOver}</BottleResolverTextActions>
         </FormStack>
       </BottleResolverSection>
-      {alert ? null : <LabelDetails previewUrl={previewUrl} result={result} />}
+      {labelDetails}
     </BottleResolverColumn>
   );
 }
@@ -365,7 +361,7 @@ function LabelDetails({
   result,
 }: {
   previewUrl: string | null;
-  result: PhotoIdentification | null;
+  result: PhotoLabelReading | null;
 }) {
   if (!previewUrl && !hasRecognizedLabelDetails(result)) return null;
   return (

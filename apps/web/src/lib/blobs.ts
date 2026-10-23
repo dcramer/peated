@@ -107,3 +107,15 @@ export async function shrinkPhotoForUpload(
   const name = file.name.replace(/\.[^.]*$/, "") || "photo";
   return new File([blob], `${name}.jpg`, { type: UPLOAD_PHOTO_TYPE });
 }
+
+/**
+ * Prepares a form photo for upload: a picked file is shrunk, and an edited
+ * canvas is encoded at the smaller canvas size.
+ */
+export async function prepareImageUpload(
+  image: File | HTMLCanvasElement,
+): Promise<Blob> {
+  return image instanceof File
+    ? await shrinkPhotoForUpload(image)
+    : await toBlob(image);
+}

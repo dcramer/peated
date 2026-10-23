@@ -73,7 +73,6 @@ export function TastingDraftList({
     try {
       await deleteMutation.mutateAsync({ draft: draft.id });
     } catch (error) {
-      // Someone already deleted or posted it; either way it is gone.
       if (!isORPCNotFoundError(error)) {
         setDeleteError(
           getFormErrorMessage(error, {
@@ -82,17 +81,18 @@ export function TastingDraftList({
         );
         return;
       }
+      // Someone already deleted or posted it; either way it is gone. A failed
+      // mutation skips the app's refresh after mutations, so update the
+      // header count here.
+      void queryClient.invalidateQueries({
+        queryKey: orpc.tastingDrafts.count.key(),
+      });
     }
     setDeletedIds((ids) => new Set(ids).add(draft.id));
     setDeleting(null);
     flash("Draft deleted.", "info");
     // Refill the page from the server, so later drafts move up.
     router.refresh();
-    // A failed mutation skips the app's refresh after mutations, so update
-    // the header count when the draft was already gone.
-    await queryClient.invalidateQueries({
-      queryKey: orpc.tastingDrafts.count.key(),
-    });
   }
 
   if (!drafts.length) {

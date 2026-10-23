@@ -1,6 +1,9 @@
 import { toTitleCase } from "@peated/server/lib/strings";
 import { CategoryEnum } from "@peated/server/schemas";
-import type { PendingImageRouteState } from "@peated/web/lib/addBottle";
+import {
+  type PendingImageRouteState,
+  WRONG_PHOTO_MATCH_PARAM,
+} from "@peated/web/lib/addBottle";
 import { z } from "zod";
 
 export type CreateBottleReturnAction =
@@ -15,7 +18,7 @@ const CreateBottleEntityChoiceSchema = z.object({
   name: z.string().trim().min(1),
 });
 
-export const CreateBottlePrefillSchema = z.object({
+const CreateBottlePrefillSchema = z.object({
   brandId: z.number().int().positive().nullish(),
   brandName: z.string().trim().min(1).nullish(),
   category: CategoryEnum.nullish(),
@@ -260,7 +263,7 @@ export function getCreateBottleHref({
     params.set("pendingImageUrl", pendingImage.imageUrl);
   }
   if (wrongPhotoMatchId) {
-    params.set("wrongPhotoMatch", String(wrongPhotoMatchId));
+    params.set(WRONG_PHOTO_MATCH_PARAM, String(wrongPhotoMatchId));
   }
   return `/bottles/new?${params.toString()}`;
 }

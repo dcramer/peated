@@ -705,6 +705,14 @@ describe("POST /tastings/photo-identification", () => {
     expect(seen).toEqual(["photo", "label", "step"]);
     expect(runSignal?.aborted).toBe(true);
     expect(loggedOutcomes()).toEqual(["cancelled"]);
+    // Let the stopped lookup settle; a stop by the caller is not a timeout.
+    await expect(runBottleReferenceMock.mock.results[0]?.value).rejects.toThrow(
+      "Stopped.",
+    );
+    expect(sentrySpanSetAttributeMock).not.toHaveBeenCalledWith(
+      "photo_identification.lookup_timed_out",
+      true,
+    );
   });
 
   test("logs a lookup that fails mid-stream once, as failed", async ({
@@ -1140,37 +1148,6 @@ describe("POST /tastings/photo-identification", () => {
     });
     expect(response.imageEvidence.fieldCandidates.brand?.value).toBe("Ardbeg");
     expect(sentrySpanSetAttributeMock).toHaveBeenCalledWith(
-      "photo_identification.lookup_timed_out",
-      true,
-    );
-  });
-
-  test("stops the bottle lookup when the caller gives up", async () => {
-    const controller = new AbortController();
-    extractPhotoBottleEvidenceMock.mockImplementation(async ({ photo }) => ({
-      extractedIdentity: null,
-      imageEvidence: buildImageEvidence(photo.id),
-    }));
-    runBottleReferenceMock.mockImplementation(
-      (_input, options) =>
-        new Promise((_resolve, reject) => {
-          options?.signal?.addEventListener("abort", () =>
-            reject(options.signal?.reason),
-          );
-          controller.abort(new Error("Request closed."));
-        }),
-    );
-
-    const error = await waitError(
-      identifyImage({
-        photo: { id: "photo-lookup-cancel", imageUrl: "/uploads/missing.webp" },
-        traceAttributes: {},
-        signal: controller.signal,
-      }),
-    );
-
-    expect(error).toMatchObject({ message: "Request closed." });
-    expect(sentrySpanSetAttributeMock).not.toHaveBeenCalledWith(
       "photo_identification.lookup_timed_out",
       true,
     );

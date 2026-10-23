@@ -52,9 +52,12 @@ identification limit, it queues itself again with a delay. Any other error marks
 
 `GenerateEntityPronunciationAudio` calls Google Cloud Text-to-Speech, not a
 model, so it runs on `default` with a 15-second request timeout. A failed run
-keeps the old audio; `/admin/catalog/rebuild-pronunciation-audio` queues it
-again. See
-[Naming And Entity Boundaries](../../../../docs/architecture/whisky-identity-model.md#naming-and-entity-boundaries).
+keeps the old audio. To fill missing or outdated audio, send `{"afterId":0}` to
+`/admin/catalog/rebuild-pronunciation-audio` with `pnpm cli api post`, and
+repeat with each returned `nextAfterId` until it is null. Each call checks up to 500 Entities and queues the job only
+for those whose audio is missing or does not match their IPA. See
+[Naming And Entity Boundaries](../../../../docs/architecture/whisky-identity-model.md#naming-and-entity-boundaries)
+for the audio rules.
 
 When the AI service is out of budget, rate limited, down, or unreachable
 (`isModelServiceUnavailable`), the models queue pauses for 15 minutes and puts

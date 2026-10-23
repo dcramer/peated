@@ -2,6 +2,7 @@ import {
   formatAbv,
   formatBottleDisplayName,
   formatBottleLabel,
+  nameIncludes,
   type BottleDisplayNameSource,
 } from "@peated/server/lib/bottleDisplayName";
 import type { Outputs } from "@peated/server/orpc/router";
@@ -9,7 +10,7 @@ import type { BottleIdentityRowProps } from "@peated/web/components/bottleIdenti
 import type { BottleListItem } from "@peated/web/components/bottleList.stylex";
 import type { SearchPickerOption } from "@peated/web/components/searchPicker.stylex";
 
-import { nameIncludes, nameIncludesAge } from "./bottleMetadata";
+import { nameIncludesAge } from "./bottleMetadata";
 import { getReleaseFamilyHref } from "./releaseFamily";
 import { getBottleSeriesUrl, getBottleUrl, getEntityUrl } from "./urls";
 

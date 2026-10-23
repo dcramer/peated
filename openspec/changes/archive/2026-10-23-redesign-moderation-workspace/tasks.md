@@ -1,3 +1,6 @@
+> The owner dropped tasks 3.6, 4.7, 5.7, and 8.4 on 2026-10-23 before
+> archiving. Each asked only for extra web or browser tests.
+
 ## 1. Moderation Read Contracts
 
 - [x] 1.1 Add strict moderation task-key, task-summary, source-locator, filter, count, and paging schemas under the administrator route boundary.
@@ -21,7 +24,7 @@
 - [x] 3.3 Build the desktop three-column Moderation shell and mobile list/detail route behavior with loading, empty, unavailable, no-longer-actionable, and completion states.
 - [x] 3.4 Build the compact Inbox list, counts, search, category and blocked filters, oldest-first presentation, selected state, and URL-preserved list context.
 - [x] 3.5 Implement task selection, one non-mutating Skip control, successful auto-advance, end-of-list behavior, query invalidation, focus movement, and live announcements.
-- [ ] 3.6 Add deterministic component tests for task rows, filter URLs, responsive composition contracts, stale-task fallbacks, and navigation state helpers.
+- ~~3.6 Add deterministic component tests for task rows, filter URLs, responsive composition contracts, stale-task fallbacks, and navigation state helpers.~~ Dropped by the owner on 2026-10-23.
 
 ## 4. Listing Decision Tasks
 
@@ -31,7 +34,7 @@
 - [x] 4.4 Implement the same-Bottle correction task with current/proposed field comparison and the existing transactional repair mutation.
 - [x] 4.5 Implement no-match and blocked listing presentation with human-readable missing identity, manual Bottle selection, valid retry placement, and ignore.
 - [x] 4.6 Move candidate evidence, classifier metadata, automation assessment, processing identifiers, and structured export behind separate default-closed disclosures.
-- [ ] 4.7 Cover all listing variants, unavailable recommendations, mutation pending/error/success, preserved input, manual selection, Skip, and auto-advance with focused web tests.
+- ~~4.7 Cover all listing variants, unavailable recommendations, mutation pending/error/success, preserved input, manual selection, Skip, and auto-advance with focused web tests.~~ Dropped by the owner on 2026-10-23.
 
 ## 5. Catalog Operation And Finding Tasks
 
@@ -41,7 +44,7 @@
 - [x] 5.4 Implement blocked, stale, and failed operation presentation with only the source-owned removal, manual-resolution, close, or operational-recovery actions valid for the current state.
 - [x] 5.5 Implement structured removal reason/note behavior, existing undo behavior where supported, and mutation-error preservation inside the focused task shell.
 - [x] 5.6 Implement finding-disposition tasks with findings, evidence, canonical manual-edit links, structured close reason, and optional note.
-- [ ] 5.7 Cover one-operation-per-task behavior, field exclusions, merge impact, blocked approval, removal, finding closure, failure preservation, and auto-advance with focused web tests.
+- ~~5.7 Cover one-operation-per-task behavior, field exclusions, merge impact, blocked approval, removal, finding closure, failure preservation, and auto-advance with focused web tests.~~ Dropped by the owner on 2026-10-23.
 
 ## 6. Moderation History
 
@@ -64,7 +67,7 @@
 - [x] 8.1 Implement mobile Moderation navigation, Inbox list-to-detail transitions, back behavior, scroll restoration, and at least 44-pixel touch targets.
 - [x] 8.2 Implement stacked mobile field diffs and action layouts without horizontal overflow or hidden decision-critical content.
 - [x] 8.3 Verify semantic headings, regions, controls, disclosures, visible focus, live mutation announcements, and shortcut suppression inside form controls.
-- [ ] 8.4 Add or update targeted Playwright flows for desktop and mobile listing, operation, finding, History, and Automation behavior using existing mock RPC fixtures.
+- ~~8.4 Add or update targeted Playwright flows for desktop and mobile listing, operation, finding, History, and Automation behavior using existing mock RPC fixtures.~~ Dropped by the owner on 2026-10-23.
 
 ## 9. Cutover And Verification
 

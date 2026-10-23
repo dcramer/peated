@@ -26,7 +26,8 @@ import TastingForm, {
   type TastingEditFormSubmitData,
 } from "@peated/web/features/tastings/tastingForm";
 import { AuthRequired } from "@peated/web/hooks/useAuthRequired";
-import { toBlob } from "@peated/web/lib/blobs";
+import { parseIdParam } from "@peated/web/lib/addBottle";
+import { prepareImageUpload } from "@peated/web/lib/blobs";
 import { getFormErrorMessage } from "@peated/web/lib/formHelpers";
 import type { ImageUploadValue } from "@peated/web/lib/imageUpload";
 import { useORPC } from "@peated/web/lib/orpc/context";
@@ -50,12 +51,6 @@ import { useRouter, useSearchParams } from "next/navigation";
 import { useRef, useState } from "react";
 
 const TITLE = "Finish tasting";
-
-function parseBottleId(value: string | null) {
-  if (!value) return null;
-  const id = Number(value);
-  return Number.isInteger(id) && id > 0 ? id : null;
-}
 
 /**
  * Finishes a tasting draft: confirm its Bottle, edit the details, then post.
@@ -91,7 +86,7 @@ function TastingDraftFlowContent({ draftId }: { draftId: string }) {
 
   // A Bottle picked from search arrives as `?bottle=`; one that already
   // exists comes back from create-bottle as a conflict.
-  const pickedBottleId = parseBottleId(searchParams.get("bottle"));
+  const pickedBottleId = parseIdParam(searchParams.get("bottle"));
   const [existingBottleId, setExistingBottleId] = useState<number | null>(null);
   const choiceBottleId = pickedBottleId ?? existingBottleId;
   const choiceQuery = useQuery({
@@ -176,7 +171,7 @@ function TastingDraftFlowContent({ draftId }: { draftId: string }) {
     if (change === "remove") return null;
     if (change === "keep" || !image) return undefined;
     const upload = await pendingUploadMutation.mutateAsync({
-      file: image instanceof File ? image : await toBlob(image),
+      file: await prepareImageUpload(image),
       purpose: "photo_tasting_entry",
       idempotencyKey: createIdempotencyKey(),
     });

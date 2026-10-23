@@ -22,11 +22,7 @@ import {
   getBottleStructuredIdentityKey,
 } from "@peated/server/lib/bottleConflicts";
 import { findSeriesIdByName } from "@peated/server/lib/bottleHelpers";
-import {
-  getBottleExactIdentity,
-  getBottleGroupNameForBrand,
-  materializeBottleForGroup,
-} from "@peated/server/lib/bottleIdentity";
+import { getMovedBottleIdentity } from "@peated/server/lib/bottleIdentity";
 import type { SystemBottlePatch } from "@peated/server/lib/bottleSchemas";
 import { moveEntityAliases } from "@peated/server/lib/entityAliases";
 import {
@@ -588,22 +584,13 @@ async function performEntityMerge({
         // duplicate the moved Bottles.
         const seriesWillBeCreated =
           currentSeries !== null && movedSeriesId === null;
-        const targetGroup = {
-          ...group,
-          ...getBottleGroupNameForBrand({ name: group.name, brand: toEntity }),
-          brandId: toEntity.id,
-          seriesId: movedSeriesId,
-        };
         for (const member of seriesWillBeCreated ? [] : members) {
-          const exact = getBottleExactIdentity({
+          const desired = getMovedBottleIdentity({
             bottle: member,
-            sourceGroupStatedAge: group.statedAge,
+            group,
+            brand: toEntity,
+            seriesId: movedSeriesId,
           });
-          const desired = {
-            ...exact,
-            noAgeStatement: member.noAgeStatement,
-            ...materializeBottleForGroup({ group: targetGroup, exact }),
-          };
           const desiredKey = getBottleStructuredIdentityKey(desired);
           // Exact Bottle merge (docs/architecture/whisky-identity-model.md)
           // needs the full structured identity. Same-named Bottles with

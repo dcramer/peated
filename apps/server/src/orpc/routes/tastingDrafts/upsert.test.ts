@@ -223,7 +223,7 @@ describe("PUT /tasting-drafts/{draft}", () => {
       { context: { user: defaults.user } },
     );
 
-    expect(draft.friends.map(({ id }) => id)).toEqual([friend.id]);
+    expect((await getDraftRow(draft.id))?.friends).toEqual([friend.id]);
   });
 
   test("rejects a new draft past the per-member cap", async ({

@@ -62,6 +62,12 @@ the Bottle and action before any tasting is saved.
   color, or camera access.
 - A failed or uncertain identification must preserve a path to search or retry.
 - Multiple-Bottle or ambiguous evidence must not silently select a Bottle.
+- The user may remove or replace the pending image before tasting save.
+- General tasting entry uses the shared bottle resolver. Existing
+  Bottle-scoped tasting links may continue directly with their known Bottle.
+- The main **Find a bottle** action opens lookup without a preset next action.
+- Keep normal steps within a phone screen with the keyboard closed. Long
+  notes, larger text, and open pickers must remain scrollable.
 
 ### Fallback Screen
 
@@ -82,17 +88,15 @@ these parts change:
   bottle** leads when the label was read, and **Search bottles** leads when it
   was not.
 
+A lookup that fails after it started streaming keeps what it sent. Its likely
+matches become the suggestions, and **Add a new bottle** and **Search bottles**
+start from the label facts and keep the photo, as they do after no match. A
+failure before anything arrived offers a blank search and a blank new Bottle.
+
 **Start over** is always a quiet text action. Label details stay collapsed,
 with two exceptions: an approved new Bottle shows the photo and label facts
 above its actions, because one tap adds it, and a failed lookup keeps the
 photo in view.
-
-- The user may remove or replace the pending image before tasting save.
-- General tasting entry uses the shared bottle resolver. Existing
-  Bottle-scoped tasting links may continue directly with their known Bottle.
-- The main **Find a bottle** action opens lookup without a preset next action.
-- Keep normal steps within a phone screen with the keyboard closed. Long
-  notes, larger text, and open pickers must remain scrollable.
 
 ## Identity And Classification
 
@@ -230,8 +234,9 @@ URL, and so does **Change bottle** afterward, so the last pick is the one kept.
 Picking the Bottle that was matched withdraws the report: the match was right,
 so the record and its photo copy are deleted instead of kept as a false
 example. The page then drops the record's ID from the URL, so a reload or a
-later change does not try to update a deleted record. A later Bottle merge can still make both Bottles the same; that marks
-a duplicate, not a withdrawal, and the record stays.
+later change does not try to update a deleted record. A later Bottle merge
+can still make both Bottles the same; that marks a duplicate, not a
+withdrawal, and the record stays.
 Only the reporting member can set it. A failed report or update never blocks
 search, creation, or the member's next action.
 
@@ -267,7 +272,8 @@ best-effort attachment.
 ## Failures And Recovery
 
 - Extraction or classification failure returns an identification error; the UI
-  keeps the local preview and offers search or retry.
+  keeps the local preview and anything the lookup already streamed, and
+  offers search or retry.
 - Low-confidence, review-only, and `no_match` outcomes open the fallback screen
   with suggestions, search, and manual creation rather than forcing a semantic
   decision.
