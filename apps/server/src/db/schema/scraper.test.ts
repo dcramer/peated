@@ -22,14 +22,20 @@ test("target state enforces policy, counters, and paired leases", async () => {
       ...targetValues,
       requestsPerWindow: 0,
     }),
-  ).rejects.toThrow(/scrape_target_policy_check/);
+  ).rejects.toHaveProperty(
+    "cause.message",
+    expect.stringMatching(/scrape_target_policy_check/),
+  );
 
   await expect(
     db.insert(scrapeTargets).values({
       ...targetValues,
       leaseToken: "orphaned-token",
     }),
-  ).rejects.toThrow(/scrape_target_lease_pair_check/);
+  ).rejects.toHaveProperty(
+    "cause.message",
+    expect.stringMatching(/scrape_target_lease_pair_check/),
+  );
 });
 
 test("origin state requires exact origins and reviewed robots bypasses", async () => {
@@ -41,7 +47,10 @@ test("origin state requires exact origins and reviewed robots bypasses", async (
       targetKey: targetValues.key,
       robotsMode: "enforce",
     }),
-  ).rejects.toThrow(/scrape_origin_value_check/);
+  ).rejects.toHaveProperty(
+    "cause.message",
+    expect.stringMatching(/scrape_origin_value_check/),
+  );
 
   await expect(
     db.insert(scrapeOrigins).values({
@@ -49,7 +58,10 @@ test("origin state requires exact origins and reviewed robots bypasses", async (
       targetKey: targetValues.key,
       robotsMode: "not_applicable",
     }),
-  ).rejects.toThrow(/scrape_origin_robots_rationale_check/);
+  ).rejects.toHaveProperty(
+    "cause.message",
+    expect.stringMatching(/scrape_origin_robots_rationale_check/),
+  );
 });
 
 test("run state enforces bounded counters and paired execution claims", async () => {
@@ -66,7 +78,10 @@ test("run state enforces bounded counters and paired execution claims", async ()
       requestLimit: 2,
       sliceRequestCount: 3,
     }),
-  ).rejects.toThrow(/external_site_run_request_budget_check/);
+  ).rejects.toHaveProperty(
+    "cause.message",
+    expect.stringMatching(/external_site_run_request_budget_check/),
+  );
 
   await expect(
     db.insert(externalSiteRuns).values({
@@ -74,5 +89,8 @@ test("run state enforces bounded counters and paired execution claims", async ()
       trigger: "manual",
       executionToken: "orphaned-token",
     }),
-  ).rejects.toThrow(/external_site_run_execution_pair_check/);
+  ).rejects.toHaveProperty(
+    "cause.message",
+    expect.stringMatching(/external_site_run_execution_pair_check/),
+  );
 });
