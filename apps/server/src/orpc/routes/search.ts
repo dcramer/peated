@@ -6,6 +6,7 @@ import {
   bottles,
   bottleSeries,
   bottleSeriesTombstones,
+  bottlesToDistillers,
   bottleTombstones,
   countries,
   entities,
@@ -42,7 +43,17 @@ import searchContract, {
   type SearchScope,
 } from "@peated/server/orpc/contracts/search";
 import * as Sentry from "@sentry/node";
-import { and, asc, eq, isNotNull, like, or, sql, type SQL } from "drizzle-orm";
+import {
+  and,
+  asc,
+  eq,
+  inArray,
+  isNotNull,
+  like,
+  or,
+  sql,
+  type SQL,
+} from "drizzle-orm";
 import type { z } from "zod";
 
 type SearchOutput = z.infer<typeof SearchOutputSchema>;
@@ -62,7 +73,7 @@ type MemberResult = Extract<
   { type: "members" }
 >["results"][number];
 
-type BottleRow = Omit<BottleResult, "group"> & {
+type BottleRow = Omit<BottleResult, "group" | "distillers"> & {
   fullName: string;
   group: { name: string } | null;
 };
@@ -225,6 +236,7 @@ function bottleColumns() {
       ),
     tastingBandCounts: bottles.tastingBandCounts,
     brand: {
+      id: entities.id,
       name: entities.name,
       shortName: entities.shortName,
     },
@@ -806,16 +818,63 @@ async function readSearchRows(
   };
 }
 
-function bottleResult(row: BottleRow, includeGroup = false): BottleResult {
+type DistillersByBottleId = Map<number, BottleResult["distillers"]>;
+
+// Every bottle result carries its group and distillers, so a Bottle shows the
+// same name and producers wherever it appears in the response.
+function bottleResult(
+  row: BottleRow,
+  distillersByBottleId: DistillersByBottleId,
+): BottleResult {
   const { fullName: _, group, ...result } = row;
   const bottle: BottleResult = {
     ...result,
+    distillers: distillersByBottleId.get(row.id) ?? [],
     imageUrl: result.imageUrl
       ? absoluteUrl(config.API_SERVER, result.imageUrl)
       : null,
   };
-  if (includeGroup && group) bottle.group = group;
+  if (group) bottle.group = group;
   return bottle;
+}
+
+function getBottleRows(rows: SearchRows): BottleRow[] {
+  return [
+    ...rows.groups.flatMap((group) =>
+      group.type === "bottles" ? group.results : [],
+    ),
+    ...(rows.exact?.type === "bottle" ? [rows.exact.ref] : []),
+    ...rows.nearest.flatMap((row) =>
+      row.type === "bottles" ? [row.result] : [],
+    ),
+  ];
+}
+
+async function loadDistillers(
+  database: AnyDatabase,
+  bottleRows: BottleRow[],
+): Promise<DistillersByBottleId> {
+  const bottleIds = Array.from(new Set(bottleRows.map(({ id }) => id)));
+  if (!bottleIds.length) return new Map();
+  const rows = await database
+    .select({
+      bottleId: bottlesToDistillers.bottleId,
+      id: entities.id,
+      name: entities.name,
+      kind: entities.kind,
+    })
+    .from(bottlesToDistillers)
+    .innerJoin(entities, eq(bottlesToDistillers.distillerId, entities.id))
+    .where(inArray(bottlesToDistillers.bottleId, bottleIds))
+    .orderBy(asc(entities.name));
+  const distillersByBottleId: DistillersByBottleId = new Map();
+  for (const { bottleId, ...distiller } of rows) {
+    distillersByBottleId.set(bottleId, [
+      ...(distillersByBottleId.get(bottleId) ?? []),
+      distiller,
+    ]);
+  }
+  return distillersByBottleId;
 }
 
 function memberResult(row: MemberResult): MemberResult {
@@ -841,13 +900,18 @@ function seriesResult(row: SeriesRow): SeriesResult {
   };
 }
 
-function serializeGroup(group: GroupRows) {
+function serializeGroup(
+  group: GroupRows,
+  distillersByBottleId: DistillersByBottleId,
+) {
   switch (group.type) {
     case "bottles":
       return {
         type: group.type,
         hasMore: group.hasMore,
-        results: group.results.map((row) => bottleResult(row, true)),
+        results: group.results.map((row) =>
+          bottleResult(row, distillersByBottleId),
+        ),
       };
     case "series":
       return {
@@ -874,12 +938,15 @@ function serializeGroup(group: GroupRows) {
   }
 }
 
-function serializeNearest(row: NearestRow) {
+function serializeNearest(
+  row: NearestRow,
+  distillersByBottleId: DistillersByBottleId,
+) {
   switch (row.type) {
     case "bottles":
       return {
         type: row.type,
-        result: bottleResult(row.result),
+        result: bottleResult(row.result, distillersByBottleId),
       };
     case "series":
       return {
@@ -903,15 +970,25 @@ function serializeNearest(row: NearestRow) {
   }
 }
 
-function serializeSearch(rows: SearchRows) {
-  const groups = rows.groups.map(serializeGroup);
+function serializeSearch(
+  rows: SearchRows,
+  distillersByBottleId: DistillersByBottleId,
+) {
+  const groups = rows.groups.map((group) =>
+    serializeGroup(group, distillersByBottleId),
+  );
   const exact =
     rows.exact?.type === "bottle"
-      ? { type: "bottle", ref: bottleResult(rows.exact.ref) }
+      ? {
+          type: "bottle",
+          ref: bottleResult(rows.exact.ref, distillersByBottleId),
+        }
       : rows.exact?.type === "series"
         ? { type: "series", ref: seriesResult(rows.exact.ref) }
         : rows.exact;
-  const nearest = rows.nearest.map(serializeNearest);
+  const nearest = rows.nearest.map((row) =>
+    serializeNearest(row, distillersByBottleId),
+  );
   return SearchOutputSchema.parse({
     query: rows.query,
     exact,
@@ -925,8 +1002,12 @@ async function buildSearchResponse(input: SearchInput, context: Context) {
     { name: "search.read", op: "function" },
     () => readSearchRows(input, context),
   );
+  const distillersByBottleId = await Sentry.startSpan(
+    { name: "search.distillers", op: "function" },
+    () => loadDistillers(db, getBottleRows(rows)),
+  );
   return Sentry.startSpan({ name: "search.serialize", op: "function" }, () =>
-    serializeSearch(rows),
+    serializeSearch(rows, distillersByBottleId),
   );
 }
 
