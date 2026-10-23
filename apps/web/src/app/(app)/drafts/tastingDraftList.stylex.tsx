@@ -133,8 +133,9 @@ export function TastingDraftList({
                   href={getTastingDraftHref(draft)}
                   imageFit={draft.imageUrl ? "cover" : undefined}
                   imageUrl={draft.imageUrl ?? draft.bottle?.imageUrl}
-                  metadata={[description.status]}
+                  metadata={[description.status, ...(description.facts ?? [])]}
                   name={name}
+                  provenance={description.provenance}
                   subtitle={
                     description.name ? (
                       <>

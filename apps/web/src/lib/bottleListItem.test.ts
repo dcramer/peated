@@ -14,7 +14,7 @@ describe("toBottleListItem", () => {
     expect(toBottleListItem(mockBottle)).toMatchObject({
       name: "Lagavulin 16-year-old",
       provenance: [],
-      metadata: ["16 years", "43%"],
+      metadata: ["43%"],
     });
   });
 
@@ -93,6 +93,47 @@ describe("toBottleListItem", () => {
     ).toEqual(["40 years", "43%"]);
   });
 
+  test("shows one year, vintage before release", () => {
+    expect(
+      toBottleListItem({
+        ...seriesBottle,
+        name: "Caol Ila",
+        releaseYear: 2023,
+      }).metadata,
+    ).toEqual(["1982 vintage", "40 years", "43%"]);
+    expect(
+      toBottleListItem({ ...seriesBottle, releaseYear: 2023 }).metadata,
+    ).toEqual(["40 years", "43%"]);
+    expect(
+      toBottleListItem({
+        ...seriesBottle,
+        edition: "Batch 3",
+        releaseYear: 2023,
+      }).metadata,
+    ).toEqual(["Batch 3", "40 years", "43%"]);
+  });
+
+  test("does not repeat an age or ABV the name already prints", () => {
+    expect(
+      toBottleListItem({
+        ...mockBottle,
+        name: "Lagavulin 16 Years Old 43%",
+      }).metadata,
+    ).toEqual([]);
+    expect(
+      toBottleListItem({ ...mockBottle, name: "Lagavulin 160 Years" }).metadata,
+    ).toEqual(["16 years", "43%"]);
+  });
+
+  test("keeps a series that only appears inside a longer word", () => {
+    expect(
+      toBottleListItem({
+        ...seriesBottle,
+        name: "Private Collections Caol Ila 1982",
+      }).provenance?.[0],
+    ).toMatchObject({ name: "Private Collection" });
+  });
+
   test.each([
     ["brand", "brands"],
     ["distillery", "distillers"],
@@ -138,6 +179,21 @@ describe("toBottleListItem", () => {
     ]);
   });
 
+  test("does not count the brand toward the distillery summary", () => {
+    const distillers = [
+      mockCaolIlaEntity,
+      mockHighlandParkEntity,
+      mockTaliskerEntity,
+    ];
+
+    expect(
+      toBottleListItem({
+        ...mockBottle,
+        distillers: [mockBottle.brand, ...distillers],
+      }).provenance?.map((item) => item.name),
+    ).toEqual(distillers.map((distiller) => distiller.name));
+  });
+
   test("summarizes more than three distilleries with their names in a tooltip", () => {
     const distillers = [
       mockCaolIlaEntity,
@@ -180,7 +236,7 @@ describe("toBottleListItem", () => {
     expect(option.id).toBe(mockBottle.id);
     expect(option.label).toBe(`${option.bottle.name} · 43%`);
     expect(option.bottle.provenance).toEqual([{ name: "Lagavulin" }]);
-    expect(option.bottle.metadata).toEqual(["16 years", "43%"]);
+    expect(option.bottle.metadata).toEqual(["43%"]);
   });
 
   test("can omit the brand from a list owned by that brand", () => {
