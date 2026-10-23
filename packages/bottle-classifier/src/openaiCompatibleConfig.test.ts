@@ -36,7 +36,7 @@ describe("resolveOpenAICompatibleConfig", () => {
       apiKey: "gateway-key",
       baseURL: "https://ai-gateway.vercel.sh/v1",
       bottleClassifierModel: "openai/gpt-6-luna",
-      bottleClassifierReasoningEffort: "high",
+      bottleClassifierReasoningEffort: "medium",
       embeddingModel: "openai/text-embedding-3-large",
       evalModel: "openai/gpt-5.6-luna",
       evalReasoningEffort: "medium",
@@ -51,7 +51,7 @@ describe("resolveOpenAICompatibleConfig", () => {
         config.bottleClassifierModel,
         config.bottleClassifierReasoningEffort,
       ),
-    ).toEqual({ reasoning: { effort: "high" } });
+    ).toEqual({ reasoning: { effort: "medium" } });
     expect(
       getStableOpenAISettings(config.evalModel, config.evalReasoningEffort),
     ).toEqual({ reasoning: { effort: "medium" } });
