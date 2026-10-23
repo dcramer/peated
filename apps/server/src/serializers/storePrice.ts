@@ -64,6 +64,8 @@ async function loadStorePriceBottleAttrs(
     BottleSerializer,
     bottleList,
     currentUser,
+    [],
+    { includeGroupSummary: true },
   );
   const bottlesById = new Map(
     serializedBottles.map((bottle) => [bottle.id, bottle]),

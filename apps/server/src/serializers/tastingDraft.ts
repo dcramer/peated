@@ -84,7 +84,9 @@ export const TastingDraftSerializer = serializer({
       followList.map(({ fromUserId, toUserId }) => `${fromUserId}:${toUserId}`),
     );
     const [serializedBottles, serializedFriends] = await Promise.all([
-      serialize(BottleSerializer, bottleList, currentUser),
+      serialize(BottleSerializer, bottleList, currentUser, [], {
+        includeGroupSummary: true,
+      }),
       serialize(UserSerializer, friendList, currentUser),
     ]);
     const bottlesById = new Map(

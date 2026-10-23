@@ -603,15 +603,29 @@ export default function BottleForm({
   const reviewingCandidates = candidateReviewOpen;
   const isCreate = mode === "create";
   const isLastCreateStep = currentStep === createSteps.length - 1;
-  const draftIdentityProps = getBottleIdentityProps({
+  const draftIdentity = getBottleIdentityProps({
     name: name || "Bottle preview",
-    brand: { name: brand?.name ?? "" },
+    brand: {
+      name: brand?.name ?? "",
+      id: brand ? (identityChoice(brand).id ?? undefined) : undefined,
+    },
+    series: series ? { name: series.name } : null,
+    distillers: distillers.map((distiller) => ({
+      ...identityChoice({ id: distiller.id, name: distiller.label }),
+      kind: distiller.entity?.kind ?? null,
+    })),
     statedAge: statedAge ?? null,
     noAgeStatement: noAgeStatement ?? null,
     abv: abv ?? null,
     edition,
+    vintageYear,
     releaseYear,
   });
+  // The preview sits inside the form, so its provenance must not navigate away.
+  const draftIdentityProps = {
+    ...draftIdentity,
+    provenance: draftIdentity.provenance?.map(({ name }) => ({ name })),
+  };
 
   useEffect(() => {
     return () => {

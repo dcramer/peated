@@ -1,8 +1,13 @@
 import { isORPCClientError } from "@peated/orpc/client/errors";
-import { formatBottleDisplayName } from "@peated/server/lib/bottleDisplayName";
+import {
+  formatBottleDisplayName,
+  formatBottleLabel,
+} from "@peated/server/lib/bottleDisplayName";
 import type { Inputs, Outputs } from "@peated/server/orpc/router";
 import type { Bottle } from "@peated/server/types";
 import { z } from "zod";
+
+import { getBottleIdentityProps } from "./bottleListItem";
 
 export type TastingDraft = Outputs["tastingDrafts"]["details"];
 type TastingDraftSaveInput = Inputs["tastingDrafts"]["upsert"];
@@ -76,20 +81,22 @@ export function getIdentificationPollInterval(
 type TastingDraftDescription = {
   name: string | null;
   status: string;
+  /** The chosen Bottle's provenance and facts, as other bottle rows show them. */
+  provenance?: ReturnType<typeof getBottleIdentityProps>["provenance"];
+  facts?: readonly string[];
 };
 
 /**
  * The name and status line an inbox row shows for a draft. `name` is null
  * when the draft has neither a Bottle nor a hint; the row then shows the date.
+ * A chosen Bottle adds its provenance and facts.
  */
 export function describeTastingDraft(
   draft: Pick<TastingDraft, "bottle" | "bottleHint" | "identification">,
 ): TastingDraftDescription {
   if (draft.bottle) {
-    return {
-      name: formatBottleDisplayName(draft.bottle),
-      status: "Bottle chosen",
-    };
+    const { name, provenance, metadata } = getBottleIdentityProps(draft.bottle);
+    return { name, status: "Bottle chosen", provenance, facts: metadata };
   }
 
   const name = draft.bottleHint || null;
@@ -100,7 +107,7 @@ export function describeTastingDraft(
     case "match":
       return {
         name,
-        status: `Looks like ${formatBottleDisplayName(suggestion.bottle)}`,
+        status: `Looks like ${formatBottleLabel(suggestion.bottle)}`,
       };
     case "proposal":
       return { name, status: `New to Peated: ${suggestion.name}` };

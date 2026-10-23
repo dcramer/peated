@@ -52,11 +52,7 @@ function getAgeFact(bottle: BottleHeaderSpecs, name: string): KeyFact | null {
   if (bottle.statedAge === null) {
     return bottle.noAgeStatement ? { label: "Age", value: "NAS" } : null;
   }
-  const ageInName = new RegExp(
-    `\\b${bottle.statedAge}[- ]years?\\b`,
-    "iu",
-  ).test(name);
-  return ageInName
+  return nameIncludesAge(name, bottle.statedAge)
     ? null
     : { label: "Age", value: `${bottle.statedAge} years` };
 }
@@ -65,6 +61,11 @@ function getAgeFact(bottle: BottleHeaderSpecs, name: string): KeyFact | null {
 // wrong match only drops or moves one header fact, so this stays simple.
 function removeCaskMarker(value: string) {
   return value.replace(/^(?:cask\s*)?(?:no\.?|#)?\s*(?=\d)/iu, "");
+}
+
+/** Matches an age the name prints, such as `16-year-old` or `16 Years`. */
+export function nameIncludesAge(name: string, statedAge: number) {
+  return new RegExp(`\\b${statedAge}[- ]years?\\b`, "iu").test(name);
 }
 
 /**
