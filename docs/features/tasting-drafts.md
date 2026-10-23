@@ -169,7 +169,9 @@ inbox.
 The inbox lists drafts, most recently saved first, a page at a time. Each row
 shows the photo, the Bottle name or the bottle hint, when the member had the
 dram, and where finding the Bottle stands: Bottle chosen, a suggested Bottle,
-a new Bottle to add, couldn't tell, or still identifying. A draft with no
+a new Bottle to add, couldn't tell, or still identifying. A chosen Bottle
+also shows its producer line and facts, such as age and ABV, as other bottle
+rows do, and a suggested catalog Bottle includes its ABV. A draft with no
 Bottle and no hint is named by the date the member had it. The status line
 wraps instead of being cut off. Each row can delete its draft after the member
 confirms; the page then reloads, so later drafts move up, and a page left

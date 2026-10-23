@@ -217,9 +217,10 @@ describe("getIdentificationPollInterval", () => {
 
 describe("describeTastingDraft", () => {
   it("names a draft by its chosen Bottle", () => {
-    expect(describeTastingDraft(makeDraft({ bottle }))).toEqual({
+    expect(describeTastingDraft(makeDraft({ bottle }))).toMatchObject({
       name: "Ardbeg 10-year-old",
       status: "Bottle chosen",
+      facts: ["46%"],
     });
   });
 
@@ -235,7 +236,7 @@ describe("describeTastingDraft", () => {
       ),
     ).toEqual({
       name: "the smoky one",
-      status: "Looks like Ardbeg 10-year-old",
+      status: "Looks like Ardbeg 10-year-old · 46%",
     });
   });
 

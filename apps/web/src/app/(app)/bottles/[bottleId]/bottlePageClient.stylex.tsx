@@ -458,7 +458,9 @@ export function BottleOverviewClient() {
     ) ?? [];
   const otherSeriesBottles = seriesBottlesQuery.data
     ? selectOtherSeriesBottles(seriesBottlesQuery.data.results, bottle.id).map(
-        (seriesBottle) => toBottleListItem(seriesBottle),
+        // The section heading names the series, so rows leave it out.
+        (seriesBottle) =>
+          toBottleListItem(seriesBottle, { seriesPlacement: "none" }),
       )
     : [];
   const seriesRail = !bottle.series ? null : seriesBottlesQuery.isPending ? (

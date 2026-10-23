@@ -58,18 +58,21 @@ function getAgeFact(bottle: BottleHeaderSpecs, name: string): KeyFact | null {
   if (bottle.statedAge === null) {
     return bottle.noAgeStatement ? { label: "Age", value: "NAS" } : null;
   }
-  const ageInName = new RegExp(
-    `\\b${bottle.statedAge}[- ]years?\\b`,
-    "iu",
-  ).test(name);
-  return ageInName
+  return nameIncludesAge(name, bottle.statedAge)
     ? null
     : { label: "Age", value: `${bottle.statedAge} years` };
 }
 
-// Whole words only, so `12` is not found in `120`. A wrong match only drops
-// or moves one header fact, so this stays simple.
-function nameIncludes(name: string, text: string) {
+/** Matches an age the name prints, such as `16-year-old` or `16 Years`. */
+export function nameIncludesAge(name: string, statedAge: number) {
+  return new RegExp(`\\b${statedAge}[- ]years?\\b`, "iu").test(name);
+}
+
+/**
+ * Whole words only, so `12` is not found in `120` and `Cask` is not found in
+ * `Casks`. A wrong match only drops or moves one fact, so this stays simple.
+ */
+export function nameIncludes(name: string, text: string) {
   const escaped = text
     .replace(/^(?:cask\s*)?(?:no\.?|#)?\s*(?=\d)/iu, "")
     .replace(/[.*+?^${}()|[\]\\]/gu, "\\$&");

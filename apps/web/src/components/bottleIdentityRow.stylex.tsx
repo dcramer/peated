@@ -216,6 +216,13 @@ export function BottleIdentityRow({
       {sidebar ? trailingContent : null}
     </div>
   );
+  const visual = (
+    <BottleVisual
+      fit={imageFit}
+      imageUrl={imageUrl}
+      size={compact ? "xs" : sidebar ? "sm" : activity ? "activity" : "md"}
+    />
+  );
   return (
     <div
       {...stylex.props(
@@ -234,11 +241,11 @@ export function BottleIdentityRow({
           linkedRowStyles.onGround,
       )}
     >
-      <BottleVisual
-        fit={imageFit}
-        imageUrl={imageUrl}
-        size={compact ? "xs" : sidebar ? "sm" : activity ? "activity" : "md"}
-      />
+      {activity ? (
+        <span {...stylex.props(styles.activityVisual)}>{visual}</span>
+      ) : (
+        visual
+      )}
       {activity ? (
         <div {...stylex.props(styles.activityBody)}>
           <div {...stylex.props(styles.activitySummary)}>
@@ -285,6 +292,14 @@ const styles = stylex.create({
     alignItems: "flex-start",
     paddingTop: space.x1,
     paddingBottom: 0,
+  },
+  // Activity rows align to the top. When the thumbnail is shorter than the
+  // three identity lines (64px), center it on them instead of the first line.
+  activityVisual: {
+    display: "flex",
+    flexShrink: 0,
+    alignItems: "center",
+    minHeight: "64px",
   },
   activityBody: {
     display: "flex",
