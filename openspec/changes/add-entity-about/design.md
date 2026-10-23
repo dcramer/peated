@@ -168,6 +168,33 @@ Alternatives considered:
   keeps the same checking, and an expression index on one document field can
   support filtering if a feature needs it later.
 
+**When a field leaves the document.** The document is the default home.
+Move a field out only when all three are true:
+
+1. A current feature needs to query it across Entities: filtering, sorting,
+   joining, or counting.
+2. Its shape has stayed the same for a while.
+3. Its published values are reliable enough to sort or filter on.
+
+The first choice is a read-only **projection table**: for example,
+`entity_site_fact_index (entityId, field, numberValue, textValue)`.
+
+- The publish step rebuilds an Entity's rows from its document in the same
+  transaction.
+- A job can rebuild every row from the documents.
+- The document stays the only owner, so the projection needs no backfill
+  plan of its own and can be dropped at any time.
+
+Make a real owning table or column only when the database must enforce the
+value, such as a foreign key or a uniqueness rule. Then move ownership in one
+bounded migration, and leave the old document field ignored and optional
+instead of removing it. That keeps the backward-compatibility rule.
+
+Facts Peated already stores as Entity columns stay there: owner, status,
+location, founding year, and website. When the document's history disagrees
+with one, such as an `opened` event in 1820 and a founding year of 1819, the
+pipeline creates an Inbox finding and does not change the column.
+
 ### 3. Publishing rules live in code
 
 `isFactPublishable(citations, sourceSites)` applies the support rule: one
