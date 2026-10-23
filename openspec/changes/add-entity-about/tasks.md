@@ -1,15 +1,13 @@
 ## 1. About document storage
 
 - [ ] 1.1 Add the About schema module with the document schema, `aboutFactFields.ts`, and a `schemaVersion`; put the backward-compatibility rule in a comment beside the schema
-- [ ] 1.2 Add `sourceSites.ts` with types for domain, name, tier, and notes, starting empty until the audit in 5.1
-- [ ] 1.3 Add `entity_about` and `entity_about_run` tables and the `entity_about` change object type; generate the migration
-- [ ] 1.4 Add read and write functions that parse `unknown`, check the saved version on every write, save the full document to change history, check linked Entities on write, and follow merged Entities on read; integration tests for each
-- [ ] 1.5 Add a test that parses a sample of real document shapes, so schema changes that break stored documents fail CI
-- [ ] 1.6 Add the `aboutPipeline` system actor
-- [ ] 1.7 Write `isFactPublishable` and `chooseFactValue` and run them in the public serializer, with integration tests covering one primary source, two reference sites, same-site citations, finder-only sources, and even conflicts
-- [ ] 1.8 Add moderator API routes to edit events, site facts, sources, and sections in the document, with tests for permissions, stale versions, and the rule that the pipeline never overwrites a person's edit
-- [ ] 1.9 Backfill a document for each Entity with `entity_event` rows, copying `sourceUrl` into sources and citations; check event counts per Entity
-- [ ] 1.10 Point Overview history, owner acquisitions, and existing event routes at the document; stop writing `entity_event`
+- [ ] 1.2 Add the `entity_about` table and the `entity_about` change object type; generate the migration
+- [ ] 1.3 Add read and write functions that parse `unknown`, check the saved version on every write, save the full document to change history, check linked Entities on write, and follow merged Entities on read; integration tests for each
+- [ ] 1.4 Add a test that parses a sample of real document shapes, so schema changes that break stored documents fail CI
+- [ ] 1.5 Write `isFactShown` and `getDisagreement` and run them in the public serializer, with tests for retailer-only facts and conflicting values
+- [ ] 1.6 Add moderator API routes to edit events, site facts, sources, and sections in the document, with tests for permissions, stale versions, and the rule that the pipeline never overwrites a person's edit
+- [ ] 1.7 Backfill a document for each Entity with `entity_event` rows, copying `sourceUrl` into sources and citations; check event counts per Entity
+- [ ] 1.8 Point Overview history, owner acquisitions, and existing event routes at the document; stop writing `entity_event`
 
 ## 2. Catalog numbers
 
@@ -36,43 +34,30 @@
 - [ ] 4.2 Enter Brora's sources, events, eras, names, site facts, status, and sections through `pnpm cli api`; verify each write by reading it back
 - [ ] 4.3 Delete `apps/web/src/features/entityAbout/articles/brora.ts` and the in-code article map
 
-## 5. Writing standard
+## 5. Writing rules
 
-- [ ] 5.1 Audit source sites and write the dated tier list in `docs/research/`; load it into `source_site`
-- [ ] 5.2 Add the banned-phrase list and About style rules to the `peated-writing` skill as a file the code check imports
-- [ ] 5.3 Write the remaining 11 human-written articles from the design's list, as stored data
-- [ ] 5.4 Write the scoring checklist
+- [ ] 5.1 Add the banned-phrase list and About style rules to the `peated-writing` skill as a file the code check imports
+- [ ] 5.2 Write one brand article by hand as the second prompt example, as stored data
 
-## 6. Pipeline
+## 6. The job
 
-- [ ] 6.1 Add the run workflow with stored state, per-run and daily limits, idempotent steps, and a pause switch
-- [ ] 6.2 Add the research step using the shared web search and page-fetch tooling, filtered by the source-site list
-- [ ] 6.3 Add the extract step with quote checks, schema checks, matching by kind and date, publishing rules, and Inbox findings for identity changes and conflicts with people's edits
-- [ ] 6.4 Add the write step with sentence-level fact IDs and code checks for citations, years, numbers, length, and banned phrases
-- [ ] 6.5 Add the scoring step with one rewrite and the fall-back to facts only
-- [ ] 6.6 Add the publish step: keep unchanged sections, rewrite only sections whose facts changed, and update the Entity description unless a person wrote it
-- [ ] 6.7 Stop `generateEntityDetails` from writing descriptions; keep pronunciation and other fields
-- [ ] 6.8 Add model checks under `pnpm evals` for extraction and writing, using the 12 human-written articles and their evidence packs
-- [ ] 6.9 Add tests for limits, resume after failure, the pause switch, and keeping people's edits
+- [ ] 6.1 Add `writeEntityAbout`: one model call with the existing web search and page-fetch tools, fixed search and read limits, and output parsed with the document schema
+- [ ] 6.2 Add the code checks: quotes on pages read, sentence facts, years and numbers, length limits, banned phrases, and sentence length; one retry, then save nothing
+- [ ] 6.3 Merge drafts into the stored document, keeping items a person wrote; save with a version check; update the description from the lead unless a person wrote it
+- [ ] 6.4 Add the `aboutPipeline` system actor, an on/off switch, and an admin action to queue one Entity or a batch ordered by activity
+- [ ] 6.5 Stop `generateEntityDetails` from writing descriptions; keep pronunciation and other fields
+- [ ] 6.6 Add tests for each check, the merge, and the switch
+- [ ] 6.7 Add a model check under `pnpm evals` with 5 Entities
 
-## 7. Safety nets
+## 7. Rollout
 
-- [ ] 7.1 Add About spot-check tasks and About finding tasks to the moderation Inbox
-- [ ] 7.2 Route member reports on About pages to the Inbox, and turn corrections into person-written facts that trigger a write-only run
-- [ ] 7.3 Add the pipeline health view to Background work, including the weekly stop rule
-- [ ] 7.4 Add a moderator action to hide one Entity's generated About content
+- [ ] 7.1 Run the job on 20 Entities and read every result; fix the prompt or checks
+- [ ] 7.2 Queue batches by activity
 
-## 8. Rollout
+## 8. Docs and cleanup
 
-- [ ] 8.1 Run the pipeline with publishing paused on the 12 human-written-article Entities plus 38 more; compare against the articles and record fact error rate, draft rejection reasons, and cost
-- [ ] 8.2 Set the scoring threshold and budgets from those results
-- [ ] 8.3 Turn on publishing and start the backfill ordered by activity
-- [ ] 8.4 Review spot checks weekly for the first month
-
-## 9. Docs and cleanup
-
-- [ ] 9.1 Write `docs/features/entity-about.md` and link it from `CLAUDE.md`
-- [ ] 9.2 Add the Distillery and Brand history rule to `docs/architecture/whisky-identity-model.md`
-- [ ] 9.3 Drop `entity_event` after a release with no reads from it
-- [ ] 9.4 Trim `docs/research/catalog/2026-10-23-brora-about.md` to sources, traps, and unknowns once Brora's facts are stored
-- [ ] 9.5 Run full `pnpm test`, typechecks, and lint
+- [ ] 8.1 Write `docs/features/entity-about.md` and link it from `CLAUDE.md`
+- [ ] 8.2 Add the Distillery and Brand history rule to `docs/architecture/whisky-identity-model.md`
+- [ ] 8.3 Drop `entity_event` after a release with no reads from it
+- [ ] 8.4 Trim `docs/research/catalog/2026-10-23-brora-about.md` to sources, traps, and unknowns once Brora's facts are stored
+- [ ] 8.5 Run full `pnpm test`, typechecks, and lint

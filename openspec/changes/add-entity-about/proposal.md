@@ -30,11 +30,11 @@ live in code.
 - Add an **About** tab for distilleries and brands. A fixed template places a
   sourced lead, short sections, a timeline, key facts, owners, catalog charts,
   and numbered sources. Each part shows only when its data passes a minimum.
-- Add an automated **research and writing pipeline**: find sources, extract
-  facts with quotes, write short prose from accepted facts only, check it in
-  code and with a scoring model, then publish without approval.
-- Add safety nets that do not block publishing: member corrections, sampled
-  spot checks in the moderation Inbox, quality measures, and a pause switch.
+- Add one **`writeEntityAbout` job**: a single model call searches and reads
+  public pages and returns a document draft. Code checks that quotes appear on
+  pages read, that every sentence carries a fact, length, and banned phrases,
+  then publishes without approval. Runs happen when an administrator queues
+  them.
 - Show era context on Bottle pages, such as "Distilled during Brora's heavily
   peated years (1969–1973)."
 - Replace each Entity's unsourced generated description with its sourced lead
@@ -52,31 +52,27 @@ live in code.
 - `entity-about-pages`: The About tab, its template for distilleries and
   brands, catalog numbers, widget display rules, and era context on Bottle
   pages.
-- `entity-about-pipeline`: Automated research, fact extraction, writing,
-  quality checks, publishing, refresh, and measurement.
+- `entity-about-pipeline`: The job that writes About documents and the code
+  checks that guard what it publishes.
 
 ### Modified Capabilities
 
 - `entity-identity`: An Entity's description comes from its sourced About lead
   once one is published.
-- `moderation-workspace`: The Inbox includes About spot checks and conflicts
-  between automated updates and people's edits.
 
 ## Impact
 
-- **Database:** two new tables, `entity_about` (one document per Entity) and
-  `entity_about_run`, a new `change` object type, and a later drop of
-  `entity_event`. Generated with `pnpm db:generate`.
+- **Database:** one new table, `entity_about` (one document per Entity), a
+  new `change` object type, and a later drop of `entity_event`. Generated with `pnpm db:generate`.
 - **Server:** new routes under `apps/server/src/orpc/routes/entities/about/`
-  and catalog-number routes; a vintage filter on `bottles.list`; new worker
-  jobs; changes to `generateEntityDetails`.
+  and catalog-number routes; a vintage filter on `bottles.list`; one new
+  worker job; changes to `generateEntityDetails`.
 - **Web:** About tab, widgets in `apps/web/src/features/entityAbout/`, Bottle
   page era line, overview changes.
 - **Models and services:** web search and page fetching (the Firecrawl tooling
-  the classifier already uses) and the AI gateway. New model checks under
-  `pnpm evals`.
+  the classifier already uses) and the AI gateway. One model check
+  under `pnpm evals`.
 - **Docs:** new `docs/features/entity-about.md`; updates to
-  `docs/architecture/whisky-identity-model.md`, the `peated-writing` skill,
-  and a source-site audit in `docs/research/`.
-- **Operations:** cost limits, a pause switch, and a backfill ordered by
-  activity.
+  `docs/architecture/whisky-identity-model.md` and the `peated-writing`
+  skill.
+- **Operations:** an on/off switch and batches queued by activity.
