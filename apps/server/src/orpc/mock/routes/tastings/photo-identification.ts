@@ -99,7 +99,6 @@ export default mockOS.tastings.photoIdentification.handler(
         classification: {
           status: "classified",
           action: "match",
-          confidence: 0.96,
           reason: "Mock exact label match.",
         },
       },

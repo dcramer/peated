@@ -104,7 +104,6 @@ function buildPhotoResult(): PhotoIdentification {
       classification: {
         status: "classified",
         action: "create_bottle",
-        confidence: null,
         reason: null,
       },
     },
@@ -185,6 +184,19 @@ describe("photo create prefill", () => {
       caskNumber: "1234",
       maturation: "First-fill sherry butt",
       outturn: 612,
+    });
+  });
+
+  test("fills a new Bottle from the label facts a failed lookup streamed", () => {
+    // Only the label event arrived before the lookup failed.
+    const { imageEvidence } = buildPhotoResult();
+
+    expect(getCreateNameSeed({ imageEvidence })).toBe("");
+    expect(getCreateBottlePrefill({ imageEvidence })).toMatchObject({
+      brandId: null,
+      brandName: "Raw Label Brand",
+      category: "single_malt",
+      distillers: [{ id: null, name: "Qualified Existing Distillery Co." }],
     });
   });
 });

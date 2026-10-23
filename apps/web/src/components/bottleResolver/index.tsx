@@ -511,23 +511,28 @@ export default function BottleResolver({
   const createDecision = getCreateDecision(photoResult);
   const proposedName = getProposedName(photoResult);
   const defaultSearchHref = searchHrefForQuery();
-  const searchSeed = getSearchSeed(photoResult);
+  // A lookup that fails mid-stream keeps what it streamed: the photo, the
+  // label facts, and the likely matches (feature doc, Fallback Screen).
+  const labelReading =
+    photoResult ??
+    (photoProgress?.imageEvidence
+      ? { imageEvidence: photoProgress.imageEvidence }
+      : null);
+  const pendingImage =
+    photoResult?.pendingImage ?? photoProgress?.pendingImage ?? null;
   const wrongMatchId = wrongMatch?.id ?? null;
   const searchHref = searchHrefForQuery(
-    searchSeed,
-    photoResult?.pendingImage,
+    getSearchSeed(labelReading),
+    pendingImage,
     wrongMatchId,
   );
-  const createBottlePrefill = getCreateBottlePrefill(photoResult);
   const createBottleHref =
-    photoResult && createBottleHrefForResult
-      ? createBottleHrefForResult(
-          getCreateNameSeed(photoResult),
-          createBottlePrefill,
-          photoResult.pendingImage,
-          wrongMatchId,
-        )
-      : null;
+    createBottleHrefForResult?.(
+      getCreateNameSeed(labelReading),
+      getCreateBottlePrefill(labelReading),
+      pendingImage,
+      wrongMatchId,
+    ) ?? null;
   // The lookup's other candidates, streamed while it ran, minus the Bottle it
   // matched (or the member rejected).
   const suggestions = (photoProgress?.candidates ?? [])
@@ -615,14 +620,17 @@ export default function BottleResolver({
           <>
             <PhotoFallbackState
               alert
-              createBottleHref={createBottleHrefForResult?.("") ?? null}
-              onPickSuggestion={() => undefined}
+              createBottleHref={createBottleHref}
+              onPickSuggestion={(bottle) => {
+                void pickBottle(bottle);
+              }}
               onStartOver={startOver}
+              pickingBottleId={pickingBottleId}
               previewUrl={previewUrl}
               reason={photoError}
-              result={null}
-              searchHref={defaultSearchHref}
-              suggestions={[]}
+              result={labelReading}
+              searchHref={searchHref}
+              suggestions={suggestions}
             />
             {photoFailureTrace && (
               <PhotoIdentificationTraceFootnote

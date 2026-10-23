@@ -1325,6 +1325,23 @@ async function handleRpcRequest({ request, response, url }) {
         return true;
       }
 
+      if (getAccessToken(request).includes("photo-stream-outage")) {
+        // The lookup fails after it sent the label and a likely match.
+        sendRpcPhotoStream(
+          response,
+          buildNoMatchPhotoIdentification(),
+          "88888888888888888888888888888888",
+          [exactSearchBottle],
+          {
+            defined: true,
+            code: "SERVICE_UNAVAILABLE",
+            status: 503,
+            message: "We can't check photos right now.",
+          },
+        );
+        return true;
+      }
+
       if (getAccessToken(request).includes("photo-no-match")) {
         sendRpcPhotoStream(
           response,
@@ -1413,7 +1430,6 @@ async function handleRpcRequest({ request, response, url }) {
             classification: {
               status: "classified",
               action: "match",
-              confidence: 95,
               reason: "Matched the fixture bottle.",
             },
           },
@@ -2295,7 +2311,6 @@ function buildNoMatchPhotoIdentification() {
       classification: {
         status: "classified",
         action: "no_match",
-        confidence: 0,
         reason: "No existing Peated bottle matched the label details.",
       },
     },
@@ -2572,11 +2587,16 @@ function sendRpcResponse(response, data, sentryTraceId = null) {
  * photo, the label reading, any likely matches, then the full result as the
  * final `done` event.
  */
+/**
+ * Streams the photo, label, and likely-match events, then ends with the result,
+ * or with `error` (an oRPC error) in place of the result.
+ */
 function sendRpcPhotoStream(
   response,
   result,
   sentryTraceId = null,
   likelyMatches = [],
+  error = null,
 ) {
   const headers = {
     ...corsHeaders,
@@ -2595,7 +2615,7 @@ function sendRpcPhotoStream(
       (likelyMatches.length
         ? event("message", { type: "candidates", bottles: likelyMatches })
         : "") +
-      event("done", result),
+      (error ? event("error", error) : event("done", result)),
   );
 }
 

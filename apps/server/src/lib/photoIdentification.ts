@@ -418,7 +418,6 @@ function buildPhotoIdentificationDiagnostics({
       classification: {
         status: "ignored",
         action: null,
-        confidence: null,
         reason: classification.reason,
       },
     };
@@ -435,7 +434,6 @@ function buildPhotoIdentificationDiagnostics({
     classification: {
       status: "classified",
       action: classification.decision.action,
-      confidence: null,
       reason: classification.decision.rationale,
     },
   };
