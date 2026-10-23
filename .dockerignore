@@ -16,6 +16,7 @@
 **/.playwright
 
 # misc
+**/.claude/worktrees
 **/.DS_Store
 **/.env.local
 **/.env.development.local

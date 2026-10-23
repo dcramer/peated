@@ -6,3 +6,7 @@ migrations/
 __fixtures__/
 .agents/
 CLAUDE.md
+# Prettier reads only the root .gitignore; these are ignored in apps/web.
+.next/
+.playwright/
+next-env.d.ts
