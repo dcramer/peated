@@ -33,7 +33,7 @@ export function getEditionCaskNumberProblem({
     : null;
 }
 
-export type BottleTitleIdentity = {
+type BottleTitleIdentity = {
   brandId: number;
   seriesId: number | null;
   /** Brand plus the shared Bottle name, without the edition. */
@@ -68,16 +68,17 @@ function getSameTitleDifference(
 }
 
 /**
- * Finds a Bottle in another group with the same title and edition but a
- * different vintage or age. Nothing people see tells those Bottles apart, so
- * each name must carry its vintage or age. Members of one group share a name
- * by design, so `excludeGroupId` leaves the edited Bottle's group out.
+ * Returns an error message when a Bottle in another group has the same title
+ * and edition but a different vintage or age. Nothing people see tells those
+ * Bottles apart, so each name must carry its vintage or age. Members of one
+ * group share a name by design, so `excludeGroupId` leaves the edited
+ * Bottle's group out.
  */
-export async function findBottleWithSameTitle(
+export async function getSameTitleProblem(
   tx: AnyTransaction,
   identity: BottleTitleIdentity,
   excludeGroupId: number | null = null,
-): Promise<{ id: number; difference: SameTitleDifference } | null> {
+): Promise<string | null> {
   if (identity.vintageYear === null && identity.statedAge === null) {
     return null;
   }
@@ -108,16 +109,9 @@ export async function findBottleWithSameTitle(
 
   for (const row of rows) {
     const difference = getSameTitleDifference(identity, row);
-    if (difference) return { id: row.id, difference };
+    if (difference) {
+      return `Bottle ${row.id} is also named "${identity.titleFullName}" with a different ${difference}. Add each Bottle's ${difference} to its name.`;
+    }
   }
   return null;
-}
-
-export function formatSameTitleProblem(
-  titleFullName: string,
-  conflict: { id: number; difference: SameTitleDifference },
-) {
-  return conflict.difference === "vintage"
-    ? `Bottle ${conflict.id} is also named "${titleFullName}" with a different vintage. Add each Bottle's vintage to its name.`
-    : `Bottle ${conflict.id} is also named "${titleFullName}" with a different age. Add each Bottle's age to its name.`;
 }

@@ -5,6 +5,7 @@ import {
   entities,
 } from "@peated/server/db/schema";
 import { sql } from "drizzle-orm";
+import type { SelectResultFields } from "drizzle-orm/query-builders/select.types";
 
 /**
  * Columns `formatBottleDisplayName` needs, for a query that selects from
@@ -32,20 +33,7 @@ export const bottleDisplayNameColumns = {
   >`(SELECT ${bottleGroups.name} FROM ${bottleGroups} WHERE ${bottleGroups.id} = ${bottles.groupId})`,
 };
 
-type BottleDisplayNameRow = {
-  name: string;
-  edition: string | null;
-  statedAge: number | null;
-  vintageYear: number | null;
-  releaseYear: number | null;
-  abv: number | null;
-  singleCask: boolean | null;
-  caskStrength: boolean | null;
-  brandName: string;
-  brandShortName: string | null;
-  seriesName: string | null;
-  groupName: string | null;
-};
+type BottleDisplayNameRow = SelectResultFields<typeof bottleDisplayNameColumns>;
 
 /** Shapes `bottleDisplayNameColumns` for `BottleDisplayNameSourceSchema`. */
 export function toBottleDisplayNameSource({

@@ -221,6 +221,26 @@ describe("toBottleListItem", () => {
     ).toEqual([]);
   });
 
+  test("shows the edition in place of the vintage, beside the release year", () => {
+    const releaseBottle = {
+      ...mockBottle,
+      releaseYear: 2026,
+      vintageYear: 1988,
+      statedAge: null,
+      noAgeStatement: null,
+      abv: null,
+    };
+
+    expect(toBottleListItem(releaseBottle).metadata).toEqual([
+      "1988 vintage",
+      "2026 release",
+    ]);
+    expect(
+      toBottleListItem({ ...releaseBottle, edition: "for La Maison du Whisky" })
+        .metadata,
+    ).toEqual(["for La Maison du Whisky", "2026 release"]);
+  });
+
   test("uses only known release facts without manufacturing missing dates or ages", () => {
     expect(
       toBottleListItem({

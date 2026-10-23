@@ -1,13 +1,7 @@
-import {
-  formatAbv,
-  isBatchEdition,
-} from "@peated/server/lib/bottleDisplayName";
+import { formatAbv, nameIncludes } from "@peated/server/lib/bottleDisplayName";
 import { formatCategoryName } from "@peated/server/lib/format";
 import type { Bottle } from "@peated/server/types";
-import type {
-  KeyFact,
-  KeyFactList,
-} from "@peated/web/components/catalogDetails.stylex";
+import type { KeyFact } from "@peated/web/components/catalogDetails.stylex";
 
 type BottleHeaderSpecs = Pick<
   Bottle,
@@ -22,19 +16,19 @@ type BottleHeaderSpecs = Pick<
   | "vintageYear"
 > & { series: { name: string } | null };
 
+// `Batch 24`, `Batch No. 24`, or `Batch Number 24`; the rest is the batch.
+const BATCH_PREFIX = /^batch(?:\s+(?:no\.?|number))?\s+(?=\S)/iu;
+
 function getReleaseMarkerFact(bottle: BottleHeaderSpecs): KeyFact | null {
-  if (bottle.edition && isBatchEdition(bottle.edition)) {
-    return {
-      label: "Batch",
-      value: bottle.edition.replace(/^batch(?:\s+(?:no\.?|number))?\s+/iu, ""),
-    };
+  if (bottle.edition && BATCH_PREFIX.test(bottle.edition)) {
+    return { label: "Batch", value: bottle.edition.replace(BATCH_PREFIX, "") };
   }
   return bottle.caskNumber ? { label: "Cask", value: bottle.caskNumber } : null;
 }
 
 // A selection or other worded edition, such as `for La Maison du Whisky`.
 function getEditionFact(bottle: BottleHeaderSpecs): KeyFact | null {
-  return bottle.edition && !isBatchEdition(bottle.edition)
+  return bottle.edition && !BATCH_PREFIX.test(bottle.edition)
     ? { label: "Edition", value: bottle.edition, text: true }
     : null;
 }
@@ -67,16 +61,10 @@ function getAgeFact(bottle: BottleHeaderSpecs, name: string): KeyFact | null {
     : { label: "Age", value: `${bottle.statedAge} years` };
 }
 
-// Whole words only, so `12` is not found in `120`. A wrong match only drops
-// or moves one header fact, so this stays simple.
-function nameIncludes(name: string, text: string) {
-  const escaped = text
-    .replace(/^(?:cask\s*)?(?:no\.?|#)?\s*(?=\d)/iu, "")
-    .replace(/[.*+?^${}()|[\]\\]/gu, "\\$&");
-  return new RegExp(
-    `(?:^|[^\\p{L}\\p{N}])${escaped}(?![\\p{L}\\p{N}])`,
-    "iu",
-  ).test(name);
+// A cask value may keep a `Cask No.` or `#` marker the name leaves out. A
+// wrong match only drops or moves one header fact, so this stays simple.
+function removeCaskMarker(value: string) {
+  return value.replace(/^(?:cask\s*)?(?:no\.?|#)?\s*(?=\d)/iu, "");
 }
 
 /**
@@ -90,18 +78,18 @@ function nameIncludes(name: string, text: string) {
 export function getBottleHeaderSpecs(
   bottle: BottleHeaderSpecs,
   name: string,
-): KeyFactList | null {
+): readonly KeyFact[] | null {
   const releaseMarker = getReleaseMarkerFact(bottle);
   const edition = getEditionFact(bottle);
   const year = getYearFact(bottle);
   const inName = (fact: KeyFact | null) =>
-    fact !== null && nameIncludes(name, String(fact.value));
+    fact !== null && nameIncludes(name, removeCaskMarker(String(fact.value)));
   const abv =
     bottle.abv === null ? null : { label: "ABV", value: formatAbv(bottle.abv) };
   const series = bottle.series
     ? { label: "Series", value: bottle.series.name, text: true }
     : null;
-  const [first, second, third] = [
+  const facts = [
     inName(series) ? null : series,
     inName(abv) ? null : abv,
     getAgeFact(bottle, name),
@@ -114,10 +102,9 @@ export function getBottleHeaderSpecs(
     inName(edition) ? edition : null,
     inName(year) ? year : null,
     inName(releaseMarker) ? releaseMarker : null,
-  ].filter((fact): fact is KeyFact => fact !== null);
+  ]
+    .filter((fact): fact is KeyFact => fact !== null)
+    .slice(0, 3);
 
-  if (!first) return null;
-  if (!second) return [first];
-  if (!third) return [first, second];
-  return [first, second, third];
+  return facts.length ? facts : null;
 }

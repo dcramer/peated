@@ -277,8 +277,7 @@ Use inside prose, notifications, narrow activity items, controls, or other
 places that cannot support a metadata row.
 
 - Produce a recognizable marketed label, not a field inventory.
-- Use the expression; omit the edition when the surface has no supporting
-  metadata.
+- Use the expression. Never include the edition.
 - Include series when it is essential to recognizing the product and is not
   already represented; secondary context may otherwise be omitted.
 - Keep ABV after the name when known.
@@ -324,15 +323,20 @@ Open Graph metadata, share text, accessible labels, and some exports.
 - Produce a readable marketed identity rather than serializing every exact
   field.
 - Include producer, nonduplicative series, and expression.
-- Omit the edition unless the text must distinguish releases that otherwise
-  have the same name.
+- Never include the edition. `formatBottleLabel` builds this text from
+  `formatBottleDisplayName`, which leaves the edition out.
 - Include a year only when it is a necessary part of that marketed identity.
 - Omit generic single-cask and cask-strength flags.
 - Include ABV when known.
 - Do not assume the stored `fullName` is the ideal text for every consumer.
 
+Releases that share a name get the same text, apart from ABV when their
+strengths differ. Plain text does not try to tell them apart further: each
+Bottle keeps its own page and URL, which carries its numeric ID, and the page
+header and rows show the edition as a fact.
+
 Family-level SEO uses the shared expression identity. Exact Bottle SEO uses the
-exact release identity.
+same plain-text label: brand, series, expression, and ABV.
 
 ### Verification and details
 
@@ -361,7 +365,7 @@ particular result component omits some of them visually.
 | Bottler             | When distinct and useful | Optional         | Rarely             | Context supplies | When needed       | Yes          |
 | Series              | First key fact           | First provenance | When essential     | Context supplies | If nonduplicative | Yes          |
 | Expression          | Primary                  | Primary          | Primary            | Context supplies | Primary           | Yes          |
-| Edition             | Key fact                 | Metadata         | No                 | Primary          | Conditional       | Yes          |
+| Edition             | Key fact                 | Metadata         | No                 | Primary          | No                | Yes          |
 | Stated age          | Once                     | Optional         | Only when integral | Exact override   | If integral       | Yes          |
 | ABV                 | Yes when known           | Yes when known   | Yes when known     | Optional support | Yes when known    | Yes          |
 | Distillation year   | Conditional              | Conditional      | Rarely             | When useful      | Conditional       | Yes          |

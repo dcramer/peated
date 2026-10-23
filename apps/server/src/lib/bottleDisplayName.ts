@@ -34,31 +34,16 @@ export function formatAbv(abv: number) {
   return `${abv.toFixed(1).replace(/\.0$/u, "")}%`;
 }
 
-function includesIdentityText(value: string, candidate: string) {
-  return value.toLocaleLowerCase().includes(candidate.toLocaleLowerCase());
-}
-
-export function isBatchEdition(edition: string | null | undefined) {
-  return edition
-    ? /^batch(?:\s+(?:no\.?|number))?\s+\S/iu.test(edition)
-    : false;
-}
-
-/** Returns an exact release fact that belongs beside, rather than inside, the title. */
-export function getBottleReleaseMetadata(
-  bottle: Pick<
-    BottleDisplayNameSource,
-    "edition" | "releaseYear" | "vintageYear"
-  >,
-) {
-  if (bottle.edition) return bottle.edition;
-  if (bottle.vintageYear !== null && bottle.vintageYear !== undefined) {
-    return `${bottle.vintageYear} vintage`;
-  }
-  if (bottle.releaseYear !== null && bottle.releaseYear !== undefined) {
-    return `${bottle.releaseYear} release`;
-  }
-  return null;
+/**
+ * Bottle Presentation: a name that already shows a fact does not repeat it.
+ * Matches whole words, ignoring case, so `12` is not found in `120`.
+ */
+export function nameIncludes(name: string, text: string) {
+  const escaped = text.replace(/[.*+?^${}()|[\]\\]/gu, "\\$&");
+  return new RegExp(
+    `(?<![\\p{L}\\p{N}])${escaped}(?![\\p{L}\\p{N}])`,
+    "iu",
+  ).test(name);
 }
 
 // Stored Bottle names end in ` - <edition>` (formatCanonicalBottleName).
@@ -122,7 +107,7 @@ export function formatBottleDisplayName(
   const expressionName = getExpressionName(bottle);
   const brandName = bottle.brand.shortName || bottle.brand.name;
   const seriesName =
-    bottle.series && !includesIdentityText(expressionName, bottle.series.name)
+    bottle.series && !nameIncludes(expressionName, bottle.series.name)
       ? bottle.series.name
       : null;
 
@@ -144,7 +129,7 @@ export function appendAbv(name: string, abv: number | null | undefined) {
   if (abv === null || abv === undefined) return name;
 
   const abvText = formatAbv(abv);
-  return includesIdentityText(name, abvText) ? name : `${name} · ${abvText}`;
+  return nameIncludes(name, abvText) ? name : `${name} · ${abvText}`;
 }
 
 /** Formats the bottle name with its ABV; see `appendAbv`. */

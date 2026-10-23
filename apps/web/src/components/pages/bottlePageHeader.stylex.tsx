@@ -7,7 +7,7 @@ import { AppLink } from "@peated/web/components/appLink";
 import {
   KeyFacts,
   hasVisibleKeyFacts,
-  type KeyFactList,
+  type KeyFact,
 } from "@peated/web/components/catalogDetails.stylex";
 import { EntityLinks } from "@peated/web/components/entityLinks";
 import type { BottleRatingSummaryProps } from "@peated/web/components/scoring.stylex";
@@ -34,7 +34,7 @@ export type BottlePageHeaderProps = {
   /** Links the name to the bottle page when the header appears on another page. */
   nameHref?: string;
   rating?: BottleRatingSummaryProps | null;
-  specs?: KeyFactList | null;
+  specs?: readonly KeyFact[] | null;
 };
 
 /**
@@ -90,9 +90,7 @@ export function BottlePageHeader({
         actions={actions}
         actionsPosition="start"
         facts={
-          specs && hasVisibleKeyFacts(specs) ? (
-            <KeyFacts facts={specs} inline />
-          ) : null
+          specs && hasVisibleKeyFacts(specs) ? <KeyFacts facts={specs} /> : null
         }
         metadata={metadata}
         menu={menu}

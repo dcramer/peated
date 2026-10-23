@@ -2,7 +2,7 @@ import {
   formatAbv,
   formatBottleDisplayName,
   formatBottleLabel,
-  getBottleReleaseMetadata,
+  nameIncludes,
   type BottleDisplayNameSource,
 } from "@peated/server/lib/bottleDisplayName";
 import type { Outputs } from "@peated/server/orpc/router";
@@ -33,13 +33,6 @@ export type BottleIdentitySource = Omit<BottleDisplayNameSource, "series"> & {
   series?: { name: string; id?: number; fullName?: string } | null;
 } & Pick<Bottle, "abv" | "noAgeStatement" | "statedAge"> &
   Partial<Pick<Bottle, "bottler" | "distillers">>;
-
-// Whole numbers only, so `1982` is not found in `19821`.
-function nameIncludesYear(name: string, year: number) {
-  return new RegExp(`(?<![\\p{L}\\p{N}])${year}(?![\\p{L}\\p{N}])`, "u").test(
-    name,
-  );
-}
 
 /** Selection controls own navigation; bottle content must not contain nested links. */
 export function toBottlePickerOption(
@@ -81,20 +74,13 @@ export function getBottleIdentityProps(
   const series =
     seriesPlacement === "provenance" &&
     bottle.series &&
-    !name.toLocaleLowerCase().includes(bottle.series.name.toLocaleLowerCase())
+    !nameIncludes(name, bottle.series.name)
       ? bottle.series
       : null;
   // Bottle Presentation: a year the name already prints is not repeated.
   const yearNotInName = (year: number | null | undefined) =>
-    year != null && !nameIncludesYear(name, year);
-  const releaseFact =
-    bottle.edition || yearNotInName(bottle.vintageYear ?? bottle.releaseYear)
-      ? getBottleReleaseMetadata(bottle)
-      : null;
+    year != null && !nameIncludes(name, String(year));
   const abv = bottle.abv !== null ? formatAbv(bottle.abv) : null;
-  const releaseYear = yearNotInName(bottle.releaseYear)
-    ? `${bottle.releaseYear} release`
-    : null;
   const distillers = bottle.distillers ?? [];
   const distillerProvenance =
     distillers.length > 3
@@ -142,8 +128,14 @@ export function getBottleIdentityProps(
         : []),
     ],
     metadata: [
-      releaseFact !== releaseYear ? releaseFact : null,
-      releaseYear,
+      // The edition is the more exact release fact, so it takes the vintage's place.
+      bottle.edition ||
+        (yearNotInName(bottle.vintageYear)
+          ? `${bottle.vintageYear} vintage`
+          : null),
+      yearNotInName(bottle.releaseYear)
+        ? `${bottle.releaseYear} release`
+        : null,
       bottle.statedAge !== null
         ? `${bottle.statedAge} years`
         : bottle.noAgeStatement

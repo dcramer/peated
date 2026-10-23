@@ -20,7 +20,7 @@ const meta = {
         imageUrl: BottleImage.src,
         bottle: {
           name: "Lagavulin 16-year-old",
-          metadata: ["16 years", "43% ABV"],
+          metadata: ["16 years", "43%"],
         },
         ratingBand: "outstanding",
         tags: ["Smoke", "Dried fruit", "Sea salt"],
@@ -77,7 +77,7 @@ export const Overview: Story = {
                 href: "/bottles/lagavulin-16",
                 bottle: {
                   name: "Lagavulin 16-year-old",
-                  metadata: ["16 years", "43% ABV"],
+                  metadata: ["16 years", "43%"],
                 },
                 ratingBand: "outstanding",
               },
@@ -99,7 +99,7 @@ export const LongNotes: Story = {
         href: "/bottles/lagavulin-16",
         bottle: {
           name: "Lagavulin 16-year-old",
-          metadata: ["16 years", "43% ABV"],
+          metadata: ["16 years", "43%"],
         },
         ratingBand: "outstanding",
         tags: ["Smoke", "Dried fruit", "Sea salt"],

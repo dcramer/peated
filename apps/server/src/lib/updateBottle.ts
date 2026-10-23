@@ -2,8 +2,6 @@
  * Transactional moderator editing for Bottles. Shared patches fan out
  * durable member Bottle materialization; exact patches remain isolated.
  */
-// TODO(dcramer): Rename this module's BottleUpdate symbols now that
-// the Bottle/BottleRelease distinction is retired.
 import { ORPCError } from "@orpc/server";
 import {
   bottleNameDuplicatesBrand,
@@ -42,9 +40,8 @@ import {
   materializeBottleForGroup,
 } from "@peated/server/lib/bottleIdentity";
 import {
-  findBottleWithSameTitle,
-  formatSameTitleProblem,
   getEditionCaskNumberProblem,
+  getSameTitleProblem,
 } from "@peated/server/lib/bottleNamingRules";
 import { isValidReleaseDate } from "@peated/server/lib/bottleRelease";
 import {
@@ -75,7 +72,6 @@ import { and, asc, eq, inArray, isNull, ne, sql } from "drizzle-orm";
 import { z } from "zod";
 
 export { BottlePatchSchema } from "@peated/server/lib/bottleSchemas";
-export type { BottlePatch } from "@peated/server/lib/bottleSchemas";
 
 type SharedPatch = Partial<
   Pick<
@@ -1065,7 +1061,7 @@ async function assertBottleNamingRules(
   });
   for (const member of checkedMembers) {
     const desired = desiredByBottleId.get(member.id)!;
-    const conflict = await findBottleWithSameTitle(
+    const problem = await getSameTitleProblem(
       tx,
       {
         brandId: stable.brandId,
@@ -1079,11 +1075,7 @@ async function assertBottleNamingRules(
       // and their facts show beside the title. Compare only other groups.
       group.id,
     );
-    if (conflict) {
-      throw new BottleUpdateInputError(
-        formatSameTitleProblem(stable.fullName, conflict),
-      );
-    }
+    if (problem) throw new BottleUpdateInputError(problem);
   }
 }
 

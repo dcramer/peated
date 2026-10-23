@@ -560,7 +560,7 @@ export function BottleOverviewClient() {
   );
 }
 
-export function useBottlePage() {
+function useBottlePage() {
   const bottle = useContext(BottlePageContext);
   if (!bottle) throw new Error("Bottle page content requires its route frame");
   return bottle;

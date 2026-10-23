@@ -9,7 +9,7 @@ const items: BottleListProps["items"] = [
     href: "/bottles/1",
     id: "1",
     imageUrl: BottleImage.src,
-    metadata: ["Single Malt", "10 years", "46% ABV"],
+    metadata: ["10 years", "46%"],
     name: "Port Charlotte 10-year-old",
     ratings: {
       maxScore: 94,
@@ -29,7 +29,7 @@ const items: BottleListProps["items"] = [
   {
     href: "/bottles/2",
     id: "2",
-    metadata: ["Single Malt", "NAS", "54.2%"],
+    metadata: ["NAS", "54.2%"],
     name: "Ardbeg Uigeadail",
     ratings: {
       maxScore: 97,
@@ -49,7 +49,7 @@ const items: BottleListProps["items"] = [
   {
     href: "/bottles/3",
     id: "3",
-    metadata: ["Single Malt", "12 years", "43% ABV"],
+    metadata: ["12 years", "43%"],
     name: "Caol Ila 12-year-old",
     ratings: {
       raterCount: 4,
@@ -62,7 +62,7 @@ const items: BottleListProps["items"] = [
     id: "4",
     metadata: ["2026 release", "15 years", "51.4%"],
     name: "A deliberately long independent bottle name that tests the shared row",
-    subtitle: "Highland · Single Malt",
+    provenance: [{ name: "Glen Garioch" }],
   },
 ];
 
