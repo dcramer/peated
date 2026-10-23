@@ -27,6 +27,13 @@ function normalizeStatedValue(value: string) {
   return value.trim().toLowerCase().replace(/\s+/g, " ");
 }
 
+/** Values that differ only in precision, such as 1983 and 1983-03, agree. */
+export function valuesAgree(left: string, right: string) {
+  const a = normalizeStatedValue(left);
+  const b = normalizeStatedValue(right);
+  return a.startsWith(b) || b.startsWith(a);
+}
+
 /** Returns every stated value and its sources when citations disagree. */
 export function getDisagreement(citations: readonly AboutCitation[]) {
   const byValue = new Map<string, { value: string; sourceIds: string[] }>();
@@ -42,13 +49,9 @@ export function getDisagreement(citations: readonly AboutCitation[]) {
     }
     byValue.set(key, entry);
   }
-  // Values that differ only in precision, such as 1983 and 1983-03, agree.
   const keys = [...byValue.keys()];
   const conflicting = keys.some((left) =>
-    keys.some(
-      (right) =>
-        left !== right && !left.startsWith(right) && !right.startsWith(left),
-    ),
+    keys.some((right) => !valuesAgree(left, right)),
   );
   return conflicting ? { values: [...byValue.values()] } : null;
 }

@@ -11,6 +11,7 @@ import {
   getSystemActorForDatabase,
 } from "@peated/server/lib/actors";
 import { reviewAboutDraft } from "@peated/server/lib/entityAbout/checks";
+import { isFactShown } from "@peated/server/lib/entityAbout/display";
 import { mergePipelineDraft } from "@peated/server/lib/entityAbout/document";
 import { toPublicEntityAbout } from "@peated/server/lib/entityAbout/publicAbout";
 import {
@@ -19,7 +20,7 @@ import {
 } from "@peated/server/lib/entityAbout/store";
 import { logWarn } from "@peated/server/lib/log";
 import type { JobPayload } from "@peated/server/worker/types";
-import { eq } from "drizzle-orm";
+import { eq, inArray } from "drizzle-orm";
 import { z } from "zod";
 
 export const WriteEntityAboutJobArgsSchema = z
@@ -40,6 +41,44 @@ const defaultServices: WriteEntityAboutServices = {
   writer: runEntityAboutWriter,
   now: () => new Date(),
 };
+
+/**
+ * Lists stored history the page cannot show yet, so the writer can look for
+ * sources. A matching event in the draft adds its citations to the stored
+ * one (see `mergePipelineDraft`).
+ */
+async function describeUnsourcedHistory(entityId: number) {
+  const stored = await getEntityAbout(db, entityId);
+  if (!stored) return [];
+  const { events, sources } = stored.document;
+  const hidden = events.filter(
+    (event) => !isFactShown(event.citations, sources),
+  );
+  const ownerIds = hidden.flatMap((event) =>
+    event.newOwnerId ? [event.newOwnerId] : [],
+  );
+  const owners = new Map(
+    ownerIds.length
+      ? (
+          await db
+            .select({ id: entities.id, name: entities.name })
+            .from(entities)
+            .where(inArray(entities.id, ownerIds))
+        ).map((row) => [row.id, row.name])
+      : [],
+  );
+  return hidden.map((event) => {
+    const owner = event.newOwnerId
+      ? owners.get(event.newOwnerId)
+      : event.newOwnerName;
+    const details = [
+      event.name ? `name ${event.name}` : null,
+      owner ? `new owner ${owner}` : null,
+      event.text?.slice(0, 300),
+    ].filter(Boolean);
+    return `${event.kind}, ${event.date}${details.length ? `: ${details.join("; ")}` : ""}`;
+  });
+}
 
 export type WriteEntityAboutResult =
   | { status: "disabled" | "skipped" }
@@ -69,6 +108,7 @@ export async function writeEntityAbout(
     .select({ name: entityAliases.name })
     .from(entityAliases)
     .where(eq(entityAliases.entityId, entity.id));
+  const unsourcedHistory = await describeUnsourcedHistory(entity.id);
 
   let errors: string[] = [];
   let accepted = null;
@@ -85,6 +125,7 @@ export async function writeEntityAbout(
       owner: entity.owner?.name ?? null,
       yearEstablished: entity.yearEstablished,
       website: entity.website,
+      unsourcedHistory,
       previousErrors: errors,
     });
     const now = services.now().toISOString();

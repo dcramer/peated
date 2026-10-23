@@ -40,8 +40,11 @@ live in code.
   them.
 - Show era context on Bottle pages, such as "Distilled during Brora's heavily
   peated years (1969–1973)."
-- Replace each Entity's unsourced generated description with its sourced lead
-  once one exists. `generateEntityDetails` stops writing descriptions.
+- Replace each Entity's unsourced generated description with its sourced lead.
+  After the writer covers every Distillery and Brand, clear the generated
+  descriptions still left. `generateEntityDetails` stops writing descriptions.
+- Source legacy history in the same run: the writer checks each unsourced
+  event, and history nobody can source stays stored but hidden.
 - Move the Brora proof of concept from a code file to stored data and delete
   the code file.
 

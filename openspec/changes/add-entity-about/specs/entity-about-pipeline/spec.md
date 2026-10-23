@@ -94,6 +94,27 @@ Bottles.
 - **WHEN** a moderator corrected an event's year and the job runs again
 - **THEN** the corrected event is kept as the moderator wrote it
 
+### Requirement: Stored history is sourced or stays hidden
+
+The job SHALL give the writer each stored event that the page cannot show, as
+a lead to check, not as evidence. When a draft event has the same kind as a
+kept event (one a person wrote, or one with no citations) and their dates
+agree, the job SHALL add the draft's citations to the kept event and SHALL NOT
+change its date or text. Kept events nobody can source SHALL stay stored and
+hidden.
+
+#### Scenario: Legacy event sourced
+
+- **WHEN** an Entity has a legacy "opened 1819" event with no source and the
+  draft cites a page for opening in 1819
+- **THEN** the legacy event gains that citation and is shown, and no second
+  opening event is added
+
+#### Scenario: Legacy event with no source found
+
+- **WHEN** the draft has no event matching a legacy event with no source
+- **THEN** the legacy event stays stored and hidden
+
 ### Requirement: Runs happen on request
 
 The job SHALL run when an administrator queues it for one Entity or for a

@@ -24,7 +24,10 @@ Decisions already made:
   typed field list in code. Schema changes should be rare and backward
   compatible.
 - Entity history moves from `entity_event` into the document.
-- Unsourced descriptions are replaced as sourced leads are published.
+- Unsourced descriptions are replaced as sourced leads are published. Those
+  left after the full run are cleared. Descriptions a person wrote stay.
+- All shown history needs a source. Legacy history is sourced by the same
+  run; what nobody can source stays stored but hidden.
 
 Constraints come from `CLAUDE.md` (record evidence, never present guesses as
 facts), `docs/policies/agent-design.md`, `docs/policies/background-work.md`,
@@ -242,6 +245,10 @@ that the pick is one of the stated values.
      replace items the pipeline wrote.
    - Save with a version check and record the change.
    - Update the Entity description from the lead unless a person wrote it.
+   - A draft event that matches a kept event (a person's, or one with no
+     citations; same kind, dates that agree) adds its citations to that
+     event. The writer's input lists stored events the page cannot show, as
+     leads to check.
 
 The job writes as a new system actor, `aboutPipeline`. It never changes the
 Entity's name, kind, owner, status, or Bottles.

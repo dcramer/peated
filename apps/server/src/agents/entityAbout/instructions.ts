@@ -123,6 +123,8 @@ export type EntityAboutWriterInput = {
   owner: string | null;
   yearEstablished: number | null;
   website: string | null;
+  /** Stored history items that no shown source supports yet. */
+  unsourcedHistory: string[];
   previousErrors?: string[];
 };
 
@@ -140,6 +142,13 @@ export function buildEntityAboutInput(input: EntityAboutWriterInput) {
     input.website ? `Website in Peated: ${input.website}` : null,
     "Peated's fields above help you find the right producer. They are not evidence; cite pages for every fact.",
   ];
+  if (input.unsourcedHistory.length) {
+    lines.push(
+      "",
+      "Peated has these history items without a source. They are leads, not evidence. When a page you read supports one, include it as an event with the same kind and a date that agrees. Leave out any you cannot support.",
+      ...input.unsourcedHistory.map((item) => `- ${item}`),
+    );
+  }
   if (input.previousErrors?.length) {
     lines.push(
       "",
