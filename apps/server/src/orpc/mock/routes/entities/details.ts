@@ -1,4 +1,8 @@
-import { mockEntities } from "@peated/server/orpc/mock/fixtures";
+import { hasEntityAboutPage } from "@peated/server/lib/entityAbout/display";
+import {
+  mockEntities,
+  mockEntityAbouts,
+} from "@peated/server/orpc/mock/fixtures";
 import { mockOS } from "@peated/server/orpc/mock/implementer";
 
 export default mockOS.entities.details.handler(async ({ input, errors }) => {
@@ -9,5 +13,10 @@ export default mockOS.entities.details.handler(async ({ input, errors }) => {
     throw errors.NOT_FOUND({ message: "Mock entity not found." });
   }
 
-  return { ...entity, images: [], isFollowing: false };
+  return {
+    ...entity,
+    images: [],
+    isFollowing: false,
+    hasAbout: hasEntityAboutPage(mockEntityAbouts.get(entity.id) ?? null),
+  };
 });

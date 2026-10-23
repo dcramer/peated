@@ -1,4 +1,4 @@
-import { db, type AnyDatabase } from "@peated/server/db";
+import { db, type AnyDatabase, type AnyTransaction } from "@peated/server/db";
 import {
   bottleGroupDistillers,
   bottleGroups,
@@ -12,6 +12,7 @@ import {
   entityImages,
   entityReferences,
   entityTombstones,
+  type Actor,
 } from "@peated/server/db/schema";
 import {
   getPeatedSystemActorForDatabase,
@@ -24,6 +25,14 @@ import {
 import { findSeriesIdByName } from "@peated/server/lib/bottleHelpers";
 import { getMovedBottleIdentity } from "@peated/server/lib/bottleIdentity";
 import type { SystemBottlePatch } from "@peated/server/lib/bottleSchemas";
+import {
+  mergeEntityAboutDocuments,
+  pruneSources,
+} from "@peated/server/lib/entityAbout/document";
+import {
+  getEntityAbout,
+  saveEntityAbout,
+} from "@peated/server/lib/entityAbout/store";
 import { moveEntityAliases } from "@peated/server/lib/entityAliases";
 import {
   EntityMergeOperationExecutionError,
@@ -802,6 +811,13 @@ async function performEntityMerge({
       .set({ newOwnerId: toEntity.id })
       .where(inArray(entityEvents.newOwnerId, fromEntityIds));
 
+    await mergeEntityAbout(tx, {
+      toEntity: { ...toEntity, kind: destinationKind },
+      fromEntityIds,
+      mergedEntityIds: mergedEntityIdList,
+      actor,
+    });
+
     for (const sourceSeries of sourceSeriesRows) {
       const targetFullName = `${toEntity.name} ${sourceSeries.name}`;
       const [targetSeries] = await tx
@@ -949,6 +965,69 @@ async function performEntityMerge({
   }
 
   return completedOperationResult;
+}
+
+/**
+ * Entity merge rule for About documents: the destination absorbs each merged
+ * Entity's history, site facts, and sources, and keeps its own prose. Both
+ * documents are saved to change history before the merged rows are removed.
+ */
+async function mergeEntityAbout(
+  tx: AnyTransaction,
+  {
+    toEntity,
+    fromEntityIds,
+    mergedEntityIds,
+    actor,
+  }: {
+    toEntity: { id: number; name: string; kind: EntityKind };
+    fromEntityIds: readonly number[];
+    mergedEntityIds: readonly number[];
+    actor: Actor;
+  },
+) {
+  const sources = [];
+  for (const entityId of fromEntityIds) {
+    const about = await getEntityAbout(tx, entityId, { forUpdate: true });
+    if (about) sources.push(about);
+  }
+  if (!sources.length) return;
+
+  const destination = await getEntityAbout(tx, toEntity.id);
+  let document = destination?.document ?? null;
+  for (const source of sources) {
+    document = mergeEntityAboutDocuments(document, source.document);
+  }
+  if (!document) return;
+
+  const merged = new Set(mergedEntityIds);
+  const removedEvents = new Set(
+    document.events
+      // An owner cannot acquire itself once both are one Entity.
+      .filter((event) => event.newOwnerId && merged.has(event.newOwnerId))
+      .map((event) => `event:${event.id}`),
+  );
+  document = pruneSources({
+    ...document,
+    events: document.events.filter(
+      (event) => !removedEvents.has(`event:${event.id}`),
+    ),
+    sections: document.sections.flatMap((section) => {
+      const sentences = section.sentences.filter((sentence) =>
+        sentence.factIds.every((id) => !removedEvents.has(id)),
+      );
+      return sentences.length ? [{ ...section, sentences }] : [];
+    }),
+  });
+
+  await saveEntityAbout(tx, {
+    entity: toEntity,
+    document,
+    expectedVersion: destination?.version ?? null,
+    actor,
+    // Moving history is not new writing; legacy items keep their state.
+    unchangedFrom: document,
+  });
 }
 
 export default async function mergeEntity(rawInput: JobPayload) {

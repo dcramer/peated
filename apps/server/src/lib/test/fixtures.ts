@@ -37,6 +37,14 @@ import {
 } from "@peated/server/db/schema";
 import { generateOAuthClientId } from "@peated/server/lib/oauth";
 import { generatePublicId } from "@peated/server/lib/publicId";
+import {
+  ENTITY_ABOUT_SCHEMA_VERSION,
+  EntityAboutDocumentSchema,
+  type AboutEvent,
+  type AboutSection,
+  type AboutSource,
+  type EntityAboutDocument,
+} from "@peated/server/schemas/entityAbout";
 import slugify from "@sindresorhus/slugify";
 import { and, eq, inArray, or, sql } from "drizzle-orm";
 import { readFile } from "fs/promises";
@@ -462,6 +470,70 @@ export const EntityEvent = async (
     })
     .returning();
   if (!result) throw new Error("Unable to create EntityEvent fixture");
+  return result;
+};
+
+type AboutEventFixture = Partial<AboutEvent> & Pick<AboutEvent, "id">;
+
+/**
+ * Stores an About document. Events and sources take short partial objects;
+ * a cited event uses the fixture source unless it lists its own citations.
+ */
+export const EntityAbout = async (
+  {
+    entityId,
+    events = [],
+    sources,
+    siteFacts = {},
+    sections = [],
+    status = "published",
+    version = 1,
+  }: {
+    entityId?: number;
+    events?: AboutEventFixture[];
+    sources?: AboutSource[];
+    siteFacts?: EntityAboutDocument["siteFacts"];
+    sections?: AboutSection[];
+    status?: "published" | "hidden";
+    version?: number;
+  } = {},
+  db: AnyDatabase = dbConn,
+): Promise<dbSchema.EntityAboutRecord> => {
+  const id = entityId ?? (await Entity({}, db)).id;
+  const fixtureSources: AboutSource[] = sources ?? [
+    {
+      id: "s1",
+      url: "https://example.com/history",
+      title: "History",
+      publisher: "Example",
+      publishedOn: null,
+      kind: "reference",
+      status: "available",
+    },
+  ];
+  const document = EntityAboutDocumentSchema.parse({
+    sources: fixtureSources,
+    events: events.map((event) => ({
+      kind: "closed",
+      date: "1983",
+      writtenBy: "person",
+      citations: [{ sourceId: fixtureSources[0]?.id ?? "s1" }],
+      ...event,
+    })),
+    siteFacts,
+    sections,
+  });
+  const [result] = await db
+    .insert(dbSchema.entityAbout)
+    .values({
+      entityId: id,
+      document,
+      schemaVersion: ENTITY_ABOUT_SCHEMA_VERSION,
+      version,
+      status,
+    })
+    .returning();
+  if (!result) throw new Error("Unable to create EntityAbout fixture");
   return result;
 };
 

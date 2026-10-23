@@ -1,14 +1,14 @@
 import { db } from "@peated/server/db";
-import { entities, entityEvents } from "@peated/server/db/schema";
+import { entities } from "@peated/server/db/schema";
+import { isFactShown } from "@peated/server/lib/entityAbout/display";
+import { toLegacyEvent } from "@peated/server/lib/entityAbout/legacyEvents";
+import { getEntityAbout } from "@peated/server/lib/entityAbout/store";
 import { implement } from "@peated/server/orpc";
 import entityEventListContract from "@peated/server/orpc/contracts/entities/events/list";
-import { serialize } from "@peated/server/serializers";
-import { EntityEventSerializer } from "@peated/server/serializers/entityEvent";
-import { asc, eq } from "drizzle-orm";
+import { eq } from "drizzle-orm";
 
 export default implement(entityEventListContract).handler(async function ({
   input,
-  context,
   errors,
 }) {
   const [entity] = await db
@@ -20,13 +20,16 @@ export default implement(entityEventListContract).handler(async function ({
     throw errors.NOT_FOUND({ message: "Entity not found." });
   }
 
-  const events = await db
-    .select()
-    .from(entityEvents)
-    .where(eq(entityEvents.entityId, entity.id))
-    .orderBy(asc(entityEvents.date), asc(entityEvents.id));
+  const about = await getEntityAbout(db, entity.id);
+  const document = about?.document;
+  const results = (document?.events ?? [])
+    // Display rule: history without a non-retailer source stays hidden.
+    .filter((event) => isFactShown(event.citations, document?.sources ?? []))
+    .sort((a, b) => a.date.localeCompare(b.date) || a.id - b.id)
+    .flatMap((event) => {
+      const legacy = toLegacyEvent(entity.id, event, document?.sources ?? []);
+      return legacy ? [legacy] : [];
+    });
 
-  return {
-    results: await serialize(EntityEventSerializer, events, context.user),
-  };
+  return { results };
 });
