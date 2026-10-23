@@ -10,6 +10,7 @@ import {
   mockBottlePrices,
   mockBottles,
   mockBottleTags,
+  mockCairdeasSeries,
   mockCaolIlaEntity,
   mockChanges,
   mockCollectionBottles,
@@ -41,6 +42,7 @@ import {
   mockSuntoryGlobalSpiritsEntity,
   mockTaliskerEntity,
   mockTasting,
+  mockTastingDrafts,
   mockUser,
   mockUserDetails,
   mockUserFlavorList,
@@ -672,6 +674,46 @@ describe("mock oRPC router", () => {
         query: "Ardbeg",
       }),
     ).resolves.toMatchObject({ results: [] });
+  });
+
+  it("lists a Series and recommends from any Bottle", async () => {
+    const series = await anonymousClient.bottles.list({
+      series: mockCairdeasSeries.id,
+    });
+    expect(
+      series.results.map((bottle) => bottle.id).sort((a, b) => a - b),
+    ).toEqual([9309, 9310]);
+    expect(
+      series.results.every(
+        (bottle) => bottle.series?.id === mockCairdeasSeries.id,
+      ),
+    ).toBe(true);
+
+    const recommendations = await anonymousClient.bottles.recommendations({
+      bottle: 9309,
+    });
+    expect(recommendations.results.length).toBeGreaterThan(0);
+    expect(recommendations.results.some((bottle) => bottle.id === 9309)).toBe(
+      false,
+    );
+  });
+
+  it("lists the signed-in member's tasting drafts", async () => {
+    await expect(anonymousClient.tastingDrafts.list({})).rejects.toMatchObject({
+      code: "UNAUTHORIZED",
+    });
+    await expect(anonymousClient.tastingDrafts.count({})).rejects.toMatchObject(
+      { code: "UNAUTHORIZED" },
+    );
+
+    await expect(authenticatedClient.tastingDrafts.count({})).resolves.toEqual({
+      count: mockTastingDrafts.length,
+    });
+    const drafts = await authenticatedClient.tastingDrafts.list({});
+    expect(drafts.results.map((draft) => draft.identification.status)).toEqual(
+      expect.arrayContaining(["none", "pending", "done"]),
+    );
+    expect(drafts.results.some((draft) => draft.bottle !== null)).toBe(true);
   });
 
   it("keeps signed-in read filters protected", async () => {

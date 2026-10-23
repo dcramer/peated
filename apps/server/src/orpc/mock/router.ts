@@ -55,6 +55,8 @@ import search from "./routes/search";
 import smwsDistillerList from "./routes/smws/distiller-list";
 import stats from "./routes/stats";
 import tagBottles from "./routes/tags/bottles";
+import tastingDraftCount from "./routes/tastingDrafts/count";
+import tastingDraftList from "./routes/tastingDrafts/list";
 import tastingCreate from "./routes/tastings/create";
 import tastingDetails from "./routes/tastings/details";
 import tastingList from "./routes/tastings/list";
@@ -175,6 +177,10 @@ export const mockRouter = mockOS.router({
     details: tastingDetails,
     list: tastingList,
     photoIdentification: tastingPhotoIdentification,
+  },
+  tastingDrafts: {
+    count: tastingDraftCount,
+    list: tastingDraftList,
   },
   users: {
     activity: {
