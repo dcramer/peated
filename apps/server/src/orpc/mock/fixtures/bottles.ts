@@ -1,6 +1,6 @@
 import { getRatingBand } from "@peated/server/constants";
 import type { MockOutputs } from "../contract";
-import { mockBottleGroup } from "./bottle-groups";
+import { mockBottleGroup, mockCairdeasSeries } from "./bottle-groups";
 import { mockImageUrls, timestamp } from "./constants";
 import {
   mockAmrutEntity,
@@ -319,6 +319,7 @@ export const mockBottles: Bottle[] = [
     fullName: "Laphroaig Càirdeas Warehouse 1",
     name: "Càirdeas Warehouse 1",
     group: mockBottleGroup,
+    series: mockCairdeasSeries,
     edition: "Warehouse 1",
     statedAge: null,
     noAgeStatement: true,
@@ -350,6 +351,7 @@ export const mockBottles: Bottle[] = [
     fullName: "Laphroaig Càirdeas White Port & Madeira",
     name: "Càirdeas White Port & Madeira",
     group: mockBottleGroup,
+    series: mockCairdeasSeries,
     edition: "White Port & Madeira",
     statedAge: null,
     noAgeStatement: true,
@@ -528,9 +530,12 @@ export function mockBottleFor(
     : bottle;
 }
 
-export function mockRecommendationBottlesFor(user: User | null) {
+export function mockRecommendationBottlesFor(
+  user: User | null,
+  bottleId: number = mockBottle.id,
+) {
   return mockBottles
-    .filter((bottle) => bottle.id !== mockBottle.id)
+    .filter((bottle) => bottle.id !== bottleId)
     .slice(0, 6)
     .map((bottle) => mockBottleFor(user, bottle));
 }

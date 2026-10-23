@@ -29,9 +29,8 @@ import {
 import { getPeatedSystemActor, getUserActor } from "@peated/server/lib/actors";
 import { processSeries } from "@peated/server/lib/bottleHelpers";
 import {
-  findBottleWithSameTitle,
-  formatSameTitleProblem,
   getEditionCaskNumberProblem,
+  getSameTitleProblem,
 } from "@peated/server/lib/bottleNamingRules";
 import {
   getBottleSeriesMemberships,
@@ -60,11 +59,12 @@ import { bottleNormalize } from "@peated/server/orpc/routes/bottles/validation";
 import type { BottleInputSchema } from "@peated/server/schemas";
 import type { BottlePreviewResult } from "@peated/server/types";
 import { pushUniqueJob } from "@peated/server/worker/dispatch";
-import { and, eq, sql } from "drizzle-orm";
+import { eq, sql } from "drizzle-orm";
 import type { z } from "zod";
 import {
   findConflictingSmwsBottleId,
   getSmwsCodeForBottleIdentity,
+  matchesBottleStructuredIdentity,
 } from "./bottleConflicts";
 import { materializeBottleIdentity } from "./bottleIdentity";
 import {
@@ -366,7 +366,7 @@ async function prepareBottleCreateInTransaction(
       name: `${brand.shortName || brand.name} ${bottleData.name}`,
     });
 
-  const sameTitleBottle = await findBottleWithSameTitle(tx, {
+  const sameTitleProblem = await getSameTitleProblem(tx, {
     brandId: brand.id,
     seriesId,
     titleFullName: groupFullName,
@@ -376,10 +376,8 @@ async function prepareBottleCreateInTransaction(
       ? bottleName.statedAge
       : (bottleData.statedAge ?? null),
   });
-  if (sameTitleBottle) {
-    throw new BottleCreateBadRequestError(
-      formatSameTitleProblem(groupFullName, sameTitleBottle),
-    );
+  if (sameTitleProblem) {
+    throw new BottleCreateBadRequestError(sameTitleProblem);
   }
 
   const bottleInsertData: NewBottle = {
@@ -421,26 +419,7 @@ async function findExactBottleIdentityInTransaction(
   const [existing] = await tx
     .select({ id: bottles.id })
     .from(bottles)
-    .where(
-      and(
-        eq(bottles.brandId, bottle.brandId),
-        eq(sql`LOWER(${bottles.fullName})`, bottle.fullName.toLowerCase()),
-        sql`${bottles.seriesId} IS NOT DISTINCT FROM ${bottle.seriesId ?? null}`,
-        sql`${bottles.edition} IS NOT DISTINCT FROM ${bottle.edition ?? null}`,
-        sql`${bottles.statedAge} IS NOT DISTINCT FROM ${bottle.statedAge ?? null}`,
-        sql`${bottles.noAgeStatement} IS NOT DISTINCT FROM ${bottle.noAgeStatement ?? null}`,
-        sql`${bottles.vintageYear} IS NOT DISTINCT FROM ${bottle.vintageYear ?? null}`,
-        sql`${bottles.bottlingYear} IS NOT DISTINCT FROM ${bottle.bottlingYear ?? null}`,
-        sql`${bottles.releaseYear} IS NOT DISTINCT FROM ${bottle.releaseYear ?? null}`,
-        sql`${bottles.releaseMonth} IS NOT DISTINCT FROM ${bottle.releaseMonth ?? null}`,
-        sql`${bottles.releaseDay} IS NOT DISTINCT FROM ${bottle.releaseDay ?? null}`,
-        sql`${bottles.abv} IS NOT DISTINCT FROM ${bottle.abv ?? null}`,
-        sql`${bottles.singleCask} IS NOT DISTINCT FROM ${bottle.singleCask ?? null}`,
-        sql`${bottles.caskStrength} IS NOT DISTINCT FROM ${bottle.caskStrength ?? null}`,
-        sql`${bottles.caskNumber} IS NOT DISTINCT FROM ${bottle.caskNumber ?? null}`,
-        sql`${bottles.outturn} IS NOT DISTINCT FROM ${bottle.outturn ?? null}`,
-      ),
-    )
+    .where(matchesBottleStructuredIdentity(bottle))
     .orderBy(bottles.id)
     .limit(1);
   return existing?.id ?? null;

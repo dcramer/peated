@@ -212,7 +212,6 @@ export const PhotoIdentificationDiagnosticsSchema = z.object({
   classification: z.object({
     status: z.enum(["ignored", "classified"]),
     action: z.string().nullable().default(null),
-    confidence: z.number().nullable().default(null),
     reason: z.string().nullable().default(null),
   }),
 });
@@ -327,6 +326,9 @@ export const PhotoIdentificationStepEnum = z.enum([
   "comparing",
 ]);
 
+/** Most likely-match Bottles one photo lookup progress event may carry. */
+export const PHOTO_IDENTIFICATION_MAX_PROGRESS_CANDIDATES = 5;
+
 /**
  * Progress sent while a photo is identified. The stream ends with the full
  * PhotoIdentificationSchema result.
@@ -342,7 +344,9 @@ export const PhotoIdentificationProgressSchema = z.discriminatedUnion("type", [
   }),
   z.object({
     type: z.literal("candidates"),
-    bottles: z.array(BottleSchema).max(5),
+    bottles: z
+      .array(BottleSchema)
+      .max(PHOTO_IDENTIFICATION_MAX_PROGRESS_CANDIDATES),
   }),
   z.object({
     type: z.literal("step"),

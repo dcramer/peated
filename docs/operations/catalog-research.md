@@ -93,6 +93,13 @@ brand page mixed proper releases, packaging variants, tasting samples, and
 misattributed Suntory bottles, so every exact identity required independent
 producer, auction, or retailer evidence.
 
+Peated's own public API has a pacing limit for catalog-wide reads. Page
+`GET /v1/bottles?sort=created&limit=100` one request at a time: a full pass of
+about 32,000 Bottles takes about an hour. Parallel deep pages slowed each
+request to over a minute. For "what changed recently", read `GET /v1/changes`
+instead: an update row holds only the changed fields, so the name a Bottle had
+before a pass comes from the earlier `add` or `update` row.
+
 ## Common Mistakes
 
 - A current range is not the full catalog.

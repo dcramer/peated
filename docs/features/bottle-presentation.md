@@ -212,8 +212,10 @@ subject.
   Leave out a series, ABV, or stated age the name already prints. An edition,
   year, batch, or cask the name already prints moves behind category, so it
   shows only when a slot is free. Additional Details always lists the edition.
-  On phones, worded values such as the series or edition use smaller type so
-  more of them fits before they cut off.
+  On phones, the key facts show their values only, on one line, because
+  values such as 46% or Single Malt read on their own; the rating sits on one
+  line above the facts, and the description preview shows
+  three lines, so the tabs stay near the top of the first screen.
 - Show a year only when it is part of, or necessary to understand, the release
   identity.
 - Do not add single-cask or cask-strength badges.
@@ -241,8 +243,10 @@ Do not rebuild these lines in a page-specific mapper:
    `Gordon & MacPhail Private Collection Benromach 1982`. Category is left out:
    the name or distillery almost always makes it clear, and the bottle page
    and filters still show it.
-3. Known release facts, stated age, and ABV. A year the name already prints is
-   not repeated.
+3. Known release facts, stated age, and ABV: the edition, at most one year
+   (vintage, then release), age, and ABV. A year, age, or ABV the name already
+   prints is not repeated. This line wraps between facts instead of cutting
+   one off, so ABV stays visible on phones.
 
 Rows that hide the second line keep the series in the name instead: compact
 rows and recent tasting rows. A series page leaves the series out of its own
@@ -277,8 +281,7 @@ Use inside prose, notifications, narrow activity items, controls, or other
 places that cannot support a metadata row.
 
 - Produce a recognizable marketed label, not a field inventory.
-- Use the expression; omit the edition when the surface has no supporting
-  metadata.
+- Use the expression. Never include the edition.
 - Include series when it is essential to recognizing the product and is not
   already represented; secondary context may otherwise be omitted.
 - Keep ABV after the name when known.
@@ -324,15 +327,20 @@ Open Graph metadata, share text, accessible labels, and some exports.
 - Produce a readable marketed identity rather than serializing every exact
   field.
 - Include producer, nonduplicative series, and expression.
-- Omit the edition unless the text must distinguish releases that otherwise
-  have the same name.
+- Never include the edition. `formatBottleLabel` builds this text from
+  `formatBottleDisplayName`, which leaves the edition out.
 - Include a year only when it is a necessary part of that marketed identity.
 - Omit generic single-cask and cask-strength flags.
 - Include ABV when known.
 - Do not assume the stored `fullName` is the ideal text for every consumer.
 
+Releases that share a name get the same text, apart from ABV when their
+strengths differ. Plain text does not try to tell them apart further: each
+Bottle keeps its own page and URL, which carries its numeric ID, and the page
+header and rows show the edition as a fact.
+
 Family-level SEO uses the shared expression identity. Exact Bottle SEO uses the
-exact release identity.
+same plain-text label: brand, series, expression, and ABV.
 
 ### Verification and details
 
@@ -361,7 +369,7 @@ particular result component omits some of them visually.
 | Bottler             | When distinct and useful | Optional         | Rarely             | Context supplies | When needed       | Yes          |
 | Series              | First key fact           | First provenance | When essential     | Context supplies | If nonduplicative | Yes          |
 | Expression          | Primary                  | Primary          | Primary            | Context supplies | Primary           | Yes          |
-| Edition             | Key fact                 | Metadata         | No                 | Primary          | Conditional       | Yes          |
+| Edition             | Key fact                 | Metadata         | No                 | Primary          | No                | Yes          |
 | Stated age          | Once                     | Optional         | Only when integral | Exact override   | If integral       | Yes          |
 | ABV                 | Yes when known           | Yes when known   | Yes when known     | Optional support | Yes when known    | Yes          |
 | Distillation year   | Conditional              | Conditional      | Rarely             | When useful      | Conditional       | Yes          |

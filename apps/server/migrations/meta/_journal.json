@@ -2241,6 +2241,13 @@
       "when": 1792664709218,
       "tag": "0319_square_molly_hayes",
       "breakpoints": false
+    },
+    {
+      "idx": 320,
+      "version": "7",
+      "when": 1792746256307,
+      "tag": "0320_perfect_shooting_star",
+      "breakpoints": false
     }
   ]
 }

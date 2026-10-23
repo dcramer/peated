@@ -32,12 +32,20 @@ export function getPendingImageFromParams(
   };
 }
 
+/** Search param that carries the wrong photo match a chosen Bottle completes. */
+export const WRONG_PHOTO_MATCH_PARAM = "wrongPhotoMatch";
+
+/** Reads a positive integer ID from a search param, or `null`. */
+export function parseIdParam(value: string | null) {
+  const id = Number(value);
+  return Number.isInteger(id) && id > 0 ? id : null;
+}
+
 /** Reads the wrong photo match that the next chosen Bottle completes. */
 export function getWrongPhotoMatchFromParams(
   searchParams: Pick<URLSearchParams, "get">,
 ) {
-  const id = Number(searchParams.get("wrongPhotoMatch"));
-  return Number.isInteger(id) && id > 0 ? id : null;
+  return parseIdParam(searchParams.get(WRONG_PHOTO_MATCH_PARAM));
 }
 
 export function getAddBottleHref({
@@ -57,7 +65,7 @@ export function getAddBottleHref({
   if (pendingImageUrl) params.set("pendingImageUrl", pendingImageUrl);
   if (resultSource) params.set("resultSource", resultSource);
   if (wrongPhotoMatchId) {
-    params.set("wrongPhotoMatch", String(wrongPhotoMatchId));
+    params.set(WRONG_PHOTO_MATCH_PARAM, String(wrongPhotoMatchId));
   }
   params.set("intent", intent);
 

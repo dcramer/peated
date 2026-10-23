@@ -235,10 +235,13 @@ export async function serializeQueueItems(
     : [];
   const bottlesById = Object.fromEntries(
     (
-      await serialize(BottleSerializer, bottleList, context.user, [
-        "description",
-        "tastingNotes",
-      ])
+      await serialize(
+        BottleSerializer,
+        bottleList,
+        context.user,
+        ["description", "tastingNotes"],
+        { includeGroupSummary: true },
+      )
     ).map((item, index) => [bottleList[index].id, item]),
   );
 

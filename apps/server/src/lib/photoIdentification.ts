@@ -12,10 +12,10 @@ import type { BottleCandidate } from "@peated/bottle-classifier/internal/types";
 import {
   BottleExtractedDetailsSchema,
   ImageBottleEvidenceSchema,
+  runBottleReference,
   type BottleExtractedDetails,
   type ImageBottleEvidence,
 } from "@peated/server/agents/bottleClassifier";
-import { runBottleReference } from "@peated/server/agents/bottleClassifier/classifyBottleReference";
 import { findExactReferenceBottleCandidate } from "@peated/server/agents/bottleClassifier/findExactReferenceBottleCandidate";
 import config from "@peated/server/config";
 import {
@@ -58,14 +58,6 @@ type PhotoIdentificationImage = {
   id: string;
   imageUrl: string;
 };
-
-export async function getPhotoExtractionImageInput({
-  photo,
-}: {
-  photo: PhotoIdentificationImage;
-}) {
-  return await getUploadImageDataUrl(photo.imageUrl);
-}
 
 function maybeField<T extends boolean | number | string | string[]>(
   value: T | null | undefined,
@@ -156,6 +148,9 @@ export function buildPhotoEvidenceFromExtractedIdentity({
       bottlingYear: maybeField(extractedIdentity?.bottling_year),
       releaseYear: maybeField(extractedIdentity?.release_year),
       edition: maybeField(extractedIdentity?.edition),
+      caskNumber: maybeField(extractedIdentity?.cask_number),
+      maturation: maybeField(extractedIdentity?.maturation),
+      outturn: maybeField(extractedIdentity?.outturn),
       caskStrength: maybeField(extractedIdentity?.cask_strength),
       singleCask: maybeField(extractedIdentity?.single_cask),
     },
@@ -175,7 +170,7 @@ export function buildPhotoEvidenceFromExtractedIdentity({
 /**
  * Runs the server-owned whisky label extraction boundary for a pending image.
  */
-export async function extractPhotoBottleEvidence({
+async function extractPhotoBottleEvidence({
   photo,
   signal,
 }: {
@@ -217,7 +212,7 @@ export async function extractPhotoBottleEvidence({
           onImageExtractionMetadata: reportResponse,
         });
         const extraction = await extractor.extractFromImageWithMetadata(
-          await getPhotoExtractionImageInput({ photo }),
+          await getUploadImageDataUrl(photo.imageUrl),
           { signal },
         );
         return {
@@ -240,7 +235,7 @@ export async function extractPhotoBottleEvidence({
   };
 }
 
-export function buildPhotoReferenceName(
+function buildPhotoReferenceName(
   extractedIdentity: BottleExtractedDetails | null,
 ) {
   const parts = [
@@ -340,8 +335,7 @@ export type PhotoIdentificationDecision = Extract<
 // identification always carries the uploaded bottle photo as primary image
 // evidence and never resolves against a current bottle assignment. The user
 // still confirms the suggested next step, so this tier only chooses between the
-// confirm and manual-search suggestions rather than acting silently. The
-// numeric `confidence` is no longer read for this gate.
+// confirm and manual-search suggestions rather than acting silently.
 function derivePhotoIdentificationTier(decision: PhotoIdentificationDecision) {
   const confidenceBasis = decision.confidenceBasis;
 
@@ -424,7 +418,6 @@ function buildPhotoIdentificationDiagnostics({
       classification: {
         status: "ignored",
         action: null,
-        confidence: null,
         reason: classification.reason,
       },
     };
@@ -441,7 +434,6 @@ function buildPhotoIdentificationDiagnostics({
     classification: {
       status: "classified",
       action: classification.decision.action,
-      confidence: null,
       reason: classification.decision.rationale,
     },
   };

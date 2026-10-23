@@ -7,7 +7,7 @@ import { AppLink } from "@peated/web/components/appLink";
 import {
   KeyFacts,
   hasVisibleKeyFacts,
-  type KeyFactList,
+  type KeyFact,
 } from "@peated/web/components/catalogDetails.stylex";
 import { EntityLinks } from "@peated/web/components/entityLinks";
 import type { BottleRatingSummaryProps } from "@peated/web/components/scoring.stylex";
@@ -34,7 +34,7 @@ export type BottlePageHeaderProps = {
   /** Links the name to the bottle page when the header appears on another page. */
   nameHref?: string;
   rating?: BottleRatingSummaryProps | null;
-  specs?: KeyFactList | null;
+  specs?: readonly KeyFact[] | null;
 };
 
 /**
@@ -83,6 +83,8 @@ export function BottlePageHeader({
     <div {...stylex.props(styles.aside)}>{aside}</div>
   ) : null;
   const hasRatings = Boolean(ratings);
+  const keyFacts =
+    specs && hasVisibleKeyFacts(specs) ? <KeyFacts facts={specs} /> : null;
 
   return (
     <div {...stylex.props(styles.root, hasRatings && styles.rootWithRatings)}>
@@ -90,8 +92,16 @@ export function BottlePageHeader({
         actions={actions}
         actionsPosition="start"
         facts={
-          specs && hasVisibleKeyFacts(specs) ? (
-            <KeyFacts facts={specs} inline />
+          // Phones show the rating above the key facts instead of in its own
+          // block below the actions; the column copy is hidden there. Without
+          // key facts the rating stays in its column.
+          keyFacts ? (
+            <>
+              {ratings ? (
+                <div {...stylex.props(styles.phoneRatings)}>{ratings}</div>
+              ) : null}
+              {keyFacts}
+            </>
           ) : null
         }
         metadata={metadata}
@@ -119,7 +129,16 @@ export function BottlePageHeader({
           </>
         }
       />
-      {ratings ? <div {...stylex.props(styles.ratings)}>{ratings}</div> : null}
+      {ratings ? (
+        <div
+          {...stylex.props(
+            styles.ratings,
+            keyFacts && styles.ratingsBesideFacts,
+          )}
+        >
+          {ratings}
+        </div>
+      ) : null}
     </div>
   );
 }
@@ -167,12 +186,19 @@ const styles = stylex.create({
     gridColumn: { default: "2", [NARROW]: "1" },
     gridRow: { default: "1", [NARROW]: "auto" },
     gridTemplateColumns: "minmax(0, 1fr)",
-    justifyItems: { default: "stretch", [PHONE]: "center" },
+    justifyItems: "stretch",
     paddingTop: { default: space.x4, [NARROW]: 0 },
     paddingBottom: { default: space.x4, [NARROW]: 0 },
   },
   aside: {
     display: "flex",
-    justifySelf: { default: "end", [PHONE]: "center" },
+    justifySelf: { default: "end", [PHONE]: "start" },
+  },
+  ratingsBesideFacts: {
+    display: { default: "grid", [PHONE]: "none" },
+  },
+  phoneRatings: {
+    display: { default: "none", [PHONE]: "block" },
+    marginBottom: space.x3,
   },
 });

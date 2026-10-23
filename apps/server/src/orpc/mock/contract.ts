@@ -55,6 +55,8 @@ import search from "@peated/server/orpc/contracts/search";
 import smwsDistillerList from "@peated/server/orpc/contracts/smws/distiller-list";
 import stats from "@peated/server/orpc/contracts/stats";
 import tagBottles from "@peated/server/orpc/contracts/tags/bottles";
+import tastingDraftCount from "@peated/server/orpc/contracts/tastingDrafts/count";
+import tastingDraftList from "@peated/server/orpc/contracts/tastingDrafts/list";
 import tastingCreate from "@peated/server/orpc/contracts/tastings/create";
 import tastingDetails from "@peated/server/orpc/contracts/tastings/details";
 import tastingList from "@peated/server/orpc/contracts/tastings/list";
@@ -175,6 +177,10 @@ export const mockContract = {
     details: tastingDetails,
     list: tastingList,
     photoIdentification: tastingPhotoIdentification,
+  },
+  tastingDrafts: {
+    count: tastingDraftCount,
+    list: tastingDraftList,
   },
   users: {
     activity: {

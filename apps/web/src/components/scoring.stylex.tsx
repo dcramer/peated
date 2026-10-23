@@ -6,6 +6,7 @@ import { foundationStyles } from "../styles/foundations.stylex";
 import { colors, fonts, space } from "../styles/tokens.stylex";
 
 const COMPACT = "@media (max-width: 639px)";
+const PHONE = "@media (max-width: 480px)";
 
 export const RATING_BANDS = SERVER_RATING_BANDS.map((band) => ({
   key: band.id,
@@ -38,6 +39,7 @@ export function TastingRating({ band, size = "md" }: TastingRatingProps) {
       {...stylex.props(
         styles.ratingLayout,
         size === "sm" && styles.smallRatingLayout,
+        size === "lg" && styles.largeRatingLayout,
       )}
     >
       <span {...stylex.props(styles.visuallyHidden)}>
@@ -86,7 +88,13 @@ export function ReviewScore({
     : `Review score, ${score} out of ${scale}`;
 
   return (
-    <span {...stylex.props(styles.ratingLayout, styles.reviewScore)}>
+    <span
+      {...stylex.props(
+        styles.ratingLayout,
+        styles.reviewScore,
+        size === "lg" && styles.largeRatingLayout,
+      )}
+    >
       <span {...stylex.props(styles.visuallyHidden)}>{accessibleLabel}</span>
       {rating ? (
         <span
@@ -293,17 +301,19 @@ function totalRatings(counts: RatingCounts) {
 }
 
 const styles = stylex.create({
+  // Phones show the value and its name on one line beside the key facts.
   summaryHeadline: {
     display: "flex",
-    alignItems: "flex-end",
-    flexDirection: "column",
-    gap: space.x1,
+    alignItems: { default: "flex-end", [PHONE]: "baseline" },
+    flexDirection: { default: "column", [PHONE]: "row" },
+    columnGap: space.x2,
+    rowGap: space.x1,
   },
   summaryLabel: {
     minWidth: 0,
     color: colors.ink,
     fontFamily: fonts.display,
-    fontSize: "24px",
+    fontSize: { default: "24px", [PHONE]: "18px" },
     fontWeight: 700,
     letterSpacing: "-0.03em",
     lineHeight: 1.05,
@@ -318,7 +328,7 @@ const styles = stylex.create({
   summaryValue: {
     color: colors.ink,
     fontFamily: fonts.display,
-    fontSize: "48px",
+    fontSize: { default: "48px", [PHONE]: "28px" },
     fontVariantNumeric: "tabular-nums",
     fontWeight: 700,
     letterSpacing: "-0.045em",
@@ -349,6 +359,14 @@ const styles = stylex.create({
   smallRatingLabel: {
     fontSize: "13px",
     lineHeight: 1.2,
+  },
+  // Large ratings head a tasting page; phones show them on one line at the
+  // start, like the bottle rating summary.
+  largeRatingLayout: {
+    alignItems: { default: "flex-end", [PHONE]: "baseline" },
+    flexDirection: { default: "column", [PHONE]: "row" },
+    gap: { default: "2px", [PHONE]: space.x2 },
+    marginLeft: { default: "auto", [PHONE]: 0 },
   },
   largeRatingLabel: {
     fontSize: "20px",
@@ -386,6 +404,7 @@ const styles = stylex.create({
   largeReviewScoreValue: {
     fontSize: "40px",
     [COMPACT]: { fontSize: "36px" },
+    [PHONE]: { fontSize: "28px" },
   },
   reviewScoreScale: {
     marginLeft: "3px",

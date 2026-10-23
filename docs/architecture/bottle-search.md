@@ -27,7 +27,9 @@ classification validation and automation gates still control assignment.
 Catalog listing retains filters, counts, pagination, explicit sort choices, and
 exact-reference priority. The Bottle section of global search shares these documents,
 with exact names and references ordered before text relevance. Ordinary search does
-not require embeddings.
+not require embeddings. Every Bottle result, including a Peated ID match and a
+possible match, carries its BottleGroup name and distilleries, so search rows
+show the same name and producers as other bottle rows.
 
 ## Documents and queries
 

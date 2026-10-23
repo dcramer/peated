@@ -192,3 +192,38 @@ export function materializeBottleForGroup({
     flavorProfile: group.flavorProfile,
   };
 }
+
+/**
+ * Returns the structured identity a Bottle gets when an Entity merge moves its
+ * group to another brand and Series. The merge job and its preview both use it
+ * so the preview finds the same exact duplicates the job merges.
+ */
+export function getMovedBottleIdentity({
+  bottle,
+  group,
+  brand,
+  seriesId,
+}: {
+  bottle: BottleExactIdentity & Pick<Bottle, "noAgeStatement">;
+  group: BottleGroupMaterialization;
+  brand: Pick<Entity, "id" | "name" | "shortName">;
+  seriesId: BottleGroup["seriesId"];
+}) {
+  const exact = getBottleExactIdentity({
+    bottle,
+    sourceGroupStatedAge: group.statedAge,
+  });
+  return {
+    ...exact,
+    noAgeStatement: bottle.noAgeStatement,
+    ...materializeBottleForGroup({
+      group: {
+        ...group,
+        ...getBottleGroupNameForBrand({ name: group.name, brand }),
+        brandId: brand.id,
+        seriesId,
+      },
+      exact,
+    }),
+  };
+}

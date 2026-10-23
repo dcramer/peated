@@ -3,7 +3,6 @@ import { describe, expect, it } from "vitest";
 import {
   formatBottleDisplayName,
   formatBottleLabel,
-  getBottleReleaseMetadata,
 } from "./bottleDisplayName";
 
 const bottle = {
@@ -70,9 +69,6 @@ describe("formatBottleDisplayName", () => {
         group: { name: "Clynelish 1972" },
       }),
     ).toBe("Gordon & MacPhail The Dram Takers Clynelish 1972");
-    expect(getBottleReleaseMetadata(selectedCask)).toBe(
-      "for La Maison du Whisky",
-    );
   });
 
   it.each(["Batch C923", "9.3", "S2B13", "2026 Release"])(
@@ -89,7 +85,6 @@ describe("formatBottleDisplayName", () => {
       expect(formatBottleDisplayName(editionBottle)).toBe(
         "Decadent Drinks Glenburgie 38-year-old",
       );
-      expect(getBottleReleaseMetadata(editionBottle)).toBe(edition);
     },
   );
 
@@ -122,23 +117,6 @@ describe("formatBottleDisplayName", () => {
         series: { name: "Exploration Series" },
       }),
     ).toBe("Pōkeno Exploration Series No. 1 Totara Cask");
-  });
-
-  it("returns at most one supporting release fact", () => {
-    expect(
-      getBottleReleaseMetadata({
-        edition: null,
-        releaseYear: 2026,
-        vintageYear: 1988,
-      }),
-    ).toBe("1988 vintage");
-    expect(
-      getBottleReleaseMetadata({
-        edition: "Batch 24",
-        releaseYear: 2026,
-        vintageYear: 1988,
-      }),
-    ).toBe("Batch 24");
   });
 });
 

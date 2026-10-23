@@ -11,6 +11,7 @@ import { colors, space } from "../../styles/tokens.stylex";
 
 const NARROW = "@media (max-width: 759px)";
 const MOBILE = "@media (max-width: 559px)";
+const PHONE_ROW = "@media (min-width: 360px) and (max-width: 559px)";
 
 export function PageFrame({
   children,
@@ -132,6 +133,7 @@ export function PageHeader({
           <div
             {...stylex.props(
               styles.headerActions,
+              actionsPosition === "start" && styles.startActions,
               actionsPosition === "inline" && styles.inlineActions,
             )}
           >
@@ -353,6 +355,12 @@ const styles = stylex.create({
     alignItems: "center",
     gap: { default: space.x2, [MOBILE]: space.x1 },
     flexWrap: "wrap",
+  },
+  // DESIGN.md: a detail page's actions stay on one row on phones from 360px; a
+  // wrapped menu button reads as a separate, orphaned control. Narrower
+  // screens wrap rather than overflow the page.
+  startActions: {
+    flexWrap: { default: "wrap", [PHONE_ROW]: "nowrap" },
   },
   tabbedPage: {
     minWidth: 0,

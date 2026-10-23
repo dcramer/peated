@@ -6,7 +6,7 @@ import { foundationStyles } from "../../styles/foundations.stylex";
 import { colors, controlMetrics, space } from "../../styles/tokens.stylex";
 import { ImageViewer } from "../imageViewer.stylex";
 
-export type PhotoPreviewProps = {
+type PhotoPreviewProps = {
   loading?: boolean;
   metadata?: string;
   src: string;

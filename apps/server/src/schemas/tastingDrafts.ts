@@ -72,7 +72,7 @@ export type PersistedTastingDraftIdentification = z.infer<
   typeof PersistedTastingDraftIdentificationSchema
 >;
 
-export const TastingDraftIdentificationStatusEnum = z
+const TastingDraftIdentificationStatusEnum = z
   .enum(TASTING_DRAFT_IDENTIFICATION_STATUS_LIST)
   .describe(
     "`none`: no photo. `pending`: the Bottle is being identified from the photo. `done`: see `result`. `failed`: identification broke and is not tried again; search for the Bottle instead",

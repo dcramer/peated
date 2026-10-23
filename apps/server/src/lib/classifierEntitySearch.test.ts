@@ -258,4 +258,48 @@ describe("searchClassifierEntities", () => {
       }),
     );
   });
+  test("matches SQL wildcard characters in a prefix literally", async ({
+    fixtures,
+  }) => {
+    await fixtures.Entity({ name: "Wildcard Distillers", kind: "distillery" });
+
+    const results = await searchClassifierEntities({ query: "W_ld", limit: 5 });
+
+    expect(results).not.toContainEqual(
+      expect.objectContaining({ name: "Wildcard Distillers" }),
+    );
+  });
+
+  test("reports an alias only when the alias is what matched", async ({
+    fixtures,
+  }) => {
+    const entity = await fixtures.Entity({
+      name: "Alias Check Distillery",
+      kind: "distillery",
+    });
+    await fixtures.EntityReference({
+      entityId: entity.id,
+      name: "Alias Check Old Name",
+    });
+
+    const byName = await searchClassifierEntities({
+      query: "Alias Check Distillery",
+      limit: 5,
+    });
+    const byAlias = await searchClassifierEntities({
+      query: "Alias Check Old Name",
+      limit: 5,
+    });
+
+    expect(byName).not.toContainEqual(
+      expect.objectContaining({ reference: "Alias Check Old Name" }),
+    );
+    expect(byAlias).toContainEqual(
+      expect.objectContaining({
+        entityId: entity.id,
+        reference: "Alias Check Old Name",
+        source: expect.arrayContaining(["exact"]),
+      }),
+    );
+  });
 });

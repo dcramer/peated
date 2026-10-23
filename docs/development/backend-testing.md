@@ -20,6 +20,19 @@ Backend tests in this repo are integration-first. Test behavior over real wiring
 - Route tests call the in-process [routerClient](../../apps/server/src/orpc/router.ts) instead of booting an HTTP server.
 - Shared fixtures and defaults come from the Vitest test context.
 
+## Test Database
+
+Tests need the Postgres and Redis services from
+[docker-compose.yml](../../docker-compose.yml). Start them with
+`docker compose up -d`, as the [README](../../README.md#dev) describes;
+`apps/server/.env.test` points at their ports.
+
+A stock Postgres will not work. [Dockerfile.postgres](../../Dockerfile.postgres)
+builds Postgres 17 with PostGIS 3.5, pgvector 0.8.0, and the `tin` search
+extension from PlanetScale's [Lead](https://github.com/planetscale/lead), and
+compose preloads `tin`. The first build takes a while because it compiles
+`tin` from Rust source.
+
 ## Test Context
 
 Fixtures are exposed on the test context via [fixtures.ts](../../apps/server/src/lib/test/fixtures.ts):

@@ -102,7 +102,6 @@ export async function listAdminContent(
       .select({
         review: memberReviews,
         bottleId: bottles.id,
-        bottleFullName: bottles.fullName,
         bottle: bottleDisplayNameColumns,
         memberId: users.id,
         memberUsername: users.username,
@@ -126,7 +125,6 @@ export async function listAdminContent(
         id: row.review.id,
         bottle: {
           id: row.bottleId,
-          fullName: row.bottleFullName,
           ...toBottleDisplayNameSource(row.bottle),
         },
         member: {
@@ -167,7 +165,6 @@ export async function listAdminContent(
       .select({
         tasting: tastings,
         bottleId: bottles.id,
-        bottleFullName: bottles.fullName,
         bottle: bottleDisplayNameColumns,
         memberId: users.id,
         memberUsername: users.username,
@@ -189,7 +186,6 @@ export async function listAdminContent(
         id: row.tasting.id,
         bottle: {
           id: row.bottleId,
-          fullName: row.bottleFullName,
           ...toBottleDisplayNameSource(row.bottle),
         },
         member: {
@@ -230,7 +226,6 @@ export async function listAdminContent(
       review: externalReviews,
       article: externalReviewArticles,
       bottleId: bottles.id,
-      bottleFullName: bottles.fullName,
       bottle: bottleDisplayNameColumns,
       siteId: externalSites.id,
       siteName: externalSites.name,
@@ -266,10 +261,9 @@ export async function listAdminContent(
       id: row.review.id,
       name: row.review.name,
       bottle:
-        row.bottleId && row.bottleFullName && row.bottle
+        row.bottleId && row.bottle
           ? {
               id: row.bottleId,
-              fullName: row.bottleFullName,
               ...toBottleDisplayNameSource(row.bottle),
             }
           : null,

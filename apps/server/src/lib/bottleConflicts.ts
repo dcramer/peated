@@ -13,7 +13,7 @@ export type BottleIdentityEntity = {
   shortName?: string | null;
 };
 
-export type BottleIdentityState = {
+type BottleIdentityState = {
   name: string;
   fullName: string;
   brandId: number;
@@ -35,37 +35,60 @@ export type BottleIdentityState = {
   outturn: number | null;
 };
 
-export type BottleStructuredIdentity = Omit<
+type BottleStructuredIdentity = Omit<
   BottleIdentityState,
   "name" | "brand" | "bottler"
 >;
 
-/**
- * Keys the structured fields that together prove two Bottles are the same
- * release. A shared title alone is not enough: releases such as Batch 1 and
- * Batch 2, or two vintages, can share a full name.
- */
+// Whisky Identity Model: with the Brand and the lowercased full name, these
+// fields together prove two Bottles are the same release. A shared title alone
+// is not enough: releases such as Batch 1 and Batch 2, or two vintages, can
+// share a full name.
+const STRUCTURED_IDENTITY_FIELDS = [
+  "seriesId",
+  "edition",
+  "statedAge",
+  "noAgeStatement",
+  "vintageYear",
+  "bottlingYear",
+  "releaseYear",
+  "releaseMonth",
+  "releaseDay",
+  "abv",
+  "singleCask",
+  "caskStrength",
+  "caskNumber",
+  "outturn",
+] as const satisfies readonly (keyof BottleStructuredIdentity)[];
+
+/** Keys the structured identity so callers can compare Bottles in memory. */
 export function getBottleStructuredIdentityKey(
   identity: BottleStructuredIdentity,
 ) {
   return JSON.stringify([
     identity.brandId,
     identity.fullName.toLowerCase(),
-    identity.seriesId,
-    identity.edition,
-    identity.statedAge,
-    identity.noAgeStatement,
-    identity.vintageYear,
-    identity.bottlingYear,
-    identity.releaseYear,
-    identity.releaseMonth,
-    identity.releaseDay,
-    identity.abv,
-    identity.singleCask,
-    identity.caskStrength,
-    identity.caskNumber,
-    identity.outturn,
+    ...STRUCTURED_IDENTITY_FIELDS.map((field) => identity[field]),
   ]);
+}
+
+/**
+ * Matches stored Bottles with the same structured identity as
+ * `getBottleStructuredIdentityKey`. A missing field matches only a missing
+ * stored value.
+ */
+export function matchesBottleStructuredIdentity(
+  identity: Pick<BottleStructuredIdentity, "brandId" | "fullName"> &
+    Partial<BottleStructuredIdentity>,
+) {
+  return and(
+    eq(bottles.brandId, identity.brandId),
+    eq(sql`LOWER(${bottles.fullName})`, identity.fullName.toLowerCase()),
+    ...STRUCTURED_IDENTITY_FIELDS.map(
+      (field) =>
+        sql`${bottles[field]} IS NOT DISTINCT FROM ${identity[field] ?? null}`,
+    ),
+  );
 }
 
 export type BottleIdentityCandidate = {
@@ -305,22 +328,7 @@ export async function reserveBottleIdentitiesInTransaction(
       .where(
         and(
           notInArray(bottles.id, excludedBottleIds),
-          eq(bottles.brandId, desired.brandId),
-          eq(sql`LOWER(${bottles.fullName})`, desired.fullName.toLowerCase()),
-          sql`${bottles.seriesId} IS NOT DISTINCT FROM ${desired.seriesId}`,
-          sql`${bottles.edition} IS NOT DISTINCT FROM ${desired.edition}`,
-          sql`${bottles.statedAge} IS NOT DISTINCT FROM ${desired.statedAge}`,
-          sql`${bottles.noAgeStatement} IS NOT DISTINCT FROM ${desired.noAgeStatement}`,
-          sql`${bottles.vintageYear} IS NOT DISTINCT FROM ${desired.vintageYear}`,
-          sql`${bottles.bottlingYear} IS NOT DISTINCT FROM ${desired.bottlingYear}`,
-          sql`${bottles.releaseYear} IS NOT DISTINCT FROM ${desired.releaseYear}`,
-          sql`${bottles.releaseMonth} IS NOT DISTINCT FROM ${desired.releaseMonth}`,
-          sql`${bottles.releaseDay} IS NOT DISTINCT FROM ${desired.releaseDay}`,
-          sql`${bottles.abv} IS NOT DISTINCT FROM ${desired.abv}`,
-          sql`${bottles.singleCask} IS NOT DISTINCT FROM ${desired.singleCask}`,
-          sql`${bottles.caskStrength} IS NOT DISTINCT FROM ${desired.caskStrength}`,
-          sql`${bottles.caskNumber} IS NOT DISTINCT FROM ${desired.caskNumber}`,
-          sql`${bottles.outturn} IS NOT DISTINCT FROM ${desired.outturn}`,
+          matchesBottleStructuredIdentity(desired),
         ),
       )
       .orderBy(asc(bottles.id))

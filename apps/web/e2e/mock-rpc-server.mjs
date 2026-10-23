@@ -1080,9 +1080,7 @@ async function handleRpcRequest({ request, response, url }) {
       }
 
       if (input?.bottle === createdBottleId) {
-        const bottle = buildCreatedBottle({
-          includeExactBottleDetails: isExactBottlePhotoScenario(request),
-        });
+        const bottle = buildCreatedBottle();
         sendRpcResponse(response, withCollectionStatus(request, bottle));
         return true;
       }
@@ -1327,60 +1325,19 @@ async function handleRpcRequest({ request, response, url }) {
         return true;
       }
 
-      if (getAccessToken(request).includes("photo-create-warning")) {
-        sendRpcPhotoStream(response, buildCreateProposalPhotoIdentification());
-        return true;
-      }
-
-      if (getAccessToken(request).includes("photo-create-existing")) {
+      if (getAccessToken(request).includes("photo-stream-outage")) {
+        // The lookup fails after it sent the label and a likely match.
         sendRpcPhotoStream(
           response,
-          buildCreateProposalPhotoIdentification(),
-          "77777777777777777777777777777777",
-        );
-        return true;
-      }
-
-      if (getAccessToken(request).includes("photo-create-unsuitable")) {
-        sendRpcPhotoStream(
-          response,
-          buildCreateProposalPhotoIdentification({
-            suitableAsBottleImage: false,
-          }),
-          "44444444444444444444444444444444",
-        );
-        return true;
-      }
-
-      if (getAccessToken(request).includes("photo-create-complete-bottle")) {
-        sendRpcPhotoStream(
-          response,
-          buildCreateProposalPhotoIdentification({
-            includeExactBottleDetails: true,
-          }),
-          "22222222222222222222222222222222",
-        );
-        return true;
-      }
-
-      if (getAccessToken(request).includes("photo-create-prefilled-bottle")) {
-        sendRpcPhotoStream(
-          response,
-          buildCreateProposalPhotoIdentification({
-            includeExactBottleDetails: true,
-          }),
+          buildNoMatchPhotoIdentification(),
           "88888888888888888888888888888888",
-        );
-        return true;
-      }
-
-      if (
-        getAccessToken(request).includes("photo-create-bottle-default-image")
-      ) {
-        sendRpcPhotoStream(
-          response,
-          buildCreateProposalPhotoIdentification(),
-          "44444444444444444444444444444444",
+          [exactSearchBottle],
+          {
+            defined: true,
+            code: "SERVICE_UNAVAILABLE",
+            status: 503,
+            message: "We can't check photos right now.",
+          },
         );
         return true;
       }
@@ -1390,24 +1347,6 @@ async function handleRpcRequest({ request, response, url }) {
           response,
           buildNoMatchPhotoIdentification(),
           "55555555555555555555555555555555",
-        );
-        return true;
-      }
-
-      if (getAccessToken(request).includes("photo-manual-match")) {
-        sendRpcPhotoStream(
-          response,
-          buildManualSearchMatchPhotoIdentification(),
-          "413c334005c60d8dcc8dbf109761c5e3",
-        );
-        return true;
-      }
-
-      if (getAccessToken(request).includes("photo-needs-review")) {
-        sendRpcPhotoStream(
-          response,
-          buildManualReviewPhotoIdentification(),
-          "66666666666666666666666666666666",
         );
         return true;
       }
@@ -1491,7 +1430,6 @@ async function handleRpcRequest({ request, response, url }) {
             classification: {
               status: "classified",
               action: "match",
-              confidence: 95,
               reason: "Matched the fixture bottle.",
             },
           },
@@ -1518,12 +1456,6 @@ async function handleRpcRequest({ request, response, url }) {
         id: playwrightWrongPhotoMatchId,
         withdrawn: false,
       });
-      return true;
-    case "tastings/photoIdentificationCreate":
-      sendRpcResponse(
-        response,
-        createPhotoIdentificationBottle(request, input),
-      );
       return true;
     case "tastings/imageUpdate":
       if (getAccessToken(request).includes("tasting-image-failure")) {
@@ -2067,234 +1999,15 @@ function updateCollectionBottleImage(request, input) {
   });
 }
 
-function buildCreateProposalPhotoIdentification({
-  includeExactBottleDetails = false,
-  suitableAsBottleImage = true,
-} = {}) {
-  const proposedBottle = {
-    name: createdBottleName,
-    category: "single_malt",
-    series: null,
-    edition: includeExactBottleDetails ? "First Fill Oloroso" : null,
-    statedAge: null,
-    caskStrength: null,
-    singleCask: null,
-    abv: includeExactBottleDetails ? 46 : null,
-    vintageYear: null,
-    releaseYear: includeExactBottleDetails ? 2026 : null,
-    brand: {
-      id: testBrand.id,
-      name: testBrand.name,
-    },
-    distillers: [
-      {
-        id: testBrand.id,
-        name: testBrand.name,
-      },
-    ],
-    bottler: null,
-  };
-  const decision = {
-    action: "create_bottle",
-    proposedBottle,
-  };
-
-  return {
-    pendingImage: {
-      id: "playwright-photo-upload",
-      imageUrl: "http://127.0.0.1:4999/uploads/playwright-photo.webp",
-      expiresAt: "2026-06-07T13:00:00.000Z",
-    },
-    imageEvidence: {
-      sourceImageId: "playwright-photo-upload",
-      sourceImageHash: "playwright-photo-hash",
-      extractors: [
-        {
-          kind: "vision",
-          model: "playwright",
-          confidence: 0.92,
-          textSpans: [
-            {
-              text: `${testBrand.name} ${createdBottleName}`,
-              confidence: 0.92,
-            },
-          ],
-          observations: ["Single bottle label is readable."],
-        },
-      ],
-      fieldCandidates: {
-        brand: {
-          value: testBrand.name,
-          confidence: 0.95,
-          sourceExtractorIndexes: [0],
-        },
-        expression: {
-          value: createdBottleName,
-          confidence: 0.9,
-          sourceExtractorIndexes: [0],
-        },
-        series: {
-          value: "Playwright Series",
-          confidence: 0.88,
-          sourceExtractorIndexes: [0],
-        },
-        distillery: {
-          value: [testBrand.name],
-          confidence: 0.89,
-          sourceExtractorIndexes: [0],
-        },
-        category: {
-          value: "single_malt",
-          confidence: 0.87,
-          sourceExtractorIndexes: [0],
-        },
-        edition:
-          proposedBottle.edition === null
-            ? undefined
-            : {
-                value: proposedBottle.edition,
-                confidence: 0.88,
-                sourceExtractorIndexes: [0],
-              },
-      },
-      photoSuitability: {
-        isSingleBottlePhoto: true,
-        labelReadable: true,
-        suitableAsTastingImage: true,
-        suitableAsBottleImage,
-        reason: suitableAsBottleImage
-          ? null
-          : "The photo is not suitable as a public catalog image.",
-      },
-      conflicts: [],
-    },
-    classification: {
-      status: "classified",
-      decision,
-      artifacts: {
-        candidates: [
-          {
-            bottleId: existingBottleId,
-            bottleFullName: existingBottle.fullName,
-            fullName: existingBottle.fullName,
-          },
-        ],
-      },
-    },
-    suggestedNextStep: "confirm_create",
-    diagnostics: {
-      extraction: {
-        status: "found",
-        summary: `${testBrand.name} ${createdBottleName}`,
-      },
-      candidates: {
-        count: 1,
-      },
-      classification: {
-        status: "classified",
-        action: "create_bottle",
-        confidence: 92,
-        reason: "Create proposal fixture.",
-      },
-    },
-    createToken: `playwright-create-token:create_bottle:${suitableAsBottleImage ? "suitable" : "unsuitable"}`,
-  };
-}
-
-function createPhotoIdentificationBottle(request, input) {
-  const expectedCreateToken = getExpectedPhotoCreateToken(request);
-  if (input?.createToken !== expectedCreateToken) {
-    throw new Error("Unexpected photo identification create token");
-  }
-
-  const token = getAccessToken(request);
-  const bottle = buildCreatedBottle({
-    includeExactBottleDetails: isExactBottlePhotoScenario(request),
-  });
-
-  if (token.includes("photo-create-warning")) {
-    return {
-      bottle,
-      warnings: [
-        {
-          code: "CATALOG_IMAGE_COPY_FAILED",
-          message: "The bottle was added, but the public image was not saved.",
-        },
-      ],
-    };
-  }
-
-  if (token.includes("photo-create-existing")) {
-    return {
-      bottle: existingBottle,
-    };
-  }
-
-  if (token.includes("photo-create-unsuitable")) {
-    return {
-      bottle,
-    };
-  }
-
-  if (
-    token.includes("photo-create-bottle-default-image") ||
-    token.includes("photo-create-complete-bottle") ||
-    token.includes("photo-create-prefilled-bottle")
-  ) {
-    return {
-      bottle,
-    };
-  }
-
-  throw new Error("Unexpected photo identification create scenario");
-}
-
-function getExpectedPhotoCreateToken(request) {
-  const token = getAccessToken(request);
-  if (token.includes("photo-create-unsuitable")) {
-    return "playwright-create-token:create_bottle:unsuitable";
-  }
-
-  if (
-    token.includes("photo-create-bottle-default-image") ||
-    token.includes("photo-create-complete-bottle") ||
-    token.includes("photo-create-prefilled-bottle") ||
-    token.includes("photo-create-warning") ||
-    token.includes("photo-create-existing")
-  ) {
-    return "playwright-create-token:create_bottle:suitable";
-  }
-
-  return null;
-}
-
-function isExactBottlePhotoScenario(request) {
-  const token = getAccessToken(request);
-  return (
-    token.includes("photo-create-complete-bottle") ||
-    token.includes("photo-create-prefilled-bottle") ||
-    token.includes("proposal-release-library")
-  );
-}
-
-function buildCreatedBottle({ includeExactBottleDetails = false } = {}) {
-  const bottleWithoutGroup = buildBottle({
+function buildCreatedBottle() {
+  const bottle = buildBottle({
     id: createdBottleId,
     name: createdBottleName,
     brand: testBrand,
   });
-  const bottle = {
-    ...bottleWithoutGroup,
-    group: buildBottleGroup({ bottle: bottleWithoutGroup }),
-  };
-  if (!includeExactBottleDetails) return bottle;
-
   return {
     ...bottle,
-    fullName: `${bottle.fullName} First Fill Oloroso`,
-    edition: "First Fill Oloroso",
-    abv: 46,
-    releaseYear: 2026,
+    group: buildBottleGroup({ bottle }),
   };
 }
 
@@ -2598,178 +2311,7 @@ function buildNoMatchPhotoIdentification() {
       classification: {
         status: "classified",
         action: "no_match",
-        confidence: 0,
         reason: "No existing Peated bottle matched the label details.",
-      },
-    },
-  };
-}
-
-function buildManualSearchMatchPhotoIdentification() {
-  return {
-    pendingImage: {
-      id: "playwright-photo-upload",
-      imageUrl: "http://127.0.0.1:4999/uploads/playwright-photo.webp",
-      expiresAt: "2026-06-07T13:00:00.000Z",
-    },
-    imageEvidence: {
-      sourceImageId: "playwright-photo-upload",
-      sourceImageHash: "playwright-photo-hash",
-      extractors: [
-        {
-          kind: "vision",
-          model: "playwright",
-          confidence: 0.75,
-          textSpans: [
-            {
-              text: `${testBrand.name} ${existingBottle.name} 2022 release`,
-              confidence: 0.75,
-            },
-          ],
-          observations: ["Single bottle label is readable."],
-        },
-      ],
-      fieldCandidates: {
-        brand: {
-          value: testBrand.name,
-          confidence: 0.75,
-          sourceExtractorIndexes: [0],
-        },
-        expression: {
-          value: existingBottle.name,
-          confidence: 0.75,
-          sourceExtractorIndexes: [0],
-        },
-        releaseYear: {
-          value: 2022,
-          confidence: 0.75,
-          sourceExtractorIndexes: [0],
-        },
-      },
-      photoSuitability: {
-        isSingleBottlePhoto: true,
-        labelReadable: true,
-        suitableAsTastingImage: true,
-        suitableAsBottleImage: true,
-        reason: null,
-      },
-      conflicts: [],
-    },
-    classification: {
-      status: "classified",
-      decision: {
-        action: "match",
-        matchedBottle: exactMatchedBottle,
-      },
-      artifacts: {
-        candidates: [
-          {
-            bottleId: exactMatchedBottleId,
-            bottleFullName: exactMatchedBottle.fullName,
-            fullName: exactMatchedBottle.fullName,
-          },
-          {
-            bottleId: existingBottleId,
-            bottleFullName: existingBottle.fullName,
-            fullName: existingBottle.fullName,
-          },
-        ],
-      },
-    },
-    suggestedNextStep: "manual_search",
-    diagnostics: {
-      extraction: {
-        status: "found",
-        summary: `${testBrand.name} ${existingBottle.name} 2022 release`,
-      },
-      candidates: {
-        count: 2,
-      },
-      classification: {
-        status: "classified",
-        action: "match",
-        confidence: null,
-        reason:
-          "Local release candidate safely matches, but the next step was downgraded.",
-      },
-    },
-  };
-}
-
-function buildManualReviewPhotoIdentification() {
-  return {
-    pendingImage: {
-      id: "playwright-photo-upload",
-      imageUrl: "http://127.0.0.1:4999/uploads/playwright-photo.webp",
-      expiresAt: "2026-06-07T13:00:00.000Z",
-    },
-    imageEvidence: {
-      sourceImageId: "playwright-photo-upload",
-      sourceImageHash: "playwright-photo-hash",
-      extractors: [
-        {
-          kind: "vision",
-          model: "playwright",
-          confidence: 0.72,
-          textSpans: [
-            {
-              text: `${testBrand.name} ${existingBottle.name}`,
-              confidence: 0.72,
-            },
-          ],
-          observations: ["Single bottle label is partly readable."],
-        },
-      ],
-      fieldCandidates: {
-        brand: {
-          value: testBrand.name,
-          confidence: 0.72,
-          sourceExtractorIndexes: [0],
-        },
-        expression: {
-          value: existingBottle.name,
-          confidence: 0.68,
-          sourceExtractorIndexes: [0],
-        },
-      },
-      photoSuitability: {
-        isSingleBottlePhoto: true,
-        labelReadable: true,
-        suitableAsTastingImage: true,
-        suitableAsBottleImage: false,
-        reason: "The photo is too uncertain for catalog creation.",
-      },
-      conflicts: [],
-    },
-    classification: {
-      status: "classified",
-      decision: {
-        action: "no_match",
-      },
-      artifacts: {
-        candidates: [
-          {
-            bottleId: existingBottleId,
-            bottleFullName: existingBottle.fullName,
-            fullName: existingBottle.fullName,
-          },
-        ],
-      },
-    },
-    suggestedNextStep: "manual_search",
-    diagnostics: {
-      extraction: {
-        status: "found",
-        summary: `${testBrand.name} ${existingBottle.name}`,
-      },
-      candidates: {
-        count: 1,
-      },
-      classification: {
-        status: "classified",
-        action: "no_match",
-        confidence: 55,
-        reason: "Possible match needs user review.",
       },
     },
   };
@@ -2798,9 +2340,7 @@ function getMockBottle(request, bottleId) {
   }
   if (bottleId === exactMergeOtherBottleId) return exactMergeOtherBottle;
   if (bottleId === createdBottleId) {
-    return buildCreatedBottle({
-      includeExactBottleDetails: isExactBottlePhotoScenario(request),
-    });
+    return buildCreatedBottle();
   }
   if (bottleId === groupedBottleDetails.id) return groupedBottleDetails;
   const groupMember = bottleGroupMembers.find(
@@ -3047,11 +2587,16 @@ function sendRpcResponse(response, data, sentryTraceId = null) {
  * photo, the label reading, any likely matches, then the full result as the
  * final `done` event.
  */
+/**
+ * Streams the photo, label, and likely-match events, then ends with the result,
+ * or with `error` (an oRPC error) in place of the result.
+ */
 function sendRpcPhotoStream(
   response,
   result,
   sentryTraceId = null,
   likelyMatches = [],
+  error = null,
 ) {
   const headers = {
     ...corsHeaders,
@@ -3070,7 +2615,7 @@ function sendRpcPhotoStream(
       (likelyMatches.length
         ? event("message", { type: "candidates", bottles: likelyMatches })
         : "") +
-      event("done", result),
+      (error ? event("error", error) : event("done", result)),
   );
 }
 
