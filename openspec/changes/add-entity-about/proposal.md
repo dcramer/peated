@@ -14,13 +14,16 @@ live in code.
 
 ## What Changes
 
-- Add a shared **source** record and **citations** that link each fact to the
-  passage that supports it. Conflicting sources stay visible instead of being
-  settled by guesswork.
-- Extend Entity history: dated events gain names over time, eras with an end
-  year, related Entities, and several citations each.
-- Add typed **distillery site facts**: stills, capacity, water source, and
-  building listing, each with citations and an as-of date.
+- Store each Entity's About data as **one typed JSON document**, checked by a
+  schema in code. It holds sources, citations linking each fact to its
+  supporting passage, history events, eras, names over time, distillery site
+  facts, and prose sections. Conflicting sources stay visible instead of
+  being settled by guesswork.
+- Keep the list of site facts and the reviewed source sites in **typed files
+  in code**, changed by pull request. Changes to the document schema should
+  be rare and backward compatible.
+- **BREAKING (internal):** move Entity history from `entity_event` into the
+  document, then drop the table.
 - Add **catalog numbers** routes built from Bottles: Bottles by year
   distilled, who bottled them, which distilleries make a brand, and releases
   by year. Add a vintage filter to the Bottle list.
@@ -61,9 +64,9 @@ live in code.
 
 ## Impact
 
-- **Database:** new tables for sources, citations, site facts, About sections,
-  and pipeline runs; new columns and kinds on `entity_event`. Generated with
-  `pnpm db:generate`.
+- **Database:** two new tables, `entity_about` (one document per Entity) and
+  `entity_about_run`, a new `change` object type, and a later drop of
+  `entity_event`. Generated with `pnpm db:generate`.
 - **Server:** new routes under `apps/server/src/orpc/routes/entities/about/`
   and catalog-number routes; a vintage filter on `bottles.list`; new worker
   jobs; changes to `generateEntityDetails`.
