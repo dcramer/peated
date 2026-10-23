@@ -122,8 +122,8 @@ web server is already running with the API pointed at a compatible test target.
 
 ## CI Budget
 
-Three photo tests cover searching after an outage, replacing a photo during
-lookup, and stopping a stalled request. The last test advances the browser clock.
+Three photo tests cover keeping what a failed lookup found, replacing a photo
+during lookup, and stopping a stalled request. The last test advances the browser clock.
 
 - The Playwright command should finish in less than 5 minutes on a healthy CI
   runner. Its hard timeout is 7 minutes. The 15-minute GitHub job timeout also

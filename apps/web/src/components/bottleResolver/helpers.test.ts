@@ -187,6 +187,19 @@ describe("photo create prefill", () => {
       outturn: 612,
     });
   });
+
+  test("fills a new Bottle from the label facts a failed lookup streamed", () => {
+    // Only the label event arrived before the lookup failed.
+    const { imageEvidence } = buildPhotoResult();
+
+    expect(getCreateNameSeed({ imageEvidence })).toBe("");
+    expect(getCreateBottlePrefill({ imageEvidence })).toMatchObject({
+      brandId: null,
+      brandName: "Raw Label Brand",
+      category: "single_malt",
+      distillers: [{ id: null, name: "Qualified Existing Distillery Co." }],
+    });
+  });
 });
 
 describe("photo identification progress", () => {

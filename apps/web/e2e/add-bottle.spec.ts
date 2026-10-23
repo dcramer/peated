@@ -156,31 +156,13 @@ test.describe("Add Bottle", () => {
     ).toHaveAttribute("href", bottlePathPattern(existingBottle.id));
   });
 
-  test("recovers from a photo service outage through search", async ({
+  test("keeps the label and likely matches when the photo lookup fails", async ({
     context,
     page,
   }, testInfo) => {
     await signIn(context, {
-      accessToken: uniqueAccessToken(testInfo, "photo-outage"),
+      accessToken: uniqueAccessToken(testInfo, "photo-stream-outage"),
     });
-    await page.route("**/rpc/tastings/photoIdentification", (route) =>
-      route.fulfill({
-        status: 503,
-        contentType: "application/json",
-        headers: {
-          "access-control-allow-origin": "*",
-          "x-sentry-trace-id": "88888888888888888888888888888888",
-        },
-        body: JSON.stringify({
-          json: {
-            defined: true,
-            code: "SERVICE_UNAVAILABLE",
-            status: 503,
-            message: "We can't check photos right now.",
-          },
-        }),
-      }),
-    );
     await page.goto("/addBottle");
     await uploadLabel(page);
     await expect(
@@ -188,10 +170,26 @@ test.describe("Add Bottle", () => {
         "We can't check photos right now. Search by name or try again later.",
       ),
     ).toBeVisible();
+
+    // A new Bottle starts from the streamed label facts and keeps the photo.
+    const createHref = await page
+      .getByRole("link", { name: "Add a new bottle" })
+      .getAttribute("href");
+    const createParams = new URL(createHref ?? "", "http://localhost")
+      .searchParams;
+    expect(createParams.get("name")).toBe(createdBottleName);
+    expect(createParams.get("brandName")).toBe(testBrand.name);
+    expect(createParams.get("pendingImageId")).toBe("playwright-photo-upload");
+
+    // The streamed likely match continues with that Bottle.
     await page
-      .getByRole("link", { name: "Search bottles", exact: true })
+      .getByRole("button", {
+        name: `Use this bottle: ${exactSearchBottle.fullName}`,
+      })
       .click();
-    await expect(page).toHaveURL(/\/search/);
+    await expect(
+      page.getByRole("button", { name: "Add to Library" }),
+    ).toBeVisible();
   });
 
   test("can replace a photo while identification is pending", async ({

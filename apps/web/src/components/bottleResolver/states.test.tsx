@@ -241,6 +241,31 @@ describe("PhotoFallbackState", () => {
     expect(html).toContain('href="/search?q=Springbank"');
   });
 
+  it("keeps the likely matches and label facts when the lookup fails", () => {
+    const html = renderFallback({
+      alert: true,
+      previewUrl: "blob:label-photo",
+      reason: "We can't check photos right now.",
+      result: {
+        imageEvidence: {
+          ...result.imageEvidence,
+          fieldCandidates: {
+            brand: { value: "Kilkerran", confidence: 0.9 },
+          },
+        },
+      },
+      suggestions: [makeBottle({ id: 7, fullName: "Springbank 10-year-old" })],
+    });
+
+    expect(html).toContain('role="alert"');
+    expect(html).toContain("Is it one of these?");
+    expect(html).toContain("Use this bottle: Springbank 10-year-old");
+    expect(html).toContain('href="/bottles/new?name=Batch"');
+    // The photo stays in view, and the label facts stay available.
+    expect(html).toContain('src="blob:label-photo"');
+    expect(html).toMatch(/Brand.*Kilkerran/);
+  });
+
   it("adds an approved new Bottle through its own actions", () => {
     const html = renderFallback({
       result: {
