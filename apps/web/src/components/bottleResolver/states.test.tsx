@@ -136,7 +136,6 @@ const result: PhotoIdentification = {
     classification: {
       status: "ignored",
       action: null,
-      confidence: null,
       reason: "Test fixture",
     },
   },

@@ -1430,7 +1430,6 @@ async function handleRpcRequest({ request, response, url }) {
             classification: {
               status: "classified",
               action: "match",
-              confidence: 95,
               reason: "Matched the fixture bottle.",
             },
           },
@@ -2312,7 +2311,6 @@ function buildNoMatchPhotoIdentification() {
       classification: {
         status: "classified",
         action: "no_match",
-        confidence: 0,
         reason: "No existing Peated bottle matched the label details.",
       },
     },

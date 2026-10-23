@@ -104,7 +104,6 @@ function buildPhotoResult(): PhotoIdentification {
       classification: {
         status: "classified",
         action: "create_bottle",
-        confidence: null,
         reason: null,
       },
     },
