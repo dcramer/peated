@@ -43,7 +43,7 @@ catalog:
   "@tanstack/react-query-next-experimental": ^5.91.0
   # TODO: theres an issue upgrading right now to 11.0.1
 
-  tsx: ^4.21.0
+  tsx: ^4.23.15
   typescript: ^5.9.3
   "@types/node": ^24.13.2
   "@types/pg": ^8.18.0
@@ -56,6 +56,29 @@ catalog:
   react-dom: ^19.2.7
   "@types/react": ^19.2.17
   "@types/react-dom": ^19.2.3
+
+# Overrides for vulnerable packages whose parents are already on their latest
+# release but still ask for an old version. Remove each one when its parent
+# allows the fixed version.
+overrides:
+  # drizzle-kit 0.31.11 lists @esbuild-kit/esm-loader but never loads it. Its
+  # esbuild 0.18 has the dev server advisory fixed in 0.25.
+  '@esbuild-kit/core-utils>esbuild': ^0.25.12
+  # github-actionlint 1.7.12 asks for adm-zip ^0.5.16. adm-zip 0.6.1 fixes
+  # zip-bomb, symlink, and SUID advisories. Only the Windows download unzips.
+  'github-actionlint>adm-zip': ^0.6.1
+  # jsx-email 3.2.1 pins these exact versions. The newer releases fix Vite
+  # dev server, PostCSS source map, and React Router advisories.
+  'jsx-email>postcss': ^8.5.31
+  'jsx-email>react-router-dom': ^7.18.4
+  'jsx-email>vite': ^8.3.5
+  # @google-cloud/storage 7 uses gaxios 6 and teeny-request 9, which ask for
+  # uuid ^9. uuid 11.1.1 adds a missing buffer bounds check.
+  'gaxios@6>uuid': ^11.1.1
+  'teeny-request@9>uuid': ^11.1.1
+  # @sentry/nextjs's bundler plugins accept any webpack 5 as a peer, and the
+  # lockfile kept 5.93. Later releases fix DOM clobbering and buildHttp SSRF.
+  webpack: ^5.104.1
 
 minimumReleaseAgeExclude:
   - zod@4.5.4
