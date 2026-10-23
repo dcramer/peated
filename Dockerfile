@@ -20,6 +20,7 @@ FROM base AS base-env
 WORKDIR /app
 
 COPY .npmrc package.json pnpm-lock.yaml pnpm-workspace.yaml .
+COPY patches ./patches
 COPY apps/cli/package.json ./apps/cli/package.json
 COPY apps/web/package.json ./apps/web/package.json
 COPY apps/server/package.json ./apps/server/package.json

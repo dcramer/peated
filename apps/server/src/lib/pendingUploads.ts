@@ -1,5 +1,6 @@
 import { createId } from "@paralleldrive/cuid2";
 import { db } from "@peated/server/db";
+import { uniqueViolationConstraint } from "@peated/server/db/errors";
 import {
   type NewPendingUpload,
   type PendingUpload,
@@ -49,10 +50,7 @@ function isPermanentUploadNamespace(
 }
 
 function isPendingUploadIdempotencyConflict(err: any) {
-  return (
-    err?.code === "23505" &&
-    err?.constraint === "pending_upload_idempotency_key"
-  );
+  return uniqueViolationConstraint(err) === "pending_upload_idempotency_key";
 }
 
 async function findPendingUploadByIdempotencyKey({

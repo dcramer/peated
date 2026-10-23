@@ -25,8 +25,8 @@ catalog:
   '@orpc/zod': 1.15.0
   dotenv: ^16.4.7
   dotenv-cli: ^7.4.4
-  drizzle-kit: ^0.30.6
-  drizzle-orm: ^0.39.3
+  drizzle-kit: ^0.31.11
+  drizzle-orm: ^0.45.4
   jsx-email: ^1.10.11
   pg: ^8.20.0
   prettier: ^3.8.1
@@ -58,3 +58,10 @@ catalog:
 
 minimumReleaseAgeExclude:
   - zod@4.5.4
+
+patchedDependencies:
+  # Sensitive data policy (docs/policies/sensitive-data.md): DrizzleQueryError
+  # puts every SQL parameter value in its message and stack, which reach logs,
+  # Sentry, and BullMQ failure reasons. The patch keeps the query text only.
+  # Regenerate it with `pnpm patch` when drizzle-orm changes version.
+  drizzle-orm@0.45.4: patches/drizzle-orm@0.45.4.patch

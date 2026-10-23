@@ -1,4 +1,5 @@
 import { db } from "@peated/server/db";
+import { uniqueViolationConstraint } from "@peated/server/db/errors";
 import { countries, regions, type NewRegion } from "@peated/server/db/schema";
 import { procedure } from "@peated/server/orpc";
 import { ConflictError } from "@peated/server/orpc/errors";
@@ -94,9 +95,9 @@ export default procedure
         .returning();
     } catch (error: any) {
       const conflictField =
-        error?.code === "23505" && error?.constraint === "region_slug_unq"
+        uniqueViolationConstraint(error) === "region_slug_unq"
           ? regions.slug
-          : error?.code === "23505" && error?.constraint === "region_name_unq"
+          : uniqueViolationConstraint(error) === "region_name_unq"
             ? regions.name
             : null;
       if (!conflictField) throw error;

@@ -1,5 +1,6 @@
 import program from "@peated/cli/program";
 import { db } from "@peated/server/db";
+import { uniqueViolationConstraint } from "@peated/server/db/errors";
 import { users } from "@peated/server/db/schema";
 import {
   createAccessToken,
@@ -34,8 +35,9 @@ subcommand
     } catch (err: any) {
       if (
         !options.ifExists ||
-        err?.code !== "23505" ||
-        !["user_email_unq", "user_username_unq"].includes(err?.constraint)
+        !["user_email_unq", "user_username_unq"].includes(
+          uniqueViolationConstraint(err) ?? "",
+        )
       ) {
         throw err;
       }

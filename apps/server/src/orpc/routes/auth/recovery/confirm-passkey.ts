@@ -1,5 +1,6 @@
 import { ORPCError } from "@orpc/server";
 import { db } from "@peated/server/db";
+import { uniqueViolationConstraint } from "@peated/server/db/errors";
 import { passkeys, users } from "@peated/server/db/schema";
 import {
   auditRecoveryFailure,
@@ -126,10 +127,7 @@ export function createRecoveryPasskeyConfirmProcedure(
           passkey = result.passkey;
           updatedUser = result.updatedUser;
         } catch (err: any) {
-          if (
-            err?.code === "23505" &&
-            err?.constraint === "passkey_credential_id_unq"
-          ) {
+          if (uniqueViolationConstraint(err) === "passkey_credential_id_unq") {
             throw errors.CONFLICT({
               message: "This passkey is already registered.",
             });
