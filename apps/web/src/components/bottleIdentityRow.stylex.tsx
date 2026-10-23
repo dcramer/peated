@@ -428,7 +428,14 @@ const styles = stylex.create({
     marginTop: "2px",
     color: colors.inkMuted,
   },
+  // A fact wider than the row, such as a long worded edition, truncates on its
+  // own line instead of running past the row.
   fact: {
+    display: "inline-block",
+    maxWidth: "100%",
+    overflow: "hidden",
+    textOverflow: "ellipsis",
+    verticalAlign: "top",
     whiteSpace: "nowrap",
   },
   subtitle: {
