@@ -33,6 +33,7 @@ function serializeSection(
     .map((sentence) => ({
       text: sentence.text,
       sourceIds: [...new Set(sentence.factIds.flatMap(sourceIdsForFact))],
+      factIds: sentence.factIds,
     }));
   return sentences.length
     ? {

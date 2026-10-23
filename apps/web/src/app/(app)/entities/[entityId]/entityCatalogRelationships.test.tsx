@@ -30,6 +30,7 @@ function renderRelationships(
     ...mockEntity,
     id: 1,
     images: [],
+    hasAbout: false,
     kind,
     name: "Example",
   } satisfies Entity;

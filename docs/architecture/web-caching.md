@@ -30,7 +30,9 @@ headers prove it.
 - `publicCatalog.server.ts` caches anonymous entity summaries and first-page
   entity/series bottle lists for five minutes. Keys include entity, series,
   distillery view, sort, and limit. Members, searches, extra filters, later
-  pages, and unscoped lists bypass this cache.
+  pages, and unscoped lists bypass this cache. It also caches each Entity's
+  About page data (the About document and its catalog numbers) for five
+  minutes, the same for visitors and members.
 - Read sessions outside shared cache callbacks; use anonymous clients inside.
 - Keep canonical details and edit reads fresh. Anonymous page frames reuse
   canonical details; member frames fetch personalized state separately.

@@ -14,6 +14,7 @@ const distillery = {
   ...mockEntity,
   id: 321,
   images: [],
+  hasAbout: false,
   kind: "distillery",
   name: "Port Ellen",
   peatedId: "E0321",

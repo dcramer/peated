@@ -230,6 +230,9 @@ export const AboutPublicSectionSchema = z.object({
     z.object({
       text: z.string(),
       sourceIds: z.array(AboutSourceIdSchema),
+      factIds: z
+        .array(z.string())
+        .describe("`event:<id>` or `site:<field>` for each fact stated."),
     }),
   ),
 });

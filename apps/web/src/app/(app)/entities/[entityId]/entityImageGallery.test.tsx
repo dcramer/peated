@@ -12,6 +12,7 @@ const timestamp = "2026-01-01T00:00:00.000Z";
 
 const entity = {
   ...mockEntity,
+  hasAbout: false,
   images: [
     {
       id: 1,

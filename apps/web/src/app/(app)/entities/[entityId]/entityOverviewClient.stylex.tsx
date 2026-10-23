@@ -134,6 +134,9 @@ export function EntityOverviewClient() {
             reviewsAndTastings={recentReviewsAndTastingsQuery.data}
           />
           <EntityHistoryOverview
+            aboutHref={
+              entity.hasAbout ? `${getEntityUrl(entity)}/about` : undefined
+            }
             entityName={entity.name}
             error={Boolean(eventListQuery.error)}
             eventList={eventListQuery.data}

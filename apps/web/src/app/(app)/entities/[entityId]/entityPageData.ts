@@ -1,6 +1,5 @@
 import type { Outputs } from "@peated/server/orpc/router";
 import type { PageTabItem } from "@peated/web/components/pageTabs.stylex";
-import { getEntityAbout } from "@peated/web/features/entityAbout/entityAbout";
 import { getEntityUrl } from "@peated/web/lib/urls";
 
 export type Entity = Outputs["entities"]["details"];
@@ -12,6 +11,7 @@ type EntityTabSource = Pick<
   | "shortName"
   | "totalBottles"
   | "publicReviewAndTastingCount"
+  | "hasAbout"
 >;
 export type CompanyPageCounts = {
   bottles: number;
@@ -77,7 +77,7 @@ export function getEntityTabs(
     { href: baseUrl, label: "Overview" },
   ];
 
-  if (getEntityAbout(entity.id)) {
+  if (entity.hasAbout) {
     tabs.push({ href: `${baseUrl}/about`, label: "About" });
   }
 

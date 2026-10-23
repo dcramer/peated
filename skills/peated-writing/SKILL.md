@@ -87,6 +87,14 @@ Avoid both extremes:
 - Too laddish: `46 years old and absolutely sending it. Get involved.`
 - Peated: `Forty-six years in and the smoke has turned to embers — extraordinary, and priced accordingly.`
 
+## Write About Pages
+
+Entity About pages are sourced reference text, not copy. Use the plain
+register, no jokes. Each sentence states facts a source supports, in at most
+30 words. Do not use the phrases in
+`apps/server/src/lib/entityAbout/bannedPhrases.ts`; the About checks reject
+them. See `docs/features/entity-about.md`.
+
 ## Deliver The Copy
 
 When drafting, return final copy first. Mark facts that still need verification.

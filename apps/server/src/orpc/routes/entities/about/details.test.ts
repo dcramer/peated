@@ -93,7 +93,7 @@ describe("GET /entities/:entity/about", () => {
     });
     // A sentence that rests on a hidden fact is left out.
     expect(about?.lead?.sentences).toEqual([
-      { text: "It opened in 1819.", sourceIds: ["hes"] },
+      { text: "It opened in 1819.", sourceIds: ["hes"], factIds: ["event:1"] },
     ]);
     expect(about?.sources.map(({ id }) => id)).toEqual(["hes", "wp"]);
     expect(JSON.stringify(about)).not.toContain("Founded 1819");
@@ -120,5 +120,44 @@ describe("GET /entities/:entity/about", () => {
     expect(
       await routerClient.entities.about.details({ entity: entity.id }),
     ).toBeNull();
+  });
+});
+
+describe("GET /entity-about/sitemap", () => {
+  test("lists only pages the About tab shows", async ({ fixtures }) => {
+    const shown = await fixtures.Entity({ kind: "distillery" });
+    const leadOnly = await fixtures.Entity({ kind: "distillery" });
+    const hidden = await fixtures.Entity({ kind: "distillery" });
+    const lead = {
+      key: "lead",
+      heading: null,
+      eraEventId: null,
+      writtenBy: "person" as const,
+      sentences: [{ text: "It opened in 1819.", factIds: ["event:1"] }],
+    };
+    const events = [
+      { id: 1, kind: "opened" as const, date: "1819" },
+      { id: 2, kind: "closed" as const, date: "1983" },
+    ];
+    await fixtures.EntityAbout({
+      entityId: shown.id,
+      events,
+      sections: [lead],
+    });
+    await fixtures.EntityAbout({
+      entityId: leadOnly.id,
+      events: [events[0]!],
+      sections: [lead],
+    });
+    await fixtures.EntityAbout({
+      entityId: hidden.id,
+      events,
+      sections: [lead],
+      status: "hidden",
+    });
+
+    const { results } = await routerClient.entities.about.sitemap({});
+
+    expect(results.map(({ id }) => id)).toEqual([shown.id]);
   });
 });

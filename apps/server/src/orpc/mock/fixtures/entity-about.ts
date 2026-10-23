@@ -53,6 +53,33 @@ export const mockEntityAbouts = new Map([
   ],
 ]);
 
+// The legacy history list shows the same events as the About document.
+export const mockBroraHistory = BRORA_ABOUT_EXAMPLE.events.flatMap((event) => {
+  const source = BRORA_ABOUT_EXAMPLE.sources.find(
+    (candidate) => candidate.id === event.citations[0]?.sourceId,
+  );
+  const { kind } = event;
+  return kind === "generic" ||
+    kind === "opened" ||
+    kind === "closed" ||
+    kind === "mothballed" ||
+    kind === "reopened"
+    ? [
+        {
+          id: 9900 + event.id,
+          entityId: mockBrora.id,
+          kind,
+          date: event.date,
+          description: event.text,
+          newOwnerId: null,
+          sourceUrl: source?.url ?? null,
+          createdAt: timestamp,
+          updatedAt: timestamp,
+        },
+      ]
+    : [];
+});
+
 export const mockEntityVintageCounts = new Map([
   [
     mockBrora.id,
