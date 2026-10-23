@@ -1,5 +1,5 @@
 import * as stylex from "@stylexjs/stylex";
-import type { MouseEventHandler, ReactNode } from "react";
+import { Fragment, type MouseEventHandler, type ReactNode } from "react";
 
 import { foundationStyles } from "../styles/foundations.stylex";
 import { colors, effects, space, zIndices } from "../styles/tokens.stylex";
@@ -43,8 +43,9 @@ export type BottleIdentityRowProps = {
   /** Tightens vertical padding when the row is nested inside another surface. */
   verticalPadding?: "sm" | "md";
   /**
-   * Lets the subtitle and metadata wrap instead of clipping. Use it when those
-   * lines hold a sentence the member needs in full, such as a draft's status.
+   * Lets the subtitle wrap instead of clipping, and lets a long fact break
+   * inside itself. Use it when those lines hold a sentence the member needs in
+   * full, such as a draft's status.
    */
   wrapDetails?: boolean;
 };
@@ -194,10 +195,10 @@ export function BottleIdentityRow({
           )}
         >
           {metadata.map((item, index) => (
-            <span key={`${item}-${index}`}>
+            <Fragment key={`${item}-${index}`}>
               {index ? <span aria-hidden="true"> · </span> : null}
-              {item}
-            </span>
+              <span {...stylex.props(!wrapDetails && styles.fact)}>{item}</span>
+            </Fragment>
           ))}
         </div>
       ) : null}
@@ -419,13 +420,15 @@ const styles = stylex.create({
     textDecorationThickness: "1px",
     textUnderlineOffset: "2px",
   },
+  // DESIGN.md: metadata wraps when needed, so ABV and other facts are never
+  // cut off. Lines break between facts, not inside one.
   metadata: {
     maxWidth: "100%",
-    overflow: "hidden",
     // BottleIdentityRow uses 2px gaps to fit three lines beside its 64px thumbnail.
     marginTop: "2px",
     color: colors.inkMuted,
-    textOverflow: "ellipsis",
+  },
+  fact: {
     whiteSpace: "nowrap",
   },
   subtitle: {

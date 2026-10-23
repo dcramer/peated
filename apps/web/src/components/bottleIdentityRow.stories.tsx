@@ -194,7 +194,7 @@ export const RowLayouts: Story = {
     docs: {
       description: {
         story:
-          "Compare the actual bottle, sidebar, activity, tasting, search, selection, and loading components at wide and phone widths. Standard rows use three identity lines and a medium thumbnail; activity makes that image larger in wide feed columns. Sidebars use a small thumbnail, compact two-line titles, and trailing details below the identity. Compact library additions use the extra-small thumbnail. Tasting drafts let their status wrap so it is never cut off.",
+          "Compare the actual bottle, sidebar, activity, tasting, search, selection, and loading components at wide and phone widths. Standard rows use three identity lines and a medium thumbnail; activity makes that image larger in wide feed columns. Sidebars use a small thumbnail, compact two-line titles, and trailing details below the identity. Compact library additions use the extra-small thumbnail. Release facts wrap between facts, so ABV is never cut off; tasting drafts also let their status wrap.",
       },
     },
   },
