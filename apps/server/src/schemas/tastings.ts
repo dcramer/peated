@@ -212,7 +212,6 @@ export const PhotoIdentificationDiagnosticsSchema = z.object({
   classification: z.object({
     status: z.enum(["ignored", "classified"]),
     action: z.string().nullable().default(null),
-    confidence: z.number().nullable().default(null),
     reason: z.string().nullable().default(null),
   }),
 });

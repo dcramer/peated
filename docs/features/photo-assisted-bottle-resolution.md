@@ -88,6 +88,11 @@ these parts change:
   bottle** leads when the label was read, and **Search bottles** leads when it
   was not.
 
+A lookup that fails after it started streaming keeps what it sent. Its likely
+matches become the suggestions, and **Add a new bottle** and **Search bottles**
+start from the label facts and keep the photo, as they do after no match. A
+failure before anything arrived offers a blank search and a blank new Bottle.
+
 **Start over** is always a quiet text action. Label details stay collapsed,
 with two exceptions: an approved new Bottle shows the photo and label facts
 above its actions, because one tap adds it, and a failed lookup keeps the
@@ -267,7 +272,8 @@ best-effort attachment.
 ## Failures And Recovery
 
 - Extraction or classification failure returns an identification error; the UI
-  keeps the local preview and offers search or retry.
+  keeps the local preview and anything the lookup already streamed, and
+  offers search or retry.
 - Low-confidence, review-only, and `no_match` outcomes open the fallback screen
   with suggestions, search, and manual creation rather than forcing a semantic
   decision.

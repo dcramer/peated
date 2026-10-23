@@ -1,7 +1,7 @@
 "use client";
 
 import { getRatingBandById } from "@peated/server/constants";
-import { appendAbv } from "@peated/server/lib/bottleDisplayName";
+import { formatBottleLabel } from "@peated/server/lib/bottleDisplayName";
 import type { Outputs } from "@peated/server/orpc/router";
 import * as stylex from "@stylexjs/stylex";
 import { usePathname, useSearchParams } from "next/navigation";
@@ -136,7 +136,7 @@ function ContentSummary({ item }: { item: ContentItem }) {
   const title =
     item.kind === "external_review"
       ? item.name
-      : appendAbv(item.bottle.fullName, item.bottle.abv);
+      : formatBottleLabel(item.bottle);
   const text = item.kind === "external_review" ? item.clip : item.notes;
 
   return (
