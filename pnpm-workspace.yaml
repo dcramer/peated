@@ -6,6 +6,7 @@ packages:
 allowBuilds:
   '@ast-grep/cli': true
   '@fission-ai/openspec': false
+  '@parcel/watcher': false
   '@sentry/cli': false
   '@swc/core': true
   bcrypt: true
@@ -27,7 +28,7 @@ catalog:
   dotenv-cli: ^7.4.4
   drizzle-kit: ^0.31.11
   drizzle-orm: ^0.45.4
-  jsx-email: ^1.10.11
+  jsx-email: ^3.2.1
   pg: ^8.20.0
   prettier: ^3.8.1
   "@sentry/core": 10.76.2

@@ -1,6 +1,6 @@
 import { Preview } from "jsx-email";
 import React from "react";
-import { defaulted, object, string, type Infer } from "superstruct";
+import { create, defaulted, object, string, type Infer } from "superstruct";
 import { Button, Section, Text } from "../components/core";
 import Layout from "../components/layout";
 import theme from "../theme";
@@ -12,6 +12,9 @@ export const TemplateStruct = object({
   baseUrl: defaulted(string(), "https://peated.com"),
 });
 export type TemplateProps = Infer<typeof TemplateStruct>;
+
+/** Sample props for the jsx-email preview server. */
+export const previewProps: TemplateProps = create({}, TemplateStruct);
 
 export const Template = ({ magicLinkUrl, baseUrl }: TemplateProps) => {
   const previewText = `Login to your Peated account.`;
