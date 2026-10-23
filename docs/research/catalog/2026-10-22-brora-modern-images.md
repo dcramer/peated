@@ -3,7 +3,7 @@
 Scope: Bottle images for Brora releases from 2014 onward, including the last
 Special Releases, Diageo one-offs, Triptych, Distillery Collection, Casks of
 Distinction, and independent bottlings. Release identities and facts come from
-the [October 20 Brora audit](./2026-10-20-brora/README.md); this pass only
+the [October 20 Brora audit](./2026-10-20-brora.md); this pass only
 looked for images.
 
 The October 20 audit found exact photos for most of these Bottles but no
