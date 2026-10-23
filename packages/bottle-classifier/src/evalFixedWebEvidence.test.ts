@@ -129,6 +129,29 @@ describe("fixed web evidence", () => {
     expect(execute).not.toHaveBeenCalled();
   });
 
+  test("serves a Whiskybase lookup only from a reviewed page and never searches live", async () => {
+    const execute = vi.fn();
+    const executor = createFixedWebSearchExecutor(fixedEvidence());
+
+    await expect(
+      executor({
+        toolName: "whiskybase_lookup",
+        args: { url: officialUrl },
+        execute,
+      }),
+    ).resolves.toMatchObject({ summary: "Reviewed page summary." });
+    await expect(
+      executor({
+        toolName: "whiskybase_search",
+        args: { query: "example bottle" },
+        execute,
+      }),
+    ).resolves.toEqual({
+      error: "No reviewed fixed Whiskybase search evidence.",
+    });
+    expect(execute).not.toHaveBeenCalled();
+  });
+
   test("returns only the reviewed image extraction", async () => {
     const extract = createFixedImageExtractor(fixedEvidence());
 

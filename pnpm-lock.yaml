@@ -849,6 +849,9 @@ importers:
       '@sentry/core':
         specifier: 'catalog:'
         version: 10.69.0
+      cheerio:
+        specifier: 1.2.0
+        version: 1.2.0
       openai:
         specifier: ^6.27.0
         version: 6.27.0(ws@8.21.3)(zod@4.5.4)

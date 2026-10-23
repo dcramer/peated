@@ -84,9 +84,21 @@ export type BottleWebToolResult =
   | BottleWebSearchBatchResult
   | { error: string };
 
+// Whiskybase tools read pages through Firecrawl, so they share this budget.
+export type BottleWebToolName =
+  | "firecrawl_web_search"
+  | "firecrawl_read_page"
+  | "whiskybase_lookup"
+  | "whiskybase_search";
+
+export type BottleWebToolArgs =
+  | { queries: string[] }
+  | { query: string }
+  | { url: string; focus?: string };
+
 export type BottleWebSearchExecutor = (input: {
-  toolName: "firecrawl_web_search" | "firecrawl_read_page";
-  args: { queries: string[] } | { url: string; focus: string };
+  toolName: BottleWebToolName;
+  args: BottleWebToolArgs;
   execute: () => Promise<BottleWebToolResult>;
 }) => Promise<BottleWebToolResult>;
 
@@ -100,13 +112,15 @@ export async function executeBottleWebSearchInvocation({
 }: {
   budget: BottleWebSearchBudget;
   budgetUnits?: number;
-  toolName: "firecrawl_web_search" | "firecrawl_read_page";
-  args: { queries: string[] } | { url: string; focus: string };
+  toolName: BottleWebToolName;
+  args: BottleWebToolArgs;
   execute: () => Promise<BottleWebToolResult>;
   executeWebSearch?: BottleWebSearchExecutor;
 }): Promise<BottleWebToolResult> {
+  // The page-read allowance is reserved for verifying one source page. Each
+  // Whiskybase lookup or search uses a search allowance instead.
   const budgetKind =
-    toolName === "firecrawl_web_search" ? "search" : "page_read";
+    toolName === "firecrawl_read_page" ? "page_read" : "search";
   const allowed =
     budgetKind === "search"
       ? budget.tryConsumeSearch(budgetUnits)
@@ -165,12 +179,22 @@ export function createBottleWebSearchBudget(
       consumedPageReads += 1;
       return true;
     },
-    getExhaustedError: (kind) => ({
-      error:
-        kind === "search"
-          ? `Web search budget exhausted after ${maxSearchQueries} ${maxSearchQueries === 1 ? "query" : "queries"}`
-          : `Web page-read budget exhausted after ${maxPageReads} ${maxPageReads === 1 ? "page" : "pages"}`,
-    }),
+    getExhaustedError: (kind) => {
+      const remainingSearchQueries = maxSearchQueries - consumedSearchQueries;
+      // A batch larger than the remaining allowance is refused whole. Say what
+      // is left so the agent can retry with fewer queries.
+      if (kind === "search" && remainingSearchQueries > 0) {
+        return {
+          error: `Web search budget has ${remainingSearchQueries} ${remainingSearchQueries === 1 ? "query" : "queries"} left; send at most that many`,
+        };
+      }
+      return {
+        error:
+          kind === "search"
+            ? `Web search budget exhausted after ${maxSearchQueries} ${maxSearchQueries === 1 ? "query" : "queries"}`
+            : `Web page-read budget exhausted after ${maxPageReads} ${maxPageReads === 1 ? "page" : "pages"}`,
+      };
+    },
   };
 }
 
