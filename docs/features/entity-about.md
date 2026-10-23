@@ -100,8 +100,27 @@ it:
 
 A draft that fails gets one retry with the reasons. After that, the job saves
 nothing. A draft that passes is merged into the stored document, keeping
-every item a person wrote, and saved with a version check. The lead replaces
-the Entity description unless a person wrote the description.
+every item a person wrote, and saved with a version check.
+
+## History And Descriptions Without Sources
+
+All shown history needs a source. History copied from `entity_event` often has
+none, so it is stored but hidden until a source is found:
+
+- The job lists each stored event the page cannot show in the writer's input,
+  as a lead to check. It is not evidence.
+- When a draft event has the same kind as a kept event (one a person wrote, or
+  one with no citations) and the dates agree, the draft's citations are added
+  to the kept event. Its date and text stay as stored. No second event is
+  added.
+- History nobody can source stays stored and hidden. A moderator can add a
+  source later.
+
+A run that publishes a lead replaces the Entity description, unless a person
+wrote it. After the writer has covered every distillery and brand,
+`/admin/catalog/clear-entity-descriptions` clears each generated description
+that is not the published lead, so no unsourced description remains.
+Descriptions a person wrote stay.
 
 The prompt is in `apps/server/src/agents/entityAbout/instructions.ts`. The
 person-written Brora document in

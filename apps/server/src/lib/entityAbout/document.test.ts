@@ -52,7 +52,7 @@ describe("mergePipelineDraft", () => {
     });
     const draft = document({
       events: [
-        // Repeats the person's event, so it is dropped.
+        // Repeats the person's event, so only its citations are kept.
         {
           id: 1,
           kind: "closed",
@@ -102,5 +102,50 @@ describe("mergePipelineDraft", () => {
     expect(merged.sections[1]?.sentences[0]?.factIds).toEqual([
       `event:${openedId}`,
     ]);
+  });
+
+  test("adds draft citations to kept history instead of repeating it", () => {
+    const stored = document({
+      sources: [],
+      events: [
+        // Legacy history with no source, written by the system.
+        { id: 7, kind: "opened", date: "1819", writtenBy: "pipeline" },
+        { id: 8, kind: "closed", date: "1931", writtenBy: "pipeline" },
+      ],
+    });
+    const draft = document({
+      events: [
+        {
+          id: 1,
+          kind: "opened",
+          date: "1819-05",
+          writtenBy: "pipeline",
+          citations: [{ sourceId: "s1", statedValue: "1819" }],
+        },
+      ],
+      sections: [
+        {
+          key: "lead",
+          writtenBy: "pipeline",
+          sentences: [{ text: "It opened in 1819.", factIds: ["event:1"] }],
+        },
+      ],
+    });
+
+    const merged = mergePipelineDraft(stored, draft, now);
+
+    expect(
+      merged.events.map(({ id, date, citations }) => [
+        id,
+        date,
+        citations.map((c) => c.sourceId),
+      ]),
+    ).toEqual([
+      // The stored date stays; the draft's source is added.
+      [7, "1819", ["s1"]],
+      // History nobody could source stays stored, and hidden.
+      [8, "1931", []],
+    ]);
+    expect(merged.sections[0]?.sentences[0]?.factIds).toEqual(["event:7"]);
   });
 });

@@ -1,4 +1,5 @@
 import type {
+  AboutCitation,
   AboutEvent,
   AboutSection,
   AboutSource,
@@ -6,7 +7,7 @@ import type {
 } from "@peated/server/schemas/entityAbout";
 
 import { ABOUT_FACT_FIELD_LIST } from "./aboutFactFields";
-import { eventFactId, getFactCitations } from "./display";
+import { eventFactId, getFactCitations, valuesAgree } from "./display";
 
 export const EMPTY_ABOUT_DOCUMENT: EntityAboutDocument = {
   sources: [],
@@ -247,9 +248,11 @@ function remapFactId(factId: string, maps: IdMaps) {
 }
 
 /**
- * Merges a pipeline draft into the stored document. Everything a person wrote
- * stays. The draft replaces only pipeline items, and a draft event that
- * repeats a person's event (same kind and date) is dropped.
+ * Merges a pipeline draft into the stored document. Pipeline rule (owner:
+ * docs/features/entity-about.md): everything a person wrote stays, and so
+ * does history without a source. The draft replaces only the pipeline's cited
+ * items. A draft event that matches a kept event (same kind, dates that
+ * agree) adds its citations to the kept event instead of repeating it.
  */
 export function mergePipelineDraft(
   stored: EntityAboutDocument | null,
@@ -257,10 +260,20 @@ export function mergePipelineDraft(
   now: string,
 ): EntityAboutDocument {
   const base = stored ?? EMPTY_ABOUT_DOCUMENT;
-  const personEvents = base.events.filter((e) => e.writtenBy === "person");
-  const personKeys = new Set(personEvents.map((e) => `${e.kind}:${e.date}`));
+  const keptEvents = base.events.filter(
+    (event) => event.writtenBy === "person" || !event.citations.length,
+  );
+  const matches = new Map<number, number>();
+  for (const event of draft.events) {
+    const kept = keptEvents.find(
+      (candidate) =>
+        candidate.kind === event.kind &&
+        valuesAgree(candidate.date, event.date),
+    );
+    if (kept) matches.set(event.id, kept.id);
+  }
   const draftEvents = draft.events
-    .filter((event) => !personKeys.has(`${event.kind}:${event.date}`))
+    .filter((event) => !matches.has(event.id))
     .map((event) => ({
       ...event,
       writtenBy: "pipeline" as const,
@@ -268,16 +281,30 @@ export function mergePipelineDraft(
       updatedAt: now,
     }));
 
-  const personOnly: EntityAboutDocument = {
-    ...base,
-    events: personEvents,
-    sources: base.sources,
-  };
-  const { sources, events, maps } = absorbSourcesAndEvents(
-    personOnly,
-    draft,
-    draftEvents,
-  );
+  const keptOnly: EntityAboutDocument = { ...base, events: keptEvents };
+  const absorbed = absorbSourcesAndEvents(keptOnly, draft, draftEvents);
+  const { sources, maps } = absorbed;
+  const remapCitation = (citation: AboutCitation) => ({
+    ...citation,
+    sourceId: maps.sources.get(citation.sourceId) ?? citation.sourceId,
+  });
+
+  const events = absorbed.events.map((event) => {
+    const added = draft.events
+      .filter((candidate) => matches.get(candidate.id) === event.id)
+      .flatMap((candidate) => candidate.citations.map(remapCitation))
+      .filter(
+        (citation) =>
+          !event.citations.some((c) => c.sourceId === citation.sourceId),
+      );
+    if (!added.length) return event;
+    return {
+      ...event,
+      citations: [...event.citations, ...added],
+      updatedAt: now,
+    };
+  });
+  for (const [draftId, keptId] of matches) maps.events.set(draftId, keptId);
 
   const siteFacts: EntityAboutDocument["siteFacts"] = {};
   for (const field of ABOUT_FACT_FIELD_LIST) {
@@ -289,10 +316,7 @@ export function mergePipelineDraft(
       siteFacts[field] = {
         ...proposed,
         writtenBy: "pipeline",
-        citations: proposed.citations.map((citation) => ({
-          ...citation,
-          sourceId: maps.sources.get(citation.sourceId) ?? citation.sourceId,
-        })),
+        citations: proposed.citations.map(remapCitation),
       };
     }
   }

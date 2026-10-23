@@ -51,11 +51,14 @@
 - [x] 6.5 Stop `generateEntityDetails` from writing descriptions; keep pronunciation and other fields
 - [x] 6.6 Add tests for each check, the merge, and the switch
 - [ ] 6.7 Add a model check under `pnpm evals` with 5 Entities
+- [x] 6.8 Give the writer stored history without a source as leads; a matching draft event adds its citations to the stored event, and unmatched history stays hidden
+- [x] 6.9 Add `/admin/catalog/clear-entity-descriptions` to clear generated descriptions that are not the published lead, with a test
 
 ## 7. Rollout
 
 - [ ] 7.1 Run the job on 20 Entities and read every result; fix the prompt or checks
 - [ ] 7.2 Queue batches by activity
+- [ ] 7.3 After every Distillery and Brand has run, clear the generated descriptions still left
 
 ## 8. Docs and cleanup
 

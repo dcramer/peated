@@ -187,9 +187,46 @@ describe("writeEntityAbout", () => {
         writtenBy,
       ]),
     ).toEqual([
+      // The draft's 1983 closing agrees with the person's, so it adds a
+      // source instead of a second event.
       ["closed", "1983-03", "person"],
       ["opened", "1819", "pipeline"],
-      ["closed", "1983", "pipeline"],
+    ]);
+  });
+
+  test("asks the writer to source stored history", async ({ fixtures }) => {
+    const entity = await fixtures.Entity({ kind: "distillery" });
+    await fixtures.EntityAbout({
+      entityId: entity.id,
+      sources: [],
+      events: [
+        {
+          id: 5,
+          kind: "opened",
+          date: "1819",
+          text: "Built by the Sutherland estate.",
+          writtenBy: "pipeline",
+          citations: [],
+        },
+      ],
+    });
+    const run = services(async () => ({ draft: goodDraft, pagesRead: [page] }));
+
+    await writeEntityAbout({ entityId: entity.id }, run);
+
+    expect(run.writer.mock.calls[0]?.[0].unsourcedHistory).toEqual([
+      "opened, 1819: Built by the Sutherland estate.",
+    ]);
+    const about = await getEntityAbout(db, entity.id);
+    expect(
+      about?.document.events.map(({ id, text, citations }) => [
+        id,
+        text,
+        citations.length,
+      ]),
+    ).toEqual([
+      [5, "Built by the Sutherland estate.", 1],
+      [2, null, 1],
     ]);
   });
 
