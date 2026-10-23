@@ -155,7 +155,7 @@ export function PhotoMatchState({
   result: PhotoIdentification;
   previewUrl: string | null;
   matchedBottle: Bottle;
-  renderMatchedResultActions?: (
+  renderMatchedResultActions: (
     props: BottleResolverMatchedActionsProps,
   ) => ReactNode;
   resolvingAction: BottleResolverAction | null;
@@ -175,31 +175,20 @@ export function PhotoMatchState({
         <FormNotice>
           Check the edition and strength against your label.
         </FormNotice>
-        {renderMatchedResultActions ? (
-          renderMatchedResultActions({
-            bottle: matchedBottle,
-            hasLibraryEntry,
-            libraryEntryImageUrl,
-            pendingImage,
-            loadingExactLibraryStatus,
-            resolvingAction:
-              resolvingAction === "create" ? null : resolvingAction,
-            // The member just rejected this Bottle; don't continue with it.
-            disabled: reportingWrongMatch,
-            onResolve: (action) => {
-              onLoadBottle(matchedBottle, action);
-            },
-          })
-        ) : (
-          <Button
-            disabled={Boolean(resolvingAction) || reportingWrongMatch}
-            fullWidth
-            onClick={() => onLoadBottle(matchedBottle)}
-            variant="accent"
-          >
-            Continue
-          </Button>
-        )}
+        {renderMatchedResultActions({
+          bottle: matchedBottle,
+          hasLibraryEntry,
+          libraryEntryImageUrl,
+          pendingImage,
+          loadingExactLibraryStatus,
+          resolvingAction:
+            resolvingAction === "create" ? null : resolvingAction,
+          // The member just rejected this Bottle; don't continue with it.
+          disabled: reportingWrongMatch,
+          onResolve: (action) => {
+            onLoadBottle(matchedBottle, action);
+          },
+        })}
         {onWrongMatch ? (
           <Button
             disabled={Boolean(resolvingAction) || reportingWrongMatch}
@@ -233,7 +222,6 @@ export function PhotoFallbackState({
   proposal = null,
   createBottleHref,
   searchHref,
-  searchLabel,
   onStartOver,
 }: {
   result: PhotoIdentification | null;
@@ -249,7 +237,6 @@ export function PhotoFallbackState({
   proposal?: { name: string; actions: ReactNode } | null;
   createBottleHref: string | null;
   searchHref: string;
-  searchLabel: string;
   onStartOver: () => void;
 }) {
   const reasonLine = alert ? <span role="alert">{reason}</span> : reason;
@@ -265,7 +252,7 @@ export function PhotoFallbackState({
       variant={variant}
     >
       {variant === "text" ? null : <Search aria-hidden="true" size={16} />}
-      {searchLabel}
+      Search bottles
     </ButtonLink>
   );
   const createLink = (variant: "accent" | "tonal") =>

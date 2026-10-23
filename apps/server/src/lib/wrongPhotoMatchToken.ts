@@ -4,7 +4,7 @@ import { z } from "zod";
 
 // The token proves Peated matched this photo to this Bottle, so a member can
 // only report a match the classifier really made.
-export const WrongPhotoMatchTokenPayloadSchema = z
+const WrongPhotoMatchTokenPayloadSchema = z
   .object({
     type: z.literal("wrong_photo_match"),
     userId: z.number().int().positive(),

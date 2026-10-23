@@ -1,7 +1,6 @@
 "use client";
 
 import { isORPCClientError } from "@peated/orpc/client/errors";
-import { Button } from "@peated/web/components/button.stylex";
 import {
   FormNotice,
   FormStack,
@@ -17,7 +16,6 @@ import {
 } from "@peated/web/lib/orpc/link";
 import { saveWrongPhotoMatchPick } from "@peated/web/lib/wrongPhotoMatches";
 import { useMutation } from "@tanstack/react-query";
-import { Plus } from "lucide-react";
 import { useEffect, useRef, useState, type ChangeEvent } from "react";
 
 import {
@@ -103,8 +101,6 @@ export default function BottleResolver({
   search,
   renderMatchedResultActions,
   renderCreateProposalActions,
-  createProposalActionLabel = "Continue",
-  searchActionLabel = "Search bottles",
 }: BottleResolverProps) {
   const orpc = useORPC();
   const photoRequestRef = useRef<AbortController | null>(null);
@@ -174,15 +170,14 @@ export default function BottleResolver({
   const wrongPhotoMatchCreateMutation = useMutation(
     orpc.wrongPhotoMatches.create.mutationOptions(),
   );
-  // Shrinking the photo happens before the request starts, so it counts as
-  // identifying too; otherwise the resolver shows nothing until the upload.
-  const [isPreparingPhoto, setIsPreparingPhoto] = useState(false);
+  // True from choosing a photo until its lookup ends or the member stops it.
+  // It covers shrinking the photo before the upload starts, so the resolver
+  // never shows an empty screen.
+  const [isIdentifying, setIsIdentifying] = useState(false);
   const steadyStep = useSteadyValue(
     photoProgress?.step ?? null,
     MINIMUM_STEP_MS,
   );
-  const isIdentifying =
-    isPreparingPhoto || photoIdentificationMutation.isPending;
 
   useEffect(() => {
     previewUrlRef.current = previewUrl;
@@ -364,7 +359,7 @@ export default function BottleResolver({
     setPhotoIdentificationTraceId(null);
     setPhotoFailureTrace(null);
     setWrongMatch(null);
-    setIsPreparingPhoto(true);
+    setIsIdentifying(true);
 
     const nextPreviewUrl = URL.createObjectURL(file);
     replacePreviewUrl(nextPreviewUrl);
@@ -444,7 +439,7 @@ export default function BottleResolver({
       clearTimeout(slowTimeout);
       if (photoRequestRef.current === controller) {
         photoRequestRef.current = null;
-        setIsPreparingPhoto(false);
+        setIsIdentifying(false);
       }
       logInfo("Bottle photo submission finished", {
         extra: {
@@ -472,8 +467,15 @@ export default function BottleResolver({
     event.target.value = "";
   }
 
-  /** Continues with a suggested Bottle and saves it on any wrong-match report. */
-  async function pickSuggestion(bottle: PhotoMatchCandidate) {
+  /**
+   * Continues with a Bottle the member picked: a likely match while the lookup
+   * runs, which stops it, or a suggestion, which is saved on any wrong-match
+   * report.
+   */
+  async function pickBottle(bottle: PhotoMatchCandidate) {
+    photoRequestRef.current?.abort();
+    photoRequestRef.current = null;
+    setIsIdentifying(false);
     if (wrongMatch?.id) {
       void saveWrongPhotoMatchPick(
         orpc.wrongPhotoMatches.update.call,
@@ -489,24 +491,10 @@ export default function BottleResolver({
     }
   }
 
-  /** Uses a likely match before the classifier finishes, and stops it. */
-  async function pickLikelyMatch(bottle: PhotoMatchCandidate) {
-    photoRequestRef.current?.abort();
-    photoRequestRef.current = null;
-    setIsPreparingPhoto(false);
-    setPickingBottleId(bottle.id);
-    try {
-      await loadBottle(bottle);
-    } finally {
-      setPickingBottleId(null);
-    }
-  }
-
   function startOver() {
     photoRequestRef.current?.abort();
     photoRequestRef.current = null;
-    photoIdentificationMutation.reset();
-    setIsPreparingPhoto(false);
+    setIsIdentifying(false);
     setError(null);
     setPhotoError(null);
     setPhotoResult(null);
@@ -634,7 +622,6 @@ export default function BottleResolver({
               reason={photoError}
               result={null}
               searchHref={defaultSearchHref}
-              searchLabel={searchActionLabel}
               suggestions={[]}
             />
             {photoFailureTrace && (
@@ -659,7 +646,7 @@ export default function BottleResolver({
             search={search}
             searchHref={defaultSearchHref}
             onPickMatch={(bottle) => {
-              void pickLikelyMatch(bottle);
+              void pickBottle(bottle);
             }}
             onStartOver={startOver}
           />
@@ -700,44 +687,24 @@ export default function BottleResolver({
                 suggestions={suggestions}
                 pickingBottleId={pickingBottleId}
                 onPickSuggestion={(bottle) => {
-                  void pickSuggestion(bottle);
+                  void pickBottle(bottle);
                 }}
                 proposal={
                   createDecision && proposedName
                     ? {
                         name: proposedName,
-                        actions: renderCreateProposalActions ? (
-                          renderCreateProposalActions({
-                            createPending:
-                              photoIdentificationCreateMutation.isPending,
-                            resolvingAction,
-                            onResolve: (action) =>
-                              void acceptCreateProposal(photoResult, action),
-                          })
-                        ) : (
-                          <Button
-                            disabled={
-                              photoIdentificationCreateMutation.isPending
-                            }
-                            fullWidth
-                            loading={
-                              photoIdentificationCreateMutation.isPending
-                            }
-                            onClick={() =>
-                              void acceptCreateProposal(photoResult, "create")
-                            }
-                            variant="accent"
-                          >
-                            <Plus aria-hidden="true" size={16} />
-                            {createProposalActionLabel}
-                          </Button>
-                        ),
+                        actions: renderCreateProposalActions({
+                          createPending:
+                            photoIdentificationCreateMutation.isPending,
+                          resolvingAction,
+                          onResolve: (action) =>
+                            void acceptCreateProposal(photoResult, action),
+                        }),
                       }
                     : null
                 }
                 createBottleHref={createBottleHref}
                 searchHref={searchHref}
-                searchLabel={searchActionLabel}
                 onStartOver={startOver}
               />
             )}

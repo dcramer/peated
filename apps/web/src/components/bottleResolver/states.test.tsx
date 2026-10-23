@@ -150,6 +150,7 @@ function renderMatchedBottle(bottle: Bottle, onWrongMatch?: () => void) {
       result={result}
       previewUrl={null}
       matchedBottle={bottle}
+      renderMatchedResultActions={() => null}
       resolvingAction={null}
       hasLibraryEntry={false}
       pendingImage={null}
@@ -172,7 +173,6 @@ function renderFallback(
       onPickSuggestion={vi.fn()}
       createBottleHref="/bottles/new?name=Batch"
       searchHref="/search?q=Springbank"
-      searchLabel="Search bottles"
       onStartOver={vi.fn()}
       {...props}
     />,

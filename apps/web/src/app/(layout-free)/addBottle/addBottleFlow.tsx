@@ -41,8 +41,10 @@ import {
   getAddBottleHref,
   getPendingImageFromParams,
   getWrongPhotoMatchFromParams,
+  parseIdParam,
+  WRONG_PHOTO_MATCH_PARAM,
 } from "@peated/web/lib/addBottle";
-import { shrinkPhotoForUpload, toBlob } from "@peated/web/lib/blobs";
+import { prepareImageUpload } from "@peated/web/lib/blobs";
 import { getFormErrorMessage } from "@peated/web/lib/formHelpers";
 import { uploadImageAfterSave } from "@peated/web/lib/imageUpload";
 import { logError } from "@peated/web/lib/log";
@@ -87,12 +89,6 @@ function getFlowTitle(intent: AddBottleIntent) {
   return "Find a bottle";
 }
 
-function parseId(value: string | null) {
-  if (!value) return null;
-  const id = Number(value);
-  return Number.isInteger(id) && id > 0 ? id : null;
-}
-
 function getSearchHref(
   query = "",
   intent: AddBottleIntent = "choose",
@@ -108,7 +104,7 @@ function getSearchHref(
     params.set("pendingImageUrl", pendingImage.imageUrl);
   }
   if (wrongPhotoMatchId) {
-    params.set("wrongPhotoMatch", String(wrongPhotoMatchId));
+    params.set(WRONG_PHOTO_MATCH_PARAM, String(wrongPhotoMatchId));
   }
   return `/search?${params.toString()}`;
 }
@@ -479,7 +475,7 @@ function AddBottleFlowContent() {
   const { flash } = useFlashMessages();
   const intent = getIntent(searchParams.get("intent"));
   const flowTitle = getFlowTitle(intent);
-  const requestedBottleId = parseId(searchParams.get("bottle"));
+  const requestedBottleId = parseIdParam(searchParams.get("bottle"));
   const requestedResultSource =
     searchParams.get("resultSource") === "created" ? "created" : undefined;
   const requestedFlightId = searchParams.get("flight") || null;
@@ -639,7 +635,7 @@ function AddBottleFlowContent() {
         setHandledBottleKey(requestedBottleKey);
         if (requestedWrongPhotoMatchId && !wrongPhotoMatchId) {
           const params = new URLSearchParams(searchParams);
-          params.delete("wrongPhotoMatch");
+          params.delete(WRONG_PHOTO_MATCH_PARAM);
           router.replace(`/addBottle?${params}`, { scroll: false });
         }
       } catch (err) {
@@ -861,10 +857,7 @@ function AddBottleFlowContent() {
     if (image) {
       try {
         await uploadImageAfterSave({
-          prepare: async () =>
-            image instanceof File
-              ? await shrinkPhotoForUpload(image)
-              : await toBlob(image),
+          prepare: () => prepareImageUpload(image),
           upload: async (imageFile) => {
             await tastingImageUpdateMutation.mutateAsync({
               tasting: tasting.id,
@@ -908,10 +901,7 @@ function AddBottleFlowContent() {
     try {
       if (image) {
         await uploadImageAfterSave({
-          prepare: async () =>
-            image instanceof File
-              ? await shrinkPhotoForUpload(image)
-              : await toBlob(image),
+          prepare: () => prepareImageUpload(image),
           upload: async (imageFile) => {
             review = await memberReviewImageUpdateMutation.mutateAsync({
               bottle: review.bottleId,
@@ -1046,8 +1036,6 @@ function AddBottleFlowContent() {
           wrongPhotoMatchId,
         })
       }
-      createProposalActionLabel="Add a bottle"
-      searchActionLabel="Search bottles"
       renderMatchedResultActions={(props) => (
         <BottleResultActions {...props} intent={intent} />
       )}

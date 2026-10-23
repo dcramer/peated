@@ -147,7 +147,6 @@ function BottleResolverState({ state }: { state: ResolverState }) {
       previewUrl: BottleImage.src,
       result: null,
       searchHref: "#search",
-      searchLabel: "Search bottles",
     };
     if (state === "failure") {
       return (

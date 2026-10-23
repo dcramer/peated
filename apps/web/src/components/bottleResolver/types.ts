@@ -68,14 +68,12 @@ export type BottleResolverProps = {
     wrongPhotoMatchId?: number | null,
   ) => string;
   title: string;
-  renderMatchedResultActions?: (
+  renderMatchedResultActions: (
     props: BottleResolverMatchedActionsProps,
   ) => ReactNode;
-  renderCreateProposalActions?: (
+  renderCreateProposalActions: (
     props: BottleResolverCreateProposalActionsProps,
   ) => ReactNode;
-  createProposalActionLabel?: string;
   /** Lets the route supply its existing bottle search. */
   search?: ReactNode;
-  searchActionLabel?: string;
 };
