@@ -19,6 +19,7 @@ export * from "./notifications";
 export * from "./places";
 export * from "./prices";
 export * from "./stats";
+export * from "./tastingDrafts";
 export * from "./tastings";
 export * from "./user-stats";
 export * from "./users";
