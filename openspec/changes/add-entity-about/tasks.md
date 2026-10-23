@@ -8,6 +8,9 @@
 - [ ] 1.6 Add moderator API routes to edit events, site facts, sources, and sections in the document, with tests for permissions, stale versions, and the rule that the pipeline never overwrites a person's edit
 - [ ] 1.7 Backfill a document for each Entity with `entity_event` rows, copying `sourceUrl` into sources and citations; check event counts per Entity
 - [ ] 1.8 Point Overview history, owner acquisitions, and existing event routes at the document; stop writing `entity_event`
+- [ ] 1.9 Update `mergeEntity` to combine About documents, with an integration test for two Entities that both have documents
+- [ ] 1.10 Add a moderator route to hide and show an About page, with tests
+- [ ] 1.11 Add mock API routes and fixtures for the new routes under `apps/server/src/orpc/mock/`
 
 ## 2. Catalog numbers
 
@@ -42,7 +45,7 @@
 ## 6. The job
 
 - [ ] 6.1 Add `writeEntityAbout`: one model call with the existing web search and page-fetch tools, fixed search and read limits, and output parsed with the document schema
-- [ ] 6.2 Add the code checks: quotes on pages read, sentence facts, years and numbers, length limits, banned phrases, and sentence length; one retry, then save nothing
+- [ ] 6.2 Add the code checks: quotes on pages read, sentence facts, years and numbers, no catalog numbers in prose, length limits, banned phrases, and sentence length; one retry, then save nothing
 - [ ] 6.3 Merge drafts into the stored document, keeping items a person wrote; save with a version check; update the description from the lead unless a person wrote it
 - [ ] 6.4 Add the `aboutPipeline` system actor, an on/off switch, and an admin action to queue one Entity or a batch ordered by activity
 - [ ] 6.5 Stop `generateEntityDetails` from writing descriptions; keep pronunciation and other fields

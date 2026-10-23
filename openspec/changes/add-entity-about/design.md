@@ -56,6 +56,8 @@ facts), `docs/policies/agent-design.md`, `docs/policies/background-work.md`,
 - Changing Entity identity, ownership, or status automatically.
 - Scheduled refreshes, scoring models, spot-check queues, run tracking, and
   quality dashboards. Add them only if real errors show they are needed.
+- A web editor for moderators. They edit through the API and `pnpm cli api`.
+- Adding About text to search documents.
 
 ## Decisions
 
@@ -85,24 +87,27 @@ reviewed place.
   - `version`: for saved-version checks on every write.
   - `status`: `published` or `hidden`.
   - `checkedOn`, `updatedAt`.
-    **The document**
 
-- `sources`: list of `{ id, url, title, publisher, publishedOn, kind }`.
+**The document**
+
+- `sources`: list of `{ id, url, title, publisher, publishedOn, kind,
+status }`.
   `kind` is `official`, `reference`, `press`, or `retailer`.
   `url` is unique within the document.
 - `events`: list of `{ id, kind, date, endDate, continuing, name, title,
-text, relatedEntityId, newOwnerId, citations, writtenBy }`.
+text, relatedEntityId, newOwnerId, newOwnerName, citations, writtenBy }`.
   - Kinds: `opened`, `closed`, `mothballed`, `reopened`, `acquired`,
     `renamed`, `era`, `generic`.
 - `siteFacts`: an object keyed by field, each value
   `{ value, asOf, citations, writtenBy }`. Distilleries only.
 - `sections`: list of `{ key, heading, eraEventId, sentences, writtenBy }`.
-  Each sentence is `{ text, factIds }`. The lead is the section with key
-  `lead`.
+  Each sentence is `{ text, factIds }`. A fact ID is an event `id` or
+  `site:<field>`. The lead is the section with key `lead`. Sentences never
+  state catalog numbers, which change daily and belong in charts.
 - Every `citations` entry is `{ sourceId, statedValue, quote }`. Quotes are
   at most 300 characters and are removed by the public serializer.
-- `writtenBy` is `person` or `pipeline`. Whether a fact is published is
-  computed by the publishing rules on read, not stored, so it can't go stale.
+- `writtenBy` is `person` or `pipeline`. Whether a fact is shown is
+  computed by the display rules on read, not stored, so it can't go stale.
 
 **Typed files in code** (changed by pull request, so review comes from code
 review):
@@ -112,13 +117,16 @@ review):
   stills, capacity in litres of alcohol a year, water source, heating,
   building listing). The document schema is built from this list. Adding a
   fact is one entry, not a migration.
-  **Schema rules** (the schema module states this in a comment beside the
-  schema):
+
+**Schema rules** (the schema module states this in a comment beside the
+schema):
 
 - Changes to the document schema should be rare and backward compatible: add
   optional fields, never rename or remove one, and never change a field's
   meaning.
 - Every saved document must still parse after a change.
+- The public `entities.about.details` response follows the same rule: add
+  fields, never rename or remove them.
 - A change that cannot meet this needs a `schemaVersion` bump, an upgrade
   function that runs when a document is read, and a bounded migration that
   rewrites stored documents and checks the result.
@@ -134,12 +142,19 @@ review):
   - Writes check that the Entities exist.
   - Reads resolve merged Entities through `entity_tombstone`, so a merge
     never edits documents.
-  - A deleted Entity's links are dropped on read and reported as a finding.
+  - A deleted Entity's links are dropped on read and logged.
+  - Owners Peated has no Entity for are stored by name (`newOwnerName`). The
+    pipeline never creates Entities.
 - **Concurrency:** writes send the version they read. A stale version is
   rejected and the writer retries from the new document, per
   `docs/policies/database-correctness.md`.
 - **Checking:** the schema module parses `unknown` at every read and write,
   per `docs/policies/data-and-permissions.md`.
+
+**Merges.** `mergeEntity` moves events, site facts, and sources into the
+destination document, combining sources with the same URL. The destination's
+sections stay. Both documents are saved to change history first. This
+replaces the job's current `entity_event` updates.
 
 **History moves into the document.** `entity_event` rows are copied into each
 Entity's document. Overview history, the acquisitions shown on owner pages,
@@ -305,6 +320,22 @@ link to the distilleries that make them.
 `docs/architecture/whisky-identity-model.md` gains one rule: history about a
 production site belongs on the Distillery, and history about a label belongs
 on the Brand.
+
+### 9. Extending later
+
+Each likely change has one place to make it, without reworking storage:
+
+| Change                                | Where it goes                                                    |
+| ------------------------------------- | ---------------------------------------------------------------- |
+| New site fact                         | One entry in `aboutFactFields.ts`                                |
+| New event kind                        | An added enum value in the schema (backward compatible)          |
+| New page part                         | A component, its display rule, and one template entry            |
+| About pages for Bottlers or Companies | A template for that kind; same document                          |
+| About pages for Series                | The same schema in a `series_about` table                        |
+| Filter or sort by a fact              | A projection table rebuilt from documents                        |
+| Review before publishing              | Add a `draft` status; the job saves drafts instead of publishing |
+| Scheduled refresh                     | A job that queues Entities by `checkedOn` age                    |
+| Stronger quality checks               | A scoring step after the code checks                             |
 
 ## Risks / Trade-offs
 

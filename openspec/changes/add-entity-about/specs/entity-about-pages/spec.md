@@ -131,3 +131,15 @@ SHALL include only facts shown on the page.
 - **WHEN** a crawler opens an About page
 - **THEN** it receives a canonical URL and structured data for the founding
   date and location shown on the page
+
+### Requirement: Moderators can hide an About page
+
+A moderator SHALL be able to hide an Entity's About page and show it again.
+Hiding SHALL keep the document. A hidden page SHALL behave as if the Entity
+had no About page, and the job SHALL NOT show it again.
+
+#### Scenario: Hide a bad page
+
+- **WHEN** a moderator hides a distillery's About page
+- **THEN** the About tab disappears, the document is kept, and later runs
+  leave it hidden

@@ -31,12 +31,18 @@ be dropped.
 
 Each sentence SHALL list the facts it uses. Code SHALL reject a sentence that
 lists no facts, or that contains a year or number not found in the facts it
-lists.
+lists. Sentences SHALL NOT state Bottle counts, ratings, or other catalog
+numbers, because those change every day; the page's charts show them.
 
 #### Scenario: Filler sentence
 
 - **WHEN** a sentence says the distillery "is known for its rich history" and
   lists no facts
+- **THEN** the draft is rejected
+
+#### Scenario: Catalog count in prose
+
+- **WHEN** a sentence says "Peated lists 255 Brora bottles"
 - **THEN** the draft is rejected
 
 #### Scenario: Wrong year
