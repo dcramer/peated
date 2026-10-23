@@ -105,10 +105,10 @@ describe("admin content moderation", () => {
 
     expect(first.results.map(({ id }) => id)).toEqual([newer.id]);
     // Releases can share a name, so moderators see the ABV with the bottle.
-    // Bottle links use the display name, so the Bottle's name fields come too.
+    // Bottle labels and links use the display name, so the Bottle's name
+    // fields come too.
     expect(first.results[0]?.bottle).toMatchObject({
       id: bottle.id,
-      fullName: bottle.fullName,
       abv: 46.3,
       name: bottle.name,
       brand: { name: expect.any(String) },
