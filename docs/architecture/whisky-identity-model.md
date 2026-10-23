@@ -260,11 +260,10 @@ file is deleted too. Because a URL never changes meaning, the API serves these
 files with a one-year `immutable` cache.
 
 Audio needs `GCP_CREDENTIALS` and the Cloud Text-to-Speech API enabled on that
-Google Cloud project. Without credentials the job does nothing. To fill missing
-or outdated audio, POST `/admin/catalog/rebuild-pronunciation-audio` with
-`{"afterId":0}` through the authenticated API client, and repeat with each
-returned `nextAfterId` until it is null. Each call checks up to 500 Entities and
-queues only those whose audio is missing or does not match their IPA.
+Google Cloud project. Without credentials the job does nothing. The
+`/admin/catalog/rebuild-pronunciation-audio` route queues the job again for
+Entities whose audio is missing or does not match their IPA. See
+[Worker Jobs](../../apps/server/src/worker/README.md#queues) for how to run it.
 
 Peated keeps references for the Entity name, short name, and the name without a
 leading “The.” A moderator can add more references. Adding or deleting an alias

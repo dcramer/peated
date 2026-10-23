@@ -99,6 +99,16 @@ export function getPronunciationAudioUrl(entityId: number, ipa: string) {
   return `${AUDIO_URL_PREFIX}${entityId}-${hash}.mp3`;
 }
 
+/** Returns the audio URL an Entity should store: none without IPA. */
+export function getExpectedPronunciationAudioUrl(entity: {
+  id: number;
+  pronunciationIpa: string | null;
+}) {
+  return entity.pronunciationIpa
+    ? getPronunciationAudioUrl(entity.id, entity.pronunciationIpa)
+    : null;
+}
+
 /**
  * Whether an upload path is pronunciation audio. Its file name changes
  * whenever its content does, so it can be cached forever.

@@ -1,6 +1,6 @@
 import { db } from "@peated/server/db";
 import { entities } from "@peated/server/db/schema";
-import { getPronunciationAudioUrl } from "@peated/server/lib/entityPronunciationAudio";
+import { getExpectedPronunciationAudioUrl } from "@peated/server/lib/entityPronunciationAudio";
 import { procedure } from "@peated/server/orpc";
 import { requireAdmin } from "@peated/server/orpc/middleware";
 import { pushUniqueJob } from "@peated/server/worker/dispatch";
@@ -62,10 +62,7 @@ export default procedure
     // stored URL with the one the current IPA and voice would produce.
     const stale = page.filter(
       (row) =>
-        row.pronunciationAudioUrl !==
-        (row.pronunciationIpa
-          ? getPronunciationAudioUrl(row.id, row.pronunciationIpa)
-          : null),
+        row.pronunciationAudioUrl !== getExpectedPronunciationAudioUrl(row),
     );
     for (const row of stale) {
       await pushUniqueJob(
