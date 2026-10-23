@@ -45,6 +45,22 @@ describe("getEntityClassification", () => {
 });
 
 describe("getEntityTabs", () => {
+  it("adds About after Overview when the record has an article", () => {
+    const tabs = getEntityTabs({
+      id: 116,
+      kind: "distillery",
+      name: "Brora",
+      shortName: null,
+      totalBottles: 255,
+      publicReviewAndTastingCount: 7,
+    });
+
+    expect(tabs.slice(0, 2)).toEqual([
+      { href: "/distillers/116-brora", label: "Overview" },
+      { href: "/distillers/116-brora/about", label: "About" },
+    ]);
+  });
+
   it("uses computed Company portfolio and Bottle totals", () => {
     expect(
       getEntityTabs(

@@ -1,5 +1,6 @@
 import type { Outputs } from "@peated/server/orpc/router";
 import type { PageTabItem } from "@peated/web/components/pageTabs.stylex";
+import { getEntityAbout } from "@peated/web/features/entityAbout/entityAbout";
 import { getEntityUrl } from "@peated/web/lib/urls";
 
 export type Entity = Outputs["entities"]["details"];
@@ -75,6 +76,10 @@ export function getEntityTabs(
   const tabs: [PageTabItem, ...PageTabItem[]] = [
     { href: baseUrl, label: "Overview" },
   ];
+
+  if (getEntityAbout(entity.id)) {
+    tabs.push({ href: `${baseUrl}/about`, label: "About" });
+  }
 
   if (entity.kind === "company" && companyCounts?.portfolio) {
     tabs.push({
