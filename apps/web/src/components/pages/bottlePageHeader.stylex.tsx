@@ -83,6 +83,8 @@ export function BottlePageHeader({
     <div {...stylex.props(styles.aside)}>{aside}</div>
   ) : null;
   const hasRatings = Boolean(ratings);
+  const keyFacts =
+    specs && hasVisibleKeyFacts(specs) ? <KeyFacts facts={specs} /> : null;
 
   return (
     <div {...stylex.props(styles.root, hasRatings && styles.rootWithRatings)}>
@@ -90,7 +92,16 @@ export function BottlePageHeader({
         actions={actions}
         actionsPosition="start"
         facts={
-          specs && hasVisibleKeyFacts(specs) ? <KeyFacts facts={specs} /> : null
+          // Phones show the rating above the key facts instead of in its own
+          // block below the actions; the column copy is hidden there.
+          ratings || keyFacts ? (
+            <>
+              {ratings ? (
+                <div {...stylex.props(styles.phoneRatings)}>{ratings}</div>
+              ) : null}
+              {keyFacts}
+            </>
+          ) : null
         }
         metadata={metadata}
         menu={menu}
@@ -160,17 +171,21 @@ const styles = stylex.create({
   },
   ratings: {
     boxSizing: "border-box",
-    display: "grid",
+    display: { default: "grid", [PHONE]: "none" },
     minWidth: 0,
     gridColumn: { default: "2", [NARROW]: "1" },
     gridRow: { default: "1", [NARROW]: "auto" },
     gridTemplateColumns: "minmax(0, 1fr)",
-    justifyItems: { default: "stretch", [PHONE]: "center" },
+    justifyItems: "stretch",
     paddingTop: { default: space.x4, [NARROW]: 0 },
     paddingBottom: { default: space.x4, [NARROW]: 0 },
   },
   aside: {
     display: "flex",
-    justifySelf: { default: "end", [PHONE]: "center" },
+    justifySelf: { default: "end", [PHONE]: "start" },
+  },
+  phoneRatings: {
+    display: { default: "none", [PHONE]: "block" },
+    marginBottom: space.x3,
   },
 });
