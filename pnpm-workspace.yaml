@@ -30,10 +30,10 @@ catalog:
   jsx-email: ^1.10.11
   pg: ^8.20.0
   prettier: ^3.8.1
-  "@sentry/core": 10.69.0
-  "@sentry/hono": 10.69.0
-  "@sentry/nextjs": 10.69.0
-  "@sentry/node": 10.69.0
+  "@sentry/core": 10.76.2
+  "@sentry/hono": 10.76.2
+  "@sentry/nextjs": 10.76.2
+  "@sentry/node": 10.76.2
   "@logtape/hono": 2.2.3
   "@logtape/logtape": 2.2.3
   "@logtape/redaction": 2.2.3
