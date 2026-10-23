@@ -1,24 +1,44 @@
+import type { EntityKind } from "@peated/server/types";
 import * as stylex from "@stylexjs/stylex";
-import type { ReactNode } from "react";
 
+import { EntityIdentityRow } from "../../components/entityIdentityRow.stylex";
 import { SectionHeading } from "../../components/sectionHeading.stylex";
 import { TextLink } from "../../components/textLink.stylex";
+import { getEntityUrl } from "../../lib/urls";
 import { foundationStyles } from "../../styles/foundations.stylex";
 import { colors, space } from "../../styles/tokens.stylex";
 import {
-  getCitationNumbers,
-  type AboutDisagreement,
+  ABOUT_MIN_BOTTLERS,
+  ABOUT_MIN_RELEASE_BOTTLES,
+  ABOUT_MIN_TIMELINE_SPANS,
+  ABOUT_MIN_VINTAGE_BOTTLES,
+  countWithYear,
+  fillYears,
+  getEras,
+  getNameSpans,
+  getOperatingSpans,
+  type AboutEvent,
   type AboutSection,
   type EntityAbout,
-  type VintageCount,
+  type RelatedCounts,
+  type YearCounts,
 } from "./entityAbout";
 import { EntityLifeline } from "./entityLifeline.stylex";
 import { VintageChart } from "./vintageChart.stylex";
 
+export type EntityAboutCounts = {
+  vintages: YearCounts;
+  bottlers: RelatedCounts;
+  distillers: RelatedCounts;
+  releaseYears: YearCounts;
+};
+
 export type EntityAboutArticleProps = {
   about: EntityAbout;
+  entity: { id: number; name: string; kind: EntityKind };
+  counts: EntityAboutCounts;
+  citationNumbers: Map<string, number>;
   currentYear: number;
-  vintages: { years: readonly VintageCount[]; withoutVintage: number };
 };
 
 const reviewedFormatter = new Intl.DateTimeFormat("en-GB", {
@@ -28,7 +48,18 @@ const reviewedFormatter = new Intl.DateTimeFormat("en-GB", {
   timeZone: "UTC",
 });
 
-function Citations({
+const DISAGREEMENT_TOPICS = {
+  acquired: "when the owner changed",
+  closed: "when it closed",
+  era: "when this period ran",
+  generic: "the date",
+  mothballed: "when it was mothballed",
+  opened: "when it opened",
+  renamed: "when the name changed",
+  reopened: "when it reopened",
+} satisfies Record<AboutEvent["kind"], string>;
+
+export function Citations({
   ids,
   numbers,
 }: {
@@ -36,10 +67,10 @@ function Citations({
   numbers: Map<string, number>;
 }) {
   const cited = [...new Set(ids)]
-    .map((id) => ({ id, number: numbers.get(id) }))
-    .filter((entry): entry is { id: string; number: number } =>
-      Boolean(entry.number),
-    )
+    .flatMap((id) => {
+      const number = numbers.get(id);
+      return number ? [{ id, number }] : [];
+    })
     .sort((a, b) => a.number - b.number);
   if (!cited.length) return null;
 
@@ -61,21 +92,42 @@ function Citations({
   );
 }
 
+/** Names each value sources give, with their citations, and the one shown. */
 function Disagreement({
-  note,
+  event,
+  about,
   numbers,
 }: {
-  note: AboutDisagreement;
+  event: AboutEvent;
+  about: EntityAbout;
   numbers: Map<string, number>;
 }) {
+  if (!event.disagreement) return null;
   return (
     <aside {...stylex.props(styles.disagreement)}>
       <p {...stylex.props(foundationStyles.fieldLabel, styles.noteLabel)}>
-        Sources disagree: {note.topic.toLowerCase()}
+        Sources disagree: {DISAGREEMENT_TOPICS[event.kind]}
       </p>
-      <p {...stylex.props(foundationStyles.body, styles.muted)}>
-        {note.text}
-        <Citations ids={note.sources} numbers={numbers} />
+      <ul {...stylex.props(styles.disagreementList)}>
+        {event.disagreement.values.map((entry) => (
+          <li
+            key={entry.value}
+            {...stylex.props(foundationStyles.body, styles.muted)}
+          >
+            {entry.value}:{" "}
+            {entry.sourceIds
+              .map(
+                (id) =>
+                  about.sources.find((source) => source.id === id)?.publisher ??
+                  id,
+              )
+              .join(", ")}
+            <Citations ids={entry.sourceIds} numbers={numbers} />
+          </li>
+        ))}
+      </ul>
+      <p {...stylex.props(foundationStyles.metadata, styles.muted)}>
+        This page uses {event.date.slice(0, 4)}.
       </p>
     </aside>
   );
@@ -83,135 +135,223 @@ function Disagreement({
 
 function ArticleSection({
   section,
+  about,
   numbers,
-  level,
-  after,
 }: {
   section: AboutSection;
+  about: EntityAbout;
   numbers: Map<string, number>;
-  level: 2 | 3;
-  after?: ReactNode;
 }) {
+  const eventIds = new Set(
+    section.sentences.flatMap((sentence) => sentence.factIds),
+  );
+  const disputed = about.events.filter(
+    (event) => event.disagreement && eventIds.has(`event:${event.id}`),
+  );
+  const era = section.eraEventId
+    ? about.events.find((event) => event.id === section.eraEventId)
+    : undefined;
+  const id = `about-${section.key}`;
+
   return (
-    <section
-      aria-labelledby={`about-${section.id}`}
-      {...stylex.props(level === 2 ? styles.section : styles.subsection)}
-    >
+    <section aria-labelledby={id} {...stylex.props(styles.section)}>
       <div {...stylex.props(styles.sectionHeader)}>
-        {level === 2 ? (
-          <SectionHeading id={`about-${section.id}`}>
-            {section.heading}
-          </SectionHeading>
-        ) : (
-          <h3
-            id={`about-${section.id}`}
-            {...stylex.props(foundationStyles.rowTitle, styles.subheading)}
-          >
-            {section.heading}
-          </h3>
-        )}
-        {section.years ? (
+        <SectionHeading id={id}>{section.heading}</SectionHeading>
+        {era ? (
           <span {...stylex.props(foundationStyles.metadata, styles.muted)}>
-            {section.years}
+            {era.date.slice(0, 4)}–
+            {era.endDate ? era.endDate.slice(0, 4) : "today"}
           </span>
         ) : null}
       </div>
-      {section.paragraphs.map((paragraph) => (
-        <p
-          key={paragraph.text}
-          {...stylex.props(foundationStyles.prose, styles.paragraph)}
-        >
-          {paragraph.text}
-          <Citations ids={paragraph.sources} numbers={numbers} />
-        </p>
-      ))}
-      {section.disagreements?.map((note) => (
-        <Disagreement key={note.topic} note={note} numbers={numbers} />
-      ))}
-      {section.subsections?.map((subsection) => (
-        <ArticleSection
-          key={subsection.id}
-          level={3}
+      <p {...stylex.props(foundationStyles.prose)}>
+        {section.sentences.map((sentence, index) => (
+          <span key={`${index}-${sentence.text}`}>
+            {index > 0 ? " " : null}
+            {sentence.text}
+            <Citations ids={sentence.sourceIds} numbers={numbers} />
+          </span>
+        ))}
+      </p>
+      {disputed.map((event) => (
+        <Disagreement
+          about={about}
+          event={event}
+          key={event.id}
           numbers={numbers}
-          section={subsection}
         />
       ))}
-      {after}
     </section>
   );
 }
 
-/** The article's opening paragraph, placed by the page above its sidebar. */
-export function EntityAboutLead({ about }: { about: EntityAbout }) {
+function RelatedList({
+  heading,
+  intro,
+  counts,
+}: {
+  heading: string;
+  intro: string;
+  counts: RelatedCounts;
+}) {
   return (
-    <p {...stylex.props(foundationStyles.prose, styles.lead)}>
-      {about.lead.text}
-      <Citations ids={about.lead.sources} numbers={getCitationNumbers(about)} />
-    </p>
+    <section
+      aria-label={heading}
+      {...stylex.props(styles.section, styles.chartSection)}
+    >
+      <SectionHeading>{heading}</SectionHeading>
+      <p {...stylex.props(foundationStyles.body, styles.muted)}>{intro}</p>
+      <ol {...stylex.props(styles.relatedList)}>
+        {counts.results.map((row) => (
+          <li key={row.entity.id} {...stylex.props(styles.relatedRow)}>
+            <EntityIdentityRow
+              end={
+                <span
+                  {...stylex.props(foundationStyles.metadata, styles.count)}
+                >
+                  {row.count.toLocaleString("en-US")}
+                </span>
+              }
+              href={getEntityUrl(row.entity)}
+              kind={row.entity.kind}
+              name={row.entity.name}
+            />
+          </li>
+        ))}
+      </ol>
+    </section>
+  );
+}
+
+function YearChart({
+  heading,
+  intro,
+  counts,
+  about,
+  entityName,
+  bottleListHref,
+}: {
+  heading: string;
+  intro: string;
+  counts: YearCounts;
+  about: EntityAbout;
+  entityName: string;
+  bottleListHref?: string;
+}) {
+  return (
+    <section
+      aria-label={heading}
+      {...stylex.props(styles.section, styles.chartSection)}
+    >
+      <SectionHeading>{heading}</SectionHeading>
+      <p {...stylex.props(foundationStyles.body, styles.muted)}>{intro}</p>
+      <VintageChart
+        eras={getEras(about)}
+        bottleListHref={bottleListHref}
+        names={getNameSpans(about, entityName)}
+        withoutVintage={counts.withoutYear}
+        years={fillYears(counts)}
+      />
+    </section>
   );
 }
 
 /**
- * Reads like a short reference article: the site's life on one year axis, sourced sections, live catalog data, and numbered sources.
+ * The About page body. Its template is fixed per Entity kind (owner:
+ * docs/features/entity-about.md); each part shows only above its minimum.
  */
 export function EntityAboutArticle({
   about,
+  entity,
+  counts,
+  citationNumbers,
   currentYear,
-  vintages,
 }: EntityAboutArticleProps) {
-  const numbers = getCitationNumbers(about);
-  const sources = [...about.sources]
-    .filter((source) => numbers.has(source.id))
-    .sort((a, b) => numbers.get(a.id)! - numbers.get(b.id)!);
-  const [nameSection, historySection, ...laterSections] = about.sections;
+  const lanes = [
+    {
+      label: "Status",
+      spans: getOperatingSpans(about),
+      quietLabel: "Silent",
+    },
+    {
+      label: "Name",
+      spans: getNameSpans(about, entity.name),
+      tone: "neutral" as const,
+    },
+  ].filter((lane) => lane.spans.length);
+  const showTimeline =
+    lanes.reduce((total, lane) => total + lane.spans.length, 0) >=
+    ABOUT_MIN_TIMELINE_SPANS;
+  const showVintages =
+    entity.kind === "distillery" &&
+    countWithYear(counts.vintages) >= ABOUT_MIN_VINTAGE_BOTTLES;
+  const showBottlers =
+    entity.kind === "distillery" &&
+    counts.bottlers.results.length >= ABOUT_MIN_BOTTLERS;
+  const showDistillers =
+    entity.kind === "brand" && counts.distillers.results.length > 0;
+  const showReleaseYears =
+    countWithYear(counts.releaseYears) >= ABOUT_MIN_RELEASE_BOTTLES;
+  const sources = about.sources
+    .filter((source) => citationNumbers.has(source.id))
+    .sort(
+      (a, b) =>
+        (citationNumbers.get(a.id) ?? 0) - (citationNumbers.get(b.id) ?? 0),
+    );
 
   return (
     <article {...stylex.props(styles.article)}>
-      <section aria-label="Timeline" {...stylex.props(styles.timeline)}>
-        <EntityLifeline
-          currentYear={currentYear}
-          lanes={[
-            { label: "Status", spans: about.operating, quietLabel: "Silent" },
-            { label: "Name", spans: about.names, tone: "neutral" },
-          ]}
-        />
-      </section>
-
-      {nameSection ? (
-        <ArticleSection level={2} numbers={numbers} section={nameSection} />
-      ) : null}
-      {historySection ? (
-        <ArticleSection level={2} numbers={numbers} section={historySection} />
-      ) : null}
-
-      {vintages.years.length ? (
-        <section
-          aria-labelledby="about-vintages"
-          {...stylex.props(styles.section)}
-        >
-          <SectionHeading id="about-vintages">
-            Bottles by year distilled
-          </SectionHeading>
-          <p {...stylex.props(foundationStyles.body, styles.muted)}>
-            Every bottle in Peated with a vintage year.
-          </p>
-          <VintageChart
-            highlight={about.peatedYears}
-            names={about.names}
-            withoutVintage={vintages.withoutVintage}
-            years={vintages.years}
-          />
+      {showTimeline ? (
+        <section aria-label="Timeline" {...stylex.props(styles.timeline)}>
+          <EntityLifeline currentYear={currentYear} lanes={lanes} />
         </section>
       ) : null}
 
-      {laterSections.map((section) => (
+      {about.sections.map((section) => (
         <ArticleSection
-          key={section.id}
-          level={2}
-          numbers={numbers}
+          about={about}
+          key={section.key}
+          numbers={citationNumbers}
           section={section}
         />
       ))}
+
+      {showVintages ? (
+        <YearChart
+          about={about}
+          counts={counts.vintages}
+          entityName={entity.name}
+          heading="Bottles by year distilled"
+          bottleListHref={`/bottles?distiller=${entity.id}`}
+          intro="Every bottle in Peated with a vintage year."
+        />
+      ) : null}
+
+      {showBottlers ? (
+        <RelatedList
+          counts={counts.bottlers}
+          heading="Who bottled it"
+          intro={`Bottles in Peated distilled at ${entity.name}, by bottler.`}
+        />
+      ) : null}
+
+      {showDistillers ? (
+        <RelatedList
+          counts={counts.distillers}
+          heading="Where it's made"
+          intro={`Bottles in Peated sold as ${entity.name}, by distillery.`}
+        />
+      ) : null}
+
+      {showReleaseYears ? (
+        <YearChart
+          about={about}
+          counts={counts.releaseYears}
+          entityName={entity.name}
+          heading="Releases by year"
+          intro={`Bottles in Peated sold as ${entity.name}, by release year.`}
+        />
+      ) : null}
 
       <section
         aria-labelledby="about-sources"
@@ -226,28 +366,53 @@ export function EntityAboutArticle({
               {...stylex.props(styles.source)}
             >
               <span {...stylex.props(foundationStyles.metadata, styles.muted)}>
-                {numbers.get(source.id)}
+                {citationNumbers.get(source.id)}
               </span>
               <span {...stylex.props(styles.sourceText)}>
                 <TextLink href={source.url} rel="noreferrer" target="_blank">
                   {source.title}
                 </TextLink>
-                <span
-                  {...stylex.props(foundationStyles.metadata, styles.muted)}
-                >
-                  {source.publisher}
-                </span>
+                {source.publisher ? (
+                  <span
+                    {...stylex.props(foundationStyles.metadata, styles.muted)}
+                  >
+                    {source.publisher}
+                  </span>
+                ) : null}
               </span>
             </li>
           ))}
         </ol>
-        <p {...stylex.props(foundationStyles.metadata, styles.muted)}>
-          Checked against these sources on{" "}
-          {reviewedFormatter.format(new Date(`${about.reviewedOn}T00:00:00Z`))}.
-          Something wrong? Report it from the menu at the top of the page.
-        </p>
+        {about.checkedOn ? (
+          <p {...stylex.props(foundationStyles.metadata, styles.muted)}>
+            Checked against these sources on{" "}
+            {reviewedFormatter.format(new Date(`${about.checkedOn}T00:00:00Z`))}
+            . Something wrong? Report it from the menu at the top of the page.
+          </p>
+        ) : null}
       </section>
     </article>
+  );
+}
+
+/** The opening paragraph, placed by the page above its sidebar. */
+export function EntityAboutLead({
+  lead,
+  citationNumbers,
+}: {
+  lead: AboutSection;
+  citationNumbers: Map<string, number>;
+}) {
+  return (
+    <p {...stylex.props(foundationStyles.prose, styles.lead)}>
+      {lead.sentences.map((sentence, index) => (
+        <span key={`${index}-${sentence.text}`}>
+          {index > 0 ? " " : null}
+          {sentence.text}
+          <Citations ids={sentence.sourceIds} numbers={citationNumbers} />
+        </span>
+      ))}
+    </p>
   );
 }
 
@@ -272,24 +437,14 @@ const styles = stylex.create({
     gap: space.x3,
     paddingTop: space.x8,
   },
-  subsection: {
-    display: "flex",
-    flexDirection: "column",
-    gap: space.x3,
-    paddingTop: space.x6,
+  chartSection: {
+    maxWidth: "100%",
   },
   sectionHeader: {
     display: "flex",
     flexWrap: "wrap",
     alignItems: "baseline",
     columnGap: space.x3,
-  },
-  subheading: {
-    margin: 0,
-    color: colors.ink,
-  },
-  paragraph: {
-    color: colors.ink,
   },
   muted: {
     margin: 0,
@@ -318,6 +473,26 @@ const styles = stylex.create({
     borderStyle: "solid",
     borderColor: colors.sectionRule,
     borderRadius: "4px",
+  },
+  disagreementList: {
+    margin: 0,
+    paddingLeft: space.x4,
+  },
+  relatedList: {
+    display: "flex",
+    flexDirection: "column",
+    margin: 0,
+    padding: 0,
+    listStyle: "none",
+  },
+  relatedRow: {
+    borderBottomWidth: { default: "1px", ":last-child": 0 },
+    borderBottomStyle: "solid",
+    borderBottomColor: colors.hairline,
+  },
+  count: {
+    color: colors.inkMuted,
+    fontVariantNumeric: "tabular-nums",
   },
   sources: {
     display: "flex",

@@ -2,40 +2,59 @@ import { FactList } from "../../components/factList.stylex";
 import { RailSection } from "../../components/pages/pageLayout.stylex";
 import { TextLink } from "../../components/textLink.stylex";
 import { getEntityUrl } from "../../lib/urls";
-import type { EntityAbout } from "./entityAbout";
+import {
+  ABOUT_MIN_KEY_FACTS,
+  type AboutKeyFact,
+  type AboutOwner,
+} from "./entityAbout";
+import { Citations } from "./entityAboutArticle.stylex";
 
-function OwnerLink({ entityId, name }: { entityId?: number; name: string }) {
-  if (!entityId) return name;
-  return (
-    <TextLink href={getEntityUrl({ id: entityId, kind: null, name })}>
-      {name}
-    </TextLink>
-  );
-}
-
-/** The sidebar summary of an About article: key facts and every owner. */
-export function EntityAboutFacts({ about }: { about: EntityAbout }) {
+/** The About sidebar: key facts with their sources, and owners over time. */
+export function EntityAboutFacts({
+  keyFacts,
+  owners,
+  citationNumbers,
+}: {
+  keyFacts: readonly AboutKeyFact[];
+  owners: readonly AboutOwner[];
+  citationNumbers: Map<string, number>;
+}) {
   return (
     <>
-      <RailSection heading="At a glance">
-        <FactList
-          facts={about.facts.map((fact) => ({
-            label: fact.label,
-            value: <OwnerLink entityId={fact.entityId} name={fact.value} />,
-          }))}
-        />
-      </RailSection>
-      <RailSection heading="Owners">
-        <FactList
-          facts={[...about.owners].reverse().map((owner) => ({
-            label:
-              owner.end === null
-                ? `${owner.start}–today`
-                : `${owner.start}–${owner.end}`,
-            value: <OwnerLink entityId={owner.entityId} name={owner.label} />,
-          }))}
-        />
-      </RailSection>
+      {keyFacts.length >= ABOUT_MIN_KEY_FACTS ? (
+        <RailSection heading="Key facts">
+          <FactList
+            facts={keyFacts.map((fact) => ({
+              label: fact.label,
+              value: (
+                <>
+                  {fact.value}
+                  <Citations ids={fact.sourceIds} numbers={citationNumbers} />
+                </>
+              ),
+            }))}
+          />
+        </RailSection>
+      ) : null}
+      {owners.length ? (
+        <RailSection heading="Owners">
+          <FactList
+            facts={owners.map((owner) => ({
+              label:
+                owner.end === null
+                  ? `${owner.start}–today`
+                  : `${owner.start}–${owner.end}`,
+              value: owner.entity ? (
+                <TextLink href={getEntityUrl(owner.entity)}>
+                  {owner.entity.name}
+                </TextLink>
+              ) : (
+                owner.label
+              ),
+            }))}
+          />
+        </RailSection>
+      ) : null}
     </>
   );
 }

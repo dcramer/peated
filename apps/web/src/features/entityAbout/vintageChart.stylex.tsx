@@ -1,7 +1,9 @@
 "use client";
 
 import * as stylex from "@stylexjs/stylex";
-import { useState } from "react";
+import { useState, type ReactNode } from "react";
+
+import { AppLink } from "../../components/appLink";
 
 import { foundationStyles } from "../../styles/foundations.stylex";
 import { colors, space } from "../../styles/tokens.stylex";
@@ -12,8 +14,10 @@ const LABELED_PEAKS = 3;
 export type VintageChartProps = {
   years: readonly VintageCount[];
   withoutVintage: number;
-  /** A sourced period to shade behind the bars, such as heavily peated years. */
-  highlight?: AboutSpan;
+  /** Sourced eras to shade behind the bars, such as heavily peated years. */
+  eras?: readonly AboutSpan[];
+  /** A Bottle list URL; each year links to it filtered to that vintage. */
+  bottleListHref?: string;
   /** Names the site used, shown under the axis and in each year's tooltip. */
   names?: readonly AboutSpan[];
 };
@@ -35,11 +39,38 @@ function getNameForYear(names: readonly AboutSpan[], year: number) {
   )?.label;
 }
 
+/** One year's column; a link to that year's Bottles when it has any. */
+function ChartColumn({
+  children,
+  href,
+  onMouseEnter,
+}: {
+  children: ReactNode;
+  href?: string;
+  onMouseEnter: () => void;
+}) {
+  return href ? (
+    <AppLink
+      href={href}
+      onMouseEnter={onMouseEnter}
+      tabIndex={-1}
+      {...stylex.props(styles.column, styles.columnLink)}
+    >
+      {children}
+    </AppLink>
+  ) : (
+    <div onMouseEnter={onMouseEnter} {...stylex.props(styles.column)}>
+      {children}
+    </div>
+  );
+}
+
 /** Shows how many catalog Bottles were distilled in each year. */
 export function VintageChart({
   years,
   withoutVintage,
-  highlight,
+  eras = [],
+  bottleListHref,
   names = [],
 }: VintageChartProps) {
   const [activeYear, setActiveYear] = useState<number | null>(null);
@@ -63,15 +94,24 @@ export function VintageChart({
   const visibleNames = names.filter(
     (name) => name.start <= last && (name.end === null || name.end > first),
   );
+  const hrefForYear = bottleListHref
+    ? (year: number) =>
+        `${bottleListHref}${bottleListHref.includes("?") ? "&" : "?"}vintageYear=${year}`
+    : undefined;
+  const visibleEras = eras.filter(
+    (era) => era.start <= last && (era.end === null || era.end >= first),
+  );
   const active = years.find((entry) => entry.year === activeYear);
   const activeName = active ? getNameForYear(names, active.year) : undefined;
 
   return (
     <figure {...stylex.props(styles.figure)}>
-      {highlight ? (
+      {visibleEras.length ? (
         <div {...stylex.props(foundationStyles.metadata, styles.legend)}>
           <span aria-hidden="true" {...stylex.props(styles.legendSwatch)} />
-          {highlight.label}, {highlight.start}–{highlight.end}
+          {visibleEras
+            .map((era) => `${era.label}, ${era.start}–${era.end ?? "today"}`)
+            .join("; ")}
         </div>
       ) : null}
 
@@ -80,22 +120,23 @@ export function VintageChart({
         onMouseLeave={() => setActiveYear(null)}
         {...stylex.props(styles.plot)}
       >
-        {highlight ? (
+        {visibleEras.map((era) => (
           <span
+            key={`${era.label}-${era.start}`}
             {...stylex.props(
               styles.band(
-                position(highlight.start),
-                width(highlight.start, (highlight.end ?? last) + 1),
+                position(era.start),
+                width(era.start, (era.end ?? last) + 1),
               ),
             )}
           />
-        ) : null}
+        ))}
         <div {...stylex.props(styles.columns(span))}>
           {years.map((entry) => (
-            <div
+            <ChartColumn
+              href={entry.count > 0 ? hrefForYear?.(entry.year) : undefined}
               key={entry.year}
               onMouseEnter={() => setActiveYear(entry.year)}
-              {...stylex.props(styles.column)}
             >
               {peaks.has(entry.year) && entry.count > 0 ? (
                 <span {...stylex.props(foundationStyles.metadata, styles.peak)}>
@@ -110,7 +151,7 @@ export function VintageChart({
                   )}
                 />
               ) : null}
-            </div>
+            </ChartColumn>
           ))}
         </div>
         {active ? (
@@ -184,7 +225,13 @@ export function VintageChart({
             .filter((entry) => entry.count > 0)
             .map((entry) => (
               <tr key={entry.year}>
-                <th scope="row">{entry.year}</th>
+                <th scope="row">
+                  {hrefForYear ? (
+                    <a href={hrefForYear(entry.year)}>{entry.year}</a>
+                  ) : (
+                    entry.year
+                  )}
+                </th>
                 <td>{entry.count}</td>
               </tr>
             ))}
@@ -256,6 +303,10 @@ const styles = stylex.create({
     minWidth: 0,
   },
   // Leaves room above the tallest bar for its count.
+  columnLink: {
+    cursor: "pointer",
+    textDecoration: "none",
+  },
   bar: (share: number) => ({
     width: "100%",
     maxWidth: "28px",

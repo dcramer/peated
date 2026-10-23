@@ -284,6 +284,11 @@ Google Cloud project. Without credentials the job does nothing. The
 Entities whose audio is missing or does not match their IPA. See
 [Worker Jobs](../../apps/server/src/worker/README.md#queues) for how to run it.
 
+History about a production site, such as openings, closings, stills, and
+owners, belongs on the Distillery. History about a label belongs on the Brand.
+When a distillery's own line is the same Entity, as with Ardbeg, both belong on
+that one Entity. See [Entity About Pages](../features/entity-about.md).
+
 Peated keeps references for the Entity name, short name, and the name without a
 leading “The.” A moderator can add more references. Adding or deleting an alias
 does not change these references. The same alias can belong to more than one

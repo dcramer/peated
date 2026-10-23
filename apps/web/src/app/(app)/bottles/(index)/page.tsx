@@ -40,6 +40,7 @@ export default async function BottleListPage(props: {
         "limit",
         "minScore",
         "series",
+        "vintageYear",
       ],
       overrides: { limit: 50 },
     }),

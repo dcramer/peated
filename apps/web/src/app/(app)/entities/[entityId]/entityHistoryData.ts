@@ -58,3 +58,23 @@ export function getEntityHistoryEvents(
     };
   });
 }
+
+const KEY_KINDS = new Set(["opened", "closed", "mothballed", "reopened"]);
+
+/**
+ * Key dates for an Overview whose full history lives on the About page: the
+ * first opening and the latest closing and reopening.
+ */
+export function getKeyHistoryEvents(
+  events: readonly EntityEvent[],
+): EntityEvent[] {
+  const keyed = events.filter((event) => KEY_KINDS.has(event.kind));
+  const opened = keyed.find((event) => event.kind === "opened");
+  const closed = keyed.findLast(
+    (event) => event.kind === "closed" || event.kind === "mothballed",
+  );
+  const reopened = keyed.findLast((event) => event.kind === "reopened");
+  return [opened, closed, reopened]
+    .filter((event) => event !== undefined)
+    .sort((a, b) => a.date.localeCompare(b.date));
+}

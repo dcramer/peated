@@ -66,6 +66,31 @@ const loadCompanyPortfolio = unstable_cache(
   { revalidate: 300 },
 );
 
+const loadEntityAbout = unstable_cache(
+  async (entity: number) => {
+    const { client } = await createAnonymousServerClient();
+    const [about, vintages, bottlers, distillers, releaseYears] =
+      await Promise.all([
+        client.entities.about.details({ entity }),
+        client.entities.about.vintages({ entity }),
+        client.entities.about.bottlers({ entity }),
+        client.entities.about.distillers({ entity }),
+        client.entities.about.releaseYears({ entity }),
+      ]);
+    return {
+      about,
+      counts: { vintages, bottlers, distillers, releaseYears },
+    };
+  },
+  ["public-entity-about"],
+  { revalidate: 300 },
+);
+
+/** About pages and their catalog numbers are public; five-minute cache. */
+export async function getPageEntityAbout(entity: number) {
+  return loadEntityAbout(entity);
+}
+
 /** Entity catalog summaries are public and revalidate every five minutes. */
 export async function getPageEntityCatalog(entity: number) {
   return loadEntityCatalog(entity);

@@ -1,8 +1,12 @@
 import type { Meta, StoryObj } from "@storybook/nextjs-vite";
 
+import { mockBrora, mockEntityAbouts } from "@peated/server/orpc/mock/fixtures";
 import { StoryCanvas } from "../../components/storyFixtures.stylex";
-import { broraAbout } from "./articles/brora";
+
+import { getNameSpans, getOperatingSpans } from "./entityAbout";
 import { EntityLifeline } from "./entityLifeline.stylex";
+
+const broraAbout = mockEntityAbouts.get(mockBrora.id)!;
 
 const meta = {
   title: "Components/History/Lifeline",
@@ -10,8 +14,16 @@ const meta = {
   args: {
     currentYear: 2026,
     lanes: [
-      { label: "Status", spans: broraAbout.operating, quietLabel: "Silent" },
-      { label: "Name", spans: broraAbout.names, tone: "neutral" },
+      {
+        label: "Status",
+        spans: getOperatingSpans(broraAbout),
+        quietLabel: "Silent",
+      },
+      {
+        label: "Name",
+        spans: getNameSpans(broraAbout, mockBrora.name),
+        tone: "neutral",
+      },
     ],
   },
   decorators: [

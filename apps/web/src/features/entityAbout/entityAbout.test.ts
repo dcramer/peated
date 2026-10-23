@@ -1,96 +1,125 @@
+import { mockBrora, mockEntityAbouts } from "@peated/server/orpc/mock/fixtures";
 import { describe, expect, it } from "vitest";
 
-import { broraAbout } from "./articles/brora";
 import {
+  fillYears,
   getCitationNumbers,
-  getVintageCounts,
-  type AboutSection,
-  type AboutSpan,
+  getEraContext,
+  getKeyFacts,
+  getNameSpans,
+  getOperatingSpans,
+  getOwners,
   type EntityAbout,
 } from "./entityAbout";
 
-function getCitedIds(about: EntityAbout) {
-  const ids: string[] = [...about.lead.sources];
-  const visit = (section: AboutSection) => {
-    section.paragraphs.forEach((paragraph) => ids.push(...paragraph.sources));
-    section.disagreements?.forEach((note) => ids.push(...note.sources));
-    section.subsections?.forEach(visit);
-  };
-  about.facts.forEach((fact) => ids.push(...fact.sources));
-  about.sections.forEach(visit);
-  return ids;
-}
+const brora = mockEntityAbouts.get(mockBrora.id)!;
 
-/** Returns each place where a span does not start as the previous one ends. */
-function getSpanBreaks(spans: readonly AboutSpan[]) {
-  const breaks = spans.flatMap((span, index) => {
-    const next = spans[index + 1];
-    return next && next.start !== span.end
-      ? [`${span.label}→${next.label}`]
-      : [];
-  });
-  if (spans.at(-1)?.end !== null) breaks.push("last span ends before today");
-  return breaks;
-}
-
-describe("getVintageCounts", () => {
-  it("counts bottles by vintage and keeps empty years between them", () => {
-    expect(
-      getVintageCounts([
-        { vintageYear: 1972 },
-        { vintageYear: 1970 },
-        { vintageYear: 1972 },
-        { vintageYear: null },
-      ]),
-    ).toEqual({
-      years: [
-        { year: 1970, count: 1 },
-        { year: 1971, count: 0 },
-        { year: 1972, count: 2 },
-      ],
-      withoutVintage: 1,
-    });
+describe("getOperatingSpans", () => {
+  it("turns openings and closings into producing and silent spans", () => {
+    expect(getOperatingSpans(brora)).toEqual([
+      { label: "Producing", start: 1819, end: 1931 },
+      { label: "Silent", start: 1931, end: 1938 },
+      { label: "Producing", start: 1938, end: 1941 },
+      { label: "Silent", start: 1941, end: 1945 },
+      { label: "Producing", start: 1945, end: 1968 },
+      { label: "Silent", start: 1968, end: 1968 },
+      { label: "Producing", start: 1968, end: 1983 },
+      { label: "Silent", start: 1983, end: 2021 },
+      { label: "Producing", start: 2021, end: null },
+    ]);
   });
 
-  it("returns no years when no bottle has a vintage", () => {
-    expect(getVintageCounts([{ vintageYear: null }])).toEqual({
-      years: [],
-      withoutVintage: 1,
-    });
+  it("returns nothing until the opening is known", () => {
+    const withoutOpening: EntityAbout = {
+      ...brora,
+      events: brora.events.filter((event) => event.kind !== "opened"),
+    };
+
+    expect(getOperatingSpans(withoutOpening)).toEqual([]);
   });
 });
 
-describe("getCitationNumbers", () => {
-  it("numbers sources in the order the article first cites them", () => {
-    const numbers = getCitationNumbers({
-      ...broraAbout,
-      lead: { text: "Lead.", sources: ["b", "a"] },
-      facts: [{ label: "Founded", value: "1819", sources: ["a", "c"] }],
-      sections: [],
-    });
-
-    expect([...numbers]).toEqual([
-      ["b", 1],
-      ["a", 2],
-      ["c", 3],
+describe("getNameSpans", () => {
+  it("follows the first name through each rename", () => {
+    expect(getNameSpans(brora, "Brora")).toEqual([
+      { label: "Clynelish", start: 1819, end: 1969 },
+      { label: "Brora", start: 1969, end: null },
     ]);
   });
 });
 
-describe("Brora About article", () => {
-  // Evidence rule: every claim cites a listed source, and every listed source
-  // supports at least one claim.
-  it("cites only listed sources and lists only cited sources", () => {
-    const cited = new Set(getCitedIds(broraAbout));
-    const listed = new Set(broraAbout.sources.map((source) => source.id));
+describe("getOwners", () => {
+  it("lists acquisitions newest first, with the years each owner held it", () => {
+    expect(
+      getOwners(brora).map(({ label, start, end }) => [label, start, end]),
+    ).toEqual([
+      ["Diageo", 1997, null],
+      ["Guinness (United Distillers)", 1986, 1997],
+      ["Distillers Company (DCL)", 1925, 1986],
+      ["John Risk and the Distillers Company", 1912, 1925],
+      ["James Ainslie & Co. and John Risk", 1896, 1912],
+    ]);
+  });
+});
 
-    expect([...cited].filter((id) => !listed.has(id))).toEqual([]);
-    expect([...listed].filter((id) => !cited.has(id))).toEqual([]);
+describe("getKeyFacts", () => {
+  it("adds the founding year and first name before site facts", () => {
+    expect(
+      getKeyFacts(brora, "Brora").map(({ label, value }) => [label, value]),
+    ).toEqual([
+      ["Founded", "1819"],
+      ["First name", "Clynelish, until 1969"],
+      ["Wash stills", "1"],
+      ["Spirit stills", "1"],
+      ["Water", "Clynemilton Burn"],
+      ["Listed building", "Category B"],
+    ]);
+  });
+});
+
+describe("getCitationNumbers", () => {
+  it("numbers sources in the order the page first cites them", () => {
+    const numbers = getCitationNumbers(brora, getKeyFacts(brora, "Brora"));
+
+    expect([...numbers.keys()].slice(0, 3)).toEqual(["wp", "hes", "wf2"]);
+    expect(new Set(numbers.values()).size).toBe(numbers.size);
+  });
+});
+
+describe("getEraContext", () => {
+  it("names the era a vintage falls in", () => {
+    expect(getEraContext(brora, "Brora", 1972)).toEqual({
+      kind: "era",
+      span: { label: "Heavily peated", start: 1969, end: 1973 },
+    });
   });
 
-  it("describes every year from founding to today without gaps", () => {
-    expect(getSpanBreaks(broraAbout.operating)).toEqual([]);
-    expect(getSpanBreaks(broraAbout.names)).toEqual([]);
-    expect(getSpanBreaks(broraAbout.owners)).toEqual([]);
+  it("names the former name when no era covers the vintage", () => {
+    expect(getEraContext(brora, "Brora", 1965)).toEqual({
+      kind: "name",
+      span: { label: "Clynelish", start: 1819, end: 1969 },
+    });
+  });
+
+  it("says nothing for a vintage with no era under today's name", () => {
+    expect(getEraContext(brora, "Brora", 1981)).toBeNull();
+  });
+});
+
+describe("fillYears", () => {
+  it("keeps empty years between the first and last vintage", () => {
+    expect(
+      fillYears({
+        results: [
+          { year: 1970, count: 1 },
+          { year: 1972, count: 2 },
+        ],
+        withoutYear: 0,
+      }),
+    ).toEqual([
+      { year: 1970, count: 1 },
+      { year: 1971, count: 0 },
+      { year: 1972, count: 2 },
+    ]);
   });
 });

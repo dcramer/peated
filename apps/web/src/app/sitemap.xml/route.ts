@@ -20,6 +20,7 @@ export async function GET() {
     ),
     "/sitemaps/bottles/sitemap.xml",
     "/sitemaps/series/sitemap.xml",
+    "/sitemaps/about.xml",
     "/sitemaps/static.xml",
   ]);
 

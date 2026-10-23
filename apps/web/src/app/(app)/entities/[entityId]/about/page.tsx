@@ -1,9 +1,12 @@
+import config from "@peated/web/config";
 import type { Metadata } from "next";
 import { notFound } from "next/navigation";
+import type { AboutPage, WithContext } from "schema-dts";
 
 import {
-  getEntityAbout,
-  getVintageCounts,
+  getCitationNumbers,
+  getKeyFacts,
+  getOwners,
 } from "@peated/web/features/entityAbout/entityAbout";
 import {
   EntityAboutArticle,
@@ -13,41 +16,23 @@ import { EntityAboutFacts } from "@peated/web/features/entityAbout/entityAboutFa
 import { EntityAboutLayout } from "@peated/web/features/entityAbout/entityAboutLayout.stylex";
 import { parseCatalogRouteId } from "@peated/web/lib/catalogRoute";
 import { getEntityPage } from "@peated/web/lib/entityPage.server";
-import { getPublicPageServerClient } from "@peated/web/lib/orpc/client.server";
+import { getPageEntityAbout } from "@peated/web/lib/publicCatalog.server";
 import { getCatalogSeoMetadata } from "@peated/web/lib/seoMetadata";
+import { serializeJsonLd } from "@peated/web/lib/structuredData";
 import { getEntityUrl } from "@peated/web/lib/urls";
 
 import { EntityImageGallery } from "../entityImageGallery.stylex";
-
-// Proof of concept: read the distiller's Bottles page by page. A stored
-// article would get a vintage count from the API instead.
-const MAX_BOTTLE_PAGES = 10;
-
-async function getDistilledBottles(distillerId: number) {
-  const { client } = await getPublicPageServerClient();
-  const bottles: { vintageYear: number | null }[] = [];
-  for (let cursor = 1; cursor <= MAX_BOTTLE_PAGES; cursor += 1) {
-    const page = await client.bottles.list({
-      cursor,
-      distiller: distillerId,
-      limit: 100,
-    });
-    bottles.push(...page.results);
-    if (!page.rel.nextCursor) break;
-  }
-  return bottles;
-}
 
 export async function generateMetadata(props: {
   params: Promise<{ entityId: string }>;
 }): Promise<Metadata> {
   const { entityId } = await props.params;
   const entity = await getEntityPage(parseCatalogRouteId(entityId));
-  const about = getEntityAbout(entity.id);
-  if (!about) notFound();
+  const { about } = await getPageEntityAbout(entity.id);
+  if (!entity.hasAbout || !about?.lead) notFound();
   return getCatalogSeoMetadata({
     title: `About ${entity.name}`,
-    description: about.lead.text,
+    description: about.lead.sentences.map((s) => s.text).join(" "),
     url: `${getEntityUrl(entity)}/about`,
   });
 }
@@ -57,29 +42,61 @@ export default async function EntityAboutPage(props: {
 }) {
   const { entityId } = await props.params;
   const entity = await getEntityPage(parseCatalogRouteId(entityId));
-  const about = getEntityAbout(entity.id);
-  if (!about) notFound();
+  const { about, counts } = await getPageEntityAbout(entity.id);
+  if (!entity.hasAbout || !about?.lead) notFound();
 
-  const bottles = await getDistilledBottles(entity.id);
+  const keyFacts = getKeyFacts(about, entity.name);
+  const citationNumbers = getCitationNumbers(about, keyFacts);
+  const entityUrl = new URL(getEntityUrl(entity), config.URL_PREFIX).href;
+  const opened = about.events.find((event) => event.kind === "opened");
+  // Adds the founding date to the Organization the entity layout describes.
+  const jsonLd: WithContext<AboutPage> = {
+    "@context": "https://schema.org",
+    "@type": "AboutPage",
+    url: `${entityUrl}/about`,
+    name: `About ${entity.name}`,
+    mainEntity: {
+      "@type": "Organization",
+      "@id": `${entityUrl}#organization`,
+      foundingDate: opened?.date,
+    },
+  };
 
   return (
-    <EntityAboutLayout
-      lead={<EntityAboutLead about={about} />}
-      article={
-        <EntityAboutArticle
-          about={about}
-          currentYear={new Date().getUTCFullYear()}
-          vintages={getVintageCounts(bottles)}
-        />
-      }
-      rail={
-        <>
-          {entity.images?.length ? (
-            <EntityImageGallery entity={entity} />
-          ) : null}
-          <EntityAboutFacts about={about} />
-        </>
-      }
-    />
+    <>
+      <script
+        type="application/ld+json"
+        dangerouslySetInnerHTML={{ __html: serializeJsonLd(jsonLd) }}
+      />
+      <EntityAboutLayout
+        lead={
+          <EntityAboutLead
+            citationNumbers={citationNumbers}
+            lead={about.lead}
+          />
+        }
+        article={
+          <EntityAboutArticle
+            about={about}
+            citationNumbers={citationNumbers}
+            counts={counts}
+            currentYear={new Date().getUTCFullYear()}
+            entity={entity}
+          />
+        }
+        rail={
+          <>
+            {entity.images?.length ? (
+              <EntityImageGallery entity={entity} />
+            ) : null}
+            <EntityAboutFacts
+              citationNumbers={citationNumbers}
+              keyFacts={keyFacts}
+              owners={getOwners(about)}
+            />
+          </>
+        }
+      />
+    </>
   );
 }

@@ -53,6 +53,7 @@ describe("getEntityTabs", () => {
       shortName: null,
       totalBottles: 255,
       publicReviewAndTastingCount: 7,
+      hasAbout: true,
     });
 
     expect(tabs.slice(0, 2)).toEqual([
@@ -71,6 +72,7 @@ describe("getEntityTabs", () => {
           shortName: null,
           totalBottles: 10,
           publicReviewAndTastingCount: 20,
+          hasAbout: false,
         },
         { bottles: 400, portfolio: 62 },
       ),
@@ -99,6 +101,7 @@ describe("getEntityTabs", () => {
           shortName: null,
           totalBottles: 0,
           publicReviewAndTastingCount: 0,
+          hasAbout: false,
         },
         { bottles: 0, portfolio: 0 },
       ),
@@ -114,6 +117,7 @@ describe("getEntityTabs", () => {
         shortName: "SMWS",
         totalBottles: 1_301,
         publicReviewAndTastingCount: 29,
+        hasAbout: false,
       }),
     ).toEqual([
       {
@@ -146,6 +150,7 @@ describe("getEntityTabs", () => {
         shortName: null,
         totalBottles: 42,
         publicReviewAndTastingCount: 8,
+        hasAbout: false,
       }),
     ).toEqual([
       { href: "/distillers/321-port-ellen", label: "Overview" },

@@ -1,43 +1,10 @@
-import { broraAbout } from "./articles/brora";
+import type { Outputs } from "@peated/server/orpc/router";
 
-// About schema rule (owner: openspec change add-entity-about): every Entity's
-// About document is stored against this shape. Change it rarely, and only in
-// backward-compatible ways: add optional fields; never rename or remove a
-// field or change its meaning. A breaking change needs a schema version bump,
-// an upgrade that runs on read, and a checked migration of stored documents.
-
-/** A published source the About article cites. */
-export type AboutSource = {
-  id: string;
-  title: string;
-  publisher: string;
-  url: string;
-};
-
-/** One paragraph and the sources that support every claim in it. */
-export type AboutParagraph = {
-  text: string;
-  sources: readonly string[];
-};
-
-/**
- * A fact the sources do not agree on. The article states the best-supported
- * value and shows this note beside it with every source.
- */
-export type AboutDisagreement = {
-  topic: string;
-  text: string;
-  sources: readonly string[];
-};
-
-export type AboutSection = {
-  id: string;
-  heading: string;
-  years?: string;
-  paragraphs: readonly AboutParagraph[];
-  disagreements?: readonly AboutDisagreement[];
-  subsections?: readonly AboutSection[];
-};
+export type EntityAbout = NonNullable<Outputs["entities"]["about"]["details"]>;
+export type AboutEvent = EntityAbout["events"][number];
+export type AboutSection = NonNullable<EntityAbout["lead"]>;
+export type YearCounts = Outputs["entities"]["about"]["vintages"];
+export type RelatedCounts = Outputs["entities"]["about"]["bottlers"];
 
 /** A span of years. A null end means it continues today. */
 export type AboutSpan = {
@@ -46,82 +13,200 @@ export type AboutSpan = {
   end: number | null;
 };
 
-export type AboutFact = {
-  label: string;
-  value: string;
-  entityId?: number;
-  sources: readonly string[];
-};
+export type VintageCount = { year: number; count: number };
 
-export type EntityAbout = {
-  entityId: number;
-  reviewedOn: string;
-  lead: AboutParagraph;
-  facts: readonly AboutFact[];
-  operating: readonly AboutSpan[];
-  names: readonly AboutSpan[];
-  owners: readonly (AboutSpan & { entityId?: number })[];
-  peatedYears?: AboutSpan;
-  sections: readonly AboutSection[];
-  sources: readonly AboutSource[];
-};
+// Display minimums (owner: docs/features/entity-about.md). A part below its
+// minimum is hidden, with no heading or placeholder.
+export const ABOUT_MIN_TIMELINE_SPANS = 2;
+export const ABOUT_MIN_VINTAGE_BOTTLES = 10;
+export const ABOUT_MIN_BOTTLERS = 3;
+export const ABOUT_MIN_RELEASE_BOTTLES = 10;
+export const ABOUT_MIN_KEY_FACTS = 2;
 
-// Proof of concept: articles live in code until Peated stores them.
-const articles = new Map<number, EntityAbout>([
-  [broraAbout.entityId, broraAbout],
-]);
-
-export function getEntityAbout(entityId: number) {
-  return articles.get(entityId) ?? null;
+function year(date: string) {
+  return Number(date.slice(0, 4));
 }
 
-/** Numbers sources in the order the article first cites them. */
-export function getCitationNumbers(article: EntityAbout) {
+const OPERATING_KINDS = new Set(["opened", "reopened"]);
+const SILENT_KINDS = new Set(["closed", "mothballed"]);
+
+/**
+ * Turns opened, closed, mothballed, and reopened events into producing and
+ * silent spans. Returns nothing until the first opening is known.
+ */
+export function getOperatingSpans(about: EntityAbout): AboutSpan[] {
+  const changes = about.events.filter(
+    (event) => OPERATING_KINDS.has(event.kind) || SILENT_KINDS.has(event.kind),
+  );
+  if (changes[0]?.kind !== "opened") return [];
+  const spans: AboutSpan[] = [];
+  for (const event of changes) {
+    const label = OPERATING_KINDS.has(event.kind) ? "Producing" : "Silent";
+    const last = spans.at(-1);
+    if (last?.label === label) continue;
+    if (last) last.end = year(event.date);
+    spans.push({ label, start: year(event.date), end: null });
+  }
+  // Spans shorter than a year still mark the change on the timeline.
+  return spans.filter((span) => span.end === null || span.end >= span.start);
+}
+
+/** Names over time, from an opening name and later renames. */
+export function getNameSpans(about: EntityAbout, currentName: string) {
+  const opened = about.events.find((event) => event.kind === "opened");
+  const renames = about.events.filter((event) => event.kind === "renamed");
+  if (!opened || !renames.length) return [];
+  const spans: AboutSpan[] = [
+    { label: opened.name ?? currentName, start: year(opened.date), end: null },
+  ];
+  for (const rename of renames) {
+    spans.at(-1)!.end = year(rename.date);
+    spans.push({
+      label: rename.name ?? currentName,
+      start: year(rename.date),
+      end: null,
+    });
+  }
+  return spans;
+}
+
+export type AboutOwner = AboutSpan & { entity: AboutEvent["newOwner"] };
+
+/** Owners from acquisitions, newest first. */
+export function getOwners(about: EntityAbout): AboutOwner[] {
+  const acquisitions = about.events.filter(
+    (event) => event.kind === "acquired",
+  );
+  return acquisitions
+    .map((event, index) => ({
+      label: event.newOwner?.name ?? event.newOwnerName ?? "Unknown owner",
+      entity: event.newOwner,
+      start: year(event.date),
+      end: acquisitions[index + 1] ? year(acquisitions[index + 1]!.date) : null,
+    }))
+    .reverse();
+}
+
+export function getEras(about: EntityAbout): AboutSpan[] {
+  return about.events.flatMap((event) =>
+    event.kind === "era" && event.title
+      ? [
+          {
+            label: event.title,
+            start: year(event.date),
+            end: event.endDate ? year(event.endDate) : null,
+          },
+        ]
+      : [],
+  );
+}
+
+export type AboutKeyFact = {
+  label: string;
+  value: string;
+  sourceIds: string[];
+};
+
+/** Key facts for the sidebar: founding, first name, and site facts. */
+export function getKeyFacts(
+  about: EntityAbout,
+  currentName: string,
+): AboutKeyFact[] {
+  const facts: AboutKeyFact[] = [];
+  const opened = about.events.find((event) => event.kind === "opened");
+  if (opened) {
+    facts.push({
+      label: "Founded",
+      value: String(year(opened.date)),
+      sourceIds: opened.citations.map((c) => c.sourceId),
+    });
+  }
+  const names = getNameSpans(about, currentName);
+  const firstName = names[0];
+  if (firstName && firstName.label !== currentName) {
+    facts.push({
+      label: "First name",
+      value: `${firstName.label}, until ${firstName.end}`,
+      sourceIds: about.events
+        .filter((event) => event.kind === "renamed")
+        .flatMap((event) => event.citations.map((c) => c.sourceId)),
+    });
+  }
+  for (const fact of about.siteFacts) {
+    // Numbers are shown with thousands separators; text stays as written.
+    const value = fact.value.toLocaleString("en-US");
+    facts.push({
+      label: fact.label,
+      value: fact.unit ? `${value} ${fact.unit}` : value,
+      sourceIds: fact.citations.map((c) => c.sourceId),
+    });
+  }
+  return facts;
+}
+
+/** Numbers sources in the order the page first cites them. */
+export function getCitationNumbers(
+  about: EntityAbout,
+  keyFacts: readonly AboutKeyFact[],
+) {
   const numbers = new Map<string, number>();
   const cite = (ids: readonly string[]) => {
     for (const id of ids) {
       if (!numbers.has(id)) numbers.set(id, numbers.size + 1);
     }
   };
-  const visit = (section: AboutSection) => {
-    section.paragraphs.forEach((paragraph) => cite(paragraph.sources));
-    section.disagreements?.forEach((note) => cite(note.sources));
-    section.subsections?.forEach(visit);
-  };
-
-  cite(article.lead.sources);
-  article.facts.forEach((fact) => cite(fact.sources));
-  article.sections.forEach(visit);
+  const sections = [about.lead, ...about.sections].filter(
+    (section) => section !== null,
+  );
+  for (const section of sections) {
+    for (const sentence of section.sentences) cite(sentence.sourceIds);
+  }
+  keyFacts.forEach((fact) => cite(fact.sourceIds));
+  for (const event of about.events) {
+    cite(event.citations.map((citation) => citation.sourceId));
+  }
   return numbers;
 }
 
-export type VintageCount = { year: number; count: number };
+/** Fills empty years between the first and last vintage so gaps show. */
+export function fillYears(counts: YearCounts): VintageCount[] {
+  if (!counts.results.length) return [];
+  const byYear = new Map(counts.results.map((row) => [row.year, row.count]));
+  const first = counts.results[0]!.year;
+  const last = counts.results.at(-1)!.year;
+  const years: VintageCount[] = [];
+  for (let value = first; value <= last; value += 1) {
+    years.push({ year: value, count: byYear.get(value) ?? 0 });
+  }
+  return years;
+}
+
+export function countWithYear(counts: YearCounts) {
+  return counts.results.reduce((total, row) => total + row.count, 0);
+}
 
 /**
- * Counts Bottles by vintage year and fills empty years between the first and
- * last vintage so gaps stay visible.
+ * Era context for a Bottle distilled in `vintageYear`: the sourced era that
+ * covers it, or the name the site used then when it differs from today's.
  */
-export function getVintageCounts(
-  bottles: readonly { vintageYear: number | null }[],
+export function getEraContext(
+  about: EntityAbout,
+  currentName: string,
+  vintageYear: number,
 ) {
-  const counts = new Map<number, number>();
-  let withoutVintage = 0;
-  for (const bottle of bottles) {
-    if (bottle.vintageYear === null) {
-      withoutVintage += 1;
-      continue;
-    }
-    counts.set(bottle.vintageYear, (counts.get(bottle.vintageYear) ?? 0) + 1);
+  const era = getEras(about).find(
+    (span) =>
+      vintageYear >= span.start &&
+      (span.end === null || vintageYear <= span.end),
+  );
+  if (era) return { kind: "era" as const, span: era };
+  const name = getNameSpans(about, currentName).find(
+    (span) =>
+      vintageYear >= span.start &&
+      (span.end === null || vintageYear < span.end),
+  );
+  if (name && name.label !== currentName) {
+    return { kind: "name" as const, span: name };
   }
-
-  const years = [...counts.keys()];
-  if (!years.length) return { years: [], withoutVintage };
-
-  const first = Math.min(...years);
-  const last = Math.max(...years);
-  const result: VintageCount[] = [];
-  for (let year = first; year <= last; year += 1) {
-    result.push({ year, count: counts.get(year) ?? 0 });
-  }
-  return { years: result, withoutVintage };
+  return null;
 }
