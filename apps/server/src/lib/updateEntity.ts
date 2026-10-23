@@ -425,7 +425,10 @@ export async function updateEntityInTransaction(
       .where(eq(entities.id, entity.id))
       .returning();
   } catch (error) {
-    if (uniqueViolationConstraint(error) === "entity_name_unq") {
+    if (
+      error instanceof Error &&
+      uniqueViolationConstraint(error) === "entity_name_unq"
+    ) {
       throw new EntityUpdateConflictError("Entity with name already exists.", {
         cause: error,
       });

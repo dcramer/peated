@@ -11,8 +11,8 @@ const UniqueViolationSchema = z.object({
  * Drizzle wraps PostgreSQL errors in `DrizzleQueryError`, and callers may wrap
  * them again, so this checks the error and its causes.
  */
-export function uniqueViolationConstraint(error: unknown): string | null {
-  let current = error;
+export function uniqueViolationConstraint(error: Error): string | null {
+  let current: unknown = error;
   for (let depth = 0; depth < 5 && current instanceof Error; depth += 1) {
     const violation = UniqueViolationSchema.safeParse(current);
     if (violation.success) return violation.data.constraint ?? null;

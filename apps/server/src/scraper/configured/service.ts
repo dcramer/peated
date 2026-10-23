@@ -312,7 +312,7 @@ export async function createSiteWithScrapeSource(
       return { site, source };
     });
   } catch (error) {
-    if (uniqueViolationConstraint(error) !== null) {
+    if (error instanceof Error && uniqueViolationConstraint(error) !== null) {
       throw new ScrapeSourceConflictError(
         "A source for this website already exists.",
       );

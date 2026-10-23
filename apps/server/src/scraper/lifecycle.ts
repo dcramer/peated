@@ -322,7 +322,10 @@ async function queueManualExternalSiteRun({
       return insertRun(tx, currentSite, "manual", registry, requestedById);
     });
   } catch (error) {
-    if (uniqueViolationConstraint(error) !== "external_site_run_active_unq") {
+    if (
+      !(error instanceof Error) ||
+      uniqueViolationConstraint(error) !== "external_site_run_active_unq"
+    ) {
       throw error;
     }
     return await throwActiveRunConflict(site.id);
@@ -358,7 +361,10 @@ async function queueScrapeSourcePreview({
     });
     run = configured.run;
   } catch (error) {
-    if (uniqueViolationConstraint(error) !== "external_site_run_active_unq") {
+    if (
+      !(error instanceof Error) ||
+      uniqueViolationConstraint(error) !== "external_site_run_active_unq"
+    ) {
       throw error;
     }
     return await throwActiveRunConflict(site.id);
@@ -399,7 +405,10 @@ async function queueScheduledExternalSiteRun(
   } catch (error) {
     // Paused or unfinished configured sources are not due for collection.
     if (error instanceof ScrapeSourceValidationError) return null;
-    if (uniqueViolationConstraint(error) !== "external_site_run_active_unq") {
+    if (
+      !(error instanceof Error) ||
+      uniqueViolationConstraint(error) !== "external_site_run_active_unq"
+    ) {
       throw error;
     }
     return await throwActiveRunConflict(siteId);

@@ -900,7 +900,8 @@ export async function mergeBottlesInTransaction(
   } catch (error) {
     if (
       ["tasting_unq", "tasting_legacy_unq"].includes(
-        uniqueViolationConstraint(error) ?? "",
+        (error instanceof Error ? uniqueViolationConstraint(error) : null) ??
+          "",
       )
     ) {
       throw new BottleMergeConflictError("consumer_conflict", {

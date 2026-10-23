@@ -13,19 +13,18 @@ describe("uniqueViolationConstraint", () => {
       .values({ name: tag.name, tagCategory: tag.tagCategory })
       .then(
         () => null,
-        (reason: unknown) => reason,
+        (reason: Error) => reason,
       );
+    if (!error) throw new Error("Expected the duplicate insert to fail.");
 
     expect(uniqueViolationConstraint(error)).toBe("tag_pkey");
     // Sensitive data policy: patches/drizzle-orm@*.patch keeps parameter
     // values out of failed-query messages and stacks.
-    expect(error).toBeInstanceOf(Error);
-    expect((error as Error).message).not.toContain(tag.name);
-    expect((error as Error).stack).not.toContain(tag.name);
+    expect(error.message).not.toContain(tag.name);
+    expect(error.stack).not.toContain(tag.name);
   });
 
   test("returns null for other errors", () => {
     expect(uniqueViolationConstraint(new Error("boom"))).toBeNull();
-    expect(uniqueViolationConstraint("23505")).toBeNull();
   });
 });
