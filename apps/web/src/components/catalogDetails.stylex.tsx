@@ -119,8 +119,9 @@ const styles = stylex.create({
     display: "flex",
     flexDirection: "column",
   },
-  // DESIGN.md: phones show key fact values only, on one line, so the header
-  // leaves room for the details below it. Labels stay for screen readers.
+  // DESIGN.md: phones show key fact values only, on one line. Values such as
+  // 46% or Single Malt read on their own, and the header leaves room for the
+  // page. Labels stay for screen readers.
   keyFactLabel: {
     order: 2,
     position: { default: "static", [PHONE]: "absolute" },

@@ -433,8 +433,8 @@ JSDoc.
   Hide the count when it has not been computed, and omit a range with equal
   endpoints. In bottle headers, show the value first and its label underneath;
   on phones, show them on one line above the key facts, and show the key
-  fact values on one line without visible labels, since the details below
-  repeat them, so the header leaves room for the page; keep the section's accessible name without repeating “Bottle rating” on
+  fact values on one line without visible labels, since values such as 46%
+  or Single Malt read on their own, so the header leaves room for the page; keep the section's accessible name without repeating “Bottle rating” on
   screen. Do not add source labels or row details there. Omit the whole summary
   when no rating exists.
 

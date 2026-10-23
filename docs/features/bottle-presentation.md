@@ -212,8 +212,9 @@ subject.
   Leave out a series, ABV, or stated age the name already prints. An edition,
   year, batch, or cask the name already prints moves behind category, so it
   shows only when a slot is free. Additional Details always lists the edition.
-  On phones, the key facts show their values only, on one line, because the
-  details below name each one; the rating sits on one line above the facts, and the description preview shows
+  On phones, the key facts show their values only, on one line, because
+  values such as 46% or Single Malt read on their own; the rating sits on one
+  line above the facts, and the description preview shows
   three lines, so the tabs stay near the top of the first screen.
 - Show a year only when it is part of, or necessary to understand, the release
   identity.
