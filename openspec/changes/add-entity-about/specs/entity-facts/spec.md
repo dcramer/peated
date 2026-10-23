@@ -22,7 +22,8 @@ older version.
 
 ### Requirement: About schema changes stay backward compatible
 
-Changes to the About document schema SHALL be rare. A change SHALL add only
+Changes to the About document schema SHALL be rare. The same rule SHALL apply
+to the public About API response, which changes only by adding fields. A change SHALL add only
 optional fields, and SHALL NOT rename or remove a field or change what a field
 means. Every stored document SHALL still parse after a change. A change that
 cannot meet this SHALL bump the schema version and ship an upgrade that runs
@@ -72,7 +73,7 @@ normalized URL.
 
 #### Scenario: Source page moves
 
-- **WHEN** a source URL stops loading during a refresh
+- **WHEN** a later run or a moderator finds that a source URL no longer loads
 - **THEN** the source is marked unavailable and its citations remain, so the
   facts can be checked again
 
@@ -129,7 +130,8 @@ citations. Event kinds SHALL include `opened`, `closed`, `mothballed`,
 `reopened`, `acquired`, `renamed`, `era`, and `generic`. A `renamed` event
 SHALL store the new name. An `era` event SHALL have an end date or be marked
 as continuing, and a short title. An event MAY link one related Entity, such as
-a distillery built next door. An `acquired` event SHALL link the new owner.
+a distillery built next door. An `acquired` event SHALL link the new owner's Entity, or store the owner's
+name when Peated has no Entity for it. The pipeline SHALL NOT create Entities.
 Writes SHALL check that linked Entities exist, and reads SHALL follow merged
 Entities to their current record.
 
@@ -142,6 +144,13 @@ Entities to their current record.
 
 - **WHEN** a distillery made heavily peated malt from 1969 to 1973
 - **THEN** an `era` event stores the title, the start, and the end
+
+#### Scenario: Owner without an Entity
+
+- **WHEN** a source says the Sutherland estate owned a distillery and Peated
+  has no Entity for the estate
+- **THEN** the `acquired` event stores the name "Sutherland estate" with no
+  Entity link
 
 #### Scenario: Merged owner
 
@@ -185,3 +194,18 @@ to restore an earlier version.
 
 - **WHEN** the pipeline publishes a new event
 - **THEN** change history shows the event and the pipeline as the actor
+
+### Requirement: Entity merge combines About documents
+
+When one Entity is merged into another, the system SHALL move the merged
+Entity's events, site facts, and sources into the destination's About
+document, combining sources with the same URL. It SHALL keep the destination's
+sections and drop the merged Entity's sections that the pipeline wrote.
+Sections a person wrote SHALL be kept in change history. Both documents SHALL
+be saved to change history before the merge.
+
+#### Scenario: Merge two distilleries with About documents
+
+- **WHEN** a duplicate distillery with 3 events is merged into its original
+- **THEN** the original's document gains the 3 events and their sources, and
+  its own sections are unchanged
