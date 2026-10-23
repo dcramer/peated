@@ -241,8 +241,10 @@ Do not rebuild these lines in a page-specific mapper:
    `Gordon & MacPhail Private Collection Benromach 1982`. Category is left out:
    the name or distillery almost always makes it clear, and the bottle page
    and filters still show it.
-3. Known release facts, stated age, and ABV. A year the name already prints is
-   not repeated.
+3. Known release facts, stated age, and ABV: the edition, at most one year
+   (vintage, then release), age, and ABV. A year, age, or ABV the name already
+   prints is not repeated. This line wraps between facts instead of cutting
+   one off, so ABV stays visible on phones.
 
 Rows that hide the second line keep the series in the name instead: compact
 rows and recent tasting rows. A series page leaves the series out of its own

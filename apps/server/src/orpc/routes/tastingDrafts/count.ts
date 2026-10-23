@@ -1,20 +1,12 @@
 import { db } from "@peated/server/db";
 import { tastingDrafts } from "@peated/server/db/schema";
-import { procedure } from "@peated/server/orpc";
+import { implement } from "@peated/server/orpc";
+import tastingDraftCountContract from "@peated/server/orpc/contracts/tastingDrafts/count";
 import { requireAuth } from "@peated/server/orpc/middleware";
 import { count, eq } from "drizzle-orm";
-import { z } from "zod";
 
-export default procedure
+export default implement(tastingDraftCountContract)
   .use(requireAuth)
-  .route({
-    method: "GET",
-    path: "/tasting-drafts/count",
-    summary: "Count tasting drafts",
-    description: "Count your own tasting drafts.",
-    operationId: "countTastingDrafts",
-  })
-  .output(z.object({ count: z.number().int() }))
   .handler(async ({ context }) => {
     const [{ total }] = await db
       .select({ total: count() })
