@@ -19,14 +19,17 @@ live in code.
   supporting passage, history events, eras, names over time, distillery site
   facts, and prose sections. Conflicting sources stay visible instead of
   being settled by guesswork.
-- Keep the list of site facts and the reviewed source sites in **typed files
-  in code**, changed by pull request. Changes to the document schema should
+- Keep the list of site facts in a **typed file in code**, changed by pull
+  request. Changes to the document schema should
   be rare and backward compatible.
 - **BREAKING (internal):** move Entity history from `entity_event` into the
   document, then drop the table.
 - Add **catalog numbers** routes built from Bottles: Bottles by year
   distilled, who bottled them, which distilleries make a brand, and releases
   by year. Add a vintage filter to the Bottle list.
+- **Nothing is shown without a source.** Every event, site fact, and sentence
+  cites sources, whether the pipeline or a moderator wrote it, and every page
+  lists its numbered sources.
 - Add an **About** tab for distilleries and brands. A fixed template places a
   sourced lead, short sections, a timeline, key facts, owners, catalog charts,
   and numbered sources. Each part shows only when its data passes a minimum.
