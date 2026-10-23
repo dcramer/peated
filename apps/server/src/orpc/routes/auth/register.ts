@@ -1,5 +1,6 @@
 import config from "@peated/server/config";
 import { db } from "@peated/server/db";
+import { uniqueViolationConstraint } from "@peated/server/db/errors";
 import { passkeys, users } from "@peated/server/db/schema";
 import { AuditEvent, auditLog } from "@peated/server/lib/auditLog";
 import {
@@ -110,13 +111,13 @@ export default procedure
             })
             .returning();
         } catch (err: any) {
+          const constraint = uniqueViolationConstraint(err);
           if (
-            err?.code === "23505" &&
-            (err?.constraint === "user_username_unq" ||
-              err?.constraint === "user_email_unq")
+            constraint === "user_username_unq" ||
+            constraint === "user_email_unq"
           ) {
             const fieldName =
-              err.constraint === "user_username_unq" ? "username" : "email";
+              constraint === "user_username_unq" ? "username" : "email";
             throw errors.CONFLICT({
               message: `An account with this ${fieldName} already exists.`,
               data: { field: fieldName },
@@ -136,10 +137,7 @@ export default procedure
             tx,
           );
         } catch (err: any) {
-          if (
-            err?.code === "23505" &&
-            err?.constraint === "passkey_credential_id_unq"
-          ) {
+          if (uniqueViolationConstraint(err) === "passkey_credential_id_unq") {
             throw errors.CONFLICT({
               message: "This passkey is already registered.",
             });
@@ -187,13 +185,13 @@ export default procedure
           })
           .returning();
       } catch (err: any) {
+        const constraint = uniqueViolationConstraint(err);
         if (
-          err?.code === "23505" &&
-          (err?.constraint === "user_username_unq" ||
-            err?.constraint === "user_email_unq")
+          constraint === "user_username_unq" ||
+          constraint === "user_email_unq"
         ) {
           const fieldName =
-            err.constraint === "user_username_unq" ? "username" : "email";
+            constraint === "user_username_unq" ? "username" : "email";
           throw errors.CONFLICT({
             message: `An account with this ${fieldName} already exists.`,
             data: { field: fieldName },

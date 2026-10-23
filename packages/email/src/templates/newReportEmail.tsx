@@ -1,6 +1,7 @@
 import { Preview } from "jsx-email";
 import React from "react";
 import {
+  create,
   defaulted,
   nullable,
   number,
@@ -42,6 +43,9 @@ export const TemplateStruct = object({
   baseUrl: defaulted(string(), "https://peated.com"),
 });
 export type TemplateProps = Infer<typeof TemplateStruct>;
+
+/** Sample props for the jsx-email preview server. */
+export const previewProps: TemplateProps = create({}, TemplateStruct);
 
 export const Template = ({ report, baseUrl }: TemplateProps) => {
   const reporterUrl = `${baseUrl}/users/${encodeURIComponent(report.reporterUsername)}`;

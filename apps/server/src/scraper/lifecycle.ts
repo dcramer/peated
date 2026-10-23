@@ -1,4 +1,5 @@
 import { db, type AnyDatabase } from "@peated/server/db";
+import { uniqueViolationConstraint } from "@peated/server/db/errors";
 import {
   externalReviewArticles,
   externalReviewBodies,
@@ -20,7 +21,6 @@ import {
   lte,
   or,
 } from "drizzle-orm";
-import { z } from "zod";
 import { createPinnedScrapeSourceRun } from "./configured/runs";
 import { ScrapeSourceValidationError } from "./configured/service";
 import {
@@ -49,11 +49,6 @@ export class ExternalSiteRunActiveError extends Error {
     );
   }
 }
-
-const ActiveRunConflictSchema = z.object({
-  code: z.literal("23505"),
-  constraint: z.literal("external_site_run_active_unq"),
-});
 
 async function findActiveRun(siteId: number, connection: AnyDatabase = db) {
   const [run] = await connection
@@ -327,7 +322,12 @@ async function queueManualExternalSiteRun({
       return insertRun(tx, currentSite, "manual", registry, requestedById);
     });
   } catch (error) {
-    if (!ActiveRunConflictSchema.safeParse(error).success) throw error;
+    if (
+      !(error instanceof Error) ||
+      uniqueViolationConstraint(error) !== "external_site_run_active_unq"
+    ) {
+      throw error;
+    }
     return await throwActiveRunConflict(site.id);
   }
   await dispatchExternalSiteRun(run, site, enqueue);
@@ -361,7 +361,12 @@ async function queueScrapeSourcePreview({
     });
     run = configured.run;
   } catch (error) {
-    if (!ActiveRunConflictSchema.safeParse(error).success) throw error;
+    if (
+      !(error instanceof Error) ||
+      uniqueViolationConstraint(error) !== "external_site_run_active_unq"
+    ) {
+      throw error;
+    }
     return await throwActiveRunConflict(site.id);
   }
   await dispatchExternalSiteRun(run, site, enqueue);
@@ -400,7 +405,12 @@ async function queueScheduledExternalSiteRun(
   } catch (error) {
     // Paused or unfinished configured sources are not due for collection.
     if (error instanceof ScrapeSourceValidationError) return null;
-    if (!ActiveRunConflictSchema.safeParse(error).success) throw error;
+    if (
+      !(error instanceof Error) ||
+      uniqueViolationConstraint(error) !== "external_site_run_active_unq"
+    ) {
+      throw error;
+    }
     return await throwActiveRunConflict(siteId);
   }
 

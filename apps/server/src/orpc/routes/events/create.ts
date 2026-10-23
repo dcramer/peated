@@ -1,4 +1,5 @@
 import { db } from "@peated/server/db";
+import { uniqueViolationConstraint } from "@peated/server/db/errors";
 import { countries, events } from "@peated/server/db/schema";
 import { procedure } from "@peated/server/orpc";
 import { requireAdmin } from "@peated/server/orpc/middleware";
@@ -49,7 +50,7 @@ export default procedure
           .returning();
         return event;
       } catch (err: any) {
-        if (err?.code === "23505" && err?.constraint === "event_name_unq") {
+        if (uniqueViolationConstraint(err) === "event_name_unq") {
           throw errors.CONFLICT({
             message: "Event already exists.",
             cause: err,

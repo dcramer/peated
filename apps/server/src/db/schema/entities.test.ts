@@ -43,6 +43,6 @@ describe("Entity status", () => {
   }) => {
     await expect(
       fixtures.Entity({ kind: "brand", status: "mothballed" }),
-    ).rejects.toMatchObject({ code: "23514" });
+    ).rejects.toMatchObject({ cause: { code: "23514" } });
   });
 });

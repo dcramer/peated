@@ -1,3 +1,4 @@
+import { uniqueViolationConstraint } from "@peated/server/db/errors";
 import { hashSync } from "bcrypt";
 import { eq } from "drizzle-orm";
 import jsonwebtoken from "jsonwebtoken";
@@ -138,7 +139,7 @@ export async function createUser(
         return user;
       });
     } catch (err: any) {
-      if (err?.code === "23505" && err?.constraint === "user_username_unq") {
+      if (uniqueViolationConstraint(err) === "user_username_unq") {
         currentUsername = `${baseUsername}-${random(10000, 99999)}`;
       } else {
         throw err;

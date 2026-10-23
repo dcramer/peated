@@ -1,5 +1,6 @@
 import { normalizeEntityName } from "@peated/bottle-classifier/normalize";
 import { db, type AnyTransaction } from "@peated/server/db";
+import { uniqueViolationConstraint } from "@peated/server/db/errors";
 import type { Entity, User } from "@peated/server/db/schema";
 import {
   bottleGroups,
@@ -128,11 +129,6 @@ type EntityUpdateData = Partial<
     | "location"
   >
 >;
-
-const EntityNameConflictSchema = z.object({
-  code: z.literal("23505"),
-  constraint: z.literal("entity_name_unq"),
-});
 
 export type EntityUpdateFinalizationManifest = {
   entity: Entity;
@@ -429,7 +425,10 @@ export async function updateEntityInTransaction(
       .where(eq(entities.id, entity.id))
       .returning();
   } catch (error) {
-    if (EntityNameConflictSchema.safeParse(error).success) {
+    if (
+      error instanceof Error &&
+      uniqueViolationConstraint(error) === "entity_name_unq"
+    ) {
       throw new EntityUpdateConflictError("Entity with name already exists.", {
         cause: error,
       });
