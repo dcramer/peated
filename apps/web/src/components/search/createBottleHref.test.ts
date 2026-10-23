@@ -1,7 +1,3 @@
-import {
-  getTastingDraftBottleHref,
-  parseTastingDraftId,
-} from "@peated/web/lib/tastingDrafts";
 import { describe, expect, test } from "vitest";
 import {
   getCreateBottleHref,
@@ -117,12 +113,6 @@ describe("getCreateBottleHref", () => {
 
     expect(url.pathname).toBe("/bottles/new");
     expect(url.searchParams.get("name")).toBe("Lagavulin 16");
-
-    // The create page reads the draft back and opens its confirm step.
-    const returnDraftId = parseTastingDraftId(url.searchParams.get("draft"));
-    expect(returnDraftId).toBe(draftId);
-    expect(getTastingDraftBottleHref({ id: draftId }, 42)).toBe(
-      `/drafts/${draftId}?bottle=42`,
-    );
+    expect(url.searchParams.get("draft")).toBe(draftId);
   });
 });

@@ -209,7 +209,9 @@ sends the whole draft, because a save replaces every field.
 - table: `apps/server/src/db/schema/tastingDrafts.ts`
 - routes: `apps/server/src/orpc/routes/tastingDrafts/`
 - shared tasting insert: `apps/server/src/orpc/routes/tastings/insertTasting.ts`
-- photo copy: `apps/server/src/lib/pendingUploads.ts`
+- photo copy on save: `apps/server/src/lib/pendingUploads.ts`
+- photo copy on post and new Bottle: `copyUploadByUrl` in
+  `apps/server/src/lib/uploads.ts`
 - identification job: `apps/server/src/lib/tastingDraftIdentification.ts`
 - web inbox: `apps/web/src/app/(app)/drafts/`
 - web finish flow: `apps/web/src/app/(layout-free)/drafts/[draftId]/`

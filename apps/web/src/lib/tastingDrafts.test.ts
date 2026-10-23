@@ -7,6 +7,7 @@ import {
   describeTastingDraft,
   getExistingBottleConflictId,
   getIdentificationPollInterval,
+  getTastingDraftBottleHref,
   getTastingDraftPhotoChange,
   getTastingDraftSuggestion,
   parseTastingDraftId,
@@ -373,5 +374,14 @@ describe("parseTastingDraftId", () => {
     expect(parseTastingDraftId("../admin")).toBeNull();
     expect(parseTastingDraftId("")).toBeNull();
     expect(parseTastingDraftId(null)).toBeNull();
+  });
+});
+
+describe("getTastingDraftBottleHref", () => {
+  it("returns to the draft's confirm step with the chosen Bottle", () => {
+    const draftId = "5f0c6b8e-3c1d-4a5e-9b7f-2d4e6a8c0b1d";
+    expect(getTastingDraftBottleHref({ id: draftId }, 42)).toBe(
+      `/drafts/${draftId}?bottle=42`,
+    );
   });
 });

@@ -22,13 +22,7 @@ export function flashBadgeAwards(
   }
 }
 
-export function BadgeAwardMessage({
-  badge,
-  level,
-}: {
-  badge: Badge;
-  level: number;
-}) {
+function BadgeAwardMessage({ badge, level }: { badge: Badge; level: number }) {
   return (
     <Link
       href={`/badges/${badge.id}`}
