@@ -328,6 +328,8 @@ values before adding a local exception.
 - Use 34px, 40px, and 44px control heights. Use 40px by default and at least
   44px on narrow screens or coarse pointers.
 - Give controls in the same action row the same height.
+- Keep a detail page's header actions on one row from 360px wide. Below that
+  they may wrap so the page never scrolls sideways.
 - Start with content that works at 320px without horizontal page overflow.
 - Preserve information order when columns collapse.
 
