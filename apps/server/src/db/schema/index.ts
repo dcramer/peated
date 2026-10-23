@@ -9,6 +9,7 @@ export * from "./collections";
 export * from "./comments";
 export * from "./countries";
 export * from "./entities";
+export * from "./entityAbout";
 export * from "./entityEvents";
 export * from "./entityFollows";
 export * from "./enums";

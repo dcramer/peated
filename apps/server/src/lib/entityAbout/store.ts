@@ -1,0 +1,208 @@
+import type { AnyDatabase } from "@peated/server/db";
+import {
+  changes,
+  entities,
+  entityAbout,
+  entityTombstones,
+  type Actor,
+  type EntityKind,
+} from "@peated/server/db/schema";
+import {
+  ENTITY_ABOUT_SCHEMA_VERSION,
+  type EntityAboutDocument,
+} from "@peated/server/schemas/entityAbout";
+import { eq, inArray, sql } from "drizzle-orm";
+
+import {
+  ABOUT_FACT_FIELD_LIST,
+  aboutFactFieldAppliesTo,
+} from "./aboutFactFields";
+import { findAboutWriteErrors, parseEntityAboutDocument } from "./document";
+
+export type StoredEntityAbout = {
+  entityId: number;
+  document: EntityAboutDocument;
+  version: number;
+  status: "published" | "hidden";
+  checkedOn: string | null;
+};
+
+export class EntityAboutWriteError extends Error {
+  constructor(
+    message: string,
+    readonly reasons: string[],
+  ) {
+    super(message);
+  }
+}
+
+export class EntityAboutVersionError extends Error {}
+
+export async function getEntityAbout(
+  database: AnyDatabase,
+  entityId: number,
+  { forUpdate = false }: { forUpdate?: boolean } = {},
+): Promise<StoredEntityAbout | null> {
+  const query = database
+    .select()
+    .from(entityAbout)
+    .where(eq(entityAbout.entityId, entityId))
+    .limit(1);
+  const [row] = forUpdate ? await query.for("update") : await query;
+  if (!row) return null;
+  return {
+    entityId: row.entityId,
+    document: parseEntityAboutDocument(row.document, row.schemaVersion),
+    version: row.version,
+    status: row.status,
+    checkedOn: row.checkedOn,
+  };
+}
+
+/** Returns Entity IDs the document links that no longer exist or merged. */
+async function findMissingLinkedEntities(
+  database: AnyDatabase,
+  document: EntityAboutDocument,
+) {
+  const ids = new Set<number>();
+  for (const event of document.events) {
+    if (event.relatedEntityId) ids.add(event.relatedEntityId);
+    if (event.newOwnerId) ids.add(event.newOwnerId);
+  }
+  if (!ids.size) return [];
+  const idList = [...ids];
+  const [found, tombstoned] = await Promise.all([
+    database
+      .select({ id: entities.id })
+      .from(entities)
+      .where(inArray(entities.id, idList)),
+    database
+      .select({ id: entityTombstones.entityId })
+      .from(entityTombstones)
+      .where(inArray(entityTombstones.entityId, idList)),
+  ]);
+  const known = new Set([...found, ...tombstoned].map((row) => row.id));
+  return idList.filter((id) => !known.has(id));
+}
+
+/**
+ * The only write path for About documents. Run it inside a transaction: it
+ * locks the row, rejects a stale `expectedVersion`, checks the document, and
+ * saves the full document to change history.
+ */
+export async function saveEntityAbout(
+  tx: AnyDatabase,
+  {
+    entity,
+    document,
+    expectedVersion,
+    actor,
+    checkedOn,
+    unchangedFrom,
+  }: {
+    entity: { id: number; name: string; kind: EntityKind };
+    document: EntityAboutDocument;
+    expectedVersion: number | null;
+    actor: Actor;
+    checkedOn?: string | null;
+    /** Items to treat as already stored; defaults to the stored document. */
+    unchangedFrom?: EntityAboutDocument | null;
+  },
+): Promise<StoredEntityAbout> {
+  const stored = await getEntityAbout(tx, entity.id, { forUpdate: true });
+  if ((stored?.version ?? null) !== expectedVersion) {
+    throw new EntityAboutVersionError(
+      `About for entity ${entity.id} changed since it was read.`,
+    );
+  }
+
+  const reasons = findAboutWriteErrors(
+    unchangedFrom === undefined ? (stored?.document ?? null) : unchangedFrom,
+    document,
+  );
+  for (const field of ABOUT_FACT_FIELD_LIST) {
+    if (
+      document.siteFacts[field] &&
+      !aboutFactFieldAppliesTo(field, entity.kind)
+    ) {
+      reasons.push(`Site fact ${field} does not apply to a ${entity.kind}.`);
+    }
+  }
+  const missing = await findMissingLinkedEntities(tx, document);
+  for (const id of missing) reasons.push(`Linked entity ${id} does not exist.`);
+  if (reasons.length) {
+    throw new EntityAboutWriteError(
+      "The About document is not valid.",
+      reasons,
+    );
+  }
+
+  const version = (stored?.version ?? 0) + 1;
+  const nextCheckedOn =
+    checkedOn === undefined ? (stored?.checkedOn ?? null) : checkedOn;
+  await tx
+    .insert(entityAbout)
+    .values({
+      entityId: entity.id,
+      document,
+      schemaVersion: ENTITY_ABOUT_SCHEMA_VERSION,
+      version,
+      checkedOn: nextCheckedOn,
+    })
+    .onConflictDoUpdate({
+      target: entityAbout.entityId,
+      set: {
+        document,
+        schemaVersion: ENTITY_ABOUT_SCHEMA_VERSION,
+        version,
+        checkedOn: nextCheckedOn,
+        updatedAt: sql`now()`,
+      },
+    });
+
+  await tx.insert(changes).values({
+    objectType: "entity_about",
+    objectId: entity.id,
+    displayName: entity.name,
+    actorId: actor.id,
+    type: stored ? "update" : "add",
+    data: { version, document } as never,
+  });
+
+  return {
+    entityId: entity.id,
+    document,
+    version,
+    status: stored?.status ?? "published",
+    checkedOn: nextCheckedOn,
+  };
+}
+
+export async function setEntityAboutStatus(
+  tx: AnyDatabase,
+  {
+    entity,
+    status,
+    actor,
+  }: {
+    entity: { id: number; name: string };
+    status: "published" | "hidden";
+    actor: Actor;
+  },
+) {
+  const [row] = await tx
+    .update(entityAbout)
+    .set({ status, updatedAt: sql`now()` })
+    .where(eq(entityAbout.entityId, entity.id))
+    .returning({ version: entityAbout.version });
+  if (!row) return false;
+  await tx.insert(changes).values({
+    objectType: "entity_about",
+    objectId: entity.id,
+    displayName: entity.name,
+    actorId: actor.id,
+    type: "update",
+    data: { status },
+  });
+  return true;
+}

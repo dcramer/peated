@@ -1,20 +1,18 @@
 import { db } from "@peated/server/db";
-import { entityEvents } from "@peated/server/db/schema";
+import { getEntityAbout } from "@peated/server/lib/entityAbout/store";
 import waitError from "@peated/server/lib/test/waitError";
 import { routerClient } from "@peated/server/orpc/router";
-import { eq } from "drizzle-orm";
 
 describe("PATCH /entities/:entity/events/:event", () => {
   test("updates an event", async ({ fixtures }) => {
     const user = await fixtures.User({ mod: true });
     const entity = await fixtures.Entity();
     const owner = await fixtures.Entity({ kind: "company" });
-    const event = await fixtures.EntityEvent({
+    await fixtures.EntityAbout({
       entityId: entity.id,
-      kind: "acquired",
-      date: "2001",
-      newOwnerId: owner.id,
+      events: [{ id: 7, kind: "acquired", date: "2001", newOwnerId: owner.id }],
     });
+    const event = { id: 7 };
 
     const data = await routerClient.entities.events.update(
       {
@@ -33,17 +31,22 @@ describe("PATCH /entities/:entity/events/:event", () => {
       description: "Production stopped.",
       newOwnerId: null,
     });
-    expect(
-      await db.query.entityEvents.findFirst({
-        where: eq(entityEvents.id, event.id),
+    const about = await getEntityAbout(db, entity.id);
+    expect(about?.document.events).toEqual([
+      expect.objectContaining({
+        id: 7,
+        kind: "closed",
+        newOwnerId: null,
+        writtenBy: "person",
       }),
-    ).toMatchObject({ kind: "closed", newOwnerId: null });
+    ]);
   });
 
   test("validates the complete updated event", async ({ fixtures }) => {
     const user = await fixtures.User({ mod: true });
     const entity = await fixtures.Entity();
-    const event = await fixtures.EntityEvent({ entityId: entity.id });
+    await fixtures.EntityAbout({ entityId: entity.id, events: [{ id: 3 }] });
+    const event = { id: 3 };
 
     const err = await waitError(() =>
       routerClient.entities.events.update(
@@ -59,5 +62,20 @@ describe("PATCH /entities/:entity/events/:event", () => {
     expect(err).toMatchInlineSnapshot(
       `[Error: A description is required when kind is generic.]`,
     );
+  });
+
+  test("rejects removing the only source", async ({ fixtures }) => {
+    const user = await fixtures.User({ mod: true });
+    const entity = await fixtures.Entity();
+    await fixtures.EntityAbout({ entityId: entity.id, events: [{ id: 3 }] });
+
+    const err = await waitError(() =>
+      routerClient.entities.events.update(
+        { entity: entity.id, event: 3, sourceUrl: null },
+        { context: { user } },
+      ),
+    );
+
+    expect(err).toMatchInlineSnapshot(`[Error: Event 3 needs a source.]`);
   });
 });

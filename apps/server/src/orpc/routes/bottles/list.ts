@@ -287,6 +287,9 @@ export default implement(bottleListContract).handler(async function ({
   if (rest.age) {
     where.push(eq(bottles.statedAge, rest.age));
   }
+  if (rest.vintageYear) {
+    where.push(eq(bottles.vintageYear, rest.vintageYear));
+  }
   if (rest.tag) {
     where.push(
       sql`EXISTS(SELECT FROM ${bottleTags} WHERE ${bottleTags.tag} = ${rest.tag} AND ${bottleTags.bottleId} = ${bottles.id})`,

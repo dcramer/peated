@@ -218,6 +218,20 @@ export const ENTITY_EVENT_KIND_LIST = [
   "acquired",
 ] as const;
 
+// About history adds name changes and named eras to the legacy event kinds.
+export const ENTITY_ABOUT_EVENT_KIND_LIST = [
+  ...ENTITY_EVENT_KIND_LIST,
+  "renamed",
+  "era",
+] as const;
+
+export const ENTITY_ABOUT_SOURCE_KIND_LIST = [
+  "official",
+  "reference",
+  "press",
+  "retailer",
+] as const;
+
 export const BADGE_FORMULA_LIST = ["default", "linear", "fibonacci"] as const;
 
 export const BADGE_CHECK_TYPE_LIST = [

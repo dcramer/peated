@@ -1,8 +1,7 @@
 import { db } from "@peated/server/db";
-import { entityEvents } from "@peated/server/db/schema";
+import { getEntityAbout } from "@peated/server/lib/entityAbout/store";
 import waitError from "@peated/server/lib/test/waitError";
 import { routerClient } from "@peated/server/orpc/router";
-import { eq } from "drizzle-orm";
 
 describe("POST /entities/:entity/events", () => {
   test("creates a dated history event", async ({ fixtures }) => {
@@ -27,11 +26,13 @@ describe("POST /entities/:entity/events", () => {
       description: "Production moved to a new still house.",
       sourceUrl: "https://example.com/history",
     });
-    expect(
-      await db.query.entityEvents.findFirst({
-        where: eq(entityEvents.id, data.id),
-      }),
-    ).toBeDefined();
+    const about = await getEntityAbout(db, entity.id);
+    expect(about?.document.events).toEqual([
+      expect.objectContaining({ id: data.id, writtenBy: "person" }),
+    ]);
+    expect(about?.document.sources.map(({ url }) => url)).toEqual([
+      "https://example.com/history",
+    ]);
   });
 
   test("records an acquisition", async ({ fixtures }) => {
@@ -45,6 +46,7 @@ describe("POST /entities/:entity/events", () => {
         kind: "acquired",
         date: "2004-11-15",
         newOwnerId: owner.id,
+        sourceUrl: "https://example.com/acquired",
       },
       { context: { user } },
     );
@@ -108,6 +110,22 @@ describe("POST /entities/:entity/events", () => {
     );
 
     expect(err).toMatchInlineSnapshot(`[Error: Input validation failed]`);
+  });
+
+  test("requires a source", async ({ fixtures }) => {
+    const user = await fixtures.User({ mod: true });
+    const entity = await fixtures.Entity();
+
+    const err = await waitError(() =>
+      routerClient.entities.events.create(
+        { entity: entity.id, kind: "closed", date: "1983" },
+        { context: { user } },
+      ),
+    );
+
+    expect(err).toMatchInlineSnapshot(
+      `[Error: Add a source URL for this history item.]`,
+    );
   });
 
   test("requires moderator privileges", async ({ fixtures }) => {

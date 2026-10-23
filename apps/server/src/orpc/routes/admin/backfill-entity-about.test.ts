@@ -1,0 +1,90 @@
+import { db } from "@peated/server/db";
+import { getEntityAbout } from "@peated/server/lib/entityAbout/store";
+import waitError from "@peated/server/lib/test/waitError";
+import { routerClient } from "@peated/server/orpc/router";
+
+describe("POST /admin/catalog/backfill-entity-about", () => {
+  test("copies legacy history into About documents", async ({ fixtures }) => {
+    const admin = await fixtures.User({ admin: true });
+    const entity = await fixtures.Entity();
+    const opened = await fixtures.EntityEvent({
+      entityId: entity.id,
+      kind: "opened",
+      date: "1819",
+      sourceUrl: "https://example.com/history",
+    });
+    const closed = await fixtures.EntityEvent({
+      entityId: entity.id,
+      kind: "closed",
+      date: "1983",
+      sourceUrl: "https://example.com/history",
+    });
+    const uncited = await fixtures.EntityEvent({
+      entityId: entity.id,
+      kind: "reopened",
+      date: "2021",
+    });
+
+    const result = await routerClient.admin.backfillEntityAbout(
+      {},
+      { context: { user: admin } },
+    );
+
+    expect(result).toEqual({ copiedEvents: 3, entities: 1, nextAfterId: null });
+    const about = await getEntityAbout(db, entity.id);
+    expect(about?.document.events.map(({ id }) => id)).toEqual([
+      opened.id,
+      closed.id,
+      uncited.id,
+    ]);
+    // Events that shared a URL share one source.
+    expect(about?.document.sources).toHaveLength(1);
+    expect(about?.document.events[2]?.citations).toEqual([]);
+  });
+
+  test("is safe to repeat", async ({ fixtures }) => {
+    const admin = await fixtures.User({ admin: true });
+    const entity = await fixtures.Entity();
+    await fixtures.EntityEvent({
+      entityId: entity.id,
+      sourceUrl: "https://example.com/history",
+    });
+
+    await routerClient.admin.backfillEntityAbout(
+      {},
+      { context: { user: admin } },
+    );
+    const second = await routerClient.admin.backfillEntityAbout(
+      {},
+      { context: { user: admin } },
+    );
+
+    expect(second.copiedEvents).toBe(0);
+    expect((await getEntityAbout(db, entity.id))?.version).toBe(1);
+  });
+
+  test("pages through Entities", async ({ fixtures }) => {
+    const admin = await fixtures.User({ admin: true });
+    const first = await fixtures.Entity();
+    const second = await fixtures.Entity();
+    await fixtures.EntityEvent({ entityId: first.id });
+    await fixtures.EntityEvent({ entityId: second.id });
+
+    const page = await routerClient.admin.backfillEntityAbout(
+      { limit: 1 },
+      { context: { user: admin } },
+    );
+
+    expect(page).toMatchObject({ entities: 1, nextAfterId: first.id });
+  });
+
+  test("requires administrator privileges", async ({ fixtures }) => {
+    const user = await fixtures.User({ mod: true });
+
+    const err = await waitError(() =>
+      routerClient.admin.backfillEntityAbout({}, { context: { user } }),
+    );
+
+    expect(err).toMatchInlineSnapshot(`[Error: Unauthorized.]`);
+  });
+});

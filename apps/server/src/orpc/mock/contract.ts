@@ -26,6 +26,11 @@ import companyList from "@peated/server/orpc/contracts/companies/list";
 import countryDetails from "@peated/server/orpc/contracts/countries/details";
 import countryList from "@peated/server/orpc/contracts/countries/list";
 import distilleryList from "@peated/server/orpc/contracts/distilleries/list";
+import entityAboutBottlers from "@peated/server/orpc/contracts/entities/about/bottlers";
+import entityAboutDetails from "@peated/server/orpc/contracts/entities/about/details";
+import entityAboutDistillers from "@peated/server/orpc/contracts/entities/about/distillers";
+import entityAboutReleaseYears from "@peated/server/orpc/contracts/entities/about/release-years";
+import entityAboutVintages from "@peated/server/orpc/contracts/entities/about/vintages";
 import entityCatalog from "@peated/server/orpc/contracts/entities/catalog";
 import entityCreate from "@peated/server/orpc/contracts/entities/create";
 import entityDetails from "@peated/server/orpc/contracts/entities/details";
@@ -126,6 +131,13 @@ export const mockContract = {
   },
   distilleries: { list: distilleryList },
   entities: {
+    about: {
+      bottlers: entityAboutBottlers,
+      details: entityAboutDetails,
+      distillers: entityAboutDistillers,
+      releaseYears: entityAboutReleaseYears,
+      vintages: entityAboutVintages,
+    },
     flavorProfile: entityFlavorProfile,
     catalog: entityCatalog,
     create: entityCreate,

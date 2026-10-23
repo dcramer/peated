@@ -1,5 +1,6 @@
 import type { MockOutputs } from "../contract";
 import { timestamp } from "./constants";
+import { mockBrora } from "./entity-about";
 import {
   mockCork,
   mockCountries,
@@ -490,6 +491,7 @@ export const mockEntities: Entity[] = [
     totalTastings: 56,
   },
   mockSparseCompanyEntity,
+  mockBrora,
 ];
 
 const followedEntityIds = new Set([9201, 9207, 9208]);
