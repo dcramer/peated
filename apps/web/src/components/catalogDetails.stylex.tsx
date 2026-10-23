@@ -105,11 +105,11 @@ const styles = stylex.create({
     display: "flex",
     flexWrap: "wrap",
     // Keeps labels on one line when a smaller text value shares the row.
-    alignItems: "flex-end",
+    alignItems: { default: "flex-end", [PHONE]: "baseline" },
     width: "100%",
     minWidth: 0,
-    columnGap: space.x8,
-    rowGap: space.x4,
+    columnGap: { default: space.x8, [PHONE]: space.x4 },
+    rowGap: { default: space.x4, [PHONE]: space.x1 },
     margin: 0,
   },
   keyFact: {
@@ -117,11 +117,15 @@ const styles = stylex.create({
     minWidth: 0,
     flex: "0 1 auto",
     display: "flex",
-    flexDirection: "column",
+    // DESIGN.md: phones show each fact on one line, value then label, so the
+    // header leaves room for the page below it.
+    flexDirection: { default: "column", [PHONE]: "row" },
+    alignItems: { default: "stretch", [PHONE]: "baseline" },
+    columnGap: "6px",
   },
   keyFactLabel: {
     order: 2,
-    marginTop: "6px",
+    marginTop: { default: "6px", [PHONE]: 0 },
     overflow: "hidden",
     color: colors.inkMuted,
     textOverflow: "ellipsis",
@@ -133,7 +137,7 @@ const styles = stylex.create({
     margin: 0,
     color: colors.ink,
     fontFamily: fonts.display,
-    fontSize: "28px",
+    fontSize: { default: "28px", [PHONE]: "18px" },
     fontVariantNumeric: "tabular-nums",
     fontWeight: 700,
     letterSpacing: "-0.035em",
@@ -142,6 +146,6 @@ const styles = stylex.create({
     whiteSpace: "nowrap",
   },
   keyFactValueText: {
-    fontSize: { default: "28px", [PHONE]: "20px" },
+    fontSize: { default: "28px", [PHONE]: "18px" },
   },
 });

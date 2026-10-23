@@ -45,7 +45,7 @@ export function ExpandableDescription({
 
   return (
     <div>
-      <div id={contentId}>
+      <div id={contentId} {...stylex.props(!expanded && styles.preview)}>
         <Markdown
           content={expanded ? content : preview.text}
           noLinks={noLinks}
@@ -66,7 +66,16 @@ export function ExpandableDescription({
   );
 }
 
+const PHONE = "@media (max-width: 480px)";
+
 const styles = stylex.create({
+  // Phones show three lines of the preview so the page below stays in view.
+  preview: {
+    display: { default: "block", [PHONE]: "-webkit-box" },
+    overflow: { default: "visible", [PHONE]: "hidden" },
+    WebkitBoxOrient: "vertical",
+    WebkitLineClamp: { default: "none", [PHONE]: 3 },
+  },
   action: {
     marginTop: space.x1,
     marginLeft: "-12px",

@@ -212,8 +212,9 @@ subject.
   Leave out a series, ABV, or stated age the name already prints. An edition,
   year, batch, or cask the name already prints moves behind category, so it
   shows only when a slot is free. Additional Details always lists the edition.
-  On phones, worded values such as the series or edition use smaller type so
-  more of them fits before they cut off.
+  On phones, each key fact shows on one line as its value then its label, the
+  rating sits on one line above the facts, and the description preview shows
+  three lines, so the tabs stay near the top of the first screen.
 - Show a year only when it is part of, or necessary to understand, the release
   identity.
 - Do not add single-cask or cask-strength badges.

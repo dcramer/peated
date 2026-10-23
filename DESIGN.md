@@ -328,6 +328,8 @@ values before adding a local exception.
 - Use 34px, 40px, and 44px control heights. Use 40px by default and at least
   44px on narrow screens or coarse pointers.
 - Give controls in the same action row the same height.
+- Keep a detail page's header actions on one row from 360px wide. Below that
+  they may wrap so the page never scrolls sideways.
 - Start with content that works at 320px without horizontal page overflow.
 - Preserve information order when columns collapse.
 
@@ -430,7 +432,9 @@ JSDoc.
   line. Keep the median at the right edge. On narrow rows, omit the range line.
   Hide the count when it has not been computed, and omit a range with equal
   endpoints. In bottle headers, show the value first and its label underneath;
-  keep the section's accessible name without repeating “Bottle rating” on
+  on phones, show them on one line above the key facts, and show each key
+  fact on one line as its value then its label, so the header leaves room for
+  the page; keep the section's accessible name without repeating “Bottle rating” on
   screen. Do not add source labels or row details there. Omit the whole summary
   when no rating exists.
 
