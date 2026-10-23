@@ -4,6 +4,7 @@ import {
   type CandidateExpansionMode,
   type ClassifyBottleReferenceInput,
 } from "@peated/bottle-classifier/contract";
+import { getBottleFieldConflicts } from "@peated/bottle-classifier/fieldConflicts";
 import {
   BottleCandidateSchema,
   BottleExtractedDetailsSchema,
@@ -23,6 +24,7 @@ import {
   actors,
   bottleBarcodes,
   bottleObservations,
+  bottleReferences,
   bottles,
   storePriceMatchAttempts,
   storePriceMatchProposals,
@@ -33,6 +35,7 @@ import {
 } from "@peated/server/db/schema";
 import { getPeatedSystemActor } from "@peated/server/lib/actors";
 import { createBottleCheck } from "@peated/server/lib/bottleChecks";
+import { getBottleCandidateById } from "@peated/server/lib/bottleReferenceCandidates";
 import {
   assignBottleReferenceInTransaction,
   fillMissingBottleImage,
@@ -163,6 +166,18 @@ function parseStoredExtractedLabel(
   return parsed.success ? parsed.data : null;
 }
 
+/** A scraper's structured facts outrank the label read saved with the proposal. */
+function readListingFacts(
+  proposal: StorePriceMatchProposalForReview,
+): ExtractedBottleDetails | null {
+  const structured = BottleExtractedDetailsSchema.safeParse(
+    proposal.price.sourceBottleIdentity,
+  );
+  return structured.success
+    ? structured.data
+    : parseStoredExtractedLabel(proposal);
+}
+
 export class UnknownStorePriceMatchProposalError extends Error {
   constructor(proposalId: number) {
     super(`Price match proposal not found (${proposalId}).`);
@@ -177,6 +192,15 @@ export class StorePriceMatchProposalNotReviewableError extends Error {
   ) {
     super(`Price match proposal is not reviewable (${proposalId}, ${status}).`);
     this.name = "StorePriceMatchProposalNotReviewableError";
+  }
+}
+
+export class StorePriceMatchNeedsReasonError extends Error {
+  constructor(readonly conflicts: string[]) {
+    super(
+      `That Bottle differs from the listing's saved facts (${conflicts.join(", ")}). Check the label and the store page, then give a reason to match it anyway.`,
+    );
+    this.name = "StorePriceMatchNeedsReasonError";
   }
 }
 
@@ -729,6 +753,7 @@ async function clearIgnoredStorePriceAssignmentInTransaction(
     .update(storePrices)
     .set({
       bottleId: null,
+      matchedReferenceId: null,
       updatedAt: sql`NOW()`,
     })
     .where(
@@ -1391,6 +1416,20 @@ export async function getStorePriceMatchProposalForReviewInTransaction(
     expectedProcessingToken?: string;
   },
 ): Promise<StorePriceMatchProposalForReview> {
+  const preflight = await getStorePriceMatchProposalPreflight(tx, proposalId);
+  // Price matching owns lock order: reusable references precede their consumers.
+  if (preflight.referenceScope === "global_alias") {
+    await tx
+      .select({ id: bottleReferences.id })
+      .from(bottleReferences)
+      .where(
+        eq(
+          sql`LOWER(${bottleReferences.name})`,
+          normalizeBottleReferenceKey(preflight.price.name).toLowerCase(),
+        ),
+      )
+      .for("update");
+  }
   const [row] = await tx
     .select({
       proposal: storePriceMatchProposals,
@@ -1407,6 +1446,12 @@ export async function getStorePriceMatchProposalForReviewInTransaction(
 
   if (!row) {
     throw new UnknownStorePriceMatchProposalError(proposalId);
+  }
+  if (
+    row.price.name !== preflight.price.name ||
+    row.proposal.referenceScope !== preflight.referenceScope
+  ) {
+    throw new StorePriceMatchProposalIdentityChangedError(proposalId);
   }
   // A row written by the previous release during a deploy may use old names.
   row.proposal.status = toCurrentProposalStatus(row.proposal.status);
@@ -1537,6 +1582,7 @@ async function persistApprovedStorePriceMatchInTransaction(
     .update(storePrices)
     .set({
       bottleId,
+      matchedReferenceId: null,
       updatedAt: sql`NOW()`,
     })
     .where(eq(storePrices.id, proposal.price.id));
@@ -1555,13 +1601,16 @@ async function persistApprovedStorePriceMatchInTransaction(
     createdById: reviewedById,
   });
 
-  // The decision writer is idempotent by source. Always offer a completed
+  // The decision writer deduplicates retries, not later assignments. Offer a completed
   // moderation decision so legacy or preassigned prices still gain history.
   const metadata: IncomingBottleDecisionMetadata = {
     ...decisionLog.metadata,
     proposalType: proposal.proposalType,
     referenceScope: proposal.referenceScope ?? "none",
+    previousBottleId: proposal.price.bottleId,
   };
+  if (proposal.price.matchedReferenceId !== null)
+    metadata.previousReferenceId = proposal.price.matchedReferenceId;
   if (decisionLog.actor.type === "system") {
     metadata.initiatedByUserId = reviewedById;
   }
@@ -1686,6 +1735,7 @@ export async function applyApprovedStorePriceMatchInTransaction(
     actor,
     allowSystemActor = false,
     expectedProcessingToken,
+    review,
   }: {
     proposalId: number;
     bottleId: number;
@@ -1693,6 +1743,8 @@ export async function applyApprovedStorePriceMatchInTransaction(
     actor: IncomingBottleDecisionActor;
     allowSystemActor?: boolean;
     expectedProcessingToken?: string;
+    // Set for a moderator's choice. Automatic matches are checked before this.
+    review?: { reason?: string };
   },
 ) {
   await resolveActiveBottleIds(tx, [bottleId], { lock: "update" });
@@ -1701,6 +1753,20 @@ export async function applyApprovedStorePriceMatchInTransaction(
     proposalId,
     expectedProcessingToken,
   });
+
+  // Store price matching owns this rule: a moderator's Bottle agrees with the
+  // listing's saved facts, or the moderator records why it is still the Bottle.
+  const metadata: IncomingBottleDecisionMetadata = {};
+  if (review) {
+    const candidate = await getBottleCandidateById(bottleId, tx);
+    const conflicts = candidate
+      ? getBottleFieldConflicts(readListingFacts(proposal), candidate)
+      : [];
+    if (conflicts.length && !review.reason)
+      throw new StorePriceMatchNeedsReasonError(conflicts);
+    if (conflicts.length) metadata.sourceConflicts = conflicts;
+    if (review.reason) metadata.reviewReason = review.reason;
+  }
 
   return {
     approval: await applyApprovedStorePriceMatchProposalInTransaction(tx, {
@@ -1711,6 +1777,7 @@ export async function applyApprovedStorePriceMatchInTransaction(
       decisionLog: {
         actor,
         decision: "match",
+        metadata,
       },
     }),
     bottleId,
@@ -1724,6 +1791,7 @@ export async function applyApprovedStorePriceMatch({
   actor,
   allowSystemActor = false,
   expectedProcessingToken,
+  review,
 }: {
   proposalId: number;
   bottleId: number;
@@ -1731,6 +1799,7 @@ export async function applyApprovedStorePriceMatch({
   actor: IncomingBottleDecisionActor;
   allowSystemActor?: boolean;
   expectedProcessingToken?: string;
+  review?: { reason?: string };
 }) {
   const { approval } = await db.transaction(async (tx) =>
     applyApprovedStorePriceMatchInTransaction(tx, {
@@ -1740,6 +1809,7 @@ export async function applyApprovedStorePriceMatch({
       actor,
       allowSystemActor,
       expectedProcessingToken,
+      review,
     }),
   );
 

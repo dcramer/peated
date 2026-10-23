@@ -1,5 +1,8 @@
 import { db } from "@peated/server/db";
 import {
+  auctionAlerts,
+  auctionLots,
+  auctionWatches,
   bottleAliases,
   bottleFlavorProfiles,
   bottleGroupDistillers,
@@ -181,6 +184,17 @@ export default procedure
         .limit(1);
 
       const blockingReferences: string[] = [];
+      for (const table of [auctionLots, auctionAlerts, auctionWatches]) {
+        const rows = await tx
+          .select({ id: table.id })
+          .from(table)
+          .where(eq(table.bottleId, bottle.id))
+          .limit(1);
+        if (rows.length) {
+          blockingReferences.push("auctions");
+          break;
+        }
+      }
       if (tastingRows.length > 0) {
         blockingReferences.push("tastings");
       }

@@ -6,13 +6,20 @@ import {
   externalReviews,
 } from "@peated/server/db/schema";
 import { getUserActor } from "@peated/server/lib/actors";
-import { resolveBottleReferenceTarget } from "@peated/server/lib/bottleReferenceResolution";
 import {
-  assignBottleReferenceInTransaction,
+  assignReviewBottleResolutionInTransaction,
+  resolveBottleReferenceTarget,
+} from "@peated/server/lib/bottleReferenceResolution";
+import {
   finalizeBottleReferenceAssignment,
   StaleBottleReferenceReviewIdentityError,
 } from "@peated/server/lib/bottleReferences";
 import { and, eq, ne } from "drizzle-orm";
+import { dispatchBottleStatsRecomputes } from "./dispatchBottleStatsRecompute";
+import {
+  getIncomingBottleDecisionFromResolutionSource,
+  recordIncomingBottleDecisionInTransaction,
+} from "./incomingBottleDecisionLog";
 
 export type FixBadExternalReviewEntitiesResult = {
   scanned: number;
@@ -119,13 +126,46 @@ export async function fixBadExternalReviewEntities(
           assignedByActorId: actor.id,
           expectedReview: review,
         };
-        return assignBottleReferenceInTransaction(tx, {
-          bottleId: targetBottleId,
-          sourceReferenceIdentity: resolution.sourceReferenceIdentity,
-          ...referenceInput,
-        });
+        const result = await assignReviewBottleResolutionInTransaction(
+          tx,
+          resolution,
+          {
+            bottleId: targetBottleId,
+            sourceReferenceIdentity: resolution.sourceReferenceIdentity,
+            ...referenceInput,
+          },
+        );
+        const decision = getIncomingBottleDecisionFromResolutionSource(
+          resolution.source,
+          { createdBottle: resolution.createdBottle },
+        );
+        if (!isSameTarget && decision)
+          await recordIncomingBottleDecisionInTransaction(tx, {
+            sourceKind: "review",
+            sourceId: review.id,
+            externalSiteId: article.externalSiteId,
+            name: review.name,
+            url: article.canonicalUrl,
+            actor,
+            bottleId: targetBottleId,
+            decision,
+            metadata: {
+              previousBottleId: review.bottleId,
+              resolutionSource: resolution.source,
+            },
+          });
+        return result;
       });
-      await finalizeBottleReferenceAssignment(referenceAssignment);
+      if (referenceAssignment)
+        await finalizeBottleReferenceAssignment(referenceAssignment);
+      else
+        await dispatchBottleStatsRecomputes(
+          "externalReview",
+          review.id,
+          [review.bottleId, targetBottleId].filter(
+            (id): id is number => id !== null,
+          ),
+        );
     } catch (error) {
       if (error instanceof StaleBottleReferenceReviewIdentityError) {
         summary.unchanged += 1;

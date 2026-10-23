@@ -568,6 +568,7 @@ subcommand
           )[0].id,
           ratingBand: "outstanding",
           createdById: toUserId,
+          tastedAt: new Date(),
         })
         .returning();
 

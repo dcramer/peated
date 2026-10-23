@@ -4,6 +4,13 @@ Store price matching links each retailer listing to one complete Bottle. It
 uses the shared [Bottle Classifier](./bottle-classifier.md) and adds saved
 proposals, review, and automation rules.
 
+Existing-Bottle automation is assessed by
+`apps/server/src/lib/bottleMatchingAutomation.ts`, shared with auctions. It
+checks the classifier's retrieved target, populated source conflicts, assignment
+replacement, evidence, and unresolved risks. Price creation keeps its separate
+assessment in `priceMatchingAutomation.ts`; auction matching never creates
+Bottles or automatically accepts names.
+
 Read these identity rules first:
 
 - [Whisky Identity Model](./whisky-identity-model.md)
@@ -13,6 +20,8 @@ Read these identity rules first:
 ## Saved Identity
 
 - `store_price.bottleId` is the Bottle assigned to the listing.
+- `matchedReferenceId` records a reference-derived assignment, not a guess
+  from the listing name. Explicit approval or a trusted identifier clears it.
 - A null `bottleId` means unresolved. Do not guess from old release fields.
 - One `store_price_match_proposal` stores the current proposal for each price.
 - `store_price_match_attempt` keeps earlier attempts and review outcomes.
@@ -88,8 +97,8 @@ Proposal types use the classifier's action names: `match`, `create_bottle`,
 and `no_match`. A `match` whose `currentBottleId` differs from its suggested
 Bottle would replace the listing's current Bottle. Status values are
 `pending_review`, `approved`, `ignored`, and `errored`. A decision that may
-apply automatically is applied as soon as it is saved; it stays
-`pending_review` only if applying fails.
+apply automatically is applied as soon as it is saved; if applying fails, it
+becomes `errored`.
 
 Moderators can:
 
@@ -97,6 +106,22 @@ Moderators can:
 - approve one complete new Bottle;
 - choose a different existing Bottle; or
 - ignore the proposal.
+
+A reference correction clears only listings known to have used that reference
+and reopens their proposals for review. The old suggestion and automatic
+approval are not reused. For a legacy approved proposal whose price was already
+cleared, `POST /prices/match-queue/{proposal}/reopen` performs the same reset.
+It requires moderator access, the observed proposal update time and source
+fingerprint, and no active evaluation. It does not queue model work or change
+the catalog. Earlier decisions and attempts remain saved.
+
+The same route undoes a wrong match. Send the Bottle the listing has now as
+`expectedBottleId` and a `reason`. The route clears the listing's Bottle,
+removes the observation that approval saved on that Bottle, records the reason
+as an `unassign` decision, and returns the proposal to review. It refuses when
+a saved Bottle reference would assign the same Bottle again; correct that
+reference first. It does not remove an image the listing gave the Bottle or
+retire a Bottle that a create made; those need a Bottle edit or merge.
 
 A moderator may atomically create a complete, independently reviewed Bottle
 from any reviewable proposal, including an `errored` one. An active
@@ -111,6 +136,15 @@ still opens it.
 A retry run in `no_web` mode skips web search and reuses the proposal's saved
 extracted facts. When no facts were saved, it extracts them again rather than
 classify with none.
+
+A moderator's match is compared with the listing's saved facts: the scraper's
+structured facts when it supplied them, otherwise the label read saved with
+the proposal. When the chosen Bottle differs on category, age, ABV, a year,
+cask strength, single cask, or edition, the server refuses the match until the
+moderator sends a `reason`. The reason and the differing fields are saved on
+the decision. The label read is often wrong, so a difference is a prompt to
+check the label and the store page, not proof of a bad match. This check runs
+no model.
 
 Approval locks and rechecks current state. It submits one Bottle ID. It never
 selects a BottleGroup representative or a legacy release. Failed work can retry

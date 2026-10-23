@@ -4,10 +4,15 @@ import { db } from "@peated/server/db";
 import type { Entity } from "@peated/server/db/schema";
 import { changes, entities } from "@peated/server/db/schema";
 import { getPeatedSystemActor } from "@peated/server/lib/actors";
-import { logTelemetryError, logWarn } from "@peated/server/lib/log";
+import { logError, logTelemetryError, logWarn } from "@peated/server/lib/log";
 import { getStructuredResponse } from "@peated/server/lib/openai";
 import { withSentryConversation } from "@peated/server/lib/openaiClient";
 import { EntityKindEnum } from "@peated/server/schemas";
+import {
+  EntityPronunciationIpaSchema,
+  EntityPronunciationSchema,
+} from "@peated/server/schemas/entities";
+import { pushUniqueJob } from "@peated/server/worker/dispatch";
 import type { JobPayload } from "@peated/server/worker/types";
 import { eq } from "drizzle-orm";
 import { z } from "zod";
@@ -63,6 +68,12 @@ function generatePrompt(entity: InputEntity) {
     [
       "'kind' must be the best single identity from: brand, distillery, bottler, company.",
     ].join(" "),
+    [
+      `'pronunciation' should say how people say ${entity.name} in plain English respelling: lowercase syllables joined by hyphens, words split by spaces, and the stressed syllable in capitals when it is confidently known, like "glen GEER-ee" for Glen Garioch.`,
+      "Use only letters, spaces, hyphens, and apostrophes.",
+      "'pronunciationIpa' should give the same pronunciation in the International Phonetic Alphabet without slashes or brackets, like \"ɡlɛn ˈɡɪəri\".",
+      "Follow how the producer and local speakers say the name. Return null for either field when the pronunciation is not confidently known.",
+    ].join(" "),
   ];
 
   return sections.filter(Boolean).join("\n\n");
@@ -80,6 +91,8 @@ export const OpenAIEntityDetailsSchema = z.object({
   yearEstablished: EntityEstablishedYearSchema,
   website: z.string().trim().nullable().default(null),
   kind: EntityKindEnum,
+  pronunciation: z.string().nullable().default(null),
+  pronunciationIpa: z.string().nullable().default(null),
 });
 
 export const OpenAIEntityDetailsValidationSchema = z.object({
@@ -87,23 +100,29 @@ export const OpenAIEntityDetailsValidationSchema = z.object({
   yearEstablished: EntityEstablishedYearSchema,
   website: z.string().trim().nullable().default(null),
   kind: EntityKindEnum,
+  pronunciation: z.string().nullable().default(null),
+  pronunciationIpa: z.string().nullable().default(null),
 });
 
 export type GeneratedEntityDetails = z.infer<typeof OpenAIEntityDetailsSchema>;
 
-export async function getGeneratedEntityDetails(
+export type EntityDetailsModel = (
+  conversationId: string,
+  prompt: string,
   entity: InputEntity,
-): Promise<GeneratedEntityDetails | null> {
-  const conversationId = entity.id
-    ? `entity_details:${entity.id}`
-    : `ai:entity_lookup:${entity.name ?? "draft"}`;
+) => Promise<GeneratedEntityDetails | null>;
 
-  return await withSentryConversation(
+const defaultEntityDetailsModel: EntityDetailsModel = async (
+  conversationId,
+  prompt,
+  entity,
+) =>
+  await withSentryConversation(
     conversationId,
     async () =>
       await getStructuredResponse(
         "getGeneratedEntityDetails",
-        generatePrompt(entity),
+        prompt,
         OpenAIEntityDetailsSchema,
         OpenAIEntityDetailsValidationSchema,
         undefined,
@@ -115,12 +134,49 @@ export async function getGeneratedEntityDetails(
         },
       ),
   );
+
+export async function getGeneratedEntityDetails(
+  entity: InputEntity,
+  model: EntityDetailsModel = defaultEntityDetailsModel,
+): Promise<GeneratedEntityDetails | null> {
+  const conversationId = entity.id
+    ? `entity_details:${entity.id}`
+    : `ai:entity_lookup:${entity.name ?? "draft"}`;
+
+  const result = await model(conversationId, generatePrompt(entity), entity);
+  if (!result) return null;
+
+  // Pronunciation rule (Entity schema): drop a generated value that breaks
+  // the stored format instead of saving it or failing the other details.
+  return {
+    ...result,
+    pronunciation:
+      EntityPronunciationSchema.safeParse(result.pronunciation).data ?? null,
+    pronunciationIpa:
+      EntityPronunciationIpaSchema.safeParse(result.pronunciationIpa).data ??
+      null,
+  };
 }
 
-export default async (input: JobPayload) => {
+type GenerateEntityDetailsServices = {
+  aiEnabled: boolean;
+  generateDetails: (
+    entity: InputEntity,
+  ) => Promise<GeneratedEntityDetails | null>;
+};
+
+const defaultServices: GenerateEntityDetailsServices = {
+  aiEnabled: Boolean(config.AI_GATEWAY_API_KEY),
+  generateDetails: getGeneratedEntityDetails,
+};
+
+export async function generateEntityDetails(
+  input: JobPayload,
+  services: GenerateEntityDetailsServices = defaultServices,
+) {
   const { entityId, force } = GenerateEntityDetailsJobArgsSchema.parse(input);
 
-  if (!config.AI_GATEWAY_API_KEY) {
+  if (!services.aiEnabled) {
     return;
   }
 
@@ -138,11 +194,17 @@ export default async (input: JobPayload) => {
     (!entity.description || force);
 
   // test if we need to run at all
-  if (!generateDesc && entity.yearEstablished && entity.website) {
+  if (
+    !generateDesc &&
+    entity.yearEstablished &&
+    entity.website &&
+    entity.pronunciation &&
+    entity.pronunciationIpa
+  ) {
     return;
   }
 
-  const result = await getGeneratedEntityDetails(entity);
+  const result = await services.generateDetails(entity);
 
   if (!result) {
     throw new Error(`Failed to generate details for entity: ${entityId}`);
@@ -162,6 +224,13 @@ export default async (input: JobPayload) => {
   }
 
   if (!entity.website && result.website) data.website = result.website;
+
+  if (!entity.pronunciation && result.pronunciation) {
+    data.pronunciation = result.pronunciation;
+  }
+  if (!entity.pronunciationIpa && result.pronunciationIpa) {
+    data.pronunciationIpa = result.pronunciationIpa;
+  }
 
   if (Object.keys(data).length === 0) return;
 
@@ -207,4 +276,19 @@ export default async (input: JobPayload) => {
       },
     });
   });
-};
+
+  // Generated IPA skips OnEntityChange, so it queues its own audio. The
+  // details are already saved, so a queue failure must not fail this job;
+  // the pronunciation audio backfill route repairs a missed job.
+  if (data.pronunciationIpa) {
+    try {
+      await pushUniqueJob("GenerateEntityPronunciationAudio", { entityId });
+    } catch (err) {
+      logError(err, { entity: { id: entityId } });
+    }
+  }
+}
+
+export default async function generateEntityDetailsJob(input: JobPayload) {
+  return await generateEntityDetails(input);
+}

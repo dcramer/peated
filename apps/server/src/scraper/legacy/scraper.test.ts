@@ -343,6 +343,56 @@ describe("handleBottle", () => {
     );
   });
 
+  it("closes a verified proposal after the trusted source confirms its assigned Bottle", async ({
+    fixtures,
+  }) => {
+    await fixtures.ExternalSiteOrExisting({ type: "smws" });
+    await handleBottle(bottleInput, priceInput);
+    const assignedPrice = await db.query.storePrices.findFirst();
+    const [proposal] = await db
+      .insert(storePriceMatchProposals)
+      .values({
+        priceId: assignedPrice!.id,
+        status: "verified",
+        proposalType: "match",
+        currentBottleId: assignedPrice!.bottleId,
+        suggestedBottleId: assignedPrice!.bottleId,
+      })
+      .returning();
+    const [attempt] = await db
+      .insert(storePriceMatchAttempts)
+      .values({
+        priceId: assignedPrice!.id,
+        proposalId: proposal!.id,
+        proposalType: "match",
+        initialStatus: "verified",
+        currentBottleId: assignedPrice!.bottleId,
+        suggestedBottleId: assignedPrice!.bottleId,
+      })
+      .returning();
+
+    await handleBottle(bottleInput, priceInput);
+
+    const [resolvedProposal, resolvedAttempt] = await Promise.all([
+      db.query.storePriceMatchProposals.findFirst({
+        where: eq(storePriceMatchProposals.id, proposal!.id),
+      }),
+      db.query.storePriceMatchAttempts.findFirst({
+        where: eq(storePriceMatchAttempts.id, attempt!.id),
+      }),
+    ]);
+    expect(resolvedProposal).toMatchObject({
+      status: "approved",
+      currentBottleId: assignedPrice!.bottleId,
+      suggestedBottleId: assignedPrice!.bottleId,
+    });
+    expect(resolvedAttempt).toMatchObject({
+      finalStatus: "approved",
+      currentBottleId: assignedPrice!.bottleId,
+      suggestedBottleId: assignedPrice!.bottleId,
+    });
+  });
+
   it("rejects invalid flat Bottle input before persistence", async () => {
     await expect(handleBottle({ ...bottleInput, name: "" })).rejects.toThrow();
 

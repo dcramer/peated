@@ -34,6 +34,7 @@ export const scrapeRecordTypeEnum = pgEnum("scrape_record_type", [
   "price",
   "catalog",
   "bottle",
+  "auction",
 ]);
 
 export const scrapeSourceRunPurposeEnum = pgEnum("scrape_source_run_purpose", [

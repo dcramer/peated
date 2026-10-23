@@ -4,6 +4,7 @@ import type { BottleClassificationDecision } from "@peated/server/agents/bottleC
 import { db } from "@peated/server/db";
 import { getPostgresConnectionConfig } from "@peated/server/db/connection";
 import {
+  bottleChecks,
   bottleReferences,
   bottleTombstones,
   externalReviewArticles,
@@ -36,6 +37,7 @@ type MockClassificationDecision = Pick<
 > & {
   candidateBottleIds?: number[];
   matchedBottleId?: number;
+  referenceScope?: "global_alias" | "none";
   proposedBottle?: Extract<
     BottleClassificationDecision,
     { action: "create_bottle" }
@@ -63,9 +65,11 @@ function buildClassification(
     status: "classified" as const,
     decision: {
       rationale: "test fixture",
+      confidenceBasis: { webEvidence: "supportive", unresolvedRisks: [] },
       candidateBottleIds: [],
       identityScope: "product",
       observation: null,
+      referenceScope: "global_alias",
       ...decision,
     },
     artifacts: {
@@ -151,6 +155,46 @@ async function waitForSessionBlockedBy(
 }
 
 describe("POST /external-reviews", () => {
+  test("keeps a dated source-only match out of the global reference table", async ({
+    fixtures,
+  }) => {
+    const site = await fixtures.ExternalSiteOrExisting();
+    const user = await fixtures.User({ admin: true });
+    const bottle = await fixtures.Bottle({ name: "Dated release 2020" });
+    const name = "Generic product title";
+    classifyBottleReferenceMock.mockResolvedValue(
+      buildClassification(
+        {
+          action: "match",
+          matchedBottleId: bottle.id,
+          candidateBottleIds: [bottle.id],
+          referenceScope: "none",
+        },
+        [{ bottleId: bottle.id }],
+      ),
+    );
+    const result = await routerClient.externalReviews.create(
+      {
+        site: site.type,
+        name,
+        issue: "Fall 2020",
+        url: "https://example.com/dated-release",
+        category: "single_malt",
+        nativeScore: nativeScore(90),
+      },
+      { context: { user } },
+    );
+    expect(
+      await db.query.externalReviews.findFirst({
+        where: eq(externalReviews.id, result.id),
+      }),
+    ).toMatchObject({ bottleId: bottle.id, matchedReferenceId: null });
+    expect(
+      await db.query.bottleReferences.findFirst({
+        where: eq(bottleReferences.name, normalizeBottleReferenceKey(name)),
+      }),
+    ).toBeUndefined();
+  });
   beforeEach(() => {
     classifyBottleReferenceMock.mockReset();
     classifyBottleReferenceMock.mockResolvedValue(
@@ -496,6 +540,25 @@ describe("POST /external-reviews", () => {
       decision: "match",
       bottleId: bottle.id,
       createdBottle: false,
+    });
+    expect(
+      await db.query.bottleChecks.findFirst({
+        where: and(
+          eq(bottleChecks.sourceKind, "review"),
+          eq(bottleChecks.sourceId, String(result.id)),
+        ),
+      }),
+    ).toMatchObject({
+      intent: "resolve_reference",
+      inputSnapshot: {
+        reference: expect.objectContaining({ name: reviewName, url }),
+      },
+      output: expect.objectContaining({
+        decision: expect.objectContaining({
+          action: "match",
+          matchedBottleId: bottle.id,
+        }),
+      }),
     });
   });
 

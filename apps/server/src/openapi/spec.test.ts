@@ -252,6 +252,17 @@ describe("Published OpenAPI metadata", () => {
     }
   });
 
+  it("publishes photo identification as an event stream", async () => {
+    const response = await app.request("/spec-full.json");
+    // SAFETY: A successful spec response is serialized directly from OpenAPIGenerator.
+    const spec = (await response.json()) as OpenAPI.Document;
+    const success =
+      spec.paths?.["/tastings/photo-identification"]?.post?.responses?.["200"];
+    const content = success && "content" in success ? success.content : {};
+
+    expect(Object.keys(content ?? {})).toEqual(["text/event-stream"]);
+  });
+
   it("documents and groups every operation with a unique operation ID", async () => {
     const response = await app.request("/spec-full.json");
     expect(response.status).toBe(200);
@@ -290,6 +301,40 @@ describe("Published OpenAPI metadata", () => {
         }),
       );
     }
+  });
+
+  it("publishes WebAuthn passkey payloads as typed objects for generated clients", async () => {
+    const spec = await generateSpec();
+    const paths = spec.paths ?? {};
+    const payloads = [
+      getJsonResponseSchema(paths["/auth/passkey/authenticate/challenge"]?.post)
+        ?.properties?.options,
+      getJsonResponseSchema(paths["/auth/passkey/register/challenge"]?.post)
+        ?.properties?.options,
+      getJsonResponseSchema(paths["/auth/register/challenge"]?.post)?.properties
+        ?.options,
+      getJsonRequestSchema(paths["/auth/passkey/authenticate/verify"]?.post)
+        ?.properties?.response,
+      getJsonRequestSchema(paths["/auth/passkey/register/verify"]?.post)
+        ?.properties?.response,
+      getJsonRequestSchema(paths["/auth/register"]?.post)?.properties
+        ?.passkeyResponse,
+      getJsonResponseSchema(paths["/auth/recovery/challenge"]?.post)?.properties
+        ?.options,
+      getJsonRequestSchema(paths["/auth/recovery/passkey/confirm"]?.post)
+        ?.properties?.passkeyResponse,
+    ];
+
+    for (const payload of payloads) {
+      expect(payload).toMatchObject({
+        type: "object",
+        properties: expect.any(Object),
+      });
+    }
+    expect(payloads[0]).toMatchObject({ required: ["challenge"] });
+    expect(payloads[3].properties.response).toMatchObject({
+      required: ["clientDataJSON", "authenticatorData", "signature"],
+    });
   });
 
   it("declares bearer authentication for protected routes and optional authentication for public reads", async () => {
@@ -756,7 +801,7 @@ describe("OpenAPI generation ($ref reuse)", () => {
     );
 
     for (const schema of [listItemSchema, updateSchema]) {
-      expect(schema?.anyOf).toHaveLength(3);
+      expect(schema?.anyOf).toHaveLength(4);
       const variants = Object.fromEntries(
         schema.anyOf.map((variant: any) => [
           variant.properties?.type?.const,
@@ -764,10 +809,41 @@ describe("OpenAPI generation ($ref reuse)", () => {
         ]),
       );
       expect(Object.keys(variants).sort()).toEqual([
+        "auction_available",
         "comment",
         "friend_request",
         "toast",
       ]);
+
+      const auctionRef = variants.auction_available.properties.ref;
+      expect(auctionRef.anyOf).toHaveLength(2);
+      expect(auctionRef.anyOf).toContainEqual({ type: "null" });
+      const auctionRefObject = auctionRef.anyOf.find(
+        (candidate: any) => candidate.type === "object",
+      );
+      expect(Object.keys(auctionRefObject.properties)).toEqual([
+        "lotId",
+        "bottle",
+        "sourceName",
+        "url",
+      ]);
+      expect(auctionRefObject.required).toEqual([
+        "lotId",
+        "bottle",
+        "sourceName",
+        "url",
+      ]);
+      expect(auctionRefObject.properties.lotId).toMatchObject({
+        type: "number",
+      });
+      expect(auctionRefObject.properties.sourceName).toMatchObject({
+        type: "string",
+      });
+      expect(auctionRefObject.properties.url).toMatchObject({
+        type: "string",
+        format: "uri",
+      });
+      expectBottleResponse(auctionRefObject.properties.bottle);
 
       const friendRef = variants.friend_request.properties.ref;
       expect(friendRef.anyOf).toHaveLength(2);

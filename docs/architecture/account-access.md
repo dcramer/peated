@@ -147,9 +147,9 @@ transaction:
   are removed.
 - Everything else the member owns is deleted: comments and toasts left on
   tastings (with counters adjusted), collections, flights, follows, blocks,
-  badge awards, notifications, pending uploads, sign-in identities, passkeys, and
-  OAuth grants. Friend tags naming the member are cleared from other members'
-  tastings and reviews. Other members' tastings that used one of the member's
+  badge awards, notifications, pending uploads, tasting drafts, sign-in
+  identities, passkeys, and OAuth grants. Friend tags naming the member are
+  cleared from other members' tastings, reviews, and tasting drafts. Other members' tastings that used one of the member's
   flights keep the tasting and lose the flight link.
 - Staff references without a database rule (Bottle observations, store-price
   reviews and retry runs, and site scrape requests) are cleared.
@@ -190,8 +190,9 @@ member removes it in their Apple ID settings. Revocation needs
 - web interstitial: `apps/web/src/app/(layout-free)/auth/suspended/`
 - acceptance route: `apps/server/src/orpc/routes/auth/tos/accept.ts`
 - registration and authentication: `apps/server/src/orpc/routes/auth/`
-- web acceptance prompts: `apps/web/src/components/pendingTosAlert.tsx` and the
-  ToS-required authentication page
+- web acceptance page: `apps/web/src/app/(layout-free)/auth/tos-required/`,
+  reached by redirects in `apps/web/src/lib/auth.actions.ts` and
+  `apps/web/src/app/(layout-free)/auth/magic-link/route.ts`
 
 When changing this policy, update the owning middleware and representative
 integration tests in the same change. Test fixtures may default to an accepted,

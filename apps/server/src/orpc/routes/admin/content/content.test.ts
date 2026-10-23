@@ -74,7 +74,10 @@ describe("admin content moderation", () => {
   }) => {
     const admin = await fixtures.User({ admin: true });
     const member = await fixtures.User();
-    const bottle = await fixtures.Bottle({ name: "Searchable Bottle" });
+    const bottle = await fixtures.Bottle({
+      abv: 46.3,
+      name: "Searchable Bottle",
+    });
     const older = await fixtures.Tasting({
       bottleId: bottle.id,
       createdAt: new Date("2026-01-01T00:00:00.000Z"),
@@ -101,6 +104,16 @@ describe("admin content moderation", () => {
     );
 
     expect(first.results.map(({ id }) => id)).toEqual([newer.id]);
+    // Releases can share a name, so moderators see the ABV with the bottle.
+    // Bottle labels and links use the display name, so the Bottle's name
+    // fields come too.
+    expect(first.results[0]?.bottle).toMatchObject({
+      id: bottle.id,
+      abv: 46.3,
+      name: bottle.name,
+      brand: { name: expect.any(String) },
+      group: { name: expect.any(String) },
+    });
     expect(first.rel).toEqual({ nextCursor: 2, prevCursor: null });
     expect(second.results.map(({ id }) => id)).toEqual([older.id]);
     expect(second.rel).toEqual({ nextCursor: null, prevCursor: 1 });
@@ -305,6 +318,7 @@ describe("admin content moderation", () => {
     );
     expect(detail).toMatchObject({
       hidden: false,
+      bottle: { id: bottle.id, name: bottle.name },
       moderation: { removed: true, reason: "Source asked for removal." },
     });
     expect(
@@ -315,5 +329,19 @@ describe("admin content moderation", () => {
         })
       ).results.map(({ id }) => id),
     ).not.toContain(review.id);
+  });
+
+  test("shows no Bottle for an unmatched critic review", async ({
+    fixtures,
+  }) => {
+    const admin = await fixtures.User({ admin: true });
+    const review = await fixtures.ExternalReview({ bottleId: null });
+
+    const detail = await routerClient.admin.content.details(
+      { id: review.id, kind: "external_review" },
+      { context: { user: admin } },
+    );
+
+    expect(detail.bottle).toBeNull();
   });
 });

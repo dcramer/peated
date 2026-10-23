@@ -3,6 +3,8 @@ import {
   bottleReferences,
   bottleTombstones,
   externalReviews,
+  incomingBottleDecisionLogs,
+  storePriceMatchProposals,
   storePrices,
 } from "@peated/server/db/schema";
 import { getUserActor } from "@peated/server/lib/actors";
@@ -17,7 +19,7 @@ beforeEach(() => {
 });
 
 describe("PATCH /bottle-references/:reference", () => {
-  test("reassigns the reference and exact consumers using the old identity", async ({
+  test("corrects the reference and invalidates only proven dependent matches", async ({
     fixtures,
   }) => {
     const source = await fixtures.Bottle({ name: "Wrong Bottle" });
@@ -33,11 +35,13 @@ describe("PATCH /bottle-references/:reference", () => {
     });
     const sourcePrice = await fixtures.StorePrice({
       bottleId: source.id,
-      name,
+      name: "Different normalized listing name",
+      matchedReferenceId: reference.id,
     });
     const unresolvedPrice = await fixtures.StorePrice({
       bottleId: null,
       name: name.toLowerCase(),
+      matchedReferenceId: reference.id,
     });
     const similarPrice = await fixtures.StorePrice({
       bottleId: source.id,
@@ -50,15 +54,43 @@ describe("PATCH /bottle-references/:reference", () => {
     const sourceReview = await fixtures.ExternalReview({
       bottleId: source.id,
       name,
+      matchedReferenceId: reference.id,
     });
     const unresolvedReview = await fixtures.ExternalReview({
       bottleId: null,
       name: name.toUpperCase(),
+      matchedReferenceId: reference.id,
     });
     const unrelatedReview = await fixtures.ExternalReview({
       bottleId: unrelated.id,
       name,
     });
+    const manualReview = await fixtures.ExternalReview({
+      bottleId: source.id,
+      name,
+      matchedReferenceId: reference.id,
+    });
+    await routerClient.externalReviews.update(
+      { externalReview: manualReview.id, bottle: source.id },
+      { context: { user } },
+    );
+    const legacyPrice = await fixtures.StorePrice({
+      bottleId: source.id,
+      name,
+    });
+    const [proposal] = await db
+      .insert(storePriceMatchProposals)
+      .values({
+        priceId: sourcePrice.id,
+        status: "approved",
+        proposalType: "match",
+        currentBottleId: source.id,
+        suggestedBottleId: source.id,
+        referenceScope: "global_alias",
+        reviewedById: user.id,
+        reviewedAt: new Date(),
+      })
+      .returning();
 
     const result = await routerClient.bottleReferences.update(
       {
@@ -105,7 +137,7 @@ describe("PATCH /bottle-references/:reference", () => {
         db.query.storePrices.findFirst({
           where: eq(storePrices.id, consumer.id),
         }),
-      ).resolves.toMatchObject({ bottleId: target.id });
+      ).resolves.toMatchObject({ bottleId: null, matchedReferenceId: null });
     }
     await expect(
       db.query.storePrices.findFirst({
@@ -123,13 +155,67 @@ describe("PATCH /bottle-references/:reference", () => {
         db.query.externalReviews.findFirst({
           where: eq(externalReviews.id, consumer.id),
         }),
-      ).resolves.toMatchObject({ bottleId: target.id });
+      ).resolves.toMatchObject({ bottleId: null, matchedReferenceId: null });
     }
     await expect(
       db.query.externalReviews.findFirst({
         where: eq(externalReviews.id, unrelatedReview.id),
       }),
     ).resolves.toMatchObject({ bottleId: unrelated.id });
+
+    expect(
+      await db.query.externalReviews.findFirst({
+        where: eq(externalReviews.id, manualReview.id),
+      }),
+    ).toMatchObject({ bottleId: source.id });
+    expect(
+      await db.query.storePrices.findFirst({
+        where: eq(storePrices.id, legacyPrice.id),
+      }),
+    ).toMatchObject({ bottleId: source.id });
+    expect(
+      await db.query.storePriceMatchProposals.findFirst({
+        where: eq(storePriceMatchProposals.id, proposal.id),
+      }),
+    ).toMatchObject({
+      status: "pending_review",
+      proposalType: "no_match",
+      referenceScope: "none",
+      currentBottleId: null,
+      suggestedBottleId: null,
+      reviewedAt: null,
+    });
+    const logs = await db.query.incomingBottleDecisionLogs.findMany({
+      where: eq(incomingBottleDecisionLogs.decision, "unassign"),
+    });
+    expect(
+      logs.map((log) => [
+        log.sourceKind,
+        log.sourceId,
+        log.decision,
+        log.bottleId,
+      ]),
+    ).toEqual([
+      ["store_price", sourcePrice.id, "unassign", null],
+      ["review", sourceReview.id, "unassign", null],
+    ]);
+    expect(
+      logs.every(
+        (log) =>
+          log.actorId === actor.id &&
+          log.metadata.previousBottleId === source.id,
+      ),
+    ).toBe(true);
+    expect(logs.find((log) => log.sourceKind === "store_price")).toMatchObject({
+      metadata: {
+        previousProposal: {
+          status: "approved",
+          bottleId: source.id,
+          reviewedById: user.id,
+          referenceScope: "global_alias",
+        },
+      },
+    });
 
     expect(workerClient.pushJob).toHaveBeenCalledWith("IndexBottleReference", {
       name,
@@ -155,7 +241,7 @@ describe("PATCH /bottle-references/:reference", () => {
     }
   });
 
-  test("unassigns the reference and exact consumers using the old identity", async ({
+  test("quarantines a reference and removes only its dependent matches", async ({
     fixtures,
   }) => {
     const source = await fixtures.Bottle({ name: "Wrong Bottle" });
@@ -170,6 +256,7 @@ describe("PATCH /bottle-references/:reference", () => {
     const sourcePrice = await fixtures.StorePrice({
       bottleId: source.id,
       name,
+      matchedReferenceId: reference.id,
     });
     const unrelatedPrice = await fixtures.StorePrice({
       bottleId: unrelated.id,
@@ -178,6 +265,7 @@ describe("PATCH /bottle-references/:reference", () => {
     const sourceReview = await fixtures.ExternalReview({
       bottleId: source.id,
       name,
+      matchedReferenceId: reference.id,
     });
     const unrelatedReview = await fixtures.ExternalReview({
       bottleId: unrelated.id,

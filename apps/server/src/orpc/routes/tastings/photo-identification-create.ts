@@ -4,17 +4,20 @@
  * Bottle creation, and API-facing conflict mapping.
  */
 import { db } from "@peated/server/db";
-import { bottleImages, bottles } from "@peated/server/db/schema";
 import { getUserActor } from "@peated/server/lib/actors";
 import { applyClassifierCreateDecision } from "@peated/server/lib/bottleReferenceResolution";
-import { reconcileBottleSeriesRepresentativesForBottles } from "@peated/server/lib/bottleSeriesRepresentatives";
 import { BottleAlreadyExistsError } from "@peated/server/lib/createBottle";
-import { logError } from "@peated/server/lib/log";
 import {
   copyPendingImageToBottle,
   getUsablePendingUpload,
   PendingUploadError,
 } from "@peated/server/lib/pendingUploads";
+import {
+  canPromotePhotoToCatalog,
+  CatalogImageWarningSchema,
+  promotePhotoToCatalogImage,
+} from "@peated/server/lib/photoCatalogImage";
+import { isPhotoIdentificationCreateDecisionAutoCreatable } from "@peated/server/lib/photoIdentification";
 import { verifyPhotoIdentificationCreateToken } from "@peated/server/lib/photoIdentificationCreateToken";
 import { procedure } from "@peated/server/orpc";
 import {
@@ -25,15 +28,7 @@ import {
 import { BottleSchema } from "@peated/server/schemas";
 import { serialize } from "@peated/server/serializers";
 import { BottleSerializer } from "@peated/server/serializers/bottle";
-import { and, eq, isNull } from "drizzle-orm";
 import { z } from "zod";
-import { isPhotoIdentificationCreateDecisionAutoCreatable } from "./photo-identification";
-
-const CatalogImageWarningSchema = z.object({
-  code: z.literal("CATALOG_IMAGE_COPY_FAILED"),
-  message: z.string(),
-});
-type CatalogImageWarning = z.infer<typeof CatalogImageWarningSchema>;
 
 const PhotoIdentificationCreateOutputSchema = z.object({
   bottle: BottleSchema,
@@ -49,151 +44,6 @@ type PhotoIdentificationCreateOutput = z.infer<
 type CreateDecisionResult = Awaited<
   ReturnType<typeof applyClassifierCreateDecision>
 >;
-type CreateDecision = Parameters<
-  typeof applyClassifierCreateDecision
->[0]["decision"];
-type PhotoSuitability = Awaited<
-  ReturnType<typeof verifyPhotoIdentificationCreateToken>
->["photoSuitability"];
-
-function buildCatalogImageWarning(): CatalogImageWarning {
-  return {
-    code: "CATALOG_IMAGE_COPY_FAILED",
-    message: "The bottle was added, but the public image was not saved.",
-  };
-}
-
-function shouldPromoteCatalogImage({
-  result,
-  photoSuitability,
-  pendingPurpose,
-}: {
-  result: CreateDecisionResult;
-  photoSuitability: PhotoSuitability;
-  pendingPurpose: string;
-}) {
-  if (
-    pendingPurpose !== "photo_tasting_entry" ||
-    photoSuitability.suitableAsBottleImage !== true ||
-    !result.createdBottle
-  ) {
-    return false;
-  }
-  return true;
-}
-
-function logCatalogImageApprovalError(
-  err: Error,
-  {
-    pendingImageId,
-    userId,
-    decision,
-    result,
-  }: {
-    pendingImageId: string;
-    userId: number;
-    decision: CreateDecision;
-    result: CreateDecisionResult;
-  },
-) {
-  logError(err, {
-    catalogImagePromotion: {
-      pendingImageId,
-      userId,
-      action: decision.action,
-      bottleId: result.bottleId,
-      createdBottle: result.createdBottle,
-    },
-  });
-}
-
-async function applyCatalogImageApproval({
-  promote,
-  pendingImageId,
-  userId,
-  actorId,
-  decision,
-  result,
-  copyImage,
-}: {
-  promote: boolean;
-  pendingImageId: string;
-  userId: number;
-  actorId: number;
-  decision: CreateDecision;
-  result: CreateDecisionResult;
-  copyImage: typeof copyPendingImageToBottle;
-}): Promise<CatalogImageWarning | undefined> {
-  if (!promote) {
-    return undefined;
-  }
-
-  try {
-    const [existingBottle] = await db
-      .select({ imageUrl: bottles.imageUrl })
-      .from(bottles)
-      .where(eq(bottles.id, result.bottleId))
-      .limit(1);
-    if (!existingBottle || existingBottle.imageUrl) {
-      return undefined;
-    }
-
-    const imageUrl = await copyImage({
-      id: pendingImageId,
-      userId,
-      purpose: "photo_tasting_entry",
-      bottleId: result.bottleId,
-    });
-
-    const updatedBottle = await db.transaction(async (tx) => {
-      const [updated] = await tx
-        .update(bottles)
-        .set({ imageUrl })
-        .where(and(eq(bottles.id, result.bottleId), isNull(bottles.imageUrl)))
-        .returning({ id: bottles.id });
-      if (!updated) return null;
-      await tx.insert(bottleImages).values({
-        bottleId: result.bottleId,
-        imageUrl,
-        sourceUrl: null,
-        license: null,
-        isPrimary: true,
-        createdByActorId: actorId,
-      });
-      await reconcileBottleSeriesRepresentativesForBottles(tx, [
-        result.bottleId,
-      ]);
-      return updated;
-    });
-    if (!updatedBottle) {
-      logCatalogImageApprovalError(
-        new Error("Catalog image was copied but not saved to the bottle."),
-        {
-          pendingImageId,
-          userId,
-          decision,
-          result,
-        },
-      );
-      return buildCatalogImageWarning();
-    }
-
-    return undefined;
-  } catch (cause) {
-    const error =
-      cause instanceof Error
-        ? cause
-        : new Error("Catalog image approval failed.", { cause });
-    logCatalogImageApprovalError(error, {
-      pendingImageId,
-      userId,
-      decision,
-      result,
-    });
-
-    return buildCatalogImageWarning();
-  }
-}
 
 export function createPhotoIdentificationCreateProcedure(
   copyImage: typeof copyPendingImageToBottle = copyPendingImageToBottle,
@@ -289,19 +139,29 @@ export function createPhotoIdentificationCreateProcedure(
         throw err;
       }
 
-      const warning = await applyCatalogImageApproval({
-        promote: shouldPromoteCatalogImage({
-          result,
+      const warning =
+        pendingImage.purpose === "photo_tasting_entry" &&
+        canPromotePhotoToCatalog({
+          createdBottle: result.createdBottle,
           photoSuitability,
-          pendingPurpose: pendingImage.purpose,
-        }),
-        pendingImageId: pendingImage.id,
-        userId: user.id,
-        actorId: actor.id,
-        decision,
-        result,
-        copyImage,
-      });
+        })
+          ? await promotePhotoToCatalogImage({
+              bottleId: result.bottleId,
+              actorId: actor.id,
+              copyImage: () =>
+                copyImage({
+                  id: pendingImage.id,
+                  userId: user.id,
+                  purpose: "photo_tasting_entry",
+                  bottleId: result.bottleId,
+                }),
+              logContext: {
+                pendingImageId: pendingImage.id,
+                userId: user.id,
+                createdBottle: result.createdBottle,
+              },
+            })
+          : undefined;
 
       const bottle = await db.query.bottles.findFirst({
         where: (bottles, { eq }) => eq(bottles.id, result.bottleId),

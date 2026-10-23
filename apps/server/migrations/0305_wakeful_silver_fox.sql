@@ -1,0 +1,5 @@
+ALTER TYPE "public"."scrape_record_type" ADD VALUE 'auction';
+ALTER TABLE "auction_lot_result" DROP CONSTRAINT "auction_lot_result_price_check";
+ALTER TABLE "auction_lot" DROP CONSTRAINT "auction_lot_bid_check";
+ALTER TABLE "auction_lot_result" ADD CONSTRAINT "auction_lot_result_price_check" CHECK (("auction_lot_result"."amount" IS NULL AND "auction_lot_result"."currency" IS NULL AND "auction_lot_result"."price_kind" IS NULL) OR ("auction_lot_result"."outcome" = 'sold' AND "auction_lot_result"."amount" IS NOT NULL AND "auction_lot_result"."currency" IS NOT NULL AND "auction_lot_result"."amount" BETWEEN 1 AND 9007199254740991 AND "auction_lot_result"."currency" IN ('gbp','usd','eur') AND "auction_lot_result"."price_kind" IS NOT NULL));
+ALTER TABLE "auction_lot" ADD CONSTRAINT "auction_lot_bid_check" CHECK (("auction_lot"."current_bid" IS NULL AND "auction_lot"."bid_currency" IS NULL) OR ("auction_lot"."current_bid" IS NOT NULL AND "auction_lot"."bid_currency" IS NOT NULL AND "auction_lot"."current_bid" BETWEEN 1 AND 9007199254740991 AND "auction_lot"."bid_currency" IN ('gbp','usd','eur')));

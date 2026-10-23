@@ -18,6 +18,9 @@ type Entity = MockOutputs["entities"]["list"]["results"][number];
 // producer's address, location, founding year, or ownership (see README.md).
 const entityDefaults = {
   shortName: null,
+  pronunciation: null,
+  pronunciationIpa: null,
+  pronunciationAudioUrl: null,
   status: null,
   ownerId: null,
   owner: null,
@@ -133,6 +136,8 @@ export const mockEntity = {
   peatedId: "E9201",
   name: "Lagavulin",
   shortName: null,
+  pronunciation: "lag-uh-VOO-lin",
+  pronunciationIpa: "ˌlæɡəˈvuːlɪn",
   kind: "distillery",
   ownerId: 9210,
   owner: { id: 9210, peatedId: "E9210", name: "Diageo", kind: "company" },

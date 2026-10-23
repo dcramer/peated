@@ -14,6 +14,7 @@ export type ProfileLibraryInput = Inputs["collections"]["bottles"]["list"] & {
   collection: "library";
   cursor: number;
   distiller?: number;
+  entity?: number;
   limit: 25;
   query: string;
   sort: "name" | "-created";
@@ -80,6 +81,7 @@ export function getProfileLibraryInput(
     collection: "library",
     cursor: parsePositiveNumber(getSearchParam(source, "cursor")) ?? 1,
     distiller: parsePositiveNumber(getSearchParam(source, "distiller")),
+    entity: parsePositiveNumber(getSearchParam(source, "entity")),
     limit: 25,
     query: getSearchParam(source, "query") ?? "",
     sort: getSearchParam(source, "sort") === "-created" ? "-created" : "name",

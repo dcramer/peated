@@ -24,12 +24,9 @@ const AgentDecisionJsonSchema = z
   .passthrough();
 
 describe("BottleClassifierAgentDecisionSchema", () => {
-  test("defines proposed Bottle names at the field boundary", () => {
+  test("points proposed Bottle names to the identity rules", () => {
     expect(ProposedBottleFields.name.description).toContain(
-      "Stable marketed expression relative to the Brand",
-    );
-    expect(ProposedBottleFields.name.description).toContain(
-      "When no separate expression is marketed, use the source-supported product or style phrase",
+      "following the identity rules",
     );
   });
 

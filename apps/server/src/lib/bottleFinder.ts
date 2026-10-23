@@ -4,6 +4,7 @@ import { bottleReferences } from "../db/schema";
 import type { BottleReferenceIdentitySnapshot } from "./bottleReferences";
 
 export type BottleReferenceAssignmentMatch = {
+  referenceId: number;
   reference: BottleReferenceIdentitySnapshot;
   bottleId: number;
 };
@@ -11,9 +12,10 @@ export type BottleReferenceAssignmentMatch = {
 async function findBottleReferenceIdentitySnapshot(
   name: string,
   database: AnyDatabase,
-): Promise<BottleReferenceIdentitySnapshot | null> {
+): Promise<(BottleReferenceIdentitySnapshot & { id: number }) | null> {
   const [reference] = await database
     .select({
+      id: bottleReferences.id,
       name: bottleReferences.name,
       bottleId: bottleReferences.bottleId,
       ignored: bottleReferences.ignored,
@@ -42,6 +44,7 @@ export async function findBottleReferenceAssignment(
   if (!reference || reference.bottleId === null) return null;
 
   return {
+    referenceId: reference.id,
     reference,
     bottleId: reference.bottleId,
   };

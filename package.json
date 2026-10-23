@@ -56,7 +56,6 @@
     "evals:classifier:flaky": "pnpm --filter @peated/bottle-classifier evals -- src/classifier.eval.test.ts -t 'Rogues|Spice Tree|matches Laphroaig|restore Pōkeno'",
     "evals:scraper": "pnpm --filter @peated/server evals",
     "test:ci": "CI=true pnpm -r run test:ci",
-    "preinstall": "npx only-allow pnpm",
     "postinstall": "simple-git-hooks",
     "format": "prettier --write --cache .",
     "format:check": "prettier --check --cache .",
@@ -87,6 +86,13 @@
   },
   "engines": {
     "node": ">=24.18.0 <25.0.0"
+  },
+  "devEngines": {
+    "packageManager": {
+      "name": "pnpm",
+      "version": "11.20.0",
+      "onFail": "download"
+    }
   },
   "packageManager": "pnpm@11.20.0",
   "volta": {

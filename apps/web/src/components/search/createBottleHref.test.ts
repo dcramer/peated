@@ -102,4 +102,17 @@ describe("getCreateBottleHref", () => {
       { id: 1270, name: "Port Dundas" },
     ]);
   });
+
+  test("returns a new Bottle to the tasting draft it came from", () => {
+    const draftId = "5f0c6b8e-3c1d-4a5e-9b7f-2d4e6a8c0b1d";
+    const href = getCreateBottleHref({
+      query: "lagavulin 16",
+      returnDraftId: draftId,
+    });
+    const url = new URL(href, "https://peated.test");
+
+    expect(url.pathname).toBe("/bottles/new");
+    expect(url.searchParams.get("name")).toBe("Lagavulin 16");
+    expect(url.searchParams.get("draft")).toBe(draftId);
+  });
 });

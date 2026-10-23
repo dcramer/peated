@@ -79,10 +79,14 @@ the counts and IDs.
   a retailer's, importer's, or festival's selection of an official bottling
   keeps the producer Brand, has no bottler, and carries the program name in
   `edition`. Do not clear an existing bottler only because a source omits it.
-- `name` is the producer's title without the Brand, keeping printed age,
-  vintage, or cask wording. Store age, years, ABV, edition, cask facts, and
-  outturn in their fields as well; never build a name from them, and do not
-  fall back to a generic `Single Malt`.
+- Name, edition, and cask number follow the table in "Bottle Name, Edition,
+  And Cask Number" in the identity model. In short: `name` is what people call
+  the bottle; a Bottle named for its distillery is `Distillery Vintage`, with
+  the age added only when the same Brand has another Bottle of that distillery
+  and vintage; `edition` holds a batch, selection, or market the label prints;
+  every cask number goes in `caskNumber`, never in `edition`. The API rejects
+  an edition that repeats the cask number and a title and edition that match
+  a Bottle in another group with a different vintage or age.
 - Read the edit context before a shared rename; it changes every Bottle in
   the group.
 - Use `null` for an unknown or disputed fact. Keep an existing value unless a

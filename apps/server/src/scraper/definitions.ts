@@ -153,7 +153,9 @@ const SourceDefinitionSchema = z
   .object({
     key: DefinitionKeySchema,
     externalSiteKey: z.enum(REGISTERED_EXTERNAL_SITE_KEY_LIST),
-    recordType: z.enum(["review", "price", "catalog", "bottle"]).optional(),
+    recordType: z
+      .enum(["review", "price", "catalog", "bottle", "auction"])
+      .optional(),
     targetKeys: z.tuple([DefinitionKeySchema], DefinitionKeySchema),
     resumeFromLastRun: z.boolean().default(false),
     cursorSchema: ZodSchemaSchema,

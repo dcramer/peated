@@ -38,6 +38,7 @@ describe("GET /tags/bottles", () => {
         ...row,
         createdById: user.id,
         createdAt: new Date(2026, 0, 1, 0, 0, index),
+        tastedAt: new Date(2026, 0, 1, 0, 0, index),
       })),
     );
     for (const bottle of [frequent, consistent, smallSample, unrelated]) {
@@ -84,8 +85,18 @@ describe("GET /tags/bottles", () => {
     const bottle = await fixtures.Bottle();
     const merged = await fixtures.Bottle();
     await db.insert(tastings).values([
-      { bottleId: bottle.id, tags: ["smoky"], createdById: user.id },
-      { bottleId: merged.id, tags: ["smoke"], createdById: user.id },
+      {
+        bottleId: bottle.id,
+        tags: ["smoky"],
+        createdById: user.id,
+        tastedAt: new Date(),
+      },
+      {
+        bottleId: merged.id,
+        tags: ["smoke"],
+        createdById: user.id,
+        tastedAt: new Date(),
+      },
     ]);
     await db
       .insert(bottleTombstones)
@@ -180,16 +191,19 @@ describe("GET /tags/bottles", () => {
         bottleId: publicBottle.id,
         tags: ["smoke"],
         createdById: publicUser.id,
+        tastedAt: new Date(),
       },
       {
         bottleId: publicBottle.id,
         tags: ["honey"],
         createdById: privateUser.id,
+        tastedAt: new Date(),
       },
       {
         bottleId: privateBottle.id,
         tags: ["smoke"],
         createdById: privateUser.id,
+        tastedAt: new Date(),
       },
     ]);
     await recomputeBottleStats(publicBottle.id);

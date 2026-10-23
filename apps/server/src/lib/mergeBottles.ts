@@ -5,6 +5,9 @@
 import { db, type AnyTransaction } from "@peated/server/db";
 import type { Bottle, User } from "@peated/server/db/schema";
 import {
+  auctionAlerts,
+  auctionLots,
+  auctionWatches,
   bottleBarcodes,
   bottleFlavorProfiles,
   bottleGroupDistillers,
@@ -25,7 +28,9 @@ import {
   storePriceMatchAttempts,
   storePriceMatchProposals,
   storePrices,
+  tastingDrafts,
   tastings,
+  wrongPhotoMatches,
 } from "@peated/server/db/schema";
 import { getUserActor } from "@peated/server/lib/actors";
 import { moveBottleAliasesForMergeInTransaction } from "@peated/server/lib/bottleAliases";
@@ -297,15 +302,16 @@ async function assertNoTastingCollision(
     .select({
       bottleId: tastings.bottleId,
       createdById: tastings.createdById,
-      createdAt: tastings.createdAt,
+      tastedAt: tastings.tastedAt,
     })
     .from(tastings)
     .where(inArray(tastings.bottleId, [sourceBottleId, destinationBottleId]))
-    .orderBy(asc(tastings.createdById), asc(tastings.createdAt))
+    .orderBy(asc(tastings.createdById), asc(tastings.tastedAt))
     .for("update");
+  // Mirrors the tasting_unq constraint (Bottle, member, tasted time).
   const projectedKeys = new Set<string>();
-  for (const { createdById, createdAt } of rows) {
-    const key = `${createdById}:${createdAt.getTime()}`;
+  for (const { createdById, tastedAt } of rows) {
+    const key = `${createdById}:${tastedAt.getTime()}`;
     if (projectedKeys.has(key)) {
       throw new BottleMergeConflictError("consumer_conflict");
     }
@@ -395,8 +401,45 @@ async function repointBottleConsumers(
     memberReviewsMoved: memberReviewChanges.moved,
     memberReviewsCollapsed: memberReviewChanges.collapsed,
   };
+  // Auction history owns durable lot references; watches collapse by member on a Bottle merge.
+  const sourceWatches = await tx
+    .select()
+    .from(auctionWatches)
+    .where(eq(auctionWatches.bottleId, sourceBottleId))
+    .orderBy(asc(auctionWatches.id))
+    .for("update");
+  for (const watch of sourceWatches) {
+    await tx
+      .insert(auctionWatches)
+      .values({
+        userId: watch.userId,
+        bottleId: destinationBottleId,
+        createdAt: watch.createdAt,
+      })
+      .onConflictDoUpdate({
+        target: [auctionWatches.userId, auctionWatches.bottleId],
+        set: {
+          createdAt: sql`LEAST(${auctionWatches.createdAt}, ${watch.createdAt})`,
+        },
+      });
+    await tx.delete(auctionWatches).where(eq(auctionWatches.id, watch.id));
+  }
+  for (const [name, table] of [
+    ["auctionLots", auctionLots],
+    ["auctionAlerts", auctionAlerts],
+  ] as const) {
+    const updated = await tx
+      .update(table)
+      .set({ bottleId: destinationBottleId })
+      .where(eq(table.bottleId, sourceBottleId))
+      .returning({ id: table.id });
+    if (updated.length) counts[name] = updated.length;
+  }
+  if (sourceWatches.length) counts.auctionWatches = sourceWatches.length;
   for (const [name, table, column] of [
     ["tastings", tastings, tastings.bottleId],
+    // Drafts follow the Bottle so publishing posts to the survivor.
+    ["tastingDrafts", tastingDrafts, tastingDrafts.bottleId],
     ["reviews", externalReviews, externalReviews.bottleId],
     ["storePrices", storePrices, storePrices.bottleId],
     ["bottleObservations", bottleObservations, bottleObservations.bottleId],
@@ -414,6 +457,22 @@ async function repointBottleConsumers(
       .returning({ id: table.id });
     counts[name] = updated.length;
   }
+
+  // Wrong photo matches point at both Bottles in a match; follow either one.
+  const movedWrongPhotoMatches = await tx
+    .update(wrongPhotoMatches)
+    .set({
+      wrongBottleId: sql`CASE WHEN ${wrongPhotoMatches.wrongBottleId} = ${sourceBottleId} THEN ${destinationBottleId} ELSE ${wrongPhotoMatches.wrongBottleId} END`,
+      correctBottleId: sql`CASE WHEN ${wrongPhotoMatches.correctBottleId} = ${sourceBottleId} THEN ${destinationBottleId} ELSE ${wrongPhotoMatches.correctBottleId} END`,
+    })
+    .where(
+      or(
+        eq(wrongPhotoMatches.wrongBottleId, sourceBottleId),
+        eq(wrongPhotoMatches.correctBottleId, sourceBottleId),
+      ),
+    )
+    .returning({ id: wrongPhotoMatches.id });
+  counts.wrongPhotoMatches = movedWrongPhotoMatches.length;
 
   for (const [name, table] of [
     ["storePriceMatchProposals", storePriceMatchProposals],
@@ -569,6 +628,17 @@ export async function lockBottleMergeDependencies(
     .from(incomingBottleDecisionLogs)
     .where(inArray(incomingBottleDecisionLogs.bottleId, bottleIds))
     .orderBy(asc(incomingBottleDecisionLogs.id))
+    .for("update");
+  await tx
+    .select()
+    .from(wrongPhotoMatches)
+    .where(
+      or(
+        inArray(wrongPhotoMatches.wrongBottleId, bottleIds),
+        inArray(wrongPhotoMatches.correctBottleId, bottleIds),
+      ),
+    )
+    .orderBy(asc(wrongPhotoMatches.id))
     .for("update");
   await tx
     .select()

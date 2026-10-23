@@ -13,7 +13,10 @@ import {
 } from "@peated/server/lib/passkey";
 import { procedure } from "@peated/server/orpc";
 import { authRateLimit } from "@peated/server/orpc/middleware";
-import { AuthSchema } from "@peated/server/schemas";
+import {
+  AuthSchema,
+  PasskeyRegistrationResponseSchema,
+} from "@peated/server/schemas";
 import { serialize } from "@peated/server/serializers";
 import { UserSerializer } from "@peated/server/serializers/user";
 import { eq, sql } from "drizzle-orm";
@@ -42,12 +45,9 @@ export default procedure
         .describe(
           "Password for the new account. Required when not registering with a passkey.",
         ),
-      passkeyResponse: z
-        .any()
-        .optional()
-        .describe(
-          "WebAuthn registration response. Requires `signedChallenge`.",
-        ),
+      passkeyResponse: PasskeyRegistrationResponseSchema.optional().describe(
+        "WebAuthn registration response. Requires `signedChallenge`.",
+      ),
       signedChallenge: z
         .string()
         .optional()

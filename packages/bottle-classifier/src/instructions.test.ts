@@ -6,6 +6,51 @@ import {
   WHISKY_LABEL_COMPONENTS,
 } from "./instructions";
 
+describe("identity rules", () => {
+  test.each([
+    ["reference classifier", buildBottleClassifierInstructions()],
+    ["Bottle audit", buildBottleAuditInstructions()],
+  ])("state the naming rules once in %s", (_, instructions) => {
+    expect(instructions).toContain("<identity_rules>");
+    expect(
+      instructions.split("never build a name from other fields"),
+    ).toHaveLength(2);
+    expect(instructions).toContain(
+      "is the name only when nothing else names the Bottle",
+    );
+  });
+
+  test.each([
+    ["reference classifier", buildBottleClassifierInstructions()],
+    ["Bottle audit", buildBottleAuditInstructions()],
+  ])(
+    "names a distillery Bottle by vintage and keeps release facts out in %s",
+    (_, instructions) => {
+      expect(instructions).toContain("`Mortlach 1990`");
+      expect(instructions).toContain(
+        "Add the printed age after the vintage only when a Bottle of the same Brand has the same distillery and vintage",
+      );
+      expect(instructions).toContain(
+        "Put every printed cask or barrel identifier in `caskNumber`, never in `edition`",
+      );
+    },
+  );
+
+  test("extracts a cask identifier into cask_number, not edition", () => {
+    const edition = WHISKY_LABEL_COMPONENTS.find(({ id }) => id === "edition");
+    const instructions = buildWhiskyLabelExtractorInstructions({
+      mode: "image",
+    });
+
+    expect(edition?.guidance).toContain(
+      "Put a cask or barrel identifier in `cask_number`, never in `edition`.",
+    );
+    expect(instructions).not.toContain(
+      "preserve its full wording in `edition`",
+    );
+  });
+});
+
 describe("bottler instructions", () => {
   test.each([
     ["reference classifier", buildBottleClassifierInstructions()],

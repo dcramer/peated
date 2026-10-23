@@ -1,5 +1,5 @@
 {
-  "id": "c721a7b7-4235-43a8-9c8a-bb2b89b72230",
+  "id": "0739dc24-5eb7-494c-88c8-a8b31bbe8b20",
   "prevId": "6a0ea11c-18c9-4b2e-a925-61607e8fe7af",
   "version": "7",
   "dialect": "postgresql",
@@ -110,6 +110,737 @@
             "id"
           ],
           "onDelete": "set null",
+          "onUpdate": "no action"
+        }
+      },
+      "compositePrimaryKeys": {},
+      "uniqueConstraints": {},
+      "policies": {},
+      "checkConstraints": {},
+      "isRLSEnabled": false
+    },
+    "public.auction_alert": {
+      "name": "auction_alert",
+      "schema": "",
+      "columns": {
+        "id": {
+          "name": "id",
+          "type": "bigserial",
+          "primaryKey": true,
+          "notNull": true
+        },
+        "user_id": {
+          "name": "user_id",
+          "type": "bigint",
+          "primaryKey": false,
+          "notNull": true
+        },
+        "lot_id": {
+          "name": "lot_id",
+          "type": "bigint",
+          "primaryKey": false,
+          "notNull": true
+        },
+        "bottle_id": {
+          "name": "bottle_id",
+          "type": "bigint",
+          "primaryKey": false,
+          "notNull": true
+        },
+        "created_at": {
+          "name": "created_at",
+          "type": "timestamp with time zone",
+          "primaryKey": false,
+          "notNull": true,
+          "default": "now()"
+        }
+      },
+      "indexes": {
+        "auction_alert_user_lot_unq": {
+          "name": "auction_alert_user_lot_unq",
+          "columns": [
+            {
+              "expression": "user_id",
+              "isExpression": false,
+              "asc": true,
+              "nulls": "last"
+            },
+            {
+              "expression": "lot_id",
+              "isExpression": false,
+              "asc": true,
+              "nulls": "last"
+            }
+          ],
+          "isUnique": true,
+          "concurrently": false,
+          "method": "btree",
+          "with": {}
+        }
+      },
+      "foreignKeys": {
+        "auction_alert_user_id_user_id_fk": {
+          "name": "auction_alert_user_id_user_id_fk",
+          "tableFrom": "auction_alert",
+          "tableTo": "user",
+          "columnsFrom": [
+            "user_id"
+          ],
+          "columnsTo": [
+            "id"
+          ],
+          "onDelete": "cascade",
+          "onUpdate": "no action"
+        },
+        "auction_alert_lot_id_auction_lot_id_fk": {
+          "name": "auction_alert_lot_id_auction_lot_id_fk",
+          "tableFrom": "auction_alert",
+          "tableTo": "auction_lot",
+          "columnsFrom": [
+            "lot_id"
+          ],
+          "columnsTo": [
+            "id"
+          ],
+          "onDelete": "no action",
+          "onUpdate": "no action"
+        },
+        "auction_alert_bottle_id_bottle_id_fk": {
+          "name": "auction_alert_bottle_id_bottle_id_fk",
+          "tableFrom": "auction_alert",
+          "tableTo": "bottle",
+          "columnsFrom": [
+            "bottle_id"
+          ],
+          "columnsTo": [
+            "id"
+          ],
+          "onDelete": "no action",
+          "onUpdate": "no action"
+        }
+      },
+      "compositePrimaryKeys": {},
+      "uniqueConstraints": {},
+      "policies": {},
+      "checkConstraints": {},
+      "isRLSEnabled": false
+    },
+    "public.auction_lot_result": {
+      "name": "auction_lot_result",
+      "schema": "",
+      "columns": {
+        "id": {
+          "name": "id",
+          "type": "bigserial",
+          "primaryKey": true,
+          "notNull": true
+        },
+        "lot_id": {
+          "name": "lot_id",
+          "type": "bigint",
+          "primaryKey": false,
+          "notNull": true
+        },
+        "outcome": {
+          "name": "outcome",
+          "type": "auction_outcome",
+          "typeSchema": "public",
+          "primaryKey": false,
+          "notNull": true
+        },
+        "amount": {
+          "name": "amount",
+          "type": "bigint",
+          "primaryKey": false,
+          "notNull": false
+        },
+        "currency": {
+          "name": "currency",
+          "type": "text",
+          "primaryKey": false,
+          "notNull": false
+        },
+        "price_kind": {
+          "name": "price_kind",
+          "type": "auction_price_kind",
+          "typeSchema": "public",
+          "primaryKey": false,
+          "notNull": false
+        },
+        "sold_at": {
+          "name": "sold_at",
+          "type": "timestamp with time zone",
+          "primaryKey": false,
+          "notNull": false
+        },
+        "price_note": {
+          "name": "price_note",
+          "type": "text",
+          "primaryKey": false,
+          "notNull": false
+        },
+        "source_url": {
+          "name": "source_url",
+          "type": "text",
+          "primaryKey": false,
+          "notNull": true
+        },
+        "observed_at": {
+          "name": "observed_at",
+          "type": "timestamp with time zone",
+          "primaryKey": false,
+          "notNull": true
+        }
+      },
+      "indexes": {
+        "auction_lot_result_latest_idx": {
+          "name": "auction_lot_result_latest_idx",
+          "columns": [
+            {
+              "expression": "lot_id",
+              "isExpression": false,
+              "asc": true,
+              "nulls": "last"
+            },
+            {
+              "expression": "id",
+              "isExpression": false,
+              "asc": true,
+              "nulls": "last"
+            }
+          ],
+          "isUnique": false,
+          "concurrently": false,
+          "method": "btree",
+          "with": {}
+        },
+        "auction_lot_result_observation_unq": {
+          "name": "auction_lot_result_observation_unq",
+          "columns": [
+            {
+              "expression": "lot_id",
+              "isExpression": false,
+              "asc": true,
+              "nulls": "last"
+            },
+            {
+              "expression": "observed_at",
+              "isExpression": false,
+              "asc": true,
+              "nulls": "last"
+            }
+          ],
+          "isUnique": true,
+          "concurrently": false,
+          "method": "btree",
+          "with": {}
+        }
+      },
+      "foreignKeys": {
+        "auction_lot_result_lot_id_auction_lot_id_fk": {
+          "name": "auction_lot_result_lot_id_auction_lot_id_fk",
+          "tableFrom": "auction_lot_result",
+          "tableTo": "auction_lot",
+          "columnsFrom": [
+            "lot_id"
+          ],
+          "columnsTo": [
+            "id"
+          ],
+          "onDelete": "no action",
+          "onUpdate": "no action"
+        }
+      },
+      "compositePrimaryKeys": {},
+      "uniqueConstraints": {},
+      "policies": {},
+      "checkConstraints": {
+        "auction_lot_result_price_check": {
+          "name": "auction_lot_result_price_check",
+          "value": "(\"auction_lot_result\".\"amount\" IS NULL AND \"auction_lot_result\".\"currency\" IS NULL AND \"auction_lot_result\".\"price_kind\" IS NULL) OR (\"auction_lot_result\".\"outcome\" = 'sold' AND \"auction_lot_result\".\"amount\" > 0 AND \"auction_lot_result\".\"currency\" IN ('gbp','usd','eur') AND \"auction_lot_result\".\"price_kind\" IS NOT NULL)"
+        },
+        "auction_lot_result_time_check": {
+          "name": "auction_lot_result_time_check",
+          "value": "\"auction_lot_result\".\"sold_at\" IS NULL OR \"auction_lot_result\".\"outcome\" = 'sold'"
+        }
+      },
+      "isRLSEnabled": false
+    },
+    "public.auction_lot": {
+      "name": "auction_lot",
+      "schema": "",
+      "columns": {
+        "id": {
+          "name": "id",
+          "type": "bigserial",
+          "primaryKey": true,
+          "notNull": true
+        },
+        "auction_id": {
+          "name": "auction_id",
+          "type": "bigint",
+          "primaryKey": false,
+          "notNull": true
+        },
+        "source_key": {
+          "name": "source_key",
+          "type": "text",
+          "primaryKey": false,
+          "notNull": true
+        },
+        "lot_number": {
+          "name": "lot_number",
+          "type": "text",
+          "primaryKey": false,
+          "notNull": false
+        },
+        "name": {
+          "name": "name",
+          "type": "text",
+          "primaryKey": false,
+          "notNull": true
+        },
+        "url": {
+          "name": "url",
+          "type": "text",
+          "primaryKey": false,
+          "notNull": true
+        },
+        "image_url": {
+          "name": "image_url",
+          "type": "text",
+          "primaryKey": false,
+          "notNull": false
+        },
+        "volume": {
+          "name": "volume",
+          "type": "integer",
+          "primaryKey": false,
+          "notNull": false
+        },
+        "condition": {
+          "name": "condition",
+          "type": "text",
+          "primaryKey": false,
+          "notNull": false
+        },
+        "source_bottle_identity": {
+          "name": "source_bottle_identity",
+          "type": "jsonb",
+          "primaryKey": false,
+          "notNull": false
+        },
+        "source_fingerprint": {
+          "name": "source_fingerprint",
+          "type": "text",
+          "primaryKey": false,
+          "notNull": true
+        },
+        "bottle_id": {
+          "name": "bottle_id",
+          "type": "bigint",
+          "primaryKey": false,
+          "notNull": false
+        },
+        "match_status": {
+          "name": "match_status",
+          "type": "auction_match_status",
+          "typeSchema": "public",
+          "primaryKey": false,
+          "notNull": true,
+          "default": "'pending'"
+        },
+        "match_check_id": {
+          "name": "match_check_id",
+          "type": "bigint",
+          "primaryKey": false,
+          "notNull": false
+        },
+        "matched_by_id": {
+          "name": "matched_by_id",
+          "type": "bigint",
+          "primaryKey": false,
+          "notNull": false
+        },
+        "matched_at": {
+          "name": "matched_at",
+          "type": "timestamp with time zone",
+          "primaryKey": false,
+          "notNull": false
+        },
+        "available_since": {
+          "name": "available_since",
+          "type": "timestamp with time zone",
+          "primaryKey": false,
+          "notNull": false
+        },
+        "state": {
+          "name": "state",
+          "type": "auction_lot_state",
+          "typeSchema": "public",
+          "primaryKey": false,
+          "notNull": true,
+          "default": "'unknown'"
+        },
+        "ends_at": {
+          "name": "ends_at",
+          "type": "timestamp with time zone",
+          "primaryKey": false,
+          "notNull": false
+        },
+        "current_bid": {
+          "name": "current_bid",
+          "type": "bigint",
+          "primaryKey": false,
+          "notNull": false
+        },
+        "bid_currency": {
+          "name": "bid_currency",
+          "type": "text",
+          "primaryKey": false,
+          "notNull": false
+        },
+        "first_seen_at": {
+          "name": "first_seen_at",
+          "type": "timestamp with time zone",
+          "primaryKey": false,
+          "notNull": true
+        },
+        "last_seen_at": {
+          "name": "last_seen_at",
+          "type": "timestamp with time zone",
+          "primaryKey": false,
+          "notNull": true
+        },
+        "last_checked_at": {
+          "name": "last_checked_at",
+          "type": "timestamp with time zone",
+          "primaryKey": false,
+          "notNull": true
+        }
+      },
+      "indexes": {
+        "auction_lot_occurrence_unq": {
+          "name": "auction_lot_occurrence_unq",
+          "columns": [
+            {
+              "expression": "auction_id",
+              "isExpression": false,
+              "asc": true,
+              "nulls": "last"
+            },
+            {
+              "expression": "source_key",
+              "isExpression": false,
+              "asc": true,
+              "nulls": "last"
+            }
+          ],
+          "isUnique": true,
+          "concurrently": false,
+          "method": "btree",
+          "with": {}
+        },
+        "auction_lot_bottle_idx": {
+          "name": "auction_lot_bottle_idx",
+          "columns": [
+            {
+              "expression": "bottle_id",
+              "isExpression": false,
+              "asc": true,
+              "nulls": "last"
+            }
+          ],
+          "isUnique": false,
+          "concurrently": false,
+          "method": "btree",
+          "with": {}
+        },
+        "auction_lot_state_end_idx": {
+          "name": "auction_lot_state_end_idx",
+          "columns": [
+            {
+              "expression": "state",
+              "isExpression": false,
+              "asc": true,
+              "nulls": "last"
+            },
+            {
+              "expression": "ends_at",
+              "isExpression": false,
+              "asc": true,
+              "nulls": "last"
+            }
+          ],
+          "isUnique": false,
+          "concurrently": false,
+          "method": "btree",
+          "with": {}
+        }
+      },
+      "foreignKeys": {
+        "auction_lot_auction_id_auction_id_fk": {
+          "name": "auction_lot_auction_id_auction_id_fk",
+          "tableFrom": "auction_lot",
+          "tableTo": "auction",
+          "columnsFrom": [
+            "auction_id"
+          ],
+          "columnsTo": [
+            "id"
+          ],
+          "onDelete": "no action",
+          "onUpdate": "no action"
+        },
+        "auction_lot_bottle_id_bottle_id_fk": {
+          "name": "auction_lot_bottle_id_bottle_id_fk",
+          "tableFrom": "auction_lot",
+          "tableTo": "bottle",
+          "columnsFrom": [
+            "bottle_id"
+          ],
+          "columnsTo": [
+            "id"
+          ],
+          "onDelete": "no action",
+          "onUpdate": "no action"
+        },
+        "auction_lot_match_check_id_bottle_check_id_fk": {
+          "name": "auction_lot_match_check_id_bottle_check_id_fk",
+          "tableFrom": "auction_lot",
+          "tableTo": "bottle_check",
+          "columnsFrom": [
+            "match_check_id"
+          ],
+          "columnsTo": [
+            "id"
+          ],
+          "onDelete": "no action",
+          "onUpdate": "no action"
+        },
+        "auction_lot_matched_by_id_user_id_fk": {
+          "name": "auction_lot_matched_by_id_user_id_fk",
+          "tableFrom": "auction_lot",
+          "tableTo": "user",
+          "columnsFrom": [
+            "matched_by_id"
+          ],
+          "columnsTo": [
+            "id"
+          ],
+          "onDelete": "set null",
+          "onUpdate": "no action"
+        }
+      },
+      "compositePrimaryKeys": {},
+      "uniqueConstraints": {},
+      "policies": {},
+      "checkConstraints": {
+        "auction_lot_volume_check": {
+          "name": "auction_lot_volume_check",
+          "value": "\"auction_lot\".\"volume\" IS NULL OR \"auction_lot\".\"volume\" > 0"
+        },
+        "auction_lot_bid_check": {
+          "name": "auction_lot_bid_check",
+          "value": "(\"auction_lot\".\"current_bid\" IS NULL AND \"auction_lot\".\"bid_currency\" IS NULL) OR (\"auction_lot\".\"current_bid\" > 0 AND \"auction_lot\".\"bid_currency\" IN ('gbp','usd','eur'))"
+        },
+        "auction_lot_match_check": {
+          "name": "auction_lot_match_check",
+          "value": "(\"auction_lot\".\"bottle_id\" IS NOT NULL) = (\"auction_lot\".\"match_status\" = 'matched')"
+        }
+      },
+      "isRLSEnabled": false
+    },
+    "public.auction_watch": {
+      "name": "auction_watch",
+      "schema": "",
+      "columns": {
+        "id": {
+          "name": "id",
+          "type": "bigserial",
+          "primaryKey": true,
+          "notNull": true
+        },
+        "user_id": {
+          "name": "user_id",
+          "type": "bigint",
+          "primaryKey": false,
+          "notNull": true
+        },
+        "bottle_id": {
+          "name": "bottle_id",
+          "type": "bigint",
+          "primaryKey": false,
+          "notNull": true
+        },
+        "created_at": {
+          "name": "created_at",
+          "type": "timestamp with time zone",
+          "primaryKey": false,
+          "notNull": true,
+          "default": "now()"
+        }
+      },
+      "indexes": {
+        "auction_watch_user_bottle_unq": {
+          "name": "auction_watch_user_bottle_unq",
+          "columns": [
+            {
+              "expression": "user_id",
+              "isExpression": false,
+              "asc": true,
+              "nulls": "last"
+            },
+            {
+              "expression": "bottle_id",
+              "isExpression": false,
+              "asc": true,
+              "nulls": "last"
+            }
+          ],
+          "isUnique": true,
+          "concurrently": false,
+          "method": "btree",
+          "with": {}
+        },
+        "auction_watch_bottle_idx": {
+          "name": "auction_watch_bottle_idx",
+          "columns": [
+            {
+              "expression": "bottle_id",
+              "isExpression": false,
+              "asc": true,
+              "nulls": "last"
+            }
+          ],
+          "isUnique": false,
+          "concurrently": false,
+          "method": "btree",
+          "with": {}
+        }
+      },
+      "foreignKeys": {
+        "auction_watch_user_id_user_id_fk": {
+          "name": "auction_watch_user_id_user_id_fk",
+          "tableFrom": "auction_watch",
+          "tableTo": "user",
+          "columnsFrom": [
+            "user_id"
+          ],
+          "columnsTo": [
+            "id"
+          ],
+          "onDelete": "cascade",
+          "onUpdate": "no action"
+        },
+        "auction_watch_bottle_id_bottle_id_fk": {
+          "name": "auction_watch_bottle_id_bottle_id_fk",
+          "tableFrom": "auction_watch",
+          "tableTo": "bottle",
+          "columnsFrom": [
+            "bottle_id"
+          ],
+          "columnsTo": [
+            "id"
+          ],
+          "onDelete": "no action",
+          "onUpdate": "no action"
+        }
+      },
+      "compositePrimaryKeys": {},
+      "uniqueConstraints": {},
+      "policies": {},
+      "checkConstraints": {},
+      "isRLSEnabled": false
+    },
+    "public.auction": {
+      "name": "auction",
+      "schema": "",
+      "columns": {
+        "id": {
+          "name": "id",
+          "type": "bigserial",
+          "primaryKey": true,
+          "notNull": true
+        },
+        "external_site_id": {
+          "name": "external_site_id",
+          "type": "bigint",
+          "primaryKey": false,
+          "notNull": true
+        },
+        "source_key": {
+          "name": "source_key",
+          "type": "text",
+          "primaryKey": false,
+          "notNull": true
+        },
+        "name": {
+          "name": "name",
+          "type": "text",
+          "primaryKey": false,
+          "notNull": true
+        },
+        "url": {
+          "name": "url",
+          "type": "text",
+          "primaryKey": false,
+          "notNull": true
+        },
+        "starts_at": {
+          "name": "starts_at",
+          "type": "timestamp with time zone",
+          "primaryKey": false,
+          "notNull": false
+        },
+        "ends_at": {
+          "name": "ends_at",
+          "type": "timestamp with time zone",
+          "primaryKey": false,
+          "notNull": false
+        },
+        "last_checked_at": {
+          "name": "last_checked_at",
+          "type": "timestamp with time zone",
+          "primaryKey": false,
+          "notNull": true
+        }
+      },
+      "indexes": {
+        "auction_site_source_unq": {
+          "name": "auction_site_source_unq",
+          "columns": [
+            {
+              "expression": "external_site_id",
+              "isExpression": false,
+              "asc": true,
+              "nulls": "last"
+            },
+            {
+              "expression": "source_key",
+              "isExpression": false,
+              "asc": true,
+              "nulls": "last"
+            }
+          ],
+          "isUnique": true,
+          "concurrently": false,
+          "method": "btree",
+          "with": {}
+        }
+      },
+      "foreignKeys": {
+        "auction_external_site_id_external_site_id_fk": {
+          "name": "auction_external_site_id_external_site_id_fk",
+          "tableFrom": "auction",
+          "tableTo": "external_site",
+          "columnsFrom": [
+            "external_site_id"
+          ],
+          "columnsTo": [
+            "id"
+          ],
+          "onDelete": "no action",
           "onUpdate": "no action"
         }
       },
@@ -4248,36 +4979,6 @@
           "method": "btree",
           "with": {}
         },
-        "entity_name_lower_pattern_idx": {
-          "name": "entity_name_lower_pattern_idx",
-          "columns": [
-            {
-              "expression": "LOWER(\"name\") text_pattern_ops",
-              "asc": true,
-              "isExpression": true,
-              "nulls": "last"
-            }
-          ],
-          "isUnique": false,
-          "concurrently": false,
-          "method": "btree",
-          "with": {}
-        },
-        "entity_short_name_lower_pattern_idx": {
-          "name": "entity_short_name_lower_pattern_idx",
-          "columns": [
-            {
-              "expression": "LOWER(\"short_name\") text_pattern_ops",
-              "asc": true,
-              "isExpression": true,
-              "nulls": "last"
-            }
-          ],
-          "isUnique": false,
-          "concurrently": false,
-          "method": "btree",
-          "with": {}
-        },
         "entity_normalized_name_idx": {
           "name": "entity_normalized_name_idx",
           "columns": [
@@ -4844,21 +5545,6 @@
             }
           ],
           "isUnique": true,
-          "concurrently": false,
-          "method": "btree",
-          "with": {}
-        },
-        "entity_reference_name_lower_pattern_idx": {
-          "name": "entity_reference_name_lower_pattern_idx",
-          "columns": [
-            {
-              "expression": "LOWER(\"name\") text_pattern_ops",
-              "asc": true,
-              "isExpression": true,
-              "nulls": "last"
-            }
-          ],
-          "isUnique": false,
           "concurrently": false,
           "method": "btree",
           "with": {}
@@ -11361,6 +12047,46 @@
         "user"
       ]
     },
+    "public.auction_lot_state": {
+      "name": "auction_lot_state",
+      "schema": "public",
+      "values": [
+        "upcoming",
+        "live",
+        "aftersale",
+        "closed",
+        "withdrawn",
+        "unknown"
+      ]
+    },
+    "public.auction_match_status": {
+      "name": "auction_match_status",
+      "schema": "public",
+      "values": [
+        "pending",
+        "matched",
+        "review",
+        "ignored"
+      ]
+    },
+    "public.auction_outcome": {
+      "name": "auction_outcome",
+      "schema": "public",
+      "values": [
+        "sold",
+        "unsold",
+        "cancelled",
+        "unknown"
+      ]
+    },
+    "public.auction_price_kind": {
+      "name": "auction_price_kind",
+      "schema": "public",
+      "values": [
+        "hammer",
+        "aftersale"
+      ]
+    },
     "public.badge_award_object_type": {
       "name": "badge_award_object_type",
       "schema": "public",
@@ -11652,7 +12378,8 @@
       "values": [
         "comment",
         "toast",
-        "friend_request"
+        "friend_request",
+        "auction_available"
       ]
     },
     "public.pendingUploadKind": {

@@ -378,7 +378,7 @@ describe("assignBottleReferenceInTransaction", () => {
     }
   });
 
-  test("allows concurrent assignments that converge on the same reference identity", async ({
+  test("concurrent reference reuse preserves the original approval", async ({
     fixtures,
   }) => {
     const bottle = await fixtures.Bottle();
@@ -407,7 +407,7 @@ describe("assignBottleReferenceInTransaction", () => {
     expect(await getAlias(source.name)).toMatchObject({
       bottleId: bottle.id,
       assignmentSource: "source_approved",
-      assignedByActorId: bottle.createdByActorId,
+      assignedByActorId: source.assignedByActorId,
     });
   });
 

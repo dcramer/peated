@@ -54,6 +54,26 @@ export function formQueryOptions<
   };
 }
 
+/**
+ * Starts a client query from data the server loaded for this page view and
+ * discards it when the page unmounts.
+ *
+ * A cached copy would win over newer server data on the next visit, because
+ * `initialData` only applies to a new query. Invalidation does not fix that:
+ * TanStack Query skips inactive queries that never fetched, and our default
+ * `refetchOnMount: false` keeps the old copy on remount.
+ */
+export function serverDataQueryOptions<
+  const TOptions extends { queryKey: readonly unknown[] },
+  TData,
+>(options: TOptions, initialData: TData) {
+  return {
+    ...options,
+    initialData,
+    gcTime: 0,
+  };
+}
+
 let browserQueryClient: QueryClient | undefined = undefined;
 
 // isServerComponent must be true for any server component

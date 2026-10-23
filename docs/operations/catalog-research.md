@@ -93,6 +93,13 @@ brand page mixed proper releases, packaging variants, tasting samples, and
 misattributed Suntory bottles, so every exact identity required independent
 producer, auction, or retailer evidence.
 
+Peated's own public API has a pacing limit for catalog-wide reads. Page
+`GET /v1/bottles?sort=created&limit=100` one request at a time: a full pass of
+about 32,000 Bottles takes about an hour. Parallel deep pages slowed each
+request to over a minute. For "what changed recently", read `GET /v1/changes`
+instead: an update row holds only the changed fields, so the name a Bottle had
+before a pass comes from the earlier `add` or `update` row.
+
 ## Common Mistakes
 
 - A current range is not the full catalog.
@@ -124,12 +131,25 @@ producer, auction, or retailer evidence.
 - Collector indexes can contain fabricated or misidentified lead entries. Verify
   the exact label against an independent auction, producer, or retailer source
   before creating a Bottle; a plausible old date and name are not evidence.
-- An exact image may still lack permission for Peated to store it.
+- An exact image may still lack permission for Peated to store it. The
+  releasing producer's or bottler's own official image is the exception; see
+  [Review Images](./catalog-maintenance.md#review-images).
+- Producer product pages for sold-out releases often drop off live sites. A
+  Wayback capture of a producer news page can still hold the full-size image,
+  but client-rendered shop pages (malts.com 2020–2021) capture blank.
 - Creating an Entity with an address triggers geocoding that can replace the
   address with a wrong street. Re-read the Entity and correct the address and
   coordinates.
 - A shared Bottle rename fans out to every Bottle in its group. Read the edit
   context first and give each member its own edition in the same pass.
+- Sending `statedAge: null` can expose an older age stored on the Bottle's
+  group. Check the age in the PATCH response and send `null` again if it
+  is not empty.
+- A Bottle merge returns 409 when the retired Bottle's full name matches
+  another Bottle's reference (a bare `Benromach Organic` beside the no-age
+  Organic). Rename the retired Bottle to its exact name first, then merge.
+- Whisky Auctioneer lot text can give the wrong bottling year. Zoom the lot
+  photo and trust the label.
 - A direct image URL does not record its source page or license. Count image
   identity, source-page provenance, and reuse status separately in the final
   audit.

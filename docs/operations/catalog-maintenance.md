@@ -97,19 +97,24 @@ Then apply these rules:
   [Who Is The Brand, Series, And Bottler](../architecture/whisky-identity-model.md#who-is-the-brand-series-and-bottler).
   An official Brand or distillery release has no bottler. Do not infer one
   from an owner, importer, distributor, or physical packer.
-- `name` is the common name of the bottle: the expression as the producer's
-  product title, the label, and the trade name it, without the Brand. Keep any
-  age, vintage, cask number, or strength wording that the title or label
-  prints, because that wording is how people know the bottle. Also store those
-  facts in their fields. Do not add age, year, ABV, cask number, outturn, or
-  package text that the producer does not print, and never build a name from
-  fields to make it unique. A generic word such as `Single Malt` is a name
-  only when the marketed name is exactly that. Use `edition` for an explicit
-  marketed release descriptor such as `2022 Edition`, `Batch 24`, or a
-  numbered collection entry. Copy its wording from the producer's product
-  title or visible label. Narrative prose can prove that a code identifies a
-  release, but it cannot add generic words such as `Release`, `Edition`,
-  `Batch`, or `Volume` that the title and label omit.
+- Set `name`, `edition`, and `caskNumber` with the table in
+  [Bottle Name, Edition, And Cask Number](../architecture/whisky-identity-model.md#bottle-name-edition-and-cask-number).
+  `name` is what people call the bottle. A Bottle named for its distillery is
+  the distillery and vintage, such as `Clynelish 1972`; add the age only when
+  the same Brand has another Bottle of that distillery and vintage, and then
+  add it to both. `edition` holds a batch, selection, or market the label
+  prints, such as `Batch 24` or `for La Maison du Whisky`; it shows beside the
+  title, not in it. Every cask number goes in `caskNumber`, never in
+  `edition`. Copy edition wording from the producer's product title or visible
+  label; narrative prose cannot add words such as `Release`, `Edition`,
+  `Batch`, or `Volume`.
+- The API rejects an `edition` that repeats the `caskNumber`, and a name,
+  Brand, Series, edition, vintage, or age change that leaves two Bottles in
+  different groups with the same title and edition but different vintages or
+  ages. Fix the names instead of working around the check. Bottles in one
+  group share a name, so the check does not compare them with each other.
+  Entity and Series merges and Brand repairs move Bottles without the check,
+  so review same-named releases after a merge.
 - The server normalizes `name` on create and update: age wording such as
   `22 Years` or `Aged 7 Years` becomes `22-year-old` or `Aged 7-year-old`, so
   write `7-year-old` rather than `Aged 7 Years`. See
@@ -117,8 +122,8 @@ Then apply these rules:
   before writing names with ages or batch codes.
 - Before changing a name, read the Bottle edit context. A name change is
   shared and updates every Bottle in the group. When a group has more than one
-  member, give each member its own `edition` in the same pass so no sibling
-  is left with a bare shared name.
+  member, give each member its own `edition` in the same pass so every sibling
+  shows a release fact beside the shared title.
 - Store only known date parts. Use `releaseYear`, then `releaseMonth`, then
   `releaseDay`. A month needs a year, and a day needs a month. Do not invent the
   first day of a month. Do not copy a distillation or bottling date into release
@@ -128,6 +133,11 @@ Then apply these rules:
 - Merge records only when they describe the same marketed release. Package
   volume and market packaging alone do not create a new Bottle. Different
   vintage, age, ABV, edition, or cask facts usually require separate Bottles.
+  Records with the same name are not proof of a duplicate. Before merging,
+  read both records' references and prices: a batch, season, or proof printed
+  only there can mark separate releases. For example, Parker's Heritage
+  Collection 10th Edition was bottled separately from fall 1990 and spring
+  1991 distillations, and only the back label shows which.
 - Unaged new-make or new-pot spirit is not whisky and is out of scope. So is
   anything that is not a marketed release under the identity model's
   definition: visitor hand-fills, private casks never sold as labeled
@@ -181,6 +191,13 @@ using a similar release.
 - Check the source site's reuse terms. Record the canonical source page in
   `sourceUrl` and the license or reuse terms in `license`. A direct image URL is
   not enough provenance.
+- The official image of the exact Bottle from the company that released it
+  (the producer, or the independent bottler for its own bottlings) may be
+  stored even when its site terms grant no reuse license (maintainer decision,
+  October 2026). Use a page that company runs, or a Wayback capture of one, as
+  `sourceUrl`, and name the owner and the missing grant in `license`, such as
+  `© Diageo. Official product image; Diageo site terms grant no reuse
+license.` Retailer, auction, and collector photos still need a reuse grant.
 - Record why no usable image was found when a Bottle remains without one.
 - After upload, fetch and inspect the stored image and confirm its `sourceUrl`
   and `license` survived processing.
@@ -320,6 +337,16 @@ that will remain, `222`:
 pnpm cli api post /bottles/111/merge --input /tmp/bottle-merge.json
 ```
 
+Keep as survivor the Bottle with tastings, an image, or the older ID. The
+survivor keeps only its own fields. Tastings, prices, collections, aliases, and
+references move to it, but the retired Bottle's facts do not. After the
+merge:
+
+- patch the survivor with any facts from the retired Bottle that the evidence
+  supports, such as `abv`, `statedAge`, or `distillers`;
+- list the survivor's references and unassign any moved reference whose text
+  names another release, such as an automatic name with the wrong batch.
+
 An Entity merge uses the same body and direction with
 `POST /entities/111/merge` (moderator only). Merge Entities only when the
 producer's own pages prove that two records describe one organization or one
@@ -356,6 +383,12 @@ pnpm cli api delete /bottles/123/aliases/789
   that scope. Summarize the bounded scope and planned counts before writing.
   Get separate explicit authorization before merges, deletes, uncertain
   identity changes, or changes that affect records outside the named scope.
+- A direct request to moderate the store-price queue also authorizes a merge
+  of a duplicate Bottle and a correction to a Bottle when a listing decision
+  depends on it. Each one needs evidence that it is correct: the label image,
+  a producer source, or the store's own statement that two listings hold the
+  same whisky. Record that evidence in the research record. Deletes and
+  uncertain identity changes still need separate authorization.
 - Read every Bottle immediately before changing it. Stop if an ID, identifying
   fact, or current value differs from the work list.
 - Read the Bottle edit context before every shared rename. Confirm the shared
@@ -373,7 +406,8 @@ pnpm cli api delete /bottles/123/aliases/789
 - Fetch each uploaded `imageUrl` again and inspect the stored image. Confirm that
   it still shows the expected release after server processing.
 - After a merge, fetch both IDs. Confirm that the old ID resolves to the chosen
-  survivor and that references, facts, and the best image were preserved.
+  survivor, that its facts include the retired Bottle's supported facts, and
+  that references and the best image were preserved.
 - After a name change or merge, fetch aliases and references again. Confirm that
   verified public names remain visible and active references point to the
   expected Bottle.

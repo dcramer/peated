@@ -15,6 +15,7 @@ export const notificationTypeEnum = pgEnum("notification_type", [
   "comment",
   "toast",
   "friend_request",
+  "auction_available",
 ]);
 
 // this table is intended to delete notifications which are older than X time and read

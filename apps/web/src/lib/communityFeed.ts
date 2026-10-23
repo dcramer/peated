@@ -3,7 +3,10 @@ import type {
   CommunityFeedBottle,
   CommunityFeedItem,
 } from "@peated/web/components/communityFeed.stylex";
-import { getBottleIdentityProps } from "@peated/web/lib/bottleListItem";
+import {
+  getBottleIdentityProps,
+  type BottleListItemOptions,
+} from "@peated/web/lib/bottleListItem";
 import {
   getBottleUrl,
   getMemberReviewUrl,
@@ -18,11 +21,18 @@ type Bottle = Outputs["bottles"]["list"]["results"][number];
 type MemberReview = Outputs["memberReviews"]["list"]["results"][number];
 type Tasting = Outputs["tastings"]["list"]["results"][number];
 
-/** Activity feed rule: real images crop to fill their fixed thumbnail frame. */
-function feedBottle(bottle: Bottle): CommunityFeedBottle {
+/**
+ * Activity feed rule: real images crop to fill their fixed thumbnail frame.
+ * Library additions use compact rows, which hide provenance, so their series
+ * stays in the name.
+ */
+function feedBottle(
+  bottle: Bottle,
+  seriesPlacement?: BottleListItemOptions["seriesPlacement"],
+): CommunityFeedBottle {
   return {
     id: bottle.peatedId,
-    ...getBottleIdentityProps(bottle),
+    ...getBottleIdentityProps(bottle, { seriesPlacement }),
     href: getBottleUrl(bottle),
     imageFit: "cover",
     imageUrl: bottle.imageUrl,
@@ -37,7 +47,9 @@ function tastingFeedItem(tasting: Tasting, id = String(tasting.id)) {
     actorHref: `/users/${tasting.createdBy.username}`,
     actorImageUrl: tasting.createdBy.pictureUrl,
     action: "tasted",
-    date: tasting.createdAt,
+    // Feeds order tastings by when they were posted but show when they were had.
+    date: tasting.tastedAt,
+    postedAt: tasting.createdAt,
     href: getTastingUrl(tasting),
     bottles: [
       {
@@ -72,6 +84,7 @@ export function getMemberReviewFeedItems(
     actorImageUrl: review.createdBy.pictureUrl,
     action: "reviewed",
     date: review.createdAt,
+    postedAt: review.createdAt,
     href: getMemberReviewUrl(review),
     bottles: [
       {
@@ -91,6 +104,7 @@ function criticReviewFeedItem(
 ): CommunityFeedItem | null {
   if (!review.bottle) return null;
   const source = review.site?.name ?? review.reviewerName ?? "Critic";
+  const date = review.article.publishedAt ?? review.createdAt;
   return {
     id,
     kind: "critic_review",
@@ -98,7 +112,8 @@ function criticReviewFeedItem(
     actorHref: review.url,
     actorImageUrl: review.site?.imageUrl,
     action: "published a review",
-    date: review.article.publishedAt ?? review.createdAt,
+    date,
+    postedAt: date,
     href: review.url,
     bottles: [
       {
@@ -146,7 +161,9 @@ export function getCommunityFeedItems({
     if (entry.type === "critic_review") {
       const review = entry.review;
       const item = criticReviewFeedItem(review, entry.id);
-      return item ? [{ ...item, date: entry.createdAt }] : [];
+      return item
+        ? [{ ...item, date: entry.createdAt, postedAt: entry.createdAt }]
+        : [];
     }
     const actor = {
       actor: entry.createdBy.username,
@@ -166,6 +183,7 @@ export function getCommunityFeedItems({
           kind: "member_review",
           action: "reviewed",
           date: entry.createdAt,
+          postedAt: entry.createdAt,
           href: getMemberReviewUrl(entry.review),
           bottles: [
             {
@@ -192,13 +210,14 @@ export function getCommunityFeedItems({
         id: entry.id,
         kind: "collection_add",
         date: entry.createdAt,
+        postedAt: entry.createdAt,
         href: entry.collection.href ?? undefined,
         action: `added ${count === 1 ? "a bottle" : `${count} bottles`} to${entry.collection.href ? "" : ` ${destinationLabel}`}`,
         destination: entry.collection.href
           ? { href: entry.collection.href, label: destinationLabel }
           : undefined,
         bottles: entry.items.map((item) => ({
-          ...feedBottle(item.bottle),
+          ...feedBottle(item.bottle, "name"),
           id: String(item.id),
           imageUrl: item.imageUrl ?? item.bottle.imageUrl,
         })),
@@ -213,7 +232,7 @@ export function getCommunityFeedItems({
     ];
   });
   return [...criticItems, ...memberItems].sort(
-    (left, right) => Date.parse(right.date) - Date.parse(left.date),
+    (left, right) => Date.parse(right.postedAt) - Date.parse(left.postedAt),
   );
 }
 

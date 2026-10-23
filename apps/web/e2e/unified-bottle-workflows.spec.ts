@@ -1,4 +1,7 @@
-import { formatBottleDisplayName } from "@peated/server/lib/bottleDisplayName";
+import {
+  formatBottleDisplayName,
+  formatBottleLabel,
+} from "@peated/server/lib/bottleDisplayName";
 import { z } from "zod";
 import { expect, type Page, type Request, test, type TestInfo } from "./test";
 
@@ -76,7 +79,7 @@ test.describe("unified Bottle workflows", () => {
     expect(independentBottle.releaseYear).toBe(2025);
     expect(independentBottle.maturation).toBe("Oloroso hogshead");
     expect(independentBottle.outturn).toBe(240);
-    expect(independentBottle.caskNumber).toBe("#5678");
+    expect(independentBottle.caskNumber).toBe("5678");
     expect(independentBottle.description).toBeNull();
     expect(independentBottle.descriptionSrc).toBeNull();
     expect(independentBottle.tastingNotes).toBeUndefined();
@@ -321,13 +324,13 @@ test.describe("unified Bottle workflows", () => {
     await expect(
       page.getByRole("radio", {
         exact: true,
-        name: `Keep ${formatBottleDisplayName(exactMergeOtherBottle)} (${exactMergeOtherBottle.peatedId}) Retire ${formatBottleDisplayName(existingBottleDetails)} (${existingBottleDetails.peatedId}).`,
+        name: `Keep ${formatBottleLabel(exactMergeOtherBottle)} (${exactMergeOtherBottle.peatedId}) Retire ${formatBottleLabel(existingBottleDetails)} (${existingBottleDetails.peatedId}).`,
       }),
     ).toBeChecked();
     await expect(
       page.getByRole("radio", {
         exact: true,
-        name: `Keep ${formatBottleDisplayName(existingBottleDetails)} (${existingBottleDetails.peatedId}) Retire ${formatBottleDisplayName(exactMergeOtherBottle)} (${exactMergeOtherBottle.peatedId}).`,
+        name: `Keep ${formatBottleLabel(existingBottleDetails)} (${existingBottleDetails.peatedId}) Retire ${formatBottleLabel(exactMergeOtherBottle)} (${exactMergeOtherBottle.peatedId}).`,
       }),
     ).toBeVisible();
 

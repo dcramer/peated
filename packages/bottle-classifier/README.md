@@ -117,7 +117,9 @@ The server and eval runner read these settings:
 | `BOTTLE_CLASSIFIER_EVAL_FIXED_EVIDENCE_FILE` | Reviewed test case evidence for controlled evals | none              |
 | `BOTTLE_CLASSIFIER_EVAL_FIXTURE_IDS`         | Comma-separated exact test case IDs to run       | all               |
 
-Model calls use Vercel AI Gateway. GPT-5 and GPT-6 model names receive the
+Model calls use Vercel AI Gateway. A model name without a provider prefix is
+sent to OpenAI; name another provider in full, such as
+`anthropic/claude-haiku-5.5`. GPT-5 and GPT-6 model names receive the
 reasoning effort; other names get a fixed temperature and no reasoning setting.
 Without Firecrawl, the classifier has no web
 tools. The eval config loads the repo-root `.env.local`; shell values take

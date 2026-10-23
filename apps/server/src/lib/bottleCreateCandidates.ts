@@ -256,6 +256,15 @@ function candidateScore(
     sameChoice(input.bottler, candidate.bottler) ||
     sameChoice(input.series, candidate.series);
 
+  // Bottle search owns this rule: the distillery is the physical producer, so
+  // a Bottle that shares none of the entered distilleries is another Bottle.
+  // A Bottle with no stored distillery stays, because missing is not a conflict.
+  if (
+    input.distillers?.length &&
+    candidate.distillers.length &&
+    !distillerMatch
+  )
+    return null;
   // A generic age-only name needs a matching stored identity anchor.
   if (inputDistinctive.size === 0 && !identityMatch) return null;
   if (

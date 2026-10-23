@@ -1086,10 +1086,13 @@ describe("POST /bottles", () => {
     expect(change).toBeDefined();
     expect(change.type).toEqual("add");
     expect(change.displayName).toEqual(`${brand.name} Limited Edition`);
-    expect(workerClient.pushUniqueJob).toHaveBeenCalledWith(
-      "IndexBottleSeriesSearch",
-      { seriesId: newSeries.id },
-    );
+
+    // Indexing jobs do not run in tests, so this proves creation wrote the
+    // search document.
+    const { results } = await routerClient.bottleSeries.list({
+      query: "limited edition",
+    });
+    expect(results.map(({ id }) => id)).toEqual([newSeries.id]);
   });
 
   test("rejects invalid series ID", async ({ defaults, fixtures }) => {

@@ -51,6 +51,7 @@ export default implement(collectionBottleListContract).handler(async function ({
     (input.query ||
       input.brand ||
       input.distiller ||
+      input.entity ||
       (reservedCollection && input.status))
   ) {
     throw errors.BAD_REQUEST({
@@ -110,6 +111,19 @@ export default implement(collectionBottleListContract).handler(async function ({
   }
   if (input.brand) {
     baseWhere.push(eq(bottles.brandId, input.brand));
+  }
+  if (input.entity) {
+    baseWhere.push(
+      or(
+        eq(bottles.brandId, input.entity),
+        eq(bottles.bottlerId, input.entity),
+        sql`EXISTS(
+          SELECT FROM ${bottlesToDistillers}
+          WHERE ${bottlesToDistillers.distillerId} = ${input.entity}
+            AND ${bottlesToDistillers.bottleId} = ${collectionBottles.bottleId}
+        )`,
+      ),
+    );
   }
   if (input.distiller) {
     baseWhere.push(sql`EXISTS(

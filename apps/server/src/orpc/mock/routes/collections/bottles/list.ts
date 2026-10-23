@@ -27,6 +27,7 @@ export default mockOS.collections.bottles.list.handler(
       (input.query ||
         input.brand ||
         input.distiller ||
+        input.entity ||
         (isReserved && input.status))
     ) {
       throw errors.BAD_REQUEST({
@@ -48,6 +49,12 @@ export default mockOS.collections.bottles.list.handler(
           item.bottle.brand.name,
         ) &&
         (input.brand == null || item.bottle.brand.id === input.brand) &&
+        (input.entity == null ||
+          item.bottle.brand.id === input.entity ||
+          item.bottle.bottler?.id === input.entity ||
+          item.bottle.distillers.some(
+            (entity) => entity.id === input.entity,
+          )) &&
         (input.distiller == null ||
           item.bottle.distillers.some(
             (entity) => entity.id === input.distiller,

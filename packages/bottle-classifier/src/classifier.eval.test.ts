@@ -482,7 +482,7 @@ function evaluateDecisionContract(
       )
     ) {
       failures.push(
-        `proposedBottle.name expected one of ${expected.proposedBottleNameOneOf.join(", ")}`,
+        `proposedBottle.name expected one of ${expected.proposedBottleNameOneOf.join(", ")} but got ${JSON.stringify(proposedBottleName)}`,
       );
     }
   }
@@ -706,6 +706,10 @@ function buildClassifierAdapters(
   if (entityContexts.size > 0) {
     dataSource.getEntityContext = async (entityId: number) =>
       entityContexts.get(entityId) ?? null;
+    if (!testCase.testCase.localCatalog) {
+      dataSource.searchEntities =
+        createInspectedEntitySearch(inspectedEntities);
+    }
   }
   return dataSource;
 }
@@ -714,21 +718,26 @@ function createClassifierOptions(testCase: ClassifierScenarioEvalCase) {
   return createEvalClassifierOptions(buildClassifierAdapters(testCase));
 }
 
-function createEvalRuntime(fixtureId: string) {
+function createEvalRuntime(fixtureId: string, webEvidenceFile?: string) {
   const toolEvents: TranscriptEvent[] = [];
   const fixedEvidenceFile =
-    process.env.BOTTLE_CLASSIFIER_EVAL_FIXED_EVIDENCE_FILE;
+    process.env.BOTTLE_CLASSIFIER_EVAL_FIXED_EVIDENCE_FILE ?? webEvidenceFile;
   const fixedEvidence = fixedEvidenceFile
     ? loadFixedWebEvidenceCase(fixedEvidenceFile, fixtureId)
     : null;
   const options: Pick<
     CreateBottleClassifierOptions,
     | "executeWebSearch"
+    | "firecrawlApiKey"
     | "initialSearchEvidence"
     | "observeReferenceAgentDecision"
     | "observeToolEvent"
     | "overrides"
   > = {
+    // Controlled evals own web I/O. Enable the normal tool schemas; the fixed executor never calls a provider.
+    firecrawlApiKey: fixedEvidence
+      ? "fixed-evidence"
+      : process.env.FIRECRAWL_API_KEY,
     initialSearchEvidence: fixedEvidence?.searchResult.evidence,
     executeWebSearch: fixedEvidence
       ? createFixedWebSearchExecutor(fixedEvidence)
@@ -743,10 +752,9 @@ function createEvalRuntime(fixtureId: string) {
           assertSuccessfulWebSearchReplay(result);
           return result;
         },
-    overrides:
-      fixedEvidence && fixedEvidence.imageResults.length > 0
-        ? { extractFromImage: createFixedImageExtractor(fixedEvidence) }
-        : undefined,
+    overrides: fixedEvidence
+      ? { extractFromImage: createFixedImageExtractor(fixedEvidence) }
+      : undefined,
     observeReferenceAgentDecision: (decision) => {
       toolEvents.push({
         type: "message",
@@ -792,7 +800,10 @@ const classifierHarness = createHarness<ClassifierScenarioEvalCase, JsonValue>({
   name: "bottle-classifier",
   run: async ({ input }) => {
     const startedAt = performance.now();
-    const evalRuntime = createEvalRuntime(input.testCase.fixtureId);
+    const evalRuntime = createEvalRuntime(
+      input.testCase.fixtureId,
+      input.kind === "decision" ? input.testCase.webEvidenceFile : undefined,
+    );
     const {
       result: { result, modelMetadata },
       modelCalls,
@@ -835,7 +846,8 @@ function auditEntityContext(entity: EntityResolution): EntityContext {
   return EntityContextSchema.parse({
     entityId: entity.entityId,
     name: entity.name,
-    shortName: entity.shortName,
+    // Saved production Entities can carry an empty short name.
+    shortName: entity.shortName || null,
     kind: entity.kind,
     website: null,
     country: null,
@@ -844,6 +856,22 @@ function auditEntityContext(entity: EntityResolution): EntityContext {
     aliases: entity.reference ? [entity.reference] : [],
     relatedBottles: [],
   });
+}
+
+// Captured fixtures without a local catalog still need Entity search, or the
+// classifier cannot reuse the inspected Brand and distiller ids.
+function createInspectedEntitySearch(inspectedEntities: EntityResolution[]) {
+  return createLocalCatalogDataSource({
+    entities: inspectedEntities.map((entity) => ({
+      id: entity.entityId,
+      name: entity.name,
+      shortName: entity.shortName || null,
+      aliases: entity.reference ? [entity.reference] : [],
+      kind: entity.kind,
+    })),
+    bottles: [],
+    references: [],
+  }).searchEntities;
 }
 
 function createAuditEvalClassifierOptions(testCase: AuditBottleEvalFixture) {
@@ -861,18 +889,6 @@ function createAuditEvalClassifierOptions(testCase: AuditBottleEvalFixture) {
       auditEntityContext(entity),
     ]),
   );
-  const entitySearch = createLocalCatalogDataSource({
-    entities: inspectedEntities.map((entity) => ({
-      id: entity.entityId,
-      name: entity.name,
-      shortName: entity.shortName,
-      aliases: entity.reference ? [entity.reference] : [],
-      kind: entity.kind,
-    })),
-    bottles: [],
-    references: [],
-  }).searchEntities;
-
   return createEvalClassifierOptions({
     searchBottles: buildSearchBottlesAdapter(testCase),
     getBottleCandidateById: async (bottleId) =>
@@ -880,7 +896,7 @@ function createAuditEvalClassifierOptions(testCase: AuditBottleEvalFixture) {
         (candidate) => candidate.bottleId === bottleId,
       ) ?? null,
     getBottleContext: async (bottleId) => bottleContexts.get(bottleId) ?? null,
-    searchEntities: entitySearch,
+    searchEntities: createInspectedEntitySearch(inspectedEntities),
     getEntityContext: async (entityId) => entityContexts.get(entityId) ?? null,
   });
 }

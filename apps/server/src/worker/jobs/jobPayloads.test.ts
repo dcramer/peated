@@ -2,29 +2,38 @@ import { describe, expect, test } from "vitest";
 import { CapturePriceImageJobArgsSchema } from "./capturePriceImage";
 import { GenerateCountryDetailsJobArgsSchema } from "./generateCountryDetails";
 import { GenerateEntityDetailsJobArgsSchema } from "./generateEntityDetails";
+import { GenerateEntityPronunciationAudioJobArgsSchema } from "./generateEntityPronunciationAudio";
 import { GenerateRegionDetailsJobArgsSchema } from "./generateRegionDetails";
 import { GeocodeCountryLocationJobArgsSchema } from "./geocodeCountryLocation";
 import { GeocodeEntityLocationJobArgsSchema } from "./geocodeEntityLocation";
 import { GeocodeRegionLocationJobArgsSchema } from "./geocodeRegionLocation";
+import { IdentifyTastingDraftJobArgsSchema } from "./identifyTastingDraft";
 import { IndexBottleSeriesSearchJobArgsSchema } from "./indexBottleSeriesSearch";
 import { IndexEntitySearchJobArgsSchema } from "./indexEntitySearch";
 import { OnEntityChangeJobArgsSchema } from "./onEntityChange";
 import { ProcessNotificationJobArgsSchema } from "./processNotification";
 import { ProcessStorePriceMatchRetryRunJobArgsSchema } from "./processStorePriceMatchRetryRun";
+import { ResolveAuctionLotJobArgsSchema } from "./resolveAuctionLot";
 import { ResolveStorePriceBottleJobArgsSchema } from "./resolveStorePriceBottle";
 import { VerifyEntityCreationJobArgsSchema } from "./verifyEntityCreation";
 
 const jobPayloads = [
+  [ResolveAuctionLotJobArgsSchema, { lotId: 1, fingerprint: "source-facts" }],
   [
     CapturePriceImageJobArgsSchema,
     { priceId: 1, imageUrl: "https://example.com/a.jpg" },
   ],
   [GenerateCountryDetailsJobArgsSchema, { countryId: 1 }],
   [GenerateEntityDetailsJobArgsSchema, { entityId: 1 }],
+  [GenerateEntityPronunciationAudioJobArgsSchema, { entityId: 1 }],
   [GenerateRegionDetailsJobArgsSchema, { regionId: 1 }],
   [GeocodeCountryLocationJobArgsSchema, { countryId: 1 }],
   [GeocodeEntityLocationJobArgsSchema, { entityId: 1 }],
   [GeocodeRegionLocationJobArgsSchema, { regionId: 1 }],
+  [
+    IdentifyTastingDraftJobArgsSchema,
+    { draftId: "5f0c9b3e-8c1a-4a57-9a43-2f0b8f6c1d2e" },
+  ],
   [IndexBottleSeriesSearchJobArgsSchema, { seriesId: 1 }],
   [IndexEntitySearchJobArgsSchema, { entityId: 1 }],
   [OnEntityChangeJobArgsSchema, { entityId: 1 }],

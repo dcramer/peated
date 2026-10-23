@@ -1,4 +1,4 @@
-import { formatBottleDisplayName } from "@peated/server/lib/bottleDisplayName";
+import { formatBottleLabel } from "@peated/server/lib/bottleDisplayName";
 import { ButtonLink } from "@peated/web/components/button.stylex";
 import { CommunityFeed } from "@peated/web/components/communityFeed.stylex";
 import {
@@ -34,7 +34,7 @@ export async function generateMetadata(props: {
     props.searchParams,
   ]);
   const bottle = await getBottlePage(parseCatalogRouteId(bottleId));
-  const name = formatBottleDisplayName(bottle);
+  const name = formatBottleLabel(bottle);
   return getCatalogSeoMetadata(
     {
       title: `${name} reviews and tastings`,

@@ -39,32 +39,6 @@ test.describe("Add Bottle", () => {
     );
   });
 
-  test("opens a search result in the Bottle resolver", async ({
-    context,
-    page,
-  }, testInfo) => {
-    await signIn(context, {
-      accessToken: uniqueAccessToken(testInfo, "search-route"),
-    });
-    await page.goto("/search?intent=choose&q=Lagavulin");
-
-    await page
-      .getByRole("link", {
-        name: `${testBrand.name} ${exactSearchBottle.name}`,
-      })
-      .click();
-
-    await expect(page).toHaveURL(
-      `/addBottle?bottle=${exactSearchBottle.id}&intent=choose`,
-    );
-    await expect(
-      page.getByRole("button", { name: "Add to Library" }),
-    ).toBeVisible();
-    await expect(
-      page.getByRole("link", { name: "View bottle" }),
-    ).toHaveAttribute("href", bottlePathPattern(exactSearchBottle.id));
-  });
-
   test("adds a matched label photo to the Library", async ({
     context,
     page,
@@ -87,31 +61,108 @@ test.describe("Add Bottle", () => {
     );
   });
 
-  test("recovers from a photo service outage through search", async ({
+  test("reports a wrong photo match and saves the Bottle chosen next", async ({
+    context,
+    page,
+    snapshot,
+  }, testInfo) => {
+    await signIn(context, {
+      accessToken: uniqueAccessToken(testInfo, "scan-wrong-match"),
+    });
+    await page.goto("/addBottle");
+    await uploadLabel(page);
+    await expect(selectedBottle(page, existingBottle.group.name)).toBeVisible();
+    const wrongMatchButton = page.getByRole("button", {
+      name: "Not my bottle",
+    });
+    await snapshot("Add bottle / Photo match / Light", {
+      ready: wrongMatchButton,
+    });
+    await page.emulateMedia({ colorScheme: "dark" });
+    await snapshot("Add bottle / Photo match / Dark", {
+      ready: wrongMatchButton,
+    });
+    await page.emulateMedia({ colorScheme: "light" });
+
+    const reportRequest = page.waitForRequest((request) =>
+      request.url().includes("/rpc/wrongPhotoMatches/create"),
+    );
+    await wrongMatchButton.click();
+    await reportRequest;
+
+    // The lookup had another candidate, so the screen leads with it.
+    const findYourBottle = page.getByRole("heading", {
+      name: "Is it one of these?",
+    });
+    await expect(findYourBottle).toBeVisible();
+    // Move off the button the click left under the pointer so the snapshot
+    // shows its resting state.
+    await page.mouse.move(0, 0);
+    await expect(
+      page.getByText("Thanks, we've noted the wrong match."),
+    ).toBeVisible();
+    await snapshot("Add bottle / Wrong photo match / Light", {
+      ready: findYourBottle,
+    });
+    await page.emulateMedia({ colorScheme: "dark" });
+    await snapshot("Add bottle / Wrong photo match / Dark", {
+      ready: findYourBottle,
+    });
+    await page.emulateMedia({ colorScheme: "light" });
+    await expect(
+      page.getByRole("link", { name: "Search bottles" }),
+    ).toHaveAttribute("href", /wrongPhotoMatch=9001/);
+
+    // Picking the lookup's other candidate saves it on the report.
+    const pickRequest = page.waitForRequest((request) =>
+      request.url().includes("/rpc/wrongPhotoMatches/update"),
+    );
+    await page
+      .getByRole("button", {
+        name: `Use this bottle: ${exactSearchBottle.fullName}`,
+      })
+      .click();
+    expect((await pickRequest).postData()).toContain(
+      `"correctBottle":${exactSearchBottle.id}`,
+    );
+    await expect(
+      page.getByRole("button", { name: "Add to Library" }),
+    ).toBeVisible();
+    // Changing the Bottle again keeps the report, so the last pick is saved.
+    await expect(
+      page.getByRole("link", { name: "Change bottle" }),
+    ).toHaveAttribute("href", /wrongPhotoMatch=9001/);
+
+    const updateRequest = page.waitForRequest((request) =>
+      request.url().includes("/rpc/wrongPhotoMatches/update"),
+    );
+    await page.goto(
+      `/search?intent=choose&q=Lagavulin&pendingImageId=playwright-photo-upload&wrongPhotoMatch=9001`,
+    );
+    await page
+      .getByRole("link", {
+        name: `${testBrand.name} ${existingBottle.name}`,
+      })
+      .click();
+    // A search result opens the resolver with the photo and report attached.
+    await expect(page).toHaveURL(
+      `/addBottle?bottle=${existingBottle.id}&pendingImageId=playwright-photo-upload&wrongPhotoMatch=9001&intent=choose`,
+    );
+    expect((await updateRequest).postData()).toContain(
+      `"correctBottle":${existingBottle.id}`,
+    );
+    await expect(
+      page.getByRole("link", { name: "View bottle" }),
+    ).toHaveAttribute("href", bottlePathPattern(existingBottle.id));
+  });
+
+  test("keeps the label and likely matches when the photo lookup fails", async ({
     context,
     page,
   }, testInfo) => {
     await signIn(context, {
-      accessToken: uniqueAccessToken(testInfo, "photo-outage"),
+      accessToken: uniqueAccessToken(testInfo, "photo-stream-outage"),
     });
-    await page.route("**/rpc/tastings/photoIdentification", (route) =>
-      route.fulfill({
-        status: 503,
-        contentType: "application/json",
-        headers: {
-          "access-control-allow-origin": "*",
-          "x-sentry-trace-id": "88888888888888888888888888888888",
-        },
-        body: JSON.stringify({
-          json: {
-            defined: true,
-            code: "SERVICE_UNAVAILABLE",
-            status: 503,
-            message: "We can't check photos right now.",
-          },
-        }),
-      }),
-    );
     await page.goto("/addBottle");
     await uploadLabel(page);
     await expect(
@@ -119,10 +170,26 @@ test.describe("Add Bottle", () => {
         "We can't check photos right now. Search by name or try again later.",
       ),
     ).toBeVisible();
+
+    // A new Bottle starts from the streamed label facts and keeps the photo.
+    const createHref = await page
+      .getByRole("link", { name: "Add a new bottle" })
+      .getAttribute("href");
+    const createParams = new URL(createHref ?? "", "http://localhost")
+      .searchParams;
+    expect(createParams.get("name")).toBe(createdBottleName);
+    expect(createParams.get("brandName")).toBe(testBrand.name);
+    expect(createParams.get("pendingImageId")).toBe("playwright-photo-upload");
+
+    // The streamed likely match continues with that Bottle.
     await page
-      .getByRole("link", { name: "Search bottles", exact: true })
+      .getByRole("button", {
+        name: `Use this bottle: ${exactSearchBottle.fullName}`,
+      })
       .click();
-    await expect(page).toHaveURL(/\/search/);
+    await expect(
+      page.getByRole("button", { name: "Add to Library" }),
+    ).toBeVisible();
   });
 
   test("can replace a photo while identification is pending", async ({
@@ -162,11 +229,9 @@ test.describe("Add Bottle", () => {
     await page.clock.install();
     await uploadLabel(page);
     await expect(
-      page.getByText("Reading the label and checking Peated for a match.", {
-        exact: true,
-      }),
+      page.getByRole("status").filter({ hasText: "Reading the label…" }),
     ).toBeVisible();
-    await page.clock.fastForward(120_001);
+    await page.clock.fastForward(600_001);
     await expect(
       page.getByText(
         "This is taking too long. Search by name or try again later.",
@@ -276,10 +341,16 @@ test.describe("Add Bottle", () => {
 
     await expect(page.getByText("1 bottle may match this one.")).toBeVisible();
     await page.getByRole("button", { name: "Review" }).click();
-    await expect(
-      page.getByRole("region", { name: "Bottles that may match" }),
-    ).toContainText(exactSearchBottle.fullName);
-    await page.getByRole("button", { name: "Use this bottle" }).click();
+    // Titles leave the edition out, so find the exact Bottle by the button
+    // label, which names its full stored name.
+    const match = page
+      .getByRole("region", { name: "Bottles that may match" })
+      .getByRole("button", {
+        name: `Use this bottle: ${exactSearchBottle.fullName}`,
+        exact: true,
+      });
+    await expect(match).toBeVisible();
+    await match.click();
 
     await expect(page).toHaveURL(
       `/addBottle?bottle=${exactSearchBottle.id}&pendingImageId=playwright-photo-upload&pendingImageUrl=${encodeURIComponent(pendingImageUrl)}&intent=choose`,
@@ -294,21 +365,25 @@ test.describe("Add Bottle", () => {
     await signIn(context, {
       accessToken: uniqueAccessToken(testInfo, "distinct-release"),
     });
+    let releaseCandidates!: () => void;
+    const candidatesReady = new Promise<void>((resolve) => {
+      releaseCandidates = resolve;
+    });
+    await page.route("**/rpc/bottles/createCandidates*", async (route) => {
+      await candidatesReady;
+      await route.continue();
+    });
     await page.goto(
       `/bottles/new?name=21-year-old&brand=${testBrand.id}&returnAction=view`,
     );
 
-    await expect(page.getByText("1 bottle may match this one.")).toBeVisible();
+    // Save stays usable during the duplicate check and opens the review once
+    // the check returns.
     await reachFinalCreateStep(page);
-    const finalReview = page.getByRole("button", {
-      name: "Review 1 bottle",
-      exact: true,
-    });
-    await snapshot("Add bottle / Final duplicate gate / Desktop", {
-      fullPage: false,
-      ready: finalReview,
-    });
-    await finalReview.click();
+    await page
+      .getByRole("button", { name: "Add a bottle", exact: true })
+      .click();
+    releaseCandidates();
     await expect(
       page.getByRole("button", { name: "Use this bottle" }),
     ).toBeVisible();
@@ -368,7 +443,12 @@ test.describe("Add Bottle", () => {
     const candidates = page.getByRole("region", {
       name: "Bottles that may match",
     });
-    await expect(candidates).not.toContainText(exactSearchBottle.fullName);
+    await expect(
+      candidates.getByRole("button", {
+        name: `Use this bottle: ${exactSearchBottle.fullName}`,
+        exact: true,
+      }),
+    ).toHaveCount(0);
     await expect(
       candidates.getByRole("button", { name: "Use this bottle" }),
     ).toHaveCount(2);

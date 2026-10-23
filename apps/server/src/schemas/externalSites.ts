@@ -43,7 +43,9 @@ export const ExternalSiteRunSchema = z.object({
   requestErrorCount: z.number().int().min(0).nullable(),
   retryCount: z.number().int().min(0),
   rateLimitCount: z.number().int().min(0),
-  recordType: z.enum(["review", "price", "catalog", "bottle"]).nullable(),
+  recordType: z
+    .enum(["review", "price", "catalog", "bottle", "auction"])
+    .nullable(),
   emittedItemCount: z.number().int().min(0),
   newItemCount: z.number().int().min(0),
   existingItemCount: z.number().int().min(0),

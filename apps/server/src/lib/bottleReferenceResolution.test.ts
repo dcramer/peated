@@ -1,15 +1,20 @@
 import { BottleClassificationResultSchema } from "@peated/bottle-classifier";
 import type { BottleClassificationDecision } from "@peated/server/agents/bottleClassifier";
 import { db } from "@peated/server/db";
-import { bottleTombstones, bottles } from "@peated/server/db/schema";
+import {
+  bottleChecks,
+  bottleTombstones,
+  bottles,
+} from "@peated/server/db/schema";
 import { getUserActor } from "@peated/server/lib/actors";
 import {
   lockBottleReferenceResolutionAssignmentInTransaction,
+  persistReviewBottleCheck,
   resolveBottleReferenceTarget as resolveBottleReferenceTargetWithClassifier,
   resolveScrapedBottleReferenceTarget as resolveScrapedBottleReferenceTargetWithClassifier,
   type BottleReferenceResolution,
 } from "@peated/server/lib/bottleReferenceResolution";
-import { eq } from "drizzle-orm";
+import { and, eq } from "drizzle-orm";
 import { beforeEach, describe, expect, test, vi } from "vitest";
 
 type BottleReferenceClassifier = NonNullable<
@@ -78,6 +83,7 @@ function buildClassification(
     status: "classified" as const,
     decision: {
       rationale: "test fixture",
+      confidenceBasis: { webEvidence: "supportive", unresolvedRisks: [] },
       candidateBottleIds: [],
       identityScope: "product",
       observation: null,
@@ -186,6 +192,52 @@ test("rejects every inactive Bottle before persisting a resolution", async ({
 });
 
 describe("resolveBottleReferenceTarget", () => {
+  test.for([
+    { action: "match", imageEvidence: undefined },
+    { action: "match", imageEvidence: null },
+    { action: "create_bottle", imageEvidence: undefined },
+    { action: "create_bottle", imageEvidence: null },
+  ] as const)(
+    "leaves $action unresolved without supporting evidence when imageEvidence is $imageEvidence",
+    async ({ action, imageEvidence }, { fixtures }) => {
+      const bottle = await fixtures.Bottle();
+      const classification = buildClassification(
+        action === "match"
+          ? {
+              action,
+              matchedBottleId: bottle.id,
+              confidenceBasis: { webEvidence: "not_used", unresolvedRisks: [] },
+            }
+          : {
+              action,
+              proposedBottle: {
+                name: "Unsupported release",
+                brand: { id: bottle.brandId, name: "Brand" },
+                distillers: [],
+              },
+              confidenceBasis: { webEvidence: "not_used", unresolvedRisks: [] },
+            },
+        [{ bottleId: bottle.id }],
+      );
+      classification.artifacts.imageEvidence = imageEvidence;
+      classifyBottleReferenceMock.mockResolvedValueOnce(classification);
+
+      const resolution = await resolveBottleReferenceTarget({
+        reference: { name: "Unsupported review" },
+        createdByActorId: bottle.createdByActorId,
+      });
+
+      expect(resolution).toMatchObject({
+        assignment: null,
+        source: "unresolved",
+        error: null,
+        createdBottle: false,
+        classification: { result: classification },
+      });
+      expect(await db.select().from(bottles)).toHaveLength(1);
+    },
+  );
+
   beforeEach(() => {
     classifyBottleReferenceMock.mockReset();
     classifyBottleReferenceMock.mockResolvedValue(
@@ -469,7 +521,7 @@ describe("resolveBottleReferenceTarget", () => {
         rationale: "The exact marketed Bottle is missing.",
         identityScope: "product",
         observation: null,
-        confidenceBasis: null,
+        confidenceBasis: { webEvidence: "supportive", unresolvedRisks: [] },
         matchedBottleId: null,
         proposedBottle: {
           name: "Independent Expression",
@@ -610,4 +662,32 @@ describe("resolveBottleReferenceTarget", () => {
     }
     expect(await countBottles()).toBe(bottleCount);
   });
+});
+
+test("saving a review run never fails the review", async () => {
+  const reviewId = 987654;
+
+  // An empty reference name fails the Bottle check's own validation.
+  await expect(
+    persistReviewBottleCheck({
+      reviewId,
+      classification: {
+        input: { reference: { name: "" }, candidateExpansion: "open" },
+        result: BottleClassificationResultSchema.parse({
+          status: "ignored",
+          reason: "test fixture",
+          artifacts: { extractedIdentity: null, candidates: [] },
+        }),
+      },
+    }),
+  ).resolves.toBeUndefined();
+
+  expect(
+    await db.query.bottleChecks.findFirst({
+      where: and(
+        eq(bottleChecks.sourceKind, "review"),
+        eq(bottleChecks.sourceId, String(reviewId)),
+      ),
+    }),
+  ).toBeUndefined();
 });

@@ -1,5 +1,5 @@
 import { getRatingBandById } from "@peated/server/constants";
-import { formatBottleDisplayName } from "@peated/server/lib/bottleDisplayName";
+import { formatBottleLabel } from "@peated/server/lib/bottleDisplayName";
 import type { Outputs } from "@peated/server/orpc/router";
 import config from "@peated/web/config";
 import type { Metadata } from "next";
@@ -13,7 +13,10 @@ type TastingSeoSource = Pick<
   Tasting,
   "id" | "notes" | "imageUrl" | "createdAt" | "ratingBand"
 > & {
-  bottle: Parameters<typeof getBottleUrl>[0] & { imageUrl: string | null };
+  bottle: Parameters<typeof getBottleUrl>[0] & {
+    abv: number | null;
+    imageUrl: string | null;
+  };
   createdBy: Pick<Tasting["createdBy"], "username" | "private">;
 };
 
@@ -25,7 +28,7 @@ export function getTastingSeoMetadata(tasting: TastingSeoSource): Metadata {
     };
   }
 
-  const bottleName = formatBottleDisplayName(tasting.bottle);
+  const bottleName = formatBottleLabel(tasting.bottle);
   const title = `${bottleName} — tasting by ${tasting.createdBy.username}`;
   const rating = tasting.ratingBand
     ? ` Rated ${getRatingBandById(tasting.ratingBand).label}.`
@@ -79,7 +82,7 @@ export function serializeTastingStructuredData(
 ): string | null {
   if (tasting.createdBy.private) return null;
 
-  const bottleName = formatBottleDisplayName(tasting.bottle);
+  const bottleName = formatBottleLabel(tasting.bottle);
   const url = new URL(getTastingUrl(tasting), config.URL_PREFIX).href;
   const bottleUrl = new URL(getBottleUrl(tasting.bottle), config.URL_PREFIX)
     .href;

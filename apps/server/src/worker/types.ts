@@ -1,15 +1,20 @@
 import { z } from "zod";
 
 export type JobName =
+  | "ResolveAuctionLot"
+  | "ApplyAuctionLotMatch"
   | "CapturePriceImage"
   | "CleanupPendingUploads"
+  | "CleanupWrongPhotoMatchPhotos"
   | "GenerateBottleDetails"
   | "GenerateCountryDetails"
   | "GenerateEntityDetails"
+  | "GenerateEntityPronunciationAudio"
   | "GenerateRegionDetails"
   | "GeocodeCountryLocation"
   | "GeocodeRegionLocation"
   | "GeocodeEntityLocation"
+  | "IdentifyTastingDraft"
   | "IndexBottleReference"
   | "IndexBottleSearch"
   | "IndexBottleSeriesSearch"

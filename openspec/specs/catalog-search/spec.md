@@ -21,7 +21,7 @@ Bottle and Entity search SHALL match normalized complete words and normalized wo
 #### Scenario: Operator-like text remains text
 
 - **WHEN** a query contains text such as `OR` or `-`
-- **THEN** the query cannot enable PostgreSQL search operators
+- **THEN** the query compiles to literal TINQL and cannot enable search operators
 
 ### Requirement: Global search reports complete results
 
@@ -53,7 +53,7 @@ Global search SHALL preserve each source's ranked order while preventing a nonex
 
 ### Requirement: Search indexes are immediately useful and refreshable
 
-A newly committed Bottle SHALL have canonical search coverage, and a searchable Entity name change SHALL refresh Bottle vectors that contain that Entity as Brand, bottler, or distiller.
+A newly committed Bottle SHALL have canonical search coverage, and a searchable Entity name change SHALL refresh the search documents of Bottles that contain that Entity as Brand, bottler, or distiller.
 
 #### Scenario: Search immediately after Bottle creation
 
@@ -63,7 +63,7 @@ A newly committed Bottle SHALL have canonical search coverage, and a searchable 
 #### Scenario: Rename a related Entity
 
 - **WHEN** an Entity name or short name changes
-- **THEN** directly related Bottle vectors are queued for refresh
+- **THEN** directly related Bottle search documents are queued for refresh
 
 ### Requirement: Ranked search is stable and respects accepted aliases
 

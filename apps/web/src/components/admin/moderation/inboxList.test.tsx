@@ -48,6 +48,19 @@ const listingTask = {
 } satisfies Task;
 
 describe("Moderation Inbox list", () => {
+  test("links an auction task to its lot rather than a classifier check", () => {
+    expect(
+      inboxTaskHref(
+        {
+          ...listingTask,
+          key: "auction_lot:44",
+          kind: "auction_lot",
+          source: { kind: "auction_lot", lotId: 44 },
+        },
+        new URLSearchParams("category=listing"),
+      ),
+    ).toBe("/admin/moderation/inbox/auction_lot/44?category=listing");
+  });
   test("renders compact task questions, counts, and selected state", () => {
     const html = renderToStaticMarkup(
       <InboxListContent

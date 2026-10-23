@@ -20,8 +20,7 @@ const meta = {
         imageUrl: BottleImage.src,
         bottle: {
           name: "Lagavulin 16-year-old",
-          provenance: [{ name: "Single Malt" }],
-          metadata: ["16 years", "43% ABV"],
+          metadata: ["16 years", "43%"],
         },
         ratingBand: "outstanding",
         tags: ["Smoke", "Dried fruit", "Sea salt"],
@@ -35,8 +34,7 @@ const meta = {
         href: "/bottles/ardbeg-uigeadail",
         bottle: {
           name: "Ardbeg Uigeadail",
-          provenance: [{ name: "Single Malt" }],
-          metadata: ["NAS", "54.2% ABV"],
+          metadata: ["NAS", "54.2%"],
         },
         ratingBand: "good",
         tags: ["Tar", "Raisin", "Espresso"],
@@ -79,8 +77,7 @@ export const Overview: Story = {
                 href: "/bottles/lagavulin-16",
                 bottle: {
                   name: "Lagavulin 16-year-old",
-                  provenance: [{ name: "Single Malt" }],
-                  metadata: ["16 years", "43% ABV"],
+                  metadata: ["16 years", "43%"],
                 },
                 ratingBand: "outstanding",
               },
@@ -102,8 +99,7 @@ export const LongNotes: Story = {
         href: "/bottles/lagavulin-16",
         bottle: {
           name: "Lagavulin 16-year-old",
-          provenance: [{ name: "Single Malt" }],
-          metadata: ["16 years", "43% ABV"],
+          metadata: ["16 years", "43%"],
         },
         ratingBand: "outstanding",
         tags: ["Smoke", "Dried fruit", "Sea salt"],

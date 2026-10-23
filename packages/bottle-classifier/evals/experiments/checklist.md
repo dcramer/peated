@@ -314,6 +314,13 @@ and cases with different Bottle names from the failure that led to it.
       and `The Gifted Horse` remain negative controls. See
       [C27 results](./C27-multi-item-preflight.md).
 
+- [x] **C29 — Keep the title's age, vintage, and cask wording in proposed
+      names.** **Accepted.** The name field description followed the rule from
+      before 2026-09-16 and dropped printed age wording. Target name checks rose
+      from 1/21 to 13/21, below the recorded 18/21 bar, and the full suite rose
+      from 73 to 79 of 109 checks at flat cost. See
+      [C29 results](./C29-printed-name-wording.md).
+
 ## Current stopping point
 
 C09 and C10 improve checks after Luna, while C11 removes model work for Bottle
@@ -358,11 +365,15 @@ do not.
 - [ ] **Q04 — Recheck stale creation proposals with Luna.** Run 100 older Terra
       creation proposals through the current full path. Review every automatic
       creation and record cost, tokens, time, and the resulting automatic rate.
-- [ ] **C28 — Allow supported creation while omitting unsupported optional
-      facts.** Require the proposed identity to have an externally supported
-      difference from every nearby candidate. Drop any optional field without
-      support before writing. Compare with cases where ABV, year, or edition is
-      the only fact that prevents a duplicate.
+- [x] **C28 — Confirm a one-fact difference before creating a Bottle.**
+      **Uncertain; reverted.** Asking Luna to confirm that a release with a
+      single differing ABV, batch, or year exists cut duplicate creates on two
+      source-error cases from 4/6 to 1/6, mostly by declining; it matched the
+      right Bottle once in six and lost a real cask release's only create. See
+      [C28 results](./C28-confirm-one-fact-difference.md).
+- [ ] **C30 — Omit unsupported optional facts from a supported creation.**
+      Drop any optional field without support before writing. This is the
+      untested half of the original C28 item.
 
 ## Completion rule
 

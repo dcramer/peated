@@ -10,6 +10,7 @@ import type {
 } from "@peated/bottle-classifier/internal/types";
 import type { StorePrice } from "@peated/server/db/schema";
 import type { StorePriceMatchAutomationAssessment } from "@peated/server/schemas";
+import { assessExistingBottleMatch } from "./bottleMatchingAutomation";
 
 export type { StorePriceMatchAutomationAssessment };
 
@@ -50,18 +51,23 @@ export function assessStorePriceMatch({
     return { automationEligible: false, automationBlockers: [] };
   }
 
-  const isCreate = action === "create_bottle";
-  const target = isCreate
-    ? proposedBottle
-    : (candidates.find(({ bottleId }) => bottleId === suggestedBottleId) ??
-      null);
+  if (action === "match")
+    return assessExistingBottleMatch({
+      currentBottleId: price.bottleId,
+      suggestedBottleId,
+      candidates,
+      identityScope,
+      sourceBottleIdentity,
+      hasUnresolvedRisks,
+      webEvidence,
+      readListingImage,
+      sourceLabel: "the store's product facts",
+    });
+
+  const target = proposedBottle;
   const automationBlockers: string[] = [];
   if (!target) {
-    automationBlockers.push(
-      isCreate
-        ? "the classifier returned no Bottle to create"
-        : "the matched Bottle was not among the reviewed candidates",
-    );
+    automationBlockers.push("the classifier returned no Bottle to create");
     return { automationEligible: false, automationBlockers };
   }
 
@@ -72,23 +78,16 @@ export function assessStorePriceMatch({
     );
   }
 
-  const reaffirmsCurrentAssignment =
-    !isCreate &&
-    price.bottleId !== null &&
-    price.bottleId === suggestedBottleId;
-  const replacesCurrentAssignment =
-    !isCreate && price.bottleId !== null && !reaffirmsCurrentAssignment;
   const tier = deriveAutomationTier({
-    actionRiskClass: isCreate ? "create" : "match",
+    actionRiskClass: "create",
     hasUnresolvedRisks,
     webEvidence: webEvidence ?? null,
     hasMatchTarget: true,
-    reaffirmsCurrentAssignment,
-    replacesCurrentAssignment,
+    reaffirmsCurrentAssignment: false,
+    replacesCurrentAssignment: false,
     hasDeterministicAnchor:
       identityScope === "exact_cask" ||
-      (isCreate &&
-        hasCompleteSourceIdentity(sourceBottleIdentity) &&
+      (hasCompleteSourceIdentity(sourceBottleIdentity) &&
         !sourceConflicts.length),
     hasPrimaryLabelOrImageEvidence: readListingImage,
   });
@@ -96,9 +95,7 @@ export function assessStorePriceMatch({
     automationBlockers.push(
       hasUnresolvedRisks
         ? "the classifier reported unresolved risks"
-        : replacesCurrentAssignment
-          ? "it replaces the listing's current Bottle"
-          : "the classifier found no supporting evidence",
+        : "the classifier found no supporting evidence",
     );
   }
 

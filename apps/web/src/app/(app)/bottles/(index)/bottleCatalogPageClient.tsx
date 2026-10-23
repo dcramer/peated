@@ -167,6 +167,8 @@ export function BottleCatalogPageClient({
       item: toBottleListItem(bottle, {
         includeRatings: true,
         includeRelatedReleases: true,
+        // A series filter titles the page with the series, so rows leave it out.
+        seriesPlacement: queryParams.series ? "none" : "provenance",
       }),
     }),
   );

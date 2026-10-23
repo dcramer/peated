@@ -1,6 +1,11 @@
 "use client";
 
-import { formatBottleDisplayName } from "@peated/server/lib/bottleDisplayName";
+import {
+  formatAbv,
+  formatBottleDisplayName,
+  formatBottleLabel,
+} from "@peated/server/lib/bottleDisplayName";
+import { formatReleaseDate } from "@peated/server/lib/bottleRelease";
 import { formatCategoryName } from "@peated/server/lib/format";
 import type { Outputs } from "@peated/server/orpc/router";
 import * as stylex from "@stylexjs/stylex";
@@ -19,7 +24,10 @@ import {
 } from "@peated/web/components/feedback.stylex";
 import { useFlashMessages } from "@peated/web/components/flashMessages.stylex";
 import { BottleOverview } from "@peated/web/components/pages/bottleOverview.stylex";
-import { BottlePageHeader } from "@peated/web/components/pages/bottlePageHeader.stylex";
+import {
+  BottlePageHeader,
+  getBottleHeaderIdentity,
+} from "@peated/web/components/pages/bottlePageHeader.stylex";
 import { BottleRailSection } from "@peated/web/components/pages/bottleRailSection.stylex";
 import {
   PageTabs,
@@ -38,16 +46,12 @@ import {
   getAddSimilarBottlePath,
 } from "@peated/web/lib/addBottle";
 import { toBottleListItem } from "@peated/web/lib/bottleListItem";
-import { getBottleReleasePlacement } from "@peated/web/lib/bottleMetadata";
 import { getReviewAndTastingFeedItems } from "@peated/web/lib/communityFeed";
 import { logTelemetryError } from "@peated/web/lib/log";
 import { useORPC } from "@peated/web/lib/orpc/context";
+import { serverDataQueryOptions } from "@peated/web/lib/orpc/query";
 import { selectOtherSeriesBottles } from "@peated/web/lib/seriesBottleRail";
-import {
-  getBottleSeriesUrl,
-  getBottleUrl,
-  getEntityUrl,
-} from "@peated/web/lib/urls";
+import { getBottleSeriesUrl, getBottleUrl } from "@peated/web/lib/urls";
 import { colors, space } from "../../../../styles/tokens.stylex";
 
 import { foundationStyles } from "../../../../styles/foundations.stylex";
@@ -58,12 +62,6 @@ type Bottle = Outputs["bottles"]["details"];
 const BottlePageContext = createContext<Bottle | null>(null);
 
 const PHONE = "@media (max-width: 480px)";
-
-function getBottleDistillers(bottle: Bottle) {
-  return bottle.distillers.length ? (
-    <EntityLinks entities={bottle.distillers} />
-  ) : null;
-}
 
 function getDeclaredFacts(bottle: Bottle): [FactListItem, ...FactListItem[]] {
   return [
@@ -95,7 +93,7 @@ function getDeclaredFacts(bottle: Bottle): [FactListItem, ...FactListItem[]] {
     },
     {
       label: "ABV",
-      value: bottle.abv === null ? null : `${bottle.abv.toFixed(1)}%`,
+      value: bottle.abv === null ? null : formatAbv(bottle.abv),
     },
     {
       label: "Age",
@@ -122,10 +120,7 @@ function getDeclaredFacts(bottle: Bottle): [FactListItem, ...FactListItem[]] {
           ? null
           : `${bottle.outturn.toLocaleString("en-US")} bottles`,
     },
-    {
-      label: "Release",
-      value: getBottleReleasePlacement(bottle).header,
-    },
+    { label: "Edition", value: bottle.edition },
     {
       label: "Vintage",
       value: bottle.vintageYear === null ? null : String(bottle.vintageYear),
@@ -136,7 +131,7 @@ function getDeclaredFacts(bottle: Bottle): [FactListItem, ...FactListItem[]] {
     },
     {
       label: "Released",
-      value: getBottleReleasePlacement(bottle).details,
+      value: formatReleaseDate(bottle),
     },
     {
       label: "Phenols",
@@ -176,6 +171,7 @@ function getTabs(bottle: Bottle): [PageTabItem, ...PageTabItem[]] {
       label: "Reviews",
     },
     { href: `${baseUrl}/prices`, label: "Prices" },
+    { href: `${baseUrl}/auctions`, label: "Auctions" },
   ];
 
   if (bottle.group && bottle.group.totalBottles > 1) {
@@ -275,7 +271,7 @@ function BottleActions({ bottle }: { bottle: Bottle }) {
           if (navigator.share) {
             navigator
               .share({
-                title: formatBottleDisplayName(bottle),
+                title: formatBottleLabel(bottle),
                 url: window.location.href,
               })
               .catch((error) => logTelemetryError(error, {}));
@@ -358,12 +354,14 @@ export function BottlePageFrameClient({
 }) {
   const orpc = useORPC();
   const pathname = usePathname();
-  const bottleQuery = useQuery({
-    ...orpc.bottles.details.queryOptions({
-      input: { bottle: initialBottle.id },
-    }),
-    initialData: initialBottle,
-  });
+  const bottleQuery = useQuery(
+    serverDataQueryOptions(
+      orpc.bottles.details.queryOptions({
+        input: { bottle: initialBottle.id },
+      }),
+      initialBottle,
+    ),
+  );
 
   if (bottleQuery.error) {
     return (
@@ -399,11 +397,8 @@ export function BottlePageFrameClient({
               <BottleLibraryAction bottle={bottle} />
             </>
           }
-          brand={bottle.brand.shortName || bottle.brand.name}
-          brandHref={getEntityUrl(bottle.brand)}
-          metadata={getBottleDistillers(bottle)}
+          {...getBottleHeaderIdentity(bottle)}
           menu={<BottleActions bottle={bottle} />}
-          name={formatBottleDisplayName(bottle, { includeBrand: false })}
           rating={
             bottle.scoreCount === 0 &&
             !Object.values(bottle.tastingBandCounts).some((count) => count > 0)
@@ -463,7 +458,9 @@ export function BottleOverviewClient() {
     ) ?? [];
   const otherSeriesBottles = seriesBottlesQuery.data
     ? selectOtherSeriesBottles(seriesBottlesQuery.data.results, bottle.id).map(
-        (seriesBottle) => toBottleListItem(seriesBottle),
+        // The section heading names the series, so rows leave it out.
+        (seriesBottle) =>
+          toBottleListItem(seriesBottle, { seriesPlacement: "none" }),
       )
     : [];
   const seriesRail = !bottle.series ? null : seriesBottlesQuery.isPending ? (
@@ -565,7 +562,7 @@ export function BottleOverviewClient() {
   );
 }
 
-export function useBottlePage() {
+function useBottlePage() {
   const bottle = useContext(BottlePageContext);
   if (!bottle) throw new Error("Bottle page content requires its route frame");
   return bottle;

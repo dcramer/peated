@@ -18,6 +18,11 @@ await vi.hoisted(async () => {
 });
 
 let accessToken: string | null = null;
+const previewProps = {
+  previewModeId: "test",
+  previewModeEncryptionKey: "test",
+  previewModeSigningKey: "test",
+};
 
 function getPageBottleList(input: Parameters<typeof loadBottleList>[0]) {
   return withNextRequest(accessToken, () => loadBottleList(input));
@@ -44,17 +49,14 @@ beforeEach(() => {
       maxMemoryCacheSize: 1024 * 1024,
       CurCacheHandler: FileSystemCache,
       fetchCacheKeyPrefix: `public-catalog-test-${++cacheNumber}`,
-      getPrerenderManifest: () => ({
+      previewProps,
+      prerenderManifest: {
         version: 4,
         routes: {},
         dynamicRoutes: {},
         notFoundRoutes: [],
-        preview: {
-          previewModeId: "test",
-          previewModeEncryptionKey: "test",
-          previewModeSigningKey: "test",
-        },
-      }),
+        preview: previewProps,
+      },
     }),
   );
   fetchMock.mockImplementation(async (input, init) => {

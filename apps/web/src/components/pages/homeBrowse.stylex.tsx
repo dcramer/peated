@@ -63,29 +63,6 @@ function HomeListSectionLayout({
   );
 }
 
-/** Shows bottles with published median scores in API rank order. */
-export function HomeHighestRated({
-  bottles,
-  totalRated,
-}: {
-  bottles: readonly BottleListItem[];
-  totalRated: number;
-}) {
-  return (
-    <HomeListSectionLayout
-      action={
-        <TextLink href="/bottles?sort=-score&minScore=0" size="sm">
-          All {totalRated.toLocaleString("en-US")} rated{" "}
-          <span aria-hidden="true">→</span>
-        </TextLink>
-      }
-      title="Bottles to try"
-    >
-      <BottleList ariaLabel="Bottles to try" items={bottles} />
-    </HomeListSectionLayout>
-  );
-}
-
 /** Shows bottles with known release years in API release order. */
 export function HomeLatestReleases({
   bottles,

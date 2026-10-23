@@ -11,12 +11,14 @@ import {
 } from "@peated/server/lib/passkey";
 import { procedure } from "@peated/server/orpc";
 import { authRateLimit } from "@peated/server/orpc/middleware";
-import { AuthSchema } from "@peated/server/schemas";
+import {
+  AuthSchema,
+  PasskeyAuthenticationResponseSchema,
+} from "@peated/server/schemas";
 import { serialize } from "@peated/server/serializers";
 import { UserSerializer } from "@peated/server/serializers/user";
 import {
   verifyAuthenticationResponse,
-  type AuthenticationResponseJSON,
   type VerifyAuthenticationResponseOpts,
 } from "@simplewebauthn/server";
 import { and, eq, sql } from "drizzle-orm";
@@ -49,9 +51,7 @@ export function createPasskeyAuthenticateVerifyProcedure(
     })
     .input(
       z.object({
-        response: z
-          .custom<AuthenticationResponseJSON>()
-          .describe("WebAuthn authentication response"),
+        response: PasskeyAuthenticationResponseSchema,
         signedChallenge: z.string().describe("Signed challenge from options"),
         tosAccepted: z
           .boolean()

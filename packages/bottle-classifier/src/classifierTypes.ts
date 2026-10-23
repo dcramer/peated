@@ -52,7 +52,7 @@ const CaskNumberSchema = z
   .default(null);
 const OutturnSchema = z.number().int().positive().nullable().default(null);
 
-function hasValidReleaseDate(
+export function hasValidReleaseDate(
   year: number | null | undefined,
   month: number | null | undefined,
   day: number | null | undefined,
@@ -326,7 +326,7 @@ export const ProposedBottleFields = {
     .trim()
     .min(1)
     .describe(
-      "Stable marketed expression relative to the Brand. Omit the Brand prefix and exact traits represented by other fields. When no separate expression is marketed, use the source-supported product or style phrase. Do not repeat the Brand, copy a retailer title, or invent an expression.",
+      "The Bottle's common name without the Brand, following the identity rules.",
     ),
   series: ProposedSeriesChoiceSchema.nullable().default(null),
   category: CategoryEnum.nullable().default(null),
@@ -405,7 +405,7 @@ export const BottleCandidateSearchInputSchema = z
       .nullable()
       .default(null)
       .describe(
-        "Core release name after removing brand, age, ABV, and generic style words.",
+        "Distinctive release words to search for, without the Brand. This is search text, not the proposed Bottle name.",
       ),
     series: z
       .string()
@@ -580,7 +580,7 @@ const BottleClassifierDecisionBaseSchema = z
       .max(MAX_BOTTLE_CANDIDATES)
       .default([]),
     identityScope: BottleIdentityScopeEnum.default("product").describe(
-      "`product` for stable bottle-family identity; `exact_cask` only when the exact cask itself is the marketed bottle identity. SMWS codes qualify; generic cask/barrel details do not qualify without reliable evidence that the listed product is an exact single-cask identity.",
+      "Whether the decision identifies a stable product or one exact cask, following the identity rules.",
     ),
     referenceScope: ReferenceScopeEnum.optional().describe(
       "`global_alias` only when the listing label is safe to store as a reusable Bottle reference; `none` when no reusable reference should be created.",

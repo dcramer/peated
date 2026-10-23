@@ -1,0 +1,2 @@
+CREATE INDEX "review_matched_reference_idx" ON "review" USING btree ("matched_reference_id") WHERE "review"."matched_reference_id" IS NOT NULL;
+CREATE INDEX "store_price_matched_reference_idx" ON "store_price" USING btree ("matched_reference_id") WHERE "store_price"."matched_reference_id" IS NOT NULL;

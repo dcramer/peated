@@ -7,6 +7,7 @@ import { db } from "@peated/server/db";
 import {
   bottleReferences,
   externalReviews,
+  incomingBottleDecisionLogs,
   storePrices,
 } from "@peated/server/db/schema";
 import { fixBadExternalReviewEntities as fixBadExternalReviewEntitiesWithClassifier } from "@peated/server/lib/fixBadExternalReviewEntities";
@@ -36,6 +37,7 @@ type MockClassificationDecision = Pick<
 > & {
   candidateBottleIds?: number[];
   matchedBottleId?: number;
+  referenceScope?: "global_alias" | "none";
 };
 
 type MockClassificationArtifacts = {
@@ -55,6 +57,7 @@ function buildClassification(
       candidateBottleIds: [],
       identityScope: "product",
       observation: null,
+      referenceScope: "global_alias",
       ...decision,
     },
     artifacts: {
@@ -68,6 +71,47 @@ function buildClassification(
 }
 
 describe("fixBadExternalReviewEntities", () => {
+  test("records a source-only correction without promoting its title", async ({
+    fixtures,
+  }) => {
+    const user = await fixtures.User({ mod: true });
+    const oldBottle = await fixtures.Bottle({ name: "Wrong release" });
+    const bottle = await fixtures.Bottle({ name: "Dated release 2020" });
+    const review = await fixtures.ExternalReview({
+      bottleId: oldBottle.id,
+      name: "Generic title",
+    });
+    classifyBottleReferenceMock.mockResolvedValue(
+      buildClassification(
+        {
+          action: "match",
+          matchedBottleId: bottle.id,
+          candidateBottleIds: [bottle.id],
+          referenceScope: "none",
+        },
+        { candidates: [{ bottleId: bottle.id, fullName: bottle.fullName }] },
+      ),
+    );
+    await fixBadExternalReviewEntities({ user });
+    expect(
+      await db.query.externalReviews.findFirst({
+        where: eq(externalReviews.id, review.id),
+      }),
+    ).toMatchObject({ bottleId: bottle.id, matchedReferenceId: null });
+    expect(
+      await db.query.bottleReferences.findFirst({
+        where: eq(bottleReferences.name, review.name),
+      }),
+    ).toBeUndefined();
+    expect(
+      await db.query.incomingBottleDecisionLogs.findFirst({
+        where: eq(incomingBottleDecisionLogs.sourceId, review.id),
+      }),
+    ).toMatchObject({
+      bottleId: bottle.id,
+      metadata: { previousBottleId: oldBottle.id },
+    });
+  });
   beforeEach(() => {
     classifyBottleReferenceMock.mockReset();
     vi.mocked(workerClient.pushUniqueJob).mockReset();

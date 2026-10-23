@@ -1,14 +1,18 @@
 import registry from "../registry";
+import applyAuctionLotMatch from "./applyAuctionLotMatch";
 import capturePriceImage from "./capturePriceImage";
 import cleanupPendingUploads from "./cleanupPendingUploads";
+import cleanupWrongPhotoMatchPhotos from "./cleanupWrongPhotoMatchPhotos";
 import createMissingBottles from "./createMissingBottles";
 import generateBottleDetails from "./generateBottleDetails";
 import generateCountryDetails from "./generateCountryDetails";
 import generateEntityDetails from "./generateEntityDetails";
+import generateEntityPronunciationAudio from "./generateEntityPronunciationAudio";
 import generateRegionDetails from "./generateRegionDetails";
 import geocodeCountryLocation from "./geocodeCountryLocation";
 import geocodeEntityLocation from "./geocodeEntityLocation";
 import geocodeRegionLocation from "./geocodeRegionLocation";
+import identifyTastingDraft from "./identifyTastingDraft";
 import indexBottleReference from "./indexBottleReference";
 import indexBottleSearch from "./indexBottleSearch";
 import indexBottleSeriesSearch from "./indexBottleSeriesSearch";
@@ -28,6 +32,7 @@ import repairBottleStats from "./repairBottleStats";
 import repairCollectionBottleCounts from "./repairCollectionBottleCounts";
 import repairEntityBottleCounts from "./repairEntityBottleCounts";
 import repairLocationBottleCounts from "./repairLocationBottleCounts";
+import resolveAuctionLot from "./resolveAuctionLot";
 import resolveStorePriceBottle from "./resolveStorePriceBottle";
 import runScraper from "./runScraper";
 import updateBottleStats from "./updateBottleStats";
@@ -43,7 +48,10 @@ import verifyEntityCreation from "./verifyEntityCreation";
 // queue so fast derived-data work such as search indexing and stats never
 // waits behind a classifier call.
 registry.add("CapturePriceImage", capturePriceImage);
+registry.add("ApplyAuctionLotMatch", applyAuctionLotMatch);
+registry.add("ResolveAuctionLot", resolveAuctionLot, { queueName: "models" });
 registry.add("CleanupPendingUploads", cleanupPendingUploads);
+registry.add("CleanupWrongPhotoMatchPhotos", cleanupWrongPhotoMatchPhotos);
 registry.add("GenerateBottleDetails", generateBottleDetails, {
   queueName: "models",
 });
@@ -53,12 +61,21 @@ registry.add("GenerateCountryDetails", generateCountryDetails, {
 registry.add("GenerateEntityDetails", generateEntityDetails, {
   queueName: "models",
 });
+// Pronunciation audio calls Cloud Text-to-Speech, not a model, and every
+// request carries a timeout, so it stays on the default queue.
+registry.add(
+  "GenerateEntityPronunciationAudio",
+  generateEntityPronunciationAudio,
+);
 registry.add("GenerateRegionDetails", generateRegionDetails, {
   queueName: "models",
 });
 registry.add("GeocodeCountryLocation", geocodeCountryLocation);
 registry.add("GeocodeRegionLocation", geocodeRegionLocation);
 registry.add("GeocodeEntityLocation", geocodeEntityLocation);
+registry.add("IdentifyTastingDraft", identifyTastingDraft, {
+  queueName: "models",
+});
 registry.add("IndexBottleReference", indexBottleReference);
 registry.add("IndexBottleSearch", indexBottleSearch);
 registry.add("IndexBottleSeriesSearch", indexBottleSeriesSearch);

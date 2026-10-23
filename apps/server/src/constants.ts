@@ -66,6 +66,11 @@ export type ReservedCollectionSlug = (typeof RESERVED_COLLECTION_SLUGS)[number];
 // `initialRunEvery` applies only when a site is first added. Change an existing
 // schedule through the admin API.
 export const EXTERNAL_SITE_DEFINITIONS = {
+  // Auction collection stays manual until a full run and live-auction refresh capacity are checked.
+  scotchwhiskyauctions: {
+    name: "Scotch Whisky Auctions",
+    initialRunEvery: null,
+  },
   // Astor stays manual-only while its non-browser catalog behavior is checked.
   astorwines: { name: "Astor Wines", initialRunEvery: null },
   // Berry Bros. & Rudd does not run automatically because robots.txt does not
@@ -315,21 +320,6 @@ export const SIMPLE_RATING_VALUES = {
   SIP: 1,
   SAVOR: 2,
 } as const;
-
-export const SIMPLE_RATING_LABELS = {
-  [-1]: "Pass",
-  [1]: "Sip",
-  [2]: "Savor",
-} as const;
-
-export const SIMPLE_RATING_DESCRIPTIONS = {
-  [-1]: "Not my thing",
-  [1]: "Enjoyable, would drink again",
-  [2]: "Amazing, would seek out",
-} as const;
-
-export type SimpleRatingValue =
-  (typeof SIMPLE_RATING_VALUES)[keyof typeof SIMPLE_RATING_VALUES];
 
 export const RATING_BANDS = [
   { id: "mediocre", min: 0, max: 79, label: "Mediocre" },

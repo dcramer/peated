@@ -1,4 +1,5 @@
 export * from "./actors";
+export * from "./auctions";
 export * from "./badges";
 export * from "./bottleChecks";
 export * from "./bottles";
@@ -31,7 +32,9 @@ export * from "./scraper";
 export * from "./scrapeSources";
 export * from "./stores";
 export * from "./tags";
+export * from "./tastingDrafts";
 export * from "./tastings";
 export * from "./toasts";
 export * from "./userBlocks";
 export * from "./users";
+export * from "./wrongPhotoMatches";

@@ -1,5 +1,5 @@
-import type { BottleDisplayNameSource } from "@peated/server/lib/bottleDisplayName";
-import { formatBottleDisplayName } from "@peated/server/lib/bottleDisplayName";
+import type { BottleLabelSource } from "@peated/server/lib/bottleDisplayName";
+import { formatBottleLabel } from "@peated/server/lib/bottleDisplayName";
 import type { EntityKind } from "@peated/server/types";
 import config from "@peated/web/config";
 import type { Metadata } from "next";
@@ -44,7 +44,7 @@ export const noIndexFollowPageMetadata = {
   robots: { index: false, follow: true },
 } satisfies Metadata;
 
-type BottleSeoMetadataSource = BottleDisplayNameSource & {
+type BottleSeoMetadataSource = BottleLabelSource & {
   id: number;
   description: string | null;
   imageUrl: string | null;
@@ -205,7 +205,7 @@ export function getBottleSeoMetadata(
   bottle: BottleSeoMetadataSource,
   { canonical = false }: MetadataOptions = {},
 ): Metadata {
-  const title = formatBottleDisplayName(bottle);
+  const title = formatBottleLabel(bottle);
   const description =
     summarize(bottle.description || "", 160) ||
     `See bottle details for ${title} in the Peated whisky database.`;

@@ -1,0 +1,26 @@
+{
+  "writtenAt": "2026-10-01T16:09:19.052Z",
+  "toolName": "firecrawl_read_page",
+  "input": {
+    "url": "https://whiskyadvocate.com/Clynelish-14-year-old-43",
+    "focus": "Confirm exact product identity, stated age, ABV, and marketed release or label name."
+  },
+  "output": {
+    "provider": "firecrawl",
+    "query": "Confirm exact product identity, stated age, ABV, and marketed release or label name.",
+    "summary": "Clynelish 14 year old, 43%\n\nPrice: $53.00● Issue: Summer 2012 ● Reviewer: Dave Broom ● Category: Single Malt Scotch",
+    "results": [
+      {
+        "title": "Clynelish 14 year old, 43%",
+        "url": "https://whiskyadvocate.com/Clynelish-14-year-old-43",
+        "domain": "whiskyadvocate.com",
+        "description": "Ahh, Clynelish. The enigma of the northeast coast. A single malt whose waxy character — and it does smell of snuffed&hellip;",
+        "extraSnippets": []
+      }
+    ]
+  },
+  "metadata": {
+    "cacheKey": "cd05276f441e55933ccfdab761c59bcc2856dae0183d093240c2f2cd172f8468",
+    "mode": "auto"
+  }
+}

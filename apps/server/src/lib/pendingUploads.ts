@@ -14,12 +14,14 @@ import { Readable } from "node:stream";
 export const PENDING_UPLOAD_NAMESPACE = "pending-uploads";
 export const PERMANENT_UPLOAD_NAMESPACES = [
   "tastings",
+  "tasting-drafts",
   "member-reviews",
   "collection-bottles",
   "bottles",
   "bottle-releases",
   "badges",
   "avatars",
+  "wrong-photo-matches",
 ] as const;
 export const DEFAULT_PENDING_UPLOAD_TTL_MS = 1000 * 60 * 60 * 48;
 
@@ -209,7 +211,7 @@ async function copyPendingImageToPermanentDestination({
   purpose: NewPendingUpload["purpose"];
   destinationNamespace: (typeof PERMANENT_UPLOAD_NAMESPACES)[number];
   destinationType: string;
-  destinationId: number;
+  destinationId: number | string;
 }): Promise<string> {
   if (!isPermanentUploadNamespace(destinationNamespace)) {
     throw new PendingUploadError("Invalid permanent upload namespace.");
@@ -262,6 +264,23 @@ export async function copyPendingImageToTasting({
   });
 }
 
+/** Copies an approved pending image to a tasting draft's photo slot. */
+export async function copyPendingImageToTastingDraft({
+  id,
+  userId,
+  purpose,
+  tastingDraftId,
+}: PendingImageCopyInput & { tastingDraftId: string }): Promise<string> {
+  return await copyPendingImageToPermanentDestination({
+    id,
+    userId,
+    purpose,
+    destinationNamespace: "tasting-drafts",
+    destinationType: "tasting_draft",
+    destinationId: tastingDraftId,
+  });
+}
+
 /** Copies an approved pending image to a member review image slot. */
 export async function copyPendingImageToMemberReview({
   id,
@@ -310,6 +329,24 @@ export async function copyPendingImageToBottle({
     destinationNamespace: "bottles",
     destinationType: "bottle",
     destinationId: bottleId,
+  });
+}
+
+/** Copies a label photo to a private wrong-photo-match record. */
+export async function copyPendingImageToWrongPhotoMatch({
+  id,
+  userId,
+}: {
+  id: string;
+  userId: number;
+}): Promise<string> {
+  return await copyPendingImageToPermanentDestination({
+    id,
+    userId,
+    purpose: "photo_tasting_entry",
+    destinationNamespace: "wrong-photo-matches",
+    destinationType: "wrong_photo_match",
+    destinationId: id,
   });
 }
 

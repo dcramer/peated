@@ -7,7 +7,7 @@ import {
 } from "@peated/server/lib/passkey";
 import { procedure } from "@peated/server/orpc";
 import { authRateLimit, requireAuth } from "@peated/server/orpc/middleware";
-import type { RegistrationResponseJSON } from "@simplewebauthn/server";
+import { PasskeyRegistrationResponseSchema } from "@peated/server/schemas";
 import { eq } from "drizzle-orm";
 import { z } from "zod";
 
@@ -31,9 +31,7 @@ export function createPasskeyRegisterVerifyProcedure(
     })
     .input(
       z.object({
-        response: z
-          .custom<RegistrationResponseJSON>()
-          .describe("WebAuthn registration response"),
+        response: PasskeyRegistrationResponseSchema,
         signedChallenge: z.string().describe("Signed challenge from options"),
         nickname: z
           .string()

@@ -39,18 +39,27 @@ export function nextTaskAfterCompletion<Task extends { key: string }>(
   );
 }
 
-export function selectedInboxTask(
-  pathname: string,
-):
-  | { kind: "listing" | "operation" | "finding" | "report"; id: number }
+export function selectedInboxTask(pathname: string):
+  | {
+      kind:
+        | "listing"
+        | "auction_lot"
+        | "external_review"
+        | "operation"
+        | "finding"
+        | "report";
+      id: number;
+    }
   | undefined {
   const match = pathname.match(
-    /^\/admin\/moderation\/inbox\/(listing|operation|finding|report)\/(\d+)\/?$/,
+    /^\/admin\/moderation\/inbox\/(listing|auction_lot|external_review|operation|finding|report)\/(\d+)\/?$/,
   );
   if (!match) return undefined;
   const kind = match[1];
   if (
     kind !== "listing" &&
+    kind !== "auction_lot" &&
+    kind !== "external_review" &&
     kind !== "operation" &&
     kind !== "finding" &&
     kind !== "report"
@@ -150,14 +159,14 @@ export default function InboxPage() {
         }),
       ]);
       setAnnouncement(
-        `${ignored} inconclusive ${ignored === 1 ? "listing" : "listings"} ignored.`,
+        `${ignored} inconclusive store ${ignored === 1 ? "listing" : "listings"} ignored.`,
       );
       router.push("/admin/moderation/inbox?inconclusive=true");
     } catch (cause) {
       setBulkError(
         cause instanceof Error
           ? cause.message
-          : "The inconclusive listings could not be ignored.",
+          : "The inconclusive store listings could not be ignored.",
       );
     }
   }

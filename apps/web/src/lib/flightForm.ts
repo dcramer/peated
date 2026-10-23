@@ -1,28 +1,9 @@
 import type { Bottle } from "@peated/server/types";
 
-import {
-  formatBottleDisplayName,
-  type BottleDisplayNameSource,
-} from "@peated/server/lib/bottleDisplayName";
-
-export type FlightBottleOption = {
-  id: number;
-  name: string;
-};
-
 export function getFlightBottleIds(
   bottles: Array<Pick<Bottle, "id">>,
 ): number[] {
   return bottles.map((bottle) => bottle.id);
-}
-
-export function bottleToFlightOption(
-  bottle: BottleDisplayNameSource & Pick<Bottle, "id">,
-): FlightBottleOption {
-  return {
-    id: bottle.id,
-    name: formatBottleDisplayName(bottle),
-  };
 }
 
 export function flightMembershipChanged(

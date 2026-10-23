@@ -1,5 +1,5 @@
 import * as stylex from "@stylexjs/stylex";
-import type { MouseEventHandler, ReactNode } from "react";
+import { Fragment, type MouseEventHandler, type ReactNode } from "react";
 
 import { foundationStyles } from "../styles/foundations.stylex";
 import { colors, effects, space, zIndices } from "../styles/tokens.stylex";
@@ -25,6 +25,8 @@ export type BottleIdentityRowProps = {
   /** Links only the bottle title when the surrounding card is also clickable. */
   linkArea?: "row" | "title";
   metadata?: readonly string[];
+  /** Compact rows show ABV after the name because they omit the metadata line. */
+  abv?: string | null;
   name: string;
   onClick?: MouseEventHandler<HTMLAnchorElement>;
   query?: string;
@@ -40,6 +42,12 @@ export type BottleIdentityRowProps = {
   variant?: "standard" | "activity" | "search" | "sidebar" | "compact";
   /** Tightens vertical padding when the row is nested inside another surface. */
   verticalPadding?: "sm" | "md";
+  /**
+   * Lets the subtitle wrap instead of clipping, and lets a long fact break
+   * inside itself. Use it when those lines hold a sentence the member needs in
+   * full, such as a draft's status.
+   */
+  wrapDetails?: boolean;
 };
 
 /**
@@ -56,10 +64,12 @@ export type BottleIdentityRowProps = {
  * Use layout="cell" inside an existing row/selection control. Linked cells keep
  * their link inside the bottle identity. Use linkArea="title" when the
  * surrounding card is also clickable. Compact omits provenance, metadata,
- * subtitle, status, and related releases; end remains available. Activity may
+ * subtitle, status, and related releases, but keep ABV after the name;
+ * end remains available. Activity may
  * add review text below the bottle details without forcing it beneath the image.
  */
 export function BottleIdentityRow({
+  abv,
   align = "center",
   end,
   hasTasted = false,
@@ -79,6 +89,7 @@ export function BottleIdentityRow({
   activityDetails,
   variant = "standard",
   verticalPadding = "md",
+  wrapDetails = false,
 }: BottleIdentityRowProps) {
   const compact = variant === "compact";
   const activity = variant === "activity";
@@ -102,6 +113,7 @@ export function BottleIdentityRow({
           foundationStyles.rowTitle,
           compactTitle && foundationStyles.compactRowTitle,
           styles.nameLine,
+          compact && styles.compactNameLine,
         )}
       >
         {href ? (
@@ -132,6 +144,11 @@ export function BottleIdentityRow({
             <MatchedText query={query} text={name} />
           </span>
         )}
+        {compact && abv ? (
+          <span {...stylex.props(foundationStyles.metadata, styles.compactAbv)}>
+            {abv}
+          </span>
+        ) : null}
         {!compact && !sidebar && isLibrary ? (
           <MemberStatus kind="library" />
         ) : null}
@@ -159,7 +176,11 @@ export function BottleIdentityRow({
       {!compact && subtitle ? (
         <div
           title={getTextTitle(subtitle)}
-          {...stylex.props(foundationStyles.metadata, styles.subtitle)}
+          {...stylex.props(
+            foundationStyles.metadata,
+            styles.subtitle,
+            wrapDetails && styles.wrappedDetail,
+          )}
         >
           {subtitle}
         </div>
@@ -167,13 +188,17 @@ export function BottleIdentityRow({
       {!compact && metadata.length ? (
         <div
           title={metadata.join(" · ")}
-          {...stylex.props(foundationStyles.metadata, styles.metadata)}
+          {...stylex.props(
+            foundationStyles.metadata,
+            styles.metadata,
+            wrapDetails && styles.wrappedDetail,
+          )}
         >
           {metadata.map((item, index) => (
-            <span key={`${item}-${index}`}>
+            <Fragment key={`${item}-${index}`}>
               {index ? <span aria-hidden="true"> · </span> : null}
-              {item}
-            </span>
+              <span {...stylex.props(!wrapDetails && styles.fact)}>{item}</span>
+            </Fragment>
           ))}
         </div>
       ) : null}
@@ -191,6 +216,13 @@ export function BottleIdentityRow({
       ) : null}
       {sidebar ? trailingContent : null}
     </div>
+  );
+  const visual = (
+    <BottleVisual
+      fit={imageFit}
+      imageUrl={imageUrl}
+      size={compact ? "xs" : sidebar ? "sm" : activity ? "activity" : "md"}
+    />
   );
   return (
     <div
@@ -210,11 +242,11 @@ export function BottleIdentityRow({
           linkedRowStyles.onGround,
       )}
     >
-      <BottleVisual
-        fit={imageFit}
-        imageUrl={imageUrl}
-        size={compact ? "xs" : sidebar ? "sm" : activity ? "activity" : "md"}
-      />
+      {activity ? (
+        <span {...stylex.props(styles.activityVisual)}>{visual}</span>
+      ) : (
+        visual
+      )}
       {activity ? (
         <div {...stylex.props(styles.activityBody)}>
           <div {...stylex.props(styles.activitySummary)}>
@@ -261,6 +293,14 @@ const styles = stylex.create({
     alignItems: "flex-start",
     paddingTop: space.x1,
     paddingBottom: 0,
+  },
+  // Activity rows align to the top. When the thumbnail is shorter than the
+  // three identity lines (64px), center it on them instead of the first line.
+  activityVisual: {
+    display: "flex",
+    flexShrink: 0,
+    alignItems: "center",
+    minHeight: "64px",
   },
   activityBody: {
     display: "flex",
@@ -314,11 +354,22 @@ const styles = stylex.create({
     paddingTop: space.x1,
     paddingBottom: space.x1,
   },
+  compactNameLine: {
+    display: "flex",
+    alignItems: "baseline",
+    gap: "6px",
+  },
   compactName: {
     display: "block",
+    minWidth: 0,
     overflow: "hidden",
     fontWeight: 400,
     textOverflow: "ellipsis",
+    whiteSpace: "nowrap",
+  },
+  compactAbv: {
+    flexShrink: 0,
+    color: colors.inkMuted,
     whiteSpace: "nowrap",
   },
   cellLayout: {
@@ -369,13 +420,22 @@ const styles = stylex.create({
     textDecorationThickness: "1px",
     textUnderlineOffset: "2px",
   },
+  // DESIGN.md: metadata wraps when needed, so ABV and other facts are never
+  // cut off. Lines break between facts, not inside one.
   metadata: {
     maxWidth: "100%",
-    overflow: "hidden",
     // BottleIdentityRow uses 2px gaps to fit three lines beside its 64px thumbnail.
     marginTop: "2px",
     color: colors.inkMuted,
+  },
+  // A fact wider than the row, such as a long worded edition, truncates on its
+  // own line instead of running past the row.
+  fact: {
+    display: "inline-block",
+    maxWidth: "100%",
+    overflow: "hidden",
     textOverflow: "ellipsis",
+    verticalAlign: "top",
     whiteSpace: "nowrap",
   },
   subtitle: {
@@ -385,6 +445,12 @@ const styles = stylex.create({
     color: colors.inkMuted,
     textOverflow: "ellipsis",
     whiteSpace: "nowrap",
+  },
+  wrappedDetail: {
+    overflow: "visible",
+    textOverflow: "clip",
+    whiteSpace: "normal",
+    overflowWrap: "anywhere",
   },
   relatedReleases: {
     marginTop: space.x1,

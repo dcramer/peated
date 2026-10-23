@@ -35,6 +35,28 @@ On a fresh machine, install the Playwright browser once:
 pnpm test:e2e:install
 ```
 
+If `playwright test` fails with "Executable doesn't exist" and you already have
+a Chromium installed, point Playwright at it with a throwaway config instead of
+downloading another browser. Do not commit this file:
+
+```ts
+// apps/web/e2e-local.config.ts (do not commit)
+import base from "./playwright.config";
+export default {
+  ...base,
+  projects: base.projects?.map((p) => ({
+    ...p,
+    use: { ...p.use, launchOptions: { executablePath: "/path/to/chromium" } },
+  })),
+};
+```
+
+Run it from `apps/web`:
+
+```shell
+pnpm exec playwright test -c e2e-local.config.ts
+```
+
 ## What To Test
 
 - Use Vitest for logic such as state, validation, callbacks, and route loading
@@ -122,8 +144,8 @@ web server is already running with the API pointed at a compatible test target.
 
 ## CI Budget
 
-Three photo tests cover searching after an outage, replacing a photo during
-lookup, and stopping a stalled request. The last test advances the browser clock.
+Three photo tests cover keeping what a failed lookup found, replacing a photo
+during lookup, and stopping a stalled request. The last test advances the browser clock.
 
 - The Playwright command should finish in less than 5 minutes on a healthy CI
   runner. Its hard timeout is 7 minutes. The 15-minute GitHub job timeout also

@@ -99,16 +99,26 @@ type TastingEditFormProps = {
   onSubmit: SubmitHandler<TastingEditFormSubmitData>;
 };
 
+/** Finishes a tasting draft: each Continue saves the draft, and the last step posts it. */
+type TastingDraftFormProps = {
+  initialData: TastingCreateFormProps["initialData"];
+  mode: "draft";
+  onChangeBottle: () => void;
+  onSaveDraft: (data: TastingEditFormSubmitData) => Promise<void>;
+  onSubmit: SubmitHandler<TastingEditFormSubmitData>;
+};
+
 export default function TastingForm(
   props: {
     errorMessage?: string;
     suggestedTags: { results: TastingTagSuggestion[] };
     title: string;
-  } & (TastingCreateFormProps | TastingEditFormProps),
+  } & (TastingCreateFormProps | TastingEditFormProps | TastingDraftFormProps),
 ) {
   const { errorMessage, initialData, suggestedTags, title } = props;
   const orpc = useORPC();
-  const canChooseMode = props.mode !== "edit";
+  const canChooseMode = props.mode === undefined || props.mode === "create";
+  const [savingDraft, setSavingDraft] = useState(false);
   const [formMode, setFormMode] = useState<TastingFormMode | null>(
     canChooseMode ? null : "tasting",
   );
@@ -134,6 +144,7 @@ export default function TastingForm(
   const {
     control,
     formState: { errors, isSubmitting },
+    getValues,
     handleSubmit,
     register,
     setValue,
@@ -199,6 +210,7 @@ export default function TastingForm(
     category: option.tag ? toTitleCase(option.tag.tagCategory) : "Other notes",
     common: option.count > 0,
     name: option.id,
+    synonyms: option.tag?.synonyms,
     usageCount: option.count,
   }));
 
@@ -240,7 +252,7 @@ export default function TastingForm(
   const submit: SubmitHandler<TastingFormFields> = async (fields) => {
     setSubmitError(undefined);
     try {
-      if (props.mode === "edit") {
+      if (props.mode === "edit" || props.mode === "draft") {
         await props.onSubmit(buildTastingEditFormSubmission({ fields, image }));
       } else {
         await props.onSubmit(
@@ -256,16 +268,48 @@ export default function TastingForm(
         getFormErrorMessage(error, {
           expectedErrorNames: ["BAD_REQUEST", "CONFLICT"],
           fallbackMessage:
-            "We couldn't save that tasting. Your notes are still here — try again.",
+            props.mode === "draft"
+              ? "We couldn't post that tasting. Your notes are still here — try again."
+              : "We couldn't save that tasting. Your notes are still here — try again.",
         }),
       );
     }
   };
 
+  async function saveDraft() {
+    if (props.mode !== "draft") return true;
+
+    setSubmitError(undefined);
+    setSavingDraft(true);
+    try {
+      await props.onSaveDraft(
+        buildTastingEditFormSubmission({ fields: getValues(), image }),
+      );
+      return true;
+    } catch (error) {
+      setSubmitError(
+        getFormErrorMessage(error, {
+          expectedErrorNames: ["BAD_REQUEST", "CONFLICT"],
+          fallbackMessage:
+            "We couldn't save your draft. Your notes are still here — try again.",
+        }),
+      );
+      return false;
+    } finally {
+      setSavingDraft(false);
+    }
+  }
+
+  // Leaving the form drops what it holds, so save the draft first.
+  async function changeDraftBottle() {
+    if (props.mode !== "draft") return;
+    if (await saveDraft()) props.onChangeBottle();
+  }
+
   const submitReview: SubmitHandler<MemberReviewFormFields> = async (
     fields,
   ) => {
-    if (props.mode === "edit") return;
+    if (props.mode === "edit" || props.mode === "draft") return;
 
     setSubmitError(undefined);
     try {
@@ -300,6 +344,7 @@ export default function TastingForm(
             : ["servingStyle", "color", "friends"],
         );
     if (!stepIsValid) return;
+    if (!(await saveDraft())) return;
     setCurrentStep((step) => Math.min(step + 1, steps.length - 1));
     scrollToFormTop();
   }
@@ -312,7 +357,7 @@ export default function TastingForm(
         event.preventDefault();
         void continueForm();
       };
-  const saving = isReview ? isReviewSubmitting : isSubmitting;
+  const saving = isReview ? isReviewSubmitting : isSubmitting || savingDraft;
   const reviewIsLoading = isReview && reviewQuery.isPending;
   const reviewLoadFailed = isReview && Boolean(reviewQuery.error);
   const validReviewScore =
@@ -330,11 +375,13 @@ export default function TastingForm(
       : undefined;
   const saveLabel = !isLastStep
     ? "Continue"
-    : !isReview
-      ? "Save tasting"
-      : reviewQuery.data
-        ? "Update review"
-        : "Save review";
+    : props.mode === "draft"
+      ? "Post"
+      : !isReview
+        ? "Save tasting"
+        : reviewQuery.data
+          ? "Update review"
+          : "Save review";
 
   function selectFormMode(nextMode: TastingFormMode) {
     setSubmitError(undefined);
@@ -378,9 +425,9 @@ export default function TastingForm(
             ? "Edit your review"
             : "Write a review"
           : formMode === "tasting"
-            ? props.mode === "edit"
-              ? title
-              : "Log a tasting"
+            ? canChooseMode
+              ? "Log a tasting"
+              : title
             : "Rate this bottle"
       }
     >
@@ -389,6 +436,11 @@ export default function TastingForm(
           <SelectedBottleSummary
             bottle={initialData.bottle}
             imageUrl={photoPreview ?? initialData.bottle.imageUrl}
+            onChange={
+              props.mode === "draft" && !saving
+                ? () => void changeDraftBottle()
+                : undefined
+            }
           />
           {submitError || errorMessage ? (
             <FormNotice role="alert">{submitError ?? errorMessage}</FormNotice>

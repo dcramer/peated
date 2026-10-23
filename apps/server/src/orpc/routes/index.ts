@@ -2,6 +2,7 @@ import { api } from "@peated/server/orpc";
 import activity from "./activity";
 import admin from "./admin";
 import ai from "./ai";
+import auctions from "./auctions";
 import audits from "./audits";
 import auth from "./auth";
 import badges from "./badges";
@@ -38,16 +39,19 @@ import search from "./search";
 import smws from "./smws";
 import stats from "./stats";
 import tags from "./tags";
+import tastingDrafts from "./tastingDrafts";
 import tastings from "./tastings";
 import toasts from "./toasts";
 import users from "./users";
 import version from "./version";
+import wrongPhotoMatches from "./wrongPhotoMatches";
 
 export interface Router {
   activity: typeof activity;
   admin: typeof admin;
   ai: typeof ai;
   audits: typeof audits;
+  auctions: typeof auctions;
   auth: typeof auth;
   badges: typeof badges;
   bottles: typeof bottles;
@@ -83,10 +87,12 @@ export interface Router {
   smws: typeof smws;
   stats: typeof stats;
   tags: typeof tags;
+  tastingDrafts: typeof tastingDrafts;
   tastings: typeof tastings;
   toasts: typeof toasts;
   users: typeof users;
   version: typeof version;
+  wrongPhotoMatches: typeof wrongPhotoMatches;
 }
 
 export default api.router({
@@ -94,6 +100,7 @@ export default api.router({
   admin,
   ai,
   audits,
+  auctions,
   auth,
   badges,
   bottles,
@@ -129,8 +136,10 @@ export default api.router({
   search,
   stats,
   tags,
+  tastingDrafts,
   tastings,
   toasts,
   users,
   version,
+  wrongPhotoMatches,
 });

@@ -61,6 +61,17 @@ describe("nextTaskAfterCompletion", () => {
 });
 
 describe("selectedInboxTask", () => {
+  test("reads an unresolved critic review task", () => {
+    expect(
+      selectedInboxTask("/admin/moderation/inbox/external_review/18876"),
+    ).toEqual({ kind: "external_review", id: 18876 });
+  });
+  test("reads a source-owned auction task", () => {
+    expect(selectedInboxTask("/admin/moderation/inbox/auction_lot/7")).toEqual({
+      kind: "auction_lot",
+      id: 7,
+    });
+  });
   test("reads a selected task from the inbox route", () => {
     expect(selectedInboxTask("/admin/moderation/inbox/operation/42")).toEqual({
       kind: "operation",

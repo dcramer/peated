@@ -193,6 +193,17 @@ describe("GET /admin/scrapers/activity", () => {
 
     await db.insert(incomingBottleDecisionLogs).values([
       {
+        sourceKind: "store_price",
+        sourceId: matchedPrice.id,
+        externalSiteId: priceSite.id,
+        name: matchedPrice.name,
+        decision: "create_bottle",
+        actorId: systemActor.id,
+        bottleId: bottle.id,
+        createdBottle: true,
+        createdAt: startedAt,
+      },
+      {
         sourceKind: "review",
         sourceId: createdReview.id,
         externalSiteId: reviewSite.id,

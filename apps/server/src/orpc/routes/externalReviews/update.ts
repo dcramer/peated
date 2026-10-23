@@ -3,11 +3,17 @@ import {
   externalReviewArticles,
   externalReviews,
 } from "@peated/server/db/schema";
+import { isExternalReviewPublicationApprovedInTransaction } from "@peated/server/externalReviews/publication";
 import { getUserActorForDatabase } from "@peated/server/lib/actors";
 import { dispatchBottleStatsRecompute } from "@peated/server/lib/dispatchBottleStatsRecompute";
 import {
+  ExternalReviewResolutionVersionSchema,
+  reviewResolutionVersionMatches,
+} from "@peated/server/lib/externalReviewResolution";
+import {
   recordIncomingBottleDecisionInTransaction,
   shouldRecordIncomingBottleDecision,
+  type IncomingBottleDecisionMetadata,
 } from "@peated/server/lib/incomingBottleDecisionLog";
 import {
   ActiveBottleSelectionError,
@@ -25,6 +31,7 @@ const InputSchema = z.object({
   externalReview: z.coerce.number().int().positive(),
   bottle: z.number().int().positive().nullable().optional(),
   hidden: z.boolean().optional(),
+  expectedResolution: ExternalReviewResolutionVersionSchema.optional(),
 });
 
 export default procedure
@@ -83,6 +90,33 @@ export default procedure
           }
         }
 
+        let publicationApproved = false;
+        let publicationSiteId: number | null = null;
+        if (
+          input.expectedResolution &&
+          nextBottleId != null &&
+          !hasHiddenUpdate
+        ) {
+          const [source] = await tx
+            .select({ externalSiteId: externalReviewArticles.externalSiteId })
+            .from(externalReviews)
+            .innerJoin(
+              externalReviewArticles,
+              eq(externalReviews.articleId, externalReviewArticles.id),
+            )
+            .where(eq(externalReviews.id, externalReviewId))
+            .limit(1);
+          if (!source)
+            throw errors.NOT_FOUND({ message: "External review not found." });
+          publicationSiteId = source.externalSiteId;
+          // Review publication owns lock order: lock the source before its review.
+          publicationApproved =
+            await isExternalReviewPublicationApprovedInTransaction(
+              tx,
+              source.externalSiteId,
+            );
+        }
+
         const [locked] = await tx
           .select({
             article: externalReviewArticles,
@@ -100,10 +134,41 @@ export default procedure
           throw errors.NOT_FOUND({ message: "External review not found." });
         }
         const { article, externalReview: lockedExternalReview } = locked;
+        if (
+          publicationSiteId !== null &&
+          article.externalSiteId !== publicationSiteId
+        ) {
+          throw errors.CONFLICT({
+            message: "This review changed. Refresh it before deciding.",
+          });
+        }
+        if (
+          input.expectedResolution &&
+          !reviewResolutionVersionMatches(
+            lockedExternalReview,
+            input.expectedResolution,
+          )
+        ) {
+          throw errors.CONFLICT({
+            message: "This review changed. Refresh it before deciding.",
+          });
+        }
 
         const update: Partial<typeof externalReviews.$inferInsert> = {};
-        if (hasBottleUpdate) update.bottleId = nextBottleId;
+        if (hasBottleUpdate) {
+          update.bottleId = nextBottleId;
+          update.matchedReferenceId = null;
+          update.bottleNoMatchAt = null;
+        }
         if (hasHiddenUpdate) update.hidden = hidden;
+        if (
+          input.expectedResolution &&
+          nextBottleId != null &&
+          !hasHiddenUpdate &&
+          publicationApproved
+        ) {
+          update.hidden = false;
+        }
         const [externalReview] = await tx
           .update(externalReviews)
           .set(update)
@@ -116,23 +181,32 @@ export default procedure
         }
 
         if (
-          nextBottleId != null &&
-          shouldRecordIncomingBottleDecision({
-            previousBottleId: lockedExternalReview.bottleId,
-            bottleId: nextBottleId,
-            decision: "match",
-          })
+          hasBottleUpdate &&
+          (lockedExternalReview.matchedReferenceId !== null ||
+            shouldRecordIncomingBottleDecision({
+              previousBottleId: lockedExternalReview.bottleId,
+              bottleId: nextBottleId,
+              decision: nextBottleId === null ? "unassign" : "match",
+            }))
         ) {
           const actor = await getUserActorForDatabase(tx, context.user);
+          const metadata: IncomingBottleDecisionMetadata = {
+            previousBottleId: lockedExternalReview.bottleId,
+            resolutionSource: "moderator",
+          };
+          if (lockedExternalReview.matchedReferenceId !== null)
+            metadata.previousReferenceId =
+              lockedExternalReview.matchedReferenceId;
           await recordIncomingBottleDecisionInTransaction(tx, {
             sourceKind: "review",
             sourceId: externalReview.id,
             externalSiteId: article.externalSiteId,
             name: externalReview.name,
             url: article.canonicalUrl,
-            decision: "match",
+            decision: nextBottleId === null ? "unassign" : "match",
             actor,
             bottleId: nextBottleId,
+            metadata,
           });
         }
 

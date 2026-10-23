@@ -135,6 +135,12 @@ export default function EntityForm({
     if (result?.yearEstablished && !current.yearEstablished) {
       setValue("yearEstablished", result.yearEstablished);
     }
+    if (result?.pronunciation && !current.pronunciation) {
+      setValue("pronunciation", result.pronunciation);
+    }
+    if (result?.pronunciationIpa && !current.pronunciationIpa) {
+      setValue("pronunciationIpa", result.pronunciationIpa);
+    }
   }
 
   return (
@@ -181,6 +187,45 @@ export default function EntityForm({
                 id="entity-short-name"
                 invalid={Boolean(errors.shortName)}
                 placeholder="The Macallan"
+              />
+            </Field>
+            <Field
+              error={errors.pronunciation?.message}
+              errorId="entity-pronunciation-error"
+              hint="Plain English. Put the stressed syllable in capitals when you know it."
+              htmlFor="entity-pronunciation"
+              label="Pronunciation"
+              optional
+            >
+              <TextInput
+                {...register("pronunciation", {
+                  setValueAs: (value) => value || null,
+                })}
+                aria-describedby="entity-pronunciation-error"
+                autoComplete="off"
+                id="entity-pronunciation"
+                invalid={Boolean(errors.pronunciation)}
+                placeholder="glen GEER-ee"
+              />
+            </Field>
+            <Field
+              error={errors.pronunciationIpa?.message}
+              errorId="entity-pronunciation-ipa-error"
+              hint="International Phonetic Alphabet, without slashes."
+              htmlFor="entity-pronunciation-ipa"
+              label="Pronunciation (IPA)"
+              optional
+            >
+              <TextInput
+                {...register("pronunciationIpa", {
+                  setValueAs: (value) => value || null,
+                })}
+                aria-describedby="entity-pronunciation-ipa-error"
+                autoComplete="off"
+                id="entity-pronunciation-ipa"
+                invalid={Boolean(errors.pronunciationIpa)}
+                lang="und-fonipa"
+                placeholder="ɡlɛn ˈɡɪəri"
               />
             </Field>
             <Field

@@ -3,16 +3,16 @@ import {
   createPendingImageUpload,
   PENDING_UPLOAD_NAMESPACE,
 } from "@peated/server/lib/pendingUploads";
+import { buildPhotoEvidenceFromExtractedIdentity } from "@peated/server/lib/photoIdentification";
 import {
-  buildPhotoEvidenceFromExtractedIdentity,
-  getPhotoExtractionImageInput,
-} from "@peated/server/lib/photoIdentification";
-import { compressAndResizeImage } from "@peated/server/lib/uploads";
+  compressAndResizeImage,
+  getUploadImageDataUrl,
+} from "@peated/server/lib/uploads";
 
 describe("photo identification", () => {
   test("preserves raw label text as image evidence", () => {
     const imageEvidence = buildPhotoEvidenceFromExtractedIdentity({
-      pendingUpload: {
+      photo: {
         id: "pending-image",
         imageUrl: "https://example.com/bottle.jpg",
       },
@@ -33,6 +33,28 @@ describe("photo identification", () => {
     expect(imageEvidence.fieldCandidates.edition).toBeUndefined();
   });
 
+  test("keeps cask facts read from the label", () => {
+    const imageEvidence = buildPhotoEvidenceFromExtractedIdentity({
+      photo: {
+        id: "pending-image",
+        imageUrl: "https://example.com/bottle.jpg",
+      },
+      extractedIdentity: BottleExtractedDetailsSchema.parse({
+        brand: "Example",
+        expression: "Single Cask",
+        cask_number: "123",
+        maturation: "First-fill sherry butt",
+        outturn: 612,
+      }),
+    });
+
+    expect(imageEvidence.fieldCandidates.caskNumber?.value).toBe("123");
+    expect(imageEvidence.fieldCandidates.maturation?.value).toBe(
+      "First-fill sherry butt",
+    );
+    expect(imageEvidence.fieldCandidates.outturn?.value).toBe(612);
+  });
+
   test("uses a data URL for local pending image extraction", async ({
     defaults,
     fixtures,
@@ -44,7 +66,7 @@ describe("photo identification", () => {
       onProcess: (...args) => compressAndResizeImage(...args, 1600, 1600),
     });
 
-    const imageInput = await getPhotoExtractionImageInput({ pendingUpload });
+    const imageInput = await getUploadImageDataUrl(pendingUpload.imageUrl);
 
     expect(pendingUpload.imageUrl).toContain(
       `/uploads/${PENDING_UPLOAD_NAMESPACE}/`,

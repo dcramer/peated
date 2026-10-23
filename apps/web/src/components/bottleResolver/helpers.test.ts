@@ -1,9 +1,15 @@
+import { mockBottle } from "@peated/server/orpc/mock/fixtures";
 import { describe, expect, test } from "vitest";
 import {
+  applyPhotoProgress,
+  EMPTY_PHOTO_PROGRESS,
   getCreateBottlePrefill,
   getCreateNameSeed,
-  getManualResultCopy,
+  getFallbackReason,
+  getLabelSummary,
+  getPhotoProgressStatus,
   type PhotoIdentification,
+  type PhotoIdentificationProgressEvent,
 } from "./helpers";
 
 function buildPhotoResult(): PhotoIdentification {
@@ -98,11 +104,11 @@ function buildPhotoResult(): PhotoIdentification {
       classification: {
         status: "classified",
         action: "create_bottle",
-        confidence: null,
         reason: null,
       },
     },
     createToken: null,
+    wrongMatchToken: null,
   };
 }
 
@@ -143,15 +149,105 @@ describe("photo create prefill", () => {
       },
     };
 
-    expect(getManualResultCopy(result)).toMatchObject({
-      title: "We couldn't find this bottle",
-      createLabel: "Add a new bottle",
-      primaryAction: "create",
-    });
+    expect(getFallbackReason(result)).toBe(
+      "We read the label but couldn't match it to a bottle.",
+    );
     expect(getCreateBottlePrefill(result)).toMatchObject({
       brandName: "Raw Label Brand",
       category: "single_malt",
       distillers: [{ id: null, name: "Qualified Existing Distillery Co." }],
     });
+  });
+
+  test("keeps cask details read from the label when the proposal leaves them out", () => {
+    const result = buildPhotoResult();
+    result.imageEvidence.fieldCandidates = {
+      ...result.imageEvidence.fieldCandidates,
+      caskNumber: {
+        value: "1234",
+        confidence: 0.9,
+        sourceExtractorIndexes: [0],
+      },
+      maturation: {
+        value: "First-fill sherry butt",
+        confidence: 0.9,
+        sourceExtractorIndexes: [0],
+      },
+      outturn: {
+        value: 612,
+        confidence: 0.9,
+        sourceExtractorIndexes: [0],
+      },
+    };
+
+    expect(getCreateBottlePrefill(result)).toMatchObject({
+      caskNumber: "1234",
+      maturation: "First-fill sherry butt",
+      outturn: 612,
+    });
+  });
+
+  test("fills a new Bottle from the label facts a failed lookup streamed", () => {
+    // Only the label event arrived before the lookup failed.
+    const { imageEvidence } = buildPhotoResult();
+
+    expect(getCreateNameSeed({ imageEvidence })).toBe("");
+    expect(getCreateBottlePrefill({ imageEvidence })).toMatchObject({
+      brandId: null,
+      brandName: "Raw Label Brand",
+      category: "single_malt",
+      distillers: [{ id: null, name: "Qualified Existing Distillery Co." }],
+    });
+  });
+});
+
+describe("photo identification progress", () => {
+  test("collects each event and names the current step", () => {
+    const result = buildPhotoResult();
+    const events: PhotoIdentificationProgressEvent[] = [
+      { type: "photo", pendingImage: result.pendingImage },
+      { type: "label", imageEvidence: result.imageEvidence },
+      { type: "candidates", bottles: [mockBottle] },
+      { type: "step", step: "checking_web" },
+    ];
+    const statuses = [getPhotoProgressStatus(EMPTY_PHOTO_PROGRESS)];
+    let progress = EMPTY_PHOTO_PROGRESS;
+    for (const event of events) {
+      progress = applyPhotoProgress(progress, event);
+      statuses.push(getPhotoProgressStatus(progress));
+    }
+
+    expect(progress).toEqual({
+      pendingImage: result.pendingImage,
+      imageEvidence: result.imageEvidence,
+      candidates: [mockBottle],
+      step: "checking_web",
+    });
+    expect(statuses).toEqual([
+      "Reading the label…",
+      "Reading the label…",
+      "Checking Peated…",
+      "Checking Peated…",
+      "Checking the web…",
+    ]);
+  });
+});
+
+describe("getLabelSummary", () => {
+  test("joins the brand, name, age, and strength that were read", () => {
+    const { imageEvidence } = buildPhotoResult();
+    expect(
+      getLabelSummary({
+        ...imageEvidence,
+        fieldCandidates: {
+          brand: { value: "Beauchamp", confidence: 0.75 },
+          expression: { value: "Single Malt", confidence: 0.75 },
+          abv: { value: 46, confidence: 0.75 },
+        },
+      }),
+    ).toBe("Beauchamp · Single Malt · 46% ABV");
+    expect(
+      getLabelSummary({ ...imageEvidence, fieldCandidates: {} }),
+    ).toBeNull();
   });
 });

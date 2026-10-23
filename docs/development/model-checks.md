@@ -28,12 +28,48 @@ judgment that a repeatable code test cannot prove.
 - For a controlled classifier comparison, give both variants the same reviewed
   evidence pack keyed by test case ID. Query-keyed replay is insufficient when a
   prompt change can alter the query. Run current live web behavior separately.
+- A decision fixture may set `webEvidenceFile` to a package-relative reviewed
+  evidence pack. This makes its evidence available in CI without web credentials.
+  `BOTTLE_CLASSIFIER_EVAL_FIXED_EVIDENCE_FILE` overrides that fixture default.
 - Run focused model checks while changing model behavior. Run the full suite
   once at a deliberate full-suite run.
+
+## Capture a production miss
+
+Store-price and review classifier runs are saved as Bottle checks with the full
+input, decision, and artifacts. To turn a wrong decision into a test case:
+
+1. Find the source record. The moderation history entry for the decision gives
+   its source kind and ID.
+2. Fetch the saved run with the authenticated CLI:
+   `pnpm -s cli api get '/audits/runs?sourceKind=review&sourceId=123' > run.json`.
+3. Draft the test case and its evidence pack:
+   `pnpm --filter @peated/bottle-classifier fixtures:draft "$PWD/run.json" <fixture-id> "$PWD/<out-dir>"`.
+4. Verify the Bottle online, write `expected`, complete `provenance`, and move
+   the test case into `src/eval-fixtures/decision-cases/`. The validator rejects
+   the draft until you do.
+
+Do not rely on Sentry for this. It keeps only some classifier runs and cuts
+long inputs and tool outputs.
 
 ## Pull request checks
 
 - Add `trigger-evals` to run classifier model checks.
+- Classifier CI sets `BOTTLE_CLASSIFIER_EVAL_FIXED_EVIDENCE_FILE` to
+  `evals/evidence/ci.json`. This reviewed snapshot covers every classifier and
+  audit case. Missing case or image coverage fails validation before model
+  calls. Web search and page reads use only that case's saved evidence; image
+  reads use its saved extraction. Unreviewed pages and images never fall
+  through to a live provider.
+- Empty search evidence explicitly marks a local-input-only case. Saved
+  upstream extractions may preserve known errors from the captured run; they
+  are inputs for classifier judgment, not assertions about the correct result.
+  The separate label-extraction model checks still read checked-in image bytes
+  through the live extraction model.
+- To run the same controlled suite locally, set the fixed-evidence variable to
+  `evals/evidence/ci.json` and run `pnpm evals:classifier`. For a separate
+  live-web check, set it to an empty string and supply Firecrawl credentials.
+  This disables both the CI snapshot and individual fixture evidence defaults.
 - Add `trigger-evals-scraper` to run scraper model checks.
 - Scraper model checks also run automatically when files under
   `apps/server/src/scraper/configured/` change in an internal pull request.

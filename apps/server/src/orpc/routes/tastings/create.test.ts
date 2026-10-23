@@ -177,24 +177,106 @@ describe("POST /tastings", () => {
     expect(error).toMatchInlineSnapshot(`[Error: Cannot identify flight.]`);
   });
 
-  test("returns a conflict for a duplicate Bottle Tasting", async ({
+  test("uses the post time as the tasted time by default", async ({
     defaults,
     fixtures,
   }) => {
     const bottle = await fixtures.Bottle();
-    const createdAt = new Date().toISOString();
 
-    await routerClient.tastings.create(
-      { bottle: bottle.id, createdAt },
+    const { tasting } = await routerClient.tastings.create(
+      { bottle: bottle.id },
       { context: { user: defaults.user } },
     );
+
+    expect(tasting.tastedAt).toBe(tasting.createdAt);
+  });
+
+  test("keeps an old tasted time but posts it now", async ({
+    defaults,
+    fixtures,
+  }) => {
+    const bottle = await fixtures.Bottle();
+    const tastedAt = new Date("2024-03-09T21:30:00.000Z").toISOString();
+    const before = Date.now();
+
+    const { tasting } = await routerClient.tastings.create(
+      { bottle: bottle.id, tastedAt },
+      { context: { user: defaults.user } },
+    );
+
+    expect(tasting.tastedAt).toBe(tastedAt);
+    expect(new Date(tasting.createdAt).getTime()).toBeGreaterThanOrEqual(
+      before,
+    );
+  });
+
+  test("rejects a tasted time in the future", async ({
+    defaults,
+    fixtures,
+  }) => {
+    const bottle = await fixtures.Bottle();
+    const tastedAt = new Date(Date.now() + 60 * 60 * 1000).toISOString();
+
     const error = await waitError(() =>
       routerClient.tastings.create(
-        { bottle: bottle.id, createdAt },
+        { bottle: bottle.id, tastedAt },
         { context: { user: defaults.user } },
       ),
     );
-    expect(error).toMatchInlineSnapshot(`[Error: Tasting already exists.]`);
+    expect(error).toMatchInlineSnapshot(`[Error: Input validation failed]`);
+  });
+
+  test("returns the first tasting when a post is repeated", async ({
+    defaults,
+    fixtures,
+  }) => {
+    const bottle = await fixtures.Bottle({ statedAge: 5 });
+    await fixtures.Badge({
+      tracker: "bottle",
+      checks: [{ type: "age", config: { minAge: 5, maxAge: 10 } }],
+    });
+    const input = {
+      bottle: bottle.id,
+      notes: "Peat smoke and pear.",
+      idempotencyKey: "post-1",
+    };
+
+    const first = await routerClient.tastings.create(input, {
+      context: { user: defaults.user },
+    });
+    const second = await routerClient.tastings.create(input, {
+      context: { user: defaults.user },
+    });
+
+    expect(second.tasting.id).toBe(first.tasting.id);
+    expect(first.awards).toHaveLength(1);
+    expect(second.awards).toEqual([]);
+    expect(
+      await db.query.tastings.findMany({
+        where: eq(tastings.bottleId, bottle.id),
+        columns: { id: true },
+      }),
+    ).toEqual([{ id: first.tasting.id }]);
+  });
+
+  test("scopes the repeat key to the member", async ({
+    defaults,
+    fixtures,
+  }) => {
+    const bottle = await fixtures.Bottle();
+    const otherUser = await fixtures.User();
+
+    const mine = await routerClient.tastings.create(
+      { bottle: bottle.id, idempotencyKey: "shared-key" },
+      { context: { user: defaults.user } },
+    );
+    const theirs = await routerClient.tastings.create(
+      { bottle: bottle.id, idempotencyKey: "shared-key" },
+      { context: { user: otherUser } },
+    );
+
+    expect(theirs.tasting.id).not.toBe(mine.tasting.id);
+    expect(theirs.tasting.createdBy.id).toBe(otherUser.id);
   });
 
   test("does not mutate the cached tag summary inline", async ({

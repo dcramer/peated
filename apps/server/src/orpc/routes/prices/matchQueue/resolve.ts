@@ -6,6 +6,7 @@ import {
 import {
   applyApprovedStorePriceMatch,
   ignoreStorePriceMatchProposal,
+  StorePriceMatchNeedsReasonError,
   StorePriceMatchProposalAlreadyProcessingError,
   StorePriceMatchProposalIdentityChangedError,
   StorePriceMatchProposalNotReviewableError,
@@ -22,6 +23,7 @@ const InputSchema = z.discriminatedUnion("action", [
       proposal: z.coerce.number().int().positive(),
       action: z.literal("match"),
       bottle: z.coerce.number().int().positive(),
+      reason: z.string().trim().min(1).max(500).optional(),
     })
     .strict(),
   z
@@ -39,7 +41,7 @@ export default procedure
     path: "/prices/match-queue/{proposal}",
     summary: "Resolve price match queue item",
     description:
-      "Approve or ignore a store price match proposal. Requires moderator privileges",
+      "Approve or ignore a store price match proposal. A match to a Bottle that differs from the listing's saved facts needs a reason. Requires moderator privileges",
     operationId: "resolvePriceMatchQueueItem",
   })
   .input(InputSchema)
@@ -52,6 +54,7 @@ export default procedure
           bottleId: input.bottle,
           reviewedById: context.user.id,
           actor: await getUserActor(context.user),
+          review: { reason: input.reason },
         });
         return {};
       }
@@ -67,6 +70,9 @@ export default procedure
         throw errors.NOT_FOUND({
           message: err.message,
         });
+      }
+      if (err instanceof StorePriceMatchNeedsReasonError) {
+        throw errors.BAD_REQUEST({ message: err.message });
       }
       if (err instanceof StorePriceMatchProposalNotReviewableError) {
         throw errors.CONFLICT({

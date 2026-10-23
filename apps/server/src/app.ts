@@ -28,6 +28,7 @@ import { z, ZodError } from "zod";
 import config from "./config";
 import { userToActorContext, withActorContext } from "./lib/actorContext";
 import { getUserFromHeader } from "./lib/auth";
+import { isPronunciationAudioUpload } from "./lib/entityPronunciationAudio";
 import { httpLogger, logError, logInfo, logWarn } from "./lib/log";
 import { readFile as readUploadFile } from "./lib/uploads";
 import { oauthTokenHandler } from "./oauth/token";
@@ -145,6 +146,7 @@ const rpcHandler = new RPCHandler(router, {
 });
 
 const ONE_DAY = 60 * 60 * 24;
+const ONE_YEAR = ONE_DAY * 365;
 const honoApp = new Hono();
 
 const MissingUploadErrorSchema = z.object({
@@ -239,8 +241,14 @@ export const app = honoApp
       throw err;
     }
 
-    // Set appropriate headers
-    c.header("Cache-Control", `public, max-age=${ONE_DAY}`);
+    // Pronunciation audio file names hash their content, so a URL never
+    // changes meaning. Other uploads can be replaced at the same path.
+    c.header(
+      "Cache-Control",
+      isPronunciationAudioUpload(filename)
+        ? `public, max-age=${ONE_YEAR}, immutable`
+        : `public, max-age=${ONE_DAY}`,
+    );
     c.header("Content-Type", lookup(filename) || "application/octet-stream");
 
     return c.body(new Uint8Array(body));

@@ -20,22 +20,26 @@ describe("GET /bottle-series/{series}/flavor-profile", () => {
       {
         bottleId: first.id,
         createdById: defaults.user.id,
+        tastedAt: new Date("2026-01-01"),
         tags: ["smoke", "ash", "vanilla"],
         createdAt: new Date("2026-01-01"),
       },
       {
         bottleId: second.id,
         createdById: defaults.user.id,
+        tastedAt: new Date(),
         tags: ["smoke"],
       },
       {
         bottleId: unrelated.id,
         createdById: defaults.user.id,
+        tastedAt: new Date(),
         tags: ["vanilla"],
       },
       {
         bottleId: second.id,
         createdById: privateUser.id,
+        tastedAt: new Date(),
         tags: ["vanilla"],
       },
     ]);

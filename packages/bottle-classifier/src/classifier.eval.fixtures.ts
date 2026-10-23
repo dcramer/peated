@@ -28,6 +28,7 @@ export type ClassifierEvalCase = {
   name: string;
   input: ClassifyBottleReferenceInput;
   localCatalog?: LocalCatalog;
+  webEvidenceFile?: string;
   searchResponses?: SearchResponseFixture[];
   context: ClassifierEvalContext;
   expected: ClassifierEvalExpectation;
@@ -47,6 +48,7 @@ function loadFixtureFiles(): ClassifierEvalCase[] {
       name: fixture.name,
       input: fixture.input,
       localCatalog: fixture.localCatalog,
+      webEvidenceFile: fixture.webEvidenceFile,
       searchResponses: fixture.searchResponses,
       context: fixture.context,
       expected: fixture.expected,

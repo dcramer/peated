@@ -4,6 +4,8 @@ import {
   mockImageUrls,
 } from "@peated/server/orpc/mock/fixtures";
 import { mockOS } from "@peated/server/orpc/mock/implementer";
+import type { PhotoIdentificationSchema } from "@peated/server/schemas";
+import type { z } from "zod";
 
 export default mockOS.tastings.photoIdentification.handler(
   async ({ input, context, errors }) => {
@@ -17,7 +19,7 @@ export default mockOS.tastings.photoIdentification.handler(
     const matchedBottle = mockBottleDetailsFor(context.user, bottle);
     const pendingImageId = `mock-${input.idempotencyKey}`;
 
-    return {
+    const result: z.infer<typeof PhotoIdentificationSchema> = {
       pendingImage: {
         id: pendingImageId,
         imageUrl: mockImageUrls.cairdeasWarehouse1,
@@ -97,11 +99,19 @@ export default mockOS.tastings.photoIdentification.handler(
         classification: {
           status: "classified",
           action: "match",
-          confidence: 0.96,
           reason: "Mock exact label match.",
         },
       },
       createToken: null,
+      wrongMatchToken: null,
     };
+
+    return (async function* () {
+      yield { type: "photo" as const, pendingImage: result.pendingImage };
+      yield { type: "label" as const, imageEvidence: result.imageEvidence };
+      yield { type: "candidates" as const, bottles: [matchedBottle] };
+      yield { type: "step" as const, step: "comparing" as const };
+      return result;
+    })();
   },
 );

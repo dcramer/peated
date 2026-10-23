@@ -37,11 +37,32 @@ describe("TastingReviewBottleSummary", () => {
       <TastingReviewBottleSummary
         bottle={mockBottle}
         photoUrl={null}
-        placement="mobile"
+        placement="desktop"
       />,
     );
 
     expect(html).not.toContain("at full size");
     expect(html).toContain("Lagavulin 16-year-old");
+  });
+
+  it("leaves the bottle name to the page header on mobile", () => {
+    const withPhoto = renderToStaticMarkup(
+      <TastingReviewBottleSummary
+        bottle={mockBottle}
+        photoUrl="/tasting.webp"
+        placement="mobile"
+      />,
+    );
+    const withoutImages = renderToStaticMarkup(
+      <TastingReviewBottleSummary
+        bottle={mockBottle}
+        photoUrl={null}
+        placement="mobile"
+      />,
+    );
+
+    expect(withPhoto).toContain('src="/tasting.webp"');
+    expect(withPhoto).not.toContain('aria-label="Bottle"');
+    expect(withoutImages).toBe("");
   });
 });

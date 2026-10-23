@@ -21,6 +21,7 @@ import useEntityFollowing from "@peated/web/hooks/useEntityFollowing";
 import { getEntityBottleCreateHref } from "@peated/web/lib/entityBottleCreateHref";
 import { logTelemetryError } from "@peated/web/lib/log";
 import { useORPC } from "@peated/web/lib/orpc/context";
+import { serverDataQueryOptions } from "@peated/web/lib/orpc/query";
 import { getEntityUrl } from "@peated/web/lib/urls";
 import { space } from "../../../../styles/tokens.stylex";
 
@@ -32,6 +33,7 @@ import {
   type CompanyPageCounts,
   type Entity,
 } from "./entityPageData";
+import { EntityPronunciation } from "./entityPronunciation.stylex";
 
 const EntityPageContext = createContext<Entity | null>(null);
 
@@ -173,12 +175,14 @@ export function EntityPageFrameClient({
 }) {
   const orpc = useORPC();
   const pathname = usePathname();
-  const entityQuery = useQuery({
-    ...orpc.entities.details.queryOptions({
-      input: { entity: initialEntity.id },
-    }),
-    initialData: initialEntity,
-  });
+  const entityQuery = useQuery(
+    serverDataQueryOptions(
+      orpc.entities.details.queryOptions({
+        input: { entity: initialEntity.id },
+      }),
+      initialEntity,
+    ),
+  );
 
   if (entityQuery.error) {
     return (
@@ -226,7 +230,17 @@ export function EntityPageFrameClient({
               <ExpandableDescription content={entity.description} />
             ) : null
           }
-          metadata={getEntityClassification(entity)}
+          metadata={
+            entity.pronunciation || entity.pronunciationIpa ? (
+              <>
+                {getEntityClassification(entity)}
+                {" · "}
+                <EntityPronunciation entity={entity} />
+              </>
+            ) : (
+              getEntityClassification(entity)
+            )
+          }
           menu={<EntityActions entity={entity} />}
           title={entity.name}
         />

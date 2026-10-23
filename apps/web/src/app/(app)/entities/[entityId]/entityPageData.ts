@@ -67,12 +67,6 @@ export function getDistilleryBottleView(
   return view === "other" || view === "releases" ? view : fallback;
 }
 
-export function getEntityLocationLabel(entity: Entity) {
-  return [entity.region?.name, entity.country?.name]
-    .filter((value): value is string => Boolean(value))
-    .join(" · ");
-}
-
 export function getEntityTabs(
   entity: EntityTabSource,
   companyCounts?: CompanyPageCounts,

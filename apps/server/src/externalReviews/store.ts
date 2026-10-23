@@ -1,5 +1,6 @@
 import { db, type AnyTransaction } from "@peated/server/db";
 import {
+  bottleReferences,
   externalReviewArticles,
   externalReviewBodies,
   externalReviews,
@@ -21,6 +22,7 @@ import { z } from "zod";
 
 const StoredExternalReviewSchema = ExternalReviewObservationSchema.safeExtend({
   bottleId: z.number().int().positive().nullable().default(null),
+  matchedReferenceId: z.number().int().positive().nullable().optional(),
   clip: reviewText(180).nullable().optional(),
   version: z.number().int().nonnegative().optional(),
   tags: z.array(reviewText(64)).optional(),
@@ -130,6 +132,22 @@ export async function storeExternalReviewArticleInTransaction(
       invalidBottleIds.add(bottleId);
     }
   }
+  // Review ingestion owns provenance: validate the accepted reference before saving.
+  for (const review of input.externalReviews) {
+    if (review.matchedReferenceId == null || review.bottleId === null) continue;
+    const [reference] = await tx
+      .select()
+      .from(bottleReferences)
+      .where(eq(bottleReferences.id, review.matchedReferenceId))
+      .for("update");
+    if (
+      !reference ||
+      reference.ignored ||
+      reference.bottleId !== review.bottleId
+    ) {
+      throw new Error("Review reference changed before its match was saved.");
+    }
+  }
 
   if (referenceLookupNames.length) {
     await tx
@@ -190,6 +208,12 @@ export async function storeExternalReviewArticleInTransaction(
       "articleId" | "sourceKey" | "updatedAt"
     > = {
       bottleId,
+      matchedReferenceId:
+        existing?.bottleId != null
+          ? existing.matchedReferenceId
+          : bottleId !== null
+            ? (externalReview.matchedReferenceId ?? null)
+            : null,
       name: externalReview.name,
       nativeScoreValue: externalReview.nativeScore?.value ?? null,
       nativeScoreScale: externalReview.nativeScore?.scale ?? null,

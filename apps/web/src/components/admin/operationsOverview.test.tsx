@@ -38,6 +38,7 @@ const operations = {
   },
   needsAttention: [],
   recentRuns: [],
+  pendingAuctions: [],
 };
 
 const inboxCounts = {

@@ -1,0 +1,50 @@
+{
+  "id": "auction-ardbeg-ten-title",
+  "name": "auction title: ordinary Ardbeg Ten is distinct from its cask-strength release",
+  "input": {
+    "reference": {
+      "name": "Ardbeg 10 Year Old",
+      "url": "https://www.scotchwhiskyauctions.com/auctions/232-the-183rd-auction/896554-ardbeg-10-year-old/"
+    },
+    "initialCandidates": [
+      {
+        "bottleId": 910001,
+        "fullName": "Ardbeg 10-year-old",
+        "brand": "Ardbeg",
+        "distillery": ["Ardbeg"],
+        "category": "single_malt",
+        "statedAge": 10,
+        "abv": 46,
+        "source": ["text"]
+      },
+      {
+        "bottleId": 910002,
+        "fullName": "Ardbeg 10-year-old Cask Strength",
+        "brand": "Ardbeg",
+        "distillery": ["Ardbeg"],
+        "category": "single_malt",
+        "statedAge": 10,
+        "abv": 61.7,
+        "caskStrength": true,
+        "source": ["text"]
+      }
+    ],
+    "candidateExpansion": "initial_only"
+  },
+  "provenance": {
+    "source": "curated_regression",
+    "verifiedSourceUrls": [
+      "https://www.scotchwhiskyauctions.com/auctions/232-the-183rd-auction/896554-ardbeg-10-year-old/",
+      "https://www.ardbeg.com/en-int/products/ardbeg-ten-years-old",
+      "https://www.ardbeg.com/en-gb/products/ardbeg-ten-years-old-cask-strength"
+    ],
+    "notes": "Checked 2026-10-01. The auction publishes this exact title, 46% ABV, and 70cl. Ardbeg independently identifies its ordinary Ten at 46% and its separately named Ten Cask Strength at 61.7%. The input preserves index-only collection: no detail facts or photo are supplied. Candidate IDs are fixture-only, not production Peated IDs. No production miss or DB outcome is claimed. The expected Bottle is independently supported. This case does not require reference acceptance: a correct occurrence match may conservatively decline to make an age-only auction title reusable."
+  },
+  "expected": {
+    "status": "classified",
+    "action": "match",
+    "identityScope": "product",
+    "matchedBottleId": 910001,
+    "summary": "Match the ordinary Ten, not the differently marketed cask-strength release. An index-only title may remain reviewable without supporting evidence; matching this occurrence does not require accepting a reusable name."
+  }
+}

@@ -72,4 +72,22 @@ describe("GET /uploads/:filename", () => {
     expect(response.headers.get("cache-control")).toBe("public, max-age=86400");
     expect(Buffer.from(await response.arrayBuffer())).toEqual(imageBytes);
   });
+
+  test("caches pronunciation audio forever", async () => {
+    const filename = "entity-pronunciations/1-0123456789abcdef.mp3";
+    const audioBytes = Buffer.from("ID3");
+
+    await mkdir(join(config.UPLOAD_PATH, "entity-pronunciations"), {
+      recursive: true,
+    });
+    await writeFile(join(config.UPLOAD_PATH, filename), audioBytes);
+
+    const response = await app.request(`/uploads/${filename}`);
+
+    expect(response.status).toBe(200);
+    expect(response.headers.get("content-type")).toBe("audio/mpeg");
+    expect(response.headers.get("cache-control")).toBe(
+      "public, max-age=31536000, immutable",
+    );
+  });
 });

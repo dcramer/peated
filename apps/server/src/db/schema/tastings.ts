@@ -67,6 +67,11 @@ export const tastings = pgTable(
     comments: integer("comments").default(0).notNull(),
     toasts: integer("toasts").default(0).notNull(),
 
+    // When the member had the dram. Feeds sort by createdAt (when it was
+    // posted), so backdating cannot move a tasting up the feed.
+    tastedAt: timestamp("tasted_at").notNull(),
+    // Client-chosen key so a retried post returns the first tasting.
+    idempotencyKey: varchar("idempotency_key", { length: 128 }),
     createdAt: timestamp("created_at").defaultNow().notNull(),
     createdById: bigint("created_by_id", { mode: "number" })
       .references(() => users.id)
@@ -78,10 +83,11 @@ export const tastings = pgTable(
     removalReason: text("removal_reason"),
   },
   (table) => [
-    unique("tasting_unq").on(
-      table.bottleId,
+    // One member cannot record the same Bottle twice at the same tasted time.
+    unique("tasting_unq").on(table.bottleId, table.createdById, table.tastedAt),
+    unique("tasting_idempotency_key").on(
       table.createdById,
-      table.createdAt,
+      table.idempotencyKey,
     ),
     index("tasting_bottle_idx").on(table.bottleId),
     index("tasting_release_idx").on(table.legacyReleaseId),

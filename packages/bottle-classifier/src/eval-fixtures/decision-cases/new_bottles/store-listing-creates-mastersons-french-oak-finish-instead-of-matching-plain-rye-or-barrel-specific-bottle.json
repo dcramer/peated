@@ -173,7 +173,7 @@
       "category": "rye",
       "statedAge": 10
     },
-    "proposedBottleNameIncludes": ["French Oak"],
+    "proposedBottleNameIncludes": ["French Oak", "10-year-old"],
     "proposedBottleNameExcludes": ["Barrel F2-038", "F2-038"],
     "summary": "Create a clean Masterson's French Oak Finish Bottle. The plain rye candidate lacks the distinct finish, while Barrel F2-038 adds a source-unsupported cask identity."
   }

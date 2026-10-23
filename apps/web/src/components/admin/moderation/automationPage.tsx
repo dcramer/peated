@@ -110,6 +110,22 @@ export default function AutomationPage() {
         </AdminSection>
       ) : null}
       {error ? <Alert type="error">{error}</Alert> : null}
+      {data.pendingAuctions.length ? (
+        <AdminSection
+          title="Pending auction matches"
+          description="Recent lots waiting for matching. Decisions ready for review appear in Inbox."
+        >
+          <AdminTable
+            items={data.pendingAuctions}
+            primaryKey={(item) => item.key}
+            columns={[
+              { name: "lot", value: (item) => item.title },
+              { name: "status", value: (item) => item.status },
+              { name: "detail", value: (item) => item.detail ?? "—" },
+            ]}
+          />
+        </AdminSection>
+      ) : null}
       <AdminSection
         title="Stopped work"
         description={`${data.needsAttention.length} items`}

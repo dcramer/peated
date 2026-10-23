@@ -43,6 +43,42 @@ describe("getIncomingBottleDecisionFromResolutionSource", () => {
 });
 
 describe("recordIncomingBottleDecisionInTransaction", () => {
+  test("keeps later corrections and deduplicates concurrent retries", async ({
+    fixtures,
+  }) => {
+    const actor = await getPeatedSystemActor();
+    const first = await fixtures.Bottle();
+    const second = await fixtures.Bottle();
+    const site = await fixtures.ExternalSiteOrExisting();
+    const record = (bottleId: number | null) =>
+      db.transaction((tx) =>
+        recordIncomingBottleDecisionInTransaction(tx, {
+          sourceKind: "review",
+          sourceId: 42,
+          externalSiteId: site.id,
+          name: "Repeated listing",
+          actor,
+          decision: bottleId === null ? "unassign" : "match",
+          bottleId,
+        }),
+      );
+    expect(await record(first.id)).not.toBeNull();
+    const retries = await Promise.all([record(first.id), record(first.id)]);
+    expect(retries).toEqual([null, null]);
+    expect(await record(second.id)).not.toBeNull();
+    expect(await record(null)).not.toBeNull();
+    expect(await record(first.id)).not.toBeNull();
+    const logs = await db.query.incomingBottleDecisionLogs.findMany({
+      where: eq(incomingBottleDecisionLogs.sourceId, 42),
+      orderBy: incomingBottleDecisionLogs.id,
+    });
+    expect(logs.map(({ bottleId }) => bottleId)).toEqual([
+      first.id,
+      second.id,
+      null,
+      first.id,
+    ]);
+  });
   test("writes one Bottle identity without legacy release or target claims", async ({
     fixtures,
   }) => {

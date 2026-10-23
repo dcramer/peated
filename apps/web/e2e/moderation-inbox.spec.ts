@@ -23,20 +23,24 @@ test("bulk-ignores listings with no clear Bottle outcome", async ({
     ),
   ).toHaveCount(2);
 
-  await page.getByRole("button", { name: "Ignore all 2 inconclusive" }).click();
+  await page
+    .getByRole("button", { name: "Ignore inconclusive store listings" })
+    .click();
   await expect(
-    page.getByRole("heading", { name: "Ignore all inconclusive listings?" }),
+    page.getByRole("heading", { name: "Ignore inconclusive store listings?" }),
   ).toBeVisible();
 
   const ignoreRequest = page.waitForRequest((request) =>
     request.url().includes("/rpc/admin/moderation/ignoreInconclusive"),
   );
-  await page.getByRole("button", { name: "Ignore 2 listings" }).click();
+  await page.getByRole("button", { name: "Ignore store listings" }).click();
   await ignoreRequest;
 
   await expect(page).toHaveURL("/admin/moderation/inbox?inconclusive=true");
   await expect(page.getByText("Nothing needs a decision")).toBeVisible();
-  await expect(page.getByRole("button", { name: /Ignore all/ })).toHaveCount(0);
+  await expect(
+    page.getByRole("button", { name: "Ignore inconclusive store listings" }),
+  ).toHaveCount(0);
 });
 
 function uniqueAccessToken(testInfo: TestInfo): string {

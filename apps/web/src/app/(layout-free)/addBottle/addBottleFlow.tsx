@@ -8,6 +8,8 @@ import BottleResolver, {
   type BottleResolverResult,
   type PendingImageRef,
 } from "@peated/web/components/bottleResolver";
+import { createIdempotencyKey } from "@peated/web/components/bottleResolver/helpers";
+import { BottleResolverActionGrid } from "@peated/web/components/bottleResolver/layout.stylex";
 import { PhotoIdentificationTraceFootnote } from "@peated/web/components/bottleResolver/panels";
 import { Button, ButtonLink } from "@peated/web/components/button.stylex";
 import {
@@ -27,6 +29,7 @@ import { getCreateBottleHref } from "@peated/web/components/search/createBottleH
 import { Search as BottleSearch } from "@peated/web/components/search/search.stylex";
 import { SelectedBottleSummary } from "@peated/web/components/selectedBottleSummary.stylex";
 import { WorkflowScreen } from "@peated/web/components/workflowScreen.stylex";
+import { flashBadgeAwards } from "@peated/web/features/tastings/badgeAwardMessage.stylex";
 import TastingForm, {
   TastingFormLoading,
   type MemberReviewFormSubmitData,
@@ -37,8 +40,11 @@ import { AuthRequired } from "@peated/web/hooks/useAuthRequired";
 import {
   getAddBottleHref,
   getPendingImageFromParams,
+  getWrongPhotoMatchFromParams,
+  parseIdParam,
+  WRONG_PHOTO_MATCH_PARAM,
 } from "@peated/web/lib/addBottle";
-import { toBlob } from "@peated/web/lib/blobs";
+import { prepareImageUpload } from "@peated/web/lib/blobs";
 import { getFormErrorMessage } from "@peated/web/lib/formHelpers";
 import { uploadImageAfterSave } from "@peated/web/lib/imageUpload";
 import { logError } from "@peated/web/lib/log";
@@ -49,17 +55,19 @@ import {
   getMemberReviewUrl,
   getTastingUrl,
 } from "@peated/web/lib/urls";
+import { saveWrongPhotoMatchPick } from "@peated/web/lib/wrongPhotoMatches";
 import { useMutation, useQueryClient } from "@tanstack/react-query";
 import { BookOpen, Eye, Plus, RotateCcw, Search, Wine } from "lucide-react";
 import { useRouter, useSearchParams } from "next/navigation";
 import { useCallback, useEffect, useMemo, useState } from "react";
-import { BadgeAwardMessage } from "./badgeAwardMessage.stylex";
 
 type AddBottleIntent = "catalog" | "choose" | "library" | "tasting" | "view";
 type CollectionBottle = Outputs["collections"]["bottles"]["create"];
 type RatingDraft = BottleResolverResult & {
   suggestedTags: { results: TastingTagSuggestion[] };
-  createdAt: string;
+  tastedAt: string;
+  // One key per draft, so a repeated save cannot post the tasting twice.
+  idempotencyKey: string;
 };
 
 function getIntent(value: string | null): AddBottleIntent {
@@ -81,16 +89,11 @@ function getFlowTitle(intent: AddBottleIntent) {
   return "Find a bottle";
 }
 
-function parseId(value: string | null) {
-  if (!value) return null;
-  const id = Number(value);
-  return Number.isInteger(id) && id > 0 ? id : null;
-}
-
 function getSearchHref(
   query = "",
   intent: AddBottleIntent = "choose",
   pendingImage?: PendingImageRef | null,
+  wrongPhotoMatchId?: number | null,
 ) {
   const params = new URLSearchParams({
     intent,
@@ -99,6 +102,9 @@ function getSearchHref(
   if (pendingImage?.id) params.set("pendingImageId", pendingImage.id);
   if (pendingImage?.imageUrl) {
     params.set("pendingImageUrl", pendingImage.imageUrl);
+  }
+  if (wrongPhotoMatchId) {
+    params.set(WRONG_PHOTO_MATCH_PARAM, String(wrongPhotoMatchId));
   }
   return `/search?${params.toString()}`;
 }
@@ -177,6 +183,7 @@ function BottleResultActions({
   pendingImage,
   loadingExactLibraryStatus,
   resolvingAction,
+  disabled = false,
   intent,
   changeBottleHref,
   onResolve,
@@ -200,6 +207,7 @@ function BottleResultActions({
       onClick={() => onResolve("library")}
       variant={primaryAction === "library" ? "accent" : "tonal"}
       disabled={
+        disabled ||
         Boolean(resolvingAction) ||
         loadingExactLibraryStatus ||
         (hasLibraryEntry && !canSaveLibraryPhoto)
@@ -216,7 +224,7 @@ function BottleResultActions({
       key="tasting"
       onClick={() => onResolve("tasting")}
       variant={primaryAction === "tasting" ? "accent" : "tonal"}
-      disabled={Boolean(resolvingAction)}
+      disabled={disabled || Boolean(resolvingAction)}
       loading={resolvingAction === "tasting"}
     >
       <Wine aria-hidden="true" size={16} />
@@ -321,7 +329,7 @@ function BottleCreationActions({
   return (
     <FormStack>
       {primaryButton}
-      <FormGrid>{secondaryButtons}</FormGrid>
+      <BottleResolverActionGrid>{secondaryButtons}</BottleResolverActionGrid>
     </FormStack>
   );
 }
@@ -366,7 +374,12 @@ function BottleResultScreen({
         <BottleResultActions
           {...selection}
           intent={intent}
-          changeBottleHref={getSearchHref("", intent, selection.pendingImage)}
+          changeBottleHref={getSearchHref(
+            "",
+            intent,
+            selection.pendingImage,
+            selection.wrongPhotoMatchId,
+          )}
           loadingExactLibraryStatus={false}
           resolvingAction={
             addingToLibrary ? "library" : loadingRatingForm ? "tasting" : null
@@ -462,7 +475,7 @@ function AddBottleFlowContent() {
   const { flash } = useFlashMessages();
   const intent = getIntent(searchParams.get("intent"));
   const flowTitle = getFlowTitle(intent);
-  const requestedBottleId = parseId(searchParams.get("bottle"));
+  const requestedBottleId = parseIdParam(searchParams.get("bottle"));
   const requestedResultSource =
     searchParams.get("resultSource") === "created" ? "created" : undefined;
   const requestedFlightId = searchParams.get("flight") || null;
@@ -470,6 +483,7 @@ function AddBottleFlowContent() {
     () => getPendingImageFromParams(new URLSearchParams(searchParams)),
     [searchParams],
   );
+  const requestedWrongPhotoMatchId = getWrongPhotoMatchFromParams(searchParams);
   const requestedBottleKey = useMemo(() => {
     const pendingImageKey = requestedPendingImage?.id ?? "no-image";
     if (requestedBottleId) {
@@ -562,13 +576,27 @@ function AddBottleFlowContent() {
         const bottle = await orpc.bottles.details.call({
           bottle: bottleId,
         });
-        const collectionStatus = await orpc.collections.bottles.list.call({
-          user: "me",
-          collection: "library",
-          bottle: bottle.id,
-        });
+        const [collectionStatus, reportGone] = await Promise.all([
+          orpc.collections.bottles.list.call({
+            user: "me",
+            collection: "library",
+            bottle: bottle.id,
+          }),
+          // The member reported the photo match as wrong; this is their pick.
+          requestedWrongPhotoMatchId
+            ? saveWrongPhotoMatchPick(
+                orpc.wrongPhotoMatches.update.call,
+                requestedWrongPhotoMatchId,
+                bottle.id,
+              )
+            : false,
+        ]);
 
         if (cancelled) return;
+        // Picking the matched Bottle withdrew the report; stop sending its ID.
+        const wrongPhotoMatchId = reportGone
+          ? null
+          : requestedWrongPhotoMatchId;
         const libraryEntry = collectionStatus.results[0] ?? null;
         const selection: BottleResolverResult = {
           bottle,
@@ -577,6 +605,7 @@ function AddBottleFlowContent() {
           pendingImage: requestedPendingImage,
           previewUrl: requestedPendingImage?.imageUrl || null,
           resultSource: requestedResultSource,
+          wrongPhotoMatchId,
         };
 
         if (intent === "tasting") {
@@ -589,7 +618,8 @@ function AddBottleFlowContent() {
             setRatingDraft({
               ...selection,
               suggestedTags,
-              createdAt: new Date().toISOString(),
+              tastedAt: new Date().toISOString(),
+              idempotencyKey: createIdempotencyKey(),
             });
           } catch (err) {
             logError(err);
@@ -603,6 +633,11 @@ function AddBottleFlowContent() {
           setSelectedBottle(selection);
         }
         setHandledBottleKey(requestedBottleKey);
+        if (requestedWrongPhotoMatchId && !wrongPhotoMatchId) {
+          const params = new URLSearchParams(searchParams);
+          params.delete(WRONG_PHOTO_MATCH_PARAM);
+          router.replace(`/addBottle?${params}`, { scroll: false });
+        }
       } catch (err) {
         logError(err);
         if (cancelled) return;
@@ -629,6 +664,9 @@ function AddBottleFlowContent() {
     requestedPendingImage,
     requestedBottleKey,
     requestedResultSource,
+    requestedWrongPhotoMatchId,
+    router,
+    searchParams,
   ]);
 
   function resetFlow(nextIntent: AddBottleIntent) {
@@ -662,7 +700,8 @@ function AddBottleFlowContent() {
       setRatingDraft({
         ...selection,
         suggestedTags,
-        createdAt: new Date().toISOString(),
+        tastedAt: new Date().toISOString(),
+        idempotencyKey: createIdempotencyKey(),
       });
       revokeBlobPreviewUrl(selection);
     } catch (err) {
@@ -806,7 +845,8 @@ function AddBottleFlowContent() {
     const { tasting, awards } = await tastingCreateMutation.mutateAsync({
       ...data,
       flight: requestedFlightId,
-      createdAt: ratingDraft.createdAt,
+      tastedAt: ratingDraft.tastedAt,
+      idempotencyKey: ratingDraft.idempotencyKey,
       pendingImageId,
     });
 
@@ -817,8 +857,7 @@ function AddBottleFlowContent() {
     if (image) {
       try {
         await uploadImageAfterSave({
-          prepare: async () =>
-            image instanceof File ? image : await toBlob(image),
+          prepare: () => prepareImageUpload(image),
           upload: async (imageFile) => {
             await tastingImageUpdateMutation.mutateAsync({
               tasting: tasting.id,
@@ -838,14 +877,7 @@ function AddBottleFlowContent() {
       }
     }
 
-    for (const award of awards) {
-      if (award.level != award.prevLevel && award.level) {
-        flash(
-          <BadgeAwardMessage badge={award.badge} level={award.level} />,
-          "info",
-        );
-      }
-    }
+    flashBadgeAwards(flash, awards);
 
     router.push(
       requestedFlightId
@@ -869,8 +901,7 @@ function AddBottleFlowContent() {
     try {
       if (image) {
         await uploadImageAfterSave({
-          prepare: async () =>
-            image instanceof File ? image : await toBlob(image),
+          prepare: () => prepareImageUpload(image),
           upload: async (imageFile) => {
             review = await memberReviewImageUpdateMutation.mutateAsync({
               bottle: review.bottleId,
@@ -988,23 +1019,23 @@ function AddBottleFlowContent() {
           showBottleRatings={false}
         />
       }
-      searchHrefForQuery={(query, pendingImage) =>
-        getSearchHref(query, intent, pendingImage)
+      searchHrefForQuery={(query, pendingImage, wrongPhotoMatchId) =>
+        getSearchHref(query, intent, pendingImage, wrongPhotoMatchId)
       }
       createBottleHrefForResult={(
         query: string,
         prefill?: CreateBottlePrefill,
         pendingImage?: PendingImageRef | null,
+        wrongPhotoMatchId?: number | null,
       ) =>
         getCreateBottleHref({
           query,
           returnAction: intent,
           prefill,
           pendingImage,
+          wrongPhotoMatchId,
         })
       }
-      createProposalActionLabel="Add a bottle"
-      searchActionLabel="Search bottles"
       renderMatchedResultActions={(props) => (
         <BottleResultActions {...props} intent={intent} />
       )}

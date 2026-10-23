@@ -4,7 +4,9 @@ The [current 105-case GPT-6 Luna high baseline](./baselines/2026-09-22-gpt-6-lun
 pins the source commit, test-case hashes, run settings, aggregate results, and
 raw report hash. The [model comparison](./experiments/model-gpt-6-luna-2026-09-22.md)
 records the same-day GPT 5.6 Luna control, the changed cases, and the focused
-safety repeat. The earlier
+safety repeat. A later
+[Claude Haiku 5.5 comparison](./experiments/model-claude-haiku-5-5-2026-10-10.md)
+was rejected: 48 of 115 checks against GPT-6 Luna's 90. The earlier
 [105-case GPT 5.6 Luna high baseline](./baselines/2026-09-03-luna-high-current.json)
 remains the reference for the September experiments. The findings from the first fourteen experiments are summarized
 in the dated

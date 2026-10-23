@@ -16,6 +16,10 @@ test("dispatches derived work for an existing Entity", async ({ fixtures }) => {
     "GenerateEntityDetails",
     { entityId: entity.id },
   );
+  expect(workerClient.pushUniqueJob).toHaveBeenCalledWith(
+    "GenerateEntityPronunciationAudio",
+    { entityId: entity.id },
+  );
   expect(workerClient.runJob).toHaveBeenNthCalledWith(1, "IndexEntitySearch", {
     entityId: entity.id,
   });

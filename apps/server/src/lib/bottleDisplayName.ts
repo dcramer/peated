@@ -19,43 +19,41 @@ export type BottleDisplayNameSource = {
   } | null;
 };
 
+/** Requires ABV so a caller cannot drop it by reading a partial Bottle. */
+export type BottleLabelSource = BottleDisplayNameSource & {
+  abv: number | null;
+};
+
 export type BottleDisplayNameOptions = {
   includeBrand?: boolean;
   includeSeries?: boolean;
 };
 
-function includesIdentityText(value: string, candidate: string) {
-  return value.toLocaleLowerCase().includes(candidate.toLocaleLowerCase());
+/** Short strength label, such as `43%` or `52.2%`. */
+export function formatAbv(abv: number) {
+  return `${abv.toFixed(1).replace(/\.0$/u, "")}%`;
 }
 
-function isCompactEditionCode(edition: string) {
-  return (
-    /\d/u.test(edition) && /^[A-Za-z0-9]+(?:[./-][A-Za-z0-9]+)*$/u.test(edition)
-  );
+/**
+ * Bottle Presentation: a name that already shows a fact does not repeat it.
+ * Matches whole words, ignoring case, so `12` is not found in `120`.
+ */
+export function nameIncludes(name: string, text: string) {
+  const escaped = text.replace(/[.*+?^${}()|[\]\\]/gu, "\\$&");
+  return new RegExp(
+    `(?<![\\p{L}\\p{N}])${escaped}(?![\\p{L}\\p{N}])`,
+    "iu",
+  ).test(name);
 }
 
-export function isBatchEdition(edition: string | null | undefined) {
-  return edition
-    ? /^batch(?:\s+(?:no\.?|number))?\s+\S/iu.test(edition)
-    : false;
-}
-
-/** Returns an exact release fact that belongs beside, rather than inside, the title. */
-export function getBottleReleaseMetadata(
-  bottle: Pick<
-    BottleDisplayNameSource,
-    "edition" | "releaseYear" | "vintageYear"
-  >,
-) {
-  if (bottle.edition && isBatchEdition(bottle.edition)) return bottle.edition;
-  if (bottle.edition) return null;
-  if (bottle.vintageYear !== null && bottle.vintageYear !== undefined) {
-    return `${bottle.vintageYear} vintage`;
-  }
-  if (bottle.releaseYear !== null && bottle.releaseYear !== undefined) {
-    return `${bottle.releaseYear} release`;
-  }
-  return null;
+// Stored Bottle names end in ` - <edition>` (formatCanonicalBottleName).
+function removeStoredEdition(name: string, edition: string | null | undefined) {
+  const suffix = edition ? ` - ${edition.trim()}` : null;
+  return suffix &&
+    name.length > suffix.length &&
+    name.toLocaleLowerCase().endsWith(suffix.toLocaleLowerCase())
+    ? name.slice(0, -suffix.length)
+    : name;
 }
 
 function getExpressionName(bottle: BottleDisplayNameSource) {
@@ -81,7 +79,9 @@ function getExpressionName(bottle: BottleDisplayNameSource) {
       .filter((value): value is string => value !== undefined)
       .map((value) => value.toLocaleLowerCase()),
   );
-  const titleSegments = bottle.name.split(" - ");
+  const titleSegments = removeStoredEdition(bottle.name, bottle.edition).split(
+    " - ",
+  );
 
   while (
     titleSegments.length > 1 &&
@@ -95,30 +95,19 @@ function getExpressionName(bottle: BottleDisplayNameSource) {
   return titleSegments.join(" - ") || bottle.name;
 }
 
-function getReleaseName(bottle: BottleDisplayNameSource) {
-  const expressionName = getExpressionName(bottle);
-
-  if (bottle.edition && !isBatchEdition(bottle.edition)) {
-    if (includesIdentityText(expressionName, bottle.edition)) {
-      return expressionName;
-    }
-
-    const separator = isCompactEditionCode(bottle.edition) ? " " : " - ";
-    return `${expressionName}${separator}${bottle.edition}`;
-  }
-
-  return expressionName;
-}
-
-/** Formats the concise marketed identity used for human-facing bottle names. */
+/**
+ * Formats the concise marketed identity used for human-facing bottle names.
+ * Whisky Identity Model: the edition is a release fact shown beside the
+ * title, never inside it.
+ */
 export function formatBottleDisplayName(
   bottle: BottleDisplayNameSource,
   { includeBrand = true, includeSeries = true }: BottleDisplayNameOptions = {},
 ) {
-  const expressionName = getReleaseName(bottle);
+  const expressionName = getExpressionName(bottle);
   const brandName = bottle.brand.shortName || bottle.brand.name;
   const seriesName =
-    bottle.series && !includesIdentityText(expressionName, bottle.series.name)
+    bottle.series && !nameIncludes(expressionName, bottle.series.name)
       ? bottle.series.name
       : null;
 
@@ -129,4 +118,24 @@ export function formatBottleDisplayName(
   ]
     .filter(Boolean)
     .join(" ");
+}
+
+/**
+ * Releases often share a name and differ only in strength, so bottle labels
+ * show ABV whenever it is known. Use this for names that are not structured,
+ * such as a stored `fullName`.
+ */
+export function appendAbv(name: string, abv: number | null | undefined) {
+  if (abv === null || abv === undefined) return name;
+
+  const abvText = formatAbv(abv);
+  return nameIncludes(name, abvText) ? name : `${name} · ${abvText}`;
+}
+
+/** Formats the bottle name with its ABV; see `appendAbv`. */
+export function formatBottleLabel(
+  bottle: BottleLabelSource,
+  options?: BottleDisplayNameOptions,
+) {
+  return appendAbv(formatBottleDisplayName(bottle, options), bottle.abv);
 }

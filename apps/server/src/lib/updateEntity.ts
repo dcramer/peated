@@ -47,6 +47,10 @@ import { z } from "zod";
 export const EntityUpdateInputSchema = z.object({
   name: EntityInputFields.name.optional(),
   shortName: EntityInputFields.shortName.removeDefault().optional(),
+  pronunciation: EntityInputFields.pronunciation.removeDefault().optional(),
+  pronunciationIpa: EntityInputFields.pronunciationIpa
+    .removeDefault()
+    .optional(),
   kind: EntityInputFields.kind.optional(),
   status: EntityInputFields.status.removeDefault().optional(),
   ownerId: EntityInputFields.ownerId.removeDefault().optional(),
@@ -109,6 +113,8 @@ type EntityUpdateData = Partial<
     Entity,
     | "name"
     | "shortName"
+    | "pronunciation"
+    | "pronunciationIpa"
     | "kind"
     | "status"
     | "ownerId"
@@ -331,6 +337,18 @@ export async function updateEntityInTransaction(
   if (input.website !== undefined && input.website !== entity.website) {
     data.website = input.website;
   }
+  if (
+    input.pronunciation !== undefined &&
+    input.pronunciation !== entity.pronunciation
+  ) {
+    data.pronunciation = input.pronunciation;
+  }
+  if (
+    input.pronunciationIpa !== undefined &&
+    input.pronunciationIpa !== entity.pronunciationIpa
+  ) {
+    data.pronunciationIpa = input.pronunciationIpa;
+  }
 
   if (Object.keys(data).length === 0) {
     return {
@@ -472,6 +490,8 @@ export async function updateEntityInTransaction(
             input: { brand: newEntity.id },
             actorId,
             creationSource: "manual_entry",
+            // Moving Bottles to the new Entity does not edit their names.
+            enforceNamingRules: false,
           }),
         );
       }

@@ -25,7 +25,9 @@ import {
   storePriceMatchAttempts,
   storePriceMatchProposals,
   storePrices,
+  tastingDrafts,
   tastings,
+  wrongPhotoMatches,
 } from "@peated/server/db/schema";
 import { getUserActor } from "@peated/server/lib/actors";
 import { reconcileBottleSeriesRepresentatives } from "@peated/server/lib/bottleSeriesRepresentatives";
@@ -174,6 +176,11 @@ describe("exact Bottle merges", () => {
         legacyParentBottleId: source.id,
       })
       .returning();
+    const sourceDraft = await fixtures.TastingDraft({ bottleId: source.id });
+    const wrongPhotoMatch = await fixtures.WrongPhotoMatch({
+      wrongBottleId: source.id,
+      correctBottleId: source.id,
+    });
     const [decisionLog] = await db
       .insert(incomingBottleDecisionLogs)
       .values({
@@ -292,6 +299,19 @@ describe("exact Bottle merges", () => {
         where: eq(incomingBottleDecisionLogs.id, decisionLog!.id),
       }),
     ).toMatchObject({ bottleId: destination.id });
+    expect(
+      await db.query.tastingDrafts.findFirst({
+        where: eq(tastingDrafts.id, sourceDraft.id),
+      }),
+    ).toMatchObject({ bottleId: destination.id });
+    expect(
+      await db.query.wrongPhotoMatches.findFirst({
+        where: eq(wrongPhotoMatches.id, wrongPhotoMatch.id),
+      }),
+    ).toMatchObject({
+      wrongBottleId: destination.id,
+      correctBottleId: destination.id,
+    });
     expect(
       await db.query.storePriceMatchProposals.findFirst({
         where: eq(storePriceMatchProposals.id, proposal!.id),
@@ -413,6 +433,7 @@ describe("exact Bottle merges", () => {
             updateScope: "exact_merge",
             consumerCounts: expect.objectContaining({
               tastings: 1,
+              tastingDrafts: 1,
               storePrices: 1,
               collectionMembershipsCollapsed: 1,
               flightMembershipsCollapsed: 1,
@@ -991,16 +1012,16 @@ describe("exact Bottle merges", () => {
       name: "Collision Destination",
     });
     const user = await fixtures.User();
-    const createdAt = new Date("2026-03-01T00:00:00.000Z");
+    const tastedAt = new Date("2026-03-01T00:00:00.000Z");
     await fixtures.Tasting({
       bottleId: source.id,
       createdById: user.id,
-      createdAt,
+      tastedAt,
     });
     await fixtures.Tasting({
       bottleId: destination.id,
       createdById: user.id,
-      createdAt,
+      tastedAt,
     });
 
     await expect(

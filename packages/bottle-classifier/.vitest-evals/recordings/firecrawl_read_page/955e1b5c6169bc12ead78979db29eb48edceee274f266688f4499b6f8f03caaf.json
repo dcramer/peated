@@ -1,0 +1,26 @@
+{
+  "writtenAt": "2026-10-19T10:12:57.382Z",
+  "toolName": "firecrawl_read_page",
+  "input": {
+    "url": "https://norfolkwineandspirits.com/shop/the-exclusive-malts-islay-distillery-2007-aged-8-years-57-1/",
+    "focus": "Exact marketed product title, bottler and label details including cask number, ABV, outturn, distillation/bottling dates, and age"
+  },
+  "output": {
+    "provider": "firecrawl",
+    "query": "Exact marketed product title, bottler and label details including cask number, ABV, outturn, distillation/bottling dates, and age",
+    "summary": "The Exclusive Malts – Islay Distillery – 2007 – Aged 8 Years (57.1%)\n\n| Weight | 3.5 lbs | | Country of Origin | Scotland | | Region | Islay | | Age | 8 Years Old | | Cask Type | Refill Ex-Sherry Hogshead | | Date Distilled | 17th October 2007 | | Date Bottled | May 2016 | | Single Cask/Barrel | Yes | | Cask/Barrel Number | 1603 | | Number of Bottles | 292 | | Natural Color | Yes | | NCF (Non-Chill Filtered) | Yes | | Cask Strength | Yes | | ABV | 57.1% | | Size | 750 mL |",
+    "results": [
+      {
+        "title": "The Exclusive Malts – Islay Distillery – 2007 – Aged 8 Years (57.1%) | Norfolk Wine & Spirits",
+        "url": "https://norfolkwineandspirits.com/shop/the-exclusive-malts-islay-distillery-2007-aged-8-years-57-1/",
+        "domain": "norfolkwineandspirits.com",
+        "description": null,
+        "extraSnippets": []
+      }
+    ]
+  },
+  "metadata": {
+    "cacheKey": "955e1b5c6169bc12ead78979db29eb48edceee274f266688f4499b6f8f03caaf",
+    "mode": "auto"
+  }
+}

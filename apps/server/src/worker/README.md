@@ -44,6 +44,21 @@ cannot starve indexing. A default-queue job that needs model work queues it
 instead of running it inline, and every outbound request on the default queue
 carries a timeout.
 
+`IdentifyTastingDraft` runs on `models` too. It reads a tasting draft's photo
+and saves the identified Bottle on the draft. Over the member's hourly photo
+identification limit, it queues itself again with a delay. Any other error marks the draft
+`failed` without a retry. See
+[Tasting Drafts](../../../../docs/features/tasting-drafts.md#identifying-the-bottle).
+
+`GenerateEntityPronunciationAudio` calls Google Cloud Text-to-Speech, not a
+model, so it runs on `default` with a 15-second request timeout. A failed run
+keeps the old audio. To fill missing or outdated audio, send `{"afterId":0}` to
+`/admin/catalog/rebuild-pronunciation-audio` with `pnpm cli api post`, and
+repeat with each returned `nextAfterId` until it is null. Each call checks up to 500 Entities and queues the job only
+for those whose audio is missing or does not match their IPA. See
+[Naming And Entity Boundaries](../../../../docs/architecture/whisky-identity-model.md#naming-and-entity-boundaries)
+for the audio rules.
+
 When the AI service is out of budget, rate limited, down, or unreachable
 (`isModelServiceUnavailable`), the models queue pauses for 15 minutes and puts
 the job back without using an attempt. A model job must let that error throw
@@ -77,4 +92,4 @@ Handlers should let unexpected errors throw so BullMQ can record and retry them.
 
 Waiting jobs live only in Redis. A Redis reset drops them without a failure
 record, so bulk work needs a repair path that finds what is still undone from
-the database, such as `missingOnly` on the Bottle search rebuild endpoint.
+the database, such as `missingOnly` on `/admin/catalog/rebuild-search`.

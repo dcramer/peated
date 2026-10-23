@@ -6,7 +6,7 @@ import {
 } from "@peated/server/lib/passkey";
 import { procedure } from "@peated/server/orpc";
 import { authRateLimit, requireAuth } from "@peated/server/orpc/middleware";
-import type { PublicKeyCredentialCreationOptionsJSON } from "@simplewebauthn/server";
+import { PasskeyCreationOptionsSchema } from "@peated/server/schemas";
 import { eq } from "drizzle-orm";
 import { z } from "zod";
 
@@ -26,7 +26,7 @@ export default procedure
   .input(z.object({}))
   .output(
     z.object({
-      options: z.custom<PublicKeyCredentialCreationOptionsJSON>(),
+      options: PasskeyCreationOptionsSchema,
       signedChallenge: z.string(),
     }),
   )

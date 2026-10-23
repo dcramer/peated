@@ -14,6 +14,7 @@ import {
   storePriceMatchAttempts,
   storePriceMatchProposals,
   storePrices,
+  tastingDrafts,
   tastings,
 } from "@peated/server/db/schema";
 import {
@@ -75,6 +76,11 @@ async function bottleMergeConsumerPreview(
     .select({ total: count() })
     .from(tastings)
     .where(eq(tastings.bottleId, sourceBottleId))
+    .then(([row]) => row?.total ?? 0);
+  const tastingDraftCount = await database
+    .select({ total: count() })
+    .from(tastingDrafts)
+    .where(eq(tastingDrafts.bottleId, sourceBottleId))
     .then(([row]) => row?.total ?? 0);
   const reviewCount = await database
     .select({ total: count() })
@@ -149,7 +155,7 @@ async function bottleMergeConsumerPreview(
             FROM tasting destination_tasting
             WHERE destination_tasting.bottle_id = ${destinationBottleId}
               AND destination_tasting.created_by_id = ${tastings.createdById}
-              AND destination_tasting.created_at = ${tastings.createdAt}
+              AND destination_tasting.tasted_at = ${tastings.tastedAt}
           )`,
       ),
     )
@@ -163,6 +169,7 @@ async function bottleMergeConsumerPreview(
   return {
     consumers: {
       tastings: tastingCount,
+      tastingDrafts: tastingDraftCount,
       externalReviews: reviewCount,
       storePrices: storePriceCount,
       observations: observationCount,

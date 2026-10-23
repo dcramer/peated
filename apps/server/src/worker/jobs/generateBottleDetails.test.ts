@@ -227,34 +227,13 @@ test("fans out generated details and keeps exact content selected-only", async (
     }),
   ).toEqual({ flavorProfile: "peated" });
 
-  const updateAudits = await db
-    .select()
-    .from(changes)
-    .where(and(eq(changes.objectType, "bottle"), eq(changes.type, "update")))
-    .orderBy(asc(changes.objectId));
-  expect(updateAudits).toHaveLength(2);
-  expect(updateAudits[0]).toMatchObject({
-    objectId: source.bottle.id,
-    data: {
-      updateScope: "mixed",
-      creationSource: "repair_workflow",
-      flavorProfile: "peated",
-      description: "Generated description",
-      descriptionSrc: "generated",
-      suggestedTags: ["smoke", "fruit"],
-    },
-  });
-  expect(updateAudits[1]).toMatchObject({
-    objectId: sibling.bottle.id,
-    data: {
-      updateScope: "shared",
-      creationSource: "repair_workflow",
-      flavorProfile: "peated",
-    },
-  });
-  expect(updateAudits[1]?.data).not.toHaveProperty("description");
-  expect(updateAudits[1]?.data).not.toHaveProperty("tastingNotes");
-  expect(updateAudits[1]?.data).not.toHaveProperty("suggestedTags");
+  // Generated details are derived text, not a Bottle edit.
+  expect(
+    await db
+      .select()
+      .from(changes)
+      .where(and(eq(changes.objectType, "bottle"), eq(changes.type, "update"))),
+  ).toEqual([]);
 
   expect(workerClient.pushUniqueJob).toHaveBeenCalledTimes(2);
   for (const bottleId of [source.bottle.id, sibling.bottle.id]) {

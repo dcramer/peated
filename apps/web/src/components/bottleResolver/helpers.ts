@@ -1,20 +1,30 @@
 import type { Inputs } from "@peated/server/orpc/router";
-import { CategoryEnum } from "@peated/server/schemas";
+// The schemas barrel loads server-only modules (OAuth uses node:crypto), which
+// breaks this file in Storybook's browser bundle; import the enum directly.
+import { CategoryEnum } from "@peated/server/schemas/common";
 import type { CreateBottlePrefill } from "@peated/web/components/search/createBottleHref";
 import { z } from "zod";
 
-import { getFieldValue, type PhotoIdentification } from "./fieldValues";
+import {
+  getFieldValue,
+  type PhotoIdentification,
+  type PhotoIdentificationProgressEvent,
+} from "./fieldValues";
 
-export type { PhotoIdentification } from "./fieldValues";
+export type {
+  PhotoIdentification,
+  PhotoIdentificationProgressEvent,
+} from "./fieldValues";
 export type PhotoIdentificationCreateInput =
   Inputs["tastings"]["photoIdentificationCreate"];
 
-type ManualResultCopy = {
-  title: string;
-  description: string;
-  createLabel?: string;
-  primaryAction?: "search" | "create";
-};
+/**
+ * The label facts the helpers below read: a full result, or only what a
+ * lookup streamed before it failed. Without a classification they use the
+ * raw label facts.
+ */
+export type PhotoLabelReading = Pick<PhotoIdentification, "imageEvidence"> &
+  Partial<Pick<PhotoIdentification, "classification">>;
 
 export function createIdempotencyKey() {
   const randomId = globalThis.crypto?.randomUUID?.();
@@ -23,7 +33,7 @@ export function createIdempotencyKey() {
 }
 
 function getRawFieldValue(
-  result: PhotoIdentification | null,
+  result: PhotoLabelReading | null,
   field: keyof PhotoIdentification["imageEvidence"]["fieldCandidates"],
 ) {
   const value = result?.imageEvidence.fieldCandidates[field]?.value;
@@ -32,7 +42,7 @@ function getRawFieldValue(
 }
 
 function getRawStringFieldValue(
-  result: PhotoIdentification | null,
+  result: PhotoLabelReading | null,
   field: keyof PhotoIdentification["imageEvidence"]["fieldCandidates"],
 ) {
   const value = getRawFieldValue(result, field);
@@ -41,7 +51,7 @@ function getRawStringFieldValue(
 }
 
 function getRawNumberFieldValue(
-  result: PhotoIdentification | null,
+  result: PhotoLabelReading | null,
   field: keyof PhotoIdentification["imageEvidence"]["fieldCandidates"],
 ) {
   const value = getRawFieldValue(result, field);
@@ -50,7 +60,7 @@ function getRawNumberFieldValue(
 }
 
 function getRawStringFieldValues(
-  result: PhotoIdentification | null,
+  result: PhotoLabelReading | null,
   field: keyof PhotoIdentification["imageEvidence"]["fieldCandidates"],
 ) {
   const value = getRawFieldValue(result, field);
@@ -66,7 +76,7 @@ function getRawStringFieldValues(
 }
 
 function getRawBooleanFieldValue(
-  result: PhotoIdentification | null,
+  result: PhotoLabelReading | null,
   field: keyof PhotoIdentification["imageEvidence"]["fieldCandidates"],
 ) {
   const value = getRawFieldValue(result, field);
@@ -74,13 +84,13 @@ function getRawBooleanFieldValue(
   return parsed.success ? parsed.data : null;
 }
 
-export function getSearchSeed(result: PhotoIdentification | null) {
+export function getSearchSeed(result: PhotoLabelReading | null) {
   const brand = getFieldValue(result, "brand");
   const expression = getFieldValue(result, "expression");
   return [brand, expression].filter(Boolean).join(" ");
 }
 
-export function getCreateNameSeed(result: PhotoIdentification | null) {
+export function getCreateNameSeed(result: PhotoLabelReading | null) {
   const decision = getCreateDecisionLike(result);
   return (
     decision?.proposedBottle.name ??
@@ -90,7 +100,7 @@ export function getCreateNameSeed(result: PhotoIdentification | null) {
 }
 
 export function getCreateBottlePrefill(
-  result: PhotoIdentification | null,
+  result: PhotoLabelReading | null,
 ): CreateBottlePrefill {
   const decision = getCreateDecisionLike(result);
   const proposedBottle = decision?.proposedBottle ?? null;
@@ -144,13 +154,20 @@ export function getCreateBottlePrefill(
     singleCask:
       proposedBottle?.singleCask ??
       getRawBooleanFieldValue(result, "singleCask"),
-    maturation: proposedBottle?.maturation ?? null,
-    caskNumber: proposedBottle?.caskNumber ?? null,
-    outturn: proposedBottle?.outturn ?? null,
+    maturation:
+      proposedBottle?.maturation ??
+      getRawStringFieldValue(result, "maturation") ??
+      null,
+    caskNumber:
+      proposedBottle?.caskNumber ??
+      getRawStringFieldValue(result, "caskNumber") ??
+      null,
+    outturn:
+      proposedBottle?.outturn ?? getRawNumberFieldValue(result, "outturn"),
   };
 }
 
-function hasRecognizedLabelDetails(result: PhotoIdentification | null) {
+export function hasRecognizedLabelDetails(result: PhotoLabelReading | null) {
   return Boolean(
     getFieldValue(result, "brand") ||
     getFieldValue(result, "expression") ||
@@ -185,8 +202,8 @@ export function getCreateDecision(result: PhotoIdentification | null) {
   return getCreateDecisionLike(result);
 }
 
-function getCreateDecisionLike(result: PhotoIdentification | null) {
-  if (result?.classification.status !== "classified") {
+function getCreateDecisionLike(result: PhotoLabelReading | null) {
+  if (result?.classification?.status !== "classified") {
     return null;
   }
 
@@ -204,68 +221,87 @@ export function getProposedName(result: PhotoIdentification | null) {
     .join(" ");
 }
 
-export function getCreateProposalLabel(result: PhotoIdentification | null) {
-  const decision = getCreateDecision(result);
-  if (!decision) return null;
-
-  return {
-    title: "Bottle not in Peated",
-    description: "Add a new bottle using this label.",
-  };
+/** Says in one line why the photo did not lead straight to a Bottle. */
+export function getFallbackReason(result: PhotoIdentification | null) {
+  if (getCreateDecision(result)) {
+    return "This label looks new to Peated. Check the details before you add it.";
+  }
+  if (hasRecognizedLabelDetails(result)) {
+    return "We read the label but couldn't match it to a bottle.";
+  }
+  return "We couldn't read enough from this label.";
 }
 
-export function getManualResultCopy(
-  result: PhotoIdentification | null,
-): ManualResultCopy {
-  const action =
-    result?.classification.status === "classified"
-      ? result.classification.decision.action
-      : null;
+type PhotoIdentificationStep = Extract<
+  PhotoIdentificationProgressEvent,
+  { type: "step" }
+>["step"];
 
-  if (action === "match") {
-    return {
-      title: "We couldn't confirm the match",
-      description:
-        "We found a possible match, but it was not reliable enough to use automatically.",
-      createLabel: undefined,
-    };
+export type PhotoMatchCandidate = Extract<
+  PhotoIdentificationProgressEvent,
+  { type: "candidates" }
+>["bottles"][number];
+
+/** What a member has seen so far while a photo is identified. */
+export type PhotoProgress = {
+  pendingImage: PhotoIdentification["pendingImage"] | null;
+  imageEvidence: PhotoIdentification["imageEvidence"] | null;
+  candidates: PhotoMatchCandidate[];
+  step: PhotoIdentificationStep | null;
+};
+
+export const EMPTY_PHOTO_PROGRESS: PhotoProgress = {
+  pendingImage: null,
+  imageEvidence: null,
+  candidates: [],
+  step: null,
+};
+
+export function applyPhotoProgress(
+  progress: PhotoProgress,
+  event: PhotoIdentificationProgressEvent,
+): PhotoProgress {
+  switch (event.type) {
+    case "photo":
+      return { ...progress, pendingImage: event.pendingImage };
+    case "label":
+      return { ...progress, imageEvidence: event.imageEvidence };
+    case "candidates":
+      return { ...progress, candidates: event.bottles };
+    case "step":
+      return { ...progress, step: event.step };
   }
+}
 
-  if (action === "no_match") {
-    if (hasRecognizedLabelDetails(result)) {
-      return {
-        title: "We couldn't find this bottle",
-        description:
-          "We found label details, but not enough to choose an existing bottle automatically. Review them before creating it in Peated.",
-        createLabel: "Add a new bottle",
-        primaryAction: "create" as const,
-      };
-    }
+const STEP_STATUS = {
+  checking_peated: "Checking Peated…",
+  checking_web: "Checking the web…",
+  comparing: "Comparing details…",
+} satisfies Record<PhotoIdentificationStep, string>;
 
-    return {
-      title: "We couldn't identify the bottle",
-      description:
-        "Search can still find it, or you can start over with a clearer photo.",
-      createLabel: "Add a new bottle",
-      primaryAction: "search" as const,
-    };
-  }
+/** One plain line naming the current step, readable without animation. */
+export function getPhotoProgressStatus(progress: PhotoProgress) {
+  if (progress.step) return STEP_STATUS[progress.step];
+  if (progress.imageEvidence) return "Checking Peated…";
+  return "Reading the label…";
+}
 
-  if (action === "create_bottle") {
-    return {
-      title: "We couldn't find this bottle",
-      description:
-        "We found label details, but not enough to choose an existing bottle automatically. Review them before creating it in Peated.",
-      createLabel: "Add a new bottle",
-      primaryAction: "create" as const,
-    };
-  }
+/** After this long, point the member to the ways out. */
+export const SLOW_PHOTO_IDENTIFICATION_MS = 45_000;
 
-  return {
-    title: "We couldn't identify the bottle",
-    description:
-      "Search can still find it, or you can start over with another photo.",
-    createLabel: "Add a new bottle",
-    primaryAction: "search" as const,
-  };
+/** One line naming what the label reading found, such as brand, name, age, and ABV. */
+export function getLabelSummary(
+  imageEvidence: PhotoIdentification["imageEvidence"],
+) {
+  const result = { imageEvidence };
+  return (
+    [
+      getFieldValue(result, "brand"),
+      getFieldValue(result, "expression"),
+      getFieldValue(result, "statedAge"),
+      getFieldValue(result, "abv"),
+    ]
+      .filter(Boolean)
+      .join(" · ") || null
+  );
 }

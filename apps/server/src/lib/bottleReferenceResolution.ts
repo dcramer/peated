@@ -2,7 +2,12 @@ import {
   isIgnoredBottleClassification,
   type BottleClassificationResult,
   type BottleReferenceInput,
+  type ClassifyBottleReferenceInput,
 } from "@peated/bottle-classifier";
+import {
+  agentActionRiskClass,
+  deriveAutomationTier,
+} from "@peated/bottle-classifier/automationTier";
 import type {
   BottleClassificationDecision,
   BottleConfidenceBasis,
@@ -12,12 +17,21 @@ import { classifyBottleReference } from "@peated/server/agents/bottleClassifier/
 import { classifyScrapedBottleReference } from "@peated/server/agents/bottleClassifier/scrapedBottleReference";
 import config from "@peated/server/config";
 import { db, type AnyTransaction } from "@peated/server/db";
+import { externalReviews } from "@peated/server/db/schema";
+import { createBottleCheck } from "@peated/server/lib/bottleChecks";
 import { findBottleReferenceAssignment } from "@peated/server/lib/bottleFinder";
 import type { BottleReferenceIdentitySnapshot } from "@peated/server/lib/bottleReferences";
 import {
   createOrReuseBottleInTransaction,
   finalizeCreatedBottle,
 } from "@peated/server/lib/createBottle";
+import { logTelemetryError } from "@peated/server/lib/log";
+import { eq } from "drizzle-orm";
+import {
+  assertExpectedReviewIdentity,
+  assignBottleReferenceInTransaction,
+  type BottleReferenceAssignmentInput,
+} from "./bottleReferences";
 import { buildClassifierBottleInput } from "./classifierDecisionCreateInputs";
 import {
   ActiveBottleSelectionError,
@@ -52,7 +66,81 @@ export type BottleReferenceResolution = {
   classifierEvidence: BottleReferenceClassifierEvidence | null;
   createdBottle: boolean;
   sourceReferenceIdentity?: BottleReferenceIdentitySnapshot;
+  // Present whenever the classifier ran, so the caller can save the run.
+  classification?: ReferenceClassificationRun;
 };
+
+export type ReferenceClassificationRun = {
+  input: ClassifyBottleReferenceInput;
+  result: BottleClassificationResult;
+};
+
+/** A source-only classifier match must never become a reusable name assertion. */
+export async function assignReviewBottleResolutionInTransaction(
+  tx: AnyTransaction,
+  resolution: BottleReferenceResolution,
+  input: BottleReferenceAssignmentInput & {
+    expectedReview: NonNullable<
+      BottleReferenceAssignmentInput["expectedReview"]
+    >;
+  },
+) {
+  const classification = resolution.classification?.result;
+  if (
+    resolution.source === "exact_reference" ||
+    (classification?.status === "classified" &&
+      classification.decision.referenceScope === "global_alias")
+  ) {
+    const result = await assignBottleReferenceInTransaction(tx, {
+      ...input,
+      sourceReferenceIdentity: resolution.sourceReferenceIdentity,
+    });
+    await tx
+      .update(externalReviews)
+      .set({ matchedReferenceId: result.referenceId })
+      .where(eq(externalReviews.id, input.expectedReview.id));
+    return result;
+  }
+  await resolveActiveBottleIds(tx, [input.bottleId], { lock: "update" });
+  await assertExpectedReviewIdentity(tx, input.expectedReview);
+  await tx
+    .update(externalReviews)
+    .set({
+      bottleId: input.bottleId,
+      matchedReferenceId: null,
+      bottleNoMatchAt: null,
+    })
+    .where(eq(externalReviews.id, input.expectedReview.id));
+  return null;
+}
+
+/**
+ * Saves a review's classifier run as a Bottle check so the exact input,
+ * candidates, and evidence can be replayed as an eval test case later.
+ *
+ * Best effort: the review does not depend on this record, so call it after the
+ * review is saved. A failure is logged with the review id and never thrown.
+ */
+export async function persistReviewBottleCheck({
+  reviewId,
+  classification,
+}: {
+  reviewId: number;
+  classification: ReferenceClassificationRun;
+}) {
+  try {
+    await createBottleCheck({
+      intent: "resolve_reference",
+      sourceKind: "review",
+      sourceId: reviewId,
+      input: classification.input,
+      result: classification.result,
+      model: config.BOTTLE_CLASSIFIER_MODEL,
+    });
+  } catch (error) {
+    logTelemetryError(error, { extra: { reviewId } });
+  }
+}
 
 /** Locks the resolved Bottle before any reference or consumer row is locked. */
 export async function lockBottleReferenceResolutionAssignmentInTransaction(
@@ -208,10 +296,11 @@ async function resolveBottleReferenceTargetWithClassifier(
   }
 
   let classification: BottleClassificationResult;
+  // Source titles carry no structured facts. Supplying an extracted identity
+  // here, even an empty one, would make the classifier skip text extraction.
+  const classificationInput: ClassifyBottleReferenceInput = { reference };
   try {
-    // Source titles carry no structured facts. Supplying an extracted identity
-    // here, even an empty one, would make the classifier skip text extraction.
-    classification = await classify({ reference });
+    classification = await classify(classificationInput);
   } catch (error) {
     return {
       assignment: null,
@@ -225,6 +314,11 @@ async function resolveBottleReferenceTargetWithClassifier(
     };
   }
 
+  const classificationRun = {
+    input: classificationInput,
+    result: classification,
+  };
+
   if (isIgnoredBottleClassification(classification)) {
     return {
       assignment: null,
@@ -235,6 +329,7 @@ async function resolveBottleReferenceTargetWithClassifier(
       rationale: null,
       classifierEvidence: null,
       createdBottle: false,
+      classification: classificationRun,
     };
   }
 
@@ -245,6 +340,40 @@ async function resolveBottleReferenceTargetWithClassifier(
     const classifierEvidence = projectClassifierEvidence(
       classification.decision,
     );
+
+    // Review ingestion owns initial assignment; existing-assignment repairs use their own workflow.
+    const decision = classification.decision;
+    const tier = deriveAutomationTier({
+      actionRiskClass: agentActionRiskClass(decision.action),
+      hasUnresolvedRisks: Boolean(
+        decision.confidenceBasis?.unresolvedRisks.length,
+      ),
+      webEvidence: decision.confidenceBasis?.webEvidence,
+      hasMatchTarget: decision.action === "match",
+      reaffirmsCurrentAssignment:
+        decision.action === "match" &&
+        reference.currentBottleId === decision.matchedBottleId,
+      replacesCurrentAssignment:
+        decision.action === "match" &&
+        reference.currentBottleId != null &&
+        reference.currentBottleId !== decision.matchedBottleId,
+      hasDeterministicAnchor: decision.identityScope === "exact_cask",
+      hasPrimaryLabelOrImageEvidence:
+        classification.artifacts.imageEvidence != null,
+    });
+    if (reference.currentBottleId == null && tier === "review") {
+      return {
+        assignment: null,
+        source: "unresolved",
+        error: null,
+        confidence: null,
+        model: config.BOTTLE_CLASSIFIER_MODEL,
+        rationale: decisionRationale,
+        classifierEvidence,
+        createdBottle: false,
+        classification: classificationRun,
+      };
+    }
 
     if (classification.decision.action === "match") {
       const bottleId = classification.decision.matchedBottleId;
@@ -260,6 +389,7 @@ async function resolveBottleReferenceTargetWithClassifier(
         rationale: decisionRationale,
         classifierEvidence,
         createdBottle: false,
+        classification: classificationRun,
       };
     }
 
@@ -273,6 +403,7 @@ async function resolveBottleReferenceTargetWithClassifier(
         rationale: decisionRationale,
         classifierEvidence,
         createdBottle: false,
+        classification: classificationRun,
       };
     }
 
@@ -289,6 +420,7 @@ async function resolveBottleReferenceTargetWithClassifier(
       rationale: decisionRationale,
       classifierEvidence,
       createdBottle: result.createdBottle,
+      classification: classificationRun,
     };
   } catch (error) {
     return {
@@ -303,6 +435,7 @@ async function resolveBottleReferenceTargetWithClassifier(
       rationale: null,
       classifierEvidence: null,
       createdBottle: false,
+      classification: classificationRun,
     };
   }
 }

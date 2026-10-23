@@ -63,6 +63,39 @@ and values that were not quarter-star steps also stayed unrated. The conversion
 did not replace ratings people had already chosen. The original star and simple
 rating values remain on each tasting as a record of what changed.
 
+## Tasting times
+
+A tasting has two times:
+
+- `tastedAt` is when the member had the dram. The member may set it to any past
+  time. It defaults to the time of posting.
+- `createdAt` is when the tasting was posted. The server always sets it.
+
+Feeds and tasting lists sort by `createdAt`, so a dram posted days later still
+appears with recent activity. Pages and feed entries show `tastedAt`.
+Backdating cannot move a tasting up a feed.
+
+Tastings posted before `tastedAt` existed took their `createdAt` as the tasted
+time, because `createdAt` held the time the member chose.
+
+One member cannot record the same Bottle twice at the same `tastedAt`. Bottle
+merges check the same rule before they move tastings.
+
+## Repeated posts
+
+`POST /tastings` accepts an optional `idempotencyKey`. Each member's keys are
+unique. When a request repeats a key, the server returns the tasting that key
+created and no badge awards; it does not create another tasting. Clients that
+retry a post, such as after a lost response, should send the same key each
+time.
+
+## Tasting drafts
+
+A member can save a tasting as a draft and post it later. Drafts live in their
+own table, so they never count toward feeds, stats, or badges. Publishing a
+draft creates the tasting with the draft's `tastedAt` and uses the draft ID as
+its `idempotencyKey`. See [Tasting Drafts](../features/tasting-drafts.md).
+
 ## Public tasting pages
 
 Tasting details use the same privacy rules as tasting lists: public members'
