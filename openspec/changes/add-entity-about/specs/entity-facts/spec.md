@@ -40,6 +40,24 @@ stored documents.
 - **THEN** the change includes a schema version bump, an upgrade on read, and
   a migration that checks each rewritten document
 
+### Requirement: Nothing is shown without a source
+
+Every event and site fact SHALL have at least one citation to a source in the
+document, whoever writes it: the pipeline or a moderator. Every sentence SHALL
+cite facts, so it traces to their sources. The system SHALL reject a write that
+adds an uncited event, site fact, or sentence. A source that no fact cites
+SHALL be removed on save.
+
+#### Scenario: Moderator adds an event without a source
+
+- **WHEN** a moderator saves a new closing event with no citation
+- **THEN** the write is rejected with a message asking for a source
+
+#### Scenario: Pipeline fact loses its only citation
+
+- **WHEN** the quote check drops a fact's only citation
+- **THEN** the fact is dropped, and any sentence citing it fails the checks
+
 ### Requirement: Sources
 
 The system SHALL store each public web page that supports a fact as a source in
