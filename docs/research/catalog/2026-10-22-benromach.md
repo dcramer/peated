@@ -19,6 +19,9 @@ Heritage single casks from 1973, 1975, and 1977. Each card links to a
 product page at `/whisky/<slug>` with ABV, vintage, cask type, and often
 the distillation and bottling years.
 
+Distillery-exclusive and retailer single casks, such as single bourbon
+barrels, are not on the producer site. Use auction records or label photos.
+
 The site calls the distillery both "Benromach" and "Benromach Distillery".
 They are one site in Forres, owned by Gordon & MacPhail since 1993.
 
@@ -87,14 +90,33 @@ be zoomed in the browser. Whiskybase shows a bot check; it was skipped.
 
 ## Sources for the second pass
 
-| Source                                                                                                                                                                                                                                                                                                                                                                     | Established                                                                                                                                                                                   |
-| -------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- | --------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
-| Producer pages `/whisky/cask-strength-vintage-2014-batch2`, `-2014-batch3`, `-3`, `-2`, `cask-strength-vintages`, `-2010-batch-1`, `-2009-batch-4`, `-1`, `cask-strength-vintage`, `-pre-2020`                                                                                                                                                                             | Cask Strength Vintage batches with ABV: 2014 B2 59.7%, 2014 B3 60.6%, 2013 B1 59.7% (distilled 2013, bottled 2023), 2012 B3 59.6%, 2012 B1 60.2%, 2010 B1 58.5%, 2009 B4 57.2%, 2009 B2 57.1% |
-| Producer pages `/whisky/contrasts-*`, `organic`, `peat-smoke`, `peat-smoke-sherry-cask-matured`, `sassicaia`, `château-cissac-bordeaux`, `triple-distilled`                                                                                                                                                                                                                | Contrasts titles, vintages, ABV; Contrasts: Organic 2015 distilled 2015, bottled 2024, 9 years                                                                                                |
-| Producer pages `/whisky/aged-40-years`, `/whisky/benromach-aged-40-years`                                                                                                                                                                                                                                                                                                  | 2022 Release Batch 2, 56.5%, 1,098 bottles; 2021 Release, 57.1%                                                                                                                               |
-| [Whisky Auctioneer past auctions](https://whiskyauctioneer.com/search/past-auctions?keyword=benromach) searched for organic, contrasts, peat smoke, cask strength, 40 year, triple distilled, 18 year, sassicaia, hermitage, tokaji, cissac, port, wood finish, cara gold, 2009, 2010                                                                                      | Release lists with bottling year and ABV (below)                                                                                                                                              |
-| Whisky Auctioneer lot photos 5164163 (Organic 2010, b2017), 5057521 (Organic 2011, b2019), 5173710 (Cask Strength 2008 Batch 1, 57.9%), 5178196 (Cask Strength 2009 Batch 1, 58.8%), 8198040 (2014 Batch 02), 7040142 (40 Year Old 2022 Release), 8215816 (2022 Batch 2 Release), 5070424 (2012 Contrasts: Peat Smoke, Sherry Cask Matured), 5214600 (Château Cissac 2010) | Printed label wording quoted in this guide                                                                                                                                                    |
-| Retailer listings on Peated price records (The Whisky World, Master of Malt, Fine Drams, Mission Liquor, Wooden Cork)                                                                                                                                                                                                                                                      | Bottling years for Contrasts releases; the 2012 bourbon Peat Smoke                                                                                                                            |
+- Producer pages for Cask Strength Vintage batches
+  (`/whisky/cask-strength-vintage-2014-batch2`, `-2014-batch3`, `-3`, `-2`,
+  `cask-strength-vintages`, `-2010-batch-1`, `-2009-batch-4`, `-1`,
+  `cask-strength-vintage`, `-pre-2020`): batch and ABV. 2014 Batch 2 59.7%,
+  2014 Batch 3 60.6%, 2013 Batch 1 59.7% (distilled 2013, bottled 2023),
+  2012 Batch 3 59.6%, 2012 Batch 1 60.2%, 2010 Batch 1 58.5%, 2009 Batch 4
+  57.2%, 2009 Batch 2 57.1%.
+- Producer pages `/whisky/contrasts-*`, `organic`, `peat-smoke`,
+  `peat-smoke-sherry-cask-matured`, `sassicaia`, `château-cissac-bordeaux`,
+  and `triple-distilled`: Contrasts titles, vintages, and ABV. Contrasts:
+  Organic 2015 was distilled 2015 and bottled 2024 at 9 years.
+- Producer pages `/whisky/aged-40-years` and `/whisky/benromach-aged-40-years`:
+  2022 Release Batch 2 at 56.5% with 1,098 bottles, and 2021 Release at 57.1%.
+- [Whisky Auctioneer past auctions](https://whiskyauctioneer.com/search/past-auctions?keyword=benromach),
+  searched for organic, contrasts, peat smoke, cask strength, 40 year, triple
+  distilled, 18 year, sassicaia, hermitage, tokaji, cissac, port, wood finish,
+  cara gold, 2009, and 2010: the release lists below, with bottling year and
+  ABV.
+- Whisky Auctioneer lot photos, for the printed label wording quoted in this
+  guide: 5164163 (Organic 2010, bottled 2017), 5057521 (Organic 2011, bottled
+  2019), 5173710 (Cask Strength 2008 Batch 1, 57.9%), 5178196 (Cask Strength
+  2009 Batch 1, 58.8%), 8198040 (2014 Batch 02), 7040142 (40 Year Old 2022
+  Release), 8215816 (2022 Batch 2 Release), 5070424 (2012 Contrasts: Peat
+  Smoke, Sherry Cask Matured), and 5214600 (Château Cissac 2010).
+- Retailer listings on Peated price records (The Whisky World, Master of Malt,
+  Fine Drams, Mission Liquor, Wooden Cork): bottling years for Contrasts
+  releases, and the 2012 bourbon-cask Peat Smoke.
 
 Release lists from the auction archive (bottling year, ABV):
 
@@ -131,71 +153,62 @@ Release lists from the auction archive (bottling year, ABV):
 - The producer's `/whisky/triple-distilled` archive page carries text about
   a 1973 single cask. Its title and 50% ABV are right.
 - Contrasts: Organic 2015: the producer says bottled 2024; Master of Malt and
-  The Whisky World say bottled 2025. Peated treats it as one release
-  (Bottle 46998) and leaves `bottlingYear` empty.
+  The Whisky World say bottled 2025. Peated treats it as one release and
+  leaves the bottling year empty.
 - Whisky Auctioneer lot text for Organic 2010 says "bottled in 2018" on lots
   whose labels say 2017 and 2015. Trust the label.
-- Stored ages on several old Peated Bottles were arithmetic, not printed
-  (for example 15 years for Peat Smoke 2005 bottled 2014). They were cleared
-  where the label or the distilled and bottled years proved them wrong.
+- One auction title calls Contrasts: Cara Gold Malt an 11 Year Old; Peated
+  stores 10 years. Not settled.
+- Older Peated Bottles held ages worked out from the distilled and bottled
+  years (for example 15 years for Peat Smoke 2005 bottled 2014). Pre-2020
+  Organic and Peat Smoke labels print no age, so do not store one.
 
-## Results of the 22 October 2026 pass (production)
+## Names and Series
 
-Naming follows the rule in `whisky-identity-model.md`, "Bottle Name,
-Edition, And Cask Number", as settled in commit fd838c0f0 on branch
-`claude/bottle-naming-review-b97d76` (dcramer/peated#1436, not merged on
-22 October 2026). When the label prints the vintage apart from the title,
-the year follows the expression (`Peat Smoke 2008`, `Cask Strength 2008`);
-a printed title that already ends in the year stays as printed
-(`Hermitage 2007`). Post-2020 releases keep `Contrasts:`, Bottles that
-share a title carry their vintage, and no vintage name adds an age. All Contrasts and Contrast
-Range releases from 2014 on are in Series S0136 "Contrasts".
+Names follow "Bottle Name, Edition, And Cask Number" in
+[the identity model](../../architecture/whisky-identity-model.md). For
+Benromach that gives `Peat Smoke 2008` and `Cask Strength 2008` (the label
+prints the vintage apart from the title), `Hermitage 2007` (the title already
+ends in the year), and `40-year-old 2022 Release`. Releases from 2020 on keep
+the `Contrasts:` prefix. The batch goes in `edition`.
 
-| Status            | Bottles                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                        |
-| ----------------- | -------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
-| Merged (approved) | 61944 → 56629 (Organic 2011); 14327 → 3053 (Triple Distilled 2009); 62807 → 46998 (Contrasts: Organic 2015); 63627 → 18509 (18-year-old)                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                       |
-| Updated           | 57076, 2698 `Organic 2010`; 56629 `Organic 2011`; 47056 `Contrasts: Organic 2012`; 46998 `Contrasts: Organic 2015`; 3975, 3411, 2696, 2697 `Peat Smoke 2005/2006/2008/2010`; 61935, 1647, 45898 `Contrasts: Peat Smoke 2009/2012/2014`; 3053 `Triple Distilled 2009`; 56380 `Contrasts: Triple Distilled`; 45569 `Contrasts: Double Matured`; 45863 `Contrasts: Wine Finish`; 46145 `Contrasts: Virgin Oak`; 47053 (Series); 1345 `Contrasts: Cara Gold Malt`; 63880 (Series, bottled 2018); 3686 `Hermitage 2005`; 15909 (facts, Series); 18516 (45%, bottled 2005); 2343 `Cask Strength 2008` Batch 1; 1971 `Cask Strength 2009`; 1346 `Cask Strength 2012`; 57075 `Cask Strength 2007` Batch 1; 62806 `Cask Strength 2014` Batch 2; 47057 `40-year-old 2022 Release` Batch 2 (1,098 bottles); 47058 `40-year-old 2022 Release` (1,132 bottles); 18509 (40%) |
-| Created           | 68303–68305 `Cask Strength 2009` Batch 1, 2, 4; 68306 `Cask Strength 2010` Batch 1; 68307, 68308 `Cask Strength 2012` Batch 1, 3; 68309 `Cask Strength 2013` Batch 1; 68310 `Cask Strength 2014` Batch 3; 68311 `40-year-old 2021 Release`; 68312 `40-year-old` (2019, 43%)                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                    |
-| No change         | 1173 `Organic` (no-age 2006–2014 release); 47052, 47054, 47055                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                 |
-| Unresolved        | See below                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                      |
+All Contrasts and Contrast Range releases from 2014 on belong to the Contrasts
+Series. Older releases, such as the no-age Organic (2006–2014) and the
+Sassicaia 5 Year Old, have no Series: no source shows them in the collection
+before 2014.
 
 ## Unresolved
 
-- 1971 `Cask Strength 2009` and 1346 `Cask Strength 2012` have no ABV or
-  batch, so each may duplicate one of the new batch Bottles. 1346 could also
-  be the 2002 vintage bottled in 2012. Needs a reference, price, or tasting
-  photo that shows the batch.
-- 1647 `Contrasts: Peat Smoke 2012`: its reference matches the sherry-cask
-  auction title, but its price link is the bourbon release. Which one is it?
-- 17965 `Peat Smoke` (no facts): which vintage?
-- 2697 `Peat Smoke 2010`: bourbon (producer vintage list) or the 2010 Sherry
-  Cask Matured at 59.9%? Its stored age of 10 is unverified.
-- 3687 `2008 Organic`: no Organic distilled in 2008 was found on the producer
-  site or at auction. It may be a bottling year or the Organic Special
-  Edition. Left unchanged.
-- 14453 `Sassicaia Wood Finish 2009`: the 2002 vintage bottled 2009 or the
-  2009 vintage bottled 2017?
-- 63620 `Sassicaia Wood Finish` 5 years: Peated stores vintage 2006, but
-  auction records say bottled 2006. The label photo was unreadable. It
-  predates the 2014 Contrasts evidence, so it has no Series.
-- 18236 `Tokaji Finish`: the 21 Year Old (b2004) or the 5 Year Old (b2006)?
-- 1345 `Contrasts: Cara Gold Malt` stores 10 years; one auction title says
-  11 Year Old. 57075 stores 11 years; the US label was not read.
-- 1173 `Organic` (2006–2014) has no Series: no source shows it in the
-  Contrasts collection before 2014.
-- Not created, recorded for a later pass: Organic Special Edition (b2009,
-  b2011); Organic 2010 bottled 2016 and 2018; Contrasts: Organic 2013
-  (b2022); Contrasts: Peat Smoke Sherry Cask Matured (2012, if 1647 is the
-  bourbon one); Peat Smoke 2000, 2002 batches, 2004, 2007, 2009 (b2018) and
-  2010 Sherry Cask Matured; Cask Strength 2001, 2002, 2003 and the Taiwan
-  12 Year Old batches; 40 Year Old 2023 Release (53.8%, one auction lot
-  only); Sassicaia, Hermitage, Château Cissac, Tokaji, and Port vintages not
-  in Peated.
-- Images were not reviewed in this pass. Several Contrasts Bottles carry
-  images uploaded from store listings with no source page or license.
-- Renames did not rewrite generated descriptions. Five that stated a
-  disproven age were cleared to regenerate (3975, 3686, 3053, 2343, 2698).
-  The rest still use the old names in their text.
-- Distillery-exclusive and retailer single casks, such as single bourbon
-  barrels, are not on the producer site. Use auction records or label
-  photos.
+- Two older Peated records, `Cask Strength 2009` and `Cask Strength 2012`,
+  have no ABV or batch. Each may duplicate one of the batch releases. The 2012
+  record could also be the 2002 vintage bottled in 2012. Needs a reference,
+  price, or tasting photo that shows the batch.
+- Contrasts: Peat Smoke 2012 exists in sherry and bourbon casks. One Peated
+  record has a reference that matches the sherry-cask auction title and a
+  price link to the bourbon release. Which is it?
+- Peat Smoke 2010: bourbon (the producer's vintage list) or the 2010 Sherry
+  Cask Matured at 59.9%? A stored age of 10 is unverified.
+- A `Peat Smoke` record with no facts: which vintage?
+- `2008 Organic`: no Organic distilled in 2008 was found on the producer site
+  or at auction. It may be a bottling year or the Organic Special Edition.
+- `Sassicaia Wood Finish 2009`: the 2002 vintage bottled 2009, or the 2009
+  vintage bottled 2017?
+- Sassicaia Wood Finish 5 years: Peated stores vintage 2006, but auction
+  records say bottled 2006. The label photo was unreadable.
+- `Tokaji Finish`: the 21 Year Old (bottled 2004) or the 5 Year Old (bottled
+  2006)?
+- The US label of Cask Strength 2007 Batch 1 was not read, so its 11-year age
+  is unconfirmed.
+- Releases with sources but not in Peated on 22 October 2026: Organic Special
+  Edition (bottled 2009 and 2011); Organic 2010 bottled 2016 and 2018;
+  Contrasts: Organic 2013 (bottled 2022); Contrasts: Peat Smoke Sherry Cask
+  Matured 2012, if the record above is the bourbon one; Peat Smoke 2000, the
+  2002 batches, 2004, 2007, 2009 (bottled 2018), and 2010 Sherry Cask Matured;
+  Cask Strength 2001, 2002, 2003, and the Taiwan 12 Year Old batches; 40 Year
+  Old 2023 Release (53.8%, one auction lot only); and the Sassicaia,
+  Hermitage, Château Cissac, Tokaji, and Port vintages in the lists above.
+
+## Images
+
+Images were not reviewed. Several Contrasts Bottles carry images uploaded from
+store listings with no source page or license.
