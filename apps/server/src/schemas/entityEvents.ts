@@ -27,6 +27,8 @@ export const EntityEventInputFields = {
   // History text is stored as About event text, which allows 1000 characters.
   description: z.string().trim().min(1).max(1000).nullable().optional(),
   newOwnerId: z.number().int().positive().nullable().optional(),
+  // An owner Peated has no Entity for, by name. History stores either.
+  newOwnerName: z.string().trim().min(1).max(200).nullable().optional(),
   sourceUrl: z.string().url().nullable().optional(),
 } as const;
 
@@ -40,14 +42,14 @@ export const EntityEventInputSchema = z
         message: "A description is required when kind is generic.",
       });
     }
-    if (event.kind === "acquired" && !event.newOwnerId) {
+    if (event.kind === "acquired" && !event.newOwnerId && !event.newOwnerName) {
       context.addIssue({
         code: "custom",
         path: ["newOwnerId"],
         message: "A new owner is required when kind is acquired.",
       });
     }
-    if (event.kind !== "acquired" && event.newOwnerId) {
+    if (event.kind !== "acquired" && (event.newOwnerId || event.newOwnerName)) {
       context.addIssue({
         code: "custom",
         path: ["newOwnerId"],
@@ -63,6 +65,7 @@ export const EntityEventSchema = z.object({
   date: EntityEventDateSchema,
   description: z.string().nullable(),
   newOwnerId: z.number().nullable(),
+  newOwnerName: z.string().nullable(),
   sourceUrl: z.string().url().nullable(),
   createdAt: z.string().datetime(),
   updatedAt: z.string().datetime(),

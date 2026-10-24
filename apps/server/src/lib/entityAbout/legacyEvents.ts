@@ -41,6 +41,7 @@ export function toLegacyEvent(
     date: event.date,
     description: event.text,
     newOwnerId: event.newOwnerId,
+    newOwnerName: event.newOwnerName,
     sourceUrl: sources.find((source) => source.id === sourceId)?.url ?? null,
     createdAt: event.createdAt ?? now,
     updatedAt: event.updatedAt ?? event.createdAt ?? now,
@@ -79,6 +80,7 @@ export type LegacyEventInput = {
   date: string;
   description: string | null;
   newOwnerId: number | null;
+  newOwnerName: string | null;
   sourceUrl: string | null;
 };
 
@@ -111,7 +113,8 @@ export function putLegacyEvent(
     date: input.date,
     text: input.description,
     newOwnerId: input.newOwnerId,
-    newOwnerName: null,
+    // A linked owner replaces a name-only one.
+    newOwnerName: input.newOwnerId ? null : input.newOwnerName,
     citations,
     writtenBy: "person",
     createdAt: before?.createdAt ?? now,

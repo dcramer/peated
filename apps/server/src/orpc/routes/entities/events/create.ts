@@ -68,6 +68,7 @@ export default procedure
                 date: input.date,
                 description: input.description ?? null,
                 newOwnerId: input.newOwnerId ?? null,
+                newOwnerName: input.newOwnerName ?? null,
                 sourceUrl: input.sourceUrl ?? null,
               },
               new Date().toISOString(),
