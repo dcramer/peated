@@ -87,7 +87,7 @@ export default implement(tastingListContract).handler(async function ({
       .select({ id: countries.id })
       .from(countries)
       .where(
-        Number.isFinite(+input.country)
+        isLocationId(input.country)
           ? eq(countries.id, Number(input.country))
           : eq(sql`LOWER(${countries.slug})`, input.country.toLowerCase()),
       )
@@ -103,7 +103,7 @@ export default implement(tastingListContract).handler(async function ({
         .where(
           and(
             eq(regions.countryId, country.id),
-            Number.isFinite(+input.region)
+            isLocationId(input.region)
               ? eq(regions.id, Number(input.region))
               : eq(sql`LOWER(${regions.slug})`, input.region.toLowerCase()),
           ),
@@ -196,3 +196,8 @@ export default implement(tastingListContract).handler(async function ({
     },
   };
 });
+
+// Only whole, safe integers are IDs; anything else, such as "1.5", is a slug.
+function isLocationId(value: string) {
+  return /^\d+$/.test(value) && Number.isSafeInteger(Number(value));
+}

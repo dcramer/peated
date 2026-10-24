@@ -48,8 +48,10 @@ Each count must equal what its filter returns:
   are defined once, in `AGE_BUCKETS`, and both the stats and the filter use
   them.
 - Location follows the Bottle's brand, the same rule the member region list
-  counts by. A country's count adds up all of that country's region rows, so
-  it matches the country filter.
+  counts by. The region list returns its 25 largest country and region groups,
+  plus a total for every country; the Countries group uses those totals, so
+  each matches the country filter. Regions lists that country's rows from the
+  25 largest groups.
 - Counts are the member's totals. They do not shrink when another filter is
   set.
 

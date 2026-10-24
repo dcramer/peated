@@ -360,4 +360,19 @@ describe("GET /tastings", () => {
     );
     expect(error).toMatchInlineSnapshot(`[Error: Invalid country.]`);
   });
+
+  test("treats a non-integer country or region as an unknown slug", async ({
+    fixtures,
+  }) => {
+    const country = await fixtures.Country({ name: "Scotland" });
+
+    for (const input of [
+      { country: "1.5" },
+      { country: "1e30" },
+      { country: String(country.id), region: "2.5" },
+    ]) {
+      const error = await waitError(routerClient.tastings.list(input));
+      expect(error.message).toMatch(/^Invalid (country|region)\.$/);
+    }
+  });
 });

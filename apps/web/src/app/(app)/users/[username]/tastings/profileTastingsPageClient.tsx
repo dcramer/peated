@@ -292,16 +292,16 @@ function getFilterGroups({
     });
   }
 
-  const countries = getCountryCounts(regions);
+  const countries = regions?.countries ?? [];
   if (countries.length) {
     groups.push({
       filters: countries
-        .filter((item, index) => index < 6 || item.slug === country)
+        .filter((item, index) => index < 6 || item.country.slug === country)
         .map((item) => ({
           count: item.count,
-          label: item.name,
-          selected: selected("country", item.slug),
-          value: item.slug,
+          label: item.country.name,
+          selected: selected("country", item.country.slug),
+          value: item.country.slug,
         })),
       label: "Countries",
       name: "country",
@@ -338,26 +338,6 @@ function getFilterGroups({
   }
 
   return groups;
-}
-
-/**
- * Country totals add up every region row for the country, which is the same
- * set the country filter returns.
- */
-function getCountryCounts(regions?: RegionList) {
-  const countries = new Map<
-    string,
-    { count: number; name: string; slug: string }
-  >();
-  for (const { count, country } of regions?.results ?? []) {
-    const current = countries.get(country.slug);
-    if (current) current.count += count;
-    else countries.set(country.slug, { ...country, count });
-  }
-  return Array.from(countries.values()).sort(
-    (left, right) =>
-      right.count - left.count || left.name.localeCompare(right.name),
-  );
 }
 
 function formatYears(value: number) {

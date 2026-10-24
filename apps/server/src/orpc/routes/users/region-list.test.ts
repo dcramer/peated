@@ -291,6 +291,9 @@ describe("GET /users/:user/regions", () => {
 
     expect(data).toEqual({
       totalCount: 5,
+      countries: [
+        { country: { name: "Scotland", slug: "scotland" }, count: 4 },
+      ],
       results: [
         {
           country: { name: "Scotland", slug: "scotland" },
@@ -343,6 +346,12 @@ describe("GET /users/:user/regions", () => {
 
     expect(data).toEqual({
       totalCount: 1,
+      countries: [
+        {
+          country: { name: "Promoted Country", slug: "promoted-country" },
+          count: 1,
+        },
+      ],
       results: [
         {
           country: {
@@ -430,5 +439,50 @@ describe("GET /users/:user/regions", () => {
     );
 
     expect(error).toMatchObject({ status: 409 });
+  });
+
+  test("totals every country beyond the 25 largest groups", async ({
+    defaults,
+    fixtures,
+  }) => {
+    const scotland = await fixtures.Country({ name: "Scotland" });
+    const japan = await fixtures.Country({ name: "Japan" });
+    for (let index = 0; index < 26; index++) {
+      const region = await fixtures.Region({
+        countryId: scotland.id,
+        name: `Region ${index}`,
+      });
+      const brand = await fixtures.Entity({
+        countryId: scotland.id,
+        regionId: region.id,
+      });
+      const bottle = await fixtures.Bottle({ brandId: brand.id });
+      // Larger groups first, so the smallest Scottish region falls past 25.
+      for (let count = 0; count < (index < 25 ? 2 : 1); count++) {
+        await fixtures.Tasting({
+          bottleId: bottle.id,
+          createdById: defaults.user.id,
+        });
+      }
+    }
+    const japaneseBrand = await fixtures.Entity({
+      countryId: japan.id,
+      regionId: null,
+    });
+    await fixtures.Tasting({
+      bottleId: (await fixtures.Bottle({ brandId: japaneseBrand.id })).id,
+      createdById: defaults.user.id,
+    });
+
+    const { countries, results } = await routerClient.users.regionList(
+      { user: "me" },
+      { context: { user: defaults.user } },
+    );
+
+    expect(results).toHaveLength(25);
+    expect(countries).toEqual([
+      { country: { name: "Scotland", slug: scotland.slug }, count: 51 },
+      { country: { name: "Japan", slug: japan.slug }, count: 1 },
+    ]);
   });
 });
