@@ -22,7 +22,7 @@ export const mockBrora = {
   name: "Brora",
   kind: "distillery",
   description:
-    "Brora is a single-pair distillery on the east coast of Sutherland. It opened in 1819 as Clynelish and took the name Brora around 1969.",
+    "Brora opened in 1819 as Clynelish and took the name Brora around 1969. It closed in March 1983 and started distilling again on 19 May 2021.",
   descriptionSrc: "generated",
   yearEstablished: 1819,
   website: "https://www.malts.com/en-gb/distilleries/brora",

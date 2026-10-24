@@ -1,4 +1,9 @@
-import { checkAboutProse, checkConflictPicks } from "../checks";
+import {
+  checkAboutProse,
+  checkConflictPicks,
+  keepVerifiedCitations,
+} from "../checks";
+import { getFactCitations } from "../display";
 import { findAboutWriteErrors } from "../document";
 import { BRORA_ABOUT_EXAMPLE } from "./brora";
 import { JOHNNIE_WALKER_ABOUT_EXAMPLE } from "./johnnieWalker";
@@ -16,5 +21,24 @@ describe.each([
   test("passes the prose checks", () => {
     expect(checkAboutProse(example)).toEqual([]);
     expect(checkConflictPicks(example)).toEqual([]);
+  });
+
+  test("keeps every fact under the evidence checks", () => {
+    // The quotes are copied from the source pages, so each page is read as
+    // the text of its quotes. A fact its quotes cannot state is dropped.
+    const quotes = new Map<string, string[]>();
+    for (const citation of [...getFactCitations(example).values()].flat()) {
+      if (!citation.quote) continue;
+      quotes.set(citation.sourceId, [
+        ...(quotes.get(citation.sourceId) ?? []),
+        citation.quote,
+      ]);
+    }
+    const pages = example.sources.map((source) => ({
+      url: source.url,
+      text: (quotes.get(source.id) ?? []).join(" "),
+    }));
+
+    expect(keepVerifiedCitations(example, pages, null)).toEqual(example);
   });
 });

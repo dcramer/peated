@@ -115,7 +115,16 @@ const BRORA_ABOUT_INPUT = {
       name: "Clynelish",
       text: "The Sutherland estate built it near Clynelish farm to give tenant farmers a buyer for their barley.",
       citations: [
-        { sourceId: "hes", statedValue: "1819" },
+        {
+          sourceId: "hes",
+          statedValue: "1819",
+          quote: "Founded in 1819 by Sutherland Estate",
+        },
+        {
+          sourceId: "df",
+          statedValue: "1819",
+          quote: "Originally founded in 1819 as Clynelish Distillery",
+        },
         {
           sourceId: "wf2",
           quote:
@@ -135,7 +144,12 @@ const BRORA_ABOUT_INPUT = {
           statedValue: "1896",
           quote: "Enlarged in 1896 by Ainslie and Co.",
         },
-        { sourceId: "wp", statedValue: "1896" },
+        {
+          sourceId: "wp",
+          statedValue: "1896",
+          quote:
+            "In 1896 they sold it to the Glasgow blender James Ainslie and his business partner John Risk.",
+        },
       ],
     },
     {
@@ -143,22 +157,29 @@ const BRORA_ABOUT_INPUT = {
       kind: "acquired",
       date: "1912",
       newOwnerName: "John Risk and the Distillers Company",
-      citations: [{ sourceId: "wp", statedValue: "1912" }],
+      citations: [
+        {
+          sourceId: "wp",
+          statedValue: "1912",
+          quote:
+            "In 1912 The Distillers Company join John Risk and take full control of the distillery in 1925.",
+        },
+      ],
     },
     {
       id: 4,
       kind: "acquired",
       date: "1925",
-      newOwnerName: "Distillers Company (DCL)",
+      newOwnerName: "The Distillers Company",
       citations: [
         {
           sourceId: "wp",
           statedValue: "1925",
-          quote: "full control of the distillery in 1925",
+          quote:
+            "In 1912 The Distillers Company join John Risk and take full control of the distillery in 1925.",
         },
         {
           sourceId: "wf6",
-          statedValue: "1925",
           quote: "John Risk disposes of his holding to D.C.L.",
         },
       ],
@@ -170,10 +191,14 @@ const BRORA_ABOUT_INPUT = {
       citations: [
         {
           sourceId: "wf6",
-          statedValue: "1931-03",
           quote: "Clynelish is closed in March.",
         },
-        { sourceId: "df", statedValue: "1931" },
+        {
+          sourceId: "df",
+          statedValue: "1931",
+          quote:
+            "Production ceased between 1931-38 and again during the Second World War 1941-1945.",
+        },
       ],
     },
     {
@@ -183,10 +208,14 @@ const BRORA_ABOUT_INPUT = {
       citations: [
         {
           sourceId: "wf6",
-          statedValue: "1938-09",
           quote: "Clynelish is restarted in September.",
         },
-        { sourceId: "df", statedValue: "1938" },
+        {
+          sourceId: "df",
+          statedValue: "1938",
+          quote:
+            "Production ceased between 1931-38 and again during the Second World War 1941-1945.",
+        },
       ],
     },
     {
@@ -197,11 +226,15 @@ const BRORA_ABOUT_INPUT = {
       citations: [
         {
           sourceId: "wf6",
-          statedValue: "1941-05",
           quote:
             "Clynelish shuts down in May, on account of wartime restrictions on the supply of barley to distillers.",
         },
-        { sourceId: "df", statedValue: "1941" },
+        {
+          sourceId: "df",
+          statedValue: "1941",
+          quote:
+            "Production ceased between 1931-38 and again during the Second World War 1941-1945.",
+        },
       ],
     },
     {
@@ -225,7 +258,6 @@ const BRORA_ABOUT_INPUT = {
       citations: [
         {
           sourceId: "wf7",
-          statedValue: "1961",
           quote:
             "The two stills are converted from direct coal heating to internal steam heating.",
         },
@@ -244,9 +276,14 @@ const BRORA_ABOUT_INPUT = {
       citations: [
         {
           sourceId: "wf7",
-          statedValue: "1967",
           quote:
             "a second, modern distillery is being built on an adjacent site",
+        },
+        {
+          sourceId: "df",
+          statedValue: "1967",
+          quote:
+            "Then in 1967-68 a brand new, much larger distillery with three pairs of stills as opposed to one was built alongside the old Victorian distillery.",
         },
       ],
     },
@@ -270,7 +307,11 @@ const BRORA_ABOUT_INPUT = {
       citations: [
         {
           sourceId: "wf7",
-          statedValue: "1968-12-28",
+          statedValue: "1968",
+          quote: "the summer of 1968 is very dry on Islay",
+        },
+        {
+          sourceId: "wf7",
           quote: "Mashing starts on December 28",
         },
       ],
@@ -287,12 +328,17 @@ const BRORA_ABOUT_INPUT = {
           quote:
             "in 1969 the original Clynelish distillery had the humiliation of being renamed Brora.",
         },
-        { sourceId: "wp", statedValue: "1968" },
+        {
+          sourceId: "wp",
+          statedValue: "1968",
+          quote:
+            'until the opening of the Clynelish Distillery in 1968, whereupon the name of the original Clynelish was changed to "Brora".',
+        },
         {
           sourceId: "wf9",
-          statedValue: "1975",
+          statedValue: "1969",
           quote:
-            "The malt is now referred to as 'Brora', to fulfil H.M. Customs & Excise's demand.",
+            "the Customs & Excise asked for separate names already in 1969",
         },
       ],
     },
@@ -324,7 +370,12 @@ const BRORA_ABOUT_INPUT = {
           statedValue: "1983-03",
           quote: "It was finally shut down altogether in March 1983.",
         },
-        { sourceId: "wp", statedValue: "1983" },
+        {
+          sourceId: "wp",
+          statedValue: "1983",
+          quote:
+            "It operated between 1819 and 1983 before being mothballed until 2021, when it was reactivated.",
+        },
         {
           sourceId: "dg17",
           statedValue: "1983",
@@ -336,7 +387,7 @@ const BRORA_ABOUT_INPUT = {
       id: 16,
       kind: "acquired",
       date: "1986",
-      newOwnerName: "Guinness (United Distillers)",
+      newOwnerName: "Guinness",
       citations: [
         {
           sourceId: "wpDcl",
@@ -363,7 +414,13 @@ const BRORA_ABOUT_INPUT = {
       kind: "generic",
       date: "1984-03-07",
       text: "The old distillery was listed as a Category B building.",
-      citations: [{ sourceId: "hes", statedValue: "1984-03-07" }],
+      citations: [
+        {
+          sourceId: "hes",
+          statedValue: "1984-03-07",
+          quote: "Category B Date Added 07/03/1984",
+        },
+      ],
     },
     {
       id: 19,
@@ -373,8 +430,13 @@ const BRORA_ABOUT_INPUT = {
       citations: [
         {
           sourceId: "dg17",
-          statedValue: "2017-10-09",
           quote: "£35 million investment by Diageo",
+        },
+        {
+          sourceId: "wp",
+          statedValue: "2017-10-09",
+          quote:
+            "On 9 October 2017 Diageo announced that it will re-open the Brora distillery with production resuming in 2020.",
         },
       ],
     },
@@ -386,35 +448,38 @@ const BRORA_ABOUT_INPUT = {
       citations: [
         {
           sourceId: "dg21",
-          statedValue: "2021-05-19",
           quote: "first cask of Brora spirit in more than 38 years",
         },
-        { sourceId: "snd", statedValue: "2021-05-19" },
+        {
+          sourceId: "snd",
+          statedValue: "2021-05-19",
+          quote:
+            "May 19, 2021 Diageo has officially reopened its Brora Distillery",
+        },
       ],
     },
   ],
   siteFacts: {
-    washStills: {
-      value: 1,
-      asOf: "2021",
-      citations: [{ sourceId: "wp", statedValue: "1" }],
-    },
-    spiritStills: {
-      value: 1,
-      asOf: "2021",
-      citations: [{ sourceId: "wp", statedValue: "1" }],
-    },
     waterSource: {
       value: "Clynemilton Burn",
       citations: [
-        { sourceId: "wf8", quote: "piped from a weir on the Clynemilton Burn" },
-        { sourceId: "wp", statedValue: "Clynemilton Burn" },
+        {
+          sourceId: "wf8",
+          statedValue: "Clynemilton Burn",
+          quote: "piped from a weir on the Clynemilton Burn",
+        },
       ],
     },
     listing: {
       value: "Category B",
       asOf: "1984",
-      citations: [{ sourceId: "hes", statedValue: "Category B" }],
+      citations: [
+        {
+          sourceId: "hes",
+          statedValue: "Category B",
+          quote: "Category B Date Added 07/03/1984",
+        },
+      ],
     },
   },
   sections: [
@@ -422,11 +487,7 @@ const BRORA_ABOUT_INPUT = {
       key: "lead",
       sentences: [
         {
-          text: "Brora is a single-pair distillery on the east coast of Sutherland.",
-          factIds: ["site:washStills", "site:spiritStills"],
-        },
-        {
-          text: "It opened in 1819 as Clynelish and took the name Brora around 1969.",
+          text: "Brora opened in 1819 as Clynelish and took the name Brora around 1969.",
           factIds: ["event:1", "event:13"],
         },
         {
@@ -544,10 +605,6 @@ const BRORA_ABOUT_INPUT = {
       key: "making",
       heading: "How it's made",
       sentences: [
-        {
-          text: "Brora has 1 wash still and 1 spirit still.",
-          factIds: ["site:washStills", "site:spiritStills"],
-        },
         {
           text: "Its water comes from a weir on the Clynemilton Burn.",
           factIds: ["site:waterSource"],

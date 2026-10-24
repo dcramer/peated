@@ -456,6 +456,34 @@ describe("checkConflictPicks", () => {
     ).toBeNull();
   });
 
+  test("reads the end year of a short year range", () => {
+    const reopened = (date: string) =>
+      keepVerifiedCitations(
+        draft({
+          events: [
+            {
+              id: 1,
+              kind: "reopened",
+              date,
+              citations: [
+                {
+                  sourceId: "wp",
+                  statedValue: date,
+                  quote: "Production ceased between 1931-38.",
+                },
+              ],
+            },
+          ],
+        }),
+        [{ ...page, text: `${page.text} Production ceased between 1931-38.` }],
+        null,
+      ).events.length;
+
+    // "1931-38" states 1938, but not a year it does not span.
+    expect(reopened("1938")).toBe(1);
+    expect(reopened("1948")).toBe(0);
+  });
+
   test("matches whole numbers only", () => {
     const stills = (value: number, quote: string) =>
       keepVerifiedCitations(
