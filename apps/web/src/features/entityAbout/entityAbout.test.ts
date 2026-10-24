@@ -3,9 +3,11 @@ import { describe, expect, it } from "vitest";
 
 import {
   fillYears,
+  getAxisYears,
   getCitationNumbers,
   getEraContext,
   getKeyFacts,
+  getLabeledYears,
   getNameSpans,
   getOperatingSpans,
   getOwners,
@@ -118,6 +120,60 @@ describe("fillYears", () => {
       { year: 1970, count: 1 },
       { year: 1971, count: 0 },
       { year: 1972, count: 2 },
+    ]);
+  });
+});
+
+describe("getAxisYears", () => {
+  it("labels both ends and every fifth year that is not crowding an end", () => {
+    expect([...getAxisYears(2004, 2024)]).toEqual([
+      2004, 2010, 2015, 2020, 2024,
+    ]);
+    expect([...getAxisYears(1965, 1983)]).toEqual([
+      1965, 1970, 1975, 1980, 1983,
+    ]);
+  });
+});
+
+describe("getLabeledYears", () => {
+  it("labels every bar in a short chart", () => {
+    const years = [
+      { year: 2004, count: 1 },
+      { year: 2005, count: 0 },
+      { year: 2014, count: 1 },
+      { year: 2021, count: 4 },
+      { year: 2023, count: 1 },
+    ];
+
+    expect([...getLabeledYears(years)].sort((a, b) => a - b)).toEqual([
+      2004, 2014, 2021, 2023,
+    ]);
+  });
+
+  it("labels only the three tallest bars in a wide chart", () => {
+    const years = fillYears({
+      results: [
+        { year: 1960, count: 1 },
+        { year: 1961, count: 2 },
+        { year: 1999, count: 5 },
+        { year: 2000, count: 4 },
+      ],
+      withoutYear: 0,
+    });
+
+    expect([...getLabeledYears(years)].sort((a, b) => a - b)).toEqual([
+      1961, 1999, 2000,
+    ]);
+  });
+
+  it("labels only the three tallest bars in a long chart", () => {
+    const years = Array.from({ length: 20 }, (_, index) => ({
+      year: 1960 + index,
+      count: index + 1,
+    }));
+
+    expect([...getLabeledYears(years)].sort((a, b) => a - b)).toEqual([
+      1977, 1978, 1979,
     ]);
   });
 });
