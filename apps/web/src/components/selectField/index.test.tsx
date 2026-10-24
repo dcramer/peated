@@ -51,4 +51,34 @@ describe("SelectField", () => {
     expect(onQuery).toHaveBeenCalledTimes(1);
     expect(onQuery).toHaveBeenCalledWith("", []);
   });
+
+  it("searches again when a search dependency changes", async () => {
+    const queryClient = new QueryClient({
+      defaultOptions: { queries: { staleTime: 5 * 60 * 1000 } },
+    });
+    const searchCountry = vi.fn(async (country: string) => [
+      { id: country, name: `Region in ${country}` },
+    ]);
+
+    async function renderForCountry(country: string) {
+      await act(async () => {
+        root.render(
+          <QueryClientProvider client={queryClient}>
+            <SelectField
+              label="Region"
+              onQuery={() => searchCountry(country)}
+              searchDependencies={[country]}
+            />
+          </QueryClientProvider>,
+        );
+      });
+      await wait(300);
+      await act(async () => {});
+    }
+
+    await renderForCountry("scotland");
+    await renderForCountry("japan");
+
+    expect(searchCountry.mock.calls).toEqual([["scotland"], ["japan"]]);
+  });
 });

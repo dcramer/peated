@@ -21,6 +21,7 @@ export default function RegionField({
         });
         return results;
       }}
+      searchDependencies={[searchContext.country ?? null]}
       {...props}
     />
   );

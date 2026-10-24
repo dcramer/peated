@@ -25,6 +25,8 @@ type BaseProps<T extends Option> = {
   options?: T[];
   placeholder?: string;
   readOnly?: boolean;
+  /** Values outside the typed text that `onQuery` results depend on. */
+  searchDependencies?: readonly unknown[];
   suggestedOptions?: T[];
 };
 
@@ -53,17 +55,25 @@ export default function SelectField<T extends Option>(props: Props<T>) {
     options = [],
     placeholder = "Search",
     readOnly = false,
+    searchDependencies = [],
     suggestedOptions = [],
     value,
   } = props;
   const fieldId = useId();
   const [query, setQuery] = useState("");
   const [debouncedQuery] = useDebounceValue(query, 150);
-  // Query keys compare by value, so the new default `options` array made on
-  // each render does not start another search.
+  // Query keys compare by value, so a new default array made on each render
+  // does not start another search. `onQuery` is a new function on each render
+  // too, so values it reads beyond the text must be in searchDependencies.
   const { data: searchResults = [], isFetching: loading } = useQuery(
     queryOptions({
-      queryKey: ["select-field", fieldId, debouncedQuery, options],
+      queryKey: [
+        "select-field",
+        fieldId,
+        debouncedQuery,
+        options,
+        searchDependencies,
+      ],
       queryFn: onQuery ? () => onQuery(debouncedQuery, options) : skipToken,
       // Keep the last results visible while the next query loads, as before.
       placeholderData: keepPreviousData,
