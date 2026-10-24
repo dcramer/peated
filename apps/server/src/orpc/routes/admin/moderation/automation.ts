@@ -243,11 +243,11 @@ export function createModerationAutomationProcedure(
         .select({
           id: auctionLots.id,
           name: auctionLots.name,
-          lastSeenAt: auctionLots.lastSeenAt,
+          lastSeenAt: auctionLots.lastCheckedAt,
         })
         .from(auctionLots)
         .where(eq(auctionLots.matchStatus, "pending"))
-        .orderBy(desc(auctionLots.lastSeenAt), desc(auctionLots.id))
+        .orderBy(desc(auctionLots.lastCheckedAt), desc(auctionLots.id))
         .limit(25);
       return {
         generatedAt: new Date().toISOString(),

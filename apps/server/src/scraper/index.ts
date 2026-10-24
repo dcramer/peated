@@ -1,6 +1,7 @@
 /** Public scraper actions used by API routes and workers. */
 import type { ExternalSite } from "@peated/server/db/schema";
 import type { ExternalSiteKey } from "@peated/server/types";
+import { requestAuctionLotDetails as requestDetails } from "./auctionDetails";
 import { createScrapeSourceSuggestionRun } from "./configured/runs";
 import {
   findScraperSourceBySiteKey,
@@ -83,6 +84,14 @@ export function redispatchStaleExternalSiteRuns(options?: {
   eligibleAt?: Date;
 }) {
   return lifecycle.redispatchStaleExternalSiteRuns(options);
+}
+
+export function queueRequestedAuctionLotDetails() {
+  return lifecycle.queueRequestedAuctionLotDetails();
+}
+
+export function requestAuctionLotDetails(lotId: number, fingerprint: string) {
+  return requestDetails(lotId, fingerprint);
 }
 
 export function executeScraperRun(

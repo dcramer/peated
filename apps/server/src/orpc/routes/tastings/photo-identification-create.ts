@@ -5,6 +5,7 @@
  */
 import { db } from "@peated/server/db";
 import { getUserActor } from "@peated/server/lib/actors";
+import { assessBottleResolution } from "@peated/server/lib/bottleMatchingAutomation";
 import { applyClassifierCreateDecision } from "@peated/server/lib/bottleReferenceResolution";
 import { BottleAlreadyExistsError } from "@peated/server/lib/createBottle";
 import {
@@ -17,7 +18,6 @@ import {
   CatalogImageWarningSchema,
   promotePhotoToCatalogImage,
 } from "@peated/server/lib/photoCatalogImage";
-import { isPhotoIdentificationCreateDecisionAutoCreatable } from "@peated/server/lib/photoIdentification";
 import { verifyPhotoIdentificationCreateToken } from "@peated/server/lib/photoIdentificationCreateToken";
 import { procedure } from "@peated/server/orpc";
 import {
@@ -112,7 +112,10 @@ export function createPhotoIdentificationCreateProcedure(
           message: "Photo identification result is not a create proposal.",
         });
       }
-      if (!isPhotoIdentificationCreateDecisionAutoCreatable(decision)) {
+      if (
+        !assessBottleResolution({ decision, readListingImage: true })
+          .automationEligible
+      ) {
         throw errors.BAD_REQUEST({
           message:
             "Photo identification result needs review before creating a bottle.",

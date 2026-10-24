@@ -1,0 +1,67 @@
+{
+  "writtenAt": "2026-10-02T03:06:11.451Z",
+  "toolName": "firecrawl_web_search",
+  "input": {
+    "queries": [
+      "Ardbeg 2009 14 Year Old Single Cask 3771 Fèis Ìle 2024 59% outturn 633"
+    ]
+  },
+  "output": {
+    "evidence": [
+      {
+        "provider": "firecrawl",
+        "query": "Ardbeg 2009 14 Year Old Single Cask 3771 Fèis Ìle 2024 59% outturn 633",
+        "summary": "Rating 4.5(45)Jun 3, 2024 · Cask Type: 2nd Fill PX-Sherry Butt; Cask number: 3771; Number of bottles: 633; Strength: 59.0 %; Size: 700 ml; Barcode: 5010494991178; Bottled ... It was bottled at the natural cask strength of 59% ABV from cask #3771. This is one of just 633 individually numbered bottles released. Distillery: Ardbeg ... Ardbeg 2009/2023 (59%, OB, Feis Ile 2024, 2nd fill Pedro Ximenez sherry butt, cask #3771, 633 bottles) ... 4 days ago · Today's reviews feature two older Ardbeg releases - the 25yo 2022 release and 14yo Single Cask 3771 from Fèis Ìle 2024. Full tasting notes are ...",
+        "results": [
+          {
+            "title": "Ardbeg 2009 - Ratings and Reviews - Whiskybase",
+            "url": "https://www.whiskybase.com/whiskies/whisky/255038/ardbeg-2009",
+            "domain": "whiskybase.com",
+            "description": "Rating 4.5(45)Jun 3, 2024 · Cask Type: 2nd Fill PX-Sherry Butt; Cask number: 3771; Number of bottles: 633; Strength: 59.0 %; Size: 700 ml; Barcode: 5010494991178; Bottled ...",
+            "extraSnippets": []
+          },
+          {
+            "title": "Ardbeg - 14 Year Old 2009 - Single Pedro Ximenez Cask #3771 Auction",
+            "url": "https://www.thegrandwhiskyauction.com/lot-682216/ardbeg-14-year-old-2009-single-pedro-ximenez-cask-3771",
+            "domain": "thegrandwhiskyauction.com",
+            "description": "It was bottled at the natural cask strength of 59% ABV from cask #3771. This is one of just 633 individually numbered bottles released. Distillery: Ardbeg ...",
+            "extraSnippets": []
+          },
+          {
+            "title": "Ardbeg from 2009 to 1989 - Whiskyfun",
+            "url": "https://www.whiskyfun.com/2024/Ardbeg-from-2009-to-1989.html",
+            "domain": "whiskyfun.com",
+            "description": "Ardbeg 2009/2023 (59%, OB, Feis Ile 2024, 2nd fill Pedro Ximenez sherry butt, cask #3771, 633 bottles) ...",
+            "extraSnippets": []
+          },
+          {
+            "title": "Today's reviews feature two older Ardbeg releases - Instagram",
+            "url": "https://www.instagram.com/p/Dd06LTxOvxy/",
+            "domain": "instagram.com",
+            "description": "4 days ago · Today's reviews feature two older Ardbeg releases - the 25yo 2022 release and 14yo Single Cask 3771 from Fèis Ìle 2024. Full tasting notes are ...",
+            "extraSnippets": []
+          },
+          {
+            "title": "Ardbeg - 2009 (Single Cask #3771) - Whisky Hammer",
+            "url": "https://www.whiskyhammer.com/item/228009/Ardbeg/Ardbeg---2009-Single-Cask-3771.html",
+            "domain": "whiskyhammer.com",
+            "description": "In stockFrom the highly acclaimed Islay distillery, Ardbeg, we have a single cask edition, matured in a 2nd fill Pedro Ximinez Sherry Butt. In cask date 2nd July 2009, ...",
+            "extraSnippets": []
+          },
+          {
+            "title": "Ardbeg 2009 - Market Value and Price Insights - Whiskystats",
+            "url": "https://www.whiskystats.com/whisky/255038",
+            "domain": "whiskystats.com",
+            "description": "2nd Fill PX-Sherry Butt. Casknumber. 3771. Number of bottles. 633. Strength. 59.00 %vol. Size. 700 ml. Barcode. 5010494991178. Bottle For. Feis Ile 2024.",
+            "extraSnippets": []
+          }
+        ]
+      }
+    ],
+    "errors": []
+  },
+  "metadata": {
+    "cacheKey": "e4fcfa30aa5f8506590b3f5c0acceeb147dc5c3f9087e6044dbe538bfe26d493",
+    "mode": "auto"
+  }
+}

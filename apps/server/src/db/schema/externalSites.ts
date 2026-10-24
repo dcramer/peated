@@ -41,6 +41,7 @@ export const scrapeSourceRunPurposeEnum = pgEnum("scrape_source_run_purpose", [
   "collect",
   "preview",
   "suggest",
+  "details",
 ]);
 
 export const externalSites = pgTable(

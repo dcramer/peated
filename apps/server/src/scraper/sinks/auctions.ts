@@ -1,15 +1,24 @@
 import {
   notifyAuctionLot,
+  saveAuctionLotDetails,
   upsertAuctionObservation,
 } from "@peated/server/lib/auctions";
-import type { AuctionObservation } from "@peated/server/schemas/auctions";
 import { pushUniqueJob } from "@peated/server/worker/dispatch";
+import type { ScotchWhiskyAuctionsObservation } from "../adapters/scotchWhiskyAuctions";
 import type { ScraperSink } from "../types";
 
-export const auctionSink: ScraperSink<AuctionObservation[]> = async ({
-  externalSiteId,
-  observation,
-}) => {
+export const auctionSink: ScraperSink<
+  ScotchWhiskyAuctionsObservation
+> = async ({ externalSiteId, observation }) => {
+  if (!Array.isArray(observation.value)) {
+    const lot = await saveAuctionLotDetails(externalSiteId, observation.value);
+    if (lot?.matchStatus === "pending")
+      await pushUniqueJob("ApplyAuctionLotMatch", {
+        lotId: lot.id,
+        fingerprint: lot.sourceFingerprint,
+      });
+    return { newItemCount: 0, existingItemCount: lot ? 1 : 0 };
+  }
   let newItemCount = 0;
   for (const item of observation.value) {
     const { lot, isNew } = await upsertAuctionObservation(externalSiteId, item);

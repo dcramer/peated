@@ -21,7 +21,9 @@ export const ExternalSiteSchema = z.object({
     .string()
     .datetime()
     .nullable()
-    .describe("Completion timestamp of the latest terminal scraper run"),
+    .describe(
+      "Completion timestamp of the latest terminal scraper run, excluding detail reads",
+    ),
   nextRunAt: z
     .string()
     .datetime()
@@ -34,7 +36,7 @@ export const ExternalSiteRunSchema = z.object({
   id: z.number().describe("Unique identifier for this scraper run"),
   status: z.enum(["queued", "running", "succeeded", "failed"]),
   trigger: z.enum(["scheduled", "manual"]),
-  purpose: z.enum(["collect", "preview", "suggest"]),
+  purpose: z.enum(["collect", "preview", "suggest", "details"]),
   requestedById: z.number().nullable(),
   attemptCount: z.number().int().min(0),
   requestLimit: z.number().int().positive(),

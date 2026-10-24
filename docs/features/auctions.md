@@ -1,7 +1,7 @@
 # Whisky auctions
 
 Auction listings belong to a sale occurrence, not a physical bottle. Peated
-links each supported single-bottle lot to one existing Bottle. The same release
+links each supported single-bottle lot to one Bottle. The same release
 can have several simultaneous lots or return in a later auction without
 overwriting history. Sets and multipacks are outside the initial scope.
 
@@ -10,7 +10,8 @@ overwriting history. Sets and multipacks are outside the initial scope.
 - `auction`: an auction house's event, unique by external site and source key.
 - `auction_lot`: an occurrence, unique by auction and source lot key. It keeps
   the source URL, lot number, title, available size and condition, source identity
-  facts, matching fingerprint, assignment, source state, and successful check times.
+  facts, matching fingerprint, assignment, source state, and one availability
+  check time.
 - `auction_lot_result`: append-only reported outcomes and price corrections.
   Public lists select one latest result per lot, not one sale per revision.
 - `auction_watch`: a private member subscription to one exact Bottle.
@@ -50,10 +51,39 @@ not a sale time. Missing prices and dates remain null.
 The collector queues unresolved lots through `ResolveAuctionLot`. Matching first
 reuses an exact accepted Bottle reference unless source facts conflict. Otherwise
 it saves the classifier decision as a Bottle check. A match can apply automatically
-under the same evidence rules as store prices: the chosen Bottle must be a
+under the shared Bottle-resolution rules used by prices, reviews, and photos: the chosen Bottle must be a
 retrieved, active candidate, supporting evidence must justify the match, and
 populated facts must not conflict. Missing evidence or unresolved risks require
 review. Exact-reference classifier shortcuts keep their reference dependency.
+
+Auction classification sets `readCandidateImages: false` in its saved request.
+It uses the listing title, supplied structured source facts, catalog fields,
+references, observations, and bounded source research. It does not automatically
+read catalog photos or load their saved label readings. Published thumbnails
+remain moderator review links, not extraction inputs. Missing batch or cask
+evidence still requires review; a generic candidate's photo cannot fill that gap.
+
+For a new Scotch Whisky Auctions lot without an accepted reference, a saved check,
+or structured source facts, matching requests one detail-page read before the
+first classification. The lot stays pending while those facts are collected.
+Existing references and checks still reuse their evidence without another read.
+The scheduler batches at most 25 requested lots per run and puts live lots before
+historical lots. Index refreshes run first. All requests share the same robots
+rules, 30-second spacing, and saved progress.
+
+Details supply explicit cask numbers, strength, volume, distillation and bottling
+years, cask-strength wording, and bottle counts. An individual bottle number is
+not a release identifier. Descriptions and price graphs are not saved. A completed
+read without useful facts, including a removed page, allows the normal title-based
+check; missing identity evidence still requires review.
+
+Detail facts never refresh availability or change prices. Changed facts produce
+a new matching fingerprint and check; earlier checks and results stay saved.
+Each request records the lot version, check ID, request time, and source URL to
+reject old responses. Assignments made during a read stay intact. The saved
+`details` run can resume interrupted work; a failed run requires an explicit
+admin retry. Detail runs do not count as listing refreshes in source health.
+Deployment does not request details for existing review lots.
 
 Moderators review unresolved lots, including ended lots, in the Inbox. Protected
 lot details and saved-run APIs provide source facts and evidence. The UI sends
@@ -73,13 +103,20 @@ Administrators can recheck 1–100 explicit imported lots with expected source,
 Bottle, and check versions. The whole batch is validated before work is saved;
 matched and ignored lots are skipped. Workers reuse references and saved checks
 on the default queue through `ApplyAuctionLotMatch`, so this work does not wait
-behind new classifications. Only missing checks queue `ResolveAuctionLot` on
-the models queue. Dispatch failures leave pending work that can be submitted
-again. Rechecks do not collect auctions or crawl detail pages.
+behind new classifications. Missing checks wait for requested source facts or
+queue `ResolveAuctionLot` on the models queue. Dispatch failures leave pending
+work that can be submitted again. Rechecks do not collect auction indexes.
+Setting `refreshSourceDetails` requests fresh Scotch Whisky Auctions details
+instead of applying
+the old check. This also retries a terminally failed detail run for the selected
+unresolved lots. The same batch versions and administrator access are required.
 
-Auction matching never creates Bottles, edits catalog facts, or automatically
-accepts new references. Creation proposals need separate catalog review; ignored
-classifications stay out of the Inbox.
+An evidence-backed creation proposal uses the same canonical Bottle creation
+as other sources. Creation and lot assignment commit together; an exact duplicate
+may reuse its existing Bottle. The saved check and attributed decision remain
+in history. Unsupported proposals stay in review. Auction matching never edits
+existing catalog facts, copies source images, or automatically accepts new
+references. Ignored classifications stay out of the Inbox.
 
 Bottle merges move lots, alert references, and watches to the replacement Bottle;
 duplicate member watches collapse, preserving the earlier subscription time.
@@ -103,10 +140,11 @@ promise that a lot remains open. Email alerts are not included.
 ## Initial collection and activation
 
 `scotchwhiskyauctions` uses the shared scraper runtime, robots checks, request
-limits, retry rules, and resumable page checkpoints. Each run traverses every
-page of the 2 most recent numeric auction links, revisiting those auctions for
-published closing results and corrections. Repeating a saved page is safe.
-This is a recent-window collector, not a complete archive backfill.
+limits, retry rules, and resumable page checkpoints. Manual runs traverse every
+page of the two recent auction links. Scheduled runs select open auctions from
+their explicit headings; when none is open, they check the latest ended event
+by its reported date for final results. Repeating a saved page is safe. This is
+recent collection, not a complete archive backfill.
 
 Auction collection follows the scraper's
 [responsible public-facts collection policy](../../apps/server/src/scraper/README.md#responsible-collection-of-public-facts).
@@ -116,18 +154,20 @@ We do not seek explicit permission to index these public facts. We do not copy
 the source's photographs, descriptions, or editorial content.
 
 The target is enabled for manual runs and its initial automatic schedule is
-null. Deploy the API and worker before triggering the first production run.
-The [rollout procedure](../operations/auctions.md) covers that run and checks
-before scheduling repeat collection. A closed-auction run can verify history;
+null. Deploy the API and worker together.
+The [rollout procedure](../operations/auctions.md) covers deployment, manual
+checks, and scheduling repeat collection. A closed-auction run can verify history;
 live availability still needs a currently open auction's markup and measured
 refresh capacity.
 The dated [source audit](../research/2026-09-30-whisky-auction-sources.md) records
 the checked public evidence and limits.
 
-The initial adapter does not infer precise closing times from a date-only
-heading, fetch detail-page condition or identity facts, or implement prioritized
-hourly watched-lot checks. Full repeat runs reconcile the recent window;
-late corrections beyond that window require an explicitly scoped collection.
+The adapter does not infer precise closing times from a date-only
+heading, fetch detail-page condition descriptions, or implement prioritized
+hourly watched-lot checks. An unmet reserve during live bidding is not an unsold
+result. Closing confirmation is required for that outcome. Sites may extend
+the whole auction or individual lots, so a scheduled deadline never proves a sale.
+Late corrections outside the selected event require an explicitly scoped collection.
 Choose a repeat interval within the 6-hour freshness window only after
 measuring a complete run. Automated activation is a separate operator decision.
 

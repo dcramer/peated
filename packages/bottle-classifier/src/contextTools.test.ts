@@ -9,6 +9,7 @@ import type {
   EntityContext,
 } from "./bottleContextContract";
 import {
+  createBottleClassifier,
   prepareBottleAuditAgentRun,
   prepareBottleClassifierAgentRun,
 } from "./classifierRuntime";
@@ -90,6 +91,66 @@ function entityContext(): EntityContext {
 }
 
 describe("Bottle-check context tools", () => {
+  test("keeps candidate-image policy scoped to each reference run", async () => {
+    const { publicImages: _images, ...fields } = bottleContext();
+    const source: BottleContextSource = {
+      ...fields,
+      imageSources: [
+        { source: { kind: "bottle" }, url: "https://example.com/bottle.webp" },
+      ],
+    };
+    const readImageLabel = vi.fn(async () => ({
+      extractedIdentity: null,
+      rawLabelText: "UNVERIFIED LABEL READING",
+    }));
+    const classifier = createBottleClassifier({
+      client: testClient,
+      model: "test-model",
+      maxSearchQueries: 0,
+      adapters: {
+        searchBottles: async () => [],
+        getBottleContext: async () => source,
+        readImageLabel,
+      },
+      overrides: {
+        runPreparedBottleClassifierAgent: async (prepared) => {
+          await invokePreparedTool(prepared, "get_bottle_context", {
+            bottleId: source.bottleId,
+          });
+          return {
+            finalOutput: {
+              action: "no_match",
+              rationale: "Identity remains unresolved.",
+              candidateBottleIds: [source.bottleId],
+              identityScope: "product",
+              referenceScope: "none",
+              observation: null,
+              matchedBottleId: null,
+              proposedBottle: null,
+            },
+          };
+        },
+      },
+    });
+
+    for (const readCandidateImages of [false, undefined]) {
+      const run = await classifier.runBottleReference({
+        reference: { name: source.fullName },
+        extractedIdentity: null,
+        readCandidateImages,
+      });
+
+      const context = run.result.artifacts.bottleContexts[0];
+      expect(context?.exact).toMatchObject(source.exact);
+      expect(context?.publicImages).toHaveLength(
+        readCandidateImages === false ? 0 : 1,
+      );
+      expect(readImageLabel).toHaveBeenCalledTimes(
+        readCandidateImages === false ? 0 : 1,
+      );
+    }
+  });
+
   test("returns a supported maturation proposal from an audit run", async () => {
     const currentBottleContext = bottleContext();
     const prepared = prepareBottleAuditAgentRun(

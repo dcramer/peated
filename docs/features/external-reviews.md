@@ -32,10 +32,11 @@ again while its name stays the same. A later accepted reference for that name
 still matches the review on its next import. A classifier failure records
 no completed answer and fails the worker job, so a retry can ask again.
 
-Initial automatic matches and creates must pass the classifier's evidence-derived
-automation tier before assigning a review or creating a Bottle. A decision
-that needs review leaves the source unresolved and keeps its saved proposal.
-The existing workflow for repairing an already assigned review is separate.
+Automatic matches and creates must pass `assessBottleResolution`, the same
+Bottle assessment as prices, auctions, and photos, before assigning a review or
+creating a Bottle. A decision that needs review leaves the source unresolved
+and keeps its saved proposal. Repairing an already assigned review uses the
+same assessment; only a moderator's repair may replace the current Bottle.
 Completed unresolved attempts, including ignored inputs, appear in the
 Moderation Inbox. A moderator can read the saved evidence, assign an existing
 Bottle, or request a new check. A missing Bottle can be added through the

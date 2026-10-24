@@ -5,7 +5,7 @@ import {
 import type { AuctionLot, BottleCheck } from "@peated/server/db/schema";
 import { isSupportedBottleCheckSchemaVersion } from "./bottleCheckSchemaVersion";
 import { PersistedReferenceBottleCheckOutputSchema } from "./bottleChecks";
-import { assessExistingBottleMatch } from "./bottleMatchingAutomation";
+import { assessBottleResolution } from "./bottleMatchingAutomation";
 
 export function auctionLotCheckKey(lotId: number, fingerprint: string) {
   return `auction-lot:${lotId}:${fingerprint}`;
@@ -51,22 +51,16 @@ export function assessAuctionMatch(lot: AuctionLot, check: BottleCheck) {
   if (
     !evidence ||
     evidence.output.status !== "classified" ||
-    evidence.output.decision.action !== "match"
+    evidence.output.decision.action === "no_match"
   )
     return null;
   const { decision } = evidence.output;
-  const assessment = assessExistingBottleMatch({
+  const assessment = assessBottleResolution({
+    decision,
     currentBottleId: lot.bottleId,
-    suggestedBottleId: decision.matchedBottleId,
     candidates: evidence.artifacts.candidates,
-    identityScope: decision.identityScope,
     sourceBottleIdentity: lot.sourceBottleIdentity,
-    hasUnresolvedRisks:
-      !decision.confidenceBasis ||
-      decision.confidenceBasis.unresolvedRisks.length > 0,
-    webEvidence: decision.confidenceBasis?.webEvidence,
     readListingImage: evidence.artifacts.extractedIdentitySource === "image",
-    sourceLabel: "the auction's bottle facts",
   });
   const target = evidence.artifacts.candidates.find(
     ({ bottleId }) => bottleId === decision.matchedBottleId,

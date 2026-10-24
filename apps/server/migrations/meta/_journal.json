@@ -2248,6 +2248,13 @@
       "when": 1792746256307,
       "tag": "0320_perfect_shooting_star",
       "breakpoints": false
+    },
+    {
+      "idx": 321,
+      "version": "7",
+      "when": 1792855767182,
+      "tag": "0321_auction_details",
+      "breakpoints": false
     }
   ]
 }

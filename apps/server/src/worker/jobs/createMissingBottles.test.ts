@@ -65,11 +65,11 @@ function buildClassification(
     status: "classified" as const,
     decision: {
       rationale: "test fixture",
-      confidenceBasis: { webEvidence: "supportive", unresolvedRisks: [] },
       candidateBottleIds: [],
       identityScope: "product",
       observation: null,
       referenceScope: "global_alias",
+      confidenceBasis: { webEvidence: "supportive", unresolvedRisks: [] },
       ...decision,
     },
     artifacts: {

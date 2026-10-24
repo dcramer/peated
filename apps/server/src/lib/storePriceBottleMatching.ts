@@ -62,6 +62,12 @@ export async function resolveStorePriceBottleMatchInTransaction(
       tx,
       referenceMatch.reference,
     );
+    const candidate = await getBottleCandidateById(referenceMatch.bottleId, tx);
+    if (
+      !candidate ||
+      getBottleFieldConflicts(sourceBottleIdentity, candidate).length
+    )
+      return { bottleId: null, candidate: null, source: null, referenceMatch };
     return {
       bottleId: referenceMatch.bottleId,
       candidate: null,

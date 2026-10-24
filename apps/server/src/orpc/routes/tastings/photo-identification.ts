@@ -11,7 +11,6 @@ import {
   getClassificationLogAttributes,
   getImageEvidenceFieldAttributes,
   identifyBottlePhoto,
-  isPhotoIdentificationCreateDecisionAutoCreatable,
   PHOTO_IDENTIFICATION_RATE_LIMIT,
   serializeProposedBottle,
   type PhotoIdentificationAttributes,
@@ -497,8 +496,8 @@ async function* streamPhotoIdentification({
     });
     const createToken =
       classification.status === "classified" &&
-      suggestedNextStep === "confirm_create" &&
-      isPhotoIdentificationCreateDecisionAutoCreatable(classification.decision)
+      classification.decision.action === "create_bottle" &&
+      suggestedNextStep === "confirm_create"
         ? await signPhotoIdentificationCreateToken({
             type: "photo_identification_create",
             userId: context.user.id,

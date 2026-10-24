@@ -4,6 +4,7 @@ import {
   createDecidedBottleClassification,
   type ClassifyBottleReferenceInput,
 } from "@peated/bottle-classifier/contract";
+import { getBottleFieldConflicts } from "@peated/bottle-classifier/fieldConflicts";
 import type { BottleCandidate } from "@peated/bottle-classifier/internal/types";
 import { findBottleReferenceAssignment } from "@peated/server/lib/bottleFinder";
 import { getBottleCandidateById } from "@peated/server/lib/bottleReferenceCandidates";
@@ -39,7 +40,10 @@ export async function resolveExactReferenceBottleRun(
   const candidate = await findExactReferenceBottleCandidate(
     input.reference.name,
   );
-  if (!candidate) {
+  if (
+    !candidate ||
+    getBottleFieldConflicts(input.extractedIdentity ?? null, candidate).length
+  ) {
     return null;
   }
 

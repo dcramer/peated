@@ -107,6 +107,31 @@ export const AuctionObservationSchema = z
   })
   .strict();
 
+export const AuctionLotDetailRequestSchema = z
+  .object({
+    lotId: z.number().int().positive(),
+    fingerprint: z.string().min(1),
+    expectedCheckId: z.number().int().positive().nullable(),
+    requestedAt: z.iso.datetime({ offset: true }),
+    url: UrlSchema,
+  })
+  .strict();
+
+export const AuctionLotDetailObservationSchema = z
+  .object({
+    kind: z.literal("details"),
+    request: AuctionLotDetailRequestSchema,
+    name: z.string().trim().min(1).max(500).nullable(),
+    sourceBottleIdentity: BottleExtractedDetailsSchema.nullable(),
+    volume: z.number().int().positive().nullable(),
+    checkedAt: z.iso.datetime({ offset: true }),
+  })
+  .strict();
+
+export type AuctionLotDetailObservation = z.infer<
+  typeof AuctionLotDetailObservationSchema
+>;
+
 export const AuctionResultSchema = z.object({
   id: z.number(),
   outcome: AuctionOutcomeSchema,

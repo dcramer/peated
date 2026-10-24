@@ -4,10 +4,6 @@ import {
   type BottleReferenceInput,
   type ClassifyBottleReferenceInput,
 } from "@peated/bottle-classifier";
-import {
-  agentActionRiskClass,
-  deriveAutomationTier,
-} from "@peated/bottle-classifier/automationTier";
 import type {
   BottleClassificationDecision,
   BottleConfidenceBasis,
@@ -27,6 +23,7 @@ import {
 } from "@peated/server/lib/createBottle";
 import { logTelemetryError } from "@peated/server/lib/log";
 import { eq } from "drizzle-orm";
+import { assessBottleResolution } from "./bottleMatchingAutomation";
 import {
   assertExpectedReviewIdentity,
   assignBottleReferenceInTransaction,
@@ -261,6 +258,7 @@ type ResolveBottleReferenceTargetInput = {
   reference: BottleReferenceInput;
   referenceLookupNames?: string[];
   createdByActorId: number;
+  allowReplacement?: boolean;
 };
 
 async function resolveBottleReferenceTargetWithClassifier(
@@ -268,6 +266,7 @@ async function resolveBottleReferenceTargetWithClassifier(
     reference,
     referenceLookupNames = [],
     createdByActorId,
+    allowReplacement,
   }: ResolveBottleReferenceTargetInput,
   classify: typeof classifyBottleReference,
 ): Promise<BottleReferenceResolution> {
@@ -341,32 +340,26 @@ async function resolveBottleReferenceTargetWithClassifier(
       classification.decision,
     );
 
-    // Review ingestion owns initial assignment; existing-assignment repairs use their own workflow.
-    const decision = classification.decision;
-    const tier = deriveAutomationTier({
-      actionRiskClass: agentActionRiskClass(decision.action),
-      hasUnresolvedRisks: Boolean(
-        decision.confidenceBasis?.unresolvedRisks.length,
-      ),
-      webEvidence: decision.confidenceBasis?.webEvidence,
-      hasMatchTarget: decision.action === "match",
-      reaffirmsCurrentAssignment:
-        decision.action === "match" &&
-        reference.currentBottleId === decision.matchedBottleId,
-      replacesCurrentAssignment:
-        decision.action === "match" &&
-        reference.currentBottleId != null &&
-        reference.currentBottleId !== decision.matchedBottleId,
-      hasDeterministicAnchor: decision.identityScope === "exact_cask",
-      hasPrimaryLabelOrImageEvidence:
-        classification.artifacts.imageEvidence != null,
-    });
-    if (reference.currentBottleId == null && tier === "review") {
+    if (
+      classification.decision.action === "no_match" ||
+      !assessBottleResolution({
+        decision: classification.decision,
+        candidates: classification.artifacts.candidates,
+        currentBottleId: reference.currentBottleId ?? null,
+        allowReplacement,
+        sourceBottleIdentity:
+          classification.artifacts.extractedIdentitySource === "image"
+            ? classification.artifacts.extractedIdentity
+            : null,
+        readListingImage:
+          classification.artifacts.extractedIdentitySource === "image",
+      }).automationEligible
+    ) {
       return {
         assignment: null,
         source: "unresolved",
         error: null,
-        confidence: null,
+        confidence: decisionConfidence,
         model: config.BOTTLE_CLASSIFIER_MODEL,
         rationale: decisionRationale,
         classifierEvidence,
@@ -383,20 +376,6 @@ async function resolveBottleReferenceTargetWithClassifier(
           bottleId,
         },
         source: "classifier_match",
-        error: null,
-        confidence: decisionConfidence,
-        model: config.BOTTLE_CLASSIFIER_MODEL,
-        rationale: decisionRationale,
-        classifierEvidence,
-        createdBottle: false,
-        classification: classificationRun,
-      };
-    }
-
-    if (classification.decision.action === "no_match") {
-      return {
-        assignment: null,
-        source: "unresolved",
         error: null,
         confidence: decisionConfidence,
         model: config.BOTTLE_CLASSIFIER_MODEL,

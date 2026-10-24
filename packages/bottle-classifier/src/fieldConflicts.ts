@@ -25,6 +25,10 @@ export type ComparableBottleFields = {
   caskStrength: boolean | null;
   singleCask: boolean | null;
   edition: string | null;
+  caskNumber?: string | null;
+  bottlingYear?: number | null;
+  releaseMonth?: number | null;
+  releaseDay?: number | null;
 };
 
 export type BottleFieldConflict =
@@ -35,7 +39,11 @@ export type BottleFieldConflict =
   | "releaseYear"
   | "caskStrength"
   | "singleCask"
-  | "edition";
+  | "edition"
+  | "caskNumber"
+  | "bottlingYear"
+  | "releaseMonth"
+  | "releaseDay";
 
 /**
  * Deterministic code rule (owner: Bottle classifier): code may reject only a
@@ -50,8 +58,10 @@ export function getBottleFieldConflicts(
   if (!facts) return [];
 
   const conflicts: BottleFieldConflict[] = [];
-  const differs = <T>(left: T | null, right: T | null) =>
-    left !== null && right !== null && left !== right;
+  const differs = <T>(
+    left: T | null | undefined,
+    right: T | null | undefined,
+  ) => left != null && right != null && left !== right;
 
   if (differs(facts.category, bottle.category)) conflicts.push("category");
   if (differs(facts.stated_age, bottle.statedAge)) conflicts.push("statedAge");
@@ -82,6 +92,14 @@ export function getBottleFieldConflicts(
   ) {
     conflicts.push("edition");
   }
+  if (differs(facts.cask_number, bottle.caskNumber))
+    conflicts.push("caskNumber");
+  if (differs(facts.bottling_year, bottle.bottlingYear))
+    conflicts.push("bottlingYear");
+  if (differs(facts.release_month, bottle.releaseMonth))
+    conflicts.push("releaseMonth");
+  if (differs(facts.release_day, bottle.releaseDay))
+    conflicts.push("releaseDay");
 
   return conflicts;
 }

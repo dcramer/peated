@@ -168,10 +168,11 @@ async function claimScraperRun({
           executionExpiresAt: null,
         })
         .where(eq(externalSiteRuns.id, runId));
-      await tx
-        .update(externalSites)
-        .set({ lastRunAt: now, lastRunId: runId })
-        .where(eq(externalSites.id, candidate.run.externalSiteId));
+      if (candidate.run.purpose !== "details")
+        await tx
+          .update(externalSites)
+          .set({ lastRunAt: now, lastRunId: runId })
+          .where(eq(externalSites.id, candidate.run.externalSiteId));
       return { status: "completed" };
     }
     if (
@@ -250,10 +251,12 @@ async function completeRun(claim: ClaimedRun, completedAt: Date) {
         externalSiteId: externalSiteRuns.externalSiteId,
       });
     if (!completed) throw new ScraperRunTakenOverError();
-    await tx
-      .update(externalSites)
-      .set({ lastRunAt: completedAt, lastRunId: completed.id })
-      .where(eq(externalSites.id, completed.externalSiteId));
+    // Listing collection owns site freshness. Detail reads only enrich lot facts.
+    if (claim.run.purpose !== "details")
+      await tx
+        .update(externalSites)
+        .set({ lastRunAt: completedAt, lastRunId: completed.id })
+        .where(eq(externalSites.id, completed.externalSiteId));
   });
 }
 
@@ -290,10 +293,11 @@ async function failRun(claim: ClaimedRun, error: Error, completedAt: Date) {
             now: completedAt,
           })
         : null;
-    await tx
-      .update(externalSites)
-      .set({ lastRunAt: completedAt, lastRunId: failed.id })
-      .where(eq(externalSites.id, failed.externalSiteId));
+    if (claim.run.purpose !== "details")
+      await tx
+        .update(externalSites)
+        .set({ lastRunAt: completedAt, lastRunId: failed.id })
+        .where(eq(externalSites.id, failed.externalSiteId));
     return repair?.id;
   });
 }

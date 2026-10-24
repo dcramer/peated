@@ -2,6 +2,7 @@ import { db } from "@peated/server/db";
 import { externalSites } from "@peated/server/db/schema";
 import {
   ExternalSiteRunActiveError,
+  queueRequestedAuctionLotDetails,
   queueScheduledExternalSiteRun,
   redispatchStaleExternalSiteRuns,
   ScraperTargetDisabledError,
@@ -11,11 +12,13 @@ import { and, isNotNull, isNull, lte, or, sql } from "drizzle-orm";
 export interface ScraperScheduleLifecycle {
   queueScheduledExternalSiteRun: typeof queueScheduledExternalSiteRun;
   redispatchStaleExternalSiteRuns: typeof redispatchStaleExternalSiteRuns;
+  queueRequestedAuctionLotDetails: typeof queueRequestedAuctionLotDetails;
 }
 
 const scraperScheduleLifecycle: ScraperScheduleLifecycle = {
   queueScheduledExternalSiteRun,
   redispatchStaleExternalSiteRuns,
+  queueRequestedAuctionLotDetails,
 };
 
 export async function scheduleScrapers(
@@ -47,6 +50,7 @@ export async function scheduleScrapers(
       }
     }
   }
+  await lifecycle.queueRequestedAuctionLotDetails();
 }
 
 export default async function scheduleScrapersJob() {

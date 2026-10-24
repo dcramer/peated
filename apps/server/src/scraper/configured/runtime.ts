@@ -513,6 +513,9 @@ export async function resolveScrapeSourceRunRegistry(
   if (row.run.purpose === "suggest") {
     throw new Error("An AI run cannot use saved rules.");
   }
+  if (row.run.purpose === "details") {
+    throw new Error("Auction detail reads require their built-in source.");
+  }
   if (rules.kind !== row.source.kind) {
     throw new Error("The rules collect the wrong content.");
   }

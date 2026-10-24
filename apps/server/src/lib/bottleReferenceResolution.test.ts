@@ -83,10 +83,10 @@ function buildClassification(
     status: "classified" as const,
     decision: {
       rationale: "test fixture",
-      confidenceBasis: { webEvidence: "supportive", unresolvedRisks: [] },
       candidateBottleIds: [],
       identityScope: "product",
       observation: null,
+      confidenceBasis: { webEvidence: "supportive", unresolvedRisks: [] },
       ...decision,
     },
     artifacts: {
@@ -592,6 +592,45 @@ describe("resolveBottleReferenceTarget", () => {
       groupId: created!.groupId,
     });
   });
+
+  test.for(["match", "create_bottle"] as const)(
+    "keeps an unsupported %s unresolved with its evidence",
+    async (action, { fixtures }) => {
+      const actor = await getUserActor(await fixtures.User({ admin: true }));
+      const bottle = await fixtures.Bottle();
+      const before = await countBottles();
+      classifyBottleReferenceMock.mockResolvedValue(
+        buildClassification(
+          {
+            action,
+            matchedBottleId: action === "match" ? bottle.id : null,
+            confidenceBasis: { webEvidence: "not_used", unresolvedRisks: [] },
+            proposedBottle:
+              action === "create_bottle"
+                ? {
+                    name: "Missing release",
+                    brand: { id: bottle.brandId, name: "Example" },
+                    distillers: [],
+                  }
+                : undefined,
+          },
+          action === "match" ? [{ bottleId: bottle.id }] : [],
+        ),
+      );
+      const result = await resolveBottleReferenceTarget({
+        reference: { name: "Unresolved source" },
+        createdByActorId: actor.id,
+      });
+      expect(result).toMatchObject({
+        assignment: null,
+        source: "unresolved",
+        createdBottle: false,
+        error: null,
+        classification: { result: { decision: { action } } },
+      });
+      expect(await countBottles()).toBe(before);
+    },
+  );
 
   test("reuses existing SMWS bottles by code when a classifier create omits the subtitle", async ({
     fixtures,

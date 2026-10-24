@@ -1,8 +1,27 @@
 import { describe, expect, test } from "vitest";
 
-import { assessStorePriceMatch } from "./priceMatchingAutomation";
+import type { WebEvidenceJudgment } from "@peated/bottle-classifier/automationTier";
+import {
+  BottleClassificationDecisionSchema,
+  type BottleCandidate,
+  type BottleExtractedDetails,
+  type ProposedBottle,
+} from "@peated/bottle-classifier/internal/types";
+import { assessBottleResolution } from "./bottleMatchingAutomation";
 
-type AssessmentInput = Parameters<typeof assessStorePriceMatch>[0];
+type AssessmentInput = {
+  action: "match" | "create_bottle" | "no_match";
+  currentBottleId: number | null;
+  suggestedBottleId: number | null;
+  candidates: BottleCandidate[];
+  proposedBottle: ProposedBottle | null;
+  identityScope: "product" | "exact_cask";
+  sourceBottleIdentity: BottleExtractedDetails | null;
+  hasUnresolvedRisks: boolean;
+  webEvidence: WebEvidenceJudgment;
+  readListingImage: boolean;
+  allowReplacement: boolean;
+};
 
 function buildExtractedLabel(
   overrides: Partial<NonNullable<AssessmentInput["sourceBottleIdentity"]>> = {},
@@ -81,9 +100,9 @@ function buildProposedBottle(
 }
 
 function assess(overrides: Partial<AssessmentInput> = {}) {
-  return assessStorePriceMatch({
+  const input: AssessmentInput = {
     action: "create_bottle",
-    price: { bottleId: null },
+    currentBottleId: null,
     suggestedBottleId: null,
     candidates: [],
     proposedBottle: buildProposedBottle(),
@@ -92,11 +111,49 @@ function assess(overrides: Partial<AssessmentInput> = {}) {
     hasUnresolvedRisks: false,
     webEvidence: "supportive",
     readListingImage: false,
+    allowReplacement: false,
     ...overrides,
+  };
+  return assessBottleResolution({
+    decision: BottleClassificationDecisionSchema.parse({
+      action: input.action,
+      matchedBottleId: input.suggestedBottleId,
+      proposedBottle: input.proposedBottle,
+      identityScope: input.identityScope,
+      rationale: "Evidence identifies the Bottle.",
+      candidateBottleIds: input.candidates.map(({ bottleId }) => bottleId),
+      observation: null,
+      confidenceBasis: {
+        webEvidence: input.webEvidence,
+        unresolvedRisks: input.hasUnresolvedRisks
+          ? [{ category: "release_ambiguity", note: "Unclear release." }]
+          : [],
+      },
+    }),
+    currentBottleId: input.currentBottleId,
+    candidates: input.candidates,
+    sourceBottleIdentity: input.sourceBottleIdentity,
+    readListingImage: input.readListingImage,
+    allowReplacement: input.allowReplacement,
   });
 }
 
-describe("assessStorePriceMatch", () => {
+describe("assessBottleResolution", () => {
+  test("an authorized correction can replace a match but cannot bypass unresolved risks", () => {
+    const input: Partial<AssessmentInput> = {
+      action: "match",
+      currentBottleId: 2,
+      suggestedBottleId: 1,
+      candidates: [buildCandidate()],
+      proposedBottle: null,
+      allowReplacement: true,
+    };
+    expect(assess(input)).toMatchObject({ automationEligible: true });
+    expect(assess({ ...input, hasUnresolvedRisks: true })).toMatchObject({
+      automationEligible: false,
+    });
+  });
+
   test("applies a create backed by supportive web evidence", () => {
     expect(assess()).toEqual({
       automationEligible: true,
@@ -140,7 +197,7 @@ describe("assessStorePriceMatch", () => {
       assess({ sourceBottleIdentity: buildExtractedLabel({ abv: 46 }) }),
     ).toEqual({
       automationEligible: false,
-      automationBlockers: ["conflicts with the store's product facts (abv)"],
+      automationBlockers: ["conflicts with the source's bottle facts (abv)"],
     });
   });
 
@@ -171,7 +228,7 @@ describe("assessStorePriceMatch", () => {
     expect(
       assess({
         action: "match",
-        price: { bottleId: 2 },
+        currentBottleId: 2,
         suggestedBottleId: 1,
         candidates: [buildCandidate()],
         proposedBottle: null,
@@ -217,7 +274,7 @@ describe("assessStorePriceMatch", () => {
       }),
     ).toEqual({
       automationEligible: false,
-      automationBlockers: ["conflicts with the store's product facts (abv)"],
+      automationBlockers: ["conflicts with the source's bottle facts (abv)"],
     });
   });
 
@@ -225,7 +282,7 @@ describe("assessStorePriceMatch", () => {
     expect(
       assess({
         action: "match",
-        price: { bottleId: 1 },
+        currentBottleId: 1,
         suggestedBottleId: 1,
         candidates: [buildCandidate()],
         proposedBottle: null,

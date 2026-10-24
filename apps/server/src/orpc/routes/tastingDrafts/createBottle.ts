@@ -2,6 +2,7 @@ import { createId } from "@paralleldrive/cuid2";
 import { db } from "@peated/server/db";
 import { tastingDrafts } from "@peated/server/db/schema";
 import { getUserActor } from "@peated/server/lib/actors";
+import { assessBottleResolution } from "@peated/server/lib/bottleMatchingAutomation";
 import { applyClassifierCreateDecision } from "@peated/server/lib/bottleReferenceResolution";
 import { BottleAlreadyExistsError } from "@peated/server/lib/createBottle";
 import {
@@ -9,7 +10,6 @@ import {
   CatalogImageWarningSchema,
   promotePhotoToCatalogImage,
 } from "@peated/server/lib/photoCatalogImage";
-import { isPhotoIdentificationCreateDecisionAutoCreatable } from "@peated/server/lib/photoIdentification";
 import { copyUploadByUrl } from "@peated/server/lib/uploads";
 import { procedure } from "@peated/server/orpc";
 import {
@@ -79,7 +79,10 @@ export default procedure
     }
     const { decision, photoSuitability } = result;
     // The automation rules may have changed since the draft was identified.
-    if (!isPhotoIdentificationCreateDecisionAutoCreatable(decision)) {
+    if (
+      !assessBottleResolution({ decision, readListingImage: true })
+        .automationEligible
+    ) {
       throw errors.BAD_REQUEST({
         message: "This Bottle needs review before it can be created.",
       });

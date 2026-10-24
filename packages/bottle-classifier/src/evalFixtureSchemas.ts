@@ -236,6 +236,7 @@ export const classifierEvalFixtureSchema = z
         imageEvidence: ImageBottleEvidenceSchema.nullable().optional(),
         initialCandidates: z.array(BottleCandidateSchema).optional(),
         candidateExpansion: CandidateExpansionModeSchema.optional(),
+        readCandidateImages: z.boolean().optional(),
       })
       .strict(),
     searchResponses: z.array(searchResponseFixtureSchema).optional(),

@@ -1,12 +1,5 @@
 import { createWhiskyLabelExtractor } from "@peated/bottle-classifier";
-import {
-  agentActionRiskClass,
-  deriveAutomationTier,
-} from "@peated/bottle-classifier/automationTier";
-import {
-  createDecidedBottleClassification,
-  createIgnoredBottleClassification,
-} from "@peated/bottle-classifier/contract";
+import { createIgnoredBottleClassification } from "@peated/bottle-classifier/contract";
 import type { BottleClassifierProgressEvent } from "@peated/bottle-classifier/internal/runtime";
 import type { BottleCandidate } from "@peated/bottle-classifier/internal/types";
 import {
@@ -16,8 +9,9 @@ import {
   type BottleExtractedDetails,
   type ImageBottleEvidence,
 } from "@peated/server/agents/bottleClassifier";
-import { findExactReferenceBottleCandidate } from "@peated/server/agents/bottleClassifier/findExactReferenceBottleCandidate";
+import { resolveExactReferenceBottleRun } from "@peated/server/agents/bottleClassifier/findExactReferenceBottleCandidate";
 import config from "@peated/server/config";
+import { assessBottleResolution } from "@peated/server/lib/bottleMatchingAutomation";
 import {
   createOpenAIClient,
   withSentryConversation,
@@ -331,51 +325,27 @@ export type PhotoIdentificationDecision = Extract<
   { status: "classified" }
 >["decision"];
 
-// Derives the automation tier for a photo-identification decision. Photo
-// identification always carries the uploaded bottle photo as primary image
-// evidence and never resolves against a current bottle assignment. The user
-// still confirms the suggested next step, so this tier only chooses between the
-// confirm and manual-search suggestions rather than acting silently.
-function derivePhotoIdentificationTier(decision: PhotoIdentificationDecision) {
-  const confidenceBasis = decision.confidenceBasis;
-
-  return deriveAutomationTier({
-    actionRiskClass: agentActionRiskClass(decision.action),
-    hasUnresolvedRisks: (confidenceBasis?.unresolvedRisks.length ?? 0) > 0,
-    webEvidence: confidenceBasis?.webEvidence ?? null,
-    hasMatchTarget:
-      decision.action === "match" && decision.matchedBottleId !== null,
-    reaffirmsCurrentAssignment: false,
-    replacesCurrentAssignment: false,
-    hasDeterministicAnchor: decision.identityScope === "exact_cask",
-    hasPrimaryLabelOrImageEvidence: true,
-  });
-}
-
-export function isPhotoIdentificationCreateDecisionAutoCreatable(
-  decision: PhotoIdentificationDecision,
-) {
-  return derivePhotoIdentificationTier(decision) === "auto";
-}
-
 function getSuggestedNextStep(
   classification: PhotoIdentificationClassification,
 ): z.infer<typeof PhotoIdentificationSuggestedNextStepEnum> {
-  if (classification.status === "ignored") {
+  // Photo identification owns confirmation; the shared gate only chooses a suggestion.
+  if (
+    classification.status === "ignored" ||
+    !assessBottleResolution({
+      decision: classification.decision,
+      candidates: classification.artifacts.candidates,
+      sourceBottleIdentity: classification.artifacts.extractedIdentity,
+      readListingImage: true,
+    }).automationEligible
+  ) {
     return "manual_search";
   }
 
   switch (classification.decision.action) {
     case "match":
-      return derivePhotoIdentificationTier(classification.decision) === "auto"
-        ? "confirm_match"
-        : "manual_search";
+      return "confirm_match";
     case "create_bottle":
-      return isPhotoIdentificationCreateDecisionAutoCreatable(
-        classification.decision,
-      )
-        ? "confirm_create"
-        : "manual_search";
+      return "confirm_create";
     case "no_match":
       return "manual_search";
   }
@@ -648,34 +618,10 @@ export async function identifyBottlePhoto(
         imageEvidence,
       };
       span.setAttribute("photo_identification.stage", "classification");
-      const exactReferenceCandidate = await findExactReferenceBottleCandidate(
-        classificationInput.reference.name,
-      );
-      const classificationRun = exactReferenceCandidate
-        ? {
-            result: createDecidedBottleClassification({
-              decision: {
-                action: "match",
-                rationale:
-                  "A literal stored Bottle reference identifies this Bottle.",
-                candidateBottleIds: [exactReferenceCandidate.bottleId],
-                identityScope: "product",
-                observation: null,
-                confidenceBasis: {
-                  unresolvedRisks: [],
-                  webEvidence: "not_needed",
-                },
-                matchedBottleId: exactReferenceCandidate.bottleId,
-                proposedBottle: null,
-              },
-              artifacts: {
-                extractedIdentity,
-                imageEvidence,
-                candidates: [exactReferenceCandidate],
-              },
-            }),
-            modelMetadata: null,
-          }
+      const exactReferenceRun =
+        await resolveExactReferenceBottleRun(classificationInput);
+      const classificationRun = exactReferenceRun
+        ? exactReferenceRun
         : await runReferenceWithinTimeLimit({
             input: classificationInput,
             services,
@@ -701,7 +647,7 @@ export async function identifyBottlePhoto(
         "photo_identification.image_evidence_summary":
           diagnostics.extraction.summary ?? "none",
         "photo_identification.initial_candidate_count":
-          exactReferenceCandidate === null ? 0 : 1,
+          exactReferenceRun === null ? 0 : 1,
         "photo_identification.final_candidate_count":
           classification.artifacts.candidates.length,
         "photo_identification.suggested_next_step": suggestedNextStep,

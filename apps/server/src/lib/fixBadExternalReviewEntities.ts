@@ -93,6 +93,7 @@ export async function fixBadExternalReviewEntities(
         // classifier sees the real reference title.
         referenceLookupNames: [review.name],
         createdByActorId: actor.id,
+        allowReplacement: user.mod || user.admin,
       },
       classify,
     );

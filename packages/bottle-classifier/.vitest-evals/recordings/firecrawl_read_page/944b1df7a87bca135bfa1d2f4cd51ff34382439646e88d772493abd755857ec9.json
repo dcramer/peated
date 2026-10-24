@@ -1,0 +1,26 @@
+{
+  "writtenAt": "2026-10-02T03:06:20.186Z",
+  "toolName": "firecrawl_read_page",
+  "input": {
+    "url": "https://www.scotchwhiskyauctions.com/auctions/232-the-183rd-auction/893368-ardbeg-2009-14-year-old-single-cask-3771-feis-ile-2024/",
+    "focus": "Exact product description, age, cask number, ABV, bottling/release year and outturn for this Ardbeg single cask"
+  },
+  "output": {
+    "provider": "firecrawl",
+    "query": "Exact product description, age, cask number, ABV, bottling/release year and outturn for this Ardbeg single cask",
+    "summary": null,
+    "results": [
+      {
+        "title": "Ardbeg 2009 14 Year Old Single Cask #3771 Feis Ile 2024 | The 183rd Auction | Scotch Whisky Auctions",
+        "url": "https://www.scotchwhiskyauctions.com/auctions/232-the-183rd-auction/893368-ardbeg-2009-14-year-old-single-cask-3771-feis-ile-2024/",
+        "domain": "scotchwhiskyauctions.com",
+        "description": null,
+        "extraSnippets": []
+      }
+    ]
+  },
+  "metadata": {
+    "cacheKey": "944b1df7a87bca135bfa1d2f4cd51ff34382439646e88d772493abd755857ec9",
+    "mode": "auto"
+  }
+}

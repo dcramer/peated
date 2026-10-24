@@ -20,6 +20,47 @@ test("health list requires an administrator", async () => {
   expect(error).toMatchInlineSnapshot(`[Error: Unauthorized.]`);
 });
 
+test.for(["queued", "running", "succeeded", "failed"] as const)(
+  "%s detail work does not hide failed listing collection",
+  async (status, { fixtures }) => {
+    const admin = await fixtures.User({ admin: true });
+    const site = await fixtures.ExternalSite({ type: "scotchwhiskyauctions" });
+    const [collection] = await db
+      .insert(externalSiteRuns)
+      .values({
+        externalSiteId: site.id,
+        trigger: "manual",
+        purpose: "collect",
+        status: "failed",
+        createdAt: new Date(Date.now() - 10_000),
+        completedAt: new Date(Date.now() - 5_000),
+      })
+      .returning();
+    await db.insert(externalSiteRuns).values({
+      externalSiteId: site.id,
+      trigger: "manual",
+      purpose: "details",
+      status,
+      completedAt:
+        status === "succeeded" || status === "failed" ? new Date() : null,
+    });
+    const result = await routerClient.externalSites.healthList(
+      {},
+      { context: { user: admin } },
+    );
+    expect(result.summary).toEqual({ total: 1, healthy: 0, unhealthy: 1 });
+    expect(result.results[0]).toMatchObject({
+      latestRun: { id: collection.id, status: "failed" },
+      lastSucceededAt: null,
+    });
+    const details = await routerClient.externalSites.healthDetails(
+      { site: site.type },
+      { context: { user: admin } },
+    );
+    expect(details.latestRun?.id).toBe(collection.id);
+  },
+);
+
 test("health list reports source inventory, runtime, and latest execution", async ({
   fixtures,
 }) => {

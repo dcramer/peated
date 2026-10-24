@@ -46,6 +46,11 @@ performed extraction or retrieval may also provide `extractedIdentity`,
 `initialCandidates`, and `candidateExpansion`. Use `initial_only` when the agent
 must stay within the supplied candidates.
 
+Set `readCandidateImages: false` for text-only candidate inspection. This skips
+catalog-photo fetching and saved label readings while retaining catalog fields,
+references, and observations. It does not disable extraction from a supplied
+source image. Other callers and audits keep their existing photo behavior.
+
 The package root also exports the reviewed request and result schemas and types.
 The `contract` subpath provides that contract without the classifier factory.
 
