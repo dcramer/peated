@@ -6,7 +6,7 @@ import {
   entities,
   tastings,
 } from "@peated/server/db/schema";
-import { pushUniqueJob } from "@peated/server/worker/dispatch";
+import { pushJob } from "@peated/server/worker/dispatch";
 import { eq, sql } from "drizzle-orm";
 import { z } from "zod";
 import type { JobPayload } from "../types";
@@ -77,14 +77,14 @@ export default async (input: JobPayload) => {
   });
 
   if (entity.countryId) {
-    await pushUniqueJob(
+    await pushJob(
       "UpdateCountryStats",
       { countryId: entity.countryId },
       { delay: 5000 },
     );
   }
   if (entity.regionId) {
-    await pushUniqueJob(
+    await pushJob(
       "UpdateRegionStats",
       { regionId: entity.regionId },
       { delay: 5000 },

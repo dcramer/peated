@@ -9,7 +9,7 @@ import {
   processExternalReview,
 } from "@peated/server/externalReviews/process";
 import { dispatchBottleStatsRecompute } from "@peated/server/lib/dispatchBottleStatsRecompute";
-import { pushUniqueJob } from "@peated/server/worker/dispatch";
+import { pushJob } from "@peated/server/worker/dispatch";
 import { and, asc, eq, gt, lt } from "drizzle-orm";
 import { z } from "zod";
 import type { JobPayload } from "../types";
@@ -24,14 +24,14 @@ export type UpdateExternalReviewServices = {
   loadVocabulary: typeof loadReviewVocabulary;
   processReview: typeof processExternalReview;
   updateBottle: typeof dispatchBottleStatsRecompute;
-  queueNext: typeof pushUniqueJob;
+  queueNext: typeof pushJob;
 };
 
 const defaultServices: UpdateExternalReviewServices = {
   loadVocabulary: loadReviewVocabulary,
   processReview: processExternalReview,
   updateBottle: dispatchBottleStatsRecompute,
-  queueNext: pushUniqueJob,
+  queueNext: pushJob,
 };
 
 /** Updates saved external reviews that were processed by older code. */

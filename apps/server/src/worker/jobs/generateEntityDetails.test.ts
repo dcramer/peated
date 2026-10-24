@@ -1,6 +1,6 @@
 import { db } from "@peated/server/db";
 import { entities } from "@peated/server/db/schema";
-import { pushUniqueJob } from "@peated/server/lib/test/workerDispatch";
+import { pushJob } from "@peated/server/lib/test/workerDispatch";
 import { eq } from "drizzle-orm";
 import { expect, test, vi } from "vitest";
 import {
@@ -63,10 +63,9 @@ test("fills a missing pronunciation", async ({ fixtures }) => {
     pronunciation: "glen GEER-ee",
     pronunciationIpa: "ɡlɛn ˈɡɪəri",
   });
-  expect(pushUniqueJob).toHaveBeenCalledWith(
-    "GenerateEntityPronunciationAudio",
-    { entityId: entity.id },
-  );
+  expect(pushJob).toHaveBeenCalledWith("GenerateEntityPronunciationAudio", {
+    entityId: entity.id,
+  });
 });
 
 test("keeps generated details when the audio job cannot be queued", async ({
@@ -81,7 +80,7 @@ test("keeps generated details when the audio job cannot be queued", async ({
     website: "https://www.glengarioch.com",
   });
   const model = vi.fn<EntityDetailsModel>(async () => generatedDetails());
-  vi.mocked(pushUniqueJob).mockRejectedValueOnce(new Error("Redis is down"));
+  vi.mocked(pushJob).mockRejectedValueOnce(new Error("Redis is down"));
 
   await expect(generateEntityDetails(entity.id, model)).resolves.toBe(
     undefined,
@@ -135,7 +134,7 @@ test("drops a generated pronunciation in the wrong format", async ({
     pronunciation: null,
     pronunciationIpa: null,
   });
-  expect(pushUniqueJob).not.toHaveBeenCalled();
+  expect(pushJob).not.toHaveBeenCalled();
 });
 
 test("skips the model when every generated field is filled", async ({

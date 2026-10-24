@@ -76,11 +76,11 @@ describe("POST /bottles", () => {
       description: "Text copied from the official product page.",
       descriptionSrc: "user",
     });
-    expect(workerClient.pushUniqueJob).toHaveBeenCalledWith("OnBottleChange", {
+    expect(workerClient.pushJob).toHaveBeenCalledWith("OnBottleChange", {
       bottleId: result.id,
       generateDetails: false,
     });
-    expect(workerClient.pushUniqueJob).not.toHaveBeenCalledWith(
+    expect(workerClient.pushJob).not.toHaveBeenCalledWith(
       "VerifyBottleCreation",
       {
         bottleId: result.id,
@@ -273,11 +273,11 @@ describe("POST /bottles", () => {
       .from(bottlesToDistillers)
       .where(eq(bottlesToDistillers.bottleId, bottle.id));
     expect(distillers.length).toBe(0);
-    expect(workerClient.pushUniqueJob).toHaveBeenCalledWith("OnBottleChange", {
+    expect(workerClient.pushJob).toHaveBeenCalledWith("OnBottleChange", {
       bottleId: bottle.id,
       generateDetails: true,
     });
-    expect(workerClient.pushUniqueJob).toHaveBeenCalledWith(
+    expect(workerClient.pushJob).toHaveBeenCalledWith(
       "VerifyBottleCreation",
       {
         bottleId: bottle.id,
@@ -556,10 +556,10 @@ describe("POST /bottles", () => {
     expect(brand.createdByActorId).toBe((await getUserActor(defaults.user)).id);
     expect(brand.countryId).toEqual(country.id);
     expect(brand.regionId).toEqual(region.id);
-    expect(workerClient.pushUniqueJob).toHaveBeenCalledWith("OnEntityChange", {
+    expect(workerClient.pushJob).toHaveBeenCalledWith("OnEntityChange", {
       entityId: brand.id,
     });
-    expect(workerClient.pushUniqueJob).toHaveBeenCalledWith(
+    expect(workerClient.pushJob).toHaveBeenCalledWith(
       "VerifyEntityCreation",
       {
         entityId: brand.id,
@@ -847,7 +847,7 @@ describe("POST /bottles", () => {
     );
 
     expect(data.id).toBeDefined();
-    expect(workerClient.pushUniqueJob).toHaveBeenCalledWith(
+    expect(workerClient.pushJob).toHaveBeenCalledWith(
       "VerifyBottleCreation",
       {
         bottleId: data.id,

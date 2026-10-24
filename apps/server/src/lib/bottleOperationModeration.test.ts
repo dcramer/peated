@@ -182,9 +182,6 @@ async function createPreparedCheck({
 describe("Bottle operation moderation", () => {
   beforeEach(() => {
     vi.mocked(workerClient.pushJob).mockReset().mockResolvedValue(undefined);
-    vi.mocked(workerClient.pushUniqueJob)
-      .mockReset()
-      .mockResolvedValue(undefined);
   });
 
   test("keeps unsupported check versions non-executable", async ({

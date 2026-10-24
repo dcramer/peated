@@ -2,7 +2,7 @@ import { db } from "@peated/server/db";
 import { bottleSeries, bottles, entities } from "@peated/server/db/schema";
 import { procedure } from "@peated/server/orpc";
 import { requireAdmin } from "@peated/server/orpc/middleware";
-import { pushUniqueJob } from "@peated/server/worker/dispatch";
+import { pushJob } from "@peated/server/worker/dispatch";
 import { and, asc, eq, gt, or } from "drizzle-orm";
 import { z } from "zod";
 
@@ -15,21 +15,21 @@ const SEARCH_SCOPES = {
       eq(bottles.searchTerms, ""),
     ),
     queue: (bottleId: number) =>
-      pushUniqueJob("IndexBottleSearch", { bottleId }, { delay: 0 }),
+      pushJob("IndexBottleSearch", { bottleId }, { delay: 0 }),
   },
   entities: {
     id: entities.id,
     table: entities,
     missingDocuments: eq(entities.searchNames, ""),
     queue: (entityId: number) =>
-      pushUniqueJob("IndexEntitySearch", { entityId }, { delay: 0 }),
+      pushJob("IndexEntitySearch", { entityId }, { delay: 0 }),
   },
   series: {
     id: bottleSeries.id,
     table: bottleSeries,
     missingDocuments: eq(bottleSeries.searchNames, ""),
     queue: (seriesId: number) =>
-      pushUniqueJob("IndexBottleSeriesSearch", { seriesId }, { delay: 0 }),
+      pushJob("IndexBottleSeriesSearch", { seriesId }, { delay: 0 }),
   },
 };
 

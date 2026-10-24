@@ -53,7 +53,7 @@ import { canModerate } from "@peated/server/lib/moderators";
 import { recomputeBottleGroupStatsInTransaction } from "@peated/server/lib/recomputeBottleGroupStats";
 import { recomputeBottleStatsInTransaction } from "@peated/server/lib/recomputeBottleStats";
 import type { Context } from "@peated/server/orpc/context";
-import { pushUniqueJob } from "@peated/server/worker/dispatch";
+import { pushJob } from "@peated/server/worker/dispatch";
 import { and, asc, eq, inArray, or, sql } from "drizzle-orm";
 
 export class BottleMergeAuthorizationError extends Error {
@@ -1173,7 +1173,7 @@ export async function finalizeBottleMerge(
   ];
   for (const [job, payload] of jobs) {
     try {
-      await pushUniqueJob(job, payload);
+      await pushJob(job, payload);
     } catch (error) {
       logError(error, { extra: { job, ...payload } });
     }

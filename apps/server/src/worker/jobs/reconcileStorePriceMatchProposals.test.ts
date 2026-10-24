@@ -177,14 +177,12 @@ describe("reconcileStorePriceMatchProposals", () => {
 
     await reconcileStorePriceMatchProposalsWithServices();
 
-    expect(workerClient.pushUniqueJob).toHaveBeenCalledWith(
+    expect(workerClient.pushJob).toHaveBeenCalledWith(
       "ResolveStorePriceBottle",
       { priceId: price.id },
     );
-    expect(workerClient.pushJob).not.toHaveBeenCalledWith(
-      "ResolveStorePriceBottle",
-      expect.anything(),
-    );
+    // The registration makes this push unique, so a waiting job absorbs it.
+    expect(registry.isUnique("ResolveStorePriceBottle")).toBe(true);
   });
 
   test("is registered as a worker job", () => {

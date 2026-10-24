@@ -6,7 +6,7 @@ import {
 } from "@peated/server/lib/externalReviewResolution";
 import { procedure } from "@peated/server/orpc";
 import { requireMod } from "@peated/server/orpc/middleware";
-import { pushUniqueJob } from "@peated/server/worker/client";
+import { pushJob } from "@peated/server/worker/client";
 import { asc, inArray } from "drizzle-orm";
 import { z } from "zod";
 
@@ -64,7 +64,7 @@ export default procedure
     });
     // Review matching owns this state: queueing work must not erase an unresolved result.
     for (const { reviewId, ...expectedResolution } of input.reviews) {
-      await pushUniqueJob("CreateMissingBottles", {
+      await pushJob("CreateMissingBottles", {
         reviewId,
         expectedResolution,
       });

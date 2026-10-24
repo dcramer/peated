@@ -9,7 +9,7 @@ import {
 import { logError } from "@peated/server/lib/log";
 import { procedure } from "@peated/server/orpc";
 import { requireMod } from "@peated/server/orpc/middleware";
-import { pushUniqueJob } from "@peated/server/worker/dispatch";
+import { pushJob } from "@peated/server/worker/dispatch";
 import { z } from "zod";
 
 export default procedure
@@ -38,7 +38,7 @@ export default procedure
         createdByActorId: actor.id,
       });
       try {
-        await pushUniqueJob("IndexBottleSearch", {
+        await pushJob("IndexBottleSearch", {
           bottleId: alias.bottleId,
         });
       } catch (error) {

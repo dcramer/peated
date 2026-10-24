@@ -209,7 +209,7 @@ describe("external review resolution", () => {
         { context: { user: mod } },
       ),
     ).resolves.toEqual({ queued: [first.id] });
-    expect(workerDispatch.pushUniqueJob).toHaveBeenCalledWith(
+    expect(workerDispatch.pushJob).toHaveBeenCalledWith(
       "CreateMissingBottles",
       {
         reviewId: first.id,
@@ -260,7 +260,7 @@ describe("external review resolution", () => {
         .update(externalReviews)
         .set({ bottleNoMatchAt: attemptedAt })
         .where(eq(externalReviews.id, review.id));
-    workerDispatch.pushUniqueJob.mockImplementationOnce(async () => {
+    workerDispatch.pushJob.mockImplementationOnce(async () => {
       await db
         .update(externalReviews)
         .set({ bottleId: bottle.id, bottleNoMatchAt: null })

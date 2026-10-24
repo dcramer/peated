@@ -2,7 +2,7 @@ import { db } from "@peated/server/db";
 import { bottleSeries, bottles, entities } from "@peated/server/db/schema";
 import { logInfo } from "@peated/server/lib/log";
 import { buildBottleSeriesSearchDocument } from "@peated/server/lib/search";
-import { pushUniqueJob } from "@peated/server/worker/dispatch";
+import { pushJob } from "@peated/server/worker/dispatch";
 import type { JobPayload } from "@peated/server/worker/types";
 import { eq } from "drizzle-orm";
 import { z } from "zod";
@@ -44,7 +44,7 @@ export default async (input: JobPayload) => {
     .where(eq(bottles.seriesId, series.id));
   await Promise.all(
     relatedBottles.map(({ id }) =>
-      pushUniqueJob("IndexBottleSearch", { bottleId: id }),
+      pushJob("IndexBottleSearch", { bottleId: id }),
     ),
   );
 };

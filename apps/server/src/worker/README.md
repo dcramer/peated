@@ -10,7 +10,8 @@ and [Sensitive Data](../../../../docs/policies/sensitive-data.md) first.
 1. Add the job name to `JobName` in `types.ts`.
 2. Create the handler under `jobs/`.
 3. Check its arguments with a strict Zod schema at the start of the handler.
-4. Register the handler in `jobs/index.ts`.
+4. Register the handler in `jobs/index.ts`, and decide whether it is unique
+   (see [Unique Jobs](#unique-jobs)).
 5. Add focused tests for argument checks, saved changes, and retry safety.
 
 ```ts
@@ -85,10 +86,37 @@ scheduledJob("0 3 * * *", "update-example", async () => {
 The registry adds Sentry spans, actor context, and success or failure logs.
 Failed jobs stay in Redis, and in Admin's Background work, for three days. The
 worker removes older failed jobs every hour (`removeOldFailedJobs` in
-`queue.ts`). A unique job ID that still exists blocks a new add, so
-`pushUniqueJob` removes a completed or failed job with the same ID before
-queueing again.
+`queue.ts`).
 Handlers should let unexpected errors throw so BullMQ can record and retry them.
+
+## Unique Jobs
+
+The job's registration, not the caller, decides whether it is unique:
+
+```ts
+registry.add("UpdateExample", updateExample, { unique: true });
+```
+
+Make a job unique when it is keyed by its arguments and only the latest
+request matters, such as re-indexing one Bottle or recomputing one Entity's
+stats. Leave it plain when every push is separate work, such as one
+notification or one report, or when the caller sets its own `jobId`.
+
+A unique push uses BullMQ deduplication. Its key is the job name plus a hash of
+all its arguments, and the push waits 5 seconds by default:
+
+- While a job with the same key is waiting, the push merges into it. That job
+  has not read anything yet, so it will see the change.
+- While a job with the same key is running, it may already have read older
+  data. BullMQ keeps the push (`keepLastIfActive`) and queues it once when the
+  run completes or fails. Several pushes during one run become one more run.
+  Two runs with the same key never overlap.
+- The key is cleared when the job finishes, so a finished or failed job never
+  blocks the next push.
+
+Unique jobs get ordinary job IDs. Callers may pass `delay` or removal options,
+but a `jobId` passed for a unique job is ignored, because the key decides
+deduplication.
 
 Waiting jobs live only in Redis. A Redis reset drops them without a failure
 record, so bulk work needs a repair path that finds what is still undone from

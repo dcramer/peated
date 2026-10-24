@@ -169,9 +169,6 @@ async function executePersistedOperation({
 describe("Bottle operation execution", () => {
   beforeEach(() => {
     vi.mocked(workerClient.pushJob).mockReset().mockResolvedValue(undefined);
-    vi.mocked(workerClient.pushUniqueJob)
-      .mockReset()
-      .mockResolvedValue(undefined);
   });
 
   test("keeps persisted execution results strict", () => {

@@ -9,7 +9,7 @@ import { logError, logInfo, logTelemetryError } from "../lib/log";
 import { isModelServiceUnavailable } from "../lib/openaiClient";
 import { initializeScraperRuntime } from "../scraper";
 import { SCRAPER_JOB_LOCK_MS } from "../scraper/runTimeout";
-import { pushUniqueJob, runJob, type WorkerDispatch } from "./dispatch";
+import { pushJob, runJob, type WorkerDispatch } from "./dispatch";
 import "./jobs";
 import createNextRepeatingEvents from "./jobs/createNextRepeatingEvents";
 import scheduleScrapers from "./jobs/scheduleScrapers";
@@ -26,7 +26,6 @@ import { type JobArgs, type JobName, type QueuedJobInput } from "./types";
 export {
   configureWorkerDispatch,
   pushJob,
-  pushUniqueJob,
   runJob,
   useQueueWorkerDispatch,
 } from "./dispatch";
@@ -55,61 +54,51 @@ async function runRegisteredJob(jobName: JobName, args?: JobArgs) {
   return await jobFn(args, buildJobContext(activeContext));
 }
 
+/**
+ * Worker queue rule: unique jobs deduplicate on a key built from the job name
+ * and arguments, not on a fixed job ID. A push while the job is waiting merges
+ * into it. A push while it is running is kept, and BullMQ queues it once when
+ * the run finishes (`keepLastIfActive`), so a change made mid-run is never
+ * lost and two runs with the same key never overlap.
+ */
 export function buildUniqueJobOptions(
   jobName: JobName,
   args?: JobArgs,
   opts?: JobsOptions,
 ): JobsOptions {
-  // Worker queue rule: a unique ID only deduplicates unfinished work. Remove
-  // completed jobs so a later data change can queue the same work again.
+  const { jobId: _jobId, ...callerOpts } = opts ?? {};
   return {
     delay: 5000,
     removeOnComplete: true,
     removeOnFail: false,
-    ...(opts || {}),
-    jobId: generateUniqIdentifier(jobName, args),
+    ...callerOpts,
+    deduplication: {
+      id: generateUniqIdentifier(jobName, args),
+      keepLastIfActive: true,
+    },
   };
 }
 
 /**
- * Worker queue rule: BullMQ ignores an add whose job ID still exists in any
- * state. Failed jobs keep their ID for three days, and completed unique jobs
- * queued before removeOnComplete was set are kept forever, so either would
- * silently block the same work from queueing again. Remove a finished job
- * first; leave waiting or active work alone.
+ * Worker queue rule: the job's registration decides whether it is unique, so
+ * every caller of the same job gets the same deduplication.
  */
-type QueuedJobLookup = {
-  getJob(jobId: string): Promise<
-    | {
-        isCompleted(): Promise<boolean>;
-        isFailed(): Promise<boolean>;
-        remove(): Promise<void>;
-      }
-    | undefined
-  >;
-};
-
-export async function removeFinishedJob(queue: QueuedJobLookup, jobId: string) {
-  const existing = await queue.getJob(jobId);
-  if (!existing) return;
-  if ((await existing.isCompleted()) || (await existing.isFailed())) {
-    await existing.remove();
-  }
-}
-
-async function pushUniqueJobToQueue(
+async function pushJobToQueue(
   jobName: JobName,
   args?: JobArgs,
   opts?: JobsOptions,
 ) {
-  opts = buildUniqueJobOptions(jobName, args, opts);
-  const queue = await getQueue(registry.getQueueName(jobName));
-  await removeFinishedJob(queue, opts.jobId!);
-
-  return await pushJobToQueue(jobName, args, opts);
+  if (!registry.isUnique(jobName)) {
+    return await addJobToQueue(jobName, args, opts);
+  }
+  return await addJobToQueue(
+    jobName,
+    args,
+    buildUniqueJobOptions(jobName, args, opts),
+  );
 }
 
-async function pushJobToQueue(
+async function addJobToQueue(
   jobName: JobName,
   args?: JobArgs,
   opts?: JobsOptions,
@@ -149,7 +138,6 @@ async function pushJobToQueue(
 
 export const queueWorkerDispatch: WorkerDispatch = {
   pushJob: pushJobToQueue,
-  pushUniqueJob: pushUniqueJobToQueue,
   runJob: runRegisteredJob,
 };
 const MODEL_SERVICE_PAUSE_MS = 15 * 60 * 1000;
@@ -278,7 +266,7 @@ export async function runWorker() {
       await runJob("ProcessAccountDeletions");
     });
     scheduledJob("27 * * * *", "update-external-reviews", async () => {
-      await pushUniqueJob(
+      await pushJob(
         "UpdateExternalReviews",
         {},
         { removeOnComplete: true, removeOnFail: false },

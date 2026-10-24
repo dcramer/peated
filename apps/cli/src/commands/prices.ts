@@ -8,7 +8,7 @@ import {
   type StorePrice,
 } from "@peated/server/db/schema";
 import { findBottleId } from "@peated/server/lib/bottleFinder";
-import { pushUniqueJob } from "@peated/server/worker/client";
+import { pushJob } from "@peated/server/worker/client";
 import { and, asc, eq, isNotNull, isNull, ne, sql } from "drizzle-orm";
 import { DatabaseError } from "pg";
 
@@ -152,7 +152,7 @@ subcommand
       hasResults = false;
       const query = await baseQuery.offset(offset).limit(step);
       for (const { id } of query) {
-        await pushUniqueJob("ResolveStorePriceBottle", {
+        await pushJob("ResolveStorePriceBottle", {
           priceId: id,
         });
         hasResults = true;

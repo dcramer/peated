@@ -36,7 +36,7 @@ import {
   storePronunciationAudio,
 } from "@peated/server/lib/entityPronunciationAudio";
 import { createLegacyStorePriceReviewCheck } from "@peated/server/lib/test/legacyBottleChecks";
-import { pushUniqueJob } from "@peated/server/lib/test/workerDispatch";
+import { pushJob } from "@peated/server/lib/test/workerDispatch";
 import { readFile } from "@peated/server/lib/uploads";
 import type { Context } from "@peated/server/orpc/context";
 import { and, eq, inArray } from "drizzle-orm";
@@ -751,7 +751,7 @@ test("preserves generated Bottle content during an equivalent Entity merge", asy
       tastingNotes,
     })
     .where(eq(bottles.id, bottle.id));
-  vi.mocked(pushUniqueJob).mockClear();
+  vi.mocked(pushJob).mockClear();
 
   await mergeEntity({
     fromEntityIds: [source.id],
@@ -767,7 +767,7 @@ test("preserves generated Bottle content during an equivalent Entity merge", asy
     suggestedTags: ["smoke"],
     tastingNotes,
   });
-  expect(pushUniqueJob).toHaveBeenCalledWith("OnBottleChange", {
+  expect(pushJob).toHaveBeenCalledWith("OnBottleChange", {
     bottleId: bottle.id,
   });
 });
@@ -972,7 +972,7 @@ test("preserves the source when the locked destination is deleted", async ({
   });
   const bottle = await fixtures.Bottle({ brandId: source.id });
 
-  vi.mocked(pushUniqueJob).mockClear();
+  vi.mocked(pushJob).mockClear();
   await deleteDestinationWhileMergeWaits(destination.id, () =>
     mergeEntity({
       fromEntityIds: [source.id],
@@ -997,7 +997,7 @@ test("preserves the source when the locked destination is deleted", async ({
       where: eq(entityTombstones.entityId, source.id),
     }),
   ).toBeUndefined();
-  expect(pushUniqueJob).not.toHaveBeenCalled();
+  expect(pushJob).not.toHaveBeenCalled();
 });
 
 test("stales an operation when its locked destination is deleted", async ({
@@ -1018,7 +1018,7 @@ test("stales an operation when its locked destination is deleted", async ({
     destinationEntityId: destination.id,
   });
 
-  vi.mocked(pushUniqueJob).mockClear();
+  vi.mocked(pushJob).mockClear();
   await deleteDestinationWhileMergeWaits(destination.id, () =>
     mergeEntity({
       operationId: operation.id,
@@ -1045,7 +1045,7 @@ test("stales an operation when its locked destination is deleted", async ({
       where: eq(entityTombstones.entityId, source.id),
     }),
   ).toBeUndefined();
-  expect(pushUniqueJob).not.toHaveBeenCalled();
+  expect(pushJob).not.toHaveBeenCalled();
 });
 
 test("merge A from B", async ({ fixtures }) => {

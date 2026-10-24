@@ -2,7 +2,7 @@ import { db } from "@peated/server/db";
 import { entities } from "@peated/server/db/schema";
 import { getPronunciationAudioUrl } from "@peated/server/lib/entityPronunciationAudio";
 import waitError from "@peated/server/lib/test/waitError";
-import { pushUniqueJob } from "@peated/server/lib/test/workerDispatch";
+import { pushJob } from "@peated/server/lib/test/workerDispatch";
 import { routerClient } from "@peated/server/orpc/router";
 import { eq } from "drizzle-orm";
 
@@ -29,7 +29,7 @@ describe("POST /admin/catalog/rebuild-pronunciation-audio", () => {
         pronunciationAudioUrl: getPronunciationAudioUrl(current.id, "ɡlɛn"),
       })
       .where(eq(entities.id, current.id));
-    pushUniqueJob.mockClear();
+    pushJob.mockClear();
 
     const result = await routerClient.admin.rebuildPronunciationAudio(
       {},
@@ -37,7 +37,7 @@ describe("POST /admin/catalog/rebuild-pronunciation-audio", () => {
     );
 
     expect(result).toEqual({ queued: 3, nextAfterId: null });
-    expect(pushUniqueJob.mock.calls).toEqual([
+    expect(pushJob.mock.calls).toEqual([
       [
         "GenerateEntityPronunciationAudio",
         { entityId: missing.id },
@@ -60,7 +60,7 @@ describe("POST /admin/catalog/rebuild-pronunciation-audio", () => {
     const admin = await fixtures.User({ admin: true });
     const first = await fixtures.Entity({ pronunciationIpa: "ɡlɛn" });
     const second = await fixtures.Entity({ pronunciationIpa: "ɡlɛn" });
-    pushUniqueJob.mockClear();
+    pushJob.mockClear();
 
     const page = await routerClient.admin.rebuildPronunciationAudio(
       { limit: 1 },
@@ -73,7 +73,7 @@ describe("POST /admin/catalog/rebuild-pronunciation-audio", () => {
       { context: { user: admin } },
     );
     expect(last).toEqual({ queued: 1, nextAfterId: null });
-    expect(pushUniqueJob.mock.calls.map((args) => args[1])).toEqual([
+    expect(pushJob.mock.calls.map((args) => args[1])).toEqual([
       { entityId: first.id },
       { entityId: second.id },
     ]);
@@ -82,13 +82,13 @@ describe("POST /admin/catalog/rebuild-pronunciation-audio", () => {
   test("requires administrator access", async ({ fixtures }) => {
     const user = await fixtures.User({ mod: true });
     await fixtures.Entity({ pronunciationIpa: "ɡlɛn" });
-    pushUniqueJob.mockClear();
+    pushJob.mockClear();
 
     const err = await waitError(
       routerClient.admin.rebuildPronunciationAudio({}, { context: { user } }),
     );
 
     expect(err).toMatchInlineSnapshot(`[Error: Unauthorized.]`);
-    expect(pushUniqueJob).not.toHaveBeenCalled();
+    expect(pushJob).not.toHaveBeenCalled();
   });
 });

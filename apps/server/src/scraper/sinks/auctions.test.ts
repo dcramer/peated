@@ -44,7 +44,7 @@ test("collection queues matching, then the worker publishes one live alert", asy
   });
   const lot = await db.query.auctionLots.findFirst();
   if (!lot) throw new Error("Collector did not save the lot.");
-  expect(worker.pushUniqueJob).toHaveBeenCalledWith("ResolveAuctionLot", {
+  expect(worker.pushJob).toHaveBeenCalledWith("ResolveAuctionLot", {
     lotId: lot.id,
     fingerprint: lot.sourceFingerprint,
   });

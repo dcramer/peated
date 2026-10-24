@@ -23,6 +23,16 @@ describe("worker registry", () => {
     expect(registry.getQueueName(jobName)).toBe("scrapers");
   });
 
+  test("records whether a job is unique, defaulting to plain", () => {
+    const plainJob = `RegistryPlainJob-${crypto.randomUUID()}`;
+    const uniqueJob = `RegistryUniqueJob-${crypto.randomUUID()}`;
+    registry.add(plainJob, async () => undefined);
+    registry.add(uniqueJob, async () => undefined, { unique: true });
+
+    expect(registry.isUnique(plainJob)).toBe(false);
+    expect(registry.isUnique(uniqueJob)).toBe(true);
+  });
+
   test("flushes Sentry after a successful job", async () => {
     const flush = spyOnSentryFlush();
     const jobName = `RegistrySuccessfulJob-${crypto.randomUUID()}`;

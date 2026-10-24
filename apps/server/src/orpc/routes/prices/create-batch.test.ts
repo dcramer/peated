@@ -216,15 +216,14 @@ describe("POST /external-sites/:site/prices", () => {
       price: 7_999,
     });
     expect(await db.select().from(storePriceHistories)).toHaveLength(2);
-    expect(workerClient.pushUniqueJob).toHaveBeenCalledWith(
-      "CapturePriceImage",
-      { priceId: matched!.id, imageUrl },
-    );
-    expect(workerClient.pushUniqueJob).toHaveBeenCalledWith(
-      "IndexBottleSearch",
-      { bottleId: bottle.id },
-    );
-    expect(workerClient.pushUniqueJob).toHaveBeenCalledWith(
+    expect(workerClient.pushJob).toHaveBeenCalledWith("CapturePriceImage", {
+      priceId: matched!.id,
+      imageUrl,
+    });
+    expect(workerClient.pushJob).toHaveBeenCalledWith("IndexBottleSearch", {
+      bottleId: bottle.id,
+    });
+    expect(workerClient.pushJob).toHaveBeenCalledWith(
       "ResolveStorePriceBottle",
       { priceId: unresolved!.id },
     );
@@ -491,7 +490,7 @@ describe("POST /external-sites/:site/prices", () => {
       .update(storePrices)
       .set({ bottleId: bottle.id })
       .where(eq(storePrices.id, initial!.id));
-    vi.mocked(workerClient.pushUniqueJob).mockClear();
+    vi.mocked(workerClient.pushJob).mockClear();
 
     await createStorePricesAsPeated({
       site: site.type,
@@ -516,7 +515,7 @@ describe("POST /external-sites/:site/prices", () => {
       price: 7_500,
       sourceFingerprint: initial!.sourceFingerprint,
     });
-    expect(workerClient.pushUniqueJob).not.toHaveBeenCalledWith(
+    expect(workerClient.pushJob).not.toHaveBeenCalledWith(
       "ResolveStorePriceBottle",
       expect.anything(),
     );
@@ -545,7 +544,7 @@ describe("POST /external-sites/:site/prices", () => {
       .update(storePrices)
       .set({ bottleId: bottle.id })
       .where(eq(storePrices.id, initial!.id));
-    vi.mocked(workerClient.pushUniqueJob).mockClear();
+    vi.mocked(workerClient.pushJob).mockClear();
 
     await createStorePricesAsPeated({
       site: site.type,
@@ -560,11 +559,11 @@ describe("POST /external-sites/:site/prices", () => {
       externalProductId: listing.externalProductId,
     });
     expect(updated!.sourceFingerprint).not.toBe(initial!.sourceFingerprint);
-    expect(workerClient.pushUniqueJob).toHaveBeenCalledWith(
+    expect(workerClient.pushJob).toHaveBeenCalledWith(
       "ResolveStorePriceBottle",
       { priceId: initial!.id, force: true },
     );
-    expect(workerClient.pushUniqueJob).not.toHaveBeenCalledWith(
+    expect(workerClient.pushJob).not.toHaveBeenCalledWith(
       "ResolveStorePriceBottle",
       { priceId: initial!.id },
     );
@@ -801,7 +800,7 @@ describe("POST /external-sites/:site/prices", () => {
     const matched = prices.find(
       ({ externalProductId }) => externalProductId === "matching-volume",
     );
-    expect(workerClient.pushUniqueJob).toHaveBeenCalledWith(
+    expect(workerClient.pushJob).toHaveBeenCalledWith(
       "ResolveStorePriceBottle",
       { priceId: matched!.id, force: true },
     );
@@ -809,7 +808,7 @@ describe("POST /external-sites/:site/prices", () => {
       ({ externalProductId }) => externalProductId === "wrong-volume",
     );
     expect(unresolved).toMatchObject({ bottleId: null });
-    expect(workerClient.pushUniqueJob).toHaveBeenCalledWith(
+    expect(workerClient.pushJob).toHaveBeenCalledWith(
       "ResolveStorePriceBottle",
       { priceId: unresolved!.id },
     );
@@ -847,13 +846,13 @@ describe("POST /external-sites/:site/prices", () => {
     };
 
     await createStorePricesAsPeated({ site: site.type, prices: [listing] });
-    vi.mocked(workerClient.pushUniqueJob).mockClear();
+    vi.mocked(workerClient.pushJob).mockClear();
     await createStorePricesAsPeated({
       site: site.type,
       prices: [{ ...listing, price: 6_900 }],
     });
 
-    expect(workerClient.pushUniqueJob).not.toHaveBeenCalledWith(
+    expect(workerClient.pushJob).not.toHaveBeenCalledWith(
       "ResolveStorePriceBottle",
       expect.anything(),
     );
@@ -876,7 +875,7 @@ describe("POST /external-sites/:site/prices", () => {
     const price = await db.query.storePrices.findFirst({
       where: eq(storePrices.externalSiteId, site.id),
     });
-    expect(workerClient.pushUniqueJob).toHaveBeenCalledWith(
+    expect(workerClient.pushJob).toHaveBeenCalledWith(
       "ResolveStorePriceBottle",
       { priceId: price!.id },
     );
@@ -885,14 +884,14 @@ describe("POST /external-sites/:site/prices", () => {
       status: "pending_review",
       proposalType: "no_match",
     });
-    vi.mocked(workerClient.pushUniqueJob).mockClear();
+    vi.mocked(workerClient.pushJob).mockClear();
 
     await createStorePricesAsPeated({
       site: site.type,
       prices: [{ ...listing, price: 6_900 }],
     });
 
-    expect(workerClient.pushUniqueJob).not.toHaveBeenCalledWith(
+    expect(workerClient.pushJob).not.toHaveBeenCalledWith(
       "ResolveStorePriceBottle",
       expect.anything(),
     );
@@ -935,7 +934,7 @@ describe("POST /external-sites/:site/prices", () => {
       bottleId: bottle.id,
       name: bottle.fullName,
     });
-    expect(workerClient.pushUniqueJob).not.toHaveBeenCalledWith(
+    expect(workerClient.pushJob).not.toHaveBeenCalledWith(
       "ResolveStorePriceBottle",
       expect.anything(),
     );
@@ -979,7 +978,7 @@ describe("POST /external-sites/:site/prices", () => {
       bottleId: null,
       name: normalizedAliasBottle.fullName,
     });
-    expect(workerClient.pushUniqueJob).toHaveBeenCalledWith(
+    expect(workerClient.pushJob).toHaveBeenCalledWith(
       "ResolveStorePriceBottle",
       { priceId: price!.id },
     );
@@ -1083,11 +1082,11 @@ describe("POST /external-sites/:site/prices", () => {
         price: 9_999,
         url: "https://example.com/prices/concurrent-result",
       });
-      expect(workerClient.pushUniqueJob).toHaveBeenCalledWith(
+      expect(workerClient.pushJob).toHaveBeenCalledWith(
         "ResolveStorePriceBottle",
         { priceId: price!.id },
       );
-      expect(workerClient.pushUniqueJob).not.toHaveBeenCalledWith(
+      expect(workerClient.pushJob).not.toHaveBeenCalledWith(
         "IndexBottleSearch",
         { bottleId: incomingBottle.id },
       );
@@ -1224,7 +1223,7 @@ describe("POST /external-sites/:site/prices", () => {
       price: 6_999,
       sourceFingerprint: expect.any(String),
     });
-    expect(workerClient.pushUniqueJob).not.toHaveBeenCalledWith(
+    expect(workerClient.pushJob).not.toHaveBeenCalledWith(
       "ResolveStorePriceBottle",
       expect.anything(),
     );
@@ -1308,7 +1307,7 @@ describe("POST /external-sites/:site/prices", () => {
         where: (bottles, { eq }) => eq(bottles.id, bottle.id),
       }),
     ).toMatchObject({ imageUrl });
-    expect(workerClient.pushUniqueJob).not.toHaveBeenCalledWith(
+    expect(workerClient.pushJob).not.toHaveBeenCalledWith(
       "CapturePriceImage",
       expect.anything(),
     );

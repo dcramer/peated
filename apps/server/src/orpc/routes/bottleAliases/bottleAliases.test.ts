@@ -32,10 +32,9 @@ describe("Bottle aliases", () => {
         where: eq(bottleReferences.name, alias.name),
       }),
     ).resolves.toBeUndefined();
-    expect(workerClient.pushUniqueJob).toHaveBeenCalledWith(
-      "IndexBottleSearch",
-      { bottleId: bottle.id },
-    );
+    expect(workerClient.pushJob).toHaveBeenCalledWith("IndexBottleSearch", {
+      bottleId: bottle.id,
+    });
   });
 
   test("rejects public writes, canonical names, and equivalent duplicates", async ({

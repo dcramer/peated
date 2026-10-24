@@ -42,7 +42,7 @@ import {
   EntityInputFields,
   isEntityStatusAllowed,
 } from "@peated/server/schemas/entities";
-import { pushUniqueJob } from "@peated/server/worker/dispatch";
+import { pushJob } from "@peated/server/worker/dispatch";
 import { asc, eq, inArray, or, sql } from "drizzle-orm";
 import { z } from "zod";
 
@@ -551,7 +551,7 @@ export async function finalizeEntityUpdate(
       );
     for (const { id: bottleId } of relatedBottles) {
       try {
-        await pushUniqueJob("IndexBottleSearch", { bottleId });
+        await pushJob("IndexBottleSearch", { bottleId });
       } catch (error) {
         logError(error, { extra: { bottleId }, entity: result.entity });
       }
@@ -559,7 +559,7 @@ export async function finalizeEntityUpdate(
   }
 
   try {
-    await pushUniqueJob(
+    await pushJob(
       "OnEntityChange",
       { entityId: result.entity.id },
       { delay: 5000 },

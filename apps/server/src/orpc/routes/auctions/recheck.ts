@@ -8,7 +8,7 @@ import {
 import { auctionLotCheckKey } from "@peated/server/lib/auctionMatchEvidence";
 import { procedure } from "@peated/server/orpc";
 import { requireAdmin } from "@peated/server/orpc/middleware";
-import { pushUniqueJob } from "@peated/server/worker/client";
+import { pushJob } from "@peated/server/worker/client";
 import { asc, eq, inArray, sql } from "drizzle-orm";
 import { z } from "zod";
 
@@ -136,7 +136,7 @@ export default procedure
     });
     if (!input.refreshSourceDetails) {
       for (const args of result.queued)
-        await pushUniqueJob("ApplyAuctionLotMatch", args);
+        await pushJob("ApplyAuctionLotMatch", args);
     }
     return {
       queued: result.queued.map(({ lotId }) => lotId),

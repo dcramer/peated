@@ -15,7 +15,7 @@ import {
 import { storeExternalReviewArticle } from "@peated/server/externalReviews/store";
 import { findBottleReferenceAssignment } from "@peated/server/lib/bottleFinder";
 import { logTelemetryError } from "@peated/server/lib/log";
-import { pushUniqueJob } from "@peated/server/worker/dispatch";
+import { pushJob } from "@peated/server/worker/dispatch";
 import { and, eq } from "drizzle-orm";
 import { z } from "zod";
 
@@ -29,13 +29,13 @@ type ExternalReviewArticleIngestionCandidate = Partial<
 
 export interface ExternalReviewIngestionServices {
   createClip: typeof createReviewClip;
-  queueMissingBottles: typeof pushUniqueJob;
+  queueMissingBottles: typeof pushJob;
   reportError: typeof logTelemetryError;
 }
 
 const externalReviewIngestionServices: ExternalReviewIngestionServices = {
   createClip: createReviewClip,
-  queueMissingBottles: pushUniqueJob,
+  queueMissingBottles: pushJob,
   reportError: logTelemetryError,
 };
 

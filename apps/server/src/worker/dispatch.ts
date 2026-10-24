@@ -11,7 +11,6 @@ type RunJob = (jobName: JobName, args?: JobArgs) => Promise<void>;
 
 export type WorkerDispatch = {
   pushJob: DispatchJob;
-  pushUniqueJob: DispatchJob;
   runJob: RunJob;
 };
 
@@ -24,9 +23,6 @@ async function loadQueueWorkerDispatch() {
 const queueDispatch: WorkerDispatch = {
   async pushJob(...args) {
     await (await loadQueueWorkerDispatch()).pushJob(...args);
-  },
-  async pushUniqueJob(...args) {
-    await (await loadQueueWorkerDispatch()).pushUniqueJob(...args);
   },
   async runJob(...args) {
     await (await loadQueueWorkerDispatch()).runJob(...args);
@@ -50,19 +46,7 @@ export async function runJob(jobName: JobName, args?: JobArgs) {
     : await workerDispatch.runJob(jobName, args);
 }
 
-export async function pushUniqueJob(
-  jobName: JobName,
-  args?: JobArgs,
-  opts?: JobsOptions,
-) {
-  if (opts !== undefined) {
-    return await workerDispatch.pushUniqueJob(jobName, args, opts);
-  }
-  return args === undefined
-    ? await workerDispatch.pushUniqueJob(jobName)
-    : await workerDispatch.pushUniqueJob(jobName, args);
-}
-
+/** Queues a job; its registration decides whether the push is unique. */
 export async function pushJob(
   jobName: JobName,
   args?: JobArgs,

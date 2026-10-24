@@ -10,7 +10,7 @@ import capturePriceImageWithServices, {
 } from "./capturePriceImage";
 
 const fetchImage = vi.fn<typeof fetch>();
-const queueResolution = vi.fn<typeof workerClient.pushUniqueJob>();
+const queueResolution = vi.fn<typeof workerClient.pushJob>();
 const storeImage = vi.fn<typeof uploads.storeFile>();
 const services: CapturePriceImageServices = {
   compressImage: compressAndResizeImage,

@@ -12,7 +12,7 @@ import {
   EntityPronunciationIpaSchema,
   EntityPronunciationSchema,
 } from "@peated/server/schemas/entities";
-import { pushUniqueJob } from "@peated/server/worker/dispatch";
+import { pushJob } from "@peated/server/worker/dispatch";
 import type { JobPayload } from "@peated/server/worker/types";
 import { eq } from "drizzle-orm";
 import { z } from "zod";
@@ -282,7 +282,7 @@ export async function generateEntityDetails(
   // the pronunciation audio backfill route repairs a missed job.
   if (data.pronunciationIpa) {
     try {
-      await pushUniqueJob("GenerateEntityPronunciationAudio", { entityId });
+      await pushJob("GenerateEntityPronunciationAudio", { entityId });
     } catch (err) {
       logError(err, { entity: { id: entityId } });
     }

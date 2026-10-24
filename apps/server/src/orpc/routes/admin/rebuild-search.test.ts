@@ -1,6 +1,6 @@
 import { db } from "@peated/server/db";
 import { bottleSeries, bottles, entities } from "@peated/server/db/schema";
-import { pushUniqueJob } from "@peated/server/lib/test/workerDispatch";
+import { pushJob } from "@peated/server/lib/test/workerDispatch";
 import { routerClient } from "@peated/server/orpc/router";
 import { eq } from "drizzle-orm";
 
@@ -12,7 +12,7 @@ test("pages search rebuilds by stable ID without skipping or duplicating Bottles
   const admin = await fixtures.User({ admin: true });
   const first = await fixtures.Bottle();
   const second = await fixtures.Bottle();
-  pushUniqueJob.mockClear();
+  pushJob.mockClear();
   const page = await routerClient.admin.rebuildSearch(
     { limit: 1 },
     { context: { user: admin } },
@@ -23,7 +23,7 @@ test("pages search rebuilds by stable ID without skipping or duplicating Bottles
     { context: { user: admin } },
   );
   expect(last).toEqual({ queued: 1, nextAfterId: null });
-  expect(pushUniqueJob.mock.calls.map((args) => args[1])).toEqual([
+  expect(pushJob.mock.calls.map((args) => args[1])).toEqual([
     { bottleId: first.id },
     { bottleId: second.id },
   ]);
@@ -43,13 +43,13 @@ test("queues only Bottles without search documents when repairing", async ({
     .update(bottles)
     .set({ searchNames: "", searchTerms: "" })
     .where(eq(bottles.id, missing.id));
-  pushUniqueJob.mockClear();
+  pushJob.mockClear();
   const page = await routerClient.admin.rebuildSearch(
     { missingOnly: true },
     { context: { user: admin } },
   );
   expect(page).toEqual({ queued: 1, nextAfterId: null });
-  expect(pushUniqueJob.mock.calls.map((args) => args[1])).toEqual([
+  expect(pushJob.mock.calls.map((args) => args[1])).toEqual([
     { bottleId: missing.id },
   ]);
 });
@@ -62,13 +62,13 @@ test("queues Entity index jobs for the Entity scope", async ({ fixtures }) => {
     .update(entities)
     .set({ searchNames: "" })
     .where(eq(entities.id, missing.id));
-  pushUniqueJob.mockClear();
+  pushJob.mockClear();
   const page = await routerClient.admin.rebuildSearch(
     { scope: "entities", missingOnly: true },
     { context: { user: admin } },
   );
   expect(page).toEqual({ queued: 1, nextAfterId: null });
-  expect(pushUniqueJob.mock.calls).toEqual([
+  expect(pushJob.mock.calls).toEqual([
     ["IndexEntitySearch", { entityId: missing.id }, { delay: 0 }],
   ]);
 });
@@ -80,13 +80,13 @@ test("queues Series index jobs for the Series scope", async ({ fixtures }) => {
     .update(bottleSeries)
     .set({ searchNames: "" })
     .where(eq(bottleSeries.id, series.id));
-  pushUniqueJob.mockClear();
+  pushJob.mockClear();
   const page = await routerClient.admin.rebuildSearch(
     { scope: "series", missingOnly: true },
     { context: { user: admin } },
   );
   expect(page).toEqual({ queued: 1, nextAfterId: null });
-  expect(pushUniqueJob.mock.calls).toEqual([
+  expect(pushJob.mock.calls).toEqual([
     ["IndexBottleSeriesSearch", { seriesId: series.id }, { delay: 0 }],
   ]);
 });
@@ -98,5 +98,5 @@ test("requires administrator access before enqueueing search work", async ({
   await expect(
     routerClient.admin.rebuildSearch({}, { context: { user } }),
   ).rejects.toThrow();
-  expect(pushUniqueJob).not.toHaveBeenCalled();
+  expect(pushJob).not.toHaveBeenCalled();
 });

@@ -52,7 +52,7 @@ import {
   updateBottleInTransaction,
   type BottleUpdateFinalizationManifest,
 } from "@peated/server/lib/updateBottle";
-import { pushUniqueJob } from "@peated/server/worker/dispatch";
+import { pushJob } from "@peated/server/worker/dispatch";
 import {
   EntityMergeJobInputSchema,
   isOperationEntityMergeJobInput,
@@ -943,11 +943,7 @@ async function performEntityMerge({
     await finalizeBottleUpdate(manifest);
   }
   try {
-    await pushUniqueJob(
-      "OnEntityChange",
-      { entityId: toEntityId },
-      { delay: 5000 },
-    );
+    await pushJob("OnEntityChange", { entityId: toEntityId }, { delay: 5000 });
   } catch (err) {
     logError(err, { entity: { id: toEntityId } });
   }

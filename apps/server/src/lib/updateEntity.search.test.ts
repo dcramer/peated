@@ -3,8 +3,8 @@ import { updateEntity } from "@peated/server/lib/updateEntity";
 import { beforeEach, expect, test, vi } from "vitest";
 
 beforeEach(() => {
-  vi.mocked(workerClient.pushUniqueJob).mockReset();
-  vi.mocked(workerClient.pushUniqueJob).mockResolvedValue(undefined);
+  vi.mocked(workerClient.pushJob).mockReset();
+  vi.mocked(workerClient.pushJob).mockResolvedValue(undefined);
 });
 
 test("an Entity name change reindexes every related Bottle", async ({
@@ -26,7 +26,7 @@ test("an Entity name change reindexes every related Bottle", async ({
   });
 
   const indexedBottleIds = vi
-    .mocked(workerClient.pushUniqueJob)
+    .mocked(workerClient.pushJob)
     .mock.calls.filter(([job]) => job === "IndexBottleSearch")
     .flatMap(([, input]) =>
       input !== undefined && "bottleId" in input ? [input.bottleId] : [],

@@ -192,7 +192,7 @@ describe("Bottle creation", () => {
       .from(bottleAliases)
       .where(eq(bottleAliases.bottleId, result.bottle.id));
     expect(aliases).toEqual([]);
-    expect(workerClient.pushUniqueJob).not.toHaveBeenCalledWith(
+    expect(workerClient.pushJob).not.toHaveBeenCalledWith(
       "OnBottleAliasChange",
       expect.anything(),
     );
@@ -753,7 +753,7 @@ describe("Bottle creation", () => {
   }) => {
     const brand = await fixtures.Entity({ name: "Post Commit Test Brand" });
     let visibleAtDispatch = false;
-    vi.mocked(workerClient.pushUniqueJob).mockImplementationOnce(async () => {
+    vi.mocked(workerClient.pushJob).mockImplementationOnce(async () => {
       const [persisted] = await db
         .select({ id: bottles.id })
         .from(bottles)

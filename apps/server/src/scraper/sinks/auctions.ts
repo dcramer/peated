@@ -3,7 +3,7 @@ import {
   saveAuctionLotDetails,
   upsertAuctionObservation,
 } from "@peated/server/lib/auctions";
-import { pushUniqueJob } from "@peated/server/worker/dispatch";
+import { pushJob } from "@peated/server/worker/dispatch";
 import type { ScotchWhiskyAuctionsObservation } from "../adapters/scotchWhiskyAuctions";
 import type { ScraperSink } from "../types";
 
@@ -13,7 +13,7 @@ export const auctionSink: ScraperSink<
   if (!Array.isArray(observation.value)) {
     const lot = await saveAuctionLotDetails(externalSiteId, observation.value);
     if (lot?.matchStatus === "pending")
-      await pushUniqueJob("ApplyAuctionLotMatch", {
+      await pushJob("ApplyAuctionLotMatch", {
         lotId: lot.id,
         fingerprint: lot.sourceFingerprint,
       });
@@ -24,7 +24,7 @@ export const auctionSink: ScraperSink<
     const { lot, isNew } = await upsertAuctionObservation(externalSiteId, item);
     if (isNew) newItemCount += 1;
     if (lot.matchStatus === "pending") {
-      await pushUniqueJob("ResolveAuctionLot", {
+      await pushJob("ResolveAuctionLot", {
         lotId: lot.id,
         fingerprint: lot.sourceFingerprint,
       });

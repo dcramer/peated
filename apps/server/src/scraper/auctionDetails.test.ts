@@ -16,7 +16,7 @@ import {
 } from "@peated/server/lib/auctions";
 import { createBottleCheck } from "@peated/server/lib/bottleChecks";
 import { getBottleCandidateById } from "@peated/server/lib/bottleReferenceCandidates";
-import { pushUniqueJob } from "@peated/server/lib/test/workerDispatch";
+import { pushJob } from "@peated/server/lib/test/workerDispatch";
 import { routerClient } from "@peated/server/orpc/router";
 import { requestAuctionLotDetails } from "@peated/server/scraper";
 import { eq } from "drizzle-orm";
@@ -179,11 +179,11 @@ test.for(["pending", "review", "matched", "ignored"] as const)(
     expect(await db.query.auctionLots.findFirst()).toEqual(current);
     expect(await db.query.auctionLotResults.findMany()).toHaveLength(1);
     if (status === "pending")
-      expect(pushUniqueJob).toHaveBeenCalledWith("ApplyAuctionLotMatch", {
+      expect(pushJob).toHaveBeenCalledWith("ApplyAuctionLotMatch", {
         lotId: lot.id,
         fingerprint: saved.sourceFingerprint,
       });
-    else expect(pushUniqueJob).not.toHaveBeenCalled();
+    else expect(pushJob).not.toHaveBeenCalled();
   },
 );
 
@@ -234,7 +234,7 @@ test("a listing URL change allows fresh details without changing the lot identit
     }),
   ).toEqual({ newItemCount: 0, existingItemCount: 0 });
   expect(await db.query.auctionLots.findFirst()).toEqual(updated);
-  expect(pushUniqueJob).not.toHaveBeenCalled();
+  expect(pushJob).not.toHaveBeenCalled();
   expect(
     await requestAuctionLotDetails(lot.id, updated.sourceFingerprint),
   ).toBe(true);
@@ -557,7 +557,7 @@ test("detail replay recovers matching dispatch but cannot reuse a changed listin
       checkedAt: new Date().toISOString(),
     },
   };
-  pushUniqueJob.mockRejectedValueOnce(new Error("Queue unavailable"));
+  pushJob.mockRejectedValueOnce(new Error("Queue unavailable"));
   await expect(
     auctionSink({ externalSiteId: site.id, observation }),
   ).rejects.toThrow(/Queue unavailable/);
@@ -572,7 +572,7 @@ test("detail replay recovers matching dispatch but cannot reuse a changed listin
     existingItemCount: 1,
   });
   expect(await db.query.auctionLots.findFirst()).toEqual(saved);
-  expect(pushUniqueJob).toHaveBeenLastCalledWith("ApplyAuctionLotMatch", {
+  expect(pushJob).toHaveBeenLastCalledWith("ApplyAuctionLotMatch", {
     lotId: lot.id,
     fingerprint: saved.sourceFingerprint,
   });
@@ -617,12 +617,12 @@ test("detail replay recovers matching dispatch but cannot reuse a changed listin
     request.requestedAt,
   );
   expect(await saveAuctionLotDetails(site.id, observation.value)).toBeNull();
-  const dispatchCount = pushUniqueJob.mock.calls.length;
+  const dispatchCount = pushJob.mock.calls.length;
   expect(await auctionSink({ externalSiteId: site.id, observation })).toEqual({
     newItemCount: 0,
     existingItemCount: 0,
   });
-  expect(pushUniqueJob).toHaveBeenCalledTimes(dispatchCount);
+  expect(pushJob).toHaveBeenCalledTimes(dispatchCount);
   expect(await db.query.auctionLots.findFirst()).toEqual(requested);
   expect(await db.query.auctionLotResults.findMany()).toHaveLength(1);
 
@@ -657,7 +657,7 @@ test("detail replay recovers matching dispatch but cannot reuse a changed listin
     newItemCount: 0,
     existingItemCount: 0,
   });
-  expect(pushUniqueJob).toHaveBeenCalledTimes(dispatchCount);
+  expect(pushJob).toHaveBeenCalledTimes(dispatchCount);
   expect(await db.query.auctionLots.findFirst()).toEqual(refreshed);
 });
 
