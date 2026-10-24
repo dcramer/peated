@@ -20,6 +20,7 @@ import {
   ABOUT_FACT_FIELD_LIST,
   aboutFactFieldAppliesTo,
 } from "./aboutFactFields";
+import { findStaleSentences } from "./checks";
 import { findAboutWriteErrors } from "./document";
 
 function unsupportedSchemaVersion(version: number): never {
@@ -267,7 +268,10 @@ export async function saveEntityAbout(
   // copies stored items, so it passes the whole document.
   const baseline =
     unchangedFrom === undefined ? (stored?.document ?? null) : unchangedFrom;
-  const reasons = findAboutWriteErrors(baseline, document);
+  const reasons = [
+    ...findAboutWriteErrors(baseline, document),
+    ...findStaleSentences(baseline, document),
+  ];
   for (const field of ABOUT_FACT_FIELD_LIST) {
     if (
       document.siteFacts[field] &&

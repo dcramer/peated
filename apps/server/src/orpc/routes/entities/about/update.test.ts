@@ -102,6 +102,48 @@ describe("PUT /entities/:entity/about", () => {
     expect([saved?.version, saved?.checkedOn]).toEqual([1, null]);
   });
 
+  test("rejects a fact change that a pipeline sentence contradicts", async ({
+    fixtures,
+  }) => {
+    const user = await fixtures.User({ mod: true });
+    const entity = await fixtures.Entity();
+    await fixtures.EntityAbout({
+      entityId: entity.id,
+      events: [{ id: 1, kind: "closed", date: "1983", writtenBy: "pipeline" }],
+      sections: [
+        {
+          key: "lead",
+          heading: null,
+          eraEventId: null,
+          writtenBy: "pipeline",
+          sentences: [{ text: "It closed in 1983.", factIds: ["event:1"] }],
+        },
+      ],
+    });
+    const stored = await getEntityAbout(db, entity.id);
+
+    const err = await waitError(() =>
+      routerClient.entities.about.update(
+        {
+          entity: entity.id,
+          version: 1,
+          document: {
+            ...stored!.document,
+            events: stored!.document.events.map((event) => ({
+              ...event,
+              date: "1985",
+            })),
+          },
+        },
+        { context: { user } },
+      ),
+    );
+
+    expect(err).toMatchInlineSnapshot(
+      `[Error: "It closed in 1983." (lead) states 1983, which its facts do not.]`,
+    );
+  });
+
   test("rejects a new fact without a source", async ({ fixtures }) => {
     const user = await fixtures.User({ mod: true });
     const entity = await fixtures.Entity();

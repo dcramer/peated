@@ -258,11 +258,13 @@ export async function writeEntityAbout(
       // About row, so a merge running at the same time cannot deadlock.
       // NO KEY UPDATE still waits on a merge's lock, but not on the key-share
       // lock an About edit's first insert takes on the Entity.
-      await tx
+      const [locked] = await tx
         .select({ id: entities.id })
         .from(entities)
         .where(eq(entities.id, entity.id))
         .for("no key update");
+      // The Entity was merged or deleted during the run.
+      if (!locked) return { skipped: true, errors: [] };
       const stored = await getEntityAbout(tx, entity.id, { forUpdate: true });
       const now = services.now();
       // Owners are read again: a moderator may have linked one mid-run.
@@ -297,6 +299,7 @@ export async function writeEntityAbout(
     saved = { errors: error.reasons };
   }
 
+  if ("skipped" in saved) return { status: "skipped" };
   if (!saved.version) return rejected(entity.id, saved.errors);
   return { status: "saved", version: saved.version };
 }

@@ -83,8 +83,10 @@ links to the About page only when that page exists.
   through `entities.about.document`, and send it back with their edits
   through `entities.about.update`, along with the version they read. The
   public page leaves quotes out, so it is not a starting point for edits.
-  Their edits are marked as written by a person. They can hide or show the
-  page with `entities.about.status`.
+  Their edits are marked as written by a person. An edit that leaves one of
+  the pipeline's shown sentences at odds with a fact it cites is rejected,
+  so a person who changes a fact also fixes the sentences that state it.
+  They can hide or show the page with `entities.about.status`.
 - The legacy Entity history routes (`entities.events.*`) edit the same
   document. A new history item needs a source URL. Changing an item's date
   or kind keeps its sources but clears what they were quoted as stating. An

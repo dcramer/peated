@@ -296,6 +296,34 @@ function checkSentence(
 }
 
 /**
+ * Returns problems an edit adds to the pipeline's shown sentences, such as a
+ * year its cited fact no longer states. Write rule (owner:
+ * docs/features/entity-about.md): a person who changes a fact also fixes the
+ * sentences that state it. Problems already stored do not block an edit, and
+ * a sentence that cites a hidden fact is not shown, so it is not checked.
+ */
+export function findStaleSentences(
+  before: EntityAboutDocument | null,
+  after: EntityAboutDocument,
+) {
+  const errorsOf = (document: EntityAboutDocument) => {
+    const shown = getShownFactIds(document);
+    const factText = factSearchText(document);
+    return document.sections
+      .filter((section) => section.writtenBy === "pipeline")
+      .flatMap((section) =>
+        section.sentences
+          .filter((sentence) => sentence.factIds.every((id) => shown.has(id)))
+          .flatMap((sentence) =>
+            checkSentence(section, sentence, shown, factText),
+          ),
+      );
+  };
+  const known = new Set(before ? errorsOf(before) : []);
+  return errorsOf(after).filter((error) => !known.has(error));
+}
+
+/**
  * Checks a merged document before the pipeline saves it. Pipeline rule
  * (owner: docs/features/entity-about.md): the pipeline's sentences must still
  * match the facts they cite after a person's values win the merge, and a run

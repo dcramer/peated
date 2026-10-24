@@ -3,6 +3,7 @@ import type { EntityAboutWriter } from "@peated/server/agents/entityAbout/writer
 import { db } from "@peated/server/db";
 import { entities } from "@peated/server/db/schema";
 import { getEntityAbout } from "@peated/server/lib/entityAbout/store";
+import { routerClient } from "@peated/server/orpc/router";
 import { eq } from "drizzle-orm";
 import { vi } from "vitest";
 
@@ -424,6 +425,25 @@ describe("writeEntityAbout", () => {
 
     expect(result).toMatchObject({ status: "rejected" });
     expect(run.writer).toHaveBeenCalledTimes(2);
+    expect(await getEntityAbout(db, entity.id)).toBeNull();
+  });
+
+  test("skips an Entity deleted during the run", async ({ fixtures }) => {
+    const admin = await fixtures.User({ admin: true });
+    const entity = await fixtures.Entity({ kind: "distillery" });
+
+    const result = await writeEntityAbout(
+      { entityId: entity.id },
+      services(async () => {
+        await routerClient.entities.delete(
+          { entity: entity.id },
+          { context: { user: admin } },
+        );
+        return { draft: goodDraft, pagesRead: [page] };
+      }),
+    );
+
+    expect(result).toEqual({ status: "skipped" });
     expect(await getEntityAbout(db, entity.id)).toBeNull();
   });
 
