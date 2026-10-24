@@ -29,7 +29,6 @@ type InputEntity = Partial<Entity> & {
 export const GenerateEntityDetailsJobArgsSchema = z
   .object({
     entityId: z.number().int().positive(),
-    force: z.boolean().default(false),
   })
   .strict();
 
@@ -174,7 +173,7 @@ export async function generateEntityDetails(
   input: JobPayload,
   services: GenerateEntityDetailsServices = defaultServices,
 ) {
-  const { entityId, force } = GenerateEntityDetailsJobArgsSchema.parse(input);
+  const { entityId } = GenerateEntityDetailsJobArgsSchema.parse(input);
 
   if (!services.aiEnabled) {
     return;
@@ -189,13 +188,10 @@ export async function generateEntityDetails(
   });
   if (!entity) return;
 
-  const generateDesc =
-    (!entity.descriptionSrc || entity.descriptionSrc === "generated") &&
-    (!entity.description || force);
-
-  // test if we need to run at all
+  // Description rule (owner: docs/features/entity-about.md): descriptions
+  // come from sourced About leads, never from a model's memory, so this job
+  // fills only the other details.
   if (
-    !generateDesc &&
     entity.yearEstablished &&
     entity.website &&
     entity.pronunciation &&
@@ -210,14 +206,6 @@ export async function generateEntityDetails(
     throw new Error(`Failed to generate details for entity: ${entityId}`);
   }
   const data: Partial<typeof entities.$inferInsert> = {};
-  if (
-    generateDesc &&
-    result.description &&
-    result.description !== entity.description
-  ) {
-    data.description = result.description;
-    data.descriptionSrc = "generated";
-  }
 
   if (!entity.yearEstablished && result.yearEstablished) {
     data.yearEstablished = result.yearEstablished;

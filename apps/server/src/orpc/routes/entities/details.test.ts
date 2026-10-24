@@ -22,6 +22,53 @@ describe("GET /entities/:entity", () => {
     expect("createdBy" in data).toBe(false);
   });
 
+  test("shows the About tab only when the page has enough to show", async ({
+    fixtures,
+  }) => {
+    const entity = await fixtures.Entity({ kind: "distillery" });
+    const stills = {
+      value: 2,
+      asOf: null,
+      citations: [{ sourceId: "s1", statedValue: "2", quote: null }],
+    };
+    const document = (newOwnerId: number) => ({
+      events: [
+        {
+          id: 1,
+          kind: "acquired" as const,
+          date: "1925",
+          newOwnerId,
+          newOwnerName: "DCL",
+        },
+      ],
+      siteFacts: { washStills: stills, spiritStills: stills },
+      sections: [
+        {
+          key: "lead",
+          heading: null,
+          eraEventId: null,
+          sentences: [{ text: "DCL bought it in 1925.", factIds: ["event:1"] }],
+        },
+      ],
+    });
+    const owner = await fixtures.Entity({ kind: "company" });
+    await fixtures.EntityAbout({ entityId: entity.id, ...document(owner.id) });
+
+    expect(
+      (await routerClient.entities.details({ entity: entity.id })).hasAbout,
+    ).toBe(true);
+
+    // The owner later merges into the Entity, so the lead's only fact reads
+    // as the Entity buying itself and is hidden; the page has no lead.
+    await db
+      .insert(entityTombstones)
+      .values({ entityId: owner.id, newEntityId: entity.id });
+
+    expect(
+      (await routerClient.entities.details({ entity: entity.id })).hasAbout,
+    ).toBe(false);
+  });
+
   test("returns the Entity update timestamp", async ({ fixtures }) => {
     const createdAt = new Date("2020-01-01T00:00:00.000Z");
     const updatedAt = new Date("2025-06-01T00:00:00.000Z");

@@ -43,6 +43,7 @@ import updateRegionStats from "./updateRegionStats";
 import updateSiteReviewScores from "./updateSiteReviewScores";
 import verifyBottleCreation from "./verifyBottleCreation";
 import verifyEntityCreation from "./verifyEntityCreation";
+import writeEntityAbout from "./writeEntityAbout";
 
 // Worker queue rule: jobs that wait on a hosted model run on the "models"
 // queue so fast derived-data work such as search indexing and stats never
@@ -68,6 +69,10 @@ registry.add("GenerateCountryDetails", generateCountryDetails, {
   queueName: "models",
 });
 registry.add("GenerateEntityDetails", generateEntityDetails, {
+  queueName: "models",
+  unique: true,
+});
+registry.add("WriteEntityAbout", writeEntityAbout, {
   queueName: "models",
   unique: true,
 });

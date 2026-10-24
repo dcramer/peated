@@ -15,6 +15,7 @@ import bottleRecommendations from "./routes/bottles/recommendations";
 import bottleSitemap from "./routes/bottles/sitemap";
 import bottleSuggestedTags from "./routes/bottles/suggested-tags";
 import bottleTags from "./routes/bottles/tags";
+import bottleSeriesList from "./routes/bottleSeries/list";
 import brandList from "./routes/brands/list";
 import changeList from "./routes/changes/list";
 import collectionBottleCreate from "./routes/collections/bottles/create";
@@ -26,6 +27,12 @@ import companyList from "./routes/companies/list";
 import countryDetails from "./routes/countries/details";
 import countryList from "./routes/countries/list";
 import distilleryList from "./routes/distilleries/list";
+import entityAboutBottlers from "./routes/entities/about/bottlers";
+import entityAboutDetails from "./routes/entities/about/details";
+import entityAboutDistillers from "./routes/entities/about/distillers";
+import entityAboutReleaseYears from "./routes/entities/about/release-years";
+import entityAboutSitemap from "./routes/entities/about/sitemap";
+import entityAboutVintages from "./routes/entities/about/vintages";
 import entityCatalog from "./routes/entities/catalog";
 import entityCreate from "./routes/entities/create";
 import entityDetails from "./routes/entities/details";
@@ -121,12 +128,21 @@ export const mockRouter = mockOS.router({
       update: collectionBottleUpdate,
     },
   },
+  bottleSeries: { list: bottleSeriesList },
   countries: {
     details: countryDetails,
     list: countryList,
   },
   distilleries: { list: distilleryList },
   entities: {
+    about: {
+      bottlers: entityAboutBottlers,
+      details: entityAboutDetails,
+      distillers: entityAboutDistillers,
+      releaseYears: entityAboutReleaseYears,
+      sitemap: entityAboutSitemap,
+      vintages: entityAboutVintages,
+    },
     flavorProfile: entityFlavorProfile,
     catalog: entityCatalog,
     create: entityCreate,

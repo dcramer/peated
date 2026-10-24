@@ -582,6 +582,27 @@ test("lists bottles with age filter", async ({ fixtures }) => {
   expect(results[0].id).toBe(bottle1.id);
 });
 
+test("lists bottles distilled in one vintage year", async ({ fixtures }) => {
+  const distillery = await fixtures.Entity({ kind: "distillery" });
+  const bottle1972 = await fixtures.Bottle({
+    name: "Brora 1972",
+    vintageYear: 1972,
+    distillerIds: [distillery.id],
+  });
+  await fixtures.Bottle({
+    name: "Brora 1982",
+    vintageYear: 1982,
+    distillerIds: [distillery.id],
+  });
+
+  const { results } = await routerClient.bottles.list({
+    distiller: distillery.id,
+    vintageYear: 1972,
+  });
+
+  expect(results.map(({ id }) => id)).toEqual([bottle1972.id]);
+});
+
 test("filters tags by direct Bottle identity", async ({ fixtures }) => {
   const bottle1 = await fixtures.Bottle({ name: "Tagged Bottle" });
   const bottle2 = await fixtures.Bottle({ name: "Other Bottle" });

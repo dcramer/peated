@@ -1,0 +1,58 @@
+{
+  "case": "ardnamurchan",
+  "reviewedAt": "2026-10-24",
+  "entity": {
+    "id": 84,
+    "name": "Ardnamurchan",
+    "kind": "distillery",
+    "aliases": [],
+    "location": "Highland, Scotland",
+    "owner": "Adelphi",
+    "yearEstablished": 2014,
+    "website": "https://ardnamurchandistillery.com/"
+  },
+  "pages": [
+    {
+      "url": "https://ardnamurchandistillery.com/",
+      "title": "The home of award winning whisky. Taste the story. | Ardnamurchan Distillery",
+      "publisher": "Ardnamurchan Distillery",
+      "description": "The distillery's home page: when it was set up and where it is.",
+      "text": "Welcome to Ardnamurchan Distillery.\n\nOur distillery sits on the wild west Highland coast of Scotland and mixes old methods with new ideas. We were established in 2014 and take our character from the Ardnamurchan peninsula. We make and mature our spirit here, using double distillation, renewable energy and even blockchain tracking.\n\nArd-na-murkan: headland of the great seas.\nArdnamurchan Lighthouse, at the most westerly point of the British mainland, has guided ships along this coast since 1849. Its 35 metre tower, cut from Mull granite, was built in 1849 and designed by Alan Stevenson, whose nephew was Robert Louis Stevenson. Its coordinates appear in the lighthouse logo on our labels.\n\nThe Whisky\nOur award-winning single malts come from spirit maturing in our own warehouses. We make two spirits, unpeated and peated. The peated malt is 30PPM, and some 80PPM spirit is still resting in cask. Most of our whisky matures in ex-sherry European oak and ex-bourbon American oak, with other casks that once held anything from white wine and Mezcal to Sauternes and Madeira.\n\nOur range: AD/ Single Malt (notes of orchard fruit, marzipan, honey and oyster shells); AD/ Cask Strength; AD/ Single Cask; AD/ Sherry Cask; and Maclean's Nose, a blended Scotch with a west coast character."
+    },
+    {
+      "url": "https://en.wikipedia.org/wiki/Ardnamurchan_distillery",
+      "title": "Ardnamurchan distillery - Wikipedia",
+      "publisher": "Wikipedia",
+      "description": "Encyclopedia entry on the Ardnamurchan peninsula distillery.",
+      "text": "Ardnamurchan distillery makes Scotch whisky on the Ardnamurchan peninsula in Lochaber, in the Scottish Highlands, and takes its name from it. It is seen as one of the most remote distilleries in Scotland. The independent bottler Adelphi built it and owns it.\n\nHistory\nPlans went in during 2011, and the council approved them in April 2012. Building started in 2013 and was finished in May 2014, and production began the same year. The first whisky old enough to meet the three-year legal minimum came out in 2017. In 2018, casks went to local children as a charitable investment, and by 2020 more than 10,000 casks had been filled.\n\nFacilities\nRenewable energy runs the site: hydro-electric power and a large biomass boiler fuelled with wood from the local Ardnamurchan forest, which also warms the floor maltings. Water for production comes from springs above the distillery, and the Glenmore river supplies cooling water.\n\nProducts\nTwo styles: peated and unpeated West Highland whisky."
+    },
+    {
+      "url": "https://www.thespiritsbusiness.com/2014/07/princess-anne-opens-new-scotch-distillery/",
+      "title": "Princess Anne opens new Scotch distillery - The Spirits Business",
+      "publisher": "The Spirits Business",
+      "description": "Trade news on the Princess Royal opening the distillery and filling its first spirit.",
+      "text": "Melita Kiely | 28 July 2014\n\nOn Sunday, Princess Anne formally opened the new Ardnamurchan Distillery, and she was given the honour of drawing its first spirit.\n\nThe distillery stands at Glenbeg, Lochaber, on the Ardnamurchan Estate. Before the ceremony, Princess Anne toured the plant and met the staff. It belongs to Adelphi Distillery Ltd, will make single malt Scotch, and hopes to draw up to 14,000 visitors a year.\n\nThe multi-million pound site is the first in Scotland heated only by wood chips from the local area. Speaking to the Press and Journal, Adelphi director Donald Houston said the aim was a distillery run by sustainable and renewable means. He said the project marks a step in a long-term plan for the area and should bring tourism and jobs to a very remote part of Scotland."
+    },
+    {
+      "url": "https://www.urbanrealm.com/news/4943/Whisky_production_gets_underway_at_Ardnamurchan_distillery.html",
+      "title": "Whisky production gets underway at Ardnamurchan distillery - July 2014 - News - Urban Realm",
+      "publisher": "Urban Realm",
+      "description": "Architecture news on Adelphi starting production at its new Ardnamurchan site.",
+      "text": "Production of Adelphi Distillery's own single malt is now under way at its new Ardnamurchan site in Argyll. HRH The Princess Royal performed the official opening.\n\nOrganic Architects designed the distillery, warehouse and visitor centre beside the Glenmore River, with a boiler burning woodchip from local sources. The scheme is on the shortlist for a Scottish Government planning award. In the entry, Organic director Gareth Roberts praised its clean technology inside traditional-style buildings and the good, low-impact jobs it brings.\n\nThe site lies 1.5 miles west of Adelphi's base at Glenborrodale Castle.\n\nPhoto captions: the new building mixes traditional and modern design; work on the facility began in late 2012."
+    }
+  ],
+  "expected": {
+    "events": [
+      {
+        "kind": "opened",
+        "year": "2014"
+      },
+      {
+        "kind": "generic",
+        "year": "2017"
+      }
+    ],
+    "notes": "opened 2014: official site (established in 2014), Wikipedia (finished in May 2014; production began the same year) and The Spirits Business (article dated 28 July 2014 reports the opening on Sunday). generic 2017: Wikipedia only (first whisky meeting the three-year minimum came out in 2017). An opened date of 2014, 2014-05 or 2014-07 all pass the year check."
+  },
+  "notes": "Conflicts: Wikipedia says building started in 2013; Urban Realm (July 2014) says work began in late 2012. Wikipedia also says plans went in during 2011 and were approved in April 2012. The opening day is not stated outright: The Spirits Business (28 July 2014) says only \"on Sunday\", which a writer must not turn into an exact date; Wikipedia says finished in May 2014. Urban Realm places the site in Argyll while Wikipedia and The Spirits Business say Lochaber; location is not an event. Traps: the official homepage dates Ardnamurchan Lighthouse to 1849 (guiding ships since 1849, built in 1849); that is the namesake lighthouse, not the distillery, and must not become an opened 1849 event. The 2018 casks for local children and the 10,000 casks by 2020 are optional generic facts. The 30PPM/80PPM peating levels and the tasting notes have no date and must be left out. Peated stores the owner as Adelphi (kind bottler), which matches the pages. Page texts are reviewed paraphrases of the cited pages, not copies."
+}

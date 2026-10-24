@@ -18,6 +18,7 @@ describe("EntitySiblingOverview", () => {
         peatedId: "E0042",
       },
       images: [],
+      hasAbout: false,
     } satisfies Entity;
 
     const html = renderToStaticMarkup(

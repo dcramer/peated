@@ -1,6 +1,7 @@
 import type { MockOutputs } from "../contract";
 import { timestamp } from "./constants";
 import { mockEntity } from "./entities";
+import { mockBroraHistory } from "./entity-about";
 
 export const mockEntityHistory = [
   {
@@ -43,6 +44,7 @@ export const mockEntityHistory = [
 
 export const mockEntityHistories = [
   ...mockEntityHistory,
+  ...mockBroraHistory,
   {
     id: 9804,
     entityId: 9204,

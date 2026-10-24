@@ -61,6 +61,11 @@ export const BottleListInputSchema = z.object({
   flight: z.string().nullish(),
   category: z.enum(CATEGORY_LIST).nullish(),
   age: z.coerce.number().nullish(),
+  vintageYear: z.coerce
+    .number()
+    .int()
+    .nullish()
+    .describe("Filter by the year the whisky was distilled."),
   ageBand: z.enum(BOTTLE_AGE_BAND_LIST).nullish(),
   minScore: z.coerce.number().int().min(0).max(100).nullish(),
   cursor: z.coerce.number().gte(1).default(1),

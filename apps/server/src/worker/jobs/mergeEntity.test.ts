@@ -30,6 +30,7 @@ import {
 } from "@peated/server/lib/bottleChecks";
 import { prepareOperation } from "@peated/server/lib/bottleOperationReview";
 import { createBottle } from "@peated/server/lib/createBottle";
+import { getEntityAbout } from "@peated/server/lib/entityAbout/store";
 import { loadEntityMergeOperation } from "@peated/server/lib/entityMergeOperation";
 import {
   getPronunciationAudioUrl,
@@ -175,6 +176,36 @@ test("repoints history when Entities merge", async ({ fixtures }) => {
       where: eq(entityEvents.id, duplicateEvent.id),
     }),
   ).toBeUndefined();
+});
+
+test("leaves About pages to the writer when Entities merge", async ({
+  fixtures,
+}) => {
+  const source = await fixtures.Entity({ kind: "distillery" });
+  const destination = await fixtures.Entity({ kind: "distillery" });
+  await fixtures.EntityAbout({
+    entityId: destination.id,
+    events: [{ id: 1, kind: "opened", date: "1819" }],
+  });
+  await fixtures.EntityAbout({
+    entityId: source.id,
+    events: [{ id: 1, kind: "closed", date: "1983" }],
+  });
+  const before = await getEntityAbout(db, destination.id);
+  vi.mocked(pushJob).mockClear();
+
+  await mergeEntity({
+    fromEntityIds: [source.id],
+    toEntityId: destination.id,
+  });
+
+  // The merged Entity's page lives on in change history; the destination's
+  // page is written again from sources instead of combined.
+  expect(await getEntityAbout(db, destination.id)).toEqual(before);
+  expect(await getEntityAbout(db, source.id)).toBeNull();
+  expect(pushJob).toHaveBeenCalledWith("WriteEntityAbout", {
+    entityId: destination.id,
+  });
 });
 
 test("keeps images when Entities merge", async ({ fixtures }) => {

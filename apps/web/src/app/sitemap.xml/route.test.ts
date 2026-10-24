@@ -9,6 +9,7 @@ describe("root sitemap", () => {
     expect(xml).toContain("/sitemaps/bottles/sitemap.xml");
     expect(xml).toContain("/sitemaps/series/sitemap.xml");
     expect(xml).toContain("/sitemaps/locations.xml");
+    expect(xml).toContain("/sitemaps/about.xml");
     expect(xml).toContain("/sitemaps/brands/sitemap.xml");
     expect(xml).not.toContain("/sitemaps/tastings/");
   });

@@ -15,6 +15,7 @@ import bottleRecommendations from "@peated/server/orpc/contracts/bottles/recomme
 import bottleSitemap from "@peated/server/orpc/contracts/bottles/sitemap";
 import bottleSuggestedTags from "@peated/server/orpc/contracts/bottles/suggested-tags";
 import bottleTags from "@peated/server/orpc/contracts/bottles/tags";
+import bottleSeriesList from "@peated/server/orpc/contracts/bottleSeries/list";
 import brandList from "@peated/server/orpc/contracts/brands/list";
 import changeList from "@peated/server/orpc/contracts/changes/list";
 import collectionBottleCreate from "@peated/server/orpc/contracts/collections/bottles/create";
@@ -26,6 +27,12 @@ import companyList from "@peated/server/orpc/contracts/companies/list";
 import countryDetails from "@peated/server/orpc/contracts/countries/details";
 import countryList from "@peated/server/orpc/contracts/countries/list";
 import distilleryList from "@peated/server/orpc/contracts/distilleries/list";
+import entityAboutBottlers from "@peated/server/orpc/contracts/entities/about/bottlers";
+import entityAboutDetails from "@peated/server/orpc/contracts/entities/about/details";
+import entityAboutDistillers from "@peated/server/orpc/contracts/entities/about/distillers";
+import entityAboutReleaseYears from "@peated/server/orpc/contracts/entities/about/release-years";
+import entityAboutSitemap from "@peated/server/orpc/contracts/entities/about/sitemap";
+import entityAboutVintages from "@peated/server/orpc/contracts/entities/about/vintages";
 import entityCatalog from "@peated/server/orpc/contracts/entities/catalog";
 import entityCreate from "@peated/server/orpc/contracts/entities/create";
 import entityDetails from "@peated/server/orpc/contracts/entities/details";
@@ -121,12 +128,21 @@ export const mockContract = {
       update: collectionBottleUpdate,
     },
   },
+  bottleSeries: { list: bottleSeriesList },
   countries: {
     details: countryDetails,
     list: countryList,
   },
   distilleries: { list: distilleryList },
   entities: {
+    about: {
+      bottlers: entityAboutBottlers,
+      details: entityAboutDetails,
+      distillers: entityAboutDistillers,
+      releaseYears: entityAboutReleaseYears,
+      sitemap: entityAboutSitemap,
+      vintages: entityAboutVintages,
+    },
     flavorProfile: entityFlavorProfile,
     catalog: entityCatalog,
     create: entityCreate,

@@ -10,6 +10,7 @@ import {
   mockBottlePrices,
   mockBottles,
   mockBottleTags,
+  mockBrora,
   mockCairdeasSeries,
   mockCaolIlaEntity,
   mockChanges,
@@ -133,7 +134,12 @@ describe("mock oRPC router", () => {
   it("returns data used by the main pages", async () => {
     await expect(
       anonymousClient.entities.details({ entity: mockEntity.id }),
-    ).resolves.toEqual({ ...mockEntity, images: [], isFollowing: false });
+    ).resolves.toEqual({
+      ...mockEntity,
+      images: [],
+      isFollowing: false,
+      hasAbout: false,
+    });
     await expect(
       anonymousClient.entities.events.list({ entity: mockEntity.id }),
     ).resolves.toEqual({ results: mockEntityHistory });
@@ -146,6 +152,7 @@ describe("mock oRPC router", () => {
     });
     expect(diageoEntities.results).toEqual([
       mockCaolIlaEntity,
+      mockBrora,
       mockTaliskerEntity,
       mockEntity,
       mockJohnnieWalkerEntity,
@@ -328,7 +335,12 @@ describe("mock oRPC router", () => {
     ).resolves.toEqual(kentucky);
     await expect(
       anonymousClient.entities.details({ entity: yamazaki.brand.id }),
-    ).resolves.toEqual({ ...yamazaki.brand, images: [], isFollowing: false });
+    ).resolves.toEqual({
+      ...yamazaki.brand,
+      images: [],
+      isFollowing: false,
+      hasAbout: false,
+    });
     await expect(
       anonymousClient.bottles.details({ bottle: yamazaki.id }),
     ).resolves.toMatchObject({ id: yamazaki.id, fullName: yamazaki.fullName });
@@ -696,6 +708,28 @@ describe("mock oRPC router", () => {
     expect(recommendations.results.some((bottle) => bottle.id === 9309)).toBe(
       false,
     );
+  });
+
+  it("lists a distillery's Series by bottle count", async () => {
+    const { results, total } = await anonymousClient.bottleSeries.list({
+      distillery: mockLaphroaigEntity.id,
+      sort: "-bottles",
+    });
+
+    expect(total).toBe(1);
+    expect(results[0]).toMatchObject({
+      id: mockCairdeasSeries.id,
+      numBottles: 2,
+      brand: { id: mockLaphroaigEntity.id },
+    });
+  });
+
+  it("lists About pages for the sitemap", async () => {
+    const { results, nextAfterId } =
+      await anonymousClient.entities.about.sitemap({});
+
+    expect(results.map(({ id }) => id)).toEqual([mockBrora.id]);
+    expect(nextAfterId).toBeNull();
   });
 
   it("lists the signed-in member's tasting drafts", async () => {

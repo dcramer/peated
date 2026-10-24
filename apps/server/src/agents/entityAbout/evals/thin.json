@@ -1,0 +1,41 @@
+{
+  "case": "thin",
+  "reviewedAt": "2026-10-24",
+  "entity": {
+    "id": 365810,
+    "name": "Jackton Distillery",
+    "kind": "distillery",
+    "aliases": [],
+    "location": null,
+    "owner": null,
+    "yearEstablished": null,
+    "website": null
+  },
+  "pages": [
+    {
+      "url": "https://www.undiscoveredscotland.co.uk/eastkilbride/jacktondistillery/index.html",
+      "title": "Jackton Distillery Feature Page on Undiscovered Scotland",
+      "publisher": "Undiscovered Scotland",
+      "description": "Travel guide feature on Jackton Distillery near East Kilbride.",
+      "text": "Jackton Distillery is on the western edge of East Kilbride in South Lanarkshire, roughly eight miles south of central Glasgow. It is a young family business, led by women, that hopes to shake up the whisky world, and we think it may well do so. Jackton village used to stand apart from East Kilbride but the town has now grown around it, and the distillery has changed just as much, from a working farm into a modern, high-tech visitor attraction.\n\nThe farm is central to the idea. From the start the plan was to turn farm produce into drinks. On a trial basis some home-grown barley is now malted on site, though bought-in malt is still used too, and the spent grain feeds the farm's beef cattle. The site also hosts weddings and has 12 holiday cottages for up to 28 guests.\n\nThe production hall is full of copper and steel: a wash still and spirit still for Scotch, a Kothe still for other drinks, and a Haygo system added later to raise output. Gin, vodka and even beer are made here alongside whisky, and there is a small bottling line.\n\nSpirit for Scotch was first made here in February 2020 and laid down in the bonded warehouses. When we visited, a first single malt seemed close. For now the whisky on sale was a blend, offered in three cask finishes."
+    },
+    {
+      "url": "https://scottishgrocer.co.uk/2026/09/04/jackton-distillery-rolls-out-raer-single-malt/",
+      "title": "Jackton Distillery rolls out RAER single malt | Scottish Grocer & Convenience Retailer",
+      "publisher": "Scottish Grocer & Convenience Retailer",
+      "description": "Trade news on Jackton Distillery's first single malt release.",
+      "text": "Jackton Distillery rolls out RAER single malt\n\nMilestone for Lowland whisky maker\n\nFamily-run Jackton Distillery began shipping its first single malt, RAER Single Malt Whisky, The Inaugural Release, today (Friday 4 September).\n\nThe launch brings malt whisky making back to South Lanarkshire after more than 180 years. The area's last malt distillery, Gill near Lesmahagow, closed in 1840. Records suggest no distillery in the county has distilled, matured and bottled its own single malt since then. Jackton sits on the Kean family's farm close to East Kilbride.\n\nCasks used were Bourbon plus Oloroso, Amontillado and Pedro Ximénez sherry. It is bottled at 48.7% ABV, with natural colour and no chill filtering. It is limited to 6,000 numbered bottles at £68 per 700ml. A see-through window on the front label, the 'RAER View', is part of the design. Tour visitors can now taste it, and a roadshow runs from 5 to 12 September, with an Edinburgh event on 13 September.\n\nManaging director Jaynie Kean, 28, said the family's first casks were filled in February 2020, shortly before the pandemic, and hopes people will drink the whisky rather than only collect it."
+    }
+  ],
+  "expected": {
+    "thin": true,
+    "events": [
+      {
+        "kind": "opened",
+        "year": "2020"
+      }
+    ],
+    "notes": "opened 2020: production began in February 2020. Undiscovered Scotland says spirit for Scotch was first made there in February 2020; Scottish Grocer reports the managing director saying the first casks were filled in February 2020. The pages give no founding or building date, so the first spirit is the only start date. A writer may record it as opened 2020-02 (production began). The first single malt launch is a real fact, but the Scottish Grocer page says only \"today (Friday 4 September)\" with no year; the year 2026 appears only in the page URL (/2026/09/04/), not in the text. A quote cannot state the year, so a generic launch event is not expected; if the writer adds one dated 2026-09-04 from the URL, its quote will not contain the year and code should drop it. Only the 2020 start is required. With this few facts the writer should return a short lead or no sections."
+  },
+  "notes": "Chosen as the thin case because Peated's record is nearly empty (name only: no location, owner, founding year or website; 2 Bottles, both RAER) and the web has very few independent pages: a travel-guide feature (undated) and one trade-press launch story. Other results were shops, deal sites and an auction-style site (rarewhisky101.com, scottishdelight.com, wowcher.co.uk), which the writer must not cite, plus VisitScotland and a student newspaper that were not saved. Traps: Scottish Grocer says the area's last malt distillery, Gill near Lesmahagow, closed in 1840; that is a different distillery and must not become a Jackton closed event. The 180-year gap is a span from that 1840 closure, not a Jackton date. Jaynie Kean's age (28) is not an event. The 6,000-bottle limit and £68 price must be left out (bottle counts and prices). The writer may need the RAER brand name to search, which Peated's Bottles carry but the input does not. A web search summary claimed the site was registered in 2017; no saved page states that, so it is not in the evidence and must not appear. Page texts are reviewed paraphrases of the cited pages, not copies."
+}

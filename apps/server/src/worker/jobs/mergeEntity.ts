@@ -7,6 +7,7 @@ import {
   bottlesToDistillers,
   changes,
   entities,
+  entityAboutNotes,
   entityEvents,
   entityFollows,
   entityImages,
@@ -801,6 +802,10 @@ async function performEntityMerge({
       .update(entityEvents)
       .set({ newOwnerId: toEntity.id })
       .where(inArray(entityEvents.newOwnerId, fromEntityIds));
+    await tx
+      .update(entityAboutNotes)
+      .set({ entityId: toEntity.id })
+      .where(inArray(entityAboutNotes.entityId, fromEntityIds));
 
     for (const sourceSeries of sourceSeriesRows) {
       const targetFullName = `${toEntity.name} ${sourceSeries.name}`;
@@ -944,6 +949,10 @@ async function performEntityMerge({
   }
   try {
     await pushJob("OnEntityChange", { entityId: toEntityId }, { delay: 5000 });
+    // Merge rule (owner: docs/features/entity-about.md): About pages are not
+    // combined. The destination's page is written again from sources; the
+    // job skips other kinds and does nothing while the writer is off.
+    await pushJob("WriteEntityAbout", { entityId: toEntityId });
   } catch (err) {
     logError(err, { entity: { id: toEntityId } });
   }
