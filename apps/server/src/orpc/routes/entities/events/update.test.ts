@@ -70,6 +70,23 @@ describe("PATCH /entities/:entity/events/:event", () => {
     ]);
   });
 
+  test("leaves an item as is when nothing changes", async ({ fixtures }) => {
+    const user = await fixtures.User({ mod: true });
+    const entity = await fixtures.Entity();
+    await fixtures.EntityAbout({
+      entityId: entity.id,
+      events: [{ id: 1, kind: "closed", date: "1983", writtenBy: "pipeline" }],
+    });
+
+    await routerClient.entities.events.update(
+      { entity: entity.id, event: 1, date: "1983" },
+      { context: { user } },
+    );
+
+    const about = await getEntityAbout(db, entity.id);
+    expect(about?.document.events[0]?.writtenBy).toBe("pipeline");
+  });
+
   test("keeps an owner known only by name", async ({ fixtures }) => {
     const user = await fixtures.User({ mod: true });
     const entity = await fixtures.Entity();
