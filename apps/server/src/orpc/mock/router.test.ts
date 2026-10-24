@@ -710,6 +710,28 @@ describe("mock oRPC router", () => {
     );
   });
 
+  it("lists a distillery's Series by bottle count", async () => {
+    const { results, total } = await anonymousClient.bottleSeries.list({
+      distillery: mockLaphroaigEntity.id,
+      sort: "-bottles",
+    });
+
+    expect(total).toBe(1);
+    expect(results[0]).toMatchObject({
+      id: mockCairdeasSeries.id,
+      numBottles: 2,
+      brand: { id: mockLaphroaigEntity.id },
+    });
+  });
+
+  it("lists About pages for the sitemap", async () => {
+    const { results, nextAfterId } =
+      await anonymousClient.entities.about.sitemap({});
+
+    expect(results.map(({ id }) => id)).toEqual([mockBrora.id]);
+    expect(nextAfterId).toBeNull();
+  });
+
   it("lists the signed-in member's tasting drafts", async () => {
     await expect(anonymousClient.tastingDrafts.list({})).rejects.toMatchObject({
       code: "UNAUTHORIZED",
