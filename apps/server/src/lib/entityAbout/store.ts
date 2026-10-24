@@ -69,6 +69,29 @@ export async function getEntityAbout(
   };
 }
 
+/**
+ * Maps each Entity ID to the Entity it now is. Merge rule (owner:
+ * `mergeEntity`): a merge leaves About documents alone, and reads follow the
+ * merged Entity's tombstone instead.
+ */
+export async function followMergedEntities(
+  database: AnyDatabase,
+  ids: readonly number[],
+) {
+  const target = new Map<number, number>(ids.map((id) => [id, id]));
+  if (!ids.length) return target;
+  const tombstones = await database
+    .select()
+    .from(entityTombstones)
+    .where(inArray(entityTombstones.entityId, [...ids]));
+  for (const tombstone of tombstones) {
+    if (tombstone.newEntityId) {
+      target.set(tombstone.entityId, tombstone.newEntityId);
+    }
+  }
+  return target;
+}
+
 /** Returns Entity IDs the document links that no longer exist or merged. */
 async function findMissingLinkedEntities(
   database: AnyDatabase,

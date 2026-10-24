@@ -82,6 +82,9 @@ const AboutEventFields = z.object({
   relatedEntityId: z.number().int().positive().nullable().default(null),
   newOwnerId: z.number().int().positive().nullable().default(null),
   newOwnerName: z.string().trim().min(1).max(200).nullable().default(null),
+  // The `entity_event` row this item was copied from, so the backfill copies
+  // each row once. Dropped with `entity_event`.
+  legacyEventId: z.number().int().positive().nullable().default(null),
   citations: z.array(AboutCitationSchema).default([]),
   writtenBy: AboutWrittenByEnum,
   createdAt: z.string().datetime().nullable().default(null),

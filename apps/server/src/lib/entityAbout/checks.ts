@@ -15,7 +15,9 @@ import {
   eventFactId,
   getDisagreement,
   getShownFactIds,
+  ISO_DATE_PATTERN,
   siteFactId,
+  valuesAgree,
 } from "./display";
 import {
   findAboutWriteErrors,
@@ -39,8 +41,6 @@ function normalizeForQuote(value: string) {
     .replace(/[^\p{L}\p{N}]+/gu, " ")
     .trim();
 }
-
-const ISO_DATE_PATTERN = /^\d{4}(?:-\d{2}){0,2}$/;
 
 /**
  * Whether some quote states `value`: every number in it, or its words. A date
@@ -297,9 +297,8 @@ export function checkConflictPicks(document: EntityAboutDocument) {
   for (const event of document.events) {
     const disagreement = getDisagreement(event.citations);
     if (!disagreement) continue;
-    const matches = disagreement.values.some(
-      ({ value }) =>
-        value.startsWith(event.date) || event.date.startsWith(value),
+    const matches = disagreement.values.some(({ value }) =>
+      valuesAgree(value, event.date),
     );
     if (!matches) {
       errors.push(
@@ -313,9 +312,9 @@ export function checkConflictPicks(document: EntityAboutDocument) {
     if (ABOUT_FACT_FIELDS[field].type !== "number") continue;
     const disagreement = fact ? getDisagreement(fact.citations) : null;
     if (!fact || !disagreement) continue;
-    const stored = stripThousands(String(fact.value)).toLowerCase();
+    const stored = stripThousands(String(fact.value));
     const matches = disagreement.values.some(({ value }) =>
-      stripThousands(value).toLowerCase().includes(stored),
+      containsNumber(value, stored),
     );
     if (!matches) {
       errors.push(

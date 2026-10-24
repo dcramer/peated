@@ -29,7 +29,6 @@ type InputEntity = Partial<Entity> & {
 export const GenerateEntityDetailsJobArgsSchema = z
   .object({
     entityId: z.number().int().positive(),
-    force: z.boolean().default(false),
   })
   .strict();
 

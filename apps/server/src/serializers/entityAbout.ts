@@ -1,10 +1,13 @@
 import { db } from "@peated/server/db";
-import { entities, entityTombstones } from "@peated/server/db/schema";
+import { entities } from "@peated/server/db/schema";
 import {
   toPublicEntityAbout,
   type AboutLinkedEntity,
 } from "@peated/server/lib/entityAbout/publicAbout";
-import type { StoredEntityAbout } from "@peated/server/lib/entityAbout/store";
+import {
+  followMergedEntities,
+  type StoredEntityAbout,
+} from "@peated/server/lib/entityAbout/store";
 import type { EntityAboutPublic } from "@peated/server/schemas/entityAbout";
 import { inArray } from "drizzle-orm";
 import { serializer } from ".";
@@ -16,15 +19,7 @@ async function loadLinkedEntities(ids: number[]) {
   const linked = new Map<number, AboutLinkedEntity>();
   if (!ids.length) return linked;
 
-  const tombstones = await db
-    .select()
-    .from(entityTombstones)
-    .where(inArray(entityTombstones.entityId, ids));
-  const target = new Map<number, number>(ids.map((id) => [id, id]));
-  for (const tombstone of tombstones) {
-    if (tombstone.newEntityId)
-      target.set(tombstone.entityId, tombstone.newEntityId);
-  }
+  const target = await followMergedEntities(db, ids);
 
   const rows = await db
     .select({ id: entities.id, name: entities.name, kind: entities.kind })

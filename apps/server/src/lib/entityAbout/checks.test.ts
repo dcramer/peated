@@ -238,4 +238,30 @@ describe("checkConflictPicks", () => {
       "Event 1 stores 1970, which no source states.",
     ]);
   });
+
+  test("compares numbers whole, so 2 stills is not 12 or 20", () => {
+    const stills = (value: number) =>
+      draft({
+        sources: [
+          source,
+          { ...source, id: "df", url: "https://www.diffordsguide.com/brora" },
+        ],
+        siteFacts: {
+          washStills: {
+            value,
+            asOf: null,
+            writtenBy: "pipeline",
+            citations: [
+              { sourceId: "wp", statedValue: "12" },
+              { sourceId: "df", statedValue: "20" },
+            ],
+          },
+        },
+      });
+
+    expect(checkConflictPicks(stills(2))).toEqual([
+      "Site fact washStills stores 2, which no source states.",
+    ]);
+    expect(checkConflictPicks(stills(12))).toEqual([]);
+  });
 });

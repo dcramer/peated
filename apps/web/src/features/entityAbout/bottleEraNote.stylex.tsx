@@ -1,5 +1,6 @@
 "use client";
 
+import { hasEntityAboutPage } from "@peated/server/lib/entityAbout/display";
 import * as stylex from "@stylexjs/stylex";
 import { useQuery } from "@tanstack/react-query";
 
@@ -39,22 +40,25 @@ export function BottleEraNote({
 
   const context = getEraContext(about, distiller.name, vintageYear);
   if (!context) return null;
-  const href = `${getEntityUrl(distiller)}/about`;
+  // Link only when the About tab exists; otherwise the note stands alone.
+  const href = hasEntityAboutPage(about)
+    ? `${getEntityUrl(distiller)}/about`
+    : null;
+  const linked = (text: string) =>
+    href ? <TextLink href={href}>{text}</TextLink> : text;
 
   return (
     <span {...stylex.props(foundationStyles.metadata, styles.note)}>
       {context.kind === "era" ? (
         <>
           Distilled during {distiller.name}&apos;s{" "}
-          <TextLink href={href}>
-            {context.span.label.toLowerCase()} years
-          </TextLink>{" "}
-          ({context.span.start}–{context.span.end ?? "today"})
+          {linked(`${context.span.label.toLowerCase()} years`)} (
+          {context.span.start}–{context.span.end ?? "today"})
         </>
       ) : (
         <>
           Distilled when {distiller.name} was{" "}
-          <TextLink href={href}>called {context.span.label}</TextLink>
+          {linked(`called ${context.span.label}`)}
         </>
       )}
     </span>

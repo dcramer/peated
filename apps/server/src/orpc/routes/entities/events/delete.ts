@@ -1,11 +1,12 @@
 import { db } from "@peated/server/db";
-import { entities } from "@peated/server/db/schema";
+import { entities, entityEvents } from "@peated/server/db/schema";
 import { getUserActorForDatabase } from "@peated/server/lib/actors";
 import { pruneSources } from "@peated/server/lib/entityAbout/document";
 import { editEntityHistory } from "@peated/server/lib/entityAbout/legacyEvents";
 import {
   EntityAboutVersionError,
   EntityAboutWriteError,
+  getEntityAbout,
 } from "@peated/server/lib/entityAbout/store";
 import { procedure } from "@peated/server/orpc";
 import { requireMod } from "@peated/server/orpc/middleware";
@@ -38,14 +39,18 @@ export default procedure
     if (!entity) throw errors.NOT_FOUND({ message: "History item not found." });
 
     try {
-      await db.transaction(async (tx) =>
-        editEntityHistory(tx, {
+      await db.transaction(async (tx) => {
+        const stored = await getEntityAbout(tx, entity.id, { forUpdate: true });
+        const removed = stored?.document.events.find(
+          (event) => event.id === input.event,
+        );
+        if (!removed) {
+          throw errors.NOT_FOUND({ message: "History item not found." });
+        }
+        await editEntityHistory(tx, {
           entity,
           actor: await getUserActorForDatabase(tx, context.user),
           edit: (document) => {
-            if (!document.events.some((event) => event.id === input.event)) {
-              throw errors.NOT_FOUND({ message: "History item not found." });
-            }
             return pruneSources({
               ...document,
               events: document.events.filter(
@@ -72,8 +77,15 @@ export default procedure
               }),
             });
           },
-        }),
-      );
+        });
+        // The backfill copies `entity_event` rows; removing the row keeps a
+        // repeat run from bringing the item back.
+        if (removed.legacyEventId) {
+          await tx
+            .delete(entityEvents)
+            .where(eq(entityEvents.id, removed.legacyEventId));
+        }
+      });
     } catch (error) {
       if (error instanceof EntityAboutVersionError) {
         throw errors.CONFLICT({ message: error.message });
