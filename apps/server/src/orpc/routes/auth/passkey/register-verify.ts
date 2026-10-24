@@ -1,4 +1,5 @@
 import { db } from "@peated/server/db";
+import { uniqueViolationConstraint } from "@peated/server/db/errors";
 import { passkeys } from "@peated/server/db/schema";
 import { AuditEvent, auditLog } from "@peated/server/lib/auditLog";
 import {
@@ -78,10 +79,7 @@ export function createPasskeyRegisterVerifyProcedure(
           input.nickname,
         );
       } catch (err: any) {
-        if (
-          err?.code === "23505" &&
-          err?.constraint === "passkey_credential_id_unq"
-        ) {
+        if (uniqueViolationConstraint(err) === "passkey_credential_id_unq") {
           throw errors.CONFLICT({
             message: "This passkey is already registered.",
           });

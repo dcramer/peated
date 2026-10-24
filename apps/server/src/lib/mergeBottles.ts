@@ -3,6 +3,7 @@
  * complete Bottle. Related records move straight to that Bottle.
  */
 import { db, type AnyTransaction } from "@peated/server/db";
+import { uniqueViolationConstraint } from "@peated/server/db/errors";
 import type { Bottle, User } from "@peated/server/db/schema";
 import {
   auctionAlerts,
@@ -53,7 +54,6 @@ import { recomputeBottleStatsInTransaction } from "@peated/server/lib/recomputeB
 import type { Context } from "@peated/server/orpc/context";
 import { pushUniqueJob } from "@peated/server/worker/dispatch";
 import { and, asc, eq, inArray, or, sql } from "drizzle-orm";
-import { z } from "zod";
 
 export class BottleMergeAuthorizationError extends Error {
   constructor() {
@@ -153,21 +153,6 @@ function validateMergeInput(
   if (sourceBottleId === destinationBottleId) {
     throw new BottleMergeConflictError("same_bottle");
   }
-}
-
-function postgresConstraint(error: Error) {
-  let current: Error = error;
-  for (let depth = 0; depth < 5 && current instanceof Error; depth += 1) {
-    const candidate = z
-      .object({ code: z.string(), constraint: z.string().optional() })
-      .safeParse(current);
-    if (candidate.success && candidate.data.code === "23505") {
-      return candidate.data.constraint ?? null;
-    }
-    if (!(current.cause instanceof Error)) return null;
-    current = current.cause;
-  }
-  return null;
 }
 
 async function consolidateCollectionMemberships(
@@ -915,7 +900,8 @@ export async function mergeBottlesInTransaction(
   } catch (error) {
     if (
       ["tasting_unq", "tasting_legacy_unq"].includes(
-        (error instanceof Error ? postgresConstraint(error) : null) ?? "",
+        (error instanceof Error ? uniqueViolationConstraint(error) : null) ??
+          "",
       )
     ) {
       throw new BottleMergeConflictError("consumer_conflict", {

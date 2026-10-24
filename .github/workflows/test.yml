@@ -49,6 +49,7 @@ jobs:
               - ".oxlintrc.json"
               - "knip.jsonc"
               - "package.json"
+              - "patches/**"
               - "pnpm-lock.yaml"
               - "pnpm-workspace.yaml"
               - "sgconfig.yml"

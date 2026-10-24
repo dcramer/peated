@@ -62,7 +62,10 @@ describe("BottleGroup membership constraints", () => {
         .update(bottles)
         .set({ groupId: 9_000_000_000 })
         .where(eq(bottles.id, member.id)),
-    ).rejects.toThrow(/bottle_group_id_bottle_group_id_fk/);
+    ).rejects.toHaveProperty(
+      "cause.message",
+      expect.stringMatching(/bottle_group_id_bottle_group_id_fk/),
+    );
   });
 
   test("rejects a representative Bottle from a different group", async ({
@@ -76,7 +79,10 @@ describe("BottleGroup membership constraints", () => {
         .update(bottleGroups)
         .set({ representativeBottleId: otherBottle.id })
         .where(eq(bottleGroups.id, requireGroupId(bottle.groupId))),
-    ).rejects.toThrow(/bottle_group_representative_membership_fk/);
+    ).rejects.toHaveProperty(
+      "cause.message",
+      expect.stringMatching(/bottle_group_representative_membership_fk/),
+    );
   });
 
   test("protects a singleton representative from moving or deletion", async ({
@@ -94,13 +100,19 @@ describe("BottleGroup membership constraints", () => {
         .update(bottles)
         .set({ groupId: otherBottle.groupId })
         .where(eq(bottles.id, bottle.id)),
-    ).rejects.toThrow(/bottle_group_representative_membership_fk/);
+    ).rejects.toHaveProperty(
+      "cause.message",
+      expect.stringMatching(/bottle_group_representative_membership_fk/),
+    );
     await db
       .delete(bottleReferences)
       .where(eq(bottleReferences.bottleId, bottle.id));
     await expect(
       db.delete(bottles).where(eq(bottles.id, bottle.id)),
-    ).rejects.toThrow(/bottle_group_representative_membership_fk/);
+    ).rejects.toHaveProperty(
+      "cause.message",
+      expect.stringMatching(/bottle_group_representative_membership_fk/),
+    );
   });
 });
 
@@ -110,31 +122,46 @@ describe("Bottle fact constraints", () => {
 
     await expect(
       db.update(bottles).set({ abv: 101 }).where(eq(bottles.id, bottle.id)),
-    ).rejects.toThrow(/bottle_abv_check/);
+    ).rejects.toHaveProperty(
+      "cause.message",
+      expect.stringMatching(/bottle_abv_check/),
+    );
     await expect(
       db
         .update(bottles)
         .set({ vintageYear: 1799 })
         .where(eq(bottles.id, bottle.id)),
-    ).rejects.toThrow(/bottle_vintage_year_check/);
+    ).rejects.toHaveProperty(
+      "cause.message",
+      expect.stringMatching(/bottle_vintage_year_check/),
+    );
     await expect(
       db
         .update(bottles)
         .set({ bottlingYear: 1799 })
         .where(eq(bottles.id, bottle.id)),
-    ).rejects.toThrow(/bottle_bottling_year_check/);
+    ).rejects.toHaveProperty(
+      "cause.message",
+      expect.stringMatching(/bottle_bottling_year_check/),
+    );
     await expect(
       db
         .update(bottles)
         .set({ releaseYear: 1799 })
         .where(eq(bottles.id, bottle.id)),
-    ).rejects.toThrow(/bottle_release_year_check/);
+    ).rejects.toHaveProperty(
+      "cause.message",
+      expect.stringMatching(/bottle_release_year_check/),
+    );
     await expect(
       db
         .update(bottles)
         .set({ releaseYear: null, releaseMonth: 1 })
         .where(eq(bottles.id, bottle.id)),
-    ).rejects.toThrow(/bottle_release_month_check/);
+    ).rejects.toHaveProperty(
+      "cause.message",
+      expect.stringMatching(/bottle_release_month_check/),
+    );
   });
 
   test("rejects a non-positive barcode volume", async ({ fixtures }) => {
@@ -148,6 +175,9 @@ describe("Bottle fact constraints", () => {
         volume: 0,
         createdByActorId: bottle.createdByActorId,
       }),
-    ).rejects.toThrow(/bottle_barcode_volume_check/);
+    ).rejects.toHaveProperty(
+      "cause.message",
+      expect.stringMatching(/bottle_barcode_volume_check/),
+    );
   });
 });

@@ -117,16 +117,19 @@ const styles = stylex.create({
     minWidth: 0,
     flex: "0 1 auto",
     display: "flex",
-    // DESIGN.md: phones show each fact on one line, value then label, so the
-    // header leaves room for the page below it.
-    flexDirection: { default: "column", [PHONE]: "row" },
-    alignItems: { default: "stretch", [PHONE]: "baseline" },
-    columnGap: "6px",
+    flexDirection: "column",
   },
+  // DESIGN.md: phones show key fact values only, on one line. Values such as
+  // 46% or Single Malt read on their own, and the header leaves room for the
+  // page. Labels stay for screen readers.
   keyFactLabel: {
     order: 2,
+    position: { default: "static", [PHONE]: "absolute" },
+    width: { default: "auto", [PHONE]: "1px" },
+    height: { default: "auto", [PHONE]: "1px" },
     marginTop: { default: "6px", [PHONE]: 0 },
     overflow: "hidden",
+    clipPath: { default: "none", [PHONE]: "inset(50%)" },
     color: colors.inkMuted,
     textOverflow: "ellipsis",
     whiteSpace: "nowrap",

@@ -103,6 +103,9 @@ describe("catalog listing persistence", () => {
         url: "https://example.com/products/invalid-volume",
         volume: 0,
       }),
-    ).rejects.toThrow(/catalog_listing_volume_check/);
+    ).rejects.toHaveProperty(
+      "cause.message",
+      expect.stringMatching(/catalog_listing_volume_check/),
+    );
   });
 });

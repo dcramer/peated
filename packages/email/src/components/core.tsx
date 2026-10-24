@@ -61,22 +61,31 @@ export function Text({
   );
 }
 
+type ButtonProps = Omit<
+  ComponentProps<typeof DefaultButton>,
+  "width" | "height"
+> &
+  Partial<Pick<ComponentProps<typeof DefaultButton>, "width" | "height">>;
+
+// jsx-email sizes buttons from width and height so Outlook can draw them.
 export function Button({
   style = {},
+  width = 200,
+  height = 44,
   ...props
-}: ComponentProps<typeof DefaultButton>) {
+}: ButtonProps) {
   return (
     <DefaultButton
+      width={width}
+      height={height}
+      align="center"
+      backgroundColor={theme.colors.highlight}
+      borderColor={theme.colors.highlight}
+      borderRadius={4}
+      fontSize={14}
+      textColor={theme.colors.black}
       style={{
-        border: `1px solid ${theme.colors.highlight}`,
-        backgroundColor: theme.colors.highlight,
-        borderRadius: "4px",
-        padding: "12px",
-        textAlign: "center",
-        fontSize: "14px",
         fontWeight: "500",
-        color: theme.colors.black,
-        textDecoration: "none",
         ...style,
       }}
       {...props}

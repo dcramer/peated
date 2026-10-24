@@ -1644,6 +1644,75 @@ test("updates every Bottle in the merged BottleGroup", async ({
     data: expect.objectContaining({ creationSource: "repair_workflow" }),
   });
 });
+test("stops without changes when BottleGroup members would share one identity", async ({
+  fixtures,
+}) => {
+  const parent = await fixtures.Entity({
+    name: "Parent Group",
+    kind: "company",
+  });
+  const brand = await fixtures.Entity({ name: "House Brand", kind: "brand" });
+  const source = await fixtures.Entity({
+    name: "House Brothers Ltd.",
+    kind: "distillery",
+  });
+  const destination = await fixtures.Entity({
+    name: "House Brothers",
+    kind: "company",
+    ownerId: parent.id,
+  });
+  const representative = await fixtures.Bottle({
+    brandId: brand.id,
+    bottlerId: source.id,
+    distillerIds: [brand.id],
+    name: "18-year-old Gold Label",
+    statedAge: 18,
+    category: "single_malt",
+  });
+  const groupId = requireGroupId(representative.groupId);
+  const drifted = await fixtures.BottleGroupMember({ groupId, statedAge: 18 });
+  // The member's stored name and bottler drifted from its BottleGroup.
+  await db
+    .update(bottles)
+    .set({
+      name: "House Brand 18-year-old",
+      fullName: "House Brand 18-year-old",
+      bottlerId: null,
+    })
+    .where(eq(bottles.id, drifted.id));
+
+  await expect(
+    mergeEntity({ fromEntityIds: [source.id], toEntityId: destination.id }),
+  ).rejects.toThrow(
+    `BottleGroup ${groupId} has a Bottle that would match Bottle ${representative.id}. Merge or separate the matching Bottles before this Entity merge can continue.`,
+  );
+
+  await expect(
+    db.query.entities.findFirst({ where: eq(entities.id, source.id) }),
+  ).resolves.toBeDefined();
+  await expect(
+    db.query.entityTombstones.findFirst({
+      where: eq(entityTombstones.entityId, source.id),
+    }),
+  ).resolves.toBeUndefined();
+  await expect(
+    db.query.bottleGroups.findFirst({ where: eq(bottleGroups.id, groupId) }),
+  ).resolves.toMatchObject({ bottlerId: source.id });
+  expect(
+    await db.query.bottles.findMany({
+      where: eq(bottles.groupId, groupId),
+      orderBy: (table, { asc }) => [asc(table.id)],
+    }),
+  ).toEqual([
+    expect.objectContaining({ id: representative.id, bottlerId: source.id }),
+    expect.objectContaining({
+      id: drifted.id,
+      bottlerId: null,
+      fullName: "House Brand 18-year-old",
+    }),
+  ]);
+});
+
 test("operation-backed merge records applied only after canonical state and attributes catalog changes to the moderator", async ({
   fixtures,
 }) => {
