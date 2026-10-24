@@ -158,6 +158,10 @@ export function findAboutWriteErrors(
       errors.push(`Section ${section.key} is listed twice.`);
     }
     sectionKeys.add(section.key);
+    // Every section but the lead is labeled by its heading.
+    if (section.key !== "lead" && !section.heading) {
+      errors.push(`Section ${section.key} needs a heading.`);
+    }
     if (section.eraEventId && !eventIds.has(section.eraEventId)) {
       errors.push(`Section ${section.key} names a missing era.`);
     }

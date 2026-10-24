@@ -10,6 +10,7 @@ import {
   ensureSource,
 } from "@peated/server/lib/entityAbout/legacyEvents";
 import {
+  EntityAboutWriteError,
   getEntityAbout,
   saveEntityAbout,
 } from "@peated/server/lib/entityAbout/store";
@@ -65,7 +66,7 @@ export default procedure
     path: "/admin/catalog/backfill-entity-about",
     summary: "Copy entity history into About documents",
     description:
-      "Copy a page of Entities' legacy history items into their About documents. Items already in a document are skipped, so the call is safe to repeat. Continue with `nextAfterId` until it is null. Requires administrator privileges.",
+      "Copy a page of Entities' legacy history items into their About documents. Items already in a document are skipped, so the call is safe to repeat. An Entity whose history cannot be saved is listed in `failed` with the reasons, and the rest of the page continues. Continue with `nextAfterId` until it is null. Requires administrator privileges.",
     operationId: "backfillEntityAbout",
   })
   .input(
@@ -93,6 +94,9 @@ export default procedure
     z.object({
       copiedEvents: z.number(),
       entities: z.number(),
+      failed: z.array(
+        z.object({ entityId: z.number(), reasons: z.array(z.string()) }),
+      ),
       nextAfterId: z.number().nullable(),
     }),
   )
@@ -105,7 +109,7 @@ export default procedure
       .limit(input.limit + 1);
     const page = entityRows.slice(0, input.limit).map((row) => row.id);
     if (!page.length)
-      return { copiedEvents: 0, entities: 0, nextAfterId: null };
+      return { copiedEvents: 0, entities: 0, failed: [], nextAfterId: null };
 
     const rows = await db
       .select()
@@ -123,50 +127,74 @@ export default procedure
 
     const actor = await getPeatedSystemActorForDatabase(db);
     let copiedEvents = 0;
+    const failed: { entityId: number; reasons: string[] }[] = [];
     for (const entityId of page) {
       const legacyRows = rows.filter((row) => row.entityId === entityId);
       const entity = names.get(entityId);
       if (!entity) continue;
 
-      await db.transaction(async (tx) => {
-        const stored = await getEntityAbout(tx, entityId, { forUpdate: true });
-        // Copy rule: each `entity_event` row is copied once, matched by
-        // `legacyEventId`; document event IDs are per document and can
-        // collide with legacy row IDs.
-        const present = new Set(
-          stored?.document.events.flatMap((event) =>
-            event.legacyEventId ? [event.legacyEventId] : [],
+      // Legacy rows that break a store rule are reported, not skipped
+      // silently, so one bad row does not stall the backfill.
+      const badUrls = legacyRows.filter(
+        (row) => row.sourceUrl && !URL.canParse(row.sourceUrl),
+      );
+      if (badUrls.length) {
+        failed.push({
+          entityId,
+          reasons: badUrls.map(
+            (row) => `History item ${row.id} has an invalid source URL.`,
           ),
-        );
-        const missing = legacyRows.filter((row) => !present.has(row.id));
-        if (!missing.length) return;
-
-        const legacy = buildDocumentFromLegacyEvents(missing);
-        const document = stored
-          ? mergeEntityAboutDocuments(stored.document, legacy)
-          : legacy;
-        const copied =
-          document.events.length - (stored?.document.events.length ?? 0);
-        if (copied !== missing.length) {
-          throw new Error(
-            `Copied ${copied} of ${missing.length} history items for entity ${entityId}.`,
-          );
-        }
-        await saveEntityAbout(tx, {
-          entity,
-          document,
-          expectedVersion: stored?.version ?? null,
-          actor,
-          // Copying is not new writing; legacy items keep their state.
-          unchangedFrom: document,
         });
-        copiedEvents += copied;
-      });
+        continue;
+      }
+
+      try {
+        await db.transaction(async (tx) => {
+          const stored = await getEntityAbout(tx, entityId, {
+            forUpdate: true,
+          });
+          // Copy rule: each `entity_event` row is copied once, matched by
+          // `legacyEventId`; document event IDs are per document and can
+          // collide with legacy row IDs.
+          const present = new Set(
+            stored?.document.events.flatMap((event) =>
+              event.legacyEventId ? [event.legacyEventId] : [],
+            ),
+          );
+          const missing = legacyRows.filter((row) => !present.has(row.id));
+          if (!missing.length) return;
+
+          const legacy = buildDocumentFromLegacyEvents(missing);
+          const document = stored
+            ? mergeEntityAboutDocuments(stored.document, legacy)
+            : legacy;
+          const copied =
+            document.events.length - (stored?.document.events.length ?? 0);
+          if (copied !== missing.length) {
+            throw new Error(
+              `Copied ${copied} of ${missing.length} history items for entity ${entityId}.`,
+            );
+          }
+          await saveEntityAbout(tx, {
+            entity,
+            document,
+            expectedVersion: stored?.version ?? null,
+            actor,
+            // Copying is not new writing; legacy items keep their state.
+            unchangedFrom: document,
+          });
+          copiedEvents += copied;
+        });
+      } catch (error) {
+        if (!(error instanceof EntityAboutWriteError)) throw error;
+        failed.push({ entityId, reasons: error.reasons });
+      }
     }
 
     return {
       copiedEvents,
       entities: page.length,
+      failed,
       nextAfterId: entityRows.length > input.limit ? page.at(-1)! : null,
     };
   });

@@ -24,7 +24,8 @@ The document holds:
   stills or the water source. `apps/server/src/lib/entityAbout/aboutFactFields.ts`
   lists them. Adding one is one entry there.
 - **Sections**: short sentences. Each sentence lists the facts it rests on.
-  The section with key `lead` opens the page.
+  The section with key `lead` opens the page; every other section has a
+  heading.
 
 Every item records who wrote it: a `person` or the `pipeline`. The pipeline
 never replaces an item a person wrote. Every save stores the full document in
@@ -145,6 +146,8 @@ none, so it is stored but hidden until a source is found:
 `/admin/catalog/backfill-entity-about` copies `entity_event` rows into About
 documents. Each copied item records its row in `legacyEventId`, and the
 backfill copies a row only when no item records it, so repeat runs are safe.
+An Entity whose rows break a save rule, such as an invalid source URL, is
+listed in the response's `failed` with the reasons, and the page continues.
 Deleting a history item also deletes its row. Copied history counts as
 written by a person: the writer can add sources to it but never replaces it.
 
