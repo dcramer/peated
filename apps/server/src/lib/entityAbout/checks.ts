@@ -45,28 +45,32 @@ function normalizeForQuote(value: string) {
 const FILLER_WORDS = new Set(["and", "the", "for", "with"]);
 
 /**
- * Whether the quotes state `value`: every number in it, or every word that
- * carries meaning. A date needs only its year, because pages write months
- * and days many ways.
+ * Whether the quotes state `value`: every number in it, and the whole phrase
+ * or every word that carries meaning. A date needs only its year, because
+ * pages write months and days many ways.
  */
 function quotesState(quotes: readonly string[], value: string) {
   const checked = ISO_DATE_PATTERN.test(value) ? value.slice(0, 4) : value;
-  const numbers = stripThousands(checked).match(NUMBER_PATTERN);
-  if (numbers) {
-    return numbers.every((number) =>
-      quotes.some((quote) => containsNumber(quote, number)),
-    );
-  }
-  // The whole phrase, or each word that carries meaning: "James Ainslie and
-  // his partner John Risk" states "James Ainslie and John Risk".
+  const numbers = stripThousands(checked).match(NUMBER_PATTERN) ?? [];
+  const numbersStated = numbers.every((number) =>
+    quotes.some((quote) => containsNumber(quote, number)),
+  );
+  if (!numbersStated) return false;
+  // "James Ainslie and his partner John Risk" states "James Ainslie and John
+  // Risk". A value of only numbers, or only short words, needs its numbers
+  // or the whole phrase.
   const text = normalizeForQuote(quotes.join(" "));
   const phrase = normalizeForQuote(checked);
   if (text.includes(phrase)) return true;
-  const quoted = new Set(text.split(" "));
-  return phrase
+  const words = phrase
     .split(" ")
-    .filter((word) => word.length > 2 && !FILLER_WORDS.has(word))
-    .every((word) => quoted.has(word));
+    .filter(
+      (word) =>
+        word.length > 2 && !FILLER_WORDS.has(word) && !/^\p{N}+$/u.test(word),
+    );
+  if (!words.length) return numbers.length > 0;
+  const quoted = new Set(text.split(" "));
+  return words.every((word) => quoted.has(word));
 }
 
 /**
@@ -132,12 +136,18 @@ export function keepVerifiedCitations(
     }))
     .filter((event) => {
       const quotes = quotesOf(event.citations);
-      // Names are shown as facts too, so a quote must state them.
+      // Names are shown as facts too, so one quote must state each whole;
+      // words from different quotes do not make a name.
+      const named = (name: string | null) =>
+        !name ||
+        event.citations.some((citation) =>
+          quotesState(quotesOf([citation]), name),
+        );
       return (
         quotesState(quotes, event.date.slice(0, 4)) &&
         (!event.endDate || quotesState(quotes, event.endDate.slice(0, 4))) &&
-        (!event.name || quotesState(quotes, event.name)) &&
-        (!event.newOwnerName || quotesState(quotes, event.newOwnerName))
+        named(event.name) &&
+        named(event.newOwnerName)
       );
     });
 

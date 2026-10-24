@@ -97,8 +97,9 @@ it:
 - Every item matches the stored schema, including its length limits.
 - A quote must appear on a page the model read in this run and state the
   citation's value. A fact stands only when a kept quote states its year (or
-  number); a dated article's publication date counts. Citations that fail
-  are dropped, then facts with no citations left.
+  number); a dated article's publication date counts. A name or new owner
+  must appear whole in one quote. Citations that fail are dropped, then facts
+  with no citations left.
 - Every sentence cites facts in the draft. Every year and number in a
   sentence appears in those facts.
 - When sources disagree on a date or number, the chosen value must be one a
