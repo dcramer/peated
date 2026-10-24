@@ -21,6 +21,7 @@ import {
   valuesAgree,
 } from "./display";
 import {
+  countShownFacts,
   findAboutWriteErrors,
   normalizeSourceUrl,
   pruneSources,
@@ -304,6 +305,7 @@ function checkSentence(
 export function checkMergedAbout(
   stored: EntityAboutDocument | null,
   merged: EntityAboutDocument,
+  ownerNames: ReadonlyMap<number, string>,
 ) {
   const shown = getShownFactIds(merged);
   const factText = factSearchText(merged);
@@ -314,7 +316,9 @@ export function checkMergedAbout(
         checkSentence(section, sentence, shown, factText),
       ),
     );
-  const lost = stored ? getShownFactIds(stored).size - shown.size : 0;
+  const lost = stored
+    ? countShownFacts(stored, ownerNames) - countShownFacts(merged, ownerNames)
+    : 0;
   if (lost > 0) {
     errors.push(`The draft would show ${lost} fewer facts than the page does.`);
   }

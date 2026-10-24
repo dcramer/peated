@@ -10,6 +10,7 @@ import { ABOUT_FACT_FIELD_LIST } from "./aboutFactFields";
 import {
   eventFactId,
   getFactCitations,
+  getShownFactIds,
   siteFactId,
   valuesAgree,
 } from "./display";
@@ -370,6 +371,27 @@ function sameEvent(
     );
   }
   return sameText(keptDetail, draftDetail);
+}
+
+/**
+ * Counts the facts a page shows, with events that state the same fact
+ * counted once. A run folds such a copy into the kept event, so the copy is
+ * not a lost fact.
+ */
+export function countShownFacts(
+  document: EntityAboutDocument,
+  ownerNames: ReadonlyMap<number, string>,
+) {
+  const shown = getShownFactIds(document);
+  const events = document.events.filter((event) =>
+    shown.has(eventFactId(event.id)),
+  );
+  const copies = events.filter((event, index) =>
+    events
+      .slice(0, index)
+      .some((earlier) => sameEvent(earlier, event, ownerNames)),
+  );
+  return shown.size - copies.length;
 }
 
 /** Facts a person's section cites; a pipeline run keeps them as they are. */

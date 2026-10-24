@@ -448,6 +448,34 @@ describe("writeEntityAbout", () => {
     expect(about?.document.events.map(({ id }) => id)).toEqual([1, 2, 3]);
   });
 
+  test("folds a copy of a person's event without counting it as lost", async ({
+    fixtures,
+  }) => {
+    const entity = await fixtures.Entity({ kind: "distillery" });
+    await fixtures.EntityAbout({
+      entityId: entity.id,
+      events: [
+        { id: 1, kind: "opened", date: "1819", writtenBy: "pipeline" },
+        { id: 2, kind: "opened", date: "1819", writtenBy: "person" },
+        { id: 3, kind: "closed", date: "1983", writtenBy: "pipeline" },
+      ],
+    });
+
+    const result = await writeEntityAbout(
+      { entityId: entity.id },
+      services(async () => ({ draft: goodDraft, pagesRead: [page] })),
+    );
+
+    expect(result).toMatchObject({ status: "saved" });
+    const about = await getEntityAbout(db, entity.id);
+    expect(
+      about?.document.events.map(({ kind, writtenBy }) => [kind, writtenBy]),
+    ).toEqual([
+      ["opened", "person"],
+      ["closed", "pipeline"],
+    ]);
+  });
+
   test("rejects prose that contradicts a person's fact", async ({
     fixtures,
   }) => {

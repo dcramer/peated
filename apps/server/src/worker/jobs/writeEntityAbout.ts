@@ -313,7 +313,10 @@ function mergeAndCheck(
     now,
     ownerNames,
   );
-  return { merged, errors: checkMergedAbout(stored?.document ?? null, merged) };
+  return {
+    merged,
+    errors: checkMergedAbout(stored?.document ?? null, merged, ownerNames),
+  };
 }
 
 function rejected(entityId: number, errors: string[]): WriteEntityAboutResult {
