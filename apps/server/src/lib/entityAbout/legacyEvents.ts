@@ -160,7 +160,7 @@ export async function editEntityHistory(
     edit: (document: EntityAboutDocument) => EntityAboutDocument;
   },
 ) {
-  const stored = await getEntityAbout(tx, entity.id);
+  const stored = await getEntityAbout(tx, entity.id, { forUpdate: true });
   const document = edit(stored?.document ?? EMPTY_ABOUT_DOCUMENT);
   return await saveEntityAbout(tx, {
     entity,

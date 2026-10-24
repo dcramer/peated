@@ -129,8 +129,10 @@ none, so it is stored but hidden until a source is found:
 - History nobody can source stays stored and hidden. A moderator can add a
   source later.
 
-A run that publishes a lead replaces the Entity description, unless a person
-wrote it. After the writer has covered every distillery and brand,
+A run that publishes a lead replaces an empty or generated Entity
+description. A description a person wrote, or one written before Peated
+recorded who wrote descriptions, stays. A hidden page never changes the
+description. After the writer has covered every distillery and brand,
 `/admin/catalog/clear-entity-descriptions` clears each generated description
 that is not the published lead, so no unsourced description remains.
 Descriptions a person wrote stay.

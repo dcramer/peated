@@ -7,7 +7,10 @@ import {
   putLegacyEvent,
   toLegacyEvent,
 } from "@peated/server/lib/entityAbout/legacyEvents";
-import { EntityAboutWriteError } from "@peated/server/lib/entityAbout/store";
+import {
+  EntityAboutVersionError,
+  EntityAboutWriteError,
+} from "@peated/server/lib/entityAbout/store";
 import { procedure } from "@peated/server/orpc";
 import { requireMod } from "@peated/server/orpc/middleware";
 import {
@@ -82,6 +85,9 @@ export default procedure
       }
       return result;
     } catch (error) {
+      if (error instanceof EntityAboutVersionError) {
+        throw errors.CONFLICT({ message: error.message });
+      }
       if (error instanceof EntityAboutWriteError) {
         if (
           error.reasons.some((reason) => reason.startsWith("Linked entity"))

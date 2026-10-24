@@ -24,7 +24,8 @@ export const EntityEventDateSchema = z
 export const EntityEventInputFields = {
   kind: EntityEventKindEnum,
   date: EntityEventDateSchema,
-  description: z.string().trim().min(1).nullable().optional(),
+  // History text is stored as About event text, which allows 1000 characters.
+  description: z.string().trim().min(1).max(1000).nullable().optional(),
   newOwnerId: z.number().int().positive().nullable().optional(),
   sourceUrl: z.string().url().nullable().optional(),
 } as const;

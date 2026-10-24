@@ -129,6 +129,32 @@ describe("writeEntityAbout", () => {
     expect(saved?.description).toBe("Written by a moderator.");
   });
 
+  test("keeps descriptions it did not write", async ({ fixtures }) => {
+    // Unknown origin: written before descriptions recorded who wrote them.
+    const unknown = await fixtures.Entity({
+      kind: "distillery",
+      description: "An older description.",
+      descriptionSrc: null,
+    });
+    // A hidden page never feeds the public description.
+    const hidden = await fixtures.Entity({ kind: "distillery" });
+    await fixtures.EntityAbout({ entityId: hidden.id, status: "hidden" });
+
+    for (const entity of [unknown, hidden]) {
+      await writeEntityAbout(
+        { entityId: entity.id },
+        services(async () => ({ draft: goodDraft, pagesRead: [page] })),
+      );
+    }
+
+    const rows = await db
+      .select({ id: entities.id, description: entities.description })
+      .from(entities);
+    const byId = new Map(rows.map((row) => [row.id, row.description]));
+    expect(byId.get(unknown.id)).toBe("An older description.");
+    expect(byId.get(hidden.id)).toBe(hidden.description);
+  });
+
   test("keeps a description a person writes during the run", async ({
     fixtures,
   }) => {
