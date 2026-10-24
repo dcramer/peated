@@ -12,6 +12,7 @@ const company = {
   ...mockEntity,
   id: 1,
   images: [],
+  hasAbout: false,
   kind: "company",
   name: "Example Company",
 } satisfies Entity;

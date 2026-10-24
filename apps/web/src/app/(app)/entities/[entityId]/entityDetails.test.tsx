@@ -10,6 +10,7 @@ describe("EntityDetails", () => {
     const entity = {
       ...mockEntity,
       images: [],
+      hasAbout: false,
       ownerId: 2,
       owner: {
         id: 2,
@@ -29,6 +30,7 @@ describe("EntityDetails", () => {
     const entity = {
       ...mockEntity,
       images: [],
+      hasAbout: false,
       status: "mothballed",
     } satisfies Entity;
 
@@ -39,7 +41,12 @@ describe("EntityDetails", () => {
   });
 
   test("omits an unknown status", () => {
-    const entity = { ...mockEntity, images: [], status: null } satisfies Entity;
+    const entity = {
+      ...mockEntity,
+      images: [],
+      hasAbout: false,
+      status: null,
+    } satisfies Entity;
 
     const html = renderToStaticMarkup(<EntityDetails entity={entity} />);
 

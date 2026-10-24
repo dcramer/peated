@@ -1,6 +1,7 @@
 import type { MockOutputs } from "../contract";
 import { timestamp } from "./constants";
 import { mockEntity } from "./entities";
+import { mockBroraHistory } from "./entity-about";
 
 export const mockEntityHistory = [
   {
@@ -10,6 +11,7 @@ export const mockEntityHistory = [
     date: "1816",
     description: "Licensed on the south shore of Islay.",
     newOwnerId: null,
+    newOwnerName: null,
     sourceUrl:
       "https://www.malts.com/en-us/articles/lagavulin-from-the-isle-of-islay-to-global-phenomenon",
     createdAt: timestamp,
@@ -23,6 +25,7 @@ export const mockEntityHistory = [
     description:
       "Became part of Diageo when Guinness and Grand Metropolitan merged.",
     newOwnerId: 9210,
+    newOwnerName: null,
     sourceUrl: "https://www.diageo.com/en/our-business/our-history",
     createdAt: timestamp,
     updatedAt: timestamp,
@@ -34,6 +37,7 @@ export const mockEntityHistory = [
     date: "2016",
     description: "Marked its 200th anniversary with an 8-year-old whisky.",
     newOwnerId: null,
+    newOwnerName: null,
     sourceUrl:
       "https://www.malts.com/en-gb/products/lagavulin-8-year-old-single-malt-scotch-whisky-70cl",
     createdAt: timestamp,
@@ -43,6 +47,7 @@ export const mockEntityHistory = [
 
 export const mockEntityHistories = [
   ...mockEntityHistory,
+  ...mockBroraHistory,
   {
     id: 9804,
     entityId: 9204,
@@ -51,6 +56,7 @@ export const mockEntityHistories = [
     description:
       "Daniel Swigert developed a distillery at the site now known as Buffalo Trace.",
     newOwnerId: null,
+    newOwnerName: null,
     sourceUrl: "https://www.buffalotracedistillery.com/buffalo-trace-history/",
     createdAt: timestamp,
     updatedAt: timestamp,
@@ -62,6 +68,7 @@ export const mockEntityHistories = [
     date: "1992",
     description: "The Sazerac Company purchased the distillery.",
     newOwnerId: 9217,
+    newOwnerName: null,
     sourceUrl: "https://www.buffalotracedistillery.com/buffalo-trace-history/",
     createdAt: timestamp,
     updatedAt: timestamp,
@@ -74,6 +81,7 @@ export const mockEntityHistories = [
     description:
       "The new Midleton Distillery opened beside the older distillery.",
     newOwnerId: null,
+    newOwnerName: null,
     sourceUrl: "https://www.irishdistillers.ie/our-story/",
     createdAt: timestamp,
     updatedAt: timestamp,
@@ -86,6 +94,7 @@ export const mockEntityHistories = [
     description:
       "The first official reference to Redbreast appeared in Gilbey's records.",
     newOwnerId: null,
+    newOwnerName: null,
     sourceUrl: "https://www.redbreastwhiskey.com/en-us/heritage/",
     createdAt: timestamp,
     updatedAt: timestamp,
@@ -97,6 +106,7 @@ export const mockEntityHistories = [
     date: "1983",
     description: "The Society made its home at The Vaults in Leith, Edinburgh.",
     newOwnerId: null,
+    newOwnerName: null,
     sourceUrl: "https://smws.com/venues/the-vaults-edinburgh",
     createdAt: timestamp,
     updatedAt: timestamp,
@@ -108,6 +118,7 @@ export const mockEntityHistories = [
     date: "1988",
     description: "Irish Distillers joined Pernod Ricard.",
     newOwnerId: 9218,
+    newOwnerName: null,
     sourceUrl: "https://www.irishdistillers.ie/our-story/",
     createdAt: timestamp,
     updatedAt: timestamp,

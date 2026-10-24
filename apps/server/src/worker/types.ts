@@ -11,6 +11,7 @@ export type JobName =
   | "GenerateEntityDetails"
   | "GenerateEntityPronunciationAudio"
   | "GenerateRegionDetails"
+  | "WriteEntityAbout"
   | "GeocodeCountryLocation"
   | "GeocodeRegionLocation"
   | "GeocodeEntityLocation"

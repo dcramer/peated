@@ -91,6 +91,9 @@ export default {
     process.env.SCRAPER_FIRECRAWL_API_KEY?.trim() || null,
   PEATED_BOT_PRIVATE_JWK: process.env.PEATED_BOT_PRIVATE_JWK?.trim() || null,
   FIRECRAWL_API_URL: process.env.FIRECRAWL_API_URL || null,
+  // The About writer publishes without review; it stays off until an
+  // administrator turns it on.
+  ENTITY_ABOUT_WRITER_ENABLED: process.env.ENTITY_ABOUT_WRITER_ENABLED === "1",
   BOTTLE_CLASSIFIER_MAX_SEARCH_QUERIES: Number(
     process.env.BOTTLE_CLASSIFIER_MAX_SEARCH_QUERIES ||
       process.env.PRICE_MATCH_MAX_SEARCH_QUERIES ||

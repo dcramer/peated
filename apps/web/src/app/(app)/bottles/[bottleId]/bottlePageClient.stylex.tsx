@@ -39,6 +39,7 @@ import {
   type RowMenuItem,
 } from "@peated/web/components/rowMenu.stylex";
 import { TextLink } from "@peated/web/components/textLink.stylex";
+import { BottleEraNote } from "@peated/web/features/entityAbout/bottleEraNote.stylex";
 import { FlavorProfileSection } from "@peated/web/features/flavorProfile/flavorProfileSection";
 import useAuth from "@peated/web/hooks/useAuth";
 import {
@@ -123,7 +124,16 @@ function getDeclaredFacts(bottle: Bottle): [FactListItem, ...FactListItem[]] {
     { label: "Edition", value: bottle.edition },
     {
       label: "Vintage",
-      value: bottle.vintageYear === null ? null : String(bottle.vintageYear),
+      value:
+        bottle.vintageYear === null ? null : (
+          <>
+            {bottle.vintageYear}
+            <BottleEraNote
+              distillers={bottle.distillers}
+              vintageYear={bottle.vintageYear}
+            />
+          </>
+        ),
     },
     {
       label: "Bottled",

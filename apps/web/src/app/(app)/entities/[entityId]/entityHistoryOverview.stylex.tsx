@@ -8,17 +8,26 @@ import {
 import { HistoryTimeline } from "@peated/web/components/historyTimeline.stylex";
 import { PageSection } from "@peated/web/components/pages/pageLayout.stylex";
 
-import { getEntityHistoryEvents } from "./entityHistoryData";
+import { TextLink } from "@peated/web/components/textLink.stylex";
+import { foundationStyles } from "@peated/web/styles/foundations.stylex";
+
+import {
+  getEntityHistoryEvents,
+  getKeyHistoryEvents,
+} from "./entityHistoryData";
 
 type EntityEventList = Outputs["entities"]["events"]["list"];
 
 export function EntityHistoryOverview({
+  aboutHref,
   entityName,
   error,
   eventList,
   pending,
   retry,
 }: {
+  /** When set, show key dates only and link to the full history. */
+  aboutHref?: string;
   entityName: string;
   error: boolean;
   eventList?: EntityEventList;
@@ -47,13 +56,21 @@ export function EntityHistoryOverview({
     );
   }
 
-  const events = getEntityHistoryEvents(eventList?.results ?? []);
+  const results = eventList?.results ?? [];
+  const events = getEntityHistoryEvents(
+    aboutHref ? getKeyHistoryEvents(results) : results,
+  );
   if (!events.length) return null;
 
   return (
     <div id="history" {...stylex.props(styles.anchor)}>
       <PageSection heading="History">
         <HistoryTimeline events={events} />
+        {aboutHref ? (
+          <p {...stylex.props(foundationStyles.body, styles.more)}>
+            <TextLink href={aboutHref}>Read the full history</TextLink>
+          </p>
+        ) : null}
       </PageSection>
     </div>
   );
@@ -62,5 +79,8 @@ export function EntityHistoryOverview({
 const styles = stylex.create({
   anchor: {
     scrollMarginTop: "24px",
+  },
+  more: {
+    margin: 0,
   },
 });

@@ -122,7 +122,7 @@ test("drops a generated pronunciation in the wrong format", async ({
   });
   const model = vi.fn<EntityDetailsModel>(async () =>
     generatedDetails({
-      description: "A Highland distillery in Oldmeldrum.",
+      yearEstablished: 1797,
       pronunciation: "Glen Geery",
       pronunciationIpa: "/ɡlɛn ˈɡɪəri/",
     }),
@@ -131,7 +131,7 @@ test("drops a generated pronunciation in the wrong format", async ({
   await generateEntityDetails(entity.id, model);
 
   await expect(readEntity(entity.id)).resolves.toMatchObject({
-    description: "A Highland distillery in Oldmeldrum.",
+    yearEstablished: 1797,
     pronunciation: null,
     pronunciationIpa: null,
   });
@@ -156,4 +156,21 @@ test("skips the model when every generated field is filled", async ({
   await generateEntityDetails(entity.id, model);
 
   expect(model).not.toHaveBeenCalled();
+});
+
+test("never writes a description from the model", async ({ fixtures }) => {
+  const entity = await fixtures.Entity({
+    name: "Glen Garioch",
+    kind: "distillery",
+    description: null,
+  });
+  const model = vi.fn<EntityDetailsModel>(async () =>
+    generatedDetails({ description: "A Highland distillery in Oldmeldrum." }),
+  );
+
+  await generateEntityDetails(entity.id, model);
+
+  await expect(readEntity(entity.id)).resolves.toMatchObject({
+    description: null,
+  });
 });

@@ -71,6 +71,7 @@ export default async function EntityBottlesPage(props: {
         "entity",
         "limit",
         "series",
+        "vintageYear",
       ],
       overrides: {
         company: entity.kind === "company" ? entity.id : undefined,

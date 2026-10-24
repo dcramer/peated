@@ -1,5 +1,7 @@
 import { base } from "../..";
+import backfillEntityAbout from "./backfill-entity-about";
 import catalogCoverage from "./catalog-coverage";
+import clearEntityDescriptions from "./clear-entity-descriptions";
 import content from "./content";
 import moderation from "./moderation";
 import oauthClients from "./oauth-clients";
@@ -8,9 +10,12 @@ import rebuildPronunciationAudio from "./rebuild-pronunciation-audio";
 import rebuildSearch from "./rebuild-search";
 import reports from "./reports";
 import scraperActivity from "./scraper-activity";
+import writeEntityAbout from "./write-entity-about";
 import wrongPhotoMatches from "./wrongPhotoMatches";
 
 export default base.tag("admin").router({
+  backfillEntityAbout,
+  clearEntityDescriptions,
   catalogCoverage,
   content,
   moderation,
@@ -21,4 +26,5 @@ export default base.tag("admin").router({
   reports,
   scraperActivity,
   wrongPhotoMatches,
+  writeEntityAbout,
 });

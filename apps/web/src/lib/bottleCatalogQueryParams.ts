@@ -26,6 +26,7 @@ export const BOTTLE_CATALOG_QUERY_FIELDS = [
   "series",
   "sort",
   "tag",
+  "vintageYear",
 ] as const;
 
 export const BOTTLE_CATALOG_ALLOWED_VALUES = {

@@ -230,6 +230,10 @@ export const EntityDetailsSchema = EntitySchema.extend({
     .boolean()
     .readonly()
     .describe("Whether the current user follows this entity"),
+  hasAbout: z
+    .boolean()
+    .readonly()
+    .describe("Whether the entity has a published About page"),
 });
 
 export const EntityInputFields = {

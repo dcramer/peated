@@ -15,6 +15,7 @@ export * from "./comments";
 export * from "./common";
 export * from "./countries";
 export * from "./entities";
+export * from "./entityAbout";
 export * from "./entityEvents";
 export * from "./events";
 export * from "./externalReviews";

@@ -30,6 +30,7 @@ import {
 } from "@peated/server/lib/bottleChecks";
 import { prepareOperation } from "@peated/server/lib/bottleOperationReview";
 import { createBottle } from "@peated/server/lib/createBottle";
+import { getEntityAbout } from "@peated/server/lib/entityAbout/store";
 import { loadEntityMergeOperation } from "@peated/server/lib/entityMergeOperation";
 import {
   getPronunciationAudioUrl,
@@ -175,6 +176,182 @@ test("repoints history when Entities merge", async ({ fixtures }) => {
       where: eq(entityEvents.id, duplicateEvent.id),
     }),
   ).toBeUndefined();
+});
+
+test("combines About documents when Entities merge", async ({ fixtures }) => {
+  const source = await fixtures.Entity({ kind: "distillery" });
+  const destination = await fixtures.Entity({ kind: "distillery" });
+  await fixtures.EntityAbout({
+    entityId: destination.id,
+    events: [{ id: 1, kind: "opened", date: "1819" }],
+    sections: [
+      {
+        key: "lead",
+        heading: null,
+        eraEventId: null,
+        writtenBy: "person",
+        sentences: [{ text: "It opened in 1819.", factIds: ["event:1"] }],
+      },
+    ],
+  });
+  await fixtures.EntityAbout({
+    entityId: source.id,
+    sources: [
+      {
+        id: "a",
+        url: "https://example.com/history",
+        title: "History",
+        publisher: null,
+        publishedOn: null,
+        kind: "reference",
+        status: "available",
+      },
+    ],
+    events: [
+      { id: 1, kind: "closed", date: "1983" },
+      // Would say the merged Entity acquired itself.
+      { id: 2, kind: "acquired", date: "1990", newOwnerId: destination.id },
+    ],
+    sections: [
+      {
+        key: "lead",
+        heading: null,
+        eraEventId: null,
+        writtenBy: "pipeline",
+        sentences: [{ text: "It closed in 1983.", factIds: ["event:1"] }],
+      },
+    ],
+  });
+
+  await mergeEntity({
+    fromEntityIds: [source.id],
+    toEntityId: destination.id,
+  });
+
+  const about = await getEntityAbout(db, destination.id);
+  expect(about?.document.events.map(({ kind, date }) => [kind, date])).toEqual([
+    ["opened", "1819"],
+    ["closed", "1983"],
+  ]);
+  // Both documents used the same URL, so there is one source.
+  expect(about?.document.sources).toHaveLength(1);
+  expect(about?.document.sections.map(({ sentences }) => sentences)).toEqual([
+    [{ text: "It opened in 1819.", factIds: ["event:1"] }],
+  ]);
+});
+
+test("keeps a hidden About page hidden after a merge", async ({ fixtures }) => {
+  const source = await fixtures.Entity({ kind: "distillery" });
+  const destination = await fixtures.Entity({ kind: "distillery" });
+  await fixtures.EntityAbout({
+    entityId: source.id,
+    status: "hidden",
+    events: [{ id: 1, kind: "closed", date: "1983" }],
+  });
+
+  await mergeEntity({
+    fromEntityIds: [source.id],
+    toEntityId: destination.id,
+  });
+
+  const about = await getEntityAbout(db, destination.id);
+  expect(about?.status).toBe("hidden");
+});
+
+test("keeps a hidden page's facts off a published page", async ({
+  fixtures,
+}) => {
+  const source = await fixtures.Entity({ kind: "distillery" });
+  const destination = await fixtures.Entity({ kind: "distillery" });
+  await fixtures.EntityAbout({
+    entityId: source.id,
+    status: "hidden",
+    events: [{ id: 1, kind: "closed", date: "1983" }],
+  });
+  await fixtures.EntityAbout({
+    entityId: destination.id,
+    events: [{ id: 1, kind: "opened", date: "1819" }],
+  });
+
+  await mergeEntity({
+    fromEntityIds: [source.id],
+    toEntityId: destination.id,
+  });
+
+  const about = await getEntityAbout(db, destination.id);
+  expect(about?.status).toBe("published");
+  expect(about?.document.events.map(({ kind }) => kind)).toEqual(["opened"]);
+});
+
+test("removes a self-acquisition when the merged Entity has no About page", async ({
+  fixtures,
+}) => {
+  const owner = await fixtures.Entity({ kind: "company" });
+  const destination = await fixtures.Entity({ kind: "distillery" });
+  await fixtures.EntityAbout({
+    entityId: destination.id,
+    events: [
+      { id: 1, kind: "opened", date: "1819" },
+      { id: 2, kind: "acquired", date: "1925", newOwnerId: owner.id },
+    ],
+  });
+
+  await mergeEntity({
+    fromEntityIds: [owner.id],
+    toEntityId: destination.id,
+  });
+
+  const about = await getEntityAbout(db, destination.id);
+  expect(about?.document.events.map(({ kind }) => kind)).toEqual(["opened"]);
+});
+
+test("moves history that links a deleted Entity", async ({ fixtures }) => {
+  const source = await fixtures.Entity({ kind: "distillery" });
+  const destination = await fixtures.Entity({ kind: "distillery" });
+  // A deleted Entity leaves a tombstone with no replacement.
+  await db
+    .insert(entityTombstones)
+    .values({ entityId: 987_655, newEntityId: null });
+  await fixtures.EntityAbout({
+    entityId: source.id,
+    events: [{ id: 1, kind: "acquired", date: "1925", newOwnerId: 987_655 }],
+  });
+
+  await mergeEntity({
+    fromEntityIds: [source.id],
+    toEntityId: destination.id,
+  });
+
+  const about = await getEntityAbout(db, destination.id);
+  expect(about?.document.events.map(({ newOwnerId }) => newOwnerId)).toEqual([
+    987_655,
+  ]);
+});
+
+test("drops site facts the merge target cannot have", async ({ fixtures }) => {
+  const source = await fixtures.Entity({ kind: "distillery" });
+  const destination = await fixtures.Entity({ kind: "brand" });
+  await fixtures.EntityAbout({
+    entityId: source.id,
+    events: [{ id: 1, kind: "closed", date: "1983" }],
+    siteFacts: {
+      washStills: {
+        value: 1,
+        asOf: null,
+        citations: [{ sourceId: "s1", statedValue: "1", quote: null }],
+        writtenBy: "person",
+      },
+    },
+  });
+
+  await mergeEntity({
+    fromEntityIds: [source.id],
+    toEntityId: destination.id,
+  });
+
+  const about = await getEntityAbout(db, destination.id);
+  expect(about?.document.siteFacts).toEqual({});
+  expect(about?.document.events.map(({ kind }) => kind)).toEqual(["closed"]);
 });
 
 test("keeps images when Entities merge", async ({ fixtures }) => {
