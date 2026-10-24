@@ -42,6 +42,8 @@ export default implement(entityEventListContract).handler(async function ({
       const newOwnerId = legacy.newOwnerId
         ? (owners.get(legacy.newOwnerId) ?? legacy.newOwnerId)
         : null;
+      // An owner merged into this Entity would read as it buying itself.
+      if (newOwnerId === entity.id) return [];
       return [{ ...legacy, newOwnerId }];
     });
 

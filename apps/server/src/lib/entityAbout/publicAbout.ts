@@ -55,6 +55,13 @@ export function toPublicEntityAbout(
 ): EntityAboutPublic {
   const { document } = item;
   const shown = getShownFactIds(document);
+  // Merge rule (owner: `mergeEntity`): an owner later merged into this
+  // Entity would read as the Entity buying itself, so that event is hidden.
+  for (const event of document.events) {
+    const owner = event.newOwnerId && linkedEntities.get(event.newOwnerId);
+    if (owner && owner.id === item.entityId)
+      shown.delete(eventFactId(event.id));
+  }
   const factCitations = getFactCitations(document);
   const sourceIdsForFact = (factId: string) =>
     (factCitations.get(factId) ?? []).map((c) => c.sourceId);

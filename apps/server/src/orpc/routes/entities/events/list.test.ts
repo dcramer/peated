@@ -25,6 +25,33 @@ describe("GET /entities/:entity/events", () => {
     expect(results.map(({ newOwnerId }) => newOwnerId)).toEqual([owner.id]);
   });
 
+  test("hides an acquisition by an owner merged into the Entity", async ({
+    fixtures,
+  }) => {
+    const entity = await fixtures.Entity();
+    const mergedOwner = await fixtures.Entity({ kind: "company" });
+    await db
+      .insert(entityTombstones)
+      .values({ entityId: mergedOwner.id, newEntityId: entity.id });
+    await fixtures.EntityAbout({
+      entityId: entity.id,
+      events: [
+        { id: 1, kind: "opened", date: "1819" },
+        { id: 2, kind: "acquired", date: "1925", newOwnerId: mergedOwner.id },
+      ],
+    });
+
+    const { results } = await routerClient.entities.events.list({
+      entity: entity.id,
+    });
+    const about = await routerClient.entities.about.details({
+      entity: entity.id,
+    });
+
+    expect(results.map(({ kind }) => kind)).toEqual(["opened"]);
+    expect(about?.events.map(({ kind }) => kind)).toEqual(["opened"]);
+  });
+
   test("lists history in date order", async ({ fixtures }) => {
     const entity = await fixtures.Entity();
     await fixtures.EntityAbout({

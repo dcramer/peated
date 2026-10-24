@@ -1,4 +1,5 @@
 import { db } from "@peated/server/db";
+import { entityTombstones } from "@peated/server/db/schema";
 import { getEntityAbout } from "@peated/server/lib/entityAbout/store";
 import waitError from "@peated/server/lib/test/waitError";
 import { routerClient } from "@peated/server/orpc/router";
@@ -110,6 +111,32 @@ describe("POST /entities/:entity/events", () => {
     );
 
     expect(err).toMatchInlineSnapshot(`[Error: Input validation failed]`);
+  });
+
+  test("rejects an owner that was deleted", async ({ fixtures }) => {
+    const user = await fixtures.User({ mod: true });
+    const entity = await fixtures.Entity();
+    // A deleted Entity leaves a tombstone with no replacement.
+    await db
+      .insert(entityTombstones)
+      .values({ entityId: 987_654, newEntityId: null });
+
+    const err = await waitError(() =>
+      routerClient.entities.events.create(
+        {
+          entity: entity.id,
+          kind: "acquired",
+          date: "1925",
+          newOwnerId: 987_654,
+          sourceUrl: "https://example.com/history",
+        },
+        { context: { user } },
+      ),
+    );
+
+    expect(err).toMatchInlineSnapshot(
+      `[Error: Linked entity 987654 does not exist.]`,
+    );
   });
 
   test("requires a source", async ({ fixtures }) => {
