@@ -29,9 +29,20 @@ The document holds:
   The section with key `lead` opens the page; every other section has a
   heading.
 
-Every item records who wrote it: a `person` or the `pipeline`. The pipeline
-never replaces an item a person wrote. Every save stores the full document in
-the `change` table, so an earlier version can be restored.
+The page is a generated artifact. Each writer run returns the whole next
+version, and moderators can patch it. Every save stores the full document in
+the `change` table, so an earlier version can be restored. Facts that must
+survive every run belong in notes or in the history timeline, not only on the
+page.
+
+Two other stores feed the writer:
+
+- **History timeline** (`entity_event`): the Entity's dated history items,
+  edited through `entities.events.*` and shown on the Overview. The writer
+  reads them as leads, so the page's events roughly cover them.
+- **Notes** (`entity_about_note`): plain-text notes moderators keep for the
+  writer, such as a fact to keep or a trap to avoid, with an optional source
+  URL. Every run reads them. They guide the writer but are never cited.
 
 History about a production site belongs on the Distillery. History about a
 label belongs on the Brand. See
@@ -73,27 +84,21 @@ Catalog numbers are counted from active Bottles at read time, the same way as
 the Entity Bottles tab. Prose never states them; they change daily. Chart bars
 link to the Bottle list filtered to that year.
 
-When an Entity has an About page, its Overview shows key dates and a link
-instead of the full history list. A Bottle page with one distiller and a
+A Bottle page with one distiller and a
 vintage notes the era or former name that covers that vintage. The note
 links to the About page only when that page exists.
 
 ## Who Can Change It
 
-- Moderators read the full document, with quotes and who wrote each item,
-  through `entities.about.document`, and send it back with their edits
-  through `entities.about.update`, along with the version they read. The
-  public page leaves quotes out, so it is not a starting point for edits.
-  Their edits are marked as written by a person. An edit that leaves one of
-  the pipeline's shown sentences at odds with a fact it cites is rejected,
-  so a person who changes a fact also fixes the sentences that state it.
-  They can hide or show the page with `entities.about.status`.
-- The legacy Entity history routes (`entities.events.*`) edit the same
-  document. A new history item needs a source URL. Changing an item's date
-  or kind keeps its sources but clears what they were quoted as stating. An
-  edit that changes nothing leaves the item as it was and saves nothing. These routes address
-  items by ID, so the writer never gives a replaced item's ID to another
-  fact.
+- Moderators read the full document, with quotes, through
+  `entities.about.document`, and send back a new version through
+  `entities.about.update`, along with the version they read. The public page
+  leaves quotes out, so it is not a starting point for edits. Every event,
+  site fact, and sentence needs a source. The next writer run may rewrite
+  their edit; a fact that must stay belongs in a note. They can hide or show
+  the page with `entities.about.status`.
+- Moderators keep notes with `entities.about.notes.list`, `create`, and
+  `delete`.
 - The `writeEntityAbout` worker job writes as the `aboutPipeline` system
   actor. Administrators queue it with `/admin/catalog/write-entity-about`.
   `ENTITY_ABOUT_WRITER_ENABLED` turns it off; so does a missing
@@ -103,13 +108,15 @@ links to the About page only when that page exists.
 ## How The Job Writes A Page
 
 `writeEntityAbout` makes one model call with web search and page-reading
-tools and fixed limits. The model returns a draft document. Code then checks
-it:
+tools and fixed limits. The model gets the Entity's fields, its notes, its
+history timeline, and the current page, and returns the complete next
+version. It may keep, correct, add, or drop anything. Code then checks it:
 
 - Every item matches the stored schema, including its length limits.
-- A quote must appear on a page the model read in this run and state the
-  citation's value. A fact stands only when a kept quote states its year (or
-  number); a dated article's publication date counts. A name or new owner
+- A quote must appear on a page the model read in this run, or be the same
+  quote from the same page as one the current page already has, and state
+  the citation's value. A fact stands only when a kept quote states its year
+  (or number); a dated article's publication date counts. A name or new owner
   must appear whole in one quote, and every number in an event's text or
   title must appear in a quote. Citations that fail are dropped, then facts
   with no citations left.
@@ -126,15 +133,14 @@ store's own save rules run as a check too, so a draft the store would reject
 gets its retry. A draft with no sourced facts fails.
 
 A draft that fails gets one retry with the reasons. After that, the job saves
-nothing. A draft that passes is merged into the stored document, keeping
-every item a person wrote and every pipeline fact a person's section cites.
-After the merge, the pipeline's sentences are checked again against the
-facts they cite, so a sentence cannot contradict a value a person set. A run
-never leaves the page with fewer shown facts; such a draft, for example one
-written while search was failing, saves nothing. A moderator
-removes facts by editing. The merge is saved with a version check. When an
-item a person wrote breaks a store rule, such as a site fact kept after the
-Entity's kind changed, the job saves nothing until a moderator fixes it.
+nothing. A draft that passes is saved as the next version, with a version
+check: a page a moderator edited during the run fails it, and the job is
+retried from the new page. A bad run is undone by restoring an earlier
+version from the change log.
+
+New owners are stored by name. When exactly one Entity or alias has that
+name, the job links it, and the page shows a link while that Entity exists,
+following merges to the Entity it became. Otherwise the page shows the name.
 
 A model check runs this job on 5 Entities with saved pages instead of the
 live web: `apps/server/src/agents/entityAbout/writer.eval.test.ts`. Each case
@@ -142,52 +148,13 @@ in `apps/server/src/agents/entityAbout/evals/` lists its pages, the events a
 careful writer should find, and review notes. See
 `docs/development/model-checks.md`.
 
-## History Without Sources
-
-All shown history needs a source. History copied from `entity_event` often has
-none, so it is stored but hidden until a source is found:
-
-- The job lists each stored event the page cannot show in the writer's input,
-  as a lead to check. It is not evidence.
-- When a draft event has the same kind as a kept event (one a person wrote, or
-  one with no citations), the dates agree, and no name, owner, or title
-  conflicts, the draft's citations are added to the kept event. Its date and
-  text stay as stored, and no second event is added. A generic event matches
-  only the same text, or a listed item whose number the writer reuses,
-  because many different things happen in one year.
-- History nobody can source stays stored and hidden. A moderator can add a
-  source later.
-
-## Copying Legacy History
-
-`/admin/catalog/backfill-entity-about` copies `entity_event` rows into About
-documents. The history routes read only documents, so run it right after the
-API deploy: until it finishes, Overview history is empty and editing an old
-item returns not found. Each copied item records its row in `legacyEventId`, and the
-backfill copies a row only when no item records it, so repeat runs are safe.
-An Entity whose rows break a save rule, such as an invalid source URL, is
-listed in the response's `failed` with the reasons, and the page continues.
-A save that removes a copied item, through either history route or the
-document route, also deletes its row. Copied history counts as
-written by a person: the writer can add sources to it but never replaces it.
-
 ## Merges
 
-Merging Entities does not combine their About pages. The destination keeps its
-page, and the merged Entity's page is deleted with it; every saved version
-stays in the `change` table, so a moderator can copy back anything a person
-wrote. The merge moves `entity_event` rows to the destination, where the next
-backfill run copies them in as history without a source. The merge also queues
-a writer run for the destination, so its page can pick up what the merged
-page had.
-
-Links to a merged Entity are followed, through every later merge, to the
-Entity it became when the page or history is read, and an acquisition by an
-owner that was merged into the page's own Entity is hidden. A new link must
-name an Entity that exists or was merged; a deleted one is rejected. The
-backfill moves stored links as they are. An Entity that another page links,
-directly or through a merge, cannot be deleted; merge it instead, or remove the
-link first.
+Merging Entities does not combine their About pages. The destination keeps
+its page, and the merged Entity's page is deleted with it; every saved
+version stays in the `change` table. The merge moves the merged Entity's
+history items and notes to the destination and queues a writer run, so the
+destination's next version can draw on them.
 
 ## Descriptions
 

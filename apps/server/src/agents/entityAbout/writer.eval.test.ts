@@ -57,7 +57,7 @@ describe.skipIf(!isAIGatewayConfigured())("About writer", () => {
 
     // The job's own checks decide whether a draft is saved; a rejected run
     // lists every reason.
-    expect(result).toMatchObject({ status: "saved" });
+    expect(result, JSON.stringify(result)).toMatchObject({ status: "saved" });
     const document = (await getEntityAbout(db, entity.id))!.document;
     const shownEvents = document.events.filter((event) =>
       isFactShown(event.citations, document.sources),
