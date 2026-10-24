@@ -20,7 +20,7 @@ export default procedure
       "Get the full stored About document to edit, including source quotes, who wrote each item, and hidden facts. Send it back to `PUT /entities/{entity}/about` with your changes and this `version`. Requires moderator privileges.",
     operationId: "getEntityAboutDocument",
   })
-  .input(z.object({ entity: z.coerce.number() }))
+  .input(z.object({ entity: z.coerce.number().int().positive() }))
   .output(
     z.object({
       version: z.number().nullable(),

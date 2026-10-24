@@ -20,7 +20,7 @@ export default procedure
   })
   .input(
     z.object({
-      entity: z.coerce.number(),
+      entity: z.coerce.number().int().positive(),
       status: EntityAboutStatusEnum,
     }),
   )

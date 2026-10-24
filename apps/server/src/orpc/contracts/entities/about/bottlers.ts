@@ -12,5 +12,5 @@ export default contract
       "Count active bottles distilled at the entity for each bottler. `withoutEntity` counts bottles with no bottler, such as official releases.",
     operationId: "listEntityBottlerCounts",
   })
-  .input(z.object({ entity: z.coerce.number() }))
+  .input(z.object({ entity: z.coerce.number().int().positive() }))
   .output(EntityRelatedCountsSchema);

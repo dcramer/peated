@@ -20,7 +20,7 @@ import { isDeepStrictEqual } from "node:util";
 import { z } from "zod";
 
 const InputSchema = z.object({
-  entity: z.coerce.number(),
+  entity: z.coerce.number().int().positive(),
   version: z
     .number()
     .int()

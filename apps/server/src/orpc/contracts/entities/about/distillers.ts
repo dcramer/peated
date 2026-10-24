@@ -12,5 +12,5 @@ export default contract
       "Count active bottles sold under the entity as brand for each distillery that made them.",
     operationId: "listEntityDistilleryCounts",
   })
-  .input(z.object({ entity: z.coerce.number() }))
+  .input(z.object({ entity: z.coerce.number().int().positive() }))
   .output(EntityRelatedCountsSchema);

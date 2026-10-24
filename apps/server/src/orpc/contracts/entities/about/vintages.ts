@@ -12,5 +12,5 @@ export default contract
       "Count active bottles distilled at the entity for each vintage year.",
     operationId: "listEntityVintageCounts",
   })
-  .input(z.object({ entity: z.coerce.number() }))
+  .input(z.object({ entity: z.coerce.number().int().positive() }))
   .output(EntityYearCountsSchema);

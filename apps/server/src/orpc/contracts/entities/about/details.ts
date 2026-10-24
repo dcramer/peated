@@ -12,5 +12,5 @@ export default contract
       "Get the sourced history, site facts, prose, and sources for a brand or distillery. Facts without a source and every source quote are left out. Returns `null` when the entity has no published About page.",
     operationId: "getEntityAbout",
   })
-  .input(z.object({ entity: z.coerce.number() }))
+  .input(z.object({ entity: z.coerce.number().int().positive() }))
   .output(EntityAboutSchema.nullable());
