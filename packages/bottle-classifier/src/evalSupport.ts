@@ -1,5 +1,4 @@
 import OpenAI from "openai";
-import type { ResponseCreateParamsNonStreaming } from "openai/resources/responses/responses";
 import type {
   BottleClassifierDataSource,
   CreateBottleClassifierOptions,
@@ -9,10 +8,7 @@ import {
   recordEvalOpenAIResponse,
 } from "./evalTelemetry";
 import { resolveOpenAICompatibleConfig } from "./openaiCompatibleConfig";
-import {
-  getStableOpenAISettings,
-  resolveOpenAIReasoningEffort,
-} from "./openaiModelSettings";
+import { resolveOpenAIReasoningEffort } from "./openaiModelSettings";
 
 const evalGatewayConfig = resolveOpenAICompatibleConfig(process.env);
 
@@ -25,11 +21,6 @@ export const evalImageExtractionModel = evalGatewayConfig.imageExtractionModel;
 export const evalImageExtractionReasoningEffort = resolveOpenAIReasoningEffort(
   evalImageExtractionModel,
   evalGatewayConfig.imageExtractionReasoningEffort,
-);
-export const evalJudgeModel = evalGatewayConfig.evalModel;
-export const evalJudgeReasoningEffort = resolveOpenAIReasoningEffort(
-  evalJudgeModel,
-  evalGatewayConfig.evalReasoningEffort,
 );
 export const hasEvalAIGatewayCredentials = Boolean(evalGatewayConfig.apiKey);
 
@@ -88,33 +79,4 @@ export function createEvalClassifierOptions(
     firecrawlApiUrl: process.env.FIRECRAWL_API_URL ?? null,
     dataSource,
   };
-}
-
-export function getEvalJudgeModelSettings() {
-  return getStableOpenAISettings(evalJudgeModel, evalJudgeReasoningEffort);
-}
-
-export async function promptEvalJudgeModel(
-  input: string,
-  options?: { system?: string },
-) {
-  const request: ResponseCreateParamsNonStreaming = {
-    model: evalJudgeModel,
-    input: [
-      {
-        role: "user",
-        content: [
-          {
-            type: "input_text",
-            text: input,
-          },
-        ],
-      },
-    ],
-    ...getEvalJudgeModelSettings(),
-  };
-  if (options?.system) request.instructions = options.system;
-  const response = await createEvalOpenAIClient().responses.create(request);
-
-  return response.output_text;
 }

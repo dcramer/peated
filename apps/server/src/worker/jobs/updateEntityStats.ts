@@ -16,9 +16,6 @@ export const UpdateEntityStatsJobArgsSchema = z
     entityId: z.number().int().positive(),
   })
   .strict();
-export type UpdateEntityStatsJobArgs = z.infer<
-  typeof UpdateEntityStatsJobArgsSchema
->;
 
 export default async (input: JobPayload) => {
   const { entityId } = UpdateEntityStatsJobArgsSchema.parse(input);

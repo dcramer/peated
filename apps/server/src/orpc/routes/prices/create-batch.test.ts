@@ -1,3 +1,7 @@
+import {
+  normalizeBottleInput,
+  normalizeBottleReferenceKey,
+} from "@peated/bottle-classifier/normalize";
 import { db } from "@peated/server/db";
 import { getPostgresConnectionConfig } from "@peated/server/db/connection";
 import {
@@ -11,10 +15,6 @@ import {
 } from "@peated/server/db/schema";
 import { getPeatedSystemActor, getUserActor } from "@peated/server/lib/actors";
 import { createStorePricesAsPeated } from "@peated/server/lib/createStorePrices";
-import {
-  normalizeBottleInput,
-  normalizeBottleReferenceKey,
-} from "@peated/server/lib/normalize";
 import waitError from "@peated/server/lib/test/waitError";
 import * as workerClient from "@peated/server/lib/test/workerDispatch";
 import { routerClient } from "@peated/server/orpc/router";

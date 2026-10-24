@@ -2,6 +2,7 @@
  * Owns Bottle reference reservation and assignment. Exact reservation claims only
  * the reference row; full assignment also migrates matching unresolved consumers.
  */
+import { normalizeBottleReferenceKey } from "@peated/bottle-classifier/normalize";
 import { db, type AnyDatabase, type AnyTransaction } from "@peated/server/db";
 import type {
   BottleReference,
@@ -26,7 +27,6 @@ import {
   logInfo,
   type SentryLogContexts,
 } from "@peated/server/lib/log";
-import { normalizeBottleReferenceKey } from "@peated/server/lib/normalize";
 import {
   ActiveBottleSelectionError,
   resolveActiveBottleIds,
@@ -198,11 +198,6 @@ export type BottleReferenceAssignmentInput = {
   expectedReview?: BottleReferenceReviewIdentitySnapshot;
   rejectIgnored?: boolean;
 };
-
-export type BottleReferenceAssignmentOptions = Pick<
-  BottleReferenceAssignmentInput,
-  "assignmentSource" | "assignedByActorId"
->;
 
 export type BottleImageCandidate = {
   bottleId: number;

@@ -9,7 +9,7 @@ import { useState, type ReactNode } from "react";
 
 import { BottleIdentityRow } from "@peated/web/components/bottleIdentityRow.stylex";
 import { IconButton } from "@peated/web/components/button.stylex";
-import ConfirmationDialog from "@peated/web/components/confirmationDialog.client";
+import ConfirmationDialog from "@peated/web/components/confirmationDialog.stylex";
 import {
   EmptyState,
   LoadingList,

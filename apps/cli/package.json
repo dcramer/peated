@@ -7,9 +7,6 @@
     "db": "tsx --require dotenv/config ./src/index.ts db",
     "bottles": "tsx --require dotenv/config ./src/index.ts bottles",
     "entities": "tsx --require dotenv/config ./src/index.ts entities",
-    "tastings": "tsx --require dotenv/config ./src/index.ts tastings",
-    "mocks": "tsx --require dotenv/config ./src/bin/index.ts mocks",
-    "users": "tsx --require dotenv/config ./src/bin/index.ts users",
     "test": "vitest run",
     "typecheck": "tsc --noEmit"
   },

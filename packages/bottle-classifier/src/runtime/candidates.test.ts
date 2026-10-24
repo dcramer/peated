@@ -51,6 +51,38 @@ describe("mergeBottleCandidate", () => {
     expect(z.json().safeParse(merged).success).toBe(true);
   });
 
+  test("fills release month and day found by a later result", () => {
+    const candidates = new Map<number, BottleCandidate>();
+
+    mergeBottleCandidate(
+      candidates,
+      BottleCandidateSchema.parse({
+        bottleId: 1,
+        fullName: "Example Annual Release",
+        source: ["exact"],
+        releaseYear: 2024,
+        releaseMonth: null,
+      }),
+    );
+    mergeBottleCandidate(
+      candidates,
+      BottleCandidateSchema.parse({
+        bottleId: 1,
+        fullName: "Example Annual Release",
+        source: ["search"],
+        releaseYear: 2024,
+        releaseMonth: 6,
+        releaseDay: 15,
+      }),
+    );
+
+    expect(candidates.get(1)).toMatchObject({
+      releaseYear: 2024,
+      releaseMonth: 6,
+      releaseDay: 15,
+    });
+  });
+
   test("keeps the accepted reference that produced an exact match", () => {
     const candidates = new Map<number, BottleCandidate>();
 

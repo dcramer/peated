@@ -38,8 +38,6 @@ describe("resolveOpenAICompatibleConfig", () => {
       bottleClassifierModel: "openai/gpt-6-luna",
       bottleClassifierReasoningEffort: "high",
       embeddingModel: "openai/text-embedding-3-large",
-      evalModel: "openai/gpt-5.6-luna",
-      evalReasoningEffort: "medium",
       imageExtractionModel: "openai/gpt-6-luna",
       imageExtractionReasoningEffort: "high",
       model: "openai/gpt-5.4",
@@ -52,9 +50,6 @@ describe("resolveOpenAICompatibleConfig", () => {
         config.bottleClassifierReasoningEffort,
       ),
     ).toEqual({ reasoning: { effort: "high" } });
-    expect(
-      getStableOpenAISettings(config.evalModel, config.evalReasoningEffort),
-    ).toEqual({ reasoning: { effort: "medium" } });
   });
 
   it("requires gateway credentials in production", () => {
@@ -72,8 +67,6 @@ describe("resolveOpenAICompatibleConfig", () => {
         BOTTLE_CLASSIFIER_MODEL: "gpt-5.6-luna",
         BOTTLE_CLASSIFIER_REASONING_EFFORT: "low",
         OPENAI_EMBEDDING_MODEL: "openai/text-embedding-3-small",
-        OPENAI_EVAL_MODEL: "gpt-5-mini",
-        OPENAI_EVAL_REASONING_EFFORT: "xhigh",
         OPENAI_IMAGE_EXTRACTION_MODEL: "gpt-5.6-luna",
         OPENAI_IMAGE_EXTRACTION_REASONING_EFFORT: "xhigh",
         OPENAI_MODEL: "gpt-5.4",
@@ -83,8 +76,6 @@ describe("resolveOpenAICompatibleConfig", () => {
       bottleClassifierModel: "openai/gpt-5.6-luna",
       bottleClassifierReasoningEffort: "low",
       embeddingModel: "openai/text-embedding-3-small",
-      evalModel: "openai/gpt-5-mini",
-      evalReasoningEffort: "xhigh",
       imageExtractionModel: "openai/gpt-5.6-luna",
       imageExtractionReasoningEffort: "xhigh",
       model: "openai/gpt-5.4",
@@ -117,20 +108,6 @@ describe("resolveOpenAICompatibleConfig", () => {
     expect(
       resolveOpenAIReasoningEffort(config.model, config.reasoningEffort),
     ).toBe("high");
-  });
-
-  it("applies an explicit effort to the eval judge independently", () => {
-    const config = resolveOpenAICompatibleConfig({
-      OPENAI_EVAL_MODEL: "gpt-5.6-luna",
-      OPENAI_EVAL_REASONING_EFFORT: "high",
-      OPENAI_REASONING_EFFORT: "low",
-    });
-
-    expect(config.evalReasoningEffort).toBe("high");
-    expect(
-      getStableOpenAISettings(config.evalModel, config.evalReasoningEffort),
-    ).toEqual({ reasoning: { effort: "high" } });
-    expect(config.reasoningEffort).toBe("low");
   });
 
   it("sends reasoning settings without temperature to GPT-6 models", () => {
@@ -175,13 +152,13 @@ describe("resolveOpenAICompatibleConfig", () => {
     },
   );
 
-  it("identifies an invalid eval judge effort", () => {
+  it("identifies an invalid image extraction effort", () => {
     expect(() =>
       resolveOpenAICompatibleConfig({
-        OPENAI_EVAL_REASONING_EFFORT: "maximum",
+        OPENAI_IMAGE_EXTRACTION_REASONING_EFFORT: "maximum",
       }),
     ).toThrow(
-      "OPENAI_EVAL_REASONING_EFFORT must be one of: none, low, medium, high, xhigh",
+      "OPENAI_IMAGE_EXTRACTION_REASONING_EFFORT must be one of: none, low, medium, high, xhigh",
     );
   });
 });

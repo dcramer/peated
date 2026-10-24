@@ -16,10 +16,6 @@ export const CollectionSchema = z.object({
   createdBy: UserSchema.optional().describe("User who created this collection"),
 });
 
-export const CollectionInputSchema = z.object({
-  name: z.string().trim().min(1, "Required").describe("Name of the collection"),
-});
-
 export const CollectionBottleStatusSchema = z.enum(["sealed", "open", "empty"]);
 
 export const CollectionBottleSchema = z.object({

@@ -3,7 +3,7 @@
 import { useState, type ReactNode } from "react";
 
 import { Button } from "@peated/web/components/button.stylex";
-import ConfirmationDialog from "@peated/web/components/confirmationDialog.client";
+import ConfirmationDialog from "@peated/web/components/confirmationDialog.stylex";
 import { FlashMessage, Notice } from "@peated/web/components/feedback.stylex";
 import {
   FormActions,

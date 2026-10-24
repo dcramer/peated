@@ -55,10 +55,6 @@ export const BottleWebReadPageArgsSchema = z.object({
     ),
 });
 
-export const BottleWebSearchErrorSchema = z.object({
-  error: z.string().min(1),
-});
-
 const MAX_BOTTLE_SEARCH_RESULTS = 6;
 export const MAX_BOTTLE_SEARCH_SUMMARY_CHARS = 1200;
 const MAX_BOTTLE_SEARCH_TITLE_CHARS = 160;
@@ -210,12 +206,6 @@ export function buildBottleSearchEvidence({
       }),
     ),
   });
-}
-
-export function compactBottleSearchEvidence(
-  evidence: BottleSearchEvidence,
-): BottleSearchEvidence {
-  return buildBottleSearchEvidence(evidence);
 }
 
 function normalizeSearchText(

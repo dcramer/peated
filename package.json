@@ -29,7 +29,6 @@
     "db:up": "dotenv -e .env.local -- pnpm --filter='./apps/server' exec drizzle-kit up",
     "bottles": "dotenv -e .env.local -- pnpm --filter='./apps/cli' cli bottles",
     "entities": "dotenv -e .env.local -- pnpm --filter='./apps/cli' cli entities",
-    "tastings": "dotenv -e .env.local -- pnpm --filter='./apps/cli' cli tastings",
     "mocks": "dotenv -e .env.local -- pnpm --filter='./apps/cli' cli mocks",
     "user": "dotenv -e .env.local -- pnpm --filter='./apps/cli' cli users",
     "start": "dotenv -e .env.local -- turbo start",

@@ -6,7 +6,6 @@ import router from "./routes";
 export default router;
 
 export type Router = typeof router;
-// export type { Router } from "./routes";
 export type Inputs = InferRouterInputs<Router>;
 export type Outputs = InferRouterOutputs<Router>;
 

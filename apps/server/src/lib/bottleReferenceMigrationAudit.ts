@@ -1,3 +1,4 @@
+import { normalizeBottleReferenceKey } from "@peated/bottle-classifier/normalize";
 import type { AnyDatabase } from "@peated/server/db";
 import { db } from "@peated/server/db";
 import {
@@ -5,7 +6,6 @@ import {
   bottles,
   bottleTombstones,
 } from "@peated/server/db/schema";
-import { normalizeBottleReferenceKey } from "@peated/server/lib/normalize";
 import { asc, isNotNull, sql } from "drizzle-orm";
 import { createHash } from "node:crypto";
 import { z } from "zod";

@@ -10,7 +10,6 @@ export const OnBottleChangeJobArgsSchema = z
     generateDetails: z.boolean().default(false),
   })
   .strict();
-export type OnBottleChangeJobArgs = z.infer<typeof OnBottleChangeJobArgsSchema>;
 
 type BottleChangeStatsJobPlan = {
   name: "UpdateBottleStats";

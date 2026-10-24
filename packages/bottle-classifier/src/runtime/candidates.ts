@@ -31,6 +31,8 @@ const CANDIDATE_METADATA_FIELDS = [
   "vintageYear",
   "bottlingYear",
   "releaseYear",
+  "releaseMonth",
+  "releaseDay",
 ] as const satisfies ReadonlyArray<keyof BottleCandidate>;
 
 export function mergeBottleCandidate(
@@ -98,8 +100,9 @@ function fillMissingCandidateField<
 >(existing: BottleCandidate, candidate: BottleCandidate, field: TField): void {
   // Candidates may omit an unknown year, so an undefined value must not replace
   // null: the merged candidate is stored as JSON and undefined is not JSON.
+  // An omitted value on the existing candidate is missing too, so fill it.
   if (
-    existing[field] === null &&
+    (existing[field] === null || existing[field] === undefined) &&
     candidate[field] !== null &&
     candidate[field] !== undefined
   ) {

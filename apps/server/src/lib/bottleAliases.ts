@@ -1,3 +1,4 @@
+import { normalizeBottleReferenceKey } from "@peated/bottle-classifier/normalize";
 import {
   db,
   type AnyConnection,
@@ -10,7 +11,6 @@ import {
   bottles,
   type BottleAlias,
 } from "@peated/server/db/schema";
-import { normalizeBottleReferenceKey } from "@peated/server/lib/normalize";
 import { and, asc, eq, inArray } from "drizzle-orm";
 
 export class BottleAliasBottleNotFoundError extends Error {

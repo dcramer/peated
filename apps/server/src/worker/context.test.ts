@@ -7,7 +7,6 @@ import {
 } from "../lib/actorContext";
 import { applyJobActorContextToSentry } from "./context";
 import { buildQueuedJobData, parseQueuedJobData } from "./payload";
-import { parseJobContext } from "./types";
 
 describe("worker context", () => {
   test("serializes Peated users as queue actor context", () => {
@@ -85,14 +84,17 @@ describe("worker context", () => {
 
   test("parses queued actor context from worker payloads", () => {
     expect(
-      parseJobContext({
-        traceContext: { "sentry-trace": "trace", baggage: "sampled" },
-        actor: {
-          type: "user",
-          userId: 789,
-          username: "queued",
+      parseQueuedJobData({
+        args: {},
+        context: {
+          traceContext: { "sentry-trace": "trace", baggage: "sampled" },
+          actor: {
+            type: "user",
+            userId: 789,
+            username: "queued",
+          },
         },
-      }),
+      }).context,
     ).toEqual({
       traceContext: { "sentry-trace": "trace", baggage: "sampled" },
       actor: {
@@ -128,12 +130,15 @@ describe("worker context", () => {
 
   test("drops malformed queued actor context", () => {
     expect(
-      parseJobContext({
-        actor: {
-          type: "user",
-          userId: "not-a-number",
+      parseQueuedJobData({
+        args: {},
+        context: {
+          actor: {
+            type: "user",
+            userId: "not-a-number",
+          },
         },
-      }),
+      }).context,
     ).toEqual({});
   });
 });

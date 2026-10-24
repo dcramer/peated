@@ -2,7 +2,6 @@ export const DEFAULT_API_SERVER = "https://api.peated.com";
 export const DEFAULT_WEB_SERVER = "https://peated.com";
 export const DEFAULT_OAUTH_CLIENT_ID = "CTQLxbH7tzvZnIMYvniLthOk";
 export const OAUTH_CALLBACK_PATH = "/oauth/callback";
-export const OAUTH_REGISTERED_REDIRECT_URI = `http://127.0.0.1${OAUTH_CALLBACK_PATH}`;
 
 export function resolveOAuthClientId(
   option: string | undefined,

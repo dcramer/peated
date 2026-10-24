@@ -16,10 +16,6 @@ export const VerifyBottleCreationJobArgsSchema = z
   })
   .strict();
 
-export type VerifyBottleCreationJobArgs = z.infer<
-  typeof VerifyBottleCreationJobArgsSchema
->;
-
 export type VerifyBottleCreationServices = {
   runAudit: NonNullable<Parameters<typeof runPostUserCreationBottleAudit>[1]>;
 };

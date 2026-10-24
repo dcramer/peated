@@ -10,8 +10,6 @@ import {
 } from "../constants";
 import { isDistantFuture, isDistantPast } from "../lib/dates";
 
-export const zTag = z.string();
-
 export const zDatetime = z
   .string()
   .datetime()

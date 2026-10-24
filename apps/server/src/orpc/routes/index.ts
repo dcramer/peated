@@ -46,55 +46,6 @@ import users from "./users";
 import version from "./version";
 import wrongPhotoMatches from "./wrongPhotoMatches";
 
-export interface Router {
-  activity: typeof activity;
-  admin: typeof admin;
-  ai: typeof ai;
-  audits: typeof audits;
-  auctions: typeof auctions;
-  auth: typeof auth;
-  badges: typeof badges;
-  bottles: typeof bottles;
-  bottleAliases: typeof bottleAliases;
-  bottlers: typeof bottlers;
-  brands: typeof brands;
-  bottleReferences: typeof bottleReferences;
-  bottleBarcodes: typeof bottleBarcodes;
-  bottleGroups: typeof bottleGroups;
-  bottleSeries: typeof bottleSeries;
-  changes: typeof changes;
-  collections: typeof collections;
-  comments: typeof comments;
-  companies: typeof companies;
-  countries: typeof countries;
-  distilleries: typeof distilleries;
-  email: typeof email;
-  entities: typeof entities;
-  events: typeof events;
-  externalSites: typeof externalSites;
-  flights: typeof flights;
-  friends: typeof friends;
-  memberReviews: typeof memberReviews;
-  notifications: typeof notifications;
-  oauth: typeof oauth;
-  pendingUploads: typeof pendingUploads;
-  prices: typeof prices;
-  regions: typeof regions;
-  reports: typeof reports;
-  externalReviews: typeof externalReviews;
-  root: typeof root;
-  search: typeof search;
-  smws: typeof smws;
-  stats: typeof stats;
-  tags: typeof tags;
-  tastingDrafts: typeof tastingDrafts;
-  tastings: typeof tastings;
-  toasts: typeof toasts;
-  users: typeof users;
-  version: typeof version;
-  wrongPhotoMatches: typeof wrongPhotoMatches;
-}
-
 export default api.router({
   activity,
   admin,

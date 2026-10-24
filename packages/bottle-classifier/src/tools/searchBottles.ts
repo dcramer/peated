@@ -14,8 +14,6 @@ export const SearchBottlesResultSchema = z.object({
 const SEARCH_BOTTLES_TOOL_DESCRIPTION =
   "Search local Peated Bottle candidates. Use before web search when local matches are missing or conflicting, and again after web evidence reveals a canonical trait that could recover a better local candidate.";
 
-export type SearchBottlesResult = z.infer<typeof SearchBottlesResultSchema>;
-
 export function createSearchBottlesTool({
   searchBottles,
   onResults,
