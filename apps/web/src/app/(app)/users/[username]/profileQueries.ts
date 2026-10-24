@@ -11,11 +11,13 @@ import {
   type QueryKey,
 } from "@tanstack/react-query";
 
+import type { ListView } from "@peated/web/components/lists.stylex";
 import type { SearchParamSource } from "@peated/web/lib/apiQueryParams";
 import type { ORPCQueryUtils } from "@peated/web/lib/orpc/context";
 
 type ActivityList = Outputs["users"]["activity"]["list"];
 export type ProfileLibraryInput = Inputs["collections"]["bottles"]["list"] & {
+  age?: AgeBucketId;
   brand?: number;
   collection: "library";
   cursor: number;
@@ -41,7 +43,6 @@ export type ProfileTastingInput = Inputs["tastings"]["list"] & {
   sort: "-created" | "-rating" | "name";
   user: number;
 };
-export type ProfileTastingView = "list" | "table";
 
 /** The server and browser must use the same query keys. */
 export const profileQueries = {
@@ -109,9 +110,8 @@ export function getProfileTastingInput(
   };
 }
 
-export function getProfileTastingView(
-  source: SearchParamSource,
-): ProfileTastingView {
+/** Tastings and Library show a list unless the URL asks for the table. */
+export function getProfileListView(source: SearchParamSource): ListView {
   return getSearchParam(source, "view") === "table" ? "table" : "list";
 }
 
@@ -120,6 +120,7 @@ export function getProfileLibraryInput(
   userId: number,
 ): ProfileLibraryInput {
   return {
+    age: parseOption(getSearchParam(source, "age"), AGE_BUCKET_IDS),
     brand: parsePositiveNumber(getSearchParam(source, "brand")),
     collection: "library",
     cursor: parsePositiveNumber(getSearchParam(source, "cursor")) ?? 1,

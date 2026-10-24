@@ -1,14 +1,20 @@
 "use client";
 
+import { useSearchParams } from "next/navigation";
 import type { ReactNode } from "react";
 
-import { LoadingList } from "@peated/web/components/feedback.stylex";
-import { ListToolbarLoading } from "@peated/web/components/lists.stylex";
+import { LibraryListLoading } from "@peated/web/components/libraryList.stylex";
+import { LibraryTableLoading } from "@peated/web/components/libraryTable.stylex";
+import {
+  ListToolbarLoading,
+  type ListView,
+} from "@peated/web/components/lists.stylex";
 import { MemberListFiltersLoading } from "@peated/web/components/pages/memberListFilters.stylex";
 import { PageColumns } from "@peated/web/components/pages/pageLayout.stylex";
 import { profileBottleSearchCopy } from "../profileBottleSearch.stylex";
 import { useProfile } from "../profileContext";
 import { getProfileLoadingRows } from "../profileLoading";
+import { getProfileListView } from "../profileQueries";
 
 export function ProfileLibraryLayout({
   children,
@@ -22,38 +28,48 @@ export function ProfileLibraryLayout({
 
 /** Keeps the toolbar, Library rows, and filter rail stable while data loads. */
 export function ProfileLibraryLoading() {
-  const { user } = useProfile();
+  const searchParams = useSearchParams();
 
   return (
     <div aria-busy="true" aria-label="Loading member library" role="status">
       <ProfileLibraryLayout rail={<ProfileLibraryFiltersLoading />}>
-        <ProfileLibraryResultsLoading
-          rows={getProfileLoadingRows(user.stats.library.total)}
-        />
+        <ProfileLibraryResultsLoading view={getProfileListView(searchParams)} />
       </ProfileLibraryLayout>
     </div>
   );
 }
 
-/** Reserves the Library toolbar and rows at their finished sizes. */
-export function ProfileLibraryResultsLoading({
-  rows,
-}: {
-  rows: Parameters<typeof LoadingList>[0]["rows"];
-}) {
+/**
+ * Reserves the toolbar and the list or table while Library bottles load, at
+ * the finished sizes, so the results replace it without moving the page.
+ */
+export function ProfileLibraryResultsLoading({ view }: { view: ListView }) {
+  const { isCurrentUser, user } = useProfile();
+  const rows = getProfileLoadingRows(user.stats.library.total);
+
   return (
     <>
-      <ListToolbarLoading mobileActionLayout="pageColumns" />
-      <LoadingList label="Loading library bottles" rows={rows} />
+      <ListToolbarLoading mobileActionLayout="pageColumns" view />
+      {view === "table" ? (
+        <LibraryTableLoading
+          actions={isCurrentUser}
+          label="Loading library bottles"
+          rows={rows}
+        />
+      ) : (
+        <LibraryListLoading label="Loading library bottles" rows={rows} />
+      )}
     </>
   );
 }
 
-function ProfileLibraryFiltersLoading() {
+/** Reserves the filter rail while counts load. */
+export function ProfileLibraryFiltersLoading() {
   return (
     <MemberListFiltersLoading
       groups={[
         { label: "Status", rows: 4 },
+        { label: "Age", rows: 6, summary: true },
         { label: "Brands", rows: 5 },
         { label: "Distilleries", rows: 5 },
       ]}

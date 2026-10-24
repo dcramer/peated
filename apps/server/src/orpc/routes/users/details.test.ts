@@ -103,7 +103,7 @@ describe("GET /users/:user", () => {
     expect(data.stats.contributions).toBe(1);
   });
 
-  test("counts non-empty Library bottles by status", async ({
+  test("counts every Library bottle, empty ones included, and each status", async ({
     defaults,
     fixtures,
   }) => {
@@ -158,7 +158,7 @@ describe("GET /users/:user", () => {
     );
 
     expect(data.stats.library).toEqual({
-      total: 3,
+      total: 4,
       open: 1,
       sealed: 1,
     });
@@ -241,7 +241,7 @@ describe("GET /users/:user", () => {
       tastings: 3,
       bottles: 2,
       collected: 4,
-      library: { total: 2, open: 1, sealed: 1 },
+      library: { total: 3, open: 1, sealed: 1 },
     });
   });
 

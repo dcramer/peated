@@ -2,10 +2,8 @@
 
 import type { Outputs } from "@peated/server/orpc/router";
 import { useQuery } from "@tanstack/react-query";
-import { usePathname, useRouter, useSearchParams } from "next/navigation";
-import { useOptimistic, useTransition } from "react";
 
-import { ButtonLink } from "@peated/web/components/button.stylex";
+import { Button, ButtonLink } from "@peated/web/components/button.stylex";
 import { CommunityFeed } from "@peated/web/components/communityFeed.stylex";
 import {
   EmptyState,
@@ -27,8 +25,14 @@ import { getTastingTableItems } from "@peated/web/lib/tastingTable";
 import { ProfileBottleSearch } from "../profileBottleSearch.stylex";
 import { useProfile } from "../profileContext";
 import {
+  getAgeFilterGroup,
+  getEntityCountGroup,
+  useEntityFilterGroup,
+  useProfileListParams,
+} from "../profileListFilters";
+import {
+  getProfileListView,
   getProfileTastingInput,
-  getProfileTastingView,
   profileQueries,
 } from "../profileQueries";
 import {
@@ -50,7 +54,6 @@ const sortOptions = [
 const FILTER_PARAMS = [
   "age",
   "country",
-  "cursor",
   "distiller",
   "entity",
   "query",
@@ -60,78 +63,44 @@ const FILTER_PARAMS = [
 
 export function ProfileTastingsPageClient() {
   const orpc = useORPC();
-  const pathname = usePathname();
-  const router = useRouter();
-  const searchParams = useSearchParams();
   const { isCurrentUser, user } = useProfile();
-  const [isNavigating, startTransition] = useTransition();
-  const [displayedParams, setDisplayedParams] = useOptimistic(
-    searchParams.toString(),
-  );
+  const {
+    activeFilterCount,
+    clearFilters,
+    displayed,
+    isNavigating,
+    pathname,
+    searchParams,
+    setParam,
+  } = useProfileListParams(FILTER_PARAMS);
   const input = getProfileTastingInput(searchParams, user.id);
-  const displayed = new URLSearchParams(displayedParams);
   const displayedInput = getProfileTastingInput(displayed, user.id);
-  const view = getProfileTastingView(displayed);
+  const view = getProfileListView(displayed);
   const tastingQuery = useQuery(profileQueries.tastings(orpc, input));
   const statsQuery = useQuery(profileQueries.tastingStats(orpc, user.id));
   const regionQuery = useQuery(profileQueries.regions(orpc, user.id));
-  const { entity } = displayedInput;
-  const entityQuery = useQuery({
-    ...orpc.entities.details.queryOptions({ input: { entity: entity ?? 0 } }),
-    enabled: entity !== undefined,
-  });
-  const activeFilterCount = FILTER_PARAMS.filter(
-    (name) => name !== "cursor" && displayed.get(name),
-  ).length;
+  const entityGroup = useEntityFilterGroup(displayedInput.entity);
   const hasFilters = activeFilterCount > 0;
-  const filters = getFilterGroups({
-    entity:
-      entity === undefined
-        ? undefined
-        : { id: entity, name: entityQuery.data?.name },
-    params: displayed,
-    regions: regionQuery.data,
-    stats: statsQuery.data,
-  });
+  const filters = [
+    ...(entityGroup ? [entityGroup] : []),
+    ...getFilterGroups({
+      params: displayed,
+      regions: regionQuery.data,
+      stats: statsQuery.data,
+    }),
+  ];
 
-  function navigate(next: URLSearchParams) {
-    const nextQuery = next.toString();
-    startTransition(() => {
-      // Tasting queries follow the committed URL; only controls anticipate navigation.
-      setDisplayedParams(nextQuery);
-      router.push(nextQuery ? `${pathname}?${nextQuery}` : pathname, {
-        scroll: false,
-      });
-    });
-  }
-
-  function setParam(name: string, value: string) {
-    const next = new URLSearchParams(displayedParams);
-    if (name !== "view") next.delete("cursor");
+  function setFilter(name: string, value: string) {
     // A region belongs to one country, so changing the country clears it.
-    if (name === "country") next.delete("region");
-    if (value) next.set(name, value);
-    else next.delete(name);
-    navigate(next);
-  }
-
-  function selectEntity(entityId: number) {
-    // One Entity filter replaces the search text it came from.
-    const next = new URLSearchParams(displayedParams);
-    ["cursor", "query"].forEach((name) => next.delete(name));
-    next.set("entity", String(entityId));
-    navigate(next);
-  }
-
-  function clearFilters() {
-    const next = new URLSearchParams(displayedParams);
-    FILTER_PARAMS.forEach((name) => next.delete(name));
-    navigate(next);
+    setParam(name, value, name === "country" ? ["region"] : []);
   }
 
   const search = (
     <ProfileBottleSearch
-      onEntitySelect={selectEntity}
+      // One brand or producer filter replaces the search text it came from.
+      onEntitySelect={(entityId) =>
+        setParam("entity", String(entityId), ["query"])
+      }
       onSubmit={(value) => setParam("query", value)}
       query={displayedInput.query}
       scope="tastings"
@@ -140,7 +109,7 @@ export function ProfileTastingsPageClient() {
   );
   const groupProps = {
     groups: filters,
-    onChange: setParam,
+    onChange: setFilter,
     total: statsQuery.data?.total,
   };
   const results = tastingQuery.data?.results ?? [];
@@ -207,7 +176,14 @@ export function ProfileTastingsPageClient() {
             </SectionError>
           ) : !results.length ? (
             hasFilters ? (
-              <EmptyState heading="No matching tastings">
+              <EmptyState
+                action={
+                  <Button onClick={clearFilters} size="sm" variant="text">
+                    Clear filters
+                  </Button>
+                }
+                heading="No matching tastings"
+              >
                 No tastings match these filters.
               </EmptyState>
             ) : (
@@ -263,12 +239,10 @@ export function ProfileTastingsPageClient() {
 }
 
 function getFilterGroups({
-  entity,
   params,
   regions,
   stats,
 }: {
-  entity?: { id: number; name?: string };
   params: URLSearchParams;
   regions?: RegionList;
   stats?: TastingStats;
@@ -277,21 +251,6 @@ function getFilterGroups({
   const country = params.get("country");
   const distillers = stats?.producers.distillers ?? [];
   const groups: MemberListFilterGroup[] = [];
-
-  // A brand or producer picked from search matches any role it has.
-  if (entity) {
-    groups.push({
-      filters: [
-        {
-          label: entity.name ?? "Loading…",
-          selected: true,
-          value: String(entity.id),
-        },
-      ],
-      label: "Brand or producer",
-      name: "entity",
-    });
-  }
 
   if (stats?.bands.total) {
     groups.push({
@@ -307,21 +266,7 @@ function getFilterGroups({
   }
 
   if (stats?.total) {
-    const { age } = stats;
-    groups.push({
-      filters: age.buckets.map((bucket) => ({
-        count: bucket.count,
-        label: bucket.id === "unstated" ? "No age stated" : bucket.label,
-        selected: selected("age", bucket.id),
-        value: bucket.id,
-      })),
-      label: "Age",
-      name: "age",
-      summary:
-        age.median !== null && age.oldest !== null
-          ? `Median ${formatYears(age.median)} · oldest ${formatYears(age.oldest)}`
-          : undefined,
-    });
+    groups.push(getAgeFilterGroup(stats.age, params.get("age")));
   }
 
   const countries = regions?.countries ?? [];
@@ -357,21 +302,15 @@ function getFilterGroups({
   }
 
   if (distillers.length) {
-    groups.push({
-      filters: distillers.map((item) => ({
-        count: item.count,
-        label: item.name,
-        selected: selected("distiller", String(item.id)),
-        value: String(item.id),
-      })),
-      label: "Distilleries",
-      name: "distiller",
-    });
+    groups.push(
+      getEntityCountGroup({
+        items: distillers,
+        label: "Distilleries",
+        name: "distiller",
+        selected: params.get("distiller"),
+      }),
+    );
   }
 
   return groups;
-}
-
-function formatYears(value: number) {
-  return `${value.toLocaleString("en-US")} ${value === 1 ? "year" : "years"}`;
 }

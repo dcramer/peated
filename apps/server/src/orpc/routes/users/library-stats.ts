@@ -12,7 +12,7 @@ import { implement } from "@peated/server/orpc";
 import type { LibraryStatsSchema } from "@peated/server/orpc/contracts/users/library-stats";
 import libraryStatsContract from "@peated/server/orpc/contracts/users/library-stats";
 import type { CategoryEnum } from "@peated/server/schemas";
-import { and, eq, gt, inArray, sql } from "drizzle-orm";
+import { and, eq, gt, inArray } from "drizzle-orm";
 import type { z } from "zod";
 import { buildAgeStats } from "./age-stats";
 import {
@@ -34,6 +34,7 @@ type LibraryStatsAccumulator = {
   status: {
     open: number;
     sealed: number;
+    empty: number;
     unspecified: number;
   };
   unstatedAgeCount: number;
@@ -45,7 +46,7 @@ type LibraryBottleRead = UserBottleRead & {
 
 const emptyStats: LibraryStats = {
   total: 0,
-  status: { open: 0, sealed: 0, unspecified: 0 },
+  status: { open: 0, sealed: 0, empty: 0, unspecified: 0 },
   brands: [],
   distillers: [],
   age: {
@@ -75,7 +76,7 @@ function createLibraryStatsAccumulator(): LibraryStatsAccumulator {
     categoryCounts: new Map(),
     brandCounts: new Map(),
     distillerCounts: new Map(),
-    status: { open: 0, sealed: 0, unspecified: 0 },
+    status: { open: 0, sealed: 0, empty: 0, unspecified: 0 },
     unstatedAgeCount: 0,
   };
 }
@@ -87,6 +88,11 @@ function accumulateLibraryStats(
   accumulator.total += bottleList.length;
 
   for (const bottle of bottleList) {
+    if (bottle?.status === "open") accumulator.status.open += 1;
+    else if (bottle?.status === "sealed") accumulator.status.sealed += 1;
+    else if (bottle?.status === "empty") accumulator.status.empty += 1;
+    else accumulator.status.unspecified += 1;
+
     if (!bottle) {
       accumulator.unstatedAgeCount += 1;
       continue;
@@ -104,9 +110,6 @@ function accumulateLibraryStats(
     for (const distillerId of bottle.distillerIds) {
       incrementCount(accumulator.distillerCounts, distillerId);
     }
-    if (bottle.status === "open") accumulator.status.open += 1;
-    else if (bottle.status === "sealed") accumulator.status.sealed += 1;
-    else accumulator.status.unspecified += 1;
   }
 }
 
@@ -221,7 +224,6 @@ export default implement(libraryStatsContract).handler(async function ({
         .where(
           and(
             eq(collectionBottles.collectionId, library.id),
-            sql`${collectionBottles.status} IS DISTINCT FROM 'empty'`,
             afterId === null ? undefined : gt(collectionBottles.id, afterId),
           ),
         )

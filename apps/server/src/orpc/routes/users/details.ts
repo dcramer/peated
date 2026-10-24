@@ -82,7 +82,8 @@ async function aggregateCollectionStats(userId: number) {
       if (bottle) bottleIds.add(bottle.id);
 
       if (row.collectionName.toLowerCase() !== libraryName) continue;
-      if (row.status !== "empty") library.total += 1;
+      // The Library tab lists empty bottles, so its count includes them.
+      library.total += 1;
       if (row.status === "open") library.open += 1;
       if (row.status === "sealed") library.sealed += 1;
     }

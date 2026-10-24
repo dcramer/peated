@@ -3,8 +3,8 @@ import { describe, expect, test } from "vitest";
 import {
   getProfileActivityRouteState,
   getProfileLibraryInput,
+  getProfileListView,
   getProfileTastingInput,
-  getProfileTastingView,
 } from "./profileQueries";
 
 describe("profile route query state", () => {
@@ -33,6 +33,7 @@ describe("profile route query state", () => {
     expect(
       getProfileLibraryInput(
         {
+          age: "atLeast25",
           brand: "12",
           cursor: "2",
           distiller: "19",
@@ -44,6 +45,7 @@ describe("profile route query state", () => {
         42,
       ),
     ).toEqual({
+      age: "atLeast25",
       brand: 12,
       collection: "library",
       cursor: 2,
@@ -60,6 +62,7 @@ describe("profile route query state", () => {
     expect(
       getProfileLibraryInput(
         {
+          age: "ancient",
           brand: "-1",
           cursor: "0",
           distiller: "nan",
@@ -69,6 +72,7 @@ describe("profile route query state", () => {
         42,
       ),
     ).toEqual({
+      age: undefined,
       brand: undefined,
       collection: "library",
       cursor: 1,
@@ -143,8 +147,8 @@ describe("profile route query state", () => {
   });
 
   test("shows the list unless the table is requested", () => {
-    expect(getProfileTastingView({ view: "table" })).toBe("table");
-    expect(getProfileTastingView({ view: "grid" })).toBe("list");
-    expect(getProfileTastingView({})).toBe("list");
+    expect(getProfileListView({ view: "table" })).toBe("table");
+    expect(getProfileListView({ view: "grid" })).toBe("list");
+    expect(getProfileListView({})).toBe("list");
   });
 });

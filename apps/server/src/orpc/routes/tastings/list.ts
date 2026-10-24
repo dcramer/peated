@@ -1,4 +1,3 @@
-import { AGE_BUCKETS } from "@peated/server/constants";
 import { db } from "@peated/server/db";
 import {
   bottleReferences,
@@ -11,6 +10,7 @@ import {
   tastings,
   users,
 } from "@peated/server/db/schema";
+import { statedAgeBucketWhere } from "@peated/server/lib/ageBuckets";
 import { getUserFromId } from "@peated/server/lib/api";
 import {
   bottleTextPredicate,
@@ -76,16 +76,8 @@ export default implement(tastingListContract).handler(async function ({
     bottleWhere.push(eq(tastings.ratingBand, input.ratingBand));
   }
 
-  if (input.age === "unstated") {
-    bottleWhere.push(isNull(bottles.statedAge));
-  } else if (input.age) {
-    const bucket = AGE_BUCKETS.find(({ id }) => id === input.age)!;
-    if (bucket.min !== null) {
-      bottleWhere.push(sql`${bottles.statedAge} >= ${bucket.min}`);
-    }
-    if (bucket.max !== null) {
-      bottleWhere.push(sql`${bottles.statedAge} <= ${bucket.max}`);
-    }
+  if (input.age) {
+    bottleWhere.push(statedAgeBucketWhere(input.age));
   }
 
   if (input.region && !input.country) {

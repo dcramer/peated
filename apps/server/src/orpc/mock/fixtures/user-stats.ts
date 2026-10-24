@@ -164,6 +164,7 @@ export const mockUserLibraryStats = {
   status: {
     open: 4,
     sealed: 8,
+    empty: 0,
     unspecified: 0,
   },
   brands: [
