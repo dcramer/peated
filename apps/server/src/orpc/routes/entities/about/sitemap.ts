@@ -1,7 +1,10 @@
 import { db } from "@peated/server/db";
 import { entities, entityAbout } from "@peated/server/db/schema";
 import { hasPublishedAboutPage } from "@peated/server/lib/entityAbout/publicAbout";
-import { toStoredEntityAbout } from "@peated/server/lib/entityAbout/store";
+import {
+  loadLinkedEntities,
+  toStoredEntityAbout,
+} from "@peated/server/lib/entityAbout/store";
 import { procedure } from "@peated/server/orpc";
 import { EntityKindEnum } from "@peated/server/schemas";
 import { and, asc, eq, gt } from "drizzle-orm";
@@ -64,8 +67,13 @@ export default procedure
 
     // Same tab rule as entity details, so the sitemap never lists a page
     // that would return not found.
-    const results = page.flatMap(({ entity, about }) =>
-      hasPublishedAboutPage(toStoredEntityAbout(about))
+    const stored = page.map(({ about }) => toStoredEntityAbout(about));
+    const linkedEntities = await loadLinkedEntities(
+      db,
+      stored.map((about) => about.document),
+    );
+    const results = page.flatMap(({ entity, about }, index) =>
+      hasPublishedAboutPage(stored[index] ?? null, linkedEntities)
         ? [{ ...entity, updatedAt: about.updatedAt.toISOString() }]
         : [],
     );

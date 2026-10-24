@@ -134,20 +134,26 @@ export function toPublicEntityAbout(
  * a shown lead. Description rule (owner: docs/features/entity-about.md): a
  * generated description is kept only when it equals this text.
  */
-export function getPublishedLeadText(item: StoredEntityAbout | null) {
+export function getPublishedLeadText(
+  item: StoredEntityAbout | null,
+  linkedEntities: ReadonlyMap<number, AboutLinkedEntity>,
+) {
   if (item?.status !== "published") return null;
-  const lead = toPublicEntityAbout(item, new Map()).lead;
+  const lead = toPublicEntityAbout(item, linkedEntities).lead;
   return lead?.sentences.map((sentence) => sentence.text).join(" ") || null;
 }
 
 /**
  * Whether the About tab shows. Tab rule (owner:
  * docs/features/entity-about.md): the page is published and has enough to
- * show. Linked Entities do not matter here.
+ * show, counted the way the page itself shows it.
  */
-export function hasPublishedAboutPage(item: StoredEntityAbout | null) {
+export function hasPublishedAboutPage(
+  item: StoredEntityAbout | null,
+  linkedEntities: ReadonlyMap<number, AboutLinkedEntity>,
+) {
   return (
     item?.status === "published" &&
-    hasEntityAboutPage(toPublicEntityAbout(item, new Map()))
+    hasEntityAboutPage(toPublicEntityAbout(item, linkedEntities))
   );
 }

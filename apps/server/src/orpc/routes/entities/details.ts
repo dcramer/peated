@@ -1,7 +1,10 @@
 import { db } from "@peated/server/db";
 import { entityFollows, entityImages } from "@peated/server/db/schema";
 import { hasPublishedAboutPage } from "@peated/server/lib/entityAbout/publicAbout";
-import { getEntityAbout } from "@peated/server/lib/entityAbout/store";
+import {
+  getEntityAbout,
+  loadLinkedEntities,
+} from "@peated/server/lib/entityAbout/store";
 import { resolveEntity } from "@peated/server/lib/resolveEntity";
 import { implement } from "@peated/server/orpc";
 import entityDetailsContract from "@peated/server/orpc/contracts/entities/details";
@@ -56,6 +59,9 @@ export default implement(entityDetailsContract).handler(async function ({
     ...(await serialize(EntitySerializer, entity, context.user)),
     images: await serialize(EntityImageSerializer, images, context.user),
     isFollowing,
-    hasAbout: hasPublishedAboutPage(about),
+    hasAbout: hasPublishedAboutPage(
+      about,
+      await loadLinkedEntities(db, about ? [about.document] : []),
+    ),
   };
 });
