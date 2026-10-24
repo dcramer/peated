@@ -1,4 +1,6 @@
 import { faker } from "@faker-js/faker";
+import { normalizeBottleReferenceKey } from "@peated/bottle-classifier/normalize";
+import { SMWS_DISTILLERY_CODES } from "@peated/bottle-classifier/smws";
 import { RATING_BAND_IDS } from "@peated/server/constants";
 import type { AnyDatabase, AnyTransaction } from "@peated/server/db";
 import { db as dbConn } from "@peated/server/db";
@@ -33,7 +35,6 @@ import {
   toasts,
   users,
 } from "@peated/server/db/schema";
-import { normalizeBottleReferenceKey } from "@peated/server/lib/normalize";
 import { generateOAuthClientId } from "@peated/server/lib/oauth";
 import { generatePublicId } from "@peated/server/lib/publicId";
 import slugify from "@sindresorhus/slugify";
@@ -65,7 +66,6 @@ import {
   buildBottleSeriesSearchDocument,
   buildEntitySearchDocument,
 } from "../search";
-import { SMWS_DISTILLERY_CODES } from "../smws";
 import { toTitleCase } from "../strings";
 
 function getDistilleryNames() {

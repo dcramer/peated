@@ -6,5 +6,3 @@ export const MagicLinkSchema = z.object({
   email: z.string().email().describe("Email address for the magic link"),
   createdAt: zDatetime.describe("Timestamp when the magic link was created"),
 });
-
-export type MagicLink = z.infer<typeof MagicLinkSchema>;

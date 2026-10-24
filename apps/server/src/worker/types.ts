@@ -84,12 +84,6 @@ export const JobContextSchema = z
 export type JobActorContext = z.infer<typeof JobActorContextSchema>;
 export type JobContext = z.infer<typeof JobContextSchema>;
 
-/** Parse queued job context, dropping malformed trace or actor attribution. */
-export function parseJobContext(input: JobPayload | null): JobContext {
-  const result = JobContextSchema.safeParse(input);
-  return result.success ? result.data : {};
-}
-
 export type JobFunction<TResult = void> = (
   args?: JobPayload,
   context?: JobContext,

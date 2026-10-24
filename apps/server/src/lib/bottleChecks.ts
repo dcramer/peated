@@ -318,16 +318,7 @@ const BottleCheckSubjectSchema = z.discriminatedUnion("intent", [
     .strict(),
 ]);
 
-export type CreateBottleCheckInput = z.input<
-  typeof CreateBottleCheckInputSchema
->;
 export type BottleCheckSubject = z.input<typeof BottleCheckSubjectSchema>;
-export type BottleCheckCloseReason = z.infer<
-  typeof BottleCheckCloseReasonSchema
->;
-export type ListActionableBottleChecksInput = z.input<
-  typeof ListActionableBottleChecksInputSchema
->;
 export type BottleCheckWithOperations = BottleCheck & {
   operations: BottleOperation[];
 };

@@ -4,8 +4,6 @@ export const mockApiServer = `http://127.0.0.1:${process.env.PLAYWRIGHT_API_PORT
 export const createdBottleName = "Playwright Reserve";
 export const tastingNotes = "Smoke, lemon peel, and sea salt.";
 export const photoTastingNotes = "Photo flow: smoke, lemon peel, and sea salt.";
-export const genericTastingNotes =
-  "Release family: smoke, lemon peel, and sea salt.";
 export const failingTastingNotes = "Please make this tasting fail.";
 
 export const testUser = {

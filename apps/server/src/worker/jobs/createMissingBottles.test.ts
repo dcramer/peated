@@ -1,4 +1,5 @@
 import { BottleClassificationResultSchema } from "@peated/bottle-classifier";
+import { normalizeBottleReferenceKey } from "@peated/bottle-classifier/normalize";
 import type { BottleClassificationDecision } from "@peated/server/agents/bottleClassifier";
 import { db } from "@peated/server/db";
 import {
@@ -11,7 +12,6 @@ import {
 } from "@peated/server/db/schema";
 import { getPeatedSystemActor } from "@peated/server/lib/actors";
 import { listActionableBottleChecks } from "@peated/server/lib/bottleChecks";
-import { normalizeBottleReferenceKey } from "@peated/server/lib/normalize";
 import * as workerClient from "@peated/server/lib/test/workerDispatch";
 import { routerClient } from "@peated/server/orpc/router";
 import {

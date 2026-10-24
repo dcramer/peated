@@ -681,8 +681,6 @@ export type BottleExtractedDetails = z.infer<
   typeof BottleExtractedDetailsSchema
 >;
 export type BottleConfidenceBasis = z.infer<typeof BottleConfidenceBasisSchema>;
-export type UnresolvedRisk = z.infer<typeof UnresolvedRiskSchema>;
-export type UnresolvedRiskCategory = z.infer<typeof UnresolvedRiskCategoryEnum>;
 export type ReferenceScope = z.infer<typeof ReferenceScopeEnum>;
 export type Category = z.infer<typeof CategoryEnum>;
 export type BottleCandidate = z.infer<typeof BottleCandidateSchema>;

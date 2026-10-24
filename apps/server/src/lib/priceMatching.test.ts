@@ -1,4 +1,5 @@
 import type { BottleContext, EntityContext } from "@peated/bottle-classifier";
+import { normalizeBottleReferenceKey } from "@peated/bottle-classifier/normalize";
 import {
   BottleClassificationError,
   BottleClassificationResultSchema,
@@ -37,7 +38,6 @@ import {
 } from "@peated/server/lib/bottleReferenceCandidates";
 import { finalizeCreatedBottle } from "@peated/server/lib/createBottle";
 import { buildBottleCreateInput } from "@peated/server/lib/flatBottleInput";
-import { normalizeBottleReferenceKey } from "@peated/server/lib/normalize";
 import {
   applyApprovedStorePriceMatch,
   canClearIgnoredStorePriceAssignment,

@@ -1,8 +1,6 @@
 import {
   DEFAULT_BOTTLE_CLASSIFIER_MODEL,
   DEFAULT_BOTTLE_CLASSIFIER_REASONING_EFFORT,
-  DEFAULT_OPENAI_EVAL_MODEL,
-  DEFAULT_OPENAI_EVAL_REASONING_EFFORT,
   DEFAULT_OPENAI_IMAGE_EXTRACTION_MODEL,
   DEFAULT_OPENAI_IMAGE_EXTRACTION_REASONING_EFFORT,
   DEFAULT_OPENAI_MODEL,
@@ -18,8 +16,6 @@ type OpenAICompatibleEnvKey =
   | "BOTTLE_CLASSIFIER_MODEL"
   | "BOTTLE_CLASSIFIER_REASONING_EFFORT"
   | "NODE_ENV"
-  | "OPENAI_EVAL_MODEL"
-  | "OPENAI_EVAL_REASONING_EFFORT"
   | "OPENAI_EMBEDDING_MODEL"
   | "OPENAI_IMAGE_EXTRACTION_MODEL"
   | "OPENAI_IMAGE_EXTRACTION_REASONING_EFFORT"
@@ -36,8 +32,6 @@ export type OpenAICompatibleConfig = {
   bottleClassifierModel: string;
   bottleClassifierReasoningEffort: OpenAIReasoningEffort | undefined;
   embeddingModel: string;
-  evalModel: string;
-  evalReasoningEffort: OpenAIReasoningEffort | undefined;
   imageExtractionModel: string;
   imageExtractionReasoningEffort: OpenAIReasoningEffort | undefined;
   model: string;
@@ -76,8 +70,6 @@ export function resolveOpenAICompatibleConfig(
     nonEmpty(envValue(env, "BOTTLE_CLASSIFIER_MODEL")) ??
     DEFAULT_BOTTLE_CLASSIFIER_MODEL;
   const model = nonEmpty(envValue(env, "OPENAI_MODEL")) ?? DEFAULT_OPENAI_MODEL;
-  const evalModel =
-    nonEmpty(envValue(env, "OPENAI_EVAL_MODEL")) ?? DEFAULT_OPENAI_EVAL_MODEL;
   const embeddingModel =
     nonEmpty(envValue(env, "OPENAI_EMBEDDING_MODEL")) ??
     DEFAULT_OPENAI_EMBEDDING_MODEL;
@@ -94,12 +86,6 @@ export function resolveOpenAICompatibleConfig(
         DEFAULT_BOTTLE_CLASSIFIER_REASONING_EFFORT,
     ),
     embeddingModel: gatewayModel(embeddingModel),
-    evalModel: gatewayModel(evalModel),
-    evalReasoningEffort: parseOpenAIReasoningEffort(
-      envValue(env, "OPENAI_EVAL_REASONING_EFFORT") ??
-        DEFAULT_OPENAI_EVAL_REASONING_EFFORT,
-      "OPENAI_EVAL_REASONING_EFFORT",
-    ),
     imageExtractionModel: gatewayModel(imageExtractionModel),
     imageExtractionReasoningEffort: parseOpenAIReasoningEffort(
       envValue(env, "OPENAI_IMAGE_EXTRACTION_REASONING_EFFORT") ??

@@ -108,8 +108,6 @@ The server and eval runner read these settings:
 | `BOTTLE_CLASSIFIER_REASONING_EFFORT`         | Classifier reasoning effort                      | `high`            |
 | `OPENAI_IMAGE_EXTRACTION_MODEL`              | Label extraction model                           | `gpt-6-luna`      |
 | `OPENAI_IMAGE_EXTRACTION_REASONING_EFFORT`   | Label extraction reasoning effort                | `high`            |
-| `OPENAI_EVAL_MODEL`                          | Eval judge model                                 | `gpt-5.6-luna`    |
-| `OPENAI_EVAL_REASONING_EFFORT`               | Eval judge reasoning effort                      | `medium`          |
 | `BOTTLE_CLASSIFIER_MAX_SEARCH_QUERIES`       | Web search queries allowed per classifier run    | `3`               |
 | `FIRECRAWL_API_KEY`                          | Optional web search and page reading             | none              |
 | `FIRECRAWL_API_URL`                          | Optional Firecrawl endpoint override             | provider default  |

@@ -13,12 +13,6 @@ export interface SessionData {
   ts: number | null;
 }
 
-export const defaultSession: SessionData = {
-  user: null,
-  accessToken: null,
-  ts: null,
-};
-
 export const sessionOptions: SessionOptions = {
   password: process.env.SESSION_SECRET || "", // TODO: this should error out
   cookieName: "_session",

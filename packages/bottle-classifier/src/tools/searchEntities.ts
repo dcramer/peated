@@ -8,7 +8,6 @@ import {
 } from "../classifierTypes";
 import { startToolSpan } from "../observability";
 
-export const EntitySearchResultSchema = EntityResolutionSchema;
 export type EntitySearchResult = EntityResolution;
 const SEARCH_ENTITIES_TOOL_DESCRIPTION =
   "Search local Peated brand, distillery, and bottler entities. Use when producer identity is blocking a match or create decision. Do not use for bottles.";

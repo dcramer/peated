@@ -1,3 +1,4 @@
+import { normalizeBottleReferenceKey } from "@peated/bottle-classifier/normalize";
 import { db } from "@peated/server/db";
 import {
   externalReviewArticles,
@@ -30,7 +31,6 @@ import {
   type IncomingBottleDecisionMetadata,
 } from "@peated/server/lib/incomingBottleDecisionLog";
 import { logInfo } from "@peated/server/lib/log";
-import { normalizeBottleReferenceKey } from "@peated/server/lib/normalize";
 import { and, asc, eq, gt, isNull } from "drizzle-orm";
 import { z } from "zod";
 import { pushUniqueJob } from "../dispatch";

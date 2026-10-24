@@ -85,4 +85,3 @@ export const OAuthTokenRequestSchema = z.object({
 export type OAuthAuthorizationRequest = z.infer<
   typeof OAuthAuthorizationRequestSchema
 >;
-export type OAuthTokenRequest = z.infer<typeof OAuthTokenRequestSchema>;

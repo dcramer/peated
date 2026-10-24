@@ -463,5 +463,3 @@ export const app = honoApp
       await next();
     });
   });
-
-export type AppType = typeof app;

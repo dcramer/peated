@@ -11,6 +11,7 @@ import {
   type BottleCandidate,
   type BottleExtractedDetails,
 } from "@peated/bottle-classifier/internal/types";
+import { normalizeBottleReferenceKey } from "@peated/bottle-classifier/normalize";
 import type { CatalogVerificationCreationSource } from "@peated/catalog-verifier";
 import {
   BottleClassificationError,
@@ -55,7 +56,6 @@ import {
   type IncomingBottleDecisionType,
 } from "@peated/server/lib/incomingBottleDecisionLog";
 import { logError, logInfo } from "@peated/server/lib/log";
-import { normalizeBottleReferenceKey } from "@peated/server/lib/normalize";
 import { isModelServiceUnavailable } from "@peated/server/lib/openaiClient";
 import {
   assessStorePriceMatch,

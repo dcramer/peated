@@ -1,3 +1,4 @@
+import { normalizeBottleReferenceKey } from "@peated/bottle-classifier/normalize";
 import { db } from "@peated/server/db";
 import {
   bottleObservations,
@@ -7,7 +8,6 @@ import {
 import { getUserActorForDatabase } from "@peated/server/lib/actors";
 import { findBottleReferenceAssignment } from "@peated/server/lib/bottleFinder";
 import { recordIncomingBottleDecisionInTransaction } from "@peated/server/lib/incomingBottleDecisionLog";
-import { normalizeBottleReferenceKey } from "@peated/server/lib/normalize";
 import {
   priceMatchProposalHistory,
   reopenStorePriceMatchesInTransaction,

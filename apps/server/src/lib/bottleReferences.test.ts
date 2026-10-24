@@ -1,3 +1,4 @@
+import { normalizeBottleReferenceKey } from "@peated/bottle-classifier/normalize";
 import { db } from "@peated/server/db";
 import {
   bottleImages,
@@ -18,7 +19,6 @@ import {
   StaleBottleReferenceReviewIdentityError,
   syncBottleReferenceConsumersForReferenceChange,
 } from "@peated/server/lib/bottleReferences";
-import { normalizeBottleReferenceKey } from "@peated/server/lib/normalize";
 import * as workerClient from "@peated/server/lib/test/workerDispatch";
 import { eq, sql } from "drizzle-orm";
 import { beforeEach, vi } from "vitest";

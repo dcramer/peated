@@ -7,8 +7,7 @@ import config from "@peated/web/config";
 import { headers } from "next/headers";
 import { cache } from "react";
 import { getSession } from "../session.server";
-import type { ClientContext } from "./client";
-import { getLink } from "./link";
+import { getLink, type ClientContext } from "./link";
 
 /**
  * Creates a server oRPC client, using the session token unless explicitly

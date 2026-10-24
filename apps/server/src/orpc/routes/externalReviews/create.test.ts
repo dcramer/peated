@@ -1,5 +1,6 @@
 import { createRouterClient } from "@orpc/server";
 import { BottleClassificationResultSchema } from "@peated/bottle-classifier";
+import { normalizeBottleReferenceKey } from "@peated/bottle-classifier/normalize";
 import type { BottleClassificationDecision } from "@peated/server/agents/bottleClassifier";
 import { db } from "@peated/server/db";
 import { getPostgresConnectionConfig } from "@peated/server/db/connection";
@@ -13,7 +14,6 @@ import {
 } from "@peated/server/db/schema";
 import { storeExternalReviewArticle } from "@peated/server/externalReviews/store";
 import { getPeatedSystemActor } from "@peated/server/lib/actors";
-import { normalizeBottleReferenceKey } from "@peated/server/lib/normalize";
 import waitError from "@peated/server/lib/test/waitError";
 import type { Context } from "@peated/server/orpc/context";
 import {

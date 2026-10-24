@@ -60,25 +60,12 @@ export type BadgeCheckType = z.infer<typeof BadgeCheckTypeEnum>;
 export type BadgeTracker = z.infer<typeof BadgeTrackerEnum>;
 export type BadgeFormula = z.infer<typeof BadgeFormulaEnum>;
 
-export type BottleEntityRole = z.infer<typeof BottleEntityRoleEnum>;
 export type EntityKind = z.infer<typeof EntityKindEnum>;
-export type ObjectType = z.infer<typeof ObjectTypeEnum>;
-export type FollowStatus = z.infer<typeof FollowStatusEnum>;
 export type FriendStatus = z.infer<typeof FriendStatusEnum>;
 export type Point = z.infer<typeof PointSchema>;
 export type ActivityEntry = z.infer<typeof ActivityEntrySchema>;
 export type ActivityCollectionAddEntry = z.infer<
   typeof ActivityCollectionAddEntrySchema
->;
-export type ActivityTastingSessionEntry = z.infer<
-  typeof ActivityTastingSessionEntrySchema
->;
-export type ProfileActivityEntry = z.infer<typeof ProfileActivityEntrySchema>;
-export type ProfileCollectionAddActivity = z.infer<
-  typeof ProfileCollectionAddActivitySchema
->;
-export type ProfileTastingSessionActivity = z.infer<
-  typeof ProfileTastingSessionActivitySchema
 >;
 
 export type Badge = z.infer<typeof BadgeSchema>;
@@ -163,9 +150,3 @@ export type BottlePreviewResult = {
   releaseMonth?: number | null;
   releaseDay?: number | null;
 };
-
-export const createTuple = <T extends Readonly<{ id: string }[]>>(arr: T) =>
-  // SAFETY: Array.map preserves the tuple order and returns each literal id unchanged.
-  arr.map((s) => s.id) as {
-    [K in keyof T]: T[K] extends { id: infer U } ? U : never;
-  };

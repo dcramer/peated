@@ -1,7 +1,7 @@
 "use client";
 
 import type { Outputs } from "@peated/server/orpc/router";
-import ConfirmationDialog from "@peated/web/components/confirmationDialog.client";
+import ConfirmationDialog from "@peated/web/components/confirmationDialog.stylex";
 import TimeSince from "@peated/web/components/timeSince";
 import { buildQueryString } from "@peated/web/lib/urls";
 import * as stylex from "@stylexjs/stylex";

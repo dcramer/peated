@@ -110,8 +110,6 @@ export const ActivityListResponseSchema = z.object({
 
 export const ProfileTastingSessionActivitySchema =
   ActivityTastingSessionEntrySchema;
-export const ProfileCollectionActivityCollectionSchema =
-  ActivityCollectionSchema;
 export const ProfileCollectionAddActivitySchema =
   ActivityCollectionAddEntrySchema;
 export const ProfileActivityEntrySchema = z.discriminatedUnion("type", [
