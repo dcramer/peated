@@ -68,6 +68,7 @@ import userFlavorList from "./routes/users/flavor-list";
 import userLibrarySearch from "./routes/users/library-search";
 import userLibraryStats from "./routes/users/library-stats";
 import userRegionList from "./routes/users/region-list";
+import userTastingSearch from "./routes/users/tasting-search";
 import userTastingStats from "./routes/users/tasting-stats";
 
 // Requests for routes not listed here return 404 from the mock server.
@@ -192,6 +193,7 @@ export const mockRouter = mockOS.router({
     librarySearch: userLibrarySearch,
     libraryStats: userLibraryStats,
     regionList: userRegionList,
+    tastingSearch: userTastingSearch,
     tastingStats: userTastingStats,
   },
 });

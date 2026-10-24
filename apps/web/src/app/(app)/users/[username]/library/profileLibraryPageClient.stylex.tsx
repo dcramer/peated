@@ -7,14 +7,15 @@ import { usePathname, useRouter, useSearchParams } from "next/navigation";
 import { useOptimistic, useState, useTransition } from "react";
 
 import { ButtonLink } from "@peated/web/components/button.stylex";
+import { SectionError } from "@peated/web/components/feedback.stylex";
+import { ListControls } from "@peated/web/components/listControls.stylex";
 import {
-  LoadingList,
-  SectionError,
-} from "@peated/web/components/feedback.stylex";
+  MemberListFilterGroups,
+  MemberListFilters,
+  type MemberListFilterGroup,
+} from "@peated/web/components/pages/memberListFilters.stylex";
 import {
-  MemberLibraryFilters,
   MemberLibraryList,
-  type MemberLibraryFilterGroup,
   type MemberLibraryItem,
 } from "@peated/web/components/pages/memberProfileContent.stylex";
 import { toBottleListItem } from "@peated/web/lib/bottleListItem";
@@ -22,10 +23,13 @@ import { getCursorHref } from "@peated/web/lib/cursorHref";
 import { useORPC } from "@peated/web/lib/orpc/context";
 import { foundationStyles } from "../../../../../styles/foundations.stylex";
 import { colors, space } from "../../../../../styles/tokens.stylex";
+import { ProfileBottleSearch } from "../profileBottleSearch.stylex";
 import { useProfile } from "../profileContext";
 import { getProfileLibraryInput, profileQueries } from "../profileQueries";
-import { ProfileLibraryLayout } from "./profileLibraryLayout.stylex";
-import { ProfileLibrarySearch } from "./profileLibrarySearch.stylex";
+import {
+  ProfileLibraryLayout,
+  ProfileLibraryResultsLoading,
+} from "./profileLibraryLayout";
 
 type LibraryEntry =
   Outputs["collections"]["bottles"]["list"]["results"][number];
@@ -94,10 +98,7 @@ export function ProfileLibraryPageClient() {
     });
   }
 
-  function setFilter(
-    name: "brand" | "distiller" | "entity" | "status" | "sort",
-    value: string,
-  ) {
+  function setFilter(name: string, value: string) {
     const next = new URLSearchParams(displayedParams);
     next.delete("cursor");
     if (value) next.set(name, value);
@@ -200,39 +201,30 @@ export function ProfileLibraryPageClient() {
   }
 
   const search = (
-    <ProfileLibrarySearch
+    <ProfileBottleSearch
       onEntitySelect={selectEntity}
       onSubmit={setQuery}
       query={query}
+      scope="library"
       userId={user.id}
     />
   );
-  const filterPanel = (
-    <MemberLibraryFilters
-      groups={filters}
-      mode="rail"
-      onChange={setFilter}
-      onClear={clearFilters}
-      query={query}
-      search={search}
-      total={statsQuery.data?.total}
-    />
-  );
+  const groupProps = {
+    groups: filters,
+    onChange: setFilter,
+    total: statsQuery.data?.total,
+  };
 
   return (
     <ProfileLibraryLayout
-      mobileFilters={
-        <MemberLibraryFilters
-          groups={filters}
-          mode="mobile"
-          onChange={setFilter}
+      rail={
+        <MemberListFilters
+          {...groupProps}
           onClear={clearFilters}
           query={query}
           search={search}
-          total={statsQuery.data?.total}
         />
       }
-      rail={filterPanel}
     >
       <div aria-busy={mutationPending || undefined}>
         {mutationError ? (
@@ -244,7 +236,7 @@ export function ProfileLibraryPageClient() {
           </p>
         ) : null}
         {libraryQuery.isPending ? (
-          <LoadingList label="Loading member library" rows={4} />
+          <ProfileLibraryResultsLoading rows={4} />
         ) : libraryQuery.error ? (
           <SectionError
             heading="Library is unavailable"
@@ -278,6 +270,21 @@ export function ProfileLibraryPageClient() {
               hasActiveFilters({ brand, distiller, entity, query, status })
                 ? "No matching bottles"
                 : "No library bottles yet"
+            }
+            mobileAction={
+              <ListControls
+                activeFilterCount={
+                  [brand, distiller, entity, query, status].filter(Boolean)
+                    .length
+                }
+                filters={<MemberListFilterGroups {...groupProps} />}
+                onClear={clearFilters}
+                onSortChange={(value) => setFilter("sort", value)}
+                pluralNoun="bottles"
+                search={search}
+                sort={sort}
+                sortOptions={sortOptions}
+              />
             }
             items={applyEntryChanges(
               libraryQuery.data.results,
@@ -396,9 +403,9 @@ function getFilterGroups({
   entity?: { id: number; name?: string };
   stats?: Outputs["users"]["libraryStats"];
   status: string;
-}): MemberLibraryFilterGroup[] {
+}): MemberListFilterGroup[] {
   const total = stats?.total ?? 0;
-  const groups: MemberLibraryFilterGroup[] = [
+  const groups: MemberListFilterGroup[] = [
     ...(entity
       ? [
           {
@@ -410,7 +417,7 @@ function getFilterGroups({
               },
             ],
             label: "Brand or producer",
-            name: "entity" as const,
+            name: "entity",
           },
         ]
       : []),

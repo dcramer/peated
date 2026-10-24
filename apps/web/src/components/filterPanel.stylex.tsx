@@ -13,7 +13,8 @@ import {
   space,
 } from "../styles/tokens.stylex";
 import { Button, IconButton } from "./button.stylex";
-import { FacetRow } from "./facetRow.stylex";
+import { FacetRow, FacetRowLoading } from "./facetRow.stylex";
+import { LoadingText } from "./feedback.stylex";
 import { TextInput } from "./field.stylex";
 
 const NARROW = "@media (max-width: 759px)";
@@ -207,6 +208,8 @@ export type FacetGroupProps = {
   onChange: (value: string) => void;
   options: readonly FacetGroupOption[];
   selected?: string;
+  /** A short, non-interactive fact about the whole group, such as a median. */
+  summary?: ReactNode;
   total?: number;
 };
 
@@ -216,6 +219,7 @@ export function FacetGroup({
   onChange,
   options,
   selected,
+  summary,
   total,
 }: FacetGroupProps) {
   const id = useId();
@@ -225,6 +229,11 @@ export function FacetGroup({
       <SectionHeading id={id} level={3}>
         {label}
       </SectionHeading>
+      {summary ? (
+        <p {...stylex.props(foundationStyles.metadata, styles.facetSummary)}>
+          {summary}
+        </p>
+      ) : null}
       <div {...stylex.props(styles.facetRows)}>
         {options.map((option) => {
           const isSelected = selected === option.value;
@@ -248,6 +257,36 @@ export function FacetGroup({
             />
           );
         })}
+      </div>
+    </section>
+  );
+}
+
+/**
+ * Reserves one facet group while its counts load. The heading is real; pass
+ * `summary` when the finished group shows a summary line.
+ */
+export function FacetGroupLoading({
+  label,
+  rows,
+  summary = false,
+}: {
+  label: string;
+  rows: number;
+  summary?: boolean;
+}) {
+  return (
+    <section aria-hidden="true" {...stylex.props(styles.facetGroup)}>
+      <SectionHeading level={3}>{label}</SectionHeading>
+      {summary ? (
+        <p {...stylex.props(foundationStyles.metadata, styles.facetSummary)}>
+          <LoadingText width="60%" />
+        </p>
+      ) : null}
+      <div {...stylex.props(styles.facetRows)}>
+        {Array.from({ length: rows }, (_, index) => (
+          <FacetRowLoading key={index} />
+        ))}
       </div>
     </section>
   );
@@ -369,6 +408,12 @@ const styles = stylex.create({
   },
   facetGroup: {
     minWidth: 0,
+  },
+  facetSummary: {
+    marginTop: space.x1,
+    marginBottom: 0,
+    color: colors.inkMuted,
+    fontVariantNumeric: "tabular-nums",
   },
   facetRows: {
     marginTop: space.x2,

@@ -1,4 +1,4 @@
-import { ProfileLibraryLoading } from "./profileLibraryLayout.stylex";
+import { ProfileLibraryLoading } from "./profileLibraryLayout";
 
 export default function LibraryLoading() {
   return <ProfileLibraryLoading />;

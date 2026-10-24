@@ -68,6 +68,7 @@ import userFlavorList from "@peated/server/orpc/contracts/users/flavor-list";
 import userLibrarySearch from "@peated/server/orpc/contracts/users/library-search";
 import userLibraryStats from "@peated/server/orpc/contracts/users/library-stats";
 import userRegionList from "@peated/server/orpc/contracts/users/region-list";
+import userTastingSearch from "@peated/server/orpc/contracts/users/tasting-search";
 import userTastingStats from "@peated/server/orpc/contracts/users/tasting-stats";
 
 // The mock API supports only the routes listed here.
@@ -192,6 +193,7 @@ export const mockContract = {
     librarySearch: userLibrarySearch,
     libraryStats: userLibraryStats,
     regionList: userRegionList,
+    tastingSearch: userTastingSearch,
     tastingStats: userTastingStats,
   },
 };

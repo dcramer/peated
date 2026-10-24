@@ -15,6 +15,7 @@ import list from "./list";
 import regionList from "./region-list";
 import suspensionUpdate from "./suspension-update";
 import tagList from "./tag-list";
+import tastingSearch from "./tasting-search";
 import tastingStats from "./tasting-stats";
 import update from "./update";
 
@@ -36,5 +37,6 @@ export default base.tag("users").router({
   regionList,
   suspensionUpdate,
   tagList,
+  tastingSearch,
   tastingStats,
 });

@@ -1,3 +1,4 @@
+import { AGE_BUCKETS, isAgeInBucket } from "@peated/server/constants";
 import type { AgeStats } from "@peated/server/schemas";
 
 function median(values: number[]): number | null {
@@ -18,33 +19,13 @@ export function buildAgeStats(ages: number[], unstatedCount: number): AgeStats {
       ? ages.reduce((oldest, age) => Math.max(oldest, age))
       : null,
     buckets: [
+      ...AGE_BUCKETS.map((bucket) => ({
+        id: bucket.id,
+        label: bucket.label,
+        count: ages.filter((age) => isAgeInBucket(age, bucket)).length,
+      })),
       {
-        id: "under10",
-        label: "Under 10",
-        count: ages.filter((age) => age < 10).length,
-      },
-      {
-        id: "from10To12",
-        label: "10–12",
-        count: ages.filter((age) => age >= 10 && age <= 12).length,
-      },
-      {
-        id: "from13To17",
-        label: "13–17",
-        count: ages.filter((age) => age >= 13 && age <= 17).length,
-      },
-      {
-        id: "from18To24",
-        label: "18–24",
-        count: ages.filter((age) => age >= 18 && age <= 24).length,
-      },
-      {
-        id: "atLeast25",
-        label: "25+",
-        count: ages.filter((age) => age >= 25).length,
-      },
-      {
-        id: "unstated",
+        id: "unstated" as const,
         label: "Unstated",
         count: unstatedCount,
       },

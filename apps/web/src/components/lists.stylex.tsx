@@ -1,5 +1,5 @@
 import * as stylex from "@stylexjs/stylex";
-import { ChevronDown, Download } from "lucide-react";
+import { ChevronDown, Download, LayoutList, Table2 } from "lucide-react";
 import type { ReactNode, SelectHTMLAttributes } from "react";
 
 import { foundationStyles } from "../styles/foundations.stylex";
@@ -12,42 +12,62 @@ import {
 } from "../styles/tokens.stylex";
 import { AppLink } from "./appLink";
 import { ButtonLink, IconButton } from "./button.stylex";
+import { LoadingText } from "./feedback.stylex";
 import { ItemList, ItemListItem } from "./itemList.stylex";
 import { getTextTitle } from "./textTitle";
 
 const COMPACT = "@media (max-width: 639px)";
 const TABLE_NARROW = "@media (max-width: 959px)";
+// PageColumns drops its rail at this width.
+const PAGE_NARROW = "@media (max-width: 759px)";
 
 export type ListSortOption = {
   label: string;
   value: string;
 };
 
+export type ListView = "list" | "table";
+
 export type ListToolbarProps = {
   count: number;
+  /** Replaces the sort control where the page's filter rail collapses. */
   mobileAction?: ReactNode;
+  /**
+   * The layout whose filter rail `mobileAction` replaces: Table collapses its
+   * rail below 960px, PageColumns below 760px.
+   */
+  mobileActionLayout?: "pageColumns" | "table";
   noun: string;
   pluralNoun?: string;
   onExport?: () => void;
   onSortChange: (value: string) => void;
+  /** Shows list and table view buttons when set with `view`. */
+  onViewChange?: (view: ListView) => void;
   pending?: boolean;
   sort: string;
   sortOptions: readonly [ListSortOption, ...ListSortOption[]];
   total?: number;
+  view?: ListView;
 };
 
-/** Keeps sorting available while pending results retain their last settled count. */
+/**
+ * Keeps sorting available while pending results retain their last settled
+ * count. Lists with a compact table view pass `view` and `onViewChange`.
+ */
 export function ListToolbar({
   count,
   mobileAction,
+  mobileActionLayout = "table",
   noun,
   pluralNoun = `${noun}s`,
   onExport,
   onSortChange,
+  onViewChange,
   pending = false,
   sort,
   sortOptions,
   total,
+  view,
 }: ListToolbarProps) {
   return (
     <div
@@ -74,12 +94,18 @@ export function ListToolbar({
           {...stylex.props(
             foundationStyles.metadata,
             styles.status,
-            Boolean(mobileAction) && styles.statusWithMobileAction,
+            Boolean(mobileAction) &&
+              mobileActionStyles[mobileActionLayout].status,
           )}
         >
           {pending ? "Updating…" : null}
         </span>
-        <span {...stylex.props(Boolean(mobileAction) && styles.wideSort)}>
+        <span
+          {...stylex.props(
+            Boolean(mobileAction) &&
+              mobileActionStyles[mobileActionLayout].sort,
+          )}
+        >
           <ListSort
             noun={pluralNoun}
             onChange={onSortChange}
@@ -87,6 +113,9 @@ export function ListToolbar({
             value={sort}
           />
         </span>
+        {view && onViewChange ? (
+          <ListViewToggle onChange={onViewChange} value={view} />
+        ) : null}
         {onExport ? (
           <IconButton
             icon={<Download aria-hidden="true" size={15} strokeWidth={1.75} />}
@@ -97,9 +126,110 @@ export function ListToolbar({
           />
         ) : null}
         {mobileAction ? (
-          <span {...stylex.props(styles.mobileAction)}>{mobileAction}</span>
+          <span
+            {...stylex.props(mobileActionStyles[mobileActionLayout].action)}
+          >
+            {mobileAction}
+          </span>
         ) : null}
       </div>
+    </div>
+  );
+}
+
+/**
+ * Reserves the toolbar while its list loads: the count line, the sort control,
+ * the list/table toggle with `view`, and the narrow-screen filters button with
+ * `mobileActionLayout`, each at its finished size.
+ */
+export function ListToolbarLoading({
+  mobileActionLayout,
+  view = false,
+}: {
+  mobileActionLayout?: ListToolbarProps["mobileActionLayout"];
+  view?: boolean;
+}) {
+  const mobile = mobileActionLayout
+    ? mobileActionStyles[mobileActionLayout]
+    : undefined;
+  return (
+    <div
+      aria-hidden="true"
+      {...stylex.props(
+        styles.toolbar,
+        Boolean(mobile) && styles.toolbarWithMobileAction,
+      )}
+    >
+      <p {...stylex.props(styles.count)}>
+        <span {...stylex.props(styles.countValue)}>
+          <LoadingText width="7em" />
+        </span>
+      </p>
+      <div {...stylex.props(styles.actions)}>
+        <span
+          {...stylex.props(
+            foundationStyles.metadata,
+            styles.status,
+            mobile?.status,
+          )}
+        />
+        <span {...stylex.props(mobile?.sort)}>
+          <span
+            {...stylex.props(foundationStyles.fieldLabel, styles.sortLabel)}
+          >
+            <span>Sort</span>
+            <span {...stylex.props(styles.loadingSelect)} />
+          </span>
+        </span>
+        {view ? (
+          <span {...stylex.props(styles.viewToggle)}>
+            <span {...stylex.props(styles.loadingIconButton)} />
+            <span {...stylex.props(styles.loadingIconButton)} />
+          </span>
+        ) : null}
+        {mobile ? (
+          <span {...stylex.props(mobile.action)}>
+            <span {...stylex.props(styles.loadingFiltersButton)} />
+          </span>
+        ) : null}
+      </div>
+    </div>
+  );
+}
+
+const listViews = [
+  {
+    icon: LayoutList,
+    label: "List view",
+    value: "list",
+  },
+  {
+    icon: Table2,
+    label: "Table view",
+    value: "table",
+  },
+] as const;
+
+function ListViewToggle({
+  onChange,
+  value,
+}: {
+  onChange: (view: ListView) => void;
+  value: ListView;
+}) {
+  return (
+    <div aria-label="View" role="group" {...stylex.props(styles.viewToggle)}>
+      {listViews.map(({ icon: Icon, label, value: option }) => (
+        <IconButton
+          aria-pressed={value === option}
+          icon={<Icon aria-hidden="true" size={16} strokeWidth={1.75} />}
+          key={option}
+          label={label}
+          onClick={() => onChange(option)}
+          size="sm"
+          variant={value === option ? "default" : "tonal"}
+        />
+      ))}
     </div>
   );
 }
@@ -308,13 +438,16 @@ export function RailListItem({
 }
 
 const styles = stylex.create({
+  // In a narrow column the controls wrap below the count instead of breaking it.
   toolbar: {
     display: "flex",
     width: "100%",
     minWidth: 0,
+    flexWrap: "wrap",
     alignItems: "center",
     justifyContent: "space-between",
-    gap: space.x4,
+    columnGap: space.x4,
+    rowGap: space.x3,
     paddingBottom: space.x3,
     [COMPACT]: {
       alignItems: "flex-start",
@@ -336,6 +469,7 @@ const styles = stylex.create({
   },
   countValue: {
     color: colors.ink,
+    whiteSpace: "nowrap",
     fontFamily: fonts.display,
     fontSize: "20px",
     fontWeight: 700,
@@ -344,14 +478,45 @@ const styles = stylex.create({
   },
   countDetail: {
     color: colors.inkMuted,
+    whiteSpace: "nowrap",
   },
   actions: {
     display: "flex",
     alignItems: "center",
     gap: space.x2,
+    [COMPACT]: { maxWidth: "100%", flexWrap: "wrap" },
   },
+  // Phones put the status after the controls so it never pushes them sideways.
   status: {
-    minWidth: "9ch",
+    minWidth: { default: "9ch", [COMPACT]: 0 },
+    order: { default: 0, [COMPACT]: 1 },
+  },
+  loadingSelect: {
+    display: "block",
+    width: "128px",
+    height: controlMetrics.controlHeightSmall,
+    borderRadius: controlMetrics.radius,
+    backgroundColor: colors.inset,
+  },
+  // Matches ListControls' "Filters" button.
+  loadingFiltersButton: {
+    display: "block",
+    width: "92px",
+    height: controlMetrics.controlHeightSmall,
+    borderRadius: controlMetrics.radius,
+    backgroundColor: colors.surface,
+  },
+  loadingIconButton: {
+    display: "block",
+    width: controlMetrics.controlHeightSmall,
+    height: controlMetrics.controlHeightSmall,
+    borderRadius: controlMetrics.radius,
+    backgroundColor: colors.surface,
+  },
+  viewToggle: {
+    display: "inline-flex",
+    flexShrink: 0,
+    gap: space.x1,
   },
   statusWithMobileAction: {
     [TABLE_NARROW]: {
@@ -378,6 +543,23 @@ const styles = stylex.create({
   mobileAction: {
     display: "none",
     [TABLE_NARROW]: {
+      display: "inline-flex",
+    },
+  },
+  pageStatusWithMobileAction: {
+    [PAGE_NARROW]: {
+      minWidth: 0,
+    },
+  },
+  pageWideSort: {
+    display: "inline-flex",
+    [PAGE_NARROW]: {
+      display: "none",
+    },
+  },
+  pageMobileAction: {
+    display: "none",
+    [PAGE_NARROW]: {
       display: "inline-flex",
     },
   },
@@ -495,3 +677,16 @@ const styles = stylex.create({
     fontVariantNumeric: "tabular-nums",
   },
 });
+
+const mobileActionStyles = {
+  pageColumns: {
+    action: styles.pageMobileAction,
+    sort: styles.pageWideSort,
+    status: styles.pageStatusWithMobileAction,
+  },
+  table: {
+    action: styles.mobileAction,
+    sort: styles.wideSort,
+    status: styles.statusWithMobileAction,
+  },
+};

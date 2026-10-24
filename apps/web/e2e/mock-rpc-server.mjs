@@ -1595,6 +1595,7 @@ async function handleRpcRequest({ request, response, url }) {
     case "users/regionList":
       sendRpcResponse(response, {
         results: [],
+        countries: [],
         totalCount: 0,
       });
       return true;

@@ -5,6 +5,8 @@ import { foundationStyles } from "../styles/foundations.stylex";
 import { colors, space } from "../styles/tokens.stylex";
 import { linkedRowStyles } from "./linkedRow.stylex";
 
+// Matches breakpointStyles in foundations, which TastingTable uses to move its
+// date into the details line when the Date column hides.
 const NARROW = "@media (max-width: 759px)";
 
 export type CatalogTableColumn<Item> = {
@@ -15,12 +17,25 @@ export type CatalogTableColumn<Item> = {
   key: string;
   padding?: "default" | "flush";
   priority?: "primary" | "secondary";
-  width?: "action" | "count" | "menu" | "rating" | "toggleMenu";
+  /** Figure fits a short value such as an ABV or age. */
+  width?:
+    | "action"
+    | "count"
+    | "date"
+    | "figure"
+    | "menu"
+    | "rating"
+    | "toggleMenu";
 };
 
 export type CatalogTableProps<Item> = {
   caption: string;
   columns: readonly CatalogTableColumn<Item>[];
+  /**
+   * Compact rows use less padding and align cells to their first line, for
+   * rows that add a second line under a compact identity.
+   */
+  density?: "compact" | "standard";
   getKey: (item: Item) => string | number;
   items: readonly Item[];
   linked?: boolean;
@@ -30,10 +45,16 @@ export type CatalogTableProps<Item> = {
 export function CatalogTable<Item>({
   caption,
   columns,
+  density = "standard",
   getKey,
   items,
   linked = false,
 }: CatalogTableProps<Item>) {
+  // Secondary columns hide on narrow screens, so the first visible one changes.
+  const firstNarrowIndex = columns.findIndex(
+    (column) => column.priority !== "secondary",
+  );
+
   return (
     <div {...stylex.props(styles.frame)}>
       <table {...stylex.props(styles.table)}>
@@ -48,6 +69,7 @@ export function CatalogTable<Item>({
                   foundationStyles.fieldLabel,
                   styles.header,
                   index === 0 && styles.firstColumn,
+                  index === firstNarrowIndex && styles.firstNarrowColumn,
                   alignStyles[column.align ?? "left"],
                   column.priority === "secondary" && styles.secondary,
                   column.width && widthStyles[column.width],
@@ -74,7 +96,9 @@ export function CatalogTable<Item>({
                   key={column.key}
                   {...stylex.props(
                     styles.cell,
+                    density === "compact" && styles.compactCell,
                     index === 0 && styles.firstColumn,
+                    index === firstNarrowIndex && styles.firstNarrowColumn,
                     alignStyles[column.align ?? "left"],
                     column.padding === "flush" && styles.flushCell,
                     column.priority === "secondary" && styles.secondary,
@@ -149,8 +173,16 @@ const styles = stylex.create({
     paddingLeft: space.x3,
     verticalAlign: "middle",
   },
+  compactCell: {
+    paddingTop: space.x2,
+    paddingBottom: space.x2,
+    verticalAlign: "top",
+  },
   firstColumn: {
     paddingLeft: 0,
+  },
+  firstNarrowColumn: {
+    paddingLeft: { default: null, [NARROW]: 0 },
   },
   flushCell: {
     paddingTop: 0,
@@ -191,6 +223,12 @@ const styles = stylex.create({
       width: "68px",
     },
   },
+  dateWidth: {
+    width: "112px",
+  },
+  figureWidth: {
+    width: "76px",
+  },
   ratingWidth: {
     width: "184px",
     [NARROW]: {
@@ -209,6 +247,8 @@ const alignStyles = {
 const widthStyles = {
   action: styles.actionWidth,
   count: styles.countWidth,
+  date: styles.dateWidth,
+  figure: styles.figureWidth,
   menu: styles.menuWidth,
   rating: styles.ratingWidth,
   toggleMenu: styles.toggleMenuWidth,

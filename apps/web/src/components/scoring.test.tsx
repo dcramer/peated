@@ -125,9 +125,16 @@ describe("Ratings", () => {
   it("shows a tasting's named rating and range instead of a five-point mark", () => {
     act(() => root.render(<TastingRating band="very_good" />));
 
-    expect(container.textContent).toContain("Very good");
-    expect(container.textContent).toContain("85–89 range");
+    expect(getVisibleText(container)).toBe("Very good85–89");
+    expect(container.textContent).toContain("Very good rating, 85–89 range");
     expect(container.querySelector('[role="img"]')).toBeNull();
+  });
+
+  it("shows only a tasting's rating name when asked", () => {
+    act(() => root.render(<TastingRating band="very_good" labelOnly />));
+
+    expect(getVisibleText(container)).toBe("Very good");
+    expect(container.textContent).toContain("Very good rating, 85–89 range");
   });
 
   it("names an exact review score on a 100-point scale", () => {
@@ -144,3 +151,9 @@ describe("Ratings", () => {
     expect(container.textContent).toContain("8/10");
   });
 });
+
+function getVisibleText(container: HTMLElement) {
+  return Array.from(container.querySelectorAll('[aria-hidden="true"]'))
+    .map((element) => element.textContent)
+    .join("");
+}

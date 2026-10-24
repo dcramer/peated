@@ -22,6 +22,8 @@ export type RatingCounts = Partial<Record<RatingBand, number>>;
 export type TastingRatingProps = {
   /** One tasting rating. */
   band: RatingBand;
+  /** Shows only the name, for dense tables; screen readers still hear the range. */
+  labelOnly?: boolean;
   size?: "sm" | "md" | "lg";
 };
 
@@ -29,7 +31,11 @@ export type TastingRatingProps = {
  * Shows one tasting's named rating and range, never a five-point score.
  * Small ratings keep the label and range inline for compact metadata rows.
  */
-export function TastingRating({ band, size = "md" }: TastingRatingProps) {
+export function TastingRating({
+  band,
+  labelOnly = false,
+  size = "md",
+}: TastingRatingProps) {
   const selectedBand = RATING_BANDS.find((candidate) => candidate.key === band);
   const label = selectedBand?.label ?? "Unknown";
   const range = selectedBand?.range ?? "Unknown";
@@ -55,15 +61,17 @@ export function TastingRating({ band, size = "md" }: TastingRatingProps) {
       >
         {label}
       </span>
-      <span
-        aria-hidden="true"
-        {...stylex.props(
-          styles.tastingRatingRange,
-          size === "lg" && styles.largeTastingRatingRange,
-        )}
-      >
-        {range} range
-      </span>
+      {labelOnly ? null : (
+        <span
+          aria-hidden="true"
+          {...stylex.props(
+            styles.tastingRatingRange,
+            size === "lg" && styles.largeTastingRatingRange,
+          )}
+        >
+          {range}
+        </span>
+      )}
     </span>
   );
 }

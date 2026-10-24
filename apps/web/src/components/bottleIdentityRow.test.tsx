@@ -22,4 +22,20 @@ describe("BottleIdentityRow", () => {
     );
     expect(html).toContain(">4 distilleries</span>");
   });
+
+  test("names a link that opens something other than the Bottle", () => {
+    const html = renderToStaticMarkup(
+      <BottleIdentityRow
+        href="/tastings/42"
+        linkLabel="View tasting of Lagavulin 16-year-old"
+        name="Lagavulin 16-year-old"
+        variant="compact"
+      />,
+    );
+
+    expect(html).toContain(
+      'aria-label="View tasting of Lagavulin 16-year-old"',
+    );
+    expect(html).toContain('href="/tastings/42"');
+  });
 });

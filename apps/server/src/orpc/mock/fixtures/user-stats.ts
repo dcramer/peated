@@ -55,6 +55,17 @@ export const mockUserRegionList = {
       count: 4,
     },
   ],
+  countries: [
+    { country: { name: mockCountry.name, slug: mockCountry.slug }, count: 29 },
+    {
+      country: { name: mockCountries[2]!.name, slug: mockCountries[2]!.slug },
+      count: 7,
+    },
+    {
+      country: { name: mockCountries[3]!.name, slug: mockCountries[3]!.slug },
+      count: 4,
+    },
+  ],
   totalCount: 42,
 } satisfies MockOutputs["users"]["regionList"];
 

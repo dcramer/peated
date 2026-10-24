@@ -23,6 +23,7 @@ export const Overview: Story = {
       <StoryRow>
         <TastingRating band="very_good" size="sm" />
         <TastingRating band="very_good" size="lg" />
+        <TastingRating band="very_good" labelOnly size="sm" />
       </StoryRow>
     </StoryStack>
   ),

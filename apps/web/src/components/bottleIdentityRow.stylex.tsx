@@ -4,7 +4,12 @@ import { Fragment, type MouseEventHandler, type ReactNode } from "react";
 import { foundationStyles } from "../styles/foundations.stylex";
 import { colors, effects, space, zIndices } from "../styles/tokens.stylex";
 import { AppLink } from "./appLink";
-import { BottleVisual, type BottleVisualFit } from "./bottleVisual.stylex";
+import {
+  BottleVisual,
+  BottleVisualLoading,
+  type BottleVisualFit,
+} from "./bottleVisual.stylex";
+import { LoadingText } from "./feedback.stylex";
 import Join from "./join";
 import { linkedRowStyles } from "./linkedRow.stylex";
 import { MatchedText } from "./matchedText.stylex";
@@ -13,7 +18,10 @@ import { TextLink } from "./textLink.stylex";
 import { getTextTitle } from "./textTitle";
 
 export type BottleIdentityRowProps = {
-  /** Aligns standard row content; compact rows always center their single line. */
+  /**
+   * Vertical alignment of the image and text. Use start when the first line
+   * must line up with neighboring cells, as in a table row.
+   */
   align?: "center" | "start";
   end?: ReactNode;
   hasTasted?: boolean;
@@ -22,8 +30,17 @@ export type BottleIdentityRowProps = {
   imageUrl?: string | null;
   isLibrary?: boolean;
   layout?: "cell" | "row";
-  /** Links only the bottle title when the surrounding card is also clickable. */
-  linkArea?: "row" | "title";
+  /**
+   * Where the title link's hit area reaches. Row fills this identity; title
+   * links only the name when the surrounding card is also clickable; parent
+   * fills the nearest linked container, such as a linked CatalogTable row.
+   */
+  linkArea?: "row" | "title" | "parent";
+  /**
+   * Accessible name for the title link when it opens something other than the
+   * Bottle, such as a tasting.
+   */
+  linkLabel?: string;
   metadata?: readonly string[];
   /** Compact rows show ABV after the name because they omit the metadata line. */
   abv?: string | null;
@@ -36,8 +53,12 @@ export type BottleIdentityRowProps = {
     href: string;
   };
   subtitle?: ReactNode;
-  /** Activity-only review text or byline shown beside the bottle image. */
-  activityDetails?: ReactNode;
+  /**
+   * Review or tasting text shown with the bottle. Activity rows place it below
+   * the bottle details beside the image; compact rows add one line under the
+   * name, which the caller truncates.
+   */
+  details?: ReactNode;
   /** Sidebar uses a small thumbnail, a two-line name, and a footer for trailing content. */
   variant?: "standard" | "activity" | "search" | "sidebar" | "compact";
   /** Tightens vertical padding when the row is nested inside another surface. */
@@ -55,7 +76,8 @@ export type BottleIdentityRowProps = {
  * release facts; activity keeps that identity with a larger feed thumbnail;
  * search tightens the title and spacing for typeahead results;
  * sidebar uses compact titles and small thumbnails; compact shows one regular-weight
- * name line for dense lists of library additions. Sidebar names use two lines with
+ * name line for dense lists of library additions, or a bold name with one
+ * details line in dense tables. Sidebar names use two lines with
  * the full name in title.
  * Search places trailing ratings or actions below the identity on narrow screens.
  * Use toBottleListItem for API Bottles or getBottleIdentityProps for partial reads.
@@ -65,8 +87,9 @@ export type BottleIdentityRowProps = {
  * their link inside the bottle identity. Use linkArea="title" when the
  * surrounding card is also clickable. Compact omits provenance, metadata,
  * subtitle, status, and related releases, but keep ABV after the name;
- * end remains available. Activity may
- * add review text below the bottle details without forcing it beneath the image.
+ * end remains available. Activity may add review text below the bottle details
+ * without forcing it beneath the image; compact may add one details line under
+ * the name for dense tables.
  */
 export function BottleIdentityRow({
   abv,
@@ -79,6 +102,7 @@ export function BottleIdentityRow({
   isLibrary = false,
   layout = "row",
   linkArea = "row",
+  linkLabel,
   metadata = [],
   name,
   onClick,
@@ -86,7 +110,7 @@ export function BottleIdentityRow({
   provenance = [],
   relatedReleases,
   subtitle,
-  activityDetails,
+  details,
   variant = "standard",
   verticalPadding = "md",
   wrapDetails = false,
@@ -118,6 +142,7 @@ export function BottleIdentityRow({
       >
         {href ? (
           <AppLink
+            aria-label={linkLabel}
             href={href}
             onClick={onClick}
             title={name}
@@ -125,9 +150,10 @@ export function BottleIdentityRow({
               styles.name,
               sidebar && styles.sidebarName,
               compact && styles.compactName,
-              linkArea === "row"
-                ? linkedRowStyles.primaryLink
-                : styles.titleLink,
+              compact && !details && styles.compactNameRegular,
+              linkArea === "title"
+                ? styles.titleLink
+                : linkedRowStyles.primaryLink,
             )}
           >
             <MatchedText query={query} text={name} />
@@ -139,6 +165,7 @@ export function BottleIdentityRow({
               styles.name,
               sidebar && styles.sidebarName,
               compact && styles.compactName,
+              compact && !details && styles.compactNameRegular,
             )}
           >
             <MatchedText query={query} text={name} />
@@ -156,6 +183,9 @@ export function BottleIdentityRow({
           <MemberStatus kind="tasted" />
         ) : null}
       </div>
+      {compact && details ? (
+        <div {...stylex.props(styles.compactDetails)}>{details}</div>
+      ) : null}
       {!compact && provenance.length ? (
         <div {...stylex.props(foundationStyles.metadata, styles.subtitle)}>
           <Join divider=" · ">
@@ -233,7 +263,7 @@ export function BottleIdentityRow({
         variant === "search" && styles.searchRow,
         sidebar && styles.sidebarRow,
         compact && styles.compactRow,
-        !compact && align === "start" && styles.startAlignedRow,
+        align === "start" && styles.startAlignedRow,
         layout === "cell" && styles.cellLayout,
         Boolean(href) && linkArea === "row" && linkedRowStyles.container,
         Boolean(href) &&
@@ -253,16 +283,103 @@ export function BottleIdentityRow({
             {bottleDetails}
             {trailingContent}
           </div>
-          {activityDetails ? (
-            <div {...stylex.props(styles.activityDetails)}>
-              {activityDetails}
-            </div>
+          {details ? (
+            <div {...stylex.props(styles.activityDetails)}>{details}</div>
           ) : null}
         </div>
       ) : (
         bottleDetails
       )}
       {!activity && !sidebar ? trailingContent : null}
+    </div>
+  );
+}
+
+/**
+ * Reserves one bottle row while it loads. It reuses the row's frame, image
+ * size, title line, and details slot, so the finished row replaces it in place.
+ * Standard and activity rows reserve a provenance and a metadata line.
+ */
+export function BottleIdentityRowLoading({
+  align = "center",
+  details,
+  end,
+  layout = "row",
+  variant = "standard",
+  verticalPadding = "md",
+}: Pick<
+  BottleIdentityRowProps,
+  "align" | "details" | "end" | "layout" | "verticalPadding"
+> & {
+  variant?: "activity" | "compact" | "standard";
+}) {
+  const activity = variant === "activity";
+  const compact = variant === "compact";
+  const copy = (
+    <div {...stylex.props(styles.copy)}>
+      <div
+        {...stylex.props(
+          foundationStyles.rowTitle,
+          compact && foundationStyles.compactRowTitle,
+          styles.nameLine,
+        )}
+      >
+        <LoadingText width="14em" />
+      </div>
+      {compact && details ? (
+        <div {...stylex.props(styles.compactDetails)}>{details}</div>
+      ) : null}
+      {!compact ? (
+        <>
+          <div {...stylex.props(foundationStyles.metadata, styles.subtitle)}>
+            <LoadingText width="9em" />
+          </div>
+          <div {...stylex.props(foundationStyles.metadata, styles.metadata)}>
+            <LoadingText width="13em" />
+          </div>
+        </>
+      ) : null}
+    </div>
+  );
+  const trailingContent = end ? (
+    <div {...stylex.props(styles.end)}>{end}</div>
+  ) : null;
+
+  return (
+    <div
+      aria-hidden="true"
+      {...stylex.props(
+        styles.row,
+        verticalPadding === "sm" && styles.smallVerticalPadding,
+        activity && styles.activityRow,
+        compact && styles.compactRow,
+        align === "start" && styles.startAlignedRow,
+        layout === "cell" && styles.cellLayout,
+      )}
+    >
+      {activity ? (
+        <span {...stylex.props(styles.activityVisual)}>
+          <BottleVisualLoading size="activity" />
+        </span>
+      ) : (
+        <BottleVisualLoading size={compact ? "xs" : "md"} />
+      )}
+      {activity ? (
+        <div {...stylex.props(styles.activityBody)}>
+          <div {...stylex.props(styles.activitySummary)}>
+            {copy}
+            {trailingContent}
+          </div>
+          {details ? (
+            <div {...stylex.props(styles.activityDetails)}>{details}</div>
+          ) : null}
+        </div>
+      ) : (
+        <>
+          {copy}
+          {trailingContent}
+        </>
+      )}
     </div>
   );
 }
@@ -315,7 +432,7 @@ const styles = stylex.create({
     gap: space.x3,
   },
   activityDetails: {
-    marginTop: space.x3,
+    marginTop: space.x2,
   },
   searchRow: {
     paddingTop: space.x2,
@@ -363,9 +480,18 @@ const styles = stylex.create({
     display: "block",
     minWidth: 0,
     overflow: "hidden",
-    fontWeight: 400,
     textOverflow: "ellipsis",
     whiteSpace: "nowrap",
+  },
+  // Compact variant rule: a single-line row (a library addition) keeps a
+  // regular-weight name; a row with a details line is a two-line identity and
+  // keeps the bold compact row title.
+  compactNameRegular: {
+    fontWeight: 400,
+  },
+  compactDetails: {
+    width: "100%",
+    minWidth: 0,
   },
   compactAbv: {
     flexShrink: 0,

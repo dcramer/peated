@@ -94,6 +94,13 @@ export default implement(userRegionListContract).handler(async function ({
     throw error;
   }
 
+  // Country totals cover every group, not only the 25 returned in `results`,
+  // so they match the tastings.list country filter.
+  const countryCounts = new Map<number, number>();
+  for (const { countryId, count } of grouped.values()) {
+    countryCounts.set(countryId, (countryCounts.get(countryId) ?? 0) + count);
+  }
+
   const aggregates = Array.from(grouped.values())
     .sort(
       (left, right) =>
@@ -107,9 +114,7 @@ export default implement(userRegionListContract).handler(async function ({
     )
     .slice(0, 25);
 
-  const countryIds = Array.from(
-    new Set(aggregates.map(({ countryId }) => countryId)),
-  );
+  const countryIds = Array.from(countryCounts.keys());
   const countriesById = countryIds.length
     ? Object.fromEntries(
         (
@@ -154,6 +159,14 @@ export default implement(userRegionListContract).handler(async function ({
       region: regionId === null ? null : regionsById[regionId],
       count,
     })),
+    countries: Array.from(countryCounts, ([countryId, count]) => ({
+      country: countriesById[countryId],
+      count,
+    })).sort(
+      (left, right) =>
+        right.count - left.count ||
+        left.country.name.localeCompare(right.country.name),
+    ),
     totalCount,
   };
 });

@@ -7,10 +7,8 @@ import {
   BottleIdentityRow,
   type BottleIdentityRowProps,
 } from "@peated/web/components/bottleIdentityRow.stylex";
-import { Button } from "@peated/web/components/button.stylex";
 import { Chip } from "@peated/web/components/chip.stylex";
 import { EmptyState } from "@peated/web/components/feedback.stylex";
-import { FacetGroup } from "@peated/web/components/filterPanel.stylex";
 import { ItemList, ItemListItem } from "@peated/web/components/itemList.stylex";
 import {
   CursorPager,
@@ -21,10 +19,7 @@ import {
   RowMenu,
   type RowMenuGroup,
 } from "@peated/web/components/rowMenu.stylex";
-import { foundationStyles } from "../../styles/foundations.stylex";
-import { colors, effects, space } from "../../styles/tokens.stylex";
-
-const NARROW = "@media (max-width: 759px)";
+import { space } from "../../styles/tokens.stylex";
 
 export type MemberLibraryItem = BottleIdentityRowProps & {
   actions?: readonly RowMenuGroup[];
@@ -37,6 +32,8 @@ export type MemberLibraryListProps = {
   emptyDescription: ReactNode;
   emptyHeading: string;
   items: readonly MemberLibraryItem[];
+  /** ListControls for narrow screens, where PageColumns hides the rail. */
+  mobileAction?: ReactNode;
   nextHref?: string;
   onSortChange: (value: string) => void;
   pending?: boolean;
@@ -53,6 +50,7 @@ export function MemberLibraryList({
   emptyDescription,
   emptyHeading,
   items,
+  mobileAction,
   nextHref,
   onSortChange,
   pending = false,
@@ -66,6 +64,8 @@ export function MemberLibraryList({
     <section aria-label="Member library" {...stylex.props(styles.library)}>
       <ListToolbar
         count={items.length}
+        mobileAction={mobileAction}
+        mobileActionLayout="pageColumns"
         noun="bottle"
         onSortChange={onSortChange}
         pending={pending}
@@ -110,106 +110,7 @@ export function MemberLibraryList({
   );
 }
 
-export type MemberLibraryFilter = {
-  count?: number;
-  label: string;
-  selected: boolean;
-  value: string;
-};
-
-export type MemberLibraryFilterGroup = {
-  filters: readonly MemberLibraryFilter[];
-  label: string;
-  name: "brand" | "distiller" | "entity" | "status";
-};
-
-export function MemberLibraryFilters({
-  groups,
-  mode,
-  onChange,
-  onClear,
-  query,
-  search,
-  total,
-}: {
-  groups: readonly MemberLibraryFilterGroup[];
-  mode: "mobile" | "rail";
-  onChange: (name: MemberLibraryFilterGroup["name"], value: string) => void;
-  onClear: () => void;
-  /** Applied search text, used to offer "Clear filters". */
-  query: string;
-  /** Library search field; the route owns its queries and navigation. */
-  search: ReactNode;
-  total?: number;
-}) {
-  const hasFilters = Boolean(
-    query ||
-    groups.some((group) => group.filters.some((filter) => filter.selected)),
-  );
-  const content = (
-    <div {...stylex.props(styles.filterContent)}>
-      {search}
-      {groups.map((group) => (
-        <FacetGroup
-          key={group.name}
-          label={group.label}
-          onChange={(value) => onChange(group.name, value)}
-          options={group.filters}
-          selected={group.filters.find((filter) => filter.selected)?.value}
-          total={total}
-        />
-      ))}
-      {hasFilters ? (
-        <Button onClick={onClear} size="sm" variant="text">
-          Clear filters
-        </Button>
-      ) : null}
-    </div>
-  );
-
-  return mode === "mobile" ? (
-    <details {...stylex.props(styles.mobileFilters)}>
-      <summary
-        {...stylex.props(
-          foundationStyles.interactiveSmall,
-          styles.mobileSummary,
-        )}
-      >
-        Filter library
-      </summary>
-      {content}
-    </details>
-  ) : (
-    <div {...stylex.props(styles.railFilters)}>{content}</div>
-  );
-}
-
 const styles = stylex.create({
   library: { minWidth: 0 },
   libraryEnd: { display: "flex", alignItems: "center", gap: space.x2 },
-  filterContent: { display: "flex", flexDirection: "column", gap: space.x6 },
-  railFilters: { display: "block", [NARROW]: { display: "none" } },
-  mobileFilters: {
-    display: "none",
-    marginBottom: space.x6,
-    borderTopWidth: "1px",
-    borderTopStyle: "solid",
-    borderTopColor: colors.sectionRule,
-    borderBottomWidth: "1px",
-    borderBottomStyle: "solid",
-    borderBottomColor: colors.hairline,
-    backgroundColor: "transparent",
-    [NARROW]: { display: "block" },
-  },
-  mobileSummary: {
-    padding: space.x3,
-    color: colors.ink,
-    fontWeight: 600,
-    cursor: "pointer",
-    outline: "none",
-    boxShadow: {
-      default: "none",
-      ":focus-visible": effects.focusRing,
-    },
-  },
 });

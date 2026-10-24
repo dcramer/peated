@@ -28,7 +28,8 @@
   code. Page metadata goes below its title. `BottleIdentityRow` owns bottle rows;
   `BottleVisual` owns bottle images; `CommunityFeed` owns activity and full-width
   tasting lists on the homepage, `/activity`, bottle, brand or producer, and
-  member pages. Dedicated detail views and narrow sidebar lists keep their own
+  member pages. `TastingTable` owns the dense table view of one
+  member's tastings. Dedicated detail views and narrow sidebar lists keep their own
   task-specific compositions.
   Use `formatBottleDisplayName` or `toBottleListItem` for displayed bottle names.
   API responses used by these helpers must include the BottleGroup summary.

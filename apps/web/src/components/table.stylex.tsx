@@ -1,20 +1,14 @@
 "use client";
 
 import * as stylex from "@stylexjs/stylex";
-import { ListFilter } from "lucide-react";
-import { useState, type ReactNode } from "react";
+import type { ReactNode } from "react";
 
 import { colors, space } from "../styles/tokens.stylex";
 import { Button } from "./button.stylex";
 import { FilterQuery, type FilterQueryProps } from "./filterPanel.stylex";
-import {
-  CursorPager,
-  ListSort,
-  ListToolbar,
-  type ListSortOption,
-} from "./lists.stylex";
+import { ListControls } from "./listControls.stylex";
+import { CursorPager, ListToolbar, type ListSortOption } from "./lists.stylex";
 import { SectionHeading } from "./sectionHeading.stylex";
-import { Slideout } from "./slideout.stylex";
 
 const NARROW = "@media (max-width: 959px)";
 
@@ -63,32 +57,27 @@ export function Table({
   sortOptions,
   total,
 }: TableProps) {
-  const [controlsOpen, setControlsOpen] = useState(false);
   const hasControls = Boolean(query || filters);
   const clearAction = activeFilterCount > 0 ? onClear : undefined;
-  const controlsLabel = activeFilterCount
-    ? `Search, filters, and sort, ${activeFilterCount} active ${
-        activeFilterCount === 1 ? "filter" : "filters"
-      }`
-    : "Search, filters, and sort";
-
   const mobileAction = hasControls ? (
-    <Button
-      aria-expanded={controlsOpen}
-      aria-haspopup="dialog"
-      aria-label={controlsLabel}
-      onClick={() => setControlsOpen(true)}
-      size="sm"
-      variant="tonal"
-    >
-      <ListFilter aria-hidden="true" size={16} strokeWidth={1.75} />
-      Filters
-      {activeFilterCount ? (
-        <span aria-hidden="true" {...stylex.props(styles.activeCount)}>
-          {activeFilterCount}
-        </span>
-      ) : null}
-    </Button>
+    <ListControls
+      activeFilterCount={activeFilterCount}
+      filters={
+        filters ? (
+          <div
+            {...stylex.props(styles.filterGroups, styles.drawerFilterGroups)}
+          >
+            {filters}
+          </div>
+        ) : undefined
+      }
+      onClear={onClear}
+      onSortChange={onSortChange}
+      pluralNoun={pluralNoun}
+      search={query ? <FilterQuery {...query} /> : undefined}
+      sort={sort}
+      sortOptions={sortOptions}
+    />
   ) : undefined;
 
   return (
@@ -134,52 +123,6 @@ export function Table({
           </aside>
         ) : null}
       </div>
-      {hasControls ? (
-        <Slideout
-          footer={
-            <div {...stylex.props(styles.footerActions)}>
-              {clearAction ? (
-                <Button onClick={clearAction} size="md" variant="text">
-                  Clear filters
-                </Button>
-              ) : null}
-              <Button
-                onClick={() => setControlsOpen(false)}
-                size="md"
-                variant="accent"
-              >
-                View results
-              </Button>
-            </div>
-          }
-          onClose={() => setControlsOpen(false)}
-          open={controlsOpen}
-          title="Search, filters, and sort"
-        >
-          <div {...stylex.props(styles.drawerControls)}>
-            {query ? <FilterQuery {...query} /> : null}
-            <ListSort
-              fullWidth
-              noun={pluralNoun}
-              onChange={onSortChange}
-              options={sortOptions}
-              value={sort}
-            />
-            {filters ? (
-              <section aria-label="Filters">
-                <div
-                  {...stylex.props(
-                    styles.filterGroups,
-                    styles.drawerFilterGroups,
-                  )}
-                >
-                  {filters}
-                </div>
-              </section>
-            ) : null}
-          </div>
-        </Slideout>
-      ) : null}
     </section>
   );
 }
@@ -247,30 +190,5 @@ const styles = stylex.create({
   },
   drawerFilterGroups: {
     paddingTop: 0,
-  },
-  activeCount: {
-    minWidth: "18px",
-    height: "18px",
-    paddingRight: "5px",
-    paddingLeft: "5px",
-    borderRadius: "999px",
-    backgroundColor: colors.accent,
-    color: colors.ground,
-    fontSize: "11px",
-    fontWeight: 700,
-    lineHeight: "18px",
-    textAlign: "center",
-  },
-  drawerControls: {
-    display: "flex",
-    minWidth: 0,
-    flexDirection: "column",
-    gap: space.x6,
-  },
-  footerActions: {
-    display: "flex",
-    alignItems: "center",
-    justifyContent: "flex-end",
-    gap: space.x2,
   },
 });

@@ -119,6 +119,9 @@ const styles = stylex.create({
   coverVisual: {
     padding: 0,
   },
+  loadingVisual: {
+    backgroundColor: colors.surface,
+  },
   visualExtraSmall: {
     width: "24px",
     maxWidth: "24px",
@@ -231,6 +234,24 @@ const styles = stylex.create({
     height: `calc(${bottleThumbnailMetrics.height} - ${space.x4})`,
   },
 });
+
+/** Reserves a bottle image frame at its finished size while a row loads. */
+export function BottleVisualLoading({
+  size = "md",
+}: {
+  size?: BottleVisualSize;
+}) {
+  return (
+    <span
+      aria-hidden="true"
+      {...stylex.props(
+        styles.visual,
+        visualSizeStyles[size],
+        styles.loadingVisual,
+      )}
+    />
+  );
+}
 
 const visualSizeStyles = {
   xs: styles.visualExtraSmall,
