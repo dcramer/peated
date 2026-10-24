@@ -80,6 +80,15 @@ overrides:
   # lockfile kept 5.93. Later releases fix DOM clobbering and buildHttp SSRF.
   webpack: ^5.104.1
 
+packageExtensions:
+  # @hookform/resolvers imports zod types without declaring zod, so pnpm's
+  # hidden hoisting picks one of the workspace's zod 4 copies. When it picked
+  # knip's newer zod, the web build failed to type check zodResolver.ts. As a
+  # peer, it uses the web app's own zod.
+  '@hookform/resolvers':
+    peerDependencies:
+      zod: '*'
+
 minimumReleaseAgeExclude:
   - zod@4.5.4
 
