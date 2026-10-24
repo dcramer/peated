@@ -267,6 +267,35 @@ describe("checkConflictPicks", () => {
     ]);
   });
 
+  test("checks an era's range against the stored dates", () => {
+    const era = (endDate: string) =>
+      draft({
+        sources: [
+          source,
+          { ...source, id: "df", url: "https://www.diffordsguide.com/brora" },
+        ],
+        events: [
+          {
+            id: 1,
+            kind: "era",
+            title: "Heavily peated",
+            date: "1969",
+            endDate,
+            writtenBy: "pipeline",
+            citations: [
+              { sourceId: "wp", statedValue: "1969–1973" },
+              { sourceId: "df", statedValue: "1969-1974" },
+            ],
+          },
+        ],
+      });
+
+    expect(checkConflictPicks(era("1973"))).toEqual([]);
+    expect(checkConflictPicks(era("1975"))).toEqual([
+      "Event 1 stores 1969–1975, which no source states.",
+    ]);
+  });
+
   test("compares numbers whole, so 2 stills is not 12 or 20", () => {
     const stills = (value: number) =>
       draft({
