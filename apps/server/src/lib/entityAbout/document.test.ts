@@ -232,6 +232,43 @@ describe("mergePipelineDraft", () => {
     ]);
   });
 
+  test("does not match a listed item whose owner differs", () => {
+    const stored = document({
+      sources: [],
+      events: [
+        {
+          id: 4,
+          kind: "acquired",
+          date: "1925",
+          newOwnerName: "DCL",
+          writtenBy: "person",
+          citations: [],
+        },
+      ],
+    });
+    const draft = (newOwnerName: string) =>
+      document({
+        events: [
+          {
+            id: 4,
+            kind: "acquired",
+            date: "1925",
+            newOwnerName,
+            writtenBy: "pipeline",
+            citations: cited,
+          },
+        ],
+      });
+
+    // The writer reused the listed ID, but names a different owner.
+    expect(
+      mergePipelineDraft(stored, draft("Diageo"), now, new Map()).events,
+    ).toHaveLength(2);
+    expect(
+      mergePipelineDraft(stored, draft("DCL"), now, new Map()).events,
+    ).toHaveLength(1);
+  });
+
   test("keeps different events from the same year apart", () => {
     const stored = document({
       sources: [],

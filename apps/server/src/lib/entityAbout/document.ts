@@ -314,10 +314,39 @@ function sameText(left: string | null, right: string | null) {
 }
 
 /**
+ * The detail that tells one event of a kind from another: undefined for kinds
+ * that have none, and null when the event does not state it.
+ */
+function eventDetail(
+  event: AboutEvent,
+  ownerNames: ReadonlyMap<number, string>,
+) {
+  switch (event.kind) {
+    case "generic":
+      return event.text;
+    case "renamed":
+      return event.name;
+    case "acquired":
+      return (
+        event.newOwnerName ??
+        (event.newOwnerId ? (ownerNames.get(event.newOwnerId) ?? null) : null)
+      );
+    case "era":
+      return event.title;
+    case "opened":
+    case "closed":
+    case "mothballed":
+    case "reopened":
+      return undefined;
+  }
+}
+
+/**
  * Whether a draft event states the same fact as a kept one: same kind, dates
  * that agree, and the same name, owner, title, or text where the kind has
- * one. A writer may also reuse the ID of a listed item without a source.
- * Unknown details never match, because many things happen in one year.
+ * one. A writer may also reuse the ID of a listed item without a source; a
+ * name, owner, or title that differs still rules it out. Unknown details
+ * never match, because many things happen in one year.
  */
 function sameEvent(
   kept: AboutEvent,
@@ -327,27 +356,20 @@ function sameEvent(
   if (kept.kind !== draft.kind || !valuesAgree(kept.date, draft.date)) {
     return false;
   }
-  // Only stored history without a source is listed to the writer.
-  if (!kept.citations.length && kept.id === draft.id) return true;
-  switch (draft.kind) {
-    case "generic":
-      return sameText(kept.text, draft.text);
-    case "renamed":
-      return sameText(kept.name, draft.name);
-    case "acquired":
-      return sameText(
-        kept.newOwnerName ??
-          (kept.newOwnerId ? (ownerNames.get(kept.newOwnerId) ?? null) : null),
-        draft.newOwnerName,
-      );
-    case "era":
-      return sameText(kept.title, draft.title);
-    case "opened":
-    case "closed":
-    case "mothballed":
-    case "reopened":
-      return true;
+  const keptDetail = eventDetail(kept, ownerNames);
+  const draftDetail = eventDetail(draft, ownerNames);
+  if (keptDetail === undefined || draftDetail === undefined) return true;
+  // Only stored history without a source is listed to the writer. A generic
+  // item's text is reworded freely; other details must not conflict.
+  if (!kept.citations.length && kept.id === draft.id) {
+    return (
+      kept.kind === "generic" ||
+      keptDetail === null ||
+      draftDetail === null ||
+      sameText(keptDetail, draftDetail)
+    );
   }
+  return sameText(keptDetail, draftDetail);
 }
 
 /**
