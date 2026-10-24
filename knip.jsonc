@@ -2,13 +2,8 @@
   "$schema": "https://unpkg.com/knip@6/schema-jsonc.json",
   "workspaces": {
     ".": {
-      "ignoreDependencies": [
-        // OpenSpec is invoked directly by the repository's change workflow.
-        "@fission-ai/openspec",
-        // pnpm-workspace.yaml names zod as a peer of @hookform/resolvers, a
-        // package extension rather than a root dependency.
-        "zod",
-      ],
+      // OpenSpec is invoked directly by the repository's change workflow.
+      "ignoreDependencies": ["@fission-ai/openspec"],
       // The workflow runs the web workspace's Playwright binary via pnpm --dir.
       "ignoreBinaries": ["playwright"],
     },
