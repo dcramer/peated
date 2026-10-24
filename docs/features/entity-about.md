@@ -163,8 +163,8 @@ destination's next version can draw on them.
 
 ## Descriptions
 
-A run that publishes a lead replaces an empty or generated Entity
-description. A description a person wrote, or one written before Peated
+A save that publishes a lead, from a writer run or a moderator's edit,
+replaces an empty or generated Entity description. A description a person wrote, or one written before Peated
 recorded who wrote descriptions, stays. A hidden page never changes the
 description. After the writer has covered every distillery and brand,
 `/admin/catalog/clear-entity-descriptions` clears each generated description

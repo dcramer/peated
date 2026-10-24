@@ -16,6 +16,12 @@ replaced or cleared by the pipeline or the cleanup.
   unsourced generated description
 - **THEN** the distillery's description becomes the lead
 
+#### Scenario: Moderator edits the lead
+
+- **WHEN** a moderator saves a new lead for a distillery with a generated
+  description
+- **THEN** the distillery's description becomes the new lead
+
 #### Scenario: Moderator-written description
 
 - **WHEN** the pipeline publishes a lead for a brand whose description a

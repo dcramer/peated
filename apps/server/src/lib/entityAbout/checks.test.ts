@@ -479,6 +479,32 @@ describe("checkConflictPicks", () => {
     expect(stills(1887, "The still dates from c.1887.")).toBeDefined();
   });
 
+  test("keeps a site fact's date only when a quote states its year", () => {
+    const asOf = (date: string) =>
+      keepVerifiedCitations(
+        draft({
+          siteFacts: {
+            washStills: {
+              value: 1,
+              asOf: date,
+              citations: [
+                {
+                  sourceId: "wp",
+                  statedValue: "1",
+                  quote: "It has 1 wash still.",
+                },
+              ],
+            },
+          },
+        }),
+        [{ ...page, text: `${page.text} It has 1 wash still.` }],
+        null,
+      ).siteFacts.washStills?.asOf;
+
+    // No quote gives a year, so the date is dropped and the fact stays.
+    expect(asOf("2019")).toBeNull();
+  });
+
   test("reads thousands separators and same-year spans", () => {
     expect(
       getDisagreement([

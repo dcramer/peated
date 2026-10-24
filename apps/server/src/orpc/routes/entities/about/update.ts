@@ -1,6 +1,7 @@
 import { db } from "@peated/server/db";
 import { entities } from "@peated/server/db/schema";
 import { getUserActorForDatabase } from "@peated/server/lib/actors";
+import { updateEntityDescription } from "@peated/server/lib/entityAbout/description";
 import { saveEntityAbout } from "@peated/server/lib/entityAbout/store";
 import { procedure } from "@peated/server/orpc";
 import { withAboutRouteErrors } from "@peated/server/orpc/errors";
@@ -50,12 +51,14 @@ export default procedure
     return await withAboutRouteErrors(async () => {
       const saved = await db.transaction(async (tx) => {
         const actor = await getUserActorForDatabase(tx, context.user);
-        return await saveEntityAbout(tx, {
+        const result = await saveEntityAbout(tx, {
           entity,
           document: input.document,
           expectedVersion: input.version,
           actor,
         });
+        await updateEntityDescription(tx, entity, result, actor);
+        return result;
       });
       return await serialize(
         EntityAboutSerializer,

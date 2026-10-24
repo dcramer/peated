@@ -1,7 +1,9 @@
 import { db } from "@peated/server/db";
+import { entities } from "@peated/server/db/schema";
 import { getEntityAbout } from "@peated/server/lib/entityAbout/store";
 import waitError from "@peated/server/lib/test/waitError";
 import { routerClient } from "@peated/server/orpc/router";
+import { eq } from "drizzle-orm";
 
 const source = {
   id: "s1",
@@ -43,6 +45,50 @@ describe("PUT /entities/:entity/about", () => {
       "1819",
       "1983-03",
     ]);
+  });
+
+  test("updates a generated description to the new lead", async ({
+    fixtures,
+  }) => {
+    const user = await fixtures.User({ mod: true });
+    const entity = await fixtures.Entity({
+      kind: "distillery",
+      description: "An old generated description.",
+      descriptionSrc: "generated",
+    });
+    const event = (id: number, kind: "opened" | "closed", date: string) => ({
+      id,
+      kind,
+      date,
+      citations: [{ sourceId: "s1" }],
+    });
+
+    await routerClient.entities.about.update(
+      {
+        entity: entity.id,
+        version: null,
+        document: {
+          sources: [source],
+          events: [event(1, "opened", "1819"), event(2, "closed", "1983")],
+          sections: [
+            {
+              key: "lead",
+              sentences: [
+                { text: "It opened in 1819.", factIds: ["event:1"] },
+                { text: "It closed in 1983.", factIds: ["event:2"] },
+              ],
+            },
+          ],
+        },
+      },
+      { context: { user } },
+    );
+
+    const [updated] = await db
+      .select({ description: entities.description })
+      .from(entities)
+      .where(eq(entities.id, entity.id));
+    expect(updated?.description).toBe("It opened in 1819. It closed in 1983.");
   });
 
   test("rejects an edit based on an older version", async ({ fixtures }) => {

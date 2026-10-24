@@ -9,12 +9,10 @@ import {
 import config from "@peated/server/config";
 import { db, type AnyDatabase } from "@peated/server/db";
 import {
-  changes,
   entities,
   entityAboutNotes,
   entityAliases,
   entityEvents,
-  type Actor,
 } from "@peated/server/db/schema";
 import {
   ABOUT_WRITER_SYSTEM_ACTOR_KEY,
@@ -24,18 +22,16 @@ import {
   keepFoundEntityLinks,
   reviewAboutDraft,
 } from "@peated/server/lib/entityAbout/checks";
-import { getPublishedLeadText } from "@peated/server/lib/entityAbout/publicAbout";
+import { updateEntityDescription } from "@peated/server/lib/entityAbout/description";
 import {
   EntityAboutVersionError,
   EntityAboutWriteError,
   getEntityAbout,
-  loadLinkedEntities,
   saveEntityAbout,
-  type StoredEntityAbout,
 } from "@peated/server/lib/entityAbout/store";
 import { logWarn } from "@peated/server/lib/log";
 import type { JobPayload } from "@peated/server/worker/types";
-import { and, asc, eq, isNull, ne, or } from "drizzle-orm";
+import { asc, eq } from "drizzle-orm";
 import { z } from "zod";
 
 export const WriteEntityAboutJobArgsSchema = z
@@ -200,7 +196,7 @@ export async function writeEntityAbout(
         actor,
         checkedOn: services.now().toISOString().slice(0, 10),
       });
-      await updateDescription(tx, entity, result, actor);
+      await updateEntityDescription(tx, entity, result, actor);
       return result;
     });
   } catch (error) {
@@ -222,50 +218,6 @@ function rejected(entityId: number, errors: string[]): WriteEntityAboutResult {
     extra: { entityId, errorCount: errors.length },
   });
   return { status: "rejected", errors };
-}
-
-/**
- * A published, sourced lead replaces a generated or empty description, never
- * a person's or one of unknown origin. The check is in the update itself, so
- * an edit made during the run wins.
- */
-async function updateDescription(
-  tx: AnyDatabase,
-  entity: { id: number; name: string },
-  about: StoredEntityAbout,
-  actor: Actor,
-) {
-  const description = getPublishedLeadText(
-    about,
-    await loadLinkedEntities(tx, [about.document]),
-  );
-  if (!description) return;
-  const [updated] = await tx
-    .update(entities)
-    .set({ description, descriptionSrc: "generated", updatedAt: new Date() })
-    .where(
-      and(
-        eq(entities.id, entity.id),
-        or(
-          isNull(entities.description),
-          eq(entities.description, ""),
-          and(
-            eq(entities.descriptionSrc, "generated"),
-            ne(entities.description, description),
-          ),
-        ),
-      ),
-    )
-    .returning({ id: entities.id });
-  if (!updated) return;
-  await tx.insert(changes).values({
-    objectType: "entity",
-    objectId: entity.id,
-    displayName: entity.name,
-    actorId: actor.id,
-    type: "update",
-    data: { description, descriptionSrc: "generated" },
-  });
 }
 
 export default async function writeEntityAboutJob(input: JobPayload) {

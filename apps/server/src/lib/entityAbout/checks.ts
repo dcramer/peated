@@ -222,8 +222,14 @@ export function keepVerifiedCitations(
     const fact = draft.siteFacts[field];
     if (!fact) continue;
     const citations = fact.citations.filter(isVerified);
-    if (quotesState(quotesOf(citations), String(fact.value))) {
-      siteFacts[field] = { ...fact, citations };
+    const quotes = quotesOf(citations);
+    if (quotesState(quotes, String(fact.value))) {
+      // The date is optional, so one no quote states is dropped, not the fact.
+      const asOf =
+        fact.asOf && quotesState(quotes, fact.asOf.slice(0, 4))
+          ? fact.asOf
+          : null;
+      siteFacts[field] = { ...fact, asOf, citations };
     }
   }
 
