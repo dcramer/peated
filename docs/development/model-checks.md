@@ -55,6 +55,11 @@ long inputs and tool outputs.
 ## Pull request checks
 
 - Add `trigger-evals` to run classifier model checks.
+- The `evals / classifier score` status on the pull request shows the pass
+  rate, for example `73.6% passed (103/140) · needs 80%`. It links to the run,
+  whose summary lists each failed case. The `evals / classifier` job fails when
+  the pass rate is below the floor set by `EVAL_MIN_PASS_RATE` in
+  `.github/workflows/evals.yml`.
 - Classifier CI sets `BOTTLE_CLASSIFIER_EVAL_FIXED_EVIDENCE_FILE` to
   `evals/evidence/ci.json`. This reviewed snapshot covers every classifier and
   audit case. Missing case or image coverage fails validation before model
