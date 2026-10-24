@@ -7,19 +7,23 @@ import {
   ABOUT_MIN_FACTS_FOR_SECTIONS,
 } from "@peated/server/lib/entityAbout/checks";
 import { BRORA_ABOUT_EXAMPLE } from "@peated/server/lib/entityAbout/examples/brora";
+import { JOHNNIE_WALKER_ABOUT_EXAMPLE } from "@peated/server/lib/entityAbout/examples/johnnieWalker";
+import type { EntityAboutDocument } from "@peated/server/schemas/entityAbout";
 
 import type { AboutDraft } from "./draftSchema";
 
-/** A short slice of the Brora example in the writer's output format. */
-function buildExample(): AboutDraft {
-  const doc = BRORA_ABOUT_EXAMPLE;
-  const eventIds = new Set([1, 13, 14, 15, 20]);
+/** A short slice of a stored example in the writer's output format. */
+function buildExample(
+  doc: EntityAboutDocument,
+  eventIds: ReadonlySet<number>,
+  sectionKeys: readonly string[],
+): AboutDraft {
   const events = doc.events.filter((event) => eventIds.has(event.id));
   const sourceIds = new Set(
     events.flatMap((event) => event.citations.map((c) => c.sourceId)),
   );
   const sections = doc.sections.filter((section) =>
-    ["lead", "peated"].includes(section.key),
+    sectionKeys.includes(section.key),
   );
   return {
     sources: doc.sources
@@ -111,9 +115,12 @@ ${siteFactList}
 - Use no more sentences in total than you have facts. With fewer than ${ABOUT_MIN_FACTS_FOR_PROSE} facts, return no sections.
 - A short, correct page is better than a long one. When evidence is thin, return a few facts and a lead of one or two sentences.
 
-# Example
-This is part of a page written by a person, in your output format:
-${JSON.stringify(buildExample(), null, 1)}`;
+# Examples
+These are parts of pages written by people, in your output format. A distillery:
+${JSON.stringify(buildExample(BRORA_ABOUT_EXAMPLE, new Set([1, 13, 14, 15, 20]), ["lead", "peated"]), null, 1)}
+
+A brand:
+${JSON.stringify(buildExample(JOHNNIE_WALKER_ABOUT_EXAMPLE, new Set([1, 5, 8, 9, 10]), ["lead", "owners"]), null, 1)}`;
 
 export type EntityAboutWriterInput = {
   name: string;

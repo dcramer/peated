@@ -189,6 +189,7 @@ description. After the writer has covered every distillery and brand,
 that is not the published lead, so no unsourced description remains.
 Descriptions a person wrote stay.
 
-The prompt is in `apps/server/src/agents/entityAbout/instructions.ts`. The
-person-written Brora document in
-`apps/server/src/lib/entityAbout/examples/brora.ts` is its example.
+The prompt is in `apps/server/src/agents/entityAbout/instructions.ts`. Its
+examples are documents people wrote in
+`apps/server/src/lib/entityAbout/examples/`: Brora for a distillery and Johnnie
+Walker for a brand.

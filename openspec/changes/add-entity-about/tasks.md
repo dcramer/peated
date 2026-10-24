@@ -40,7 +40,7 @@
 ## 5. Writing rules
 
 - [x] 5.1 Add the banned-phrase list and About style rules to the `peated-writing` skill as a file the code check imports
-- [ ] 5.2 Write one brand article by hand as the second prompt example, as stored data
+- [x] 5.2 Write one brand article by hand as the second prompt example, as stored data
 
 ## 6. The job
 
