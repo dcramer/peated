@@ -125,6 +125,8 @@ export type EntityAboutWriterInput = {
   website: string | null;
   /** Stored history items that no shown source supports yet. */
   unsourcedHistory: string[];
+  /** Facts the page shows now that this run replaces, with their pages. */
+  shownFacts: string[];
   previousErrors?: string[];
 };
 
@@ -147,6 +149,13 @@ export function buildEntityAboutInput(input: EntityAboutWriterInput) {
       "",
       "Peated has these history items without a source. They are leads, not evidence. When a page you read supports one, include it as an event with the same kind, a date that agrees, and the item's number as its `id`. Leave out any you cannot support.",
       ...input.unsourcedHistory.map((item) => `- ${item}`),
+    );
+  }
+  if (input.shownFacts.length) {
+    lines.push(
+      "",
+      "The page now shows these facts from an earlier run. This run replaces them, and a draft that shows fewer facts than the page does is rejected. Check each again, starting with the page it was found on, and include it if a page you read still supports it.",
+      ...input.shownFacts.map((item) => `- ${item}`),
     );
   }
   if (input.previousErrors?.length) {

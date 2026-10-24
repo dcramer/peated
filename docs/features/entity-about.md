@@ -160,15 +160,19 @@ written by a person: the writer can add sources to it but never replaces it.
 
 ## Merges
 
-Merging Entities combines their About documents. Site facts that do not apply
-to the destination's kind are dropped, and so is an acquisition by the
-destination itself. A merge never reveals a page a moderator hid: a hidden
-page's content joins only a destination that is hidden or new, and a new
-page then starts hidden. Links to a merged Entity are followed, through every
-later merge, to the Entity it became when the page or history is read, and an acquisition by an owner
-that was merged into the page's own Entity is hidden. A new link must name an
-Entity that exists or was merged; a deleted one is rejected. Merges and the
-backfill move stored links as they are.
+Merging Entities does not combine their About pages. The destination keeps its
+page, and the merged Entity's page is deleted with it; every saved version
+stays in the `change` table, so a moderator can copy back anything a person
+wrote. The merge moves `entity_event` rows to the destination, where the next
+backfill run copies them in as history without a source. The merge also queues
+a writer run for the destination, so its page can pick up what the merged
+page had.
+
+Links to a merged Entity are followed, through every later merge, to the
+Entity it became when the page or history is read, and an acquisition by an
+owner that was merged into the page's own Entity is hidden. A new link must
+name an Entity that exists or was merged; a deleted one is rejected. The
+backfill moves stored links as they are.
 
 ## Descriptions
 

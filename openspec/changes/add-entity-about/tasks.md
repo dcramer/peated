@@ -8,7 +8,7 @@
 - [x] 1.6 Add moderator API routes to edit events, site facts, sources, and sections in the document, with tests for permissions, stale versions, and the rule that the pipeline never overwrites a person's edit
 - [x] 1.7 Backfill a document for each Entity with `entity_event` rows, copying `sourceUrl` into sources and citations; check event counts per Entity
 - [x] 1.8 Point Overview history, owner acquisitions, and existing event routes at the document; stop writing `entity_event`
-- [x] 1.9 Update `mergeEntity` to combine About documents, with an integration test for two Entities that both have documents
+- [x] 1.9 Update `mergeEntity` to leave About documents alone and queue a writer run for the destination, with an integration test
 - [x] 1.10 Add a moderator route to hide and show an About page, with tests
 - [x] 1.11 Add mock API routes and fixtures for the new routes under `apps/server/src/orpc/mock/`
 

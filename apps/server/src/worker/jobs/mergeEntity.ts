@@ -1,4 +1,4 @@
-import { db, type AnyDatabase, type AnyTransaction } from "@peated/server/db";
+import { db, type AnyDatabase } from "@peated/server/db";
 import {
   bottleGroupDistillers,
   bottleGroups,
@@ -12,7 +12,6 @@ import {
   entityImages,
   entityReferences,
   entityTombstones,
-  type Actor,
 } from "@peated/server/db/schema";
 import {
   getPeatedSystemActorForDatabase,
@@ -25,23 +24,6 @@ import {
 import { findSeriesIdByName } from "@peated/server/lib/bottleHelpers";
 import { getMovedBottleIdentity } from "@peated/server/lib/bottleIdentity";
 import type { SystemBottlePatch } from "@peated/server/lib/bottleSchemas";
-import {
-  ABOUT_FACT_FIELD_LIST,
-  aboutFactFieldAppliesTo,
-} from "@peated/server/lib/entityAbout/aboutFactFields";
-import {
-  eventFactId,
-  siteFactId,
-} from "@peated/server/lib/entityAbout/display";
-import {
-  mergeEntityAboutDocuments,
-  removeFacts,
-} from "@peated/server/lib/entityAbout/document";
-import {
-  getEntityAbout,
-  saveEntityAbout,
-  setEntityAboutStatus,
-} from "@peated/server/lib/entityAbout/store";
 import { moveEntityAliases } from "@peated/server/lib/entityAliases";
 import {
   EntityMergeOperationExecutionError,
@@ -70,7 +52,6 @@ import {
   updateBottleInTransaction,
   type BottleUpdateFinalizationManifest,
 } from "@peated/server/lib/updateBottle";
-import type { EntityAboutDocument } from "@peated/server/schemas/entityAbout";
 import { pushJob } from "@peated/server/worker/dispatch";
 import {
   EntityMergeJobInputSchema,
@@ -821,13 +802,6 @@ async function performEntityMerge({
       .set({ newOwnerId: toEntity.id })
       .where(inArray(entityEvents.newOwnerId, fromEntityIds));
 
-    await mergeEntityAbout(tx, {
-      toEntity: { ...toEntity, kind: destinationKind },
-      fromEntityIds,
-      mergedEntityIds: mergedEntityIdList,
-      actor,
-    });
-
     for (const sourceSeries of sourceSeriesRows) {
       const targetFullName = `${toEntity.name} ${sourceSeries.name}`;
       const [targetSeries] = await tx
@@ -969,96 +943,20 @@ async function performEntityMerge({
     await finalizeBottleUpdate(manifest);
   }
   try {
-    await pushJob("OnEntityChange", { entityId: toEntityId }, { delay: 5000 });
+    await pushJob(
+      "OnEntityChange",
+      { entityId: toEntityId },
+      { delay: 5000 },
+    );
+    // Merge rule (owner: docs/features/entity-about.md): About pages are not
+    // combined. The destination's page is written again from sources; the
+    // job skips other kinds and does nothing while the writer is off.
+    await pushJob("WriteEntityAbout", { entityId: toEntityId });
   } catch (err) {
     logError(err, { entity: { id: toEntityId } });
   }
 
   return completedOperationResult;
-}
-
-/**
- * Entity merge rule for About documents: the destination absorbs each merged
- * Entity's history, site facts, and sources, and keeps its own prose. Both
- * documents are saved to change history before the merged rows are removed.
- */
-async function mergeEntityAbout(
-  tx: AnyTransaction,
-  {
-    toEntity,
-    fromEntityIds,
-    mergedEntityIds,
-    actor,
-  }: {
-    toEntity: { id: number; name: string; kind: EntityKind };
-    fromEntityIds: readonly number[];
-    mergedEntityIds: readonly number[];
-    actor: Actor;
-  },
-) {
-  const sources = [];
-  for (const entityId of fromEntityIds) {
-    const about = await getEntityAbout(tx, entityId, { forUpdate: true });
-    if (about) sources.push(about);
-  }
-  const destination = await getEntityAbout(tx, toEntity.id, {
-    forUpdate: true,
-  });
-  // Hidden-page rule (owner: docs/features/entity-about.md): a merge never
-  // reveals a page a moderator hid. A hidden page's content joins only a
-  // destination that is hidden or new (which then starts hidden); otherwise
-  // it stays in the merged Entity's change history.
-  const destinationHidden = destination
-    ? destination.status === "hidden"
-    : sources.some((source) => source.status === "hidden");
-  let combined = destination?.document ?? null;
-  for (const source of sources) {
-    if (source.status === "hidden" && !destinationHidden) continue;
-    combined = mergeEntityAboutDocuments(combined, source.document);
-  }
-  if (!combined) return;
-
-  const merged = new Set(mergedEntityIds);
-  const { events, siteFacts } = combined;
-  const document = removeFacts(
-    combined,
-    new Set([
-      // An owner cannot acquire itself once both are one Entity.
-      ...events
-        .filter((event) => event.newOwnerId && merged.has(event.newOwnerId))
-        .map((event) => eventFactId(event.id)),
-      // Site facts follow the destination's kind; a distillery's stills do not
-      // move to a brand. They stay in the merged Entity's change history.
-      ...ABOUT_FACT_FIELD_LIST.filter(
-        (field) =>
-          siteFacts[field] && !aboutFactFieldAppliesTo(field, toEntity.kind),
-      ).map(siteFactId),
-    ]),
-  );
-
-  // Nothing moved and nothing was cleaned up.
-  if (
-    destination &&
-    JSON.stringify(document) === JSON.stringify(destination.document)
-  ) {
-    return;
-  }
-
-  await saveEntityAbout(tx, {
-    entity: toEntity,
-    document,
-    expectedVersion: destination?.version ?? null,
-    actor,
-    // Moving history is not new writing; legacy items keep their state.
-    unchangedFrom: document,
-  });
-  if (!destination && destinationHidden) {
-    await setEntityAboutStatus(tx, {
-      entity: toEntity,
-      status: "hidden",
-      actor,
-    });
-  }
 }
 
 export default async function mergeEntity(rawInput: JobPayload) {

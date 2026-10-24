@@ -154,10 +154,11 @@ schema):
 - **Checking:** the schema module parses `unknown` at every read and write,
   per `docs/policies/data-and-permissions.md`.
 
-**Merges.** `mergeEntity` moves events, site facts, and sources into the
-destination document, combining sources with the same URL. The destination's
-sections stay. Both documents are saved to change history first. This
-replaces the job's current `entity_event` updates.
+**Merges.** `mergeEntity` does not combine About documents. The destination
+keeps its document, the merged Entity's document is deleted with it (its
+versions stay in change history), and the merge queues a writer run for the
+destination. Combining two sourced articles never gave a coherent page and
+needed special cases for hidden pages, site facts, and self-acquisitions.
 
 **History moves into the document.** `entity_event` rows are copied into each
 Entity's document. Overview history, the acquisitions shown on owner pages,

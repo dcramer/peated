@@ -16,6 +16,10 @@ import {
   getSystemActorForDatabase,
 } from "@peated/server/lib/actors";
 import {
+  ABOUT_FACT_FIELD_LIST,
+  ABOUT_FACT_FIELDS,
+} from "@peated/server/lib/entityAbout/aboutFactFields";
+import {
   checkMergedAbout,
   reviewAboutDraft,
 } from "@peated/server/lib/entityAbout/checks";
@@ -31,7 +35,11 @@ import {
   type StoredEntityAbout,
 } from "@peated/server/lib/entityAbout/store";
 import { logWarn } from "@peated/server/lib/log";
-import type { EntityAboutDocument } from "@peated/server/schemas/entityAbout";
+import type {
+  AboutCitation,
+  AboutEvent,
+  EntityAboutDocument,
+} from "@peated/server/schemas/entityAbout";
 import type { JobPayload } from "@peated/server/worker/types";
 import { and, eq, inArray, isNull, ne, or } from "drizzle-orm";
 import { z } from "zod";
@@ -60,11 +68,6 @@ const defaultServices: WriteEntityAboutServices = {
   now: () => new Date(),
 };
 
-/**
- * Lists stored history the page cannot show yet, so the writer can look for
- * sources. A matching event in the draft adds its citations to the stored
- * one (see `mergePipelineDraft`).
- */
 /** Names of the Entities a stored document links as new owners. */
 async function loadOwnerNames(
   database: AnyDatabase,
@@ -89,25 +92,73 @@ async function loadOwnerNames(
   return ownerNames;
 }
 
+function describeEvent(
+  event: AboutEvent,
+  ownerNames: ReadonlyMap<number, string>,
+) {
+  const owner = event.newOwnerId
+    ? ownerNames.get(event.newOwnerId)
+    : event.newOwnerName;
+  const details = [
+    event.name ? `name ${event.name}` : null,
+    owner ? `new owner ${owner}` : null,
+    event.text?.slice(0, 300),
+  ].filter(Boolean);
+  return `#${event.id} ${event.kind}, ${event.date}${details.length ? `: ${details.join("; ")}` : ""}`;
+}
+
+/**
+ * Lists stored history the page cannot show yet, so the writer can look for
+ * sources. A matching event in the draft adds its citations to the stored
+ * one (see `mergePipelineDraft`).
+ */
 function describeUnsourcedHistory(
   stored: EntityAboutDocument | null,
   ownerNames: ReadonlyMap<number, string>,
 ) {
   if (!stored) return [];
-  const { events, sources } = stored;
-  return events
-    .filter((event) => !isFactShown(event.citations, sources))
-    .map((event) => {
-      const owner = event.newOwnerId
-        ? ownerNames.get(event.newOwnerId)
-        : event.newOwnerName;
-      const details = [
-        event.name ? `name ${event.name}` : null,
-        owner ? `new owner ${owner}` : null,
-        event.text?.slice(0, 300),
-      ].filter(Boolean);
-      return `#${event.id} ${event.kind}, ${event.date}${details.length ? `: ${details.join("; ")}` : ""}`;
-    });
+  return stored.events
+    .filter((event) => !isFactShown(event.citations, stored.sources))
+    .map((event) => describeEvent(event, ownerNames));
+}
+
+/**
+ * Lists the shown facts this run replaces, with where they were found. A
+ * draft that shows fewer facts is rejected (see `checkMergedAbout`), so the
+ * writer checks these again first.
+ */
+function describeShownFacts(
+  stored: EntityAboutDocument | null,
+  ownerNames: ReadonlyMap<number, string>,
+) {
+  if (!stored) return [];
+  const urls = new Map(stored.sources.map((source) => [source.id, source.url]));
+  const cited = (citations: readonly AboutCitation[]) => {
+    const found = [
+      ...new Set(citations.flatMap((c) => urls.get(c.sourceId) ?? [])),
+    ];
+    return found.length ? ` (found on ${found.join(", ")})` : "";
+  };
+  const shown = (citations: readonly AboutCitation[]) =>
+    isFactShown(citations, stored.sources);
+  return [
+    ...stored.events
+      .filter(
+        (event) => event.writtenBy === "pipeline" && shown(event.citations),
+      )
+      .map(
+        (event) => describeEvent(event, ownerNames) + cited(event.citations),
+      ),
+    ...ABOUT_FACT_FIELD_LIST.flatMap((field) => {
+      const fact = stored.siteFacts[field];
+      if (!fact || fact.writtenBy !== "pipeline" || !shown(fact.citations)) {
+        return [];
+      }
+      return [
+        `${ABOUT_FACT_FIELDS[field].label}: ${fact.value}${cited(fact.citations)}`,
+      ];
+    }),
+  ];
 }
 
 export type WriteEntityAboutResult =
@@ -145,6 +196,7 @@ export async function writeEntityAbout(
     before?.document ?? null,
     ownerNames,
   );
+  const shownFacts = describeShownFacts(before?.document ?? null, ownerNames);
 
   let errors: string[] = [];
   let accepted = null;
@@ -162,6 +214,7 @@ export async function writeEntityAbout(
       yearEstablished: entity.yearEstablished,
       website: entity.website,
       unsourcedHistory,
+      shownFacts,
       previousErrors: errors,
     });
     const now = services.now().toISOString();

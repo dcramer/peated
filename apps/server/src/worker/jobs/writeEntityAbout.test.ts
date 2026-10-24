@@ -318,6 +318,27 @@ describe("writeEntityAbout", () => {
     ]);
   });
 
+  test("asks the writer to check the facts it replaces", async ({
+    fixtures,
+  }) => {
+    const entity = await fixtures.Entity({ kind: "distillery" });
+    await fixtures.EntityAbout({
+      entityId: entity.id,
+      events: [
+        { id: 1, kind: "opened", date: "1819", writtenBy: "pipeline" },
+        // A person's fact stays either way, so it is not listed.
+        { id: 2, kind: "closed", date: "1983", writtenBy: "person" },
+      ],
+    });
+    const run = services(async () => ({ draft: goodDraft, pagesRead: [page] }));
+
+    await writeEntityAbout({ entityId: entity.id }, run);
+
+    expect(run.writer.mock.calls[0]?.[0].shownFacts).toEqual([
+      "#1 opened, 1819 (found on https://example.com/history)",
+    ]);
+  });
+
   test("drops site facts that do not apply to the kind", async ({
     fixtures,
   }) => {

@@ -195,17 +195,16 @@ to restore an earlier version.
 - **WHEN** the pipeline publishes a new event
 - **THEN** change history shows the event and the pipeline as the actor
 
-### Requirement: Entity merge combines About documents
+### Requirement: Entity merge leaves About documents to the writer
 
-When one Entity is merged into another, the system SHALL move the merged
-Entity's events, site facts, and sources into the destination's About
-document, combining sources with the same URL. It SHALL keep the destination's
-sections and drop the merged Entity's sections that the pipeline wrote.
-Sections a person wrote SHALL be kept in change history. Both documents SHALL
-be saved to change history before the merge.
+When one Entity is merged into another, the system SHALL keep the
+destination's About document unchanged and SHALL NOT copy the merged Entity's
+document into it. The merged Entity's document SHALL remain in change history,
+and the system SHALL queue a writer run for the destination.
 
 #### Scenario: Merge two distilleries with About documents
 
-- **WHEN** a duplicate distillery with 3 events is merged into its original
-- **THEN** the original's document gains the 3 events and their sources, and
-  its own sections are unchanged
+- **WHEN** a duplicate distillery with an About document is merged into its
+  original
+- **THEN** the original's document is unchanged, the duplicate's document is
+  only in change history, and a writer run is queued for the original

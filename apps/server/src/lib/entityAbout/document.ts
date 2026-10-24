@@ -477,35 +477,18 @@ export function mergePipelineDraft(
 }
 
 /**
- * Entity merge rule (owner: `mergeEntity`): the destination absorbs the
- * merged Entity's events, site facts it lacks, and sources. The destination's
- * sections stay; the merged Entity's sections live on in change history.
+ * Adds copied history and its sources to a stored document, combining
+ * sources with the same URL and renumbering events that would collide. The
+ * backfill's copy rule (owner: `backfill-entity-about`) uses it.
  */
-export function mergeEntityAboutDocuments(
-  destination: EntityAboutDocument | null,
-  merged: EntityAboutDocument,
+export function addHistory(
+  stored: EntityAboutDocument,
+  history: Pick<EntityAboutDocument, "sources" | "events">,
 ): EntityAboutDocument {
-  const base = destination ?? EMPTY_ABOUT_DOCUMENT;
-  const { sources, events, maps } = absorbSourcesAndEvents(
-    base,
-    merged.sources,
-    merged.events,
+  const { sources, events } = absorbSourcesAndEvents(
+    stored,
+    history.sources,
+    history.events,
   );
-  const siteFacts: EntityAboutDocument["siteFacts"] = { ...base.siteFacts };
-  for (const field of ABOUT_FACT_FIELD_LIST) {
-    const fact = merged.siteFacts[field];
-    if (siteFacts[field] || !fact) continue;
-    siteFacts[field] = {
-      ...fact,
-      citations: fact.citations.map((citation) =>
-        remapCitation(citation, maps),
-      ),
-    };
-  }
-  return pruneSources({
-    sources,
-    events,
-    siteFacts,
-    sections: base.sections,
-  });
+  return pruneSources({ ...stored, sources, events });
 }

@@ -3,7 +3,7 @@ import { entities, entityEvents } from "@peated/server/db/schema";
 import { getPeatedSystemActorForDatabase } from "@peated/server/lib/actors";
 import {
   EMPTY_ABOUT_DOCUMENT,
-  mergeEntityAboutDocuments,
+  addHistory,
 } from "@peated/server/lib/entityAbout/document";
 import {
   blankAboutEvent,
@@ -166,7 +166,7 @@ export default procedure
 
           const legacy = buildDocumentFromLegacyEvents(missing);
           const document = stored
-            ? mergeEntityAboutDocuments(stored.document, legacy)
+            ? addHistory(stored.document, legacy)
             : legacy;
           const copied =
             document.events.length - (stored?.document.events.length ?? 0);
