@@ -2255,6 +2255,13 @@
       "when": 1792855767182,
       "tag": "0321_auction_details",
       "breakpoints": false
+    },
+    {
+      "idx": 322,
+      "version": "7",
+      "when": 1792864398316,
+      "tag": "0322_add_entity_about",
+      "breakpoints": false
     }
   ]
 }

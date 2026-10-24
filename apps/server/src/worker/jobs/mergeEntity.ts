@@ -948,11 +948,7 @@ async function performEntityMerge({
     await finalizeBottleUpdate(manifest);
   }
   try {
-    await pushJob(
-      "OnEntityChange",
-      { entityId: toEntityId },
-      { delay: 5000 },
-    );
+    await pushJob("OnEntityChange", { entityId: toEntityId }, { delay: 5000 });
     // Merge rule (owner: docs/features/entity-about.md): About pages are not
     // combined. The destination's page is written again from sources; the
     // job skips other kinds and does nothing while the writer is off.

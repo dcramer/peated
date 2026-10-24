@@ -192,7 +192,7 @@ test("leaves About pages to the writer when Entities merge", async ({
     events: [{ id: 1, kind: "closed", date: "1983" }],
   });
   const before = await getEntityAbout(db, destination.id);
-  vi.mocked(pushUniqueJob).mockClear();
+  vi.mocked(pushJob).mockClear();
 
   await mergeEntity({
     fromEntityIds: [source.id],
@@ -203,7 +203,7 @@ test("leaves About pages to the writer when Entities merge", async ({
   // page is written again from sources instead of combined.
   expect(await getEntityAbout(db, destination.id)).toEqual(before);
   expect(await getEntityAbout(db, source.id)).toBeNull();
-  expect(pushUniqueJob).toHaveBeenCalledWith("WriteEntityAbout", {
+  expect(pushJob).toHaveBeenCalledWith("WriteEntityAbout", {
     entityId: destination.id,
   });
 });

@@ -2,7 +2,7 @@ import { db } from "@peated/server/db";
 import { entities } from "@peated/server/db/schema";
 import { procedure } from "@peated/server/orpc";
 import { requireAdmin } from "@peated/server/orpc/middleware";
-import { pushUniqueJob } from "@peated/server/worker/dispatch";
+import { pushJob } from "@peated/server/worker/dispatch";
 import { ENTITY_ABOUT_WRITER_READY } from "@peated/server/worker/jobs/writeEntityAbout";
 import { asc, desc, inArray } from "drizzle-orm";
 import { z } from "zod";
@@ -66,7 +66,7 @@ export default procedure
         ).map((row) => row.id);
 
     await Promise.all(
-      ids.map((entityId) => pushUniqueJob("WriteEntityAbout", { entityId })),
+      ids.map((entityId) => pushJob("WriteEntityAbout", { entityId })),
     );
     return { queued: ids };
   });

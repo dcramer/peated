@@ -72,7 +72,10 @@ registry.add("GenerateEntityDetails", generateEntityDetails, {
   queueName: "models",
   unique: true,
 });
-registry.add("WriteEntityAbout", writeEntityAbout, { queueName: "models" });
+registry.add("WriteEntityAbout", writeEntityAbout, {
+  queueName: "models",
+  unique: true,
+});
 // Pronunciation audio calls Cloud Text-to-Speech, not a model, and every
 // request carries a timeout, so it stays on the default queue.
 registry.add(
