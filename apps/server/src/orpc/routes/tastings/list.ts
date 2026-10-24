@@ -63,6 +63,15 @@ export default implement(tastingListContract).handler(async function ({
     );
   }
 
+  // Same role the member tasting stats count distilleries by.
+  if (input.distiller) {
+    bottleWhere.push(sql`EXISTS(
+        SELECT FROM ${bottlesToDistillers}
+        WHERE ${bottlesToDistillers.bottleId} = ${tastings.bottleId}
+          AND ${bottlesToDistillers.distillerId} = ${input.distiller}
+      )`);
+  }
+
   if (input.ratingBand) {
     bottleWhere.push(eq(tastings.ratingBand, input.ratingBand));
   }
@@ -184,12 +193,28 @@ export default implement(tastingListContract).handler(async function ({
       desc(tastings.id),
     );
 
+  // One member's list reports its filtered total; feeds across members skip
+  // the count. A short page proves the total unless it is an empty page past
+  // the first, so count only when the page cannot.
+  const total = !input.user
+    ? undefined
+    : results.length <= limit && (results.length > 0 || offset === 0)
+      ? offset + results.length
+      : await db
+          .select({ count: sql<string>`COUNT(*)` })
+          .from(tastings)
+          .innerJoin(users, eq(users.id, tastings.createdById))
+          .innerJoin(bottles, eq(bottles.id, tastings.bottleId))
+          .where(and(...baseWhere, ...bottleWhere))
+          .then(([row]) => Number(row?.count ?? 0));
+
   return {
     results: await serialize(
       TastingSerializer,
       results.map((t) => t.tastings).slice(0, limit),
       context.user,
     ),
+    total,
     rel: {
       nextCursor: results.length > limit ? cursor + 1 : null,
       prevCursor: cursor > 1 ? cursor - 1 : null,

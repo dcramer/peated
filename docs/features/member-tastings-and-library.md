@@ -12,9 +12,9 @@ routes return nothing a visitor could not already see.
 
 Both tabs use the same parts:
 
-- A toolbar with the count on this page, the member's total, and a sort. The
-  Tastings tab hides the total while a filter is set, because the filtered
-  total is not known.
+- A toolbar with the count on this page, the total, and a sort. The Tastings
+  total counts the tastings that match the filters; the Library total is the
+  member's whole Library.
 - A search box that suggests brands, producers, and Bottles from this member's
   records. Picking a brand or producer filters the list. Picking a Bottle opens
   it. Enter without a suggestion searches the Bottle names.
@@ -31,6 +31,7 @@ be shared and the server renders it on first load.
 | ------------- | ---------------------------------------------------- |
 | `query`       | Search the tasted Bottle's name                      |
 | `entity`      | A brand, bottler, or distillery of the tasted Bottle |
+| `distiller`   | A distillery of the tasted Bottle, from the rail     |
 | `rating`      | One rating, such as `very_good`                      |
 | `age`         | One stated-age range, such as `from13To17`           |
 | `country`     | The country of the Bottle's brand                    |
@@ -38,7 +39,9 @@ be shared and the server renders it on first load.
 | `sort`        | `-created` (newest), `-rating` (best first), `name`  |
 | `view`        | `table` for the compact table; the list is default   |
 
-The rail shows Rating, Age, Countries, Regions, and Distilleries. Age also
+The rail shows Rating, Age, Countries, Regions, and Distilleries. Distilleries
+sets `distiller`, which matches only the distillery role its count uses;
+`entity` is for a brand or producer picked from search. Age also
 shows the median and oldest stated age. Regions appear only after a country is
 picked.
 

@@ -347,6 +347,75 @@ describe("GET /tastings", () => {
     );
   });
 
+  test("reports the filtered total for one member's list", async ({
+    defaults,
+    fixtures,
+  }) => {
+    for (const ratingBand of [
+      "unicorn",
+      "unicorn",
+      "unicorn",
+      "good",
+    ] as const) {
+      await fixtures.Tasting({ createdById: defaults.user.id, ratingBand });
+    }
+    await fixtures.Tasting({ ratingBand: "unicorn" });
+
+    const pages = await Promise.all(
+      [1, 2, 3].map((cursor) =>
+        routerClient.tastings.list({
+          cursor,
+          limit: 2,
+          ratingBand: "unicorn",
+          user: defaults.user.id,
+        }),
+      ),
+    );
+    expect(pages.map(({ results, total }) => [results.length, total])).toEqual([
+      [2, 3],
+      [1, 3],
+      [0, 3],
+    ]);
+
+    const feed = await routerClient.tastings.list({ ratingBand: "unicorn" });
+    expect(feed.total).toBeUndefined();
+  });
+
+  test("filters by distillery with the same count as tasting stats", async ({
+    defaults,
+    fixtures,
+  }) => {
+    const producer = await fixtures.Entity({ kind: "distillery" });
+    // The producer is only the brand here, so the distiller filter skips it.
+    const brandOnly = await fixtures.Bottle({
+      brandId: producer.id,
+      distillerIds: [],
+    });
+    const distilled = await fixtures.Bottle({ distillerIds: [producer.id] });
+    await fixtures.Tasting({
+      bottleId: brandOnly.id,
+      createdById: defaults.user.id,
+    });
+    const distilledTasting = await fixtures.Tasting({
+      bottleId: distilled.id,
+      createdById: defaults.user.id,
+    });
+
+    const stats = await routerClient.users.tastingStats(
+      { user: defaults.user.id },
+      { context: { user: defaults.user } },
+    );
+    const { results, total } = await routerClient.tastings.list({
+      distiller: producer.id,
+      user: defaults.user.id,
+    });
+
+    expect(results.map(({ id }) => id)).toEqual([distilledTasting.id]);
+    expect(total).toBe(
+      stats.producers.distillers.find(({ id }) => id === producer.id)?.count,
+    );
+  });
+
   test("requires country with region", async () => {
     const error = await waitError(
       routerClient.tastings.list({ region: "islay" }),

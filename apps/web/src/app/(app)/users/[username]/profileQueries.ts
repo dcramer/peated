@@ -32,6 +32,7 @@ export type ProfileTastingInput = Inputs["tastings"]["list"] & {
   age?: AgeBucketId;
   country?: string;
   cursor: number;
+  distiller?: number;
   entity?: number;
   limit: 25;
   query: string;
@@ -96,6 +97,7 @@ export function getProfileTastingInput(
     age: parseOption(getSearchParam(source, "age"), AGE_BUCKET_IDS),
     country,
     cursor: parsePositiveNumber(getSearchParam(source, "cursor")) ?? 1,
+    distiller: parsePositiveNumber(getSearchParam(source, "distiller")),
     entity: parsePositiveNumber(getSearchParam(source, "entity")),
     limit: 25,
     query: getSearchParam(source, "query") ?? "",

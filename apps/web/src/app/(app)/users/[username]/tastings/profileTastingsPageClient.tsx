@@ -46,6 +46,7 @@ const FILTER_PARAMS = [
   "age",
   "country",
   "cursor",
+  "distiller",
   "entity",
   "query",
   "rating",
@@ -159,7 +160,7 @@ export function ProfileTastingsPageClient() {
           pending={pending}
           sort={displayedInput.sort}
           sortOptions={sortOptions}
-          total={hasFilters ? undefined : user.stats.tastings}
+          total={tastingQuery.data?.total}
           view={view}
         />
         <div aria-busy={pending || undefined}>
@@ -246,8 +247,8 @@ function getFilterGroups({
   const distillers = stats?.producers.distillers ?? [];
   const groups: MemberListFilterGroup[] = [];
 
-  // A brand or producer picked from search may not be a top distillery.
-  if (entity && !distillers.some((item) => item.id === entity.id)) {
+  // A brand or producer picked from search matches any role it has.
+  if (entity) {
     groups.push({
       filters: [
         {
@@ -329,11 +330,11 @@ function getFilterGroups({
       filters: distillers.map((item) => ({
         count: item.count,
         label: item.name,
-        selected: selected("entity", String(item.id)),
+        selected: selected("distiller", String(item.id)),
         value: String(item.id),
       })),
       label: "Distilleries",
-      name: "entity",
+      name: "distiller",
     });
   }
 

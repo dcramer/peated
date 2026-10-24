@@ -16,6 +16,14 @@ export default contract
       .object({
         bottle: z.coerce.number().int().positive().optional(),
         entity: z.coerce.number().optional(),
+        distiller: z.coerce
+          .number()
+          .int()
+          .positive()
+          .optional()
+          .describe(
+            "Filter by a distillery of the tasted Bottle. Unlike `entity`, brand and bottler roles do not match.",
+          ),
         user: z
           .union([z.coerce.number(), z.literal("me"), z.string()])
           .optional(),
@@ -69,4 +77,15 @@ export default contract
   )
   // TODO(response-envelope): Return { data, meta } when all list routes use the
   // same wrapper.
-  .output(listResponse(TastingSchema));
+  .output(
+    listResponse(TastingSchema).extend({
+      total: z
+        .number()
+        .int()
+        .nonnegative()
+        .optional()
+        .describe(
+          "Tastings matching the filters, for one member's list (`user`). Omitted for feeds across members.",
+        ),
+    }),
+  );
