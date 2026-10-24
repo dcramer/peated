@@ -26,6 +26,10 @@ import { findSeriesIdByName } from "@peated/server/lib/bottleHelpers";
 import { getMovedBottleIdentity } from "@peated/server/lib/bottleIdentity";
 import type { SystemBottlePatch } from "@peated/server/lib/bottleSchemas";
 import {
+  ABOUT_FACT_FIELD_LIST,
+  aboutFactFieldAppliesTo,
+} from "@peated/server/lib/entityAbout/aboutFactFields";
+import {
   mergeEntityAboutDocuments,
   pruneSources,
 } from "@peated/server/lib/entityAbout/document";
@@ -61,6 +65,7 @@ import {
   updateBottleInTransaction,
   type BottleUpdateFinalizationManifest,
 } from "@peated/server/lib/updateBottle";
+import type { EntityAboutDocument } from "@peated/server/schemas/entityAbout";
 import { pushUniqueJob } from "@peated/server/worker/dispatch";
 import {
   EntityMergeJobInputSchema,
@@ -1005,20 +1010,33 @@ async function mergeEntityAbout(
   if (!document) return;
 
   const merged = new Set(mergedEntityIds);
-  const removedEvents = new Set(
+  const removedFacts = new Set(
     document.events
       // An owner cannot acquire itself once both are one Entity.
       .filter((event) => event.newOwnerId && merged.has(event.newOwnerId))
       .map((event) => `event:${event.id}`),
   );
+  // Site facts follow the destination's kind; a distillery's stills do not
+  // move to a brand. They stay in the merged Entity's change history.
+  const siteFacts: EntityAboutDocument["siteFacts"] = {};
+  for (const field of ABOUT_FACT_FIELD_LIST) {
+    const fact = document.siteFacts[field];
+    if (!fact) continue;
+    if (aboutFactFieldAppliesTo(field, toEntity.kind)) {
+      siteFacts[field] = fact;
+    } else {
+      removedFacts.add(`site:${field}`);
+    }
+  }
   document = pruneSources({
     ...document,
     events: document.events.filter(
-      (event) => !removedEvents.has(`event:${event.id}`),
+      (event) => !removedFacts.has(`event:${event.id}`),
     ),
+    siteFacts,
     sections: document.sections.flatMap((section) => {
       const sentences = section.sentences.filter((sentence) =>
-        sentence.factIds.every((id) => !removedEvents.has(id)),
+        sentence.factIds.every((id) => !removedFacts.has(id)),
       );
       return sentences.length ? [{ ...section, sentences }] : [];
     }),

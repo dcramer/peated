@@ -240,6 +240,32 @@ test("combines About documents when Entities merge", async ({ fixtures }) => {
   ]);
 });
 
+test("drops site facts the merge target cannot have", async ({ fixtures }) => {
+  const source = await fixtures.Entity({ kind: "distillery" });
+  const destination = await fixtures.Entity({ kind: "brand" });
+  await fixtures.EntityAbout({
+    entityId: source.id,
+    events: [{ id: 1, kind: "closed", date: "1983" }],
+    siteFacts: {
+      washStills: {
+        value: 1,
+        asOf: null,
+        citations: [{ sourceId: "s1", statedValue: "1", quote: null }],
+        writtenBy: "person",
+      },
+    },
+  });
+
+  await mergeEntity({
+    fromEntityIds: [source.id],
+    toEntityId: destination.id,
+  });
+
+  const about = await getEntityAbout(db, destination.id);
+  expect(about?.document.siteFacts).toEqual({});
+  expect(about?.document.events.map(({ kind }) => kind)).toEqual(["closed"]);
+});
+
 test("keeps images when Entities merge", async ({ fixtures }) => {
   const source = await fixtures.Entity();
   const destination = await fixtures.Entity();
