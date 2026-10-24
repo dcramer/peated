@@ -1,14 +1,14 @@
 import { db } from "@peated/server/db";
 import { entities } from "@peated/server/db/schema";
-import {
-  toPublicEntityAbout,
-  type AboutLinkedEntity,
-} from "@peated/server/lib/entityAbout/publicAbout";
+import { toPublicEntityAbout } from "@peated/server/lib/entityAbout/publicAbout";
 import {
   followMergedEntities,
   type StoredEntityAbout,
 } from "@peated/server/lib/entityAbout/store";
-import type { EntityAboutPublic } from "@peated/server/schemas/entityAbout";
+import type {
+  AboutLinkedEntity,
+  EntityAboutPublic,
+} from "@peated/server/schemas/entityAbout";
 import { inArray } from "drizzle-orm";
 import { serializer } from ".";
 

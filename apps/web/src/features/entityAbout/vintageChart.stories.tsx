@@ -18,7 +18,7 @@ const meta = {
   component: VintageChart,
   args: {
     years: fillYears(broraVintages),
-    withoutVintage: broraVintages.withoutYear,
+    withoutYear: broraVintages.withoutYear,
     eras: getEras(broraAbout),
     names: getNameSpans(broraAbout, mockBrora.name),
   },

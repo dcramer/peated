@@ -3,7 +3,10 @@ import { entities } from "@peated/server/db/schema";
 import { getEntityAbout } from "@peated/server/lib/entityAbout/store";
 import { procedure } from "@peated/server/orpc";
 import { requireMod } from "@peated/server/orpc/middleware";
-import { EntityAboutDocumentSchema } from "@peated/server/schemas";
+import {
+  EntityAboutDocumentSchema,
+  EntityAboutStatusEnum,
+} from "@peated/server/schemas/entityAbout";
 import { eq } from "drizzle-orm";
 import { z } from "zod";
 
@@ -21,7 +24,7 @@ export default procedure
   .output(
     z.object({
       version: z.number().nullable(),
-      status: z.enum(["published", "hidden"]).nullable(),
+      status: EntityAboutStatusEnum.nullable(),
       checkedOn: z.string().nullable(),
       document: EntityAboutDocumentSchema.nullable(),
     }),

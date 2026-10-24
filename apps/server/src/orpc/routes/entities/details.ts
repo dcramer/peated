@@ -1,7 +1,6 @@
 import { db } from "@peated/server/db";
 import { entityFollows, entityImages } from "@peated/server/db/schema";
-import { hasEntityAboutPage } from "@peated/server/lib/entityAbout/display";
-import { toPublicEntityAbout } from "@peated/server/lib/entityAbout/publicAbout";
+import { hasPublishedAboutPage } from "@peated/server/lib/entityAbout/publicAbout";
 import { getEntityAbout } from "@peated/server/lib/entityAbout/store";
 import { resolveEntity } from "@peated/server/lib/resolveEntity";
 import { implement } from "@peated/server/orpc";
@@ -40,27 +39,23 @@ export default implement(entityDetailsContract).handler(async function ({
     isFollowing = Boolean(follow);
   }
 
-  const images = await db
-    .select()
-    .from(entityImages)
-    .where(eq(entityImages.entityId, entity.id))
-    .orderBy(
-      desc(entityImages.isPrimary),
-      asc(entityImages.createdAt),
-      asc(entityImages.id),
-    );
-
-  // The tab rule needs only the shown facts and prose, not linked Entities.
-  const about = await getEntityAbout(db, entity.id);
-  const publicAbout =
-    about?.status === "published"
-      ? toPublicEntityAbout(about, new Map())
-      : null;
+  const [images, about] = await Promise.all([
+    db
+      .select()
+      .from(entityImages)
+      .where(eq(entityImages.entityId, entity.id))
+      .orderBy(
+        desc(entityImages.isPrimary),
+        asc(entityImages.createdAt),
+        asc(entityImages.id),
+      ),
+    getEntityAbout(db, entity.id),
+  ]);
 
   return {
     ...(await serialize(EntitySerializer, entity, context.user)),
     images: await serialize(EntityImageSerializer, images, context.user),
     isFollowing,
-    hasAbout: hasEntityAboutPage(publicAbout),
+    hasAbout: hasPublishedAboutPage(about),
   };
 });

@@ -3,15 +3,11 @@ import { entities } from "@peated/server/db/schema";
 import { getUserActorForDatabase } from "@peated/server/lib/actors";
 import {
   editEntityHistory,
-  isLegacyKind,
   putLegacyEvent,
   toLegacyEvent,
 } from "@peated/server/lib/entityAbout/legacyEvents";
-import {
-  EntityAboutVersionError,
-  EntityAboutWriteError,
-} from "@peated/server/lib/entityAbout/store";
 import { procedure } from "@peated/server/orpc";
+import { withAboutRouteErrors } from "@peated/server/orpc/errors";
 import { requireMod } from "@peated/server/orpc/middleware";
 import {
   EntityEventInputFields,
@@ -52,7 +48,7 @@ export default procedure
       .limit(1);
     if (!entity) throw errors.NOT_FOUND({ message: "History item not found." });
 
-    try {
+    return await withAboutRouteErrors(async () => {
       const saved = await db.transaction(async (tx) =>
         editEntityHistory(tx, {
           entity,
@@ -61,7 +57,7 @@ export default procedure
             const before = document.events.find((e) => e.id === input.event);
             const legacy =
               before && toLegacyEvent(entity.id, before, document.sources);
-            if (!before || !legacy || !isLegacyKind(before.kind)) {
+            if (!legacy) {
               throw errors.NOT_FOUND({ message: "History item not found." });
             }
             const next = EntityEventInputSchema.safeParse({
@@ -103,7 +99,7 @@ export default procedure
             }
             return putLegacyEvent(
               document,
-              before.id,
+              legacy.id,
               {
                 kind: next.data.kind,
                 date: next.data.date,
@@ -126,18 +122,5 @@ export default procedure
         });
       }
       return result;
-    } catch (error) {
-      if (error instanceof EntityAboutVersionError) {
-        throw errors.CONFLICT({ message: error.message });
-      }
-      if (error instanceof EntityAboutWriteError) {
-        if (
-          error.reasons.some((reason) => reason.startsWith("Linked entity"))
-        ) {
-          throw errors.NOT_FOUND({ message: "New owner not found." });
-        }
-        throw errors.BAD_REQUEST({ message: error.reasons.join(" ") });
-      }
-      throw error;
-    }
+    });
   });

@@ -3,12 +3,11 @@ import { entities } from "@peated/server/db/schema";
 import { getUserActorForDatabase } from "@peated/server/lib/actors";
 import { markPersonEdits } from "@peated/server/lib/entityAbout/document";
 import {
-  EntityAboutVersionError,
-  EntityAboutWriteError,
   getEntityAbout,
   saveEntityAbout,
 } from "@peated/server/lib/entityAbout/store";
 import { procedure } from "@peated/server/orpc";
+import { withAboutRouteErrors } from "@peated/server/orpc/errors";
 import { requireMod } from "@peated/server/orpc/middleware";
 import {
   EntityAboutDocumentSchema,
@@ -52,7 +51,7 @@ export default procedure
       .limit(1);
     if (!entity) throw errors.NOT_FOUND({ message: "Entity not found." });
 
-    try {
+    return await withAboutRouteErrors(async () => {
       const saved = await db.transaction(async (tx) => {
         const stored = await getEntityAbout(tx, entity.id);
         const actor = await getUserActorForDatabase(tx, context.user);
@@ -73,15 +72,5 @@ export default procedure
         { ...saved, id: saved.entityId },
         context.user,
       );
-    } catch (error) {
-      if (error instanceof EntityAboutVersionError) {
-        throw errors.CONFLICT({ message: error.message });
-      }
-      if (error instanceof EntityAboutWriteError) {
-        throw errors.BAD_REQUEST({
-          message: `${error.message} ${error.reasons.join(" ")}`,
-        });
-      }
-      throw error;
-    }
+    });
   });

@@ -1,13 +1,9 @@
 import { db } from "@peated/server/db";
 import { entities, entityAbout } from "@peated/server/db/schema";
-import { hasEntityAboutPage } from "@peated/server/lib/entityAbout/display";
-import { toPublicEntityAbout } from "@peated/server/lib/entityAbout/publicAbout";
+import { hasPublishedAboutPage } from "@peated/server/lib/entityAbout/publicAbout";
+import { toStoredEntityAbout } from "@peated/server/lib/entityAbout/store";
 import { procedure } from "@peated/server/orpc";
-import {
-  ENTITY_ABOUT_SCHEMA_VERSION,
-  EntityAboutDocumentSchema,
-  EntityKindEnum,
-} from "@peated/server/schemas";
+import { EntityKindEnum } from "@peated/server/schemas";
 import { and, asc, eq, gt } from "drizzle-orm";
 import { z } from "zod";
 
@@ -47,14 +43,12 @@ export default procedure
   .handler(async ({ input }) => {
     const rows = await db
       .select({
-        id: entities.id,
-        name: entities.name,
-        kind: entities.kind,
-        document: entityAbout.document,
-        schemaVersion: entityAbout.schemaVersion,
-        version: entityAbout.version,
-        checkedOn: entityAbout.checkedOn,
-        updatedAt: entityAbout.updatedAt,
+        entity: {
+          id: entities.id,
+          name: entities.name,
+          kind: entities.kind,
+        },
+        about: entityAbout,
       })
       .from(entityAbout)
       .innerJoin(entities, eq(entities.id, entityAbout.entityId))
@@ -70,31 +64,14 @@ export default procedure
 
     // Same tab rule as entity details, so the sitemap never lists a page
     // that would return not found.
-    const results = page.flatMap((row) => {
-      if (row.schemaVersion !== ENTITY_ABOUT_SCHEMA_VERSION) return [];
-      const about = toPublicEntityAbout(
-        {
-          entityId: row.id,
-          document: EntityAboutDocumentSchema.parse(row.document),
-          version: row.version,
-          checkedOn: row.checkedOn,
-        },
-        new Map(),
-      );
-      return hasEntityAboutPage(about)
-        ? [
-            {
-              id: row.id,
-              name: row.name,
-              kind: row.kind,
-              updatedAt: row.updatedAt.toISOString(),
-            },
-          ]
-        : [];
-    });
+    const results = page.flatMap(({ entity, about }) =>
+      hasPublishedAboutPage(toStoredEntityAbout(about))
+        ? [{ ...entity, updatedAt: about.updatedAt.toISOString() }]
+        : [],
+    );
 
     return {
       results,
-      nextAfterId: rows.length > input.limit ? page.at(-1)!.id : null,
+      nextAfterId: rows.length > input.limit ? page.at(-1)!.entity.id : null,
     };
   });

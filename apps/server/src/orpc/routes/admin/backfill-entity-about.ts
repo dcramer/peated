@@ -2,9 +2,13 @@ import { db } from "@peated/server/db";
 import { entities, entityEvents } from "@peated/server/db/schema";
 import { getPeatedSystemActorForDatabase } from "@peated/server/lib/actors";
 import {
+  EMPTY_ABOUT_DOCUMENT,
   mergeEntityAboutDocuments,
-  normalizeSourceUrl,
 } from "@peated/server/lib/entityAbout/document";
+import {
+  blankAboutEvent,
+  ensureSource,
+} from "@peated/server/lib/entityAbout/legacyEvents";
 import {
   getEntityAbout,
   saveEntityAbout,
@@ -12,7 +16,8 @@ import {
 import { procedure } from "@peated/server/orpc";
 import { requireAdmin } from "@peated/server/orpc/middleware";
 import type {
-  AboutSource,
+  AboutCitation,
+  AboutEvent,
   EntityAboutDocument,
 } from "@peated/server/schemas/entityAbout";
 import { asc, eq, gt, inArray } from "drizzle-orm";
@@ -24,50 +29,33 @@ type LegacyRow = typeof entityEvents.$inferSelect;
 function buildDocumentFromLegacyEvents(
   rows: readonly LegacyRow[],
 ): EntityAboutDocument {
-  const sources: AboutSource[] = [];
-  const sourceIdByUrl = new Map<string, string>();
-  const events = rows.map((row) => {
-    let citations: EntityAboutDocument["events"][number]["citations"] = [];
+  let document = EMPTY_ABOUT_DOCUMENT;
+  for (const row of rows) {
+    let citations: AboutCitation[] = [];
     if (row.sourceUrl) {
-      const key = normalizeSourceUrl(row.sourceUrl);
-      let sourceId = sourceIdByUrl.get(key);
-      if (!sourceId) {
-        sourceId = `s${sources.length + 1}`;
-        sourceIdByUrl.set(key, sourceId);
-        sources.push({
-          id: sourceId,
-          url: row.sourceUrl,
-          title: new URL(row.sourceUrl).hostname.replace(/^www\./, ""),
-          publisher: null,
-          publishedOn: null,
-          kind: "reference",
-          status: "available",
-        });
-      }
-      citations = [{ sourceId, statedValue: null, quote: null }];
+      const added = ensureSource(document, row.sourceUrl);
+      document = added.document;
+      citations = [
+        { sourceId: added.sourceId, statedValue: null, quote: null },
+      ];
     }
-    return {
-      id: row.id,
+    const event: AboutEvent = {
+      ...blankAboutEvent(row.id),
       kind: row.kind,
       date: row.date,
-      endDate: null,
-      continuing: false,
-      name: null,
-      title: null,
       text: row.description,
-      relatedEntityId: null,
       newOwnerId: row.newOwnerId,
-      newOwnerName: null,
       legacyEventId: row.id,
       citations,
       // Legacy history is the curated record: the writer may add sources to
       // it but never replaces it.
-      writtenBy: "person" as const,
+      writtenBy: "person",
       createdAt: row.createdAt.toISOString(),
       updatedAt: row.updatedAt.toISOString(),
     };
-  });
-  return { sources, events, siteFacts: {}, sections: [] };
+    document = { ...document, events: [...document.events, event] };
+  }
+  return document;
 }
 
 export default procedure
@@ -133,6 +121,7 @@ export default procedure
       ).map((row) => [row.id, row]),
     );
 
+    const actor = await getPeatedSystemActorForDatabase(db);
     let copiedEvents = 0;
     for (const entityId of page) {
       const legacyRows = rows.filter((row) => row.entityId === entityId);
@@ -167,7 +156,7 @@ export default procedure
           entity,
           document,
           expectedVersion: stored?.version ?? null,
-          actor: await getPeatedSystemActorForDatabase(tx),
+          actor,
           // Copying is not new writing; legacy items keep their state.
           unchangedFrom: document,
         });

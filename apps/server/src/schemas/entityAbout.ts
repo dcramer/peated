@@ -198,6 +198,11 @@ const AboutLinkedEntitySchema = z.object({
   name: z.string(),
   kind: EntityKindEnum,
 });
+// Matches the `entity_about_status` database enum.
+export const EntityAboutStatusEnum = z.enum(["published", "hidden"]);
+export type EntityAboutStatus = z.infer<typeof EntityAboutStatusEnum>;
+
+export type AboutLinkedEntity = z.infer<typeof AboutLinkedEntitySchema>;
 
 export const AboutPublicEventSchema = z.object({
   id: z.number(),

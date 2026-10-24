@@ -13,7 +13,7 @@ const LABELED_PEAKS = 3;
 
 export type VintageChartProps = {
   years: readonly VintageCount[];
-  withoutVintage: number;
+  withoutYear: number;
   /** Sourced eras to shade behind the bars, such as heavily peated years. */
   eras?: readonly AboutSpan[];
   /** A Bottle list URL; each year links to it filtered to that vintage. */
@@ -68,7 +68,7 @@ function ChartColumn({
 /** Shows how many catalog Bottles were distilled in each year. */
 export function VintageChart({
   years,
-  withoutVintage,
+  withoutYear,
   eras = [],
   bottleListHref,
   names = [],
@@ -238,11 +238,11 @@ export function VintageChart({
         </tbody>
       </table>
 
-      {withoutVintage > 0 ? (
+      {withoutYear > 0 ? (
         <figcaption
           {...stylex.props(foundationStyles.metadata, styles.caption)}
         >
-          {pluralBottles(withoutVintage)} without a vintage year aren't shown.
+          {pluralBottles(withoutYear)} without a year aren't shown.
         </figcaption>
       ) : null}
     </figure>

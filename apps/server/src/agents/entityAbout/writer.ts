@@ -1,5 +1,6 @@
 import { Agent, OpenAIProvider, Runner } from "@openai/agents";
 import config from "@peated/server/config";
+import type { AboutPageRead } from "@peated/server/lib/entityAbout/checks";
 import { createOpenAIClient } from "@peated/server/lib/openaiClient";
 
 import { AboutDraftSchema, type AboutDraft } from "./draftSchema";
@@ -8,14 +9,14 @@ import {
   ENTITY_ABOUT_INSTRUCTIONS,
   type EntityAboutWriterInput,
 } from "./instructions";
-import { createAboutWebTools, type PageRead, type WebBudget } from "./webTools";
+import { createAboutWebTools, type WebBudget } from "./webTools";
 
 const MAX_TURNS = 24;
 export const ABOUT_WEB_BUDGET: WebBudget = { searches: 6, reads: 8 };
 
 export type EntityAboutWriterResult = {
   draft: AboutDraft;
-  pagesRead: PageRead[];
+  pagesRead: AboutPageRead[];
 };
 
 export type EntityAboutWriter = (
@@ -27,10 +28,10 @@ export const runEntityAboutWriter: EntityAboutWriter = async (input) => {
   if (!config.FIRECRAWL_API_KEY) {
     throw new Error("FIRECRAWL_API_KEY is not configured");
   }
-  const pagesRead: PageRead[] = [];
-  const { tools } = createAboutWebTools({
+  const pagesRead: AboutPageRead[] = [];
+  const tools = createAboutWebTools({
     apiKey: config.FIRECRAWL_API_KEY,
-    apiUrl: config.FIRECRAWL_API_URL ?? undefined,
+    apiUrl: config.FIRECRAWL_API_URL,
     budget: ABOUT_WEB_BUDGET,
     pagesRead,
   });

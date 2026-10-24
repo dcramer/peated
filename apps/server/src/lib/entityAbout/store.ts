@@ -11,6 +11,7 @@ import {
   ENTITY_ABOUT_SCHEMA_VERSION,
   EntityAboutDocumentSchema,
   type EntityAboutDocument,
+  type EntityAboutStatus,
 } from "@peated/server/schemas/entityAbout";
 import { and, eq, inArray, sql } from "drizzle-orm";
 
@@ -28,7 +29,7 @@ export type StoredEntityAbout = {
   entityId: number;
   document: EntityAboutDocument;
   version: number;
-  status: "published" | "hidden";
+  status: EntityAboutStatus;
   checkedOn: string | null;
 };
 
@@ -36,6 +37,8 @@ export class EntityAboutWriteError extends Error {
   constructor(
     message: string,
     readonly reasons: string[],
+    /** Linked Entities that do not exist, so routes can answer not found. */
+    readonly missingEntityIds: number[] = [],
   ) {
     super(message);
   }
@@ -54,7 +57,13 @@ export async function getEntityAbout(
     .where(eq(entityAbout.entityId, entityId))
     .limit(1);
   const [row] = forUpdate ? await query.for("update") : await query;
-  if (!row) return null;
+  return row ? toStoredEntityAbout(row) : null;
+}
+
+/** Parses a stored `entity_about` row. */
+export function toStoredEntityAbout(
+  row: typeof entityAbout.$inferSelect,
+): StoredEntityAbout {
   return {
     entityId: row.entityId,
     // About schema rule: version 1 is the only stored shape. A breaking
@@ -178,6 +187,7 @@ export async function saveEntityAbout(
     throw new EntityAboutWriteError(
       "The About document is not valid.",
       reasons,
+      missing,
     );
   }
 
@@ -246,7 +256,7 @@ export async function setEntityAboutStatus(
     actor,
   }: {
     entity: { id: number; name: string };
-    status: "published" | "hidden";
+    status: EntityAboutStatus;
     actor: Actor;
   },
 ) {

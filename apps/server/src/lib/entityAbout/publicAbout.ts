@@ -1,23 +1,20 @@
 import type {
   AboutCitation,
+  AboutLinkedEntity,
   AboutSection,
   EntityAboutPublic,
 } from "@peated/server/schemas/entityAbout";
 
 import { ABOUT_FACT_FIELD_LIST, ABOUT_FACT_FIELDS } from "./aboutFactFields";
 import {
+  eventFactId,
   getDisagreement,
+  getFactCitations,
   getShownFactIds,
-  isFactShown,
+  hasEntityAboutPage,
   siteFactId,
 } from "./display";
 import type { StoredEntityAbout } from "./store";
-
-export type AboutLinkedEntity = {
-  id: number;
-  name: string;
-  kind: "brand" | "distillery" | "bottler" | "company";
-};
 
 const publicCitations = (citations: readonly AboutCitation[]) =>
   citations.map(({ sourceId, statedValue }) => ({ sourceId, statedValue }));
@@ -58,40 +55,36 @@ export function toPublicEntityAbout(
 ): EntityAboutPublic {
   const { document } = item;
   const shown = getShownFactIds(document);
-  const citationsByFact = new Map<string, readonly AboutCitation[]>();
+  const factCitations = getFactCitations(document);
   const sourceIdsForFact = (factId: string) =>
-    (citationsByFact.get(factId) ?? []).map((c) => c.sourceId);
+    (factCitations.get(factId) ?? []).map((c) => c.sourceId);
 
   const events = document.events
-    .filter((event) => isFactShown(event.citations, document.sources))
+    .filter((event) => shown.has(eventFactId(event.id)))
     .sort((a, b) => a.date.localeCompare(b.date) || a.id - b.id)
-    .map((event) => {
-      citationsByFact.set(`event:${event.id}`, event.citations);
-      return {
-        id: event.id,
-        kind: event.kind,
-        date: event.date,
-        endDate: event.endDate,
-        continuing: event.continuing,
-        name: event.name,
-        title: event.title,
-        text: event.text,
-        relatedEntity: event.relatedEntityId
-          ? (linkedEntities.get(event.relatedEntityId) ?? null)
-          : null,
-        newOwner: event.newOwnerId
-          ? (linkedEntities.get(event.newOwnerId) ?? null)
-          : null,
-        newOwnerName: event.newOwnerName,
-        citations: publicCitations(event.citations),
-        disagreement: getDisagreement(event.citations),
-      };
-    });
+    .map((event) => ({
+      id: event.id,
+      kind: event.kind,
+      date: event.date,
+      endDate: event.endDate,
+      continuing: event.continuing,
+      name: event.name,
+      title: event.title,
+      text: event.text,
+      relatedEntity: event.relatedEntityId
+        ? (linkedEntities.get(event.relatedEntityId) ?? null)
+        : null,
+      newOwner: event.newOwnerId
+        ? (linkedEntities.get(event.newOwnerId) ?? null)
+        : null,
+      newOwnerName: event.newOwnerName,
+      citations: publicCitations(event.citations),
+      disagreement: getDisagreement(event.citations),
+    }));
 
   const siteFacts = ABOUT_FACT_FIELD_LIST.flatMap((field) => {
     const fact = document.siteFacts[field];
-    if (!fact || !isFactShown(fact.citations, document.sources)) return [];
-    citationsByFact.set(siteFactId(field), fact.citations);
+    if (!fact || !shown.has(siteFactId(field))) return [];
     return [
       {
         field,
@@ -114,10 +107,7 @@ export function toPublicEntityAbout(
     .map((section) => serializeSection(section, shown, sourceIdsForFact))
     .filter((section) => section !== null);
 
-  const citedSourceIds = new Set<string>();
-  for (const citations of citationsByFact.values()) {
-    for (const citation of citations) citedSourceIds.add(citation.sourceId);
-  }
+  const citedSourceIds = new Set([...shown].flatMap(sourceIdsForFact));
 
   return {
     entityId: item.entityId,
@@ -140,4 +130,16 @@ export function getPublishedLeadText(item: StoredEntityAbout | null) {
   if (item?.status !== "published") return null;
   const lead = toPublicEntityAbout(item, new Map()).lead;
   return lead?.sentences.map((sentence) => sentence.text).join(" ") || null;
+}
+
+/**
+ * Whether the About tab shows. Tab rule (owner:
+ * docs/features/entity-about.md): the page is published and has enough to
+ * show. Linked Entities do not matter here.
+ */
+export function hasPublishedAboutPage(item: StoredEntityAbout | null) {
+  return (
+    item?.status === "published" &&
+    hasEntityAboutPage(toPublicEntityAbout(item, new Map()))
+  );
 }

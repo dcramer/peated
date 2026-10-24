@@ -100,9 +100,7 @@ describe("PUT /entities/:entity/about", () => {
       ),
     );
 
-    expect(err).toMatchInlineSnapshot(
-      `[Error: The About document is not valid. Event 1 needs a source.]`,
-    );
+    expect(err).toMatchInlineSnapshot(`[Error: Event 1 needs a source.]`);
   });
 
   test("rejects a sentence without a source", async ({ fixtures }) => {
@@ -139,7 +137,7 @@ describe("PUT /entities/:entity/about", () => {
     );
 
     expect(err).toMatchInlineSnapshot(
-      `[Error: The About document is not valid. A sentence in lead needs a source.]`,
+      `[Error: A sentence in lead needs a source.]`,
     );
   });
 
@@ -168,7 +166,7 @@ describe("PUT /entities/:entity/about", () => {
     );
 
     expect(err).toMatchInlineSnapshot(
-      `[Error: The About document is not valid. Site fact washStills does not apply to a brand.]`,
+      `[Error: Site fact washStills does not apply to a brand.]`,
     );
   });
 
