@@ -83,6 +83,33 @@ describe("keepVerifiedCitations", () => {
     expect(result.events).toEqual([]);
   });
 
+  test("counts a publication date only when its year is on the page", () => {
+    // The quote has no year; only the article's date can date the event.
+    const kept = (date: string) =>
+      keepVerifiedCitations(
+        draft({
+          sources: [{ ...source, publishedOn: `${date}-05-19` }],
+          events: [
+            {
+              id: 1,
+              kind: "generic",
+              date,
+              text: "Brora closed.",
+              writtenBy: "pipeline",
+              citations: [
+                { sourceId: "wp", statedValue: null, quote: "Brora closed" },
+              ],
+            },
+          ],
+        }),
+        [page],
+      ).events.length;
+
+    // 2021 is on the page; 2024 is not, so a claimed 2024 date is no evidence.
+    expect(kept("2021")).toBe(1);
+    expect(kept("2024")).toBe(0);
+  });
+
   test("ignores case, quote marks, and punctuation", () => {
     const result = keepVerifiedCitations(
       draft({ events: [event(1, "2021", "rebuilt in 2021, after 38 years")] }),
