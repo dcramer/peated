@@ -189,4 +189,70 @@ describe("mergePipelineDraft", () => {
     ]);
     expect(merged.sections[0]?.sentences[0]?.factIds).toEqual(["event:3"]);
   });
+
+  test("keeps different events from the same year apart", () => {
+    const stored = document({
+      sources: [],
+      events: [
+        {
+          id: 7,
+          kind: "generic",
+          date: "1961",
+          text: "The stills switched to steam.",
+          writtenBy: "pipeline",
+        },
+        {
+          id: 8,
+          kind: "acquired",
+          date: "1925",
+          newOwnerName: "DCL",
+          writtenBy: "pipeline",
+        },
+      ],
+    });
+    const draft = document({
+      events: [
+        {
+          id: 1,
+          kind: "generic",
+          date: "1961",
+          text: "A new warehouse was built.",
+          writtenBy: "pipeline",
+          citations: cited,
+        },
+        {
+          id: 2,
+          kind: "acquired",
+          date: "1925",
+          newOwnerName: "John Risk",
+          writtenBy: "pipeline",
+          citations: cited,
+        },
+        // Reuses the listed item's ID, so it sources that item.
+        {
+          id: 7,
+          kind: "generic",
+          date: "1961",
+          text: "Coal fires gave way to steam.",
+          writtenBy: "pipeline",
+          citations: cited,
+        },
+      ],
+    });
+
+    const merged = mergePipelineDraft(stored, draft, now);
+
+    expect(
+      merged.events.map(({ id, text, newOwnerName, citations }) => [
+        id,
+        text ?? newOwnerName,
+        citations.length,
+      ]),
+    ).toEqual([
+      [7, "The stills switched to steam.", 1],
+      [8, "DCL", 0],
+      [1, "A new warehouse was built.", 1],
+      [2, "John Risk", 1],
+    ]);
+  });
 });

@@ -10,11 +10,11 @@ import {
   ABOUT_WRITER_SYSTEM_ACTOR_KEY,
   getSystemActorForDatabase,
 } from "@peated/server/lib/actors";
-import { reviewAboutDraft } from "@peated/server/lib/entityAbout/checks";
 import {
-  getShownFactIds,
-  isFactShown,
-} from "@peated/server/lib/entityAbout/display";
+  checkMergedAbout,
+  reviewAboutDraft,
+} from "@peated/server/lib/entityAbout/checks";
+import { isFactShown } from "@peated/server/lib/entityAbout/display";
 import { mergePipelineDraft } from "@peated/server/lib/entityAbout/document";
 import { toPublicEntityAbout } from "@peated/server/lib/entityAbout/publicAbout";
 import {
@@ -22,6 +22,7 @@ import {
   saveEntityAbout,
 } from "@peated/server/lib/entityAbout/store";
 import { logWarn } from "@peated/server/lib/log";
+import type { EntityAboutDocument } from "@peated/server/schemas/entityAbout";
 import type { JobPayload } from "@peated/server/worker/types";
 import { eq, inArray } from "drizzle-orm";
 import { z } from "zod";
@@ -50,10 +51,9 @@ const defaultServices: WriteEntityAboutServices = {
  * sources. A matching event in the draft adds its citations to the stored
  * one (see `mergePipelineDraft`).
  */
-async function describeUnsourcedHistory(entityId: number) {
-  const stored = await getEntityAbout(db, entityId);
+async function describeUnsourcedHistory(stored: EntityAboutDocument | null) {
   if (!stored) return [];
-  const { events, sources } = stored.document;
+  const { events, sources } = stored;
   const hidden = events.filter(
     (event) => !isFactShown(event.citations, sources),
   );
@@ -79,7 +79,7 @@ async function describeUnsourcedHistory(entityId: number) {
       owner ? `new owner ${owner}` : null,
       event.text?.slice(0, 300),
     ].filter(Boolean);
-    return `${event.kind}, ${event.date}${details.length ? `: ${details.join("; ")}` : ""}`;
+    return `#${event.id} ${event.kind}, ${event.date}${details.length ? `: ${details.join("; ")}` : ""}`;
   });
 }
 
@@ -111,7 +111,11 @@ export async function writeEntityAbout(
     .select({ name: entityAliases.name })
     .from(entityAliases)
     .where(eq(entityAliases.entityId, entity.id));
-  const unsourcedHistory = await describeUnsourcedHistory(entity.id);
+  // Read without a lock to guide the writer; the save checks again under one.
+  const before = await getEntityAbout(db, entity.id);
+  const unsourcedHistory = await describeUnsourcedHistory(
+    before?.document ?? null,
+  );
 
   let errors: string[] = [];
   let accepted = null;
@@ -138,7 +142,12 @@ export async function writeEntityAbout(
       pagesRead,
       entity.kind,
     );
-    errors = reviewed.errors;
+    errors = reviewed.errors.length
+      ? reviewed.errors
+      : checkMergedAbout(
+          before?.document ?? null,
+          mergePipelineDraft(before?.document ?? null, reviewed.document, now),
+        );
     if (!errors.length) accepted = reviewed.document;
   }
 
@@ -158,14 +167,8 @@ export async function writeEntityAbout(
       document,
       services.now().toISOString(),
     );
-    // Pipeline rule (owner: docs/features/entity-about.md): a run never
-    // leaves the page with fewer shown facts. A thin draft, such as one
-    // written while search was failing, saves nothing; a moderator removes
-    // facts. Counts, not IDs, because a run renumbers the pipeline's events.
-    const lost = stored
-      ? getShownFactIds(stored.document).size - getShownFactIds(merged).size
-      : 0;
-    if (lost > 0) return { lost };
+    const mergeErrors = checkMergedAbout(stored?.document ?? null, merged);
+    if (mergeErrors.length) return { errors: mergeErrors, version: null };
 
     const today = services.now().toISOString().slice(0, 10);
     const actor = await getSystemActorForDatabase(
@@ -205,19 +208,17 @@ export async function writeEntityAbout(
         data: { description, descriptionSrc: "generated" },
       });
     }
-    return { result };
+    return { errors: [], version: result.version };
   });
 
-  if ("lost" in saved) {
-    const errors = [
-      `The draft would show ${saved.lost} fewer facts than the page does.`,
-    ];
+  if (saved.version === null) {
+    // The page changed between the draft and the save.
     logWarn("About draft rejected", {
-      extra: { entityId: entity.id, errorCount: errors.length },
+      extra: { entityId: entity.id, errorCount: saved.errors.length },
     });
-    return { status: "rejected", errors };
+    return { status: "rejected", errors: saved.errors };
   }
-  return { status: "saved", version: saved.result.version };
+  return { status: "saved", version: saved.version };
 }
 
 export default async function writeEntityAboutJob(input: JobPayload) {

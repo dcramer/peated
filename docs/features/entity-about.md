@@ -105,8 +105,10 @@ gets its retry. A draft with no sourced facts fails.
 A draft that fails gets one retry with the reasons. After that, the job saves
 nothing. A draft that passes is merged into the stored document, keeping
 every item a person wrote and every pipeline fact a person's section cites.
-A run never leaves the page with fewer shown facts; such a draft, for
-example one written while search was failing, saves nothing. A moderator
+After the merge, the pipeline's sentences are checked again against the
+facts they cite, so a sentence cannot contradict a value a person set. A run
+never leaves the page with fewer shown facts; such a draft, for example one
+written while search was failing, saves nothing. A moderator
 removes facts by editing. The merge is saved with a version check.
 
 ## History And Descriptions Without Sources
@@ -117,8 +119,10 @@ none, so it is stored but hidden until a source is found:
 - The job lists each stored event the page cannot show in the writer's input,
   as a lead to check. It is not evidence.
 - When a draft event has the same kind as a kept event (one a person wrote, or
-  one with no citations) and the dates agree, the draft's citations are added
-  to the kept event. Its date and text stay as stored. No second event is
+  one with no citations), the dates agree, and no name, owner, or title
+  conflicts, the draft's citations are added to the kept event. A generic
+  event matches only the same text, or a listed item whose number the writer
+  reuses, because many different things happen in one year. Its date and text stay as stored. No second event is
   added.
 - History nobody can source stays stored and hidden. A moderator can add a
   source later.

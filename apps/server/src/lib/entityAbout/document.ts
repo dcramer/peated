@@ -252,6 +252,45 @@ function remapFactId(factId: string, maps: IdMaps) {
   return id ? eventFactId(id) : factId;
 }
 
+function namesAgree(left: string | null, right: string | null) {
+  return (
+    !left || !right || left.trim().toLowerCase() === right.trim().toLowerCase()
+  );
+}
+
+/**
+ * Whether a draft event states the same fact as a kept one: same kind, dates
+ * that agree, and no conflicting name, owner, or title. A generic event is
+ * matched only by the same text, or by the writer reusing the ID of a listed
+ * item without a source, because many different things happen in one year.
+ */
+function sameEvent(kept: AboutEvent, draft: AboutEvent) {
+  if (kept.kind !== draft.kind || !valuesAgree(kept.date, draft.date)) {
+    return false;
+  }
+  switch (draft.kind) {
+    case "generic":
+      // Only stored history without a source is listed to the writer.
+      return (
+        (!kept.citations.length && kept.id === draft.id) ||
+        (kept.text !== null &&
+          draft.text !== null &&
+          kept.text.trim().toLowerCase() === draft.text.trim().toLowerCase())
+      );
+    case "renamed":
+      return namesAgree(kept.name, draft.name);
+    case "acquired":
+      return namesAgree(kept.newOwnerName, draft.newOwnerName);
+    case "era":
+      return namesAgree(kept.title, draft.title);
+    case "opened":
+    case "closed":
+    case "mothballed":
+    case "reopened":
+      return true;
+  }
+}
+
 /**
  * Merges a pipeline draft into the stored document. Pipeline rule (owner:
  * docs/features/entity-about.md): everything a person wrote stays, and so
@@ -281,11 +320,7 @@ export function mergePipelineDraft(
   );
   const matches = new Map<number, number>();
   for (const event of draft.events) {
-    const kept = keptEvents.find(
-      (candidate) =>
-        candidate.kind === event.kind &&
-        valuesAgree(candidate.date, event.date),
-    );
+    const kept = keptEvents.find((candidate) => sameEvent(candidate, event));
     if (kept) matches.set(event.id, kept.id);
   }
   const draftEvents = draft.events
