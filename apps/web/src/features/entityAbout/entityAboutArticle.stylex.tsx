@@ -1,10 +1,8 @@
 import type { EntityKind } from "@peated/server/types";
 import * as stylex from "@stylexjs/stylex";
 
-import { EntityIdentityRow } from "../../components/entityIdentityRow.stylex";
 import { SectionHeading } from "../../components/sectionHeading.stylex";
 import { TextLink } from "../../components/textLink.stylex";
-import { getEntityUrl } from "../../lib/urls";
 import { foundationStyles } from "../../styles/foundations.stylex";
 import { colors, space } from "../../styles/tokens.stylex";
 import {
@@ -24,6 +22,7 @@ import {
   type YearCounts,
 } from "./entityAbout";
 import { EntityLifeline } from "./entityLifeline.stylex";
+import { RelatedEntityList } from "./relatedEntityList.stylex";
 import { VintageChart } from "./vintageChart.stylex";
 
 export type EntityAboutCounts = {
@@ -188,10 +187,14 @@ function RelatedList({
   heading,
   intro,
   counts,
+  title,
+  noun,
 }: {
   heading: string;
   intro: string;
   counts: RelatedCounts;
+  title: string;
+  noun: string;
 }) {
   return (
     <section
@@ -200,24 +203,7 @@ function RelatedList({
     >
       <SectionHeading>{heading}</SectionHeading>
       <p {...stylex.props(foundationStyles.body, styles.muted)}>{intro}</p>
-      <ol {...stylex.props(styles.relatedList)}>
-        {counts.results.map((row) => (
-          <li key={row.entity.id} {...stylex.props(styles.relatedRow)}>
-            <EntityIdentityRow
-              end={
-                <span
-                  {...stylex.props(foundationStyles.metadata, styles.count)}
-                >
-                  {row.count.toLocaleString("en-US")}
-                </span>
-              }
-              href={getEntityUrl(row.entity)}
-              kind={row.entity.kind}
-              name={row.entity.name}
-            />
-          </li>
-        ))}
-      </ol>
+      <RelatedEntityList counts={counts} noun={noun} title={title} />
     </section>
   );
 }
@@ -330,6 +316,8 @@ export function EntityAboutArticle({
         <RelatedList
           counts={counts.bottlers}
           heading="Who bottled it"
+          noun="bottlers"
+          title={`Who bottled ${entity.name}`}
           intro={`Bottles in Peated distilled at ${entity.name}, by bottler.`}
         />
       ) : null}
@@ -338,6 +326,8 @@ export function EntityAboutArticle({
         <RelatedList
           counts={counts.distillers}
           heading="Where it's made"
+          noun="distilleries"
+          title={`Where ${entity.name} is made`}
           intro={`Bottles in Peated sold as ${entity.name}, by distillery.`}
         />
       ) : null}
@@ -364,7 +354,12 @@ export function EntityAboutArticle({
               key={source.id}
               {...stylex.props(styles.source)}
             >
-              <span {...stylex.props(foundationStyles.metadata, styles.muted)}>
+              <span
+                {...stylex.props(
+                  foundationStyles.metadata,
+                  styles.sourceNumber,
+                )}
+              >
                 {citationNumbers.get(source.id)}
               </span>
               <span {...stylex.props(styles.sourceText)}>
@@ -477,22 +472,6 @@ const styles = stylex.create({
     margin: 0,
     paddingLeft: space.x4,
   },
-  relatedList: {
-    display: "flex",
-    flexDirection: "column",
-    margin: 0,
-    padding: 0,
-    listStyle: "none",
-  },
-  relatedRow: {
-    borderBottomWidth: { default: "1px", ":last-child": 0 },
-    borderBottomStyle: "solid",
-    borderBottomColor: colors.hairline,
-  },
-  count: {
-    color: colors.inkMuted,
-    fontVariantNumeric: "tabular-nums",
-  },
   sources: {
     display: "flex",
     flexDirection: "column",
@@ -501,11 +480,20 @@ const styles = stylex.create({
     padding: 0,
     listStyle: "none",
   },
+  // A footnote link targets its source, which is highlighted on arrival.
   source: {
     display: "grid",
     gridTemplateColumns: "24px minmax(0, 1fr)",
     alignItems: "baseline",
     scrollMarginTop: "24px",
+    marginInline: `calc(-1 * ${space.x2})`,
+    paddingBlock: space.x1,
+    paddingInline: space.x2,
+    borderRadius: "3px",
+    backgroundColor: { default: "transparent", ":target": colors.inset },
+  },
+  sourceNumber: {
+    color: { default: colors.inkMuted, ":is(:target > *)": colors.accent },
   },
   sourceText: {
     display: "flex",

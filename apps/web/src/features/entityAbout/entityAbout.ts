@@ -168,6 +168,38 @@ export function getCitationNumbers(
   return numbers;
 }
 
+/**
+ * The years a chart axis labels: both ends, and every fifth year more than
+ * two years from either end, so no two labels run together.
+ */
+export function getAxisYears(first: number, last: number): Set<number> {
+  const years = new Set([first, last]);
+  for (let year = Math.ceil(first / 5) * 5; year <= last; year += 5) {
+    if (year - first > 2 && last - year > 2) years.add(year);
+  }
+  return new Set([...years].sort((a, b) => a - b));
+}
+
+const LABEL_EVERY_BAR_UP_TO = 12;
+const LABELED_PEAKS = 3;
+
+/**
+ * The years whose bar shows its count: every bar in a short chart, otherwise
+ * the three tallest, so equal bars are never labeled at random.
+ */
+export function getLabeledYears(years: readonly VintageCount[]): Set<number> {
+  const bars = years.filter((entry) => entry.count > 0);
+  if (bars.length <= LABEL_EVERY_BAR_UP_TO) {
+    return new Set(bars.map((entry) => entry.year));
+  }
+  return new Set(
+    [...bars]
+      .sort((a, b) => b.count - a.count)
+      .slice(0, LABELED_PEAKS)
+      .map((entry) => entry.year),
+  );
+}
+
 /** Fills empty years between the first and last vintage so gaps show. */
 export function fillYears(counts: YearCounts): VintageCount[] {
   if (!counts.results.length) return [];

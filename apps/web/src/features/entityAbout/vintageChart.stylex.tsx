@@ -7,9 +7,12 @@ import { AppLink } from "../../components/appLink";
 
 import { foundationStyles } from "../../styles/foundations.stylex";
 import { colors, space } from "../../styles/tokens.stylex";
-import type { AboutSpan, VintageCount } from "./entityAbout";
-
-const LABELED_PEAKS = 3;
+import {
+  getAxisYears,
+  getLabeledYears,
+  type AboutSpan,
+  type VintageCount,
+} from "./entityAbout";
 
 export type VintageChartProps = {
   years: readonly VintageCount[];
@@ -80,12 +83,8 @@ export function VintageChart({
   const last = years[years.length - 1]!.year;
   const span = last - first + 1;
   const max = Math.max(...years.map((entry) => entry.count));
-  const peaks = new Set(
-    [...years]
-      .sort((a, b) => b.count - a.count)
-      .slice(0, LABELED_PEAKS)
-      .map((entry) => entry.year),
-  );
+  const peaks = getLabeledYears(years);
+  const axisYears = getAxisYears(first, last);
   const currentName = names[names.length - 1]?.label;
   const position = (year: number) =>
     `${((Math.max(year, first) - first) / span) * 100}%`;
@@ -186,9 +185,7 @@ export function VintageChart({
               entry.year === last && styles.axisLabelEnd,
             )}
           >
-            {entry.year === first || entry.year === last || entry.year % 5 === 0
-              ? entry.year
-              : null}
+            {axisYears.has(entry.year) ? entry.year : null}
           </span>
         ))}
       </div>
