@@ -4,17 +4,17 @@ import { useSearchParams } from "next/navigation";
 import type { ReactNode } from "react";
 
 import { CommunityFeedLoading } from "@peated/web/components/communityFeed.stylex";
-import { ListToolbarLoading } from "@peated/web/components/lists.stylex";
+import {
+  ListToolbarLoading,
+  type ListView,
+} from "@peated/web/components/lists.stylex";
 import { MemberListFiltersLoading } from "@peated/web/components/pages/memberListFilters.stylex";
 import { PageColumns } from "@peated/web/components/pages/pageLayout.stylex";
 import { TastingTableLoading } from "@peated/web/components/tastingTable.stylex";
 import { profileBottleSearchCopy } from "../profileBottleSearch.stylex";
 import { useProfile } from "../profileContext";
 import { getProfileLoadingRows } from "../profileLoading";
-import {
-  getProfileTastingView,
-  type ProfileTastingView,
-} from "../profileQueries";
+import { getProfileListView } from "../profileQueries";
 
 export function ProfileTastingsLayout({
   children,
@@ -30,11 +30,7 @@ export function ProfileTastingsLayout({
  * Reserves the toolbar and the list or table while tastings load, at the
  * finished sizes, so the results replace it without moving the page.
  */
-export function ProfileTastingsResultsLoading({
-  view,
-}: {
-  view: ProfileTastingView;
-}) {
+export function ProfileTastingsResultsLoading({ view }: { view: ListView }) {
   const { user } = useProfile();
   const rows = getProfileLoadingRows(user.stats.tastings);
 
@@ -86,7 +82,7 @@ export function ProfileTastingsLoading() {
         rail={<ProfileTastingsFiltersLoading hasCountry={hasCountry} />}
       >
         <ProfileTastingsResultsLoading
-          view={getProfileTastingView(searchParams)}
+          view={getProfileListView(searchParams)}
         />
       </ProfileTastingsLayout>
     </div>

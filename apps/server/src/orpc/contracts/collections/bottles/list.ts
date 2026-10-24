@@ -1,4 +1,7 @@
-import { RESERVED_COLLECTION_SLUGS } from "@peated/server/constants";
+import {
+  AGE_BUCKET_IDS,
+  RESERVED_COLLECTION_SLUGS,
+} from "@peated/server/constants";
 import {
   CollectionBottleSchema,
   CollectionBottleStatusSchema,
@@ -39,6 +42,12 @@ export default contract
         status: z
           .union([CollectionBottleStatusSchema, z.literal("unset")])
           .optional(),
+        age: z
+          .enum(AGE_BUCKET_IDS)
+          .optional()
+          .describe(
+            "Filter by the Bottle's stated age range. `unstated` matches Bottles without a stated age. Library only.",
+          ),
         sort: z
           .enum(["name", "-created"])
           .default("name")
@@ -52,4 +61,12 @@ export default contract
   )
   // TODO(response-envelope): Return { data, meta } when all list routes use the
   // same wrapper.
-  .output(listResponse(CollectionBottleSchema));
+  .output(
+    listResponse(CollectionBottleSchema).extend({
+      total: z
+        .number()
+        .int()
+        .nonnegative()
+        .describe("Bottles in the collection that match the filters."),
+    }),
+  );

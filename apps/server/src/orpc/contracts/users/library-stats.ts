@@ -7,7 +7,8 @@ export const LibraryStatsSchema = z.object({
   status: z.object({
     open: z.number(),
     sealed: z.number(),
-    unspecified: z.number(),
+    empty: z.number(),
+    unspecified: z.number().describe("Bottles without a status."),
   }),
   brands: z.array(
     z.object({ id: z.number(), name: z.string(), count: z.number() }),

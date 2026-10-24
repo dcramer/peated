@@ -380,8 +380,8 @@ export function getRatingBandById(id: RatingBandId): RatingBand {
   return RATING_BANDS.find((band) => band.id === id)!;
 }
 
-// Tasting age stats and the tasting age filter both read these ranges, so a
-// count shown for a range always matches the tastings that filter returns.
+// Member age stats and the Tastings and Library age filters all read these
+// ranges, so a count shown for a range matches what that filter returns.
 // Stated ages are whole years; `min` and `max` are inclusive.
 export const AGE_BUCKETS = [
   { id: "under10", label: "Under 10", min: null, max: 9 },

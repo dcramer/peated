@@ -29,7 +29,8 @@
   `BottleVisual` owns bottle images; `CommunityFeed` owns activity and full-width
   tasting lists on the homepage, `/activity`, bottle, brand or producer, and
   member pages. `TastingTable` owns the dense table view of one
-  member's tastings. Dedicated detail views and narrow sidebar lists keep their own
+  member's tastings; `LibraryList` and `LibraryTable` own the list and table
+  views of one member's Library. Dedicated detail views and narrow sidebar lists keep their own
   task-specific compositions.
   Use `formatBottleDisplayName` or `toBottleListItem` for displayed bottle names.
   API responses used by these helpers must include the BottleGroup summary.

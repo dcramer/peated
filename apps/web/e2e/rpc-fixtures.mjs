@@ -61,7 +61,7 @@ export const moderatorUser = {
 
 export const libraryInsightsStats = {
   total: 76,
-  status: { open: 12, sealed: 64, unspecified: 0 },
+  status: { open: 12, sealed: 64, empty: 0, unspecified: 0 },
   brands: [{ id: 9201, name: "Lagavulin", count: 12 }],
   distillers: [
     { id: 101, name: "Laphroaig", count: 8 },

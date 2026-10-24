@@ -1,3 +1,4 @@
+import { AGE_BUCKETS, isAgeInBucket } from "@peated/server/constants";
 import {
   includesQuery,
   matchesMockUser,
@@ -28,6 +29,7 @@ export default mockOS.collections.bottles.list.handler(
         input.brand ||
         input.distiller ||
         input.entity ||
+        input.age ||
         (isReserved && input.status))
     ) {
       throw errors.BAD_REQUEST({
@@ -62,7 +64,8 @@ export default mockOS.collections.bottles.list.handler(
         (input.bottle === undefined || item.bottle.id === input.bottle) &&
         (input.status === undefined ||
           input.status === item.status ||
-          (input.status === "unset" && item.status === null)),
+          (input.status === "unset" && item.status === null)) &&
+        matchesAge(input.age, item.bottle.statedAge),
     );
 
     collectionBottles.sort((a, b) =>
@@ -71,18 +74,28 @@ export default mockOS.collections.bottles.list.handler(
         : a.bottle.fullName.localeCompare(b.bottle.fullName) || a.id - b.id,
     );
 
-    return mockPage(
-      collectionBottles.map((item) => {
-        const bottle = mockBottleFor(context.user, item.bottle);
-        return {
-          ...item,
-          status: isLibrary ? item.status : null,
-          bottle,
-          hasTasted: bottle.hasTasted,
-        };
-      }),
-      input.cursor,
-      input.limit,
-    );
+    return {
+      ...mockPage(
+        collectionBottles.map((item) => {
+          const bottle = mockBottleFor(context.user, item.bottle);
+          return {
+            ...item,
+            status: isLibrary ? item.status : null,
+            bottle,
+            hasTasted: bottle.hasTasted,
+          };
+        }),
+        input.cursor,
+        input.limit,
+      ),
+      total: collectionBottles.length,
+    };
   },
 );
+
+function matchesAge(age: string | undefined, statedAge: number | null) {
+  if (age === undefined) return true;
+  if (age === "unstated") return statedAge === null;
+  const bucket = AGE_BUCKETS.find(({ id }) => id === age)!;
+  return statedAge !== null && isAgeInBucket(statedAge, bucket);
+}

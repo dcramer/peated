@@ -2480,6 +2480,7 @@ function listCollectionBottles(request, input) {
 
   return {
     results,
+    total: results.length,
     rel: {
       nextCursor: null,
       prevCursor: null,

@@ -22,7 +22,7 @@ describe("GET /users/:user/library/stats", () => {
 
     expect(data).toMatchObject({
       total: 0,
-      status: { open: 0, sealed: 0, unspecified: 0 },
+      status: { open: 0, sealed: 0, empty: 0, unspecified: 0 },
       brands: [],
       distillers: [],
       age: {
@@ -35,7 +35,7 @@ describe("GET /users/:user/library/stats", () => {
     expect(data.age.buckets.every((bucket) => bucket.count === 0)).toBe(true);
   });
 
-  test("summarizes non-empty Library entries", async ({
+  test("summarizes every Library entry, empty ones included", async ({
     defaults,
     fixtures,
   }) => {
@@ -76,6 +76,7 @@ describe("GET /users/:user/library/stats", () => {
       statedAge: null,
     });
     const emptyBottle = await fixtures.Bottle({
+      brandId: brandB.id,
       category: "single_malt",
       statedAge: 50,
     });
@@ -129,31 +130,37 @@ describe("GET /users/:user/library/stats", () => {
       { context: { user: defaults.user } },
     );
 
-    expect(data.total).toBe(4);
-    expect(data.status).toEqual({ open: 2, sealed: 1, unspecified: 1 });
+    // The Library list shows empty bottles, so the rail counts them too.
+    expect(data.total).toBe(5);
+    expect(data.status).toEqual({
+      open: 2,
+      sealed: 1,
+      empty: 1,
+      unspecified: 1,
+    });
     expect(data.brands).toEqual([
       { id: brandA.id, name: brandA.name, count: 3 },
-      { id: brandB.id, name: brandB.name, count: 1 },
+      { id: brandB.id, name: brandB.name, count: 2 },
     ]);
     expect(data.distillers).toEqual([
       { id: distillerA.id, name: distillerA.name, count: 2 },
-      { id: distillerB.id, name: distillerB.name, count: 1 },
+      { id: distillerB.id, name: distillerB.name, count: 2 },
     ]);
     expect(data.age).toEqual({
-      knownCount: 3,
-      median: 12,
-      oldest: 25,
+      knownCount: 4,
+      median: 18.5,
+      oldest: 50,
       buckets: [
         { id: "under10", label: "Under 10", count: 1 },
         { id: "from10To12", label: "10–12", count: 1 },
         { id: "from13To17", label: "13–17", count: 0 },
         { id: "from18To24", label: "18–24", count: 0 },
-        { id: "atLeast25", label: "25+", count: 1 },
+        { id: "atLeast25", label: "25+", count: 2 },
         { id: "unstated", label: "Unstated", count: 1 },
       ],
     });
     expect(data.categories).toEqual([
-      { category: "single_malt", count: 2 },
+      { category: "single_malt", count: 3 },
       { category: "bourbon", count: 1 },
       { category: "rye", count: 1 },
     ]);
@@ -352,7 +359,7 @@ describe("GET /users/:user/library/stats", () => {
 
     expect(data).toMatchObject({
       total: 201,
-      status: { open: 198, sealed: 3, unspecified: 0 },
+      status: { open: 198, sealed: 3, empty: 0, unspecified: 0 },
       distillers: [
         { id: distillerA.id, name: distillerA.name, count: 2 },
         { id: distillerB.id, name: distillerB.name, count: 1 },

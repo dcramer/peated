@@ -7,7 +7,7 @@ import { dehydrate, HydrationBoundary } from "@tanstack/react-query";
 import type { Metadata } from "next";
 
 import { getProfileLibraryInput, profileQueries } from "../profileQueries";
-import { ProfileLibraryPageClient } from "./profileLibraryPageClient.stylex";
+import { ProfileLibraryPageClient } from "./profileLibraryPageClient";
 
 // Search engines should index the profile overview, not this list.
 export const metadata: Metadata = noIndexFollowPageMetadata;

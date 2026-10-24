@@ -26,7 +26,9 @@ export default contract
           bottles: z.number(),
           collected: z.number(),
           library: z.object({
-            total: z.number(),
+            total: z
+              .number()
+              .describe("Every Library bottle, empty ones included."),
             open: z.number(),
             sealed: z.number(),
           }),

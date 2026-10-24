@@ -1,7 +1,7 @@
 import { db } from "@peated/server/db";
 import { collectionBottles } from "@peated/server/db/schema";
 import waitError from "@peated/server/lib/test/waitError";
-import { routerClient } from "@peated/server/orpc/router";
+import { routerClient, type Inputs } from "@peated/server/orpc/router";
 import { describe, expect, test } from "vitest";
 
 describe("GET /users/:user/collections/:collection/bottles", () => {
@@ -132,6 +132,15 @@ describe("GET /users/:user/collections/:collection/bottles", () => {
     ).toEqual([entries[1]!.id, entries[0]!.id, entries[2]!.id]);
     expect(firstPage.rel).toEqual({ nextCursor: 2, prevCursor: null });
     expect(lastPage.rel).toEqual({ nextCursor: null, prevCursor: 2 });
+    // The total counts every filtered entry, not just this page.
+    expect([firstPage, secondPage, lastPage].map((page) => page.total)).toEqual(
+      [3, 3, 3],
+    );
+    const pastLastPage = await routerClient.collections.bottles.list(
+      { ...input, cursor: 5 },
+      { context },
+    );
+    expect(pastLastPage).toMatchObject({ results: [], total: 3 });
   });
 
   test("filters direct membership by Bottle id", async ({
@@ -317,6 +326,123 @@ describe("GET /users/:user/collections/:collection/bottles", () => {
     expect(
       response.results.map((entry) => entry.bottle.id).sort((a, b) => a - b),
     ).toEqual([asBrand.id, asDistiller.id, asBottler.id].sort((a, b) => a - b));
+  });
+
+  test("filters Library by stated age range", async ({
+    defaults,
+    fixtures,
+  }) => {
+    const library = await fixtures.Collection({
+      name: "Library",
+      createdById: defaults.user.id,
+    });
+    const nine = await fixtures.Bottle({ statedAge: 9 });
+    const ten = await fixtures.Bottle({ statedAge: 10 });
+    const twelve = await fixtures.Bottle({ statedAge: 12 });
+    const thirteen = await fixtures.Bottle({ statedAge: 13 });
+    const unstated = await fixtures.Bottle({ statedAge: null });
+    await db.insert(collectionBottles).values(
+      [nine, ten, twelve, thirteen, unstated].map((bottle) => ({
+        collectionId: library.id,
+        bottleId: bottle.id,
+      })),
+    );
+    const context = { user: defaults.user };
+
+    const tenToTwelve = await routerClient.collections.bottles.list(
+      { user: "me", collection: "library", age: "from10To12" },
+      { context },
+    );
+    const noAge = await routerClient.collections.bottles.list(
+      { user: "me", collection: "library", age: "unstated" },
+      { context },
+    );
+
+    expect(
+      tenToTwelve.results.map((entry) => entry.bottle.id).sort((a, b) => a - b),
+    ).toEqual([ten.id, twelve.id].sort((a, b) => a - b));
+    expect(tenToTwelve.total).toBe(2);
+    expect(noAge.results.map((entry) => entry.bottle.id)).toEqual([
+      unstated.id,
+    ]);
+  });
+
+  test("matches each Library stats count with its filter", async ({
+    defaults,
+    fixtures,
+  }) => {
+    const library = await fixtures.Collection({
+      name: "Library",
+      createdById: defaults.user.id,
+    });
+    const brand = await fixtures.Entity({ name: "Count Brand" });
+    const distiller = await fixtures.Entity({ name: "Count Distillery" });
+    const bottles = await Promise.all([
+      fixtures.Bottle({ brandId: brand.id, statedAge: 8 }),
+      fixtures.Bottle({ brandId: brand.id, statedAge: 18 }),
+      fixtures.Bottle({ distillerIds: [distiller.id], statedAge: 30 }),
+      fixtures.Bottle({ distillerIds: [distiller.id], statedAge: null }),
+    ]);
+    // Empty bottles are listed by default, so the counts include them too.
+    await db.insert(collectionBottles).values(
+      bottles.map((bottle, index) => ({
+        collectionId: library.id,
+        bottleId: bottle.id,
+        status: (["open", "empty", "empty", null] as const)[index],
+      })),
+    );
+    const context = { user: defaults.user };
+    const list = (
+      filter: Partial<
+        Pick<
+          Inputs["collections"]["bottles"]["list"],
+          "age" | "brand" | "distiller" | "status"
+        >
+      >,
+    ) =>
+      routerClient.collections.bottles.list(
+        { user: "me", collection: "library", ...filter },
+        { context },
+      );
+
+    const stats = await routerClient.users.libraryStats(
+      { user: "me" },
+      { context },
+    );
+
+    expect((await list({})).total).toBe(stats.total);
+    for (const [status, count] of [
+      ["open", stats.status.open],
+      ["sealed", stats.status.sealed],
+      ["empty", stats.status.empty],
+      ["unset", stats.status.unspecified],
+    ] as const) {
+      expect((await list({ status })).total, status).toBe(count);
+    }
+    for (const bucket of stats.age.buckets) {
+      expect((await list({ age: bucket.id })).total, bucket.id).toBe(
+        bucket.count,
+      );
+    }
+    for (const item of stats.brands) {
+      expect((await list({ brand: item.id })).total).toBe(item.count);
+    }
+    for (const item of stats.distillers) {
+      expect((await list({ distiller: item.id })).total).toBe(item.count);
+    }
+  });
+
+  test("rejects the age filter outside Library", async ({ defaults }) => {
+    const error = await waitError(() =>
+      routerClient.collections.bottles.list(
+        { user: "me", collection: "default", age: "under10" },
+        { context: { user: defaults.user } },
+      ),
+    );
+
+    expect(error).toMatchInlineSnapshot(
+      `[Error: Collection filters are only supported for Library.]`,
+    );
   });
 
   test("rejects the removed target filter", async ({ defaults, fixtures }) => {

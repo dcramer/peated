@@ -5,6 +5,7 @@ import {
   bottlesToDistillers,
   collectionBottles,
 } from "@peated/server/db/schema";
+import { statedAgeBucketWhere } from "@peated/server/lib/ageBuckets";
 import { getUserFromId, profileVisible } from "@peated/server/lib/api";
 import {
   getReservedCollection,
@@ -52,6 +53,7 @@ export default implement(collectionBottleListContract).handler(async function ({
       input.brand ||
       input.distiller ||
       input.entity ||
+      input.age ||
       (reservedCollection && input.status))
   ) {
     throw errors.BAD_REQUEST({
@@ -72,6 +74,7 @@ export default implement(collectionBottleListContract).handler(async function ({
     if (reservedCollection) {
       return {
         results: [],
+        total: 0,
         rel: {
           nextCursor: null,
           prevCursor: null,
@@ -140,6 +143,9 @@ export default implement(collectionBottleListContract).handler(async function ({
   } else if (input.status) {
     baseWhere.push(eq(collectionBottles.status, input.status));
   }
+  if (input.age) {
+    baseWhere.push(statedAgeBucketWhere(input.age));
+  }
 
   const results = await db
     .select({ collectionBottles })
@@ -154,12 +160,25 @@ export default implement(collectionBottleListContract).handler(async function ({
         : [asc(bottles.fullName), asc(collectionBottles.id)]),
     );
 
+  // A short page proves the total unless it is an empty page past the first,
+  // so count only when the page cannot.
+  const total =
+    results.length <= limit && (results.length > 0 || offset === 0)
+      ? offset + results.length
+      : await db
+          .select({ count: sql<string>`COUNT(*)` })
+          .from(collectionBottles)
+          .leftJoin(bottles, eq(bottles.id, collectionBottles.bottleId))
+          .where(and(...baseWhere))
+          .then(([row]) => Number(row?.count ?? 0));
+
   return {
     results: await serialize(
       CollectionBottleSerializer,
       results.slice(0, limit).map(({ collectionBottles }) => collectionBottles),
       context.user,
     ),
+    total,
     rel: {
       nextCursor: results.length > limit ? cursor + 1 : null,
       prevCursor: cursor > 1 ? cursor - 1 : null,
