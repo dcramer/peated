@@ -168,11 +168,8 @@ export async function writeEntityAbout(
       pagesRead,
       entity.kind,
     );
-    // A section the schema rejected is a reason to retry, not a silent gap.
-    const droppedSections = converted.dropped
-      .filter((item) => item.startsWith("section "))
-      .map((item) => `The ${item} does not match the output format.`);
-    errors = [...droppedSections, ...reviewed.errors];
+    // An item the schema rejected is a reason to retry, not a silent gap.
+    errors = [...converted.errors, ...reviewed.errors];
     if (!errors.length) {
       errors = mergeAndCheck(before, reviewed.document, now, ownerNames).errors;
     }

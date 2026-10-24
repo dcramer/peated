@@ -219,6 +219,24 @@ describe("writeEntityAbout", () => {
     expect(await getEntityAbout(db, entity.id)).toBeNull();
   });
 
+  test("tells the writer which items break the output format", async ({
+    fixtures,
+  }) => {
+    const entity = await fixtures.Entity({ kind: "distillery" });
+    const tooLong = structuredClone(goodDraft);
+    tooLong.events[0]!.citations[0]!.quote = "x".repeat(301);
+    const writer = services(async () => ({
+      draft: tooLong,
+      pagesRead: [page],
+    }));
+
+    await writeEntityAbout({ entityId: entity.id }, writer);
+
+    expect(writer.writer.mock.calls[1]?.[0].previousErrors?.[0]).toMatch(
+      /^The event 1 does not match the output format at citations\.0\.quote:/,
+    );
+  });
+
   test("drops facts whose quotes are not on a page it read", async ({
     fixtures,
   }) => {

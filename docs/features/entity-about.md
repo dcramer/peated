@@ -94,6 +94,7 @@ links to the About page only when that page exists.
 tools and fixed limits. The model returns a draft document. Code then checks
 it:
 
+- Every item matches the stored schema, including its length limits.
 - A quote must appear on a page the model read in this run and state the
   citation's value. A fact stands only when a kept quote states its year (or
   number); a dated article's publication date counts. Citations that fail
