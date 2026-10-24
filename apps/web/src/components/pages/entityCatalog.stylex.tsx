@@ -1,9 +1,14 @@
 "use client";
 
 import * as stylex from "@stylexjs/stylex";
+import { Check, Plus } from "lucide-react";
 import type { ReactNode } from "react";
 
-import { Button, ButtonLink } from "@peated/web/components/button.stylex";
+import {
+  Button,
+  ButtonLink,
+  IconButton,
+} from "@peated/web/components/button.stylex";
 import {
   EntityIdentityRow,
   type EntityListItem,
@@ -218,6 +223,26 @@ function EntityCatalogTable({
     });
   }
 
+  if (onToggleFollowing) {
+    // Wide tables show follow as a one-click toggle; the row menu keeps it
+    // for narrow screens, where this column is hidden.
+    columns.push({
+      align: "right",
+      cell: (item) => (
+        <EntityFollowToggle
+          item={item}
+          onToggle={onToggleFollowing}
+          pending={pendingIds?.has(item.id) ?? false}
+        />
+      ),
+      header: <span {...stylex.props(styles.visuallyHidden)}>Follow</span>,
+      interactive: true,
+      key: "follow",
+      priority: "secondary",
+      width: "menu",
+    });
+  }
+
   if (onToggleFollowing || items.some((item) => item.createBottleHref)) {
     columns.push({
       align: "right",
@@ -246,6 +271,37 @@ function EntityCatalogTable({
       getKey={(item) => item.id}
       items={items}
       linked
+    />
+  );
+}
+
+function EntityFollowToggle({
+  item,
+  onToggle,
+  pending,
+}: {
+  item: EntityCatalogItem;
+  onToggle: (item: EntityCatalogItem) => void;
+  pending: boolean;
+}) {
+  const label = `${item.isFollowing ? "Unfollow" : "Follow"} ${item.name}`;
+
+  return (
+    <IconButton
+      aria-pressed={item.isFollowing}
+      icon={
+        item.isFollowing ? (
+          <Check aria-hidden="true" size={16} strokeWidth={2} />
+        ) : (
+          <Plus aria-hidden="true" size={16} strokeWidth={2} />
+        )
+      }
+      label={label}
+      loading={pending}
+      onClick={() => onToggle(item)}
+      size="sm"
+      title={label}
+      variant={item.isFollowing ? "tonal" : "text"}
     />
   );
 }

@@ -92,4 +92,22 @@ describe("EntityCatalogList", () => {
     expect(html).toContain("Part of");
     expect(html).toContain("Suntory Global Spirits › Jim Beam");
   });
+
+  it("offers a direct follow toggle when following can change", () => {
+    const html = renderToStaticMarkup(
+      <EntityCatalogList
+        items={[{ ...item, isFollowing: true }]}
+        noun="result"
+        onSortChange={() => undefined}
+        onToggleFollowing={vi.fn()}
+        page={1}
+        sort="name"
+        sortOptions={[{ label: "Name", value: "name" }]}
+        total={1}
+      />,
+    );
+
+    expect(html).toContain('aria-label="Unfollow Example Brand"');
+    expect(html).toContain('aria-pressed="true"');
+  });
 });
