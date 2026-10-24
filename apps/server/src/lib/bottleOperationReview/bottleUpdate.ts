@@ -343,16 +343,21 @@ function relevantBottleUpdateToken({
   return token;
 }
 
+// Exact Bottle identity: compare the same fields as
+// reserveBottleIdentitiesInTransaction in bottleConflicts.ts, which owns the
+// rule at write time, so review never rejects an update the write accepts.
 async function requireNoBottleIdentityCollision({
   database,
   desiredFullName,
   desiredBrandId,
+  desiredSeriesId,
   desiredExact,
   allowedBottleIds,
 }: {
   database: AnyDatabase;
   desiredFullName: string;
   desiredBrandId: number | null;
+  desiredSeriesId: number | null;
   desiredExact: ReturnType<typeof bottleExact>;
   allowedBottleIds: readonly number[];
 }) {
@@ -365,10 +370,12 @@ async function requireNoBottleIdentityCollision({
       and(
         eq(bottles.brandId, desiredBrandId),
         eq(sql`LOWER(${bottles.fullName})`, desiredFullName.toLowerCase()),
+        sql`${bottles.seriesId} IS NOT DISTINCT FROM ${desiredSeriesId}`,
         sql`${bottles.edition} IS NOT DISTINCT FROM ${desiredExact.edition}`,
         sql`${bottles.statedAge} IS NOT DISTINCT FROM ${desiredExact.statedAge}`,
         sql`${bottles.noAgeStatement} IS NOT DISTINCT FROM ${desiredExact.noAgeStatement}`,
         sql`${bottles.vintageYear} IS NOT DISTINCT FROM ${desiredExact.vintageYear}`,
+        sql`${bottles.bottlingYear} IS NOT DISTINCT FROM ${desiredExact.bottlingYear}`,
         sql`${bottles.releaseYear} IS NOT DISTINCT FROM ${desiredExact.releaseYear}`,
         sql`${bottles.releaseMonth} IS NOT DISTINCT FROM ${desiredExact.releaseMonth}`,
         sql`${bottles.releaseDay} IS NOT DISTINCT FROM ${desiredExact.releaseDay}`,
@@ -376,6 +383,7 @@ async function requireNoBottleIdentityCollision({
         sql`${bottles.singleCask} IS NOT DISTINCT FROM ${desiredExact.singleCask}`,
         sql`${bottles.caskStrength} IS NOT DISTINCT FROM ${desiredExact.caskStrength}`,
         sql`${bottles.caskNumber} IS NOT DISTINCT FROM ${desiredExact.caskNumber}`,
+        sql`${bottles.outturn} IS NOT DISTINCT FROM ${desiredExact.outturn}`,
         allowedBottleIds.length
           ? sql`${bottles.id} NOT IN (${sql.join(
               allowedBottleIds.map((id) => sql`${id}`),
@@ -396,19 +404,23 @@ async function requireNoBottleIdentityCollision({
 function structuredIdentityKey({
   brandId,
   fullName,
+  seriesId,
   exact,
 }: {
   brandId: number | null;
   fullName: string;
+  seriesId: number | null;
   exact: ReturnType<typeof bottleExact>;
 }) {
   return JSON.stringify([
     brandId,
     fullName.toLowerCase(),
+    seriesId,
     exact.edition,
     exact.statedAge,
     exact.noAgeStatement,
     exact.vintageYear,
+    exact.bottlingYear,
     exact.releaseYear,
     exact.releaseMonth,
     exact.releaseDay,
@@ -416,6 +428,7 @@ function structuredIdentityKey({
     exact.singleCask,
     exact.caskStrength,
     exact.caskNumber,
+    exact.outturn,
   ]);
 }
 
@@ -705,6 +718,7 @@ export async function prepareBottleUpdate(
       const identityKey = structuredIdentityKey({
         brandId: desiredBrandId,
         fullName: desired.fullName,
+        seriesId,
         exact: desiredExact,
       });
       if (desiredIdentities.has(identityKey)) {
@@ -718,6 +732,7 @@ export async function prepareBottleUpdate(
         database: context.database,
         desiredFullName: desired.fullName,
         desiredBrandId,
+        desiredSeriesId: seriesId,
         desiredExact,
         allowedBottleIds: memberIds,
       });
@@ -727,6 +742,7 @@ export async function prepareBottleUpdate(
       database: context.database,
       desiredFullName: after.fullName,
       desiredBrandId,
+      desiredSeriesId: seriesId,
       desiredExact: exactAfter,
       allowedBottleIds: [resource.bottle.id],
     });

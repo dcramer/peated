@@ -97,7 +97,9 @@ export const EntityResolutionSchema = z
     kind: EntityKindEnum,
     reference: z.string().trim().nullable().default(null),
     score: z.number().nullable().default(null),
-    source: z.array(z.enum(["exact", "text", "prefix"])).default([]),
+    source: z
+      .array(z.enum(["exact", "text", "prefix", "contained"]))
+      .default([]),
   })
   .strict();
 

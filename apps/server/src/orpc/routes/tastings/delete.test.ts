@@ -65,4 +65,20 @@ describe("DELETE /tastings/{tasting}", () => {
       `[Error: Cannot delete another user's tasting.]`,
     );
   });
+
+  test("moderator can delete another user's Tasting", async ({ fixtures }) => {
+    const moderator = await fixtures.User({ mod: true });
+    const tasting = await fixtures.Tasting();
+
+    await routerClient.tastings.delete(
+      { tasting: tasting.id },
+      { context: { user: moderator } },
+    );
+
+    expect(
+      await db.query.tastings.findFirst({
+        where: eq(tastings.id, tasting.id),
+      }),
+    ).toBeUndefined();
+  });
 });

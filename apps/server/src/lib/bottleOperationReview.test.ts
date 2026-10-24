@@ -897,6 +897,59 @@ describe("Bottle operation review preparation", () => {
     );
   });
 
+  test("treats Bottles that differ only by bottling year as distinct identities", async ({
+    fixtures,
+  }) => {
+    const groupBottle = await fixtures.Bottle({
+      name: "Bottling Year Review",
+      edition: null,
+    });
+    const groupId = requireGroupId(groupBottle.groupId);
+    await fixtures.BottleGroupMember({
+      groupId,
+      edition: "Annual Release",
+      bottlingYear: 2020,
+    });
+
+    async function prepareEditionUpdate(bottleId: number) {
+      return await prepareOperation({
+        operation: {
+          id: 32,
+          proposal: {
+            type: "update_bottle",
+            input: {
+              bottleId,
+              patch: { edition: "Annual Release" },
+            },
+            rationale: "The inspected label names this edition.",
+            evidenceRefs: [{ kind: "bottle", bottleId }],
+          },
+        },
+        artifacts: artifacts({
+          bottleContexts: [await bottleContext(bottleId)],
+        }),
+      });
+    }
+
+    const otherYear = await fixtures.BottleGroupMember({
+      groupId,
+      bottlingYear: 2021,
+    });
+    await expect(prepareEditionUpdate(otherYear.id)).resolves.toMatchObject({
+      status: "pending_review",
+      type: "update_bottle",
+    });
+
+    const sameYear = await fixtures.BottleGroupMember({
+      groupId,
+      bottlingYear: 2020,
+    });
+    await expect(prepareEditionUpdate(sameYear.id)).resolves.toMatchObject({
+      status: "blocked",
+      preparationError: { code: "identity_collision" },
+    });
+  });
+
   test("state tokens ignore unrelated counters and timestamps", async ({
     fixtures,
   }) => {

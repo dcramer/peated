@@ -43,6 +43,23 @@ describe("GET /flights", () => {
     );
   });
 
+  test("returns all flights for admin with none filter", async ({
+    fixtures,
+  }) => {
+    const user = await fixtures.User({ admin: true, mod: false });
+    const publicFlight = await fixtures.Flight({ public: true });
+    const privateFlight = await fixtures.Flight({ public: false });
+
+    const data = await routerClient.flights.list(
+      { filter: "none" },
+      { context: { user } },
+    );
+
+    expect(data.results.map((f) => f.id).sort()).toEqual(
+      [publicFlight.publicId, privateFlight.publicId].sort(),
+    );
+  });
+
   test("filters by query", async ({ fixtures }) => {
     const flight1 = await fixtures.Flight({
       name: "Test Flight 1",
