@@ -134,6 +134,37 @@ export function getProfileLibraryInput(
   };
 }
 
+/**
+ * Counts the filters a parsed Library input applies. URL values the parser
+ * drops, such as `status=bogus`, do not count.
+ */
+export function countProfileLibraryFilters(input: ProfileLibraryInput) {
+  return [
+    input.age,
+    input.brand,
+    input.distiller,
+    input.entity,
+    input.query,
+    input.status,
+  ].filter(Boolean).length;
+}
+
+/**
+ * Counts the filters a parsed tasting input applies. URL values the parser
+ * drops, such as a region without its country, do not count.
+ */
+export function countProfileTastingFilters(input: ProfileTastingInput) {
+  return [
+    input.age,
+    input.country,
+    input.distiller,
+    input.entity,
+    input.query,
+    input.ratingBand,
+    input.region,
+  ].filter(Boolean).length;
+}
+
 function getSearchParam(source: SearchParamSource, name: string) {
   if (Symbol.iterator in source) {
     for (const [entryName, value] of source) {

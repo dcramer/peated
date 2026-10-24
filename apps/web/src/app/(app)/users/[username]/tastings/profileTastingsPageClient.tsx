@@ -31,6 +31,7 @@ import {
   useProfileListParams,
 } from "../profileListFilters";
 import {
+  countProfileTastingFilters,
   getProfileListView,
   getProfileTastingInput,
   profileQueries,
@@ -65,17 +66,19 @@ export function ProfileTastingsPageClient() {
   const orpc = useORPC();
   const { isCurrentUser, user } = useProfile();
   const {
-    activeFilterCount,
     clearFilters,
     displayed,
     isNavigating,
     pathname,
-    resultsFiltered,
     searchParams,
     setParam,
   } = useProfileListParams(FILTER_PARAMS);
   const input = getProfileTastingInput(searchParams, user.id);
   const displayedInput = getProfileTastingInput(displayed, user.id);
+  // The Filters button follows the controls; empty states follow the results
+  // on screen, which come from the committed URL.
+  const activeFilterCount = countProfileTastingFilters(displayedInput);
+  const resultsFiltered = countProfileTastingFilters(input) > 0;
   const view = getProfileListView(displayed);
   const tastingQuery = useQuery(profileQueries.tastings(orpc, input));
   const statsQuery = useQuery(profileQueries.tastingStats(orpc, user.id));

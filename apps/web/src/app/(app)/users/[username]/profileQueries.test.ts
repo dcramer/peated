@@ -1,6 +1,8 @@
 import { describe, expect, test } from "vitest";
 
 import {
+  countProfileLibraryFilters,
+  countProfileTastingFilters,
   getProfileActivityRouteState,
   getProfileLibraryInput,
   getProfileListView,
@@ -150,5 +152,35 @@ describe("profile route query state", () => {
     expect(getProfileListView({ view: "table" })).toBe("table");
     expect(getProfileListView({ view: "grid" })).toBe("list");
     expect(getProfileListView({})).toBe("list");
+  });
+
+  test("counts only the filters a list applies", () => {
+    expect(
+      countProfileLibraryFilters(
+        getProfileLibraryInput(
+          { age: "under10", query: "islay", sort: "-created", view: "table" },
+          42,
+        ),
+      ),
+    ).toBe(2);
+    expect(
+      countProfileTastingFilters(
+        getProfileTastingInput({ country: "scotland", region: "islay" }, 42),
+      ),
+    ).toBe(2);
+  });
+
+  test("does not count URL values the parser drops", () => {
+    expect(
+      countProfileLibraryFilters(
+        getProfileLibraryInput({ brand: "abc", status: "bogus" }, 42),
+      ),
+    ).toBe(0);
+    // A region without its country is dropped.
+    expect(
+      countProfileTastingFilters(
+        getProfileTastingInput({ rating: "great", region: "islay" }, 42),
+      ),
+    ).toBe(0);
   });
 });

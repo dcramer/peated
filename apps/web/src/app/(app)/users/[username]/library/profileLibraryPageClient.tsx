@@ -35,6 +35,7 @@ import {
   useProfileListParams,
 } from "../profileListFilters";
 import {
+  countProfileLibraryFilters,
   getProfileLibraryInput,
   getProfileListView,
   profileQueries,
@@ -70,17 +71,19 @@ export function ProfileLibraryPageClient() {
   const { flash } = useFlashMessages();
   const { isCurrentUser, user } = useProfile();
   const {
-    activeFilterCount,
     clearFilters,
     displayed,
     isNavigating,
     pathname,
-    resultsFiltered,
     searchParams,
     setParam,
   } = useProfileListParams(FILTER_PARAMS);
   const input = getProfileLibraryInput(searchParams, user.id);
   const displayedInput = getProfileLibraryInput(displayed, user.id);
+  // The Filters button follows the controls; empty states follow the results
+  // on screen, which come from the committed URL.
+  const activeFilterCount = countProfileLibraryFilters(displayedInput);
+  const resultsFiltered = countProfileLibraryFilters(input) > 0;
   const view = getProfileListView(displayed);
   const libraryQuery = useQuery(profileQueries.library(orpc, input));
   const statsQuery = useQuery(profileQueries.libraryStats(orpc, user.id));
@@ -135,11 +138,17 @@ export function ProfileLibraryPageClient() {
         collection: "library",
         user: "me",
       });
-      updateLibraryList((current) => ({
-        ...current,
-        results: current.results.filter((item) => item.id !== entry.id),
-        total: current.total - 1,
-      }));
+      // Other cached pages and filters may not hold this bottle; leave their
+      // totals alone.
+      updateLibraryList((current) =>
+        current.results.some((item) => item.id === entry.id)
+          ? {
+              ...current,
+              results: current.results.filter((item) => item.id !== entry.id),
+              total: current.total - 1,
+            }
+          : current,
+      );
       // The tab badge and "In library" come from the server-rendered profile,
       // which query invalidation does not reach.
       router.refresh();

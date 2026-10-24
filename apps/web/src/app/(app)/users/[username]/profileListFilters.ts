@@ -14,10 +14,8 @@ import { useORPC } from "@peated/web/lib/orpc/context";
  * next URL as soon as a member picks something; queries read the committed
  * `searchParams`, so results stay until the next page arrives.
  *
- * `filterParams` lists the filters "Clear filters" removes and the Filters
- * button counts; display choices such as `sort` and `view` stay out of it.
- * `activeFilterCount` follows `displayed`, for the controls; `resultsFiltered`
- * follows `searchParams`, so empty states describe the results on screen.
+ * `filterParams` lists the filters "Clear filters" removes; display choices
+ * such as `sort` and `view` stay out of it.
  */
 export function useProfileListParams(filterParams: readonly string[]) {
   const pathname = usePathname();
@@ -63,13 +61,10 @@ export function useProfileListParams(filterParams: readonly string[]) {
   }
 
   return {
-    activeFilterCount: filterParams.filter((param) => displayed.get(param))
-      .length,
     clearFilters,
     displayed,
     isNavigating,
     pathname,
-    resultsFiltered: filterParams.some((param) => searchParams.get(param)),
     searchParams,
     setParam,
   };
