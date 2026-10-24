@@ -70,6 +70,7 @@ export function ProfileTastingsPageClient() {
     displayed,
     isNavigating,
     pathname,
+    resultsFiltered,
     searchParams,
     setParam,
   } = useProfileListParams(FILTER_PARAMS);
@@ -80,7 +81,6 @@ export function ProfileTastingsPageClient() {
   const statsQuery = useQuery(profileQueries.tastingStats(orpc, user.id));
   const regionQuery = useQuery(profileQueries.regions(orpc, user.id));
   const entityGroup = useEntityFilterGroup(displayedInput.entity);
-  const hasFilters = activeFilterCount > 0;
   const filters = [
     ...(entityGroup ? [entityGroup] : []),
     ...getFilterGroups({
@@ -191,7 +191,7 @@ export function ProfileTastingsPageClient() {
               This page is past the end of the list.
             </EmptyState>
           ) : !results.length ? (
-            hasFilters ? (
+            resultsFiltered ? (
               <EmptyState
                 action={
                   <Button onClick={clearFilters} size="sm" variant="text">

@@ -16,6 +16,8 @@ import { useORPC } from "@peated/web/lib/orpc/context";
  *
  * `filterParams` lists the filters "Clear filters" removes and the Filters
  * button counts; display choices such as `sort` and `view` stay out of it.
+ * `activeFilterCount` follows `displayed`, for the controls; `resultsFiltered`
+ * follows `searchParams`, so empty states describe the results on screen.
  */
 export function useProfileListParams(filterParams: readonly string[]) {
   const pathname = usePathname();
@@ -67,6 +69,7 @@ export function useProfileListParams(filterParams: readonly string[]) {
     displayed,
     isNavigating,
     pathname,
+    resultsFiltered: filterParams.some((param) => searchParams.get(param)),
     searchParams,
     setParam,
   };

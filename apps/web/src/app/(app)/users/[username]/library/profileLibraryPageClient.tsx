@@ -2,6 +2,7 @@
 
 import type { Outputs } from "@peated/server/orpc/router";
 import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
+import { useRouter } from "next/navigation";
 
 import { Button, ButtonLink } from "@peated/web/components/button.stylex";
 import {
@@ -65,6 +66,7 @@ const FILTER_PARAMS = [
 export function ProfileLibraryPageClient() {
   const orpc = useORPC();
   const queryClient = useQueryClient();
+  const router = useRouter();
   const { flash } = useFlashMessages();
   const { isCurrentUser, user } = useProfile();
   const {
@@ -73,6 +75,7 @@ export function ProfileLibraryPageClient() {
     displayed,
     isNavigating,
     pathname,
+    resultsFiltered,
     searchParams,
     setParam,
   } = useProfileListParams(FILTER_PARAMS);
@@ -94,21 +97,13 @@ export function ProfileLibraryPageClient() {
     ...getFilterGroups({ params: displayed, stats: statsQuery.data }),
   ];
 
+  // The app's query client refetches every query after a mutation, including
+  // the list total and the rail counts; this shows the change until then.
   function updateLibraryList(change: (current: LibraryList) => LibraryList) {
     queryClient.setQueriesData<LibraryList>(
       { queryKey: orpc.collections.bottles.list.key({ type: "query" }) },
       (current) => (current ? change(current) : current),
     );
-  }
-
-  // The list total and the rail counts both change with a status or removal.
-  function refreshLibrary() {
-    void queryClient.invalidateQueries({
-      queryKey: orpc.collections.bottles.list.key({ type: "query" }),
-    });
-    void queryClient.invalidateQueries({
-      queryKey: orpc.users.libraryStats.key({ type: "query" }),
-    });
   }
 
   async function updateStatus(
@@ -128,7 +123,6 @@ export function ProfileLibraryPageClient() {
           item.id === updated.id ? updated : item,
         ),
       }));
-      refreshLibrary();
     } catch {
       flash("We couldn't change this bottle's status. Try again.", "error");
     }
@@ -146,7 +140,9 @@ export function ProfileLibraryPageClient() {
         results: current.results.filter((item) => item.id !== entry.id),
         total: current.total - 1,
       }));
-      refreshLibrary();
+      // The tab badge and "In library" come from the server-rendered profile,
+      // which query invalidation does not reach.
+      router.refresh();
     } catch {
       flash(
         "We couldn't remove this bottle from your Library. Try again.",
@@ -215,7 +211,6 @@ export function ProfileLibraryPageClient() {
     getLibraryItem(entry, getActions(entry)),
   );
   const pending = isNavigating || libraryQuery.isFetching;
-  const hasFilters = activeFilterCount > 0;
 
   return (
     <ProfileLibraryLayout
@@ -291,7 +286,7 @@ export function ProfileLibraryPageClient() {
               This page is past the end of the list.
             </EmptyState>
           ) : !items.length ? (
-            hasFilters ? (
+            resultsFiltered ? (
               <EmptyState
                 action={
                   <Button onClick={clearFilters} size="sm" variant="text">
