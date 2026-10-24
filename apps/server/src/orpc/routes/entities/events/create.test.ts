@@ -139,6 +139,35 @@ describe("POST /entities/:entity/events", () => {
     );
   });
 
+  test("rejects an owner merged into an Entity later deleted", async ({
+    fixtures,
+  }) => {
+    const user = await fixtures.User({ mod: true });
+    const entity = await fixtures.Entity();
+    // 987_655 was merged into 987_656, which was then deleted.
+    await db.insert(entityTombstones).values([
+      { entityId: 987_655, newEntityId: 987_656 },
+      { entityId: 987_656, newEntityId: null },
+    ]);
+
+    const err = await waitError(() =>
+      routerClient.entities.events.create(
+        {
+          entity: entity.id,
+          kind: "acquired",
+          date: "1925",
+          newOwnerId: 987_655,
+          sourceUrl: "https://example.com/history",
+        },
+        { context: { user } },
+      ),
+    );
+
+    expect(err).toMatchInlineSnapshot(
+      `[Error: Linked entity 987655 does not exist.]`,
+    );
+  });
+
   test("requires a source", async ({ fixtures }) => {
     const user = await fixtures.User({ mod: true });
     const entity = await fixtures.Entity();

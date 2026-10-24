@@ -185,9 +185,10 @@ export async function loadLinkedEntities(
 
 /**
  * Returns Entity IDs the document newly links that do not exist. A merged
- * Entity counts as existing, since reads follow it to the one it became; a
- * deleted one does not. Links already stored are not checked again, so an
- * Entity deleted later does not block every save of the page.
+ * Entity counts as existing when the Entity it became, through every later
+ * merge, still exists, since reads follow it there; a deleted one does not.
+ * Links already stored are not checked again, so an Entity deleted later does
+ * not block every save of the page.
  */
 async function findMissingLinkedEntities(
   database: AnyDatabase,
@@ -203,23 +204,13 @@ async function findMissingLinkedEntities(
     (id) => !before.has(id),
   );
   if (!idList.length) return [];
-  const [found, merged] = await Promise.all([
-    database
-      .select({ id: entities.id })
-      .from(entities)
-      .where(inArray(entities.id, idList)),
-    database
-      .select({ id: entityTombstones.entityId })
-      .from(entityTombstones)
-      .where(
-        and(
-          inArray(entityTombstones.entityId, idList),
-          isNotNull(entityTombstones.newEntityId),
-        ),
-      ),
-  ]);
-  const known = new Set([...found, ...merged].map((row) => row.id));
-  return idList.filter((id) => !known.has(id));
+  const target = await followMergedEntities(database, idList);
+  const found = await database
+    .select({ id: entities.id })
+    .from(entities)
+    .where(inArray(entities.id, [...new Set(target.values())]));
+  const known = new Set(found.map((row) => row.id));
+  return idList.filter((id) => !known.has(target.get(id) ?? id));
 }
 
 /**
