@@ -79,6 +79,12 @@ overrides:
   # @sentry/nextjs's bundler plugins accept any webpack 5 as a peer, and the
   # lockfile kept 5.93. Later releases fix DOM clobbering and buildHttp SSRF.
   webpack: ^5.104.1
+  # isomorphic-dompurify 4.6 wants jsdom 30, which pulls in an ESM-only
+  # dependency that breaks require() in Next.js on Vercel (ERR_REQUIRE_ESM), so
+  # every page that rendered markdown on the server returned 500. This is the
+  # workaround from the package's Known Issues (kkomelin/isomorphic-dompurify
+  # #394). Remove it when isomorphic-dompurify works without it.
+  'isomorphic-dompurify>jsdom': 25.0.1
 
 minimumReleaseAgeExclude:
   - zod@4.5.4
