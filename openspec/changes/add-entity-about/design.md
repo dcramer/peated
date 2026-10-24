@@ -23,11 +23,13 @@ Decisions already made:
 - About data lives in one typed document per Entity. Site facts come from a
   typed field list in code. Schema changes should be rare and backward
   compatible.
-- Entity history moves from `entity_event` into the document.
+- The About page is a generated artifact. Each run writes the whole next
+  version; change history keeps the old ones.
+- The history timeline stays in `entity_event`, as its own simple widget.
+  The writer reads it as leads.
+- Facts moderators want every run to know go in a notes table.
 - Unsourced descriptions are replaced as sourced leads are published. Those
   left after the full run are cleared. Descriptions a person wrote stay.
-- All shown history needs a source. Legacy history is sourced by the same
-  run; what nobody can source stays stored but hidden.
 
 Constraints come from `CLAUDE.md` (record evidence, never present guesses as
 facts), `docs/policies/agent-design.md`, `docs/policies/background-work.md`,
@@ -47,7 +49,7 @@ facts), `docs/policies/agent-design.md`, `docs/policies/background-work.md`,
 - Make low-quality text hard to publish with a few exact checks in code.
 - Keep the pipeline small: one job, one model call, no new review queues.
 - Keep layout in code so 3,900 pages stay consistent and change together.
-- Keep people's edits authoritative.
+- Keep the page easy to regenerate: no merge rules between runs and edits.
 
 **Non-Goals:**
 
@@ -98,19 +100,19 @@ status }`.
   `kind` is `official`, `reference`, or `press`.
   `url` is unique within the document.
 - `events`: list of `{ id, kind, date, endDate, continuing, name, title,
-text, relatedEntityId, newOwnerId, newOwnerName, citations, writtenBy }`.
+text, relatedEntityId, newOwnerId, newOwnerName, citations }`.
   - Kinds: `opened`, `closed`, `mothballed`, `reopened`, `acquired`,
     `renamed`, `era`, `generic`.
 - `siteFacts`: an object keyed by field, each value
-  `{ value, asOf, citations, writtenBy }`. Distilleries only.
-- `sections`: list of `{ key, heading, eraEventId, sentences, writtenBy }`.
+  `{ value, asOf, citations }`. Distilleries only.
+- `sections`: list of `{ key, heading, eraEventId, sentences }`.
   Each sentence is `{ text, factIds }`. A fact ID is an event `id` or
   `site:<field>`. The lead is the section with key `lead`. Sentences never
   state catalog numbers, which change daily and belong in charts.
 - Every `citations` entry is `{ sourceId, statedValue, quote }`. Quotes are
   at most 300 characters and are removed by the public serializer.
-- `writtenBy` is `person` or `pipeline`. Whether a fact is shown is
-  computed by the display rules on read, not stored, so it can't go stale.
+- Whether a fact is shown is computed by the display rules on read, not
+  stored, so it can't go stale.
 
 **Typed files in code** (changed by pull request, so review comes from code
 review):
@@ -140,15 +142,13 @@ schema):
   table under a new object type, `entity_about`, with the actor. The pipeline
   writes as a new system actor, `aboutPipeline`. Rollback restores an
   earlier version.
-- **Entity links:** `relatedEntityId` and `newOwnerId` have no database
-  foreign keys.
-  - Writes check that the Entities exist.
-  - Reads resolve merged Entities through `entity_tombstone`, so a merge
-    never edits documents.
-  - An Entity that a document links, directly or through a merge, cannot be
-    deleted; merge it instead.
-  - Owners Peated has no Entity for are stored by name (`newOwnerName`). The
-    pipeline never creates Entities.
+- **Entity links:** `relatedEntityId` and `newOwnerId` are optional links
+  with no database foreign keys.
+  - An acquisition always stores the owner's name (`newOwnerName`). The job
+    links it when exactly one Entity or alias has that name.
+  - Reads resolve merged Entities through `entity_tombstone` and show a link
+    while the Entity exists, else the name. A merge never edits documents.
+  - The pipeline never creates Entities.
 - **Concurrency:** writes send the version they read. A stale version is
   rejected and the writer retries from the new document, per
   `docs/policies/database-correctness.md`.
@@ -157,14 +157,18 @@ schema):
 
 **Merges.** `mergeEntity` does not combine About documents. The destination
 keeps its document, the merged Entity's document is deleted with it (its
-versions stay in change history), and the merge queues a writer run for the
-destination. Combining two sourced articles never gave a coherent page and
-needed special cases for hidden pages, site facts, and self-acquisitions.
+versions stay in change history), and the merge moves history rows and notes
+to the destination and queues a writer run.
 
-**History moves into the document.** `entity_event` rows are copied into each
-Entity's document. Overview history, the acquisitions shown on owner pages,
-and the moderator event routes read and write the document. The table is
-dropped in a later migration.
+**History timeline and notes stay outside the document.**
+
+- `entity_event` stays the history timeline: a simple widget, such as the
+  Overview list, edited through the existing `entities.events.*` routes.
+  The writer reads its rows as leads, so the page's events roughly cover it.
+- `entity_about_note` holds plain-text notes (up to 500 characters, with an
+  optional source URL) that moderators keep through
+  `entities.about.notes.*`. Every run reads them. They guide the writer but
+  are never cited, so every shown fact still has a web source.
 
 Alternatives considered:
 
@@ -174,8 +178,9 @@ Alternatives considered:
 - **Data files in the repository.** Rejected: every pipeline write and every
   moderator correction would be a commit, and moderators could not edit in
   the product.
-- **Keeping `entity_event` next to the document.** Rejected: two homes for
-  history drift apart.
+- **Moving `entity_event` into the document.** Rejected: a page that is
+  rewritten on every run is the wrong home for history people curate, and
+  copying it in needed a backfill and merge rules that kept breaking.
 - **Typed columns for site facts.** Replaced by the typed field list. It
   keeps the same checking, and an expression index on one document field can
   support filtering if a feature needs it later.
@@ -227,15 +232,16 @@ that the pick is one of the stated values.
    - Tools: the existing web search and page-fetch tools from
      `packages/bottle-classifier`, with a fixed limit of searches and page
      reads.
-   - Input: the Entity's name, kind, location, owner, aliases, the field list,
-     the style rules, and two examples written by people (Brora and one
-     brand).
-   - Output: a complete About document draft, parsed with the document
-     schema.
+   - Input: the Entity's name, kind, location, owner, aliases, its notes,
+     its history timeline, the current page, the field list, the style
+     rules, and two examples written by people (Brora and one brand).
+   - Output: the complete next version of the page, parsed with the
+     document schema. It may keep, correct, add, or drop anything.
    - Page text is data, not instructions. The model has no write tools.
 2. **Checks in code.** Each check works on exact text:
-   - Drop citations whose quote is not in a page read during this run, then
-     drop facts with no citations left.
+   - Drop citations whose quote is not in a page read during this run, unless
+     it is the same quote from the same page as one the current page already
+     has. Then drop facts with no citations left.
    - Every sentence lists facts in the draft, and every year or number in it
      appears in those facts.
    - Length limits match the number of shown facts.
@@ -243,14 +249,10 @@ that the pick is one of the stated values.
 3. **Retry.** A draft that fails gets one retry with the failure reasons.
    After that, the job logs the reason and saves nothing.
 4. **Save.**
-   - Merge into the stored document: keep every item a person wrote and
-     replace items the pipeline wrote.
-   - Save with a version check and record the change.
+   - Link owners by name, then save the draft as the next version with a
+     version check and record the change. A page a moderator edited during
+     the run fails the check, and the job is retried from the new page.
    - Update the Entity description from the lead unless a person wrote it.
-   - A draft event that matches a kept event (a person's, or one with no
-     citations; same kind, dates that agree) adds its citations to that
-     event. The writer's input lists stored events the page cannot show, as
-     leads to check.
 
 The job writes as a new system actor, `aboutPipeline`. It never changes the
 Entity's name, kind, owner, status, or Bottles.
@@ -300,8 +302,7 @@ gains a `vintageYear` filter.
 The route renders the template list, skipping parts whose rule fails. Parts
 come from the proof of concept, rewired to the API.
 
-The Overview replaces `EntityHistoryOverview` with key dates and a link when
-About exists. Bottle pages get `BottleEraNote`, fed by the Bottle's single
+Bottle pages get `BottleEraNote`, fed by the Bottle's single
 distiller and vintage from `entities.about.details`. Each component gets one
 Storybook Overview story, per `apps/web/AGENTS.md`.
 
@@ -318,8 +319,8 @@ Storybook Overview story, per `apps/web/AGENTS.md`.
   reviewed pages, and the check runs the real job's checks, per
   `docs/development/model-checks.md`.
 - Problems on live pages arrive through the existing Entity reports. A
-  moderator edits the document, the edit is marked as written by a person,
-  and later runs keep it.
+  moderator patches the page, and adds a note when the fix must survive
+  later runs.
 
 ### 8. Brand and distillery split
 
@@ -353,7 +354,7 @@ Each likely change has one place to make it, without reworking storage:
 - **Wrong facts published without review.**
   - Quotes are checked against pages read in the run.
   - Shops, auctions, and forums are never cited.
-  - People's edits are kept.
+  - A bad run is rolled back from change history.
   - Reports and moderator edits fix the rest.
   - If errors are common, add a review step then.
 - **Bland but correct text.**
@@ -365,26 +366,22 @@ Each likely change has one place to make it, without reworking storage:
 - **A document schema change breaks stored documents.**
   - Changes are rare and backward compatible by rule.
   - A test parses sample documents.
+- **A run rewrites a moderator's patch.** Patches are versions, not
+  protected items. A fix that must last goes in a note.
 - **Copying source text.** Quotes are private and short. The style rules and
   the sentence-per-fact rule keep prose in Peated's own words.
 
 ## Migration Plan
 
-1. Add `entity_about` and the `entity_about` change object type. Generate the
-   migration with `pnpm db:generate`.
-2. Point Overview history, owner acquisitions, and moderator event routes at
-   the document. Stop writing `entity_event`. This ships with step 1.
-3. Right after the API deploy, backfill a document for each Entity with
-   `entity_event` rows. Copy each `sourceUrl` as a source, and check event
-   counts for each Entity. Until it finishes, Overview history is empty and
-   legacy history edits return not found.
-4. Enter Brora's document through the API, following the catalog maintenance
-   approval and checks. Delete the code file.
-5. Ship the catalog-numbers routes and the About tab.
-6. Run the job on 20 Entities, read every result, and fix the prompt or
+1. Add `entity_about`, `entity_about_note`, and the `entity_about` change
+   object type in migration `0322_add_entity_about`, generated with
+   `pnpm db:generate`.
+2. Enter Brora's document through `pnpm cli api`, following the catalog
+   maintenance approval and checks. Delete the code file.
+3. Ship the catalog-numbers routes and the About tab.
+4. Run the job on 20 Entities, read every result, and fix the prompt or
    checks.
-7. Queue batches by activity.
-8. Drop `entity_event` after a release with no reads from it.
+5. Queue batches by activity, then run `clear-entity-descriptions`.
 
 Rollback:
 

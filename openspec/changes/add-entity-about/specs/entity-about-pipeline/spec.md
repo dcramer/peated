@@ -4,22 +4,37 @@
 
 The `writeEntityAbout` job SHALL make one model call per run. The model SHALL
 search and read public pages with the existing web search and page-fetch
-tools, and SHALL return a complete About document: sources, events, site
-facts, and sections. The job SHALL run for one Entity at a time and SHALL stop
-at a fixed limit of searches and page reads.
+tools, and SHALL return the complete next version of the About page:
+sources, events, site facts, and sections. The model SHALL get the Entity's
+fields, its notes, its history timeline, and the current page, and MAY keep,
+correct, add, or drop anything. The job SHALL run for one Entity at a time and
+SHALL stop at a fixed limit of searches and page reads.
 
 #### Scenario: Run for a distillery
 
 - **WHEN** the job runs for Brora
-- **THEN** it returns one About document draft built from the pages it read
-  in that run
+- **THEN** it returns one complete page built from the pages it read in that
+  run and the citations it kept from the current page
+
+#### Scenario: Page rewritten
+
+- **WHEN** the current page has a fact no page supports anymore
+- **THEN** the next version may drop it, and the old version stays in change
+  history
 
 ### Requirement: Quotes are checked against pages read
 
 Every citation SHALL include a short quote. Code SHALL drop a citation when
 its quote does not appear in a page the model read in the same run, after
-whitespace and punctuation are normalized. A fact left with no citations SHALL
-be dropped.
+whitespace and punctuation are normalized, unless it is the same quote from
+the same page as a citation the current page already has. A fact left with no
+citations SHALL be dropped.
+
+#### Scenario: Kept citation
+
+- **WHEN** the model keeps a citation exactly as the current page has it and
+  does not read that page again
+- **THEN** the citation stands
 
 #### Scenario: Invented quote
 
@@ -83,37 +98,53 @@ unsourced text.
 - **WHEN** both drafts for a new Entity fail the checks
 - **THEN** no About document is saved and the Entity keeps its current page
 
-### Requirement: People's edits are kept
+### Requirement: Each save is a new version
 
-The job SHALL keep every item a person wrote and SHALL replace only items the
-pipeline wrote. It SHALL NOT change an Entity's name, kind, owner, status, or
-Bottles.
+The job SHALL save a passing draft as the next version of the page, with a
+version check, and record it in change history. A page edited during the run
+SHALL fail the check, and the job SHALL be retried from the new page. The job
+SHALL NOT change an Entity's name, kind, owner, status, or Bottles.
 
-#### Scenario: Moderator fixed a date
+#### Scenario: Bad run
 
-- **WHEN** a moderator corrected an event's year and the job runs again
-- **THEN** the corrected event is kept as the moderator wrote it
+- **WHEN** a run publishes a wrong fact
+- **THEN** a moderator restores the earlier version from change history
 
-### Requirement: Stored history is sourced or stays hidden
+#### Scenario: Edit during a run
 
-The job SHALL give the writer each stored event that the page cannot show, as
-a lead to check, not as evidence. When a draft event has the same kind as a
-kept event (one a person wrote, or one with no citations) and their dates
-agree, the job SHALL add the draft's citations to the kept event and SHALL NOT
-change its date or text. Kept events nobody can source SHALL stay stored and
-hidden.
+- **WHEN** a moderator saves the page while the job is running
+- **THEN** the job's save fails the version check and the job runs again
+  from the moderator's version
 
-#### Scenario: Legacy event sourced
+### Requirement: Notes and history guide the writer
 
-- **WHEN** an Entity has a legacy "opened 1819" event with no source and the
-  draft cites a page for opening in 1819
-- **THEN** the legacy event gains that citation and is shown, and no second
-  opening event is added
+Every run SHALL read the Entity's notes and its history timeline. They SHALL
+be leads for the writer, not sources: every shown fact SHALL still cite a
+page. The page's events SHOULD cover the history timeline when a page the
+writer reads supports it.
 
-#### Scenario: Legacy event with no source found
+#### Scenario: Note keeps a fix
 
-- **WHEN** the draft has no event matching a legacy event with no source
-- **THEN** the legacy event stays stored and hidden
+- **WHEN** a moderator adds the note "Not the modern Clynelish next door"
+- **THEN** every later run gets that note
+
+#### Scenario: Timeline item
+
+- **WHEN** the history timeline has "closed 1983" and a page the writer reads
+  states it
+- **THEN** the page includes a closing event in 1983
+
+### Requirement: Owners are linked by name
+
+An acquisition SHALL store the new owner's name. The job SHALL link it to an
+Entity when exactly one Entity or alias has that name, and SHALL NOT create
+Entities.
+
+#### Scenario: One match
+
+- **WHEN** a draft names "Distillers Company" as the new owner and one Entity
+  has that name
+- **THEN** the event stores the name and links that Entity
 
 ### Requirement: Runs happen on request
 
@@ -122,7 +153,7 @@ batch ordered by public activity. The job SHALL NOT run on a schedule. A
 configuration switch SHALL stop new runs. Saved drafts SHALL publish without
 approval.
 
-#### Scenario: Backfill
+#### Scenario: Batch
 
 - **WHEN** an administrator queues the 200 most active distilleries
 - **THEN** the job runs for each, and drafts that pass the checks publish

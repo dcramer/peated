@@ -22,8 +22,11 @@ live in code.
 - Keep the list of site facts in a **typed file in code**, changed by pull
   request. Changes to the document schema should
   be rare and backward compatible.
-- **BREAKING (internal):** move Entity history from `entity_event` into the
-  document, then drop the table.
+- Treat the About page as a **generated artifact**. Each writer run returns
+  the whole next version, and every save is a version in change history, so
+  a bad run is rolled back there. The history timeline (`entity_event`)
+  stays as it is, and a new **notes** table holds facts moderators want
+  every run to know.
 - Add **catalog numbers** routes built from Bottles: Bottles by year
   distilled, who bottled them, which distilleries make a brand, and releases
   by year. Add a vintage filter to the Bottle list.
@@ -43,8 +46,8 @@ live in code.
 - Replace each Entity's unsourced generated description with its sourced lead.
   After the writer covers every Distillery and Brand, clear the generated
   descriptions still left. `generateEntityDetails` stops writing descriptions.
-- Source legacy history in the same run: the writer checks each unsourced
-  event, and history nobody can source stays stored but hidden.
+- Give the writer the Entity's history timeline as leads, so the page's
+  events roughly cover it.
 - Move the Brora proof of concept from a code file to stored data and delete
   the code file.
 
@@ -68,13 +71,15 @@ live in code.
 
 ## Impact
 
-- **Database:** one new table, `entity_about` (one document per Entity), a
-  new `change` object type, and a later drop of `entity_event`. Generated with `pnpm db:generate`.
+- **Database:** two new tables, `entity_about` (one document per Entity) and
+  `entity_about_note` (moderator notes for the writer), and a new `change`
+  object type, in migration `0322_add_entity_about`. Generated with
+  `pnpm db:generate`.
 - **Server:** new routes under `apps/server/src/orpc/routes/entities/about/`
   and catalog-number routes; a vintage filter on `bottles.list`; one new
   worker job; changes to `generateEntityDetails`.
-- **Web:** About tab, widgets in `apps/web/src/features/entityAbout/`, Bottle
-  page era line, overview changes.
+- **Web:** About tab, widgets in `apps/web/src/features/entityAbout/`, and the
+  Bottle page era line.
 - **Models and services:** web search and page fetching (the Firecrawl tooling
   the classifier already uses) and the AI gateway. One model check
   under `pnpm evals`.
