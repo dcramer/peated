@@ -8,7 +8,7 @@ const FIRECRAWL_TIMEOUT_MS = 30_000;
 const SEARCH_RESULT_LIMIT = 8;
 // Pages are long; the writer needs the passages, and quotes are checked
 // against exactly this text.
-const MAX_PAGE_CHARS = 24_000;
+export const MAX_PAGE_CHARS = 24_000;
 
 /**
  * Replaces markdown links with their text and drops images, so the writer
@@ -94,23 +94,75 @@ async function firecrawl(
   return payload;
 }
 
-/**
- * The writer's two tools. Each has a fixed allowance; when it is used up the
- * tool says so instead of calling Firecrawl.
- */
-export function createAboutWebTools({
+export type AboutSearchResult = {
+  url: string;
+  title: string;
+  description: string | null;
+};
+
+/** Where the writer's tools find and read pages. */
+export type AboutWebSource = {
+  search: (query: string) => Promise<AboutSearchResult[]>;
+  read: (url: string) => Promise<{ title: string | null; text: string }>;
+};
+
+/** Searches and reads the live web through Firecrawl. */
+export function createFirecrawlSource({
   apiKey,
   apiUrl: configuredUrl,
-  budget,
-  pagesRead,
 }: {
   apiKey: string;
   /** Defaults to Firecrawl's hosted API. */
   apiUrl: string | null;
+}): AboutWebSource {
+  const apiUrl = configuredUrl ?? FIRECRAWL_API_URL;
+  return {
+    search: async (query) => {
+      const payload = SearchResponseSchema.parse(
+        await firecrawl(apiKey, apiUrl, {
+          path: "/v2/search",
+          body: { query, limit: SEARCH_RESULT_LIMIT, sources: ["web"] },
+        }),
+      );
+      return payload.data.web.map((result) => ({
+        url: result.url,
+        title: result.title ?? result.url,
+        description: result.description ?? null,
+      }));
+    },
+    read: async (url) => {
+      const payload = ScrapeResponseSchema.parse(
+        await firecrawl(apiKey, apiUrl, {
+          path: "/v2/scrape",
+          body: {
+            url,
+            formats: ["markdown"],
+            onlyMainContent: true,
+            proxy: "basic",
+          },
+        }),
+      );
+      return {
+        title: payload.data.metadata?.title ?? null,
+        text: toPlainText(payload.data.markdown ?? ""),
+      };
+    },
+  };
+}
+
+/**
+ * The writer's two tools. Each has a fixed allowance; when it is used up the
+ * tool says so instead of calling the source.
+ */
+export function createAboutWebTools({
+  source,
+  budget,
+  pagesRead,
+}: {
+  source: AboutWebSource;
   budget: WebBudget;
   pagesRead: AboutPageRead[];
 }) {
-  const apiUrl = configuredUrl ?? FIRECRAWL_API_URL;
   const used = { searches: 0, reads: 0 };
 
   const searchWeb = tool({
@@ -126,19 +178,7 @@ export function createAboutWebTools({
       }
       used.searches += 1;
       try {
-        const payload = SearchResponseSchema.parse(
-          await firecrawl(apiKey, apiUrl, {
-            path: "/v2/search",
-            body: { query, limit: SEARCH_RESULT_LIMIT, sources: ["web"] },
-          }),
-        );
-        return {
-          results: payload.data.web.map((result) => ({
-            url: result.url,
-            title: result.title ?? result.url,
-            description: result.description ?? null,
-          })),
-        };
+        return { results: await source.search(query) };
       } catch (error) {
         return {
           error: error instanceof Error ? error.message : "Search failed.",
@@ -165,27 +205,10 @@ export function createAboutWebTools({
       }
       used.reads += 1;
       try {
-        const payload = ScrapeResponseSchema.parse(
-          await firecrawl(apiKey, apiUrl, {
-            path: "/v2/scrape",
-            body: {
-              url,
-              formats: ["markdown"],
-              onlyMainContent: true,
-              proxy: "basic",
-            },
-          }),
-        );
-        const text = toPlainText(payload.data.markdown ?? "").slice(
-          0,
-          MAX_PAGE_CHARS,
-        );
+        const page = await source.read(url);
+        const text = page.text.slice(0, MAX_PAGE_CHARS);
         pagesRead.push({ url, text });
-        return {
-          url,
-          title: payload.data.metadata?.title ?? null,
-          text,
-        };
+        return { url, title: page.title, text };
       } catch (error) {
         return {
           error: error instanceof Error ? error.message : "Read failed.",
