@@ -102,17 +102,25 @@ export type AboutDraft = z.infer<typeof AboutDraftSchema>;
 
 /**
  * Converts the writer's draft into a stored document, marked as written by
- * the pipeline. Items the schema rejects are dropped, not repaired.
+ * the pipeline. Items the schema rejects are dropped, not repaired, and
+ * each one becomes an error the writer can fix on its retry.
  */
 export function draftToDocument(draft: AboutDraft, now: string) {
-  const dropped: string[] = [];
+  const errors: string[] = [];
+  const reject = (item: string, error: z.ZodError) => {
+    const issue = error.issues[0];
+    const path = issue?.path.join(".");
+    errors.push(
+      `The ${item} does not match the output format${path ? ` at ${path}` : ""}: ${issue?.message ?? "invalid"}.`,
+    );
+  };
 
   const sources = draft.sources.flatMap((source) => {
     const parsed = AboutSourceSchema.safeParse({
       ...source,
       status: "available",
     });
-    if (!parsed.success) dropped.push(`source ${source.id}`);
+    if (!parsed.success) reject(`source ${source.id}`, parsed.error);
     return parsed.success ? [parsed.data] : [];
   });
 
@@ -125,7 +133,7 @@ export function draftToDocument(draft: AboutDraft, now: string) {
       createdAt: now,
       updatedAt: now,
     });
-    if (!parsed.success) dropped.push(`event ${event.id}`);
+    if (!parsed.success) reject(`event ${event.id}`, parsed.error);
     return parsed.success ? [parsed.data] : [];
   });
 
@@ -140,7 +148,7 @@ export function draftToDocument(draft: AboutDraft, now: string) {
       },
     });
     if (parsed.success) Object.assign(siteFacts, parsed.data);
-    else dropped.push(`site fact ${fact.field}`);
+    else reject(`site fact ${fact.field}`, parsed.error);
   }
 
   const sections = draft.sections.flatMap((section) => {
@@ -148,7 +156,7 @@ export function draftToDocument(draft: AboutDraft, now: string) {
       ...section,
       writtenBy: "pipeline",
     });
-    if (!parsed.success) dropped.push(`section ${section.key}`);
+    if (!parsed.success) reject(`section ${section.key}`, parsed.error);
     return parsed.success ? [parsed.data] : [];
   });
 
@@ -158,5 +166,5 @@ export function draftToDocument(draft: AboutDraft, now: string) {
     siteFacts,
     sections,
   };
-  return { document, dropped };
+  return { document, errors };
 }
