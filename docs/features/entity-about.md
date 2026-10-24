@@ -85,7 +85,8 @@ links to the About page only when that page exists.
   document. A new history item needs a source URL.
 - The `writeEntityAbout` worker job writes as the `aboutPipeline` system
   actor. Administrators queue it with `/admin/catalog/write-entity-about`.
-  `ENTITY_ABOUT_WRITER_ENABLED` turns it off.
+  `ENTITY_ABOUT_WRITER_ENABLED` turns it off; so does a missing
+  `AI_GATEWAY_API_KEY` or `FIRECRAWL_API_KEY`.
 
 ## How The Job Writes A Page
 

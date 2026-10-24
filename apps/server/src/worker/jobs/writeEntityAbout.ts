@@ -48,8 +48,11 @@ type WriteEntityAboutServices = {
 };
 
 const defaultServices: WriteEntityAboutServices = {
+  // The writer needs both the model and web tools.
   enabled:
-    config.ENTITY_ABOUT_WRITER_ENABLED && Boolean(config.AI_GATEWAY_API_KEY),
+    config.ENTITY_ABOUT_WRITER_ENABLED &&
+    Boolean(config.AI_GATEWAY_API_KEY) &&
+    Boolean(config.FIRECRAWL_API_KEY),
   writer: runEntityAboutWriter,
   now: () => new Date(),
 };
