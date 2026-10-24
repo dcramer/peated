@@ -1,6 +1,7 @@
 import type { EntityKind } from "@peated/server/db/schema";
 import type {
   AboutCitation,
+  AboutSection,
   EntityAboutDocument,
 } from "@peated/server/schemas/entityAbout";
 
@@ -168,38 +169,68 @@ export function checkAboutProse(document: EntityAboutDocument) {
   }
 
   for (const { section, sentence } of sentences) {
-    const where = `"${sentence.text.slice(0, 60)}" (${section.key})`;
-    if (!sentence.factIds.length) {
-      errors.push(`${where} cites no facts.`);
-      continue;
-    }
-    const missing = sentence.factIds.filter((id) => !shown.has(id));
-    if (missing.length) {
-      errors.push(
-        `${where} cites facts that are not shown: ${missing.join(", ")}.`,
-      );
-      continue;
-    }
-    const cited = sentence.factIds
-      .map((id) => factText.get(id) ?? "")
-      .join(" ");
-    for (const number of stripThousands(sentence.text).match(NUMBER_PATTERN) ??
-      []) {
-      if (!containsNumber(cited, number)) {
-        errors.push(`${where} states ${number}, which its facts do not.`);
-      }
-    }
-    const words = sentence.text.split(/\s+/).filter(Boolean).length;
-    if (words > ABOUT_MAX_SENTENCE_WORDS) {
-      errors.push(
-        `${where} has ${words} words; the limit is ${ABOUT_MAX_SENTENCE_WORDS}.`,
-      );
-    }
-    for (const phrase of findBannedPhrases(sentence.text)) {
-      errors.push(`${where} uses the banned phrase "${phrase}".`);
-    }
+    errors.push(...checkSentence(section, sentence, shown, factText));
   }
 
+  return errors;
+}
+
+function checkSentence(
+  section: AboutSection,
+  sentence: AboutSection["sentences"][number],
+  shown: ReadonlySet<string>,
+  factText: ReadonlyMap<string, string>,
+) {
+  const where = `"${sentence.text.slice(0, 60)}" (${section.key})`;
+  if (!sentence.factIds.length) return [`${where} cites no facts.`];
+  const missing = sentence.factIds.filter((id) => !shown.has(id));
+  if (missing.length) {
+    return [`${where} cites facts that are not shown: ${missing.join(", ")}.`];
+  }
+  const errors: string[] = [];
+  const cited = sentence.factIds.map((id) => factText.get(id) ?? "").join(" ");
+  for (const number of stripThousands(sentence.text).match(NUMBER_PATTERN) ??
+    []) {
+    if (!containsNumber(cited, number)) {
+      errors.push(`${where} states ${number}, which its facts do not.`);
+    }
+  }
+  const words = sentence.text.split(/\s+/).filter(Boolean).length;
+  if (words > ABOUT_MAX_SENTENCE_WORDS) {
+    errors.push(
+      `${where} has ${words} words; the limit is ${ABOUT_MAX_SENTENCE_WORDS}.`,
+    );
+  }
+  for (const phrase of findBannedPhrases(sentence.text)) {
+    errors.push(`${where} uses the banned phrase "${phrase}".`);
+  }
+  return errors;
+}
+
+/**
+ * Checks a merged document before the pipeline saves it. Pipeline rule
+ * (owner: docs/features/entity-about.md): the pipeline's sentences must still
+ * match the facts they cite after a person's values win the merge, and a run
+ * never leaves the page with fewer shown facts. Counts, not IDs, because a
+ * run renumbers the pipeline's events.
+ */
+export function checkMergedAbout(
+  stored: EntityAboutDocument | null,
+  merged: EntityAboutDocument,
+) {
+  const shown = getShownFactIds(merged);
+  const factText = factSearchText(merged);
+  const errors = merged.sections
+    .filter((section) => section.writtenBy === "pipeline")
+    .flatMap((section) =>
+      section.sentences.flatMap((sentence) =>
+        checkSentence(section, sentence, shown, factText),
+      ),
+    );
+  const lost = stored ? getShownFactIds(stored).size - shown.size : 0;
+  if (lost > 0) {
+    errors.push(`The draft would show ${lost} fewer facts than the page does.`);
+  }
   return errors;
 }
 

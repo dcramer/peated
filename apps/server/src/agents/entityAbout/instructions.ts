@@ -145,7 +145,7 @@ export function buildEntityAboutInput(input: EntityAboutWriterInput) {
   if (input.unsourcedHistory.length) {
     lines.push(
       "",
-      "Peated has these history items without a source. They are leads, not evidence. When a page you read supports one, include it as an event with the same kind and a date that agrees. Leave out any you cannot support.",
+      "Peated has these history items without a source. They are leads, not evidence. When a page you read supports one, include it as an event with the same kind, a date that agrees, and the item's number as its `id`. Leave out any you cannot support.",
       ...input.unsourcedHistory.map((item) => `- ${item}`),
     );
   }

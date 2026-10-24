@@ -215,7 +215,7 @@ describe("writeEntityAbout", () => {
     await writeEntityAbout({ entityId: entity.id }, run);
 
     expect(run.writer.mock.calls[0]?.[0].unsourcedHistory).toEqual([
-      "opened, 1819: Built by the Sutherland estate.",
+      "#5 opened, 1819: Built by the Sutherland estate.",
     ]);
     const about = await getEntityAbout(db, entity.id);
     expect(
@@ -299,6 +299,57 @@ describe("writeEntityAbout", () => {
     expect(result).toMatchObject({ status: "rejected" });
     const about = await getEntityAbout(db, entity.id);
     expect(about?.document.events.map(({ id }) => id)).toEqual([1, 2, 3]);
+  });
+
+  test("rejects prose that contradicts a person's fact", async ({
+    fixtures,
+  }) => {
+    const entity = await fixtures.Entity({ kind: "distillery" });
+    await fixtures.EntityAbout({
+      entityId: entity.id,
+      siteFacts: {
+        washStills: {
+          value: 2,
+          asOf: null,
+          citations: [{ sourceId: "s1", statedValue: "2", quote: null }],
+          writtenBy: "person",
+        },
+      },
+    });
+    const oneStill: AboutDraft = {
+      ...goodDraft,
+      siteFacts: [
+        {
+          field: "washStills",
+          value: 1,
+          asOf: null,
+          citations: [
+            {
+              sourceId: "wp",
+              statedValue: "1",
+              quote: "Brora distillery was founded in 1819.",
+            },
+          ],
+        },
+      ],
+      sections: [
+        {
+          ...goodDraft.sections[0]!,
+          sentences: [
+            ...goodDraft.sections[0]!.sentences,
+            { text: "It has 1 wash still.", factIds: ["site:washStills"] },
+          ],
+        },
+      ],
+    };
+    const run = services(async () => ({ draft: oneStill, pagesRead: [page] }));
+
+    const result = await writeEntityAbout({ entityId: entity.id }, run);
+
+    expect(result).toMatchObject({ status: "rejected" });
+    expect(run.writer).toHaveBeenCalledTimes(2);
+    const about = await getEntityAbout(db, entity.id);
+    expect(about?.document.siteFacts.washStills?.value).toBe(2);
   });
 
   test("saves nothing from an empty draft", async ({ fixtures }) => {
