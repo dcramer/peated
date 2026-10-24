@@ -58,6 +58,31 @@ describe("keepVerifiedCitations", () => {
     expect(result.sources).toEqual([]);
   });
 
+  test("drops a fact whose quote does not state its date", () => {
+    const result = keepVerifiedCitations(
+      draft({
+        events: [
+          // A real quote, but it says 1983, not 1984.
+          {
+            ...event(1, "1984", "Brora closed in 1983."),
+            citations: [
+              {
+                sourceId: "wp",
+                statedValue: null,
+                quote: "Brora closed in 1983.",
+              },
+            ],
+          },
+          // The stated value is not in the quote.
+          event(2, "1984", "It was rebuilt in 2021 after 38 years."),
+        ],
+      }),
+      [page],
+    );
+
+    expect(result.events).toEqual([]);
+  });
+
   test("ignores case, quote marks, and punctuation", () => {
     const result = keepVerifiedCitations(
       draft({ events: [event(1, "2021", "rebuilt in 2021, after 38 years")] }),

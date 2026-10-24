@@ -24,7 +24,7 @@ import {
 import { logWarn } from "@peated/server/lib/log";
 import type { EntityAboutDocument } from "@peated/server/schemas/entityAbout";
 import type { JobPayload } from "@peated/server/worker/types";
-import { eq, inArray } from "drizzle-orm";
+import { and, eq, inArray, isNull, ne, or } from "drizzle-orm";
 import { z } from "zod";
 
 export const WriteEntityAboutJobArgsSchema = z
@@ -184,21 +184,33 @@ export async function writeEntityAbout(
     });
 
     // A sourced lead replaces a generated description, never a person's.
+    // The check is in the update itself, so an edit made during the run wins.
     const lead = toPublicEntityAbout(result, new Map()).lead;
     const description = lead?.sentences.map((s) => s.text).join(" ");
-    if (
-      description &&
-      entity.descriptionSrc !== "user" &&
-      description !== entity.description
-    ) {
-      await tx
-        .update(entities)
-        .set({
-          description,
-          descriptionSrc: "generated",
-          updatedAt: new Date(),
-        })
-        .where(eq(entities.id, entity.id));
+    const [updated] = description
+      ? await tx
+          .update(entities)
+          .set({
+            description,
+            descriptionSrc: "generated",
+            updatedAt: new Date(),
+          })
+          .where(
+            and(
+              eq(entities.id, entity.id),
+              or(
+                isNull(entities.descriptionSrc),
+                ne(entities.descriptionSrc, "user"),
+              ),
+              or(
+                isNull(entities.description),
+                ne(entities.description, description),
+              ),
+            ),
+          )
+          .returning({ id: entities.id })
+      : [];
+    if (updated) {
       await tx.insert(changes).values({
         objectType: "entity",
         objectId: entity.id,

@@ -252,37 +252,35 @@ function remapFactId(factId: string, maps: IdMaps) {
   return id ? eventFactId(id) : factId;
 }
 
-function namesAgree(left: string | null, right: string | null) {
+function sameText(left: string | null, right: string | null) {
   return (
-    !left || !right || left.trim().toLowerCase() === right.trim().toLowerCase()
+    left !== null &&
+    right !== null &&
+    left.trim().toLowerCase() === right.trim().toLowerCase()
   );
 }
 
 /**
  * Whether a draft event states the same fact as a kept one: same kind, dates
- * that agree, and no conflicting name, owner, or title. A generic event is
- * matched only by the same text, or by the writer reusing the ID of a listed
- * item without a source, because many different things happen in one year.
+ * that agree, and the same name, owner, title, or text where the kind has
+ * one. A writer may also reuse the ID of a listed item without a source.
+ * Unknown details never match, because many things happen in one year.
  */
 function sameEvent(kept: AboutEvent, draft: AboutEvent) {
   if (kept.kind !== draft.kind || !valuesAgree(kept.date, draft.date)) {
     return false;
   }
+  // Only stored history without a source is listed to the writer.
+  if (!kept.citations.length && kept.id === draft.id) return true;
   switch (draft.kind) {
     case "generic":
-      // Only stored history without a source is listed to the writer.
-      return (
-        (!kept.citations.length && kept.id === draft.id) ||
-        (kept.text !== null &&
-          draft.text !== null &&
-          kept.text.trim().toLowerCase() === draft.text.trim().toLowerCase())
-      );
+      return sameText(kept.text, draft.text);
     case "renamed":
-      return namesAgree(kept.name, draft.name);
+      return sameText(kept.name, draft.name);
     case "acquired":
-      return namesAgree(kept.newOwnerName, draft.newOwnerName);
+      return sameText(kept.newOwnerName, draft.newOwnerName);
     case "era":
-      return namesAgree(kept.title, draft.title);
+      return sameText(kept.title, draft.title);
     case "opened":
     case "closed":
     case "mothballed":
@@ -318,9 +316,14 @@ export function mergePipelineDraft(
       !event.citations.length ||
       personFactIds.has(eventFactId(event.id)),
   );
+  // Each kept event takes at most one draft event's citations.
   const matches = new Map<number, number>();
   for (const event of draft.events) {
-    const kept = keptEvents.find((candidate) => sameEvent(candidate, event));
+    const kept = keptEvents.find(
+      (candidate) =>
+        ![...matches.values()].includes(candidate.id) &&
+        sameEvent(candidate, event),
+    );
     if (kept) matches.set(event.id, kept.id);
   }
   const draftEvents = draft.events

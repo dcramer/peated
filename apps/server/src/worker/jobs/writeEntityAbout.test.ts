@@ -10,7 +10,7 @@ import { writeEntityAbout } from "./writeEntityAbout";
 
 const page = {
   url: "https://en.wikipedia.org/wiki/Brora_distillery",
-  text: "Brora distillery was founded in 1819. Production at Brora was stopped in early 1983.",
+  text: "Brora distillery was founded in 1819. Production at Brora was stopped in early 1983. It has 1 wash still.",
 };
 
 function draft(
@@ -121,6 +121,31 @@ describe("writeEntityAbout", () => {
       { entityId: entity.id },
       services(async () => ({ draft: goodDraft, pagesRead: [page] })),
     );
+
+    const [saved] = await db
+      .select()
+      .from(entities)
+      .where(eq(entities.id, entity.id));
+    expect(saved?.description).toBe("Written by a moderator.");
+  });
+
+  test("keeps a description a person writes during the run", async ({
+    fixtures,
+  }) => {
+    const entity = await fixtures.Entity({
+      kind: "distillery",
+      description: "An unsourced description.",
+      descriptionSrc: "generated",
+    });
+    const run = services(async () => {
+      await db
+        .update(entities)
+        .set({ description: "Written by a moderator.", descriptionSrc: "user" })
+        .where(eq(entities.id, entity.id));
+      return { draft: goodDraft, pagesRead: [page] };
+    });
+
+    await writeEntityAbout({ entityId: entity.id }, run);
 
     const [saved] = await db
       .select()
@@ -245,7 +270,7 @@ describe("writeEntityAbout", () => {
             {
               sourceId: "wp",
               statedValue: "1",
-              quote: "Brora distillery was founded in 1819.",
+              quote: "It has 1 wash still.",
             },
           ],
         },
@@ -327,7 +352,7 @@ describe("writeEntityAbout", () => {
             {
               sourceId: "wp",
               statedValue: "1",
-              quote: "Brora distillery was founded in 1819.",
+              quote: "It has 1 wash still.",
             },
           ],
         },
