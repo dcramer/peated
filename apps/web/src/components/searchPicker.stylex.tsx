@@ -367,6 +367,8 @@ function PickerControl({
               resetNavigation();
               setIsOpen(true);
             }}
+            // Focus stays here after a pick, so a click must reopen too.
+            onClick={() => !disabled && setIsOpen(true)}
             onFocus={() => !disabled && setIsOpen(true)}
             onKeyDown={handleKeyDown}
             placeholder={placeholder}
@@ -381,7 +383,12 @@ function PickerControl({
             )}
           />
           {isOpen && !disabled ? (
-            <FloatingPanel style={styles.overlay}>
+            <FloatingPanel
+              // Keep focus in the input. Safari does not focus tapped buttons,
+              // so the blur would close this panel before the tap selects.
+              onMouseDown={(event) => event.preventDefault()}
+              style={styles.overlay}
+            >
               <div
                 aria-label={`${label} results`}
                 id={listboxId}

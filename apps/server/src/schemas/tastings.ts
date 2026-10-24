@@ -5,9 +5,10 @@ import {
 } from "@peated/bottle-classifier/contract";
 import { z } from "zod";
 import { RATING_BAND_IDS, SIMPLE_RATING_VALUES } from "../constants";
+import { isDistantFuture } from "../lib/dates";
 import { BadgeAwardSchema } from "./badges";
 import { BottleSchema } from "./bottles";
-import { CategoryEnum, ServingStyleEnum, zDatetime } from "./common";
+import { CategoryEnum, ServingStyleEnum } from "./common";
 import { PendingUploadSchema } from "./pendingUploads";
 import { TagCategoriesSchema } from "./tags";
 import { UserSchema } from "./users";
@@ -97,13 +98,27 @@ export const TastingSchema = z.object({
     .readonly()
     .describe("Whether the current user has toasted this tasting"),
 
+  tastedAt: z
+    .string()
+    .datetime()
+    .readonly()
+    .describe("When the member had the dram"),
   createdAt: z
     .string()
     .datetime()
     .readonly()
-    .describe("Timestamp when the tasting was created"),
+    .describe("When the tasting was posted. Feeds sort by this time"),
   createdBy: UserSchema.readonly().describe("User who created this tasting"),
 });
+
+// Any past time is allowed so people can post drams they had long ago.
+// Feeds sort by post time, so backdating cannot move a tasting up the feed.
+export const TastedAtInputSchema = z
+  .string()
+  .datetime()
+  .refine((value) => !isDistantFuture(new Date(value), 60 * 5), {
+    message: "Value too far in future.",
+  });
 
 export const TastingContentInputSchema = TastingSchema.omit({
   id: true,
@@ -113,6 +128,7 @@ export const TastingContentInputSchema = TastingSchema.omit({
   toasts: true,
   hasToasted: true,
   createdBy: true,
+  createdAt: true,
   legacySimpleRating: true,
   legacyStarRating: true,
   tagCategories: true,
@@ -121,9 +137,18 @@ export const TastingContentInputSchema = TastingSchema.omit({
     .string()
     .nullish()
     .describe("Flight ID if this tasting is part of a flight"),
-  createdAt: zDatetime
-    .nullish()
-    .describe("Custom creation timestamp for the tasting"),
+  tastedAt: TastedAtInputSchema.nullish().describe(
+    "When the member had the dram. Defaults to the time of posting",
+  ),
+  idempotencyKey: z
+    .string()
+    .trim()
+    .min(1)
+    .max(128)
+    .optional()
+    .describe(
+      "Key chosen by the client for this post. Sending the same key again returns the tasting it created instead of a new one",
+    ),
   image: TastingImageInputSchema,
   pendingImageId: z
     .string()
@@ -187,7 +212,6 @@ export const PhotoIdentificationDiagnosticsSchema = z.object({
   classification: z.object({
     status: z.enum(["ignored", "classified"]),
     action: z.string().nullable().default(null),
-    confidence: z.number().nullable().default(null),
     reason: z.string().nullable().default(null),
   }),
 });
@@ -196,7 +220,7 @@ const PhotoIdentificationCandidateSchema = BottleCandidateSchema.pick({
   fullName: true,
 });
 
-const PhotoIdentificationProposedBottleSchema = z.object({
+export const PhotoIdentificationProposedBottleSchema = z.object({
   name: z.string().trim().min(1),
   series: z
     .object({
@@ -271,12 +295,14 @@ export const PhotoIdentificationClassificationSchema = z.discriminatedUnion(
   ],
 );
 
+const PhotoIdentificationPendingImageSchema = PendingUploadSchema.pick({
+  id: true,
+  imageUrl: true,
+  expiresAt: true,
+});
+
 export const PhotoIdentificationSchema = z.object({
-  pendingImage: PendingUploadSchema.pick({
-    id: true,
-    imageUrl: true,
-    expiresAt: true,
-  }),
+  pendingImage: PhotoIdentificationPendingImageSchema,
   imageEvidence: ImageBottleEvidenceSchema,
   classification: PhotoIdentificationClassificationSchema,
   suggestedNextStep: PhotoIdentificationSuggestedNextStepEnum,
@@ -285,4 +311,45 @@ export const PhotoIdentificationSchema = z.object({
     .string()
     .nullable()
     .describe("Signed token for creating an auto-approved photo proposal"),
+  wrongMatchToken: z
+    .string()
+    .nullable()
+    .describe(
+      "Signed token for reporting a matched Bottle as wrong, or `null` when there is no match",
+    ),
 });
+
+/** The generic steps a member sees while the classifier works. */
+export const PhotoIdentificationStepEnum = z.enum([
+  "checking_peated",
+  "checking_web",
+  "comparing",
+]);
+
+/** Most likely-match Bottles one photo lookup progress event may carry. */
+export const PHOTO_IDENTIFICATION_MAX_PROGRESS_CANDIDATES = 5;
+
+/**
+ * Progress sent while a photo is identified. The stream ends with the full
+ * PhotoIdentificationSchema result.
+ */
+export const PhotoIdentificationProgressSchema = z.discriminatedUnion("type", [
+  z.object({
+    type: z.literal("photo"),
+    pendingImage: PhotoIdentificationPendingImageSchema,
+  }),
+  z.object({
+    type: z.literal("label"),
+    imageEvidence: ImageBottleEvidenceSchema,
+  }),
+  z.object({
+    type: z.literal("candidates"),
+    bottles: z
+      .array(BottleSchema)
+      .max(PHOTO_IDENTIFICATION_MAX_PROGRESS_CANDIDATES),
+  }),
+  z.object({
+    type: z.literal("step"),
+    step: PhotoIdentificationStepEnum,
+  }),
+]);

@@ -1,5 +1,6 @@
 import config from "@peated/server/config";
 import { db } from "@peated/server/db";
+import { uniqueViolationConstraint } from "@peated/server/db/errors";
 import { passkeys, users } from "@peated/server/db/schema";
 import { AuditEvent, auditLog } from "@peated/server/lib/auditLog";
 import {
@@ -13,7 +14,10 @@ import {
 } from "@peated/server/lib/passkey";
 import { procedure } from "@peated/server/orpc";
 import { authRateLimit } from "@peated/server/orpc/middleware";
-import { AuthSchema } from "@peated/server/schemas";
+import {
+  AuthSchema,
+  PasskeyRegistrationResponseSchema,
+} from "@peated/server/schemas";
 import { serialize } from "@peated/server/serializers";
 import { UserSerializer } from "@peated/server/serializers/user";
 import { eq, sql } from "drizzle-orm";
@@ -42,12 +46,9 @@ export default procedure
         .describe(
           "Password for the new account. Required when not registering with a passkey.",
         ),
-      passkeyResponse: z
-        .any()
-        .optional()
-        .describe(
-          "WebAuthn registration response. Requires `signedChallenge`.",
-        ),
+      passkeyResponse: PasskeyRegistrationResponseSchema.optional().describe(
+        "WebAuthn registration response. Requires `signedChallenge`.",
+      ),
       signedChallenge: z
         .string()
         .optional()
@@ -110,13 +111,13 @@ export default procedure
             })
             .returning();
         } catch (err: any) {
+          const constraint = uniqueViolationConstraint(err);
           if (
-            err?.code === "23505" &&
-            (err?.constraint === "user_username_unq" ||
-              err?.constraint === "user_email_unq")
+            constraint === "user_username_unq" ||
+            constraint === "user_email_unq"
           ) {
             const fieldName =
-              err.constraint === "user_username_unq" ? "username" : "email";
+              constraint === "user_username_unq" ? "username" : "email";
             throw errors.CONFLICT({
               message: `An account with this ${fieldName} already exists.`,
               data: { field: fieldName },
@@ -136,10 +137,7 @@ export default procedure
             tx,
           );
         } catch (err: any) {
-          if (
-            err?.code === "23505" &&
-            err?.constraint === "passkey_credential_id_unq"
-          ) {
+          if (uniqueViolationConstraint(err) === "passkey_credential_id_unq") {
             throw errors.CONFLICT({
               message: "This passkey is already registered.",
             });
@@ -187,13 +185,13 @@ export default procedure
           })
           .returning();
       } catch (err: any) {
+        const constraint = uniqueViolationConstraint(err);
         if (
-          err?.code === "23505" &&
-          (err?.constraint === "user_username_unq" ||
-            err?.constraint === "user_email_unq")
+          constraint === "user_username_unq" ||
+          constraint === "user_email_unq"
         ) {
           const fieldName =
-            err.constraint === "user_username_unq" ? "username" : "email";
+            constraint === "user_username_unq" ? "username" : "email";
           throw errors.CONFLICT({
             message: `An account with this ${fieldName} already exists.`,
             data: { field: fieldName },

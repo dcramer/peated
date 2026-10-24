@@ -1,4 +1,5 @@
 import { type AnyDatabase, type AnyTransaction, db } from "@peated/server/db";
+import { uniqueViolationConstraint } from "@peated/server/db/errors";
 import {
   externalReviewArticles,
   externalReviewBodies,
@@ -61,7 +62,6 @@ export class ScrapeSourceChangedError extends Error {
 
 export const SCRAPE_SOURCE_PAUSED_ERROR = "The source was paused.";
 
-const DatabaseErrorSchema = z.object({ code: z.string() });
 const ReviewSourceKeyPattern = /^review:[a-f0-9]{64}$/;
 
 /** Keeps the original ID and visibility while carrying over a later scrape. */
@@ -312,7 +312,7 @@ export async function createSiteWithScrapeSource(
       return { site, source };
     });
   } catch (error) {
-    if (DatabaseErrorSchema.safeParse(error).data?.code === "23505") {
+    if (error instanceof Error && uniqueViolationConstraint(error) !== null) {
       throw new ScrapeSourceConflictError(
         "A source for this website already exists.",
       );

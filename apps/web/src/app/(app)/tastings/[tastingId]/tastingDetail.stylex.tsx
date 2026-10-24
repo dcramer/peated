@@ -23,7 +23,7 @@ export function TastingDetail({
       author={tasting.createdBy}
       bottle={tasting.bottle}
       color={tasting.color}
-      createdAt={tasting.createdAt}
+      createdAt={tasting.tastedAt}
       footer={
         <TastingToastSummary
           authorId={tasting.createdBy.id}

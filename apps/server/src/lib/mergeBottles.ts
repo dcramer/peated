@@ -3,6 +3,7 @@
  * complete Bottle. Related records move straight to that Bottle.
  */
 import { db, type AnyTransaction } from "@peated/server/db";
+import { uniqueViolationConstraint } from "@peated/server/db/errors";
 import type { Bottle, User } from "@peated/server/db/schema";
 import {
   auctionAlerts,
@@ -28,7 +29,9 @@ import {
   storePriceMatchAttempts,
   storePriceMatchProposals,
   storePrices,
+  tastingDrafts,
   tastings,
+  wrongPhotoMatches,
 } from "@peated/server/db/schema";
 import { getUserActor } from "@peated/server/lib/actors";
 import { moveBottleAliasesForMergeInTransaction } from "@peated/server/lib/bottleAliases";
@@ -51,7 +54,6 @@ import { recomputeBottleStatsInTransaction } from "@peated/server/lib/recomputeB
 import type { Context } from "@peated/server/orpc/context";
 import { pushUniqueJob } from "@peated/server/worker/dispatch";
 import { and, asc, eq, inArray, or, sql } from "drizzle-orm";
-import { z } from "zod";
 
 export class BottleMergeAuthorizationError extends Error {
   constructor() {
@@ -151,21 +153,6 @@ function validateMergeInput(
   if (sourceBottleId === destinationBottleId) {
     throw new BottleMergeConflictError("same_bottle");
   }
-}
-
-function postgresConstraint(error: Error) {
-  let current: Error = error;
-  for (let depth = 0; depth < 5 && current instanceof Error; depth += 1) {
-    const candidate = z
-      .object({ code: z.string(), constraint: z.string().optional() })
-      .safeParse(current);
-    if (candidate.success && candidate.data.code === "23505") {
-      return candidate.data.constraint ?? null;
-    }
-    if (!(current.cause instanceof Error)) return null;
-    current = current.cause;
-  }
-  return null;
 }
 
 async function consolidateCollectionMemberships(
@@ -300,15 +287,16 @@ async function assertNoTastingCollision(
     .select({
       bottleId: tastings.bottleId,
       createdById: tastings.createdById,
-      createdAt: tastings.createdAt,
+      tastedAt: tastings.tastedAt,
     })
     .from(tastings)
     .where(inArray(tastings.bottleId, [sourceBottleId, destinationBottleId]))
-    .orderBy(asc(tastings.createdById), asc(tastings.createdAt))
+    .orderBy(asc(tastings.createdById), asc(tastings.tastedAt))
     .for("update");
+  // Mirrors the tasting_unq constraint (Bottle, member, tasted time).
   const projectedKeys = new Set<string>();
-  for (const { createdById, createdAt } of rows) {
-    const key = `${createdById}:${createdAt.getTime()}`;
+  for (const { createdById, tastedAt } of rows) {
+    const key = `${createdById}:${tastedAt.getTime()}`;
     if (projectedKeys.has(key)) {
       throw new BottleMergeConflictError("consumer_conflict");
     }
@@ -435,6 +423,8 @@ async function repointBottleConsumers(
   if (sourceWatches.length) counts.auctionWatches = sourceWatches.length;
   for (const [name, table, column] of [
     ["tastings", tastings, tastings.bottleId],
+    // Drafts follow the Bottle so publishing posts to the survivor.
+    ["tastingDrafts", tastingDrafts, tastingDrafts.bottleId],
     ["reviews", externalReviews, externalReviews.bottleId],
     ["storePrices", storePrices, storePrices.bottleId],
     ["bottleObservations", bottleObservations, bottleObservations.bottleId],
@@ -452,6 +442,22 @@ async function repointBottleConsumers(
       .returning({ id: table.id });
     counts[name] = updated.length;
   }
+
+  // Wrong photo matches point at both Bottles in a match; follow either one.
+  const movedWrongPhotoMatches = await tx
+    .update(wrongPhotoMatches)
+    .set({
+      wrongBottleId: sql`CASE WHEN ${wrongPhotoMatches.wrongBottleId} = ${sourceBottleId} THEN ${destinationBottleId} ELSE ${wrongPhotoMatches.wrongBottleId} END`,
+      correctBottleId: sql`CASE WHEN ${wrongPhotoMatches.correctBottleId} = ${sourceBottleId} THEN ${destinationBottleId} ELSE ${wrongPhotoMatches.correctBottleId} END`,
+    })
+    .where(
+      or(
+        eq(wrongPhotoMatches.wrongBottleId, sourceBottleId),
+        eq(wrongPhotoMatches.correctBottleId, sourceBottleId),
+      ),
+    )
+    .returning({ id: wrongPhotoMatches.id });
+  counts.wrongPhotoMatches = movedWrongPhotoMatches.length;
 
   for (const [name, table] of [
     ["storePriceMatchProposals", storePriceMatchProposals],
@@ -607,6 +613,17 @@ export async function lockBottleMergeDependencies(
     .from(incomingBottleDecisionLogs)
     .where(inArray(incomingBottleDecisionLogs.bottleId, bottleIds))
     .orderBy(asc(incomingBottleDecisionLogs.id))
+    .for("update");
+  await tx
+    .select()
+    .from(wrongPhotoMatches)
+    .where(
+      or(
+        inArray(wrongPhotoMatches.wrongBottleId, bottleIds),
+        inArray(wrongPhotoMatches.correctBottleId, bottleIds),
+      ),
+    )
+    .orderBy(asc(wrongPhotoMatches.id))
     .for("update");
   await tx
     .select()
@@ -883,7 +900,8 @@ export async function mergeBottlesInTransaction(
   } catch (error) {
     if (
       ["tasting_unq", "tasting_legacy_unq"].includes(
-        (error instanceof Error ? postgresConstraint(error) : null) ?? "",
+        (error instanceof Error ? uniqueViolationConstraint(error) : null) ??
+          "",
       )
     ) {
       throw new BottleMergeConflictError("consumer_conflict", {

@@ -11,12 +11,14 @@ function activityItem({
   kind: CommunityFeedItem["kind"];
   hour: number;
 }): CommunityFeedItem {
+  const postedAt = `2026-09-05T${String(hour).padStart(2, "0")}:00:00.000Z`;
   return {
     id,
     kind,
     actor: "Member",
     action: "added activity",
-    date: `2026-09-05T${String(hour).padStart(2, "0")}:00:00.000Z`,
+    date: postedAt,
+    postedAt,
     bottles: [],
   };
 }

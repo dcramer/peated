@@ -75,8 +75,7 @@ export const searchResultGroups = [
           },
         },
         bottle: {
-          provenance: [{ name: "Single Malt" }],
-          metadata: ["16 years", "43.0% ABV"],
+          metadata: ["16 years", "43%"],
         },
         title: "Lagavulin 16-year-old",
         visual: { kind: "bottle", label: "Lagavulin 16-year-old bottle" },
@@ -99,8 +98,7 @@ export const searchResultGroups = [
           },
         },
         bottle: {
-          provenance: [{ name: "Single Malt" }],
-          metadata: ["2024 release", "12 years", "56.4% ABV"],
+          metadata: ["2024 release", "12 years", "56.4%"],
         },
         title: "Lagavulin 12 Cask Strength 2024",
         visual: { kind: "bottle", label: "Lagavulin 12 Cask Strength bottle" },

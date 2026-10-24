@@ -45,6 +45,22 @@ describe("GET /entities", () => {
     );
   });
 
+  test("finds Entities by a short name prefix that is also a stop word", async ({
+    fixtures,
+  }) => {
+    const glenOrd = await fixtures.Entity({ name: "Glen Ord", kind: "brand" });
+    await fixtures.Entity({ name: "Lagavulin", kind: "brand" });
+
+    for (const query of ["or", "Or", "gl"]) {
+      const { results } = await routerClient.entities.list({
+        query,
+        sort: "rank",
+      });
+
+      expect(results.map(({ id }) => id)).toEqual([glenOrd.id]);
+    }
+  });
+
   test("filters Entities across kinds by current owner", async ({
     fixtures,
   }) => {

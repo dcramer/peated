@@ -1,6 +1,7 @@
 import { describe, expect, test } from "vitest";
 import {
   ApiBatchRequestError,
+  checkImageUploadOptions,
   parseApiBatchConcurrency,
   parseApiBatchInput,
   parseApiBatchStartIndex,
@@ -135,5 +136,54 @@ describe("parseApiBatchConcurrency", () => {
 
   test.each(["0", "21", "1.5", "nope"])("rejects %s", (value) => {
     expect(() => parseApiBatchConcurrency(value)).toThrow();
+  });
+});
+
+describe("checkImageUploadOptions", () => {
+  test("accepts Entity image fields on Entity image uploads", () => {
+    expect(() =>
+      checkImageUploadOptions("/entities/12/images", {
+        caption: "Ardbeg Distillery",
+        idempotencyKey: "ardbeg-exterior",
+        primary: true,
+      }),
+    ).not.toThrow();
+  });
+
+  test.each(["/pending-uploads", "/tastings/photo-identification"])(
+    "accepts an idempotency key on %s",
+    (path) => {
+      expect(() =>
+        checkImageUploadOptions(path, { idempotencyKey: "upload-1" }),
+      ).not.toThrow();
+    },
+  );
+
+  test("accepts Bottle image uploads without extra fields", () => {
+    expect(() =>
+      checkImageUploadOptions("/bottles/123/image", {}),
+    ).not.toThrow();
+  });
+
+  test("rejects fields the route does not accept", () => {
+    expect(() =>
+      checkImageUploadOptions("/bottles/123/image", {
+        idempotencyKey: "bottle-123",
+      }),
+    ).toThrow(
+      "/bottles/123/image does not accept --idempotency-key. See `pnpm cli api upload-image --help`.",
+    );
+    expect(() =>
+      checkImageUploadOptions("/bottles/123/image", {
+        caption: "Front label",
+        primary: true,
+      }),
+    ).toThrow("/bottles/123/image does not accept --caption, --primary.");
+    expect(() =>
+      checkImageUploadOptions("/pending-uploads", {
+        caption: "Front label",
+        idempotencyKey: "upload-1",
+      }),
+    ).toThrow("/pending-uploads does not accept --caption.");
   });
 });

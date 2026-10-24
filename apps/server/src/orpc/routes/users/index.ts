@@ -9,6 +9,7 @@ import deleteUser from "./delete";
 import deletionCancel from "./deletion-cancel";
 import details from "./details";
 import flavorList from "./flavor-list";
+import librarySearch from "./library-search";
 import libraryStats from "./library-stats";
 import list from "./list";
 import regionList from "./region-list";
@@ -30,6 +31,7 @@ export default base.tag("users").router({
   blockDelete,
   blockList,
   flavorList,
+  librarySearch,
   libraryStats,
   regionList,
   suspensionUpdate,

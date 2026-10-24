@@ -1,0 +1,1780 @@
+{
+  "id": "review-glenfarclas-scotts-selection-brand",
+  "name": "review glenfarclas scotts selection brand",
+  "webEvidenceFile": "src/eval-fixtures/glenfarclas-review.evidence.json",
+  "input": {
+    "reference": {
+      "id": 18877,
+      "url": "https://www.whiskyfun.com/2026/A-very-lovely-trio-of-Glenfarclas.html",
+      "name": "Glenfarclas 1965/2005 (48.5%, Scott’s Selection)",
+      "imageUrl": null,
+      "externalSiteId": 5785,
+      "currentBottleId": null
+    },
+    "extractedIdentity": {
+      "abv": 48.5,
+      "brand": "Glenfarclas",
+      "series": null,
+      "bottler": "Scott's Selection",
+      "edition": null,
+      "outturn": null,
+      "category": null,
+      "distillery": ["Glenfarclas"],
+      "expression": null,
+      "maturation": null,
+      "stated_age": null,
+      "cask_number": null,
+      "release_day": null,
+      "single_cask": null,
+      "release_year": null,
+      "vintage_year": 1965,
+      "bottling_year": 2005,
+      "cask_strength": null,
+      "release_month": null
+    },
+    "imageEvidence": null,
+    "initialCandidates": [
+      {
+        "abv": 46,
+        "brand": "Glenfarclas",
+        "score": 61.818283,
+        "series": null,
+        "source": ["vector", "text"],
+        "bottler": null,
+        "edition": null,
+        "outturn": null,
+        "bottleId": 65677,
+        "category": "single_malt",
+        "fullName": "Glenfarclas 40-year-old",
+        "reference": "Glenfarclas 40-year-old, 46%",
+        "statedAge": 40,
+        "caskNumber": null,
+        "comparison": {
+          "missing": ["vintageYear", "releaseYear", "caskStrength", "bottler"],
+          "conflicts": ["abv", "brand"],
+          "agreements": ["category", "statedAge", "distillers"]
+        },
+        "distillery": ["Glenfarclas"],
+        "maturation": null,
+        "releaseDay": null,
+        "singleCask": null,
+        "releaseYear": null,
+        "vintageYear": null,
+        "bottlingYear": null,
+        "caskStrength": null,
+        "releaseMonth": null,
+        "familyContext": {
+          "siblingBottles": []
+        }
+      },
+      {
+        "abv": null,
+        "brand": "Glenfarclas",
+        "score": 58.15473,
+        "series": null,
+        "source": ["vector", "text"],
+        "bottler": "Glenfarclas",
+        "edition": null,
+        "outturn": null,
+        "bottleId": 709,
+        "category": "single_malt",
+        "fullName": "Glenfarclas 40-year-old",
+        "reference": "Glenfarclas 40-year-old",
+        "statedAge": 40,
+        "caskNumber": null,
+        "comparison": {
+          "missing": [
+            "abv",
+            "vintageYear",
+            "releaseYear",
+            "caskStrength",
+            "distillers"
+          ],
+          "conflicts": ["brand", "bottler"],
+          "agreements": ["category", "statedAge"]
+        },
+        "distillery": [],
+        "maturation": null,
+        "releaseDay": null,
+        "singleCask": null,
+        "releaseYear": null,
+        "vintageYear": null,
+        "bottlingYear": null,
+        "caskStrength": null,
+        "releaseMonth": null,
+        "familyContext": {
+          "siblingBottles": []
+        }
+      },
+      {
+        "abv": null,
+        "brand": "Scott's Selection",
+        "score": 56.570736,
+        "series": null,
+        "source": ["vector", "text", "brand_coverage"],
+        "bottler": null,
+        "edition": null,
+        "outturn": null,
+        "bottleId": 18194,
+        "category": "single_malt",
+        "fullName": "Scott's Selection 1977 vintage (distilled at Old Pulteney)",
+        "reference": "Scott's Selection (distilled at Old Pulteney) 1977 vintage, 56.9%",
+        "statedAge": null,
+        "caskNumber": null,
+        "comparison": {
+          "missing": [
+            "statedAge",
+            "abv",
+            "releaseYear",
+            "caskStrength",
+            "bottler",
+            "distillers"
+          ],
+          "conflicts": ["vintageYear"],
+          "agreements": ["category", "brand"]
+        },
+        "distillery": [],
+        "maturation": null,
+        "releaseDay": null,
+        "singleCask": null,
+        "releaseYear": null,
+        "vintageYear": 1977,
+        "bottlingYear": null,
+        "caskStrength": null,
+        "releaseMonth": null,
+        "familyContext": {
+          "siblingBottles": []
+        }
+      },
+      {
+        "abv": null,
+        "brand": "Scott's Selection",
+        "score": 54.22133,
+        "series": null,
+        "source": ["vector", "text", "brand_coverage"],
+        "bottler": null,
+        "edition": null,
+        "outturn": null,
+        "bottleId": 18224,
+        "category": "single_malt",
+        "fullName": "Scott's Selection 1980 Vintage (distilled at Glen Elgin)",
+        "reference": "Scott's Selection (distilled at Glen Elgin), 1980 Vintage, 44.1%",
+        "statedAge": null,
+        "caskNumber": null,
+        "comparison": {
+          "missing": [
+            "statedAge",
+            "abv",
+            "releaseYear",
+            "caskStrength",
+            "bottler",
+            "distillers"
+          ],
+          "conflicts": ["vintageYear"],
+          "agreements": ["category", "brand"]
+        },
+        "distillery": [],
+        "maturation": null,
+        "releaseDay": null,
+        "singleCask": null,
+        "releaseYear": null,
+        "vintageYear": 1980,
+        "bottlingYear": null,
+        "caskStrength": null,
+        "releaseMonth": null,
+        "familyContext": {
+          "siblingBottles": []
+        }
+      },
+      {
+        "abv": null,
+        "brand": "Scott's Selection",
+        "score": 54.22133,
+        "series": null,
+        "source": ["vector", "text"],
+        "bottler": null,
+        "edition": null,
+        "outturn": null,
+        "bottleId": 18072,
+        "category": "single_malt",
+        "fullName": "Scott's Selection 1984 vintage (distilled at Caol Ila)",
+        "reference": "Scott's Selection (distilled at Caol Ila), 1984 vintage, 53.5%",
+        "statedAge": null,
+        "caskNumber": null,
+        "comparison": {
+          "missing": [
+            "statedAge",
+            "abv",
+            "releaseYear",
+            "caskStrength",
+            "bottler",
+            "distillers"
+          ],
+          "conflicts": ["vintageYear"],
+          "agreements": ["category", "brand"]
+        },
+        "distillery": [],
+        "maturation": null,
+        "releaseDay": null,
+        "singleCask": null,
+        "releaseYear": null,
+        "vintageYear": 1984,
+        "bottlingYear": null,
+        "caskStrength": null,
+        "releaseMonth": null,
+        "familyContext": {
+          "siblingBottles": []
+        }
+      },
+      {
+        "abv": null,
+        "brand": "Scott's Selection",
+        "score": 53.96087,
+        "series": null,
+        "source": ["vector", "text"],
+        "bottler": null,
+        "edition": null,
+        "outturn": null,
+        "bottleId": 18198,
+        "category": "single_malt",
+        "fullName": "Scott's Selection 1981 vintage (distilled at Highland Park)",
+        "reference": "Scott's Selection (distilled at Highland Park) 1981 vintage, 50.6%",
+        "statedAge": null,
+        "caskNumber": null,
+        "comparison": {
+          "missing": [
+            "statedAge",
+            "abv",
+            "releaseYear",
+            "caskStrength",
+            "bottler"
+          ],
+          "conflicts": ["vintageYear", "distillers"],
+          "agreements": ["category", "brand"]
+        },
+        "distillery": ["Highland Park"],
+        "maturation": null,
+        "releaseDay": null,
+        "singleCask": null,
+        "releaseYear": null,
+        "vintageYear": 1981,
+        "bottlingYear": null,
+        "caskStrength": null,
+        "releaseMonth": null,
+        "familyContext": {
+          "siblingBottles": []
+        }
+      },
+      {
+        "abv": null,
+        "brand": "Scott's Selection",
+        "score": 53.020763,
+        "series": null,
+        "source": ["text", "brand_coverage"],
+        "bottler": null,
+        "edition": null,
+        "outturn": null,
+        "bottleId": 19206,
+        "category": "single_malt",
+        "fullName": "Scott's Selection 1961, 39-year-old (distilled at Mortlach)",
+        "reference": null,
+        "statedAge": 39,
+        "caskNumber": null,
+        "comparison": {
+          "missing": ["abv", "vintageYear", "bottler", "distillers"],
+          "conflicts": ["brand"],
+          "agreements": []
+        },
+        "distillery": [],
+        "maturation": null,
+        "releaseDay": null,
+        "singleCask": null,
+        "releaseYear": null,
+        "vintageYear": null,
+        "bottlingYear": null,
+        "caskStrength": null,
+        "releaseMonth": null,
+        "familyContext": {
+          "siblingBottles": []
+        }
+      },
+      {
+        "abv": null,
+        "brand": "Glenfarclas",
+        "score": 50.519157,
+        "series": null,
+        "source": ["text", "context"],
+        "bottler": "Glenfarclas",
+        "edition": null,
+        "outturn": null,
+        "bottleId": 5074,
+        "category": "single_malt",
+        "fullName": "Glenfarclas 1965 The Family Casks",
+        "reference": null,
+        "statedAge": 50,
+        "caskNumber": null,
+        "comparison": {
+          "missing": ["abv", "vintageYear", "distillers"],
+          "conflicts": ["bottler"],
+          "agreements": ["brand"]
+        },
+        "distillery": [],
+        "maturation": null,
+        "releaseDay": null,
+        "singleCask": null,
+        "releaseYear": null,
+        "vintageYear": null,
+        "bottlingYear": null,
+        "caskStrength": null,
+        "releaseMonth": null,
+        "familyContext": {
+          "siblingBottles": []
+        }
+      },
+      {
+        "abv": null,
+        "brand": "Scott's Selection",
+        "score": 50.34749,
+        "series": null,
+        "source": ["text"],
+        "bottler": null,
+        "edition": null,
+        "outturn": null,
+        "bottleId": 19184,
+        "category": "single_grain",
+        "fullName": "Scott's Selection 1963 (distilled at 'North of Scotland,')",
+        "reference": null,
+        "statedAge": null,
+        "caskNumber": null,
+        "comparison": {
+          "missing": ["abv", "vintageYear", "bottler", "distillers"],
+          "conflicts": ["brand"],
+          "agreements": []
+        },
+        "distillery": [],
+        "maturation": null,
+        "releaseDay": null,
+        "singleCask": null,
+        "releaseYear": null,
+        "vintageYear": null,
+        "bottlingYear": null,
+        "caskStrength": null,
+        "releaseMonth": null,
+        "familyContext": {
+          "siblingBottles": []
+        }
+      },
+      {
+        "abv": null,
+        "brand": "The Balvenie",
+        "score": 50.101585,
+        "series": null,
+        "source": ["text"],
+        "bottler": null,
+        "edition": null,
+        "outturn": null,
+        "bottleId": 17201,
+        "category": "single_malt",
+        "fullName": "The Balvenie 40-year-old (Batch 2)",
+        "reference": null,
+        "statedAge": 40,
+        "caskNumber": null,
+        "comparison": {
+          "missing": [
+            "abv",
+            "vintageYear",
+            "releaseYear",
+            "caskStrength",
+            "bottler"
+          ],
+          "conflicts": ["brand", "distillers"],
+          "agreements": ["category", "statedAge"]
+        },
+        "distillery": ["The Balvenie"],
+        "maturation": null,
+        "releaseDay": null,
+        "singleCask": null,
+        "releaseYear": null,
+        "vintageYear": null,
+        "bottlingYear": null,
+        "caskStrength": null,
+        "releaseMonth": null,
+        "familyContext": {
+          "siblingBottles": []
+        }
+      },
+      {
+        "abv": null,
+        "brand": "Glenfarclas",
+        "score": 45.605328,
+        "series": null,
+        "source": ["text"],
+        "bottler": "Glenfarclas",
+        "edition": null,
+        "outturn": null,
+        "bottleId": 4058,
+        "category": "single_malt",
+        "fullName": "Glenfarclas 1980 Christmas Edition Port Pipes Selection",
+        "reference": null,
+        "statedAge": 40,
+        "caskNumber": null,
+        "comparison": {
+          "missing": ["abv", "vintageYear", "distillers"],
+          "conflicts": ["bottler"],
+          "agreements": ["brand"]
+        },
+        "distillery": [],
+        "maturation": null,
+        "releaseDay": null,
+        "singleCask": null,
+        "releaseYear": null,
+        "vintageYear": null,
+        "bottlingYear": null,
+        "caskStrength": null,
+        "releaseMonth": null,
+        "familyContext": {
+          "siblingBottles": []
+        }
+      },
+      {
+        "abv": 48.5,
+        "brand": "House of Hazelwood",
+        "score": 43.270134,
+        "series": "The Legacy Collection",
+        "source": ["text"],
+        "bottler": "House of Hazelwood",
+        "edition": null,
+        "outturn": null,
+        "bottleId": 64374,
+        "category": "blended_grain",
+        "fullName": "House of Hazelwood The Eight Grain 40-year-old",
+        "reference": null,
+        "statedAge": 40,
+        "caskNumber": null,
+        "comparison": {
+          "missing": [
+            "vintageYear",
+            "releaseYear",
+            "caskStrength",
+            "distillers"
+          ],
+          "conflicts": ["category", "brand", "bottler"],
+          "agreements": ["statedAge", "abv"]
+        },
+        "distillery": [],
+        "maturation": null,
+        "releaseDay": null,
+        "singleCask": null,
+        "releaseYear": null,
+        "vintageYear": null,
+        "bottlingYear": null,
+        "caskStrength": null,
+        "releaseMonth": null,
+        "familyContext": {
+          "siblingBottles": []
+        }
+      },
+      {
+        "abv": null,
+        "brand": "Glenfarclas",
+        "score": 42.379227,
+        "series": null,
+        "source": ["vector", "text"],
+        "bottler": null,
+        "edition": null,
+        "outturn": null,
+        "bottleId": 17135,
+        "category": "single_malt",
+        "fullName": "Glenfarclas Family Cask 1964 (Cask #4719)",
+        "reference": "Glenfarclas Family Cask 1964 (Cask #4719), 48.5%",
+        "statedAge": null,
+        "caskNumber": null,
+        "comparison": {
+          "missing": ["abv", "vintageYear", "bottler", "distillers"],
+          "conflicts": [],
+          "agreements": ["brand"]
+        },
+        "distillery": [],
+        "maturation": null,
+        "releaseDay": null,
+        "singleCask": null,
+        "releaseYear": null,
+        "vintageYear": null,
+        "bottlingYear": null,
+        "caskStrength": null,
+        "releaseMonth": null,
+        "familyContext": {
+          "siblingBottles": []
+        }
+      },
+      {
+        "abv": 40,
+        "brand": "The Dalmore",
+        "score": 39.291183,
+        "series": null,
+        "source": ["text"],
+        "bottler": null,
+        "edition": null,
+        "outturn": null,
+        "bottleId": 60875,
+        "category": "single_malt",
+        "fullName": "Dalmore 40-year-old",
+        "reference": null,
+        "statedAge": 40,
+        "caskNumber": null,
+        "comparison": {
+          "missing": ["vintageYear", "releaseYear", "caskStrength", "bottler"],
+          "conflicts": ["abv", "brand", "distillers"],
+          "agreements": ["category", "statedAge"]
+        },
+        "distillery": ["The Dalmore"],
+        "maturation": null,
+        "releaseDay": null,
+        "singleCask": null,
+        "releaseYear": null,
+        "vintageYear": null,
+        "bottlingYear": null,
+        "caskStrength": null,
+        "releaseMonth": null,
+        "familyContext": {
+          "siblingBottles": []
+        }
+      },
+      {
+        "abv": null,
+        "brand": "Glenfarclas",
+        "score": 38.414764,
+        "series": null,
+        "source": ["text"],
+        "bottler": "Glenfarclas",
+        "edition": null,
+        "outturn": null,
+        "bottleId": 2823,
+        "category": "single_malt",
+        "fullName": "Glenfarclas The Masters Selection Family Casks",
+        "reference": null,
+        "statedAge": null,
+        "caskNumber": null,
+        "comparison": {
+          "missing": ["abv", "vintageYear", "distillers"],
+          "conflicts": ["bottler"],
+          "agreements": ["brand"]
+        },
+        "distillery": [],
+        "maturation": null,
+        "releaseDay": null,
+        "singleCask": null,
+        "releaseYear": null,
+        "vintageYear": null,
+        "bottlingYear": null,
+        "caskStrength": null,
+        "releaseMonth": null,
+        "familyContext": {
+          "siblingBottles": []
+        }
+      },
+      {
+        "abv": null,
+        "brand": "Glengoyne",
+        "score": 37.865837,
+        "series": null,
+        "source": ["vector", "text"],
+        "bottler": null,
+        "edition": null,
+        "outturn": null,
+        "bottleId": 17566,
+        "category": "single_malt",
+        "fullName": "Glengoyne 40-year-old",
+        "reference": "Glengoyne 40-year-old, 45.9%",
+        "statedAge": 40,
+        "caskNumber": null,
+        "comparison": {
+          "missing": [
+            "abv",
+            "vintageYear",
+            "releaseYear",
+            "caskStrength",
+            "bottler",
+            "distillers"
+          ],
+          "conflicts": ["brand"],
+          "agreements": ["category", "statedAge"]
+        },
+        "distillery": [],
+        "maturation": null,
+        "releaseDay": null,
+        "singleCask": null,
+        "releaseYear": null,
+        "vintageYear": null,
+        "bottlingYear": null,
+        "caskStrength": null,
+        "releaseMonth": null,
+        "familyContext": {
+          "siblingBottles": []
+        }
+      },
+      {
+        "abv": null,
+        "brand": "Auchentoshan",
+        "score": 37.865837,
+        "series": null,
+        "source": ["text"],
+        "bottler": null,
+        "edition": null,
+        "outturn": null,
+        "bottleId": 18057,
+        "category": "single_malt",
+        "fullName": "Auchentoshan 40-year-old",
+        "reference": null,
+        "statedAge": 40,
+        "caskNumber": null,
+        "comparison": {
+          "missing": [
+            "abv",
+            "vintageYear",
+            "releaseYear",
+            "caskStrength",
+            "bottler",
+            "distillers"
+          ],
+          "conflicts": ["brand"],
+          "agreements": ["category", "statedAge"]
+        },
+        "distillery": [],
+        "maturation": null,
+        "releaseDay": null,
+        "singleCask": null,
+        "releaseYear": null,
+        "vintageYear": null,
+        "bottlingYear": null,
+        "caskStrength": null,
+        "releaseMonth": null,
+        "familyContext": {
+          "siblingBottles": []
+        }
+      },
+      {
+        "abv": null,
+        "brand": "BenRiach",
+        "score": 37.865837,
+        "series": null,
+        "source": ["text"],
+        "bottler": null,
+        "edition": null,
+        "outturn": null,
+        "bottleId": 18127,
+        "category": "single_malt",
+        "fullName": "BenRiach 40-year-old",
+        "reference": null,
+        "statedAge": 40,
+        "caskNumber": null,
+        "comparison": {
+          "missing": [
+            "abv",
+            "vintageYear",
+            "releaseYear",
+            "caskStrength",
+            "bottler",
+            "distillers"
+          ],
+          "conflicts": ["brand"],
+          "agreements": ["category", "statedAge"]
+        },
+        "distillery": [],
+        "maturation": null,
+        "releaseDay": null,
+        "singleCask": null,
+        "releaseYear": null,
+        "vintageYear": null,
+        "bottlingYear": null,
+        "caskStrength": null,
+        "releaseMonth": null,
+        "familyContext": {
+          "siblingBottles": []
+        }
+      },
+      {
+        "abv": null,
+        "brand": "Bunnahabhain",
+        "score": 37.865837,
+        "series": null,
+        "source": ["text"],
+        "bottler": null,
+        "edition": null,
+        "outturn": null,
+        "bottleId": 16973,
+        "category": "single_malt",
+        "fullName": "Bunnahabhain 40-year-old",
+        "reference": null,
+        "statedAge": 40,
+        "caskNumber": null,
+        "comparison": {
+          "missing": [
+            "abv",
+            "vintageYear",
+            "releaseYear",
+            "caskStrength",
+            "bottler",
+            "distillers"
+          ],
+          "conflicts": ["brand"],
+          "agreements": ["category", "statedAge"]
+        },
+        "distillery": [],
+        "maturation": null,
+        "releaseDay": null,
+        "singleCask": null,
+        "releaseYear": null,
+        "vintageYear": null,
+        "bottlingYear": null,
+        "caskStrength": null,
+        "releaseMonth": null,
+        "familyContext": {
+          "siblingBottles": []
+        }
+      },
+      {
+        "abv": null,
+        "brand": "Deanston",
+        "score": 37.865837,
+        "series": null,
+        "source": ["text"],
+        "bottler": null,
+        "edition": null,
+        "outturn": null,
+        "bottleId": 14441,
+        "category": "single_malt",
+        "fullName": "Deanston 40-year-old",
+        "reference": null,
+        "statedAge": 40,
+        "caskNumber": null,
+        "comparison": {
+          "missing": [
+            "abv",
+            "vintageYear",
+            "releaseYear",
+            "caskStrength",
+            "bottler",
+            "distillers"
+          ],
+          "conflicts": ["brand"],
+          "agreements": ["category", "statedAge"]
+        },
+        "distillery": [],
+        "maturation": null,
+        "releaseDay": null,
+        "singleCask": null,
+        "releaseYear": null,
+        "vintageYear": null,
+        "bottlingYear": null,
+        "caskStrength": null,
+        "releaseMonth": null,
+        "familyContext": {
+          "siblingBottles": []
+        }
+      },
+      {
+        "abv": null,
+        "brand": "Teeling",
+        "score": 37.865837,
+        "series": null,
+        "source": ["text"],
+        "bottler": null,
+        "edition": null,
+        "outturn": null,
+        "bottleId": 43101,
+        "category": "single_malt",
+        "fullName": "Teeling 40-year-old",
+        "reference": null,
+        "statedAge": 40,
+        "caskNumber": null,
+        "comparison": {
+          "missing": [
+            "abv",
+            "vintageYear",
+            "releaseYear",
+            "caskStrength",
+            "bottler",
+            "distillers"
+          ],
+          "conflicts": ["brand"],
+          "agreements": ["category", "statedAge"]
+        },
+        "distillery": [],
+        "maturation": null,
+        "releaseDay": null,
+        "singleCask": null,
+        "releaseYear": null,
+        "vintageYear": null,
+        "bottlingYear": null,
+        "caskStrength": null,
+        "releaseMonth": null,
+        "familyContext": {
+          "siblingBottles": []
+        }
+      },
+      {
+        "abv": 44.8,
+        "brand": "Bowmore",
+        "score": 37.674362,
+        "series": null,
+        "source": ["text"],
+        "bottler": null,
+        "edition": null,
+        "outturn": null,
+        "bottleId": 65656,
+        "category": "single_malt",
+        "fullName": "Bowmore 40-year-old",
+        "reference": null,
+        "statedAge": 40,
+        "caskNumber": null,
+        "comparison": {
+          "missing": ["vintageYear", "releaseYear", "caskStrength", "bottler"],
+          "conflicts": ["abv", "brand", "distillers"],
+          "agreements": ["category", "statedAge"]
+        },
+        "distillery": ["Bowmore"],
+        "maturation": null,
+        "releaseDay": null,
+        "singleCask": null,
+        "releaseYear": null,
+        "vintageYear": null,
+        "bottlingYear": null,
+        "caskStrength": null,
+        "releaseMonth": null,
+        "familyContext": {
+          "siblingBottles": []
+        }
+      },
+      {
+        "abv": 42,
+        "brand": "The Dalmore",
+        "score": 37.397686,
+        "series": null,
+        "source": ["text"],
+        "bottler": null,
+        "edition": null,
+        "outturn": null,
+        "bottleId": 60796,
+        "category": "single_malt",
+        "fullName": "Dalmore 40-year-old",
+        "reference": null,
+        "statedAge": 40,
+        "caskNumber": null,
+        "comparison": {
+          "missing": ["vintageYear", "releaseYear", "caskStrength", "bottler"],
+          "conflicts": ["abv", "brand", "distillers"],
+          "agreements": ["category", "statedAge"]
+        },
+        "distillery": ["The Dalmore"],
+        "maturation": null,
+        "releaseDay": null,
+        "singleCask": null,
+        "releaseYear": null,
+        "vintageYear": null,
+        "bottlingYear": null,
+        "caskStrength": null,
+        "releaseMonth": null,
+        "familyContext": {
+          "siblingBottles": []
+        }
+      },
+      {
+        "abv": null,
+        "brand": "Glenglassaugh",
+        "score": 37.219288,
+        "series": null,
+        "source": ["text"],
+        "bottler": "Glenglassaugh",
+        "edition": null,
+        "outturn": null,
+        "bottleId": 4908,
+        "category": "single_malt",
+        "fullName": "Glenglassaugh 40-year-old Crystal Decanter",
+        "reference": null,
+        "statedAge": 40,
+        "caskNumber": null,
+        "comparison": {
+          "missing": [
+            "abv",
+            "vintageYear",
+            "releaseYear",
+            "caskStrength",
+            "distillers"
+          ],
+          "conflicts": ["brand", "bottler"],
+          "agreements": ["category", "statedAge"]
+        },
+        "distillery": [],
+        "maturation": null,
+        "releaseDay": null,
+        "singleCask": null,
+        "releaseYear": null,
+        "vintageYear": null,
+        "bottlingYear": null,
+        "caskStrength": null,
+        "releaseMonth": null,
+        "familyContext": {
+          "siblingBottles": []
+        }
+      },
+      {
+        "abv": null,
+        "brand": "Glenglassaugh",
+        "score": 37.15531,
+        "series": null,
+        "source": ["text"],
+        "bottler": null,
+        "edition": null,
+        "outturn": null,
+        "bottleId": 17402,
+        "category": "single_malt",
+        "fullName": "Glenglassaugh lassaugh, 40-year-old",
+        "reference": null,
+        "statedAge": 40,
+        "caskNumber": null,
+        "comparison": {
+          "missing": [
+            "abv",
+            "vintageYear",
+            "releaseYear",
+            "caskStrength",
+            "bottler",
+            "distillers"
+          ],
+          "conflicts": ["brand"],
+          "agreements": ["category", "statedAge"]
+        },
+        "distillery": [],
+        "maturation": null,
+        "releaseDay": null,
+        "singleCask": null,
+        "releaseYear": null,
+        "vintageYear": null,
+        "bottlingYear": null,
+        "caskStrength": null,
+        "releaseMonth": null,
+        "familyContext": {
+          "siblingBottles": []
+        }
+      },
+      {
+        "abv": null,
+        "brand": "Old Pulteney",
+        "score": 36.81807,
+        "series": null,
+        "source": ["text"],
+        "bottler": null,
+        "edition": null,
+        "outturn": null,
+        "bottleId": 16971,
+        "category": "single_malt",
+        "fullName": "Old Pulteney 40-year-old",
+        "reference": null,
+        "statedAge": 40,
+        "caskNumber": null,
+        "comparison": {
+          "missing": [
+            "abv",
+            "vintageYear",
+            "releaseYear",
+            "caskStrength",
+            "bottler",
+            "distillers"
+          ],
+          "conflicts": ["brand"],
+          "agreements": ["category", "statedAge"]
+        },
+        "distillery": [],
+        "maturation": null,
+        "releaseDay": null,
+        "singleCask": null,
+        "releaseYear": null,
+        "vintageYear": null,
+        "bottlingYear": null,
+        "caskStrength": null,
+        "releaseMonth": null,
+        "familyContext": {
+          "siblingBottles": []
+        }
+      },
+      {
+        "abv": null,
+        "brand": "Canadian Club",
+        "score": 36.69214,
+        "series": null,
+        "source": ["text"],
+        "bottler": null,
+        "edition": null,
+        "outturn": null,
+        "bottleId": 14358,
+        "category": null,
+        "fullName": "Canadian Club 40-year-old",
+        "reference": null,
+        "statedAge": 40,
+        "caskNumber": null,
+        "comparison": {
+          "missing": [
+            "category",
+            "abv",
+            "vintageYear",
+            "releaseYear",
+            "caskStrength",
+            "bottler",
+            "distillers"
+          ],
+          "conflicts": ["brand"],
+          "agreements": ["statedAge"]
+        },
+        "distillery": [],
+        "maturation": null,
+        "releaseDay": null,
+        "singleCask": null,
+        "releaseYear": null,
+        "vintageYear": null,
+        "bottlingYear": null,
+        "caskStrength": null,
+        "releaseMonth": null,
+        "familyContext": {
+          "siblingBottles": []
+        }
+      },
+      {
+        "abv": null,
+        "brand": "Ledaig",
+        "score": 34.816525,
+        "series": null,
+        "source": ["text"],
+        "bottler": "Wilson & Morgan",
+        "edition": null,
+        "outturn": null,
+        "bottleId": 2894,
+        "category": "single_malt",
+        "fullName": "Ledaig 2005 WM Barrel Selection",
+        "reference": null,
+        "statedAge": 15,
+        "caskNumber": null,
+        "comparison": {
+          "missing": ["abv", "vintageYear", "distillers"],
+          "conflicts": ["brand", "bottler"],
+          "agreements": ["category"]
+        },
+        "distillery": [],
+        "maturation": null,
+        "releaseDay": null,
+        "singleCask": null,
+        "releaseYear": null,
+        "vintageYear": null,
+        "bottlingYear": null,
+        "caskStrength": null,
+        "releaseMonth": null,
+        "familyContext": {
+          "siblingBottles": []
+        }
+      },
+      {
+        "abv": null,
+        "brand": "Ledaig",
+        "score": 33.55004,
+        "series": null,
+        "source": ["text"],
+        "bottler": "Berry Bros & Rudd",
+        "edition": null,
+        "outturn": null,
+        "bottleId": 4828,
+        "category": "single_malt",
+        "fullName": "Ledaig 2005 BR Berrys' Own Selection",
+        "reference": null,
+        "statedAge": 15,
+        "caskNumber": null,
+        "comparison": {
+          "missing": ["abv", "vintageYear", "distillers"],
+          "conflicts": ["brand", "bottler"],
+          "agreements": ["category"]
+        },
+        "distillery": [],
+        "maturation": null,
+        "releaseDay": null,
+        "singleCask": null,
+        "releaseYear": null,
+        "vintageYear": null,
+        "bottlingYear": null,
+        "caskStrength": null,
+        "releaseMonth": null,
+        "familyContext": {
+          "siblingBottles": []
+        }
+      },
+      {
+        "abv": 48.5,
+        "brand": "Nc'nean",
+        "score": 28.163769,
+        "series": null,
+        "source": ["text"],
+        "bottler": null,
+        "edition": "Amy",
+        "outturn": null,
+        "bottleId": 46117,
+        "category": "single_malt",
+        "fullName": "Nc'nean Quiet Rebels - Amy - 48.5% ABV",
+        "reference": null,
+        "statedAge": null,
+        "caskNumber": null,
+        "comparison": {
+          "missing": ["vintageYear", "bottler"],
+          "conflicts": ["brand", "distillers"],
+          "agreements": ["abv"]
+        },
+        "distillery": ["Nc'nean"],
+        "maturation": null,
+        "releaseDay": null,
+        "singleCask": false,
+        "releaseYear": null,
+        "vintageYear": null,
+        "bottlingYear": null,
+        "caskStrength": null,
+        "releaseMonth": null,
+        "familyContext": {
+          "siblingBottles": []
+        }
+      },
+      {
+        "abv": null,
+        "brand": "Murray McDavid",
+        "score": 27.940935,
+        "series": null,
+        "source": ["text"],
+        "bottler": null,
+        "edition": null,
+        "outturn": null,
+        "bottleId": 19216,
+        "category": "single_malt",
+        "fullName": "Murray McDavid 1965 34-year-old (distilled at Springbank)",
+        "reference": null,
+        "statedAge": 34,
+        "caskNumber": null,
+        "comparison": {
+          "missing": ["abv", "vintageYear", "bottler", "distillers"],
+          "conflicts": ["brand"],
+          "agreements": []
+        },
+        "distillery": [],
+        "maturation": null,
+        "releaseDay": null,
+        "singleCask": null,
+        "releaseYear": null,
+        "vintageYear": null,
+        "bottlingYear": null,
+        "caskStrength": null,
+        "releaseMonth": null,
+        "familyContext": {
+          "siblingBottles": []
+        }
+      },
+      {
+        "abv": null,
+        "brand": "Glenfarclas",
+        "score": 27.001808,
+        "series": null,
+        "source": ["text"],
+        "bottler": "Glenfarclas",
+        "edition": null,
+        "outturn": null,
+        "bottleId": 3769,
+        "category": "single_malt",
+        "fullName": "Glenfarclas 2000 Premium Edition Vintage",
+        "reference": null,
+        "statedAge": 20,
+        "caskNumber": null,
+        "comparison": {
+          "missing": ["abv", "vintageYear", "distillers"],
+          "conflicts": ["bottler"],
+          "agreements": ["brand"]
+        },
+        "distillery": [],
+        "maturation": null,
+        "releaseDay": null,
+        "singleCask": null,
+        "releaseYear": null,
+        "vintageYear": null,
+        "bottlingYear": null,
+        "caskStrength": null,
+        "releaseMonth": null,
+        "familyContext": {
+          "siblingBottles": []
+        }
+      },
+      {
+        "abv": 48.5,
+        "brand": "Thompson Bros.",
+        "score": 26.775661,
+        "series": null,
+        "source": ["text"],
+        "bottler": "Thompson Bros.",
+        "edition": null,
+        "outturn": null,
+        "bottleId": 46074,
+        "category": "single_malt",
+        "fullName": "Thompson Bros. Highland Single Malt Scotch Whisky - 18-year-old - 48.5% ABV",
+        "reference": null,
+        "statedAge": 18,
+        "caskNumber": null,
+        "comparison": {
+          "missing": ["vintageYear", "distillers"],
+          "conflicts": ["brand", "bottler"],
+          "agreements": ["abv"]
+        },
+        "distillery": [],
+        "maturation": null,
+        "releaseDay": null,
+        "singleCask": null,
+        "releaseYear": null,
+        "vintageYear": null,
+        "bottlingYear": null,
+        "caskStrength": null,
+        "releaseMonth": null,
+        "familyContext": {
+          "siblingBottles": []
+        }
+      },
+      {
+        "abv": null,
+        "brand": "Glenfarclas",
+        "score": 0.7731573615124555,
+        "series": null,
+        "source": ["vector"],
+        "bottler": null,
+        "edition": null,
+        "outturn": null,
+        "bottleId": 17092,
+        "category": "single_malt",
+        "fullName": "Glenfarclas 1953",
+        "reference": "Glenfarclas 1953, 47.2%",
+        "statedAge": 58,
+        "caskNumber": null,
+        "comparison": {
+          "missing": ["abv", "vintageYear", "bottler", "distillers"],
+          "conflicts": [],
+          "agreements": ["brand"]
+        },
+        "distillery": [],
+        "maturation": null,
+        "releaseDay": null,
+        "singleCask": null,
+        "releaseYear": null,
+        "vintageYear": null,
+        "bottlingYear": null,
+        "caskStrength": null,
+        "releaseMonth": null,
+        "familyContext": {
+          "siblingBottles": []
+        }
+      },
+      {
+        "abv": null,
+        "brand": "Glenfarclas",
+        "score": 0.7652128327241844,
+        "series": null,
+        "source": ["vector"],
+        "bottler": null,
+        "edition": null,
+        "outturn": null,
+        "bottleId": 17134,
+        "category": "single_malt",
+        "fullName": "Glenfarclas Family Cask 1962 (Cask #2639)",
+        "reference": "Glenfarclas Family Cask 1962 (Cask #2639), 48.9%",
+        "statedAge": null,
+        "caskNumber": null,
+        "comparison": {
+          "missing": ["abv", "vintageYear", "bottler", "distillers"],
+          "conflicts": [],
+          "agreements": ["brand"]
+        },
+        "distillery": [],
+        "maturation": null,
+        "releaseDay": null,
+        "singleCask": null,
+        "releaseYear": null,
+        "vintageYear": null,
+        "bottlingYear": null,
+        "caskStrength": null,
+        "releaseMonth": null,
+        "familyContext": {
+          "siblingBottles": []
+        }
+      },
+      {
+        "abv": null,
+        "brand": "Glenfarclas",
+        "score": 0.7638092742863883,
+        "series": null,
+        "source": ["vector"],
+        "bottler": null,
+        "edition": null,
+        "outturn": null,
+        "bottleId": 16579,
+        "category": "single_malt",
+        "fullName": "Glenfarclas Family Casks 1969 (Cask #2545)",
+        "reference": "Glenfarclas Family Casks 1969 (Cask #2545), 57.5%",
+        "statedAge": null,
+        "caskNumber": null,
+        "comparison": {
+          "missing": ["abv", "vintageYear", "bottler", "distillers"],
+          "conflicts": [],
+          "agreements": ["brand"]
+        },
+        "distillery": [],
+        "maturation": null,
+        "releaseDay": null,
+        "singleCask": null,
+        "releaseYear": null,
+        "vintageYear": null,
+        "bottlingYear": null,
+        "caskStrength": null,
+        "releaseMonth": null,
+        "familyContext": {
+          "siblingBottles": []
+        }
+      },
+      {
+        "abv": null,
+        "brand": "Glenfarclas",
+        "score": 0.7583483311217651,
+        "series": null,
+        "source": ["vector"],
+        "bottler": null,
+        "edition": null,
+        "outturn": null,
+        "bottleId": 17132,
+        "category": "single_malt",
+        "fullName": "Glenfarclas Family Cask 1970 (Cask #140)",
+        "reference": "Glenfarclas Family Cask 1970 (Cask #140), 57.1%",
+        "statedAge": 50,
+        "caskNumber": null,
+        "comparison": {
+          "missing": ["abv", "vintageYear", "bottler", "distillers"],
+          "conflicts": [],
+          "agreements": ["brand"]
+        },
+        "distillery": [],
+        "maturation": null,
+        "releaseDay": null,
+        "singleCask": null,
+        "releaseYear": null,
+        "vintageYear": null,
+        "bottlingYear": null,
+        "caskStrength": null,
+        "releaseMonth": null,
+        "familyContext": {
+          "siblingBottles": []
+        }
+      },
+      {
+        "abv": null,
+        "brand": "Glenfarclas",
+        "score": 0.7523057763461104,
+        "series": null,
+        "source": ["vector"],
+        "bottler": null,
+        "edition": null,
+        "outturn": null,
+        "bottleId": 15940,
+        "category": "single_malt",
+        "fullName": "Glenfarclas 50-year-old",
+        "reference": "Glenfarclas 50-year-old, 41.1%",
+        "statedAge": 50,
+        "caskNumber": null,
+        "comparison": {
+          "missing": ["abv", "vintageYear", "bottler", "distillers"],
+          "conflicts": [],
+          "agreements": ["brand"]
+        },
+        "distillery": [],
+        "maturation": null,
+        "releaseDay": null,
+        "singleCask": null,
+        "releaseYear": null,
+        "vintageYear": null,
+        "bottlingYear": null,
+        "caskStrength": null,
+        "releaseMonth": null,
+        "familyContext": {
+          "siblingBottles": []
+        }
+      },
+      {
+        "abv": null,
+        "brand": "Glenfarclas",
+        "score": 0.7187064852531511,
+        "series": null,
+        "source": ["vector"],
+        "bottler": null,
+        "edition": null,
+        "outturn": null,
+        "bottleId": 17141,
+        "category": "single_malt",
+        "fullName": "Glenfarclas Family Cask 1972 (Cask #3551)",
+        "reference": "Glenfarclas Family Cask 1972 (Cask #3551), 44.7%",
+        "statedAge": null,
+        "caskNumber": null,
+        "comparison": {
+          "missing": ["abv", "vintageYear", "bottler", "distillers"],
+          "conflicts": [],
+          "agreements": ["category", "brand"]
+        },
+        "distillery": [],
+        "maturation": null,
+        "releaseDay": null,
+        "singleCask": null,
+        "releaseYear": null,
+        "vintageYear": null,
+        "bottlingYear": null,
+        "caskStrength": null,
+        "releaseMonth": null,
+        "familyContext": {
+          "siblingBottles": []
+        }
+      },
+      {
+        "abv": null,
+        "brand": "Glenfarclas",
+        "score": 0.7176895815107229,
+        "series": null,
+        "source": ["vector"],
+        "bottler": null,
+        "edition": null,
+        "outturn": null,
+        "bottleId": 17133,
+        "category": "single_malt",
+        "fullName": "Glenfarclas Family Cask 1961 (Cask #1325)",
+        "reference": "Glenfarclas Family Cask 1961 (Cask #1325), 47%",
+        "statedAge": null,
+        "caskNumber": null,
+        "comparison": {
+          "missing": ["abv", "vintageYear", "bottler", "distillers"],
+          "conflicts": [],
+          "agreements": ["category", "brand"]
+        },
+        "distillery": [],
+        "maturation": null,
+        "releaseDay": null,
+        "singleCask": null,
+        "releaseYear": null,
+        "vintageYear": null,
+        "bottlingYear": null,
+        "caskStrength": null,
+        "releaseMonth": null,
+        "familyContext": {
+          "siblingBottles": []
+        }
+      },
+      {
+        "abv": null,
+        "brand": "Glenfarclas",
+        "score": 0.7069884032352101,
+        "series": null,
+        "source": ["vector"],
+        "bottler": null,
+        "edition": null,
+        "outturn": null,
+        "bottleId": 17140,
+        "category": "single_malt",
+        "fullName": "Glenfarclas Family Cask 1971 (Cask #3546)",
+        "reference": "Glenfarclas Family Cask 1971 (Cask #3546), 51.1%",
+        "statedAge": null,
+        "caskNumber": null,
+        "comparison": {
+          "missing": ["abv", "vintageYear", "bottler", "distillers"],
+          "conflicts": [],
+          "agreements": ["category", "brand"]
+        },
+        "distillery": [],
+        "maturation": null,
+        "releaseDay": null,
+        "singleCask": null,
+        "releaseYear": null,
+        "vintageYear": null,
+        "bottlingYear": null,
+        "caskStrength": null,
+        "releaseMonth": null,
+        "familyContext": {
+          "siblingBottles": []
+        }
+      },
+      {
+        "abv": null,
+        "brand": "Glenfarclas",
+        "score": 0.7015300943397752,
+        "series": null,
+        "source": ["vector"],
+        "bottler": null,
+        "edition": null,
+        "outturn": null,
+        "bottleId": 16584,
+        "category": "single_malt",
+        "fullName": "Glenfarclas Family Casks 1987 (Cask #3829)",
+        "reference": "Glenfarclas Family Casks 1987 (Cask #3829), 48%",
+        "statedAge": null,
+        "caskNumber": null,
+        "comparison": {
+          "missing": ["abv", "vintageYear", "bottler", "distillers"],
+          "conflicts": [],
+          "agreements": ["category", "brand"]
+        },
+        "distillery": [],
+        "maturation": null,
+        "releaseDay": null,
+        "singleCask": null,
+        "releaseYear": null,
+        "vintageYear": null,
+        "bottlingYear": null,
+        "caskStrength": null,
+        "releaseMonth": null,
+        "familyContext": {
+          "siblingBottles": []
+        }
+      },
+      {
+        "abv": null,
+        "brand": "Glenfarclas",
+        "score": 0.6961482320299649,
+        "series": null,
+        "source": ["vector"],
+        "bottler": null,
+        "edition": null,
+        "outturn": null,
+        "bottleId": 17137,
+        "category": "single_malt",
+        "fullName": "Glenfarclas Family Cask 1981 (Cask #57)",
+        "reference": "Glenfarclas Family Cask 1981 (Cask #57), 50.8%",
+        "statedAge": null,
+        "caskNumber": null,
+        "comparison": {
+          "missing": ["abv", "vintageYear", "bottler", "distillers"],
+          "conflicts": [],
+          "agreements": ["category", "brand"]
+        },
+        "distillery": [],
+        "maturation": null,
+        "releaseDay": null,
+        "singleCask": null,
+        "releaseYear": null,
+        "vintageYear": null,
+        "bottlingYear": null,
+        "caskStrength": null,
+        "releaseMonth": null,
+        "familyContext": {
+          "siblingBottles": []
+        }
+      },
+      {
+        "abv": null,
+        "brand": "Glenfarclas",
+        "score": 0.6957658607460092,
+        "series": null,
+        "source": ["vector"],
+        "bottler": null,
+        "edition": null,
+        "outturn": null,
+        "bottleId": 16577,
+        "category": "single_malt",
+        "fullName": "Glenfarclas Family Casks 1984 (Cask #6032)",
+        "reference": "Glenfarclas Family Casks 1984 (Cask #6032), 47%",
+        "statedAge": null,
+        "caskNumber": null,
+        "comparison": {
+          "missing": ["abv", "vintageYear", "bottler", "distillers"],
+          "conflicts": [],
+          "agreements": ["category", "brand"]
+        },
+        "distillery": [],
+        "maturation": null,
+        "releaseDay": null,
+        "singleCask": null,
+        "releaseYear": null,
+        "vintageYear": null,
+        "bottlingYear": null,
+        "caskStrength": null,
+        "releaseMonth": null,
+        "familyContext": {
+          "siblingBottles": []
+        }
+      }
+    ]
+  },
+  "context": {
+    "inspectedBottleIds": [5074],
+    "bottleContexts": [
+      {
+        "exact": {
+          "abv": null,
+          "edition": null,
+          "outturn": null,
+          "statedAge": null,
+          "caskNumber": null,
+          "maturation": null,
+          "releaseDay": null,
+          "singleCask": null,
+          "releaseYear": null,
+          "vintageYear": null,
+          "bottlingYear": null,
+          "caskStrength": null,
+          "releaseMonth": null
+        },
+        "shared": {
+          "name": "1965 The Family Casks",
+          "brand": {
+            "name": "Glenfarclas",
+            "entityId": 976
+          },
+          "series": null,
+          "bottler": {
+            "name": "Glenfarclas",
+            "entityId": 976
+          },
+          "category": "single_malt",
+          "statedAge": 50,
+          "distillers": []
+        },
+        "groupId": 12125,
+        "bottleId": 5074,
+        "fullName": "Glenfarclas 1965 The Family Casks",
+        "siblings": [],
+        "references": [
+          {
+            "name": "Glenfarclas 1965 The Family Casks",
+            "ignored": false
+          }
+        ],
+        "observations": [],
+        "imageSources": []
+      }
+    ],
+    "inspectedEntities": [
+      {
+        "kind": "distillery",
+        "name": "Glenfarclas",
+        "score": 1,
+        "source": ["exact", "text", "prefix", "contained"],
+        "entityId": 976,
+        "reference": "Glenfarclas",
+        "shortName": null,
+        "retrievedFor": [
+          {
+            "exact": true,
+            "query": "Glenfarclas"
+          }
+        ]
+      },
+      {
+        "kind": "brand",
+        "name": "Scott's Selection",
+        "score": 1,
+        "source": ["exact", "text", "prefix", "contained"],
+        "entityId": 5710,
+        "reference": "Scott's Selection",
+        "shortName": null,
+        "retrievedFor": [
+          {
+            "exact": true,
+            "query": "Scott's Selection"
+          }
+        ]
+      },
+      {
+        "kind": "distillery",
+        "name": "Nc'nean",
+        "score": 1,
+        "source": ["exact", "text", "prefix", "contained"],
+        "entityId": 1198,
+        "reference": "Nc'nean Distillery",
+        "shortName": null,
+        "retrievedFor": [
+          {
+            "exact": true,
+            "query": "Nc'nean"
+          }
+        ]
+      },
+      {
+        "kind": "brand",
+        "name": "Thompson Bros.",
+        "score": 1,
+        "source": ["exact", "text", "prefix", "contained"],
+        "entityId": 365820,
+        "reference": "Phil & Simon Thompson",
+        "shortName": null,
+        "retrievedFor": [
+          {
+            "exact": true,
+            "query": "Thompson Bros."
+          }
+        ]
+      },
+      {
+        "kind": "bottler",
+        "name": "Thompson Bros",
+        "score": 1,
+        "source": ["exact", "text", "contained"],
+        "entityId": 367034,
+        "reference": "Thompson Bros",
+        "shortName": null,
+        "retrievedFor": [
+          {
+            "exact": true,
+            "query": "Thompson Bros."
+          }
+        ]
+      },
+      {
+        "kind": "bottler",
+        "name": "Murray McDavid",
+        "score": 1,
+        "source": ["exact", "text", "prefix", "contained"],
+        "entityId": 5670,
+        "reference": "Murray McDavid",
+        "shortName": null,
+        "retrievedFor": [
+          {
+            "exact": true,
+            "query": "Murray McDavid"
+          }
+        ]
+      }
+    ],
+    "inspectedSeries": []
+  },
+  "provenance": {
+    "source": "production_miss",
+    "verifiedSourceUrls": [
+      "https://spink.com/lot/SFW21000122",
+      "https://www.just-whisky.co.uk/product/glenfarclas-1965-2005-scotts-selection-1372535"
+    ],
+    "dbOutcome": {
+      "bottleId": 67099,
+      "createsBottle": true,
+      "summary": "Production created Bottle 67099 with Glenfarclas as Brand and 1965/2005 as name."
+    },
+    "notes": "Captured from saved classifier run 27205 (review 18877, model openai/gpt-6-luna, 2026-10-16T18:48:15.829Z). Production rationale: The Whiskyfun review identifies the exact Glenfarclas 1965/2005 at 48.5% for Scott's Selection. Product-specific search evidence describes it as distilled at Glenfarclas in 1965, bottled in 2005, and bottled at natural cask strength. The description of it as around 40 years old is not an explicit age statement, so statedAge is left null; no marketed single-cask claim or cask identifier is established. Inspected candidate 5074 is a distinct Glenfarclas Family Casks 1965 release with a 50-year age statement, so it is not a safe match. No local candidate represents this complete release. Verified independently on 2026-10-19. Existing Glenfarclas and Scott's Selection Entity context comes from the same article's saved run 27205; no new matching Bottle is injected."
+  },
+  "expected": {
+    "status": "classified",
+    "action": "create_bottle",
+    "identityScope": "product",
+    "matchedBottleId": null,
+    "proposedBottle": {
+      "brand": {
+        "id": 5710,
+        "name": "Scott's Selection"
+      },
+      "vintageYear": 1965,
+      "bottlingYear": 2005,
+      "abv": 48.5,
+      "statedAge": null,
+      "category": "single_malt"
+    },
+    "proposedBottleNameOneOf": ["Glenfarclas 1965"],
+    "expectedTier": "auto",
+    "summary": "Create the independently bottled Glenfarclas under Scott's Selection, using the printed distillery and vintage as its name. Do not put the bottling year in the name or infer a stated age."
+  }
+}

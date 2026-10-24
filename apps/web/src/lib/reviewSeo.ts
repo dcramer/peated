@@ -1,4 +1,4 @@
-import { formatBottleDisplayName } from "@peated/server/lib/bottleDisplayName";
+import { formatBottleLabel } from "@peated/server/lib/bottleDisplayName";
 import type { Outputs } from "@peated/server/orpc/router";
 import config from "@peated/web/config";
 import type { Metadata } from "next";
@@ -13,6 +13,7 @@ type MemberReviewSeoSource = Pick<
   "id" | "score" | "notes" | "imageUrl" | "createdAt" | "updatedAt"
 > & {
   bottle: Parameters<typeof getBottleUrl>[0] & {
+    abv: number | null;
     brand: { name: string };
     imageUrl: string | null;
   };
@@ -29,7 +30,7 @@ export function getMemberReviewSeoMetadata(
     };
   }
 
-  const bottleName = formatBottleDisplayName(review.bottle);
+  const bottleName = formatBottleLabel(review.bottle);
   const title = `${bottleName} — review by ${review.createdBy.username}`;
   const notes = review.notes?.replace(/\s+/g, " ").trim();
   const summary =
@@ -81,7 +82,7 @@ export function serializeMemberReviewStructuredData(
 ): string | null {
   if (review.createdBy.private) return null;
 
-  const bottleName = formatBottleDisplayName(review.bottle);
+  const bottleName = formatBottleLabel(review.bottle);
   const reviewUrl = new URL(getMemberReviewUrl(review), config.URL_PREFIX).href;
   const bottleUrl = new URL(getBottleUrl(review.bottle), config.URL_PREFIX)
     .href;

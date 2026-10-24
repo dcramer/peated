@@ -1,5 +1,7 @@
 import { formatCanonicalBottleName } from "@peated/bottle-classifier/bottleIdentity";
-import type { Bottle, BottleGroup } from "@peated/server/db/schema";
+import { stripDuplicateBrandPrefixFromBottleName } from "@peated/bottle-classifier/normalize";
+import type { Bottle, BottleGroup, Entity } from "@peated/server/db/schema";
+import { formatBottleName } from "@peated/server/lib/format";
 
 type StableBottleIdentity = Pick<
   BottleGroup,
@@ -67,6 +69,27 @@ export type MaterializedBottleForGroup = Pick<
 
 function valueOrCurrent<T>(value: T | undefined, current: T): T {
   return value === undefined ? current : value;
+}
+
+/**
+ * Names a BottleGroup under a brand the way Bottle updates store it. A name
+ * that repeats the brand loses that prefix, so "Kilnhouse Twelve" under
+ * Kilnhouse becomes "Twelve".
+ */
+export function getBottleGroupNameForBrand({
+  name,
+  brand,
+}: {
+  name: string;
+  brand: Pick<Entity, "name" | "shortName">;
+}): Pick<BottleGroup, "name" | "fullName"> {
+  const brandedName = stripDuplicateBrandPrefixFromBottleName(name, brand.name);
+  return {
+    name: brandedName,
+    fullName: formatBottleName({
+      name: `${brand.shortName || brand.name} ${brandedName}`,
+    }),
+  };
 }
 
 /** Returns only a non-redundant exact age relative to the shared age. */
@@ -167,5 +190,40 @@ export function materializeBottleForGroup({
     seriesId: group.seriesId,
     category: group.category,
     flavorProfile: group.flavorProfile,
+  };
+}
+
+/**
+ * Returns the structured identity a Bottle gets when an Entity merge moves its
+ * group to another brand and Series. The merge job and its preview both use it
+ * so the preview finds the same exact duplicates the job merges.
+ */
+export function getMovedBottleIdentity({
+  bottle,
+  group,
+  brand,
+  seriesId,
+}: {
+  bottle: BottleExactIdentity & Pick<Bottle, "noAgeStatement">;
+  group: BottleGroupMaterialization;
+  brand: Pick<Entity, "id" | "name" | "shortName">;
+  seriesId: BottleGroup["seriesId"];
+}) {
+  const exact = getBottleExactIdentity({
+    bottle,
+    sourceGroupStatedAge: group.statedAge,
+  });
+  return {
+    ...exact,
+    noAgeStatement: bottle.noAgeStatement,
+    ...materializeBottleForGroup({
+      group: {
+        ...group,
+        ...getBottleGroupNameForBrand({ name: group.name, brand }),
+        brandId: brand.id,
+        seriesId,
+      },
+      exact,
+    }),
   };
 }

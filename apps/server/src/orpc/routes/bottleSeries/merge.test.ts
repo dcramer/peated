@@ -263,4 +263,47 @@ describe("POST /bottle-series/:series/merge", () => {
       }),
     ).toBeUndefined();
   });
+
+  test("moves a same-named release with a different vintage", async ({
+    fixtures,
+  }) => {
+    const user = await fixtures.User({ admin: true });
+    const brand = await fixtures.Entity({ name: "Series Vintage Brand" });
+    const source = await fixtures.BottleSeries({
+      name: "Old Range",
+      brandId: brand.id,
+    });
+    const destination = await fixtures.BottleSeries({
+      name: "New Range",
+      brandId: brand.id,
+    });
+    const moving = await fixtures.Bottle({
+      name: "Peat Smoke",
+      brandId: brand.id,
+      seriesId: source.id,
+      vintageYear: 2008,
+    });
+    const staying = await fixtures.Bottle({
+      name: "Peat Smoke",
+      brandId: brand.id,
+      seriesId: destination.id,
+      vintageYear: 2010,
+    });
+
+    await routerClient.bottleSeries.merge(
+      { series: source.id, other: destination.id, direction: "mergeInto" },
+      { context: { user } },
+    );
+
+    const moved = await db
+      .select({ id: bottles.id, seriesId: bottles.seriesId })
+      .from(bottles)
+      .where(inArray(bottles.id, [moving.id, staying.id]));
+    expect(moved).toEqual(
+      expect.arrayContaining([
+        { id: moving.id, seriesId: destination.id },
+        { id: staying.id, seriesId: destination.id },
+      ]),
+    );
+  });
 });

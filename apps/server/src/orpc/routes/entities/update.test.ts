@@ -933,4 +933,86 @@ describe("PATCH /entities/:entity", () => {
       descriptionSrc: "user",
     });
   });
+
+  test("sets and clears pronunciation", async ({ fixtures }) => {
+    const entity = await fixtures.Entity({
+      name: "Glen Garioch",
+      kind: "distillery",
+    });
+    const modUser = await fixtures.User({ mod: true });
+
+    const data = await routerClient.entities.update(
+      {
+        entity: entity.id,
+        pronunciation: "glen GEER-ee",
+        pronunciationIpa: "ɡlɛn ˈɡɪəri",
+      },
+      { context: { user: modUser } },
+    );
+
+    expect(data).toMatchObject({
+      pronunciation: "glen GEER-ee",
+      pronunciationIpa: "ɡlɛn ˈɡɪəri",
+    });
+    const [change] = await db
+      .select()
+      .from(changes)
+      .where(eq(changes.objectId, entity.id))
+      .orderBy(desc(changes.id))
+      .limit(1);
+    expect(change.data).toEqual({
+      pronunciation: "glen GEER-ee",
+      pronunciationIpa: "ɡlɛn ˈɡɪəri",
+    });
+
+    await routerClient.entities.update(
+      {
+        entity: entity.id,
+        pronunciation: null,
+        pronunciationIpa: null,
+      },
+      { context: { user: modUser } },
+    );
+
+    await expect(
+      db.query.entities.findFirst({ where: eq(entities.id, entity.id) }),
+    ).resolves.toMatchObject({
+      pronunciation: null,
+      pronunciationIpa: null,
+    });
+  });
+
+  test("ignores a client-supplied pronunciation audio URL", async ({
+    fixtures,
+  }) => {
+    const entity = await fixtures.Entity({ pronunciationIpa: "ɡlɛn" });
+    const modUser = await fixtures.User({ mod: true });
+    const input = {
+      entity: entity.id,
+      pronunciationAudioUrl: "https://example.com/other.mp3",
+    };
+
+    const data = await routerClient.entities.update(input, {
+      context: { user: modUser },
+    });
+
+    expect(data.pronunciationAudioUrl).toBeNull();
+  });
+
+  test("rejects IPA pronunciation wrapped in slashes", async ({ fixtures }) => {
+    const entity = await fixtures.Entity();
+    const modUser = await fixtures.User({ mod: true });
+
+    const error = await waitError(
+      routerClient.entities.update(
+        {
+          entity: entity.id,
+          pronunciationIpa: "/ɡlɛn ˈɡɪəri/",
+        },
+        { context: { user: modUser } },
+      ),
+    );
+
+    expect(error).toMatchObject({ status: 400 });
+  });
 });

@@ -1,6 +1,7 @@
 import { and, eq, getTableColumns, inArray } from "drizzle-orm";
 import { type z } from "zod";
 import { serialize, serializer } from ".";
+import config from "../config";
 import { db } from "../db";
 import {
   countries,
@@ -12,6 +13,7 @@ import {
 } from "../db/schema";
 import { notEmpty } from "../lib/filter";
 import { formatPeatedId } from "../lib/peatedId";
+import { absoluteUrl } from "../lib/urls";
 import { type EntitySchema } from "../schemas";
 import { CountrySerializer } from "./country";
 import { RegionSerializer } from "./region";
@@ -133,6 +135,11 @@ export const EntitySerializer = serializer({
       peatedId: formatPeatedId("entity", item.id),
       name: item.name,
       shortName: item.shortName,
+      pronunciation: item.pronunciation,
+      pronunciationIpa: item.pronunciationIpa,
+      pronunciationAudioUrl: item.pronunciationAudioUrl
+        ? absoluteUrl(config.API_SERVER, item.pronunciationAudioUrl)
+        : null,
       kind: item.kind,
       status: item.status,
       ownerId: item.ownerId,

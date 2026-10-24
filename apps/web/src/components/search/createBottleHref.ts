@@ -1,6 +1,9 @@
 import { toTitleCase } from "@peated/server/lib/strings";
 import { CategoryEnum } from "@peated/server/schemas";
-import type { PendingImageRouteState } from "@peated/web/lib/addBottle";
+import {
+  type PendingImageRouteState,
+  WRONG_PHOTO_MATCH_PARAM,
+} from "@peated/web/lib/addBottle";
 import { z } from "zod";
 
 export type CreateBottleReturnAction =
@@ -15,7 +18,7 @@ const CreateBottleEntityChoiceSchema = z.object({
   name: z.string().trim().min(1),
 });
 
-export const CreateBottlePrefillSchema = z.object({
+const CreateBottlePrefillSchema = z.object({
   brandId: z.number().int().positive().nullish(),
   brandName: z.string().trim().min(1).nullish(),
   category: CategoryEnum.nullish(),
@@ -158,13 +161,18 @@ export function parseCreateBottlePrefill(
 export function getCreateBottleHref({
   query,
   returnAction,
+  returnDraftId,
   prefill,
   pendingImage,
+  wrongPhotoMatchId,
 }: {
   query: string;
   returnAction?: CreateBottleReturnAction;
+  /** Returns to this tasting draft's confirm step with the Bottle. */
+  returnDraftId?: string;
   prefill?: CreateBottlePrefill;
   pendingImage?: PendingImageRouteState | null;
+  wrongPhotoMatchId?: number | null;
 }) {
   const parsedPrefill = prefill ?? {};
   const params = new URLSearchParams({
@@ -173,6 +181,7 @@ export function getCreateBottleHref({
   if (returnAction) {
     params.set("returnAction", returnAction);
   }
+  if (returnDraftId) params.set("draft", returnDraftId);
 
   if (parsedPrefill.brandId) {
     params.set("brand", String(parsedPrefill.brandId));
@@ -252,6 +261,9 @@ export function getCreateBottleHref({
   if (pendingImage?.id) params.set("pendingImageId", pendingImage.id);
   if (pendingImage?.imageUrl) {
     params.set("pendingImageUrl", pendingImage.imageUrl);
+  }
+  if (wrongPhotoMatchId) {
+    params.set(WRONG_PHOTO_MATCH_PARAM, String(wrongPhotoMatchId));
   }
   return `/bottles/new?${params.toString()}`;
 }

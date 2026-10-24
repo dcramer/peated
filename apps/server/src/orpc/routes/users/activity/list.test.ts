@@ -1,5 +1,6 @@
 import { db } from "@peated/server/db";
 import { collectionBottles } from "@peated/server/db/schema";
+import { setTestTimeZone } from "@peated/server/lib/test/timeZone";
 import waitError from "@peated/server/lib/test/waitError";
 import { routerClient } from "@peated/server/orpc/router";
 import { describe, expect, test } from "vitest";
@@ -116,6 +117,48 @@ describe("GET /users/:user/activity", () => {
     expect(secondPage.results).toHaveLength(2);
     expect(secondPage.rel.nextCursor).toBeNull();
   });
+
+  // Ahead of UTC, a local-time snapshot would include later posts; behind UTC,
+  // it would skip recent ones.
+  for (const timeZone of ["Pacific/Auckland", "America/Los_Angeles"]) {
+    test(`keeps the feed snapshot in UTC when the server runs in ${timeZone}`, async ({
+      defaults,
+      fixtures,
+    }) => {
+      setTestTimeZone(timeZone);
+      const older = await fixtures.Tasting({
+        createdById: defaults.user.id,
+        createdAt: new Date("2026-01-01T12:00:00Z"),
+      });
+      const recent = await fixtures.Tasting({
+        createdById: defaults.user.id,
+        createdAt: new Date(Date.now() - 4 * 60 * 60 * 1000),
+      });
+
+      const firstPage = await routerClient.users.activity.list({
+        user: defaults.user.username,
+        limit: 1,
+      });
+      expect(firstPage.results).toMatchObject([
+        { type: "tasting_session", tastings: [{ id: recent.id }] },
+      ]);
+
+      await fixtures.Tasting({
+        createdById: defaults.user.id,
+        createdAt: new Date(Date.now() + 60_000),
+      });
+
+      const secondPage = await routerClient.users.activity.list({
+        user: defaults.user.username,
+        cursor: firstPage.rel.nextCursor!,
+        limit: 1,
+      });
+      expect(secondPage.results).toMatchObject([
+        { type: "tasting_session", tastings: [{ id: older.id }] },
+      ]);
+      expect(secondPage.rel.nextCursor).toBeNull();
+    });
+  }
 
   test("groups additions to the same collection", async ({
     defaults,

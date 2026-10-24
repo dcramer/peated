@@ -13,6 +13,10 @@ import {
   users,
 } from "@peated/server/db/schema";
 import type { ChangeData } from "@peated/server/db/schema/changes";
+import {
+  bottleDisplayNameColumns,
+  toBottleDisplayNameSource,
+} from "@peated/server/lib/bottleDisplayNameColumns";
 import { absoluteUrl } from "@peated/server/lib/urls";
 import {
   AdminContentItemSchema,
@@ -98,7 +102,7 @@ export async function listAdminContent(
       .select({
         review: memberReviews,
         bottleId: bottles.id,
-        bottleFullName: bottles.fullName,
+        bottle: bottleDisplayNameColumns,
         memberId: users.id,
         memberUsername: users.username,
         memberPrivate: users.private,
@@ -119,7 +123,10 @@ export async function listAdminContent(
       results: rows.slice(0, input.limit).map((row) => ({
         kind: "member_review",
         id: row.review.id,
-        bottle: { id: row.bottleId, fullName: row.bottleFullName },
+        bottle: {
+          id: row.bottleId,
+          ...toBottleDisplayNameSource(row.bottle),
+        },
         member: {
           id: row.memberId,
           username: row.memberUsername,
@@ -158,7 +165,7 @@ export async function listAdminContent(
       .select({
         tasting: tastings,
         bottleId: bottles.id,
-        bottleFullName: bottles.fullName,
+        bottle: bottleDisplayNameColumns,
         memberId: users.id,
         memberUsername: users.username,
         memberPrivate: users.private,
@@ -177,7 +184,10 @@ export async function listAdminContent(
       results: rows.slice(0, input.limit).map((row) => ({
         kind: "tasting",
         id: row.tasting.id,
-        bottle: { id: row.bottleId, fullName: row.bottleFullName },
+        bottle: {
+          id: row.bottleId,
+          ...toBottleDisplayNameSource(row.bottle),
+        },
         member: {
           id: row.memberId,
           username: row.memberUsername,
@@ -216,7 +226,7 @@ export async function listAdminContent(
       review: externalReviews,
       article: externalReviewArticles,
       bottleId: bottles.id,
-      bottleFullName: bottles.fullName,
+      bottle: bottleDisplayNameColumns,
       siteId: externalSites.id,
       siteName: externalSites.name,
       siteKey: externalSites.type,
@@ -251,8 +261,11 @@ export async function listAdminContent(
       id: row.review.id,
       name: row.review.name,
       bottle:
-        row.bottleId && row.bottleFullName
-          ? { id: row.bottleId, fullName: row.bottleFullName }
+        row.bottleId && row.bottle
+          ? {
+              id: row.bottleId,
+              ...toBottleDisplayNameSource(row.bottle),
+            }
           : null,
       site: { id: row.siteId, name: row.siteName, key: row.siteKey },
       article: {
@@ -326,16 +339,6 @@ export async function getAdminContent(kind: AdminContentKind, id: number) {
     ...item,
     history: await loadHistory(kind, id),
   });
-}
-
-export function contentTable(kind: AdminContentKind) {
-  if (kind === "member_review") return memberReviews;
-  if (kind === "external_review") return externalReviews;
-  return tastings;
-}
-
-export function contentObjectType(kind: AdminContentKind) {
-  return kind;
 }
 
 export function contentDisplayName(kind: AdminContentKind, id: number) {

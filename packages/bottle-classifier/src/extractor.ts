@@ -2,7 +2,10 @@ import { createHash } from "node:crypto";
 import type OpenAI from "openai";
 import { zodTextFormat } from "openai/helpers/zod";
 import { z } from "zod";
-import { BottleExtractedDetailsSchema } from "./classifierTypes";
+import {
+  BottleExtractedDetailsSchema,
+  hasValidReleaseDate,
+} from "./classifierTypes";
 import { buildWhiskyLabelExtractorInstructions } from "./extractorInstructions";
 import {
   getStableOpenAISettings,
@@ -34,6 +37,7 @@ export interface WhiskyLabelClient {
   responses: {
     create(
       input: Parameters<OpenAI["responses"]["create"]>[0],
+      options?: { signal?: AbortSignal },
     ): PromiseLike<WhiskyLabelProviderResponse>;
   };
 }
@@ -81,6 +85,26 @@ export function getImageLabelExtractionVersion({
     .digest("hex");
 }
 
+function parseResponse(outputText: string) {
+  const output = JSON.parse(outputText);
+  const result = output?.result;
+  // Release month and day stay unknown unless they form a real date with the
+  // release year. Models sometimes copy a bottling date into them; drop that
+  // date instead of failing the whole label reading.
+  if (
+    result &&
+    !hasValidReleaseDate(
+      result.release_year,
+      result.release_month,
+      result.release_day,
+    )
+  ) {
+    result.release_month = null;
+    result.release_day = null;
+  }
+  return ResponseSchema.parse(output);
+}
+
 export function createWhiskyLabelExtractor({
   client,
   model,
@@ -105,13 +129,17 @@ export function createWhiskyLabelExtractor({
         imageUrlOrBase64,
         onMetadata: onImageExtractionMetadata,
       }),
-    extractFromImageWithMetadata: async (imageUrlOrBase64: string) =>
+    extractFromImageWithMetadata: async (
+      imageUrlOrBase64: string,
+      { signal }: { signal?: AbortSignal } = {},
+    ) =>
       extractFromImageWithMetadata({
         client,
         model: imageModel,
         reasoningEffort: imageReasoningEffort,
         imageUrlOrBase64,
         onMetadata: onImageExtractionMetadata,
+        signal,
       }),
     extractFromText: async (label: string) =>
       extractFromText({
@@ -153,34 +181,39 @@ export async function extractFromImageWithMetadata({
   reasoningEffort,
   imageUrlOrBase64,
   onMetadata,
+  signal,
 }: {
   client: WhiskyLabelClient;
   model: string;
   reasoningEffort?: OpenAIReasoningEffort;
   imageUrlOrBase64: string;
   onMetadata?: (metadata: WhiskyLabelExtractionMetadata) => void;
+  signal?: AbortSignal;
 }): Promise<WhiskyLabelExtractionResult> {
   const startedAt = performance.now();
-  const response = await client.responses.create({
-    model,
-    instructions: buildWhiskyLabelExtractorInstructions({ mode: "image" }),
-    input: [
-      {
-        role: "user",
-        content: [
-          {
-            type: "input_image",
-            image_url: imageUrlOrBase64,
-            detail: IMAGE_DETAIL,
-          },
-        ],
+  const response = await client.responses.create(
+    {
+      model,
+      instructions: buildWhiskyLabelExtractorInstructions({ mode: "image" }),
+      input: [
+        {
+          role: "user",
+          content: [
+            {
+              type: "input_image",
+              image_url: imageUrlOrBase64,
+              detail: IMAGE_DETAIL,
+            },
+          ],
+        },
+      ],
+      text: {
+        format: ResponseFormat,
       },
-    ],
-    text: {
-      format: ResponseFormat,
+      ...getStableOpenAISettings(model, reasoningEffort),
     },
-    ...getStableOpenAISettings(model, reasoningEffort),
-  });
+    signal ? { signal } : undefined,
+  );
 
   const metadata = {
     durationMs: performance.now() - startedAt,
@@ -202,9 +235,7 @@ export async function extractFromImageWithMetadata({
   };
   onMetadata?.(metadata);
 
-  const { result, rawLabelText } = ResponseSchema.parse(
-    JSON.parse(response.output_text),
-  );
+  const { result, rawLabelText } = parseResponse(response.output_text);
   return {
     result,
     rawLabelText,
@@ -243,6 +274,6 @@ export async function extractFromText({
     ...getStableOpenAISettings(model, reasoningEffort),
   });
 
-  const { result } = ResponseSchema.parse(JSON.parse(response.output_text));
+  const { result } = parseResponse(response.output_text);
   return result;
 }

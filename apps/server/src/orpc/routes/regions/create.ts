@@ -1,5 +1,6 @@
 import { ORPCError } from "@orpc/server";
 import { db } from "@peated/server/db";
+import { uniqueViolationConstraint } from "@peated/server/db/errors";
 import { countries, regions, type NewRegion } from "@peated/server/db/schema";
 import { procedure } from "@peated/server/orpc";
 import { ConflictError } from "@peated/server/orpc/errors";
@@ -51,7 +52,7 @@ export default procedure
     try {
       [newRegion] = await db.insert(regions).values(data).returning();
     } catch (err: any) {
-      if (err?.code === "23505" && err?.constraint === "region_slug_unq") {
+      if (uniqueViolationConstraint(err) === "region_slug_unq") {
         const [existingRegion] = await db
           .select()
           .from(regions)
@@ -62,10 +63,7 @@ export default procedure
             ),
           );
         throw new ConflictError(existingRegion, err);
-      } else if (
-        err?.code === "23505" &&
-        err?.constraint === "region_name_unq"
-      ) {
+      } else if (uniqueViolationConstraint(err) === "region_name_unq") {
         const [existingRegion] = await db
           .select()
           .from(regions)

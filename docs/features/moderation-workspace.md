@@ -21,7 +21,7 @@ those records into a second task system.
 
 ## Inbox
 
-The Inbox includes open store-price proposals, reviewable auction lots, Bottle or Entity changes waiting
+The Inbox includes open store-price proposals, completed unresolved critic-review matches, reviewable auction lots, Bottle or Entity changes waiting
 for review, unresolved findings, and open member reports. Work that is still
 running, failed, stale, or waiting to retry belongs in Background work until it
 needs a person to decide. A store-price proposal appears only while the store
@@ -33,10 +33,19 @@ Bottle to just that lot, or explicitly remember a name when the saved decision
 supports reuse. The auction screen does not create Bottles or edit catalog
 facts. See [Whisky auctions](./auctions.md).
 
+Critic-review tasks are keyed by the review ID. Their saved classifier check
+is evidence, not a second task. Assignment and recheck actions validate the
+observed name and completed-attempt timestamp, and assigned or removed reviews
+leave the Inbox. Rechecks preserve the last unresolved task while the worker
+runs or retries; a failure cannot hide it. Staged sources can still be matched
+before publication.
+
 A catalog task reads its saved Bottle check through
 `apps/server/src/lib/bottleCheckEvidence.ts`, which keeps only the IDs, links,
-and field names that review needs. A check saved before a classifier schema
-change still opens and can be reviewed.
+and field names that review needs. A check on an older schema version, or
+with a saved proposal that no longer parses, opens as unsupported. It shows no
+operations and can only be closed (`isSupportedBottleCheck` in
+`apps/server/src/lib/bottleCheckSchemaVersion.ts`).
 
 A report task shows who sent the report, who it is about (when a member is
 named), the reason, and a link to the live content. Its actions remove the

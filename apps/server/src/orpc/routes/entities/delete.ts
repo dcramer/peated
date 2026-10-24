@@ -9,6 +9,7 @@ import {
 } from "@peated/server/db/schema";
 import { getUserActorForDatabase } from "@peated/server/lib/actors";
 import { deleteOwnedEntityImage } from "@peated/server/lib/entityImages";
+import { deleteOwnedPronunciationAudio } from "@peated/server/lib/entityPronunciationAudio";
 import { closeOpenReportsForTarget } from "@peated/server/lib/reports";
 import { procedure } from "@peated/server/orpc";
 import { requireAdmin } from "@peated/server/orpc/middleware";
@@ -77,9 +78,10 @@ export default procedure
       );
     });
 
-    await Promise.all(
-      images.map((image) => deleteOwnedEntityImage(image.imageUrl)),
-    );
+    await Promise.all([
+      ...images.map((image) => deleteOwnedEntityImage(image.imageUrl)),
+      deleteOwnedPronunciationAudio(entity.pronunciationAudioUrl),
+    ]);
 
     return {};
   });

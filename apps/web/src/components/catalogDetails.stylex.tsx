@@ -29,48 +29,32 @@ export function PeatedId({ detail, id }: PeatedIdProps) {
 
 export type KeyFact = {
   label: string;
+  /** Marks a value made of words, such as a series name, which uses smaller type on phones so more of it fits. */
+  text?: boolean;
   value?: number | string | null;
 };
-
-export type KeyFactList =
-  | readonly [KeyFact]
-  | readonly [KeyFact, KeyFact]
-  | readonly [KeyFact, KeyFact, KeyFact]
-  | readonly [KeyFact, KeyFact, KeyFact, KeyFact];
 
 function hasKeyFactValue(fact: KeyFact) {
   return fact.value !== null && fact.value !== undefined && fact.value !== "";
 }
 
-export function hasVisibleKeyFacts(facts: KeyFactList) {
+export function hasVisibleKeyFacts(facts: readonly KeyFact[]) {
   return facts.some(hasKeyFactValue);
 }
 
-export function KeyFacts({ facts }: { facts: KeyFactList }) {
+/** Facts sized to their content and wrapped in one row, as in a page header. */
+export function KeyFacts({ facts }: { facts: readonly KeyFact[] }) {
   const visibleFacts = facts.filter(hasKeyFactValue);
 
   if (!visibleFacts.length) return null;
 
   return (
-    <dl
-      {...stylex.props(
-        styles.keyFacts,
-        getKeyFactsColumnStyle(visibleFacts.length),
-      )}
-    >
+    <dl {...stylex.props(styles.keyFacts)}>
       {visibleFacts.map((fact, index) => (
         <div
           data-key-fact={index + 1}
           key={`${fact.label}-${index}`}
-          {...stylex.props(
-            styles.keyFact,
-            visibleFacts.length >= 3 &&
-              index % 2 === 0 &&
-              styles.keyFactPhoneOdd,
-            visibleFacts.length >= 3 &&
-              index % 2 === 1 &&
-              styles.keyFactPhoneEven,
-          )}
+          {...stylex.props(styles.keyFact)}
         >
           <dt
             title={fact.label}
@@ -78,7 +62,13 @@ export function KeyFacts({ facts }: { facts: KeyFactList }) {
           >
             {fact.label}
           </dt>
-          <dd title={String(fact.value)} {...stylex.props(styles.keyFactValue)}>
+          <dd
+            title={String(fact.value)}
+            {...stylex.props(
+              styles.keyFactValue,
+              fact.text && styles.keyFactValueText,
+            )}
+          >
             {fact.value}
           </dd>
         </div>
@@ -112,50 +102,34 @@ const styles = stylex.create({
     whiteSpace: { default: "nowrap", [COMPACT]: "normal" },
   },
   keyFacts: {
-    display: "grid",
+    display: "flex",
+    flexWrap: "wrap",
+    // Keeps labels on one line when a smaller text value shares the row.
+    alignItems: { default: "flex-end", [PHONE]: "baseline" },
     width: "100%",
     minWidth: 0,
-    gap: "6px",
+    columnGap: { default: space.x8, [PHONE]: space.x4 },
+    rowGap: { default: space.x4, [PHONE]: space.x1 },
     margin: 0,
-    paddingTop: "20px",
-    paddingBottom: "20px",
-  },
-  keyFactsOne: {
-    gridTemplateColumns: "minmax(0, 1fr)",
-  },
-  keyFactsTwo: {
-    gridTemplateColumns: "repeat(2, minmax(0, 1fr))",
-  },
-  keyFactsThree: {
-    gridTemplateColumns: {
-      default: "repeat(3, minmax(0, 1fr))",
-      [PHONE]: "repeat(2, minmax(0, 1fr))",
-    },
-  },
-  keyFactsFour: {
-    gridTemplateColumns: {
-      default: "repeat(4, minmax(0, 1fr))",
-      [PHONE]: "repeat(2, minmax(0, 1fr))",
-    },
   },
   keyFact: {
     boxSizing: "border-box",
     minWidth: 0,
-    flex: "1 1 0",
+    flex: "0 1 auto",
     display: "flex",
     flexDirection: "column",
-    paddingRight: space.x6,
   },
-  keyFactPhoneOdd: {
-    paddingLeft: 0,
-  },
-  keyFactPhoneEven: {
-    paddingLeft: { default: 0, [PHONE]: space.x6 },
-  },
+  // DESIGN.md: phones show key fact values only, on one line. Values such as
+  // 46% or Single Malt read on their own, and the header leaves room for the
+  // page. Labels stay for screen readers.
   keyFactLabel: {
     order: 2,
-    marginTop: "6px",
+    position: { default: "static", [PHONE]: "absolute" },
+    width: { default: "auto", [PHONE]: "1px" },
+    height: { default: "auto", [PHONE]: "1px" },
+    marginTop: { default: "6px", [PHONE]: 0 },
     overflow: "hidden",
+    clipPath: { default: "none", [PHONE]: "inset(50%)" },
     color: colors.inkMuted,
     textOverflow: "ellipsis",
     whiteSpace: "nowrap",
@@ -166,7 +140,7 @@ const styles = stylex.create({
     margin: 0,
     color: colors.ink,
     fontFamily: fonts.display,
-    fontSize: "28px",
+    fontSize: { default: "28px", [PHONE]: "18px" },
     fontVariantNumeric: "tabular-nums",
     fontWeight: 700,
     letterSpacing: "-0.035em",
@@ -174,16 +148,7 @@ const styles = stylex.create({
     textOverflow: "ellipsis",
     whiteSpace: "nowrap",
   },
+  keyFactValueText: {
+    fontSize: { default: "28px", [PHONE]: "18px" },
+  },
 });
-const keyFactsColumnStyles = {
-  1: styles.keyFactsOne,
-  2: styles.keyFactsTwo,
-  3: styles.keyFactsThree,
-  4: styles.keyFactsFour,
-} satisfies Record<KeyFactList["length"], stylex.StyleXStyles>;
-function getKeyFactsColumnStyle(factCount: number) {
-  if (factCount === 1) return keyFactsColumnStyles[1];
-  if (factCount === 2) return keyFactsColumnStyles[2];
-  if (factCount === 3) return keyFactsColumnStyles[3];
-  return keyFactsColumnStyles[4];
-}

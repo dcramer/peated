@@ -82,6 +82,16 @@ export function coerceActivityDate(value: Date | string) {
 }
 
 /**
+ * Binds a date for comparison with a `timestamp` column, which stores UTC.
+ *
+ * A raw `Date` in a `sql` template is sent in the Node process time zone, and
+ * PostgreSQL drops that offset when casting to `timestamp`.
+ */
+export function utcTimestamp(value: Date) {
+  return sql`${value.toISOString()}::timestamp`;
+}
+
+/**
  * Returns per-source offsets for a logical feed page while keeping secondary
  * collection groups capped whenever primary tasting or review activity exists.
  */
@@ -239,7 +249,7 @@ function markedTastingsSql({
       INNER JOIN ${users} ON ${users.id} = ${tastings.createdById}
       WHERE ${userCondition}
         AND ${tastings.removedAt} IS NULL
-        AND ${tastings.createdAt} <= ${snapshotAt}
+        AND ${tastings.createdAt} <= ${utcTimestamp(snapshotAt)}
     ) ordered_tastings
   `;
 }
@@ -277,7 +287,7 @@ function markedCollectionAdditionsSql({
         ON ${collections.id} = ${collectionBottles.collectionId}
       INNER JOIN ${users} ON ${users.id} = ${collections.createdById}
       WHERE ${userCondition}
-        AND ${collectionBottles.createdAt} <= ${snapshotAt.toISOString()}::timestamp
+        AND ${collectionBottles.createdAt} <= ${utcTimestamp(snapshotAt)}
     ) ordered_additions
   `;
 }
@@ -405,9 +415,9 @@ export async function countPrimaryActivity({
           ON ${externalReviewPublications.externalSiteId} = ${externalReviewArticles.externalSiteId}
         WHERE ${visibleExternalReviewWhere()}
           AND ${externalReviews.bottleId} IS NOT NULL
-          AND ${externalReviews.createdAt} <= ${snapshotAt}
+          AND ${externalReviews.createdAt} <= ${utcTimestamp(snapshotAt)}
           AND ${externalReviewArticles.publishedAt} IS NOT NULL
-          AND ${externalReviewArticles.publishedAt} <= ${snapshotAt}
+          AND ${externalReviewArticles.publishedAt} <= ${utcTimestamp(snapshotAt)}
       )`
     : sql``;
   const result = await db.execute<{ count: string }>(sql`
@@ -417,7 +427,7 @@ export async function countPrimaryActivity({
     ) + (
       SELECT COUNT(*) FROM ${memberReviews}
       INNER JOIN ${users} ON ${users.id} = ${memberReviews.createdById}
-      WHERE ${userCondition} AND ${memberReviews.createdAt} <= ${snapshotAt}
+      WHERE ${userCondition} AND ${memberReviews.createdAt} <= ${utcTimestamp(snapshotAt)}
         AND ${memberReviews.removedAt} IS NULL
     ) ${criticReviewCount} AS count
   `);
@@ -524,7 +534,7 @@ export async function getPrimaryActivity({
         ARRAY[]::bigint[] AS tasting_ids
       FROM ${memberReviews}
       INNER JOIN ${users} ON ${users.id} = ${memberReviews.createdById}
-      WHERE ${userCondition} AND ${memberReviews.createdAt} <= ${snapshotAt}
+      WHERE ${userCondition} AND ${memberReviews.createdAt} <= ${utcTimestamp(snapshotAt)}
         AND ${memberReviews.removedAt} IS NULL
       ${
         includeCriticReviews
@@ -542,9 +552,9 @@ export async function getPrimaryActivity({
               ON ${externalReviewPublications.externalSiteId} = ${externalReviewArticles.externalSiteId}
             WHERE ${visibleExternalReviewWhere()}
               AND ${externalReviews.bottleId} IS NOT NULL
-              AND ${externalReviews.createdAt} <= ${snapshotAt}
+              AND ${externalReviews.createdAt} <= ${utcTimestamp(snapshotAt)}
               AND ${externalReviewArticles.publishedAt} IS NOT NULL
-              AND ${externalReviewArticles.publishedAt} <= ${snapshotAt}
+              AND ${externalReviewArticles.publishedAt} <= ${utcTimestamp(snapshotAt)}
           `
           : sql``
       }

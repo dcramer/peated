@@ -271,6 +271,9 @@ export async function runWorker() {
     scheduledJob("0 * * * *", "cleanup-pending-uploads", async () => {
       await runJob("CleanupPendingUploads");
     });
+    scheduledJob("3 * * * *", "cleanup-wrong-photo-match-photos", async () => {
+      await runJob("CleanupWrongPhotoMatchPhotos");
+    });
     scheduledJob("7 * * * *", "process-account-deletions", async () => {
       await runJob("ProcessAccountDeletions");
     });

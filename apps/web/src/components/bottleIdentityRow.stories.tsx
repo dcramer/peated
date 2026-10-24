@@ -72,7 +72,7 @@ const meta = {
 | Variant | Use | Content |
 | --- | --- | --- |
 | standard (default) | Catalog, tastings, reviews, and selection | Name, provenance, and release facts; 48 × 64px thumbnail (42 × 58px on mobile). |
-| activity | Community feed tastings and reviews | Top-aligned identity with a framed 96px square in wide feed columns, the usual 48 × 64px frame in a desktop sidebar, and 42 × 58px on mobile. Personal-photo thumbnails cover the frame; catalog images contain the full bottle. |
+| activity | Community feed tastings and reviews | Top-aligned identity with a framed 96px square in wide feed columns, the usual 48 × 64px frame in a desktop sidebar, and 42 × 58px on mobile, centered on the three identity lines. Personal-photo thumbnails cover the frame; catalog images contain the full bottle. |
 | search | Typeahead results | Standard identity and thumbnail, 15px compact title, and 8px vertical padding. |
 | sidebar | Sidebar bottle lists | 15px title limited to two lines, 32 × 46px thumbnail, and trailing content below the identity. |
 | compact | Single or grouped library additions | One regular-weight name line, 24 × 32px thumbnail, and a 44px hit area. |
@@ -99,19 +99,33 @@ export const Overview: Story = {
           align="start"
           href="/bottles/19936"
           imageUrl={BottleImage.src}
-          metadata={["2026 release", "10 years", "50% ABV"]}
+          metadata={["2026 release", "10 years", "50%"]}
           name="SMWS Highland peaty potion"
-          subtitle="Highland · Single Malt"
+          provenance={[{ name: "Ardmore" }]}
         />
       </ItemListItem>
       <ItemListItem>
         <BottleIdentityRow
-          provenance={[{ name: "Single Malt" }]}
           href="/bottles/42"
           imageUrl={null}
-          metadata={["16 years", "43.0% ABV", "Distillers Edition"]}
+          metadata={["16 years", "43%", "Distillers Edition"]}
           name="Lagavulin 16-year-old"
           relatedReleases={{ count: 3, href: "/bottles/42/releases" }}
+        />
+      </ItemListItem>
+      <ItemListItem>
+        <BottleIdentityRow
+          provenance={[
+            {
+              name: "Private Collection",
+              href: "/series/1088-gordon-and-mac-phail-private-collection",
+            },
+            { name: "Benromach", href: "/distillers/128-benromach" },
+          ]}
+          href="/bottles/67888"
+          imageUrl={null}
+          metadata={["40 years", "59.9%"]}
+          name="Gordon & MacPhail Benromach 1982"
         />
       </ItemListItem>
       <ItemListItem>
@@ -138,10 +152,9 @@ export const Overview: Story = {
       </ItemListItem>
       <ItemListItem>
         <BottleIdentityRow
-          provenance={[{ name: "Single Malt" }]}
           href="/bottles/18481"
           imageUrl={null}
-          metadata={["61.5% ABV", "2024 release", "Islay barley"]}
+          metadata={["61.5%", "2024 release", "Islay barley"]}
           name="Bruichladdich Octomore Edition 15.3 Islay Barley Super Heavily Peated"
         />
       </ItemListItem>
@@ -181,7 +194,7 @@ export const RowLayouts: Story = {
     docs: {
       description: {
         story:
-          "Compare the actual bottle, sidebar, activity, tasting, search, selection, and loading components at wide and phone widths. Standard rows use three identity lines and a medium thumbnail; activity makes that image larger in wide feed columns. Sidebars use a small thumbnail, compact two-line titles, and trailing details below the identity. Compact library additions use the extra-small thumbnail.",
+          "Compare the actual bottle, sidebar, activity, tasting, search, selection, and loading components at wide and phone widths. Standard rows use three identity lines and a medium thumbnail; activity makes that image larger in wide feed columns. Sidebars use a small thumbnail, compact two-line titles, and trailing details below the identity. Compact library additions use the extra-small thumbnail. Release facts wrap between facts, so ABV is never cut off; tasting drafts also let their status wrap.",
       },
     },
   },
@@ -202,6 +215,18 @@ export const RowLayouts: Story = {
               },
               { name: "Blended Malt" },
             ]}
+          />
+        </section>
+        <section aria-label="Tasting draft">
+          <SectionHeading level={3}>Tasting draft</SectionHeading>
+          <BottleIdentityRow
+            href="/drafts/example"
+            imageUrl={null}
+            metadata={[
+              "New to Peated: Pappy Van Winkle's Family Reserve 15-year-old",
+            ]}
+            name="Oct 18, 2026"
+            wrapDetails
           />
         </section>
         <section aria-label="Library addition">
@@ -237,6 +262,7 @@ export const RowLayouts: Story = {
                 action: "published a review",
                 kind: "critic_review",
                 date: "2026-08-24T12:00:00.000Z",
+                postedAt: "2026-08-24T12:00:00.000Z",
                 id: "review",
                 bottles: [
                   {
@@ -252,6 +278,7 @@ export const RowLayouts: Story = {
                 action: "tasted",
                 kind: "tasting",
                 date: "2026-08-24T12:00:00.000Z",
+                postedAt: "2026-08-24T12:00:00.000Z",
                 id: "tasting",
                 bottles: [
                   {
@@ -288,8 +315,7 @@ export const RowLayouts: Story = {
                   {
                     href: "/bottles/18481",
                     bottle: {
-                      provenance: [{ name: "Single Malt" }],
-                      metadata: ["61.5% ABV", "2024 release"],
+                      metadata: ["61.5%", "2024 release"],
                     },
                     id: "search-long-name",
                     title:

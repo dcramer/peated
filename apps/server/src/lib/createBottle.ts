@@ -29,6 +29,10 @@ import {
 import { getPeatedSystemActor, getUserActor } from "@peated/server/lib/actors";
 import { processSeries } from "@peated/server/lib/bottleHelpers";
 import {
+  getEditionCaskNumberProblem,
+  getSameTitleProblem,
+} from "@peated/server/lib/bottleNamingRules";
+import {
   getBottleSeriesMemberships,
   updateBottleSeriesReleaseCounts,
 } from "@peated/server/lib/bottleSeriesReleaseCounts";
@@ -55,11 +59,12 @@ import { bottleNormalize } from "@peated/server/orpc/routes/bottles/validation";
 import type { BottleInputSchema } from "@peated/server/schemas";
 import type { BottlePreviewResult } from "@peated/server/types";
 import { pushUniqueJob } from "@peated/server/worker/dispatch";
-import { and, eq, sql } from "drizzle-orm";
+import { eq, sql } from "drizzle-orm";
 import type { z } from "zod";
 import {
   findConflictingSmwsBottleId,
   getSmwsCodeForBottleIdentity,
+  matchesBottleStructuredIdentity,
 } from "./bottleConflicts";
 import { materializeBottleIdentity } from "./bottleIdentity";
 import {
@@ -94,7 +99,6 @@ export class BottleAlreadyExistsError extends Error {
 type PersistedBottleResult = {
   bottle: Bottle;
   newEntityIds: number[];
-  seriesCreated: boolean;
 };
 
 type PreparedBottleCreate = {
@@ -103,7 +107,6 @@ type PreparedBottleCreate = {
   createdByActorId: number;
   distillerIds: number[];
   newEntityIds: number[];
-  seriesCreated: boolean;
   groupFullName: string;
   groupName: string;
 };
@@ -240,8 +243,12 @@ async function prepareBottleCreateInTransaction(
     );
   }
 
+  const editionProblem = getEditionCaskNumberProblem(bottleData);
+  if (editionProblem) {
+    throw new BottleCreateBadRequestError(editionProblem);
+  }
+
   const newEntityIds: Set<number> = new Set();
-  let seriesCreated = false;
 
   const attemptedSmwsIdentity = {
     name: bottleData.name,
@@ -298,7 +305,7 @@ async function prepareBottleCreateInTransaction(
 
   let seriesId: number | null = null;
   if (input.series) {
-    [seriesId, seriesCreated] = await processSeries({
+    seriesId = await processSeries({
       series: input.series,
       brand,
       createdByActorId: actorId,
@@ -359,6 +366,20 @@ async function prepareBottleCreateInTransaction(
       name: `${brand.shortName || brand.name} ${bottleData.name}`,
     });
 
+  const sameTitleProblem = await getSameTitleProblem(tx, {
+    brandId: brand.id,
+    seriesId,
+    titleFullName: groupFullName,
+    edition: bottleData.edition ?? null,
+    vintageYear: bottleData.vintageYear ?? null,
+    statedAge: bottleName
+      ? bottleName.statedAge
+      : (bottleData.statedAge ?? null),
+  });
+  if (sameTitleProblem) {
+    throw new BottleCreateBadRequestError(sameTitleProblem);
+  }
+
   const bottleInsertData: NewBottle = {
     ...bottleData,
     name: bottleName?.name ?? bottleData.name,
@@ -380,7 +401,6 @@ async function prepareBottleCreateInTransaction(
     createdByActorId: actorId,
     distillerIds,
     newEntityIds: Array.from(newEntityIds),
-    seriesCreated,
     groupFullName,
     groupName,
   };
@@ -399,26 +419,7 @@ async function findExactBottleIdentityInTransaction(
   const [existing] = await tx
     .select({ id: bottles.id })
     .from(bottles)
-    .where(
-      and(
-        eq(bottles.brandId, bottle.brandId),
-        eq(sql`LOWER(${bottles.fullName})`, bottle.fullName.toLowerCase()),
-        sql`${bottles.seriesId} IS NOT DISTINCT FROM ${bottle.seriesId ?? null}`,
-        sql`${bottles.edition} IS NOT DISTINCT FROM ${bottle.edition ?? null}`,
-        sql`${bottles.statedAge} IS NOT DISTINCT FROM ${bottle.statedAge ?? null}`,
-        sql`${bottles.noAgeStatement} IS NOT DISTINCT FROM ${bottle.noAgeStatement ?? null}`,
-        sql`${bottles.vintageYear} IS NOT DISTINCT FROM ${bottle.vintageYear ?? null}`,
-        sql`${bottles.bottlingYear} IS NOT DISTINCT FROM ${bottle.bottlingYear ?? null}`,
-        sql`${bottles.releaseYear} IS NOT DISTINCT FROM ${bottle.releaseYear ?? null}`,
-        sql`${bottles.releaseMonth} IS NOT DISTINCT FROM ${bottle.releaseMonth ?? null}`,
-        sql`${bottles.releaseDay} IS NOT DISTINCT FROM ${bottle.releaseDay ?? null}`,
-        sql`${bottles.abv} IS NOT DISTINCT FROM ${bottle.abv ?? null}`,
-        sql`${bottles.singleCask} IS NOT DISTINCT FROM ${bottle.singleCask ?? null}`,
-        sql`${bottles.caskStrength} IS NOT DISTINCT FROM ${bottle.caskStrength ?? null}`,
-        sql`${bottles.caskNumber} IS NOT DISTINCT FROM ${bottle.caskNumber ?? null}`,
-        sql`${bottles.outturn} IS NOT DISTINCT FROM ${bottle.outturn ?? null}`,
-      ),
-    )
+    .where(matchesBottleStructuredIdentity(bottle))
     .orderBy(bottles.id)
     .limit(1);
   return existing?.id ?? null;
@@ -436,7 +437,6 @@ async function insertPreparedBottleInTransaction(
     createdByActorId,
     distillerIds,
     newEntityIds,
-    seriesCreated,
   } = prepared;
 
   const [bottle] = await tx
@@ -475,7 +475,6 @@ async function insertPreparedBottleInTransaction(
   return {
     bottle,
     newEntityIds,
-    seriesCreated,
   };
 }
 
@@ -733,7 +732,7 @@ export async function createOrReuseBottleInTransaction(
 
 /** Dispatches unique, best-effort work only after the Bottle transaction commits. */
 export async function finalizeCreatedBottle(
-  { bottle, seriesCreated, newEntityIds }: BottleCreateResult,
+  { bottle, newEntityIds }: BottleCreateResult,
   {
     creationSource = "manual_entry",
     generateDetails = true,
@@ -766,23 +765,6 @@ export async function finalizeCreatedBottle(
         id: bottle.id,
       },
     });
-  }
-
-  if (bottle.seriesId && seriesCreated) {
-    try {
-      await pushUniqueJob("IndexBottleSeriesSearch", {
-        seriesId: bottle.seriesId,
-      });
-    } catch (err) {
-      logError(err, {
-        bottle: {
-          id: bottle.id,
-        },
-        series: {
-          id: bottle.seriesId,
-        },
-      });
-    }
   }
 
   for (const entityId of newEntityIds) {

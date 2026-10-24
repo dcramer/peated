@@ -1,10 +1,15 @@
 import { bottleHrefSelector } from "./assertions";
-import { existingBottle, testAccessToken, testUser } from "./rpc-fixtures.mjs";
+import {
+  existingBottle,
+  testAccessToken,
+  testBrand,
+  testUser,
+} from "./rpc-fixtures.mjs";
 import { signIn } from "./session";
 import { expect, type Page, test, type TestInfo } from "./test";
 
 test.describe("profile Library", () => {
-  test("saves a Bottle and updates its status", async ({
+  test("saves a Bottle, updates its status, and removes it", async ({
     context,
     page,
   }, testInfo) => {
@@ -20,10 +25,16 @@ test.describe("profile Library", () => {
 
     await expect(bottle.getByText("Sealed")).toBeVisible();
     await page.reload();
-    await expect(libraryBottleRow(page).getByText("Sealed")).toBeVisible();
+    const savedBottle = libraryBottleRow(page);
+    await expect(savedBottle.getByText("Sealed")).toBeVisible();
+
+    await savedBottle.getByRole("button", { name: /^Actions for / }).click();
+    await page.getByRole("menuitem", { name: "Remove from library" }).click();
+
+    await expect(savedBottle).toHaveCount(0);
   });
 
-  test("sorts the Library and keeps its Bottle results", async ({
+  test("sorts the Library and filters it by a suggested producer", async ({
     context,
     page,
   }, testInfo) => {
@@ -41,23 +52,22 @@ test.describe("profile Library", () => {
     );
     await expect(sort).toHaveValue("-created");
     await expect(libraryBottleLink(page)).toBeVisible();
-  });
 
-  test("removes a Bottle from the owner's Library", async ({
-    context,
-    page,
-  }, testInfo) => {
-    await signIn(context, {
-      accessToken: uniqueAccessToken(testInfo, "library-remove"),
-    });
-    await addBottleToLibrary(page);
-    await page.goto(`/users/${testUser.username}/library`);
+    const search = page
+      .getByRole("searchbox", { name: "Find in this library" })
+      .filter({ visible: true });
+    await search.fill(testBrand.name.slice(0, 4));
+    await expect(
+      page
+        .getByRole("region", { name: "Search results" })
+        .getByRole("link", { name: testBrand.name, exact: true }),
+    ).toBeVisible();
+    await search.press("Enter");
 
-    const bottle = libraryBottleRow(page);
-    await bottle.getByRole("button", { name: /^Actions for / }).click();
-    await page.getByRole("menuitem", { name: "Remove from library" }).click();
-
-    await expect(bottle).toHaveCount(0);
+    await expect(page).toHaveURL(
+      `/users/${testUser.username}/library?sort=-created&entity=${testBrand.id}`,
+    );
+    await expect(libraryBottleLink(page)).toBeVisible();
   });
 });
 

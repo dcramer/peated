@@ -1,4 +1,4 @@
-import { withSentryConfig } from "@sentry/nextjs";
+import { withSentryConfig } from "@sentry/nextjs/config";
 import withStylexTurbopack from "@stylexswc/nextjs-plugin/turbopack";
 import { createRequire } from "node:module";
 

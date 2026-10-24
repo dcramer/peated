@@ -22,6 +22,18 @@
     "deny": []
   },
   "hooks": {
+    "SessionStart": [
+      {
+        "matcher": "startup",
+        "hooks": [
+          {
+            "type": "command",
+            "command": "cd \"$CLAUDE_PROJECT_DIR\" && { sed '1,/^---$/d' pnpm-lock.yaml | cmp -s - node_modules/.pnpm/lock.yaml || SKIP_INSTALL_SIMPLE_GIT_HOOKS=1 pnpm run setup:local >&2; }",
+            "timeout": 600
+          }
+        ]
+      }
+    ],
     "UserPromptSubmit": [
       {
         "matcher": "*",

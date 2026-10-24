@@ -1,13 +1,12 @@
 "use client";
 
 import { isORPCClientError } from "@peated/orpc/client/errors";
-import { Button } from "@peated/web/components/button.stylex";
 import {
-  FormDetails,
   FormNotice,
   FormStack,
 } from "@peated/web/components/formLayout.stylex";
 import { WorkflowScreen } from "@peated/web/components/workflowScreen.stylex";
+import { shrinkPhotoForUpload } from "@peated/web/lib/blobs";
 import { logError, logInfo } from "@peated/web/lib/log";
 import { useORPC } from "@peated/web/lib/orpc/context";
 import {
@@ -15,34 +14,39 @@ import {
   isORPCAccountRedirectError,
   type ORPCResponseTraceContext,
 } from "@peated/web/lib/orpc/link";
+import { saveWrongPhotoMatchPick } from "@peated/web/lib/wrongPhotoMatches";
 import { useMutation } from "@tanstack/react-query";
 import { useEffect, useRef, useState, type ChangeEvent } from "react";
 
 import {
+  applyPhotoProgress,
   createIdempotencyKey,
+  EMPTY_PHOTO_PROGRESS,
   getCreateBottlePrefill,
   getCreateDecision,
   getCreateNameSeed,
-  getCreateProposalLabel,
-  getManualResultCopy,
+  getFallbackReason,
   getMatchedBottle,
   getProposedName,
   getSearchSeed,
+  SLOW_PHOTO_IDENTIFICATION_MS,
   type PhotoIdentification,
   type PhotoIdentificationCreateInput,
+  type PhotoIdentificationProgressEvent,
+  type PhotoMatchCandidate,
+  type PhotoProgress,
 } from "./helpers";
 import { BottleResolverColumn } from "./layout.stylex";
 import {
-  FallbackActions,
+  getPhotoFailureCopyPayload,
   getPhotoIdentificationCopyPayload,
   PhotoIdentificationTraceFootnote,
   type PhotoFailureTrace,
 } from "./panels";
 import {
+  PhotoFallbackState,
   PhotoLoadingState,
-  PhotoMatchCreateState,
-  PhotoNoMatchState,
-  PhotoReadFailureState,
+  PhotoMatchState,
   PhotoUploadState,
 } from "./states";
 import type {
@@ -62,6 +66,33 @@ export type {
   PendingImageRef,
 } from "./types";
 
+/** Shortest time a classifier step stays on screen, so quick tool calls don't flicker. */
+const MINIMUM_STEP_MS = 1200;
+
+/**
+ * Holds each value for at least `minimumMs` before showing the next one. A
+ * cleared value (null), such as a new photo starting, shows at once.
+ */
+function useSteadyValue<T>(value: T | null, minimumMs: number): T | null {
+  const [shown, setShown] = useState(value);
+  const shownAtRef = useRef(0);
+
+  useEffect(() => {
+    if (Object.is(value, shown)) return;
+    const wait =
+      value === null
+        ? 0
+        : Math.max(0, shownAtRef.current + minimumMs - Date.now());
+    const timer = setTimeout(() => {
+      shownAtRef.current = Date.now();
+      setShown(value);
+    }, wait);
+    return () => clearTimeout(timer);
+  }, [value, shown, minimumMs]);
+
+  return shown;
+}
+
 export default function BottleResolver({
   onResolve,
   searchHrefForQuery,
@@ -70,8 +101,6 @@ export default function BottleResolver({
   search,
   renderMatchedResultActions,
   renderCreateProposalActions,
-  createProposalActionLabel = "Continue",
-  searchActionLabel = "Search bottles",
 }: BottleResolverProps) {
   const orpc = useORPC();
   const photoRequestRef = useRef<AbortController | null>(null);
@@ -83,6 +112,11 @@ export default function BottleResolver({
   const [photoResult, setPhotoResult] = useState<PhotoIdentification | null>(
     null,
   );
+  const [photoProgress, setPhotoProgress] = useState<PhotoProgress | null>(
+    null,
+  );
+  const [photoSlow, setPhotoSlow] = useState(false);
+  const [pickingBottleId, setPickingBottleId] = useState<number | null>(null);
   const [photoIdentificationTraceId, setPhotoIdentificationTraceId] = useState<
     string | null
   >(null);
@@ -98,29 +132,52 @@ export default function BottleResolver({
     imageUrl: string | null;
     loading: boolean;
   } | null>(null);
+  // Set once the member says the matched Bottle is not theirs. `id` is null
+  // when the report could not be saved; search still works without it.
+  const [wrongMatch, setWrongMatch] = useState<{ id: number | null } | null>(
+    null,
+  );
+  const [reportingWrongMatch, setReportingWrongMatch] = useState(false);
 
   const photoIdentificationMutation = useMutation({
     retry: false,
     mutationFn: async ({
       responseTraceContext,
       signal,
+      onProgress,
       ...input
     }: {
       file: File;
       idempotencyKey: string;
       responseTraceContext: ORPCResponseTraceContext;
       signal: AbortSignal;
+      onProgress: (event: PhotoIdentificationProgressEvent) => void;
     }) => {
-      return orpc.tastings.photoIdentification.call(input, {
+      const stream = await orpc.tastings.photoIdentification.call(input, {
         context: { responseTraceContext },
         signal,
       });
+      while (true) {
+        const step = await stream.next();
+        if (step.done) return step.value;
+        onProgress(step.value);
+      }
     },
   });
   const photoIdentificationCreateMutation = useMutation(
     orpc.tastings.photoIdentificationCreate.mutationOptions(),
   );
-  const isIdentifying = photoIdentificationMutation.isPending;
+  const wrongPhotoMatchCreateMutation = useMutation(
+    orpc.wrongPhotoMatches.create.mutationOptions(),
+  );
+  // True from choosing a photo until its lookup ends or the member stops it.
+  // It covers shrinking the photo before the upload starts, so the resolver
+  // never shows an empty screen.
+  const [isIdentifying, setIsIdentifying] = useState(false);
+  const steadyStep = useSteadyValue(
+    photoProgress?.step ?? null,
+    MINIMUM_STEP_MS,
+  );
 
   useEffect(() => {
     previewUrlRef.current = previewUrl;
@@ -164,9 +221,11 @@ export default function BottleResolver({
     await onResolve(
       {
         ...bottle,
-        pendingImage: photoResult?.pendingImage ?? null,
+        pendingImage:
+          photoResult?.pendingImage ?? photoProgress?.pendingImage ?? null,
         previewUrl: currentPreviewUrl,
         photoTrace,
+        wrongPhotoMatchId: wrongMatch?.id ?? null,
       },
       action,
     );
@@ -253,6 +312,27 @@ export default function BottleResolver({
     }
   }
 
+  async function reportWrongMatch(result: PhotoIdentification) {
+    setReportingWrongMatch(true);
+    let id: number | null = null;
+    try {
+      if (result.wrongMatchToken) {
+        const created = await wrongPhotoMatchCreateMutation.mutateAsync({
+          token: result.wrongMatchToken,
+          traceId: photoIdentificationTraceId,
+        });
+        id = created.id;
+      }
+    } catch (err) {
+      if (isORPCAccountRedirectError(err)) return;
+      // The member can still find their bottle; only the report is lost.
+      logError(err);
+    } finally {
+      setReportingWrongMatch(false);
+    }
+    setWrongMatch({ id });
+  }
+
   async function identifyPhoto(file: File) {
     photoRequestRef.current?.abort();
     const controller = new AbortController();
@@ -262,16 +342,24 @@ export default function BottleResolver({
     let timedOut = false;
     let errorCode: string | null = null;
     let suggestedNextStep: string | null = null;
-    // Stop waiting after two minutes, including the upload and bottle lookup.
+    let uploadSize: number | null = null;
+    // Stop waiting after 10 minutes, including the upload and bottle lookup.
     const timeout = setTimeout(() => {
       timedOut = true;
       controller.abort();
-    }, 120_000);
+    }, 600_000);
+    const slowTimeout = setTimeout(() => {
+      if (photoRequestRef.current === controller) setPhotoSlow(true);
+    }, SLOW_PHOTO_IDENTIFICATION_MS);
     setError(null);
     setPhotoError(null);
     setPhotoResult(null);
+    setPhotoProgress(EMPTY_PHOTO_PROGRESS);
+    setPhotoSlow(false);
     setPhotoIdentificationTraceId(null);
     setPhotoFailureTrace(null);
+    setWrongMatch(null);
+    setIsIdentifying(true);
 
     const nextPreviewUrl = URL.createObjectURL(file);
     replacePreviewUrl(nextPreviewUrl);
@@ -286,11 +374,19 @@ export default function BottleResolver({
       },
     });
     try {
+      const upload = await shrinkPhotoForUpload(file, 1600);
+      uploadSize = upload.size;
       const result = await photoIdentificationMutation.mutateAsync({
-        file,
+        file: upload,
         idempotencyKey,
         responseTraceContext,
         signal: controller.signal,
+        onProgress: (event) => {
+          if (photoRequestRef.current !== controller) return;
+          setPhotoProgress((progress) =>
+            applyPhotoProgress(progress ?? EMPTY_PHOTO_PROGRESS, event),
+          );
+        },
       });
       if (photoRequestRef.current !== controller) {
         outcome = "cancelled";
@@ -340,8 +436,11 @@ export default function BottleResolver({
       }
     } finally {
       clearTimeout(timeout);
-      if (photoRequestRef.current === controller)
+      clearTimeout(slowTimeout);
+      if (photoRequestRef.current === controller) {
         photoRequestRef.current = null;
+        setIsIdentifying(false);
+      }
       logInfo("Bottle photo submission finished", {
         extra: {
           "photo_identification.idempotency_key": idempotencyKey,
@@ -355,6 +454,7 @@ export default function BottleResolver({
             responseTraceContext.sentryTraceId,
           "photo_identification.file_size": file.size,
           "photo_identification.file_type": file.type || "unknown",
+          "photo_identification.upload_size": uploadSize,
         },
       });
     }
@@ -367,36 +467,77 @@ export default function BottleResolver({
     event.target.value = "";
   }
 
+  /**
+   * Continues with a Bottle the member picked: a likely match while the lookup
+   * runs, which stops it, or a suggestion, which is saved on any wrong-match
+   * report.
+   */
+  async function pickBottle(bottle: PhotoMatchCandidate) {
+    photoRequestRef.current?.abort();
+    photoRequestRef.current = null;
+    setIsIdentifying(false);
+    if (wrongMatch?.id) {
+      void saveWrongPhotoMatchPick(
+        orpc.wrongPhotoMatches.update.call,
+        wrongMatch.id,
+        bottle.id,
+      );
+    }
+    setPickingBottleId(bottle.id);
+    try {
+      await loadBottle(bottle);
+    } finally {
+      setPickingBottleId(null);
+    }
+  }
+
   function startOver() {
     photoRequestRef.current?.abort();
     photoRequestRef.current = null;
-    photoIdentificationMutation.reset();
+    setIsIdentifying(false);
     setError(null);
     setPhotoError(null);
     setPhotoResult(null);
+    setPhotoProgress(null);
+    setPhotoSlow(false);
     setPhotoIdentificationTraceId(null);
     setPhotoFailureTrace(null);
     setMatchedBottleStatus(null);
+    setWrongMatch(null);
     replacePreviewUrl(null);
   }
 
   const matchedBottle = getMatchedBottle(photoResult);
   const createDecision = getCreateDecision(photoResult);
   const proposedName = getProposedName(photoResult);
-  const createProposalLabel = getCreateProposalLabel(photoResult);
   const defaultSearchHref = searchHrefForQuery();
-  const searchSeed = getSearchSeed(photoResult);
-  const searchHref = searchHrefForQuery(searchSeed, photoResult?.pendingImage);
-  const createBottlePrefill = getCreateBottlePrefill(photoResult);
+  // A lookup that fails mid-stream keeps what it streamed: the photo, the
+  // label facts, and the likely matches (feature doc, Fallback Screen).
+  const labelReading =
+    photoResult ??
+    (photoProgress?.imageEvidence
+      ? { imageEvidence: photoProgress.imageEvidence }
+      : null);
+  const pendingImage =
+    photoResult?.pendingImage ?? photoProgress?.pendingImage ?? null;
+  const wrongMatchId = wrongMatch?.id ?? null;
+  const searchHref = searchHrefForQuery(
+    getSearchSeed(labelReading),
+    pendingImage,
+    wrongMatchId,
+  );
   const createBottleHref =
-    photoResult && createBottleHrefForResult
-      ? createBottleHrefForResult(
-          getCreateNameSeed(photoResult),
-          createBottlePrefill,
-          photoResult.pendingImage,
-        )
-      : null;
-  const manualResultCopy = getManualResultCopy(photoResult);
+    createBottleHrefForResult?.(
+      getCreateNameSeed(labelReading),
+      getCreateBottlePrefill(labelReading),
+      pendingImage,
+      wrongMatchId,
+    ) ?? null;
+  // The lookup's other candidates, streamed while it ran, minus the Bottle it
+  // matched (or the member rejected).
+  const suggestions = (photoProgress?.candidates ?? [])
+    .filter((bottle) => bottle.id !== matchedBottle?.id)
+    .slice(0, 3);
   const matchedBottleHasLibraryEntry =
     matchedBottleStatus && matchedBottleStatus.bottleId === matchedBottle?.id
       ? matchedBottleStatus.hasLibraryEntry
@@ -476,40 +617,57 @@ export default function BottleResolver({
         )}
 
         {!isIdentifying && previewUrl && !photoResult && photoError && (
-          <PhotoReadFailureState
-            previewUrl={previewUrl}
-            photoError={photoError}
-            searchHref={defaultSearchHref}
-            searchLabel={searchActionLabel}
-            createBottleHref={createBottleHrefForResult?.("") ?? null}
-            trace={photoFailureTrace}
-            onStartOver={startOver}
-          />
+          <>
+            <PhotoFallbackState
+              alert
+              createBottleHref={createBottleHref}
+              onPickSuggestion={(bottle) => {
+                void pickBottle(bottle);
+              }}
+              onStartOver={startOver}
+              pickingBottleId={pickingBottleId}
+              previewUrl={previewUrl}
+              reason={photoError}
+              result={labelReading}
+              searchHref={searchHref}
+              suggestions={suggestions}
+            />
+            {photoFailureTrace && (
+              <PhotoIdentificationTraceFootnote
+                traceId={photoFailureTrace.traceId}
+                copyPayload={getPhotoFailureCopyPayload(photoFailureTrace)}
+              />
+            )}
+          </>
         )}
 
-        {isIdentifying && (
+        {(isIdentifying || (photoProgress && !photoResult && !photoError)) && (
           <PhotoLoadingState
             previewUrl={previewUrl}
+            progress={{
+              ...(photoProgress ?? EMPTY_PHOTO_PROGRESS),
+              step: steadyStep,
+            }}
+            identifying={isIdentifying}
+            slow={photoSlow}
+            pickingBottleId={pickingBottleId}
             search={search}
             searchHref={defaultSearchHref}
+            onPickMatch={(bottle) => {
+              void pickBottle(bottle);
+            }}
             onStartOver={startOver}
           />
         )}
 
         {!isIdentifying && photoResult && (
           <BottleResolverColumn>
-            {matchedBottle || createDecision ? (
-              <PhotoMatchCreateState
+            {matchedBottle && !wrongMatch ? (
+              <PhotoMatchState
                 result={photoResult}
                 previewUrl={previewUrl}
                 matchedBottle={matchedBottle}
                 renderMatchedResultActions={renderMatchedResultActions}
-                renderCreateProposalActions={renderCreateProposalActions}
-                createProposalLabel={createProposalLabel}
-                hasCreateDecision={Boolean(createDecision)}
-                proposedName={proposedName}
-                createPending={photoIdentificationCreateMutation.isPending}
-                createActionLabel={createProposalActionLabel}
                 resolvingAction={resolvingAction}
                 hasLibraryEntry={matchedBottleHasLibraryEntry}
                 libraryEntryImageUrl={matchedBottleStatus?.imageUrl}
@@ -518,45 +676,46 @@ export default function BottleResolver({
                 onLoadBottle={(bottle, action) => {
                   void loadBottle(bottle, action);
                 }}
-                onAcceptCreateProposal={(result, action) => {
-                  void acceptCreateProposal(result, action);
+                reportingWrongMatch={reportingWrongMatch}
+                onWrongMatch={() => {
+                  void reportWrongMatch(photoResult);
                 }}
-                onStartOver={startOver}
               />
             ) : (
-              <PhotoNoMatchState
+              <PhotoFallbackState
                 result={photoResult}
                 previewUrl={previewUrl}
-                title={manualResultCopy.title}
-                description={manualResultCopy.description}
-                searchHref={searchHref}
-                searchLabel={searchActionLabel}
-                createBottleHref={
-                  manualResultCopy.createLabel ? createBottleHref : null
+                reason={
+                  wrongMatch
+                    ? wrongMatch.id
+                      ? "Thanks, we've noted the wrong match."
+                      : "Let's find the right one."
+                    : getFallbackReason(photoResult)
                 }
-                createBottleLabel={manualResultCopy.createLabel}
-                primaryAction={manualResultCopy.primaryAction}
+                suggestions={suggestions}
+                pickingBottleId={pickingBottleId}
+                onPickSuggestion={(bottle) => {
+                  void pickBottle(bottle);
+                }}
+                proposal={
+                  createDecision && proposedName
+                    ? {
+                        name: proposedName,
+                        actions: renderCreateProposalActions({
+                          createPending:
+                            photoIdentificationCreateMutation.isPending,
+                          resolvingAction,
+                          onResolve: (action) =>
+                            void acceptCreateProposal(photoResult, action),
+                        }),
+                      }
+                    : null
+                }
+                createBottleHref={createBottleHref}
+                searchHref={searchHref}
                 onStartOver={startOver}
               />
             )}
-            {matchedBottle ? (
-              <FormDetails compact title="Change bottle">
-                <FallbackActions
-                  searchHref={searchHref}
-                  searchLabel={searchActionLabel}
-                  createBottleHref={createBottleHref}
-                  createBottleLabel="Add a new bottle"
-                />
-                <Button onClick={startOver} variant="tonal" fullWidth>
-                  Use a different photo
-                </Button>
-              </FormDetails>
-            ) : createDecision ? (
-              <FallbackActions
-                searchHref={searchHref}
-                searchLabel={searchActionLabel}
-              />
-            ) : null}
             {photoIdentificationTraceId && (
               <PhotoIdentificationTraceFootnote
                 traceId={photoIdentificationTraceId}

@@ -379,11 +379,13 @@ describe("GET /users/:user/regions", () => {
       ...Array.from({ length: 176 }, (_, index) => ({
         bottleId: locations[0]!.bottleId,
         createdById: defaults.user.id,
+        tastedAt: new Date(createdAt + index),
         createdAt: new Date(createdAt + index),
       })),
       ...locations.slice(1).map((location, index) => ({
         bottleId: location.bottleId,
         createdById: defaults.user.id,
+        tastedAt: new Date(createdAt + 176 + index),
         createdAt: new Date(createdAt + 176 + index),
       })),
     ]);

@@ -46,8 +46,8 @@ configuration when it does not already exist. To do only that step, run:
 pnpm run setup:env
 ```
 
-`.env.local` is ignored and is copied into Codex-managed worktrees through
-`.worktreeinclude`.
+`.env.local` is ignored and is copied into Codex and Claude Code worktrees
+through `.worktreeinclude`.
 
 To work on the UI without Postgres, Redis, or sample data, run:
 
@@ -60,10 +60,13 @@ not need Postgres or Redis. Open `http://localhost:3200`. You can sign in with
 any valid email address and any password. If the UI calls an unsupported API
 route, that request returns `404`.
 
-Codex uses the same `setup:local` command when it creates a worktree. Git hooks
-are shared with the primary checkout, so the Codex environment skips installing
-them again. Codex also has buttons to run the app without the database or check
-the code.
+Codex uses the same `setup:local` command when it creates a worktree. Claude Code
+runs it when a session starts and `node_modules` does not match
+`pnpm-lock.yaml`. The first install in a new worktree takes a few minutes; later
+sessions skip it. Git hooks are shared with the primary checkout, so both skip
+installing them again. Neither creates the database or runs migrations, because
+worktrees share the local Postgres. Codex also has buttons to run the app
+without the database or check the code.
 
 Run the same code checks used before review:
 

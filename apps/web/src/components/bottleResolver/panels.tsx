@@ -1,18 +1,12 @@
-import {
-  Button,
-  ButtonLink,
-  IconButton,
-} from "@peated/web/components/button.stylex";
+import { IconButton } from "@peated/web/components/button.stylex";
 import { FactList } from "@peated/web/components/factList.stylex";
-import { FormGrid, FormNotice } from "@peated/web/components/formLayout.stylex";
+import { FormNotice } from "@peated/web/components/formLayout.stylex";
 import { copyTextToClipboard } from "@peated/web/lib/clipboard";
 import { logError } from "@peated/web/lib/log";
-import { Copy, Plus, RotateCcw, Search } from "lucide-react";
-import { type ReactNode, useState } from "react";
+import { Copy } from "lucide-react";
+import { useState } from "react";
 
 import { getFieldValue, type PhotoIdentification } from "./fieldValues";
-import { BottleResolverColumn, BottleResolverSection } from "./layout.stylex";
-import { PhotoPreview } from "./photoPreview.stylex";
 
 export type PhotoFailureTrace = {
   traceId: string;
@@ -25,7 +19,11 @@ export type PhotoFailureTrace = {
   error: string;
 };
 
-export function LabelFacts({ result }: { result: PhotoIdentification | null }) {
+export function LabelFacts({
+  result,
+}: {
+  result: Pick<PhotoIdentification, "imageEvidence"> | null;
+}) {
   const fields = [
     ["Brand", getFieldValue(result, "brand")],
     ["Name", getFieldValue(result, "expression")],
@@ -55,88 +53,6 @@ export function LabelFacts({ result }: { result: PhotoIdentification | null }) {
         ]
       }
     />
-  );
-}
-
-export function PhotoFailurePanel({
-  previewUrl,
-  title,
-  description,
-  searchHref,
-  searchLabel,
-  createBottleHref,
-  createBottleLabel = "Add a new bottle",
-  primaryAction = "search",
-  onStartOver,
-  variant,
-  children,
-}: {
-  previewUrl: string | null;
-  title: string;
-  description: string;
-  searchHref: string;
-  searchLabel: string;
-  createBottleHref?: string | null;
-  createBottleLabel?: string;
-  primaryAction?: "search" | "create";
-  onStartOver: () => void;
-  variant: "error" | "no-match";
-  children?: ReactNode;
-}) {
-  const isError = variant === "error";
-
-  return (
-    <BottleResolverColumn>
-      {previewUrl ? (
-        <PhotoPreview
-          metadata={
-            isError
-              ? "We couldn't read enough from this photo"
-              : "Details read from this photo"
-          }
-          src={previewUrl}
-          title="Label photo"
-        />
-      ) : null}
-      {isError ? <FormNotice role="alert">{description}</FormNotice> : null}
-      <BottleResolverSection
-        description={isError ? undefined : description}
-        title={title}
-      >
-        {children}
-        <FormGrid>
-          {primaryAction === "create" && createBottleHref ? (
-            <>
-              <ButtonLink fullWidth href={createBottleHref} variant="accent">
-                <Plus aria-hidden="true" size={16} />
-                {createBottleLabel}
-              </ButtonLink>
-              <ButtonLink fullWidth href={searchHref} variant="tonal">
-                <Search aria-hidden="true" size={16} />
-                {searchLabel}
-              </ButtonLink>
-            </>
-          ) : (
-            <>
-              <ButtonLink fullWidth href={searchHref} variant="accent">
-                <Search aria-hidden="true" size={16} />
-                {searchLabel}
-              </ButtonLink>
-              {createBottleHref && (
-                <ButtonLink fullWidth href={createBottleHref} variant="tonal">
-                  <Plus aria-hidden="true" size={16} />
-                  {createBottleLabel}
-                </ButtonLink>
-              )}
-            </>
-          )}
-          <Button fullWidth onClick={onStartOver} variant="tonal">
-            <RotateCcw aria-hidden="true" size={16} />
-            Start over
-          </Button>
-        </FormGrid>
-      </BottleResolverSection>
-    </BottleResolverColumn>
   );
 }
 
@@ -213,58 +129,5 @@ export function getPhotoFailureCopyPayload(trace: PhotoFailureTrace) {
     },
     null,
     2,
-  );
-}
-
-export function FallbackActions({
-  searchHref,
-  searchLabel,
-  createBottleHref,
-  createBottleLabel = "Add a new bottle",
-  title,
-  description,
-  onStartOver,
-  showStartOver = false,
-}: {
-  searchHref: string;
-  searchLabel: string;
-  createBottleHref?: string | null;
-  createBottleLabel?: string;
-  title?: string;
-  description?: string;
-  onStartOver?: () => void;
-  showStartOver?: boolean;
-}) {
-  const actions = (
-    <FormGrid>
-      <ButtonLink fullWidth href={searchHref} variant="tonal">
-        <Search aria-hidden="true" size={16} />
-        {searchLabel}
-      </ButtonLink>
-      {createBottleHref ? (
-        <ButtonLink fullWidth href={createBottleHref} variant="tonal">
-          <Plus aria-hidden="true" size={16} />
-          {createBottleLabel}
-        </ButtonLink>
-      ) : null}
-      {showStartOver && onStartOver ? (
-        <Button fullWidth onClick={onStartOver} variant="tonal">
-          <RotateCcw aria-hidden="true" size={16} />
-          Start over
-        </Button>
-      ) : null}
-    </FormGrid>
-  );
-
-  return (
-    <BottleResolverColumn>
-      {title ? (
-        <BottleResolverSection description={description} title={title}>
-          {actions}
-        </BottleResolverSection>
-      ) : (
-        actions
-      )}
-    </BottleResolverColumn>
   );
 }

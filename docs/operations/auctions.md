@@ -8,7 +8,7 @@ seconds apart. Collection follows the scraper's
 
 ## Deploying this change
 
-Apply generated migration `0310_auction_details` with the API and worker deployment.
+Apply generated migration `0321_auction_details` with the API and worker deployment.
 It adds detail-request tracking and removes the duplicate `last_seen_at` column.
 The retained `last_checked_at` stores the same listing-check time.
 

@@ -10,10 +10,7 @@ import {
 import { Button } from "@peated/web/components/button.stylex";
 import { Chip } from "@peated/web/components/chip.stylex";
 import { EmptyState } from "@peated/web/components/feedback.stylex";
-import {
-  FacetGroup,
-  FilterQuery,
-} from "@peated/web/components/filterPanel.stylex";
+import { FacetGroup } from "@peated/web/components/filterPanel.stylex";
 import { ItemList, ItemListItem } from "@peated/web/components/itemList.stylex";
 import {
   CursorPager,
@@ -123,7 +120,7 @@ export type MemberLibraryFilter = {
 export type MemberLibraryFilterGroup = {
   filters: readonly MemberLibraryFilter[];
   label: string;
-  name: "brand" | "distiller" | "status";
+  name: "brand" | "distiller" | "entity" | "status";
 };
 
 export function MemberLibraryFilters({
@@ -131,16 +128,18 @@ export function MemberLibraryFilters({
   mode,
   onChange,
   onClear,
-  onQuerySubmit,
   query,
+  search,
   total,
 }: {
   groups: readonly MemberLibraryFilterGroup[];
   mode: "mobile" | "rail";
   onChange: (name: MemberLibraryFilterGroup["name"], value: string) => void;
   onClear: () => void;
-  onQuerySubmit: (query: string) => void;
+  /** Applied search text, used to offer "Clear filters". */
   query: string;
+  /** Library search field; the route owns its queries and navigation. */
+  search: ReactNode;
   total?: number;
 }) {
   const hasFilters = Boolean(
@@ -149,13 +148,7 @@ export function MemberLibraryFilters({
   );
   const content = (
     <div {...stylex.props(styles.filterContent)}>
-      <FilterQuery
-        label="Find in this library"
-        onSubmit={onQuerySubmit}
-        placeholder="Bottle or brand"
-        query={query}
-        submitLabel="Find"
-      />
+      {search}
       {groups.map((group) => (
         <FacetGroup
           key={group.name}

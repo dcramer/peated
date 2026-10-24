@@ -1,11 +1,20 @@
-import type { Outputs } from "@peated/server/orpc/router";
+import type {
+  PhotoIdentificationProgressSchema,
+  PhotoIdentificationSchema,
+} from "@peated/server/schemas";
 import { z } from "zod";
 
-export type PhotoIdentification = Outputs["tastings"]["photoIdentification"];
+/** The full result that ends a photo identification stream. */
+export type PhotoIdentification = z.infer<typeof PhotoIdentificationSchema>;
+
+/** One progress event sent before the full result. */
+export type PhotoIdentificationProgressEvent = z.infer<
+  typeof PhotoIdentificationProgressSchema
+>;
 
 /** Formats classifier evidence without importing the server schema runtime. */
 export function getFieldValue(
-  result: PhotoIdentification | null,
+  result: Pick<PhotoIdentification, "imageEvidence"> | null,
   field: keyof PhotoIdentification["imageEvidence"]["fieldCandidates"],
 ) {
   const value = result?.imageEvidence.fieldCandidates[field]?.value;

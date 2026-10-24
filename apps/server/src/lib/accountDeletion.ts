@@ -21,10 +21,12 @@ import {
   storePriceMatchProposals,
   storePriceMatchRetryRuns,
   tastingBadgeAwards,
+  tastingDrafts,
   tastings,
   toasts,
   userBlocks,
   users,
+  wrongPhotoMatches,
   type User,
 } from "@peated/server/db/schema";
 import { getUserActorForDatabase } from "@peated/server/lib/actors";
@@ -117,8 +119,8 @@ function deletedUserFields(userId: number, deletedAt: Date) {
  * as a tombstone with its personal fields replaced, and the member's tastings
  * and reviews stay as removed rows, like moderated content. Everything else the
  * member owns (comments, toasts, collections, flights, follows, blocks,
- * badges, notifications, uploads, sign-in identities, passkeys, and OAuth
- * grants) is deleted.
+ * badges, notifications, uploads, tasting drafts, sign-in identities,
+ * passkeys, and OAuth grants) is deleted.
  *
  * Stored images are removed after the database commit. That step is
  * best-effort: a storage failure is reported and does not undo the deletion.
@@ -201,6 +203,14 @@ export async function deleteUserAccount(
       .select({ imageUrl: pendingUploads.imageUrl })
       .from(pendingUploads)
       .where(eq(pendingUploads.createdById, userId));
+    const draftRows = await tx
+      .select({ imageUrl: tastingDrafts.imageUrl })
+      .from(tastingDrafts)
+      .where(eq(tastingDrafts.createdById, userId));
+    const wrongPhotoMatchRows = await tx
+      .select({ imageUrl: wrongPhotoMatches.imageUrl })
+      .from(wrongPhotoMatches)
+      .where(eq(wrongPhotoMatches.createdById, userId));
 
     // Notifications sent to the member, sent by the member, or about the
     // member's comments and toasts.
@@ -311,6 +321,10 @@ export async function deleteUserAccount(
     await tx
       .delete(pendingUploads)
       .where(eq(pendingUploads.createdById, userId));
+    await tx.delete(tastingDrafts).where(eq(tastingDrafts.createdById, userId));
+    await tx
+      .delete(wrongPhotoMatches)
+      .where(eq(wrongPhotoMatches.createdById, userId));
     await tx.delete(identities).where(eq(identities.userId, userId));
     await tx.delete(passkeys).where(eq(passkeys.userId, userId));
     await tx
@@ -330,6 +344,12 @@ export async function deleteUserAccount(
         friends: sql`array_remove(${memberReviews.friends}, ${userId}::bigint)`,
       })
       .where(sql`${userId}::bigint = ANY(${memberReviews.friends})`);
+    await tx
+      .update(tastingDrafts)
+      .set({
+        friends: sql`array_remove(${tastingDrafts.friends}, ${userId}::bigint)`,
+      })
+      .where(sql`${userId}::bigint = ANY(${tastingDrafts.friends})`);
 
     // Staff references without a database rule for a removed member.
     await tx
@@ -381,6 +401,8 @@ export async function deleteUserAccount(
         ...reviewRows.map((row) => row.imageUrl),
         ...collectionRows.map((row) => row.imageUrl),
         ...pendingRows.map((row) => row.imageUrl),
+        ...draftRows.map((row) => row.imageUrl),
+        ...wrongPhotoMatchRows.map((row) => row.imageUrl),
       ].filter((url): url is string => Boolean(url)),
     };
   });

@@ -15,7 +15,7 @@ import TimeSince from "./timeSince";
 
 export type CommunityFeedBottle = Pick<
   BottleIdentityRowProps,
-  "provenance" | "href" | "imageFit" | "imageUrl" | "metadata" | "name"
+  "abv" | "provenance" | "href" | "imageFit" | "imageUrl" | "metadata" | "name"
 > & {
   id: string;
   description?: string;
@@ -32,7 +32,10 @@ export type CommunityFeedItem = {
   actorHref?: string;
   actorImageUrl?: string | null;
   action: string;
+  /** The time the row shows. For a tasting, when the dram was had. */
   date: string;
+  /** Orders the feed: when the entry was posted, so late posts stay recent. */
+  postedAt: string;
   href?: string;
   bottles: readonly CommunityFeedBottle[];
   destination?: { href: string; label: string };
@@ -133,6 +136,7 @@ function CommunityFeedEntry({ item }: { item: CommunityFeedItem }) {
                 variant={
                   item.kind === "collection_add" ? "compact" : "activity"
                 }
+                abv={bottle.abv}
                 provenance={bottle.provenance}
                 name={bottle.name}
                 href={bottle.href}

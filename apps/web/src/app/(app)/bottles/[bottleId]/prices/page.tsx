@@ -1,4 +1,4 @@
-import { formatBottleDisplayName } from "@peated/server/lib/bottleDisplayName";
+import { formatBottleLabel } from "@peated/server/lib/bottleDisplayName";
 import { EmptyState } from "@peated/web/components/feedback.stylex";
 import { getBottlePage } from "@peated/web/lib/bottlePage.server";
 import { parseCatalogRouteId } from "@peated/web/lib/catalogRoute";
@@ -14,7 +14,7 @@ export async function generateMetadata(props: {
 }): Promise<Metadata> {
   const { bottleId } = await props.params;
   const bottle = await getBottlePage(parseCatalogRouteId(bottleId));
-  const name = formatBottleDisplayName(bottle);
+  const name = formatBottleLabel(bottle);
   return getCatalogSeoMetadata({
     title: `${name} prices`,
     description: `Compare listed prices for ${name} on Peated.`,

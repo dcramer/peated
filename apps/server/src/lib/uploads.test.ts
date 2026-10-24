@@ -3,7 +3,11 @@ import { buffer } from "node:stream/consumers";
 import sharp from "sharp";
 import { describe, expect, test } from "vitest";
 
-import { compressAndResizeImage, getUploadImageDataUrl } from "./uploads";
+import {
+  compressAndCropSquareImage,
+  compressAndResizeImage,
+  getUploadImageDataUrl,
+} from "./uploads";
 
 function createGradientPixels(width: number, height: number) {
   const pixels = Buffer.alloc(width * height * 3);
@@ -50,6 +54,45 @@ describe("compressAndResizeImage", () => {
     expect(metadata.height).toBe(80);
     expect(metadata.orientation).toBeUndefined();
     expect(metadata.exif).toBeUndefined();
+  });
+
+  test("shrinks a portrait photo without cropping it", async () => {
+    const input = await sharp(createGradientPixels(300, 400), {
+      raw: { width: 300, height: 400, channels: 3 },
+    })
+      .jpeg()
+      .toBuffer();
+
+    const { stream } = compressAndResizeImage(
+      Readable.from(input),
+      "bottle.jpg",
+      160,
+      160,
+    );
+    const metadata = await sharp(await buffer(stream)).metadata();
+
+    expect(metadata.width).toBe(120);
+    expect(metadata.height).toBe(160);
+  });
+});
+
+describe("compressAndCropSquareImage", () => {
+  test("crops a portrait photo to a square", async () => {
+    const input = await sharp(createGradientPixels(300, 400), {
+      raw: { width: 300, height: 400, channels: 3 },
+    })
+      .jpeg()
+      .toBuffer();
+
+    const { stream } = compressAndCropSquareImage(
+      Readable.from(input),
+      "avatar.jpg",
+      100,
+    );
+    const metadata = await sharp(await buffer(stream)).metadata();
+
+    expect(metadata.width).toBe(100);
+    expect(metadata.height).toBe(100);
   });
 });
 

@@ -176,6 +176,9 @@ export const testBrand = {
   peatedId: "E9201",
   name: "Lagavulin",
   shortName: null,
+  pronunciation: null,
+  pronunciationIpa: null,
+  pronunciationAudioUrl: null,
   kind: "brand",
   status: null,
   ownerId: null,
@@ -373,9 +376,9 @@ export const exactSearchBottle = {
     id: exactSearchBottleId,
     name: "21-year-old",
   }),
-  fullName: `${testBrand.name} 21-year-old - Cask 42`,
+  fullName: `${testBrand.name} 21-year-old - Batch 42`,
   statedAge: 21,
-  edition: "Cask 42",
+  edition: "Batch 42",
   abv: 55.1,
   vintageYear: 2004,
   releaseYear: 2025,
@@ -383,7 +386,7 @@ export const exactSearchBottle = {
   caskStrength: true,
   outturn: 240,
   maturation: "Oloroso hogshead",
-  caskNumber: "#5678",
+  caskNumber: "5678",
 };
 
 export const anotherReleaseSourceBottle = {
@@ -418,7 +421,7 @@ export const unifiedBottleEditContext = {
     flavorProfile: "peated",
   },
   exact: {
-    edition: "Cask 42",
+    edition: "Batch 42",
     statedAge: 21,
     abv: 55.1,
     singleCask: true,
@@ -432,7 +435,7 @@ export const unifiedBottleEditContext = {
     releaseYear: 2023,
     releaseMonth: null,
     releaseDay: null,
-    caskNumber: "#5678",
+    caskNumber: "5678",
     maturation: "Oloroso hogshead",
     outturn: 240,
     description: "A fixture exact Bottle description.",
@@ -580,12 +583,12 @@ export const destinationBottleGroupId = 50_002;
 export const bottleGroupRepresentative = {
   ...buildBottle({
     id: 50_101,
-    name: "16-year-old Cask 42 (2022)",
+    name: "16-year-old Batch 42 (2022)",
     totalTastings: 12,
   }),
   imageUrl: bottleImageUrl,
-  fullName: "Lagavulin 16-year-old Cask 42 (2022)",
-  edition: "Cask 42",
+  fullName: "Lagavulin 16-year-old Batch 42 (2022)",
+  edition: "Batch 42",
   statedAge: 16,
   abv: 55.1,
   vintageYear: 2005,
@@ -594,7 +597,7 @@ export const bottleGroupRepresentative = {
   caskStrength: true,
   outturn: 240,
   maturation: "Oloroso hogshead",
-  caskNumber: "#5678",
+  caskNumber: "5678",
 };
 
 /** @type {CatalogFixtureBottle} */
@@ -932,6 +935,7 @@ export function buildTasting({
     comments: 0,
     toasts: 0,
     hasToasted: false,
+    tastedAt: timestamp,
     createdAt: timestamp,
     createdBy: testUser,
   };
@@ -1155,3 +1159,30 @@ export const testSeries = {
   createdAt: timestamp,
   updatedAt: timestamp,
 };
+
+const tastingDraftId = "4f6c1a52-7a0b-4d1e-9f3e-2b8c5d7e9a10";
+export const tastingDraftHint = "The smoky one from the festival";
+export const tastingDraftNotes = "Draft flow: peat smoke and lemon.";
+
+/** A draft whose photo matched an existing Bottle the member has not confirmed. */
+export function buildTastingDraft() {
+  return {
+    id: tastingDraftId,
+    tastedAt: timestamp,
+    bottleHint: tastingDraftHint,
+    bottle: null,
+    imageUrl: `${mockApiServer}/uploads/tasting-draft.png`,
+    identification: {
+      status: "done",
+      result: { action: "match", bottle: existingBottle },
+    },
+    notes: null,
+    ratingBand: null,
+    tags: [],
+    servingStyle: null,
+    color: null,
+    friends: [],
+    createdAt: timestamp,
+    updatedAt: timestamp,
+  };
+}

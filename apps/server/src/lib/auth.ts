@@ -1,3 +1,4 @@
+import { uniqueViolationConstraint } from "@peated/server/db/errors";
 import { hashSync } from "bcrypt";
 import { eq } from "drizzle-orm";
 import jsonwebtoken from "jsonwebtoken";
@@ -31,6 +32,8 @@ export const TOKEN_LIFETIME_SECONDS = {
   "email-verification": 7 * 24 * 60 * 60,
   "webauthn-challenge": 10 * 60,
   "photo-identification-create": 7 * 24 * 60 * 60,
+  // Matches the pending photo's 48-hour lifetime.
+  "wrong-photo-match": 48 * 60 * 60,
 } as const;
 
 type TokenPurpose = keyof typeof TOKEN_LIFETIME_SECONDS;
@@ -136,7 +139,7 @@ export async function createUser(
         return user;
       });
     } catch (err: any) {
-      if (err?.code === "23505" && err?.constraint === "user_username_unq") {
+      if (uniqueViolationConstraint(err) === "user_username_unq") {
         currentUsername = `${baseUsername}-${random(10000, 99999)}`;
       } else {
         throw err;

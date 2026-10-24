@@ -21,7 +21,9 @@ identity.
 
 Human-facing bottle names use `formatBottleDisplayName` from
 `apps/server/src/lib/bottleDisplayName.ts`. The formatter accepts a structured
-Bottle and returns its concise marketed identity. A caller can suppress brand
+Bottle and returns its concise marketed identity. It never includes the
+edition; what goes in `name` and `edition` is set by "Bottle Name, Edition, And
+Cask Number" in the Whisky Identity Model. A caller can suppress brand
 context only when the surrounding layout already supplies it.
 
 React components still own truncation, links, line breaks, and supporting
@@ -38,8 +40,9 @@ Bottle identity can contain the following layers:
 2. **Series**: a stable named range containing multiple expressions.
 3. **Expression**: the marketed product or expression name shared by a
    BottleGroup, when the Bottle is grouped.
-4. **Release marker**: an exact human-facing designation such as a chapter,
-   batch, act, scene, volume, edition, society code, or marketed barrel number.
+4. **Release facts**: the edition, such as a batch, a selection, or a market,
+   and the cask number. A release name people use as the title, such as a
+   chapter, an act and scene, or an SMWS code, is part of the expression.
 5. **Supporting facts**: stated age and ABV as structured fields. When the
    producer prints the age in the product name, that wording is part of the
    expression, not a supporting fact.
@@ -57,7 +60,7 @@ details or moderation view.
 
 ### Prefer marketed identity over derived descriptions
 
-Preserve wording that is part of the marketed expression or release marker.
+Preserve wording that is part of the marketed expression or edition.
 For example, `Cask Strength` remains visible when it is literally part of a
 product name. Do not separately generate `Cask strength` from the boolean flag
 as header metadata.
@@ -78,19 +81,17 @@ that present bottle identity should display it when present unless:
 
 Series must remain searchable even on surfaces that do not render it.
 
-### Separate release names from supporting release facts
+### Keep release facts beside the title
 
-A meaningful named edition is normally more recognizable than a year. Keep a
-chapter, volume, scene, or other marketed release name in the title. Put a
-numbered or coded batch beside the title as supporting metadata. Do not also
-append years by default.
+The title is the Brand, a nonduplicative Series, and the Bottle name. The
+edition and cask number are facts beside it, never inside it. A release name
+that people use as the title, such as `Chapter Thirty Two` or `Act 12 Scene 9`,
+belongs in the Bottle name, so it stays in the title.
 
-Stable wording such as `Small Batch` or `Batch Proof` remains part of the title.
-Only an exact batch marker such as `Batch 24` or `Batch C923` moves to metadata.
-
-An exact cask or barrel code is useful when it identifies the marketed release.
-The generic fact that the bottle is single-cask is not a substitute for that
-code.
+Stable wording such as `Small Batch` or `Batch Proof` is part of the name. A
+batch such as `Batch 24`, a selection such as `for La Maison du Whisky`, and a
+cask number are facts. The generic fact that the bottle is single-cask is not a
+substitute for its cask number.
 
 ### Show years only when they help identify the Bottle
 
@@ -99,7 +100,7 @@ year on a compact surface when:
 
 - the year is part of the marketed release identity;
 - the release is conventionally identified by that year; or
-- no stronger release marker exists and the year is needed to distinguish
+- no edition exists and the year is needed to distinguish
   related Bottles.
 
 When several years are stored, a compact view should normally show at most one.
@@ -124,6 +125,15 @@ ABV is the useful technical strength fact for a bottle header or metadata row.
 When ABV is visible, do not add a derived cask-strength label. Ordinary headers
 should not add that label even when ABV is unavailable.
 
+Releases often share a name and differ only in strength, so every bottle label
+shows ABV when it is known: rows, compact rows, picker and selection text, page
+and share titles, notifications, and emails. Text labels use
+`formatBottleLabel`, which writes `Lagavulin 16-year-old · 43%`. Labels built
+from a stored `fullName` use `appendAbv`. Neither repeats ABV the name already
+states. Rows show the same short `43%` or `52.2%` with their other facts; the
+percent sign makes the meaning clear without the word ABV. URL slugs keep the
+plain name so links stay stable.
+
 ### Treat category as taxonomy
 
 Category supports filtering, editing, and verification. It is not part of a
@@ -133,7 +143,7 @@ information when that helps the task.
 ### Avoid duplicate or conflicting tokens
 
 A structured field should not be repeated when equivalent wording is already
-visible in the producer, series, expression, or release marker. Deduplication is
+visible in the producer, series, expression, or edition. Deduplication is
 semantic and case-insensitive; it is not permission to strip marketed wording
 from a product name.
 
@@ -191,11 +201,21 @@ section heading, grouping label, or adjacent UI.
 Use for a bottle page or another surface where the Bottle is the primary
 subject.
 
-- Show producer context and nonduplicative series.
+- Show producer context. The title leaves out the series; it shows as the
+  first key fact instead.
 - Make the expression the primary title.
-- Show a meaningful release marker prominently.
-- Show an exact batch marker in the supporting release facts.
+- Show the edition and cask number as facts, not in the title.
 - Show stated age once and show ABV when known.
+- Put up to three key facts under the title, above the actions, in this order:
+  series, ABV, stated age, any other edition, one year (vintage, then bottling,
+  then release), a batch or cask number, then category to fill a spare slot.
+  Leave out a series, ABV, or stated age the name already prints. An edition,
+  year, batch, or cask the name already prints moves behind category, so it
+  shows only when a slot is free. Additional Details always lists the edition.
+  On phones, the key facts show their values only, on one line, because
+  values such as 46% or Single Malt read on their own; the rating sits on one
+  line above the facts, and the description preview shows
+  three lines, so the tabs stay near the top of the first screen.
 - Show a year only when it is part of, or necessary to understand, the release
   identity.
 - Do not add single-cask or cask-strength badges.
@@ -216,16 +236,28 @@ identity fields; `toBottleListItem` adds links, images, and optional list action
 and ratings.
 Do not rebuild these lines in a page-specific mapper:
 
-1. The marketed bottle name, including brand context.
-2. Distillers not already identified by the brand, followed by the category.
-3. Known release facts, stated age, and ABV.
+1. The marketed bottle name, including brand context. The series is not in
+   the name.
+2. The series, then distillers not already identified by the brand. Whisky
+   drinkers name a bottler's range before its distillery, as in
+   `Gordon & MacPhail Private Collection Benromach 1982`. Category is left out:
+   the name or distillery almost always makes it clear, and the bottle page
+   and filters still show it.
+3. Known release facts, stated age, and ABV: the edition, at most one year
+   (vintage, then release), age, and ABV. A year, age, or ABV the name already
+   prints is not repeated. This line wraps between facts instead of cutting
+   one off, so ABV stays visible on phones.
+
+Rows that hide the second line keep the series in the name instead: compact
+rows and recent tasting rows. A series page leaves the series out of its own
+rows. `getBottleIdentityProps` takes `seriesPlacement` for these cases.
 
 Missing facts do not create placeholder lines. Activity context, Library status,
 personal images, and actions belong to their owning view, not a competing bottle
 identity layout. Sidebar bottle lists use the shared sidebar variant with
 compact titles, smaller thumbnails, and trailing content below the identity.
-Recent tastings show the tasting date and rating instead of catalog facts.
-Primary page headings remain a separate display context.
+Recent tastings show the tasting date and rating instead of catalog facts,
+except ABV. Primary page headings remain a separate display context.
 
 Picker options and selected bottles also use `BottleIdentityRow`. Build them
 with `toBottlePickerOption`; it retains the numeric database ID and removes
@@ -235,10 +267,9 @@ they must not fall back to a separate name-and-metadata format.
 
 - Show enough producer, series, and expression context to recognize the Bottle
   outside its detail page.
-- Include a named release marker in the title.
-- Put an exact batch marker or optional year in secondary metadata.
-- Include age or ABV when the component's density makes them useful.
-- Do not let a year crowd out a more meaningful release marker or ABV.
+- Put the edition or an optional year in secondary metadata.
+- Include ABV when known. Include age when the component's density allows.
+- Do not let a year crowd out the edition or ABV.
 - Do not add single-cask or cask-strength labels.
 
 The component owns truncation, linking, line breaks, and which optional
@@ -250,11 +281,11 @@ Use inside prose, notifications, narrow activity items, controls, or other
 places that cannot support a metadata row.
 
 - Produce a recognizable marketed label, not a field inventory.
-- Prefer the expression plus a named release marker.
-- Omit exact batch markers when the surface has no supporting metadata.
+- Use the expression. Never include the edition.
 - Include series when it is essential to recognizing the product and is not
   already represented; secondary context may otherwise be omitted.
-- Omit ABV, general production details, and years that are not needed.
+- Keep ABV after the name when known.
+- Omit general production details and years that are not needed.
 
 ### Family-relative identity
 
@@ -263,10 +294,10 @@ producer and shared expression.
 
 - Show the smallest exact release fact that identifies the member within the
   family.
-- Prefer an explicit chapter, volume, scene, or other named edition in the
-  title. Put an exact batch marker in supporting metadata.
-- If no explicit release marker exists, use a marketed distillation, bottling,
-  or release year that distinguishes the member.
+- Show the edition, such as a batch or selection, when it distinguishes the
+  member.
+- If there is no edition, use a marketed distillation, bottling, or release
+  year that distinguishes the member.
 - Use an exact age override when it differs from the group and is the useful
   distinction.
 - ABV may be a supporting detail or the final way to distinguish Bottles when
@@ -283,7 +314,7 @@ established by the family view.
 Tables and lists may already be grouped under a brand, series, expression, or
 other heading. They may omit only the context explicitly supplied by that
 surrounding UI. For example, grouping by brand can suppress the brand label but
-does not automatically suppress a series or release marker.
+does not automatically suppress a series or edition.
 
 This is an overlay on the detailed, standard, or compact branch rather than a
 separate bottle naming scheme.
@@ -295,16 +326,21 @@ Open Graph metadata, share text, accessible labels, and some exports.
 
 - Produce a readable marketed identity rather than serializing every exact
   field.
-- Include producer, nonduplicative series, expression, and a meaningful release
-  marker.
-- Omit an exact batch marker unless the text must distinguish releases that
-  otherwise have the same name.
+- Include producer, nonduplicative series, and expression.
+- Never include the edition. `formatBottleLabel` builds this text from
+  `formatBottleDisplayName`, which leaves the edition out.
 - Include a year only when it is a necessary part of that marketed identity.
-- Omit generic single-cask and cask-strength flags and normally omit ABV.
+- Omit generic single-cask and cask-strength flags.
+- Include ABV when known.
 - Do not assume the stored `fullName` is the ideal text for every consumer.
 
+Releases that share a name get the same text, apart from ABV when their
+strengths differ. Plain text does not try to tell them apart further: each
+Bottle keeps its own page and URL, which carries its numeric ID, and the page
+header and rows show the edition as a fact.
+
 Family-level SEO uses the shared expression identity. Exact Bottle SEO uses the
-exact release identity.
+same plain-text label: brand, series, expression, and ABV.
 
 ### Verification and details
 
@@ -327,24 +363,23 @@ particular result component omits some of them visually.
 
 ## Field Matrix
 
-| Field                     | Detailed header          | Standard result   | Compact inline     | Family-relative  | Plain text        | Verification |
-| ------------------------- | ------------------------ | ----------------- | ------------------ | ---------------- | ----------------- | ------------ |
-| Brand                     | Yes                      | Usually           | Usually            | Context supplies | Yes               | Yes          |
-| Bottler                   | When distinct and useful | Optional          | Rarely             | Context supplies | When needed       | Yes          |
-| Series                    | If nonduplicative        | If nonduplicative | When essential     | Context supplies | If nonduplicative | Yes          |
-| Expression                | Primary                  | Primary           | Primary            | Context supplies | Primary           | Yes          |
-| Named edition             | Prominent                | In title          | In title           | Primary          | Yes               | Yes          |
-| Exact batch marker        | Supporting fact          | Metadata          | Rarely             | Metadata         | Conditional       | Yes          |
-| Stated age                | Once                     | Optional          | Only when integral | Exact override   | If integral       | Yes          |
-| ABV                       | Yes when known           | Optional          | No                 | Optional support | Normally no       | Yes          |
-| Distillation year         | Conditional              | Conditional       | Rarely             | When useful      | Conditional       | Yes          |
-| Bottling year             | Conditional              | Conditional       | Rarely             | When useful      | Conditional       | Yes          |
-| Release year              | Conditional              | Conditional       | Rarely             | When useful      | Conditional       | Yes          |
-| Single-cask flag          | No                       | No                | No                 | No               | No                | Yes          |
-| Cask-strength flag        | No                       | No                | No                 | No               | No                | Yes          |
-| Marketed cask/barrel code | As release marker        | As release marker | If needed          | Primary          | If needed         | Yes          |
-| Cask type/size/fill       | No                       | Normally no       | No                 | No               | No                | Yes          |
-| Category                  | No                       | Optional          | No                 | No               | No                | Yes          |
+| Field               | Detailed header          | Standard result  | Compact inline     | Family-relative  | Plain text        | Verification |
+| ------------------- | ------------------------ | ---------------- | ------------------ | ---------------- | ----------------- | ------------ |
+| Brand               | Yes                      | Usually          | Usually            | Context supplies | Yes               | Yes          |
+| Bottler             | When distinct and useful | Optional         | Rarely             | Context supplies | When needed       | Yes          |
+| Series              | First key fact           | First provenance | When essential     | Context supplies | If nonduplicative | Yes          |
+| Expression          | Primary                  | Primary          | Primary            | Context supplies | Primary           | Yes          |
+| Edition             | Key fact                 | Metadata         | No                 | Primary          | No                | Yes          |
+| Stated age          | Once                     | Optional         | Only when integral | Exact override   | If integral       | Yes          |
+| ABV                 | Yes when known           | Yes when known   | Yes when known     | Optional support | Yes when known    | Yes          |
+| Distillation year   | Conditional              | Conditional      | Rarely             | When useful      | Conditional       | Yes          |
+| Bottling year       | Conditional              | Conditional      | Rarely             | When useful      | Conditional       | Yes          |
+| Release year        | Conditional              | Conditional      | Rarely             | When useful      | Conditional       | Yes          |
+| Single-cask flag    | No                       | No               | No                 | No               | No                | Yes          |
+| Cask-strength flag  | No                       | No               | No                 | No               | No                | Yes          |
+| Cask number         | Key fact                 | No               | No                 | When useful      | No                | Yes          |
+| Cask type/size/fill | No                       | Normally no      | No                 | No               | No                | Yes          |
+| Category            | Spare key fact slot      | No               | No                 | No               | No                | Yes          |
 
 “No” for a derived flag does not remove identical wording that belongs to the
 marketed expression or edition.
@@ -354,17 +389,17 @@ marketed expression or edition.
 Examples validate these branches; they must not become named special cases in
 the implementation.
 
-| Bottle                                                | Important identity                                                              | Concise consequence                                                    |
-| ----------------------------------------------------- | ------------------------------------------------------------------------------- | ---------------------------------------------------------------------- |
-| Whiskyland Glenburgie 38-year-old, Chapter Thirty Two | `Whiskyland` is the Brand; `Chapter Thirty Two` is the release marker           | Show both; omit 1988 vintage and 2026 release from the ordinary header |
-| High West A Midwinter Night's Dram, Act 12 Scene 9    | Act and scene identify the release                                              | Prefer the edition; do not also require its release year               |
-| Elijah Craig Barrel Proof, Batch C923                 | `Barrel Proof` is marketed expression wording; the batch identifies the release | Keep the expression as the title and show the batch beside it          |
-| Four Roses Limited Edition Small Batch 2017           | The year is the annual release identity when no stronger marker exists          | Show the release year                                                  |
-| Macallan Sherry Oak 18-year-old, 1994 Vintage         | Vintage is how the producer distinguishes the release                           | Show the vintage and do not add another year label                     |
-| Willett Family Estate, Barrel 4769                    | The exact barrel code identifies the marketed release                           | Show the code; do not add `Single cask` merely from the boolean        |
-| SMWS 95.71 Prepare for Winter                         | The society code and subtitle are marketed identity                             | Preserve them; age and ABV may support the detailed header             |
-| Highland Park Cask Strength No. 5                     | `Cask Strength` belongs to the expression                                       | Keep the words in the title; do not repeat them as metadata            |
-| Pōkeno Exploration Series No. 1 Totara Cask           | Series wording is already present in the marketed expression                    | Do not repeat the series in a second visible token                     |
+| Bottle                                                | Stored identity                                                           | Concise consequence                                               |
+| ----------------------------------------------------- | ------------------------------------------------------------------------- | ----------------------------------------------------------------- |
+| Whiskyland Glenburgie 38-year-old Chapter Thirty Two  | `Chapter Thirty Two` is how people name the release, so it is in the name | Show it in the title; omit 1988 vintage and 2026 release          |
+| High West A Midwinter Night's Dram Act 12 Scene 9     | Act and scene are in the name                                             | Keep them in the title; do not also require the release year      |
+| Elijah Craig Barrel Proof, edition `Batch C923`       | `Barrel Proof` is name wording; the batch is the edition                  | Title is the expression; show the batch beside it                 |
+| G&M The Dram Takers Clynelish 1972, cask 14300        | Distillery and vintage name it; `for La Maison du Whisky` is the edition  | Title omits the selection, cask, and 37-year age; facts show them |
+| Rare Malts Clynelish 1972 22-year-old and 24-year-old | Same Brand, distillery, and vintage, so each name carries its age         | Titles stay distinct                                              |
+| Willett Family Estate Single Barrel, cask 4769        | The cask number is `caskNumber`                                           | Show the cask as a fact; do not add `Single cask` from the flag   |
+| SMWS 95.71 Prepare for Winter                         | The Society code and subtitle are the name; `95.71` is also `caskNumber`  | Preserve them; age and ABV may support the detailed header        |
+| Highland Park Cask Strength No. 5                     | `Cask Strength No. 5` is the name                                         | Keep the words in the title; do not repeat them as metadata       |
+| Pōkeno Exploration Series No. 1 Totara Cask           | Series wording is already present in the marketed expression              | Do not repeat the series in a second visible token                |
 
 ## Implementation Map
 
@@ -376,8 +411,8 @@ shared visual reference for desktop and phone layouts.
 
 | Need                        | Component                             | Responsibility                                                                                                                                                                                                                                |
 | --------------------------- | ------------------------------------- | --------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
-| One standard bottle row     | `BottleIdentityRow`                   | Full marketed name, provenance, release facts, thumbnail, and linked hit area.                                                                                                                                                                |
-| One-line library addition   | `BottleIdentityRow variant="compact"` | Same name, smaller thumbnail, and a 44px hit area; long names truncate visually.                                                                                                                                                              |
+| One standard bottle row     | `BottleIdentityRow`                   | Marketed name, series and distilleries, release facts, thumbnail, and linked hit area.                                                                                                                                                        |
+| One-line library addition   | `BottleIdentityRow variant="compact"` | Same name with ABV after it, smaller thumbnail, and a 44px hit area; long names truncate visually and keep the ABV visible.                                                                                                                   |
 | Catalog list                | `BottleList`                          | List semantics and optional ratings or row actions.                                                                                                                                                                                           |
 | Member Library              | `pages/MemberLibraryList`             | Standard bottle rows and Library actions. Personal photos cover the thumbnail; catalog bottle images remain contained.                                                                                                                        |
 | Mixed activity              | `CommunityFeed`                       | Author, action, date, grouped bottles, scores, and review links; covers real images in fixed feed thumbnails, gives missing images a neutral frame, uses the usual image size in sidebars and on mobile, and keeps library additions compact. |
@@ -400,9 +435,9 @@ const item = toBottleListItem(bottle);
 All variants accept the full marketed name, including brand context. Sidebar
 rows use compact two-line titles and smaller thumbnails, omit membership icons,
 and place trailing dates, ratings, or actions below the identity. Recent tasting
-rows show tasting dates and ratings instead of catalog provenance and facts. Compact
-rows omit provenance, metadata, subtitles, membership status, and related-release
-links. The optional `end` slot remains available. `layout="cell"` fits the identity
+rows show tasting dates and ratings instead of catalog provenance and facts,
+except ABV. Compact rows omit provenance, metadata, subtitles, membership status,
+and related-release links, but keep ABV after the name. The optional `end` slot remains available. `layout="cell"` fits the identity
 inside an existing table or selection control; it does not change content density.
 The row owns thumbnail size, so callers do not build a second image/name layout.
 
@@ -421,8 +456,8 @@ The contract is applied at the presentation site that owns each branch:
   general cask labels.
 - SEO, sharing, notifications, and other unstructured consumers use concise
   plain-text identity helpers.
-- Search-vector construction indexes series independently of whether a result
-  surface has room to display it.
+- Bottle search documents (`buildBottleSearchDocuments`) include the Series
+  even when a result surface has no room to show it.
 - Additional Details remains the complete home for years, cask flags, and cask
   details omitted from the usual Bottle display. The cask statement shows at
   most two lines; when it is cut off, the full text is available as a tooltip.

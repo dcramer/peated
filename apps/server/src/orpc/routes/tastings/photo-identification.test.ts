@@ -21,16 +21,20 @@ import {
   copyPendingImageToBottle,
   createPendingImageUpload,
 } from "@peated/server/lib/pendingUploads";
+import {
+  identifyBottlePhoto,
+  PHOTO_LOOKUP_TIME_LIMIT_MS,
+  type IdentifyBottlePhotoServices,
+  type PhotoIdentificationSpan,
+  type PhotoIdentificationStartSpan,
+} from "@peated/server/lib/photoIdentification";
 import { verifyPhotoIdentificationCreateToken } from "@peated/server/lib/photoIdentificationCreateToken";
 import waitError from "@peated/server/lib/test/waitError";
+import { verifyWrongPhotoMatchToken } from "@peated/server/lib/wrongPhotoMatchToken";
 import type { Context } from "@peated/server/orpc/context";
 import {
   createPhotoIdentificationProcedure,
-  identifyPendingImage,
-  type IdentifyPendingImageServices,
   type PhotoIdentificationProcedureServices,
-  type PhotoIdentificationSpan,
-  type PhotoIdentificationStartSpan,
 } from "@peated/server/orpc/routes/tastings/photo-identification";
 import { createPhotoIdentificationCreateProcedure } from "@peated/server/orpc/routes/tastings/photo-identification-create";
 import type { PhotoIdentificationInputSchema } from "@peated/server/schemas";
@@ -39,7 +43,7 @@ import OpenAI from "openai";
 import { afterEach, beforeEach, vi } from "vitest";
 import type { z } from "zod";
 
-type RunReference = IdentifyPendingImageServices["runReference"];
+type RunReference = IdentifyBottlePhotoServices["runReference"];
 const classifyBottleReferenceMock =
   vi.fn<
     (
@@ -47,8 +51,17 @@ const classifyBottleReferenceMock =
     ) => Promise<Awaited<ReturnType<RunReference>>["result"]>
   >();
 const runBottleReferenceMock = vi.fn<RunReference>();
+const logOutcomeMock =
+  vi.fn<PhotoIdentificationProcedureServices["logOutcome"]>();
+
+/** The outcome of each logged photo lookup, in order. */
+function loggedOutcomes() {
+  return logOutcomeMock.mock.calls.map(
+    ([attributes]) => attributes["photo_identification.outcome"],
+  );
+}
 const extractPhotoBottleEvidenceMock =
-  vi.fn<IdentifyPendingImageServices["extractEvidence"]>();
+  vi.fn<IdentifyBottlePhotoServices["extractEvidence"]>();
 const copyPendingImageToBottleMock = vi.fn<typeof copyPendingImageToBottle>();
 const sentrySpanSetAttributeMock = vi.fn();
 const startSpanCallMock = vi.fn();
@@ -89,31 +102,57 @@ type MockCreateBottleDecision = Omit<
   proposedBottle: CreateDecisionInput["proposedBottle"];
 };
 
+let lookupTimeLimitMs = PHOTO_LOOKUP_TIME_LIMIT_MS;
 const identifyImage: PhotoIdentificationProcedureServices["identifyImage"] = (
   input,
 ) =>
-  identifyPendingImage(input, {
+  identifyBottlePhoto(input, {
     extractEvidence: extractPhotoBottleEvidenceMock,
     runReference: runBottleReferenceMock,
     startSpan,
+    lookupTimeLimitMs,
   });
 const photoIdentificationProcedure = createPhotoIdentificationProcedure({
   createPendingImage: createPendingImageUpload,
   identifyImage,
+  logOutcome: logOutcomeMock,
 });
 const photoIdentificationCreateProcedure =
   createPhotoIdentificationCreateProcedure(copyPendingImageToBottleMock);
 
+function streamPhotoIdentification(
+  input: z.input<typeof PhotoIdentificationInputSchema>,
+  options?: { context: Context },
+) {
+  return createRouterClient(
+    { photoIdentification: photoIdentificationProcedure },
+    { context: options?.context ?? { user: null } },
+  ).photoIdentification(input);
+}
+
+/** Reads a photo identification stream to its end. */
+async function readPhotoIdentification(
+  stream: Awaited<ReturnType<typeof streamPhotoIdentification>>,
+) {
+  const events = [];
+  while (true) {
+    const step = await stream.next();
+    if (step.done) return { events, result: step.value };
+    events.push(step.value);
+  }
+}
+
 const routerClient = {
   tastings: {
-    photoIdentification: (
+    photoIdentification: async (
       input: z.input<typeof PhotoIdentificationInputSchema>,
       options?: { context: Context },
     ) =>
-      createRouterClient(
-        { photoIdentification: photoIdentificationProcedure },
-        { context: options?.context ?? { user: null } },
-      ).photoIdentification(input),
+      (
+        await readPhotoIdentification(
+          await streamPhotoIdentification(input, options),
+        )
+      ).result,
     photoIdentificationCreate: (
       input: { createToken: string },
       options?: { context: Context },
@@ -270,31 +309,29 @@ async function identifyCreateProposal({
   }>;
   suitableAsBottleImage?: boolean;
 }) {
-  extractPhotoBottleEvidenceMock.mockImplementation(
-    async ({ pendingUpload }) => ({
-      extractedIdentity: {
-        brand: "Photo Create Test",
-        expression: "Scan Proposal",
-        series: null,
-        distillery: ["Photo Create Test"],
-        bottler: null,
-        category: "single_malt",
-        stated_age: null,
-        abv: null,
-        vintage_year: null,
-        release_year: null,
-        maturation: null,
-        cask_number: null,
-        outturn: null,
-        cask_strength: null,
-        single_cask: null,
-        edition: null,
-      },
-      imageEvidence: buildImageEvidence(pendingUpload.id, {
-        suitableAsBottleImage,
-      }),
+  extractPhotoBottleEvidenceMock.mockImplementation(async ({ photo }) => ({
+    extractedIdentity: {
+      brand: "Photo Create Test",
+      expression: "Scan Proposal",
+      series: null,
+      distillery: ["Photo Create Test"],
+      bottler: null,
+      category: "single_malt",
+      stated_age: null,
+      abv: null,
+      vintage_year: null,
+      release_year: null,
+      maturation: null,
+      cask_number: null,
+      outturn: null,
+      cask_strength: null,
+      single_cask: null,
+      edition: null,
+    },
+    imageEvidence: buildImageEvidence(photo.id, {
+      suitableAsBottleImage,
     }),
-  );
+  }));
   classifyBottleReferenceMock.mockResolvedValue(
     buildClassification(decision, { candidates }),
   );
@@ -336,9 +373,34 @@ async function countCatalogRows() {
   };
 }
 
+function mockArdbegLabelReading() {
+  extractPhotoBottleEvidenceMock.mockImplementation(async ({ photo }) => ({
+    extractedIdentity: {
+      brand: "Ardbeg",
+      bottler: null,
+      expression: "Uigeadail",
+      series: null,
+      distillery: null,
+      category: "single_malt",
+      stated_age: null,
+      abv: null,
+      release_year: null,
+      vintage_year: null,
+      maturation: null,
+      cask_number: null,
+      outturn: null,
+      cask_strength: null,
+      single_cask: null,
+      edition: null,
+    },
+    imageEvidence: buildImageEvidence(photo.id),
+  }));
+}
+
 describe("POST /tastings/photo-identification", () => {
   beforeEach(() => {
     config.AI_GATEWAY_API_KEY = undefined;
+    lookupTimeLimitMs = PHOTO_LOOKUP_TIME_LIMIT_MS;
     classifyBottleReferenceMock.mockReset();
     runBottleReferenceMock.mockReset();
     runBottleReferenceMock.mockImplementation(async (input) => ({
@@ -350,6 +412,7 @@ describe("POST /tastings/photo-identification", () => {
     copyPendingImageToBottleMock.mockImplementation(copyPendingImageToBottle);
     startSpanCallMock.mockReset();
     sentrySpanSetAttributeMock.mockClear();
+    logOutcomeMock.mockClear();
   });
 
   afterEach(() => {
@@ -374,29 +437,27 @@ describe("POST /tastings/photo-identification", () => {
     const matchedBottle = await fixtures.Bottle({ name: "Uigeadail" });
     const matchedBottleId = matchedBottle.id;
 
-    extractPhotoBottleEvidenceMock.mockImplementation(
-      async ({ pendingUpload }) => ({
-        extractedIdentity: {
-          brand: "Ardbeg",
-          bottler: null,
-          expression: "Uigeadail",
-          series: null,
-          distillery: null,
-          category: "single_malt",
-          stated_age: null,
-          abv: null,
-          release_year: null,
-          vintage_year: null,
-          maturation: null,
-          cask_number: null,
-          outturn: null,
-          cask_strength: null,
-          single_cask: null,
-          edition: null,
-        },
-        imageEvidence: buildImageEvidence(pendingUpload.id),
-      }),
-    );
+    extractPhotoBottleEvidenceMock.mockImplementation(async ({ photo }) => ({
+      extractedIdentity: {
+        brand: "Ardbeg",
+        bottler: null,
+        expression: "Uigeadail",
+        series: null,
+        distillery: null,
+        category: "single_malt",
+        stated_age: null,
+        abv: null,
+        release_year: null,
+        vintage_year: null,
+        maturation: null,
+        cask_number: null,
+        outturn: null,
+        cask_strength: null,
+        single_cask: null,
+        edition: null,
+      },
+      imageEvidence: buildImageEvidence(photo.id),
+    }));
     classifyBottleReferenceMock.mockResolvedValue(
       buildClassification(
         {
@@ -460,6 +521,16 @@ describe("POST /tastings/photo-identification", () => {
     expect(response.classification.artifacts.candidates[0]).not.toHaveProperty(
       "bottleId",
     );
+    // A match can be reported as wrong without trusting the browser's copy.
+    expect(response.createToken).toBeNull();
+    await expect(
+      verifyWrongPhotoMatchToken(response.wrongMatchToken!),
+    ).resolves.toMatchObject({
+      userId: defaults.user.id,
+      pendingImageId: response.pendingImage.id,
+      bottleId: matchedBottleId,
+      imageEvidence: response.imageEvidence,
+    });
 
     expect(classifyBottleReferenceMock).toHaveBeenCalledTimes(1);
     expect(runBottleReferenceMock).toHaveBeenCalledTimes(1);
@@ -519,16 +590,162 @@ describe("POST /tastings/photo-identification", () => {
     );
   });
 
+  test("streams the photo, label, likely matches, and steps before the result", async ({
+    fixtures,
+    defaults,
+  }) => {
+    const matchedBottle = await fixtures.Bottle({ name: "Uigeadail" });
+    mockArdbegLabelReading();
+    const classification = buildClassification(
+      { action: "match", matchedBottleId: matchedBottle.id },
+      {
+        candidates: [
+          {
+            bottleId: matchedBottle.id,
+            fullName: matchedBottle.fullName,
+            brand: "Ardbeg",
+            score: 0.9,
+            source: ["text"],
+          },
+        ],
+      },
+    );
+    runBottleReferenceMock.mockImplementation(async (_input, options) => {
+      options?.onProgress?.({
+        type: "candidates",
+        candidates: classification.artifacts.candidates,
+      });
+      options?.onProgress?.({
+        type: "tool",
+        name: "firecrawl_web_search",
+        status: "started",
+      });
+      options?.onProgress?.({
+        type: "tool",
+        name: "firecrawl_web_search",
+        status: "finished",
+      });
+      return { result: classification, modelMetadata: null };
+    });
+
+    const { events, result } = await readPhotoIdentification(
+      await streamPhotoIdentification(
+        {
+          file: await fixtures.SampleSquareImage(),
+          idempotencyKey: "photo-identification-progress",
+        },
+        { context: { user: defaults.user } },
+      ),
+    );
+
+    expect(events.map((event) => event.type)).toEqual([
+      "photo",
+      "label",
+      "candidates",
+      "step",
+      "step",
+    ]);
+    expect(events[0]).toEqual({
+      type: "photo",
+      pendingImage: result.pendingImage,
+    });
+    expect(events[1]).toEqual({
+      type: "label",
+      imageEvidence: result.imageEvidence,
+    });
+    expect(events[2]).toMatchObject({
+      type: "candidates",
+      bottles: [{ id: matchedBottle.id }],
+    });
+    expect(events.slice(3)).toEqual([
+      { type: "step", step: "checking_web" },
+      { type: "step", step: "comparing" },
+    ]);
+    expect(result.classification).toMatchObject({
+      status: "classified",
+      decision: { action: "match", matchedBottle: { id: matchedBottle.id } },
+    });
+  });
+
+  test("stops identification when the stream is closed early", async ({
+    fixtures,
+    defaults,
+  }) => {
+    mockArdbegLabelReading();
+    let runSignal: AbortSignal | undefined;
+    runBottleReferenceMock.mockImplementation(async (_input, options) => {
+      runSignal = options?.signal;
+      options?.onProgress?.({
+        type: "tool",
+        name: "search_bottles",
+        status: "started",
+      });
+      return await new Promise((_resolve, reject) => {
+        options?.signal?.addEventListener(
+          "abort",
+          () => reject(new Error("Stopped.")),
+          { once: true },
+        );
+      });
+    });
+
+    const stream = await streamPhotoIdentification(
+      {
+        file: await fixtures.SampleSquareImage(),
+        idempotencyKey: "photo-identification-stop",
+      },
+      { context: { user: defaults.user } },
+    );
+    const seen = [];
+    for await (const event of stream) {
+      seen.push(event.type);
+      if (event.type === "step") break;
+    }
+
+    expect(seen).toEqual(["photo", "label", "step"]);
+    expect(runSignal?.aborted).toBe(true);
+    expect(loggedOutcomes()).toEqual(["cancelled"]);
+    // Let the stopped lookup settle; a stop by the caller is not a timeout.
+    await expect(runBottleReferenceMock.mock.results[0]?.value).rejects.toThrow(
+      "Stopped.",
+    );
+    expect(sentrySpanSetAttributeMock).not.toHaveBeenCalledWith(
+      "photo_identification.lookup_timed_out",
+      true,
+    );
+  });
+
+  test("logs a lookup that fails mid-stream once, as failed", async ({
+    fixtures,
+    defaults,
+  }) => {
+    mockArdbegLabelReading();
+    runBottleReferenceMock.mockRejectedValue(new Error("Classifier broke"));
+
+    const err = await waitError(
+      routerClient.tastings.photoIdentification(
+        {
+          file: await fixtures.SampleSquareImage(),
+          idempotencyKey: "photo-identification-mid-stream-failure",
+        },
+        { context: { user: defaults.user } },
+      ),
+    );
+
+    expect(err).toMatchInlineSnapshot(
+      `[Error: Unable to identify bottle from photo.]`,
+    );
+    expect(loggedOutcomes()).toEqual(["failed"]);
+  });
+
   test("reuses pending upload for idempotent retries", async ({
     fixtures,
     defaults,
   }) => {
-    extractPhotoBottleEvidenceMock.mockImplementation(
-      async ({ pendingUpload }) => ({
-        extractedIdentity: null,
-        imageEvidence: buildImageEvidence(pendingUpload.id),
-      }),
-    );
+    extractPhotoBottleEvidenceMock.mockImplementation(async ({ photo }) => ({
+      extractedIdentity: null,
+      imageEvidence: buildImageEvidence(photo.id),
+    }));
     classifyBottleReferenceMock.mockResolvedValue(
       buildClassification({ action: "no_match" }),
     );
@@ -594,29 +811,27 @@ describe("POST /tastings/photo-identification", () => {
       bottleId: bottle.id,
       name: "Ardbeg Uigeadail",
     });
-    extractPhotoBottleEvidenceMock.mockImplementation(
-      async ({ pendingUpload }) => ({
-        extractedIdentity: {
-          brand: "Ardbeg",
-          expression: "Uigeadail",
-          series: null,
-          distillery: ["Ardbeg"],
-          bottler: null,
-          category: "single_malt",
-          stated_age: null,
-          abv: null,
-          vintage_year: null,
-          release_year: null,
-          maturation: null,
-          cask_number: null,
-          outturn: null,
-          cask_strength: null,
-          single_cask: null,
-          edition: null,
-        },
-        imageEvidence: buildImageEvidence(pendingUpload.id),
-      }),
-    );
+    extractPhotoBottleEvidenceMock.mockImplementation(async ({ photo }) => ({
+      extractedIdentity: {
+        brand: "Ardbeg",
+        expression: "Uigeadail",
+        series: null,
+        distillery: ["Ardbeg"],
+        bottler: null,
+        category: "single_malt",
+        stated_age: null,
+        abv: null,
+        vintage_year: null,
+        release_year: null,
+        maturation: null,
+        cask_number: null,
+        outturn: null,
+        cask_strength: null,
+        single_cask: null,
+        edition: null,
+      },
+      imageEvidence: buildImageEvidence(photo.id),
+    }));
     const response = await routerClient.tastings.photoIdentification(
       {
         file: await fixtures.SampleSquareImage(),
@@ -662,39 +877,37 @@ describe("POST /tastings/photo-identification", () => {
     const { imageSources: _imageSources, ...persistedBottleContext } =
       bottleContext;
 
-    extractPhotoBottleEvidenceMock.mockImplementation(
-      async ({ pendingUpload }) => ({
-        extractedIdentity: {
-          brand: "Ardbeg",
-          expression: "Uigeadail",
-          series: null,
-          distillery: ["Ardbeg"],
-          bottler: null,
-          category: "single_malt",
-          stated_age: null,
-          abv: 54.2,
-          vintage_year: null,
-          release_year: null,
-          maturation: null,
-          cask_number: null,
-          outturn: null,
-          cask_strength: null,
-          single_cask: null,
-          edition: null,
-        },
-        imageEvidence: {
-          ...buildImageEvidence(pendingUpload.id),
-          fieldCandidates: {
-            ...buildImageEvidence(pendingUpload.id).fieldCandidates,
-            abv: {
-              value: 54.2,
-              confidence: 0.95,
-              sourceExtractorIndexes: [0],
-            },
+    extractPhotoBottleEvidenceMock.mockImplementation(async ({ photo }) => ({
+      extractedIdentity: {
+        brand: "Ardbeg",
+        expression: "Uigeadail",
+        series: null,
+        distillery: ["Ardbeg"],
+        bottler: null,
+        category: "single_malt",
+        stated_age: null,
+        abv: 54.2,
+        vintage_year: null,
+        release_year: null,
+        maturation: null,
+        cask_number: null,
+        outturn: null,
+        cask_strength: null,
+        single_cask: null,
+        edition: null,
+      },
+      imageEvidence: {
+        ...buildImageEvidence(photo.id),
+        fieldCandidates: {
+          ...buildImageEvidence(photo.id).fieldCandidates,
+          abv: {
+            value: 54.2,
+            confidence: 0.95,
+            sourceExtractorIndexes: [0],
           },
         },
-      }),
-    );
+      },
+    }));
     const classification = buildClassification(
       {
         action: "match",
@@ -765,12 +978,10 @@ describe("POST /tastings/photo-identification", () => {
     fixtures,
     defaults,
   }) => {
-    extractPhotoBottleEvidenceMock.mockImplementation(
-      async ({ pendingUpload }) => ({
-        extractedIdentity: null,
-        imageEvidence: buildImageEvidence(pendingUpload.id),
-      }),
-    );
+    extractPhotoBottleEvidenceMock.mockImplementation(async ({ photo }) => ({
+      extractedIdentity: null,
+      imageEvidence: buildImageEvidence(photo.id),
+    }));
     classifyBottleReferenceMock.mockResolvedValue(
       buildClassification(
         { action: "no_match" },
@@ -813,12 +1024,10 @@ describe("POST /tastings/photo-identification", () => {
     fixtures,
     defaults,
   }) => {
-    extractPhotoBottleEvidenceMock.mockImplementation(
-      async ({ pendingUpload }) => ({
-        extractedIdentity: null,
-        imageEvidence: buildImageEvidence(pendingUpload.id),
-      }),
-    );
+    extractPhotoBottleEvidenceMock.mockImplementation(async ({ photo }) => ({
+      extractedIdentity: null,
+      imageEvidence: buildImageEvidence(photo.id),
+    }));
     const classification = buildClassification({ action: "no_match" });
     classification.artifacts.searchEvidence = [
       {
@@ -881,12 +1090,10 @@ describe("POST /tastings/photo-identification", () => {
     fixtures,
     defaults,
   }) => {
-    extractPhotoBottleEvidenceMock.mockImplementation(
-      async ({ pendingUpload }) => ({
-        extractedIdentity: null,
-        imageEvidence: buildImageEvidence(pendingUpload.id),
-      }),
-    );
+    extractPhotoBottleEvidenceMock.mockImplementation(async ({ photo }) => ({
+      extractedIdentity: null,
+      imageEvidence: buildImageEvidence(photo.id),
+    }));
     runBottleReferenceMock.mockRejectedValue(
       new Error("Classification failed", {
         cause: new OpenAI.APIError(503, {}, "Unavailable", new Headers()),
@@ -905,6 +1112,44 @@ describe("POST /tastings/photo-identification", () => {
     expect(sentrySpanSetAttributeMock).toHaveBeenCalledWith(
       "photo_identification.stage",
       "classification",
+    );
+  });
+
+  test("returns the label facts when the bottle lookup runs out of time", async ({
+    fixtures,
+    defaults,
+  }) => {
+    lookupTimeLimitMs = 10;
+    extractPhotoBottleEvidenceMock.mockImplementation(async ({ photo }) => ({
+      extractedIdentity: null,
+      imageEvidence: buildImageEvidence(photo.id),
+    }));
+    runBottleReferenceMock.mockImplementation(
+      (_input, options) =>
+        new Promise((_resolve, reject) => {
+          options?.signal?.addEventListener("abort", () =>
+            reject(options.signal?.reason),
+          );
+        }),
+    );
+
+    const response = await routerClient.tastings.photoIdentification(
+      {
+        file: await fixtures.SampleSquareImage(),
+        idempotencyKey: "photo-lookup-time-limit",
+      },
+      { context: { user: defaults.user } },
+    );
+
+    expect(response.suggestedNextStep).toBe("manual_search");
+    expect(response.diagnostics.classification).toMatchObject({
+      status: "ignored",
+      reason: "The bottle lookup ran out of time.",
+    });
+    expect(response.imageEvidence.fieldCandidates.brand?.value).toBe("Ardbeg");
+    expect(sentrySpanSetAttributeMock).toHaveBeenCalledWith(
+      "photo_identification.lookup_timed_out",
+      true,
     );
   });
 
@@ -957,6 +1202,7 @@ describe("POST /tastings/photo-identification", () => {
 
     expect(identification.suggestedNextStep).toBe("manual_search");
     expect(identification.createToken).toBeNull();
+    expect(identification.wrongMatchToken).toBeNull();
     expect(identification.classification).toMatchObject({
       status: "classified",
       decision: {

@@ -1,0 +1,89 @@
+{
+  "id": "review-glenfarclas-cask-outturn",
+  "name": "review glenfarclas cask outturn",
+  "webEvidenceFile": "src/eval-fixtures/glenfarclas-review.evidence.json",
+  "input": {
+    "reference": {
+      "id": 18876,
+      "url": "https://www.whiskyfun.com/2026/A-very-lovely-trio-of-Glenfarclas.html",
+      "name": "Glenfarclas 1979/2014 (50.8%, OB, Family Casks for Bow Bar & Shinanoya, Japan, hogshead, cask #8801, 212 bottles)",
+      "imageUrl": null,
+      "externalSiteId": 5785,
+      "currentBottleId": null
+    },
+    "extractedIdentity": null,
+    "imageEvidence": null,
+    "initialCandidates": []
+  },
+  "context": {
+    "inspectedBottleIds": [],
+    "bottleContexts": [],
+    "inspectedEntities": [
+      {
+        "kind": "distillery",
+        "name": "Glenfarclas",
+        "score": 1,
+        "source": ["exact", "text", "prefix", "contained"],
+        "entityId": 976,
+        "reference": "Glenfarclas",
+        "shortName": null,
+        "retrievedFor": [
+          {
+            "exact": true,
+            "query": "Glenfarclas"
+          }
+        ]
+      },
+      {
+        "kind": "brand",
+        "name": "Scott's Selection",
+        "score": 1,
+        "source": ["exact", "text", "prefix", "contained"],
+        "entityId": 5710,
+        "reference": "Scott's Selection",
+        "shortName": null,
+        "retrievedFor": [
+          {
+            "exact": true,
+            "query": "Scott's Selection"
+          }
+        ]
+      }
+    ],
+    "inspectedSeries": []
+  },
+  "provenance": {
+    "source": "production_miss",
+    "verifiedSourceUrls": [
+      "https://www.whiskyfun.com/2026/A-very-lovely-trio-of-Glenfarclas.html",
+      "https://www.whiskybase.com/whiskies/whisky/66288/glenfarclas-1979"
+    ],
+    "dbOutcome": {
+      "bottleId": null,
+      "createsBottle": false,
+      "summary": "Production saved an ignored result before extraction because a release outturn was mistaken for a multi-bottle listing; the review remained unassigned."
+    },
+    "notes": "Captured from saved classifier run 27204 (review 18876, model openai/gpt-6-luna, 2026-10-16T18:45:00.582Z). Production rationale: none Verified independently on 2026-10-19. Existing Glenfarclas and Scott's Selection Entity context comes from the same article's saved run 27205; no new matching Bottle is injected. The cask expectation preserves the # prefix printed in the observed title and original seller heading."
+  },
+  "expected": {
+    "status": "classified",
+    "action": "create_bottle",
+    "identityScope": "exact_cask",
+    "matchedBottleId": null,
+    "proposedBottle": {
+      "brand": {
+        "id": 976,
+        "name": "Glenfarclas"
+      },
+      "vintageYear": 1979,
+      "bottlingYear": 2014,
+      "abv": 50.8,
+      "caskNumber": "#8801",
+      "outturn": 212,
+      "singleCask": true,
+      "bottler": null
+    },
+    "expectedTier": "auto",
+    "summary": "Classify the single cask release. The 212 bottles are its outturn, not a bundle."
+  }
+}

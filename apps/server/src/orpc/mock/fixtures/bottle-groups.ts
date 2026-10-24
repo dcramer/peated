@@ -2,6 +2,22 @@ import type { MockOutputs } from "../contract";
 import { timestamp } from "./constants";
 import { mockLaphroaigEntity } from "./entities";
 
+type BottleSeries = NonNullable<
+  MockOutputs["bottles"]["list"]["results"][number]["series"]
+>;
+
+// Laphroaig names each limited Càirdeas bottling by year; see README.md.
+export const mockCairdeasSeries = {
+  id: 9801,
+  peatedId: "S9801",
+  name: "Càirdeas",
+  fullName: "Laphroaig Càirdeas",
+  description: null,
+  numReleases: 2,
+  createdAt: timestamp,
+  updatedAt: timestamp,
+} satisfies BottleSeries;
+
 export const mockBottleGroup = {
   schemaVersion: 1,
   id: 9701,
@@ -11,7 +27,7 @@ export const mockBottleGroup = {
   bottlerId: null,
   distillerIds: [mockLaphroaigEntity.id],
   category: "single_malt",
-  seriesId: null,
+  seriesId: mockCairdeasSeries.id,
   statedAge: null,
   representativeBottleId: 9309,
   flavorProfile: "heavily_peated",

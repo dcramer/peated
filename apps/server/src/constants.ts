@@ -321,21 +321,6 @@ export const SIMPLE_RATING_VALUES = {
   SAVOR: 2,
 } as const;
 
-export const SIMPLE_RATING_LABELS = {
-  [-1]: "Pass",
-  [1]: "Sip",
-  [2]: "Savor",
-} as const;
-
-export const SIMPLE_RATING_DESCRIPTIONS = {
-  [-1]: "Not my thing",
-  [1]: "Enjoyable, would drink again",
-  [2]: "Amazing, would seek out",
-} as const;
-
-export type SimpleRatingValue =
-  (typeof SIMPLE_RATING_VALUES)[keyof typeof SIMPLE_RATING_VALUES];
-
 export const RATING_BANDS = [
   { id: "mediocre", min: 0, max: 79, label: "Mediocre" },
   { id: "good", min: 80, max: 84, label: "Good" },

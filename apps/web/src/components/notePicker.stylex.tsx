@@ -26,8 +26,16 @@ export type NotePickerOption = {
   category: string;
   common?: boolean;
   name: string;
+  /** Other words for the note, such as "peppery" for Pepper, that also find it. */
+  synonyms?: readonly string[];
   usageCount: number;
 };
+
+function noteMatchesQuery(note: NotePickerOption, normalizedQuery: string) {
+  return [note.name, ...(note.synonyms ?? [])].some((text) =>
+    text.toLocaleLowerCase().includes(normalizedQuery),
+  );
+}
 
 export type NotePickerProps = {
   notes: readonly NotePickerOption[];
@@ -65,8 +73,7 @@ export function NotePickerField({
     return notes
       .filter(
         (note) =>
-          !value.includes(note.name) &&
-          note.name.toLocaleLowerCase().includes(normalizedQuery),
+          !value.includes(note.name) && noteMatchesQuery(note, normalizedQuery),
       )
       .sort(
         (left, right) =>
@@ -162,7 +169,12 @@ export function NotePickerField({
       </div>
 
       {suggestionsOpen ? (
-        <FloatingPanel style={styles.suggestionOverlay}>
+        <FloatingPanel
+          // Keep focus in the input. Safari does not focus tapped buttons,
+          // so the blur would clear the query before the tap selects.
+          onMouseDown={(event) => event.preventDefault()}
+          style={styles.suggestionOverlay}
+        >
           <div id={listboxId} role="listbox">
             {matches.length ? (
               matches.map((note, index) => (
@@ -267,7 +279,7 @@ export function NotePicker({
     const normalizedQuery = trimmedQuery.toLocaleLowerCase();
     const filtered = notes.filter((note) =>
       normalizedQuery
-        ? note.name.toLocaleLowerCase().includes(normalizedQuery)
+        ? noteMatchesQuery(note, normalizedQuery)
         : note.category === activeCategory,
     );
 

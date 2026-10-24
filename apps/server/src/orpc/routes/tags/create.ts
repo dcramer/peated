@@ -1,5 +1,6 @@
 import { ORPCError } from "@orpc/server";
 import { db } from "@peated/server/db";
+import { uniqueViolationConstraint } from "@peated/server/db/errors";
 import { tags } from "@peated/server/db/schema";
 import { procedure } from "@peated/server/orpc";
 import { requireMod } from "@peated/server/orpc/middleware";
@@ -33,7 +34,7 @@ export default procedure
           .returning();
         return tag;
       } catch (err: any) {
-        if (err?.code === "23505" && err?.constraint === "tag_pkey") {
+        if (uniqueViolationConstraint(err) === "tag_pkey") {
           throw errors.CONFLICT({
             message: "Tag with name already exists.",
             cause: err,

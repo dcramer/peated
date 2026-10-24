@@ -254,6 +254,7 @@ describe("GET /users/:user", () => {
       Array.from({ length: 201 }, (_, index) => ({
         bottleId: bottle.id,
         createdById: defaults.user.id,
+        tastedAt: new Date(Date.UTC(2025, 0, 1, 0, 0, index)),
         createdAt: new Date(Date.UTC(2025, 0, 1, 0, 0, index)),
       })),
     );

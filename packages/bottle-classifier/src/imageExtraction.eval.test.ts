@@ -39,6 +39,7 @@ const EXTRACTED_IDENTITY_FIELDS: ExtractedIdentityField[] = [
   "bottling_year",
   "cask_strength",
   "single_cask",
+  "cask_number",
   "edition",
 ];
 

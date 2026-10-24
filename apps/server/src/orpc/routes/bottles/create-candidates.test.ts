@@ -59,6 +59,35 @@ test("uses physical distillery candidates even when the supplied Brand is wrong"
   expect(results[0]?.distillers.map((d) => d.id)).toEqual([distiller.id]);
 });
 
+test("leaves out a same-name Bottle from a different distillery", async ({
+  fixtures,
+}) => {
+  const brand = await fixtures.Entity({ name: "Independent bottler" });
+  const caolIla = await fixtures.Entity({
+    name: "Caol Ila",
+    kind: "distillery",
+  });
+  const ledaig = await fixtures.Entity({ name: "Ledaig", kind: "distillery" });
+  const expected = await fixtures.Bottle({
+    name: "Sherry Cask Finish",
+    brandId: brand.id,
+    distillerIds: [caolIla.id],
+  });
+  await fixtures.Bottle({
+    name: "Sherry Cask Finish",
+    brandId: brand.id,
+    distillerIds: [ledaig.id],
+  });
+
+  const { results } = await routerClient.bottles.createCandidates({
+    name: "Sherry Cask Finish",
+    brand: { id: brand.id, name: brand.name },
+    distillers: [{ id: caolIla.id, name: caolIla.name }],
+  });
+
+  expect(results.map((b) => b.id)).toEqual([expected.id]);
+});
+
 test("finds the Yamazaki regression despite the wrong Brand and collection suffix", async ({
   fixtures,
 }) => {

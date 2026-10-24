@@ -48,6 +48,10 @@ export const entities = pgTable(
     normalizedShortName: text("normalized_short_name").generatedAlwaysAs(
       sql`regexp_replace(lower(coalesce(short_name, '')), '[^a-z0-9]+', '', 'g')`,
     ),
+    pronunciation: text("pronunciation"),
+    pronunciationIpa: text("pronunciation_ipa"),
+    // Owned by GenerateEntityPronunciationAudio; clients never write it.
+    pronunciationAudioUrl: text("pronunciation_audio_url"),
 
     ownerId: bigint("owner_id", { mode: "number" }),
 
@@ -104,6 +108,15 @@ export const entities = pgTable(
   },
   (table) => [
     uniqueIndex("entity_name_unq").using("btree", sql`LOWER(${table.name})`),
+    // Classifier Entity lookups match lowercased names exactly and by prefix.
+    index("entity_name_lower_pattern_idx").using(
+      "btree",
+      sql`LOWER(${table.name}) text_pattern_ops`,
+    ),
+    index("entity_short_name_lower_pattern_idx").using(
+      "btree",
+      sql`LOWER(${table.shortName}) text_pattern_ops`,
+    ),
     index("entity_normalized_name_idx").on(table.normalizedName),
     index("entity_normalized_short_name_idx").on(table.normalizedShortName),
     index("entity_search_names_tin_idx").using("tin", table.searchNames),
@@ -228,6 +241,10 @@ export const entityReferences = pgTable(
     uniqueIndex("entity_reference_name_idx").using(
       "btree",
       sql`LOWER(${table.name})`,
+    ),
+    index("entity_reference_name_lower_pattern_idx").using(
+      "btree",
+      sql`LOWER(${table.name}) text_pattern_ops`,
     ),
     index("entity_reference_normalized_name_idx").on(table.normalizedName),
   ],

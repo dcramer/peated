@@ -1,4 +1,5 @@
 import { db } from "@peated/server/db";
+import { uniqueViolationConstraint } from "@peated/server/db/errors";
 import type {
   Comment,
   NewComment,
@@ -83,7 +84,7 @@ export default procedure
           .onConflictDoNothing()
           .returning();
       } catch (err: any) {
-        if (err?.code === "23505" && err?.constraint === "comment_unq") {
+        if (uniqueViolationConstraint(err) === "comment_unq") {
           throw errors.CONFLICT({
             message: "Comment already exists.",
             cause: err,

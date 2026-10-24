@@ -272,10 +272,25 @@ export type RunBottleClassifierAgentInput = {
   identityAnchor?: BottleClassificationDecision | null;
   webSearchBudget?: BottleWebSearchBudget;
   signal?: AbortSignal;
+  onProgress?: BottleClassifierProgressObserver;
 };
+
+/**
+ * Progress from one classifier run, for a caller that shows it while the run
+ * continues. Candidates are Peated's own likely matches, found before the
+ * model starts; tool events name each tool the model starts and finishes.
+ */
+export type BottleClassifierProgressEvent =
+  | { type: "candidates"; candidates: BottleCandidate[] }
+  | { type: "tool"; name: string; status: "started" | "finished" };
+
+export type BottleClassifierProgressObserver = (
+  event: BottleClassifierProgressEvent,
+) => void;
 
 export type BottleClassifierRunOptions = {
   signal?: AbortSignal;
+  onProgress?: BottleClassifierProgressObserver;
 };
 
 export type BottleClassifierAdapters = BottleClassifierDataSource;
@@ -603,6 +618,7 @@ export async function prepareBottleClassifierAgentRun(
     webSearchBudget: inputWebSearchBudget,
     conversationId,
     signal,
+    onProgress,
   }: RunBottleClassifierAgentInput,
 ): Promise<PreparedBottleClassifierAgentRun> {
   const dataSource = getBottleClassifierDataSource(options);
@@ -703,6 +719,15 @@ export async function prepareBottleClassifierAgentRun(
     },
   });
   observeRunnerTools(runner, options.observeToolEvent);
+  if (onProgress) {
+    observeRunnerTools(runner, (event) => {
+      onProgress({
+        type: "tool",
+        name: event.name,
+        status: event.type === "tool_call" ? "started" : "finished",
+      });
+    });
+  }
   const input = buildAgentInput({
     reference,
     extractedIdentity: normalizedExtractedIdentity,
@@ -1250,6 +1275,8 @@ export function createBottleClassifier(
     identityAnchor = null,
     webSearchBudget,
     conversationId,
+    signal,
+    onProgress,
   }: RunBottleClassifierAgentInput): Promise<BottleClassifierAgentRun> => {
     const resolvedConversationId = buildClassifierConversationId(
       reference,
@@ -1303,6 +1330,8 @@ export function createBottleClassifier(
       resolvedEntities,
       identityAnchor,
       webSearchBudget,
+      signal,
+      onProgress,
     });
 
     const run = await runPreparedBottleClassifierAgent(preparedRun);
@@ -1529,6 +1558,13 @@ export function createBottleClassifier(
         webSearchBudget: preparedEvidence.webSearchBudget,
       };
       if (runOptions.signal) agentInput.signal = runOptions.signal;
+      if (runOptions.onProgress) {
+        agentInput.onProgress = runOptions.onProgress;
+        runOptions.onProgress({
+          type: "candidates",
+          candidates: artifacts.candidates,
+        });
+      }
       const agentRun = await runBottleClassifierAgentWithBudget(agentInput);
       const agentResult = {
         ...agentRun.agentResult,

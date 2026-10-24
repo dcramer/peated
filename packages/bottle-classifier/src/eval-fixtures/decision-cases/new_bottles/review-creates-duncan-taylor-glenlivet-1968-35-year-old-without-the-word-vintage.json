@@ -1283,8 +1283,8 @@
       "statedAge": 35,
       "vintageYear": 1968
     },
-    "proposedBottleNameOneOf": ["Glenlivet 1968 35-year-old"],
-    "proposedBottleNameExcludes": ["Vintage"],
-    "summary": "Create the Duncan Taylor Glenlivet named Glenlivet 1968 35-year-old: distillery, vintage, age, without the word Vintage."
+    "proposedBottleNameOneOf": ["Glenlivet 1968"],
+    "proposedBottleNameExcludes": ["Vintage", "year-old"],
+    "summary": "Create the Duncan Taylor Glenlivet named Glenlivet 1968: distillery and vintage, with the 35-year age in its field and no other Duncan Taylor Glenlivet 1968 to tell apart."
   }
 }

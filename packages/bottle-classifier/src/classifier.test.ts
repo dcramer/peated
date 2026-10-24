@@ -5,6 +5,7 @@ import {
   prepareBottleClassifierAgentRun,
   type BottleAgentRunResult,
   type BottleClassifierDataSource,
+  type BottleClassifierProgressEvent,
   type BottleClassifierToolEvent,
   type CreateBottleClassifierOptions,
   type PreparedBottleClassifierAgentRun,
@@ -1183,7 +1184,7 @@ describe("createBottleClassifier", () => {
   });
 
   test.each([
-    "Buffalo Trace Full Collection - 8 Bottles",
+    "Buffalo Trace Full Collection - Pack of 8",
     "Buffalo Trace and Eagle Rare Combo Pack",
     "Buffalo Trace Trilogy Set",
   ])("auto ignores explicit multi-bottle listing %s", async (name) => {
@@ -1215,6 +1216,9 @@ describe("createBottleClassifier", () => {
   test.each([
     "Garrison Brothers Bottled in Bond Bourbon",
     "Orphan Barrel The Gifted Horse",
+    "Glenfarclas 1979/2014 (50.8%, OB, Family Casks for Bow Bar & Shinanoya, Japan, hogshead, cask #8801, 212 bottles)",
+    "Glenfarclas ‘190 Anniversary’ (90° proof, OB, 15,000 bottles, 2026)",
+    "Clynelish 1997 (55.2%, independent bottling, cask #42, 198 bottles)",
   ])(
     "does not treat nearby product wording as a multi-item listing: %s",
     async (name) => {
@@ -2352,6 +2356,89 @@ describe("createBottleClassifier", () => {
     } finally {
       expect(runAgent).toHaveBeenCalledOnce();
     }
+  });
+
+  test("passes the stop signal to the agent run", async () => {
+    const signal = new AbortController().signal;
+    const runAgent = vi.fn(
+      async (preparedRun: PreparedBottleClassifierAgentRun) => {
+        expect(preparedRun.runOptions.signal).toBe(signal);
+        return nativeAgentResult({
+          finalOutput: noMatchAgentDecision(),
+          inputTokens: 20,
+          outputTokens: 5,
+        });
+      },
+    );
+    const { classifier } = createTestClassifier({
+      maxSearchQueries: 0,
+      runPreparedBottleClassifierAgent: runAgent,
+    });
+
+    await classifier.runBottleReference(
+      {
+        reference: { name: "Example Single Malt Whisky" },
+        extractedIdentity: null,
+        initialCandidates: [],
+      },
+      { signal },
+    );
+
+    expect(runAgent).toHaveBeenCalledOnce();
+  });
+
+  test("reports progress from one reference run", async () => {
+    const progress: BottleClassifierProgressEvent[] = [];
+    const runAgent = vi.fn(
+      async (preparedRun: PreparedBottleClassifierAgentRun) => {
+        expect(progress).toEqual([
+          { type: "candidates", candidates: [macallanSherryOakCandidate] },
+        ]);
+        // SAFETY: observeRunnerTools reads only the tool name and call ID, so
+        // the runner context, agent, and tool can be partial stand-ins here.
+        preparedRun.runner.emit(
+          "agent_tool_start",
+          {} as never,
+          {} as never,
+          { name: "search_bottles" } as never,
+          { toolCall: { callId: "call-1", arguments: "{}" } } as never,
+        );
+        // SAFETY: Same stand-ins as the start event above.
+        preparedRun.runner.emit(
+          "agent_tool_end",
+          {} as never,
+          {} as never,
+          { name: "search_bottles" } as never,
+          "[]",
+          { toolCall: { callId: "call-1", arguments: "{}" } } as never,
+        );
+        return nativeAgentResult({
+          finalOutput: noMatchAgentDecision(),
+          inputTokens: 1,
+          outputTokens: 1,
+        });
+      },
+    );
+    const { classifier } = createTestClassifier({
+      maxSearchQueries: 0,
+      runPreparedBottleClassifierAgent: runAgent,
+    });
+
+    await classifier.runBottleReference(
+      {
+        reference: { name: "Macallan 12 Sherry Oak" },
+        extractedIdentity: null,
+        initialCandidates: [macallanSherryOakCandidate],
+      },
+      { onProgress: (event) => progress.push(event) },
+    );
+
+    expect(runAgent).toHaveBeenCalledOnce();
+    expect(progress).toEqual([
+      { type: "candidates", candidates: [macallanSherryOakCandidate] },
+      { type: "tool", name: "search_bottles", status: "started" },
+      { type: "tool", name: "search_bottles", status: "finished" },
+    ]);
   });
 
   test("returns null metadata for an override-only reference run", async () => {

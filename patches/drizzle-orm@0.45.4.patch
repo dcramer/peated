@@ -1,0 +1,28 @@
+diff --git a/errors.cjs b/errors.cjs
+index b593f0da263a7ad7904f44e89f1c0992c39c4aad..178fbb7ae9e6df8fd634644a3c341e6e5ec5f68e 100644
+--- a/errors.cjs
++++ b/errors.cjs
+@@ -34,8 +34,7 @@ class DrizzleError extends Error {
+ }
+ class DrizzleQueryError extends Error {
+   constructor(query, params, cause) {
+-    super(`Failed query: ${query}
+-params: ${params}`);
++    super(`Failed query: ${query}`);
+     this.query = query;
+     this.params = params;
+     this.cause = cause;
+diff --git a/errors.js b/errors.js
+index 6db8b6365e30f239bf2738504937ed81733e82dd..8b40bb028a155c5c25ae5801afe12d17871d0042 100644
+--- a/errors.js
++++ b/errors.js
+@@ -9,8 +9,7 @@ class DrizzleError extends Error {
+ }
+ class DrizzleQueryError extends Error {
+   constructor(query, params, cause) {
+-    super(`Failed query: ${query}
+-params: ${params}`);
++    super(`Failed query: ${query}`);
+     this.query = query;
+     this.params = params;
+     this.cause = cause;

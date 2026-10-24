@@ -1,3 +1,4 @@
+import { AuditEvent, auditLog } from "@peated/server/lib/auditLog";
 import { z } from "zod";
 import { base } from "..";
 import { getConnection } from "../../worker/redis";
@@ -32,6 +33,24 @@ async function incrementRateLimitCounter(key: string, windowMs: number) {
 }
 
 /**
+ * Counts one use of a rate limit outside a request, such as background work
+ * that shares a route's per-user limit. Returns how long to wait before
+ * trying again when the limit is reached, or null when this use is allowed.
+ */
+export async function consumeRateLimit(
+  { windowMs, maxRequests, keyPrefix = "rl" }: RateLimitOptions,
+  identifier: string,
+): Promise<number | null> {
+  const key = `${keyPrefix}:${identifier}`;
+  const count = await incrementRateLimitCounter(key, windowMs);
+  if (count <= maxRequests) return null;
+
+  const redis = await getConnection();
+  const remainingMs = await redis.pttl(key);
+  return remainingMs > 0 ? remainingMs : windowMs;
+}
+
+/**
  * Builds reusable rate-limit middleware while preserving any route-specific
  * context narrowing applied before this middleware runs.
  */
@@ -60,6 +79,17 @@ export function createRateLimit<TContext extends Context = Context>(
       const count = await incrementCounter(key, windowMs);
 
       if (count > maxRequests) {
+        // Audit only the first blocked request in each window so a flood of
+        // retries cannot flood the audit log.
+        if (count === maxRequests + 1) {
+          auditLog({
+            event: AuditEvent.RATE_LIMIT_EXCEEDED,
+            userId: context.user?.id,
+            ip: context.ip,
+            userAgent: context.userAgent,
+            metadata: { limit: keyPrefix },
+          });
+        }
         throw errors.FORBIDDEN({
           message: "Too many requests. Please try again later.",
         });
@@ -84,9 +114,3 @@ export function createAuthRateLimit(
 }
 
 export const authRateLimit = createAuthRateLimit();
-
-export const strictAuthRateLimit = createRateLimit({
-  windowMs: 60 * 60 * 1000, // 1 hour
-  maxRequests: 10, // 10 attempts per hour
-  keyPrefix: "auth-strict",
-});

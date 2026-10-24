@@ -42,6 +42,11 @@ Use `infiniteOptions()` for paged queries. Use `key()` when changing cached
 data. Use `call()` only when a component needs a direct request outside a query
 or mutation hook.
 
+When a client component starts a query from data the server loaded for the
+page, use `serverDataQueryOptions()` instead of setting `initialData` directly.
+A plain `initialData` query keeps its cached copy across visits, so the page
+can show old values after an edit.
+
 ## Errors
 
 Let unexpected errors throw. Use `safe()` only when the caller handles a

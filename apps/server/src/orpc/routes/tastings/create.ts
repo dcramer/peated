@@ -1,41 +1,47 @@
 import { db } from "@peated/server/db";
-import type { Flight, NewTasting, Tasting } from "@peated/server/db/schema";
-import {
-  flightBottles,
-  flights,
-  follows,
-  tastings,
-} from "@peated/server/db/schema";
-import { awardAllBadgeXp } from "@peated/server/lib/badges";
+import type { Flight, NewTasting } from "@peated/server/db/schema";
+import { flightBottles, flights, tastings } from "@peated/server/db/schema";
 import { logError } from "@peated/server/lib/log";
 import {
   copyPendingImageToTasting,
   getUsablePendingUpload,
   PendingUploadError,
 } from "@peated/server/lib/pendingUploads";
-import {
-  ActiveBottleSelectionError,
-  resolveActiveBottleIds,
-} from "@peated/server/lib/resolveActiveBottleIds";
 import { implement } from "@peated/server/orpc";
 import tastingCreateContract from "@peated/server/orpc/contracts/tastings/create";
 import {
   requireAuth,
   requireTosAccepted,
 } from "@peated/server/orpc/middleware/auth";
+import { validateFriends } from "@peated/server/orpc/validators/friends";
 import { validateTags } from "@peated/server/orpc/validators/tags";
 import { serialize } from "@peated/server/serializers";
-import { BadgeSerializer } from "@peated/server/serializers/badge";
 import { BadgeAwardSerializer } from "@peated/server/serializers/badgeAward";
 import { TastingSerializer } from "@peated/server/serializers/tasting";
-import { and, eq, inArray } from "drizzle-orm";
+import { and, eq } from "drizzle-orm";
 import { dispatchTastingStatsRecompute } from "./dispatchStatsRecompute";
-import { isTastingIdentityConflict } from "./isTastingIdentityConflict";
+import { findTastingByIdempotencyKey, insertTasting } from "./insertTasting";
 
 export default implement(tastingCreateContract)
   .use(requireAuth)
   .use(requireTosAccepted)
   .handler(async function ({ input, context, errors }) {
+    // A retried post returns the tasting it already created. Check this first
+    // so a retry still succeeds after its pending photo expires.
+    if (input.idempotencyKey) {
+      const existing = await findTastingByIdempotencyKey(
+        db,
+        context.user.id,
+        input.idempotencyKey,
+      );
+      if (existing) {
+        return {
+          tasting: await serialize(TastingSerializer, existing, context.user),
+          awards: [],
+        };
+      }
+    }
+
     if (input.pendingImageId) {
       try {
         const pendingUpload = await getUsablePendingUpload({
@@ -55,6 +61,7 @@ export default implement(tastingCreateContract)
       }
     }
 
+    const createdAt = new Date();
     const data: Omit<NewTasting, "bottleId"> = {
       notes: input.notes || null,
       ratingBand: input.ratingBand ?? null,
@@ -62,43 +69,18 @@ export default implement(tastingCreateContract)
       color: input.color || null,
       tags: input.tags ? await validateTags(input.tags) : [],
       createdById: context.user.id,
+      createdAt,
+      tastedAt: input.tastedAt ? new Date(input.tastedAt) : createdAt,
+      idempotencyKey: input.idempotencyKey ?? null,
     };
-    if (input.createdAt) {
-      data.createdAt = new Date(input.createdAt);
-    }
 
     if (input.friends && input.friends.length) {
-      const friendUserIds = Array.from(new Set(input.friends));
-      const matches = await db
-        .select()
-        .from(follows)
-        .where(
-          and(
-            eq(follows.fromUserId, context.user.id),
-            eq(follows.status, "following"),
-            inArray(follows.toUserId, friendUserIds),
-          ),
-        );
-      if (matches.length != friendUserIds.length) {
-        throw errors.BAD_REQUEST({
-          message: "Friends must all be active relationships.",
-        });
-      }
+      await validateFriends(context.user.id, input.friends);
       data.friends = input.friends;
     }
 
+    const bottleId = input.bottle;
     const created = await db.transaction(async (tx) => {
-      try {
-        await resolveActiveBottleIds(tx, [input.bottle]);
-      } catch (error) {
-        if (!(error instanceof ActiveBottleSelectionError)) throw error;
-        throw errors.BAD_REQUEST({
-          message: "Cannot identify bottle.",
-          cause: error,
-        });
-      }
-      const bottleId = input.bottle;
-
       let flight: Flight | null = null;
       if (input.flight) {
         const flightResults = await tx
@@ -120,45 +102,25 @@ export default implement(tastingCreateContract)
         flight = flightResults[0].flight;
       }
 
-      let tasting: Tasting | undefined;
-      try {
-        [tasting] = await tx
-          .insert(tastings)
-          .values({
-            ...data,
-            bottleId,
-            flightId: flight?.id ?? null,
-          })
-          .returning();
-      } catch (error) {
-        if (error instanceof Error && isTastingIdentityConflict(error)) {
-          throw errors.CONFLICT({
-            message: "Tasting already exists.",
-            cause: error,
-          });
-        }
-        throw error;
-      }
-      if (!tasting) return null;
-
-      const awards = await awardAllBadgeXp(tx, tasting);
-
-      for (const award of awards) {
-        Object.assign(award, {
-          badge: await serialize(BadgeSerializer, award.badge, context.user),
-        });
-      }
-
-      return { tasting, awards, bottleId };
+      return await insertTasting(
+        tx,
+        { ...data, bottleId, flightId: flight?.id ?? null },
+        context.user,
+      );
     });
 
-    if (!created) {
-      throw errors.INTERNAL_SERVER_ERROR({
-        message: "Unable to create tasting.",
-      });
+    if (created.replayed) {
+      return {
+        tasting: await serialize(
+          TastingSerializer,
+          created.tasting,
+          context.user,
+        ),
+        awards: [],
+      };
     }
     let { tasting } = created;
-    const { awards, bottleId } = created;
+    const { awards } = created;
 
     if (input.pendingImageId) {
       try {

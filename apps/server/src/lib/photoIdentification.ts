@@ -1,30 +1,57 @@
 import { createWhiskyLabelExtractor } from "@peated/bottle-classifier";
+import { createIgnoredBottleClassification } from "@peated/bottle-classifier/contract";
+import type { BottleClassifierProgressEvent } from "@peated/bottle-classifier/internal/runtime";
+import type { BottleCandidate } from "@peated/bottle-classifier/internal/types";
 import {
   BottleExtractedDetailsSchema,
   ImageBottleEvidenceSchema,
+  runBottleReference,
   type BottleExtractedDetails,
   type ImageBottleEvidence,
 } from "@peated/server/agents/bottleClassifier";
+import { resolveExactReferenceBottleRun } from "@peated/server/agents/bottleClassifier/findExactReferenceBottleCandidate";
 import config from "@peated/server/config";
+import { assessBottleResolution } from "@peated/server/lib/bottleMatchingAutomation";
 import {
   createOpenAIClient,
   withSentryConversation,
 } from "@peated/server/lib/openaiClient";
 import { instrumentOpenAIResponsesCall } from "@peated/server/lib/openaiResponsesTelemetry";
 import { getUploadImageDataUrl } from "@peated/server/lib/uploads";
+import { absoluteUrl } from "@peated/server/lib/urls";
+import {
+  type PhotoIdentificationDiagnosticsSchema,
+  type PhotoIdentificationProposedBottleSchema,
+  type PhotoIdentificationSchema,
+  type PhotoIdentificationStepEnum,
+  type PhotoIdentificationSuggestedNextStepEnum,
+} from "@peated/server/schemas";
+import * as Sentry from "@sentry/node";
+import { z } from "zod";
 
-type PhotoIdentificationPendingImage = {
+/**
+ * Per-member limit for identifying Bottle photos. The photo route and
+ * background tasting draft identification share it, so drafts cannot be used
+ * to get around the route's limit.
+ */
+export const PHOTO_IDENTIFICATION_RATE_LIMIT = {
+  windowMs: 60 * 60 * 1000,
+  maxRequests: 30,
+  keyPrefix: "photo-identification",
+};
+
+/**
+ * Longest a photo's bottle lookup may run after the label is read. It bounds
+ * the model cost of one photo; past it, the member gets the label facts
+ * instead of a match.
+ */
+export const PHOTO_LOOKUP_TIME_LIMIT_MS = 3 * 60 * 1000;
+
+/** A stored Bottle photo: a pending upload or a tasting draft's photo. */
+type PhotoIdentificationImage = {
   id: string;
   imageUrl: string;
 };
-
-export async function getPhotoExtractionImageInput({
-  pendingUpload,
-}: {
-  pendingUpload: PhotoIdentificationPendingImage;
-}) {
-  return await getUploadImageDataUrl(pendingUpload.imageUrl);
-}
 
 function maybeField<T extends boolean | number | string | string[]>(
   value: T | null | undefined,
@@ -51,11 +78,11 @@ function maybeField<T extends boolean | number | string | string[]>(
  * consumed by the bottle classifier and returned by photo identification.
  */
 export function buildPhotoEvidenceFromExtractedIdentity({
-  pendingUpload,
+  photo,
   extractedIdentity,
   rawLabelText = null,
 }: {
-  pendingUpload: PhotoIdentificationPendingImage;
+  photo: PhotoIdentificationImage;
   extractedIdentity: BottleExtractedDetails | null;
   rawLabelText?: string | null;
 }): ImageBottleEvidence {
@@ -82,7 +109,7 @@ export function buildPhotoEvidenceFromExtractedIdentity({
   ].filter(Boolean);
 
   return ImageBottleEvidenceSchema.parse({
-    sourceImageId: pendingUpload.id,
+    sourceImageId: photo.id,
     extractors: [
       {
         kind: "vision",
@@ -115,6 +142,9 @@ export function buildPhotoEvidenceFromExtractedIdentity({
       bottlingYear: maybeField(extractedIdentity?.bottling_year),
       releaseYear: maybeField(extractedIdentity?.release_year),
       edition: maybeField(extractedIdentity?.edition),
+      caskNumber: maybeField(extractedIdentity?.cask_number),
+      maturation: maybeField(extractedIdentity?.maturation),
+      outturn: maybeField(extractedIdentity?.outturn),
       caskStrength: maybeField(extractedIdentity?.cask_strength),
       singleCask: maybeField(extractedIdentity?.single_cask),
     },
@@ -134,10 +164,12 @@ export function buildPhotoEvidenceFromExtractedIdentity({
 /**
  * Runs the server-owned whisky label extraction boundary for a pending image.
  */
-export async function extractPhotoBottleEvidence({
-  pendingUpload,
+async function extractPhotoBottleEvidence({
+  photo,
+  signal,
 }: {
-  pendingUpload: PhotoIdentificationPendingImage;
+  photo: PhotoIdentificationImage;
+  signal?: AbortSignal;
 }): Promise<{
   extractedIdentity: BottleExtractedDetails | null;
   imageEvidence: ImageBottleEvidence;
@@ -146,13 +178,13 @@ export async function extractPhotoBottleEvidence({
     return {
       extractedIdentity: null,
       imageEvidence: buildPhotoEvidenceFromExtractedIdentity({
-        pendingUpload,
+        photo,
         extractedIdentity: null,
       }),
     };
   }
 
-  const conversationId = `photo_identification:${pendingUpload.id}`;
+  const conversationId = `photo_identification:${photo.id}`;
   const extraction = await withSentryConversation(conversationId, async () => {
     return await instrumentOpenAIResponsesCall({
       baseURL: config.AI_GATEWAY_HOST,
@@ -174,7 +206,8 @@ export async function extractPhotoBottleEvidence({
           onImageExtractionMetadata: reportResponse,
         });
         const extraction = await extractor.extractFromImageWithMetadata(
-          await getPhotoExtractionImageInput({ pendingUpload }),
+          await getUploadImageDataUrl(photo.imageUrl),
+          { signal },
         );
         return {
           extractedIdentity: BottleExtractedDetailsSchema.nullable().parse(
@@ -189,14 +222,14 @@ export async function extractPhotoBottleEvidence({
   return {
     extractedIdentity: extraction.extractedIdentity,
     imageEvidence: buildPhotoEvidenceFromExtractedIdentity({
-      pendingUpload,
+      photo,
       extractedIdentity: extraction.extractedIdentity,
       rawLabelText: extraction.rawLabelText,
     }),
   };
 }
 
-export function buildPhotoReferenceName(
+function buildPhotoReferenceName(
   extractedIdentity: BottleExtractedDetails | null,
 ) {
   const parts = [
@@ -213,4 +246,474 @@ export function buildPhotoReferenceName(
   ].filter(Boolean);
 
   return parts.length ? parts.join(" ") : "Bottle photo upload";
+}
+
+export type PhotoIdentificationClassification = Awaited<
+  ReturnType<typeof runBottleReference>
+>["result"];
+export type PhotoIdentificationModelMetadata = Awaited<
+  ReturnType<typeof runBottleReference>
+>["modelMetadata"];
+type PhotoIdentificationAttributeValue =
+  | boolean
+  | number
+  | string
+  | string[]
+  | number[];
+export interface PhotoIdentificationAttributes {
+  [name: string]: PhotoIdentificationAttributeValue;
+}
+export type PhotoIdentificationSpan = {
+  setAttribute: (key: string, value: PhotoIdentificationAttributeValue) => void;
+};
+
+export type PhotoIdentificationStartSpan = <Result>(
+  context: Parameters<typeof Sentry.startSpan>[0],
+  callback: (span: PhotoIdentificationSpan) => Promise<Result>,
+) => Promise<Result>;
+
+type PhotoIdentificationStep = z.infer<typeof PhotoIdentificationStepEnum>;
+
+/**
+ * Progress from one photo identification, sent while it runs. Candidates are
+ * Peated's own likely matches, found before the classifier model starts.
+ */
+export type PhotoIdentificationProgress =
+  | { type: "label"; imageEvidence: ImageBottleEvidence }
+  | { type: "candidates"; candidates: BottleCandidate[] }
+  | { type: "step"; step: PhotoIdentificationStep };
+
+const PEATED_LOOKUP_TOOLS = new Set([
+  "search_bottles",
+  "search_entities",
+  "get_bottle_context",
+  "get_entity_context",
+]);
+
+// Members see generic steps only. Web queries and site names stay on the
+// server (product decision, photo-assisted-bottle-resolution.md).
+function toPhotoIdentificationProgress(
+  event: BottleClassifierProgressEvent,
+): PhotoIdentificationProgress {
+  if (event.type === "candidates") return event;
+  if (event.status === "finished") return { type: "step", step: "comparing" };
+  if (PEATED_LOOKUP_TOOLS.has(event.name)) {
+    return { type: "step", step: "checking_peated" };
+  }
+  if (event.name.startsWith("firecrawl_")) {
+    return { type: "step", step: "checking_web" };
+  }
+  return { type: "step", step: "comparing" };
+}
+
+export type IdentifyBottlePhotoServices = {
+  extractEvidence: typeof extractPhotoBottleEvidence;
+  runReference: typeof runBottleReference;
+  startSpan: PhotoIdentificationStartSpan;
+  lookupTimeLimitMs: number;
+};
+
+const identifyBottlePhotoServices: IdentifyBottlePhotoServices = {
+  extractEvidence: extractPhotoBottleEvidence,
+  runReference: runBottleReference,
+  startSpan: (context, callback) => Sentry.startSpan(context, callback),
+  lookupTimeLimitMs: PHOTO_LOOKUP_TIME_LIMIT_MS,
+};
+
+export type PhotoIdentificationDecision = Extract<
+  PhotoIdentificationClassification,
+  { status: "classified" }
+>["decision"];
+
+function getSuggestedNextStep(
+  classification: PhotoIdentificationClassification,
+): z.infer<typeof PhotoIdentificationSuggestedNextStepEnum> {
+  // Photo identification owns confirmation; the shared gate only chooses a suggestion.
+  if (
+    classification.status === "ignored" ||
+    !assessBottleResolution({
+      decision: classification.decision,
+      candidates: classification.artifacts.candidates,
+      sourceBottleIdentity: classification.artifacts.extractedIdentity,
+      readListingImage: true,
+    }).automationEligible
+  ) {
+    return "manual_search";
+  }
+
+  switch (classification.decision.action) {
+    case "match":
+      return "confirm_match";
+    case "create_bottle":
+      return "confirm_create";
+    case "no_match":
+      return "manual_search";
+  }
+}
+
+function summarizeExtraction(
+  imageEvidence: z.infer<typeof PhotoIdentificationSchema>["imageEvidence"],
+) {
+  const text = imageEvidence.extractors
+    .flatMap((extractor) => extractor.textSpans.map((span) => span.text))
+    .filter(Boolean)
+    .join(" ")
+    .trim();
+
+  return text || null;
+}
+
+function buildPhotoIdentificationDiagnostics({
+  extractionStatus,
+  extractionSummary,
+  classification,
+}: {
+  extractionStatus: z.infer<
+    typeof PhotoIdentificationDiagnosticsSchema
+  >["extraction"]["status"];
+  extractionSummary: string | null;
+  classification: PhotoIdentificationClassification;
+}): z.infer<typeof PhotoIdentificationDiagnosticsSchema> {
+  const artifacts = classification.artifacts;
+
+  if (classification.status === "ignored") {
+    return {
+      extraction: {
+        status: extractionStatus,
+        summary: extractionSummary,
+      },
+      candidates: {
+        count: artifacts.candidates.length,
+      },
+      classification: {
+        status: "ignored",
+        action: null,
+        reason: classification.reason,
+      },
+    };
+  }
+
+  return {
+    extraction: {
+      status: extractionStatus,
+      summary: extractionSummary,
+    },
+    candidates: {
+      count: artifacts.candidates.length,
+    },
+    classification: {
+      status: "classified",
+      action: classification.decision.action,
+      reason: classification.decision.rationale,
+    },
+  };
+}
+
+export function getClassificationLogAttributes(
+  prefix: string,
+  classification: PhotoIdentificationClassification,
+  modelMetadata?: PhotoIdentificationModelMetadata,
+) {
+  const candidates = classification.artifacts.candidates;
+  const candidateBottleIds = classification.artifacts.candidates
+    .map((candidate) => candidate.bottleId)
+    .flatMap((id) => {
+      const parsed = z.number().safeParse(id);
+      return parsed.success ? [parsed.data] : [];
+    });
+  const candidateNames = classification.artifacts.candidates
+    .map((candidate) => candidate.fullName)
+    .filter(Boolean)
+    .slice(0, 5);
+  // Sentry span attributes support scalar arrays, not object arrays, so keep a
+  // bounded route-owned JSON-string projection for candidate trait debugging.
+  const candidateIdentity = candidates.slice(0, 5).map((candidate) =>
+    JSON.stringify({
+      bottleId: candidate.bottleId,
+      fullName: candidate.fullName,
+      category: candidate.category,
+      statedAge: candidate.statedAge,
+      abv: candidate.abv,
+      vintageYear: candidate.vintageYear,
+      bottlingYear: candidate.bottlingYear,
+      releaseYear: candidate.releaseYear,
+      edition: candidate.edition,
+    }),
+  );
+  const attrs: PhotoIdentificationAttributes = {
+    [`${prefix}.status`]: classification.status,
+    [`${prefix}.candidate_count`]: candidates.length,
+    [`${prefix}.candidate_bottle_ids`]: candidateBottleIds,
+    [`${prefix}.candidate_names`]: candidateNames,
+    [`${prefix}.candidate_identity`]: candidateIdentity,
+  };
+
+  if (classification.status === "ignored") {
+    attrs[`${prefix}.reason`] = classification.reason;
+    return attrs;
+  }
+
+  const { decision } = classification;
+  attrs[`${prefix}.action`] = decision.action;
+  if (decision.confidenceBasis) {
+    attrs[`${prefix}.confidence_basis_web_evidence`] =
+      decision.confidenceBasis.webEvidence;
+    attrs[`${prefix}.confidence_basis_unresolved_risk_count`] =
+      decision.confidenceBasis.unresolvedRisks.length;
+  }
+  if (modelMetadata) {
+    attrs[`${prefix}.tool_calls`] = modelMetadata.toolCalls.names;
+  }
+  if (decision.rationale) attrs[`${prefix}.reason`] = decision.rationale;
+
+  if ("matchedBottleId" in decision && decision.matchedBottleId !== null) {
+    attrs[`${prefix}.matched_bottle_id`] = decision.matchedBottleId;
+  }
+  if ("proposedBottle" in decision && decision.proposedBottle) {
+    attrs[`${prefix}.proposed_bottle_brand`] =
+      decision.proposedBottle.brand.name;
+    attrs[`${prefix}.proposed_bottle_name`] = decision.proposedBottle.name;
+  }
+  return attrs;
+}
+
+export function getImageEvidenceFieldAttributes(
+  imageEvidence: z.infer<typeof PhotoIdentificationSchema>["imageEvidence"],
+) {
+  const attrs: Record<string, string | number> = {};
+  const fieldCandidates = imageEvidence.fieldCandidates;
+
+  for (const field of [
+    "brand",
+    "expression",
+    "statedAge",
+    "abv",
+    "vintageYear",
+    "bottlingYear",
+    "releaseYear",
+    "edition",
+  ] as const) {
+    const candidate = fieldCandidates[field];
+    if (!candidate) continue;
+    attrs[`photo_identification.field.${field}`] = candidate.value;
+    attrs[`photo_identification.field.${field}.confidence`] =
+      candidate.confidence;
+  }
+
+  return attrs;
+}
+
+function setSpanAttributes(
+  span: PhotoIdentificationSpan,
+  attrs: PhotoIdentificationAttributes,
+) {
+  for (const [key, value] of Object.entries(attrs)) {
+    span.setAttribute(key, value);
+  }
+}
+
+/**
+ * Runs the bottle lookup until it finishes, `signal` aborts, or the time limit
+ * passes.
+ */
+async function runReferenceWithinTimeLimit({
+  input,
+  services,
+  signal,
+  span,
+  onProgress,
+}: {
+  input: Parameters<typeof runBottleReference>[0];
+  services: IdentifyBottlePhotoServices;
+  signal?: AbortSignal;
+  span: PhotoIdentificationSpan;
+  onProgress?: (event: BottleClassifierProgressEvent) => void;
+}): ReturnType<typeof runBottleReference> {
+  const timeLimit = AbortSignal.timeout(services.lookupTimeLimitMs);
+  try {
+    return await services.runReference(input, {
+      signal: signal ? AbortSignal.any([signal, timeLimit]) : timeLimit,
+      onProgress,
+    });
+  } catch (err) {
+    // Photo lookup cost rule: a lookup past its time limit stops and returns
+    // the label facts already read. Other failures still fail.
+    if (!timeLimit.aborted) throw err;
+    span.setAttribute("photo_identification.lookup_timed_out", true);
+    return {
+      result: createIgnoredBottleClassification({
+        reason: "The bottle lookup ran out of time.",
+        artifacts: {
+          extractedIdentity: input.extractedIdentity,
+          imageEvidence: input.imageEvidence,
+        },
+      }),
+      modelMetadata: null,
+    };
+  }
+}
+
+/**
+ * Runs label extraction and local candidate discovery for a stored Bottle
+ * photo. A literal accepted reference resolves directly; all other inputs run
+ * the full classifier once, within `lookupTimeLimitMs`. A lookup that runs out
+ * of time returns the label facts with no match. `signal` stops the lookup
+ * when the caller no longer wants it, such as a closed request. Callers own the
+ * photo's ownership checks and pass the attribute that names it, such as its
+ * pending upload or tasting draft.
+ *
+ * This is the shared Photo Identification workflow span boundary for all callers.
+ */
+export async function identifyBottlePhoto(
+  {
+    photo,
+    traceAttributes,
+    signal,
+    onProgress,
+  }: {
+    photo: PhotoIdentificationImage;
+    traceAttributes: PhotoIdentificationAttributes;
+    signal?: AbortSignal;
+    onProgress?: (progress: PhotoIdentificationProgress) => void;
+  },
+  services: IdentifyBottlePhotoServices = identifyBottlePhotoServices,
+) {
+  const conversationId = `photo_identification:${photo.id}`;
+
+  return await services.startSpan(
+    {
+      op: "gen_ai.invoke_workflow",
+      name: "invoke_workflow Photo Identification",
+      attributes: {
+        "gen_ai.operation.name": "invoke_workflow",
+        "gen_ai.provider.name": "openai",
+        "gen_ai.workflow.name": "Photo Identification",
+        "gen_ai.conversation.id": conversationId,
+        ...traceAttributes,
+        "photo_identification.source_image_url": absoluteUrl(
+          config.API_SERVER,
+          photo.imageUrl,
+        ),
+        "photo_identification.upload_path": photo.imageUrl,
+      },
+    },
+    async (span) => {
+      span.setAttribute("photo_identification.stage", "extraction");
+      const { extractedIdentity, imageEvidence } =
+        await services.extractEvidence({
+          photo,
+          signal,
+        });
+      onProgress?.({ type: "label", imageEvidence });
+
+      const classificationInput = {
+        reference: {
+          id: photo.id,
+          name: buildPhotoReferenceName(extractedIdentity),
+          url: null,
+          imageUrl: absoluteUrl(config.API_SERVER, photo.imageUrl),
+        },
+        conversationId,
+        extractedIdentity,
+        imageEvidence,
+      };
+      span.setAttribute("photo_identification.stage", "classification");
+      const exactReferenceRun =
+        await resolveExactReferenceBottleRun(classificationInput);
+      const classificationRun = exactReferenceRun
+        ? exactReferenceRun
+        : await runReferenceWithinTimeLimit({
+            input: classificationInput,
+            services,
+            signal,
+            span,
+            onProgress: onProgress
+              ? (event) => onProgress(toPhotoIdentificationProgress(event))
+              : undefined,
+          });
+      const classification = classificationRun.result;
+      const referenceName = classificationInput.reference.name;
+      const diagnostics = buildPhotoIdentificationDiagnostics({
+        extractionStatus: extractedIdentity ? "found" : "empty",
+        extractionSummary: summarizeExtraction(imageEvidence),
+        classification,
+      });
+      const suggestedNextStep = getSuggestedNextStep(classification);
+
+      setSpanAttributes(span, {
+        "photo_identification.stage": "completed",
+        "photo_identification.reference_name": referenceName,
+        "photo_identification.extracted_identity_summary": referenceName,
+        "photo_identification.image_evidence_summary":
+          diagnostics.extraction.summary ?? "none",
+        "photo_identification.initial_candidate_count":
+          exactReferenceRun === null ? 0 : 1,
+        "photo_identification.final_candidate_count":
+          classification.artifacts.candidates.length,
+        "photo_identification.suggested_next_step": suggestedNextStep,
+        ...getImageEvidenceFieldAttributes(imageEvidence),
+        ...getClassificationLogAttributes(
+          "photo_identification.final",
+          classification,
+          classificationRun.modelMetadata,
+        ),
+      });
+
+      return {
+        imageEvidence,
+        classification,
+        modelMetadata: classificationRun.modelMetadata,
+        referenceName,
+        diagnostics,
+        suggestedNextStep,
+      };
+    },
+  );
+}
+
+/**
+ * The parts of a proposed Bottle a member sees before confirming it. Candidate
+ * IDs, rationale, and other classifier internals stay on the server.
+ */
+export function serializeProposedBottle(
+  proposedBottle: Extract<
+    PhotoIdentificationDecision,
+    { action: "create_bottle" }
+  >["proposedBottle"],
+): z.infer<typeof PhotoIdentificationProposedBottleSchema> {
+  return {
+    name: proposedBottle.name,
+    series: proposedBottle.series
+      ? {
+          id: proposedBottle.series.id,
+          name: proposedBottle.series.name,
+        }
+      : null,
+    category: proposedBottle.category,
+    edition: proposedBottle.edition,
+    statedAge: proposedBottle.statedAge,
+    abv: proposedBottle.abv,
+    caskStrength: proposedBottle.caskStrength,
+    singleCask: proposedBottle.singleCask,
+    maturation: proposedBottle.maturation,
+    caskNumber: proposedBottle.caskNumber,
+    outturn: proposedBottle.outturn,
+    vintageYear: proposedBottle.vintageYear,
+    bottlingYear: proposedBottle.bottlingYear ?? null,
+    releaseYear: proposedBottle.releaseYear,
+    brand: {
+      id: proposedBottle.brand.id,
+      name: proposedBottle.brand.name,
+    },
+    distillers: proposedBottle.distillers.map((distiller) => ({
+      id: distiller.id,
+      name: distiller.name,
+    })),
+    bottler: proposedBottle.bottler
+      ? {
+          id: proposedBottle.bottler.id,
+          name: proposedBottle.bottler.name,
+        }
+      : null,
+  };
 }

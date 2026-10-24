@@ -65,6 +65,7 @@ function buildClassification(
     status: "classified" as const,
     decision: {
       rationale: "test fixture",
+      confidenceBasis: { webEvidence: "supportive", unresolvedRisks: [] },
       candidateBottleIds: [],
       identityScope: "product",
       observation: null,

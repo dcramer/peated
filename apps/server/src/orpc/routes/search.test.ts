@@ -464,6 +464,44 @@ test("resolves Bottle, Entity, and Series Peated ID tombstones directly", async 
   });
 });
 
+test("gives every Bottle result its distillers and group", async ({
+  fixtures,
+}) => {
+  const distillery = await fixtures.Entity({
+    name: "Distillerneedle Works",
+    kind: "distillery",
+    type: ["distiller"],
+  });
+  const bottle = await fixtures.Bottle({
+    name: "Distillerneedle",
+    distillerIds: [distillery.id],
+  });
+  await indexBottleSearch({ bottleId: bottle.id });
+
+  const [textData, idData] = await Promise.all([
+    routerClient.search({
+      query: "distillerneedle",
+      scopes: ["bottles"],
+      limit: 5,
+    }),
+    routerClient.search({
+      query: formatPeatedId("bottle", bottle.id),
+      scopes: ["bottles"],
+    }),
+  ]);
+
+  const expected = {
+    id: bottle.id,
+    brand: expect.objectContaining({ id: bottle.brandId }),
+    distillers: expect.arrayContaining([
+      { id: distillery.id, name: distillery.name, kind: "distillery" },
+    ]),
+    group: { name: expect.any(String) },
+  };
+  expect(textData.groups[0]?.results[0]).toMatchObject(expected);
+  expect(idData.exact).toMatchObject({ type: "bottle", ref: expected });
+});
+
 test("searches active Bottles and directly assigned aliases", async ({
   fixtures,
 }) => {
@@ -538,6 +576,18 @@ test("finds an Entity by a display alias without exact-match authority", async (
 
   expect(data.groups).toMatchObject([
     { type: "brands", hasMore: false, results: [{ id: entity.id }] },
+  ]);
+});
+
+test("finds an Entity by a short name prefix that is also a stop word", async ({
+  fixtures,
+}) => {
+  const entity = await fixtures.Entity({ name: "Glen Ord", kind: "brand" });
+
+  const data = await routerClient.search({ query: "or", scopes: ["brands"] });
+
+  expect(data.groups).toMatchObject([
+    { type: "brands", results: [{ id: entity.id }] },
   ]);
 });
 

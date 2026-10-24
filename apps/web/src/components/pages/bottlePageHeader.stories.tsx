@@ -2,6 +2,7 @@ import type { Meta, StoryObj } from "@storybook/nextjs-vite";
 
 import { Button, ButtonLink } from "@peated/web/components/button.stylex";
 import { RowMenu } from "@peated/web/components/rowMenu.stylex";
+import { TastingRating } from "@peated/web/components/scoring.stylex";
 import { StoryCanvas } from "../storyFixtures.stylex";
 import { BottlePageHeader } from "./bottlePageHeader.stylex";
 
@@ -47,6 +48,10 @@ const meta = {
         very_good: 12,
       },
     },
+    specs: [
+      { label: "ABV", value: "52%" },
+      { label: "Category", value: "Single Malt" },
+    ],
   },
   argTypes: {
     actions: { control: false },
@@ -72,9 +77,45 @@ export const TastingOnly: Story = {
     brandHref: "/entities/1697",
     metadata: "New Riff Distilling",
     name: "6-year-old Malted Rye",
+    specs: [
+      { label: "ABV", value: "50%" },
+      { label: "Category", value: "Rye" },
+    ],
     rating: {
       tastingCounts: { very_good: 2 },
     },
+  },
+};
+
+export const ReleaseFacts: Story = {
+  args: {
+    brand: "Elijah Craig",
+    brandHref: "/entities/1200",
+    metadata: "Heaven Hill Distillery",
+    name: "Barrel Proof",
+    specs: [
+      { label: "ABV", value: "68.3%" },
+      { label: "Age", value: "12 years" },
+      { label: "Batch", value: "C923" },
+    ],
+  },
+};
+
+export const SeriesFact: Story = {
+  args: {
+    brand: "Gordon & MacPhail",
+    brandHref: "/entities/1500",
+    metadata: "Clynelish",
+    name: "Clynelish 1972",
+    specs: [
+      {
+        label: "Series",
+        value: "Connoisseurs Choice Cask Strength",
+        text: true,
+      },
+      { label: "ABV", value: "58.9%" },
+      { label: "Age", value: "37 years" },
+    ],
   },
 };
 
@@ -95,6 +136,17 @@ export const ThinData: Story = {
     metadata: "Port Ellen Distillery",
     menu: null,
     name: "Independent bottling",
+    rating: null,
+    specs: undefined,
+  },
+};
+
+export const MemberRating: Story = {
+  args: {
+    actions: null,
+    aside: <TastingRating band="very_good" size="lg" />,
+    menu: null,
+    nameHref: "/bottles/1-laphroaig-elements-l-2-0",
     rating: null,
   },
 };

@@ -14,7 +14,9 @@ agreements, missing facts, and conflicts.
 
 The shared comparator orders release evidence before name similarity. Stored
 relationship IDs take precedence over names. Cask punctuation and small ABV
-differences remain conflicts. Missing facts are not contradictions. Maturation
+differences remain conflicts. Missing facts are not contradictions. Creation
+candidates leave out a Bottle that shares none of the entered distilleries; a
+Bottle with no stored distillery stays. Maturation
 wording and outturn do not determine identity. Bottling year remains contextual
 evidence, not an independent reason to create another Bottle.
 
@@ -25,7 +27,9 @@ classification validation and automation gates still control assignment.
 Catalog listing retains filters, counts, pagination, explicit sort choices, and
 exact-reference priority. The Bottle section of global search shares these documents,
 with exact names and references ordered before text relevance. Ordinary search does
-not require embeddings.
+not require embeddings. Every Bottle result, including a Peated ID match and a
+possible match, carries its BottleGroup name and distilleries, so search rows
+show the same name and producers as other bottle rows.
 
 ## Documents and queries
 
@@ -39,10 +43,12 @@ documents, and creation writes initial documents.
 
 Every text read uses TIN.
 
-User input is compiled into bounded literal TINQL. Catalog search supports
-alphabetic prefixes. Candidate discovery uses a broad word query and, on an empty
-text result, one spelling fallback with edit distance one. Numeric and mixed
-letter/number identifiers never receive fuzzy or prefix expansion.
+User input is compiled into bounded literal TINQL. Catalog search matches
+alphabetic prefixes of two or more letters, so "or" finds "Glen Ord". Typed
+"and", "or", and "not" are ignored unless they are the whole query; they are
+never search operators. Candidate discovery uses a broad word query and, on an
+empty text result, one spelling fallback with edit distance one. Numeric and
+mixed letter/number identifiers never receive fuzzy or prefix expansion.
 
 Broad word queries drop words that describe almost every whisky, such as
 "single", "malt", "scotch", and "year", when any other word remains. An OR over

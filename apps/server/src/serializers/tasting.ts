@@ -191,6 +191,7 @@ export const TastingSerializer = serializer({
       servingStyle: item.servingStyle,
       friends: attrs.friends,
 
+      tastedAt: item.tastedAt.toISOString(),
       createdAt: item.createdAt.toISOString(),
 
       comments: item.comments,

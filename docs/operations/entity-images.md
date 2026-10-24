@@ -18,9 +18,9 @@ and database schema own exact behavior.
 
 ## Prepare Files
 
-Entity images appear at `16:10`. Prepare them at `1600 x 1000` to avoid an
-unintended crop in the current upload processor. Keep each source file below the
-20 MiB upload limit.
+Entity images appear whole in a `16:10` frame. Prepare them at `1600 x 1000`
+to fill it; the server shrinks larger images to fit within `1600 x 1600`
+without cropping. Keep each source file below the 20 MiB upload limit.
 
 The server converts uploads to WebP and removes embedded metadata. Do not rely
 on EXIF or IPTC fields for attribution.

@@ -55,6 +55,8 @@ import search from "@peated/server/orpc/contracts/search";
 import smwsDistillerList from "@peated/server/orpc/contracts/smws/distiller-list";
 import stats from "@peated/server/orpc/contracts/stats";
 import tagBottles from "@peated/server/orpc/contracts/tags/bottles";
+import tastingDraftCount from "@peated/server/orpc/contracts/tastingDrafts/count";
+import tastingDraftList from "@peated/server/orpc/contracts/tastingDrafts/list";
 import tastingCreate from "@peated/server/orpc/contracts/tastings/create";
 import tastingDetails from "@peated/server/orpc/contracts/tastings/details";
 import tastingList from "@peated/server/orpc/contracts/tastings/list";
@@ -63,6 +65,7 @@ import userActivityList from "@peated/server/orpc/contracts/users/activity/list"
 import userBadgeList from "@peated/server/orpc/contracts/users/badge-list";
 import userDetails from "@peated/server/orpc/contracts/users/details";
 import userFlavorList from "@peated/server/orpc/contracts/users/flavor-list";
+import userLibrarySearch from "@peated/server/orpc/contracts/users/library-search";
 import userLibraryStats from "@peated/server/orpc/contracts/users/library-stats";
 import userRegionList from "@peated/server/orpc/contracts/users/region-list";
 import userTastingStats from "@peated/server/orpc/contracts/users/tasting-stats";
@@ -175,6 +178,10 @@ export const mockContract = {
     list: tastingList,
     photoIdentification: tastingPhotoIdentification,
   },
+  tastingDrafts: {
+    count: tastingDraftCount,
+    list: tastingDraftList,
+  },
   users: {
     activity: {
       list: userActivityList,
@@ -182,6 +189,7 @@ export const mockContract = {
     badgeList: userBadgeList,
     details: userDetails,
     flavorList: userFlavorList,
+    librarySearch: userLibrarySearch,
     libraryStats: userLibraryStats,
     regionList: userRegionList,
     tastingStats: userTastingStats,

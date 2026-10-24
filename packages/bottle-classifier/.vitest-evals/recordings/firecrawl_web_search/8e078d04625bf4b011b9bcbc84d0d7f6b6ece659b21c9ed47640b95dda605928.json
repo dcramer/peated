@@ -1,0 +1,65 @@
+{
+  "writtenAt": "2026-10-19T10:12:47.357Z",
+  "toolName": "firecrawl_web_search",
+  "input": {
+    "queries": ["\"The Exclusive Malts\" Islay 2007 \"1661\" 57.1 8 years"]
+  },
+  "output": {
+    "evidence": [
+      {
+        "provider": "firecrawl",
+        "query": "\"The Exclusive Malts\" Islay 2007 \"1661\" 57.1 8 years",
+        "summary": "[🔍](https://norfolkwineandspirits.com/shop/the-exclusive-malts-islay-distillery-2007-aged-8-years-57-1/#)\n\n# The Exclusive Malts – Islay Distillery – 2007 – Aged 8 Years (57.1%)\n$194.99\n\nIn stock\n\nThe Exclusive Malts - Islay Distillery - 2007 - Aged 8 Years (57.1%) quantity\n\nAdd to cart\n\nApple Logo\n\nPay securely with Pay with 0000\n\n0000\n\n0000\n\nAdd to wishlist\n\n## Add to list\nThe Exclusive Malts - Islay Distillery - 2007 - Aged 8 Years (57.1%)\n\nYour listsCreate a new list\n\nYou have not created any lists yet.\n\nName your listWho can see this list?\n\nClose\n\nSKU: 892032102605\n\n| Weight | 3.5 lbs |",
+        "results": [
+          {
+            "title": "The Exclusive Malts – Islay Distillery – 2007 – Aged 8 Years (57.1%)",
+            "url": "https://norfolkwineandspirits.com/shop/the-exclusive-malts-islay-distillery-2007-aged-8-years-57-1/",
+            "domain": "norfolkwineandspirits.com",
+            "description": "[🔍](https://norfolkwineandspirits.com/shop/the-exclusive-malts-islay-distillery-2007-aged-8-years-57-1/#)\n\n# The Exclusive Malts – Islay Distillery – 2007 – Aged 8 Years (57.1%)\n$194.99\n\nIn stock\n\nThe Exclusive Malts - ",
+            "extraSnippets": []
+          },
+          {
+            "title": "Single Malt Report: Islay Distillery 7 year old 2007 Exclusive Malts, cask ...",
+            "url": "http://www.divingforpearlsblog.com/2016/06/single-malt-report-islay-distillery-7.html",
+            "domain": "divingforpearlsblog.com",
+            "description": "Jun 16, 2016",
+            "extraSnippets": []
+          },
+          {
+            "title": "The Exclusive Malts “Islay” 8 Year 2007 (57.1% abv) - The Malt Impostor",
+            "url": "https://maltimpostor.com/2017/01/the-exclusive-malts-islay-8-year-2007-57-abv/",
+            "domain": "maltimpostor.com",
+            "description": "On the scale of celebrity supercouple nicknames– **The Exclusive Malts “Islay” 8 Year 2007 57% is _Cash and Cary_–In reference to Cary Grant and his second wife, Barbara Woolworth Hutton, heiress to the Woolworth retail ",
+            "extraSnippets": []
+          },
+          {
+            "title": "Islay Distillery 2007 8 Year Exclusive Malts - D&M Wines and Liquors",
+            "url": "https://dandm.com/products/islay-distillery-2007-8-year-exclusive-malts",
+            "domain": "dandm.com",
+            "description": "Out of stockScotch Style Single Malt Country Scotland Region Islay Vintage 2007 Bottler Exclusive Malts Distillery Lagavulin ABV 57.1% Age in Years 8 Size 750mL. $149.99.",
+            "extraSnippets": []
+          },
+          {
+            "title": "The Exclusive Malts Islay 7 year old 2007 (cask #904), 54.6%",
+            "url": "https://whiskyadvocate.com/The-Exclusive-Malts-Islay-7-year-old-2007-cask-N904-54-6",
+            "domain": "whiskyadvocate.com",
+            "description": "54.6% Price: $145.00. An Islay single malt of unknown origin aged in a bourbon barrel … smoke, iodine, paste, and oak. balanced by honey, salt, and caramel.",
+            "extraSnippets": []
+          },
+          {
+            "title": "The Creative Whisky Co. 'The Exclusive Malts' Balmenach 8 Year ...",
+            "url": "https://fineliquors.com/products/the-creative-whisky-co-the-exclusive-malts-balmenach-8-year-old-single-malt-scotch-whisky-2007-release",
+            "domain": "fineliquors.com",
+            "description": "Free deliveryThe 2007 Balmenach 8-Year-Old offers fresh orchard fruits, honey, citrus, toffee, and vanilla, with gentle oak spice and a sweet, refreshing finish.",
+            "extraSnippets": []
+          }
+        ]
+      }
+    ],
+    "errors": []
+  },
+  "metadata": {
+    "cacheKey": "8e078d04625bf4b011b9bcbc84d0d7f6b6ece659b21c9ed47640b95dda605928",
+    "mode": "auto"
+  }
+}

@@ -101,8 +101,16 @@ async function ReleaseResults({
       {bottleList.results.length ? (
         <ItemList ariaLabel="Bottle releases">
           {bottleList.results.map((bottle) => {
+            // Bottle Presentation: family-relative rows. The page header
+            // already names the producer and shared series, so rows leave
+            // them out and show what tells each release apart.
             const { ratings, ...identity } = toBottleListItem(bottle, {
+              includeBrandInName: false,
               includeRatings: true,
+              seriesPlacement:
+                bottle.series?.id === anchorBottle.series?.id
+                  ? "none"
+                  : "provenance",
             });
             return (
               <ItemListItem key={bottle.id}>

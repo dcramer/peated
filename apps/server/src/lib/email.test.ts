@@ -41,6 +41,9 @@ const createEmailTestHarness = () => {
           rejected: [],
           pending: [],
           response: "ok",
+          envelopeTime: 0,
+          messageTime: 0,
+          messageSize: 0,
         };
         callback(null, info);
       });

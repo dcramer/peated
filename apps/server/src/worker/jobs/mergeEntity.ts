@@ -17,11 +17,12 @@ import {
   getPeatedSystemActorForDatabase,
   getUserActorForDatabase,
 } from "@peated/server/lib/actors";
-import { findConflictingSmwsBottleId } from "@peated/server/lib/bottleConflicts";
 import {
-  getBottleExactIdentity,
-  materializeBottleForGroup,
-} from "@peated/server/lib/bottleIdentity";
+  findConflictingSmwsBottleId,
+  getBottleStructuredIdentityKey,
+} from "@peated/server/lib/bottleConflicts";
+import { findSeriesIdByName } from "@peated/server/lib/bottleHelpers";
+import { getMovedBottleIdentity } from "@peated/server/lib/bottleIdentity";
 import type { SystemBottlePatch } from "@peated/server/lib/bottleSchemas";
 import { moveEntityAliases } from "@peated/server/lib/entityAliases";
 import {
@@ -36,7 +37,7 @@ import {
   assertValidEntityOwner,
   EntityOwnershipConflictError,
 } from "@peated/server/lib/entityOwnership";
-import { formatBottleName } from "@peated/server/lib/format";
+import { deleteOwnedPronunciationAudio } from "@peated/server/lib/entityPronunciationAudio";
 import { logError, logInfo, logWarn } from "@peated/server/lib/log";
 import {
   finalizeBottleMerge,
@@ -45,6 +46,7 @@ import {
 } from "@peated/server/lib/mergeBottles";
 import { getAutomationModeratorUser } from "@peated/server/lib/systemUser";
 import {
+  BottleUpdateConflictError,
   bottleUpdateExpectedSharedState,
   finalizeBottleUpdate,
   updateBottleInTransaction,
@@ -74,6 +76,38 @@ class EntityMergeBottleGroupRequiredError extends Error {
     );
     this.name = "EntityMergeBottleGroupRequiredError";
   }
+}
+
+class EntityMergeBottleIdentityConflictError extends Error {
+  constructor(
+    groupId: number,
+    conflictingBottleId: number | null,
+    options: ErrorOptions,
+  ) {
+    const match =
+      conflictingBottleId === null
+        ? "another Bottle"
+        : `Bottle ${conflictingBottleId}`;
+    super(
+      `BottleGroup ${groupId} has a Bottle that would match ${match}. Merge or separate the matching Bottles before this Entity merge can continue.`,
+      options,
+    );
+    this.name = "EntityMergeBottleIdentityConflictError";
+  }
+}
+
+/** Keeps the blocking reason on the operation record when one exists. */
+function entityMergeBlockedError(
+  error: Error,
+  operation: LoadedEntityMergeOperation | null,
+) {
+  return operation
+    ? new EntityMergeOperationExecutionError(
+        error.message,
+        operation.operationId,
+        { cause: error },
+      )
+    : error;
 }
 
 function replaceMergedEntityIds(
@@ -195,6 +229,7 @@ async function performEntityMerge({
   let completedOperationResult: ReturnType<typeof buildOperationResult> | null =
     null;
   let performedMutation = false;
+  let sourceAudioUrls: (string | null)[] = [];
 
   await db.transaction(async (tx) => {
     if (operation) {
@@ -294,19 +329,15 @@ async function performEntityMerge({
       sourceSeriesIds,
     );
     if (bottleWithoutGroupId !== null) {
-      const error = new EntityMergeBottleGroupRequiredError(
-        bottleWithoutGroupId,
+      throw entityMergeBlockedError(
+        new EntityMergeBottleGroupRequiredError(bottleWithoutGroupId),
+        operation,
       );
-      if (operation) {
-        throw new EntityMergeOperationExecutionError(
-          error.message,
-          operation.operationId,
-          { cause: error },
-        );
-      }
-      throw error;
     }
     performedMutation = true;
+    sourceAudioUrls = mergeEntityRows
+      .filter(({ id }) => fromEntityIds.includes(id))
+      .map(({ pronunciationAudioUrl }) => pronunciationAudioUrl);
 
     const mutationUser =
       operation?.approvingModerator ?? (await getAutomationModeratorUser(tx));
@@ -566,23 +597,32 @@ async function performEntityMerge({
             sql`CASE WHEN ${bottles.id} = ${group.representativeBottleId} THEN 1 ELSE 0 END`,
             asc(bottles.id),
           );
-        const targetGroup = {
-          ...group,
-          brandId: toEntity.id,
-          fullName: formatBottleName({
-            name: `${toEntity.shortName || toEntity.name} ${group.name}`,
-          }),
-        };
-        for (const member of members) {
-          const desired = materializeBottleForGroup({
-            group: targetGroup,
-            exact: getBottleExactIdentity({
-              bottle: member,
-              sourceGroupStatedAge: group.statedAge,
-            }),
+        // The brand update below moves a source-brand Series to the
+        // destination Series with the same name, or creates one.
+        const movedSeriesId =
+          currentSeries && currentSeries.brandId !== toEntityId
+            ? await findSeriesIdByName(tx, {
+                brand: toEntity,
+                name: currentSeries.name,
+              })
+            : group.seriesId;
+        // A Series created by the move has no Bottles, so nothing can
+        // duplicate the moved Bottles.
+        const seriesWillBeCreated =
+          currentSeries !== null && movedSeriesId === null;
+        for (const member of seriesWillBeCreated ? [] : members) {
+          const desired = getMovedBottleIdentity({
+            bottle: member,
+            group,
+            brand: toEntity,
+            seriesId: movedSeriesId,
           });
-          const [duplicate] = await tx
-            .select({ id: bottles.id })
+          const desiredKey = getBottleStructuredIdentityKey(desired);
+          // Exact Bottle merge (docs/architecture/whisky-identity-model.md)
+          // needs the full structured identity. Same-named Bottles with
+          // different release fields move without merging.
+          const candidates = await tx
+            .select()
             .from(bottles)
             .where(
               and(
@@ -597,8 +637,11 @@ async function performEntityMerge({
                 ),
               ),
             )
-            .orderBy(asc(bottles.id))
-            .limit(1);
+            .orderBy(asc(bottles.id));
+          const duplicate = candidates.find(
+            (candidate) =>
+              getBottleStructuredIdentityKey(candidate) === desiredKey,
+          );
           if (!duplicate) continue;
           bottleMergeManifests.push(
             await mergeBottlesInTransaction(tx, {
@@ -627,22 +670,47 @@ async function performEntityMerge({
       if (bottlerChanges) input.bottler = toEntityId;
       if (distillersChange) input.distillers = nextDistillerIds;
       if (seriesInput !== undefined) input.series = seriesInput;
-      bottleUpdateManifests.push(
-        await updateBottleInTransaction(tx, {
-          bottleId: selectedBottleId,
-          expectedSharedState: bottleUpdateExpectedSharedState({
-            group,
-            distillerIds: groupDistillers.map(({ distillerId }) => distillerId),
-            series: currentSeries,
+      try {
+        bottleUpdateManifests.push(
+          await updateBottleInTransaction(tx, {
+            bottleId: selectedBottleId,
+            expectedSharedState: bottleUpdateExpectedSharedState({
+              group,
+              distillerIds: groupDistillers.map(
+                ({ distillerId }) => distillerId,
+              ),
+              series: currentSeries,
+            }),
+            input,
+            actorId: actor.id,
+            creationSource: "repair_workflow",
+            // An Entity merge changes the record ID, not the Bottle itself.
+            // Keep the Bottle's existing generated content.
+            invalidateGeneratedDetails: false,
+            // Whisky Identity Model, "Bottle Name, Edition, And Cask Number":
+            // a merge carries existing names and does not choose them, so a
+            // title clash it creates is left for a catalog repair to fix.
+            enforceNamingRules: false,
           }),
-          input,
-          actorId: actor.id,
-          creationSource: "repair_workflow",
-          // An Entity merge changes the record ID, not the Bottle itself.
-          // Keep the Bottle's existing generated content.
-          invalidateGeneratedDetails: false,
-        }),
-      );
+        );
+      } catch (error) {
+        // Catalog rule (moderators): the shared update rebuilds every member's
+        // identity from its BottleGroup, so two members, or a member and
+        // another Bottle, can collide. Only the producer collisions handled
+        // above have a known survivor; any other duplicate needs a moderator's
+        // Bottle merge, so stop without changing data.
+        if (error instanceof BottleUpdateConflictError) {
+          throw entityMergeBlockedError(
+            new EntityMergeBottleIdentityConflictError(
+              groupId,
+              error.conflictingBottleId,
+              { cause: error },
+            ),
+            operation,
+          );
+        }
+        throw error;
+      }
     }
 
     await moveEntityAliases(
@@ -864,6 +932,9 @@ async function performEntityMerge({
   if (!performedMutation) {
     return completedOperationResult;
   }
+
+  // Source Entities are deleted; the destination keeps its own audio.
+  await Promise.all(sourceAudioUrls.map(deleteOwnedPronunciationAudio));
 
   for (const manifest of bottleMergeManifests) {
     await finalizeBottleMerge(manifest);

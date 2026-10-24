@@ -1,6 +1,7 @@
 import { ORPCError } from "@orpc/server";
 import config from "@peated/server/config";
 import { db, type AnyDatabase } from "@peated/server/db";
+import { uniqueViolationConstraint } from "@peated/server/db/errors";
 import { identities, users, type User } from "@peated/server/db/schema";
 import {
   AppleIdentityTokenError,
@@ -332,7 +333,7 @@ async function authExternalIdentity(
       });
     } catch (err: any) {
       // Another request already linked this identity.
-      if (err?.code !== "23505" || err?.constraint !== "identity_unq") {
+      if (uniqueViolationConstraint(err) !== "identity_unq") {
         throw err;
       }
     }

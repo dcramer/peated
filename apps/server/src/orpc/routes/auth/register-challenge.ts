@@ -3,7 +3,7 @@ import { users } from "@peated/server/db/schema";
 import { generatePasskeyChallenge } from "@peated/server/lib/passkey";
 import { procedure } from "@peated/server/orpc";
 import { authRateLimit } from "@peated/server/orpc/middleware";
-import type { PublicKeyCredentialCreationOptionsJSON } from "@simplewebauthn/server";
+import { PasskeyCreationOptionsSchema } from "@peated/server/schemas";
 import { createHash } from "crypto";
 import { eq, sql } from "drizzle-orm";
 import { z } from "zod";
@@ -36,7 +36,7 @@ export default procedure
   )
   .output(
     z.object({
-      options: z.custom<PublicKeyCredentialCreationOptionsJSON>(),
+      options: PasskeyCreationOptionsSchema,
       signedChallenge: z.string(),
     }),
   )

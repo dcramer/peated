@@ -1,6 +1,7 @@
 import { db } from "@peated/server/db";
 import { bottleSeries, changes, entities } from "@peated/server/db/schema";
 import { getUserActorForDatabase } from "@peated/server/lib/actors";
+import { buildBottleSeriesSearchDocument } from "@peated/server/lib/search";
 import { procedure } from "@peated/server/orpc";
 import { ConflictError } from "@peated/server/orpc/errors";
 import {
@@ -13,7 +14,6 @@ import {
 } from "@peated/server/schemas";
 import { serialize } from "@peated/server/serializers";
 import { BottleSeriesSerializer } from "@peated/server/serializers/bottleSeries";
-import { pushJob } from "@peated/server/worker/dispatch";
 import { eq, sql } from "drizzle-orm";
 
 export default procedure
@@ -59,15 +59,20 @@ export default procedure
         throw new ConflictError(existingSeries);
       }
 
-      // Create the series
+      // A new Series has no Bottles, so writing its search document here
+      // leaves no indexing work for after the transaction.
+      const seriesData = {
+        name: input.name,
+        fullName,
+        description: input.description,
+        brandId: input.brand,
+        createdByActorId: actorId,
+      };
       const [series] = await tx
         .insert(bottleSeries)
         .values({
-          name: input.name,
-          fullName,
-          description: input.description,
-          brandId: input.brand,
-          createdByActorId: actorId,
+          ...seriesData,
+          ...buildBottleSeriesSearchDocument(seriesData, brand),
         })
         .returning();
 
@@ -87,10 +92,6 @@ export default procedure
       });
 
       return series;
-    });
-
-    await pushJob("IndexBottleSeriesSearch", {
-      seriesId: series.id,
     });
 
     return await serialize(BottleSeriesSerializer, series, user);

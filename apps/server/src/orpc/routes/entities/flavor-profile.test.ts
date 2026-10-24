@@ -34,26 +34,45 @@ describe("GET /entities/{entity}/flavor-profile", () => {
       {
         bottleId: first.id,
         createdById: defaults.user.id,
+        tastedAt: new Date("2026-01-01"),
         tags: ["smoke", "ash", "brine", "vanilla", "smoke"],
         createdAt: new Date("2026-01-01"),
       },
       {
         bottleId: first.id,
         createdById: defaults.user.id,
+        tastedAt: new Date("2026-01-02"),
         tags: ["smoke", "ash"],
         createdAt: new Date("2026-01-02"),
       },
-      { bottleId: second.id, createdById: defaults.user.id, tags: ["smoke"] },
-      { bottleId: first.id, createdById: privateUser.id, tags: ["iodine"] },
+      {
+        bottleId: second.id,
+        createdById: defaults.user.id,
+        tags: ["smoke"],
+        tastedAt: new Date(),
+      },
+      {
+        bottleId: first.id,
+        createdById: privateUser.id,
+        tags: ["iodine"],
+        tastedAt: new Date(),
+      },
       {
         bottleId: privateOnly.id,
         createdById: privateUser.id,
+        tastedAt: new Date(),
         tags: ["iodine"],
       },
-      { bottleId: empty.id, createdById: defaults.user.id, tags: [] },
+      {
+        bottleId: empty.id,
+        createdById: defaults.user.id,
+        tags: [],
+        tastedAt: new Date(),
+      },
       {
         bottleId: unknown.id,
         createdById: defaults.user.id,
+        tastedAt: new Date(),
         tags: ["unclassified-note"],
       },
     ]);
@@ -118,6 +137,7 @@ describe("GET /entities/{entity}/flavor-profile", () => {
       [active, removed, legacy, brandOnly, bottlerOnly].map((bottle) => ({
         bottleId: bottle.id,
         createdById: defaults.user.id,
+        tastedAt: new Date(),
         tags: ["smoke"],
       })),
     );

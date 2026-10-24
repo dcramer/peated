@@ -23,7 +23,10 @@ describe("direct Bottle consumer constraints", () => {
         collectionId: collection.id,
         bottleId: bottle.id,
       }),
-    ).rejects.toThrow(/collection_bottle_collection_id_bottle_id_unique/);
+    ).rejects.toHaveProperty(
+      "cause.message",
+      expect.stringMatching(/collection_bottle_collection_id_bottle_id_unique/),
+    );
 
     const legacyCollection = await fixtures.Collection();
     await expect(
@@ -37,7 +40,10 @@ describe("direct Bottle consumer constraints", () => {
           bottleId: bottle.id,
         },
       ]),
-    ).rejects.toThrow(/collection_bottle_collection_id_bottle_id_unique/);
+    ).rejects.toHaveProperty(
+      "cause.message",
+      expect.stringMatching(/collection_bottle_collection_id_bottle_id_unique/),
+    );
 
     await expect(
       db.insert(collectionBottles).values({
@@ -51,14 +57,20 @@ describe("direct Bottle consumer constraints", () => {
         collectionId: collection.id,
         bottleId: MISSING_BOTTLE_ID,
       }),
-    ).rejects.toThrow(/collection_bottle_bottle_id_bottle_id_fk/);
+    ).rejects.toHaveProperty(
+      "cause.message",
+      expect.stringMatching(/collection_bottle_bottle_id_bottle_id_fk/),
+    );
 
     await expect(
       db.insert(collectionBottles).values({
         collectionId: collection.id,
         bottleId: sql<number>`NULL`,
       }),
-    ).rejects.toThrow(/not-null constraint/);
+    ).rejects.toHaveProperty(
+      "cause.message",
+      expect.stringMatching(/not-null constraint/),
+    );
   });
 
   test("Flights require a unique valid Bottle", async ({ fixtures }) => {
@@ -75,7 +87,10 @@ describe("direct Bottle consumer constraints", () => {
         flightId: flight.id,
         bottleId: bottle.id,
       }),
-    ).rejects.toThrow(/flight_bottle_flight_id_bottle_id_unique/);
+    ).rejects.toHaveProperty(
+      "cause.message",
+      expect.stringMatching(/flight_bottle_flight_id_bottle_id_unique/),
+    );
 
     const legacyFlight = await fixtures.Flight();
     await expect(
@@ -89,7 +104,10 @@ describe("direct Bottle consumer constraints", () => {
           bottleId: bottle.id,
         },
       ]),
-    ).rejects.toThrow(/flight_bottle_flight_id_bottle_id_unique/);
+    ).rejects.toHaveProperty(
+      "cause.message",
+      expect.stringMatching(/flight_bottle_flight_id_bottle_id_unique/),
+    );
 
     await expect(
       db.insert(flightBottles).values({
@@ -103,14 +121,20 @@ describe("direct Bottle consumer constraints", () => {
         flightId: flight.id,
         bottleId: MISSING_BOTTLE_ID,
       }),
-    ).rejects.toThrow(/flight_bottle_bottle_id_bottle_id_fk/);
+    ).rejects.toHaveProperty(
+      "cause.message",
+      expect.stringMatching(/flight_bottle_bottle_id_bottle_id_fk/),
+    );
 
     await expect(
       db.insert(flightBottles).values({
         flightId: flight.id,
         bottleId: sql<number>`NULL`,
       }),
-    ).rejects.toThrow(/not-null constraint/);
+    ).rejects.toHaveProperty(
+      "cause.message",
+      expect.stringMatching(/not-null constraint/),
+    );
   });
 
   test("tastings require a unique valid Bottle", async ({ fixtures }) => {
@@ -118,53 +142,59 @@ describe("direct Bottle consumer constraints", () => {
     const otherBottle = await fixtures.Bottle();
     const user = await fixtures.User();
     const otherUser = await fixtures.User();
-    const createdAt = new Date("2026-07-27T12:00:00.000Z");
+    const tastedAt = new Date("2026-07-27T12:00:00.000Z");
 
     await db.insert(tastings).values({
       bottleId: bottle.id,
       createdById: user.id,
-      createdAt,
+      tastedAt,
     });
 
     await expect(
       db.insert(tastings).values({
         bottleId: bottle.id,
         createdById: user.id,
-        createdAt,
+        tastedAt,
       }),
-    ).rejects.toThrow(/tasting_unq/);
+    ).rejects.toHaveProperty(
+      "cause.message",
+      expect.stringMatching(/tasting_unq/),
+    );
 
     await expect(
       db.insert(tastings).values([
         {
           bottleId: bottle.id,
           createdById: user.id,
-          createdAt: new Date(createdAt.getTime() + 10_000),
+          tastedAt: new Date(tastedAt.getTime() + 10_000),
         },
         {
           bottleId: bottle.id,
           createdById: user.id,
-          createdAt: new Date(createdAt.getTime() + 10_000),
+          tastedAt: new Date(tastedAt.getTime() + 10_000),
         },
       ]),
-    ).rejects.toThrow(/tasting_unq/);
+    ).rejects.toHaveProperty(
+      "cause.message",
+      expect.stringMatching(/tasting_unq/),
+    );
 
     await expect(
       db.insert(tastings).values([
         {
           bottleId: bottle.id,
           createdById: otherUser.id,
-          createdAt,
+          tastedAt,
         },
         {
           bottleId: bottle.id,
           createdById: user.id,
-          createdAt: new Date(createdAt.getTime() + 1_000),
+          tastedAt: new Date(tastedAt.getTime() + 1_000),
         },
         {
           bottleId: otherBottle.id,
           createdById: user.id,
-          createdAt,
+          tastedAt,
         },
       ]),
     ).resolves.toBeDefined();
@@ -173,16 +203,22 @@ describe("direct Bottle consumer constraints", () => {
       db.insert(tastings).values({
         bottleId: MISSING_BOTTLE_ID,
         createdById: user.id,
-        createdAt: new Date(createdAt.getTime() + 2_000),
+        tastedAt: new Date(tastedAt.getTime() + 2_000),
       }),
-    ).rejects.toThrow(/tasting_bottle_id_bottle_id_fk/);
+    ).rejects.toHaveProperty(
+      "cause.message",
+      expect.stringMatching(/tasting_bottle_id_bottle_id_fk/),
+    );
 
     await expect(
       db.insert(tastings).values({
         bottleId: sql<number>`NULL`,
         createdById: user.id,
-        createdAt: new Date(createdAt.getTime() + 3_000),
+        tastedAt: new Date(tastedAt.getTime() + 3_000),
       }),
-    ).rejects.toThrow(/not-null constraint/);
+    ).rejects.toHaveProperty(
+      "cause.message",
+      expect.stringMatching(/not-null constraint/),
+    );
   });
 });

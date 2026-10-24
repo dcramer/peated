@@ -20,6 +20,19 @@ Backend tests in this repo are integration-first. Test behavior over real wiring
 - Route tests call the in-process [routerClient](../../apps/server/src/orpc/router.ts) instead of booting an HTTP server.
 - Shared fixtures and defaults come from the Vitest test context.
 
+## Test Database
+
+Tests need the Postgres and Redis services from
+[docker-compose.yml](../../docker-compose.yml). Start them with
+`docker compose up -d`, as the [README](../../README.md#dev) describes;
+`apps/server/.env.test` points at their ports.
+
+A stock Postgres will not work. [Dockerfile.postgres](../../Dockerfile.postgres)
+builds Postgres 17 with PostGIS 3.5, pgvector 0.8.0, and the `tin` search
+extension from PlanetScale's [Lead](https://github.com/planetscale/lead), and
+compose preloads `tin`. The first build takes a while because it compiles
+`tin` from Rust source.
+
 ## Test Context
 
 Fixtures are exposed on the test context via [fixtures.ts](../../apps/server/src/lib/test/fixtures.ts):
@@ -134,3 +147,18 @@ test before opening a PR.
 services are published on different host ports, add an untracked
 `apps/server/.env.test.local` to override `DATABASE_URL` and `REDIS_URL` for
 local test runs.
+
+Worktrees on different branches share `test_peated` by default, so one branch's
+migrations can break another's test run. To give a worktree its own database,
+set a different database name in that worktree's `apps/server/.env.test.local`:
+
+```shell
+DATABASE_URL=postgresql://postgres:postgres@localhost:15432/test_peated_drafts
+```
+
+Test setup creates and migrates the database if it does not exist. Use
+lowercase letters, digits, and underscores in the name.
+
+Values set in your shell win over both files, and `.env.test.local` wins over
+`.env.test`. The `test`, `test:watch`, `test:ci`, and `evals` scripts load the
+files in that order.

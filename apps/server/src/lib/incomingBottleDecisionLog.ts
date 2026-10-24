@@ -31,6 +31,9 @@ export interface IncomingBottleDecisionMetadata {
   referenceId?: number;
   previousReferenceId?: number;
   previousProposal?: ReturnType<typeof priceMatchProposalHistory>;
+  // A moderator's own reason, and the saved listing facts their Bottle differs on.
+  reviewReason?: string;
+  sourceConflicts?: string[];
 }
 
 const IncomingBottleDecisionMetadataSchema = z.record(z.string(), z.json());

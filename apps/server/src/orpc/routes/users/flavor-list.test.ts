@@ -112,6 +112,7 @@ describe("GET /users/:user/flavors", () => {
         bottleId: bottle.id,
         ratingBand: "good" as const,
         createdById: defaults.user.id,
+        tastedAt: new Date(Date.UTC(2026, 0, 1, 0, 0, index)),
         createdAt: new Date(Date.UTC(2026, 0, 1, 0, 0, index)),
       })),
     );

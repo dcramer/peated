@@ -89,10 +89,14 @@ export default procedure
       sourceDetailsCheckedAt: lot.sourceDetailsCheckedAt?.toISOString() ?? null,
       sourceDetailsRunId: lot.sourceDetailsRunId,
       currentBottle: current
-        ? await serialize(BottleSerializer, current, context.user)
+        ? await serialize(BottleSerializer, current, context.user, [], {
+            includeGroupSummary: true,
+          })
         : null,
       suggestedBottle: suggestion
-        ? await serialize(BottleSerializer, suggestion, context.user)
+        ? await serialize(BottleSerializer, suggestion, context.user, [], {
+            includeGroupSummary: true,
+          })
         : null,
       decision,
       artifacts: evidence?.artifacts ?? null,

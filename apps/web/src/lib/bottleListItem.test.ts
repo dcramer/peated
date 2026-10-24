@@ -13,9 +13,125 @@ describe("toBottleListItem", () => {
   test("uses the full marketed name and separates provenance from release facts", () => {
     expect(toBottleListItem(mockBottle)).toMatchObject({
       name: "Lagavulin 16-year-old",
-      provenance: [{ name: "Single Malt" }],
-      metadata: ["16 years", "43.0% ABV"],
+      provenance: [],
+      metadata: ["43%"],
     });
+  });
+
+  const series = {
+    id: 1088,
+    peatedId: "S1088",
+    name: "Private Collection",
+    fullName: "Gordon & MacPhail Private Collection",
+    description: null,
+    numReleases: 12,
+    createdAt: "2026-01-01T00:00:00.000Z",
+    updatedAt: "2026-01-01T00:00:00.000Z",
+  };
+  const seriesBottle = {
+    ...mockBottle,
+    brand: { ...mockBottle.brand, id: 999, name: "Gordon & MacPhail" },
+    distillers: [mockCaolIlaEntity],
+    name: "Caol Ila 1982",
+    series,
+    statedAge: 40,
+    vintageYear: 1982,
+  };
+
+  test("puts the series before the distillery instead of in the name", () => {
+    expect(toBottleListItem(seriesBottle)).toMatchObject({
+      name: "Gordon & MacPhail Caol Ila 1982",
+      provenance: [
+        {
+          name: "Private Collection",
+          href: "/series/1088-gordon-and-mac-phail-private-collection",
+        },
+        { name: mockCaolIlaEntity.name, href: expect.any(String) },
+      ],
+    });
+  });
+
+  test("keeps the series in the name for rows that hide provenance", () => {
+    expect(
+      toBottleListItem(seriesBottle, { seriesPlacement: "name" }),
+    ).toMatchObject({
+      name: "Gordon & MacPhail Private Collection Caol Ila 1982",
+      provenance: [{ name: mockCaolIlaEntity.name, href: expect.any(String) }],
+    });
+  });
+
+  test("omits the series on its own page and when the name prints it", () => {
+    expect(
+      toBottleListItem(seriesBottle, { seriesPlacement: "none" }),
+    ).toMatchObject({
+      name: "Gordon & MacPhail Caol Ila 1982",
+      provenance: [{ name: mockCaolIlaEntity.name, href: expect.any(String) }],
+    });
+    expect(
+      toBottleListItem({
+        ...seriesBottle,
+        name: "Private Collection Caol Ila 1982",
+      }).provenance,
+    ).toEqual([{ name: mockCaolIlaEntity.name, href: expect.any(String) }]);
+  });
+
+  test("does not repeat a year the name already prints", () => {
+    expect(toBottleListItem(seriesBottle).metadata).toEqual([
+      "40 years",
+      "43%",
+    ]);
+    expect(
+      toBottleListItem({ ...seriesBottle, name: "Caol Ila 19821" }).metadata,
+    ).toEqual(["1982 vintage", "40 years", "43%"]);
+    expect(
+      toBottleListItem({
+        ...seriesBottle,
+        releaseYear: 2023,
+        vintageYear: null,
+        name: "Caol Ila 2023 Release",
+      }).metadata,
+    ).toEqual(["40 years", "43%"]);
+  });
+
+  test("shows one year, vintage before release", () => {
+    expect(
+      toBottleListItem({
+        ...seriesBottle,
+        name: "Caol Ila",
+        releaseYear: 2023,
+      }).metadata,
+    ).toEqual(["1982 vintage", "40 years", "43%"]);
+    expect(
+      toBottleListItem({ ...seriesBottle, releaseYear: 2023 }).metadata,
+    ).toEqual(["40 years", "43%"]);
+    expect(
+      toBottleListItem({
+        ...seriesBottle,
+        edition: "Batch 3",
+        releaseYear: 2023,
+      }).metadata,
+    ).toEqual(["Batch 3", "40 years", "43%"]);
+  });
+
+  test("does not repeat an age or ABV the name already prints", () => {
+    expect(
+      toBottleListItem({
+        ...mockBottle,
+        name: "Lagavulin 16 Years Old 43%",
+      }).metadata,
+    ).toEqual([]);
+    expect(
+      toBottleListItem({ ...mockBottle, name: "Lagavulin 160 Years" }).metadata,
+    ).toEqual(["16 years", "43%"]);
+  });
+
+  test("keeps a series that only appears inside a longer word", () => {
+    expect(
+      toBottleListItem({
+        ...seriesBottle,
+        name: "Private Collections Caol Ila 1982",
+      }).provenance?.[0],
+    ).toMatchObject({ name: "Private Collection" });
   });
 
   test.each([
@@ -43,7 +159,7 @@ describe("toBottleListItem", () => {
     expect(
       toBottleListItem({ ...mockBottle, distillers: [mockBottle.brand] })
         .provenance,
-    ).toEqual([{ name: "Single Malt" }]);
+    ).toEqual([]);
   });
 
   test("shows up to three distilleries by name", () => {
@@ -60,8 +176,22 @@ describe("toBottleListItem", () => {
           .toLowerCase()
           .replaceAll(" ", "-")}`,
       })),
-      { name: "Single Malt" },
     ]);
+  });
+
+  test("does not count the brand toward the distillery summary", () => {
+    const distillers = [
+      mockCaolIlaEntity,
+      mockHighlandParkEntity,
+      mockTaliskerEntity,
+    ];
+
+    expect(
+      toBottleListItem({
+        ...mockBottle,
+        distillers: [mockBottle.brand, ...distillers],
+      }).provenance?.map((item) => item.name),
+    ).toEqual(distillers.map((distiller) => distiller.name));
   });
 
   test("summarizes more than three distilleries with their names in a tooltip", () => {
@@ -77,7 +207,6 @@ describe("toBottleListItem", () => {
         name: "4 distilleries",
         title: distillers.map((distiller) => distiller.name).join(" · "),
       },
-      { name: "Single Malt" },
     ]);
   });
 
@@ -105,11 +234,9 @@ describe("toBottleListItem", () => {
     });
 
     expect(option.id).toBe(mockBottle.id);
-    expect(option.bottle.provenance).toEqual([
-      { name: "Lagavulin" },
-      { name: "Single Malt" },
-    ]);
-    expect(option.bottle.metadata).toEqual(["16 years", "43.0% ABV"]);
+    expect(option.label).toBe(`${option.bottle.name} · 43%`);
+    expect(option.bottle.provenance).toEqual([{ name: "Lagavulin" }]);
+    expect(option.bottle.metadata).toEqual(["43%"]);
   });
 
   test("can omit the brand from a list owned by that brand", () => {
@@ -147,7 +274,7 @@ describe("toBottleListItem", () => {
         { ...mockBottle, bottler: mockBottle.brand },
         { includeBottler: true },
       ).provenance,
-    ).toEqual([{ name: "Single Malt" }]);
+    ).toEqual([]);
   });
 
   test("uses only known release facts without manufacturing missing dates or ages", () => {

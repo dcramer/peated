@@ -3,8 +3,22 @@ import { workAsyncStorage } from "next/dist/server/app-render/work-async-storage
 import { workUnitAsyncStorage } from "next/dist/server/app-render/work-unit-async-storage.external";
 import { createRequestStoreForAPI } from "next/dist/server/async-storage/request-store";
 import { createWorkStore } from "next/dist/server/async-storage/work-store";
+import {
+  defaultConfig,
+  type ResolvedCacheLifeProfiles,
+} from "next/dist/server/config-shared";
 import { NextRequest } from "next/server";
 import { sessionOptions } from "../session.server";
+
+// Next fills the default profile's `stale` from `staleTimes.static` when it
+// loads config. Match that so the work store gets resolved profiles.
+const cacheLifeProfiles: ResolvedCacheLifeProfiles = {
+  ...defaultConfig.cacheLife,
+  default: {
+    ...defaultConfig.cacheLife.default,
+    stale: defaultConfig.experimental.staleTimes.static,
+  },
+};
 
 /** Runs server reads with real Next request cookies and the application's session reader. */
 export async function withNextRequest<T>(
@@ -26,6 +40,7 @@ export async function withNextRequest<T>(
     { tags: [], expirationsByCacheKind: new Map() },
     undefined,
     undefined,
+    undefined,
   );
   const work = createWorkStore({
     page: "/test",
@@ -34,12 +49,17 @@ export async function withNextRequest<T>(
     previouslyRevalidatedTags: [],
     renderOpts: {
       cacheComponents: false,
-      supportsDynamicResponse: true,
+      cacheLifeProfiles,
+      staticPageGenerationTimeout: defaultConfig.staticPageGenerationTimeout,
+      validationLevel: "warning",
       isDraftMode: false,
       isBuildTimePrerendering: false,
-      shouldWaitOnAllReady: false,
       assetPrefix: "",
-      experimental: { authInterrupts: false },
+      experimental: {
+        authInterrupts: false,
+        useCacheTimeout: defaultConfig.staticPageGenerationTimeout * 0.9,
+        durableUseCacheEntries: false,
+      },
       waitUntil: undefined,
       onClose: (callback) => queueMicrotask(callback),
       onAfterTaskError: undefined,

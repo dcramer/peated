@@ -52,7 +52,7 @@ const CaskNumberSchema = z
   .default(null);
 const OutturnSchema = z.number().int().positive().nullable().default(null);
 
-function hasValidReleaseDate(
+export function hasValidReleaseDate(
   year: number | null | undefined,
   month: number | null | undefined,
   day: number | null | undefined,

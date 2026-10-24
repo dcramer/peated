@@ -13,6 +13,7 @@ import { AppLink, isInternalAppHref, type AppLinkProps } from "./appLink";
 import { LinkPending } from "./linkPending.stylex";
 
 const REDUCED_MOTION = "@media (prefers-reduced-motion: reduce)";
+const PHONE = "@media (max-width: 480px)";
 
 export type ButtonVariant = "default" | "tonal" | "accent" | "danger" | "text";
 export type ButtonSize = "sm" | "md" | "lg";
@@ -282,9 +283,10 @@ const styles = stylex.create({
     paddingRight: "16px",
     paddingLeft: "16px",
   },
+  // Phones trim large buttons so a header's two actions and menu fit one row.
   buttonLarge: {
-    paddingRight: "20px",
-    paddingLeft: "20px",
+    paddingRight: { default: "20px", [PHONE]: "12px" },
+    paddingLeft: { default: "20px", [PHONE]: "12px" },
   },
   iconButtonSmall: {
     width: controlMetrics.controlHeightSmall,

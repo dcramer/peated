@@ -1,4 +1,5 @@
 import { db } from "@peated/server/db";
+import { uniqueViolationConstraint } from "@peated/server/db/errors";
 import { memberReviews, tastings, users } from "@peated/server/db/schema";
 import { getUserFromId } from "@peated/server/lib/api";
 import { generatePasswordHash } from "@peated/server/lib/auth";
@@ -120,7 +121,7 @@ export default procedure
 
       return await serialize(UserSerializer, newUser, context.user);
     } catch (err: any) {
-      if (err?.code === "23505" && err?.constraint === "user_username_unq") {
+      if (uniqueViolationConstraint(err) === "user_username_unq") {
         throw errors.CONFLICT({
           message: "Username in use.",
           cause: err,

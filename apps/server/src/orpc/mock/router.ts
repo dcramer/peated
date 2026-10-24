@@ -55,6 +55,8 @@ import search from "./routes/search";
 import smwsDistillerList from "./routes/smws/distiller-list";
 import stats from "./routes/stats";
 import tagBottles from "./routes/tags/bottles";
+import tastingDraftCount from "./routes/tastingDrafts/count";
+import tastingDraftList from "./routes/tastingDrafts/list";
 import tastingCreate from "./routes/tastings/create";
 import tastingDetails from "./routes/tastings/details";
 import tastingList from "./routes/tastings/list";
@@ -63,6 +65,7 @@ import userActivityList from "./routes/users/activity/list";
 import userBadgeList from "./routes/users/badge-list";
 import userDetails from "./routes/users/details";
 import userFlavorList from "./routes/users/flavor-list";
+import userLibrarySearch from "./routes/users/library-search";
 import userLibraryStats from "./routes/users/library-stats";
 import userRegionList from "./routes/users/region-list";
 import userTastingStats from "./routes/users/tasting-stats";
@@ -175,6 +178,10 @@ export const mockRouter = mockOS.router({
     list: tastingList,
     photoIdentification: tastingPhotoIdentification,
   },
+  tastingDrafts: {
+    count: tastingDraftCount,
+    list: tastingDraftList,
+  },
   users: {
     activity: {
       list: userActivityList,
@@ -182,6 +189,7 @@ export const mockRouter = mockOS.router({
     badgeList: userBadgeList,
     details: userDetails,
     flavorList: userFlavorList,
+    librarySearch: userLibrarySearch,
     libraryStats: userLibraryStats,
     regionList: userRegionList,
     tastingStats: userTastingStats,

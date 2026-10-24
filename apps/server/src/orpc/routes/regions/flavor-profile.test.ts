@@ -37,6 +37,7 @@ describe("GET /countries/{country}/regions/{region}/flavor-profile", () => {
       [produced, branded].map((bottle) => ({
         bottleId: bottle.id,
         createdById: defaults.user.id,
+        tastedAt: new Date(),
         tags: ["apple"],
       })),
     );

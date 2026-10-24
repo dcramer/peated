@@ -90,6 +90,8 @@ export default implement(contract).handler(async ({ input, context }) => {
     BottleSerializer,
     rows.map((row) => bottlesById.get(row.bottleId)!),
     context.user,
+    [],
+    { includeGroupSummary: true },
   );
   return {
     results: rows.map((row, index) => ({
