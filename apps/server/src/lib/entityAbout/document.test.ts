@@ -148,4 +148,45 @@ describe("mergePipelineDraft", () => {
     ]);
     expect(merged.sections[0]?.sentences[0]?.factIds).toEqual(["event:7"]);
   });
+
+  test("keeps pipeline facts that a person's section cites", () => {
+    const stored = document({
+      events: [
+        {
+          id: 3,
+          kind: "closed",
+          date: "1983",
+          writtenBy: "pipeline",
+          citations: cited,
+        },
+      ],
+      sections: [
+        {
+          key: "lead",
+          writtenBy: "person",
+          sentences: [{ text: "It closed in 1983.", factIds: ["event:3"] }],
+        },
+      ],
+    });
+    const draft = document({
+      events: [
+        {
+          id: 3,
+          kind: "opened",
+          date: "1819",
+          writtenBy: "pipeline",
+          citations: cited,
+        },
+      ],
+    });
+
+    const merged = mergePipelineDraft(stored, draft, now);
+
+    expect(merged.events.map(({ id, kind }) => [id, kind])).toEqual([
+      [3, "closed"],
+      // Renumbered, so the person's sentence still cites the closing.
+      [4, "opened"],
+    ]);
+    expect(merged.sections[0]?.sentences[0]?.factIds).toEqual(["event:3"]);
+  });
 });

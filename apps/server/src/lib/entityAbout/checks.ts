@@ -1,9 +1,14 @@
+import type { EntityKind } from "@peated/server/db/schema";
 import type {
   AboutCitation,
   EntityAboutDocument,
 } from "@peated/server/schemas/entityAbout";
 
-import { ABOUT_FACT_FIELD_LIST, ABOUT_FACT_FIELDS } from "./aboutFactFields";
+import {
+  ABOUT_FACT_FIELD_LIST,
+  ABOUT_FACT_FIELDS,
+  aboutFactFieldAppliesTo,
+} from "./aboutFactFields";
 import { findBannedPhrases } from "./bannedPhrases";
 import {
   eventFactId,
@@ -11,7 +16,11 @@ import {
   getShownFactIds,
   siteFactId,
 } from "./display";
-import { normalizeSourceUrl, pruneSources } from "./document";
+import {
+  findAboutWriteErrors,
+  normalizeSourceUrl,
+  pruneSources,
+} from "./document";
 
 export const ABOUT_MAX_SENTENCE_WORDS = 30;
 export const ABOUT_MAX_LEAD_SENTENCES = 4;
@@ -235,15 +244,31 @@ export function checkConflictPicks(document: EntityAboutDocument) {
 
 /**
  * Runs every check on a pipeline draft. Returns the draft with unverified
- * citations removed, and the reasons it cannot be saved.
+ * citations removed and site facts that do not apply to the Entity's kind
+ * dropped, and the reasons it cannot be saved. The save rules run here too,
+ * so a draft the store would reject gets its retry instead.
  */
 export function reviewAboutDraft(
   draft: EntityAboutDocument,
   pages: readonly AboutPageRead[],
+  kind: EntityKind,
 ) {
-  const document = keepVerifiedCitations(draft, pages);
-  return {
-    document,
-    errors: [...checkAboutProse(document), ...checkConflictPicks(document)],
-  };
+  const verified = keepVerifiedCitations(draft, pages);
+  const siteFacts: EntityAboutDocument["siteFacts"] = {};
+  for (const field of ABOUT_FACT_FIELD_LIST) {
+    const fact = verified.siteFacts[field];
+    if (fact && aboutFactFieldAppliesTo(field, kind)) siteFacts[field] = fact;
+  }
+  const document = pruneSources({ ...verified, siteFacts });
+  const errors = [
+    ...checkAboutProse(document),
+    ...checkConflictPicks(document),
+  ];
+  if (!getShownFactIds(document).size) {
+    errors.push("The draft has no facts with a source.");
+  }
+  // The save rules repeat some checks above, so they run last to keep each
+  // reason listed once.
+  if (!errors.length) errors.push(...findAboutWriteErrors(null, document));
+  return { document, errors };
 }

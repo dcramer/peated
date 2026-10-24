@@ -230,6 +230,95 @@ describe("writeEntityAbout", () => {
     ]);
   });
 
+  test("drops site facts that do not apply to the kind", async ({
+    fixtures,
+  }) => {
+    const entity = await fixtures.Entity({ kind: "brand" });
+    const withStills: AboutDraft = {
+      ...goodDraft,
+      siteFacts: [
+        {
+          field: "washStills",
+          value: 1,
+          asOf: null,
+          citations: [
+            {
+              sourceId: "wp",
+              statedValue: "1",
+              quote: "Brora distillery was founded in 1819.",
+            },
+          ],
+        },
+      ],
+    };
+
+    const result = await writeEntityAbout(
+      { entityId: entity.id },
+      services(async () => ({ draft: withStills, pagesRead: [page] })),
+    );
+
+    expect(result).toMatchObject({ status: "saved" });
+    const about = await getEntityAbout(db, entity.id);
+    expect(about?.document.siteFacts).toEqual({});
+  });
+
+  test("retries a draft the store would reject", async ({ fixtures }) => {
+    const entity = await fixtures.Entity({ kind: "distillery" });
+    const missingEra: AboutDraft = {
+      ...goodDraft,
+      sections: [{ ...goodDraft.sections[0]!, eraEventId: 99 }],
+    };
+    const run = services(async () => ({
+      draft: missingEra,
+      pagesRead: [page],
+    }));
+
+    const result = await writeEntityAbout({ entityId: entity.id }, run);
+
+    expect(result).toMatchObject({ status: "rejected" });
+    expect(run.writer).toHaveBeenCalledTimes(2);
+    expect(await getEntityAbout(db, entity.id)).toBeNull();
+  });
+
+  test("never saves a draft that shows fewer facts", async ({ fixtures }) => {
+    const entity = await fixtures.Entity({ kind: "distillery" });
+    await fixtures.EntityAbout({
+      entityId: entity.id,
+      events: [
+        { id: 1, kind: "opened", date: "1819", writtenBy: "pipeline" },
+        { id: 2, kind: "closed", date: "1983", writtenBy: "pipeline" },
+        { id: 3, kind: "reopened", date: "2021", writtenBy: "pipeline" },
+      ],
+    });
+
+    const result = await writeEntityAbout(
+      { entityId: entity.id },
+      services(async () => ({ draft: goodDraft, pagesRead: [page] })),
+    );
+
+    expect(result).toMatchObject({ status: "rejected" });
+    const about = await getEntityAbout(db, entity.id);
+    expect(about?.document.events.map(({ id }) => id)).toEqual([1, 2, 3]);
+  });
+
+  test("saves nothing from an empty draft", async ({ fixtures }) => {
+    const entity = await fixtures.Entity({ kind: "distillery" });
+    const empty: AboutDraft = {
+      sources: [],
+      events: [],
+      siteFacts: [],
+      sections: [],
+    };
+
+    const result = await writeEntityAbout(
+      { entityId: entity.id },
+      services(async () => ({ draft: empty, pagesRead: [] })),
+    );
+
+    expect(result).toMatchObject({ status: "rejected" });
+    expect(await getEntityAbout(db, entity.id)).toBeNull();
+  });
+
   test("does nothing while turned off", async ({ fixtures }) => {
     const entity = await fixtures.Entity({ kind: "distillery" });
     const writer = {
