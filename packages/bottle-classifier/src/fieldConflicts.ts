@@ -15,6 +15,17 @@ export function exactEditionMarkersMatch(
   return normalizeMarker(left) === normalizeMarker(right);
 }
 
+// Titles print `#3771` where the catalog stores `3771`; both name one cask.
+function normalizeCaskNumber(value: string | null | undefined) {
+  return (
+    value
+      ?.replace(/^\s*#\s*/, "")
+      .replace(/\s+/g, " ")
+      .trim()
+      .toUpperCase() || null
+  );
+}
+
 /** The typed Bottle fields that source facts can directly contradict. */
 export type ComparableBottleFields = {
   category: string | null;
@@ -92,7 +103,12 @@ export function getBottleFieldConflicts(
   ) {
     conflicts.push("edition");
   }
-  if (differs(facts.cask_number, bottle.caskNumber))
+  if (
+    differs(
+      normalizeCaskNumber(facts.cask_number),
+      normalizeCaskNumber(bottle.caskNumber),
+    )
+  )
     conflicts.push("caskNumber");
   if (differs(facts.bottling_year, bottle.bottlingYear))
     conflicts.push("bottlingYear");

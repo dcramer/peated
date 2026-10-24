@@ -71,6 +71,22 @@ describe("getBottleFieldConflicts", () => {
     expect(getBottleFieldConflicts(null, bottle)).toEqual([]);
   });
 
+  test("reads a printed # or letter case as the same cask number", () => {
+    const target = { ...bottle, caskNumber: "3771" };
+    expect(
+      getBottleFieldConflicts({ ...facts, cask_number: "#3771" }, target),
+    ).toEqual([]);
+    expect(
+      getBottleFieldConflicts(
+        { ...facts, cask_number: "r10/34" },
+        { ...bottle, caskNumber: "R10/34" },
+      ),
+    ).toEqual([]);
+    expect(
+      getBottleFieldConflicts({ ...facts, cask_number: "#3773" }, target),
+    ).toEqual(["caskNumber"]);
+  });
+
   test("checks cask and date facts for every caller without inventing missing values", () => {
     const target = {
       ...bottle,
