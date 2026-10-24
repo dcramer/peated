@@ -311,9 +311,11 @@ Storybook Overview story, per `apps/web/AGENTS.md`.
   `peated-writing` skill. The code check imports the same list.
 - The prompt uses two examples written by people: the Brora article and one
   brand.
-- `pnpm evals` gets a model check with 5 Entities: Brora, a famous distillery,
-  a recent craft distillery, a brand with many distilleries, and a thin
-  record. It checks quotes, citations, and length limits, per
+- `pnpm evals` gets a model check with 5 Entities: a rebuilt silent
+  distillery, a famous distillery, a recent craft distillery, a brand with
+  many distilleries, and a thin record. Brora and Johnnie Walker are the
+  prompt's examples, so they are not cases. The writer reads saved,
+  reviewed pages, and the check runs the real job's checks, per
   `docs/development/model-checks.md`.
 - Problems on live pages arrive through the existing Entity reports. A
   moderator edits the document, the edit is marked as written by a person,

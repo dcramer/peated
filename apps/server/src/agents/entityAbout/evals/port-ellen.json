@@ -1,0 +1,59 @@
+{
+  "case": "port-ellen",
+  "reviewedAt": "2026-10-24",
+  "entity": {
+    "id": 1271,
+    "name": "Port Ellen",
+    "kind": "distillery",
+    "aliases": [],
+    "location": "Islay, Scotland",
+    "owner": "Diageo",
+    "yearEstablished": 1825,
+    "website": "https://www.malts.com/en-row/distilleries/port-ellen/"
+  },
+  "pages": [
+    {
+      "url": "https://www.malts.com/en-row/distilleries/port-ellen/",
+      "title": "Visit Port Ellen | Whisky Distillery Tours | Malts",
+      "publisher": "Diageo (Malts.com)",
+      "description": "Diageo's visitor page for the Port Ellen distillery on Islay, with a short history.",
+      "text": "Port Ellen Distillery & Visitor Centre\n\nPort Ellen Distillery is in the village of Port Ellen on Islay, close to the island's main ferry pier. It was first founded in 1825 and became known for a peated, coastal style of malt until it shut in 1983. For decades afterwards it was one of Scotland's famous ghost distilleries, and old Port Ellen bottles became prized by collectors.\n\nA long restoration brought the distillery back to life in 2024. Its official public reopening, after a major regeneration project, came on 19th March, 2024.\n\nToday visits are small, premium and booked ahead: guided tours that tell the site's story, with tastings of older Port Ellen releases. We cannot take walk-in visitors, and under 18s must come with an adult.\n\nFour experiences are offered: Atlas of Smoke, four hours, from £900 a head; Port Ellen Reborn, 90 minutes, from £250; a 200th Anniversary Experience lasting two and a half hours, from £450; and one-hour Open Days.\n\nFind us at Kiln Square in Port Ellen, postcode PA42 7AF. Traveline Scotland can help you plan the journey."
+    },
+    {
+      "url": "https://en.wikipedia.org/wiki/Port_Ellen_distillery",
+      "title": "Port Ellen distillery - Wikipedia",
+      "publisher": "Wikipedia",
+      "description": "Encyclopedia entry on Port Ellen distillery, its closures and its return.",
+      "text": "Port Ellen distillery is a Scotch whisky distillery in the village of Port Ellen on Islay. Its founding year is given as 1825. It has closed more than once, and it came back in 2024 after standing shut since 1983.\n\nHistory\nThe site started in 1825 as a malt mill. John Ramsay developed it into a distillery and ran it from 1833 to 1892; warehouses from his time survive as listed buildings.\n\nThe Distillers Company (DCL) bought Port Ellen in 1925 and shut it in 1930. It was rebuilt in 1966/1967, worked through the 1970s, and closed again in 1983. DCL then pulled down some buildings, reused others and broke up the stills. A maltings on the site has supplied all Islay distilleries under a 1987 agreement. Whisky first made for blends was bottled as single malt after 1983, and the dwindling stock became collectable.\n\nIn October 2017 Diageo, which succeeded DCL, said the distillery would return in 2020 as part of a £35 million plan that also covered Brora. A plan for a new stillhouse was filed on 8 May 2019. Alexander McDonald led the revival, and the new stills were copied from 1980s records.\n\nIn 2022 Sotheby's sold a 1979 cask, with a glass artwork by Ini Archibong, for £875,000. The distillery reopened on 19 March 2024, 40 years on, at a cost of £185 million (US$235 million). A 200th Anniversary Edition of 150 bottles at £7,500 each, its first release since then, was announced in September 2025."
+    },
+    {
+      "url": "https://www.thespiritsbusiness.com/2024/03/port-ellen-distillery-back-in-business-after-40-years/",
+      "title": "Port Ellen distillery back in business after 40 years - The Spirits Business",
+      "publisher": "The Spirits Business",
+      "description": "Trade news on Port Ellen reopening after 40 years.",
+      "text": "Melita Kiely | 19 March 2024\n\nIslay's Port Ellen is open again today (19 March), four decades after it fell silent.\n\nOwner Diageo has spent £185 million (US$235m) on bringing Port Ellen back, restoring Brora and upgrading its Scotch visitor centres. Ewan Andrew, Diageo's president of global supply chain and procurement, declared the site open at a ceremony there, calling the day a milestone for the company and for Scotch.\n\nThe new glass still house gives a clear view over the bay toward the Carraig Fhada lighthouse. It holds two pairs of copper pot stills. The Phoenix Stills are copies of the original Port Ellen stills and will make the smoky house spirit. The Experimental Stills run into a 10-part spirit safe, against the usual three parts, and a full-time technician in an on-site lab will record what they produce.\n\nMaster blender Aimée Morrison said the lab will help the team study how smoke and each cask shape the spirit.\n\nPort Ellen Gemini, a pair of 44-year-old whiskies bottled to mark the reopening, is now on sale."
+    }
+  ],
+  "expected": {
+    "events": [
+      {
+        "kind": "opened",
+        "year": "1825"
+      },
+      {
+        "kind": "acquired",
+        "year": "1925"
+      },
+      {
+        "kind": "closed",
+        "year": "1983"
+      },
+      {
+        "kind": "reopened",
+        "year": "2024"
+      }
+    ],
+    "notes": "opened 1825: Malts.com (first founded in 1825) and Wikipedia (founding year 1825). acquired 1925: Wikipedia (The Distillers Company (DCL) bought it in 1925); newOwnerName should be The Distillers Company (DCL). closed 1983: Malts.com and Wikipedia. reopened 2024: all three pages; Malts.com and The Spirits Business give the day, 19 March 2024 (The Spirits Business says \"today (19 March)\" under a 19 March 2024 dateline; Wikipedia gives 19 March 2024). Expected dates are year-level, so 2024-03-19 also passes."
+  },
+  "notes": "Conflict on the founding: Malts.com and the Wikipedia lead give 1825, but the Wikipedia history says the site was a malt mill in 1825 and became a distillery under John Ramsay from 1833. The official 1825 date should win, with a second citation or a separate 1833 fact allowed. Wikipedia also has an earlier closure (1930) and rebuild (1966/1967); a mothballed 1930 era, or closed 1930 plus reopened 1966/1967, is correct but not required. Traps: the 2017 plan to return in 2020 did not happen (2024 is the real reopening); the 1979 cask sold at Sotheby's in 2022, the Gemini whiskies, the Experimental Stills, the 200th Anniversary Edition and the tour prices are bottle, auction or visitor details, not distillery events, and prices must be left out. The £185 million covers Port Ellen, Brora and visitor centres, per The Spirits Business; Wikipedia's 2017 figure is £35 million. Peated stores the owner Diageo and the Malts.com page as website. Page texts are reviewed paraphrases of the cited pages, not copies."
+}

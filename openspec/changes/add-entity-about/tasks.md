@@ -50,7 +50,7 @@
 - [x] 6.4 Add the `aboutPipeline` system actor, an on/off switch, and an admin action to queue one Entity or a batch ordered by activity
 - [x] 6.5 Stop `generateEntityDetails` from writing descriptions; keep pronunciation and other fields
 - [x] 6.6 Add tests for each check, the merge, and the switch
-- [ ] 6.7 Add a model check under `pnpm evals` with 5 Entities
+- [x] 6.7 Add a model check under `pnpm evals` with 5 Entities
 - [x] 6.8 Give the writer stored history without a source as leads; a matching draft event adds its citations to the stored event, and unmatched history stays hidden
 - [x] 6.9 Add `/admin/catalog/clear-entity-descriptions` to clear generated descriptions that are not the published lead, with a test
 

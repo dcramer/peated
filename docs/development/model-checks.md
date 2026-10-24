@@ -73,6 +73,11 @@ long inputs and tool outputs.
 - Add `trigger-evals-scraper` to run scraper model checks.
 - Scraper model checks also run automatically when files under
   `apps/server/src/scraper/configured/` change in an internal pull request.
+- The About writer check, `apps/server/src/agents/entityAbout/writer.eval.test.ts`,
+  is a server model check, so `trigger-evals-scraper` runs it too. Its writer
+  reads only the reviewed pages in `apps/server/src/agents/entityAbout/evals/`,
+  so it needs no Firecrawl key. Run it alone with
+  `pnpm --filter @peated/server evals -- src/agents/entityAbout/writer.eval.test.ts`.
 - Ordinary `pnpm test` runs do not call a model.
 
 Exact wording or tool order can be checked when it is the product contract.

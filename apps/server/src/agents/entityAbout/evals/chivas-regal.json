@@ -1,0 +1,59 @@
+{
+  "case": "chivas-regal",
+  "reviewedAt": "2026-10-24",
+  "entity": {
+    "id": 496,
+    "name": "Chivas Regal",
+    "kind": "brand",
+    "aliases": [],
+    "location": "Scotland",
+    "owner": "Chivas Brothers",
+    "yearEstablished": 1909,
+    "website": "https://www.chivas.com/"
+  },
+  "pages": [
+    {
+      "url": "https://en.wikipedia.org/wiki/Chivas_Regal",
+      "title": "Chivas Regal - Wikipedia",
+      "publisher": "Wikipedia",
+      "description": "Encyclopedia entry on the Chivas Regal blended Scotch.",
+      "text": "Chivas Regal is a blended Scotch whisky made in Scotland by Chivas Brothers, the Pernod Ricard subsidiary.\n\nHistory\nCharles Stewart Howard, master blender at Chivas Brothers, created Chivas Regal in 1909 as a 25-year-old luxury whisky. In 1939 the 12-year-old made its US debut at 75 degrees proof (42.8% ABV, which Americans call 86 proof), and it went on to set the pattern for premium Scotch.\n\nThe range grew with the 18 Years Old in 1997 and the 25 Years Old in 2007, then Mizunara in 2014, The Icon in 2015 and XV in 2018. Pernod Ricard bought Chivas Brothers in 2001. Sales rose 61% from 2002 to 2008 and hit 4.9 million cases (of nine litres) in both 2012 and 2013, before falling to 4.4 million in 2015. Since 2016 it has been the fourth-best-selling Scotch in the world.\n\nStrathisla distillery\nThe brand's home and visitor centre is Strathisla in Speyside. Founded in 1786 as Milton (or Miltown), it is the Highlands' oldest distillery still at work. Strathisla is the core malt of every Chivas Regal blend, backed by Longmorn, The Glenlivet, Allt-a-Bhainne, Miltonduff and Braeval malts and by grain from Strathclyde.\n\nAwards\nThe whiskies have won many medals; at the 2026 ISC the 18 and 25 Years Old both took gold."
+    },
+    {
+      "url": "https://en.wikipedia.org/wiki/Chivas_Brothers",
+      "title": "Chivas Brothers - Wikipedia",
+      "publisher": "Wikipedia",
+      "description": "Encyclopedia entry on Chivas Brothers, the Pernod Ricard company behind Chivas Regal.",
+      "text": "Chivas Brothers is a Scotch whisky company, owned by Pernod Ricard since 2001. The article dates the company to 1786, tying it to its home at Strathisla distillery in Keith, Speyside, the oldest Highland distillery still running.\n\nEarly years\nBrothers James (born 1810) and John Chivas (born 1814) left a farm in Aberdeenshire for Aberdeen in 1836. James went to work for William Edwards. Edwards had bought a grocery and wine shop in 1828 from the family of John Forrest, who opened it in 1801. James became a partner in 1838. After Edwards's death in 1841, Charles Stewart stepped in, and Stewart and Chivas won a Royal Warrant from Queen Victoria in 1843. Its first blend, Royal Glen Dee, came out in 1854. Stewart left in 1857, John joined, and the firm took the Chivas Brothers name. Royal Strathythan, a 10-year-old blend, followed in 1863.\n\nAfter the family\nAlexander Chivas, the last of the family in the business, died in 1893. In 1895 Alexander Smith and master blender Charles Stewart Howard bought out the trustees, promising to keep the name. Howard made a 25-year-old blend in 1909, called it Chivas Regal and sold it in the US until 1915.\n\nBrokers Morrison & Lundie bought the firm in 1936 and moved to a 12-year-old, which reached the US in 1939. Seagrams bought Chivas Brothers in 1949 and in 1950 added Milton distillery, renamed Strathisla. Pernod Ricard took over in 2001. The firm opened Dalmunach in 2015 and in October 2023 announced plans for an Islay distillery."
+    },
+    {
+      "url": "https://scotchwhisky.com/whiskypedia/2340/chivas-regal/",
+      "title": "Chivas Regal | Scotch Whisky",
+      "publisher": "ScotchWhisky.com (Whiskypedia)",
+      "description": "Whisky reference profile of Chivas Regal with a history timeline and owners.",
+      "text": "The world's first luxury blended Scotch, owned by Chivas Brothers, and a story of survival.\n\nChivas Regal History\nThe roots go back to 1801, when John Forrest opened a grocery and wine merchant in Aberdeen. The shop moved several times and changed owners, but whisky stayed central. By the time Chivas Regal arrived, the firm had traded as Chivas Brothers for about 40 years and held a Royal Warrant.\n\nAround 1900, directors Charles Howard and Alexander Smith sold six blends, among them Royal Glen Dee and Royal Strathythan. With the US and Canada booming, Howard launched Chivas Regal 25 Year Old in 1909. After Howard and Smith both died in 1935, the firm was bought in early 1936 by Stanley P. Morrison and R.D. Lundie, who were whisky brokers, and its stock was sold for £149,000. As war arrived in 1939, Chivas Regal was relaunched as a 12 Year Old for the US market. Seagram bought the company in 1949 and the next year added Milton distillery, renamed Strathisla. The 18 Year Old arrived in 1997, and four years later the business passed to Pernod Ricard.\n\nTimeline\n1801 Forrest opens his shop\n1843 Royal Warrant from Queen Victoria\n1909 Charles Howard creates Chivas Regal\n1939 Relaunched as a 12-year-old in the US\n1949 Bought by Seagram\n1950 Strathisla added\n1997 18 Year Old created\n2001 Becomes part of Pernod Ricard\n2013 Mizunara launched in Japan\n\nOwners: Pernod Ricard since 2001. Earlier: Seagram Distillers (1949 - 2001) and before that Chivas Brothers Holdings (1909 - 1949)."
+    }
+  ],
+  "expected": {
+    "events": [
+      {
+        "kind": "opened",
+        "year": "1909"
+      },
+      {
+        "kind": "generic",
+        "year": "1939"
+      },
+      {
+        "kind": "acquired",
+        "year": "1949"
+      },
+      {
+        "kind": "acquired",
+        "year": "2001"
+      }
+    ],
+    "notes": "opened 1909: all three pages (Chivas Regal Wikipedia: Howard created it in 1909 as a 25-year-old; Chivas Brothers Wikipedia: Howard made the 25-year-old blend in 1909 and called it Chivas Regal; ScotchWhisky.com: launched in 1909, and the 1909 timeline entry). generic 1939: the 12-year-old in the US (all three pages). acquired 1949: Seagram buys Chivas Brothers (Chivas Brothers Wikipedia; ScotchWhisky.com history, timeline and owners list Seagram Distillers 1949 - 2001). acquired 2001: Pernod Ricard (both Wikipedia pages; ScotchWhisky.com timeline and owners list)."
+  },
+  "notes": "Main trap: the brand began in 1909, but the pages carry many older dates for the company and its distillery. Chivas Brothers Wikipedia dates the company to 1786 (that is Strathisla's founding year, per the Chivas Regal Wikipedia Strathisla section); ScotchWhisky.com says the roots go back to 1801 with John Forrest's shop; there are also 1828, 1836, 1838, 1843 Royal Warrant, 1854 Royal Glen Dee, 1857 and 1863 Royal Strathythan. None of these is when Chivas Regal began; an opened date before 1909 is wrong. Morrison & Lundie bought Chivas Brothers in 1936 (Chivas Brothers Wikipedia and ScotchWhisky.com); that is a valid optional acquired event. Conflicts: Mizunara is 2014 on both Wikipedia pages but 2013 on the ScotchWhisky.com timeline. The 18 Year Old is 1997 everywhere; the 25 Years Old relaunch is 2007 on the Chivas Regal Wikipedia page. The 1950 purchase of Milton/Strathisla is optional. Noise to leave out: sales figures, case counts, proof values and awards. No producer page: https://www.chivas.com/ returned 403, so no official source is included. Peated stores no region and no aliases; owner Chivas Brothers. Page texts are reviewed paraphrases of the cited pages, not copies."
+}

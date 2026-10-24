@@ -136,6 +136,12 @@ removes facts by editing. The merge is saved with a version check. When an
 item a person wrote breaks a store rule, such as a site fact kept after the
 Entity's kind changed, the job saves nothing until a moderator fixes it.
 
+A model check runs this job on 5 Entities with saved pages instead of the
+live web: `apps/server/src/agents/entityAbout/writer.eval.test.ts`. Each case
+in `apps/server/src/agents/entityAbout/evals/` lists its pages, the events a
+careful writer should find, and review notes. See
+`docs/development/model-checks.md`.
+
 ## History Without Sources
 
 All shown history needs a source. History copied from `entity_event` often has

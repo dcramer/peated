@@ -1,0 +1,55 @@
+{
+  "case": "springbank",
+  "reviewedAt": "2026-10-24",
+  "entity": {
+    "id": 1362,
+    "name": "Springbank",
+    "kind": "distillery",
+    "aliases": [],
+    "location": "Cambeltown, Scotland",
+    "owner": "J&A Mitchell & Co Ltd",
+    "yearEstablished": 1828,
+    "website": "https://www.springbank.scot/"
+  },
+  "pages": [
+    {
+      "url": "https://en.wikipedia.org/wiki/Springbank_(distillery)",
+      "title": "Springbank (distillery) - Wikipedia",
+      "publisher": "Wikipedia",
+      "description": "Encyclopedia entry on the family-owned Springbank distillery in Campbeltown.",
+      "text": "Springbank is a single malt distillery in Campbeltown on the Kintyre peninsula, in the west of Scotland, run by the family firm J & A Mitchell & Company. The same company owns Glengyle distillery, the old independent bottler William Cadenheads and a few blended labels such as Campbeltown Loch.\n\nLicensed in 1828, it is one of the few survivors in a town that once had more than thirty working distilleries. It makes three whiskies, peated and unpeated, under three brand names, and sells only a small share of its spirit to blenders.\n\nHistory\nThe Reid Brothers founded Springbank in 1828 and sold it in 1837 to John and William Mitchell. John's son later joined, and the firm became J&A Mitchell. When the brothers split up in 1872, John paid £5,055 for the distillery and William went off to build Glengyle.\n\nA storm in December 1883 brought down the chimneys, and another in 1904 tore off part of the tun room roof. US Prohibition caused a temporary shutdown in 1926; work started again in 1936. A weak UK economy closed the distillery in 1979, and it reopened in 1989. In 1993 it emerged that Springbank supplied the miniatures sold at Balmoral Castle. Hazelburn was first distilled in 1997.\n\nProduction\nSpringbank handles every step on site, from floor malting all of its own barley to bottling. The barley is dried over Islay peat for 30 to 48 hours, depending on the style."
+    },
+    {
+      "url": "https://scotchwhisky.com/whiskypedia/1892/springbank/",
+      "title": "Springbank | Scotch Whisky",
+      "publisher": "ScotchWhisky.com (Whiskypedia)",
+      "description": "Whisky reference profile of Springbank with a history timeline.",
+      "text": "Uniquely in Scotland, Springbank malts, distils, matures and bottles on one site, making three styles.\n\nSpringbank History\nThe Mitchell family and their relatives have held Springbank since 1837. Founder William Reid, who took out a licence in 1828, was a Mitchell in-law. Illegal stills were common in Kintyre before then: coppersmith Robert Armour's books record 400 small stills made from 1811-1817, with Reids and Mitchells among the buyers.\n\nIn 1837 Reid sold up to the Mitchell brothers, John and William, his in-laws. William left in 1872 for Riechlachan and John's son Alexander came in, giving the firm its J&A Mitchell name. Campbeltown became Scotland's whisky capital, with 35 distilleries at one time. The 1920s crash left only Springbank, Glen Scotia and Hazelburn, and by the 1960s just Springbank and Glen Scotia.\n\nSpringbank was mothballed from 1979 to 1987. When it restarted, Hedley Wright, the owner and a great-great grandson of John Mitchell, stopped selling to blenders to build up single malt. The maltings came back in 1992.\n\nTimeline\n1828 William Reid licenses Springbank\n1837 Sold to John and William Mitchell\n1872 William leaves; Alexander joins\n1897 J&A Mitchell founded\n1926 Distillery closes\n1933 Production resumes\n1960 Maltings close\n1969 J&A Mitchell buys Cadenhead\n1979 Mothballed again until 1987, when a limited run starts\n1992 Maltings reinstated\n1997 First Hazelburn run\n1999 Dha Mhile, the first organic single malt, launched"
+    },
+    {
+      "url": "https://britishlistedbuildings.co.uk/200389415-springbank-distillery-glebe-street-campbeltown-campbeltown",
+      "title": "Springbank Distillery, Glebe Street, Campbeltown, Campbeltown, Argyll and Bute",
+      "publisher": "British Listed Buildings (copy of the Historic Environment Scotland listing LB43067)",
+      "description": "Copy of the Historic Environment Scotland listing for the Springbank distillery buildings.",
+      "text": "Springbank Distillery, Glebe Street, Campbeltown, Argyll and Bute\nCategory B listed building\n\nRecorded as Springbank Distillery (Glebe Street and Well Close), on 28 March 1996 by Historic Scotland; designation reference LB43067, source ID 389415.\n\nDescription\nA large group of distillery buildings, the oldest dating from 1828. An office stands in the middle. To the south-west a roughly T-shaped main block contains the still house, the malt bins and mash tun, and stores. The kiln at the west end joins the maltings and barley loft, and a cooperage, bottling halls, warehouses and stores lie to the east and north. The office is a single-storey, three-bay sandstone and rubble building with sash windows and a grey slate roof.\n\nStatement of special interest\nCampbeltown's wave of distillery building after 1815 followed new licensing rules of 1814-15. Visiting late in the 19th century, Alfred Barnard described a site of more than 10 acres at the heart of the town, with buildings over three acres and a 600-foot street front. He gave 1828 as the year it was built, its builder being the father-in-law of the then owners, J & A Mitchell & Co. He noted a quadrangle layout with a single gateway."
+    }
+  ],
+  "expected": {
+    "events": [
+      {
+        "kind": "opened",
+        "year": "1828"
+      },
+      {
+        "kind": "acquired",
+        "year": "1837"
+      },
+      {
+        "kind": "mothballed",
+        "year": "1979"
+      }
+    ],
+    "notes": "opened 1828: all three pages (Wikipedia: licensed in 1828 and founded by the Reid Brothers in 1828; ScotchWhisky.com: William Reid's licence in 1828 and the 1828 timeline entry; listing record: oldest buildings from 1828 and Barnard's build year 1828). acquired 1837: Wikipedia and ScotchWhisky.com (sold to John and William Mitchell in 1837); newOwnerName John and William Mitchell. mothballed 1979: Wikipedia (closed in 1979) and ScotchWhisky.com (mothballed from 1979 to 1987); closed with a later reopened event is also an acceptable reading, so a scorer should accept closed or mothballed for 1979."
+  },
+  "notes": "Conflicts: (1) Return after the 1979 closure: Wikipedia says it reopened in 1989; ScotchWhisky.com says mothballed from 1979 to 1987, and its timeline says a limited run started in 1987. Both years are stated; a writer should cite each with its own statedValue rather than pick one silently. (2) Interwar closure: both give 1926, but Wikipedia says work started again in 1936 while the ScotchWhisky.com timeline says production resumed in 1933. (3) Founder naming: Wikipedia says the Reid Brothers; ScotchWhisky.com says William Reid. These conflicts are why the reopened years are left out of expected. Wikipedia also says John Mitchell paid for the distillery in 1872 when the partnership split; an acquired 1872 event is valid but optional. Traps: the listing date 28 March 1996 is a heritage designation, not a distillery event; the 1814-15 licensing rules and building after 1815 are Campbeltown context; the 1883 and 1904 storms, the 1969 Cadenhead purchase (a company acquisition, not a change of the distillery's owner), the 1897 J&A Mitchell founding, the 1993 Balmoral miniatures and 1999 Dha Mhile are optional or off-topic. Hazelburn first distilled in 1997 and maltings reinstated in 1992 are valid optional generic events. No capacity figure is included, so no LPA site fact is expected. Peated's region is stored with the typo \"Cambeltown\"; kept as stored. springbank.scot was not usable (homepage had no dated history; the site then returned a Cloudflare block), so no official page is included. The Historic Environment Scotland portal page (https://portal.historicenvironment.scot/designation/LB43067) renders by script and returned only its title, so the British Listed Buildings copy of the same record is used; per the writer prompt that is kind reference. Canmore (https://canmore.org.uk/site/83593) returned 403. Page texts are reviewed paraphrases of the cited pages, not copies."
+}
