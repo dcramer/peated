@@ -81,11 +81,20 @@ export function keepVerifiedCitations(
     draft.sources.map((source) => [source.id, normalizeSourceUrl(source.url)]),
   );
 
-  const published = new Map(
-    draft.sources.map((source) => [source.id, source.publishedOn]),
-  );
   // A dated article that reports something happening now states its
-  // publication date, so that date counts as quoted.
+  // publication date, so that date counts as quoted, but only when its year
+  // is on the page read; the model's own date is not evidence.
+  const published = new Map<string, string>();
+  for (const source of draft.sources) {
+    const text = pageText.get(normalizeSourceUrl(source.url));
+    if (
+      source.publishedOn &&
+      text &&
+      containsNumber(text, source.publishedOn.slice(0, 4))
+    ) {
+      published.set(source.id, source.publishedOn);
+    }
+  }
   const quotesOf = (citations: readonly AboutCitation[]) =>
     citations.flatMap((citation) => [
       ...(citation.quote ? [citation.quote] : []),
