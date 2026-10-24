@@ -223,6 +223,31 @@ describe("keepVerifiedCitations with the current page", () => {
     expect(result.events).toHaveLength(1);
   });
 
+  test("keeps a publication date the current page already has", () => {
+    // The quote has no year; the article's date dates the event.
+    const page = (publishedOn: string) =>
+      draft({
+        sources: [{ ...source, publishedOn }],
+        events: [
+          {
+            id: 1,
+            kind: "generic",
+            date: "2021",
+            text: "Brora reopened.",
+            citations: [
+              { sourceId: "wp", statedValue: null, quote: "Brora reopened" },
+            ],
+          },
+        ],
+      });
+
+    const current = page("2021-05-19");
+    expect(keepVerifiedCitations(current, [], current).events).toHaveLength(1);
+    expect(
+      keepVerifiedCitations(page("2022-05-19"), [], current).events,
+    ).toEqual([]);
+  });
+
   test("still checks a changed quote against the pages read", () => {
     const current = draft({
       events: [event(1, "1983", "Brora closed in 1983.")],
