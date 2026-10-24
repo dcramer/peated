@@ -266,7 +266,11 @@ function sameText(left: string | null, right: string | null) {
  * one. A writer may also reuse the ID of a listed item without a source.
  * Unknown details never match, because many things happen in one year.
  */
-function sameEvent(kept: AboutEvent, draft: AboutEvent) {
+function sameEvent(
+  kept: AboutEvent,
+  draft: AboutEvent,
+  ownerNames: ReadonlyMap<number, string>,
+) {
   if (kept.kind !== draft.kind || !valuesAgree(kept.date, draft.date)) {
     return false;
   }
@@ -278,7 +282,11 @@ function sameEvent(kept: AboutEvent, draft: AboutEvent) {
     case "renamed":
       return sameText(kept.name, draft.name);
     case "acquired":
-      return sameText(kept.newOwnerName, draft.newOwnerName);
+      return sameText(
+        kept.newOwnerName ??
+          (kept.newOwnerId ? (ownerNames.get(kept.newOwnerId) ?? null) : null),
+        draft.newOwnerName,
+      );
     case "era":
       return sameText(kept.title, draft.title);
     case "opened":
@@ -301,6 +309,8 @@ export function mergePipelineDraft(
   stored: EntityAboutDocument | null,
   draft: EntityAboutDocument,
   now: string,
+  /** Names of linked owners, so a draft can match an acquisition by name. */
+  ownerNames: ReadonlyMap<number, string>,
 ): EntityAboutDocument {
   const base = stored ?? EMPTY_ABOUT_DOCUMENT;
   const personSections = base.sections.filter((s) => s.writtenBy === "person");
@@ -322,7 +332,7 @@ export function mergePipelineDraft(
     const kept = keptEvents.find(
       (candidate) =>
         ![...matches.values()].includes(candidate.id) &&
-        sameEvent(candidate, event),
+        sameEvent(candidate, event, ownerNames),
     );
     if (kept) matches.set(event.id, kept.id);
   }

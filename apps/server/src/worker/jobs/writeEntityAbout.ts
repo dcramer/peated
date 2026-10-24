@@ -18,6 +18,7 @@ import { isFactShown } from "@peated/server/lib/entityAbout/display";
 import { mergePipelineDraft } from "@peated/server/lib/entityAbout/document";
 import { toPublicEntityAbout } from "@peated/server/lib/entityAbout/publicAbout";
 import {
+  followMergedEntities,
   getEntityAbout,
   saveEntityAbout,
 } from "@peated/server/lib/entityAbout/store";
@@ -51,36 +52,46 @@ const defaultServices: WriteEntityAboutServices = {
  * sources. A matching event in the draft adds its citations to the stored
  * one (see `mergePipelineDraft`).
  */
-async function describeUnsourcedHistory(stored: EntityAboutDocument | null) {
-  if (!stored) return [];
-  const { events, sources } = stored;
-  const hidden = events.filter(
-    (event) => !isFactShown(event.citations, sources),
-  );
-  const ownerIds = hidden.flatMap((event) =>
+/** Names of the Entities a stored document links as new owners. */
+async function loadOwnerNames(stored: EntityAboutDocument | null) {
+  const ids = (stored?.events ?? []).flatMap((event) =>
     event.newOwnerId ? [event.newOwnerId] : [],
   );
-  const owners = new Map(
-    ownerIds.length
-      ? (
-          await db
-            .select({ id: entities.id, name: entities.name })
-            .from(entities)
-            .where(inArray(entities.id, ownerIds))
-        ).map((row) => [row.id, row.name])
-      : [],
-  );
-  return hidden.map((event) => {
-    const owner = event.newOwnerId
-      ? owners.get(event.newOwnerId)
-      : event.newOwnerName;
-    const details = [
-      event.name ? `name ${event.name}` : null,
-      owner ? `new owner ${owner}` : null,
-      event.text?.slice(0, 300),
-    ].filter(Boolean);
-    return `#${event.id} ${event.kind}, ${event.date}${details.length ? `: ${details.join("; ")}` : ""}`;
-  });
+  if (!ids.length) return new Map<number, string>();
+  // A merged owner is named by the Entity it became.
+  const target = await followMergedEntities(db, ids);
+  const rows = await db
+    .select({ id: entities.id, name: entities.name })
+    .from(entities)
+    .where(inArray(entities.id, [...new Set(target.values())]));
+  const names = new Map(rows.map((row) => [row.id, row.name]));
+  const ownerNames = new Map<number, string>();
+  for (const id of ids) {
+    const name = names.get(target.get(id) ?? id);
+    if (name) ownerNames.set(id, name);
+  }
+  return ownerNames;
+}
+
+function describeUnsourcedHistory(
+  stored: EntityAboutDocument | null,
+  ownerNames: ReadonlyMap<number, string>,
+) {
+  if (!stored) return [];
+  const { events, sources } = stored;
+  return events
+    .filter((event) => !isFactShown(event.citations, sources))
+    .map((event) => {
+      const owner = event.newOwnerId
+        ? ownerNames.get(event.newOwnerId)
+        : event.newOwnerName;
+      const details = [
+        event.name ? `name ${event.name}` : null,
+        owner ? `new owner ${owner}` : null,
+        event.text?.slice(0, 300),
+      ].filter(Boolean);
+      return `#${event.id} ${event.kind}, ${event.date}${details.length ? `: ${details.join("; ")}` : ""}`;
+    });
 }
 
 export type WriteEntityAboutResult =
@@ -113,8 +124,10 @@ export async function writeEntityAbout(
     .where(eq(entityAliases.entityId, entity.id));
   // Read without a lock to guide the writer; the save checks again under one.
   const before = await getEntityAbout(db, entity.id);
-  const unsourcedHistory = await describeUnsourcedHistory(
+  const ownerNames = await loadOwnerNames(before?.document ?? null);
+  const unsourcedHistory = describeUnsourcedHistory(
     before?.document ?? null,
+    ownerNames,
   );
 
   let errors: string[] = [];
@@ -142,12 +155,22 @@ export async function writeEntityAbout(
       pagesRead,
       entity.kind,
     );
-    errors = reviewed.errors.length
-      ? reviewed.errors
-      : checkMergedAbout(
+    // A section the schema rejected is a reason to retry, not a silent gap.
+    const droppedSections = converted.dropped
+      .filter((item) => item.startsWith("section "))
+      .map((item) => `The ${item} does not match the output format.`);
+    errors = [...droppedSections, ...reviewed.errors];
+    if (!errors.length) {
+      errors = checkMergedAbout(
+        before?.document ?? null,
+        mergePipelineDraft(
           before?.document ?? null,
-          mergePipelineDraft(before?.document ?? null, reviewed.document, now),
-        );
+          reviewed.document,
+          now,
+          ownerNames,
+        ),
+      );
+    }
     if (!errors.length) accepted = reviewed.document;
   }
 
@@ -166,6 +189,7 @@ export async function writeEntityAbout(
       stored?.document ?? null,
       document,
       services.now().toISOString(),
+      ownerNames,
     );
     const mergeErrors = checkMergedAbout(stored?.document ?? null, merged);
     if (mergeErrors.length) return { errors: mergeErrors, version: null };

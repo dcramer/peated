@@ -110,6 +110,34 @@ describe("keepVerifiedCitations", () => {
     expect(kept("2024")).toBe(0);
   });
 
+  test("drops an owner name no quote states", () => {
+    const owned = (newOwnerName: string) =>
+      keepVerifiedCitations(
+        draft({
+          events: [
+            {
+              id: 1,
+              kind: "acquired",
+              date: "2021",
+              newOwnerName,
+              writtenBy: "pipeline",
+              citations: [
+                {
+                  sourceId: "wp",
+                  statedValue: "2021",
+                  quote: "It was rebuilt in 2021 after 38 years.",
+                },
+              ],
+            },
+          ],
+        }),
+        [{ ...page, text: `${page.text} Diageo rebuilt Brora.` }],
+      ).events.length;
+
+    // The quote states the year, not who bought it.
+    expect(owned("Diageo")).toBe(0);
+  });
+
   test("ignores case, quote marks, and punctuation", () => {
     const result = keepVerifiedCitations(
       draft({ events: [event(1, "2021", "rebuilt in 2021, after 38 years")] }),

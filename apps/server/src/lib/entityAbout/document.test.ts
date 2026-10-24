@@ -82,7 +82,7 @@ describe("mergePipelineDraft", () => {
       ],
     });
 
-    const merged = mergePipelineDraft(stored, draft, now);
+    const merged = mergePipelineDraft(stored, draft, now, new Map());
 
     expect(
       merged.events.map(({ kind, date, writtenBy }) => [kind, date, writtenBy]),
@@ -132,7 +132,7 @@ describe("mergePipelineDraft", () => {
       ],
     });
 
-    const merged = mergePipelineDraft(stored, draft, now);
+    const merged = mergePipelineDraft(stored, draft, now, new Map());
 
     expect(
       merged.events.map(({ id, date, citations }) => [
@@ -180,7 +180,7 @@ describe("mergePipelineDraft", () => {
       ],
     });
 
-    const merged = mergePipelineDraft(stored, draft, now);
+    const merged = mergePipelineDraft(stored, draft, now, new Map());
 
     expect(merged.events.map(({ id, kind }) => [id, kind])).toEqual([
       [3, "closed"],
@@ -249,7 +249,7 @@ describe("mergePipelineDraft", () => {
       ],
     });
 
-    const merged = mergePipelineDraft(stored, draft, now);
+    const merged = mergePipelineDraft(stored, draft, now, new Map());
 
     expect(
       merged.events.map(({ id, text, newOwnerName, citations }) => [
@@ -264,5 +264,41 @@ describe("mergePipelineDraft", () => {
       [1, "A new warehouse was built.", 1],
       [2, "John Risk", 1],
     ]);
+  });
+
+  test("matches a linked owner by its name", () => {
+    const stored = document({
+      events: [
+        {
+          id: 4,
+          kind: "acquired",
+          date: "1925",
+          newOwnerId: 42,
+          writtenBy: "person",
+          citations: cited,
+        },
+      ],
+    });
+    const draft = document({
+      events: [
+        {
+          id: 1,
+          kind: "acquired",
+          date: "1925",
+          newOwnerName: "Distillers Company",
+          writtenBy: "pipeline",
+          citations: [{ sourceId: "s1", statedValue: "1925" }],
+        },
+      ],
+    });
+
+    const merged = mergePipelineDraft(
+      stored,
+      draft,
+      now,
+      new Map([[42, "Distillers Company"]]),
+    );
+
+    expect(merged.events.map(({ id }) => id)).toEqual([4]);
   });
 });

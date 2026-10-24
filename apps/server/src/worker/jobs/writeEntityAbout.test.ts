@@ -403,6 +403,36 @@ describe("writeEntityAbout", () => {
     expect(about?.document.siteFacts.washStills?.value).toBe(2);
   });
 
+  test("never removes the page's lead", async ({ fixtures }) => {
+    const entity = await fixtures.Entity({ kind: "distillery" });
+    await fixtures.EntityAbout({
+      entityId: entity.id,
+      events: [
+        { id: 1, kind: "opened", date: "1819", writtenBy: "pipeline" },
+        { id: 2, kind: "closed", date: "1983", writtenBy: "pipeline" },
+      ],
+      sections: [
+        {
+          key: "lead",
+          heading: null,
+          eraEventId: null,
+          writtenBy: "pipeline",
+          sentences: [{ text: "It opened in 1819.", factIds: ["event:1"] }],
+        },
+      ],
+    });
+    const noProse: AboutDraft = { ...goodDraft, sections: [] };
+
+    const result = await writeEntityAbout(
+      { entityId: entity.id },
+      services(async () => ({ draft: noProse, pagesRead: [page] })),
+    );
+
+    expect(result).toMatchObject({ status: "rejected" });
+    const about = await getEntityAbout(db, entity.id);
+    expect(about?.document.sections.map(({ key }) => key)).toEqual(["lead"]);
+  });
+
   test("saves nothing from an empty draft", async ({ fixtures }) => {
     const entity = await fixtures.Entity({ kind: "distillery" });
     const empty: AboutDraft = {

@@ -42,9 +42,12 @@ function normalizeForQuote(value: string) {
     .trim();
 }
 
+const FILLER_WORDS = new Set(["and", "the", "for", "with"]);
+
 /**
- * Whether some quote states `value`: every number in it, or its words. A date
- * needs only its year, because pages write months and days many ways.
+ * Whether the quotes state `value`: every number in it, or every word that
+ * carries meaning. A date needs only its year, because pages write months
+ * and days many ways.
  */
 function quotesState(quotes: readonly string[], value: string) {
   const checked = ISO_DATE_PATTERN.test(value) ? value.slice(0, 4) : value;
@@ -54,8 +57,16 @@ function quotesState(quotes: readonly string[], value: string) {
       quotes.some((quote) => containsNumber(quote, number)),
     );
   }
-  const words = normalizeForQuote(checked);
-  return quotes.some((quote) => normalizeForQuote(quote).includes(words));
+  // The whole phrase, or each word that carries meaning: "James Ainslie and
+  // his partner John Risk" states "James Ainslie and John Risk".
+  const text = normalizeForQuote(quotes.join(" "));
+  const phrase = normalizeForQuote(checked);
+  if (text.includes(phrase)) return true;
+  const quoted = new Set(text.split(" "));
+  return phrase
+    .split(" ")
+    .filter((word) => word.length > 2 && !FILLER_WORDS.has(word))
+    .every((word) => quoted.has(word));
 }
 
 /**
@@ -121,9 +132,12 @@ export function keepVerifiedCitations(
     }))
     .filter((event) => {
       const quotes = quotesOf(event.citations);
+      // Names are shown as facts too, so a quote must state them.
       return (
         quotesState(quotes, event.date.slice(0, 4)) &&
-        (!event.endDate || quotesState(quotes, event.endDate.slice(0, 4)))
+        (!event.endDate || quotesState(quotes, event.endDate.slice(0, 4))) &&
+        (!event.name || quotesState(quotes, event.name)) &&
+        (!event.newOwnerName || quotesState(quotes, event.newOwnerName))
       );
     });
 
@@ -264,8 +278,8 @@ function checkSentence(
  * Checks a merged document before the pipeline saves it. Pipeline rule
  * (owner: docs/features/entity-about.md): the pipeline's sentences must still
  * match the facts they cite after a person's values win the merge, and a run
- * never leaves the page with fewer shown facts. Counts, not IDs, because a
- * run renumbers the pipeline's events.
+ * never leaves the page with fewer shown facts or without its lead. Counts,
+ * not IDs, because a run renumbers the pipeline's events.
  */
 export function checkMergedAbout(
   stored: EntityAboutDocument | null,
@@ -283,6 +297,13 @@ export function checkMergedAbout(
   const lost = stored ? getShownFactIds(stored).size - shown.size : 0;
   if (lost > 0) {
     errors.push(`The draft would show ${lost} fewer facts than the page does.`);
+  }
+  const hasLead = (document: EntityAboutDocument) =>
+    document.sections.some(
+      (section) => section.key === "lead" && section.sentences.length,
+    );
+  if (stored && hasLead(stored) && !hasLead(merged)) {
+    errors.push("The draft would remove the page's lead.");
   }
   return errors;
 }
