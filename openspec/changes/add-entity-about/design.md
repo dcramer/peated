@@ -95,7 +95,7 @@ reviewed place.
 
 - `sources`: list of `{ id, url, title, publisher, publishedOn, kind,
 status }`.
-  `kind` is `official`, `reference`, `press`, or `retailer`.
+  `kind` is `official`, `reference`, or `press`.
   `url` is unique within the document.
 - `events`: list of `{ id, kind, date, endDate, continuing, name, title,
 text, relatedEntityId, newOwnerId, newOwnerName, citations, writtenBy }`.
@@ -210,7 +210,7 @@ pipeline leaves the column alone. A moderator fixes whichever is wrong.
 
 Two plain functions run in the public serializer on every read:
 
-- `isFactShown(citations)` hides a fact whose only sources are `retailer`.
+- `isFactShown(citations)` hides a fact with no source.
 - `getDisagreement(citations)` returns every stated value when citations
   disagree, for the "Sources disagree" note.
 
@@ -349,7 +349,7 @@ Each likely change has one place to make it, without reworking storage:
 
 - **Wrong facts published without review.**
   - Quotes are checked against pages read in the run.
-  - Retailer-only facts are hidden.
+  - Shops, auctions, and forums are never cited.
   - People's edits are kept.
   - Reports and moderator edits fix the rest.
   - If errors are common, add a review step then.

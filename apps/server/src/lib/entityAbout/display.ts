@@ -9,18 +9,15 @@ import { ABOUT_FACT_FIELD_LIST, type AboutFactField } from "./aboutFactFields";
 
 /**
  * Display rule (owner: docs/features/entity-about.md): a fact is shown only
- * when at least one citation points to a source that is not a retailer.
- * Uncited facts, including legacy history without a source, stay hidden.
+ * when at least one citation points to a source in the document. Uncited
+ * facts, including legacy history without a source, stay hidden.
  */
 export function isFactShown(
   citations: readonly AboutCitation[],
   sources: readonly AboutSource[],
 ) {
-  const kinds = new Map(sources.map((source) => [source.id, source.kind]));
-  return citations.some((citation) => {
-    const kind = kinds.get(citation.sourceId);
-    return kind !== undefined && kind !== "retailer";
-  });
+  const ids = new Set(sources.map((source) => source.id));
+  return citations.some((citation) => ids.has(citation.sourceId));
 }
 
 function normalizeStatedValue(value: string) {

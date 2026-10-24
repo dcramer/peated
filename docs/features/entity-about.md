@@ -15,7 +15,8 @@ the rule.
 The document holds:
 
 - **Sources**: pages that support facts. Each has a kind: `official`,
-  `reference`, `press`, or `retailer`.
+  `reference`, or `press`. Shops, auctions, and forums are never cited; the
+  writer uses them only as leads.
 - **Events**: dated history, such as openings, closings, renames,
   acquisitions, and eras (a span like "heavily peated, 1969 to 1973"). Each
   event lists its citations: the source, the value the source states, and a
@@ -40,7 +41,7 @@ label belongs on the Brand. See
 Rules in `apps/server/src/lib/entityAbout/display.ts` run on every read, so
 nothing stored can go stale:
 
-- A fact needs at least one source that is not a retailer.
+- A fact needs at least one source.
 - When sources state different values, the page shows the chosen value and a
   "Sources disagree" note with each value and its sources. Values where one is
   a more exact form of the other, such as `1983` and `1983-03`, agree. Ranges

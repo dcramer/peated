@@ -12,15 +12,6 @@ const sources: AboutSource[] = [
     status: "available",
   },
   {
-    id: "shop",
-    url: "https://shop.example.com/brora",
-    title: "Brora history",
-    publisher: "A shop",
-    publishedOn: null,
-    kind: "retailer",
-    status: "available",
-  },
-  {
     id: "wp",
     url: "https://en.wikipedia.org/wiki/Brora_distillery",
     title: "Brora distillery",
@@ -58,12 +49,12 @@ describe("GET /entities/:entity/about", () => {
             { sourceId: "hes", statedValue: "1969", quote: null },
           ],
         },
-        // Display rule: a retailer alone cannot support a fact.
+        // Display rule: a fact without a source stays hidden.
         {
           id: 3,
           kind: "closed",
           date: "1983-05",
-          citations: [{ sourceId: "shop", statedValue: null, quote: null }],
+          citations: [],
         },
       ],
       sections: [

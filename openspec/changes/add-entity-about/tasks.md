@@ -4,7 +4,7 @@
 - [x] 1.2 Add the `entity_about` table and the `entity_about` change object type; generate the migration
 - [x] 1.3 Add read and write functions that parse `unknown`, check the saved version on every write, save the full document to change history, check linked Entities on write, and follow merged Entities on read; integration tests for each
 - [x] 1.4 Add a test that parses a sample of real document shapes, so schema changes that break stored documents fail CI
-- [x] 1.5 Write `isFactShown` and `getDisagreement` and run them in the public serializer, with tests for retailer-only facts and conflicting values
+- [x] 1.5 Write `isFactShown` and `getDisagreement` and run them in the public serializer, with tests for unsourced facts and conflicting values
 - [x] 1.6 Add moderator API routes to edit events, site facts, sources, and sections in the document, with tests for permissions, stale versions, and the rule that the pipeline never overwrites a person's edit
 - [x] 1.7 Backfill a document for each Entity with `entity_event` rows, copying `sourceUrl` into sources and citations; check event counts per Entity
 - [x] 1.8 Point Overview history, owner acquisitions, and existing event routes at the document; stop writing `entity_event`

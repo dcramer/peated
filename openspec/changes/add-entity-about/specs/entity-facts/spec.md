@@ -96,17 +96,17 @@ of public API responses.
 - **THEN** the response includes each citation's source and stated value but
   not its quote
 
-### Requirement: Retailer-only facts are not published
+### Requirement: Shops are not sources
 
 Each source SHALL have a kind: `official` (the producer, government, or
-heritage records), `reference` (histories and encyclopedias), `press`, or
-`retailer` (shops, auctions, and forums). A fact whose only citations are
-`retailer` sources SHALL be stored but not shown.
+heritage records), `reference` (histories and encyclopedias), or `press`.
+The pipeline SHALL NOT cite shops, auctions, or forums; it MAY use them only
+to find other sources.
 
-#### Scenario: Retailer blog only
+#### Scenario: Shop blog only
 
-- **WHEN** a closing month is cited only from a shop's blog
-- **THEN** the fact is not shown on the page
+- **WHEN** a closing month appears only on a shop's blog
+- **THEN** the draft leaves the month out unless another source states it
 
 ### Requirement: Conflicting sources stay visible
 

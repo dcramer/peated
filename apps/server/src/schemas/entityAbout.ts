@@ -23,7 +23,7 @@ export const ENTITY_ABOUT_SCHEMA_VERSION = 1;
 export const AboutSourceKindEnum = z
   .enum(ENTITY_ABOUT_SOURCE_KIND_LIST)
   .describe(
-    "`official` is the producer, government, or heritage records; `reference` is histories and encyclopedias; `press` is news and trade press; `retailer` is shops, auctions, and forums.",
+    "`official` is the producer, government, or heritage records; `reference` is histories and encyclopedias; `press` is news and trade press.",
   );
 
 export const AboutEventKindEnum = z.enum(ENTITY_ABOUT_EVENT_KIND_LIST);

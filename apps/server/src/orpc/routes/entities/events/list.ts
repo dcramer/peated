@@ -32,7 +32,7 @@ export default implement(entityEventListContract).handler(async function ({
     ),
   );
   const results = (document?.events ?? [])
-    // Display rule: history without a non-retailer source stays hidden.
+    // Display rule: history without a source stays hidden.
     .filter((event) => isFactShown(event.citations, document?.sources ?? []))
     .sort((a, b) => a.date.localeCompare(b.date) || a.id - b.id)
     .flatMap((event) => {

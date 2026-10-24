@@ -229,7 +229,6 @@ export const ENTITY_ABOUT_SOURCE_KIND_LIST = [
   "official",
   "reference",
   "press",
-  "retailer",
 ] as const;
 
 export const BADGE_FORMULA_LIST = ["default", "linear", "fibonacci"] as const;
