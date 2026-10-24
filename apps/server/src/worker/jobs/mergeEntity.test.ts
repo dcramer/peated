@@ -240,6 +240,24 @@ test("combines About documents when Entities merge", async ({ fixtures }) => {
   ]);
 });
 
+test("keeps a hidden About page hidden after a merge", async ({ fixtures }) => {
+  const source = await fixtures.Entity({ kind: "distillery" });
+  const destination = await fixtures.Entity({ kind: "distillery" });
+  await fixtures.EntityAbout({
+    entityId: source.id,
+    status: "hidden",
+    events: [{ id: 1, kind: "closed", date: "1983" }],
+  });
+
+  await mergeEntity({
+    fromEntityIds: [source.id],
+    toEntityId: destination.id,
+  });
+
+  const about = await getEntityAbout(db, destination.id);
+  expect(about?.status).toBe("hidden");
+});
+
 test("drops site facts the merge target cannot have", async ({ fixtures }) => {
   const source = await fixtures.Entity({ kind: "distillery" });
   const destination = await fixtures.Entity({ kind: "brand" });
