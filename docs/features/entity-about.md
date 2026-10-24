@@ -73,8 +73,10 @@ vintage notes the era or former name that covers that vintage.
 
 ## Who Can Change It
 
-- Moderators edit the document through `entities.about.update`, sending the
-  version they read. Their edits are marked as written by a person. They can
+- Moderators read the full document, with quotes and who wrote each item,
+  through `entities.about.document`, and send it back with their edits
+  through `entities.about.update`, along with the version they read. The
+  public page leaves quotes out, so it is not a starting point for edits. Their edits are marked as written by a person. They can
   hide or show the page with `entities.about.status`.
 - The legacy Entity history routes (`entities.events.*`) edit the same
   document. A new history item needs a source URL.

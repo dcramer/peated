@@ -116,11 +116,10 @@ function Disagreement({
           >
             {entry.value}:{" "}
             {entry.sourceIds
-              .map(
-                (id) =>
-                  about.sources.find((source) => source.id === id)?.publisher ??
-                  id,
-              )
+              .flatMap((id) => {
+                const source = about.sources.find((item) => item.id === id);
+                return source ? [source.publisher ?? source.title] : [];
+              })
               .join(", ")}
             <Citations ids={entry.sourceIds} numbers={numbers} />
           </li>
