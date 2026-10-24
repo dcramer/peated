@@ -22,7 +22,7 @@ import {
   RowMenu,
   type RowMenuItem,
 } from "@peated/web/components/rowMenu.stylex";
-import { colors, controlMetrics } from "../../styles/tokens.stylex";
+import { breakpointStyles } from "../../styles/foundations.stylex";
 import { CatalogTable, type CatalogTableColumn } from "../catalogTable.stylex";
 import { Table } from "../table.stylex";
 import { CatalogPageLoading } from "./catalogPage.stylex";
@@ -247,7 +247,7 @@ function EntityCatalogTable({
               <RowMenu
                 groups={groups}
                 label={item.name}
-                triggerVariant="text"
+                triggerVariant="quiet"
               />
             ) : null}
           </div>
@@ -287,12 +287,7 @@ function EntityFollowToggle({
   const label = `${item.isFollowing ? "Unfollow" : "Follow"} ${item.name}`;
 
   return (
-    <span
-      {...stylex.props(
-        styles.followToggle,
-        item.isFollowing && styles.followToggleOn,
-      )}
-    >
+    <span {...stylex.props(breakpointStyles.wideOnly)}>
       <IconButton
         aria-pressed={item.isFollowing}
         icon={<FollowEye following={item.isFollowing} />}
@@ -301,13 +296,13 @@ function EntityFollowToggle({
         onClick={() => onToggle(item)}
         size="sm"
         title={label}
-        variant="text"
+        variant="quiet"
       />
     </span>
   );
 }
 
-/** The same eye as the Following mark: outlined to follow, filled when followed. */
+/** The Following mark's eye: outlined to follow, filled when followed. */
 function FollowEye({ following }: { following: boolean }) {
   const outline =
     "M1.6 8s2.2-3.5 6.4-3.5S14.4 8 14.4 8 12.2 11.5 8 11.5 1.6 8 1.6 8Z";
@@ -402,17 +397,6 @@ const styles = stylex.create({
     alignItems: "center",
     justifyContent: "flex-end",
     gap: "2px",
-  },
-  followToggle: {
-    display: {
-      default: "inline-flex",
-      // Matches CatalogTable's narrow layout.
-      "@media (max-width: 759px)": "none",
-    },
-    borderRadius: controlMetrics.radius,
-  },
-  followToggleOn: {
-    backgroundColor: colors.accentTint,
   },
   visuallyHidden: {
     position: "absolute",

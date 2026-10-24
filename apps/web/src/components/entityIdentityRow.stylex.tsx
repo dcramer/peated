@@ -1,6 +1,8 @@
 import type { EntityKind } from "@peated/server/types";
 import * as stylex from "@stylexjs/stylex";
 
+import { breakpointStyles } from "../styles/foundations.stylex";
+
 import { MemberStatus } from "./memberStatus.stylex";
 import {
   TextIdentityRow,
@@ -56,7 +58,9 @@ export function EntityIdentityRow({
       status={
         isFollowing ? (
           <span
-            {...stylex.props(followingMark === "narrow" && styles.narrowOnly)}
+            {...stylex.props(
+              followingMark === "narrow" && breakpointStyles.narrowOnly,
+            )}
           >
             <MemberStatus kind="following" />
           </span>
@@ -65,13 +69,3 @@ export function EntityIdentityRow({
     />
   );
 }
-
-const styles = stylex.create({
-  narrowOnly: {
-    // Matches CatalogTable's narrow layout, where the follow toggle is hidden.
-    display: {
-      default: "none",
-      "@media (max-width: 759px)": "inline",
-    },
-  },
-});
