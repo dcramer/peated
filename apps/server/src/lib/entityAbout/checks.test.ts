@@ -9,7 +9,7 @@ import {
   checkConflictPicks,
   keepVerifiedCitations,
 } from "./checks";
-import { getDisagreement } from "./display";
+import { getDisagreement, valuesAgree } from "./display";
 import { toPublicEntityAbout } from "./publicAbout";
 
 const source = {
@@ -326,6 +326,13 @@ describe("checkAboutProse", () => {
     expect(errors).toEqual([
       "Only 2 facts are shown; sections beyond the lead need at least 6.",
     ]);
+  });
+});
+
+describe("valuesAgree", () => {
+  test("reads a short year range as text, not a month", () => {
+    expect(valuesAgree("1969-70", "1969")).toBe(false);
+    expect(valuesAgree("1969-07", "1969")).toBe(true);
   });
 });
 

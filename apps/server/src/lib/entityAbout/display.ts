@@ -30,7 +30,9 @@ function normalizeStatedValue(value: string) {
   );
 }
 
-export const ISO_DATE_PATTERN = /^\d{4}(?:-\d{2}){0,2}$/;
+// A month is 01–12 and a day 01–31, so "1969-70" is not a date.
+export const ISO_DATE_PATTERN =
+  /^\d{4}(?:-(?:0[1-9]|1[0-2])(?:-(?:0[1-9]|[12]\d|3[01]))?)?$/;
 
 const DATE_RANGE_PATTERN =
   /^(\d{4}(?:-\d{2}){0,2}) ?[–-] ?(\d{4}(?:-\d{2}){0,2})$/;
