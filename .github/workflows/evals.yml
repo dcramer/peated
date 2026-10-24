@@ -112,7 +112,7 @@ jobs:
     runs-on: ubuntu-latest
     permissions:
       contents: read
-      checks: write
+      statuses: write
     env:
       AI_GATEWAY_API_KEY: ${{ secrets.AI_GATEWAY_API_KEY }}
       BOTTLE_CLASSIFIER_EVAL_FIXED_EVIDENCE_FILE: evals/evidence/ci.json
@@ -161,16 +161,49 @@ jobs:
           retention-days: 7
 
       - name: Publish classifier eval report
+        id: report
         if: steps.results.conclusion == 'success'
         uses: getsentry/vitest-evals@abea6a519955e5df56ecb2a2d83bae9c821561e1 # v0.16.1
         with:
           results: packages/bottle-classifier/vitest-results.json
-          publish-check: true
-          check-name: classifier eval score
           min-pass-rate: ${{ env.EVAL_MIN_PASS_RATE }}
-          # Keep the existing workflow job blocking until branch protection
-          # explicitly requires the dedicated Check Run.
-          soft-fail: false
+
+      # The pull request checks list shows a commit status's description, so
+      # the pass rate is visible there without opening the run.
+      - name: Show pass rate on the pull request
+        if: ${{ !cancelled() }}
+        env:
+          GH_TOKEN: ${{ github.token }}
+          EVAL_STATUS: ${{ steps.report.outputs.status }}
+          EVAL_TITLE: ${{ steps.report.outputs.gate-title }}
+          EVALS_PASSED: ${{ steps.report.outputs.evals-passed }}
+          EVALS_TOTAL: ${{ steps.report.outputs.evals-total }}
+          HEAD_SHA: ${{ github.event.pull_request.head.sha }}
+          RUN_URL: ${{ github.server_url }}/${{ github.repository }}/actions/runs/${{ github.run_id }}
+        run: |
+          set -euo pipefail
+
+          case "$EVAL_STATUS" in
+            passed) state=success ;;
+            failed) state=failure ;;
+            *) state=error ;;
+          esac
+
+          if [[ "${EVALS_TOTAL:-0}" -gt 0 ]]; then
+            pass_rate=$(awk -v passed="$EVALS_PASSED" -v total="$EVALS_TOTAL" 'BEGIN { printf "%.1f", 100 * passed / total }')
+            floor=$(awk -v rate="$EVAL_MIN_PASS_RATE" 'BEGIN { printf "%g", 100 * rate }')
+            description="${pass_rate}% passed (${EVALS_PASSED}/${EVALS_TOTAL}) · needs ${floor}%"
+          else
+            description="${EVAL_TITLE:-Classifier evals did not finish}"
+          fi
+
+          gh api "repos/$GITHUB_REPOSITORY/statuses/$HEAD_SHA" \
+            -f state="$state" \
+            -f context="evals / classifier score" \
+            -f description="${description:0:140}" \
+            -f target_url="$RUN_URL" \
+            >/dev/null
+          echo "$description"
 
   scraper:
     name: "evals / scraper"
