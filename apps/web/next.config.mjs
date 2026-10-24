@@ -69,12 +69,27 @@ const stylexNextConfig = withStylexTurbopack({
   },
 })(nextConfig);
 
+// The StyleX Turbopack wrapper runs its Node.js loader on every JS and TS file,
+// including node_modules. That loader pool pushed cold Vercel builds past the
+// 8 GB build machine. Run it only on app files that mention StyleX; the loader
+// returns every other file unchanged.
+const stylexRule = {
+  loaders: stylexNextConfig.turbopack.rules["*.ts"].loaders,
+  condition: { all: [{ not: "foreign" }, { content: /stylex/ }] },
+};
+const stylexRules = Object.fromEntries(
+  Object.keys(stylexNextConfig.turbopack.rules).map((glob) => [
+    glob,
+    stylexRule,
+  ]),
+);
+
 // The StyleX Turbopack wrapper replaces `turbopack.rules`. Preserve Peated's
 // existing asset loaders after StyleX adds its source transforms.
 stylexNextConfig.turbopack = {
   ...stylexNextConfig.turbopack,
   rules: {
-    ...stylexNextConfig.turbopack?.rules,
+    ...stylexRules,
     ...nextConfig.turbopack?.rules,
   },
 };
