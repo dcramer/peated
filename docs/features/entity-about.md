@@ -98,9 +98,16 @@ it:
   words. No banned phrases, from
   `apps/server/src/lib/entityAbout/bannedPhrases.ts`.
 
+Site facts that do not apply to the Entity's kind are dropped, and the
+store's own save rules run as a check too, so a draft the store would reject
+gets its retry. A draft with no sourced facts fails.
+
 A draft that fails gets one retry with the reasons. After that, the job saves
 nothing. A draft that passes is merged into the stored document, keeping
-every item a person wrote, and saved with a version check.
+every item a person wrote and every pipeline fact a person's section cites.
+A run never leaves the page with fewer shown facts; such a draft, for
+example one written while search was failing, saves nothing. A moderator
+removes facts by editing. The merge is saved with a version check.
 
 ## History And Descriptions Without Sources
 

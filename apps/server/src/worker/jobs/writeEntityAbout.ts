@@ -11,7 +11,10 @@ import {
   getSystemActorForDatabase,
 } from "@peated/server/lib/actors";
 import { reviewAboutDraft } from "@peated/server/lib/entityAbout/checks";
-import { isFactShown } from "@peated/server/lib/entityAbout/display";
+import {
+  getShownFactIds,
+  isFactShown,
+} from "@peated/server/lib/entityAbout/display";
 import { mergePipelineDraft } from "@peated/server/lib/entityAbout/document";
 import { toPublicEntityAbout } from "@peated/server/lib/entityAbout/publicAbout";
 import {
@@ -130,7 +133,11 @@ export async function writeEntityAbout(
     });
     const now = services.now().toISOString();
     const converted = draftToDocument(draft, now);
-    const reviewed = reviewAboutDraft(converted.document, pagesRead);
+    const reviewed = reviewAboutDraft(
+      converted.document,
+      pagesRead,
+      entity.kind,
+    );
     errors = reviewed.errors;
     if (!errors.length) accepted = reviewed.document;
   }
@@ -146,6 +153,20 @@ export async function writeEntityAbout(
   const document = accepted;
   const saved = await db.transaction(async (tx) => {
     const stored = await getEntityAbout(tx, entity.id, { forUpdate: true });
+    const merged = mergePipelineDraft(
+      stored?.document ?? null,
+      document,
+      services.now().toISOString(),
+    );
+    // Pipeline rule (owner: docs/features/entity-about.md): a run never
+    // leaves the page with fewer shown facts. A thin draft, such as one
+    // written while search was failing, saves nothing; a moderator removes
+    // facts. Counts, not IDs, because a run renumbers the pipeline's events.
+    const lost = stored
+      ? getShownFactIds(stored.document).size - getShownFactIds(merged).size
+      : 0;
+    if (lost > 0) return { lost };
+
     const today = services.now().toISOString().slice(0, 10);
     const actor = await getSystemActorForDatabase(
       tx,
@@ -153,11 +174,7 @@ export async function writeEntityAbout(
     );
     const result = await saveEntityAbout(tx, {
       entity,
-      document: mergePipelineDraft(
-        stored?.document ?? null,
-        document,
-        services.now().toISOString(),
-      ),
+      document: merged,
       expectedVersion: stored?.version ?? null,
       actor,
       checkedOn: today,
@@ -188,10 +205,19 @@ export async function writeEntityAbout(
         data: { description, descriptionSrc: "generated" },
       });
     }
-    return result;
+    return { result };
   });
 
-  return { status: "saved", version: saved.version };
+  if ("lost" in saved) {
+    const errors = [
+      `The draft would show ${saved.lost} fewer facts than the page does.`,
+    ];
+    logWarn("About draft rejected", {
+      extra: { entityId: entity.id, errorCount: errors.length },
+    });
+    return { status: "rejected", errors };
+  }
+  return { status: "saved", version: saved.result.version };
 }
 
 export default async function writeEntityAboutJob(input: JobPayload) {

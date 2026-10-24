@@ -7,7 +7,12 @@ import type {
 } from "@peated/server/schemas/entityAbout";
 
 import { ABOUT_FACT_FIELD_LIST } from "./aboutFactFields";
-import { eventFactId, getFactCitations, valuesAgree } from "./display";
+import {
+  eventFactId,
+  getFactCitations,
+  siteFactId,
+  valuesAgree,
+} from "./display";
 
 export const EMPTY_ABOUT_DOCUMENT: EntityAboutDocument = {
   sources: [],
@@ -250,9 +255,10 @@ function remapFactId(factId: string, maps: IdMaps) {
 /**
  * Merges a pipeline draft into the stored document. Pipeline rule (owner:
  * docs/features/entity-about.md): everything a person wrote stays, and so
- * does history without a source. The draft replaces only the pipeline's cited
- * items. A draft event that matches a kept event (same kind, dates that
- * agree) adds its citations to the kept event instead of repeating it.
+ * do history without a source and pipeline facts a person's section cites.
+ * The draft replaces only the pipeline's other items. A draft event that
+ * matches a kept event (same kind, dates that agree) adds its citations to
+ * the kept event instead of repeating it.
  */
 export function mergePipelineDraft(
   stored: EntityAboutDocument | null,
@@ -260,8 +266,18 @@ export function mergePipelineDraft(
   now: string,
 ): EntityAboutDocument {
   const base = stored ?? EMPTY_ABOUT_DOCUMENT;
+  const personSections = base.sections.filter((s) => s.writtenBy === "person");
+  const personFactIds = new Set(
+    personSections.flatMap((section) => [
+      ...section.sentences.flatMap((sentence) => sentence.factIds),
+      ...(section.eraEventId ? [eventFactId(section.eraEventId)] : []),
+    ]),
+  );
   const keptEvents = base.events.filter(
-    (event) => event.writtenBy === "person" || !event.citations.length,
+    (event) =>
+      event.writtenBy === "person" ||
+      !event.citations.length ||
+      personFactIds.has(eventFactId(event.id)),
   );
   const matches = new Map<number, number>();
   for (const event of draft.events) {
@@ -310,7 +326,11 @@ export function mergePipelineDraft(
   for (const field of ABOUT_FACT_FIELD_LIST) {
     const before = base.siteFacts[field];
     const proposed = draft.siteFacts[field];
-    if (before?.writtenBy === "person") {
+    if (
+      before &&
+      (before.writtenBy === "person" ||
+        (!proposed && personFactIds.has(siteFactId(field))))
+    ) {
       siteFacts[field] = before;
     } else if (proposed) {
       siteFacts[field] = {
@@ -321,7 +341,6 @@ export function mergePipelineDraft(
     }
   }
 
-  const personSections = base.sections.filter((s) => s.writtenBy === "person");
   const personSectionKeys = new Set(personSections.map((s) => s.key));
   const draftSections = draft.sections
     .filter((section) => !personSectionKeys.has(section.key))
