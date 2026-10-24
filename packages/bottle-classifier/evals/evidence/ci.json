@@ -1,6 +1,6 @@
 {
   "name": "Reviewed classifier CI evidence",
-  "reviewedAt": "2026-10-20",
+  "reviewedAt": "2026-10-24",
   "notes": "Fixed external evidence for every classifier and audit case. Search/page material is retained from the reviewed evidence packs C01, C02, C04, C05, C06, C24, C26, stable-name-examples, black-label-islay-origin, and the Glenfarclas review pack, plus the cited additions. Source-image re-reads retain the captured upstream extraction where provided, including known extraction errors; classifier judgment must still handle those errors. Empty search evidence explicitly marks local-input-only cases, not a missing provider response. Expected actions, Bottle IDs, and assertions are not used to construct this data. Standalone label-extraction evals still run against checked-in images and the live extraction model. Candidate-image observations retain valid captured tool results from CI run 39285550059, reviewed against the fixture source notes. Glendalough and Russell's Reserve source labels were visually reviewed on October 20, 2026; Ardbeg retains the exact label fields already verified by its curated regression. Direct source-page reads retain the exact captured title and, where already documented, review issue/byline/price metadata. These bounded source excerpts add no facts from expected outputs.",
   "sources": [
     "http://www.divingforpearlsblog.com/2022_10_17_archive.html",
@@ -141,7 +141,17 @@
     "https://www.woodfordreserve.com/woodford-reserve-double-double-oaked-returns-as-2023-winter-distillery-series/",
     "https://www.yumpu.com/en/document/view/8083559/serges-favourites-whiskies-whiskyfun",
     "https://www.scotchwhiskyauctions.com/auctions/205-the-157th-auction/751232-ardbeg-2009-14-year-old-single-cask-3771-feis-ile-2024/",
-    "https://www.whiskyfun.com/2024/Ardbeg-from-2009-to-1989.html"
+    "https://www.whiskyfun.com/2024/Ardbeg-from-2009-to-1989.html",
+    "https://www.scotchwhiskyauctions.com/auctions/231-the-182nd-auction/889000-macallan-quest/",
+    "https://scotchwhisky.com/magazine/latest-news/16442/macallan-quest-collection-for-travel-retail/",
+    "https://www.scotchwhiskyauctions.com/auctions/231-the-182nd-auction/888632-macallan-classic-cut-2017-release/",
+    "https://thewhiskeywash.com/?p=14822",
+    "https://www.scotchwhiskyauctions.com/auctions/231-the-182nd-auction/890444-ardbeg-2006-single-cask-2787-feis-ile-2023/",
+    "https://www.just-whisky.co.uk/october-2023/143315-ardbeg-16-years-old-2006-feis-ile-2023-single-cask-no2787-5010494984941.html",
+    "https://www.scotchwhiskyauctions.com/auctions/231-the-182nd-auction/892052-writers-tears/",
+    "https://www.scotchwhiskyauctions.com/auctions/231-the-182nd-auction/892156-hennessy-xo/",
+    "https://www.scotchwhiskyauctions.com/auctions/231-the-182nd-auction/891396-macallan-glasses-set/",
+    "https://www.scotchwhiskyauctions.com/auctions/231-the-182nd-auction/891827-glenlivet-gm-generations-70-year-old-sample-presentation-set/"
   ],
   "cases": {
     "1792-single-barrel": {
@@ -4648,6 +4658,191 @@
     "woodford-double-oaked": {
       "searchResult": {
         "evidence": [],
+        "errors": []
+      },
+      "pageResults": [],
+      "imageResults": []
+    },
+    "auction-macallan-quest-title": {
+      "searchResult": {
+        "evidence": [
+          {
+            "provider": "firecrawl",
+            "query": "Reviewed exact release evidence",
+            "summary": "The auction lot and launch coverage identify Macallan Quest as the 40% entry release of the travel-retail Quest Collection launched in 2017.",
+            "results": [
+              {
+                "title": "Macallan Quest",
+                "url": "https://www.scotchwhiskyauctions.com/auctions/231-the-182nd-auction/889000-macallan-quest/",
+                "description": "70cl, 40% ABV. Part of the Quest Collection, created for the travel retail market in 2017."
+              },
+              {
+                "title": "Macallan Quest Collection for travel retail",
+                "url": "https://scotchwhisky.com/magazine/latest-news/16442/macallan-quest-collection-for-travel-retail/",
+                "description": "Travel-retail range of Quest, Lumina, Terra and Enigma; Quest is the entry expression at 40%."
+              }
+            ]
+          }
+        ],
+        "errors": []
+      },
+      "pageResults": [],
+      "imageResults": [
+        {
+          "url": "https://api.peated.com/uploads/prices-edno8cnb0mmqa50avnb0vcm3.webp",
+          "result": {
+            "abv": 40,
+            "brand": "The Macallan",
+            "series": "Quest Collection",
+            "bottler": null,
+            "edition": null,
+            "outturn": null,
+            "category": "single_malt",
+            "distillery": ["Macallan"],
+            "expression": "Quest",
+            "maturation": null,
+            "stated_age": null,
+            "cask_number": null,
+            "release_day": null,
+            "single_cask": null,
+            "release_year": null,
+            "vintage_year": null,
+            "bottling_year": null,
+            "cask_strength": null,
+            "release_month": null
+          }
+        }
+      ]
+    },
+    "auction-ardbeg-2006-cask-2787-feis-ile-2023": {
+      "searchResult": {
+        "evidence": [
+          {
+            "provider": "firecrawl",
+            "query": "Reviewed exact release evidence",
+            "summary": "The auction lot and a retailer listing identify Ardbeg cask 2787: distilled 20 July 2006, bottled 14 February 2023, 16 years, second-fill oloroso butt, 56.8%, 623 bottles.",
+            "results": [
+              {
+                "title": "Ardbeg 2006 Single Cask #2787 Feis Ile 2023",
+                "url": "https://www.scotchwhiskyauctions.com/auctions/231-the-182nd-auction/890444-ardbeg-2006-single-cask-2787-feis-ile-2023/",
+                "description": "Cask 2787; 2nd fill oloroso sherry butt; distilled 20.07.2006; bottled 14.02.2023; 56.8%; bottle 049/623."
+              },
+              {
+                "title": "Ardbeg 16 Years Old 2006 - Feis Ile 2023 - Single Cask No.2787",
+                "url": "https://www.just-whisky.co.uk/october-2023/143315-ardbeg-16-years-old-2006-feis-ile-2023-single-cask-no2787-5010494984941.html",
+                "description": "Ardbeg 2006, 16 years old, single cask 2787, 56.8%, 623 bottles."
+              }
+            ]
+          }
+        ],
+        "errors": []
+      },
+      "pageResults": [],
+      "imageResults": [
+        {
+          "url": "https://api.peated.com/uploads/bottles-fizcazr1uxh1j2ssy0a9cmwb.webp",
+          "result": {
+            "abv": 56.8,
+            "brand": "Ardbeg",
+            "series": null,
+            "bottler": null,
+            "edition": null,
+            "outturn": null,
+            "category": "single_malt",
+            "distillery": ["Ardbeg Distillery Limited"],
+            "expression": "Single Cask The Ultimate",
+            "maturation": "2nd Fill Oloroso Sherry Butt",
+            "stated_age": null,
+            "cask_number": null,
+            "release_day": null,
+            "single_cask": true,
+            "release_year": null,
+            "vintage_year": null,
+            "bottling_year": 2023,
+            "cask_strength": true,
+            "release_month": null
+          }
+        }
+      ]
+    },
+    "auction-writers-tears-brand-only-title": {
+      "searchResult": {
+        "evidence": [],
+        "errors": []
+      },
+      "pageResults": [],
+      "imageResults": [
+        {
+          "url": "https://api.peated.com/uploads/prices-p12quyr8050lp5bzabg6aglw.webp",
+          "result": {
+            "abv": null,
+            "brand": "Writer's Tears",
+            "series": null,
+            "bottler": null,
+            "edition": null,
+            "outturn": null,
+            "category": "blend",
+            "distillery": [],
+            "expression": "Copper Pot",
+            "maturation": null,
+            "stated_age": null,
+            "cask_number": null,
+            "release_day": null,
+            "single_cask": null,
+            "release_year": null,
+            "vintage_year": null,
+            "bottling_year": null,
+            "cask_strength": null,
+            "release_month": null
+          }
+        }
+      ]
+    },
+    "auction-hennessy-xo-cognac-without-category-word": {
+      "searchResult": {
+        "evidence": [],
+        "errors": []
+      },
+      "pageResults": [],
+      "imageResults": []
+    },
+    "auction-macallan-glasses-set": {
+      "searchResult": {
+        "evidence": [],
+        "errors": []
+      },
+      "pageResults": [],
+      "imageResults": []
+    },
+    "auction-glenlivet-generations-70-sample-set": {
+      "searchResult": {
+        "evidence": [],
+        "errors": []
+      },
+      "pageResults": [],
+      "imageResults": []
+    },
+    "auction-macallan-classic-cut-2017-wrong-cask-strength-flag": {
+      "searchResult": {
+        "evidence": [
+          {
+            "provider": "firecrawl",
+            "query": "Reviewed exact release evidence",
+            "summary": "The auction lot and an independent review identify the first annual Macallan Classic Cut, the 2017 edition, at 58.4% from sherry casks.",
+            "results": [
+              {
+                "title": "Macallan Classic Cut 2017 Release",
+                "url": "https://www.scotchwhiskyauctions.com/auctions/231-the-182nd-auction/888632-macallan-classic-cut-2017-release/",
+                "description": "70cl, 58.4% ABV, bottled 2017, sherry casks. The Classic Cut is a series of annual releases that began in 2017."
+              },
+              {
+                "title": "Macallan Classic Cut 2017 Edition review",
+                "url": "https://thewhiskeywash.com/?p=14822",
+                "description": "The 2017 Edition of Macallan Classic Cut, bottled at cask strength, 58.4%."
+              }
+            ]
+          }
+        ],
         "errors": []
       },
       "pageResults": [],

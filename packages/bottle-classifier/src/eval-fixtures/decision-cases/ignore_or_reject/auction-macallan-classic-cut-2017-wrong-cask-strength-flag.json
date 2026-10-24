@@ -1,0 +1,1532 @@
+{
+  "id": "auction-macallan-classic-cut-2017-wrong-cask-strength-flag",
+  "name": "auction title: the Classic Cut 2017 Bottle with a wrong cask-strength flag needs catalog review",
+  "input": {
+    "reference": {
+      "id": 7551,
+      "url": "https://www.scotchwhiskyauctions.com/auctions/231-the-182nd-auction/888632-macallan-classic-cut-2017-release/",
+      "name": "Macallan Classic Cut 2017 Release",
+      "imageUrl": null,
+      "externalSiteId": 28097,
+      "currentBottleId": null
+    },
+    "extractedIdentity": {
+      "abv": null,
+      "brand": "Macallan",
+      "series": null,
+      "bottler": null,
+      "edition": "2017 Release",
+      "outturn": null,
+      "category": null,
+      "distillery": ["The Macallan"],
+      "expression": "Classic Cut",
+      "maturation": null,
+      "stated_age": null,
+      "cask_number": null,
+      "release_day": null,
+      "single_cask": null,
+      "release_year": 2017,
+      "vintage_year": null,
+      "bottling_year": null,
+      "cask_strength": null,
+      "release_month": null
+    },
+    "imageEvidence": null,
+    "initialCandidates": [
+      {
+        "abv": 58.4,
+        "brand": "The Macallan",
+        "score": 70.583725,
+        "series": "Classic Cut",
+        "source": ["vector", "text", "brand", "brand_coverage", "context"],
+        "bottler": null,
+        "edition": "2017 Edition",
+        "outturn": null,
+        "bottleId": 3277,
+        "category": "single_malt",
+        "fullName": "The Macallan Classic Cut - 2017 Edition",
+        "reference": "The Macallan Classic Cut (2017 Edition)",
+        "statedAge": null,
+        "caskNumber": null,
+        "comparison": {
+          "missing": [],
+          "conflicts": [],
+          "agreements": ["category", "brand", "distillers"]
+        },
+        "distillery": ["The Macallan"],
+        "maturation": "Sherry seasoned American and European oak casks",
+        "releaseDay": null,
+        "singleCask": false,
+        "releaseYear": 2017,
+        "vintageYear": null,
+        "bottlingYear": null,
+        "caskStrength": false,
+        "releaseMonth": null,
+        "familyContext": {
+          "siblingBottles": []
+        }
+      },
+      {
+        "abv": 52.5,
+        "brand": "The Macallan",
+        "score": 69.13359,
+        "series": "Classic Cut",
+        "source": ["text", "brand_coverage"],
+        "bottler": null,
+        "edition": "2022 Edition",
+        "outturn": null,
+        "bottleId": 1523,
+        "category": "single_malt",
+        "fullName": "The Macallan Classic Cut - 2022 Edition",
+        "reference": null,
+        "statedAge": null,
+        "caskNumber": null,
+        "comparison": {
+          "missing": [],
+          "conflicts": [],
+          "agreements": ["category", "brand", "distillers"]
+        },
+        "distillery": ["The Macallan"],
+        "maturation": "European and American oak casks",
+        "releaseDay": null,
+        "singleCask": false,
+        "releaseYear": 2022,
+        "vintageYear": null,
+        "bottlingYear": null,
+        "caskStrength": null,
+        "releaseMonth": null,
+        "familyContext": {
+          "siblingBottles": []
+        }
+      },
+      {
+        "abv": 51.2,
+        "brand": "The Macallan",
+        "score": 68.790665,
+        "series": "Classic Cut",
+        "source": ["text", "brand", "brand_coverage"],
+        "bottler": null,
+        "edition": "2018 Edition",
+        "outturn": null,
+        "bottleId": 2908,
+        "category": "single_malt",
+        "fullName": "The Macallan Classic Cut - 2018 Edition",
+        "reference": null,
+        "statedAge": null,
+        "caskNumber": null,
+        "comparison": {
+          "missing": [],
+          "conflicts": [],
+          "agreements": ["category", "brand", "distillers"]
+        },
+        "distillery": ["The Macallan"],
+        "maturation": "Sherry-seasoned American and European oak casks",
+        "releaseDay": null,
+        "singleCask": false,
+        "releaseYear": 2018,
+        "vintageYear": null,
+        "bottlingYear": null,
+        "caskStrength": null,
+        "releaseMonth": null,
+        "familyContext": {
+          "siblingBottles": []
+        }
+      },
+      {
+        "abv": 55,
+        "brand": "The Macallan",
+        "score": 68.294205,
+        "series": "Classic Cut",
+        "source": ["text", "brand", "brand_coverage"],
+        "bottler": null,
+        "edition": "2020 Edition",
+        "outturn": null,
+        "bottleId": 2172,
+        "category": "single_malt",
+        "fullName": "The Macallan Classic Cut - 2020 Edition",
+        "reference": null,
+        "statedAge": null,
+        "caskNumber": null,
+        "comparison": {
+          "missing": [],
+          "conflicts": [],
+          "agreements": ["category", "brand", "distillers"]
+        },
+        "distillery": ["The Macallan"],
+        "maturation": "Sherry-seasoned European oak and ex-bourbon American oak casks",
+        "releaseDay": null,
+        "singleCask": false,
+        "releaseYear": 2020,
+        "vintageYear": null,
+        "bottlingYear": null,
+        "caskStrength": null,
+        "releaseMonth": null,
+        "familyContext": {
+          "siblingBottles": []
+        }
+      },
+      {
+        "abv": 51,
+        "brand": "The Macallan",
+        "score": 68.294205,
+        "series": "Classic Cut",
+        "source": ["text", "brand", "brand_coverage"],
+        "bottler": null,
+        "edition": "2021 Edition",
+        "outturn": null,
+        "bottleId": 1832,
+        "category": "single_malt",
+        "fullName": "The Macallan Classic Cut - 2021 Edition",
+        "reference": null,
+        "statedAge": null,
+        "caskNumber": null,
+        "comparison": {
+          "missing": [],
+          "conflicts": [],
+          "agreements": ["category", "brand", "distillers"]
+        },
+        "distillery": ["The Macallan"],
+        "maturation": "Sherry-seasoned American oak and ex-bourbon American oak casks",
+        "releaseDay": null,
+        "singleCask": false,
+        "releaseYear": 2021,
+        "vintageYear": null,
+        "bottlingYear": null,
+        "caskStrength": null,
+        "releaseMonth": null,
+        "familyContext": {
+          "siblingBottles": []
+        }
+      },
+      {
+        "abv": 50.6,
+        "brand": "The Macallan",
+        "score": 67.69507,
+        "series": "Classic Cut",
+        "source": ["vector", "text", "brand_coverage"],
+        "bottler": null,
+        "edition": "2025 Edition",
+        "outturn": null,
+        "bottleId": 45456,
+        "category": "single_malt",
+        "fullName": "The Macallan Classic Cut - 2025 Edition",
+        "reference": "The Macallan Classic Cut - 2025 Edition - 50.6% ABV",
+        "statedAge": null,
+        "caskNumber": null,
+        "comparison": {
+          "missing": [],
+          "conflicts": [],
+          "agreements": ["category", "brand", "distillers"]
+        },
+        "distillery": ["The Macallan"],
+        "maturation": null,
+        "releaseDay": null,
+        "singleCask": null,
+        "releaseYear": 2025,
+        "vintageYear": null,
+        "bottlingYear": null,
+        "caskStrength": null,
+        "releaseMonth": null,
+        "familyContext": {
+          "siblingBottles": []
+        }
+      },
+      {
+        "abv": 50.3,
+        "brand": "The Macallan",
+        "score": 65.808846,
+        "series": "Classic Cut",
+        "source": ["text", "brand_coverage"],
+        "bottler": null,
+        "edition": "2023 Edition",
+        "outturn": null,
+        "bottleId": 54722,
+        "category": "single_malt",
+        "fullName": "The Macallan Classic Cut - 2023 Edition",
+        "reference": null,
+        "statedAge": null,
+        "caskNumber": null,
+        "comparison": {
+          "missing": [],
+          "conflicts": [],
+          "agreements": ["category", "brand", "distillers"]
+        },
+        "distillery": ["The Macallan"],
+        "maturation": "Bourbon and sherry-seasoned oak casks",
+        "releaseDay": null,
+        "singleCask": null,
+        "releaseYear": 2023,
+        "vintageYear": null,
+        "bottlingYear": null,
+        "caskStrength": null,
+        "releaseMonth": null,
+        "familyContext": {
+          "siblingBottles": []
+        }
+      },
+      {
+        "abv": 52.4,
+        "brand": "The Macallan",
+        "score": 65.808846,
+        "series": "Classic Cut",
+        "source": ["text", "brand_coverage"],
+        "bottler": null,
+        "edition": "2024 Edition",
+        "outturn": null,
+        "bottleId": 54721,
+        "category": "single_malt",
+        "fullName": "The Macallan Classic Cut - 2024 Edition",
+        "reference": null,
+        "statedAge": null,
+        "caskNumber": null,
+        "comparison": {
+          "missing": [],
+          "conflicts": [],
+          "agreements": ["category", "brand", "distillers"]
+        },
+        "distillery": ["The Macallan"],
+        "maturation": "Bourbon and sherry-seasoned oak casks",
+        "releaseDay": null,
+        "singleCask": null,
+        "releaseYear": 2024,
+        "vintageYear": null,
+        "bottlingYear": null,
+        "caskStrength": null,
+        "releaseMonth": null,
+        "familyContext": {
+          "siblingBottles": []
+        }
+      },
+      {
+        "abv": 52.9,
+        "brand": "The Macallan",
+        "score": 64.66164,
+        "series": "Classic Cut",
+        "source": ["vector", "text", "brand", "brand_coverage"],
+        "bottler": null,
+        "edition": "2019 Edition",
+        "outturn": null,
+        "bottleId": 2550,
+        "category": "single_malt",
+        "fullName": "The Macallan Classic Cut - 2019 Edition",
+        "reference": "The Macallan Classic Cut Limited 2019 Edition - 52.9% ABV",
+        "statedAge": null,
+        "caskNumber": null,
+        "comparison": {
+          "missing": [],
+          "conflicts": [],
+          "agreements": ["category", "brand", "distillers"]
+        },
+        "distillery": ["The Macallan"],
+        "maturation": "Sherry-seasoned oak casks",
+        "releaseDay": null,
+        "singleCask": false,
+        "releaseYear": 2019,
+        "vintageYear": null,
+        "bottlingYear": null,
+        "caskStrength": null,
+        "releaseMonth": null,
+        "familyContext": {
+          "siblingBottles": []
+        }
+      },
+      {
+        "abv": 44.5,
+        "brand": "The Macallan",
+        "score": 38.189682,
+        "series": "M Collection",
+        "source": ["text"],
+        "bottler": null,
+        "edition": "2017 Release",
+        "outturn": null,
+        "bottleId": 54952,
+        "category": "single_malt",
+        "fullName": "The Macallan M - 2017 Release",
+        "reference": null,
+        "statedAge": null,
+        "caskNumber": null,
+        "comparison": {
+          "missing": [],
+          "conflicts": ["brand"],
+          "agreements": ["edition", "releaseYear", "distillers"]
+        },
+        "distillery": ["The Macallan"],
+        "maturation": "Sherry-seasoned oak casks",
+        "releaseDay": null,
+        "singleCask": false,
+        "releaseYear": 2017,
+        "vintageYear": null,
+        "bottlingYear": null,
+        "caskStrength": null,
+        "releaseMonth": null,
+        "familyContext": {
+          "siblingBottles": []
+        }
+      },
+      {
+        "abv": 56.8,
+        "brand": "The Macallan",
+        "score": 37.9057,
+        "series": "Boutique Collection",
+        "source": ["text", "brand_coverage"],
+        "bottler": null,
+        "edition": "2017 Release",
+        "outturn": null,
+        "bottleId": 54716,
+        "category": "single_malt",
+        "fullName": "The Macallan Boutique Collection - 2017 Release",
+        "reference": null,
+        "statedAge": null,
+        "caskNumber": null,
+        "comparison": {
+          "missing": [],
+          "conflicts": ["brand"],
+          "agreements": ["edition", "releaseYear", "distillers"]
+        },
+        "distillery": ["The Macallan"],
+        "maturation": null,
+        "releaseDay": null,
+        "singleCask": null,
+        "releaseYear": 2017,
+        "vintageYear": null,
+        "bottlingYear": null,
+        "caskStrength": null,
+        "releaseMonth": null,
+        "familyContext": {
+          "siblingBottles": []
+        }
+      },
+      {
+        "abv": 45,
+        "brand": "The Macallan",
+        "score": 37.52062,
+        "series": "M Collection",
+        "source": ["vector", "text"],
+        "bottler": null,
+        "edition": "2017 Release",
+        "outturn": null,
+        "bottleId": 54957,
+        "category": "single_malt",
+        "fullName": "The Macallan M Black - 2017 Release",
+        "reference": "The Macallan M Black, 45%",
+        "statedAge": null,
+        "caskNumber": null,
+        "comparison": {
+          "missing": [],
+          "conflicts": ["brand"],
+          "agreements": ["edition", "releaseYear", "distillers"]
+        },
+        "distillery": ["The Macallan"],
+        "maturation": "Sherry-seasoned oak casks, including casks holding peated spirit",
+        "releaseDay": null,
+        "singleCask": false,
+        "releaseYear": 2017,
+        "vintageYear": null,
+        "bottlingYear": null,
+        "caskStrength": null,
+        "releaseMonth": null,
+        "familyContext": {
+          "siblingBottles": []
+        }
+      },
+      {
+        "abv": 43,
+        "brand": "The Macallan",
+        "score": 34.335567,
+        "series": "Sherry Oak Collection",
+        "source": ["vector", "text"],
+        "bottler": null,
+        "edition": "2017 Release",
+        "outturn": null,
+        "bottleId": 14147,
+        "category": "single_malt",
+        "fullName": "The Macallan Sherry Oak - 2017 Release",
+        "reference": "The Macallan 18-year-old Sherry Oak (2017 Edition), 43%",
+        "statedAge": 18,
+        "caskNumber": null,
+        "comparison": {
+          "missing": [],
+          "conflicts": ["brand"],
+          "agreements": ["edition", "releaseYear", "distillers"]
+        },
+        "distillery": ["The Macallan"],
+        "maturation": "Predominantly sherry seasoned European oak casks from Jerez, Spain",
+        "releaseDay": null,
+        "singleCask": false,
+        "releaseYear": 2017,
+        "vintageYear": null,
+        "bottlingYear": null,
+        "caskStrength": null,
+        "releaseMonth": null,
+        "familyContext": {
+          "siblingBottles": []
+        }
+      },
+      {
+        "abv": null,
+        "brand": "Armorik",
+        "score": 29.023901,
+        "series": null,
+        "source": ["text"],
+        "bottler": null,
+        "edition": null,
+        "outturn": null,
+        "bottleId": 17216,
+        "category": "single_malt",
+        "fullName": "Armorik Classic",
+        "reference": null,
+        "statedAge": null,
+        "caskNumber": null,
+        "comparison": {
+          "missing": ["edition", "releaseYear", "distillers"],
+          "conflicts": ["brand"],
+          "agreements": []
+        },
+        "distillery": [],
+        "maturation": null,
+        "releaseDay": null,
+        "singleCask": null,
+        "releaseYear": null,
+        "vintageYear": null,
+        "bottlingYear": null,
+        "caskStrength": null,
+        "releaseMonth": null,
+        "familyContext": {
+          "siblingBottles": []
+        }
+      },
+      {
+        "abv": null,
+        "brand": "Shieldaig",
+        "score": 28.928223,
+        "series": null,
+        "source": ["text"],
+        "bottler": null,
+        "edition": null,
+        "outturn": null,
+        "bottleId": 16877,
+        "category": "blend",
+        "fullName": "Shieldaig Classic",
+        "reference": null,
+        "statedAge": null,
+        "caskNumber": null,
+        "comparison": {
+          "missing": ["edition", "releaseYear", "distillers"],
+          "conflicts": ["brand"],
+          "agreements": []
+        },
+        "distillery": [],
+        "maturation": null,
+        "releaseDay": null,
+        "singleCask": null,
+        "releaseYear": null,
+        "vintageYear": null,
+        "bottlingYear": null,
+        "caskStrength": null,
+        "releaseMonth": null,
+        "familyContext": {
+          "siblingBottles": []
+        }
+      },
+      {
+        "abv": null,
+        "brand": "Glenglassaugh",
+        "score": 28.192772,
+        "series": null,
+        "source": ["text"],
+        "bottler": "Glenglassaugh",
+        "edition": null,
+        "outturn": null,
+        "bottleId": 711,
+        "category": "single_malt",
+        "fullName": "Glenglassaugh Octaves Classic (Batch 2)",
+        "reference": null,
+        "statedAge": null,
+        "caskNumber": null,
+        "comparison": {
+          "missing": ["edition", "releaseYear", "distillers"],
+          "conflicts": ["brand"],
+          "agreements": []
+        },
+        "distillery": [],
+        "maturation": null,
+        "releaseDay": null,
+        "singleCask": null,
+        "releaseYear": null,
+        "vintageYear": null,
+        "bottlingYear": null,
+        "caskStrength": null,
+        "releaseMonth": null,
+        "familyContext": {
+          "siblingBottles": []
+        }
+      },
+      {
+        "abv": null,
+        "brand": "SLYRS",
+        "score": 28.192772,
+        "series": null,
+        "source": ["text"],
+        "bottler": null,
+        "edition": null,
+        "outturn": null,
+        "bottleId": 12959,
+        "category": "single_malt",
+        "fullName": "SLYRS Classic Single Malt",
+        "reference": null,
+        "statedAge": null,
+        "caskNumber": null,
+        "comparison": {
+          "missing": ["edition", "releaseYear", "distillers"],
+          "conflicts": ["brand"],
+          "agreements": []
+        },
+        "distillery": [],
+        "maturation": null,
+        "releaseDay": null,
+        "singleCask": null,
+        "releaseYear": null,
+        "vintageYear": null,
+        "bottlingYear": null,
+        "caskStrength": null,
+        "releaseMonth": null,
+        "familyContext": {
+          "siblingBottles": []
+        }
+      },
+      {
+        "abv": 44,
+        "brand": "Glenglassaugh",
+        "score": 27.484642,
+        "series": null,
+        "source": ["text"],
+        "bottler": null,
+        "edition": null,
+        "outturn": null,
+        "bottleId": 65137,
+        "category": "single_malt",
+        "fullName": "Glenglassaugh Octaves Classic",
+        "reference": null,
+        "statedAge": null,
+        "caskNumber": null,
+        "comparison": {
+          "missing": ["edition", "releaseYear", "series"],
+          "conflicts": ["brand", "distillers"],
+          "agreements": ["category"]
+        },
+        "distillery": ["Glenglassaugh"],
+        "maturation": "octave casks",
+        "releaseDay": null,
+        "singleCask": null,
+        "releaseYear": null,
+        "vintageYear": null,
+        "bottlingYear": null,
+        "caskStrength": null,
+        "releaseMonth": null,
+        "familyContext": {
+          "siblingBottles": []
+        }
+      },
+      {
+        "abv": null,
+        "brand": "Bruichladdich",
+        "score": 27.397099,
+        "series": null,
+        "source": ["text"],
+        "bottler": null,
+        "edition": null,
+        "outturn": null,
+        "bottleId": 1117,
+        "category": "single_malt",
+        "fullName": "Bruichladdich Laddie Classic Edition_01",
+        "reference": null,
+        "statedAge": null,
+        "caskNumber": null,
+        "comparison": {
+          "missing": ["edition", "releaseYear", "series"],
+          "conflicts": ["brand", "distillers"],
+          "agreements": ["category"]
+        },
+        "distillery": ["Bruichladdich"],
+        "maturation": null,
+        "releaseDay": null,
+        "singleCask": null,
+        "releaseYear": null,
+        "vintageYear": null,
+        "bottlingYear": null,
+        "caskStrength": null,
+        "releaseMonth": null,
+        "familyContext": {
+          "siblingBottles": []
+        }
+      },
+      {
+        "abv": null,
+        "brand": "The Glenrothes",
+        "score": 27.24399,
+        "series": null,
+        "source": ["text"],
+        "bottler": null,
+        "edition": null,
+        "outturn": null,
+        "bottleId": 2848,
+        "category": "single_malt",
+        "fullName": "The Glenrothes Whisky Maker's Cut The Soleo Collection",
+        "reference": null,
+        "statedAge": null,
+        "caskNumber": null,
+        "comparison": {
+          "missing": ["edition", "releaseYear", "distillers"],
+          "conflicts": ["brand"],
+          "agreements": []
+        },
+        "distillery": [],
+        "maturation": null,
+        "releaseDay": null,
+        "singleCask": null,
+        "releaseYear": null,
+        "vintageYear": null,
+        "bottlingYear": null,
+        "caskStrength": null,
+        "releaseMonth": null,
+        "familyContext": {
+          "siblingBottles": []
+        }
+      },
+      {
+        "abv": null,
+        "brand": "Two Stacks",
+        "score": 26.84819,
+        "series": null,
+        "source": ["text"],
+        "bottler": null,
+        "edition": null,
+        "outturn": null,
+        "bottleId": 13092,
+        "category": "blend",
+        "fullName": "Two Stacks The First Cut",
+        "reference": null,
+        "statedAge": null,
+        "caskNumber": null,
+        "comparison": {
+          "missing": ["edition", "releaseYear", "distillers"],
+          "conflicts": ["brand"],
+          "agreements": []
+        },
+        "distillery": [],
+        "maturation": null,
+        "releaseDay": null,
+        "singleCask": null,
+        "releaseYear": null,
+        "vintageYear": null,
+        "bottlingYear": null,
+        "caskStrength": null,
+        "releaseMonth": null,
+        "familyContext": {
+          "siblingBottles": []
+        }
+      },
+      {
+        "abv": null,
+        "brand": "Label 5",
+        "score": 26.790684,
+        "series": null,
+        "source": ["text"],
+        "bottler": null,
+        "edition": null,
+        "outturn": null,
+        "bottleId": 16470,
+        "category": "blend",
+        "fullName": "Label 5 Classic Black",
+        "reference": null,
+        "statedAge": null,
+        "caskNumber": null,
+        "comparison": {
+          "missing": ["edition", "releaseYear", "distillers"],
+          "conflicts": ["brand"],
+          "agreements": []
+        },
+        "distillery": [],
+        "maturation": null,
+        "releaseDay": null,
+        "singleCask": null,
+        "releaseYear": null,
+        "vintageYear": null,
+        "bottlingYear": null,
+        "caskStrength": null,
+        "releaseMonth": null,
+        "familyContext": {
+          "siblingBottles": []
+        }
+      },
+      {
+        "abv": null,
+        "brand": "Jim Beam",
+        "score": 26.613522,
+        "series": null,
+        "source": ["text"],
+        "bottler": null,
+        "edition": null,
+        "outturn": null,
+        "bottleId": 14258,
+        "category": "bourbon",
+        "fullName": "Jim Beam Distiller's Cut",
+        "reference": null,
+        "statedAge": null,
+        "caskNumber": null,
+        "comparison": {
+          "missing": ["edition", "releaseYear", "distillers"],
+          "conflicts": ["brand"],
+          "agreements": []
+        },
+        "distillery": [],
+        "maturation": null,
+        "releaseDay": null,
+        "singleCask": null,
+        "releaseYear": null,
+        "vintageYear": null,
+        "bottlingYear": null,
+        "caskStrength": null,
+        "releaseMonth": null,
+        "familyContext": {
+          "siblingBottles": []
+        }
+      },
+      {
+        "abv": null,
+        "brand": "Kavalan",
+        "score": 26.518013,
+        "series": null,
+        "source": ["text"],
+        "bottler": "Kavalan",
+        "edition": null,
+        "outturn": null,
+        "bottleId": 992,
+        "category": "single_malt",
+        "fullName": "Kavalan Classic",
+        "reference": null,
+        "statedAge": null,
+        "caskNumber": null,
+        "comparison": {
+          "missing": ["edition", "releaseYear", "distillers"],
+          "conflicts": ["brand"],
+          "agreements": []
+        },
+        "distillery": [],
+        "maturation": null,
+        "releaseDay": null,
+        "singleCask": null,
+        "releaseYear": null,
+        "vintageYear": null,
+        "bottlingYear": null,
+        "caskStrength": null,
+        "releaseMonth": null,
+        "familyContext": {
+          "siblingBottles": []
+        }
+      },
+      {
+        "abv": null,
+        "brand": "Auchentoshan",
+        "score": 26.201427,
+        "series": null,
+        "source": ["text"],
+        "bottler": "Auchentoshan",
+        "edition": null,
+        "outturn": null,
+        "bottleId": 1132,
+        "category": "single_malt",
+        "fullName": "Auchentoshan Classic",
+        "reference": null,
+        "statedAge": null,
+        "caskNumber": null,
+        "comparison": {
+          "missing": ["edition", "releaseYear", "series", "distillers"],
+          "conflicts": ["brand"],
+          "agreements": ["category"]
+        },
+        "distillery": [],
+        "maturation": null,
+        "releaseDay": null,
+        "singleCask": null,
+        "releaseYear": null,
+        "vintageYear": null,
+        "bottlingYear": null,
+        "caskStrength": null,
+        "releaseMonth": null,
+        "familyContext": {
+          "siblingBottles": []
+        }
+      },
+      {
+        "abv": null,
+        "brand": "Paul John",
+        "score": 25.852657,
+        "series": null,
+        "source": ["text"],
+        "bottler": null,
+        "edition": null,
+        "outturn": null,
+        "bottleId": 463,
+        "category": "single_malt",
+        "fullName": "Paul John Classic Select Cask",
+        "reference": null,
+        "statedAge": null,
+        "caskNumber": null,
+        "comparison": {
+          "missing": ["edition", "releaseYear", "series", "distillers"],
+          "conflicts": ["brand"],
+          "agreements": ["category"]
+        },
+        "distillery": [],
+        "maturation": null,
+        "releaseDay": null,
+        "singleCask": null,
+        "releaseYear": null,
+        "vintageYear": null,
+        "bottlingYear": null,
+        "caskStrength": null,
+        "releaseMonth": null,
+        "familyContext": {
+          "siblingBottles": []
+        }
+      },
+      {
+        "abv": null,
+        "brand": "The Macallan",
+        "score": 0.774561707679073,
+        "series": "Rare Cask",
+        "source": ["vector"],
+        "bottler": null,
+        "edition": null,
+        "outturn": null,
+        "bottleId": 3870,
+        "category": "single_malt",
+        "fullName": "The Macallan Rare Cask Black 1824 Masters Series",
+        "reference": "The Macallan Rare Cask",
+        "statedAge": null,
+        "caskNumber": null,
+        "comparison": {
+          "missing": ["edition", "releaseYear"],
+          "conflicts": ["brand"],
+          "agreements": ["distillers"]
+        },
+        "distillery": ["The Macallan"],
+        "maturation": null,
+        "releaseDay": null,
+        "singleCask": null,
+        "releaseYear": null,
+        "vintageYear": null,
+        "bottlingYear": null,
+        "caskStrength": null,
+        "releaseMonth": null,
+        "familyContext": {
+          "siblingBottles": []
+        }
+      },
+      {
+        "abv": 43,
+        "brand": "The Macallan",
+        "score": 0.7638982889858132,
+        "series": null,
+        "source": ["vector"],
+        "bottler": null,
+        "edition": null,
+        "outturn": null,
+        "bottleId": 662,
+        "category": "single_malt",
+        "fullName": "The Macallan Estate",
+        "reference": "The Macallan Estate",
+        "statedAge": null,
+        "caskNumber": null,
+        "comparison": {
+          "missing": [],
+          "conflicts": [],
+          "agreements": ["category", "brand", "distillers"]
+        },
+        "distillery": ["The Macallan"],
+        "maturation": "Sherry-seasoned oak casks",
+        "releaseDay": null,
+        "singleCask": false,
+        "releaseYear": 2019,
+        "vintageYear": null,
+        "bottlingYear": null,
+        "caskStrength": null,
+        "releaseMonth": null,
+        "familyContext": {
+          "siblingBottles": []
+        }
+      },
+      {
+        "abv": 40,
+        "brand": "The Macallan",
+        "score": 0.7305523952506432,
+        "series": "Quest Collection",
+        "source": ["vector"],
+        "bottler": null,
+        "edition": null,
+        "outturn": null,
+        "bottleId": 805,
+        "category": "single_malt",
+        "fullName": "The Macallan Quest",
+        "reference": "The Macallan Quest",
+        "statedAge": null,
+        "caskNumber": null,
+        "comparison": {
+          "missing": [],
+          "conflicts": [],
+          "agreements": ["category", "brand", "distillers"]
+        },
+        "distillery": ["The Macallan"],
+        "maturation": null,
+        "releaseDay": null,
+        "singleCask": null,
+        "releaseYear": 2017,
+        "vintageYear": null,
+        "bottlingYear": null,
+        "caskStrength": null,
+        "releaseMonth": null,
+        "familyContext": {
+          "siblingBottles": []
+        }
+      },
+      {
+        "abv": 48,
+        "brand": "The Macallan",
+        "score": 0.720706291421145,
+        "series": "Edition Series",
+        "source": ["vector"],
+        "bottler": null,
+        "edition": null,
+        "outturn": null,
+        "bottleId": 3869,
+        "category": "single_malt",
+        "fullName": "The Macallan Edition No. 1",
+        "reference": "The Macallan Edition No. 1",
+        "statedAge": null,
+        "caskNumber": null,
+        "comparison": {
+          "missing": [],
+          "conflicts": [],
+          "agreements": ["category", "brand", "distillers"]
+        },
+        "distillery": ["The Macallan"],
+        "maturation": null,
+        "releaseDay": null,
+        "singleCask": null,
+        "releaseYear": 2015,
+        "vintageYear": null,
+        "bottlingYear": null,
+        "caskStrength": null,
+        "releaseMonth": null,
+        "familyContext": {
+          "siblingBottles": []
+        }
+      },
+      {
+        "abv": null,
+        "brand": "The Macallan",
+        "score": 0.7172030219761555,
+        "series": "Double Cask Collection",
+        "source": ["vector"],
+        "bottler": null,
+        "edition": null,
+        "outturn": null,
+        "bottleId": 2169,
+        "category": "single_malt",
+        "fullName": "The Macallan Double Cask",
+        "reference": "The Macallan 18-year-old Double Cask",
+        "statedAge": 18,
+        "caskNumber": null,
+        "comparison": {
+          "missing": [],
+          "conflicts": [],
+          "agreements": ["category", "brand", "distillers"]
+        },
+        "distillery": ["The Macallan"],
+        "maturation": "Sherry seasoned American and European oak casks",
+        "releaseDay": null,
+        "singleCask": null,
+        "releaseYear": null,
+        "vintageYear": null,
+        "bottlingYear": null,
+        "caskStrength": null,
+        "releaseMonth": null,
+        "familyContext": {
+          "siblingBottles": []
+        }
+      },
+      {
+        "abv": 48.3,
+        "brand": "The Macallan",
+        "score": 0.7068994274431538,
+        "series": "Edition Series",
+        "source": ["vector"],
+        "bottler": null,
+        "edition": null,
+        "outturn": null,
+        "bottleId": 3278,
+        "category": "single_malt",
+        "fullName": "The Macallan Edition No. 3",
+        "reference": "The Macallan Edition No. 3, 48.3%",
+        "statedAge": null,
+        "caskNumber": null,
+        "comparison": {
+          "missing": ["edition"],
+          "conflicts": ["brand"],
+          "agreements": ["releaseYear", "distillers"]
+        },
+        "distillery": ["The Macallan"],
+        "maturation": null,
+        "releaseDay": null,
+        "singleCask": null,
+        "releaseYear": 2017,
+        "vintageYear": null,
+        "bottlingYear": null,
+        "caskStrength": null,
+        "releaseMonth": null,
+        "familyContext": {
+          "siblingBottles": []
+        }
+      },
+      {
+        "abv": null,
+        "brand": "The Macallan",
+        "score": 0.7006088672585229,
+        "series": "Double Cask Collection",
+        "source": ["vector"],
+        "bottler": null,
+        "edition": null,
+        "outturn": null,
+        "bottleId": 25,
+        "category": "single_malt",
+        "fullName": "The Macallan Double Cask",
+        "reference": "The Macallan 12-year-old Double Cask",
+        "statedAge": 12,
+        "caskNumber": null,
+        "comparison": {
+          "missing": [],
+          "conflicts": [],
+          "agreements": ["category", "brand", "distillers"]
+        },
+        "distillery": ["The Macallan"],
+        "maturation": "Sherry seasoned American and European oak casks",
+        "releaseDay": null,
+        "singleCask": null,
+        "releaseYear": null,
+        "vintageYear": null,
+        "bottlingYear": null,
+        "caskStrength": null,
+        "releaseMonth": null,
+        "familyContext": {
+          "siblingBottles": []
+        }
+      },
+      {
+        "abv": 49.2,
+        "brand": "The Macallan",
+        "score": 0.6995939509460736,
+        "series": "Easter Elchies Black",
+        "source": ["vector"],
+        "bottler": null,
+        "edition": "2018 Release",
+        "outturn": 1958,
+        "bottleId": 590,
+        "category": "single_malt",
+        "fullName": "The Macallan Easter Elchies Black - 2018 Release",
+        "reference": "The Macallan Easter Elchies Black",
+        "statedAge": null,
+        "caskNumber": null,
+        "comparison": {
+          "missing": [],
+          "conflicts": [],
+          "agreements": ["category", "brand", "distillers"]
+        },
+        "distillery": ["The Macallan"],
+        "maturation": null,
+        "releaseDay": null,
+        "singleCask": null,
+        "releaseYear": 2018,
+        "vintageYear": null,
+        "bottlingYear": null,
+        "caskStrength": null,
+        "releaseMonth": null,
+        "familyContext": {
+          "siblingBottles": []
+        }
+      },
+      {
+        "abv": null,
+        "brand": "The Macallan",
+        "score": 0.6973794919642478,
+        "series": "Double Cask Collection",
+        "source": ["vector"],
+        "bottler": null,
+        "edition": null,
+        "outturn": null,
+        "bottleId": 44083,
+        "category": "single_malt",
+        "fullName": "The Macallan Double Cask",
+        "reference": "The Macallan 30-year-old Double Cask",
+        "statedAge": 30,
+        "caskNumber": null,
+        "comparison": {
+          "missing": [],
+          "conflicts": [],
+          "agreements": ["category", "brand", "distillers"]
+        },
+        "distillery": ["The Macallan"],
+        "maturation": "Sherry seasoned American and European oak casks",
+        "releaseDay": null,
+        "singleCask": null,
+        "releaseYear": null,
+        "vintageYear": null,
+        "bottlingYear": null,
+        "caskStrength": null,
+        "releaseMonth": null,
+        "familyContext": {
+          "siblingBottles": [
+            {
+              "abv": 43,
+              "edition": "2021 Release",
+              "outturn": null,
+              "bottleId": 45105,
+              "fullName": "The Macallan Double Cask - 2021 Release",
+              "statedAge": 30,
+              "caskNumber": null,
+              "maturation": "Sherry seasoned American and European oak casks",
+              "releaseDay": null,
+              "singleCask": false,
+              "releaseYear": 2021,
+              "traitFields": [
+                "edition",
+                "statedAge",
+                "releaseYear",
+                "abv",
+                "singleCask"
+              ],
+              "vintageYear": null,
+              "bottlingYear": null,
+              "caskStrength": null,
+              "releaseMonth": null
+            }
+          ]
+        }
+      },
+      {
+        "abv": 40,
+        "brand": "The Macallan",
+        "score": 0.6666666666666666,
+        "series": "Sherry Oak Collection",
+        "source": ["brand_coverage"],
+        "bottler": null,
+        "edition": null,
+        "outturn": null,
+        "bottleId": 1105,
+        "category": "single_malt",
+        "fullName": "The Macallan 10-year-old",
+        "reference": null,
+        "statedAge": 10,
+        "caskNumber": null,
+        "comparison": {
+          "missing": [],
+          "conflicts": [],
+          "agreements": ["category", "brand", "distillers"]
+        },
+        "distillery": ["The Macallan"],
+        "maturation": "Sherry wood",
+        "releaseDay": null,
+        "singleCask": false,
+        "releaseYear": null,
+        "vintageYear": null,
+        "bottlingYear": null,
+        "caskStrength": null,
+        "releaseMonth": null,
+        "familyContext": {
+          "siblingBottles": []
+        }
+      }
+    ],
+    "readCandidateImages": false
+  },
+  "context": {
+    "inspectedBottleIds": [3277],
+    "bottleContexts": [
+      {
+        "exact": {
+          "abv": 58.4,
+          "edition": "2017 Edition",
+          "outturn": null,
+          "statedAge": null,
+          "caskNumber": null,
+          "maturation": "Sherry seasoned American and European oak casks",
+          "releaseDay": null,
+          "singleCask": false,
+          "releaseYear": 2017,
+          "vintageYear": null,
+          "bottlingYear": null,
+          "caskStrength": false,
+          "releaseMonth": null
+        },
+        "shared": {
+          "name": "Classic Cut",
+          "brand": {
+            "name": "The Macallan",
+            "entityId": 1157
+          },
+          "series": {
+            "name": "Classic Cut",
+            "seriesId": 731
+          },
+          "bottler": null,
+          "category": "single_malt",
+          "statedAge": null,
+          "distillers": [
+            {
+              "name": "The Macallan",
+              "entityId": 1157
+            }
+          ]
+        },
+        "groupId": 11084,
+        "bottleId": 3277,
+        "fullName": "The Macallan Classic Cut - 2017 Edition",
+        "siblings": [],
+        "references": [
+          {
+            "name": "The Macallan Classic Cut (2017 Edition)",
+            "ignored": false
+          },
+          {
+            "name": "The Macallan Classic Cut (2017 Edition), 58.4%",
+            "ignored": false
+          },
+          {
+            "name": "The Macallan Classic Cut Limited 2017 Edition",
+            "ignored": false
+          }
+        ],
+        "observations": [
+          {
+            "facts": {
+              "proposalType": "no_match",
+              "proposedBottle": null
+            },
+            "rawText": "The Macallan Classic Cut (2017 Edition)",
+            "sourceKey": "store_price:12033814",
+            "sourceUrl": "https://www.masterofmalt.com/whiskies/the-macallan/the-macallan-classic-cut-2017-release-whisky/?sku=88260",
+            "sourceName": "The Macallan Classic Cut (2017 Edition)",
+            "sourceType": "store_price",
+            "parsedIdentity": null
+          }
+        ],
+        "imageSources": []
+      }
+    ],
+    "inspectedEntities": [
+      {
+        "kind": "distillery",
+        "name": "The Macallan",
+        "score": 1,
+        "source": ["exact", "text", "prefix", "contained"],
+        "entityId": 1157,
+        "reference": "Macallan",
+        "shortName": null,
+        "retrievedFor": [
+          {
+            "exact": true,
+            "query": "Macallan"
+          },
+          {
+            "exact": true,
+            "query": "The Macallan"
+          }
+        ]
+      },
+      {
+        "kind": "brand",
+        "name": "Armorik",
+        "score": 1,
+        "source": ["exact", "text", "prefix", "contained"],
+        "entityId": 33,
+        "reference": "Armorik",
+        "shortName": null,
+        "retrievedFor": [
+          {
+            "exact": true,
+            "query": "Armorik"
+          }
+        ]
+      },
+      {
+        "kind": "brand",
+        "name": "Shieldaig",
+        "score": 1,
+        "source": ["exact", "text", "prefix", "contained"],
+        "entityId": 3943,
+        "reference": "Shieldaig",
+        "shortName": null,
+        "retrievedFor": [
+          {
+            "exact": true,
+            "query": "Shieldaig"
+          }
+        ]
+      },
+      {
+        "kind": "distillery",
+        "name": "Glenglassaugh",
+        "score": 1,
+        "source": ["exact", "text", "prefix", "contained"],
+        "entityId": 255,
+        "reference": "Glenglassaugh",
+        "shortName": null,
+        "retrievedFor": [
+          {
+            "exact": true,
+            "query": "Glenglassaugh"
+          }
+        ]
+      },
+      {
+        "kind": "brand",
+        "name": "SLYRS",
+        "score": 1,
+        "source": ["exact", "text", "prefix", "contained"],
+        "entityId": 1344,
+        "reference": "SLYRS",
+        "shortName": null,
+        "retrievedFor": [
+          {
+            "exact": true,
+            "query": "SLYRS"
+          }
+        ]
+      },
+      {
+        "kind": "distillery",
+        "name": "The Glenrothes",
+        "score": 1,
+        "source": ["exact", "text", "prefix", "contained"],
+        "entityId": 985,
+        "reference": "Glenrothes",
+        "shortName": null,
+        "retrievedFor": [
+          {
+            "exact": true,
+            "query": "The Glenrothes"
+          }
+        ]
+      },
+      {
+        "kind": "bottler",
+        "name": "Two Stacks",
+        "score": 1,
+        "source": ["exact", "text", "prefix", "contained"],
+        "entityId": 173,
+        "reference": "Two Stacks",
+        "shortName": null,
+        "retrievedFor": [
+          {
+            "exact": true,
+            "query": "Two Stacks"
+          }
+        ]
+      },
+      {
+        "kind": "brand",
+        "name": "Label 5",
+        "score": 1,
+        "source": ["exact", "text", "prefix", "contained"],
+        "entityId": 1122,
+        "reference": "Label 5",
+        "shortName": null,
+        "retrievedFor": [
+          {
+            "exact": true,
+            "query": "Label 5"
+          }
+        ]
+      },
+      {
+        "kind": "brand",
+        "name": "Jim Beam",
+        "score": 1,
+        "source": ["exact", "text", "prefix", "contained"],
+        "entityId": 1085,
+        "reference": "Jim Beam",
+        "shortName": null,
+        "retrievedFor": [
+          {
+            "exact": true,
+            "query": "Jim Beam"
+          }
+        ]
+      },
+      {
+        "kind": "distillery",
+        "name": "Kavalan",
+        "score": 1,
+        "source": ["exact", "text", "prefix", "contained"],
+        "entityId": 1099,
+        "reference": "Kavalan",
+        "shortName": null,
+        "retrievedFor": [
+          {
+            "exact": true,
+            "query": "Kavalan"
+          }
+        ]
+      },
+      {
+        "kind": "distillery",
+        "name": "SLYRS Bavarian Whisky Distillery",
+        "score": 0.5,
+        "source": ["text", "prefix"],
+        "entityId": 366155,
+        "reference": "SLYRS Bavarian Whisky Distillery",
+        "shortName": null,
+        "retrievedFor": [
+          {
+            "query": "SLYRS"
+          }
+        ]
+      },
+      {
+        "kind": "distillery",
+        "name": "Beam",
+        "score": 0.36428571428571427,
+        "source": ["contained"],
+        "entityId": 2201,
+        "reference": "Beam",
+        "shortName": null,
+        "retrievedFor": [
+          {
+            "query": "Jim Beam"
+          }
+        ]
+      }
+    ],
+    "inspectedSeries": []
+  },
+  "provenance": {
+    "source": "production_miss",
+    "verifiedSourceUrls": [
+      "https://www.scotchwhiskyauctions.com/auctions/231-the-182nd-auction/888632-macallan-classic-cut-2017-release/",
+      "https://thewhiskeywash.com/?p=14822"
+    ],
+    "dbOutcome": {
+      "bottleId": 3277,
+      "createsBottle": false,
+      "summary": "Production returned match."
+    },
+    "notes": "Captured from saved classifier run 25088 (auction_lot 7551, model null, 2026-10-02T16:59:28.621Z). Production rationale: Bottle 3277 is the Macallan Classic Cut 2017 release: its stored identity matches the brand, distillery, expression, and 2017 release year, and its accepted references identify the product as the 2017 Edition. The auction title's “2017 Release” wording is not evidence of a separate marketed edition. Checked 2026-10-24. Lot 182-00352 page: 70cl, 58.4%, bottled 2017, sherry casks; winning bid £210. Independent review gives the 2017 Edition at 58.4%. Bottle 3277 is the 2017 Edition at 58.4%. Production matched it without web evidence, and code added an edition-conflict risk for the \"2017 Release\" wording, so the lot stayed in review. Bottle 3277 stores caskStrength=false (checked 2026-10-24), which the reviewed evidence contradicts; under the classifier rule for populated conflicts the right outcome is no_match until the Bottle is fixed. Peated Bottle 14146 may duplicate 3277; it is not a candidate here. Current auction matching sends readCandidateImages:false, so the case does too; the saved run predates that and read candidate photos."
+  },
+  "expected": {
+    "status": "classified",
+    "action": "no_match",
+    "identityScope": "product",
+    "expectedTier": "review",
+    "summary": "Bottle 3277 is the right release, but it stores caskStrength=false while the release is bottled at cask strength. Leave the lot for Bottle Review; do not match or create a duplicate."
+  }
+}

@@ -1,0 +1,1183 @@
+{
+  "id": "auction-writers-tears-brand-only-title",
+  "name": "auction title: a Writers' Tears brand name alone needs review",
+  "input": {
+    "reference": {
+      "id": 8919,
+      "url": "https://www.scotchwhiskyauctions.com/auctions/231-the-182nd-auction/892052-writers-tears/",
+      "name": "Writer’s Tears",
+      "imageUrl": null,
+      "externalSiteId": 28097,
+      "currentBottleId": null
+    },
+    "extractedIdentity": {
+      "abv": null,
+      "brand": "Writer’s Tears",
+      "series": null,
+      "bottler": null,
+      "edition": null,
+      "outturn": null,
+      "category": "blend",
+      "distillery": [],
+      "expression": null,
+      "maturation": null,
+      "stated_age": null,
+      "cask_number": null,
+      "release_day": null,
+      "single_cask": null,
+      "release_year": null,
+      "vintage_year": null,
+      "bottling_year": null,
+      "cask_strength": null,
+      "release_month": null
+    },
+    "imageEvidence": null,
+    "initialCandidates": [
+      {
+        "abv": null,
+        "brand": "Writers' Tears",
+        "score": 74.0579,
+        "series": null,
+        "source": ["vector", "text"],
+        "bottler": null,
+        "edition": null,
+        "outturn": null,
+        "bottleId": 13679,
+        "category": "blend",
+        "fullName": "Writers' Tears Double Oak",
+        "reference": "Writers' Tears Double Oak",
+        "statedAge": null,
+        "caskNumber": null,
+        "comparison": {
+          "missing": [],
+          "conflicts": ["brand"],
+          "agreements": ["category"]
+        },
+        "distillery": ["Walsh Whiskey"],
+        "maturation": null,
+        "releaseDay": null,
+        "singleCask": null,
+        "releaseYear": null,
+        "vintageYear": null,
+        "bottlingYear": null,
+        "caskStrength": null,
+        "releaseMonth": null,
+        "familyContext": {
+          "siblingBottles": []
+        }
+      },
+      {
+        "abv": 46,
+        "brand": "Writers' Tears",
+        "score": 73.2151,
+        "series": null,
+        "source": ["vector", "text", "brand_coverage"],
+        "bottler": null,
+        "edition": null,
+        "outturn": null,
+        "bottleId": 64828,
+        "category": "blend",
+        "fullName": "Writers' Tears Double Oak",
+        "reference": "Writers' Tears Double Oak, 46%",
+        "statedAge": null,
+        "caskNumber": null,
+        "comparison": {
+          "missing": [],
+          "conflicts": ["brand"],
+          "agreements": ["category"]
+        },
+        "distillery": [],
+        "maturation": "American and French oak",
+        "releaseDay": null,
+        "singleCask": null,
+        "releaseYear": null,
+        "vintageYear": null,
+        "bottlingYear": null,
+        "caskStrength": null,
+        "releaseMonth": null,
+        "familyContext": {
+          "siblingBottles": []
+        }
+      },
+      {
+        "abv": null,
+        "brand": "Writers' Tears",
+        "score": 71.65277,
+        "series": null,
+        "source": ["vector", "text"],
+        "bottler": null,
+        "edition": null,
+        "outturn": null,
+        "bottleId": 12635,
+        "category": "blend",
+        "fullName": "Writers' Tears Japanese Cask Finish",
+        "reference": "Writers' Tears Japanese Cask Finish, 55%",
+        "statedAge": null,
+        "caskNumber": null,
+        "comparison": {
+          "missing": [],
+          "conflicts": ["brand"],
+          "agreements": ["category"]
+        },
+        "distillery": ["Walsh Whiskey"],
+        "maturation": null,
+        "releaseDay": null,
+        "singleCask": null,
+        "releaseYear": null,
+        "vintageYear": null,
+        "bottlingYear": null,
+        "caskStrength": null,
+        "releaseMonth": null,
+        "familyContext": {
+          "siblingBottles": []
+        }
+      },
+      {
+        "abv": 40,
+        "brand": "Writers' Tears",
+        "score": 70.40985,
+        "series": null,
+        "source": ["vector", "text", "brand_coverage", "context"],
+        "bottler": "Walsh Whiskey",
+        "edition": null,
+        "outturn": null,
+        "bottleId": 47014,
+        "category": "blend",
+        "fullName": "Writers' Tears Copper Pot - 40.0% ABV",
+        "reference": "Writers' Tears Copper Pot - 40.0% ABV",
+        "statedAge": null,
+        "caskNumber": null,
+        "comparison": {
+          "missing": [],
+          "conflicts": ["brand"],
+          "agreements": ["category"]
+        },
+        "distillery": [],
+        "maturation": null,
+        "releaseDay": null,
+        "singleCask": null,
+        "releaseYear": null,
+        "vintageYear": null,
+        "bottlingYear": null,
+        "caskStrength": null,
+        "releaseMonth": null,
+        "familyContext": {
+          "siblingBottles": []
+        }
+      },
+      {
+        "abv": 46,
+        "brand": "Writers' Tears",
+        "score": 70.274536,
+        "series": null,
+        "source": ["vector", "text"],
+        "bottler": "Walsh Whiskey",
+        "edition": null,
+        "outturn": null,
+        "bottleId": 45865,
+        "category": "single_pot_still",
+        "fullName": "Writers' Tears Single Pot Still - 46.0% ABV",
+        "reference": "Writers' Tears Single Pot Still",
+        "statedAge": null,
+        "caskNumber": null,
+        "comparison": {
+          "missing": [],
+          "conflicts": ["category", "brand"],
+          "agreements": []
+        },
+        "distillery": [],
+        "maturation": null,
+        "releaseDay": null,
+        "singleCask": false,
+        "releaseYear": null,
+        "vintageYear": null,
+        "bottlingYear": null,
+        "caskStrength": false,
+        "releaseMonth": null,
+        "familyContext": {
+          "siblingBottles": []
+        }
+      },
+      {
+        "abv": null,
+        "brand": "Writers' Tears",
+        "score": 69.41353,
+        "series": null,
+        "source": ["text", "brand", "brand_coverage"],
+        "bottler": null,
+        "edition": null,
+        "outturn": null,
+        "bottleId": 44023,
+        "category": "blend",
+        "fullName": "Writers' Tears Cask Strength",
+        "reference": null,
+        "statedAge": null,
+        "caskNumber": null,
+        "comparison": {
+          "missing": [],
+          "conflicts": ["brand"],
+          "agreements": ["category"]
+        },
+        "distillery": ["Walsh Whiskey"],
+        "maturation": null,
+        "releaseDay": null,
+        "singleCask": null,
+        "releaseYear": null,
+        "vintageYear": null,
+        "bottlingYear": null,
+        "caskStrength": null,
+        "releaseMonth": null,
+        "familyContext": {
+          "siblingBottles": [
+            {
+              "abv": 54.5,
+              "edition": "10th Edition",
+              "outturn": 3000,
+              "bottleId": 44994,
+              "fullName": "Writers' Tears Cask Strength - 10th Edition",
+              "statedAge": null,
+              "caskNumber": null,
+              "maturation": "American oak bourbon barrels",
+              "releaseDay": null,
+              "singleCask": null,
+              "releaseYear": 2020,
+              "traitFields": ["edition", "releaseYear", "abv", "caskStrength"],
+              "vintageYear": null,
+              "bottlingYear": null,
+              "caskStrength": true,
+              "releaseMonth": null
+            },
+            {
+              "abv": 54.2,
+              "edition": "11th Edition",
+              "outturn": 6000,
+              "bottleId": 44995,
+              "fullName": "Writers' Tears Cask Strength - 11th Edition",
+              "statedAge": null,
+              "caskNumber": null,
+              "maturation": "American oak bourbon barrels",
+              "releaseDay": null,
+              "singleCask": null,
+              "releaseYear": 2021,
+              "traitFields": ["edition", "releaseYear", "abv", "caskStrength"],
+              "vintageYear": null,
+              "bottlingYear": null,
+              "caskStrength": true,
+              "releaseMonth": null
+            },
+            {
+              "abv": 53,
+              "edition": "8th Edition",
+              "outturn": 5175,
+              "bottleId": 44992,
+              "fullName": "Writers' Tears Cask Strength - 8th Edition",
+              "statedAge": null,
+              "caskNumber": null,
+              "maturation": "American oak bourbon barrels",
+              "releaseDay": null,
+              "singleCask": null,
+              "releaseYear": 2018,
+              "traitFields": ["edition", "releaseYear", "abv", "caskStrength"],
+              "vintageYear": null,
+              "bottlingYear": null,
+              "caskStrength": true,
+              "releaseMonth": null
+            },
+            {
+              "abv": 53,
+              "edition": "9th Edition",
+              "outturn": 3780,
+              "bottleId": 44993,
+              "fullName": "Writers' Tears Cask Strength - 9th Edition",
+              "statedAge": null,
+              "caskNumber": null,
+              "maturation": "American oak bourbon barrels",
+              "releaseDay": null,
+              "singleCask": null,
+              "releaseYear": 2019,
+              "traitFields": ["edition", "releaseYear", "abv", "caskStrength"],
+              "vintageYear": null,
+              "bottlingYear": null,
+              "caskStrength": true,
+              "releaseMonth": null
+            }
+          ]
+        }
+      },
+      {
+        "abv": null,
+        "brand": "Writers' Tears",
+        "score": 69.11531,
+        "series": null,
+        "source": ["text"],
+        "bottler": "Walsh Whiskey",
+        "edition": null,
+        "outturn": null,
+        "bottleId": 612,
+        "category": "single_pot_still",
+        "fullName": "Writers' Tears Red Head",
+        "reference": null,
+        "statedAge": null,
+        "caskNumber": null,
+        "comparison": {
+          "missing": [],
+          "conflicts": ["category", "brand"],
+          "agreements": []
+        },
+        "distillery": ["Walsh Whiskey"],
+        "maturation": null,
+        "releaseDay": null,
+        "singleCask": null,
+        "releaseYear": null,
+        "vintageYear": null,
+        "bottlingYear": null,
+        "caskStrength": null,
+        "releaseMonth": null,
+        "familyContext": {
+          "siblingBottles": []
+        }
+      },
+      {
+        "abv": 53,
+        "brand": "Writers' Tears",
+        "score": 68.8045,
+        "series": null,
+        "source": ["vector", "text", "brand_coverage"],
+        "bottler": null,
+        "edition": "8th Edition",
+        "outturn": 5175,
+        "bottleId": 44992,
+        "category": "blend",
+        "fullName": "Writers' Tears Cask Strength - 8th Edition",
+        "reference": "Writers' Tears Cask Strength 2018, 53%",
+        "statedAge": null,
+        "caskNumber": null,
+        "comparison": {
+          "missing": [],
+          "conflicts": ["brand"],
+          "agreements": ["category"]
+        },
+        "distillery": ["Walsh Whiskey"],
+        "maturation": "American oak bourbon barrels",
+        "releaseDay": null,
+        "singleCask": null,
+        "releaseYear": 2018,
+        "vintageYear": null,
+        "bottlingYear": null,
+        "caskStrength": true,
+        "releaseMonth": null,
+        "familyContext": {
+          "siblingBottles": [
+            {
+              "abv": null,
+              "edition": null,
+              "outturn": null,
+              "bottleId": 44023,
+              "fullName": "Writers' Tears Cask Strength",
+              "statedAge": null,
+              "caskNumber": null,
+              "maturation": null,
+              "releaseDay": null,
+              "singleCask": null,
+              "releaseYear": null,
+              "traitFields": [],
+              "vintageYear": null,
+              "bottlingYear": null,
+              "caskStrength": null,
+              "releaseMonth": null
+            },
+            {
+              "abv": 54.5,
+              "edition": "10th Edition",
+              "outturn": 3000,
+              "bottleId": 44994,
+              "fullName": "Writers' Tears Cask Strength - 10th Edition",
+              "statedAge": null,
+              "caskNumber": null,
+              "maturation": "American oak bourbon barrels",
+              "releaseDay": null,
+              "singleCask": null,
+              "releaseYear": 2020,
+              "traitFields": ["edition", "releaseYear", "abv", "caskStrength"],
+              "vintageYear": null,
+              "bottlingYear": null,
+              "caskStrength": true,
+              "releaseMonth": null
+            },
+            {
+              "abv": 54.2,
+              "edition": "11th Edition",
+              "outturn": 6000,
+              "bottleId": 44995,
+              "fullName": "Writers' Tears Cask Strength - 11th Edition",
+              "statedAge": null,
+              "caskNumber": null,
+              "maturation": "American oak bourbon barrels",
+              "releaseDay": null,
+              "singleCask": null,
+              "releaseYear": 2021,
+              "traitFields": ["edition", "releaseYear", "abv", "caskStrength"],
+              "vintageYear": null,
+              "bottlingYear": null,
+              "caskStrength": true,
+              "releaseMonth": null
+            },
+            {
+              "abv": 53,
+              "edition": "9th Edition",
+              "outturn": 3780,
+              "bottleId": 44993,
+              "fullName": "Writers' Tears Cask Strength - 9th Edition",
+              "statedAge": null,
+              "caskNumber": null,
+              "maturation": "American oak bourbon barrels",
+              "releaseDay": null,
+              "singleCask": null,
+              "releaseYear": 2019,
+              "traitFields": ["edition", "releaseYear", "abv", "caskStrength"],
+              "vintageYear": null,
+              "bottlingYear": null,
+              "caskStrength": true,
+              "releaseMonth": null
+            }
+          ]
+        }
+      },
+      {
+        "abv": 54.5,
+        "brand": "Writers' Tears",
+        "score": 67.86162,
+        "series": null,
+        "source": ["vector", "text", "brand", "brand_coverage"],
+        "bottler": null,
+        "edition": "10th Edition",
+        "outturn": 3000,
+        "bottleId": 44994,
+        "category": "blend",
+        "fullName": "Writers' Tears Cask Strength - 10th Edition",
+        "reference": "Writers' Tears Cask Strength 2020 Release",
+        "statedAge": null,
+        "caskNumber": null,
+        "comparison": {
+          "missing": [],
+          "conflicts": ["brand"],
+          "agreements": ["category"]
+        },
+        "distillery": ["Walsh Whiskey"],
+        "maturation": "American oak bourbon barrels",
+        "releaseDay": null,
+        "singleCask": null,
+        "releaseYear": 2020,
+        "vintageYear": null,
+        "bottlingYear": null,
+        "caskStrength": true,
+        "releaseMonth": null,
+        "familyContext": {
+          "siblingBottles": [
+            {
+              "abv": null,
+              "edition": null,
+              "outturn": null,
+              "bottleId": 44023,
+              "fullName": "Writers' Tears Cask Strength",
+              "statedAge": null,
+              "caskNumber": null,
+              "maturation": null,
+              "releaseDay": null,
+              "singleCask": null,
+              "releaseYear": null,
+              "traitFields": [],
+              "vintageYear": null,
+              "bottlingYear": null,
+              "caskStrength": null,
+              "releaseMonth": null
+            },
+            {
+              "abv": 54.2,
+              "edition": "11th Edition",
+              "outturn": 6000,
+              "bottleId": 44995,
+              "fullName": "Writers' Tears Cask Strength - 11th Edition",
+              "statedAge": null,
+              "caskNumber": null,
+              "maturation": "American oak bourbon barrels",
+              "releaseDay": null,
+              "singleCask": null,
+              "releaseYear": 2021,
+              "traitFields": ["edition", "releaseYear", "abv", "caskStrength"],
+              "vintageYear": null,
+              "bottlingYear": null,
+              "caskStrength": true,
+              "releaseMonth": null
+            },
+            {
+              "abv": 53,
+              "edition": "8th Edition",
+              "outturn": 5175,
+              "bottleId": 44992,
+              "fullName": "Writers' Tears Cask Strength - 8th Edition",
+              "statedAge": null,
+              "caskNumber": null,
+              "maturation": "American oak bourbon barrels",
+              "releaseDay": null,
+              "singleCask": null,
+              "releaseYear": 2018,
+              "traitFields": ["edition", "releaseYear", "abv", "caskStrength"],
+              "vintageYear": null,
+              "bottlingYear": null,
+              "caskStrength": true,
+              "releaseMonth": null
+            },
+            {
+              "abv": 53,
+              "edition": "9th Edition",
+              "outturn": 3780,
+              "bottleId": 44993,
+              "fullName": "Writers' Tears Cask Strength - 9th Edition",
+              "statedAge": null,
+              "caskNumber": null,
+              "maturation": "American oak bourbon barrels",
+              "releaseDay": null,
+              "singleCask": null,
+              "releaseYear": 2019,
+              "traitFields": ["edition", "releaseYear", "abv", "caskStrength"],
+              "vintageYear": null,
+              "bottlingYear": null,
+              "caskStrength": true,
+              "releaseMonth": null
+            }
+          ]
+        }
+      },
+      {
+        "abv": 54.2,
+        "brand": "Writers' Tears",
+        "score": 67.86162,
+        "series": null,
+        "source": ["vector", "text", "brand", "brand_coverage"],
+        "bottler": null,
+        "edition": "11th Edition",
+        "outturn": 6000,
+        "bottleId": 44995,
+        "category": "blend",
+        "fullName": "Writers' Tears Cask Strength - 11th Edition",
+        "reference": "Writers' Tears Cask Strength 2021 Release",
+        "statedAge": null,
+        "caskNumber": null,
+        "comparison": {
+          "missing": [],
+          "conflicts": ["brand"],
+          "agreements": ["category"]
+        },
+        "distillery": ["Walsh Whiskey"],
+        "maturation": "American oak bourbon barrels",
+        "releaseDay": null,
+        "singleCask": null,
+        "releaseYear": 2021,
+        "vintageYear": null,
+        "bottlingYear": null,
+        "caskStrength": true,
+        "releaseMonth": null,
+        "familyContext": {
+          "siblingBottles": [
+            {
+              "abv": null,
+              "edition": null,
+              "outturn": null,
+              "bottleId": 44023,
+              "fullName": "Writers' Tears Cask Strength",
+              "statedAge": null,
+              "caskNumber": null,
+              "maturation": null,
+              "releaseDay": null,
+              "singleCask": null,
+              "releaseYear": null,
+              "traitFields": [],
+              "vintageYear": null,
+              "bottlingYear": null,
+              "caskStrength": null,
+              "releaseMonth": null
+            },
+            {
+              "abv": 54.5,
+              "edition": "10th Edition",
+              "outturn": 3000,
+              "bottleId": 44994,
+              "fullName": "Writers' Tears Cask Strength - 10th Edition",
+              "statedAge": null,
+              "caskNumber": null,
+              "maturation": "American oak bourbon barrels",
+              "releaseDay": null,
+              "singleCask": null,
+              "releaseYear": 2020,
+              "traitFields": ["edition", "releaseYear", "abv", "caskStrength"],
+              "vintageYear": null,
+              "bottlingYear": null,
+              "caskStrength": true,
+              "releaseMonth": null
+            },
+            {
+              "abv": 53,
+              "edition": "8th Edition",
+              "outturn": 5175,
+              "bottleId": 44992,
+              "fullName": "Writers' Tears Cask Strength - 8th Edition",
+              "statedAge": null,
+              "caskNumber": null,
+              "maturation": "American oak bourbon barrels",
+              "releaseDay": null,
+              "singleCask": null,
+              "releaseYear": 2018,
+              "traitFields": ["edition", "releaseYear", "abv", "caskStrength"],
+              "vintageYear": null,
+              "bottlingYear": null,
+              "caskStrength": true,
+              "releaseMonth": null
+            },
+            {
+              "abv": 53,
+              "edition": "9th Edition",
+              "outturn": 3780,
+              "bottleId": 44993,
+              "fullName": "Writers' Tears Cask Strength - 9th Edition",
+              "statedAge": null,
+              "caskNumber": null,
+              "maturation": "American oak bourbon barrels",
+              "releaseDay": null,
+              "singleCask": null,
+              "releaseYear": 2019,
+              "traitFields": ["edition", "releaseYear", "abv", "caskStrength"],
+              "vintageYear": null,
+              "bottlingYear": null,
+              "caskStrength": true,
+              "releaseMonth": null
+            }
+          ]
+        }
+      },
+      {
+        "abv": 53,
+        "brand": "Writers' Tears",
+        "score": 67.86162,
+        "series": null,
+        "source": ["vector", "text", "brand_coverage"],
+        "bottler": null,
+        "edition": "9th Edition",
+        "outturn": 3780,
+        "bottleId": 44993,
+        "category": "blend",
+        "fullName": "Writers' Tears Cask Strength - 9th Edition",
+        "reference": "Writers' Tears Cask Strength 2019 Release",
+        "statedAge": null,
+        "caskNumber": null,
+        "comparison": {
+          "missing": [],
+          "conflicts": ["brand"],
+          "agreements": ["category"]
+        },
+        "distillery": ["Walsh Whiskey"],
+        "maturation": "American oak bourbon barrels",
+        "releaseDay": null,
+        "singleCask": null,
+        "releaseYear": 2019,
+        "vintageYear": null,
+        "bottlingYear": null,
+        "caskStrength": true,
+        "releaseMonth": null,
+        "familyContext": {
+          "siblingBottles": [
+            {
+              "abv": null,
+              "edition": null,
+              "outturn": null,
+              "bottleId": 44023,
+              "fullName": "Writers' Tears Cask Strength",
+              "statedAge": null,
+              "caskNumber": null,
+              "maturation": null,
+              "releaseDay": null,
+              "singleCask": null,
+              "releaseYear": null,
+              "traitFields": [],
+              "vintageYear": null,
+              "bottlingYear": null,
+              "caskStrength": null,
+              "releaseMonth": null
+            },
+            {
+              "abv": 54.5,
+              "edition": "10th Edition",
+              "outturn": 3000,
+              "bottleId": 44994,
+              "fullName": "Writers' Tears Cask Strength - 10th Edition",
+              "statedAge": null,
+              "caskNumber": null,
+              "maturation": "American oak bourbon barrels",
+              "releaseDay": null,
+              "singleCask": null,
+              "releaseYear": 2020,
+              "traitFields": ["edition", "releaseYear", "abv", "caskStrength"],
+              "vintageYear": null,
+              "bottlingYear": null,
+              "caskStrength": true,
+              "releaseMonth": null
+            },
+            {
+              "abv": 54.2,
+              "edition": "11th Edition",
+              "outturn": 6000,
+              "bottleId": 44995,
+              "fullName": "Writers' Tears Cask Strength - 11th Edition",
+              "statedAge": null,
+              "caskNumber": null,
+              "maturation": "American oak bourbon barrels",
+              "releaseDay": null,
+              "singleCask": null,
+              "releaseYear": 2021,
+              "traitFields": ["edition", "releaseYear", "abv", "caskStrength"],
+              "vintageYear": null,
+              "bottlingYear": null,
+              "caskStrength": true,
+              "releaseMonth": null
+            },
+            {
+              "abv": 53,
+              "edition": "8th Edition",
+              "outturn": 5175,
+              "bottleId": 44992,
+              "fullName": "Writers' Tears Cask Strength - 8th Edition",
+              "statedAge": null,
+              "caskNumber": null,
+              "maturation": "American oak bourbon barrels",
+              "releaseDay": null,
+              "singleCask": null,
+              "releaseYear": 2018,
+              "traitFields": ["edition", "releaseYear", "abv", "caskStrength"],
+              "vintageYear": null,
+              "bottlingYear": null,
+              "caskStrength": true,
+              "releaseMonth": null
+            }
+          ]
+        }
+      },
+      {
+        "abv": null,
+        "brand": "Writers' Tears",
+        "score": 65.78816,
+        "series": null,
+        "source": ["vector", "text"],
+        "bottler": null,
+        "edition": null,
+        "outturn": null,
+        "bottleId": 12858,
+        "category": "blend",
+        "fullName": "Writers' Tears Inniskillin Ice Wine Cask Limited Edition",
+        "reference": "Writers' Tears Inniskillin Ice Wine Cask Limited Edition, 46%",
+        "statedAge": null,
+        "caskNumber": null,
+        "comparison": {
+          "missing": [],
+          "conflicts": ["brand"],
+          "agreements": ["category"]
+        },
+        "distillery": ["Writers' Tears"],
+        "maturation": null,
+        "releaseDay": null,
+        "singleCask": null,
+        "releaseYear": null,
+        "vintageYear": null,
+        "bottlingYear": null,
+        "caskStrength": null,
+        "releaseMonth": null,
+        "familyContext": {
+          "siblingBottles": []
+        }
+      },
+      {
+        "abv": 54.8,
+        "brand": "Writers' Tears",
+        "score": 64.214165,
+        "series": null,
+        "source": ["text", "brand", "brand_coverage"],
+        "bottler": null,
+        "edition": "13th Edition",
+        "outturn": 8700,
+        "bottleId": 56574,
+        "category": "blend",
+        "fullName": "Writers' Tears Cask Strength - 13th Edition",
+        "reference": null,
+        "statedAge": null,
+        "caskNumber": null,
+        "comparison": {
+          "missing": [],
+          "conflicts": ["brand"],
+          "agreements": ["category"]
+        },
+        "distillery": ["Walsh Whiskey"],
+        "maturation": "American oak bourbon barrels",
+        "releaseDay": null,
+        "singleCask": null,
+        "releaseYear": 2023,
+        "vintageYear": null,
+        "bottlingYear": null,
+        "caskStrength": true,
+        "releaseMonth": null,
+        "familyContext": {
+          "siblingBottles": []
+        }
+      },
+      {
+        "abv": null,
+        "brand": "Writers' Tears",
+        "score": 63.579353,
+        "series": null,
+        "source": ["vector", "text", "brand_coverage"],
+        "bottler": null,
+        "edition": null,
+        "outturn": null,
+        "bottleId": 13849,
+        "category": "blend",
+        "fullName": "Writers' Tears Copper Pot Deau XO Cognac Cask Finish",
+        "reference": "Writers' Tears Copper Pot Deau XO Cognac Cask Finish, 46%",
+        "statedAge": null,
+        "caskNumber": null,
+        "comparison": {
+          "missing": [],
+          "conflicts": ["brand"],
+          "agreements": ["category"]
+        },
+        "distillery": ["Walsh Whiskey"],
+        "maturation": null,
+        "releaseDay": null,
+        "singleCask": null,
+        "releaseYear": null,
+        "vintageYear": null,
+        "bottlingYear": null,
+        "caskStrength": null,
+        "releaseMonth": null,
+        "familyContext": {
+          "siblingBottles": []
+        }
+      },
+      {
+        "abv": 54.6,
+        "brand": "Writers' Tears",
+        "score": 63.271675,
+        "series": null,
+        "source": ["text", "brand", "brand_coverage"],
+        "bottler": null,
+        "edition": "12th Edition",
+        "outturn": 7920,
+        "bottleId": 56573,
+        "category": "blend",
+        "fullName": "Writers' Tears Cask Strength - 12th Edition",
+        "reference": null,
+        "statedAge": null,
+        "caskNumber": null,
+        "comparison": {
+          "missing": [],
+          "conflicts": ["brand"],
+          "agreements": ["category"]
+        },
+        "distillery": ["Walsh Whiskey"],
+        "maturation": "American oak bourbon barrels",
+        "releaseDay": null,
+        "singleCask": null,
+        "releaseYear": 2022,
+        "vintageYear": null,
+        "bottlingYear": null,
+        "caskStrength": true,
+        "releaseMonth": null,
+        "familyContext": {
+          "siblingBottles": []
+        }
+      },
+      {
+        "abv": 56.5,
+        "brand": "The Scotch Malt Whisky Society",
+        "score": 33.72033,
+        "series": null,
+        "source": ["text"],
+        "bottler": "The Scotch Malt Whisky Society",
+        "edition": null,
+        "outturn": null,
+        "bottleId": 50065,
+        "category": "single_malt",
+        "fullName": "SMWS 7.203 Angels' tears",
+        "reference": null,
+        "statedAge": 15,
+        "caskNumber": "7.203",
+        "comparison": {
+          "missing": [],
+          "conflicts": ["category", "brand"],
+          "agreements": []
+        },
+        "distillery": ["Longmorn"],
+        "maturation": "Second-fill barrel",
+        "releaseDay": null,
+        "singleCask": true,
+        "releaseYear": null,
+        "vintageYear": 2002,
+        "bottlingYear": null,
+        "caskStrength": null,
+        "releaseMonth": null,
+        "familyContext": {
+          "siblingBottles": []
+        }
+      },
+      {
+        "abv": 46,
+        "brand": "Penderyn Distillery",
+        "score": 31.004162,
+        "series": null,
+        "source": ["text"],
+        "bottler": null,
+        "edition": null,
+        "outturn": null,
+        "bottleId": 61773,
+        "category": "single_malt",
+        "fullName": "Penderyn Serpent's Tears Llandudno Peated",
+        "reference": null,
+        "statedAge": null,
+        "caskNumber": null,
+        "comparison": {
+          "missing": [],
+          "conflicts": ["category", "brand"],
+          "agreements": []
+        },
+        "distillery": ["Penderyn Distillery"],
+        "maturation": null,
+        "releaseDay": null,
+        "singleCask": null,
+        "releaseYear": null,
+        "vintageYear": null,
+        "bottlingYear": null,
+        "caskStrength": null,
+        "releaseMonth": null,
+        "familyContext": {
+          "siblingBottles": []
+        }
+      }
+    ],
+    "readCandidateImages": false
+  },
+  "context": {
+    "inspectedBottleIds": [47014],
+    "bottleContexts": [
+      {
+        "exact": {
+          "abv": 40,
+          "edition": null,
+          "outturn": null,
+          "statedAge": null,
+          "caskNumber": null,
+          "maturation": null,
+          "releaseDay": null,
+          "singleCask": null,
+          "releaseYear": null,
+          "vintageYear": null,
+          "bottlingYear": null,
+          "caskStrength": null,
+          "releaseMonth": null
+        },
+        "shared": {
+          "name": "Copper Pot",
+          "brand": {
+            "name": "Writers' Tears",
+            "entityId": 507
+          },
+          "series": null,
+          "bottler": {
+            "name": "Walsh Whiskey",
+            "entityId": 1980
+          },
+          "category": "blend",
+          "statedAge": null,
+          "distillers": []
+        },
+        "groupId": 19974,
+        "bottleId": 47014,
+        "fullName": "Writers' Tears Copper Pot - 40.0% ABV",
+        "siblings": [],
+        "references": [
+          {
+            "name": "Writers Tears Copper Pot",
+            "ignored": false
+          },
+          {
+            "name": "Writers Tears Copper Pot, 40%",
+            "ignored": false
+          },
+          {
+            "name": "Writers' Tears Copper Pot - 40.0% ABV",
+            "ignored": false
+          },
+          {
+            "name": "Writers Tears Pot Still Irish Whiskey, 40%",
+            "ignored": false
+          }
+        ],
+        "observations": [
+          {
+            "facts": {
+              "proposalType": "no_match",
+              "proposedBottle": null,
+              "referenceScope": "none"
+            },
+            "rawText": "Writers' Tears",
+            "sourceKey": "store_price:12029568",
+            "sourceUrl": "https://www.finedrams.com/writer-s-tears-whiskey.html",
+            "sourceName": "Writers' Tears",
+            "sourceType": "store_price",
+            "parsedIdentity": null
+          },
+          {
+            "facts": {
+              "proposalType": "match_existing",
+              "proposedBottle": null,
+              "referenceScope": "none"
+            },
+            "rawText": "Writers' Tears Copper Pot Whiskey",
+            "sourceKey": "store_price:11757859",
+            "sourceUrl": "https://www.reservebar.com/products/writers-tears-copper-pot-whiskey/GROUPING-148771",
+            "sourceName": "Writers' Tears Copper Pot Whiskey",
+            "sourceType": "store_price",
+            "parsedIdentity": null
+          },
+          {
+            "facts": {
+              "proposalType": "match_existing",
+              "proposedBottle": null,
+              "referenceScope": "none"
+            },
+            "rawText": "Writers' Tears Copper Pot Irish Whiskey",
+            "sourceKey": "store_price:1007",
+            "sourceUrl": "https://woodencork.com/collections/whiskey/products/writers-tears-copper-pot-irish-whiskey",
+            "sourceName": "Writers' Tears Copper Pot Irish Whiskey",
+            "sourceType": "store_price",
+            "parsedIdentity": null
+          },
+          {
+            "facts": {
+              "proposalType": "create_new",
+              "proposedBottle": {
+                "abv": 40,
+                "name": "Copper Pot",
+                "brand": {
+                  "id": 507,
+                  "name": "Writers' Tears"
+                },
+                "series": null,
+                "bottler": {
+                  "id": null,
+                  "name": "Walsh Whiskey"
+                },
+                "edition": null,
+                "caskFill": null,
+                "caskSize": null,
+                "caskType": null,
+                "category": "blend",
+                "statedAge": null,
+                "distillers": [],
+                "singleCask": null,
+                "releaseYear": null,
+                "vintageYear": null,
+                "caskStrength": null
+              }
+            },
+            "rawText": "Writers Tears Copper Pot Irish Whiskey",
+            "sourceKey": "store_price:12030607",
+            "sourceUrl": "https://www.masterofmalt.com/whiskies/walsh-whiskey-distillery-co/writers-tears-copper-pot-irish-whiskey/?sku=34433",
+            "sourceName": "Writers Tears Copper Pot Irish Whiskey",
+            "sourceType": "store_price",
+            "parsedIdentity": {
+              "abv": 40,
+              "brand": "Writers' Tears",
+              "series": null,
+              "bottler": "Walsh Whiskey",
+              "edition": null,
+              "category": "blend",
+              "cask_fill": null,
+              "cask_size": null,
+              "cask_type": "oak",
+              "distillery": [],
+              "expression": "Copper Pot",
+              "stated_age": null,
+              "single_cask": null,
+              "release_year": null,
+              "vintage_year": null,
+              "cask_strength": null
+            }
+          }
+        ],
+        "imageSources": [
+          {
+            "url": "https://api.peated.com/uploads/prices-p12quyr8050lp5bzabg6aglw.webp",
+            "source": {
+              "kind": "bottle"
+            },
+            "sourceUrl": null
+          }
+        ]
+      }
+    ],
+    "inspectedEntities": [
+      {
+        "kind": "brand",
+        "name": "Writers' Tears",
+        "score": 1,
+        "source": ["exact", "contained", "text", "prefix"],
+        "entityId": 507,
+        "reference": "Writers' Tears",
+        "shortName": null,
+        "retrievedFor": [
+          {
+            "exact": true,
+            "query": "Writer’s Tears"
+          },
+          {
+            "exact": true,
+            "query": "Writers' Tears"
+          }
+        ]
+      },
+      {
+        "kind": "company",
+        "name": "Walsh Whiskey",
+        "score": 1,
+        "source": ["exact", "text", "prefix", "contained"],
+        "entityId": 1980,
+        "reference": "Walsh Whiskey",
+        "shortName": null,
+        "retrievedFor": [
+          {
+            "exact": true,
+            "query": "Walsh Whiskey"
+          }
+        ]
+      }
+    ],
+    "inspectedSeries": []
+  },
+  "provenance": {
+    "source": "production_miss",
+    "verifiedSourceUrls": [
+      "https://www.scotchwhiskyauctions.com/auctions/231-the-182nd-auction/892052-writers-tears/"
+    ],
+    "dbOutcome": {
+      "bottleId": null,
+      "createsBottle": false,
+      "summary": "Production returned no_match."
+    },
+    "notes": "Captured from saved classifier run 26378 (auction_lot 8919, model null, 2026-10-02T21:42:16.284Z). Production rationale: The supplied source name is only “Writer’s Tears,” and no label image or product-specific details establish which release is listed. Bottle 47014 is a specific Copper Pot release, but the source does not identify it as Copper Pot; other distinct Writers’ Tears releases are also present in the local candidates. No safe match or complete create draft is supported. Checked 2026-10-24. Lot 182-03663 page: title \"Writer's Tears\", 70cl, 40%, no expression name; winning bid £25. Writers' Tears sells several expressions (Copper Pot, Red Head, Double Oak, cask strength). The title alone cannot pick one. Search evidence is empty to keep the title-only input. Current auction matching sends readCandidateImages:false, so the case does too; the saved run predates that and read candidate photos."
+  },
+  "expected": {
+    "status": "classified",
+    "action": "no_match",
+    "identityScope": "product",
+    "referenceScope": "none",
+    "expectedTier": "review",
+    "summary": "Leave the lot unresolved. The title names only a brand with several expressions."
+  }
+}

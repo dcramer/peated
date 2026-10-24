@@ -1,0 +1,656 @@
+{
+  "id": "auction-macallan-quest-title",
+  "name": "auction title: Macallan Quest is the single Quest Collection release",
+  "input": {
+    "reference": {
+      "id": 7736,
+      "url": "https://www.scotchwhiskyauctions.com/auctions/231-the-182nd-auction/889000-macallan-quest/",
+      "name": "Macallan Quest",
+      "imageUrl": null,
+      "externalSiteId": 28097,
+      "currentBottleId": null
+    },
+    "extractedIdentity": {
+      "abv": null,
+      "brand": "The Macallan",
+      "series": null,
+      "bottler": null,
+      "edition": null,
+      "outturn": null,
+      "category": "single_malt",
+      "distillery": ["The Macallan"],
+      "expression": "Quest",
+      "maturation": null,
+      "stated_age": null,
+      "cask_number": null,
+      "release_day": null,
+      "single_cask": null,
+      "release_year": null,
+      "vintage_year": null,
+      "bottling_year": null,
+      "cask_strength": null,
+      "release_month": null
+    },
+    "imageEvidence": null,
+    "initialCandidates": [
+      {
+        "abv": 40,
+        "brand": "The Macallan",
+        "score": 61.81091,
+        "series": "Quest Collection",
+        "source": ["vector", "text", "brand", "brand_coverage", "context"],
+        "bottler": null,
+        "edition": null,
+        "outturn": null,
+        "bottleId": 805,
+        "category": "single_malt",
+        "fullName": "The Macallan Quest",
+        "reference": "The Macallan Quest",
+        "statedAge": null,
+        "caskNumber": null,
+        "comparison": {
+          "missing": [],
+          "conflicts": [],
+          "agreements": ["category", "brand", "distillers"]
+        },
+        "distillery": ["The Macallan"],
+        "maturation": null,
+        "releaseDay": null,
+        "singleCask": null,
+        "releaseYear": 2017,
+        "vintageYear": null,
+        "bottlingYear": null,
+        "caskStrength": null,
+        "releaseMonth": null,
+        "familyContext": {
+          "siblingBottles": []
+        }
+      },
+      {
+        "abv": 44.9,
+        "brand": "The Macallan",
+        "score": 60.48934,
+        "series": "Quest Collection",
+        "source": ["text", "brand_coverage"],
+        "bottler": null,
+        "edition": null,
+        "outturn": null,
+        "bottleId": 3279,
+        "category": "single_malt",
+        "fullName": "The Macallan Enigma",
+        "reference": null,
+        "statedAge": null,
+        "caskNumber": null,
+        "comparison": {
+          "missing": [],
+          "conflicts": [],
+          "agreements": ["category", "brand", "distillers"]
+        },
+        "distillery": ["The Macallan"],
+        "maturation": null,
+        "releaseDay": null,
+        "singleCask": null,
+        "releaseYear": 2017,
+        "vintageYear": null,
+        "bottlingYear": null,
+        "caskStrength": null,
+        "releaseMonth": null,
+        "familyContext": {
+          "siblingBottles": []
+        }
+      },
+      {
+        "abv": 41.3,
+        "brand": "The Macallan",
+        "score": 60.48934,
+        "series": "Quest Collection",
+        "source": ["text", "brand_coverage"],
+        "bottler": null,
+        "edition": null,
+        "outturn": null,
+        "bottleId": 3280,
+        "category": "single_malt",
+        "fullName": "The Macallan Lumina",
+        "reference": null,
+        "statedAge": null,
+        "caskNumber": null,
+        "comparison": {
+          "missing": [],
+          "conflicts": [],
+          "agreements": ["category", "brand", "distillers"]
+        },
+        "distillery": ["The Macallan"],
+        "maturation": null,
+        "releaseDay": null,
+        "singleCask": null,
+        "releaseYear": 2017,
+        "vintageYear": null,
+        "bottlingYear": null,
+        "caskStrength": null,
+        "releaseMonth": null,
+        "familyContext": {
+          "siblingBottles": []
+        }
+      },
+      {
+        "abv": 43.8,
+        "brand": "The Macallan",
+        "score": 60.48934,
+        "series": "Quest Collection",
+        "source": ["text", "brand_coverage"],
+        "bottler": null,
+        "edition": null,
+        "outturn": null,
+        "bottleId": 3282,
+        "category": "single_malt",
+        "fullName": "The Macallan Terra",
+        "reference": null,
+        "statedAge": null,
+        "caskNumber": null,
+        "comparison": {
+          "missing": [],
+          "conflicts": [],
+          "agreements": ["category", "brand", "distillers"]
+        },
+        "distillery": ["The Macallan"],
+        "maturation": null,
+        "releaseDay": null,
+        "singleCask": null,
+        "releaseYear": 2017,
+        "vintageYear": null,
+        "bottlingYear": null,
+        "caskStrength": null,
+        "releaseMonth": null,
+        "familyContext": {
+          "siblingBottles": []
+        }
+      },
+      {
+        "abv": 43,
+        "brand": "The Macallan",
+        "score": 21.17333,
+        "series": null,
+        "source": ["vector", "text"],
+        "bottler": null,
+        "edition": null,
+        "outturn": null,
+        "bottleId": 662,
+        "category": "single_malt",
+        "fullName": "The Macallan Estate",
+        "reference": "The Macallan Estate",
+        "statedAge": null,
+        "caskNumber": null,
+        "comparison": {
+          "missing": [],
+          "conflicts": [],
+          "agreements": ["category", "brand", "distillers"]
+        },
+        "distillery": ["The Macallan"],
+        "maturation": "Sherry-seasoned oak casks",
+        "releaseDay": null,
+        "singleCask": false,
+        "releaseYear": 2019,
+        "vintageYear": null,
+        "bottlingYear": null,
+        "caskStrength": null,
+        "releaseMonth": null,
+        "familyContext": {
+          "siblingBottles": []
+        }
+      },
+      {
+        "abv": null,
+        "brand": "The Macallan",
+        "score": 20.5015,
+        "series": "Tales of The Macallan",
+        "source": ["text"],
+        "bottler": null,
+        "edition": null,
+        "outturn": null,
+        "bottleId": 54637,
+        "category": "single_malt",
+        "fullName": "The Macallan Tales of The Macallan Volume I",
+        "reference": null,
+        "statedAge": null,
+        "caskNumber": null,
+        "comparison": {
+          "missing": [],
+          "conflicts": [],
+          "agreements": ["category", "brand", "distillers"]
+        },
+        "distillery": ["The Macallan"],
+        "maturation": null,
+        "releaseDay": null,
+        "singleCask": null,
+        "releaseYear": null,
+        "vintageYear": null,
+        "bottlingYear": null,
+        "caskStrength": null,
+        "releaseMonth": null,
+        "familyContext": {
+          "siblingBottles": []
+        }
+      },
+      {
+        "abv": 44.8,
+        "brand": "The Macallan",
+        "score": 20.390629,
+        "series": "Tales of The Macallan",
+        "source": ["text"],
+        "bottler": null,
+        "edition": null,
+        "outturn": null,
+        "bottleId": 54642,
+        "category": "single_malt",
+        "fullName": "The Macallan Tales of The Macallan Volume II",
+        "reference": null,
+        "statedAge": null,
+        "caskNumber": null,
+        "comparison": {
+          "missing": [],
+          "conflicts": [],
+          "agreements": ["category", "brand", "distillers"]
+        },
+        "distillery": ["The Macallan"],
+        "maturation": null,
+        "releaseDay": null,
+        "singleCask": null,
+        "releaseYear": null,
+        "vintageYear": null,
+        "bottlingYear": null,
+        "caskStrength": null,
+        "releaseMonth": null,
+        "familyContext": {
+          "siblingBottles": []
+        }
+      },
+      {
+        "abv": 52,
+        "brand": "The Macallan",
+        "score": 19.464334,
+        "series": null,
+        "source": ["text"],
+        "bottler": null,
+        "edition": null,
+        "outturn": 2012,
+        "bottleId": 17094,
+        "category": "single_malt",
+        "fullName": "The Macallan Diamond Jubilee",
+        "reference": null,
+        "statedAge": null,
+        "caskNumber": null,
+        "comparison": {
+          "missing": [],
+          "conflicts": [],
+          "agreements": ["category", "brand", "distillers"]
+        },
+        "distillery": ["The Macallan"],
+        "maturation": "Sherry-seasoned oak casks",
+        "releaseDay": null,
+        "singleCask": false,
+        "releaseYear": 2012,
+        "vintageYear": null,
+        "bottlingYear": null,
+        "caskStrength": null,
+        "releaseMonth": null,
+        "familyContext": {
+          "siblingBottles": []
+        }
+      },
+      {
+        "abv": 46.8,
+        "brand": "The Macallan",
+        "score": 19.453478,
+        "series": null,
+        "source": ["text"],
+        "bottler": null,
+        "edition": null,
+        "outturn": 1000,
+        "bottleId": 17335,
+        "category": "single_malt",
+        "fullName": "The Macallan Royal Marriage",
+        "reference": null,
+        "statedAge": null,
+        "caskNumber": null,
+        "comparison": {
+          "missing": [],
+          "conflicts": [],
+          "agreements": ["category", "brand", "distillers"]
+        },
+        "distillery": ["The Macallan"],
+        "maturation": "Two sherry casks filled on 29 April 1996 and 29 April 1999",
+        "releaseDay": null,
+        "singleCask": false,
+        "releaseYear": 2011,
+        "vintageYear": null,
+        "bottlingYear": null,
+        "caskStrength": null,
+        "releaseMonth": null,
+        "familyContext": {
+          "siblingBottles": []
+        }
+      },
+      {
+        "abv": 43,
+        "brand": "The Macallan",
+        "score": 19.361803,
+        "series": "1824 Series",
+        "source": ["text"],
+        "bottler": null,
+        "edition": null,
+        "outturn": null,
+        "bottleId": 65532,
+        "category": "single_malt",
+        "fullName": "The Macallan Ruby",
+        "reference": null,
+        "statedAge": null,
+        "caskNumber": null,
+        "comparison": {
+          "missing": [],
+          "conflicts": [],
+          "agreements": ["category", "brand", "distillers"]
+        },
+        "distillery": ["The Macallan"],
+        "maturation": "100% sherry seasoned American and European oak casks",
+        "releaseDay": null,
+        "singleCask": null,
+        "releaseYear": null,
+        "vintageYear": null,
+        "bottlingYear": null,
+        "caskStrength": null,
+        "releaseMonth": null,
+        "familyContext": {
+          "siblingBottles": []
+        }
+      },
+      {
+        "abv": 43,
+        "brand": "The Macallan",
+        "score": 19.361803,
+        "series": "1824 Series",
+        "source": ["text"],
+        "bottler": null,
+        "edition": null,
+        "outturn": null,
+        "bottleId": 65531,
+        "category": "single_malt",
+        "fullName": "The Macallan Sienna",
+        "reference": null,
+        "statedAge": null,
+        "caskNumber": null,
+        "comparison": {
+          "missing": [],
+          "conflicts": [],
+          "agreements": ["category", "brand", "distillers"]
+        },
+        "distillery": ["The Macallan"],
+        "maturation": "100% sherry seasoned American and European oak casks",
+        "releaseDay": null,
+        "singleCask": null,
+        "releaseYear": null,
+        "vintageYear": null,
+        "bottlingYear": null,
+        "caskStrength": null,
+        "releaseMonth": null,
+        "familyContext": {
+          "siblingBottles": []
+        }
+      },
+      {
+        "abv": 40.8,
+        "brand": "The Macallan",
+        "score": 19.351606,
+        "series": "Concept",
+        "source": ["text"],
+        "bottler": null,
+        "edition": null,
+        "outturn": null,
+        "bottleId": 589,
+        "category": "single_malt",
+        "fullName": "The Macallan Concept Number 3",
+        "reference": null,
+        "statedAge": null,
+        "caskNumber": null,
+        "comparison": {
+          "missing": [],
+          "conflicts": [],
+          "agreements": ["category", "brand", "distillers"]
+        },
+        "distillery": ["The Macallan"],
+        "maturation": null,
+        "releaseDay": null,
+        "singleCask": null,
+        "releaseYear": 2020,
+        "vintageYear": null,
+        "bottlingYear": null,
+        "caskStrength": null,
+        "releaseMonth": null,
+        "familyContext": {
+          "siblingBottles": []
+        }
+      },
+      {
+        "abv": null,
+        "brand": "The Macallan",
+        "score": 19.261911,
+        "series": "Rare Cask",
+        "source": ["vector", "text"],
+        "bottler": null,
+        "edition": null,
+        "outturn": null,
+        "bottleId": 3870,
+        "category": "single_malt",
+        "fullName": "The Macallan Rare Cask Black 1824 Masters Series",
+        "reference": "The Macallan Rare Cask",
+        "statedAge": null,
+        "caskNumber": null,
+        "comparison": {
+          "missing": [],
+          "conflicts": [],
+          "agreements": ["category", "brand", "distillers"]
+        },
+        "distillery": ["The Macallan"],
+        "maturation": null,
+        "releaseDay": null,
+        "singleCask": null,
+        "releaseYear": null,
+        "vintageYear": null,
+        "bottlingYear": null,
+        "caskStrength": null,
+        "releaseMonth": null,
+        "familyContext": {
+          "siblingBottles": []
+        }
+      },
+      {
+        "abv": 40,
+        "brand": "The Macallan",
+        "score": 19.194195,
+        "series": "1824 Series",
+        "source": ["text"],
+        "bottler": null,
+        "edition": null,
+        "outturn": null,
+        "bottleId": 2911,
+        "category": "single_malt",
+        "fullName": "The Macallan Double Cask Gold",
+        "reference": null,
+        "statedAge": null,
+        "caskNumber": null,
+        "comparison": {
+          "missing": [],
+          "conflicts": [],
+          "agreements": ["category", "brand", "distillers"]
+        },
+        "distillery": ["The Macallan"],
+        "maturation": "Sherry-seasoned American and European oak casks",
+        "releaseDay": null,
+        "singleCask": false,
+        "releaseYear": 2012,
+        "vintageYear": null,
+        "bottlingYear": null,
+        "caskStrength": null,
+        "releaseMonth": null,
+        "familyContext": {
+          "siblingBottles": []
+        }
+      },
+      {
+        "abv": 41.7,
+        "brand": "The Macallan",
+        "score": 19.059921,
+        "series": "Replica Collection",
+        "source": ["text", "brand_coverage"],
+        "bottler": null,
+        "edition": null,
+        "outturn": null,
+        "bottleId": 18929,
+        "category": "single_malt",
+        "fullName": "The Macallan 1841 Replica",
+        "reference": null,
+        "statedAge": null,
+        "caskNumber": null,
+        "comparison": {
+          "missing": [],
+          "conflicts": [],
+          "agreements": ["category", "brand", "distillers"]
+        },
+        "distillery": ["The Macallan"],
+        "maturation": null,
+        "releaseDay": null,
+        "singleCask": false,
+        "releaseYear": 2002,
+        "vintageYear": null,
+        "bottlingYear": null,
+        "caskStrength": null,
+        "releaseMonth": null,
+        "familyContext": {
+          "siblingBottles": []
+        }
+      }
+    ],
+    "readCandidateImages": false
+  },
+  "context": {
+    "inspectedBottleIds": [805],
+    "bottleContexts": [
+      {
+        "exact": {
+          "abv": 40,
+          "edition": null,
+          "outturn": null,
+          "statedAge": null,
+          "caskNumber": null,
+          "maturation": null,
+          "releaseDay": null,
+          "singleCask": null,
+          "releaseYear": 2017,
+          "vintageYear": null,
+          "bottlingYear": null,
+          "caskStrength": null,
+          "releaseMonth": null
+        },
+        "shared": {
+          "name": "Quest",
+          "brand": {
+            "name": "The Macallan",
+            "entityId": 1157
+          },
+          "series": {
+            "name": "Quest Collection",
+            "seriesId": 726
+          },
+          "bottler": null,
+          "category": "single_malt",
+          "statedAge": null,
+          "distillers": [
+            {
+              "name": "The Macallan",
+              "entityId": 1157
+            }
+          ]
+        },
+        "groupId": 9435,
+        "bottleId": 805,
+        "fullName": "The Macallan Quest",
+        "siblings": [],
+        "references": [
+          {
+            "name": "The Macallan Quest",
+            "ignored": false
+          },
+          {
+            "name": "The Macallan Quest Single Malt",
+            "ignored": false
+          },
+          {
+            "name": "The Macallan Quest Single Malt 1L",
+            "ignored": false
+          }
+        ],
+        "observations": [
+          {
+            "facts": {
+              "proposalType": "no_match",
+              "proposedBottle": null,
+              "referenceScope": "none"
+            },
+            "rawText": "The Macallan Quest",
+            "sourceKey": "store_price:12057867",
+            "sourceUrl": "https://www.masterofmalt.com/whiskies/the-macallan/the-macallan-quest-whisky/?sku=76678",
+            "sourceName": "The Macallan Quest",
+            "sourceType": "store_price",
+            "parsedIdentity": null
+          }
+        ],
+        "imageSources": [
+          {
+            "url": "https://api.peated.com/uploads/prices-edno8cnb0mmqa50avnb0vcm3.webp",
+            "source": {
+              "kind": "bottle"
+            },
+            "sourceUrl": "https://www.masterofmalt.com/whiskies/the-macallan/the-macallan-quest-whisky/?sku=76678"
+          }
+        ]
+      }
+    ],
+    "inspectedEntities": [
+      {
+        "kind": "distillery",
+        "name": "The Macallan",
+        "score": 1,
+        "source": ["exact", "text", "prefix", "contained"],
+        "entityId": 1157,
+        "reference": "The Macallan",
+        "shortName": null,
+        "retrievedFor": [
+          {
+            "exact": true,
+            "query": "The Macallan"
+          }
+        ]
+      }
+    ],
+    "inspectedSeries": []
+  },
+  "provenance": {
+    "source": "production_miss",
+    "verifiedSourceUrls": [
+      "https://www.scotchwhiskyauctions.com/auctions/231-the-182nd-auction/889000-macallan-quest/",
+      "https://scotchwhisky.com/magazine/latest-news/16442/macallan-quest-collection-for-travel-retail/"
+    ],
+    "dbOutcome": {
+      "bottleId": 805,
+      "createsBottle": false,
+      "summary": "Production returned match."
+    },
+    "notes": "Captured from saved classifier run 25266 (auction_lot 7736, model null, 2026-10-02T17:25:47.006Z). Production rationale: The auction reference identifies Macallan Quest. Inspected Bottle 805 is The Macallan Quest; its label evidence confirms Quest and 40% ABV, and its stored brand, distillery, Quest Collection series, and release details are compatible. The page could not be read, but no unresolved identity-critical conflict remains. Checked 2026-10-24. Lot 182-00710 page: Macallan Quest, 70cl, 40%, Quest Collection created for travel retail in 2017; winning bid £60. Quest is one NAS 40% expression, matching Bottle 805. Current auction matching sends readCandidateImages:false, so the case does too; the saved run predates that and read candidate photos."
+  },
+  "expected": {
+    "status": "classified",
+    "action": "match",
+    "identityScope": "product",
+    "matchedBottleId": 805,
+    "summary": "Match the one Macallan Quest release. A name that identifies one product needs no extra traits."
+  }
+}

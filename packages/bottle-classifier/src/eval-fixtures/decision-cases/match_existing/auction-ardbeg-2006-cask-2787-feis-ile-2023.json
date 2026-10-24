@@ -1,0 +1,1234 @@
+{
+  "id": "auction-ardbeg-2006-cask-2787-feis-ile-2023",
+  "name": "auction cask title matches the Ardbeg 2006 cask 2787 release",
+  "input": {
+    "reference": {
+      "id": 4722,
+      "url": "https://www.scotchwhiskyauctions.com/auctions/231-the-182nd-auction/890444-ardbeg-2006-single-cask-2787-feis-ile-2023/",
+      "name": "Ardbeg 2006 Single Cask #2787 Feis Ile 2023",
+      "imageUrl": null,
+      "externalSiteId": 28097,
+      "currentBottleId": null
+    },
+    "extractedIdentity": {
+      "abv": null,
+      "brand": "Ardbeg",
+      "series": null,
+      "bottler": null,
+      "edition": "Cask #2787",
+      "outturn": null,
+      "category": "single_malt",
+      "distillery": ["Ardbeg"],
+      "expression": "Feis Ile",
+      "maturation": null,
+      "stated_age": null,
+      "cask_number": "2787",
+      "release_day": null,
+      "single_cask": true,
+      "release_year": 2023,
+      "vintage_year": 2006,
+      "bottling_year": null,
+      "cask_strength": null,
+      "release_month": null
+    },
+    "imageEvidence": null,
+    "initialCandidates": [
+      {
+        "abv": 56.8,
+        "brand": "Ardbeg",
+        "score": 194.02112,
+        "series": "Fèis Ìle & Ardbeg Day",
+        "source": ["text", "brand_coverage", "context", "current"],
+        "bottler": null,
+        "edition": "Cask 2787 · Fèis Ìle 2023",
+        "outturn": 623,
+        "bottleId": 52158,
+        "category": "single_malt",
+        "fullName": "Ardbeg Single Cask - Cask 2787 · Fèis Ìle 2023",
+        "reference": null,
+        "statedAge": 16,
+        "caskNumber": "2787",
+        "comparison": {
+          "missing": [],
+          "conflicts": ["edition"],
+          "agreements": [
+            "category",
+            "vintageYear",
+            "releaseYear",
+            "caskNumber",
+            "singleCask",
+            "brand",
+            "distillers"
+          ]
+        },
+        "distillery": ["Ardbeg"],
+        "maturation": "Second-fill Oloroso sherry butt",
+        "releaseDay": null,
+        "singleCask": true,
+        "releaseYear": 2023,
+        "vintageYear": 2006,
+        "bottlingYear": 2023,
+        "caskStrength": true,
+        "releaseMonth": null,
+        "familyContext": {
+          "siblingBottles": []
+        }
+      },
+      {
+        "abv": 56.7,
+        "brand": "Ardbeg",
+        "score": 128.8949,
+        "series": "Fèis Ìle & Ardbeg Day",
+        "source": ["text"],
+        "bottler": null,
+        "edition": "Ardbeg Day · Fèis Ìle 2012",
+        "outturn": null,
+        "bottleId": 4391,
+        "category": "single_malt",
+        "fullName": "Ardbeg Day - Ardbeg Day · Fèis Ìle 2012",
+        "reference": null,
+        "statedAge": null,
+        "caskNumber": null,
+        "comparison": {
+          "missing": ["statedAge", "vintageYear", "caskNumber"],
+          "conflicts": ["edition", "abv", "releaseYear", "singleCask"],
+          "agreements": [
+            "category",
+            "caskStrength",
+            "brand",
+            "series",
+            "distillers"
+          ]
+        },
+        "distillery": ["Ardbeg"],
+        "maturation": "Ex-bourbon casks, married in refill sherry casks",
+        "releaseDay": null,
+        "singleCask": false,
+        "releaseYear": 2012,
+        "vintageYear": null,
+        "bottlingYear": 2012,
+        "caskStrength": true,
+        "releaseMonth": null,
+        "familyContext": {
+          "siblingBottles": []
+        }
+      },
+      {
+        "abv": 49.9,
+        "brand": "Ardbeg",
+        "score": 121.01245,
+        "series": "Fèis Ìle & Ardbeg Day",
+        "source": ["vector", "text"],
+        "bottler": null,
+        "edition": "Ardbeg Day · Fèis Ìle 2014",
+        "outturn": null,
+        "bottleId": 3952,
+        "category": "single_malt",
+        "fullName": "Ardbeg Auriverdes - Ardbeg Day · Fèis Ìle 2014",
+        "reference": "Ardbeg Auriverdes, 49.9%",
+        "statedAge": null,
+        "caskNumber": null,
+        "comparison": {
+          "missing": ["statedAge", "vintageYear", "caskNumber"],
+          "conflicts": ["edition", "abv", "releaseYear", "singleCask"],
+          "agreements": [
+            "category",
+            "caskStrength",
+            "brand",
+            "series",
+            "distillers"
+          ]
+        },
+        "distillery": ["Ardbeg"],
+        "maturation": "Ex-bourbon casks with specially toasted cask lids",
+        "releaseDay": null,
+        "singleCask": false,
+        "releaseYear": 2014,
+        "vintageYear": null,
+        "bottlingYear": 2014,
+        "caskStrength": true,
+        "releaseMonth": null,
+        "familyContext": {
+          "siblingBottles": []
+        }
+      },
+      {
+        "abv": 56.1,
+        "brand": "Ardbeg",
+        "score": 119.895325,
+        "series": "Fèis Ìle & Ardbeg Day",
+        "source": ["text"],
+        "bottler": null,
+        "edition": "Fèis Ìle 2025 Distillery Exclusive",
+        "outturn": null,
+        "bottleId": 52160,
+        "category": "single_malt",
+        "fullName": "Ardbeg Homecoming - Fèis Ìle 2025 Distillery Exclusive",
+        "reference": null,
+        "statedAge": null,
+        "caskNumber": null,
+        "comparison": {
+          "missing": ["statedAge", "vintageYear", "caskNumber"],
+          "conflicts": ["edition", "abv", "releaseYear", "singleCask"],
+          "agreements": [
+            "category",
+            "caskStrength",
+            "brand",
+            "series",
+            "distillers"
+          ]
+        },
+        "distillery": ["Ardbeg"],
+        "maturation": "Rum cask finish",
+        "releaseDay": null,
+        "singleCask": false,
+        "releaseYear": 2025,
+        "vintageYear": null,
+        "bottlingYear": 2025,
+        "caskStrength": true,
+        "releaseMonth": null,
+        "familyContext": {
+          "siblingBottles": []
+        }
+      },
+      {
+        "abv": 50,
+        "brand": "Bruichladdich",
+        "score": 117.83739,
+        "series": "Fèis Ìle",
+        "source": ["text"],
+        "bottler": null,
+        "edition": "02.1 · Fèis Ìle 2023",
+        "outturn": 2500,
+        "bottleId": 52131,
+        "category": "single_malt",
+        "fullName": "Bruichladdich Rock'ndaal - 02.1 · Fèis Ìle 2023",
+        "reference": null,
+        "statedAge": 16,
+        "caskNumber": null,
+        "comparison": {
+          "missing": ["caskNumber"],
+          "conflicts": ["edition", "singleCask", "brand", "distillers"],
+          "agreements": ["category", "vintageYear", "releaseYear"]
+        },
+        "distillery": ["Bruichladdich"],
+        "maturation": "Ex-bourbon and Sauternes casks",
+        "releaseDay": null,
+        "singleCask": false,
+        "releaseYear": 2023,
+        "vintageYear": 2006,
+        "bottlingYear": 2023,
+        "caskStrength": false,
+        "releaseMonth": null,
+        "familyContext": {
+          "siblingBottles": []
+        }
+      },
+      {
+        "abv": 50,
+        "brand": "Bruichladdich Port Charlotte",
+        "score": 114.73976,
+        "series": "Fèis Ìle",
+        "source": ["text"],
+        "bottler": "Bruichladdich",
+        "edition": "02.2 · Fèis Ìle 2023",
+        "outturn": null,
+        "bottleId": 52132,
+        "category": "single_malt",
+        "fullName": "Port Charlotte Rock'ndaal - 02.2 · Fèis Ìle 2023",
+        "reference": null,
+        "statedAge": 16,
+        "caskNumber": null,
+        "comparison": {
+          "missing": ["caskNumber"],
+          "conflicts": ["edition", "singleCask", "brand", "distillers"],
+          "agreements": ["category", "vintageYear", "releaseYear"]
+        },
+        "distillery": ["Bruichladdich"],
+        "maturation": "Refill wine casks and sherry butts",
+        "releaseDay": null,
+        "singleCask": false,
+        "releaseYear": 2023,
+        "vintageYear": 2006,
+        "bottlingYear": 2023,
+        "caskStrength": false,
+        "releaseMonth": null,
+        "familyContext": {
+          "siblingBottles": []
+        }
+      },
+      {
+        "abv": 46,
+        "brand": "Ardbeg",
+        "score": 113.81023,
+        "series": "Fèis Ìle & Ardbeg Day",
+        "source": ["text", "brand_coverage"],
+        "bottler": null,
+        "edition": "Ardbeg Day · Fèis Ìle 2023",
+        "outturn": null,
+        "bottleId": 39674,
+        "category": "single_malt",
+        "fullName": "Ardbeg Heavy Vapours - Ardbeg Day · Fèis Ìle 2023",
+        "reference": null,
+        "statedAge": null,
+        "caskNumber": null,
+        "comparison": {
+          "missing": ["vintageYear", "caskNumber"],
+          "conflicts": ["edition", "singleCask"],
+          "agreements": ["category", "releaseYear", "brand", "distillers"]
+        },
+        "distillery": ["Ardbeg"],
+        "maturation": "Ex-bourbon casks",
+        "releaseDay": null,
+        "singleCask": false,
+        "releaseYear": 2023,
+        "vintageYear": null,
+        "bottlingYear": 2023,
+        "caskStrength": false,
+        "releaseMonth": null,
+        "familyContext": {
+          "siblingBottles": []
+        }
+      },
+      {
+        "abv": 55.3,
+        "brand": "Isle of Jura",
+        "score": 111.018234,
+        "series": "Fèis Ìle",
+        "source": ["text"],
+        "bottler": "Isle of Jura",
+        "edition": "Fèis Ìle 2026",
+        "outturn": null,
+        "bottleId": 52167,
+        "category": "single_malt",
+        "fullName": "Isle of Jura 16-year-old Armagnac Cask Finish - Fèis Ìle 2026",
+        "reference": null,
+        "statedAge": 16,
+        "caskNumber": null,
+        "comparison": {
+          "missing": ["vintageYear", "caskNumber"],
+          "conflicts": [
+            "edition",
+            "abv",
+            "releaseYear",
+            "singleCask",
+            "brand",
+            "series",
+            "distillers"
+          ],
+          "agreements": ["category", "statedAge", "caskStrength"]
+        },
+        "distillery": ["Isle of Jura"],
+        "maturation": "Second-fill bourbon barrels, finished for 18 months in a single Armagnac cask",
+        "releaseDay": null,
+        "singleCask": false,
+        "releaseYear": 2026,
+        "vintageYear": null,
+        "bottlingYear": 2026,
+        "caskStrength": true,
+        "releaseMonth": null,
+        "familyContext": {
+          "siblingBottles": []
+        }
+      },
+      {
+        "abv": 56.1,
+        "brand": "Lagavulin",
+        "score": 108.430466,
+        "series": "Fèis Ìle",
+        "source": ["text"],
+        "bottler": null,
+        "edition": "Fèis Ìle 2017",
+        "outturn": null,
+        "bottleId": 3252,
+        "category": "single_malt",
+        "fullName": "Lagavulin Natural Cask Strength - Fèis Ìle 2017",
+        "reference": null,
+        "statedAge": 16,
+        "caskNumber": null,
+        "comparison": {
+          "missing": ["vintageYear", "caskNumber", "singleCask"],
+          "conflicts": [
+            "edition",
+            "abv",
+            "releaseYear",
+            "brand",
+            "series",
+            "distillers"
+          ],
+          "agreements": ["category", "statedAge", "caskStrength"]
+        },
+        "distillery": ["Lagavulin"],
+        "maturation": null,
+        "releaseDay": null,
+        "singleCask": null,
+        "releaseYear": 2017,
+        "vintageYear": null,
+        "bottlingYear": 2017,
+        "caskStrength": true,
+        "releaseMonth": null,
+        "familyContext": {
+          "siblingBottles": []
+        }
+      },
+      {
+        "abv": 54.1,
+        "brand": "Bunnahabhain",
+        "score": 106.34865,
+        "series": "Fèis Ìle",
+        "source": ["text"],
+        "bottler": null,
+        "edition": "Fèis Ìle 2016",
+        "outturn": 250,
+        "bottleId": 16000,
+        "category": "single_malt",
+        "fullName": "Bunnahabhain Amontillado Cask Finish - Fèis Ìle 2016",
+        "reference": null,
+        "statedAge": 16,
+        "caskNumber": null,
+        "comparison": {
+          "missing": ["caskNumber", "singleCask"],
+          "conflicts": [
+            "edition",
+            "abv",
+            "vintageYear",
+            "releaseYear",
+            "brand",
+            "series",
+            "distillers"
+          ],
+          "agreements": ["category", "statedAge", "caskStrength"]
+        },
+        "distillery": ["Bunnahabhain"],
+        "maturation": "Ten years in bourbon casks followed by six years in Amontillado sherry casks",
+        "releaseDay": null,
+        "singleCask": null,
+        "releaseYear": 2016,
+        "vintageYear": 2000,
+        "bottlingYear": 2016,
+        "caskStrength": true,
+        "releaseMonth": null,
+        "familyContext": {
+          "siblingBottles": []
+        }
+      },
+      {
+        "abv": 58.1,
+        "brand": "Bruichladdich Octomore",
+        "score": 106.19029,
+        "series": "Fèis Ìle",
+        "source": ["text"],
+        "bottler": null,
+        "edition": "Fèis Ìle 2023",
+        "outturn": 605,
+        "bottleId": 52134,
+        "category": "single_malt",
+        "fullName": "Octomore Valinch_0.2 - Fèis Ìle 2023",
+        "reference": null,
+        "statedAge": 11,
+        "caskNumber": null,
+        "comparison": {
+          "missing": ["caskNumber"],
+          "conflicts": ["edition", "vintageYear", "brand", "distillers"],
+          "agreements": ["category", "releaseYear", "singleCask"]
+        },
+        "distillery": ["Bruichladdich"],
+        "maturation": "Refill Calvados cask",
+        "releaseDay": null,
+        "singleCask": true,
+        "releaseYear": 2023,
+        "vintageYear": 2011,
+        "bottlingYear": 2023,
+        "caskStrength": true,
+        "releaseMonth": null,
+        "familyContext": {
+          "siblingBottles": []
+        }
+      },
+      {
+        "abv": 51.2,
+        "brand": "Bunnahabhain",
+        "score": 105.06847,
+        "series": "Fèis Ìle",
+        "source": ["text"],
+        "bottler": null,
+        "edition": "Fèis Ìle 2023",
+        "outturn": null,
+        "bottleId": 52048,
+        "category": "single_malt",
+        "fullName": "Bunnahabhain Canasta Cask Matured - Fèis Ìle 2023",
+        "reference": null,
+        "statedAge": null,
+        "caskNumber": null,
+        "comparison": {
+          "missing": ["vintageYear", "caskNumber", "singleCask"],
+          "conflicts": ["edition", "brand", "distillers"],
+          "agreements": ["category", "releaseYear"]
+        },
+        "distillery": ["Bunnahabhain"],
+        "maturation": "Fully matured in Canasta sherry casks",
+        "releaseDay": null,
+        "singleCask": null,
+        "releaseYear": 2023,
+        "vintageYear": null,
+        "bottlingYear": null,
+        "caskStrength": true,
+        "releaseMonth": null,
+        "familyContext": {
+          "siblingBottles": []
+        }
+      },
+      {
+        "abv": 53.9,
+        "brand": "Caol Ila",
+        "score": 104.11889,
+        "series": "Fèis Ìle",
+        "source": ["text"],
+        "bottler": "Caol Ila",
+        "edition": "Fèis Ìle 2020",
+        "outturn": 3000,
+        "bottleId": 2004,
+        "category": "single_malt",
+        "fullName": "Caol Ila Natural Cask Strength - Fèis Ìle 2020",
+        "reference": null,
+        "statedAge": 16,
+        "caskNumber": null,
+        "comparison": {
+          "missing": ["vintageYear", "caskNumber", "distillers"],
+          "conflicts": [
+            "edition",
+            "abv",
+            "releaseYear",
+            "singleCask",
+            "brand",
+            "series"
+          ],
+          "agreements": ["category", "statedAge", "caskStrength"]
+        },
+        "distillery": [],
+        "maturation": "Finished in Amoroso-seasoned hogsheads",
+        "releaseDay": null,
+        "singleCask": false,
+        "releaseYear": 2020,
+        "vintageYear": null,
+        "bottlingYear": 2020,
+        "caskStrength": true,
+        "releaseMonth": null,
+        "familyContext": {
+          "siblingBottles": []
+        }
+      },
+      {
+        "abv": 52.6,
+        "brand": "Bunnahabhain",
+        "score": 104.10909,
+        "series": "Fèis Ìle",
+        "source": ["text"],
+        "bottler": null,
+        "edition": "Fèis Ìle 2023",
+        "outturn": 1740,
+        "bottleId": 52049,
+        "category": "single_malt",
+        "fullName": "Bunnahabhain Mòine Triple Cask - Fèis Ìle 2023",
+        "reference": null,
+        "statedAge": 17,
+        "caskNumber": null,
+        "comparison": {
+          "missing": ["vintageYear", "caskNumber", "singleCask"],
+          "conflicts": ["edition", "brand", "distillers"],
+          "agreements": ["category", "releaseYear"]
+        },
+        "distillery": ["Bunnahabhain"],
+        "maturation": "A marriage of peated whisky with an Oloroso cask finish, bourbon cask maturation and a rum cask finish",
+        "releaseDay": null,
+        "singleCask": null,
+        "releaseYear": 2023,
+        "vintageYear": null,
+        "bottlingYear": null,
+        "caskStrength": true,
+        "releaseMonth": null,
+        "familyContext": {
+          "siblingBottles": []
+        }
+      },
+      {
+        "abv": 52.8,
+        "brand": "Bowmore",
+        "score": 61.493332,
+        "series": "Fèis Ìle",
+        "source": ["text"],
+        "bottler": "Bowmore",
+        "edition": "2023",
+        "outturn": 3500,
+        "bottleId": 52078,
+        "category": "single_malt",
+        "fullName": "Bowmore Fèis Ìle Release - 2023",
+        "reference": null,
+        "statedAge": 18,
+        "caskNumber": null,
+        "comparison": {
+          "missing": ["caskNumber", "singleCask"],
+          "conflicts": ["edition", "vintageYear", "brand", "distillers"],
+          "agreements": ["category", "releaseYear"]
+        },
+        "distillery": ["Bowmore"],
+        "maturation": null,
+        "releaseDay": null,
+        "singleCask": null,
+        "releaseYear": 2023,
+        "vintageYear": 2005,
+        "bottlingYear": 2023,
+        "caskStrength": null,
+        "releaseMonth": null,
+        "familyContext": {
+          "siblingBottles": []
+        }
+      },
+      {
+        "abv": 58.4,
+        "brand": "Lagavulin",
+        "score": 59.92133,
+        "series": "Fèis Ìle",
+        "source": ["text"],
+        "bottler": null,
+        "edition": "Fèis Ìle 2023",
+        "outturn": 3024,
+        "bottleId": 52086,
+        "category": "single_malt",
+        "fullName": "Lagavulin Natural Cask Strength - Fèis Ìle 2023",
+        "reference": null,
+        "statedAge": 14,
+        "caskNumber": null,
+        "comparison": {
+          "missing": ["vintageYear", "caskNumber", "singleCask"],
+          "conflicts": ["edition", "brand", "distillers"],
+          "agreements": ["category", "releaseYear"]
+        },
+        "distillery": ["Lagavulin"],
+        "maturation": "American and European oak, finished for 14 months in Armagnac casks",
+        "releaseDay": null,
+        "singleCask": null,
+        "releaseYear": 2023,
+        "vintageYear": null,
+        "bottlingYear": 2023,
+        "caskStrength": true,
+        "releaseMonth": null,
+        "familyContext": {
+          "siblingBottles": []
+        }
+      },
+      {
+        "abv": 52.3,
+        "brand": "Bunnahabhain",
+        "score": 59.686707,
+        "series": "Fèis Ìle",
+        "source": ["text"],
+        "bottler": null,
+        "edition": "Fèis Ìle 2023",
+        "outturn": null,
+        "bottleId": 52050,
+        "category": "single_malt",
+        "fullName": "Bunnahabhain Manzanilla Cask Finish - Fèis Ìle 2023",
+        "reference": null,
+        "statedAge": 25,
+        "caskNumber": null,
+        "comparison": {
+          "missing": ["caskNumber", "singleCask"],
+          "conflicts": ["edition", "vintageYear", "brand", "distillers"],
+          "agreements": ["category", "releaseYear"]
+        },
+        "distillery": ["Bunnahabhain"],
+        "maturation": "American oak cask maturation followed by a Manzanilla sherry cask finish",
+        "releaseDay": null,
+        "singleCask": null,
+        "releaseYear": 2023,
+        "vintageYear": 1998,
+        "bottlingYear": 2023,
+        "caskStrength": true,
+        "releaseMonth": null,
+        "familyContext": {
+          "siblingBottles": []
+        }
+      },
+      {
+        "abv": 60.4,
+        "brand": "Caol Ila",
+        "score": 58.7303,
+        "series": "Fèis Ìle",
+        "source": ["text"],
+        "bottler": "Caol Ila",
+        "edition": "2023",
+        "outturn": 3096,
+        "bottleId": 51893,
+        "category": "single_malt",
+        "fullName": "Caol Ila Fèis Ìle - 2023",
+        "reference": null,
+        "statedAge": 13,
+        "caskNumber": null,
+        "comparison": {
+          "missing": ["vintageYear", "caskNumber"],
+          "conflicts": ["edition", "singleCask", "brand", "distillers"],
+          "agreements": ["category", "releaseYear"]
+        },
+        "distillery": ["Caol Ila"],
+        "maturation": "First-fill Pedro Ximénez and Oloroso-seasoned butts.",
+        "releaseDay": null,
+        "singleCask": false,
+        "releaseYear": 2023,
+        "vintageYear": null,
+        "bottlingYear": 2023,
+        "caskStrength": true,
+        "releaseMonth": null,
+        "familyContext": {
+          "siblingBottles": []
+        }
+      },
+      {
+        "abv": 48.1,
+        "brand": "The Kinship",
+        "score": 58.30578,
+        "series": "The Kinship",
+        "source": ["text"],
+        "bottler": "Hunter Laing",
+        "edition": "Fèis Ìle 2023",
+        "outturn": null,
+        "bottleId": 52257,
+        "category": "single_malt",
+        "fullName": "The Kinship Bowmore - Fèis Ìle 2023",
+        "reference": null,
+        "statedAge": 27,
+        "caskNumber": null,
+        "comparison": {
+          "missing": ["vintageYear", "caskNumber", "singleCask"],
+          "conflicts": ["edition", "brand", "distillers"],
+          "agreements": ["category", "releaseYear"]
+        },
+        "distillery": ["Bowmore"],
+        "maturation": null,
+        "releaseDay": null,
+        "singleCask": null,
+        "releaseYear": 2023,
+        "vintageYear": null,
+        "bottlingYear": 2023,
+        "caskStrength": null,
+        "releaseMonth": null,
+        "familyContext": {
+          "siblingBottles": []
+        }
+      },
+      {
+        "abv": 61.5,
+        "brand": "The Kinship",
+        "score": 58.30578,
+        "series": "The Kinship",
+        "source": ["text"],
+        "bottler": "Hunter Laing",
+        "edition": "Fèis Ìle 2023",
+        "outturn": null,
+        "bottleId": 52260,
+        "category": "single_malt",
+        "fullName": "The Kinship Bruichladdich - Fèis Ìle 2023",
+        "reference": null,
+        "statedAge": 18,
+        "caskNumber": null,
+        "comparison": {
+          "missing": ["vintageYear", "caskNumber", "singleCask"],
+          "conflicts": ["edition", "brand", "distillers"],
+          "agreements": ["category", "releaseYear"]
+        },
+        "distillery": ["Bruichladdich"],
+        "maturation": null,
+        "releaseDay": null,
+        "singleCask": null,
+        "releaseYear": 2023,
+        "vintageYear": null,
+        "bottlingYear": 2023,
+        "caskStrength": null,
+        "releaseMonth": null,
+        "familyContext": {
+          "siblingBottles": []
+        }
+      },
+      {
+        "abv": 54.2,
+        "brand": "The Kinship",
+        "score": 58.30578,
+        "series": "The Kinship",
+        "source": ["text"],
+        "bottler": "Hunter Laing",
+        "edition": "Fèis Ìle 2023",
+        "outturn": null,
+        "bottleId": 52261,
+        "category": "single_malt",
+        "fullName": "The Kinship Laphroaig - Fèis Ìle 2023",
+        "reference": null,
+        "statedAge": 25,
+        "caskNumber": null,
+        "comparison": {
+          "missing": ["vintageYear", "caskNumber", "singleCask"],
+          "conflicts": ["edition", "brand", "distillers"],
+          "agreements": ["category", "releaseYear"]
+        },
+        "distillery": ["Laphroaig"],
+        "maturation": null,
+        "releaseDay": null,
+        "singleCask": null,
+        "releaseYear": 2023,
+        "vintageYear": null,
+        "bottlingYear": 2023,
+        "caskStrength": null,
+        "releaseMonth": null,
+        "familyContext": {
+          "siblingBottles": []
+        }
+      },
+      {
+        "abv": 46,
+        "brand": "Ardbeg",
+        "score": 0.7163790110341676,
+        "series": "Smoketrails",
+        "source": ["vector"],
+        "bottler": null,
+        "edition": "Manzanilla Edition",
+        "outturn": null,
+        "bottleId": 45583,
+        "category": "single_malt",
+        "fullName": "Ardbeg Smoketrails - Manzanilla Edition",
+        "reference": "Ardbeg Smoketrails",
+        "statedAge": null,
+        "caskNumber": null,
+        "comparison": {
+          "missing": [
+            "statedAge",
+            "vintageYear",
+            "caskNumber",
+            "singleCask",
+            "caskStrength"
+          ],
+          "conflicts": ["edition", "abv", "releaseYear", "series"],
+          "agreements": ["category", "brand", "distillers"]
+        },
+        "distillery": ["Ardbeg"],
+        "maturation": "American oak and ex-Manzanilla sherry casks",
+        "releaseDay": null,
+        "singleCask": null,
+        "releaseYear": 2022,
+        "vintageYear": null,
+        "bottlingYear": 2022,
+        "caskStrength": null,
+        "releaseMonth": null,
+        "familyContext": {
+          "siblingBottles": []
+        }
+      },
+      {
+        "abv": 58.3,
+        "brand": "Single Cask Nation",
+        "score": 0.6925843623719957,
+        "series": null,
+        "source": ["vector"],
+        "bottler": "Single Cask Nation",
+        "edition": null,
+        "outturn": null,
+        "bottleId": 47750,
+        "category": "single_malt",
+        "fullName": "Single Cask Nation Ardnamurchan - 5-year-old - 2023 Release - 2018 Vintage - 58.3% ABV",
+        "reference": "Single Cask Nation Ardnamurchan - 5-year-old - 2023 Release - 2018 Vintage - 58.3% ABV",
+        "statedAge": 5,
+        "caskNumber": "789",
+        "comparison": {
+          "missing": ["edition"],
+          "conflicts": ["vintageYear", "caskNumber", "brand", "distillers"],
+          "agreements": ["category", "releaseYear", "singleCask"]
+        },
+        "distillery": ["Ardnamurchan"],
+        "maturation": null,
+        "releaseDay": null,
+        "singleCask": true,
+        "releaseYear": 2023,
+        "vintageYear": 2018,
+        "bottlingYear": 2023,
+        "caskStrength": null,
+        "releaseMonth": null,
+        "familyContext": {
+          "siblingBottles": []
+        }
+      }
+    ],
+    "readCandidateImages": false
+  },
+  "context": {
+    "inspectedBottleIds": [52158],
+    "bottleContexts": [
+      {
+        "exact": {
+          "abv": 56.8,
+          "edition": "Cask 2787 · Fèis Ìle 2023",
+          "outturn": 623,
+          "statedAge": 16,
+          "caskNumber": "2787",
+          "maturation": "Second-fill Oloroso sherry butt",
+          "releaseDay": null,
+          "singleCask": true,
+          "releaseYear": 2023,
+          "vintageYear": 2006,
+          "bottlingYear": 2023,
+          "caskStrength": true,
+          "releaseMonth": null
+        },
+        "shared": {
+          "name": "Single Cask",
+          "brand": {
+            "name": "Ardbeg",
+            "entityId": 28
+          },
+          "series": {
+            "name": "Fèis Ìle & Ardbeg Day",
+            "seriesId": 463
+          },
+          "bottler": null,
+          "category": "single_malt",
+          "statedAge": null,
+          "distillers": [
+            {
+              "name": "Ardbeg",
+              "entityId": 28
+            }
+          ]
+        },
+        "groupId": 25118,
+        "bottleId": 52158,
+        "fullName": "Ardbeg Single Cask - Cask 2787 · Fèis Ìle 2023",
+        "siblings": [],
+        "references": [],
+        "observations": [
+          {
+            "facts": {
+              "proposalType": "create_new",
+              "proposedBottle": {
+                "abv": null,
+                "name": "16-year-old",
+                "brand": {
+                  "id": null,
+                  "name": "Ardbeg"
+                },
+                "series": {
+                  "id": null,
+                  "name": "Fèis Ìle & Ardbeg Day"
+                },
+                "bottler": null,
+                "edition": "Fèis Ìle 2023",
+                "outturn": null,
+                "category": "single_malt",
+                "statedAge": 16,
+                "caskNumber": "2787",
+                "distillers": [
+                  {
+                    "id": null,
+                    "name": "Ardbeg"
+                  }
+                ],
+                "maturation": "Second Fill Oloroso Sherry Butt",
+                "releaseDay": null,
+                "singleCask": true,
+                "releaseYear": 2023,
+                "vintageYear": 2006,
+                "bottlingYear": null,
+                "caskStrength": null,
+                "releaseMonth": null
+              },
+              "referenceScope": "none"
+            },
+            "rawText": "Ardbeg 16-year-old 2006 - Second Fill Oloroso Sherry Butt (cask 2787) (Fèis Ìle 2023)",
+            "sourceKey": "store_price:12033969",
+            "sourceUrl": "https://www.masterofmalt.com/whiskies/ardbeg/ardbeg-16-year-old-2006-cask-2787-feis-ile-2023-whisky/?sku=143650",
+            "sourceName": "Ardbeg 16-year-old 2006 - Second Fill Oloroso Sherry Butt (cask 2787) (Fèis Ìle 2023)",
+            "sourceType": "store_price",
+            "parsedIdentity": null
+          }
+        ],
+        "imageSources": [
+          {
+            "url": "https://api.peated.com/uploads/bottles-fizcazr1uxh1j2ssy0a9cmwb.webp",
+            "source": {
+              "kind": "bottle"
+            },
+            "sourceUrl": "https://whiskygospel.com/2023/04/24/islay-feis-ile-festival-2023-bottles/"
+          }
+        ]
+      }
+    ],
+    "inspectedEntities": [
+      {
+        "kind": "distillery",
+        "name": "Ardbeg",
+        "score": 1,
+        "source": ["exact", "text", "prefix", "contained"],
+        "entityId": 28,
+        "reference": "Ardbeg",
+        "shortName": null,
+        "retrievedFor": [
+          {
+            "exact": true,
+            "query": "Ardbeg"
+          }
+        ]
+      },
+      {
+        "kind": "distillery",
+        "name": "Bunnahabhain",
+        "score": 1,
+        "source": ["exact", "text", "prefix", "contained"],
+        "entityId": 144,
+        "reference": "Bunnahabhain",
+        "shortName": "",
+        "retrievedFor": [
+          {
+            "exact": true,
+            "query": "Bunnahabhain"
+          }
+        ]
+      },
+      {
+        "kind": "distillery",
+        "name": "Lagavulin",
+        "score": 1,
+        "source": ["exact", "text", "prefix", "contained"],
+        "entityId": 1124,
+        "reference": "Lagavulin",
+        "shortName": null,
+        "retrievedFor": [
+          {
+            "exact": true,
+            "query": "Lagavulin"
+          }
+        ]
+      },
+      {
+        "kind": "brand",
+        "name": "The Kinship",
+        "score": 1,
+        "source": ["exact", "text", "prefix", "contained"],
+        "entityId": 365722,
+        "reference": "The Kinship",
+        "shortName": null,
+        "retrievedFor": [
+          {
+            "exact": true,
+            "query": "The Kinship"
+          }
+        ]
+      },
+      {
+        "kind": "bottler",
+        "name": "Hunter Laing",
+        "score": 1,
+        "source": ["exact", "text", "prefix", "contained"],
+        "entityId": 5733,
+        "reference": "Hunter Laing",
+        "shortName": null,
+        "retrievedFor": [
+          {
+            "exact": true,
+            "query": "Hunter Laing"
+          }
+        ]
+      },
+      {
+        "kind": "distillery",
+        "name": "Bowmore",
+        "score": 1,
+        "source": ["exact", "text", "prefix", "contained"],
+        "entityId": 394,
+        "reference": "Bowmore",
+        "shortName": null,
+        "retrievedFor": [
+          {
+            "exact": true,
+            "query": "Bowmore"
+          }
+        ]
+      },
+      {
+        "kind": "distillery",
+        "name": "Bruichladdich",
+        "score": 1,
+        "source": ["exact", "text", "prefix", "contained"],
+        "entityId": 192,
+        "reference": "Bruichladdich",
+        "shortName": "",
+        "retrievedFor": [
+          {
+            "exact": true,
+            "query": "Bruichladdich"
+          },
+          {
+            "query": "Bruichladdich Port Charlotte"
+          },
+          {
+            "query": "Bruichladdich Octomore"
+          }
+        ]
+      },
+      {
+        "kind": "brand",
+        "name": "Bruichladdich Octomore",
+        "score": 1,
+        "source": ["text", "prefix", "exact", "contained"],
+        "entityId": 1210,
+        "reference": "Octomore",
+        "shortName": "Octomore",
+        "retrievedFor": [
+          {
+            "query": "Bruichladdich"
+          },
+          {
+            "exact": true,
+            "query": "Bruichladdich Octomore"
+          }
+        ]
+      },
+      {
+        "kind": "brand",
+        "name": "Bruichladdich Port Charlotte",
+        "score": 1,
+        "source": ["text", "prefix", "exact", "contained"],
+        "entityId": 1269,
+        "reference": "Port Charlotte",
+        "shortName": "Port Charlotte",
+        "retrievedFor": [
+          {
+            "query": "Bruichladdich"
+          },
+          {
+            "exact": true,
+            "query": "Bruichladdich Port Charlotte"
+          }
+        ]
+      },
+      {
+        "kind": "distillery",
+        "name": "Laphroaig",
+        "score": 1,
+        "source": ["exact", "text", "prefix", "contained"],
+        "entityId": 1129,
+        "reference": "Laphroaig",
+        "shortName": "",
+        "retrievedFor": [
+          {
+            "exact": true,
+            "query": "Laphroaig"
+          }
+        ]
+      },
+      {
+        "kind": "bottler",
+        "name": "Single Cask Nation",
+        "score": 1,
+        "source": ["exact", "text", "prefix", "contained"],
+        "entityId": 365762,
+        "reference": "Single Cask Nation",
+        "shortName": null,
+        "retrievedFor": [
+          {
+            "exact": true,
+            "query": "Single Cask Nation"
+          }
+        ]
+      },
+      {
+        "kind": "distillery",
+        "name": "Ardnamurchan",
+        "score": 1,
+        "source": ["exact", "text", "prefix", "contained"],
+        "entityId": 84,
+        "reference": "Ardnamurchan",
+        "shortName": null,
+        "retrievedFor": [
+          {
+            "exact": true,
+            "query": "Ardnamurchan"
+          }
+        ]
+      },
+      {
+        "kind": "distillery",
+        "name": "Caol Ila",
+        "score": 1,
+        "source": ["exact", "text", "prefix", "contained"],
+        "entityId": 366,
+        "reference": "Caol Ila",
+        "shortName": "",
+        "retrievedFor": [
+          {
+            "exact": true,
+            "query": "Caol Ila"
+          }
+        ]
+      },
+      {
+        "kind": "brand",
+        "name": "The Single Cask",
+        "score": 0.375,
+        "source": ["contained"],
+        "entityId": 366640,
+        "reference": "Single Cask",
+        "shortName": null,
+        "retrievedFor": [
+          {
+            "query": "Single Cask Nation"
+          }
+        ]
+      },
+      {
+        "kind": "company",
+        "name": "Morrison Bowmore Distillers Ltd",
+        "score": 0.2,
+        "source": ["text"],
+        "entityId": 5684,
+        "reference": null,
+        "shortName": null,
+        "retrievedFor": [
+          {
+            "query": "Bowmore"
+          }
+        ]
+      },
+      {
+        "kind": "company",
+        "name": "D. Johnston & Co. (Laphroaig) Ltd.",
+        "score": 0.2,
+        "source": ["text"],
+        "entityId": 5737,
+        "reference": null,
+        "shortName": null,
+        "retrievedFor": [
+          {
+            "query": "Laphroaig"
+          }
+        ]
+      }
+    ],
+    "inspectedSeries": []
+  },
+  "provenance": {
+    "source": "production_miss",
+    "verifiedSourceUrls": [
+      "https://www.scotchwhiskyauctions.com/auctions/231-the-182nd-auction/890444-ardbeg-2006-single-cask-2787-feis-ile-2023/",
+      "https://www.just-whisky.co.uk/october-2023/143315-ardbeg-16-years-old-2006-feis-ile-2023-single-cask-no2787-5010494984941.html"
+    ],
+    "dbOutcome": {
+      "bottleId": 52158,
+      "createsBottle": false,
+      "summary": "Production returned match."
+    },
+    "notes": "Captured from saved classifier run 22699 (auction_lot 4722, model null, 2026-10-02T07:34:44.684Z). Production rationale: The auction title identifies the Ardbeg 2006 single cask #2787 released for Fèis Ìle 2023. Exact-product web evidence corroborates the 16-year age and release details, and the inspected local Bottle has the same cask, vintage, release, and matching identity traits. Its edition wording is consistent with the source title; the formatting differs, not the marketed release. Checked 2026-10-24. Lot 182-02112 page: 56.8%, 70cl, cask 2787, 2nd fill oloroso butt, distilled 20.07.2006, bottled 14.02.2023, bottle 049/623; winning bid £320. A retailer listing gives the same cask, years, strength and 623 bottles. Bottle 52158 has cask 2787, 2006, 2023, 16 years, 56.8%, 623. Production matched it but code added an edition-conflict risk (\"Cask #2787\" vs \"Cask 2787 · Fèis Ìle 2023\"). Current auction matching sends readCandidateImages:false, so the case does too; the saved run predates that and read candidate photos."
+  },
+  "expected": {
+    "status": "classified",
+    "action": "match",
+    "identityScope": "exact_cask",
+    "matchedBottleId": 52158,
+    "summary": "Match cask 2787 exactly. Edition wording that differs from the catalog does not make it another release."
+  }
+}

@@ -1,0 +1,538 @@
+{
+  "id": "auction-macallan-glasses-set",
+  "name": "auction title: a Macallan glasses set is not a Bottle",
+  "input": {
+    "reference": {
+      "id": 7654,
+      "url": "https://www.scotchwhiskyauctions.com/auctions/231-the-182nd-auction/891396-macallan-glasses-set/",
+      "name": "Macallan Glasses Set",
+      "imageUrl": null,
+      "externalSiteId": 28097,
+      "currentBottleId": null
+    },
+    "extractedIdentity": null,
+    "imageEvidence": null,
+    "initialCandidates": [
+      {
+        "abv": 56.3,
+        "brand": "The Scotch Malt Whisky Society",
+        "score": 30.658142,
+        "series": null,
+        "source": ["text"],
+        "bottler": "The Scotch Malt Whisky Society",
+        "edition": null,
+        "outturn": null,
+        "bottleId": 38217,
+        "category": "single_malt",
+        "fullName": "SMWS 55.87 The stage is set",
+        "reference": null,
+        "statedAge": 16,
+        "caskNumber": "55.87",
+        "comparison": {
+          "missing": [],
+          "conflicts": [],
+          "agreements": []
+        },
+        "distillery": ["Royal Brackla"],
+        "maturation": "First-fill ex-bodega Oloroso butt",
+        "releaseDay": null,
+        "singleCask": true,
+        "releaseYear": null,
+        "vintageYear": 2006,
+        "bottlingYear": null,
+        "caskStrength": null,
+        "releaseMonth": null,
+        "familyContext": {
+          "siblingBottles": []
+        }
+      },
+      {
+        "abv": 57.8,
+        "brand": "Karuizawa",
+        "score": 30.498499,
+        "series": "Snow Scenes",
+        "source": ["text"],
+        "bottler": null,
+        "edition": "Two Bottle Set",
+        "outturn": 162,
+        "bottleId": 52932,
+        "category": "single_malt",
+        "fullName": "Karuizawa Snow Scenes - Two Bottle Set",
+        "reference": null,
+        "statedAge": 35,
+        "caskNumber": "4322",
+        "comparison": {
+          "missing": [],
+          "conflicts": [],
+          "agreements": []
+        },
+        "distillery": ["Karuizawa"],
+        "maturation": "Sherry Cask",
+        "releaseDay": null,
+        "singleCask": true,
+        "releaseYear": 2016,
+        "vintageYear": 1981,
+        "bottlingYear": 2016,
+        "caskStrength": true,
+        "releaseMonth": null,
+        "familyContext": {
+          "siblingBottles": []
+        }
+      },
+      {
+        "abv": 57.2,
+        "brand": "Karuizawa",
+        "score": 30.498499,
+        "series": "Snow Scenes",
+        "source": ["text"],
+        "bottler": null,
+        "edition": "Two Bottle Set",
+        "outturn": 162,
+        "bottleId": 52933,
+        "category": "single_malt",
+        "fullName": "Karuizawa Snow Scenes - Two Bottle Set",
+        "reference": null,
+        "statedAge": 35,
+        "caskNumber": "7427",
+        "comparison": {
+          "missing": [],
+          "conflicts": [],
+          "agreements": []
+        },
+        "distillery": ["Karuizawa"],
+        "maturation": "Sherry Cask",
+        "releaseDay": null,
+        "singleCask": true,
+        "releaseYear": 2016,
+        "vintageYear": 1981,
+        "bottlingYear": 2016,
+        "caskStrength": true,
+        "releaseMonth": null,
+        "familyContext": {
+          "siblingBottles": []
+        }
+      },
+      {
+        "abv": 55.2,
+        "brand": "Karuizawa",
+        "score": 30.420732,
+        "series": "Ten Thousand Arrows",
+        "source": ["text"],
+        "bottler": "Hua Yang International Exhibition",
+        "edition": "Full Set",
+        "outturn": 257,
+        "bottleId": 52929,
+        "category": "single_malt",
+        "fullName": "Karuizawa Ten Thousand Arrows - Full Set",
+        "reference": null,
+        "statedAge": null,
+        "caskNumber": "2510",
+        "comparison": {
+          "missing": [],
+          "conflicts": [],
+          "agreements": []
+        },
+        "distillery": ["Karuizawa"],
+        "maturation": "Sherry Butt",
+        "releaseDay": null,
+        "singleCask": true,
+        "releaseYear": 2015,
+        "vintageYear": 1982,
+        "bottlingYear": 2015,
+        "caskStrength": true,
+        "releaseMonth": null,
+        "familyContext": {
+          "siblingBottles": []
+        }
+      },
+      {
+        "abv": 59.8,
+        "brand": "Karuizawa",
+        "score": 30.420732,
+        "series": "Ten Thousand Arrows",
+        "source": ["text"],
+        "bottler": "Hua Yang International Exhibition",
+        "edition": "Full Set",
+        "outturn": 257,
+        "bottleId": 52928,
+        "category": "single_malt",
+        "fullName": "Karuizawa Ten Thousand Arrows - Full Set",
+        "reference": null,
+        "statedAge": null,
+        "caskNumber": "6355",
+        "comparison": {
+          "missing": [],
+          "conflicts": [],
+          "agreements": []
+        },
+        "distillery": ["Karuizawa"],
+        "maturation": "Sherry Butt",
+        "releaseDay": null,
+        "singleCask": true,
+        "releaseYear": 2015,
+        "vintageYear": 1981,
+        "bottlingYear": 2015,
+        "caskStrength": true,
+        "releaseMonth": null,
+        "familyContext": {
+          "siblingBottles": []
+        }
+      },
+      {
+        "abv": 56.5,
+        "brand": "Karuizawa",
+        "score": 30.344288,
+        "series": "Ten Thousand Arrows",
+        "source": ["text"],
+        "bottler": "Hua Yang International Exhibition",
+        "edition": "Full Set",
+        "outturn": 257,
+        "bottleId": 52927,
+        "category": "single_malt",
+        "fullName": "Karuizawa Ten Thousand Arrows - Full Set",
+        "reference": null,
+        "statedAge": null,
+        "caskNumber": "8317",
+        "comparison": {
+          "missing": [],
+          "conflicts": [],
+          "agreements": []
+        },
+        "distillery": ["Karuizawa"],
+        "maturation": "Ex-Bourbon Cask",
+        "releaseDay": null,
+        "singleCask": true,
+        "releaseYear": 2015,
+        "vintageYear": 1980,
+        "bottlingYear": 2015,
+        "caskStrength": true,
+        "releaseMonth": null,
+        "familyContext": {
+          "siblingBottles": []
+        }
+      },
+      {
+        "abv": 59.5,
+        "brand": "Karuizawa",
+        "score": 29.498425,
+        "series": "Battle of Kawanakajima",
+        "source": ["text"],
+        "bottler": null,
+        "edition": "Two Bottle Set",
+        "outturn": 228,
+        "bottleId": 53149,
+        "category": "single_malt",
+        "fullName": "Karuizawa Battle of Kawanakajima - Two Bottle Set",
+        "reference": null,
+        "statedAge": 35,
+        "caskNumber": "7922",
+        "comparison": {
+          "missing": [],
+          "conflicts": [],
+          "agreements": []
+        },
+        "distillery": ["Karuizawa"],
+        "maturation": "Sherry Cask",
+        "releaseDay": null,
+        "singleCask": true,
+        "releaseYear": 2016,
+        "vintageYear": 1981,
+        "bottlingYear": 2016,
+        "caskStrength": true,
+        "releaseMonth": null,
+        "familyContext": {
+          "siblingBottles": []
+        }
+      },
+      {
+        "abv": 57.3,
+        "brand": "Karuizawa",
+        "score": 29.498425,
+        "series": "Battle of Kawanakajima",
+        "source": ["text"],
+        "bottler": null,
+        "edition": "Two Bottle Set",
+        "outturn": 228,
+        "bottleId": 53148,
+        "category": "single_malt",
+        "fullName": "Karuizawa Battle of Kawanakajima - Two Bottle Set",
+        "reference": null,
+        "statedAge": 35,
+        "caskNumber": "226",
+        "comparison": {
+          "missing": [],
+          "conflicts": [],
+          "agreements": []
+        },
+        "distillery": ["Karuizawa"],
+        "maturation": "Sherry Cask",
+        "releaseDay": null,
+        "singleCask": true,
+        "releaseYear": 2016,
+        "vintageYear": 1981,
+        "bottlingYear": 2016,
+        "caskStrength": true,
+        "releaseMonth": null,
+        "familyContext": {
+          "siblingBottles": []
+        }
+      },
+      {
+        "abv": 59.8,
+        "brand": "Karuizawa",
+        "score": 29.423271,
+        "series": "Ten Thousand Arrows",
+        "source": ["text"],
+        "bottler": "Hua Yang International Exhibition",
+        "edition": "Two Bottle Set",
+        "outturn": 89,
+        "bottleId": 55940,
+        "category": "single_malt",
+        "fullName": "Karuizawa Ten Thousand Arrows - Two Bottle Set",
+        "reference": null,
+        "statedAge": null,
+        "caskNumber": "6355",
+        "comparison": {
+          "missing": [],
+          "conflicts": [],
+          "agreements": []
+        },
+        "distillery": ["Karuizawa"],
+        "maturation": "Sherry Butt",
+        "releaseDay": null,
+        "singleCask": true,
+        "releaseYear": 2015,
+        "vintageYear": 1981,
+        "bottlingYear": 2015,
+        "caskStrength": true,
+        "releaseMonth": null,
+        "familyContext": {
+          "siblingBottles": []
+        }
+      },
+      {
+        "abv": 56.5,
+        "brand": "Karuizawa",
+        "score": 29.349375,
+        "series": "Ten Thousand Arrows",
+        "source": ["text"],
+        "bottler": "Hua Yang International Exhibition",
+        "edition": "Two Bottle Set",
+        "outturn": 89,
+        "bottleId": 52930,
+        "category": "single_malt",
+        "fullName": "Karuizawa Ten Thousand Arrows - Two Bottle Set",
+        "reference": null,
+        "statedAge": null,
+        "caskNumber": "8317",
+        "comparison": {
+          "missing": [],
+          "conflicts": [],
+          "agreements": []
+        },
+        "distillery": ["Karuizawa"],
+        "maturation": "Ex-Bourbon Cask",
+        "releaseDay": null,
+        "singleCask": true,
+        "releaseYear": 2015,
+        "vintageYear": 1980,
+        "bottlingYear": 2015,
+        "caskStrength": true,
+        "releaseMonth": null,
+        "familyContext": {
+          "siblingBottles": []
+        }
+      },
+      {
+        "abv": 56.7,
+        "brand": "Karuizawa",
+        "score": 27.424618,
+        "series": "The Great Battle of Yashima",
+        "source": ["text"],
+        "bottler": "Hua Yang International Exhibition",
+        "edition": "Single Bottle Set",
+        "outturn": 261,
+        "bottleId": 52924,
+        "category": "single_malt",
+        "fullName": "Karuizawa The Great Battle of Yashima - Single Bottle Set",
+        "reference": null,
+        "statedAge": 35,
+        "caskNumber": "164",
+        "comparison": {
+          "missing": [],
+          "conflicts": [],
+          "agreements": []
+        },
+        "distillery": ["Karuizawa"],
+        "maturation": "Sherry Cask",
+        "releaseDay": null,
+        "singleCask": true,
+        "releaseYear": 2016,
+        "vintageYear": 1981,
+        "bottlingYear": 2016,
+        "caskStrength": true,
+        "releaseMonth": null,
+        "familyContext": {
+          "siblingBottles": []
+        }
+      },
+      {
+        "abv": 57.4,
+        "brand": "Karuizawa",
+        "score": 27.424618,
+        "series": "The Great Battle of Yashima",
+        "source": ["text"],
+        "bottler": "Hua Yang International Exhibition",
+        "edition": "Two Bottle Set",
+        "outturn": 155,
+        "bottleId": 52926,
+        "category": "single_malt",
+        "fullName": "Karuizawa The Great Battle of Yashima - Two Bottle Set",
+        "reference": null,
+        "statedAge": 35,
+        "caskNumber": "4373",
+        "comparison": {
+          "missing": [],
+          "conflicts": [],
+          "agreements": []
+        },
+        "distillery": ["Karuizawa"],
+        "maturation": "Sherry Cask",
+        "releaseDay": null,
+        "singleCask": true,
+        "releaseYear": 2016,
+        "vintageYear": 1981,
+        "bottlingYear": 2016,
+        "caskStrength": true,
+        "releaseMonth": null,
+        "familyContext": {
+          "siblingBottles": []
+        }
+      },
+      {
+        "abv": 56.7,
+        "brand": "Karuizawa",
+        "score": 27.424618,
+        "series": "The Great Battle of Yashima",
+        "source": ["text"],
+        "bottler": "Hua Yang International Exhibition",
+        "edition": "Two Bottle Set",
+        "outturn": 155,
+        "bottleId": 52925,
+        "category": "single_malt",
+        "fullName": "Karuizawa The Great Battle of Yashima - Two Bottle Set",
+        "reference": null,
+        "statedAge": 35,
+        "caskNumber": "164",
+        "comparison": {
+          "missing": [],
+          "conflicts": [],
+          "agreements": []
+        },
+        "distillery": ["Karuizawa"],
+        "maturation": "Sherry Cask",
+        "releaseDay": null,
+        "singleCask": true,
+        "releaseYear": 2016,
+        "vintageYear": 1981,
+        "bottlingYear": 2016,
+        "caskStrength": true,
+        "releaseMonth": null,
+        "familyContext": {
+          "siblingBottles": []
+        }
+      },
+      {
+        "abv": 56.4,
+        "brand": "The Scotch Malt Whisky Society",
+        "score": 26.219408,
+        "series": null,
+        "source": ["text"],
+        "bottler": "The Scotch Malt Whisky Society",
+        "edition": null,
+        "outturn": null,
+        "bottleId": 56786,
+        "category": "single_malt",
+        "fullName": "SMWS 112.135 Set Sail for Sicily",
+        "reference": null,
+        "statedAge": 9,
+        "caskNumber": "112.135",
+        "comparison": {
+          "missing": [],
+          "conflicts": [],
+          "agreements": []
+        },
+        "distillery": ["Loch Lomond"],
+        "maturation": "First-fill barrel",
+        "releaseDay": null,
+        "singleCask": true,
+        "releaseYear": null,
+        "vintageYear": null,
+        "bottlingYear": null,
+        "caskStrength": null,
+        "releaseMonth": null,
+        "familyContext": {
+          "siblingBottles": []
+        }
+      },
+      {
+        "abv": 63.1,
+        "brand": "The Scotch Malt Whisky Society",
+        "score": 23.986397,
+        "series": null,
+        "source": ["text"],
+        "bottler": "The Scotch Malt Whisky Society",
+        "edition": null,
+        "outturn": null,
+        "bottleId": 43424,
+        "category": "single_malt",
+        "fullName": "SMWS 115.30 Superb and surprising!",
+        "reference": null,
+        "statedAge": 9,
+        "caskNumber": "115.30",
+        "comparison": {
+          "missing": [],
+          "conflicts": [],
+          "agreements": []
+        },
+        "distillery": ["Knockdhu"],
+        "maturation": "refill htmc hogshead",
+        "releaseDay": null,
+        "singleCask": true,
+        "releaseYear": null,
+        "vintageYear": 2014,
+        "bottlingYear": null,
+        "caskStrength": null,
+        "releaseMonth": null,
+        "familyContext": {
+          "siblingBottles": []
+        }
+      }
+    ],
+    "readCandidateImages": false
+  },
+  "context": {
+    "inspectedBottleIds": [],
+    "bottleContexts": [],
+    "inspectedEntities": [],
+    "inspectedSeries": []
+  },
+  "provenance": {
+    "source": "production_miss",
+    "verifiedSourceUrls": [
+      "https://www.scotchwhiskyauctions.com/auctions/231-the-182nd-auction/891396-macallan-glasses-set/"
+    ],
+    "dbOutcome": {
+      "bottleId": null,
+      "createsBottle": false,
+      "summary": "Production returned no_match."
+    },
+    "notes": "Captured from saved classifier run 25182 (auction_lot 7654, model null, 2026-10-02T17:14:19.905Z). Production rationale: The source title and auction URL identify a Macallan glasses set, not a marketed whisky bottle. The source page could not be read, and there is no evidence supporting a Bottle match or creation. Checked 2026-10-24. Lot 182-03021 page: Macallan Glasses Set, no whisky listed; winning bid £35. The gift-set ignore patterns do not match \"Glasses Set\". Search evidence is empty to keep the title-only input. Current auction matching sends readCandidateImages:false, so the case does too; the saved run predates that and read candidate photos."
+  },
+  "expected": {
+    "status": "classified",
+    "action": "no_match",
+    "identityScope": "product",
+    "summary": "Do not match or create a Bottle for glassware."
+  }
+}

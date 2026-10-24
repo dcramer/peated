@@ -18,6 +18,19 @@ updated worker before the API accepts requests; it must know the
 Deployment preserves saved checks, assignments, results, and the source schedule.
 It does not rerun the matching backlog.
 
+## Rollout status
+
+Checked October 24, 2026; details in the
+[production check](../research/2026-10-24-auction-production-check.md).
+
+- Done: deploy with `0321_auction_details`; first manual run (October 1);
+  source health and runs read after deploy; hammer prices and 20 matches
+  spot-checked against lot pages.
+- Not done: any detail read; any recheck of the 6,194 lots in review (all
+  checked under older rules); the 184th auction, which ended October 11
+  before collection; a current open-auction check and timed full run; an
+  automatic schedule.
+
 ## Collection checks and scheduling
 
 The first completed production run on October 1, 2026 took 3 hours 51 minutes,
