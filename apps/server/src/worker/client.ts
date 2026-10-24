@@ -75,25 +75,43 @@ export function buildUniqueJobOptions(
  * state. Failed jobs keep their ID for three days, and completed unique jobs
  * queued before removeOnComplete was set are kept forever, so either would
  * silently block the same work from queueing again. Remove a finished job
- * first; leave waiting or active work alone.
+ * first. A waiting or delayed job absorbs the push, because it has not read
+ * anything yet. A running job may already have read older data, so the push
+ * queues one follow-up under a second ID instead of being dropped.
  */
 type QueuedJobLookup = {
   getJob(jobId: string): Promise<
     | {
-        isCompleted(): Promise<boolean>;
-        isFailed(): Promise<boolean>;
+        getState(): Promise<string>;
         remove(): Promise<void>;
       }
     | undefined
   >;
 };
 
-export async function removeFinishedJob(queue: QueuedJobLookup, jobId: string) {
+async function clearFinishedJob(
+  queue: QueuedJobLookup,
+  jobId: string,
+): Promise<string | undefined> {
   const existing = await queue.getJob(jobId);
-  if (!existing) return;
-  if ((await existing.isCompleted()) || (await existing.isFailed())) {
+  if (!existing) return undefined;
+  const state = await existing.getState();
+  if (state === "completed" || state === "failed") {
     await existing.remove();
+    return undefined;
   }
+  return state;
+}
+
+/** Returns the job ID a unique push should use. */
+export async function claimUniqueJobId(
+  queue: QueuedJobLookup,
+  jobId: string,
+): Promise<string> {
+  if ((await clearFinishedJob(queue, jobId)) !== "active") return jobId;
+  const followUpId = `${jobId}-rerun`;
+  await clearFinishedJob(queue, followUpId);
+  return followUpId;
 }
 
 /**
@@ -110,7 +128,7 @@ async function pushJobToQueue(
   }
   const uniqueOpts = buildUniqueJobOptions(jobName, args, opts);
   const queue = await getQueue(registry.getQueueName(jobName));
-  await removeFinishedJob(queue, uniqueOpts.jobId!);
+  uniqueOpts.jobId = await claimUniqueJobId(queue, uniqueOpts.jobId!);
   return await addJobToQueue(jobName, args, uniqueOpts);
 }
 

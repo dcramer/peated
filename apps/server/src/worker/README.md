@@ -103,9 +103,12 @@ stats. Leave it plain when every push is separate work, such as one
 notification or one report, or when the caller sets its own `jobId`.
 
 A unique push uses a job ID built from the job name and all of its arguments,
-waits 5 seconds by default, and is dropped while the same job is still waiting
-or running. A unique job ID that still exists blocks a new add, so `pushJob`
-removes a completed or failed job with the same ID before queueing again.
+and waits 5 seconds by default. A push is absorbed by the same job while it is
+still waiting, because that job has not read anything yet. While the same job
+is running, it may already have read older data, so the push queues one
+follow-up job (ID ending in `-rerun`) instead. A unique job ID that still exists
+blocks a new add, so `pushJob` removes a completed or failed job with that ID
+before queueing again.
 Callers may still pass `delay` or removal options; a unique job always keeps
 its generated ID.
 

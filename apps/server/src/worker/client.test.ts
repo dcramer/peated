@@ -2,8 +2,8 @@ import type { JobsOptions } from "bullmq";
 import { expect, test, vi } from "vitest";
 import {
   buildUniqueJobOptions,
+  claimUniqueJobId,
   generateUniqIdentifier,
-  removeFinishedJob,
 } from "./client";
 import registry from "./registry";
 
@@ -29,33 +29,61 @@ test("keeps explicit unique job options", () => {
   ).toMatchObject(options);
 });
 
-test("removes a finished job with the same unique ID so the work can queue again", async () => {
-  for (const finished of [
-    { isCompleted: async () => true, isFailed: async () => false },
-    { isCompleted: async () => false, isFailed: async () => true },
-  ]) {
-    const remove = vi.fn();
-    const queue = { getJob: async () => ({ ...finished, remove }) };
+function fakeQueue(states: Record<string, string>) {
+  const removed: string[] = [];
+  return {
+    removed,
+    async getJob(jobId: string) {
+      const state = states[jobId];
+      if (!state) return undefined;
+      return {
+        getState: async () => state,
+        remove: async () => {
+          removed.push(jobId);
+        },
+      };
+    },
+  };
+}
 
-    await removeFinishedJob(queue, "IndexBottleSearch-1");
+test("reuses the unique ID after removing a finished job", async () => {
+  for (const state of ["completed", "failed"]) {
+    const queue = fakeQueue({ "UpdateBottleStats-1": state });
 
-    expect(remove).toHaveBeenCalledOnce();
+    await expect(claimUniqueJobId(queue, "UpdateBottleStats-1")).resolves.toBe(
+      "UpdateBottleStats-1",
+    );
+    expect(queue.removed).toEqual(["UpdateBottleStats-1"]);
   }
 });
 
-test("keeps an unfinished job with the same unique ID", async () => {
-  const remove = vi.fn();
-  const queue = {
-    getJob: async () => ({
-      isCompleted: async () => false,
-      isFailed: async () => false,
-      remove,
-    }),
-  };
+test("lets a waiting or delayed job absorb the push", async () => {
+  for (const state of ["waiting", "delayed"]) {
+    const queue = fakeQueue({ "UpdateBottleStats-1": state });
 
-  await removeFinishedJob(queue, "IndexBottleSearch-1");
+    await expect(claimUniqueJobId(queue, "UpdateBottleStats-1")).resolves.toBe(
+      "UpdateBottleStats-1",
+    );
+    expect(queue.removed).toEqual([]);
+  }
+});
 
-  expect(remove).not.toHaveBeenCalled();
+test("queues one follow-up behind a running job so a later write is not lost", async () => {
+  const queue = fakeQueue({ "UpdateBottleStats-1": "active" });
+
+  await expect(claimUniqueJobId(queue, "UpdateBottleStats-1")).resolves.toBe(
+    "UpdateBottleStats-1-rerun",
+  );
+
+  // A finished follow-up from an earlier run is cleared so it can queue again.
+  const withOldFollowUp = fakeQueue({
+    "UpdateBottleStats-1": "active",
+    "UpdateBottleStats-1-rerun": "completed",
+  });
+  await expect(
+    claimUniqueJobId(withOldFollowUp, "UpdateBottleStats-1"),
+  ).resolves.toBe("UpdateBottleStats-1-rerun");
+  expect(withOldFollowUp.removed).toEqual(["UpdateBottleStats-1-rerun"]);
 });
 
 test("registration makes every push of derived-data work unique", () => {
