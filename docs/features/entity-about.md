@@ -159,8 +159,8 @@ Merging Entities combines their About documents. Site facts that do not apply
 to the destination's kind are dropped, and so is an acquisition by the
 destination itself. A merge never reveals a page a moderator hid: a hidden
 page's content joins only a destination that is hidden or new, and a new
-page then starts hidden. Links to a merged Entity are followed to the Entity
-it became when the page or history is read, and an acquisition by an owner
+page then starts hidden. Links to a merged Entity are followed, through every
+later merge, to the Entity it became when the page or history is read, and an acquisition by an owner
 that was merged into the page's own Entity is hidden. A new link must name an
 Entity that exists or was merged; a deleted one is rejected. Merges and the
 backfill move stored links as they are.
