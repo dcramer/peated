@@ -20,12 +20,14 @@ import {
   ABOUT_WRITER_SYSTEM_ACTOR_KEY,
   getSystemActorForDatabase,
 } from "@peated/server/lib/actors";
-import { reviewAboutDraft } from "@peated/server/lib/entityAbout/checks";
+import {
+  keepFoundEntityLinks,
+  reviewAboutDraft,
+} from "@peated/server/lib/entityAbout/checks";
 import { getPublishedLeadText } from "@peated/server/lib/entityAbout/publicAbout";
 import {
   EntityAboutWriteError,
   getEntityAbout,
-  linkOwnersByName,
   loadLinkedEntities,
   saveEntityAbout,
   type StoredEntityAbout,
@@ -131,7 +133,11 @@ export async function writeEntityAbout(
   let errors: string[] = [];
   let accepted = null;
   for (let attempt = 0; attempt < MAX_ATTEMPTS && !accepted; attempt += 1) {
-    const { draft, pagesRead } = await services.writer({
+    const {
+      draft,
+      pagesRead,
+      entitiesFound = [],
+    } = await services.writer({
       entityId: entity.id,
       name: entity.name,
       kind: entity.kind,
@@ -159,11 +165,16 @@ export async function writeEntityAbout(
     );
     // An item the schema rejected is a reason to retry, not a silent gap.
     errors = [...converted.errors, ...reviewed.errors];
-    if (!errors.length) accepted = reviewed.document;
+    if (!errors.length) {
+      accepted = keepFoundEntityLinks(
+        reviewed.document,
+        entitiesFound,
+        current?.document ?? null,
+      );
+    }
   }
   if (!accepted) return rejected(entity.id, errors);
 
-  const document = await linkOwnersByName(db, accepted);
   let saved;
   try {
     saved = await db.transaction(async (tx) => {
@@ -184,7 +195,7 @@ export async function writeEntityAbout(
       // retried from the new page.
       const result = await saveEntityAbout(tx, {
         entity,
-        document,
+        document: accepted,
         expectedVersion: current?.version ?? null,
         actor,
         checkedOn: services.now().toISOString().slice(0, 10),

@@ -76,6 +76,34 @@ function quotesState(quotes: readonly string[], value: string) {
 }
 
 /**
+ * Link rule (owner: docs/features/entity-about.md): an event links an Entity
+ * only by an ID that Entity search returned in this run, or one the current
+ * page already has. Any other ID is cleared; the names stay.
+ */
+export function keepFoundEntityLinks(
+  document: EntityAboutDocument,
+  entitiesFound: readonly number[],
+  current: EntityAboutDocument | null,
+): EntityAboutDocument {
+  const allowed = new Set([
+    ...entitiesFound,
+    ...(current?.events ?? []).flatMap((event) =>
+      [event.newOwnerId, event.relatedEntityId].filter((id) => id !== null),
+    ),
+  ]);
+  const keep = (id: number | null) =>
+    id !== null && allowed.has(id) ? id : null;
+  return {
+    ...document,
+    events: document.events.map((event) => ({
+      ...event,
+      newOwnerId: keep(event.newOwnerId),
+      relatedEntityId: keep(event.relatedEntityId),
+    })),
+  };
+}
+
+/**
  * Evidence rule (owner: docs/features/entity-about.md): a citation stands
  * only when its quote appears on a page read in the same run, or is the same
  * quote from the same page as one the current page already has, and states

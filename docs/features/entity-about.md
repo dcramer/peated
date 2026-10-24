@@ -107,8 +107,8 @@ links to the About page only when that page exists.
 
 ## How The Job Writes A Page
 
-`writeEntityAbout` makes one model call with web search and page-reading
-tools and fixed limits. The model gets the Entity's fields, its notes, its
+`writeEntityAbout` makes one model call with web search, page-reading, and
+Entity search tools, and fixed web limits. The model gets the Entity's fields, its notes, its
 history timeline, and the current page, and returns the complete next
 version. It may keep, correct, add, or drop anything. Code then checks it:
 
@@ -139,9 +139,13 @@ check: a page a moderator edited during the run fails it, and the job is
 retried from the new page. A bad run is undone by restoring an earlier
 version from the change log.
 
-New owners are stored by name. When exactly one Entity or alias has that
-name, the job links it, and the page shows a link while that Entity exists,
-following merges to the Entity it became. Otherwise the page shows the name.
+New owners are always stored by name. The writer links an owner, or another
+Entity an event is about, with an Entity search tool that uses the same
+search as the classifiers (`searchClassifierEntities`). The job keeps a link
+only when that search returned the ID in this run or the current page already
+has it, so a moderator's link carries over. The page shows a link while that
+Entity exists, following merges to the Entity it became. Otherwise it shows
+the name.
 
 A model check runs this job on 5 Entities with saved pages instead of the
 live web: `apps/server/src/agents/entityAbout/writer.eval.test.ts`. Each case

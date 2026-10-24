@@ -95,8 +95,7 @@ reviewed place.
 
 **The document**
 
-- `sources`: list of `{ id, url, title, publisher, publishedOn, kind,
-status }`.
+- `sources`: list of `{ id, url, title, publisher, publishedOn, kind }`.
   `kind` is `official`, `reference`, or `press`.
   `url` is unique within the document.
 - `events`: list of `{ id, kind, date, endDate, continuing, name, title,
@@ -144,8 +143,10 @@ schema):
   earlier version.
 - **Entity links:** `relatedEntityId` and `newOwnerId` are optional links
   with no database foreign keys.
-  - An acquisition always stores the owner's name (`newOwnerName`). The job
-    links it when exactly one Entity or alias has that name.
+  - An acquisition always stores the owner's name (`newOwnerName`). The
+    writer sets IDs from an Entity search tool built on the classifiers'
+    `searchClassifierEntities`; the job keeps an ID only when that search
+    returned it in the run or the current page has it.
   - Reads resolve merged Entities through `entity_tombstone` and show a link
     while the Entity exists, else the name. A merge never edits documents.
   - The pipeline never creates Entities.
@@ -229,9 +230,8 @@ that the pick is one of the stated values.
 `docs/policies/background-work.md` requires.
 
 1. **One model call with tools.**
-   - Tools: the existing web search and page-fetch tools from
-     `packages/bottle-classifier`, with a fixed limit of searches and page
-     reads.
+   - Tools: web search and page fetch, with a fixed limit of searches and
+     page reads, and Entity search over the classifiers' search.
    - Input: the Entity's name, kind, location, owner, aliases, its notes,
      its history timeline, the current page, the field list, the style
      rules, and two examples written by people (Brora and one brand).

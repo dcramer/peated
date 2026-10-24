@@ -4,6 +4,7 @@ import type { AboutPageRead } from "@peated/server/lib/entityAbout/checks";
 import { createOpenAIClient } from "@peated/server/lib/openaiClient";
 
 import { AboutDraftSchema, type AboutDraft } from "./draftSchema";
+import { createEntitySearchTool } from "./entitySearch";
 import {
   buildEntityAboutInput,
   ENTITY_ABOUT_INSTRUCTIONS,
@@ -22,6 +23,8 @@ export const ABOUT_WEB_BUDGET: WebBudget = { searches: 6, reads: 8 };
 export type EntityAboutWriterResult = {
   draft: AboutDraft;
   pagesRead: AboutPageRead[];
+  /** Entity IDs that search_entities returned in this run. */
+  entitiesFound?: number[];
 };
 
 export type EntityAboutWriter = (
@@ -37,11 +40,15 @@ export function createEntityAboutWriter(
 ): EntityAboutWriter {
   return async (input) => {
     const pagesRead: AboutPageRead[] = [];
-    const tools = createAboutWebTools({
-      source: getSource(),
-      budget: ABOUT_WEB_BUDGET,
-      pagesRead,
-    });
+    const entitiesFound = new Set<number>();
+    const tools = [
+      ...createAboutWebTools({
+        source: getSource(),
+        budget: ABOUT_WEB_BUDGET,
+        pagesRead,
+      }),
+      createEntitySearchTool(entitiesFound),
+    ];
 
     const agent = new Agent({
       name: "entity_about_writer",
@@ -69,11 +76,12 @@ export function createEntityAboutWriter(
     return {
       draft: AboutDraftSchema.parse(result.finalOutput),
       pagesRead,
+      entitiesFound: [...entitiesFound],
     };
   };
 }
 
-/** One writer run on the live web: one agent with web search and page reading. */
+/** One writer run on the live web: one agent with web search, page reading, and Entity search. */
 export const runEntityAboutWriter = createEntityAboutWriter(() => {
   if (!config.FIRECRAWL_API_KEY) {
     throw new Error("FIRECRAWL_API_KEY is not configured");

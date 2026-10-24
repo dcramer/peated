@@ -39,6 +39,8 @@ function draft(
         title: null,
         text: null,
         newOwnerName: null,
+        newOwnerId: null,
+        relatedEntityId: null,
         citations: [
           {
             sourceId: "wp",
@@ -57,6 +59,8 @@ function draft(
         title: null,
         text: null,
         newOwnerName: null,
+        newOwnerId: null,
+        relatedEntityId: null,
         citations: [
           {
             sourceId: "wp",
@@ -324,17 +328,20 @@ describe("writeEntityAbout", () => {
     expect(result).toEqual({ status: "saved", version: 2 });
   });
 
-  test("links a new owner to the Entity of that name", async ({ fixtures }) => {
+  test("links an owner only by an ID Entity search returned", async ({
+    fixtures,
+  }) => {
     const entity = await fixtures.Entity({ kind: "distillery" });
     const owner = await fixtures.Entity({
       name: "Distillers Company",
       kind: "company",
     });
+    const other = await fixtures.Entity({ kind: "company" });
     const acquiredPage = {
       url: page.url,
       text: `${page.text} The Distillers Company bought it in 1925.`,
     };
-    const acquired: AboutDraft = {
+    const acquired = (newOwnerId: number): AboutDraft => ({
       ...goodDraft,
       events: [
         ...goodDraft.events,
@@ -348,6 +355,8 @@ describe("writeEntityAbout", () => {
           title: null,
           text: null,
           newOwnerName: "Distillers Company",
+          newOwnerId,
+          relatedEntityId: null,
           citations: [
             {
               sourceId: "wp",
@@ -357,18 +366,45 @@ describe("writeEntityAbout", () => {
           ],
         },
       ],
-    };
+    });
+    const ownerOf = async () =>
+      (await getEntityAbout(db, entity.id))?.document.events.find(
+        ({ id }) => id === 3,
+      );
+
+    // An ID no search returned is cleared; the name stays.
+    await writeEntityAbout(
+      { entityId: entity.id },
+      services(async () => ({
+        draft: acquired(other.id),
+        pagesRead: [acquiredPage],
+        entitiesFound: [owner.id],
+      })),
+    );
+    expect(await ownerOf()).toMatchObject({
+      newOwnerName: "Distillers Company",
+      newOwnerId: null,
+    });
 
     await writeEntityAbout(
       { entityId: entity.id },
-      services(async () => ({ draft: acquired, pagesRead: [acquiredPage] })),
+      services(async () => ({
+        draft: acquired(owner.id),
+        pagesRead: [acquiredPage],
+        entitiesFound: [owner.id],
+      })),
     );
+    expect(await ownerOf()).toMatchObject({ newOwnerId: owner.id });
 
-    const about = await getEntityAbout(db, entity.id);
-    expect(about?.document.events.find(({ id }) => id === 3)).toMatchObject({
-      newOwnerName: "Distillers Company",
-      newOwnerId: owner.id,
-    });
+    // A link the current page has carries over without a new search.
+    await writeEntityAbout(
+      { entityId: entity.id },
+      services(async () => ({
+        draft: acquired(owner.id),
+        pagesRead: [acquiredPage],
+      })),
+    );
+    expect(await ownerOf()).toMatchObject({ newOwnerId: owner.id });
   });
 
   test("drops site facts that do not apply to the kind", async ({

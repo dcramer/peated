@@ -63,19 +63,13 @@ SHALL be removed on save.
 
 The system SHALL store each public web page that supports a fact as a source in
 the Entity's About document, with its URL, title, publisher, publication date
-when known, and status. Two sources in one document SHALL NOT share a
+when known. Two sources in one document SHALL NOT share a
 normalized URL.
 
 #### Scenario: Same page cited twice
 
 - **WHEN** two events on one Entity cite the same Wikipedia page
 - **THEN** both citations point to one source in that document
-
-#### Scenario: Source page moves
-
-- **WHEN** a later run or a moderator finds that a source URL no longer loads
-- **THEN** the source is marked unavailable and its citations remain, so the
-  facts can be checked again
 
 ### Requirement: Citations carry the stated value
 

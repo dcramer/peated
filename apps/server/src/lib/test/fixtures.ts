@@ -508,7 +508,6 @@ export const EntityAbout = async (
       publisher: "Example",
       publishedOn: null,
       kind: "reference",
-      status: "available",
     },
   ];
   const document = EntityAboutDocumentSchema.parse({

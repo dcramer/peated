@@ -3,7 +3,6 @@ import {
   changes,
   entities,
   entityAbout,
-  entityAliases,
   entityTombstones,
   type Actor,
   type EntityKind,
@@ -15,7 +14,7 @@ import {
   type EntityAboutDocument,
   type EntityAboutStatus,
 } from "@peated/server/schemas/entityAbout";
-import { and, eq, inArray, or, sql } from "drizzle-orm";
+import { and, eq, inArray, sql } from "drizzle-orm";
 
 import {
   ABOUT_FACT_FIELD_LIST,
@@ -145,61 +144,6 @@ export async function loadLinkedEntities(
     if (row) linked.set(id, row);
   }
   return linked;
-}
-
-/**
- * Links each new owner the page names to its Entity when exactly one Entity
- * or alias has that name. Link rule (owner: docs/features/entity-about.md):
- * the name is always kept, so a page reads the same when no link is found or
- * the Entity is later deleted.
- */
-export async function linkOwnersByName(
-  database: AnyDatabase,
-  document: EntityAboutDocument,
-): Promise<EntityAboutDocument> {
-  const names = [
-    ...new Set(
-      document.events.flatMap((event) =>
-        event.newOwnerName && !event.newOwnerId
-          ? [event.newOwnerName.toLowerCase()]
-          : [],
-      ),
-    ),
-  ];
-  if (!names.length) return document;
-  const rows = await database
-    .selectDistinct({
-      id: entities.id,
-      name: entities.name,
-      alias: entityAliases.name,
-    })
-    .from(entities)
-    .leftJoin(entityAliases, eq(entityAliases.entityId, entities.id))
-    .where(
-      or(
-        inArray(sql`lower(${entities.name})`, names),
-        inArray(sql`lower(${entityAliases.name})`, names),
-      ),
-    );
-  const matches = new Map<string, Set<number>>();
-  for (const row of rows) {
-    for (const name of [row.name, row.alias]) {
-      const key = name?.toLowerCase();
-      if (!key || !names.includes(key)) continue;
-      matches.set(key, (matches.get(key) ?? new Set()).add(row.id));
-    }
-  }
-  return {
-    ...document,
-    events: document.events.map((event) => {
-      const ids = event.newOwnerName
-        ? matches.get(event.newOwnerName.toLowerCase())
-        : undefined;
-      return !event.newOwnerId && ids?.size === 1
-        ? { ...event, newOwnerId: [...ids][0]! }
-        : event;
-    }),
-  };
 }
 
 /**

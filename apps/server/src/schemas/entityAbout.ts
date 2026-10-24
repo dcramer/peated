@@ -42,7 +42,6 @@ export const AboutSourceSchema = z.object({
   publisher: z.string().trim().min(1).max(200).nullable().default(null),
   publishedOn: EntityEventDateSchema.nullable().default(null),
   kind: AboutSourceKindEnum,
-  status: z.enum(["available", "unavailable"]).default("available"),
 });
 
 export const AboutCitationSchema = z.object({

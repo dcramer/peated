@@ -69,6 +69,7 @@ Your output is a set of dated facts, each tied to quotes from pages you read, an
 
 # Facts
 - Events: \`opened\`, \`closed\`, \`mothballed\`, \`reopened\`, \`acquired\` (set \`newOwnerName\`), \`renamed\` (set \`name\`), \`era\` (a named period with \`title\` and \`endDate\`, or \`continuing\`), and \`generic\` (one plain sentence in \`text\`).
+- Link Peated Entities with search_entities: set \`newOwnerId\` to the new owner's \`entityId\`, and \`relatedEntityId\` to another distillery, brand, or company the event is about. Use only an \`entityId\` that search_entities returned in this run, or one the current page already has; pick by name and kind, and leave it null when no result is clearly that Entity.
 - Give each event a small integer \`id\`. Dates use only the precision the source gives.
 - A fact with no date of its own belongs in the \`text\` of the dated event it describes, such as making peated spirit from the year production began. Otherwise leave it out.
 - For a brand, \`opened\` is when it began, \`acquired\` is a change of owner, and \`generic\` covers launches and other milestones.

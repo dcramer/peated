@@ -3,8 +3,8 @@
 ### Requirement: One job writes an About document
 
 The `writeEntityAbout` job SHALL make one model call per run. The model SHALL
-search and read public pages with the existing web search and page-fetch
-tools, and SHALL return the complete next version of the About page:
+search and read public pages with web search and page-fetch tools, look up
+Peated Entities with Entity search, and SHALL return the complete next version of the About page:
 sources, events, site facts, and sections. The model SHALL get the Entity's
 fields, its notes, its history timeline, and the current page, and MAY keep,
 correct, add, or drop anything. The job SHALL run for one Entity at a time and
@@ -134,17 +134,24 @@ writer reads supports it.
   states it
 - **THEN** the page includes a closing event in 1983
 
-### Requirement: Owners are linked by name
+### Requirement: Entities are linked from Entity search
 
-An acquisition SHALL store the new owner's name. The job SHALL link it to an
-Entity when exactly one Entity or alias has that name, and SHALL NOT create
-Entities.
+An acquisition SHALL store the new owner's name. The writer SHALL link an
+owner or another Entity only by an ID that Entity search returned in the run
+or that the current page already has; the job SHALL clear any other ID and
+SHALL NOT create Entities.
 
-#### Scenario: One match
+#### Scenario: Search result
 
-- **WHEN** a draft names "Distillers Company" as the new owner and one Entity
-  has that name
+- **WHEN** Entity search returned "Distillers Company" and the draft links it
+  as the new owner
 - **THEN** the event stores the name and links that Entity
+
+#### Scenario: Unknown ID
+
+- **WHEN** a draft links an Entity ID no search returned and the current page
+  does not have
+- **THEN** the link is cleared and the name stays
 
 ### Requirement: Runs happen on request
 

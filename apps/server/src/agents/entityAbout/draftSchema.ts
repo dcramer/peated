@@ -66,6 +66,20 @@ export const AboutDraftSchema = z.object({
         .string()
         .nullable()
         .describe("For `acquired`, the new owner's name."),
+      newOwnerId: z
+        .number()
+        .int()
+        .nullable()
+        .describe(
+          "For `acquired`, the new owner's `entityId` from search_entities. Null when no result is that owner.",
+        ),
+      relatedEntityId: z
+        .number()
+        .int()
+        .nullable()
+        .describe(
+          "The `entityId` from search_entities of another distillery, brand, or company this event is about, such as the distillery a brand moved to. Null otherwise.",
+        ),
       citations: z.array(CitationSchema),
     }),
   ),
@@ -116,20 +130,13 @@ export function draftToDocument(draft: AboutDraft) {
   };
 
   const sources = draft.sources.flatMap((source) => {
-    const parsed = AboutSourceSchema.safeParse({
-      ...source,
-      status: "available",
-    });
+    const parsed = AboutSourceSchema.safeParse(source);
     if (!parsed.success) reject(`source ${source.id}`, parsed.error);
     return parsed.success ? [parsed.data] : [];
   });
 
   const events = draft.events.flatMap((event) => {
-    const parsed = AboutEventSchema.safeParse({
-      ...event,
-      relatedEntityId: null,
-      newOwnerId: null,
-    });
+    const parsed = AboutEventSchema.safeParse(event);
     if (!parsed.success) reject(`event ${event.id}`, parsed.error);
     return parsed.success ? [parsed.data] : [];
   });
@@ -183,7 +190,7 @@ export function documentToDraft(document: EntityAboutDocument): AboutDraft {
         : [],
     );
   return {
-    sources: document.sources.map(({ status: _status, ...source }) => source),
+    sources: document.sources,
     events: document.events.map((event) => ({
       id: event.id,
       kind: event.kind,
@@ -194,6 +201,8 @@ export function documentToDraft(document: EntityAboutDocument): AboutDraft {
       title: event.title,
       text: event.text,
       newOwnerName: event.newOwnerName,
+      newOwnerId: event.newOwnerId,
+      relatedEntityId: event.relatedEntityId,
       citations: citations(event.citations),
     })),
     siteFacts: ABOUT_FACT_FIELD_LIST.flatMap((field) => {

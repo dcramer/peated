@@ -9,7 +9,6 @@ const sources: AboutSource[] = [
     publisher: "Historic Environment Scotland",
     publishedOn: null,
     kind: "official",
-    status: "available",
   },
   {
     id: "wp",
@@ -18,7 +17,6 @@ const sources: AboutSource[] = [
     publisher: "Wikipedia",
     publishedOn: null,
     kind: "reference",
-    status: "available",
   },
 ];
 
