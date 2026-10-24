@@ -28,6 +28,16 @@ export default async function ProfilePageRoute(props: {
   const queryClient = getQueryClient();
   const orpc = createTanstackQueryUtils(client);
   await Promise.all([
+    // The rail names a brand or producer picked from search; render it now.
+    ...(tastingInput.entity === undefined
+      ? []
+      : [
+          queryClient.prefetchQuery(
+            orpc.entities.details.queryOptions({
+              input: { entity: tastingInput.entity },
+            }),
+          ),
+        ]),
     queryClient.prefetchQuery(profileQueries.regions(orpc, user.id)),
     queryClient.prefetchQuery(profileQueries.tastingStats(orpc, user.id)),
     queryClient.prefetchQuery(profileQueries.tastings(orpc, tastingInput)),

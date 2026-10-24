@@ -20,7 +20,8 @@ import { foundationStyles } from "../../../../styles/foundations.stylex";
 import { space } from "../../../../styles/tokens.stylex";
 
 const SEARCH_DEBOUNCE_MS = 140;
-const scopeCopy = {
+/** Labels and messages for each list the search covers. */
+export const profileBottleSearchCopy = {
   library: {
     empty: "No brands, producers, or bottles in this library match.",
     label: "Find in this library",
@@ -62,7 +63,7 @@ export function ProfileBottleSearch({
     setSearchText,
     SEARCH_DEBOUNCE_MS,
   );
-  const copy = scopeCopy[scope];
+  const copy = profileBottleSearchCopy[scope];
   const searchRoute =
     scope === "library" ? orpc.users.librarySearch : orpc.users.tastingSearch;
   const searchQuery = useQuery({

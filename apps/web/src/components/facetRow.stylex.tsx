@@ -8,6 +8,7 @@ import {
   effects,
   fonts,
 } from "../styles/tokens.stylex";
+import { LoadingText } from "./feedback.stylex";
 
 type AvailableFacet = {
   count: number;
@@ -90,6 +91,24 @@ export function FacetRow({
         {available && selected ? "×" : null}
       </span>
     </button>
+  );
+}
+
+/** Reserves one counted facet row while its counts load. */
+export function FacetRowLoading() {
+  return (
+    <div aria-hidden="true" {...stylex.props(styles.row, styles.unavailable)}>
+      <span {...stylex.props(foundationStyles.interactiveSmall, styles.label)}>
+        <LoadingText width="70%" />
+      </span>
+      <span {...stylex.props(styles.trackSlot)}>
+        <span {...stylex.props(styles.track)} />
+      </span>
+      <span {...stylex.props(foundationStyles.metadata, styles.count)}>
+        <LoadingText width="2ch" />
+      </span>
+      <span {...stylex.props(styles.dismissSlot)} />
+    </div>
   );
 }
 

@@ -9,9 +9,11 @@ import {
 import { colors, space } from "../styles/tokens.stylex";
 import {
   BottleIdentityRow,
+  BottleIdentityRowLoading,
   type BottleIdentityRowProps,
 } from "./bottleIdentityRow.stylex";
 import { CatalogTable, type CatalogTableColumn } from "./catalogTable.stylex";
+import { LoadingText } from "./feedback.stylex";
 import { TastingRating, type RatingBand } from "./scoring.stylex";
 import { Timestamp } from "./timestamp";
 
@@ -29,6 +31,20 @@ export type TastingTableItem = Pick<
   /** When the member had the dram. */
   tastedAt: string;
 };
+
+// The finished table and its loading view share these headers and widths.
+const columnLayout = {
+  date: { header: "Date", key: "date", priority: "secondary", width: "date" },
+  bottle: { header: "Bottle", key: "bottle" },
+  abv: {
+    align: "right",
+    header: "ABV",
+    key: "abv",
+    priority: "secondary",
+    width: "figure",
+  },
+  rating: { align: "right", header: "Rating", key: "rating", width: "rating" },
+} as const satisfies Record<string, Omit<CatalogTableColumn<unknown>, "cell">>;
 
 export type TastingTableProps = {
   caption: string;
@@ -50,10 +66,7 @@ export function TastingTable({ caption, items }: TastingTableProps) {
           <Timestamp date={item.tastedAt} format="date" />
         </span>
       ),
-      header: "Date",
-      key: "date",
-      priority: "secondary",
-      width: "date",
+      ...columnLayout.date,
     },
     {
       cell: (item) => (
@@ -70,33 +83,25 @@ export function TastingTable({ caption, items }: TastingTableProps) {
           variant="compact"
         />
       ),
-      header: "Bottle",
-      key: "bottle",
+      ...columnLayout.bottle,
     },
     {
-      align: "right",
       cell: (item) =>
         item.abv ? (
           <span {...stylex.props(foundationStyles.metadata, styles.firstLine)}>
             {item.abv}
           </span>
         ) : null,
-      header: "ABV",
-      key: "abv",
-      priority: "secondary",
-      width: "figure",
+      ...columnLayout.abv,
     },
     {
-      align: "right",
       cell: (item) =>
         item.ratingBand ? (
           <span {...stylex.props(styles.firstLine, styles.rating)}>
             <TastingRating band={item.ratingBand} labelOnly size="sm" />
           </span>
         ) : null,
-      header: "Rating",
-      key: "rating",
-      width: "rating",
+      ...columnLayout.rating,
     },
   ];
 
@@ -109,6 +114,77 @@ export function TastingTable({ caption, items }: TastingTableProps) {
       items={items}
       linked
     />
+  );
+}
+
+/** Reserves the tasting table's columns and two-line rows while it loads. */
+export function TastingTableLoading({
+  label = "Loading tastings",
+  rows = 8,
+}: {
+  label?: string;
+  rows?: number;
+}) {
+  const columns: CatalogTableColumn<number>[] = [
+    {
+      cell: () => (
+        <span {...stylex.props(foundationStyles.metadata, styles.firstLine)}>
+          <LoadingText width="84px" />
+        </span>
+      ),
+      ...columnLayout.date,
+    },
+    {
+      cell: () => (
+        <BottleIdentityRowLoading
+          align="start"
+          details={
+            <p {...stylex.props(foundationStyles.metadata, styles.details)}>
+              <LoadingText width="24em" />
+            </p>
+          }
+          layout="cell"
+          variant="compact"
+        />
+      ),
+      ...columnLayout.bottle,
+    },
+    {
+      cell: () => (
+        <span {...stylex.props(foundationStyles.metadata, styles.firstLine)}>
+          <LoadingText width="3ch" />
+        </span>
+      ),
+      ...columnLayout.abv,
+    },
+    {
+      cell: () => (
+        <span
+          {...stylex.props(
+            foundationStyles.interactiveSmall,
+            styles.firstLine,
+            styles.rating,
+          )}
+        >
+          <LoadingText width="72px" />
+        </span>
+      ),
+      ...columnLayout.rating,
+    },
+  ];
+
+  return (
+    <div aria-busy="true" aria-label={label} role="status">
+      <div aria-hidden="true">
+        <CatalogTable
+          caption={label}
+          columns={columns}
+          density="compact"
+          getKey={(index) => index}
+          items={Array.from({ length: rows }, (_, index) => index)}
+        />
+      </div>
+    </div>
   );
 }
 

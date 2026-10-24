@@ -4,10 +4,12 @@ import { colors, space } from "../styles/tokens.stylex";
 import { Avatar } from "./avatar.stylex";
 import {
   BottleIdentityRow,
+  BottleIdentityRowLoading,
   type BottleIdentityRowProps,
 } from "./bottleIdentityRow.stylex";
 import { Card, CardPrimaryLink } from "./card.stylex";
 import { Chip } from "./chip.stylex";
+import { LoadingText } from "./feedback.stylex";
 import { ItemList, ItemListItem } from "./itemList.stylex";
 import { ReviewScore, TastingRating, type RatingBand } from "./scoring.stylex";
 import { TextLink } from "./textLink.stylex";
@@ -238,6 +240,101 @@ function CommunityFeedEntry({
 }
 
 const MAX_VISIBLE_NOTES = 4;
+
+/**
+ * Reserves feed entries while they load: the same list, card, and activity row
+ * as a finished tasting, with a note, tasting notes, and a date. Pass the same
+ * `showActor` as the finished feed so the first row starts in the same place.
+ */
+export function CommunityFeedLoading({
+  label = "Loading activity",
+  rows = 4,
+  showActor = true,
+}: {
+  label?: string;
+  rows?: number;
+  showActor?: boolean;
+}) {
+  return (
+    <div aria-busy="true" aria-label={label} role="status">
+      <div aria-hidden="true">
+        <ItemList ariaLabel={label}>
+          {Array.from({ length: rows }, (_, index) => (
+            <ItemListItem key={index}>
+              <Card
+                appearance="plain"
+                padding="none"
+                {...stylex.props(styles.entry)}
+              >
+                {showActor ? (
+                  <div
+                    {...stylex.props(
+                      foundationStyles.metadata,
+                      styles.author,
+                      styles.context,
+                    )}
+                  >
+                    <LoadingText width="24px" />
+                    <LoadingText width="12em" />
+                  </div>
+                ) : null}
+                <div
+                  {...stylex.props(
+                    styles.content,
+                    !showActor && styles.contentWithoutActor,
+                  )}
+                >
+                  <BottleIdentityRowLoading
+                    details={
+                      <div {...stylex.props(styles.details)}>
+                        <p
+                          {...stylex.props(
+                            foundationStyles.body,
+                            styles.excerpt,
+                          )}
+                        >
+                          <LoadingText width="28em" />
+                        </p>
+                        <ul {...stylex.props(styles.notes)}>
+                          {["4em", "5em", "3em"].map((width) => (
+                            <li key={width} {...stylex.props(styles.note)}>
+                              <Chip size="sm">
+                                <LoadingText width={width} />
+                              </Chip>
+                            </li>
+                          ))}
+                        </ul>
+                        {showActor ? null : (
+                          <div
+                            {...stylex.props(
+                              foundationStyles.metadata,
+                              styles.footer,
+                            )}
+                          >
+                            <LoadingText width="72px" />
+                          </div>
+                        )}
+                      </div>
+                    }
+                    end={
+                      <div {...stylex.props(styles.facts)}>
+                        <span {...stylex.props(foundationStyles.interactive)}>
+                          <LoadingText width="72px" />
+                        </span>
+                      </div>
+                    }
+                    variant="activity"
+                    verticalPadding="sm"
+                  />
+                </div>
+              </Card>
+            </ItemListItem>
+          ))}
+        </ItemList>
+      </div>
+    </div>
+  );
+}
 
 function TastingNotePreview({ tags }: { tags: readonly string[] }) {
   const visibleTags = tags.slice(0, MAX_VISIBLE_NOTES);

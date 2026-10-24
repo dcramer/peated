@@ -19,8 +19,14 @@ Both tabs use the same parts:
   records. Picking a brand or producer filters the list. Picking a Bottle opens
   it. Enter without a suggestion searches the Bottle names.
 - A filter rail. Each group shows a count and a bar for every choice; clicking
-  a choice filters the list, and clicking it again clears it. On phones the
-  rail becomes a drawer above the list.
+  a choice filters the list, and clicking it again clears it. Below 760px the
+  rail is hidden; a Filters button in the toolbar, counting active filters,
+  opens a drawer with search, sort, and the same groups. The bottle catalogs
+  use the same button and drawer.
+
+While a tab loads, its loading view reserves the toolbar, the rail groups, and
+the list or table rows at their finished sizes, so nothing moves when the
+results arrive. See [Web Loading](../development/web-loading.md).
 
 Filters, search text, sort, and page live in the URL, so a filtered view can
 be shared and the server renders it on first load.

@@ -4,7 +4,12 @@ import { Fragment, type MouseEventHandler, type ReactNode } from "react";
 import { foundationStyles } from "../styles/foundations.stylex";
 import { colors, effects, space, zIndices } from "../styles/tokens.stylex";
 import { AppLink } from "./appLink";
-import { BottleVisual, type BottleVisualFit } from "./bottleVisual.stylex";
+import {
+  BottleVisual,
+  BottleVisualLoading,
+  type BottleVisualFit,
+} from "./bottleVisual.stylex";
+import { LoadingText } from "./feedback.stylex";
 import Join from "./join";
 import { linkedRowStyles } from "./linkedRow.stylex";
 import { MatchedText } from "./matchedText.stylex";
@@ -286,6 +291,95 @@ export function BottleIdentityRow({
         bottleDetails
       )}
       {!activity && !sidebar ? trailingContent : null}
+    </div>
+  );
+}
+
+/**
+ * Reserves one bottle row while it loads. It reuses the row's frame, image
+ * size, title line, and details slot, so the finished row replaces it in place.
+ * Standard and activity rows reserve a provenance and a metadata line.
+ */
+export function BottleIdentityRowLoading({
+  align = "center",
+  details,
+  end,
+  layout = "row",
+  variant = "standard",
+  verticalPadding = "md",
+}: Pick<
+  BottleIdentityRowProps,
+  "align" | "details" | "end" | "layout" | "verticalPadding"
+> & {
+  variant?: "activity" | "compact" | "standard";
+}) {
+  const activity = variant === "activity";
+  const compact = variant === "compact";
+  const copy = (
+    <div {...stylex.props(styles.copy)}>
+      <div
+        {...stylex.props(
+          foundationStyles.rowTitle,
+          compact && foundationStyles.compactRowTitle,
+          styles.nameLine,
+        )}
+      >
+        <LoadingText width="14em" />
+      </div>
+      {compact && details ? (
+        <div {...stylex.props(styles.compactDetails)}>{details}</div>
+      ) : null}
+      {!compact ? (
+        <>
+          <div {...stylex.props(foundationStyles.metadata, styles.subtitle)}>
+            <LoadingText width="9em" />
+          </div>
+          <div {...stylex.props(foundationStyles.metadata, styles.metadata)}>
+            <LoadingText width="13em" />
+          </div>
+        </>
+      ) : null}
+    </div>
+  );
+  const trailingContent = end ? (
+    <div {...stylex.props(styles.end)}>{end}</div>
+  ) : null;
+
+  return (
+    <div
+      aria-hidden="true"
+      {...stylex.props(
+        styles.row,
+        verticalPadding === "sm" && styles.smallVerticalPadding,
+        activity && styles.activityRow,
+        compact && styles.compactRow,
+        align === "start" && styles.startAlignedRow,
+        layout === "cell" && styles.cellLayout,
+      )}
+    >
+      {activity ? (
+        <span {...stylex.props(styles.activityVisual)}>
+          <BottleVisualLoading size="activity" />
+        </span>
+      ) : (
+        <BottleVisualLoading size={compact ? "xs" : "md"} />
+      )}
+      {activity ? (
+        <div {...stylex.props(styles.activityBody)}>
+          <div {...stylex.props(styles.activitySummary)}>
+            {copy}
+            {trailingContent}
+          </div>
+          {details ? (
+            <div {...stylex.props(styles.activityDetails)}>{details}</div>
+          ) : null}
+        </div>
+      ) : (
+        <>
+          {copy}
+          {trailingContent}
+        </>
+      )}
     </div>
   );
 }

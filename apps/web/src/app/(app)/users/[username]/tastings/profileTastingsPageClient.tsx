@@ -9,11 +9,12 @@ import { ButtonLink } from "@peated/web/components/button.stylex";
 import { CommunityFeed } from "@peated/web/components/communityFeed.stylex";
 import {
   EmptyState,
-  LoadingList,
   SectionError,
 } from "@peated/web/components/feedback.stylex";
+import { ListControls } from "@peated/web/components/listControls.stylex";
 import { CursorPager, ListToolbar } from "@peated/web/components/lists.stylex";
 import {
+  MemberListFilterGroups,
   MemberListFilters,
   type MemberListFilterGroup,
 } from "@peated/web/components/pages/memberListFilters.stylex";
@@ -30,7 +31,11 @@ import {
   getProfileTastingView,
   profileQueries,
 } from "../profileQueries";
-import { ProfileTastingsLayout } from "./profileTastingsLayout";
+import {
+  ProfileTastingsFiltersLoading,
+  ProfileTastingsLayout,
+  ProfileTastingsResultsLoading,
+} from "./profileTastingsLayout";
 
 type RegionList = Outputs["users"]["regionList"];
 type TastingStats = Outputs["users"]["tastingStats"];
@@ -75,9 +80,10 @@ export function ProfileTastingsPageClient() {
     ...orpc.entities.details.queryOptions({ input: { entity: entity ?? 0 } }),
     enabled: entity !== undefined,
   });
-  const hasFilters = FILTER_PARAMS.some(
+  const activeFilterCount = FILTER_PARAMS.filter(
     (name) => name !== "cursor" && displayed.get(name),
-  );
+  ).length;
+  const hasFilters = activeFilterCount > 0;
   const filters = getFilterGroups({
     entity:
       entity === undefined
@@ -132,41 +138,66 @@ export function ProfileTastingsPageClient() {
       userId={user.id}
     />
   );
-  const filterProps = {
+  const groupProps = {
     groups: filters,
-    mobileLabel: "Filter tastings",
     onChange: setParam,
-    onClear: clearFilters,
-    query: displayedInput.query,
-    search,
     total: statsQuery.data?.total,
   };
   const results = tastingQuery.data?.results ?? [];
   const pending = isNavigating || tastingQuery.isFetching;
+  // Counts come from the server render; keep the rail's shape until they do.
+  const filtersPending = statsQuery.isPending || regionQuery.isPending;
+  const hasCountry = Boolean(displayedInput.country);
 
   return (
     <ProfileTastingsLayout
-      mobileFilters={<MemberListFilters {...filterProps} mode="mobile" />}
-      rail={<MemberListFilters {...filterProps} mode="rail" />}
+      rail={
+        filtersPending ? (
+          <ProfileTastingsFiltersLoading hasCountry={hasCountry} />
+        ) : (
+          <MemberListFilters
+            {...groupProps}
+            onClear={clearFilters}
+            query={displayedInput.query}
+            search={search}
+          />
+        )
+      }
     >
       <section aria-label={`${user.username}'s tastings`}>
-        <ListToolbar
-          count={results.length}
-          noun="tasting"
-          onSortChange={(value) => setParam("sort", value)}
-          onViewChange={(value) =>
-            setParam("view", value === "table" ? value : "")
-          }
-          pending={pending}
-          sort={displayedInput.sort}
-          sortOptions={sortOptions}
-          total={tastingQuery.data?.total}
-          view={view}
-        />
+        {/* Without data the toolbar would read "0 tastings"; reserve it instead. */}
+        {tastingQuery.isPending ? (
+          <ProfileTastingsResultsLoading view={view} />
+        ) : tastingQuery.data ? (
+          <ListToolbar
+            count={results.length}
+            mobileAction={
+              <ListControls
+                activeFilterCount={activeFilterCount}
+                filters={<MemberListFilterGroups {...groupProps} />}
+                onClear={clearFilters}
+                onSortChange={(value) => setParam("sort", value)}
+                pluralNoun="tastings"
+                search={search}
+                sort={displayedInput.sort}
+                sortOptions={sortOptions}
+              />
+            }
+            mobileActionLayout="pageColumns"
+            noun="tasting"
+            onSortChange={(value) => setParam("sort", value)}
+            onViewChange={(value) =>
+              setParam("view", value === "table" ? value : "")
+            }
+            pending={pending}
+            sort={displayedInput.sort}
+            sortOptions={sortOptions}
+            total={tastingQuery.data.total}
+            view={view}
+          />
+        ) : null}
         <div aria-busy={pending || undefined}>
-          {tastingQuery.isPending ? (
-            <LoadingList label="Loading member tastings" rows={4} />
-          ) : tastingQuery.error ? (
+          {tastingQuery.isPending ? null : tastingQuery.error ? (
             <SectionError
               heading="Tastings are unavailable"
               onRetry={() => void tastingQuery.refetch()}

@@ -183,6 +183,21 @@ export function LoadingPlaceholder({
   );
 }
 
+/**
+ * A text-height placeholder for loading rows. It sits inside the line it
+ * replaces, so that line keeps its font's height.
+ */
+export function LoadingText({ width }: { width: string }) {
+  return (
+    <span
+      aria-hidden="true"
+      {...stylex.props(styles.loadingText, styles.loadingTextWidth(width))}
+    >
+      {"\u00a0"}
+    </span>
+  );
+}
+
 export type EmptyStateProps = {
   action?: ReactNode;
   children: ReactNode;
@@ -589,6 +604,15 @@ const styles = stylex.create({
     width: "46px",
     height: "20px",
   },
+  loadingText: {
+    display: "inline-block",
+    maxWidth: "100%",
+    height: "0.9em",
+    borderRadius: controlMetrics.radiusSmall,
+    backgroundColor: colors.surface,
+    verticalAlign: "middle",
+  },
+  loadingTextWidth: (width: string) => ({ width }),
   delay0: { animationDelay: "0ms" },
   delay1: { animationDelay: "50ms" },
   delay2: { animationDelay: "150ms" },

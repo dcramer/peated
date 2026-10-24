@@ -7,11 +7,10 @@ import { usePathname, useRouter, useSearchParams } from "next/navigation";
 import { useOptimistic, useState, useTransition } from "react";
 
 import { ButtonLink } from "@peated/web/components/button.stylex";
+import { SectionError } from "@peated/web/components/feedback.stylex";
+import { ListControls } from "@peated/web/components/listControls.stylex";
 import {
-  LoadingList,
-  SectionError,
-} from "@peated/web/components/feedback.stylex";
-import {
+  MemberListFilterGroups,
   MemberListFilters,
   type MemberListFilterGroup,
 } from "@peated/web/components/pages/memberListFilters.stylex";
@@ -27,7 +26,10 @@ import { colors, space } from "../../../../../styles/tokens.stylex";
 import { ProfileBottleSearch } from "../profileBottleSearch.stylex";
 import { useProfile } from "../profileContext";
 import { getProfileLibraryInput, profileQueries } from "../profileQueries";
-import { ProfileLibraryLayout } from "./profileLibraryLayout.stylex";
+import {
+  ProfileLibraryLayout,
+  ProfileLibraryResultsLoading,
+} from "./profileLibraryLayout";
 
 type LibraryEntry =
   Outputs["collections"]["bottles"]["list"]["results"][number];
@@ -207,34 +209,22 @@ export function ProfileLibraryPageClient() {
       userId={user.id}
     />
   );
-  const filterPanel = (
-    <MemberListFilters
-      groups={filters}
-      mobileLabel="Filter library"
-      mode="rail"
-      onChange={setFilter}
-      onClear={clearFilters}
-      query={query}
-      search={search}
-      total={statsQuery.data?.total}
-    />
-  );
+  const groupProps = {
+    groups: filters,
+    onChange: setFilter,
+    total: statsQuery.data?.total,
+  };
 
   return (
     <ProfileLibraryLayout
-      mobileFilters={
+      rail={
         <MemberListFilters
-          groups={filters}
-          mobileLabel="Filter library"
-          mode="mobile"
-          onChange={setFilter}
+          {...groupProps}
           onClear={clearFilters}
           query={query}
           search={search}
-          total={statsQuery.data?.total}
         />
       }
-      rail={filterPanel}
     >
       <div aria-busy={mutationPending || undefined}>
         {mutationError ? (
@@ -246,7 +236,7 @@ export function ProfileLibraryPageClient() {
           </p>
         ) : null}
         {libraryQuery.isPending ? (
-          <LoadingList label="Loading member library" rows={4} />
+          <ProfileLibraryResultsLoading rows={4} />
         ) : libraryQuery.error ? (
           <SectionError
             heading="Library is unavailable"
@@ -280,6 +270,21 @@ export function ProfileLibraryPageClient() {
               hasActiveFilters({ brand, distiller, entity, query, status })
                 ? "No matching bottles"
                 : "No library bottles yet"
+            }
+            mobileAction={
+              <ListControls
+                activeFilterCount={
+                  [brand, distiller, entity, query, status].filter(Boolean)
+                    .length
+                }
+                filters={<MemberListFilterGroups {...groupProps} />}
+                onClear={clearFilters}
+                onSortChange={(value) => setFilter("sort", value)}
+                pluralNoun="bottles"
+                search={search}
+                sort={sort}
+                sortOptions={sortOptions}
+              />
             }
             items={applyEntryChanges(
               libraryQuery.data.results,

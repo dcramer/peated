@@ -7,6 +7,7 @@ import { TextInput } from "../field.stylex";
 import { StoryCanvas } from "../storyFixtures.stylex";
 import {
   MemberListFilters,
+  MemberListFiltersLoading,
   type MemberListFilterGroup,
 } from "./memberListFilters.stylex";
 
@@ -61,14 +62,12 @@ function getGroups(selected: FilterState): MemberListFilterGroup[] {
   ];
 }
 
-function MemberListFiltersExample({ mode }: { mode: "mobile" | "rail" }) {
+function MemberListFiltersExample() {
   const [selected, setSelected] = useState<FilterState>({ age: "atLeast25" });
 
   return (
     <MemberListFilters
       groups={getGroups(selected)}
-      mobileLabel="Filter tastings"
-      mode={mode}
       onChange={(name, value) =>
         setSelected((current) => ({ ...current, [name]: value }))
       }
@@ -92,7 +91,7 @@ const meta = {
     docs: {
       description: {
         component:
-          "Search and facet filters beside one member's Library or tastings. Each facet row shows its exact count with a bar against the shared total; a group may state one summary fact, such as the median age. Rail mode sits beside the list; mobile mode collapses the same content under the route's label. Routes own queries, URL state, and navigation.",
+          "Search and facet filters in the rail beside one member's Library or tastings. Each facet row shows its exact count with a bar against the shared total; a group may state one summary fact, such as the median age. PageColumns hides the rail below 760px, where ListControls shows the same groups in a drawer. Routes own queries, URL state, and navigation.",
       },
     },
   },
@@ -108,36 +107,38 @@ const meta = {
 export default meta;
 type Story = StoryObj<typeof meta>;
 
-// The example owns groups and selection, so only `mode` is a live control.
+// The example owns groups and selection, so the args are not live controls.
 export const Overview: Story = {
   args: {
     groups: [],
-    mobileLabel: "Filter tastings",
-    mode: "rail",
     onChange: () => undefined,
     onClear: () => undefined,
     query: "",
     search: null,
   },
-  argTypes: {
-    groups: { control: false },
-    mobileLabel: { control: false },
-    query: { control: false },
-    search: { control: false },
-  },
-  render: ({ mode }) => <MemberListFiltersExample mode={mode} />,
+  parameters: { controls: { disable: true } },
+  render: () => <MemberListFiltersExample />,
 };
 
-export const Mobile: Story = {
+export const Loading: Story = {
   ...Overview,
-  args: { ...Overview.args, mode: "mobile" },
-  globals: { viewport: { isRotated: false, value: "peatedPhone" } },
   parameters: {
+    ...Overview.parameters,
     docs: {
       description: {
         story:
-          "Below 760px the rail is hidden and the same filters open from a summary row above the list.",
+          "Reserves the search field and the usual groups at their finished sizes while counts load. Compare it with Overview.",
       },
     },
   },
+  render: () => (
+    <MemberListFiltersLoading
+      groups={[
+        { label: "Rating", rows: 5 },
+        { label: "Age", rows: 6, summary: true },
+        { label: "Regions", rows: 3 },
+      ]}
+      searchLabel="Find in these tastings"
+    />
+  ),
 };

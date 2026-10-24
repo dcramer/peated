@@ -13,7 +13,8 @@ import {
   space,
 } from "../styles/tokens.stylex";
 import { Button, IconButton } from "./button.stylex";
-import { FacetRow } from "./facetRow.stylex";
+import { FacetRow, FacetRowLoading } from "./facetRow.stylex";
+import { LoadingText } from "./feedback.stylex";
 import { TextInput } from "./field.stylex";
 
 const NARROW = "@media (max-width: 759px)";
@@ -256,6 +257,36 @@ export function FacetGroup({
             />
           );
         })}
+      </div>
+    </section>
+  );
+}
+
+/**
+ * Reserves one facet group while its counts load. The heading is real; pass
+ * `summary` when the finished group shows a summary line.
+ */
+export function FacetGroupLoading({
+  label,
+  rows,
+  summary = false,
+}: {
+  label: string;
+  rows: number;
+  summary?: boolean;
+}) {
+  return (
+    <section aria-hidden="true" {...stylex.props(styles.facetGroup)}>
+      <SectionHeading level={3}>{label}</SectionHeading>
+      {summary ? (
+        <p {...stylex.props(foundationStyles.metadata, styles.facetSummary)}>
+          <LoadingText width="60%" />
+        </p>
+      ) : null}
+      <div {...stylex.props(styles.facetRows)}>
+        {Array.from({ length: rows }, (_, index) => (
+          <FacetRowLoading key={index} />
+        ))}
       </div>
     </section>
   );

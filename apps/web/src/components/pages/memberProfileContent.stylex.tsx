@@ -32,6 +32,8 @@ export type MemberLibraryListProps = {
   emptyDescription: ReactNode;
   emptyHeading: string;
   items: readonly MemberLibraryItem[];
+  /** ListControls for narrow screens, where PageColumns hides the rail. */
+  mobileAction?: ReactNode;
   nextHref?: string;
   onSortChange: (value: string) => void;
   pending?: boolean;
@@ -48,6 +50,7 @@ export function MemberLibraryList({
   emptyDescription,
   emptyHeading,
   items,
+  mobileAction,
   nextHref,
   onSortChange,
   pending = false,
@@ -61,6 +64,8 @@ export function MemberLibraryList({
     <section aria-label="Member library" {...stylex.props(styles.library)}>
       <ListToolbar
         count={items.length}
+        mobileAction={mobileAction}
+        mobileActionLayout="pageColumns"
         noun="bottle"
         onSortChange={onSortChange}
         pending={pending}

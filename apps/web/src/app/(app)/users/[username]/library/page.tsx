@@ -26,6 +26,16 @@ export default async function ProfileLibraryPage(props: {
   const queryClient = getQueryClient();
   const orpc = createTanstackQueryUtils(client);
   await Promise.all([
+    // The rail names a brand or producer picked from search; render it now.
+    ...(libraryInput.entity === undefined
+      ? []
+      : [
+          queryClient.prefetchQuery(
+            orpc.entities.details.queryOptions({
+              input: { entity: libraryInput.entity },
+            }),
+          ),
+        ]),
     queryClient.prefetchQuery(profileQueries.library(orpc, libraryInput)),
     queryClient.prefetchQuery(profileQueries.libraryStats(orpc, user.id)),
   ]);

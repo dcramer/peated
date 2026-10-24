@@ -4,11 +4,12 @@ import * as stylex from "@stylexjs/stylex";
 import type { ReactNode } from "react";
 
 import { Button } from "@peated/web/components/button.stylex";
-import { FacetGroup } from "@peated/web/components/filterPanel.stylex";
+import {
+  FacetGroup,
+  FacetGroupLoading,
+} from "@peated/web/components/filterPanel.stylex";
 import { foundationStyles } from "../../styles/foundations.stylex";
-import { colors, effects, space } from "../../styles/tokens.stylex";
-
-const NARROW = "@media (max-width: 759px)";
+import { colors, controlMetrics, space } from "../../styles/tokens.stylex";
 
 export type MemberListFilter = {
   count?: number;
@@ -26,40 +27,24 @@ export type MemberListFilterGroup = {
   summary?: ReactNode;
 };
 
-/**
- * Search and facet filters for one member's Library or tastings. Rail mode sits
- * beside the list; mobile mode collapses the same content under `mobileLabel`.
- * Facet bars share `total`. Routes own queries, URL state, and navigation.
- */
-export function MemberListFilters({
-  groups,
-  mobileLabel,
-  mode,
-  onChange,
-  onClear,
-  query,
-  search,
-  total,
-}: {
+type MemberListFilterGroupsProps = {
   groups: readonly MemberListFilterGroup[];
-  /** Mobile summary text, such as "Filter library". */
-  mobileLabel: string;
-  mode: "mobile" | "rail";
   onChange: (name: string, value: string) => void;
-  onClear: () => void;
-  /** Applied search text, used to offer "Clear filters". */
-  query: string;
-  /** Search field; the route owns its queries and navigation. */
-  search: ReactNode;
+  /** Every facet bar is measured against this total. */
   total?: number;
-}) {
-  const hasFilters = Boolean(
-    query ||
-    groups.some((group) => group.filters.some((filter) => filter.selected)),
-  );
-  const content = (
+};
+
+/**
+ * The facet groups for one member's Library or tastings. The rail shows them
+ * under search; on narrow screens, ListControls shows them in its drawer.
+ */
+export function MemberListFilterGroups({
+  groups,
+  onChange,
+  total,
+}: MemberListFilterGroupsProps) {
+  return (
     <div {...stylex.props(styles.filterContent)}>
-      {search}
       {groups.map((group) => (
         <FacetGroup
           key={group.name}
@@ -71,6 +56,38 @@ export function MemberListFilters({
           total={total}
         />
       ))}
+    </div>
+  );
+}
+
+/**
+ * Search and facet filters in the rail beside one member's Library or
+ * tastings. PageColumns hides the rail on narrow screens, where ListControls
+ * takes over. Routes own queries, URL state, and navigation.
+ */
+export function MemberListFilters({
+  onClear,
+  query,
+  search,
+  ...groupProps
+}: MemberListFilterGroupsProps & {
+  onClear: () => void;
+  /** Applied search text, used to offer "Clear filters". */
+  query: string;
+  /** Search field; the route owns its queries and navigation. */
+  search: ReactNode;
+}) {
+  const hasFilters = Boolean(
+    query ||
+    groupProps.groups.some((group) =>
+      group.filters.some((filter) => filter.selected),
+    ),
+  );
+
+  return (
+    <div {...stylex.props(styles.filterContent)}>
+      {search}
+      <MemberListFilterGroups {...groupProps} />
       {hasFilters ? (
         <Button onClick={onClear} size="sm" variant="text">
           Clear filters
@@ -78,48 +95,45 @@ export function MemberListFilters({
       ) : null}
     </div>
   );
+}
 
-  return mode === "mobile" ? (
-    <details {...stylex.props(styles.mobileFilters)}>
-      <summary
-        {...stylex.props(
-          foundationStyles.interactiveSmall,
-          styles.mobileSummary,
-        )}
-      >
-        {mobileLabel}
-      </summary>
-      {content}
-    </details>
-  ) : (
-    <div {...stylex.props(styles.railFilters)}>{content}</div>
+export type MemberListFilterGroupLoading = {
+  label: string;
+  rows: number;
+  summary?: boolean;
+};
+
+/** Reserves the rail's search field and usual groups while counts load. */
+export function MemberListFiltersLoading({
+  groups,
+  searchLabel,
+}: {
+  groups: readonly MemberListFilterGroupLoading[];
+  searchLabel: string;
+}) {
+  return (
+    <div aria-hidden="true" {...stylex.props(styles.filterContent)}>
+      <div {...stylex.props(styles.loadingSearch)}>
+        <span {...stylex.props(foundationStyles.fieldLabel)}>
+          {searchLabel}
+        </span>
+        <span {...stylex.props(styles.loadingSearchField)} />
+      </div>
+      {groups.map((group) => (
+        <FacetGroupLoading key={group.label} {...group} />
+      ))}
+    </div>
   );
 }
 
 const styles = stylex.create({
   filterContent: { display: "flex", flexDirection: "column", gap: space.x6 },
-  railFilters: { display: "block", [NARROW]: { display: "none" } },
-  mobileFilters: {
-    display: "none",
-    marginBottom: space.x6,
-    borderTopWidth: "1px",
-    borderTopStyle: "solid",
-    borderTopColor: colors.sectionRule,
-    borderBottomWidth: "1px",
-    borderBottomStyle: "solid",
-    borderBottomColor: colors.hairline,
-    backgroundColor: "transparent",
-    [NARROW]: { display: "block" },
-  },
-  mobileSummary: {
-    padding: space.x3,
-    color: colors.ink,
-    fontWeight: 600,
-    cursor: "pointer",
-    outline: "none",
-    boxShadow: {
-      default: "none",
-      ":focus-visible": effects.focusRing,
-    },
+  // Matches the route's search field: a label above a full-width field.
+  loadingSearch: { display: "flex", flexDirection: "column", gap: space.x2 },
+  loadingSearchField: {
+    display: "block",
+    height: controlMetrics.controlHeight,
+    borderRadius: controlMetrics.radius,
+    backgroundColor: colors.inset,
   },
 });
