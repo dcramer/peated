@@ -111,15 +111,16 @@ no matching era SHALL show nothing.
 - **THEN** the page shows that the distillery was called Clynelish when it
   was distilled
 
-### Requirement: Overview links to About
+### Requirement: History timeline stays a simple widget
 
-When an Entity has an About tab, its Overview SHALL show a short summary of
-key dates in place of the full history list, with a link to About.
+The Overview SHALL keep showing the Entity's history timeline from
+`entity_event`, whether or not the Entity has an About tab. The About page's
+events SHALL roughly cover the timeline but SHALL NOT replace it.
 
 #### Scenario: Overview with About
 
 - **WHEN** a visitor opens the Overview of a distillery with an About tab
-- **THEN** the full history list is replaced by key dates and a link to About
+- **THEN** the history timeline is shown as before
 
 ### Requirement: About pages are public and indexable
 

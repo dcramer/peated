@@ -4,10 +4,10 @@
 
 The system SHALL store each Entity's sources, citations, history events, site
 facts, and About sections in one About document. Every read and write SHALL
-check the document against the About schema in code. Each event, site fact,
-and section SHALL record whether a person or the pipeline wrote it. A write SHALL include
-the document version it read, and the system SHALL reject a write based on an
-older version.
+check the document against the About schema in code. The document is a
+generated page: each writer run or moderator patch SHALL save a complete new
+version. A write SHALL include the document version it read, and the system
+SHALL reject a write based on an older version.
 
 #### Scenario: Two writers
 
@@ -123,17 +123,18 @@ sources.
 
 ### Requirement: Entity history events
 
-Entity history events SHALL live in the About document; the `entity_event`
-table SHALL be retired after its rows are copied. An event SHALL have a kind, a date of a year, a year and month,
-or a full date, an optional end date, optional text, and one or more
-citations. Event kinds SHALL include `opened`, `closed`, `mothballed`,
+The About page SHALL describe history with its own events. The Entity's
+history timeline SHALL stay in `entity_event` as a separate widget, and the
+writer SHALL read it as leads. An About event SHALL have a kind, a date of a
+year, a year and month, or a full date, an optional end date, optional text,
+and one or more citations. Event kinds SHALL include `opened`, `closed`, `mothballed`,
 `reopened`, `acquired`, `renamed`, `era`, and `generic`. A `renamed` event
 SHALL store the new name. An `era` event SHALL have an end date or be marked
 as continuing, and a short title. An event MAY link one related Entity, such as
-a distillery built next door. An `acquired` event SHALL link the new owner's Entity, or store the owner's
-name when Peated has no Entity for it. The pipeline SHALL NOT create Entities.
-Writes SHALL check that linked Entities exist, and reads SHALL follow merged
-Entities to their current record.
+a distillery built next door. An `acquired` event SHALL store the new owner's name and MAY link the owner's
+Entity. The pipeline SHALL NOT create Entities. Reads SHALL follow merged
+Entities to their current record, and SHALL show the name when the linked
+Entity no longer exists.
 
 #### Scenario: Name change
 
@@ -151,6 +152,11 @@ Entities to their current record.
   has no Entity for the estate
 - **THEN** the `acquired` event stores the name "Sutherland estate" with no
   Entity link
+
+#### Scenario: Deleted owner
+
+- **WHEN** an event's linked owner Entity is deleted
+- **THEN** the page shows the owner's name without a link
 
 #### Scenario: Merged owner
 
@@ -195,16 +201,37 @@ to restore an earlier version.
 - **WHEN** the pipeline publishes a new event
 - **THEN** change history shows the event and the pipeline as the actor
 
+### Requirement: Moderator notes for the writer
+
+The system SHALL store plain-text notes for an Entity's About page, each up
+to 500 characters with an optional source URL. Moderators SHALL list, add,
+and remove notes. Every writer run SHALL read them. Notes SHALL NOT be cited
+or shown on the page.
+
+#### Scenario: Note added
+
+- **WHEN** a moderator adds a note that two distilleries have used the name
+  Clynelish
+- **THEN** the next writer run gets the note, and the page shows only facts
+  that cite a web source
+
+#### Scenario: Note on another Entity
+
+- **WHEN** a moderator removes a note through a different Entity's route
+- **THEN** the request fails with not found and the note stays
+
 ### Requirement: Entity merge leaves About documents to the writer
 
 When one Entity is merged into another, the system SHALL keep the
 destination's About document unchanged and SHALL NOT copy the merged Entity's
-document into it. The merged Entity's document SHALL remain in change history,
-and the system SHALL queue a writer run for the destination.
+document into it. The merged Entity's document SHALL remain in change history.
+The system SHALL move the merged Entity's history timeline and notes to the
+destination and SHALL queue a writer run for the destination.
 
 #### Scenario: Merge two distilleries with About documents
 
-- **WHEN** a duplicate distillery with an About document is merged into its
-  original
+- **WHEN** a duplicate distillery with an About document and notes is merged
+  into its original
 - **THEN** the original's document is unchanged, the duplicate's document is
-  only in change history, and a writer run is queued for the original
+  only in change history, the notes move to the original, and a writer run is
+  queued for the original
