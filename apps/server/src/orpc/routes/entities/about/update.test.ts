@@ -210,3 +210,73 @@ describe("PATCH /entities/:entity/about/status", () => {
     ).not.toBeNull();
   });
 });
+
+describe("GET /entities/:entity/about/document", () => {
+  test("round-trips the full document so unchanged items keep their author", async ({
+    fixtures,
+  }) => {
+    const user = await fixtures.User({ mod: true });
+    const entity = await fixtures.Entity({ kind: "distillery" });
+    await fixtures.EntityAbout({
+      entityId: entity.id,
+      events: [
+        {
+          id: 1,
+          kind: "opened",
+          date: "1819",
+          writtenBy: "pipeline",
+          citations: [
+            { sourceId: "s1", statedValue: "1819", quote: "Founded in 1819." },
+          ],
+        },
+        { id: 2, kind: "closed", date: "1983", writtenBy: "pipeline" },
+      ],
+    });
+
+    const { version, document } = await routerClient.entities.about.document(
+      { entity: entity.id },
+      { context: { user } },
+    );
+    await routerClient.entities.about.update(
+      {
+        entity: entity.id,
+        version,
+        document: {
+          ...document!,
+          events: document!.events.map((event) =>
+            event.id === 2 ? { ...event, date: "1983-03" } : event,
+          ),
+        },
+      },
+      { context: { user } },
+    );
+
+    const stored = await getEntityAbout(db, entity.id);
+    expect(
+      stored?.document.events.map(({ id, writtenBy, citations }) => [
+        id,
+        writtenBy,
+        citations[0]?.quote ?? null,
+      ]),
+    ).toEqual([
+      [1, "pipeline", "Founded in 1819."],
+      [2, "person", null],
+    ]);
+  });
+
+  test("keeps the full document from people who are not moderators", async ({
+    fixtures,
+  }) => {
+    const user = await fixtures.User();
+    const entity = await fixtures.Entity();
+
+    const err = await waitError(() =>
+      routerClient.entities.about.document(
+        { entity: entity.id },
+        { context: { user } },
+      ),
+    );
+
+    expect(err).toMatchObject({ code: "UNAUTHORIZED" });
+  });
+});

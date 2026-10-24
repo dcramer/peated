@@ -39,7 +39,7 @@ export default procedure
     path: "/entities/{entity}/about",
     summary: "Update entity About page",
     description:
-      "Replace an entity's About document. Items you add or change are recorded as written by a person, and the About writer never changes them. Every new or changed event, site fact, and sentence needs a source. Rejects an edit based on an older `version`. Requires moderator privileges.",
+      "Replace an entity's About document. Start from `GET /entities/{entity}/about/document`, which keeps source quotes and who wrote each item; the public page leaves those out. Items you add or change are recorded as written by a person, and the About writer never changes them. Every new or changed event, site fact, and sentence needs a source. Rejects an edit based on an older `version`. Requires moderator privileges.",
     operationId: "updateEntityAbout",
   })
   .input(InputSchema)
