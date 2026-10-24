@@ -112,6 +112,13 @@ before queueing again.
 Callers may still pass `delay` or removal options; a unique job always keeps
 its generated ID.
 
+Known limit: the follow-up waits only its delay, so it can start while the
+first run is still going. Two runs of the same job can then overlap, and a push
+that arrives while both are running is dropped. Its change waits for the next
+push of that job. This needs a run longer than the delay plus two more writes
+to the same record during it, so it is rare. Closing it would mean queueing the
+rerun when the running job finishes instead.
+
 Waiting jobs live only in Redis. A Redis reset drops them without a failure
 record, so bulk work needs a repair path that finds what is still undone from
 the database, such as `missingOnly` on `/admin/catalog/rebuild-search`.

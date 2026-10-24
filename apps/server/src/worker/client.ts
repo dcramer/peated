@@ -103,7 +103,10 @@ async function clearFinishedJob(
   return state;
 }
 
-/** Returns the job ID a unique push should use. */
+/**
+ * Returns the job ID a unique push should use. Known limit (worker README,
+ * "Unique Jobs"): when the follow-up is also running, this push is dropped.
+ */
 export async function claimUniqueJobId(
   queue: QueuedJobLookup,
   jobId: string,
