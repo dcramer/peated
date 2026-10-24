@@ -110,6 +110,13 @@ export function putLegacyEvent(
     const added = ensureSource(next, input.sourceUrl);
     next = added.document;
     citations = [{ sourceId: added.sourceId, statedValue: null, quote: null }];
+  } else if (before.date !== input.date || before.kind !== input.kind) {
+    // The source stays, but what it was quoted as stating no longer fits.
+    citations = citations.map((citation) => ({
+      ...citation,
+      statedValue: null,
+      quote: null,
+    }));
   }
 
   const event: AboutEvent = {

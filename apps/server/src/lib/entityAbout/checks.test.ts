@@ -9,6 +9,7 @@ import {
   checkConflictPicks,
   keepVerifiedCitations,
 } from "./checks";
+import { getDisagreement } from "./display";
 import { toPublicEntityAbout } from "./publicAbout";
 
 const source = {
@@ -384,6 +385,30 @@ describe("checkConflictPicks", () => {
         new Map(),
       ).events[0]?.disagreement,
     ).toBeNull();
+  });
+
+  test("reads thousands separators and same-year spans", () => {
+    expect(
+      getDisagreement([
+        { sourceId: "wp", statedValue: "500,000", quote: null },
+        { sourceId: "df", statedValue: "500000", quote: null },
+      ]),
+    ).toBeNull();
+    // An era that ends in the same year it starts, at coarser precision.
+    expect(() =>
+      draft({
+        events: [
+          {
+            id: 1,
+            kind: "era",
+            title: "Trial run",
+            date: "1985-06",
+            endDate: "1985",
+            writtenBy: "pipeline",
+          },
+        ],
+      }),
+    ).not.toThrow();
   });
 
   test("compares numbers whole, so 2 stills is not 12 or 20", () => {
