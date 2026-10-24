@@ -98,7 +98,8 @@ it:
 - A quote must appear on a page the model read in this run and state the
   citation's value. A fact stands only when a kept quote states its year (or
   number); a dated article's publication date counts. A name or new owner
-  must appear whole in one quote. Citations that fail are dropped, then facts
+  must appear whole in one quote, and every number in an event's text or
+  title must appear in a quote. Citations that fail are dropped, then facts
   with no citations left.
 - Every sentence cites facts in the draft. Every year and number in a
   sentence appears in those facts.

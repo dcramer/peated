@@ -143,11 +143,19 @@ export function keepVerifiedCitations(
         event.citations.some((citation) =>
           quotesState(quotesOf([citation]), name),
         );
+      // Text and titles are the model's words, but any number in them is
+      // a fact, so a quote must state it too.
+      const numbersQuoted = (value: string | null) =>
+        (stripThousands(value ?? "").match(NUMBER_PATTERN) ?? []).every(
+          (number) => quotes.some((quote) => containsNumber(quote, number)),
+        );
       return (
         quotesState(quotes, event.date.slice(0, 4)) &&
         (!event.endDate || quotesState(quotes, event.endDate.slice(0, 4))) &&
         named(event.name) &&
-        named(event.newOwnerName)
+        named(event.newOwnerName) &&
+        numbersQuoted(event.text) &&
+        numbersQuoted(event.title)
       );
     });
 

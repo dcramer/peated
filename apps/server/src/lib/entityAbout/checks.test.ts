@@ -83,6 +83,25 @@ describe("keepVerifiedCitations", () => {
     expect(result.events).toEqual([]);
   });
 
+  test("drops an event whose text states a number no quote states", () => {
+    const withText = (text: string) =>
+      keepVerifiedCitations(
+        draft({
+          events: [
+            {
+              ...event(1, "2021", "It was rebuilt in 2021 after 38 years."),
+              kind: "generic",
+              text,
+            },
+          ],
+        }),
+        [page],
+      ).events.length;
+
+    expect(withText("Brora was rebuilt after 38 years.")).toBe(1);
+    expect(withText("Brora was rebuilt with 4 stills.")).toBe(0);
+  });
+
   test("counts a publication date only when its year is on the page", () => {
     // The quote has no year; only the article's date can date the event.
     const kept = (date: string) =>
