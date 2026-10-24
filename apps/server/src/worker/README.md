@@ -102,22 +102,21 @@ request matters, such as re-indexing one Bottle or recomputing one Entity's
 stats. Leave it plain when every push is separate work, such as one
 notification or one report, or when the caller sets its own `jobId`.
 
-A unique push uses a job ID built from the job name and all of its arguments,
-and waits 5 seconds by default. A push is absorbed by the same job while it is
-still waiting, because that job has not read anything yet. While the same job
-is running, it may already have read older data, so the push queues one
-follow-up job (ID ending in `-rerun`) instead. A unique job ID that still exists
-blocks a new add, so `pushJob` removes a completed or failed job with that ID
-before queueing again.
-Callers may still pass `delay` or removal options; a unique job always keeps
-its generated ID.
+A unique push uses BullMQ deduplication. Its key is the job name plus a hash of
+all its arguments, and the push waits 5 seconds by default:
 
-Known limit: the follow-up waits only its delay, so it can start while the
-first run is still going. Two runs of the same job can then overlap, and a push
-that arrives while both are running is dropped. Its change waits for the next
-push of that job. This needs a run longer than the delay plus two more writes
-to the same record during it, so it is rare. Closing it would mean queueing the
-rerun when the running job finishes instead.
+- While a job with the same key is waiting, the push merges into it. That job
+  has not read anything yet, so it will see the change.
+- While a job with the same key is running, it may already have read older
+  data. BullMQ keeps the push (`keepLastIfActive`) and queues it once when the
+  run completes or fails. Several pushes during one run become one more run.
+  Two runs with the same key never overlap.
+- The key is cleared when the job finishes, so a finished or failed job never
+  blocks the next push.
+
+Unique jobs get ordinary job IDs. Callers may pass `delay` or removal options,
+but a `jobId` passed for a unique job is ignored, because the key decides
+deduplication.
 
 Waiting jobs live only in Redis. A Redis reset drops them without a failure
 record, so bulk work needs a repair path that finds what is still undone from

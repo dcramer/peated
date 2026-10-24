@@ -54,67 +54,29 @@ async function runRegisteredJob(jobName: JobName, args?: JobArgs) {
   return await jobFn(args, buildJobContext(activeContext));
 }
 
+/**
+ * Worker queue rule: unique jobs deduplicate on a key built from the job name
+ * and arguments, not on a fixed job ID. A push while the job is waiting merges
+ * into it. A push while it is running is kept, and BullMQ queues it once when
+ * the run finishes (`keepLastIfActive`), so a change made mid-run is never
+ * lost and two runs with the same key never overlap.
+ */
 export function buildUniqueJobOptions(
   jobName: JobName,
   args?: JobArgs,
   opts?: JobsOptions,
 ): JobsOptions {
-  // Worker queue rule: a unique ID only deduplicates unfinished work. Remove
-  // completed jobs so a later data change can queue the same work again.
+  const { jobId: _jobId, ...callerOpts } = opts ?? {};
   return {
     delay: 5000,
     removeOnComplete: true,
     removeOnFail: false,
-    ...(opts || {}),
-    jobId: generateUniqIdentifier(jobName, args),
+    ...callerOpts,
+    deduplication: {
+      id: generateUniqIdentifier(jobName, args),
+      keepLastIfActive: true,
+    },
   };
-}
-
-/**
- * Worker queue rule: BullMQ ignores an add whose job ID still exists in any
- * state. Failed jobs keep their ID for three days, and completed unique jobs
- * queued before removeOnComplete was set are kept forever, so either would
- * silently block the same work from queueing again. Remove a finished job
- * first. A waiting or delayed job absorbs the push, because it has not read
- * anything yet. A running job may already have read older data, so the push
- * queues one follow-up under a second ID instead of being dropped.
- */
-type QueuedJobLookup = {
-  getJob(jobId: string): Promise<
-    | {
-        getState(): Promise<string>;
-        remove(): Promise<void>;
-      }
-    | undefined
-  >;
-};
-
-async function clearFinishedJob(
-  queue: QueuedJobLookup,
-  jobId: string,
-): Promise<string | undefined> {
-  const existing = await queue.getJob(jobId);
-  if (!existing) return undefined;
-  const state = await existing.getState();
-  if (state === "completed" || state === "failed") {
-    await existing.remove();
-    return undefined;
-  }
-  return state;
-}
-
-/**
- * Returns the job ID a unique push should use. Known limit (worker README,
- * "Unique Jobs"): when the follow-up is also running, this push is dropped.
- */
-export async function claimUniqueJobId(
-  queue: QueuedJobLookup,
-  jobId: string,
-): Promise<string> {
-  if ((await clearFinishedJob(queue, jobId)) !== "active") return jobId;
-  const followUpId = `${jobId}-rerun`;
-  await clearFinishedJob(queue, followUpId);
-  return followUpId;
 }
 
 /**
@@ -129,10 +91,11 @@ async function pushJobToQueue(
   if (!registry.isUnique(jobName)) {
     return await addJobToQueue(jobName, args, opts);
   }
-  const uniqueOpts = buildUniqueJobOptions(jobName, args, opts);
-  const queue = await getQueue(registry.getQueueName(jobName));
-  uniqueOpts.jobId = await claimUniqueJobId(queue, uniqueOpts.jobId!);
-  return await addJobToQueue(jobName, args, uniqueOpts);
+  return await addJobToQueue(
+    jobName,
+    args,
+    buildUniqueJobOptions(jobName, args, opts),
+  );
 }
 
 async function addJobToQueue(
