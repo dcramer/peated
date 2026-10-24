@@ -201,6 +201,37 @@ describe("mergePipelineDraft", () => {
     expect(merged.siteFacts.washStills?.value).toBe(1);
   });
 
+  test("never gives a replaced event's ID to a different fact", () => {
+    const stored = document({
+      events: [
+        {
+          id: 2,
+          kind: "opened",
+          date: "1819",
+          writtenBy: "pipeline",
+          citations: cited,
+        },
+      ],
+    });
+    const draft = document({
+      events: [
+        {
+          id: 2,
+          kind: "closed",
+          date: "1983",
+          writtenBy: "pipeline",
+          citations: cited,
+        },
+      ],
+    });
+
+    const merged = mergePipelineDraft(stored, draft, now, new Map());
+
+    expect(merged.events.map(({ id, kind }) => [id, kind])).toEqual([
+      [3, "closed"],
+    ]);
+  });
+
   test("keeps different events from the same year apart", () => {
     const stored = document({
       sources: [],

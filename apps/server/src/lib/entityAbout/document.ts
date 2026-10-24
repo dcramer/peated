@@ -253,6 +253,8 @@ function absorbSourcesAndEvents(
   base: EntityAboutDocument,
   incomingSources: readonly AboutSource[],
   events: readonly AboutEvent[],
+  /** Event IDs to leave unused, such as those of events being replaced. */
+  reservedEventIds: readonly number[] = [],
 ) {
   const maps: IdMaps = { sources: new Map(), events: new Map() };
   const sources: AboutSource[] = [...base.sources];
@@ -274,8 +276,11 @@ function absorbSourcesAndEvents(
     sources.push({ ...source, id });
   }
 
-  let nextId = Math.max(0, ...base.events.map((event) => event.id)) + 1;
-  const usedEventIds = new Set(base.events.map((event) => event.id));
+  const usedEventIds = new Set([
+    ...base.events.map((event) => event.id),
+    ...reservedEventIds,
+  ]);
+  let nextId = Math.max(0, ...usedEventIds) + 1;
   const absorbed = events.map((event) => {
     const id = usedEventIds.has(event.id) ? nextId++ : event.id;
     usedEventIds.add(id);
@@ -396,7 +401,15 @@ export function mergePipelineDraft(
     }));
 
   const keptOnly: EntityAboutDocument = { ...base, events: keptEvents };
-  const absorbed = absorbSourcesAndEvents(keptOnly, draft.sources, draftEvents);
+  // ID rule: an event ID names one fact for as long as it exists, so a
+  // replaced pipeline event's ID is never given to a different fact. The
+  // history routes edit and delete by ID.
+  const absorbed = absorbSourcesAndEvents(
+    keptOnly,
+    draft.sources,
+    draftEvents,
+    base.events.map((event) => event.id),
+  );
   const { sources, maps } = absorbed;
 
   const events = absorbed.events.map((event) => {

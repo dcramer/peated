@@ -99,6 +99,18 @@ export function putLegacyEvent(
   now: string,
 ): EntityAboutDocument {
   const before = document.events.find((event) => event.id === eventId);
+  // An edit that changes nothing leaves the item, and who wrote it, as is.
+  if (
+    before &&
+    before.kind === input.kind &&
+    before.date === input.date &&
+    before.text === input.description &&
+    before.newOwnerId === input.newOwnerId &&
+    before.newOwnerName === (input.newOwnerId ? null : input.newOwnerName) &&
+    citedUrl(before, document.sources) === input.sourceUrl
+  ) {
+    return document;
+  }
   let next = document;
   let citations = before?.citations ?? [];
   if (input.sourceUrl === null) {
