@@ -12,7 +12,7 @@ import {
   EntityAboutDocumentSchema,
   type EntityAboutDocument,
 } from "@peated/server/schemas/entityAbout";
-import { eq, inArray, sql } from "drizzle-orm";
+import { and, eq, inArray, sql } from "drizzle-orm";
 
 import {
   ABOUT_FACT_FIELD_LIST,
@@ -126,6 +126,17 @@ export async function saveEntityAbout(
     );
   }
 
+  // Every saved document must parse on read (owner: the schema rule in
+  // schemas/entityAbout.ts), so it is parsed before it is written.
+  const parsed = EntityAboutDocumentSchema.safeParse(document);
+  if (!parsed.success) {
+    throw new EntityAboutWriteError(
+      "The About document is not valid.",
+      parsed.error.issues.map(
+        (issue) => `${issue.path.join(".")}: ${issue.message}`,
+      ),
+    );
+  }
   const reasons = findAboutWriteErrors(
     unchangedFrom === undefined ? (stored?.document ?? null) : unchangedFrom,
     document,
@@ -150,25 +161,41 @@ export async function saveEntityAbout(
   const version = (stored?.version ?? 0) + 1;
   const nextCheckedOn =
     checkedOn === undefined ? (stored?.checkedOn ?? null) : checkedOn;
-  await tx
-    .insert(entityAbout)
-    .values({
-      entityId: entity.id,
-      document,
-      schemaVersion: ENTITY_ABOUT_SCHEMA_VERSION,
-      version,
-      checkedOn: nextCheckedOn,
-    })
-    .onConflictDoUpdate({
-      target: entityAbout.entityId,
-      set: {
-        document,
-        schemaVersion: ENTITY_ABOUT_SCHEMA_VERSION,
-        version,
-        checkedOn: nextCheckedOn,
-        updatedAt: sql`now()`,
-      },
-    });
+  // A first save can race another first save; the loser gets a version
+  // error instead of overwriting.
+  const [written] = stored
+    ? await tx
+        .update(entityAbout)
+        .set({
+          document,
+          schemaVersion: ENTITY_ABOUT_SCHEMA_VERSION,
+          version,
+          checkedOn: nextCheckedOn,
+          updatedAt: sql`now()`,
+        })
+        .where(
+          and(
+            eq(entityAbout.entityId, entity.id),
+            eq(entityAbout.version, stored.version),
+          ),
+        )
+        .returning({ entityId: entityAbout.entityId })
+    : await tx
+        .insert(entityAbout)
+        .values({
+          entityId: entity.id,
+          document,
+          schemaVersion: ENTITY_ABOUT_SCHEMA_VERSION,
+          version,
+          checkedOn: nextCheckedOn,
+        })
+        .onConflictDoNothing()
+        .returning({ entityId: entityAbout.entityId });
+  if (!written) {
+    throw new EntityAboutVersionError(
+      `About for entity ${entity.id} changed since it was read.`,
+    );
+  }
 
   await tx.insert(changes).values({
     objectType: "entity_about",

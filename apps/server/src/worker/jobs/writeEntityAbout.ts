@@ -183,9 +183,13 @@ export async function writeEntityAbout(
       checkedOn: today,
     });
 
-    // A sourced lead replaces a generated description, never a person's.
-    // The check is in the update itself, so an edit made during the run wins.
-    const lead = toPublicEntityAbout(result, new Map()).lead;
+    // A published, sourced lead replaces a generated or empty description,
+    // never a person's or one of unknown origin. The check is in the update
+    // itself, so an edit made during the run wins.
+    const lead =
+      result.status === "published"
+        ? toPublicEntityAbout(result, new Map()).lead
+        : null;
     const description = lead?.sentences.map((s) => s.text).join(" ");
     const [updated] = description
       ? await tx
@@ -199,12 +203,11 @@ export async function writeEntityAbout(
             and(
               eq(entities.id, entity.id),
               or(
-                isNull(entities.descriptionSrc),
-                ne(entities.descriptionSrc, "user"),
-              ),
-              or(
                 isNull(entities.description),
-                ne(entities.description, description),
+                and(
+                  eq(entities.descriptionSrc, "generated"),
+                  ne(entities.description, description),
+                ),
               ),
             ),
           )

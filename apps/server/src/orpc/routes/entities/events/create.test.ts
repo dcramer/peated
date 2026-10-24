@@ -128,6 +128,29 @@ describe("POST /entities/:entity/events", () => {
     );
   });
 
+  test("rejects text longer than the About document stores", async ({
+    fixtures,
+  }) => {
+    const user = await fixtures.User({ mod: true });
+    const entity = await fixtures.Entity();
+
+    const err = await waitError(() =>
+      routerClient.entities.events.create(
+        {
+          entity: entity.id,
+          kind: "generic",
+          date: "1983",
+          description: "x".repeat(1001),
+          sourceUrl: "https://example.com/history",
+        },
+        { context: { user } },
+      ),
+    );
+
+    expect(err).toMatchObject({ code: "BAD_REQUEST" });
+    expect(await getEntityAbout(db, entity.id)).toBeNull();
+  });
+
   test("requires moderator privileges", async ({ fixtures }) => {
     const user = await fixtures.User();
     const entity = await fixtures.Entity();
