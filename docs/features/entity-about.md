@@ -3,7 +3,8 @@
 A distillery or brand can have an About tab: a short, sourced account of the
 place or label, with a timeline, key facts, owners, and numbers from the
 Bottle catalog. Every statement on the page traces to a fact, and every fact
-traces to a source.
+traces to a source. Bottlers and companies will get About pages the same
+way later; Bottles will need their own design.
 
 ## What Is Stored
 
