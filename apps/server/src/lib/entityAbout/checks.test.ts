@@ -9,6 +9,7 @@ import {
   checkConflictPicks,
   keepVerifiedCitations,
 } from "./checks";
+import { toPublicEntityAbout } from "./publicAbout";
 
 const source = {
   id: "wp",
@@ -352,6 +353,37 @@ describe("checkConflictPicks", () => {
     expect(checkConflictPicks(era("1975"))).toEqual([
       "Event 1 stores 1969–1975, which no source states.",
     ]);
+  });
+
+  test("compares only stated dates against an event's date", () => {
+    const document = draft({
+      sources: [
+        source,
+        { ...source, id: "df", url: "https://www.diffordsguide.com/brora" },
+      ],
+      events: [
+        {
+          id: 1,
+          kind: "renamed",
+          name: "Brora",
+          date: "1969",
+          writtenBy: "pipeline",
+          // These sources state the new name, not a date.
+          citations: [
+            { sourceId: "wp", statedValue: "Brora" },
+            { sourceId: "df", statedValue: "Brora Distillery" },
+          ],
+        },
+      ],
+    });
+
+    expect(checkConflictPicks(document)).toEqual([]);
+    expect(
+      toPublicEntityAbout(
+        { entityId: 1, document, version: 1, checkedOn: null },
+        new Map(),
+      ).events[0]?.disagreement,
+    ).toBeNull();
   });
 
   test("compares numbers whole, so 2 stills is not 12 or 20", () => {
