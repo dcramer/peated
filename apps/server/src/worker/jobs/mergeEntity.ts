@@ -30,8 +30,12 @@ import {
   aboutFactFieldAppliesTo,
 } from "@peated/server/lib/entityAbout/aboutFactFields";
 import {
+  eventFactId,
+  siteFactId,
+} from "@peated/server/lib/entityAbout/display";
+import {
   mergeEntityAboutDocuments,
-  pruneSources,
+  removeFacts,
 } from "@peated/server/lib/entityAbout/document";
 import {
   getEntityAbout,
@@ -1007,45 +1011,30 @@ async function mergeEntityAbout(
   const destinationHidden = destination
     ? destination.status === "hidden"
     : sources.some((source) => source.status === "hidden");
-  let document = destination?.document ?? null;
+  let combined = destination?.document ?? null;
   for (const source of sources) {
     if (source.status === "hidden" && !destinationHidden) continue;
-    document = mergeEntityAboutDocuments(document, source.document);
+    combined = mergeEntityAboutDocuments(combined, source.document);
   }
-  if (!document) return;
+  if (!combined) return;
 
   const merged = new Set(mergedEntityIds);
-  const removedFacts = new Set(
-    document.events
+  const { events, siteFacts } = combined;
+  const document = removeFacts(
+    combined,
+    new Set([
       // An owner cannot acquire itself once both are one Entity.
-      .filter((event) => event.newOwnerId && merged.has(event.newOwnerId))
-      .map((event) => `event:${event.id}`),
+      ...events
+        .filter((event) => event.newOwnerId && merged.has(event.newOwnerId))
+        .map((event) => eventFactId(event.id)),
+      // Site facts follow the destination's kind; a distillery's stills do not
+      // move to a brand. They stay in the merged Entity's change history.
+      ...ABOUT_FACT_FIELD_LIST.filter(
+        (field) =>
+          siteFacts[field] && !aboutFactFieldAppliesTo(field, toEntity.kind),
+      ).map(siteFactId),
+    ]),
   );
-  // Site facts follow the destination's kind; a distillery's stills do not
-  // move to a brand. They stay in the merged Entity's change history.
-  const siteFacts: EntityAboutDocument["siteFacts"] = {};
-  for (const field of ABOUT_FACT_FIELD_LIST) {
-    const fact = document.siteFacts[field];
-    if (!fact) continue;
-    if (aboutFactFieldAppliesTo(field, toEntity.kind)) {
-      siteFacts[field] = fact;
-    } else {
-      removedFacts.add(`site:${field}`);
-    }
-  }
-  document = pruneSources({
-    ...document,
-    events: document.events.filter(
-      (event) => !removedFacts.has(`event:${event.id}`),
-    ),
-    siteFacts,
-    sections: document.sections.flatMap((section) => {
-      const sentences = section.sentences.filter((sentence) =>
-        sentence.factIds.every((id) => !removedFacts.has(id)),
-      );
-      return sentences.length ? [{ ...section, sentences }] : [];
-    }),
-  });
 
   // Nothing moved and nothing was cleaned up.
   if (

@@ -141,11 +141,11 @@ function ArticleSection({
   about: EntityAbout;
   numbers: Map<string, number>;
 }) {
-  const eventIds = new Set(
+  const citedFactIds = new Set(
     section.sentences.flatMap((sentence) => sentence.factIds),
   );
   const disputed = about.events.filter(
-    (event) => event.disagreement && eventIds.has(`event:${event.id}`),
+    (event) => event.disagreement && citedFactIds.has(`event:${event.id}`),
   );
   const era = section.eraEventId
     ? about.events.find((event) => event.id === section.eraEventId)
@@ -248,7 +248,7 @@ function YearChart({
         eras={getEras(about)}
         bottleListHref={bottleListHref}
         names={getNameSpans(about, entityName)}
-        withoutVintage={counts.withoutYear}
+        withoutYear={counts.withoutYear}
         years={fillYears(counts)}
       />
     </section>

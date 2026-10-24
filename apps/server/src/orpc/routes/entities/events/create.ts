@@ -7,11 +7,8 @@ import {
   putLegacyEvent,
   toLegacyEvent,
 } from "@peated/server/lib/entityAbout/legacyEvents";
-import {
-  EntityAboutVersionError,
-  EntityAboutWriteError,
-} from "@peated/server/lib/entityAbout/store";
 import { procedure } from "@peated/server/orpc";
+import { withAboutRouteErrors } from "@peated/server/orpc/errors";
 import { requireMod } from "@peated/server/orpc/middleware";
 import {
   EntityEventInputSchema,
@@ -53,7 +50,7 @@ export default procedure
     }
 
     let eventId = 0;
-    try {
+    return await withAboutRouteErrors(async () => {
       const saved = await db.transaction(async (tx) =>
         editEntityHistory(tx, {
           entity,
@@ -85,18 +82,5 @@ export default procedure
         });
       }
       return result;
-    } catch (error) {
-      if (error instanceof EntityAboutVersionError) {
-        throw errors.CONFLICT({ message: error.message });
-      }
-      if (error instanceof EntityAboutWriteError) {
-        if (
-          error.reasons.some((reason) => reason.startsWith("Linked entity"))
-        ) {
-          throw errors.NOT_FOUND({ message: "New owner not found." });
-        }
-        throw errors.BAD_REQUEST({ message: error.reasons.join(" ") });
-      }
-      throw error;
-    }
+    });
   });

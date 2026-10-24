@@ -1,5 +1,6 @@
 import { tool } from "@openai/agents";
 import { BOT_USER_AGENT } from "@peated/server/constants";
+import type { AboutPageRead } from "@peated/server/lib/entityAbout/checks";
 import { z } from "zod";
 
 const FIRECRAWL_API_URL = "https://api.firecrawl.dev";
@@ -8,9 +9,6 @@ const SEARCH_RESULT_LIMIT = 8;
 // Pages are long; the writer needs the passages, and quotes are checked
 // against exactly this text.
 const MAX_PAGE_CHARS = 24_000;
-
-/** A page the writer read, kept so code can check its quotes. */
-export type PageRead = { url: string; text: string };
 
 export type WebBudget = { searches: number; reads: number };
 
@@ -90,15 +88,17 @@ async function firecrawl(
  */
 export function createAboutWebTools({
   apiKey,
-  apiUrl = FIRECRAWL_API_URL,
+  apiUrl: configuredUrl,
   budget,
   pagesRead,
 }: {
   apiKey: string;
-  apiUrl?: string;
+  /** Defaults to Firecrawl's hosted API. */
+  apiUrl: string | null;
   budget: WebBudget;
-  pagesRead: PageRead[];
+  pagesRead: AboutPageRead[];
 }) {
+  const apiUrl = configuredUrl ?? FIRECRAWL_API_URL;
   const used = { searches: 0, reads: 0 };
 
   const searchWeb = tool({
@@ -179,5 +179,5 @@ export function createAboutWebTools({
     },
   });
 
-  return { tools: [searchWeb, readPage], used };
+  return [searchWeb, readPage];
 }

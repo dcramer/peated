@@ -19,7 +19,7 @@ import {
 // Counting rule: About charts count the same active Bottles as the Bottles
 // tab (grouped, not tombstoned), so their numbers agree.
 function activeBottle(): SQL<unknown> {
-  return sql`${bottles.groupId} IS NOT NULL AND ${bottles.id} NOT IN (SELECT ${bottleTombstones.bottleId} FROM ${bottleTombstones})`;
+  return sql`${bottles.groupId} IS NOT NULL AND NOT EXISTS(SELECT FROM ${bottleTombstones} WHERE ${bottleTombstones.bottleId} = ${bottles.id})`;
 }
 
 function distilledAt(entityId: number): SQL<unknown> {
@@ -85,32 +85,34 @@ export async function countBottlers(entityId: number) {
 
 /** Bottles sold under the Entity as Brand, by distillery. */
 export async function countDistillers(entityId: number) {
-  const rows = await db
-    .select({
-      id: entities.id,
-      name: entities.name,
-      kind: entities.kind,
-      count: count(),
-    })
-    .from(bottles)
-    .innerJoin(
-      bottlesToDistillers,
-      eq(bottlesToDistillers.bottleId, bottles.id),
-    )
-    .innerJoin(entities, eq(entities.id, bottlesToDistillers.distillerId))
-    .where(and(activeBottle(), eq(bottles.brandId, entityId)))
-    .groupBy(entities.id, entities.name, entities.kind)
-    .orderBy(desc(count()), asc(entities.name));
-  const [withoutDistiller] = await db
-    .select({ count: count() })
-    .from(bottles)
-    .where(
-      and(
-        activeBottle(),
-        eq(bottles.brandId, entityId),
-        sql`NOT EXISTS(SELECT FROM ${bottlesToDistillers} WHERE ${bottlesToDistillers.bottleId} = ${bottles.id})`,
+  const [rows, [withoutDistiller]] = await Promise.all([
+    db
+      .select({
+        id: entities.id,
+        name: entities.name,
+        kind: entities.kind,
+        count: count(),
+      })
+      .from(bottles)
+      .innerJoin(
+        bottlesToDistillers,
+        eq(bottlesToDistillers.bottleId, bottles.id),
+      )
+      .innerJoin(entities, eq(entities.id, bottlesToDistillers.distillerId))
+      .where(and(activeBottle(), eq(bottles.brandId, entityId)))
+      .groupBy(entities.id, entities.name, entities.kind)
+      .orderBy(desc(count()), asc(entities.name)),
+    db
+      .select({ count: count() })
+      .from(bottles)
+      .where(
+        and(
+          activeBottle(),
+          eq(bottles.brandId, entityId),
+          sql`NOT EXISTS(SELECT FROM ${bottlesToDistillers} WHERE ${bottlesToDistillers.bottleId} = ${bottles.id})`,
+        ),
       ),
-    );
+  ]);
   return {
     results: rows.map((row) => ({
       entity: { id: row.id, name: row.name, kind: row.kind },

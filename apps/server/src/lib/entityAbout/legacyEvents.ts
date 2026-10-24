@@ -22,7 +22,10 @@ import { getEntityAbout, saveEntityAbout } from "./store";
 type LegacyKind = (typeof ENTITY_EVENT_KIND_LIST)[number];
 type LegacyEvent = z.infer<typeof EntityEventSchema>;
 
-export function isLegacyKind(kind: string): kind is LegacyKind {
+// Items stored before About documents have no timestamps.
+const UNKNOWN_TIME = new Date(0).toISOString();
+
+function isLegacyKind(kind: string): kind is LegacyKind {
   return ENTITY_EVENT_KIND_LIST.some((legacyKind) => legacyKind === kind);
 }
 
@@ -32,8 +35,6 @@ export function toLegacyEvent(
   sources: readonly AboutSource[],
 ): LegacyEvent | null {
   if (!isLegacyKind(event.kind)) return null;
-  const sourceId = event.citations[0]?.sourceId;
-  const now = new Date(0).toISOString();
   return {
     id: event.id,
     entityId,
@@ -42,10 +43,16 @@ export function toLegacyEvent(
     description: event.text,
     newOwnerId: event.newOwnerId,
     newOwnerName: event.newOwnerName,
-    sourceUrl: sources.find((source) => source.id === sourceId)?.url ?? null,
-    createdAt: event.createdAt ?? now,
-    updatedAt: event.updatedAt ?? event.createdAt ?? now,
+    sourceUrl: citedUrl(event, sources),
+    createdAt: event.createdAt ?? UNKNOWN_TIME,
+    updatedAt: event.updatedAt ?? event.createdAt ?? UNKNOWN_TIME,
   };
+}
+
+/** The URL of an event's first source; legacy history shows one. */
+function citedUrl(event: AboutEvent, sources: readonly AboutSource[]) {
+  const sourceId = event.citations[0]?.sourceId;
+  return sources.find((source) => source.id === sourceId)?.url ?? null;
 }
 
 /** Finds or adds a moderator-supplied source and returns its ID. */
@@ -75,7 +82,7 @@ export function ensureSource(document: EntityAboutDocument, url: string) {
   };
 }
 
-export type LegacyEventInput = {
+type LegacyEventInput = {
   kind: LegacyKind;
   date: string;
   description: string | null;
@@ -94,21 +101,19 @@ export function putLegacyEvent(
   const before = document.events.find((event) => event.id === eventId);
   let next = document;
   let citations = before?.citations ?? [];
-  const beforeUrl = toLegacyEvent(
-    0,
-    before ?? stubEvent(eventId),
-    document.sources,
-  )?.sourceUrl;
   if (input.sourceUrl === null) {
     citations = [];
-  } else if (input.sourceUrl !== beforeUrl) {
+  } else if (
+    !before ||
+    input.sourceUrl !== citedUrl(before, document.sources)
+  ) {
     const added = ensureSource(next, input.sourceUrl);
     next = added.document;
     citations = [{ sourceId: added.sourceId, statedValue: null, quote: null }];
   }
 
   const event: AboutEvent = {
-    ...(before ?? stubEvent(eventId)),
+    ...(before ?? blankAboutEvent(eventId)),
     kind: input.kind,
     date: input.date,
     text: input.description,
@@ -126,7 +131,8 @@ export function putLegacyEvent(
   return pruneSources({ ...next, events });
 }
 
-function stubEvent(id: number): AboutEvent {
+/** An event with every optional field empty, for callers to fill in. */
+export function blankAboutEvent(id: number): AboutEvent {
   return {
     id,
     kind: "generic",

@@ -44,6 +44,43 @@ export function pruneSources(
   };
 }
 
+/**
+ * Removes facts, the sentences that cite them, and sections left empty. A
+ * section about a removed era keeps its other text.
+ */
+export function removeFacts(
+  document: EntityAboutDocument,
+  factIds: ReadonlySet<string>,
+): EntityAboutDocument {
+  const siteFacts: EntityAboutDocument["siteFacts"] = {};
+  for (const field of ABOUT_FACT_FIELD_LIST) {
+    const fact = document.siteFacts[field];
+    if (fact && !factIds.has(siteFactId(field))) siteFacts[field] = fact;
+  }
+  return pruneSources({
+    ...document,
+    events: document.events.filter(
+      (event) => !factIds.has(eventFactId(event.id)),
+    ),
+    siteFacts,
+    sections: document.sections.flatMap((section) => {
+      const sentences = section.sentences.filter((sentence) =>
+        sentence.factIds.every((id) => !factIds.has(id)),
+      );
+      if (!sentences.length) return [];
+      const eraRemoved =
+        section.eraEventId && factIds.has(eventFactId(section.eraEventId));
+      return [
+        {
+          ...section,
+          sentences,
+          eraEventId: eraRemoved ? null : section.eraEventId,
+        },
+      ];
+    }),
+  });
+}
+
 function sameItem<T>(left: T, right: T) {
   return JSON.stringify(left) === JSON.stringify(right);
 }
@@ -77,7 +114,8 @@ export function findAboutWriteErrors(
     sourceUrls.add(url);
   }
 
-  for (const [factId, citations] of getFactCitations(next)) {
+  const factCitations = getFactCitations(next);
+  for (const [factId, citations] of factCitations) {
     for (const citation of citations) {
       if (!sourceIds.has(citation.sourceId)) {
         errors.push(`${factId} cites unknown source ${citation.sourceId}.`);
@@ -113,7 +151,7 @@ export function findAboutWriteErrors(
     }
   }
 
-  const factIds = new Set(getFactCitations(next).keys());
+  const factIds = new Set(factCitations.keys());
   const sectionKeys = new Set<string>();
   for (const section of next.sections) {
     if (sectionKeys.has(section.key)) {
@@ -195,6 +233,13 @@ export function markPersonEdits(
 
 type IdMaps = { sources: Map<string, string>; events: Map<number, number> };
 
+function remapCitation(citation: AboutCitation, maps: IdMaps) {
+  return {
+    ...citation,
+    sourceId: maps.sources.get(citation.sourceId) ?? citation.sourceId,
+  };
+}
+
 /**
  * Adds incoming sources and events to a base document, combining sources
  * with the same URL and renumbering events that would collide. Returns the
@@ -202,7 +247,7 @@ type IdMaps = { sources: Map<string, string>; events: Map<number, number> };
  */
 function absorbSourcesAndEvents(
   base: EntityAboutDocument,
-  incoming: EntityAboutDocument,
+  incomingSources: readonly AboutSource[],
   events: readonly AboutEvent[],
 ) {
   const maps: IdMaps = { sources: new Map(), events: new Map() };
@@ -211,7 +256,7 @@ function absorbSourcesAndEvents(
     sources.map((source) => [normalizeSourceUrl(source.url), source.id]),
   );
   const usedIds = new Set(sources.map((source) => source.id));
-  for (const source of incoming.sources) {
+  for (const source of incomingSources) {
     const existing = byUrl.get(normalizeSourceUrl(source.url));
     if (existing) {
       maps.sources.set(source.id, existing);
@@ -225,20 +270,19 @@ function absorbSourcesAndEvents(
     sources.push({ ...source, id });
   }
 
-  let nextEventId = Math.max(0, ...base.events.map((event) => event.id)) + 1;
+  let nextId = Math.max(0, ...base.events.map((event) => event.id)) + 1;
   const usedEventIds = new Set(base.events.map((event) => event.id));
   const absorbed = events.map((event) => {
-    const id = usedEventIds.has(event.id) ? nextEventId++ : event.id;
+    const id = usedEventIds.has(event.id) ? nextId++ : event.id;
     usedEventIds.add(id);
-    nextEventId = Math.max(nextEventId, id + 1);
+    nextId = Math.max(nextId, id + 1);
     maps.events.set(event.id, id);
     return {
       ...event,
       id,
-      citations: event.citations.map((citation) => ({
-        ...citation,
-        sourceId: maps.sources.get(citation.sourceId) ?? citation.sourceId,
-      })),
+      citations: event.citations.map((citation) =>
+        remapCitation(citation, maps),
+      ),
     };
   });
 
@@ -328,13 +372,15 @@ export function mergePipelineDraft(
   );
   // Each kept event takes at most one draft event's citations.
   const matches = new Map<number, number>();
+  const claimed = new Set<number>();
   for (const event of draft.events) {
     const kept = keptEvents.find(
       (candidate) =>
-        ![...matches.values()].includes(candidate.id) &&
-        sameEvent(candidate, event, ownerNames),
+        !claimed.has(candidate.id) && sameEvent(candidate, event, ownerNames),
     );
-    if (kept) matches.set(event.id, kept.id);
+    if (!kept) continue;
+    matches.set(event.id, kept.id);
+    claimed.add(kept.id);
   }
   const draftEvents = draft.events
     .filter((event) => !matches.has(event.id))
@@ -346,17 +392,15 @@ export function mergePipelineDraft(
     }));
 
   const keptOnly: EntityAboutDocument = { ...base, events: keptEvents };
-  const absorbed = absorbSourcesAndEvents(keptOnly, draft, draftEvents);
+  const absorbed = absorbSourcesAndEvents(keptOnly, draft.sources, draftEvents);
   const { sources, maps } = absorbed;
-  const remapCitation = (citation: AboutCitation) => ({
-    ...citation,
-    sourceId: maps.sources.get(citation.sourceId) ?? citation.sourceId,
-  });
 
   const events = absorbed.events.map((event) => {
     const added = draft.events
       .filter((candidate) => matches.get(candidate.id) === event.id)
-      .flatMap((candidate) => candidate.citations.map(remapCitation))
+      .flatMap((candidate) =>
+        candidate.citations.map((citation) => remapCitation(citation, maps)),
+      )
       .filter(
         (citation) =>
           !event.citations.some((c) => c.sourceId === citation.sourceId),
@@ -384,7 +428,9 @@ export function mergePipelineDraft(
       siteFacts[field] = {
         ...proposed,
         writtenBy: "pipeline",
-        citations: proposed.citations.map(remapCitation),
+        citations: proposed.citations.map((citation) =>
+          remapCitation(citation, maps),
+        ),
       };
     }
   }
@@ -424,7 +470,7 @@ export function mergeEntityAboutDocuments(
   const base = destination ?? EMPTY_ABOUT_DOCUMENT;
   const { sources, events, maps } = absorbSourcesAndEvents(
     base,
-    merged,
+    merged.sources,
     merged.events,
   );
   const siteFacts: EntityAboutDocument["siteFacts"] = { ...base.siteFacts };
@@ -433,10 +479,9 @@ export function mergeEntityAboutDocuments(
     if (siteFacts[field] || !fact) continue;
     siteFacts[field] = {
       ...fact,
-      citations: fact.citations.map((citation) => ({
-        ...citation,
-        sourceId: maps.sources.get(citation.sourceId) ?? citation.sourceId,
-      })),
+      citations: fact.citations.map((citation) =>
+        remapCitation(citation, maps),
+      ),
     };
   }
   return pruneSources({

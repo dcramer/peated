@@ -62,8 +62,8 @@ export default procedure
             .limit(input.limit)
         ).map((row) => row.id);
 
-    for (const entityId of ids) {
-      await pushUniqueJob("WriteEntityAbout", { entityId });
-    }
+    await Promise.all(
+      ids.map((entityId) => pushUniqueJob("WriteEntityAbout", { entityId })),
+    );
     return { queued: ids };
   });

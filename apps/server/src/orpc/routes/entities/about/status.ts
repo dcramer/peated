@@ -4,6 +4,7 @@ import { getUserActorForDatabase } from "@peated/server/lib/actors";
 import { setEntityAboutStatus } from "@peated/server/lib/entityAbout/store";
 import { procedure } from "@peated/server/orpc";
 import { requireMod } from "@peated/server/orpc/middleware";
+import { EntityAboutStatusEnum } from "@peated/server/schemas/entityAbout";
 import { eq } from "drizzle-orm";
 import { z } from "zod";
 
@@ -20,10 +21,10 @@ export default procedure
   .input(
     z.object({
       entity: z.coerce.number(),
-      status: z.enum(["published", "hidden"]),
+      status: EntityAboutStatusEnum,
     }),
   )
-  .output(z.object({ status: z.enum(["published", "hidden"]) }))
+  .output(z.object({ status: EntityAboutStatusEnum }))
   .handler(async function ({ input, context, errors }) {
     const [entity] = await db
       .select({ id: entities.id, name: entities.name })
