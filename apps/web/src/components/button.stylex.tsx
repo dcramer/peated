@@ -15,7 +15,13 @@ import { LinkPending } from "./linkPending.stylex";
 const REDUCED_MOTION = "@media (prefers-reduced-motion: reduce)";
 const PHONE = "@media (max-width: 480px)";
 
-export type ButtonVariant = "default" | "tonal" | "accent" | "danger" | "text";
+export type ButtonVariant =
+  | "default"
+  | "tonal"
+  | "accent"
+  | "danger"
+  | "quiet"
+  | "text";
 export type ButtonSize = "sm" | "md" | "lg";
 
 type SharedButtonProps = Omit<
@@ -331,6 +337,20 @@ const styles = stylex.create({
     },
     color: colors.critical,
   },
+  quiet: {
+    backgroundColor: {
+      default: "transparent",
+      ":hover": colors.accentTint,
+      ":active": colors.accentTint,
+      ":focus-visible": colors.accentTint,
+    },
+    color: {
+      default: colors.ink,
+      ":hover": colors.accentDeep,
+      ":active": colors.accentDeep,
+      ":focus-visible": colors.accentDeep,
+    },
+  },
   text: {
     backgroundColor: {
       default: "transparent",
@@ -396,6 +416,7 @@ const variantStyles = {
   tonal: styles.tonal,
   accent: styles.accent,
   danger: styles.danger,
+  quiet: styles.quiet,
   text: styles.text,
 } satisfies Record<ButtonVariant, stylex.StyleXStyles>;
 

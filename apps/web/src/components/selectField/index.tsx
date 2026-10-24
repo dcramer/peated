@@ -4,7 +4,14 @@ import {
   SearchPicker,
   type SearchPickerOption,
 } from "@peated/web/components/searchPicker.stylex";
-import { useEffect, useMemo, useState } from "react";
+import {
+  keepPreviousData,
+  queryOptions,
+  skipToken,
+  useQuery,
+} from "@tanstack/react-query";
+import { useId, useMemo, useState } from "react";
+import { useDebounceValue } from "usehooks-ts";
 
 import type { OnQuery, Option } from "./types";
 
@@ -18,6 +25,8 @@ type BaseProps<T extends Option> = {
   options?: T[];
   placeholder?: string;
   readOnly?: boolean;
+  /** Values outside the typed text that `onQuery` results depend on. */
+  searchDependencies?: readonly unknown[];
   suggestedOptions?: T[];
 };
 
@@ -46,39 +55,39 @@ export default function SelectField<T extends Option>(props: Props<T>) {
     options = [],
     placeholder = "Search",
     readOnly = false,
+    searchDependencies = [],
     suggestedOptions = [],
     value,
   } = props;
+  const fieldId = useId();
   const [query, setQuery] = useState("");
-  const [queryOptions, setQueryOptions] = useState<T[]>([]);
-  const [loading, setLoading] = useState(false);
+  const [debouncedQuery] = useDebounceValue(query, 150);
+  // Query keys compare by value, so a new default array made on each render
+  // does not start another search. `onQuery` is a new function on each render
+  // too, so values it reads beyond the text must be in searchDependencies.
+  const { data: searchResults = [], isFetching: loading } = useQuery(
+    queryOptions({
+      queryKey: [
+        "select-field",
+        fieldId,
+        debouncedQuery,
+        options,
+        searchDependencies,
+      ],
+      queryFn: onQuery ? () => onQuery(debouncedQuery, options) : skipToken,
+      // Keep the last results visible while the next query loads, as before.
+      placeholderData: keepPreviousData,
+    }),
+  );
   const selected = useMemo(
     () => (Array.isArray(value) ? value : value ? [value] : []),
     [value],
   );
 
-  useEffect(() => {
-    if (!onQuery) return;
-    let active = true;
-    const timeout = window.setTimeout(async () => {
-      setLoading(true);
-      try {
-        const results = await onQuery(query, options);
-        if (active) setQueryOptions(results);
-      } finally {
-        if (active) setLoading(false);
-      }
-    }, 150);
-    return () => {
-      active = false;
-      window.clearTimeout(timeout);
-    };
-  }, [onQuery, options, query]);
-
   const available = useMemo(() => {
     const values = [
       ...selected,
-      ...queryOptions,
+      ...searchResults,
       ...suggestedOptions,
       ...options,
     ];
@@ -86,7 +95,7 @@ export default function SelectField<T extends Option>(props: Props<T>) {
       (option, index) =>
         values.findIndex((candidate) => candidate.id === option.id) === index,
     );
-  }, [options, queryOptions, selected, suggestedOptions]);
+  }, [options, searchResults, selected, suggestedOptions]);
   const byId = new Map(available.map((option) => [String(option.id), option]));
   const toPickerOption = (option: T): SearchPickerOption => ({
     bottle: option.bottle,

@@ -22,7 +22,7 @@ export default procedure
     path: "/tastings/{tasting}",
     summary: "Delete tasting",
     description:
-      "Delete a tasting and update related statistics. Only the tasting creator or admin can delete",
+      "Delete a tasting and update related statistics. Only the tasting creator, a moderator, or an admin can delete",
     operationId: "deleteTasting",
   })
   .input(z.object({ tasting: z.coerce.number() }))
@@ -64,7 +64,8 @@ export default procedure
       }
       if (
         lockedTasting.createdById !== context.user.id &&
-        !context.user.admin
+        !context.user.admin &&
+        !context.user.mod
       ) {
         throw errors.FORBIDDEN({
           message: "Cannot delete another user's tasting.",

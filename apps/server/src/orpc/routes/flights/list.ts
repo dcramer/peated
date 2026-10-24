@@ -18,7 +18,7 @@ export default implement(flightListContract).handler(async function ({
     where.push(ilike(flights.name, `%${query}%`));
   }
 
-  if (context.user?.mod && input.filter === "none") {
+  if ((context.user?.admin || context.user?.mod) && input.filter === "none") {
     // do nothing
   } else {
     if (context.user) {

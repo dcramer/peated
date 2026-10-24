@@ -56,7 +56,7 @@ export default procedure
     path: "/flights/{flight}",
     summary: "Update flight",
     description:
-      "Update flight information including name, description, and Bottle membership. Only the flight creator or moderator can update",
+      "Update flight information including name, description, and Bottle membership. Only the flight creator, a moderator, or an admin can update",
     operationId: "updateFlight",
   })
   .use(requireAuth)
@@ -75,7 +75,8 @@ export default procedure
         message: "Flight not found.",
       });
     }
-    if (flight.createdById !== context.user.id && !context.user.mod) {
+    const canModerate = context.user.admin || context.user.mod;
+    if (flight.createdById !== context.user.id && !canModerate) {
       throw errors.FORBIDDEN({
         message: "Cannot update another user's flight.",
       });
@@ -94,7 +95,7 @@ export default procedure
         .update(flights)
         .set(data)
         .where(
-          context.user.mod
+          canModerate
             ? eq(flights.id, flight.id)
             : and(
                 eq(flights.id, flight.id),
@@ -127,10 +128,7 @@ export default procedure
                 message: "Flight not found.",
               });
             }
-            if (
-              currentFlight.createdById !== context.user.id &&
-              !context.user.mod
-            ) {
+            if (currentFlight.createdById !== context.user.id && !canModerate) {
               throw errors.FORBIDDEN({
                 message: "Cannot update another user's flight.",
               });
