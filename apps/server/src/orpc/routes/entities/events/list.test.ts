@@ -52,6 +52,27 @@ describe("GET /entities/:entity/events", () => {
     expect(about?.events.map(({ kind }) => kind)).toEqual(["opened"]);
   });
 
+  test("follows an owner through more than one merge", async ({ fixtures }) => {
+    const entity = await fixtures.Entity();
+    const owner = await fixtures.Entity({ kind: "company" });
+    const middle = await fixtures.Entity({ kind: "company" });
+    const first = await fixtures.Entity({ kind: "company" });
+    await db.insert(entityTombstones).values([
+      { entityId: first.id, newEntityId: middle.id },
+      { entityId: middle.id, newEntityId: owner.id },
+    ]);
+    await fixtures.EntityAbout({
+      entityId: entity.id,
+      events: [{ id: 1, kind: "acquired", date: "1925", newOwnerId: first.id }],
+    });
+
+    const { results } = await routerClient.entities.events.list({
+      entity: entity.id,
+    });
+
+    expect(results.map(({ newOwnerId }) => newOwnerId)).toEqual([owner.id]);
+  });
+
   test("lists history in date order", async ({ fixtures }) => {
     const entity = await fixtures.Entity();
     await fixtures.EntityAbout({

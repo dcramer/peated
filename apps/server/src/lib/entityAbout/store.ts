@@ -88,18 +88,30 @@ export async function followMergedEntities(
   ids: readonly number[],
 ) {
   const target = new Map<number, number>(ids.map((id) => [id, id]));
-  if (!ids.length) return target;
-  const tombstones = await database
-    .select()
-    .from(entityTombstones)
-    .where(inArray(entityTombstones.entityId, [...ids]));
-  for (const tombstone of tombstones) {
-    if (tombstone.newEntityId) {
-      target.set(tombstone.entityId, tombstone.newEntityId);
+  // Merges chain (A into B, then B into C), so each hop is followed to the
+  // end. The limit stops a tombstone cycle.
+  let pending = [...new Set(ids)];
+  for (let hop = 0; pending.length && hop < MAX_MERGE_HOPS; hop += 1) {
+    const tombstones = await database
+      .select()
+      .from(entityTombstones)
+      .where(inArray(entityTombstones.entityId, pending));
+    const next = new Map<number, number>();
+    for (const tombstone of tombstones) {
+      if (tombstone.newEntityId) {
+        next.set(tombstone.entityId, tombstone.newEntityId);
+      }
     }
+    for (const [id, current] of target) {
+      const moved = next.get(current);
+      if (moved) target.set(id, moved);
+    }
+    pending = [...new Set(next.values())];
   }
   return target;
 }
+
+const MAX_MERGE_HOPS = 10;
 
 /**
  * Returns Entity IDs the document newly links that do not exist. A merged

@@ -183,11 +183,13 @@ export async function writeEntityAbout(
     saved = await db.transaction(async (tx) => {
       // Lock order rule (owner: `mergeEntity`): the Entity row, then its
       // About row, so a merge running at the same time cannot deadlock.
+      // NO KEY UPDATE still waits on a merge's lock, but not on the key-share
+      // lock an About edit's first insert takes on the Entity.
       await tx
         .select({ id: entities.id })
         .from(entities)
         .where(eq(entities.id, entity.id))
-        .for("update");
+        .for("no key update");
       const stored = await getEntityAbout(tx, entity.id, { forUpdate: true });
       const now = services.now();
       // Owners are read again: a moderator may have linked one mid-run.
