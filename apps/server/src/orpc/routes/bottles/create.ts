@@ -4,6 +4,7 @@ import {
   BottleCreateBadRequestError,
   createBottle,
 } from "@peated/server/lib/createBottle";
+import { canModerate } from "@peated/server/lib/moderators";
 import { procedure } from "@peated/server/orpc";
 import {
   requireTosAccepted,
@@ -31,7 +32,7 @@ export default procedure
   .output(BottleSchema)
   .handler(async function ({ input, context, errors }) {
     const { reviewed, ...bottleInput } = input;
-    if (reviewed && !context.user.admin && !context.user.mod) {
+    if (reviewed && !canModerate(context.user)) {
       throw errors.FORBIDDEN({
         message: "Only moderators can mark a bottle as reviewed.",
       });

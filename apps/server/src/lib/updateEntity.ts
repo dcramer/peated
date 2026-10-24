@@ -29,6 +29,7 @@ import {
   updateLocationBottleCounts,
 } from "@peated/server/lib/locationBottleCounts";
 import { logError } from "@peated/server/lib/log";
+import { canModerate } from "@peated/server/lib/moderators";
 import {
   BottleUpdateConflictError,
   BottleUpdateGraphError,
@@ -585,7 +586,7 @@ export async function updateEntity({
   input: unknown;
   user: User | null;
 }): Promise<{ entity: Entity; changed: boolean }> {
-  if (!user?.admin && !user?.mod) {
+  if (!canModerate(user)) {
     throw new EntityUpdateAuthorizationError();
   }
 

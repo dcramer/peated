@@ -1,6 +1,7 @@
 import { db } from "@peated/server/db";
 import { users } from "@peated/server/db/schema";
 import { sendReportEmail } from "@peated/server/lib/email";
+import { canModerateWhere } from "@peated/server/lib/moderators";
 import {
   describeReportSubject,
   recordNameOf,
@@ -8,7 +9,7 @@ import {
 import { getAdminReport } from "@peated/server/orpc/routes/admin/reports/data";
 import { REPORT_REASON_LABELS } from "@peated/server/schemas/reports";
 import type { JobPayload } from "@peated/server/worker/types";
-import { and, eq, isNull, ne, or } from "drizzle-orm";
+import { and, eq, isNull, ne } from "drizzle-orm";
 import { z } from "zod";
 
 export const NotifyReportJobArgsSchema = z
@@ -36,7 +37,7 @@ export async function notifyReportWith(
     .from(users)
     .where(
       and(
-        or(eq(users.mod, true), eq(users.admin, true)),
+        canModerateWhere(),
         eq(users.verified, true),
         isNull(users.deletedAt),
         isNull(users.suspendedAt),

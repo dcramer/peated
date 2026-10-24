@@ -16,6 +16,7 @@ import {
   type AuctionLot,
   type BottleCheck,
 } from "@peated/server/db/schema";
+import { canModerate } from "@peated/server/lib/moderators";
 import {
   AuctionLotDetailObservationSchema,
   AuctionObservationSchema,
@@ -399,7 +400,7 @@ export async function assignAuctionLot({
       const user = await tx.query.users.findFirst({
         where: eq(users.id, userId),
       });
-      if (!user || (!user.mod && !user.admin))
+      if (!canModerate(user))
         throw new Error("Auction assignment requires a moderator.");
     }
     if (rememberReference && (userId === undefined || expectedCheckId == null))

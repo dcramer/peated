@@ -52,6 +52,7 @@ import {
 } from "@peated/server/lib/bottleOperationReviewSchemas";
 import { EntityMergeOperationExecutionResultSchema } from "@peated/server/lib/entityMergeOperation";
 import { logError } from "@peated/server/lib/log";
+import { canModerate } from "@peated/server/lib/moderators";
 import type { PersistedBottleOperationExecutionResult } from "@peated/server/schemas/bottleOperationResults";
 import { and, eq, sql } from "drizzle-orm";
 import { isDeepStrictEqual } from "node:util";
@@ -187,7 +188,7 @@ class BottleOperationActionError extends Error {
 }
 
 function assertModerator(user: User | null): asserts user is User {
-  if (!user?.admin && !user?.mod) {
+  if (!canModerate(user)) {
     throw new BottleOperationModerationAuthorizationError();
   }
 }

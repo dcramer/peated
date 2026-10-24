@@ -33,6 +33,7 @@ import {
   assertCollectedEvidenceRefs,
   prepareProposals,
 } from "@peated/server/lib/bottleOperationReview";
+import { canModerate } from "@peated/server/lib/moderators";
 import {
   and,
   asc,
@@ -1049,7 +1050,7 @@ export async function closeBottleCheck(
   user: User | null,
   database: AnyConnection = db,
 ): Promise<BottleCheckWithOperations> {
-  if (!user?.admin && !user?.mod) {
+  if (!canModerate(user)) {
     throw new BottleCheckCloseAuthorizationError();
   }
   const input = CloseBottleCheckInputSchema.parse(rawInput);

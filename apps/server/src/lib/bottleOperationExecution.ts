@@ -6,6 +6,7 @@ import {
   finalizeBottleMerge,
   mergeBottlesInTransaction,
 } from "@peated/server/lib/mergeBottles";
+import { canModerate } from "@peated/server/lib/moderators";
 import {
   finalizeBottleUpdate,
   updateBottleInTransaction,
@@ -58,7 +59,7 @@ export async function executePreparedOperationInTransaction({
   prepared: PreparedOperationExecution;
   transaction: AnyTransaction;
 }): Promise<BottleOperationExecution> {
-  if (!approvingModerator.admin && !approvingModerator.mod) {
+  if (!canModerate(approvingModerator)) {
     throw new BottleOperationExecutionAuthorizationError();
   }
   const actorId = (

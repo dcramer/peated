@@ -5,6 +5,7 @@ import type { User } from "@peated/server/db/schema";
 import { bottleImages, bottles } from "@peated/server/db/schema";
 import { getPeatedSystemActor, getUserActor } from "@peated/server/lib/actors";
 import { reconcileBottleSeriesRepresentativesForBottles } from "@peated/server/lib/bottleSeriesRepresentatives";
+import { canModerate } from "@peated/server/lib/moderators";
 import { humanizeBytes } from "@peated/server/lib/strings";
 import { compressAndResizeImage, storeFile } from "@peated/server/lib/uploads";
 import { absoluteUrl } from "@peated/server/lib/urls";
@@ -183,18 +184,13 @@ export async function updateBottleImageForUser({
   if (!targetBottle) throw new BottleImageBottleNotFoundError(bottleId);
 
   const userActor = await getUserActor(user);
-  if (
-    !user.admin &&
-    !user.mod &&
-    targetBottle.createdByActorId !== userActor.id
-  ) {
+  if (!canModerate(user) && targetBottle.createdByActorId !== userActor.id) {
     throw new BottleImageForbiddenError();
   }
   // Image source and license are moderator-only catalog fields, set by
   // moderators and our scraping tools. Bottle creators may only upload photos.
   if (
-    !user.admin &&
-    !user.mod &&
+    !canModerate(user) &&
     (sourceUrl !== undefined || license !== undefined)
   ) {
     throw new BottleImageForbiddenError(

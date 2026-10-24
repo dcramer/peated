@@ -7,6 +7,7 @@ import {
 } from "@peated/server/db/schema";
 import { visibleExternalReviewWhere } from "@peated/server/externalReviews/visibility";
 import { logWarn } from "@peated/server/lib/log";
+import { canModerate } from "@peated/server/lib/moderators";
 import { implement } from "@peated/server/orpc";
 import externalReviewListContract from "@peated/server/orpc/contracts/externalReviews/list";
 import { serialize } from "@peated/server/serializers";
@@ -46,7 +47,7 @@ export default implement(externalReviewListContract).handler(async function ({
     );
   }
 
-  if (requiresModerator && !context.user?.admin && !context.user?.mod) {
+  if (requiresModerator && !canModerate(context.user)) {
     logWarn(
       "User requested external review list without moderator permissions",
       {

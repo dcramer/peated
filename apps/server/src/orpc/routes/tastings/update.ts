@@ -2,6 +2,7 @@ import { db } from "@peated/server/db";
 import type { NewTasting, Tasting } from "@peated/server/db/schema";
 import { follows, tastings } from "@peated/server/db/schema";
 import { arraysEqual } from "@peated/server/lib/equals";
+import { canModerate } from "@peated/server/lib/moderators";
 import { procedure } from "@peated/server/orpc";
 import {
   requireAuth,
@@ -118,7 +119,7 @@ export default procedure
 
     if (
       input.image === null &&
-      (user?.admin || user?.mod || user?.id === tasting.createdById)
+      (canModerate(user) || user?.id === tasting.createdById)
     ) {
       tastingData.imageUrl = null;
     }
