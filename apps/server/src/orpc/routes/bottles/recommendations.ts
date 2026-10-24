@@ -1,37 +1,23 @@
 import { db } from "@peated/server/db";
-import { bottles, bottleTombstones, tastings } from "@peated/server/db/schema";
+import { bottles, tastings } from "@peated/server/db/schema";
+import { activeBottleWhere } from "@peated/server/lib/activeBottles";
 import { implement } from "@peated/server/orpc";
 import bottleRecommendationsContract from "@peated/server/orpc/contracts/bottles/recommendations";
 import { BOTTLE_RECOMMENDATION_REASON } from "@peated/server/schemas";
 import { serialize } from "@peated/server/serializers";
 import { BottleSerializer } from "@peated/server/serializers/bottle";
-import {
-  and,
-  asc,
-  desc,
-  eq,
-  inArray,
-  isNotNull,
-  isNull,
-  ne,
-  sql,
-} from "drizzle-orm";
+import { and, asc, desc, eq, inArray, isNull, ne, sql } from "drizzle-orm";
 import { alias } from "drizzle-orm/pg-core";
 
 const MIN_SOURCE_MEMBERS = 3;
 const MIN_SHARED_MEMBERS = 2;
-
-const activeBottleConditions = and(
-  isNotNull(bottles.groupId),
-  sql`NOT EXISTS(SELECT FROM ${bottleTombstones} WHERE ${bottleTombstones.bottleId} = ${bottles.id})`,
-);
 
 export default implement(bottleRecommendationsContract).handler(
   async function ({ input, context, errors }) {
     const [source] = await db
       .select({ id: bottles.id })
       .from(bottles)
-      .where(and(eq(bottles.id, input.bottle), activeBottleConditions));
+      .where(and(eq(bottles.id, input.bottle), activeBottleWhere()));
 
     if (!source) {
       throw errors.NOT_FOUND({
@@ -79,7 +65,7 @@ export default implement(bottleRecommendationsContract).handler(
           isNull(sourceRatings.removedAt),
           isNull(candidateRatings.removedAt),
           ne(candidateRatings.bottleId, source.id),
-          activeBottleConditions,
+          activeBottleWhere(),
         ),
       )
       .groupBy(candidateRatings.bottleId)

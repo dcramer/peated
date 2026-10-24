@@ -1,8 +1,9 @@
 import { db } from "@peated/server/db";
-import { bottles, bottleTombstones } from "@peated/server/db/schema";
+import { bottles } from "@peated/server/db/schema";
+import { activeBottleWhere } from "@peated/server/lib/activeBottles";
 import { logInfo } from "@peated/server/lib/log";
 import { pushUniqueJob } from "@peated/server/worker/dispatch";
-import { and, asc, eq, gt, isNotNull, notExists } from "drizzle-orm";
+import { and, asc, gt } from "drizzle-orm";
 import { z } from "zod";
 import type { JobPayload } from "../types";
 
@@ -22,14 +23,8 @@ export default async function repairBottleStatsJob(input: JobPayload) {
     .from(bottles)
     .where(
       and(
-        isNotNull(bottles.groupId),
+        activeBottleWhere(),
         afterBottleId ? gt(bottles.id, afterBottleId) : undefined,
-        notExists(
-          db
-            .select({ bottleId: bottleTombstones.bottleId })
-            .from(bottleTombstones)
-            .where(eq(bottleTombstones.bottleId, bottles.id)),
-        ),
       ),
     )
     .orderBy(asc(bottles.id))

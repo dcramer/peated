@@ -1,22 +1,13 @@
 import { db, type AnyDatabase, type AnyTransaction } from "@peated/server/db";
 import {
-  bottleTombstones,
   bottles,
   bottlesToDistillers,
   countries,
   entities,
   regions,
 } from "@peated/server/db/schema";
-import {
-  and,
-  asc,
-  eq,
-  gte,
-  inArray,
-  isNotNull,
-  isNull,
-  sql,
-} from "drizzle-orm";
+import { activeBottleWhere } from "@peated/server/lib/activeBottles";
+import { and, asc, eq, gte, inArray, sql } from "drizzle-orm";
 
 export type BottleProductionLocations = {
   bottleId: number;
@@ -57,14 +48,7 @@ export async function getBottleProductionLocations(
       eq(bottlesToDistillers.bottleId, bottles.id),
     )
     .innerJoin(entities, eq(entities.id, bottlesToDistillers.distillerId))
-    .leftJoin(bottleTombstones, eq(bottleTombstones.bottleId, bottles.id))
-    .where(
-      and(
-        inArray(bottles.id, ids),
-        isNotNull(bottles.groupId),
-        isNull(bottleTombstones.bottleId),
-      ),
-    )
+    .where(and(inArray(bottles.id, ids), activeBottleWhere()))
     .orderBy(asc(bottles.id), asc(entities.countryId), asc(entities.regionId));
 
   const locations = new Map<
@@ -166,13 +150,9 @@ async function findWrongLocationBottleCounts(
         ON ${bottlesToDistillers.bottleId} = ${bottles.id}
       INNER JOIN ${entities}
         ON ${entities.id} = ${bottlesToDistillers.distillerId}
-      WHERE ${bottles.groupId} IS NOT NULL
+      WHERE ${activeBottleWhere()}
         AND ${entities.countryId} IS NOT NULL
         AND ${countrySourceFilter}
-        AND NOT EXISTS (
-          SELECT 1 FROM ${bottleTombstones}
-          WHERE ${bottleTombstones.bottleId} = ${bottles.id}
-        )
 
       UNION
 
@@ -185,13 +165,9 @@ async function findWrongLocationBottleCounts(
         ON ${bottlesToDistillers.bottleId} = ${bottles.id}
       INNER JOIN ${entities}
         ON ${entities.id} = ${bottlesToDistillers.distillerId}
-      WHERE ${bottles.groupId} IS NOT NULL
+      WHERE ${activeBottleWhere()}
         AND ${entities.regionId} IS NOT NULL
         AND ${regionSourceFilter}
-        AND NOT EXISTS (
-          SELECT 1 FROM ${bottleTombstones}
-          WHERE ${bottleTombstones.bottleId} = ${bottles.id}
-        )
     ), actual_counts AS (
       SELECT kind, location_id, COUNT(*) AS total
       FROM active_bottle_locations

@@ -1,13 +1,13 @@
 import { db } from "@peated/server/db";
 import {
-  bottleTombstones,
   bottles,
   bottlesToDistillers,
   entities,
 } from "@peated/server/db/schema";
+import { activeBottleWhere } from "@peated/server/lib/activeBottles";
 import { procedure } from "@peated/server/orpc";
 import { CategoryEnum } from "@peated/server/schemas";
-import { and, asc, eq, isNotNull, or, sql } from "drizzle-orm";
+import { and, asc, eq, or, sql } from "drizzle-orm";
 import { z } from "zod";
 
 export default procedure
@@ -55,8 +55,7 @@ export default procedure
       .from(bottles)
       .where(
         and(
-          isNotNull(bottles.groupId),
-          sql`NOT EXISTS(SELECT FROM ${bottleTombstones} WHERE ${bottleTombstones.bottleId} = ${bottles.id})`,
+          activeBottleWhere(),
           or(
             eq(bottles.brandId, entity.id),
             eq(bottles.bottlerId, entity.id),

@@ -1,7 +1,6 @@
 import { db } from "@peated/server/db";
 import {
   bottles,
-  bottleTombstones,
   entities,
   externalReviewArticles,
   externalReviewPublications,
@@ -10,17 +9,10 @@ import {
   tastings,
 } from "@peated/server/db/schema";
 import { visibleExternalReviewWhere } from "@peated/server/externalReviews/visibility";
+import { activeBottleWhere } from "@peated/server/lib/activeBottles";
 import { implement } from "@peated/server/orpc";
 import statsContract from "@peated/server/orpc/contracts/stats";
-import { and, eq, isNotNull, isNull, sql } from "drizzle-orm";
-
-// This route counts only current public Bottle identities.
-function activeBottleWhere() {
-  return and(
-    isNotNull(bottles.groupId),
-    sql`NOT EXISTS(SELECT FROM ${bottleTombstones} WHERE ${bottleTombstones.bottleId} = ${bottles.id})`,
-  );
-}
+import { and, eq, isNull, sql } from "drizzle-orm";
 
 export default implement(statsContract).handler(async function () {
   const asOf = new Date().toISOString();

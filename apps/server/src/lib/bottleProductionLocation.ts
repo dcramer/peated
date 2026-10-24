@@ -1,18 +1,11 @@
 import { db } from "@peated/server/db";
 import {
-  bottleTombstones,
   bottles,
   bottlesToDistillers,
   entities,
 } from "@peated/server/db/schema";
-import {
-  and,
-  asc,
-  isNotNull,
-  sql,
-  type SQL,
-  type SQLWrapper,
-} from "drizzle-orm";
+import { activeBottleWhere } from "@peated/server/lib/activeBottles";
+import { and, asc, sql, type SQL, type SQLWrapper } from "drizzle-orm";
 
 type ProductionLocation =
   | { countryId: number | SQLWrapper; regionId?: never }
@@ -44,13 +37,7 @@ export async function listBottleCategoriesByProductionLocation(
       count: sql<string>`COUNT(*)`,
     })
     .from(bottles)
-    .where(
-      and(
-        isNotNull(bottles.groupId),
-        sql`NOT EXISTS(SELECT FROM ${bottleTombstones} WHERE ${bottleTombstones.bottleId} = ${bottles.id})`,
-        bottleProducedIn(location),
-      ),
-    )
+    .where(and(activeBottleWhere(), bottleProducedIn(location)))
     .groupBy(bottles.category)
     .orderBy(asc(bottles.category));
 

@@ -1,13 +1,9 @@
 import { db } from "@peated/server/db";
-import {
-  bottles,
-  bottleTags,
-  bottleTombstones,
-  tags,
-} from "@peated/server/db/schema";
+import { bottles, bottleTags, tags } from "@peated/server/db/schema";
+import { activeBottleWhere } from "@peated/server/lib/activeBottles";
 import { implement } from "@peated/server/orpc";
 import suggestedTagsContract from "@peated/server/orpc/contracts/bottles/suggested-tags";
-import { and, eq, isNotNull, notExists, or, sql } from "drizzle-orm";
+import { and, eq, or, sql } from "drizzle-orm";
 
 const COMMON_TASTING_NOTE_NAMES = [
   "vanilla",
@@ -24,18 +20,7 @@ export default implement(suggestedTagsContract).handler(async function ({
   const [bottle] = await db
     .select()
     .from(bottles)
-    .where(
-      and(
-        eq(bottles.id, input.bottle),
-        isNotNull(bottles.groupId),
-        notExists(
-          db
-            .select({ bottleId: bottleTombstones.bottleId })
-            .from(bottleTombstones)
-            .where(eq(bottleTombstones.bottleId, bottles.id)),
-        ),
-      ),
-    );
+    .where(and(eq(bottles.id, input.bottle), activeBottleWhere()));
 
   if (!bottle) {
     throw errors.NOT_FOUND({
@@ -58,11 +43,7 @@ export default implement(suggestedTagsContract).handler(async function ({
           eq(bottleTags.bottleId, bottle.id),
           eq(bottles.brandId, bottle.brandId),
         )}
-          AND ${bottles.groupId} IS NOT NULL
-          AND NOT EXISTS (
-            SELECT FROM ${bottleTombstones}
-            WHERE ${bottleTombstones.bottleId} = ${bottles.id}
-          )
+          AND ${activeBottleWhere()}
         GROUP BY ${bottleTags.tag}
         ORDER BY total DESC, ${bottleTags.tag} ASC
       `)

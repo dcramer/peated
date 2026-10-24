@@ -7,7 +7,6 @@ import type {
 } from "@peated/entity-classifier";
 import { db } from "@peated/server/db";
 import {
-  bottleTombstones,
   bottles,
   countries,
   entities,
@@ -15,12 +14,13 @@ import {
   entityReferences,
   regions,
 } from "@peated/server/db/schema";
+import { activeBottleWhere } from "@peated/server/lib/activeBottles";
 import {
   findBrandRepairCandidates,
   getBrandRepairGroups,
   type BrandRepairGroup,
 } from "@peated/server/lib/brandRepairCandidates";
-import { and, desc, eq, ilike, inArray, isNotNull, or, sql } from "drizzle-orm";
+import { and, desc, eq, ilike, inArray, or, sql } from "drizzle-orm";
 
 const MAX_BRAND_REPAIR_GROUPS = 1000;
 const MAX_ENTITY_SCAN_LIMIT = 300;
@@ -108,11 +108,7 @@ function entityBrandUseCondition() {
   return sql`EXISTS (
     SELECT 1 FROM ${bottles}
     WHERE ${bottles.brandId} = ${entities.id}
-      AND ${bottles.groupId} IS NOT NULL
-      AND NOT EXISTS (
-        SELECT 1 FROM ${bottleTombstones}
-        WHERE ${bottleTombstones.bottleId} = ${bottles.id}
-      )
+      AND ${activeBottleWhere()}
   )`;
 }
 
@@ -589,16 +585,7 @@ async function getSampleBottlesByBrandIds(brandIds: number[]) {
       totalTastings: bottles.totalTastings,
     })
     .from(bottles)
-    .where(
-      and(
-        inArray(bottles.brandId, brandIds),
-        isNotNull(bottles.groupId),
-        sql`NOT EXISTS (
-          SELECT 1 FROM ${bottleTombstones}
-          WHERE ${bottleTombstones.bottleId} = ${bottles.id}
-        )`,
-      ),
-    )
+    .where(and(inArray(bottles.brandId, brandIds), activeBottleWhere()))
     .orderBy(desc(bottles.totalTastings), desc(bottles.id));
 
   const samplesByBrandId = new Map<

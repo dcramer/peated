@@ -4,9 +4,9 @@ import {
   bottles,
   bottleSeries,
   bottlesToDistillers,
-  bottleTombstones,
   entities,
 } from "@peated/server/db/schema";
+import { activeBottleWhere } from "@peated/server/lib/activeBottles";
 import {
   BottleCandidateComparisonSchema,
   compareBottleCandidate,
@@ -133,10 +133,7 @@ export default procedure
     }
 
     const tinQuery = textSearchQuery(input.name, { any: true });
-    const active = and(
-      isNotNull(bottles.groupId),
-      sql`${bottles.id} NOT IN (SELECT ${bottleTombstones.bottleId} FROM ${bottleTombstones})`,
-    );
+    const active = activeBottleWhere();
     const distillerIds = input.distillers.flatMap(({ id }) => (id ? [id] : []));
     const identityQueries = [
       ...(input.brand?.id

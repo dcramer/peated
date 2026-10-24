@@ -4,9 +4,9 @@ import {
   bottleNoteCategories,
   bottles,
   bottleTags,
-  bottleTombstones,
   tags,
 } from "@peated/server/db/schema";
+import { activeBottleWhere } from "@peated/server/lib/activeBottles";
 import type { FlavorProfile } from "@peated/server/schemas/flavorProfile";
 import { sql, type SQL } from "drizzle-orm";
 
@@ -19,11 +19,7 @@ export async function getBottleFlavorProfile(
   const result = await db.execute<FlavorProfile>(sql`
     WITH scoped_bottles AS MATERIALIZED (
       SELECT ${bottles.id} AS id FROM ${bottles}
-      WHERE ${bottles.groupId} IS NOT NULL
-        AND NOT EXISTS (
-          SELECT FROM ${bottleTombstones}
-          WHERE ${bottleTombstones.bottleId} = ${bottles.id}
-        )
+      WHERE ${activeBottleWhere()}
         AND ${scope}
     ), public_notes AS MATERIALIZED (
       SELECT scoped_bottles.id AS bottle_id,

@@ -1,12 +1,13 @@
 import { db } from "@peated/server/db";
-import { bottles, bottleTombstones } from "@peated/server/db/schema";
+import { bottles } from "@peated/server/db/schema";
+import { activeBottleWhere } from "@peated/server/lib/activeBottles";
 import {
   bottleDisplayNameColumns,
   toBottleDisplayNameSource,
 } from "@peated/server/lib/bottleDisplayNameColumns";
 import { implement } from "@peated/server/orpc";
 import bottleSitemapContract from "@peated/server/orpc/contracts/bottles/sitemap";
-import { and, asc, isNotNull, sql } from "drizzle-orm";
+import { and, asc } from "drizzle-orm";
 
 const PAGE_LIMIT = 1000;
 
@@ -18,12 +19,7 @@ export default implement(bottleSitemapContract).handler(async ({ input }) => {
       bottle: bottleDisplayNameColumns,
     })
     .from(bottles)
-    .where(
-      and(
-        isNotNull(bottles.groupId),
-        sql`NOT EXISTS(SELECT FROM ${bottleTombstones} WHERE ${bottleTombstones.bottleId} = ${bottles.id})`,
-      ),
-    )
+    .where(and(activeBottleWhere()))
     .orderBy(asc(bottles.id))
     .limit(PAGE_LIMIT)
     .offset((input.page - 1) * PAGE_LIMIT);

@@ -5,7 +5,6 @@ import {
   bottles,
   bottlesToDistillers,
   bottleTags,
-  bottleTombstones,
   collectionBottles,
   countries,
   entities,
@@ -14,6 +13,7 @@ import {
   flights,
   regions,
 } from "@peated/server/db/schema";
+import { activeBottleWhere } from "@peated/server/lib/activeBottles";
 import { bottleProducedIn } from "@peated/server/lib/bottleProductionLocation";
 import { companyBottleEntityIds } from "@peated/server/lib/companyPortfolio";
 import { getReservedCollection } from "@peated/server/lib/db";
@@ -100,10 +100,7 @@ export default implement(bottleListContract).handler(async function ({
   const where: (SQL<unknown> | undefined)[] = [];
   let followedEntityIds: number[] | null = null;
   let hasUnknownFlight = false;
-  where.push(isNotNull(bottles.groupId));
-  where.push(
-    sql`${bottles.id} NOT IN (SELECT ${bottleTombstones.bottleId} FROM ${bottleTombstones})`,
-  );
+  where.push(activeBottleWhere());
 
   if (filter === "following") {
     if (!context.user) {

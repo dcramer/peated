@@ -1,11 +1,7 @@
 import { db, type AnyTransaction } from "@peated/server/db";
-import {
-  bottleImages,
-  bottleSeries,
-  bottleTombstones,
-  bottles,
-} from "@peated/server/db/schema";
-import { and, asc, eq, inArray, isNotNull, isNull, sql } from "drizzle-orm";
+import { bottleImages, bottleSeries, bottles } from "@peated/server/db/schema";
+import { activeBottleWhere } from "@peated/server/lib/activeBottles";
+import { and, asc, eq, inArray, isNotNull, sql } from "drizzle-orm";
 
 export type BottleSeriesRepresentativeRepair = {
   seriesId: number;
@@ -32,14 +28,7 @@ async function selectRepresentativeBottleId(
         eq(bottleImages.isPrimary, true),
       ),
     )
-    .leftJoin(bottleTombstones, eq(bottleTombstones.bottleId, bottles.id))
-    .where(
-      and(
-        eq(bottles.seriesId, seriesId),
-        isNotNull(bottles.groupId),
-        isNull(bottleTombstones.bottleId),
-      ),
-    )
+    .where(and(eq(bottles.seriesId, seriesId), activeBottleWhere()))
     .orderBy(
       sql`CASE WHEN ${bottles.id} = ${currentBottleId} THEN 0 ELSE 1 END`,
       asc(bottles.id),
@@ -134,11 +123,8 @@ export async function checkBottleSeriesRepresentatives(
         INNER JOIN ${bottleImages}
           ON ${bottleImages.bottleId} = ${bottles.id}
           AND ${bottleImages.isPrimary} = TRUE
-        LEFT JOIN ${bottleTombstones}
-          ON ${bottleTombstones.bottleId} = ${bottles.id}
         WHERE ${bottles.seriesId} = ${bottleSeries.id}
-          AND ${bottles.groupId} IS NOT NULL
-          AND ${bottleTombstones.bottleId} IS NULL
+          AND ${activeBottleWhere()}
         ORDER BY
           CASE
             WHEN ${bottles.id} = ${bottleSeries.representativeBottleId}

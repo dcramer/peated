@@ -18,6 +18,7 @@ import {
   tastings,
   users,
 } from "@peated/server/db/schema";
+import { activeBottleWhere } from "@peated/server/lib/activeBottles";
 import {
   escapeLike,
   nameRank,
@@ -43,17 +44,7 @@ import searchContract, {
   type SearchScope,
 } from "@peated/server/orpc/contracts/search";
 import * as Sentry from "@sentry/node";
-import {
-  and,
-  asc,
-  eq,
-  inArray,
-  isNotNull,
-  like,
-  or,
-  sql,
-  type SQL,
-} from "drizzle-orm";
+import { and, asc, eq, inArray, like, or, sql } from "drizzle-orm";
 import type { z } from "zod";
 
 type SearchOutput = z.infer<typeof SearchOutputSchema>;
@@ -148,14 +139,6 @@ type SearchInput = {
   limit: number;
   suggestions: "exclude" | "include" | "only";
 };
-
-function activeBottleWhere() {
-  // Search results and scope totals must use the same active Bottles.
-  return and(
-    isNotNull(bottles.groupId),
-    sql`${bottles.id} NOT IN (SELECT ${bottleTombstones.bottleId} FROM ${bottleTombstones})`,
-  );
-}
 
 function visibleMemberWhere(context: Context) {
   // Search results and scope totals must use the same visible members.

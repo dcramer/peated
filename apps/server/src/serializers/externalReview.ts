@@ -77,6 +77,8 @@ export const ExternalReviewSerializer = serializer({
           .where(
             and(
               inArray(bottles.id, bottleIds),
+              // Active Bottle rule (whisky-identity-model.md): show the attached Bottle
+              // unless it has a tombstone. A missing group is data to repair, not hide.
               sql`NOT EXISTS(SELECT FROM ${bottleTombstones} WHERE ${bottleTombstones.bottleId} = ${bottles.id})`,
             ),
           )

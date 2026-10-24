@@ -1,14 +1,10 @@
 import { db } from "@peated/server/db";
-import {
-  bottleReferences,
-  bottles,
-  bottleTombstones,
-  entities,
-} from "@peated/server/db/schema";
+import { bottleReferences, bottles, entities } from "@peated/server/db/schema";
+import { activeBottleWhere } from "@peated/server/lib/activeBottles";
 import { formatCategoryName } from "@peated/server/lib/format";
 import { logInfo } from "@peated/server/lib/log";
 import { getOpenAIEmbedding } from "@peated/server/lib/openaiEmbeddings";
-import { and, eq, isNotNull, isNull, sql } from "drizzle-orm";
+import { and, eq, isNull, sql } from "drizzle-orm";
 import { z } from "zod";
 import type { JobPayload } from "../types";
 
@@ -75,8 +71,6 @@ function bottleSearchSourceWhere(source: BottleReferenceSearchSource) {
     FROM ${bottles}
     INNER JOIN ${entities}
       ON ${entities.id} = ${bottles.brandId}
-    LEFT JOIN ${bottleTombstones}
-      ON ${bottleTombstones.bottleId} = ${bottles.id}
     WHERE ${bottles.id} = ${source.bottle.id}
       AND ${bottles.groupId} IS NOT DISTINCT FROM ${source.bottle.groupId}
       AND ${bottles.brandId} IS NOT DISTINCT FROM ${source.bottle.brandId}
@@ -93,8 +87,7 @@ function bottleSearchSourceWhere(source: BottleReferenceSearchSource) {
       AND ${entities.id} = ${source.brand.id}
       AND ${entities.name} IS NOT DISTINCT FROM ${source.brand.name}
       AND ${entities.shortName} IS NOT DISTINCT FROM ${source.brand.shortName}
-      AND ${bottles.groupId} IS NOT NULL
-      AND ${bottleTombstones.bottleId} IS NULL
+      AND ${activeBottleWhere()}
   )`;
 }
 
@@ -175,14 +168,7 @@ async function loadActiveBottleReferenceSearchSource(
     })
     .from(bottles)
     .innerJoin(entities, eq(entities.id, bottles.brandId))
-    .leftJoin(bottleTombstones, eq(bottleTombstones.bottleId, bottles.id))
-    .where(
-      and(
-        eq(bottles.id, reference.bottleId),
-        isNotNull(bottles.groupId),
-        isNull(bottleTombstones.bottleId),
-      ),
-    )
+    .where(and(eq(bottles.id, reference.bottleId), activeBottleWhere()))
     .limit(1);
 
   if (!resolved) {

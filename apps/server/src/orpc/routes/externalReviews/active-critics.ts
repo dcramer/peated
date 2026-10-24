@@ -1,18 +1,18 @@
 import { db } from "@peated/server/db";
 import {
   bottles,
-  bottleTombstones,
   externalReviewArticles,
   externalReviewPublications,
   externalReviews,
   externalSites,
 } from "@peated/server/db/schema";
 import { visibleExternalReviewWhere } from "@peated/server/externalReviews/visibility";
+import { activeBottleWhere } from "@peated/server/lib/activeBottles";
 import { formatBottleLabel } from "@peated/server/lib/bottleDisplayName";
 import { implement } from "@peated/server/orpc";
 import activeCriticsContract from "@peated/server/orpc/contracts/externalReviews/active-critics";
 import { serializeExternalSite } from "@peated/server/serializers/externalSite";
-import { and, asc, desc, eq, inArray, isNotNull, sql } from "drizzle-orm";
+import { and, asc, desc, eq, inArray, isNotNull } from "drizzle-orm";
 
 export default implement(activeCriticsContract).handler(async function ({
   input,
@@ -47,8 +47,7 @@ export default implement(activeCriticsContract).handler(async function ({
         visibleExternalReviewWhere(),
         isNotNull(externalReviews.bottleId),
         isNotNull(externalReviewArticles.publishedAt),
-        isNotNull(bottles.groupId),
-        sql`NOT EXISTS(SELECT FROM ${bottleTombstones} WHERE ${bottleTombstones.bottleId} = ${bottles.id})`,
+        activeBottleWhere(),
       ),
     )
     .orderBy(

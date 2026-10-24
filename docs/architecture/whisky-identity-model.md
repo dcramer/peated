@@ -85,6 +85,25 @@ There is no parent-versus-release creation decision and no `repair_parent`
 workflow. Discovering another release does not change an existing Bottle's
 identity.
 
+## Active Bottles
+
+A Bottle is active when it belongs to a BottleGroup and has no tombstone.
+Search, lists, counts, sitemaps, statistics, and classifier context read Bottles
+through `activeBottleWhere` in `apps/server/src/lib/activeBottles.ts`, so they
+agree on which Bottles exist. Writes that accept Bottle ids check the same rule
+with `resolveActiveBottleIds`.
+
+- A Bottle without a BottleGroup breaks the invariant above. Only the
+  BottleGroup migration could leave one behind. Treat it as data to repair by
+  giving it a singleton group, as ordinary creation does. Hiding it is not the
+  fix.
+- Merge and delete remove the Bottle row in the same transaction that writes
+  its tombstone, so a tombstoned row normally does not exist. The tombstone
+  check is a guard.
+- A store price or external review shows its Bottle unless the Bottle has a
+  tombstone. It does not hide a Bottle that lacks a group: the Bottle page
+  still shows that Bottle, and hiding it would drop public data.
+
 ## Whisky Categories
 
 Category records one normalized production style. Country and region remain

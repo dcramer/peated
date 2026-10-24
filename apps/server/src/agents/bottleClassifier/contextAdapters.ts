@@ -35,6 +35,7 @@ import {
   users,
   type BottleObservation,
 } from "@peated/server/db/schema";
+import { activeBottleWhere } from "@peated/server/lib/activeBottles";
 import { getUploadImageDataUrl } from "@peated/server/lib/uploads";
 import { absoluteUrl } from "@peated/server/lib/urls";
 import { and, asc, desc, eq, isNotNull, isNull, notExists } from "drizzle-orm";
@@ -433,35 +434,13 @@ export async function getEntityClassifierContext(
     db
       .select({ bottleId: bottles.id, fullName: bottles.fullName })
       .from(bottles)
-      .where(
-        and(
-          eq(bottles.brandId, entityId),
-          isNotNull(bottles.groupId),
-          notExists(
-            db
-              .select({ bottleId: bottleTombstones.bottleId })
-              .from(bottleTombstones)
-              .where(eq(bottleTombstones.bottleId, bottles.id)),
-          ),
-        ),
-      )
+      .where(and(eq(bottles.brandId, entityId), activeBottleWhere()))
       .orderBy(asc(bottles.id))
       .limit(MAX_ENTITY_CONTEXT_BOTTLES),
     db
       .select({ bottleId: bottles.id, fullName: bottles.fullName })
       .from(bottles)
-      .where(
-        and(
-          eq(bottles.bottlerId, entityId),
-          isNotNull(bottles.groupId),
-          notExists(
-            db
-              .select({ bottleId: bottleTombstones.bottleId })
-              .from(bottleTombstones)
-              .where(eq(bottleTombstones.bottleId, bottles.id)),
-          ),
-        ),
-      )
+      .where(and(eq(bottles.bottlerId, entityId), activeBottleWhere()))
       .orderBy(asc(bottles.id))
       .limit(MAX_ENTITY_CONTEXT_BOTTLES),
     db
@@ -469,16 +448,7 @@ export async function getEntityClassifierContext(
       .from(bottlesToDistillers)
       .innerJoin(bottles, eq(bottles.id, bottlesToDistillers.bottleId))
       .where(
-        and(
-          eq(bottlesToDistillers.distillerId, entityId),
-          isNotNull(bottles.groupId),
-          notExists(
-            db
-              .select({ bottleId: bottleTombstones.bottleId })
-              .from(bottleTombstones)
-              .where(eq(bottleTombstones.bottleId, bottles.id)),
-          ),
-        ),
+        and(eq(bottlesToDistillers.distillerId, entityId), activeBottleWhere()),
       )
       .orderBy(asc(bottles.id))
       .limit(MAX_ENTITY_CONTEXT_BOTTLES),
