@@ -40,9 +40,29 @@ function normalizeForQuote(value: string) {
     .trim();
 }
 
+const ISO_DATE_PATTERN = /^\d{4}(?:-\d{2}){0,2}$/;
+
+/**
+ * Whether some quote states `value`: every number in it, or its words. A date
+ * needs only its year, because pages write months and days many ways.
+ */
+function quotesState(quotes: readonly string[], value: string) {
+  const checked = ISO_DATE_PATTERN.test(value) ? value.slice(0, 4) : value;
+  const numbers = stripThousands(checked).match(NUMBER_PATTERN);
+  if (numbers) {
+    return numbers.every((number) =>
+      quotes.some((quote) => containsNumber(quote, number)),
+    );
+  }
+  const words = normalizeForQuote(checked);
+  return quotes.some((quote) => normalizeForQuote(quote).includes(words));
+}
+
 /**
  * Evidence rule (owner: docs/features/entity-about.md): a pipeline citation
- * stands only when its quote appears on a page read in the same run. Facts
+ * stands only when its quote appears on a page read in the same run and
+ * states the citation's value. A fact stands only when a kept quote states
+ * its date (or value): the model's own fields are never the evidence. Facts
  * left without citations are dropped, then unused sources.
  */
 export function keepVerifiedCitations(
@@ -61,27 +81,51 @@ export function keepVerifiedCitations(
     draft.sources.map((source) => [source.id, normalizeSourceUrl(source.url)]),
   );
 
+  const published = new Map(
+    draft.sources.map((source) => [source.id, source.publishedOn]),
+  );
+  // A dated article that reports something happening now states its
+  // publication date, so that date counts as quoted.
+  const quotesOf = (citations: readonly AboutCitation[]) =>
+    citations.flatMap((citation) => [
+      ...(citation.quote ? [citation.quote] : []),
+      published.get(citation.sourceId) ?? "",
+    ]);
+
   const isVerified = (citation: AboutCitation) => {
     if (!citation.quote) return false;
     const url = sourceUrls.get(citation.sourceId);
     const text = url ? pageText.get(url) : undefined;
     const quote = normalizeForQuote(citation.quote);
-    return Boolean(text && quote && text.includes(quote));
+    return Boolean(
+      text &&
+      quote &&
+      text.includes(quote) &&
+      (!citation.statedValue ||
+        quotesState(quotesOf([citation]), citation.statedValue)),
+    );
   };
-
   const events = draft.events
     .map((event) => ({
       ...event,
       citations: event.citations.filter(isVerified),
     }))
-    .filter((event) => event.citations.length > 0);
+    .filter((event) => {
+      const quotes = quotesOf(event.citations);
+      return (
+        quotesState(quotes, event.date.slice(0, 4)) &&
+        (!event.endDate || quotesState(quotes, event.endDate.slice(0, 4)))
+      );
+    });
 
   const siteFacts: EntityAboutDocument["siteFacts"] = {};
   for (const field of ABOUT_FACT_FIELD_LIST) {
     const fact = draft.siteFacts[field];
     if (!fact) continue;
     const citations = fact.citations.filter(isVerified);
-    if (citations.length) siteFacts[field] = { ...fact, citations };
+    if (quotesState(quotesOf(citations), String(fact.value))) {
+      siteFacts[field] = { ...fact, citations };
+    }
   }
 
   return pruneSources({ ...draft, events, siteFacts });

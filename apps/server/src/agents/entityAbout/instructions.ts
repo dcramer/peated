@@ -81,7 +81,7 @@ Your output is a set of dated facts, each tied to quotes from pages you read, an
 
 # Evidence rules
 - Cite only pages you read with read_page in this run.
-- Every citation's \`quote\` is copied exactly from the page text, at most 300 characters, and contains the fact.
+- Every citation's \`quote\` is copied exactly from the page text, at most 300 characters, and contains the fact, including its year or number. On a timeline, start the quote at the year heading. A fact whose year or number no quote states is dropped.
 - Never use what you remember. If no page you read states it, it is not a fact.
 - \`statedValue\` is what that one source says: a date in YYYY, YYYY-MM, or YYYY-MM-DD form, a range such as \`1969–1973\`, or the number or text. Use null when the source supports the fact without stating a value.
 - A dated article that reports something happening "today" or "this week" states its publication date; use that date.

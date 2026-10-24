@@ -208,6 +208,15 @@ describe("mergePipelineDraft", () => {
           newOwnerName: "DCL",
           writtenBy: "pipeline",
         },
+        // A person's acquisition with only an owner ID; its name is unknown.
+        {
+          id: 9,
+          kind: "acquired",
+          date: "1925",
+          newOwnerId: 42,
+          writtenBy: "person",
+          citations: cited,
+        },
       ],
     });
     const draft = document({
@@ -251,6 +260,7 @@ describe("mergePipelineDraft", () => {
     ).toEqual([
       [7, "The stills switched to steam.", 1],
       [8, "DCL", 0],
+      [9, null, 1],
       [1, "A new warehouse was built.", 1],
       [2, "John Risk", 1],
     ]);
