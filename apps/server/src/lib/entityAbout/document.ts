@@ -418,10 +418,11 @@ export function mergePipelineDraft(
   for (const field of ABOUT_FACT_FIELD_LIST) {
     const before = base.siteFacts[field];
     const proposed = draft.siteFacts[field];
+    // A fact a person's sentence cites keeps its value, so the sentence
+    // stays true.
     if (
       before &&
-      (before.writtenBy === "person" ||
-        (!proposed && personFactIds.has(siteFactId(field))))
+      (before.writtenBy === "person" || personFactIds.has(siteFactId(field)))
     ) {
       siteFacts[field] = before;
     } else if (proposed) {

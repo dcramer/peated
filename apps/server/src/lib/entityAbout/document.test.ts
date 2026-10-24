@@ -160,11 +160,17 @@ describe("mergePipelineDraft", () => {
           citations: cited,
         },
       ],
+      siteFacts: {
+        washStills: { value: 1, writtenBy: "pipeline", citations: cited },
+      },
       sections: [
         {
           key: "lead",
           writtenBy: "person",
-          sentences: [{ text: "It closed in 1983.", factIds: ["event:3"] }],
+          sentences: [
+            { text: "It closed in 1983.", factIds: ["event:3"] },
+            { text: "It has 1 wash still.", factIds: ["site:washStills"] },
+          ],
         },
       ],
     });
@@ -178,6 +184,10 @@ describe("mergePipelineDraft", () => {
           citations: cited,
         },
       ],
+      // A new value would contradict the person's sentence.
+      siteFacts: {
+        washStills: { value: 2, writtenBy: "pipeline", citations: cited },
+      },
     });
 
     const merged = mergePipelineDraft(stored, draft, now, new Map());
@@ -188,6 +198,7 @@ describe("mergePipelineDraft", () => {
       [4, "opened"],
     ]);
     expect(merged.sections[0]?.sentences[0]?.factIds).toEqual(["event:3"]);
+    expect(merged.siteFacts.washStills?.value).toBe(1);
   });
 
   test("keeps different events from the same year apart", () => {

@@ -138,6 +138,45 @@ describe("keepVerifiedCitations", () => {
     expect(owned("Diageo")).toBe(0);
   });
 
+  test("needs one quote to state a name", () => {
+    const renamed = (name: string, quotes: string[]) =>
+      keepVerifiedCitations(
+        draft({
+          events: [
+            {
+              id: 1,
+              kind: "renamed",
+              date: "1983",
+              name,
+              writtenBy: "pipeline",
+              citations: quotes.map((quote) => ({
+                sourceId: "wp",
+                statedValue: "1983",
+                quote,
+              })),
+            },
+          ],
+        }),
+        [
+          {
+            ...page,
+            text: `${page.text} Clynelish opened in 1983. Brora Mill closed in 1983.`,
+          },
+        ],
+      ).events.length;
+
+    // "Clynelish Mill" is built from two quotes; neither states it.
+    expect(
+      renamed("Clynelish Mill", [
+        "Clynelish opened in 1983.",
+        "Brora Mill closed in 1983.",
+      ]),
+    ).toBe(0);
+    // A name of only short words must appear whole.
+    expect(renamed("No 1", ["Clynelish opened in 1983."])).toBe(0);
+    expect(renamed("Clynelish", ["Clynelish opened in 1983."])).toBe(1);
+  });
+
   test("ignores case, quote marks, and punctuation", () => {
     const result = keepVerifiedCitations(
       draft({ events: [event(1, "2021", "rebuilt in 2021, after 38 years")] }),
