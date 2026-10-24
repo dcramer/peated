@@ -16,7 +16,11 @@ import {
   auctionLotCheckKey,
   readAuctionMatchEvidence,
 } from "./auctionMatchEvidence";
-import { assignAuctionLot, AuctionLotMatchChangedError } from "./auctions";
+import {
+  assignAuctionLot,
+  AuctionLotMatchChangedError,
+  isMiniatureAuctionLot,
+} from "./auctions";
 import { createBottleCheck } from "./bottleChecks";
 import { findBottleReferenceAssignment } from "./bottleFinder";
 import { BottleAlreadyExistsError } from "./createBottle";
@@ -49,6 +53,21 @@ async function resolveAuctionLotMatch(
     lot.matchStatus !== "pending"
   )
     return true;
+  // Auction scope rule: ignore miniatures before any reference, detail read, or model call.
+  if (isMiniatureAuctionLot(lot)) {
+    await db
+      .update(auctionLots)
+      .set({ matchStatus: "ignored" })
+      .where(
+        and(
+          eq(auctionLots.id, lotId),
+          eq(auctionLots.sourceFingerprint, fingerprint),
+          eq(auctionLots.matchStatus, "pending"),
+          isNull(auctionLots.bottleId),
+        ),
+      );
+    return true;
+  }
   const reference = await findBottleReferenceAssignment(
     normalizeBottleReferenceKey(lot.name),
   );

@@ -595,6 +595,98 @@ test.for(["masterofmalt", "scotchwhiskyauctions"] as const)(
   },
 );
 
+async function lotWithVolume(siteId: number, volume: number | null) {
+  return (
+    await upsertAuctionObservation(siteId, {
+      auction: {
+        sourceKey: "1",
+        name: "Auction",
+        url: "https://example.com/auction",
+      },
+      lot: {
+        sourceKey: "1",
+        name: "Example 12 Year Old Mini",
+        url: "https://example.com/lot",
+        state: "closed",
+        volume,
+      },
+      observedAt: new Date().toISOString(),
+    })
+  ).lot;
+}
+
+test.for([30, 50, 100])(
+  "a %i ml miniature lot is ignored without a reference, detail read, or model call",
+  async (volume, { fixtures }) => {
+    const site = await fixtures.ExternalSite({ type: "scotchwhiskyauctions" });
+    const lot = await lotWithVolume(site.id, volume);
+    await fixtures.BottleReference({
+      name: normalizeBottleReferenceKey(lot.name),
+      bottleId: (await fixtures.Bottle()).id,
+    });
+    const run = vi.spyOn(classifier, "runScrapedBottleReference");
+    await resolveAuctionLot(lot.id, lot.sourceFingerprint);
+    expect(run).not.toHaveBeenCalled();
+    expect(pushJob).not.toHaveBeenCalled();
+    expect(await db.query.bottleChecks.findMany()).toHaveLength(0);
+    expect(await db.query.auctionLots.findFirst()).toMatchObject({
+      bottleId: null,
+      matchStatus: "ignored",
+      matchCheckId: null,
+      matchedReferenceId: null,
+      sourceDetailsRequestedAt: null,
+    });
+  },
+);
+
+test.for([700, null])(
+  "a %s ml lot still collects source facts and reaches the model",
+  async (volume, { fixtures }) => {
+    const swa = await fixtures.ExternalSite({ type: "scotchwhiskyauctions" });
+    const swaLot = await lotWithVolume(swa.id, volume);
+    await applyAuctionLotMatchJob({
+      lotId: swaLot.id,
+      fingerprint: swaLot.sourceFingerprint,
+    });
+    expect(
+      await db.query.auctionLots.findFirst({
+        where: eq(auctionLots.id, swaLot.id),
+      }),
+    ).toMatchObject({
+      matchStatus: "pending",
+      sourceDetailsRequestedAt: expect.any(Date),
+    });
+
+    const site = await fixtures.ExternalSite({ type: "masterofmalt" });
+    const lot = await lotWithVolume(site.id, volume);
+    const run = vi
+      .spyOn(classifier, "runScrapedBottleReference")
+      .mockResolvedValue({
+        result: createIgnoredBottleClassification({
+          reason: "non-whisky",
+          artifacts: {},
+        }),
+        modelMetadata: {
+          agentDurationMs: 0,
+          usage: {
+            requests: 0,
+            inputTokens: 0,
+            outputTokens: 0,
+            totalTokens: 0,
+          },
+          toolCalls: { count: 0, names: [] },
+        },
+      });
+    await resolveAuctionLot(lot.id, lot.sourceFingerprint);
+    expect(run).toHaveBeenCalledTimes(1);
+    expect(
+      await db.query.auctionLots.findFirst({
+        where: eq(auctionLots.id, lot.id),
+      }),
+    ).toMatchObject({ matchCheckId: expect.any(Number) });
+  },
+);
+
 test("a conflicting accepted name cannot bypass source facts on the fast queue", async ({
   fixtures,
 }) => {

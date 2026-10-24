@@ -6,6 +6,7 @@ import {
   externalSites,
 } from "@peated/server/db/schema";
 import { auctionLotCheckKey } from "@peated/server/lib/auctionMatchEvidence";
+import { isMiniatureAuctionLot } from "@peated/server/lib/auctions";
 import { procedure } from "@peated/server/orpc";
 import { requireAdmin } from "@peated/server/orpc/middleware";
 import { pushJob } from "@peated/server/worker/client";
@@ -42,7 +43,7 @@ export default procedure
     path: "/auction-lots/recheck",
     summary: "Recheck imported auction lots",
     description:
-      "Recheck up to 100 unresolved lots with observed source, assignment, and saved-check versions. Reuse current evidence or explicitly refresh Scotch Whisky Auctions detail facts; skip matched or ignored lots. Requires an administrator.",
+      "Recheck up to 100 unresolved lots with observed source, assignment, and saved-check versions. Reuse current evidence or explicitly refresh Scotch Whisky Auctions detail facts; skip matched or ignored lots. Miniature lots (100 ml or less) become ignored without a detail read. Requires an administrator.",
     operationId: "recheckAuctionLots",
   })
   .input(InputSchema)
@@ -67,6 +68,8 @@ export default procedure
         .orderBy(asc(auctionLots.id))
         .for("update", { of: auctionLots });
       const queued: { lotId: number; fingerprint: string }[] = [];
+      const refreshIds: number[] = [];
+      const apply: typeof queued = [];
       const skipped: number[] = [];
       for (const expected of input.lots) {
         const row = lots.find(({ lot }) => lot.id === expected.lotId);
@@ -109,35 +112,39 @@ export default procedure
               message:
                 "Detail refresh is not supported for this auction source.",
             });
-          queued.push({ lotId: lot.id, fingerprint: lot.sourceFingerprint });
+          const args = { lotId: lot.id, fingerprint: lot.sourceFingerprint };
+          queued.push(args);
+          // Auction scope rule: a miniature never gets a detail read; the default recheck ignores it.
+          if (input.refreshSourceDetails && !isMiniatureAuctionLot(lot))
+            refreshIds.push(lot.id);
+          else apply.push(args);
         }
       }
-      if (queued.length)
+      if (refreshIds.length)
         await tx
           .update(auctionLots)
-          .set(
-            input.refreshSourceDetails
-              ? {
-                  matchStatus: "review",
-                  // Auction detail retries must advance each lot's own request, not another lot's.
-                  sourceDetailsRequestedAt: sql`GREATEST(clock_timestamp(), ${auctionLots.sourceDetailsRequestedAt} + INTERVAL '1 millisecond')`,
-                  sourceDetailsCheckedAt: null,
-                  sourceDetailsRunId: null,
-                }
-              : { matchStatus: "pending" },
-          )
+          .set({
+            matchStatus: "review",
+            // Auction detail retries must advance each lot's own request, not another lot's.
+            sourceDetailsRequestedAt: sql`GREATEST(clock_timestamp(), ${auctionLots.sourceDetailsRequestedAt} + INTERVAL '1 millisecond')`,
+            sourceDetailsCheckedAt: null,
+            sourceDetailsRunId: null,
+          })
+          .where(inArray(auctionLots.id, refreshIds));
+      if (apply.length)
+        await tx
+          .update(auctionLots)
+          .set({ matchStatus: "pending" })
           .where(
             inArray(
               auctionLots.id,
-              queued.map(({ lotId }) => lotId),
+              apply.map(({ lotId }) => lotId),
             ),
           );
-      return { queued, skipped };
+      return { queued, apply, skipped };
     });
-    if (!input.refreshSourceDetails) {
-      for (const args of result.queued)
-        await pushJob("ApplyAuctionLotMatch", args);
-    }
+    for (const args of result.apply)
+      await pushJob("ApplyAuctionLotMatch", args);
     return {
       queued: result.queued.map(({ lotId }) => lotId),
       skipped: result.skipped,
