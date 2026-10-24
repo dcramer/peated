@@ -296,7 +296,12 @@ export async function saveEntityAbout(
   if (removedLegacyIds.length) {
     await tx
       .delete(entityEvents)
-      .where(inArray(entityEvents.id, removedLegacyIds));
+      .where(
+        and(
+          eq(entityEvents.entityId, entity.id),
+          inArray(entityEvents.id, removedLegacyIds),
+        ),
+      );
   }
 
   const version = (stored?.version ?? 0) + 1;
