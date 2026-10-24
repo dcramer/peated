@@ -5,7 +5,7 @@ import { changes, entities, entityReferences } from "@peated/server/db/schema";
 import { getUserActorForDatabase } from "@peated/server/lib/actors";
 import { procedure } from "@peated/server/orpc";
 import { requireMod } from "@peated/server/orpc/middleware";
-import { pushUniqueJob } from "@peated/server/worker/dispatch";
+import { pushJob } from "@peated/server/worker/dispatch";
 import { and, eq, isNull, sql } from "drizzle-orm";
 import { z } from "zod";
 
@@ -115,7 +115,7 @@ export default procedure
       return nextReference;
     });
 
-    await pushUniqueJob("IndexEntitySearch", {
+    await pushJob("IndexEntitySearch", {
       entityId: entity.id,
     });
 

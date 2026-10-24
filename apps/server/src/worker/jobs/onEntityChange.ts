@@ -1,5 +1,5 @@
 import { db } from "@peated/server/db";
-import { pushUniqueJob, runJob } from "@peated/server/worker/dispatch";
+import { pushJob, runJob } from "@peated/server/worker/dispatch";
 import type { JobPayload } from "@peated/server/worker/types";
 import { z } from "zod";
 
@@ -21,9 +21,9 @@ export default async (input: JobPayload) => {
   if (!entity) return;
 
   // Generated details wait on a model, so they run on the models queue.
-  await pushUniqueJob("GenerateEntityDetails", { entityId });
-  await pushUniqueJob("GenerateEntityPronunciationAudio", { entityId });
+  await pushJob("GenerateEntityDetails", { entityId });
+  await pushJob("GenerateEntityPronunciationAudio", { entityId });
   await runJob("IndexEntitySearch", { entityId });
   await runJob("GeocodeEntityLocation", { entityId });
-  await pushUniqueJob("UpdateEntityStats", { entityId }, { delay: 5000 });
+  await pushJob("UpdateEntityStats", { entityId }, { delay: 5000 });
 };

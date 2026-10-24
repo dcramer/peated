@@ -32,7 +32,7 @@ import {
   ExternalSiteKeySchema,
   StorePriceInputSchema,
 } from "@peated/server/schemas";
-import { pushUniqueJob } from "@peated/server/worker/dispatch";
+import { pushJob } from "@peated/server/worker/dispatch";
 import { and, eq, inArray, isNull, or, sql } from "drizzle-orm";
 import { createHash } from "node:crypto";
 import { z } from "zod";
@@ -498,7 +498,7 @@ async function queueUnclassifiedPrices(priceIds: number[]) {
   );
   for (const priceId of priceIds) {
     if (classified.has(priceId)) continue;
-    await pushUniqueJob("ResolveStorePriceBottle", { priceId });
+    await pushJob("ResolveStorePriceBottle", { priceId });
   }
 }
 
@@ -653,7 +653,7 @@ async function createStorePricesInternal(
           });
 
         if (!price.imageUrl && sp.imageUrl) {
-          await pushUniqueJob("CapturePriceImage", {
+          await pushJob("CapturePriceImage", {
             priceId: price.id,
             imageUrl: sp.imageUrl,
           });
@@ -665,7 +665,7 @@ async function createStorePricesInternal(
             price.directMatchSource !== "trusted_source") ||
           (price.directMatchSource === "barcode" && price.bottleChanged)
         ) {
-          await pushUniqueJob("ResolveStorePriceBottle", {
+          await pushJob("ResolveStorePriceBottle", {
             priceId: price.id,
             force: true,
           });

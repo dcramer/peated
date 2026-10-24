@@ -7,7 +7,7 @@ import {
   shouldRunCatalogVerification,
 } from "@peated/catalog-verifier";
 import { logInfo } from "@peated/server/lib/log";
-import { pushUniqueJob } from "@peated/server/worker/dispatch";
+import { pushJob } from "@peated/server/worker/dispatch";
 
 export function getCatalogVerificationCreationMetadata(
   creationSource: CatalogVerificationCreationSource,
@@ -40,7 +40,7 @@ export async function queueBottleCreationVerification({
     return;
   }
 
-  await pushUniqueJob(
+  await pushJob(
     "VerifyBottleCreation",
     {
       bottleId,
@@ -75,7 +75,7 @@ export async function queueEntityCreationVerification({
     return;
   }
 
-  await pushUniqueJob(
+  await pushJob(
     "VerifyEntityCreation",
     {
       entityId,

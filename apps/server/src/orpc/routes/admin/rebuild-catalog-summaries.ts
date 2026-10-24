@@ -1,6 +1,6 @@
 import { procedure } from "@peated/server/orpc";
 import { requireAdmin } from "@peated/server/orpc/middleware";
-import { pushUniqueJob } from "@peated/server/worker/dispatch";
+import { pushJob } from "@peated/server/worker/dispatch";
 import { z } from "zod";
 
 export default procedure
@@ -16,42 +16,42 @@ export default procedure
   .input(z.object({}).strict().default({}))
   .output(z.object({ status: z.literal("queued") }).strict())
   .handler(async () => {
-    await pushUniqueJob(
+    await pushJob(
       "RepairBottleStats",
       {},
       {
         delay: 0,
       },
     );
-    await pushUniqueJob(
+    await pushJob(
       "RepairEntityBottleCounts",
       {},
       {
         delay: 0,
       },
     );
-    await pushUniqueJob(
+    await pushJob(
       "RepairLocationBottleCounts",
       {},
       {
         delay: 0,
       },
     );
-    await pushUniqueJob(
+    await pushJob(
       "RepairBottleGroupBottleCounts",
       {},
       {
         delay: 0,
       },
     );
-    await pushUniqueJob(
+    await pushJob(
       "RepairBottleSeriesReleaseCounts",
       {},
       {
         delay: 0,
       },
     );
-    await pushUniqueJob(
+    await pushJob(
       "RepairCollectionBottleCounts",
       {},
       {

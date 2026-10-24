@@ -108,10 +108,9 @@ describe("PUT /bottle-references", () => {
     expect(workerClient.pushJob).toHaveBeenCalledWith("IndexBottleReference", {
       name: reference!.name,
     });
-    expect(workerClient.pushUniqueJob).toHaveBeenCalledWith(
-      "IndexBottleSearch",
-      { bottleId: bottle.id },
-    );
+    expect(workerClient.pushJob).toHaveBeenCalledWith("IndexBottleSearch", {
+      bottleId: bottle.id,
+    });
   });
 
   test("does not overwrite consumers assigned to another Bottle", async ({
@@ -255,7 +254,7 @@ describe("PUT /bottle-references", () => {
   }) => {
     const bottle = await fixtures.Bottle();
     const user = await fixtures.User({ mod: true });
-    vi.mocked(workerClient.pushUniqueJob).mockRejectedValueOnce(
+    vi.mocked(workerClient.pushJob).mockRejectedValueOnce(
       new Error("Queue unavailable"),
     );
 

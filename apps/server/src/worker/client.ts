@@ -9,7 +9,7 @@ import { logError, logInfo, logTelemetryError } from "../lib/log";
 import { isModelServiceUnavailable } from "../lib/openaiClient";
 import { initializeScraperRuntime } from "../scraper";
 import { SCRAPER_JOB_LOCK_MS } from "../scraper/runTimeout";
-import { pushUniqueJob, runJob, type WorkerDispatch } from "./dispatch";
+import { pushJob, runJob, type WorkerDispatch } from "./dispatch";
 import "./jobs";
 import createNextRepeatingEvents from "./jobs/createNextRepeatingEvents";
 import scheduleScrapers from "./jobs/scheduleScrapers";
@@ -26,7 +26,6 @@ import { type JobArgs, type JobName, type QueuedJobInput } from "./types";
 export {
   configureWorkerDispatch,
   pushJob,
-  pushUniqueJob,
   runJob,
   useQueueWorkerDispatch,
 } from "./dispatch";
@@ -97,19 +96,25 @@ export async function removeFinishedJob(queue: QueuedJobLookup, jobId: string) {
   }
 }
 
-async function pushUniqueJobToQueue(
+/**
+ * Worker queue rule: the job's registration decides whether it is unique, so
+ * every caller of the same job gets the same deduplication.
+ */
+async function pushJobToQueue(
   jobName: JobName,
   args?: JobArgs,
   opts?: JobsOptions,
 ) {
-  opts = buildUniqueJobOptions(jobName, args, opts);
+  if (!registry.isUnique(jobName)) {
+    return await addJobToQueue(jobName, args, opts);
+  }
+  const uniqueOpts = buildUniqueJobOptions(jobName, args, opts);
   const queue = await getQueue(registry.getQueueName(jobName));
-  await removeFinishedJob(queue, opts.jobId!);
-
-  return await pushJobToQueue(jobName, args, opts);
+  await removeFinishedJob(queue, uniqueOpts.jobId!);
+  return await addJobToQueue(jobName, args, uniqueOpts);
 }
 
-async function pushJobToQueue(
+async function addJobToQueue(
   jobName: JobName,
   args?: JobArgs,
   opts?: JobsOptions,
@@ -149,7 +154,6 @@ async function pushJobToQueue(
 
 export const queueWorkerDispatch: WorkerDispatch = {
   pushJob: pushJobToQueue,
-  pushUniqueJob: pushUniqueJobToQueue,
   runJob: runRegisteredJob,
 };
 const MODEL_SERVICE_PAUSE_MS = 15 * 60 * 1000;
@@ -278,7 +282,7 @@ export async function runWorker() {
       await runJob("ProcessAccountDeletions");
     });
     scheduledJob("27 * * * *", "update-external-reviews", async () => {
-      await pushUniqueJob(
+      await pushJob(
         "UpdateExternalReviews",
         {},
         { removeOnComplete: true, removeOnFail: false },

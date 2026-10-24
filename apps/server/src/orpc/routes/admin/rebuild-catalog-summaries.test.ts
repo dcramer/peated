@@ -1,5 +1,5 @@
 import waitError from "@peated/server/lib/test/waitError";
-import { pushUniqueJob } from "@peated/server/lib/test/workerDispatch";
+import { pushJob } from "@peated/server/lib/test/workerDispatch";
 import { routerClient } from "@peated/server/orpc/router";
 
 describe("POST /admin/catalog/rebuild-summaries", () => {
@@ -18,8 +18,8 @@ describe("POST /admin/catalog/rebuild-summaries", () => {
         { context: { user: admin } },
       ),
     ).resolves.toEqual({ status: "queued" });
-    expect(pushUniqueJob).toHaveBeenCalledTimes(6);
-    expect(pushUniqueJob).toHaveBeenNthCalledWith(
+    expect(pushJob).toHaveBeenCalledTimes(6);
+    expect(pushJob).toHaveBeenNthCalledWith(
       1,
       "RepairBottleStats",
       {},
@@ -27,7 +27,7 @@ describe("POST /admin/catalog/rebuild-summaries", () => {
         delay: 0,
       },
     );
-    expect(pushUniqueJob).toHaveBeenNthCalledWith(
+    expect(pushJob).toHaveBeenNthCalledWith(
       2,
       "RepairEntityBottleCounts",
       {},
@@ -35,7 +35,7 @@ describe("POST /admin/catalog/rebuild-summaries", () => {
         delay: 0,
       },
     );
-    expect(pushUniqueJob).toHaveBeenNthCalledWith(
+    expect(pushJob).toHaveBeenNthCalledWith(
       3,
       "RepairLocationBottleCounts",
       {},
@@ -43,7 +43,7 @@ describe("POST /admin/catalog/rebuild-summaries", () => {
         delay: 0,
       },
     );
-    expect(pushUniqueJob).toHaveBeenNthCalledWith(
+    expect(pushJob).toHaveBeenNthCalledWith(
       4,
       "RepairBottleGroupBottleCounts",
       {},
@@ -51,7 +51,7 @@ describe("POST /admin/catalog/rebuild-summaries", () => {
         delay: 0,
       },
     );
-    expect(pushUniqueJob).toHaveBeenNthCalledWith(
+    expect(pushJob).toHaveBeenNthCalledWith(
       5,
       "RepairBottleSeriesReleaseCounts",
       {},
@@ -59,7 +59,7 @@ describe("POST /admin/catalog/rebuild-summaries", () => {
         delay: 0,
       },
     );
-    expect(pushUniqueJob).toHaveBeenNthCalledWith(
+    expect(pushJob).toHaveBeenNthCalledWith(
       6,
       "RepairCollectionBottleCounts",
       {},
@@ -77,6 +77,6 @@ describe("POST /admin/catalog/rebuild-summaries", () => {
         routerClient.admin.rebuildCatalogSummaries({}, { context: { user } }),
       ),
     ).resolves.toMatchObject({ message: "Unauthorized." });
-    expect(pushUniqueJob).not.toHaveBeenCalled();
+    expect(pushJob).not.toHaveBeenCalled();
   });
 });

@@ -2,7 +2,7 @@ import {
   claimStorePriceMatchProposalProcessingLease,
   releaseStorePriceMatchProposalProcessingLease,
 } from "@peated/server/lib/priceMatching";
-import { pushUniqueJob } from "@peated/server/worker/dispatch";
+import { pushJob } from "@peated/server/worker/dispatch";
 
 export type StorePriceMatchRetryEnqueueResult =
   | {
@@ -30,7 +30,7 @@ export async function enqueueStorePriceMatchRetry({
   }
 
   try {
-    await pushUniqueJob("ResolveStorePriceBottle", {
+    await pushJob("ResolveStorePriceBottle", {
       priceId,
       force: true,
       processingToken: lease.processingToken,

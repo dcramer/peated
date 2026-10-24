@@ -220,14 +220,12 @@ describe("PATCH /bottle-references/:reference", () => {
     expect(workerClient.pushJob).toHaveBeenCalledWith("IndexBottleReference", {
       name,
     });
-    expect(workerClient.pushUniqueJob).toHaveBeenCalledWith(
-      "IndexBottleSearch",
-      { bottleId: source.id },
-    );
-    expect(workerClient.pushUniqueJob).toHaveBeenCalledWith(
-      "IndexBottleSearch",
-      { bottleId: target.id },
-    );
+    expect(workerClient.pushJob).toHaveBeenCalledWith("IndexBottleSearch", {
+      bottleId: source.id,
+    });
+    expect(workerClient.pushJob).toHaveBeenCalledWith("IndexBottleSearch", {
+      bottleId: target.id,
+    });
     for (const bottle of [source, target]) {
       expect(workerClient.pushJob).toHaveBeenCalledWith(
         "UpdateBottleStats",

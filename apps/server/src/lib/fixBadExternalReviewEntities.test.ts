@@ -115,7 +115,7 @@ describe("fixBadExternalReviewEntities", () => {
   });
   beforeEach(() => {
     classifyBottleReferenceMock.mockReset();
-    vi.mocked(workerClient.pushUniqueJob).mockReset();
+    vi.mocked(workerClient.pushJob).mockReset();
     classifyBottleReferenceMock.mockResolvedValue(
       buildClassification({ action: "no_match" }),
     );
@@ -224,12 +224,9 @@ describe("fixBadExternalReviewEntities", () => {
       where: eq(storePrices.id, sameNamePrice.id),
     });
     expect(siblingPrice?.bottleId).toEqual(correctBottle.id);
-    expect(workerClient.pushUniqueJob).toHaveBeenCalledWith(
-      "IndexBottleSearch",
-      {
-        bottleId: correctBottle.id,
-      },
-    );
+    expect(workerClient.pushJob).toHaveBeenCalledWith("IndexBottleSearch", {
+      bottleId: correctBottle.id,
+    });
   });
 
   test("reassigns through an exact reference to an active Bottle", async ({

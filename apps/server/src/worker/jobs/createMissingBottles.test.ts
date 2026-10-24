@@ -200,7 +200,7 @@ describe("createMissingBottles", () => {
   });
   beforeEach(() => {
     classifyBottleReferenceMock.mockReset();
-    vi.mocked(workerClient.pushUniqueJob).mockReset();
+    vi.mocked(workerClient.pushJob).mockReset();
     classifyBottleReferenceMock.mockResolvedValue(
       buildClassification({ action: "no_match" }),
     );
@@ -334,12 +334,9 @@ describe("createMissingBottles", () => {
     const actionable = await listActionableBottleChecks({ limit: 100 });
     expect(actionable.results.map((item) => item.id)).not.toContain(check?.id);
 
-    expect(workerClient.pushUniqueJob).toHaveBeenCalledWith(
-      "IndexBottleSearch",
-      {
-        bottleId: updatedReview?.bottleId,
-      },
-    );
+    expect(workerClient.pushJob).toHaveBeenCalledWith("IndexBottleSearch", {
+      bottleId: updatedReview?.bottleId,
+    });
     expect(workerClient.pushJob).toHaveBeenCalledWith(
       "UpdateBottleStats",
       { bottleId },
@@ -467,7 +464,7 @@ describe("createMissingBottles", () => {
       await createMissingBottles(
         scope === "article" ? { articleId: failed.articleId } : undefined,
       );
-      const jobs = workerClient.pushUniqueJob.mock.calls.filter(
+      const jobs = workerClient.pushJob.mock.calls.filter(
         ([name]) => name === "CreateMissingBottles",
       );
       expect(jobs.map(([, input]) => input)).toEqual([
@@ -497,7 +494,7 @@ describe("createMissingBottles", () => {
         scope === "article" ? { articleId: failed.articleId } : undefined,
       );
       expect(
-        workerClient.pushUniqueJob.mock.calls
+        workerClient.pushJob.mock.calls
           .filter(([name]) => name === "CreateMissingBottles")
           .slice(2),
       ).toEqual([["CreateMissingBottles", { reviewId: failed.id }]]);
@@ -518,7 +515,7 @@ describe("createMissingBottles", () => {
     await createMissingBottles();
 
     expect(classifyBottleReferenceMock).not.toHaveBeenCalled();
-    expect(workerClient.pushUniqueJob.mock.calls).toEqual([
+    expect(workerClient.pushJob.mock.calls).toEqual([
       ["CreateMissingBottles", { reviewId: review.id }],
     ]);
 
@@ -533,7 +530,7 @@ describe("createMissingBottles", () => {
   }) => {
     const review = await fixtures.ExternalReview({ bottleId: null });
     const error = new Error("Queue unavailable");
-    workerClient.pushUniqueJob.mockRejectedValueOnce(error);
+    workerClient.pushJob.mockRejectedValueOnce(error);
     await expect(
       createMissingBottles({ articleId: review.articleId }),
     ).rejects.toBe(error);
@@ -543,7 +540,7 @@ describe("createMissingBottles", () => {
       }),
     ).toMatchObject({ bottleId: null, bottleNoMatchAt: null });
     await createMissingBottles({ articleId: review.articleId });
-    expect(workerClient.pushUniqueJob).toHaveBeenLastCalledWith(
+    expect(workerClient.pushJob).toHaveBeenLastCalledWith(
       "CreateMissingBottles",
       { reviewId: review.id },
     );
@@ -567,7 +564,7 @@ describe("createMissingBottles", () => {
       .returning({ id: externalReviews.id });
     await createMissingBottles();
     expect(classifyBottleReferenceMock).not.toHaveBeenCalled();
-    expect(workerClient.pushUniqueJob.mock.calls).toEqual(
+    expect(workerClient.pushJob.mock.calls).toEqual(
       [first, ...rest].map(({ id }) => [
         "CreateMissingBottles",
         { reviewId: id },
@@ -648,9 +645,7 @@ describe("createMissingBottles", () => {
       },
       { context: { user: mod } },
     );
-    await createMissingBottles(
-      workerClient.pushUniqueJob.mock.calls.at(-1)![1],
-    );
+    await createMissingBottles(workerClient.pushJob.mock.calls.at(-1)![1]);
     expect(classifyBottleReferenceMock).toHaveBeenCalledTimes(1);
     const completed = await db.query.externalReviews.findFirst({
       where: eq(externalReviews.id, review.id),
@@ -682,7 +677,7 @@ describe("createMissingBottles", () => {
     await routerClient.externalReviews.recheck(input, {
       context: { user: mod },
     });
-    const payload = workerClient.pushUniqueJob.mock.calls.at(-1)![1];
+    const payload = workerClient.pushJob.mock.calls.at(-1)![1];
     const assertVisible = async () => {
       await expect(
         routerClient.admin.moderation.task(
@@ -710,9 +705,7 @@ describe("createMissingBottles", () => {
     await routerClient.externalReviews.recheck(input, {
       context: { user: mod },
     });
-    await createMissingBottles(
-      workerClient.pushUniqueJob.mock.calls.at(-1)![1],
-    );
+    await createMissingBottles(workerClient.pushJob.mock.calls.at(-1)![1]);
     const completed = await db.query.externalReviews.findFirst({
       where: eq(externalReviews.id, review.id),
     });
@@ -761,7 +754,7 @@ describe("createMissingBottles", () => {
       },
       { context: { user: mod } },
     );
-    const payload = workerClient.pushUniqueJob.mock.calls.at(-1)![1];
+    const payload = workerClient.pushJob.mock.calls.at(-1)![1];
     await createMissingBottles(payload);
     expect(
       await db.query.externalReviews.findFirst({
@@ -827,9 +820,7 @@ describe("createMissingBottles", () => {
       const changed = await db.query.externalReviews.findFirst({
         where: eq(externalReviews.id, review.id),
       });
-      await createMissingBottles(
-        workerClient.pushUniqueJob.mock.calls.at(-1)![1],
-      );
+      await createMissingBottles(workerClient.pushJob.mock.calls.at(-1)![1]);
       expect(classifyBottleReferenceMock).not.toHaveBeenCalled();
       expect(
         await db.query.externalReviews.findFirst({
@@ -907,9 +898,7 @@ describe("createMissingBottles", () => {
           { candidates: [{ bottleId: bottle.id }] },
         );
       });
-      await createMissingBottles(
-        workerClient.pushUniqueJob.mock.calls.at(-1)![1],
-      );
+      await createMissingBottles(workerClient.pushJob.mock.calls.at(-1)![1]);
       expect(classifyBottleReferenceMock).toHaveBeenCalledTimes(1);
       expect(
         await db.query.externalReviews.findFirst({
@@ -941,10 +930,10 @@ describe("createMissingBottles", () => {
     await createMissingBottles({ articleId: selected.articleId });
 
     expect(classifyBottleReferenceMock).not.toHaveBeenCalled();
-    expect(workerClient.pushUniqueJob.mock.calls).toEqual([
+    expect(workerClient.pushJob.mock.calls).toEqual([
       ["CreateMissingBottles", { reviewId: selected.id }],
     ]);
-    await createMissingBottles(workerClient.pushUniqueJob.mock.calls[0]![1]);
+    await createMissingBottles(workerClient.pushJob.mock.calls[0]![1]);
     expect(classifyBottleReferenceMock).toHaveBeenCalledTimes(1);
     expect(classifyBottleReferenceMock).toHaveBeenCalledWith(
       expect.objectContaining({

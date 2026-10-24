@@ -110,35 +110,54 @@ function instrumentedJob<TResult>(
   return wrappedJob;
 }
 
-class Registry {
-  private jobs: Record<string, { fn: JobFunction; queueName: JobQueueName }> =
-    {};
+type RegisteredJob = {
+  fn: JobFunction;
+  queueName: JobQueueName;
+  unique: boolean;
+};
 
+class Registry {
+  private jobs: Record<string, RegisteredJob> = {};
+
+  /**
+   * Worker queue rule: registration decides whether a job is unique. A unique
+   * job collapses repeated pushes with the same arguments into one waiting
+   * job, so callers cannot queue duplicate derived-data work by choosing the
+   * wrong push function.
+   */
   add<TResult>(
     name: string,
     fn: JobFunction<TResult>,
-    { queueName = "default" }: { queueName?: JobQueueName } = {},
+    {
+      queueName = "default",
+      unique = false,
+    }: { queueName?: JobQueueName; unique?: boolean } = {},
   ) {
     this.jobs[name] = {
       fn: instrumentedJob(name, fn, queueName),
       queueName,
+      unique,
     };
   }
 
   get(name: string) {
-    const rv = this.jobs[name];
-    if (rv === undefined) {
-      throw new Error(`Unknown job: ${name}`);
-    }
-    return rv.fn;
+    return this.getRegistered(name).fn;
   }
 
   getQueueName(name: string) {
+    return this.getRegistered(name).queueName;
+  }
+
+  isUnique(name: string) {
+    return this.getRegistered(name).unique;
+  }
+
+  private getRegistered(name: string) {
     const rv = this.jobs[name];
     if (rv === undefined) {
       throw new Error(`Unknown job: ${name}`);
     }
-    return rv.queueName;
+    return rv;
   }
 }
 

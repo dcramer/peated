@@ -40,7 +40,7 @@ describe("POST /entities", () => {
     expect(workerClient.pushJob).toHaveBeenCalledWith("OnEntityChange", {
       entityId: data.id,
     });
-    expect(workerClient.pushUniqueJob).toHaveBeenCalledWith(
+    expect(workerClient.pushJob).toHaveBeenCalledWith(
       "VerifyEntityCreation",
       {
         entityId: data.id,
@@ -203,7 +203,7 @@ describe("POST /entities", () => {
     expect(data.id).toEqual(entity.id);
     expect(data.kind).toEqual("distillery");
     expect(workerClient.pushJob).not.toHaveBeenCalled();
-    expect(workerClient.pushUniqueJob).not.toHaveBeenCalledWith(
+    expect(workerClient.pushJob).not.toHaveBeenCalledWith(
       "VerifyEntityCreation",
       expect.anything(),
       expect.anything(),

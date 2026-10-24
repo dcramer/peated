@@ -6,14 +6,14 @@ import { beforeEach, expect, test, vi } from "vitest";
 import indexBottleSeriesSearch from "./indexBottleSeriesSearch";
 
 beforeEach(() => {
-  vi.mocked(workerClient.pushUniqueJob).mockClear();
+  vi.mocked(workerClient.pushJob).mockClear();
 });
 
 test("skips stale work for a deleted BottleSeries", async () => {
   await expect(
     indexBottleSeriesSearch({ seriesId: 2_147_483_647 }),
   ).resolves.toBeUndefined();
-  expect(workerClient.pushUniqueJob).not.toHaveBeenCalled();
+  expect(workerClient.pushJob).not.toHaveBeenCalled();
 });
 
 test("writes a Series search document that TIN can query", async ({

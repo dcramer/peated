@@ -166,8 +166,8 @@ function selectBottleAggregates(
 }
 
 function resetQueueMock() {
-  vi.mocked(workerClient.pushUniqueJob).mockReset();
-  vi.mocked(workerClient.pushUniqueJob).mockResolvedValue(undefined);
+  vi.mocked(workerClient.pushJob).mockReset();
+  vi.mocked(workerClient.pushJob).mockResolvedValue(undefined);
 }
 
 describe("Bottle updates", () => {
@@ -299,7 +299,7 @@ describe("Bottle updates", () => {
     expect(groupAfter.updatedAt).toEqual(groupBefore.updatedAt);
     expect(await loadUpdateAudits([first.bottle.id])).toEqual([]);
     expect(await loadAliases([first.bottle.id])).toEqual(aliasesBefore);
-    expect(workerClient.pushUniqueJob).not.toHaveBeenCalled();
+    expect(workerClient.pushJob).not.toHaveBeenCalled();
   });
 
   test("composes a sourced update transaction with explicit post-commit finalization", async ({
@@ -325,7 +325,7 @@ describe("Bottle updates", () => {
         actorId: actor.id,
         creationSource: "price_match_review",
       });
-      expect(workerClient.pushUniqueJob).not.toHaveBeenCalled();
+      expect(workerClient.pushJob).not.toHaveBeenCalled();
       return result;
     });
 
@@ -337,7 +337,7 @@ describe("Bottle updates", () => {
     expect((await loadUpdateAudits([first.bottle.id]))[0]?.data).toMatchObject({
       creationSource: "price_match_review",
     });
-    expect(workerClient.pushUniqueJob).not.toHaveBeenCalled();
+    expect(workerClient.pushJob).not.toHaveBeenCalled();
 
     await finalizeBottleUpdate(manifest);
 
@@ -352,7 +352,7 @@ describe("Bottle updates", () => {
       );
     expect(createdEntities).toHaveLength(2);
     for (const { id: entityId } of createdEntities) {
-      expect(workerClient.pushUniqueJob).not.toHaveBeenCalledWith(
+      expect(workerClient.pushJob).not.toHaveBeenCalledWith(
         "VerifyEntityCreation",
         { entityId, creationSource: "price_match_review" },
         { delay: 5_000 },
@@ -565,10 +565,10 @@ describe("Bottle updates", () => {
     const audits = await loadUpdateAudits([first.bottle.id]);
     expect(audits).toHaveLength(1);
     expect(audits[0].data).toMatchObject({ updateScope: "shared" });
-    expect(workerClient.pushUniqueJob).toHaveBeenCalledWith("OnEntityChange", {
+    expect(workerClient.pushJob).toHaveBeenCalledWith("OnEntityChange", {
       entityId: selectedBrand.id,
     });
-    expect(workerClient.pushUniqueJob).not.toHaveBeenCalledWith(
+    expect(workerClient.pushJob).not.toHaveBeenCalledWith(
       "VerifyEntityCreation",
       expect.objectContaining({ entityId: selectedBrand.id }),
     );
@@ -615,25 +615,23 @@ describe("Bottle updates", () => {
     resetQueueMock();
 
     let observedCommittedOwners = false;
-    vi.mocked(workerClient.pushUniqueJob).mockImplementation(
-      async (jobName) => {
-        if (jobName !== "OnEntityChange" || observedCommittedOwners) return;
+    vi.mocked(workerClient.pushJob).mockImplementation(async (jobName) => {
+      if (jobName !== "OnEntityChange" || observedCommittedOwners) return;
 
-        const persistedGroup = await db.query.bottleGroups.findFirst({
-          where: eq(bottleGroups.id, first.group.id),
-          with: {
-            distillers: {
-              columns: { distillerId: true },
-            },
+      const persistedGroup = await db.query.bottleGroups.findFirst({
+        where: eq(bottleGroups.id, first.group.id),
+        with: {
+          distillers: {
+            columns: { distillerId: true },
           },
-        });
-        observedCommittedOwners =
-          persistedGroup?.brandId === newBrand.id &&
-          persistedGroup.bottlerId === newBottler.id &&
-          persistedGroup.distillers.length === 1 &&
-          persistedGroup.distillers[0]?.distillerId === newDistiller.id;
-      },
-    );
+        },
+      });
+      observedCommittedOwners =
+        persistedGroup?.brandId === newBrand.id &&
+        persistedGroup.bottlerId === newBottler.id &&
+        persistedGroup.distillers.length === 1 &&
+        persistedGroup.distillers[0]?.distillerId === newDistiller.id;
+    });
 
     await updateBottle({
       bottleId: first.bottle.id,
@@ -646,7 +644,7 @@ describe("Bottle updates", () => {
     });
 
     const ownerEntityIds = vi
-      .mocked(workerClient.pushUniqueJob)
+      .mocked(workerClient.pushJob)
       .mock.calls.flatMap(([jobName, payload]) =>
         jobName === "OnEntityChange" &&
         payload !== undefined &&
@@ -692,7 +690,7 @@ describe("Bottle updates", () => {
         context: contextFor(mod),
       }),
     ).resolves.toMatchObject({ changed: false });
-    expect(workerClient.pushUniqueJob).not.toHaveBeenCalled();
+    expect(workerClient.pushJob).not.toHaveBeenCalled();
   });
 
   test("moves production-location Bottle counts with Distillery links", async ({
@@ -995,7 +993,7 @@ describe("Bottle updates", () => {
     expect(await loadGroupMembers(first.group.id)).toEqual(membersBefore);
     expect(await loadAliases(memberIds)).toEqual(aliasesBefore);
     expect(await loadUpdateAudits(memberIds)).toEqual([]);
-    expect(workerClient.pushUniqueJob).not.toHaveBeenCalled();
+    expect(workerClient.pushJob).not.toHaveBeenCalled();
   });
 
   test("isolates exact identity and content patches to the selected Bottle", async ({
@@ -1260,10 +1258,10 @@ describe("Bottle updates", () => {
         }),
       }),
     ]);
-    expect(workerClient.pushUniqueJob).toHaveBeenCalledWith("OnBottleChange", {
+    expect(workerClient.pushJob).toHaveBeenCalledWith("OnBottleChange", {
       bottleId: first.bottle.id,
     });
-    expect(workerClient.pushUniqueJob).not.toHaveBeenCalledWith(
+    expect(workerClient.pushJob).not.toHaveBeenCalledWith(
       "OnBottleAliasChange",
       expect.anything(),
     );
@@ -1399,7 +1397,7 @@ describe("Bottle updates", () => {
     expect(result.changed).toBe(true);
     expect(
       vi
-        .mocked(workerClient.pushUniqueJob)
+        .mocked(workerClient.pushJob)
         .mock.calls.filter(([jobName]) => jobName === "OnBottleChange")
         .map(([, payload]) => payload),
     ).toEqual(members.map(({ bottle }) => ({ bottleId: bottle.id })));
@@ -1648,7 +1646,7 @@ describe("Bottle updates", () => {
         .orderBy(asc(bottleGroupDistillers.distillerId)),
     ).toEqual(groupDistillersBefore);
     expect(await loadUpdateAudits(memberIds)).toEqual([]);
-    expect(workerClient.pushUniqueJob).not.toHaveBeenCalled();
+    expect(workerClient.pushJob).not.toHaveBeenCalled();
 
     resetQueueMock();
     const exactResult = await updateBottle({
@@ -1693,8 +1691,8 @@ describe("Bottle updates", () => {
         .where(eq(bottleGroupDistillers.groupId, first.group.id))
         .orderBy(asc(bottleGroupDistillers.distillerId)),
     ).toEqual(groupDistillersBefore);
-    expect(workerClient.pushUniqueJob).toHaveBeenCalledTimes(1);
-    expect(workerClient.pushUniqueJob).toHaveBeenCalledWith("OnBottleChange", {
+    expect(workerClient.pushJob).toHaveBeenCalledTimes(1);
+    expect(workerClient.pushJob).toHaveBeenCalledWith("OnBottleChange", {
       bottleId: members[0].bottle.id,
     });
   });
@@ -1803,7 +1801,7 @@ describe("Bottle updates", () => {
     expect(
       await loadUpdateAudits(members.map(({ bottle }) => bottle.id)),
     ).toEqual(auditsBeforeEqual);
-    expect(workerClient.pushUniqueJob).not.toHaveBeenCalled();
+    expect(workerClient.pushJob).not.toHaveBeenCalled();
 
     await updateBottle({
       bottleId: members[2].bottle.id,
@@ -1828,7 +1826,7 @@ describe("Bottle updates", () => {
     expect(persisted.map(({ statedAge }) => statedAge)).toEqual([15, null, 18]);
     expect(
       vi
-        .mocked(workerClient.pushUniqueJob)
+        .mocked(workerClient.pushJob)
         .mock.calls.filter(([jobName]) => jobName === "OnBottleChange")
         .map(([, payload]) => payload),
     ).toEqual(members.map(({ bottle }) => ({ bottleId: bottle.id })));
@@ -1960,7 +1958,7 @@ describe("Bottle updates", () => {
     expect(
       (await loadAliases([aliasOwner.bottle.id])).map(({ name }) => name),
     ).toContain(conflictingAliasName);
-    expect(workerClient.pushUniqueJob).not.toHaveBeenCalledWith(
+    expect(workerClient.pushJob).not.toHaveBeenCalledWith(
       "OnBottleAliasChange",
       expect.anything(),
     );
@@ -2068,7 +2066,7 @@ describe("Bottle updates", () => {
     expect(await loadGroupMembers(first.group.id)).toEqual([bottleBefore]);
     expect(await loadAliases([first.bottle.id])).toEqual(aliasesBefore);
     expect(await loadUpdateAudits([first.bottle.id])).toEqual([]);
-    expect(workerClient.pushUniqueJob).not.toHaveBeenCalled();
+    expect(workerClient.pushJob).not.toHaveBeenCalled();
   });
 
   test("rejects duplicate desired SMWS codes within a shared fan-out", async ({
@@ -2124,7 +2122,7 @@ describe("Bottle updates", () => {
     expect(await loadGroupMembers(first.group.id)).toEqual(membersBefore);
     expect(await loadAliases(memberIds)).toEqual(aliasesBefore);
     expect(await loadUpdateAudits(memberIds)).toEqual([]);
-    expect(workerClient.pushUniqueJob).not.toHaveBeenCalled();
+    expect(workerClient.pushJob).not.toHaveBeenCalled();
   });
 
   test("returns typed graph errors for absent, group-less, and retired Bottles", async ({
@@ -2156,7 +2154,7 @@ describe("Bottle updates", () => {
       expect(error).toMatchObject(expected);
     }
     expect(await loadUpdateAudits([legacy.id, retired.id])).toEqual([]);
-    expect(workerClient.pushUniqueJob).not.toHaveBeenCalled();
+    expect(workerClient.pushJob).not.toHaveBeenCalled();
   });
 
   test("recomputes old and new series", async ({ fixtures }) => {
@@ -2197,7 +2195,7 @@ describe("Bottle updates", () => {
       ),
     ).toEqual({ [oldSeries.id]: 0, [newSeries.id]: 2 });
     for (const seriesId of [oldSeries.id, newSeries.id]) {
-      expect(workerClient.pushUniqueJob).toHaveBeenCalledWith(
+      expect(workerClient.pushJob).toHaveBeenCalledWith(
         "IndexBottleSeriesSearch",
         { seriesId },
       );
@@ -2227,7 +2225,7 @@ describe("Bottle updates", () => {
     });
     resetQueueMock();
     let observedCommittedState = false;
-    vi.mocked(workerClient.pushUniqueJob).mockImplementation(
+    vi.mocked(workerClient.pushJob).mockImplementation(
       async (jobName, payload) => {
         if (jobName === "OnBottleChange") {
           const [persisted] = await db
@@ -2272,7 +2270,7 @@ describe("Bottle updates", () => {
       .select()
       .from(bottleSeries)
       .where(eq(bottleSeries.name, "Dispatch New Series"));
-    const calls = vi.mocked(workerClient.pushUniqueJob).mock.calls;
+    const calls = vi.mocked(workerClient.pushJob).mock.calls;
     const payloadsFor = (jobName: string) =>
       calls
         .filter(([calledJobName]) => calledJobName === jobName)

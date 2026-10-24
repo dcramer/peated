@@ -1,5 +1,5 @@
 import { db } from "@peated/server/db";
-import { pushUniqueJob, runJob } from "@peated/server/worker/dispatch";
+import { pushJob, runJob } from "@peated/server/worker/dispatch";
 import { z } from "zod";
 import type { JobPayload } from "../types";
 import type { UpdateBottleStatsJobArgs } from "./updateBottleStats";
@@ -46,9 +46,9 @@ export default async (input: JobPayload) => {
   // Generated details wait on a model, so they run on the models queue; the
   // resulting patch queues another change, which re-indexes the Bottle.
   if (generateDetails) {
-    await pushUniqueJob("GenerateBottleDetails", { bottleId });
+    await pushJob("GenerateBottleDetails", { bottleId });
   }
   await runJob("IndexBottleSearch", { bottleId });
   const statsJob = buildBottleChangeStatsJob(bottleId);
-  await pushUniqueJob(statsJob.name, statsJob.args, statsJob.opts);
+  await pushJob(statsJob.name, statsJob.args, statsJob.opts);
 };

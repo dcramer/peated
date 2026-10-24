@@ -68,7 +68,7 @@ import { logError } from "@peated/server/lib/log";
 import { canModerate } from "@peated/server/lib/moderators";
 import type { Context } from "@peated/server/orpc/context";
 import { EntityChoiceInputSchema } from "@peated/server/schemas";
-import { pushUniqueJob } from "@peated/server/worker/dispatch";
+import { pushJob } from "@peated/server/worker/dispatch";
 import { and, asc, eq, inArray, isNull, ne, sql } from "drizzle-orm";
 import { z } from "zod";
 
@@ -1793,14 +1793,14 @@ export async function finalizeBottleUpdate(
 ) {
   for (const bottleId of result.changedBottleIds) {
     try {
-      await pushUniqueJob("OnBottleChange", { bottleId });
+      await pushJob("OnBottleChange", { bottleId });
     } catch (error) {
       logError(error, { extra: { bottleId } });
     }
   }
   for (const name of result.changedReferenceNames) {
     try {
-      await pushUniqueJob("OnBottleReferenceChange", { name });
+      await pushJob("OnBottleReferenceChange", { name });
     } catch (error) {
       logError(error, {
         bottle: { id: result.bottle.id },
@@ -1810,7 +1810,7 @@ export async function finalizeBottleUpdate(
   }
   for (const entityId of result.changedEntityIds) {
     try {
-      await pushUniqueJob("OnEntityChange", { entityId });
+      await pushJob("OnEntityChange", { entityId });
     } catch (error) {
       logError(error, { entity: { id: entityId } });
     }
@@ -1827,7 +1827,7 @@ export async function finalizeBottleUpdate(
   }
   for (const seriesId of result.affectedSeriesIds) {
     try {
-      await pushUniqueJob("IndexBottleSeriesSearch", { seriesId });
+      await pushJob("IndexBottleSeriesSearch", { seriesId });
     } catch (error) {
       logError(error, { series: { id: seriesId } });
     }

@@ -4,7 +4,7 @@ import onBottleChange, { buildBottleChangeStatsJob } from "./onBottleChange";
 
 beforeEach(() => {
   vi.mocked(workerClient.runJob).mockClear();
-  vi.mocked(workerClient.pushUniqueJob).mockClear();
+  vi.mocked(workerClient.pushJob).mockClear();
 });
 
 test("builds direct Bottle statistics work", () => {
@@ -22,14 +22,14 @@ test("dispatches derived work for the supplied Bottle", async ({
 
   await onBottleChange({ bottleId: bottle.id });
 
-  expect(workerClient.pushUniqueJob).not.toHaveBeenCalledWith(
+  expect(workerClient.pushJob).not.toHaveBeenCalledWith(
     "GenerateBottleDetails",
     expect.anything(),
   );
   expect(workerClient.runJob).toHaveBeenCalledWith("IndexBottleSearch", {
     bottleId: bottle.id,
   });
-  expect(workerClient.pushUniqueJob).toHaveBeenCalledWith(
+  expect(workerClient.pushJob).toHaveBeenCalledWith(
     "UpdateBottleStats",
     { bottleId: bottle.id },
     { delay: 5000, removeOnComplete: true, removeOnFail: false },
@@ -43,10 +43,9 @@ test("generates details only when explicitly requested", async ({
 
   await onBottleChange({ bottleId: bottle.id, generateDetails: true });
 
-  expect(workerClient.pushUniqueJob).toHaveBeenCalledWith(
-    "GenerateBottleDetails",
-    { bottleId: bottle.id },
-  );
+  expect(workerClient.pushJob).toHaveBeenCalledWith("GenerateBottleDetails", {
+    bottleId: bottle.id,
+  });
   expect(workerClient.runJob).toHaveBeenCalledWith("IndexBottleSearch", {
     bottleId: bottle.id,
   });
@@ -56,7 +55,7 @@ test("skips stale work for a deleted Bottle", async () => {
   await onBottleChange({ bottleId: 2_147_483_647 });
 
   expect(workerClient.runJob).not.toHaveBeenCalled();
-  expect(workerClient.pushUniqueJob).not.toHaveBeenCalled();
+  expect(workerClient.pushJob).not.toHaveBeenCalled();
 });
 
 test.each([

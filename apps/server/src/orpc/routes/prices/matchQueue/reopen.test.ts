@@ -31,7 +31,7 @@ describe("POST /prices/match-queue/{proposal}/reopen", () => {
   test("reopens a cleared approved match for manual review, not automatic reuse", async ({
     fixtures,
   }) => {
-    vi.mocked(workerClient.pushUniqueJob).mockClear();
+    vi.mocked(workerClient.pushJob).mockClear();
     const user = await fixtures.User({ mod: true });
     const oldBottle = await fixtures.Bottle();
     const target = await fixtures.Bottle();
@@ -90,7 +90,7 @@ describe("POST /prices/match-queue/{proposal}/reopen", () => {
       reviewedById: null,
       reviewedAt: null,
     });
-    expect(workerClient.pushUniqueJob).not.toHaveBeenCalled();
+    expect(workerClient.pushJob).not.toHaveBeenCalled();
     expect(
       await db.query.incomingBottleDecisionLogs.findFirst({
         where: eq(incomingBottleDecisionLogs.sourceId, price.id),

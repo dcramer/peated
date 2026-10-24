@@ -10,7 +10,7 @@ import {
 } from "@peated/server/schemas";
 import { serialize } from "@peated/server/serializers";
 import { BottleSeriesSerializer } from "@peated/server/serializers/bottleSeries";
-import { pushUniqueJob } from "@peated/server/worker/dispatch";
+import { pushJob } from "@peated/server/worker/dispatch";
 import { and, eq, ne, sql } from "drizzle-orm";
 import { z } from "zod";
 
@@ -126,7 +126,7 @@ export default procedure
       return updatedSeries;
     });
 
-    await pushUniqueJob(
+    await pushJob(
       "IndexBottleSeriesSearch",
       {
         seriesId: updatedSeries.id,

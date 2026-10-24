@@ -14,7 +14,7 @@ import { beforeEach, describe, expect, test, vi } from "vitest";
 
 describe("repairBottleBrandDistilleryAssignments", () => {
   beforeEach(() => {
-    vi.mocked(workerClient.pushUniqueJob).mockReset();
+    vi.mocked(workerClient.pushJob).mockReset();
   });
 
   test("previews one shared BottleGroup repair without mutating members", async ({
@@ -66,7 +66,7 @@ describe("repairBottleBrandDistilleryAssignments", () => {
     expect(
       await db.query.bottles.findFirst({ where: eq(bottles.id, bottle.id) }),
     ).toMatchObject({ brandId: fromBrand.id, seriesId: sourceSeries.id });
-    expect(workerClient.pushUniqueJob).not.toHaveBeenCalled();
+    expect(workerClient.pushJob).not.toHaveBeenCalled();
   });
 
   test("previews exact batch identity from BottleGroup authority despite member drift", async ({
@@ -119,7 +119,7 @@ describe("repairBottleBrandDistilleryAssignments", () => {
       }),
       db.select().from(changes).where(inArray(changes.objectId, memberIds)),
     ]);
-    vi.mocked(workerClient.pushUniqueJob).mockReset();
+    vi.mocked(workerClient.pushJob).mockReset();
 
     const result = await repairBottleBrandDistilleryAssignments({
       bottleIds: [second.id],
@@ -164,7 +164,7 @@ describe("repairBottleBrandDistilleryAssignments", () => {
         .from(changes)
         .where(inArray(changes.objectId, memberIds)),
     ).toEqual(auditsBefore);
-    expect(workerClient.pushUniqueJob).not.toHaveBeenCalled();
+    expect(workerClient.pushJob).not.toHaveBeenCalled();
   });
 
   test("fans shared brand, distillery, name, and series changes to every Bottle", async ({
@@ -254,10 +254,10 @@ describe("repairBottleBrandDistilleryAssignments", () => {
         creationSource: "repair_workflow",
       }),
     ]);
-    expect(workerClient.pushUniqueJob).toHaveBeenCalledWith("OnBottleChange", {
+    expect(workerClient.pushJob).toHaveBeenCalledWith("OnBottleChange", {
       bottleId: first.id,
     });
-    expect(workerClient.pushUniqueJob).toHaveBeenCalledWith("OnBottleChange", {
+    expect(workerClient.pushJob).toHaveBeenCalledWith("OnBottleChange", {
       bottleId: second.id,
     });
   });

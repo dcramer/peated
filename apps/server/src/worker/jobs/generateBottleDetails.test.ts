@@ -78,13 +78,13 @@ async function createTwoMemberGroup(user: User, brandId: number) {
     .update(bottles)
     .set({ suggestedTags: ["sibling-tag"] })
     .where(eq(bottles.id, siblingBottle.id));
-  vi.mocked(workerClient.pushUniqueJob).mockClear();
+  vi.mocked(workerClient.pushJob).mockClear();
   return { source, sibling: { bottle: siblingBottle } };
 }
 
 beforeEach(() => {
   bottleDetailsModel = vi.fn();
-  vi.mocked(workerClient.pushUniqueJob).mockClear();
+  vi.mocked(workerClient.pushJob).mockClear();
 });
 
 test("normalizes generated tags to the catalog and storage limit", async ({
@@ -235,9 +235,9 @@ test("fans out generated details and keeps exact content selected-only", async (
       .where(and(eq(changes.objectType, "bottle"), eq(changes.type, "update"))),
   ).toEqual([]);
 
-  expect(workerClient.pushUniqueJob).toHaveBeenCalledTimes(2);
+  expect(workerClient.pushJob).toHaveBeenCalledTimes(2);
   for (const bottleId of [source.bottle.id, sibling.bottle.id]) {
-    expect(workerClient.pushUniqueJob).toHaveBeenCalledWith("OnBottleChange", {
+    expect(workerClient.pushJob).toHaveBeenCalledWith("OnBottleChange", {
       bottleId,
     });
   }
@@ -266,7 +266,7 @@ test("preserves a concurrent moderator exact-content edit", async ({
     },
     context: contextFor(mod),
   });
-  vi.mocked(workerClient.pushUniqueJob).mockClear();
+  vi.mocked(workerClient.pushJob).mockClear();
 
   deferred.resolve(generatedDetails());
   await expect(work).resolves.toBeUndefined();
@@ -291,7 +291,7 @@ test("preserves a concurrent moderator exact-content edit", async ({
     suggestedTags: [],
     flavorProfile: null,
   });
-  expect(workerClient.pushUniqueJob).not.toHaveBeenCalled();
+  expect(workerClient.pushJob).not.toHaveBeenCalled();
 });
 
 test("discards generated work planned from stale exact identity", async ({
@@ -319,7 +319,7 @@ test("discards generated work planned from stale exact identity", async ({
     where: eq(bottles.id, source.bottle.id),
   });
   if (!moderatorBottle) throw new Error("Expected updated Bottle.");
-  vi.mocked(workerClient.pushUniqueJob).mockClear();
+  vi.mocked(workerClient.pushJob).mockClear();
 
   deferred.resolve(generatedDetails());
   await expect(work).resolves.toBeUndefined();
@@ -347,7 +347,7 @@ test("discards generated work planned from stale exact identity", async ({
     flavorProfile: null,
   });
   expect(moderatorBottle.fullName).not.toBe(source.bottle.fullName);
-  expect(workerClient.pushUniqueJob).not.toHaveBeenCalled();
+  expect(workerClient.pushJob).not.toHaveBeenCalled();
 });
 
 test("preserves a concurrent moderator shared-flavor edit", async ({
@@ -369,7 +369,7 @@ test("preserves a concurrent moderator shared-flavor edit", async ({
     input: { flavorProfile: "lightly_peated" },
     context: contextFor(mod),
   });
-  vi.mocked(workerClient.pushUniqueJob).mockClear();
+  vi.mocked(workerClient.pushJob).mockClear();
 
   deferred.resolve(generatedDetails());
   await expect(work).resolves.toBeUndefined();
@@ -390,7 +390,7 @@ test("preserves a concurrent moderator shared-flavor edit", async ({
       columns: { flavorProfile: true },
     }),
   ).toEqual({ flavorProfile: "lightly_peated" });
-  expect(workerClient.pushUniqueJob).not.toHaveBeenCalled();
+  expect(workerClient.pushJob).not.toHaveBeenCalled();
 });
 
 test("discards generated work planned from stale shared authority", async ({
@@ -409,7 +409,7 @@ test("discards generated work planned from stale shared authority", async ({
     .update(bottleGroups)
     .set({ name: "New shared authority" })
     .where(eq(bottleGroups.id, source.group.id));
-  vi.mocked(workerClient.pushUniqueJob).mockClear();
+  vi.mocked(workerClient.pushJob).mockClear();
 
   deferred.resolve(generatedDetails());
   await expect(work).resolves.toBeUndefined();
@@ -426,7 +426,7 @@ test("discards generated work planned from stale shared authority", async ({
       columns: { description: true, tastingNotes: true },
     }),
   ).toEqual({ description: null, tastingNotes: null });
-  expect(workerClient.pushUniqueJob).not.toHaveBeenCalled();
+  expect(workerClient.pushJob).not.toHaveBeenCalled();
 });
 
 test("does not fan out after the selected Bottle moves groups", async ({
@@ -461,7 +461,7 @@ test("does not fan out after the selected Bottle moves groups", async ({
     .update(bottles)
     .set({ groupId: destination.group.id })
     .where(eq(bottles.id, source.bottle.id));
-  vi.mocked(workerClient.pushUniqueJob).mockClear();
+  vi.mocked(workerClient.pushJob).mockClear();
 
   deferred.resolve(generatedDetails());
   await expect(work).resolves.toBeUndefined();
@@ -495,7 +495,7 @@ test("does not fan out after the selected Bottle moves groups", async ({
       flavorProfile: null,
     },
   ]);
-  expect(workerClient.pushUniqueJob).not.toHaveBeenCalled();
+  expect(workerClient.pushJob).not.toHaveBeenCalled();
 });
 
 test("rejects invalid shared authority before invoking AI", async ({
@@ -541,6 +541,6 @@ test("rejects invalid shared authority before invoking AI", async ({
       .from(changes)
       .where(and(eq(changes.objectType, "bottle"), eq(changes.type, "update"))),
   ).toEqual([]);
-  expect(workerClient.pushUniqueJob).not.toHaveBeenCalled();
+  expect(workerClient.pushJob).not.toHaveBeenCalled();
   expect(bottleDetailsModel).not.toHaveBeenCalled();
 });

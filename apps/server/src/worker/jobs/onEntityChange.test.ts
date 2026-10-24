@@ -4,7 +4,7 @@ import onEntityChange from "./onEntityChange";
 
 beforeEach(() => {
   vi.mocked(workerClient.runJob).mockClear();
-  vi.mocked(workerClient.pushUniqueJob).mockClear();
+  vi.mocked(workerClient.pushJob).mockClear();
 });
 
 test("dispatches derived work for an existing Entity", async ({ fixtures }) => {
@@ -12,11 +12,10 @@ test("dispatches derived work for an existing Entity", async ({ fixtures }) => {
 
   await onEntityChange({ entityId: entity.id });
 
-  expect(workerClient.pushUniqueJob).toHaveBeenCalledWith(
-    "GenerateEntityDetails",
-    { entityId: entity.id },
-  );
-  expect(workerClient.pushUniqueJob).toHaveBeenCalledWith(
+  expect(workerClient.pushJob).toHaveBeenCalledWith("GenerateEntityDetails", {
+    entityId: entity.id,
+  });
+  expect(workerClient.pushJob).toHaveBeenCalledWith(
     "GenerateEntityPronunciationAudio",
     { entityId: entity.id },
   );
@@ -28,7 +27,7 @@ test("dispatches derived work for an existing Entity", async ({ fixtures }) => {
     "GeocodeEntityLocation",
     { entityId: entity.id },
   );
-  expect(workerClient.pushUniqueJob).toHaveBeenCalledWith(
+  expect(workerClient.pushJob).toHaveBeenCalledWith(
     "UpdateEntityStats",
     { entityId: entity.id },
     { delay: 5000 },
@@ -39,5 +38,5 @@ test("skips stale work for a deleted Entity", async () => {
   await onEntityChange({ entityId: 2_147_483_647 });
 
   expect(workerClient.runJob).not.toHaveBeenCalled();
-  expect(workerClient.pushUniqueJob).not.toHaveBeenCalled();
+  expect(workerClient.pushJob).not.toHaveBeenCalled();
 });

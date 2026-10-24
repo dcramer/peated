@@ -58,7 +58,7 @@ import type { Context } from "@peated/server/orpc/context";
 import { bottleNormalize } from "@peated/server/orpc/routes/bottles/validation";
 import type { BottleInputSchema } from "@peated/server/schemas";
 import type { BottlePreviewResult } from "@peated/server/types";
-import { pushUniqueJob } from "@peated/server/worker/dispatch";
+import { pushJob } from "@peated/server/worker/dispatch";
 import { eq, sql } from "drizzle-orm";
 import type { z } from "zod";
 import {
@@ -742,7 +742,7 @@ export async function finalizeCreatedBottle(
   } = {},
 ) {
   try {
-    await pushUniqueJob("OnBottleChange", {
+    await pushJob("OnBottleChange", {
       bottleId: bottle.id,
       generateDetails,
     });
@@ -769,7 +769,7 @@ export async function finalizeCreatedBottle(
 
   for (const entityId of newEntityIds) {
     try {
-      await pushUniqueJob("OnEntityChange", { entityId });
+      await pushJob("OnEntityChange", { entityId });
     } catch (err) {
       logError(err, {
         entity: {

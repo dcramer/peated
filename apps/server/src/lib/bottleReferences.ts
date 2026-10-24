@@ -32,7 +32,7 @@ import {
   resolveActiveBottleIds,
   type ActiveBottleRejectionReason,
 } from "@peated/server/lib/resolveActiveBottleIds";
-import { pushJob, pushUniqueJob } from "@peated/server/worker/dispatch";
+import { pushJob } from "@peated/server/worker/dispatch";
 import { and, asc, eq, inArray, isNull, or, sql } from "drizzle-orm";
 import {
   recordIncomingBottleDecisionInTransaction,
@@ -845,7 +845,7 @@ export async function finalizeBottleReferenceAssignment(
   }
 
   try {
-    await pushUniqueJob("IndexBottleSearch", { bottleId });
+    await pushJob("IndexBottleSearch", { bottleId });
   } catch (err) {
     logError(err, contexts);
   }
@@ -1268,7 +1268,7 @@ export async function correctBottleReference(
       ),
     )) {
       try {
-        await pushUniqueJob("IndexBottleSearch", {
+        await pushJob("IndexBottleSearch", {
           bottleId: changedBottleId,
         });
       } catch (err) {

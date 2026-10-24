@@ -1381,7 +1381,7 @@ describe("price match queue", () => {
       "OnBottleReferenceChange",
       expect.anything(),
     );
-    expect(workerClient.pushUniqueJob).not.toHaveBeenCalledWith(
+    expect(workerClient.pushJob).not.toHaveBeenCalledWith(
       "IndexBottleSearch",
       expect.anything(),
     );
@@ -1932,7 +1932,7 @@ describe("price match queue", () => {
     expect(observation).toMatchObject({
       bottleId: result.id,
     });
-    expect(workerClient.pushUniqueJob).not.toHaveBeenCalledWith(
+    expect(workerClient.pushJob).not.toHaveBeenCalledWith(
       "VerifyBottleCreation",
       {
         bottleId: result.id,
@@ -2404,7 +2404,7 @@ describe("price match queue", () => {
       db.select({ id: bottles.id }).from(bottles),
       db.select({ id: bottleGroups.id }).from(bottleGroups),
     ]);
-    vi.mocked(workerClient.pushUniqueJob).mockClear();
+    vi.mocked(workerClient.pushJob).mockClear();
 
     const result = await routerClient.prices.matchQueue.createBottle(
       {
@@ -2457,7 +2457,7 @@ describe("price match queue", () => {
     );
     expect(bottlesAfter).toHaveLength(bottlesBefore.length + 1);
     expect(groupsAfter).toHaveLength(groupsBefore.length + 1);
-    expect(workerClient.pushUniqueJob).not.toHaveBeenCalledWith(
+    expect(workerClient.pushJob).not.toHaveBeenCalledWith(
       "VerifyBottleCreation",
       {
         bottleId: result.id,
@@ -3124,7 +3124,7 @@ describe("price match queue", () => {
     expect(result).toEqual({
       status: "queued",
     });
-    expect(workerClient.pushUniqueJob).toHaveBeenCalledWith(
+    expect(workerClient.pushJob).toHaveBeenCalledWith(
       "ResolveStorePriceBottle",
       {
         priceId: price.id,
@@ -3162,7 +3162,7 @@ describe("price match queue", () => {
     expect(result).toEqual({
       status: "already_processing",
     });
-    expect(workerClient.pushUniqueJob).not.toHaveBeenCalled();
+    expect(workerClient.pushJob).not.toHaveBeenCalled();
   });
 
   test("bulk retry starts a background run for actionable search results", async ({
@@ -3250,7 +3250,7 @@ describe("price match queue", () => {
         removeOnFail: false,
       },
     );
-    expect(workerClient.pushUniqueJob).not.toHaveBeenCalledWith(
+    expect(workerClient.pushJob).not.toHaveBeenCalledWith(
       "ResolveStorePriceBottle",
       expect.anything(),
     );
@@ -3374,7 +3374,7 @@ describe("price match queue", () => {
         proposalType: "no_match",
       })
       .returning();
-    vi.mocked(workerClient.pushUniqueJob).mockRejectedValueOnce(
+    vi.mocked(workerClient.pushJob).mockRejectedValueOnce(
       new Error("queue unavailable"),
     );
 

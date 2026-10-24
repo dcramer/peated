@@ -3,7 +3,7 @@ import { entities } from "@peated/server/db/schema";
 import { getExpectedPronunciationAudioUrl } from "@peated/server/lib/entityPronunciationAudio";
 import { procedure } from "@peated/server/orpc";
 import { requireAdmin } from "@peated/server/orpc/middleware";
-import { pushUniqueJob } from "@peated/server/worker/dispatch";
+import { pushJob } from "@peated/server/worker/dispatch";
 import { and, asc, gt, isNotNull, or } from "drizzle-orm";
 import { z } from "zod";
 
@@ -65,7 +65,7 @@ export default procedure
         row.pronunciationAudioUrl !== getExpectedPronunciationAudioUrl(row),
     );
     for (const row of stale) {
-      await pushUniqueJob(
+      await pushJob(
         "GenerateEntityPronunciationAudio",
         { entityId: row.id },
         { delay: 0 },

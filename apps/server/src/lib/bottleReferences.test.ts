@@ -25,7 +25,6 @@ import { beforeEach, vi } from "vitest";
 
 beforeEach(() => {
   vi.mocked(workerClient.pushJob).mockReset();
-  vi.mocked(workerClient.pushUniqueJob).mockReset();
 });
 
 async function getAlias(name: string) {
@@ -680,10 +679,9 @@ describe("finalizeBottleReferenceAssignment", () => {
     expect(workerClient.pushJob).toHaveBeenCalledWith("IndexBottleReference", {
       name: result.reference.name,
     });
-    expect(workerClient.pushUniqueJob).toHaveBeenCalledWith(
-      "IndexBottleSearch",
-      { bottleId: bottle.id },
-    );
+    expect(workerClient.pushJob).toHaveBeenCalledWith("IndexBottleSearch", {
+      bottleId: bottle.id,
+    });
     expect(workerClient.pushJob).not.toHaveBeenCalledWith(
       "UpdateBottleStats",
       expect.anything(),
@@ -705,7 +703,7 @@ describe("finalizeBottleReferenceAssignment", () => {
     vi.mocked(workerClient.pushJob).mockRejectedValueOnce(
       new Error("Queue unavailable"),
     );
-    vi.mocked(workerClient.pushUniqueJob).mockRejectedValueOnce(
+    vi.mocked(workerClient.pushJob).mockRejectedValueOnce(
       new Error("Queue unavailable"),
     );
 

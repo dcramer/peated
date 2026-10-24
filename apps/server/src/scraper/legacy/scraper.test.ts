@@ -96,7 +96,7 @@ describe("handleBottle", () => {
         release_day: bottleInput.releaseDay,
       }),
     });
-    expect(workerClient.pushUniqueJob).not.toHaveBeenCalledWith(
+    expect(workerClient.pushJob).not.toHaveBeenCalledWith(
       "ResolveStorePriceBottle",
       expect.anything(),
     );
@@ -264,7 +264,7 @@ describe("handleBottle", () => {
         ),
       }),
     ).toMatchObject({ bottleId: null, price: priceInput.price });
-    expect(workerClient.pushUniqueJob).toHaveBeenCalledWith(
+    expect(workerClient.pushJob).toHaveBeenCalledWith(
       "ResolveStorePriceBottle",
       expect.anything(),
     );
@@ -301,7 +301,6 @@ describe("handleBottle", () => {
       })
       .returning();
     vi.mocked(workerClient.pushJob).mockClear();
-    vi.mocked(workerClient.pushUniqueJob).mockClear();
 
     await handleBottle(bottleInput, priceInput);
 
@@ -337,7 +336,7 @@ describe("handleBottle", () => {
       "ResolveStorePriceBottle",
       expect.anything(),
     );
-    expect(workerClient.pushUniqueJob).not.toHaveBeenCalledWith(
+    expect(workerClient.pushJob).not.toHaveBeenCalledWith(
       "ResolveStorePriceBottle",
       expect.anything(),
     );

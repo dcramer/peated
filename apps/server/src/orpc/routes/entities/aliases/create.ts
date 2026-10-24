@@ -6,7 +6,7 @@ import {
 } from "@peated/server/lib/entityAliases";
 import { procedure } from "@peated/server/orpc";
 import { requireMod } from "@peated/server/orpc/middleware";
-import { pushUniqueJob } from "@peated/server/worker/dispatch";
+import { pushJob } from "@peated/server/worker/dispatch";
 import { z } from "zod";
 
 export default procedure
@@ -40,7 +40,7 @@ export default procedure
         name: input.name,
         createdByActorId: actor.id,
       });
-      await pushUniqueJob("IndexEntitySearch", {
+      await pushJob("IndexEntitySearch", {
         entityId: alias.entityId,
       });
       return {

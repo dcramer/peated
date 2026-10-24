@@ -3,7 +3,7 @@ import { db } from "@peated/server/db";
 import { storePrices } from "@peated/server/db/schema";
 import { logInfo, logTelemetryError } from "@peated/server/lib/log";
 import { compressAndResizeImage, storeFile } from "@peated/server/lib/uploads";
-import { pushUniqueJob } from "@peated/server/worker/dispatch";
+import { pushJob } from "@peated/server/worker/dispatch";
 import type { JobContext, JobPayload } from "@peated/server/worker/types";
 import { eq } from "drizzle-orm";
 import { Readable } from "stream";
@@ -19,14 +19,14 @@ export const CapturePriceImageJobArgsSchema = z
 export interface CapturePriceImageServices {
   compressImage: typeof compressAndResizeImage;
   fetchImage: typeof fetch;
-  queueResolution: typeof pushUniqueJob;
+  queueResolution: typeof pushJob;
   storeImage: typeof storeFile;
 }
 
 const capturePriceImageServices: CapturePriceImageServices = {
   compressImage: compressAndResizeImage,
   fetchImage: fetch,
-  queueResolution: pushUniqueJob,
+  queueResolution: pushJob,
   storeImage: storeFile,
 };
 

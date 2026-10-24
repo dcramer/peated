@@ -14,7 +14,7 @@ import { upsertAuctionObservation } from "@peated/server/lib/auctions";
 import { createBottleCheck } from "@peated/server/lib/bottleChecks";
 import { getBottleCandidateById } from "@peated/server/lib/bottleReferenceCandidates";
 import { correctBottleReference } from "@peated/server/lib/bottleReferences";
-import { pushUniqueJob } from "@peated/server/lib/test/workerDispatch";
+import { pushJob } from "@peated/server/lib/test/workerDispatch";
 import { routerClient } from "@peated/server/orpc/router";
 import applyAuctionLotMatchJob from "@peated/server/worker/jobs/applyAuctionLotMatch";
 import { eq } from "drizzle-orm";
@@ -401,7 +401,7 @@ describe("POST /auction-lots/recheck", () => {
         },
       ],
     };
-    pushUniqueJob.mockRejectedValueOnce(new Error("Queue unavailable"));
+    pushJob.mockRejectedValueOnce(new Error("Queue unavailable"));
     await expect(
       routerClient.auctions.recheck(input, { context: { user: admin } }),
     ).rejects.toThrow(/Queue unavailable/);
@@ -452,7 +452,7 @@ describe("POST /auction-lots/recheck", () => {
         { context: { user: admin } },
       ),
     ).rejects.toThrow(/changed/i);
-    expect(pushUniqueJob).not.toHaveBeenCalled();
+    expect(pushJob).not.toHaveBeenCalled();
     expect(await db.query.auctionLots.findFirst()).toMatchObject({
       matchStatus: "review",
     });
@@ -462,7 +462,7 @@ describe("POST /auction-lots/recheck", () => {
         { context: { user: admin } },
       ),
     ).toEqual({ queued: [data.lot.id], skipped: [] });
-    expect(pushUniqueJob).toHaveBeenCalledWith("ApplyAuctionLotMatch", {
+    expect(pushJob).toHaveBeenCalledWith("ApplyAuctionLotMatch", {
       lotId: data.lot.id,
       fingerprint: data.lot.sourceFingerprint,
     });
@@ -520,7 +520,7 @@ describe("POST /auction-lots/recheck", () => {
         { context: { user: admin } },
       ),
     ).toEqual({ queued: [], skipped: [data.lot.id] });
-    expect(pushUniqueJob).not.toHaveBeenCalledWith(
+    expect(pushJob).not.toHaveBeenCalledWith(
       "ApplyAuctionLotMatch",
       expect.anything(),
     );

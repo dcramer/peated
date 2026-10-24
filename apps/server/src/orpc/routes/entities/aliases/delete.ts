@@ -1,7 +1,7 @@
 import { deleteEntityAlias } from "@peated/server/lib/entityAliases";
 import { procedure } from "@peated/server/orpc";
 import { requireMod } from "@peated/server/orpc/middleware";
-import { pushUniqueJob } from "@peated/server/worker/dispatch";
+import { pushJob } from "@peated/server/worker/dispatch";
 import { z } from "zod";
 
 export default procedure
@@ -28,7 +28,7 @@ export default procedure
     if (!deleted) {
       throw errors.NOT_FOUND({ message: "Entity alias not found." });
     }
-    await pushUniqueJob("IndexEntitySearch", {
+    await pushJob("IndexEntitySearch", {
       entityId: input.entity,
     });
     return {};

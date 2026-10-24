@@ -48,8 +48,8 @@ function contextFor(user: User | null) {
 
 describe("exact Bottle merges", () => {
   beforeEach(() => {
-    vi.mocked(workerClient.pushUniqueJob).mockReset();
-    vi.mocked(workerClient.pushUniqueJob).mockResolvedValue(undefined);
+    vi.mocked(workerClient.pushJob).mockReset();
+    vi.mocked(workerClient.pushJob).mockResolvedValue(undefined);
   });
 
   test("converges direct consumers, aliases, mappings, and aggregates on the selected Bottle", async ({
@@ -468,7 +468,7 @@ describe("exact Bottle merges", () => {
         context: contextFor(mod),
       }),
     ).toMatchObject({ changed: false });
-    expect(workerClient.pushUniqueJob).toHaveBeenCalledWith("OnBottleChange", {
+    expect(workerClient.pushJob).toHaveBeenCalledWith("OnBottleChange", {
       bottleId: destination.id,
     });
   });

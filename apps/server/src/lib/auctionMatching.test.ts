@@ -26,7 +26,7 @@ import {
 import { assignAuctionLot, upsertAuctionObservation } from "./auctions";
 import { createBottleCheck } from "./bottleChecks";
 import { getBottleCandidateById } from "./bottleReferenceCandidates";
-import { pushUniqueJob } from "./test/workerDispatch";
+import { pushJob } from "./test/workerDispatch";
 
 async function importedLot(
   siteId: number,
@@ -131,7 +131,7 @@ test("reuses an accepted reference without a new model decision", async ({
     fingerprint: lot.sourceFingerprint,
   });
   expect(run).not.toHaveBeenCalled();
-  expect(pushUniqueJob).not.toHaveBeenCalledWith(
+  expect(pushJob).not.toHaveBeenCalledWith(
     "ResolveAuctionLot",
     expect.anything(),
   );
@@ -273,7 +273,7 @@ test("a supported saved match applies without a model call or new reference", as
   // A model job already waiting for this version must leave the completed match alone.
   await resolveAuctionLot(lot.id, lot.sourceFingerprint);
   expect(run).not.toHaveBeenCalled();
-  expect(pushUniqueJob).not.toHaveBeenCalledWith(
+  expect(pushJob).not.toHaveBeenCalledWith(
     "ResolveAuctionLot",
     expect.anything(),
   );
@@ -536,7 +536,7 @@ test.for([
     fingerprint: lot.sourceFingerprint,
   });
   expect(run).not.toHaveBeenCalled();
-  expect(pushUniqueJob).not.toHaveBeenCalledWith(
+  expect(pushJob).not.toHaveBeenCalledWith(
     "ResolveAuctionLot",
     expect.anything(),
   );
@@ -577,12 +577,12 @@ test.for(["masterofmalt", "scotchwhiskyauctions"] as const)(
     await applyAuctionLotMatchJob(args);
     expect(run).not.toHaveBeenCalled();
     if (type === "scotchwhiskyauctions") {
-      expect(pushUniqueJob).not.toHaveBeenCalled();
+      expect(pushJob).not.toHaveBeenCalled();
       expect(
         (await db.query.auctionLots.findFirst())?.sourceDetailsRequestedAt,
       ).toBeInstanceOf(Date);
     } else {
-      expect(pushUniqueJob).toHaveBeenCalledWith("ResolveAuctionLot", args);
+      expect(pushJob).toHaveBeenCalledWith("ResolveAuctionLot", args);
       expect(
         (await db.query.auctionLots.findFirst())?.sourceDetailsRequestedAt,
       ).toBeNull();
@@ -609,7 +609,7 @@ test("a conflicting accepted name cannot bypass source facts on the fast queue",
   const run = vi.spyOn(classifier, "runScrapedBottleReference");
   await applyAuctionLotMatchJob(args);
   expect(run).not.toHaveBeenCalled();
-  expect(pushUniqueJob).toHaveBeenCalledWith("ResolveAuctionLot", args);
+  expect(pushJob).toHaveBeenCalledWith("ResolveAuctionLot", args);
   expect(await db.query.auctionLots.findFirst()).toMatchObject({
     bottleId: null,
     matchStatus: "pending",
@@ -625,7 +625,7 @@ test("failed model dispatch stays pending and can be retried without classifying
   const lot = await importedLot(site.id);
   const args = { lotId: lot.id, fingerprint: lot.sourceFingerprint };
   const run = vi.spyOn(classifier, "runScrapedBottleReference");
-  pushUniqueJob.mockRejectedValueOnce(new Error("Queue unavailable"));
+  pushJob.mockRejectedValueOnce(new Error("Queue unavailable"));
   await expect(applyAuctionLotMatchJob(args)).rejects.toThrow(
     "Queue unavailable",
   );
@@ -634,7 +634,7 @@ test("failed model dispatch stays pending and can be retried without classifying
     matchStatus: "pending",
   });
   await applyAuctionLotMatchJob(args);
-  expect(pushUniqueJob).toHaveBeenCalledWith("ResolveAuctionLot", args);
+  expect(pushJob).toHaveBeenCalledWith("ResolveAuctionLot", args);
   expect(run).not.toHaveBeenCalled();
   expect(await db.query.bottleChecks.findMany()).toHaveLength(0);
 });
@@ -655,7 +655,7 @@ test("stale or already reviewed rechecks do not dispatch model work", async ({
     fingerprint: lot.sourceFingerprint,
   });
   expect(run).not.toHaveBeenCalled();
-  expect(pushUniqueJob).not.toHaveBeenCalledWith(
+  expect(pushJob).not.toHaveBeenCalledWith(
     "ResolveAuctionLot",
     expect.anything(),
   );
@@ -679,7 +679,7 @@ test("saved-match jobs reject unowned payload fields before making changes", asy
     bottleId: null,
   });
   expect(run).not.toHaveBeenCalled();
-  expect(pushUniqueJob).not.toHaveBeenCalled();
+  expect(pushJob).not.toHaveBeenCalled();
 });
 
 test.for(["changed", "review", "matched"] as const)(

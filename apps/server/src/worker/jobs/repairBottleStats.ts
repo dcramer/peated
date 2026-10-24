@@ -2,7 +2,7 @@ import { db } from "@peated/server/db";
 import { bottles } from "@peated/server/db/schema";
 import { activeBottleWhere } from "@peated/server/lib/activeBottles";
 import { logInfo } from "@peated/server/lib/log";
-import { pushUniqueJob } from "@peated/server/worker/dispatch";
+import { pushJob } from "@peated/server/worker/dispatch";
 import { and, asc, gt } from "drizzle-orm";
 import { z } from "zod";
 import type { JobPayload } from "../types";
@@ -35,7 +35,7 @@ export default async function repairBottleStatsJob(input: JobPayload) {
       page
         .slice(offset, offset + 50)
         .map(({ id }) =>
-          pushUniqueJob(
+          pushJob(
             "UpdateBottleStats",
             { bottleId: id },
             { delay: 0, removeOnComplete: true, removeOnFail: false },
@@ -46,7 +46,7 @@ export default async function repairBottleStatsJob(input: JobPayload) {
 
   const lastBottleId = page.at(-1)?.id ?? null;
   if (page.length === PAGE_SIZE && lastBottleId) {
-    await pushUniqueJob(
+    await pushJob(
       "RepairBottleStats",
       { afterBottleId: lastBottleId },
       { delay: 0, removeOnComplete: true, removeOnFail: false },

@@ -3,7 +3,7 @@ import { entityReferences } from "@peated/server/db/schema";
 import { requiredEntityReferenceNames } from "@peated/server/lib/db";
 import { procedure } from "@peated/server/orpc";
 import { requireMod } from "@peated/server/orpc/middleware";
-import { pushUniqueJob } from "@peated/server/worker/dispatch";
+import { pushJob } from "@peated/server/worker/dispatch";
 import { eq, sql } from "drizzle-orm";
 import { z } from "zod";
 
@@ -58,7 +58,7 @@ export default procedure
       );
 
     if (reference.entity) {
-      await pushUniqueJob("IndexEntitySearch", {
+      await pushJob("IndexEntitySearch", {
         entityId: reference.entity.id,
       });
     }
