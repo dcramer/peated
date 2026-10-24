@@ -116,8 +116,9 @@ version. It may keep, correct, add, or drop anything. Code then checks it:
 - A quote must appear on a page the model read in this run, or be the same
   quote from the same page as one the current page already has, and state
   the citation's value. A fact stands only when a kept quote states its year
-  (or number); a dated article's publication date counts when its year is on
-  the page read or the current page has the same date. A name or new owner
+  (or number); a short range such as "1931-38" states both years, and a dated
+  article's publication date counts when its year is on the page read or the
+  current page has the same date. A name or new owner
   must appear whole in one quote, and every number in an event's text or
   title must appear in a quote. Citations that fail are dropped, then facts
   with no citations left.

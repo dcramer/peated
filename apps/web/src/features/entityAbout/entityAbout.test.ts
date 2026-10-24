@@ -54,8 +54,8 @@ describe("getOwners", () => {
       getOwners(brora).map(({ label, start, end }) => [label, start, end]),
     ).toEqual([
       ["Diageo", 1997, null],
-      ["Guinness (United Distillers)", 1986, 1997],
-      ["Distillers Company (DCL)", 1925, 1986],
+      ["Guinness", 1986, 1997],
+      ["The Distillers Company", 1925, 1986],
       ["John Risk and the Distillers Company", 1912, 1925],
       ["James Ainslie & Co. and John Risk", 1896, 1912],
     ]);
@@ -69,8 +69,6 @@ describe("getKeyFacts", () => {
     ).toEqual([
       ["Founded", "1819"],
       ["First name", "Clynelish, until 1969"],
-      ["Wash stills", "1"],
-      ["Spirit stills", "1"],
       ["Water", "Clynemilton Burn"],
       ["Listed building", "Category B"],
     ]);
@@ -81,7 +79,7 @@ describe("getCitationNumbers", () => {
   it("numbers sources in the order the page first cites them", () => {
     const numbers = getCitationNumbers(brora, getKeyFacts(brora, "Brora"));
 
-    expect([...numbers.keys()].slice(0, 3)).toEqual(["wp", "hes", "wf2"]);
+    expect([...numbers.keys()].slice(0, 3)).toEqual(["hes", "df", "wf2"]);
     expect(new Set(numbers.values()).size).toBe(numbers.size);
   });
 });

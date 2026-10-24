@@ -30,6 +30,12 @@ were changed.
 - Difford's Guide [history](https://www.diffordsguide.com/producers/227/brora-distillery-the-original-clynelish/history)
   gives 1931–38 and 1941–45 closures and March 1983.
 
+Whiskyfun's history pages show each year as an image heading, so the page text
+never states the year. The About example cites Whiskyfun only for details and
+takes every year from a page whose text states it (checked October 24, 2026).
+Whiskyfun's 1975 version of the rename sits under such a heading, so the example
+shows only 1968 (Wikipedia) and 1969 (Difford's, Whiskyfun's text).
+
 ## Conflicts and how the article settles them
 
 | Fact                 | Sources say                                                                                                       | Article                            |
