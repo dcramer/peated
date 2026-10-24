@@ -10,6 +10,7 @@ import {
 import {
   ENTITY_ABOUT_SCHEMA_VERSION,
   EntityAboutDocumentSchema,
+  type AboutLinkedEntity,
   type EntityAboutDocument,
   type EntityAboutStatus,
 } from "@peated/server/schemas/entityAbout";
@@ -112,6 +113,40 @@ export async function followMergedEntities(
 }
 
 const MAX_MERGE_HOPS = 10;
+
+/**
+ * Loads the Entities the documents link, following merged Entities to the
+ * one they became. Every public read of a page uses it, so the tab, the page,
+ * and the description agree on what shows.
+ */
+export async function loadLinkedEntities(
+  database: AnyDatabase,
+  documents: readonly EntityAboutDocument[],
+) {
+  const linked = new Map<number, AboutLinkedEntity>();
+  const ids = [
+    ...new Set(
+      documents.flatMap((document) =>
+        document.events.flatMap((event) =>
+          [event.relatedEntityId, event.newOwnerId].filter((id) => id !== null),
+        ),
+      ),
+    ),
+  ];
+  if (!ids.length) return linked;
+
+  const target = await followMergedEntities(database, ids);
+  const rows = await database
+    .select({ id: entities.id, name: entities.name, kind: entities.kind })
+    .from(entities)
+    .where(inArray(entities.id, [...new Set(target.values())]));
+  const byId = new Map(rows.map((row) => [row.id, row]));
+  for (const [id, targetId] of target) {
+    const row = byId.get(targetId);
+    if (row) linked.set(id, row);
+  }
+  return linked;
+}
 
 /**
  * Returns Entity IDs the document newly links that do not exist. A merged

@@ -5,7 +5,10 @@ import {
   getSystemActorForDatabase,
 } from "@peated/server/lib/actors";
 import { getPublishedLeadText } from "@peated/server/lib/entityAbout/publicAbout";
-import { getEntityAbout } from "@peated/server/lib/entityAbout/store";
+import {
+  getEntityAbout,
+  loadLinkedEntities,
+} from "@peated/server/lib/entityAbout/store";
 import { procedure } from "@peated/server/orpc";
 import { requireAdmin } from "@peated/server/orpc/middleware";
 import { and, asc, eq, gt, inArray, isNotNull } from "drizzle-orm";
@@ -77,7 +80,15 @@ export default procedure
         // Description rule (owner: docs/features/entity-about.md): a generated
         // description stays only when it is the published About lead.
         const about = await getEntityAbout(tx, entity.id);
-        if (getPublishedLeadText(about) === entity.description) return;
+        const linkedEntities = await loadLinkedEntities(
+          tx,
+          about ? [about.document] : [],
+        );
+        if (
+          getPublishedLeadText(about, linkedEntities) === entity.description
+        ) {
+          return;
+        }
 
         const [updated] = await tx
           .update(entities)

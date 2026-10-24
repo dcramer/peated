@@ -1,9 +1,9 @@
-import config from "@peated/server/config";
 import { db } from "@peated/server/db";
 import { entities } from "@peated/server/db/schema";
 import { procedure } from "@peated/server/orpc";
 import { requireAdmin } from "@peated/server/orpc/middleware";
 import { pushUniqueJob } from "@peated/server/worker/dispatch";
+import { ENTITY_ABOUT_WRITER_READY } from "@peated/server/worker/jobs/writeEntityAbout";
 import { asc, desc, inArray } from "drizzle-orm";
 import { z } from "zod";
 
@@ -44,8 +44,11 @@ export default procedure
   )
   .output(z.object({ queued: z.array(z.number()) }))
   .handler(async ({ input, errors }) => {
-    if (!config.ENTITY_ABOUT_WRITER_ENABLED) {
-      throw errors.BAD_REQUEST({ message: "The About writer is turned off." });
+    if (!ENTITY_ABOUT_WRITER_READY) {
+      throw errors.BAD_REQUEST({
+        message:
+          "The About writer is turned off or missing its model or web search key.",
+      });
     }
     const ids = input.entity
       ? [input.entity]

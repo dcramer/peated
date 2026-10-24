@@ -26,6 +26,7 @@ import {
   EntityAboutWriteError,
   followMergedEntities,
   getEntityAbout,
+  loadLinkedEntities,
   saveEntityAbout,
   type StoredEntityAbout,
 } from "@peated/server/lib/entityAbout/store";
@@ -47,12 +48,14 @@ type WriteEntityAboutServices = {
   now: () => Date;
 };
 
+/** Whether the writer can run: turned on, with the model and web tools. */
+export const ENTITY_ABOUT_WRITER_READY =
+  config.ENTITY_ABOUT_WRITER_ENABLED &&
+  Boolean(config.AI_GATEWAY_API_KEY) &&
+  Boolean(config.FIRECRAWL_API_KEY);
+
 const defaultServices: WriteEntityAboutServices = {
-  // The writer needs both the model and web tools.
-  enabled:
-    config.ENTITY_ABOUT_WRITER_ENABLED &&
-    Boolean(config.AI_GATEWAY_API_KEY) &&
-    Boolean(config.FIRECRAWL_API_KEY),
+  enabled: ENTITY_ABOUT_WRITER_READY,
   writer: runEntityAboutWriter,
   now: () => new Date(),
 };
@@ -262,7 +265,10 @@ async function updateDescription(
   about: StoredEntityAbout,
   actor: Actor,
 ) {
-  const description = getPublishedLeadText(about);
+  const description = getPublishedLeadText(
+    about,
+    await loadLinkedEntities(tx, [about.document]),
+  );
   if (!description) return;
   const [updated] = await tx
     .update(entities)

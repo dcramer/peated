@@ -53,6 +53,7 @@ nothing stored can go stale:
 The About tab appears only when the page has a lead and at least one other
 part: a section, a timeline with 2 or more spans, or 2 or more key facts. The
 sitemap uses the same rule, so it never lists a page that returns not found.
+Both count what shows the way the page does, with linked Entities loaded.
 
 Each part of the page has a minimum and is hidden below it, with no heading or
 placeholder. The constants live in
@@ -92,7 +93,8 @@ links to the About page only when that page exists.
 - The `writeEntityAbout` worker job writes as the `aboutPipeline` system
   actor. Administrators queue it with `/admin/catalog/write-entity-about`.
   `ENTITY_ABOUT_WRITER_ENABLED` turns it off; so does a missing
-  `AI_GATEWAY_API_KEY` or `FIRECRAWL_API_KEY`.
+  `AI_GATEWAY_API_KEY` or `FIRECRAWL_API_KEY`, and the admin route then
+  refuses to queue it.
 
 ## How The Job Writes A Page
 
