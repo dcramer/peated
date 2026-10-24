@@ -1001,11 +1001,19 @@ async function mergeEntityAbout(
     const about = await getEntityAbout(tx, entityId, { forUpdate: true });
     if (about) sources.push(about);
   }
-  if (!sources.length) return;
-
-  const destination = await getEntityAbout(tx, toEntity.id);
+  const destination = await getEntityAbout(tx, toEntity.id, {
+    forUpdate: true,
+  });
+  // Hidden-page rule (owner: docs/features/entity-about.md): a merge never
+  // reveals a page a moderator hid. A hidden page's content joins only a
+  // destination that is hidden or new (which then starts hidden); otherwise
+  // it stays in the merged Entity's change history.
+  const destinationHidden = destination
+    ? destination.status === "hidden"
+    : sources.some((source) => source.status === "hidden");
   let document = destination?.document ?? null;
   for (const source of sources) {
+    if (source.status === "hidden" && !destinationHidden) continue;
     document = mergeEntityAboutDocuments(document, source.document);
   }
   if (!document) return;
@@ -1043,6 +1051,14 @@ async function mergeEntityAbout(
     }),
   });
 
+  // Nothing moved and nothing was cleaned up.
+  if (
+    destination &&
+    JSON.stringify(document) === JSON.stringify(destination.document)
+  ) {
+    return;
+  }
+
   await saveEntityAbout(tx, {
     entity: toEntity,
     document,
@@ -1051,9 +1067,7 @@ async function mergeEntityAbout(
     // Moving history is not new writing; legacy items keep their state.
     unchangedFrom: document,
   });
-  // A merge never reveals a page a moderator hid. An existing destination
-  // page keeps its own status.
-  if (!destination && sources.some((source) => source.status === "hidden")) {
+  if (!destination && destinationHidden) {
     await setEntityAboutStatus(tx, {
       entity: toEntity,
       status: "hidden",

@@ -27,11 +27,19 @@ function normalizeStatedValue(value: string) {
   return value.trim().toLowerCase().replace(/\s+/g, " ");
 }
 
-/** Values that differ only in precision, such as 1983 and 1983-03, agree. */
+export const ISO_DATE_PATTERN = /^\d{4}(?:-\d{2}){0,2}$/;
+
+/**
+ * Dates that differ only in precision, such as 1983 and 1983-03, agree.
+ * Other values agree only when they are the same: 2 stills is not 20.
+ */
 export function valuesAgree(left: string, right: string) {
   const a = normalizeStatedValue(left);
   const b = normalizeStatedValue(right);
-  return a.startsWith(b) || b.startsWith(a);
+  if (ISO_DATE_PATTERN.test(a) && ISO_DATE_PATTERN.test(b)) {
+    return a.startsWith(b) || b.startsWith(a);
+  }
+  return a === b;
 }
 
 /** Returns every stated value and its sources when citations disagree. */

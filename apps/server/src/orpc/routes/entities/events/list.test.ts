@@ -1,7 +1,30 @@
+import { db } from "@peated/server/db";
+import { entityTombstones } from "@peated/server/db/schema";
 import waitError from "@peated/server/lib/test/waitError";
 import { routerClient } from "@peated/server/orpc/router";
 
 describe("GET /entities/:entity/events", () => {
+  test("shows a merged owner as the Entity it became", async ({ fixtures }) => {
+    const entity = await fixtures.Entity();
+    const owner = await fixtures.Entity({ kind: "company" });
+    const mergedOwner = await fixtures.Entity({ kind: "company" });
+    await db
+      .insert(entityTombstones)
+      .values({ entityId: mergedOwner.id, newEntityId: owner.id });
+    await fixtures.EntityAbout({
+      entityId: entity.id,
+      events: [
+        { id: 1, kind: "acquired", date: "1925", newOwnerId: mergedOwner.id },
+      ],
+    });
+
+    const { results } = await routerClient.entities.events.list({
+      entity: entity.id,
+    });
+
+    expect(results.map(({ newOwnerId }) => newOwnerId)).toEqual([owner.id]);
+  });
+
   test("lists history in date order", async ({ fixtures }) => {
     const entity = await fixtures.Entity();
     await fixtures.EntityAbout({

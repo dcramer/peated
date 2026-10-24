@@ -1,5 +1,5 @@
 import { db } from "@peated/server/db";
-import { actors, entities, entityEvents } from "@peated/server/db/schema";
+import { entities, entityEvents } from "@peated/server/db/schema";
 import { getPeatedSystemActorForDatabase } from "@peated/server/lib/actors";
 import {
   mergeEntityAboutDocuments,
@@ -18,7 +18,7 @@ import type {
 import { asc, eq, gt, inArray } from "drizzle-orm";
 import { z } from "zod";
 
-type LegacyRow = typeof entityEvents.$inferSelect & { actorType: string };
+type LegacyRow = typeof entityEvents.$inferSelect;
 
 /** Builds an About document from one Entity's `entity_event` rows. */
 function buildDocumentFromLegacyEvents(
@@ -58,9 +58,11 @@ function buildDocumentFromLegacyEvents(
       relatedEntityId: null,
       newOwnerId: row.newOwnerId,
       newOwnerName: null,
+      legacyEventId: row.id,
       citations,
-      writtenBy:
-        row.actorType === "user" ? ("person" as const) : ("pipeline" as const),
+      // Legacy history is the curated record: the writer may add sources to
+      // it but never replaces it.
+      writtenBy: "person" as const,
       createdAt: row.createdAt.toISOString(),
       updatedAt: row.updatedAt.toISOString(),
     };
@@ -118,12 +120,8 @@ export default procedure
       return { copiedEvents: 0, entities: 0, nextAfterId: null };
 
     const rows = await db
-      .select({
-        event: entityEvents,
-        actorType: actors.type,
-      })
+      .select()
       .from(entityEvents)
-      .innerJoin(actors, eq(actors.id, entityEvents.createdByActorId))
       .where(inArray(entityEvents.entityId, page))
       .orderBy(asc(entityEvents.date), asc(entityEvents.id));
     const names = new Map(
@@ -137,15 +135,20 @@ export default procedure
 
     let copiedEvents = 0;
     for (const entityId of page) {
-      const legacyRows = rows
-        .filter((row) => row.event.entityId === entityId)
-        .map((row) => ({ ...row.event, actorType: row.actorType }));
+      const legacyRows = rows.filter((row) => row.entityId === entityId);
       const entity = names.get(entityId);
       if (!entity) continue;
 
       await db.transaction(async (tx) => {
         const stored = await getEntityAbout(tx, entityId, { forUpdate: true });
-        const present = new Set(stored?.document.events.map((e) => e.id));
+        // Copy rule: each `entity_event` row is copied once, matched by
+        // `legacyEventId`; document event IDs are per document and can
+        // collide with legacy row IDs.
+        const present = new Set(
+          stored?.document.events.flatMap((event) =>
+            event.legacyEventId ? [event.legacyEventId] : [],
+          ),
+        );
         const missing = legacyRows.filter((row) => !present.has(row.id));
         if (!missing.length) return;
 

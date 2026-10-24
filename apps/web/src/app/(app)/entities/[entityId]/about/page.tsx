@@ -28,8 +28,10 @@ export async function generateMetadata(props: {
 }): Promise<Metadata> {
   const { entityId } = await props.params;
   const entity = await getEntityPage(parseCatalogRouteId(entityId));
+  // Check the tab rule before loading the page's catalog numbers.
+  if (!entity.hasAbout) notFound();
   const { about } = await getPageEntityAbout(entity.id);
-  if (!entity.hasAbout || !about?.lead) notFound();
+  if (!about?.lead) notFound();
   return getCatalogSeoMetadata({
     title: `About ${entity.name}`,
     description: about.lead.sentences.map((s) => s.text).join(" "),
@@ -42,8 +44,9 @@ export default async function EntityAboutPage(props: {
 }) {
   const { entityId } = await props.params;
   const entity = await getEntityPage(parseCatalogRouteId(entityId));
+  if (!entity.hasAbout) notFound();
   const { about, counts } = await getPageEntityAbout(entity.id);
-  if (!entity.hasAbout || !about?.lead) notFound();
+  if (!about?.lead) notFound();
 
   const keyFacts = getKeyFacts(about, entity.name);
   const citationNumbers = getCitationNumbers(about, keyFacts);

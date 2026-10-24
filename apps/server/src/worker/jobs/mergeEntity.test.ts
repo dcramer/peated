@@ -258,6 +258,53 @@ test("keeps a hidden About page hidden after a merge", async ({ fixtures }) => {
   expect(about?.status).toBe("hidden");
 });
 
+test("keeps a hidden page's facts off a published page", async ({
+  fixtures,
+}) => {
+  const source = await fixtures.Entity({ kind: "distillery" });
+  const destination = await fixtures.Entity({ kind: "distillery" });
+  await fixtures.EntityAbout({
+    entityId: source.id,
+    status: "hidden",
+    events: [{ id: 1, kind: "closed", date: "1983" }],
+  });
+  await fixtures.EntityAbout({
+    entityId: destination.id,
+    events: [{ id: 1, kind: "opened", date: "1819" }],
+  });
+
+  await mergeEntity({
+    fromEntityIds: [source.id],
+    toEntityId: destination.id,
+  });
+
+  const about = await getEntityAbout(db, destination.id);
+  expect(about?.status).toBe("published");
+  expect(about?.document.events.map(({ kind }) => kind)).toEqual(["opened"]);
+});
+
+test("removes a self-acquisition when the merged Entity has no About page", async ({
+  fixtures,
+}) => {
+  const owner = await fixtures.Entity({ kind: "company" });
+  const destination = await fixtures.Entity({ kind: "distillery" });
+  await fixtures.EntityAbout({
+    entityId: destination.id,
+    events: [
+      { id: 1, kind: "opened", date: "1819" },
+      { id: 2, kind: "acquired", date: "1925", newOwnerId: owner.id },
+    ],
+  });
+
+  await mergeEntity({
+    fromEntityIds: [owner.id],
+    toEntityId: destination.id,
+  });
+
+  const about = await getEntityAbout(db, destination.id);
+  expect(about?.document.events.map(({ kind }) => kind)).toEqual(["opened"]);
+});
+
 test("drops site facts the merge target cannot have", async ({ fixtures }) => {
   const source = await fixtures.Entity({ kind: "distillery" });
   const destination = await fixtures.Entity({ kind: "brand" });

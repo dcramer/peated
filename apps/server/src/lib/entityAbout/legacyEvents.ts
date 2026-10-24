@@ -139,6 +139,7 @@ function stubEvent(id: number): AboutEvent {
     relatedEntityId: null,
     newOwnerId: null,
     newOwnerName: null,
+    legacyEventId: null,
     citations: [],
     writtenBy: "person",
     createdAt: null,

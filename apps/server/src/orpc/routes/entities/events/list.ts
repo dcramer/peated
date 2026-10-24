@@ -2,7 +2,10 @@ import { db } from "@peated/server/db";
 import { entities } from "@peated/server/db/schema";
 import { isFactShown } from "@peated/server/lib/entityAbout/display";
 import { toLegacyEvent } from "@peated/server/lib/entityAbout/legacyEvents";
-import { getEntityAbout } from "@peated/server/lib/entityAbout/store";
+import {
+  followMergedEntities,
+  getEntityAbout,
+} from "@peated/server/lib/entityAbout/store";
 import { implement } from "@peated/server/orpc";
 import entityEventListContract from "@peated/server/orpc/contracts/entities/events/list";
 import { eq } from "drizzle-orm";
@@ -22,13 +25,24 @@ export default implement(entityEventListContract).handler(async function ({
 
   const about = await getEntityAbout(db, entity.id);
   const document = about?.document;
+  const owners = await followMergedEntities(
+    db,
+    (document?.events ?? []).flatMap((event) =>
+      event.newOwnerId ? [event.newOwnerId] : [],
+    ),
+  );
   const results = (document?.events ?? [])
     // Display rule: history without a non-retailer source stays hidden.
     .filter((event) => isFactShown(event.citations, document?.sources ?? []))
     .sort((a, b) => a.date.localeCompare(b.date) || a.id - b.id)
     .flatMap((event) => {
       const legacy = toLegacyEvent(entity.id, event, document?.sources ?? []);
-      return legacy ? [legacy] : [];
+      if (!legacy) return [];
+      // An owner merged into another Entity is shown as the one it became.
+      const newOwnerId = legacy.newOwnerId
+        ? (owners.get(legacy.newOwnerId) ?? legacy.newOwnerId)
+        : null;
+      return [{ ...legacy, newOwnerId }];
     });
 
   return { results };

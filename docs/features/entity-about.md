@@ -69,15 +69,17 @@ link to the Bottle list filtered to that year.
 
 When an Entity has an About page, its Overview shows key dates and a link
 instead of the full history list. A Bottle page with one distiller and a
-vintage notes the era or former name that covers that vintage.
+vintage notes the era or former name that covers that vintage. The note
+links to the About page only when that page exists.
 
 ## Who Can Change It
 
 - Moderators read the full document, with quotes and who wrote each item,
   through `entities.about.document`, and send it back with their edits
   through `entities.about.update`, along with the version they read. The
-  public page leaves quotes out, so it is not a starting point for edits. Their edits are marked as written by a person. They can
-  hide or show the page with `entities.about.status`.
+  public page leaves quotes out, so it is not a starting point for edits.
+  Their edits are marked as written by a person. They can hide or show the
+  page with `entities.about.status`.
 - The legacy Entity history routes (`entities.events.*`) edit the same
   document. A new history item needs a source URL.
 - The `writeEntityAbout` worker job writes as the `aboutPipeline` system
@@ -115,7 +117,7 @@ never leaves the page with fewer shown facts; such a draft, for example one
 written while search was failing, saves nothing. A moderator
 removes facts by editing. The merge is saved with a version check.
 
-## History And Descriptions Without Sources
+## History Without Sources
 
 All shown history needs a source. History copied from `entity_event` often has
 none, so it is stored but hidden until a source is found:
@@ -124,12 +126,31 @@ none, so it is stored but hidden until a source is found:
   as a lead to check. It is not evidence.
 - When a draft event has the same kind as a kept event (one a person wrote, or
   one with no citations), the dates agree, and no name, owner, or title
-  conflicts, the draft's citations are added to the kept event. A generic
-  event matches only the same text, or a listed item whose number the writer
-  reuses, because many different things happen in one year. Its date and text stay as stored. No second event is
-  added.
+  conflicts, the draft's citations are added to the kept event. Its date and
+  text stay as stored, and no second event is added. A generic event matches
+  only the same text, or a listed item whose number the writer reuses,
+  because many different things happen in one year.
 - History nobody can source stays stored and hidden. A moderator can add a
   source later.
+
+## Copying Legacy History
+
+`/admin/catalog/backfill-entity-about` copies `entity_event` rows into About
+documents. Each copied item records its row in `legacyEventId`, and the
+backfill copies a row only when no item records it, so repeat runs are safe.
+Deleting a history item also deletes its row. Copied history counts as
+written by a person: the writer can add sources to it but never replaces it.
+
+## Merges
+
+Merging Entities combines their About documents. Site facts that do not apply
+to the destination's kind are dropped, and so is an acquisition by the
+destination itself. A merge never reveals a page a moderator hid: a hidden
+page's content joins only a destination that is hidden or new, and a new
+page then starts hidden. Links to a merged Entity are followed to the Entity
+it became when the page or history is read.
+
+## Descriptions
 
 A run that publishes a lead replaces an empty or generated Entity
 description. A description a person wrote, or one written before Peated

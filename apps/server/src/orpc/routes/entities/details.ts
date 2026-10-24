@@ -1,13 +1,13 @@
 import { db } from "@peated/server/db";
 import { entityFollows, entityImages } from "@peated/server/db/schema";
 import { hasEntityAboutPage } from "@peated/server/lib/entityAbout/display";
+import { toPublicEntityAbout } from "@peated/server/lib/entityAbout/publicAbout";
 import { getEntityAbout } from "@peated/server/lib/entityAbout/store";
 import { resolveEntity } from "@peated/server/lib/resolveEntity";
 import { implement } from "@peated/server/orpc";
 import entityDetailsContract from "@peated/server/orpc/contracts/entities/details";
 import { serialize } from "@peated/server/serializers";
 import { EntitySerializer } from "@peated/server/serializers/entity";
-import { EntityAboutSerializer } from "@peated/server/serializers/entityAbout";
 import { EntityImageSerializer } from "@peated/server/serializers/entityImage";
 import { and, asc, desc, eq } from "drizzle-orm";
 
@@ -50,14 +50,11 @@ export default implement(entityDetailsContract).handler(async function ({
       asc(entityImages.id),
     );
 
+  // The tab rule needs only the shown facts and prose, not linked Entities.
   const about = await getEntityAbout(db, entity.id);
   const publicAbout =
-    about && about.status === "published"
-      ? await serialize(
-          EntityAboutSerializer,
-          { ...about, id: about.entityId },
-          context.user,
-        )
+    about?.status === "published"
+      ? toPublicEntityAbout(about, new Map())
       : null;
 
   return {

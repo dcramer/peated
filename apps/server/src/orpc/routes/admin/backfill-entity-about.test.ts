@@ -63,6 +63,70 @@ describe("POST /admin/catalog/backfill-entity-about", () => {
     expect((await getEntityAbout(db, entity.id))?.version).toBe(1);
   });
 
+  test("does not bring back history a moderator deleted", async ({
+    fixtures,
+  }) => {
+    const admin = await fixtures.User({ admin: true });
+    const entity = await fixtures.Entity();
+    const row = await fixtures.EntityEvent({
+      entityId: entity.id,
+      sourceUrl: "https://example.com/history",
+    });
+    await routerClient.admin.backfillEntityAbout(
+      {},
+      { context: { user: admin } },
+    );
+    const copied = (await getEntityAbout(db, entity.id))!.document.events[0]!;
+
+    await routerClient.entities.events.delete(
+      { entity: entity.id, event: copied.id },
+      { context: { user: admin } },
+    );
+    const again = await routerClient.admin.backfillEntityAbout(
+      {},
+      { context: { user: admin } },
+    );
+
+    expect(copied.legacyEventId).toBe(row.id);
+    expect(again.copiedEvents).toBe(0);
+    expect((await getEntityAbout(db, entity.id))?.document.events).toEqual([]);
+  });
+
+  test("copies rows whose IDs match unrelated document events", async ({
+    fixtures,
+  }) => {
+    const admin = await fixtures.User({ admin: true });
+    const entity = await fixtures.Entity();
+    const row = await fixtures.EntityEvent({
+      entityId: entity.id,
+      kind: "opened",
+      date: "1819",
+      sourceUrl: "https://example.com/history",
+    });
+    // An item added before the backfill, with the same ID as the legacy row.
+    await fixtures.EntityAbout({
+      entityId: entity.id,
+      events: [{ id: row.id, kind: "closed", date: "1983" }],
+    });
+
+    const result = await routerClient.admin.backfillEntityAbout(
+      {},
+      { context: { user: admin } },
+    );
+
+    expect(result.copiedEvents).toBe(1);
+    const about = await getEntityAbout(db, entity.id);
+    expect(
+      about?.document.events.map(({ kind, legacyEventId }) => [
+        kind,
+        legacyEventId,
+      ]),
+    ).toEqual([
+      ["closed", null],
+      ["opened", row.id],
+    ]);
+  });
+
   test("pages through Entities", async ({ fixtures }) => {
     const admin = await fixtures.User({ admin: true });
     const first = await fixtures.Entity();
