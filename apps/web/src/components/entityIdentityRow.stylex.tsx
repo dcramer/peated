@@ -1,4 +1,7 @@
 import type { EntityKind } from "@peated/server/types";
+import * as stylex from "@stylexjs/stylex";
+
+import { breakpointStyles } from "../styles/foundations.stylex";
 
 import { MemberStatus } from "./memberStatus.stylex";
 import {
@@ -18,7 +21,10 @@ export type EntityIdentityRowProps = Omit<
   TextIdentityRowProps,
   "metadata" | "status"
 > &
-  EntityIdentity;
+  EntityIdentity & {
+    /** Use "narrow" when wide catalog tables show their own follow toggle. */
+    followingMark?: "always" | "narrow";
+  };
 
 /** A linked brand or producer identity, independent of the page that lists it. */
 export type EntityListItem = EntityIdentity & { href: string };
@@ -37,6 +43,7 @@ const kindLabels = {
  * actions in end, or adjacent table cells. Use cell inside a table or picker.
  */
 export function EntityIdentityRow({
+  followingMark = "always",
   isFollowing = false,
   kind,
   location,
@@ -48,7 +55,17 @@ export function EntityIdentityRow({
       metadata={[kind ? kindLabels[kind] : null, location]
         .filter(Boolean)
         .join(" · ")}
-      status={isFollowing ? <MemberStatus kind="following" /> : undefined}
+      status={
+        isFollowing ? (
+          <span
+            {...stylex.props(
+              followingMark === "narrow" && breakpointStyles.narrowOnly,
+            )}
+          >
+            <MemberStatus kind="following" />
+          </span>
+        ) : undefined
+      }
     />
   );
 }

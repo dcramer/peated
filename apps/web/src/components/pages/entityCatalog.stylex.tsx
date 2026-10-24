@@ -3,7 +3,11 @@
 import * as stylex from "@stylexjs/stylex";
 import type { ReactNode } from "react";
 
-import { Button, ButtonLink } from "@peated/web/components/button.stylex";
+import {
+  Button,
+  ButtonLink,
+  IconButton,
+} from "@peated/web/components/button.stylex";
 import {
   EntityIdentityRow,
   type EntityListItem,
@@ -18,6 +22,7 @@ import {
   RowMenu,
   type RowMenuItem,
 } from "@peated/web/components/rowMenu.stylex";
+import { breakpointStyles } from "../../styles/foundations.stylex";
 import { CatalogTable, type CatalogTableColumn } from "../catalogTable.stylex";
 import { Table } from "../table.stylex";
 import { CatalogPageLoading } from "./catalogPage.stylex";
@@ -184,6 +189,7 @@ function EntityCatalogTable({
           name={item.name}
           kind={item.kind}
           location={item.location}
+          followingMark={onToggleFollowing ? "narrow" : "always"}
           isFollowing={item.isFollowing && showFollowingMarks}
           layout="cell"
         />
@@ -228,14 +234,29 @@ function EntityCatalogTable({
           pendingIds,
         });
 
-        return groups.length ? (
-          <RowMenu groups={groups} label={item.name} triggerVariant="text" />
-        ) : null;
+        return (
+          <div {...stylex.props(styles.actions)}>
+            {onToggleFollowing ? (
+              <EntityFollowToggle
+                item={item}
+                onToggle={onToggleFollowing}
+                pending={pendingIds?.has(item.id) ?? false}
+              />
+            ) : null}
+            {groups.length ? (
+              <RowMenu
+                groups={groups}
+                label={item.name}
+                triggerVariant="quiet"
+              />
+            ) : null}
+          </div>
+        );
       },
       header: <span {...stylex.props(styles.visuallyHidden)}>Actions</span>,
       interactive: true,
       key: "actions",
-      width: "menu",
+      width: onToggleFollowing ? "toggleMenu" : "menu",
     });
   }
 
@@ -247,6 +268,82 @@ function EntityCatalogTable({
       items={items}
       linked
     />
+  );
+}
+
+/**
+ * Wide tables show follow as a one-click toggle. Narrow tables hide it to save
+ * room; the row menu keeps Follow and Unfollow there.
+ */
+function EntityFollowToggle({
+  item,
+  onToggle,
+  pending,
+}: {
+  item: EntityCatalogItem;
+  onToggle: (item: EntityCatalogItem) => void;
+  pending: boolean;
+}) {
+  const label = `${item.isFollowing ? "Unfollow" : "Follow"} ${item.name}`;
+
+  return (
+    <span {...stylex.props(breakpointStyles.wideOnly)}>
+      <IconButton
+        aria-pressed={item.isFollowing}
+        icon={<FollowEye following={item.isFollowing} />}
+        label={label}
+        loading={pending}
+        onClick={() => onToggle(item)}
+        size="sm"
+        title={label}
+        variant="quiet"
+      />
+    </span>
+  );
+}
+
+/** The Following mark's eye: outlined to follow, filled when followed. */
+function FollowEye({ following }: { following: boolean }) {
+  const outline =
+    "M1.6 8s2.2-3.5 6.4-3.5S14.4 8 14.4 8 12.2 11.5 8 11.5 1.6 8 1.6 8Z";
+
+  return (
+    <svg
+      aria-hidden="true"
+      fill="none"
+      focusable="false"
+      height="18"
+      viewBox="0 0 16 16"
+      width="18"
+    >
+      {following ? (
+        <path
+          clipRule="evenodd"
+          d={`${outline}M8 9.8a1.8 1.8 0 1 0 0-3.6 1.8 1.8 0 0 0 0 3.6Z`}
+          fill="currentColor"
+          fillRule="evenodd"
+          stroke="currentColor"
+          strokeLinejoin="round"
+          strokeWidth="1.2"
+        />
+      ) : (
+        <>
+          <path
+            d={outline}
+            stroke="currentColor"
+            strokeLinejoin="round"
+            strokeWidth="1.3"
+          />
+          <circle
+            cx="8"
+            cy="8"
+            r="1.6"
+            stroke="currentColor"
+            strokeWidth="1.3"
+          />
+        </>
+      )}
+    </svg>
   );
 }
 
@@ -295,6 +392,12 @@ export function EntityCatalogLoading({ title }: { title: string }) {
 }
 
 const styles = stylex.create({
+  actions: {
+    display: "flex",
+    alignItems: "center",
+    justifyContent: "flex-end",
+    gap: "2px",
+  },
   visuallyHidden: {
     position: "absolute",
     width: "1px",

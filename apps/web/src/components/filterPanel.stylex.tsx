@@ -133,12 +133,19 @@ function FilterQueryForm({
 }: FilterQueryProps & { filterToggle?: ReactNode }) {
   const id = useId();
   const hasFilterToggle = filterToggle !== undefined;
-  const [draft, setDraft] = useState({ source: query, value: query });
-  const draftValue = draft.source === query ? draft.value : query;
+  const [draft, setDraft] = useState(query);
+  const [draftQuery, setDraftQuery] = useState(query);
+
+  // The route's query owns the field. Drop unsubmitted text whenever it
+  // changes so an old draft cannot return when the URL goes back to a value.
+  if (draftQuery !== query) {
+    setDraftQuery(query);
+    setDraft(query);
+  }
 
   function submit(event: FormEvent<HTMLFormElement>) {
     event.preventDefault();
-    onSubmit(draftValue.trim());
+    onSubmit(draft.trim());
   }
 
   return (
@@ -156,12 +163,10 @@ function FilterQueryForm({
           aria-label={label}
           controlSize="sm"
           id={id}
-          onChange={(event) =>
-            setDraft({ source: query, value: event.currentTarget.value })
-          }
+          onChange={(event) => setDraft(event.currentTarget.value)}
           placeholder={placeholder}
           type="search"
-          value={draftValue}
+          value={draft}
         />
       </label>
       {hasFilterToggle ? (

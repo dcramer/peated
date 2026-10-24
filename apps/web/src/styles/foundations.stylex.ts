@@ -2,6 +2,20 @@ import * as stylex from "@stylexjs/stylex";
 import { colors, fonts } from "./tokens.stylex";
 
 const DARK = "@media (prefers-color-scheme: dark)";
+const NARROW = "@media (max-width: 759px)";
+
+/**
+ * Shows content on one side of the shared 760px layout breakpoint. Put these
+ * on a wrapper; `display: contents` keeps the wrapper out of the layout.
+ */
+export const breakpointStyles = stylex.create({
+  narrowOnly: {
+    display: { default: "none", [NARROW]: "contents" },
+  },
+  wideOnly: {
+    display: { default: "contents", [NARROW]: "none" },
+  },
+});
 
 /** Web typography roles. Components compose these with layout, color, and emphasis. */
 export const foundationStyles = stylex.create({

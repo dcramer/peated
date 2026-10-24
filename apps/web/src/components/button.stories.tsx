@@ -15,7 +15,7 @@ const meta = {
     size: { control: "inline-radio", options: ["sm", "md", "lg"] },
     variant: {
       control: "select",
-      options: ["default", "tonal", "accent", "text"],
+      options: ["default", "tonal", "accent", "quiet", "text"],
     },
   },
   parameters: {
@@ -39,6 +39,7 @@ export const Overview: Story = {
         <Button variant="tonal">Browse database</Button>
         <Button variant="accent">Save tasting</Button>
         <Button variant="text">Add this bottle</Button>
+        <Button variant="quiet">Row action</Button>
       </StoryRow>
       <StoryRow>
         {(["sm", "md", "lg"] as const).map((size) => (

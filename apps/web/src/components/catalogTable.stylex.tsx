@@ -15,7 +15,7 @@ export type CatalogTableColumn<Item> = {
   key: string;
   padding?: "default" | "flush";
   priority?: "primary" | "secondary";
-  width?: "action" | "count" | "menu" | "rating";
+  width?: "action" | "count" | "menu" | "rating" | "toggleMenu";
 };
 
 export type CatalogTableProps<Item> = {
@@ -182,6 +182,15 @@ const styles = stylex.create({
     paddingRight: space.x3,
     paddingLeft: space.x3,
   },
+  toggleMenuWidth: {
+    // Two 44px actions with a small gap; narrow tables show only the menu.
+    width: "116px",
+    paddingRight: space.x3,
+    paddingLeft: space.x3,
+    [NARROW]: {
+      width: "68px",
+    },
+  },
   ratingWidth: {
     width: "184px",
     [NARROW]: {
@@ -202,4 +211,5 @@ const widthStyles = {
   count: styles.countWidth,
   menu: styles.menuWidth,
   rating: styles.ratingWidth,
+  toggleMenu: styles.toggleMenuWidth,
 } as const;
