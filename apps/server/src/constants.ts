@@ -366,3 +366,35 @@ export function getRatingBand(score: number): RatingBand | undefined {
 export function getRatingBandById(id: RatingBandId): RatingBand {
   return RATING_BANDS.find((band) => band.id === id)!;
 }
+
+// Tasting age stats and the tasting age filter both read these ranges, so a
+// count shown for a range always matches the tastings that filter returns.
+// Stated ages are whole years; `min` and `max` are inclusive.
+export const AGE_BUCKETS = [
+  { id: "under10", label: "Under 10", min: null, max: 9 },
+  { id: "from10To12", label: "10–12", min: 10, max: 12 },
+  { id: "from13To17", label: "13–17", min: 13, max: 17 },
+  { id: "from18To24", label: "18–24", min: 18, max: 24 },
+  { id: "atLeast25", label: "25+", min: 25, max: null },
+] as const;
+
+export type AgeBucket = (typeof AGE_BUCKETS)[number];
+
+/** Age range IDs, plus `unstated` for Bottles without a stated age. */
+export const AGE_BUCKET_IDS = [
+  AGE_BUCKETS[0].id,
+  AGE_BUCKETS[1].id,
+  AGE_BUCKETS[2].id,
+  AGE_BUCKETS[3].id,
+  AGE_BUCKETS[4].id,
+  "unstated",
+] as const;
+
+export type AgeBucketId = (typeof AGE_BUCKET_IDS)[number];
+
+export function isAgeInBucket(age: number, bucket: AgeBucket) {
+  return (
+    (bucket.min === null || age >= bucket.min) &&
+    (bucket.max === null || age <= bucket.max)
+  );
+}

@@ -3,7 +3,8 @@ import { describe, expect, test } from "vitest";
 import {
   getProfileActivityRouteState,
   getProfileLibraryInput,
-  getProfileTastingCursor,
+  getProfileTastingInput,
+  getProfileTastingView,
 } from "./profileQueries";
 
 describe("profile route query state", () => {
@@ -25,7 +26,7 @@ describe("profile route query state", () => {
       cursor: undefined,
       page: 1,
     });
-    expect(getProfileTastingCursor({ cursor: "not-a-page" })).toBe(1);
+    expect(getProfileTastingInput({ cursor: "not-a-page" }, 42).cursor).toBe(1);
   });
 
   test("keeps only supported library filters", () => {
@@ -86,5 +87,61 @@ describe("profile route query state", () => {
       getProfileLibraryInput(params, 42),
     );
     expect(getProfileLibraryInput({}, 42).sort).toBe("name");
+  });
+
+  test("keeps only supported tasting filters", () => {
+    expect(
+      getProfileTastingInput(
+        new URLSearchParams({
+          age: "from13To17",
+          country: "scotland",
+          cursor: "3",
+          entity: "7",
+          internalRouteValue: "ignore-me",
+          query: "brora",
+          rating: "unicorn",
+          region: "islay",
+          sort: "-rating",
+        }),
+        42,
+      ),
+    ).toEqual({
+      age: "from13To17",
+      country: "scotland",
+      cursor: 3,
+      entity: 7,
+      limit: 25,
+      query: "brora",
+      ratingBand: "unicorn",
+      region: "islay",
+      sort: "-rating",
+      user: 42,
+    });
+  });
+
+  test("drops unsupported tasting filters and a region without a country", () => {
+    expect(
+      getProfileTastingInput(
+        { age: "old", rating: "great", region: "islay", sort: "best" },
+        42,
+      ),
+    ).toEqual({
+      age: undefined,
+      country: undefined,
+      cursor: 1,
+      entity: undefined,
+      limit: 25,
+      query: "",
+      ratingBand: undefined,
+      region: undefined,
+      sort: "-created",
+      user: 42,
+    });
+  });
+
+  test("shows the list unless the table is requested", () => {
+    expect(getProfileTastingView({ view: "table" })).toBe("table");
+    expect(getProfileTastingView({ view: "grid" })).toBe("list");
+    expect(getProfileTastingView({})).toBe("list");
   });
 });

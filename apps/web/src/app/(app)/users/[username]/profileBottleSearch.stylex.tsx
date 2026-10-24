@@ -16,26 +16,41 @@ import { getBottleIdentityProps } from "@peated/web/lib/bottleListItem";
 import { getEntityIdentityProps } from "@peated/web/lib/entityIdentity";
 import { useORPC } from "@peated/web/lib/orpc/context";
 import { getBottleUrl, getEntityUrl } from "@peated/web/lib/urls";
-import { foundationStyles } from "../../../../../styles/foundations.stylex";
-import { space } from "../../../../../styles/tokens.stylex";
+import { foundationStyles } from "../../../../styles/foundations.stylex";
+import { space } from "../../../../styles/tokens.stylex";
 
 const SEARCH_DEBOUNCE_MS = 140;
-const libraryScopes = [{ label: "Library", value: "library" }] as const;
+const scopeCopy = {
+  library: {
+    empty: "No brands, producers, or bottles in this library match.",
+    label: "Find in this library",
+    scopes: [{ label: "Library", value: "library" }],
+    status: "Searching this library…",
+  },
+  tastings: {
+    empty: "No brands, producers, or bottles in these tastings match.",
+    label: "Find in these tastings",
+    scopes: [{ label: "Tastings", value: "tastings" }],
+    status: "Searching these tastings…",
+  },
+} as const;
 
 /**
- * Suggests brands, producers, and Bottles from one member's Library while
- * they type. Picking a brand or producer filters the Library; picking a
- * Bottle opens it; Enter without a suggestion searches the Library text.
+ * Suggests brands, producers, and Bottles from one member's Library or
+ * tastings while they type. Picking a brand or producer filters the list;
+ * picking a Bottle opens it; Enter without a suggestion searches the text.
  */
-export function ProfileLibrarySearch({
+export function ProfileBottleSearch({
   onEntitySelect,
   onSubmit,
   query,
+  scope,
   userId,
 }: {
   onEntitySelect: (entityId: number) => void;
   onSubmit: (query: string) => void;
   query: string;
+  scope: "library" | "tastings";
   userId: number;
 }) {
   const orpc = useORPC();
@@ -47,8 +62,11 @@ export function ProfileLibrarySearch({
     setSearchText,
     SEARCH_DEBOUNCE_MS,
   );
+  const copy = scopeCopy[scope];
+  const searchRoute =
+    scope === "library" ? orpc.users.librarySearch : orpc.users.tastingSearch;
   const searchQuery = useQuery({
-    ...orpc.users.librarySearch.queryOptions({
+    ...searchRoute.queryOptions({
       input: { user: userId, query: searchText },
     }),
     enabled: searchText.length > 0,
@@ -76,13 +94,13 @@ export function ProfileLibrarySearch({
   return (
     <div {...stylex.props(styles.field)}>
       <span aria-hidden="true" {...stylex.props(foundationStyles.fieldLabel)}>
-        Find in this library
+        {copy.label}
       </span>
       <SearchBox
-        ariaLabel="Find in this library"
+        ariaLabel={copy.label}
         emptyText={
           showResults && searchQuery.data && !groups.length
-            ? "No brands, producers, or bottles in this library match."
+            ? copy.empty
             : undefined
         }
         fluid
@@ -97,8 +115,8 @@ export function ProfileLibrarySearch({
         placeholder="Brand or bottle"
         query={draftValue}
         resultQuery={searchQuery.isPlaceholderData ? "" : searchText}
-        scope="library"
-        scopes={libraryScopes}
+        scope={scope}
+        scopes={copy.scopes}
         status={
           !showResults
             ? "ready"
@@ -108,14 +126,14 @@ export function ProfileLibrarySearch({
                 ? "searching"
                 : "ready"
         }
-        statusText="Searching this library…"
+        statusText={copy.status}
       />
     </div>
   );
 }
 
 function toGroups(
-  data: Outputs["users"]["librarySearch"],
+  data: Outputs["users"]["librarySearch" | "tastingSearch"],
 ): SearchResultGroup[] {
   const entityItems = data.entities.map(({ entity }) => ({
     entity: getEntityIdentityProps(entity),

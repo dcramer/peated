@@ -1,5 +1,5 @@
 import * as stylex from "@stylexjs/stylex";
-import { ChevronDown, Download } from "lucide-react";
+import { ChevronDown, Download, LayoutList, Table2 } from "lucide-react";
 import type { ReactNode, SelectHTMLAttributes } from "react";
 
 import { foundationStyles } from "../styles/foundations.stylex";
@@ -23,6 +23,8 @@ export type ListSortOption = {
   value: string;
 };
 
+export type ListView = "list" | "table";
+
 export type ListToolbarProps = {
   count: number;
   mobileAction?: ReactNode;
@@ -30,13 +32,19 @@ export type ListToolbarProps = {
   pluralNoun?: string;
   onExport?: () => void;
   onSortChange: (value: string) => void;
+  /** Shows list and table view buttons when set with `view`. */
+  onViewChange?: (view: ListView) => void;
   pending?: boolean;
   sort: string;
   sortOptions: readonly [ListSortOption, ...ListSortOption[]];
   total?: number;
+  view?: ListView;
 };
 
-/** Keeps sorting available while pending results retain their last settled count. */
+/**
+ * Keeps sorting available while pending results retain their last settled
+ * count. Lists with a compact table view pass `view` and `onViewChange`.
+ */
 export function ListToolbar({
   count,
   mobileAction,
@@ -44,10 +52,12 @@ export function ListToolbar({
   pluralNoun = `${noun}s`,
   onExport,
   onSortChange,
+  onViewChange,
   pending = false,
   sort,
   sortOptions,
   total,
+  view,
 }: ListToolbarProps) {
   return (
     <div
@@ -87,6 +97,9 @@ export function ListToolbar({
             value={sort}
           />
         </span>
+        {view && onViewChange ? (
+          <ListViewToggle onChange={onViewChange} value={view} />
+        ) : null}
         {onExport ? (
           <IconButton
             icon={<Download aria-hidden="true" size={15} strokeWidth={1.75} />}
@@ -100,6 +113,43 @@ export function ListToolbar({
           <span {...stylex.props(styles.mobileAction)}>{mobileAction}</span>
         ) : null}
       </div>
+    </div>
+  );
+}
+
+const listViews = [
+  {
+    icon: LayoutList,
+    label: "List view",
+    value: "list",
+  },
+  {
+    icon: Table2,
+    label: "Table view",
+    value: "table",
+  },
+] as const;
+
+function ListViewToggle({
+  onChange,
+  value,
+}: {
+  onChange: (view: ListView) => void;
+  value: ListView;
+}) {
+  return (
+    <div aria-label="View" role="group" {...stylex.props(styles.viewToggle)}>
+      {listViews.map(({ icon: Icon, label, value: option }) => (
+        <IconButton
+          aria-pressed={value === option}
+          icon={<Icon aria-hidden="true" size={16} strokeWidth={1.75} />}
+          key={option}
+          label={label}
+          onClick={() => onChange(option)}
+          size="sm"
+          variant={value === option ? "default" : "tonal"}
+        />
+      ))}
     </div>
   );
 }
@@ -349,9 +399,17 @@ const styles = stylex.create({
     display: "flex",
     alignItems: "center",
     gap: space.x2,
+    [COMPACT]: { maxWidth: "100%", flexWrap: "wrap" },
   },
+  // Phones put the status after the controls so it never pushes them sideways.
   status: {
-    minWidth: "9ch",
+    minWidth: { default: "9ch", [COMPACT]: 0 },
+    order: { default: 0, [COMPACT]: 1 },
+  },
+  viewToggle: {
+    display: "inline-flex",
+    flexShrink: 0,
+    gap: space.x1,
   },
   statusWithMobileAction: {
     [TABLE_NARROW]: {

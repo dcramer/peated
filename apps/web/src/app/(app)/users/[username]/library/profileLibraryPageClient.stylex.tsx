@@ -12,9 +12,11 @@ import {
   SectionError,
 } from "@peated/web/components/feedback.stylex";
 import {
-  MemberLibraryFilters,
+  MemberListFilters,
+  type MemberListFilterGroup,
+} from "@peated/web/components/pages/memberListFilters.stylex";
+import {
   MemberLibraryList,
-  type MemberLibraryFilterGroup,
   type MemberLibraryItem,
 } from "@peated/web/components/pages/memberProfileContent.stylex";
 import { toBottleListItem } from "@peated/web/lib/bottleListItem";
@@ -22,10 +24,10 @@ import { getCursorHref } from "@peated/web/lib/cursorHref";
 import { useORPC } from "@peated/web/lib/orpc/context";
 import { foundationStyles } from "../../../../../styles/foundations.stylex";
 import { colors, space } from "../../../../../styles/tokens.stylex";
+import { ProfileBottleSearch } from "../profileBottleSearch.stylex";
 import { useProfile } from "../profileContext";
 import { getProfileLibraryInput, profileQueries } from "../profileQueries";
 import { ProfileLibraryLayout } from "./profileLibraryLayout.stylex";
-import { ProfileLibrarySearch } from "./profileLibrarySearch.stylex";
 
 type LibraryEntry =
   Outputs["collections"]["bottles"]["list"]["results"][number];
@@ -94,10 +96,7 @@ export function ProfileLibraryPageClient() {
     });
   }
 
-  function setFilter(
-    name: "brand" | "distiller" | "entity" | "status" | "sort",
-    value: string,
-  ) {
+  function setFilter(name: string, value: string) {
     const next = new URLSearchParams(displayedParams);
     next.delete("cursor");
     if (value) next.set(name, value);
@@ -200,16 +199,18 @@ export function ProfileLibraryPageClient() {
   }
 
   const search = (
-    <ProfileLibrarySearch
+    <ProfileBottleSearch
       onEntitySelect={selectEntity}
       onSubmit={setQuery}
       query={query}
+      scope="library"
       userId={user.id}
     />
   );
   const filterPanel = (
-    <MemberLibraryFilters
+    <MemberListFilters
       groups={filters}
+      mobileLabel="Filter library"
       mode="rail"
       onChange={setFilter}
       onClear={clearFilters}
@@ -222,8 +223,9 @@ export function ProfileLibraryPageClient() {
   return (
     <ProfileLibraryLayout
       mobileFilters={
-        <MemberLibraryFilters
+        <MemberListFilters
           groups={filters}
+          mobileLabel="Filter library"
           mode="mobile"
           onChange={setFilter}
           onClear={clearFilters}
@@ -396,9 +398,9 @@ function getFilterGroups({
   entity?: { id: number; name?: string };
   stats?: Outputs["users"]["libraryStats"];
   status: string;
-}): MemberLibraryFilterGroup[] {
+}): MemberListFilterGroup[] {
   const total = stats?.total ?? 0;
-  const groups: MemberLibraryFilterGroup[] = [
+  const groups: MemberListFilterGroup[] = [
     ...(entity
       ? [
           {
@@ -410,7 +412,7 @@ function getFilterGroups({
               },
             ],
             label: "Brand or producer",
-            name: "entity" as const,
+            name: "entity",
           },
         ]
       : []),

@@ -4,6 +4,7 @@ import { useState } from "react";
 import {
   CursorPager,
   ListToolbar,
+  type ListView,
   RailList,
   RailListItem,
 } from "./lists.stylex";
@@ -27,6 +28,24 @@ function ToolbarExample() {
       sort={sort}
       sortOptions={sortOptions}
       total={41}
+    />
+  );
+}
+
+function ViewToggleExample() {
+  const [sort, setSort] = useState("recent");
+  const [view, setView] = useState<ListView>("list");
+
+  return (
+    <ListToolbar
+      count={10}
+      noun="tasting"
+      onSortChange={setSort}
+      onViewChange={setView}
+      sort={sort}
+      sortOptions={sortOptions}
+      total={290}
+      view={view}
     />
   );
 }
@@ -86,4 +105,16 @@ export const UpdatingResults: Story = {
       total={41}
     />
   ),
+};
+
+export const ViewToggle: Story = {
+  render: () => <ViewToggleExample />,
+  parameters: {
+    docs: {
+      description: {
+        story:
+          "Lists with a compact table, such as a member's tastings, pass view and onViewChange. The pressed button marks the current view; the route keeps it in the URL.",
+      },
+    },
+  },
 };

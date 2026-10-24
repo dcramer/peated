@@ -1,3 +1,9 @@
+import {
+  AGE_BUCKET_IDS,
+  RATING_BAND_IDS,
+  type AgeBucketId,
+  type RatingBandId,
+} from "@peated/server/constants";
 import type { Inputs, Outputs } from "@peated/server/orpc/router";
 import {
   infiniteQueryOptions,
@@ -21,6 +27,20 @@ export type ProfileLibraryInput = Inputs["collections"]["bottles"]["list"] & {
   status?: "empty" | "open" | "sealed" | "unset";
   user: number;
 };
+
+export type ProfileTastingInput = Inputs["tastings"]["list"] & {
+  age?: AgeBucketId;
+  country?: string;
+  cursor: number;
+  entity?: number;
+  limit: 25;
+  query: string;
+  ratingBand?: RatingBandId;
+  region?: string;
+  sort: "-created" | "-rating" | "name";
+  user: number;
+};
+export type ProfileTastingView = "list" | "table";
 
 /** The server and browser must use the same query keys. */
 export const profileQueries = {
@@ -52,10 +72,8 @@ export const profileQueries = {
     orpc.users.regionList.queryOptions({ input: { user: userId } }),
   tastingStats: (orpc: ORPCQueryUtils, userId: number) =>
     orpc.users.tastingStats.queryOptions({ input: { user: userId } }),
-  tastings: (orpc: ORPCQueryUtils, userId: number, cursor: number) =>
-    orpc.tastings.list.queryOptions({
-      input: { cursor, limit: 10, user: userId },
-    }),
+  tastings: (orpc: ORPCQueryUtils, input: ProfileTastingInput) =>
+    orpc.tastings.list.queryOptions({ input }),
 };
 
 export function getProfileActivityRouteState(source: SearchParamSource) {
@@ -68,8 +86,31 @@ export function getProfileActivityRouteState(source: SearchParamSource) {
   };
 }
 
-export function getProfileTastingCursor(source: SearchParamSource) {
-  return parsePositiveNumber(getSearchParam(source, "cursor")) ?? 1;
+export function getProfileTastingInput(
+  source: SearchParamSource,
+  userId: number,
+): ProfileTastingInput {
+  const sort = getSearchParam(source, "sort");
+  const country = getSearchParam(source, "country") || undefined;
+  return {
+    age: parseOption(getSearchParam(source, "age"), AGE_BUCKET_IDS),
+    country,
+    cursor: parsePositiveNumber(getSearchParam(source, "cursor")) ?? 1,
+    entity: parsePositiveNumber(getSearchParam(source, "entity")),
+    limit: 25,
+    query: getSearchParam(source, "query") ?? "",
+    ratingBand: parseOption(getSearchParam(source, "rating"), RATING_BAND_IDS),
+    // The API rejects a region without its country.
+    region: country ? getSearchParam(source, "region") || undefined : undefined,
+    sort: sort === "-rating" || sort === "name" ? sort : "-created",
+    user: userId,
+  };
+}
+
+export function getProfileTastingView(
+  source: SearchParamSource,
+): ProfileTastingView {
+  return getSearchParam(source, "view") === "table" ? "table" : "list";
 }
 
 export function getProfileLibraryInput(
@@ -106,6 +147,13 @@ function parsePositiveNumber(value: string | undefined) {
   if (!value) return undefined;
   const parsed = Number.parseInt(value, 10);
   return Number.isSafeInteger(parsed) && parsed > 0 ? parsed : undefined;
+}
+
+function parseOption<Option extends string>(
+  value: string | undefined,
+  options: readonly Option[],
+) {
+  return options.find((option) => option === value);
 }
 
 function parseLibraryStatus(value: string | undefined) {

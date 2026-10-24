@@ -88,6 +88,21 @@ export const TastingList: Story = {
     },
   },
 };
+export const MemberTastingList: Story = {
+  args: {
+    ariaLabel: "dcramer's tastings",
+    items: withStoryImages(getTastingFeedItems(mockTastings.slice(0, 3))),
+    showActor: false,
+  },
+  parameters: {
+    docs: {
+      description: {
+        story:
+          "One member's tasting list omits the repeated author line. The date follows the note and tasting notes and links to the tasting.",
+      },
+    },
+  },
+};
 export const ManyTastingNotes: Story = {
   args: {
     ariaLabel: "Tastings",

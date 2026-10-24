@@ -207,6 +207,8 @@ export type FacetGroupProps = {
   onChange: (value: string) => void;
   options: readonly FacetGroupOption[];
   selected?: string;
+  /** A short, non-interactive fact about the whole group, such as a median. */
+  summary?: ReactNode;
   total?: number;
 };
 
@@ -216,6 +218,7 @@ export function FacetGroup({
   onChange,
   options,
   selected,
+  summary,
   total,
 }: FacetGroupProps) {
   const id = useId();
@@ -225,6 +228,11 @@ export function FacetGroup({
       <SectionHeading id={id} level={3}>
         {label}
       </SectionHeading>
+      {summary ? (
+        <p {...stylex.props(foundationStyles.metadata, styles.facetSummary)}>
+          {summary}
+        </p>
+      ) : null}
       <div {...stylex.props(styles.facetRows)}>
         {options.map((option) => {
           const isSelected = selected === option.value;
@@ -369,6 +377,12 @@ const styles = stylex.create({
   },
   facetGroup: {
     minWidth: 0,
+  },
+  facetSummary: {
+    marginTop: space.x1,
+    marginBottom: 0,
+    color: colors.inkMuted,
+    fontVariantNumeric: "tabular-nums",
   },
   facetRows: {
     marginTop: space.x2,

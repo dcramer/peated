@@ -1,4 +1,5 @@
 import {
+  includesQuery,
   mockFriends,
   mockPage,
   mockTastingFor,
@@ -41,7 +42,15 @@ export default mockOS.tastings.list.handler(
           tasting.bottle.brand.id === input.entity ||
           tasting.bottle.distillers.some(
             (entity) => entity.id === input.entity,
-          )),
+          )) &&
+        (!input.query ||
+          includesQuery(
+            input.query,
+            tasting.bottle.fullName,
+            tasting.bottle.name,
+          )) &&
+        (input.ratingBand === undefined ||
+          tasting.ratingBand === input.ratingBand),
     );
 
     return mockPage(

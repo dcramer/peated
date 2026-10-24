@@ -1,3 +1,4 @@
+import { AGE_BUCKET_IDS } from "@peated/server/constants";
 import { z } from "zod";
 import { FriendStatusEnum } from "./shared";
 
@@ -118,14 +119,7 @@ export const AgeStatsSchema = z.object({
   oldest: z.number().nullable(),
   buckets: z.array(
     z.object({
-      id: z.enum([
-        "under10",
-        "from10To12",
-        "from13To17",
-        "from18To24",
-        "atLeast25",
-        "unstated",
-      ]),
+      id: z.enum(AGE_BUCKET_IDS),
       label: z.string(),
       count: z.number(),
     }),

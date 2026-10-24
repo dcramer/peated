@@ -6,8 +6,8 @@ import { noIndexFollowPageMetadata } from "@peated/web/lib/seoMetadata";
 import { dehydrate, HydrationBoundary } from "@tanstack/react-query";
 import type { Metadata } from "next";
 
-import { getProfileTastingCursor, profileQueries } from "../profileQueries";
-import { ProfileTastingsPageClient } from "./profileTastingsPageClient.stylex";
+import { getProfileTastingInput, profileQueries } from "../profileQueries";
+import { ProfileTastingsPageClient } from "./profileTastingsPageClient";
 
 export const fetchCache = "default-no-store";
 
@@ -21,12 +21,16 @@ export default async function ProfilePageRoute(props: {
   const { username } = await props.params;
   const { client } = await createServerClient();
   const user = await getProfilePage(username);
-  const cursor = getProfileTastingCursor(await props.searchParams);
+  const tastingInput = getProfileTastingInput(
+    await props.searchParams,
+    user.id,
+  );
   const queryClient = getQueryClient();
   const orpc = createTanstackQueryUtils(client);
   await Promise.all([
     queryClient.prefetchQuery(profileQueries.regions(orpc, user.id)),
-    queryClient.prefetchQuery(profileQueries.tastings(orpc, user.id, cursor)),
+    queryClient.prefetchQuery(profileQueries.tastingStats(orpc, user.id)),
+    queryClient.prefetchQuery(profileQueries.tastings(orpc, tastingInput)),
   ]);
 
   return (

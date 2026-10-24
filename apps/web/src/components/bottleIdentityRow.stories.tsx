@@ -194,7 +194,7 @@ export const RowLayouts: Story = {
     docs: {
       description: {
         story:
-          "Compare the actual bottle, sidebar, activity, tasting, search, selection, and loading components at wide and phone widths. Standard rows use three identity lines and a medium thumbnail; activity makes that image larger in wide feed columns. Sidebars use a small thumbnail, compact two-line titles, and trailing details below the identity. Compact library additions use the extra-small thumbnail. Release facts wrap between facts, so ABV is never cut off; tasting drafts also let their status wrap.",
+          "Compare the actual bottle, sidebar, activity, tasting, search, selection, and loading components at wide and phone widths. Standard rows use three identity lines and a medium thumbnail; activity makes that image larger in wide feed columns. Sidebars use a small thumbnail, compact two-line titles, and trailing details below the identity. Compact library additions use the extra-small thumbnail and a regular-weight name; compact tasting table rows keep the bold name and add one details line. Release facts wrap between facts, so ABV is never cut off; tasting drafts also let their status wrap.",
       },
     },
   },
@@ -232,6 +232,24 @@ export const RowLayouts: Story = {
         <section aria-label="Library addition">
           <SectionHeading level={3}>Library addition</SectionHeading>
           <BottleIdentityRow {...args} variant="compact" />
+        </section>
+        <section aria-label="Tasting table row">
+          <SectionHeading level={3}>Tasting table row</SectionHeading>
+          <BottleIdentityRow
+            {...args}
+            align="start"
+            details="Smoke, dried fruit, sea salt, and a long finish."
+            variant="compact"
+          />
+          <BottleIdentityRow
+            align="start"
+            details="Oct 18, 2026 · Peat first, then a waxy, citrus finish that runs past one line."
+            href="/tastings/example"
+            imageUrl={null}
+            linkLabel="View tasting of Bruichladdich Octomore Edition 15.3"
+            name="Bruichladdich Octomore Edition 15.3 Islay Barley Super Heavily Peated"
+            variant="compact"
+          />
         </section>
         <StoryCanvas width="compact">
           <BottleRailSection

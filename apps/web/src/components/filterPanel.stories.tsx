@@ -51,6 +51,7 @@ export const WithoutCounts: Story = {
 };
 
 function ControlledFilters({ ariaLabel }: FilterPanelProps) {
+  const [age, setAge] = useState("");
   const [country, setCountry] = useState("scotland");
   const [query, setQuery] = useState("");
 
@@ -58,8 +59,9 @@ function ControlledFilters({ ariaLabel }: FilterPanelProps) {
     <FilterPanel
       ariaLabel={ariaLabel}
       onClear={
-        country || query
+        age || country || query
           ? () => {
+              setAge("");
               setCountry("");
               setQuery("");
             }
@@ -81,6 +83,21 @@ function ControlledFilters({ ariaLabel }: FilterPanelProps) {
           { count: 312, label: "United States", value: "united-states" },
         ]}
         selected={country}
+        total={1736}
+      />
+      <FacetGroup
+        label="Age"
+        onChange={setAge}
+        options={[
+          { count: 212, label: "Under 10", value: "under10" },
+          { count: 498, label: "10–12", value: "from10To12" },
+          { count: 361, label: "13–17", value: "from13To17" },
+          { count: 137, label: "18–24", value: "from18To24" },
+          { count: 52, label: "25+", value: "atLeast25" },
+          { count: 476, label: "No age stated", value: "unstated" },
+        ]}
+        selected={age}
+        summary="Median 12 years · oldest 50"
         total={1736}
       />
     </FilterPanel>

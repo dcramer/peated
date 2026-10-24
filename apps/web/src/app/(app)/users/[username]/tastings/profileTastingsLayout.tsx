@@ -2,41 +2,53 @@
 
 import type { ReactNode } from "react";
 
-import { LoadingList } from "@peated/web/components/feedback.stylex";
 import {
-  PageColumns,
-  RailSection,
-} from "@peated/web/components/pages/pageLayout.stylex";
+  LoadingList,
+  LoadingPlaceholder,
+} from "@peated/web/components/feedback.stylex";
+import { PageColumns } from "@peated/web/components/pages/pageLayout.stylex";
 import { useProfile } from "../profileContext";
 import { getProfileLoadingRows } from "../profileLoading";
 
 export function ProfileTastingsLayout({
   children,
+  mobileFilters,
   rail,
 }: {
   children: ReactNode;
+  mobileFilters?: ReactNode;
   rail?: ReactNode;
 }) {
-  return <PageColumns rail={rail}>{children}</PageColumns>;
+  return (
+    <>
+      {mobileFilters}
+      <PageColumns rail={rail}>{children}</PageColumns>
+    </>
+  );
 }
 
+/** Keeps the toolbar and filter rail in place while tastings load. */
 export function ProfileTastingsLoading() {
-  const { isCurrentUser, user } = useProfile();
+  const { user } = useProfile();
 
   return (
-    <ProfileTastingsLayout
-      rail={
-        <RailSection
-          heading={isCurrentUser ? "What you pour" : "What they pour"}
-        >
-          <LoadingList label="Loading member regions" rows={3} />
-        </RailSection>
-      }
-    >
-      <LoadingList
-        label="Loading member tastings"
-        rows={getProfileLoadingRows(user.stats.tastings)}
-      />
-    </ProfileTastingsLayout>
+    <div aria-busy="true" aria-label="Loading member tastings" role="status">
+      <ProfileTastingsLayout
+        rail={
+          <div aria-hidden="true">
+            <LoadingPlaceholder preset="heading" />
+            <LoadingList label="Loading tasting filters" rows={4} />
+          </div>
+        }
+      >
+        <div aria-hidden="true">
+          <LoadingPlaceholder preset="heading" />
+          <LoadingList
+            label="Loading member tastings"
+            rows={getProfileLoadingRows(user.stats.tastings)}
+          />
+        </div>
+      </ProfileTastingsLayout>
+    </div>
   );
 }

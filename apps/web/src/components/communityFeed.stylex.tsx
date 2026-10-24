@@ -46,29 +46,53 @@ export type CommunityFeedItem = {
  * Activity and full-width tasting list shared by the homepage, activity, bottle,
  * brand or producer, and member pages. Map API entries with getCommunityFeedItems
  * or getTastingFeedItems. Routes own queries, empty states, and actions.
+ * Set showActor to false when every entry has the same author, such as one
+ * member's tasting list; the date then links to the entry below its note.
  */
 export function CommunityFeed({
   ariaLabel = "Activity",
   items,
   limit,
+  showActor = true,
 }: {
   ariaLabel?: string;
   items: readonly CommunityFeedItem[];
   limit?: number;
+  showActor?: boolean;
 }) {
   const visibleItems = limit === undefined ? items : items.slice(0, limit);
   return (
     <ItemList ariaLabel={ariaLabel}>
       {visibleItems.map((item) => (
         <ItemListItem key={item.id}>
-          <CommunityFeedEntry item={item} />
+          <CommunityFeedEntry item={item} showActor={showActor} />
         </ItemListItem>
       ))}
     </ItemList>
   );
 }
 
-function CommunityFeedEntry({ item }: { item: CommunityFeedItem }) {
+function CommunityFeedEntry({
+  item,
+  showActor,
+}: {
+  item: CommunityFeedItem;
+  showActor: boolean;
+}) {
+  // Without the author line, the first bottle's footer carries the date link.
+  const showDate = (index: number) => !showActor && index === 0;
+  const date = item.href ? (
+    <CardPrimaryLink
+      aria-label={getActivityLinkLabel(item)}
+      href={item.href}
+      {...stylex.props(styles.activityLink)}
+    >
+      <TimeSince date={item.date} />
+    </CardPrimaryLink>
+  ) : (
+    <TimeSince date={item.date} />
+  );
+
   return (
     <article>
       <Card
@@ -77,60 +101,63 @@ function CommunityFeedEntry({ item }: { item: CommunityFeedItem }) {
         padding="none"
         {...stylex.props(styles.entry)}
       >
-        <header {...stylex.props(styles.author)}>
-          <Avatar
-            imageUrl={item.actorImageUrl}
-            initials={item.actor.slice(0, 2).toUpperCase()}
-            size="xs"
-          />
-          <div {...stylex.props(foundationStyles.metadata, styles.context)}>
-            {item.actorHref ? (
-              <TextLink href={item.actorHref}>{item.actor}</TextLink>
-            ) : (
-              <strong>{item.actor}</strong>
-            )}{" "}
-            {item.href && !item.destination ? (
-              <CardPrimaryLink
-                aria-label={getActivityLinkLabel(item)}
-                href={item.href}
-                {...stylex.props(styles.activityLink)}
-              >
-                {item.action}
-              </CardPrimaryLink>
-            ) : (
-              item.action
-            )}
-            {item.destination ? (
-              <>
-                {" "}
-                {item.href === item.destination.href ? (
-                  <CardPrimaryLink
-                    aria-label={getActivityLinkLabel(item)}
-                    href={item.href}
-                    {...stylex.props(styles.activityLink)}
-                  >
-                    {item.destination.label}
-                  </CardPrimaryLink>
-                ) : (
-                  <TextLink href={item.destination.href}>
-                    {item.destination.label}
-                  </TextLink>
-                )}
-              </>
-            ) : null}
-            <span {...stylex.props(styles.date)}>
-              <span aria-hidden="true"> · </span>
-              <TimeSince date={item.date} />
-            </span>
-          </div>
-        </header>
+        {showActor ? (
+          <header {...stylex.props(styles.author)}>
+            <Avatar
+              imageUrl={item.actorImageUrl}
+              initials={item.actor.slice(0, 2).toUpperCase()}
+              size="xs"
+            />
+            <div {...stylex.props(foundationStyles.metadata, styles.context)}>
+              {item.actorHref ? (
+                <TextLink href={item.actorHref}>{item.actor}</TextLink>
+              ) : (
+                <strong>{item.actor}</strong>
+              )}{" "}
+              {item.href && !item.destination ? (
+                <CardPrimaryLink
+                  aria-label={getActivityLinkLabel(item)}
+                  href={item.href}
+                  {...stylex.props(styles.activityLink)}
+                >
+                  {item.action}
+                </CardPrimaryLink>
+              ) : (
+                item.action
+              )}
+              {item.destination ? (
+                <>
+                  {" "}
+                  {item.href === item.destination.href ? (
+                    <CardPrimaryLink
+                      aria-label={getActivityLinkLabel(item)}
+                      href={item.href}
+                      {...stylex.props(styles.activityLink)}
+                    >
+                      {item.destination.label}
+                    </CardPrimaryLink>
+                  ) : (
+                    <TextLink href={item.destination.href}>
+                      {item.destination.label}
+                    </TextLink>
+                  )}
+                </>
+              ) : null}
+              <span {...stylex.props(styles.date)}>
+                <span aria-hidden="true"> · </span>
+                <TimeSince date={item.date} />
+              </span>
+            </div>
+          </header>
+        ) : null}
         <div
           {...stylex.props(
             styles.content,
+            !showActor && styles.contentWithoutActor,
             item.kind === "collection_add" && styles.compactContent,
           )}
         >
-          {item.bottles.map((bottle) => (
+          {item.bottles.map((bottle, index) => (
             <div key={bottle.id} {...stylex.props(styles.bottle)}>
               <BottleIdentityRow
                 variant={
@@ -145,8 +172,11 @@ function CommunityFeedEntry({ item }: { item: CommunityFeedItem }) {
                 linkArea="title"
                 metadata={bottle.metadata}
                 verticalPadding="sm"
-                activityDetails={
-                  bottle.description || bottle.byline || bottle.tags?.length ? (
+                details={
+                  bottle.description ||
+                  bottle.byline ||
+                  bottle.tags?.length ||
+                  showDate(index) ? (
                     <div {...stylex.props(styles.details)}>
                       {bottle.description ? (
                         <p
@@ -161,14 +191,18 @@ function CommunityFeedEntry({ item }: { item: CommunityFeedItem }) {
                       {bottle.tags?.length ? (
                         <TastingNotePreview tags={bottle.tags} />
                       ) : null}
-                      {bottle.byline ? (
+                      {bottle.byline || showDate(index) ? (
                         <div
                           {...stylex.props(
                             foundationStyles.metadata,
                             styles.footer,
                           )}
                         >
-                          By {bottle.byline}
+                          {bottle.byline ? `By ${bottle.byline}` : null}
+                          {bottle.byline && showDate(index) ? (
+                            <span aria-hidden="true"> · </span>
+                          ) : null}
+                          {showDate(index) ? date : null}
                         </div>
                       ) : null}
                     </div>
@@ -276,6 +310,7 @@ const styles = stylex.create({
     gap: space.x3,
     [MOBILE]: { gridColumn: "1 / -1" },
   },
+  contentWithoutActor: { gridColumn: "1 / -1" },
   bottle: { minWidth: 0 },
   compactContent: { gap: 0 },
   facts: {

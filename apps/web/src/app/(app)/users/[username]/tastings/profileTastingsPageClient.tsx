@@ -1,0 +1,365 @@
+"use client";
+
+import type { Outputs } from "@peated/server/orpc/router";
+import { useQuery } from "@tanstack/react-query";
+import { usePathname, useRouter, useSearchParams } from "next/navigation";
+import { useOptimistic, useTransition } from "react";
+
+import { ButtonLink } from "@peated/web/components/button.stylex";
+import { CommunityFeed } from "@peated/web/components/communityFeed.stylex";
+import {
+  EmptyState,
+  LoadingList,
+  SectionError,
+} from "@peated/web/components/feedback.stylex";
+import { CursorPager, ListToolbar } from "@peated/web/components/lists.stylex";
+import {
+  MemberListFilters,
+  type MemberListFilterGroup,
+} from "@peated/web/components/pages/memberListFilters.stylex";
+import { RATING_BANDS } from "@peated/web/components/scoring.stylex";
+import { TastingTable } from "@peated/web/components/tastingTable.stylex";
+import { getTastingFeedItems } from "@peated/web/lib/communityFeed";
+import { getCursorHref } from "@peated/web/lib/cursorHref";
+import { useORPC } from "@peated/web/lib/orpc/context";
+import { getTastingTableItems } from "@peated/web/lib/tastingTable";
+import { ProfileBottleSearch } from "../profileBottleSearch.stylex";
+import { useProfile } from "../profileContext";
+import {
+  getProfileTastingInput,
+  getProfileTastingView,
+  profileQueries,
+} from "../profileQueries";
+import { ProfileTastingsLayout } from "./profileTastingsLayout";
+
+type RegionList = Outputs["users"]["regionList"];
+type TastingStats = Outputs["users"]["tastingStats"];
+
+const sortOptions = [
+  { label: "Newest", value: "-created" },
+  { label: "Best rated", value: "-rating" },
+  { label: "Bottle name", value: "name" },
+] as const;
+
+// Filters a member can clear at once; `sort` and `view` are display choices.
+const FILTER_PARAMS = [
+  "age",
+  "country",
+  "cursor",
+  "entity",
+  "query",
+  "rating",
+  "region",
+];
+
+export function ProfileTastingsPageClient() {
+  const orpc = useORPC();
+  const pathname = usePathname();
+  const router = useRouter();
+  const searchParams = useSearchParams();
+  const { isCurrentUser, user } = useProfile();
+  const [isNavigating, startTransition] = useTransition();
+  const [displayedParams, setDisplayedParams] = useOptimistic(
+    searchParams.toString(),
+  );
+  const input = getProfileTastingInput(searchParams, user.id);
+  const displayed = new URLSearchParams(displayedParams);
+  const displayedInput = getProfileTastingInput(displayed, user.id);
+  const view = getProfileTastingView(displayed);
+  const tastingQuery = useQuery(profileQueries.tastings(orpc, input));
+  const statsQuery = useQuery(profileQueries.tastingStats(orpc, user.id));
+  const regionQuery = useQuery(profileQueries.regions(orpc, user.id));
+  const { entity } = displayedInput;
+  const entityQuery = useQuery({
+    ...orpc.entities.details.queryOptions({ input: { entity: entity ?? 0 } }),
+    enabled: entity !== undefined,
+  });
+  const hasFilters = FILTER_PARAMS.some(
+    (name) => name !== "cursor" && displayed.get(name),
+  );
+  const filters = getFilterGroups({
+    entity:
+      entity === undefined
+        ? undefined
+        : { id: entity, name: entityQuery.data?.name },
+    params: displayed,
+    regions: regionQuery.data,
+    stats: statsQuery.data,
+  });
+
+  function navigate(next: URLSearchParams) {
+    const nextQuery = next.toString();
+    startTransition(() => {
+      // Tasting queries follow the committed URL; only controls anticipate navigation.
+      setDisplayedParams(nextQuery);
+      router.push(nextQuery ? `${pathname}?${nextQuery}` : pathname, {
+        scroll: false,
+      });
+    });
+  }
+
+  function setParam(name: string, value: string) {
+    const next = new URLSearchParams(displayedParams);
+    if (name !== "view") next.delete("cursor");
+    // A region belongs to one country, so changing the country clears it.
+    if (name === "country") next.delete("region");
+    if (value) next.set(name, value);
+    else next.delete(name);
+    navigate(next);
+  }
+
+  function selectEntity(entityId: number) {
+    // One Entity filter replaces the search text it came from.
+    const next = new URLSearchParams(displayedParams);
+    ["cursor", "query"].forEach((name) => next.delete(name));
+    next.set("entity", String(entityId));
+    navigate(next);
+  }
+
+  function clearFilters() {
+    const next = new URLSearchParams(displayedParams);
+    FILTER_PARAMS.forEach((name) => next.delete(name));
+    navigate(next);
+  }
+
+  const search = (
+    <ProfileBottleSearch
+      onEntitySelect={selectEntity}
+      onSubmit={(value) => setParam("query", value)}
+      query={displayedInput.query}
+      scope="tastings"
+      userId={user.id}
+    />
+  );
+  const filterProps = {
+    groups: filters,
+    mobileLabel: "Filter tastings",
+    onChange: setParam,
+    onClear: clearFilters,
+    query: displayedInput.query,
+    search,
+    total: statsQuery.data?.total,
+  };
+  const results = tastingQuery.data?.results ?? [];
+  const pending = isNavigating || tastingQuery.isFetching;
+
+  return (
+    <ProfileTastingsLayout
+      mobileFilters={<MemberListFilters {...filterProps} mode="mobile" />}
+      rail={<MemberListFilters {...filterProps} mode="rail" />}
+    >
+      <section aria-label={`${user.username}'s tastings`}>
+        <ListToolbar
+          count={results.length}
+          noun="tasting"
+          onSortChange={(value) => setParam("sort", value)}
+          onViewChange={(value) =>
+            setParam("view", value === "table" ? value : "")
+          }
+          pending={pending}
+          sort={displayedInput.sort}
+          sortOptions={sortOptions}
+          total={hasFilters ? undefined : user.stats.tastings}
+          view={view}
+        />
+        <div aria-busy={pending || undefined}>
+          {tastingQuery.isPending ? (
+            <LoadingList label="Loading member tastings" rows={4} />
+          ) : tastingQuery.error ? (
+            <SectionError
+              heading="Tastings are unavailable"
+              onRetry={() => void tastingQuery.refetch()}
+            >
+              The profile is still available. Try loading{" "}
+              {isCurrentUser ? "your" : "their"} tastings again.
+            </SectionError>
+          ) : !results.length ? (
+            hasFilters ? (
+              <EmptyState heading="No matching tastings">
+                No tastings match these filters.
+              </EmptyState>
+            ) : (
+              <EmptyState
+                action={
+                  isCurrentUser ? (
+                    <ButtonLink
+                      href="/addBottle?intent=tasting"
+                      size="sm"
+                      variant="accent"
+                    >
+                      Find a bottle
+                    </ButtonLink>
+                  ) : undefined
+                }
+                heading="No tastings yet"
+              >
+                {isCurrentUser
+                  ? "Your tasting record will appear here."
+                  : `${user.username} has not logged a tasting yet.`}
+              </EmptyState>
+            )
+          ) : view === "table" ? (
+            <TastingTable
+              caption={`${user.username}'s tastings`}
+              items={getTastingTableItems(results)}
+            />
+          ) : (
+            <CommunityFeed
+              ariaLabel={`${user.username}'s tastings`}
+              items={getTastingFeedItems(results)}
+              showActor={false}
+            />
+          )}
+        </div>
+        <CursorPager
+          ariaLabel={`${user.username} tasting pages`}
+          nextHref={getCursorHref(
+            pathname,
+            searchParams,
+            tastingQuery.data?.rel.nextCursor,
+          )}
+          page={input.cursor}
+          previousHref={getCursorHref(
+            pathname,
+            searchParams,
+            tastingQuery.data?.rel.prevCursor,
+          )}
+        />
+      </section>
+    </ProfileTastingsLayout>
+  );
+}
+
+function getFilterGroups({
+  entity,
+  params,
+  regions,
+  stats,
+}: {
+  entity?: { id: number; name?: string };
+  params: URLSearchParams;
+  regions?: RegionList;
+  stats?: TastingStats;
+}): MemberListFilterGroup[] {
+  const selected = (name: string, value: string) => params.get(name) === value;
+  const country = params.get("country");
+  const distillers = stats?.producers.distillers ?? [];
+  const groups: MemberListFilterGroup[] = [];
+
+  // A brand or producer picked from search may not be a top distillery.
+  if (entity && !distillers.some((item) => item.id === entity.id)) {
+    groups.push({
+      filters: [
+        {
+          label: entity.name ?? "Loading…",
+          selected: true,
+          value: String(entity.id),
+        },
+      ],
+      label: "Brand or producer",
+      name: "entity",
+    });
+  }
+
+  if (stats?.bands.total) {
+    groups.push({
+      filters: RATING_BANDS.toReversed().map((band) => ({
+        count: stats.bands[band.key],
+        label: `${band.label} · ${band.range}`,
+        selected: selected("rating", band.key),
+        value: band.key,
+      })),
+      label: "Rating",
+      name: "rating",
+    });
+  }
+
+  if (stats?.total) {
+    const { age } = stats;
+    groups.push({
+      filters: age.buckets.map((bucket) => ({
+        count: bucket.count,
+        label: bucket.id === "unstated" ? "No age stated" : bucket.label,
+        selected: selected("age", bucket.id),
+        value: bucket.id,
+      })),
+      label: "Age",
+      name: "age",
+      summary:
+        age.median !== null && age.oldest !== null
+          ? `Median ${formatYears(age.median)} · oldest ${formatYears(age.oldest)}`
+          : undefined,
+    });
+  }
+
+  const countries = getCountryCounts(regions);
+  if (countries.length) {
+    groups.push({
+      filters: countries
+        .filter((item, index) => index < 6 || item.slug === country)
+        .map((item) => ({
+          count: item.count,
+          label: item.name,
+          selected: selected("country", item.slug),
+          value: item.slug,
+        })),
+      label: "Countries",
+      name: "country",
+    });
+  }
+
+  const countryRegions = (regions?.results ?? []).filter(
+    (item) => item.region && item.country.slug === country,
+  );
+  if (countryRegions.length) {
+    groups.push({
+      filters: countryRegions.map((item) => ({
+        count: item.count,
+        label: item.region!.name,
+        selected: selected("region", item.region!.slug),
+        value: item.region!.slug,
+      })),
+      label: "Regions",
+      name: "region",
+    });
+  }
+
+  if (distillers.length) {
+    groups.push({
+      filters: distillers.map((item) => ({
+        count: item.count,
+        label: item.name,
+        selected: selected("entity", String(item.id)),
+        value: String(item.id),
+      })),
+      label: "Distilleries",
+      name: "entity",
+    });
+  }
+
+  return groups;
+}
+
+/**
+ * Country totals add up every region row for the country, which is the same
+ * set the country filter returns.
+ */
+function getCountryCounts(regions?: RegionList) {
+  const countries = new Map<
+    string,
+    { count: number; name: string; slug: string }
+  >();
+  for (const { count, country } of regions?.results ?? []) {
+    const current = countries.get(country.slug);
+    if (current) current.count += count;
+    else countries.set(country.slug, { ...country, count });
+  }
+  return Array.from(countries.values()).sort(
+    (left, right) =>
+      right.count - left.count || left.name.localeCompare(right.name),
+  );
+}
+
+function formatYears(value: number) {
+  return `${value.toLocaleString("en-US")} ${value === 1 ? "year" : "years"}`;
+}
