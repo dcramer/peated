@@ -14,7 +14,7 @@ import {
   type EntityAboutDocument,
   type EntityAboutStatus,
 } from "@peated/server/schemas/entityAbout";
-import { and, eq, inArray, isNotNull, sql } from "drizzle-orm";
+import { and, eq, inArray, isNotNull, ne, or, sql } from "drizzle-orm";
 
 import {
   ABOUT_FACT_FIELD_LIST,
@@ -113,6 +113,40 @@ export async function followMergedEntities(
 }
 
 const MAX_MERGE_HOPS = 10;
+
+/**
+ * Returns an Entity whose About page links the given Entity, directly or
+ * through an Entity merged into it, or `null`. Link rule (owner:
+ * docs/features/entity-about.md): a linked Entity cannot be deleted, so
+ * stored history never points at nothing.
+ */
+export async function findAboutPageLinking(
+  database: AnyDatabase,
+  entityId: number,
+) {
+  const ids = new Set([entityId]);
+  let pending = [entityId];
+  for (let hop = 0; pending.length && hop < MAX_MERGE_HOPS; hop += 1) {
+    const merged = await database
+      .select({ id: entityTombstones.entityId })
+      .from(entityTombstones)
+      .where(inArray(entityTombstones.newEntityId, pending));
+    pending = merged.map(({ id }) => id).filter((id) => !ids.has(id));
+    for (const id of pending) ids.add(id);
+  }
+  const links = [...ids].flatMap((id) =>
+    ["newOwnerId", "relatedEntityId"].map(
+      (key) =>
+        sql`${entityAbout.document} @> ${JSON.stringify({ events: [{ [key]: id }] })}::jsonb`,
+    ),
+  );
+  const [page] = await database
+    .select({ entityId: entityAbout.entityId })
+    .from(entityAbout)
+    .where(and(ne(entityAbout.entityId, entityId), or(...links)))
+    .limit(1);
+  return page?.entityId ?? null;
+}
 
 /**
  * Loads the Entities the documents link, following merged Entities to the
@@ -229,8 +263,8 @@ export async function saveEntityAbout(
       ),
     );
   }
-  // Rules for new writing compare against this baseline. A merge or the
-  // backfill moves stored items, so it passes the whole document.
+  // Rules for new writing compare against this baseline. The backfill
+  // copies stored items, so it passes the whole document.
   const baseline =
     unchangedFrom === undefined ? (stored?.document ?? null) : unchangedFrom;
   const reasons = findAboutWriteErrors(baseline, document);

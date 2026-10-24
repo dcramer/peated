@@ -16,6 +16,7 @@ import {
 import { serialize } from "@peated/server/serializers";
 import { EntityAboutSerializer } from "@peated/server/serializers/entityAbout";
 import { eq } from "drizzle-orm";
+import { isDeepStrictEqual } from "node:util";
 import { z } from "zod";
 
 const InputSchema = z.object({
@@ -54,14 +55,22 @@ export default procedure
     return await withAboutRouteErrors(async () => {
       const saved = await db.transaction(async (tx) => {
         const stored = await getEntityAbout(tx, entity.id);
+        const document = markPersonEdits(
+          stored?.document ?? null,
+          input.document,
+          new Date().toISOString(),
+        );
+        // An unchanged page saves nothing, so its version and check date stay.
+        if (
+          stored?.version === input.version &&
+          isDeepStrictEqual(document, stored.document)
+        ) {
+          return stored;
+        }
         const actor = await getUserActorForDatabase(tx, context.user);
         return await saveEntityAbout(tx, {
           entity,
-          document: markPersonEdits(
-            stored?.document ?? null,
-            input.document,
-            new Date().toISOString(),
-          ),
+          document,
           expectedVersion: input.version,
           actor,
           checkedOn: new Date().toISOString().slice(0, 10),

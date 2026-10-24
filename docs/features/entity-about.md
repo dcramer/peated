@@ -173,7 +173,9 @@ Links to a merged Entity are followed, through every later merge, to the
 Entity it became when the page or history is read, and an acquisition by an
 owner that was merged into the page's own Entity is hidden. A new link must
 name an Entity that exists or was merged; a deleted one is rejected. The
-backfill moves stored links as they are.
+backfill moves stored links as they are. An Entity that another page links,
+directly or through a merge, cannot be deleted; merge it instead, or remove the
+link first.
 
 ## Descriptions
 

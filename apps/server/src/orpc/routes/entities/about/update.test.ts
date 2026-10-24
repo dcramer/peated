@@ -80,6 +80,28 @@ describe("PUT /entities/:entity/about", () => {
     );
   });
 
+  test("saves nothing when the page is unchanged", async ({ fixtures }) => {
+    const user = await fixtures.User({ mod: true });
+    const entity = await fixtures.Entity();
+    await fixtures.EntityAbout({
+      entityId: entity.id,
+      events: [{ id: 1, writtenBy: "pipeline" }],
+    });
+    const { version, document } = await routerClient.entities.about.document(
+      { entity: entity.id },
+      { context: { user } },
+    );
+
+    const about = await routerClient.entities.about.update(
+      { entity: entity.id, version, document: document! },
+      { context: { user } },
+    );
+
+    expect(about.version).toBe(1);
+    const saved = await getEntityAbout(db, entity.id);
+    expect([saved?.version, saved?.checkedOn]).toEqual([1, null]);
+  });
+
   test("rejects a new fact without a source", async ({ fixtures }) => {
     const user = await fixtures.User({ mod: true });
     const entity = await fixtures.Entity();

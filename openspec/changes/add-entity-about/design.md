@@ -145,7 +145,8 @@ schema):
   - Writes check that the Entities exist.
   - Reads resolve merged Entities through `entity_tombstone`, so a merge
     never edits documents.
-  - A deleted Entity's links are dropped on read and logged.
+  - An Entity that a document links, directly or through a merge, cannot be
+    deleted; merge it instead.
   - Owners Peated has no Entity for are stored by name (`newOwnerName`). The
     pipeline never creates Entities.
 - **Concurrency:** writes send the version they read. A stale version is
