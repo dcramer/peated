@@ -249,9 +249,10 @@ that the pick is one of the stated values.
 3. **Retry.** A draft that fails gets one retry with the failure reasons.
    After that, the job logs the reason and saves nothing.
 4. **Save.**
-   - Link owners by name, then save the draft as the next version with a
-     version check and record the change. A page a moderator edited during
-     the run fails the check, and the job is retried from the new page.
+   - Keep only Entity links from search or the current page, then save the
+     draft as the next version with a version check and record the change.
+     When a moderator saves the page during the run, their version stays
+     and the job saves nothing.
    - Update the Entity description from the lead unless a person wrote it.
 
 The job writes as a new system actor, `aboutPipeline`. It never changes the

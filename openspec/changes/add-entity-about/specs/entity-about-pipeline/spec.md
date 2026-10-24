@@ -102,7 +102,8 @@ unsourced text.
 
 The job SHALL save a passing draft as the next version of the page, with a
 version check, and record it in change history. A page edited during the run
-SHALL fail the check, and the job SHALL be retried from the new page. The job
+SHALL fail the check, and the job SHALL keep the edited version and save
+nothing. The job
 SHALL NOT change an Entity's name, kind, owner, status, or Bottles.
 
 #### Scenario: Bad run
@@ -113,8 +114,8 @@ SHALL NOT change an Entity's name, kind, owner, status, or Bottles.
 #### Scenario: Edit during a run
 
 - **WHEN** a moderator saves the page while the job is running
-- **THEN** the job's save fails the version check and the job runs again
-  from the moderator's version
+- **THEN** the job's save fails the version check, the moderator's version
+  stays, and the job saves nothing
 
 ### Requirement: Notes and history guide the writer
 

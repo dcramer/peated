@@ -59,6 +59,15 @@ describe("keepVerifiedCitations", () => {
 
     expect(result.events).toEqual([]);
     expect(result.sources).toEqual([]);
+
+    // A quote is whole words from the page, not part of one.
+    expect(
+      keepVerifiedCitations(
+        draft({ events: [event(1, "1983", "ra closed in 1983.")] }),
+        [page],
+        null,
+      ).events,
+    ).toEqual([]);
   });
 
   test("drops a fact whose quote does not state its date", () => {

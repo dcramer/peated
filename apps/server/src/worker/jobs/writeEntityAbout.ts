@@ -26,6 +26,7 @@ import {
 } from "@peated/server/lib/entityAbout/checks";
 import { getPublishedLeadText } from "@peated/server/lib/entityAbout/publicAbout";
 import {
+  EntityAboutVersionError,
   EntityAboutWriteError,
   getEntityAbout,
   loadLinkedEntities,
@@ -191,8 +192,7 @@ export async function writeEntityAbout(
         tx,
         ABOUT_WRITER_SYSTEM_ACTOR_KEY,
       );
-      // A page edited during the run fails the version check; the job is
-      // retried from the new page.
+      // A page edited during the run fails the version check.
       const result = await saveEntityAbout(tx, {
         entity,
         document: accepted,
@@ -204,6 +204,9 @@ export async function writeEntityAbout(
       return result;
     });
   } catch (error) {
+    // A person saved the page during the run. Their version is newer, so it
+    // stays, and this run's draft is dropped.
+    if (error instanceof EntityAboutVersionError) return { status: "skipped" };
     // Save rules the draft checks already cover; this is a backstop.
     if (!(error instanceof EntityAboutWriteError)) throw error;
     return rejected(entity.id, error.reasons);

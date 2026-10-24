@@ -476,6 +476,29 @@ describe("writeEntityAbout", () => {
     expect(await getEntityAbout(db, entity.id)).toBeNull();
   });
 
+  test("keeps a moderator's edit saved during the run", async ({
+    fixtures,
+  }) => {
+    const mod = await fixtures.User({ mod: true });
+    const entity = await fixtures.Entity({ kind: "distillery" });
+    await fixtures.EntityAbout({ entityId: entity.id, events: [{ id: 1 }] });
+    const before = await getEntityAbout(db, entity.id);
+
+    const result = await writeEntityAbout(
+      { entityId: entity.id },
+      services(async () => {
+        await routerClient.entities.about.update(
+          { entity: entity.id, version: 1, document: before!.document },
+          { context: { user: mod } },
+        );
+        return { draft: goodDraft, pagesRead: [page] };
+      }),
+    );
+
+    expect(result).toEqual({ status: "skipped" });
+    expect((await getEntityAbout(db, entity.id))?.version).toBe(2);
+  });
+
   test("saves nothing from an empty draft", async ({ fixtures }) => {
     const entity = await fixtures.Entity({ kind: "distillery" });
     const empty: AboutDraft = {

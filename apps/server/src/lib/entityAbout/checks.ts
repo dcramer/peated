@@ -179,7 +179,7 @@ export function keepVerifiedCitations(
     const text = url ? pageText.get(url) : undefined;
     const quote = normalizeForQuote(citation.quote);
     const found =
-      Boolean(text && quote && text.includes(quote)) ||
+      Boolean(text && quote && ` ${text} `.includes(` ${quote} `)) ||
       Boolean(url && carried.has(`${url} ${quote}`));
     return (
       found &&

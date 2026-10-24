@@ -135,8 +135,8 @@ gets its retry. A draft with no sourced facts fails.
 
 A draft that fails gets one retry with the reasons. After that, the job saves
 nothing. A draft that passes is saved as the next version, with a version
-check: a page a moderator edited during the run fails it, and the job is
-retried from the new page. A bad run is undone by restoring an earlier
+check: when a moderator saves the page during the run, their version stays
+and the job saves nothing. A bad run is undone by restoring an earlier
 version from the change log.
 
 New owners are always stored by name. The writer links an owner, or another
