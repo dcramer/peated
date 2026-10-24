@@ -79,6 +79,12 @@ overrides:
   # @sentry/nextjs's bundler plugins accept any webpack 5 as a peer, and the
   # lockfile kept 5.93. Later releases fix DOM clobbering and buildHttp SSRF.
   webpack: ^5.104.1
+  # isomorphic-dompurify 4.6 wants jsdom 30, whose html-encoding-sniffer 7
+  # require()s an ES module. The Vercel functions could not load it, so every
+  # page that renders markdown on the server returned 500. jsdom 26 uses the
+  # CommonJS sniffer 4; isomorphic-dompurify only calls `new JSDOM("")`, and
+  # dompurify itself stays current.
+  'isomorphic-dompurify>jsdom': ^26.1.0
 
 minimumReleaseAgeExclude:
   - zod@4.5.4
