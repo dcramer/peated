@@ -23,8 +23,15 @@ import {
   checkMergedAbout,
   reviewAboutDraft,
 } from "@peated/server/lib/entityAbout/checks";
-import { isFactShown } from "@peated/server/lib/entityAbout/display";
-import { mergePipelineDraft } from "@peated/server/lib/entityAbout/document";
+import {
+  eventFactId,
+  isFactShown,
+  siteFactId,
+} from "@peated/server/lib/entityAbout/display";
+import {
+  getPersonCitedFactIds,
+  mergePipelineDraft,
+} from "@peated/server/lib/entityAbout/document";
 import { getPublishedLeadText } from "@peated/server/lib/entityAbout/publicAbout";
 import {
   EntityAboutWriteError,
@@ -141,17 +148,27 @@ function describeShownFacts(
   };
   const shown = (citations: readonly AboutCitation[]) =>
     isFactShown(citations, stored.sources);
+  // A fact a person's section cites stays whatever the draft says.
+  const kept = getPersonCitedFactIds(stored);
   return [
     ...stored.events
       .filter(
-        (event) => event.writtenBy === "pipeline" && shown(event.citations),
+        (event) =>
+          event.writtenBy === "pipeline" &&
+          shown(event.citations) &&
+          !kept.has(eventFactId(event.id)),
       )
       .map(
         (event) => describeEvent(event, ownerNames) + cited(event.citations),
       ),
     ...ABOUT_FACT_FIELD_LIST.flatMap((field) => {
       const fact = stored.siteFacts[field];
-      if (!fact || fact.writtenBy !== "pipeline" || !shown(fact.citations)) {
+      if (
+        !fact ||
+        fact.writtenBy !== "pipeline" ||
+        !shown(fact.citations) ||
+        kept.has(siteFactId(field))
+      ) {
         return [];
       }
       return [

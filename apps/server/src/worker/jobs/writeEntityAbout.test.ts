@@ -326,8 +326,19 @@ describe("writeEntityAbout", () => {
       entityId: entity.id,
       events: [
         { id: 1, kind: "opened", date: "1819", writtenBy: "pipeline" },
-        // A person's fact stays either way, so it is not listed.
+        // A person's fact stays either way, so it is not listed; nor is a
+        // pipeline fact a person's sentence cites.
         { id: 2, kind: "closed", date: "1983", writtenBy: "person" },
+        { id: 3, kind: "reopened", date: "2021", writtenBy: "pipeline" },
+      ],
+      sections: [
+        {
+          key: "lead",
+          heading: null,
+          eraEventId: null,
+          writtenBy: "person",
+          sentences: [{ text: "It reopened in 2021.", factIds: ["event:3"] }],
+        },
       ],
     });
     const run = services(async () => ({ draft: goodDraft, pagesRead: [page] }));

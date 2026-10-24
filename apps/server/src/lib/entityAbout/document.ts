@@ -372,6 +372,18 @@ function sameEvent(
   return sameText(keptDetail, draftDetail);
 }
 
+/** Facts a person's section cites; a pipeline run keeps them as they are. */
+export function getPersonCitedFactIds(document: EntityAboutDocument) {
+  return new Set(
+    document.sections
+      .filter((section) => section.writtenBy === "person")
+      .flatMap((section) => [
+        ...section.sentences.flatMap((sentence) => sentence.factIds),
+        ...(section.eraEventId ? [eventFactId(section.eraEventId)] : []),
+      ]),
+  );
+}
+
 /**
  * Merges a pipeline draft into the stored document. Pipeline rule (owner:
  * docs/features/entity-about.md): everything a person wrote stays, and so
@@ -389,12 +401,7 @@ export function mergePipelineDraft(
 ): EntityAboutDocument {
   const base = stored ?? EMPTY_ABOUT_DOCUMENT;
   const personSections = base.sections.filter((s) => s.writtenBy === "person");
-  const personFactIds = new Set(
-    personSections.flatMap((section) => [
-      ...section.sentences.flatMap((sentence) => sentence.factIds),
-      ...(section.eraEventId ? [eventFactId(section.eraEventId)] : []),
-    ]),
-  );
+  const personFactIds = getPersonCitedFactIds(base);
   const keptEvents = base.events.filter(
     (event) =>
       event.writtenBy === "person" ||

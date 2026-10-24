@@ -387,6 +387,29 @@ describe("checkConflictPicks", () => {
     ).toBeNull();
   });
 
+  test("matches whole numbers only", () => {
+    const stills = (value: number, quote: string) =>
+      keepVerifiedCitations(
+        draft({
+          siteFacts: {
+            washStills: {
+              value,
+              asOf: null,
+              writtenBy: "pipeline",
+              citations: [
+                { sourceId: "wp", statedValue: String(value), quote },
+              ],
+            },
+          },
+        }),
+        [{ ...page, text: `${page.text} ${quote}` }],
+      ).siteFacts.washStills;
+
+    // 46 is not stated by 46.5; a year after "c." is still a whole number.
+    expect(stills(46, "It holds 46.5 thousand litres.")).toBeUndefined();
+    expect(stills(1887, "The still dates from c.1887.")).toBeDefined();
+  });
+
   test("reads thousands separators and same-year spans", () => {
     expect(
       getDisagreement([

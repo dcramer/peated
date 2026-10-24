@@ -209,10 +209,11 @@ function stripThousands(value: string) {
   return value.replace(/(\d),(?=\d{3}\b)/g, "$1");
 }
 
+// A whole number: 46 is not inside 46.5 or 146, but 1887 is in "c.1887".
 function containsNumber(text: string, number: string) {
-  return new RegExp(`(?<![\\d.])${number.replace(".", "\\.")}(?![\\d])`).test(
-    stripThousands(text),
-  );
+  return new RegExp(
+    `(?<!\\d|\\d\\.)${number.replace(".", "\\.")}(?!\\d|\\.\\d)`,
+  ).test(stripThousands(text));
 }
 
 /**
