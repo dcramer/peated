@@ -3,6 +3,10 @@ import { entities } from "@peated/server/db/schema";
 import { getUserActorForDatabase } from "@peated/server/lib/actors";
 import { pruneSources } from "@peated/server/lib/entityAbout/document";
 import { editEntityHistory } from "@peated/server/lib/entityAbout/legacyEvents";
+import {
+  EntityAboutVersionError,
+  EntityAboutWriteError,
+} from "@peated/server/lib/entityAbout/store";
 import { procedure } from "@peated/server/orpc";
 import { requireMod } from "@peated/server/orpc/middleware";
 import { eq } from "drizzle-orm";
@@ -33,40 +37,52 @@ export default procedure
       .limit(1);
     if (!entity) throw errors.NOT_FOUND({ message: "History item not found." });
 
-    await db.transaction(async (tx) =>
-      editEntityHistory(tx, {
-        entity,
-        actor: await getUserActorForDatabase(tx, context.user),
-        edit: (document) => {
-          if (!document.events.some((event) => event.id === input.event)) {
-            throw errors.NOT_FOUND({ message: "History item not found." });
-          }
-          return pruneSources({
-            ...document,
-            events: document.events.filter((event) => event.id !== input.event),
-            // Sentences that cite the removed item go with it; a section
-            // about a removed era keeps its other text.
-            sections: document.sections.flatMap((section) => {
-              const sentences = section.sentences.filter(
-                (sentence) =>
-                  !sentence.factIds.includes(`event:${input.event}`),
-              );
-              if (!sentences.length) return [];
-              return [
-                {
-                  ...section,
-                  sentences,
-                  eraEventId:
-                    section.eraEventId === input.event
-                      ? null
-                      : section.eraEventId,
-                },
-              ];
-            }),
-          });
-        },
-      }),
-    );
+    try {
+      await db.transaction(async (tx) =>
+        editEntityHistory(tx, {
+          entity,
+          actor: await getUserActorForDatabase(tx, context.user),
+          edit: (document) => {
+            if (!document.events.some((event) => event.id === input.event)) {
+              throw errors.NOT_FOUND({ message: "History item not found." });
+            }
+            return pruneSources({
+              ...document,
+              events: document.events.filter(
+                (event) => event.id !== input.event,
+              ),
+              // Sentences that cite the removed item go with it; a section
+              // about a removed era keeps its other text.
+              sections: document.sections.flatMap((section) => {
+                const sentences = section.sentences.filter(
+                  (sentence) =>
+                    !sentence.factIds.includes(`event:${input.event}`),
+                );
+                if (!sentences.length) return [];
+                return [
+                  {
+                    ...section,
+                    sentences,
+                    eraEventId:
+                      section.eraEventId === input.event
+                        ? null
+                        : section.eraEventId,
+                  },
+                ];
+              }),
+            });
+          },
+        }),
+      );
+    } catch (error) {
+      if (error instanceof EntityAboutVersionError) {
+        throw errors.CONFLICT({ message: error.message });
+      }
+      if (error instanceof EntityAboutWriteError) {
+        throw errors.BAD_REQUEST({ message: error.reasons.join(" ") });
+      }
+      throw error;
+    }
 
     return {};
   });

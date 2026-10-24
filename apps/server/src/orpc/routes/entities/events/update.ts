@@ -28,6 +28,7 @@ const InputSchema = z.object({
   date: EntityEventInputFields.date.optional(),
   description: EntityEventInputFields.description,
   newOwnerId: EntityEventInputFields.newOwnerId,
+  newOwnerName: EntityEventInputFields.newOwnerName,
   sourceUrl: EntityEventInputFields.sourceUrl,
 });
 
@@ -76,6 +77,15 @@ export default procedure
                   : input.kind !== undefined && input.kind !== "acquired"
                     ? null
                     : legacy.newOwnerId,
+              // Keeps a name-only owner unless the edit sets an owner or
+              // changes the kind.
+              newOwnerName:
+                input.newOwnerName !== undefined
+                  ? input.newOwnerName
+                  : input.newOwnerId ||
+                      (input.kind !== undefined && input.kind !== "acquired")
+                    ? null
+                    : legacy.newOwnerName,
               sourceUrl:
                 input.sourceUrl !== undefined
                   ? input.sourceUrl
@@ -99,6 +109,7 @@ export default procedure
                 date: next.data.date,
                 description: next.data.description ?? null,
                 newOwnerId: next.data.newOwnerId ?? null,
+                newOwnerName: next.data.newOwnerName ?? null,
                 sourceUrl: next.data.sourceUrl ?? null,
               },
               new Date().toISOString(),

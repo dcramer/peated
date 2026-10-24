@@ -42,6 +42,34 @@ describe("PATCH /entities/:entity/events/:event", () => {
     ]);
   });
 
+  test("keeps an owner known only by name", async ({ fixtures }) => {
+    const user = await fixtures.User({ mod: true });
+    const entity = await fixtures.Entity();
+    await fixtures.EntityAbout({
+      entityId: entity.id,
+      events: [
+        {
+          id: 7,
+          kind: "acquired",
+          date: "1925",
+          newOwnerName: "Distillers Company",
+          writtenBy: "pipeline",
+        },
+      ],
+    });
+
+    const data = await routerClient.entities.events.update(
+      { entity: entity.id, event: 7, date: "1925-06" },
+      { context: { user } },
+    );
+
+    expect(data).toMatchObject({
+      date: "1925-06",
+      newOwnerId: null,
+      newOwnerName: "Distillers Company",
+    });
+  });
+
   test("validates the complete updated event", async ({ fixtures }) => {
     const user = await fixtures.User({ mod: true });
     const entity = await fixtures.Entity();
