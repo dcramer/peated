@@ -59,6 +59,7 @@ function classified(
     z.input<typeof BottleClassificationDecisionSchema>,
     "rationale" | "candidateBottleIds"
   >,
+  candidates: Array<{ bottleId: number }> = [],
 ) {
   return {
     result: BottleClassificationResultSchema.parse({
@@ -71,7 +72,10 @@ function classified(
       artifacts: {
         extractedIdentity: null,
         imageEvidence: null,
-        candidates: [],
+        candidates: candidates.map((candidate) => ({
+          fullName: `Candidate ${candidate.bottleId}`,
+          ...candidate,
+        })),
         searchEvidence: [],
         resolvedEntities: [],
       },
@@ -160,7 +164,9 @@ describe("identifyTastingDraft", () => {
       defaults.user,
       fixtures.SampleSquareImage,
     );
-    runReference.mockResolvedValue(classified(matchDecision(bottle.id)));
+    runReference.mockResolvedValue(
+      classified(matchDecision(bottle.id), [{ bottleId: bottle.id }]),
+    );
 
     await identifyTastingDraft(draft.id, services);
 
@@ -265,7 +271,7 @@ describe("identifyTastingDraft", () => {
         fixtures.SampleSquareImage,
         draft.id,
       );
-      return classified(matchDecision(bottle.id));
+      return classified(matchDecision(bottle.id), [{ bottleId: bottle.id }]);
     });
 
     await identifyTastingDraft(draft.id, services);
