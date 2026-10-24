@@ -85,6 +85,7 @@ describe("PATCH /entities/:entity/events/:event", () => {
 
     const about = await getEntityAbout(db, entity.id);
     expect(about?.document.events[0]?.writtenBy).toBe("pipeline");
+    expect(about?.version).toBe(1);
   });
 
   test("keeps an owner known only by name", async ({ fixtures }) => {

@@ -191,6 +191,8 @@ export async function editEntityHistory(
 ) {
   const stored = await getEntityAbout(tx, entity.id, { forUpdate: true });
   const document = edit(stored?.document ?? EMPTY_ABOUT_DOCUMENT);
+  // An edit that changes nothing saves nothing, so the version holds.
+  if (stored && document === stored.document) return stored;
   return await saveEntityAbout(tx, {
     entity,
     document,

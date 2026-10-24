@@ -87,7 +87,7 @@ links to the About page only when that page exists.
 - The legacy Entity history routes (`entities.events.*`) edit the same
   document. A new history item needs a source URL. Changing an item's date
   or kind keeps its sources but clears what they were quoted as stating. An
-  edit that changes nothing leaves the item as it was. These routes address
+  edit that changes nothing leaves the item as it was and saves nothing. These routes address
   items by ID, so the writer never gives a replaced item's ID to another
   fact.
 - The `writeEntityAbout` worker job writes as the `aboutPipeline` system
