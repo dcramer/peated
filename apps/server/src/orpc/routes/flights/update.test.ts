@@ -86,6 +86,38 @@ describe("PATCH /flights/:flight", () => {
     ).resolves.toMatchObject({ name: "Moderator edit" });
   });
 
+  test("admin can update another user's flight metadata and Bottles", async ({
+    fixtures,
+  }) => {
+    const admin = await fixtures.User({ admin: true, mod: false });
+    const bottle = await fixtures.Bottle();
+    const flight = await fixtures.Flight({ bottles: [] });
+
+    await routerClient.flights.update(
+      {
+        flight: flight.publicId,
+        name: "Admin edit",
+      },
+      { context: { user: admin } },
+    );
+    await routerClient.flights.update(
+      {
+        flight: flight.publicId,
+        bottles: [bottle.id],
+      },
+      { context: { user: admin } },
+    );
+
+    await expect(
+      db.query.flights.findFirst({ where: eq(flights.id, flight.id) }),
+    ).resolves.toMatchObject({ name: "Admin edit" });
+    const memberships = await db
+      .select({ bottleId: flightBottles.bottleId })
+      .from(flightBottles)
+      .where(eq(flightBottles.flightId, flight.id));
+    expect(memberships.map(({ bottleId }) => bottleId)).toEqual([bottle.id]);
+  });
+
   test("no changes returns the existing flight", async ({ fixtures }) => {
     const user = await fixtures.User({ mod: true });
     const flight = await fixtures.Flight();

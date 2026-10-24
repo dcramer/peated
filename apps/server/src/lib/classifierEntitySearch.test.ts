@@ -1,4 +1,5 @@
 import { EntityResolutionSchema } from "@peated/bottle-classifier/internal/types";
+import { EntityResolutionSchema as EntityClassifierResolutionSchema } from "@peated/entity-classifier";
 import { searchClassifierEntities } from "@peated/server/lib/classifierEntitySearch";
 
 describe("searchClassifierEntities", () => {
@@ -115,6 +116,13 @@ describe("searchClassifierEntities", () => {
         source: expect.arrayContaining(["contained"]),
       }),
     );
+    // Both classifiers read these results through their own schemas.
+    expect(
+      results.map((result) => EntityResolutionSchema.parse(result)),
+    ).toEqual(results);
+    expect(
+      results.map((result) => EntityClassifierResolutionSchema.parse(result)),
+    ).toEqual(results);
   });
 
   test("ranks the more specific contained producer name first", async ({
