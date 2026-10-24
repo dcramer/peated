@@ -1,3 +1,4 @@
+import { canModerate } from "@peated/server/lib/moderators";
 import { and, eq, inArray } from "drizzle-orm";
 import { type z } from "zod";
 import { serializer } from ".";
@@ -78,13 +79,13 @@ export const UserSerializer = serializer({
     }
     if (
       currentUser &&
-      (currentUser.admin || currentUser.mod || currentUser.id === item.id)
+      (canModerate(currentUser) || currentUser.id === item.id)
     ) {
       user.email = item.email;
       user.createdAt = item.createdAt.toISOString();
       user.verified = item.verified;
       user.admin = item.admin;
-      user.mod = item.admin || item.mod;
+      user.mod = canModerate(item);
       user.notifyComments = item.notifyComments ?? false;
       user.termsAcceptedAt = item.termsAcceptedAt?.toISOString();
       user.deletionScheduledAt = getDeletionScheduledAt(item)?.toISOString();

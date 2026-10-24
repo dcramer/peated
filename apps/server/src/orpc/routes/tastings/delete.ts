@@ -5,6 +5,7 @@ import {
   tastings,
   toasts,
 } from "@peated/server/db/schema";
+import { canModerate } from "@peated/server/lib/moderators";
 import { procedure } from "@peated/server/orpc";
 import {
   requireAuth,
@@ -39,11 +40,7 @@ export default procedure
       });
     }
 
-    if (
-      tasting.createdById !== context.user.id &&
-      !context.user.admin &&
-      !context.user.mod
-    ) {
+    if (tasting.createdById !== context.user.id && !canModerate(context.user)) {
       throw errors.FORBIDDEN({
         message: "Cannot delete another user's tasting.",
       });
@@ -64,8 +61,7 @@ export default procedure
       }
       if (
         lockedTasting.createdById !== context.user.id &&
-        !context.user.admin &&
-        !context.user.mod
+        !canModerate(context.user)
       ) {
         throw errors.FORBIDDEN({
           message: "Cannot delete another user's tasting.",

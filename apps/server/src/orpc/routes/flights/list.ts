@@ -1,5 +1,6 @@
 import { db } from "@peated/server/db";
 import { flights } from "@peated/server/db/schema";
+import { canModerate } from "@peated/server/lib/moderators";
 import { implement } from "@peated/server/orpc";
 import flightListContract from "@peated/server/orpc/contracts/flights/list";
 import { serialize } from "@peated/server/serializers";
@@ -18,7 +19,7 @@ export default implement(flightListContract).handler(async function ({
     where.push(ilike(flights.name, `%${query}%`));
   }
 
-  if ((context.user?.admin || context.user?.mod) && input.filter === "none") {
+  if (canModerate(context.user) && input.filter === "none") {
     // do nothing
   } else {
     if (context.user) {

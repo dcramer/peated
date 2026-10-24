@@ -49,6 +49,7 @@ import {
   updateLocationBottleCounts,
 } from "@peated/server/lib/locationBottleCounts";
 import { logError } from "@peated/server/lib/log";
+import { canModerate } from "@peated/server/lib/moderators";
 import { recomputeBottleGroupStatsInTransaction } from "@peated/server/lib/recomputeBottleGroupStats";
 import { recomputeBottleStatsInTransaction } from "@peated/server/lib/recomputeBottleStats";
 import type { Context } from "@peated/server/orpc/context";
@@ -1189,7 +1190,7 @@ export async function mergeBottles({
   destinationBottleId: number;
   context: Context;
 }): Promise<BottleMergeResult> {
-  if (!context.user?.admin && !context.user?.mod) {
+  if (!canModerate(context.user)) {
     throw new BottleMergeAuthorizationError();
   }
   validateMergeInput(sourceBottleId, destinationBottleId);

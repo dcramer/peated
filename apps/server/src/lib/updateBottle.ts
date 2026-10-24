@@ -65,6 +65,7 @@ import {
   updateLocationBottleCounts,
 } from "@peated/server/lib/locationBottleCounts";
 import { logError } from "@peated/server/lib/log";
+import { canModerate } from "@peated/server/lib/moderators";
 import type { Context } from "@peated/server/orpc/context";
 import { EntityChoiceInputSchema } from "@peated/server/schemas";
 import { pushUniqueJob } from "@peated/server/worker/dispatch";
@@ -1875,7 +1876,7 @@ export async function updateBottle({
   input: unknown;
   context: Context;
 }): Promise<BottleUpdateResult> {
-  if (!context.user?.admin && !context.user?.mod) {
+  if (!canModerate(context.user)) {
     throw new BottleUpdateAuthorizationError();
   }
   const actor = await getUserActor(context.user);

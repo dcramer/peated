@@ -1,4 +1,5 @@
 import { customOpenAPIOperation } from "@orpc/openapi";
+import { canModerate } from "@peated/server/lib/moderators";
 import { base } from "..";
 import type { Context } from "../context";
 
@@ -62,7 +63,7 @@ export const requireAdmin = customOpenAPIOperation(
 
 export const requireMod = customOpenAPIOperation(
   base.$context<Context>().middleware(({ context, next, errors }) => {
-    if (!context.user?.admin && !context.user?.mod) {
+    if (!canModerate(context.user)) {
       throw errors.UNAUTHORIZED();
     }
     return next({

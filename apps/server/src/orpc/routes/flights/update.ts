@@ -5,6 +5,7 @@ import {
   flightBottles,
   flights,
 } from "@peated/server/db/schema";
+import { canModerate } from "@peated/server/lib/moderators";
 import {
   ActiveBottleSelectionError,
   resolveActiveBottleIds,
@@ -75,8 +76,8 @@ export default procedure
         message: "Flight not found.",
       });
     }
-    const canModerate = context.user.admin || context.user.mod;
-    if (flight.createdById !== context.user.id && !canModerate) {
+    const isModerator = canModerate(context.user);
+    if (flight.createdById !== context.user.id && !isModerator) {
       throw errors.FORBIDDEN({
         message: "Cannot update another user's flight.",
       });
@@ -95,7 +96,7 @@ export default procedure
         .update(flights)
         .set(data)
         .where(
-          canModerate
+          isModerator
             ? eq(flights.id, flight.id)
             : and(
                 eq(flights.id, flight.id),
@@ -128,7 +129,7 @@ export default procedure
                 message: "Flight not found.",
               });
             }
-            if (currentFlight.createdById !== context.user.id && !canModerate) {
+            if (currentFlight.createdById !== context.user.id && !isModerator) {
               throw errors.FORBIDDEN({
                 message: "Cannot update another user's flight.",
               });

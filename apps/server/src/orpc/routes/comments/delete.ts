@@ -1,5 +1,6 @@
 import { db } from "@peated/server/db";
 import { comments, tastings } from "@peated/server/db/schema";
+import { canModerate } from "@peated/server/lib/moderators";
 import { deleteNotification } from "@peated/server/lib/notifications";
 import { closeOpenReportsForTarget } from "@peated/server/lib/reports";
 import { procedure } from "@peated/server/orpc";
@@ -54,11 +55,7 @@ export default procedure
       });
     }
 
-    if (
-      comment.createdById !== context.user.id &&
-      !context.user.admin &&
-      !context.user.mod
-    ) {
+    if (comment.createdById !== context.user.id && !canModerate(context.user)) {
       throw errors.FORBIDDEN({
         message: "Cannot delete another user's comment.",
       });

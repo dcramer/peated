@@ -1,3 +1,4 @@
+import { canModerate } from "@peated/server/lib/moderators";
 import {
   includesQuery,
   mockBottleFor,
@@ -22,7 +23,7 @@ export default mockOS.externalReviews.list.handler(
     const hasPublicScope =
       input.bottle !== undefined || input.sort === "recent";
     const requiresModerator = input.onlyUnknown || !hasPublicScope;
-    if (requiresModerator && !context.user?.admin && !context.user?.mod) {
+    if (requiresModerator && !canModerate(context.user)) {
       throw errors.BAD_REQUEST({
         message: "Must be a moderator to list all external reviews.",
       });
