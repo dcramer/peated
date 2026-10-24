@@ -22,10 +22,7 @@ import {
   getExactCaskCodeAnchor,
   getMarketedCaskCodeAnchor,
 } from "./exactCask";
-import {
-  exactEditionMarkersMatch,
-  getBottleFieldConflicts,
-} from "./fieldConflicts";
+import { compareBottleFields, getBottleFieldConflicts } from "./fieldConflicts";
 import { normalizeString } from "./normalize";
 import { normalizeObservation } from "./observation";
 import {
@@ -326,7 +323,7 @@ function stringListsOverlap(
   );
 }
 
-function proposedBottleNeedsMaterialTargetRepair({
+function proposedBottleHasKnownTargetConflict({
   target,
   proposedBottle,
 }: {
@@ -376,72 +373,7 @@ function proposedBottleNeedsMaterialTargetRepair({
     return true;
   }
 
-  if (
-    proposedBottle.statedAge !== null &&
-    target.statedAge !== proposedBottle.statedAge
-  ) {
-    return true;
-  }
-
-  if (
-    proposedBottle.edition &&
-    !exactEditionMarkersMatch(target.edition, proposedBottle.edition)
-  ) {
-    return true;
-  }
-
-  if (
-    proposedBottle.caskStrength !== null &&
-    target.caskStrength !== proposedBottle.caskStrength
-  ) {
-    return true;
-  }
-
-  if (
-    proposedBottle.singleCask !== null &&
-    target.singleCask !== proposedBottle.singleCask
-  ) {
-    return true;
-  }
-
-  if (proposedBottle.abv !== null && target.abv !== proposedBottle.abv) {
-    return true;
-  }
-
-  if (
-    proposedBottle.vintageYear !== null &&
-    target.vintageYear !== proposedBottle.vintageYear
-  ) {
-    return true;
-  }
-
-  if (
-    proposedBottle.releaseYear !== null &&
-    target.releaseYear !== proposedBottle.releaseYear
-  ) {
-    return true;
-  }
-
-  return false;
-}
-
-function proposedBottleHasKnownTargetConflict({
-  target,
-  proposedBottle,
-}: {
-  target: BottleCandidate;
-  proposedBottle: ProposedBottle;
-}): boolean {
-  return proposedBottleNeedsMaterialTargetRepair({
-    target,
-    proposedBottle: {
-      ...proposedBottle,
-      abv: target.abv === null ? null : proposedBottle.abv,
-      caskStrength:
-        target.caskStrength === null ? null : proposedBottle.caskStrength,
-      singleCask: target.singleCask === null ? null : proposedBottle.singleCask,
-    },
-  });
+  return compareBottleFields(proposedBottle, target).conflicts.length > 0;
 }
 
 function createNoMatchDecision({

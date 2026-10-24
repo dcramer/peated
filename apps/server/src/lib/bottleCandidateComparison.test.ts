@@ -31,6 +31,19 @@ describe("Bottle candidate evidence", () => {
     ).toEqual([field]);
   });
 
+  test("uses the matching rule for edition wording and a printed #", () => {
+    expect(
+      compareBottleCandidate(
+        { name: candidate.name, edition: "2017 Release", caskNumber: "#3771" },
+        { ...candidate, edition: "2017 Edition", caskNumber: "3771" },
+      ),
+    ).toEqual({
+      agreements: ["edition", "caskNumber"],
+      missing: [],
+      conflicts: [],
+    });
+  });
+
   test("unknown facts are missing evidence, not contradictions", () => {
     const result = compareBottleCandidate(
       { name: candidate.name, releaseYear: 2024, abv: 49.6 },

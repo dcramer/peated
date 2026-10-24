@@ -264,12 +264,16 @@ function buildAbvMatchInput({
   brand = "Example",
   candidateAbv,
   extractedAbv,
+  candidateEdition = null,
+  extractedEdition = null,
   source,
   webEvidence = "not_needed",
 }: {
   brand?: string;
   candidateAbv: number;
   extractedAbv: number;
+  candidateEdition?: string | null;
+  extractedEdition?: string | null;
   source: "image" | "text" | "structured" | null;
   webEvidence?: "supportive" | "conflicting" | "not_needed";
 }) {
@@ -280,6 +284,7 @@ function buildAbvMatchInput({
     brand,
     singleCask: null,
     abv: candidateAbv,
+    edition: candidateEdition,
   };
 
   return {
@@ -321,7 +326,7 @@ function buildAbvMatchInput({
         maturation: null,
         cask_number: null,
         outturn: null,
-        edition: null,
+        edition: extractedEdition,
       },
     }),
   };
@@ -1530,6 +1535,49 @@ describe("finalizeBottleReferenceClassification", () => {
       action: "match",
       matchedBottleId: 9901,
       confidenceBasis: { unresolvedRisks: [] },
+    });
+  });
+
+  test("keeps a Match whose edition differs only in wording without adding a risk", () => {
+    expect(
+      finalizeBottleReferenceClassification(
+        buildAbvMatchInput({
+          extractedAbv: 46,
+          candidateAbv: 46,
+          extractedEdition: "2017 Release",
+          candidateEdition: "2017 Edition",
+          source: "text",
+        }),
+      ),
+    ).toMatchObject({
+      action: "match",
+      matchedBottleId: 9901,
+      confidenceBasis: { unresolvedRisks: [] },
+    });
+  });
+
+  test("sends a Match whose edition has a different batch number to review", () => {
+    expect(
+      finalizeBottleReferenceClassification(
+        buildAbvMatchInput({
+          extractedAbv: 46,
+          candidateAbv: 46,
+          extractedEdition: "Batch 4",
+          candidateEdition: "Batch 3",
+          source: "text",
+        }),
+      ),
+    ).toMatchObject({
+      action: "match",
+      matchedBottleId: 9901,
+      confidenceBasis: {
+        unresolvedRisks: [
+          {
+            category: "trait_conflict",
+            note: "Extracted edition conflicts with the matched Bottle.",
+          },
+        ],
+      },
     });
   });
 

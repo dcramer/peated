@@ -13,8 +13,10 @@ full Bottle serialization. Responses retain the existing Bottle fields and add
 agreements, missing facts, and conflicts.
 
 The shared comparator orders release evidence before name similarity. Stored
-relationship IDs take precedence over names. Cask punctuation and small ABV
-differences remain conflicts. Missing facts are not contradictions. Creation
+relationship IDs take precedence over names. Typed fields use the one
+comparison the classifier and automatic matching use (see "Deterministic Code" in
+[Bottle Classifier](./bottle-classifier.md)). Missing facts are not
+contradictions. Creation
 candidates leave out a Bottle that shares none of the entered distilleries; a
 Bottle with no stored distillery stays. Maturation
 wording and outturn do not determine identity. Bottling year remains contextual

@@ -1,3 +1,7 @@
+import {
+  COMPARABLE_BOTTLE_FIELDS,
+  compareBottleFields,
+} from "@peated/bottle-classifier/fieldConflicts";
 import { BottleCandidateComparisonSchema } from "@peated/bottle-classifier/internal/types";
 import type { z } from "zod";
 import type {
@@ -5,22 +9,6 @@ import type {
   BottleCreateCandidateInput,
 } from "./bottleCreateCandidates";
 export { BottleCandidateComparisonSchema };
-
-const releaseFields = [
-  "category",
-  "edition",
-  "statedAge",
-  "noAgeStatement",
-  "abv",
-  "vintageYear",
-  "bottlingYear",
-  "releaseYear",
-  "releaseMonth",
-  "releaseDay",
-  "caskNumber",
-  "singleCask",
-  "caskStrength",
-] as const;
 
 export type BottleCandidateComparison = z.infer<
   typeof BottleCandidateComparisonSchema
@@ -44,26 +32,13 @@ export function compareBottleCandidate(
   input: BottleCreateCandidateInput,
   candidate: BottleCreateCandidate,
 ): BottleCandidateComparison {
+  // The classifier package owns the typed-field rule for every source.
+  const fields = compareBottleFields(input, candidate);
   const result: BottleCandidateComparison = {
-    agreements: [],
-    missing: [],
-    conflicts: [],
+    agreements: [...fields.agreements],
+    missing: [...fields.missing],
+    conflicts: [...fields.conflicts],
   };
-  for (const key of releaseFields) {
-    const expected = input[key];
-    if (expected == null) continue;
-    const actual = candidate[key];
-    if (actual == null) result.missing.push(key);
-    else {
-      // Bottle search owns this rule: punctuation in cask codes and small ABV
-      // differences remain differences. Retrieval tolerance is not agreement.
-      const equal =
-        key === "category" || key === "edition" || key === "caskNumber"
-          ? normalized(String(expected)) === normalized(String(actual))
-          : expected === actual;
-      result[equal ? "agreements" : "conflicts"].push(key);
-    }
-  }
   for (const key of ["brand", "bottler", "series"] as const) {
     const expected = input[key];
     if (!expected) continue;
@@ -95,7 +70,7 @@ export function orderBottleCandidateComparisons(
   left: BottleCandidateComparison,
   right: BottleCandidateComparison,
 ) {
-  const releases = new Set<string>(releaseFields);
+  const releases = new Set<string>(COMPARABLE_BOTTLE_FIELDS);
   const count = (fields: readonly string[]) =>
     fields.filter((f) => releases.has(f)).length;
   return (
