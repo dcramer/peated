@@ -135,7 +135,7 @@ describe("keepVerifiedCitations", () => {
   });
 
   test("drops an owner name no quote states", () => {
-    const owned = (newOwnerName: string) =>
+    const owned = (newOwnerName: string, quote: string) =>
       keepVerifiedCitations(
         draft({
           events: [
@@ -144,22 +144,24 @@ describe("keepVerifiedCitations", () => {
               kind: "acquired",
               date: "2021",
               newOwnerName,
-              citations: [
-                {
-                  sourceId: "wp",
-                  statedValue: "2021",
-                  quote: "It was rebuilt in 2021 after 38 years.",
-                },
-              ],
+              citations: [{ sourceId: "wp", statedValue: "2021", quote }],
             },
           ],
         }),
-        [{ ...page, text: `${page.text} Diageo rebuilt Brora.` }],
+        [
+          {
+            ...page,
+            text: `${page.text} Diageo rebuilt Brora. Campbell bought it in 2021.`,
+          },
+        ],
         null,
       ).events.length;
 
     // The quote states the year, not who bought it.
-    expect(owned("Diageo")).toBe(0);
+    expect(owned("Diageo", "It was rebuilt in 2021 after 38 years.")).toBe(0);
+    // A name must be whole words: "Campbell" does not state "Bell".
+    expect(owned("Campbell", "Campbell bought it in 2021.")).toBe(1);
+    expect(owned("Bell", "Campbell bought it in 2021.")).toBe(0);
   });
 
   test("needs one quote to state a name", () => {

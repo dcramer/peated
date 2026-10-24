@@ -63,7 +63,8 @@ function quotesState(quotes: readonly string[], value: string) {
   // or the whole phrase.
   const text = normalizeForQuote(quotes.join(" "));
   const phrase = normalizeForQuote(checked);
-  if (text.includes(phrase)) return true;
+  // Whole words only: "Campbell" does not state "Bell".
+  if (` ${text} `.includes(` ${phrase} `)) return true;
   const words = phrase
     .split(" ")
     .filter(
