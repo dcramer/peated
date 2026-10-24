@@ -36,6 +36,7 @@ import {
 import {
   getEntityAbout,
   saveEntityAbout,
+  setEntityAboutStatus,
 } from "@peated/server/lib/entityAbout/store";
 import { moveEntityAliases } from "@peated/server/lib/entityAliases";
 import {
@@ -1050,6 +1051,15 @@ async function mergeEntityAbout(
     // Moving history is not new writing; legacy items keep their state.
     unchangedFrom: document,
   });
+  // A merge never reveals a page a moderator hid. An existing destination
+  // page keeps its own status.
+  if (!destination && sources.some((source) => source.status === "hidden")) {
+    await setEntityAboutStatus(tx, {
+      entity: toEntity,
+      status: "hidden",
+      actor,
+    });
+  }
 }
 
 export default async function mergeEntity(rawInput: JobPayload) {
