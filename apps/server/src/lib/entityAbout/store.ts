@@ -13,7 +13,7 @@ import {
   type EntityAboutDocument,
   type EntityAboutStatus,
 } from "@peated/server/schemas/entityAbout";
-import { and, eq, inArray, sql } from "drizzle-orm";
+import { and, eq, inArray, isNotNull, sql } from "drizzle-orm";
 
 import {
   ABOUT_FACT_FIELD_LIST,
@@ -101,19 +101,27 @@ export async function followMergedEntities(
   return target;
 }
 
-/** Returns Entity IDs the document links that no longer exist or merged. */
+/**
+ * Returns Entity IDs the document newly links that do not exist. A merged
+ * Entity counts as existing, since reads follow it to the one it became; a
+ * deleted one does not. Links already stored are not checked again, so an
+ * Entity deleted later does not block every save of the page.
+ */
 async function findMissingLinkedEntities(
   database: AnyDatabase,
   document: EntityAboutDocument,
+  stored: EntityAboutDocument | null,
 ) {
-  const ids = new Set<number>();
-  for (const event of document.events) {
-    if (event.relatedEntityId) ids.add(event.relatedEntityId);
-    if (event.newOwnerId) ids.add(event.newOwnerId);
-  }
-  if (!ids.size) return [];
-  const idList = [...ids];
-  const [found, tombstoned] = await Promise.all([
+  const linkedIds = (doc: EntityAboutDocument | null) =>
+    (doc?.events ?? []).flatMap((event) =>
+      [event.relatedEntityId, event.newOwnerId].filter((id) => id !== null),
+    );
+  const before = new Set(linkedIds(stored));
+  const idList = [...new Set(linkedIds(document))].filter(
+    (id) => !before.has(id),
+  );
+  if (!idList.length) return [];
+  const [found, merged] = await Promise.all([
     database
       .select({ id: entities.id })
       .from(entities)
@@ -121,9 +129,14 @@ async function findMissingLinkedEntities(
     database
       .select({ id: entityTombstones.entityId })
       .from(entityTombstones)
-      .where(inArray(entityTombstones.entityId, idList)),
+      .where(
+        and(
+          inArray(entityTombstones.entityId, idList),
+          isNotNull(entityTombstones.newEntityId),
+        ),
+      ),
   ]);
-  const known = new Set([...found, ...tombstoned].map((row) => row.id));
+  const known = new Set([...found, ...merged].map((row) => row.id));
   return idList.filter((id) => !known.has(id));
 }
 
@@ -181,7 +194,11 @@ export async function saveEntityAbout(
       reasons.push(`Site fact ${field} does not apply to a ${entity.kind}.`);
     }
   }
-  const missing = await findMissingLinkedEntities(tx, document);
+  const missing = await findMissingLinkedEntities(
+    tx,
+    document,
+    stored?.document ?? null,
+  );
   for (const id of missing) reasons.push(`Linked entity ${id} does not exist.`);
   if (reasons.length) {
     throw new EntityAboutWriteError(
