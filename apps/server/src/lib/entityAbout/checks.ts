@@ -13,6 +13,7 @@ import {
 import { findBannedPhrases } from "./bannedPhrases";
 import {
   eventFactId,
+  getDateDisagreement,
   getDisagreement,
   getShownFactIds,
   ISO_DATE_PATTERN,
@@ -334,7 +335,7 @@ export function checkMergedAbout(
 export function checkConflictPicks(document: EntityAboutDocument) {
   const errors: string[] = [];
   for (const event of document.events) {
-    const disagreement = getDisagreement(event.citations);
+    const disagreement = getDateDisagreement(event.citations);
     if (!disagreement) continue;
     const stored = event.endDate
       ? `${event.date}–${event.endDate}`

@@ -85,6 +85,21 @@ export function getDisagreement(citations: readonly AboutCitation[]) {
   return conflicting ? { values: [...byValue.values()] } : null;
 }
 
+/**
+ * The disagreement on an event's date. A source may state a name or text
+ * for an event instead of a date; only dates and ranges can disagree with
+ * the stored date.
+ */
+export function getDateDisagreement(citations: readonly AboutCitation[]) {
+  return getDisagreement(
+    citations.filter(
+      (citation) =>
+        citation.statedValue &&
+        parseDates(normalizeStatedValue(citation.statedValue)),
+    ),
+  );
+}
+
 export function eventFactId(eventId: number) {
   return `event:${eventId}`;
 }

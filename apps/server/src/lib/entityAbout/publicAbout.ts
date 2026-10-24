@@ -8,6 +8,7 @@ import type {
 import { ABOUT_FACT_FIELD_LIST, ABOUT_FACT_FIELDS } from "./aboutFactFields";
 import {
   eventFactId,
+  getDateDisagreement,
   getDisagreement,
   getFactCitations,
   getShownFactIds,
@@ -86,7 +87,7 @@ export function toPublicEntityAbout(
         : null,
       newOwnerName: event.newOwnerName,
       citations: publicCitations(event.citations),
-      disagreement: getDisagreement(event.citations),
+      disagreement: getDateDisagreement(event.citations),
     }));
 
   const siteFacts = ABOUT_FACT_FIELD_LIST.flatMap((field) => {

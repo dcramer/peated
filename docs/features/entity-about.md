@@ -44,7 +44,8 @@ nothing stored can go stale:
 - When sources state different values, the page shows the chosen value and a
   "Sources disagree" note with each value and its sources. Values where one is
   a more exact form of the other, such as `1983` and `1983-03`, agree. Ranges
-  such as `1969–1973` agree when their starts and ends do.
+  such as `1969–1973` agree when their starts and ends do. For history, only
+  stated dates count; a source that states a name instead does not disagree.
 - A sentence that rests on a hidden fact is left out.
 - Quotes stay private. The page lists sources and the date the page was last
   checked, and says nothing else about how the text was written.
