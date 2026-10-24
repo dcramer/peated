@@ -182,10 +182,11 @@ export async function saveEntityAbout(
       ),
     );
   }
-  const reasons = findAboutWriteErrors(
-    unchangedFrom === undefined ? (stored?.document ?? null) : unchangedFrom,
-    document,
-  );
+  // Rules for new writing compare against this baseline. A merge or the
+  // backfill moves stored items, so it passes the whole document.
+  const baseline =
+    unchangedFrom === undefined ? (stored?.document ?? null) : unchangedFrom;
+  const reasons = findAboutWriteErrors(baseline, document);
   for (const field of ABOUT_FACT_FIELD_LIST) {
     if (
       document.siteFacts[field] &&
@@ -194,11 +195,7 @@ export async function saveEntityAbout(
       reasons.push(`Site fact ${field} does not apply to a ${entity.kind}.`);
     }
   }
-  const missing = await findMissingLinkedEntities(
-    tx,
-    document,
-    stored?.document ?? null,
-  );
+  const missing = await findMissingLinkedEntities(tx, document, baseline);
   for (const id of missing) reasons.push(`Linked entity ${id} does not exist.`);
   if (reasons.length) {
     throw new EntityAboutWriteError(

@@ -305,6 +305,29 @@ test("removes a self-acquisition when the merged Entity has no About page", asyn
   expect(about?.document.events.map(({ kind }) => kind)).toEqual(["opened"]);
 });
 
+test("moves history that links a deleted Entity", async ({ fixtures }) => {
+  const source = await fixtures.Entity({ kind: "distillery" });
+  const destination = await fixtures.Entity({ kind: "distillery" });
+  // A deleted Entity leaves a tombstone with no replacement.
+  await db
+    .insert(entityTombstones)
+    .values({ entityId: 987_655, newEntityId: null });
+  await fixtures.EntityAbout({
+    entityId: source.id,
+    events: [{ id: 1, kind: "acquired", date: "1925", newOwnerId: 987_655 }],
+  });
+
+  await mergeEntity({
+    fromEntityIds: [source.id],
+    toEntityId: destination.id,
+  });
+
+  const about = await getEntityAbout(db, destination.id);
+  expect(about?.document.events.map(({ newOwnerId }) => newOwnerId)).toEqual([
+    987_655,
+  ]);
+});
+
 test("drops site facts the merge target cannot have", async ({ fixtures }) => {
   const source = await fixtures.Entity({ kind: "distillery" });
   const destination = await fixtures.Entity({ kind: "brand" });
