@@ -1,5 +1,5 @@
 import { db } from "@peated/server/db";
-import { entities, entityTombstones } from "@peated/server/db/schema";
+import { entities } from "@peated/server/db/schema";
 import { getUserActor } from "@peated/server/lib/actors";
 import {
   getPronunciationAudioUrl,
@@ -27,30 +27,6 @@ describe("DELETE /entities/:entity", () => {
       .from(entities)
       .where(eq(entities.id, entity.id));
     expect(newEntity).toBeUndefined();
-  });
-
-  test("rejects an entity another About page links", async ({ fixtures }) => {
-    const user = await fixtures.User({ admin: true });
-    const owner = await fixtures.Entity();
-    const merged = await fixtures.Entity();
-    await db
-      .insert(entityTombstones)
-      .values({ entityId: merged.id, newEntityId: owner.id });
-    await fixtures.EntityAbout({
-      events: [
-        { id: 1, kind: "acquired", date: "1925", newOwnerId: merged.id },
-      ],
-    });
-
-    const err = await waitError(() =>
-      routerClient.entities.delete({ entity: owner.id }, { context: { user } }),
-    );
-    expect(err.message).toContain("links this entity");
-    const [kept] = await db
-      .select()
-      .from(entities)
-      .where(eq(entities.id, owner.id));
-    expect(kept).toBeDefined();
   });
 
   test("removes the Entity's pronunciation audio", async ({ fixtures }) => {

@@ -10,7 +10,7 @@ describe.each([
   ["Johnnie Walker", JOHNNIE_WALKER_ABOUT_EXAMPLE],
 ])("%s About example", (_name, example) => {
   test("is a valid document", () => {
-    expect(findAboutWriteErrors(null, example)).toEqual([]);
+    expect(findAboutWriteErrors(example)).toEqual([]);
   });
 
   test("passes the prose checks", () => {

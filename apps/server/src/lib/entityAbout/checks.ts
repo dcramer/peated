@@ -15,13 +15,13 @@ import {
   eventFactId,
   getDateDisagreement,
   getDisagreement,
+  getFactCitations,
   getShownFactIds,
   ISO_DATE_PATTERN,
   siteFactId,
   valuesAgree,
 } from "./display";
 import {
-  countShownFacts,
   findAboutWriteErrors,
   normalizeSourceUrl,
   pruneSources,
@@ -76,15 +76,17 @@ function quotesState(quotes: readonly string[], value: string) {
 }
 
 /**
- * Evidence rule (owner: docs/features/entity-about.md): a pipeline citation
- * stands only when its quote appears on a page read in the same run and
- * states the citation's value. A fact stands only when a kept quote states
- * its date (or value): the model's own fields are never the evidence. Facts
- * left without citations are dropped, then unused sources.
+ * Evidence rule (owner: docs/features/entity-about.md): a citation stands
+ * only when its quote appears on a page read in the same run, or is the same
+ * quote from the same page as one the current page already has, and states
+ * the citation's value. A fact stands only when a kept quote states its date
+ * (or value): the model's own fields are never the evidence. Facts left
+ * without citations are dropped, then unused sources.
  */
 export function keepVerifiedCitations(
   draft: EntityAboutDocument,
   pages: readonly AboutPageRead[],
+  current: EntityAboutDocument | null,
 ): EntityAboutDocument {
   const pageText = new Map<string, string>();
   for (const page of pages) {
@@ -118,17 +120,33 @@ export function keepVerifiedCitations(
       published.get(citation.sourceId) ?? "",
     ]);
 
+  const quoteKey = (url: string, quote: string) =>
+    `${normalizeSourceUrl(url)} ${normalizeForQuote(quote)}`;
+  const currentUrls = new Map(
+    (current?.sources ?? []).map((source) => [source.id, source.url]),
+  );
+  const carried = new Set(
+    [...(current ? getFactCitations(current).values() : [])].flatMap(
+      (citations) =>
+        citations.flatMap((citation) => {
+          const url = currentUrls.get(citation.sourceId);
+          return url && citation.quote ? [quoteKey(url, citation.quote)] : [];
+        }),
+    ),
+  );
+
   const isVerified = (citation: AboutCitation) => {
     if (!citation.quote) return false;
     const url = sourceUrls.get(citation.sourceId);
     const text = url ? pageText.get(url) : undefined;
     const quote = normalizeForQuote(citation.quote);
-    return Boolean(
-      text &&
-      quote &&
-      text.includes(quote) &&
+    const found =
+      Boolean(text && quote && text.includes(quote)) ||
+      Boolean(url && carried.has(`${url} ${quote}`));
+    return (
+      found &&
       (!citation.statedValue ||
-        quotesState(quotesOf([citation]), citation.statedValue)),
+        quotesState(quotesOf([citation]), citation.statedValue))
     );
   };
   const events = draft.events
@@ -218,7 +236,7 @@ function containsNumber(text: string, number: string) {
 }
 
 /**
- * Checks pipeline prose against the facts it cites. Each check compares exact
+ * Checks prose against the facts it cites. Each check compares exact
  * text; tone and meaning are not judged here.
  */
 export function checkAboutProse(document: EntityAboutDocument) {
@@ -296,71 +314,6 @@ function checkSentence(
 }
 
 /**
- * Returns problems an edit adds to the pipeline's shown sentences, such as a
- * year its cited fact no longer states. Write rule (owner:
- * docs/features/entity-about.md): a person who changes a fact also fixes the
- * sentences that state it. Problems already stored do not block an edit, and
- * a sentence that cites a hidden fact is not shown, so it is not checked.
- */
-export function findStaleSentences(
-  before: EntityAboutDocument | null,
-  after: EntityAboutDocument,
-) {
-  const errorsOf = (document: EntityAboutDocument) => {
-    const shown = getShownFactIds(document);
-    const factText = factSearchText(document);
-    return document.sections
-      .filter((section) => section.writtenBy === "pipeline")
-      .flatMap((section) =>
-        section.sentences
-          .filter((sentence) => sentence.factIds.every((id) => shown.has(id)))
-          .flatMap((sentence) =>
-            checkSentence(section, sentence, shown, factText),
-          ),
-      );
-  };
-  const known = new Set(before ? errorsOf(before) : []);
-  return errorsOf(after).filter((error) => !known.has(error));
-}
-
-/**
- * Checks a merged document before the pipeline saves it. Pipeline rule
- * (owner: docs/features/entity-about.md): the pipeline's sentences must still
- * match the facts they cite after a person's values win the merge, and a run
- * never leaves the page with fewer shown facts or without its lead. Counts,
- * not IDs, because a run renumbers the pipeline's events.
- */
-export function checkMergedAbout(
-  stored: EntityAboutDocument | null,
-  merged: EntityAboutDocument,
-  ownerNames: ReadonlyMap<number, string>,
-) {
-  const shown = getShownFactIds(merged);
-  const factText = factSearchText(merged);
-  const errors = merged.sections
-    .filter((section) => section.writtenBy === "pipeline")
-    .flatMap((section) =>
-      section.sentences.flatMap((sentence) =>
-        checkSentence(section, sentence, shown, factText),
-      ),
-    );
-  const lost = stored
-    ? countShownFacts(stored, ownerNames) - countShownFacts(merged, ownerNames)
-    : 0;
-  if (lost > 0) {
-    errors.push(`The draft would show ${lost} fewer facts than the page does.`);
-  }
-  const hasLead = (document: EntityAboutDocument) =>
-    document.sections.some(
-      (section) => section.key === "lead" && section.sentences.length,
-    );
-  if (stored && hasLead(stored) && !hasLead(merged)) {
-    errors.push("The draft would remove the page's lead.");
-  }
-  return errors;
-}
-
-/**
  * When sources disagree, the stored value must be one the sources state.
  * Dates may be stated more precisely than they are stored, so a stored year
  * matches a stated full date in that year.
@@ -411,8 +364,9 @@ export function reviewAboutDraft(
   draft: EntityAboutDocument,
   pages: readonly AboutPageRead[],
   kind: EntityKind,
+  current: EntityAboutDocument | null,
 ) {
-  const verified = keepVerifiedCitations(draft, pages);
+  const verified = keepVerifiedCitations(draft, pages, current);
   const siteFacts: EntityAboutDocument["siteFacts"] = {};
   for (const field of ABOUT_FACT_FIELD_LIST) {
     const fact = verified.siteFacts[field];
@@ -428,6 +382,6 @@ export function reviewAboutDraft(
   }
   // The save rules repeat some checks above, so they run last to keep each
   // reason listed once.
-  if (!errors.length) errors.push(...findAboutWriteErrors(null, document));
+  if (!errors.length) errors.push(...findAboutWriteErrors(document));
   return { document, errors };
 }

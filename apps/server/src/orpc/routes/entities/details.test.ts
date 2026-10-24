@@ -30,17 +30,23 @@ describe("GET /entities/:entity", () => {
       value: 2,
       asOf: null,
       citations: [{ sourceId: "s1", statedValue: "2", quote: null }],
-      writtenBy: "person" as const,
     };
     const document = (newOwnerId: number) => ({
-      events: [{ id: 1, kind: "acquired" as const, date: "1925", newOwnerId }],
+      events: [
+        {
+          id: 1,
+          kind: "acquired" as const,
+          date: "1925",
+          newOwnerId,
+          newOwnerName: "DCL",
+        },
+      ],
       siteFacts: { washStills: stills, spiritStills: stills },
       sections: [
         {
           key: "lead",
           heading: null,
           eraEventId: null,
-          writtenBy: "person" as const,
           sentences: [{ text: "DCL bought it in 1925.", factIds: ["event:1"] }],
         },
       ],

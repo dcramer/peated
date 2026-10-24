@@ -1,15 +1,20 @@
 import { relations } from "drizzle-orm";
 import {
   bigint,
+  bigserial,
   date,
+  index,
   integer,
   jsonb,
   pgEnum,
   pgTable,
   smallint,
+  text,
   timestamp,
+  varchar,
 } from "drizzle-orm/pg-core";
 
+import { actors } from "./actors";
 import { entities } from "./entities";
 
 export const entityAboutStatusEnum = pgEnum("entity_about_status", [
@@ -41,3 +46,24 @@ export const entityAboutRelations = relations(entityAbout, ({ one }) => ({
 }));
 
 export type EntityAboutRecord = typeof entityAbout.$inferSelect;
+
+// Notes a moderator keeps for an Entity's About page. Every writer run reads
+// them; they guide the writer but are never cited on the page.
+export const entityAboutNotes = pgTable(
+  "entity_about_note",
+  {
+    id: bigserial("id", { mode: "number" }).primaryKey(),
+    entityId: bigint("entity_id", { mode: "number" })
+      .references(() => entities.id, { onDelete: "cascade" })
+      .notNull(),
+    text: varchar("text", { length: 500 }).notNull(),
+    sourceUrl: text("source_url"),
+    createdByActorId: bigint("created_by_actor_id", { mode: "number" })
+      .references(() => actors.id)
+      .notNull(),
+    createdAt: timestamp("created_at").defaultNow().notNull(),
+  },
+  (table) => [index("entity_about_note_entity_idx").on(table.entityId)],
+);
+
+export type EntityAboutNote = typeof entityAboutNotes.$inferSelect;

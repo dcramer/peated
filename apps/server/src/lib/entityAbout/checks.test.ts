@@ -30,7 +30,6 @@ function event(id: number, date: string, quote: string) {
     id,
     kind: "closed" as const,
     date,
-    writtenBy: "pipeline" as const,
     citations: [{ sourceId: "wp", statedValue: date, quote }],
   };
 }
@@ -45,6 +44,7 @@ describe("keepVerifiedCitations", () => {
     const result = keepVerifiedCitations(
       draft({ events: [event(1, "1983", "Brora closed in 1983.")] }),
       [page],
+      null,
     );
 
     expect(result.events).toHaveLength(1);
@@ -54,6 +54,7 @@ describe("keepVerifiedCitations", () => {
     const result = keepVerifiedCitations(
       draft({ events: [event(1, "1985", "Brora closed in 1985.")] }),
       [page],
+      null,
     );
 
     expect(result.events).toEqual([]);
@@ -80,6 +81,7 @@ describe("keepVerifiedCitations", () => {
         ],
       }),
       [page],
+      null,
     );
 
     expect(result.events).toEqual([]);
@@ -98,6 +100,7 @@ describe("keepVerifiedCitations", () => {
           ],
         }),
         [page],
+        null,
       ).events.length;
 
     expect(withText("Brora was rebuilt after 38 years.")).toBe(1);
@@ -116,7 +119,6 @@ describe("keepVerifiedCitations", () => {
               kind: "generic",
               date,
               text: "Brora closed.",
-              writtenBy: "pipeline",
               citations: [
                 { sourceId: "wp", statedValue: null, quote: "Brora closed" },
               ],
@@ -124,6 +126,7 @@ describe("keepVerifiedCitations", () => {
           ],
         }),
         [page],
+        null,
       ).events.length;
 
     // 2021 is on the page; 2024 is not, so a claimed 2024 date is no evidence.
@@ -141,7 +144,6 @@ describe("keepVerifiedCitations", () => {
               kind: "acquired",
               date: "2021",
               newOwnerName,
-              writtenBy: "pipeline",
               citations: [
                 {
                   sourceId: "wp",
@@ -153,6 +155,7 @@ describe("keepVerifiedCitations", () => {
           ],
         }),
         [{ ...page, text: `${page.text} Diageo rebuilt Brora.` }],
+        null,
       ).events.length;
 
     // The quote states the year, not who bought it.
@@ -169,7 +172,6 @@ describe("keepVerifiedCitations", () => {
               kind: "renamed",
               date: "1983",
               name,
-              writtenBy: "pipeline",
               citations: quotes.map((quote) => ({
                 sourceId: "wp",
                 statedValue: "1983",
@@ -184,6 +186,7 @@ describe("keepVerifiedCitations", () => {
             text: `${page.text} Clynelish opened in 1983. Brora Mill closed in 1983.`,
           },
         ],
+        null,
       ).events.length;
 
     // "Clynelish Mill" is built from two quotes; neither states it.
@@ -202,9 +205,36 @@ describe("keepVerifiedCitations", () => {
     const result = keepVerifiedCitations(
       draft({ events: [event(1, "2021", "rebuilt in 2021, after 38 years")] }),
       [page],
+      null,
     );
 
     expect(result.events).toHaveLength(1);
+  });
+});
+
+describe("keepVerifiedCitations with the current page", () => {
+  test("keeps a quote the current page already has without a read", () => {
+    const current = draft({
+      events: [event(1, "1983", "Brora closed in 1983.")],
+    });
+
+    const result = keepVerifiedCitations(current, [], current);
+
+    expect(result.events).toHaveLength(1);
+  });
+
+  test("still checks a changed quote against the pages read", () => {
+    const current = draft({
+      events: [event(1, "1983", "Brora closed in 1983.")],
+    });
+
+    const result = keepVerifiedCitations(
+      draft({ events: [event(1, "1985", "Brora closed in 1985.")] }),
+      [],
+      current,
+    );
+
+    expect(result.events).toEqual([]);
   });
 });
 
@@ -214,7 +244,7 @@ describe("checkAboutProse", () => {
     event(2, "2021", "rebuilt in 2021"),
   ];
   const lead = (sentences: { text: string; factIds: string[] }[]) => [
-    { key: "lead", writtenBy: "pipeline" as const, sentences },
+    { key: "lead", sentences },
   ];
 
   test("accepts sentences that state their facts", () => {
@@ -285,7 +315,6 @@ describe("checkAboutProse", () => {
           {
             key: "history",
             heading: "History",
-            writtenBy: "pipeline" as const,
             sentences: [
               { text: "It was rebuilt in 2021.", factIds: ["event:2"] },
             ],
@@ -313,7 +342,6 @@ describe("checkConflictPicks", () => {
           kind: "renamed",
           name: "Brora",
           date: "1970",
-          writtenBy: "pipeline",
           citations: [
             { sourceId: "wp", statedValue: "1968" },
             { sourceId: "df", statedValue: "1969" },
@@ -341,7 +369,6 @@ describe("checkConflictPicks", () => {
             title: "Heavily peated",
             date: "1969",
             endDate,
-            writtenBy: "pipeline",
             citations: [
               { sourceId: "wp", statedValue: "1969–1973" },
               { sourceId: "df", statedValue: "1969-1974" },
@@ -368,7 +395,6 @@ describe("checkConflictPicks", () => {
           kind: "renamed",
           name: "Brora",
           date: "1969",
-          writtenBy: "pipeline",
           // These sources state the new name, not a date.
           citations: [
             { sourceId: "wp", statedValue: "Brora" },
@@ -395,7 +421,6 @@ describe("checkConflictPicks", () => {
             washStills: {
               value,
               asOf: null,
-              writtenBy: "pipeline",
               citations: [
                 { sourceId: "wp", statedValue: String(value), quote },
               ],
@@ -403,6 +428,7 @@ describe("checkConflictPicks", () => {
           },
         }),
         [{ ...page, text: `${page.text} ${quote}` }],
+        null,
       ).siteFacts.washStills;
 
     // 46 is not stated by 46.5; a year after "c." is still a whole number.
@@ -427,7 +453,6 @@ describe("checkConflictPicks", () => {
             title: "Trial run",
             date: "1985-06",
             endDate: "1985",
-            writtenBy: "pipeline",
           },
         ],
       }),
@@ -445,7 +470,6 @@ describe("checkConflictPicks", () => {
           washStills: {
             value,
             asOf: null,
-            writtenBy: "pipeline",
             citations: [
               { sourceId: "wp", statedValue: "12" },
               { sourceId: "df", statedValue: "20" },

@@ -26,7 +26,6 @@ describe("POST /admin/catalog/clear-entity-descriptions", () => {
           key: "lead",
           heading: null,
           eraEventId: null,
-          writtenBy: "pipeline",
           sentences: [{ text: "It opened in 1819.", factIds: ["event:1"] }],
         },
       ],

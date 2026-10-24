@@ -290,14 +290,10 @@ const JOHNNIE_WALKER_ABOUT_INPUT = {
   ],
 };
 
-function writtenByPerson<T extends object>(items: T[]) {
-  return items.map((item) => ({ ...item, writtenBy: "person" }));
-}
-
 export const JOHNNIE_WALKER_ABOUT_EXAMPLE: EntityAboutDocument =
   EntityAboutDocumentSchema.parse({
     sources: JOHNNIE_WALKER_ABOUT_INPUT.sources,
-    events: writtenByPerson(JOHNNIE_WALKER_ABOUT_INPUT.events),
+    events: JOHNNIE_WALKER_ABOUT_INPUT.events,
     siteFacts: {},
-    sections: writtenByPerson(JOHNNIE_WALKER_ABOUT_INPUT.sections),
+    sections: JOHNNIE_WALKER_ABOUT_INPUT.sections,
   });

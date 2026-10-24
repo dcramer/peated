@@ -8,7 +8,6 @@ import {
   entityTombstones,
 } from "@peated/server/db/schema";
 import { getUserActorForDatabase } from "@peated/server/lib/actors";
-import { findAboutPageLinking } from "@peated/server/lib/entityAbout/store";
 import { deleteOwnedEntityImage } from "@peated/server/lib/entityImages";
 import { deleteOwnedPronunciationAudio } from "@peated/server/lib/entityPronunciationAudio";
 import { closeOpenReportsForTarget } from "@peated/server/lib/reports";
@@ -24,7 +23,7 @@ export default procedure
     path: "/entities/{entity}",
     summary: "Delete entity",
     description:
-      "Delete an entity and its aliases and reference names while reserving its public ID so it cannot be reused. Fails when another entity's About page links it; merge it instead. Requires administrator privileges.",
+      "Delete an entity and its aliases and reference names while reserving its public ID so it cannot be reused. Requires administrator privileges.",
     operationId: "deleteEntity",
   })
   .input(z.object({ entity: z.coerce.number() }))
@@ -47,12 +46,6 @@ export default procedure
       .where(eq(entityImages.entityId, entity.id));
 
     await db.transaction(async (tx) => {
-      const linkedFrom = await findAboutPageLinking(tx, entity.id);
-      if (linkedFrom) {
-        throw errors.CONFLICT({
-          message: `The About page of entity ${linkedFrom} links this entity. Merge it instead, or remove the link first.`,
-        });
-      }
       const actorId = (await getUserActorForDatabase(tx, context.user)).id;
 
       await Promise.all([

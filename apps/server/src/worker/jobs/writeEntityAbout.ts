@@ -1,4 +1,7 @@
-import { draftToDocument } from "@peated/server/agents/entityAbout/draftSchema";
+import {
+  documentToDraft,
+  draftToDocument,
+} from "@peated/server/agents/entityAbout/draftSchema";
 import {
   runEntityAboutWriter,
   type EntityAboutWriter,
@@ -8,47 +11,28 @@ import { db, type AnyDatabase } from "@peated/server/db";
 import {
   changes,
   entities,
+  entityAboutNotes,
   entityAliases,
+  entityEvents,
   type Actor,
 } from "@peated/server/db/schema";
 import {
   ABOUT_WRITER_SYSTEM_ACTOR_KEY,
   getSystemActorForDatabase,
 } from "@peated/server/lib/actors";
-import {
-  ABOUT_FACT_FIELD_LIST,
-  ABOUT_FACT_FIELDS,
-} from "@peated/server/lib/entityAbout/aboutFactFields";
-import {
-  checkMergedAbout,
-  reviewAboutDraft,
-} from "@peated/server/lib/entityAbout/checks";
-import {
-  eventFactId,
-  isFactShown,
-  siteFactId,
-} from "@peated/server/lib/entityAbout/display";
-import {
-  getPersonCitedFactIds,
-  mergePipelineDraft,
-} from "@peated/server/lib/entityAbout/document";
+import { reviewAboutDraft } from "@peated/server/lib/entityAbout/checks";
 import { getPublishedLeadText } from "@peated/server/lib/entityAbout/publicAbout";
 import {
   EntityAboutWriteError,
-  followMergedEntities,
   getEntityAbout,
+  linkOwnersByName,
   loadLinkedEntities,
   saveEntityAbout,
   type StoredEntityAbout,
 } from "@peated/server/lib/entityAbout/store";
 import { logWarn } from "@peated/server/lib/log";
-import type {
-  AboutCitation,
-  AboutEvent,
-  EntityAboutDocument,
-} from "@peated/server/schemas/entityAbout";
 import type { JobPayload } from "@peated/server/worker/types";
-import { and, eq, inArray, isNull, ne, or } from "drizzle-orm";
+import { and, asc, eq, isNull, ne, or } from "drizzle-orm";
 import { z } from "zod";
 
 export const WriteEntityAboutJobArgsSchema = z
@@ -75,107 +59,33 @@ const defaultServices: WriteEntityAboutServices = {
   now: () => new Date(),
 };
 
-/** Names of the Entities a stored document links as new owners. */
-async function loadOwnerNames(
-  database: AnyDatabase,
-  stored: EntityAboutDocument | null,
-) {
-  const ids = (stored?.events ?? []).flatMap((event) =>
-    event.newOwnerId ? [event.newOwnerId] : [],
-  );
-  if (!ids.length) return new Map<number, string>();
-  // A merged owner is named by the Entity it became.
-  const target = await followMergedEntities(database, ids);
+/**
+ * The Entity's history rows as leads for the writer: each kind, date, text,
+ * owner, and source URL a person entered.
+ */
+async function describeHistory(database: AnyDatabase, entityId: number) {
   const rows = await database
-    .select({ id: entities.id, name: entities.name })
-    .from(entities)
-    .where(inArray(entities.id, [...new Set(target.values())]));
-  const names = new Map(rows.map((row) => [row.id, row.name]));
-  const ownerNames = new Map<number, string>();
-  for (const id of ids) {
-    const name = names.get(target.get(id) ?? id);
-    if (name) ownerNames.set(id, name);
-  }
-  return ownerNames;
-}
-
-function describeEvent(
-  event: AboutEvent,
-  ownerNames: ReadonlyMap<number, string>,
-) {
-  const owner = event.newOwnerId
-    ? ownerNames.get(event.newOwnerId)
-    : event.newOwnerName;
-  const details = [
-    event.name ? `name ${event.name}` : null,
-    owner ? `new owner ${owner}` : null,
-    event.text?.slice(0, 300),
-  ].filter(Boolean);
-  return `#${event.id} ${event.kind}, ${event.date}${details.length ? `: ${details.join("; ")}` : ""}`;
-}
-
-/**
- * Lists stored history the page cannot show yet, so the writer can look for
- * sources. A matching event in the draft adds its citations to the stored
- * one (see `mergePipelineDraft`).
- */
-function describeUnsourcedHistory(
-  stored: EntityAboutDocument | null,
-  ownerNames: ReadonlyMap<number, string>,
-) {
-  if (!stored) return [];
-  return stored.events
-    .filter((event) => !isFactShown(event.citations, stored.sources))
-    .map((event) => describeEvent(event, ownerNames));
-}
-
-/**
- * Lists the shown facts this run replaces, with where they were found. A
- * draft that shows fewer facts is rejected (see `checkMergedAbout`), so the
- * writer checks these again first.
- */
-function describeShownFacts(
-  stored: EntityAboutDocument | null,
-  ownerNames: ReadonlyMap<number, string>,
-) {
-  if (!stored) return [];
-  const urls = new Map(stored.sources.map((source) => [source.id, source.url]));
-  const cited = (citations: readonly AboutCitation[]) => {
-    const found = [
-      ...new Set(citations.flatMap((c) => urls.get(c.sourceId) ?? [])),
-    ];
-    return found.length ? ` (found on ${found.join(", ")})` : "";
-  };
-  const shown = (citations: readonly AboutCitation[]) =>
-    isFactShown(citations, stored.sources);
-  // A fact a person's section cites stays whatever the draft says.
-  const kept = getPersonCitedFactIds(stored);
-  return [
-    ...stored.events
-      .filter(
-        (event) =>
-          event.writtenBy === "pipeline" &&
-          shown(event.citations) &&
-          !kept.has(eventFactId(event.id)),
-      )
-      .map(
-        (event) => describeEvent(event, ownerNames) + cited(event.citations),
-      ),
-    ...ABOUT_FACT_FIELD_LIST.flatMap((field) => {
-      const fact = stored.siteFacts[field];
-      if (
-        !fact ||
-        fact.writtenBy !== "pipeline" ||
-        !shown(fact.citations) ||
-        kept.has(siteFactId(field))
-      ) {
-        return [];
-      }
-      return [
-        `${ABOUT_FACT_FIELDS[field].label}: ${fact.value}${cited(fact.citations)}`,
-      ];
-    }),
-  ];
+    .select({
+      kind: entityEvents.kind,
+      date: entityEvents.date,
+      description: entityEvents.description,
+      sourceUrl: entityEvents.sourceUrl,
+      owner: entities.name,
+    })
+    .from(entityEvents)
+    .leftJoin(entities, eq(entities.id, entityEvents.newOwnerId))
+    .where(eq(entityEvents.entityId, entityId))
+    .orderBy(asc(entityEvents.date));
+  return rows.map((row) =>
+    [
+      `${row.kind}, ${row.date}`,
+      row.owner ? `new owner ${row.owner}` : null,
+      row.description,
+      row.sourceUrl ? `source ${row.sourceUrl}` : null,
+    ]
+      .filter(Boolean)
+      .join("; "),
+  );
 }
 
 export type WriteEntityAboutResult =
@@ -184,9 +94,9 @@ export type WriteEntityAboutResult =
   | { status: "saved"; version: number };
 
 /**
- * Writes an About document for one distillery or brand. Pipeline rule
- * (owner: docs/features/entity-about.md): a draft that fails the checks twice
- * saves nothing, and items a person wrote are never changed.
+ * Writes the next version of an About page for one distillery or brand.
+ * Pipeline rule (owner: docs/features/entity-about.md): the writer returns
+ * the whole page, and a draft that fails the checks twice saves nothing.
  */
 export async function writeEntityAbout(
   input: JobPayload,
@@ -206,14 +116,17 @@ export async function writeEntityAbout(
     .select({ name: entityAliases.name })
     .from(entityAliases)
     .where(eq(entityAliases.entityId, entity.id));
-  // Read without a lock to guide the writer; the save checks again under one.
-  const before = await getEntityAbout(db, entity.id);
-  const ownerNames = await loadOwnerNames(db, before?.document ?? null);
-  const unsourcedHistory = describeUnsourcedHistory(
-    before?.document ?? null,
-    ownerNames,
-  );
-  const shownFacts = describeShownFacts(before?.document ?? null, ownerNames);
+  const history = await describeHistory(db, entity.id);
+  const notes = await db
+    .select({
+      text: entityAboutNotes.text,
+      sourceUrl: entityAboutNotes.sourceUrl,
+    })
+    .from(entityAboutNotes)
+    .where(eq(entityAboutNotes.entityId, entity.id))
+    .orderBy(asc(entityAboutNotes.id));
+  // Read without a lock to guide the writer; the save checks the version.
+  const current = await getEntityAbout(db, entity.id);
 
   let errors: string[] = [];
   let accepted = null;
@@ -230,96 +143,63 @@ export async function writeEntityAbout(
       owner: entity.owner?.name ?? null,
       yearEstablished: entity.yearEstablished,
       website: entity.website,
-      unsourcedHistory,
-      shownFacts,
+      notes: notes.map((note) =>
+        note.sourceUrl ? `${note.text} (from ${note.sourceUrl})` : note.text,
+      ),
+      history,
+      currentPage: current ? documentToDraft(current.document) : null,
       previousErrors: errors,
     });
-    const now = services.now().toISOString();
-    const converted = draftToDocument(draft, now);
+    const converted = draftToDocument(draft);
     const reviewed = reviewAboutDraft(
       converted.document,
       pagesRead,
       entity.kind,
+      current?.document ?? null,
     );
     // An item the schema rejected is a reason to retry, not a silent gap.
     errors = [...converted.errors, ...reviewed.errors];
-    if (!errors.length) {
-      errors = mergeAndCheck(before, reviewed.document, now, ownerNames).errors;
-    }
     if (!errors.length) accepted = reviewed.document;
   }
   if (!accepted) return rejected(entity.id, errors);
 
-  const document = accepted;
+  const document = await linkOwnersByName(db, accepted);
   let saved;
   try {
     saved = await db.transaction(async (tx) => {
       // Lock order rule (owner: `mergeEntity`): the Entity row, then its
       // About row, so a merge running at the same time cannot deadlock.
-      // NO KEY UPDATE still waits on a merge's lock, but not on the key-share
-      // lock an About edit's first insert takes on the Entity.
       const [locked] = await tx
         .select({ id: entities.id })
         .from(entities)
         .where(eq(entities.id, entity.id))
         .for("no key update");
       // The Entity was merged or deleted during the run.
-      if (!locked) return { skipped: true, errors: [] };
-      const stored = await getEntityAbout(tx, entity.id, { forUpdate: true });
-      const now = services.now();
-      // Owners are read again: a moderator may have linked one mid-run.
-      const { merged, errors } = mergeAndCheck(
-        stored,
-        document,
-        now.toISOString(),
-        await loadOwnerNames(tx, stored?.document ?? null),
-      );
-      // The page changed between the draft and the save.
-      if (errors.length) return { errors };
-
+      if (!locked) return null;
       const actor = await getSystemActorForDatabase(
         tx,
         ABOUT_WRITER_SYSTEM_ACTOR_KEY,
       );
+      // A page edited during the run fails the version check; the job is
+      // retried from the new page.
       const result = await saveEntityAbout(tx, {
         entity,
-        document: merged,
-        expectedVersion: stored?.version ?? null,
+        document,
+        expectedVersion: current?.version ?? null,
         actor,
-        checkedOn: now.toISOString().slice(0, 10),
+        checkedOn: services.now().toISOString().slice(0, 10),
       });
       await updateDescription(tx, entity, result, actor);
-      return { errors, version: result.version };
+      return result;
     });
   } catch (error) {
-    // Items a person wrote can break a store rule the draft cannot fix, such
-    // as a site fact kept after the Entity's kind changed. A moderator fixes
-    // those; retrying the job would fail the same way.
+    // Save rules the draft checks already cover; this is a backstop.
     if (!(error instanceof EntityAboutWriteError)) throw error;
-    saved = { errors: error.reasons };
+    return rejected(entity.id, error.reasons);
   }
 
-  if ("skipped" in saved) return { status: "skipped" };
-  if (!saved.version) return rejected(entity.id, saved.errors);
+  if (!saved) return { status: "skipped" };
   return { status: "saved", version: saved.version };
-}
-
-function mergeAndCheck(
-  stored: StoredEntityAbout | null,
-  document: EntityAboutDocument,
-  now: string,
-  ownerNames: ReadonlyMap<number, string>,
-) {
-  const merged = mergePipelineDraft(
-    stored?.document ?? null,
-    document,
-    now,
-    ownerNames,
-  );
-  return {
-    merged,
-    errors: checkMergedAbout(stored?.document ?? null, merged, ownerNames),
-  };
 }
 
 function rejected(entityId: number, errors: string[]): WriteEntityAboutResult {

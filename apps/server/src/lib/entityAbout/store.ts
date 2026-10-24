@@ -3,7 +3,7 @@ import {
   changes,
   entities,
   entityAbout,
-  entityEvents,
+  entityAliases,
   entityTombstones,
   type Actor,
   type EntityKind,
@@ -15,13 +15,12 @@ import {
   type EntityAboutDocument,
   type EntityAboutStatus,
 } from "@peated/server/schemas/entityAbout";
-import { and, eq, inArray, isNotNull, ne, or, sql } from "drizzle-orm";
+import { and, eq, inArray, or, sql } from "drizzle-orm";
 
 import {
   ABOUT_FACT_FIELD_LIST,
   aboutFactFieldAppliesTo,
 } from "./aboutFactFields";
-import { findStaleSentences } from "./checks";
 import { findAboutWriteErrors } from "./document";
 
 function unsupportedSchemaVersion(version: number): never {
@@ -40,8 +39,6 @@ export class EntityAboutWriteError extends Error {
   constructor(
     message: string,
     readonly reasons: string[],
-    /** Linked Entities that do not exist, so routes can answer not found. */
-    readonly missingEntityIds: number[] = [],
   ) {
     super(message);
   }
@@ -83,7 +80,7 @@ export function toStoredEntityAbout(
 
 /**
  * Maps each Entity ID to the Entity it now is. Merge rule (owner:
- * `mergeEntity`): a merge leaves About documents alone, and reads follow the
+ * `mergeEntity`): a merge leaves About pages alone, and reads follow the
  * merged Entity's tombstone instead.
  */
 export async function followMergedEntities(
@@ -115,40 +112,6 @@ export async function followMergedEntities(
 }
 
 const MAX_MERGE_HOPS = 10;
-
-/**
- * Returns an Entity whose About page links the given Entity, directly or
- * through an Entity merged into it, or `null`. Link rule (owner:
- * docs/features/entity-about.md): a linked Entity cannot be deleted, so
- * stored history never points at nothing.
- */
-export async function findAboutPageLinking(
-  database: AnyDatabase,
-  entityId: number,
-) {
-  const ids = new Set([entityId]);
-  let pending = [entityId];
-  for (let hop = 0; pending.length && hop < MAX_MERGE_HOPS; hop += 1) {
-    const merged = await database
-      .select({ id: entityTombstones.entityId })
-      .from(entityTombstones)
-      .where(inArray(entityTombstones.newEntityId, pending));
-    pending = merged.map(({ id }) => id).filter((id) => !ids.has(id));
-    for (const id of pending) ids.add(id);
-  }
-  const links = [...ids].flatMap((id) =>
-    ["newOwnerId", "relatedEntityId"].map(
-      (key) =>
-        sql`${entityAbout.document} @> ${JSON.stringify({ events: [{ [key]: id }] })}::jsonb`,
-    ),
-  );
-  const [page] = await database
-    .select({ entityId: entityAbout.entityId })
-    .from(entityAbout)
-    .where(and(ne(entityAbout.entityId, entityId), or(...links)))
-    .limit(1);
-  return page?.entityId ?? null;
-}
 
 /**
  * Loads the Entities the documents link, following merged Entities to the
@@ -185,33 +148,58 @@ export async function loadLinkedEntities(
 }
 
 /**
- * Returns Entity IDs the document newly links that do not exist. A merged
- * Entity counts as existing when the Entity it became, through every later
- * merge, still exists, since reads follow it there; a deleted one does not.
- * Links already stored are not checked again, so an Entity deleted later does
- * not block every save of the page.
+ * Links each new owner the page names to its Entity when exactly one Entity
+ * or alias has that name. Link rule (owner: docs/features/entity-about.md):
+ * the name is always kept, so a page reads the same when no link is found or
+ * the Entity is later deleted.
  */
-async function findMissingLinkedEntities(
+export async function linkOwnersByName(
   database: AnyDatabase,
   document: EntityAboutDocument,
-  stored: EntityAboutDocument | null,
-) {
-  const linkedIds = (doc: EntityAboutDocument | null) =>
-    (doc?.events ?? []).flatMap((event) =>
-      [event.relatedEntityId, event.newOwnerId].filter((id) => id !== null),
-    );
-  const before = new Set(linkedIds(stored));
-  const idList = [...new Set(linkedIds(document))].filter(
-    (id) => !before.has(id),
-  );
-  if (!idList.length) return [];
-  const target = await followMergedEntities(database, idList);
-  const found = await database
-    .select({ id: entities.id })
+): Promise<EntityAboutDocument> {
+  const names = [
+    ...new Set(
+      document.events.flatMap((event) =>
+        event.newOwnerName && !event.newOwnerId
+          ? [event.newOwnerName.toLowerCase()]
+          : [],
+      ),
+    ),
+  ];
+  if (!names.length) return document;
+  const rows = await database
+    .selectDistinct({
+      id: entities.id,
+      name: entities.name,
+      alias: entityAliases.name,
+    })
     .from(entities)
-    .where(inArray(entities.id, [...new Set(target.values())]));
-  const known = new Set(found.map((row) => row.id));
-  return idList.filter((id) => !known.has(target.get(id) ?? id));
+    .leftJoin(entityAliases, eq(entityAliases.entityId, entities.id))
+    .where(
+      or(
+        inArray(sql`lower(${entities.name})`, names),
+        inArray(sql`lower(${entityAliases.name})`, names),
+      ),
+    );
+  const matches = new Map<string, Set<number>>();
+  for (const row of rows) {
+    for (const name of [row.name, row.alias]) {
+      const key = name?.toLowerCase();
+      if (!key || !names.includes(key)) continue;
+      matches.set(key, (matches.get(key) ?? new Set()).add(row.id));
+    }
+  }
+  return {
+    ...document,
+    events: document.events.map((event) => {
+      const ids = event.newOwnerName
+        ? matches.get(event.newOwnerName.toLowerCase())
+        : undefined;
+      return !event.newOwnerId && ids?.size === 1
+        ? { ...event, newOwnerId: [...ids][0]! }
+        : event;
+    }),
+  };
 }
 
 /**
@@ -227,15 +215,12 @@ export async function saveEntityAbout(
     expectedVersion,
     actor,
     checkedOn,
-    unchangedFrom,
   }: {
     entity: { id: number; name: string; kind: EntityKind };
     document: EntityAboutDocument;
     expectedVersion: number | null;
     actor: Actor;
     checkedOn?: string | null;
-    /** Items to treat as already stored; defaults to the stored document. */
-    unchangedFrom?: EntityAboutDocument | null;
   },
 ): Promise<StoredEntityAbout> {
   const stored = await getEntityAbout(tx, entity.id, { forUpdate: true });
@@ -256,14 +241,7 @@ export async function saveEntityAbout(
       ),
     );
   }
-  // Rules for new writing compare against this baseline. The backfill
-  // copies stored items, so it passes the whole document.
-  const baseline =
-    unchangedFrom === undefined ? (stored?.document ?? null) : unchangedFrom;
-  const reasons = [
-    ...findAboutWriteErrors(baseline, document),
-    ...findStaleSentences(baseline, document),
-  ];
+  const reasons = findAboutWriteErrors(document);
   for (const field of ABOUT_FACT_FIELD_LIST) {
     if (
       document.siteFacts[field] &&
@@ -272,36 +250,11 @@ export async function saveEntityAbout(
       reasons.push(`Site fact ${field} does not apply to a ${entity.kind}.`);
     }
   }
-  const missing = await findMissingLinkedEntities(tx, document, baseline);
-  for (const id of missing) reasons.push(`Linked entity ${id} does not exist.`);
   if (reasons.length) {
     throw new EntityAboutWriteError(
       "The About document is not valid.",
       reasons,
-      missing,
     );
-  }
-
-  // Copy rule (owner: `/admin/catalog/backfill-entity-about`): the backfill
-  // copies each `entity_event` row once. A row whose item a save removes is
-  // deleted too, so a repeat run does not bring the item back.
-  const legacyIds = (doc: EntityAboutDocument | null) =>
-    (doc?.events ?? []).flatMap((event) =>
-      event.legacyEventId ? [event.legacyEventId] : [],
-    );
-  const kept = new Set(legacyIds(document));
-  const removedLegacyIds = legacyIds(stored?.document ?? null).filter(
-    (id) => !kept.has(id),
-  );
-  if (removedLegacyIds.length) {
-    await tx
-      .delete(entityEvents)
-      .where(
-        and(
-          eq(entityEvents.entityId, entity.id),
-          inArray(entityEvents.id, removedLegacyIds),
-        ),
-      );
   }
 
   const version = (stored?.version ?? 0) + 1;

@@ -516,7 +516,6 @@ export const EntityAbout = async (
     events: events.map((event) => ({
       kind: "closed",
       date: "1983",
-      writtenBy: "person",
       citations: [{ sourceId: fixtureSources[0]?.id ?? "s1" }],
       ...event,
     })),

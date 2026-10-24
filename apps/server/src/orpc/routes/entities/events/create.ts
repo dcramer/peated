@@ -1,19 +1,14 @@
 import { db } from "@peated/server/db";
-import { entities } from "@peated/server/db/schema";
+import { changes, entities, entityEvents } from "@peated/server/db/schema";
 import { getUserActorForDatabase } from "@peated/server/lib/actors";
-import {
-  editEntityHistory,
-  nextEventId,
-  putLegacyEvent,
-  toLegacyEvent,
-} from "@peated/server/lib/entityAbout/legacyEvents";
 import { procedure } from "@peated/server/orpc";
-import { withAboutRouteErrors } from "@peated/server/orpc/errors";
 import { requireMod } from "@peated/server/orpc/middleware";
 import {
   EntityEventInputSchema,
   EntityEventSchema,
 } from "@peated/server/schemas";
+import { serialize } from "@peated/server/serializers";
+import { EntityEventSerializer } from "@peated/server/serializers/entityEvent";
 import { eq } from "drizzle-orm";
 import { z } from "zod";
 
@@ -28,59 +23,68 @@ export default procedure
     path: "/entities/{entity}/events",
     summary: "Add to entity history",
     description:
-      "Add a dated item to an entity's history. Every item needs a `sourceUrl`. Requires moderator privileges.",
+      "Add a dated item to an entity's history. Requires moderator privileges.",
     operationId: "createEntityEvent",
   })
   .input(InputSchema)
   .output(EntityEventSchema)
   .handler(async function ({ input, context, errors }) {
-    const [entity] = await db
-      .select({ id: entities.id, name: entities.name, kind: entities.kind })
-      .from(entities)
-      .where(eq(entities.id, input.entity))
-      .limit(1);
-    if (!entity) throw errors.NOT_FOUND({ message: "Entity not found." });
-    if (input.newOwnerId === entity.id) {
-      throw errors.BAD_REQUEST({ message: "An entity cannot acquire itself." });
-    }
-    if (!input.sourceUrl) {
-      throw errors.BAD_REQUEST({
-        message: "Add a source URL for this history item.",
-      });
-    }
+    const event = await db.transaction(async (tx) => {
+      const [entity] = await tx
+        .select({ id: entities.id, name: entities.name })
+        .from(entities)
+        .where(eq(entities.id, input.entity))
+        .limit(1);
+      if (!entity) {
+        throw errors.NOT_FOUND({ message: "Entity not found." });
+      }
 
-    let eventId = 0;
-    return await withAboutRouteErrors(async () => {
-      const saved = await db.transaction(async (tx) =>
-        editEntityHistory(tx, {
-          entity,
-          actor: await getUserActorForDatabase(tx, context.user),
-          edit: (document) => {
-            eventId = nextEventId(document);
-            return putLegacyEvent(
-              document,
-              eventId,
-              {
-                kind: input.kind,
-                date: input.date,
-                description: input.description ?? null,
-                newOwnerId: input.newOwnerId ?? null,
-                newOwnerName: input.newOwnerName ?? null,
-                sourceUrl: input.sourceUrl ?? null,
-              },
-              new Date().toISOString(),
-            );
-          },
-        }),
-      );
-      const event = saved.document.events.find((item) => item.id === eventId);
-      const result =
-        event && toLegacyEvent(entity.id, event, saved.document.sources);
-      if (!result) {
+      if (input.newOwnerId) {
+        if (input.newOwnerId === entity.id) {
+          throw errors.BAD_REQUEST({
+            message: "An entity cannot acquire itself.",
+          });
+        }
+        const [owner] = await tx
+          .select({ id: entities.id })
+          .from(entities)
+          .where(eq(entities.id, input.newOwnerId))
+          .limit(1);
+        if (!owner) {
+          throw errors.NOT_FOUND({ message: "New owner not found." });
+        }
+      }
+
+      const actorId = (await getUserActorForDatabase(tx, context.user)).id;
+      const [event] = await tx
+        .insert(entityEvents)
+        .values({
+          entityId: entity.id,
+          kind: input.kind,
+          date: input.date,
+          description: input.description ?? null,
+          newOwnerId: input.newOwnerId ?? null,
+          sourceUrl: input.sourceUrl ?? null,
+          createdByActorId: actorId,
+        })
+        .returning();
+      if (!event) {
         throw errors.INTERNAL_SERVER_ERROR({
           message: "Failed to create entity event.",
         });
       }
-      return result;
+
+      await tx.insert(changes).values({
+        objectType: "entity",
+        objectId: entity.id,
+        displayName: entity.name,
+        actorId,
+        type: "update",
+        data: { entityEvent: { action: "add", ...event } },
+      });
+
+      return event;
     });
+
+    return await serialize(EntityEventSerializer, event, context.user);
   });

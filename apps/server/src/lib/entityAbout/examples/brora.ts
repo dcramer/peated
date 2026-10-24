@@ -557,19 +557,10 @@ const BRORA_ABOUT_INPUT = {
   ],
 };
 
-function writtenByPerson<T extends object>(items: T[]) {
-  return items.map((item) => ({ ...item, writtenBy: "person" }));
-}
-
 export const BRORA_ABOUT_EXAMPLE: EntityAboutDocument =
   EntityAboutDocumentSchema.parse({
     sources: BRORA_ABOUT_INPUT.sources,
-    events: writtenByPerson(BRORA_ABOUT_INPUT.events),
-    siteFacts: Object.fromEntries(
-      Object.entries(BRORA_ABOUT_INPUT.siteFacts).map(([field, fact]) => [
-        field,
-        { ...fact, writtenBy: "person" },
-      ]),
-    ),
-    sections: writtenByPerson(BRORA_ABOUT_INPUT.sections),
+    events: BRORA_ABOUT_INPUT.events,
+    siteFacts: BRORA_ABOUT_INPUT.siteFacts,
+    sections: BRORA_ABOUT_INPUT.sections,
   });

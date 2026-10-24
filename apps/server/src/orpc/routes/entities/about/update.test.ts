@@ -1,9 +1,7 @@
 import { db } from "@peated/server/db";
-import { entityEvents } from "@peated/server/db/schema";
 import { getEntityAbout } from "@peated/server/lib/entityAbout/store";
 import waitError from "@peated/server/lib/test/waitError";
 import { routerClient } from "@peated/server/orpc/router";
-import { eq } from "drizzle-orm";
 
 const source = {
   id: "s1",
@@ -13,16 +11,14 @@ const source = {
 };
 
 describe("PUT /entities/:entity/about", () => {
-  test("saves a moderator's edits as written by a person", async ({
-    fixtures,
-  }) => {
+  test("saves a moderator's edit as a new version", async ({ fixtures }) => {
     const user = await fixtures.User({ mod: true });
     const entity = await fixtures.Entity({ kind: "distillery" });
     await fixtures.EntityAbout({
       entityId: entity.id,
       events: [
-        { id: 1, kind: "opened", date: "1819", writtenBy: "pipeline" },
-        { id: 2, kind: "closed", date: "1983", writtenBy: "pipeline" },
+        { id: 1, kind: "opened", date: "1819" },
+        { id: 2, kind: "closed", date: "1983" },
       ],
     });
     const stored = await getEntityAbout(db, entity.id);
@@ -36,14 +32,6 @@ describe("PUT /entities/:entity/about", () => {
           events: stored!.document.events.map((event) =>
             event.id === 2 ? { ...event, date: "1983-03" } : event,
           ),
-          siteFacts: {
-            washStills: {
-              value: 1,
-              asOf: "2021",
-              citations: [{ sourceId: "s1", statedValue: "1", quote: null }],
-              writtenBy: "pipeline",
-            },
-          },
         },
       },
       { context: { user } },
@@ -51,13 +39,10 @@ describe("PUT /entities/:entity/about", () => {
 
     expect(about.version).toBe(2);
     const saved = await getEntityAbout(db, entity.id);
-    expect(
-      saved?.document.events.map(({ id, writtenBy }) => [id, writtenBy]),
-    ).toEqual([
-      [1, "pipeline"],
-      [2, "person"],
+    expect(saved?.document.events.map(({ date }) => date)).toEqual([
+      "1819",
+      "1983-03",
     ]);
-    expect(saved?.document.siteFacts.washStills?.writtenBy).toBe("person");
   });
 
   test("rejects an edit based on an older version", async ({ fixtures }) => {
@@ -82,100 +67,6 @@ describe("PUT /entities/:entity/about", () => {
     );
   });
 
-  test("deletes the legacy row of a removed copied item", async ({
-    fixtures,
-  }) => {
-    const user = await fixtures.User({ mod: true });
-    const entity = await fixtures.Entity();
-    const legacy = await fixtures.EntityEvent({ entityId: entity.id });
-    await fixtures.EntityAbout({
-      entityId: entity.id,
-      events: [{ id: 1, legacyEventId: legacy.id }],
-    });
-    const stored = await getEntityAbout(db, entity.id);
-
-    await routerClient.entities.about.update(
-      {
-        entity: entity.id,
-        version: 1,
-        document: { ...stored!.document, events: [] },
-      },
-      { context: { user } },
-    );
-
-    // A repeat backfill copies only rows that still exist.
-    expect(
-      await db
-        .select()
-        .from(entityEvents)
-        .where(eq(entityEvents.id, legacy.id)),
-    ).toEqual([]);
-  });
-
-  test("saves nothing when the page is unchanged", async ({ fixtures }) => {
-    const user = await fixtures.User({ mod: true });
-    const entity = await fixtures.Entity();
-    await fixtures.EntityAbout({
-      entityId: entity.id,
-      events: [{ id: 1, writtenBy: "pipeline" }],
-    });
-    const { version, document } = await routerClient.entities.about.document(
-      { entity: entity.id },
-      { context: { user } },
-    );
-
-    const about = await routerClient.entities.about.update(
-      { entity: entity.id, version, document: document! },
-      { context: { user } },
-    );
-
-    expect(about.version).toBe(1);
-    const saved = await getEntityAbout(db, entity.id);
-    expect([saved?.version, saved?.checkedOn]).toEqual([1, null]);
-  });
-
-  test("rejects a fact change that a pipeline sentence contradicts", async ({
-    fixtures,
-  }) => {
-    const user = await fixtures.User({ mod: true });
-    const entity = await fixtures.Entity();
-    await fixtures.EntityAbout({
-      entityId: entity.id,
-      events: [{ id: 1, kind: "closed", date: "1983", writtenBy: "pipeline" }],
-      sections: [
-        {
-          key: "lead",
-          heading: null,
-          eraEventId: null,
-          writtenBy: "pipeline",
-          sentences: [{ text: "It closed in 1983.", factIds: ["event:1"] }],
-        },
-      ],
-    });
-    const stored = await getEntityAbout(db, entity.id);
-
-    const err = await waitError(() =>
-      routerClient.entities.about.update(
-        {
-          entity: entity.id,
-          version: 1,
-          document: {
-            ...stored!.document,
-            events: stored!.document.events.map((event) => ({
-              ...event,
-              date: "1985",
-            })),
-          },
-        },
-        { context: { user } },
-      ),
-    );
-
-    expect(err).toMatchInlineSnapshot(
-      `[Error: "It closed in 1983." (lead) states 1983, which its facts do not.]`,
-    );
-  });
-
   test("rejects a new fact without a source", async ({ fixtures }) => {
     const user = await fixtures.User({ mod: true });
     const entity = await fixtures.Entity();
@@ -187,9 +78,7 @@ describe("PUT /entities/:entity/about", () => {
           version: null,
           document: {
             sources: [source],
-            events: [
-              { id: 1, kind: "closed", date: "1983", writtenBy: "person" },
-            ],
+            events: [{ id: 1, kind: "closed", date: "1983" }],
           },
         },
         { context: { user } },
@@ -215,14 +104,12 @@ describe("PUT /entities/:entity/about", () => {
                 id: 1,
                 kind: "closed",
                 date: "1983",
-                writtenBy: "person",
                 citations: [{ sourceId: "s1" }],
               },
             ],
             sections: [
               {
                 key: "lead",
-                writtenBy: "person",
                 sentences: [{ text: "A fine distillery.", factIds: [] }],
               },
             ],
@@ -253,14 +140,12 @@ describe("PUT /entities/:entity/about", () => {
                 id: 1,
                 kind: "closed",
                 date: "1983",
-                writtenBy: "person",
                 citations: [{ sourceId: "s1" }],
               },
             ],
             sections: [
               {
                 key: "history",
-                writtenBy: "person",
                 sentences: [
                   { text: "It closed in 1983.", factIds: ["event:1"] },
                 ],
@@ -291,7 +176,6 @@ describe("PUT /entities/:entity/about", () => {
             siteFacts: {
               washStills: {
                 value: 2,
-                writtenBy: "person",
                 citations: [{ sourceId: "s1" }],
               },
             },
@@ -346,7 +230,7 @@ describe("PATCH /entities/:entity/about/status", () => {
 });
 
 describe("GET /entities/:entity/about/document", () => {
-  test("round-trips the full document so unchanged items keep their author", async ({
+  test("round-trips the full document with its quotes", async ({
     fixtures,
   }) => {
     const user = await fixtures.User({ mod: true });
@@ -358,12 +242,11 @@ describe("GET /entities/:entity/about/document", () => {
           id: 1,
           kind: "opened",
           date: "1819",
-          writtenBy: "pipeline",
           citations: [
             { sourceId: "s1", statedValue: "1819", quote: "Founded in 1819." },
           ],
         },
-        { id: 2, kind: "closed", date: "1983", writtenBy: "pipeline" },
+        { id: 2, kind: "closed", date: "1983" },
       ],
     });
 
@@ -387,14 +270,13 @@ describe("GET /entities/:entity/about/document", () => {
 
     const stored = await getEntityAbout(db, entity.id);
     expect(
-      stored?.document.events.map(({ id, writtenBy, citations }) => [
+      stored?.document.events.map(({ id, citations }) => [
         id,
-        writtenBy,
         citations[0]?.quote ?? null,
       ]),
     ).toEqual([
-      [1, "pipeline", "Founded in 1819."],
-      [2, "person", null],
+      [1, "Founded in 1819."],
+      [2, null],
     ]);
   });
 

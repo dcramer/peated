@@ -1,20 +1,16 @@
 import { db } from "@peated/server/db";
-import { entities } from "@peated/server/db/schema";
+import { changes, entities, entityEvents } from "@peated/server/db/schema";
 import { getUserActorForDatabase } from "@peated/server/lib/actors";
-import {
-  editEntityHistory,
-  putLegacyEvent,
-  toLegacyEvent,
-} from "@peated/server/lib/entityAbout/legacyEvents";
 import { procedure } from "@peated/server/orpc";
-import { withAboutRouteErrors } from "@peated/server/orpc/errors";
 import { requireMod } from "@peated/server/orpc/middleware";
 import {
   EntityEventInputFields,
   EntityEventInputSchema,
   EntityEventSchema,
 } from "@peated/server/schemas";
-import { eq } from "drizzle-orm";
+import { serialize } from "@peated/server/serializers";
+import { EntityEventSerializer } from "@peated/server/serializers/entityEvent";
+import { and, eq } from "drizzle-orm";
 import { z } from "zod";
 
 const InputSchema = z.object({
@@ -24,7 +20,6 @@ const InputSchema = z.object({
   date: EntityEventInputFields.date.optional(),
   description: EntityEventInputFields.description,
   newOwnerId: EntityEventInputFields.newOwnerId,
-  newOwnerName: EntityEventInputFields.newOwnerName,
   sourceUrl: EntityEventInputFields.sourceUrl,
 });
 
@@ -41,86 +36,108 @@ export default procedure
   .input(InputSchema)
   .output(EntityEventSchema)
   .handler(async function ({ input, context, errors }) {
-    const [entity] = await db
-      .select({ id: entities.id, name: entities.name, kind: entities.kind })
-      .from(entities)
-      .where(eq(entities.id, input.entity))
-      .limit(1);
-    if (!entity) throw errors.NOT_FOUND({ message: "History item not found." });
+    const event = await db.transaction(async (tx) => {
+      const [event] = await tx
+        .select()
+        .from(entityEvents)
+        .where(
+          and(
+            eq(entityEvents.id, input.event),
+            eq(entityEvents.entityId, input.entity),
+          ),
+        )
+        .for("update");
+      if (!event) {
+        throw errors.NOT_FOUND({ message: "History item not found." });
+      }
 
-    return await withAboutRouteErrors(async () => {
-      const saved = await db.transaction(async (tx) =>
-        editEntityHistory(tx, {
-          entity,
-          actor: await getUserActorForDatabase(tx, context.user),
-          edit: (document) => {
-            const before = document.events.find((e) => e.id === input.event);
-            const legacy =
-              before && toLegacyEvent(entity.id, before, document.sources);
-            if (!legacy) {
-              throw errors.NOT_FOUND({ message: "History item not found." });
-            }
-            const next = EntityEventInputSchema.safeParse({
-              kind: input.kind ?? legacy.kind,
-              date: input.date ?? legacy.date,
-              description:
-                input.description !== undefined
-                  ? input.description
-                  : legacy.description,
-              newOwnerId:
-                input.newOwnerId !== undefined
-                  ? input.newOwnerId
-                  : input.kind !== undefined && input.kind !== "acquired"
-                    ? null
-                    : legacy.newOwnerId,
-              // Keeps a name-only owner unless the edit sets an owner or
-              // changes the kind.
-              newOwnerName:
-                input.newOwnerName !== undefined
-                  ? input.newOwnerName
-                  : input.newOwnerId ||
-                      (input.kind !== undefined && input.kind !== "acquired")
-                    ? null
-                    : legacy.newOwnerName,
-              sourceUrl:
-                input.sourceUrl !== undefined
-                  ? input.sourceUrl
-                  : legacy.sourceUrl,
-            });
-            if (!next.success) {
-              throw errors.BAD_REQUEST({
-                message: next.error.issues[0]?.message ?? "Invalid event.",
-              });
-            }
-            if (next.data.newOwnerId === entity.id) {
-              throw errors.BAD_REQUEST({
-                message: "An entity cannot acquire itself.",
-              });
-            }
-            return putLegacyEvent(
-              document,
-              legacy.id,
-              {
-                kind: next.data.kind,
-                date: next.data.date,
-                description: next.data.description ?? null,
-                newOwnerId: next.data.newOwnerId ?? null,
-                newOwnerName: next.data.newOwnerName ?? null,
-                sourceUrl: next.data.sourceUrl ?? null,
-              },
-              new Date().toISOString(),
-            );
-          },
-        }),
-      );
-      const event = saved.document.events.find((e) => e.id === input.event);
-      const result =
-        event && toLegacyEvent(entity.id, event, saved.document.sources);
-      if (!result) {
+      const nextInput = EntityEventInputSchema.safeParse({
+        kind: input.kind ?? event.kind,
+        date: input.date ?? event.date,
+        description:
+          input.description !== undefined
+            ? input.description
+            : event.description,
+        newOwnerId:
+          input.newOwnerId !== undefined
+            ? input.newOwnerId
+            : input.kind !== undefined && input.kind !== "acquired"
+              ? null
+              : event.newOwnerId,
+        sourceUrl:
+          input.sourceUrl !== undefined ? input.sourceUrl : event.sourceUrl,
+      });
+      if (!nextInput.success) {
+        throw errors.BAD_REQUEST({
+          message: nextInput.error.issues[0]?.message ?? "Invalid event.",
+        });
+      }
+
+      if (nextInput.data.newOwnerId) {
+        if (nextInput.data.newOwnerId === event.entityId) {
+          throw errors.BAD_REQUEST({
+            message: "An entity cannot acquire itself.",
+          });
+        }
+        const [owner] = await tx
+          .select({ id: entities.id })
+          .from(entities)
+          .where(eq(entities.id, nextInput.data.newOwnerId))
+          .limit(1);
+        if (!owner) {
+          throw errors.NOT_FOUND({ message: "New owner not found." });
+        }
+      }
+
+      const data: Partial<typeof entityEvents.$inferInsert> = {};
+      if (nextInput.data.kind !== event.kind) data.kind = nextInput.data.kind;
+      if (nextInput.data.date !== event.date) data.date = nextInput.data.date;
+      if (nextInput.data.description !== event.description) {
+        data.description = nextInput.data.description ?? null;
+      }
+      if (nextInput.data.newOwnerId !== event.newOwnerId) {
+        data.newOwnerId = nextInput.data.newOwnerId ?? null;
+      }
+      if (nextInput.data.sourceUrl !== event.sourceUrl) {
+        data.sourceUrl = nextInput.data.sourceUrl ?? null;
+      }
+      if (!Object.keys(data).length) return event;
+      data.updatedAt = new Date();
+
+      const [updatedEvent] = await tx
+        .update(entityEvents)
+        .set(data)
+        .where(eq(entityEvents.id, event.id))
+        .returning();
+      if (!updatedEvent) {
         throw errors.INTERNAL_SERVER_ERROR({
           message: "Failed to update entity event.",
         });
       }
-      return result;
+
+      const [entity] = await tx
+        .select({ name: entities.name })
+        .from(entities)
+        .where(eq(entities.id, event.entityId))
+        .limit(1);
+      const actorId = (await getUserActorForDatabase(tx, context.user)).id;
+      await tx.insert(changes).values({
+        objectType: "entity",
+        objectId: event.entityId,
+        displayName: entity?.name,
+        actorId,
+        type: "update",
+        data: {
+          entityEvent: {
+            action: "update",
+            id: event.id,
+            ...data,
+          },
+        },
+      });
+
+      return updatedEvent;
     });
+
+    return await serialize(EntityEventSerializer, event, context.user);
   });

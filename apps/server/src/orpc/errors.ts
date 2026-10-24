@@ -26,8 +26,8 @@ export class ConflictError extends ORPCError<
 
 /**
  * Runs an About write and rethrows store errors as route errors: a stale
- * version is a conflict, a missing linked Entity is not found, and a broken
- * save rule is a bad request. Other errors pass through.
+ * version is a conflict and a broken save rule is a bad request. Other
+ * errors pass through.
  */
 export async function withAboutRouteErrors<T>(
   write: () => Promise<T>,
@@ -39,10 +39,9 @@ export async function withAboutRouteErrors<T>(
       throw new ORPCError("CONFLICT", { message: error.message });
     }
     if (error instanceof EntityAboutWriteError) {
-      throw new ORPCError(
-        error.missingEntityIds.length ? "NOT_FOUND" : "BAD_REQUEST",
-        { message: error.reasons.join(" ") },
-      );
+      throw new ORPCError("BAD_REQUEST", {
+        message: error.reasons.join(" "),
+      });
     }
     throw error;
   }

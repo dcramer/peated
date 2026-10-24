@@ -1,5 +1,4 @@
 import { base } from "../..";
-import backfillEntityAbout from "./backfill-entity-about";
 import catalogCoverage from "./catalog-coverage";
 import clearEntityDescriptions from "./clear-entity-descriptions";
 import content from "./content";
@@ -14,7 +13,6 @@ import writeEntityAbout from "./write-entity-about";
 import wrongPhotoMatches from "./wrongPhotoMatches";
 
 export default base.tag("admin").router({
-  backfillEntityAbout,
   clearEntityDescriptions,
   catalogCoverage,
   content,

@@ -101,11 +101,11 @@ export const AboutDraftSchema = z.object({
 export type AboutDraft = z.infer<typeof AboutDraftSchema>;
 
 /**
- * Converts the writer's draft into a stored document, marked as written by
- * the pipeline. Items the schema rejects are dropped, not repaired, and
- * each one becomes an error the writer can fix on its retry.
+ * Converts the writer's draft into a stored document. Items the schema
+ * rejects are dropped, not repaired, and each one becomes an error the
+ * writer can fix on its retry.
  */
-export function draftToDocument(draft: AboutDraft, now: string) {
+export function draftToDocument(draft: AboutDraft) {
   const errors: string[] = [];
   const reject = (item: string, error: z.ZodError) => {
     const issue = error.issues[0];
@@ -129,9 +129,6 @@ export function draftToDocument(draft: AboutDraft, now: string) {
       ...event,
       relatedEntityId: null,
       newOwnerId: null,
-      writtenBy: "pipeline",
-      createdAt: now,
-      updatedAt: now,
     });
     if (!parsed.success) reject(`event ${event.id}`, parsed.error);
     return parsed.success ? [parsed.data] : [];
@@ -144,7 +141,6 @@ export function draftToDocument(draft: AboutDraft, now: string) {
         value: fact.value,
         asOf: fact.asOf,
         citations: fact.citations,
-        writtenBy: "pipeline",
       },
     });
     if (parsed.success) Object.assign(siteFacts, parsed.data);
@@ -152,10 +148,7 @@ export function draftToDocument(draft: AboutDraft, now: string) {
   }
 
   const sections = draft.sections.flatMap((section) => {
-    const parsed = AboutSectionSchema.safeParse({
-      ...section,
-      writtenBy: "pipeline",
-    });
+    const parsed = AboutSectionSchema.safeParse(section);
     if (!parsed.success) reject(`section ${section.key}`, parsed.error);
     return parsed.success ? [parsed.data] : [];
   });
@@ -167,4 +160,63 @@ export function draftToDocument(draft: AboutDraft, now: string) {
     sections,
   };
   return { document, errors };
+}
+
+/**
+ * A stored document in the writer's output format, so the writer can return
+ * it with changes. Quotes are kept; a citation without one cannot be
+ * carried and is left out.
+ */
+export function documentToDraft(document: EntityAboutDocument): AboutDraft {
+  const citations = (
+    list: EntityAboutDocument["events"][number]["citations"],
+  ) =>
+    list.flatMap((citation) =>
+      citation.quote
+        ? [
+            {
+              sourceId: citation.sourceId,
+              statedValue: citation.statedValue,
+              quote: citation.quote,
+            },
+          ]
+        : [],
+    );
+  return {
+    sources: document.sources.map(({ status: _status, ...source }) => source),
+    events: document.events.map((event) => ({
+      id: event.id,
+      kind: event.kind,
+      date: event.date,
+      endDate: event.endDate,
+      continuing: event.continuing,
+      name: event.name,
+      title: event.title,
+      text: event.text,
+      newOwnerName: event.newOwnerName,
+      citations: citations(event.citations),
+    })),
+    siteFacts: ABOUT_FACT_FIELD_LIST.flatMap((field) => {
+      const fact = document.siteFacts[field];
+      return fact
+        ? [
+            {
+              field,
+              value: fact.value,
+              asOf: fact.asOf,
+              citations: citations(fact.citations),
+            },
+          ]
+        : [];
+    }),
+    sections: document.sections.map((section) => ({
+      key: section.key,
+      heading: section.heading,
+      eraEventId: section.eraEventId,
+      sentences: section.sentences.map(({ text, factIds }) => ({
+        text,
+        factIds,
+      })),
+    })),
+  };
 }

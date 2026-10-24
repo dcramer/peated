@@ -1,11 +1,7 @@
 import { db } from "@peated/server/db";
 import { entities } from "@peated/server/db/schema";
 import { getUserActorForDatabase } from "@peated/server/lib/actors";
-import { markPersonEdits } from "@peated/server/lib/entityAbout/document";
-import {
-  getEntityAbout,
-  saveEntityAbout,
-} from "@peated/server/lib/entityAbout/store";
+import { saveEntityAbout } from "@peated/server/lib/entityAbout/store";
 import { procedure } from "@peated/server/orpc";
 import { withAboutRouteErrors } from "@peated/server/orpc/errors";
 import { requireMod } from "@peated/server/orpc/middleware";
@@ -16,7 +12,6 @@ import {
 import { serialize } from "@peated/server/serializers";
 import { EntityAboutSerializer } from "@peated/server/serializers/entityAbout";
 import { eq } from "drizzle-orm";
-import { isDeepStrictEqual } from "node:util";
 import { z } from "zod";
 
 const InputSchema = z.object({
@@ -39,7 +34,7 @@ export default procedure
     path: "/entities/{entity}/about",
     summary: "Update entity About page",
     description:
-      "Replace an entity's About document. Start from `GET /entities/{entity}/about/document`, which keeps source quotes and who wrote each item; the public page leaves those out. Items you add or change are recorded as written by a person, and the About writer never changes them. Every new or changed event, site fact, and sentence needs a source. Rejects an edit based on an older `version`. Requires moderator privileges.",
+      "Replace an entity's About document with a new version. Start from `GET /entities/{entity}/about/document`, which keeps source quotes; the public page leaves them out. Every event, site fact, and sentence needs a source. The About writer rewrites the whole page on its next run; earlier versions stay in change history. Rejects an edit based on an older `version`. Requires moderator privileges.",
     operationId: "updateEntityAbout",
   })
   .input(InputSchema)
@@ -54,26 +49,12 @@ export default procedure
 
     return await withAboutRouteErrors(async () => {
       const saved = await db.transaction(async (tx) => {
-        const stored = await getEntityAbout(tx, entity.id);
-        const document = markPersonEdits(
-          stored?.document ?? null,
-          input.document,
-          new Date().toISOString(),
-        );
-        // An unchanged page saves nothing, so its version and check date stay.
-        if (
-          stored?.version === input.version &&
-          isDeepStrictEqual(document, stored.document)
-        ) {
-          return stored;
-        }
         const actor = await getUserActorForDatabase(tx, context.user);
         return await saveEntityAbout(tx, {
           entity,
-          document,
+          document: input.document,
           expectedVersion: input.version,
           actor,
-          checkedOn: new Date().toISOString().slice(0, 10),
         });
       });
       return await serialize(

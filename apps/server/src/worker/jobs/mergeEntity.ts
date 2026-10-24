@@ -7,6 +7,7 @@ import {
   bottlesToDistillers,
   changes,
   entities,
+  entityAboutNotes,
   entityEvents,
   entityFollows,
   entityImages,
@@ -801,6 +802,10 @@ async function performEntityMerge({
       .update(entityEvents)
       .set({ newOwnerId: toEntity.id })
       .where(inArray(entityEvents.newOwnerId, fromEntityIds));
+    await tx
+      .update(entityAboutNotes)
+      .set({ entityId: toEntity.id })
+      .where(inArray(entityAboutNotes.entityId, fromEntityIds));
 
     for (const sourceSeries of sourceSeriesRows) {
       const targetFullName = `${toEntity.name} ${sourceSeries.name}`;

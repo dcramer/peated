@@ -28,12 +28,6 @@ export const AboutSourceKindEnum = z
 
 export const AboutEventKindEnum = z.enum(ENTITY_ABOUT_EVENT_KIND_LIST);
 
-export const AboutWrittenByEnum = z
-  .enum(["person", "pipeline"])
-  .describe(
-    "Who last wrote this item. The pipeline never changes `person` items.",
-  );
-
 export const AboutSourceIdSchema = z.string().trim().min(1).max(40);
 
 /** A fact ID is `event:<id>` or `site:<field>`. */
@@ -79,16 +73,12 @@ const AboutEventFields = z.object({
   name: z.string().trim().min(1).max(200).nullable().default(null),
   title: z.string().trim().min(1).max(200).nullable().default(null),
   text: z.string().trim().min(1).max(1000).nullable().default(null),
+  // Links are shown when the Entity still exists; the owner's name is kept
+  // so the page reads the same when it does not.
   relatedEntityId: z.number().int().positive().nullable().default(null),
   newOwnerId: z.number().int().positive().nullable().default(null),
   newOwnerName: z.string().trim().min(1).max(200).nullable().default(null),
-  // The `entity_event` row this item was copied from, so the backfill copies
-  // each row once. Dropped with `entity_event`.
-  legacyEventId: z.number().int().positive().nullable().default(null),
   citations: z.array(AboutCitationSchema).default([]),
-  writtenBy: AboutWrittenByEnum,
-  createdAt: z.string().datetime().nullable().default(null),
-  updatedAt: z.string().datetime().nullable().default(null),
 });
 
 export const AboutEventSchema = AboutEventFields.superRefine(
@@ -108,8 +98,8 @@ export const AboutEventSchema = AboutEventFields.superRefine(
         issue("endDate", "An era needs an end date or must be continuing.");
       }
     }
-    if (event.kind === "acquired" && !event.newOwnerId && !event.newOwnerName) {
-      issue("newOwnerId", "An acquisition needs the new owner.");
+    if (event.kind === "acquired" && !event.newOwnerName) {
+      issue("newOwnerName", "An acquisition needs the new owner's name.");
     }
     if (event.kind !== "acquired" && (event.newOwnerId || event.newOwnerName)) {
       issue("newOwnerId", "Only an acquisition has a new owner.");
@@ -130,7 +120,6 @@ const AboutSiteFactSchema = z.object({
   value: z.union([z.number(), z.string().trim().min(1).max(200)]),
   asOf: EntityEventDateSchema.nullable().default(null),
   citations: z.array(AboutCitationSchema).default([]),
-  writtenBy: AboutWrittenByEnum,
 });
 
 // Built from the field list. Each value must match its field's type.
@@ -164,7 +153,6 @@ export const AboutSectionSchema = z.object({
   heading: z.string().trim().min(1).max(120).nullable().default(null),
   eraEventId: z.number().int().positive().nullable().default(null),
   sentences: z.array(AboutSentenceSchema).min(1),
-  writtenBy: AboutWrittenByEnum,
 });
 
 export const EntityAboutDocumentSchema = z.object({
@@ -181,7 +169,7 @@ export type AboutSiteFact = z.infer<typeof AboutSiteFactSchema>;
 export type AboutSection = z.infer<typeof AboutSectionSchema>;
 export type EntityAboutDocument = z.infer<typeof EntityAboutDocumentSchema>;
 
-// Public responses leave out quotes and pipeline bookkeeping.
+// Public responses leave out quotes.
 
 export const AboutPublicCitationSchema = z.object({
   sourceId: AboutSourceIdSchema,
@@ -263,6 +251,13 @@ export const EntityAboutSchema = z.object({
 });
 
 export type EntityAboutPublic = z.infer<typeof EntityAboutSchema>;
+
+export const EntityAboutNoteSchema = z.object({
+  id: z.number(),
+  text: z.string(),
+  sourceUrl: z.string().nullable(),
+  createdAt: z.string(),
+});
 
 export const EntityYearCountsSchema = z.object({
   results: z

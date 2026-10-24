@@ -72,7 +72,6 @@ export const mockBroraHistory = BRORA_ABOUT_EXAMPLE.events.flatMap((event) => {
           date: event.date,
           description: event.text,
           newOwnerId: null,
-          newOwnerName: null,
           sourceUrl: source?.url ?? null,
           createdAt: timestamp,
           updatedAt: timestamp,

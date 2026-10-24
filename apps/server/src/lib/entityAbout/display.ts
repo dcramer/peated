@@ -9,8 +9,7 @@ import { ABOUT_FACT_FIELD_LIST, type AboutFactField } from "./aboutFactFields";
 
 /**
  * Display rule (owner: docs/features/entity-about.md): a fact is shown only
- * when at least one citation points to a source in the document. Uncited
- * facts, including legacy history without a source, stay hidden.
+ * when at least one citation points to a source in the document.
  */
 export function isFactShown(
   citations: readonly AboutCitation[],

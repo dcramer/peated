@@ -62,7 +62,6 @@ describe("GET /entities/:entity/about", () => {
           key: "lead",
           heading: null,
           eraEventId: null,
-          writtenBy: "pipeline",
           sentences: [
             { text: "It opened in 1819.", factIds: ["event:1"] },
             { text: "It closed in May 1983.", factIds: ["event:3"] },
@@ -123,7 +122,6 @@ describe("GET /entity-about/sitemap", () => {
       key: "lead",
       heading: null,
       eraEventId: null,
-      writtenBy: "person" as const,
       sentences: [{ text: "It opened in 1819.", factIds: ["event:1"] }],
     };
     const events = [

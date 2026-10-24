@@ -100,10 +100,7 @@ describe("writeEntityAbout", () => {
     expect(result).toEqual({ status: "saved", version: 1 });
     const about = await getEntityAbout(db, entity.id);
     expect(about?.checkedOn).toBe("2026-10-23");
-    expect(about?.document.events.map(({ writtenBy }) => writtenBy)).toEqual([
-      "pipeline",
-      "pipeline",
-    ]);
+    expect(about?.document.events.map(({ id }) => id)).toEqual([1, 2]);
     const [saved] = await db
       .select()
       .from(entities)
@@ -256,99 +253,122 @@ describe("writeEntityAbout", () => {
     expect(result).toMatchObject({ status: "rejected" });
   });
 
-  test("keeps items a person wrote", async ({ fixtures }) => {
+  test("gives the writer its notes, history, and current page", async ({
+    fixtures,
+  }) => {
+    const user = await fixtures.User({ mod: true });
     const entity = await fixtures.Entity({ kind: "distillery" });
-    await fixtures.EntityAbout({
+    await fixtures.EntityEvent({
       entityId: entity.id,
-      events: [{ id: 1, kind: "closed", date: "1983-03", writtenBy: "person" }],
+      kind: "closed",
+      date: "1983",
+      sourceUrl: "https://example.com/closing",
     });
-
-    await writeEntityAbout(
-      { entityId: entity.id },
-      services(async () => ({ draft: goodDraft, pagesRead: [page] })),
+    await routerClient.entities.about.notes.create(
+      { entity: entity.id, text: "Not the modern Clynelish next door." },
+      { context: { user } },
     );
-
-    const about = await getEntityAbout(db, entity.id);
-    expect(
-      about?.document.events.map(({ kind, date, writtenBy }) => [
-        kind,
-        date,
-        writtenBy,
-      ]),
-    ).toEqual([
-      // The draft's 1983 closing agrees with the person's, so it adds a
-      // source instead of a second event.
-      ["closed", "1983-03", "person"],
-      ["opened", "1819", "pipeline"],
-    ]);
-  });
-
-  test("asks the writer to source stored history", async ({ fixtures }) => {
-    const entity = await fixtures.Entity({ kind: "distillery" });
     await fixtures.EntityAbout({
       entityId: entity.id,
-      sources: [],
-      events: [
-        {
-          id: 5,
-          kind: "opened",
-          date: "1819",
-          text: "Built by the Sutherland estate.",
-          writtenBy: "pipeline",
-          citations: [],
-        },
-      ],
+      events: [{ id: 1, kind: "opened", date: "1819" }],
     });
     const run = services(async () => ({ draft: goodDraft, pagesRead: [page] }));
 
     await writeEntityAbout({ entityId: entity.id }, run);
 
-    expect(run.writer.mock.calls[0]?.[0].unsourcedHistory).toEqual([
-      "#5 opened, 1819: Built by the Sutherland estate.",
+    const input = run.writer.mock.calls[0]![0];
+    expect(input.notes).toEqual(["Not the modern Clynelish next door."]);
+    expect(input.history).toEqual([
+      "closed, 1983; source https://example.com/closing",
     ]);
-    const about = await getEntityAbout(db, entity.id);
-    expect(
-      about?.document.events.map(({ id, text, citations }) => [
-        id,
-        text,
-        citations.length,
-      ]),
-    ).toEqual([
-      [5, "Built by the Sutherland estate.", 1],
-      [2, null, 1],
-    ]);
+    expect(input.currentPage?.events.map(({ id }) => id)).toEqual([1]);
   });
 
-  test("asks the writer to check the facts it replaces", async ({
+  test("replaces the whole page with the writer's next version", async ({
     fixtures,
   }) => {
     const entity = await fixtures.Entity({ kind: "distillery" });
     await fixtures.EntityAbout({
       entityId: entity.id,
+      events: [{ id: 7, kind: "mothballed", date: "1931" }],
+    });
+
+    const result = await writeEntityAbout(
+      { entityId: entity.id },
+      services(async () => ({ draft: goodDraft, pagesRead: [page] })),
+    );
+
+    expect(result).toEqual({ status: "saved", version: 2 });
+    const about = await getEntityAbout(db, entity.id);
+    expect(about?.document.events.map(({ id }) => id)).toEqual([1, 2]);
+  });
+
+  test("keeps a citation from the current page without a read", async ({
+    fixtures,
+  }) => {
+    const entity = await fixtures.Entity({ kind: "distillery" });
+
+    await writeEntityAbout(
+      { entityId: entity.id },
+      services(async () => ({ draft: goodDraft, pagesRead: [page] })),
+    );
+    // The next run reads no pages and returns the page as it is.
+    const result = await writeEntityAbout(
+      { entityId: entity.id },
+      services(async ({ currentPage }) => ({
+        draft: currentPage!,
+        pagesRead: [],
+      })),
+    );
+
+    expect(result).toEqual({ status: "saved", version: 2 });
+  });
+
+  test("links a new owner to the Entity of that name", async ({ fixtures }) => {
+    const entity = await fixtures.Entity({ kind: "distillery" });
+    const owner = await fixtures.Entity({
+      name: "Distillers Company",
+      kind: "company",
+    });
+    const acquiredPage = {
+      url: page.url,
+      text: `${page.text} The Distillers Company bought it in 1925.`,
+    };
+    const acquired: AboutDraft = {
+      ...goodDraft,
       events: [
-        { id: 1, kind: "opened", date: "1819", writtenBy: "pipeline" },
-        // A person's fact stays either way, so it is not listed; nor is a
-        // pipeline fact a person's sentence cites.
-        { id: 2, kind: "closed", date: "1983", writtenBy: "person" },
-        { id: 3, kind: "reopened", date: "2021", writtenBy: "pipeline" },
-      ],
-      sections: [
+        ...goodDraft.events,
         {
-          key: "lead",
-          heading: null,
-          eraEventId: null,
-          writtenBy: "person",
-          sentences: [{ text: "It reopened in 2021.", factIds: ["event:3"] }],
+          id: 3,
+          kind: "acquired",
+          date: "1925",
+          endDate: null,
+          continuing: false,
+          name: null,
+          title: null,
+          text: null,
+          newOwnerName: "Distillers Company",
+          citations: [
+            {
+              sourceId: "wp",
+              statedValue: "1925",
+              quote: "The Distillers Company bought it in 1925.",
+            },
+          ],
         },
       ],
+    };
+
+    await writeEntityAbout(
+      { entityId: entity.id },
+      services(async () => ({ draft: acquired, pagesRead: [acquiredPage] })),
+    );
+
+    const about = await getEntityAbout(db, entity.id);
+    expect(about?.document.events.find(({ id }) => id === 3)).toMatchObject({
+      newOwnerName: "Distillers Company",
+      newOwnerId: owner.id,
     });
-    const run = services(async () => ({ draft: goodDraft, pagesRead: [page] }));
-
-    await writeEntityAbout({ entityId: entity.id }, run);
-
-    expect(run.writer.mock.calls[0]?.[0].shownFacts).toEqual([
-      "#1 opened, 1819 (found on https://example.com/history)",
-    ]);
   });
 
   test("drops site facts that do not apply to the kind", async ({
@@ -381,33 +401,6 @@ describe("writeEntityAbout", () => {
     expect(result).toMatchObject({ status: "saved" });
     const about = await getEntityAbout(db, entity.id);
     expect(about?.document.siteFacts).toEqual({});
-  });
-
-  test("saves nothing when the stored page breaks a store rule", async ({
-    fixtures,
-  }) => {
-    // A person's site fact stays after the Entity becomes a brand, so the
-    // store rejects every save until a moderator removes it.
-    const entity = await fixtures.Entity({ kind: "brand" });
-    await fixtures.EntityAbout({
-      entityId: entity.id,
-      siteFacts: {
-        washStills: {
-          value: 1,
-          asOf: null,
-          citations: [{ sourceId: "s1", statedValue: "1", quote: null }],
-          writtenBy: "person",
-        },
-      },
-    });
-
-    const result = await writeEntityAbout(
-      { entityId: entity.id },
-      services(async () => ({ draft: goodDraft, pagesRead: [page] })),
-    );
-
-    expect(result.status).toBe("rejected");
-    expect((await getEntityAbout(db, entity.id))?.version).toBe(1);
   });
 
   test("retries a draft the store would reject", async ({ fixtures }) => {
@@ -445,136 +438,6 @@ describe("writeEntityAbout", () => {
 
     expect(result).toEqual({ status: "skipped" });
     expect(await getEntityAbout(db, entity.id)).toBeNull();
-  });
-
-  test("never saves a draft that shows fewer facts", async ({ fixtures }) => {
-    const entity = await fixtures.Entity({ kind: "distillery" });
-    await fixtures.EntityAbout({
-      entityId: entity.id,
-      events: [
-        { id: 1, kind: "opened", date: "1819", writtenBy: "pipeline" },
-        { id: 2, kind: "closed", date: "1983", writtenBy: "pipeline" },
-        { id: 3, kind: "reopened", date: "2021", writtenBy: "pipeline" },
-      ],
-    });
-
-    const result = await writeEntityAbout(
-      { entityId: entity.id },
-      services(async () => ({ draft: goodDraft, pagesRead: [page] })),
-    );
-
-    expect(result).toMatchObject({ status: "rejected" });
-    const about = await getEntityAbout(db, entity.id);
-    expect(about?.document.events.map(({ id }) => id)).toEqual([1, 2, 3]);
-  });
-
-  test("folds a copy of a person's event without counting it as lost", async ({
-    fixtures,
-  }) => {
-    const entity = await fixtures.Entity({ kind: "distillery" });
-    await fixtures.EntityAbout({
-      entityId: entity.id,
-      events: [
-        { id: 1, kind: "opened", date: "1819", writtenBy: "pipeline" },
-        { id: 2, kind: "opened", date: "1819", writtenBy: "person" },
-        { id: 3, kind: "closed", date: "1983", writtenBy: "pipeline" },
-      ],
-    });
-
-    const result = await writeEntityAbout(
-      { entityId: entity.id },
-      services(async () => ({ draft: goodDraft, pagesRead: [page] })),
-    );
-
-    expect(result).toMatchObject({ status: "saved" });
-    const about = await getEntityAbout(db, entity.id);
-    expect(
-      about?.document.events.map(({ kind, writtenBy }) => [kind, writtenBy]),
-    ).toEqual([
-      ["opened", "person"],
-      ["closed", "pipeline"],
-    ]);
-  });
-
-  test("rejects prose that contradicts a person's fact", async ({
-    fixtures,
-  }) => {
-    const entity = await fixtures.Entity({ kind: "distillery" });
-    await fixtures.EntityAbout({
-      entityId: entity.id,
-      siteFacts: {
-        washStills: {
-          value: 2,
-          asOf: null,
-          citations: [{ sourceId: "s1", statedValue: "2", quote: null }],
-          writtenBy: "person",
-        },
-      },
-    });
-    const oneStill: AboutDraft = {
-      ...goodDraft,
-      siteFacts: [
-        {
-          field: "washStills",
-          value: 1,
-          asOf: null,
-          citations: [
-            {
-              sourceId: "wp",
-              statedValue: "1",
-              quote: "It has 1 wash still.",
-            },
-          ],
-        },
-      ],
-      sections: [
-        {
-          ...goodDraft.sections[0]!,
-          sentences: [
-            ...goodDraft.sections[0]!.sentences,
-            { text: "It has 1 wash still.", factIds: ["site:washStills"] },
-          ],
-        },
-      ],
-    };
-    const run = services(async () => ({ draft: oneStill, pagesRead: [page] }));
-
-    const result = await writeEntityAbout({ entityId: entity.id }, run);
-
-    expect(result).toMatchObject({ status: "rejected" });
-    expect(run.writer).toHaveBeenCalledTimes(2);
-    const about = await getEntityAbout(db, entity.id);
-    expect(about?.document.siteFacts.washStills?.value).toBe(2);
-  });
-
-  test("never removes the page's lead", async ({ fixtures }) => {
-    const entity = await fixtures.Entity({ kind: "distillery" });
-    await fixtures.EntityAbout({
-      entityId: entity.id,
-      events: [
-        { id: 1, kind: "opened", date: "1819", writtenBy: "pipeline" },
-        { id: 2, kind: "closed", date: "1983", writtenBy: "pipeline" },
-      ],
-      sections: [
-        {
-          key: "lead",
-          heading: null,
-          eraEventId: null,
-          writtenBy: "pipeline",
-          sentences: [{ text: "It opened in 1819.", factIds: ["event:1"] }],
-        },
-      ],
-    });
-    const noProse: AboutDraft = { ...goodDraft, sections: [] };
-
-    const result = await writeEntityAbout(
-      { entityId: entity.id },
-      services(async () => ({ draft: noProse, pagesRead: [page] })),
-    );
-
-    expect(result).toMatchObject({ status: "rejected" });
-    const about = await getEntityAbout(db, entity.id);
-    expect(about?.document.sections.map(({ key }) => key)).toEqual(["lead"]);
   });
 
   test("saves nothing from an empty draft", async ({ fixtures }) => {
