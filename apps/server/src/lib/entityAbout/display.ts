@@ -24,7 +24,14 @@ export function isFactShown(
 }
 
 function normalizeStatedValue(value: string) {
-  return value.trim().toLowerCase().replace(/\s+/g, " ");
+  return (
+    value
+      .trim()
+      .toLowerCase()
+      .replace(/\s+/g, " ")
+      // "500,000" and "500000" are the same number.
+      .replace(/(\d),(?=\d{3}\b)/g, "$1")
+  );
 }
 
 export const ISO_DATE_PATTERN = /^\d{4}(?:-\d{2}){0,2}$/;

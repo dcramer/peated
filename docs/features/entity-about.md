@@ -84,7 +84,8 @@ links to the About page only when that page exists.
   Their edits are marked as written by a person. They can hide or show the
   page with `entities.about.status`.
 - The legacy Entity history routes (`entities.events.*`) edit the same
-  document. A new history item needs a source URL.
+  document. A new history item needs a source URL. Changing an item's date
+  or kind keeps its sources but clears what they were quoted as stating.
 - The `writeEntityAbout` worker job writes as the `aboutPipeline` system
   actor. Administrators queue it with `/admin/catalog/write-entity-about`.
   `ENTITY_ABOUT_WRITER_ENABLED` turns it off; so does a missing

@@ -114,7 +114,13 @@ export const AboutEventSchema = AboutEventFields.superRefine(
     if (event.kind !== "acquired" && (event.newOwnerId || event.newOwnerName)) {
       issue("newOwnerId", "Only an acquisition has a new owner.");
     }
-    if (event.endDate && event.endDate < event.date) {
+    // "1985" ends a span that starts "1985-06"; only an earlier period is
+    // before the start.
+    if (
+      event.endDate &&
+      event.endDate < event.date &&
+      !event.date.startsWith(event.endDate)
+    ) {
       issue("endDate", "The end date is before the start date.");
     }
   },

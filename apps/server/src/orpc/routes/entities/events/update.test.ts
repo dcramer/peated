@@ -42,6 +42,34 @@ describe("PATCH /entities/:entity/events/:event", () => {
     ]);
   });
 
+  test("clears quoted values when the date changes", async ({ fixtures }) => {
+    const user = await fixtures.User({ mod: true });
+    const entity = await fixtures.Entity();
+    await fixtures.EntityAbout({
+      entityId: entity.id,
+      events: [
+        {
+          id: 1,
+          kind: "closed",
+          date: "1983",
+          citations: [
+            { sourceId: "s1", statedValue: "1983", quote: "Closed in 1983." },
+          ],
+        },
+      ],
+    });
+
+    await routerClient.entities.events.update(
+      { entity: entity.id, event: 1, date: "1985" },
+      { context: { user } },
+    );
+
+    const about = await getEntityAbout(db, entity.id);
+    expect(about?.document.events[0]?.citations).toEqual([
+      { sourceId: "s1", statedValue: null, quote: null },
+    ]);
+  });
+
   test("keeps an owner known only by name", async ({ fixtures }) => {
     const user = await fixtures.User({ mod: true });
     const entity = await fixtures.Entity();
