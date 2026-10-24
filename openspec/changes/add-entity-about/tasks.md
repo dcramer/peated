@@ -33,7 +33,7 @@
 
 ## 4. Brora on stored data
 
-- [ ] 4.1 Get approval for Brora's production changes under `docs/operations/catalog-maintenance.md`
+- [x] 4.1 Get approval for Brora's production changes under `docs/operations/catalog-maintenance.md`
 - [ ] 4.2 Enter Brora's sources, events, eras, names, site facts, status, and sections through `pnpm cli api`; verify each write by reading it back
 - [x] 4.3 Delete `apps/web/src/features/entityAbout/articles/brora.ts` and the in-code article map
 
