@@ -68,6 +68,15 @@ export function auctionAvailability(
   return lot.state;
 }
 
+/**
+ * Auction scope rule (owner: auctions): a single miniature lot, 100 ml or less
+ * by its stored volume, is out of scope like sets and multipacks. A lot with an
+ * unknown volume is matched normally.
+ */
+export function isMiniatureAuctionLot(lot: Pick<AuctionLot, "volume">) {
+  return lot.volume !== null && lot.volume <= 100;
+}
+
 function identityFingerprint(
   input: Pick<AuctionLot, "name" | "volume" | "sourceBottleIdentity">,
 ) {

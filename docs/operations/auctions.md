@@ -95,8 +95,9 @@ to avoid new model calls. Put their current versions in a temporary JSON file:
 
 The IDs are examples. An administrator submits the real file with
 `pnpm cli api post /auction-lots/recheck --input PATH`. A changed lot rejects
-the whole batch. Matched and ignored lots are skipped. Default rechecks reuse
-current references and saved checks; missing evidence may need a model call.
+the whole batch. Matched and ignored lots are skipped. Miniature lots (100 ml
+or less) become ignored without a detail read or model call. Default rechecks
+reuse current references and saved checks; missing evidence may need a model call.
 They do not scan auction indexes. A supported saved creation proposal can create
 or safely reuse a Bottle through the shared resolution rules, in the same
 transaction as its lot assignment. Unsupported proposals stay in review.

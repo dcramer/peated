@@ -21,6 +21,7 @@ import { routerClient } from "@peated/server/orpc/router";
 import { requestAuctionLotDetails } from "@peated/server/scraper";
 import { eq } from "drizzle-orm";
 import { afterEach, beforeEach, vi } from "vitest";
+import applyAuctionLotMatchJob from "../worker/jobs/applyAuctionLotMatch";
 import { parseScotchWhiskyAuctionDetails } from "./adapters/scotchWhiskyAuctionDetails";
 import { ScotchWhiskyAuctionDetailsCursorSchema } from "./adapters/scotchWhiskyAuctions";
 import { createScraperLifecycle, type ScraperEnqueue } from "./lifecycle";
@@ -808,6 +809,113 @@ test("detail retry rejects mixed-source batches without changing any lot and ski
       where: eq(auctionLots.id, otherLot.id),
     }),
   ).toEqual(ignored);
+});
+
+test.for([false, true])(
+  "an admin recheck ignores a miniature review lot without a detail read or model call (refresh: %s)",
+  async (refreshSourceDetails, { fixtures }) => {
+    const site = await fixtures.ExternalSite({ type: "scotchwhiskyauctions" });
+    const { lot } = await upsertAuctionObservation(site.id, {
+      auction: {
+        sourceKey: "232",
+        name: "The 183rd auction",
+        url: "https://www.scotchwhiskyauctions.com/auctions/232-the-183rd-auction/",
+      },
+      lot: {
+        sourceKey: "893368",
+        name: "Yamazaki 12 Year Old Mini 5cl",
+        url,
+        state: "closed",
+        volume: 50,
+      },
+      observedAt: new Date().toISOString(),
+    });
+    // A miniature lot already in review from before the scope rule.
+    const { check } = await createBottleCheck({
+      intent: "resolve_reference",
+      sourceKind: "auction_lot",
+      sourceId: lot.id,
+      backgroundEventKey: auctionLotCheckKey(lot.id, lot.sourceFingerprint),
+      input: { reference: { id: lot.id, name: lot.name, url: lot.url } },
+      result: createDecidedBottleClassification({
+        decision: {
+          action: "no_match",
+          rationale: "Size differs from the catalog Bottle.",
+          candidateBottleIds: [],
+          matchedBottleId: null,
+          identityScope: "product",
+          observation: null,
+          proposedBottle: null,
+        },
+        artifacts: {},
+      }),
+    });
+    await db
+      .update(auctionLots)
+      .set({ matchStatus: "review", matchCheckId: check.id })
+      .where(eq(auctionLots.id, lot.id));
+    const input = {
+      refreshSourceDetails,
+      lots: [
+        {
+          lotId: lot.id,
+          fingerprint: lot.sourceFingerprint,
+          expectedBottleId: null,
+          expectedCheckId: check.id,
+        },
+      ],
+    };
+    const admin = await fixtures.User({ admin: true });
+    expect(
+      await routerClient.auctions.recheck(input, { context: { user: admin } }),
+    ).toEqual({ queued: [lot.id], skipped: [] });
+    const args = { lotId: lot.id, fingerprint: lot.sourceFingerprint };
+    expect(pushJob).toHaveBeenCalledWith("ApplyAuctionLotMatch", args);
+    const model = vi.spyOn(classifier, "runScrapedBottleReference");
+    await applyAuctionLotMatchJob(args);
+    expect(model).not.toHaveBeenCalled();
+    expect(pushJob).not.toHaveBeenCalledWith(
+      "ResolveAuctionLot",
+      expect.anything(),
+    );
+    expect(await db.query.auctionLots.findFirst()).toMatchObject({
+      bottleId: null,
+      matchStatus: "ignored",
+      sourceDetailsRequestedAt: null,
+    });
+    expect(await queueDetails()).toBeNull();
+    expect(
+      await routerClient.auctions.recheck(input, { context: { user: admin } }),
+    ).toEqual({ queued: [], skipped: [lot.id] });
+  },
+);
+
+test("a detail read that reports a miniature size ignores the lot before its first model check", async ({
+  fixtures,
+}) => {
+  const site = await fixtures.ExternalSite({ type: "scotchwhiskyauctions" });
+  const lot = await importedLot(site.id);
+  const model = vi.spyOn(classifier, "runScrapedBottleReference");
+  await resolveAuctionLot(lot.id, lot.sourceFingerprint);
+  const run = (await queueDetails())!;
+  const request = ScotchWhiskyAuctionDetailsCursorSchema.parse(run.cursor)
+    .lots[0];
+  const saved = await saveAuctionLotDetails(site.id, {
+    kind: "details",
+    request,
+    name,
+    sourceBottleIdentity: null,
+    volume: 50,
+    checkedAt: new Date().toISOString(),
+  });
+  expect(saved).toMatchObject({ volume: 50, matchStatus: "pending" });
+  await resolveAuctionLot(lot.id, saved!.sourceFingerprint);
+  expect(model).not.toHaveBeenCalled();
+  expect(await db.query.bottleChecks.findMany()).toHaveLength(0);
+  expect(await db.query.auctionLots.findFirst()).toMatchObject({
+    bottleId: null,
+    matchStatus: "ignored",
+  });
 });
 
 test("requested live lots are checked before older closed lots", async ({

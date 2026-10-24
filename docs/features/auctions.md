@@ -3,7 +3,8 @@
 Auction listings belong to a sale occurrence, not a physical bottle. Peated
 links each supported single-bottle lot to one Bottle. The same release
 can have several simultaneous lots or return in a later auction without
-overwriting history. Sets and multipacks are outside the initial scope.
+overwriting history. Sets, multipacks, and single miniatures are outside the
+initial scope.
 
 ## Stored records
 
@@ -49,8 +50,15 @@ not a sale time. Missing prices and dates remain null.
 ## Bottle matching
 
 The collector queues unresolved lots through `ResolveAuctionLot`. Matching first
-reuses an exact accepted Bottle reference unless source facts conflict. Otherwise
-it saves the classifier decision as a Bottle check. A match can apply automatically
+ignores a miniature: a lot whose stored size is 100 ml or less, such as a 3 cl
+sample or a 5 cl mini. It uses the saved lot size, not the title, and makes no
+reference lookup, detail read, or classifier call. A lot with an unknown size is
+matched normally; if a later detail read reports a miniature size, the next match
+ignores it. Miniatures already in review stay there until an administrator
+rechecks them.
+
+Matching then reuses an exact accepted Bottle reference unless source facts
+conflict. Otherwise it saves the classifier decision as a Bottle check. A match can apply automatically
 under the shared Bottle-resolution rules used by prices, reviews, and photos: the chosen Bottle must be a
 retrieved, active candidate, supporting evidence must justify the match, and
 populated facts must not conflict. Missing evidence or unresolved risks require
@@ -101,8 +109,9 @@ Pending matching belongs in Background work, not Inbox.
 
 Administrators can recheck 1–100 explicit imported lots with expected source,
 Bottle, and check versions. The whole batch is validated before work is saved;
-matched and ignored lots are skipped. Workers reuse references and saved checks
-on the default queue through `ApplyAuctionLotMatch`, so this work does not wait
+matched and ignored lots are skipped. A recheck ignores a miniature lot without
+a detail read, even with `refreshSourceDetails`. Workers reuse references and
+saved checks on the default queue through `ApplyAuctionLotMatch`, so this work does not wait
 behind new classifications. Missing checks wait for requested source facts or
 queue `ResolveAuctionLot` on the models queue. Dispatch failures leave pending
 work that can be submitted again. Rechecks do not collect auction indexes.
