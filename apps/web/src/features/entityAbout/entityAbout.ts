@@ -181,15 +181,21 @@ export function getAxisYears(first: number, last: number): Set<number> {
 }
 
 const LABEL_EVERY_BAR_UP_TO = 12;
+// Wider charts have columns too narrow on a phone for counts side by side.
+const LABEL_EVERY_BAR_MAX_COLUMNS = 24;
 const LABELED_PEAKS = 3;
 
 /**
- * The years whose bar shows its count: every bar in a short chart, otherwise
- * the three tallest, so equal bars are never labeled at random.
+ * The years whose bar shows its count: every bar in a short, narrow chart,
+ * otherwise the three tallest, so equal bars are never labeled at random.
+ * `years` has one entry per column, empty years included.
  */
 export function getLabeledYears(years: readonly VintageCount[]): Set<number> {
   const bars = years.filter((entry) => entry.count > 0);
-  if (bars.length <= LABEL_EVERY_BAR_UP_TO) {
+  if (
+    bars.length <= LABEL_EVERY_BAR_UP_TO &&
+    years.length <= LABEL_EVERY_BAR_MAX_COLUMNS
+  ) {
     return new Set(bars.map((entry) => entry.year));
   }
   return new Set(

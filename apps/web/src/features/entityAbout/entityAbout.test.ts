@@ -150,6 +150,22 @@ describe("getLabeledYears", () => {
     ]);
   });
 
+  it("labels only the three tallest bars in a wide chart", () => {
+    const years = fillYears({
+      results: [
+        { year: 1960, count: 1 },
+        { year: 1961, count: 2 },
+        { year: 1999, count: 5 },
+        { year: 2000, count: 4 },
+      ],
+      withoutYear: 0,
+    });
+
+    expect([...getLabeledYears(years)].sort((a, b) => a - b)).toEqual([
+      1961, 1999, 2000,
+    ]);
+  });
+
   it("labels only the three tallest bars in a long chart", () => {
     const years = Array.from({ length: 20 }, (_, index) => ({
       year: 1960 + index,
