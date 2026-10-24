@@ -141,6 +141,46 @@ describe("PUT /entities/:entity/about", () => {
     );
   });
 
+  test("rejects a section without a heading", async ({ fixtures }) => {
+    const user = await fixtures.User({ mod: true });
+    const entity = await fixtures.Entity();
+
+    const err = await waitError(() =>
+      routerClient.entities.about.update(
+        {
+          entity: entity.id,
+          version: null,
+          document: {
+            sources: [source],
+            events: [
+              {
+                id: 1,
+                kind: "closed",
+                date: "1983",
+                writtenBy: "person",
+                citations: [{ sourceId: "s1" }],
+              },
+            ],
+            sections: [
+              {
+                key: "history",
+                writtenBy: "person",
+                sentences: [
+                  { text: "It closed in 1983.", factIds: ["event:1"] },
+                ],
+              },
+            ],
+          },
+        },
+        { context: { user } },
+      ),
+    );
+
+    expect(err).toMatchInlineSnapshot(
+      `[Error: Section history needs a heading.]`,
+    );
+  });
+
   test("rejects site facts on a brand", async ({ fixtures }) => {
     const user = await fixtures.User({ mod: true });
     const entity = await fixtures.Entity({ kind: "brand" });

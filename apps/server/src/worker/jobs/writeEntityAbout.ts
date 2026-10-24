@@ -181,6 +181,13 @@ export async function writeEntityAbout(
   let saved;
   try {
     saved = await db.transaction(async (tx) => {
+      // Lock order rule (owner: `mergeEntity`): the Entity row, then its
+      // About row, so a merge running at the same time cannot deadlock.
+      await tx
+        .select({ id: entities.id })
+        .from(entities)
+        .where(eq(entities.id, entity.id))
+        .for("update");
       const stored = await getEntityAbout(tx, entity.id, { forUpdate: true });
       const now = services.now();
       // Owners are read again: a moderator may have linked one mid-run.

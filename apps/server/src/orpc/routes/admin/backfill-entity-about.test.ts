@@ -4,6 +4,47 @@ import waitError from "@peated/server/lib/test/waitError";
 import { routerClient } from "@peated/server/orpc/router";
 
 describe("POST /admin/catalog/backfill-entity-about", () => {
+  test("reports an Entity it cannot copy and continues", async ({
+    fixtures,
+  }) => {
+    const admin = await fixtures.User({ admin: true });
+    const broken = await fixtures.Entity();
+    await fixtures.EntityEvent({
+      entityId: broken.id,
+      kind: "generic",
+      date: "1900",
+      description: "x".repeat(1001),
+    });
+    const badUrl = await fixtures.Entity();
+    const unparsable = await fixtures.EntityEvent({
+      entityId: badUrl.id,
+      kind: "opened",
+      date: "1819",
+      sourceUrl: "not a url",
+    });
+    const fine = await fixtures.Entity();
+    await fixtures.EntityEvent({
+      entityId: fine.id,
+      kind: "opened",
+      date: "1819",
+    });
+
+    const result = await routerClient.admin.backfillEntityAbout(
+      {},
+      { context: { user: admin } },
+    );
+
+    expect(result.copiedEvents).toBe(1);
+    expect(result.failed).toEqual([
+      { entityId: broken.id, reasons: [expect.stringContaining("text")] },
+      {
+        entityId: badUrl.id,
+        reasons: [`History item ${unparsable.id} has an invalid source URL.`],
+      },
+    ]);
+    expect(await getEntityAbout(db, fine.id)).not.toBeNull();
+  });
+
   test("copies legacy history into About documents", async ({ fixtures }) => {
     const admin = await fixtures.User({ admin: true });
     const entity = await fixtures.Entity();
@@ -30,7 +71,12 @@ describe("POST /admin/catalog/backfill-entity-about", () => {
       { context: { user: admin } },
     );
 
-    expect(result).toEqual({ copiedEvents: 3, entities: 1, nextAfterId: null });
+    expect(result).toEqual({
+      copiedEvents: 3,
+      entities: 1,
+      failed: [],
+      nextAfterId: null,
+    });
     const about = await getEntityAbout(db, entity.id);
     expect(about?.document.events.map(({ id }) => id)).toEqual([
       opened.id,
