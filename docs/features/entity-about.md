@@ -115,7 +115,9 @@ After the merge, the pipeline's sentences are checked again against the
 facts they cite, so a sentence cannot contradict a value a person set. A run
 never leaves the page with fewer shown facts; such a draft, for example one
 written while search was failing, saves nothing. A moderator
-removes facts by editing. The merge is saved with a version check.
+removes facts by editing. The merge is saved with a version check. When an
+item a person wrote breaks a store rule, such as a site fact kept after the
+Entity's kind changed, the job saves nothing until a moderator fixes it.
 
 ## History Without Sources
 

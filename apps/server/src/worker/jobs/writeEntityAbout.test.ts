@@ -155,6 +155,25 @@ describe("writeEntityAbout", () => {
     expect(byId.get(hidden.id)).toBe(hidden.description);
   });
 
+  test("fills an empty description", async ({ fixtures }) => {
+    const entity = await fixtures.Entity({
+      kind: "distillery",
+      description: "",
+      descriptionSrc: null,
+    });
+
+    await writeEntityAbout(
+      { entityId: entity.id },
+      services(async () => ({ draft: goodDraft, pagesRead: [page] })),
+    );
+
+    const [saved] = await db
+      .select()
+      .from(entities)
+      .where(eq(entities.id, entity.id));
+    expect(saved?.description).toBe("Brora opened in 1819. It closed in 1983.");
+  });
+
   test("keeps a description a person writes during the run", async ({
     fixtures,
   }) => {
@@ -311,6 +330,33 @@ describe("writeEntityAbout", () => {
     expect(result).toMatchObject({ status: "saved" });
     const about = await getEntityAbout(db, entity.id);
     expect(about?.document.siteFacts).toEqual({});
+  });
+
+  test("saves nothing when the stored page breaks a store rule", async ({
+    fixtures,
+  }) => {
+    // A person's site fact stays after the Entity becomes a brand, so the
+    // store rejects every save until a moderator removes it.
+    const entity = await fixtures.Entity({ kind: "brand" });
+    await fixtures.EntityAbout({
+      entityId: entity.id,
+      siteFacts: {
+        washStills: {
+          value: 1,
+          asOf: null,
+          citations: [{ sourceId: "s1", statedValue: "1", quote: null }],
+          writtenBy: "person",
+        },
+      },
+    });
+
+    const result = await writeEntityAbout(
+      { entityId: entity.id },
+      services(async () => ({ draft: goodDraft, pagesRead: [page] })),
+    );
+
+    expect(result.status).toBe("rejected");
+    expect((await getEntityAbout(db, entity.id))?.version).toBe(1);
   });
 
   test("retries a draft the store would reject", async ({ fixtures }) => {

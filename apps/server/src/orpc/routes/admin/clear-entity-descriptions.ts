@@ -4,7 +4,7 @@ import {
   ABOUT_WRITER_SYSTEM_ACTOR_KEY,
   getSystemActorForDatabase,
 } from "@peated/server/lib/actors";
-import { toPublicEntityAbout } from "@peated/server/lib/entityAbout/publicAbout";
+import { getPublishedLeadText } from "@peated/server/lib/entityAbout/publicAbout";
 import { getEntityAbout } from "@peated/server/lib/entityAbout/store";
 import { procedure } from "@peated/server/orpc";
 import { requireAdmin } from "@peated/server/orpc/middleware";
@@ -67,18 +67,17 @@ export default procedure
       .limit(input.limit + 1);
     const page = rows.slice(0, input.limit);
 
+    const actor = await getSystemActorForDatabase(
+      db,
+      ABOUT_WRITER_SYSTEM_ACTOR_KEY,
+    );
     let cleared = 0;
     for (const entity of page) {
       await db.transaction(async (tx) => {
         // Description rule (owner: docs/features/entity-about.md): a generated
         // description stays only when it is the published About lead.
         const about = await getEntityAbout(tx, entity.id);
-        const lead =
-          about?.status === "published"
-            ? toPublicEntityAbout(about, new Map()).lead
-            : null;
-        const leadText = lead?.sentences.map((s) => s.text).join(" ");
-        if (leadText && leadText === entity.description) return;
+        if (getPublishedLeadText(about) === entity.description) return;
 
         const [updated] = await tx
           .update(entities)
@@ -95,10 +94,6 @@ export default procedure
           )
           .returning({ id: entities.id });
         if (!updated) return;
-        const actor = await getSystemActorForDatabase(
-          tx,
-          ABOUT_WRITER_SYSTEM_ACTOR_KEY,
-        );
         await tx.insert(changes).values({
           objectType: "entity",
           objectId: entity.id,
