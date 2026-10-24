@@ -1,5 +1,5 @@
 import { db } from "@peated/server/db";
-import { entities, entityEvents } from "@peated/server/db/schema";
+import { entities } from "@peated/server/db/schema";
 import { getUserActorForDatabase } from "@peated/server/lib/actors";
 import { eventFactId } from "@peated/server/lib/entityAbout/display";
 import { removeFacts } from "@peated/server/lib/entityAbout/document";
@@ -39,10 +39,9 @@ export default procedure
     await withAboutRouteErrors(async () => {
       await db.transaction(async (tx) => {
         const stored = await getEntityAbout(tx, entity.id, { forUpdate: true });
-        const removed = stored?.document.events.find(
-          (event) => event.id === input.event,
-        );
-        if (!removed) {
+        if (
+          !stored?.document.events.some((event) => event.id === input.event)
+        ) {
           throw errors.NOT_FOUND({ message: "History item not found." });
         }
         await editEntityHistory(tx, {
@@ -51,13 +50,6 @@ export default procedure
           edit: (document) =>
             removeFacts(document, new Set([eventFactId(input.event)])),
         });
-        // The backfill copies `entity_event` rows; removing the row keeps a
-        // repeat run from bringing the item back.
-        if (removed.legacyEventId) {
-          await tx
-            .delete(entityEvents)
-            .where(eq(entityEvents.id, removed.legacyEventId));
-        }
       });
     });
 

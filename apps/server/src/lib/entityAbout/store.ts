@@ -3,6 +3,7 @@ import {
   changes,
   entities,
   entityAbout,
+  entityEvents,
   entityTombstones,
   type Actor,
   type EntityKind,
@@ -279,6 +280,23 @@ export async function saveEntityAbout(
       reasons,
       missing,
     );
+  }
+
+  // Copy rule (owner: `/admin/catalog/backfill-entity-about`): the backfill
+  // copies each `entity_event` row once. A row whose item a save removes is
+  // deleted too, so a repeat run does not bring the item back.
+  const legacyIds = (doc: EntityAboutDocument | null) =>
+    (doc?.events ?? []).flatMap((event) =>
+      event.legacyEventId ? [event.legacyEventId] : [],
+    );
+  const kept = new Set(legacyIds(document));
+  const removedLegacyIds = legacyIds(stored?.document ?? null).filter(
+    (id) => !kept.has(id),
+  );
+  if (removedLegacyIds.length) {
+    await tx
+      .delete(entityEvents)
+      .where(inArray(entityEvents.id, removedLegacyIds));
   }
 
   const version = (stored?.version ?? 0) + 1;

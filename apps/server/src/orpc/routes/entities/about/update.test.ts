@@ -1,7 +1,9 @@
 import { db } from "@peated/server/db";
+import { entityEvents } from "@peated/server/db/schema";
 import { getEntityAbout } from "@peated/server/lib/entityAbout/store";
 import waitError from "@peated/server/lib/test/waitError";
 import { routerClient } from "@peated/server/orpc/router";
+import { eq } from "drizzle-orm";
 
 const source = {
   id: "s1",
@@ -78,6 +80,36 @@ describe("PUT /entities/:entity/about", () => {
     expect(err).toMatchInlineSnapshot(
       `[Error: About for entity ${entity.id} changed since it was read.]`,
     );
+  });
+
+  test("deletes the legacy row of a removed copied item", async ({
+    fixtures,
+  }) => {
+    const user = await fixtures.User({ mod: true });
+    const entity = await fixtures.Entity();
+    const legacy = await fixtures.EntityEvent({ entityId: entity.id });
+    await fixtures.EntityAbout({
+      entityId: entity.id,
+      events: [{ id: 1, legacyEventId: legacy.id }],
+    });
+    const stored = await getEntityAbout(db, entity.id);
+
+    await routerClient.entities.about.update(
+      {
+        entity: entity.id,
+        version: 1,
+        document: { ...stored!.document, events: [] },
+      },
+      { context: { user } },
+    );
+
+    // A repeat backfill copies only rows that still exist.
+    expect(
+      await db
+        .select()
+        .from(entityEvents)
+        .where(eq(entityEvents.id, legacy.id)),
+    ).toEqual([]);
   });
 
   test("saves nothing when the page is unchanged", async ({ fixtures }) => {

@@ -165,7 +165,8 @@ documents. Each copied item records its row in `legacyEventId`, and the
 backfill copies a row only when no item records it, so repeat runs are safe.
 An Entity whose rows break a save rule, such as an invalid source URL, is
 listed in the response's `failed` with the reasons, and the page continues.
-Deleting a history item also deletes its row. Copied history counts as
+A save that removes a copied item, through either history route or the
+document route, also deletes its row. Copied history counts as
 written by a person: the writer can add sources to it but never replaces it.
 
 ## Merges
