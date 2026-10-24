@@ -161,7 +161,9 @@ none, so it is stored but hidden until a source is found:
 ## Copying Legacy History
 
 `/admin/catalog/backfill-entity-about` copies `entity_event` rows into About
-documents. Each copied item records its row in `legacyEventId`, and the
+documents. The history routes read only documents, so run it right after the
+API deploy: until it finishes, Overview history is empty and editing an old
+item returns not found. Each copied item records its row in `legacyEventId`, and the
 backfill copies a row only when no item records it, so repeat runs are safe.
 An Entity whose rows break a save rule, such as an invalid source URL, is
 listed in the response's `failed` with the reasons, and the page continues.

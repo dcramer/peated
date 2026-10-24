@@ -372,10 +372,12 @@ Each likely change has one place to make it, without reworking storage:
 
 1. Add `entity_about` and the `entity_about` change object type. Generate the
    migration with `pnpm db:generate`.
-2. Backfill a document for each Entity with `entity_event` rows. Copy each
-   `sourceUrl` as a source, and check event counts for each Entity.
-3. Point Overview history, owner acquisitions, and moderator event routes at
-   the document. Stop writing `entity_event`.
+2. Point Overview history, owner acquisitions, and moderator event routes at
+   the document. Stop writing `entity_event`. This ships with step 1.
+3. Right after the API deploy, backfill a document for each Entity with
+   `entity_event` rows. Copy each `sourceUrl` as a source, and check event
+   counts for each Entity. Until it finishes, Overview history is empty and
+   legacy history edits return not found.
 4. Enter Brora's document through the API, following the catalog maintenance
    approval and checks. Delete the code file.
 5. Ship the catalog-numbers routes and the About tab.
