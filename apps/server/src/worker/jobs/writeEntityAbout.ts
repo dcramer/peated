@@ -4,8 +4,13 @@ import {
   type EntityAboutWriter,
 } from "@peated/server/agents/entityAbout/writer";
 import config from "@peated/server/config";
-import { db } from "@peated/server/db";
-import { changes, entities, entityAliases } from "@peated/server/db/schema";
+import { db, type AnyDatabase } from "@peated/server/db";
+import {
+  changes,
+  entities,
+  entityAliases,
+  type Actor,
+} from "@peated/server/db/schema";
 import {
   ABOUT_WRITER_SYSTEM_ACTOR_KEY,
   getSystemActorForDatabase,
@@ -16,11 +21,13 @@ import {
 } from "@peated/server/lib/entityAbout/checks";
 import { isFactShown } from "@peated/server/lib/entityAbout/display";
 import { mergePipelineDraft } from "@peated/server/lib/entityAbout/document";
-import { toPublicEntityAbout } from "@peated/server/lib/entityAbout/publicAbout";
+import { getPublishedLeadText } from "@peated/server/lib/entityAbout/publicAbout";
 import {
+  EntityAboutWriteError,
   followMergedEntities,
   getEntityAbout,
   saveEntityAbout,
+  type StoredEntityAbout,
 } from "@peated/server/lib/entityAbout/store";
 import { logWarn } from "@peated/server/lib/log";
 import type { EntityAboutDocument } from "@peated/server/schemas/entityAbout";
@@ -161,103 +168,115 @@ export async function writeEntityAbout(
       .map((item) => `The ${item} does not match the output format.`);
     errors = [...droppedSections, ...reviewed.errors];
     if (!errors.length) {
-      errors = checkMergedAbout(
-        before?.document ?? null,
-        mergePipelineDraft(
-          before?.document ?? null,
-          reviewed.document,
-          now,
-          ownerNames,
-        ),
-      );
+      errors = mergeAndCheck(before, reviewed.document, now, ownerNames).errors;
     }
     if (!errors.length) accepted = reviewed.document;
   }
-
-  if (!accepted) {
-    // Log counts only; drafts can quote third-party pages.
-    logWarn("About draft rejected", {
-      extra: { entityId: entity.id, errorCount: errors.length },
-    });
-    return { status: "rejected", errors };
-  }
+  if (!accepted) return rejected(entity.id, errors);
 
   const document = accepted;
-  const saved = await db.transaction(async (tx) => {
-    const stored = await getEntityAbout(tx, entity.id, { forUpdate: true });
-    const merged = mergePipelineDraft(
-      stored?.document ?? null,
-      document,
-      services.now().toISOString(),
-      ownerNames,
-    );
-    const mergeErrors = checkMergedAbout(stored?.document ?? null, merged);
-    if (mergeErrors.length) return { errors: mergeErrors, version: null };
+  let saved;
+  try {
+    saved = await db.transaction(async (tx) => {
+      const stored = await getEntityAbout(tx, entity.id, { forUpdate: true });
+      const now = services.now();
+      const { merged, errors } = mergeAndCheck(
+        stored,
+        document,
+        now.toISOString(),
+        ownerNames,
+      );
+      // The page changed between the draft and the save.
+      if (errors.length) return { errors };
 
-    const today = services.now().toISOString().slice(0, 10);
-    const actor = await getSystemActorForDatabase(
-      tx,
-      ABOUT_WRITER_SYSTEM_ACTOR_KEY,
-    );
-    const result = await saveEntityAbout(tx, {
-      entity,
-      document: merged,
-      expectedVersion: stored?.version ?? null,
-      actor,
-      checkedOn: today,
-    });
-
-    // A published, sourced lead replaces a generated or empty description,
-    // never a person's or one of unknown origin. The check is in the update
-    // itself, so an edit made during the run wins.
-    const lead =
-      result.status === "published"
-        ? toPublicEntityAbout(result, new Map()).lead
-        : null;
-    const description = lead?.sentences.map((s) => s.text).join(" ");
-    const [updated] = description
-      ? await tx
-          .update(entities)
-          .set({
-            description,
-            descriptionSrc: "generated",
-            updatedAt: new Date(),
-          })
-          .where(
-            and(
-              eq(entities.id, entity.id),
-              or(
-                isNull(entities.description),
-                and(
-                  eq(entities.descriptionSrc, "generated"),
-                  ne(entities.description, description),
-                ),
-              ),
-            ),
-          )
-          .returning({ id: entities.id })
-      : [];
-    if (updated) {
-      await tx.insert(changes).values({
-        objectType: "entity",
-        objectId: entity.id,
-        displayName: entity.name,
-        actorId: actor.id,
-        type: "update",
-        data: { description, descriptionSrc: "generated" },
+      const actor = await getSystemActorForDatabase(
+        tx,
+        ABOUT_WRITER_SYSTEM_ACTOR_KEY,
+      );
+      const result = await saveEntityAbout(tx, {
+        entity,
+        document: merged,
+        expectedVersion: stored?.version ?? null,
+        actor,
+        checkedOn: now.toISOString().slice(0, 10),
       });
-    }
-    return { errors: [], version: result.version };
-  });
-
-  if (saved.version === null) {
-    // The page changed between the draft and the save.
-    logWarn("About draft rejected", {
-      extra: { entityId: entity.id, errorCount: saved.errors.length },
+      await updateDescription(tx, entity, result, actor);
+      return { errors, version: result.version };
     });
-    return { status: "rejected", errors: saved.errors };
+  } catch (error) {
+    // Items a person wrote can break a store rule the draft cannot fix, such
+    // as a site fact kept after the Entity's kind changed. A moderator fixes
+    // those; retrying the job would fail the same way.
+    if (!(error instanceof EntityAboutWriteError)) throw error;
+    saved = { errors: error.reasons };
   }
+
+  if (!saved.version) return rejected(entity.id, saved.errors);
   return { status: "saved", version: saved.version };
+}
+
+function mergeAndCheck(
+  stored: StoredEntityAbout | null,
+  document: EntityAboutDocument,
+  now: string,
+  ownerNames: ReadonlyMap<number, string>,
+) {
+  const merged = mergePipelineDraft(
+    stored?.document ?? null,
+    document,
+    now,
+    ownerNames,
+  );
+  return { merged, errors: checkMergedAbout(stored?.document ?? null, merged) };
+}
+
+function rejected(entityId: number, errors: string[]): WriteEntityAboutResult {
+  // Log counts only; drafts can quote third-party pages.
+  logWarn("About draft rejected", {
+    extra: { entityId, errorCount: errors.length },
+  });
+  return { status: "rejected", errors };
+}
+
+/**
+ * A published, sourced lead replaces a generated or empty description, never
+ * a person's or one of unknown origin. The check is in the update itself, so
+ * an edit made during the run wins.
+ */
+async function updateDescription(
+  tx: AnyDatabase,
+  entity: { id: number; name: string },
+  about: StoredEntityAbout,
+  actor: Actor,
+) {
+  const description = getPublishedLeadText(about);
+  if (!description) return;
+  const [updated] = await tx
+    .update(entities)
+    .set({ description, descriptionSrc: "generated", updatedAt: new Date() })
+    .where(
+      and(
+        eq(entities.id, entity.id),
+        or(
+          isNull(entities.description),
+          eq(entities.description, ""),
+          and(
+            eq(entities.descriptionSrc, "generated"),
+            ne(entities.description, description),
+          ),
+        ),
+      ),
+    )
+    .returning({ id: entities.id });
+  if (!updated) return;
+  await tx.insert(changes).values({
+    objectType: "entity",
+    objectId: entity.id,
+    displayName: entity.name,
+    actorId: actor.id,
+    type: "update",
+    data: { description, descriptionSrc: "generated" },
+  });
 }
 
 export default async function writeEntityAboutJob(input: JobPayload) {

@@ -130,3 +130,14 @@ export function toPublicEntityAbout(
     sources: document.sources.filter((source) => citedSourceIds.has(source.id)),
   };
 }
+
+/**
+ * The published lead as plain text, or null for a hidden page or one without
+ * a shown lead. Description rule (owner: docs/features/entity-about.md): a
+ * generated description is kept only when it equals this text.
+ */
+export function getPublishedLeadText(item: StoredEntityAbout | null) {
+  if (item?.status !== "published") return null;
+  const lead = toPublicEntityAbout(item, new Map()).lead;
+  return lead?.sentences.map((sentence) => sentence.text).join(" ") || null;
+}
