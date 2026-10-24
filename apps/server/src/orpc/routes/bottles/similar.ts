@@ -1,9 +1,6 @@
 import { db } from "@peated/server/db";
-import {
-  bottles,
-  bottlesToDistillers,
-  bottleTombstones,
-} from "@peated/server/db/schema";
+import { bottles, bottlesToDistillers } from "@peated/server/db/schema";
+import { activeBottleWhere } from "@peated/server/lib/activeBottles";
 import { procedure } from "@peated/server/orpc";
 import { BottleSchema, listResponse } from "@peated/server/schemas";
 import { serialize } from "@peated/server/serializers";
@@ -22,11 +19,6 @@ import {
 } from "drizzle-orm";
 import { alias } from "drizzle-orm/pg-core";
 import { z } from "zod";
-
-const activeBottleConditions = and(
-  isNotNull(bottles.groupId),
-  sql`NOT EXISTS(SELECT FROM ${bottleTombstones} WHERE ${bottleTombstones.bottleId} = ${bottles.id})`,
-);
 
 export default procedure
   .route({
@@ -54,7 +46,7 @@ export default procedure
     const [source] = await db
       .select({ bottle: bottles })
       .from(bottles)
-      .where(and(eq(bottles.id, input.bottle), activeBottleConditions));
+      .where(and(eq(bottles.id, input.bottle), activeBottleWhere()));
 
     if (!source) {
       throw errors.NOT_FOUND({
@@ -73,7 +65,7 @@ export default procedure
         .from(bottles)
         .where(
           and(
-            activeBottleConditions,
+            activeBottleWhere(),
             eq(bottles.brandId, bottle.brandId),
             eq(bottles.name, bottle.name),
             ne(bottles.groupId, groupId),
@@ -85,7 +77,7 @@ export default procedure
     ).map((row) => row.bottle);
 
     const where: (SQL<unknown> | undefined)[] = [
-      activeBottleConditions,
+      activeBottleWhere(),
       eq(bottles.brandId, bottle.brandId),
       ne(bottles.groupId, groupId),
       notInArray(bottles.id, [bottle.id, ...results.map((r) => r.id)]),

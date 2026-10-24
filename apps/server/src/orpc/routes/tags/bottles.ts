@@ -3,9 +3,9 @@ import {
   bottleNoteCategories,
   bottles,
   bottleTags,
-  bottleTombstones,
   tags,
 } from "@peated/server/db/schema";
+import { activeBottleWhere } from "@peated/server/lib/activeBottles";
 import { implement } from "@peated/server/orpc";
 import contract from "@peated/server/orpc/contracts/tags/bottles";
 import { serialize } from "@peated/server/serializers";
@@ -58,11 +58,7 @@ export default implement(contract).handler(async ({ input, context }) => {
       ${bottles.notedReviewAndTastingCount}::integer AS tagged
     FROM (${counts}) AS note_counts
     INNER JOIN ${bottles} ON ${bottles.id} = note_counts.bottle_id
-    WHERE ${bottles.groupId} IS NOT NULL
-      AND NOT EXISTS (
-        SELECT FROM ${bottleTombstones}
-        WHERE ${bottleTombstones.bottleId} = ${bottles.id}
-      )
+    WHERE ${activeBottleWhere()}
       AND ${bottles.notedReviewAndTastingCount} > 0
     ORDER BY note_counts.matching::numeric /
         ${bottles.notedReviewAndTastingCount} DESC,

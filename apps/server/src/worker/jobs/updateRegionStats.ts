@@ -1,11 +1,11 @@
 import { db } from "@peated/server/db";
 import {
-  bottleTombstones,
   bottles,
   bottlesToDistillers,
   entities,
   regions,
 } from "@peated/server/db/schema";
+import { activeBottleWhere } from "@peated/server/lib/activeBottles";
 import { eq, sql } from "drizzle-orm";
 import { z } from "zod";
 import type { JobPayload } from "../types";
@@ -30,12 +30,7 @@ export default async function updateRegionStats(input: JobPayload) {
         INNER JOIN ${entities}
           ON ${entities.id} = ${bottlesToDistillers.distillerId}
         WHERE ${entities.regionId} = ${regions.id}
-          AND ${bottles.groupId} IS NOT NULL
-          AND NOT EXISTS (
-            SELECT 1
-            FROM ${bottleTombstones}
-            WHERE ${bottleTombstones.bottleId} = ${bottles.id}
-          )
+          AND ${activeBottleWhere()}
       )`,
     })
     .where(eq(regions.id, regionId));

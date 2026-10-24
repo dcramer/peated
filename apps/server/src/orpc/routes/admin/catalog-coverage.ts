@@ -1,15 +1,15 @@
 import { db } from "@peated/server/db";
 import {
   bottleSeries,
-  bottleTombstones,
   bottles,
   entities,
   externalReviews,
   storePrices,
 } from "@peated/server/db/schema";
+import { activeBottleWhere } from "@peated/server/lib/activeBottles";
 import { procedure } from "@peated/server/orpc";
 import { requireAdmin } from "@peated/server/orpc/middleware";
-import { and, eq, isNotNull, isNull, sql } from "drizzle-orm";
+import { and, eq, isNull, sql } from "drizzle-orm";
 import { z } from "zod";
 
 const itemCoverageSchema = z.object({
@@ -70,15 +70,7 @@ export default procedure
           withImage: sql<number>`count(*) filter (where nullif(btrim(${bottles.imageUrl}), '') is not null)::int`,
         })
         .from(bottles)
-        .where(
-          and(
-            isNotNull(bottles.groupId),
-            sql`not exists (
-                select 1 from ${bottleTombstones}
-                where ${bottleTombstones.bottleId} = ${bottles.id}
-              )`,
-          ),
-        ),
+        .where(and(activeBottleWhere())),
       db
         .select({
           total: sql<number>`count(*)::int`,
@@ -101,11 +93,7 @@ export default procedure
           and(
             eq(externalReviews.hidden, false),
             isNull(externalReviews.removedAt),
-            isNotNull(bottles.groupId),
-            sql`not exists (
-                select 1 from ${bottleTombstones}
-                where ${bottleTombstones.bottleId} = ${bottles.id}
-              )`,
+            activeBottleWhere(),
           ),
         ),
       db
@@ -114,16 +102,7 @@ export default procedure
         })
         .from(storePrices)
         .innerJoin(bottles, eq(storePrices.bottleId, bottles.id))
-        .where(
-          and(
-            eq(storePrices.hidden, false),
-            isNotNull(bottles.groupId),
-            sql`not exists (
-                select 1 from ${bottleTombstones}
-                where ${bottleTombstones.bottleId} = ${bottles.id}
-              )`,
-          ),
-        ),
+        .where(and(eq(storePrices.hidden, false), activeBottleWhere())),
       db
         .select({
           total: sql<number>`count(*)::int`,

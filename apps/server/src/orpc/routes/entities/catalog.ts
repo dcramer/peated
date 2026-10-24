@@ -1,19 +1,18 @@
 import { db } from "@peated/server/db";
 import {
-  bottleTombstones,
   bottles,
   bottlesToDistillers,
   entities,
 } from "@peated/server/db/schema";
+import { activeBottleWhere } from "@peated/server/lib/activeBottles";
 import { bottleIdsForEntity } from "@peated/server/lib/entityBottleIds";
 import { implement } from "@peated/server/orpc";
 import entityCatalogContract from "@peated/server/orpc/contracts/entities/catalog";
-import { and, asc, desc, eq, isNotNull, ne, sql } from "drizzle-orm";
+import { and, asc, desc, eq, ne, sql } from "drizzle-orm";
 
-const activeBottleWhere = (entityId: number) => {
+const entityBottleWhere = (entityId: number) => {
   return and(
-    isNotNull(bottles.groupId),
-    sql`NOT EXISTS(SELECT FROM ${bottleTombstones} WHERE ${bottleTombstones.bottleId} = ${bottles.id})`,
+    activeBottleWhere(),
     sql`${bottles.id} IN (${bottleIdsForEntity(entityId)})`,
   );
 };
@@ -30,7 +29,7 @@ export default implement(entityCatalogContract).handler(async function ({
     throw errors.NOT_FOUND({ message: "Entity not found." });
   }
 
-  const associatedBottle = activeBottleWhere(entity.id);
+  const associatedBottle = entityBottleWhere(entity.id);
   const [
     counts,
     categoryRows,

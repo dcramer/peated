@@ -60,7 +60,10 @@ Keep ranked text retrieval in the supported score-order-and-limit shape: filter 
 Brand, and page in memory or in an outer query over the winning ids. Compare
 identity facts after bounded retrieval, rather than sorting the whole catalog in
 application code. A page shorter than its limit already proves the total, so run
-the count query only when more rows exist. See
+the count query only when more rows exist. Filter active Bottles with
+`activeBottleWhere`: its tombstone check is a `NOT IN` list, because a
+`NOT EXISTS` subquery can plan as an anti-join, and `tin.score()` then fails
+with "requires a tin index scan". See
 [PlanetScale query shapes](https://planetscale.com/docs/postgres/search/reference/sql-shapes).
 
 ## Rebuilding documents

@@ -4,10 +4,10 @@ import {
   bottleReferences,
   bottles,
   bottlesToDistillers,
-  bottleTombstones,
   entities,
   entityReferences,
 } from "@peated/server/db/schema";
+import { activeBottleWhere } from "@peated/server/lib/activeBottles";
 import {
   and,
   asc,
@@ -19,7 +19,7 @@ import {
   or,
   sql,
 } from "drizzle-orm";
-import { alias as tableAlias, type AnyPgColumn } from "drizzle-orm/pg-core";
+import { alias as tableAlias } from "drizzle-orm/pg-core";
 
 const MAX_PREFIX_WORDS = 8;
 const MAX_SCAN_LIMIT = 2000;
@@ -195,25 +195,11 @@ type RankedTargetCandidate = {
 
 const referenceBottles = tableAlias(bottles, "brand_repair_reference_bottle");
 
-function activeBottleConditions(bottle: {
-  groupId: AnyPgColumn;
-  id: AnyPgColumn;
-}) {
-  return and(
-    isNotNull(bottle.groupId),
-    sql`NOT EXISTS(SELECT FROM ${bottleTombstones} WHERE ${bottleTombstones.bottleId} = ${bottle.id})`,
-  );
-}
-
 function activeBrandUseCondition() {
   return sql`EXISTS (
     SELECT 1 FROM ${bottles}
     WHERE ${bottles.brandId} = ${entities.id}
-      AND ${bottles.groupId} IS NOT NULL
-      AND NOT EXISTS (
-        SELECT 1 FROM ${bottleTombstones}
-        WHERE ${bottleTombstones.bottleId} = ${bottles.id}
-      )
+      AND ${activeBottleWhere()}
   )`;
 }
 
@@ -238,7 +224,7 @@ async function getQueryReferenceMembership({
       and(
         eq(bottleReferences.ignored, false),
         ilike(bottleReferences.name, `%${query}%`),
-        activeBottleConditions(referenceBottles),
+        activeBottleWhere(referenceBottles),
         currentBrandId
           ? eq(referenceBottles.brandId, currentBrandId)
           : undefined,
@@ -267,7 +253,7 @@ async function getSupportingReferenceMembership(
       and(
         eq(bottleReferences.ignored, false),
         inArray(bottleReferences.bottleId, candidateBottleIds),
-        activeBottleConditions(referenceBottles),
+        activeBottleWhere(referenceBottles),
       ),
     )
     .orderBy(asc(bottleReferences.name));
@@ -616,12 +602,7 @@ async function getCandidateBottles({
           totalTastings: bottles.totalTastings,
         })
         .from(bottles)
-        .where(
-          and(
-            eq(bottles.brandId, currentBrandId),
-            activeBottleConditions(bottles),
-          ),
-        )
+        .where(and(eq(bottles.brandId, currentBrandId), activeBottleWhere()))
         .orderBy(desc(bottles.totalTastings), desc(bottles.id))
         .limit(MAX_SCAN_LIMIT);
     }
@@ -634,7 +615,7 @@ async function getCandidateBottles({
           and(
             eq(bottles.brandId, currentBrandId),
             ilike(bottles.fullName, `%${query}%`),
-            activeBottleConditions(bottles),
+            activeBottleWhere(),
           ),
         )
         .limit(MAX_SCAN_LIMIT),
@@ -667,7 +648,7 @@ async function getCandidateBottles({
         and(
           eq(bottles.brandId, currentBrandId),
           inArray(bottles.id, Array.from(bottleIds).slice(0, MAX_SCAN_LIMIT)),
-          activeBottleConditions(bottles),
+          activeBottleWhere(),
         ),
       )
       .orderBy(desc(bottles.totalTastings), desc(bottles.id));
@@ -683,7 +664,7 @@ async function getCandidateBottles({
         totalTastings: bottles.totalTastings,
       })
       .from(bottles)
-      .where(and(isNotNull(bottles.brandId), activeBottleConditions(bottles)))
+      .where(and(isNotNull(bottles.brandId), activeBottleWhere()))
       .orderBy(desc(bottles.totalTastings), desc(bottles.id))
       .limit(MAX_SCAN_LIMIT);
   }
@@ -708,12 +689,7 @@ async function getCandidateBottles({
       db
         .select({ id: bottles.id })
         .from(bottles)
-        .where(
-          and(
-            ilike(bottles.fullName, `%${query}%`),
-            activeBottleConditions(bottles),
-          ),
-        )
+        .where(and(ilike(bottles.fullName, `%${query}%`), activeBottleWhere()))
         .limit(MAX_SCAN_LIMIT),
       getQueryReferenceMembership({ query }),
     ]);
@@ -734,10 +710,7 @@ async function getCandidateBottles({
       .select({ id: bottles.id })
       .from(bottles)
       .where(
-        and(
-          inArray(bottles.brandId, matchingBrandIds),
-          activeBottleConditions(bottles),
-        ),
+        and(inArray(bottles.brandId, matchingBrandIds), activeBottleWhere()),
       )
       .limit(MAX_SCAN_LIMIT);
 
@@ -763,7 +736,7 @@ async function getCandidateBottles({
       and(
         isNotNull(bottles.brandId),
         inArray(bottles.id, Array.from(bottleIds).slice(0, MAX_SCAN_LIMIT)),
-        activeBottleConditions(bottles),
+        activeBottleWhere(),
       ),
     )
     .orderBy(desc(bottles.totalTastings), desc(bottles.id));
@@ -821,7 +794,7 @@ async function collectBrandRepairCandidates({
         .where(
           and(
             inArray(bottlesToDistillers.distillerId, currentBrandIds),
-            activeBottleConditions(bottles),
+            activeBottleWhere(),
           ),
         ),
     ]);

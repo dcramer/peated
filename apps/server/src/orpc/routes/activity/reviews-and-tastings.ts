@@ -6,7 +6,6 @@ import type {
 } from "@peated/server/db/schema";
 import {
   bottles,
-  bottleTombstones,
   entities,
   externalReviewArticles,
   externalReviewPublications,
@@ -16,6 +15,7 @@ import {
   users,
 } from "@peated/server/db/schema";
 import { visibleExternalReviewWhere } from "@peated/server/externalReviews/visibility";
+import { activeBottleWhere } from "@peated/server/lib/activeBottles";
 import {
   coerceActivityDate,
   utcTimestamp,
@@ -109,11 +109,7 @@ export default implement(contract).handler(
             SELECT ${bottles.id} AS bottle_id
             FROM ${bottles}
             WHERE ${bottles.id} IN (${bottleIdsForEntity(input.entity)})
-              AND ${bottles.groupId} IS NOT NULL
-              AND NOT EXISTS (
-                SELECT FROM ${bottleTombstones}
-                WHERE ${bottleTombstones.bottleId} = ${bottles.id}
-              )
+              AND ${activeBottleWhere()}
           )
         `
       : sql``;

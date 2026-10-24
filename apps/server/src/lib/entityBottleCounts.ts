@@ -1,20 +1,11 @@
 import { db, type AnyDatabase, type AnyTransaction } from "@peated/server/db";
 import {
-  bottleTombstones,
   bottles,
   bottlesToDistillers,
   entities,
 } from "@peated/server/db/schema";
-import {
-  and,
-  asc,
-  eq,
-  gte,
-  inArray,
-  isNotNull,
-  isNull,
-  sql,
-} from "drizzle-orm";
+import { activeBottleWhere } from "@peated/server/lib/activeBottles";
+import { and, asc, eq, gte, inArray, sql } from "drizzle-orm";
 
 type BottleLinks = {
   bottleId: number;
@@ -48,14 +39,7 @@ export async function getBottleEntityLinks(
     })
     .from(bottles)
     .leftJoin(bottlesToDistillers, eq(bottlesToDistillers.bottleId, bottles.id))
-    .leftJoin(bottleTombstones, eq(bottleTombstones.bottleId, bottles.id))
-    .where(
-      and(
-        inArray(bottles.id, ids),
-        isNotNull(bottles.groupId),
-        isNull(bottleTombstones.bottleId),
-      ),
-    )
+    .where(and(inArray(bottles.id, ids), activeBottleWhere()))
     .orderBy(asc(bottles.id), asc(bottlesToDistillers.distillerId));
 
   const links = new Map<number, Set<number>>();
@@ -151,24 +135,16 @@ async function findWrongCounts(
     WITH active_bottle_entities AS (
       SELECT ${bottles.id} AS bottle_id, ${bottles.brandId} AS entity_id
       FROM ${bottles}
-      WHERE ${bottles.groupId} IS NOT NULL
+      WHERE ${activeBottleWhere()}
         AND ${brandFilter}
-        AND NOT EXISTS (
-          SELECT 1 FROM ${bottleTombstones}
-          WHERE ${bottleTombstones.bottleId} = ${bottles.id}
-        )
 
       UNION
 
       SELECT ${bottles.id} AS bottle_id, ${bottles.bottlerId} AS entity_id
       FROM ${bottles}
-      WHERE ${bottles.groupId} IS NOT NULL
+      WHERE ${activeBottleWhere()}
         AND ${bottles.bottlerId} IS NOT NULL
         AND ${bottlerFilter}
-        AND NOT EXISTS (
-          SELECT 1 FROM ${bottleTombstones}
-          WHERE ${bottleTombstones.bottleId} = ${bottles.id}
-        )
 
       UNION
 
@@ -176,12 +152,8 @@ async function findWrongCounts(
       FROM ${bottlesToDistillers}
       INNER JOIN ${bottles}
         ON ${bottles.id} = ${bottlesToDistillers.bottleId}
-      WHERE ${bottles.groupId} IS NOT NULL
+      WHERE ${activeBottleWhere()}
         AND ${distillerFilter}
-        AND NOT EXISTS (
-          SELECT 1 FROM ${bottleTombstones}
-          WHERE ${bottleTombstones.bottleId} = ${bottles.id}
-        )
     ), actual_counts AS (
       SELECT entity_id, COUNT(*) AS total
       FROM active_bottle_entities

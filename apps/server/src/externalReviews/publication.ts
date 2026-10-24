@@ -1,13 +1,13 @@
 import type { AnyTransaction } from "@peated/server/db";
 import {
   bottles,
-  bottleTombstones,
   externalReviewArticles,
   externalReviewPublications,
   externalReviews,
   externalSites,
 } from "@peated/server/db/schema";
-import { and, eq, inArray, isNotNull, isNull, sql } from "drizzle-orm";
+import { activeBottleWhere } from "@peated/server/lib/activeBottles";
+import { and, eq, inArray, isNotNull, sql } from "drizzle-orm";
 
 /** Locks the source before a transaction decides review visibility. */
 export async function isExternalReviewPublicationApprovedInTransaction(
@@ -43,18 +43,13 @@ export async function publishResolvedReview(
       eq(externalReviews.articleId, externalReviewArticles.id),
     )
     .innerJoin(bottles, eq(externalReviews.bottleId, bottles.id))
-    .leftJoin(
-      bottleTombstones,
-      eq(externalReviews.bottleId, bottleTombstones.bottleId),
-    )
     .where(
       and(
         eq(externalReviews.id, reviewId),
         eq(externalReviewArticles.externalSiteId, externalSiteId),
         eq(externalReviews.hidden, true),
         isNotNull(externalReviews.bottleId),
-        isNotNull(bottles.groupId),
-        isNull(bottleTombstones.bottleId),
+        activeBottleWhere(),
       ),
     )
     .limit(1)
@@ -80,17 +75,12 @@ export async function publishResolvedReviews(
       eq(externalReviews.articleId, externalReviewArticles.id),
     )
     .innerJoin(bottles, eq(externalReviews.bottleId, bottles.id))
-    .leftJoin(
-      bottleTombstones,
-      eq(externalReviews.bottleId, bottleTombstones.bottleId),
-    )
     .where(
       and(
         eq(externalReviewArticles.externalSiteId, externalSiteId),
         eq(externalReviews.hidden, true),
         isNotNull(externalReviews.bottleId),
-        isNotNull(bottles.groupId),
-        isNull(bottleTombstones.bottleId),
+        activeBottleWhere(),
       ),
     )
     .for("update", { of: externalReviews });

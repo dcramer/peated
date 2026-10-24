@@ -5,6 +5,7 @@ import {
   bottles,
   bottleTombstones,
 } from "@peated/server/db/schema";
+import { activeBottleWhere } from "@peated/server/lib/activeBottles";
 import { aggregateBottleActivityStatsInTransaction } from "@peated/server/lib/recomputeBottleActivityStats";
 import { asc, eq, inArray, sql } from "drizzle-orm";
 
@@ -69,12 +70,8 @@ async function findWrongBottleCounts(
     WITH active_counts AS (
       SELECT ${bottles.groupId} AS group_id, COUNT(*) AS total
       FROM ${bottles}
-      WHERE ${bottles.groupId} IS NOT NULL
+      WHERE ${activeBottleWhere()}
         AND ${bottleFilter}
-        AND NOT EXISTS (
-          SELECT 1 FROM ${bottleTombstones}
-          WHERE ${bottleTombstones.bottleId} = ${bottles.id}
-        )
       GROUP BY ${bottles.groupId}
     )
     SELECT

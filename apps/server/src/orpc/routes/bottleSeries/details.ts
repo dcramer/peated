@@ -4,9 +4,9 @@ import {
   bottleSeries,
   bottleSeriesTombstones,
   bottlesToDistillers,
-  bottleTombstones,
   entities,
 } from "@peated/server/db/schema";
+import { activeBottleWhere } from "@peated/server/lib/activeBottles";
 import { formatPeatedId } from "@peated/server/lib/peatedId";
 import { procedure } from "@peated/server/orpc";
 import {
@@ -15,16 +15,7 @@ import {
 } from "@peated/server/schemas";
 import { serialize } from "@peated/server/serializers";
 import { BottleSeriesWithImageSerializer } from "@peated/server/serializers/bottleSeries";
-import {
-  and,
-  asc,
-  desc,
-  eq,
-  getTableColumns,
-  isNotNull,
-  isNull,
-  sql,
-} from "drizzle-orm";
+import { and, asc, desc, eq, getTableColumns, sql } from "drizzle-orm";
 import { z } from "zod";
 
 export default procedure
@@ -94,14 +85,7 @@ export default procedure
         eq(bottlesToDistillers.bottleId, bottles.id),
       )
       .innerJoin(entities, eq(entities.id, bottlesToDistillers.distillerId))
-      .leftJoin(bottleTombstones, eq(bottleTombstones.bottleId, bottles.id))
-      .where(
-        and(
-          eq(bottles.seriesId, result.series.id),
-          isNotNull(bottles.groupId),
-          isNull(bottleTombstones.bottleId),
-        ),
-      )
+      .where(and(eq(bottles.seriesId, result.series.id), activeBottleWhere()))
       .groupBy(entities.id, entities.name, entities.shortName, entities.kind)
       .orderBy(
         desc(distillerBottleCount),
