@@ -274,6 +274,22 @@ export function ProfileLibraryPageClient() {
               The profile is still available. Try loading{" "}
               {isCurrentUser ? "your" : "their"} Library again.
             </SectionError>
+          ) : !items.length && input.cursor > 1 ? (
+            // A page past the end, such as after removing its last row or
+            // from an old link, is not an empty list.
+            <EmptyState
+              action={
+                <ButtonLink
+                  href={getCursorHref(pathname, searchParams, 1)}
+                  size="sm"
+                >
+                  Go to the first page
+                </ButtonLink>
+              }
+              heading="No bottles on this page"
+            >
+              This page is past the end of the list.
+            </EmptyState>
           ) : !items.length ? (
             hasFilters ? (
               <EmptyState
