@@ -318,12 +318,15 @@ export function checkConflictPicks(document: EntityAboutDocument) {
   for (const event of document.events) {
     const disagreement = getDisagreement(event.citations);
     if (!disagreement) continue;
+    const stored = event.endDate
+      ? `${event.date}–${event.endDate}`
+      : event.date;
     const matches = disagreement.values.some(({ value }) =>
-      valuesAgree(value, event.date),
+      valuesAgree(value, stored),
     );
     if (!matches) {
       errors.push(
-        `Event ${event.id} stores ${event.date}, which no source states.`,
+        `Event ${event.id} stores ${stored}, which no source states.`,
       );
     }
   }

@@ -60,14 +60,17 @@ const defaultServices: WriteEntityAboutServices = {
  * one (see `mergePipelineDraft`).
  */
 /** Names of the Entities a stored document links as new owners. */
-async function loadOwnerNames(stored: EntityAboutDocument | null) {
+async function loadOwnerNames(
+  database: AnyDatabase,
+  stored: EntityAboutDocument | null,
+) {
   const ids = (stored?.events ?? []).flatMap((event) =>
     event.newOwnerId ? [event.newOwnerId] : [],
   );
   if (!ids.length) return new Map<number, string>();
   // A merged owner is named by the Entity it became.
-  const target = await followMergedEntities(db, ids);
-  const rows = await db
+  const target = await followMergedEntities(database, ids);
+  const rows = await database
     .select({ id: entities.id, name: entities.name })
     .from(entities)
     .where(inArray(entities.id, [...new Set(target.values())]));
@@ -131,7 +134,7 @@ export async function writeEntityAbout(
     .where(eq(entityAliases.entityId, entity.id));
   // Read without a lock to guide the writer; the save checks again under one.
   const before = await getEntityAbout(db, entity.id);
-  const ownerNames = await loadOwnerNames(before?.document ?? null);
+  const ownerNames = await loadOwnerNames(db, before?.document ?? null);
   const unsourcedHistory = describeUnsourcedHistory(
     before?.document ?? null,
     ownerNames,
@@ -180,11 +183,12 @@ export async function writeEntityAbout(
     saved = await db.transaction(async (tx) => {
       const stored = await getEntityAbout(tx, entity.id, { forUpdate: true });
       const now = services.now();
+      // Owners are read again: a moderator may have linked one mid-run.
       const { merged, errors } = mergeAndCheck(
         stored,
         document,
         now.toISOString(),
-        ownerNames,
+        await loadOwnerNames(tx, stored?.document ?? null),
       );
       // The page changed between the draft and the save.
       if (errors.length) return { errors };

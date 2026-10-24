@@ -29,15 +29,36 @@ function normalizeStatedValue(value: string) {
 
 export const ISO_DATE_PATTERN = /^\d{4}(?:-\d{2}){0,2}$/;
 
+const DATE_RANGE_PATTERN =
+  /^(\d{4}(?:-\d{2}){0,2}) ?[–-] ?(\d{4}(?:-\d{2}){0,2})$/;
+
+/** Reads a date or a range such as `1969–1973` as a start and an end. */
+function parseDates(value: string) {
+  if (ISO_DATE_PATTERN.test(value)) return { start: value, end: null };
+  const range = DATE_RANGE_PATTERN.exec(value);
+  return range ? { start: range[1]!, end: range[2]! } : null;
+}
+
+function datesAgree(left: string, right: string) {
+  return left.startsWith(right) || right.startsWith(left);
+}
+
 /**
  * Dates that differ only in precision, such as 1983 and 1983-03, agree.
- * Other values agree only when they are the same: 2 stills is not 20.
+ * Ranges agree when their starts and ends do; a single date is compared
+ * with a range's start. Other values agree only when they are the same:
+ * 2 stills is not 20.
  */
 export function valuesAgree(left: string, right: string) {
   const a = normalizeStatedValue(left);
   const b = normalizeStatedValue(right);
-  if (ISO_DATE_PATTERN.test(a) && ISO_DATE_PATTERN.test(b)) {
-    return a.startsWith(b) || b.startsWith(a);
+  const datesA = parseDates(a);
+  const datesB = parseDates(b);
+  if (datesA && datesB) {
+    return (
+      datesAgree(datesA.start, datesB.start) &&
+      (!datesA.end || !datesB.end || datesAgree(datesA.end, datesB.end))
+    );
   }
   return a === b;
 }
