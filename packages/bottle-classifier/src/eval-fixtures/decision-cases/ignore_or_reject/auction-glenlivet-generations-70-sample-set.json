@@ -1,0 +1,787 @@
+{
+  "id": "auction-glenlivet-generations-70-sample-set",
+  "name": "auction title: a 70-year-old sample presentation set is not the full Bottle",
+  "input": {
+    "reference": {
+      "id": 6333,
+      "url": "https://www.scotchwhiskyauctions.com/auctions/231-the-182nd-auction/891827-glenlivet-gm-generations-70-year-old-sample-presentation-set/",
+      "name": "GLENLIVET G&M GENERATIONS 70 YEAR OLD SAMPLE PRESENTATION SET",
+      "imageUrl": null,
+      "externalSiteId": 28097,
+      "currentBottleId": null
+    },
+    "extractedIdentity": {
+      "abv": null,
+      "brand": "Gordon & MacPhail",
+      "series": "Generations",
+      "bottler": "Gordon & MacPhail",
+      "edition": null,
+      "outturn": null,
+      "category": null,
+      "distillery": ["Glenlivet"],
+      "expression": null,
+      "maturation": null,
+      "stated_age": 70,
+      "cask_number": null,
+      "release_day": null,
+      "single_cask": null,
+      "release_year": null,
+      "vintage_year": null,
+      "bottling_year": null,
+      "cask_strength": null,
+      "release_month": null
+    },
+    "imageEvidence": null,
+    "initialCandidates": [
+      {
+        "abv": 45.9,
+        "brand": "Gordon & MacPhail",
+        "score": 140.80653,
+        "series": "Generations",
+        "source": ["vector", "text", "brand_coverage", "context"],
+        "bottler": "Gordon & MacPhail",
+        "edition": null,
+        "outturn": null,
+        "bottleId": 65654,
+        "category": "single_malt",
+        "fullName": "Gordon & MacPhail Glenlivet 70-year-old",
+        "reference": "Gordon & MacPhail Generations: Glenlivet 70-year-old, 45.9%",
+        "statedAge": 70,
+        "caskNumber": null,
+        "comparison": {
+          "missing": [],
+          "conflicts": ["distillers"],
+          "agreements": ["statedAge", "brand", "bottler", "series"]
+        },
+        "distillery": ["The Glenlivet"],
+        "maturation": null,
+        "releaseDay": null,
+        "singleCask": null,
+        "releaseYear": 2011,
+        "vintageYear": 1940,
+        "bottlingYear": null,
+        "caskStrength": true,
+        "releaseMonth": null,
+        "familyContext": {
+          "siblingBottles": []
+        }
+      },
+      {
+        "abv": 52.3,
+        "brand": "Gordon & MacPhail",
+        "score": 73.044914,
+        "series": null,
+        "source": ["text", "brand_coverage"],
+        "bottler": "Gordon & MacPhail",
+        "edition": "Platinum Jubilee Edition",
+        "outturn": null,
+        "bottleId": 62325,
+        "category": "single_malt",
+        "fullName": "Gordon & MacPhail Glen Grant 70-year-old - Platinum Jubilee Edition",
+        "reference": null,
+        "statedAge": 70,
+        "caskNumber": null,
+        "comparison": {
+          "missing": ["series"],
+          "conflicts": ["distillers"],
+          "agreements": ["statedAge", "brand", "bottler"]
+        },
+        "distillery": ["The Glen Grant"],
+        "maturation": null,
+        "releaseDay": null,
+        "singleCask": null,
+        "releaseYear": null,
+        "vintageYear": 1952,
+        "bottlingYear": null,
+        "caskStrength": null,
+        "releaseMonth": null,
+        "familyContext": {
+          "siblingBottles": []
+        }
+      },
+      {
+        "abv": 40,
+        "brand": "Gordon & MacPhail",
+        "score": 64.54096,
+        "series": null,
+        "source": ["text"],
+        "bottler": "Gordon & MacPhail",
+        "edition": null,
+        "outturn": null,
+        "bottleId": 58611,
+        "category": "single_malt",
+        "fullName": "Gordon & MacPhail Talisker 70° Proof",
+        "reference": null,
+        "statedAge": null,
+        "caskNumber": null,
+        "comparison": {
+          "missing": ["statedAge", "series"],
+          "conflicts": ["distillers"],
+          "agreements": ["brand", "bottler"]
+        },
+        "distillery": ["Talisker"],
+        "maturation": null,
+        "releaseDay": null,
+        "singleCask": null,
+        "releaseYear": null,
+        "vintageYear": null,
+        "bottlingYear": null,
+        "caskStrength": null,
+        "releaseMonth": null,
+        "familyContext": {
+          "siblingBottles": []
+        }
+      },
+      {
+        "abv": 40,
+        "brand": "Gordon & MacPhail",
+        "score": 45.153885,
+        "series": null,
+        "source": ["text"],
+        "bottler": "Gordon & MacPhail",
+        "edition": null,
+        "outturn": null,
+        "bottleId": 62557,
+        "category": "single_malt",
+        "fullName": "Gordon & MacPhail Glenlivet 1949",
+        "reference": null,
+        "statedAge": null,
+        "caskNumber": null,
+        "comparison": {
+          "missing": ["statedAge", "series"],
+          "conflicts": ["distillers"],
+          "agreements": ["brand", "bottler"]
+        },
+        "distillery": ["The Glenlivet"],
+        "maturation": null,
+        "releaseDay": null,
+        "singleCask": null,
+        "releaseYear": null,
+        "vintageYear": 1949,
+        "bottlingYear": 2001,
+        "caskStrength": null,
+        "releaseMonth": null,
+        "familyContext": {
+          "siblingBottles": []
+        }
+      },
+      {
+        "abv": 50.1,
+        "brand": "Gordon & MacPhail",
+        "score": 44.263832,
+        "series": "Private Collection",
+        "source": ["vector", "text"],
+        "bottler": "Gordon & MacPhail",
+        "edition": null,
+        "outturn": null,
+        "bottleId": 65649,
+        "category": "single_malt",
+        "fullName": "Gordon & MacPhail Glenlivet Decades 1974",
+        "reference": "Gordon & MacPhail Private Collection: Glenlivet Decades 1974",
+        "statedAge": null,
+        "caskNumber": null,
+        "comparison": {
+          "missing": ["statedAge"],
+          "conflicts": ["series", "distillers"],
+          "agreements": ["brand", "bottler"]
+        },
+        "distillery": ["The Glenlivet"],
+        "maturation": null,
+        "releaseDay": null,
+        "singleCask": null,
+        "releaseYear": null,
+        "vintageYear": 1974,
+        "bottlingYear": null,
+        "caskStrength": null,
+        "releaseMonth": null,
+        "familyContext": {
+          "siblingBottles": []
+        }
+      },
+      {
+        "abv": 54.4,
+        "brand": "Gordon & MacPhail",
+        "score": 44.263832,
+        "series": "Private Collection",
+        "source": ["text"],
+        "bottler": "Gordon & MacPhail",
+        "edition": null,
+        "outturn": null,
+        "bottleId": 65653,
+        "category": "single_malt",
+        "fullName": "Gordon & MacPhail Glenlivet Decades 1991",
+        "reference": null,
+        "statedAge": null,
+        "caskNumber": null,
+        "comparison": {
+          "missing": ["statedAge"],
+          "conflicts": ["series", "distillers"],
+          "agreements": ["brand", "bottler"]
+        },
+        "distillery": ["The Glenlivet"],
+        "maturation": null,
+        "releaseDay": null,
+        "singleCask": null,
+        "releaseYear": null,
+        "vintageYear": 1991,
+        "bottlingYear": null,
+        "caskStrength": null,
+        "releaseMonth": null,
+        "familyContext": {
+          "siblingBottles": []
+        }
+      },
+      {
+        "abv": 48.5,
+        "brand": "Gordon & MacPhail",
+        "score": 43.712006,
+        "series": "Private Collection",
+        "source": ["text"],
+        "bottler": "Gordon & MacPhail",
+        "edition": null,
+        "outturn": null,
+        "bottleId": 65652,
+        "category": "single_malt",
+        "fullName": "Gordon & MacPhail Glenlivet Decades 1980",
+        "reference": null,
+        "statedAge": null,
+        "caskNumber": null,
+        "comparison": {
+          "missing": ["statedAge"],
+          "conflicts": ["series", "distillers"],
+          "agreements": ["brand", "bottler"]
+        },
+        "distillery": ["The Glenlivet"],
+        "maturation": "First fill American oak hoggie",
+        "releaseDay": null,
+        "singleCask": null,
+        "releaseYear": null,
+        "vintageYear": 1980,
+        "bottlingYear": null,
+        "caskStrength": null,
+        "releaseMonth": null,
+        "familyContext": {
+          "siblingBottles": []
+        }
+      },
+      {
+        "abv": 40.6,
+        "brand": "Gordon & MacPhail",
+        "score": 42.942665,
+        "series": "Private Collection",
+        "source": ["vector", "text"],
+        "bottler": "Gordon & MacPhail",
+        "edition": null,
+        "outturn": null,
+        "bottleId": 65650,
+        "category": "single_malt",
+        "fullName": "Gordon & MacPhail Decades",
+        "reference": "Gordon & MacPhail Private Collection: Glenlivet Decades 1963",
+        "statedAge": null,
+        "caskNumber": null,
+        "comparison": {
+          "missing": ["statedAge"],
+          "conflicts": ["series", "distillers"],
+          "agreements": ["brand", "bottler"]
+        },
+        "distillery": ["The Glenlivet"],
+        "maturation": "First-fill American oak hogshead",
+        "releaseDay": null,
+        "singleCask": null,
+        "releaseYear": null,
+        "vintageYear": 1963,
+        "bottlingYear": null,
+        "caskStrength": null,
+        "releaseMonth": null,
+        "familyContext": {
+          "siblingBottles": []
+        }
+      },
+      {
+        "abv": 50.6,
+        "brand": "Gordon & MacPhail",
+        "score": 42.927006,
+        "series": "Private Collection",
+        "source": ["text"],
+        "bottler": "Gordon & MacPhail",
+        "edition": null,
+        "outturn": null,
+        "bottleId": 65651,
+        "category": "single_malt",
+        "fullName": "Gordon & MacPhail Glenlivet Decades 1954",
+        "reference": null,
+        "statedAge": null,
+        "caskNumber": "2736",
+        "comparison": {
+          "missing": ["statedAge"],
+          "conflicts": ["series", "distillers"],
+          "agreements": ["brand", "bottler"]
+        },
+        "distillery": ["The Glenlivet"],
+        "maturation": "First-fill sherry hogshead",
+        "releaseDay": null,
+        "singleCask": null,
+        "releaseYear": null,
+        "vintageYear": 1954,
+        "bottlingYear": 2010,
+        "caskStrength": null,
+        "releaseMonth": null,
+        "familyContext": {
+          "siblingBottles": []
+        }
+      },
+      {
+        "abv": 43.1,
+        "brand": "Gordon & MacPhail",
+        "score": 41.029648,
+        "series": "Private Collection",
+        "source": ["text"],
+        "bottler": "Gordon & MacPhail",
+        "edition": null,
+        "outturn": 266,
+        "bottleId": 61324,
+        "category": "single_malt",
+        "fullName": "Gordon & MacPhail Glenlivet 1976",
+        "reference": null,
+        "statedAge": null,
+        "caskNumber": "21602601",
+        "comparison": {
+          "missing": ["statedAge"],
+          "conflicts": ["series", "distillers"],
+          "agreements": ["brand", "bottler"]
+        },
+        "distillery": ["The Glenlivet"],
+        "maturation": "Refill Sherry Hogshead",
+        "releaseDay": null,
+        "singleCask": null,
+        "releaseYear": null,
+        "vintageYear": 1976,
+        "bottlingYear": 2021,
+        "caskStrength": null,
+        "releaseMonth": null,
+        "familyContext": {
+          "siblingBottles": []
+        }
+      },
+      {
+        "abv": 40,
+        "brand": "Gordon & MacPhail",
+        "score": 40.48458,
+        "series": null,
+        "source": ["text"],
+        "bottler": "Gordon & MacPhail",
+        "edition": "Private Collection",
+        "outturn": null,
+        "bottleId": 61736,
+        "category": "single_malt",
+        "fullName": "Gordon & MacPhail Glenlivet 1943 - Private Collection",
+        "reference": null,
+        "statedAge": null,
+        "caskNumber": null,
+        "comparison": {
+          "missing": ["statedAge", "series"],
+          "conflicts": ["distillers"],
+          "agreements": ["brand", "bottler"]
+        },
+        "distillery": ["The Glenlivet"],
+        "maturation": null,
+        "releaseDay": null,
+        "singleCask": null,
+        "releaseYear": null,
+        "vintageYear": 1943,
+        "bottlingYear": null,
+        "caskStrength": null,
+        "releaseMonth": null,
+        "familyContext": {
+          "siblingBottles": []
+        }
+      },
+      {
+        "abv": 54,
+        "brand": "Gordon & MacPhail",
+        "score": 40.365326,
+        "series": "Private Collection",
+        "source": ["text"],
+        "bottler": "Gordon & MacPhail",
+        "edition": null,
+        "outturn": 62,
+        "bottleId": 61325,
+        "category": "single_malt",
+        "fullName": "Gordon & MacPhail Glenlivet 1979",
+        "reference": null,
+        "statedAge": null,
+        "caskNumber": "19237",
+        "comparison": {
+          "missing": ["statedAge"],
+          "conflicts": ["series", "distillers"],
+          "agreements": ["brand", "bottler"]
+        },
+        "distillery": ["The Glenlivet"],
+        "maturation": "Refill American hogshead",
+        "releaseDay": null,
+        "singleCask": null,
+        "releaseYear": null,
+        "vintageYear": 1979,
+        "bottlingYear": 2019,
+        "caskStrength": null,
+        "releaseMonth": null,
+        "familyContext": {
+          "siblingBottles": []
+        }
+      },
+      {
+        "abv": 45.6,
+        "brand": "Gordon & MacPhail",
+        "score": 37.63546,
+        "series": "Private Collection",
+        "source": ["text"],
+        "bottler": "Gordon & MacPhail",
+        "edition": null,
+        "outturn": 120,
+        "bottleId": 61316,
+        "category": "single_malt",
+        "fullName": "Gordon & MacPhail Braes of Glenlivet 1975",
+        "reference": null,
+        "statedAge": null,
+        "caskNumber": "15370",
+        "comparison": {
+          "missing": ["statedAge"],
+          "conflicts": ["series", "distillers"],
+          "agreements": ["brand", "bottler"]
+        },
+        "distillery": ["Braeval"],
+        "maturation": "Refill American Hogshead",
+        "releaseDay": null,
+        "singleCask": null,
+        "releaseYear": null,
+        "vintageYear": 1975,
+        "bottlingYear": 2021,
+        "caskStrength": null,
+        "releaseMonth": null,
+        "familyContext": {
+          "siblingBottles": []
+        }
+      },
+      {
+        "abv": 45,
+        "brand": "CRN57°",
+        "score": 36.214012,
+        "series": null,
+        "source": ["text"],
+        "bottler": "The Cairn Distillery",
+        "edition": null,
+        "outturn": null,
+        "bottleId": 56019,
+        "category": "blended_malt",
+        "fullName": "CRN57° Blended Malt Scotch Whisky",
+        "reference": null,
+        "statedAge": 70,
+        "caskNumber": null,
+        "comparison": {
+          "missing": ["series", "distillers"],
+          "conflicts": ["brand", "bottler"],
+          "agreements": ["statedAge"]
+        },
+        "distillery": [],
+        "maturation": null,
+        "releaseDay": null,
+        "singleCask": null,
+        "releaseYear": null,
+        "vintageYear": null,
+        "bottlingYear": null,
+        "caskStrength": null,
+        "releaseMonth": null,
+        "familyContext": {
+          "siblingBottles": []
+        }
+      },
+      {
+        "abv": 50.5,
+        "brand": "Gordon & MacPhail",
+        "score": 0.7414770060939342,
+        "series": null,
+        "source": ["vector"],
+        "bottler": "Gordon & MacPhail",
+        "edition": "Fifth Edition",
+        "outturn": 130,
+        "bottleId": 58061,
+        "category": "single_malt",
+        "fullName": "Gordon & MacPhail Mr George Legacy - Fifth Edition",
+        "reference": "Gordon & MacPhail Mr George Legacy Series 1954 from Glen Grant, 50.5%",
+        "statedAge": 70,
+        "caskNumber": "1823",
+        "comparison": {
+          "missing": ["series"],
+          "conflicts": ["distillers"],
+          "agreements": ["statedAge", "brand", "bottler"]
+        },
+        "distillery": ["The Glen Grant"],
+        "maturation": "first-fill Sherry puncheon",
+        "releaseDay": null,
+        "singleCask": true,
+        "releaseYear": null,
+        "vintageYear": 1954,
+        "bottlingYear": 2025,
+        "caskStrength": true,
+        "releaseMonth": null,
+        "familyContext": {
+          "siblingBottles": []
+        }
+      }
+    ],
+    "readCandidateImages": false
+  },
+  "context": {
+    "inspectedBottleIds": [65654],
+    "bottleContexts": [
+      {
+        "exact": {
+          "abv": 45.9,
+          "edition": null,
+          "outturn": null,
+          "statedAge": null,
+          "caskNumber": null,
+          "maturation": null,
+          "releaseDay": null,
+          "singleCask": null,
+          "releaseYear": 2011,
+          "vintageYear": 1940,
+          "bottlingYear": null,
+          "caskStrength": true,
+          "releaseMonth": null
+        },
+        "shared": {
+          "name": "Glenlivet 70-year-old",
+          "brand": {
+            "name": "Gordon & MacPhail",
+            "entityId": 5645
+          },
+          "series": {
+            "name": "Generations",
+            "seriesId": 1211
+          },
+          "bottler": {
+            "name": "Gordon & MacPhail",
+            "entityId": 5645
+          },
+          "category": "single_malt",
+          "statedAge": 70,
+          "distillers": [
+            {
+              "name": "The Glenlivet",
+              "entityId": 244
+            }
+          ]
+        },
+        "groupId": 38615,
+        "bottleId": 65654,
+        "fullName": "Gordon & MacPhail Glenlivet 70-year-old",
+        "siblings": [],
+        "references": [
+          {
+            "name": "Gordon & MacPhail Generations: Glenlivet 70-year-old",
+            "ignored": false
+          },
+          {
+            "name": "Gordon & MacPhail Generations: Glenlivet 70-year-old, 45.9%",
+            "ignored": false
+          }
+        ],
+        "observations": [],
+        "imageSources": []
+      }
+    ],
+    "inspectedEntities": [
+      {
+        "kind": "bottler",
+        "name": "Gordon & MacPhail",
+        "score": 1,
+        "source": ["exact", "text", "prefix", "contained"],
+        "entityId": 5645,
+        "reference": "Gordon & MacPhail",
+        "shortName": null,
+        "retrievedFor": [
+          {
+            "exact": true,
+            "query": "Gordon & MacPhail"
+          }
+        ]
+      },
+      {
+        "kind": "distillery",
+        "name": "The Glenlivet",
+        "score": 1,
+        "source": ["exact", "text", "prefix", "contained"],
+        "entityId": 244,
+        "reference": "Glenlivet",
+        "shortName": null,
+        "retrievedFor": [
+          {
+            "exact": true,
+            "query": "Glenlivet"
+          },
+          {
+            "exact": true,
+            "query": "The Glenlivet"
+          }
+        ]
+      },
+      {
+        "kind": "distillery",
+        "name": "Braeval",
+        "score": 1,
+        "source": ["text", "exact", "prefix", "contained"],
+        "entityId": 416,
+        "reference": "Braes of Glenlivet",
+        "shortName": null,
+        "retrievedFor": [
+          {
+            "query": "Glenlivet"
+          },
+          {
+            "exact": true,
+            "query": "Braeval"
+          }
+        ]
+      },
+      {
+        "kind": "distillery",
+        "name": "The Glen Grant",
+        "score": 1,
+        "source": ["exact", "text", "prefix", "contained"],
+        "entityId": 273,
+        "reference": "Glen Grant",
+        "shortName": null,
+        "retrievedFor": [
+          {
+            "exact": true,
+            "query": "The Glen Grant"
+          }
+        ]
+      },
+      {
+        "kind": "brand",
+        "name": "CRN57°",
+        "score": 1,
+        "source": ["exact", "text", "prefix", "contained"],
+        "entityId": 365874,
+        "reference": "CRN57°",
+        "shortName": null,
+        "retrievedFor": [
+          {
+            "exact": true,
+            "query": "CRN57°"
+          }
+        ]
+      },
+      {
+        "kind": "distillery",
+        "name": "The Cairn Distillery",
+        "score": 1,
+        "source": ["exact", "text", "prefix", "contained"],
+        "entityId": 365875,
+        "reference": "The Cairn Distillery",
+        "shortName": "The Cairn",
+        "retrievedFor": [
+          {
+            "exact": true,
+            "query": "The Cairn Distillery"
+          }
+        ]
+      },
+      {
+        "kind": "distillery",
+        "name": "Talisker",
+        "score": 1,
+        "source": ["exact", "text", "prefix", "contained"],
+        "entityId": 1385,
+        "reference": "Talisker",
+        "shortName": "",
+        "retrievedFor": [
+          {
+            "exact": true,
+            "query": "Talisker"
+          }
+        ]
+      },
+      {
+        "kind": "brand",
+        "name": "Generation",
+        "score": 0.4318181818181818,
+        "source": ["contained"],
+        "entityId": 365963,
+        "reference": "Generation",
+        "shortName": null,
+        "retrievedFor": [
+          {
+            "query": "Generations"
+          }
+        ]
+      },
+      {
+        "kind": "distillery",
+        "name": "Aberlour",
+        "score": 0.2,
+        "source": ["text"],
+        "entityId": 13,
+        "reference": null,
+        "shortName": null,
+        "retrievedFor": [
+          {
+            "query": "Glenlivet"
+          }
+        ]
+      },
+      {
+        "kind": "distillery",
+        "name": "The Macallan",
+        "score": 0.2,
+        "source": ["text"],
+        "entityId": 1157,
+        "reference": null,
+        "shortName": null,
+        "retrievedFor": [
+          {
+            "query": "Glenlivet"
+          },
+          {
+            "query": "The Glenlivet"
+          }
+        ]
+      },
+      {
+        "kind": "company",
+        "name": "Dailuaine-Talisker Distilleries Ltd",
+        "score": 0.2,
+        "source": ["text"],
+        "entityId": 366620,
+        "reference": null,
+        "shortName": null,
+        "retrievedFor": [
+          {
+            "query": "Talisker"
+          }
+        ]
+      }
+    ],
+    "inspectedSeries": []
+  },
+  "provenance": {
+    "source": "production_miss",
+    "verifiedSourceUrls": [
+      "https://www.scotchwhiskyauctions.com/auctions/231-the-182nd-auction/891827-glenlivet-gm-generations-70-year-old-sample-presentation-set/"
+    ],
+    "dbOutcome": {
+      "bottleId": 65654,
+      "createsBottle": false,
+      "summary": "Production returned match."
+    },
+    "notes": "Captured from saved classifier run 24055 (auction_lot 6333, model null, 2026-10-02T13:30:45.643Z). Production rationale: The source identifies Gordon & MacPhail’s Glenlivet Generations 70-year-old. Inspected Bottle 65654 matches the brand, distillery, series, and age; the auction’s sample-presentation-set wording describes packaging and does not establish a different whisky release. Checked 2026-10-24. Lot 182-03447 page: a tiny sample vial from the Gordon & MacPhail Generations Glenlivet 70 Year Old presentation pack, with a book and USB stick; 45.9%, distilled 4 February 1940, bottled 2011; winning bid £250. Production matched Bottle 65654, the full 70-year-old release; that is wrong. Search evidence is empty to keep the title-only input. Current auction matching sends readCandidateImages:false, so the case does too; the saved run predates that and read candidate photos."
+  },
+  "expected": {
+    "status": "classified",
+    "action": "no_match",
+    "identityScope": "product",
+    "summary": "Do not match a sample presentation set to the full-size Bottle."
+  }
+}

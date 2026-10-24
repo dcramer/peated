@@ -1,0 +1,439 @@
+{
+  "id": "auction-hennessy-xo-cognac-without-category-word",
+  "name": "auction title: Hennessy X.O is cognac even without the word",
+  "input": {
+    "reference": {
+      "id": 6551,
+      "url": "https://www.scotchwhiskyauctions.com/auctions/231-the-182nd-auction/892156-hennessy-xo/",
+      "name": "Hennessy X.O",
+      "imageUrl": null,
+      "externalSiteId": 28097,
+      "currentBottleId": null
+    },
+    "extractedIdentity": null,
+    "imageEvidence": null,
+    "initialCandidates": [
+      {
+        "abv": null,
+        "brand": "Crown Royal",
+        "score": 0.6392397926547858,
+        "series": null,
+        "source": ["vector"],
+        "bottler": null,
+        "edition": null,
+        "outturn": null,
+        "bottleId": 16671,
+        "category": "blend",
+        "fullName": "Crown Royal XO",
+        "reference": "Crown Royal XO",
+        "statedAge": null,
+        "caskNumber": null,
+        "comparison": {
+          "missing": [],
+          "conflicts": [],
+          "agreements": []
+        },
+        "distillery": [],
+        "maturation": null,
+        "releaseDay": null,
+        "singleCask": null,
+        "releaseYear": null,
+        "vintageYear": null,
+        "bottlingYear": null,
+        "caskStrength": null,
+        "releaseMonth": null,
+        "familyContext": {
+          "siblingBottles": []
+        }
+      },
+      {
+        "abv": null,
+        "brand": "Crown Royal",
+        "score": 0.5471643852103099,
+        "series": null,
+        "source": ["vector"],
+        "bottler": null,
+        "edition": null,
+        "outturn": null,
+        "bottleId": 17078,
+        "category": "blend",
+        "fullName": "Crown Royal XR",
+        "reference": "Crown Royal XR",
+        "statedAge": null,
+        "caskNumber": null,
+        "comparison": {
+          "missing": [],
+          "conflicts": [],
+          "agreements": []
+        },
+        "distillery": [],
+        "maturation": null,
+        "releaseDay": null,
+        "singleCask": null,
+        "releaseYear": null,
+        "vintageYear": null,
+        "bottlingYear": null,
+        "caskStrength": null,
+        "releaseMonth": null,
+        "familyContext": {
+          "siblingBottles": []
+        }
+      },
+      {
+        "abv": null,
+        "brand": "Chivas Regal",
+        "score": 0.5430070334024587,
+        "series": null,
+        "source": ["vector"],
+        "bottler": null,
+        "edition": null,
+        "outturn": null,
+        "bottleId": 14038,
+        "category": "blend",
+        "fullName": "Chivas Regal XV",
+        "reference": "Chivas Regal XV",
+        "statedAge": null,
+        "caskNumber": null,
+        "comparison": {
+          "missing": [],
+          "conflicts": [],
+          "agreements": []
+        },
+        "distillery": [],
+        "maturation": null,
+        "releaseDay": null,
+        "singleCask": null,
+        "releaseYear": null,
+        "vintageYear": null,
+        "bottlingYear": null,
+        "caskStrength": null,
+        "releaseMonth": null,
+        "familyContext": {
+          "siblingBottles": []
+        }
+      },
+      {
+        "abv": null,
+        "brand": "2XO Whiskey",
+        "score": 0.5415975865786794,
+        "series": null,
+        "source": ["vector"],
+        "bottler": null,
+        "edition": null,
+        "outturn": null,
+        "bottleId": 39682,
+        "category": "bourbon",
+        "fullName": "2XO The Phoenix Blend",
+        "reference": "2XO The Phoenix Blend",
+        "statedAge": null,
+        "caskNumber": null,
+        "comparison": {
+          "missing": [],
+          "conflicts": [],
+          "agreements": []
+        },
+        "distillery": ["2XO Whiskey"],
+        "maturation": null,
+        "releaseDay": null,
+        "singleCask": null,
+        "releaseYear": null,
+        "vintageYear": null,
+        "bottlingYear": null,
+        "caskStrength": null,
+        "releaseMonth": null,
+        "familyContext": {
+          "siblingBottles": []
+        }
+      },
+      {
+        "abv": null,
+        "brand": "2XO Whiskey",
+        "score": 0.5317690242236877,
+        "series": null,
+        "source": ["vector"],
+        "bottler": "2XO Whiskey",
+        "edition": null,
+        "outturn": null,
+        "bottleId": 39684,
+        "category": "bourbon",
+        "fullName": "2XO French Oak",
+        "reference": "2XO Oak Series French Oak, 46%",
+        "statedAge": null,
+        "caskNumber": null,
+        "comparison": {
+          "missing": [],
+          "conflicts": [],
+          "agreements": []
+        },
+        "distillery": [],
+        "maturation": null,
+        "releaseDay": null,
+        "singleCask": null,
+        "releaseYear": null,
+        "vintageYear": null,
+        "bottlingYear": null,
+        "caskStrength": null,
+        "releaseMonth": null,
+        "familyContext": {
+          "siblingBottles": []
+        }
+      },
+      {
+        "abv": 40,
+        "brand": "Johnnie Walker",
+        "score": 0.5259642339064794,
+        "series": "Blue Label",
+        "source": ["vector"],
+        "bottler": null,
+        "edition": null,
+        "outturn": null,
+        "bottleId": 58105,
+        "category": "blend",
+        "fullName": "Johnnie Walker Xordinaire",
+        "reference": "Johnnie Walker Blue Label Xordinaire, 40%",
+        "statedAge": null,
+        "caskNumber": null,
+        "comparison": {
+          "missing": [],
+          "conflicts": [],
+          "agreements": []
+        },
+        "distillery": [],
+        "maturation": "Finished in former hand selected XO Cognac casks",
+        "releaseDay": null,
+        "singleCask": null,
+        "releaseYear": null,
+        "vintageYear": null,
+        "bottlingYear": null,
+        "caskStrength": null,
+        "releaseMonth": null,
+        "familyContext": {
+          "siblingBottles": []
+        }
+      },
+      {
+        "abv": null,
+        "brand": "Tullamore D.E.W.",
+        "score": 0.5207083445970262,
+        "series": null,
+        "source": ["vector"],
+        "bottler": null,
+        "edition": null,
+        "outturn": null,
+        "bottleId": 14142,
+        "category": "blend",
+        "fullName": "Tullamore D.E.W. D.E.W. XO Caribbean Rum Cask Finish",
+        "reference": "Tullamore D.E.W. XO Caribbean Rum Cask Finish",
+        "statedAge": null,
+        "caskNumber": null,
+        "comparison": {
+          "missing": [],
+          "conflicts": [],
+          "agreements": []
+        },
+        "distillery": [],
+        "maturation": null,
+        "releaseDay": null,
+        "singleCask": null,
+        "releaseYear": null,
+        "vintageYear": null,
+        "bottlingYear": null,
+        "caskStrength": null,
+        "releaseMonth": null,
+        "familyContext": {
+          "siblingBottles": []
+        }
+      },
+      {
+        "abv": null,
+        "brand": "Chivas Regal",
+        "score": 0.5048735005828273,
+        "series": null,
+        "source": ["vector"],
+        "bottler": "Chivas Brothers Ltd.",
+        "edition": null,
+        "outturn": null,
+        "bottleId": 2750,
+        "category": "blend",
+        "fullName": "Chivas Regal 15-year-old XV",
+        "reference": "Chivas Regal 15-year-old XV",
+        "statedAge": 15,
+        "caskNumber": null,
+        "comparison": {
+          "missing": [],
+          "conflicts": [],
+          "agreements": []
+        },
+        "distillery": [],
+        "maturation": null,
+        "releaseDay": null,
+        "singleCask": null,
+        "releaseYear": null,
+        "vintageYear": null,
+        "bottlingYear": null,
+        "caskStrength": null,
+        "releaseMonth": null,
+        "familyContext": {
+          "siblingBottles": []
+        }
+      },
+      {
+        "abv": null,
+        "brand": "Tullamore D.E.W.",
+        "score": 0.501448305329327,
+        "series": null,
+        "source": ["vector"],
+        "bottler": "Tullamore Distillery",
+        "edition": null,
+        "outturn": null,
+        "bottleId": 684,
+        "category": "single_malt",
+        "fullName": "Tullamore D.E.W. XO",
+        "reference": "Tullamore D.E.W. XO",
+        "statedAge": 12,
+        "caskNumber": null,
+        "comparison": {
+          "missing": [],
+          "conflicts": [],
+          "agreements": []
+        },
+        "distillery": [],
+        "maturation": null,
+        "releaseDay": null,
+        "singleCask": null,
+        "releaseYear": null,
+        "vintageYear": null,
+        "bottlingYear": null,
+        "caskStrength": null,
+        "releaseMonth": null,
+        "familyContext": {
+          "siblingBottles": []
+        }
+      },
+      {
+        "abv": null,
+        "brand": "J&B",
+        "score": 0.49691551744086004,
+        "series": null,
+        "source": ["vector"],
+        "bottler": null,
+        "edition": null,
+        "outturn": null,
+        "bottleId": 14180,
+        "category": "blend",
+        "fullName": "J&B Rare",
+        "reference": "J&B Rare",
+        "statedAge": null,
+        "caskNumber": null,
+        "comparison": {
+          "missing": [],
+          "conflicts": [],
+          "agreements": []
+        },
+        "distillery": [],
+        "maturation": null,
+        "releaseDay": null,
+        "singleCask": null,
+        "releaseYear": null,
+        "vintageYear": null,
+        "bottlingYear": null,
+        "caskStrength": null,
+        "releaseMonth": null,
+        "familyContext": {
+          "siblingBottles": []
+        }
+      },
+      {
+        "abv": null,
+        "brand": "2XO Whiskey",
+        "score": 0.4957512389744416,
+        "series": null,
+        "source": ["vector"],
+        "bottler": "2XO Whiskey",
+        "edition": null,
+        "outturn": null,
+        "bottleId": 39678,
+        "category": "bourbon",
+        "fullName": "2XO American Oak",
+        "reference": "2XO Oak Series American Oak, 46%",
+        "statedAge": null,
+        "caskNumber": null,
+        "comparison": {
+          "missing": [],
+          "conflicts": [],
+          "agreements": []
+        },
+        "distillery": [],
+        "maturation": null,
+        "releaseDay": null,
+        "singleCask": null,
+        "releaseYear": null,
+        "vintageYear": null,
+        "bottlingYear": null,
+        "caskStrength": null,
+        "releaseMonth": null,
+        "familyContext": {
+          "siblingBottles": []
+        }
+      },
+      {
+        "abv": null,
+        "brand": "Johnnie Walker",
+        "score": 0.49337692859467697,
+        "series": null,
+        "source": ["vector"],
+        "bottler": null,
+        "edition": null,
+        "outturn": null,
+        "bottleId": 14011,
+        "category": "blend",
+        "fullName": "Johnnie Walker Gold Label Reserve",
+        "reference": "Johnnie Walker Gold Reserve",
+        "statedAge": null,
+        "caskNumber": null,
+        "comparison": {
+          "missing": [],
+          "conflicts": [],
+          "agreements": []
+        },
+        "distillery": [],
+        "maturation": null,
+        "releaseDay": null,
+        "singleCask": null,
+        "releaseYear": null,
+        "vintageYear": null,
+        "bottlingYear": null,
+        "caskStrength": null,
+        "releaseMonth": null,
+        "familyContext": {
+          "siblingBottles": []
+        }
+      }
+    ],
+    "readCandidateImages": false
+  },
+  "context": {
+    "inspectedBottleIds": [],
+    "bottleContexts": [],
+    "inspectedEntities": [],
+    "inspectedSeries": []
+  },
+  "provenance": {
+    "source": "production_miss",
+    "verifiedSourceUrls": [
+      "https://www.scotchwhiskyauctions.com/auctions/231-the-182nd-auction/892156-hennessy-xo/"
+    ],
+    "dbOutcome": {
+      "bottleId": null,
+      "createsBottle": false,
+      "summary": "Production returned no_match."
+    },
+    "notes": "Captured from saved classifier run 24227 (auction_lot 6551, model null, 2026-10-02T14:08:07.028Z). Production rationale: Hennessy X.O is a Cognac, not a whisky. Cognac is outside this whisky catalog, so it cannot be matched or created as a Bottle here. The local candidates are unrelated whisky products. Checked 2026-10-24. Lot 182-03767 page: Hennessy X.O, cognac, 70cl, 40%; winning bid £95. The title has no category word, so the keyword ignore rule does not apply. Production returned no_match, which leaves the lot in review. Search evidence is empty to keep the title-only input. Current auction matching sends readCandidateImages:false, so the case does too; the saved run predates that and read candidate photos."
+  },
+  "expected": {
+    "status": "classified",
+    "action": "no_match",
+    "identityScope": "product",
+    "summary": "Do not match or create a whisky Bottle for a cognac."
+  }
+}
