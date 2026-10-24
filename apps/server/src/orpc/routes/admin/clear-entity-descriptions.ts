@@ -101,6 +101,8 @@ export default procedure
             and(
               eq(entities.id, entity.id),
               eq(entities.descriptionSrc, "generated"),
+              // A writer run may have saved a new lead since the page read.
+              eq(entities.description, entity.description!),
             ),
           )
           .returning({ id: entities.id });
