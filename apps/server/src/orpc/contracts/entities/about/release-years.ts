@@ -9,7 +9,7 @@ export default contract
     path: "/entities/{entity}/about/release-years",
     summary: "List entity release-year counts",
     description:
-      "Count active bottles sold under the entity as brand for each release year.",
+      "Count active bottles for each release year: every bottle distilled at a distillery, or the bottles sold under any other entity as brand.",
     operationId: "listEntityReleaseYearCounts",
   })
   .input(z.object({ entity: z.coerce.number().int().positive() }))

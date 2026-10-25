@@ -28,6 +28,12 @@ describe("About catalog numbers", () => {
       distillerIds: [distillery.id],
     });
     await fixtures.Bottle({ name: "D", distillerIds: [distillery.id] });
+    // Its own line, with no distiller recorded.
+    await fixtures.Bottle({
+      name: "F",
+      vintageYear: 1981,
+      brandId: distillery.id,
+    });
     // Distilled elsewhere.
     await fixtures.Bottle({ name: "E", vintageYear: 1972 });
 
@@ -36,7 +42,7 @@ describe("About catalog numbers", () => {
     ).toEqual({
       results: [
         { year: 1972, count: 2 },
-        { year: 1981, count: 1 },
+        { year: 1981, count: 2 },
       ],
       withoutYear: 1,
     });
@@ -50,7 +56,53 @@ describe("About catalog numbers", () => {
           count: 2,
         },
       ],
-      withoutEntity: 2,
+      withoutEntity: 3,
+    });
+  });
+
+  test("counts release years for every bottle distilled at a distillery", async ({
+    fixtures,
+  }) => {
+    const distillery = await fixtures.Entity({ kind: "distillery" });
+    const otherBrand = await fixtures.Entity({ kind: "brand" });
+    const otherDistillery = await fixtures.Entity({ kind: "distillery" });
+    await fixtures.Bottle({
+      name: "Own",
+      brandId: distillery.id,
+      releaseYear: 2021,
+      distillerIds: [distillery.id],
+    });
+    // An independent bottling sold under another brand still counts.
+    await fixtures.Bottle({
+      name: "Independent",
+      brandId: otherBrand.id,
+      releaseYear: 2004,
+      distillerIds: [distillery.id],
+    });
+    // Its own line counts even when no distiller is recorded.
+    await fixtures.Bottle({
+      name: "Own, no distiller",
+      brandId: distillery.id,
+      releaseYear: 2021,
+    });
+    await fixtures.Bottle({ name: "No year", distillerIds: [distillery.id] });
+    // Distilled elsewhere, including under its name.
+    await fixtures.Bottle({ name: "Elsewhere", releaseYear: 2004 });
+    await fixtures.Bottle({
+      name: "Sourced",
+      brandId: distillery.id,
+      releaseYear: 2004,
+      distillerIds: [otherDistillery.id],
+    });
+
+    expect(
+      await routerClient.entities.about.releaseYears({ entity: distillery.id }),
+    ).toEqual({
+      results: [
+        { year: 2004, count: 1 },
+        { year: 2021, count: 2 },
+      ],
+      withoutYear: 1,
     });
   });
 

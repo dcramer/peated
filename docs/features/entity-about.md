@@ -81,7 +81,10 @@ placeholder. The constants live in
 | Key facts                   | 2 or more facts             |
 
 Catalog numbers are counted from active Bottles at read time, the same way as
-the Entity Bottles tab. Prose never states them; they change daily. Chart bars
+the Entity Bottles tab. A distillery's vintages, bottlers, and release years
+count every Bottle distilled there, independent bottlings included. Its own
+line counts even when no distiller is recorded yet. A brand's
+release years count the Bottles sold under it. Prose never states them; they change daily. Chart bars
 link to the Bottle list filtered to that year.
 
 A Bottle page with one distiller and a
