@@ -11,30 +11,12 @@ import {
   uniqueIndex,
 } from "drizzle-orm/pg-core";
 
+import {
+  REPORT_OBJECT_TYPES,
+  REPORT_REASONS,
+  REPORT_STATUSES,
+} from "../../constants";
 import { users } from "./users";
-
-export const REPORT_OBJECT_TYPES = [
-  "tasting",
-  "member_review",
-  "comment",
-  "user",
-  "bottle",
-  "entity",
-  "bottle_series",
-  "flight",
-] as const;
-
-export const REPORT_REASONS = [
-  "spam",
-  "harassment",
-  "hate",
-  "sexual_content",
-  "violence",
-  "inaccurate",
-  "other",
-] as const;
-
-export const REPORT_STATUSES = ["open", "resolved", "dismissed"] as const;
 
 export const reportObjectTypeEnum = pgEnum(
   "report_object_type",

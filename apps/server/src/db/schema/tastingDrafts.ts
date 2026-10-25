@@ -13,18 +13,13 @@ import {
   varchar,
 } from "drizzle-orm/pg-core";
 
+import {
+  TASTING_DRAFT_BOTTLE_HINT_MAX_LENGTH,
+  TASTING_DRAFT_IDENTIFICATION_STATUS_LIST,
+} from "../../constants";
 import { bottles } from "./bottles";
 import { ratingBandEnum, servingStyleEnum } from "./tastings";
 import { users } from "./users";
-
-export const TASTING_DRAFT_BOTTLE_HINT_MAX_LENGTH = 255;
-
-export const TASTING_DRAFT_IDENTIFICATION_STATUS_LIST = [
-  "none",
-  "pending",
-  "done",
-  "failed",
-] as const;
 
 export const tastingDraftIdentificationStatusEnum = pgEnum(
   "tasting_draft_identification_status",

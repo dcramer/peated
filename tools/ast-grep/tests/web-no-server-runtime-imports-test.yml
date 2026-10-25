@@ -1,0 +1,16 @@
+id: web-no-server-runtime-imports
+valid:
+  - 'import { BottleSchema } from "@peated/server/schemas";'
+  - 'import { CATEGORY_LIST } from "@peated/server/constants";'
+  - 'import type { Outputs } from "@peated/server/orpc/router";'
+  - 'import { SharedSentryConfig } from "./config";'
+  - 'import { formatCategoryName } from "@peated/server/lib/format";'
+invalid:
+  - 'import { db } from "@peated/server/db";'
+  - 'import { bottles } from "@peated/server/db/schema";'
+  - 'import type { Bottle } from "@peated/server/db/schema";'
+  - 'import config from "@peated/server/config";'
+  - 'import { pushJob } from "@peated/server/worker/client";'
+  - 'import handler from "@peated/server/orpc/routes/bottles/list";'
+  - 'export { bottles } from "@peated/server/db/schema";'
+  - 'const { db } = await import("@peated/server/db");'

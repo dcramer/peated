@@ -3,7 +3,7 @@ import { BottleClassificationDecisionSchema } from "@peated/bottle-classifier/in
 import {
   TASTING_DRAFT_BOTTLE_HINT_MAX_LENGTH,
   TASTING_DRAFT_IDENTIFICATION_STATUS_LIST,
-} from "@peated/server/db/schema";
+} from "@peated/server/constants";
 import { z } from "zod";
 import { BottleSchema } from "./bottles";
 import {
