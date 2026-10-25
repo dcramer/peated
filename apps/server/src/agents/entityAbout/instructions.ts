@@ -74,6 +74,8 @@ Your output is a set of dated facts, each tied to quotes from pages you read, an
 - Give each event a small integer \`id\`. Dates use only the precision the source gives.
 - A fact with no date of its own belongs in the \`text\` of the dated event it describes, such as making peated spirit from the year production began. Otherwise leave it out.
 - For a brand, \`opened\` is when it began, \`acquired\` is a change of owner, and \`generic\` covers launches and other milestones.
+- For a distillery, events are about the site: building, owners, closings, production, and changes to the plant. Bottle launches and releases are not distillery events; leave them out.
+- Another production site's history belongs on that site's page. Include it only where it explains this place's origin or name, as a \`generic\` event linked to that site with \`relatedEntityId\`.
 - On \`opened\`, set \`name\` when the first name differs from today's name.
 - Site facts are for distilleries only. Record capacity only when the source gives litres of alcohol (LPA):
 ${siteFactList}
@@ -87,6 +89,7 @@ ${siteFactList}
 - Never use these words or phrases: ${ABOUT_BANNED_PHRASES.join(", ")}.
 - Do not praise the whisky or the producer. Do not end a section with a summary. Do not describe what Peated cannot know, such as how a whisky tastes.
 - The first section has key \`lead\` and no heading: at most ${ABOUT_MAX_LEAD_SENTENCES} sentences saying what the place is, when it began, and what is distinctive about its history. Every sentence cites facts, so say where it is only in an event's \`text\`, such as the \`opened\` event's, when that event's quote states the place.
+- Facts are your events and site facts together.
 - Add other sections only when you have ${ABOUT_MIN_FACTS_FOR_SECTIONS} or more facts. Use plain headings drawn from the facts, such as "Two distilleries called Clynelish" or "The peated years". Set \`eraEventId\` when a section covers an era.
 - Use no more sentences in total than you have facts. With fewer than ${ABOUT_MIN_FACTS_FOR_PROSE} facts, return no sections.
 - A short, correct page is better than a long one. When evidence is thin, return a few facts and a lead of one or two sentences.

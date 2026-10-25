@@ -45,7 +45,9 @@ Two other stores feed the writer:
   URL. Every run reads them. They guide the writer but are never cited.
 
 History about a production site belongs on the Distillery. History about a
-label belongs on the Brand. See
+label belongs on the Brand. A distillery page leaves out bottle launches, and
+mentions another site's history only where it explains this site's origin or
+name. See
 [Whisky Identity Model](../architecture/whisky-identity-model.md#naming-and-entity-boundaries).
 
 ## What Is Shown
