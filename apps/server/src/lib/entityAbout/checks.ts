@@ -279,7 +279,7 @@ function factSearchText(document: EntityAboutDocument) {
 const NUMBER_PATTERN = /\d+(?:\.\d+)?/g;
 
 function stripThousands(value: string) {
-  return value.replace(/(\d),(?=\d{3}\b)/g, "$1");
+  return value.replace(/(\d),(?=\d{3}(?!\d))/g, "$1");
 }
 
 // Histories shorten year ranges, so "1931-38" also states 1938. A later
@@ -362,7 +362,7 @@ function expandMillions(value: string) {
 
 /** The numbers a value states, read the same way as quotes. */
 function readNumbers(value: string) {
-  return stripThousands(expandMillions(value)).match(NUMBER_PATTERN) ?? [];
+  return expandMillions(stripThousands(value)).match(NUMBER_PATTERN) ?? [];
 }
 
 // A whole number: 46 is not inside 46.5 or 146, but 1887 is in "c.1887".
@@ -370,7 +370,7 @@ function containsNumber(text: string, number: string) {
   return new RegExp(
     `(?<!\\d|\\d\\.)${number.replace(".", "\\.")}(?!\\d|\\.\\d)`,
   ).test(
-    stripThousands(expandYearRanges(expandMillions(writeNumberWords(text)))),
+    expandMillions(stripThousands(expandYearRanges(writeNumberWords(text)))),
   );
 }
 

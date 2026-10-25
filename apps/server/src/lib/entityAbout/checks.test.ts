@@ -594,6 +594,9 @@ describe("checkConflictPicks", () => {
     expect(stills(1600000, "It is 1.6 metres tall.")).toBeUndefined();
     // A value written in millions reads the same way as the quote.
     expect(stills(1600000, "It makes 1.6 million litres.")).toBeDefined();
+    // Thousands separators are read before millions: "1,250m" is one number.
+    expect(stills(1250000000, "It cost £1,250m.")).toBeDefined();
+    expect(stills(250000000, "It cost £1,250m.")).toBeUndefined();
   });
 
   test("keeps a site fact's date only when a quote states its year", () => {
