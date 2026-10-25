@@ -282,11 +282,34 @@ function expandYearRanges(value: string) {
   );
 }
 
+// Pages write small counts as words: "two wash stills" states 2. "One" is
+// left out because pages use it in many other ways.
+const NUMBER_WORDS = [
+  "two",
+  "three",
+  "four",
+  "five",
+  "six",
+  "seven",
+  "eight",
+  "nine",
+  "ten",
+  "eleven",
+  "twelve",
+];
+
+function writeNumberWords(value: string) {
+  return value.replace(
+    new RegExp(`\\b(${NUMBER_WORDS.join("|")})\\b`, "gi"),
+    (word) => String(NUMBER_WORDS.indexOf(word.toLowerCase()) + 2),
+  );
+}
+
 // A whole number: 46 is not inside 46.5 or 146, but 1887 is in "c.1887".
 function containsNumber(text: string, number: string) {
   return new RegExp(
     `(?<!\\d|\\d\\.)${number.replace(".", "\\.")}(?!\\d|\\.\\d)`,
-  ).test(stripThousands(expandYearRanges(text)));
+  ).test(stripThousands(expandYearRanges(writeNumberWords(text))));
 }
 
 /**

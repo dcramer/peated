@@ -505,6 +505,11 @@ describe("checkConflictPicks", () => {
     // 46 is not stated by 46.5; a year after "c." is still a whole number.
     expect(stills(46, "It holds 46.5 thousand litres.")).toBeUndefined();
     expect(stills(1887, "The still dates from c.1887.")).toBeDefined();
+    // Small counts written as words state their number, whole words only.
+    expect(stills(2, "The two wash stills are heated by steam.")).toBeDefined();
+    expect(stills(4, "All four stills were rebuilt.")).toBeDefined();
+    expect(stills(10, "The stills tend to run slowly.")).toBeUndefined();
+    expect(stills(2, "It has one wash still.")).toBeUndefined();
   });
 
   test("keeps a site fact's date only when a quote states its year", () => {
