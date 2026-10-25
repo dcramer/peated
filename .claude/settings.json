@@ -17,7 +17,8 @@
       "Bash(gh pr checks:*)",
       "Bash(gh pr view:*)",
       "Bash(gh run view:*)",
-      "Bash(git status:*)"
+      "Bash(git status:*)",
+      "Bash(pnpm -s cli api:*)"
     ],
     "deny": []
   },
