@@ -41,10 +41,6 @@
         "year": "1909"
       },
       {
-        "kind": "generic",
-        "year": "1939"
-      },
-      {
         "kind": "acquired",
         "year": "1949"
       },
@@ -53,7 +49,7 @@
         "year": "2001"
       }
     ],
-    "notes": "opened 1909: all three pages (Chivas Regal Wikipedia: Howard created it in 1909 as a 25-year-old; Chivas Brothers Wikipedia: Howard made the 25-year-old blend in 1909 and called it Chivas Regal; ScotchWhisky.com: launched in 1909, and the 1909 timeline entry). generic 1939: the 12-year-old in the US (all three pages). acquired 1949: Seagram buys Chivas Brothers (Chivas Brothers Wikipedia; ScotchWhisky.com history, timeline and owners list Seagram Distillers 1949 - 2001). acquired 2001: Pernod Ricard (both Wikipedia pages; ScotchWhisky.com timeline and owners list)."
+    "notes": "opened 1909: all three pages (Chivas Regal Wikipedia: Howard created it in 1909 as a 25-year-old; Chivas Brothers Wikipedia: Howard made the 25-year-old blend in 1909 and called it Chivas Regal; ScotchWhisky.com: launched in 1909, and the 1909 timeline entry). acquired 1949: Seagram buys Chivas Brothers (Chivas Brothers Wikipedia; ScotchWhisky.com history, timeline and owners list Seagram Distillers 1949 - 2001). acquired 2001: Pernod Ricard (both Wikipedia pages; ScotchWhisky.com timeline and owners list)."
   },
-  "notes": "Main trap: the brand began in 1909, but the pages carry many older dates for the company and its distillery. Chivas Brothers Wikipedia dates the company to 1786 (that is Strathisla's founding year, per the Chivas Regal Wikipedia Strathisla section); ScotchWhisky.com says the roots go back to 1801 with John Forrest's shop; there are also 1828, 1836, 1838, 1843 Royal Warrant, 1854 Royal Glen Dee, 1857 and 1863 Royal Strathythan. None of these is when Chivas Regal began; an opened date before 1909 is wrong. Morrison & Lundie bought Chivas Brothers in 1936 (Chivas Brothers Wikipedia and ScotchWhisky.com); that is a valid optional acquired event. Conflicts: Mizunara is 2014 on both Wikipedia pages but 2013 on the ScotchWhisky.com timeline. The 18 Year Old is 1997 everywhere; the 25 Years Old relaunch is 2007 on the Chivas Regal Wikipedia page. The 1950 purchase of Milton/Strathisla is optional. Noise to leave out: sales figures, case counts, proof values and awards. No producer page: https://www.chivas.com/ returned 403, so no official source is included. Peated stores no region and no aliases; owner Chivas Brothers. Page texts are reviewed paraphrases of the cited pages, not copies."
+  "notes": "Main trap: the brand began in 1909, but the pages carry many older dates for the company and its distillery. Chivas Brothers Wikipedia dates the company to 1786 (that is Strathisla's founding year, per the Chivas Regal Wikipedia Strathisla section); ScotchWhisky.com says the roots go back to 1801 with John Forrest's shop; there are also 1828, 1836, 1838, 1843 Royal Warrant, 1854 Royal Glen Dee, 1857 and 1863 Royal Strathythan. None of these is when Chivas Regal began; an opened date before 1909 is wrong. Morrison & Lundie bought Chivas Brothers in 1936 (Chivas Brothers Wikipedia and ScotchWhisky.com); that is a valid optional acquired event. Conflicts: Mizunara is 2014 on both Wikipedia pages but 2013 on the ScotchWhisky.com timeline. The 18 Year Old is 1997 everywhere; the 25 Years Old relaunch is 2007 on the Chivas Regal Wikipedia page. The 1950 purchase of Milton/Strathisla is optional. Noise to leave out: sales figures, case counts, proof values and awards. No producer page: https://www.chivas.com/ returned 403, so no official source is included. Peated stores no region and no aliases; owner Chivas Brothers. Page texts are reviewed paraphrases of the cited pages, not copies. Generic events are allowed but never required, so these are not expected: generic 1939, the 12-year-old in the US (all three pages)."
 }

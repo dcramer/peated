@@ -82,7 +82,9 @@ long inputs and tool outputs.
   is a server model check, so `trigger-evals-scraper` runs it too. Its writer
   reads only the reviewed pages in `apps/server/src/agents/entityAbout/evals/`,
   so it needs no Firecrawl key. A failed case prints each draft's facts,
-  citations, and which quotes the checks kept. Run it alone with
+  citations, and which quotes the checks kept. A case expects only events
+  the rules require a careful writer to keep. Generic events and disputed
+  owners are optional, so the case's notes list them instead. Run it alone with
   `pnpm --filter @peated/server evals -- src/agents/entityAbout/writer.eval.test.ts`.
 - Ordinary `pnpm test` runs do not call a model.
 
