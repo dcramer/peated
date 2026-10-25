@@ -504,15 +504,17 @@ export function checkConflictPicks(document: EntityAboutDocument) {
 }
 
 /**
- * Leaves out sentences that cite a fact the checks dropped, and sections
- * left with none. The job uses it only on its last attempt (see
- * docs/features/entity-about.md); every sentence left still gets every check.
+ * Fits the prose to what the checks kept: leaves out sentences that cite a
+ * dropped fact, then trims sentences from the end until the counts fit the
+ * shown facts, dropping sections beyond the lead first. The job uses it only
+ * on its last attempt (see docs/features/entity-about.md); every sentence
+ * left still gets every check, and a page left without a lead is not saved.
  */
-export function dropSentencesCitingHiddenFacts(
+export function trimProseToShownFacts(
   document: EntityAboutDocument,
 ): EntityAboutDocument {
   const shown = getShownFactIds(document);
-  const sections = document.sections
+  let sections = document.sections
     .map((section) => ({
       ...section,
       sentences: section.sentences.filter((sentence) =>
@@ -520,7 +522,39 @@ export function dropSentencesCitingHiddenFacts(
       ),
     }))
     .filter((section) => section.sentences.length);
-  return { ...document, sections };
+  if (shown.size < ABOUT_MIN_FACTS_FOR_PROSE)
+    return { ...document, sections: [] };
+  if (shown.size < ABOUT_MIN_FACTS_FOR_SECTIONS) {
+    sections = sections.filter((section) => section.key === "lead");
+  }
+  sections = sections.map((section) =>
+    section.key === "lead"
+      ? {
+          ...section,
+          sentences: section.sentences.slice(
+            0,
+            Math.min(ABOUT_MAX_LEAD_SENTENCES, shown.size),
+          ),
+        }
+      : section,
+  );
+  // Trim from the last section beyond the lead; the lead goes last.
+  let extra =
+    sections.reduce((total, section) => total + section.sentences.length, 0) -
+    shown.size;
+  for (let i = sections.length - 1; i >= 0 && extra > 0; i -= 1) {
+    const section = sections[i]!;
+    const keep = Math.max(
+      section.key === "lead" ? 1 : 0,
+      section.sentences.length - extra,
+    );
+    extra -= section.sentences.length - keep;
+    sections[i] = { ...section, sentences: section.sentences.slice(0, keep) };
+  }
+  return {
+    ...document,
+    sections: sections.filter((section) => section.sentences.length),
+  };
 }
 
 /**

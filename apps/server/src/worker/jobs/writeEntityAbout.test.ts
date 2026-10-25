@@ -247,6 +247,31 @@ describe("writeEntityAbout", () => {
     ).toEqual(["Brora opened in 1819.", "It closed in 1983."]);
   });
 
+  test("on its last try, trims prose longer than its facts allow", async ({
+    fixtures,
+  }) => {
+    const entity = await fixtures.Entity({ kind: "distillery" });
+    const tooLong = draft([
+      { text: "Brora opened in 1819.", factIds: ["event:1"] },
+      { text: "It closed in 1983.", factIds: ["event:2"] },
+      { text: "It was open for 164 years.", factIds: ["event:1", "event:2"] },
+    ]);
+    const writer = services(async () => ({
+      draft: tooLong,
+      pagesRead: [page],
+    }));
+
+    const result = await writeEntityAbout({ entityId: entity.id }, writer);
+
+    expect(result).toMatchObject({ status: "saved" });
+    const saved = await getEntityAbout(db, entity.id);
+    expect(
+      saved?.document.sections.flatMap((section) =>
+        section.sentences.map((sentence) => sentence.text),
+      ),
+    ).toEqual(["Brora opened in 1819.", "It closed in 1983."]);
+  });
+
   test("saves nothing when leaving out sentences removes the lead", async ({
     fixtures,
   }) => {

@@ -19,9 +19,9 @@ import {
   getSystemActorForDatabase,
 } from "@peated/server/lib/actors";
 import {
-  dropSentencesCitingHiddenFacts,
   keepFoundEntityLinks,
   reviewAboutDraft,
+  trimProseToShownFacts,
 } from "@peated/server/lib/entityAbout/checks";
 import { updateEntityDescription } from "@peated/server/lib/entityAbout/description";
 import {
@@ -163,20 +163,20 @@ export async function writeEntityAbout(
     errors = [...converted.errors, ...reviewed.errors];
     let document = reviewed.document;
     // Pipeline rule (owner: docs/features/entity-about.md): with no retry
-    // left, a sentence that cites a dropped fact is left out, as the page
-    // would hide it, and the rest must pass every check again.
+    // left, the prose is trimmed to the facts the checks kept, and the
+    // rest must pass every check again.
     if (
       errors.length &&
       !converted.errors.length &&
       attempt === MAX_ATTEMPTS - 1
     ) {
       const kept = reviewAboutDraft(
-        dropSentencesCitingHiddenFacts(reviewed.document),
+        trimProseToShownFacts(reviewed.document),
         pagesRead,
         entity.kind,
         current?.document ?? null,
       );
-      // Leaving out sentences may shorten a page, never strip its lead.
+      // Trimming may shorten a page, never strip its lead.
       const keptLead = kept.document.sections.some(
         (section) => section.key === "lead",
       );
