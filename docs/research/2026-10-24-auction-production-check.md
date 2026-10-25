@@ -130,9 +130,50 @@ and, for matches, an independent source. Two runs each:
   16743 (Johnnie Walker The Royal Route), probably 821 and 3642 (Tomatin 18).
 - The two Ardcore legacy names above point at the wrong Bottle.
 
+## Detail-read pilot, October 25
+
+An administrator recheck with `refreshSourceDetails` covered 20 lots in review:
+16 picked because page facts could settle the Bottle or because older rules
+had blocked a correct match, and 4 at random. Production then ran the shared
+comparison from #1479 and #1481 and the miniature rule from #1470.
+
+- Detail run 2004 made 20 requests and read 19 lot pages with no errors. A
+  deploy mid-run stopped it for about an hour until its 60-minute lease ran
+  out and the scheduler dispatched it again.
+- No lot's state, availability, current bid, or result changed.
+- The 5 cl Yamazaki 12 lot became ignored with no page read or check.
+
+| Outcome after page facts                                               | Lots |
+| ---------------------------------------------------------------------- | ---- |
+| Matched automatically                                                  | 8    |
+| New Bottle created automatically                                       | 4    |
+| Ignored as a miniature                                                 | 1    |
+| Review: right Bottle, but no evidence anchor (`webEvidence: not_used`) | 2    |
+| Review: right Bottle, but a catalog fact conflicts                     | 1    |
+| Review: the page does not settle the release                           | 4    |
+
+All 12 automatic results agree with the page facts and the catalog. Strength
+from the page settled several: Springbank 10 Year Old 100° Proof (57%, Bottle 1146) and Springbank 12 Cask Strength 2025 (55.5%, Batch 28, Bottle 53487 —
+Batch 27 is 55.9%). The edition change let Ardbeg cask 2787 (Bottle 52158) and
+Classic Cut 2017 (Bottle 3277) match. New Bottles 68407 (Signatory Mortlach
+2013 100 Proof Edition #34), 68408 (Johnnie Walker Blue Label Year of the
+Monkey), 68409 (Wire Works Necessary Evil Batch #7), and 68410 (Wire Works
+cask 19-106) had no existing duplicate. 68409's wording differs from its
+sibling 46030.
+
+Still in review: Macallan Edition No. 1 and William Larue Weller 2017 (right
+Bottle, no anchor); Longrow 2001 16 Year Old (Bottle 2902 stores Springbank as
+bottler of an official Longrow release); Aberlour 18 Batch #06, Glenglassaugh
+1978 Co-Op, Glenmorangie Lasanta, and Writer's Tears (the page does not name
+the release).
+
+The pilot used about 19 classifier runs. At 120 requests per hour, page reads
+for the whole backlog would take about 52 hours of source requests and about
+6,000 classifier runs.
+
 ## Still unknown
 
 - How live auctions parse and how long a full current-auction run takes: no
   auction was open on this date.
-- How much detail reads improve matching: none have run.
-- The match rate on current rules: the backlog has not been rechecked.
+- How the detail-read result above holds across the whole backlog; the
+  pilot was 20 lots, mostly chosen.

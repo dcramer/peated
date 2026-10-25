@@ -20,14 +20,14 @@ It does not rerun the matching backlog.
 
 ## Rollout status
 
-Checked October 24, 2026; details in the
+Checked October 24–25, 2026; details in the
 [production check](../research/2026-10-24-auction-production-check.md).
 
 - Done: deploy with `0321_auction_details`; first manual run (October 1);
   source health and runs read after deploy; hammer prices and 20 matches
-  spot-checked against lot pages.
-- Not done: any detail read; any recheck of the 6,194 lots in review (all
-  checked under older rules); the 184th auction, which ended October 11
+  spot-checked against lot pages; a 20-lot detail-read recheck (October 25).
+- Not done: a recheck of the rest of the lots in review (all checked under
+  older rules); the 184th auction, which ended October 11
   before collection; a current open-auction check and timed full run; an
   automatic schedule.
 
@@ -54,7 +54,7 @@ window. Detail batches put requested live lots ahead of closed lots and wait
 behind index collection; all work shares the same request limits.
 
 For a manual run, submit
-`pnpm cli api post /external-sites/scotchwhiskyauctions/trigger` and track the
+`pnpm cli api post /external-sites/scotchwhiskyauctions/trigger --yes` and track the
 returned run ID. An active run is a conflict, not a reason to queue another.
 Rate-limit waits and saved-page resumes are expected. Do not start an archive
 backfill as part of this rollout.
@@ -72,7 +72,7 @@ measure a complete current-auction refresh or activate automatic collection.
 Use the admin schedule API only after these checks. It accepts
 `{"schedule":{"runEvery":MINUTES}}` at
 `PUT /admin/external-sites/scotchwhiskyauctions/schedule`; put the JSON in a
-temporary file and pass it through `pnpm cli api put ... --input PATH`.
+temporary file and pass it through `pnpm cli api put ... --yes --input PATH`.
 Enabling a schedule makes the source due immediately. Read health again after
 changing it. Set `runEvery` to null to stop automatic runs; this does not cancel
 an active run. To stop collection entirely, disable the target in the registry
@@ -107,7 +107,7 @@ to avoid new model calls. Put their current versions in a temporary JSON file:
 ```
 
 The IDs are examples. An administrator submits the real file with
-`pnpm cli api post /auction-lots/recheck --input PATH`. A changed lot rejects
+`pnpm cli api post /auction-lots/recheck --yes --input PATH`. A changed lot rejects
 the whole batch. Matched and ignored lots are skipped. Miniature lots (100 ml
 or less) become ignored without a detail read or model call. Default rechecks
 reuse current references and saved checks; missing evidence may need a model call.
