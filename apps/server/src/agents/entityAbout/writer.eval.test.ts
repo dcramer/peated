@@ -54,17 +54,19 @@ function describeDraft(
   const document = draftToDocument(draft).document;
   const reviewed = reviewAboutDraft(document, pagesRead, kind, null).document;
   const keptSiteFacts = new Map(Object.entries(reviewed.siteFacts));
+  const citationKey = ({ sourceId, quote }: AboutCitation) =>
+    `${sourceId}\n${quote}`;
   const keptQuotes = (citations: AboutCitation[] = []) =>
-    new Set(citations.map((citation) => citation.quote));
+    new Set(citations.map(citationKey));
   const listCitations = (
     citations: AboutCitation[],
-    kept: ReadonlySet<string | null>,
+    kept: ReadonlySet<string>,
   ) =>
-    citations.map(({ sourceId, statedValue, quote }) => ({
-      sourceId,
-      statedValue,
-      quote,
-      kept: kept.has(quote),
+    citations.map((citation) => ({
+      sourceId: citation.sourceId,
+      statedValue: citation.statedValue,
+      quote: citation.quote,
+      kept: kept.has(citationKey(citation)),
     }));
   return {
     pagesRead: pagesRead.map((page) => page.url),
