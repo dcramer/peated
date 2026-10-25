@@ -283,7 +283,8 @@ function expandYearRanges(value: string) {
 }
 
 // Pages write small counts as words: "two wash stills" states 2. "One" is
-// left out because pages use it in many other ways.
+// left out because pages use it in many other ways. A word inside a larger
+// number, such as "twenty-two" or "twenty two", is not read.
 const NUMBER_WORDS = [
   "two",
   "three",
@@ -300,7 +301,10 @@ const NUMBER_WORDS = [
 
 function writeNumberWords(value: string) {
   return value.replace(
-    new RegExp(`\\b(${NUMBER_WORDS.join("|")})\\b`, "gi"),
+    new RegExp(
+      `(?<!-|\\b(?:twenty|thirty|forty|fifty|sixty|seventy|eighty|ninety)\\s+)\\b(${NUMBER_WORDS.join("|")})\\b(?!-)`,
+      "gi",
+    ),
     (word) => String(NUMBER_WORDS.indexOf(word.toLowerCase()) + 2),
   );
 }

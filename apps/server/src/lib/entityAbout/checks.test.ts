@@ -539,6 +539,9 @@ describe("checkConflictPicks", () => {
     expect(stills(4, "All four stills were rebuilt.")).toBeDefined();
     expect(stills(10, "The stills tend to run slowly.")).toBeUndefined();
     expect(stills(2, "It has one wash still.")).toBeUndefined();
+    // A word inside a larger number is not read.
+    expect(stills(2, "It filled twenty-two casks.")).toBeUndefined();
+    expect(stills(2, "It filled twenty two casks.")).toBeUndefined();
   });
 
   test("keeps a site fact's date only when a quote states its year", () => {
