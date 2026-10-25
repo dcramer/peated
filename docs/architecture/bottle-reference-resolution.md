@@ -148,7 +148,9 @@ or are ignored. An intentionally ambiguous or invalid reference
 may also be marked ignored so automated maintenance does not reconsider it.
 Independent assignments, including manual matches to the same Bottle, stay
 unchanged. Legacy matches without recorded dependency require explicit review;
-matching names are not enough to backfill that evidence. Each removed match
+matching names are not enough to backfill that evidence. For a legacy price
+match, a moderator reopens the price's proposal (see
+[Store Price Matching](./store-price-matching.md)). Each removed match
 adds an attributed history entry. An ignored reference cannot remain assigned,
 and a current Bottle full name cannot be reassigned or
 unassigned.

@@ -141,6 +141,13 @@ was wrong.
 
 - **Wrong match:** `POST /prices/match-queue/{proposal}/reopen` with the
   Bottle the listing has now and a reason. The listing returns to review.
+  If you have only a price ID (from `GET /prices` or a Bottle's prices),
+  read `GET /prices/{price}/match-proposal` first. Send its `id` as
+  `proposal`, its `updatedAt` as `expectedUpdatedAt`,
+  `price.sourceFingerprint` as `expectedSourceFingerprint`, and
+  `price.bottle.id` as `expectedBottleId`. Then match the reopened proposal
+  to the right Bottle. If reopen says a saved name matches, correct the
+  Bottle reference first.
 - **Duplicate Bottle:** merge it into the Bottle that was there first, then
   check the survivor's facts, references, and prices (Catalog Maintenance).
 - **Wrong name or fact on a Bottle you created:** patch only the fields the
