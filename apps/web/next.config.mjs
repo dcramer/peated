@@ -45,21 +45,6 @@ const nextConfig = {
       },
     ];
   },
-  turbopack: {
-    rules: {
-      "*.svg": {
-        loaders: ["@svgr/webpack"],
-        as: "*.js",
-      },
-    },
-  },
-  webpack(config) {
-    config.module.rules.push({
-      test: /\.svg$/,
-      use: ["@svgr/webpack"],
-    });
-    return config;
-  },
 };
 
 const stylexNextConfig = withStylexTurbopack({
@@ -77,22 +62,12 @@ const stylexRule = {
   loaders: stylexNextConfig.turbopack.rules["*.ts"].loaders,
   condition: { all: [{ not: "foreign" }, { content: /stylex/ }] },
 };
-const stylexRules = Object.fromEntries(
+stylexNextConfig.turbopack.rules = Object.fromEntries(
   Object.keys(stylexNextConfig.turbopack.rules).map((glob) => [
     glob,
     stylexRule,
   ]),
 );
-
-// The StyleX Turbopack wrapper replaces `turbopack.rules`. Preserve Peated's
-// existing asset loaders after StyleX adds its source transforms.
-stylexNextConfig.turbopack = {
-  ...stylexNextConfig.turbopack,
-  rules: {
-    ...stylexRules,
-    ...nextConfig.turbopack?.rules,
-  },
-};
 
 export default withSentryConfig(stylexNextConfig, {
   // For all available options, see:

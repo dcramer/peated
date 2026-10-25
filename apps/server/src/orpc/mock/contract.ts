@@ -24,6 +24,7 @@ import collectionBottleList from "@peated/server/orpc/contracts/collections/bott
 import collectionBottleUpdate from "@peated/server/orpc/contracts/collections/bottles/update";
 import commentList from "@peated/server/orpc/contracts/comments/list";
 import companyList from "@peated/server/orpc/contracts/companies/list";
+import countryCategories from "@peated/server/orpc/contracts/countries/categories";
 import countryDetails from "@peated/server/orpc/contracts/countries/details";
 import countryList from "@peated/server/orpc/contracts/countries/list";
 import distilleryList from "@peated/server/orpc/contracts/distilleries/list";
@@ -54,6 +55,7 @@ import memberReviewList from "@peated/server/orpc/contracts/memberReviews/list";
 import notificationCount from "@peated/server/orpc/contracts/notifications/count";
 import notificationList from "@peated/server/orpc/contracts/notifications/list";
 import priceChangeList from "@peated/server/orpc/contracts/prices/change-list";
+import regionCategories from "@peated/server/orpc/contracts/regions/categories";
 import regionDetails from "@peated/server/orpc/contracts/regions/details";
 import regionFlavorProfile from "@peated/server/orpc/contracts/regions/flavor-profile";
 import regionList from "@peated/server/orpc/contracts/regions/list";
@@ -130,6 +132,7 @@ export const mockContract = {
   },
   bottleSeries: { list: bottleSeriesList },
   countries: {
+    categories: countryCategories,
     details: countryDetails,
     list: countryList,
   },
@@ -178,6 +181,7 @@ export const mockContract = {
     changeList: priceChangeList,
   },
   regions: {
+    categories: regionCategories,
     flavorProfile: regionFlavorProfile,
     details: regionDetails,
     list: regionList,

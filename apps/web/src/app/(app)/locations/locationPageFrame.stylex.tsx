@@ -4,8 +4,8 @@ import * as stylex from "@stylexjs/stylex";
 import { usePathname } from "next/navigation";
 import type { ReactNode } from "react";
 
-import { LocationMapIcon } from "@peated/web/components/locationMapIcon";
 import { RegionMapCredit } from "@peated/web/components/locationMapIcon/credit.stylex";
+import { LocationMapIcon } from "@peated/web/components/locationMapIcon/locationMapIcon.stylex";
 import {
   PageHeader,
   TabbedPage,
@@ -88,15 +88,10 @@ export function LocationPageFrame({
 }
 
 export function LocationVisual({ visual }: { visual: LocationMap }) {
-  const props = {
-    "aria-hidden": true,
-    ...stylex.props(styles.visualIcon),
-  } as const;
-
   return (
     <>
       <div {...stylex.props(styles.visual)}>
-        <LocationMapIcon visual={visual} {...props} />
+        <LocationMapIcon visual={visual} style={styles.visualIcon} />
       </div>
       {needsRegionMapCredit(visual) ? <RegionMapCredit /> : null}
     </>

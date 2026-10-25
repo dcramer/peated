@@ -6,8 +6,8 @@ import { foundationStyles } from "../styles/foundations.stylex";
 import { colors, fonts, space } from "../styles/tokens.stylex";
 import { Card, CardLink } from "./card.stylex";
 import { LoadingPlaceholder } from "./feedback.stylex";
-import { LocationMapIcon } from "./locationMapIcon";
 import { RegionMapCredit } from "./locationMapIcon/credit.stylex";
+import { LocationMapIcon } from "./locationMapIcon/locationMapIcon.stylex";
 
 const COMPACT = "@media (max-width: 639px)";
 const NARROW = "@media (min-width: 640px) and (max-width: 899px)";
@@ -102,10 +102,7 @@ export function LocationPreviewCard({
             visual.kind === "count" ? (
               <span {...stylex.props(styles.countVisual)}>+{visual.value}</span>
             ) : (
-              <LocationMapIcon
-                visual={visual}
-                {...stylex.props(styles.mapIcon)}
-              />
+              <LocationMapIcon visual={visual} style={styles.mapIcon} />
             )
           ) : undefined
         }

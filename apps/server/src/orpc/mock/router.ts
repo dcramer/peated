@@ -24,6 +24,7 @@ import collectionBottleList from "./routes/collections/bottles/list";
 import collectionBottleUpdate from "./routes/collections/bottles/update";
 import commentList from "./routes/comments/list";
 import companyList from "./routes/companies/list";
+import countryCategories from "./routes/countries/categories";
 import countryDetails from "./routes/countries/details";
 import countryList from "./routes/countries/list";
 import distilleryList from "./routes/distilleries/list";
@@ -54,6 +55,7 @@ import memberReviewList from "./routes/memberReviews/list";
 import notificationCount from "./routes/notifications/count";
 import notificationList from "./routes/notifications/list";
 import priceChangeList from "./routes/prices/change-list";
+import regionCategories from "./routes/regions/categories";
 import regionDetails from "./routes/regions/details";
 import regionFlavorProfile from "./routes/regions/flavor-profile";
 import regionList from "./routes/regions/list";
@@ -130,6 +132,7 @@ export const mockRouter = mockOS.router({
   },
   bottleSeries: { list: bottleSeriesList },
   countries: {
+    categories: countryCategories,
     details: countryDetails,
     list: countryList,
   },
@@ -178,6 +181,7 @@ export const mockRouter = mockOS.router({
     changeList: priceChangeList,
   },
   regions: {
+    categories: regionCategories,
     flavorProfile: regionFlavorProfile,
     details: regionDetails,
     list: regionList,

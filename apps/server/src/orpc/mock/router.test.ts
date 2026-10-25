@@ -410,6 +410,50 @@ describe("mock oRPC router", () => {
     }
   });
 
+  it("counts a location's bottle categories where the distillers are", async () => {
+    // The Peat Monster's brand is in Edinburgh, but Caol Ila distills it on Islay.
+    const islay = await anonymousClient.regions.categories({
+      country: "scotland",
+      region: "islay",
+    });
+    expect(islay.results).toContainEqual({
+      category: "blended_malt",
+      count: 1,
+    });
+    expect(islay.totalCount).toBe(
+      islay.results.reduce((total, { count }) => total + count, 0),
+    );
+
+    // Johnnie Walker has no recorded distillers, so it has no production place.
+    const scotland = await anonymousClient.countries.categories({
+      country: "scotland",
+    });
+    expect(scotland.results.map(({ category }) => category)).not.toContain(
+      "blend",
+    );
+
+    const kentucky = await anonymousClient.regions.categories({
+      country: "united-states",
+      region: "kentucky",
+    });
+    expect(kentucky.results).toEqual([
+      { category: "bourbon", count: 1 },
+      { category: "rye", count: 1 },
+    ]);
+
+    const england = await anonymousClient.countries.categories({
+      country: "england",
+    });
+    expect(england).toEqual({ results: [], totalCount: 0 });
+
+    await expect(
+      anonymousClient.regions.categories({
+        country: "scotland",
+        region: "kentucky",
+      }),
+    ).rejects.toMatchObject({ code: "BAD_REQUEST" });
+  });
+
   it("exposes sourced history for each producer without leaking another history", async () => {
     const history = await anonymousClient.entities.events.list({
       entity: 9204,

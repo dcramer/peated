@@ -76,7 +76,6 @@
     "@stylexjs/unplugin": "0.19.0",
     "@stylexswc/nextjs-plugin": "0.18.4",
     "@stylexswc/postcss-plugin": "0.18.4",
-    "@svgr/webpack": "^8.1.0",
     "@types/node": "catalog:",
     "@types/pica": "^9.0.4",
     "@types/react": "^19.2.17",
@@ -90,7 +89,6 @@
     "storybook-addon-pseudo-states": "10.6.3",
     "typescript": "catalog:",
     "vite": "catalog:",
-    "vite-plugin-svgr": "5.2.0",
     "vitest": "catalog:"
   },
   "volta": {
