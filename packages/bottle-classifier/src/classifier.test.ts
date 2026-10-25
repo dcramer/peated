@@ -1187,6 +1187,9 @@ describe("createBottleClassifier", () => {
     "Buffalo Trace Full Collection - Pack of 8",
     "Buffalo Trace and Eagle Rare Combo Pack",
     "Buffalo Trace Trilogy Set",
+    "Mortlach G&M Generations 70 Year Old Sample Presentation Set",
+    "Lagavulin Miniature Set",
+    "Ardbeg Samples Kit",
   ])("auto ignores explicit multi-bottle listing %s", async (name) => {
     const runBottleClassifierAgent = vi.fn();
     const searchBottles = vi.fn(async (): Promise<BottleCandidate[]> => []);
@@ -1219,6 +1222,9 @@ describe("createBottleClassifier", () => {
     "Glenfarclas 1979/2014 (50.8%, OB, Family Casks for Bow Bar & Shinanoya, Japan, hogshead, cask #8801, 212 bottles)",
     "Glenfarclas ‘190 Anniversary’ (90° proof, OB, 15,000 bottles, 2026)",
     "Clynelish 1997 (55.2%, independent bottling, cask #42, 198 bottles)",
+    "Glenfarclas 25 Year Old in Presentation Box",
+    "Springbank 21 Year Old Sample",
+    "Bruichladdich Cask Sample 2010",
   ])(
     "does not treat nearby product wording as a multi-item listing: %s",
     async (name) => {

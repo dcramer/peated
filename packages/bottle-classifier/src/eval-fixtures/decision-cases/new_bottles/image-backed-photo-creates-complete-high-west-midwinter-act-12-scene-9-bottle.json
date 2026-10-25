@@ -197,12 +197,12 @@
       "brand": {
         "name": "High West"
       },
-      "name": "A Midwinter Night's Dram",
       "category": "rye",
-      "edition": "Act 12 Scene 9",
+      "edition": null,
       "abv": 49.3
     },
+    "proposedBottleNameOneOf": ["A Midwinter Night's Dram Act 12 Scene 9"],
     "suggestedNextStep": "confirm_create",
-    "summary": "Create one independently complete High West A Midwinter Night's Dram Act 12 Scene 9 Bottle instead of repairing or matching the broader Bottle 43397, selecting a group, or returning no_match."
+    "summary": "Create one independently complete High West A Midwinter Night's Dram Act 12 Scene 9 Bottle, with the act and scene in its name, instead of repairing or matching the broader Bottle 43397, selecting a group, or returning no_match."
   }
 }

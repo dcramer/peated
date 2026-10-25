@@ -1,6 +1,6 @@
 {
   "id": "auction-glenlivet-generations-70-sample-set",
-  "name": "auction title: a 70-year-old sample presentation set is not the full Bottle",
+  "name": "auction title: a 70-year-old sample presentation set is ignored as a multi-item set",
   "input": {
     "reference": {
       "id": 6333,
@@ -776,12 +776,10 @@
       "createsBottle": false,
       "summary": "Production returned match."
     },
-    "notes": "Captured from saved classifier run 24055 (auction_lot 6333, model null, 2026-10-02T13:30:45.643Z). Production rationale: The source identifies Gordon & MacPhail’s Glenlivet Generations 70-year-old. Inspected Bottle 65654 matches the brand, distillery, series, and age; the auction’s sample-presentation-set wording describes packaging and does not establish a different whisky release. Checked 2026-10-24. Lot 182-03447 page: a tiny sample vial from the Gordon & MacPhail Generations Glenlivet 70 Year Old presentation pack, with a book and USB stick; 45.9%, distilled 4 February 1940, bottled 2011; winning bid £250. Production matched Bottle 65654, the full 70-year-old release; that is wrong. Search evidence is empty to keep the title-only input. Current auction matching sends readCandidateImages:false, so the case does too; the saved run predates that and read candidate photos."
+    "notes": "Captured from saved classifier run 24055 (auction_lot 6333, model null, 2026-10-02T13:30:45.643Z). Production rationale: The source identifies Gordon & MacPhail’s Glenlivet Generations 70-year-old. Inspected Bottle 65654 matches the brand, distillery, series, and age; the auction’s sample-presentation-set wording describes packaging and does not establish a different whisky release. Checked 2026-10-24. Lot 182-03447 page: a tiny sample vial from the Gordon & MacPhail Generations Glenlivet 70 Year Old presentation pack, with a book and USB stick; 45.9%, distilled 4 February 1940, bottled 2011; winning bid £250. Production matched Bottle 65654, the full 70-year-old release; that is wrong. Search evidence is empty to keep the title-only input. Current auction matching sends readCandidateImages:false, so the case does too; the saved run predates that and read candidate photos. Expectation changed 2026-10-24 (M11): the identity model treats a sample of the same whisky as the same Bottle, so the outcome rests on scope, not identity. Sample and miniature sets are out of scope for auctions (docs/features/auctions.md) and are now ignored by the multi-item check before extraction."
   },
   "expected": {
-    "status": "classified",
-    "action": "no_match",
-    "identityScope": "product",
-    "summary": "Do not match a sample presentation set to the full-size Bottle."
+    "status": "ignored",
+    "summary": "A sample presentation set packs a vial with other items, so it is not one Bottle listing. Ignore it before classification instead of matching the full-size Bottle."
   }
 }

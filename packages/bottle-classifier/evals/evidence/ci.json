@@ -151,7 +151,13 @@
     "https://www.scotchwhiskyauctions.com/auctions/231-the-182nd-auction/892052-writers-tears/",
     "https://www.scotchwhiskyauctions.com/auctions/231-the-182nd-auction/892156-hennessy-xo/",
     "https://www.scotchwhiskyauctions.com/auctions/231-the-182nd-auction/891396-macallan-glasses-set/",
-    "https://www.scotchwhiskyauctions.com/auctions/231-the-182nd-auction/891827-glenlivet-gm-generations-70-year-old-sample-presentation-set/"
+    "https://www.scotchwhiskyauctions.com/auctions/231-the-182nd-auction/891827-glenlivet-gm-generations-70-year-old-sample-presentation-set/",
+    "https://www.wildturkeybourbon.com/en-us/products/rare-breed-rye",
+    "https://www.pernod-ricard.com/fr/node/828",
+    "https://www.glenmorangie.com/products/the-quinta-ruban/",
+    "https://www.thatboutiqueywhiskycompany.com/whiskies/paul-john",
+    "https://whiskyadvocate.com/That-Boutique-y-Whisky-Company-distilled-at-Paul-John-6-year-old-52-9",
+    "https://whiskyadvocate.com/That-Boutique-y-Whisky-Company-Paul-John-6-year-old-batch-2-54-7"
   ],
   "cases": {
     "1792-single-barrel": {
@@ -1305,7 +1311,7 @@
           {
             "provider": "firecrawl",
             "query": "Reviewed Mars Komagatake 2022 Edition creation fields",
-            "summary": "Hombo identifies Single Malt Komagatake 2022 Edition as a 50% ABV annual release. Mars is the consumer brand, Komagatake is the stable expression, and Mars Shinshu is the historical name of the established Komagatake distillery.",
+            "summary": "Hombo titles the product MARS Single Malt Komagatake 2022 Edition, a 50% ABV annual release. Mars Shinshu is the historical name of the Komagatake distillery.",
             "results": [
               {
                 "title": "MARS Single Malt Komagatake 2022 Edition",
@@ -2044,14 +2050,14 @@
           "url": "https://whiskyadvocate.com/Glen-Breton-21-year-old-cask-665-43",
           "result": {
             "provider": "firecrawl",
-            "query": "Captured source title",
-            "summary": "Glen Breton 21 year old (cask 665), 43%",
+            "query": "Reviewed Glen Breton cask 665 review page",
+            "summary": "Whisky Advocate's Fall 2015 review by Davin de Kergommeaux of Glen Breton 21 year old (cask 665), 43%, price 300, says the barrel was selected by Mike Brisebois for Casker's whisky club and marks it Distillery only.",
             "results": [
               {
                 "title": "Glen Breton 21 year old (cask 665), 43%",
                 "url": "https://whiskyadvocate.com/Glen-Breton-21-year-old-cask-665-43",
                 "domain": "whiskyadvocate.com",
-                "description": "Source text retained by the input fixture; no additional page facts are supplied.",
+                "description": "Whisky Advocate's Fall 2015 review by Davin de Kergommeaux of Glen Breton 21 year old (cask 665), 43%, price 300, says the barrel was selected by Mike Brisebois for Casker's whisky club and marks it Distillery only.",
                 "extraSnippets": []
               }
             ]
@@ -2604,6 +2610,48 @@
                 "extraSnippets": []
               }
             ]
+          },
+          {
+            "provider": "firecrawl",
+            "query": "Reviewed bottler page",
+            "summary": "That Boutique-y Whisky Company's Paul John page lists its latest batch as Batch 3: 6 years old, 52.9% ABV, batch size 822, released November 2016.",
+            "results": [
+              {
+                "title": "That Boutique-y Whisky Company: Paul John",
+                "url": "https://www.thatboutiqueywhiskycompany.com/whiskies/paul-john",
+                "domain": "www.thatboutiqueywhiskycompany.com",
+                "description": null,
+                "extraSnippets": []
+              }
+            ]
+          },
+          {
+            "provider": "firecrawl",
+            "query": "Reviewed Whisky Advocate review page",
+            "summary": "Whisky Advocate's Summer 2018 review by Jonny McCormick of That Boutique-y Whisky Company (distilled at Paul John) 6 year old, 52.9%, price 130, 822 bottles, discusses Batch 4 and Batch 5 in the same issue.",
+            "results": [
+              {
+                "title": "That Boutique-y Whisky Company (distilled at Paul John) 6 year old, 52.9%",
+                "url": "https://whiskyadvocate.com/That-Boutique-y-Whisky-Company-distilled-at-Paul-John-6-year-old-52-9",
+                "domain": "whiskyadvocate.com",
+                "description": null,
+                "extraSnippets": []
+              }
+            ]
+          },
+          {
+            "provider": "firecrawl",
+            "query": "Reviewed Whisky Advocate review page",
+            "summary": "Whisky Advocate's Winter 2016 review by Jonny McCormick of That Boutique-y Whisky Company Paul John 6 year old (batch 2), 54.7%, 173 bottles.",
+            "results": [
+              {
+                "title": "That Boutique-y Whisky Company Paul John 6 year old (batch 2), 54.7%",
+                "url": "https://whiskyadvocate.com/That-Boutique-y-Whisky-Company-Paul-John-6-year-old-batch-2-54-7",
+                "domain": "whiskyadvocate.com",
+                "description": null,
+                "extraSnippets": []
+              }
+            ]
           }
         ],
         "errors": []
@@ -2630,14 +2678,65 @@
           "url": "https://whiskyadvocate.com/That-Boutique-y-Whisky-Company-distilled-at-Paul-John-6-year-old-54-7",
           "result": {
             "provider": "firecrawl",
-            "query": "Captured source title",
-            "summary": "That Boutique-y Whisky Company (distilled at Paul John) 6 year old, 54.7%. Captured review metadata: Summer 2018, Jonny McCormick, $130 retail price.",
+            "query": "Reviewed Whisky Advocate review page",
+            "summary": "Whisky Advocate's Summer 2018 review by Jonny McCormick of That Boutique-y Whisky Company (distilled at Paul John) 6 year old, 54.7%, price 130, labels the bottling Batch 4.",
             "results": [
               {
                 "title": "That Boutique-y Whisky Company (distilled at Paul John) 6 year old, 54.7%",
                 "url": "https://whiskyadvocate.com/That-Boutique-y-Whisky-Company-distilled-at-Paul-John-6-year-old-54-7",
                 "domain": "whiskyadvocate.com",
-                "description": "Source text retained by the input fixture; no additional page facts are supplied.",
+                "description": "Whisky Advocate's Summer 2018 review by Jonny McCormick of That Boutique-y Whisky Company (distilled at Paul John) 6 year old, 54.7%, price 130, labels the bottling Batch 4.",
+                "extraSnippets": []
+              }
+            ]
+          }
+        },
+        {
+          "url": "https://www.thatboutiqueywhiskycompany.com/whiskies/paul-john",
+          "result": {
+            "provider": "firecrawl",
+            "query": "Reviewed bottler page",
+            "summary": "That Boutique-y Whisky Company's Paul John page lists its latest batch as Batch 3: 6 years old, 52.9% ABV, batch size 822, released November 2016.",
+            "results": [
+              {
+                "title": "That Boutique-y Whisky Company: Paul John",
+                "url": "https://www.thatboutiqueywhiskycompany.com/whiskies/paul-john",
+                "domain": "www.thatboutiqueywhiskycompany.com",
+                "description": null,
+                "extraSnippets": []
+              }
+            ]
+          }
+        },
+        {
+          "url": "https://whiskyadvocate.com/That-Boutique-y-Whisky-Company-distilled-at-Paul-John-6-year-old-52-9",
+          "result": {
+            "provider": "firecrawl",
+            "query": "Reviewed Whisky Advocate review page",
+            "summary": "Whisky Advocate's Summer 2018 review by Jonny McCormick of That Boutique-y Whisky Company (distilled at Paul John) 6 year old, 52.9%, price 130, 822 bottles, discusses Batch 4 and Batch 5 in the same issue.",
+            "results": [
+              {
+                "title": "That Boutique-y Whisky Company (distilled at Paul John) 6 year old, 52.9%",
+                "url": "https://whiskyadvocate.com/That-Boutique-y-Whisky-Company-distilled-at-Paul-John-6-year-old-52-9",
+                "domain": "whiskyadvocate.com",
+                "description": null,
+                "extraSnippets": []
+              }
+            ]
+          }
+        },
+        {
+          "url": "https://whiskyadvocate.com/That-Boutique-y-Whisky-Company-Paul-John-6-year-old-batch-2-54-7",
+          "result": {
+            "provider": "firecrawl",
+            "query": "Reviewed Whisky Advocate review page",
+            "summary": "Whisky Advocate's Winter 2016 review by Jonny McCormick of That Boutique-y Whisky Company Paul John 6 year old (batch 2), 54.7%, 173 bottles.",
+            "results": [
+              {
+                "title": "That Boutique-y Whisky Company Paul John 6 year old (batch 2), 54.7%",
+                "url": "https://whiskyadvocate.com/That-Boutique-y-Whisky-Company-Paul-John-6-year-old-batch-2-54-7",
+                "domain": "whiskyadvocate.com",
+                "description": null,
                 "extraSnippets": []
               }
             ]
@@ -2709,7 +2808,7 @@
           {
             "provider": "firecrawl",
             "query": "Reviewed SMWS RW6.5 producer evidence",
-            "summary": "SMWS identifies RW6.5 as Appley ever after, a six-year-old single-cask rye whisky from Kyrö bottled at 56% ABV in 2024.",
+            "summary": "SMWS identifies RW6.5 as Appley ever after, a six-year-old single-cask rye whisky from Kyrö bottled at 56% ABV.",
             "results": [
               {
                 "title": "RW6.5 Appley ever after",
@@ -2796,7 +2895,7 @@
       ],
       "imageResults": []
     },
-    "store-listing-aged-springbank-25-year-old-matches-the-plain-age-statement-bottle": {
+    "store-listing-name-only-springbank-25-year-old-does-not-pick-an-annual-release": {
       "searchResult": {
         "evidence": [],
         "errors": []
@@ -3386,7 +3485,22 @@
     },
     "store-listing-glenlivet-caribbean-reserve-reaches-bottle-verification-confidence-when-reliable-web-evidence-confirms-the-family": {
       "searchResult": {
-        "evidence": [],
+        "evidence": [
+          {
+            "provider": "firecrawl",
+            "query": "Reviewed Glenlivet Caribbean Reserve producer evidence",
+            "summary": "Pernod Ricard, The Glenlivet's owner, announced The Glenlivet Caribbean Reserve as a Speyside single malt and the distillery's first single malt selectively finished in rum barrels.",
+            "results": [
+              {
+                "title": "Single malt meets caribbean soul with the launch of The Glenlivet Caribbean Reserve",
+                "url": "https://www.pernod-ricard.com/fr/node/828",
+                "domain": "www.pernod-ricard.com",
+                "description": null,
+                "extraSnippets": []
+              }
+            ]
+          }
+        ],
         "errors": []
       },
       "pageResults": [
@@ -3402,6 +3516,23 @@
                 "url": "https://shop.example/products/glenlivet-caribbean-reserve",
                 "domain": "shop.example",
                 "description": "Source text retained by the input fixture; no additional page facts are supplied.",
+                "extraSnippets": []
+              }
+            ]
+          }
+        },
+        {
+          "url": "https://www.pernod-ricard.com/fr/node/828",
+          "result": {
+            "provider": "firecrawl",
+            "query": "Reviewed Glenlivet Caribbean Reserve producer evidence",
+            "summary": "Pernod Ricard, The Glenlivet's owner, announced The Glenlivet Caribbean Reserve as a Speyside single malt and the distillery's first single malt selectively finished in rum barrels.",
+            "results": [
+              {
+                "title": "Single malt meets caribbean soul with the launch of The Glenlivet Caribbean Reserve",
+                "url": "https://www.pernod-ricard.com/fr/node/828",
+                "domain": "www.pernod-ricard.com",
+                "description": null,
                 "extraSnippets": []
               }
             ]
@@ -3831,14 +3962,14 @@
           "url": "https://www.glenmorangie.com/en-us/products/the-quinta-ruban",
           "result": {
             "provider": "firecrawl",
-            "query": "Captured source title",
-            "summary": "Glenmorangie Quinta Ruban 14-year-old",
+            "query": "Reviewed Glenmorangie Quinta Ruban producer evidence",
+            "summary": "Glenmorangie's product page titles the whisky Glenmorangie The Quinta Ruban 14 Years Old, aged for 14 years in bourbon casks and port casks from Portugal, at 46.0% ABV. The page names no numbered edition.",
             "results": [
               {
-                "title": "Glenmorangie Quinta Ruban 14-year-old",
+                "title": "Glenmorangie The Quinta Ruban 14 Years Old",
                 "url": "https://www.glenmorangie.com/en-us/products/the-quinta-ruban",
                 "domain": "www.glenmorangie.com",
-                "description": "Source text retained by the input fixture; no additional page facts are supplied.",
+                "description": "Glenmorangie's product page titles the whisky Glenmorangie The Quinta Ruban 14 Years Old, aged for 14 years in bourbon casks and port casks from Portugal, at 46.0% ABV. The page names no numbered edition.",
                 "extraSnippets": []
               }
             ]
@@ -4210,7 +4341,22 @@
     },
     "store-listing-uses-web-evidence-plus-local-follow-up-search-to-recover-the-right-bottle": {
       "searchResult": {
-        "evidence": [],
+        "evidence": [
+          {
+            "provider": "firecrawl",
+            "query": "Reviewed Wild Turkey Rare Breed Rye producer evidence",
+            "summary": "The producer page for Wild Turkey Rare Breed Rye says it is a barrel-proof, non-chill-filtered small-batch blend of 4-, 6-, and 8-year-old Kentucky straight rye, bottled directly from the barrels at the 112.2 proof it reaches in them.",
+            "results": [
+              {
+                "title": "Wild Turkey Rare Breed Rye",
+                "url": "https://www.wildturkeybourbon.com/en-us/products/rare-breed-rye",
+                "domain": "www.wildturkeybourbon.com",
+                "description": null,
+                "extraSnippets": []
+              }
+            ]
+          }
+        ],
         "errors": []
       },
       "pageResults": [
@@ -4226,6 +4372,23 @@
                 "url": "https://shop.example/products/rare-breed-rye",
                 "domain": "shop.example",
                 "description": "Source text retained by the input fixture; no additional page facts are supplied.",
+                "extraSnippets": []
+              }
+            ]
+          }
+        },
+        {
+          "url": "https://www.wildturkeybourbon.com/en-us/products/rare-breed-rye",
+          "result": {
+            "provider": "firecrawl",
+            "query": "Reviewed Wild Turkey Rare Breed Rye producer evidence",
+            "summary": "The producer page for Wild Turkey Rare Breed Rye says it is a barrel-proof, non-chill-filtered small-batch blend of 4-, 6-, and 8-year-old Kentucky straight rye, bottled directly from the barrels at the 112.2 proof it reaches in them.",
+            "results": [
+              {
+                "title": "Wild Turkey Rare Breed Rye",
+                "url": "https://www.wildturkeybourbon.com/en-us/products/rare-breed-rye",
+                "domain": "www.wildturkeybourbon.com",
+                "description": null,
                 "extraSnippets": []
               }
             ]
@@ -4270,7 +4433,22 @@
     },
     "text-only-listing-extracts-and-recovers-wild-turkey-rare-breed-rye-from-the-title": {
       "searchResult": {
-        "evidence": [],
+        "evidence": [
+          {
+            "provider": "firecrawl",
+            "query": "Reviewed Wild Turkey Rare Breed Rye producer evidence",
+            "summary": "The producer page for Wild Turkey Rare Breed Rye says it is a barrel-proof, non-chill-filtered small-batch blend of 4-, 6-, and 8-year-old Kentucky straight rye, bottled directly from the barrels at the 112.2 proof it reaches in them.",
+            "results": [
+              {
+                "title": "Wild Turkey Rare Breed Rye",
+                "url": "https://www.wildturkeybourbon.com/en-us/products/rare-breed-rye",
+                "domain": "www.wildturkeybourbon.com",
+                "description": null,
+                "extraSnippets": []
+              }
+            ]
+          }
+        ],
         "errors": []
       },
       "pageResults": [
@@ -4286,6 +4464,23 @@
                 "url": "https://shop.example/products/rare-breed-rye",
                 "domain": "shop.example",
                 "description": "Source text retained by the input fixture; no additional page facts are supplied.",
+                "extraSnippets": []
+              }
+            ]
+          }
+        },
+        {
+          "url": "https://www.wildturkeybourbon.com/en-us/products/rare-breed-rye",
+          "result": {
+            "provider": "firecrawl",
+            "query": "Reviewed Wild Turkey Rare Breed Rye producer evidence",
+            "summary": "The producer page for Wild Turkey Rare Breed Rye says it is a barrel-proof, non-chill-filtered small-batch blend of 4-, 6-, and 8-year-old Kentucky straight rye, bottled directly from the barrels at the 112.2 proof it reaches in them.",
+            "results": [
+              {
+                "title": "Wild Turkey Rare Breed Rye",
+                "url": "https://www.wildturkeybourbon.com/en-us/products/rare-breed-rye",
+                "domain": "www.wildturkeybourbon.com",
+                "description": null,
                 "extraSnippets": []
               }
             ]
@@ -4357,14 +4552,19 @@
           "result": {
             "provider": "firecrawl",
             "query": "Captured source title",
-            "summary": "SMWS RW6.5 Appley ever after",
+            "summary": "The Scotch Malt Whisky Society product page for cask RW6.5, Appley ever after, lists a Finnish rye whisky aged 6 years at 56.0% ABV, distilled 11/01/18. It prints no bottling or release year.",
             "results": [
               {
                 "title": "SMWS RW6.5 Appley ever after",
                 "url": "https://smws.com/appley-ever-after/",
                 "domain": "smws.com",
-                "description": "Source text retained by the input fixture; no additional page facts are supplied.",
-                "extraSnippets": []
+                "description": "The Scotch Malt Whisky Society product page for cask RW6.5, Appley ever after, lists a Finnish rye whisky aged 6 years at 56.0% ABV, distilled 11/01/18. It prints no bottling or release year.",
+                "extraSnippets": [
+                  "CASK NO. RW6.5",
+                  "Age 6 years",
+                  "ABV 56.0%",
+                  "DISTILLED DATE 11/01/18"
+                ]
               }
             ]
           }

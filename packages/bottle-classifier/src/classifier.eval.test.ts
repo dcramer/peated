@@ -16,6 +16,7 @@ import { AUDIT_BOTTLE_EVAL_CASES } from "./auditBottle.eval.fixtures";
 import {
   agentActionRiskClass,
   deriveAutomationTier,
+  matchesExactStoredReference,
   type AutomationTier,
 } from "./automationTier";
 import {
@@ -163,8 +164,8 @@ function buildSearchBottlesAdapter(
 // production consumers (`deriveAutomationTier`). Numeric confidence and the
 // confidence band were removed from the contract, so the tier is derived from
 // the action risk class plus the structured evidence and anchors. Photo/image
-// fixtures carry primary image evidence; exact-cask identity is the closed-form
-// deterministic anchor.
+// fixtures carry primary image evidence; exact-cask identity and a match to the
+// exact stored-reference candidate are the closed-form deterministic anchors.
 function getDerivedAutomationTier(
   testCase: ClassifierEvalCase,
   result: BottleClassificationResult,
@@ -188,7 +189,13 @@ function getDerivedAutomationTier(
     reaffirmsCurrentAssignment,
     replacesCurrentAssignment:
       currentBottleId != null && !reaffirmsCurrentAssignment,
-    hasDeterministicAnchor: decision.identityScope === "exact_cask",
+    hasDeterministicAnchor:
+      decision.identityScope === "exact_cask" ||
+      matchesExactStoredReference(
+        decision,
+        result.artifacts.candidates,
+        testCase.input.reference.name,
+      ),
     // Image-backed fixtures either pre-seed `input.imageEvidence` or carry only
     // `reference.imageUrl` and rely on live extraction; both mean the run has
     // primary label/image evidence, matching the photo-identification consumer.

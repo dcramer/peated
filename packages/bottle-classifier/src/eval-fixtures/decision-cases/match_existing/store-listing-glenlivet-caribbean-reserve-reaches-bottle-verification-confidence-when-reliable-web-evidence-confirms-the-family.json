@@ -24,22 +24,22 @@
     "initialCandidates": [
       {
         "reference": null,
-        "brand": "Glenlivet",
-        "bottler": "Glenlivet",
+        "brand": "The Glenlivet",
+        "bottler": null,
         "series": null,
-        "distillery": [],
+        "distillery": ["The Glenlivet"],
         "category": "single_malt",
         "statedAge": null,
         "edition": null,
         "caskStrength": null,
         "singleCask": null,
-        "abv": null,
+        "abv": 40,
         "vintageYear": null,
         "releaseYear": null,
         "score": 0.95,
         "source": ["text", "brand"],
         "bottleId": 1760,
-        "fullName": "Glenlivet Caribbean Reserve Rum Barrel Selection"
+        "fullName": "The Glenlivet Caribbean Reserve Rum Barrel Selection"
       }
     ]
   },
@@ -49,22 +49,22 @@
       "results": [
         {
           "reference": null,
-          "brand": "Glenlivet",
-          "bottler": "Glenlivet",
+          "brand": "The Glenlivet",
+          "bottler": null,
           "series": null,
-          "distillery": [],
+          "distillery": ["The Glenlivet"],
           "category": "single_malt",
           "statedAge": null,
           "edition": null,
           "caskStrength": null,
           "singleCask": null,
-          "abv": null,
+          "abv": 40,
           "vintageYear": null,
           "releaseYear": null,
           "score": 0.95,
           "source": ["text", "brand"],
           "bottleId": 1760,
-          "fullName": "Glenlivet Caribbean Reserve Rum Barrel Selection"
+          "fullName": "The Glenlivet Caribbean Reserve Rum Barrel Selection"
         }
       ]
     }

@@ -1,14 +1,14 @@
 {
   "id": "heavens-door-bootleg-vol-3",
   "referenceName": "Heaven's Door Bootleg Vol 3 Whiskey",
-  "expectedBottleName": "Heaven's Door Bootleg Series 13-year-old",
+  "expectedBottleName": "Heaven's Door Volume III",
   "expectedBottleNames": [
-    "Heaven's Door Bootleg Series 13-year-old",
-    "Heaven's Door Bootleg Series",
-    "Heaven's Door Bootleg Series Vino de Naranja Finish 13-year-old",
-    "Heaven's Door Bootleg Series Vino de Naranja Finish"
+    "Heaven's Door Volume III",
+    "Heaven's Door Volume III 13-year-old",
+    "Heaven's Door Bootleg Series Volume III",
+    "Heaven's Door Bootleg Series Volume III 13-year-old"
   ],
-  "summary": "Treat Heaven's Door Bootleg Vol 3 as one complete Bottle with Volume III as its exact edition; reviewed web evidence may enrich it with the marketed 13-year-old age and Vino de Naranja finish, but the source does not require those optional fields.",
+  "summary": "Treat Heaven's Door Bootleg Vol 3 as one complete 2021 Bottle named for its numbered release, Volume III, in the Bootleg Series. Reviewed web evidence may add the 13-year age and Vino de Naranja finish, but the source does not require them.",
   "peatedBottleIds": [44067],
   "provenance": {
     "source": "curated_regression",
@@ -17,13 +17,13 @@
       "https://www.masterofmalt.com/whiskies/heavens-door/heavens-door-bootleg-series-no3-2021-edition-whiskey/",
       "https://api.peated.com/v1/bottles/44067"
     ],
-    "notes": "The producer's Bootleg archive identifies Volume III as the 2021 release. Independent product detail corroborates its 13-year age and Vino de Naranja finish; those enrichments are optional for this sparse reference, while Volume III and release year 2021 are exact release identity."
+    "notes": "The producer's Bootleg archive identifies Volume III as the 2021 release. Independent product detail corroborates its 13-year age and Vino de Naranja finish; those enrichments are optional for this sparse reference, while Volume III and release year 2021 are exact release identity. The producer heads each release by its volume, such as `Volume III (2021)`. Under the 2026-10-23 naming rule a numbered release that people use as the title, like `4th Release`, belongs in the name, not the edition (M11)."
   },
   "expected": {
     "handlingStrategy": "classifier_required",
     "classifierExpectation": "bottle",
     "exactBottleIdentity": {
-      "edition": "Volume III",
+      "edition": null,
       "releaseYear": 2021
     }
   }

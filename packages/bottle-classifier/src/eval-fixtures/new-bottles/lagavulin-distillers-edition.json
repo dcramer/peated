@@ -2,19 +2,21 @@
   "id": "lagavulin-distillers-edition-bottle",
   "referenceName": "Lagavulin Distillers Edition",
   "expectedBottleName": "Lagavulin Distillers Edition",
-  "summary": "Keep Lagavulin Distillers Edition as bottle identity when no release year is present instead of inventing a child annual release from the family wording alone.",
+  "summary": "Lagavulin sells Distillers Edition as a separate dated release each year, and Peated holds those releases. A name with no year or other release fact cannot choose one, so leave it for review instead of matching the generic row or creating a release.",
   "peatedBottleIds": [44006],
   "provenance": {
     "source": "curated_regression",
     "verifiedSourceUrls": [
       "https://www.malts.com/en-us/products/lagavulin-distillers-edition-single-malt-scotch-whisky-750ml",
-      "https://api.peated.com/v1/bottles/44006"
+      "https://api.peated.com/v1/bottles/44006",
+      "https://api.peated.com/v1/bottles/44865",
+      "https://api.peated.com/v1/bottles/63930"
     ],
-    "notes": "Lagavulin markets Distillers Edition as a complete product. The reference contains no vintage or release year that would establish a separate annual release, and Peated Bottle 44006 is the broad existing product."
+    "notes": "Re-verified 2026-10-24 (M11). Peated holds 28 dated Distillers Edition Bottles from the 1997 Release to the 2024 Release, each with its own release year and most with their own vintage, beside the generic Bottle 44006. The current producer page describes a specific 2006 Lagavulin. Earlier versions of this case expected a match to 44006; the name-only source now requires review, as in M10."
   },
   "expected": {
-    "handlingStrategy": "classifier_required",
-    "classifierExpectation": "bottle",
+    "handlingStrategy": "block_if_uncertain",
+    "classifierExpectation": "review_required",
     "exactBottleIdentity": null
   }
 }

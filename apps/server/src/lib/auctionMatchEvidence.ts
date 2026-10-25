@@ -59,6 +59,7 @@ export function assessAuctionMatch(lot: AuctionLot, check: BottleCheck) {
     decision,
     currentBottleId: lot.bottleId,
     candidates: evidence.artifacts.candidates,
+    referenceName: lot.name,
     sourceBottleIdentity: lot.sourceBottleIdentity,
     readListingImage: evidence.artifacts.extractedIdentitySource === "image",
   });

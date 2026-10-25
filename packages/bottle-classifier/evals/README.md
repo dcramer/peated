@@ -56,6 +56,11 @@ Woodford Reserve Double Double Oaked case to require review because the
 producer markets separate yearly releases. Its rescore also leaves the
 historical snapshots unchanged.
 
+[M11](./experiments/M11-stale-expectations-2026-10-24.md) corrects image,
+audit, and decision expectations that the label, producer, or identity model
+contradicts, fills reviewed evidence gaps in `evidence/ci.json`, and lists the
+failing-gate decisions still open.
+
 ## With web evidence
 
 All settings used Luna high for image extraction, at most two search queries,

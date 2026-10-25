@@ -69,13 +69,24 @@ export const IMAGE_EXTRACTION_EVAL_CASES: ImageExtractionEvalCase[] = [
     imagePath: assetPath("mars-komagatake-2022-edition.webp"),
     expected: {
       fields: {
-        brand: "Komagatake",
-        expression: null,
         category: "single_malt",
         abv: 50,
-        release_year: 2022,
-        edition: null,
       },
+      // The label prints a small MARS crest above KOMAGATAKE, so either a
+      // `Mars` brand with a `Komagatake` expression or a `Komagatake` brand is
+      // a faithful reading. Choosing the Peated Brand belongs to the
+      // classifier. Hombo titles this release `2022 Edition`
+      // (docs/research/catalog/2026-09-16-mars.md).
+      anyText: [
+        {
+          fields: ["brand", "expression"],
+          includes: ["Komagatake"],
+        },
+        {
+          fields: ["expression", "edition"],
+          includes: ["2022 Edition"],
+        },
+      ],
       distilleryIncludes: ["Shinshu"],
     },
   },
@@ -89,7 +100,8 @@ export const IMAGE_EXTRACTION_EVAL_CASES: ImageExtractionEvalCase[] = [
       fields: {
         brand: "Compass Box",
         bottler: null,
-        category: "blend",
+        // The label prints `BLENDED GRAIN SCOTCH WHISKY` (M03).
+        category: "blended_grain",
         stated_age: null,
         abv: 49,
       },
@@ -116,18 +128,14 @@ export const IMAGE_EXTRACTION_EVAL_CASES: ImageExtractionEvalCase[] = [
         abv: 64.2,
         cask_strength: true,
         single_cask: true,
+        // A printed barrel number belongs in `cask_number`, never `edition`.
+        cask_number: "4769",
       },
       text: [
         {
           field: "expression",
           includes: ["Family Estate", "Single Barrel"],
           excludes: ["Small Batch", "2504"],
-        },
-      ],
-      anyText: [
-        {
-          fields: ["expression", "edition"],
-          includes: ["4769"],
         },
       ],
     },
@@ -260,6 +268,8 @@ export const IMAGE_EXTRACTION_EVAL_CASES: ImageExtractionEvalCase[] = [
         abv: 57,
         vintage_year: 2007,
         single_cask: true,
+        // The SMWS code is the printed cask identifier.
+        cask_number: "95.71",
       },
       text: [
         {
@@ -270,12 +280,9 @@ export const IMAGE_EXTRACTION_EVAL_CASES: ImageExtractionEvalCase[] = [
       ],
       anyText: [
         {
+          // The label prints the full name, never the `SMWS` abbreviation.
           fields: ["brand", "bottler"],
-          includes: ["SMWS"],
-        },
-        {
-          fields: ["expression", "edition"],
-          includes: ["95.71"],
+          includes: ["Scotch Malt Whisky Society"],
         },
       ],
     },
