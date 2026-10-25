@@ -165,6 +165,8 @@ describe("edition conflicts", () => {
     expect(editionConflicts("Batch 1.1", "Batch 1.2")).toEqual(["edition"]);
     expect(editionConflicts("Batch 1", "Batch 1.1")).toEqual(["edition"]);
     expect(editionConflicts("Batch 22/030", "Batch 22")).toEqual(["edition"]);
+    expect(editionConflicts("Batch 1.2a", "Batch 1.2b")).toEqual(["edition"]);
+    expect(editionConflicts("22/030A", "22/030")).toEqual(["edition"]);
     expect(editionConflicts("Release 02.1", "2.1")).toEqual([]);
     expect(
       compareBottleFields({ edition: "Batch 1" }, { edition: "Batch 1.1" }),
