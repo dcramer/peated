@@ -87,7 +87,9 @@ automatically. See the
 [source access audit](../research/external-review-source-audit-2026-08.md).
 Whisky Auctioneer, The Whisky Exchange, Whisky Hammer, K&L, Master of Malt,
 and Casa de Vinos block or rate-limit fetch tools (406, 403, 429); read them
-in a browser and treat search snippets of their pages as leads only.
+in a browser and treat search snippets of their pages as leads only. Since
+October 2026, The Whisky Exchange and Astor Wines also show agent-browser a
+Cloudflare bot check; do not try to get past it.
 Spirit Radar was useful as a manually reviewed lead index for Yamazaki. Its
 brand page mixed proper releases, packaging variants, tasting samples, and
 misattributed Suntory bottles, so every exact identity required independent
