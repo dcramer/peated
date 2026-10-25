@@ -1,10 +1,10 @@
 # Entity About Pages
 
-A distillery or brand can have an About tab: a short, sourced account of the
-place or label, with a timeline, key facts, owners, and numbers from the
-Bottle catalog. Every statement on the page traces to a fact, and every fact
-traces to a source. Bottlers and companies will get About pages the same
-way later; Bottles will need their own design.
+A distillery, brand, or company can have an About tab: a short, sourced
+account of the place, label, or business, with a timeline, key facts, owners,
+and numbers from the Bottle catalog. Every statement on the page traces to a
+fact, and every fact traces to a source. Bottlers will get About pages the
+same way later; Bottles will need their own design.
 
 ## What Is Stored
 
@@ -45,7 +45,9 @@ Two other stores feed the writer:
   URL. Every run reads them. They guide the writer but are never cited.
 
 History about a production site belongs on the Distillery. History about a
-label belongs on the Brand. A distillery page leaves out bottle launches, and
+label belongs on the Brand. History of the business, such as mergers and the
+distilleries and brands it bought or sold, belongs on the Company. A distillery
+page leaves out bottle launches, and
 mentions another site's history only where it explains this site's origin or
 name. See
 [Whisky Identity Model](../architecture/whisky-identity-model.md#naming-and-entity-boundaries).

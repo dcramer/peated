@@ -2,10 +2,10 @@
 
 ### Requirement: About tab
 
-A Distillery or Brand page SHALL show an About tab after Overview when the
-Entity has a published lead and at least one other About part. Otherwise the
-tab SHALL be hidden, and the Overview and its description SHALL carry what
-Peated knows. Bottler and Company pages are out of scope.
+A Distillery, Brand, or Company page SHALL show an About tab after Overview
+when the Entity has a published lead and at least one other About part.
+Otherwise the tab SHALL be hidden, and the Overview and its description SHALL
+carry what Peated knows. Bottler pages are out of scope.
 
 #### Scenario: Rich distillery
 

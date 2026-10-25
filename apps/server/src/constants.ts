@@ -218,6 +218,13 @@ export const ENTITY_EVENT_KIND_LIST = [
   "acquired",
 ] as const;
 
+// Entity kinds that can have an About page. Bottlers do not yet.
+export const ENTITY_ABOUT_KIND_LIST = [
+  "distillery",
+  "brand",
+  "company",
+] as const;
+
 // About history adds name changes and named eras to the legacy event kinds.
 export const ENTITY_ABOUT_EVENT_KIND_LIST = [
   ...ENTITY_EVENT_KIND_LIST,

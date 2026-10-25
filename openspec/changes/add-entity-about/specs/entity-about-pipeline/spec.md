@@ -16,6 +16,18 @@ SHALL stop at a fixed limit of searches and page reads.
 - **THEN** it returns one complete page built from the pages it read in that
   run and the citations it kept from the current page
 
+#### Scenario: Run for a company
+
+- **WHEN** the job runs for Diageo
+- **THEN** its events cover the business, such as mergers and the
+  distilleries and brands it bought, and leave each distillery's own history
+  to that distillery's page
+
+#### Scenario: Run for a bottler
+
+- **WHEN** the job is asked to run for a bottler
+- **THEN** it skips the Entity, because bottlers do not have About pages yet
+
 #### Scenario: Page rewritten
 
 - **WHEN** the current page has a fact no page supports anymore

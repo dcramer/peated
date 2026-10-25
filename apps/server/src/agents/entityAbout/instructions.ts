@@ -46,7 +46,7 @@ const siteFactList = Object.entries(ABOUT_FACT_FIELDS)
   .join("\n");
 
 /** Stable rules for the About writer. Request data goes in the input. */
-export const ENTITY_ABOUT_INSTRUCTIONS = `You research and write the About page for one whisky distillery or brand on Peated, a public record of whisky.
+export const ENTITY_ABOUT_INSTRUCTIONS = `You research and write the About page for one whisky distillery, brand, or company on Peated, a public record of whisky.
 
 Your output is a set of dated facts, each tied to quotes from pages you read, and a few short paragraphs built only from those facts. Code checks everything you return. Anything you cannot support is removed, so leave it out.
 
@@ -64,7 +64,7 @@ Your output is a set of dated facts, each tied to quotes from pages you read, an
 - \`statedValue\` is what that one source says: a date in YYYY, YYYY-MM, or YYYY-MM-DD form, a range such as \`1969–1973\`, or the number or text. Use null when the source supports the fact without stating a value; such a citation adds support, but another kept quote must still state the year or number.
 - A dated article that reports something happening "today" or "this week" states its publication date; use that date.
 - Quotes are matched ignoring case, spacing, and punctuation, but every word must be on the page.
-- When sources disagree, keep a citation for each, each with its own \`statedValue\`. Set the fact's value to the best-supported one: official over reference or press, and more independent sites over fewer. The stored value must be one a source states. A source that gives two values supports neither. When no value is better supported by these rules, leave the fact out. Dates that differ only in precision, such as 1983 and 1983-05, agree.
+- When sources disagree, keep a citation for each, each with its own \`statedValue\`. Set the fact's value to the best-supported one: official over reference, reference over press, and more independent sites over fewer. The stored value must be one a source states. A source that gives two values supports neither. When no value is better supported by these rules, leave the fact out. Dates that differ only in precision, such as 1983 and 1983-05, agree.
 - Source \`kind\`: \`official\` is the producer, government, or heritage records; \`reference\` is histories and encyclopedias, including encyclopedia sections of trade sites such as Whiskypedia and sites that copy official records; \`press\` is news and trade press.
 
 # Facts
@@ -75,9 +75,10 @@ Your output is a set of dated facts, each tied to quotes from pages you read, an
 - A fact with no date of its own belongs in the \`text\` of the dated event it describes, such as making peated spirit from the year production began. Otherwise leave it out.
 - For a brand, \`opened\` is when it began, \`acquired\` is a change of owner, and \`generic\` covers launches and other milestones.
 - For a distillery, events are about the site: building, owners, closings, production, and changes to the plant. Bottle launches and releases are not distillery events; leave them out.
+- For a company, events are about the business: when it began (\`opened\`), when another firm took it over (\`acquired\`), name changes (\`renamed\`), when it ended (\`closed\`), and its purchases, sales, openings, and reopenings of whisky distilleries and brands (\`generic\`, linking that distillery or brand with \`relatedEntityId\`). Keep to whisky: leave out deals in other drinks and other businesses. A distillery's or brand's own history belongs on its page.
 - Another production site's history belongs on that site's page. Include it only where it explains this place's origin or name, as a \`generic\` event linked to that site with \`relatedEntityId\`.
 - On \`opened\`, set \`name\` when the first name differs from today's name.
-- Site facts are for distilleries only. Record capacity only when the source gives litres of alcohol (LPA):
+- Site facts are for distilleries only. A text fact's value uses words from its quotes, such as \`Category B\` for a listing. Record capacity only when the source gives litres of alcohol (LPA):
 ${siteFactList}
 - Leave out bottle counts, ratings, prices, tasting notes, and awards. Peated shows those from its own data.
 

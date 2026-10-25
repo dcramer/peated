@@ -1,3 +1,4 @@
+import { ENTITY_ABOUT_KIND_LIST } from "@peated/server/constants";
 import { db } from "@peated/server/db";
 import { entities } from "@peated/server/db/schema";
 import { procedure } from "@peated/server/orpc";
@@ -14,7 +15,7 @@ export default procedure
     path: "/admin/catalog/write-entity-about",
     summary: "Queue About pages",
     description:
-      "Queue the About writer for one entity, or for a batch of distilleries and brands ordered by public activity. Pages that pass every check publish without review. Fails while the writer is turned off. Requires administrator privileges.",
+      "Queue the About writer for one entity, or for a batch of distilleries, brands, and companies ordered by public activity. Pages that pass every check publish without review. Fails while the writer is turned off. Requires administrator privileges.",
     operationId: "writeEntityAbout",
   })
   .input(
@@ -56,7 +57,7 @@ export default procedure
           await db
             .select({ id: entities.id })
             .from(entities)
-            .where(inArray(entities.kind, ["distillery", "brand"]))
+            .where(inArray(entities.kind, [...ENTITY_ABOUT_KIND_LIST]))
             .orderBy(
               desc(entities.publicReviewAndTastingCount),
               asc(entities.id),

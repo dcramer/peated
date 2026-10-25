@@ -7,6 +7,7 @@ import {
   type EntityAboutWriter,
 } from "@peated/server/agents/entityAbout/writer";
 import config from "@peated/server/config";
+import { ENTITY_ABOUT_KIND_LIST } from "@peated/server/constants";
 import { db, type AnyDatabase } from "@peated/server/db";
 import {
   entities,
@@ -108,7 +109,7 @@ export async function writeEntityAbout(
     where: (table, { eq }) => eq(table.id, entityId),
     with: { country: true, region: true, owner: true },
   });
-  if (!entity || (entity.kind !== "distillery" && entity.kind !== "brand")) {
+  if (!entity || !ENTITY_ABOUT_KIND_LIST.some((kind) => kind === entity.kind)) {
     return { status: "skipped" };
   }
   const aliases = await db
