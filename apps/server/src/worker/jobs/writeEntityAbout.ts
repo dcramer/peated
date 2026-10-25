@@ -19,6 +19,7 @@ import {
   getSystemActorForDatabase,
 } from "@peated/server/lib/actors";
 import {
+  dropSentencesCitingHiddenFacts,
   keepFoundEntityLinks,
   reviewAboutDraft,
 } from "@peated/server/lib/entityAbout/checks";
@@ -160,9 +161,29 @@ export async function writeEntityAbout(
     );
     // An item the schema rejected is a reason to retry, not a silent gap.
     errors = [...converted.errors, ...reviewed.errors];
+    let document = reviewed.document;
+    // Pipeline rule (owner: docs/features/entity-about.md): with no retry
+    // left, a sentence that cites a dropped fact is left out, as the page
+    // would hide it, and the rest must pass every check again.
+    if (
+      errors.length &&
+      !converted.errors.length &&
+      attempt === MAX_ATTEMPTS - 1
+    ) {
+      const kept = reviewAboutDraft(
+        dropSentencesCitingHiddenFacts(reviewed.document),
+        pagesRead,
+        entity.kind,
+        current?.document ?? null,
+      );
+      if (!kept.errors.length) {
+        errors = [];
+        document = kept.document;
+      }
+    }
     if (!errors.length) {
       accepted = keepFoundEntityLinks(
-        reviewed.document,
+        document,
         entitiesFound,
         current?.document ?? null,
       );

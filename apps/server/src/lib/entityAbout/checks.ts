@@ -504,6 +504,26 @@ export function checkConflictPicks(document: EntityAboutDocument) {
 }
 
 /**
+ * Leaves out sentences that cite a fact the checks dropped, and sections
+ * left with none. The job uses it only on its last attempt (see
+ * docs/features/entity-about.md); every sentence left still gets every check.
+ */
+export function dropSentencesCitingHiddenFacts(
+  document: EntityAboutDocument,
+): EntityAboutDocument {
+  const shown = getShownFactIds(document);
+  const sections = document.sections
+    .map((section) => ({
+      ...section,
+      sentences: section.sentences.filter((sentence) =>
+        sentence.factIds.every((id) => shown.has(id)),
+      ),
+    }))
+    .filter((section) => section.sentences.length);
+  return { ...document, sections };
+}
+
+/**
  * Runs every check on a pipeline draft. Returns the draft with unverified
  * citations removed and site facts that do not apply to the Entity's kind
  * dropped, and the reasons it cannot be saved. The save rules run here too,
