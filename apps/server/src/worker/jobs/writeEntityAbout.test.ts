@@ -407,7 +407,7 @@ describe("writeEntityAbout", () => {
     expect(await ownerOf()).toMatchObject({ newOwnerId: owner.id });
   });
 
-  test.each(["brand", "company"] as const)(
+  test.for(["brand", "company"] as const)(
     "saves a %s page without site facts",
     async (kind, { fixtures }) => {
       const entity = await fixtures.Entity({ kind });
