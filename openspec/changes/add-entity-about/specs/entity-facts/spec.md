@@ -123,7 +123,9 @@ writer SHALL read it as leads. An About event SHALL have a kind, a date of a
 year, a year and month, or a full date, an optional end date, optional text,
 and one or more citations. Event kinds SHALL include `opened`, `closed`, `mothballed`,
 `reopened`, `acquired`, `renamed`, `era`, and `generic`. A `renamed` event
-SHALL store the new name. An `era` event SHALL have an end date or be marked
+SHALL store the new name. A `closed` event SHALL mean production ended with no
+plan to restart, even when the place later reopened; a `mothballed` event SHALL
+mean production paused with the plant kept ready to restart. An `era` event SHALL have an end date or be marked
 as continuing, and a short title. An event MAY link one related Entity, such as
 a distillery built next door. An `acquired` event SHALL mean the Entity got a new owner, including a brand
 whose owning firm is bought, SHALL store the
