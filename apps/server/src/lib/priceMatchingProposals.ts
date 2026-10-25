@@ -1213,6 +1213,7 @@ export function createStorePriceMatchResolver({
         decision: classification.decision,
         currentBottleId: price.bottleId,
         candidates,
+        referenceName: price.name,
         sourceBottleIdentity: price.sourceBottleIdentity
           ? BottleExtractedDetailsSchema.parse(price.sourceBottleIdentity)
           : null,

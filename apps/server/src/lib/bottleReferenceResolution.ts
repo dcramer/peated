@@ -346,6 +346,7 @@ async function resolveBottleReferenceTargetWithClassifier(
         decision: classification.decision,
         candidates: classification.artifacts.candidates,
         currentBottleId: reference.currentBottleId ?? null,
+        referenceName: reference.name,
         allowReplacement,
         sourceBottleIdentity:
           classification.artifacts.extractedIdentitySource === "image"

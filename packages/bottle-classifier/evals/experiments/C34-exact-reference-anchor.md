@@ -19,13 +19,20 @@ an exact stored reference is a closed identifier, like an SMWS code.
 ## Change
 
 - `matchesExactStoredReference` in `src/automationTier.ts` is true when a
-  Match selects the candidate retrieved through an exact stored reference.
+  Match selects a candidate whose exact stored reference is the source name
+  itself, compared without case or apostrophes.
+- The `exact` source tag alone is not enough. Retrieval also tags exact
+  matches for names built from extracted facts and for the agent's own
+  `search_bottles` queries, and the candidate merge drops that provenance.
+  Without the source-name check, a match found through a query the model
+  chose could reach the automatic tier.
 - Server automation (`assessBottleResolution`) and the eval tier helper both
   pass it as a deterministic anchor.
 - Unresolved risks and field conflicts still force review.
 
-Server tests cover the anchored match, a match to a different candidate, and
-an anchored match that conflicts with source facts. The seven server test
+Server tests cover the anchored match, an exact-tagged candidate whose
+reference is not the source name, a match to a different candidate, and an
+anchored match that conflicts with source facts. The seven server test
 files that consume `assessBottleResolution` pass unchanged.
 
 ## Results

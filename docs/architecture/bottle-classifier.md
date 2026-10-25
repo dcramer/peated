@@ -209,10 +209,11 @@ non-ignored Bottle Reference assigned to exactly one Bottle. Multiple targets,
 fuzzy matches, aliases, and any case needing whisky interpretation must use the
 classifier.
 
-When the classifier does run and matches the candidate retrieved through that
-same exact reference, the match counts as a verified anchor for the automation
-tier (`matchesExactStoredReference`). It still goes to review for any
-unresolved risk or field conflict.
+When the classifier does run and matches a candidate whose stored reference is
+the source name itself, the match counts as a verified anchor for the
+automation tier (`matchesExactStoredReference`). An `exact` candidate found
+through extracted facts or the agent's own search query does not count. The
+match still goes to review for any unresolved risk or field conflict.
 
 ### SMWS Codes
 

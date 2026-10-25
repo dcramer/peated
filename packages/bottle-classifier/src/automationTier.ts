@@ -1,3 +1,5 @@
+import { normalizeString } from "./normalize";
+
 export type WebEvidenceJudgment =
   | "not_needed"
   | "not_used"
@@ -62,24 +64,48 @@ function deriveCreateTier(input: AutomationTierInput): AutomationTier {
 }
 
 /**
- * True when a Match selects the candidate retrieved through an exact accepted
- * Bottle Reference for this input. Reference names are unique, so this is the
+ * True when a Match selects the candidate whose exact accepted Bottle Reference
+ * is the source name itself. Reference names are unique, so this is the
  * same closed identifier the pre-model exact-reference path accepts (see
  * "Exact Stored References" in `docs/architecture/bottle-classifier.md`).
  */
 export function matchesExactStoredReference(
   decision: { action: string; matchedBottleId: number | null },
-  candidates: ReadonlyArray<{ bottleId: number; source: readonly string[] }>,
+  candidates: ReadonlyArray<{
+    bottleId: number;
+    reference?: string | null;
+    source: readonly string[];
+  }>,
+  referenceName: string | null | undefined,
 ): boolean {
-  if (decision.action !== "match" || decision.matchedBottleId === null) {
+  if (
+    !referenceName ||
+    decision.action !== "match" ||
+    decision.matchedBottleId === null
+  ) {
     return false;
   }
 
+  // The `exact` source tag alone is not enough: retrieval also tags exact
+  // matches for names built from extracted facts or the agent's own search
+  // queries. The anchor requires the stored reference to be the source name.
+  const sourceName = comparableReferenceName(referenceName);
   return candidates.some(
     (candidate) =>
       candidate.bottleId === decision.matchedBottleId &&
-      candidate.source.includes("exact"),
+      candidate.source.includes("exact") &&
+      Boolean(candidate.reference) &&
+      comparableReferenceName(candidate.reference!) === sourceName,
   );
+}
+
+// Mirrors the case- and apostrophe-insensitive stored-reference lookup.
+function comparableReferenceName(value: string): string {
+  return normalizeString(value)
+    .toLowerCase()
+    .replace(/'/g, "")
+    .replace(/\s+/g, " ")
+    .trim();
 }
 
 /** Any unresolved risk forces review; otherwise the action needs an anchor. */

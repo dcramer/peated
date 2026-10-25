@@ -191,7 +191,11 @@ function getDerivedAutomationTier(
       currentBottleId != null && !reaffirmsCurrentAssignment,
     hasDeterministicAnchor:
       decision.identityScope === "exact_cask" ||
-      matchesExactStoredReference(decision, result.artifacts.candidates),
+      matchesExactStoredReference(
+        decision,
+        result.artifacts.candidates,
+        testCase.input.reference.name,
+      ),
     // Image-backed fixtures either pre-seed `input.imageEvidence` or carry only
     // `reference.imageUrl` and rely on live extraction; both mean the run has
     // primary label/image evidence, matching the photo-identification consumer.

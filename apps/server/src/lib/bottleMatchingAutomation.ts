@@ -14,6 +14,7 @@ export function assessBottleResolution({
   decision,
   candidates = [],
   currentBottleId = null,
+  referenceName = null,
   sourceBottleIdentity = null,
   readListingImage = false,
   allowReplacement = false,
@@ -21,6 +22,8 @@ export function assessBottleResolution({
   decision: BottleClassificationDecision;
   candidates?: BottleCandidate[];
   currentBottleId?: number | null;
+  // The source name sent to the classifier; only it can anchor an exact match.
+  referenceName?: string | null;
   sourceBottleIdentity?: BottleExtractedDetails | null;
   readListingImage?: boolean;
   // An explicit moderator correction can replace an assignment; ingestion cannot.
@@ -64,7 +67,7 @@ export function assessBottleResolution({
     replacesCurrentAssignment,
     hasDeterministicAnchor:
       decision.identityScope === "exact_cask" ||
-      matchesExactStoredReference(decision, candidates) ||
+      matchesExactStoredReference(decision, candidates, referenceName) ||
       (decision.action === "create_bottle" &&
         Boolean(
           sourceBottleIdentity?.brand?.trim() &&
