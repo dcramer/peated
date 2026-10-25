@@ -190,8 +190,10 @@ free text; the agent, or the person on submission, owns those judgments.
 - A cask number ignores a leading `#` and letter case. Other punctuation
   counts: `53.322` and `53322` are different casks.
 - An edition is compared only by its markers, the words that contain a digit
-  (a year, batch number, or code such as `S2B13`). Accents, `No.`, and leading
-  zeros do not change a marker. Editions conflict only when each side has a
+  (a year, batch number, or code such as `S2B13`). Numbers joined by `.` or
+  `/`, with any letters after them, stay one marker: `1.1` is neither `1.2`
+  nor `1`, and `1.2a` is not `1.2b`. Accents, `No.`, and
+  leading zeros do not change a marker. Editions conflict only when each side has a
   marker the other lacks: `Batch 3` and `Batch 4` conflict; `2017 Release` and
   `2017 Edition` agree; `Cask #2787` and `Cask 2787 · Fèis Ìle 2023` do not
   conflict. The wording is left to the agent.
