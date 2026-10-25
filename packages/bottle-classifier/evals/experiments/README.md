@@ -70,6 +70,8 @@ their records remain. Test-case corrections are separate from classifier changes
 | [C27: Multi-item preflight](./C27-multi-item-preflight.md)                           | Ignore explicit multi-item titles before text extraction                                | Accepted: ten more sampled listings recognized with zero model work            |
 | [C28: One-fact difference](./C28-confirm-one-fact-difference.md)                     | Confirm a release with a single differing ABV, batch, or year exists before creating it | Uncertain: fewer duplicates, mostly by declining; one real release lost        |
 | [C29: Printed name wording](./C29-printed-name-wording.md)                           | Keep the title's age, vintage, and cask wording in proposed names                       | Accepted: target names 1/21 to 13/21; full suite 73 to 79 of 109               |
+| [C33: Sample-set preflight](./C33-sample-set-preflight.md)                           | Ignore sample and miniature sets before extraction                                      | Accepted: Glenlivet sample set 0/4 to 3/3 with no model call                   |
+| [C34: Exact-reference anchor](./C34-exact-reference-anchor.md)                       | Count a match to the exact stored-reference candidate as an automation anchor           | Accepted: Tomatin 3/6 to 3/3; server consumers unchanged                       |
 
 C09 and C10 add narrow checks after Luna, and C11 removes model work for an
 identity Peated has already accepted. The measurement and test-case corrections
@@ -84,15 +86,16 @@ below make comparisons more accurate and repeatable.
 
 ## Measurement changes
 
-| Item                                                                   | Decision                                                       |                                           Model cost |
-| ---------------------------------------------------------------------- | -------------------------------------------------------------- | ---------------------------------------------------: |
-| [M01: Exact field failures](./M01-exact-field-failures.md)             | Accepted: clearer failures, unchanged scores                   |                                                   $0 |
-| [M02: Cold Brew policy conflict](./M02-policy-conflicts.md)            | Accepted: two expectations corrected; classifier unchanged     | $0 correction; $0.005499 including the initial check |
-| [M03: Names and categories](./M03-names-and-categories.md)             | Accepted: verified test case corrections; classifier unchanged |          $0 correction; $0.039408 focused validation |
-| [M06: Fixed image extraction](./M06-fixed-image-extraction.md)         | Accepted: controlled audit input; classifier unchanged         |                                $0.003839 smoke check |
-| [M07: Null vs. missing](./M07-null-vs-missing.md)                      | Accepted: correct explicit-null scoring; classifier unchanged  |                                                   $0 |
-| [M04: Supported audit extras](./M04-supported-audit-extras.md)         | Accepted: exact reviewed operation sets; classifier unchanged  |                                                   $0 |
-| [M05: Fixed web evidence](./M05-fixed-evidence.md)                     | Accepted: controlled evidence lane; classifier unchanged       |                       $0.014501 total Luna high work |
-| [M08: Held-out release year](./M08-held-out-release-year.md)           | Accepted: removed an unsupported held-out SMWS year            |                                                   $0 |
-| [M09: Whistler release ambiguity](./M09-whistler-release-ambiguity.md) | Accepted: name-only source now requires review                 |                                                   $0 |
-| [M10: Woodford release ambiguity](./M10-woodford-release-ambiguity.md) | Accepted: name-only source now requires review                 |                                                   $0 |
+| Item                                                                   | Decision                                                          |                                           Model cost |
+| ---------------------------------------------------------------------- | ----------------------------------------------------------------- | ---------------------------------------------------: |
+| [M01: Exact field failures](./M01-exact-field-failures.md)             | Accepted: clearer failures, unchanged scores                      |                                                   $0 |
+| [M02: Cold Brew policy conflict](./M02-policy-conflicts.md)            | Accepted: two expectations corrected; classifier unchanged        | $0 correction; $0.005499 including the initial check |
+| [M03: Names and categories](./M03-names-and-categories.md)             | Accepted: verified test case corrections; classifier unchanged    |          $0 correction; $0.039408 focused validation |
+| [M06: Fixed image extraction](./M06-fixed-image-extraction.md)         | Accepted: controlled audit input; classifier unchanged            |                                $0.003839 smoke check |
+| [M07: Null vs. missing](./M07-null-vs-missing.md)                      | Accepted: correct explicit-null scoring; classifier unchanged     |                                                   $0 |
+| [M04: Supported audit extras](./M04-supported-audit-extras.md)         | Accepted: exact reviewed operation sets; classifier unchanged     |                                                   $0 |
+| [M05: Fixed web evidence](./M05-fixed-evidence.md)                     | Accepted: controlled evidence lane; classifier unchanged          |                       $0.014501 total Luna high work |
+| [M08: Held-out release year](./M08-held-out-release-year.md)           | Accepted: removed an unsupported held-out SMWS year               |                                                   $0 |
+| [M09: Whistler release ambiguity](./M09-whistler-release-ambiguity.md) | Accepted: name-only source now requires review                    |                                                   $0 |
+| [M10: Woodford release ambiguity](./M10-woodford-release-ambiguity.md) | Accepted: name-only source now requires review                    |                                                   $0 |
+| [M11: Stale expectations](./M11-stale-expectations-2026-10-24.md)      | Accepted: verified corrections and evidence; classifier unchanged |                                        $0 correction |

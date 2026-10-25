@@ -209,6 +209,11 @@ non-ignored Bottle Reference assigned to exactly one Bottle. Multiple targets,
 fuzzy matches, aliases, and any case needing whisky interpretation must use the
 classifier.
 
+When the classifier does run and matches the candidate retrieved through that
+same exact reference, the match counts as a verified anchor for the automation
+tier (`matchesExactStoredReference`). It still goes to review for any
+unresolved risk or field conflict.
+
 ### SMWS Codes
 
 SMWS is the narrow whisky-specific exception because its cask-code syntax is a
@@ -246,8 +251,9 @@ fills supported creation facts after local code has settled Bottle identity. It
 does not run for structured input or a deterministic match. A failed or empty
 read is recorded and classification continues with a fresh page-read allowance.
 
-Explicit bundle, multi-bottle, and damaged-condition names are ignored before
-text extraction. Other ignored input does not run the agent. An exact stored
+Explicit bundle, multi-bottle, sample or miniature set, and damaged-condition
+names are ignored before text extraction. A bare `sample` or `presentation box`
+is not enough. Other ignored input does not run the agent. An exact stored
 reference may use the preflight above. All other reference decisions use one bounded agent loop.
 Deterministic identifiers such as SMWS are input anchors, not bypasses.
 

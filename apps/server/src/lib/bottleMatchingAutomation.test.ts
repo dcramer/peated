@@ -224,6 +224,57 @@ describe("assessBottleResolution", () => {
     ).toMatchObject({ automationEligible: true });
   });
 
+  test("verifies a match to the exact stored-reference candidate without web research", () => {
+    expect(
+      assess({
+        action: "match",
+        suggestedBottleId: 1,
+        candidates: [
+          buildCandidate({
+            reference: "Example Distillery Port Cask 10 Year",
+            source: ["exact"],
+          }),
+        ],
+        proposedBottle: null,
+        webEvidence: "not_used",
+      }),
+    ).toMatchObject({ automationEligible: true });
+  });
+
+  test("reviews a match to a different candidate than the exact stored reference", () => {
+    expect(
+      assess({
+        action: "match",
+        suggestedBottleId: 2,
+        candidates: [
+          buildCandidate({ source: ["exact"] }),
+          buildCandidate({ bottleId: 2, source: ["text"] }),
+        ],
+        proposedBottle: null,
+        webEvidence: "not_used",
+      }),
+    ).toEqual({
+      automationEligible: false,
+      automationBlockers: ["the classifier found no supporting evidence"],
+    });
+  });
+
+  test("reviews an exact stored-reference match that conflicts with source facts", () => {
+    expect(
+      assess({
+        action: "match",
+        suggestedBottleId: 1,
+        candidates: [buildCandidate({ source: ["exact"] })],
+        proposedBottle: null,
+        sourceBottleIdentity: buildExtractedLabel({ abv: 46 }),
+        webEvidence: "not_used",
+      }),
+    ).toEqual({
+      automationEligible: false,
+      automationBlockers: ["conflicts with the source's bottle facts (abv)"],
+    });
+  });
+
   test("reviews a match that replaces the listing's current Bottle", () => {
     expect(
       assess({

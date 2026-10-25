@@ -1,6 +1,6 @@
 {
-  "id": "store-listing-aged-springbank-25-year-old-matches-the-plain-age-statement-bottle",
-  "name": "store listing: aged Springbank 25-year-old matches the plain age-statement bottle",
+  "id": "store-listing-name-only-springbank-25-year-old-does-not-pick-an-annual-release",
+  "name": "store listing: name-only Springbank 25-year-old does not pick an annual release",
   "input": {
     "reference": {
       "name": "Springbank Aged 25-year-old",
@@ -128,9 +128,19 @@
   ],
   "expected": {
     "status": "classified",
-    "action": "match",
+    "action": "no_match",
     "identityScope": "product",
-    "matchedBottleId": 469,
-    "summary": "Treat 'Aged' as generic age-statement wording, match the plain Springbank 25-year-old bottle, and avoid the more specific Limited Edition sibling unless the source supports that edition."
+    "summary": "Springbank releases its 25-year-old as separate annual vattings with different bottle counts and cask mixes. A name-only listing cannot choose one, and the broad legacy rows do not cover a specific release, so leave it for review."
+  },
+  "provenance": {
+    "source": "curated_regression",
+    "verifiedSourceUrls": [
+      "https://www.hedonism.co.uk/product/springbank-25-year-old-2023-release-whisky",
+      "https://theoldbarrelhouse.com.au/shop/scottish-whisky/2022-springbank-25-year-old-single-malt-scotch-whisky-700ml-46",
+      "https://api.peated.com/v1/bottles/469",
+      "https://api.peated.com/v1/bottles/1563",
+      "https://api.peated.com/v1/bottles/53503"
+    ],
+    "notes": "Re-verified 2026-10-24 (M11). Retailers sell the 25-year-old by release year: the 2023 release is 1,400 bottles from refill sherry and refill bourbon casks at 46%, and the 2022 release is described as a separate ex-bourbon and refill ex-sherry vatting at 46%. Peated already holds year-specific Bottle 53503 (2022, 46%). Bottles 469 and 1563 are broad legacy rows with no year or ABV. Under the identity model a different vatting is a separate Bottle, as in M10. Earlier versions of this case expected a match to 469."
   }
 }

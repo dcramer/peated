@@ -1,4 +1,7 @@
-import { deriveAutomationTier } from "@peated/bottle-classifier/automationTier";
+import {
+  deriveAutomationTier,
+  matchesExactStoredReference,
+} from "@peated/bottle-classifier/automationTier";
 import { getBottleFieldConflicts } from "@peated/bottle-classifier/fieldConflicts";
 import type {
   BottleCandidate,
@@ -61,6 +64,7 @@ export function assessBottleResolution({
     replacesCurrentAssignment,
     hasDeterministicAnchor:
       decision.identityScope === "exact_cask" ||
+      matchesExactStoredReference(decision, candidates) ||
       (decision.action === "create_bottle" &&
         Boolean(
           sourceBottleIdentity?.brand?.trim() &&

@@ -1,8 +1,8 @@
 {
   "id": "highland-park-cask-strength-no-5",
   "referenceName": "Highland Park Cask Strength No. 5",
-  "expectedBottleName": "Highland Park Cask Strength",
-  "summary": "Treat Highland Park Cask Strength No. 5 as one complete 2024 Bottle, preserving No. 5 as its exact edition and in the marketed Bottle identity.",
+  "expectedBottleName": "Highland Park Cask Strength No. 5",
+  "summary": "Treat Highland Park Cask Strength No. 5 as one complete 2024 Bottle. Under the naming rule, `Cask Strength No. 5` is the Bottle name, so the release number stays in the name rather than the edition.",
   "peatedBottleIds": [44080],
   "provenance": {
     "source": "curated_regression",
@@ -11,14 +11,18 @@
       "https://distiller.com/spirits/highland-park-cask-strength-release-no-5",
       "https://api.peated.com/v1/bottles/44080"
     ],
-    "notes": "Highland Park markets Cask Strength Release No. 5 as the exact expression at 64.7% ABV. Contemporary release coverage dates its launch to 2024; the broad Peated row lacks the release-specific identity."
+    "notes": "Highland Park markets Cask Strength Release No. 5 as the exact expression at 64.7% ABV. Contemporary release coverage dates its launch to 2024; the broad Peated row lacks the release-specific identity. The 2026-10-23 naming rule (docs/features/bottle-presentation.md) puts `Cask Strength No. 5` in the name; the producer titles it Cask Strength Release No. 5, so both name forms are accepted (M11)."
   },
   "expected": {
     "handlingStrategy": "classifier_required",
     "classifierExpectation": "bottle",
     "exactBottleIdentity": {
-      "edition": "No. 5",
+      "edition": null,
       "releaseYear": 2024
     }
-  }
+  },
+  "expectedBottleNames": [
+    "Highland Park Cask Strength No. 5",
+    "Highland Park Cask Strength Release No. 5"
+  ]
 }

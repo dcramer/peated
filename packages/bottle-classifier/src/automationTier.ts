@@ -61,6 +61,27 @@ function deriveCreateTier(input: AutomationTierInput): AutomationTier {
   return hasCreationEvidence ? "auto" : "review";
 }
 
+/**
+ * True when a Match selects the candidate retrieved through an exact accepted
+ * Bottle Reference for this input. Reference names are unique, so this is the
+ * same closed identifier the pre-model exact-reference path accepts (see
+ * "Exact Stored References" in `docs/architecture/bottle-classifier.md`).
+ */
+export function matchesExactStoredReference(
+  decision: { action: string; matchedBottleId: number | null },
+  candidates: ReadonlyArray<{ bottleId: number; source: readonly string[] }>,
+): boolean {
+  if (decision.action !== "match" || decision.matchedBottleId === null) {
+    return false;
+  }
+
+  return candidates.some(
+    (candidate) =>
+      candidate.bottleId === decision.matchedBottleId &&
+      candidate.source.includes("exact"),
+  );
+}
+
 /** Any unresolved risk forces review; otherwise the action needs an anchor. */
 export function deriveAutomationTier(
   input: AutomationTierInput,

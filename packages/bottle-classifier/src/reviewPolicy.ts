@@ -43,6 +43,10 @@ const MULTI_ITEM_REFERENCE_PATTERNS = [
   GIFT_SET_PACKAGING_KEYWORDS,
   /\bbundle\b/i,
   /\b(?:sampler|tasting|variety)\s+(?:pack|set|bundle)\b/i,
+  // A sample or miniature set packs a vial with other items, such as G&M's
+  // Generations presentation set (vial, book, and USB stick). Bare "sample"
+  // and "presentation box" stay with the classifier.
+  /\b(?:sample|miniature)s?\s+(?:presentation\s+)?(?:set|pack|kit)\b/i,
   /\b(?:dual|duo|trio|trilogy|combo)\s+(?:pack|set|bundle|collection)\b/i,
   /\b\d+\s*(?:-|x)?\s*pack\b/i,
   /\b(?:pack|set|case)\s+of\s+\d+\b/i,
