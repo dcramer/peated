@@ -11,7 +11,7 @@ import { foundationStyles } from "../../styles/foundations.stylex";
 import { colors } from "../../styles/tokens.stylex";
 import type { RelatedCounts } from "./entityAbout";
 
-const VISIBLE_ROWS = 8;
+const VISIBLE_ROWS = 5;
 
 function RelatedRows({ rows }: { rows: RelatedCounts["results"] }) {
   return (
@@ -25,7 +25,6 @@ function RelatedRows({ rows }: { rows: RelatedCounts["results"] }) {
               </span>
             }
             href={getEntityUrl(row.entity)}
-            kind={row.entity.kind}
             name={row.entity.name}
           />
         </li>
@@ -35,8 +34,9 @@ function RelatedRows({ rows }: { rows: RelatedCounts["results"] }) {
 }
 
 /**
- * The Entities with the most Bottles, largest first. A long list shows its
- * top rows; the rest open in a panel, full screen on phones.
+ * The Entities with the most Bottles, largest first. Each row shows only the
+ * name and count; the section heading already says who they are. A long list
+ * shows its top rows; the rest open in a panel, full screen on phones.
  */
 export function RelatedEntityList({
   counts,
