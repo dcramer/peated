@@ -369,12 +369,14 @@ function readNumbers(value: string) {
 }
 
 // A whole number: 46 is not inside 46.5 or 146, but 1887 is in "c.1887".
+// The number may match the text as written ("1.6" in "1.6m") or with
+// millions expanded ("1600000" in "1.6m").
 function containsNumber(text: string, number: string) {
-  return new RegExp(
+  const pattern = new RegExp(
     `(?<!\\d|\\d\\.)${number.replace(".", "\\.")}(?!\\d|\\.\\d)`,
-  ).test(
-    expandMillions(stripThousands(expandYearRanges(writeNumberWords(text)))),
   );
+  const written = stripThousands(expandYearRanges(writeNumberWords(text)));
+  return pattern.test(written) || pattern.test(expandMillions(written));
 }
 
 /**
