@@ -1,6 +1,7 @@
 import { describe, expect, test } from "vitest";
 import type { BottleExtractedDetails } from "./classifierTypes";
 import {
+  compareBottleFields,
   getBottleFieldConflicts,
   type ComparableBottleFields,
 } from "./fieldConflicts";
@@ -35,6 +36,13 @@ const bottle: ComparableBottleFields = {
   edition: "Batch 3",
 };
 
+function editionConflicts(source: string, stored: string) {
+  return getBottleFieldConflicts(
+    { ...facts, edition: source },
+    { ...bottle, edition: stored },
+  );
+}
+
 describe("getBottleFieldConflicts", () => {
   test("finds no conflict when populated fields agree or one side is empty", () => {
     expect(getBottleFieldConflicts(facts, bottle)).toEqual([]);
@@ -49,11 +57,8 @@ describe("getBottleFieldConflicts", () => {
     ).toEqual(["category", "statedAge", "edition"]);
   });
 
-  test("allows ABV rounding below a tenth", () => {
-    expect(getBottleFieldConflicts({ ...facts, abv: 46.04 }, bottle)).toEqual(
-      [],
-    );
-    expect(getBottleFieldConflicts({ ...facts, abv: 46.2 }, bottle)).toEqual([
+  test("counts any ABV difference", () => {
+    expect(getBottleFieldConflicts({ ...facts, abv: 46.04 }, bottle)).toEqual([
       "abv",
     ]);
   });
@@ -87,6 +92,15 @@ describe("getBottleFieldConflicts", () => {
     ).toEqual(["caskNumber"]);
   });
 
+  test("keeps other cask number punctuation", () => {
+    expect(
+      getBottleFieldConflicts(
+        { ...facts, cask_number: "53322" },
+        { ...bottle, caskNumber: "53.322" },
+      ),
+    ).toEqual(["caskNumber"]);
+  });
+
   test("checks cask and date facts for every caller without inventing missing values", () => {
     const target = {
       ...bottle,
@@ -114,5 +128,70 @@ describe("getBottleFieldConflicts", () => {
         target,
       ),
     ).toEqual([]);
+  });
+});
+
+describe("edition conflicts", () => {
+  test("ignores wording around the same year", () => {
+    // Auction lot 7551 against Bottle 3277, 2026-10-24.
+    expect(editionConflicts("2017 Release", "2017 Edition")).toEqual([]);
+    expect(editionConflicts("Release 2020", "2020 Edition")).toEqual([]);
+  });
+
+  test("ignores a marker that only one side records", () => {
+    // Auction lot 4722 against Bottle 52158, 2026-10-24.
+    expect(editionConflicts("Cask #2787", "Cask 2787 · Fèis Ìle 2023")).toEqual(
+      [],
+    );
+    expect(
+      editionConflicts("Batch 7", "Batch 7 · for The Whisky Shop"),
+    ).toEqual([]);
+  });
+
+  test("reads accents, No., and leading zeros as the same marker", () => {
+    expect(editionConflicts("Fèis Ìle 2023", "Feis Ile 2023")).toEqual([]);
+    expect(editionConflicts("Edition No. 1", "Edition 01")).toEqual([]);
+  });
+
+  test("conflicts when each side has a different marker", () => {
+    expect(editionConflicts("Batch 3", "Batch 4")).toEqual(["edition"]);
+    expect(editionConflicts("S2B13", "S2B14")).toEqual(["edition"]);
+    expect(editionConflicts("Fèis Ìle 2024", "Feis Ile 2023")).toEqual([
+      "edition",
+    ]);
+  });
+
+  test("leaves wording without markers to the classifier", () => {
+    expect(editionConflicts("First Edition", "Limited Edition")).toEqual([]);
+  });
+});
+
+describe("compareBottleFields", () => {
+  test("sorts supplied facts into agreements, missing facts, and conflicts", () => {
+    expect(
+      compareBottleFields(
+        { abv: 46, releaseYear: 2024, vintageYear: 2011, edition: "Batch 3" },
+        bottle,
+      ),
+    ).toEqual({
+      agreements: ["abv", "edition"],
+      missing: ["releaseYear"],
+      conflicts: ["vintageYear"],
+    });
+  });
+
+  test("calls editions without matching markers neither agreement nor conflict", () => {
+    expect(
+      compareBottleFields(
+        { edition: "First Edition" },
+        { edition: "Limited Edition" },
+      ),
+    ).toEqual({ agreements: [], missing: [], conflicts: [] });
+    expect(
+      compareBottleFields(
+        { edition: "Cask 2787" },
+        { edition: "Cask 2787 2023" },
+      ),
+    ).toEqual({ agreements: [], missing: [], conflicts: [] });
   });
 });

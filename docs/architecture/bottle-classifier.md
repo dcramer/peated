@@ -176,12 +176,31 @@ forces review. Code derives `auto` or `review` from action risk, structured
 evidence, and verified anchors; model-supplied confidence cannot raise that
 tier.
 
-When a matched candidate's populated typed field contradicts the extracted
-facts, code adds a conflict risk and the Match goes to review
-(`getBottleFieldConflicts`). The typed fields are category, age, ABV, vintage
-year, bottling year, release date, cask number, the cask-strength and single-cask flags, and edition. Code
-never turns that Match into No Match, and it never compares Brands, names, or
-other free text; the agent owns those judgments.
+One comparison, `compareBottleFields` in
+`packages/bottle-classifier/src/fieldConflicts.ts`, checks source facts
+against an existing Bottle everywhere: Bottle submission's possible matches,
+candidate order, the classifier, automatic matching for every source, and
+barcode or accepted-name reuse. It compares only typed fields: category, age,
+no-age statement, ABV, vintage year, bottling year, release date, cask number,
+the cask-strength and single-cask flags, and edition. An empty field on either
+side is missing, never a conflict. Code never compares Brands, names, or other
+free text; the agent, or the person on submission, owns those judgments.
+
+- ABV conflicts on any difference.
+- A cask number ignores a leading `#` and letter case. Other punctuation
+  counts: `53.322` and `53322` are different casks.
+- An edition is compared only by its markers, the words that contain a digit
+  (a year, batch number, or code such as `S2B13`). Accents, `No.`, and leading
+  zeros do not change a marker. Editions conflict only when each side has a
+  marker the other lacks: `Batch 3` and `Batch 4` conflict; `2017 Release` and
+  `2017 Edition` agree; `Cask #2787` and `Cask 2787 · Fèis Ìle 2023` do not
+  conflict. The wording is left to the agent.
+
+When a matched candidate conflicts with the extracted facts, code adds a
+conflict risk and the Match goes to review. Code never turns that Match into
+No Match. The save-time duplicate check in `apps/server/src/lib/bottleConflicts.ts`
+is separate: it needs every field to be exactly equal before it calls two
+Bottles the same.
 
 ### Exact Stored References
 
