@@ -125,7 +125,8 @@ and one or more citations. Event kinds SHALL include `opened`, `closed`, `mothba
 `reopened`, `acquired`, `renamed`, `era`, and `generic`. A `renamed` event
 SHALL store the new name. An `era` event SHALL have an end date or be marked
 as continuing, and a short title. An event MAY link one related Entity, such as
-a distillery built next door. An `acquired` event SHALL mean the Entity got a new owner, SHALL store the
+a distillery built next door. An `acquired` event SHALL mean the Entity got a new owner, including a brand
+whose owning firm is bought, SHALL store the
 new owner's name, and MAY link the owner's Entity. A purchase the Entity makes
 is a `generic` event. The pipeline SHALL NOT create Entities. Reads SHALL follow merged
 Entities to their current record, and SHALL show the name when the linked
