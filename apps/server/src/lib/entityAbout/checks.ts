@@ -63,7 +63,7 @@ function quotesState(quotes: readonly string[], value: string) {
   // or the whole phrase.
   const text = normalizeForQuote(quotes.join(" "));
   // "1.6 million" is a number, not the word "million" a quote must repeat.
-  const phrase = normalizeForQuote(expandMillions(stripThousands(checked)));
+  const phrase = normalizeForQuote(expandLargeNumbers(stripThousands(checked)));
   // Whole words only: "Campbell" does not state "Bell".
   if (` ${text} `.includes(` ${phrase} `)) return true;
   const words = phrase
@@ -210,8 +210,9 @@ export function keepVerifiedCitations(
           quotes.some((quote) => containsNumber(quote, number)),
         ) &&
         (
-          expandMillions(stripThousands(value ?? "")).match(NUMBER_WORD_RUN) ??
-          []
+          expandLargeNumbers(stripThousands(value ?? "")).match(
+            NUMBER_WORD_RUN,
+          ) ?? []
         )
           .filter((run) => !readNumberWords(run) && run.toLowerCase() !== "one")
           .every((run) =>
@@ -356,30 +357,32 @@ function writeNumberWords(value: string) {
   return value.replace(NUMBER_WORD_RUN, (run) => readNumberWords(run) ?? run);
 }
 
-// Capacities are often written in millions: "1.6m litres" and "1.6 million
-// litres" state 1600000. An "m" must touch the number, so "1887 M." and
+// Capacities and prices are often written in millions or billions: "1.6m
+// litres" and "1.6 million litres" state 1600000, "£1.2bn" and "1.2 billion"
+// state 1200000000. An "m" or "bn" must touch the number, so "1887 M." and
 // "20 m" are not millions.
-function expandMillions(value: string) {
+function expandLargeNumbers(value: string) {
   return value.replace(
-    /\b(\d+(?:\.\d+)?)(?:m|\s*million)\b/gi,
-    (_, n: string) => String(Math.round(Number(n) * 1_000_000)),
+    /\b(\d+(?:\.\d+)?)(m|\s*million|bn|\s*billion)\b/gi,
+    (_, n: string, unit: string) =>
+      String(Math.round(Number(n) * (/b/i.test(unit) ? 1e9 : 1e6))),
   );
 }
 
 /** The numbers a value states, read the same way as quotes. */
 function readNumbers(value: string) {
-  return expandMillions(stripThousands(value)).match(NUMBER_PATTERN) ?? [];
+  return expandLargeNumbers(stripThousands(value)).match(NUMBER_PATTERN) ?? [];
 }
 
 // A whole number: 46 is not inside 46.5 or 146, but 1887 is in "c.1887".
 // The number may match the text as written ("1.6" in "1.6m") or with
-// millions expanded ("1600000" in "1.6m").
+// millions and billions expanded ("1600000" in "1.6m").
 function containsNumber(text: string, number: string) {
   const pattern = new RegExp(
     `(?<!\\d|\\d\\.)${number.replace(".", "\\.")}(?!\\d|\\.\\d)`,
   );
   const written = stripThousands(expandYearRanges(writeNumberWords(text)));
-  return pattern.test(written) || pattern.test(expandMillions(written));
+  return pattern.test(written) || pattern.test(expandLargeNumbers(written));
 }
 
 /**

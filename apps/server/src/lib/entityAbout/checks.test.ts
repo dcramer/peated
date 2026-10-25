@@ -174,6 +174,9 @@ describe("keepVerifiedCitations", () => {
     expect(
       kept("Brora made 1.6 million litres.", "In 1983 it made 1.6m litres."),
     ).toBe(1);
+    expect(
+      kept("Diageo paid 1.2 billion.", "In 1983 Diageo paid £1.2bn."),
+    ).toBe(1);
     // A number the check cannot read must appear in a quote as written.
     expect(
       kept("Brora filled two hundred casks.", "Brora closed in 1983."),
