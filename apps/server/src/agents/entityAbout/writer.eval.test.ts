@@ -68,24 +68,28 @@ function describeDraft(
     }));
   return {
     pagesRead: pagesRead.map((page) => page.url),
-    events: document.events.map((event) => ({
-      id: event.id,
-      kind: event.kind,
-      date: event.date,
-      text: event.text,
-      citations: listCitations(
-        event.citations,
-        keptQuotes(reviewed.events.find((e) => e.id === event.id)?.citations),
-      ),
-    })),
-    siteFacts: Object.entries(document.siteFacts).map(([field, fact]) => ({
-      field,
-      value: fact.value,
-      citations: listCitations(
-        fact.citations,
-        keptQuotes(keptSiteFacts.get(field)?.citations),
-      ),
-    })),
+    // A fact the checks drop as a whole (an unquoted year, name, or number)
+    // shows kept: false; its citations then show which quotes still passed.
+    events: document.events.map((event) => {
+      const kept = reviewed.events.find((e) => e.id === event.id);
+      return {
+        id: event.id,
+        kind: event.kind,
+        date: event.date,
+        text: event.text,
+        kept: Boolean(kept),
+        citations: listCitations(event.citations, keptQuotes(kept?.citations)),
+      };
+    }),
+    siteFacts: Object.entries(document.siteFacts).map(([field, fact]) => {
+      const kept = keptSiteFacts.get(field);
+      return {
+        field,
+        value: fact.value,
+        kept: Boolean(kept),
+        citations: listCitations(fact.citations, keptQuotes(kept?.citations)),
+      };
+    }),
     sentences: document.sections.flatMap((section) =>
       section.sentences.map((sentence) => ({
         section: section.key,
@@ -106,7 +110,18 @@ describe.skipIf(!isAIGatewayConfigured())("About writer", () => {
     const write = createEntityAboutWriter(() => savedSource(evidence.pages));
     const runs: EntityAboutWriterResult[] = [];
 
-    const result = await writeEntityAbout(
+    let result: Awaited<ReturnType<typeof writeEntityAbout>> | undefined;
+    // Registered first so a writer error on the retry still prints the drafts.
+    onTestFailed(() => {
+      console.info(
+        `About writer case ${evidence.case}: ${JSON.stringify({
+          result,
+          runs: runs.map((run) => describeDraft(run, evidence.entity.kind)),
+        })}`,
+      );
+    });
+
+    result = await writeEntityAbout(
       { entityId: entity.id },
       {
         enabled: true,
@@ -118,14 +133,6 @@ describe.skipIf(!isAIGatewayConfigured())("About writer", () => {
         now: () => new Date(),
       },
     );
-    onTestFailed(() => {
-      console.info(
-        `About writer case ${evidence.case}: ${JSON.stringify({
-          result,
-          runs: runs.map((run) => describeDraft(run, evidence.entity.kind)),
-        })}`,
-      );
-    });
 
     // The job's own checks decide whether a draft is saved; a rejected run
     // lists every reason.
