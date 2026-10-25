@@ -1,4 +1,4 @@
-id: orpc-contract-no-runtime-imports
+id: server-shared-no-runtime-imports
 valid:
   - 'import { ItemSchema } from "@peated/server/schemas";'
   - 'import { parseCursor } from "@peated/server/lib/activityCursor";'
@@ -22,6 +22,7 @@ invalid:
   - 'import * as worker from "@peated/server/worker/client";'
   - 'import handler from "@peated/server/orpc/routes/items/list";'
   - 'import { db } from "../../../db";'
+  - 'import { REPORT_REASONS } from "../db/schema/reports";'
   - 'import handler from "../../routes/items/list";'
   - 'import "@peated/server/config";'
   - 'import {} from "@peated/server/config";'

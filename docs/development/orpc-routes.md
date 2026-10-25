@@ -74,6 +74,10 @@ A contract file can import schemas, constants, pure helpers, and types. It must
 not load database, configuration, worker, external service, or handler code.
 This keeps the mock API independent of the real API.
 
+The same limit applies to `schemas/` and `constants.ts`, because the web app
+bundles them for the browser. When a database table and a schema share a list
+of values, define the list in `constants.ts` and import it in both.
+
 ```ts
 // contracts/bottles/list.ts
 export default contract

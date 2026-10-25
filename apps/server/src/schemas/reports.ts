@@ -1,9 +1,9 @@
-import { z } from "zod";
 import {
   REPORT_OBJECT_TYPES,
   REPORT_REASONS,
   REPORT_STATUSES,
-} from "../db/schema/reports";
+} from "@peated/server/constants";
+import { z } from "zod";
 
 export const ReportObjectTypeEnum = z.enum(REPORT_OBJECT_TYPES);
 export const ReportReasonEnum = z.enum(REPORT_REASONS);

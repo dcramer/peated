@@ -73,6 +73,11 @@ It is false on success and for an unexpected error.
 Use `Inputs` and `Outputs` from `@peated/server/orpc/router` when code needs an
 explicit route type.
 
+Never import `@peated/server/db`, `config`, `worker`, or `orpc/routes` from the
+web app, even for types. Those modules hold server-only code, and anything the
+web app imports can end up in the browser bundle. `pnpm ast-grep:lint` checks
+this.
+
 Library references:
 
 - <https://orpc.unnoq.com/docs/client>

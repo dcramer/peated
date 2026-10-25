@@ -1,12 +1,18 @@
-id: orpc-contract-no-runtime-imports
+id: server-shared-no-runtime-imports
 language: TypeScript
 severity: error
-message: Shared contracts must not load database, configuration, worker, or real-handler modules.
-note: Import schemas, constants, pure helpers, or types instead so mock handlers remain independent of the real API.
+message: Modules shared with the web app and mock API must not load database, configuration, worker, or real-handler modules.
+note: >-
+  The web app bundles API schemas, constants, and contracts for the browser,
+  and the mock API runs without the real API. Import other schemas, constants,
+  pure helpers, or types instead. Move a list both a table and a schema need
+  into constants.ts.
 files:
+  - apps/server/src/constants.ts
   - apps/server/src/orpc/contracts/**/*.ts
+  - apps/server/src/schemas/**/*.ts
 ignores:
-  - apps/server/src/orpc/contracts/**/*.test.ts
+  - apps/server/src/**/*.test.ts
 utils:
   runtime-module:
     regex: >-

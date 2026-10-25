@@ -2,7 +2,7 @@ import {
   PENDING_UPLOAD_KIND_LIST,
   PENDING_UPLOAD_PURPOSE_LIST,
   PENDING_UPLOAD_STATUS_LIST,
-} from "@peated/server/db/schema";
+} from "@peated/server/constants";
 import { z } from "zod";
 import { ImageUploadSchema } from "./images";
 

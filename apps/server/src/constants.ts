@@ -411,3 +411,50 @@ export function isAgeInBucket(age: number, bucket: AgeBucket) {
     (bucket.max === null || age <= bucket.max)
   );
 }
+
+export const PENDING_UPLOAD_KIND_LIST = ["image"] as const;
+export const PENDING_UPLOAD_PURPOSE_LIST = [
+  "photo_tasting_entry",
+  "tasting_image",
+  "bottle_image",
+  "bottle_release_image",
+  "badge_image",
+  "avatar",
+] as const;
+export const PENDING_UPLOAD_STATUS_LIST = [
+  "pending",
+  "attached",
+  "expired",
+] as const;
+
+export const REPORT_OBJECT_TYPES = [
+  "tasting",
+  "member_review",
+  "comment",
+  "user",
+  "bottle",
+  "entity",
+  "bottle_series",
+  "flight",
+] as const;
+
+export const REPORT_REASONS = [
+  "spam",
+  "harassment",
+  "hate",
+  "sexual_content",
+  "violence",
+  "inaccurate",
+  "other",
+] as const;
+
+export const REPORT_STATUSES = ["open", "resolved", "dismissed"] as const;
+
+export const TASTING_DRAFT_BOTTLE_HINT_MAX_LENGTH = 255;
+
+export const TASTING_DRAFT_IDENTIFICATION_STATUS_LIST = [
+  "none",
+  "pending",
+  "done",
+  "failed",
+] as const;

@@ -10,22 +10,12 @@ import {
   varchar,
 } from "drizzle-orm/pg-core";
 
+import {
+  PENDING_UPLOAD_KIND_LIST,
+  PENDING_UPLOAD_PURPOSE_LIST,
+  PENDING_UPLOAD_STATUS_LIST,
+} from "../../constants";
 import { users } from "./users";
-
-export const PENDING_UPLOAD_KIND_LIST = ["image"] as const;
-export const PENDING_UPLOAD_PURPOSE_LIST = [
-  "photo_tasting_entry",
-  "tasting_image",
-  "bottle_image",
-  "bottle_release_image",
-  "badge_image",
-  "avatar",
-] as const;
-export const PENDING_UPLOAD_STATUS_LIST = [
-  "pending",
-  "attached",
-  "expired",
-] as const;
 
 export const pendingUploadKindEnum = pgEnum(
   "pendingUploadKind",
