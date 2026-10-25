@@ -1,10 +1,10 @@
 # Entity About Pages
 
-A distillery, brand, or company can have an About tab: a short, sourced
-account of the place, label, or business, with a timeline, key facts, owners,
-and numbers from the Bottle catalog. Every statement on the page traces to a
-fact, and every fact traces to a source. Bottlers will get About pages the
-same way later; Bottles will need their own design.
+A distillery, brand, bottler, or company can have an About tab: a short,
+sourced account of the place, label, or business, with a timeline, key facts,
+owners, and numbers from the Bottle catalog. Every statement on the page
+traces to a fact, and every fact traces to a source. Bottles will need their
+own design.
 
 ## What Is Stored
 
@@ -87,7 +87,8 @@ placeholder. The constants live in
 Catalog numbers are counted from active Bottles at read time, the same way as
 the Entity Bottles tab. A distillery's vintages, bottlers, and release years
 count every Bottle distilled there, independent bottlings included. Its own
-line counts even when no distiller is recorded yet. A brand's
+line counts even when no distiller is recorded yet. A bottler's distilleries
+and release years count the Bottles it bottled, under any label. A brand's
 release years count the Bottles sold under it. Prose never states them; they change daily. Chart bars
 link to the Bottle list filtered to that year.
 

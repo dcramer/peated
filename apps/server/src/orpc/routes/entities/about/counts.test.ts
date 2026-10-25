@@ -138,6 +138,69 @@ describe("About catalog numbers", () => {
     ).toEqual({ results: [{ year: 2020, count: 1 }], withoutYear: 1 });
   });
 
+  test("counts what a bottler bottled, under any label", async ({
+    fixtures,
+  }) => {
+    const bottler = await fixtures.Entity({ kind: "bottler" });
+    const label = await fixtures.Entity({ kind: "brand" });
+    const otherBottler = await fixtures.Entity({ kind: "bottler" });
+    const ardbeg = await fixtures.Entity({
+      kind: "distillery",
+      name: "Ardbeg",
+    });
+    const caolIla = await fixtures.Entity({
+      kind: "distillery",
+      name: "Caol Ila",
+    });
+    await fixtures.Bottle({
+      name: "Own label",
+      brandId: bottler.id,
+      bottlerId: bottler.id,
+      releaseYear: 2021,
+      distillerIds: [ardbeg.id],
+    });
+    // A range sold under its own label still counts for the bottler.
+    await fixtures.Bottle({
+      name: "Range",
+      brandId: label.id,
+      bottlerId: bottler.id,
+      releaseYear: 2020,
+      distillerIds: [caolIla.id],
+    });
+    // Bottled by someone else.
+    await fixtures.Bottle({
+      name: "Elsewhere",
+      bottlerId: otherBottler.id,
+      releaseYear: 2020,
+      distillerIds: [ardbeg.id],
+    });
+
+    expect(
+      await routerClient.entities.about.releaseYears({ entity: bottler.id }),
+    ).toEqual({
+      results: [
+        { year: 2020, count: 1 },
+        { year: 2021, count: 1 },
+      ],
+      withoutYear: 0,
+    });
+    expect(
+      await routerClient.entities.about.distillers({ entity: bottler.id }),
+    ).toEqual({
+      results: [
+        {
+          entity: { id: ardbeg.id, name: "Ardbeg", kind: "distillery" },
+          count: 1,
+        },
+        {
+          entity: { id: caolIla.id, name: "Caol Ila", kind: "distillery" },
+          count: 1,
+        },
+      ],
+      withoutEntity: 0,
+    });
+  });
+
   test("returns 404 for a missing entity", async () => {
     const err = await waitError(() =>
       routerClient.entities.about.vintages({ entity: 123456789 }),

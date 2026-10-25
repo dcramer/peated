@@ -25,8 +25,9 @@ SHALL stop at a fixed limit of searches and page reads.
 
 #### Scenario: Run for a bottler
 
-- **WHEN** the job is asked to run for a bottler
-- **THEN** it skips the Entity, because bottlers do not have About pages yet
+- **WHEN** the job runs for The Scotch Malt Whisky Society
+- **THEN** its events cover the business, such as its founding, owners, and
+  the ranges it launched, and leave out single bottlings
 
 #### Scenario: Page rewritten
 

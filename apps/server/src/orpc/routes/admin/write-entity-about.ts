@@ -1,11 +1,10 @@
-import { ENTITY_ABOUT_KIND_LIST } from "@peated/server/constants";
 import { db } from "@peated/server/db";
 import { entities } from "@peated/server/db/schema";
 import { procedure } from "@peated/server/orpc";
 import { requireAdmin } from "@peated/server/orpc/middleware";
 import { pushJob } from "@peated/server/worker/dispatch";
 import { ENTITY_ABOUT_WRITER_READY } from "@peated/server/worker/jobs/writeEntityAbout";
-import { asc, desc, inArray } from "drizzle-orm";
+import { asc, desc } from "drizzle-orm";
 import { z } from "zod";
 
 export default procedure
@@ -15,7 +14,7 @@ export default procedure
     path: "/admin/catalog/write-entity-about",
     summary: "Queue About pages",
     description:
-      "Queue the About writer for one entity, or for a batch of distilleries, brands, and companies ordered by public activity. Pages that pass every check publish without review. Fails while the writer is turned off. Requires administrator privileges.",
+      "Queue the About writer for one entity, or for a batch of entities ordered by public activity. Pages that pass every check publish without review. Fails while the writer is turned off. Requires administrator privileges.",
     operationId: "writeEntityAbout",
   })
   .input(
@@ -57,7 +56,6 @@ export default procedure
           await db
             .select({ id: entities.id })
             .from(entities)
-            .where(inArray(entities.kind, [...ENTITY_ABOUT_KIND_LIST]))
             .orderBy(
               desc(entities.publicReviewAndTastingCount),
               asc(entities.id),

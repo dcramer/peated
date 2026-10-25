@@ -8,6 +8,6 @@ export default implement(entityAboutDistillersContract).handler(
     const entity = await resolveEntity(input.entity);
     if (!entity) throw errors.NOT_FOUND({ message: "Entity not found." });
 
-    return await countDistillers(entity.id);
+    return await countDistillers(entity);
   },
 );

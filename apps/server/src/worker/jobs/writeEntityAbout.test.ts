@@ -407,7 +407,7 @@ describe("writeEntityAbout", () => {
     expect(await ownerOf()).toMatchObject({ newOwnerId: owner.id });
   });
 
-  test.for(["brand", "company"] as const)(
+  test.for(["brand", "bottler", "company"] as const)(
     "saves a %s page without site facts",
     async (kind, { fixtures }) => {
       const entity = await fixtures.Entity({ kind });
@@ -529,16 +529,5 @@ describe("writeEntityAbout", () => {
       status: "disabled",
     });
     expect(writer.writer).not.toHaveBeenCalled();
-  });
-
-  test("skips kinds without About pages", async ({ fixtures }) => {
-    const entity = await fixtures.Entity({ kind: "bottler" });
-
-    expect(
-      await writeEntityAbout(
-        { entityId: entity.id },
-        services(async () => ({ draft: goodDraft, pagesRead: [page] })),
-      ),
-    ).toEqual({ status: "skipped" });
   });
 });

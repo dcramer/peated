@@ -2,10 +2,10 @@
 
 ### Requirement: About tab
 
-A Distillery, Brand, or Company page SHALL show an About tab after Overview
-when the Entity has a published lead and at least one other About part.
-Otherwise the tab SHALL be hidden, and the Overview and its description SHALL
-carry what Peated knows. Bottler pages are out of scope.
+A Distillery, Brand, Bottler, or Company page SHALL show an About tab after
+Overview when the Entity has a published lead and at least one other About
+part. Otherwise the tab SHALL be hidden, and the Overview and its description
+SHALL carry what Peated knows.
 
 #### Scenario: Rich distillery
 
@@ -45,7 +45,8 @@ part SHALL NOT show a heading, a placeholder, or filler text.
 - Bottles by year distilled: at least 10 Bottles with a vintage year.
 - Who bottled it: at least 3 Bottlers.
 - Releases by year: at least 10 Bottles with a release year. A distillery counts
-  every Bottle distilled there; a brand counts the Bottles sold under it.
+  every Bottle distilled there; a bottler counts the Bottles it bottled; a
+  brand counts the Bottles sold under it.
 - Key facts: at least 2 published facts.
 
 #### Scenario: Few vintages
