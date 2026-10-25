@@ -54,6 +54,39 @@ describe("About catalog numbers", () => {
     });
   });
 
+  test("counts release years for every bottle distilled at a distillery", async ({
+    fixtures,
+  }) => {
+    const distillery = await fixtures.Entity({ kind: "distillery" });
+    const otherBrand = await fixtures.Entity({ kind: "brand" });
+    await fixtures.Bottle({
+      name: "Own",
+      brandId: distillery.id,
+      releaseYear: 2021,
+      distillerIds: [distillery.id],
+    });
+    // An independent bottling sold under another brand still counts.
+    await fixtures.Bottle({
+      name: "Independent",
+      brandId: otherBrand.id,
+      releaseYear: 2004,
+      distillerIds: [distillery.id],
+    });
+    await fixtures.Bottle({ name: "No year", distillerIds: [distillery.id] });
+    // Distilled elsewhere.
+    await fixtures.Bottle({ name: "Elsewhere", releaseYear: 2004 });
+
+    expect(
+      await routerClient.entities.about.releaseYears({ entity: distillery.id }),
+    ).toEqual({
+      results: [
+        { year: 2004, count: 1 },
+        { year: 2021, count: 1 },
+      ],
+      withoutYear: 1,
+    });
+  });
+
   test("counts distilleries and release years for a brand", async ({
     fixtures,
   }) => {

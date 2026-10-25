@@ -348,7 +348,11 @@ export function EntityAboutArticle({
           counts={counts.releaseYears}
           entityName={entity.name}
           heading="Releases by year"
-          intro={`Bottles in Peated sold as ${entity.name}, by release year.`}
+          intro={
+            entity.kind === "distillery"
+              ? `Bottles in Peated distilled at ${entity.name}, by release year.`
+              : `Bottles in Peated sold as ${entity.name}, by release year.`
+          }
         />
       ) : null}
 

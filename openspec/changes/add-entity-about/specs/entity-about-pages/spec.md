@@ -44,7 +44,8 @@ part SHALL NOT show a heading, a placeholder, or filler text.
 - Timeline: at least 2 dated periods or names.
 - Bottles by year distilled: at least 10 Bottles with a vintage year.
 - Who bottled it: at least 3 Bottlers.
-- Releases by year: at least 10 Bottles with a release year.
+- Releases by year: at least 10 Bottles with a release year. A distillery counts
+  every Bottle distilled there; a brand counts the Bottles sold under it.
 - Key facts: at least 2 published facts.
 
 #### Scenario: Few vintages

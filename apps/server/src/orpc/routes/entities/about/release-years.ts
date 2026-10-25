@@ -8,6 +8,6 @@ export default implement(entityAboutReleaseYearsContract).handler(
     const entity = await resolveEntity(input.entity);
     if (!entity) throw errors.NOT_FOUND({ message: "Entity not found." });
 
-    return await countReleaseYears(entity.id);
+    return await countReleaseYears(entity);
   },
 );

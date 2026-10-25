@@ -4,6 +4,7 @@ import {
   bottlesToDistillers,
   bottleTombstones,
   entities,
+  type EntityKind,
 } from "@peated/server/db/schema";
 import {
   and,
@@ -49,9 +50,18 @@ export function countVintages(entityId: number) {
   return countByYear(bottles.vintageYear, distilledAt(entityId));
 }
 
-/** Bottles sold under the Entity as Brand, by release year. */
-export function countReleaseYears(entityId: number) {
-  return countByYear(bottles.releaseYear, eq(bottles.brandId, entityId));
+/**
+ * Bottles by release year: for a distillery, every Bottle distilled there,
+ * independent bottlings included, like the vintage chart; otherwise the
+ * Bottles sold under the Entity as Brand.
+ */
+export function countReleaseYears(entity: { id: number; kind: EntityKind }) {
+  return countByYear(
+    bottles.releaseYear,
+    entity.kind === "distillery"
+      ? distilledAt(entity.id)
+      : eq(bottles.brandId, entity.id),
+  );
 }
 
 /** Bottles distilled at the Entity, by bottler. */
