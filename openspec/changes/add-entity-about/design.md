@@ -234,7 +234,8 @@ that the pick is one of the stated values.
      page reads, and Entity search over the classifiers' search.
    - Input: the Entity's name, kind, location, owner, aliases, its notes,
      its history timeline, the current page, the field list, the style
-     rules, and two examples written by people (Brora and one brand).
+     rules, and two examples written by people (Rosebank and Johnnie
+     Walker).
    - Output: the complete next version of the page, parsed with the
      document schema. It may keep, correct, add, or drop anything.
    - Page text is data, not instructions. The model has no write tools.
@@ -311,14 +312,15 @@ Storybook Overview story, per `apps/web/AGENTS.md`.
 
 - The banned-phrase list and the About style rules go into the
   `peated-writing` skill. The code check imports the same list.
-- The prompt uses two examples written by people: the Brora article and one
-  brand.
-- `pnpm evals` gets a model check with 5 Entities: a rebuilt silent
-  distillery, a famous distillery, a recent craft distillery, a brand with
-  many distilleries, and a thin record. Brora and Johnnie Walker are the
-  prompt's examples, so they are not cases. The writer reads saved,
-  reviewed pages, and the check runs the real job's checks, per
-  `docs/development/model-checks.md`.
+- The prompt uses two examples written by people: Rosebank for a distillery
+  and Johnnie Walker for a brand. Rosebank replaced the Brora article, so
+  Brora and Clynelish, whose histories overlap, can be model-check cases.
+- `pnpm evals` gets a model check on Entities with saved, reviewed pages,
+  including a rebuilt silent distillery, a famous distillery, a recent craft
+  distillery, a brand with many distilleries, a thin record, and two
+  distilleries that shared one name. Rosebank and Johnnie Walker are the
+  prompt's examples, so they are not cases. The check runs the real job's
+  checks, per `docs/development/model-checks.md`.
 - Problems on live pages arrive through the existing Entity reports. A
   moderator patches the page, and adds a note when the fix must survive
   later runs.

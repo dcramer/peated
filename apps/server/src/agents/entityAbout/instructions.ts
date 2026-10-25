@@ -6,8 +6,8 @@ import {
   ABOUT_MIN_FACTS_FOR_PROSE,
   ABOUT_MIN_FACTS_FOR_SECTIONS,
 } from "@peated/server/lib/entityAbout/checks";
-import { BRORA_ABOUT_EXAMPLE } from "@peated/server/lib/entityAbout/examples/brora";
 import { JOHNNIE_WALKER_ABOUT_EXAMPLE } from "@peated/server/lib/entityAbout/examples/johnnieWalker";
+import { ROSEBANK_ABOUT_EXAMPLE } from "@peated/server/lib/entityAbout/examples/rosebank";
 import type { EntityAboutDocument } from "@peated/server/schemas/entityAbout";
 
 import { documentToDraft, type AboutDraft } from "./draftSchema";
@@ -92,13 +92,13 @@ ${siteFactList}
 - Do not praise the whisky or the producer. Do not end a section with a summary. Do not describe what Peated cannot know, such as how a whisky tastes.
 - The first section has key \`lead\` and no heading: at most ${ABOUT_MAX_LEAD_SENTENCES} sentences saying what the place or business is, when it began, and what is distinctive about its history. Every sentence cites facts, so say where it is only in an event's \`text\`, such as the \`opened\` event's, when that event's quote states the place.
 - Facts are your events and site facts together.
-- Add other sections only when you have ${ABOUT_MIN_FACTS_FOR_SECTIONS} or more facts. Use plain headings drawn from the facts, such as "Two distilleries called Clynelish" or "The peated years". Set \`eraEventId\` when a section covers an era.
+- Add other sections only when you have ${ABOUT_MIN_FACTS_FOR_SECTIONS} or more facts. Use plain headings drawn from the facts, such as "Built beside the canal" or "Silent". Set \`eraEventId\` when a section covers an era.
 - Use no more sentences in total than you have facts. With fewer than ${ABOUT_MIN_FACTS_FOR_PROSE} facts, return no sections.
 - A short, correct page is better than a long one. When evidence is thin, return a few facts and a lead of one or two sentences.
 
 # Examples
 These are parts of pages written by people, in your output format. A distillery:
-${JSON.stringify(buildExample(BRORA_ABOUT_EXAMPLE, new Set([1, 13, 14, 15, 20]), ["lead", "peated"]), null, 1)}
+${JSON.stringify(buildExample(ROSEBANK_ABOUT_EXAMPLE, new Set([1, 8, 11, 13, 14]), ["lead", "silent"]), null, 1)}
 
 A brand:
 ${JSON.stringify(buildExample(JOHNNIE_WALKER_ABOUT_EXAMPLE, new Set([1, 5, 8, 9, 10]), ["lead", "owners"]), null, 1)}`;
