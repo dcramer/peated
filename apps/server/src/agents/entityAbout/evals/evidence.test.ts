@@ -7,9 +7,9 @@ import { ABOUT_EVAL_CASES } from "./evidence";
 // The About model check reads only these packs, so they are checked in
 // `pnpm test` where no model runs.
 describe("About model check evidence", () => {
-  test("has 11 distinct cases", () => {
+  test("has 12 distinct cases", () => {
     const names = ABOUT_EVAL_CASES.map((evidence) => evidence.case);
-    expect(new Set(names).size).toBe(11);
+    expect(new Set(names).size).toBe(12);
   });
 
   // Model check rule (owner: docs/development/model-checks.md): a test case
