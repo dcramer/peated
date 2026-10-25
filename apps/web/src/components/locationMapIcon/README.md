@@ -1,7 +1,7 @@
 # Scottish whisky region maps
 
-The Highland, Speyside, Lowland, Campbeltown, and Islands SVG assets are adapted
-from [Scotch regions.svg](https://commons.wikimedia.org/wiki/File:Scotch_regions.svg),
+The Highland, Speyside, Lowland, Campbeltown, and Islands SVG assets in
+`apps/web/public/assets/maps/regions/scotland/` are adapted from [Scotch regions.svg](https://commons.wikimedia.org/wiki/File:Scotch_regions.svg),
 drawn by Briangotts and converted to SVG by Interiot (1 August 2007).
 They are distributed under [CC BY-SA 3.0](https://creativecommons.org/licenses/by-sa/3.0/),
 including Peated's adaptations. This asset license is separate from the repository's code license.
@@ -13,7 +13,8 @@ These are illustrative whisky region silhouettes, not administrative or legal
 boundary data. The Islands illustration follows the source's separate grouping;
 it does not imply an additional protected Scotch whisky region.
 
-The existing Islay and Scotland assets use public-domain Natural Earth geometry.
+The Islay asset in the same folder and the Scotland asset in
+`apps/web/public/assets/maps/countries/` use public-domain Natural Earth geometry.
 Their source details are recorded in their SVG comments; they do not use the
 CC BY-SA artwork described here.
 

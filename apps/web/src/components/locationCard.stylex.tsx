@@ -3,8 +3,8 @@ import * as stylex from "@stylexjs/stylex";
 import { foundationStyles } from "../styles/foundations.stylex";
 import { colors, space } from "../styles/tokens.stylex";
 import { Card, CardLink } from "./card.stylex";
-import CountryMapIcon from "./countryMapIcon";
 import { LoadingPlaceholder } from "./feedback.stylex";
+import { LocationMapIcon } from "./locationMapIcon/locationMapIcon.stylex";
 
 export type LocationCardProps = {
   href: string;
@@ -29,10 +29,9 @@ export function LocationCard({
   return (
     <CardLink href={href} padding="none" {...stylex.props(styles.card)}>
       <div {...stylex.props(styles.map)}>
-        <CountryMapIcon
-          aria-hidden="true"
-          slug={slug}
-          {...stylex.props(styles.mapIcon)}
+        <LocationMapIcon
+          visual={{ kind: "country", slug }}
+          style={styles.mapIcon}
         />
       </div>
       <h2 {...stylex.props(foundationStyles.rowTitle, styles.title)}>{name}</h2>
