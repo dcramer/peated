@@ -62,7 +62,8 @@ function quotesState(quotes: readonly string[], value: string) {
   // Risk". A value of only numbers, or only short words, needs its numbers
   // or the whole phrase.
   const text = normalizeForQuote(quotes.join(" "));
-  const phrase = normalizeForQuote(checked);
+  // "1.6 million" is a number, not the word "million" a quote must repeat.
+  const phrase = normalizeForQuote(expandMillions(stripThousands(checked)));
   // Whole words only: "Campbell" does not state "Bell".
   if (` ${text} `.includes(` ${phrase} `)) return true;
   const words = phrase
@@ -355,10 +356,12 @@ function writeNumberWords(value: string) {
   return value.replace(NUMBER_WORD_RUN, (run) => readNumberWords(run) ?? run);
 }
 
-// Capacities are often written in millions: "1.6m litres" states 1600000.
+// Capacities are often written in millions: "1.6m litres" and "1.6 million
+// litres" state 1600000. An "m" must touch the number, so "1887 M." and
+// "20 m" are not millions.
 function expandMillions(value: string) {
   return value.replace(
-    /\b(\d+(?:\.\d+)?)\s*(?:m|million)\b/gi,
+    /\b(\d+(?:\.\d+)?)(?:m|\s*million)\b/gi,
     (_, n: string) => String(Math.round(Number(n) * 1_000_000)),
   );
 }

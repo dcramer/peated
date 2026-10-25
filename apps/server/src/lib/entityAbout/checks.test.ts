@@ -600,9 +600,32 @@ describe("checkConflictPicks", () => {
     expect(stills(1600000, "It makes 1.6 million litres.")).toBeDefined();
     // A citation may state the number as the page writes it.
     expect(stills(1.6, "It makes 1.6m litres.")).toBeDefined();
+    // An "m" apart from the number is not a million.
+    expect(
+      stills(1887000000, "Built in 1887 m. by the estate."),
+    ).toBeUndefined();
     // Thousands separators are read before millions: "1,250m" is one number.
     expect(stills(1250000000, "It cost £1,250m.")).toBeDefined();
     expect(stills(250000000, "It cost £1,250m.")).toBeUndefined();
+  });
+
+  test("reads a stated value written in millions", () => {
+    const quote = "It makes 1.6m litres of alcohol a year.";
+    const kept = keepVerifiedCitations(
+      draft({
+        siteFacts: {
+          capacityLitres: {
+            value: 1600000,
+            asOf: null,
+            citations: [{ sourceId: "wp", statedValue: "1.6 million", quote }],
+          },
+        },
+      }),
+      [{ ...page, text: `${page.text} ${quote}` }],
+      null,
+    );
+
+    expect(kept.siteFacts.capacityLitres?.citations).toHaveLength(1);
   });
 
   test("keeps a site fact's date only when a quote states its year", () => {
