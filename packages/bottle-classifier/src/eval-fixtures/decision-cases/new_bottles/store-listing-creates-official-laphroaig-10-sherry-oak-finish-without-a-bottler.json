@@ -1,0 +1,157 @@
+{
+  "id": "store-listing-creates-official-laphroaig-10-sherry-oak-finish-without-a-bottler",
+  "name": "store listing: creates the official Laphroaig 10-year-old Sherry Oak Finish without copying the bottler stored on other Laphroaig Bottles",
+  "input": {
+    "reference": {
+      "name": "Laphroaig 10 Year Old | Sherry Oak Finish | 70cl, 48% ABV",
+      "url": "https://shop.just-whisky.co.uk/products/laphroaig-10-yo-sherry",
+      "imageUrl": null,
+      "currentBottleId": null
+    },
+    "extractedIdentity": {
+      "brand": "Laphroaig",
+      "bottler": null,
+      "expression": "Sherry Oak Finish",
+      "series": null,
+      "distillery": ["Laphroaig"],
+      "category": "single_malt",
+      "stated_age": 10,
+      "abv": 48,
+      "release_year": null,
+      "release_month": null,
+      "release_day": null,
+      "vintage_year": null,
+      "bottling_year": null,
+      "cask_strength": null,
+      "single_cask": null,
+      "maturation": null,
+      "cask_number": null,
+      "outturn": null,
+      "edition": null
+    }
+  },
+  "localCatalog": {
+    "entities": [
+      {
+        "id": 1129,
+        "name": "Laphroaig",
+        "kind": "distillery"
+      }
+    ],
+    "bottles": [
+      {
+        "id": 39096,
+        "name": "Cairdeas",
+        "fullName": "Laphroaig Cairdeas",
+        "brandId": 1129,
+        "bottlerId": 1129,
+        "distillerIds": [1129],
+        "category": "single_malt",
+        "vintageYear": 2022
+      },
+      {
+        "id": 39097,
+        "name": "Cairdeas White Port and Madeira",
+        "fullName": "Laphroaig Cairdeas White Port and Madeira",
+        "brandId": 1129,
+        "bottlerId": 1129,
+        "distillerIds": [1129],
+        "category": "single_malt",
+        "vintageYear": 2023
+      },
+      {
+        "id": 44035,
+        "name": "Single Cask Selection",
+        "fullName": "Laphroaig Single Cask Selection",
+        "brandId": 1129,
+        "bottlerId": 1129,
+        "distillerIds": [1129],
+        "category": "single_malt"
+      },
+      {
+        "id": 44849,
+        "name": "Cask Strength",
+        "fullName": "Laphroaig Cask Strength - Batch 002 - Cask Strength",
+        "brandId": 1129,
+        "bottlerId": 1129,
+        "category": "single_malt",
+        "statedAge": 10,
+        "edition": "Batch 002",
+        "caskStrength": true
+      },
+      {
+        "id": 45033,
+        "name": "Single Cask Selection",
+        "fullName": "Laphroaig Single Cask Selection - Cask Collectors Edition 2 - 60.4% ABV - Single Cask",
+        "brandId": 1129,
+        "bottlerId": 1129,
+        "distillerIds": [1129],
+        "category": "single_malt",
+        "edition": "Cask Collectors Edition 2",
+        "singleCask": true,
+        "maturation": "pedro ximenez",
+        "abv": 60.4
+      },
+      {
+        "id": 45034,
+        "name": "Single Cask Selection",
+        "fullName": "Laphroaig Single Cask Selection - Cask Collectors Edition 1 - 58.3% ABV - Single Cask - Cask Strength",
+        "brandId": 1129,
+        "bottlerId": 1129,
+        "distillerIds": [1129],
+        "category": "single_malt",
+        "edition": "Cask Collectors Edition 1",
+        "caskStrength": true,
+        "singleCask": true,
+        "maturation": "oak",
+        "abv": 58.3
+      }
+    ],
+    "references": [
+      { "name": "Laphroaig Cairdeas (2022)", "bottleId": 39096 },
+      {
+        "name": "Laphroaig Cairdeas White Port and Madeira (2023)",
+        "bottleId": 39097
+      },
+      {
+        "name": "Laphroaig Single Cask Collection Cask Collectors Edition 2",
+        "bottleId": 44035
+      },
+      { "name": "Laphroaig Cask Strength (Batch 002)", "bottleId": 44849 },
+      {
+        "name": "Laphroaig Single Cask Selection - Cask Collectors Edition 2 - Single Cask - Pedro Ximenez - Hogshead",
+        "bottleId": 45033
+      },
+      {
+        "name": "Laphroaig Single Cask Selection - Cask Collectors Edition 1 - Single Cask - Oak",
+        "bottleId": 45034
+      }
+    ]
+  },
+  "provenance": {
+    "source": "curated_regression",
+    "verifiedSourceUrls": [
+      "https://shop.just-whisky.co.uk/products/laphroaig-10-yo-sherry",
+      "https://www.laphroaig.com/whiskies/10-year-old-sherry-oak-finish",
+      "https://www.thespiritsbusiness.com/2021/03/laphroaig-10-years-old-sherry-oak-joins-core-line/"
+    ],
+    "notes": "Guards the rule that an official distillery release has no bottler, even when other Bottles of the same Brand store the Brand as bottler. The local catalog holds the six Laphroaig Bottles that carried bottler Laphroaig (Entity 1129) in the production candidates preserved by store-listing-matches-laphroaig-cairdeas-2022-warehouse-1 (observed July 29, 2026); their names, fields, and references are copied from that capture. Production Bottle 1809, Laphroaig 10-year-old Sherry Oak Finish, has no bottler and is left out so the classifier must create the Bottle and choose its bottler itself. The source title is the exact Just Whisky product title, checked on October 25, 2026: 48% ABV, 10 years old, Oloroso sherry cask finish. Laphroaig's own site lists 10 Year Old Sherry Oak Finish, and The Spirits Business reported in March 2021 that it joined Laphroaig's core range."
+  },
+  "expected": {
+    "status": "classified",
+    "action": "create_bottle",
+    "identityScope": "product",
+    "matchedBottleId": null,
+    "proposedBottle": {
+      "brand": {
+        "id": 1129
+      },
+      "statedAge": 10,
+      "abv": 48,
+      "bottler": null
+    },
+    "proposedBottleNameIncludes": ["Sherry Oak Finish"],
+    "proposedBottleDistillerIds": [1129],
+    "summary": "Create the official Laphroaig 10-year-old Sherry Oak Finish under Brand and distiller Laphroaig with no bottler. The other Laphroaig Bottles' stored bottler is not evidence for this release."
+  }
+}

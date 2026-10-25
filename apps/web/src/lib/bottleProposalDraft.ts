@@ -1,4 +1,5 @@
 import type { BottleFormInitialData } from "@peated/web/components/bottleForm";
+import { z } from "zod";
 
 type ProposalDraftInput = {
   sourceBottle?: BottleFormInitialData | null;
@@ -37,6 +38,25 @@ function selectStableField<Field extends StableField>(
     proposedValue != null
     ? proposedValue
     : sourceBottle?.[field];
+}
+
+const OwnDistilleryBottlerSchema = z.object({
+  brand: z.object({ id: z.number(), kind: z.literal("distillery") }),
+  bottler: z.object({ id: z.number() }),
+});
+
+// Whisky Identity Model: an official distillery release has no bottler. When
+// the source names its distillery Brand as bottler, that value is no evidence
+// for the new Bottle, so the person or classifier decides it fresh. Any other
+// bottler still copies, such as an independent bottler's own label.
+function withoutOwnDistilleryBottler(
+  sourceBottle: BottleFormInitialData | null | undefined,
+) {
+  const parsed = OwnDistilleryBottlerSchema.safeParse(sourceBottle);
+  if (!parsed.success || parsed.data.bottler.id !== parsed.data.brand.id) {
+    return sourceBottle;
+  }
+  return { ...sourceBottle, bottler: null };
 }
 
 function selectStableName({
@@ -135,7 +155,10 @@ export function buildBottleProposalDraft({
       sourceBottle,
       proposedBottle,
     }),
-    bottler: selectStableField("bottler", { sourceBottle, proposedBottle }),
+    bottler: selectStableField("bottler", {
+      sourceBottle: withoutOwnDistilleryBottler(sourceBottle),
+      proposedBottle,
+    }),
     ...exact,
     ...description,
   };

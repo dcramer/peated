@@ -76,6 +76,44 @@ describe("buildBottleProposalDraft", () => {
     });
   });
 
+  test("leaves bottler empty when the source names its distillery Brand as bottler", () => {
+    const laphroaig = { id: 1129, name: "Laphroaig", kind: "distillery" };
+
+    const draft = buildBottleProposalDraft({
+      sourceBottle: {
+        name: "10-year-old",
+        brand: laphroaig,
+        distillers: [laphroaig],
+        bottler: laphroaig,
+      },
+    });
+
+    expect(draft.brand).toEqual(laphroaig);
+    expect(draft.distillers).toEqual([laphroaig]);
+    expect(draft.bottler).toBeNull();
+  });
+
+  test.each([
+    {
+      name: "an independent bottler's own label",
+      entity: { id: 5645, name: "Gordon & MacPhail", kind: "bottler" },
+    },
+    {
+      name: "a Brand that is also its bottler",
+      entity: { id: 5775, name: "Example Bourbon", kind: "brand" },
+    },
+  ])("keeps the source bottler for $name", ({ entity }) => {
+    const draft = buildBottleProposalDraft({
+      sourceBottle: {
+        name: "12-year-old",
+        brand: entity,
+        bottler: entity,
+      },
+    });
+
+    expect(draft.bottler).toEqual(entity);
+  });
+
   test("selects editable fields without carrying source authority", () => {
     const source = {
       id: 101,

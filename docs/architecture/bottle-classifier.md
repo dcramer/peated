@@ -61,7 +61,9 @@ The Bottle `bottler` relationship names a business that independently selects
 and releases whisky made by another producer. An official Brand or distillery
 release has no bottler. A Bottler may also be the Brand, as with Compass Box.
 Ownership, importing, distribution, or physical packing alone does not prove
-this role.
+this role. Another Bottle's stored bottler, even one of the same Brand, is not
+evidence for the Bottle being classified. Older catalog rows often name an
+official Brand as its own bottler.
 
 ## Match And Creation Rules
 

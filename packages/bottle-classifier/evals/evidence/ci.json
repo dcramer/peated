@@ -157,7 +157,10 @@
     "https://www.glenmorangie.com/products/the-quinta-ruban/",
     "https://www.thatboutiqueywhiskycompany.com/whiskies/paul-john",
     "https://whiskyadvocate.com/That-Boutique-y-Whisky-Company-distilled-at-Paul-John-6-year-old-52-9",
-    "https://whiskyadvocate.com/That-Boutique-y-Whisky-Company-Paul-John-6-year-old-batch-2-54-7"
+    "https://whiskyadvocate.com/That-Boutique-y-Whisky-Company-Paul-John-6-year-old-batch-2-54-7",
+    "https://shop.just-whisky.co.uk/products/laphroaig-10-yo-sherry",
+    "https://www.laphroaig.com/whiskies/10-year-old-sherry-oak-finish",
+    "https://www.thespiritsbusiness.com/2021/03/laphroaig-10-years-old-sherry-oak-joins-core-line/"
   ],
   "cases": {
     "1792-single-barrel": {
@@ -5039,6 +5042,43 @@
                 "title": "Macallan Classic Cut 2017 Edition review",
                 "url": "https://thewhiskeywash.com/?p=14822",
                 "description": "The 2017 Edition of Macallan Classic Cut, bottled at cask strength, 58.4%."
+              }
+            ]
+          }
+        ],
+        "errors": []
+      },
+      "pageResults": [],
+      "imageResults": []
+    },
+    "store-listing-creates-official-laphroaig-10-sherry-oak-finish-without-a-bottler": {
+      "searchResult": {
+        "evidence": [
+          {
+            "provider": "firecrawl",
+            "query": "Reviewed Laphroaig 10 Year Old Sherry Oak Finish product evidence",
+            "summary": "Laphroaig lists 10 Year Old Sherry Oak Finish among its whiskies, aged in ex-Bourbon barrels and European Oloroso sherry oak casks. A retailer lists it at 48% ABV, and The Spirits Business reported in March 2021 that it joined Laphroaig's core range.",
+            "results": [
+              {
+                "title": "10 Year Old Sherry Oak Finish",
+                "url": "https://www.laphroaig.com/whiskies/10-year-old-sherry-oak-finish",
+                "domain": "www.laphroaig.com",
+                "description": "Producer page for the expression, its age statement, and its casks.",
+                "extraSnippets": []
+              },
+              {
+                "title": "Laphroaig 10 Year Old | Sherry Oak Finish | 70cl, 48% ABV",
+                "url": "https://shop.just-whisky.co.uk/products/laphroaig-10-yo-sherry",
+                "domain": "shop.just-whisky.co.uk",
+                "description": "Retailer listing with the 48% ABV and 10-year-old age.",
+                "extraSnippets": []
+              },
+              {
+                "title": "Laphroaig 10 Years Old Sherry Oak joins core line",
+                "url": "https://www.thespiritsbusiness.com/2021/03/laphroaig-10-years-old-sherry-oak-joins-core-line/",
+                "domain": "www.thespiritsbusiness.com",
+                "description": "Trade report of the 2021 launch in Laphroaig's core range.",
+                "extraSnippets": []
               }
             ]
           }
