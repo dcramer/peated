@@ -41,6 +41,7 @@
 
 - [x] 5.1 Add the banned-phrase list and About style rules to the `peated-writing` skill as a file the code check imports
 - [x] 5.2 Write one brand article by hand as the second prompt example, as stored data
+- [x] 5.3 Replace Brora with a hand-written Rosebank page as the distillery prompt example, so Brora and Clynelish can be model-check cases
 
 ## 6. The job
 
@@ -50,7 +51,7 @@
 - [x] 6.4 Add the `aboutPipeline` system actor, an on/off switch, and an admin action to queue one Entity or a batch ordered by activity
 - [x] 6.5 Stop `generateEntityDetails` from writing descriptions; keep pronunciation and other fields
 - [x] 6.6 Add tests for each check, saving the next version, kept citations, owner links, and the switch
-- [x] 6.7 Add a model check under `pnpm evals` with 5 Entities
+- [x] 6.7 Add a model check under `pnpm evals` on Entities with saved, reviewed pages
 - [x] 6.8 Give the writer the current page, its notes, and its history timeline; let it keep, fix, add, or drop anything, and accept citations kept unchanged from the current page
 - [x] 6.9 Add `/admin/catalog/clear-entity-descriptions` to clear generated descriptions that are not the published lead, with a test
 

@@ -7,12 +7,15 @@ import { getFactCitations } from "../display";
 import { findAboutWriteErrors } from "../document";
 import { BRORA_ABOUT_EXAMPLE } from "./brora";
 import { JOHNNIE_WALKER_ABOUT_EXAMPLE } from "./johnnieWalker";
+import { ROSEBANK_ABOUT_EXAMPLE } from "./rosebank";
 
-// The examples are the writer's style models and samples of stored documents.
-// They must pass the same checks a generated draft must pass.
+// Rosebank and Johnnie Walker are the writer's style models; Brora is the
+// mock API's page. All are samples of stored documents, so they must pass the
+// same checks a generated draft must pass.
 describe.each([
-  ["Brora", BRORA_ABOUT_EXAMPLE],
+  ["Rosebank", ROSEBANK_ABOUT_EXAMPLE],
   ["Johnnie Walker", JOHNNIE_WALKER_ABOUT_EXAMPLE],
+  ["Brora", BRORA_ABOUT_EXAMPLE],
 ])("%s About example", (_name, example) => {
   test("is a valid document", () => {
     expect(findAboutWriteErrors(example)).toEqual([]);

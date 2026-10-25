@@ -5,9 +5,10 @@ import {
 
 /**
  * Brora's About document, written by a person from the sources in
- * docs/research/catalog/2026-10-23-brora-about.md. It is the writer's style
- * example, the mock API's About page, and a sample of a stored document.
- * Quotes are verbatim from the source pages, checked on 2026-10-23.
+ * docs/research/catalog/2026-10-23-brora-about.md. It is the mock API's About
+ * page and a sample of a stored document. It is not a writer example: Brora
+ * is a model-check case. Quotes are verbatim from the source pages, checked
+ * on 2026-10-23.
  */
 const BRORA_ABOUT_INPUT = {
   sources: [

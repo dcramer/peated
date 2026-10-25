@@ -157,7 +157,7 @@ has it, so a moderator's link carries over. The page shows a link while that
 Entity exists, following merges to the Entity it became. Otherwise it shows
 the name.
 
-A model check runs this job on 5 Entities with saved pages instead of the
+A model check runs this job on 11 Entities with saved pages instead of the
 live web: `apps/server/src/agents/entityAbout/writer.eval.test.ts`. Each case
 in `apps/server/src/agents/entityAbout/evals/` lists its pages, the events a
 careful writer should find, and review notes. See
@@ -183,5 +183,7 @@ Descriptions a person wrote stay.
 
 The prompt is in `apps/server/src/agents/entityAbout/instructions.ts`. Its
 examples are documents people wrote in
-`apps/server/src/lib/entityAbout/examples/`: Brora for a distillery and Johnnie
-Walker for a brand.
+`apps/server/src/lib/entityAbout/examples/`: Rosebank for a distillery and
+Johnnie Walker for a brand. A prompt example cannot be a model-check case, so
+Brora and Clynelish are cases instead. The Brora document stays as the mock
+API's About page.
