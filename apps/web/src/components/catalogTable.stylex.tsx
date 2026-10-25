@@ -54,13 +54,14 @@ export function CatalogTable<Item>({
   const firstNarrowIndex = columns.findIndex(
     (column) => column.priority !== "secondary",
   );
+  const lastIndex = columns.length - 1;
 
   return (
     <div {...stylex.props(styles.frame)}>
       <table {...stylex.props(styles.table)}>
         <caption {...stylex.props(styles.caption)}>{caption}</caption>
         <thead>
-          <tr {...stylex.props(styles.headerRow)}>
+          <tr>
             {columns.map((column, index) => (
               <th
                 key={column.key}
@@ -68,11 +69,14 @@ export function CatalogTable<Item>({
                 {...stylex.props(
                   foundationStyles.fieldLabel,
                   styles.header,
-                  index === 0 && styles.firstColumn,
-                  index === firstNarrowIndex && styles.firstNarrowColumn,
+                  styles.divider,
+                  index === firstNarrowIndex && styles.firstNarrowDivider,
+                  index === 0 && styles.firstDivider,
+                  index === lastIndex && styles.lastDivider,
                   alignStyles[column.align ?? "left"],
                   column.priority === "secondary" && styles.secondary,
                   column.width && widthStyles[column.width],
+                  index === lastIndex && styles.lastColumn,
                 )}
               >
                 {column.header}
@@ -81,12 +85,11 @@ export function CatalogTable<Item>({
           </tr>
         </thead>
         <tbody>
-          {items.map((item) => (
+          {items.map((item, rowIndex) => (
             <tr
               data-record-key={getKey(item)}
               key={getKey(item)}
               {...stylex.props(
-                styles.row,
                 linked && linkedRowStyles.container,
                 linked && linkedRowStyles.onGround,
               )}
@@ -97,12 +100,18 @@ export function CatalogTable<Item>({
                   {...stylex.props(
                     styles.cell,
                     density === "compact" && styles.compactCell,
-                    index === 0 && styles.firstColumn,
-                    index === firstNarrowIndex && styles.firstNarrowColumn,
+                    // DESIGN.md: no divider after the last row.
+                    rowIndex < items.length - 1 && [
+                      styles.divider,
+                      index === firstNarrowIndex && styles.firstNarrowDivider,
+                      index === 0 && styles.firstDivider,
+                      index === lastIndex && styles.lastDivider,
+                    ],
                     alignStyles[column.align ?? "left"],
                     column.padding === "flush" && styles.flushCell,
                     column.priority === "secondary" && styles.secondary,
                     column.width && widthStyles[column.width],
+                    index === lastIndex && styles.lastColumn,
                     column.width === "count" && [
                       foundationStyles.compactRowTitle,
                       styles.countCell,
@@ -122,9 +131,14 @@ export function CatalogTable<Item>({
 }
 
 const styles = stylex.create({
+  // Like linked ItemList rows, the frame reaches 12px past the text on each
+  // side so a row's hover fill has room around its content. Edge cells pad the
+  // text back into line and dividers stop at the text edge.
   frame: {
-    width: "100%",
+    width: "calc(100% + 24px)",
     minWidth: 0,
+    marginRight: "-12px",
+    marginLeft: "-12px",
     overflowX: "hidden",
   },
   table: {
@@ -142,11 +156,6 @@ const styles = stylex.create({
     whiteSpace: "nowrap",
     borderWidth: 0,
   },
-  headerRow: {
-    borderBottomWidth: "1px",
-    borderBottomStyle: "solid",
-    borderBottomColor: colors.hairline,
-  },
   header: {
     boxSizing: "border-box",
     paddingTop: space.x2,
@@ -155,14 +164,6 @@ const styles = stylex.create({
     paddingLeft: space.x3,
     color: colors.inkMuted,
     whiteSpace: "nowrap",
-  },
-  row: {
-    borderBottomWidth: "1px",
-    borderBottomStyle: "solid",
-    borderBottomColor: colors.hairline,
-    ":last-child": {
-      borderBottomWidth: 0,
-    },
   },
   cell: {
     boxSizing: "border-box",
@@ -178,11 +179,27 @@ const styles = stylex.create({
     paddingBottom: space.x2,
     verticalAlign: "top",
   },
-  firstColumn: {
-    paddingLeft: 0,
+  lastColumn: {
+    paddingRight: space.x3,
   },
-  firstNarrowColumn: {
-    paddingLeft: { default: null, [NARROW]: 0 },
+  // A 1px line painted at the cell's bottom edge. Cell backgrounds, unlike
+  // row borders, can stop short of the bleed on the edge cells.
+  divider: {
+    backgroundImage: `linear-gradient(${colors.hairline}, ${colors.hairline})`,
+    backgroundPosition: "left bottom",
+    backgroundRepeat: "no-repeat",
+    backgroundSize: "100% 1px",
+  },
+  firstDivider: {
+    backgroundPosition: "right bottom",
+    backgroundSize: "calc(100% - 12px) 1px",
+  },
+  firstNarrowDivider: {
+    backgroundPosition: { default: "left bottom", [NARROW]: "right bottom" },
+    backgroundSize: { default: "100% 1px", [NARROW]: "calc(100% - 12px) 1px" },
+  },
+  lastDivider: {
+    backgroundSize: "calc(100% - 12px) 1px",
   },
   flushCell: {
     paddingTop: 0,
@@ -209,7 +226,8 @@ const styles = stylex.create({
     },
   },
   menuWidth: {
-    // CatalogTable leaves 12px on each side of the 44px mobile action target.
+    // 12px on each side of the 44px mobile action target; the right side is
+    // the frame's bleed, so the target lines up with the text edge.
     width: "68px",
     paddingRight: space.x3,
     paddingLeft: space.x3,
@@ -229,10 +247,11 @@ const styles = stylex.create({
   figureWidth: {
     width: "76px",
   },
+  // Rating is always the last column, so 12px of each width is the bleed.
   ratingWidth: {
-    width: "184px",
+    width: "196px",
     [NARROW]: {
-      width: "104px",
+      width: "116px",
     },
   },
   left: { textAlign: "left" },
