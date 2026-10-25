@@ -221,6 +221,63 @@ describe("writeEntityAbout", () => {
     expect(await getEntityAbout(db, entity.id)).toBeNull();
   });
 
+  test("gives the retry its failed draft and keeps the pages already read", async ({
+    fixtures,
+  }) => {
+    const entity = await fixtures.Entity({ kind: "distillery" });
+    const filler = draft([
+      { text: "Brora has a rich history.", factIds: [] },
+      { text: "It closed in 1983.", factIds: ["event:2"] },
+    ]);
+    const writer = services(async () =>
+      writer.writer.mock.calls.length === 1
+        ? { draft: filler, pagesRead: [page] }
+        : // The fixed draft cites the same page without reading it again.
+          { draft: goodDraft, pagesRead: [] },
+    );
+
+    const result = await writeEntityAbout({ entityId: entity.id }, writer);
+
+    expect(writer.writer.mock.calls[1]?.[0].previousDraft).toEqual(filler);
+    expect(result).toEqual({ status: "saved", version: 1 });
+    const about = await getEntityAbout(db, entity.id);
+    expect(about?.document.events.map(({ id }) => id)).toEqual([1, 2]);
+  });
+
+  test("tells the retry why the checks dropped a fact", async ({
+    fixtures,
+  }) => {
+    const entity = await fixtures.Entity({ kind: "distillery" });
+    const base = draft([
+      { text: "Brora opened in 1819.", factIds: ["event:1"] },
+      { text: "It closed in 1983.", factIds: ["event:2"] },
+      { text: "A blender bought it in 1983.", factIds: ["event:3"] },
+    ]);
+    // The quote states the year but not the new owner's name.
+    const withUnquotedOwner: AboutDraft = {
+      ...base,
+      events: [
+        ...base.events,
+        {
+          ...base.events[1]!,
+          id: 3,
+          kind: "acquired",
+          newOwnerName: "James Ainslie",
+        },
+      ],
+    };
+    const writer = services(async () => ({
+      draft: withUnquotedOwner,
+      pagesRead: [page],
+    }));
+
+    await writeEntityAbout({ entityId: entity.id }, writer);
+
+    expect(writer.writer.mock.calls[1]?.[0].previousErrors).toContain(
+      'Event 3 (acquired, 1983) was dropped: no one kept quote states its new owner "James Ainslie".',
+    );
+  });
+
   test("on its last try, leaves out sentences citing a dropped fact", async ({
     fixtures,
   }) => {
@@ -247,7 +304,56 @@ describe("writeEntityAbout", () => {
     ).toEqual(["Brora opened in 1819.", "It closed in 1983."]);
   });
 
-  test("saves nothing when leaving out sentences removes the lead", async ({
+  test("on its last try, trims prose longer than its facts allow", async ({
+    fixtures,
+  }) => {
+    const entity = await fixtures.Entity({ kind: "distillery" });
+    const tooLong = draft([
+      { text: "Brora opened in 1819.", factIds: ["event:1"] },
+      { text: "It closed in 1983.", factIds: ["event:2"] },
+      { text: "It was open for 164 years.", factIds: ["event:1", "event:2"] },
+    ]);
+    const writer = services(async () => ({
+      draft: tooLong,
+      pagesRead: [page],
+    }));
+
+    const result = await writeEntityAbout({ entityId: entity.id }, writer);
+
+    expect(result).toMatchObject({ status: "saved" });
+    const saved = await getEntityAbout(db, entity.id);
+    expect(
+      saved?.document.sections.flatMap((section) =>
+        section.sentences.map((sentence) => sentence.text),
+      ),
+    ).toEqual(["Brora opened in 1819.", "It closed in 1983."]);
+  });
+
+  test("never strips a stored page's lead when trimming", async ({
+    fixtures,
+  }) => {
+    const entity = await fixtures.Entity({ kind: "distillery" });
+    await writeEntityAbout(
+      { entityId: entity.id },
+      services(async () => ({ draft: goodDraft, pagesRead: [page] })),
+    );
+    const noLead = draft([
+      { text: "It reopened in 2021.", factIds: ["event:3"] },
+      { text: "It was renamed in 1969.", factIds: ["event:4"] },
+    ]);
+
+    const result = await writeEntityAbout(
+      { entityId: entity.id },
+      services(async () => ({ draft: noLead, pagesRead: [page] })),
+    );
+
+    expect(result).toMatchObject({ status: "rejected" });
+    const about = await getEntityAbout(db, entity.id);
+    expect(about?.version).toBe(1);
+    expect(about?.document.sections[0]?.key).toBe("lead");
+  });
+
+  test("saves a new page's facts when trimming leaves no prose", async ({
     fixtures,
   }) => {
     const entity = await fixtures.Entity({ kind: "distillery" });
@@ -255,12 +361,16 @@ describe("writeEntityAbout", () => {
       { text: "It reopened in 2021.", factIds: ["event:3"] },
       { text: "It was renamed in 1969.", factIds: ["event:4"] },
     ]);
-    const writer = services(async () => ({ draft: noLead, pagesRead: [page] }));
 
-    const result = await writeEntityAbout({ entityId: entity.id }, writer);
+    const result = await writeEntityAbout(
+      { entityId: entity.id },
+      services(async () => ({ draft: noLead, pagesRead: [page] })),
+    );
 
-    expect(result).toMatchObject({ status: "rejected" });
-    expect(await getEntityAbout(db, entity.id)).toBeNull();
+    expect(result).toMatchObject({ status: "saved" });
+    const about = await getEntityAbout(db, entity.id);
+    expect(about?.document.events.map(({ id }) => id)).toEqual([1, 2]);
+    expect(about?.document.sections).toEqual([]);
   });
 
   test("tells the writer which items break the output format", async ({
@@ -295,8 +405,11 @@ describe("writeEntityAbout", () => {
       })),
     );
 
-    // One fact is left, too few for prose, so the lead fails the checks.
-    expect(result).toMatchObject({ status: "rejected" });
+    // One fact is left, too few for prose, so the retry keeps only facts.
+    expect(result).toMatchObject({ status: "saved" });
+    const about = await getEntityAbout(db, entity.id);
+    expect(about?.document.events.map(({ id }) => id)).toEqual([1]);
+    expect(about?.document.sections).toEqual([]);
   });
 
   test("gives the writer its notes, history, and current page", async ({

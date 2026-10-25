@@ -1,5 +1,8 @@
 import { db } from "@peated/server/db";
-import { reviewAboutDraft } from "@peated/server/lib/entityAbout/checks";
+import {
+  reviewAboutDraft,
+  type AboutPageRead,
+} from "@peated/server/lib/entityAbout/checks";
 import { isFactShown } from "@peated/server/lib/entityAbout/display";
 import { normalizeSourceUrl } from "@peated/server/lib/entityAbout/document";
 import { getEntityAbout } from "@peated/server/lib/entityAbout/store";
@@ -47,12 +50,18 @@ async function createEntity({ entity }: Evidence) {
 
 // Each fact of a draft with its citations, marking the ones the checks kept,
 // so a failed case shows which quotes were dropped and why a fact is hidden.
+// Like the job, it counts the pages read on every try so far.
 function describeDraft(
-  { draft, pagesRead }: EntityAboutWriterResult,
+  { draft }: EntityAboutWriterResult,
+  pagesRead: AboutPageRead[],
   kind: Evidence["entity"]["kind"],
 ) {
   const { document, errors: conversionErrors } = draftToDocument(draft);
-  const reviewed = reviewAboutDraft(document, pagesRead, kind, null).document;
+  const {
+    document: reviewed,
+    errors,
+    dropped,
+  } = reviewAboutDraft(document, pagesRead, kind, null);
   const keptSiteFacts = new Map(Object.entries(reviewed.siteFacts));
   const citationKey = ({ sourceId, quote }: AboutCitation) =>
     `${sourceId}\n${quote}`;
@@ -72,6 +81,10 @@ function describeDraft(
     pagesRead: pagesRead.map((page) => page.url),
     // Items the output format rejected never reach the document below.
     conversionErrors,
+    // Why the job retried or rejected this draft, before any trim, and
+    // why the checks dropped each fact.
+    errors,
+    dropped,
     // A fact the checks drop as a whole (an unquoted year, name, or number)
     // shows kept: false; its citations then show which quotes still passed.
     events: document.events.map((event) => {
@@ -120,7 +133,13 @@ describe.skipIf(!isAIGatewayConfigured())("About writer", () => {
       console.info(
         `About writer case ${evidence.case}: ${JSON.stringify({
           result,
-          runs: runs.map((run) => describeDraft(run, evidence.entity.kind)),
+          runs: runs.map((run, index) =>
+            describeDraft(
+              run,
+              runs.slice(0, index + 1).flatMap((r) => r.pagesRead),
+              evidence.entity.kind,
+            ),
+          ),
         })}`,
       );
     });
@@ -146,11 +165,12 @@ describe.skipIf(!isAIGatewayConfigured())("About writer", () => {
       isFactShown(event.citations, document.sources),
     );
     for (const { kind, year } of evidence.expected.events) {
+      const kinds = [kind].flat();
       expect(
         shownEvents.some(
-          (event) => event.kind === kind && event.date.startsWith(year),
+          (event) => kinds.includes(event.kind) && event.date.startsWith(year),
         ),
-        `${kind} in ${year}`,
+        `${kinds.join(" or ")} in ${year}`,
       ).toBe(true);
     }
     // Every source the page shows is one of the saved pages.

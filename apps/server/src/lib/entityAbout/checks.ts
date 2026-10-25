@@ -17,7 +17,7 @@ import {
   getDisagreement,
   getFactCitations,
   getShownFactIds,
-  ISO_DATE_PATTERN,
+  parseDates,
   siteFactId,
   valuesAgree,
 } from "./display";
@@ -48,11 +48,14 @@ const FILLER_WORDS = new Set(["and", "the", "for", "with"]);
 
 /**
  * Whether the quotes state `value`: every number in it, and the whole phrase
- * or every word that carries meaning. A date needs only its year, because
- * pages write months and days many ways.
+ * or every word that carries meaning. A date, or each end of a date range,
+ * needs only its year, because pages write months and days many ways.
  */
 function quotesState(quotes: readonly string[], value: string) {
-  const checked = ISO_DATE_PATTERN.test(value) ? value.slice(0, 4) : value;
+  const dates = parseDates(value);
+  const checked = dates
+    ? [dates.start, dates.end ?? ""].map((date) => date.slice(0, 4)).join(" ")
+    : value;
   const numbers = readNumbers(checked);
   const numbersStated = numbers.every((number) =>
     quotes.some((quote) => containsNumber(quote, number)),
@@ -118,6 +121,16 @@ export function keepVerifiedCitations(
   pages: readonly AboutPageRead[],
   current: EntityAboutDocument | null,
 ): EntityAboutDocument {
+  return verifyCitations(draft, pages, current).document;
+}
+
+/** Like `keepVerifiedCitations`, and also says why each dropped fact went. */
+function verifyCitations(
+  draft: EntityAboutDocument,
+  pages: readonly AboutPageRead[],
+  current: EntityAboutDocument | null,
+) {
+  const dropped: string[] = [];
   const pageText = new Map<string, string>();
   for (const page of pages) {
     const url = normalizeSourceUrl(page.url);
@@ -222,14 +235,35 @@ export function keepVerifiedCitations(
               ),
             ),
           );
-      return (
-        quotesState(quotes, event.date.slice(0, 4)) &&
-        (!event.endDate || quotesState(quotes, event.endDate.slice(0, 4))) &&
-        named(event.name) &&
-        named(event.newOwnerName) &&
-        numbersQuoted(event.text) &&
-        numbersQuoted(event.title)
-      );
+      const year = (date: string) => date.slice(0, 4);
+      const findMissing = () => {
+        if (!event.citations.length) {
+          return "none of its quotes is on a page read and states its statedValue";
+        }
+        if (!quotesState(quotes, year(event.date))) {
+          return `no kept quote states its year ${year(event.date)}`;
+        }
+        if (event.endDate && !quotesState(quotes, year(event.endDate))) {
+          return `no kept quote states its end year ${year(event.endDate)}`;
+        }
+        if (!named(event.name)) {
+          return `no one kept quote states its name "${event.name}"`;
+        }
+        if (!named(event.newOwnerName)) {
+          return `no one kept quote states its new owner "${event.newOwnerName}"`;
+        }
+        if (!numbersQuoted(event.text) || !numbersQuoted(event.title)) {
+          return "its text or title has a number no kept quote states";
+        }
+        return null;
+      };
+      const missing = findMissing();
+      if (missing) {
+        dropped.push(
+          `Event ${event.id} (${event.kind}, ${event.date}) was dropped: ${missing}.`,
+        );
+      }
+      return !missing;
     });
 
   const siteFacts: EntityAboutDocument["siteFacts"] = {};
@@ -245,10 +279,14 @@ export function keepVerifiedCitations(
           ? fact.asOf
           : null;
       siteFacts[field] = { ...fact, asOf, citations };
+    } else {
+      dropped.push(
+        `Site fact ${field} was dropped: no kept quote states ${fact.value}.`,
+      );
     }
   }
 
-  return pruneSources({ ...draft, events, siteFacts });
+  return { document: pruneSources({ ...draft, events, siteFacts }), dropped };
 }
 
 function factSearchText(document: EntityAboutDocument) {
@@ -504,15 +542,17 @@ export function checkConflictPicks(document: EntityAboutDocument) {
 }
 
 /**
- * Leaves out sentences that cite a fact the checks dropped, and sections
- * left with none. The job uses it only on its last attempt (see
- * docs/features/entity-about.md); every sentence left still gets every check.
+ * Fits the prose to what the checks kept: leaves out sentences that cite a
+ * dropped fact, then trims sentences from the end until the counts fit the
+ * shown facts, dropping sections beyond the lead first. The job uses it only
+ * on its last attempt (see docs/features/entity-about.md); every sentence
+ * left still gets every check, and a page left without a lead is not saved.
  */
-export function dropSentencesCitingHiddenFacts(
+export function trimProseToShownFacts(
   document: EntityAboutDocument,
 ): EntityAboutDocument {
   const shown = getShownFactIds(document);
-  const sections = document.sections
+  let sections = document.sections
     .map((section) => ({
       ...section,
       sentences: section.sentences.filter((sentence) =>
@@ -520,7 +560,39 @@ export function dropSentencesCitingHiddenFacts(
       ),
     }))
     .filter((section) => section.sentences.length);
-  return { ...document, sections };
+  if (shown.size < ABOUT_MIN_FACTS_FOR_PROSE)
+    return { ...document, sections: [] };
+  if (shown.size < ABOUT_MIN_FACTS_FOR_SECTIONS) {
+    sections = sections.filter((section) => section.key === "lead");
+  }
+  sections = sections.map((section) =>
+    section.key === "lead"
+      ? {
+          ...section,
+          sentences: section.sentences.slice(
+            0,
+            Math.min(ABOUT_MAX_LEAD_SENTENCES, shown.size),
+          ),
+        }
+      : section,
+  );
+  // Trim from the last section beyond the lead; the lead goes last.
+  let extra =
+    sections.reduce((total, section) => total + section.sentences.length, 0) -
+    shown.size;
+  for (let i = sections.length - 1; i >= 0 && extra > 0; i -= 1) {
+    const section = sections[i]!;
+    const keep = Math.max(
+      section.key === "lead" ? 1 : 0,
+      section.sentences.length - extra,
+    );
+    extra -= section.sentences.length - keep;
+    sections[i] = { ...section, sentences: section.sentences.slice(0, keep) };
+  }
+  return {
+    ...document,
+    sections: sections.filter((section) => section.sentences.length),
+  };
 }
 
 /**
@@ -535,7 +607,11 @@ export function reviewAboutDraft(
   kind: EntityKind,
   current: EntityAboutDocument | null,
 ) {
-  const verified = keepVerifiedCitations(draft, pages, current);
+  const { document: verified, dropped } = verifyCitations(
+    draft,
+    pages,
+    current,
+  );
   const siteFacts: EntityAboutDocument["siteFacts"] = {};
   for (const field of ABOUT_FACT_FIELD_LIST) {
     const fact = verified.siteFacts[field];
@@ -552,5 +628,7 @@ export function reviewAboutDraft(
   // The save rules repeat some checks above, so they run last to keep each
   // reason listed once.
   if (!errors.length) errors.push(...findAboutWriteErrors(document));
-  return { document, errors };
+  // Dropped facts are not errors: the page is saved without them. They tell
+  // a retry what to fix.
+  return { document, errors, dropped };
 }

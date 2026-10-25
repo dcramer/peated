@@ -1,6 +1,7 @@
 import {
   documentToDraft,
   draftToDocument,
+  type AboutDraft,
 } from "@peated/server/agents/entityAbout/draftSchema";
 import {
   runEntityAboutWriter,
@@ -19,9 +20,10 @@ import {
   getSystemActorForDatabase,
 } from "@peated/server/lib/actors";
 import {
-  dropSentencesCitingHiddenFacts,
   keepFoundEntityLinks,
   reviewAboutDraft,
+  trimProseToShownFacts,
+  type AboutPageRead,
 } from "@peated/server/lib/entityAbout/checks";
 import { updateEntityDescription } from "@peated/server/lib/entityAbout/description";
 import {
@@ -127,13 +129,15 @@ export async function writeEntityAbout(
   const current = await getEntityAbout(db, entity.id);
 
   let errors: string[] = [];
+  let previousDraft: AboutDraft | null = null;
+  let retryReasons: string[] = [];
+  // Pages and Entities from every try count, so the retry can keep the
+  // failed draft's citations and links without reading them again.
+  const pagesRead: AboutPageRead[] = [];
+  const entitiesFound: number[] = [];
   let accepted = null;
   for (let attempt = 0; attempt < MAX_ATTEMPTS && !accepted; attempt += 1) {
-    const {
-      draft,
-      pagesRead,
-      entitiesFound = [],
-    } = await services.writer({
+    const run = await services.writer({
       entityId: entity.id,
       name: entity.name,
       kind: entity.kind,
@@ -150,9 +154,13 @@ export async function writeEntityAbout(
       ),
       history,
       currentPage: current ? documentToDraft(current.document) : null,
-      previousErrors: errors,
+      previousDraft,
+      previousErrors: retryReasons,
     });
-    const converted = draftToDocument(draft);
+    pagesRead.push(...run.pagesRead);
+    entitiesFound.push(...(run.entitiesFound ?? []));
+    previousDraft = run.draft;
+    const converted = draftToDocument(run.draft);
     const reviewed = reviewAboutDraft(
       converted.document,
       pagesRead,
@@ -161,28 +169,36 @@ export async function writeEntityAbout(
     );
     // An item the schema rejected is a reason to retry, not a silent gap.
     errors = [...converted.errors, ...reviewed.errors];
+    // A retry also learns which facts the checks dropped, so it can fix
+    // them instead of leaving them out.
+    retryReasons = [...errors, ...reviewed.dropped];
     let document = reviewed.document;
     // Pipeline rule (owner: docs/features/entity-about.md): with no retry
-    // left, a sentence that cites a dropped fact is left out, as the page
-    // would hide it, and the rest must pass every check again.
+    // left, the prose is trimmed to the facts the checks kept, and the
+    // rest must pass every check again.
     if (
       errors.length &&
       !converted.errors.length &&
       attempt === MAX_ATTEMPTS - 1
     ) {
       const kept = reviewAboutDraft(
-        dropSentencesCitingHiddenFacts(reviewed.document),
+        trimProseToShownFacts(reviewed.document),
         pagesRead,
         entity.kind,
         current?.document ?? null,
       );
-      // Leaving out sentences may shorten a page, never strip its lead.
-      const keptLead = kept.document.sections.some(
-        (section) => section.key === "lead",
-      );
-      if (!kept.errors.length && keptLead) {
+      // Trimming may shorten a page, never strip a stored page's lead.
+      const hasLead = (page: { sections: { key: string }[] } | undefined) =>
+        Boolean(page?.sections.some((section) => section.key === "lead"));
+      const trimErrors = [...kept.errors];
+      if (hasLead(current?.document) && !hasLead(kept.document)) {
+        trimErrors.push("Trimming would remove the page's lead.");
+      }
+      if (!trimErrors.length) {
         errors = [];
         document = kept.document;
+      } else {
+        errors.push(...trimErrors.map((error) => `After trimming: ${error}`));
       }
     }
     if (!errors.length) {

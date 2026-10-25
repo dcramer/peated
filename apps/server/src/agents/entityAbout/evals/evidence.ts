@@ -33,7 +33,12 @@ export const EvidenceSchema = z.object({
     .min(1),
   expected: z.object({
     events: z.array(
-      z.object({ kind: z.string(), year: z.string().regex(/^\d{4}$/) }),
+      z.object({
+        // Several kinds when the sources support each, such as a stop that
+        // one source calls closed and another mothballed.
+        kind: z.union([z.string(), z.array(z.string()).min(2)]),
+        year: z.string().regex(/^\d{4}$/),
+      }),
     ),
     thin: z.boolean().optional(),
     notes: z.string(),
