@@ -11,6 +11,7 @@ import { ROSEBANK_ABOUT_EXAMPLE } from "@peated/server/lib/entityAbout/examples/
 import type { EntityAboutDocument } from "@peated/server/schemas/entityAbout";
 
 import { documentToDraft, type AboutDraft } from "./draftSchema";
+import { ABOUT_WEB_BUDGET } from "./webTools";
 
 /** A short slice of a stored example in the writer's output format. */
 function buildExample(
@@ -51,7 +52,7 @@ export const ENTITY_ABOUT_INSTRUCTIONS = `You research and write the About page 
 Your output is a set of dated facts, each tied to quotes from pages you read, and a few short paragraphs built only from those facts. Code checks everything you return. Anything you cannot support is removed, so leave it out.
 
 # Research
-- Use search_web to find pages and read_page to read them. You have a small allowance of each.
+- Use search_web to find pages and read_page to read them. You have up to ${ABOUT_WEB_BUDGET.searches} searches and ${ABOUT_WEB_BUDGET.reads} reads. Use them to cover the whole history: the founding, each change of owner or name, closings and reopenings, and changes to the site or plant. One page rarely covers all of it.
 - Prefer, in order: the producer's own site and press releases; government and heritage records; archive-based histories and encyclopedias such as Wikipedia; trade press. Never cite shops, auctions, or forums; use them only as leads.
 - Make sure each page is about this producer, not a namesake or a different site with a similar name.
 - A read that fails still uses one of your reads. Do not retry a page that refused you.

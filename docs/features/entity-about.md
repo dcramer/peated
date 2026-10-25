@@ -116,7 +116,8 @@ links to the About page only when that page exists.
 ## How The Job Writes A Page
 
 `writeEntityAbout` makes one model call with web search, page-reading, and
-Entity search tools, and fixed web limits. The model gets the Entity's fields, its notes, its
+Entity search tools, and fixed web limits: 16 searches and 24 page reads
+(`ABOUT_WEB_BUDGET`). The model gets the Entity's fields, its notes, its
 history timeline, and the current page, and returns the complete next
 version. It may keep, correct, add, or drop anything. Code then checks it:
 

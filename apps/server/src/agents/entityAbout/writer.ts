@@ -11,14 +11,13 @@ import {
   type EntityAboutWriterInput,
 } from "./instructions";
 import {
+  ABOUT_WEB_BUDGET,
   createAboutWebTools,
   createFirecrawlSource,
   type AboutWebSource,
-  type WebBudget,
 } from "./webTools";
 
-const MAX_TURNS = 24;
-export const ABOUT_WEB_BUDGET: WebBudget = { searches: 6, reads: 8 };
+const MAX_TURNS = 64;
 
 export type EntityAboutWriterResult = {
   draft: AboutDraft;
