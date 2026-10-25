@@ -272,7 +272,31 @@ describe("writeEntityAbout", () => {
     ).toEqual(["Brora opened in 1819.", "It closed in 1983."]);
   });
 
-  test("saves nothing when leaving out sentences removes the lead", async ({
+  test("never strips a stored page's lead when trimming", async ({
+    fixtures,
+  }) => {
+    const entity = await fixtures.Entity({ kind: "distillery" });
+    await writeEntityAbout(
+      { entityId: entity.id },
+      services(async () => ({ draft: goodDraft, pagesRead: [page] })),
+    );
+    const noLead = draft([
+      { text: "It reopened in 2021.", factIds: ["event:3"] },
+      { text: "It was renamed in 1969.", factIds: ["event:4"] },
+    ]);
+
+    const result = await writeEntityAbout(
+      { entityId: entity.id },
+      services(async () => ({ draft: noLead, pagesRead: [page] })),
+    );
+
+    expect(result).toMatchObject({ status: "rejected" });
+    const about = await getEntityAbout(db, entity.id);
+    expect(about?.version).toBe(1);
+    expect(about?.document.sections[0]?.key).toBe("lead");
+  });
+
+  test("saves a new page's facts when trimming leaves no prose", async ({
     fixtures,
   }) => {
     const entity = await fixtures.Entity({ kind: "distillery" });
@@ -280,12 +304,16 @@ describe("writeEntityAbout", () => {
       { text: "It reopened in 2021.", factIds: ["event:3"] },
       { text: "It was renamed in 1969.", factIds: ["event:4"] },
     ]);
-    const writer = services(async () => ({ draft: noLead, pagesRead: [page] }));
 
-    const result = await writeEntityAbout({ entityId: entity.id }, writer);
+    const result = await writeEntityAbout(
+      { entityId: entity.id },
+      services(async () => ({ draft: noLead, pagesRead: [page] })),
+    );
 
-    expect(result).toMatchObject({ status: "rejected" });
-    expect(await getEntityAbout(db, entity.id)).toBeNull();
+    expect(result).toMatchObject({ status: "saved" });
+    const about = await getEntityAbout(db, entity.id);
+    expect(about?.document.events.map(({ id }) => id)).toEqual([1, 2]);
+    expect(about?.document.sections).toEqual([]);
   });
 
   test("tells the writer which items break the output format", async ({
@@ -320,8 +348,11 @@ describe("writeEntityAbout", () => {
       })),
     );
 
-    // One fact is left, too few for prose, so the lead fails the checks.
-    expect(result).toMatchObject({ status: "rejected" });
+    // One fact is left, too few for prose, so the retry keeps only facts.
+    expect(result).toMatchObject({ status: "saved" });
+    const about = await getEntityAbout(db, entity.id);
+    expect(about?.document.events.map(({ id }) => id)).toEqual([1]);
+    expect(about?.document.sections).toEqual([]);
   });
 
   test("gives the writer its notes, history, and current page", async ({

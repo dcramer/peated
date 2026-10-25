@@ -105,7 +105,7 @@ check SHALL use the same list.
 A rejected draft SHALL be retried once. On the retry, the job SHALL leave out
 sentences that cite a fact the checks dropped, SHALL trim sentences from the
 end, sections beyond the lead first, until the length limits fit, and SHALL
-check the rest again. It SHALL NOT remove the lead. If the retry still fails, the job SHALL keep the
+check the rest again. It SHALL NOT remove the lead of a stored page. If the retry still fails, the job SHALL keep the
 stored document unchanged and log the reason. It SHALL NOT save unsourced
 text.
 

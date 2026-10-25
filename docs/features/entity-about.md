@@ -147,8 +147,9 @@ gets its retry. A draft with no sourced facts fails.
 A draft that fails gets one retry with the reasons. On the retry, the prose is
 trimmed to the facts the checks kept: a sentence that cites a dropped fact is
 left out, as the page would hide it, then sentences are trimmed from the end,
-sections beyond the lead first, until the length limits fit. The lead is never
-removed, and the rest must pass every check. Otherwise
+sections beyond the lead first, until the length limits fit. The trim never
+removes the lead of a page already stored; a new page whose facts are too few
+for prose is saved with facts only. The rest must pass every check. Otherwise
 the job saves nothing. A draft that passes is saved as the next version, with a version
 check: when a moderator saves the page during the run, their version stays
 and the job saves nothing. A bad run is undone by restoring an earlier

@@ -176,13 +176,18 @@ export async function writeEntityAbout(
         entity.kind,
         current?.document ?? null,
       );
-      // Trimming may shorten a page, never strip its lead.
-      const keptLead = kept.document.sections.some(
-        (section) => section.key === "lead",
-      );
-      if (!kept.errors.length && keptLead) {
+      // Trimming may shorten a page, never strip a stored page's lead.
+      const hasLead = (page: { sections: { key: string }[] } | undefined) =>
+        Boolean(page?.sections.some((section) => section.key === "lead"));
+      const trimErrors = [...kept.errors];
+      if (hasLead(current?.document) && !hasLead(kept.document)) {
+        trimErrors.push("Trimming would remove the page's lead.");
+      }
+      if (!trimErrors.length) {
         errors = [];
         document = kept.document;
+      } else {
+        errors.push(...trimErrors.map((error) => `After trimming: ${error}`));
       }
     }
     if (!errors.length) {
