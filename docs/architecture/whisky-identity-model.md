@@ -465,6 +465,20 @@ product's name. Create a separate Bottle only when a source shows that the
 liquid differs: a different vatting, cask, ABV, age, or a stated separate
 outturn.
 
+An older bottling of an ongoing expression can be its own Bottle. A core
+expression sold for decades, such as Laphroaig 15-year-old from 1985 to 2009,
+was vatted many times, and old bottlings often taste different. Make a
+separate Bottle for an older label generation when its printed wording or
+strength differs from later bottlings, such as the 1980s
+`Unblended Islay Malt` label. Keep the expression `name` and put the
+distinguishing printed wording in `edition` (`Unblended`). A pre-1992 size
+such as 75cl helps date a bottle but does not make a separate Bottle by
+itself. Leave `bottlingYear` and `releaseYear` null unless the label or a
+dated source gives the year; a decade such as "1980s" is not a year. An
+importer's strip label, such as `Importato da Francesco Cinzano`, does not
+change the liquid: store it as a Bottle reference, never as `edition` or
+`bottler`.
+
 Brand identity is not a longest-prefix match. Distillery, bottler, owner,
 importer, and parent-company names may appear in source text without becoming
 the brand. Canonical names and references are evidence, but stale or
