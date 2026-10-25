@@ -26,9 +26,15 @@ export default async function BottlePricesPage(props: {
   params: Promise<{ bottleId: string }>;
 }) {
   const { bottleId } = await props.params;
-  const bottle = await getBottlePage(parseCatalogRouteId(bottleId));
-  const { client } = await getAnonymousServerClient();
-  const priceList = await client.bottles.prices.list({ bottle: bottle.id });
+  const id = parseCatalogRouteId(bottleId);
+  // Web performance: read alongside the Bottle with the route ID. A merged
+  // Bottle has another ID, and getBottlePage redirects before this renders.
+  const [, priceList] = await Promise.all([
+    getBottlePage(id),
+    getAnonymousServerClient().then(({ client }) =>
+      client.bottles.prices.list({ bottle: id }),
+    ),
+  ]);
 
   return priceList.results.length ? (
     <BottleSellerList sellers={priceList.results} />
