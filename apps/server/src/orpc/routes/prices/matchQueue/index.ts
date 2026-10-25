@@ -3,6 +3,7 @@ import cancelRetryRun from "./cancel-retry-run";
 import createBottle from "./create-bottle";
 import details from "./details";
 import list from "./list";
+import priceDetails from "./price-details";
 import reopen from "./reopen";
 import resolve from "./resolve";
 import retry from "./retry";
@@ -15,6 +16,7 @@ export default {
   createBottle,
   details,
   list,
+  priceDetails,
   resolve,
   reopen,
   retryAll,

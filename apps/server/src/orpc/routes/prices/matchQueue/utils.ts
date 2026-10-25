@@ -7,6 +7,9 @@ import {
 import { db } from "@peated/server/db";
 import {
   bottles,
+  externalSites,
+  storePriceMatchProposals,
+  storePrices,
   type Bottle,
   type ExternalSite,
   type StorePrice,
@@ -31,8 +34,9 @@ import {
 import { serialize } from "@peated/server/serializers";
 import { BottleSerializer } from "@peated/server/serializers/bottle";
 import { StorePriceWithSiteSerializer } from "@peated/server/serializers/storePrice";
-import { inArray } from "drizzle-orm";
+import { eq, inArray, type SQL } from "drizzle-orm";
 import { z } from "zod";
+import { getQueueIsProcessingSql } from "./filters";
 
 type QueueRow = {
   isProcessing?: boolean;
@@ -203,6 +207,49 @@ function getAutomationBlockersFromError(error: string): string[] {
   } catch {
     return [error];
   }
+}
+
+/**
+ * Read one proposal with its price and store, in any status, as a queue item.
+ * Returns null when no proposal matches.
+ */
+export async function getQueueItem(
+  where: SQL,
+  context: Context,
+  readContext: {
+    caller: string;
+    operation: string;
+  },
+) {
+  const [row] = await db
+    .select({
+      isProcessing: getQueueIsProcessingSql(),
+      proposal: storePriceMatchProposals,
+      price: storePrices,
+      site: externalSites,
+    })
+    .from(storePriceMatchProposals)
+    .innerJoin(
+      storePrices,
+      eq(storePrices.id, storePriceMatchProposals.priceId),
+    )
+    .innerJoin(externalSites, eq(externalSites.id, storePrices.externalSiteId))
+    .where(where)
+    .limit(1);
+  if (!row) return null;
+
+  const [result] = await serializeQueueItems(
+    [
+      {
+        isProcessing: row.isProcessing,
+        proposal: row.proposal,
+        price: { ...row.price, externalSite: row.site },
+      },
+    ],
+    context,
+    readContext,
+  );
+  return result;
 }
 
 export async function serializeQueueItems(

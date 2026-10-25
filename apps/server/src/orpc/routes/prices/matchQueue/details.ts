@@ -1,9 +1,4 @@
-import { db } from "@peated/server/db";
-import {
-  externalSites,
-  storePriceMatchProposals,
-  storePrices,
-} from "@peated/server/db/schema";
+import { storePriceMatchProposals } from "@peated/server/db/schema";
 import { procedure } from "@peated/server/orpc";
 import { requireMod } from "@peated/server/orpc/middleware";
 import {
@@ -12,8 +7,7 @@ import {
 } from "@peated/server/schemas";
 import { eq } from "drizzle-orm";
 import { z } from "zod";
-import { getQueueIsProcessingSql } from "./filters";
-import { serializeQueueItems } from "./utils";
+import { getQueueItem } from "./utils";
 
 export default procedure
   .use(requireMod)
@@ -32,48 +26,15 @@ export default procedure
   )
   .output(detailsResponse(StorePriceMatchQueueItemSchema))
   .handler(async function ({ input, context, errors }) {
-    const [row] = await db
-      .select({
-        isProcessing: getQueueIsProcessingSql(),
-        proposal: storePriceMatchProposals,
-        price: storePrices,
-        site: externalSites,
-      })
-      .from(storePriceMatchProposals)
-      .innerJoin(
-        storePrices,
-        eq(storePrices.id, storePriceMatchProposals.priceId),
-      )
-      .innerJoin(
-        externalSites,
-        eq(externalSites.id, storePrices.externalSiteId),
-      )
-      .where(eq(storePriceMatchProposals.id, input.proposal))
-      .limit(1);
-
-    if (!row) {
+    const result = await getQueueItem(
+      eq(storePriceMatchProposals.id, input.proposal),
+      context,
+      { caller: "prices.matchQueue.details", operation: "hydrate" },
+    );
+    if (!result) {
       throw errors.NOT_FOUND({
         message: "Price match proposal not found.",
       });
     }
-
-    const [result] = await serializeQueueItems(
-      [
-        {
-          isProcessing: row.isProcessing,
-          proposal: row.proposal,
-          price: {
-            ...row.price,
-            externalSite: row.site,
-          },
-        },
-      ],
-      context,
-      {
-        caller: "prices.matchQueue.details",
-        operation: "hydrate",
-      },
-    );
-
     return result;
   });

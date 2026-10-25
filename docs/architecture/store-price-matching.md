@@ -121,6 +121,13 @@ a saved Bottle reference would assign the same Bottle again; correct that
 reference first. It does not remove an image the listing gave the Bottle or
 retire a Bottle that a create made; those need a Bottle edit or merge.
 
+Price lists return price IDs, and the queue lists only proposals that still
+need review. To find the proposal behind a price, a moderator calls
+`GET /prices/{price}/match-proposal`. It returns the price's one proposal in
+any status, with the proposal `id` and `updatedAt`, the price's
+`sourceFingerprint`, and the Bottle the price has now (`price.bottle`). Those
+are the values the reopen route expects.
+
 A moderator may atomically create a complete, independently reviewed Bottle
 from any reviewable proposal, including an `errored` one. An active
 processing lease still blocks the write. A Bottle that needs a catalog fix
