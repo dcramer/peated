@@ -9,7 +9,7 @@ import {
   checkConflictPicks,
   keepVerifiedCitations,
 } from "./checks";
-import { getDisagreement, valuesAgree } from "./display";
+import { getDateDisagreement, getDisagreement, valuesAgree } from "./display";
 import { toPublicEntityAbout } from "./publicAbout";
 
 const source = {
@@ -482,6 +482,35 @@ describe("checkConflictPicks", () => {
     // "1931-38" states 1938, but not a year it does not span.
     expect(reopened("1938")).toBe(1);
     expect(reopened("1948")).toBe(0);
+  });
+
+  test("keeps an era whose start and end years come from different quotes", () => {
+    const start = "Malt Mill was built on the site in 1908.";
+    const end = "Malt Mill closed in 1962.";
+    const kept = keepVerifiedCitations(
+      draft({
+        events: [
+          {
+            id: 1,
+            kind: "era",
+            title: "Malt Mill",
+            date: "1908",
+            endDate: "1962",
+            citations: [
+              { sourceId: "wp", statedValue: "1908", quote: start },
+              // The end-year quote has no stated value, so the two do not
+              // read as disagreeing.
+              { sourceId: "wp", statedValue: null, quote: end },
+            ],
+          },
+        ],
+      }),
+      [{ ...page, text: `${page.text} ${start} ${end}` }],
+      null,
+    );
+
+    expect(kept.events).toHaveLength(1);
+    expect(getDateDisagreement(kept.events[0]!.citations)).toBeNull();
   });
 
   test("matches whole numbers only", () => {
