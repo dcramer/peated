@@ -170,6 +170,10 @@ describe("keepVerifiedCitations", () => {
         "In 1983 its four stills fell silent.",
       ),
     ).toBe(1);
+    // "1.6 million" in text and "1.6m" in a quote are the same number.
+    expect(
+      kept("Brora made 1.6 million litres.", "In 1983 it made 1.6m litres."),
+    ).toBe(1);
     // A number the check cannot read must appear in a quote as written.
     expect(
       kept("Brora filled two hundred casks.", "Brora closed in 1983."),

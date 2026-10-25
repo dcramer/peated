@@ -208,7 +208,10 @@ export function keepVerifiedCitations(
         readNumbers(writeNumberWords(value ?? "")).every((number) =>
           quotes.some((quote) => containsNumber(quote, number)),
         ) &&
-        (value?.match(NUMBER_WORD_RUN) ?? [])
+        (
+          expandMillions(stripThousands(value ?? "")).match(NUMBER_WORD_RUN) ??
+          []
+        )
           .filter((run) => !readNumberWords(run) && run.toLowerCase() !== "one")
           .every((run) =>
             quotes.some((quote) =>
