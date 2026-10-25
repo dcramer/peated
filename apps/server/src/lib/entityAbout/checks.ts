@@ -53,7 +53,7 @@ const FILLER_WORDS = new Set(["and", "the", "for", "with"]);
  */
 function quotesState(quotes: readonly string[], value: string) {
   const checked = ISO_DATE_PATTERN.test(value) ? value.slice(0, 4) : value;
-  const numbers = stripThousands(checked).match(NUMBER_PATTERN) ?? [];
+  const numbers = readNumbers(checked);
   const numbersStated = numbers.every((number) =>
     quotes.some((quote) => containsNumber(quote, number)),
   );
@@ -205,10 +205,7 @@ export function keepVerifiedCitations(
       // written as digits or words, is a fact, so a quote must state it too.
       // Number words the check cannot read must appear in a quote as written.
       const numbersQuoted = (value: string | null) =>
-        (
-          stripThousands(writeNumberWords(value ?? "")).match(NUMBER_PATTERN) ??
-          []
-        ).every((number) =>
+        readNumbers(writeNumberWords(value ?? "")).every((number) =>
           quotes.some((quote) => containsNumber(quote, number)),
         ) &&
         (value?.match(NUMBER_WORD_RUN) ?? [])
@@ -355,11 +352,26 @@ function writeNumberWords(value: string) {
   return value.replace(NUMBER_WORD_RUN, (run) => readNumberWords(run) ?? run);
 }
 
+// Capacities are often written in millions: "1.6m litres" states 1600000.
+function expandMillions(value: string) {
+  return value.replace(
+    /\b(\d+(?:\.\d+)?)\s*(?:m|million)\b/gi,
+    (_, n: string) => String(Math.round(Number(n) * 1_000_000)),
+  );
+}
+
+/** The numbers a value states, read the same way as quotes. */
+function readNumbers(value: string) {
+  return stripThousands(expandMillions(value)).match(NUMBER_PATTERN) ?? [];
+}
+
 // A whole number: 46 is not inside 46.5 or 146, but 1887 is in "c.1887".
 function containsNumber(text: string, number: string) {
   return new RegExp(
     `(?<!\\d|\\d\\.)${number.replace(".", "\\.")}(?!\\d|\\.\\d)`,
-  ).test(stripThousands(expandYearRanges(writeNumberWords(text))));
+  ).test(
+    stripThousands(expandYearRanges(expandMillions(writeNumberWords(text)))),
+  );
 }
 
 /**
@@ -422,8 +434,7 @@ function checkSentence(
   }
   const errors: string[] = [];
   const cited = sentence.factIds.map((id) => factText.get(id) ?? "").join(" ");
-  for (const number of stripThousands(sentence.text).match(NUMBER_PATTERN) ??
-    []) {
+  for (const number of readNumbers(sentence.text)) {
     if (!containsNumber(cited, number)) {
       errors.push(`${where} states ${number}, which its facts do not.`);
     }

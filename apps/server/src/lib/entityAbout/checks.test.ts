@@ -588,6 +588,12 @@ describe("checkConflictPicks", () => {
     expect(stills(2, "It filled two hundred casks.")).toBeUndefined();
     expect(stills(3, "It holds three thousand casks.")).toBeUndefined();
     expect(stills(12, "A twelve-year-old was released.")).toBeDefined();
+    // Millions are read as whole numbers.
+    expect(stills(1600000, "It makes 1.6m litres of alcohol.")).toBeDefined();
+    expect(stills(2000000, "It makes 2 million litres.")).toBeDefined();
+    expect(stills(1600000, "It is 1.6 metres tall.")).toBeUndefined();
+    // A value written in millions reads the same way as the quote.
+    expect(stills(1600000, "It makes 1.6 million litres.")).toBeDefined();
   });
 
   test("keeps a site fact's date only when a quote states its year", () => {
