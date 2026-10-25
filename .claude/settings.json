@@ -22,6 +22,12 @@
     ],
     "deny": []
   },
+  "autoMode": {
+    "allow": [
+      "$defaults",
+      "Production Peated catalog reads and writes (merges, PATCHes, About page saves) through the authenticated `pnpm -s cli api` client, when they follow docs/operations/catalog-maintenance.md: the change was researched and staged, its records were re-checked against a fresh snapshot just before the write, and the result is verified after."
+    ]
+  },
   "hooks": {
     "SessionStart": [
       {
