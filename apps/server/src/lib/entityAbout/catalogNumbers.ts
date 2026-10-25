@@ -23,8 +23,12 @@ function activeBottle(): SQL<unknown> {
   return sql`${bottles.groupId} IS NOT NULL AND NOT EXISTS(SELECT FROM ${bottleTombstones} WHERE ${bottleTombstones.bottleId} = ${bottles.id})`;
 }
 
+// Identity rule (owner: docs/architecture/whisky-identity-model.md): a
+// distillery's own line is sold under the distillery as Brand and distilled
+// there. Many such Bottles have no distiller recorded yet, so they count too;
+// one that names another distiller does not.
 function distilledAt(entityId: number): SQL<unknown> {
-  return sql`EXISTS(SELECT FROM ${bottlesToDistillers} WHERE ${bottlesToDistillers.distillerId} = ${entityId} AND ${bottlesToDistillers.bottleId} = ${bottles.id})`;
+  return sql`(EXISTS(SELECT FROM ${bottlesToDistillers} WHERE ${bottlesToDistillers.distillerId} = ${entityId} AND ${bottlesToDistillers.bottleId} = ${bottles.id}) OR (${bottles.brandId} = ${entityId} AND NOT EXISTS(SELECT FROM ${bottlesToDistillers} WHERE ${bottlesToDistillers.bottleId} = ${bottles.id})))`;
 }
 
 async function countByYear(
