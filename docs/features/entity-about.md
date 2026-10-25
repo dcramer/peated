@@ -144,7 +144,9 @@ Site facts that do not apply to the Entity's kind are dropped, and the
 store's own save rules run as a check too, so a draft the store would reject
 gets its retry. A draft with no sourced facts fails.
 
-A draft that fails gets one retry with the reasons. On the retry, the prose is
+A draft that fails gets one retry with that draft and the reasons, so the
+writer fixes what the checks name instead of starting over. Pages read on the
+first try count on the retry. On the retry, the prose is
 trimmed to the facts the checks kept: a sentence that cites a dropped fact is
 left out, as the page would hide it, then sentences are trimmed from the end,
 sections beyond the lead first, until the length limits fit. The trim never

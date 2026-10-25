@@ -118,6 +118,8 @@ export type EntityAboutWriterInput = {
   history: string[];
   /** The page as it is now, in the output format, or null for a new page. */
   currentPage: AboutDraft | null;
+  /** On a retry, the draft that failed and why. */
+  previousDraft?: AboutDraft | null;
   previousErrors?: string[];
 };
 
@@ -158,9 +160,15 @@ export function buildEntityAboutInput(input: EntityAboutWriterInput) {
   if (input.previousErrors?.length) {
     lines.push(
       "",
-      "Your previous draft failed these checks. Fix them:",
+      "Your previous draft failed these checks. Return that draft fixed: keep every fact, citation, and sentence the checks do not name, and change only what they name. The pages it cited count as read.",
       ...input.previousErrors.map((error) => `- ${error}`),
     );
+    if (input.previousDraft) {
+      lines.push(
+        "",
+        `Your previous draft:\n${JSON.stringify(input.previousDraft)}`,
+      );
+    }
   }
   return lines.filter((line) => line !== null).join("\n");
 }

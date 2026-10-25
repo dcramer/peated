@@ -221,6 +221,29 @@ describe("writeEntityAbout", () => {
     expect(await getEntityAbout(db, entity.id)).toBeNull();
   });
 
+  test("gives the retry its failed draft and keeps the pages already read", async ({
+    fixtures,
+  }) => {
+    const entity = await fixtures.Entity({ kind: "distillery" });
+    const filler = draft([
+      { text: "Brora has a rich history.", factIds: [] },
+      { text: "It closed in 1983.", factIds: ["event:2"] },
+    ]);
+    const writer = services(async () =>
+      writer.writer.mock.calls.length === 1
+        ? { draft: filler, pagesRead: [page] }
+        : // The fixed draft cites the same page without reading it again.
+          { draft: goodDraft, pagesRead: [] },
+    );
+
+    const result = await writeEntityAbout({ entityId: entity.id }, writer);
+
+    expect(writer.writer.mock.calls[1]?.[0].previousDraft).toEqual(filler);
+    expect(result).toEqual({ status: "saved", version: 1 });
+    const about = await getEntityAbout(db, entity.id);
+    expect(about?.document.events.map(({ id }) => id)).toEqual([1, 2]);
+  });
+
   test("on its last try, leaves out sentences citing a dropped fact", async ({
     fixtures,
   }) => {

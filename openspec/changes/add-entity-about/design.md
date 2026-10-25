@@ -247,8 +247,10 @@ that the pick is one of the stated values.
      appears in those facts.
    - Length limits match the number of shown facts.
    - No banned phrases, and no sentence over 30 words.
-3. **Retry.** A draft that fails gets one retry with the failure reasons.
-   After that, the job logs the reason and saves nothing.
+3. **Retry.** A draft that fails gets one retry with that draft and the
+   failure reasons; pages read on the first try count. The retry's prose is
+   trimmed to fit its facts. After that, the job logs the reason and saves
+   nothing.
 4. **Save.**
    - Keep only Entity links from search or the current page, then save the
      draft as the next version with a version check and record the change.

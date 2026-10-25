@@ -1,6 +1,7 @@
 import {
   documentToDraft,
   draftToDocument,
+  type AboutDraft,
 } from "@peated/server/agents/entityAbout/draftSchema";
 import {
   runEntityAboutWriter,
@@ -22,6 +23,7 @@ import {
   keepFoundEntityLinks,
   reviewAboutDraft,
   trimProseToShownFacts,
+  type AboutPageRead,
 } from "@peated/server/lib/entityAbout/checks";
 import { updateEntityDescription } from "@peated/server/lib/entityAbout/description";
 import {
@@ -127,13 +129,14 @@ export async function writeEntityAbout(
   const current = await getEntityAbout(db, entity.id);
 
   let errors: string[] = [];
+  let previousDraft: AboutDraft | null = null;
+  // Pages and Entities from every try count, so the retry can keep the
+  // failed draft's citations and links without reading them again.
+  const pagesRead: AboutPageRead[] = [];
+  const entitiesFound: number[] = [];
   let accepted = null;
   for (let attempt = 0; attempt < MAX_ATTEMPTS && !accepted; attempt += 1) {
-    const {
-      draft,
-      pagesRead,
-      entitiesFound = [],
-    } = await services.writer({
+    const run = await services.writer({
       entityId: entity.id,
       name: entity.name,
       kind: entity.kind,
@@ -150,9 +153,13 @@ export async function writeEntityAbout(
       ),
       history,
       currentPage: current ? documentToDraft(current.document) : null,
+      previousDraft,
       previousErrors: errors,
     });
-    const converted = draftToDocument(draft);
+    pagesRead.push(...run.pagesRead);
+    entitiesFound.push(...(run.entitiesFound ?? []));
+    previousDraft = run.draft;
+    const converted = draftToDocument(run.draft);
     const reviewed = reviewAboutDraft(
       converted.document,
       pagesRead,
