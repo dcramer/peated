@@ -44,21 +44,18 @@ describe("getEntityHistoryEvents", () => {
       {
         date: "1816",
         description: "Licensed on Islay.",
-        source: { href: "https://example.com/opened", label: "Source" },
         state: "operating",
         title: "Opened",
       },
       {
         date: "May 1983",
         description: undefined,
-        source: undefined,
         state: "silent",
         title: "Closed",
       },
       {
         date: "Jun 15, 1984",
         description: "The stills remained silent.",
-        source: undefined,
         state: "silent",
         title: undefined,
       },

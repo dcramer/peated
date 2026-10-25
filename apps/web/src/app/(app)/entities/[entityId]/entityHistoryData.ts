@@ -50,9 +50,6 @@ export function getEntityHistoryEvents(
     return {
       date: formatEventDate(event.date),
       description: event.description ?? undefined,
-      source: event.sourceUrl
-        ? { href: event.sourceUrl, label: "Source" }
-        : undefined,
       state,
       title: eventTitles[event.kind],
     };
