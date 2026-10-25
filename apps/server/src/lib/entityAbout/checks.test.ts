@@ -143,6 +143,35 @@ describe("keepVerifiedCitations", () => {
     expect(kept("2024")).toBe(0);
   });
 
+  test("drops an event whose text has a number word no quote states", () => {
+    const kept = (text: string, quote: string) =>
+      keepVerifiedCitations(
+        draft({
+          events: [
+            {
+              id: 1,
+              kind: "generic",
+              date: "1983",
+              text,
+              citations: [{ sourceId: "wp", statedValue: "1983", quote }],
+            },
+          ],
+        }),
+        [{ ...page, text: `${page.text} ${quote}` }],
+        null,
+      ).events.length;
+
+    expect(
+      kept("Brora closed with four stills.", "Brora closed in 1983."),
+    ).toBe(0);
+    expect(
+      kept(
+        "Brora closed with four stills.",
+        "In 1983 its four stills fell silent.",
+      ),
+    ).toBe(1);
+  });
+
   test("drops an owner name no quote states", () => {
     const owned = (newOwnerName: string, quote: string) =>
       keepVerifiedCitations(
