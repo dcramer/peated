@@ -16,7 +16,6 @@ const broraHistory = [
     date: "1969",
     description:
       "The original distillery reopened under the Brora name after the new Clynelish stillhouse began production.",
-    source: { href: "https://www.diageo.com/", label: "Diageo archive" },
     state: "operating",
     title: "Renamed Brora",
   },

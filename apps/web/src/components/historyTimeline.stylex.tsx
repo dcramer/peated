@@ -2,7 +2,6 @@ import * as stylex from "@stylexjs/stylex";
 
 import { foundationStyles } from "../styles/foundations.stylex";
 import { colors, space } from "../styles/tokens.stylex";
-import { TextLink } from "./textLink.stylex";
 
 const COMPACT = "@media (max-width: 639px)";
 
@@ -12,10 +11,6 @@ export type HistoryEvent = {
   date: string;
   description?: string;
   note?: string;
-  source?: {
-    href: string;
-    label?: string;
-  };
   state: HistoryState;
   title?: string;
 };
@@ -62,17 +57,6 @@ export function HistoryTimeline({ events, summary }: HistoryTimelineProps) {
                   {event.note}
                 </span>
               ) : null}
-              {event.source ? (
-                <span {...stylex.props(foundationStyles.metadata)}>
-                  <TextLink
-                    href={event.source.href}
-                    rel="noreferrer"
-                    target="_blank"
-                  >
-                    {event.source.label ?? "Source"}
-                  </TextLink>
-                </span>
-              ) : null}
             </div>
           </li>
         ))}
@@ -104,9 +88,9 @@ const styles = stylex.create({
     },
     columnGap: { default: space.x4, [COMPACT]: space.x3 },
     minWidth: 0,
-    paddingTop: space.x4,
+    paddingTop: space.x3,
     paddingRight: { default: space.x4, [COMPACT]: space.x2 },
-    paddingBottom: space.x4,
+    paddingBottom: space.x3,
     paddingLeft: { default: space.x4, [COMPACT]: space.x3 },
     borderLeftWidth: "4px",
     borderLeftStyle: "solid",
@@ -129,7 +113,7 @@ const styles = stylex.create({
     minWidth: 0,
     flexDirection: "column",
     alignItems: "flex-start",
-    rowGap: space.x2,
+    rowGap: space.x1,
   },
   note: {
     color: colors.inkMuted,
