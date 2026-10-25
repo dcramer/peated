@@ -9,7 +9,7 @@ import {
   checkConflictPicks,
   keepVerifiedCitations,
 } from "./checks";
-import { getDisagreement, valuesAgree } from "./display";
+import { getDateDisagreement, getDisagreement, valuesAgree } from "./display";
 import { toPublicEntityAbout } from "./publicAbout";
 
 const source = {
@@ -141,6 +141,45 @@ describe("keepVerifiedCitations", () => {
     // 2021 is on the page; 2024 is not, so a claimed 2024 date is no evidence.
     expect(kept("2021")).toBe(1);
     expect(kept("2024")).toBe(0);
+  });
+
+  test("drops an event whose text has a number word no quote states", () => {
+    const kept = (text: string, quote: string) =>
+      keepVerifiedCitations(
+        draft({
+          events: [
+            {
+              id: 1,
+              kind: "generic",
+              date: "1983",
+              text,
+              citations: [{ sourceId: "wp", statedValue: "1983", quote }],
+            },
+          ],
+        }),
+        [{ ...page, text: `${page.text} ${quote}` }],
+        null,
+      ).events.length;
+
+    expect(
+      kept("Brora closed with four stills.", "Brora closed in 1983."),
+    ).toBe(0);
+    expect(
+      kept(
+        "Brora closed with four stills.",
+        "In 1983 its four stills fell silent.",
+      ),
+    ).toBe(1);
+    // A number the check cannot read must appear in a quote as written.
+    expect(
+      kept("Brora filled two hundred casks.", "Brora closed in 1983."),
+    ).toBe(0);
+    expect(
+      kept(
+        "Brora filled two hundred casks.",
+        "In 1983 Brora filled two hundred casks.",
+      ),
+    ).toBe(1);
   });
 
   test("drops an owner name no quote states", () => {
@@ -484,6 +523,35 @@ describe("checkConflictPicks", () => {
     expect(reopened("1948")).toBe(0);
   });
 
+  test("keeps an era whose start and end years come from different quotes", () => {
+    const start = "Malt Mill was built on the site in 1908.";
+    const end = "Malt Mill closed in 1962.";
+    const kept = keepVerifiedCitations(
+      draft({
+        events: [
+          {
+            id: 1,
+            kind: "era",
+            title: "Malt Mill",
+            date: "1908",
+            endDate: "1962",
+            citations: [
+              { sourceId: "wp", statedValue: "1908", quote: start },
+              // The end-year quote has no stated value, so the two do not
+              // read as disagreeing.
+              { sourceId: "wp", statedValue: null, quote: end },
+            ],
+          },
+        ],
+      }),
+      [{ ...page, text: `${page.text} ${start} ${end}` }],
+      null,
+    );
+
+    expect(kept.events).toHaveLength(1);
+    expect(getDateDisagreement(kept.events[0]!.citations)).toBeNull();
+  });
+
   test("matches whole numbers only", () => {
     const stills = (value: number, quote: string) =>
       keepVerifiedCitations(
@@ -505,6 +573,21 @@ describe("checkConflictPicks", () => {
     // 46 is not stated by 46.5; a year after "c." is still a whole number.
     expect(stills(46, "It holds 46.5 thousand litres.")).toBeUndefined();
     expect(stills(1887, "The still dates from c.1887.")).toBeDefined();
+    // Small counts written as words state their number, whole words only.
+    expect(stills(2, "The two wash stills are heated by steam.")).toBeDefined();
+    expect(stills(4, "All four stills were rebuilt.")).toBeDefined();
+    expect(stills(10, "The stills tend to run slowly.")).toBeUndefined();
+    expect(stills(2, "It has one wash still.")).toBeUndefined();
+    // A word inside a larger number is not read.
+    expect(stills(2, "It filled twenty-two casks.")).toBeUndefined();
+    expect(stills(2, "It filled twenty two casks.")).toBeUndefined();
+    expect(stills(2, "It filled twenty\u2013two casks.")).toBeUndefined();
+    expect(stills(2, "It filled twenty\u2011two casks.")).toBeUndefined();
+    expect(stills(4, "Rebuilt in 1983\u2014four stills in all.")).toBeDefined();
+    // A run of number words is a larger number, not a small one.
+    expect(stills(2, "It filled two hundred casks.")).toBeUndefined();
+    expect(stills(3, "It holds three thousand casks.")).toBeUndefined();
+    expect(stills(12, "A twelve-year-old was released.")).toBeDefined();
   });
 
   test("keeps a site fact's date only when a quote states its year", () => {

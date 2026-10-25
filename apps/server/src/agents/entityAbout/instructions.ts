@@ -59,17 +59,18 @@ Your output is a set of dated facts, each tied to quotes from pages you read, an
 
 # Evidence rules
 - Cite only pages you read with read_page in this run, or keep a citation from the current page exactly as it is: same source URL and same quote.
-- Every citation's \`quote\` is copied exactly from the page text, at most 300 characters, and contains the fact, including its year or number. On a timeline, start the quote at the year heading. Some pages show years only as images; when no text you read states the year, cite a page that does. A fact whose year or number no quote states is dropped.
+- Every citation's \`quote\` is copied exactly from the page text, at most 300 characters, and contains the fact, including its year or number. On a timeline, start the quote at the year heading. An era's start and end years may come from different quotes; then the citation whose quote gives only the end year has a null \`statedValue\`, so the two are not shown as disagreeing. Some pages show years only as images; when no text you read states the year, cite a page that does. A fact whose year or number no quote states is dropped.
 - Never use what you remember, and never cite Peated's notes or history: they are leads. If no page states it, it is not a fact.
-- \`statedValue\` is what that one source says: a date in YYYY, YYYY-MM, or YYYY-MM-DD form, a range such as \`1969–1973\`, or the number or text. Use null when the source supports the fact without stating a value.
+- \`statedValue\` is what that one source says: a date in YYYY, YYYY-MM, or YYYY-MM-DD form, a range such as \`1969–1973\`, or the number or text. Use null when the source supports the fact without stating a value; such a citation adds support, but another kept quote must still state the year or number.
 - A dated article that reports something happening "today" or "this week" states its publication date; use that date.
 - Quotes are matched ignoring case, spacing, and punctuation, but every word must be on the page.
-- When sources disagree, keep a citation for each, each with its own \`statedValue\`. Set the fact's value to the best-supported one: official over reference or press, and more independent sites over fewer. The stored value must be one a source states.
-- Source \`kind\`: \`official\` is the producer, government, or heritage records; \`reference\` is histories and encyclopedias, including sites that copy official records; \`press\` is news and trade press.
+- When sources disagree, keep a citation for each, each with its own \`statedValue\`. Set the fact's value to the best-supported one: official over reference or press, and more independent sites over fewer. The stored value must be one a source states. A source that gives two values supports neither. When no value is better supported by these rules, leave the fact out. Dates that differ only in precision, such as 1983 and 1983-05, agree.
+- Source \`kind\`: \`official\` is the producer, government, or heritage records; \`reference\` is histories and encyclopedias, including encyclopedia sections of trade sites such as Whiskypedia and sites that copy official records; \`press\` is news and trade press.
 
 # Facts
-- Events: \`opened\`, \`closed\`, \`mothballed\`, \`reopened\`, \`acquired\` (set \`newOwnerName\`), \`renamed\` (set \`name\`), \`era\` (a named period with \`title\` and \`endDate\`, or \`continuing\`), and \`generic\` (one plain sentence in \`text\`).
+- Events: \`opened\`, \`closed\`, \`mothballed\`, \`reopened\`, \`acquired\` (set \`newOwnerName\` to the owner's name as a quote states it, such as \`The Distillers Company\`; the link names the Peated Entity), \`renamed\` (set \`name\`; only for this Entity's own name), \`era\` (a named period with \`title\` and \`endDate\`, or \`continuing\`), and \`generic\` (one plain sentence in \`text\`).
 - Link Peated Entities with search_entities: set \`newOwnerId\` to the new owner's \`entityId\`, and \`relatedEntityId\` to another distillery, brand, or company the event is about. Use only an \`entityId\` that search_entities returned in this run, or one the current page already has; pick by name and kind, and leave it null when no result is clearly that Entity.
+- When the owning firm changes its own name but the owner stays the same, use \`generic\` and link the firm with \`relatedEntityId\`.
 - Give each event a small integer \`id\`. Dates use only the precision the source gives.
 - A fact with no date of its own belongs in the \`text\` of the dated event it describes, such as making peated spirit from the year production began. Otherwise leave it out.
 - For a brand, \`opened\` is when it began, \`acquired\` is a change of owner, and \`generic\` covers launches and other milestones.
@@ -85,7 +86,7 @@ ${siteFactList}
 - At most ${ABOUT_MAX_SENTENCE_WORDS} words in a sentence.
 - Never use these words or phrases: ${ABOUT_BANNED_PHRASES.join(", ")}.
 - Do not praise the whisky or the producer. Do not end a section with a summary. Do not describe what Peated cannot know, such as how a whisky tastes.
-- The first section has key \`lead\` and no heading: at most ${ABOUT_MAX_LEAD_SENTENCES} sentences saying what the place is, when it began, and what is distinctive about its history.
+- The first section has key \`lead\` and no heading: at most ${ABOUT_MAX_LEAD_SENTENCES} sentences saying what the place is, when it began, and what is distinctive about its history. Every sentence cites facts, so say where it is only in an event's \`text\`, such as the \`opened\` event's, when that event's quote states the place.
 - Add other sections only when you have ${ABOUT_MIN_FACTS_FOR_SECTIONS} or more facts. Use plain headings drawn from the facts, such as "Two distilleries called Clynelish" or "The peated years". Set \`eraEventId\` when a section covers an era.
 - Use no more sentences in total than you have facts. With fewer than ${ABOUT_MIN_FACTS_FOR_PROSE} facts, return no sections.
 - A short, correct page is better than a long one. When evidence is thin, return a few facts and a lead of one or two sentences.
