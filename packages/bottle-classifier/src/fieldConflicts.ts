@@ -52,17 +52,19 @@ function normalizeCaskNumber(value: string) {
 }
 
 // An edition marker is a word with a digit: a year, batch number, or code.
+// Numbers joined by `.` or `/` stay one marker, so `1.1` is not `1.2` or `1`.
 // `No.`, `#`, accents, and leading zeros do not change it.
 function getEditionMarkers(value: string) {
-  const words = value
-    .normalize("NFKD")
-    .replace(/\p{M}/gu, "")
-    .toLowerCase()
-    .split(/[^a-z0-9]+/);
+  const words =
+    value
+      .normalize("NFKD")
+      .replace(/\p{M}/gu, "")
+      .toLowerCase()
+      .match(/[a-z0-9]*\d(?:[./]\d+)+|[a-z0-9]+/g) ?? [];
   return new Set(
     words
       .filter((word) => /\d/.test(word))
-      .map((word) => word.replace(/^0+(?=\d)/, "")),
+      .map((word) => word.replace(/(^|[./])0+(?=\d)/g, "$1")),
   );
 }
 

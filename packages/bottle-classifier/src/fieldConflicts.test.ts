@@ -161,6 +161,16 @@ describe("edition conflicts", () => {
     ]);
   });
 
+  test("keeps numbers joined by a dot or slash as one marker", () => {
+    expect(editionConflicts("Batch 1.1", "Batch 1.2")).toEqual(["edition"]);
+    expect(editionConflicts("Batch 1", "Batch 1.1")).toEqual(["edition"]);
+    expect(editionConflicts("Batch 22/030", "Batch 22")).toEqual(["edition"]);
+    expect(editionConflicts("Release 02.1", "2.1")).toEqual([]);
+    expect(
+      compareBottleFields({ edition: "Batch 1" }, { edition: "Batch 1.1" }),
+    ).toMatchObject({ agreements: [] });
+  });
+
   test("leaves wording without markers to the classifier", () => {
     expect(editionConflicts("First Edition", "Limited Edition")).toEqual([]);
   });
