@@ -72,6 +72,7 @@ their records remain. Test-case corrections are separate from classifier changes
 | [C29: Printed name wording](./C29-printed-name-wording.md)                           | Keep the title's age, vintage, and cask wording in proposed names                       | Accepted: target names 1/21 to 13/21; full suite 73 to 79 of 109               |
 | [C33: Sample-set preflight](./C33-sample-set-preflight.md)                           | Ignore sample and miniature sets before extraction                                      | Reverted: a phrase rule must not decide what a listing is                      |
 | [C34: Exact-reference anchor](./C34-exact-reference-anchor.md)                       | Count a match to the exact stored-reference candidate as an automation anchor           | Accepted: Tomatin 3/6 to 3/3; server consumers unchanged                       |
+| [C35: Remove copied eval examples](./C35-remove-copied-eval-examples.md)             | Remove nine eval inputs copied into the extractor's examples                            | Accepted by policy: Octomore 13.1 3/3 to 0/3; other cases within noise         |
 
 C09 and C10 add narrow checks after Luna, and C11 removes model work for an
 identity Peated has already accepted. The measurement and test-case corrections

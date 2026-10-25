@@ -182,14 +182,6 @@ export const RETAILER_LABEL_EXAMPLES: RetailerLabelExample[] = [
     ],
   },
   {
-    source: "Astor Wines",
-    label: "Ardbeg Uigeadail Single Malt Scotch Whisky",
-    notes: [
-      "The official expression sits between the producer and generic style words.",
-      "Expression extraction should preserve `Uigeadail` and drop the trailing category words.",
-    ],
-  },
-  {
     source: "ReserveBar",
     label: "Maker's Mark Private Selection Kentucky Bourbon Whisky S2B13",
     notes: [
@@ -203,39 +195,6 @@ export const RETAILER_LABEL_EXAMPLES: RetailerLabelExample[] = [
     notes: [
       "Numeric batch wording is exact marketed Bottle identity.",
       "Preserve `Batch 24` in the complete Bottle draft rather than inventing or selecting a parent/group relationship.",
-    ],
-  },
-  {
-    source: "Generic Retailer",
-    label: "Heaven's Door Bootleg Vol 3 Whiskey",
-    notes: [
-      "Bootleg Series is the stable range, while `Vol 3` distinguishes the exact marketed Bottle.",
-      "Keep the volume number on the complete Bottle rather than selecting or creating a parent/group relationship.",
-    ],
-  },
-  {
-    source: "Generic Retailer",
-    label: "Four Roses Limited Edition Small Batch 2017",
-    notes: [
-      "For this family the trailing year distinguishes the exact annual Bottle, not a fake `Batch 2017` marker.",
-      "Do not truncate the bottle into `Four Roses Limited Edition Small` just because `Small Batch` contains the word Batch.",
-    ],
-  },
-  {
-    source: "Generic Retailer",
-    label: "Highland Park Cask Strength No. 5",
-    notes: [
-      "`Cask Strength No. 5` is the complete marketed Bottle identity, with `No. 5` retained as its edition.",
-      "If a structured extractor finds `edition = No. 5`, use it to search for that exact Bottle rather than selecting a parent or group.",
-    ],
-  },
-  {
-    source: "Generic Retailer",
-    label: "Lagavulin Distiller's Edition 2023 Islay Single Malt Scotch Whisky",
-    notes: [
-      "Treat `Distillers Edition` as the stable bottle family even when the retailer uses the apostrophe spelling `Distiller's Edition`.",
-      "The bare annual year is exact Bottle identity here and belongs on the complete Bottle draft.",
-      "Apply that same split when the year appears before the family wording, unless the source explicitly says `vintage`, `distilled`, or `distillation`.",
     ],
   },
   {
@@ -254,24 +213,6 @@ export const RETAILER_LABEL_EXAMPLES: RetailerLabelExample[] = [
       "Do not mechanically copy every trailing style word from the retailer title into `expression` or `proposedBottle.name` when the bottle is identified more specifically.",
     ],
   },
-  {
-    source: "Wooden Cork",
-    label: "Skrewball Peanut Butter Whiskey",
-    notes: [
-      "Unsupported novelty flavored whiskey and whiskey-liqueur products are not genuine whisky records for this database.",
-      "Treat peanut butter, PB&J, salted caramel, maple, cinnamon, apple, and similar novelty additive-flavor whiskey products as non-whisky and do not create bottles for them.",
-      "Do not overgeneralize this exclusion to every bottle whose expression contains a flavor-adjacent noun. Exclude only when the product itself is clearly the flavored-whiskey or whiskey-liqueur product.",
-      "Coffee, cold brew, chocolate, rum, and similar expression words are not automatic exclusion markers by themselves.",
-    ],
-  },
-  {
-    source: "Official",
-    label: "Octomore 13.1",
-    notes: [
-      "Treat the dotted expression itself as the complete Bottle identity.",
-      "Do not reinterpret `13.1` as a nested version under `Octomore 13` just because the dot looks edition-like.",
-    ],
-  },
 ];
 
 const EXTRACTION_EXAMPLES: ExtractionExample[] = [
@@ -283,24 +224,6 @@ const EXTRACTION_EXAMPLES: ExtractionExample[] = [
       expression: null,
       series: null,
       distillery: ["Aberfeldy"],
-      category: "single_malt",
-      stated_age: 12,
-      abv: null,
-      release_year: null,
-      vintage_year: null,
-      cask_strength: null,
-      single_cask: null,
-      edition: null,
-    },
-  },
-  {
-    input: "Jura 12-year-old Scotch Whisky",
-    output: {
-      brand: "Jura",
-      bottler: null,
-      expression: null,
-      series: null,
-      distillery: ["Isle of Jura"],
       category: "single_malt",
       stated_age: 12,
       abv: null,
@@ -345,96 +268,6 @@ const EXTRACTION_EXAMPLES: ExtractionExample[] = [
       cask_strength: true,
       single_cask: null,
       edition: "Batch 24",
-    },
-  },
-  {
-    input: "Heaven's Door Bootleg Vol 3 Whiskey",
-    output: {
-      brand: "Heaven's Door",
-      bottler: null,
-      expression: "Bootleg Series",
-      series: null,
-      distillery: [],
-      category: "bourbon",
-      stated_age: null,
-      abv: null,
-      release_year: null,
-      vintage_year: null,
-      cask_strength: null,
-      single_cask: null,
-      edition: "Vol. 3",
-    },
-  },
-  {
-    input: "Four Roses Limited Edition Small Batch 2017",
-    output: {
-      brand: "Four Roses",
-      bottler: null,
-      expression: "Limited Edition Small Batch",
-      series: null,
-      distillery: ["Four Roses"],
-      category: "bourbon",
-      stated_age: null,
-      abv: null,
-      release_year: 2017,
-      vintage_year: null,
-      cask_strength: null,
-      single_cask: null,
-      edition: null,
-    },
-  },
-  {
-    input: "Highland Park Cask Strength No. 5",
-    output: {
-      brand: "Highland Park",
-      bottler: null,
-      expression: "Cask Strength",
-      series: null,
-      distillery: ["Highland Park"],
-      category: "single_malt",
-      stated_age: null,
-      abv: null,
-      release_year: null,
-      vintage_year: null,
-      cask_strength: true,
-      single_cask: null,
-      edition: "No. 5",
-    },
-  },
-  {
-    input: "Lagavulin Distiller's Edition 2023 Islay Single Malt Scotch Whisky",
-    output: {
-      brand: "Lagavulin",
-      bottler: null,
-      expression: "Distillers Edition",
-      series: null,
-      distillery: ["Lagavulin"],
-      category: "single_malt",
-      stated_age: null,
-      abv: null,
-      release_year: 2023,
-      vintage_year: null,
-      cask_strength: null,
-      single_cask: null,
-      edition: null,
-    },
-  },
-  {
-    input: "Octomore 13.1",
-    output: {
-      brand: "Octomore",
-      bottler: null,
-      expression: "13.1",
-      series: null,
-      distillery: ["Bruichladdich"],
-      category: "single_malt",
-      stated_age: null,
-      abv: null,
-      release_year: null,
-      vintage_year: null,
-      cask_strength: null,
-      single_cask: null,
-      edition: null,
     },
   },
   {
@@ -490,14 +323,6 @@ const EXTRACTION_EXAMPLES: ExtractionExample[] = [
       single_cask: null,
       edition: null,
     },
-  },
-  {
-    input: "Unknown Bottle Gift Set with 2 Glasses",
-    output: null,
-  },
-  {
-    input: "Skrewball Peanut Butter Whiskey",
-    output: null,
   },
 ];
 
