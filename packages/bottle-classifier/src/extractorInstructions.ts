@@ -70,7 +70,8 @@ export const WHISKY_LABEL_COMPONENTS: WhiskyLabelComponent[] = [
     label: "Expression",
     outputField: "`expression`",
     guidance: [
-      "This is the core release name after removing the producer, generic style words, age, ABV, and package size.",
+      "This is the name people use for the bottle after the brand, as the producer's title and the label print it. Drop generic style words, ABV, and package size.",
+      "Keep a release number or title that people say as the bottle's name, such as a numbered release, a volume, a chapter, or an act and scene. Keep it whole; do not split a release number into a range and a number.",
       "If the title is only producer plus age plus generic style words, `expression` can be `null`.",
     ],
   },
@@ -79,8 +80,8 @@ export const WHISKY_LABEL_COMPONENTS: WhiskyLabelComponent[] = [
     label: "Series / range",
     outputField: "`series`",
     guidance: [
-      "Use this for a stable collection or family such as `Private Selection`, `Distillers Edition`, or `Octomore 13`.",
-      "Do not use `series` for one-off batch codes or release years that belong in `edition`.",
+      "Use this only for a named range the producer markets above several different releases.",
+      "A number that counts the producer's yearly or numbered releases is not a series; it stays in the release name. Batch codes and release years are not a series either.",
     ],
   },
   {
@@ -88,7 +89,7 @@ export const WHISKY_LABEL_COMPONENTS: WhiskyLabelComponent[] = [
     label: "Edition / batch / release code",
     outputField: "`edition`",
     guidance: [
-      "Use this for a release fact that is not part of the bottle's name: a batch label, a store-pick or selection printed on the label, a release code, or a numbered edition such as `Batch 3`, `for The Whisky Exchange`, `Vol. 3`, or `S2B13`.",
+      "Use this for a release fact that is not part of the name people use: a batch label, a store pick or selection printed on the label, a market, or a release code, such as `Batch 3`, `for The Whisky Exchange`, or `S2B13`.",
       "Copy the exact marketed wording from the producer's product title or visible label. Narrative prose can confirm that a code identifies a release, but it cannot add `Release`, `Edition`, `Batch`, `Volume`, or another descriptor that the title and label omit.",
       "Treat short suffix codes as meaningful identity signals when they look like a batch or store-pick marker.",
       "Put a cask or barrel identifier in `cask_number`, never in `edition`.",
@@ -426,7 +427,7 @@ export function buildWhiskyLabelExtractorInstructions({
       "When an age statement belongs in the expression, normalize the phrase to `12-year-old`.",
       "For expression-style fields, follow the bottle's evidenced canonical name. Do not mechanically append retailer style/category words from the title just to make the expression look complete.",
       "Keep marketed `Single Barrel` or `Single Cask` wording in `expression` when it is printed as part of the bottle name; setting `single_cask: true` does not remove that wording from the name.",
-      "When a stable family phrase is followed by a clearly separate numbered or coded variant label, keep the family in `expression` and the varying label in `edition` instead of collapsing both into one opaque expression.",
+      "When a stable family phrase is followed by a clearly separate batch, selection, market, or release code that is not part of the name people use, keep the family in `expression` and that code in `edition` instead of collapsing both into one opaque expression. A release number or title that people say as the bottle's name stays whole in `expression`.",
       "Apply that split from the label structure itself, not by memorizing brand-specific examples. If the split is ambiguous, stay less specific instead of guessing.",
       "Set `vintage_year`, `bottling_year`, or `release_year` only when the source makes the meaning clear. Leave a year unset when its meaning is unclear.",
       "If `edition`, `release_year`, `bottling_year`, or `vintage_year` is set, do not also copy that same batch code or year into `expression`.",
