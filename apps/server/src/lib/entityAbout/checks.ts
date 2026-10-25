@@ -288,6 +288,7 @@ function expandYearRanges(value: string) {
 // Pages write small counts as words: "two wash stills" states 2. "One" is
 // left out because pages use it in many other ways. A word inside a larger
 // number, such as "twenty-two", "twenty–two", or "twenty two", is not read.
+// An em dash is punctuation, not a joiner: "1983—four stills" states 4.
 const NUMBER_WORDS = [
   "two",
   "three",
@@ -305,7 +306,7 @@ const NUMBER_WORDS = [
 function writeNumberWords(value: string) {
   return value.replace(
     new RegExp(
-      `(?<![-\\u2010-\\u2015]|\\b(?:twenty|thirty|forty|fifty|sixty|seventy|eighty|ninety)\\s+)\\b(${NUMBER_WORDS.join("|")})\\b(?![-\\u2010-\\u2015])`,
+      `(?<![-\\u2010\\u2011\\u2013]|\\b(?:twenty|thirty|forty|fifty|sixty|seventy|eighty|ninety)\\s+)\\b(${NUMBER_WORDS.join("|")})\\b(?![-\\u2010\\u2011\\u2013])`,
       "gi",
     ),
     (word) => String(NUMBER_WORDS.indexOf(word.toLowerCase()) + 2),

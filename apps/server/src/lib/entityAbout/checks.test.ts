@@ -573,6 +573,7 @@ describe("checkConflictPicks", () => {
     expect(stills(2, "It filled twenty two casks.")).toBeUndefined();
     expect(stills(2, "It filled twenty\u2013two casks.")).toBeUndefined();
     expect(stills(2, "It filled twenty\u2011two casks.")).toBeUndefined();
+    expect(stills(4, "Rebuilt in 1983\u2014four stills in all.")).toBeDefined();
   });
 
   test("keeps a site fact's date only when a quote states its year", () => {
