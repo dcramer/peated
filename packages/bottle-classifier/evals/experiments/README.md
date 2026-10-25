@@ -70,7 +70,7 @@ their records remain. Test-case corrections are separate from classifier changes
 | [C27: Multi-item preflight](./C27-multi-item-preflight.md)                           | Ignore explicit multi-item titles before text extraction                                | Accepted: ten more sampled listings recognized with zero model work            |
 | [C28: One-fact difference](./C28-confirm-one-fact-difference.md)                     | Confirm a release with a single differing ABV, batch, or year exists before creating it | Uncertain: fewer duplicates, mostly by declining; one real release lost        |
 | [C29: Printed name wording](./C29-printed-name-wording.md)                           | Keep the title's age, vintage, and cask wording in proposed names                       | Accepted: target names 1/21 to 13/21; full suite 73 to 79 of 109               |
-| [C33: Sample-set preflight](./C33-sample-set-preflight.md)                           | Ignore sample and miniature sets before extraction                                      | Accepted: Glenlivet sample set 0/4 to 3/3 with no model call                   |
+| [C33: Sample-set preflight](./C33-sample-set-preflight.md)                           | Ignore sample and miniature sets before extraction                                      | Reverted: a phrase rule must not decide what a listing is                      |
 | [C34: Exact-reference anchor](./C34-exact-reference-anchor.md)                       | Count a match to the exact stored-reference candidate as an automation anchor           | Accepted: Tomatin 3/6 to 3/3; server consumers unchanged                       |
 
 C09 and C10 add narrow checks after Luna, and C11 removes model work for an

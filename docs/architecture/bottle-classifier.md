@@ -254,9 +254,8 @@ fills supported creation facts after local code has settled Bottle identity. It
 does not run for structured input or a deterministic match. A failed or empty
 read is recorded and classification continues with a fresh page-read allowance.
 
-Explicit bundle, multi-bottle, sample or miniature set, and damaged-condition
-names are ignored before text extraction. A bare `sample` or `presentation box`
-is not enough. Other ignored input does not run the agent. An exact stored
+Explicit bundle, multi-bottle, and damaged-condition names are ignored before
+text extraction. Other ignored input does not run the agent. An exact stored
 reference may use the preflight above. All other reference decisions use one bounded agent loop.
 Deterministic identifiers such as SMWS are input anchors, not bypasses.
 
