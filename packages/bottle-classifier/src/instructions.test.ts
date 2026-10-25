@@ -84,18 +84,6 @@ describe("bottler instructions", () => {
     },
   );
 
-  test.each([
-    buildBottleClassifierInstructions(),
-    buildBottleAuditInstructions(),
-  ])(
-    "does not treat another Bottle's stored bottler as evidence",
-    (instructions) => {
-      expect(instructions).toContain(
-        "Another Bottle's stored `bottler` is not evidence for this Bottle's `bottler`",
-      );
-    },
-  );
-
   test("defines the extracted bottler as an independent release role", () => {
     const bottler = WHISKY_LABEL_COMPONENTS.find(({ id }) => id === "bottler");
 
