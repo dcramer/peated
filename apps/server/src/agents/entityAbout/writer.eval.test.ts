@@ -51,7 +51,7 @@ function describeDraft(
   { draft, pagesRead }: EntityAboutWriterResult,
   kind: Evidence["entity"]["kind"],
 ) {
-  const document = draftToDocument(draft).document;
+  const { document, errors: conversionErrors } = draftToDocument(draft);
   const reviewed = reviewAboutDraft(document, pagesRead, kind, null).document;
   const keptSiteFacts = new Map(Object.entries(reviewed.siteFacts));
   const citationKey = ({ sourceId, quote }: AboutCitation) =>
@@ -70,6 +70,8 @@ function describeDraft(
     }));
   return {
     pagesRead: pagesRead.map((page) => page.url),
+    // Items the output format rejected never reach the document below.
+    conversionErrors,
     // A fact the checks drop as a whole (an unquoted year, name, or number)
     // shows kept: false; its citations then show which quotes still passed.
     events: document.events.map((event) => {
