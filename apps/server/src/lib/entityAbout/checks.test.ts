@@ -8,6 +8,7 @@ import {
   checkAboutProse,
   checkConflictPicks,
   keepVerifiedCitations,
+  reviewAboutDraft,
 } from "./checks";
 import { getDateDisagreement, getDisagreement, valuesAgree } from "./display";
 import { toPublicEntityAbout } from "./publicAbout";
@@ -528,6 +529,30 @@ describe("checkConflictPicks", () => {
     // "1931-38" states 1938, but not a year it does not span.
     expect(reopened("1938")).toBe(1);
     expect(reopened("1948")).toBe(0);
+  });
+
+  test("names the number that dropped a fact", () => {
+    const quote = "Brora reopened in 2021.";
+    const { dropped } = reviewAboutDraft(
+      draft({
+        events: [
+          {
+            id: 1,
+            kind: "reopened",
+            date: "2021",
+            text: "It reopened after a three-year restoration.",
+            citations: [{ sourceId: "wp", statedValue: "2021", quote }],
+          },
+        ],
+      }),
+      [{ ...page, text: `${page.text} ${quote}` }],
+      "distillery",
+      null,
+    );
+
+    expect(dropped).toEqual([
+      "Event 1 (reopened, 2021) was dropped: its text or title states 3, which no kept quote states.",
+    ]);
   });
 
   test("reads a stated date range by its years", () => {
