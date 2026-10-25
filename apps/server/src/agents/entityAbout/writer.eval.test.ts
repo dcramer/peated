@@ -165,11 +165,12 @@ describe.skipIf(!isAIGatewayConfigured())("About writer", () => {
       isFactShown(event.citations, document.sources),
     );
     for (const { kind, year } of evidence.expected.events) {
+      const kinds = [kind].flat();
       expect(
         shownEvents.some(
-          (event) => event.kind === kind && event.date.startsWith(year),
+          (event) => kinds.includes(event.kind) && event.date.startsWith(year),
         ),
-        `${kind} in ${year}`,
+        `${kinds.join(" or ")} in ${year}`,
       ).toBe(true);
     }
     // Every source the page shows is one of the saved pages.
