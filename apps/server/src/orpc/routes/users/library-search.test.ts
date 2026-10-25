@@ -22,12 +22,18 @@ describe("GET /users/:user/library/search", () => {
       distillerIds: [laphroaig.id],
       name: "10",
     });
+    // Named brands: a random fixture brand can contain "Laphroaig" and match.
     const independent = await fixtures.Bottle({
+      brandId: bottler.id,
       bottlerId: bottler.id,
       distillerIds: [laphroaig.id],
-      name: "Signatory Laphroaig 1998",
+      name: "Laphroaig 1998",
     });
-    const unrelated = await fixtures.Bottle({ name: "Uigeadail" });
+    const ardbeg = await fixtures.Entity({ name: "Ardbeg", kind: "brand" });
+    const unrelated = await fixtures.Bottle({
+      brandId: ardbeg.id,
+      name: "Uigeadail",
+    });
     const library = await fixtures.Collection({
       name: "Library",
       createdById: defaults.user.id,
