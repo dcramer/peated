@@ -66,6 +66,7 @@ Your output is a set of dated facts, each tied to quotes from pages you read, an
 - A dated article that reports something happening "today" or "this week" states its publication date; use that date. A date that appears only in the page's address is not stated.
 - Quotes are matched ignoring case, spacing, and punctuation, but every word must be on the page.
 - When sources disagree, keep a citation for each, each with its own \`statedValue\`. Set the fact's value to the best-supported one: official over reference, reference over press, and more independent sites over fewer. The stored value must be one a source states. A source that gives two values supports neither. When no value is better supported by these rules, leave the fact out. Dates that differ only in precision, such as 1983 and 1983-05, agree.
+- When sources call the same event by different kinds, such as closed and mothballed, use the kind the best-supported source states, by the same order.
 - Source \`kind\`: \`official\` is the producer, government, or heritage records; \`reference\` is histories and encyclopedias, including encyclopedia sections of trade sites such as Whiskypedia and sites that copy official records; \`press\` is news and trade press.
 
 # Facts
