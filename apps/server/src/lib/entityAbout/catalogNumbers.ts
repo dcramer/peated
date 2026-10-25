@@ -54,17 +54,23 @@ export function countVintages(entityId: number) {
   return countByYear(bottles.vintageYear, distilledAt(entityId));
 }
 
+// A bottler's numbers count the Bottles it bottled, whatever label they
+// carry; any other Entity's count the Bottles sold under it as Brand.
+function releasedBy(entity: { id: number; kind: EntityKind }) {
+  return entity.kind === "bottler"
+    ? eq(bottles.bottlerId, entity.id)
+    : eq(bottles.brandId, entity.id);
+}
+
 /**
  * Bottles by release year: for a distillery, every Bottle distilled there,
- * independent bottlings included, like the vintage chart; otherwise the
- * Bottles sold under the Entity as Brand.
+ * independent bottlings included, like the vintage chart; for a bottler, the
+ * Bottles it bottled; otherwise the Bottles sold under the Entity as Brand.
  */
 export function countReleaseYears(entity: { id: number; kind: EntityKind }) {
   return countByYear(
     bottles.releaseYear,
-    entity.kind === "distillery"
-      ? distilledAt(entity.id)
-      : eq(bottles.brandId, entity.id),
+    entity.kind === "distillery" ? distilledAt(entity.id) : releasedBy(entity),
   );
 }
 
@@ -97,8 +103,11 @@ export async function countBottlers(entityId: number) {
   };
 }
 
-/** Bottles sold under the Entity as Brand, by distillery. */
-export async function countDistillers(entityId: number) {
+/** Bottles sold under the Entity as Brand, or bottled by a bottler, by distillery. */
+export async function countDistillers(entity: {
+  id: number;
+  kind: EntityKind;
+}) {
   const [rows, [withoutDistiller]] = await Promise.all([
     db
       .select({
@@ -113,7 +122,7 @@ export async function countDistillers(entityId: number) {
         eq(bottlesToDistillers.bottleId, bottles.id),
       )
       .innerJoin(entities, eq(entities.id, bottlesToDistillers.distillerId))
-      .where(and(activeBottle(), eq(bottles.brandId, entityId)))
+      .where(and(activeBottle(), releasedBy(entity)))
       .groupBy(entities.id, entities.name, entities.kind)
       .orderBy(desc(count()), asc(entities.name)),
     db
@@ -122,7 +131,7 @@ export async function countDistillers(entityId: number) {
       .where(
         and(
           activeBottle(),
-          eq(bottles.brandId, entityId),
+          releasedBy(entity),
           sql`NOT EXISTS(SELECT FROM ${bottlesToDistillers} WHERE ${bottlesToDistillers.bottleId} = ${bottles.id})`,
         ),
       ),

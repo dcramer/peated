@@ -1,10 +1,10 @@
 # Entity About Pages
 
-A distillery or brand can have an About tab: a short, sourced account of the
-place or label, with a timeline, key facts, owners, and numbers from the
-Bottle catalog. Every statement on the page traces to a fact, and every fact
-traces to a source. Bottlers and companies will get About pages the same
-way later; Bottles will need their own design.
+A distillery, brand, bottler, or company can have an About tab: a short,
+sourced account of the place, label, or business, with a timeline, key facts,
+owners, and numbers from the Bottle catalog. Every statement on the page
+traces to a fact, and every fact traces to a source. Bottles will need their
+own design.
 
 ## What Is Stored
 
@@ -45,7 +45,11 @@ Two other stores feed the writer:
   URL. Every run reads them. They guide the writer but are never cited.
 
 History about a production site belongs on the Distillery. History about a
-label belongs on the Brand. See
+label belongs on the Brand. History of the business, such as mergers and the
+distilleries and brands it bought or sold, belongs on the Company. A distillery
+page leaves out bottle launches, and
+mentions another site's history only where it explains this site's origin or
+name. See
 [Whisky Identity Model](../architecture/whisky-identity-model.md#naming-and-entity-boundaries).
 
 ## What Is Shown
@@ -83,7 +87,8 @@ placeholder. The constants live in
 Catalog numbers are counted from active Bottles at read time, the same way as
 the Entity Bottles tab. A distillery's vintages, bottlers, and release years
 count every Bottle distilled there, independent bottlings included. Its own
-line counts even when no distiller is recorded yet. A brand's
+line counts even when no distiller is recorded yet. A bottler's distilleries
+and release years count the Bottles it bottled, under any label. A brand's
 release years count the Bottles sold under it. Prose never states them; they change daily. Chart bars
 link to the Bottle list filtered to that year.
 
@@ -120,7 +125,7 @@ version. It may keep, correct, add, or drop anything. Code then checks it:
   quote from the same page as one the current page already has, and state
   the citation's value. A fact stands only when a kept quote states its year
   (or number); a short range such as "1931-38" states both years, the words
-  two to twelve state their numbers, and a dated
+  two to twelve state their numbers, "1.6m" states 1600000 and "£1.2bn" 1200000000, and a dated
   article's publication date counts when its year is on the page read or the
   current page has the same date. A name or new owner
   must appear whole in one quote, and every number in an event's text or

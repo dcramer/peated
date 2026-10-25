@@ -53,7 +53,7 @@ const FILLER_WORDS = new Set(["and", "the", "for", "with"]);
  */
 function quotesState(quotes: readonly string[], value: string) {
   const checked = ISO_DATE_PATTERN.test(value) ? value.slice(0, 4) : value;
-  const numbers = stripThousands(checked).match(NUMBER_PATTERN) ?? [];
+  const numbers = readNumbers(checked);
   const numbersStated = numbers.every((number) =>
     quotes.some((quote) => containsNumber(quote, number)),
   );
@@ -62,7 +62,8 @@ function quotesState(quotes: readonly string[], value: string) {
   // Risk". A value of only numbers, or only short words, needs its numbers
   // or the whole phrase.
   const text = normalizeForQuote(quotes.join(" "));
-  const phrase = normalizeForQuote(checked);
+  // "1.6 million" is a number, not the word "million" a quote must repeat.
+  const phrase = normalizeForQuote(expandLargeNumbers(stripThousands(checked)));
   // Whole words only: "Campbell" does not state "Bell".
   if (` ${text} `.includes(` ${phrase} `)) return true;
   const words = phrase
@@ -205,13 +206,14 @@ export function keepVerifiedCitations(
       // written as digits or words, is a fact, so a quote must state it too.
       // Number words the check cannot read must appear in a quote as written.
       const numbersQuoted = (value: string | null) =>
-        (
-          stripThousands(writeNumberWords(value ?? "")).match(NUMBER_PATTERN) ??
-          []
-        ).every((number) =>
+        readNumbers(writeNumberWords(value ?? "")).every((number) =>
           quotes.some((quote) => containsNumber(quote, number)),
         ) &&
-        (value?.match(NUMBER_WORD_RUN) ?? [])
+        (
+          expandLargeNumbers(stripThousands(value ?? "")).match(
+            NUMBER_WORD_RUN,
+          ) ?? []
+        )
           .filter((run) => !readNumberWords(run) && run.toLowerCase() !== "one")
           .every((run) =>
             quotes.some((quote) =>
@@ -282,7 +284,7 @@ function factSearchText(document: EntityAboutDocument) {
 const NUMBER_PATTERN = /\d+(?:\.\d+)?/g;
 
 function stripThousands(value: string) {
-  return value.replace(/(\d),(?=\d{3}\b)/g, "$1");
+  return value.replace(/(\d),(?=\d{3}(?!\d))/g, "$1");
 }
 
 // Histories shorten year ranges, so "1931-38" also states 1938. A later
@@ -355,11 +357,32 @@ function writeNumberWords(value: string) {
   return value.replace(NUMBER_WORD_RUN, (run) => readNumberWords(run) ?? run);
 }
 
+// Capacities and prices are often written in millions or billions: "1.6m
+// litres" and "1.6 million litres" state 1600000, "£1.2bn" and "1.2 billion"
+// state 1200000000. An "m" or "bn" must touch the number, so "1887 M." and
+// "20 m" are not millions.
+function expandLargeNumbers(value: string) {
+  return value.replace(
+    /\b(\d+(?:\.\d+)?)(m|\s*million|bn|\s*billion)\b/gi,
+    (_, n: string, unit: string) =>
+      String(Math.round(Number(n) * (/b/i.test(unit) ? 1e9 : 1e6))),
+  );
+}
+
+/** The numbers a value states, read the same way as quotes. */
+function readNumbers(value: string) {
+  return expandLargeNumbers(stripThousands(value)).match(NUMBER_PATTERN) ?? [];
+}
+
 // A whole number: 46 is not inside 46.5 or 146, but 1887 is in "c.1887".
+// The number may match the text as written ("1.6" in "1.6m") or with
+// millions and billions expanded ("1600000" in "1.6m").
 function containsNumber(text: string, number: string) {
-  return new RegExp(
+  const pattern = new RegExp(
     `(?<!\\d|\\d\\.)${number.replace(".", "\\.")}(?!\\d|\\.\\d)`,
-  ).test(stripThousands(expandYearRanges(writeNumberWords(text))));
+  );
+  const written = stripThousands(expandYearRanges(writeNumberWords(text)));
+  return pattern.test(written) || pattern.test(expandLargeNumbers(written));
 }
 
 /**
@@ -422,8 +445,7 @@ function checkSentence(
   }
   const errors: string[] = [];
   const cited = sentence.factIds.map((id) => factText.get(id) ?? "").join(" ");
-  for (const number of stripThousands(sentence.text).match(NUMBER_PATTERN) ??
-    []) {
+  for (const number of readNumbers(sentence.text)) {
     if (!containsNumber(cited, number)) {
       errors.push(`${where} states ${number}, which its facts do not.`);
     }

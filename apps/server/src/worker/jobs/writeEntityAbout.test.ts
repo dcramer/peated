@@ -407,37 +407,38 @@ describe("writeEntityAbout", () => {
     expect(await ownerOf()).toMatchObject({ newOwnerId: owner.id });
   });
 
-  test("drops site facts that do not apply to the kind", async ({
-    fixtures,
-  }) => {
-    const entity = await fixtures.Entity({ kind: "brand" });
-    const withStills: AboutDraft = {
-      ...goodDraft,
-      siteFacts: [
-        {
-          field: "washStills",
-          value: 1,
-          asOf: null,
-          citations: [
-            {
-              sourceId: "wp",
-              statedValue: "1",
-              quote: "It has 1 wash still.",
-            },
-          ],
-        },
-      ],
-    };
+  test.for(["brand", "bottler", "company"] as const)(
+    "saves a %s page without site facts",
+    async (kind, { fixtures }) => {
+      const entity = await fixtures.Entity({ kind });
+      const withStills: AboutDraft = {
+        ...goodDraft,
+        siteFacts: [
+          {
+            field: "washStills",
+            value: 1,
+            asOf: null,
+            citations: [
+              {
+                sourceId: "wp",
+                statedValue: "1",
+                quote: "It has 1 wash still.",
+              },
+            ],
+          },
+        ],
+      };
 
-    const result = await writeEntityAbout(
-      { entityId: entity.id },
-      services(async () => ({ draft: withStills, pagesRead: [page] })),
-    );
+      const result = await writeEntityAbout(
+        { entityId: entity.id },
+        services(async () => ({ draft: withStills, pagesRead: [page] })),
+      );
 
-    expect(result).toMatchObject({ status: "saved" });
-    const about = await getEntityAbout(db, entity.id);
-    expect(about?.document.siteFacts).toEqual({});
-  });
+      expect(result).toMatchObject({ status: "saved" });
+      const about = await getEntityAbout(db, entity.id);
+      expect(about?.document.siteFacts).toEqual({});
+    },
+  );
 
   test("retries a draft the store would reject", async ({ fixtures }) => {
     const entity = await fixtures.Entity({ kind: "distillery" });
@@ -528,16 +529,5 @@ describe("writeEntityAbout", () => {
       status: "disabled",
     });
     expect(writer.writer).not.toHaveBeenCalled();
-  });
-
-  test("skips kinds without About pages", async ({ fixtures }) => {
-    const entity = await fixtures.Entity({ kind: "bottler" });
-
-    expect(
-      await writeEntityAbout(
-        { entityId: entity.id },
-        services(async () => ({ draft: goodDraft, pagesRead: [page] })),
-      ),
-    ).toEqual({ status: "skipped" });
   });
 });

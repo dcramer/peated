@@ -274,7 +274,8 @@ export function EntityAboutArticle({
     entity.kind === "distillery" &&
     counts.bottlers.results.length >= ABOUT_MIN_BOTTLERS;
   const showDistillers =
-    entity.kind === "brand" && counts.distillers.results.length > 0;
+    (entity.kind === "brand" || entity.kind === "bottler") &&
+    counts.distillers.results.length > 0;
   const showReleaseYears =
     countWithYear(counts.releaseYears) >= ABOUT_MIN_RELEASE_BOTTLES;
   const sources = about.sources
@@ -328,7 +329,11 @@ export function EntityAboutArticle({
           heading="Where it's made"
           noun="distilleries"
           title={`Where ${entity.name} is made`}
-          intro={`Bottles in Peated sold as ${entity.name}, by distillery.`}
+          intro={
+            entity.kind === "bottler"
+              ? `Bottles in Peated bottled by ${entity.name}, by distillery.`
+              : `Bottles in Peated sold as ${entity.name}, by distillery.`
+          }
         />
       ) : null}
 
@@ -341,7 +346,9 @@ export function EntityAboutArticle({
           intro={
             entity.kind === "distillery"
               ? `Bottles in Peated distilled at ${entity.name}, by release year.`
-              : `Bottles in Peated sold as ${entity.name}, by release year.`
+              : entity.kind === "bottler"
+                ? `Bottles in Peated bottled by ${entity.name}, by release year.`
+                : `Bottles in Peated sold as ${entity.name}, by release year.`
           }
         />
       ) : null}

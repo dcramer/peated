@@ -170,6 +170,13 @@ describe("keepVerifiedCitations", () => {
         "In 1983 its four stills fell silent.",
       ),
     ).toBe(1);
+    // "1.6 million" in text and "1.6m" in a quote are the same number.
+    expect(
+      kept("Brora made 1.6 million litres.", "In 1983 it made 1.6m litres."),
+    ).toBe(1);
+    expect(
+      kept("Diageo paid 1.2 billion.", "In 1983 Diageo paid £1.2bn."),
+    ).toBe(1);
     // A number the check cannot read must appear in a quote as written.
     expect(
       kept("Brora filled two hundred casks.", "Brora closed in 1983."),
@@ -588,6 +595,40 @@ describe("checkConflictPicks", () => {
     expect(stills(2, "It filled two hundred casks.")).toBeUndefined();
     expect(stills(3, "It holds three thousand casks.")).toBeUndefined();
     expect(stills(12, "A twelve-year-old was released.")).toBeDefined();
+    // Millions are read as whole numbers.
+    expect(stills(1600000, "It makes 1.6m litres of alcohol.")).toBeDefined();
+    expect(stills(2000000, "It makes 2 million litres.")).toBeDefined();
+    expect(stills(1600000, "It is 1.6 metres tall.")).toBeUndefined();
+    // A value written in millions reads the same way as the quote.
+    expect(stills(1600000, "It makes 1.6 million litres.")).toBeDefined();
+    // A citation may state the number as the page writes it.
+    expect(stills(1.6, "It makes 1.6m litres.")).toBeDefined();
+    // An "m" apart from the number is not a million.
+    expect(
+      stills(1887000000, "Built in 1887 m. by the estate."),
+    ).toBeUndefined();
+    // Thousands separators are read before millions: "1,250m" is one number.
+    expect(stills(1250000000, "It cost £1,250m.")).toBeDefined();
+    expect(stills(250000000, "It cost £1,250m.")).toBeUndefined();
+  });
+
+  test("reads a stated value written in millions", () => {
+    const quote = "It makes 1.6m litres of alcohol a year.";
+    const kept = keepVerifiedCitations(
+      draft({
+        siteFacts: {
+          capacityLitres: {
+            value: 1600000,
+            asOf: null,
+            citations: [{ sourceId: "wp", statedValue: "1.6 million", quote }],
+          },
+        },
+      }),
+      [{ ...page, text: `${page.text} ${quote}` }],
+      null,
+    );
+
+    expect(kept.siteFacts.capacityLitres?.citations).toHaveLength(1);
   });
 
   test("keeps a site fact's date only when a quote states its year", () => {

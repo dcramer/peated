@@ -108,9 +108,7 @@ export async function writeEntityAbout(
     where: (table, { eq }) => eq(table.id, entityId),
     with: { country: true, region: true, owner: true },
   });
-  if (!entity || (entity.kind !== "distillery" && entity.kind !== "brand")) {
-    return { status: "skipped" };
-  }
+  if (!entity) return { status: "skipped" };
   const aliases = await db
     .select({ name: entityAliases.name })
     .from(entityAliases)

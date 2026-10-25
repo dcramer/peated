@@ -2,7 +2,7 @@
 
 ### Requirement: Sourced Entity description
 
-When a Distillery or Brand has a published About lead, its description SHALL
+When a Distillery, Brand, Bottler, or Company has a published About lead, its description SHALL
 be that lead, recorded as generated, and SHALL show the lead's citations where
 the description is shown in full. The system SHALL NOT write a description
 from a model's memory. After the About writer has covered every Distillery
