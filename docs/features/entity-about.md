@@ -167,7 +167,7 @@ has it, so a moderator's link carries over. The page shows a link while that
 Entity exists, following merges to the Entity it became. Otherwise it shows
 the name.
 
-A model check runs this job on 11 Entities with saved pages instead of the
+A model check runs this job on 12 Entities with saved pages instead of the
 live web: `apps/server/src/agents/entityAbout/writer.eval.test.ts`. Each case
 in `apps/server/src/agents/entityAbout/evals/` lists its pages, the events a
 careful writer should find, and review notes. See
