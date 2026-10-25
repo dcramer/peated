@@ -120,15 +120,15 @@ and, for matches, an independent source. Two runs each:
 | Macallan Glasses Set                                          | no match                | 2/2                                                                           |
 | Glenlivet G&M Generations 70 Year Old Sample Presentation Set | no match                | 0/2; still matches the sample vial to the full Bottle                         |
 
-## Catalog problems found, not changed
+## Catalog problems found
 
-- Bottle 3277 (Classic Cut 2017) should have `caskStrength: true`.
-- Aberfeldy 16 (686) stores 43%; the producer lists 40%.
-- Yamazaki 12 (2276) stores `releaseYear` 1984, its launch year.
-- Likely duplicates: 3277 and 14146 (Classic Cut 2017), 17244 and 4632
-  (Glenglassaugh 1976 The Chosen Few; 4632's age 44 is also wrong), 45517 and
-  16743 (Johnnie Walker The Royal Route), probably 821 and 3642 (Tomatin 18).
-- The two Ardcore legacy names above point at the wrong Bottle.
+Fixed on October 25, 2026, with the evidence in
+[Repairs from the auction check](catalog/2026-10-25-auction-check-repairs.md):
+the Ardcore legacy names, the Classic Cut 2017 cask-strength flag, the
+Aberfeldy 16 strength, the Longrow single-cask bottler, the Chosen Few age, and
+the duplicate Chosen Few, Royal Route, Tomatin 18, and Wire Works records. The
+Classic Cut duplicate had already been merged. Yamazaki 12's release year 1984
+is its launch year and stays.
 
 ## Detail-read pilot, October 25
 
