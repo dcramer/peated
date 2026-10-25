@@ -112,6 +112,10 @@ failed once here with a cautious `no_match` (Octomore 13.1, The Exclusive
 Malts Islay, Macallan 18 1994, Macallan Classic Cut 2017 auction), so one run
 moves by about three cases.
 
+The PR's CI run scored 115/140 (82.1%). C33 was reverted afterward because a
+phrase rule must not decide what a listing is; the Glenlivet sample set is a
+model-judgment miss again.
+
 ## Open decisions
 
 These failures are consistent, not variance, but fixing them changes a rule,
