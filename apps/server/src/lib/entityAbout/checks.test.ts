@@ -170,6 +170,16 @@ describe("keepVerifiedCitations", () => {
         "In 1983 its four stills fell silent.",
       ),
     ).toBe(1);
+    // A number the check cannot read must appear in a quote as written.
+    expect(
+      kept("Brora filled two hundred casks.", "Brora closed in 1983."),
+    ).toBe(0);
+    expect(
+      kept(
+        "Brora filled two hundred casks.",
+        "In 1983 Brora filled two hundred casks.",
+      ),
+    ).toBe(1);
   });
 
   test("drops an owner name no quote states", () => {
@@ -574,6 +584,10 @@ describe("checkConflictPicks", () => {
     expect(stills(2, "It filled twenty\u2013two casks.")).toBeUndefined();
     expect(stills(2, "It filled twenty\u2011two casks.")).toBeUndefined();
     expect(stills(4, "Rebuilt in 1983\u2014four stills in all.")).toBeDefined();
+    // A run of number words is a larger number, not a small one.
+    expect(stills(2, "It filled two hundred casks.")).toBeUndefined();
+    expect(stills(3, "It holds three thousand casks.")).toBeUndefined();
+    expect(stills(12, "A twelve-year-old was released.")).toBeDefined();
   });
 
   test("keeps a site fact's date only when a quote states its year", () => {

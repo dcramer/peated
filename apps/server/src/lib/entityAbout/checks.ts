@@ -203,13 +203,23 @@ export function keepVerifiedCitations(
         );
       // Text and titles are the model's words, but any number in them,
       // written as digits or words, is a fact, so a quote must state it too.
+      // Number words the check cannot read must appear in a quote as written.
       const numbersQuoted = (value: string | null) =>
         (
           stripThousands(writeNumberWords(value ?? "")).match(NUMBER_PATTERN) ??
           []
         ).every((number) =>
           quotes.some((quote) => containsNumber(quote, number)),
-        );
+        ) &&
+        (value?.match(NUMBER_WORD_RUN) ?? [])
+          .filter((run) => !readNumberWords(run) && run.toLowerCase() !== "one")
+          .every((run) =>
+            quotes.some((quote) =>
+              ` ${normalizeForQuote(quote)} `.includes(
+                ` ${normalizeForQuote(run)} `,
+              ),
+            ),
+          );
       return (
         quotesState(quotes, event.date.slice(0, 4)) &&
         (!event.endDate || quotesState(quotes, event.endDate.slice(0, 4))) &&
@@ -285,11 +295,13 @@ function expandYearRanges(value: string) {
   );
 }
 
-// Pages write small counts as words: "two wash stills" states 2. "One" is
-// left out because pages use it in many other ways. A word inside a larger
-// number, such as "twenty-two", "twenty–two", or "twenty two", is not read.
-// An em dash is punctuation, not a joiner: "1983—four stills" states 4.
-const NUMBER_WORDS = [
+// Pages write small counts as words: "two wash stills" states 2. Only a
+// number written as one word from two to twelve is read; "one" is left out
+// because pages use it in many other ways. A run of number words such as
+// "twenty-two", "two hundred", or "three thousand" is a larger number and is
+// not read. Hyphens and en dashes join a run; an em dash is punctuation, so
+// "1983—four stills" states 4, and "twelve-year-old" states 12.
+const SMALL_NUMBER_WORDS = [
   "two",
   "three",
   "four",
@@ -303,14 +315,44 @@ const NUMBER_WORDS = [
   "twelve",
 ];
 
+const NUMBER_WORD = `(?:${[
+  "zero",
+  "one",
+  ...SMALL_NUMBER_WORDS,
+  "thirteen",
+  "fourteen",
+  "fifteen",
+  "sixteen",
+  "seventeen",
+  "eighteen",
+  "nineteen",
+  "twenty",
+  "thirty",
+  "forty",
+  "fifty",
+  "sixty",
+  "seventy",
+  "eighty",
+  "ninety",
+  "hundred",
+  "thousand",
+  "million",
+  "billion",
+].join("|")})`;
+
+const NUMBER_WORD_RUN = new RegExp(
+  `\\b${NUMBER_WORD}(?:(?:[-\\u2010\\u2011\\u2013]|\\s+(?:and\\s+)?)${NUMBER_WORD})*\\b`,
+  "gi",
+);
+
+/** The number a run of number words states, when it is one small word. */
+function readNumberWords(run: string) {
+  const index = SMALL_NUMBER_WORDS.indexOf(run.toLowerCase());
+  return index === -1 ? null : String(index + 2);
+}
+
 function writeNumberWords(value: string) {
-  return value.replace(
-    new RegExp(
-      `(?<![-\\u2010\\u2011\\u2013]|\\b(?:twenty|thirty|forty|fifty|sixty|seventy|eighty|ninety)\\s+)\\b(${NUMBER_WORDS.join("|")})\\b(?![-\\u2010\\u2011\\u2013])`,
-      "gi",
-    ),
-    (word) => String(NUMBER_WORDS.indexOf(word.toLowerCase()) + 2),
-  );
+  return value.replace(NUMBER_WORD_RUN, (run) => readNumberWords(run) ?? run);
 }
 
 // A whole number: 46 is not inside 46.5 or 146, but 1887 is in "c.1887".
