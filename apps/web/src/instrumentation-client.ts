@@ -5,26 +5,7 @@ import * as Sentry from "@sentry/nextjs";
 import { SharedSentryConfig } from "./config";
 import { configureLogging } from "./lib/log";
 
-Sentry.init({
-  ...SharedSentryConfig,
-
-  replaysOnErrorSampleRate: 1.0,
-
-  // This sets the sample rate to be 10%. You may want this to be 100% while
-  // in development and sample at a lower rate in production
-  replaysSessionSampleRate: 0.1,
-
-  // You can remove this option if you're not planning to use the Sentry Session Replay feature:
-  integrations: [
-    Sentry.replayIntegration({
-      // Additional Replay configuration goes in here, for example:
-      maskAllText: true,
-      blockAllMedia: true,
-    }),
-  ],
-
-  // needed for proper trace propagation
-});
+Sentry.init(SharedSentryConfig);
 
 Sentry.setTag("service", "@peated/web");
 configureLogging();
