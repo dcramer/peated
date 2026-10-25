@@ -32,12 +32,21 @@ export default async function BottleAuctionsPage({
   params: Promise<{ bottleId: string }>;
   searchParams: Promise<{ cursor?: string }>;
 }) {
-  const { bottleId } = await params;
-  const bottle = await getBottlePage(parseCatalogRouteId(bottleId));
-  const page = Number((await searchParams).cursor ?? 1);
+  const [{ bottleId }, { cursor: cursorParam }] = await Promise.all([
+    params,
+    searchParams,
+  ]);
+  const id = parseCatalogRouteId(bottleId);
+  const page = Number(cursorParam ?? 1);
   const cursor = Number.isSafeInteger(page) && page > 0 ? page : 1;
-  const { client } = await getAnonymousServerClient();
-  const data = await client.auctions.list({ bottle: bottle.id, cursor });
+  // Web performance: read alongside the Bottle with the route ID. A merged
+  // Bottle has another ID, and getBottlePage redirects before this renders.
+  const [bottle, data] = await Promise.all([
+    getBottlePage(id),
+    getAnonymousServerClient().then(({ client }) =>
+      client.auctions.list({ bottle: id, cursor }),
+    ),
+  ]);
   const base = `${getBottleUrl(bottle)}/auctions`;
   return (
     <>

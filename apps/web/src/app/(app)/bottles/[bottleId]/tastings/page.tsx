@@ -81,15 +81,14 @@ async function TastingResults({
   cursor?: string;
   searchParams: Record<string, string | string[] | undefined>;
 }) {
-  const [bottle, { client }] = await Promise.all([
+  // Web performance: read alongside the Bottle with the route ID. A merged
+  // Bottle has another ID, and getBottlePage redirects before this renders.
+  const [bottle, activity] = await Promise.all([
     getBottlePage(id),
-    getPublicPageServerClient(),
+    getPublicPageServerClient().then(({ client }) =>
+      client.activity.reviewsAndTastings({ bottle: id, cursor, limit: 25 }),
+    ),
   ]);
-  const activity = await client.activity.reviewsAndTastings({
-    bottle: id,
-    cursor,
-    limit: 25,
-  });
   const pathname = `${getBottleUrl(bottle)}/tastings`;
 
   return (
