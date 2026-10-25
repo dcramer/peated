@@ -13,7 +13,7 @@ export const EvidenceSchema = z.object({
   reviewedAt: z.string(),
   entity: z.object({
     name: z.string(),
-    kind: z.enum(["distillery", "brand"]),
+    kind: z.enum(["distillery", "brand", "company"]),
     aliases: z.array(z.string()),
     location: z.string().nullable(),
     owner: z.string().nullable(),

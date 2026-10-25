@@ -1,0 +1,55 @@
+{
+  "case": "diageo",
+  "reviewedAt": "2026-10-25",
+  "entity": {
+    "id": 5558,
+    "name": "Diageo",
+    "kind": "company",
+    "aliases": [],
+    "location": "United Kingdom",
+    "owner": null,
+    "yearEstablished": 1997,
+    "website": "https://www.diageo.com/"
+  },
+  "pages": [
+    {
+      "url": "https://scotchwhisky.com/whiskypedia/2624/diageo/",
+      "title": "Diageo | Scotch Whisky",
+      "publisher": "ScotchWhisky.com (Whiskypedia)",
+      "description": "Whiskypedia entry on Diageo, the distiller and blender, with its history.",
+      "text": "Diageo. Distiller & blender. The world's largest producer of spirits.\n\nProfile\nDiageo is headquartered in Park Royal, London. In Scotch whisky it operates 28 malt distilleries, nearly one-third of the industry's total capacity, and Scotland's largest grain distillery at Cameronbridge. Its leading brand is Johnnie Walker; it also has J&B, Bells and single malts such as Cardhu, Talisker, Mortlach and The Singleton. It also sells Baileys, Smirnoff and Guinness.\n\nHistory\nDiageo was formed in 1997 by the merger of the Guinness Group and Grand Metropolitan. Its subsidiary United Distillers & Vintners (UDV) combined United Distillers and International Distillers & Vintners.\n\nUnited Distillers had been formed in 1987, when Guinness combined Arthur Bell & Sons, bought in a hostile takeover two years earlier, with the Distillers Company (DCL), which it had gained control of during 1986.\n\nThe firm's earliest 'ancestor company' is Justerini & Brooks, formed in 1749; Johnnie Walker has origins dating back to 1819/20. DCL had been established in 1877 by six Scotch whisky distillers, and merged with John Walker & Son and Buchanan-Dewar in 1925.\n\nDiageo spent £40 million creating the Roseisle malt distillery near Elgin, which opened in 2010. Two years later it announced it would invest £1 billion in Scotch whisky production over five years. A new large malt distillery beside Teaninich was part of the plan, but was postponed as sales slowed.\n\nIn 2013, Diageo acquired a majority stake in India's United Spirits group for £1.28 billion."
+    },
+    {
+      "url": "https://www.encyclopedia.com/books/politics-and-business-magazines/diageo-plc",
+      "title": "Diageo Plc | Encyclopedia.com",
+      "publisher": "Encyclopedia.com (Gale)",
+      "description": "Company history of Diageo plc and the Guinness and Grand Metropolitan businesses behind it.",
+      "text": "Diageo plc. 8 Henrietta Place, London W1M 9AG, United Kingdom. Public Company. Incorporated: 1997. Employees: 85,000.\n\nDiageo plc was formed from the December 1997 merger of Guinness PLC and Grand Metropolitan plc. It has four main businesses: United Distillers & Vintners (Smirnoff, Johnnie Walker, J&B, Gordon's and Baileys), Pillsbury foods, Guinness brewing and Burger King.\n\nDiageo's history begins with Guinness: in 1759 Arthur Guinness leased an old brewery at James Gate in Dublin.\n\nBy mid-1985 chief executive Ernest Saunders had tripled profits, and he had accomplished a takeover of Distillers Company, gaining Gordon's, Tanqueray and Johnnie Walker, for £2.5 billion (US$4.6 billion). Questions over how the deal was won led to inquiries, and in 1990 he was convicted of fraud. Guinness's distilling unit was later renamed United Distillers, and in September 1987 it bought Schenley Industries for US$555 million.\n\nIn 1987 Grand Metropolitan bought Heublein, gaining Smirnoff, for £800 million, and in 1989 it took over Pillsbury, which owned Burger King.\n\nDiageo Formed in December 1997\nIn May 1997 Guinness and Grand Metropolitan announced they would merge to form a new company, tentatively called GMG Brands. Seven months later the £12 billion (US$19 billion) merger, the largest in UK history to that point, was finalized. To win approval from regulators they agreed to divest the Dewar's Scotch whiskey and Bombay gin brands. In late March 1998 the merged company, now named Diageo plc, announced an agreement to sell these brands."
+    },
+    {
+      "url": "https://en.wikipedia.org/wiki/Roseisle_distillery",
+      "title": "Roseisle distillery - Wikipedia",
+      "publisher": "Wikipedia",
+      "description": "Encyclopedia entry on Diageo's Roseisle distillery near Elgin, Moray.",
+      "text": "Roseisle distillery is a Speyside single malt Scotch whisky distillery in Roseisle, near Elgin, Moray, Scotland. Owner: Diageo. Founded: 2010. Water source: Borehole. Stills: 7 wash stills, 7 spirit stills. Capacity: 10,000,000 L.\n\nHistory\nThe distillery is owned by multinational drinks company Diageo. In 2007, Diageo announced plans to build a new distillery in Roseisle.\n\nThe distillery opened in 2010. It is the largest ever built, at 3,000 sq m, and cost £40million. Some byproducts are recycled on site. It won the Scottish Design Award 2010 and the RICS Scotland 2010 Award.\n\nRoseisle was built only to serve Diageo's blended whisky needs. Roseisle single malts appear now and then in the Diageo Special Releases, the first in September 2023. In 2024 its malt was used in Johnnie Walker Black Ruby.\n\nReferences include: Wood, Zoe (3 October 2010). \"Diageo opens the first major new whisky distillery for a generation\". The Guardian."
+    }
+  ],
+  "expected": {
+    "events": [
+      {
+        "kind": "opened",
+        "year": "1997"
+      },
+      {
+        "kind": "generic",
+        "year": "2010"
+      },
+      {
+        "kind": "generic",
+        "year": "2013"
+      }
+    ],
+    "notes": "opened 1997: both company pages (ScotchWhisky.com: formed in 1997 by the merger of the Guinness Group and Grand Metropolitan; Encyclopedia.com: formed from the December 1997 merger, Incorporated: 1997). A date of 1997-12 also passes. generic 2010: Diageo opened the Roseisle distillery (ScotchWhisky.com: Roseisle opened in 2010; Roseisle Wikipedia: opened in 2010, Founded: 2010), linked to Roseisle with relatedEntityId when search finds it. generic 2013: Diageo bought a majority stake in United Spirits, an Indian whisky group (ScotchWhisky.com)."
+  },
+  "notes": "This is a company case: events are about the business, not its brands or distilleries. Traps for the founding: Encyclopedia.com says Diageo's history begins with Guinness's 1759 brewery lease; ScotchWhisky.com names Justerini & Brooks (1749) as the earliest ancestor, Johnnie Walker (1819/20) and DCL (1877). None is when Diageo began; an opened date before 1997 is wrong. The May 1997 announcement and the tentative name GMG Brands are not a founding or a renamed event. The 1997 merger formed Diageo; it is not an acquired event, because no firm took Diageo over. Conflict: ScotchWhisky.com says Guinness gained control of DCL during 1986; Encyclopedia.com places the takeover by mid-1985. That deal, United Distillers (1987) and the 1925 DCL merger are history of Diageo's predecessors, not events of Diageo itself. Traps outside whisky: Guinness brewing, Pillsbury, Burger King, Heublein and Smirnoff, Schenley and the Bombay gin sale. The 1998 agreement to sell Dewar's is a valid optional generic event (a whisky brand sale). Plans: the 2007 plan for Roseisle came true in 2010, but the 2012 £1 billion programme's new distillery beside Teaninich was postponed and must not appear as opened. Roseisle's awards, its Special Releases and Johnnie Walker Black Ruby are distillery or bottle details for other pages. Excluded pages: Diageo's own history page and its 2024 Port Ellen press release returned no text; the Diageo and Brora Wikipedia pages are sources of the writer prompt's Brora example, so model-check rules keep them out. Peated stores Diageo as a company with no owner, location United Kingdom and diageo.com as website. Page texts are reviewed paraphrases of the cited pages, not copies."
+}
