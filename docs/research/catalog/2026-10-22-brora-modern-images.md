@@ -41,7 +41,7 @@ as narrow portraits.
   [Diageo website conditions of use](https://legal.diageo.com/en-us/website-conditions-of-use).
   They prohibit reproduction except as allowed by law or by written
   permission. No press-kit license was found. Images from these pages are
-  stored under the producer-image rule with that limit named in `license`.
+  stored under the producer-image rule with `© Diageo` in `license`.
 - Openverse and Flickr searches for "brora whisky", "brora triptych",
   "brora distillery bottle", and "brora special release" found only the
   2013 Boutique-y Batch 1 label (CC BY-SA, outside this scope) and
