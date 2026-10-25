@@ -17,7 +17,7 @@ import {
   getDisagreement,
   getFactCitations,
   getShownFactIds,
-  ISO_DATE_PATTERN,
+  parseDates,
   siteFactId,
   valuesAgree,
 } from "./display";
@@ -48,11 +48,14 @@ const FILLER_WORDS = new Set(["and", "the", "for", "with"]);
 
 /**
  * Whether the quotes state `value`: every number in it, and the whole phrase
- * or every word that carries meaning. A date needs only its year, because
- * pages write months and days many ways.
+ * or every word that carries meaning. A date, or each end of a date range,
+ * needs only its year, because pages write months and days many ways.
  */
 function quotesState(quotes: readonly string[], value: string) {
-  const checked = ISO_DATE_PATTERN.test(value) ? value.slice(0, 4) : value;
+  const dates = parseDates(value);
+  const checked = dates
+    ? [dates.start, dates.end ?? ""].map((date) => date.slice(0, 4)).join(" ")
+    : value;
   const numbers = readNumbers(checked);
   const numbersStated = numbers.every((number) =>
     quotes.some((quote) => containsNumber(quote, number)),
@@ -118,6 +121,16 @@ export function keepVerifiedCitations(
   pages: readonly AboutPageRead[],
   current: EntityAboutDocument | null,
 ): EntityAboutDocument {
+  return verifyCitations(draft, pages, current).document;
+}
+
+/** Like `keepVerifiedCitations`, and also says why each dropped fact went. */
+function verifyCitations(
+  draft: EntityAboutDocument,
+  pages: readonly AboutPageRead[],
+  current: EntityAboutDocument | null,
+) {
+  const dropped: string[] = [];
   const pageText = new Map<string, string>();
   for (const page of pages) {
     const url = normalizeSourceUrl(page.url);
@@ -222,14 +235,35 @@ export function keepVerifiedCitations(
               ),
             ),
           );
-      return (
-        quotesState(quotes, event.date.slice(0, 4)) &&
-        (!event.endDate || quotesState(quotes, event.endDate.slice(0, 4))) &&
-        named(event.name) &&
-        named(event.newOwnerName) &&
-        numbersQuoted(event.text) &&
-        numbersQuoted(event.title)
-      );
+      const year = (date: string) => date.slice(0, 4);
+      const findMissing = () => {
+        if (!event.citations.length) {
+          return "none of its quotes is on a page read and states its statedValue";
+        }
+        if (!quotesState(quotes, year(event.date))) {
+          return `no kept quote states its year ${year(event.date)}`;
+        }
+        if (event.endDate && !quotesState(quotes, year(event.endDate))) {
+          return `no kept quote states its end year ${year(event.endDate)}`;
+        }
+        if (!named(event.name)) {
+          return `no one kept quote states its name "${event.name}"`;
+        }
+        if (!named(event.newOwnerName)) {
+          return `no one kept quote states its new owner "${event.newOwnerName}"`;
+        }
+        if (!numbersQuoted(event.text) || !numbersQuoted(event.title)) {
+          return "its text or title has a number no kept quote states";
+        }
+        return null;
+      };
+      const missing = findMissing();
+      if (missing) {
+        dropped.push(
+          `Event ${event.id} (${event.kind}, ${event.date}) was dropped: ${missing}.`,
+        );
+      }
+      return !missing;
     });
 
   const siteFacts: EntityAboutDocument["siteFacts"] = {};
@@ -245,10 +279,14 @@ export function keepVerifiedCitations(
           ? fact.asOf
           : null;
       siteFacts[field] = { ...fact, asOf, citations };
+    } else {
+      dropped.push(
+        `Site fact ${field} was dropped: no kept quote states ${fact.value}.`,
+      );
     }
   }
 
-  return pruneSources({ ...draft, events, siteFacts });
+  return { document: pruneSources({ ...draft, events, siteFacts }), dropped };
 }
 
 function factSearchText(document: EntityAboutDocument) {
@@ -569,7 +607,11 @@ export function reviewAboutDraft(
   kind: EntityKind,
   current: EntityAboutDocument | null,
 ) {
-  const verified = keepVerifiedCitations(draft, pages, current);
+  const { document: verified, dropped } = verifyCitations(
+    draft,
+    pages,
+    current,
+  );
   const siteFacts: EntityAboutDocument["siteFacts"] = {};
   for (const field of ABOUT_FACT_FIELD_LIST) {
     const fact = verified.siteFacts[field];
@@ -586,5 +628,7 @@ export function reviewAboutDraft(
   // The save rules repeat some checks above, so they run last to keep each
   // reason listed once.
   if (!errors.length) errors.push(...findAboutWriteErrors(document));
-  return { document, errors };
+  // Dropped facts are not errors: the page is saved without them. They tell
+  // a retry what to fix.
+  return { document, errors, dropped };
 }

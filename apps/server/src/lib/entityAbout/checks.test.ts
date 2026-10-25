@@ -530,6 +530,31 @@ describe("checkConflictPicks", () => {
     expect(reopened("1948")).toBe(0);
   });
 
+  test("reads a stated date range by its years", () => {
+    const quote =
+      "Between May 1969 and July 1973 Brora made a heavily peated whisky.";
+    const kept = keepVerifiedCitations(
+      draft({
+        events: [
+          {
+            id: 1,
+            kind: "era",
+            title: "Heavily peated years",
+            date: "1969-05",
+            endDate: "1973-07",
+            citations: [
+              { sourceId: "wp", statedValue: "1969-05\u20131973-07", quote },
+            ],
+          },
+        ],
+      }),
+      [{ ...page, text: `${page.text} ${quote}` }],
+      null,
+    );
+
+    expect(kept.events).toHaveLength(1);
+  });
+
   test("keeps an era whose start and end years come from different quotes", () => {
     const start = "Malt Mill was built on the site in 1908.";
     const end = "Malt Mill closed in 1962.";

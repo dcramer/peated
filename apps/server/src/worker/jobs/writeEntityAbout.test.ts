@@ -244,6 +244,40 @@ describe("writeEntityAbout", () => {
     expect(about?.document.events.map(({ id }) => id)).toEqual([1, 2]);
   });
 
+  test("tells the retry why the checks dropped a fact", async ({
+    fixtures,
+  }) => {
+    const entity = await fixtures.Entity({ kind: "distillery" });
+    const base = draft([
+      { text: "Brora opened in 1819.", factIds: ["event:1"] },
+      { text: "It closed in 1983.", factIds: ["event:2"] },
+      { text: "A blender bought it in 1983.", factIds: ["event:3"] },
+    ]);
+    // The quote states the year but not the new owner's name.
+    const withUnquotedOwner: AboutDraft = {
+      ...base,
+      events: [
+        ...base.events,
+        {
+          ...base.events[1]!,
+          id: 3,
+          kind: "acquired",
+          newOwnerName: "James Ainslie",
+        },
+      ],
+    };
+    const writer = services(async () => ({
+      draft: withUnquotedOwner,
+      pagesRead: [page],
+    }));
+
+    await writeEntityAbout({ entityId: entity.id }, writer);
+
+    expect(writer.writer.mock.calls[1]?.[0].previousErrors).toContain(
+      'Event 3 (acquired, 1983) was dropped: no one kept quote states its new owner "James Ainslie".',
+    );
+  });
+
   test("on its last try, leaves out sentences citing a dropped fact", async ({
     fixtures,
   }) => {

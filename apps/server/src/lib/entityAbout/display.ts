@@ -38,7 +38,7 @@ const DATE_RANGE_PATTERN =
   /^(\d{4}(?:-\d{2}){0,2}) ?[–-] ?(\d{4}(?:-\d{2}){0,2})$/;
 
 /** Reads a date or a range such as `1969–1973` as a start and an end. */
-function parseDates(value: string) {
+export function parseDates(value: string) {
   if (ISO_DATE_PATTERN.test(value)) return { start: value, end: null };
   const range = DATE_RANGE_PATTERN.exec(value);
   return range ? { start: range[1]!, end: range[2]! } : null;

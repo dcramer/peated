@@ -130,6 +130,7 @@ export async function writeEntityAbout(
 
   let errors: string[] = [];
   let previousDraft: AboutDraft | null = null;
+  let retryReasons: string[] = [];
   // Pages and Entities from every try count, so the retry can keep the
   // failed draft's citations and links without reading them again.
   const pagesRead: AboutPageRead[] = [];
@@ -154,7 +155,7 @@ export async function writeEntityAbout(
       history,
       currentPage: current ? documentToDraft(current.document) : null,
       previousDraft,
-      previousErrors: errors,
+      previousErrors: retryReasons,
     });
     pagesRead.push(...run.pagesRead);
     entitiesFound.push(...(run.entitiesFound ?? []));
@@ -168,6 +169,9 @@ export async function writeEntityAbout(
     );
     // An item the schema rejected is a reason to retry, not a silent gap.
     errors = [...converted.errors, ...reviewed.errors];
+    // A retry also learns which facts the checks dropped, so it can fix
+    // them instead of leaving them out.
+    retryReasons = [...errors, ...reviewed.dropped];
     let document = reviewed.document;
     // Pipeline rule (owner: docs/features/entity-about.md): with no retry
     // left, the prose is trimmed to the facts the checks kept, and the

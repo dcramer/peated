@@ -57,12 +57,11 @@ function describeDraft(
   kind: Evidence["entity"]["kind"],
 ) {
   const { document, errors: conversionErrors } = draftToDocument(draft);
-  const { document: reviewed, errors } = reviewAboutDraft(
-    document,
-    pagesRead,
-    kind,
-    null,
-  );
+  const {
+    document: reviewed,
+    errors,
+    dropped,
+  } = reviewAboutDraft(document, pagesRead, kind, null);
   const keptSiteFacts = new Map(Object.entries(reviewed.siteFacts));
   const citationKey = ({ sourceId, quote }: AboutCitation) =>
     `${sourceId}\n${quote}`;
@@ -82,8 +81,10 @@ function describeDraft(
     pagesRead: pagesRead.map((page) => page.url),
     // Items the output format rejected never reach the document below.
     conversionErrors,
-    // Why the job retried or rejected this draft, before any trim.
+    // Why the job retried or rejected this draft, before any trim, and
+    // why the checks dropped each fact.
     errors,
+    dropped,
     // A fact the checks drop as a whole (an unquoted year, name, or number)
     // shows kept: false; its citations then show which quotes still passed.
     events: document.events.map((event) => {
