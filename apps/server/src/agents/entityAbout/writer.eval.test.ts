@@ -1,13 +1,20 @@
 import { db } from "@peated/server/db";
+import { reviewAboutDraft } from "@peated/server/lib/entityAbout/checks";
 import { isFactShown } from "@peated/server/lib/entityAbout/display";
 import { normalizeSourceUrl } from "@peated/server/lib/entityAbout/document";
 import { getEntityAbout } from "@peated/server/lib/entityAbout/store";
 import { isAIGatewayConfigured } from "@peated/server/lib/openaiClient";
 import * as fixtures from "@peated/server/lib/test/fixtures";
+import type { AboutCitation } from "@peated/server/schemas/entityAbout";
 import { writeEntityAbout } from "@peated/server/worker/jobs/writeEntityAbout";
+import { onTestFailed } from "vitest";
 
+import { draftToDocument } from "./draftSchema";
 import { ABOUT_EVAL_CASES, savedSource, type Evidence } from "./evals/evidence";
-import { createEntityAboutWriter } from "./writer";
+import {
+  createEntityAboutWriter,
+  type EntityAboutWriterResult,
+} from "./writer";
 
 async function createEntity({ entity }: Evidence) {
   const [region, country] = entity.location?.includes(", ")
@@ -38,6 +45,57 @@ async function createEntity({ entity }: Evidence) {
   return created;
 }
 
+// Each fact of a draft with its citations, marking the ones the checks kept,
+// so a failed case shows which quotes were dropped and why a fact is hidden.
+function describeDraft(
+  { draft, pagesRead }: EntityAboutWriterResult,
+  kind: Evidence["entity"]["kind"],
+) {
+  const document = draftToDocument(draft).document;
+  const reviewed = reviewAboutDraft(document, pagesRead, kind, null).document;
+  const keptSiteFacts = new Map(Object.entries(reviewed.siteFacts));
+  const keptQuotes = (citations: AboutCitation[] = []) =>
+    new Set(citations.map((citation) => citation.quote));
+  const listCitations = (
+    citations: AboutCitation[],
+    kept: ReadonlySet<string | null>,
+  ) =>
+    citations.map(({ sourceId, statedValue, quote }) => ({
+      sourceId,
+      statedValue,
+      quote,
+      kept: kept.has(quote),
+    }));
+  return {
+    pagesRead: pagesRead.map((page) => page.url),
+    events: document.events.map((event) => ({
+      id: event.id,
+      kind: event.kind,
+      date: event.date,
+      text: event.text,
+      citations: listCitations(
+        event.citations,
+        keptQuotes(reviewed.events.find((e) => e.id === event.id)?.citations),
+      ),
+    })),
+    siteFacts: Object.entries(document.siteFacts).map(([field, fact]) => ({
+      field,
+      value: fact.value,
+      citations: listCitations(
+        fact.citations,
+        keptQuotes(keptSiteFacts.get(field)?.citations),
+      ),
+    })),
+    sentences: document.sections.flatMap((section) =>
+      section.sentences.map((sentence) => ({
+        section: section.key,
+        text: sentence.text,
+        factIds: sentence.factIds,
+      })),
+    ),
+  };
+}
+
 // Runs the real job with a writer that reads only a case's saved pages. The
 // cases and their review notes are in ./evals/.
 describe.skipIf(!isAIGatewayConfigured())("About writer", () => {
@@ -45,15 +103,29 @@ describe.skipIf(!isAIGatewayConfigured())("About writer", () => {
     ABOUT_EVAL_CASES.map((evidence) => [evidence.case, evidence] as const),
   )("%s", async (_name, evidence) => {
     const entity = await createEntity(evidence);
+    const write = createEntityAboutWriter(() => savedSource(evidence.pages));
+    const runs: EntityAboutWriterResult[] = [];
 
     const result = await writeEntityAbout(
       { entityId: entity.id },
       {
         enabled: true,
-        writer: createEntityAboutWriter(() => savedSource(evidence.pages)),
+        writer: async (input) => {
+          const run = await write(input);
+          runs.push(run);
+          return run;
+        },
         now: () => new Date(),
       },
     );
+    onTestFailed(() => {
+      console.info(
+        `About writer case ${evidence.case}: ${JSON.stringify({
+          result,
+          runs: runs.map((run) => describeDraft(run, evidence.entity.kind)),
+        })}`,
+      );
+    });
 
     // The job's own checks decide whether a draft is saved; a rejected run
     // lists every reason.
