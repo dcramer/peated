@@ -144,8 +144,10 @@ Site facts that do not apply to the Entity's kind are dropped, and the
 store's own save rules run as a check too, so a draft the store would reject
 gets its retry. A draft with no sourced facts fails.
 
-A draft that fails gets one retry with the reasons. After that, the job saves
-nothing. A draft that passes is saved as the next version, with a version
+A draft that fails gets one retry with the reasons. On the retry, a sentence
+that cites a fact the checks dropped is left out, as the page would hide it,
+and a section left empty goes too; the rest must pass every check. Otherwise
+the job saves nothing. A draft that passes is saved as the next version, with a version
 check: when a moderator saves the page during the run, their version stays
 and the job saves nothing. A bad run is undone by restoring an earlier
 version from the change log.

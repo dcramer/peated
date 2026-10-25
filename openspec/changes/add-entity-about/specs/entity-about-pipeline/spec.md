@@ -102,9 +102,17 @@ check SHALL use the same list.
 
 ### Requirement: Failure keeps what exists
 
-A rejected draft SHALL be retried once. If the retry also fails, the job SHALL
-keep the stored document unchanged and log the reason. It SHALL NOT save
-unsourced text.
+A rejected draft SHALL be retried once. On the retry, the job SHALL leave out
+sentences that cite a fact the checks dropped, and sections left empty, and
+SHALL check the rest again. If the retry still fails, the job SHALL keep the
+stored document unchanged and log the reason. It SHALL NOT save unsourced
+text.
+
+#### Scenario: Retry cites a dropped fact
+
+- **WHEN** the retry passes except for one sentence citing a fact whose quote
+  was not on a page read
+- **THEN** the job saves the page without that sentence
 
 #### Scenario: Two rejected drafts
 
