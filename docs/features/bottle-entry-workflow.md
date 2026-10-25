@@ -30,7 +30,10 @@ the [Catalog Maintenance](../operations/catalog-maintenance.md) workflow.
   the check. If one is running, Save waits for it and then opens the review. If
   the check fails, the Bottle saves anyway.
 - “Add a similar bottle” only prefills the same independent creation form from
-  the selected Bottle. It does not reuse or join the source BottleGroup.
+  the selected Bottle. It does not reuse or join the source BottleGroup. It
+  leaves bottler empty when the source names its own distillery Brand as
+  bottler, because an official release has no bottler. It still copies any
+  other bottler, such as an independent bottler's own label.
 - A created Bottle id continues directly into Library, tasting, image, proposal,
   and return-intent workflows. The browser never reconstructs a legacy
   Bottle/BottleRelease pair.
