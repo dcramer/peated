@@ -18,9 +18,10 @@ not make a different Bottle."
   That date is for the expression, not for any one bottle.
 - [Rhum & Whisky](https://rhumandwhisky.com/eng/product/laphroaig-15-yo-1980s-cinzano-import-75cl-43)
   lists the Cinzano import as 1980s, 75cl, 43%.
-- Whiskybase user lists show two `15-year-old Unblended Islay Malt Scotch
-Whisky` entries at 750 ml: one at 43% and one at 40%. No Whiskybase page for
-  the Cinzano import itself turned up in search.
+- Whiskybase user lists show two entries titled
+  `15-year-old Unblended Islay Malt Scotch Whisky` at 750 ml: one at 43% and
+  one at 40%. No Whiskybase page for the Cinzano import itself turned up in
+  search.
 - [The Whisky Vault](https://www.thewhiskyvault.com/laphroaig-15-year-old-unblended-uk-eighties-bottling-with-tin-5750-p.asp)
   and [The Whisky Exchange](https://www.thewhiskyexchange.com/p/19945/laphroaig-15-year-old-bot1980s)
   describe the UK-market bottle: 75cl, 40%, tin, and a large red `15` behind
