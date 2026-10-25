@@ -8,6 +8,7 @@ the requests.
 ```bash
 pnpm cli api get '/prices/match-queue?state=actionable&sort=created&limit=100&cursor=1'
 pnpm cli api get /prices/match-queue/PROPOSAL_ID
+pnpm cli api get /prices/PRICE_ID/match-proposal
 pnpm cli api get /prices/match-queue/retry-runs/active
 pnpm cli api get '/bottles/create-candidates?name=Port%20Charlotte%2018&statedAge=18&limit=5'
 pnpm cli api get '/bottles?query=Port%20Charlotte%2018&limit=12'
@@ -93,7 +94,10 @@ pnpm cli api post /prices/match-queue/123/create-bottle --input /tmp/peated-requ
 Stop on `409`. Verify proposal status, the assigned or created Bottle, and
 moderation history after success.
 
-Undo a wrong match. Read the proposal first and send what you observed:
+Undo a wrong match. Read the proposal first and send what you observed. With
+only a price ID, read `/prices/PRICE_ID/match-proposal`: it returns the price's
+proposal in any status. Send its `id`, `updatedAt`, `price.sourceFingerprint`,
+and `price.bottle.id`:
 
 ```json
 {
