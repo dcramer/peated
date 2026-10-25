@@ -247,6 +247,22 @@ describe("writeEntityAbout", () => {
     ).toEqual(["Brora opened in 1819.", "It closed in 1983."]);
   });
 
+  test("saves nothing when leaving out sentences removes the lead", async ({
+    fixtures,
+  }) => {
+    const entity = await fixtures.Entity({ kind: "distillery" });
+    const noLead = draft([
+      { text: "It reopened in 2021.", factIds: ["event:3"] },
+      { text: "It was renamed in 1969.", factIds: ["event:4"] },
+    ]);
+    const writer = services(async () => ({ draft: noLead, pagesRead: [page] }));
+
+    const result = await writeEntityAbout({ entityId: entity.id }, writer);
+
+    expect(result).toMatchObject({ status: "rejected" });
+    expect(await getEntityAbout(db, entity.id)).toBeNull();
+  });
+
   test("tells the writer which items break the output format", async ({
     fixtures,
   }) => {

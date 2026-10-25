@@ -176,7 +176,11 @@ export async function writeEntityAbout(
         entity.kind,
         current?.document ?? null,
       );
-      if (!kept.errors.length) {
+      // Leaving out sentences may shorten a page, never strip its lead.
+      const keptLead = kept.document.sections.some(
+        (section) => section.key === "lead",
+      );
+      if (!kept.errors.length && keptLead) {
         errors = [];
         document = kept.document;
       }
