@@ -206,7 +206,7 @@ function verifyCitations(
       ...event,
       citations: event.citations.filter(isVerified),
     }))
-    .filter((event) => {
+    .filter((event, index) => {
       const quotes = quotesOf(event.citations);
       // Names are shown as facts too, so one quote must state each whole;
       // words from different quotes do not make a name.
@@ -265,8 +265,20 @@ function verifyCitations(
       };
       const missing = findMissing();
       if (missing) {
+        // Name the quotes that failed too: often one of them held the
+        // missing value.
+        const failed = [
+          ...new Set(
+            draft.events[index]!.citations.filter(
+              (citation) => !isVerified(citation),
+            ).map((citation) => citation.sourceId),
+          ),
+        ];
+        const failedNote = failed.length
+          ? ` Its quotes from ${failed.join(", ")} did not pass: a quote must be on a page read and state its statedValue.`
+          : "";
         dropped.push(
-          `Event ${event.id} (${event.kind}, ${event.date}) was dropped: ${missing}.`,
+          `Event ${event.id} (${event.kind}, ${event.date}) was dropped: ${missing}.${failedNote}`,
         );
       }
       return !missing;

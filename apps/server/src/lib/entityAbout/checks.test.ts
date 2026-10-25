@@ -555,6 +555,35 @@ describe("checkConflictPicks", () => {
     ]);
   });
 
+  test("names the quotes that failed when a fact is dropped", () => {
+    const withName = "In the same year, it was acquired by Glenmorangie plc.";
+    const withYear = "Glenmorangie acquired it in 2004.";
+    const { dropped } = reviewAboutDraft(
+      draft({
+        events: [
+          {
+            id: 1,
+            kind: "acquired",
+            date: "2004",
+            newOwnerName: "Glenmorangie plc",
+            citations: [
+              // No year in this quote, so it fails its stated value.
+              { sourceId: "wp", statedValue: "2004", quote: withName },
+              { sourceId: "wp", statedValue: "2004", quote: withYear },
+            ],
+          },
+        ],
+      }),
+      [{ ...page, text: `${page.text} ${withName} ${withYear}` }],
+      "bottler",
+      null,
+    );
+
+    expect(dropped).toEqual([
+      'Event 1 (acquired, 2004) was dropped: no one kept quote states its new owner "Glenmorangie plc". Its quotes from wp did not pass: a quote must be on a page read and state its statedValue.',
+    ]);
+  });
+
   test("reads a stated date range by its years", () => {
     const quote =
       "Between May 1969 and July 1973 Brora made a heavily peated whisky.";
