@@ -101,6 +101,16 @@ to create a Bottle. Under that rule the case's `create_bottle` expectation is
 questionable. Production now holds Octomore 13.1, so a production-shaped
 version of the case would include the existing Octomore Bottles as candidates.
 
+## Review fix
+
+The PR's first CI run passed the gate at 81.6%. Review then found a
+normalization rule later in the extractor prompt that still told the model to
+split "a stable family phrase followed by a numbered or coded variant label"
+into `expression` and `edition`, which contradicts the new `expression`
+guidance for numbered releases. The rule now covers only batch, selection,
+market, and release codes that are not part of the name, and says a release
+number people use as the name stays whole in `expression`.
+
 ## Follow-up
 
 - Decide the Octomore 13.1 expectation (review for a bare title, or a

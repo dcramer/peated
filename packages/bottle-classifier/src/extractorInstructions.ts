@@ -427,7 +427,7 @@ export function buildWhiskyLabelExtractorInstructions({
       "When an age statement belongs in the expression, normalize the phrase to `12-year-old`.",
       "For expression-style fields, follow the bottle's evidenced canonical name. Do not mechanically append retailer style/category words from the title just to make the expression look complete.",
       "Keep marketed `Single Barrel` or `Single Cask` wording in `expression` when it is printed as part of the bottle name; setting `single_cask: true` does not remove that wording from the name.",
-      "When a stable family phrase is followed by a clearly separate numbered or coded variant label, keep the family in `expression` and the varying label in `edition` instead of collapsing both into one opaque expression.",
+      "When a stable family phrase is followed by a clearly separate batch, selection, market, or release code that is not part of the name people use, keep the family in `expression` and that code in `edition` instead of collapsing both into one opaque expression. A release number or title that people say as the bottle's name stays whole in `expression`.",
       "Apply that split from the label structure itself, not by memorizing brand-specific examples. If the split is ambiguous, stay less specific instead of guessing.",
       "Set `vintage_year`, `bottling_year`, or `release_year` only when the source makes the meaning clear. Leave a year unset when its meaning is unclear.",
       "If `edition`, `release_year`, `bottling_year`, or `vintage_year` is set, do not also copy that same batch code or year into `expression`.",
