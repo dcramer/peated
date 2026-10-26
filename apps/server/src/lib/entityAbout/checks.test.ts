@@ -178,6 +178,12 @@ describe("keepVerifiedCitations", () => {
     expect(
       kept("Diageo paid 1.2 billion.", "In 1983 Diageo paid £1.2bn."),
     ).toBe(1);
+    expect(
+      kept(
+        "Brora made 2 million litres.",
+        "In 1983 it made two million litres.",
+      ),
+    ).toBe(1);
     // A number the check cannot read must appear in a quote as written.
     expect(
       kept("Brora filled two hundred casks.", "Brora closed in 1983."),
@@ -756,6 +762,9 @@ describe("checkConflictPicks", () => {
     // Millions are read as whole numbers.
     expect(stills(1600000, "It makes 1.6m litres of alcohol.")).toBeDefined();
     expect(stills(2000000, "It makes 2 million litres.")).toBeDefined();
+    expect(
+      stills(2000000, "It makes almost two million litres."),
+    ).toBeDefined();
     expect(stills(1600000, "It is 1.6 metres tall.")).toBeUndefined();
     // A value written in millions reads the same way as the quote.
     expect(stills(1600000, "It makes 1.6 million litres.")).toBeDefined();

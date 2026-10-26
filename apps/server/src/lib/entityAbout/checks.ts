@@ -451,7 +451,16 @@ function readNumberWords(run: string) {
 }
 
 function writeNumberWords(value: string) {
-  return value.replace(NUMBER_WORD_RUN, (run) => readNumberWords(run) ?? run);
+  // "two million" states 2 million, like "2 million".
+  return value
+    .replace(
+      new RegExp(
+        `\\b(${SMALL_NUMBER_WORDS.join("|")})\\s+(million|billion)\\b`,
+        "gi",
+      ),
+      (_, word: string, unit: string) => `${readNumberWords(word)} ${unit}`,
+    )
+    .replace(NUMBER_WORD_RUN, (run) => readNumberWords(run) ?? run);
 }
 
 // Capacities and prices are often written in millions or billions: "1.6m
