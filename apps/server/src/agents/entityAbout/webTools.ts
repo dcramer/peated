@@ -155,8 +155,39 @@ export function createFirecrawlSource({
   };
 }
 
+const FIND_SNIPPET_CHARS = 200;
+const FIND_MATCHES_PER_PAGE = 3;
+const FIND_MATCHES = 12;
+
 /**
- * The writer's two tools. Each has a fixed allowance; when it is used up the
+ * Passages from pages already read that contain `query`, ignoring case, so
+ * the writer can find every value its pages give for one fact.
+ */
+export function findInPages(pages: readonly AboutPageRead[], query: string) {
+  const needle = query.toLowerCase();
+  const matches: { url: string; passage: string }[] = [];
+  for (const page of pages) {
+    const haystack = page.text.toLowerCase();
+    let from = 0;
+    let perPage = 0;
+    while (perPage < FIND_MATCHES_PER_PAGE && matches.length < FIND_MATCHES) {
+      const at = haystack.indexOf(needle, from);
+      if (at === -1) break;
+      const start = Math.max(0, at - FIND_SNIPPET_CHARS);
+      const end = Math.min(
+        page.text.length,
+        at + needle.length + FIND_SNIPPET_CHARS,
+      );
+      matches.push({ url: page.url, passage: page.text.slice(start, end) });
+      from = end;
+      perPage += 1;
+    }
+  }
+  return matches;
+}
+
+/**
+ * The writer's web tools. Each has a fixed allowance; when it is used up the
  * tool says so instead of calling the source.
  */
 export function createAboutWebTools({
@@ -222,5 +253,21 @@ export function createAboutWebTools({
     },
   });
 
-  return [searchWeb, readPage];
+  const findInPagesTool = tool({
+    name: "find_in_pages",
+    description:
+      'Search the text of pages you already read in this run for a word or phrase, such as an owner\'s name, a year, or "stills". Returns passages with their page URL. It uses no searches or reads. Use it before you finish to find every value your pages give for each fact.',
+    parameters: z.object({
+      query: z.string().trim().min(2).max(100),
+    }),
+    execute: async ({ query }) => {
+      // Duplicate reads of one page would repeat its passages.
+      const pages = [
+        ...new Map(pagesRead.map((page) => [page.url, page])).values(),
+      ];
+      return { matches: findInPages(pages, query) };
+    },
+  });
+
+  return [searchWeb, readPage, findInPagesTool];
 }
