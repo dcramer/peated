@@ -779,9 +779,7 @@
     "notes": "Captured from saved classifier run 24055 (auction_lot 6333, model null, 2026-10-02T13:30:45.643Z). Production rationale: The source identifies Gordon & MacPhail’s Glenlivet Generations 70-year-old. Inspected Bottle 65654 matches the brand, distillery, series, and age; the auction’s sample-presentation-set wording describes packaging and does not establish a different whisky release. Checked 2026-10-24. Lot 182-03447 page: a tiny sample vial from the Gordon & MacPhail Generations Glenlivet 70 Year Old presentation pack, with a book and USB stick; 45.9%, distilled 4 February 1940, bottled 2011; winning bid £250. Production matched Bottle 65654, the full 70-year-old release; that is wrong. Search evidence is empty to keep the title-only input. Current auction matching sends readCandidateImages:false, so the case does too; the saved run predates that and read candidate photos. The identity model treats a sample of the same whisky as the same Bottle, so the right outcome rests on scope, not identity: a set is not one Bottle listing, and auctions leave sets out (docs/features/auctions.md). This is a model-judgment miss. A title pattern that ignored sample sets before the model (C33) was reverted on 2026-10-25 because a keyword rule must not decide what a listing is."
   },
   "expected": {
-    "status": "classified",
-    "action": "no_match",
-    "identityScope": "product",
-    "summary": "A sample presentation set packs a vial with other items, so it is not one Bottle listing. Decline instead of matching the full-size Bottle."
+    "status": "ignored",
+    "summary": "A sample presentation set packs a vial with other items, so it is not one whisky Bottle. Ignore it instead of matching the full-size Bottle."
   }
 }

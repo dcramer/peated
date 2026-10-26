@@ -1,0 +1,857 @@
+{
+  "id": "auction-springbank-2012-13-year-old-duty-paid-sample",
+  "name": "auction title: a duty-paid trade sample without a matching Bottle is ignored",
+  "input": {
+    "reference": {
+      "id": 4083,
+      "url": "https://www.scotchwhiskyauctions.com/auctions/232-the-183rd-auction/896012-springbank-2012-13-year-old-duty-paid-sample/",
+      "name": "Springbank 2012 13 Year Old Duty Paid Sample",
+      "imageUrl": null,
+      "externalSiteId": 28097,
+      "currentBottleId": null
+    },
+    "extractedIdentity": {
+      "abv": null,
+      "brand": "Springbank",
+      "series": null,
+      "bottler": null,
+      "edition": null,
+      "outturn": null,
+      "category": "single_malt",
+      "distillery": ["Springbank"],
+      "expression": null,
+      "maturation": null,
+      "stated_age": 13,
+      "cask_number": null,
+      "release_day": null,
+      "single_cask": null,
+      "release_year": null,
+      "vintage_year": 2012,
+      "bottling_year": null,
+      "cask_strength": null,
+      "release_month": null
+    },
+    "imageEvidence": null,
+    "initialCandidates": [
+      {
+        "abv": 53,
+        "brand": "Decadent Drams",
+        "score": 47.306873,
+        "series": null,
+        "source": ["text"],
+        "bottler": "Decadent Drinks",
+        "edition": null,
+        "outturn": 282,
+        "bottleId": 48979,
+        "category": "single_malt",
+        "fullName": "Decadent Drams Glencadam - 13-year-old - 2012 Vintage - 53.0% ABV - Single Cask",
+        "reference": null,
+        "statedAge": 13,
+        "caskNumber": null,
+        "comparison": {
+          "missing": [],
+          "conflicts": ["brand", "distillers"],
+          "agreements": ["category", "statedAge", "vintageYear"]
+        },
+        "distillery": ["Glencadam"],
+        "maturation": "refill barrel",
+        "releaseDay": null,
+        "singleCask": true,
+        "releaseYear": null,
+        "vintageYear": 2012,
+        "bottlingYear": 2025,
+        "caskStrength": false,
+        "releaseMonth": null,
+        "familyContext": {
+          "siblingBottles": []
+        }
+      },
+      {
+        "abv": 54.7,
+        "brand": "Thompson Bros.",
+        "score": 46.32948,
+        "series": null,
+        "source": ["text"],
+        "bottler": "Thompson Bros.",
+        "edition": null,
+        "outturn": null,
+        "bottleId": 63287,
+        "category": "single_malt",
+        "fullName": "Thompson Bros. Glen Ord 13-year-old",
+        "reference": null,
+        "statedAge": 13,
+        "caskNumber": null,
+        "comparison": {
+          "missing": [],
+          "conflicts": ["brand", "distillers"],
+          "agreements": ["category", "statedAge", "vintageYear"]
+        },
+        "distillery": ["Glen Ord"],
+        "maturation": null,
+        "releaseDay": null,
+        "singleCask": null,
+        "releaseYear": null,
+        "vintageYear": 2012,
+        "bottlingYear": null,
+        "caskStrength": null,
+        "releaseMonth": null,
+        "familyContext": {
+          "siblingBottles": []
+        }
+      },
+      {
+        "abv": 51.7,
+        "brand": "Single Cask Nation",
+        "score": 44.417248,
+        "series": null,
+        "source": ["text"],
+        "bottler": "Single Cask Nation",
+        "edition": null,
+        "outturn": 182,
+        "bottleId": 47666,
+        "category": "single_malt",
+        "fullName": "Single Cask Nation Dailuaine - 13-year-old - 2026 Release - 2012 Vintage - 51.7% ABV",
+        "reference": null,
+        "statedAge": 13,
+        "caskNumber": "307202",
+        "comparison": {
+          "missing": [],
+          "conflicts": ["brand", "distillers"],
+          "agreements": ["category", "statedAge", "vintageYear"]
+        },
+        "distillery": ["Dailuaine"],
+        "maturation": "1st Fill PX Sherry Hogshead (3 yrs)",
+        "releaseDay": null,
+        "singleCask": true,
+        "releaseYear": 2026,
+        "vintageYear": 2012,
+        "bottlingYear": 2026,
+        "caskStrength": null,
+        "releaseMonth": null,
+        "familyContext": {
+          "siblingBottles": []
+        }
+      },
+      {
+        "abv": 58.2,
+        "brand": "Single Cask Nation",
+        "score": 43.658627,
+        "series": null,
+        "source": ["text"],
+        "bottler": "Single Cask Nation",
+        "edition": null,
+        "outturn": 174,
+        "bottleId": 47672,
+        "category": "single_malt",
+        "fullName": "Single Cask Nation Glen Moray - 13-year-old - 2026 Release - 2012 Vintage - 58.2% ABV",
+        "reference": null,
+        "statedAge": 13,
+        "caskNumber": "800452",
+        "comparison": {
+          "missing": [],
+          "conflicts": ["brand", "distillers"],
+          "agreements": ["category", "statedAge", "vintageYear"]
+        },
+        "distillery": ["Glen Moray"],
+        "maturation": "1st Fill Bourbon Barrel",
+        "releaseDay": null,
+        "singleCask": true,
+        "releaseYear": 2026,
+        "vintageYear": 2012,
+        "bottlingYear": 2026,
+        "caskStrength": null,
+        "releaseMonth": null,
+        "familyContext": {
+          "siblingBottles": []
+        }
+      },
+      {
+        "abv": 49.7,
+        "brand": "The Whisky Agency",
+        "score": 43.28823,
+        "series": null,
+        "source": ["text"],
+        "bottler": "The Whisky Agency",
+        "edition": null,
+        "outturn": null,
+        "bottleId": 47399,
+        "category": "single_malt",
+        "fullName": "The Whisky Agency Glen Garioch - 13-year-old - 2026 Release - 2012 Vintage - 49.7% ABV - Ruby Port Cask - Barrique",
+        "reference": null,
+        "statedAge": 13,
+        "caskNumber": null,
+        "comparison": {
+          "missing": [],
+          "conflicts": ["brand", "distillers"],
+          "agreements": ["category", "statedAge", "vintageYear"]
+        },
+        "distillery": ["Glen Garioch"],
+        "maturation": "ruby_port",
+        "releaseDay": null,
+        "singleCask": null,
+        "releaseYear": 2026,
+        "vintageYear": 2012,
+        "bottlingYear": null,
+        "caskStrength": null,
+        "releaseMonth": null,
+        "familyContext": {
+          "siblingBottles": []
+        }
+      },
+      {
+        "abv": 54,
+        "brand": "William Cadenhead's",
+        "score": 43.028526,
+        "series": "Chairman's Stock",
+        "source": ["text"],
+        "bottler": "William Cadenhead's",
+        "edition": null,
+        "outturn": 210,
+        "bottleId": 47329,
+        "category": "single_malt",
+        "fullName": "Cadenhead's Tullibardine",
+        "reference": null,
+        "statedAge": 13,
+        "caskNumber": null,
+        "comparison": {
+          "missing": [],
+          "conflicts": ["brand", "distillers"],
+          "agreements": ["category", "statedAge", "vintageYear"]
+        },
+        "distillery": ["Tullibardine"],
+        "maturation": "tawny_port",
+        "releaseDay": null,
+        "singleCask": null,
+        "releaseYear": 2025,
+        "vintageYear": 2012,
+        "bottlingYear": null,
+        "caskStrength": null,
+        "releaseMonth": null,
+        "familyContext": {
+          "siblingBottles": []
+        }
+      },
+      {
+        "abv": 53.1,
+        "brand": "Decadent Drams",
+        "score": 42.39622,
+        "series": null,
+        "source": ["text"],
+        "bottler": "Decadent Drinks",
+        "edition": null,
+        "outturn": 212,
+        "bottleId": 48953,
+        "category": "single_malt",
+        "fullName": "Decadent Drams Caol Ila - 13-year-old - 2012 Vintage - 53.1% ABV - Single Cask - Cask Strength",
+        "reference": null,
+        "statedAge": 13,
+        "caskNumber": null,
+        "comparison": {
+          "missing": [],
+          "conflicts": ["brand", "distillers"],
+          "agreements": ["category", "statedAge", "vintageYear"]
+        },
+        "distillery": ["Caol Ila"],
+        "maturation": "Matured in a 1st fill sherry hogshead",
+        "releaseDay": null,
+        "singleCask": true,
+        "releaseYear": null,
+        "vintageYear": 2012,
+        "bottlingYear": 2025,
+        "caskStrength": true,
+        "releaseMonth": null,
+        "familyContext": {
+          "siblingBottles": []
+        }
+      },
+      {
+        "abv": 54.5,
+        "brand": "Kilchoman",
+        "score": 42.257782,
+        "series": null,
+        "source": ["text"],
+        "bottler": null,
+        "edition": "Germany",
+        "outturn": 1315,
+        "bottleId": 59841,
+        "category": "single_malt",
+        "fullName": "Kilchoman 13-year-old 100% Islay Unpeated Small Batch - Germany",
+        "reference": null,
+        "statedAge": 13,
+        "caskNumber": "563, 565/2012",
+        "comparison": {
+          "missing": [],
+          "conflicts": ["brand", "distillers"],
+          "agreements": ["category", "statedAge", "vintageYear"]
+        },
+        "distillery": ["Kilchoman"],
+        "maturation": "Oloroso Sherry Butts",
+        "releaseDay": null,
+        "singleCask": false,
+        "releaseYear": 2025,
+        "vintageYear": 2012,
+        "bottlingYear": 2025,
+        "caskStrength": null,
+        "releaseMonth": null,
+        "familyContext": {
+          "siblingBottles": []
+        }
+      },
+      {
+        "abv": 56.7,
+        "brand": "Cask Masters",
+        "score": 42.213634,
+        "series": null,
+        "source": ["text"],
+        "bottler": "Brave New Spirits",
+        "edition": "Cask 800029/2012",
+        "outturn": null,
+        "bottleId": 46426,
+        "category": "single_malt",
+        "fullName": "Cask Masters Glen Spey - Cask 800029/2012 - 13-year-old - 2025 Release - 2012 Vintage - 56.7% ABV - Single Cask - Other Cask - Barrique",
+        "reference": null,
+        "statedAge": 13,
+        "caskNumber": null,
+        "comparison": {
+          "missing": [],
+          "conflicts": ["brand", "distillers"],
+          "agreements": ["category", "statedAge", "vintageYear"]
+        },
+        "distillery": ["Glen Spey"],
+        "maturation": "other",
+        "releaseDay": null,
+        "singleCask": true,
+        "releaseYear": 2025,
+        "vintageYear": 2012,
+        "bottlingYear": null,
+        "caskStrength": null,
+        "releaseMonth": null,
+        "familyContext": {
+          "siblingBottles": []
+        }
+      },
+      {
+        "abv": 64.1,
+        "brand": "Glencadam",
+        "score": 40.21936,
+        "series": null,
+        "source": ["text"],
+        "bottler": "Double-V",
+        "edition": "The Green Door 2026",
+        "outturn": null,
+        "bottleId": 47127,
+        "category": "single_malt",
+        "fullName": "Glencadam 2012 DoV - The Green Door 2026 - 13-year-old - 2026 Release - 2012 Vintage - 64.1% ABV - Single Cask - Bourbon Cask - Barrel",
+        "reference": null,
+        "statedAge": 13,
+        "caskNumber": null,
+        "comparison": {
+          "missing": [],
+          "conflicts": ["brand", "distillers"],
+          "agreements": ["category", "statedAge", "vintageYear"]
+        },
+        "distillery": ["Glencadam"],
+        "maturation": "bourbon",
+        "releaseDay": null,
+        "singleCask": true,
+        "releaseYear": 2026,
+        "vintageYear": 2012,
+        "bottlingYear": null,
+        "caskStrength": null,
+        "releaseMonth": null,
+        "familyContext": {
+          "siblingBottles": []
+        }
+      },
+      {
+        "abv": 58.8,
+        "brand": "Single Cask Nation",
+        "score": 39.856773,
+        "series": null,
+        "source": ["text"],
+        "bottler": "Single Cask Nation",
+        "edition": "Cask 170571",
+        "outturn": 256,
+        "bottleId": 47391,
+        "category": "single_malt",
+        "fullName": "Single Cask Nation Auchroisk - Cask 170571 - 13-year-old - 2026 Release - 2012 Vintage - 58.8% ABV - Cask Strength",
+        "reference": null,
+        "statedAge": 13,
+        "caskNumber": "170571",
+        "comparison": {
+          "missing": [],
+          "conflicts": ["brand", "distillers"],
+          "agreements": ["category", "statedAge", "vintageYear"]
+        },
+        "distillery": ["Auchroisk"],
+        "maturation": "First-fill Spanish oak Oloroso hogshead finish (5 years)",
+        "releaseDay": null,
+        "singleCask": true,
+        "releaseYear": 2026,
+        "vintageYear": 2012,
+        "bottlingYear": 2026,
+        "caskStrength": true,
+        "releaseMonth": null,
+        "familyContext": {
+          "siblingBottles": []
+        }
+      },
+      {
+        "abv": 56,
+        "brand": "Clydebuilt",
+        "score": 39.680553,
+        "series": null,
+        "source": ["text"],
+        "bottler": "Ardgowan",
+        "edition": null,
+        "outturn": null,
+        "bottleId": 63517,
+        "category": "single_malt",
+        "fullName": "Clydebuilt BenRiach 13-year-old",
+        "reference": null,
+        "statedAge": 13,
+        "caskNumber": "750335",
+        "comparison": {
+          "missing": [],
+          "conflicts": ["brand", "distillers"],
+          "agreements": ["category", "statedAge", "vintageYear"]
+        },
+        "distillery": ["BenRiach"],
+        "maturation": null,
+        "releaseDay": null,
+        "singleCask": true,
+        "releaseYear": null,
+        "vintageYear": 2012,
+        "bottlingYear": null,
+        "caskStrength": null,
+        "releaseMonth": null,
+        "familyContext": {
+          "siblingBottles": []
+        }
+      },
+      {
+        "abv": 51.9,
+        "brand": "WhiskyHeroes",
+        "score": 39.179832,
+        "series": null,
+        "source": ["text"],
+        "bottler": "Brave New Spirits",
+        "edition": null,
+        "outturn": null,
+        "bottleId": 46141,
+        "category": "single_malt",
+        "fullName": "WhiskyHeroes Captain Shug and the Second Sight - 13-year-old - 2012 Vintage - 51.9% ABV - Single Cask - Amontilado Cask - Hogshead - 1st Fill",
+        "reference": null,
+        "statedAge": 13,
+        "caskNumber": null,
+        "comparison": {
+          "missing": [],
+          "conflicts": ["brand", "distillers"],
+          "agreements": ["category", "statedAge", "vintageYear"]
+        },
+        "distillery": ["Teaninich"],
+        "maturation": "amontilado",
+        "releaseDay": null,
+        "singleCask": true,
+        "releaseYear": null,
+        "vintageYear": 2012,
+        "bottlingYear": null,
+        "caskStrength": null,
+        "releaseMonth": null,
+        "familyContext": {
+          "siblingBottles": []
+        }
+      },
+      {
+        "abv": 57.1,
+        "brand": "Signatory Vintage",
+        "score": 38.859108,
+        "series": "100 Proof Edition",
+        "source": ["text"],
+        "bottler": "Signatory Vintage",
+        "edition": "Edition #78",
+        "outturn": null,
+        "bottleId": 45765,
+        "category": "single_malt",
+        "fullName": "Signatory Vintage Benrinnes - Edition #78 - 13-year-old - 2026 Release - 2012 Vintage - 57.1% ABV - Oloroso Cask - Butt - 1st Fill",
+        "reference": null,
+        "statedAge": 13,
+        "caskNumber": null,
+        "comparison": {
+          "missing": [],
+          "conflicts": ["brand", "distillers"],
+          "agreements": ["category", "statedAge", "vintageYear"]
+        },
+        "distillery": ["Benrinnes"],
+        "maturation": "oloroso",
+        "releaseDay": null,
+        "singleCask": null,
+        "releaseYear": 2026,
+        "vintageYear": 2012,
+        "bottlingYear": null,
+        "caskStrength": null,
+        "releaseMonth": null,
+        "familyContext": {
+          "siblingBottles": []
+        }
+      },
+      {
+        "abv": 57.4,
+        "brand": "Single Cask Nation",
+        "score": 38.738243,
+        "series": null,
+        "source": ["text"],
+        "bottler": "Single Cask Nation",
+        "edition": "US Retail Release #14",
+        "outturn": 234,
+        "bottleId": 47718,
+        "category": "single_malt",
+        "fullName": "Single Cask Nation Glen Spey - US Retail Release #14 - 13-year-old - 2012 Vintage - 57.4% ABV",
+        "reference": null,
+        "statedAge": 13,
+        "caskNumber": "170842",
+        "comparison": {
+          "missing": [],
+          "conflicts": ["brand", "distillers"],
+          "agreements": ["category", "statedAge", "vintageYear"]
+        },
+        "distillery": ["Glen Spey"],
+        "maturation": "1st Fill Bourbon Hogshead (7yrs)",
+        "releaseDay": null,
+        "singleCask": true,
+        "releaseYear": null,
+        "vintageYear": 2012,
+        "bottlingYear": 2025,
+        "caskStrength": null,
+        "releaseMonth": null,
+        "familyContext": {
+          "siblingBottles": []
+        }
+      }
+    ],
+    "readCandidateImages": false
+  },
+  "context": {
+    "inspectedBottleIds": [],
+    "bottleContexts": [],
+    "inspectedEntities": [
+      {
+        "kind": "distillery",
+        "name": "Springbank",
+        "score": 1,
+        "source": ["exact", "text", "prefix", "contained"],
+        "entityId": 1362,
+        "reference": "Springbank",
+        "shortName": null,
+        "retrievedFor": [
+          {
+            "exact": true,
+            "query": "Springbank"
+          }
+        ]
+      },
+      {
+        "kind": "brand",
+        "name": "Decadent Drams",
+        "score": 1,
+        "source": ["exact", "text", "prefix", "contained"],
+        "entityId": 365681,
+        "reference": "Decadent Drams",
+        "shortName": null,
+        "retrievedFor": [
+          {
+            "exact": true,
+            "query": "Decadent Drams"
+          }
+        ]
+      },
+      {
+        "kind": "bottler",
+        "name": "Decadent Drinks",
+        "score": 1,
+        "source": ["exact", "text", "prefix", "contained"],
+        "entityId": 5775,
+        "reference": "Decadent Drinks",
+        "shortName": null,
+        "retrievedFor": [
+          {
+            "exact": true,
+            "query": "Decadent Drinks"
+          }
+        ]
+      },
+      {
+        "kind": "distillery",
+        "name": "Glencadam",
+        "score": 1,
+        "source": ["exact", "text", "prefix", "contained"],
+        "entityId": 114,
+        "reference": "Glencadam",
+        "shortName": null,
+        "retrievedFor": [
+          {
+            "exact": true,
+            "query": "Glencadam"
+          }
+        ]
+      },
+      {
+        "kind": "brand",
+        "name": "Thompson Bros.",
+        "score": 1,
+        "source": ["exact", "text", "prefix", "contained"],
+        "entityId": 365820,
+        "reference": "Phil & Simon Thompson",
+        "shortName": null,
+        "retrievedFor": [
+          {
+            "exact": true,
+            "query": "Thompson Bros."
+          }
+        ]
+      },
+      {
+        "kind": "bottler",
+        "name": "Thompson Bros",
+        "score": 1,
+        "source": ["exact", "text", "contained"],
+        "entityId": 367034,
+        "reference": "Thompson Bros",
+        "shortName": null,
+        "retrievedFor": [
+          {
+            "exact": true,
+            "query": "Thompson Bros."
+          }
+        ]
+      },
+      {
+        "kind": "distillery",
+        "name": "Glen Ord",
+        "score": 1,
+        "source": ["exact", "text", "prefix", "contained"],
+        "entityId": 242,
+        "reference": "Glen Ord",
+        "shortName": null,
+        "retrievedFor": [
+          {
+            "exact": true,
+            "query": "Glen Ord"
+          }
+        ]
+      },
+      {
+        "kind": "bottler",
+        "name": "Single Cask Nation",
+        "score": 1,
+        "source": ["exact", "text", "prefix", "contained"],
+        "entityId": 365762,
+        "reference": "Single Cask Nation",
+        "shortName": null,
+        "retrievedFor": [
+          {
+            "exact": true,
+            "query": "Single Cask Nation"
+          }
+        ]
+      },
+      {
+        "kind": "distillery",
+        "name": "Dailuaine",
+        "score": 1,
+        "source": ["exact", "text", "prefix", "contained"],
+        "entityId": 410,
+        "reference": "Dailuaine",
+        "shortName": null,
+        "retrievedFor": [
+          {
+            "exact": true,
+            "query": "Dailuaine"
+          }
+        ]
+      },
+      {
+        "kind": "distillery",
+        "name": "Glen Moray",
+        "score": 1,
+        "source": ["exact", "text", "prefix", "contained"],
+        "entityId": 129,
+        "reference": "Glen Moray",
+        "shortName": null,
+        "retrievedFor": [
+          {
+            "exact": true,
+            "query": "Glen Moray"
+          }
+        ]
+      },
+      {
+        "kind": "bottler",
+        "name": "The Whisky Agency",
+        "score": 1,
+        "source": ["exact", "text", "prefix", "contained"],
+        "entityId": 5145,
+        "reference": "The Whisky Agency",
+        "shortName": null,
+        "retrievedFor": [
+          {
+            "exact": true,
+            "query": "The Whisky Agency"
+          }
+        ]
+      },
+      {
+        "kind": "distillery",
+        "name": "Glen Garioch",
+        "score": 1,
+        "source": ["exact", "text", "prefix", "contained"],
+        "entityId": 261,
+        "reference": "Glen Garioch",
+        "shortName": null,
+        "retrievedFor": [
+          {
+            "exact": true,
+            "query": "Glen Garioch"
+          }
+        ]
+      },
+      {
+        "kind": "bottler",
+        "name": "William Cadenhead's",
+        "score": 1,
+        "source": ["exact", "text", "prefix", "contained"],
+        "entityId": 336,
+        "reference": "Cadenheads",
+        "shortName": "Cadenhead's",
+        "retrievedFor": [
+          {
+            "exact": true,
+            "query": "William Cadenhead's"
+          }
+        ]
+      },
+      {
+        "kind": "distillery",
+        "name": "Tullibardine",
+        "score": 1,
+        "source": ["exact", "text", "prefix", "contained"],
+        "entityId": 1450,
+        "reference": "Tullibardine",
+        "shortName": null,
+        "retrievedFor": [
+          {
+            "exact": true,
+            "query": "Tullibardine"
+          }
+        ]
+      },
+      {
+        "kind": "company",
+        "name": "Dailuaine-Talisker Distilleries Ltd",
+        "score": 0.5,
+        "source": ["text", "prefix"],
+        "entityId": 366620,
+        "reference": "Dailuaine-Talisker Distilleries Ltd",
+        "shortName": null,
+        "retrievedFor": [
+          {
+            "query": "Dailuaine"
+          }
+        ]
+      },
+      {
+        "kind": "brand",
+        "name": "The Single Cask",
+        "score": 0.375,
+        "source": ["contained"],
+        "entityId": 366640,
+        "reference": "Single Cask",
+        "shortName": null,
+        "retrievedFor": [
+          {
+            "query": "Single Cask Nation"
+          }
+        ]
+      },
+      {
+        "kind": "bottler",
+        "name": "Whisky AGE",
+        "score": 0.37,
+        "source": ["contained"],
+        "entityId": 5948,
+        "reference": "Whisky AGE",
+        "shortName": null,
+        "retrievedFor": [
+          {
+            "query": "The Whisky Agency"
+          }
+        ]
+      },
+      {
+        "kind": "bottler",
+        "name": "&Whisky",
+        "score": 0.33,
+        "source": ["contained"],
+        "entityId": 365821,
+        "reference": "&Whisky",
+        "shortName": null,
+        "retrievedFor": [
+          {
+            "query": "The Whisky Agency"
+          }
+        ]
+      },
+      {
+        "kind": "brand",
+        "name": "Cadée",
+        "score": 0.31153846153846154,
+        "source": ["contained"],
+        "entityId": 367403,
+        "reference": "Cadée",
+        "shortName": null,
+        "retrievedFor": [
+          {
+            "query": "Decadent Drams"
+          },
+          {
+            "query": "Decadent Drinks"
+          },
+          {
+            "query": "William Cadenhead's"
+          }
+        ]
+      },
+      {
+        "kind": "brand",
+        "name": "The Singleton of Glen Ord",
+        "score": 0.2,
+        "source": ["text"],
+        "entityId": 1426,
+        "reference": null,
+        "shortName": null,
+        "retrievedFor": [
+          {
+            "query": "Glen Ord"
+          }
+        ]
+      }
+    ],
+    "inspectedSeries": []
+  },
+  "provenance": {
+    "source": "production_miss",
+    "verifiedSourceUrls": [
+      "https://www.scotchwhiskyauctions.com/auctions/232-the-183rd-auction/896012-springbank-2012-13-year-old-duty-paid-sample/"
+    ],
+    "dbOutcome": {
+      "bottleId": null,
+      "createsBottle": false,
+      "summary": "Production returned no_match; the lot sits in review."
+    },
+    "notes": "Captured from saved classifier run 22153 (auction_lot 4083, model null, 2026-10-02T05:01:11.937Z). Production rationale: The source title describes a Springbank 2012, 13-year-old duty-paid sample. That establishes sample and liquid details, not that this is a complete marketed Bottle or which specific release it represents. No local candidate is a Springbank match, and the available web evidence does not resolve the product identity, so neither assignment nor creation is supported. Checked 2026-10-25. Lot 183-02242 page: distilled 12.06.2012, bottled 29.04.2026, 13 years old, refill Calvados / Palo Cortado cask, 57.1% ABV, 70cl, pen markings on the label; winning bid £150. No marketed Springbank release matches these facts. The owner ruled on 2026-10-25 that auctions leave out samples, including duty-paid trade samples, so the right outcome is ignored, not review. This is the second case for the rule, with a different distillery style, age, and production outcome than the Hazelburn case. The input keeps the observed title, candidates, and search evidence; it sets readCandidateImages:false to match current auction matching."
+  },
+  "expected": {
+    "status": "ignored",
+    "summary": "A duty-paid sample is a trade cask sample, not a marketed release. Ignore it instead of leaving it for review or creating a Bottle."
+  }
+}

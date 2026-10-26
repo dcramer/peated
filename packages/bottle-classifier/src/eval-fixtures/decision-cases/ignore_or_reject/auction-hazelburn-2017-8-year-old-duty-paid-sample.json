@@ -1,0 +1,1203 @@
+{
+  "id": "auction-hazelburn-2017-8-year-old-duty-paid-sample",
+  "name": "auction title: a duty-paid trade sample is not a marketed Bottle",
+  "input": {
+    "reference": {
+      "id": 2155,
+      "url": "https://www.scotchwhiskyauctions.com/auctions/232-the-183rd-auction/897857-hazelburn-2017-8-year-old-duty-paid-sample/",
+      "name": "Hazelburn 2017 8 Year Old Duty Paid Sample",
+      "imageUrl": null,
+      "externalSiteId": 28097,
+      "currentBottleId": null
+    },
+    "extractedIdentity": {
+      "abv": null,
+      "brand": "Hazelburn",
+      "series": null,
+      "bottler": null,
+      "edition": null,
+      "outturn": null,
+      "category": null,
+      "distillery": ["Springbank"],
+      "expression": null,
+      "maturation": null,
+      "stated_age": 8,
+      "cask_number": null,
+      "release_day": null,
+      "single_cask": null,
+      "release_year": null,
+      "vintage_year": 2017,
+      "bottling_year": null,
+      "cask_strength": null,
+      "release_month": null
+    },
+    "imageEvidence": null,
+    "initialCandidates": [
+      {
+        "abv": 48.2,
+        "brand": "Hazelburn",
+        "score": 100.20668,
+        "series": "Sherry Wood",
+        "source": ["text", "brand_coverage", "context", "brand"],
+        "bottler": null,
+        "edition": "2025 Edition",
+        "outturn": 10500,
+        "bottleId": 53917,
+        "category": "single_malt",
+        "fullName": "Hazelburn Sherry Wood - 2025 Edition",
+        "reference": null,
+        "statedAge": 8,
+        "caskNumber": null,
+        "comparison": {
+          "missing": [],
+          "conflicts": [],
+          "agreements": ["statedAge", "vintageYear", "brand", "distillers"]
+        },
+        "distillery": ["Springbank"],
+        "maturation": "Oloroso sherry casks",
+        "releaseDay": null,
+        "singleCask": null,
+        "releaseYear": 2025,
+        "vintageYear": 2017,
+        "bottlingYear": null,
+        "caskStrength": null,
+        "releaseMonth": null,
+        "familyContext": {
+          "siblingBottles": []
+        }
+      },
+      {
+        "abv": null,
+        "brand": "Hazelburn",
+        "score": 68.9571,
+        "series": null,
+        "source": ["vector", "text", "context"],
+        "bottler": null,
+        "edition": null,
+        "outturn": null,
+        "bottleId": 17325,
+        "category": "single_malt",
+        "fullName": "Hazelburn 8-year-old",
+        "reference": "Hazelburn 8-year-old",
+        "statedAge": 8,
+        "caskNumber": null,
+        "comparison": {
+          "missing": [
+            "edition",
+            "abv",
+            "vintageYear",
+            "releaseYear",
+            "series",
+            "distillers"
+          ],
+          "conflicts": [],
+          "agreements": ["category", "statedAge", "brand"]
+        },
+        "distillery": [],
+        "maturation": null,
+        "releaseDay": null,
+        "singleCask": null,
+        "releaseYear": null,
+        "vintageYear": null,
+        "bottlingYear": null,
+        "caskStrength": null,
+        "releaseMonth": null,
+        "familyContext": {
+          "siblingBottles": []
+        }
+      },
+      {
+        "abv": 53,
+        "brand": "Decadent Drams",
+        "score": 61.848347,
+        "series": null,
+        "source": ["text"],
+        "bottler": "Decadent Drinks",
+        "edition": null,
+        "outturn": null,
+        "bottleId": 46571,
+        "category": "single_malt",
+        "fullName": "Decadent Drams Deanston - 8-year-old - 2025 Release - 2017 Vintage - 53.0% ABV - Single Cask - Cask Strength",
+        "reference": null,
+        "statedAge": 8,
+        "caskNumber": null,
+        "comparison": {
+          "missing": [],
+          "conflicts": ["brand", "distillers"],
+          "agreements": ["statedAge", "vintageYear"]
+        },
+        "distillery": ["Deanston"],
+        "maturation": "First fill barrel",
+        "releaseDay": null,
+        "singleCask": true,
+        "releaseYear": 2025,
+        "vintageYear": 2017,
+        "bottlingYear": 2025,
+        "caskStrength": true,
+        "releaseMonth": null,
+        "familyContext": {
+          "siblingBottles": []
+        }
+      },
+      {
+        "abv": 58.6,
+        "brand": "Single Cask Nation",
+        "score": 61.337738,
+        "series": null,
+        "source": ["text"],
+        "bottler": "Single Cask Nation",
+        "edition": null,
+        "outturn": 179,
+        "bottleId": 47674,
+        "category": "single_malt",
+        "fullName": "Single Cask Nation Cawdor Springs - 8-year-old - 2025 Release - 2017 Vintage - 58.6% ABV",
+        "reference": null,
+        "statedAge": 8,
+        "caskNumber": "305044",
+        "comparison": {
+          "missing": ["distillers"],
+          "conflicts": ["brand"],
+          "agreements": ["statedAge", "vintageYear"]
+        },
+        "distillery": [],
+        "maturation": "New Charred Oak (3yrs)",
+        "releaseDay": null,
+        "singleCask": true,
+        "releaseYear": 2025,
+        "vintageYear": 2017,
+        "bottlingYear": 2025,
+        "caskStrength": null,
+        "releaseMonth": null,
+        "familyContext": {
+          "siblingBottles": []
+        }
+      },
+      {
+        "abv": 48.2,
+        "brand": "GreatDrams",
+        "score": 55.382698,
+        "series": "Rare Cask Series",
+        "source": ["text"],
+        "bottler": "GreatDrams",
+        "edition": null,
+        "outturn": null,
+        "bottleId": 46180,
+        "category": "single_malt",
+        "fullName": "GreatDrams Peated Cask Finish - 8-year-old - 48.2% ABV - Other Cask",
+        "reference": null,
+        "statedAge": 8,
+        "caskNumber": null,
+        "comparison": {
+          "missing": ["edition", "vintageYear", "releaseYear"],
+          "conflicts": ["brand", "series", "distillers"],
+          "agreements": ["category", "statedAge", "abv"]
+        },
+        "distillery": ["Craigellachie"],
+        "maturation": "other",
+        "releaseDay": null,
+        "singleCask": null,
+        "releaseYear": null,
+        "vintageYear": null,
+        "bottlingYear": null,
+        "caskStrength": null,
+        "releaseMonth": null,
+        "familyContext": {
+          "siblingBottles": []
+        }
+      },
+      {
+        "abv": 46.3,
+        "brand": "KinGlassie",
+        "score": 55.28695,
+        "series": null,
+        "source": ["text"],
+        "bottler": null,
+        "edition": null,
+        "outturn": null,
+        "bottleId": 46764,
+        "category": "single_malt",
+        "fullName": "KinGlassie Double Matured - 8-year-old - 2017 Vintage - 46.3% ABV - Amontilado Cask",
+        "reference": null,
+        "statedAge": 8,
+        "caskNumber": null,
+        "comparison": {
+          "missing": [],
+          "conflicts": ["brand", "distillers"],
+          "agreements": ["statedAge", "vintageYear"]
+        },
+        "distillery": ["InchDairnie Distillery"],
+        "maturation": "amontilado",
+        "releaseDay": null,
+        "singleCask": null,
+        "releaseYear": null,
+        "vintageYear": 2017,
+        "bottlingYear": null,
+        "caskStrength": null,
+        "releaseMonth": null,
+        "familyContext": {
+          "siblingBottles": []
+        }
+      },
+      {
+        "abv": 46,
+        "brand": "Douglas Laing",
+        "score": 54.833767,
+        "series": "Provenance",
+        "source": ["text"],
+        "bottler": "Douglas Laing",
+        "edition": null,
+        "outturn": null,
+        "bottleId": 46829,
+        "category": "single_malt",
+        "fullName": "Douglas Laing Glengoyne",
+        "reference": null,
+        "statedAge": 8,
+        "caskNumber": "16333",
+        "comparison": {
+          "missing": ["edition"],
+          "conflicts": ["abv", "brand", "series", "distillers"],
+          "agreements": ["category", "statedAge", "vintageYear", "releaseYear"]
+        },
+        "distillery": ["Glengoyne"],
+        "maturation": null,
+        "releaseDay": null,
+        "singleCask": true,
+        "releaseYear": 2025,
+        "vintageYear": 2017,
+        "bottlingYear": null,
+        "caskStrength": null,
+        "releaseMonth": null,
+        "familyContext": {
+          "siblingBottles": []
+        }
+      },
+      {
+        "abv": 64.3,
+        "brand": "Chichibu",
+        "score": 53.80132,
+        "series": "In the Wake of Silence",
+        "source": ["text"],
+        "bottler": "La Maison du Whisky",
+        "edition": null,
+        "outturn": 171,
+        "bottleId": 47571,
+        "category": "single_malt",
+        "fullName": "Chichibu Single Cask - 8-year-old - 2025 Release - 2017 Vintage - 64.3% ABV",
+        "reference": null,
+        "statedAge": 8,
+        "caskNumber": "7492",
+        "comparison": {
+          "missing": ["edition"],
+          "conflicts": ["abv", "brand", "series", "distillers"],
+          "agreements": ["category", "statedAge", "vintageYear", "releaseYear"]
+        },
+        "distillery": ["Chichibu"],
+        "maturation": "1st fill bourbon barrel",
+        "releaseDay": null,
+        "singleCask": true,
+        "releaseYear": 2025,
+        "vintageYear": 2017,
+        "bottlingYear": null,
+        "caskStrength": null,
+        "releaseMonth": null,
+        "familyContext": {
+          "siblingBottles": []
+        }
+      },
+      {
+        "abv": null,
+        "brand": "Hazelburn",
+        "score": 51.144573,
+        "series": null,
+        "source": ["text"],
+        "bottler": "Springbank",
+        "edition": null,
+        "outturn": null,
+        "bottleId": 1097,
+        "category": "single_malt",
+        "fullName": "Hazelburn 08",
+        "reference": null,
+        "statedAge": 8,
+        "caskNumber": null,
+        "comparison": {
+          "missing": [
+            "edition",
+            "abv",
+            "vintageYear",
+            "releaseYear",
+            "series",
+            "distillers"
+          ],
+          "conflicts": [],
+          "agreements": ["category", "statedAge", "brand"]
+        },
+        "distillery": [],
+        "maturation": null,
+        "releaseDay": null,
+        "singleCask": null,
+        "releaseYear": null,
+        "vintageYear": null,
+        "bottlingYear": null,
+        "caskStrength": null,
+        "releaseMonth": null,
+        "familyContext": {
+          "siblingBottles": []
+        }
+      },
+      {
+        "abv": 46.3,
+        "brand": "KinGlassie",
+        "score": 50.5701,
+        "series": null,
+        "source": ["text"],
+        "bottler": null,
+        "edition": null,
+        "outturn": null,
+        "bottleId": 46768,
+        "category": "single_malt",
+        "fullName": "KinGlassie Raw Edition - 8-year-old - 2017 Vintage - 46.3% ABV - Bourbon Cask",
+        "reference": null,
+        "statedAge": 8,
+        "caskNumber": null,
+        "comparison": {
+          "missing": [],
+          "conflicts": ["brand", "distillers"],
+          "agreements": ["statedAge", "vintageYear"]
+        },
+        "distillery": ["InchDairnie Distillery"],
+        "maturation": "bourbon",
+        "releaseDay": null,
+        "singleCask": null,
+        "releaseYear": null,
+        "vintageYear": 2017,
+        "bottlingYear": null,
+        "caskStrength": null,
+        "releaseMonth": null,
+        "familyContext": {
+          "siblingBottles": []
+        }
+      },
+      {
+        "abv": null,
+        "brand": "The Kurayoshi",
+        "score": 49.68683,
+        "series": null,
+        "source": ["text"],
+        "bottler": null,
+        "edition": null,
+        "outturn": null,
+        "bottleId": 14250,
+        "category": "single_malt",
+        "fullName": "The Kurayoshi 8-year-old Sherry Cask",
+        "reference": null,
+        "statedAge": 8,
+        "caskNumber": null,
+        "comparison": {
+          "missing": ["edition", "abv", "vintageYear", "releaseYear", "series"],
+          "conflicts": ["brand", "distillers"],
+          "agreements": ["category", "statedAge"]
+        },
+        "distillery": ["Kurayoshi Distillery"],
+        "maturation": null,
+        "releaseDay": null,
+        "singleCask": null,
+        "releaseYear": null,
+        "vintageYear": null,
+        "bottlingYear": null,
+        "caskStrength": null,
+        "releaseMonth": null,
+        "familyContext": {
+          "siblingBottles": []
+        }
+      },
+      {
+        "abv": 58.2,
+        "brand": "Decadent Drinks",
+        "score": 46.89869,
+        "series": null,
+        "source": ["text"],
+        "bottler": "Decadent Drinks",
+        "edition": "Whiskybase Exclusive",
+        "outturn": 213,
+        "bottleId": 49225,
+        "category": "single_malt",
+        "fullName": "Decadent Drinks Glen Ord - Whiskybase Exclusive - 8-year-old - 2017 Vintage - 58.2% ABV",
+        "reference": null,
+        "statedAge": 8,
+        "caskNumber": null,
+        "comparison": {
+          "missing": [],
+          "conflicts": ["brand", "distillers"],
+          "agreements": ["statedAge", "vintageYear"]
+        },
+        "distillery": ["Glen Ord"],
+        "maturation": "Refill Hogshead",
+        "releaseDay": null,
+        "singleCask": null,
+        "releaseYear": null,
+        "vintageYear": 2017,
+        "bottlingYear": 2025,
+        "caskStrength": null,
+        "releaseMonth": null,
+        "familyContext": {
+          "siblingBottles": []
+        }
+      },
+      {
+        "abv": 60.1,
+        "brand": "Single Cask Nation",
+        "score": 45.718563,
+        "series": null,
+        "source": ["text"],
+        "bottler": "Single Cask Nation",
+        "edition": null,
+        "outturn": 241,
+        "bottleId": 47668,
+        "category": "single_malt",
+        "fullName": "Single Cask Nation Ben Nevis - 8-year-old - 2026 Release - 2017 Vintage - 60.1% ABV",
+        "reference": null,
+        "statedAge": 8,
+        "caskNumber": "327",
+        "comparison": {
+          "missing": [],
+          "conflicts": ["brand", "distillers"],
+          "agreements": ["statedAge", "vintageYear"]
+        },
+        "distillery": ["Ben Nevis"],
+        "maturation": "2nd Fill Bourbon Barrel",
+        "releaseDay": null,
+        "singleCask": true,
+        "releaseYear": 2026,
+        "vintageYear": 2017,
+        "bottlingYear": 2026,
+        "caskStrength": null,
+        "releaseMonth": null,
+        "familyContext": {
+          "siblingBottles": []
+        }
+      },
+      {
+        "abv": 50,
+        "brand": "Claxton's",
+        "score": 43.619644,
+        "series": "Exploration Series",
+        "source": ["text"],
+        "bottler": "Claxton's",
+        "edition": null,
+        "outturn": null,
+        "bottleId": 46444,
+        "category": "single_malt",
+        "fullName": "Claxton's Miltonduff - 8-year-old - 2026 Release - 2017 Vintage - 50.0% ABV - Single Cask - Bourbon Cask - Barrel",
+        "reference": null,
+        "statedAge": 8,
+        "caskNumber": null,
+        "comparison": {
+          "missing": [],
+          "conflicts": ["brand", "distillers"],
+          "agreements": ["statedAge", "vintageYear"]
+        },
+        "distillery": ["Miltonduff"],
+        "maturation": "bourbon",
+        "releaseDay": null,
+        "singleCask": true,
+        "releaseYear": 2026,
+        "vintageYear": 2017,
+        "bottlingYear": null,
+        "caskStrength": null,
+        "releaseMonth": null,
+        "familyContext": {
+          "siblingBottles": []
+        }
+      },
+      {
+        "abv": 50,
+        "brand": "Claxton's",
+        "score": 43.13839,
+        "series": "Exploration Series",
+        "source": ["text"],
+        "bottler": "Claxton's",
+        "edition": null,
+        "outturn": null,
+        "bottleId": 46568,
+        "category": "single_malt",
+        "fullName": "Claxton's Inchmurrin - 8-year-old - 2026 Release - 2017 Vintage - 50.0% ABV - Pedro Ximenez Cask - Hogshead - 1st Fill",
+        "reference": null,
+        "statedAge": 8,
+        "caskNumber": null,
+        "comparison": {
+          "missing": [],
+          "conflicts": ["brand", "distillers"],
+          "agreements": ["statedAge", "vintageYear"]
+        },
+        "distillery": ["Loch Lomond"],
+        "maturation": "pedro_ximenez",
+        "releaseDay": null,
+        "singleCask": null,
+        "releaseYear": 2026,
+        "vintageYear": 2017,
+        "bottlingYear": null,
+        "caskStrength": null,
+        "releaseMonth": null,
+        "familyContext": {
+          "siblingBottles": []
+        }
+      },
+      {
+        "abv": 57.1,
+        "brand": "Decadent Drinks",
+        "score": 43.00748,
+        "series": null,
+        "source": ["text"],
+        "bottler": "Decadent Drinks",
+        "edition": "Fiddler's Loch Ness Exclusive",
+        "outturn": 88,
+        "bottleId": 49226,
+        "category": "single_malt",
+        "fullName": "Decadent Drinks Glen Ord - Fiddler's Loch Ness Exclusive - 8-year-old - 2017 Vintage - 57.1% ABV",
+        "reference": null,
+        "statedAge": 8,
+        "caskNumber": null,
+        "comparison": {
+          "missing": [],
+          "conflicts": ["brand", "distillers"],
+          "agreements": ["statedAge", "vintageYear"]
+        },
+        "distillery": ["Glen Ord"],
+        "maturation": "Two Refill Hogshead",
+        "releaseDay": null,
+        "singleCask": null,
+        "releaseYear": null,
+        "vintageYear": 2017,
+        "bottlingYear": 2025,
+        "caskStrength": null,
+        "releaseMonth": null,
+        "familyContext": {
+          "siblingBottles": []
+        }
+      },
+      {
+        "abv": 55,
+        "brand": "Duncan Taylor",
+        "score": 42.628593,
+        "series": "The Octave",
+        "source": ["text"],
+        "bottler": "Duncan Taylor",
+        "edition": null,
+        "outturn": null,
+        "bottleId": 46430,
+        "category": "single_malt",
+        "fullName": "Duncan Taylor Glenlossie - 8-year-old - 2026 Release - 2017 Vintage - 55.0% ABV - Single Cask - Pedro Ximenez Cask",
+        "reference": null,
+        "statedAge": 8,
+        "caskNumber": null,
+        "comparison": {
+          "missing": [],
+          "conflicts": ["brand", "distillers"],
+          "agreements": ["statedAge", "vintageYear"]
+        },
+        "distillery": ["Glenlossie"],
+        "maturation": "pedro_ximenez",
+        "releaseDay": null,
+        "singleCask": true,
+        "releaseYear": 2026,
+        "vintageYear": 2017,
+        "bottlingYear": null,
+        "caskStrength": null,
+        "releaseMonth": null,
+        "familyContext": {
+          "siblingBottles": []
+        }
+      },
+      {
+        "abv": 46,
+        "brand": "Uncharted Whisky Co.",
+        "score": 42.43405,
+        "series": "Blue Collection",
+        "source": ["text"],
+        "bottler": "Uncharted Whisky Co.",
+        "edition": "Batch 1",
+        "outturn": null,
+        "bottleId": 45886,
+        "category": "single_malt",
+        "fullName": "Uncharted Whisky Co. Small Batch - Batch 1 - 8-year-old - 2017 Vintage - 46.0% ABV - Bourbon Cask",
+        "reference": null,
+        "statedAge": 8,
+        "caskNumber": null,
+        "comparison": {
+          "missing": [],
+          "conflicts": ["brand", "distillers"],
+          "agreements": ["statedAge", "vintageYear"]
+        },
+        "distillery": ["Aultmore"],
+        "maturation": "bourbon",
+        "releaseDay": null,
+        "singleCask": false,
+        "releaseYear": null,
+        "vintageYear": 2017,
+        "bottlingYear": null,
+        "caskStrength": null,
+        "releaseMonth": null,
+        "familyContext": {
+          "siblingBottles": []
+        }
+      },
+      {
+        "abv": 48.5,
+        "brand": "Equinox & Solstice",
+        "score": 42.269215,
+        "series": null,
+        "source": ["text"],
+        "bottler": "Decadent Drinks",
+        "edition": "Summer Edition 2025",
+        "outturn": null,
+        "bottleId": 48965,
+        "category": "single_malt",
+        "fullName": "Equinox & Solstice Glen Ord - Summer Edition 2025 - 8-year-old - 2025 Release - 2017 Vintage - 48.5% ABV",
+        "reference": null,
+        "statedAge": 8,
+        "caskNumber": null,
+        "comparison": {
+          "missing": [],
+          "conflicts": ["brand", "distillers"],
+          "agreements": ["statedAge", "vintageYear"]
+        },
+        "distillery": ["Glen Ord"],
+        "maturation": "Married from two refill hogsheads",
+        "releaseDay": null,
+        "singleCask": null,
+        "releaseYear": 2025,
+        "vintageYear": 2017,
+        "bottlingYear": 2025,
+        "caskStrength": null,
+        "releaseMonth": null,
+        "familyContext": {
+          "siblingBottles": []
+        }
+      },
+      {
+        "abv": 57.2,
+        "brand": "Dràm Mòr",
+        "score": 42.174583,
+        "series": null,
+        "source": ["text"],
+        "bottler": "Dràm Mòr",
+        "edition": "Cask 3",
+        "outturn": null,
+        "bottleId": 46626,
+        "category": "single_malt",
+        "fullName": "Dràm Mòr Campbeltown - Cask 3 - 8-year-old - 2017 Vintage - 57.2% ABV - Single Cask - Bourbon Cask - Barrel - Refill",
+        "reference": null,
+        "statedAge": 8,
+        "caskNumber": null,
+        "comparison": {
+          "missing": ["distillers"],
+          "conflicts": ["brand"],
+          "agreements": ["statedAge", "vintageYear"]
+        },
+        "distillery": [],
+        "maturation": "bourbon",
+        "releaseDay": null,
+        "singleCask": true,
+        "releaseYear": null,
+        "vintageYear": 2017,
+        "bottlingYear": null,
+        "caskStrength": null,
+        "releaseMonth": null,
+        "familyContext": {
+          "siblingBottles": []
+        }
+      },
+      {
+        "abv": 54,
+        "brand": "Duncan Taylor",
+        "score": 42.04831,
+        "series": "The Octave",
+        "source": ["text"],
+        "bottler": "Duncan Taylor",
+        "edition": "Cask 9549873",
+        "outturn": null,
+        "bottleId": 46877,
+        "category": "single_malt",
+        "fullName": "Duncan Taylor Aultmore - Cask 9549873 - 8-year-old - 2017 Vintage - 54.0% ABV - Single Cask - Amontilado Cask",
+        "reference": null,
+        "statedAge": 8,
+        "caskNumber": null,
+        "comparison": {
+          "missing": [],
+          "conflicts": ["brand", "distillers"],
+          "agreements": ["statedAge", "vintageYear"]
+        },
+        "distillery": ["Aultmore"],
+        "maturation": "amontilado",
+        "releaseDay": null,
+        "singleCask": true,
+        "releaseYear": null,
+        "vintageYear": 2017,
+        "bottlingYear": null,
+        "caskStrength": null,
+        "releaseMonth": null,
+        "familyContext": {
+          "siblingBottles": []
+        }
+      }
+    ],
+    "readCandidateImages": false
+  },
+  "context": {
+    "inspectedBottleIds": [17325, 53917],
+    "bottleContexts": [
+      {
+        "exact": {
+          "abv": null,
+          "edition": null,
+          "outturn": null,
+          "statedAge": null,
+          "caskNumber": null,
+          "maturation": null,
+          "releaseDay": null,
+          "singleCask": null,
+          "releaseYear": null,
+          "vintageYear": null,
+          "bottlingYear": null,
+          "caskStrength": null,
+          "releaseMonth": null
+        },
+        "shared": {
+          "name": "8-year-old",
+          "brand": {
+            "name": "Hazelburn",
+            "entityId": 1010
+          },
+          "series": null,
+          "bottler": null,
+          "category": "single_malt",
+          "statedAge": 8,
+          "distillers": []
+        },
+        "groupId": 15536,
+        "bottleId": 17325,
+        "fullName": "Hazelburn 8-year-old",
+        "siblings": [],
+        "references": [
+          {
+            "name": "Hazelburn 8-year-old",
+            "ignored": false
+          }
+        ],
+        "observations": [
+          {
+            "facts": {
+              "proposalType": "match_existing",
+              "proposedBottle": null,
+              "referenceScope": "none"
+            },
+            "rawText": "Hazelburn 8-year-old",
+            "sourceKey": "store_price:12058240",
+            "sourceUrl": "https://www.masterofmalt.com/whiskies/hazelburn-8-year-old-whisky/?sku=2867",
+            "sourceName": "Hazelburn 8-year-old",
+            "sourceType": "store_price",
+            "parsedIdentity": null
+          }
+        ],
+        "imageSources": [
+          {
+            "url": "https://api.peated.com/uploads/prices-fa2lw73swglyhe9vax5ruj1b.webp",
+            "source": {
+              "kind": "bottle"
+            },
+            "sourceUrl": "https://www.masterofmalt.com/whiskies/hazelburn-8-year-old-whisky/?sku=2867"
+          }
+        ]
+      },
+      {
+        "exact": {
+          "abv": 48.2,
+          "edition": "2025 Edition",
+          "outturn": 10500,
+          "statedAge": 8,
+          "caskNumber": null,
+          "maturation": "Oloroso sherry casks",
+          "releaseDay": null,
+          "singleCask": null,
+          "releaseYear": 2025,
+          "vintageYear": 2017,
+          "bottlingYear": null,
+          "caskStrength": null,
+          "releaseMonth": null
+        },
+        "shared": {
+          "name": "Sherry Wood",
+          "brand": {
+            "name": "Hazelburn",
+            "entityId": 1010
+          },
+          "series": {
+            "name": "Sherry Wood",
+            "seriesId": 658
+          },
+          "bottler": null,
+          "category": "single_malt",
+          "statedAge": null,
+          "distillers": [
+            {
+              "name": "Springbank",
+              "entityId": 1362
+            }
+          ]
+        },
+        "groupId": 26878,
+        "bottleId": 53917,
+        "fullName": "Hazelburn Sherry Wood - 2025 Edition",
+        "siblings": [],
+        "references": [],
+        "observations": [],
+        "imageSources": []
+      }
+    ],
+    "inspectedEntities": [
+      {
+        "kind": "brand",
+        "name": "Hazelburn",
+        "score": 1,
+        "source": ["exact", "text", "prefix", "contained"],
+        "entityId": 1010,
+        "reference": "Hazelburn",
+        "shortName": null,
+        "retrievedFor": [
+          {
+            "exact": true,
+            "query": "Hazelburn"
+          }
+        ]
+      },
+      {
+        "kind": "distillery",
+        "name": "Springbank",
+        "score": 1,
+        "source": ["exact", "text", "prefix", "contained"],
+        "entityId": 1362,
+        "reference": "Springbank",
+        "shortName": null,
+        "retrievedFor": [
+          {
+            "exact": true,
+            "query": "Springbank"
+          }
+        ]
+      },
+      {
+        "kind": "bottler",
+        "name": "Single Cask Nation",
+        "score": 1,
+        "source": ["exact", "text", "prefix", "contained"],
+        "entityId": 365762,
+        "reference": "Single Cask Nation",
+        "shortName": null,
+        "retrievedFor": [
+          {
+            "exact": true,
+            "query": "Single Cask Nation"
+          }
+        ]
+      },
+      {
+        "kind": "bottler",
+        "name": "Dràm Mòr",
+        "score": 1,
+        "source": ["exact", "text", "prefix", "contained"],
+        "entityId": 5854,
+        "reference": "Dràm Mòr",
+        "shortName": null,
+        "retrievedFor": [
+          {
+            "exact": true,
+            "query": "Dràm Mòr"
+          }
+        ]
+      },
+      {
+        "kind": "brand",
+        "name": "KinGlassie",
+        "score": 1,
+        "source": ["exact", "text", "prefix", "contained"],
+        "entityId": 365677,
+        "reference": "KinGlassie",
+        "shortName": "",
+        "retrievedFor": [
+          {
+            "exact": true,
+            "query": "KinGlassie"
+          }
+        ]
+      },
+      {
+        "kind": "distillery",
+        "name": "InchDairnie Distillery",
+        "score": 1,
+        "source": ["exact", "text", "prefix", "contained"],
+        "entityId": 365676,
+        "reference": "InchDairnie Distillery",
+        "shortName": "",
+        "retrievedFor": [
+          {
+            "exact": true,
+            "query": "InchDairnie Distillery"
+          }
+        ]
+      },
+      {
+        "kind": "bottler",
+        "name": "Decadent Drinks",
+        "score": 1,
+        "source": ["exact", "text", "prefix", "contained"],
+        "entityId": 5775,
+        "reference": "Decadent Drinks",
+        "shortName": null,
+        "retrievedFor": [
+          {
+            "exact": true,
+            "query": "Decadent Drinks"
+          }
+        ]
+      },
+      {
+        "kind": "distillery",
+        "name": "Glen Ord",
+        "score": 1,
+        "source": ["exact", "text", "prefix", "contained"],
+        "entityId": 242,
+        "reference": "Glen Ord",
+        "shortName": null,
+        "retrievedFor": [
+          {
+            "exact": true,
+            "query": "Glen Ord"
+          }
+        ]
+      },
+      {
+        "kind": "brand",
+        "name": "Decadent Drams",
+        "score": 1,
+        "source": ["exact", "text", "prefix", "contained"],
+        "entityId": 365681,
+        "reference": "Decadent Drams",
+        "shortName": null,
+        "retrievedFor": [
+          {
+            "exact": true,
+            "query": "Decadent Drams"
+          }
+        ]
+      },
+      {
+        "kind": "distillery",
+        "name": "Deanston",
+        "score": 1,
+        "source": ["exact", "text", "prefix", "contained"],
+        "entityId": 445,
+        "reference": "Deanston",
+        "shortName": null,
+        "retrievedFor": [
+          {
+            "exact": true,
+            "query": "Deanston"
+          }
+        ]
+      },
+      {
+        "kind": "distillery",
+        "name": "Ben Nevis",
+        "score": 1,
+        "source": ["exact", "text", "prefix", "contained"],
+        "entityId": 29,
+        "reference": "Ben Nevis",
+        "shortName": null,
+        "retrievedFor": [
+          {
+            "exact": true,
+            "query": "Ben Nevis"
+          }
+        ]
+      },
+      {
+        "kind": "bottler",
+        "name": "Claxton's",
+        "score": 1,
+        "source": ["exact", "text", "prefix", "contained"],
+        "entityId": 6077,
+        "reference": "Claxton's",
+        "shortName": null,
+        "retrievedFor": [
+          {
+            "exact": true,
+            "query": "Claxton's"
+          }
+        ]
+      },
+      {
+        "kind": "distillery",
+        "name": "Miltonduff",
+        "score": 1,
+        "source": ["exact", "text", "prefix", "contained"],
+        "entityId": 1185,
+        "reference": "Miltonduff",
+        "shortName": null,
+        "retrievedFor": [
+          {
+            "exact": true,
+            "query": "Miltonduff"
+          }
+        ]
+      },
+      {
+        "kind": "distillery",
+        "name": "Loch Lomond",
+        "score": 1,
+        "source": ["exact", "text", "prefix", "contained"],
+        "entityId": 1144,
+        "reference": "Loch Lomond",
+        "shortName": null,
+        "retrievedFor": [
+          {
+            "exact": true,
+            "query": "Loch Lomond"
+          }
+        ]
+      },
+      {
+        "kind": "brand",
+        "name": "Croftengea",
+        "score": 0.5,
+        "source": ["text", "prefix"],
+        "entityId": 863,
+        "reference": "Loch Lomond (Croftengea)",
+        "shortName": "",
+        "retrievedFor": [
+          {
+            "query": "Loch Lomond"
+          }
+        ]
+      },
+      {
+        "kind": "brand",
+        "name": "Inchmoan",
+        "score": 0.5,
+        "source": ["text", "prefix"],
+        "entityId": 1052,
+        "reference": "Loch Lomond (Inchmoan)",
+        "shortName": null,
+        "retrievedFor": [
+          {
+            "query": "Loch Lomond"
+          }
+        ]
+      },
+      {
+        "kind": "brand",
+        "name": "Inchmurrin",
+        "score": 0.5,
+        "source": ["text", "prefix"],
+        "entityId": 1053,
+        "reference": "Loch Lomond (Inchmurrin)",
+        "shortName": "",
+        "retrievedFor": [
+          {
+            "query": "Loch Lomond"
+          }
+        ]
+      },
+      {
+        "kind": "brand",
+        "name": "Old Rhosdhu",
+        "score": 0.5,
+        "source": ["prefix"],
+        "entityId": 1230,
+        "reference": "Loch Lomond (Rhosdhu)",
+        "shortName": "",
+        "retrievedFor": [
+          {
+            "query": "Loch Lomond"
+          }
+        ]
+      },
+      {
+        "kind": "brand",
+        "name": "The Single Cask",
+        "score": 0.375,
+        "source": ["contained"],
+        "entityId": 366640,
+        "reference": "Single Cask",
+        "shortName": null,
+        "retrievedFor": [
+          {
+            "query": "Single Cask Nation"
+          }
+        ]
+      },
+      {
+        "kind": "brand",
+        "name": "Cadée",
+        "score": 0.31153846153846154,
+        "source": ["contained"],
+        "entityId": 367403,
+        "reference": "Cadée",
+        "shortName": null,
+        "retrievedFor": [
+          {
+            "query": "Decadent Drinks"
+          },
+          {
+            "query": "Decadent Drams"
+          }
+        ]
+      },
+      {
+        "kind": "brand",
+        "name": "The Singleton of Glen Ord",
+        "score": 0.2,
+        "source": ["text"],
+        "entityId": 1426,
+        "reference": null,
+        "shortName": null,
+        "retrievedFor": [
+          {
+            "query": "Glen Ord"
+          }
+        ]
+      },
+      {
+        "kind": "brand",
+        "name": "Dew of Ben Nevis",
+        "score": 0.2,
+        "source": ["text"],
+        "entityId": 164,
+        "reference": null,
+        "shortName": null,
+        "retrievedFor": [
+          {
+            "query": "Ben Nevis"
+          }
+        ]
+      }
+    ],
+    "inspectedSeries": []
+  },
+  "provenance": {
+    "source": "production_miss",
+    "verifiedSourceUrls": [
+      "https://www.scotchwhiskyauctions.com/auctions/232-the-183rd-auction/897857-hazelburn-2017-8-year-old-duty-paid-sample/",
+      "https://www.musthavemalts.com/product/hazelburn-8-years-old-sherry-wood-2025-edition/"
+    ],
+    "dbOutcome": {
+      "bottleId": 53917,
+      "createsBottle": false,
+      "summary": "Production returned match."
+    },
+    "notes": "Captured from saved classifier run 20477 (auction_lot 2155, model null, 2026-10-01T22:24:24.010Z). Production rationale: Match to Hazelburn Sherry Wood - 2025 Edition (Bottle 53917). The auction listing identifies a Hazelburn sample distilled in 2017 and aged 8 years; public product evidence identifies the 2025 Hazelburn Sherry Wood release as an 8-year-old whisky distilled in 2017. The inspected candidate agrees on brand, distillery, age, and vintage, with no conflicting populated identity traits. The sample format is not a distinct marketed release. Checked 2026-10-25. Lot 183-04058 page: distilled 03.02.2017, bottled 18.06.2025, 8 years old, bourbon cask, 55.6% ABV, 70cl; winning bid £75. Bottle 53917 is the 2025 Sherry Wood release: Oloroso casks, 48.2%, bottled March 2025. The production match was wrong on cask and strength, and it applied automatically (lot matched, check 20477). The owner ruled on 2026-10-25 that auctions track single whisky bottles only and leave out samples, including duty-paid trade samples, so the right outcome is ignored. The input keeps the observed title, candidates, and search evidence; it sets readCandidateImages:false to match current auction matching. The saved run predates that setting."
+  },
+  "expected": {
+    "status": "ignored",
+    "summary": "A duty-paid sample is a trade cask sample, not a marketed release. Ignore it instead of matching a full-size Bottle."
+  }
+}

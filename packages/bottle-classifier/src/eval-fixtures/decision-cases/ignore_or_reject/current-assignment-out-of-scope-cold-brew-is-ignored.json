@@ -1,6 +1,6 @@
 {
-  "id": "current-assignment-out-of-scope-cold-brew-remains-no-match",
-  "name": "current assignment: out-of-scope Jameson Cold Brew remains no match",
+  "id": "current-assignment-out-of-scope-cold-brew-is-ignored",
+  "name": "current assignment: out-of-scope Jameson Cold Brew is ignored",
   "input": {
     "reference": {
       "name": "Jameson Cold Brew Irish Whiskey",
@@ -63,13 +63,10 @@
       "https://www.pernod-ricard.com/sites/default/files/inline-files/Pernod_Ricard_Norway_Produktkatalog_2.pdf",
       "https://api.peated.com/v1/bottles/13437"
     ],
-    "notes": "Jameson says Cold Brew combines Jameson Irish Whiskey with Arabica coffee, and Pernod Ricard lists it at 30% ABV. The Irish Whiskey technical file requires at least 40% ABV. It is therefore an additive-flavor spirit outside the classifier's whisky scope. An existing Peated Bottle or current assignment does not override that scope."
+    "notes": "Jameson says Cold Brew combines Jameson Irish Whiskey with Arabica coffee, and Pernod Ricard lists it at 30% ABV. The Irish Whiskey technical file requires at least 40% ABV. It is therefore an additive-flavor spirit outside the classifier's whisky scope. An existing Peated Bottle or current assignment does not override that scope. 2026-10-25: the case now expects ignored under the owner scope ruling. evidence/ci.json gained the producer page result (Arabica coffee with Jameson Irish Whiskey) and a retailer listing at 30% ABV, the sources M02 cites; before this, the controlled pack supplied no evidence that flavor was added."
   },
   "expected": {
-    "status": "classified",
-    "action": "no_match",
-    "identityScope": "product",
-    "referenceScope": "none",
-    "summary": "Return no_match for an additive-flavor spirit even when the reference is currently assigned to an existing Peated Bottle."
+    "status": "ignored",
+    "summary": "Ignore an additive-flavor spirit even when the listing is currently assigned to an existing Peated Bottle."
   }
 }

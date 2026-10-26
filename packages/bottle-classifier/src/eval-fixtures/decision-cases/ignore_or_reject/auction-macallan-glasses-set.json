@@ -530,9 +530,7 @@
     "notes": "Captured from saved classifier run 25182 (auction_lot 7654, model null, 2026-10-02T17:14:19.905Z). Production rationale: The source title and auction URL identify a Macallan glasses set, not a marketed whisky bottle. The source page could not be read, and there is no evidence supporting a Bottle match or creation. Checked 2026-10-24. Lot 182-03021 page: Macallan Glasses Set, no whisky listed; winning bid £35. The gift-set ignore patterns do not match \"Glasses Set\". Search evidence is empty to keep the title-only input. Current auction matching sends readCandidateImages:false, so the case does too; the saved run predates that and read candidate photos."
   },
   "expected": {
-    "status": "classified",
-    "action": "no_match",
-    "identityScope": "product",
-    "summary": "Do not match or create a Bottle for glassware."
+    "status": "ignored",
+    "summary": "A set of glasses is an accessory, not a whisky Bottle. Ignore it."
   }
 }

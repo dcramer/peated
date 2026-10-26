@@ -431,9 +431,7 @@
     "notes": "Captured from saved classifier run 24227 (auction_lot 6551, model null, 2026-10-02T14:08:07.028Z). Production rationale: Hennessy X.O is a Cognac, not a whisky. Cognac is outside this whisky catalog, so it cannot be matched or created as a Bottle here. The local candidates are unrelated whisky products. Checked 2026-10-24. Lot 182-03767 page: Hennessy X.O, cognac, 70cl, 40%; winning bid £95. The title has no category word, so the keyword ignore rule does not apply. Production returned no_match, which leaves the lot in review. Search evidence is empty to keep the title-only input. Current auction matching sends readCandidateImages:false, so the case does too; the saved run predates that and read candidate photos."
   },
   "expected": {
-    "status": "classified",
-    "action": "no_match",
-    "identityScope": "product",
-    "summary": "Do not match or create a whisky Bottle for a cognac."
+    "status": "ignored",
+    "summary": "Hennessy X.O is a cognac, not whisky. Ignore it instead of matching or creating a whisky Bottle."
   }
 }

@@ -66,12 +66,17 @@ describe("BottleClassifierAgentDecisionSchema", () => {
     );
   });
 
-  test("exposes only the three identity results", () => {
+  test("lets the agent ignore a source but saves only identity results", () => {
     expect(BottleClassifierActionSchema.options).toEqual([
       "match",
       "create_bottle",
       "no_match",
+      "ignore",
     ]);
+    expect(
+      BottleClassificationDecisionSchema.safeParse({ action: "ignore" })
+        .success,
+    ).toBe(false);
   });
 
   test("rejects model-reported tool telemetry", () => {
