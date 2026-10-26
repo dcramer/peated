@@ -73,7 +73,8 @@ Your output is a set of dated facts, each tied to quotes from pages you read, an
 - Quotes are matched ignoring case, spacing, and punctuation, but every word must be on the page.
 - Every claim in an event's text or a sentence must be what a quote says. Do not add a cause, a comparison, a change such as "raised" or "copied", or a "first" that no quote states. Check the current page the same way: fix or drop a kept sentence or event that says more than its quotes.
 - Before you finish, use find_in_pages for each event's subject and each site fact, such as an owner's name, a year, or "washbacks", to find every value the pages you read give. When a page you read states a different value, cite it too, so the page shows the disagreement.
-- When sources disagree, keep a citation for each, each with its own \`statedValue\`. Set the fact's value to the best-supported one: official over reference, reference over press, and more independent sites over fewer. The stored value must be one a source states. A source that gives two values supports neither, and neither does a value its own publisher's other records rule out, such as a purchase date after the buyer is recorded rebuilding the site. When no value is better supported by these rules, still keep a fact that the sources agree happened: store the value of the source you list first, and the page shows that the sources disagree. Leave a fact out only when its sources disagree on whether it happened. Dates that differ only in precision, such as 1983 and 1983-05, agree.
+- A quote supports only the event it describes. When a site closed or reopened more than once, match each quote to its own closing or reopening by what it says around the date, such as a rebuild or a rename, before you treat two dates as a disagreement.
+- When sources disagree, keep a citation for each, each with its own \`statedValue\`. Set the fact's value to the best-supported one: official over reference, reference over press, and more independent sites over fewer. The stored value must be one a source states. A source that gives two values supports neither, and neither does a value its own publisher's other records or other facts the sources agree on rule out, such as a purchase date after the buyer is recorded rebuilding the site, or a reopening after years of recorded production. When no value is better supported by these rules, still keep a fact that the sources agree happened: store the value of the source you list first, and the page shows that the sources disagree. Leave a fact out only when its sources disagree on whether it happened. Dates that differ only in precision, such as 1983 and 1983-05, agree.
 - When sources call the same event by different kinds, such as closed and mothballed, use the kind the best-supported source states, by the same order.
 - Source \`kind\`: \`official\` is the producer, government, or heritage records; \`reference\` is histories and encyclopedias, including encyclopedia sections of trade sites such as Whiskypedia and sites that copy official records; \`press\` is news and trade press. A record that quotes another work, such as a heritage record quoting an old book, ranks as that work, not as the record, when you weigh a disagreement; still list the page once, with the record's kind.
 
@@ -90,7 +91,7 @@ Your output is a set of dated facts, each tied to quotes from pages you read, an
 - For a bottler, events are about the business: when it began (\`opened\`), changes of owner (\`acquired\`), name changes (\`renamed\`), when it ended (\`closed\`), and milestones such as launching its own ranges or opening a bottling site (\`generic\`). Leave out single bottlings.
 - Another production site's history belongs on that site's page. Include it only where it explains this place's origin or name, as a \`generic\` event linked to that site with \`relatedEntityId\`.
 - On \`opened\`, set \`name\` when the first name differs from today's name.
-- Site facts are for distilleries only. A text fact's value is a short phrase copied word for word from one of its quotes, such as \`Category B\` for a listing or \`worm tubs\`; a value no quote contains is dropped. Use each field only for what it describes, and leave out a detail no field fits unless a dated event can hold it. Keep a value short, and put a changing setup's date in \`asOf\`; a value from an old survey or book gets that work's year as \`asOf\`, and a newer page that states a different value is cited too. Site facts describe the plant today; a value that describes the plant before a rebuild or refit belongs in that period's dated event instead. A sentence may say what a setup does to the spirit only when one of that fact's quotes says it. Record capacity only when the source gives litres of alcohol (LPA):
+- Site facts are for distilleries only. A text fact's value is a short phrase copied word for word from one of its quotes, such as \`Category B\` for a listing or \`worm tubs\`; a value no quote contains is dropped. Use each field only for what it describes, and leave out a detail no field fits unless a dated event can hold it. Keep a value short, and put a changing setup's date in \`asOf\`; a value from an old survey or book gets that work's year as \`asOf\`, and a newer page that states a different value is cited too. An undated fact box, such as Whiskypedia's, is a fine source for a site fact. For a site fact, store the value from the newest dated page, with its year as \`asOf\`, over an older dated page, and over an undated fact box when the dated page is from the last ten years, whatever their rank; otherwise rank decides. The producer's live site, read today, counts as dated today, so it beats an archived copy of itself. Site facts describe the plant today; a value that describes the plant before a rebuild or refit belongs in that period's dated event instead. A sentence may say what a setup does to the spirit only when one of that fact's quotes says it. Record capacity only when the source gives litres of alcohol (LPA; "mlpa" is million litres of alcohol):
 ${siteFactList}
 - Leave out bottle counts, ratings, prices, tasting notes, and awards. Peated shows those from its own data.
 
@@ -119,6 +120,8 @@ A brand:
 ${JSON.stringify(buildExample(JOHNNIE_WALKER_ABOUT_EXAMPLE, new Set([1, 5, 8, 9, 10]), ["lead", "owners"]), null, 1)}`;
 
 export type EntityAboutWriterInput = {
+  /** Today's date as YYYY-MM-DD, so the writer can tell how old a page is. */
+  today: string;
   name: string;
   kind: string;
   aliases: string[];
@@ -140,6 +143,7 @@ export type EntityAboutWriterInput = {
 /** The per-Entity request for one writer run. */
 export function buildEntityAboutInput(input: EntityAboutWriterInput) {
   const lines = [
+    `Today's date: ${input.today}`,
     `Write the About page for this ${input.kind}:`,
     `Name: ${input.name}`,
     input.aliases.length ? `Also known as: ${input.aliases.join(", ")}` : null,

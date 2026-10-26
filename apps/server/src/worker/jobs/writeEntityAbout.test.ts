@@ -415,7 +415,7 @@ describe("writeEntityAbout", () => {
     expect(about?.document.sections).toEqual([]);
   });
 
-  test("gives the writer its notes, history, and current page", async ({
+  test("gives the writer today's date, its notes, history, and current page", async ({
     fixtures,
   }) => {
     const user = await fixtures.User({ mod: true });
@@ -439,6 +439,7 @@ describe("writeEntityAbout", () => {
     await writeEntityAbout({ entityId: entity.id }, run);
 
     const input = run.writer.mock.calls[0]![0];
+    expect(input.today).toBe(new Date().toISOString().slice(0, 10));
     expect(input.notes).toEqual(["Not the modern Clynelish next door."]);
     expect(input.history).toEqual([
       "closed, 1983; source https://example.com/closing",

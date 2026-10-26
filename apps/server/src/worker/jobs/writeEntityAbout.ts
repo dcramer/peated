@@ -148,6 +148,7 @@ export async function draftEntityAbout(
   for (let attempt = 0; attempt < MAX_ATTEMPTS; attempt += 1) {
     const run = await services.writer({
       entityId: entity.id,
+      today: new Date().toISOString().slice(0, 10),
       name: entity.name,
       kind: entity.kind,
       aliases: aliases.map((alias) => alias.name),

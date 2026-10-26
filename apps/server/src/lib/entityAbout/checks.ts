@@ -88,10 +88,11 @@ function quotesState(quotes: readonly string[], value: string) {
     );
   if (!words.length) return numbers.length > 0;
   // Units are written many ways: "160 hours" is stated by "160-hour" and
-  // "100hrs" as well.
+  // "100hrs" as well. Tables can run a name into a year, as "Diageo1997".
   const quoted = new Set(
     text
       .replace(/(\p{N})(\p{L})/gu, "$1 $2")
+      .replace(/(\p{L})(\p{N})/gu, "$1 $2")
       .split(" ")
       .map((word) => UNIT_ABBREVIATIONS.get(word) ?? word),
   );
@@ -252,8 +253,8 @@ function verifyCitations(
       // written as digits or words, is a fact, so a quote must state it too.
       // Number words the check cannot read must appear in a quote as written.
       const unquotedNumbers = (value: string | null) => [
-        ...readNumbers(writeNumberWords(value ?? "")).filter(
-          (number) => !quotes.some((quote) => containsNumber(quote, number)),
+        ...readClaimNumbers(value ?? "").filter(
+          (number) => !quotes.some((quote) => statesClaimNumber(quote, number)),
         ),
         ...(
           expandLargeNumbers(stripThousands(value ?? "")).match(
@@ -509,6 +510,25 @@ function expandLargeNumbers(value: string) {
     );
 }
 
+// A decade such as "the 1930s" is stated by any year in it ("1931") or by
+// the decade itself, so it is read as "1930s", not as the year 1930.
+const DECADE = /\b(\d{3})0s\b/g;
+
+/** The numbers our own text states, with decades kept as "1930s". */
+function readClaimNumbers(value: string) {
+  const decades = [...value.matchAll(DECADE)].map(([decade]) => decade);
+  return [
+    ...decades,
+    ...readNumbers(writeNumberWords(value.replace(DECADE, ""))),
+  ];
+}
+
+function statesClaimNumber(text: string, number: string) {
+  const decade = /^(\d{3})0s$/.exec(number);
+  if (!decade) return containsNumber(text, number);
+  return new RegExp(`(?<!\\d)${decade[1]}\\d(?!\\d)`).test(text);
+}
+
 /** The numbers a value states, read the same way as quotes. */
 function readNumbers(value: string) {
   return expandLargeNumbers(stripThousands(value)).match(NUMBER_PATTERN) ?? [];
@@ -587,8 +607,8 @@ function checkSentence(
   const cited = sentence.factIds.map((id) => factText.get(id) ?? "").join(" ");
   // Numbers written as words count too, as in event text: "nine hours"
   // states 9.
-  for (const number of readNumbers(writeNumberWords(sentence.text))) {
-    if (!containsNumber(cited, number)) {
+  for (const number of readClaimNumbers(sentence.text)) {
+    if (!statesClaimNumber(cited, number)) {
       errors.push(`${where} states ${number}, which its facts do not.`);
     }
   }
