@@ -149,7 +149,7 @@ export const ABOUT_FACT_FIELDS = {
   mainUse: {
     label: "Mainly used for",
     description:
-      "What its spirit mostly goes into, such as a named blend or the owner's blends",
+      "What most of its spirit goes into, when a quote says most does, such as the owner's blends; a blend it is one of many malts in is not its main use",
     type: "text",
     unit: null,
     kinds: ["distillery"],
