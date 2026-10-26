@@ -588,6 +588,29 @@ describe("checkConflictPicks", () => {
     expect(reopened("1948")).toBe(0);
   });
 
+  test("reads a year range written with a slash", () => {
+    const quote = "Alfred Barnard visited in 1893/94.";
+    const visited = (statedValue: string) =>
+      keepVerifiedCitations(
+        draft({
+          events: [
+            {
+              id: 1,
+              kind: "generic",
+              date: "1893",
+              text: "Alfred Barnard visited.",
+              citations: [{ sourceId: "wp", statedValue, quote }],
+            },
+          ],
+        }),
+        [{ ...page, text: `${page.text} ${quote}` }],
+        null,
+      ).events.length;
+
+    expect(visited("1893–1894")).toBe(1);
+    expect(visited("1893–1895")).toBe(0);
+  });
+
   test("names the number that dropped a fact", () => {
     const quote = "Brora reopened in 2021.";
     const { dropped } = reviewAboutDraft(

@@ -363,9 +363,10 @@ function stripThousands(value: string) {
 
 // Histories shorten year ranges, so "1931-38" also states 1938. A later
 // two-digit end is read in the same century; "1999-02" is left alone.
+// "1931-38" and "1893/94" span to 1938 and 1894.
 function expandYearRanges(value: string) {
   return value.replace(
-    /\b(\d{2})(\d{2})([-–])(\d{2})\b/g,
+    /\b(\d{2})(\d{2})([-–/])(\d{2})\b/g,
     (range, century: string, start: string, dash: string, end: string) =>
       end > start ? `${century}${start}${dash}${century}${end}` : range,
   );
