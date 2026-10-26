@@ -39,12 +39,19 @@ export const ABOUT_MAX_SENTENCES_PER_FACT = 2;
 export type AboutPageRead = { url: string; text: string };
 
 function normalizeForQuote(value: string) {
-  return value
-    .normalize("NFKC")
-    .toLowerCase()
-    .replace(/[‘’“”]/g, "'")
-    .replace(/[^\p{L}\p{N}]+/gu, " ")
-    .trim();
+  return (
+    value
+      .normalize("NFKC")
+      // Records that run table cells together, as in "CategoryBDate
+      // Added28/03/1996", match a quote that spaces them out.
+      .replace(/(\p{Ll})(\p{Lu})/gu, "$1 $2")
+      .replace(/(\p{Lu})(\p{Lu}\p{Ll})/gu, "$1 $2")
+      .replace(/(\p{L})(\p{N})/gu, "$1 $2")
+      .toLowerCase()
+      .replace(/[‘’“”]/g, "'")
+      .replace(/[^\p{L}\p{N}]+/gu, " ")
+      .trim()
+  );
 }
 
 const FILLER_WORDS = new Set(["and", "the", "for", "with"]);
@@ -143,11 +150,16 @@ function quotesState(quotes: readonly string[], value: string) {
   ) {
     return true;
   }
+  // A lone capital is a grade, as in "Category B", so it must be quoted too.
+  const grades = new Set(
+    (checked.match(/\b\p{Lu}\b/gu) ?? []).map((letter) => letter.toLowerCase()),
+  );
   const words = phrase
     .split(" ")
     .filter(
       (word) =>
-        word.length > 2 && !FILLER_WORDS.has(word) && !/^\p{N}+$/u.test(word),
+        grades.has(word) ||
+        (word.length > 2 && !FILLER_WORDS.has(word) && !/^\p{N}+$/u.test(word)),
     );
   if (!words.length) return numbers.length > 0;
   // Units are written many ways: "160 hours" is stated by "160-hour" and

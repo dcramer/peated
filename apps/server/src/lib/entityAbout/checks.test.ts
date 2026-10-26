@@ -938,6 +938,27 @@ describe("checkConflictPicks", () => {
     expect(
       listing("Category B", "CategoryADate Added08/11/2022"),
     ).toBeUndefined();
+    // A quote may space out the cells the record runs together.
+    const spaced = keepVerifiedCitations(
+      draft({
+        siteFacts: {
+          listing: {
+            value: "Category B",
+            asOf: null,
+            citations: [
+              {
+                sourceId: "wp",
+                statedValue: "Category B",
+                quote: "Category B Date Added 28/03/1996",
+              },
+            ],
+          },
+        },
+      }),
+      [{ ...page, text: `${page.text} CategoryBDate Added28/03/1996` }],
+      null,
+    ).siteFacts.listing;
+    expect(spaced).toBeDefined();
     // A count of 1 needs "one" or "a single" right before the field's word.
     expect(
       stills(1, "It has one wash still and one spirit still."),
