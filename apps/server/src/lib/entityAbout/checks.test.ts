@@ -924,6 +924,29 @@ describe("checkConflictPicks", () => {
     expect(stills(250000000, "It cost £1,250m.")).toBeUndefined();
   });
 
+  test("reads a name run into a year by a table", () => {
+    const quote = "Owners: Scottish Malt Distillers1986 Diageo1997";
+    const owner = (name: string) =>
+      keepVerifiedCitations(
+        draft({
+          events: [
+            {
+              id: 1,
+              kind: "acquired",
+              date: "1997",
+              newOwnerName: name,
+              citations: [{ sourceId: "wp", statedValue: "1997", quote }],
+            },
+          ],
+        }),
+        [{ ...page, text: `${page.text} ${quote}` }],
+        null,
+      ).events.length;
+
+    expect(owner("Diageo")).toBe(1);
+    expect(owner("Guinness")).toBe(0);
+  });
+
   test("reads a unit written another way", () => {
     const fermentation = (value: string, quote: string) =>
       keepVerifiedCitations(

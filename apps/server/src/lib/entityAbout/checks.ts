@@ -88,10 +88,11 @@ function quotesState(quotes: readonly string[], value: string) {
     );
   if (!words.length) return numbers.length > 0;
   // Units are written many ways: "160 hours" is stated by "160-hour" and
-  // "100hrs" as well.
+  // "100hrs" as well. Tables can run a name into a year, as "Diageo1997".
   const quoted = new Set(
     text
       .replace(/(\p{N})(\p{L})/gu, "$1 $2")
+      .replace(/(\p{L})(\p{N})/gu, "$1 $2")
       .split(" ")
       .map((word) => UNIT_ABBREVIATIONS.get(word) ?? word),
   );
