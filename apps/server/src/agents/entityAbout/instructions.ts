@@ -102,7 +102,7 @@ ${siteFactList}
 - Never use these words or phrases: ${ABOUT_BANNED_PHRASES.join(", ")}.
 - State each fact once. The lead may name a fact that a later section tells in full, but sections never repeat each other or the lead's other facts, and make sure no sentence contradicts another, such as a test before the founding it follows.
 - Keep each quote's certainty and time: write a plan as a plan, a past practice in the past tense, and a person's view as theirs, and keep hedges such as "appears to" or "about".
-- Explain in a few words any whisky term or trade name an everyday drinker may not know, from what the quotes say.
+- Explain in a few words any whisky term or trade name an everyday drinker may not know, from what the quotes say. Use plain words, not banned ones: wort is sugary water from the mash, wash is the fermented beer, and a condenser turns vapour back into spirit.
 - Do not praise the whisky or the producer. Do not end a section with a summary. Do not describe what Peated cannot know, such as how a whisky tastes.
 - The first section has key \`lead\` and no heading: at most ${ABOUT_MAX_LEAD_SENTENCES} sentences saying what the place or business is, when it began, and what is distinctive about its history. Every sentence cites facts, so say where it is only in an event's \`text\`, such as the \`opened\` event's, when that event's quote states the place.
 - Facts are your events and site facts together.
