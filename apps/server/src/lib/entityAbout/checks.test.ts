@@ -611,6 +611,27 @@ describe("checkConflictPicks", () => {
     expect(rebuilt("It was rebuilt in 1963-5.")).toBe(0);
   });
 
+  test("still reads a count written after a year and a dash", () => {
+    const quote = "It was built in 2008 – 12 warehouses in all.";
+    expect(
+      keepVerifiedCitations(
+        draft({
+          events: [
+            {
+              id: 1,
+              kind: "generic",
+              date: "2008",
+              text: "It had 12 warehouses.",
+              citations: [{ sourceId: "wp", statedValue: "2008", quote }],
+            },
+          ],
+        }),
+        [{ ...page, text: `${page.text} ${quote}` }],
+        null,
+      ).events,
+    ).toHaveLength(1);
+  });
+
   test("reads a year range written with a slash", () => {
     const quote = "Alfred Barnard visited in 1893/94.";
     const visited = (statedValue: string) =>
