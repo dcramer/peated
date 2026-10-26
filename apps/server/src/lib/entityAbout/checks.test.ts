@@ -8,6 +8,7 @@ import {
   checkAboutProse,
   checkConflictPicks,
   keepVerifiedCitations,
+  reviewAboutDraft,
 } from "./checks";
 import { getDateDisagreement, getDisagreement, valuesAgree } from "./display";
 import { toPublicEntityAbout } from "./publicAbout";
@@ -528,6 +529,59 @@ describe("checkConflictPicks", () => {
     // "1931-38" states 1938, but not a year it does not span.
     expect(reopened("1938")).toBe(1);
     expect(reopened("1948")).toBe(0);
+  });
+
+  test("names the number that dropped a fact", () => {
+    const quote = "Brora reopened in 2021.";
+    const { dropped } = reviewAboutDraft(
+      draft({
+        events: [
+          {
+            id: 1,
+            kind: "reopened",
+            date: "2021",
+            text: "It reopened after a three-year restoration.",
+            citations: [{ sourceId: "wp", statedValue: "2021", quote }],
+          },
+        ],
+      }),
+      [{ ...page, text: `${page.text} ${quote}` }],
+      "distillery",
+      null,
+    );
+
+    expect(dropped).toEqual([
+      "Event 1 (reopened, 2021) was dropped: its text or title states 3, which no kept quote states.",
+    ]);
+  });
+
+  test("names the quotes that failed when a fact is dropped", () => {
+    const withName = "In the same year, it was acquired by Glenmorangie plc.";
+    const withYear = "Glenmorangie acquired it in 2004.";
+    const { dropped } = reviewAboutDraft(
+      draft({
+        events: [
+          {
+            id: 1,
+            kind: "acquired",
+            date: "2004",
+            newOwnerName: "Glenmorangie plc",
+            citations: [
+              // No year in this quote, so it fails its stated value.
+              { sourceId: "wp", statedValue: "2004", quote: withName },
+              { sourceId: "wp", statedValue: "2004", quote: withYear },
+            ],
+          },
+        ],
+      }),
+      [{ ...page, text: `${page.text} ${withName} ${withYear}` }],
+      "bottler",
+      null,
+    );
+
+    expect(dropped).toEqual([
+      'Event 1 (acquired, 2004) was dropped: no one kept quote states its new owner "Glenmorangie plc". Its quotes from wp did not pass: a quote must be on a page read and state its statedValue.',
+    ]);
   });
 
   test("reads a stated date range by its years", () => {

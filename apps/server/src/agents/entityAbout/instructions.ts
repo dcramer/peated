@@ -163,7 +163,7 @@ export function buildEntityAboutInput(input: EntityAboutWriterInput) {
   if (input.previousErrors?.length) {
     lines.push(
       "",
-      "Your previous draft failed these checks. Return that draft fixed: keep every fact, citation, and sentence the checks do not name, and change only what they name. The pages it cited count as read.",
+      "Your previous draft failed these checks. Return that draft fixed: keep every fact, citation, and sentence the checks do not name, and change only what they name. The pages it cited count as read. A dropped fact is lost unless you fix it: change its value to what a kept quote states, or cite a quote that states it. Remove it only when no page you read supports it.",
       ...input.previousErrors.map((error) => `- ${error}`),
     );
     if (input.previousDraft) {

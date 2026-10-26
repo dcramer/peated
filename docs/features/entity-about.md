@@ -150,7 +150,8 @@ gets its retry. A draft with no sourced facts fails.
 A draft that fails gets one retry with that draft and the reasons, so the
 writer fixes what the checks name instead of starting over. The reasons also
 say why each dropped fact was dropped, such as a new owner's name that no one
-quote states. Pages read on the
+quote states, and which of its quotes did not pass. The writer repairs a
+dropped fact and removes it only when no page supports it. Pages read on the
 first try count on the retry. On the retry, the prose is
 trimmed to the facts the checks kept: a sentence that cites a dropped fact is
 left out, as the page would hide it, then sentences are trimmed from the end,

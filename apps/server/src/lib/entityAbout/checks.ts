@@ -206,7 +206,7 @@ function verifyCitations(
       ...event,
       citations: event.citations.filter(isVerified),
     }))
-    .filter((event) => {
+    .filter((event, index) => {
       const quotes = quotesOf(event.citations);
       // Names are shown as facts too, so one quote must state each whole;
       // words from different quotes do not make a name.
@@ -218,23 +218,25 @@ function verifyCitations(
       // Text and titles are the model's words, but any number in them,
       // written as digits or words, is a fact, so a quote must state it too.
       // Number words the check cannot read must appear in a quote as written.
-      const numbersQuoted = (value: string | null) =>
-        readNumbers(writeNumberWords(value ?? "")).every((number) =>
-          quotes.some((quote) => containsNumber(quote, number)),
-        ) &&
-        (
+      const unquotedNumbers = (value: string | null) => [
+        ...readNumbers(writeNumberWords(value ?? "")).filter(
+          (number) => !quotes.some((quote) => containsNumber(quote, number)),
+        ),
+        ...(
           expandLargeNumbers(stripThousands(value ?? "")).match(
             NUMBER_WORD_RUN,
           ) ?? []
         )
           .filter((run) => !readNumberWords(run) && run.toLowerCase() !== "one")
-          .every((run) =>
-            quotes.some((quote) =>
-              ` ${normalizeForQuote(quote)} `.includes(
-                ` ${normalizeForQuote(run)} `,
+          .filter(
+            (run) =>
+              !quotes.some((quote) =>
+                ` ${normalizeForQuote(quote)} `.includes(
+                  ` ${normalizeForQuote(run)} `,
+                ),
               ),
-            ),
-          );
+          ),
+      ];
       const year = (date: string) => date.slice(0, 4);
       const findMissing = () => {
         if (!event.citations.length) {
@@ -252,15 +254,31 @@ function verifyCitations(
         if (!named(event.newOwnerName)) {
           return `no one kept quote states its new owner "${event.newOwnerName}"`;
         }
-        if (!numbersQuoted(event.text) || !numbersQuoted(event.title)) {
-          return "its text or title has a number no kept quote states";
+        const unquoted = [
+          ...unquotedNumbers(event.text),
+          ...unquotedNumbers(event.title),
+        ];
+        if (unquoted.length) {
+          return `its text or title states ${unquoted.join(", ")}, which no kept quote states`;
         }
         return null;
       };
       const missing = findMissing();
       if (missing) {
+        // Name the quotes that failed too: often one of them held the
+        // missing value.
+        const failed = [
+          ...new Set(
+            draft.events[index]!.citations.filter(
+              (citation) => !isVerified(citation),
+            ).map((citation) => citation.sourceId),
+          ),
+        ];
+        const failedNote = failed.length
+          ? ` Its quotes from ${failed.join(", ")} did not pass: a quote must be on a page read and state its statedValue.`
+          : "";
         dropped.push(
-          `Event ${event.id} (${event.kind}, ${event.date}) was dropped: ${missing}.`,
+          `Event ${event.id} (${event.kind}, ${event.date}) was dropped: ${missing}.${failedNote}`,
         );
       }
       return !missing;
