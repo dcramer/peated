@@ -9,6 +9,7 @@ import {
   ABOUT_FACT_FIELD_LIST,
   ABOUT_FACT_FIELDS,
   aboutFactFieldAppliesTo,
+  type AboutFactField,
 } from "./aboutFactFields";
 import { findBannedPhrases } from "./bannedPhrases";
 import {
@@ -71,6 +72,14 @@ function quotesState(quotes: readonly string[], value: string) {
   const phrase = normalizeForQuote(expandLargeNumbers(stripThousands(checked)));
   // Whole words only: "Campbell" does not state "Bell".
   if (` ${text} `.includes(` ${phrase} `)) return true;
+  // Some pages lose the space between table cells, as heritage records print
+  // "CategoryADate Added". A phrase of two or more words still counts there.
+  if (
+    phrase.includes(" ") &&
+    text.replaceAll(" ", "").includes(phrase.replaceAll(" ", ""))
+  ) {
+    return true;
+  }
   const words = phrase
     .split(" ")
     .filter(
@@ -78,9 +87,26 @@ function quotesState(quotes: readonly string[], value: string) {
         word.length > 2 && !FILLER_WORDS.has(word) && !/^\p{N}+$/u.test(word),
     );
   if (!words.length) return numbers.length > 0;
-  const quoted = new Set(text.split(" "));
-  return words.every((word) => quoted.has(word));
+  // Units are written many ways: "160 hours" is stated by "160-hour" and
+  // "100hrs" as well.
+  const quoted = new Set(
+    text
+      .replace(/(\p{N})(\p{L})/gu, "$1 $2")
+      .split(" ")
+      .map((word) => UNIT_ABBREVIATIONS.get(word) ?? word),
+  );
+  return words.every(
+    (word) =>
+      quoted.has(word) ||
+      quoted.has(word.replace(/s$/, "")) ||
+      quoted.has(`${word}s`),
+  );
 }
+
+const UNIT_ABBREVIATIONS = new Map([
+  ["hr", "hour"],
+  ["hrs", "hours"],
+]);
 
 /**
  * Link rule (owner: docs/features/entity-about.md): an event links an Entity
@@ -189,20 +215,25 @@ function verifyCitations(
     ),
   );
 
-  const isVerified = (citation: AboutCitation) => {
-    if (!citation.quote) return false;
-    const url = sourceUrls.get(citation.sourceId);
-    const text = url ? pageText.get(url) : undefined;
-    const quote = normalizeForQuote(citation.quote);
-    const found =
-      Boolean(text && quote && ` ${text} `.includes(` ${quote} `)) ||
-      Boolean(url && carried.has(`${url} ${quote}`));
-    return (
-      found &&
-      (!citation.statedValue ||
-        quotesState(quotesOf([citation]), citation.statedValue))
-    );
-  };
+  // `states` decides whether a quote states the citation's value; site facts
+  // also accept a count of 1 written as a word.
+  const verifiedBy =
+    (states: (quotes: readonly string[], value: string) => boolean) =>
+    (citation: AboutCitation) => {
+      if (!citation.quote) return false;
+      const url = sourceUrls.get(citation.sourceId);
+      const text = url ? pageText.get(url) : undefined;
+      const quote = normalizeForQuote(citation.quote);
+      const found =
+        Boolean(text && quote && ` ${text} `.includes(` ${quote} `)) ||
+        Boolean(url && carried.has(`${url} ${quote}`));
+      return (
+        found &&
+        (!citation.statedValue ||
+          states(quotesOf([citation]), citation.statedValue))
+      );
+    };
+  const isVerified = verifiedBy(quotesState);
   const events = draft.events
     .map((event) => ({
       ...event,
@@ -290,9 +321,11 @@ function verifyCitations(
   for (const field of ABOUT_FACT_FIELD_LIST) {
     const fact = draft.siteFacts[field];
     if (!fact) continue;
-    const citations = fact.citations.filter(isVerified);
+    const states = (quotes: readonly string[], value: string) =>
+      quotesState(quotes, value) || statesSingle(quotes, field, value);
+    const citations = fact.citations.filter(verifiedBy(states));
     const quotes = quotesOf(citations);
-    if (quotesState(quotes, String(fact.value))) {
+    if (states(quotes, String(fact.value))) {
       // The date is optional, so one no quote states is dropped, not the fact.
       const asOf =
         fact.asOf && quotesState(quotes, fact.asOf.slice(0, 4))
@@ -347,9 +380,10 @@ function stripThousands(value: string) {
 
 // Histories shorten year ranges, so "1931-38" also states 1938. A later
 // two-digit end is read in the same century; "1999-02" is left alone.
+// "1931-38" and "1893/94" span to 1938 and 1894.
 function expandYearRanges(value: string) {
   return value.replace(
-    /\b(\d{2})(\d{2})([-–])(\d{2})\b/g,
+    /\b(\d{2})(\d{2})([-–/])(\d{2})\b/g,
     (range, century: string, start: string, dash: string, end: string) =>
       end > start ? `${century}${start}${dash}${century}${end}` : range,
   );
@@ -405,6 +439,29 @@ const NUMBER_WORD_RUN = new RegExp(
   "gi",
 );
 
+/**
+ * Whether quotes state a count of 1 for a site fact, as "one wash still" or
+ * "a single spirit still". "One" alone is not read as a number because pages
+ * use it in many other ways, so it must come right before the field's own
+ * first word.
+ */
+function statesSingle(
+  quotes: readonly string[],
+  field: AboutFactField,
+  value: string,
+) {
+  if (value !== "1") return false;
+  const noun = ABOUT_FACT_FIELDS[field].label.toLowerCase().split(" ")[0]!;
+  const singular = noun.replace(/s$/, "");
+  const text = ` ${normalizeForQuote(quotes.join(" "))} `;
+  // Whole words: "one washback" does not state 1 wash still.
+  return ["one", "a single"].some((count) =>
+    [singular, `${singular}s`].some((word) =>
+      text.includes(` ${count} ${word} `),
+    ),
+  );
+}
+
 /** The number a run of number words states, when it is one small word. */
 function readNumberWords(run: string) {
   const index = SMALL_NUMBER_WORDS.indexOf(run.toLowerCase());
@@ -412,7 +469,16 @@ function readNumberWords(run: string) {
 }
 
 function writeNumberWords(value: string) {
-  return value.replace(NUMBER_WORD_RUN, (run) => readNumberWords(run) ?? run);
+  // "two million" states 2 million, like "2 million".
+  return value
+    .replace(
+      new RegExp(
+        `\\b(${SMALL_NUMBER_WORDS.join("|")})\\s+(million|billion)\\b`,
+        "gi",
+      ),
+      (_, word: string, unit: string) => `${readNumberWords(word)} ${unit}`,
+    )
+    .replace(NUMBER_WORD_RUN, (run) => readNumberWords(run) ?? run);
 }
 
 // Capacities and prices are often written in millions or billions: "1.6m
@@ -420,11 +486,22 @@ function writeNumberWords(value: string) {
 // state 1200000000. An "m" or "bn" must touch the number, so "1887 M." and
 // "20 m" are not millions.
 function expandLargeNumbers(value: string) {
-  return value.replace(
-    /\b(\d+(?:\.\d+)?)(m|\s*million|bn|\s*billion)\b/gi,
-    (_, n: string, unit: string) =>
-      String(Math.round(Number(n) * (/b/i.test(unit) ? 1e9 : 1e6))),
-  );
+  // "mlpa" or "mla" is million litres of (pure) alcohol: "4.8 mlpa", "6.5mla",
+  // or a table label such as "Capacity (mlpa) 3.4", where an "i" info icon
+  // may sit between.
+  const millionLitres = (n: string) => String(Math.round(Number(n) * 1e6));
+  return value
+    .replace(/\(mlpa\)\s*(?:i\s+)?(\d+(?:\.\d+)?)/gi, (_, n: string) =>
+      millionLitres(n),
+    )
+    .replace(/\b(\d+(?:\.\d+)?)\s*(?:mlpa|mla)\b/gi, (_, n: string) =>
+      millionLitres(n),
+    )
+    .replace(
+      /\b(\d+(?:\.\d+)?)(m|\s*million|bn|\s*billion)\b/gi,
+      (_, n: string, unit: string) =>
+        String(Math.round(Number(n) * (/b/i.test(unit) ? 1e9 : 1e6))),
+    );
 }
 
 /** The numbers a value states, read the same way as quotes. */
@@ -503,7 +580,9 @@ function checkSentence(
   }
   const errors: string[] = [];
   const cited = sentence.factIds.map((id) => factText.get(id) ?? "").join(" ");
-  for (const number of readNumbers(sentence.text)) {
+  // Numbers written as words count too, as in event text: "nine hours"
+  // states 9.
+  for (const number of readNumbers(writeNumberWords(sentence.text))) {
     if (!containsNumber(cited, number)) {
       errors.push(`${where} states ${number}, which its facts do not.`);
     }

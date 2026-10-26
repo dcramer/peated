@@ -87,6 +87,78 @@ export function getOwners(about: EntityAbout): AboutOwner[] {
     .reverse();
 }
 
+export type AboutLinkedEntity = NonNullable<AboutEvent["relatedEntity"]>;
+export type SentencePart = { text: string; entity: AboutLinkedEntity | null };
+
+function escapeRegExp(value: string) {
+  return value.replace(/[.*+?^${}()|[\]\\]/g, "\\$&");
+}
+
+/**
+ * Splits a section's sentences so a mention of an Entity linked by one of the
+ * sentence's cited events becomes a link. Display rule (owner:
+ * docs/features/entity-about.md): only the Entity's exact current name as a
+ * whole word counts, each Entity links once per section, and the page's own
+ * Entity never links.
+ */
+export function linkEntityMentions(
+  section: AboutSection,
+  about: EntityAbout,
+): SentencePart[][] {
+  const events = new Map(about.events.map((event) => [event.id, event]));
+  const linked = new Set<number>([about.entityId]);
+  return section.sentences.map((sentence) => {
+    const candidates = sentence.factIds
+      .flatMap((factId) => {
+        const event = factId.startsWith("event:")
+          ? events.get(Number(factId.slice("event:".length)))
+          : undefined;
+        return [event?.relatedEntity, event?.newOwner];
+      })
+      .filter((entity): entity is AboutLinkedEntity => Boolean(entity))
+      // Longer names first, so "Port Ellen Maltings" wins over "Port Ellen".
+      .sort((a, b) => b.name.length - a.name.length);
+
+    const matches: { start: number; end: number; entity: AboutLinkedEntity }[] =
+      [];
+    for (const entity of candidates) {
+      if (linked.has(entity.id)) continue;
+      const match = new RegExp(
+        `(?<![\\p{L}\\p{N}])${escapeRegExp(entity.name)}(?![\\p{L}\\p{N}])`,
+        "u",
+      ).exec(sentence.text);
+      if (!match) continue;
+      const start = match.index;
+      const end = start + entity.name.length;
+      if (matches.some((other) => start < other.end && other.start < end)) {
+        continue;
+      }
+      matches.push({ start, end, entity });
+      linked.add(entity.id);
+    }
+
+    const parts: SentencePart[] = [];
+    let cursor = 0;
+    for (const match of matches.sort((a, b) => a.start - b.start)) {
+      if (match.start > cursor) {
+        parts.push({
+          text: sentence.text.slice(cursor, match.start),
+          entity: null,
+        });
+      }
+      parts.push({
+        text: sentence.text.slice(match.start, match.end),
+        entity: match.entity,
+      });
+      cursor = match.end;
+    }
+    if (cursor < sentence.text.length) {
+      parts.push({ text: sentence.text.slice(cursor), entity: null });
+    }
+    return parts;
+  });
+}
+
 export function getEras(about: EntityAbout): AboutSpan[] {
   return about.events.flatMap((event) =>
     event.kind === "era" && event.title

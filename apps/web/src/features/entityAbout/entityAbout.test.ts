@@ -11,6 +11,8 @@ import {
   getNameSpans,
   getOperatingSpans,
   getOwners,
+  linkEntityMentions,
+  type AboutSection,
   type EntityAbout,
 } from "./entityAbout";
 
@@ -175,5 +177,94 @@ describe("getLabeledYears", () => {
     expect([...getLabeledYears(years)].sort((a, b) => a - b)).toEqual([
       1977, 1978, 1979,
     ]);
+  });
+});
+
+describe("linkEntityMentions", () => {
+  const clynelish = { id: 843, name: "Clynelish", kind: "distillery" as const };
+  const diageo = { id: 5558, name: "Diageo", kind: "company" as const };
+  const about: EntityAbout = {
+    ...brora,
+    events: [
+      {
+        ...brora.events[0]!,
+        id: 1,
+        relatedEntity: clynelish,
+        newOwner: null,
+      },
+      { ...brora.events[0]!, id: 2, relatedEntity: null, newOwner: diageo },
+      {
+        ...brora.events[0]!,
+        id: 3,
+        relatedEntity: {
+          id: brora.entityId,
+          name: "Brora",
+          kind: "distillery",
+        },
+        newOwner: null,
+      },
+    ],
+  };
+  const section = (
+    sentences: { text: string; factIds: string[] }[],
+  ): AboutSection => ({
+    key: "history",
+    heading: "History",
+    eraEventId: null,
+    sentences: sentences.map((sentence) => ({ ...sentence, sourceIds: [] })),
+  });
+  const linkedText = (parts: ReturnType<typeof linkEntityMentions>) =>
+    parts.map((sentence) =>
+      sentence.map((part) =>
+        part.entity ? `[${part.text}](${part.entity.id})` : part.text,
+      ),
+    );
+
+  it("links the names of Entities the cited events link", () => {
+    const parts = linkEntityMentions(
+      section([
+        {
+          text: "Brora was built beside Clynelish, and Diageo owns both.",
+          factIds: ["event:1", "event:2", "event:3"],
+        },
+      ]),
+      about,
+    );
+
+    expect(linkedText(parts)).toEqual([
+      [
+        "Brora was built beside ",
+        "[Clynelish](843)",
+        ", and ",
+        "[Diageo](5558)",
+        " owns both.",
+      ],
+    ]);
+  });
+
+  it("links an Entity once per section, and only from a cited event", () => {
+    const parts = linkEntityMentions(
+      section([
+        { text: "Diageo bought it.", factIds: ["event:2"] },
+        { text: "Diageo still owns it.", factIds: ["event:2"] },
+        { text: "Clynelish stands next door.", factIds: [] },
+      ]),
+      about,
+    );
+
+    expect(linkedText(parts)).toEqual([
+      ["[Diageo](5558)", " bought it."],
+      ["Diageo still owns it."],
+      ["Clynelish stands next door."],
+    ]);
+  });
+
+  it("needs the whole name as a word", () => {
+    const parts = linkEntityMentions(
+      section([{ text: "The Clynelishes were rivals.", factIds: ["event:1"] }]),
+      about,
+    );
+
+    expect(linkedText(parts)).toEqual([["The Clynelishes were rivals."]]);
   });
 });

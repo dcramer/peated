@@ -24,6 +24,7 @@
     "pg": "catalog:",
     "tsx": "catalog:",
     "typescript": "catalog:",
+    "undici": "7.30.1",
     "zod": "catalog:"
   },
   "devDependencies": {

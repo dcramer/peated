@@ -178,6 +178,12 @@ describe("keepVerifiedCitations", () => {
     expect(
       kept("Diageo paid 1.2 billion.", "In 1983 Diageo paid £1.2bn."),
     ).toBe(1);
+    expect(
+      kept(
+        "Brora made 2 million litres.",
+        "In 1983 it made two million litres.",
+      ),
+    ).toBe(1);
     // A number the check cannot read must appear in a quote as written.
     expect(
       kept("Brora filled two hundred casks.", "Brora closed in 1983."),
@@ -358,6 +364,26 @@ describe("checkAboutProse", () => {
     expect(errors).toEqual([
       '"It has a rich history." (lead) cites no facts.',
       '"It closed in 1985." (lead) states 1985, which its facts do not.',
+    ]);
+  });
+
+  test("checks numbers a sentence writes as words", () => {
+    expect(
+      checkAboutProse(
+        draft({
+          events: facts,
+          sections: lead([
+            { text: "It closed in 1983.", factIds: ["event:1"] },
+            {
+              text: "Two years later, nine men rebuilt it.",
+              factIds: ["event:2"],
+            },
+          ]),
+        }),
+      ),
+    ).toEqual([
+      '"Two years later, nine men rebuilt it." (lead) states 2, which its facts do not.',
+      '"Two years later, nine men rebuilt it." (lead) states 9, which its facts do not.',
     ]);
   });
 
@@ -562,6 +588,29 @@ describe("checkConflictPicks", () => {
     expect(reopened("1948")).toBe(0);
   });
 
+  test("reads a year range written with a slash", () => {
+    const quote = "Alfred Barnard visited in 1893/94.";
+    const visited = (statedValue: string) =>
+      keepVerifiedCitations(
+        draft({
+          events: [
+            {
+              id: 1,
+              kind: "generic",
+              date: "1893",
+              text: "Alfred Barnard visited.",
+              citations: [{ sourceId: "wp", statedValue, quote }],
+            },
+          ],
+        }),
+        [{ ...page, text: `${page.text} ${quote}` }],
+        null,
+      ).events.length;
+
+    expect(visited("1893–1894")).toBe(1);
+    expect(visited("1893–1895")).toBe(0);
+  });
+
   test("names the number that dropped a fact", () => {
     const quote = "Brora reopened in 2021.";
     const { dropped } = reviewAboutDraft(
@@ -705,9 +754,40 @@ describe("checkConflictPicks", () => {
     expect(stills(2, "It filled two hundred casks.")).toBeUndefined();
     expect(stills(3, "It holds three thousand casks.")).toBeUndefined();
     expect(stills(12, "A twelve-year-old was released.")).toBeDefined();
+    // A record that runs table cells together still states a phrase.
+    const listing = (value: string, quote: string) =>
+      keepVerifiedCitations(
+        draft({
+          siteFacts: {
+            listing: {
+              value,
+              asOf: null,
+              citations: [{ sourceId: "wp", statedValue: value, quote }],
+            },
+          },
+        }),
+        [{ ...page, text: `${page.text} ${quote}` }],
+        null,
+      ).siteFacts.listing;
+    expect(
+      listing("Category A", "CategoryADate Added08/11/2022"),
+    ).toBeDefined();
+    expect(
+      listing("Category B", "CategoryADate Added08/11/2022"),
+    ).toBeUndefined();
+    // A count of 1 needs "one" or "a single" right before the field's word.
+    expect(
+      stills(1, "It has one wash still and one spirit still."),
+    ).toBeDefined();
+    expect(stills(1, "It runs a single wash still.")).toBeDefined();
+    expect(stills(1, "It is one of the oldest distilleries.")).toBeUndefined();
+    expect(stills(1, "It has one washback.")).toBeUndefined();
     // Millions are read as whole numbers.
     expect(stills(1600000, "It makes 1.6m litres of alcohol.")).toBeDefined();
     expect(stills(2000000, "It makes 2 million litres.")).toBeDefined();
+    expect(
+      stills(2000000, "It makes almost two million litres."),
+    ).toBeDefined();
     expect(stills(1600000, "It is 1.6 metres tall.")).toBeUndefined();
     // A value written in millions reads the same way as the quote.
     expect(stills(1600000, "It makes 1.6 million litres.")).toBeDefined();
@@ -717,9 +797,46 @@ describe("checkConflictPicks", () => {
     expect(
       stills(1887000000, "Built in 1887 m. by the estate."),
     ).toBeUndefined();
+    // "mlpa" (million litres of pure alcohol) states millions, after the
+    // number or as a table label before it.
+    expect(stills(3400000, "Capacity (mlpa) 3.4")).toBeDefined();
+    expect(stills(3400000, "Capacity (mlpa)\ni\n3.4")).toBeDefined();
+    expect(stills(4800000, "It makes 4.8 mlpa.")).toBeDefined();
+    expect(stills(6500000, "Capacity rose to 6.5mla.")).toBeDefined();
+    expect(stills(3400000, "Capacity (mlpa) 3.4 since 2018")).toBeDefined();
+    expect(
+      stills(2018000000, "Capacity (mlpa) 3.4 since 2018"),
+    ).toBeUndefined();
     // Thousands separators are read before millions: "1,250m" is one number.
     expect(stills(1250000000, "It cost £1,250m.")).toBeDefined();
     expect(stills(250000000, "It cost £1,250m.")).toBeUndefined();
+  });
+
+  test("reads a unit written another way", () => {
+    const fermentation = (value: string, quote: string) =>
+      keepVerifiedCitations(
+        draft({
+          siteFacts: {
+            fermentation: {
+              value,
+              asOf: null,
+              citations: [{ sourceId: "wp", statedValue: value, quote }],
+            },
+          },
+        }),
+        [{ ...page, text: `${page.text} ${quote}` }],
+        null,
+      ).siteFacts.fermentation;
+
+    expect(
+      fermentation("160 hours", "We ferment for a lengthy 160-hour period."),
+    ).toBeDefined();
+    expect(
+      fermentation("100 hours", "Fermentation Time i 100hrs"),
+    ).toBeDefined();
+    expect(
+      fermentation("100 hours", "It ferments for 100 days."),
+    ).toBeUndefined();
   });
 
   test("reads a stated value written in millions", () => {

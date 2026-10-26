@@ -525,6 +525,8 @@ export async function assignAuctionLot({
       lot.sourceFingerprint !== fingerprint ||
       lot.bottleId !== expectedBottleId ||
       (expectedCheckId !== undefined && lot.matchCheckId !== expectedCheckId) ||
+      // Auction scope rule (owner: auctions): an ignored lot reopens only through a source identity change.
+      lot.matchStatus === "ignored" ||
       (automatic &&
         (lot.matchStatus !== "pending" || lot.matchCheckId !== checkId))
     )
@@ -627,6 +629,81 @@ export async function assignAuctionLot({
       bottleImageCandidate: null,
     });
   return result.lot;
+}
+
+/**
+ * Auction scope rule (owner: auctions): a moderator ignores a lot that is not
+ * one whisky bottle, such as a sample, glassware, or another spirit. Ignoring
+ * clears any assignment; a later source identity change reopens the lot.
+ */
+export async function ignoreAuctionLot({
+  lotId,
+  fingerprint,
+  expectedBottleId,
+  expectedCheckId,
+  userId,
+}: {
+  lotId: number;
+  fingerprint: string;
+  expectedBottleId: number | null;
+  expectedCheckId: number | null;
+  userId: number;
+}) {
+  return await db.transaction(async (tx) => {
+    const user = await tx.query.users.findFirst({
+      where: eq(users.id, userId),
+    });
+    if (!canModerate(user))
+      throw new Error("Ignoring an auction lot requires a moderator.");
+    const [lot] = await tx
+      .select()
+      .from(auctionLots)
+      .where(eq(auctionLots.id, lotId))
+      .for("update");
+    if (
+      !lot ||
+      lot.sourceFingerprint !== fingerprint ||
+      lot.bottleId !== expectedBottleId ||
+      lot.matchCheckId !== expectedCheckId ||
+      lot.matchStatus === "ignored"
+    )
+      throw new AuctionLotMatchChangedError();
+    if (lot.bottleId !== null) {
+      const auction = await tx.query.auctions.findFirst({
+        where: eq(auctions.id, lot.auctionId),
+      });
+      if (!auction) throw new Error("Auction lot has no auction.");
+      await recordIncomingBottleDecisionInTransaction(tx, {
+        sourceKind: "auction_lot",
+        sourceId: lot.id,
+        externalSiteId: auction.externalSiteId,
+        name: lot.name,
+        url: lot.url,
+        actor: await getUserActorByIdForDatabase(tx, userId),
+        bottleId: null,
+        decision: "unassign",
+        rationale: "Ignored: the lot is not one whisky bottle.",
+        metadata: {
+          resolutionSource: "moderator_ignore",
+          previousBottleId: lot.bottleId,
+        },
+      });
+    }
+    const [updated] = await tx
+      .update(auctionLots)
+      .set({
+        bottleId: null,
+        matchStatus: "ignored",
+        matchedReferenceId: null,
+        // The match decision columns record who ignored the lot and when.
+        matchedById: userId,
+        matchedAt: new Date(),
+        availableSince: null,
+      })
+      .where(eq(auctionLots.id, lotId))
+      .returning();
+    return updated;
+  });
 }
 
 /** Alerts own permanent deduplication; the notification and alert are committed together. */

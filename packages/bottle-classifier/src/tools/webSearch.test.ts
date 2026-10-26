@@ -346,7 +346,7 @@ describe("bottleClassifier web search tool", () => {
           query: "Cask No. 71 vintage and ABV",
         },
       ]);
-      expect(scrapeBody.proxy).toBe("basic");
+      expect(scrapeBody.proxy).toBe("auto");
       expect(evidence).toMatchObject({
         provider: "firecrawl",
         query: "Cask No. 71 vintage and ABV",
