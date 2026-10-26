@@ -3,6 +3,7 @@ import { ABOUT_BANNED_PHRASES } from "@peated/server/lib/entityAbout/bannedPhras
 import {
   ABOUT_MAX_LEAD_SENTENCES,
   ABOUT_MAX_SENTENCE_WORDS,
+  ABOUT_MAX_SENTENCES_PER_FACT,
   ABOUT_MIN_FACTS_FOR_PROSE,
   ABOUT_MIN_FACTS_FOR_SECTIONS,
 } from "@peated/server/lib/entityAbout/checks";
@@ -52,8 +53,8 @@ export const ENTITY_ABOUT_INSTRUCTIONS = `You research and write the About page 
 Your output is a set of dated facts, each tied to quotes from pages you read, and a few short paragraphs built only from those facts. Code checks everything you return. Anything you cannot support is removed, so leave it out.
 
 # Research
-- Use search_web to find pages and read_page to read them. You have up to ${ABOUT_WEB_BUDGET.searches} searches and ${ABOUT_WEB_BUDGET.reads} reads. Use them to cover the whole history: the founding, each change of owner or name, closings and reopenings, and changes to the site or plant. One page rarely covers all of it.
-- After your first pages, list what is still missing: long spans of years with no event, people, owners, brands, or sites named without a date, and leads from shops or auctions that need a page you can cite. Search for each. Stop when new searches find nothing new, not after the first good page.
+- Use search_web to find pages and read_page to read them. You have up to ${ABOUT_WEB_BUDGET.searches} searches and ${ABOUT_WEB_BUDGET.reads} reads. Use them to cover the whole history: the founding, each change of owner or name, closings and reopenings, the people who ran it, changes to the site or plant or to how it makes or chooses its whisky, and the turning points between. One page rarely covers all of it.
+- After your first pages, list what is still missing: long spans of years with no event, people, owners, brands, or sites named without a date, and leads from shops or auctions that need a page you can cite. Search for each, naming the period, person, or site in the search. While gaps remain and more than a third of your searches are left, keep searching. Stop when new searches find nothing new, not after the first good page.
 - Prefer, in order: the producer's own site and press releases; government and heritage records; archive-based histories and encyclopedias such as Wikipedia; trade press. Never cite shops, auctions, or forums; use them only as leads.
 - Make sure each page is about this producer, not a namesake or a different site with a similar name.
 - A read that fails still uses one of your reads. Do not retry a page that refused you.
@@ -66,7 +67,7 @@ Your output is a set of dated facts, each tied to quotes from pages you read, an
 - \`statedValue\` is what that one source says: a date in YYYY, YYYY-MM, or YYYY-MM-DD form, a range such as \`1969–1973\`, or the number or text. Use null when the source supports the fact without stating a value; such a citation adds support, but another kept quote must still state the year or number.
 - A dated article that reports something happening "today" or "this week" states its publication date; use that date. A date that appears only in the page's address is not stated.
 - Quotes are matched ignoring case, spacing, and punctuation, but every word must be on the page.
-- When sources disagree, keep a citation for each, each with its own \`statedValue\`. Set the fact's value to the best-supported one: official over reference, reference over press, and more independent sites over fewer. The stored value must be one a source states. A source that gives two values supports neither. When no value is better supported by these rules, leave the fact out. Dates that differ only in precision, such as 1983 and 1983-05, agree.
+- When sources disagree, keep a citation for each, each with its own \`statedValue\`. Set the fact's value to the best-supported one: official over reference, reference over press, and more independent sites over fewer. The stored value must be one a source states. A source that gives two values supports neither. When no value is better supported by these rules, still keep a fact that the sources agree happened: store the value of the source you list first, and the page shows that the sources disagree. Leave a fact out only when its sources disagree on whether it happened. Dates that differ only in precision, such as 1983 and 1983-05, agree.
 - When sources call the same event by different kinds, such as closed and mothballed, use the kind the best-supported source states, by the same order.
 - Source \`kind\`: \`official\` is the producer, government, or heritage records; \`reference\` is histories and encyclopedias, including encyclopedia sections of trade sites such as Whiskypedia and sites that copy official records; \`press\` is news and trade press.
 
@@ -89,7 +90,7 @@ ${siteFactList}
 
 # Writing
 - Write for an everyday whisky drinker. Use plain words, short sentences, active voice, and numerals.
-- Each sentence states one or two facts and lists them in \`factIds\` as \`event:<id>\` or \`site:<field>\`.
+- Each sentence states one or two facts and lists them in \`factIds\` as \`event:<id>\` or \`site:<field>\`. A key fact may get a second sentence that explains it, such as why a change mattered, from what its quotes say.
 - Every year and number in a sentence must appear in the facts it lists. Do not work out spans such as "38 years" unless a source states them.
 - At most ${ABOUT_MAX_SENTENCE_WORDS} words in a sentence.
 - Never use these words or phrases: ${ABOUT_BANNED_PHRASES.join(", ")}.
@@ -97,8 +98,9 @@ ${siteFactList}
 - The first section has key \`lead\` and no heading: at most ${ABOUT_MAX_LEAD_SENTENCES} sentences saying what the place or business is, when it began, and what is distinctive about its history. Every sentence cites facts, so say where it is only in an event's \`text\`, such as the \`opened\` event's, when that event's quote states the place.
 - Facts are your events and site facts together.
 - Add other sections only when you have ${ABOUT_MIN_FACTS_FOR_SECTIONS} or more facts. Use plain headings drawn from the facts, such as "Built beside the canal" or "Silent". Set \`eraEventId\` when a section covers an era.
-- Use no more sentences in total than you have facts. With fewer than ${ABOUT_MIN_FACTS_FOR_PROSE} facts, return no sections.
-- A short, correct page is better than a long one. When evidence is thin, return a few facts and a lead of one or two sentences.
+- Use at most ${ABOUT_MAX_SENTENCES_PER_FACT} sentences in total for each fact. With fewer than ${ABOUT_MIN_FACTS_FOR_PROSE} facts, return no sections.
+- Write the history an expert on this producer would tell in about half an hour: every period and turning point and why it mattered, but not every bottling, sales figure, or minor date. Put sections in time order.
+- Length follows the evidence. A long, well-recorded history gets a long page. When evidence is thin, return a few facts and a lead of one or two sentences.
 
 # Examples
 These are parts of pages written by people, in your output format. A distillery:

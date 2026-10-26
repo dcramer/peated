@@ -107,7 +107,15 @@ to find other sources.
 When citations for a fact state different values, the document SHALL store the
 best-supported value, which SHALL be one of the stated values, and the page
 SHALL show a "Sources disagree" note listing every stated value and its
-sources.
+sources. When no value is better supported, the document SHALL keep the fact
+with the first-listed source's value.
+
+#### Scenario: Tied sources
+
+- **WHEN** two reference sources date a heavily peated period 1969–1973 and
+  1972–1977
+- **THEN** the page keeps the period with the first source's dates and a
+  "Sources disagree" note listing both
 
 #### Scenario: Disputed rename year
 

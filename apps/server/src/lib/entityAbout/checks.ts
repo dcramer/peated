@@ -31,6 +31,8 @@ export const ABOUT_MAX_SENTENCE_WORDS = 30;
 export const ABOUT_MAX_LEAD_SENTENCES = 4;
 export const ABOUT_MIN_FACTS_FOR_PROSE = 2;
 export const ABOUT_MIN_FACTS_FOR_SECTIONS = 6;
+// A key fact may get a second sentence that explains it.
+export const ABOUT_MAX_SENTENCES_PER_FACT = 2;
 
 /** A page the writer read during one run. */
 export type AboutPageRead = { url: string; text: string };
@@ -474,9 +476,9 @@ export function checkAboutProse(document: EntityAboutDocument) {
       `The lead has ${lead.sentences.length} sentences; the limit is ${Math.min(ABOUT_MAX_LEAD_SENTENCES, shown.size)}.`,
     );
   }
-  if (sentences.length > shown.size) {
+  if (sentences.length > shown.size * ABOUT_MAX_SENTENCES_PER_FACT) {
     errors.push(
-      `The prose has ${sentences.length} sentences for ${shown.size} shown facts.`,
+      `The prose has ${sentences.length} sentences for ${shown.size} shown facts; the limit is ${shown.size * ABOUT_MAX_SENTENCES_PER_FACT}.`,
     );
   }
 
@@ -597,7 +599,7 @@ export function trimProseToShownFacts(
   // Trim from the last section beyond the lead; the lead goes last.
   let extra =
     sections.reduce((total, section) => total + section.sentences.length, 0) -
-    shown.size;
+    shown.size * ABOUT_MAX_SENTENCES_PER_FACT;
   for (let i = sections.length - 1; i >= 0 && extra > 0; i -= 1) {
     const section = sections[i]!;
     const keep = Math.max(

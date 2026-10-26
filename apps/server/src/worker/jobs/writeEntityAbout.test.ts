@@ -308,10 +308,13 @@ describe("writeEntityAbout", () => {
     fixtures,
   }) => {
     const entity = await fixtures.Entity({ kind: "distillery" });
+    // With 2 facts, all prose is the lead, which allows 2 sentences.
     const tooLong = draft([
       { text: "Brora opened in 1819.", factIds: ["event:1"] },
+      { text: "It was built in 1819.", factIds: ["event:1"] },
       { text: "It closed in 1983.", factIds: ["event:2"] },
-      { text: "It was open for 164 years.", factIds: ["event:1", "event:2"] },
+      { text: "Production stopped in 1983.", factIds: ["event:2"] },
+      { text: "It ran from 1819 to 1983.", factIds: ["event:1", "event:2"] },
     ]);
     const writer = services(async () => ({
       draft: tooLong,
@@ -326,7 +329,7 @@ describe("writeEntityAbout", () => {
       saved?.document.sections.flatMap((section) =>
         section.sentences.map((sentence) => sentence.text),
       ),
-    ).toEqual(["Brora opened in 1819.", "It closed in 1983."]);
+    ).toEqual(["Brora opened in 1819.", "It was built in 1819."]);
   });
 
   test("never strips a stored page's lead when trimming", async ({
