@@ -609,6 +609,45 @@ describe("checkConflictPicks", () => {
 
     expect(visited("1893–1894")).toBe(1);
     expect(visited("1893–1895")).toBe(0);
+    // A dash with spaces around it joins a range too.
+    const spaced = "It closed from 1943 – 45 to save barley.";
+    expect(
+      keepVerifiedCitations(
+        draft({
+          events: [
+            {
+              id: 1,
+              kind: "generic",
+              date: "1943",
+              text: "It closed to save barley.",
+              citations: [
+                { sourceId: "wp", statedValue: "1943–1945", quote: spaced },
+              ],
+            },
+          ],
+        }),
+        [{ ...page, text: `${page.text} ${spaced}` }],
+        null,
+      ).events,
+    ).toHaveLength(1);
+    // Text that writes the range the same way states the same years.
+    expect(
+      keepVerifiedCitations(
+        draft({
+          events: [
+            {
+              id: 1,
+              kind: "generic",
+              date: "1893",
+              text: "Production stopped in 1893/94.",
+              citations: [{ sourceId: "wp", statedValue: "1893", quote }],
+            },
+          ],
+        }),
+        [{ ...page, text: `${page.text} ${quote}` }],
+        null,
+      ).events,
+    ).toHaveLength(1);
   });
 
   test("names the number that dropped a fact", () => {
