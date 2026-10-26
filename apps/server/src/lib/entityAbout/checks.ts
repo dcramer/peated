@@ -71,6 +71,14 @@ function quotesState(quotes: readonly string[], value: string) {
   const phrase = normalizeForQuote(expandLargeNumbers(stripThousands(checked)));
   // Whole words only: "Campbell" does not state "Bell".
   if (` ${text} `.includes(` ${phrase} `)) return true;
+  // Some pages lose the space between table cells, as heritage records print
+  // "CategoryADate Added". A phrase of two or more words still counts there.
+  if (
+    phrase.includes(" ") &&
+    text.replaceAll(" ", "").includes(phrase.replaceAll(" ", ""))
+  ) {
+    return true;
+  }
   const words = phrase
     .split(" ")
     .filter(

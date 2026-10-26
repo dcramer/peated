@@ -725,6 +725,27 @@ describe("checkConflictPicks", () => {
     expect(stills(2, "It filled two hundred casks.")).toBeUndefined();
     expect(stills(3, "It holds three thousand casks.")).toBeUndefined();
     expect(stills(12, "A twelve-year-old was released.")).toBeDefined();
+    // A record that runs table cells together still states a phrase.
+    const listing = (value: string, quote: string) =>
+      keepVerifiedCitations(
+        draft({
+          siteFacts: {
+            listing: {
+              value,
+              asOf: null,
+              citations: [{ sourceId: "wp", statedValue: value, quote }],
+            },
+          },
+        }),
+        [{ ...page, text: `${page.text} ${quote}` }],
+        null,
+      ).siteFacts.listing;
+    expect(
+      listing("Category A", "CategoryADate Added08/11/2022"),
+    ).toBeDefined();
+    expect(
+      listing("Category B", "CategoryADate Added08/11/2022"),
+    ).toBeUndefined();
     // Millions are read as whole numbers.
     expect(stills(1600000, "It makes 1.6m litres of alcohol.")).toBeDefined();
     expect(stills(2000000, "It makes 2 million litres.")).toBeDefined();
