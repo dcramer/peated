@@ -101,7 +101,7 @@ describe("keepVerifiedCitations", () => {
     const pages = [
       {
         url: page.url,
-        text: "Brora closed in 1983. Its stills went cold on March 17, 1983. It was listed in 1986. Category B, Date Added 18/08/1986. It reopened in May 2021. Work began in Sept. 1975. It may close in 1990.",
+        text: "Brora closed in 1983. Its stills went cold on March 17, 1983. It was listed in 1986. Category B, Date Added 18/08/1986. It reopened in May 2021. Work began in Sept. 1975. It may close in 1990. Incorporated on11 November 1991.",
       },
     ];
     const result = keepVerifiedCitations(
@@ -116,6 +116,7 @@ describe("keepVerifiedCitations", () => {
           event(6, "1975-09", "Work began in Sept. 1975."),
           // "may" here is a verb, not the month.
           event(7, "1990-05", "It may close in 1990."),
+          event(8, "1991-11-11", "Incorporated on11 November 1991."),
         ],
       }),
       pages,
@@ -130,6 +131,7 @@ describe("keepVerifiedCitations", () => {
       "1983",
       "1975-09",
       "1990",
+      "1991-11-11",
     ]);
     // A citation's stated date is trimmed the same way, by its own quote.
     expect(
@@ -142,6 +144,7 @@ describe("keepVerifiedCitations", () => {
       "1983",
       "1975-09",
       "1990",
+      "1991-11-11",
     ]);
   });
 

@@ -84,8 +84,12 @@ function trimToStatedPrecision(quotes: readonly string[], date: string) {
   const monthWord = `(?:${names.join("|")})\\.?`;
   const titleMonth = `(?:${names.map((n) => n[0]!.toUpperCase() + n.slice(1)).join("|")})\\.?`;
   const m = `0?${Number(month)}`;
+  // Pages often glue a word to a number, as in "Incorporated on11 November".
+  const spaced = quotes.map((quote) =>
+    quote.replace(/(\p{L})(\p{N})/gu, "$1 $2"),
+  );
   const states = (pattern: string, flags = "i") =>
-    quotes.some((quote) => new RegExp(pattern, flags).test(quote));
+    spaced.some((quote) => new RegExp(pattern, flags).test(quote));
   const numericMonth = `\\b${year}[-/.]${m}\\b|\\b${m}[-/.]${year}\\b`;
   const monthByNumber = `\\b${monthWord}(?![a-z])\\s*,?\\s*\\d|\\d(?:st|nd|rd|th)?\\s+(?:of\\s+)?${monthWord}(?![a-z])`;
   if (
