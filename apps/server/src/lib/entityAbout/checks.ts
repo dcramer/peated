@@ -82,7 +82,8 @@ const MONTH_NAMES = [
 function trimToStatedPrecision(quotes: readonly string[], date: string) {
   const [year, month, day] = date.split("-");
   if (!month) return date;
-  const name = MONTH_NAMES[Number(month) - 1]!;
+  const name = MONTH_NAMES[Number(month) - 1];
+  if (!name) return year!;
   const names = [
     name,
     name.slice(0, 3),
@@ -95,9 +96,17 @@ function trimToStatedPrecision(quotes: readonly string[], date: string) {
   const spaced = quotes.map((quote) =>
     quote.replace(/(\p{L})(\p{N})/gu, "$1 $2"),
   );
+  // A quote that names another year is about another date, so its month or
+  // day does not count; a timeline quote with no year can.
   const states = (pattern: string, flags = "i") =>
-    spaced.some((quote) => new RegExp(pattern, flags).test(quote));
-  const numericMonth = `\\b${year}[-/.]${m}\\b|\\b${m}[-/.]${year}\\b`;
+    spaced.some(
+      (quote) =>
+        new RegExp(pattern, flags).test(quote) &&
+        (quote.includes(year!) || !/\b(?:1[5-9]|20)\d\d\b/.test(quote)),
+    );
+  // "1963-04" or "04/1963" names April; a short range such as "1963-4" does not.
+  const mm = month!.padStart(2, "0");
+  const numericMonth = `\\b${year}-${mm}\\b|\\b${m}/${year}\\b`;
   const monthByNumber = `\\b${monthWord}(?![a-z])\\s*,?\\s*\\d|\\d(?:st|nd|rd|th)?\\s+(?:of\\s+)?${monthWord}(?![a-z])`;
   if (
     !states(`${numericMonth}|${monthByNumber}`) &&
@@ -114,7 +123,8 @@ function trimToStatedPrecision(quotes: readonly string[], date: string) {
 
 /** Trims a single-date statedValue the same way; ranges and other values pass. */
 function trimStatedValue(quotes: readonly string[], value: string | null) {
-  return value && /^\d{4}-\d{2}(?:-\d{2})?$/.test(value)
+  // A short range such as "1931-38" is not a month.
+  return value && /^\d{4}-(?:0[1-9]|1[0-2])(?:-\d{2})?$/.test(value)
     ? trimToStatedPrecision(quotes, value)
     : value;
 }
