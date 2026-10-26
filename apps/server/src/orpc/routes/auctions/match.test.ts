@@ -6,6 +6,7 @@ import {
   auctionLots,
   bottleChecks,
   bottleReferences,
+  incomingBottleDecisionLogs,
 } from "@peated/server/db/schema";
 import { getUserActor } from "@peated/server/lib/actors";
 import { auctionLotCheckKey } from "@peated/server/lib/auctionMatchEvidence";
@@ -17,7 +18,7 @@ import { correctBottleReference } from "@peated/server/lib/bottleReferences";
 import { pushJob } from "@peated/server/lib/test/workerDispatch";
 import { routerClient } from "@peated/server/orpc/router";
 import applyAuctionLotMatchJob from "@peated/server/worker/jobs/applyAuctionLotMatch";
-import { eq } from "drizzle-orm";
+import { desc, eq } from "drizzle-orm";
 import {
   afterEach,
   describe,
@@ -571,6 +572,42 @@ describe("POST /auction-lots/{lot}/ignore", () => {
       matchStatus: "ignored",
       availableSince: null,
     });
+    const [latest] = await db
+      .select()
+      .from(incomingBottleDecisionLogs)
+      .where(eq(incomingBottleDecisionLogs.sourceId, data.lot.id))
+      .orderBy(desc(incomingBottleDecisionLogs.id))
+      .limit(1);
+    expect(latest).toMatchObject({
+      sourceKind: "auction_lot",
+      decision: "unassign",
+      bottleId: null,
+      metadata: {
+        resolutionSource: "moderator_ignore",
+        previousBottleId: data.bottle.id,
+      },
+    });
+  });
+
+  test("a stale assignment cannot undo an ignore", async ({ fixtures }) => {
+    const data = await reviewedLot(fixtures);
+    await routerClient.auctions.ignore(
+      {
+        lot: data.lot.id,
+        fingerprint: data.lot.sourceFingerprint,
+        expectedBottleId: null,
+        expectedCheckId: data.check.id,
+      },
+      { context: data.context },
+    );
+    await expect(
+      routerClient.auctions.match(data.input, { context: data.context }),
+    ).rejects.toThrow(/changed/i);
+    expect(await db.query.auctionLots.findFirst()).toMatchObject({
+      bottleId: null,
+      matchStatus: "ignored",
+    });
+    expect(await db.query.auctionAlerts.findMany()).toHaveLength(0);
   });
 
   test("stale versions, a second ignore, and non-moderators are rejected", async ({

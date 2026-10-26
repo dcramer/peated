@@ -525,6 +525,8 @@ export async function assignAuctionLot({
       lot.sourceFingerprint !== fingerprint ||
       lot.bottleId !== expectedBottleId ||
       (expectedCheckId !== undefined && lot.matchCheckId !== expectedCheckId) ||
+      // Auction scope rule (owner: auctions): an ignored lot reopens only through a source identity change.
+      lot.matchStatus === "ignored" ||
       (automatic &&
         (lot.matchStatus !== "pending" || lot.matchCheckId !== checkId))
     )
@@ -666,6 +668,27 @@ export async function ignoreAuctionLot({
       lot.matchStatus === "ignored"
     )
       throw new AuctionLotMatchChangedError();
+    if (lot.bottleId !== null) {
+      const auction = await tx.query.auctions.findFirst({
+        where: eq(auctions.id, lot.auctionId),
+      });
+      if (!auction) throw new Error("Auction lot has no auction.");
+      await recordIncomingBottleDecisionInTransaction(tx, {
+        sourceKind: "auction_lot",
+        sourceId: lot.id,
+        externalSiteId: auction.externalSiteId,
+        name: lot.name,
+        url: lot.url,
+        actor: await getUserActorByIdForDatabase(tx, userId),
+        bottleId: null,
+        decision: "unassign",
+        rationale: "Ignored: the lot is not one whisky bottle.",
+        metadata: {
+          resolutionSource: "moderator_ignore",
+          previousBottleId: lot.bottleId,
+        },
+      });
+    }
     const [updated] = await tx
       .update(auctionLots)
       .set({

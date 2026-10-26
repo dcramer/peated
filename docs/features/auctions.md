@@ -104,9 +104,10 @@ Both writes commit together; an ignored or conflicting reference rejects the
 whole save. The moderator can still assign just the lot.
 
 "Ignore lot" marks a lot that is not one whisky bottle as ignored, with the same
-version checks. It clears any assignment and records the moderator and time.
-Ignored lots leave the Inbox, and rechecks skip them. A later source identity
-change reopens the lot for matching.
+version checks. It clears any assignment, records the moderator and time, and logs an unassign
+decision in History when the lot had a Bottle. Ignored lots leave the Inbox,
+rechecks skip them, and assignment rejects them, so a stale screen cannot undo
+the decision. Only a later source identity change reopens the lot for matching.
 
 A source identity change clears the assignment and check link. Correcting a
 reference invalidates assignments made from it, not direct moderator decisions.
