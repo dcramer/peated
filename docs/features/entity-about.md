@@ -117,7 +117,8 @@ links to the About page only when that page exists.
 
 `writeEntityAbout` makes one model call with web search, page-reading, and
 Entity search tools, and fixed web limits: 32 searches and 48 page reads
-(`ABOUT_WEB_BUDGET`). The model gets the Entity's fields, its notes, its
+(`ABOUT_WEB_BUDGET`). Pages are read through Firecrawl's `auto` proxy: a basic
+request first, then its stealth proxy when a site blocks it. The model gets the Entity's fields, its notes, its
 history timeline, and the current page, and returns the complete next
 version. It may keep, correct, add, or drop anything. After its first pages,
 it lists the gaps in the history, such as long spans with no event or people
