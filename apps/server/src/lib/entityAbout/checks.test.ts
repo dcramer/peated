@@ -986,7 +986,12 @@ describe("checkConflictPicks", () => {
           },
         },
       }),
-      [{ ...page, text: `${page.text} CategoryBDate Added28/03/1996` }],
+      [
+        {
+          ...page,
+          text: `${page.text} CategoryBDate Added28/03/1996Supplementary Information`,
+        },
+      ],
       null,
     ).siteFacts.listing;
     expect(spaced).toBeDefined();

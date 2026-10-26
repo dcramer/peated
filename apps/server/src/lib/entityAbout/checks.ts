@@ -43,10 +43,11 @@ function normalizeForQuote(value: string) {
     value
       .normalize("NFKC")
       // Records that run table cells together, as in "CategoryBDate
-      // Added28/03/1996", match a quote that spaces them out.
+      // Added28/03/1996Supplementary", match a quote that spaces them out.
       .replace(/(\p{Ll})(\p{Lu})/gu, "$1 $2")
       .replace(/(\p{Lu})(\p{Lu}\p{Ll})/gu, "$1 $2")
       .replace(/(\p{L})(\p{N})/gu, "$1 $2")
+      .replace(/(\p{N})(\p{L})/gu, "$1 $2")
       .toLowerCase()
       .replace(/[‘’“”]/g, "'")
       .replace(/[^\p{L}\p{N}]+/gu, " ")
