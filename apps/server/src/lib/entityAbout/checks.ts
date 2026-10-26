@@ -381,16 +381,17 @@ function stripThousands(value: string) {
 // Histories shorten year ranges, so "1931-38" also states 1938. A later
 // two-digit end is read in the same century; "1999-02" is left alone.
 // "1931-38", "1893/94", "1943 – 45", and "1963-4" span to 1938, 1894, 1945,
-// and 1964. The full end year is added beside the range, not in place of it,
-// so a count after a year, as in "2008 – 12 warehouses", still states 12.
+// and 1964. Each full end year is added after the text, which stays as
+// written, so "2008 – 12 warehouses" still states 12. A number with a decimal
+// or thousands part, as in "2008 – 12,000 cases", is not a year.
 function expandYearRanges(value: string) {
-  return value.replace(
-    /\b(\d{2})(\d{2}) ?[-–/] ?(\d{1,2})\b/g,
-    (range, century: string, start: string, end: string) => {
-      const last = end.length === 1 ? `${start[0]}${end}` : end;
-      return last > start ? `${range} ${century}${last}` : range;
-    },
-  );
+  const years = [
+    ...value.matchAll(/\b(\d{2})(\d{2}) ?[-–/] ?(\d{1,2})\b(?![.,]\d)/g),
+  ].flatMap(([, century, start, end]) => {
+    const last = end!.length === 1 ? `${start![0]}${end}` : end!;
+    return last > start! ? [`${century}${last}`] : [];
+  });
+  return years.length ? `${value} ${years.join(" ")}` : value;
 }
 
 // Pages write small counts as words: "two wash stills" states 2. Only a

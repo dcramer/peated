@@ -611,6 +611,35 @@ describe("checkConflictPicks", () => {
     expect(rebuilt("It was rebuilt in 1963-5.")).toBe(0);
   });
 
+  test("reads a formatted quantity after a year and a dash", () => {
+    const stated = (text: string, quote: string) =>
+      keepVerifiedCitations(
+        draft({
+          events: [
+            {
+              id: 1,
+              kind: "generic",
+              date: "2008",
+              text,
+              citations: [{ sourceId: "wp", statedValue: "2008", quote }],
+            },
+          ],
+        }),
+        [{ ...page, text: `${page.text} ${quote}` }],
+        null,
+      ).events.length;
+
+    expect(
+      stated("It filled 12,000 casks.", "In 2008 – 12,000 casks were filled."),
+    ).toBe(1);
+    expect(
+      stated("It made 4.5 million litres.", "In 2008 – 4.5 million litres."),
+    ).toBe(1);
+    expect(
+      stated("It made 12 million litres.", "In 2008 – 12 million litres."),
+    ).toBe(1);
+  });
+
   test("still reads a count written after a year and a dash", () => {
     const quote = "It was built in 2008 – 12 warehouses in all.";
     expect(
