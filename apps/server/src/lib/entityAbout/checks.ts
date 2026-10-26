@@ -69,23 +69,43 @@ const MONTH_NAMES = [
  * the year, so a month needs its name or a numeric date in one of the fact's
  * quotes, and a day needs its number beside that month. A timeline quote
  * often gives the month under a year heading, so the year may come from
- * another quote.
+ * another quote. A lowercase month name counts only beside a number, so
+ * "it may close" does not state May.
  */
 function trimToStatedPrecision(quotes: readonly string[], date: string) {
   const [year, month, day] = date.split("-");
   if (!month) return date;
   const name = MONTH_NAMES[Number(month) - 1]!;
-  const monthWord = `(?:${name}|${name.slice(0, 3)}\\.?)`;
+  const names = [
+    name,
+    name.slice(0, 3),
+    ...(name === "september" ? ["sept"] : []),
+  ];
+  const monthWord = `(?:${names.join("|")})\\.?`;
+  const titleMonth = `(?:${names.map((n) => n[0]!.toUpperCase() + n.slice(1)).join("|")})\\.?`;
   const m = `0?${Number(month)}`;
-  const d = day ? `0?${Number(day)}(?:st|nd|rd|th)?` : null;
-  const states = (pattern: string) =>
-    quotes.some((quote) => new RegExp(pattern, "i").test(quote));
+  const states = (pattern: string, flags = "i") =>
+    quotes.some((quote) => new RegExp(pattern, flags).test(quote));
   const numericMonth = `\\b${year}[-/.]${m}\\b|\\b${m}[-/.]${year}\\b`;
-  if (!states(`\\b${monthWord}(?![a-z])|${numericMonth}`)) return year!;
-  if (!d) return date;
-  const dayWithMonth = `\\b${d}(?: of)? ${monthWord}\\b|\\b${monthWord} ${d}\\b`;
+  const monthByNumber = `\\b${monthWord}(?![a-z])\\s*,?\\s*\\d|\\d(?:st|nd|rd|th)?\\s+(?:of\\s+)?${monthWord}(?![a-z])`;
+  if (
+    !states(`${numericMonth}|${monthByNumber}`) &&
+    !states(`\\b${titleMonth}(?![a-z])`, "")
+  ) {
+    return year!;
+  }
+  if (!day) return date;
+  const d = `0?${Number(day)}(?:st|nd|rd|th)?`;
+  const dayWithMonth = `\\b${d}\\s+(?:of\\s+)?${monthWord}(?![a-z])|\\b${monthWord}\\s+${d}\\b`;
   const numericDay = `\\b${year}[-/.]${m}[-/.]${d}\\b|\\b${d}[-/.]${m}[-/.]${year}\\b|\\b${m}[-/.]${d}[-/.]${year}\\b`;
   return states(`${dayWithMonth}|${numericDay}`) ? date : `${year}-${month}`;
+}
+
+/** Trims a single-date statedValue the same way; ranges and other values pass. */
+function trimStatedValue(quotes: readonly string[], value: string | null) {
+  return value && /^\d{4}-\d{2}(?:-\d{2})?$/.test(value)
+    ? trimToStatedPrecision(quotes, value)
+    : value;
 }
 
 /**
@@ -367,7 +387,14 @@ function verifyCitations(
           `Event ${event.id} (${event.kind}) was trimmed to ${[date, endDate].filter(Boolean).join("–")}: no kept quote states its month or day.`,
         );
       }
-      return { ...event, date, endDate };
+      const citations = event.citations.map((citation) => ({
+        ...citation,
+        statedValue: trimStatedValue(
+          quotesOf([citation]),
+          citation.statedValue,
+        ),
+      }));
+      return { ...event, date, endDate, citations };
     });
 
   const siteFacts: EntityAboutDocument["siteFacts"] = {};
