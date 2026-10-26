@@ -945,6 +945,22 @@ describe("checkConflictPicks", () => {
     expect(stills(1, "It runs a single wash still.")).toBeDefined();
     expect(stills(1, "It is one of the oldest distilleries.")).toBeUndefined();
     expect(stills(1, "It has one washback.")).toBeUndefined();
+    // "Other stills" counts stills, not "other"s.
+    const otherStills = (quote: string) =>
+      keepVerifiedCitations(
+        draft({
+          siteFacts: {
+            otherStills: {
+              value: 1,
+              asOf: null,
+              citations: [{ sourceId: "wp", statedValue: "1", quote }],
+            },
+          },
+        }),
+        [{ ...page, text: `${page.text} ${quote}` }],
+        null,
+      ).siteFacts.otherStills;
+    expect(otherStills("It installed a single still for gin.")).toBeDefined();
     // Millions are read as whole numbers.
     expect(stills(1600000, "It makes 1.6m litres of alcohol.")).toBeDefined();
     expect(stills(2000000, "It makes 2 million litres.")).toBeDefined();

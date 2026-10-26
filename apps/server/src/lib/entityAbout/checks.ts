@@ -540,7 +540,11 @@ function statesSingle(
   value: string,
 ) {
   if (value !== "1") return false;
-  const noun = ABOUT_FACT_FIELDS[field].label.toLowerCase().split(" ")[0]!;
+  // "Other stills" counts stills: "a single still" states 1.
+  const noun = ABOUT_FACT_FIELDS[field].label
+    .toLowerCase()
+    .replace(/^other /, "")
+    .split(" ")[0]!;
   const singular = noun.replace(/s$/, "");
   const text = ` ${normalizeForQuote(quotes.join(" "))} `;
   // Whole words: "one washback" does not state 1 wash still.
