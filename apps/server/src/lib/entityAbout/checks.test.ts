@@ -924,6 +924,30 @@ describe("checkConflictPicks", () => {
     expect(stills(250000000, "It cost £1,250m.")).toBeUndefined();
   });
 
+  test("reads a decade as any year in it", () => {
+    const silent = (year: string) => {
+      const quote = `It fell silent in ${year}.`;
+      return keepVerifiedCitations(
+        draft({
+          events: [
+            {
+              id: 1,
+              kind: "generic",
+              date: year,
+              text: "It was silent in the 1930s.",
+              citations: [{ sourceId: "wp", statedValue: year, quote }],
+            },
+          ],
+        }),
+        [{ ...page, text: `${page.text} ${quote}` }],
+        null,
+      ).events.length;
+    };
+
+    expect(silent("1931")).toBe(1);
+    expect(silent("1941")).toBe(0);
+  });
+
   test("reads a name run into a year by a table", () => {
     const quote = "Owners: Scottish Malt Distillers1986 Diageo1997";
     const owner = (name: string) =>
