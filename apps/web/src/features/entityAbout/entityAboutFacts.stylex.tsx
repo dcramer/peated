@@ -7,17 +7,14 @@ import {
   type AboutKeyFact,
   type AboutOwner,
 } from "./entityAbout";
-import { Citations } from "./entityAboutArticle.stylex";
 
-/** The About sidebar: key facts with their sources, and owners over time. */
+/** The About sidebar: key facts and owners over time. */
 export function EntityAboutFacts({
   keyFacts,
   owners,
-  citationNumbers,
 }: {
   keyFacts: readonly AboutKeyFact[];
   owners: readonly AboutOwner[];
-  citationNumbers: Map<string, number>;
 }) {
   return (
     <>
@@ -26,12 +23,7 @@ export function EntityAboutFacts({
           <FactList
             facts={keyFacts.map((fact) => ({
               label: fact.label,
-              value: (
-                <>
-                  {fact.value}
-                  <Citations ids={fact.sourceIds} numbers={citationNumbers} />
-                </>
-              ),
+              value: fact.value,
             }))}
           />
         </RailSection>

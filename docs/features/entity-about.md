@@ -75,6 +75,10 @@ nothing stored can go stale:
   word. Each Entity links once per section, and the page never links itself.
   `linkEntityMentions` in `apps/web/src/features/entityAbout/entityAbout.ts`
   owns this.
+- A sentence shows at most 3 source numbers: the strongest of its sources
+  (official, then reference, then press), in the order the page cites them.
+  Key facts show no source numbers. The timeline and the Sources section
+  still list every source.
 - Quotes stay private. The page lists sources and the date the page was last
   checked, and says nothing else about how the text was written.
 
