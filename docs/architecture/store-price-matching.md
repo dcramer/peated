@@ -70,16 +70,19 @@ history.
 A full run:
 
 1. Extracts Bottle facts from the title or image.
-2. Ignores clear non-whisky, multipack, sampler, and damaged-condition listings.
+2. Ignores explicit multipack, bundle, and damaged-condition names, and clear
+   non-whisky names, without the agent.
 3. Finds complete Bottle candidates.
 4. Gives verified identity anchors, candidates, and source evidence to the
-   Bottle classifier.
+   Bottle classifier. It may ignore a listing that is not one whisky Bottle.
 5. Checks the classifier result against current Bottle and Entity records.
 6. Derives `auto` or `review` from action risk, evidence, and unresolved risks.
 7. Saves the proposal, attempt, and linked Bottle check in one transaction.
 8. Applies an automatic match or create only when all code-owned checks pass.
 
-The classifier returns `match`, `create_bottle`, or `no_match`. A required
+The classifier returns `match`, `create_bottle`, or `no_match`, or ignores a
+listing that is not one whisky Bottle. An ignored listing gets an `ignored`
+proposal without review. A required
 catalog correction stays `no_match`; a separate Bottle audit owns catalog
 changes. Deterministic code can reject an unsafe result but cannot promote a
 semantic result that the classifier did not make.

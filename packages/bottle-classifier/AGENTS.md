@@ -49,8 +49,10 @@ Read before changing behavior:
   and search, never exact matching.
 - Bottle Reference Input means raw text, image, or URL for classification. It is
   not a Bottle Reference until accepted.
-- Return `match`, `create_bottle`, or `no_match`. Required catalog corrections
-  are separate Suggested Changes; return `no_match` until assignment is safe.
+- Return `match`, `create_bottle`, or `no_match`, or `ignore` a source that is
+  not one whisky Bottle. Scope is the agent's judgment; do not add phrase rules
+  for it. Required catalog corrections are separate Suggested Changes; return
+  `no_match` until assignment is safe.
 - Wrong existing matches are worse than conservative creation or `no_match`.
   Resolve bounded ambiguity to `no_match`.
 - Creation may use reviewed source, label, image, catalog, or web evidence.

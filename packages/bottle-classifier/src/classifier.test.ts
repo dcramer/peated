@@ -2441,6 +2441,36 @@ describe("createBottleClassifier", () => {
     ]);
   });
 
+  test("ignores a source the agent judges is not one whisky Bottle", async () => {
+    const candidate = macallanSherryOakCandidate;
+    const { classifier } = createTestClassifier({
+      runBottleClassifierAgent: async () => ({
+        decision: {
+          ...noMatchAgentDecision(),
+          action: "ignore",
+          rationale: "The lot is a sample, not a full-size Bottle.",
+        },
+        artifacts: buildBottleClassificationArtifacts({
+          candidates: [candidate],
+        }),
+      }),
+    });
+
+    const result = await classifier.classifyBottleReference({
+      reference: { name: "Macallan 12 Year Old Sherry Oak Sample" },
+      extractedIdentity: null,
+      initialCandidates: [candidate],
+    });
+
+    expect(result).toMatchObject({
+      status: "ignored",
+      reason: "The lot is a sample, not a full-size Bottle.",
+      artifacts: {
+        candidates: [{ bottleId: macallanSherryOakCandidate.bottleId }],
+      },
+    });
+  });
+
   test("returns null metadata for an override-only reference run", async () => {
     const { classifier } = createTestClassifier({
       runBottleClassifierAgent: async () => ({

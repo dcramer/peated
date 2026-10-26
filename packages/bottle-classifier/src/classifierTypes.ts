@@ -613,10 +613,13 @@ export const BottleClassificationDecisionSchema = z.discriminatedUnion(
   [MatchDecisionSchema, CreateBottleDecisionSchema, NoMatchDecisionSchema],
 );
 
+// `ignore` is agent output only. The runtime returns it as an ignored result,
+// so a saved decision is always match, create_bottle, or no_match.
 export const BottleClassifierActionSchema = z.enum([
   "match",
   "create_bottle",
   "no_match",
+  "ignore",
 ]);
 
 // Zod preserves this property order in the JSON schema sent to the model.
@@ -631,6 +634,7 @@ export const BottleClassifierAgentDecisionSchema = z
         "match: an existing Bottle is the exact marketed product and is safe for this assignment; set matchedBottleId.",
         "create_bottle: no inspected existing Bottle represents the exact marketed product, including plausible malformed candidates; set proposedBottle only, including every marketed release trait needed to identify it.",
         "no_match: no safe existing target and no supported create action, including when an existing Bottle needs a separate Bottle Review before assignment is safe.",
+        "ignore: the source sells something other than one whisky Bottle, so Peated does not track it; give the reason in rationale and leave matchedBottleId and proposedBottle null. Unclear whisky identity is no_match, not ignore.",
       ].join(" "),
     ),
     identityScope: BottleIdentityScopeEnum.nullable().default(null),

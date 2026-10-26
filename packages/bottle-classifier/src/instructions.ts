@@ -50,7 +50,7 @@ const BOTTLE_IDENTITY_POLICY = [
     BOTTLE_SCHEMA_RULES.yearPolicy,
     BOTTLE_SCHEMA_RULES.observationPolicy,
     BOTTLE_SCHEMA_RULES.referencePolicy,
-    "Unsupported novelty flavored whisky, whiskey liqueur, and additive-flavor products are outside the whisky catalog. Return `no_match` instead of matching or creating a Bottle.",
+    "Peated tracks single whisky Bottles only. Return `ignore` when the source is clearly something else: another spirit; a flavored whisky, whiskey liqueur, or additive-flavor product; several items sold together, such as a set, multipack, bundle, or a Bottle sold with glassware or other items; a miniature; a sample of any size, such as a cask or trade sample, instead of a marketed release; or glassware, merchandise, or another accessory. Decide from what the source sells, and use product evidence when the name alone is unclear. Scope is about what is sold, not how well the source identifies it: a whisky Bottle with missing, vague, or unclear identity is in scope, so return `no_match` instead. A flavor-adjacent word is not enough; require evidence that flavor was added. A Bottle in its own box or tin is still one Bottle. Return `ignore` even when Peated already has a Bottle for the product.",
     "When product evidence presents a distinct consumer label and an independent bottler company, the label is `brand` and the company is `bottler`. Use `series` only when evidence establishes its parent Brand. One Entity may fill several relationships, and an Entity's catalog `kind` does not restrict which relationship it fills.",
     "Ownership, importing, distribution, packing, or page hosting alone does not establish a relationship. When local Bottle evidence separates a Brand Entity from a distillery Entity, reuse the Entity established in the required relationship; exact or shorter name overlap is not stronger relationship evidence.",
     "For a blend, keep every product-specific component distillery established by reviewed evidence in `proposedBottle.distillers`.",
@@ -133,7 +133,7 @@ const BOTTLE_OPERATION_POLICY = [
 
 const BOTTLE_REFERENCE_INSTRUCTIONS = [
   "<mission>",
-  "Resolve one whisky reference to one exact marketed Bottle and return the authoritative typed decision.",
+  "Resolve one whisky reference to one exact marketed Bottle, or ignore a source that is not one whisky Bottle, and return the authoritative typed decision.",
   "</mission>",
   "",
   "<success_criteria>",
@@ -155,7 +155,7 @@ const BOTTLE_REFERENCE_INSTRUCTIONS = [
   "<decision_policy>",
   "Run these steps in order:",
   renderBulletLines([
-    "1. Establish the complete source Bottle before candidate comparison. Classify each source fact by what it describes: the complete marketed Bottle, one of its components, or source and production metadata. Only complete-Bottle facts can fill Bottle identity. Resolve Brand, bottler, and series from product evidence. Search all Entities when resolving a Bottle relationship; do not filter by Entity kind. Apply the identity rules to every proposed field.",
+    "1. Decide whether the source sells one whisky Bottle. If it clearly sells something else, return `ignore`. Otherwise, establish the complete source Bottle before candidate comparison. Classify each source fact by what it describes: the complete marketed Bottle, one of its components, or source and production metadata. Only complete-Bottle facts can fill Bottle identity. Resolve Brand, bottler, and series from product evidence. Search all Entities when resolving a Bottle relationship; do not filter by Entity kind. Apply the identity rules to every proposed field.",
     "2. Compare local candidates only after step 1. Inspect a plausible target before you select it or reject it for a possible stored error. Never infer or borrow missing traits from sibling Bottles.",
     "3. If current evidence cannot resolve an identity-critical fact, its product level, or a candidate conflict, use only search tools attached to this run. When a candidate choice depends on whether a lot code or component trait belongs to the complete Bottle, seek focused product evidence instead of selecting by local exactness. Search the local catalog first when the initial candidates are thin or new evidence reveals a decisive trait. Use Firecrawl only for a question that local evidence cannot resolve. Keep the search focused. Do not perform a general audit. Read a returned page only when its short search excerpt does not expose the needed fact.",
     "4. Decide compatibility from populated candidate fields and marketed Bottle scope. A missing candidate field is not a conflict when evidence identifies the same exact marketed Bottle. A conflicting populated field makes that candidate unsafe. An unsupported extra marketed trait makes a candidate too specific. An additional source trait makes a candidate too broad only when evidence shows that trait defines a distinct marketed Bottle.",

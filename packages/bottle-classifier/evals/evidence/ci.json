@@ -1,7 +1,7 @@
 {
   "name": "Reviewed classifier CI evidence",
   "reviewedAt": "2026-10-24",
-  "notes": "Fixed external evidence for every classifier and audit case. Search/page material is retained from the reviewed evidence packs C01, C02, C04, C05, C06, C24, C26, stable-name-examples, black-label-islay-origin, and the Glenfarclas review pack, plus the cited additions. Source-image re-reads retain the captured upstream extraction where provided, including known extraction errors; classifier judgment must still handle those errors. Empty search evidence explicitly marks local-input-only cases, not a missing provider response. Expected actions, Bottle IDs, and assertions are not used to construct this data. Standalone label-extraction evals still run against checked-in images and the live extraction model. Candidate-image observations retain valid captured tool results from CI run 39285550059, reviewed against the fixture source notes. Glendalough and Russell's Reserve source labels were visually reviewed on October 20, 2026; Ardbeg retains the exact label fields already verified by its curated regression. Direct source-page reads retain the exact captured title and, where already documented, review issue/byline/price metadata. These bounded source excerpts add no facts from expected outputs.",
+  "notes": "Fixed external evidence for every classifier and audit case. Search/page material is retained from the reviewed evidence packs C01, C02, C04, C05, C06, C24, C26, stable-name-examples, black-label-islay-origin, and the Glenfarclas review pack, plus the cited additions. Source-image re-reads retain the captured upstream extraction where provided, including known extraction errors; classifier judgment must still handle those errors. Empty search evidence explicitly marks local-input-only cases, not a missing provider response. Expected actions, Bottle IDs, and assertions are not used to construct this data. Standalone label-extraction evals still run against checked-in images and the live extraction model. Candidate-image observations retain valid captured tool results from CI run 39285550059, reviewed against the fixture source notes. Glendalough and Russell's Reserve source labels were visually reviewed on October 20, 2026; Ardbeg retains the exact label fields already verified by its curated regression. Direct source-page reads retain the exact captured title and, where already documented, review issue/byline/price metadata. These bounded source excerpts add no facts from expected outputs. 2026-10-25: the Jameson Cold Brew and Skrewball cases gained producer and retailer search results showing added flavor, the sources M02 cites, after those cases began expecting ignored under the owner scope ruling.",
   "sources": [
     "http://www.divingforpearlsblog.com/2022_10_17_archive.html",
     "https://api.peated.com/uploads/bottle-releases/bottle_release-414-pending-upload-e2dv003m0knz9un4uoswa5ml.webp",
@@ -160,7 +160,22 @@
     "https://whiskyadvocate.com/That-Boutique-y-Whisky-Company-Paul-John-6-year-old-batch-2-54-7",
     "https://shop.just-whisky.co.uk/products/laphroaig-10-yo-sherry",
     "https://www.laphroaig.com/whiskies/10-year-old-sherry-oak-finish",
-    "https://www.thespiritsbusiness.com/2021/03/laphroaig-10-years-old-sherry-oak-joins-core-line/"
+    "https://www.thespiritsbusiness.com/2021/03/laphroaig-10-years-old-sherry-oak-joins-core-line/",
+    "https://www.scotchwhiskyauctions.com/auctions/232-the-183rd-auction/897857-hazelburn-2017-8-year-old-duty-paid-sample/",
+    "https://www.musthavemalts.com/product/hazelburn-8-years-old-sherry-wood-2025-edition/",
+    "https://www.htfw.com/hazelburn-sherry-wood-2025-edition-single-malt-scotch-2017-8-year-old-whisky",
+    "https://www.reddit.com/r/Scotch/comments/1lh1qwt/hazelburn_8_year_old_sherry/",
+    "https://www.dramface.com/all-reviews/2025/springbank-12-cask-strength-2025-hazelburn-8-oloroso",
+    "https://the-right-spirit.com/2025/11/23/hazelburn-8-year-oloroso-cask-matured-single-malt-2025/",
+    "https://www.blackwellswines.com/products/hazelburn-8-year-old-sherry-wood-single-malt-scotch-whisky",
+    "https://www.scotchwhiskyauctions.com/auctions/232-the-183rd-auction/896012-springbank-2012-13-year-old-duty-paid-sample/",
+    "https://www.whiskyshop.com/auctions/a134910-springbank-2012-13-year-old-duty-paid-sample",
+    "https://www.scotchwhiskyauctions.com/auctions/222-the-173rd-auction/845298-springbank-2012-13-year-old-duty-paid-sample/",
+    "https://www.scotchwhiskyauctions.com/auctions/220-the-171st-auction/831476-springbank-2012-13-year-old-duty-paid-sample/",
+    "https://www.jamesonwhiskey.com/en-us/our-whiskey/jameson-cold-brew/",
+    "https://www.ralphs.com/p/jameson-cold-brew-coffee-irish-whisky/0008043211561",
+    "https://shop.dierbergs.com/store/dierbergs-markets/products/19172463-skrewball-peanut-butter-whiskey-whiskey-peanut-butter-750-ml",
+    "https://www.skrewballwhiskey.com/en/"
   ],
   "cases": {
     "1792-single-barrel": {
@@ -768,9 +783,31 @@
       ],
       "imageResults": []
     },
-    "current-assignment-out-of-scope-cold-brew-remains-no-match": {
+    "current-assignment-out-of-scope-cold-brew-is-ignored": {
       "searchResult": {
-        "evidence": [],
+        "evidence": [
+          {
+            "provider": "firecrawl",
+            "query": "Jameson Cold Brew whiskey coffee ABV",
+            "summary": null,
+            "results": [
+              {
+                "title": "Jameson Cold Brew",
+                "url": "https://www.jamesonwhiskey.com/en-us/our-whiskey/jameson-cold-brew/",
+                "domain": "jamesonwhiskey.com",
+                "description": "# JAMESON COLD BREW\nJameson Cold Brew is a meeting of Arabica beans from Brazil and Colombia with triple-distilled Jameson Irish Whiskey.\n\nDistinctive, bold and natural with refreshing cold brew coffee impact followed by charred wood from the pot still whiskey contribution on palate.",
+                "extraSnippets": []
+              },
+              {
+                "title": "Jameson Cold Brew Coffee Irish Whisky, 750 ml - Ralphs",
+                "url": "https://www.ralphs.com/p/jameson-cold-brew-coffee-irish-whisky/0008043211561",
+                "domain": "ralphs.com",
+                "description": "Rating 4.7(277) · 60-day returnsdistilled Jameson Irish Whiskey with cold brew coffee flavor. 60 proof or 30% alcohol by volume; Classic whiskey with rich coffee bean notes, vanilla undertones",
+                "extraSnippets": []
+              }
+            ]
+          }
+        ],
         "errors": []
       },
       "pageResults": [
@@ -4113,7 +4150,29 @@
     },
     "store-listing-rejects-an-unsupported-novelty-flavored-whiskey-product": {
       "searchResult": {
-        "evidence": [],
+        "evidence": [
+          {
+            "provider": "firecrawl",
+            "query": "Skrewball Peanut Butter Whiskey natural flavors ABV",
+            "summary": null,
+            "results": [
+              {
+                "title": "Skrewball Peanut Butter Flavored Whiskey With Natural Flavors",
+                "url": "https://shop.dierbergs.com/store/dierbergs-markets/products/19172463-skrewball-peanut-butter-whiskey-whiskey-peanut-butter-750-ml",
+                "domain": "dierbergs.com",
+                "description": "In stock Rating 4.61,425One 750 mL bottle of Skrewball Peanut Butter Whiskey with Natural Flavors; 70 proof or 35% alcohol by volume; CONTAINS PEANUTS: Whiskey with Natural Flavors",
+                "extraSnippets": []
+              },
+              {
+                "title": "Skrewball | The Original Peanut Butter Whiskey",
+                "url": "https://www.skrewballwhiskey.com/en/",
+                "domain": "skrewballwhiskey.com",
+                "description": "Skrewball Whiskey is an unexpected mix of sweet & savory flavors, combining smooth whiskey & creamy peanut butter. WHISKEY WITH NATURAL FLAVORS, 35% ABV",
+                "extraSnippets": []
+              }
+            ]
+          }
+        ],
         "errors": []
       },
       "pageResults": [
@@ -4139,7 +4198,29 @@
     },
     "store-listing-rejects-jameson-cold-brew-as-additive-flavor-product": {
       "searchResult": {
-        "evidence": [],
+        "evidence": [
+          {
+            "provider": "firecrawl",
+            "query": "Jameson Cold Brew whiskey coffee ABV",
+            "summary": null,
+            "results": [
+              {
+                "title": "Jameson Cold Brew",
+                "url": "https://www.jamesonwhiskey.com/en-us/our-whiskey/jameson-cold-brew/",
+                "domain": "jamesonwhiskey.com",
+                "description": "# JAMESON COLD BREW\nJameson Cold Brew is a meeting of Arabica beans from Brazil and Colombia with triple-distilled Jameson Irish Whiskey.\n\nDistinctive, bold and natural with refreshing cold brew coffee impact followed by charred wood from the pot still whiskey contribution on palate.",
+                "extraSnippets": []
+              },
+              {
+                "title": "Jameson Cold Brew Coffee Irish Whisky, 750 ml - Ralphs",
+                "url": "https://www.ralphs.com/p/jameson-cold-brew-coffee-irish-whisky/0008043211561",
+                "domain": "ralphs.com",
+                "description": "Rating 4.7(277) · 60-day returnsdistilled Jameson Irish Whiskey with cold brew coffee flavor. 60 proof or 30% alcohol by volume; Classic whiskey with rich coffee bean notes, vanilla undertones",
+                "extraSnippets": []
+              }
+            ]
+          }
+        ],
         "errors": []
       },
       "pageResults": [
@@ -5081,6 +5162,160 @@
                 "extraSnippets": []
               }
             ]
+          }
+        ],
+        "errors": []
+      },
+      "pageResults": [],
+      "imageResults": []
+    },
+    "auction-hazelburn-2017-8-year-old-duty-paid-sample": {
+      "searchResult": {
+        "evidence": [
+          {
+            "query": "Product details, bottle label or text identifying the Hazelburn 2017 8 year old duty paid sample, including edition, ABV, sherry cask, and whether it is a sample of Hazelburn Sherry Wood 2025",
+            "results": [
+              {
+                "url": "https://www.scotchwhiskyauctions.com/auctions/232-the-183rd-auction/897857-hazelburn-2017-8-year-old-duty-paid-sample/",
+                "title": "Hazelburn 2017 8 Year Old Duty Paid Sample | The 183rd Auction | Scotch Whisky Auctions",
+                "domain": "scotchwhiskyauctions.com",
+                "description": null,
+                "extraSnippets": []
+              }
+            ],
+            "summary": null,
+            "provider": "firecrawl"
+          },
+          {
+            "query": "Hazelburn 2017 8 year old 2025 Sherry Wood 48.2% 2017 vintage official",
+            "results": [
+              {
+                "url": "https://www.musthavemalts.com/product/hazelburn-8-years-old-sherry-wood-2025-edition/",
+                "title": "Hazelburn 8 Years Old Sherry Wood 2025 Edition - Must Have Malts",
+                "domain": "musthavemalts.com",
+                "description": "14-day returnsThe single malt was distilled in February 2017 and aged for 8 years in fresh Oloroso sherry casks. It was bottled in March 2025 at 48.2%. Hazelburn 8 Years Old ...",
+                "extraSnippets": []
+              },
+              {
+                "url": "https://www.htfw.com/hazelburn-sherry-wood-2025-edition-single-malt-scotch-2017-8-year-old-whisky",
+                "title": "Hazelburn Sherry Wood 2025 Edition Single Malt Scotch Whisky 8 Year Old",
+                "domain": "htfw.com",
+                "description": "Out of stockHazelburn 8 Year Old is a pristine single malt, non-peated and triple distilled, bottled at 48.2% ABV in a classic 70cl bottle.",
+                "extraSnippets": []
+              },
+              {
+                "url": "https://www.reddit.com/r/Scotch/comments/1lh1qwt/hazelburn_8_year_old_sherry/",
+                "title": "Hazelburn 8 year old sherry : r/Scotch - Reddit",
+                "domain": "reddit.com",
+                "description": "Hazelburn 8 years old Next up in the sherry series of hazelburn releases, all oloroso casks in the mix at 48.2% abv 10500 bottles produced.Review #35: Hazelburn 8 year oldHazelburnMore results from www.reddit.com",
+                "extraSnippets": []
+              },
+              {
+                "url": "https://www.dramface.com/all-reviews/2025/springbank-12-cask-strength-2025-hazelburn-8-oloroso",
+                "title": "Springbank 12yo & Hazelburn 8yo 2025 - Dramface",
+                "domain": "dramface.com",
+                "description": "Hazelburn 8yo, Oloroso Cask, 2025 release, 48.2% ABV £78 paid, 100% matured in oloroso sherry casks. Sweet, fruity and creamy deliciousness, ...",
+                "extraSnippets": []
+              },
+              {
+                "url": "https://the-right-spirit.com/2025/11/23/hazelburn-8-year-oloroso-cask-matured-single-malt-2025/",
+                "title": "Hazelburn 8 Year Oloroso Cask Matured Single Malt (2025)",
+                "domain": "the-right-spirit.com",
+                "description": "AGE – 8 years DISTILLERY. PRICE – $152 ・ medium oranges with smoky, smoldering fiery ・ fresh plum and baked cherry, subtle graham cracker. ...",
+                "extraSnippets": []
+              },
+              {
+                "url": "https://www.blackwellswines.com/products/hazelburn-8-year-old-sherry-wood-single-malt-scotch-whisky",
+                "title": "Hazelburn 8 Year Old Sherry Wood Single Malt Scotch Whisky 2025 ...",
+                "domain": "blackwellswines.com",
+                "description": "Out of stock Rating 4.510Distilled in February 2017 and bottled in March 2025, it matured exclusively in Oloroso sherry casks and totaled 10,500 bottles. Bottled at 48.2% ABV with ...",
+                "extraSnippets": []
+              }
+            ],
+            "summary": "14-day returnsThe single malt was distilled in February 2017 and aged for 8 years in fresh Oloroso sherry casks. It was bottled in March 2025 at 48.2%. Hazelburn 8 Years Old ... Out of stockHazelburn 8 Year Old is a pristine single malt, non-peated and triple distilled, bottled at 48.2% ABV in a classic 70cl bottle. Hazelburn 8 years old Next up in the sherry series of hazelburn releases, all oloroso casks in the mix at 48.2% abv 10500 bottles produced.Review #35: Hazelburn 8 year oldHazelburnMore results from www.reddit.com Hazelburn 8yo, Oloroso Cask, 2025 release, 48.2% ABV £78 paid, 100% m",
+            "provider": "firecrawl"
+          },
+          {
+            "query": "site:scotchwhiskyauctions.com/auctions/232-the-183rd-auction/897857 \"Hazelburn 2017 8 Year Old Duty Paid Sample\"",
+            "results": [],
+            "summary": null,
+            "provider": "firecrawl"
+          }
+        ],
+        "errors": []
+      },
+      "pageResults": [],
+      "imageResults": [
+        {
+          "url": "https://api.peated.com/uploads/prices-fa2lw73swglyhe9vax5ruj1b.webp",
+          "result": {
+            "abv": 46,
+            "brand": "Hazelburn",
+            "series": null,
+            "bottler": null,
+            "edition": null,
+            "outturn": null,
+            "category": "single_malt",
+            "distillery": ["Springbank"],
+            "expression": null,
+            "maturation": null,
+            "stated_age": 8,
+            "cask_number": null,
+            "release_day": null,
+            "single_cask": null,
+            "release_year": null,
+            "vintage_year": null,
+            "bottling_year": null,
+            "cask_strength": null,
+            "release_month": null
+          }
+        }
+      ]
+    },
+    "auction-springbank-2012-13-year-old-duty-paid-sample": {
+      "searchResult": {
+        "evidence": [
+          {
+            "query": "Determine whether this listing is for a complete marketed whisky bottle or a duty-paid sample, and find any producer label/product details, age, distillation/bottling dates, ABV, cask, or edition.",
+            "results": [
+              {
+                "url": "https://www.scotchwhiskyauctions.com/auctions/232-the-183rd-auction/896012-springbank-2012-13-year-old-duty-paid-sample/",
+                "title": "Springbank 2012 13 Year Old Duty Paid Sample | The 183rd Auction | Scotch Whisky Auctions",
+                "domain": "scotchwhiskyauctions.com",
+                "description": null,
+                "extraSnippets": []
+              }
+            ],
+            "summary": null,
+            "provider": "firecrawl"
+          },
+          {
+            "query": "\"Springbank 2012 13 Year Old Duty Paid Sample\"",
+            "results": [
+              {
+                "url": "https://www.whiskyshop.com/auctions/a134910-springbank-2012-13-year-old-duty-paid-sample",
+                "title": "Springbank 2012 13 Year Old Duty Paid Sample - The Whisky Shop",
+                "domain": "whiskyshop.com",
+                "description": "Free delivery 14-day returnsSpringbank 2012 13 Year Old Duty Paid Sample. £220 15 bids. Ended: 19 Aug 2026, 21:00. Springbank 2012 13 Year Old Duty Paid Sample Description. Distilled ...",
+                "extraSnippets": []
+              },
+              {
+                "url": "https://www.scotchwhiskyauctions.com/auctions/222-the-173rd-auction/845298-springbank-2012-13-year-old-duty-paid-sample/",
+                "title": "The 173rd Auction | Springbank 2012 13 Year Old Duty Paid Sample",
+                "domain": "scotchwhiskyauctions.com",
+                "description": "Springbank 2012 13 Year Old Duty Paid Sample | The 173rd Auction | Scotch Whisky Auctions",
+                "extraSnippets": []
+              },
+              {
+                "url": "https://www.scotchwhiskyauctions.com/auctions/220-the-171st-auction/831476-springbank-2012-13-year-old-duty-paid-sample/",
+                "title": "The 171st Auction | Springbank 2012 13 Year Old Duty Paid Sample",
+                "domain": "scotchwhiskyauctions.com",
+                "description": "Springbank 2012 13 Year Old Duty Paid Sample | The 171st Auction | Scotch Whisky Auctions",
+                "extraSnippets": []
+              }
+            ],
+            "summary": "Free delivery 14-day returnsSpringbank 2012 13 Year Old Duty Paid Sample. £220 15 bids. Ended: 19 Aug 2026, 21:00. Springbank 2012 13 Year Old Duty Paid Sample Description. Distilled ... Springbank 2012 13 Year Old Duty Paid Sample | The 173rd Auction | Scotch Whisky Auctions Springbank 2012 13 Year Old Duty Paid Sample | The 171st Auction | Scotch Whisky Auctions",
+            "provider": "firecrawl"
           }
         ],
         "errors": []
