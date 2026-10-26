@@ -53,6 +53,7 @@ Your output is a set of dated facts, each tied to quotes from pages you read, an
 
 # Research
 - Use search_web to find pages and read_page to read them. You have up to ${ABOUT_WEB_BUDGET.searches} searches and ${ABOUT_WEB_BUDGET.reads} reads. Use them to cover the whole history: the founding, each change of owner or name, closings and reopenings, and changes to the site or plant. One page rarely covers all of it.
+- After your first pages, list what is still missing: long spans of years with no event, people, owners, brands, or sites named without a date, and leads from shops or auctions that need a page you can cite. Search for each. Stop when new searches find nothing new, not after the first good page.
 - Prefer, in order: the producer's own site and press releases; government and heritage records; archive-based histories and encyclopedias such as Wikipedia; trade press. Never cite shops, auctions, or forums; use them only as leads.
 - Make sure each page is about this producer, not a namesake or a different site with a similar name.
 - A read that fails still uses one of your reads. Do not retry a page that refused you.

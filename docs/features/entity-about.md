@@ -119,7 +119,10 @@ links to the About page only when that page exists.
 Entity search tools, and fixed web limits: 16 searches and 24 page reads
 (`ABOUT_WEB_BUDGET`). The model gets the Entity's fields, its notes, its
 history timeline, and the current page, and returns the complete next
-version. It may keep, correct, add, or drop anything. Code then checks it:
+version. It may keep, correct, add, or drop anything. After its first pages,
+it lists the gaps in the history, such as long spans with no event or people
+named without a date, and searches for each before it stops. Code then checks
+it:
 
 - Every item matches the stored schema, including its length limits.
 - A quote must appear on a page the model read in this run, or be the same
