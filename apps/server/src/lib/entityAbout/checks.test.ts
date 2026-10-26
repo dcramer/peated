@@ -588,6 +588,79 @@ describe("checkConflictPicks", () => {
     expect(reopened("1948")).toBe(0);
   });
 
+  test("reads a range that ends in one digit", () => {
+    const quote = "The buildings were rebuilt in 1963-4.";
+    const rebuilt = (text: string) =>
+      keepVerifiedCitations(
+        draft({
+          events: [
+            {
+              id: 1,
+              kind: "generic",
+              date: "1963",
+              text,
+              citations: [{ sourceId: "wp", statedValue: "1963", quote }],
+            },
+          ],
+        }),
+        [{ ...page, text: `${page.text} ${quote}` }],
+        null,
+      ).events.length;
+
+    expect(rebuilt("It was rebuilt in 1963-4.")).toBe(1);
+    expect(rebuilt("It was rebuilt in 1963-5.")).toBe(0);
+  });
+
+  test("reads a formatted quantity after a year and a dash", () => {
+    const stated = (text: string, quote: string) =>
+      keepVerifiedCitations(
+        draft({
+          events: [
+            {
+              id: 1,
+              kind: "generic",
+              date: "2008",
+              text,
+              citations: [{ sourceId: "wp", statedValue: "2008", quote }],
+            },
+          ],
+        }),
+        [{ ...page, text: `${page.text} ${quote}` }],
+        null,
+      ).events.length;
+
+    expect(
+      stated("It filled 12,000 casks.", "In 2008 – 12,000 casks were filled."),
+    ).toBe(1);
+    expect(
+      stated("It made 4.5 million litres.", "In 2008 – 4.5 million litres."),
+    ).toBe(1);
+    expect(
+      stated("It made 12 million litres.", "In 2008 – 12 million litres."),
+    ).toBe(1);
+  });
+
+  test("still reads a count written after a year and a dash", () => {
+    const quote = "It was built in 2008 – 12 warehouses in all.";
+    expect(
+      keepVerifiedCitations(
+        draft({
+          events: [
+            {
+              id: 1,
+              kind: "generic",
+              date: "2008",
+              text: "It had 12 warehouses.",
+              citations: [{ sourceId: "wp", statedValue: "2008", quote }],
+            },
+          ],
+        }),
+        [{ ...page, text: `${page.text} ${quote}` }],
+        null,
+      ).events,
+    ).toHaveLength(1);
+  });
+
   test("reads a year range written with a slash", () => {
     const quote = "Alfred Barnard visited in 1893/94.";
     const visited = (statedValue: string) =>
@@ -609,6 +682,45 @@ describe("checkConflictPicks", () => {
 
     expect(visited("1893–1894")).toBe(1);
     expect(visited("1893–1895")).toBe(0);
+    // A dash with spaces around it joins a range too.
+    const spaced = "It closed from 1943 – 45 to save barley.";
+    expect(
+      keepVerifiedCitations(
+        draft({
+          events: [
+            {
+              id: 1,
+              kind: "generic",
+              date: "1943",
+              text: "It closed to save barley.",
+              citations: [
+                { sourceId: "wp", statedValue: "1943–1945", quote: spaced },
+              ],
+            },
+          ],
+        }),
+        [{ ...page, text: `${page.text} ${spaced}` }],
+        null,
+      ).events,
+    ).toHaveLength(1);
+    // Text that writes the range the same way states the same years.
+    expect(
+      keepVerifiedCitations(
+        draft({
+          events: [
+            {
+              id: 1,
+              kind: "generic",
+              date: "1893",
+              text: "Production stopped in 1893/94.",
+              citations: [{ sourceId: "wp", statedValue: "1893", quote }],
+            },
+          ],
+        }),
+        [{ ...page, text: `${page.text} ${quote}` }],
+        null,
+      ).events,
+    ).toHaveLength(1);
   });
 
   test("names the number that dropped a fact", () => {
