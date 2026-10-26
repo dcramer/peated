@@ -93,11 +93,7 @@ export default async function EntityAboutPage(props: {
             {entity.images?.length ? (
               <EntityImageGallery entity={entity} />
             ) : null}
-            <EntityAboutFacts
-              citationNumbers={citationNumbers}
-              keyFacts={keyFacts}
-              owners={getOwners(about)}
-            />
+            <EntityAboutFacts keyFacts={keyFacts} owners={getOwners(about)} />
           </>
         }
       />

@@ -17,6 +17,7 @@ import {
   getEras,
   getNameSpans,
   getOperatingSpans,
+  getSentenceSources,
   getSourceNames,
   linkEntityMentions,
   type AboutEvent,
@@ -421,7 +422,10 @@ function Sentences({
           part.text
         ),
       )}
-      <Citations ids={sentence.sourceIds} numbers={numbers} />
+      <Citations
+        ids={getSentenceSources(about, sentence.sourceIds)}
+        numbers={numbers}
+      />
     </span>
   ));
 }
