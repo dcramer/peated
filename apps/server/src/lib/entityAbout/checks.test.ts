@@ -812,6 +812,33 @@ describe("checkConflictPicks", () => {
     expect(stills(250000000, "It cost £1,250m.")).toBeUndefined();
   });
 
+  test("reads a unit written another way", () => {
+    const fermentation = (value: string, quote: string) =>
+      keepVerifiedCitations(
+        draft({
+          siteFacts: {
+            fermentation: {
+              value,
+              asOf: null,
+              citations: [{ sourceId: "wp", statedValue: value, quote }],
+            },
+          },
+        }),
+        [{ ...page, text: `${page.text} ${quote}` }],
+        null,
+      ).siteFacts.fermentation;
+
+    expect(
+      fermentation("160 hours", "We ferment for a lengthy 160-hour period."),
+    ).toBeDefined();
+    expect(
+      fermentation("100 hours", "Fermentation Time i 100hrs"),
+    ).toBeDefined();
+    expect(
+      fermentation("100 hours", "It ferments for 100 days."),
+    ).toBeUndefined();
+  });
+
   test("reads a stated value written in millions", () => {
     const quote = "It makes 1.6m litres of alcohol a year.";
     const kept = keepVerifiedCitations(

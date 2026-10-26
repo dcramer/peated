@@ -87,9 +87,26 @@ function quotesState(quotes: readonly string[], value: string) {
         word.length > 2 && !FILLER_WORDS.has(word) && !/^\p{N}+$/u.test(word),
     );
   if (!words.length) return numbers.length > 0;
-  const quoted = new Set(text.split(" "));
-  return words.every((word) => quoted.has(word));
+  // Units are written many ways: "160 hours" is stated by "160-hour" and
+  // "100hrs" as well.
+  const quoted = new Set(
+    text
+      .replace(/(\p{N})(\p{L})/gu, "$1 $2")
+      .split(" ")
+      .map((word) => UNIT_ABBREVIATIONS.get(word) ?? word),
+  );
+  return words.every(
+    (word) =>
+      quoted.has(word) ||
+      quoted.has(word.replace(/s$/, "")) ||
+      quoted.has(`${word}s`),
+  );
 }
+
+const UNIT_ABBREVIATIONS = new Map([
+  ["hr", "hour"],
+  ["hrs", "hours"],
+]);
 
 /**
  * Link rule (owner: docs/features/entity-about.md): an event links an Entity
