@@ -985,6 +985,12 @@ describe("checkConflictPicks", () => {
     // Millions are read as whole numbers.
     expect(stills(1600000, "It makes 1.6m litres of alcohol.")).toBeDefined();
     expect(stills(2000000, "It makes 2 million litres.")).toBeDefined();
+    // Dots and spaces group thousands in other languages.
+    expect(
+      stills(3700000, "Kapazität von 3.700.000 Litern reinen Alkohols."),
+    ).toBeDefined();
+    expect(stills(3700000, "(litres d'alcool/an) | 3 700 000")).toBeDefined();
+    expect(stills(1975200, "In 1975 200 workers left.")).toBeUndefined();
     expect(
       stills(2000000, "It makes almost two million litres."),
     ).toBeDefined();

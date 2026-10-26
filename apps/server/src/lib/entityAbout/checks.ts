@@ -471,7 +471,16 @@ function factSearchText(document: EntityAboutDocument) {
 const NUMBER_PATTERN = /\d+(?:\.\d+)?/g;
 
 function stripThousands(value: string) {
-  return value.replace(/(\d),(?=\d{3}(?!\d))/g, "$1");
+  return (
+    value
+      .replace(/(\d),(?=\d{3}(?!\d))/g, "$1")
+      // Other languages group with dots or spaces, as in "3.700.000" and
+      // "3 700 000". Two or more groups keep "1.6" and "1975 200" apart.
+      .replace(
+        /(?<![\d.])\d{1,3}(?:[. \u00a0\u202f]\d{3}){2,}(?![\d.])/g,
+        (number) => number.replace(/[. \u00a0\u202f]/g, ""),
+      )
+  );
 }
 
 // Histories shorten year ranges, so "1931-38" also states 1938. A later
