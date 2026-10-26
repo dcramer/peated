@@ -380,10 +380,10 @@ function stripThousands(value: string) {
 
 // Histories shorten year ranges, so "1931-38" also states 1938. A later
 // two-digit end is read in the same century; "1999-02" is left alone.
-// "1931-38" and "1893/94" span to 1938 and 1894.
+// "1931-38", "1893/94", and "1943 – 45" span to 1938, 1894, and 1945.
 function expandYearRanges(value: string) {
   return value.replace(
-    /\b(\d{2})(\d{2})([-–/])(\d{2})\b/g,
+    /\b(\d{2})(\d{2}) ?([-–/]) ?(\d{2})\b/g,
     (range, century: string, start: string, dash: string, end: string) =>
       end > start ? `${century}${start}${dash}${century}${end}` : range,
   );
@@ -506,7 +506,11 @@ function expandLargeNumbers(value: string) {
 
 /** The numbers a value states, read the same way as quotes. */
 function readNumbers(value: string) {
-  return expandLargeNumbers(stripThousands(value)).match(NUMBER_PATTERN) ?? [];
+  return (
+    expandLargeNumbers(stripThousands(expandYearRanges(value))).match(
+      NUMBER_PATTERN,
+    ) ?? []
+  );
 }
 
 // A whole number: 46 is not inside 46.5 or 146, but 1887 is in "c.1887".
