@@ -184,7 +184,11 @@ barcode or accepted-name reuse. It compares only typed fields: category, age,
 no-age statement, ABV, vintage year, bottling year, release date, cask number,
 the cask-strength and single-cask flags, and edition. An empty field on either
 side is missing, never a conflict. Code never compares Brands, names, or other
-free text; the agent, or the person on submission, owns those judgments.
+free text; the agent, or the person on submission, owns those judgments. For
+the agent, a stored Brand, bottler, or distillery blocks a match only when
+evidence contradicts it. One the source does not show is not a conflict: a
+label naming only the distillery does not block a candidate with a stored
+bottler, but a stored Brand of `Canadian` for a Canadian Club Bottle does.
 
 - ABV conflicts on any difference.
 - A cask number ignores a leading `#` and letter case. Other punctuation
