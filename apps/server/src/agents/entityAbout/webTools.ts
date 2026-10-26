@@ -164,10 +164,13 @@ const FIND_MATCHES = 12;
  * the writer can find every value its pages give for one fact.
  */
 export function findInPages(pages: readonly AboutPageRead[], query: string) {
-  const needle = query.toLowerCase();
+  // Line breaks and runs of spaces match a single space, as quote checks do.
+  const collapse = (value: string) => value.replace(/\s+/g, " ");
+  const needle = collapse(query).toLowerCase();
   const matches: { url: string; passage: string }[] = [];
   for (const page of pages) {
-    const haystack = page.text.toLowerCase();
+    const text = collapse(page.text);
+    const haystack = text.toLowerCase();
     let from = 0;
     let perPage = 0;
     while (perPage < FIND_MATCHES_PER_PAGE && matches.length < FIND_MATCHES) {
@@ -175,10 +178,10 @@ export function findInPages(pages: readonly AboutPageRead[], query: string) {
       if (at === -1) break;
       const start = Math.max(0, at - FIND_SNIPPET_CHARS);
       const end = Math.min(
-        page.text.length,
+        text.length,
         at + needle.length + FIND_SNIPPET_CHARS,
       );
-      matches.push({ url: page.url, passage: page.text.slice(start, end) });
+      matches.push({ url: page.url, passage: text.slice(start, end) });
       from = end;
       perPage += 1;
     }

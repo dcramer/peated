@@ -34,6 +34,20 @@ describe("findInPages", () => {
     expect(matches[1]?.passage).toContain("1967");
   });
 
+  test("matches across line breaks", () => {
+    const matches = findInPages(
+      [
+        {
+          url: "https://example.com/d",
+          text: "Bought by Seager\nEvans in 1962.",
+        },
+      ],
+      "seager evans",
+    );
+
+    expect(matches[0]?.passage).toBe("Bought by Seager Evans in 1962.");
+  });
+
   test("returns nothing when no page has the text", () => {
     expect(findInPages(pages, "Allied Lyons")).toEqual([]);
   });
