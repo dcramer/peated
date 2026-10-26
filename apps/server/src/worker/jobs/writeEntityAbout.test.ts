@@ -7,7 +7,7 @@ import { routerClient } from "@peated/server/orpc/router";
 import { eq } from "drizzle-orm";
 import { vi } from "vitest";
 
-import { writeEntityAbout } from "./writeEntityAbout";
+import { draftEntityAbout, writeEntityAbout } from "./writeEntityAbout";
 
 const page = {
   url: "https://en.wikipedia.org/wiki/Brora_distillery",
@@ -687,5 +687,50 @@ describe("writeEntityAbout", () => {
       status: "disabled",
     });
     expect(writer.writer).not.toHaveBeenCalled();
+  });
+});
+
+describe("draftEntityAbout", () => {
+  test("returns the checked page and saves nothing", async ({ fixtures }) => {
+    const entity = await fixtures.Entity({
+      kind: "distillery",
+      description: "An unsourced description.",
+      descriptionSrc: "generated",
+    });
+
+    const result = await draftEntityAbout(
+      { entityId: entity.id },
+      services(async () => ({ draft: goodDraft, pagesRead: [page] })),
+    );
+
+    expect(result).toMatchObject({ status: "checked", errors: [] });
+    if (result.status !== "checked") throw new Error("not checked");
+    expect(result.document.events.map(({ id }) => id)).toEqual([1, 2]);
+    expect(await getEntityAbout(db, entity.id)).toBeNull();
+    const [unchanged] = await db
+      .select()
+      .from(entities)
+      .where(eq(entities.id, entity.id));
+    expect(unchanged?.description).toBe("An unsourced description.");
+  });
+
+  test("returns the retry's page with why it fails", async ({ fixtures }) => {
+    const entity = await fixtures.Entity({ kind: "distillery" });
+    const filler = draft([
+      { text: "Brora has a rich history.", factIds: [] },
+      { text: "It closed in 1983.", factIds: ["event:2"] },
+    ]);
+    const writer = services(async () => ({ draft: filler, pagesRead: [page] }));
+
+    const result = await draftEntityAbout({ entityId: entity.id }, writer);
+
+    expect(writer.writer).toHaveBeenCalledTimes(2);
+    expect(result).toMatchObject({ status: "checked" });
+    if (result.status !== "checked") throw new Error("not checked");
+    expect(result.errors).toContain(
+      '"Brora has a rich history." (lead) cites no facts.',
+    );
+    expect(result.document.sections[0]?.sentences).toHaveLength(2);
+    expect(await getEntityAbout(db, entity.id)).toBeNull();
   });
 });

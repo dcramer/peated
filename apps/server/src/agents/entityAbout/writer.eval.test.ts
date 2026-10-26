@@ -122,69 +122,75 @@ function describeDraft(
 describe.skipIf(!isAIGatewayConfigured())("About writer", () => {
   test.each(
     ABOUT_EVAL_CASES.map((evidence) => [evidence.case, evidence] as const),
-  )("%s", async (_name, evidence) => {
-    const entity = await createEntity(evidence);
-    const write = createEntityAboutWriter(() => savedSource(evidence.pages));
-    const runs: EntityAboutWriterResult[] = [];
+  )(
+    "%s",
+    async (_name, evidence) => {
+      const entity = await createEntity(evidence);
+      const write = createEntityAboutWriter(() => savedSource(evidence.pages));
+      const runs: EntityAboutWriterResult[] = [];
 
-    let result: Awaited<ReturnType<typeof writeEntityAbout>> | undefined;
-    // Registered first so a writer error on the retry still prints the drafts.
-    onTestFailed(() => {
-      console.info(
-        `About writer case ${evidence.case}: ${JSON.stringify({
-          result,
-          runs: runs.map((run, index) =>
-            describeDraft(
-              run,
-              runs.slice(0, index + 1).flatMap((r) => r.pagesRead),
-              evidence.entity.kind,
+      let result: Awaited<ReturnType<typeof writeEntityAbout>> | undefined;
+      // Registered first so a writer error on the retry still prints the drafts.
+      onTestFailed(() => {
+        console.info(
+          `About writer case ${evidence.case}: ${JSON.stringify({
+            result,
+            runs: runs.map((run, index) =>
+              describeDraft(
+                run,
+                runs.slice(0, index + 1).flatMap((r) => r.pagesRead),
+                evidence.entity.kind,
+              ),
             ),
-          ),
-        })}`,
-      );
-    });
+          })}`,
+        );
+      });
 
-    result = await writeEntityAbout(
-      { entityId: entity.id },
-      {
-        enabled: true,
-        writer: async (input) => {
-          const run = await write(input);
-          runs.push(run);
-          return run;
+      result = await writeEntityAbout(
+        { entityId: entity.id },
+        {
+          enabled: true,
+          writer: async (input) => {
+            const run = await write(input);
+            runs.push(run);
+            return run;
+          },
+          now: () => new Date(),
         },
-        now: () => new Date(),
-      },
-    );
+      );
 
-    // The job's own checks decide whether a draft is saved; a rejected run
-    // lists every reason.
-    expect(result, JSON.stringify(result)).toMatchObject({ status: "saved" });
-    const document = (await getEntityAbout(db, entity.id))!.document;
-    const shownEvents = document.events.filter((event) =>
-      isFactShown(event.citations, document.sources),
-    );
-    for (const { kind, year } of evidence.expected.events) {
-      const kinds = [kind].flat();
-      expect(
-        shownEvents.some(
-          (event) => kinds.includes(event.kind) && event.date.startsWith(year),
-        ),
-        `${kinds.join(" or ")} in ${year}`,
-      ).toBe(true);
-    }
-    // Every source the page shows is one of the saved pages.
-    const savedUrls = new Set(
-      evidence.pages.map((page) => normalizeSourceUrl(page.url)),
-    );
-    for (const source of document.sources) {
-      expect(savedUrls.has(normalizeSourceUrl(source.url))).toBe(true);
-    }
-    // With little evidence the page stays short: a lead and no sections.
-    if (evidence.expected.thin) {
-      expect(
-        document.sections.filter((section) => section.key !== "lead"),
-      ).toEqual([]);
-    }
-  });
+      // The job's own checks decide whether a draft is saved; a rejected run
+      // lists every reason.
+      expect(result, JSON.stringify(result)).toMatchObject({ status: "saved" });
+      const document = (await getEntityAbout(db, entity.id))!.document;
+      const shownEvents = document.events.filter((event) =>
+        isFactShown(event.citations, document.sources),
+      );
+      for (const { kind, year } of evidence.expected.events) {
+        const kinds = [kind].flat();
+        expect(
+          shownEvents.some(
+            (event) =>
+              kinds.includes(event.kind) && event.date.startsWith(year),
+          ),
+          `${kinds.join(" or ")} in ${year}`,
+        ).toBe(true);
+      }
+      // Every source the page shows is one of the saved pages.
+      const savedUrls = new Set(
+        evidence.pages.map((page) => normalizeSourceUrl(page.url)),
+      );
+      for (const source of document.sources) {
+        expect(savedUrls.has(normalizeSourceUrl(source.url))).toBe(true);
+      }
+      // With little evidence the page stays short: a lead and no sections.
+      if (evidence.expected.thin) {
+        expect(
+          document.sections.filter((section) => section.key !== "lead"),
+        ).toEqual([]);
+      }
+      // A run may use its whole web budget and a retry: often over 5 minutes.
+    },
+    900_000,
+  );
 });

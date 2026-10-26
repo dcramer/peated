@@ -3,6 +3,7 @@ import * as stylex from "@stylexjs/stylex";
 
 import { SectionHeading } from "../../components/sectionHeading.stylex";
 import { TextLink } from "../../components/textLink.stylex";
+import { getEntityUrl } from "../../lib/urls";
 import { foundationStyles } from "../../styles/foundations.stylex";
 import { colors, space } from "../../styles/tokens.stylex";
 import {
@@ -15,6 +16,7 @@ import {
   getEras,
   getNameSpans,
   getOperatingSpans,
+  linkEntityMentions,
   type AboutEvent,
   type AboutSection,
   type EntityAbout,
@@ -163,13 +165,7 @@ function ArticleSection({
         ) : null}
       </div>
       <p {...stylex.props(foundationStyles.prose)}>
-        {section.sentences.map((sentence, index) => (
-          <span key={`${index}-${sentence.text}`}>
-            {index > 0 ? " " : null}
-            {sentence.text}
-            <Citations ids={sentence.sourceIds} numbers={numbers} />
-          </span>
-        ))}
+        <Sentences about={about} numbers={numbers} section={section} />
       </p>
       {disputed.map((event) => (
         <Disagreement
@@ -402,23 +398,47 @@ export function EntityAboutArticle({
 
 /** The opening paragraph, placed by the page above its sidebar. */
 export function EntityAboutLead({
+  about,
   lead,
   citationNumbers,
 }: {
+  about: EntityAbout;
   lead: AboutSection;
   citationNumbers: Map<string, number>;
 }) {
   return (
     <p {...stylex.props(foundationStyles.prose, styles.lead)}>
-      {lead.sentences.map((sentence, index) => (
-        <span key={`${index}-${sentence.text}`}>
-          {index > 0 ? " " : null}
-          {sentence.text}
-          <Citations ids={sentence.sourceIds} numbers={citationNumbers} />
-        </span>
-      ))}
+      <Sentences about={about} numbers={citationNumbers} section={lead} />
     </p>
   );
+}
+
+/** A section's sentences, with linked Entity names and source numbers. */
+function Sentences({
+  section,
+  about,
+  numbers,
+}: {
+  section: AboutSection;
+  about: EntityAbout;
+  numbers: Map<string, number>;
+}) {
+  const parts = linkEntityMentions(section, about);
+  return section.sentences.map((sentence, index) => (
+    <span key={`${index}-${sentence.text}`}>
+      {index > 0 ? " " : null}
+      {parts[index]!.map((part, partIndex) =>
+        part.entity ? (
+          <TextLink href={getEntityUrl(part.entity)} key={partIndex}>
+            {part.text}
+          </TextLink>
+        ) : (
+          part.text
+        ),
+      )}
+      <Citations ids={sentence.sourceIds} numbers={numbers} />
+    </span>
+  ));
 }
 
 const styles = stylex.create({

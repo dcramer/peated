@@ -23,8 +23,12 @@ The document holds:
   event lists its citations: the source, the value the source states, and a
   short quote.
 - **Site facts**: typed facts about a production site, such as the number of
-  stills or the water source. `apps/server/src/lib/entityAbout/aboutFactFields.ts`
-  lists them. Adding one is one entry there.
+  stills or the water source, and how it makes its spirit: malting, peating,
+  washbacks, fermentation time, distillation, still shape, and condensers.
+  These undated details can only reach the page as site facts, since every
+  sentence cites a fact. `apps/server/src/lib/entityAbout/aboutFactFields.ts`
+  lists them. Adding one is one entry there; a text value must appear word for
+  word in one of its quotes.
 - **Sections**: short sentences. Each sentence lists the facts it rests on.
   The section with key `lead` opens the page; every other section has a
   heading.
@@ -64,6 +68,11 @@ nothing stored can go stale:
   such as `1969–1973` agree when their starts and ends do. For history, only
   stated dates count; a source that states a name instead does not disagree.
 - A sentence that rests on a hidden fact is left out.
+- A sentence links another Entity's name when one of its cited events links
+  that Entity and the sentence uses the Entity's exact current name as a whole
+  word. Each Entity links once per section, and the page never links itself.
+  `linkEntityMentions` in `apps/web/src/features/entityAbout/entityAbout.ts`
+  owns this.
 - Quotes stay private. The page lists sources and the date the page was last
   checked, and says nothing else about how the text was written.
 
@@ -112,13 +121,17 @@ links to the About page only when that page exists.
   `ENTITY_ABOUT_WRITER_ENABLED` turns it off; so does a missing
   `AI_GATEWAY_API_KEY` or `FIRECRAWL_API_KEY`, and the admin route then
   refuses to queue it.
+- With `dryRun: true` and one `entity`, the same route runs the writer during
+  the request and returns the checked page and its errors. It saves nothing
+  and queues nothing. Use it to read a draft before a real run publishes it.
+  The request stays open for the whole run.
 
 ## How The Job Writes A Page
 
-`writeEntityAbout` makes one model call with web search, page-reading, and
-Entity search tools, and fixed web limits: 32 searches and 48 page reads
+`writeEntityAbout` makes one model call with web search, page-reading,
+Entity search, and find-in-pages tools, and fixed web limits: 32 searches and 48 page reads
 (`ABOUT_WEB_BUDGET`). Pages are read through Firecrawl's `auto` proxy: a basic
-request first, then its stealth proxy when a site blocks it. The model gets the Entity's fields, its notes, its
+request first, then its stealth proxy when a site blocks it. Find-in-pages searches the pages already read, at no cost, so the writer can find every value its pages give for a fact. The model gets the Entity's fields, its notes, its
 history timeline, and the current page, and returns the complete next
 version. It may keep, correct, add, or drop anything. After its first pages,
 it lists the gaps in the history, such as long spans with no event or people
@@ -135,14 +148,14 @@ it:
   quote from the same page as one the current page already has, and state
   the citation's value. A fact stands only when a kept quote states its year
   (or number); a short range such as "1931-38" states both years, the words
-  two to twelve state their numbers, "1.6m" states 1600000 and "£1.2bn" 1200000000, and a dated
+  two to twelve state their numbers, "1.6m" and "1.6 mlpa" (million litres of pure alcohol) state 1600000 and "£1.2bn" 1200000000, and a dated
   article's publication date counts when its year is on the page read or the
   current page has the same date. A name or new owner
   must appear whole in one quote, and every number in an event's text or
   title must appear in a quote. Citations that fail are dropped, then facts
   with no citations left.
 - Every sentence cites facts in the draft. Every year and number in a
-  sentence appears in those facts.
+  sentence, in digits or as a word such as "nine", appears in those facts.
 - When sources disagree on a date or number, the chosen value must be one a
   source states.
 - Length limits depend on how many facts are shown: at most 2 sentences for

@@ -74,6 +74,7 @@ export default async function EntityAboutPage(props: {
       <EntityAboutLayout
         lead={
           <EntityAboutLead
+            about={about}
             citationNumbers={citationNumbers}
             lead={about.lead}
           />
