@@ -64,7 +64,10 @@ nothing stored can go stale:
 
 - A fact needs at least one source.
 - When sources state different values, the page shows the chosen value and a
-  "Sources disagree" note with each value and its sources. Values where one is
+  "Sources disagree" note with each value and its sources. The writer cites
+  only real disagreements: it leaves off a value that agreed facts rule out, a
+  value only a weak source gives, and an older plant value that a newer dated
+  page replaces. Values where one is
   a more exact form of the other, such as `1983` and `1983-03`, agree. Ranges
   such as `1969–1973` agree when their starts and ends do. For history, only
   stated dates count; a source that states a name instead does not disagree.
@@ -157,7 +160,9 @@ it:
   (or number); a short range such as "1931-38" states both years, the words
   two to twelve state their numbers, "1.6m" and "1.6 mlpa" (million litres of pure alcohol) state 1600000 and "£1.2bn" 1200000000, and a dated
   article's publication date counts when its year is on the page read or the
-  current page has the same date. A name or new owner
+  current page has the same date. An event's month or day that no quote
+  states is trimmed, so the date keeps only the year or month the quotes give.
+  A name or new owner
   must appear whole in one quote, and every number in an event's text or
   title must appear in a quote. Citations that fail are dropped, then facts
   with no citations left.

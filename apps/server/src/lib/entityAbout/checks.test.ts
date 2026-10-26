@@ -97,6 +97,88 @@ describe("keepVerifiedCitations", () => {
     expect(result.events).toEqual([]);
   });
 
+  test("keeps only the month and day a quote states", () => {
+    const pages = [
+      {
+        url: page.url,
+        text: "Brora closed in 1983. Its stills went cold on March 17, 1983. It was listed in 1986. Category B, Date Added 18/08/1986. It reopened in May 2021. Work began in Sept. 1975. It may close in 1990. Incorporated on11 November 1991. It reopened on 17 March 1984. Clynelish was closed from 1931-38.",
+      },
+    ];
+    const result = keepVerifiedCitations(
+      draft({
+        events: [
+          event(1, "1983-03-17", "Its stills went cold on March 17, 1983."),
+          event(2, "1986-08-18", "It was listed in 1986."),
+          event(3, "1986-08-18", "Category B, Date Added 18/08/1986."),
+          event(4, "2021-05-19", "It reopened in May 2021."),
+          // No quote names May.
+          event(5, "1983-05", "Brora closed in 1983."),
+          event(6, "1975-09", "Work began in Sept. 1975."),
+          // "may" here is a verb, not the month.
+          event(7, "1990-05", "It may close in 1990."),
+          event(8, "1991-11-11", "Incorporated on11 November 1991."),
+          // A day from a quote about another year does not count.
+          {
+            ...event(9, "1983-03-17", "Brora closed in 1983."),
+            citations: [
+              {
+                sourceId: "wp",
+                statedValue: "1983",
+                quote: "Brora closed in 1983.",
+              },
+              {
+                sourceId: "wp",
+                statedValue: null,
+                quote: "It reopened on 17 March 1984.",
+              },
+            ],
+          },
+          // A short year range is not a month, and does not break the trim.
+          {
+            ...event(10, "1931-03", "Clynelish was closed from 1931-38."),
+            citations: [
+              {
+                sourceId: "wp",
+                statedValue: "1931-38",
+                quote: "Clynelish was closed from 1931-38.",
+              },
+            ],
+          },
+        ],
+      }),
+      pages,
+      null,
+    );
+
+    expect(result.events.map(({ date }) => date)).toEqual([
+      "1983-03-17",
+      "1986",
+      "1986-08-18",
+      "2021-05",
+      "1983",
+      "1975-09",
+      "1990",
+      "1991-11-11",
+      "1983",
+      "1931",
+    ]);
+    // A citation's stated date is trimmed the same way, by its own quote.
+    expect(
+      result.events.map(({ citations }) => citations[0]!.statedValue),
+    ).toEqual([
+      "1983-03-17",
+      "1986",
+      "1986-08-18",
+      "2021-05",
+      "1983",
+      "1975-09",
+      "1990",
+      "1991-11-11",
+      "1983",
+      "1931-38",
+    ]);
+  });
+
   test("drops an event whose text states a number no quote states", () => {
     const withText = (text: string) =>
       keepVerifiedCitations(
@@ -887,6 +969,27 @@ describe("checkConflictPicks", () => {
     expect(
       listing("Category B", "CategoryADate Added08/11/2022"),
     ).toBeUndefined();
+    // A quote may space out the cells the record runs together.
+    const spaced = keepVerifiedCitations(
+      draft({
+        siteFacts: {
+          listing: {
+            value: "Category B",
+            asOf: null,
+            citations: [
+              {
+                sourceId: "wp",
+                statedValue: "Category B",
+                quote: "Category B Date Added 28/03/1996",
+              },
+            ],
+          },
+        },
+      }),
+      [{ ...page, text: `${page.text} CategoryBDate Added28/03/1996` }],
+      null,
+    ).siteFacts.listing;
+    expect(spaced).toBeDefined();
     // A count of 1 needs "one" or "a single" right before the field's word.
     expect(
       stills(1, "It has one wash still and one spirit still."),
@@ -894,9 +997,31 @@ describe("checkConflictPicks", () => {
     expect(stills(1, "It runs a single wash still.")).toBeDefined();
     expect(stills(1, "It is one of the oldest distilleries.")).toBeUndefined();
     expect(stills(1, "It has one washback.")).toBeUndefined();
+    // "Other stills" counts stills, not "other"s.
+    const otherStills = (quote: string) =>
+      keepVerifiedCitations(
+        draft({
+          siteFacts: {
+            otherStills: {
+              value: 1,
+              asOf: null,
+              citations: [{ sourceId: "wp", statedValue: "1", quote }],
+            },
+          },
+        }),
+        [{ ...page, text: `${page.text} ${quote}` }],
+        null,
+      ).siteFacts.otherStills;
+    expect(otherStills("It installed a single still for gin.")).toBeDefined();
     // Millions are read as whole numbers.
     expect(stills(1600000, "It makes 1.6m litres of alcohol.")).toBeDefined();
     expect(stills(2000000, "It makes 2 million litres.")).toBeDefined();
+    // Dots and spaces group thousands in other languages.
+    expect(
+      stills(3700000, "Kapazität von 3.700.000 Litern reinen Alkohols."),
+    ).toBeDefined();
+    expect(stills(3700000, "(litres d'alcool/an) | 3 700 000")).toBeDefined();
+    expect(stills(1975200, "In 1975 200 workers left.")).toBeUndefined();
     expect(
       stills(2000000, "It makes almost two million litres."),
     ).toBeDefined();

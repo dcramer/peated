@@ -8,6 +8,14 @@ describe("toPlainText", () => {
       ),
     ).toBe("Brora was founded in 1819 by the Marquess of Stafford.");
   });
+
+  test("drops footnote links so a sentence reads whole", () => {
+    expect(
+      toPlainText(
+        "In December 2003, Diageo caused controversy[\\[10\\]](https://en.wikipedia.org/wiki/Cardhu_distillery#cite_note-10)[\\[a\\]](https://en.wikipedia.org/wiki/Cardhu_distillery#cite_note-a) by renaming it.",
+      ),
+    ).toBe("In December 2003, Diageo caused controversy by renaming it.");
+  });
 });
 
 describe("findInPages", () => {

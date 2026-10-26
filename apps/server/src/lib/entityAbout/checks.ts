@@ -39,15 +39,95 @@ export const ABOUT_MAX_SENTENCES_PER_FACT = 2;
 export type AboutPageRead = { url: string; text: string };
 
 function normalizeForQuote(value: string) {
-  return value
-    .normalize("NFKC")
-    .toLowerCase()
-    .replace(/[‘’“”]/g, "'")
-    .replace(/[^\p{L}\p{N}]+/gu, " ")
-    .trim();
+  return (
+    value
+      .normalize("NFKC")
+      // Records that run table cells together, as in "CategoryBDate
+      // Added28/03/1996", match a quote that spaces them out.
+      .replace(/(\p{Ll})(\p{Lu})/gu, "$1 $2")
+      .replace(/(\p{Lu})(\p{Lu}\p{Ll})/gu, "$1 $2")
+      .replace(/(\p{L})(\p{N})/gu, "$1 $2")
+      .toLowerCase()
+      .replace(/[‘’“”]/g, "'")
+      .replace(/[^\p{L}\p{N}]+/gu, " ")
+      .trim()
+  );
 }
 
 const FILLER_WORDS = new Set(["and", "the", "for", "with"]);
+
+const MONTH_NAMES = [
+  "january",
+  "february",
+  "march",
+  "april",
+  "may",
+  "june",
+  "july",
+  "august",
+  "september",
+  "october",
+  "november",
+  "december",
+];
+
+/**
+ * Trims a date to the precision its quotes state. `quotesState` checks only
+ * the year, so a month needs its name or a numeric date in one of the fact's
+ * quotes, and a day needs its number beside that month. A timeline quote
+ * often gives the month under a year heading, so the year may come from
+ * another quote. A lowercase month name counts only beside a number, so
+ * "it may close" does not state May.
+ */
+function trimToStatedPrecision(quotes: readonly string[], date: string) {
+  const [year, month, day] = date.split("-");
+  if (!month) return date;
+  const name = MONTH_NAMES[Number(month) - 1];
+  if (!name) return year!;
+  const names = [
+    name,
+    name.slice(0, 3),
+    ...(name === "september" ? ["sept"] : []),
+  ];
+  const monthWord = `(?:${names.join("|")})\\.?`;
+  const titleMonth = `(?:${names.map((n) => n[0]!.toUpperCase() + n.slice(1)).join("|")})\\.?`;
+  const m = `0?${Number(month)}`;
+  // Pages often glue a word to a number, as in "Incorporated on11 November".
+  const spaced = quotes.map((quote) =>
+    quote.replace(/(\p{L})(\p{N})/gu, "$1 $2"),
+  );
+  // A quote that names another year is about another date, so its month or
+  // day does not count; a timeline quote with no year can.
+  const states = (pattern: string, flags = "i") =>
+    spaced.some(
+      (quote) =>
+        new RegExp(pattern, flags).test(quote) &&
+        (quote.includes(year!) || !/\b(?:1[5-9]|20)\d\d\b/.test(quote)),
+    );
+  // "1963-04" or "04/1963" names April; a short range such as "1963-4" does not.
+  const mm = month!.padStart(2, "0");
+  const numericMonth = `\\b${year}-${mm}\\b|\\b${m}/${year}\\b`;
+  const monthByNumber = `\\b${monthWord}(?![a-z])\\s*,?\\s*\\d|\\d(?:st|nd|rd|th)?\\s+(?:of\\s+)?${monthWord}(?![a-z])`;
+  if (
+    !states(`${numericMonth}|${monthByNumber}`) &&
+    !states(`\\b${titleMonth}(?![a-z])`, "")
+  ) {
+    return year!;
+  }
+  if (!day) return date;
+  const d = `0?${Number(day)}(?:st|nd|rd|th)?`;
+  const dayWithMonth = `\\b${d}\\s+(?:of\\s+)?${monthWord}(?![a-z])|\\b${monthWord}\\s+${d}\\b`;
+  const numericDay = `\\b${year}[-/.]${m}[-/.]${d}\\b|\\b${d}[-/.]${m}[-/.]${year}\\b|\\b${m}[-/.]${d}[-/.]${year}\\b`;
+  return states(`${dayWithMonth}|${numericDay}`) ? date : `${year}-${month}`;
+}
+
+/** Trims a single-date statedValue the same way; ranges and other values pass. */
+function trimStatedValue(quotes: readonly string[], value: string | null) {
+  // A short range such as "1931-38" is not a month.
+  return value && /^\d{4}-(?:0[1-9]|1[0-2])(?:-\d{2})?$/.test(value)
+    ? trimToStatedPrecision(quotes, value)
+    : value;
+}
 
 /**
  * Whether the quotes state `value`: every number in it, and the whole phrase
@@ -80,11 +160,16 @@ function quotesState(quotes: readonly string[], value: string) {
   ) {
     return true;
   }
+  // A lone capital is a grade, as in "Category B", so it must be quoted too.
+  const grades = new Set(
+    (checked.match(/\b\p{Lu}\b/gu) ?? []).map((letter) => letter.toLowerCase()),
+  );
   const words = phrase
     .split(" ")
     .filter(
       (word) =>
-        word.length > 2 && !FILLER_WORDS.has(word) && !/^\p{N}+$/u.test(word),
+        grades.has(word) ||
+        (word.length > 2 && !FILLER_WORDS.has(word) && !/^\p{N}+$/u.test(word)),
     );
   if (!words.length) return numbers.length > 0;
   // Units are written many ways: "160 hours" is stated by "160-hour" and
@@ -316,6 +401,26 @@ function verifyCitations(
         );
       }
       return !missing;
+    })
+    .map((event) => {
+      // A month or day no quote states is the model's own; keep the year.
+      const quotes = quotesOf(event.citations);
+      const date = trimToStatedPrecision(quotes, event.date);
+      const endDate =
+        event.endDate && trimToStatedPrecision(quotes, event.endDate);
+      if (date !== event.date || endDate !== event.endDate) {
+        dropped.push(
+          `Event ${event.id} (${event.kind}) was trimmed to ${[date, endDate].filter(Boolean).join("–")}: no kept quote states its month or day.`,
+        );
+      }
+      const citations = event.citations.map((citation) => ({
+        ...citation,
+        statedValue: trimStatedValue(
+          quotesOf([citation]),
+          citation.statedValue,
+        ),
+      }));
+      return { ...event, date, endDate, citations };
     });
 
   const siteFacts: EntityAboutDocument["siteFacts"] = {};
@@ -376,7 +481,16 @@ function factSearchText(document: EntityAboutDocument) {
 const NUMBER_PATTERN = /\d+(?:\.\d+)?/g;
 
 function stripThousands(value: string) {
-  return value.replace(/(\d),(?=\d{3}(?!\d))/g, "$1");
+  return (
+    value
+      .replace(/(\d),(?=\d{3}(?!\d))/g, "$1")
+      // Other languages group with dots or spaces, as in "3.700.000" and
+      // "3 700 000". Two or more groups keep "1.6" and "1975 200" apart.
+      .replace(
+        /(?<![\d.])\d{1,3}(?:[. \u00a0\u202f]\d{3}){2,}(?![\d.])/g,
+        (number) => number.replace(/[. \u00a0\u202f]/g, ""),
+      )
+  );
 }
 
 // Histories shorten year ranges, so "1931-38" also states 1938. A later
@@ -457,7 +571,11 @@ function statesSingle(
   value: string,
 ) {
   if (value !== "1") return false;
-  const noun = ABOUT_FACT_FIELDS[field].label.toLowerCase().split(" ")[0]!;
+  // "Other stills" counts stills: "a single still" states 1.
+  const noun = ABOUT_FACT_FIELDS[field].label
+    .toLowerCase()
+    .replace(/^other /, "")
+    .split(" ")[0]!;
   const singular = noun.replace(/s$/, "");
   const text = ` ${normalizeForQuote(quotes.join(" "))} `;
   // Whole words: "one washback" does not state 1 wash still.

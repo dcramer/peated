@@ -11,14 +11,19 @@ const SEARCH_RESULT_LIMIT = 8;
 export const MAX_PAGE_CHARS = 24_000;
 
 /**
- * Replaces markdown links with their text and drops images, so the writer
- * quotes the words a reader sees and quote checks can find them. URLs may
- * hold one level of parentheses, as Wikipedia's do.
+ * Replaces markdown links with their text and drops images and footnote
+ * links such as Wikipedia's "[9]", so the writer quotes the words a reader
+ * sees and quote checks can find them. URLs may hold one level of
+ * parentheses, as Wikipedia's do.
  */
 export function toPlainText(markdown: string) {
   const target = String.raw`\((?:[^()]|\([^()]*\))*\)`;
   return markdown
     .replace(new RegExp(String.raw`!\[[^\]]*\]` + target, "g"), "")
+    .replace(
+      new RegExp(String.raw`\[\\?\[[^\]\\]{1,12}\\?\]\]` + target, "g"),
+      "",
+    )
     .replace(new RegExp(String.raw`\[([^\]]*)\]` + target, "g"), "$1");
 }
 
