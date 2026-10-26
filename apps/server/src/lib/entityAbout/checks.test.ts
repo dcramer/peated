@@ -737,6 +737,14 @@ describe("checkConflictPicks", () => {
     expect(
       stills(1887000000, "Built in 1887 m. by the estate."),
     ).toBeUndefined();
+    // "mlpa" (million litres of pure alcohol) states millions, after the
+    // number or as a table label before it.
+    expect(stills(3400000, "Capacity (mlpa) 3.4")).toBeDefined();
+    expect(stills(4800000, "It makes 4.8 mlpa.")).toBeDefined();
+    expect(stills(3400000, "Capacity (mlpa) 3.4 since 2018")).toBeDefined();
+    expect(
+      stills(2018000000, "Capacity (mlpa) 3.4 since 2018"),
+    ).toBeUndefined();
     // Thousands separators are read before millions: "1,250m" is one number.
     expect(stills(1250000000, "It cost £1,250m.")).toBeDefined();
     expect(stills(250000000, "It cost £1,250m.")).toBeUndefined();

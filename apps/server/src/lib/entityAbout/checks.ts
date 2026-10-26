@@ -420,11 +420,17 @@ function writeNumberWords(value: string) {
 // state 1200000000. An "m" or "bn" must touch the number, so "1887 M." and
 // "20 m" are not millions.
 function expandLargeNumbers(value: string) {
-  return value.replace(
-    /\b(\d+(?:\.\d+)?)(m|\s*million|bn|\s*billion)\b/gi,
-    (_, n: string, unit: string) =>
-      String(Math.round(Number(n) * (/b/i.test(unit) ? 1e9 : 1e6))),
-  );
+  // "mlpa" is million litres of pure alcohol: "4.8 mlpa", or a table label
+  // such as "Capacity (mlpa) 3.4".
+  const millionLitres = (n: string) => String(Math.round(Number(n) * 1e6));
+  return value
+    .replace(/\(mlpa\)\s*(\d+(?:\.\d+)?)/gi, (_, n: string) => millionLitres(n))
+    .replace(/\b(\d+(?:\.\d+)?)\s*mlpa\b/gi, (_, n: string) => millionLitres(n))
+    .replace(
+      /\b(\d+(?:\.\d+)?)(m|\s*million|bn|\s*billion)\b/gi,
+      (_, n: string, unit: string) =>
+        String(Math.round(Number(n) * (/b/i.test(unit) ? 1e9 : 1e6))),
+    );
 }
 
 /** The numbers a value states, read the same way as quotes. */
