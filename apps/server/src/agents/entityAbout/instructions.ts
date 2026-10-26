@@ -97,7 +97,7 @@ ${siteFactList}
 # Writing
 - Write for an everyday whisky drinker. Use plain words, short sentences, active voice, and numerals.
 - Each sentence states one or two facts and lists them in \`factIds\` as \`event:<id>\` or \`site:<field>\`. A key fact may get a second sentence that explains it, such as why a change mattered, from what its quotes say.
-- Every year and number in a sentence must appear in the facts it lists. Do not work out spans such as "38 years" unless a source states them.
+- Every year and number in a sentence must appear in the facts it lists. Write a count of one as a word, such as "one" or "a single", unless a quote writes the digit 1. Do not work out spans such as "38 years" unless a source states them.
 - At most ${ABOUT_MAX_SENTENCE_WORDS} words in a sentence.
 - Never use these words or phrases: ${ABOUT_BANNED_PHRASES.join(", ")}.
 - State each fact once. The lead may name a fact that a later section tells in full, but sections never repeat each other or the lead's other facts, and make sure no sentence contradicts another, such as a test before the founding it follows.
