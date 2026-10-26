@@ -125,7 +125,8 @@ sent to OpenAI; name another provider in full, such as
 `anthropic/claude-haiku-5.5`. GPT-5 and GPT-6 model names receive the
 reasoning effort; other names get a fixed temperature and no reasoning setting.
 Without Firecrawl, the classifier has no web
-tools. The eval config loads the repo-root `.env.local`; shell values take
+tools. Pages are read through Firecrawl's `auto` proxy: a basic request first,
+then its stealth proxy when a site blocks it. The eval config loads the repo-root `.env.local`; shell values take
 precedence.
 
 ## Commands
