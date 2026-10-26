@@ -1,5 +1,5 @@
 import { expect, test } from "vitest";
-import { auctionLotAssignment } from "./auctionTask";
+import { auctionLotAssignment, auctionLotIgnore } from "./auctionTask";
 
 const item = {
   lot: { id: 7, bottleId: null },
@@ -35,4 +35,13 @@ test("a different bottle or unavailable reuse scope cannot request name acceptan
   expect(() =>
     auctionLotAssignment({ ...item, canRememberReference: false }, 42, true),
   ).toThrow(/suggested bottle/);
+});
+
+test("ignoring sends the observed source, assignment, and check versions", () => {
+  expect(auctionLotIgnore({ ...item, lot: { id: 7, bottleId: 42 } })).toEqual({
+    lot: 7,
+    fingerprint: "observed-version",
+    expectedBottleId: 42,
+    expectedCheckId: 21,
+  });
 });

@@ -3,8 +3,9 @@
 Auction listings belong to a sale occurrence, not a physical bottle. Peated
 links each supported single-bottle lot to one Bottle. The same release
 can have several simultaneous lots or return in a later auction without
-overwriting history. Sets, multipacks, and single miniatures are outside the
-initial scope.
+overwriting history. Only single whisky bottles are in scope. Sets,
+multipacks, miniatures, samples (including trade duty-paid samples),
+glassware and other accessories, and other spirits are not.
 
 ## Stored records
 
@@ -101,6 +102,12 @@ reference, but requires a current `global_alias` match and its suggested Bottle.
 A different Bottle choice or missing reuse scope cannot remember a name.
 Both writes commit together; an ignored or conflicting reference rejects the
 whole save. The moderator can still assign just the lot.
+
+"Ignore lot" marks a lot that is not one whisky bottle as ignored, with the same
+version checks. It clears any assignment, records the moderator and time, and logs an unassign
+decision in History when the lot had a Bottle. Ignored lots leave the Inbox,
+rechecks skip them, and assignment rejects them, so a stale screen cannot undo
+the decision. Only a later source identity change reopens the lot for matching.
 
 A source identity change clears the assignment and check link. Correcting a
 reference invalidates assignments made from it, not direct moderator decisions.
