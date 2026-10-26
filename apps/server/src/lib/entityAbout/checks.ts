@@ -49,6 +49,45 @@ function normalizeForQuote(value: string) {
 
 const FILLER_WORDS = new Set(["and", "the", "for", "with"]);
 
+const MONTH_NAMES = [
+  "january",
+  "february",
+  "march",
+  "april",
+  "may",
+  "june",
+  "july",
+  "august",
+  "september",
+  "october",
+  "november",
+  "december",
+];
+
+/**
+ * Trims a date to the precision its quotes state. `quotesState` checks only
+ * the year, so a month needs its name or a numeric date in one of the fact's
+ * quotes, and a day needs its number beside that month. A timeline quote
+ * often gives the month under a year heading, so the year may come from
+ * another quote.
+ */
+function trimToStatedPrecision(quotes: readonly string[], date: string) {
+  const [year, month, day] = date.split("-");
+  if (!month) return date;
+  const name = MONTH_NAMES[Number(month) - 1]!;
+  const monthWord = `(?:${name}|${name.slice(0, 3)}\\.?)`;
+  const m = `0?${Number(month)}`;
+  const d = day ? `0?${Number(day)}(?:st|nd|rd|th)?` : null;
+  const states = (pattern: string) =>
+    quotes.some((quote) => new RegExp(pattern, "i").test(quote));
+  const numericMonth = `\\b${year}[-/.]${m}\\b|\\b${m}[-/.]${year}\\b`;
+  if (!states(`\\b${monthWord}(?![a-z])|${numericMonth}`)) return year!;
+  if (!d) return date;
+  const dayWithMonth = `\\b${d}(?: of)? ${monthWord}\\b|\\b${monthWord} ${d}\\b`;
+  const numericDay = `\\b${year}[-/.]${m}[-/.]${d}\\b|\\b${d}[-/.]${m}[-/.]${year}\\b|\\b${m}[-/.]${d}[-/.]${year}\\b`;
+  return states(`${dayWithMonth}|${numericDay}`) ? date : `${year}-${month}`;
+}
+
 /**
  * Whether the quotes state `value`: every number in it, and the whole phrase
  * or every word that carries meaning. A date, or each end of a date range,
@@ -316,6 +355,19 @@ function verifyCitations(
         );
       }
       return !missing;
+    })
+    .map((event) => {
+      // A month or day no quote states is the model's own; keep the year.
+      const quotes = quotesOf(event.citations);
+      const date = trimToStatedPrecision(quotes, event.date);
+      const endDate =
+        event.endDate && trimToStatedPrecision(quotes, event.endDate);
+      if (date !== event.date || endDate !== event.endDate) {
+        dropped.push(
+          `Event ${event.id} (${event.kind}) was trimmed to ${[date, endDate].filter(Boolean).join("–")}: no kept quote states its month or day.`,
+        );
+      }
+      return { ...event, date, endDate };
     });
 
   const siteFacts: EntityAboutDocument["siteFacts"] = {};

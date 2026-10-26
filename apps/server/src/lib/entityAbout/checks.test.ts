@@ -97,6 +97,37 @@ describe("keepVerifiedCitations", () => {
     expect(result.events).toEqual([]);
   });
 
+  test("keeps only the month and day a quote states", () => {
+    const pages = [
+      {
+        url: page.url,
+        text: "Brora closed in 1983. Its stills went cold on March 17, 1983. It was listed in 1986. Category B, Date Added 18/08/1986. It reopened in May 2021.",
+      },
+    ];
+    const result = keepVerifiedCitations(
+      draft({
+        events: [
+          event(1, "1983-03-17", "Its stills went cold on March 17, 1983."),
+          event(2, "1986-08-18", "It was listed in 1986."),
+          event(3, "1986-08-18", "Category B, Date Added 18/08/1986."),
+          event(4, "2021-05-19", "It reopened in May 2021."),
+          // No quote names May.
+          event(5, "1983-05", "Brora closed in 1983."),
+        ],
+      }),
+      pages,
+      null,
+    );
+
+    expect(result.events.map(({ date }) => date)).toEqual([
+      "1983-03-17",
+      "1986",
+      "1986-08-18",
+      "2021-05",
+      "1983",
+    ]);
+  });
+
   test("drops an event whose text states a number no quote states", () => {
     const withText = (text: string) =>
       keepVerifiedCitations(

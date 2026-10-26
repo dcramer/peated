@@ -157,7 +157,9 @@ it:
   (or number); a short range such as "1931-38" states both years, the words
   two to twelve state their numbers, "1.6m" and "1.6 mlpa" (million litres of pure alcohol) state 1600000 and "£1.2bn" 1200000000, and a dated
   article's publication date counts when its year is on the page read or the
-  current page has the same date. A name or new owner
+  current page has the same date. An event's month or day that no quote
+  states is trimmed, so the date keeps only the year or month the quotes give.
+  A name or new owner
   must appear whole in one quote, and every number in an event's text or
   title must appear in a quote. Citations that fail are dropped, then facts
   with no citations left.
