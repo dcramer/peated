@@ -133,7 +133,8 @@ may reuse its existing Bottle. The saved check and attributed decision remain
 in history. Unsupported proposals stay in review. Auction matching never edits
 existing catalog facts, copies source images, or automatically accepts new
 references. When the classifier finds that a lot is out of scope, the lot
-becomes `ignored` and stays out of the Inbox.
+becomes `ignored`, just as with "Ignore lot": it leaves the Inbox, rechecks skip
+it, and assignment rejects it until a source identity change reopens it.
 
 Bottle merges move lots, alert references, and watches to the replacement Bottle;
 duplicate member watches collapse, preserving the earlier subscription time.
