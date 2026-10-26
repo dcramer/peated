@@ -746,6 +746,13 @@ describe("checkConflictPicks", () => {
     expect(
       listing("Category B", "CategoryADate Added08/11/2022"),
     ).toBeUndefined();
+    // A count of 1 needs "one" or "a single" right before the field's word.
+    expect(
+      stills(1, "It has one wash still and one spirit still."),
+    ).toBeDefined();
+    expect(stills(1, "It runs a single wash still.")).toBeDefined();
+    expect(stills(1, "It is one of the oldest distilleries.")).toBeUndefined();
+    expect(stills(1, "It has one washback.")).toBeUndefined();
     // Millions are read as whole numbers.
     expect(stills(1600000, "It makes 1.6m litres of alcohol.")).toBeDefined();
     expect(stills(2000000, "It makes 2 million litres.")).toBeDefined();

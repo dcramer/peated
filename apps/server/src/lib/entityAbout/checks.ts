@@ -9,6 +9,7 @@ import {
   ABOUT_FACT_FIELD_LIST,
   ABOUT_FACT_FIELDS,
   aboutFactFieldAppliesTo,
+  type AboutFactField,
 } from "./aboutFactFields";
 import { findBannedPhrases } from "./bannedPhrases";
 import {
@@ -197,20 +198,25 @@ function verifyCitations(
     ),
   );
 
-  const isVerified = (citation: AboutCitation) => {
-    if (!citation.quote) return false;
-    const url = sourceUrls.get(citation.sourceId);
-    const text = url ? pageText.get(url) : undefined;
-    const quote = normalizeForQuote(citation.quote);
-    const found =
-      Boolean(text && quote && ` ${text} `.includes(` ${quote} `)) ||
-      Boolean(url && carried.has(`${url} ${quote}`));
-    return (
-      found &&
-      (!citation.statedValue ||
-        quotesState(quotesOf([citation]), citation.statedValue))
-    );
-  };
+  // `states` decides whether a quote states the citation's value; site facts
+  // also accept a count of 1 written as a word.
+  const verifiedBy =
+    (states: (quotes: readonly string[], value: string) => boolean) =>
+    (citation: AboutCitation) => {
+      if (!citation.quote) return false;
+      const url = sourceUrls.get(citation.sourceId);
+      const text = url ? pageText.get(url) : undefined;
+      const quote = normalizeForQuote(citation.quote);
+      const found =
+        Boolean(text && quote && ` ${text} `.includes(` ${quote} `)) ||
+        Boolean(url && carried.has(`${url} ${quote}`));
+      return (
+        found &&
+        (!citation.statedValue ||
+          states(quotesOf([citation]), citation.statedValue))
+      );
+    };
+  const isVerified = verifiedBy(quotesState);
   const events = draft.events
     .map((event) => ({
       ...event,
@@ -298,9 +304,11 @@ function verifyCitations(
   for (const field of ABOUT_FACT_FIELD_LIST) {
     const fact = draft.siteFacts[field];
     if (!fact) continue;
-    const citations = fact.citations.filter(isVerified);
+    const states = (quotes: readonly string[], value: string) =>
+      quotesState(quotes, value) || statesSingle(quotes, field, value);
+    const citations = fact.citations.filter(verifiedBy(states));
     const quotes = quotesOf(citations);
-    if (quotesState(quotes, String(fact.value))) {
+    if (states(quotes, String(fact.value))) {
       // The date is optional, so one no quote states is dropped, not the fact.
       const asOf =
         fact.asOf && quotesState(quotes, fact.asOf.slice(0, 4))
@@ -412,6 +420,29 @@ const NUMBER_WORD_RUN = new RegExp(
   `\\b${NUMBER_WORD}(?:(?:[-\\u2010\\u2011\\u2013]|\\s+(?:and\\s+)?)${NUMBER_WORD})*\\b`,
   "gi",
 );
+
+/**
+ * Whether quotes state a count of 1 for a site fact, as "one wash still" or
+ * "a single spirit still". "One" alone is not read as a number because pages
+ * use it in many other ways, so it must come right before the field's own
+ * first word.
+ */
+function statesSingle(
+  quotes: readonly string[],
+  field: AboutFactField,
+  value: string,
+) {
+  if (value !== "1") return false;
+  const noun = ABOUT_FACT_FIELDS[field].label.toLowerCase().split(" ")[0]!;
+  const singular = noun.replace(/s$/, "");
+  const text = ` ${normalizeForQuote(quotes.join(" "))} `;
+  // Whole words: "one washback" does not state 1 wash still.
+  return ["one", "a single"].some((count) =>
+    [singular, `${singular}s`].some((word) =>
+      text.includes(` ${count} ${word} `),
+    ),
+  );
+}
 
 /** The number a run of number words states, when it is one small word. */
 function readNumberWords(run: string) {
