@@ -116,12 +116,14 @@ links to the About page only when that page exists.
 ## How The Job Writes A Page
 
 `writeEntityAbout` makes one model call with web search, page-reading, and
-Entity search tools, and fixed web limits: 16 searches and 24 page reads
+Entity search tools, and fixed web limits: 32 searches and 48 page reads
 (`ABOUT_WEB_BUDGET`). The model gets the Entity's fields, its notes, its
 history timeline, and the current page, and returns the complete next
 version. It may keep, correct, add, or drop anything. After its first pages,
 it lists the gaps in the history, such as long spans with no event or people
-named without a date, and searches for each before it stops. Code then checks
+named without a date, and searches for each before it stops. The page aims
+for the history an expert would tell in about half an hour: every period and
+turning point, not every bottling. Its length follows the evidence. Code then checks
 it:
 
 - Every item matches the stored schema, including its length limits.
@@ -139,8 +141,8 @@ it:
   sentence appears in those facts.
 - When sources disagree on a date or number, the chosen value must be one a
   source states.
-- Length limits depend on how many facts are shown. No sentence is over 30
-  words. No banned phrases, from
+- Length limits depend on how many facts are shown: at most 2 sentences for
+  each fact, and at most 4 in the lead. No sentence is over 30 words. No banned phrases, from
   `apps/server/src/lib/entityAbout/bannedPhrases.ts`.
 
 Site facts that do not apply to the Entity's kind are dropped, and the

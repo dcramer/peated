@@ -80,7 +80,7 @@ numbers, because those change every day; the page's charts show them.
 
 ### Requirement: Length follows evidence
 
-A draft SHALL have at most one sentence for each fact it publishes and a lead
+A draft SHALL have at most two sentences for each fact it publishes and a lead
 of at most 4 sentences. It SHALL have no sections when it has fewer than 6
 published facts, and no prose when it has fewer than 2.
 
@@ -119,7 +119,7 @@ text.
 
 #### Scenario: Retry runs past its length limit
 
-- **WHEN** the retry has more sentences than shown facts
+- **WHEN** the retry has more than two sentences for each shown fact
 - **THEN** the job saves the page with sentences trimmed from the end
 
 #### Scenario: Retry cites a dropped fact

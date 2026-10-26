@@ -388,6 +388,37 @@ describe("checkAboutProse", () => {
     ).toEqual(["Only 1 facts are shown; prose needs at least 2."]);
   });
 
+  test("allows up to 2 sentences for each shown fact", () => {
+    const six = [1, 2, 3, 4, 5, 6].map((id) =>
+      event(id, `190${id}`, `It changed in 190${id}.`),
+    );
+    const prose = (count: number) => [
+      ...lead(
+        [1, 2, 3, 4].map((id) => ({
+          text: `It changed in 190${id}.`,
+          factIds: [`event:${id}`],
+        })),
+      ),
+      {
+        key: "history",
+        heading: "History",
+        sentences: Array.from({ length: count - 4 }, (_, i) => ({
+          text: `In 190${(i % 6) + 1} it changed.`,
+          factIds: [`event:${(i % 6) + 1}`],
+        })),
+      },
+    ];
+
+    expect(
+      checkAboutProse(draft({ events: six, sections: prose(12) })),
+    ).toEqual([]);
+    expect(
+      checkAboutProse(draft({ events: six, sections: prose(13) })),
+    ).toEqual([
+      "The prose has 13 sentences for 6 shown facts; the limit is 12.",
+    ]);
+  });
+
   test("allows no sections beyond the lead with fewer than 6 shown facts", () => {
     const errors = checkAboutProse(
       draft({

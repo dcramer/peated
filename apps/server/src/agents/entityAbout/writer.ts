@@ -17,7 +17,7 @@ import {
   type AboutWebSource,
 } from "./webTools";
 
-const MAX_TURNS = 64;
+const MAX_TURNS = 128;
 
 export type EntityAboutWriterResult = {
   draft: AboutDraft;

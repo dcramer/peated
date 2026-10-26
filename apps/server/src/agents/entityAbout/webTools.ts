@@ -25,7 +25,7 @@ export function toPlainText(markdown: string) {
 export type WebBudget = { searches: number; reads: number };
 
 /** The writer's web allowance for one run. */
-export const ABOUT_WEB_BUDGET: WebBudget = { searches: 16, reads: 24 };
+export const ABOUT_WEB_BUDGET: WebBudget = { searches: 32, reads: 48 };
 
 const SearchResponseSchema = z
   .object({
