@@ -27,6 +27,19 @@ export function toPlainText(markdown: string) {
     .replace(new RegExp(String.raw`\[([^\]]*)\]` + target, "g"), "$1");
 }
 
+/**
+ * Puts a page's published date from its metadata at the top of its text.
+ * Main-content extraction often drops the dateline, which leaves a dated
+ * article looking undated.
+ */
+export function withPublishedDate(
+  text: string,
+  publishedTime: string | null | undefined,
+) {
+  const date = /^\d{4}-\d{2}-\d{2}/.exec(publishedTime ?? "")?.[0];
+  return date ? `Published ${date}.\n\n${text}` : text;
+}
+
 export type WebBudget = { searches: number; reads: number };
 
 /** The writer's web allowance for one run. */
@@ -58,7 +71,11 @@ const ScrapeResponseSchema = z
       .object({
         markdown: z.string().nullable().optional(),
         metadata: z
-          .object({ title: z.string().nullable().optional() })
+          .object({
+            title: z.string().nullable().optional(),
+            publishedTime: z.string().nullable().optional(),
+            "article:published_time": z.string().nullable().optional(),
+          })
           .passthrough()
           .optional(),
       })
@@ -152,9 +169,13 @@ export function createFirecrawlSource({
           },
         }),
       );
+      const metadata = payload.data.metadata;
       return {
-        title: payload.data.metadata?.title ?? null,
-        text: toPlainText(payload.data.markdown ?? ""),
+        title: metadata?.title ?? null,
+        text: withPublishedDate(
+          toPlainText(payload.data.markdown ?? ""),
+          metadata?.publishedTime ?? metadata?.["article:published_time"],
+        ),
       };
     },
   };
