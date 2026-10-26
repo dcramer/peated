@@ -579,11 +579,16 @@ function statesSingle(
     .split(" ")[0]!;
   const singular = noun.replace(/s$/, "");
   const text = ` ${normalizeForQuote(quotes.join(" "))} `;
-  // Whole words: "one washback" does not state 1 wash still.
-  return ["one", "a single"].some((count) =>
-    [singular, `${singular}s`].some((word) =>
-      text.includes(` ${count} ${word} `),
-    ),
+  // Whole words: "one washback" does not state 1 wash still. A name may sit
+  // between, as in "one Carter Head still", but "one of the stills" does not
+  // state 1.
+  const named = new RegExp(
+    ` (?:one|a single) (?:(?!of |the |\\d)\\S+ ){0,3}${singular} `,
+  );
+  return (
+    ["one", "a single"].some((count) =>
+      text.includes(` ${count} ${singular}s `),
+    ) || named.test(text)
   );
 }
 

@@ -1018,6 +1018,8 @@ describe("checkConflictPicks", () => {
         null,
       ).siteFacts.otherStills;
     expect(otherStills("It installed a single still for gin.")).toBeDefined();
+    expect(otherStills("One Carter Head still makes gin.")).toBeDefined();
+    expect(otherStills("It is one of the stills.")).toBeUndefined();
     // Millions are read as whole numbers.
     expect(stills(1600000, "It makes 1.6m litres of alcohol.")).toBeDefined();
     expect(stills(2000000, "It makes 2 million litres.")).toBeDefined();
