@@ -2,15 +2,19 @@ import { mockBrora, mockEntityAbouts } from "@peated/server/orpc/mock/fixtures";
 import { describe, expect, it } from "vitest";
 
 import {
+  ABOUT_MAX_SENTENCE_CITATIONS,
   fillYears,
   getAxisYears,
   getCitationNumbers,
+  getDisagreementTopic,
   getEraContext,
   getKeyFacts,
   getLabeledYears,
   getNameSpans,
   getOperatingSpans,
   getOwners,
+  getSentenceSources,
+  getSourceNames,
   linkEntityMentions,
   type AboutSection,
   type EntityAbout,
@@ -83,8 +87,58 @@ describe("getCitationNumbers", () => {
   it("numbers sources in the order the page first cites them", () => {
     const numbers = getCitationNumbers(brora, getKeyFacts(brora, "Brora"));
 
-    expect([...numbers.keys()].slice(0, 3)).toEqual(["hes", "df", "wf2"]);
+    // The lead's first sentence shows its strongest three sources.
+    expect([...numbers.keys()].slice(0, 3)).toEqual(["hes", "wf2", "wp"]);
     expect(new Set(numbers.values()).size).toBe(numbers.size);
+  });
+});
+
+describe("getSentenceSources", () => {
+  const about: EntityAbout = {
+    ...brora,
+    sources: [
+      { ...brora.sources[0]!, id: "p1", kind: "press" },
+      { ...brora.sources[0]!, id: "r1", kind: "reference" },
+      { ...brora.sources[0]!, id: "o1", kind: "official" },
+      { ...brora.sources[0]!, id: "p2", kind: "press" },
+      { ...brora.sources[0]!, id: "r2", kind: "reference" },
+    ],
+  };
+
+  it("shows at most a few sources, the strongest first, in page order", () => {
+    const shown = getSentenceSources(about, ["p1", "r1", "o1", "p2", "r2"]);
+
+    expect(shown).toHaveLength(ABOUT_MAX_SENTENCE_CITATIONS);
+    expect(shown).toEqual(["r1", "o1", "r2"]);
+  });
+
+  it("keeps every source when there are only a few", () => {
+    expect(getSentenceSources(about, ["p2", "p1"])).toEqual(["p2", "p1"]);
+  });
+
+  it("numbers only the sources a sentence shows", () => {
+    const numbers = getCitationNumbers(
+      {
+        ...about,
+        lead: {
+          key: "lead",
+          heading: null,
+          eraEventId: null,
+          sentences: [
+            {
+              text: "x",
+              factIds: [],
+              sourceIds: ["p1", "r1", "o1", "p2", "r2"],
+            },
+          ],
+        },
+        sections: [],
+        events: [],
+      },
+      [],
+    );
+
+    expect([...numbers.keys()]).toEqual(["r1", "o1", "r2"]);
   });
 });
 
@@ -266,5 +320,78 @@ describe("linkEntityMentions", () => {
     );
 
     expect(linkedText(parts)).toEqual([["The Clynelishes were rivals."]]);
+  });
+});
+
+describe("getDisagreementTopic", () => {
+  const event = brora.events[0]!;
+
+  it("names the new owner, so two takeovers get different headings", () => {
+    const takeover = (name: string) =>
+      getDisagreementTopic({
+        ...event,
+        kind: "acquired",
+        newOwner: null,
+        newOwnerName: name,
+      });
+
+    expect(takeover("Watney Mann")).toBe("when Watney Mann took over");
+    expect(takeover("Grand Metropolitan")).toBe(
+      "when Grand Metropolitan took over",
+    );
+  });
+
+  it("prefers the linked owner's name", () => {
+    expect(
+      getDisagreementTopic({
+        ...event,
+        kind: "acquired",
+        newOwner: { id: 5558, name: "Diageo", kind: "company" },
+        newOwnerName: "Diageo plc",
+      }),
+    ).toBe("when Diageo took over");
+  });
+
+  it("names the new name of a rename", () => {
+    expect(
+      getDisagreementTopic({ ...event, kind: "renamed", name: "Brora" }),
+    ).toBe("when it became Brora");
+  });
+
+  it("falls back to the kind of change", () => {
+    expect(
+      getDisagreementTopic({
+        ...event,
+        kind: "acquired",
+        newOwner: null,
+        newOwnerName: null,
+      }),
+    ).toBe("when the owner changed");
+  });
+});
+
+describe("getSourceNames", () => {
+  it("names each source once", () => {
+    const about: EntityAbout = {
+      ...brora,
+      sources: [
+        {
+          ...brora.sources[0]!,
+          id: "a",
+          publisher: "Historic Environment Scotland",
+        },
+        {
+          ...brora.sources[0]!,
+          id: "b",
+          publisher: "Historic Environment Scotland",
+        },
+        { ...brora.sources[0]!, id: "c", publisher: "Wikipedia" },
+      ],
+    };
+
+    expect(getSourceNames(about, ["a", "b", "c"])).toEqual([
+      "Historic Environment Scotland",
+      "Wikipedia",
+    ]);
   });
 });

@@ -139,6 +139,13 @@ before a pass comes from the earlier `add` or `update` row.
 - Producer product pages for sold-out releases often drop off live sites. A
   Wayback capture of a producer news page can still hold the full-size image,
   but client-rendered shop pages (malts.com 2020–2021) capture blank.
+  The earlier malts.com site (2016–2019, `/en-us/our-whisky-collection/`)
+  captures with text, but most of its `/media/<id>/` packshots were never
+  archived; list a product's media links first, then check each in the CDX
+  index.
+- Rare Malts Selection 75 cl and US 750 ml labels of one release share one
+  bottle-number run. Compilations that list them as "1995, USA" and "1996,
+  75 cl" rows do not prove two bottlings; the labels print no bottling year.
 - Creating an Entity with an address triggers geocoding that can replace the
   address with a wrong street. Re-read the Entity and correct the address and
   coordinates.

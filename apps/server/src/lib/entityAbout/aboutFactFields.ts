@@ -17,6 +17,7 @@ export const ABOUT_FACT_FIELD_LIST = [
   "stillDesign",
   "condensers",
   "spiritCharacter",
+  "mainUse",
 ] as const;
 
 export type AboutFactField = (typeof ABOUT_FACT_FIELD_LIST)[number];
@@ -141,6 +142,14 @@ export const ABOUT_FACT_FIELDS = {
     label: "Spirit character",
     description:
       "A style word a source uses for the new spirit, such as waxy, not tasting notes",
+    type: "text",
+    unit: null,
+    kinds: ["distillery"],
+  },
+  mainUse: {
+    label: "Mainly used for",
+    description:
+      "What its spirit mostly goes into, such as a named blend or the owner's blends",
     type: "text",
     unit: null,
     kinds: ["distillery"],

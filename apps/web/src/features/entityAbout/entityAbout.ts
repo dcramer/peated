@@ -159,6 +159,42 @@ export function linkEntityMentions(
   });
 }
 
+const DISAGREEMENT_TOPICS = {
+  acquired: "when the owner changed",
+  closed: "when it closed",
+  era: "when this period ran",
+  generic: "the date",
+  mothballed: "when it was mothballed",
+  opened: "when it opened",
+  renamed: "when the name changed",
+  reopened: "when it reopened",
+} satisfies Record<AboutEvent["kind"], string>;
+
+/**
+ * What a "Sources disagree" note is about. An owner change or rename names the
+ * owner or name, so notes for two takeovers never share a heading.
+ */
+export function getDisagreementTopic(event: AboutEvent) {
+  const owner = event.newOwner?.name ?? event.newOwnerName;
+  if (event.kind === "acquired" && owner) return `when ${owner} took over`;
+  if (event.kind === "renamed" && event.name) {
+    return `when it became ${event.name}`;
+  }
+  return DISAGREEMENT_TOPICS[event.kind];
+}
+
+/** The names of the sources behind a value, each once. */
+export function getSourceNames(
+  about: EntityAbout,
+  sourceIds: readonly string[],
+) {
+  const names = sourceIds.flatMap((id) => {
+    const source = about.sources.find((item) => item.id === id);
+    return source ? [source.publisher ?? source.title] : [];
+  });
+  return [...new Set(names)];
+}
+
 export function getEras(about: EntityAbout): AboutSpan[] {
   return about.events.flatMap((event) =>
     event.kind === "era" && event.title
@@ -217,6 +253,30 @@ export function getKeyFacts(
 }
 
 /** Numbers sources in the order the page first cites them. */
+// Display rule (owner: docs/features/entity-about.md): a sentence shows at
+// most this many sources, the strongest first; the full list stays in the
+// timeline and the Sources section.
+export const ABOUT_MAX_SENTENCE_CITATIONS = 3;
+
+const SOURCE_KIND_RANK = { official: 0, reference: 1, press: 2 };
+
+/** The sources a sentence shows: the strongest few, in the order given. */
+export function getSentenceSources(
+  about: EntityAbout,
+  sourceIds: readonly string[],
+) {
+  const rank = (id: string) => {
+    const kind = about.sources.find((source) => source.id === id)?.kind;
+    return kind ? SOURCE_KIND_RANK[kind] : 3;
+  };
+  return [...new Set(sourceIds)]
+    .map((id, index) => ({ id, index }))
+    .sort((a, b) => rank(a.id) - rank(b.id) || a.index - b.index)
+    .slice(0, ABOUT_MAX_SENTENCE_CITATIONS)
+    .sort((a, b) => a.index - b.index)
+    .map((entry) => entry.id);
+}
+
 export function getCitationNumbers(
   about: EntityAbout,
   keyFacts: readonly AboutKeyFact[],
@@ -231,7 +291,9 @@ export function getCitationNumbers(
     (section) => section !== null,
   );
   for (const section of sections) {
-    for (const sentence of section.sentences) cite(sentence.sourceIds);
+    for (const sentence of section.sentences) {
+      cite(getSentenceSources(about, sentence.sourceIds));
+    }
   }
   keyFacts.forEach((fact) => cite(fact.sourceIds));
   for (const event of about.events) {

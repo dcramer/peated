@@ -9,7 +9,11 @@ import type {
   BottleExtractedDetails,
 } from "@peated/bottle-classifier/internal/types";
 
-/** Bottle resolution owns these rules for every source; callers own permissions and saved state. */
+/**
+ * Bottle resolution owns these rules for every source; callers own permissions and saved state.
+ * An ignored classification (rule or classifier judgment that the source is not one whisky
+ * Bottle) never reaches this check: callers stop tracking that source without review.
+ */
 export function assessBottleResolution({
   decision,
   candidates = [],

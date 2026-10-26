@@ -3,9 +3,9 @@
 Auction listings belong to a sale occurrence, not a physical bottle. Peated
 links each supported single-bottle lot to one Bottle. The same release
 can have several simultaneous lots or return in a later auction without
-overwriting history. Only single whisky bottles are in scope. Sets,
-multipacks, miniatures, samples (including trade duty-paid samples),
-glassware and other accessories, and other spirits are not.
+overwriting history. Auctions track single whisky bottles only. Sets,
+multipacks, miniatures, samples (including duty-paid trade samples), glassware
+and other accessories, and other spirits are out of scope.
 
 ## Stored records
 
@@ -132,7 +132,9 @@ as other sources. Creation and lot assignment commit together; an exact duplicat
 may reuse its existing Bottle. The saved check and attributed decision remain
 in history. Unsupported proposals stay in review. Auction matching never edits
 existing catalog facts, copies source images, or automatically accepts new
-references. Ignored classifications stay out of the Inbox.
+references. When the classifier finds that a lot is out of scope, the lot
+becomes `ignored`, just as with "Ignore lot": it leaves the Inbox, rechecks skip
+it, and assignment rejects it until a source identity change reopens it.
 
 Bottle merges move lots, alert references, and watches to the replacement Bottle;
 duplicate member watches collapse, preserving the earlier subscription time.

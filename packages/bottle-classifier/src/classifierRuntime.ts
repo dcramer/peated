@@ -1575,6 +1575,20 @@ export function createBottleClassifier(
         }),
       };
       options.observeReferenceAgentDecision?.(agentResult.decision);
+      // Scope is the agent's judgment: anything that is not one whisky Bottle
+      // is ignored, and callers stop tracking the source.
+      if (agentResult.decision.action === "ignore") {
+        return {
+          result: BottleClassificationResultSchema.parse(
+            createIgnoredReferenceClassification(
+              agentResult.decision.rationale?.trim() ||
+                "The classifier found that the source is not one whisky Bottle.",
+              agentResult.artifacts,
+            ),
+          ),
+          modelMetadata: agentRun.modelMetadata,
+        };
+      }
       const finalized = await finalizeBottleClassifierAgentResult({
         reference: parsedInput.reference,
         agentResult,

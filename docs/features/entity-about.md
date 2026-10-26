@@ -24,7 +24,8 @@ The document holds:
   short quote.
 - **Site facts**: typed facts about a production site, such as the number of
   stills or the water source, and how it makes its spirit: malting, peating,
-  washbacks, fermentation time, distillation, still shape, and condensers.
+  washbacks, fermentation time, distillation, still shape, and condensers,
+  and what its spirit is mainly used for, such as a named blend.
   These undated details can only reach the page as site facts, since every
   sentence cites a fact. `apps/server/src/lib/entityAbout/aboutFactFields.ts`
   lists them. Adding one is one entry there; a text value must appear word for
@@ -67,12 +68,18 @@ nothing stored can go stale:
   a more exact form of the other, such as `1983` and `1983-03`, agree. Ranges
   such as `1969–1973` agree when their starts and ends do. For history, only
   stated dates count; a source that states a name instead does not disagree.
+  The note names the new owner or name for an owner change or rename, such as
+  "when Watney Mann took over", and lists each source once.
 - A sentence that rests on a hidden fact is left out.
 - A sentence links another Entity's name when one of its cited events links
   that Entity and the sentence uses the Entity's exact current name as a whole
   word. Each Entity links once per section, and the page never links itself.
   `linkEntityMentions` in `apps/web/src/features/entityAbout/entityAbout.ts`
   owns this.
+- A sentence shows at most 3 source numbers: the strongest of its sources
+  (official, then reference, then press), in the order the page cites them.
+  Key facts show no source numbers. The timeline and the Sources section
+  still list every source.
 - Quotes stay private. The page lists sources and the date the page was last
   checked, and says nothing else about how the text was written.
 

@@ -17,7 +17,7 @@ The package has three separate entry points:
 - `extractBottleReferenceIdentity(...)` reads facts from text or an image. It
   does not decide Peated identity.
 - `classifyBottleReference(...)` returns `match`, `create_bottle`, or
-  `no_match`, or ignores input that is not one whisky Bottle.
+  `no_match`, or ignores input that is not one whisky Bottle (see Scope).
 - `auditBottle(...)` checks an existing Bottle and returns a summary, Suggested
   Changes (`ProposedOperation` in code), and findings. It does not return a
   second reference decision.
@@ -33,6 +33,28 @@ must not assign a candidate that the classifier did not match.
 Catalog correction is separate from reference resolution. A reference result
 never includes a Suggested Change. An audit never changes which Bottle a
 reference identifies.
+
+## Scope
+
+Peated tracks single whisky Bottles. A source that is something else is
+ignored: another spirit, a flavored whisky or whiskey liqueur, several items
+sold together (a set, multipack, bundle, or a Bottle sold with glassware or
+samples), a miniature, a sample of any size (such as a cask or trade sample), or
+glassware and other accessories. A Bottle in its own box or tin is still one
+Bottle. Scope is about what is sold, not how clearly the source names it: a
+whisky Bottle with unclear identity is `no_match`, not ignored. An ignored
+result has a reason and no decision, and every caller stops tracking that source
+without review.
+
+The agent decides scope. It returns the `ignore` action, and the runtime turns
+it into the ignored result, so a saved decision is always `match`,
+`create_bottle`, or `no_match`. A few explicit names are ignored by code before
+the agent runs (see Agent And Tool Boundary). Do not add phrase or keyword rules
+for scope; improve the agent's evidence or instructions instead.
+
+A flavored product is ignored only with product evidence that flavor was added.
+A flavor-adjacent word in a name is not enough. The agent ignores an
+out-of-scope source even when Peated already has a Bottle for it.
 
 ## Bottle Identity
 
@@ -67,10 +89,6 @@ this role.
 
 False matches are worse than `no_match` or reviewed creation.
 
-- A product made by combining whisky with added flavor is outside the whisky
-  catalog. Return `no_match` even when Peated already has a Bottle for it. A
-  flavor-adjacent word in a name is not enough to apply this rule; require
-  product evidence that establishes the addition.
 - Match only when the candidate covers the complete observed Bottle and no
   populated identity field conflicts.
 - A missing candidate field is compatible when evidence identifies the same
@@ -184,7 +202,11 @@ barcode or accepted-name reuse. It compares only typed fields: category, age,
 no-age statement, ABV, vintage year, bottling year, release date, cask number,
 the cask-strength and single-cask flags, and edition. An empty field on either
 side is missing, never a conflict. Code never compares Brands, names, or other
-free text; the agent, or the person on submission, owns those judgments.
+free text; the agent, or the person on submission, owns those judgments. For
+the agent, a stored Brand, bottler, or distillery blocks a match only when
+evidence contradicts it. One the source does not show is not a conflict: a
+label naming only the distillery does not block a candidate with a stored
+bottler, but a stored Brand of `Canadian` for a Canadian Club Bottle does.
 
 - ABV conflicts on any difference.
 - A cask number ignores a leading `#` and letter case. Other punctuation
@@ -255,7 +277,9 @@ does not run for structured input or a deterministic match. A failed or empty
 read is recorded and classification continues with a fresh page-read allowance.
 
 Explicit bundle, multi-bottle, and damaged-condition names are ignored before
-text extraction. Other ignored input does not run the agent. An exact stored
+text extraction. A clear non-whisky category word or packaging-only gift-set
+name is ignored after extraction finds no whisky identity. These existing rules
+skip the agent; every other scope judgment belongs to the agent. An exact stored
 reference may use the preflight above. All other reference decisions use one bounded agent loop.
 Deterministic identifiers such as SMWS are input anchors, not bypasses.
 

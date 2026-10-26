@@ -13,9 +13,12 @@ import {
   ABOUT_MIN_VINTAGE_BOTTLES,
   countWithYear,
   fillYears,
+  getDisagreementTopic,
   getEras,
   getNameSpans,
   getOperatingSpans,
+  getSentenceSources,
+  getSourceNames,
   linkEntityMentions,
   type AboutEvent,
   type AboutSection,
@@ -48,17 +51,6 @@ const reviewedFormatter = new Intl.DateTimeFormat("en-GB", {
   year: "numeric",
   timeZone: "UTC",
 });
-
-const DISAGREEMENT_TOPICS = {
-  acquired: "when the owner changed",
-  closed: "when it closed",
-  era: "when this period ran",
-  generic: "the date",
-  mothballed: "when it was mothballed",
-  opened: "when it opened",
-  renamed: "when the name changed",
-  reopened: "when it reopened",
-} satisfies Record<AboutEvent["kind"], string>;
 
 export function Citations({
   ids,
@@ -107,7 +99,7 @@ function Disagreement({
   return (
     <aside {...stylex.props(styles.disagreement)}>
       <p {...stylex.props(foundationStyles.fieldLabel, styles.noteLabel)}>
-        Sources disagree: {DISAGREEMENT_TOPICS[event.kind]}
+        Sources disagree: {getDisagreementTopic(event)}
       </p>
       <ul {...stylex.props(styles.disagreementList)}>
         {event.disagreement.values.map((entry) => (
@@ -115,13 +107,7 @@ function Disagreement({
             key={entry.value}
             {...stylex.props(foundationStyles.body, styles.muted)}
           >
-            {entry.value}:{" "}
-            {entry.sourceIds
-              .flatMap((id) => {
-                const source = about.sources.find((item) => item.id === id);
-                return source ? [source.publisher ?? source.title] : [];
-              })
-              .join(", ")}
+            {entry.value}: {getSourceNames(about, entry.sourceIds).join(", ")}
             <Citations ids={entry.sourceIds} numbers={numbers} />
           </li>
         ))}
@@ -436,7 +422,10 @@ function Sentences({
           part.text
         ),
       )}
-      <Citations ids={sentence.sourceIds} numbers={numbers} />
+      <Citations
+        ids={getSentenceSources(about, sentence.sourceIds)}
+        numbers={numbers}
+      />
     </span>
   ));
 }
