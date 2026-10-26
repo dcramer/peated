@@ -3,7 +3,7 @@ import { z } from "zod";
 
 export const DEFAULT_BOTTLE_CLASSIFIER_MODEL = "gpt-6-luna";
 export const DEFAULT_BOTTLE_CLASSIFIER_REASONING_EFFORT = "high";
-export const DEFAULT_OPENAI_MODEL = "gpt-5.4";
+export const DEFAULT_OPENAI_MODEL = "gpt-6-luna";
 export const DEFAULT_OPENAI_IMAGE_EXTRACTION_MODEL = "gpt-6-luna";
 export const DEFAULT_OPENAI_IMAGE_EXTRACTION_REASONING_EFFORT = "high";
 

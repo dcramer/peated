@@ -22,7 +22,7 @@ describe("resolveOpenAICompatibleConfig", () => {
       baseURL: "https://ai-gateway.vercel.sh/v1",
       bottleClassifierModel: "openai/gpt-6-luna",
       embeddingModel: "openai/text-embedding-3-large",
-      model: "openai/gpt-5.4",
+      model: "openai/gpt-6-luna",
     });
   });
 
@@ -40,7 +40,7 @@ describe("resolveOpenAICompatibleConfig", () => {
       embeddingModel: "openai/text-embedding-3-large",
       imageExtractionModel: "openai/gpt-6-luna",
       imageExtractionReasoningEffort: "high",
-      model: "openai/gpt-5.4",
+      model: "openai/gpt-6-luna",
       reasoningEffort: undefined,
     });
     expect(getStableOpenAISettings(config.model)).toEqual({});
