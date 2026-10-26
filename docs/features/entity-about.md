@@ -67,6 +67,8 @@ nothing stored can go stale:
   a more exact form of the other, such as `1983` and `1983-03`, agree. Ranges
   such as `1969–1973` agree when their starts and ends do. For history, only
   stated dates count; a source that states a name instead does not disagree.
+  The note names the new owner or name for an owner change or rename, such as
+  "when Watney Mann took over", and lists each source once.
 - A sentence that rests on a hidden fact is left out.
 - A sentence links another Entity's name when one of its cited events links
   that Entity and the sentence uses the Entity's exact current name as a whole
