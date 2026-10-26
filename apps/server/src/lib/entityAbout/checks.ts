@@ -421,10 +421,12 @@ function writeNumberWords(value: string) {
 // "20 m" are not millions.
 function expandLargeNumbers(value: string) {
   // "mlpa" is million litres of pure alcohol: "4.8 mlpa", or a table label
-  // such as "Capacity (mlpa) 3.4".
+  // such as "Capacity (mlpa) 3.4", where an "i" info icon may sit between.
   const millionLitres = (n: string) => String(Math.round(Number(n) * 1e6));
   return value
-    .replace(/\(mlpa\)\s*(\d+(?:\.\d+)?)/gi, (_, n: string) => millionLitres(n))
+    .replace(/\(mlpa\)\s*(?:i\s+)?(\d+(?:\.\d+)?)/gi, (_, n: string) =>
+      millionLitres(n),
+    )
     .replace(/\b(\d+(?:\.\d+)?)\s*mlpa\b/gi, (_, n: string) => millionLitres(n))
     .replace(
       /\b(\d+(?:\.\d+)?)(m|\s*million|bn|\s*billion)\b/gi,

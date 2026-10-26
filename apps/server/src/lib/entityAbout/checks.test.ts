@@ -740,6 +740,7 @@ describe("checkConflictPicks", () => {
     // "mlpa" (million litres of pure alcohol) states millions, after the
     // number or as a table label before it.
     expect(stills(3400000, "Capacity (mlpa) 3.4")).toBeDefined();
+    expect(stills(3400000, "Capacity (mlpa)\ni\n3.4")).toBeDefined();
     expect(stills(4800000, "It makes 4.8 mlpa.")).toBeDefined();
     expect(stills(3400000, "Capacity (mlpa) 3.4 since 2018")).toBeDefined();
     expect(
