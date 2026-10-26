@@ -120,6 +120,8 @@ A brand:
 ${JSON.stringify(buildExample(JOHNNIE_WALKER_ABOUT_EXAMPLE, new Set([1, 5, 8, 9, 10]), ["lead", "owners"]), null, 1)}`;
 
 export type EntityAboutWriterInput = {
+  /** Today's date as YYYY-MM-DD, so the writer can tell how old a page is. */
+  today: string;
   name: string;
   kind: string;
   aliases: string[];
@@ -141,6 +143,7 @@ export type EntityAboutWriterInput = {
 /** The per-Entity request for one writer run. */
 export function buildEntityAboutInput(input: EntityAboutWriterInput) {
   const lines = [
+    `Today's date: ${input.today}`,
     `Write the About page for this ${input.kind}:`,
     `Name: ${input.name}`,
     input.aliases.length ? `Also known as: ${input.aliases.join(", ")}` : null,
