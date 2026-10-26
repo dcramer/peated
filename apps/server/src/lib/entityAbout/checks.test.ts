@@ -588,6 +588,29 @@ describe("checkConflictPicks", () => {
     expect(reopened("1948")).toBe(0);
   });
 
+  test("reads a range that ends in one digit", () => {
+    const quote = "The buildings were rebuilt in 1963-4.";
+    const rebuilt = (text: string) =>
+      keepVerifiedCitations(
+        draft({
+          events: [
+            {
+              id: 1,
+              kind: "generic",
+              date: "1963",
+              text,
+              citations: [{ sourceId: "wp", statedValue: "1963", quote }],
+            },
+          ],
+        }),
+        [{ ...page, text: `${page.text} ${quote}` }],
+        null,
+      ).events.length;
+
+    expect(rebuilt("It was rebuilt in 1963-4.")).toBe(1);
+    expect(rebuilt("It was rebuilt in 1963-5.")).toBe(0);
+  });
+
   test("reads a year range written with a slash", () => {
     const quote = "Alfred Barnard visited in 1893/94.";
     const visited = (statedValue: string) =>
