@@ -123,7 +123,10 @@ version. It may keep, correct, add, or drop anything. After its first pages,
 it lists the gaps in the history, such as long spans with no event or people
 named without a date, and searches for each before it stops. The page aims
 for the history an expert would tell in about half an hour: every period and
-turning point, not every bottling. Its length follows the evidence. Code then checks
+turning point, not every bottling. Its length follows the evidence. The
+writer keeps searching while gaps remain and more than a third of its searches
+are left. When sources disagree on a date and none ranks higher, it keeps the
+fact with the first source's value, and the page shows the disagreement. Code then checks
 it:
 
 - Every item matches the stored schema, including its length limits.
