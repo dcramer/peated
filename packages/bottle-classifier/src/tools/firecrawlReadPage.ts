@@ -162,7 +162,9 @@ export async function runFirecrawlReadPage({
         url,
         formats: [{ type: "highlights", query: focus }],
         onlyMainContent: true,
-        proxy: "basic",
+        // "auto" tries a basic request first and retries through
+        // Firecrawl's stealth proxy only when the site blocks it.
+        proxy: "auto",
       }),
     });
 
