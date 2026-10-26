@@ -159,6 +159,42 @@ export function linkEntityMentions(
   });
 }
 
+const DISAGREEMENT_TOPICS = {
+  acquired: "when the owner changed",
+  closed: "when it closed",
+  era: "when this period ran",
+  generic: "the date",
+  mothballed: "when it was mothballed",
+  opened: "when it opened",
+  renamed: "when the name changed",
+  reopened: "when it reopened",
+} satisfies Record<AboutEvent["kind"], string>;
+
+/**
+ * What a "Sources disagree" note is about. An owner change or rename names the
+ * owner or name, so notes for two takeovers never share a heading.
+ */
+export function getDisagreementTopic(event: AboutEvent) {
+  const owner = event.newOwner?.name ?? event.newOwnerName;
+  if (event.kind === "acquired" && owner) return `when ${owner} took over`;
+  if (event.kind === "renamed" && event.name) {
+    return `when it became ${event.name}`;
+  }
+  return DISAGREEMENT_TOPICS[event.kind];
+}
+
+/** The names of the sources behind a value, each once. */
+export function getSourceNames(
+  about: EntityAbout,
+  sourceIds: readonly string[],
+) {
+  const names = sourceIds.flatMap((id) => {
+    const source = about.sources.find((item) => item.id === id);
+    return source ? [source.publisher ?? source.title] : [];
+  });
+  return [...new Set(names)];
+}
+
 export function getEras(about: EntityAbout): AboutSpan[] {
   return about.events.flatMap((event) =>
     event.kind === "era" && event.title

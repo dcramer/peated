@@ -5,12 +5,14 @@ import {
   fillYears,
   getAxisYears,
   getCitationNumbers,
+  getDisagreementTopic,
   getEraContext,
   getKeyFacts,
   getLabeledYears,
   getNameSpans,
   getOperatingSpans,
   getOwners,
+  getSourceNames,
   linkEntityMentions,
   type AboutSection,
   type EntityAbout,
@@ -266,5 +268,78 @@ describe("linkEntityMentions", () => {
     );
 
     expect(linkedText(parts)).toEqual([["The Clynelishes were rivals."]]);
+  });
+});
+
+describe("getDisagreementTopic", () => {
+  const event = brora.events[0]!;
+
+  it("names the new owner, so two takeovers get different headings", () => {
+    const takeover = (name: string) =>
+      getDisagreementTopic({
+        ...event,
+        kind: "acquired",
+        newOwner: null,
+        newOwnerName: name,
+      });
+
+    expect(takeover("Watney Mann")).toBe("when Watney Mann took over");
+    expect(takeover("Grand Metropolitan")).toBe(
+      "when Grand Metropolitan took over",
+    );
+  });
+
+  it("prefers the linked owner's name", () => {
+    expect(
+      getDisagreementTopic({
+        ...event,
+        kind: "acquired",
+        newOwner: { id: 5558, name: "Diageo", kind: "company" },
+        newOwnerName: "Diageo plc",
+      }),
+    ).toBe("when Diageo took over");
+  });
+
+  it("names the new name of a rename", () => {
+    expect(
+      getDisagreementTopic({ ...event, kind: "renamed", name: "Brora" }),
+    ).toBe("when it became Brora");
+  });
+
+  it("falls back to the kind of change", () => {
+    expect(
+      getDisagreementTopic({
+        ...event,
+        kind: "acquired",
+        newOwner: null,
+        newOwnerName: null,
+      }),
+    ).toBe("when the owner changed");
+  });
+});
+
+describe("getSourceNames", () => {
+  it("names each source once", () => {
+    const about: EntityAbout = {
+      ...brora,
+      sources: [
+        {
+          ...brora.sources[0]!,
+          id: "a",
+          publisher: "Historic Environment Scotland",
+        },
+        {
+          ...brora.sources[0]!,
+          id: "b",
+          publisher: "Historic Environment Scotland",
+        },
+        { ...brora.sources[0]!, id: "c", publisher: "Wikipedia" },
+      ],
+    };
+
+    expect(getSourceNames(about, ["a", "b", "c"])).toEqual([
+      "Historic Environment Scotland",
+      "Wikipedia",
+    ]);
   });
 });
