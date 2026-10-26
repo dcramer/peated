@@ -526,3 +526,109 @@ describe("POST /auction-lots/recheck", () => {
     );
   });
 });
+
+describe("POST /auction-lots/{lot}/ignore", () => {
+  test("a moderator ignores an out-of-scope lot, which leaves the queue", async ({
+    fixtures,
+  }) => {
+    const data = await reviewedLot(fixtures);
+    await routerClient.auctions.ignore(
+      {
+        lot: data.lot.id,
+        fingerprint: data.lot.sourceFingerprint,
+        expectedBottleId: null,
+        expectedCheckId: data.check.id,
+      },
+      { context: data.context },
+    );
+    expect(await db.query.auctionLots.findFirst()).toMatchObject({
+      bottleId: null,
+      matchStatus: "ignored",
+      matchCheckId: data.check.id,
+      matchedById: data.moderator.id,
+    });
+    const queue = await routerClient.auctions.matchQueue(
+      {},
+      { context: data.context },
+    );
+    expect(queue.results).toHaveLength(0);
+  });
+
+  test("ignoring a matched lot clears its Bottle", async ({ fixtures }) => {
+    const data = await reviewedLot(fixtures);
+    await routerClient.auctions.match(data.input, { context: data.context });
+    await routerClient.auctions.ignore(
+      {
+        lot: data.lot.id,
+        fingerprint: data.lot.sourceFingerprint,
+        expectedBottleId: data.bottle.id,
+        expectedCheckId: data.check.id,
+      },
+      { context: data.context },
+    );
+    expect(await db.query.auctionLots.findFirst()).toMatchObject({
+      bottleId: null,
+      matchStatus: "ignored",
+      availableSince: null,
+    });
+  });
+
+  test("stale versions, a second ignore, and non-moderators are rejected", async ({
+    fixtures,
+  }) => {
+    const data = await reviewedLot(fixtures);
+    const input = {
+      lot: data.lot.id,
+      fingerprint: data.lot.sourceFingerprint,
+      expectedBottleId: null,
+      expectedCheckId: data.check.id,
+    };
+    const member = await fixtures.User();
+    await expect(
+      routerClient.auctions.ignore(input, { context: { user: member } }),
+    ).rejects.toThrow();
+    await expect(
+      routerClient.auctions.ignore(
+        { ...input, fingerprint: "older-version" },
+        { context: data.context },
+      ),
+    ).rejects.toThrow(/changed/i);
+    await expect(
+      routerClient.auctions.ignore(
+        { ...input, expectedCheckId: null },
+        { context: data.context },
+      ),
+    ).rejects.toThrow(/changed/i);
+    expect(await db.query.auctionLots.findFirst()).toMatchObject({
+      matchStatus: "review",
+    });
+    await routerClient.auctions.ignore(input, { context: data.context });
+    await expect(
+      routerClient.auctions.ignore(input, { context: data.context }),
+    ).rejects.toThrow(/already ignored/i);
+  });
+
+  test("a source identity change reopens an ignored lot", async ({
+    fixtures,
+  }) => {
+    const data = await reviewedLot(fixtures);
+    await routerClient.auctions.ignore(
+      {
+        lot: data.lot.id,
+        fingerprint: data.lot.sourceFingerprint,
+        expectedBottleId: null,
+        expectedCheckId: data.check.id,
+      },
+      { context: data.context },
+    );
+    await upsertAuctionObservation(data.site.id, {
+      ...data.observation,
+      lot: { ...data.observation.lot, name: "Example 15 Year Old" },
+      observedAt: new Date(Date.now() + 1000).toISOString(),
+    });
+    expect(await db.query.auctionLots.findFirst()).toMatchObject({
+      matchStatus: "pending",
+      matchedById: null,
+    });
+  });
+});

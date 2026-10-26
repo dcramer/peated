@@ -29,8 +29,8 @@ still shows the listing; see `docs/architecture/store-price-matching.md`.
 
 Auction tasks are keyed by the lot ID, not by a generic classifier-check ID.
 Ended lots stay reviewable for sale history. A reviewer can assign an existing
-Bottle to just that lot, or explicitly remember a name when the saved decision
-supports reuse. The auction screen does not create Bottles or edit catalog
+Bottle to just that lot, explicitly remember a name when the saved decision
+supports reuse, or ignore a lot that is not one whisky bottle. The auction screen does not create Bottles or edit catalog
 facts. See [Whisky auctions](./auctions.md).
 
 Critic-review tasks are keyed by the review ID. Their saved classifier check

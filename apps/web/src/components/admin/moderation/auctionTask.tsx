@@ -58,6 +58,19 @@ export function auctionLotAssignment(
   };
 }
 
+export function auctionLotIgnore(item: {
+  lot: Pick<Item["lot"], "id" | "bottleId">;
+  fingerprint: string;
+  matchCheckId: number | null;
+}): Inputs["auctions"]["ignore"] {
+  return {
+    lot: item.lot.id,
+    fingerprint: item.fingerprint,
+    expectedBottleId: item.lot.bottleId,
+    expectedCheckId: item.matchCheckId,
+  };
+}
+
 /** Reviews one sale occurrence; learning a reusable name is a separate explicit action. */
 export default function AuctionTask({
   task,
@@ -74,6 +87,8 @@ export default function AuctionTask({
     orpc.auctions.details.queryOptions({ input: { lot: task.source.lotId } }),
   );
   const match = useMutation(orpc.auctions.match.mutationOptions());
+  const ignore = useMutation(orpc.auctions.ignore.mutationOptions());
+  const saving = match.isPending || ignore.isPending;
   const [selecting, setSelecting] = useState(false);
   const [error, setError] = useState<string | null>(null);
 
@@ -88,6 +103,21 @@ export default function AuctionTask({
           : "Auction lot assigned.",
       );
       setSelecting(false);
+    } catch (cause) {
+      setError(
+        cause instanceof Error
+          ? cause.message
+          : "The decision could not be saved. Try again.",
+      );
+    }
+  }
+
+  async function ignoreLot() {
+    setError(null);
+    try {
+      await ignore.mutateAsync(auctionLotIgnore(item));
+      await queryClient.invalidateQueries({ queryKey: orpc.auctions.key() });
+      await onComplete("Auction lot ignored.");
     } catch (cause) {
       setError(
         cause instanceof Error
@@ -153,24 +183,31 @@ export default function AuctionTask({
         {item.suggestedBottle ? (
           <Button
             variant="accent"
-            disabled={match.isPending}
+            disabled={saving}
             loading={match.isPending}
             onClick={() => void assign(item.suggestedBottle!.id)}
           >
             Assign this lot
           </Button>
         ) : null}
-        <Button disabled={match.isPending} onClick={() => setSelecting(true)}>
+        <Button disabled={saving} onClick={() => setSelecting(true)}>
           Choose another bottle
         </Button>
         {item.canRememberReference && item.suggestedBottle ? (
           <Button
-            disabled={match.isPending}
+            disabled={saving}
             onClick={() => void assign(item.suggestedBottle!.id, true)}
           >
             Assign and remember name
           </Button>
         ) : null}
+        <Button
+          disabled={saving}
+          loading={ignore.isPending}
+          onClick={() => void ignoreLot()}
+        >
+          Ignore lot
+        </Button>
       </ModerationActions>
       {item.canRememberReference ? (
         <p>
@@ -178,6 +215,10 @@ export default function AuctionTask({
           only this lot does not teach future matching.
         </p>
       ) : null}
+      <p>
+        Auctions track single whisky bottles only. Ignore samples, sets,
+        glassware, and other spirits.
+      </p>
       <AdminDetails summary="Source facts">
         <AdminCodeBlock>
           {JSON.stringify(
