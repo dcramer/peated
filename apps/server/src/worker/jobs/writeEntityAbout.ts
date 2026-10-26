@@ -14,6 +14,7 @@ import {
   entityAboutNotes,
   entityAliases,
   entityEvents,
+  type Entity,
 } from "@peated/server/db/schema";
 import {
   ABOUT_WRITER_SYSTEM_ACTOR_KEY,
@@ -31,8 +32,10 @@ import {
   EntityAboutWriteError,
   getEntityAbout,
   saveEntityAbout,
+  type StoredEntityAbout,
 } from "@peated/server/lib/entityAbout/store";
 import { logWarn } from "@peated/server/lib/log";
+import type { EntityAboutDocument } from "@peated/server/schemas/entityAbout";
 import type { JobPayload } from "@peated/server/worker/types";
 import { asc, eq } from "drizzle-orm";
 import { z } from "zod";
@@ -90,20 +93,26 @@ async function describeHistory(database: AnyDatabase, entityId: number) {
   );
 }
 
-export type WriteEntityAboutResult =
+export type EntityAboutDraftResult =
   | { status: "disabled" | "skipped" }
-  | { status: "rejected"; errors: string[] }
-  | { status: "saved"; version: number };
+  | {
+      status: "checked";
+      entity: Entity;
+      current: StoredEntityAbout | null;
+      document: EntityAboutDocument;
+      errors: string[];
+    };
 
 /**
- * Writes the next version of an About page for one distillery or brand.
+ * Writes and checks the next version of an About page without saving it.
  * Pipeline rule (owner: docs/features/entity-about.md): the writer returns
- * the whole page, and a draft that fails the checks twice saves nothing.
+ * the whole page, and a draft that fails the checks gets one retry. The
+ * result's `errors` is empty only when the last draft passed every check.
  */
-export async function writeEntityAbout(
+export async function draftEntityAbout(
   input: JobPayload,
   services: WriteEntityAboutServices = defaultServices,
-): Promise<WriteEntityAboutResult> {
+): Promise<EntityAboutDraftResult> {
   const { entityId } = WriteEntityAboutJobArgsSchema.parse(input);
   if (!services.enabled) return { status: "disabled" };
 
@@ -135,8 +144,8 @@ export async function writeEntityAbout(
   // failed draft's citations and links without reading them again.
   const pagesRead: AboutPageRead[] = [];
   const entitiesFound: number[] = [];
-  let accepted = null;
-  for (let attempt = 0; attempt < MAX_ATTEMPTS && !accepted; attempt += 1) {
+  let document!: EntityAboutDocument;
+  for (let attempt = 0; attempt < MAX_ATTEMPTS; attempt += 1) {
     const run = await services.writer({
       entityId: entity.id,
       name: entity.name,
@@ -172,7 +181,7 @@ export async function writeEntityAbout(
     // A retry also learns which facts the checks dropped, so it can fix
     // them instead of leaving them out.
     retryReasons = [...errors, ...reviewed.dropped];
-    let document = reviewed.document;
+    document = reviewed.document;
     // Pipeline rule (owner: docs/features/entity-about.md): with no retry
     // left, the prose is trimmed to the facts the checks kept, and the
     // rest must pass every check again.
@@ -201,15 +210,39 @@ export async function writeEntityAbout(
         errors.push(...trimErrors.map((error) => `After trimming: ${error}`));
       }
     }
-    if (!errors.length) {
-      accepted = keepFoundEntityLinks(
-        document,
-        entitiesFound,
-        current?.document ?? null,
-      );
-    }
+    if (!errors.length) break;
   }
-  if (!accepted) return rejected(entity.id, errors);
+
+  return {
+    status: "checked",
+    entity,
+    current,
+    document: keepFoundEntityLinks(
+      document,
+      entitiesFound,
+      current?.document ?? null,
+    ),
+    errors,
+  };
+}
+
+export type WriteEntityAboutResult =
+  | { status: "disabled" | "skipped" }
+  | { status: "rejected"; errors: string[] }
+  | { status: "saved"; version: number };
+
+/**
+ * Writes the next version of an About page for one Entity and saves it when
+ * it passes every check. A draft that fails twice saves nothing.
+ */
+export async function writeEntityAbout(
+  input: JobPayload,
+  services: WriteEntityAboutServices = defaultServices,
+): Promise<WriteEntityAboutResult> {
+  const draft = await draftEntityAbout(input, services);
+  if (draft.status !== "checked") return draft;
+  const { entity, current, document } = draft;
+  if (draft.errors.length) return rejected(entity.id, draft.errors);
 
   let saved;
   try {
@@ -230,7 +263,7 @@ export async function writeEntityAbout(
       // A page edited during the run fails the version check.
       const result = await saveEntityAbout(tx, {
         entity,
-        document: accepted,
+        document,
         expectedVersion: current?.version ?? null,
         actor,
         checkedOn: services.now().toISOString().slice(0, 10),

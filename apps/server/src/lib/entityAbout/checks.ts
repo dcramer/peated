@@ -503,7 +503,9 @@ function checkSentence(
   }
   const errors: string[] = [];
   const cited = sentence.factIds.map((id) => factText.get(id) ?? "").join(" ");
-  for (const number of readNumbers(sentence.text)) {
+  // Numbers written as words count too, as in event text: "nine hours"
+  // states 9.
+  for (const number of readNumbers(writeNumberWords(sentence.text))) {
     if (!containsNumber(cited, number)) {
       errors.push(`${where} states ${number}, which its facts do not.`);
     }

@@ -361,6 +361,26 @@ describe("checkAboutProse", () => {
     ]);
   });
 
+  test("checks numbers a sentence writes as words", () => {
+    expect(
+      checkAboutProse(
+        draft({
+          events: facts,
+          sections: lead([
+            { text: "It closed in 1983.", factIds: ["event:1"] },
+            {
+              text: "Two years later, nine men rebuilt it.",
+              factIds: ["event:2"],
+            },
+          ]),
+        }),
+      ),
+    ).toEqual([
+      '"Two years later, nine men rebuilt it." (lead) states 2, which its facts do not.',
+      '"Two years later, nine men rebuilt it." (lead) states 9, which its facts do not.',
+    ]);
+  });
+
   test("rejects a stock phrase", () => {
     expect(
       checkAboutProse(

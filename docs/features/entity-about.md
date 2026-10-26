@@ -23,8 +23,12 @@ The document holds:
   event lists its citations: the source, the value the source states, and a
   short quote.
 - **Site facts**: typed facts about a production site, such as the number of
-  stills or the water source. `apps/server/src/lib/entityAbout/aboutFactFields.ts`
-  lists them. Adding one is one entry there.
+  stills or the water source, and how it makes its spirit: malting, peating,
+  washbacks, fermentation time, distillation, still shape, and condensers.
+  These undated details can only reach the page as site facts, since every
+  sentence cites a fact. `apps/server/src/lib/entityAbout/aboutFactFields.ts`
+  lists them. Adding one is one entry there; a text value must appear word for
+  word in one of its quotes.
 - **Sections**: short sentences. Each sentence lists the facts it rests on.
   The section with key `lead` opens the page; every other section has a
   heading.
@@ -64,6 +68,11 @@ nothing stored can go stale:
   such as `1969–1973` agree when their starts and ends do. For history, only
   stated dates count; a source that states a name instead does not disagree.
 - A sentence that rests on a hidden fact is left out.
+- A sentence links another Entity's name when one of its cited events links
+  that Entity and the sentence uses the Entity's exact current name as a whole
+  word. Each Entity links once per section, and the page never links itself.
+  `linkEntityMentions` in `apps/web/src/features/entityAbout/entityAbout.ts`
+  owns this.
 - Quotes stay private. The page lists sources and the date the page was last
   checked, and says nothing else about how the text was written.
 
@@ -112,6 +121,10 @@ links to the About page only when that page exists.
   `ENTITY_ABOUT_WRITER_ENABLED` turns it off; so does a missing
   `AI_GATEWAY_API_KEY` or `FIRECRAWL_API_KEY`, and the admin route then
   refuses to queue it.
+- With `dryRun: true` and one `entity`, the same route runs the writer during
+  the request and returns the checked page and its errors. It saves nothing
+  and queues nothing. Use it to read a draft before a real run publishes it.
+  The request stays open for the whole run.
 
 ## How The Job Writes A Page
 
@@ -142,7 +155,7 @@ it:
   title must appear in a quote. Citations that fail are dropped, then facts
   with no citations left.
 - Every sentence cites facts in the draft. Every year and number in a
-  sentence appears in those facts.
+  sentence, in digits or as a word such as "nine", appears in those facts.
 - When sources disagree on a date or number, the chosen value must be one a
   source states.
 - Length limits depend on how many facts are shown: at most 2 sentences for
