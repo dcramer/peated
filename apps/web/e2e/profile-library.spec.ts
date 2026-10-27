@@ -34,7 +34,7 @@ test.describe("profile Library", () => {
     await expect(savedBottle).toHaveCount(0);
   });
 
-  test("sorts the Library and filters it by a suggested producer", async ({
+  test("sorts and filters the Library, then searches Tastings", async ({
     context,
     page,
   }, testInfo) => {
@@ -68,6 +68,21 @@ test.describe("profile Library", () => {
       `/users/${testUser.username}/library?sort=-created&entity=${testBrand.id}`,
     );
     await expect(libraryBottleLink(page)).toBeVisible();
+
+    // Tastings uses the same search over its own route and filter counts.
+    await page.goto(`/users/${testUser.username}/tastings`);
+    await expect(
+      page.getByRole("heading", { name: "No tastings yet" }),
+    ).toBeVisible();
+    await page
+      .getByRole("searchbox", { name: "Find in these tastings" })
+      .filter({ visible: true })
+      .fill(testBrand.name.slice(0, 4));
+    await expect(
+      page.getByText(
+        "No brands, producers, or bottles in these tastings match.",
+      ),
+    ).toBeVisible();
   });
 });
 
