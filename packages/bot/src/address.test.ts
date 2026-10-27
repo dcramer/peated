@@ -1,12 +1,11 @@
-import waitError from "@peated/server/lib/test/waitError";
 import type { LookupFunction } from "node:net";
-import { vi } from "vitest";
+import { expect, test, vi } from "vitest";
 import {
   createPublicAddressLookup,
-  hasBlockedScraperLiteralAddress,
-  isPublicScraperAddress,
-  ScraperNetworkPolicyError,
-} from "./networkPolicy";
+  hasNonPublicLiteralAddress,
+  isPublicAddress,
+  PublicAddressError,
+} from "./address";
 
 test.each([
   "0.0.0.0",
@@ -27,7 +26,7 @@ test.each([
   "fe80::1",
   "ff02::1",
 ])("rejects the non-public or reserved address %s", (address) => {
-  expect(isPublicScraperAddress(address)).toBe(false);
+  expect(isPublicAddress(address)).toBe(false);
 });
 
 test.each([
@@ -37,7 +36,7 @@ test.each([
   "2001:4860:4860::8888",
   "2606:2800:220:1:248:1893:25c8:1946",
 ])("allows the public address %s", (address) => {
-  expect(isPublicScraperAddress(address)).toBe(true);
+  expect(isPublicAddress(address)).toBe(true);
 });
 
 test.each([
@@ -45,7 +44,7 @@ test.each([
   "http://2130706433/metadata",
   "http://[::1]/metadata",
 ])("rejects the reserved literal URL %s", (url) => {
-  expect(hasBlockedScraperLiteralAddress(new URL(url))).toBe(true);
+  expect(hasNonPublicLiteralAddress(new URL(url))).toBe(true);
 });
 
 function lookupResults(
@@ -77,7 +76,7 @@ test("allows DNS only when every address returned to the socket is public", asyn
     ),
   ).resolves.toBeUndefined();
 
-  await waitError(
+  await expect(
     runLookup(
       createPublicAddressLookup(
         lookupResults([
@@ -86,6 +85,5 @@ test("allows DNS only when every address returned to the socket is public", asyn
         ]),
       ),
     ),
-    ScraperNetworkPolicyError,
-  );
+  ).rejects.toBeInstanceOf(PublicAddressError);
 });

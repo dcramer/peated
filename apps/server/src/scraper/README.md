@@ -13,9 +13,10 @@ It must not call adapters, request controls, robots checks, or scraper HTTP code
 directly. The files are split by responsibility:
 
 - `lifecycle.ts` creates runs and sends them to the worker queue;
-- `runs.ts`, `session.ts`, `http.ts`, `networkPolicy.ts`, `robots.ts`, and
-  `coordinator.ts` own core execution without importing production registry or
-  worker infrastructure;
+- `runs.ts`, `session.ts`, `http.ts`, `robots.ts`, and `coordinator.ts` own
+  core execution without importing production registry or worker
+  infrastructure. Public address checks, robots.txt parsing, and request
+  signing come from [`@peated/bot`](../../../../packages/bot/README.md);
 - `runTimeout.ts` keeps the database and queue timeouts together. It also says
   how often a worker extends the database timeout during slow work such as AI
   setup;
@@ -45,7 +46,10 @@ This is our collection policy, not a claim that every use is legally permitted.
   information separate from source-reported facts.
 - Use conservative request limits, cache unchanged data, and avoid unnecessary
   repeat requests. Back off on temporary failures and rate limits.
-- Respect robots rules. Do not bypass logins, paywalls, blocks, or access controls.
+- Respect robots rules unless an admin made a recorded exception for that
+  website. Do not bypass logins, paywalls, or other access controls. Bot walls
+  and robots.txt exceptions follow the
+  [blocked websites policy](../../../../docs/policies/blocked-websites.md).
 - Record concrete source restrictions and how they relate to the intended use.
   Do not turn broad copyright notices or a missing licence into a requirement to
   request permission. Attribution and low request volume do not erase restrictions.
@@ -396,6 +400,8 @@ that fails the price schema is skipped the same way. Neither fails the run.
 Outbound requests identify as `PeatedBot/1.0 (+https://peated.com/bot)`. The
 public page explains Peated's purpose, request controls, and contact path. Do
 not replace it with a browser identity or add credential/cookie forwarding.
+A request sent through a bypass service after a bot wall follows the
+[blocked websites policy](../../../../docs/policies/blocked-websites.md).
 When `PEATED_BOT_PRIVATE_JWK` is configured, the shared HTTP transport signs
 each request with Cloudflare Web Bot Auth. Follow the
 [PeatedBot request signing runbook](../../../../docs/operations/peated-bot.md)

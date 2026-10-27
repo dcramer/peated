@@ -1,9 +1,8 @@
-import config from "@peated/server/config";
 import { generateNonce, sign, type WebBotSigner } from "web-bot-auth";
 import { signerFromJWK } from "web-bot-auth/crypto";
 import { z } from "zod";
+import { SIGNATURE_AGENT } from "./identity";
 
-const SIGNATURE_AGENT = '"https://peated.com"';
 const SIGNATURE_LIFETIME_MS = 60_000;
 
 let cachedSigner:
@@ -50,15 +49,25 @@ function getSigner(configuredKey: string) {
   return cachedSigner.signer;
 }
 
-export async function signScraperRequest(
-  url: URL,
-  headers: Readonly<Record<string, string>>,
-  created: Date,
-) {
-  const configuredKey = config.PEATED_BOT_PRIVATE_JWK;
-  if (!configuredKey) return new Headers(headers);
+/**
+ * Signs a direct PeatedBot request with Web Bot Auth. Without a private key the
+ * request stays unsigned, which keeps local development working.
+ */
+export async function signRequest({
+  url,
+  headers,
+  created,
+  privateJwk,
+}: {
+  url: URL;
+  headers: Readonly<Record<string, string>>;
+  created: Date;
+  /** The `PEATED_BOT_PRIVATE_JWK` secret, or null when it is not configured. */
+  privateJwk: string | null;
+}) {
+  if (!privateJwk) return new Headers(headers);
 
-  const signer = await getSigner(configuredKey);
+  const signer = await getSigner(privateJwk);
   const signedHeaders = new Headers(headers);
   signedHeaders.set("Signature-Agent", SIGNATURE_AGENT);
   const fields = await sign(new Request(url, { headers: signedHeaders }), {

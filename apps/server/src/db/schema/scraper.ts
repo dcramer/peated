@@ -1,3 +1,4 @@
+import type { RobotsRules } from "@peated/bot";
 import { sql } from "drizzle-orm";
 import {
   bigint,
@@ -13,16 +14,6 @@ import {
   timestamp,
 } from "drizzle-orm/pg-core";
 import { externalSites } from "./externalSites";
-
-export type CachedRobotsRules =
-  | { status: "missing" }
-  | {
-      status: "rules";
-      groups: Array<{
-        userAgents: string[];
-        rules: Array<{ directive: "allow" | "disallow"; path: string }>;
-      }>;
-    };
 
 export const scrapeOriginRobotsModeEnum = pgEnum("scrape_origin_robots_mode", [
   "enforce",
@@ -103,7 +94,7 @@ export const scrapeOrigins = pgTable(
     active: boolean("active").default(true).notNull(),
     robotsMode: scrapeOriginRobotsModeEnum("robots_mode").notNull(),
     robotsRationale: text("robots_rationale"),
-    robotsState: jsonb("robots_state").$type<CachedRobotsRules>(),
+    robotsState: jsonb("robots_state").$type<RobotsRules>(),
     robotsFetchedAt: timestamp("robots_fetched_at"),
     robotsExpiresAt: timestamp("robots_expires_at"),
     createdAt: timestamp("created_at").defaultNow().notNull(),

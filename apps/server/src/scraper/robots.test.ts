@@ -1,3 +1,4 @@
+import { parseRobotsRules } from "@peated/bot";
 import { db } from "@peated/server/db";
 import {
   externalSiteRuns,
@@ -15,8 +16,6 @@ import {
 import type { ScraperHttpClock } from "./http";
 import {
   ensureRobotsAllowed as ensureRobotsAllowedImpl,
-  parseRobotsRules,
-  robotsAllowsUrl,
   ScraperRobotsDeniedError,
 } from "./robots";
 import { createScraperSession } from "./session";
@@ -99,32 +98,6 @@ async function setupRobotsRuntime({
   if (!run) throw new Error("Expected run.");
   return { registry, run };
 }
-
-test("parses user-agent groups and applies longest-match allow precedence", () => {
-  const state = parseRobotsRules(`
-    User-agent: *
-    Disallow: /private
-
-    User-agent: PeatedBot
-    Disallow: /catalog
-    Allow: /catalog/public
-    Disallow: /*.pdf$
-  `);
-
-  expect(robotsAllowsUrl(state, new URL("https://example.com/catalog/a"))).toBe(
-    false,
-  );
-  expect(
-    robotsAllowsUrl(state, new URL("https://example.com/catalog/public/a")),
-  ).toBe(true);
-  expect(robotsAllowsUrl(state, new URL("https://example.com/file.pdf"))).toBe(
-    false,
-  );
-  // The specific PeatedBot group replaces the wildcard group.
-  expect(robotsAllowsUrl(state, new URL("https://example.com/private"))).toBe(
-    true,
-  );
-});
 
 test("uses a fresh SQL cache and refuses a disallowed path without contact", async () => {
   const { registry, run } = await setupRobotsRuntime();

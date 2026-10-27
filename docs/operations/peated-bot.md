@@ -99,9 +99,10 @@ After Cloudflare accepts the submission:
    Cloudflare.
 3. Record the UTC time, source, HTTP status, and scraper run ID in the issue or
    deployment record. Do not record request headers or the fetched body.
-4. If Springbank still returns its Cloudflare block page, record that the site
-   owner must allow PeatedBot. Do not add browser impersonation, proxies, or
-   challenge bypasses.
+4. If Springbank still returns its Cloudflare block page, record that its bot
+   wall blocks signed requests. Do not change the signed PeatedBot request to
+   get past it. Reading that site then follows the
+   [blocked websites policy](../policies/blocked-websites.md).
 
 ## Rotate or recover the key
 

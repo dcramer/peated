@@ -1,11 +1,13 @@
-import { BOT_USER_AGENT } from "@peated/server/constants";
-import { db } from "@peated/server/db";
 import {
-  type CachedRobotsRules,
-  scrapeOrigins,
-} from "@peated/server/db/schema";
+  parseRobotsRules,
+  ROBOTS_CACHE_MS,
+  robotsAllowsUrl,
+  type RobotsRules,
+  RobotsRulesSchema,
+} from "@peated/bot";
+import { db } from "@peated/server/db";
+import { scrapeOrigins } from "@peated/server/db/schema";
 import { and, eq } from "drizzle-orm";
-import { z } from "zod";
 import { resolveScraperOrigin } from "./definitions";
 import {
   requestScraperUrl,
@@ -16,31 +18,7 @@ import {
 } from "./http";
 import type { ScraperRegistry } from "./types";
 
-const ROBOTS_CACHE_MS = 24 * 60 * 60_000;
 const ROBOTS_UNAVAILABLE_RETRY_MS = 15 * 60_000;
-
-const RobotsRuleSchema = z
-  .object({
-    directive: z.enum(["allow", "disallow"]),
-    path: z.string(),
-  })
-  .strict();
-const CachedRobotsRulesSchema = z.discriminatedUnion("status", [
-  z.object({ status: z.literal("missing") }).strict(),
-  z
-    .object({
-      status: z.literal("rules"),
-      groups: z.array(
-        z
-          .object({
-            userAgents: z.array(z.string()),
-            rules: z.array(RobotsRuleSchema),
-          })
-          .strict(),
-      ),
-    })
-    .strict(),
-]);
 
 export class ScraperRobotsDeniedError extends Error {
   override name = "ScraperRobotsDeniedError";
@@ -50,93 +28,7 @@ export class ScraperRobotsDeniedError extends Error {
   }
 }
 
-export function parseRobotsRules(body: string): CachedRobotsRules {
-  const groups: Extract<CachedRobotsRules, { status: "rules" }>["groups"] = [];
-  let current: (typeof groups)[number] | null = null;
-
-  for (const originalLine of body.split(/\r?\n/)) {
-    const line = originalLine.replace(/#.*$/, "").trim();
-    if (!line) continue;
-    const separator = line.indexOf(":");
-    if (separator < 0) continue;
-    const field = line.slice(0, separator).trim().toLowerCase();
-    const value = line.slice(separator + 1).trim();
-
-    if (field === "user-agent") {
-      if (!value) continue;
-      if (!current || current.rules.length > 0) {
-        current = { userAgents: [], rules: [] };
-        groups.push(current);
-      }
-      current.userAgents.push(value.toLowerCase());
-      continue;
-    }
-    if (current && (field === "allow" || field === "disallow") && value) {
-      current.rules.push({ directive: field, path: value });
-    }
-  }
-
-  return { status: "rules", groups };
-}
-
-function matchingUserAgentGroups(
-  state: Extract<CachedRobotsRules, { status: "rules" }>,
-) {
-  const product =
-    BOT_USER_AGENT.split(/[\s/]/, 1)[0]?.toLowerCase() ?? "peatedbot";
-  let specificity = -1;
-  const result: typeof state.groups = [];
-  for (const group of state.groups) {
-    const matchingAgents = group.userAgents.filter(
-      (agent) => agent === "*" || product.startsWith(agent),
-    );
-    if (matchingAgents.length === 0) continue;
-    const groupSpecificity = Math.max(
-      ...matchingAgents.map((agent) => (agent === "*" ? 0 : agent.length)),
-    );
-    if (groupSpecificity > specificity) {
-      specificity = groupSpecificity;
-      result.length = 0;
-    }
-    if (groupSpecificity === specificity) result.push(group);
-  }
-  return result;
-}
-
-function robotsPatternMatches(path: string, pattern: string) {
-  const endAnchored = pattern.endsWith("$");
-  const withoutAnchor = endAnchored ? pattern.slice(0, -1) : pattern;
-  const expression = withoutAnchor
-    .split("*")
-    .map((part) => part.replace(/[.*+?^${}()|[\]\\]/g, "\\$&"))
-    .join(".*");
-  return new RegExp(`^${expression}${endAnchored ? "$" : ""}`).test(path);
-}
-
-export function robotsAllowsUrl(state: CachedRobotsRules, url: URL) {
-  if (state.status === "missing") return true;
-  const path = `${url.pathname}${url.search}`;
-  const matches = matchingUserAgentGroups(state)
-    .flatMap((group) => group.rules)
-    .filter((rule) => robotsPatternMatches(path, rule.path))
-    .map((rule) => ({
-      ...rule,
-      specificity: rule.path.replace(/[*$]/g, "").length,
-    }))
-    .sort((left, right) => {
-      if (left.specificity !== right.specificity) {
-        return right.specificity - left.specificity;
-      }
-      return left.directive === "allow" ? -1 : 1;
-    });
-  return matches[0]?.directive !== "disallow";
-}
-
-async function writeRobotsCache(
-  origin: string,
-  state: CachedRobotsRules,
-  now: Date,
-) {
+async function writeRobotsCache(origin: string, state: RobotsRules, now: Date) {
   await db
     .update(scrapeOrigins)
     .set({
@@ -189,7 +81,7 @@ export async function ensureRobotsAllowed({
   }
 
   const now = clock.now();
-  let state = CachedRobotsRulesSchema.safeParse(origin.robotsState);
+  let state = RobotsRulesSchema.safeParse(origin.robotsState);
   if (
     !state.success ||
     !origin.robotsExpiresAt ||
@@ -212,7 +104,7 @@ export async function ensureRobotsAllowed({
       });
       const parsed = parseRobotsRules(response.body);
       await writeRobotsCache(url.origin, parsed, now);
-      state = CachedRobotsRulesSchema.safeParse(parsed);
+      state = RobotsRulesSchema.safeParse(parsed);
     } catch (error) {
       // Robots rule (RFC 9309 section 2.3.1.3): a 4xx robots.txt answer means
       // the site publishes no rules, so the crawl may proceed. A 5xx answer or a
@@ -224,7 +116,7 @@ export async function ensureRobotsAllowed({
       ) {
         const missing = { status: "missing" } as const;
         await writeRobotsCache(url.origin, missing, now);
-        state = CachedRobotsRulesSchema.safeParse(missing);
+        state = RobotsRulesSchema.safeParse(missing);
       } else if (
         error instanceof ScraperHttpStatusError ||
         (error instanceof ScraperRequestError &&

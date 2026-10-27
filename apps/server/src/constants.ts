@@ -322,7 +322,7 @@ export const defaultHeaders = (url: string) => {
   };
 };
 
-export const BOT_USER_AGENT = "PeatedBot/1.0 (+https://peated.com/bot)";
+export { BOT_USER_AGENT } from "@peated/bot/identity";
 
 export const ALLOWED_VOLUMES = [350, 500, 700, 750, 1000, 1500, 1750];
 

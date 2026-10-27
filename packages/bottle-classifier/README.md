@@ -126,7 +126,8 @@ sent to OpenAI; name another provider in full, such as
 reasoning effort; other names get a fixed temperature and no reasoning setting.
 Without Firecrawl, the classifier has no web
 tools. Pages are read through Firecrawl's `auto` proxy: a basic request first,
-then its stealth proxy when a site blocks it. The eval config loads the repo-root `.env.local`; shell values take
+then its stealth proxy when a site blocks it, under the
+[blocked websites policy](../../docs/policies/blocked-websites.md). The eval config loads the repo-root `.env.local`; shell values take
 precedence.
 
 ## Commands
