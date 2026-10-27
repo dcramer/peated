@@ -76,7 +76,11 @@ that stripped many of these names.
   vintage?
 - **Renames inside a shared BottleGroup.** One example is the Special Releases
   Caol Ila 1978 and 1979 Bottles, which share the name `Caol Ila`. A rename
-  would change every member, and Peated has no group split.
+  would change every member, and Peated has no group split. In the same way,
+  the Chichibu `Ichiro's Malt` group and Alexander Murray's `BenRiach
+10-year-old` and `Tamdhu 7-year-old` groups use the vintage year as the
+  edition. That edition is the only thing telling their members apart, so it
+  stays until the groups are split.
 - **Names whose year is not the vintage**, such as `Fèis Ìle 2005`,
   `Year of the Horse 2026`, and a Lady of the Glen `Ardmore 2013` stored with a
   2010 vintage. Which year does the label print?
