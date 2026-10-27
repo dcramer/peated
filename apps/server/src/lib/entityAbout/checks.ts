@@ -698,7 +698,9 @@ function readNumbers(value: string) {
 // millions and billions expanded ("1600000" in "1.6m").
 function containsNumber(text: string, number: string) {
   const pattern = new RegExp(
-    `(?<!\\d|\\d\\.)${number.replace(".", "\\.")}(?!\\d|\\.\\d)`,
+    // Leading zeros, as in "09 June", state the same number, but the
+    // padded parts of a date such as "2015-06-09" state no count.
+    `(?<!\\d|\\d\\.)(?:(?<![-/:])0+)?${number.replace(".", "\\.")}(?!\\d|\\.\\d)`,
   );
   const written = stripThousands(
     expandJapaneseEras(expandYearRanges(writeNumberWords(text))),

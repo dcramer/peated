@@ -497,6 +497,29 @@ describe("checkAboutProse", () => {
     ]);
   });
 
+  test("reads a day written with a leading zero", () => {
+    const check = (text: string) =>
+      checkAboutProse(
+        draft({
+          events: [
+            event(1, "2015-06-09", "It opened on 09 June 2015."),
+            event(2, "2021", "rebuilt in 2021"),
+          ],
+          sections: lead([{ text, factIds: ["event:1", "event:2"] }]),
+        }),
+      );
+
+    expect(check("It opened on 9 June 2015.")).toEqual([]);
+    // A zero that ends another number, as in "2015", states nothing.
+    expect(check("It had 5 stills.")).toEqual([
+      '"It had 5 stills." (lead) states 5, which its facts do not.',
+    ]);
+    // The padded month in the stored date "2015-06-09" is not a count.
+    expect(check("It had 6 stills.")).toEqual([
+      '"It had 6 stills." (lead) states 6, which its facts do not.',
+    ]);
+  });
+
   test("rejects a stock phrase", () => {
     expect(
       checkAboutProse(
