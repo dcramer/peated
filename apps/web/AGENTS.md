@@ -34,6 +34,13 @@
   task-specific compositions.
   Use `formatBottleDisplayName` or `toBottleListItem` for displayed bottle names.
   API responses used by these helpers must include the BottleGroup summary.
+- `Table` owns every table's headers, alignment, column widths, row links,
+  hover, and narrow-screen columns; do not write other table markup.
+  `TastingTable`, `LibraryTable`, and `AdminTable` (admin search, sort links,
+  and paging) build on it. `CatalogResultsLayout` arranges search, filters,
+  sort, results, and paging around a list or table. Filters that narrow
+  results, such as a kind or country, go in its filter groups, not in a second
+  row of page tabs.
 - `EntityIdentityRow`, `SeriesIdentityRow`, and `LocationIdentityRow` own other
   catalog row identities across lists, sidebars, search, and selection. Keep IDs,
   descriptions, and counts out of identity metadata; place contextual counts and

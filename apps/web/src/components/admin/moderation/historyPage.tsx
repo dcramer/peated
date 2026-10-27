@@ -87,6 +87,7 @@ function HistoryDetails({ eventKey }: { eventKey: string }) {
         ) : null}
         <AdminSection title="Activity">
           <AdminTable
+            caption="Moderation activity"
             items={activity}
             primaryKey={(item) => `${item.label}:${item.occurredAt}`}
             columns={[
@@ -179,6 +180,7 @@ export default function HistoryPage({ selectedKey }: { selectedKey?: string }) {
       </form>
       {data.results.length ? (
         <AdminTable
+          caption="Moderation history"
           items={data.results}
           primaryKey={(event) => event.key}
           url={(event) => eventHref(event, searchParams)}

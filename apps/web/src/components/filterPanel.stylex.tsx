@@ -105,7 +105,7 @@ export type FilterQueryProps = {
   submitLabel?: string;
 };
 
-/** Keeps the query field consistent while the owning route handles results. */
+/** The search field at the top of a FilterRail. Enter submits; the route handles results. */
 export function FilterQuery({
   label,
   onSubmit,
@@ -162,7 +162,8 @@ function FilterQueryForm({
         <span {...stylex.props(foundationStyles.fieldLabel)}>{label}</span>
         <TextInput
           aria-label={label}
-          controlSize="sm"
+          // A sidebar search matches the member search field; Enter submits.
+          controlSize={hasFilterToggle ? "sm" : "md"}
           id={id}
           onChange={(event) => setDraft(event.currentTarget.value)}
           placeholder={placeholder}
@@ -173,16 +174,22 @@ function FilterQueryForm({
       {hasFilterToggle ? (
         <span {...stylex.props(styles.mobileFilterToggle)}>{filterToggle}</span>
       ) : null}
-      <span
-        {...stylex.props(
-          styles.desktopSubmit,
-          hasFilterToggle && styles.panelDesktopSubmit,
-        )}
-      >
-        <Button size="sm" type="submit" variant="tonal">
-          {submitLabel}
-        </Button>
-      </span>
+      {hasFilterToggle ? (
+        <span {...stylex.props(styles.panelDesktopSubmit)}>
+          <Button size="sm" type="submit" variant="tonal">
+            {submitLabel}
+          </Button>
+        </span>
+      ) : (
+        // A sidebar search submits with Enter, like the member search. Narrow
+        // screens show it in the Filters drawer, where View results closes the
+        // drawer without submitting, so it keeps a visible Search button.
+        <span {...stylex.props(styles.mobileSubmit)}>
+          <Button size="md" type="submit" variant="tonal">
+            {submitLabel}
+          </Button>
+        </span>
+      )}
       {hasFilterToggle ? (
         <span {...stylex.props(styles.mobileSubmit)}>
           <IconButton
@@ -194,6 +201,70 @@ function FilterQueryForm({
         </span>
       ) : null}
     </form>
+  );
+}
+
+/**
+ * The filter sidebar beside a list or table: search first, then facet groups,
+ * then Clear filters. It has no heading; the search label and group headings
+ * say what each part does. Pages hide it on narrow screens, where ListControls
+ * shows the same search and groups in its drawer.
+ */
+export function FilterRail({
+  ariaLabel,
+  children,
+  onClear,
+  search,
+}: {
+  ariaLabel?: string;
+  /** Facet groups. */
+  children?: ReactNode;
+  /** Pass only while a filter or search is applied. */
+  onClear?: () => void;
+  search?: ReactNode;
+}) {
+  return (
+    <section aria-label={ariaLabel} {...stylex.props(styles.rail)}>
+      {search}
+      {children}
+      {onClear ? (
+        <Button onClick={onClear} size="sm" variant="text">
+          Clear filters
+        </Button>
+      ) : null}
+    </section>
+  );
+}
+
+export type FilterRailLoadingGroup = {
+  label: string;
+  rows: number;
+  summary?: boolean;
+};
+
+/** Reserves the sidebar's search field and usual groups while counts load. */
+export function FilterRailLoading({
+  groups,
+  searchLabel,
+}: {
+  groups: readonly FilterRailLoadingGroup[];
+  /** The search label, or a placeholder when the route sets it later. */
+  searchLabel?: ReactNode;
+}) {
+  return (
+    <div aria-hidden="true" {...stylex.props(styles.rail)}>
+      {searchLabel ? (
+        <div {...stylex.props(styles.field)}>
+          <span {...stylex.props(foundationStyles.fieldLabel)}>
+            {searchLabel}
+          </span>
+          <span {...stylex.props(styles.loadingSearchField)} />
+        </div>
+      ) : null}
+      {groups.map((group) => (
+        <FacetGroupLoading key={group.label} {...group} />
+      ))}
+    </div>
   );
 }
 
@@ -296,6 +367,19 @@ const styles = stylex.create({
   root: {
     minWidth: 0,
   },
+  rail: {
+    display: "flex",
+    minWidth: 0,
+    flexDirection: "column",
+    gap: space.x6,
+  },
+  // Matches FilterQuery and the member search: a label above a 40px field.
+  loadingSearchField: {
+    display: "block",
+    height: controlMetrics.controlHeight,
+    borderRadius: controlMetrics.radius,
+    backgroundColor: colors.inset,
+  },
   toggle: {
     display: "none",
     width: "100%",
@@ -379,13 +463,8 @@ const styles = stylex.create({
       gridTemplateColumns: "minmax(0, 1fr) auto auto",
     },
   },
-  desktopSubmit: {
-    display: "inline-flex",
-  },
   panelDesktopSubmit: {
-    [NARROW]: {
-      display: "none",
-    },
+    display: { default: "inline-flex", [NARROW]: "none" },
   },
   mobileFilterToggle: {
     display: "none",

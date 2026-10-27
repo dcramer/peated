@@ -33,7 +33,7 @@ export type BottleIdentityRowProps = {
   /**
    * Where the title link's hit area reaches. Row fills this identity; title
    * links only the name when the surrounding card is also clickable; parent
-   * fills the nearest linked container, such as a linked CatalogTable row.
+   * fills the nearest linked container, such as a linked Table row.
    */
   linkArea?: "row" | "title" | "parent";
   /**

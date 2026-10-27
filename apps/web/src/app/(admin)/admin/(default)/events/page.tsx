@@ -6,7 +6,7 @@ import {
   AdminPageHeader,
   AdminSection,
 } from "@peated/web/components/admin/adminContent.stylex";
-import { AdminTable as Table } from "@peated/web/components/admin/adminTable.stylex";
+import { AdminTable } from "@peated/web/components/admin/adminTable.stylex";
 import { AdminEmptyActivity as EmptyActivity } from "@peated/web/components/admin/adminUtility.stylex";
 import DateRange from "@peated/web/components/dateRange";
 import useApiQueryParams from "@peated/web/hooks/useApiQueryParams";
@@ -48,9 +48,9 @@ export default function Page() {
           title="Needs next date"
           tone="warning"
         >
-          <Table
+          <AdminTable
+            caption="Events that need a next date"
             items={needsNextDate}
-            noHeaders
             url={(item) => `/admin/events/${item.id}/next`}
             columns={[
               { name: "name" },
@@ -67,7 +67,8 @@ export default function Page() {
       ) : null}
 
       {eventList.results.length > 0 ? (
-        <Table
+        <AdminTable
+          caption="Events"
           items={eventList.results}
           rel={eventList.rel}
           defaultSort="date"

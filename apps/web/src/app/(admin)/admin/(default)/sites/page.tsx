@@ -6,7 +6,7 @@ import {
   AdminPage,
   AdminPageHeader,
 } from "@peated/web/components/admin/adminContent.stylex";
-import { AdminTable as Table } from "@peated/web/components/admin/adminTable.stylex";
+import { AdminTable } from "@peated/web/components/admin/adminTable.stylex";
 import { AdminEmptyActivity as EmptyActivity } from "@peated/web/components/admin/adminUtility.stylex";
 import { ExternalSiteIdentity } from "@peated/web/components/admin/externalSiteIcon.stylex";
 import ScraperDashboardSummary from "@peated/web/components/admin/scraperDashboardSummary.stylex";
@@ -54,7 +54,8 @@ export default function Page() {
       />
       <ScraperDashboardSummary coverage={coverage} health={siteList.summary} />
       {siteList.results.length > 0 ? (
-        <Table
+        <AdminTable
+          caption="Sites"
           items={siteList.results}
           rel={siteList.rel}
           defaultSort="name"
@@ -63,7 +64,6 @@ export default function Page() {
           columns={[
             {
               name: "name",
-              fill: true,
               showOnMobile: true,
               sort: "name",
               sortDefaultOrder: "asc",
@@ -80,7 +80,6 @@ export default function Page() {
               ),
             },
             {
-              align: "left",
               name: "catalogListings",
               showOnMobile: true,
               title: "Catalog",
@@ -89,7 +88,6 @@ export default function Page() {
               ),
             },
             {
-              align: "left",
               name: "externalReviews",
               showOnMobile: true,
               title: "Reviews",
@@ -101,7 +99,6 @@ export default function Page() {
               ),
             },
             {
-              align: "left",
               name: "priceListings",
               showOnMobile: true,
               title: "Prices",
@@ -113,7 +110,6 @@ export default function Page() {
               ),
             },
             {
-              align: "left",
               name: "run",
               showOnMobile: true,
               title: "Run",

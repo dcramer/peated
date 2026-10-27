@@ -11,6 +11,7 @@ export default function BadgeTable({
 }) {
   return (
     <AdminTable
+      caption="Badges"
       columns={[
         {
           name: "badge",

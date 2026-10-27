@@ -1,14 +1,11 @@
 import type { Entity } from "@peated/server/types";
 
 import {
-  DataTable,
-  type DataTableColumn,
-} from "@peated/web/components/dataTable.stylex";
-import {
   EmptyState,
   LoadingPlaceholder,
 } from "@peated/web/components/feedback.stylex";
 import { CursorPager } from "@peated/web/components/lists.stylex";
+import { Table, type TableColumn } from "@peated/web/components/table.stylex";
 import { getEntityUrl } from "@peated/web/lib/urls";
 
 type LocationListItem = {
@@ -18,7 +15,7 @@ type LocationListItem = {
   totalDistillers: number;
 };
 
-const locationColumns: DataTableColumn<LocationListItem>[] = [
+const locationColumns: TableColumn<LocationListItem>[] = [
   {
     cell: () => null,
     header: "Location",
@@ -49,13 +46,13 @@ export function LocationTable({
   getHref: (item: LocationListItem) => string;
   items: readonly LocationListItem[];
 }) {
-  const columns: DataTableColumn<LocationListItem>[] = [
+  const columns: TableColumn<LocationListItem>[] = [
     { ...locationColumns[0], cell: (item) => item.name },
     ...locationColumns.slice(1),
   ];
 
   return (
-    <DataTable
+    <Table
       caption={caption}
       columns={columns}
       getHref={getHref}
@@ -78,7 +75,7 @@ export function LocationTableLoading({
   kind: "distilleries" | "locations" | "regions";
 }) {
   const label = `Loading ${kind}`;
-  const columns: DataTableColumn<(typeof loadingRows)[number]>[] = [
+  const columns: TableColumn<(typeof loadingRows)[number]>[] = [
     {
       cell: ({ delay }) => <LoadingPlaceholder delay={delay} preset="text" />,
       header: kind === "distilleries" ? "Distiller" : "Location",
@@ -106,7 +103,7 @@ export function LocationTableLoading({
 
   return (
     <div aria-busy="true" aria-label={label} role="status">
-      <DataTable
+      <Table
         caption={label}
         columns={columns}
         getKey={({ key }) => key}
@@ -116,7 +113,7 @@ export function LocationTableLoading({
   );
 }
 
-const distillerColumns: DataTableColumn<Entity>[] = [
+const distillerColumns: TableColumn<Entity>[] = [
   {
     cell: (item) => item.name,
     header: "Distiller",
@@ -154,7 +151,7 @@ export function LocationDistillerList({
   return (
     <section aria-label={`${name} distillers`}>
       {items.length ? (
-        <DataTable
+        <Table
           caption={`Distillers in ${name}`}
           columns={distillerColumns}
           getHref={(item) => getEntityUrl(item)}

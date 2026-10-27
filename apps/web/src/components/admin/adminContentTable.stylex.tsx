@@ -22,6 +22,12 @@ type ContentKind = "member_review" | "external_review" | "tasting";
 type ContentStatus = "active" | "removed" | "all";
 type ContentItem = Outputs["admin"]["content"]["list"]["results"][number];
 
+const contentCaptions = {
+  external_review: "Critic reviews",
+  member_review: "Member reviews",
+  tasting: "Tastings",
+} satisfies Record<ContentKind, string>;
+
 const statuses: ReadonlyArray<{ label: string; value: ContentStatus }> = [
   { label: "Active", value: "active" },
   { label: "Removed", value: "removed" },
@@ -72,9 +78,9 @@ export function AdminContentTable({ kind }: { kind: ContentKind }) {
         ))}
       </AdminActions>
       <AdminTable
+        caption={contentCaptions[kind]}
         columns={[
           {
-            fill: true,
             name: "content",
             value: (item) => <ContentSummary item={item} />,
           },
@@ -114,7 +120,6 @@ export function AdminContentTable({ kind }: { kind: ContentKind }) {
           },
         ]}
         items={data.results}
-        noHeaders={!data.results.length}
         rel={data.rel}
         url={contentAdminUrl}
         withSearch

@@ -8,10 +8,10 @@ import {
   BottleIdentityRow,
   BottleIdentityRowLoading,
 } from "./bottleIdentityRow.stylex";
-import { CatalogTable, type CatalogTableColumn } from "./catalogTable.stylex";
 import { LoadingText } from "./feedback.stylex";
 import type { LibraryItem } from "./libraryList.stylex";
 import { RowMenu } from "./rowMenu.stylex";
+import { Table, type TableColumn } from "./table.stylex";
 
 // The finished table and its loading view share these headers and widths.
 const columnLayout = {
@@ -30,7 +30,7 @@ const columnLayout = {
     key: "actions",
     width: "menu",
   },
-} as const satisfies Record<string, Omit<CatalogTableColumn<unknown>, "cell">>;
+} as const satisfies Record<string, Omit<TableColumn<unknown>, "cell">>;
 
 export type LibraryTableProps = {
   caption: string;
@@ -46,7 +46,7 @@ export type LibraryTableProps = {
  * paging.
  */
 export function LibraryTable({ caption, items }: LibraryTableProps) {
-  const columns: CatalogTableColumn<LibraryItem>[] = [
+  const columns: TableColumn<LibraryItem>[] = [
     {
       cell: (item) => (
         <BottleIdentityRow
@@ -103,7 +103,7 @@ export function LibraryTable({ caption, items }: LibraryTableProps) {
   }
 
   return (
-    <CatalogTable
+    <Table
       caption={caption}
       columns={columns}
       density="compact"
@@ -125,7 +125,7 @@ export function LibraryTableLoading({
   label?: string;
   rows?: number;
 }) {
-  const columns: CatalogTableColumn<number>[] = [
+  const columns: TableColumn<number>[] = [
     {
       cell: () => (
         <BottleIdentityRowLoading
@@ -174,7 +174,7 @@ export function LibraryTableLoading({
   return (
     <div aria-busy="true" aria-label={label} role="status">
       <div aria-hidden="true">
-        <CatalogTable
+        <Table
           caption={label}
           columns={columns}
           density="compact"

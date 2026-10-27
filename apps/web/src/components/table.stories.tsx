@@ -1,7 +1,7 @@
 import type { Meta, StoryObj } from "@storybook/nextjs-vite";
 
-import { DataTable, type DataTableColumn } from "./dataTable.stylex";
 import { StoryCanvas } from "./storyFixtures.stylex";
+import { Table, type TableColumn } from "./table.stylex";
 import { TextLink } from "./textLink.stylex";
 
 type LocationRow = {
@@ -54,7 +54,7 @@ const interactionRows = [
   { ...rows[0], name: "Pressed", slug: "pressed" },
 ] satisfies LocationRow[];
 
-const columns: DataTableColumn<LocationRow>[] = [
+const columns: TableColumn<LocationRow>[] = [
   {
     cell: (item) => item.name,
     header: "Location",
@@ -84,14 +84,14 @@ const columns: DataTableColumn<LocationRow>[] = [
   },
 ];
 
-const interactionColumns: DataTableColumn<LocationRow>[] = [
+const interactionColumns: TableColumn<LocationRow>[] = [
   columns[0]!,
   { ...columns[1]!, priority: undefined },
 ];
 
 const meta = {
   title: "Components/Lists & Tables/Table",
-  component: DataTable,
+  component: Table,
   args: {
     caption: "Whisky locations",
     columns,
@@ -106,7 +106,7 @@ const meta = {
       </StoryCanvas>
     ),
   ],
-} satisfies Meta<typeof DataTable<LocationRow>>;
+} satisfies Meta<typeof Table<LocationRow>>;
 
 export default meta;
 type Story = StoryObj<typeof meta>;
@@ -115,7 +115,7 @@ export const Overview: Story = {};
 
 export const InteractionStates: Story = {
   render: () => (
-    <DataTable
+    <Table
       caption="Linked table interaction states"
       columns={interactionColumns}
       getHref={(item) => `#${item.slug}`}

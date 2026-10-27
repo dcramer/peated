@@ -116,6 +116,7 @@ export default function AutomationPage() {
           description="Recent lots waiting for matching. Decisions ready for review appear in Inbox."
         >
           <AdminTable
+            caption="Pending auction matches"
             items={data.pendingAuctions}
             primaryKey={(item) => item.key}
             columns={[
@@ -132,6 +133,7 @@ export default function AutomationPage() {
       >
         {data.needsAttention.length ? (
           <AdminTable
+            caption="Stopped work"
             items={data.needsAttention}
             primaryKey={(item) => item.key}
             columns={[
@@ -171,6 +173,7 @@ export default function AutomationPage() {
       >
         {data.recentRuns.length ? (
           <AdminTable
+            caption="Automation runs"
             items={data.recentRuns}
             primaryKey={(run) => run.key}
             columns={[

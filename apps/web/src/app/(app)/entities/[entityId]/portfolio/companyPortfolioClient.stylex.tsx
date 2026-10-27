@@ -6,7 +6,7 @@ import { useSuspenseQuery } from "@tanstack/react-query";
 import { usePathname, useRouter, useSearchParams } from "next/navigation";
 import { useOptimistic, useTransition } from "react";
 
-import { PageTabs } from "@peated/web/components/pageTabs.stylex";
+import { FacetGroup } from "@peated/web/components/filterPanel.stylex";
 import { EntityCatalogList } from "@peated/web/components/pages/entityCatalog.stylex";
 import { buildSearchHref, getCursorHref } from "@peated/web/lib/cursorHref";
 import { toEntityCatalogItem } from "@peated/web/lib/entityCatalogItem";
@@ -31,6 +31,12 @@ const kindLabels = {
   brand: "Brands",
   distillery: "Distilleries",
   bottler: "Bottlers",
+} as const;
+
+const kindTotals = {
+  brand: "brands",
+  distillery: "distilleries",
+  bottler: "bottlers",
 } as const;
 
 export function CompanyPortfolioClient({
@@ -69,12 +75,12 @@ export function CompanyPortfolioClient({
     });
   }
 
-  function getKindHref(kind?: CompanyPortfolioKind) {
-    const nextParams = new URLSearchParams(searchParams);
+  function updateKind(kind: string) {
+    const nextParams = new URLSearchParams(displayedSearchParams);
     if (kind) nextParams.set("kind", kind);
     else nextParams.delete("kind");
     nextParams.delete("cursor");
-    return buildSearchHref(pathname, nextParams);
+    navigate(nextParams);
   }
 
   function updateSort(value: string) {
@@ -104,41 +110,33 @@ export function CompanyPortfolioClient({
 
   return (
     <div {...stylex.props(styles.content)}>
-      <div {...stylex.props(styles.views)}>
-        <PageTabs
-          ariaLabel={`${companyName} portfolio filters`}
-          currentHref={getKindHref(selectedKind)}
-          items={[
-            {
-              count: portfolio.totals.all,
-              href: getKindHref(),
-              label: "All",
-            },
-            {
-              count: portfolio.totals.brands,
-              href: getKindHref("brand"),
-              label: "Brands",
-            },
-            {
-              count: portfolio.totals.distilleries,
-              href: getKindHref("distillery"),
-              label: "Distilleries",
-            },
-            {
-              count: portfolio.totals.bottlers,
-              href: getKindHref("bottler"),
-              label: "Bottlers",
-            },
-          ]}
-        />
-      </div>
       <EntityCatalogList
+        activeFilterCount={selectedKind ? 1 : 0}
         emptyDescription={
           selectedKind
             ? `No recorded ${noun}s are part of ${companyName}.`
             : `${companyName} has no recorded brands, distilleries, or bottlers.`
         }
         emptyHeading={selectedKind ? `No ${noun}s yet` : "No portfolio yet"}
+        filters={
+          <FacetGroup
+            label="Type"
+            onChange={updateKind}
+            // Leave out types with no records unless they are selected.
+            options={companyPortfolioKinds
+              .filter(
+                (kind) =>
+                  kind === selectedKind || portfolio.totals[kindTotals[kind]],
+              )
+              .map((kind) => ({
+                count: portfolio.totals[kindTotals[kind]],
+                label: kindLabels[kind],
+                value: kind,
+              }))}
+            selected={selectedKind ?? ""}
+            total={portfolio.totals.all}
+          />
+        }
         items={items}
         nextHref={getCursorHref(
           pathname,
@@ -146,6 +144,7 @@ export function CompanyPortfolioClient({
           portfolio.rel.nextCursor,
         )}
         noun={noun}
+        onClear={() => updateKind("")}
         onSortChange={updateSort}
         page={page}
         pending={isNavigating || isFetching}
@@ -166,8 +165,5 @@ const styles = stylex.create({
   content: {
     minWidth: 0,
     paddingTop: space.x6,
-  },
-  views: {
-    marginBottom: space.x6,
   },
 });

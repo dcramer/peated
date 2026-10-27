@@ -4,7 +4,7 @@ import { use } from "react";
 
 import { type ExternalSiteKey } from "@peated/server/types";
 import { AdminStatus } from "@peated/web/components/admin/adminContent.stylex";
-import { AdminTable as Table } from "@peated/web/components/admin/adminTable.stylex";
+import { AdminTable } from "@peated/web/components/admin/adminTable.stylex";
 import { AdminEmptyActivity as EmptyActivity } from "@peated/web/components/admin/adminUtility.stylex";
 import ExternalSiteRunTelemetry from "@peated/web/components/admin/externalSiteRunTelemetry";
 import TimeSince from "@peated/web/components/timeSince";
@@ -42,7 +42,8 @@ export default function Page({
   );
 
   return runList.results.length ? (
-    <Table
+    <AdminTable
+      caption="Runs"
       items={runList.results}
       rel={runList.rel}
       columns={[

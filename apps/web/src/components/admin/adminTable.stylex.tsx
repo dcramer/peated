@@ -5,10 +5,9 @@ import type { PagingRel } from "@peated/server/types";
 import * as stylex from "@stylexjs/stylex";
 import { ArrowDown, ArrowUp } from "lucide-react";
 import { usePathname, useSearchParams } from "next/navigation";
-import type { ReactElement, ReactNode } from "react";
+import type { ReactElement } from "react";
 
 import { buildQueryString } from "../../lib/urls";
-import { foundationStyles } from "../../styles/foundations.stylex";
 import {
   colors,
   controlMetrics,
@@ -18,15 +17,15 @@ import {
 import { AppLink } from "../appLink";
 import { LoadingPlaceholder } from "../feedback.stylex";
 import { TextInput } from "../field.stylex";
-import { linkedRowStyles } from "../linkedRow.stylex";
 import { LinkPending } from "../linkPending.stylex";
+import { Table, type TableColumn } from "../table.stylex";
 import { AdminPager } from "./adminUtility.stylex";
 
 export type AdminTableColumn<Item extends object> = {
-  align?: "center" | "default" | "left" | "right";
-  fill?: boolean;
+  align?: "center" | "left" | "right";
   hidden?: boolean;
   name: string;
+  /** Keeps a column after the first on narrow screens. */
   showOnMobile?: boolean;
   sort?: string;
   sortDefaultOrder?: "asc" | "desc";
@@ -34,16 +33,11 @@ export type AdminTableColumn<Item extends object> = {
   value?: (item: Item) => ReactElement | string | null | false;
 };
 
-type Group = { id: number | string; name: string };
-
-export type AdminTableProps<Item extends object, ItemGroup extends Group> = {
+export type AdminTableProps<Item extends object> = {
+  caption: string;
   columns: AdminTableColumn<Item>[];
   defaultSort?: string;
-  groupBy?: (item: Item) => ItemGroup;
-  groupItem?: (item: ItemGroup) => ReactNode;
-  groupTo?: (group: ItemGroup) => string;
   items: Item[];
-  noHeaders?: boolean;
   primaryKey?: (item: Item) => string;
   rel?: PagingRel;
   searchParams?: URLSearchParams;
@@ -51,120 +45,49 @@ export type AdminTableProps<Item extends object, ItemGroup extends Group> = {
   withSearch?: boolean;
 };
 
-export function AdminTable<
-  Item extends object,
-  ItemGroup extends Group = Group,
->(props: AdminTableProps<Item, ItemGroup>) {
-  const navigationParams = useSearchParams();
-  return (
-    <AdminTableContent
-      {...props}
-      searchParams={
-        props.searchParams ?? navigationParams ?? new URLSearchParams()
-      }
-    />
-  );
-}
-
-type AdminTableLoadingProps = {
-  columns?: 1 | 2 | 3 | 4;
-  label?: string;
-  rows?: 3 | 4 | 5 | 6;
-  withSearch?: boolean;
-};
-
-const loadingDelays = [0, 1, 2, 3, 4] as const;
-
-/** Reserves the shared administrator table structure while its rows load. */
-export function AdminTableLoading({
-  columns = 2,
-  label = "Loading records",
-  rows = 5,
-  withSearch = false,
-}: AdminTableLoadingProps) {
-  return (
-    <div
-      aria-busy="true"
-      aria-label={label}
-      role="status"
-      {...stylex.props(styles.root)}
-    >
-      {withSearch ? (
-        <div aria-hidden="true" {...stylex.props(styles.loadingSearch)} />
-      ) : null}
-      <div {...stylex.props(styles.frame)}>
-        <table {...stylex.props(styles.table)}>
-          <thead>
-            <tr {...stylex.props(styles.headerRow)}>
-              {Array.from({ length: columns }, (_, columnIndex) => (
-                <th
-                  key={columnIndex}
-                  scope="col"
-                  {...stylex.props(
-                    styles.header,
-                    columnIndex > 0 && styles.secondary,
-                  )}
-                >
-                  <LoadingPlaceholder
-                    delay={loadingDelays[columnIndex]}
-                    preset="metadata"
-                  />
-                </th>
-              ))}
-            </tr>
-          </thead>
-          <tbody>
-            {Array.from({ length: rows }, (_, rowIndex) => (
-              <tr key={rowIndex} {...stylex.props(styles.row)}>
-                {Array.from({ length: columns }, (_, columnIndex) => (
-                  <td
-                    key={columnIndex}
-                    {...stylex.props(
-                      styles.cell,
-                      columnIndex > 0 && styles.secondary,
-                    )}
-                  >
-                    <LoadingPlaceholder
-                      delay={
-                        loadingDelays[
-                          (rowIndex + columnIndex) % loadingDelays.length
-                        ]
-                      }
-                      preset={columnIndex === 0 ? "text" : "metadata"}
-                    />
-                  </td>
-                ))}
-              </tr>
-            ))}
-          </tbody>
-        </table>
-      </div>
-    </div>
-  );
-}
-
-export function AdminTableContent<
-  Item extends object,
-  ItemGroup extends Group = Group,
->({
+/**
+ * Administrator records in the shared Table, with optional search, sortable
+ * headers kept in the URL, and paging. Columns read `name` from each item
+ * unless they supply `value`. Columns after the first hide on narrow screens
+ * unless they set showOnMobile.
+ */
+export function AdminTable<Item extends object>({
+  caption,
   columns,
   defaultSort,
-  groupBy,
-  groupItem = (item) => item.name,
-  groupTo,
   items,
-  noHeaders = false,
   primaryKey = defaultPrimaryKey,
   rel,
-  searchParams,
-  url = () => null,
+  searchParams: searchParamsProp,
+  url,
   withSearch = false,
-}: AdminTableProps<Item, ItemGroup> & { searchParams: URLSearchParams }) {
+}: AdminTableProps<Item>) {
   const pathname = usePathname();
+  const navigationParams = useSearchParams();
+  const searchParams =
+    searchParamsProp ?? navigationParams ?? new URLSearchParams();
   const currentSort = searchParams.get("sort") ?? defaultSort;
-  const scrollsOnMobile = columns.some(
-    (column, index) => index > 0 && column.showOnMobile,
-  );
+  const tableColumns = columns
+    .filter((column) => !column.hidden)
+    .map((column, index): TableColumn<Item> => {
+      const label = column.title ?? toTitleCase(column.name);
+      return {
+        align: column.align,
+        cell: (item) => getColumnValue(item, column),
+        header: column.sort ? (
+          <SortLink
+            defaultOrder={column.sortDefaultOrder}
+            label={label}
+            name={column.sort}
+            sort={currentSort}
+          />
+        ) : (
+          label
+        ),
+        key: column.name,
+        priority: index > 0 && !column.showOnMobile ? "secondary" : "primary",
+      };
+    });
 
   return (
     <div {...stylex.props(styles.root)}>
@@ -180,136 +103,72 @@ export function AdminTableContent<
           />
         </form>
       ) : null}
-      <div
-        aria-label={scrollsOnMobile ? "Scrollable table" : undefined}
-        role={scrollsOnMobile ? "region" : undefined}
-        tabIndex={scrollsOnMobile ? 0 : undefined}
-        {...stylex.props(
-          styles.frame,
-          scrollsOnMobile && styles.scrollableFrame,
-        )}
-      >
-        <table
-          {...stylex.props(
-            styles.table,
-            scrollsOnMobile && styles.mobileWideTable,
-          )}
-        >
-          {!noHeaders ? (
-            <thead>
-              <tr {...stylex.props(styles.headerRow)}>
-                {columns.map((column, index) => {
-                  if (column.hidden) return null;
-                  const align = resolveAlignment(column.align, index);
-                  const label = column.title ?? toTitleCase(column.name);
-                  return (
-                    <th
-                      key={column.name}
-                      scope="col"
-                      {...stylex.props(
-                        foundationStyles.fieldLabel,
-                        styles.header,
-                        alignStyles[align],
-                        index > 0 && !column.showOnMobile && styles.secondary,
-                      )}
-                    >
-                      {column.sort ? (
-                        <SortLink
-                          defaultOrder={column.sortDefaultOrder}
-                          label={label}
-                          name={column.sort}
-                          sort={currentSort}
-                        />
-                      ) : (
-                        label
-                      )}
-                    </th>
-                  );
-                })}
-              </tr>
-            </thead>
-          ) : null}
-          <tbody>
-            {items.map((item, itemIndex) => {
-              const itemKey = primaryKey(item);
-              const itemHref = url(item);
-              const group = groupBy?.(item);
-              const previousGroup =
-                itemIndex > 0 ? groupBy?.(items[itemIndex - 1]!) : undefined;
-              const showGroup = group && group.id !== previousGroup?.id;
-
-              return [
-                showGroup ? (
-                  <tr
-                    key={`group-${group.id}`}
-                    {...stylex.props(styles.groupRow)}
-                  >
-                    <th
-                      colSpan={columns.length}
-                      scope="colgroup"
-                      {...stylex.props(
-                        foundationStyles.metadata,
-                        styles.groupCell,
-                      )}
-                    >
-                      {groupTo ? (
-                        <AppLink
-                          href={groupTo(group)}
-                          {...stylex.props(styles.groupLink)}
-                        >
-                          {groupItem(group)}
-                        </AppLink>
-                      ) : (
-                        group.name
-                      )}
-                    </th>
-                  </tr>
-                ) : null,
-                <tr
-                  data-record-key={itemKey}
-                  key={itemKey}
-                  {...stylex.props(
-                    styles.row,
-                    Boolean(itemHref) && linkedRowStyles.container,
-                    Boolean(itemHref) && linkedRowStyles.onSurface,
-                  )}
-                >
-                  {columns.map((column, index) => {
-                    if (column.hidden) return null;
-                    const align = resolveAlignment(column.align, index);
-                    return (
-                      <td
-                        key={column.name}
-                        {...stylex.props(
-                          foundationStyles.metadata,
-                          styles.cell,
-                          alignStyles[align],
-                          column.fill && styles.fill,
-                          index > 0 && !column.showOnMobile && styles.secondary,
-                        )}
-                      >
-                        {index === 0 && itemHref ? (
-                          <AppLink
-                            aria-label={`Open ${itemKey}`}
-                            href={itemHref}
-                            {...stylex.props(linkedRowStyles.primaryLink)}
-                          >
-                            <LinkPending />
-                          </AppLink>
-                        ) : null}
-                        <span {...stylex.props()}>
-                          {getColumnValue(item, column)}
-                        </span>
-                      </td>
-                    );
-                  })}
-                </tr>,
-              ];
-            })}
-          </tbody>
-        </table>
-      </div>
+      {items.length ? (
+        <Table
+          caption={caption}
+          columns={tableColumns}
+          getHref={url}
+          getKey={primaryKey}
+          items={items}
+        />
+      ) : null}
       <AdminPager rel={rel} searchParams={searchParams} />
+    </div>
+  );
+}
+
+const loadingDelays = [0, 1, 2, 3, 4] as const;
+
+/** Reserves the shared administrator table structure while its rows load. */
+export function AdminTableLoading({
+  columns = 2,
+  label = "Loading records",
+  rows = 5,
+  withSearch = false,
+}: {
+  columns?: 1 | 2 | 3 | 4;
+  label?: string;
+  rows?: 3 | 4 | 5 | 6;
+  withSearch?: boolean;
+}) {
+  const loadingColumns = Array.from(
+    { length: columns },
+    (_, columnIndex): TableColumn<number> => ({
+      cell: (rowIndex) => (
+        <LoadingPlaceholder
+          delay={loadingDelays[(rowIndex + columnIndex) % loadingDelays.length]}
+          preset={columnIndex === 0 ? "text" : "metadata"}
+        />
+      ),
+      header: (
+        <LoadingPlaceholder
+          delay={loadingDelays[columnIndex]}
+          preset="metadata"
+        />
+      ),
+      key: String(columnIndex),
+      priority: columnIndex > 0 ? "secondary" : "primary",
+    }),
+  );
+
+  return (
+    <div
+      aria-busy="true"
+      aria-label={label}
+      role="status"
+      {...stylex.props(styles.root)}
+    >
+      {withSearch ? (
+        <div aria-hidden="true" {...stylex.props(styles.loadingSearch)} />
+      ) : null}
+      <div aria-hidden="true">
+        <Table
+          caption={label}
+          columns={loadingColumns}
+          getKey={(rowIndex) => rowIndex}
+          items={Array.from({ length: rows }, (_, rowIndex) => rowIndex)}
+        />
+      </div>
     </div>
   );
 }
@@ -351,17 +210,6 @@ function SortLink({
   );
 }
 
-function resolveAlignment(
-  alignment: AdminTableColumn<object>["align"],
-  index: number,
-) {
-  return alignment && alignment !== "default"
-    ? alignment
-    : index === 0
-      ? "left"
-      : "center";
-}
-
 function defaultPrimaryKey<Item extends object>(item: Item): string {
   const id = Object.entries(item).find(([name]) => name === "id")?.[1];
   return String(id);
@@ -391,62 +239,6 @@ const styles = stylex.create({
     borderRadius: controlMetrics.radius,
     backgroundColor: colors.inset,
   },
-  frame: {
-    minWidth: 0,
-    overflowX: "auto",
-    borderWidth: "1px",
-    borderStyle: "solid",
-    borderColor: colors.hairline,
-  },
-  scrollableFrame: {
-    outline: "none",
-    boxShadow: { default: "none", ":focus-visible": effects.focusRing },
-  },
-  table: { width: "100%", borderCollapse: "collapse", tableLayout: "auto" },
-  mobileWideTable: {
-    "@media (max-width: 639px)": { minWidth: "720px" },
-  },
-  headerRow: {
-    borderBottomWidth: "1px",
-    borderBottomStyle: "solid",
-    borderBottomColor: colors.hairline,
-  },
-  header: {
-    padding: `${space.x2} ${space.x3}`,
-    color: colors.inkMuted,
-    whiteSpace: "nowrap",
-  },
-  row: {
-    borderBottomWidth: "1px",
-    borderBottomStyle: "solid",
-    borderBottomColor: colors.hairline,
-  },
-  cell: {
-    padding: `${space.x3} ${space.x3}`,
-    color: colors.ink,
-    verticalAlign: "middle",
-  },
-  fill: { width: "100%", maxWidth: 0 },
-
-  secondary: { "@media (max-width: 639px)": { display: "none" } },
-  groupRow: {
-    borderBottomWidth: "1px",
-    borderBottomStyle: "solid",
-    borderBottomColor: colors.hairline,
-    backgroundColor: "transparent",
-  },
-  groupCell: {
-    padding: `${space.x2} ${space.x3}`,
-    color: colors.ink,
-    textAlign: "left",
-  },
-  groupLink: {
-    borderRadius: controlMetrics.radiusSmall,
-    outline: "none",
-    color: { default: colors.ink, ":hover": colors.accentDeep },
-    textDecoration: "none",
-    boxShadow: { default: "none", ":focus-visible": effects.focusRing },
-  },
   sortLink: {
     position: "relative",
     display: "inline-flex",
@@ -458,12 +250,4 @@ const styles = stylex.create({
     textDecoration: "none",
     boxShadow: { default: "none", ":focus-visible": effects.focusRing },
   },
-  left: { textAlign: "left" },
-  center: { textAlign: "center" },
-  right: { textAlign: "right" },
 });
-const alignStyles = {
-  center: styles.center,
-  left: styles.left,
-  right: styles.right,
-} as const;

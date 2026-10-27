@@ -16,6 +16,7 @@ export default function StorePriceTable({
 }) {
   return (
     <AdminTable
+      caption="Store prices"
       columns={[
         {
           name: "listing",

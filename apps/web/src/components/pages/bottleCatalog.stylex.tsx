@@ -7,13 +7,13 @@ import {
   type BottleListItem,
 } from "@peated/web/components/bottleList.stylex";
 import { Button, ButtonLink } from "@peated/web/components/button.stylex";
+import { CatalogResultsLayout } from "@peated/web/components/catalogResultsLayout.stylex";
 import { EmptyState } from "@peated/web/components/feedback.stylex";
 import {
   FacetGroup,
   type FilterQueryProps,
 } from "@peated/web/components/filterPanel.stylex";
 import { type ListSortOption } from "@peated/web/components/lists.stylex";
-import { Table } from "@peated/web/components/table.stylex";
 import { CatalogPageLoading } from "./catalogPage.stylex";
 
 export type BottleCatalogListProps = {
@@ -55,7 +55,7 @@ export function BottleCatalogList({
   total,
 }: BottleCatalogListProps) {
   return (
-    <Table
+    <CatalogResultsLayout
       activeFilterCount={activeFilterCount}
       ariaLabel="Bottle catalog"
       count={items.length}
@@ -96,7 +96,7 @@ export function BottleCatalogList({
       total={total}
     >
       <BottleList ariaLabel="Bottle records" items={items} />
-    </Table>
+    </CatalogResultsLayout>
   );
 }
 

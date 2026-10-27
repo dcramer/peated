@@ -3,13 +3,13 @@
 import { useSearchParams } from "next/navigation";
 import type { ReactNode } from "react";
 
+import { FilterRailLoading } from "@peated/web/components/filterPanel.stylex";
 import { LibraryListLoading } from "@peated/web/components/libraryList.stylex";
 import { LibraryTableLoading } from "@peated/web/components/libraryTable.stylex";
 import {
   ListToolbarLoading,
   type ListView,
 } from "@peated/web/components/lists.stylex";
-import { MemberListFiltersLoading } from "@peated/web/components/pages/memberListFilters.stylex";
 import { PageColumns } from "@peated/web/components/pages/pageLayout.stylex";
 import { profileBottleSearchCopy } from "../profileBottleSearch.stylex";
 import { useProfile } from "../profileContext";
@@ -66,7 +66,7 @@ export function ProfileLibraryResultsLoading({ view }: { view: ListView }) {
 /** Reserves the filter rail while counts load. */
 export function ProfileLibraryFiltersLoading() {
   return (
-    <MemberListFiltersLoading
+    <FilterRailLoading
       groups={[
         { label: "Status", rows: 4 },
         { label: "Age", rows: 6, summary: true },

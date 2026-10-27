@@ -1,7 +1,7 @@
 "use client";
 import { use } from "react";
 
-import { AdminTable as Table } from "@peated/web/components/admin/adminTable.stylex";
+import { AdminTable } from "@peated/web/components/admin/adminTable.stylex";
 import useApiQueryParams from "@peated/web/hooks/useApiQueryParams";
 import { useORPC } from "@peated/web/lib/orpc/context";
 import { useSuspenseQuery } from "@tanstack/react-query";
@@ -35,7 +35,8 @@ export default function Page(props: {
 
   return (
     <div>
-      <Table
+      <AdminTable
+        caption="Regions"
         items={regionList.results}
         rel={regionList.rel}
         defaultSort="-created"

@@ -100,7 +100,9 @@ test("distillers filters keep controls responsive while results update", async (
   ).toBeVisible();
   await expect(sort).toBeVisible();
   await page.unroute(navigation);
+  // The filter sidebar has its own Clear filters; use the empty result's.
   await page
+    .getByLabel("distiller catalog")
     .getByRole("button", { name: "Clear filters", exact: true })
     .click();
   await expect(page).toHaveURL("/distillers?sort=name");

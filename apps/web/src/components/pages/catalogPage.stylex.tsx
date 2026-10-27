@@ -4,9 +4,13 @@ import type { ReactNode } from "react";
 import {
   LoadingList,
   LoadingPlaceholder,
+  LoadingText,
 } from "@peated/web/components/feedback.stylex";
+import { FilterRailLoading } from "@peated/web/components/filterPanel.stylex";
+import { ListToolbarLoading } from "@peated/web/components/lists.stylex";
 import { foundationStyles } from "../../styles/foundations.stylex";
 import { colors, controlMetrics, space } from "../../styles/tokens.stylex";
+import { PageColumns } from "./pageLayout.stylex";
 
 const NARROW = "@media (max-width: 959px)";
 const VERY_NARROW = "@media (max-width: 359px)";
@@ -66,58 +70,31 @@ export function CatalogPageLoading({
       }
       title={title}
     >
-      <div {...stylex.props(styles.layout)}>
+      <PageColumns
+        rail={
+          <FilterRailLoading
+            groups={
+              variant === "bottle"
+                ? [
+                    { label: "Category", rows: 6 },
+                    { label: "Age statement", rows: 5 },
+                  ]
+                : [{ label: "Country", rows: 6 }]
+            }
+            searchLabel={<LoadingText width="7em" />}
+          />
+        }
+      >
         <div {...stylex.props(styles.loadingResults)}>
-          {variant === "bottle" ? (
-            <div {...stylex.props(styles.loadingSearch)}>
-              <LoadingPlaceholder preset="metadata" />
-              <span {...stylex.props(styles.loadingSearchControl)} />
-            </div>
-          ) : null}
-          <div {...stylex.props(styles.loadingToolbar)}>
-            <span {...stylex.props(styles.loadingCount)}>
-              <LoadingPlaceholder preset="text" />
-            </span>
-            <span {...stylex.props(styles.loadingSort)} />
-          </div>
+          <ListToolbarLoading mobileActionLayout="pageColumns" />
           <LoadingList
             label="Loading catalog records"
             rows={4}
             variant={variant === "entity" ? "text" : "standard"}
           />
         </div>
-        <aside {...stylex.props(styles.filters)}>
-          <CatalogFiltersLoading query={variant === "bottle"} />
-        </aside>
-      </div>
+      </PageColumns>
     </CatalogPage>
-  );
-}
-
-function CatalogFiltersLoading({ query }: { query: boolean }) {
-  return (
-    <div
-      aria-busy="true"
-      aria-label="Loading catalog filters"
-      role="status"
-      {...stylex.props(styles.loadingFilterPanel)}
-    >
-      <LoadingPlaceholder preset="metadata" />
-      {query ? <span {...stylex.props(styles.loadingFilterControl)} /> : null}
-      <div {...stylex.props(styles.loadingFacet)}>
-        <LoadingPlaceholder delay={1} preset="metadata" />
-        {([0, 1, 2, 3] as const).map((delay) => (
-          <div
-            aria-hidden="true"
-            key={delay}
-            {...stylex.props(styles.loadingOption)}
-          >
-            <span {...stylex.props(styles.loadingOptionMark)} />
-            <LoadingPlaceholder delay={delay} preset="metadata" />
-          </div>
-        ))}
-      </div>
-    </div>
   );
 }
 
@@ -145,42 +122,11 @@ const styles = stylex.create({
   navigation: {
     marginBottom: space.x6,
   },
-  layout: {
-    display: "grid",
-    minWidth: 0,
-    gridTemplateColumns: "minmax(0, 1fr) 300px",
-    alignItems: "start",
-    gap: space.x8,
-    [NARROW]: {
-      gridTemplateColumns: "minmax(0, 1fr)",
-    },
-  },
-  filters: {
-    minWidth: 0,
-    [NARROW]: {
-      display: "none",
-    },
-  },
   loadingResults: {
     display: "flex",
     minWidth: 0,
     flexDirection: "column",
     gap: space.x4,
-  },
-  loadingSearch: {
-    display: "flex",
-    flexDirection: "column",
-    gap: space.x2,
-    [NARROW]: {
-      display: "none",
-    },
-  },
-  loadingSearchControl: {
-    display: "block",
-    width: "min(100%, 520px)",
-    height: "34px",
-    borderRadius: controlMetrics.radius,
-    backgroundColor: colors.surface,
   },
   loadingAction: {
     width: "104px",
@@ -196,69 +142,5 @@ const styles = stylex.create({
     borderBottomWidth: "2px",
     borderBottomStyle: "solid",
     borderBottomColor: colors.surface,
-  },
-  loadingToolbar: {
-    display: "flex",
-    minHeight: "34px",
-    alignItems: "center",
-    justifyContent: "space-between",
-    gap: space.x4,
-  },
-  loadingCount: {
-    display: "block",
-    width: "160px",
-    maxWidth: "50%",
-  },
-  loadingSort: {
-    width: "132px",
-    height: controlMetrics.controlHeightSmall,
-    flexShrink: 0,
-    borderRadius: controlMetrics.radius,
-    backgroundColor: colors.surface,
-    [NARROW]: {
-      width: "88px",
-    },
-  },
-  loadingFilterPanel: {
-    boxSizing: "border-box",
-    display: "flex",
-    flexDirection: "column",
-    gap: space.x3,
-    padding: space.x4,
-    borderWidth: "1px",
-    borderStyle: "solid",
-    borderColor: colors.hairline,
-  },
-  loadingFilterControl: {
-    display: "none",
-    width: "100%",
-    height: "38px",
-    borderRadius: controlMetrics.radius,
-    backgroundColor: colors.surface,
-    [NARROW]: {
-      display: "block",
-    },
-  },
-  loadingFacet: {
-    display: "flex",
-    flexDirection: "column",
-    gap: space.x3,
-    paddingTop: space.x3,
-    borderTopWidth: "1px",
-    borderTopStyle: "solid",
-    borderTopColor: colors.hairline,
-  },
-  loadingOption: {
-    display: "flex",
-    minHeight: "24px",
-    alignItems: "center",
-    gap: space.x2,
-  },
-  loadingOptionMark: {
-    width: "16px",
-    height: "16px",
-    flexShrink: 0,
-    borderRadius: "50%",
-    backgroundColor: colors.surface,
   },
 });

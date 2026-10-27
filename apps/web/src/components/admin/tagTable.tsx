@@ -11,6 +11,7 @@ export default function TagTable({
 }) {
   return (
     <AdminTable
+      caption="Tags"
       columns={[
         { name: "tag", value: (tag) => toTitleCase(tag.name) },
         {

@@ -15,7 +15,7 @@ import { foundationStyles } from "../../styles/foundations.stylex";
 import { colors, space } from "../../styles/tokens.stylex";
 import { BottleIdentityRow } from "../bottleIdentityRow.stylex";
 import { useHydrated } from "../clientOnly";
-import { DataTable } from "../dataTable.stylex";
+import { Table } from "../table.stylex";
 import { TextLink } from "../textLink.stylex";
 import { AdminButton } from "./adminButton.stylex";
 import {
@@ -382,7 +382,7 @@ export function ReviewScoringForm({ settings, onPreview, onSave }: Props) {
             middle, and high scores before including this site.
           </p>
           {preview.samples.length ? (
-            <DataTable
+            <Table
               caption="How review scores count before and after this change"
               items={preview.samples}
               getKey={(sample) => sample.id}

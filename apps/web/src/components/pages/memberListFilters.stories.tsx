@@ -4,10 +4,10 @@ import type { Meta, StoryObj } from "@storybook/nextjs-vite";
 import { useState } from "react";
 
 import { TextInput } from "../field.stylex";
+import { FilterRailLoading } from "../filterPanel.stylex";
 import { StoryCanvas } from "../storyFixtures.stylex";
 import {
   MemberListFilters,
-  MemberListFiltersLoading,
   type MemberListFilterGroup,
 } from "./memberListFilters.stylex";
 
@@ -132,7 +132,7 @@ export const Loading: Story = {
     },
   },
   render: () => (
-    <MemberListFiltersLoading
+    <FilterRailLoading
       groups={[
         { label: "Rating", rows: 5 },
         { label: "Age", rows: 6, summary: true },
