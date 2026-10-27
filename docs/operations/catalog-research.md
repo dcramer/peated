@@ -59,7 +59,9 @@ edition, cask number, and Series when those facts are known.
   announcement text on `/news/<year>/`); the capture lookup API returns 429
   when called in parallel, so pace requests one at a time
 
-Do not bypass access controls. Search snippets, thumbnails, copied images, and
+Do not bypass logins, paywalls, or other access controls. A bot wall that
+blocks all automated reading follows the
+[blocked websites policy](../policies/blocked-websites.md). Search snippets, thumbnails, copied images, and
 direct image links are leads only. Save the page that explains the item.
 
 ## Sources That Worked Often

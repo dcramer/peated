@@ -123,6 +123,7 @@ behavior; research cannot override them.
 - `docs/features/tasting-drafts.md` — Unposted tastings: saving, photos, and publishing.
 - `openspec/specs/entity-identity/spec.md` — Entity kinds, ownership, and API behavior.
 - `packages/bottle-classifier/README.md` — Classifier API and commands.
+- `packages/bot/README.md` — How PeatedBot reads and searches websites.
 
 ### Build And Test Peated
 
@@ -136,6 +137,7 @@ behavior; research cannot override them.
 - `docs/policies/README.md` — Policy scope.
 - `docs/policies/agent-design.md` — Model-driven code.
 - `docs/policies/background-work.md` — Background jobs.
+- `docs/policies/blocked-websites.md` — Bot walls, bypass reads, and robots.txt exceptions.
 - `docs/policies/code-comments.md` — Comments and TODOs.
 - `docs/policies/data-and-permissions.md` — API, queue, and storage checks.
 - `docs/policies/database-correctness.md` — Stored data correctness.

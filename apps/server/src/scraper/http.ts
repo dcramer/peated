@@ -1,4 +1,11 @@
-import { BOT_USER_AGENT } from "@peated/server/constants";
+import {
+  BOT_USER_AGENT,
+  fetchPublicUrl,
+  hasNonPublicLiteralAddress,
+  isPublicAddressError,
+  signRequest,
+} from "@peated/bot";
+import config from "@peated/server/config";
 import {
   acquireScrapePermit,
   type PermitDenialReason,
@@ -7,12 +14,6 @@ import {
   releaseScrapePermit,
 } from "./coordinator";
 import { resolveScraperOrigin } from "./definitions";
-import {
-  fetchScraperUrl,
-  hasBlockedScraperLiteralAddress,
-  isScraperNetworkPolicyError,
-} from "./networkPolicy";
-import { signScraperRequest } from "./signing";
 import type { ScraperRegistry, ScraperRequest, ScraperResponse } from "./types";
 
 const MAX_REDIRECTS = 5;
@@ -180,7 +181,7 @@ function transientStatus(status: number) {
 }
 
 function transportCategory(error: Error): ScraperRequestErrorCategory {
-  if (isScraperNetworkPolicyError(error)) return "invalid_request";
+  if (isPublicAddressError(error)) return "invalid_request";
   if (
     error instanceof DOMException &&
     (error.name === "AbortError" || error.name === "TimeoutError")
@@ -270,7 +271,7 @@ export async function requestScraperUrl({
   request,
   registry,
   checkRedirect,
-  fetchImpl = fetchScraperUrl,
+  fetchImpl = fetchPublicUrl,
   clock = scraperSystemClock,
 }: {
   runId: number;
@@ -312,7 +313,7 @@ export async function requestScraperUrl({
 
   for (let redirect = 0; redirect <= MAX_REDIRECTS; redirect += 1) {
     resolveScraperOrigin(registry, sourceKey, request.target, currentUrl);
-    if (hasBlockedScraperLiteralAddress(currentUrl)) {
+    if (hasNonPublicLiteralAddress(currentUrl)) {
       throw new ScraperRequestError("invalid_request");
     }
     if (
@@ -347,11 +348,12 @@ export async function requestScraperUrl({
       }
       let requestHeaders: Headers;
       try {
-        requestHeaders = await signScraperRequest(
-          currentUrl,
+        requestHeaders = await signRequest({
+          url: currentUrl,
           headers,
-          clock.now(),
-        );
+          created: clock.now(),
+          privateJwk: config.PEATED_BOT_PRIVATE_JWK,
+        });
       } catch (error) {
         await releaseScrapePermit({
           targetKey: request.target,

@@ -34,6 +34,7 @@
     "@orpc/server": "catalog:",
     "@orpc/zod": "catalog:",
     "@paralleldrive/cuid2": "^2.2.2",
+    "@peated/bot": "workspace:*",
     "@peated/bottle-classifier": "workspace:*",
     "@peated/catalog-verifier": "workspace:*",
     "@peated/email": "workspace:*",

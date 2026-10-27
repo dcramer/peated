@@ -1,0 +1,36 @@
+{
+  "private": true,
+  "name": "@peated/bot",
+  "type": "module",
+  "exports": {
+    ".": {
+      "types": "./src/index.ts",
+      "default": "./src/index.ts"
+    },
+    "./identity": {
+      "types": "./src/identity.ts",
+      "default": "./src/identity.ts"
+    }
+  },
+  "scripts": {
+    "build": "tsc",
+    "dev": "tsc --watch",
+    "test": "vitest run --config vitest.config.mts",
+    "typecheck": "tsc --noEmit --emitDeclarationOnly false"
+  },
+  "dependencies": {
+    "@peated/tsconfig": "workspace:*",
+    "undici": "7.30.1",
+    "web-bot-auth": "0.2.0",
+    "zod": "catalog:"
+  },
+  "devDependencies": {
+    "@types/node": "catalog:",
+    "typescript": "catalog:",
+    "vite": "catalog:",
+    "vitest": "catalog:"
+  },
+  "volta": {
+    "extends": "../../package.json"
+  }
+}

@@ -1,3 +1,4 @@
+import { PublicAddressError } from "@peated/bot";
 import config from "@peated/server/config";
 import { BOT_USER_AGENT } from "@peated/server/constants";
 import { db } from "@peated/server/db";
@@ -26,7 +27,6 @@ import {
   type ScraperHttpClock,
   type ScraperHttpStatusError,
 } from "./http";
-import { ScraperNetworkPolicyError } from "./networkPolicy";
 import { syncScraperDefinitions } from "./syncDefinitions";
 
 const adapter = async () => {};
@@ -456,7 +456,7 @@ test("does not retry a DNS result rejected by the network policy", async () => {
   const { registry, run } = await setupRuntime();
   const fetchImpl = vi.fn<typeof fetch>().mockRejectedValue(
     new TypeError("fetch failed", {
-      cause: new ScraperNetworkPolicyError(),
+      cause: new PublicAddressError(),
     }),
   );
 

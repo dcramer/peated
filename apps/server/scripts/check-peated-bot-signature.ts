@@ -1,12 +1,13 @@
-import { BOT_USER_AGENT } from "@peated/server/constants";
-import { signScraperRequest } from "@peated/server/scraper/signing";
+import { BOT_USER_AGENT, signRequest } from "@peated/bot";
+import config from "@peated/server/config";
 
 const url = new URL("https://crawltest.com/cdn-cgi/web-bot-auth");
-const headers = await signScraperRequest(
+const headers = await signRequest({
   url,
-  { "User-Agent": BOT_USER_AGENT },
-  new Date(),
-);
+  headers: { "User-Agent": BOT_USER_AGENT },
+  created: new Date(),
+  privateJwk: config.PEATED_BOT_PRIVATE_JWK,
+});
 
 if (!headers.has("Signature")) {
   throw new Error("PEATED_BOT_PRIVATE_JWK must be configured for this check.");
