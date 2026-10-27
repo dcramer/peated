@@ -60,6 +60,13 @@ describe("Peated ID routes", () => {
       "/companies/456-diageo/bottles",
     ],
     [
+      "/distillers/116-brora/about",
+      116,
+      "distillery",
+      "Brora",
+      "/distillers/116-brora",
+    ],
+    [
       "/entities/12-old-name/edit",
       34,
       "distillery",

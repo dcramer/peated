@@ -45,6 +45,9 @@ Catalog list metadata applies these rules:
   canonical URL or indexing decision.
 
 Bottle, brand, and producer overview pages publish the record's canonical URL.
+A brand or producer's About page is part of its overview, so it has no URL or
+sitemap entry of its own; old `/about` URLs redirect permanently to the
+overview.
 Public Bottle price, tasting, and release tabs and brand or producer bottle,
 portfolio, Series, tasting, and code tabs publish their own titles,
 descriptions, and canonical URLs. Alias tabs use `noindex, follow`. Series and

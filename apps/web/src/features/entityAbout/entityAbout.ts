@@ -4,7 +4,6 @@ export type EntityAbout = NonNullable<Outputs["entities"]["about"]["details"]>;
 export type AboutEvent = EntityAbout["events"][number];
 export type AboutSection = NonNullable<EntityAbout["lead"]>;
 export type YearCounts = Outputs["entities"]["about"]["vintages"];
-export type RelatedCounts = Outputs["entities"]["about"]["bottlers"];
 
 /** A span of years. A null end means it continues today. */
 export type AboutSpan = {
@@ -19,9 +18,9 @@ export type VintageCount = { year: number; count: number };
 // minimum is hidden, with no heading or placeholder.
 export const ABOUT_MIN_TIMELINE_SPANS = 2;
 export const ABOUT_MIN_VINTAGE_BOTTLES = 10;
-export const ABOUT_MIN_BOTTLERS = 3;
 export const ABOUT_MIN_RELEASE_BOTTLES = 10;
-export const ABOUT_MIN_KEY_FACTS = 2;
+// History sections shown before the "Show the full history" button.
+export const ABOUT_VISIBLE_SECTIONS = 3;
 
 function year(date: string) {
   return Number(date.slice(0, 4));
@@ -210,12 +209,14 @@ export function getEras(about: EntityAbout): AboutSpan[] {
 }
 
 export type AboutKeyFact = {
+  /** `founded`, `firstName`, or a site fact's field. */
+  key: string;
   label: string;
   value: string;
   sourceIds: string[];
 };
 
-/** Key facts for the sidebar: founding, first name, and site facts. */
+/** Sourced facts for the sidebar: founding, first name, and site facts. */
 export function getKeyFacts(
   about: EntityAbout,
   currentName: string,
@@ -224,6 +225,7 @@ export function getKeyFacts(
   const opened = about.events.find((event) => event.kind === "opened");
   if (opened) {
     facts.push({
+      key: "founded",
       label: "Founded",
       value: String(year(opened.date)),
       sourceIds: opened.citations.map((c) => c.sourceId),
@@ -233,6 +235,7 @@ export function getKeyFacts(
   const firstName = names[0];
   if (firstName && firstName.label !== currentName) {
     facts.push({
+      key: "firstName",
       label: "First name",
       value: `${firstName.label}, until ${firstName.end}`,
       sourceIds: about.events
@@ -244,6 +247,7 @@ export function getKeyFacts(
     // Numbers are shown with thousands separators; text stays as written.
     const value = fact.value.toLocaleString("en-US");
     facts.push({
+      key: fact.field,
       label: fact.label,
       value: fact.unit ? `${value} ${fact.unit}` : value,
       sourceIds: fact.citations.map((c) => c.sourceId),

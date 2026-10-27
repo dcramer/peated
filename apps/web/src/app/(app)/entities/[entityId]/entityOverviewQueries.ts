@@ -10,10 +10,6 @@ export const entityOverviewQueries = {
     }),
     enabled: entityHasBottleCatalog(entity),
   }),
-  events: (orpc: ORPCQueryUtils, entity: Entity) =>
-    orpc.entities.events.list.queryOptions({
-      input: { entity: entity.id },
-    }),
   companyPortfolio: (orpc: ORPCQueryUtils, entity: Entity) => {
     const companyId = entity.kind === "company" ? entity.id : undefined;
 

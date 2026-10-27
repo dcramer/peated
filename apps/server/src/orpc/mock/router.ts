@@ -28,11 +28,8 @@ import countryCategories from "./routes/countries/categories";
 import countryDetails from "./routes/countries/details";
 import countryList from "./routes/countries/list";
 import distilleryList from "./routes/distilleries/list";
-import entityAboutBottlers from "./routes/entities/about/bottlers";
 import entityAboutDetails from "./routes/entities/about/details";
-import entityAboutDistillers from "./routes/entities/about/distillers";
 import entityAboutReleaseYears from "./routes/entities/about/release-years";
-import entityAboutSitemap from "./routes/entities/about/sitemap";
 import entityAboutVintages from "./routes/entities/about/vintages";
 import entityCatalog from "./routes/entities/catalog";
 import entityCreate from "./routes/entities/create";
@@ -139,11 +136,8 @@ export const mockRouter = mockOS.router({
   distilleries: { list: distilleryList },
   entities: {
     about: {
-      bottlers: entityAboutBottlers,
       details: entityAboutDetails,
-      distillers: entityAboutDistillers,
       releaseYears: entityAboutReleaseYears,
-      sitemap: entityAboutSitemap,
       vintages: entityAboutVintages,
     },
     flavorProfile: entityFlavorProfile,

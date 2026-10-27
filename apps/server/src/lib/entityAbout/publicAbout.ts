@@ -144,9 +144,9 @@ export function getPublishedLeadText(
 }
 
 /**
- * Whether the About tab shows. Tab rule (owner:
- * docs/features/entity-about.md): the page is published and has enough to
- * show, counted the way the page itself shows it.
+ * Whether the Entity page shows the About document. Display rule (owner:
+ * docs/features/entity-about.md): it is published and has enough to show,
+ * counted the way the page itself shows it.
  */
 export function hasPublishedAboutPage(
   item: StoredEntityAbout | null,

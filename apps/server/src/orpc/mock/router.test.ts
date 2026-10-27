@@ -768,14 +768,6 @@ describe("mock oRPC router", () => {
     });
   });
 
-  it("lists About pages for the sitemap", async () => {
-    const { results, nextAfterId } =
-      await anonymousClient.entities.about.sitemap({});
-
-    expect(results.map(({ id }) => id)).toEqual([mockBrora.id]);
-    expect(nextAfterId).toBeNull();
-  });
-
   it("lists the signed-in member's tasting drafts", async () => {
     await expect(anonymousClient.tastingDrafts.list({})).rejects.toMatchObject({
       code: "UNAUTHORIZED",

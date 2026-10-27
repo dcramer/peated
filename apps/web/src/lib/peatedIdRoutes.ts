@@ -97,9 +97,12 @@ export function resolveEntityRoute(
   match: EntityRouteMatch,
   entity: { id: number; kind: EntityKind; name: string },
 ): PeatedIdRouteResolution {
-  const suffix = match.suffix;
+  // About pages moved onto the Entity's Overview (owner:
+  // docs/features/entity-page.md); old links land there.
+  const suffix = match.suffix === "/about" ? "" : match.suffix;
   const canonicalPath = getEntityUrl(entity);
   const canonicalRequest =
+    match.suffix === suffix &&
     match.source === "collection" &&
     match.entityId === entity.id &&
     match.kind === entity.kind &&

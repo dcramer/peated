@@ -5,6 +5,7 @@ import { space } from "../../../../styles/tokens.stylex";
 
 import { FlavorProfileSection } from "@peated/web/features/flavorProfile/flavorProfileSection";
 import { useQuery } from "@tanstack/react-query";
+import type { ReactNode } from "react";
 
 import { getEntityBottleCreateHref } from "@peated/web/lib/entityBottleCreateHref";
 import { useORPC } from "@peated/web/lib/orpc/context";
@@ -13,8 +14,7 @@ import { getEntityUrl } from "@peated/web/lib/urls";
 import { CompanyOwnedList } from "./companyOwnedList";
 import { EntityBottleOverview } from "./entityBottleOverview";
 import { EntityCatalogRelationships } from "./entityCatalogRelationships";
-import { EntityDetails, hasEntityDetails } from "./entityDetails.stylex";
-import { EntityHistoryOverview } from "./entityHistoryOverview.stylex";
+import { EntityDetails, type EntityAboutFact } from "./entityDetails.stylex";
 import { EntityImageGallery } from "./entityImageGallery.stylex";
 import { EntityImagePlaceholder } from "./entityImagePlaceholder.stylex";
 import { EntityMap } from "./entityMap.stylex";
@@ -26,13 +26,26 @@ import { EntityReviewsAndTastingsOverview } from "./entityReviewsAndTastingsOver
 import { EntitySeriesOverview } from "./entitySeriesOverview";
 import { EntitySiblingOverview } from "./entitySiblingOverview";
 
-export function EntityOverviewClient() {
+/** The About document's parts, rendered on the server. */
+export type EntityOverviewAbout = {
+  lead: ReactNode;
+  timeline: ReactNode;
+  history: ReactNode;
+  sources: ReactNode;
+  owners: ReactNode;
+  facts: readonly EntityAboutFact[];
+};
+
+export function EntityOverviewClient({
+  about,
+}: {
+  about?: EntityOverviewAbout;
+}) {
   const orpc = useORPC();
   const entity = useEntityPage();
   const catalogQuery = useQuery(
     entityOverviewQueries.bottleCatalog(orpc, entity),
   );
-  const eventListQuery = useQuery(entityOverviewQueries.events(orpc, entity));
   const bottleListQuery = useQuery(
     entityOverviewQueries.popularBottles(orpc, entity),
   );
@@ -54,12 +67,17 @@ export function EntityOverviewClient() {
 
   return (
     <EntityOverviewLayout
+      lead={about?.lead}
+      timeline={about?.timeline}
+      history={about?.history}
+      sources={about?.sources}
       facts={
         <>
-          {hasEntityDetails(entity) ? <EntityDetails entity={entity} /> : null}
+          <EntityDetails aboutFacts={about?.facts} entity={entity} />
+          {about?.owners}
         </>
       }
-      catalogSections={
+      catalog={
         <>
           {companyPortfolioQuery.isPending || companyPortfolioQuery.error ? (
             <CompanyOwnedList
@@ -126,21 +144,16 @@ export function EntityOverviewClient() {
             retry={() => void bottleListQuery.refetch()}
             totalBottles={entity.totalBottles}
           />
-          <EntityReviewsAndTastingsOverview
-            entity={entity}
-            error={Boolean(recentReviewsAndTastingsQuery.error)}
-            pending={recentReviewsAndTastingsQuery.isPending}
-            retry={() => void recentReviewsAndTastingsQuery.refetch()}
-            reviewsAndTastings={recentReviewsAndTastingsQuery.data}
-          />
-          <EntityHistoryOverview
-            entityName={entity.name}
-            error={Boolean(eventListQuery.error)}
-            eventList={eventListQuery.data}
-            pending={eventListQuery.isPending}
-            retry={() => void eventListQuery.refetch()}
-          />
         </>
+      }
+      activity={
+        <EntityReviewsAndTastingsOverview
+          entity={entity}
+          error={Boolean(recentReviewsAndTastingsQuery.error)}
+          pending={recentReviewsAndTastingsQuery.isPending}
+          retry={() => void recentReviewsAndTastingsQuery.refetch()}
+          reviewsAndTastings={recentReviewsAndTastingsQuery.data}
+        />
       }
       media={
         <>
