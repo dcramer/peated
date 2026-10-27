@@ -496,6 +496,12 @@ function stripThousands(value: string) {
         /(?<![\d.])\d{1,3}(?:[. \u00a0\u202f]\d{3}){2,}(?![\d.])/g,
         (number) => number.replace(/[. \u00a0\u202f]/g, ""),
       )
+      // One space group, as in Swedish "280 000 LPA", reads as one number
+      // only before a volume unit, so "1975 200 workers" stays two.
+      .replace(
+        /(?<![\d.])(\d{1,3})[ \u00a0\u202f](\d{3})(?=\s*(?:LPA|lpa|liters?|litres?|l)\b)/g,
+        "$1$2",
+      )
       // A sum such as "\u00a31,274,684.00" states 1274684.
       .replace(/(\d)\.0{1,2}(?!\d)/g, "$1")
   );
