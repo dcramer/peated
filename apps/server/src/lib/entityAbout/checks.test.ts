@@ -1085,6 +1085,12 @@ describe("checkConflictPicks", () => {
     ).toBeDefined();
     expect(stills(3700000, "(litres d'alcool/an) | 3 700 000")).toBeDefined();
     expect(stills(1975200, "In 1975 200 workers left.")).toBeUndefined();
+    expect(
+      stills(280000, "en produktionskapacitet på cirka 280 000 LPA"),
+    ).toBeDefined();
+    expect(
+      stills(200000, "ökar sin produktion från 200 000 liter"),
+    ).toBeDefined();
     expect(stills(1274684, "Facility | £1,274,684.00 | 2013")).toBeDefined();
     expect(stills(1000, "Kapazität von 1.000 Litern.")).toBeUndefined();
     expect(
