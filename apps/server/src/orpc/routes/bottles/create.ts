@@ -43,7 +43,6 @@ export default procedure
         context,
         input: bottleInput,
         creationSource: reviewed ? "repair_workflow" : "manual_entry",
-        generateDetails: !reviewed,
       });
       return await serialize(
         BottleSerializer,

@@ -42,44 +42,6 @@ async function resolveEntityReference(
 }
 
 subcommand
-  .command("generate-descriptions")
-  .description("Generate bottle descriptions")
-  .argument("[bottleIds...]")
-  .option("--only-missing")
-  .action(async (bottleIds, options) => {
-    const step = 1000;
-    const baseQuery = db
-      .select({ id: bottles.id })
-      .from(bottles)
-      .innerJoin(bottleGroups, eq(bottleGroups.id, bottles.groupId))
-      .leftJoin(bottleTombstones, eq(bottleTombstones.bottleId, bottles.id))
-      .where(
-        and(
-          isNull(bottleTombstones.bottleId),
-          bottleIds.length
-            ? inArray(bottles.id, bottleIds)
-            : options.onlyMissing
-              ? isNull(bottles.description)
-              : undefined,
-        ),
-      )
-      .orderBy(asc(bottles.id));
-
-    let hasResults = true;
-    let offset = 0;
-    while (hasResults) {
-      hasResults = false;
-      const query = await baseQuery.offset(offset).limit(step);
-      for (const { id } of query) {
-        console.log(`Generating description for Bottle ${id}.`);
-        await runJob("GenerateBottleDetails", { bottleId: id });
-        hasResults = true;
-      }
-      offset += step;
-    }
-  });
-
-subcommand
   .command("create-missing")
   .description("Create missing bottles")
   .action(async (options) => {

@@ -1,5 +1,4 @@
 import { describe, expect, test } from "vitest";
-import { GenerateBottleDetailsJobArgsSchema } from "./generateBottleDetails";
 import { IndexBottleReferenceJobArgsSchema } from "./indexBottleReference";
 import { IndexBottleSearchJobArgsSchema } from "./indexBottleSearch";
 import { OnBottleReferenceChangeJobArgsSchema } from "./onBottleReferenceChange";
@@ -7,7 +6,6 @@ import { VerifyBottleCreationJobArgsSchema } from "./verifyBottleCreation";
 
 describe("Bottle job payloads", () => {
   test.each([
-    [GenerateBottleDetailsJobArgsSchema, { bottleId: 1 }],
     [IndexBottleSearchJobArgsSchema, { bottleId: 1 }],
     [IndexBottleReferenceJobArgsSchema, { name: "Direct Bottle Alias" }],
     [OnBottleReferenceChangeJobArgsSchema, { name: "Direct Bottle Alias" }],
@@ -20,7 +18,6 @@ describe("Bottle job payloads", () => {
   });
 
   test.each([
-    [GenerateBottleDetailsJobArgsSchema, { bottleId: 1, releaseId: 2 }],
     [IndexBottleSearchJobArgsSchema, { bottleId: 1, groupId: 2 }],
     [IndexBottleReferenceJobArgsSchema, { name: "" }],
     [OnBottleReferenceChangeJobArgsSchema, { targetId: 1 }],

@@ -735,17 +735,12 @@ export async function finalizeCreatedBottle(
   { bottle, newEntityIds }: BottleCreateResult,
   {
     creationSource = "manual_entry",
-    generateDetails = true,
   }: {
     creationSource?: CatalogVerificationCreationSource;
-    generateDetails?: boolean;
   } = {},
 ) {
   try {
-    await pushJob("OnBottleChange", {
-      bottleId: bottle.id,
-      generateDetails,
-    });
+    await pushJob("OnBottleChange", { bottleId: bottle.id });
   } catch (err) {
     logError(err, {
       bottle: {
@@ -802,12 +797,10 @@ type BottleCreateInputCandidate = Partial<
 async function createBottleForActor({
   actorId,
   creationSource,
-  generateDetails = true,
   input: rawInput,
 }: {
   actorId: number;
   creationSource: CatalogVerificationCreationSource;
-  generateDetails?: boolean;
   input: BottleCreateInputCandidate;
 }): Promise<CreateBottleResult> {
   const input = BottleCreateInputSchema.parse(rawInput);
@@ -819,7 +812,7 @@ async function createBottleForActor({
     }),
   );
 
-  await finalizeCreatedBottle(result, { creationSource, generateDetails });
+  await finalizeCreatedBottle(result, { creationSource });
   return {
     bottle: result.bottle,
     group: result.group,
@@ -829,12 +822,10 @@ async function createBottleForActor({
 /** Parses untrusted input once and owns transaction plus post-commit dispatch. */
 export async function createBottle({
   creationSource = "manual_entry",
-  generateDetails = true,
   input,
   context,
 }: {
   creationSource?: CatalogVerificationCreationSource;
-  generateDetails?: boolean;
   input: BottleCreateInputCandidate;
   context: Context & { user: User };
 }): Promise<CreateBottleResult> {
@@ -842,7 +833,6 @@ export async function createBottle({
   return createBottleForActor({
     actorId: actor.id,
     creationSource,
-    generateDetails,
     input,
   });
 }

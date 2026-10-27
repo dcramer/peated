@@ -78,7 +78,6 @@ describe("POST /bottles", () => {
     });
     expect(workerClient.pushJob).toHaveBeenCalledWith("OnBottleChange", {
       bottleId: result.id,
-      generateDetails: false,
     });
     expect(workerClient.pushJob).not.toHaveBeenCalledWith(
       "VerifyBottleCreation",
@@ -275,7 +274,6 @@ describe("POST /bottles", () => {
     expect(distillers.length).toBe(0);
     expect(workerClient.pushJob).toHaveBeenCalledWith("OnBottleChange", {
       bottleId: bottle.id,
-      generateDetails: true,
     });
     expect(workerClient.pushJob).toHaveBeenCalledWith(
       "VerifyBottleCreation",

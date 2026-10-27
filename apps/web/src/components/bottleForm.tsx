@@ -31,7 +31,6 @@ import {
 } from "@peated/web/components/field.stylex";
 import { Select, Switch } from "@peated/web/components/formControls.stylex";
 import {
-  FormActions,
   FormDesktopOnly,
   FormDetails,
   FormGrid,
@@ -63,11 +62,9 @@ import { useORPC } from "@peated/web/lib/orpc/context";
 import { zodResolver } from "@peated/web/lib/zodResolver";
 import {
   keepPreviousData,
-  useMutation,
   useQuery,
   useQueryClient,
 } from "@tanstack/react-query";
-import { WandSparkles } from "lucide-react";
 import {
   useEffect,
   useMemo,
@@ -507,7 +504,6 @@ export default function BottleForm({
     needsRemoteSeriesSearch && debouncedSeriesQuery
       ? seriesSearchResults
       : seriesPreloadResults;
-  const generateData = useMutation(orpc.ai.bottleLookup.mutationOptions());
   const draft = useWatch({ control });
   const {
     abv,
@@ -673,16 +669,6 @@ export default function BottleForm({
       );
     }
   };
-
-  async function fillDetails() {
-    const result = await generateData.mutateAsync(getValues());
-    if (!result) return;
-    const current = getValues();
-    if (result.description && !current.description) {
-      setValue("description", result.description, { shouldDirty: true });
-      setValue("descriptionSrc", "generated", { shouldDirty: true });
-    }
-  }
 
   function scrollToFormTop() {
     window.scrollTo({ top: 0 });
@@ -1447,19 +1433,6 @@ export default function BottleForm({
                     ) : null}
                     {!isCreate || currentStep === 6 ? (
                       <>
-                        {user?.mod || user?.admin ? (
-                          <FormActions>
-                            <Button
-                              loading={generateData.isPending}
-                              onClick={() => void fillDetails()}
-                              size="sm"
-                              variant="tonal"
-                            >
-                              <WandSparkles aria-hidden="true" size={15} />
-                              Fill description
-                            </Button>
-                          </FormActions>
-                        ) : null}
                         <FieldGroup label="Bottle image" optional>
                           <PictureInput
                             disabled={isSubmitting}

@@ -10954,13 +10954,13 @@ snapshots:
       '@adobe/css-tools': 4.4.2
       hast-util-select: 6.0.4
       hast-util-to-string: 3.0.1
-      jsx-email: 3.2.1(@emotion/is-prop-valid@0.8.8)(@jsx-email/plugin-inline@2.0.0)(@jsx-email/plugin-minify@2.0.0)(@jsx-email/plugin-pretty@2.0.0)(@types/node@26.1.0)(@types/react-dom@19.2.3(@types/react@19.2.17))(@types/react@19.2.17)(canispam@1.0.0(supports-color@8.1.1))(jiti@2.7.0)(prettier@3.8.1)(react-dom@19.2.7(react@19.2.7))(react@19.2.7)(supports-color@8.1.1)(terser@5.51.2)(tsx@4.23.15)(typescript@5.9.3)(use-sync-external-store@1.6.0(react@19.2.7))(yaml@2.9.1)
+      jsx-email: 3.2.1(@emotion/is-prop-valid@0.8.8)(@jsx-email/plugin-inline@2.0.0)(@jsx-email/plugin-minify@2.0.0)(@jsx-email/plugin-pretty@2.0.0)(@types/node@24.13.2)(@types/react-dom@19.2.3(@types/react@19.2.17))(@types/react@19.2.17)(canispam@1.0.0(supports-color@8.1.1))(jiti@2.7.0)(prettier@3.8.1)(react-dom@19.2.7(react@19.2.7))(react@19.2.7)(supports-color@8.1.1)(terser@5.51.2)(tsx@4.23.15)(typescript@5.9.3)(use-sync-external-store@1.6.0(react@19.2.7))(yaml@2.9.1)
       unist-util-remove: 4.0.0
       unist-util-visit: 5.1.0
 
   '@jsx-email/plugin-minify@2.0.0(jsx-email@3.2.1)':
     dependencies:
-      jsx-email: 3.2.1(@emotion/is-prop-valid@0.8.8)(@jsx-email/plugin-inline@2.0.0)(@jsx-email/plugin-minify@2.0.0)(@jsx-email/plugin-pretty@2.0.0)(@types/node@26.1.0)(@types/react-dom@19.2.3(@types/react@19.2.17))(@types/react@19.2.17)(canispam@1.0.0(supports-color@8.1.1))(jiti@2.7.0)(prettier@3.8.1)(react-dom@19.2.7(react@19.2.7))(react@19.2.7)(supports-color@8.1.1)(terser@5.51.2)(tsx@4.23.15)(typescript@5.9.3)(use-sync-external-store@1.6.0(react@19.2.7))(yaml@2.9.1)
+      jsx-email: 3.2.1(@emotion/is-prop-valid@0.8.8)(@jsx-email/plugin-inline@2.0.0)(@jsx-email/plugin-minify@2.0.0)(@jsx-email/plugin-pretty@2.0.0)(@types/node@24.13.2)(@types/react-dom@19.2.3(@types/react@19.2.17))(@types/react@19.2.17)(canispam@1.0.0(supports-color@8.1.1))(jiti@2.7.0)(prettier@3.8.1)(react-dom@19.2.7(react@19.2.7))(react@19.2.7)(supports-color@8.1.1)(terser@5.51.2)(tsx@4.23.15)(typescript@5.9.3)(use-sync-external-store@1.6.0(react@19.2.7))(yaml@2.9.1)
       rehype-minify-attribute-whitespace: 4.0.1
       rehype-minify-css-style: 4.0.1
       rehype-minify-enumerated-attribute: 5.0.2
@@ -10982,7 +10982,7 @@ snapshots:
 
   '@jsx-email/plugin-pretty@2.0.0(jsx-email@3.2.1)':
     dependencies:
-      jsx-email: 3.2.1(@emotion/is-prop-valid@0.8.8)(@jsx-email/plugin-inline@2.0.0)(@jsx-email/plugin-minify@2.0.0)(@jsx-email/plugin-pretty@2.0.0)(@types/node@26.1.0)(@types/react-dom@19.2.3(@types/react@19.2.17))(@types/react@19.2.17)(canispam@1.0.0(supports-color@8.1.1))(jiti@2.7.0)(prettier@3.8.1)(react-dom@19.2.7(react@19.2.7))(react@19.2.7)(supports-color@8.1.1)(terser@5.51.2)(tsx@4.23.15)(typescript@5.9.3)(use-sync-external-store@1.6.0(react@19.2.7))(yaml@2.9.1)
+      jsx-email: 3.2.1(@emotion/is-prop-valid@0.8.8)(@jsx-email/plugin-inline@2.0.0)(@jsx-email/plugin-minify@2.0.0)(@jsx-email/plugin-pretty@2.0.0)(@types/node@24.13.2)(@types/react-dom@19.2.3(@types/react@19.2.17))(@types/react@19.2.17)(canispam@1.0.0(supports-color@8.1.1))(jiti@2.7.0)(prettier@3.8.1)(react-dom@19.2.7(react@19.2.7))(react@19.2.7)(supports-color@8.1.1)(terser@5.51.2)(tsx@4.23.15)(typescript@5.9.3)(use-sync-external-store@1.6.0(react@19.2.7))(yaml@2.9.1)
       pretty: 2.0.0
 
   '@ladjs/naivebayes@0.1.0(supports-color@8.1.1)':

@@ -1,34 +1,24 @@
 import { zodTextFormat } from "openai/helpers/zod";
 import { describe, expect, test } from "vitest";
 import { z } from "zod";
-import { OpenAIBottleDetailsValidationSchema } from "../worker/jobs/generateBottleDetails";
 import { OpenAICountryDetailsSchema } from "../worker/jobs/generateCountryDetails";
 import { OpenAIEntityDetailsValidationSchema } from "../worker/jobs/generateEntityDetails";
 import { OpenAIRegionDetailsSchema } from "../worker/jobs/generateRegionDetails";
-import { MAX_BOTTLE_SUGGESTED_TAGS } from "./bottleSchemas";
 import { buildStructuredResponseSpanContext } from "./openai";
-
-const BottleJsonSchemaContract = z.object({
-  properties: z
-    .object({
-      suggestedTags: z.object({ maxItems: z.number().optional() }).optional(),
-    })
-    .optional(),
-});
 
 test("uses GenAI workflow semantics for structured responses", () => {
   expect(
     buildStructuredResponseSpanContext(
-      "generateBottleDetails",
+      "getGeneratedEntityDetails",
       "gpt-5.6-terra",
     ),
   ).toEqual({
     op: "gen_ai.invoke_workflow",
-    name: "invoke_workflow generateBottleDetails",
+    name: "invoke_workflow getGeneratedEntityDetails",
     attributes: {
       "gen_ai.operation.name": "invoke_workflow",
       "gen_ai.provider.name": "openai",
-      "gen_ai.workflow.name": "generateBottleDetails",
+      "gen_ai.workflow.name": "getGeneratedEntityDetails",
       "gen_ai.request.model": "gpt-5.6-terra",
       "gen_ai.output.type": "json",
     },
@@ -44,12 +34,6 @@ describe("openai structured output schemas", () => {
       ),
     ).not.toThrow();
     expect(() =>
-      zodTextFormat(
-        OpenAIBottleDetailsValidationSchema,
-        "generate_bottle_details",
-      ),
-    ).not.toThrow();
-    expect(() =>
       zodTextFormat(OpenAICountryDetailsSchema, "generate_country_details"),
     ).not.toThrow();
     expect(() =>
@@ -61,15 +45,5 @@ describe("openai structured output schemas", () => {
     const jsonSchema = z.toJSONSchema(OpenAIEntityDetailsValidationSchema);
 
     expect(JSON.stringify(jsonSchema)).not.toContain('"format":"uri"');
-  });
-
-  test("limits generated bottle tags to the storage contract", () => {
-    const jsonSchema = BottleJsonSchemaContract.parse(
-      z.toJSONSchema(OpenAIBottleDetailsValidationSchema),
-    );
-
-    expect(jsonSchema.properties?.suggestedTags?.maxItems).toBe(
-      MAX_BOTTLE_SUGGESTED_TAGS,
-    );
   });
 });
