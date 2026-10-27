@@ -491,6 +491,8 @@ function stripThousands(value: string) {
         /(?<![\d.])\d{1,3}(?:[. \u00a0\u202f]\d{3}){2,}(?![\d.])/g,
         (number) => number.replace(/[. \u00a0\u202f]/g, ""),
       )
+      // A sum such as "\u00a31,274,684.00" states 1274684.
+      .replace(/(\d)\.0{1,2}(?!\d)/g, "$1")
   );
 }
 
