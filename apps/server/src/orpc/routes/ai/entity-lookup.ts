@@ -2,10 +2,7 @@ import { db } from "@peated/server/db";
 import { countries, regions } from "@peated/server/db/schema";
 import { procedure } from "@peated/server/orpc";
 import { requireMod } from "@peated/server/orpc/middleware";
-import {
-  EntityInputObjectSchema,
-  EntityKindEnum,
-} from "@peated/server/schemas";
+import { EntityInputObjectSchema } from "@peated/server/schemas";
 import { getGeneratedEntityDetails } from "@peated/server/worker/jobs/generateEntityDetails";
 import { eq } from "drizzle-orm";
 import { z } from "zod";
@@ -13,10 +10,6 @@ import { z } from "zod";
 const InputSchema = EntityInputObjectSchema.partial();
 
 const OutputSchema = z.object({
-  description: z.string().nullish(),
-  yearEstablished: z.number().nullish(),
-  kind: EntityKindEnum.nullish(),
-  website: z.string().nullish(),
   pronunciation: z.string().nullish(),
   pronunciationIpa: z.string().nullish(),
 });
@@ -28,7 +21,7 @@ export default procedure
     path: "/ai/entity-lookup",
     summary: "AI entity lookup",
     description:
-      "Use AI to generate Entity details, including description, establishment year, kind, website, and pronunciation. Requires moderator privileges",
+      "Use AI to suggest how an Entity's name is pronounced, in plain English respelling and IPA. Descriptions and founding years come from the sourced About page instead. Requires moderator privileges",
     operationId: "aiEntityLookup",
   })
   .input(InputSchema)
@@ -52,10 +45,6 @@ export default procedure
     });
 
     return {
-      description: result?.description,
-      yearEstablished: result?.yearEstablished,
-      kind: result?.kind || null,
-      website: result?.website,
       pronunciation: result?.pronunciation,
       pronunciationIpa: result?.pronunciationIpa,
     };

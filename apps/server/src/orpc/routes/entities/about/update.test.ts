@@ -1,9 +1,9 @@
 import { db } from "@peated/server/db";
-import { entities } from "@peated/server/db/schema";
+import { changes, entities, type User } from "@peated/server/db/schema";
 import { getEntityAbout } from "@peated/server/lib/entityAbout/store";
 import waitError from "@peated/server/lib/test/waitError";
 import { routerClient } from "@peated/server/orpc/router";
-import { eq } from "drizzle-orm";
+import { and, eq } from "drizzle-orm";
 
 const source = {
   id: "s1",
@@ -89,6 +89,117 @@ describe("PUT /entities/:entity/about", () => {
       .from(entities)
       .where(eq(entities.id, entity.id));
     expect(updated?.description).toBe("It opened in 1819. It closed in 1983.");
+  });
+
+  describe("founding year", () => {
+    const opened = (
+      id: number,
+      date: string,
+      citations: { sourceId: string; statedValue?: string }[],
+    ) => ({ id, kind: "opened" as const, date, citations });
+
+    async function savePage(
+      user: User,
+      entityId: number,
+      events: ReturnType<typeof opened>[],
+      sources = [source],
+    ) {
+      await routerClient.entities.about.update(
+        {
+          entity: entityId,
+          version: null,
+          document: {
+            sources,
+            events,
+            sections: [
+              {
+                key: "lead",
+                sentences: [
+                  { text: "It opened long ago.", factIds: ["event:1"] },
+                ],
+              },
+            ],
+          },
+        },
+        { context: { user } },
+      );
+      const [entity] = await db
+        .select({ yearEstablished: entities.yearEstablished })
+        .from(entities)
+        .where(eq(entities.id, entityId));
+      return entity?.yearEstablished;
+    }
+
+    test("replaces the stored year with the cited opening year", async ({
+      fixtures,
+    }) => {
+      const user = await fixtures.User({ mod: true });
+      const entity = await fixtures.Entity({
+        kind: "distillery",
+        yearEstablished: 1820,
+      });
+
+      await expect(
+        savePage(user, entity.id, [
+          opened(1, "1819-05", [{ sourceId: "s1", statedValue: "1819" }]),
+        ]),
+      ).resolves.toBe(1819);
+
+      const history = await db
+        .select({ data: changes.data })
+        .from(changes)
+        .where(
+          and(
+            eq(changes.objectType, "entity"),
+            eq(changes.objectId, entity.id),
+          ),
+        );
+      expect(history.map(({ data }) => data)).toContainEqual({
+        yearEstablished: 1819,
+        before: { yearEstablished: 1820 },
+      });
+    });
+
+    test("keeps the stored year when sources disagree", async ({
+      fixtures,
+    }) => {
+      const user = await fixtures.User({ mod: true });
+      const entity = await fixtures.Entity({
+        kind: "distillery",
+        yearEstablished: 1820,
+      });
+
+      await expect(
+        savePage(
+          user,
+          entity.id,
+          [
+            opened(1, "1819", [
+              { sourceId: "s1", statedValue: "1819" },
+              { sourceId: "s2", statedValue: "1822" },
+            ]),
+          ],
+          [source, { ...source, id: "s2", url: "https://example.com/other" }],
+        ),
+      ).resolves.toBe(1820);
+    });
+
+    test("keeps the stored year when the page has two openings", async ({
+      fixtures,
+    }) => {
+      const user = await fixtures.User({ mod: true });
+      const entity = await fixtures.Entity({
+        kind: "distillery",
+        yearEstablished: 1820,
+      });
+
+      await expect(
+        savePage(user, entity.id, [
+          opened(1, "1819", [{ sourceId: "s1" }]),
+          opened(2, "1824", [{ sourceId: "s1" }]),
+        ]),
+      ).resolves.toBe(1820);
+    });
   });
 
   test("rejects an edit based on an older version", async ({ fixtures }) => {

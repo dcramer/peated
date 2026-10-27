@@ -125,16 +125,9 @@ export default function EntityForm({
     }
   };
 
-  async function fillDetails() {
+  async function fillPronunciation() {
     const result = await generateData.mutateAsync(getValues());
     const current = getValues();
-    if (result?.description && !current.description) {
-      setValue("description", result.description);
-      setValue("descriptionSrc", "generated");
-    }
-    if (result?.yearEstablished && !current.yearEstablished) {
-      setValue("yearEstablished", result.yearEstablished);
-    }
     if (result?.pronunciation && !current.pronunciation) {
       setValue("pronunciation", result.pronunciation);
     }
@@ -152,7 +145,22 @@ export default function EntityForm({
       <form onSubmit={handleSubmit(submit)}>
         <FormStack>
           {submitError ? <FormNotice>{submitError}</FormNotice> : null}
-          <FormSection title="Details">
+          <FormSection
+            action={
+              user?.mod || user?.admin ? (
+                <Button
+                  loading={generateData.isPending}
+                  onClick={() => void fillPronunciation()}
+                  size="sm"
+                  variant="tonal"
+                >
+                  <WandSparkles aria-hidden="true" size={15} />
+                  Fill pronunciation
+                </Button>
+              ) : undefined
+            }
+            title="Details"
+          >
             <Field
               error={errors.name?.message}
               errorId="entity-name-error"
@@ -355,22 +363,7 @@ export default function EntityForm({
             </FormSection>
           ) : null}
 
-          <FormSection
-            action={
-              user?.mod || user?.admin ? (
-                <Button
-                  loading={generateData.isPending}
-                  onClick={() => void fillDetails()}
-                  size="sm"
-                  variant="tonal"
-                >
-                  <WandSparkles aria-hidden="true" size={15} />
-                  Fill details
-                </Button>
-              ) : undefined
-            }
-            title="Details"
-          >
+          <FormSection title="Details">
             <EntityPicker
               help="The company or organization this is part of, when known."
               label="Part of"

@@ -14,10 +14,6 @@ function generatedDetails(
   details: Partial<GeneratedEntityDetails> = {},
 ): GeneratedEntityDetails {
   return {
-    description: null,
-    yearEstablished: null,
-    website: null,
-    kind: "distillery",
     pronunciation: "glen GEER-ee",
     pronunciationIpa: "ɡlɛn ˈɡɪəri",
     ...details,
@@ -121,7 +117,6 @@ test("drops a generated pronunciation in the wrong format", async ({
   });
   const model = vi.fn<EntityDetailsModel>(async () =>
     generatedDetails({
-      yearEstablished: 1797,
       pronunciation: "Glen Geery",
       pronunciationIpa: "/ɡlɛn ˈɡɪəri/",
     }),
@@ -130,23 +125,18 @@ test("drops a generated pronunciation in the wrong format", async ({
   await generateEntityDetails(entity.id, model);
 
   await expect(readEntity(entity.id)).resolves.toMatchObject({
-    yearEstablished: 1797,
     pronunciation: null,
     pronunciationIpa: null,
   });
   expect(pushJob).not.toHaveBeenCalled();
 });
 
-test("skips the model when every generated field is filled", async ({
+test("skips the model when the pronunciation is filled", async ({
   fixtures,
 }) => {
   const entity = await fixtures.Entity({
     name: "Glen Garioch",
     kind: "distillery",
-    description: "A Highland distillery in Oldmeldrum.",
-    descriptionSrc: "user",
-    yearEstablished: 1797,
-    website: "https://www.glengarioch.com",
     pronunciation: "glen GEER-ee",
     pronunciationIpa: "ɡlɛn ˈɡɪəri",
   });
@@ -157,19 +147,25 @@ test("skips the model when every generated field is filled", async ({
   expect(model).not.toHaveBeenCalled();
 });
 
-test("never writes a description from the model", async ({ fixtures }) => {
+test("leaves the description, founding year, and website empty", async ({
+  fixtures,
+}) => {
   const entity = await fixtures.Entity({
     name: "Glen Garioch",
     kind: "distillery",
     description: null,
+    yearEstablished: null,
+    website: null,
   });
-  const model = vi.fn<EntityDetailsModel>(async () =>
-    generatedDetails({ description: "A Highland distillery in Oldmeldrum." }),
-  );
+  const model = vi.fn<EntityDetailsModel>(async () => generatedDetails());
 
   await generateEntityDetails(entity.id, model);
 
+  expect(model).toHaveBeenCalledOnce();
   await expect(readEntity(entity.id)).resolves.toMatchObject({
     description: null,
+    yearEstablished: null,
+    website: null,
+    pronunciation: "glen GEER-ee",
   });
 });
