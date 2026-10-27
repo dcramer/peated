@@ -1,7 +1,6 @@
 import { spawnSync } from "node:child_process";
 import { fileURLToPath } from "node:url";
 
-const MAX_SCHEDULED_TESTS = 44;
 const CI_GLOBAL_TIMEOUT_MS = 7 * 60_000;
 const CI_TEST_TIMEOUT_MS = 45_000;
 const CI_MAX_FAILURES = 2;
@@ -43,12 +42,6 @@ const scheduledTests = specs.flatMap((spec) =>
 );
 const errors = [];
 
-if (scheduledTests.length > MAX_SCHEDULED_TESTS) {
-  errors.push(
-    `The suite schedules ${scheduledTests.length} tests; the policy allows ${MAX_SCHEDULED_TESTS}.`,
-  );
-}
-
 for (const { spec, test } of scheduledTests) {
   const isMobileProject = test.projectName === "chromium-mobile";
   const isMobileTagged = spec.tags.includes("mobile");
@@ -89,7 +82,7 @@ if (errors.length > 0) {
     process.stderr.write(`- ${error}\n`);
   }
   process.stderr.write(
-    "Remove duplicate browser coverage or update the documented policy and its budget in the same change.\n",
+    "Fix the listed tests, or update the documented policy in the same change.\n",
   );
   process.exit(1);
 }
@@ -98,7 +91,7 @@ const mobileTests = scheduledTests.filter(
   ({ test }) => test.projectName === "chromium-mobile",
 ).length;
 process.stdout.write(
-  `E2E policy passed: ${scheduledTests.length}/${MAX_SCHEDULED_TESTS} scheduled tests; ${mobileTests} mobile-only.\n`,
+  `E2E policy passed: ${scheduledTests.length} scheduled tests; ${mobileTests} mobile-only.\n`,
 );
 
 function collectSpecs(suites) {

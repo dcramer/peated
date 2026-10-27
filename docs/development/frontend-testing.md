@@ -105,8 +105,9 @@ The suite starts two local servers:
 Each web port uses its own Next.js build directory under `.playwright`, so
 fallback-port and concurrent local runs do not share a compiler lock or cache.
 The suite uses one browser worker because every test shares that Next process
-and the stateful mock API. Keep the suite small enough to stay within the CI
-budget instead of adding parallel access to those shared services.
+and the stateful mock API. CI keeps the suite fast by splitting it across
+runners, each with its own servers, instead of adding parallel access to those
+shared services. See [CI Budget](#ci-budget).
 
 This keeps browser tests independent from a local database and API server.
 Browser workflow tests should reuse the shared e2e fixtures and add narrow mock
@@ -147,20 +148,30 @@ web server is already running with the API pointed at a compatible test target.
 Three photo tests cover keeping what a failed lookup found, replacing a photo
 during lookup, and stopping a stalled request. The last test advances the browser clock.
 
-- The Playwright command should finish in less than 5 minutes on a healthy CI
-  runner. Its hard timeout is 7 minutes. The 15-minute GitHub job timeout also
-  includes dependency and browser setup.
-- The suite can schedule at most 44 tests across all browser projects. The
-  `test:e2e` command checks this limit and the mobile tagging, timeout, retry,
-  and failure policies before it starts a browser.
+- CI splits the suite into two shards with Playwright's `--shard` option. Each
+  shard runs on its own runner with its own Next.js and mock API servers.
+  `test.yml` runs the shards as `test / web e2e (1/2)` and `(2/2)`. The
+  screenshot workflow uses the same split and merges the images.
+- Each shard's Playwright command should finish in less than 5 minutes on a
+  healthy CI runner. Its hard timeout is 7 minutes. The 15-minute GitHub job
+  timeout also includes dependency and browser setup.
+- There is no limit on the number of tests. The `test:e2e` command checks the
+  mobile tagging, timeout, retry, and failure policies before it starts a
+  browser.
 - A test gets one CI retry. Do not increase retries or timeouts to hide an
   intermittent failure. Fix the ownership or remove browser coverage that a
   cheaper test already proves.
-- CI stops after two failures so it can retain traces and report the failing
-  scenarios before the outer job timeout.
-- Review the browser count and CI duration when adding a scenario. If a change
-  pushes the healthy run above the budget, consolidate the suite in the same
-  change.
+- CI stops a shard after two failures so it can retain traces and report the
+  failing scenarios before the outer job timeout.
+- When a healthy shard nears 5 minutes, add a shard. Change `shard` and
+  `total` in the e2e matrix of both `.github/workflows/test.yml` and
+  `.github/workflows/web-visual.yml`.
+
+To run one shard locally:
+
+```shell
+pnpm --dir apps/web test:e2e --shard=1/2
+```
 
 ## Reliability Rules
 

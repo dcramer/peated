@@ -73,11 +73,12 @@ storybook/components/layout/workflow-screen__saving.png
 
 ## Frameshift flow
 
-The web screenshot workflow runs the normal E2E suite and Storybook capture
-for both `main` and pull request revisions, then hands the images to the
-`dcramer/frameshift/ci` Action. Each `main` run saves the images in an artifact
-named for its full commit ID. A pull request run compares its images with the
-artifact for the merge commit's first parent:
+The web screenshot workflow runs the E2E suite in two shards and the Storybook
+capture as parallel jobs for both `main` and pull request revisions. A capture
+job merges their images and hands them to the `dcramer/frameshift/ci` Action.
+Each `main` run saves the images in an artifact named for its full commit ID. A
+pull request run compares its images with the artifact for the merge commit's
+first parent:
 
 ```text
 main commit --run E2E + Storybook--> artifact for that commit
