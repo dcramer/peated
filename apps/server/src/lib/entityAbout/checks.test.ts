@@ -1054,6 +1054,7 @@ describe("checkConflictPicks", () => {
     expect(stills(3400000, "Capacity (mlpa)\ni\n3.4")).toBeDefined();
     expect(stills(4800000, "It makes 4.8 mlpa.")).toBeDefined();
     expect(stills(6500000, "Capacity rose to 6.5mla.")).toBeDefined();
+    expect(stills(64000000, "It doubled capacity to 64mlas.")).toBeDefined();
     expect(stills(3400000, "Capacity (mlpa) 3.4 since 2018")).toBeDefined();
     expect(
       stills(2018000000, "Capacity (mlpa) 3.4 since 2018"),
