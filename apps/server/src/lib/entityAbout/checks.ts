@@ -109,8 +109,10 @@ function trimToStatedPrecision(quotes: readonly string[], date: string) {
   const mm = month!.padStart(2, "0");
   const numericMonth = `\\b${year}-${mm}\\b|\\b${m}/${year}\\b`;
   const monthByNumber = `\\b${monthWord}(?![a-z])\\s*,?\\s*\\d|\\d(?:st|nd|rd|th)?\\s+(?:of\\s+)?${monthWord}(?![a-z])`;
+  // Japanese and Chinese pages write "2022年2月9日".
+  const cjkMonth = `(?<!\\d)${m}\\s*月`;
   if (
-    !states(`${numericMonth}|${monthByNumber}`) &&
+    !states(`${numericMonth}|${monthByNumber}|${cjkMonth}`) &&
     !states(`\\b${titleMonth}(?![a-z])`, "")
   ) {
     return year!;
@@ -119,7 +121,10 @@ function trimToStatedPrecision(quotes: readonly string[], date: string) {
   const d = `0?${Number(day)}(?:st|nd|rd|th)?`;
   const dayWithMonth = `\\b${d}\\s+(?:of\\s+)?${monthWord}(?![a-z])|\\b${monthWord}\\s+${d}\\b`;
   const numericDay = `\\b${year}[-/.]${m}[-/.]${d}\\b|\\b${d}[-/.]${m}[-/.]${year}\\b|\\b${m}[-/.]${d}[-/.]${year}\\b`;
-  return states(`${dayWithMonth}|${numericDay}`) ? date : `${year}-${month}`;
+  const cjkDay = `${cjkMonth}\\s*0?${Number(day)}\\s*日`;
+  return states(`${dayWithMonth}|${numericDay}|${cjkDay}`)
+    ? date
+    : `${year}-${month}`;
 }
 
 /** Trims a single-date statedValue the same way; ranges and other values pass. */

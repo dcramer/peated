@@ -179,6 +179,31 @@ describe("keepVerifiedCitations", () => {
     ]);
   });
 
+  test("reads Japanese and Chinese dates", () => {
+    const pages = [
+      {
+        url: page.url,
+        text: "2022年2月9日に重要文化財に指定された。1980年に町の文化財に指定。",
+      },
+    ];
+    const result = keepVerifiedCitations(
+      draft({
+        events: [
+          event(1, "2022-02-09", "2022年2月9日に重要文化財に指定された。"),
+          // No quote names the month.
+          event(2, "1980-02", "1980年に町の文化財に指定。"),
+        ],
+      }),
+      pages,
+      null,
+    );
+
+    expect(result.events.map(({ date }) => date)).toEqual([
+      "2022-02-09",
+      "1980",
+    ]);
+  });
+
   test("drops an event whose text states a number no quote states", () => {
     const withText = (text: string) =>
       keepVerifiedCitations(
