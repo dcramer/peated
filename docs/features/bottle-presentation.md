@@ -151,6 +151,20 @@ When stored fields conflict, concise presentation should prefer the explicit
 human-facing marketed designation and avoid displaying a contradictory second
 token. The conflict belongs in verification or moderation workflows.
 
+## Description
+
+A Bottle description is text a person wrote or copied from a source, with
+`descriptionSrc` set to `user`. Peated no longer writes Bottle descriptions
+with a model, because text from a model's memory alone was generic and
+sometimes wrong. A Bottle without a description shows none.
+
+Descriptions marked `generated` are left over from the old writer.
+`/admin/catalog/clear-bottle-descriptions` clears them; run it with `dryRun`
+first to list what it would clear. A description with no `descriptionSrc`
+stays, since a person may have written it before Peated recorded who wrote
+descriptions. Each clear is saved as a Bottle change that keeps the old text
+under `before`, since the old writer saved its text without a change.
+
 ## Tasting-note flavor profile
 
 Bottle overview pages show a flavor-category wheel below the bottle image. Each
