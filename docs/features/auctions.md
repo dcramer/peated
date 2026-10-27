@@ -68,7 +68,10 @@ review. Exact-reference classifier shortcuts keep their reference dependency.
 Lots on one site with the same identity fingerprint (normalized title, size,
 and source facts) share one Bottle check. The earliest pending lot runs the
 classifier; identical lots wait, then reuse its decision on the default queue.
-Identical lots therefore cannot each create their own Bottle. Lots whose detail
+A lot can become identical only after its own detail read, so a twin may
+already be classifying. The first check saved for an identity wins: a lot
+that finishes later reuses that check and drops its own result. Identical lots
+therefore cannot each create their own Bottle. Lots whose detail
 facts differ, such as their cask numbers, get separate checks.
 
 Auction classification sets `readCandidateImages: false` in its saved request.

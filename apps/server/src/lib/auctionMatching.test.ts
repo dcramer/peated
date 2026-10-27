@@ -1156,3 +1156,47 @@ test("an admin recheck accepts a check shared from an identical lot", async ({
     ),
   ).toMatchObject({ queued: [second.id], skipped: [] });
 });
+
+test("a twin that became identical during classification keeps one decision and one Bottle", async ({
+  fixtures,
+}) => {
+  const site = await fixtures.ExternalSite({ type: "masterofmalt" });
+  const brand = await fixtures.Entity({ name: "Example", kind: "brand" });
+  const [first, second] = await twinLots(site.id, [{ abv: 46 }]);
+  expect(first.sourceFingerprint).not.toBe(second.sourceFingerprint);
+  const before = await db.query.bottles.findMany();
+  const result = createResult(brand.id);
+  const run = vi.spyOn(classifier, "runScrapedBottleReference");
+  run.mockImplementationOnce(async () => {
+    // The earlier lot's facts catch up while the later lot is classifying.
+    const [caughtUp] = await db
+      .update(auctionLots)
+      .set({
+        sourceFingerprint: second.sourceFingerprint,
+        sourceBottleIdentity: second.sourceBottleIdentity,
+      })
+      .where(eq(auctionLots.id, first.id))
+      .returning();
+    run.mockResolvedValueOnce({ result, modelMetadata: null });
+    await resolveAuctionLot(caughtUp!.id, caughtUp!.sourceFingerprint);
+    return { result, modelMetadata: null };
+  });
+  await resolveAuctionLot(second.id, second.sourceFingerprint);
+  expect(run).toHaveBeenCalledTimes(2);
+
+  const lots = await db.query.auctionLots.findMany();
+  const firstLot = lots.find(({ id }) => id === first.id)!;
+  const secondLot = lots.find(({ id }) => id === second.id)!;
+  expect(firstLot).toMatchObject({ matchStatus: "matched" });
+  expect(secondLot).toMatchObject({
+    matchStatus: "matched",
+    bottleId: firstLot.bottleId,
+    matchCheckId: firstLot.matchCheckId,
+  });
+  expect(await db.query.bottles.findMany()).toHaveLength(before.length + 1);
+  expect(
+    await db.query.bottleChecks.findMany({
+      where: eq(bottleChecks.sourceKind, "auction_lot"),
+    }),
+  ).toHaveLength(1);
+});
