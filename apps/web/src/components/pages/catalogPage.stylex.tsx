@@ -86,7 +86,7 @@ export function CatalogPageLoading({
         }
       >
         <div {...stylex.props(styles.loadingResults)}>
-          <ListToolbarLoading mobileActionLayout="pageColumns" />
+          <ListToolbarLoading mobileAction />
           <LoadingList
             label="Loading catalog records"
             rows={4}

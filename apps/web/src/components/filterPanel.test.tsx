@@ -4,7 +4,7 @@ import { act } from "react";
 import { createRoot, type Root } from "react-dom/client";
 import { afterEach, beforeEach, describe, expect, it, vi } from "vitest";
 
-import { FilterQuery } from "./filterPanel.stylex";
+import { FacetGroup, FilterQuery } from "./filterPanel.stylex";
 
 describe("FilterQuery", () => {
   let container: HTMLDivElement;
@@ -79,5 +79,67 @@ describe("FilterQuery", () => {
 
     render("lagavulin");
     expect(field().value).toBe("lagavulin");
+  });
+});
+
+describe("FacetGroup", () => {
+  let container: HTMLDivElement;
+  let root: Root;
+  const onChange = vi.fn();
+
+  beforeEach(() => {
+    container = document.createElement("div");
+    document.body.append(container);
+    root = createRoot(container);
+    onChange.mockReset();
+  });
+
+  afterEach(() => {
+    act(() => root.unmount());
+    container.remove();
+  });
+
+  function render(required: boolean) {
+    act(() => {
+      root.render(
+        <FacetGroup
+          label="Show"
+          onChange={onChange}
+          options={[
+            { label: "Distillery releases", value: "releases" },
+            { label: "Other bottlings", value: "other" },
+          ]}
+          required={required}
+          selected="releases"
+        />,
+      );
+    });
+  }
+
+  function getButton(name: string) {
+    const button = [...container.querySelectorAll("button")].find((element) =>
+      element.textContent?.includes(name),
+    );
+    if (!button) throw new Error(`Missing ${name}`);
+    return button;
+  }
+
+  it("clears a selected option when it is chosen again", () => {
+    render(false);
+
+    act(() => getButton("Distillery releases").click());
+
+    expect(onChange).toHaveBeenCalledWith("");
+    expect(getButton("Distillery releases").textContent).toContain("×");
+  });
+
+  it("keeps a required option selected", () => {
+    render(true);
+
+    act(() => getButton("Distillery releases").click());
+    act(() => getButton("Other bottlings").click());
+
+    expect(onChange.mock.calls).toEqual([["other"]]);
+    expect(getButton("Distillery releases").textContent).not.toContain("×");
   });
 });

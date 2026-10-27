@@ -30,12 +30,15 @@ export type FacetRowProps = Omit<
   "children" | "className" | "disabled" | "style"
 > &
   (AvailableFacet | CountlessFacet | UnavailableFacet) & {
+    /** Show the × that clears a selected row. Off for required choices. */
+    clearable?: boolean;
     label: string;
     selected?: boolean;
   };
 
 /** Combines a filter choice with an optional API-owned count and share. */
 export function FacetRow({
+  clearable = true,
   count,
   label,
   selected = false,
@@ -88,7 +91,7 @@ export function FacetRow({
         </span>
       ) : null}
       <span aria-hidden="true" {...stylex.props(styles.dismissSlot)}>
-        {available && selected ? "×" : null}
+        {available && selected && clearable ? "×" : null}
       </span>
     </button>
   );
@@ -113,17 +116,21 @@ export function FacetRowLoading() {
 }
 
 const styles = stylex.create({
+  // Like linked rows, the row reaches 8px past the text on each side so its
+  // hover and selected fills have room around the label and count.
   row: {
     boxSizing: "border-box",
     display: "flex",
-    width: "100%",
+    width: "calc(100% + 16px)",
     minWidth: 0,
     alignItems: "center",
     gap: "10px",
+    marginRight: "-8px",
+    marginLeft: "-8px",
     paddingTop: "7px",
-    paddingRight: "10px",
+    paddingRight: "8px",
     paddingBottom: "7px",
-    paddingLeft: 0,
+    paddingLeft: "8px",
     borderWidth: 0,
     borderRadius: controlMetrics.radiusSmall,
     outline: "none",
@@ -140,12 +147,10 @@ const styles = stylex.create({
       ":focus-visible": effects.focusRing,
     },
   },
+  // DESIGN.md: accent tint marks selected data.
   selected: {
-    backgroundColor: {
-      default: "transparent",
-      ":hover": "transparent",
-    },
-    color: colors.ink,
+    backgroundColor: colors.accentTint,
+    color: colors.accentDeep,
   },
   unavailable: {
     backgroundColor: "transparent",
@@ -168,10 +173,6 @@ const styles = stylex.create({
     flexBasis: "auto",
   },
   selectedLabel: {
-    paddingBottom: "2px",
-    borderBottomWidth: "2px",
-    borderBottomStyle: "solid",
-    borderBottomColor: colors.ink,
     fontWeight: 700,
   },
   trackSlot: {

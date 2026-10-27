@@ -85,7 +85,6 @@ export function CatalogResultsLayout({
             />
           ) : undefined
         }
-        mobileActionLayout="pageColumns"
         noun={noun}
         onSortChange={onSortChange}
         pending={pending}

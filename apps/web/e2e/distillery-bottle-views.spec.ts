@@ -16,7 +16,7 @@ test("switches between distillery releases and other bottlings", async ({
     page.getByRole("link", { name: bottleGroupRepresentative.name }),
   ).toBeVisible();
 
-  await page.getByRole("link", { name: "Other bottlings" }).click();
+  await page.getByRole("button", { name: "Other bottlings" }).click();
 
   await expect(page).toHaveURL(/\/bottles\?view=other$/);
   await expect(

@@ -49,7 +49,7 @@ export function ProfileLibraryResultsLoading({ view }: { view: ListView }) {
 
   return (
     <>
-      <ListToolbarLoading mobileActionLayout="pageColumns" view />
+      <ListToolbarLoading mobileAction view />
       {view === "table" ? (
         <LibraryTableLoading
           actions={isCurrentUser}

@@ -228,9 +228,11 @@ export function FilterRail({
       {search}
       {children}
       {onClear ? (
-        <Button onClick={onClear} size="sm" variant="text">
-          Clear filters
-        </Button>
+        <span {...stylex.props(styles.railClear)}>
+          <Button onClick={onClear} size="sm" variant="text">
+            Clear filters
+          </Button>
+        </span>
       ) : null}
     </section>
   );
@@ -278,6 +280,11 @@ export type FacetGroupProps = {
   label: string;
   onChange: (value: string) => void;
   options: readonly FacetGroupOption[];
+  /**
+   * One option is always selected, as in a view switch: choosing it again does
+   * nothing and it shows no × to clear it.
+   */
+  required?: boolean;
   selected?: string;
   /** A short, non-interactive fact about the whole group, such as a median. */
   summary?: ReactNode;
@@ -289,6 +296,7 @@ export function FacetGroup({
   label,
   onChange,
   options,
+  required = false,
   selected,
   summary,
   total,
@@ -309,8 +317,12 @@ export function FacetGroup({
         {options.map((option) => {
           const isSelected = selected === option.value;
           const rowProps = {
+            clearable: !required,
             label: option.label,
-            onClick: () => onChange(isSelected ? "" : option.value),
+            onClick: () => {
+              if (isSelected && required) return;
+              onChange(isSelected ? "" : option.value);
+            },
             selected: isSelected,
           };
 
@@ -372,6 +384,10 @@ const styles = stylex.create({
     minWidth: 0,
     flexDirection: "column",
     gap: space.x6,
+  },
+  // Lines up with the group headings instead of stretching across the rail.
+  railClear: {
+    alignSelf: "flex-start",
   },
   // Matches FilterQuery and the member search: a label above a 40px field.
   loadingSearchField: {

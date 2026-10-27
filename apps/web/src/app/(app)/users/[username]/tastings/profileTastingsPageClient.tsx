@@ -155,7 +155,6 @@ export function ProfileTastingsPageClient() {
                 sortOptions={sortOptions}
               />
             }
-            mobileActionLayout="pageColumns"
             noun="tasting"
             onSortChange={(value) => setParam("sort", value)}
             onViewChange={(value) =>

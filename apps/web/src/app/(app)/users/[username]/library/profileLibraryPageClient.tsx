@@ -256,7 +256,6 @@ export function ProfileLibraryPageClient() {
                 sortOptions={sortOptions}
               />
             }
-            mobileActionLayout="pageColumns"
             noun="bottle"
             onSortChange={(value) => setParam("sort", value)}
             onViewChange={(value) =>

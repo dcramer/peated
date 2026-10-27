@@ -17,7 +17,6 @@ import { ItemList, ItemListItem } from "./itemList.stylex";
 import { getTextTitle } from "./textTitle";
 
 const COMPACT = "@media (max-width: 639px)";
-const TABLE_NARROW = "@media (max-width: 959px)";
 // PageColumns drops its rail at this width.
 const PAGE_NARROW = "@media (max-width: 759px)";
 
@@ -30,13 +29,11 @@ export type ListView = "list" | "table";
 
 export type ListToolbarProps = {
   count: number;
-  /** Replaces the sort control where the page's filter rail collapses. */
-  mobileAction?: ReactNode;
   /**
-   * The layout whose filter rail `mobileAction` replaces: Table collapses its
-   * rail below 960px, PageColumns below 760px.
+   * Replaces the sort control below 760px, where PageColumns hides the
+   * page's filter rail.
    */
-  mobileActionLayout?: "pageColumns" | "table";
+  mobileAction?: ReactNode;
   noun: string;
   pluralNoun?: string;
   onExport?: () => void;
@@ -57,7 +54,6 @@ export type ListToolbarProps = {
 export function ListToolbar({
   count,
   mobileAction,
-  mobileActionLayout = "table",
   noun,
   pluralNoun = `${noun}s`,
   onExport,
@@ -94,18 +90,12 @@ export function ListToolbar({
           {...stylex.props(
             foundationStyles.metadata,
             styles.status,
-            Boolean(mobileAction) &&
-              mobileActionStyles[mobileActionLayout].status,
+            Boolean(mobileAction) && styles.statusWithMobileAction,
           )}
         >
           {pending ? "Updating…" : null}
         </span>
-        <span
-          {...stylex.props(
-            Boolean(mobileAction) &&
-              mobileActionStyles[mobileActionLayout].sort,
-          )}
-        >
+        <span {...stylex.props(Boolean(mobileAction) && styles.wideSort)}>
           <ListSort
             noun={pluralNoun}
             onChange={onSortChange}
@@ -126,11 +116,7 @@ export function ListToolbar({
           />
         ) : null}
         {mobileAction ? (
-          <span
-            {...stylex.props(mobileActionStyles[mobileActionLayout].action)}
-          >
-            {mobileAction}
-          </span>
+          <span {...stylex.props(styles.mobileAction)}>{mobileAction}</span>
         ) : null}
       </div>
     </div>
@@ -140,24 +126,21 @@ export function ListToolbar({
 /**
  * Reserves the toolbar while its list loads: the count line, the sort control,
  * the list/table toggle with `view`, and the narrow-screen filters button with
- * `mobileActionLayout`, each at its finished size.
+ * `mobileAction`, each at its finished size.
  */
 export function ListToolbarLoading({
-  mobileActionLayout,
+  mobileAction = false,
   view = false,
 }: {
-  mobileActionLayout?: ListToolbarProps["mobileActionLayout"];
+  mobileAction?: boolean;
   view?: boolean;
 }) {
-  const mobile = mobileActionLayout
-    ? mobileActionStyles[mobileActionLayout]
-    : undefined;
   return (
     <div
       aria-hidden="true"
       {...stylex.props(
         styles.toolbar,
-        Boolean(mobile) && styles.toolbarWithMobileAction,
+        mobileAction && styles.toolbarWithMobileAction,
       )}
     >
       <p {...stylex.props(styles.count)}>
@@ -170,10 +153,10 @@ export function ListToolbarLoading({
           {...stylex.props(
             foundationStyles.metadata,
             styles.status,
-            mobile?.status,
+            mobileAction && styles.statusWithMobileAction,
           )}
         />
-        <span {...stylex.props(mobile?.sort)}>
+        <span {...stylex.props(mobileAction && styles.wideSort)}>
           <span
             {...stylex.props(foundationStyles.fieldLabel, styles.sortLabel)}
           >
@@ -187,8 +170,8 @@ export function ListToolbarLoading({
             <span {...stylex.props(styles.loadingIconButton)} />
           </span>
         ) : null}
-        {mobile ? (
-          <span {...stylex.props(mobile.action)}>
+        {mobileAction ? (
+          <span {...stylex.props(styles.mobileAction)}>
             <span {...stylex.props(styles.loadingFiltersButton)} />
           </span>
         ) : null}
@@ -518,11 +501,6 @@ const styles = stylex.create({
     flexShrink: 0,
     gap: space.x1,
   },
-  statusWithMobileAction: {
-    [TABLE_NARROW]: {
-      minWidth: 0,
-    },
-  },
   sortLabel: {
     display: "flex",
     alignItems: "center",
@@ -534,30 +512,18 @@ const styles = stylex.create({
     flexDirection: "column",
     alignItems: "stretch",
   },
-  wideSort: {
-    display: "inline-flex",
-    [TABLE_NARROW]: {
-      display: "none",
-    },
-  },
-  mobileAction: {
-    display: "none",
-    [TABLE_NARROW]: {
-      display: "inline-flex",
-    },
-  },
-  pageStatusWithMobileAction: {
+  statusWithMobileAction: {
     [PAGE_NARROW]: {
       minWidth: 0,
     },
   },
-  pageWideSort: {
+  wideSort: {
     display: "inline-flex",
     [PAGE_NARROW]: {
       display: "none",
     },
   },
-  pageMobileAction: {
+  mobileAction: {
     display: "none",
     [PAGE_NARROW]: {
       display: "inline-flex",
@@ -677,16 +643,3 @@ const styles = stylex.create({
     fontVariantNumeric: "tabular-nums",
   },
 });
-
-const mobileActionStyles = {
-  pageColumns: {
-    action: styles.pageMobileAction,
-    sort: styles.pageWideSort,
-    status: styles.pageStatusWithMobileAction,
-  },
-  table: {
-    action: styles.mobileAction,
-    sort: styles.wideSort,
-    status: styles.statusWithMobileAction,
-  },
-};
