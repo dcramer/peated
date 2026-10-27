@@ -180,7 +180,16 @@ function FilterQueryForm({
             {submitLabel}
           </Button>
         </span>
-      ) : null}
+      ) : (
+        // A sidebar search submits with Enter, like the member search. Narrow
+        // screens show it in the Filters drawer, where View results closes the
+        // drawer without submitting, so it keeps a visible Search button.
+        <span {...stylex.props(styles.mobileSubmit)}>
+          <Button size="md" type="submit" variant="tonal">
+            {submitLabel}
+          </Button>
+        </span>
+      )}
       {hasFilterToggle ? (
         <span {...stylex.props(styles.mobileSubmit)}>
           <IconButton
