@@ -104,6 +104,11 @@ export function EntityBottleListClient({
 
   function navigate(nextParams: URLSearchParams) {
     nextParams.delete("cursor");
+    // The server picks Other bottlings for a distillery without releases only
+    // when nothing narrows the list, so a search must carry the shown view.
+    if (displayedView && !nextParams.has("view")) {
+      nextParams.set("view", displayedView);
+    }
     startTransition(() => {
       setDisplayedParams(nextParams.toString());
       router.push(buildSearchHref(pathname, nextParams), { scroll: false });
