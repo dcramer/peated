@@ -1577,6 +1577,7 @@ async function handleRpcRequest({ request, response, url }) {
           outstanding: 0,
           unicorn: 0,
         },
+        producers: { brands: [], bottlers: [], distillers: [] },
         mostTastedBottle: null,
         age: {
           knownCount: 0,
@@ -1588,6 +1589,10 @@ async function handleRpcRequest({ request, response, url }) {
           })),
         },
       });
+      return true;
+    case "users/tastingSearch":
+      // The mock member's Tastings list is empty, so nothing can match.
+      sendRpcResponse(response, { entities: [], bottles: [] });
       return true;
     case "users/badgeList":
       sendRpcResponse(response, emptyList);
