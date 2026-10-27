@@ -2262,6 +2262,13 @@
       "when": 1792864398316,
       "tag": "0322_add_entity_about",
       "breakpoints": false
+    },
+    {
+      "idx": 323,
+      "version": "7",
+      "when": 1793133399060,
+      "tag": "0323_add_bot_site",
+      "breakpoints": false
     }
   ]
 }

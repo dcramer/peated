@@ -39,6 +39,8 @@ export type PageRead =
       /** The page that was read, after redirects. */
       url: string;
       title: string | null;
+      /** The page's published date or time, when Firecrawl reports one. */
+      publishedTime: string | null;
       content: string;
       /** Direct PeatedBot request, or Firecrawl. */
       route: "direct" | "firecrawl";
@@ -473,6 +475,7 @@ export function createPeatedBot({
       status: "ok",
       url: finalUrl.href,
       title: page.title,
+      publishedTime: page.publishedTime,
       content: page.content,
       route: "firecrawl",
     };
@@ -491,6 +494,7 @@ export function createPeatedBot({
           status: "ok",
           url: outcome.url.href,
           title: null,
+          publishedTime: null,
           content: outcome.body,
           route: "direct",
         };
@@ -588,3 +592,5 @@ export function createPeatedBot({
 
   return { readPage, searchWeb };
 }
+
+export type PeatedBot = ReturnType<typeof createPeatedBot>;

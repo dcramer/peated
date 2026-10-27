@@ -1,4 +1,10 @@
-import { findInPages, toPlainText, withPublishedDate } from "./webTools";
+import type { PageRead, WebSearch } from "@peated/bot";
+import {
+  createBotSource,
+  findInPages,
+  toPlainText,
+  withPublishedDate,
+} from "./webTools";
 
 describe("toPlainText", () => {
   test("keeps link text and drops images", () => {
@@ -68,5 +74,88 @@ describe("findInPages", () => {
 
   test("returns nothing when no page has the text", () => {
     expect(findInPages(pages, "Allied Lyons")).toEqual([]);
+  });
+});
+
+describe("createBotSource", () => {
+  function source({
+    page,
+    search = { status: "ok", results: [] },
+  }: {
+    page?: PageRead;
+    search?: WebSearch;
+  }) {
+    const reads: Array<{ url: string; format: string }> = [];
+    const bot = {
+      readPage: async (input: { url: string; format: "markdown" | "html" }) => {
+        reads.push(input);
+        if (!page) throw new Error("No page.");
+        return page;
+      },
+      searchWeb: async () => search,
+    };
+    return { source: createBotSource(bot), reads };
+  }
+
+  test("reads a page's main text with its published date", async () => {
+    const { source: bot, reads } = source({
+      page: {
+        status: "ok",
+        url: "https://example.com/a",
+        title: "Brora",
+        publishedTime: "2025-08-07T00:15:00+00:00",
+        content: "[Brora](https://example.com/brora) was founded in 1819.",
+        route: "firecrawl",
+      },
+    });
+
+    await expect(bot.read("https://example.com/a")).resolves.toEqual({
+      title: "Brora",
+      text: "Published 2025-08-07.\n\nBrora was founded in 1819.",
+    });
+    expect(reads).toEqual([
+      { url: "https://example.com/a", format: "markdown" },
+    ]);
+  });
+
+  test("tells the writer why a page was not read", async () => {
+    const refused = source({
+      page: {
+        status: "refused",
+        url: "https://example.com/private",
+        reason: "robots_disallowed",
+      },
+    });
+    await expect(
+      refused.source.read("https://example.com/private"),
+    ).rejects.toThrow(
+      "The website's robots.txt does not allow reading this page.",
+    );
+
+    const missing = source({
+      page: {
+        status: "failed",
+        url: "https://example.com/gone",
+        reason: "not_found",
+        httpStatus: 404,
+      },
+    });
+    await expect(
+      missing.source.read("https://example.com/gone"),
+    ).rejects.toThrow("Page not found.");
+  });
+
+  test("reports a failed search", async () => {
+    const { source: bot } = source({
+      search: {
+        status: "failed",
+        reason: "service_unavailable",
+        httpStatus: 402,
+      },
+    });
+
+    await expect(bot.search("brora")).rejects.toThrow(
+      "Search failed (HTTP 402).",
+    );
   });
 });

@@ -10,6 +10,7 @@ export {
   createPeatedBot,
   type PageFormat,
   type PageRead,
+  type PeatedBot,
   type WebSearch,
 } from "./bot";
 export type { FirecrawlConfig, SearchResult } from "./firecrawl";
