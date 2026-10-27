@@ -90,11 +90,23 @@ describe("ReviewTask assignment errors", () => {
       .mockRejectedValueOnce(failure)
       .mockResolvedValue({ ...item.review, bottle });
     const pageAction = vi.fn().mockRejectedValue(failure);
+    const candidateSearch = vi.fn();
     const client = createORPCClient<RouterClient<Router>>({
       async call(path, input) {
         switch (path.join("/")) {
           case "externalReviews/resolution":
             return item;
+          case "bottles/createCandidates":
+            candidateSearch(input);
+            return {
+              results: [
+                {
+                  ...bottle,
+                  comparison: { agreements: [], missing: [], conflicts: [] },
+                },
+              ],
+              rel: { nextCursor: null, prevCursor: null },
+            };
           case "bottles/list":
             return {
               results: [bottle],
@@ -134,7 +146,7 @@ describe("ReviewTask assignment errors", () => {
         </ORPCContext.Provider>,
       ),
     );
-    return { bottle, onComplete, update, pageAction };
+    return { bottle, candidateSearch, item, onComplete, update, pageAction };
   }
 
   test.for([
@@ -207,6 +219,39 @@ describe("ReviewTask assignment errors", () => {
     });
     expect(document.querySelector('[role="dialog"]')).toBeNull();
     expect(onComplete).not.toHaveBeenCalled();
+  });
+
+  test("a review with no saved decision offers catalog candidates for its name", async () => {
+    const { bottle, candidateSearch, item, onComplete, update } =
+      await renderTask("unknown failure");
+    await act(async () => {
+      await vi.advanceTimersByTimeAsync(10);
+    });
+    expect(candidateSearch).toHaveBeenCalledWith({
+      name: item.review.name,
+      limit: 5,
+    });
+    expect(document.body.textContent).toContain(
+      "No matching decision was saved for this review.",
+    );
+    const choice = document.querySelector<HTMLButtonElement>(
+      `button[aria-label="Use this bottle: ${bottle.fullName}"]`,
+    );
+    if (!choice) throw new Error("Candidate bottle is missing");
+    await act(async () => choice.click());
+    await act(async () => {
+      await vi.advanceTimersByTimeAsync(10);
+    });
+    expect(document.body.textContent).toContain(
+      "The decision could not be saved. Try again.",
+    );
+    expect(onComplete).not.toHaveBeenCalled();
+    await act(async () => choice.click());
+    await act(async () => {
+      await vi.advanceTimersByTimeAsync(10);
+    });
+    expect(update).toHaveBeenLastCalledWith(reviewAssignment(item, bottle.id));
+    expect(onComplete).toHaveBeenCalledWith("Review assigned.");
   });
 
   test.for(["recheck", "remove"] as const)(

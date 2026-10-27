@@ -5,6 +5,7 @@ import {
 import { BottleClassificationDecisionSchema } from "@peated/bottle-classifier/internal/types";
 import { db } from "@peated/server/db";
 import { auctionLots, bottleChecks, bottles } from "@peated/server/db/schema";
+import { activeBottleWhere } from "@peated/server/lib/activeBottles";
 import { readAuctionMatchEvidence } from "@peated/server/lib/auctionMatchEvidence";
 import { getBottleCandidateById } from "@peated/server/lib/bottleReferenceCandidates";
 import { procedure } from "@peated/server/orpc";
@@ -14,7 +15,7 @@ import { AuctionLotSchema } from "@peated/server/schemas/auctions";
 import { serialize } from "@peated/server/serializers";
 import { AuctionLotSerializer } from "@peated/server/serializers/auctionLot";
 import { BottleSerializer } from "@peated/server/serializers/bottle";
-import { eq } from "drizzle-orm";
+import { and, eq, inArray } from "drizzle-orm";
 import { z } from "zod";
 
 export default procedure
@@ -24,7 +25,7 @@ export default procedure
     path: "/auction-lots/{lot}",
     summary: "Get auction matching evidence",
     description:
-      "Get a lot's source facts, current assignment, and saved matching evidence. Ended lots remain available for review. Requires a moderator.",
+      "Get a lot's source facts, current assignment, saved matching evidence, and the active Bottles the saved check considered. Ended lots remain available for review. Requires a moderator.",
     operationId: "getAuctionLot",
   })
   .input(z.object({ lot: z.coerce.number().int().positive() }).strict())
@@ -42,6 +43,7 @@ export default procedure
         sourceDetailsRunId: z.number().nullable(),
         currentBottle: BottleSchema.nullable(),
         suggestedBottle: BottleSchema.nullable(),
+        candidateBottles: z.array(BottleSchema),
         decision: BottleClassificationDecisionSchema.nullable(),
         artifacts: BottleClassificationArtifactsSchema.nullable(),
         canRememberReference: z.boolean(),
@@ -77,6 +79,20 @@ export default procedure
           where: eq(bottles.id, activeSuggestion.bottleId),
         })
       : null;
+    // The saved check's other candidates help a reviewer choose; merged or
+    // removed Bottles drop out, and the suggestion is shown on its own.
+    const candidateIds = (decision?.candidateBottleIds ?? []).filter(
+      (id) => id !== suggestion?.id,
+    );
+    const candidates = candidateIds.length
+      ? await db
+          .select()
+          .from(bottles)
+          .where(and(inArray(bottles.id, candidateIds), activeBottleWhere()))
+      : [];
+    candidates.sort(
+      (a, b) => candidateIds.indexOf(a.id) - candidateIds.indexOf(b.id),
+    );
     return {
       lot: await serialize(AuctionLotSerializer, lot, context.user),
       fingerprint: lot.sourceFingerprint,
@@ -98,6 +114,11 @@ export default procedure
             includeGroupSummary: true,
           })
         : null,
+      candidateBottles: await serialize(
+        BottleSerializer,
+        candidates,
+        context.user,
+      ),
       decision,
       artifacts: evidence?.artifacts ?? null,
       canRememberReference:

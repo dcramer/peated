@@ -10,6 +10,8 @@ import {
 } from "@peated/web/components/admin/adminContent.stylex";
 import { AdminAlert as Alert } from "@peated/web/components/admin/adminUtility.stylex";
 import { BottleIdentityRow } from "@peated/web/components/bottleIdentityRow.stylex";
+import { BottleMatchList } from "@peated/web/components/bottleMatchList.stylex";
+import Price from "@peated/web/components/price";
 import { TextLink } from "@peated/web/components/textLink.stylex";
 import { toBottleListItem } from "@peated/web/lib/bottleListItem";
 import { useORPC } from "@peated/web/lib/orpc/context";
@@ -22,6 +24,7 @@ import { useState } from "react";
 import BottleSelector from "./bottleSelector";
 import {
   ModerationActions,
+  ModerationMedia,
   ModerationReasonList,
   ModerationStack,
   ModerationTaskHeader,
@@ -141,9 +144,28 @@ export default function AuctionTask({
         status={task.statusLabel}
         taskKey={task.key}
       />
-      <TextLink href={item.lot.url} target="_blank" rel="noreferrer">
-        View auction lot
-      </TextLink>
+      <AdminSection title="Auction lot">
+        <ModerationMedia imageUrl={item.sourceImageUrl}>
+          <strong>{item.lot.name}</strong>
+          <div>
+            {item.lot.auction.name}
+            {item.lot.result?.outcome === "sold" &&
+            item.lot.result.amount &&
+            item.lot.result.currency ? (
+              <>
+                {" · Sold for "}
+                <Price
+                  value={item.lot.result.amount}
+                  currency={item.lot.result.currency}
+                />
+              </>
+            ) : null}
+          </div>
+          <TextLink href={item.lot.url} target="_blank" rel="noreferrer">
+            View auction lot
+          </TextLink>
+        </ModerationMedia>
+      </AdminSection>
       <p>
         {item.lot.state === "closed" || item.lot.state === "withdrawn"
           ? "This lot has ended. Matching it adds sale history, not an auction alert."
@@ -166,6 +188,25 @@ export default function AuctionTask({
             <li key={index}>{risk.note}</li>
           ))}
         </ModerationReasonList>
+      ) : null}
+      {item.candidateBottles.length ? (
+        <AdminSection
+          title={
+            item.suggestedBottle ? "Other possible bottles" : "Possible bottles"
+          }
+        >
+          <p>
+            The saved check considered these bottles. Choose one only if the lot
+            shows it is the same bottle.
+          </p>
+          <BottleMatchList
+            bottles={item.candidateBottles}
+            onUse={(bottle) => void assign(bottle.id)}
+            pendingBottleId={
+              match.isPending ? (match.variables?.bottleId ?? null) : null
+            }
+          />
+        </AdminSection>
       ) : null}
       {item.decision?.action === "create_bottle" ? (
         <AdminSection title="Missing bottle">

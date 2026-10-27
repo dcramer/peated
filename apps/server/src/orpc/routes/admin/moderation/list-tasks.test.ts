@@ -76,7 +76,7 @@ describe("admin moderation tasks", () => {
             type: "update_entity",
             input: { entityId: bottle.brandId, patch: { name: "First" } },
             rationale: "First independent change.",
-            evidenceRefs: [],
+            evidenceRefs: [{ kind: "entity", entityId: bottle.brandId }],
           },
           status: "pending_review",
           createdAt: new Date("2026-01-02T00:00:00.000Z"),
@@ -87,7 +87,7 @@ describe("admin moderation tasks", () => {
             type: "update_entity",
             input: { entityId: bottle.brandId, patch: { name: "Second" } },
             rationale: "Second independent change.",
-            evidenceRefs: [],
+            evidenceRefs: [{ kind: "entity", entityId: bottle.brandId }],
           },
           status: "blocked",
           createdAt: new Date("2026-01-03T00:00:00.000Z"),
@@ -327,6 +327,71 @@ describe("admin moderation tasks", () => {
       ),
     ).resolves.toEqual({
       task: expect.objectContaining({ key: `finding:${check!.id}` }),
+    });
+  });
+
+  test("lists a check whose saved proposal no longer parses as one blocked task", async ({
+    fixtures,
+  }) => {
+    const admin = await fixtures.User({ admin: true });
+    const bottle = await fixtures.Bottle();
+    const [check] = await db
+      .insert(bottleChecks)
+      .values({
+        intent: "audit_bottle",
+        origin: "moderator",
+        bottleId: bottle.id,
+        subjectKey: `audit:${bottle.id}:retired-field-test`,
+        schemaVersion: BOTTLE_CHECK_SCHEMA_VERSION,
+        inputSnapshot: {},
+        output: { summary: "Cask fill is wrong", findings: [] },
+        completedAt: new Date(),
+      })
+      .returning();
+    const [operation] = await db
+      .insert(bottleOperations)
+      .values({
+        checkId: check!.id,
+        // SAFETY: this row deliberately stores a retired shape. caskFill was
+        // removed from Bottles, so the current proposal type rejects it.
+        proposal: {
+          type: "update_bottle",
+          input: { bottleId: bottle.id, patch: { caskFill: "first_fill" } },
+          rationale: "The label names a first-fill cask.",
+          evidenceRefs: [{ kind: "bottle", bottleId: bottle.id }],
+        } as never,
+        status: "pending_review",
+      })
+      .returning();
+
+    const result = await routerClient.admin.moderation.listTasks(
+      { query: `${check!.id}` },
+      { context: { user: admin } },
+    );
+    expect(result.results.filter(({ source }) => "checkId" in source)).toEqual([
+      expect.objectContaining({
+        key: `finding:${check!.id}`,
+        state: "blocked",
+        statusLabel: "Unsupported check version",
+      }),
+    ]);
+    expect(
+      await waitError(() =>
+        routerClient.admin.moderation.task(
+          { key: `operation:${operation!.id}` },
+          { context: { user: admin } },
+        ),
+      ),
+    ).toMatchInlineSnapshot(
+      `[Error: This moderation task no longer needs attention.]`,
+    );
+    const details = await routerClient.audits.details(
+      { audit: check!.id },
+      { context: { user: admin } },
+    );
+    expect(details.audit).toMatchObject({
+      schemaSupported: false,
+      canClose: true,
     });
   });
 });

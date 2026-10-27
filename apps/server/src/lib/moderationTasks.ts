@@ -19,7 +19,7 @@ import {
   listActionableBottleCheckSummaries,
   type ActionableBottleCheckSummary,
 } from "@peated/server/lib/bottleChecks";
-import { isSupportedBottleCheckSchemaVersion } from "@peated/server/lib/bottleCheckSchemaVersion";
+import { isSupportedBottleCheck } from "@peated/server/lib/bottleCheckSchemaVersion";
 import { toCurrentProposalType } from "@peated/server/lib/priceMatchingStatus";
 import {
   CATALOG_REPORT_OBJECT_TYPES,
@@ -181,15 +181,6 @@ function checkSourceLabel(check: ActionableBottleCheckSummary): string {
   return "Catalog review";
 }
 
-function persistedFindingCount(
-  check: ActionableBottleCheckSummary,
-): number | null {
-  if (!isSupportedBottleCheckSchemaVersion(check) || !check.hasOutput) {
-    return null;
-  }
-  return check.findingCount;
-}
-
 type ListingTaskRow = {
   proposal: Pick<
     typeof storePriceMatchProposals.$inferSelect,
@@ -280,9 +271,15 @@ function catalogTasksForCheck(
     return [];
   }
 
-  const operations = check.operations.filter(
-    ({ status }) => status === "pending_review" || status === "blocked",
-  );
+  // Catalog moderation owns this rule (bottleCheckSchemaVersion.ts): a check
+  // whose saved proposals no longer parse shows no operations and can only be
+  // closed, so it is one blocked check task, not a change that opens empty.
+  const supported = isSupportedBottleCheck(check);
+  const operations = supported
+    ? check.operations.filter(
+        ({ status }) => status === "pending_review" || status === "blocked",
+      )
+    : [];
   if (operations.length > 0) {
     return operations.map((operation): ModerationTaskSummary => {
       const copy = operationCopy(operation.proposal);
@@ -307,7 +304,7 @@ function catalogTasksForCheck(
     });
   }
 
-  const findingCount = persistedFindingCount(check);
+  const findingCount = supported && check.hasOutput ? check.findingCount : null;
   if (findingCount === null || findingCount > 0) {
     const subject = check.bottleId
       ? `Bottle #${check.bottleId}`
