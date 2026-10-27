@@ -18,6 +18,7 @@ export const ABOUT_FACT_FIELD_LIST = [
   "condensers",
   "spiritCharacter",
   "mainUse",
+  "filtering",
   "maturation",
 ] as const;
 
@@ -152,6 +153,14 @@ export const ABOUT_FACT_FIELDS = {
     label: "Mainly used for",
     description:
       "What most of its spirit goes into now, when a quote says most does, such as the owner's blends; a blend it is one of many malts in is not its main use",
+    type: "text",
+    unit: null,
+    kinds: ["distillery"],
+  },
+  filtering: {
+    label: "Filtering",
+    description:
+      "How the new spirit is filtered before it goes into casks, such as through sugar maple charcoal (the Lincoln County Process)",
     type: "text",
     unit: null,
     kinds: ["distillery"],
