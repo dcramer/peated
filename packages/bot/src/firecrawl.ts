@@ -18,6 +18,8 @@ const ScrapeResponseSchema = z
         metadata: z
           .object({
             title: z.string().nullable().optional(),
+            publishedTime: z.string().nullable().optional(),
+            "article:published_time": z.string().nullable().optional(),
             url: z.string().nullable().optional(),
             sourceURL: z.string().nullable().optional(),
             statusCode: z.number().nullable().optional(),
@@ -110,6 +112,8 @@ export type FirecrawlPage = {
   /** The page Firecrawl ended on, after redirects. */
   url: string;
   title: string | null;
+  /** The page's published date or time, as its metadata states it. */
+  publishedTime: string | null;
   content: string;
   /** The status the website gave Firecrawl. */
   httpStatus: number | null;
@@ -141,6 +145,10 @@ export async function scrapeWithFirecrawl(
     ok: true,
     url: data.metadata?.url ?? data.metadata?.sourceURL ?? url.href,
     title: data.metadata?.title ?? null,
+    publishedTime:
+      data.metadata?.publishedTime ??
+      data.metadata?.["article:published_time"] ??
+      null,
     content: (format === "markdown" ? data.markdown : data.rawHtml) ?? "",
     httpStatus: data.metadata?.statusCode ?? null,
   };

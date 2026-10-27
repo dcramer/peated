@@ -52,7 +52,15 @@ function firecrawlPage({
   return () =>
     Response.json({
       success: true,
-      data: { [format]: content, metadata: { url, statusCode, title: "T" } },
+      data: {
+        [format]: content,
+        metadata: {
+          url,
+          statusCode,
+          title: "T",
+          "article:published_time": "2026-09-01T10:00:00Z",
+        },
+      },
     });
 }
 
@@ -107,6 +115,7 @@ describe("readPage", () => {
       status: "ok",
       url: "https://shop.example/a",
       title: null,
+      publishedTime: null,
       content: "<html>A</html>",
       route: "direct",
     });
@@ -356,6 +365,7 @@ describe("readPage", () => {
       status: "ok",
       url: "https://shop.example/page",
       title: "T",
+      publishedTime: "2026-09-01T10:00:00Z",
       content: "# Page",
       route: "firecrawl",
     });
