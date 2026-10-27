@@ -601,8 +601,9 @@ function readNumberWords(run: string) {
 }
 
 function writeNumberWords(value: string) {
-  // "two million" states 2 million, like "2 million".
+  // "two million" states 2 million, like "2 million", and "one million" 1 million.
   return value
+    .replace(/\bone\s+(million|billion)\b/gi, "1 $1")
     .replace(
       new RegExp(
         `\\b(${SMALL_NUMBER_WORDS.join("|")})\\s+(million|billion)\\b`,
