@@ -175,10 +175,15 @@ function isMissingRobotsStatus(status: number) {
   return status >= 400 && status < 500 && status !== 408 && status !== 429;
 }
 
-/** Robots.txt read through Firecrawl may come back wrapped in HTML. */
+/**
+ * Robots.txt read through Firecrawl may come back as plain text or wrapped in
+ * a `<pre>` element. Any other HTML is not a robots.txt file, such as a
+ * challenge page, so it returns null.
+ */
 function robotsText(body: string) {
   if (!body.trimStart().startsWith("<")) return body;
-  const preformatted = /<pre[^>]*>([\s\S]*?)<\/pre>/i.exec(body)?.[1] ?? body;
+  const preformatted = /<pre[^>]*>([\s\S]*?)<\/pre>/i.exec(body)?.[1];
+  if (preformatted === undefined) return null;
   return preformatted
     .replace(/<[^>]+>/g, "")
     .replace(/&lt;/g, "<")
@@ -336,10 +341,16 @@ export function createPeatedBot({
         robotsUrl,
         "rawHtml",
       );
+      // Through Firecrawl, only a 404 or 410 says the file does not exist.
+      // Any other failure, or a page that is not a robots.txt file, may be the
+      // bot wall again, so the rules stay unknown.
       if (!page.ok || page.httpStatus === null) return "unavailable";
-      if (isMissingRobotsStatus(page.httpStatus)) return { status: "missing" };
+      if (page.httpStatus === 404 || page.httpStatus === 410) {
+        return { status: "missing" };
+      }
       if (page.httpStatus >= 300) return "unavailable";
-      return parseRobotsRules(robotsText(page.content));
+      const body = robotsText(page.content);
+      return body === null ? "unavailable" : parseRobotsRules(body);
     }
     return "unavailable";
   }

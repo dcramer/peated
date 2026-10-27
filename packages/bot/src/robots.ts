@@ -88,14 +88,27 @@ function matchingUserAgentGroups(
   return result;
 }
 
+/**
+ * Matches a robots.txt path pattern, where `*` matches any characters and a
+ * trailing `$` anchors the end. It uses plain string search instead of a
+ * regular expression, so a pattern full of wildcards cannot stall the process.
+ */
 function robotsPatternMatches(path: string, pattern: string) {
   const endAnchored = pattern.endsWith("$");
-  const withoutAnchor = endAnchored ? pattern.slice(0, -1) : pattern;
-  const expression = withoutAnchor
-    .split("*")
-    .map((part) => part.replace(/[.*+?^${}()|[\]\\]/g, "\\$&"))
-    .join(".*");
-  return new RegExp(`^${expression}${endAnchored ? "$" : ""}`).test(path);
+  const parts = (endAnchored ? pattern.slice(0, -1) : pattern).split("*");
+  const first = parts[0] ?? "";
+  if (!path.startsWith(first)) return false;
+  if (parts.length === 1) return !endAnchored || path === first;
+
+  let position = first.length;
+  for (const part of parts.slice(1, -1)) {
+    const index = path.indexOf(part, position);
+    if (index < 0) return false;
+    position = index + part.length;
+  }
+  const last = parts.at(-1) ?? "";
+  if (!endAnchored) return path.includes(last, position);
+  return path.length - last.length >= position && path.endsWith(last);
 }
 
 /**

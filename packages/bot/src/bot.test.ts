@@ -280,6 +280,39 @@ describe("readPage", () => {
     ]);
   });
 
+  test("leaves the rules unknown when Firecrawl cannot get the real robots.txt", async () => {
+    const wall = text("Just a moment...", {
+      status: 403,
+      headers: { "cf-mitigated": "challenge" },
+    });
+    for (const answer of [
+      firecrawlPage({
+        url: "https://shop.example/robots.txt",
+        content: "Forbidden",
+        statusCode: 403,
+      }),
+      firecrawlPage({
+        url: "https://shop.example/robots.txt",
+        content: "<html><body><h1>Checking your browser</h1></body></html>",
+      }),
+    ]) {
+      const { readPage, firecrawlBodies } = setup({
+        "https://shop.example/robots.txt": wall,
+        scrape: answer,
+      });
+
+      for (let attempt = 0; attempt < 2; attempt++) {
+        await expect(
+          readPage({ url: "https://shop.example/private", format: "html" }),
+        ).resolves.toMatchObject({
+          status: "refused",
+          reason: "robots_unavailable",
+        });
+      }
+      expect(await firecrawlBodies("scrape")).toHaveLength(2);
+    }
+  });
+
   test("checks robots.txt again after a redirect", async () => {
     const { readPage, sent } = setup({
       "https://shop.example/robots.txt": text(
