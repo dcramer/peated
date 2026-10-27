@@ -92,8 +92,9 @@ async function callFirecrawl(
     // failed read instead of an exception.
     return { ok: false, httpStatus: null };
   }
-  // A rejected API key is a deployment problem, not a page problem.
-  if (response.status === 401 || response.status === 403) {
+  // A rejected API key is a deployment problem, not a page problem. Firecrawl
+  // uses 403 for websites it will not read, so only 401 means the key.
+  if (response.status === 401) {
     throw new Error(`Firecrawl rejected the API key (${response.status}).`);
   }
   if (!response.ok) {

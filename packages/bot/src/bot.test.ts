@@ -61,9 +61,11 @@ function setup(
   {
     sites: initial = {},
     firecrawl = FIRECRAWL,
+    privateJwk = null,
   }: {
     sites?: Record<string, Partial<BotSiteSettings>>;
     firecrawl?: typeof FIRECRAWL | null;
+    privateJwk?: string | null;
   } = {},
 ) {
   const network = createNetwork(routes);
@@ -84,7 +86,7 @@ function setup(
       sites.set(origin, { robotsException: false, blocked: true });
     },
     firecrawl,
-    privateJwk: null,
+    privateJwk,
     fetch: network.fetch,
     now: () => clock.now,
   });
@@ -176,6 +178,25 @@ describe("readPage", () => {
       reason: "robots_unavailable",
     });
     expect(down.sent("https://shop.example/a")).toHaveLength(0);
+  });
+
+  test("leaves the rules unknown when robots.txt answers 429 or 408", async () => {
+    for (const status of [429, 408]) {
+      const { readPage, sent } = setup({
+        "https://shop.example/robots.txt": text("", { status }),
+      });
+
+      for (let attempt = 0; attempt < 2; attempt++) {
+        await expect(
+          readPage({ url: "https://shop.example/a", format: "html" }),
+        ).resolves.toMatchObject({
+          status: "refused",
+          reason: "robots_unavailable",
+        });
+      }
+      expect(sent("https://shop.example/robots.txt")).toHaveLength(2);
+      expect(sent("https://shop.example/a")).toHaveLength(0);
+    }
   });
 
   test("marks a website blocked at a bot wall and reads it through Firecrawl after that", async () => {
@@ -310,6 +331,52 @@ describe("readPage", () => {
     ).resolves.toMatchObject({
       status: "refused",
       reason: "robots_disallowed",
+    });
+  });
+
+  test("reports a malformed redirect instead of throwing", async () => {
+    const { readPage } = setup({
+      "https://shop.example/robots.txt": text("User-agent: *\nAllow: /"),
+      "https://shop.example/a": text("", {
+        status: 302,
+        headers: { location: "http://[bad" },
+      }),
+    });
+
+    await expect(
+      readPage({ url: "https://shop.example/a", format: "html" }),
+    ).resolves.toMatchObject({
+      status: "failed",
+      reason: "http_error",
+      httpStatus: 302,
+    });
+  });
+
+  test("throws on a bad signing key instead of reporting a network failure", async () => {
+    const { readPage } = setup(
+      { "https://shop.example/robots.txt": text("") },
+      { privateJwk: '{"kty":"OKP","crv":"Ed25519"}' },
+    );
+
+    await expect(
+      readPage({ url: "https://shop.example/a", format: "html" }),
+    ).rejects.toThrow(
+      "PEATED_BOT_PRIVATE_JWK must contain a private Ed25519 JWK.",
+    );
+  });
+
+  test("reports a website Firecrawl will not read as blocked", async () => {
+    const { readPage } = setup({
+      "https://shop.example/robots.txt": text("User-agent: *\nAllow: /"),
+      scrape: text("", { status: 403 }),
+    });
+
+    await expect(
+      readPage({ url: "https://shop.example/a", format: "markdown" }),
+    ).resolves.toMatchObject({
+      status: "failed",
+      reason: "blocked",
+      httpStatus: 403,
     });
   });
 

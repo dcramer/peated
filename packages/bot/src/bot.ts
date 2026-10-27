@@ -104,10 +104,10 @@ function isBotWall(status: number, headers: Headers) {
   return false;
 }
 
-function parseReadableUrl(value: string) {
+function parseReadableUrl(value: string, base?: URL) {
   let url: URL;
   try {
-    url = new URL(value);
+    url = new URL(value, base);
   } catch {
     return null;
   }
@@ -164,6 +164,15 @@ async function readBody(
     offset += chunk.byteLength;
   }
   return new TextDecoder().decode(body);
+}
+
+/**
+ * Robots rule (RFC 9309 section 2.3.1.3): a 4xx robots.txt answer means the
+ * website publishes no rules. 408 and 429 only mean "try later", so they leave
+ * the rules unknown instead.
+ */
+function isMissingRobotsStatus(status: number) {
+  return status >= 400 && status < 500 && status !== 408 && status !== 429;
 }
 
 /** Robots.txt read through Firecrawl may come back wrapped in HTML. */
@@ -242,17 +251,20 @@ export function createPeatedBot({
         if (refusal) return { kind: "refused", read: refusal };
       }
 
+      // A bad signing key is a deployment problem, so signing stays outside
+      // the catch that turns network failures into results.
+      const headers = await signRequest({
+        url,
+        headers: { Accept: accept, "User-Agent": BOT_USER_AGENT },
+        created: now(),
+        privateJwk,
+      });
       let response: Response;
       try {
         response = await directFetch(url, {
           redirect: "manual",
           signal: AbortSignal.timeout(timeoutMs),
-          headers: await signRequest({
-            url,
-            headers: { Accept: accept, "User-Agent": BOT_USER_AGENT },
-            created: now(),
-            privateJwk,
-          }),
+          headers,
         });
       } catch (error) {
         if (error instanceof Error && isPublicAddressError(error)) {
@@ -270,7 +282,7 @@ export function createPeatedBot({
       const location = response.headers.get("location");
       if (response.status >= 300 && response.status < 400 && location) {
         await discard(response);
-        const next = parseReadableUrl(new URL(location, url).href);
+        const next = parseReadableUrl(location, url);
         if (!next) return { kind: "status", url, status: response.status };
         url = next;
         continue;
@@ -305,14 +317,12 @@ export function createPeatedBot({
       truncate: true,
     });
     if (outcome.kind === "ok") return parseRobotsRules(outcome.body);
-    // Robots rule (RFC 9309 section 2.3.1.3): a 4xx answer means the website
-    // publishes no rules. A 5xx answer or a failed request means the rules are
-    // unknown, so PeatedBot does not read the page.
+    // A 5xx answer or a failed request leaves the rules unknown, so PeatedBot
+    // does not read the page.
     if (outcome.kind === "status") {
-      if (outcome.status >= 400 && outcome.status < 500) {
-        return { status: "missing" };
-      }
-      return "unavailable";
+      return isMissingRobotsStatus(outcome.status)
+        ? { status: "missing" }
+        : "unavailable";
     }
     if (outcome.kind === "error" && outcome.reason === "not_public") {
       return "not_public";
@@ -327,9 +337,7 @@ export function createPeatedBot({
         "rawHtml",
       );
       if (!page.ok || page.httpStatus === null) return "unavailable";
-      if (page.httpStatus >= 400 && page.httpStatus < 500) {
-        return { status: "missing" };
-      }
+      if (isMissingRobotsStatus(page.httpStatus)) return { status: "missing" };
       if (page.httpStatus >= 300) return "unavailable";
       return parseRobotsRules(robotsText(page.content));
     }
@@ -407,7 +415,8 @@ export function createPeatedBot({
       return {
         status: "failed",
         url: url.href,
-        reason: "service_unavailable",
+        // Firecrawl answers 403 for websites it will not read.
+        reason: page.httpStatus === 403 ? "blocked" : "service_unavailable",
         httpStatus: page.httpStatus,
       };
     }

@@ -35,8 +35,9 @@ Unexpected problems, such as a rejected Firecrawl API key, throw.
 
 Before any read, PeatedBot checks the website's robots.txt. It follows the
 `PeatedBot` group, or the `*` group when no group names PeatedBot, and caches
-the rules for 24 hours. A 4xx robots.txt means the website has no rules. A 5xx
-or a failed request means the rules are unknown, so the page is not read. When
+the rules for 24 hours. A 4xx robots.txt means the website has no rules, except
+408 and 429, which mean "try later". Those, a 5xx, or a failed request leave
+the rules unknown, so the page is not read. When
 robots.txt itself sits behind a bot wall, PeatedBot reads it through Firecrawl.
 An admin's robots.txt exception for a website skips the check.
 
