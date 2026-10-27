@@ -14,6 +14,7 @@ import { AppLink } from "./appLink";
 import { ButtonLink, IconButton } from "./button.stylex";
 import { LoadingText } from "./feedback.stylex";
 import { ItemList, ItemListItem } from "./itemList.stylex";
+import { textLinkStyles } from "./textLinkStyles.stylex";
 import { getTextTitle } from "./textTitle";
 
 const COMPACT = "@media (max-width: 639px)";
@@ -35,6 +36,11 @@ export type ListToolbarProps = {
    */
   mobileAction?: ReactNode;
   noun: string;
+  /**
+   * Clears applied filters from beside the count. Pass it only while filters
+   * apply; narrow screens use the Filters drawer's own Clear filters.
+   */
+  onClear?: () => void;
   pluralNoun?: string;
   onExport?: () => void;
   onSortChange: (value: string) => void;
@@ -56,6 +62,7 @@ export function ListToolbar({
   mobileAction,
   noun,
   pluralNoun = `${noun}s`,
+  onClear,
   onExport,
   onSortChange,
   onViewChange,
@@ -72,15 +79,35 @@ export function ListToolbar({
         Boolean(mobileAction) && styles.toolbarWithMobileAction,
       )}
     >
-      <p aria-live="polite" {...stylex.props(styles.count)}>
-        <strong {...stylex.props(styles.countValue)}>
-          {count.toLocaleString("en-US")} {count === 1 ? noun : pluralNoun}
-        </strong>
-        {total !== undefined ? (
-          <span
-            {...stylex.props(foundationStyles.metadata, styles.countDetail)}
-          >
-            of {total.toLocaleString("en-US")}
+      <p {...stylex.props(styles.count)}>
+        <span aria-live="polite" {...stylex.props(styles.countText)}>
+          <strong {...stylex.props(styles.countValue)}>
+            {count.toLocaleString("en-US")} {count === 1 ? noun : pluralNoun}
+          </strong>
+          {total !== undefined ? (
+            <span
+              {...stylex.props(foundationStyles.metadata, styles.countDetail)}
+            >
+              of {total.toLocaleString("en-US")}
+            </span>
+          ) : null}
+        </span>
+        {onClear ? (
+          <span {...stylex.props(foundationStyles.metadata, styles.clear)}>
+            <span aria-hidden="true" {...stylex.props(styles.countDetail)}>
+              ·
+            </span>
+            <button
+              onClick={onClear}
+              type="button"
+              {...stylex.props(
+                foundationStyles.metadata,
+                textLinkStyles.link,
+                styles.clearButton,
+              )}
+            >
+              Clear filters
+            </button>
           </span>
         ) : null}
       </p>
@@ -449,6 +476,25 @@ const styles = stylex.create({
     alignItems: "baseline",
     gap: space.x2,
     margin: 0,
+  },
+  countText: {
+    display: "inline-flex",
+    minWidth: 0,
+    alignItems: "baseline",
+    gap: space.x2,
+  },
+  // A text link after the count; narrow screens clear from the Filters drawer.
+  clear: {
+    display: { default: "inline-flex", [PAGE_NARROW]: "none" },
+    alignItems: "baseline",
+    gap: space.x2,
+  },
+  clearButton: {
+    padding: 0,
+    borderWidth: 0,
+    backgroundColor: "transparent",
+    whiteSpace: "nowrap",
+    cursor: "pointer",
   },
   countValue: {
     color: colors.ink,

@@ -205,35 +205,25 @@ function FilterQueryForm({
 }
 
 /**
- * The filter sidebar beside a list or table: search first, then facet groups,
- * then Clear filters. It has no heading; the search label and group headings
- * say what each part does. Pages hide it on narrow screens, where ListControls
+ * The filter sidebar beside a list or table: search first, then facet groups.
+ * It has no heading; the search label and group headings say what each part
+ * does. ListToolbar offers Clear filters beside the result count. Pages hide it on narrow screens, where ListControls
  * shows the same search and groups in its drawer.
  */
 export function FilterRail({
   ariaLabel,
   children,
-  onClear,
   search,
 }: {
   ariaLabel?: string;
   /** Facet groups. */
   children?: ReactNode;
-  /** Pass only while a filter or search is applied. */
-  onClear?: () => void;
   search?: ReactNode;
 }) {
   return (
     <section aria-label={ariaLabel} {...stylex.props(styles.rail)}>
       {search}
       {children}
-      {onClear ? (
-        <span {...stylex.props(styles.railClear)}>
-          <Button onClick={onClear} size="sm" variant="text">
-            Clear filters
-          </Button>
-        </span>
-      ) : null}
     </section>
   );
 }
@@ -384,10 +374,6 @@ const styles = stylex.create({
     minWidth: 0,
     flexDirection: "column",
     gap: space.x6,
-  },
-  // Lines up with the group headings instead of stretching across the rail.
-  railClear: {
-    alignSelf: "flex-start",
   },
   // Matches FilterQuery and the member search: a label above a 40px field.
   loadingSearchField: {

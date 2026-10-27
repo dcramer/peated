@@ -71,8 +71,6 @@ function MemberListFiltersExample() {
       onChange={(name, value) =>
         setSelected((current) => ({ ...current, [name]: value }))
       }
-      onClear={() => setSelected({})}
-      query=""
       search={
         <TextInput
           aria-label="Find in these tastings"
@@ -112,8 +110,6 @@ export const Overview: Story = {
   args: {
     groups: [],
     onChange: () => undefined,
-    onClear: () => undefined,
-    query: "",
     search: null,
   },
   parameters: { controls: { disable: true } },

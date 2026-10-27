@@ -64,26 +64,14 @@ export function MemberListFilterGroups({
  * takes over. Routes own queries, URL state, and navigation.
  */
 export function MemberListFilters({
-  onClear,
-  query,
   search,
   ...groupProps
 }: MemberListFilterGroupsProps & {
-  onClear: () => void;
-  /** Applied search text, used to offer "Clear filters". */
-  query: string;
   /** Search field; the route owns its queries and navigation. */
   search: ReactNode;
 }) {
-  const hasFilters = Boolean(
-    query ||
-    groupProps.groups.some((group) =>
-      group.filters.some((filter) => filter.selected),
-    ),
-  );
-
   return (
-    <FilterRail onClear={hasFilters ? onClear : undefined} search={search}>
+    <FilterRail search={search}>
       <MemberListFilterGroups {...groupProps} />
     </FilterRail>
   );
