@@ -1,13 +1,10 @@
-import {
-  DataTable,
-  type DataTableColumn,
-} from "@peated/web/components/dataTable.stylex";
 import { RailList, RailListItem } from "@peated/web/components/lists.stylex";
 import {
   PageSection,
   RailSection,
 } from "@peated/web/components/pages/pageLayout.stylex";
 import { RATING_BANDS } from "@peated/web/components/scoring.stylex";
+import { Table, type TableColumn } from "@peated/web/components/table.stylex";
 import type { Metadata } from "next";
 import {
   AboutPage,
@@ -25,7 +22,7 @@ export const metadata: Metadata = {
     "A simple guide to Peated tasting ratings and 100-point reviews.",
 };
 
-const bandColumns: DataTableColumn<(typeof RATING_BANDS)[number]>[] = [
+const bandColumns: TableColumn<(typeof RATING_BANDS)[number]>[] = [
   {
     cell: (band) => band.label,
     header: "Rating",
@@ -62,7 +59,7 @@ export default function RatingsPage() {
       title="Rating guide"
     >
       <PageSection heading="The five ratings">
-        <DataTable
+        <Table
           caption="Peated tasting ratings"
           columns={bandColumns}
           getKey={(band) => band.key}

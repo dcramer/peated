@@ -23,8 +23,8 @@ import {
   type RowMenuItem,
 } from "@peated/web/components/rowMenu.stylex";
 import { breakpointStyles } from "../../styles/foundations.stylex";
-import { CatalogTable, type CatalogTableColumn } from "../catalogTable.stylex";
-import { Table } from "../table.stylex";
+import { CatalogResultsLayout } from "../catalogResultsLayout.stylex";
+import { Table, type TableColumn } from "../table.stylex";
 import { CatalogPageLoading } from "./catalogPage.stylex";
 
 export type EntityCatalogItem = EntityListItem & {
@@ -121,7 +121,7 @@ export function EntityCatalogList({
   total,
 }: EntityCatalogListProps) {
   return (
-    <Table
+    <CatalogResultsLayout
       activeFilterCount={activeFilterCount}
       ariaLabel={`${noun} catalog`}
       count={items.length}
@@ -164,7 +164,7 @@ export function EntityCatalogList({
         pendingIds={pendingIds}
         showFollowingMarks={showFollowingMarks}
       />
-    </Table>
+    </CatalogResultsLayout>
   );
 }
 
@@ -181,7 +181,7 @@ function EntityCatalogTable({
   pendingIds?: ReadonlySet<number>;
   showFollowingMarks: boolean;
 }) {
-  const columns: CatalogTableColumn<EntityCatalogItem>[] = [
+  const columns: TableColumn<EntityCatalogItem>[] = [
     {
       cell: (item) => (
         <EntityIdentityRow
@@ -194,7 +194,7 @@ function EntityCatalogTable({
           layout="cell"
         />
       ),
-      padding: "flush",
+      verticalPadding: "none",
       header: "Name",
       key: "name",
     },
@@ -261,7 +261,7 @@ function EntityCatalogTable({
   }
 
   return (
-    <CatalogTable
+    <Table
       caption={`${noun} records`}
       columns={columns}
       getKey={(item) => item.id}

@@ -9,6 +9,7 @@ export default function OAuthClientTable({
 }) {
   return (
     <AdminTable
+      caption="OAuth clients"
       columns={[
         {
           name: "client",

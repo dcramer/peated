@@ -4,7 +4,7 @@ import {
   AdminPage,
   AdminPageHeader,
 } from "@peated/web/components/admin/adminContent.stylex";
-import { AdminTable as Table } from "@peated/web/components/admin/adminTable.stylex";
+import { AdminTable } from "@peated/web/components/admin/adminTable.stylex";
 import TimeSince from "@peated/web/components/timeSince";
 import useApiQueryParams from "@peated/web/hooks/useApiQueryParams";
 import { useORPC } from "@peated/web/lib/orpc/context";
@@ -30,7 +30,8 @@ export default function Page() {
     <AdminPage>
       <AdminPageHeader title="Users" />
 
-      <Table
+      <AdminTable
+        caption="Users"
         items={userList.results}
         rel={userList.rel}
         defaultSort="-created"

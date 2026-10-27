@@ -3,13 +3,11 @@
 import * as stylex from "@stylexjs/stylex";
 import type { ReactNode } from "react";
 
-import { Button } from "@peated/web/components/button.stylex";
 import {
   FacetGroup,
-  FacetGroupLoading,
+  FilterRail,
 } from "@peated/web/components/filterPanel.stylex";
-import { foundationStyles } from "../../styles/foundations.stylex";
-import { colors, controlMetrics, space } from "../../styles/tokens.stylex";
+import { space } from "../../styles/tokens.stylex";
 
 export type MemberListFilter = {
   count?: number;
@@ -85,55 +83,12 @@ export function MemberListFilters({
   );
 
   return (
-    <div {...stylex.props(styles.filterContent)}>
-      {search}
+    <FilterRail onClear={hasFilters ? onClear : undefined} search={search}>
       <MemberListFilterGroups {...groupProps} />
-      {hasFilters ? (
-        <Button onClick={onClear} size="sm" variant="text">
-          Clear filters
-        </Button>
-      ) : null}
-    </div>
-  );
-}
-
-export type MemberListFilterGroupLoading = {
-  label: string;
-  rows: number;
-  summary?: boolean;
-};
-
-/** Reserves the rail's search field and usual groups while counts load. */
-export function MemberListFiltersLoading({
-  groups,
-  searchLabel,
-}: {
-  groups: readonly MemberListFilterGroupLoading[];
-  searchLabel: string;
-}) {
-  return (
-    <div aria-hidden="true" {...stylex.props(styles.filterContent)}>
-      <div {...stylex.props(styles.loadingSearch)}>
-        <span {...stylex.props(foundationStyles.fieldLabel)}>
-          {searchLabel}
-        </span>
-        <span {...stylex.props(styles.loadingSearchField)} />
-      </div>
-      {groups.map((group) => (
-        <FacetGroupLoading key={group.label} {...group} />
-      ))}
-    </div>
+    </FilterRail>
   );
 }
 
 const styles = stylex.create({
   filterContent: { display: "flex", flexDirection: "column", gap: space.x6 },
-  // Matches the route's search field: a label above a full-width field.
-  loadingSearch: { display: "flex", flexDirection: "column", gap: space.x2 },
-  loadingSearchField: {
-    display: "block",
-    height: controlMetrics.controlHeight,
-    borderRadius: controlMetrics.radius,
-    backgroundColor: colors.inset,
-  },
 });

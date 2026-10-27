@@ -95,9 +95,9 @@ export default function ReportsPage() {
         ))}
       </AdminActions>
       <AdminTable
+        caption="Reports"
         columns={[
           {
-            fill: true,
             name: "report",
             value: (report) => <ReportSummary report={report} />,
           },
@@ -137,7 +137,6 @@ export default function ReportsPage() {
           },
         ]}
         items={data.results}
-        noHeaders={!data.results.length}
         rel={data.rel}
         url={reportAdminHref}
       />

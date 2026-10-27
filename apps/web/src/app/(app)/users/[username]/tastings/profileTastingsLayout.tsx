@@ -4,11 +4,11 @@ import { useSearchParams } from "next/navigation";
 import type { ReactNode } from "react";
 
 import { CommunityFeedLoading } from "@peated/web/components/communityFeed.stylex";
+import { FilterRailLoading } from "@peated/web/components/filterPanel.stylex";
 import {
   ListToolbarLoading,
   type ListView,
 } from "@peated/web/components/lists.stylex";
-import { MemberListFiltersLoading } from "@peated/web/components/pages/memberListFilters.stylex";
 import { PageColumns } from "@peated/web/components/pages/pageLayout.stylex";
 import { TastingTableLoading } from "@peated/web/components/tastingTable.stylex";
 import { profileBottleSearchCopy } from "../profileBottleSearch.stylex";
@@ -57,7 +57,7 @@ export function ProfileTastingsFiltersLoading({
   hasCountry: boolean;
 }) {
   return (
-    <MemberListFiltersLoading
+    <FilterRailLoading
       groups={[
         { label: "Rating", rows: 5 },
         { label: "Age", rows: 6, summary: true },

@@ -69,6 +69,7 @@ export default function CatalogListingTable({
 }) {
   return (
     <AdminTable
+      caption="Catalog listings"
       withSearch
       columns={[
         {

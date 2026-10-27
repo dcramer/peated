@@ -28,9 +28,9 @@ export function ReviewRows({
 }) {
   return (
     <AdminTable
+      caption="Reviews"
       columns={[
         {
-          fill: true,
           name: "review",
           value: (review) => (
             <div {...stylex.props(styles.review)}>

@@ -12,9 +12,9 @@ import {
   BottleIdentityRowLoading,
   type BottleIdentityRowProps,
 } from "./bottleIdentityRow.stylex";
-import { CatalogTable, type CatalogTableColumn } from "./catalogTable.stylex";
 import { LoadingText } from "./feedback.stylex";
 import { TastingRating, type RatingBand } from "./scoring.stylex";
+import { Table, type TableColumn } from "./table.stylex";
 import { Timestamp } from "./timestamp";
 
 export type TastingTableItem = Pick<
@@ -44,7 +44,7 @@ const columnLayout = {
     width: "figure",
   },
   rating: { align: "right", header: "Rating", key: "rating", width: "rating" },
-} as const satisfies Record<string, Omit<CatalogTableColumn<unknown>, "cell">>;
+} as const satisfies Record<string, Omit<TableColumn<unknown>, "cell">>;
 
 export type TastingTableProps = {
   caption: string;
@@ -59,7 +59,7 @@ export type TastingTableProps = {
  * getTastingTableItems. Routes own queries, empty states, and paging.
  */
 export function TastingTable({ caption, items }: TastingTableProps) {
-  const columns: CatalogTableColumn<TastingTableItem>[] = [
+  const columns: TableColumn<TastingTableItem>[] = [
     {
       cell: (item) => (
         <span {...stylex.props(foundationStyles.metadata, styles.firstLine)}>
@@ -106,7 +106,7 @@ export function TastingTable({ caption, items }: TastingTableProps) {
   ];
 
   return (
-    <CatalogTable
+    <Table
       caption={caption}
       columns={columns}
       density="compact"
@@ -125,7 +125,7 @@ export function TastingTableLoading({
   label?: string;
   rows?: number;
 }) {
-  const columns: CatalogTableColumn<number>[] = [
+  const columns: TableColumn<number>[] = [
     {
       cell: () => (
         <span {...stylex.props(foundationStyles.metadata, styles.firstLine)}>
@@ -176,7 +176,7 @@ export function TastingTableLoading({
   return (
     <div aria-busy="true" aria-label={label} role="status">
       <div aria-hidden="true">
-        <CatalogTable
+        <Table
           caption={label}
           columns={columns}
           density="compact"
@@ -191,7 +191,7 @@ export function TastingTableLoading({
 function TastingTableDetails({ item }: { item: TastingTableItem }) {
   return (
     <p {...stylex.props(foundationStyles.metadata, styles.details)}>
-      {/* CatalogTable hides the Date column at the same shared breakpoint. */}
+      {/* Table hides the Date column at the same shared breakpoint. */}
       <span {...stylex.props(breakpointStyles.narrowOnly, styles.narrowDate)}>
         <Timestamp date={item.tastedAt} format="date" />
         {item.note ? <span aria-hidden="true"> · </span> : null}

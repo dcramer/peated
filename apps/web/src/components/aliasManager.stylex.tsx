@@ -7,8 +7,8 @@ import { useState } from "react";
 import { space } from "../styles/tokens.stylex";
 import { Button } from "./button.stylex";
 import { Chip } from "./chip.stylex";
-import { DataTable, type DataTableColumn } from "./dataTable.stylex";
 import { Field, TextInput, ValidationMessage } from "./field.stylex";
+import { Table, type TableColumn } from "./table.stylex";
 
 export type AliasManagerItem = {
   badge?: string;
@@ -33,7 +33,7 @@ export function AliasManager({
   const [name, setName] = useState("");
   const [error, setError] = useState<string | null>(null);
   const [pending, setPending] = useState<string | null>(null);
-  const columns: DataTableColumn<AliasManagerItem>[] = [
+  const columns: TableColumn<AliasManagerItem>[] = [
     {
       cell: (item) => (
         <span {...stylex.props(styles.name)}>
@@ -69,7 +69,7 @@ export function AliasManager({
             header: "",
             key: "delete",
           },
-        ] satisfies DataTableColumn<AliasManagerItem>[])
+        ] satisfies TableColumn<AliasManagerItem>[])
       : []),
   ];
 
@@ -142,7 +142,7 @@ export function AliasManager({
         </form>
       ) : null}
       {error ? <ValidationMessage>{error}</ValidationMessage> : null}
-      <DataTable
+      <Table
         caption="Other names"
         columns={columns}
         getKey={(item) => item.name}

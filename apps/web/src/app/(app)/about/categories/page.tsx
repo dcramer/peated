@@ -1,12 +1,9 @@
-import {
-  DataTable,
-  type DataTableColumn,
-} from "@peated/web/components/dataTable.stylex";
 import { RailList, RailListItem } from "@peated/web/components/lists.stylex";
 import {
   PageSection,
   RailSection,
 } from "@peated/web/components/pages/pageLayout.stylex";
+import { Table, type TableColumn } from "@peated/web/components/table.stylex";
 import type { Metadata } from "next";
 import { AboutPage, AboutText, AboutTextStack } from "../aboutPage.stylex";
 
@@ -71,7 +68,7 @@ const categories = [
 
 type CategoryDefinition = (typeof categories)[number];
 
-const categoryColumns: DataTableColumn<CategoryDefinition>[] = [
+const categoryColumns: TableColumn<CategoryDefinition>[] = [
   {
     cell: (category) => category.category,
     header: "Category",
@@ -81,6 +78,7 @@ const categoryColumns: DataTableColumn<CategoryDefinition>[] = [
     cell: (category) => category.definition,
     header: "Definition",
     key: "definition",
+    width: "fill",
   },
 ];
 
@@ -145,7 +143,7 @@ export default function CategoriesPage() {
       </PageSection>
 
       <PageSection heading="Definitions">
-        <DataTable
+        <Table
           caption="Peated whisky category definitions"
           columns={categoryColumns}
           getKey={(category) => category.category}

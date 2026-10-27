@@ -4,7 +4,8 @@ import { colors, space } from "../../../../../../../../styles/tokens.stylex";
 
 export const styles = stylex.create({
   mobileDetails: {
-    display: { default: "none", "@media (max-width: 639px)": "grid" },
+    // Matches the 760px breakpoint where Table hides secondary columns.
+    display: { default: "none", "@media (max-width: 759px)": "grid" },
     gap: space.x2,
     margin: `${space.x2} 0 0`,
   },

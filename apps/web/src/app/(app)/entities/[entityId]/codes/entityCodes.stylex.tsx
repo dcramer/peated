@@ -1,9 +1,9 @@
 import * as stylex from "@stylexjs/stylex";
 
 import { Card } from "@peated/web/components/card.stylex";
-import { CatalogTable } from "@peated/web/components/catalogTable.stylex";
 import { EntityIdentityRow } from "@peated/web/components/entityIdentityRow.stylex";
 import { PageSection } from "@peated/web/components/pages/pageLayout.stylex";
+import { Table } from "@peated/web/components/table.stylex";
 import { TextLink } from "@peated/web/components/textLink.stylex";
 import { foundationStyles } from "../../../../../styles/foundations.stylex";
 import { colors, space } from "../../../../../styles/tokens.stylex";
@@ -57,7 +57,7 @@ export function EntityCodes({
           }
           key={group.code || group.heading}
         >
-          <CatalogTable
+          <Table
             caption={`${group.heading} distillery codes`}
             columns={[
               {
@@ -72,7 +72,7 @@ export function EntityCodes({
               },
               {
                 key: "distillery",
-                padding: "flush",
+                verticalPadding: "none",
                 header: "Distillery",
                 cell: (row) => (
                   <EntityIdentityRow
