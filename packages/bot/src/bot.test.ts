@@ -452,6 +452,7 @@ describe("searchWeb", () => {
             web: [
               { url: "https://a.example/", title: " A ", description: "x" },
               { url: "https://b.example/" },
+              { url: "not a url", title: "Broken" },
             ],
           },
         }),
@@ -471,6 +472,18 @@ describe("searchWeb", () => {
     expect(await firecrawlBodies("search")).toEqual([
       { query: "lagavulin 16", limit: 8, sources: ["web"] },
     ]);
+  });
+
+  test("reports a reply that is not JSON as an unavailable search", async () => {
+    const { searchWeb } = setup({
+      search: text("<html>Bad gateway</html>", { status: 200 }),
+    });
+
+    await expect(searchWeb({ query: "q" })).resolves.toEqual({
+      status: "failed",
+      reason: "service_unavailable",
+      httpStatus: null,
+    });
   });
 
   test("reports an unavailable search and throws on a rejected API key", async () => {

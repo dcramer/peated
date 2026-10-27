@@ -29,23 +29,17 @@ const ScrapeResponseSchema = z
   })
   .passthrough();
 
+const SearchResultSchema = z
+  .object({
+    url: z.string().url(),
+    title: z.string().nullable().optional(),
+    description: z.string().nullable().optional(),
+  })
+  .passthrough();
+
 const SearchResponseSchema = z
   .object({
-    data: z
-      .object({
-        web: z
-          .array(
-            z
-              .object({
-                url: z.string().url(),
-                title: z.string().nullable().optional(),
-                description: z.string().nullable().optional(),
-              })
-              .passthrough(),
-          )
-          .default([]),
-      })
-      .passthrough(),
+    data: z.object({ web: z.array(z.unknown()).default([]) }).passthrough(),
   })
   .passthrough();
 
@@ -101,7 +95,14 @@ async function callFirecrawl(
     await response.body?.cancel();
     return { ok: false, httpStatus: response.status };
   }
-  return { ok: true, payload: await response.json() };
+  try {
+    return { ok: true, payload: await response.json() };
+  } catch {
+    // A cut-off or non-JSON body is a failed answer, like a network failure.
+    // A JSON reply in the wrong shape still throws when it is parsed, because
+    // that means Firecrawl's API changed.
+    return { ok: false, httpStatus: null };
+  }
 }
 
 export type FirecrawlPage = {
@@ -165,10 +166,17 @@ export async function searchWithFirecrawl(
   const { data } = SearchResponseSchema.parse(result.payload);
   return {
     ok: true,
-    results: data.web.map((item) => ({
-      url: item.url,
-      title: item.title?.trim() || item.url,
-      description: item.description ?? null,
-    })),
+    // One malformed result is skipped instead of failing the whole search.
+    results: data.web.flatMap((value) => {
+      const item = SearchResultSchema.safeParse(value);
+      if (!item.success) return [];
+      return [
+        {
+          url: item.data.url,
+          title: item.data.title?.trim() || item.data.url,
+          description: item.data.description ?? null,
+        },
+      ];
+    }),
   };
 }
