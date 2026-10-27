@@ -29,7 +29,8 @@ bottom:
 
 4. The History: the About sections, then the vintage and release-year charts.
    When more than 4 sections exist, the first 3 show and the rest wait behind
-   a "Show the full history" button; they stay in the page's HTML. A "Sources
+   a "Read the full history" button, with a line naming the sections it
+   holds; they stay in the page's HTML. A "Sources
    disagree" note is folded to one line until a reader opens it.
 5. Recent activity, for distilleries.
 6. Sources: a count and the date they were checked. The list opens with a

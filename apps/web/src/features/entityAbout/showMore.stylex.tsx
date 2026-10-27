@@ -4,7 +4,8 @@ import * as stylex from "@stylexjs/stylex";
 import { useEffect, useId, useState, type ReactNode } from "react";
 
 import { Button } from "../../components/button.stylex";
-import { space } from "../../styles/tokens.stylex";
+import { foundationStyles } from "../../styles/foundations.stylex";
+import { colors, space } from "../../styles/tokens.stylex";
 
 /**
  * Holds part of the About content behind a button. It stays in the page's
@@ -13,9 +14,12 @@ import { space } from "../../styles/tokens.stylex";
  */
 export function ShowMore({
   label,
+  hint,
   children,
 }: {
   label: string;
+  /** A short line beside the button saying what it holds. */
+  hint?: string;
   children: ReactNode;
 }) {
   const contentId = useId();
@@ -52,6 +56,11 @@ export function ShowMore({
           >
             {label}
           </Button>
+          {hint ? (
+            <span {...stylex.props(foundationStyles.metadata, styles.hint)}>
+              {hint}
+            </span>
+          ) : null}
         </div>
       )}
     </>
@@ -60,6 +69,14 @@ export function ShowMore({
 
 const styles = stylex.create({
   action: {
+    display: "flex",
+    flexWrap: "wrap",
+    alignItems: "center",
+    columnGap: space.x3,
+    rowGap: space.x2,
     paddingTop: space.x3,
+  },
+  hint: {
+    color: colors.inkMuted,
   },
 });

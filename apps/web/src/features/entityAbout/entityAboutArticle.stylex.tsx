@@ -261,9 +261,11 @@ export function EntityAboutHistory({
       {sections.slice(0, sections.length - hiddenSections.length)}
       {hiddenSections.length ? (
         <ShowMore
-          label={`Show the full history (${hiddenSections.length} more ${
-            hiddenSections.length === 1 ? "section" : "sections"
-          })`}
+          hint={`Next: ${about.sections
+            .slice(-hiddenSections.length)
+            .map((section) => section.heading)
+            .join(", ")}`}
+          label="Read the full history"
         >
           {hiddenSections}
         </ShowMore>

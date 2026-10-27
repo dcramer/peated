@@ -19,7 +19,7 @@ export type VintageCount = { year: number; count: number };
 export const ABOUT_MIN_TIMELINE_SPANS = 2;
 export const ABOUT_MIN_VINTAGE_BOTTLES = 10;
 export const ABOUT_MIN_RELEASE_BOTTLES = 10;
-// History sections shown before the "Show the full history" button.
+// History sections shown before the "Read the full history" button.
 export const ABOUT_VISIBLE_SECTIONS = 3;
 
 function year(date: string) {
