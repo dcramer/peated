@@ -20,12 +20,20 @@ It does not rerun the matching backlog.
 
 ## Rollout status
 
-Checked October 24–25, 2026; details in the
+Checked October 24–26, 2026; details in the
 [production check](../research/2026-10-24-auction-production-check.md).
 
 - Done: deploy with `0321_auction_details`; first manual run (October 1);
   source health and runs read after deploy; hammer prices and 20 matches
   spot-checked against lot pages; a 20-lot detail-read recheck (October 25).
+- Done October 26: a moderator title review ignored 328 lots that are not one
+  whisky bottle with "Ignore lot": 307 in review and 21 already matched. They
+  were samples (including duty-paid trade samples), miniatures, other spirits,
+  glassware, prints, books, and other accessories, and bottles sold as a set
+  with a mini or glasses. Whisky named for a cask finish, "Dram" releases, and
+  bottles sold with a book, print, or coaster stayed. The review queue went
+  from 6,190 to 5,883 lots. A title review cannot find a lot whose title hides
+  that it is out of scope.
 - Not done: a recheck of the rest of the lots in review (all checked under
   older rules); the 184th auction, which ended October 11
   before collection; a current open-auction check and timed full run; an
