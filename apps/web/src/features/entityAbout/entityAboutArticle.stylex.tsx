@@ -26,7 +26,7 @@ import {
   type YearCounts,
 } from "./entityAbout";
 import { EntityLifeline } from "./entityLifeline.stylex";
-import { MoreSections } from "./moreSections.stylex";
+import { ShowMore } from "./showMore.stylex";
 import { VintageChart } from "./vintageChart.stylex";
 
 export type EntityAboutCounts = {
@@ -255,9 +255,13 @@ export function EntityAboutHistory({
     <article id="history" {...stylex.props(styles.article)}>
       {sections.slice(0, ABOUT_VISIBLE_SECTIONS)}
       {hiddenSections.length ? (
-        <MoreSections count={hiddenSections.length}>
+        <ShowMore
+          label={`Show the full history (${hiddenSections.length} more ${
+            hiddenSections.length === 1 ? "section" : "sections"
+          })`}
+        >
           {hiddenSections}
-        </MoreSections>
+        </ShowMore>
       ) : null}
 
       {showVintages ? (
@@ -306,43 +310,51 @@ export function EntityAboutSources({
     );
   if (!sources.length) return null;
 
+  // The list waits behind a button; a citation number still opens it.
   return (
     <section aria-labelledby="about-sources" {...stylex.props(styles.section)}>
       <SectionHeading id="about-sources">Sources</SectionHeading>
-      <ol {...stylex.props(styles.sources)}>
-        {sources.map((source) => (
-          <li
-            id={`source-${source.id}`}
-            key={source.id}
-            {...stylex.props(styles.source)}
-          >
-            <span
-              {...stylex.props(foundationStyles.metadata, styles.sourceNumber)}
+      <p {...stylex.props(foundationStyles.metadata, styles.muted)}>
+        {sources.length === 1 ? "1 source" : `${sources.length} sources`}
+        {about.checkedOn
+          ? `, checked ${reviewedFormatter.format(
+              new Date(`${about.checkedOn}T00:00:00Z`),
+            )}`
+          : null}
+        . Something wrong? Report it from the menu at the top of the page.
+      </p>
+      <ShowMore label="Show sources">
+        <ol {...stylex.props(styles.sources)}>
+          {sources.map((source) => (
+            <li
+              id={`source-${source.id}`}
+              key={source.id}
+              {...stylex.props(styles.source)}
             >
-              {citationNumbers.get(source.id)}
-            </span>
-            <span {...stylex.props(styles.sourceText)}>
-              <TextLink href={source.url} rel="noreferrer" target="_blank">
-                {source.title}
-              </TextLink>
-              {source.publisher ? (
-                <span
-                  {...stylex.props(foundationStyles.metadata, styles.muted)}
-                >
-                  {source.publisher}
-                </span>
-              ) : null}
-            </span>
-          </li>
-        ))}
-      </ol>
-      {about.checkedOn ? (
-        <p {...stylex.props(foundationStyles.metadata, styles.muted)}>
-          Checked against these sources on{" "}
-          {reviewedFormatter.format(new Date(`${about.checkedOn}T00:00:00Z`))}.
-          Something wrong? Report it from the menu at the top of the page.
-        </p>
-      ) : null}
+              <span
+                {...stylex.props(
+                  foundationStyles.metadata,
+                  styles.sourceNumber,
+                )}
+              >
+                {citationNumbers.get(source.id)}
+              </span>
+              <span {...stylex.props(styles.sourceText)}>
+                <TextLink href={source.url} rel="noreferrer" target="_blank">
+                  {source.title}
+                </TextLink>
+                {source.publisher ? (
+                  <span
+                    {...stylex.props(foundationStyles.metadata, styles.muted)}
+                  >
+                    {source.publisher}
+                  </span>
+                ) : null}
+              </span>
+            </li>
+          ))}
+        </ol>
+      </ShowMore>
     </section>
   );
 }

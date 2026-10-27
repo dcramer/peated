@@ -22,7 +22,8 @@ bottom:
    The first 3 sections show; the rest wait behind a "Show the full history"
    button and stay in the page's HTML.
 5. Recent activity.
-6. Sources.
+6. Sources: a count and the date they were checked. The list opens with a
+   button, or when a reader follows a citation number to it.
 
 The sidebar holds facts to check at a glance:
 
