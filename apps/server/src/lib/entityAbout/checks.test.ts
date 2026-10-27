@@ -179,6 +179,31 @@ describe("keepVerifiedCitations", () => {
     ]);
   });
 
+  test("reads Japanese and Chinese dates", () => {
+    const pages = [
+      {
+        url: page.url,
+        text: "2022年2月9日に重要文化財に指定された。1980年に町の文化財に指定。",
+      },
+    ];
+    const result = keepVerifiedCitations(
+      draft({
+        events: [
+          event(1, "2022-02-09", "2022年2月9日に重要文化財に指定された。"),
+          // No quote names the month.
+          event(2, "1980-02", "1980年に町の文化財に指定。"),
+        ],
+      }),
+      pages,
+      null,
+    );
+
+    expect(result.events.map(({ date }) => date)).toEqual([
+      "2022-02-09",
+      "1980",
+    ]);
+  });
+
   test("drops an event whose text states a number no quote states", () => {
     const withText = (text: string) =>
       keepVerifiedCitations(
@@ -986,7 +1011,12 @@ describe("checkConflictPicks", () => {
           },
         },
       }),
-      [{ ...page, text: `${page.text} CategoryBDate Added28/03/1996` }],
+      [
+        {
+          ...page,
+          text: `${page.text} CategoryBDate Added28/03/1996Supplementary Information`,
+        },
+      ],
       null,
     ).siteFacts.listing;
     expect(spaced).toBeDefined();
@@ -1013,15 +1043,24 @@ describe("checkConflictPicks", () => {
         null,
       ).siteFacts.otherStills;
     expect(otherStills("It installed a single still for gin.")).toBeDefined();
+    expect(otherStills("One Carter Head still makes gin.")).toBeDefined();
+    expect(otherStills("It is one of the stills.")).toBeUndefined();
     // Millions are read as whole numbers.
     expect(stills(1600000, "It makes 1.6m litres of alcohol.")).toBeDefined();
     expect(stills(2000000, "It makes 2 million litres.")).toBeDefined();
+    expect(stills(200000, "It can make 200k lpa pa.")).toBeDefined();
+    expect(
+      stills(1000000, "It can make one million litres of alcohol."),
+    ).toBeDefined();
+    expect(stills(200000, "It has 200 kW of solar panels.")).toBeUndefined();
     // Dots and spaces group thousands in other languages.
     expect(
       stills(3700000, "Kapazität von 3.700.000 Litern reinen Alkohols."),
     ).toBeDefined();
     expect(stills(3700000, "(litres d'alcool/an) | 3 700 000")).toBeDefined();
     expect(stills(1975200, "In 1975 200 workers left.")).toBeUndefined();
+    expect(stills(1274684, "Facility | £1,274,684.00 | 2013")).toBeDefined();
+    expect(stills(1000, "Kapazität von 1.000 Litern.")).toBeUndefined();
     expect(
       stills(2000000, "It makes almost two million litres."),
     ).toBeDefined();
@@ -1040,6 +1079,7 @@ describe("checkConflictPicks", () => {
     expect(stills(3400000, "Capacity (mlpa)\ni\n3.4")).toBeDefined();
     expect(stills(4800000, "It makes 4.8 mlpa.")).toBeDefined();
     expect(stills(6500000, "Capacity rose to 6.5mla.")).toBeDefined();
+    expect(stills(64000000, "It doubled capacity to 64mlas.")).toBeDefined();
     expect(stills(3400000, "Capacity (mlpa) 3.4 since 2018")).toBeDefined();
     expect(
       stills(2018000000, "Capacity (mlpa) 3.4 since 2018"),

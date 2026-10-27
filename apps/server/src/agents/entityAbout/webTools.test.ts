@@ -1,4 +1,4 @@
-import { findInPages, toPlainText } from "./webTools";
+import { findInPages, toPlainText, withPublishedDate } from "./webTools";
 
 describe("toPlainText", () => {
   test("keeps link text and drops images", () => {
@@ -15,6 +15,16 @@ describe("toPlainText", () => {
         "In December 2003, Diageo caused controversy[\\[10\\]](https://en.wikipedia.org/wiki/Cardhu_distillery#cite_note-10)[\\[a\\]](https://en.wikipedia.org/wiki/Cardhu_distillery#cite_note-a) by renaming it.",
       ),
     ).toBe("In December 2003, Diageo caused controversy by renaming it.");
+  });
+});
+
+describe("withPublishedDate", () => {
+  test("puts the metadata's published date at the top", () => {
+    expect(withPublishedDate("Body.", "2025-08-07T00:15:00+00:00")).toBe(
+      "Published 2025-08-07.\n\nBody.",
+    );
+    expect(withPublishedDate("Body.", null)).toBe("Body.");
+    expect(withPublishedDate("Body.", "last week")).toBe("Body.");
   });
 });
 

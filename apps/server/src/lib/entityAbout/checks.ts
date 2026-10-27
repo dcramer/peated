@@ -43,10 +43,11 @@ function normalizeForQuote(value: string) {
     value
       .normalize("NFKC")
       // Records that run table cells together, as in "CategoryBDate
-      // Added28/03/1996", match a quote that spaces them out.
+      // Added28/03/1996Supplementary", match a quote that spaces them out.
       .replace(/(\p{Ll})(\p{Lu})/gu, "$1 $2")
       .replace(/(\p{Lu})(\p{Lu}\p{Ll})/gu, "$1 $2")
       .replace(/(\p{L})(\p{N})/gu, "$1 $2")
+      .replace(/(\p{N})(\p{L})/gu, "$1 $2")
       .toLowerCase()
       .replace(/[‘’“”]/g, "'")
       .replace(/[^\p{L}\p{N}]+/gu, " ")
@@ -108,8 +109,10 @@ function trimToStatedPrecision(quotes: readonly string[], date: string) {
   const mm = month!.padStart(2, "0");
   const numericMonth = `\\b${year}-${mm}\\b|\\b${m}/${year}\\b`;
   const monthByNumber = `\\b${monthWord}(?![a-z])\\s*,?\\s*\\d|\\d(?:st|nd|rd|th)?\\s+(?:of\\s+)?${monthWord}(?![a-z])`;
+  // Japanese and Chinese pages write "2022年2月9日".
+  const cjkMonth = `(?<!\\d)${m}\\s*月`;
   if (
-    !states(`${numericMonth}|${monthByNumber}`) &&
+    !states(`${numericMonth}|${monthByNumber}|${cjkMonth}`) &&
     !states(`\\b${titleMonth}(?![a-z])`, "")
   ) {
     return year!;
@@ -118,7 +121,10 @@ function trimToStatedPrecision(quotes: readonly string[], date: string) {
   const d = `0?${Number(day)}(?:st|nd|rd|th)?`;
   const dayWithMonth = `\\b${d}\\s+(?:of\\s+)?${monthWord}(?![a-z])|\\b${monthWord}\\s+${d}\\b`;
   const numericDay = `\\b${year}[-/.]${m}[-/.]${d}\\b|\\b${d}[-/.]${m}[-/.]${year}\\b|\\b${m}[-/.]${d}[-/.]${year}\\b`;
-  return states(`${dayWithMonth}|${numericDay}`) ? date : `${year}-${month}`;
+  const cjkDay = `${cjkMonth}\\s*0?${Number(day)}\\s*日`;
+  return states(`${dayWithMonth}|${numericDay}|${cjkDay}`)
+    ? date
+    : `${year}-${month}`;
 }
 
 /** Trims a single-date statedValue the same way; ranges and other values pass. */
@@ -490,6 +496,8 @@ function stripThousands(value: string) {
         /(?<![\d.])\d{1,3}(?:[. \u00a0\u202f]\d{3}){2,}(?![\d.])/g,
         (number) => number.replace(/[. \u00a0\u202f]/g, ""),
       )
+      // A sum such as "\u00a31,274,684.00" states 1274684.
+      .replace(/(\d)\.0{1,2}(?!\d)/g, "$1")
   );
 }
 
@@ -578,11 +586,16 @@ function statesSingle(
     .split(" ")[0]!;
   const singular = noun.replace(/s$/, "");
   const text = ` ${normalizeForQuote(quotes.join(" "))} `;
-  // Whole words: "one washback" does not state 1 wash still.
-  return ["one", "a single"].some((count) =>
-    [singular, `${singular}s`].some((word) =>
-      text.includes(` ${count} ${word} `),
-    ),
+  // Whole words: "one washback" does not state 1 wash still. A name may sit
+  // between, as in "one Carter Head still", but "one of the stills" does not
+  // state 1.
+  const named = new RegExp(
+    ` (?:one|a single) (?:(?!of |the |\\d)\\S+ ){0,3}${singular} `,
+  );
+  return (
+    ["one", "a single"].some((count) =>
+      text.includes(` ${count} ${singular}s `),
+    ) || named.test(text)
   );
 }
 
@@ -593,8 +606,9 @@ function readNumberWords(run: string) {
 }
 
 function writeNumberWords(value: string) {
-  // "two million" states 2 million, like "2 million".
+  // "two million" states 2 million, like "2 million", and "one million" 1 million.
   return value
+    .replace(/\bone\s+(million|billion)\b/gi, "1 $1")
     .replace(
       new RegExp(
         `\\b(${SMALL_NUMBER_WORDS.join("|")})\\s+(million|billion)\\b`,
@@ -607,10 +621,10 @@ function writeNumberWords(value: string) {
 
 // Capacities and prices are often written in millions or billions: "1.6m
 // litres" and "1.6 million litres" state 1600000, "£1.2bn" and "1.2 billion"
-// state 1200000000. An "m" or "bn" must touch the number, so "1887 M." and
-// "20 m" are not millions.
+// state 1200000000, and "200k lpa" states 200000. A "k", "m" or "bn" must
+// touch the number, so "1887 M." and "20 m" are not millions.
 function expandLargeNumbers(value: string) {
-  // "mlpa" or "mla" is million litres of (pure) alcohol: "4.8 mlpa", "6.5mla",
+  // "mlpa" or "mla" is million litres of (pure) alcohol: "4.8 mlpa", "6.5mla", "64mlas",
   // or a table label such as "Capacity (mlpa) 3.4", where an "i" info icon
   // may sit between.
   const millionLitres = (n: string) => String(Math.round(Number(n) * 1e6));
@@ -618,13 +632,17 @@ function expandLargeNumbers(value: string) {
     .replace(/\(mlpa\)\s*(?:i\s+)?(\d+(?:\.\d+)?)/gi, (_, n: string) =>
       millionLitres(n),
     )
-    .replace(/\b(\d+(?:\.\d+)?)\s*(?:mlpa|mla)\b/gi, (_, n: string) =>
+    .replace(/\b(\d+(?:\.\d+)?)\s*(?:mlpa|mlas?)\b/gi, (_, n: string) =>
       millionLitres(n),
     )
     .replace(
-      /\b(\d+(?:\.\d+)?)(m|\s*million|bn|\s*billion)\b/gi,
+      /\b(\d+(?:\.\d+)?)(k|m|\s*million|bn|\s*billion)\b/gi,
       (_, n: string, unit: string) =>
-        String(Math.round(Number(n) * (/b/i.test(unit) ? 1e9 : 1e6))),
+        String(
+          Math.round(
+            Number(n) * (/b/i.test(unit) ? 1e9 : /k/i.test(unit) ? 1e3 : 1e6),
+          ),
+        ),
     );
 }
 
