@@ -78,28 +78,22 @@ export function Table<Item>({
     markedFillIndex >= 0
       ? markedFillIndex
       : columns.findIndex((column) => !column.width);
-  // Secondary columns hide on narrow screens, so the first visible one changes.
-  const firstNarrowIndex = columns.findIndex(
+  const lastIndex = columns.length - 1;
+  // Secondary columns hide on narrow screens, so the last visible one changes.
+  const lastNarrowIndex = columns.findLastIndex(
     (column) => column.priority !== "secondary",
   );
-  const lastIndex = columns.length - 1;
 
   function columnStyles(column: TableColumn<Item>, index: number) {
     return [
       alignStyles[column.align ?? "left"],
       column.priority === "secondary" && styles.secondary,
       index === fillIndex ? styles.fill : !column.width && styles.text,
+      index === lastNarrowIndex &&
+        index !== lastIndex &&
+        styles.lastNarrowColumn,
       column.width && column.width !== "fill" && widthStyles[column.width],
       index === lastIndex && styles.lastColumn,
-    ];
-  }
-
-  function dividerStyles(index: number) {
-    return [
-      styles.divider,
-      index === firstNarrowIndex && styles.firstNarrowDivider,
-      index === 0 && styles.firstDivider,
-      index === lastIndex && styles.lastDivider,
     ];
   }
 
@@ -108,7 +102,7 @@ export function Table<Item>({
       <table {...stylex.props(styles.table)}>
         <caption {...stylex.props(styles.caption)}>{caption}</caption>
         <thead>
-          <tr>
+          <tr {...stylex.props(styles.divider)}>
             {columns.map((column, index) => (
               <th
                 key={column.key}
@@ -116,7 +110,6 @@ export function Table<Item>({
                 {...stylex.props(
                   foundationStyles.fieldLabel,
                   styles.header,
-                  dividerStyles(index),
                   columnStyles(column, index),
                 )}
               >
@@ -135,6 +128,8 @@ export function Table<Item>({
                 data-record-key={getKey(item)}
                 key={getKey(item)}
                 {...stylex.props(
+                  // DESIGN.md: no divider after the last row.
+                  rowIndex < items.length - 1 && styles.divider,
                   isLinked && linkedRowStyles.container,
                   isLinked && linkedRowStyles.onGround,
                 )}
@@ -148,8 +143,6 @@ export function Table<Item>({
                       density === "compact" && styles.compactCell,
                       column.verticalPadding === "none" &&
                         styles.noVerticalPadding,
-                      // DESIGN.md: no divider after the last row.
-                      rowIndex < items.length - 1 && dividerStyles(index),
                       columnStyles(column, index),
                       column.width === "count" && [
                         foundationStyles.compactRowTitle,
@@ -186,7 +179,7 @@ export function Table<Item>({
 const styles = stylex.create({
   // Like linked ItemList rows, the frame reaches 12px past the text on each
   // side so a row's hover fill has room around its content. Edge cells pad the
-  // text back into line and dividers stop at the text edge.
+  // text back into line and row dividers stop at the text edge.
   frame: {
     width: "calc(100% + 24px)",
     minWidth: 0,
@@ -255,24 +248,23 @@ const styles = stylex.create({
   rowLink: {
     fontWeight: 600,
   },
-  // A 1px line painted at the cell's bottom edge. Cell backgrounds, unlike
-  // row borders, can stop short of the bleed on the edge cells.
+  // The row's divider stops 12px inside each side, at the text edge, so it
+  // stays in line however many columns a narrow screen hides.
   divider: {
-    backgroundImage: `linear-gradient(${colors.hairline}, ${colors.hairline})`,
-    backgroundPosition: "left bottom",
-    backgroundRepeat: "no-repeat",
-    backgroundSize: "100% 1px",
+    position: "relative",
+    "::after": {
+      content: "''",
+      position: "absolute",
+      right: "12px",
+      bottom: 0,
+      left: "12px",
+      height: "1px",
+      backgroundColor: colors.hairline,
+      pointerEvents: "none",
+    },
   },
-  firstDivider: {
-    backgroundPosition: "right bottom",
-    backgroundSize: "calc(100% - 12px) 1px",
-  },
-  firstNarrowDivider: {
-    backgroundPosition: { default: "left bottom", [NARROW]: "right bottom" },
-    backgroundSize: { default: "100% 1px", [NARROW]: "calc(100% - 12px) 1px" },
-  },
-  lastDivider: {
-    backgroundSize: "calc(100% - 12px) 1px",
+  lastNarrowColumn: {
+    paddingRight: { default: 0, [NARROW]: space.x3 },
   },
   secondary: {
     [NARROW]: {
