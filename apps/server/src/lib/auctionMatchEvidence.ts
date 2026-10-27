@@ -2,6 +2,7 @@ import {
   BottleClassificationArtifactsSchema,
   ClassifyBottleReferenceInputSchema,
 } from "@peated/bottle-classifier/contract";
+import { normalizeBottleReferenceKey } from "@peated/bottle-classifier/normalize";
 import type { AuctionLot, BottleCheck } from "@peated/server/db/schema";
 import { isSupportedBottleCheckSchemaVersion } from "./bottleCheckSchemaVersion";
 import { PersistedReferenceBottleCheckOutputSchema } from "./bottleChecks";
@@ -11,7 +12,22 @@ export function auctionLotCheckKey(lotId: number, fingerprint: string) {
   return `auction-lot:${lotId}:${fingerprint}`;
 }
 
-/** Auction matching owns freshness: a saved decision belongs to one occurrence and identity version. */
+/**
+ * Auction matching owns freshness: a saved decision belongs to one identity
+ * version. Lots with the same fingerprint share one check (see
+ * `findSharedAuctionLotCheck`), so the check may come from an identical lot.
+ */
+export function isAuctionLotIdentityCheck(
+  lot: Pick<AuctionLot, "sourceFingerprint">,
+  check: Pick<BottleCheck, "sourceKind" | "sourceId" | "backgroundEventKey">,
+) {
+  return (
+    check.sourceKind === "auction_lot" &&
+    check.backgroundEventKey ===
+      auctionLotCheckKey(Number(check.sourceId), lot.sourceFingerprint)
+  );
+}
+
 export function readAuctionMatchEvidence(
   lot: Pick<AuctionLot, "id" | "sourceFingerprint" | "name">,
   check: BottleCheck | null | undefined,
@@ -20,10 +36,7 @@ export function readAuctionMatchEvidence(
     !check ||
     !isSupportedBottleCheckSchemaVersion(check) ||
     check.intent !== "resolve_reference" ||
-    check.sourceKind !== "auction_lot" ||
-    check.sourceId !== String(lot.id) ||
-    check.backgroundEventKey !==
-      auctionLotCheckKey(lot.id, lot.sourceFingerprint)
+    !isAuctionLotIdentityCheck(lot, check)
   )
     return null;
   const input = ClassifyBottleReferenceInputSchema.safeParse(
@@ -39,8 +52,9 @@ export function readAuctionMatchEvidence(
     !input.success ||
     !output.success ||
     !artifacts.success ||
-    input.data.reference.id !== lot.id ||
-    input.data.reference.name !== lot.name
+    input.data.reference.id !== Number(check.sourceId) ||
+    normalizeBottleReferenceKey(input.data.reference.name) !==
+      normalizeBottleReferenceKey(lot.name)
   )
     return null;
   return { output: output.data, artifacts: artifacts.data };

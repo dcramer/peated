@@ -14,6 +14,7 @@ import {
   bottles,
   type AuctionLot,
 } from "@peated/server/db/schema";
+import { routerClient } from "@peated/server/orpc/router";
 import * as scraper from "@peated/server/scraper";
 import { eq } from "drizzle-orm";
 import { afterEach, vi } from "vitest";
@@ -962,4 +963,240 @@ test("unknown and inactive targets cannot auto-assign", async ({
     bottleId: null,
     matchStatus: "review",
   });
+});
+
+async function twinLots(
+  siteId: number,
+  facts: Partial<NonNullable<AuctionLot["sourceBottleIdentity"]>>[] = [],
+) {
+  const observe = async (key: string, index: number) =>
+    (
+      await upsertAuctionObservation(siteId, {
+        auction: {
+          sourceKey: "1",
+          name: "Auction",
+          url: "https://example.com/auction",
+        },
+        lot: {
+          sourceKey: key,
+          name: "Example 12 Year Old",
+          url: `https://example.com/lot-${key}`,
+          state: "closed",
+          sourceBottleIdentity: facts[index],
+        },
+        observedAt: new Date().toISOString(),
+      })
+    ).lot;
+  const first = await observe("1", 0);
+  const second = await observe("2", 1);
+  return [first, second] as const;
+}
+
+function createResult(brandId: number) {
+  return createDecidedBottleClassification({
+    decision: {
+      action: "create_bottle",
+      matchedBottleId: null,
+      candidateBottleIds: [],
+      identityScope: "product",
+      referenceScope: "global_alias",
+      rationale: "A catalog bottle is missing.",
+      confidenceBasis: { webEvidence: "supportive", unresolvedRisks: [] },
+      observation: null,
+      proposedBottle: {
+        name: "12 Year Old",
+        brand: { id: brandId, name: "Example" },
+        distillers: [],
+        bottler: null,
+        series: null,
+        category: "single_malt",
+        statedAge: 12,
+        abv: 46,
+        edition: null,
+        caskStrength: null,
+        singleCask: null,
+        vintageYear: null,
+        releaseYear: null,
+        maturation: null,
+        caskNumber: null,
+        outturn: null,
+      },
+    },
+    artifacts: {},
+  });
+}
+
+test.for(["earlier lot first", "later lot first"] as const)(
+  "identical lots share one check and one created Bottle (%s)",
+  async (order, { fixtures }) => {
+    const site = await fixtures.ExternalSite({ type: "masterofmalt" });
+    const brand = await fixtures.Entity({ name: "Example", kind: "brand" });
+    const [first, second] = await twinLots(site.id);
+    expect(second.sourceFingerprint).toBe(first.sourceFingerprint);
+    const before = await db.query.bottles.findMany();
+    const run = vi
+      .spyOn(classifier, "runScrapedBottleReference")
+      .mockResolvedValue({
+        result: createResult(brand.id),
+        modelMetadata: null,
+      });
+
+    if (order === "later lot first") {
+      await resolveAuctionLot(second.id, second.sourceFingerprint);
+      expect(run).not.toHaveBeenCalled();
+      expect(
+        await db.query.auctionLots.findFirst({
+          where: eq(auctionLots.id, second.id),
+        }),
+      ).toMatchObject({ matchStatus: "pending", matchCheckId: null });
+    }
+    await resolveAuctionLot(first.id, first.sourceFingerprint);
+    expect(run).toHaveBeenCalledTimes(1);
+    expect(pushJob).toHaveBeenCalledWith("ApplyAuctionLotMatch", {
+      lotId: second.id,
+      fingerprint: second.sourceFingerprint,
+    });
+    await applyAuctionLotMatchJob({
+      lotId: second.id,
+      fingerprint: second.sourceFingerprint,
+    });
+    expect(run).toHaveBeenCalledTimes(1);
+
+    const lots = await db.query.auctionLots.findMany();
+    const firstLot = lots.find(({ id }) => id === first.id)!;
+    const secondLot = lots.find(({ id }) => id === second.id)!;
+    expect(firstLot).toMatchObject({ matchStatus: "matched" });
+    expect(secondLot).toMatchObject({
+      matchStatus: "matched",
+      bottleId: firstLot.bottleId,
+      matchCheckId: firstLot.matchCheckId,
+    });
+    expect(await db.query.bottles.findMany()).toHaveLength(before.length + 1);
+  },
+);
+
+test("an identical lot reuses a decision that needs review", async ({
+  fixtures,
+}) => {
+  const site = await fixtures.ExternalSite({ type: "masterofmalt" });
+  const bottle = await fixtures.Bottle();
+  const [first, second] = await twinLots(site.id);
+  const result = await matchResult(bottle.id);
+  result.decision.confidenceBasis!.unresolvedRisks = [
+    { category: "identity_ambiguity", note: "The batch is unclear." },
+  ];
+  const run = vi
+    .spyOn(classifier, "runScrapedBottleReference")
+    .mockResolvedValue({ result, modelMetadata: null });
+  await resolveAuctionLot(first.id, first.sourceFingerprint);
+  await applySavedAuctionLotMatch(second.id, second.sourceFingerprint);
+  expect(run).toHaveBeenCalledTimes(1);
+  const lots = await db.query.auctionLots.findMany();
+  expect(lots.map(({ matchStatus }) => matchStatus)).toEqual([
+    "review",
+    "review",
+  ]);
+  expect(lots[1]!.matchCheckId).toBe(lots[0]!.matchCheckId);
+});
+
+test("lots with the same title but different source facts get their own checks", async ({
+  fixtures,
+}) => {
+  const site = await fixtures.ExternalSite({ type: "masterofmalt" });
+  const bottle = await fixtures.Bottle();
+  const [first, second] = await twinLots(site.id, [
+    { cask_number: "101" },
+    { cask_number: "102" },
+  ]);
+  expect(second.sourceFingerprint).not.toBe(first.sourceFingerprint);
+  const run = vi
+    .spyOn(classifier, "runScrapedBottleReference")
+    .mockResolvedValue({
+      result: await matchResult(bottle.id),
+      modelMetadata: null,
+    });
+  await resolveAuctionLot(second.id, second.sourceFingerprint);
+  await resolveAuctionLot(first.id, first.sourceFingerprint);
+  expect(run).toHaveBeenCalledTimes(2);
+});
+
+test("an admin recheck accepts a check shared from an identical lot", async ({
+  fixtures,
+}) => {
+  const site = await fixtures.ExternalSite({ type: "masterofmalt" });
+  const bottle = await fixtures.Bottle();
+  const admin = await fixtures.User({ admin: true });
+  const [first, second] = await twinLots(site.id);
+  const result = await matchResult(bottle.id);
+  result.decision.confidenceBasis!.unresolvedRisks = [
+    { category: "identity_ambiguity", note: "The batch is unclear." },
+  ];
+  vi.spyOn(classifier, "runScrapedBottleReference").mockResolvedValue({
+    result,
+    modelMetadata: null,
+  });
+  await resolveAuctionLot(first.id, first.sourceFingerprint);
+  await applySavedAuctionLotMatch(second.id, second.sourceFingerprint);
+  const shared = await db.query.auctionLots.findFirst({
+    where: eq(auctionLots.id, second.id),
+  });
+  expect(
+    await routerClient.auctions.recheck(
+      {
+        lots: [
+          {
+            lotId: second.id,
+            fingerprint: shared!.sourceFingerprint,
+            expectedBottleId: null,
+            expectedCheckId: shared!.matchCheckId,
+          },
+        ],
+      },
+      { context: { user: admin } },
+    ),
+  ).toMatchObject({ queued: [second.id], skipped: [] });
+});
+
+test("a twin that became identical during classification keeps one decision and one Bottle", async ({
+  fixtures,
+}) => {
+  const site = await fixtures.ExternalSite({ type: "masterofmalt" });
+  const brand = await fixtures.Entity({ name: "Example", kind: "brand" });
+  const [first, second] = await twinLots(site.id, [{ abv: 46 }]);
+  expect(first.sourceFingerprint).not.toBe(second.sourceFingerprint);
+  const before = await db.query.bottles.findMany();
+  const result = createResult(brand.id);
+  const run = vi.spyOn(classifier, "runScrapedBottleReference");
+  run.mockImplementationOnce(async () => {
+    // The earlier lot's facts catch up while the later lot is classifying.
+    const [caughtUp] = await db
+      .update(auctionLots)
+      .set({
+        sourceFingerprint: second.sourceFingerprint,
+        sourceBottleIdentity: second.sourceBottleIdentity,
+      })
+      .where(eq(auctionLots.id, first.id))
+      .returning();
+    run.mockResolvedValueOnce({ result, modelMetadata: null });
+    await resolveAuctionLot(caughtUp!.id, caughtUp!.sourceFingerprint);
+    return { result, modelMetadata: null };
+  });
+  await resolveAuctionLot(second.id, second.sourceFingerprint);
+  expect(run).toHaveBeenCalledTimes(2);
+
+  const lots = await db.query.auctionLots.findMany();
+  const firstLot = lots.find(({ id }) => id === first.id)!;
+  const secondLot = lots.find(({ id }) => id === second.id)!;
+  expect(firstLot).toMatchObject({ matchStatus: "matched" });
+  expect(secondLot).toMatchObject({
+    matchStatus: "matched",
+    bottleId: firstLot.bottleId,
+    matchCheckId: firstLot.matchCheckId,
+  });
+  expect(await db.query.bottles.findMany()).toHaveLength(before.length + 1);
+  expect(
+    await db.query.bottleChecks.findMany({
+      where: eq(bottleChecks.sourceKind, "auction_lot"),
+    }),
+  ).toHaveLength(1);
 });
