@@ -7,6 +7,7 @@ import { useRouter } from "next/navigation";
 import { useState } from "react";
 import { useDebounceCallback } from "usehooks-ts";
 
+import { Button } from "@peated/web/components/button.stylex";
 import { SearchBox } from "@peated/web/components/searchBox.stylex";
 import type {
   SearchResultGroup,
@@ -19,6 +20,7 @@ import { getBottleUrl, getEntityUrl } from "@peated/web/lib/urls";
 import { foundationStyles } from "../../../../styles/foundations.stylex";
 import { space } from "../../../../styles/tokens.stylex";
 
+const NARROW = "@media (max-width: 759px)";
 const SEARCH_DEBOUNCE_MS = 140;
 /** Labels and messages for each list the search covers. */
 export const profileBottleSearchCopy = {
@@ -40,6 +42,7 @@ export const profileBottleSearchCopy = {
  * Suggests brands, producers, and Bottles from one member's Library or
  * tastings while they type. Picking a brand or producer filters the list;
  * picking a Bottle opens it; Enter without a suggestion searches the text.
+ * Below 760px a Search button also searches the text.
  */
 export function ProfileBottleSearch({
   onEntitySelect,
@@ -97,38 +100,54 @@ export function ProfileBottleSearch({
       <span aria-hidden="true" {...stylex.props(foundationStyles.fieldLabel)}>
         {copy.label}
       </span>
-      <SearchBox
-        ariaLabel={copy.label}
-        emptyText={
-          showResults && searchQuery.data && !groups.length
-            ? copy.empty
-            : undefined
-        }
-        fluid
-        // The header search keeps the page-wide `/` shortcut.
-        focusShortcut={false}
-        groups={groups}
-        onQueryChange={updateDraft}
-        onResultSelect={selectResult}
-        onRetry={() => void searchQuery.refetch()}
-        onScopeChange={() => {}}
-        onSubmit={(value) => onSubmit(value.trim())}
-        placeholder="Brand or bottle"
-        query={draftValue}
-        resultQuery={searchQuery.isPlaceholderData ? "" : searchText}
-        scope={scope}
-        scopes={copy.scopes}
-        status={
-          !showResults
-            ? "ready"
-            : searchQuery.isError
-              ? "error"
-              : searchQuery.isFetching
-                ? "searching"
-                : "ready"
-        }
-        statusText={copy.status}
-      />
+      <div {...stylex.props(styles.row)}>
+        <div {...stylex.props(styles.control)}>
+          <SearchBox
+            ariaLabel={copy.label}
+            emptyText={
+              showResults && searchQuery.data && !groups.length
+                ? copy.empty
+                : undefined
+            }
+            fluid
+            // The header search keeps the page-wide `/` shortcut.
+            focusShortcut={false}
+            groups={groups}
+            onQueryChange={updateDraft}
+            onResultSelect={selectResult}
+            onRetry={() => void searchQuery.refetch()}
+            onScopeChange={() => {}}
+            onSubmit={(value) => onSubmit(value.trim())}
+            placeholder="Brand or bottle"
+            query={draftValue}
+            resultQuery={searchQuery.isPlaceholderData ? "" : searchText}
+            scope={scope}
+            scopes={copy.scopes}
+            status={
+              !showResults
+                ? "ready"
+                : searchQuery.isError
+                  ? "error"
+                  : searchQuery.isFetching
+                    ? "searching"
+                    : "ready"
+            }
+            statusText={copy.status}
+          />
+        </div>
+        {/* Narrow screens show this search in the Filters drawer, where View
+            results closes the drawer without searching, so it keeps a
+            visible Search button, like FilterQuery. */}
+        <span {...stylex.props(styles.mobileSubmit)}>
+          <Button
+            onClick={() => onSubmit(draftValue.trim())}
+            size="md"
+            variant="tonal"
+          >
+            Search
+          </Button>
+        </span>
+      </div>
     </div>
   );
 }
@@ -173,5 +192,21 @@ const styles = stylex.create({
     flexDirection: "column",
     gap: space.x2,
     minWidth: 0,
+  },
+  row: {
+    display: "flex",
+    minWidth: 0,
+    alignItems: "flex-start",
+    gap: space.x2,
+  },
+  control: {
+    minWidth: 0,
+    flex: 1,
+  },
+  mobileSubmit: {
+    display: "none",
+    [NARROW]: {
+      display: "inline-flex",
+    },
   },
 });

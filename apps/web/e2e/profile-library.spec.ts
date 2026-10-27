@@ -69,6 +69,34 @@ test.describe("profile Library", () => {
     );
     await expect(libraryBottleLink(page)).toBeVisible();
   });
+
+  test("searches typed text from the Filters drawer @mobile", async ({
+    context,
+    page,
+  }, testInfo) => {
+    await signIn(context, {
+      accessToken: uniqueAccessToken(testInfo, "library-drawer-search"),
+    });
+    await addBottleToLibrary(page);
+    await page.goto(`/users/${testUser.username}/library`);
+
+    await page
+      .getByRole("button", { name: "Search, filters, and sort" })
+      .click();
+    const drawer = page.getByRole("dialog", {
+      name: "Search, filters, and sort",
+    });
+    await drawer
+      .getByRole("searchbox", { name: "Find in this library" })
+      .fill("16-year");
+    await drawer.getByRole("button", { name: "Search", exact: true }).click();
+
+    await expect(page).toHaveURL(
+      `/users/${testUser.username}/library?query=16-year`,
+    );
+    await drawer.getByRole("button", { name: "View results" }).click();
+    await expect(libraryBottleLink(page)).toBeVisible();
+  });
 });
 
 async function addBottleToLibrary(page: Page) {
