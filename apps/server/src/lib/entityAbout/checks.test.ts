@@ -183,7 +183,7 @@ describe("keepVerifiedCitations", () => {
     const pages = [
       {
         url: page.url,
-        text: "2022年2月9日に重要文化財に指定された。1980年に町の文化財に指定。",
+        text: "2022年2月9日に重要文化財に指定された。1980年に町の文化財に指定。昭和42年5月12日、候補地を探した。",
       },
     ];
     const result = keepVerifiedCitations(
@@ -192,6 +192,8 @@ describe("keepVerifiedCitations", () => {
           event(1, "2022-02-09", "2022年2月9日に重要文化財に指定された。"),
           // No quote names the month.
           event(2, "1980-02", "1980年に町の文化財に指定。"),
+          // An era year: Shōwa 42 is 1967.
+          event(3, "1967-05-12", "昭和42年5月12日、候補地を探した。"),
         ],
       }),
       pages,
@@ -201,6 +203,7 @@ describe("keepVerifiedCitations", () => {
     expect(result.events.map(({ date }) => date)).toEqual([
       "2022-02-09",
       "1980",
+      "1967-05-12",
     ]);
   });
 
