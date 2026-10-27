@@ -16,7 +16,9 @@ Both tabs use the same parts:
   sort, and a list or table view.
 - A search box that suggests brands, producers, and Bottles from this member's
   records. Picking a brand or producer filters the list. Picking a Bottle opens
-  it. Enter without a suggestion searches the Bottle names.
+  it. Enter without a suggestion searches the Bottle names. Below 760px a
+  Search button beside the field does the same, because the drawer's View
+  results button only closes the drawer.
 - A filter rail. Each group shows a count and a bar for every choice; clicking
   a choice filters the list, and clicking it again clears it. Below 760px the
   rail is hidden; a Filters button in the toolbar, counting active filters,
