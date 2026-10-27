@@ -65,6 +65,12 @@ retrieved, active candidate, supporting evidence must justify the match, and
 populated facts must not conflict. Missing evidence or unresolved risks require
 review. Exact-reference classifier shortcuts keep their reference dependency.
 
+Lots on one site with the same identity fingerprint (normalized title, size,
+and source facts) share one Bottle check. The earliest pending lot runs the
+classifier; identical lots wait, then reuse its decision on the default queue.
+Identical lots therefore cannot each create their own Bottle. Lots whose detail
+facts differ, such as their cask numbers, get separate checks.
+
 Auction classification sets `readCandidateImages: false` in its saved request.
 It uses the listing title, supplied structured source facts, catalog fields,
 references, observations, and bounded source research. It does not automatically

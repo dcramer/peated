@@ -8,9 +8,12 @@ import {
   auctions,
   bottleChecks,
   bottles,
+  type AuctionLot,
+  type BottleCheck,
 } from "@peated/server/db/schema";
 import { requestAuctionLotDetails } from "@peated/server/scraper";
-import { and, eq, isNull } from "drizzle-orm";
+import { pushJob } from "@peated/server/worker/dispatch";
+import { and, asc, eq, inArray, isNull, ne } from "drizzle-orm";
 import {
   assessAuctionMatch,
   auctionLotCheckKey,
@@ -118,6 +121,9 @@ async function resolveAuctionLotMatch(
       (await requestAuctionLotDetails(lotId, fingerprint))
     )
       return true;
+    const shared = await findSharedAuctionLotCheck(lot, fingerprint);
+    if (shared === "wait") return true;
+    if (shared) return applyAuctionLotCheck(lotId, fingerprint, shared);
     if (!allowClassification) return false;
     const auction = await db.query.auctions.findFirst({
       where: eq(auctions.id, lot.auctionId),
@@ -161,7 +167,73 @@ async function resolveAuctionLotMatch(
         backgroundEventKey,
       })
     ).check;
+    await applyAuctionLotCheck(lotId, fingerprint, check);
+    await queueIdenticalAuctionLots(lot, fingerprint);
+    return true;
   }
+  return applyAuctionLotCheck(lotId, fingerprint, check);
+}
+
+/**
+ * Auction matching rule (owner: auctions): lots on one site with the same
+ * identity fingerprint get the same classifier input, so they share one check.
+ * The earliest pending lot runs the model; identical lots wait and reuse its
+ * decision, so they never race to create duplicate Bottles.
+ */
+async function findSharedAuctionLotCheck(lot: AuctionLot, fingerprint: string) {
+  const twins = await findIdenticalAuctionLots(lot, fingerprint);
+  if (!twins.length) return null;
+  const [shared] = await db
+    .select()
+    .from(bottleChecks)
+    .where(
+      inArray(
+        bottleChecks.backgroundEventKey,
+        twins.map(({ id }) => auctionLotCheckKey(id, fingerprint)),
+      ),
+    )
+    .orderBy(asc(bottleChecks.id))
+    .limit(1);
+  if (shared) return shared;
+  return twins.some(
+    ({ id, matchStatus }) => id < lot.id && matchStatus === "pending",
+  )
+    ? ("wait" as const)
+    : null;
+}
+
+async function findIdenticalAuctionLots(lot: AuctionLot, fingerprint: string) {
+  const auction = await db.query.auctions.findFirst({
+    where: eq(auctions.id, lot.auctionId),
+  });
+  if (!auction) throw new Error("Auction lot has no auction.");
+  return db
+    .select({ id: auctionLots.id, matchStatus: auctionLots.matchStatus })
+    .from(auctionLots)
+    .innerJoin(auctions, eq(auctions.id, auctionLots.auctionId))
+    .where(
+      and(
+        eq(auctionLots.sourceFingerprint, fingerprint),
+        eq(auctions.externalSiteId, auction.externalSiteId),
+        ne(auctionLots.id, lot.id),
+      ),
+    );
+}
+
+/** Identical lots that waited for this check reuse it on the default queue. */
+async function queueIdenticalAuctionLots(lot: AuctionLot, fingerprint: string) {
+  const twins = await findIdenticalAuctionLots(lot, fingerprint);
+  for (const { id, matchStatus } of twins) {
+    if (matchStatus !== "pending") continue;
+    await pushJob("ApplyAuctionLotMatch", { lotId: id, fingerprint });
+  }
+}
+
+async function applyAuctionLotCheck(
+  lotId: number,
+  fingerprint: string,
+  check: BottleCheck,
+) {
   const [current] = await db
     .update(auctionLots)
     .set({ matchCheckId: check.id })
