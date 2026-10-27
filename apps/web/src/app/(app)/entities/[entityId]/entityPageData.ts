@@ -1,5 +1,6 @@
 import type { Outputs } from "@peated/server/orpc/router";
 import type { PageTabItem } from "@peated/web/components/pageTabs.stylex";
+import { BOTTLE_CATALOG_QUERY_FIELDS } from "@peated/web/lib/bottleCatalogQueryParams";
 import { getEntityUrl } from "@peated/web/lib/urls";
 
 export type Entity = Outputs["entities"]["details"];
@@ -66,6 +67,23 @@ export function getDistilleryBottleView(
 ) {
   if (entity.kind !== "distillery") return undefined;
   return view === "other" || view === "releases" ? view : fallback;
+}
+
+// Paging and order change which bottles show, not whether any exist.
+const unnarrowingBottleListFields = new Set(["cursor", "limit", "sort"]);
+
+/**
+ * Whether a search or filter narrows an entity's bottle list. Only an
+ * un-narrowed empty list means the entity has no bottles.
+ */
+export function isBottleListNarrowed(
+  searchParams: Record<string, string | string[] | undefined>,
+) {
+  return BOTTLE_CATALOG_QUERY_FIELDS.some(
+    (field) =>
+      !unnarrowingBottleListFields.has(field) &&
+      searchParams[field] !== undefined,
+  );
 }
 
 export function getEntityTabs(

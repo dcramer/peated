@@ -17,6 +17,7 @@ import { redirect } from "next/navigation";
 import {
   entityHasBottleCatalog,
   getDistilleryBottleView,
+  isBottleListNarrowed,
 } from "../entityPageData";
 import { EntityBottleListClient } from "./entityBottleListClient.stylex";
 
@@ -82,12 +83,15 @@ export default async function EntityBottlesPage(props: {
     }),
   );
   let bottleList = await getPageBottleList(queryParams);
-  if (entity.kind === "company" && bottleList.total === 0) {
+  // An empty search keeps its own "No matching bottles" result.
+  const narrowed = isBottleListNarrowed(searchParams);
+  if (entity.kind === "company" && bottleList.total === 0 && !narrowed) {
     redirect(getEntityUrl(entity));
   }
 
   if (
     entity.kind === "distillery" &&
+    !narrowed &&
     searchParams.view === undefined &&
     distilleryView === "releases" &&
     bottleList.total === 0

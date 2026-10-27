@@ -6,6 +6,7 @@ import {
   getEntityClassification,
   getEntityCurrentHref,
   getEntityTabs,
+  isBottleListNarrowed,
 } from "./entityPageData";
 
 describe("entityHasBottleCatalog", () => {
@@ -35,6 +36,20 @@ describe("getDistilleryBottleView", () => {
 
   it("does not add a view for other kinds", () => {
     expect(getDistilleryBottleView({ kind: "brand" }, "other")).toBe(undefined);
+  });
+});
+
+describe("isBottleListNarrowed", () => {
+  it("treats a search or filter as narrowing the list", () => {
+    expect(isBottleListNarrowed({ query: "sanaig" })).toBe(true);
+    expect(isBottleListNarrowed({ category: "single_malt" })).toBe(true);
+  });
+
+  it("does not count paging, order, or the view", () => {
+    expect(isBottleListNarrowed({})).toBe(false);
+    expect(
+      isBottleListNarrowed({ cursor: "2", sort: "name", view: "other" }),
+    ).toBe(false);
   });
 });
 
