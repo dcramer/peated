@@ -23,7 +23,7 @@ The document holds:
   event lists its citations: the source, the value the source states, and a
   short quote.
 - **Site facts**: typed facts about a production site, such as the number of
-  stills or the water source, and how it makes its spirit: malting, peating,
+  stills or the water source, and how it makes its spirit: malting, mash bill, peating,
   washbacks, fermentation time, distillation, still shape, and condensers,
   what its spirit is mainly used for, such as a named blend, how the new
   spirit is filtered before ageing, and where and how it ages.

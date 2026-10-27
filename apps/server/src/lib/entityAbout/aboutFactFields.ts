@@ -9,6 +9,7 @@ export const ABOUT_FACT_FIELD_LIST = [
   "heating",
   "listing",
   "malting",
+  "mashBill",
   "peating",
   "washbacks",
   "washbackMaterial",
@@ -84,6 +85,14 @@ export const ABOUT_FACT_FIELDS = {
   malting: {
     label: "Malting",
     description: "Where its malt comes from, such as its own floor maltings",
+    type: "text",
+    unit: null,
+    kinds: ["distillery"],
+  },
+  mashBill: {
+    label: "Mash bill",
+    description:
+      "The grains the plant mashes for its whisky, such as 84% corn, 8% rye and 8% malted barley, or 100% malted barley; not one release's recipe",
     type: "text",
     unit: null,
     kinds: ["distillery"],
