@@ -113,6 +113,7 @@ behavior; research cannot override them.
 - `docs/features/bottle-entry-workflow.md` — Bottle creation and editing.
 - `docs/features/bottle-presentation.md` — Bottle display rules.
 - `docs/features/entity-about.md` — Entity About pages, display rules, and the writing job.
+- `docs/features/entity-page.md` — Entity Overview: what shows, in what order.
 - `docs/features/catalog-page-seo.md` — Public search pages, metadata, canonical URLs, and sitemaps.
 - `docs/features/content-moderation.md` — Admin removal and restore of reviews and tastings.
 - `docs/features/external-reviews.md` — External review storage and publication.

@@ -22,7 +22,7 @@ describe("GET /entities/:entity", () => {
     expect("createdBy" in data).toBe(false);
   });
 
-  test("shows the About tab only when the page has enough to show", async ({
+  test("reports an About document only when it has enough to show", async ({
     fixtures,
   }) => {
     const entity = await fixtures.Entity({ kind: "distillery" });

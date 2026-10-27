@@ -145,8 +145,8 @@ const TIMELINE_EVENT_KINDS = new Set([
 ]);
 
 /**
- * About tab rule (owner: docs/features/entity-about.md): the tab shows when
- * a published page has a lead and at least one more part from its document:
+ * About display rule (owner: docs/features/entity-about.md): the Entity page
+ * shows a published document that has a lead and at least one more part:
  * a section, a timeline of 2 or more dated periods or names, or 2 or more
  * key facts.
  */

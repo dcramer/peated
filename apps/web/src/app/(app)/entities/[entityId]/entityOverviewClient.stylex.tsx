@@ -5,16 +5,15 @@ import { space } from "../../../../styles/tokens.stylex";
 
 import { FlavorProfileSection } from "@peated/web/features/flavorProfile/flavorProfileSection";
 import { useQuery } from "@tanstack/react-query";
+import type { ReactNode } from "react";
 
 import { getEntityBottleCreateHref } from "@peated/web/lib/entityBottleCreateHref";
 import { useORPC } from "@peated/web/lib/orpc/context";
 import { getEntityUrl } from "@peated/web/lib/urls";
 
 import { CompanyOwnedList } from "./companyOwnedList";
-import { EntityBottleOverview } from "./entityBottleOverview";
 import { EntityCatalogRelationships } from "./entityCatalogRelationships";
-import { EntityDetails, hasEntityDetails } from "./entityDetails.stylex";
-import { EntityHistoryOverview } from "./entityHistoryOverview.stylex";
+import { EntityDetails, type EntityAboutFact } from "./entityDetails.stylex";
 import { EntityImageGallery } from "./entityImageGallery.stylex";
 import { EntityImagePlaceholder } from "./entityImagePlaceholder.stylex";
 import { EntityMap } from "./entityMap.stylex";
@@ -23,21 +22,30 @@ import { entityOverviewQueries } from "./entityOverviewQueries";
 import { useEntityPage } from "./entityPageFrameClient.stylex";
 import { EntityReleaseOverview } from "./entityReleaseOverview";
 import { EntityReviewsAndTastingsOverview } from "./entityReviewsAndTastingsOverview";
-import { EntitySeriesOverview } from "./entitySeriesOverview";
 import { EntitySiblingOverview } from "./entitySiblingOverview";
 
-export function EntityOverviewClient() {
+/** The About document's parts, rendered on the server. */
+export type EntityOverviewAbout = {
+  lead: ReactNode;
+  timeline: ReactNode;
+  history: ReactNode;
+  sources: ReactNode;
+  owners: ReactNode;
+  facts: readonly EntityAboutFact[];
+};
+
+export function EntityOverviewClient({
+  about,
+}: {
+  about?: EntityOverviewAbout;
+}) {
   const orpc = useORPC();
   const entity = useEntityPage();
   const catalogQuery = useQuery(
     entityOverviewQueries.bottleCatalog(orpc, entity),
   );
-  const eventListQuery = useQuery(entityOverviewQueries.events(orpc, entity));
-  const bottleListQuery = useQuery(
-    entityOverviewQueries.popularBottles(orpc, entity),
-  );
-  const seriesListQuery = useQuery(
-    entityOverviewQueries.seriesByBottleCount(orpc, entity),
+  const latestBottlingsQuery = useQuery(
+    entityOverviewQueries.latestBottlings(orpc, entity),
   );
   const recentReviewsAndTastingsQuery = useQuery(
     entityOverviewQueries.recentReviewsAndTastings(orpc, entity),
@@ -51,15 +59,28 @@ export function EntityOverviewClient() {
   const siblingListQuery = useQuery(
     entityOverviewQueries.siblings(orpc, entity),
   );
+  // Only distilleries load their latest bottlings; other kinds skip it.
+  const bottlingsQueries =
+    entity.kind === "distillery"
+      ? [releaseListQuery, latestBottlingsQuery]
+      : [releaseListQuery];
+  const portfolioSection = getLargestPortfolioSection(
+    companyPortfolioQuery.data?.totals,
+  );
 
   return (
     <EntityOverviewLayout
+      lead={about?.lead}
+      timeline={about?.timeline}
+      history={about?.history}
+      sources={about?.sources}
       facts={
         <>
-          {hasEntityDetails(entity) ? <EntityDetails entity={entity} /> : null}
+          <EntityDetails aboutFacts={about?.facts} entity={entity} />
+          {about?.owners}
         </>
       }
-      catalogSections={
+      catalog={
         <>
           {companyPortfolioQuery.isPending || companyPortfolioQuery.error ? (
             <CompanyOwnedList
@@ -70,77 +91,42 @@ export function EntityOverviewClient() {
               section="portfolio"
             />
           ) : (
-            <>
-              <CompanyOwnedList
-                company={entity}
-                error={false}
-                href={`${getEntityUrl(entity)}/portfolio?kind=brand`}
-                items={companyPortfolioQuery.data?.previews.brands}
-                pending={false}
-                retry={() => void companyPortfolioQuery.refetch()}
-                section="brands"
-                total={companyPortfolioQuery.data?.totals.brands}
-              />
-              <CompanyOwnedList
-                company={entity}
-                error={false}
-                href={`${getEntityUrl(entity)}/portfolio?kind=distillery`}
-                items={companyPortfolioQuery.data?.previews.distilleries}
-                pending={false}
-                retry={() => void companyPortfolioQuery.refetch()}
-                section="distilleries"
-                total={companyPortfolioQuery.data?.totals.distilleries}
-              />
-              <CompanyOwnedList
-                company={entity}
-                error={false}
-                href={`${getEntityUrl(entity)}/portfolio?kind=bottler`}
-                items={companyPortfolioQuery.data?.previews.bottlers}
-                pending={false}
-                retry={() => void companyPortfolioQuery.refetch()}
-                section="bottlers"
-                total={companyPortfolioQuery.data?.totals.bottlers}
-              />
-            </>
+            <CompanyOwnedList
+              company={entity}
+              error={false}
+              href={`${getEntityUrl(entity)}/portfolio?kind=${portfolioSection.kind}`}
+              items={
+                companyPortfolioQuery.data?.previews[portfolioSection.section]
+              }
+              pending={false}
+              retry={() => void companyPortfolioQuery.refetch()}
+              section={portfolioSection.section}
+              total={
+                companyPortfolioQuery.data?.totals[portfolioSection.section]
+              }
+            />
           )}
           <EntityReleaseOverview
-            entity={entity}
-            error={Boolean(releaseListQuery.error)}
-            pending={releaseListQuery.isPending}
-            releaseList={releaseListQuery.data}
-            retry={() => void releaseListQuery.refetch()}
-          />
-          <EntitySeriesOverview
-            entity={entity}
-            error={Boolean(seriesListQuery.error)}
-            pending={seriesListQuery.isPending}
-            retry={() => void seriesListQuery.refetch()}
-            seriesList={seriesListQuery.data}
-          />
-          <EntityBottleOverview
-            bottleList={bottleListQuery.data}
             createBottleHref={getEntityBottleCreateHref(entity)}
             entity={entity}
-            error={Boolean(bottleListQuery.error)}
-            pending={bottleListQuery.isPending}
-            retry={() => void bottleListQuery.refetch()}
-            totalBottles={entity.totalBottles}
-          />
-          <EntityReviewsAndTastingsOverview
-            entity={entity}
-            error={Boolean(recentReviewsAndTastingsQuery.error)}
-            pending={recentReviewsAndTastingsQuery.isPending}
-            retry={() => void recentReviewsAndTastingsQuery.refetch()}
-            reviewsAndTastings={recentReviewsAndTastingsQuery.data}
-          />
-          <EntityHistoryOverview
-            entityName={entity.name}
-            error={Boolean(eventListQuery.error)}
-            eventList={eventListQuery.data}
-            pending={eventListQuery.isPending}
-            retry={() => void eventListQuery.refetch()}
+            error={bottlingsQueries.some((query) => Boolean(query.error))}
+            latestBottlings={latestBottlingsQuery.data}
+            pending={bottlingsQueries.some((query) => query.isPending)}
+            releaseList={releaseListQuery.data}
+            retry={() => {
+              for (const query of bottlingsQueries) void query.refetch();
+            }}
           />
         </>
+      }
+      activity={
+        <EntityReviewsAndTastingsOverview
+          entity={entity}
+          error={Boolean(recentReviewsAndTastingsQuery.error)}
+          pending={recentReviewsAndTastingsQuery.isPending}
+          retry={() => void recentReviewsAndTastingsQuery.refetch()}
+          reviewsAndTastings={recentReviewsAndTastingsQuery.data}
+        />
       }
       media={
         <>
@@ -191,6 +177,23 @@ export function EntityOverviewClient() {
         </>
       }
     />
+  );
+}
+
+const portfolioSections = [
+  { section: "brands", kind: "brand" },
+  { section: "distilleries", kind: "distillery" },
+  { section: "bottlers", kind: "bottler" },
+] as const;
+
+/** A company's Overview shows only its largest group; ties keep this order. */
+function getLargestPortfolioSection(
+  totals?: Record<(typeof portfolioSections)[number]["section"], number>,
+) {
+  return portfolioSections.reduce((largest, candidate) =>
+    totals && totals[candidate.section] > totals[largest.section]
+      ? candidate
+      : largest,
   );
 }
 

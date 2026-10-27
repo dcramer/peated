@@ -3,33 +3,35 @@ import type { Meta, StoryObj } from "@storybook/nextjs-vite";
 import {
   mockBrora,
   mockEntityAbouts,
-  mockEntityBottlerCounts,
   mockEntityVintageCounts,
 } from "@peated/server/orpc/mock/fixtures";
 import { StoryCanvas } from "../../components/storyFixtures.stylex";
 
 import { getCitationNumbers, getKeyFacts } from "./entityAbout";
-import { EntityAboutArticle } from "./entityAboutArticle.stylex";
+import {
+  EntityAboutHistory,
+  EntityAboutLead,
+  EntityAboutSources,
+  EntityAboutTimeline,
+} from "./entityAboutArticle.stylex";
 
 const broraAbout = mockEntityAbouts.get(mockBrora.id)!;
+const citationNumbers = getCitationNumbers(
+  broraAbout,
+  getKeyFacts(broraAbout, mockBrora.name),
+);
 
 const meta = {
   title: "Components/History/About Article",
-  component: EntityAboutArticle,
+  component: EntityAboutHistory,
   args: {
     about: broraAbout,
     entity: mockBrora,
     counts: {
       vintages: mockEntityVintageCounts.get(mockBrora.id)!,
-      bottlers: mockEntityBottlerCounts.get(mockBrora.id)!,
-      distillers: { results: [], withoutEntity: 0 },
       releaseYears: { results: [], withoutYear: 0 },
     },
-    citationNumbers: getCitationNumbers(
-      broraAbout,
-      getKeyFacts(broraAbout, mockBrora.name),
-    ),
-    currentYear: 2026,
+    citationNumbers,
   },
   decorators: [
     (Story) => (
@@ -38,13 +40,33 @@ const meta = {
       </StoryCanvas>
     ),
   ],
-} satisfies Meta<typeof EntityAboutArticle>;
+  render: (args) => (
+    <>
+      <EntityAboutLead
+        about={args.about}
+        citationNumbers={args.citationNumbers}
+        lead={args.about.lead!}
+      />
+      <EntityAboutTimeline
+        about={args.about}
+        currentYear={2026}
+        entityName={args.entity.name}
+      />
+      <EntityAboutHistory {...args} />
+      <EntityAboutSources
+        about={args.about}
+        citationNumbers={args.citationNumbers}
+      />
+    </>
+  ),
+} satisfies Meta<typeof EntityAboutHistory>;
 
 export default meta;
 type Story = StoryObj<typeof meta>;
 
 /**
- * Brora's mock article: timeline, sections with source notes, the rename
- * disagreement, the vintage chart, and the bottler list.
+ * Brora's mock About parts in page order: lead, timeline, sections with
+ * source notes and the rename disagreement, the vintage chart, and sources.
+ * The Entity page places them around its catalog lists.
  */
 export const Overview: Story = {};

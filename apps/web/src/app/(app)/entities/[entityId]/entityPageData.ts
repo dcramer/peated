@@ -12,7 +12,6 @@ type EntityTabSource = Pick<
   | "shortName"
   | "totalBottles"
   | "publicReviewAndTastingCount"
-  | "hasAbout"
 >;
 export type CompanyPageCounts = {
   bottles: number;
@@ -94,10 +93,6 @@ export function getEntityTabs(
   const tabs: [PageTabItem, ...PageTabItem[]] = [
     { href: baseUrl, label: "Overview" },
   ];
-
-  if (entity.hasAbout) {
-    tabs.push({ href: `${baseUrl}/about`, label: "About" });
-  }
 
   if (entity.kind === "company" && companyCounts?.portfolio) {
     tabs.push({

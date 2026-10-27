@@ -1,10 +1,11 @@
 # Entity About Pages
 
-A distillery, brand, bottler, or company can have an About tab: a short,
+A distillery, brand, bottler, or company can have an About page: a short,
 sourced account of the place, label, or business, with a timeline, key facts,
 owners, and numbers from the Bottle catalog. Every statement on the page
 traces to a fact, and every fact traces to a source. Bottles will need their
-own design.
+own design. The page has no URL of its own: its parts sit on the Entity's
+Overview, in the order [Entity Pages](entity-page.md) gives.
 
 ## What Is Stored
 
@@ -44,8 +45,8 @@ page.
 Two other stores feed the writer:
 
 - **History timeline** (`entity_event`): the Entity's dated history items,
-  edited through `entities.events.*` and shown on the Overview. The writer
-  reads them as leads, so the page's events roughly cover them.
+  edited through `entities.events.*`. The writer reads them as leads, so the
+  page's events roughly cover them. The public page does not show them.
 - **Notes** (`entity_about_note`): plain-text notes moderators keep for the
   writer, such as a fact to keep or a trap to avoid, with an optional source
   URL. Every run reads them. They guide the writer but are never cited.
@@ -65,7 +66,8 @@ nothing stored can go stale:
 
 - A fact needs at least one source.
 - When sources state different values, the page shows the chosen value and a
-  "Sources disagree" note with each value and its sources. The writer cites
+  "Sources disagree" note with each value and its sources. The note is folded
+  to one line until a reader opens it. The writer cites
   only real disagreements: it leaves off a value that agreed facts rule out, a
   value only a weak source gives, and an older plant value that a newer dated
   page replaces. Values where one is
@@ -87,10 +89,11 @@ nothing stored can go stale:
 - Quotes stay private. The page lists sources and the date the page was last
   checked, and says nothing else about how the text was written.
 
-The About tab appears only when the page has a lead and at least one other
+The Overview shows the page only when it has a lead and at least one other
 part: a section, a timeline with 2 or more spans, or 2 or more key facts. The
-sitemap uses the same rule, so it never lists a page that returns not found.
-Both count what shows the way the page does, with linked Entities loaded.
+rule counts what shows the way the page does, with linked Entities loaded.
+Once shown, key facts join the Entity's other facts in the sidebar, and a
+sourced founding year replaces the stored one.
 
 Each part of the page has a minimum and is hidden below it, with no heading or
 placeholder. The constants live in
@@ -100,21 +103,20 @@ placeholder. The constants live in
 | --------------------------- | --------------------------- |
 | Timeline (status and names) | 2 or more spans             |
 | Bottles by vintage          | 10 or more Bottles with one |
-| Bottlers                    | 3 or more bottlers          |
 | Bottles by release year     | 10 or more Bottles with one |
-| Key facts                   | 2 or more facts             |
 
 Catalog numbers are counted from active Bottles at read time, the same way as
-the Entity Bottles tab. A distillery's vintages, bottlers, and release years
-count every Bottle distilled there, independent bottlings included. Its own
-line counts even when no distiller is recorded yet. A bottler's distilleries
-and release years count the Bottles it bottled, under any label. A brand's
+the Entity Bottles tab. A distillery's vintages and release years count every
+Bottle distilled there, independent bottlings included. Its own line counts
+even when no distiller is recorded yet. A bottler's release years count the
+Bottles it bottled, under any label. A brand's
 release years count the Bottles sold under it. Prose never states them; they change daily. Chart bars
 link to the Bottle list filtered to that year.
 
 A Bottle page with one distiller and a
 vintage notes the era or former name that covers that vintage. The note
-links to the About page only when that page exists.
+links to the distillery's History only when the Overview shows its About
+page.
 
 ## Who Can Change It
 

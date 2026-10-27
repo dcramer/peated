@@ -10,10 +10,6 @@ export const entityOverviewQueries = {
     }),
     enabled: entityHasBottleCatalog(entity),
   }),
-  events: (orpc: ORPCQueryUtils, entity: Entity) =>
-    orpc.entities.events.list.queryOptions({
-      input: { entity: entity.id },
-    }),
   companyPortfolio: (orpc: ORPCQueryUtils, entity: Entity) => {
     const companyId = entity.kind === "company" ? entity.id : undefined;
 
@@ -27,23 +23,13 @@ export const entityOverviewQueries = {
       enabled: Boolean(companyId),
     };
   },
-  popularBottles: (orpc: ORPCQueryUtils, entity: Entity) => ({
+  // A distillery without releases of its own shows these instead.
+  latestBottlings: (orpc: ORPCQueryUtils, entity: Entity) => ({
     ...orpc.bottles.list.queryOptions({
       input: {
-        distilleryView: entity.kind === "distillery" ? "other" : undefined,
         entity: entity.id,
         limit: 4,
-        sort: "-tastings",
-      },
-    }),
-    enabled: entityHasBottleCatalog(entity),
-  }),
-  seriesByBottleCount: (orpc: ORPCQueryUtils, entity: Entity) => ({
-    ...orpc.bottleSeries.list.queryOptions({
-      input: {
-        distillery: entity.id,
-        limit: 4,
-        sort: "-bottles",
+        sort: "-release",
       },
     }),
     enabled: entity.kind === "distillery",
