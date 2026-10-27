@@ -125,7 +125,8 @@ export const ABOUT_FACT_FIELDS = {
   },
   stillDesign: {
     label: "Still shape",
-    description: "The shape of the stills, such as lamp glass or boil ball",
+    description:
+      "The shape of the stills, such as lamp glass or boil ball; not the kind of still, such as pot or column",
     type: "text",
     unit: null,
     kinds: ["distillery"],
