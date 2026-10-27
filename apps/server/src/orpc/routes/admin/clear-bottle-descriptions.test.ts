@@ -96,7 +96,7 @@ describe("POST /admin/catalog/clear-bottle-descriptions", () => {
     expect(after.get(person.id)).toEqual(before.get(person.id));
     expect(after.get(unknown.id)).toEqual(before.get(unknown.id));
 
-    const [change] = await db
+    const updates = await db
       .select({ data: changes.data })
       .from(changes)
       .where(
@@ -106,9 +106,14 @@ describe("POST /admin/catalog/clear-bottle-descriptions", () => {
           eq(changes.type, "update"),
         ),
       );
-    expect(change?.data).toMatchObject({
+    expect(updates).toHaveLength(1);
+    expect(updates[0]!.data).toMatchObject({
       description: null,
       descriptionSrc: null,
+      before: {
+        description: "A smooth and approachable dram.",
+        descriptionSrc: "generated",
+      },
     });
     expect(workerClient.pushJob).toHaveBeenCalledWith("OnBottleChange", {
       bottleId: generated.id,

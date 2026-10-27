@@ -162,7 +162,8 @@ Descriptions marked `generated` are left over from the old writer.
 `/admin/catalog/clear-bottle-descriptions` clears them; run it with `dryRun`
 first to list what it would clear. A description with no `descriptionSrc`
 stays, since a person may have written it before Peated recorded who wrote
-descriptions. Each clear is saved as a Bottle change, so it can be restored.
+descriptions. Each clear is saved as a Bottle change that keeps the old text
+under `before`, since the old writer saved its text without a change.
 
 ## Tasting-note flavor profile
 

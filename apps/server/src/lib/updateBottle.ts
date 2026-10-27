@@ -1216,7 +1216,9 @@ export async function updateBottleInTransaction(
     // work, not a reason to fail the move.
     enforceNamingRules?: boolean;
     // False only for derived content, such as generated details, that no
-    // person or source asserted; it is not a catalog edit.
+    // person or source asserted; it is not a catalog edit. A caller that
+    // writes its own change row, such as one keeping prior values, also
+    // passes false.
     recordChange?: boolean;
   },
 ): Promise<BottleUpdateFinalizationManifest> {

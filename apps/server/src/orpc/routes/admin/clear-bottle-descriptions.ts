@@ -1,5 +1,5 @@
 import { db } from "@peated/server/db";
-import { bottles } from "@peated/server/db/schema";
+import { bottles, changes } from "@peated/server/db/schema";
 import { activeBottleWhere } from "@peated/server/lib/activeBottles";
 import { getPeatedSystemActorForDatabase } from "@peated/server/lib/actors";
 import { SystemBottlePatchSchema } from "@peated/server/lib/bottleSchemas";
@@ -101,7 +101,7 @@ export default procedure
       try {
         update = await db.transaction(async (tx) => {
           const actor = await getPeatedSystemActorForDatabase(tx);
-          return await updateBottleInTransaction(tx, {
+          const result = await updateBottleInTransaction(tx, {
             bottleId: bottle.id,
             input: patch,
             // An edit since the page read may have replaced the description.
@@ -109,7 +109,32 @@ export default procedure
               bottleUpdateExpectedSelectedBottleState(bottle),
             actorId: actor.id,
             creationSource: "repair_workflow",
+            recordChange: false,
           });
+          if (!result.changed) return result;
+          // History rule (owner: docs/features/bottle-presentation.md): the
+          // old generated text was saved without a change, so this change
+          // keeps it in `before`, or a clear could not be undone.
+          await tx.insert(changes).values({
+            objectType: "bottle",
+            objectId: bottle.id,
+            actorId: actor.id,
+            displayName: result.bottle.fullName,
+            type: "update",
+            data: {
+              description: null,
+              descriptionSrc: null,
+              before: {
+                description: bottle.description,
+                descriptionSrc: bottle.descriptionSrc,
+              },
+              updateScope: "exact",
+              creationSource: "repair_workflow",
+              groupId: result.group.id,
+              requestedBottleId: bottle.id,
+            },
+          });
+          return result;
         });
       } catch (error) {
         // A Bottle edited, merged, or retired since the page read is no
