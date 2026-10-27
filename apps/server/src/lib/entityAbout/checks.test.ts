@@ -514,6 +514,10 @@ describe("checkAboutProse", () => {
     expect(check("It had 5 stills.")).toEqual([
       '"It had 5 stills." (lead) states 5, which its facts do not.',
     ]);
+    // The padded month in the stored date "2015-06-09" is not a count.
+    expect(check("It had 6 stills.")).toEqual([
+      '"It had 6 stills." (lead) states 6, which its facts do not.',
+    ]);
   });
 
   test("rejects a stock phrase", () => {
