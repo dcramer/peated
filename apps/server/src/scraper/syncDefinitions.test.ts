@@ -7,6 +7,7 @@ import {
 } from "@peated/server/db/schema";
 import { eq } from "drizzle-orm";
 import { z } from "zod";
+import { loadScrapeSourceTarget } from "./configured/target";
 import {
   createScraperRegistry,
   defineScraperSource,
@@ -167,6 +168,56 @@ test("preserves admin-owned targets, origins, and site mappings", async () => {
       active: true,
     }),
   ]);
+});
+
+test("adds a declared origin to a target that saved rules took over", async () => {
+  await db.insert(scrapeTargets).values({
+    key: "operator",
+    managedBy: "admin",
+    enabled: true,
+    minimumSpacingMs: 2_000,
+    requestsPerWindow: 60,
+    windowMs: 3_600_000,
+    timeoutMs: 30_000,
+    maxResponseBytes: 10 * 1024 * 1024,
+    maxRetries: 2,
+  });
+  await db.insert(scrapeOrigins).values({
+    origin: "https://old.example.com",
+    managedBy: "admin",
+    targetKey: "operator",
+    robotsMode: "enforce",
+  });
+
+  await syncScraperDefinitions(
+    createScraperRegistry({
+      targets: [
+        defineScrapeTarget({
+          key: "operator",
+          origins: [
+            { origin: "https://old.example.com", robots: { mode: "enforce" } },
+            { origin: "https://new.example.com", robots: { mode: "enforce" } },
+          ],
+        }),
+      ],
+      sources: [],
+    }),
+  );
+
+  const [target] = await db
+    .select()
+    .from(scrapeTargets)
+    .where(eq(scrapeTargets.key, "operator"));
+  if (!target) throw new Error("Failed to load test target.");
+  expect(target).toMatchObject({ managedBy: "admin", minimumSpacingMs: 2_000 });
+  expect(
+    (await loadScrapeSourceTarget(target)).origins.map(({ origin }) => origin),
+  ).toEqual(
+    expect.arrayContaining([
+      "https://old.example.com",
+      "https://new.example.com",
+    ]),
+  );
 });
 
 test("fails when a source site has not been synchronized", async () => {

@@ -318,8 +318,11 @@ const decadentDrinksRegistry = createScraperRegistry({
   sources: [codeOwnedSource("decadentdrinks")],
 });
 
+const cadenheadsTarget = scraperRegistry.targets.get("cadenheads")!;
+// Preparation moved the original single-host source. The later .scot host is
+// added to the prepared source by definition sync, not by preparation.
 const cadenheadsRegistry = createScraperRegistry({
-  targets: [scraperRegistry.targets.get("cadenheads")!],
+  targets: [{ ...cadenheadsTarget, origins: [cadenheadsTarget.origins[0]] }],
   sources: [codeOwnedSource("cadenheads")],
 });
 
