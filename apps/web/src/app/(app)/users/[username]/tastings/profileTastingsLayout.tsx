@@ -36,7 +36,7 @@ export function ProfileTastingsResultsLoading({ view }: { view: ListView }) {
 
   return (
     <>
-      <ListToolbarLoading mobileActionLayout="pageColumns" view />
+      <ListToolbarLoading mobileAction view />
       {view === "table" ? (
         <TastingTableLoading label="Loading member tastings" rows={rows} />
       ) : (

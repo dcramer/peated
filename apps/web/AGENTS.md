@@ -38,9 +38,10 @@
   hover, and narrow-screen columns; do not write other table markup.
   `TastingTable`, `LibraryTable`, and `AdminTable` (admin search, sort links,
   and paging) build on it. `CatalogResultsLayout` arranges search, filters,
-  sort, results, and paging around a list or table. Filters that narrow
-  results, such as a kind or country, go in its filter groups, not in a second
-  row of page tabs.
+  sort, results, and paging around a list or table. Filters and view splits
+  that narrow results, such as kind, country, Following, or distillery
+  releases versus other bottlings, go in its filter groups, not in a row of
+  tabs under the page tabs or title.
 - `EntityIdentityRow`, `SeriesIdentityRow`, and `LocationIdentityRow` own other
   catalog row identities across lists, sidebars, search, and selection. Keep IDs,
   descriptions, and counts out of identity metadata; place contextual counts and

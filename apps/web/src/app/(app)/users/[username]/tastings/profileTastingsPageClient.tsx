@@ -127,12 +127,7 @@ export function ProfileTastingsPageClient() {
         filtersPending ? (
           <ProfileTastingsFiltersLoading hasCountry={hasCountry} />
         ) : (
-          <MemberListFilters
-            {...groupProps}
-            onClear={clearFilters}
-            query={displayedInput.query}
-            search={search}
-          />
+          <MemberListFilters {...groupProps} search={search} />
         )
       }
     >
@@ -155,8 +150,11 @@ export function ProfileTastingsPageClient() {
                 sortOptions={sortOptions}
               />
             }
-            mobileActionLayout="pageColumns"
             noun="tasting"
+            // An empty result offers its own Clear filters.
+            onClear={
+              activeFilterCount && results.length ? clearFilters : undefined
+            }
             onSortChange={(value) => setParam("sort", value)}
             onViewChange={(value) =>
               setParam("view", value === "table" ? value : "")

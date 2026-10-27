@@ -9,6 +9,7 @@ import { useOptimistic, useTransition } from "react";
 
 import { addBottleRowActions } from "@peated/web/components/bottleRowActions.stylex";
 import { ButtonLink } from "@peated/web/components/button.stylex";
+import { FacetGroup } from "@peated/web/components/filterPanel.stylex";
 import {
   BottleCatalogFacets,
   BottleCatalogList,
@@ -26,8 +27,6 @@ import {
 import { toBottleListItem } from "@peated/web/lib/bottleListItem";
 import { buildSearchHref, getCursorHref } from "@peated/web/lib/cursorHref";
 import { useORPC } from "@peated/web/lib/orpc/context";
-
-import { BottleCatalogNavigation } from "./bottleCatalogNavigation.stylex";
 
 const DEFAULT_SORT = "-release";
 
@@ -71,6 +70,7 @@ const clearedFilterKeys = [
   "cursor",
   "distiller",
   "entity",
+  "filter",
   "flavorProfile",
   "flight",
   "minScore",
@@ -129,8 +129,6 @@ export function BottleCatalogPageClient({
     )?.value ?? DEFAULT_SORT;
   const filter =
     searchParams.get("filter") === "following" ? "following" : "all";
-  const allHref = getScopeHref(pathname, searchParams, "all");
-  const followingHref = getScopeHref(pathname, searchParams, "following");
 
   function navigate(nextParams: URLSearchParams) {
     startTransition(() => {
@@ -183,15 +181,6 @@ export function BottleCatalogPageClient({
           Add a bottle
         </ButtonLink>
       }
-      navigation={
-        user ? (
-          <BottleCatalogNavigation
-            allHref={allHref}
-            followingHref={followingHref}
-            scope={filter}
-          />
-        ) : undefined
-      }
       title={title}
     >
       <BottleCatalogList
@@ -215,13 +204,38 @@ export function BottleCatalogPageClient({
         }
         items={items}
         filters={
-          <BottleCatalogFacets
-            ageBand={displayedSearchParams.get("ageBand") ?? ""}
-            ageBandOptions={ageBandOptions}
-            category={displayedSearchParams.get("category") ?? ""}
-            categoryOptions={categoryOptions}
-            onChange={(name, value) => updateParams({ [name]: value })}
-          />
+          <>
+            {user ? (
+              <FacetGroup
+                label="Show"
+                required
+                onChange={(value) =>
+                  updateParams({ filter: value === "following" ? value : "" })
+                }
+                options={[
+                  { label: "All bottles", value: "all" },
+                  { label: "Following", value: "following" },
+                ]}
+                selected={
+                  displayedSearchParams.get("filter") === "following"
+                    ? "following"
+                    : "all"
+                }
+                summary={
+                  displayedSearchParams.get("filter") === "following"
+                    ? "Bottles from distillers, brands, and bottlers you follow."
+                    : undefined
+                }
+              />
+            ) : null}
+            <BottleCatalogFacets
+              ageBand={displayedSearchParams.get("ageBand") ?? ""}
+              ageBandOptions={ageBandOptions}
+              category={displayedSearchParams.get("category") ?? ""}
+              categoryOptions={categoryOptions}
+              onChange={(name, value) => updateParams({ [name]: value })}
+            />
+          </>
         }
         nextHref={getCursorHref(
           pathname,
@@ -249,16 +263,4 @@ export function BottleCatalogPageClient({
       />
     </CatalogPage>
   );
-}
-
-function getScopeHref(
-  pathname: string,
-  searchParams: { toString(): string },
-  filter: "all" | "following",
-) {
-  const nextParams = new URLSearchParams(searchParams.toString());
-  if (filter === "following") nextParams.set("filter", "following");
-  else nextParams.delete("filter");
-  nextParams.delete("cursor");
-  return buildSearchHref(pathname, nextParams);
 }

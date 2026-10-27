@@ -8,8 +8,8 @@ import { useSuspenseQuery } from "@tanstack/react-query";
 import { usePathname, useRouter, useSearchParams } from "next/navigation";
 import { useOptimistic, useTransition } from "react";
 
-import { ButtonLink } from "@peated/web/components/button.stylex";
-import { PageTabs } from "@peated/web/components/pageTabs.stylex";
+import { Button, ButtonLink } from "@peated/web/components/button.stylex";
+import { FacetGroup } from "@peated/web/components/filterPanel.stylex";
 import { CatalogPage } from "@peated/web/components/pages/catalogPage.stylex";
 import {
   EntityCatalogFacets,
@@ -92,8 +92,8 @@ export function EntityCatalogPageClient({
   const hasFilters = Boolean(country || query || region);
   const filter =
     searchParams.get("filter") === "following" ? "following" : "all";
-  const allHref = getScopeHref(pathname, searchParams, "all");
-  const followingHref = getScopeHref(pathname, searchParams, "following");
+  const displayedFilter =
+    displayedSearchParams.get("filter") === "following" ? "following" : "all";
   const showFollowing = Boolean(user && kind !== "company");
 
   function navigate(nextParams: URLSearchParams) {
@@ -118,7 +118,7 @@ export function EntityCatalogPageClient({
 
   function clearFilters() {
     const nextParams = new URLSearchParams(displayedParams);
-    ["country", "cursor", "query", "region"].forEach((name) =>
+    ["country", "cursor", "filter", "query", "region"].forEach((name) =>
       nextParams.delete(name),
     );
     navigate(nextParams);
@@ -140,28 +140,27 @@ export function EntityCatalogPageClient({
           Add {config.noun}
         </ButtonLink>
       }
-      navigation={
-        showFollowing ? (
-          <PageTabs
-            ariaLabel={`${config.title} views`}
-            currentHref={filter === "following" ? followingHref : allHref}
-            items={[
-              { href: allHref, label: `All ${config.title.toLowerCase()}` },
-              { href: followingHref, label: "Following" },
-            ]}
-          />
-        ) : undefined
-      }
       title={config.title}
     >
       <EntityCatalogList
-        activeFilterCount={[country, query, region].filter(Boolean).length}
+        activeFilterCount={
+          [
+            country,
+            query,
+            region,
+            displayedFilter === "following" ? displayedFilter : "",
+          ].filter(Boolean).length
+        }
         addHref={addHref}
         emptyAction={
           filter === "following" && !hasFilters ? (
-            <ButtonLink href={allHref} size="sm" variant="tonal">
+            <Button
+              onClick={() => updateParams({ filter: "" })}
+              size="sm"
+              variant="tonal"
+            >
               Browse all {config.title.toLowerCase()}
-            </ButtonLink>
+            </Button>
           ) : undefined
         }
         emptyDescription={
@@ -177,15 +176,34 @@ export function EntityCatalogPageClient({
             : undefined
         }
         filters={
-          <EntityCatalogFacets
-            countries={countryOptions}
-            country={country}
-            onCountryChange={(value) => updateParams({ country: value })}
-            onRegionClear={
-              region ? () => updateParams({ region: "" }) : undefined
-            }
-            region={region ? formatRegion(region) : undefined}
-          />
+          <>
+            {showFollowing ? (
+              <FacetGroup
+                label="Show"
+                required
+                onChange={(value) =>
+                  updateParams({ filter: value === "following" ? value : "" })
+                }
+                options={[
+                  {
+                    label: `All ${config.title.toLowerCase()}`,
+                    value: "all",
+                  },
+                  { label: "Following", value: "following" },
+                ]}
+                selected={displayedFilter}
+              />
+            ) : null}
+            <EntityCatalogFacets
+              countries={countryOptions}
+              country={country}
+              onCountryChange={(value) => updateParams({ country: value })}
+              onRegionClear={
+                region ? () => updateParams({ region: "" }) : undefined
+              }
+              region={region ? formatRegion(region) : undefined}
+            />
+          </>
         }
         items={items}
         nextHref={getCursorHref(
@@ -194,7 +212,11 @@ export function EntityCatalogPageClient({
           entityList.rel.nextCursor,
         )}
         noun={config.noun}
-        onClear={hasFilters ? clearFilters : undefined}
+        onClear={
+          hasFilters || displayedFilter === "following"
+            ? clearFilters
+            : undefined
+        }
         onToggleFollowing={
           showFollowing
             ? (item) =>
@@ -226,18 +248,6 @@ export function EntityCatalogPageClient({
       />
     </CatalogPage>
   );
-}
-
-function getScopeHref(
-  pathname: string,
-  searchParams: { toString(): string },
-  filter: "all" | "following",
-) {
-  const nextParams = new URLSearchParams(searchParams.toString());
-  if (filter === "following") nextParams.set("filter", "following");
-  else nextParams.delete("filter");
-  nextParams.delete("cursor");
-  return buildSearchHref(pathname, nextParams);
 }
 
 function formatRegion(region: string) {

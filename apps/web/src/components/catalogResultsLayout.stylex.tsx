@@ -85,8 +85,9 @@ export function CatalogResultsLayout({
             />
           ) : undefined
         }
-        mobileActionLayout="pageColumns"
         noun={noun}
+        // An empty result offers its own Clear filters.
+        onClear={count ? clearAction : undefined}
         onSortChange={onSortChange}
         pending={pending}
         pluralNoun={pluralNoun}
@@ -111,7 +112,6 @@ export function CatalogResultsLayout({
       rail={
         <FilterRail
           ariaLabel={`${pluralNoun} filters`}
-          onClear={clearAction}
           search={query ? <FilterQuery {...query} /> : undefined}
         >
           {filters}

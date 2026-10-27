@@ -6,7 +6,7 @@ import { useSuspenseQuery } from "@tanstack/react-query";
 import { usePathname, useRouter, useSearchParams } from "next/navigation";
 import { useOptimistic, useTransition, type ReactNode } from "react";
 
-import { PageTabs } from "@peated/web/components/pageTabs.stylex";
+import { FacetGroup } from "@peated/web/components/filterPanel.stylex";
 import { BottleCatalogList } from "@peated/web/components/pages/bottleCatalog.stylex";
 import useApiQueryParams from "@peated/web/hooks/useApiQueryParams";
 import {
@@ -53,9 +53,19 @@ export function EntityBottleListClient({
   const pathname = usePathname();
   const router = useRouter();
   const searchParams = useSearchParams();
+  const [isNavigating, startTransition] = useTransition();
+  const [displayedParams, setDisplayedParams] = useOptimistic(
+    searchParams.toString(),
+  );
+  const displayedSearchParams = new URLSearchParams(displayedParams);
   const distilleryView = getDistilleryBottleView(
     { kind: entityKind },
     searchParams.get("view") ?? undefined,
+    initialDistilleryView,
+  );
+  const displayedView = getDistilleryBottleView(
+    { kind: entityKind },
+    displayedSearchParams.get("view") ?? undefined,
     initialDistilleryView,
   );
   const queryParams = normalizeBottleCatalogQueryParams(
@@ -87,60 +97,79 @@ export function EntityBottleListClient({
     initialData: initialBottleList,
   });
   const page = Number(searchParams.get("cursor") ?? "1") || 1;
-  const [isNavigating, startTransition] = useTransition();
-  const [sort, setSort] = useOptimistic(
-    String(queryParams.sort ?? DEFAULT_SORT),
-  );
+  const sort = displayedSearchParams.get("sort") ?? DEFAULT_SORT;
+  const query = displayedSearchParams.get("query") ?? "";
+  // Empty results describe the search the list actually ran.
+  const searchedQuery = searchParams.get("query") ?? "";
 
-  function getViewHref(view: "other" | "releases") {
-    const nextParams = new URLSearchParams(searchParams);
-    nextParams.set("view", view);
+  function navigate(nextParams: URLSearchParams) {
     nextParams.delete("cursor");
-    return buildSearchHref(pathname, nextParams);
-  }
-
-  function updateSort(value: string) {
-    const nextParams = new URLSearchParams(searchParams);
-    nextParams.set("sort", value);
-    nextParams.delete("cursor");
+    // The server picks Other bottlings for a distillery without releases only
+    // when nothing narrows the list, so a search must carry the shown view.
+    if (displayedView && !nextParams.has("view")) {
+      nextParams.set("view", displayedView);
+    }
     startTransition(() => {
-      setSort(value);
+      setDisplayedParams(nextParams.toString());
       router.push(buildSearchHref(pathname, nextParams), { scroll: false });
     });
   }
 
+  function updateSort(value: string) {
+    const nextParams = new URLSearchParams(displayedSearchParams);
+    nextParams.set("sort", value);
+    navigate(nextParams);
+  }
+
+  function updateQuery(value: string) {
+    const nextParams = new URLSearchParams(displayedSearchParams);
+    if (value) nextParams.set("query", value);
+    else nextParams.delete("query");
+    navigate(nextParams);
+  }
+
+  function updateView(value: string) {
+    const nextParams = new URLSearchParams(displayedSearchParams);
+    nextParams.set("view", value);
+    navigate(nextParams);
+  }
+
   return (
     <div {...stylex.props(styles.content)}>
-      {distilleryView ? (
-        <div {...stylex.props(styles.views)}>
-          <PageTabs
-            ariaLabel={`Bottles for ${entityName}`}
-            currentHref={getViewHref(distilleryView)}
-            items={[
-              {
-                href: getViewHref("releases"),
-                label: "Distillery releases",
-              },
-              { href: getViewHref("other"), label: "Other bottlings" },
-            ]}
-          />
-        </div>
-      ) : null}
       <BottleCatalogList
-        emptyAction={emptyAction}
+        activeFilterCount={query ? 1 : 0}
+        emptyAction={searchedQuery ? undefined : emptyAction}
+        filters={
+          displayedView ? (
+            <FacetGroup
+              label="Show"
+              required
+              onChange={updateView}
+              options={[
+                { label: "Distillery releases", value: "releases" },
+                { label: "Other bottlings", value: "other" },
+              ]}
+              selected={displayedView}
+            />
+          ) : undefined
+        }
         emptyDescription={
-          distilleryView === "releases"
-            ? `No distillery releases have been added for ${entityName} yet.`
-            : distilleryView === "other"
-              ? `No other bottlings have been added for ${entityName} yet.`
-              : `No bottles have been added for ${entityName} yet.`
+          searchedQuery
+            ? `No ${entityName} bottles match "${searchedQuery}".`
+            : distilleryView === "releases"
+              ? `No distillery releases have been added for ${entityName} yet.`
+              : distilleryView === "other"
+                ? `No other bottlings have been added for ${entityName} yet.`
+                : `No bottles have been added for ${entityName} yet.`
         }
         emptyHeading={
-          distilleryView === "releases"
-            ? "No distillery releases yet"
-            : distilleryView === "other"
-              ? "No other bottlings yet"
-              : "No bottles yet"
+          searchedQuery
+            ? "No matching bottles"
+            : distilleryView === "releases"
+              ? "No distillery releases yet"
+              : distilleryView === "other"
+                ? "No other bottlings yet"
+                : "No bottles yet"
         }
         items={bottleList.results.map((bottle) =>
           toBottleListItem(bottle, {
@@ -154,6 +183,7 @@ export function EntityBottleListClient({
           searchParams,
           bottleList.rel.nextCursor,
         )}
+        onClear={query ? () => updateQuery("") : undefined}
         onSortChange={updateSort}
         page={page}
         pending={isNavigating || isFetching}
@@ -162,6 +192,12 @@ export function EntityBottleListClient({
           searchParams,
           bottleList.rel.prevCursor,
         )}
+        query={{
+          label: "Find a bottle",
+          onSubmit: (value) => updateQuery(value.trim()),
+          placeholder: "Name or release",
+          query,
+        }}
         sort={sort}
         sortOptions={sortOptions}
         total={bottleList.total}
@@ -174,8 +210,5 @@ const styles = stylex.create({
   content: {
     minWidth: 0,
     paddingTop: space.x6,
-  },
-  views: {
-    marginBottom: space.x6,
   },
 });

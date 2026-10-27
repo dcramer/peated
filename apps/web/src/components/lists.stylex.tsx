@@ -14,10 +14,10 @@ import { AppLink } from "./appLink";
 import { ButtonLink, IconButton } from "./button.stylex";
 import { LoadingText } from "./feedback.stylex";
 import { ItemList, ItemListItem } from "./itemList.stylex";
+import { textLinkStyles } from "./textLinkStyles.stylex";
 import { getTextTitle } from "./textTitle";
 
 const COMPACT = "@media (max-width: 639px)";
-const TABLE_NARROW = "@media (max-width: 959px)";
 // PageColumns drops its rail at this width.
 const PAGE_NARROW = "@media (max-width: 759px)";
 
@@ -30,14 +30,17 @@ export type ListView = "list" | "table";
 
 export type ListToolbarProps = {
   count: number;
-  /** Replaces the sort control where the page's filter rail collapses. */
-  mobileAction?: ReactNode;
   /**
-   * The layout whose filter rail `mobileAction` replaces: Table collapses its
-   * rail below 960px, PageColumns below 760px.
+   * Replaces the sort control below 760px, where PageColumns hides the
+   * page's filter rail.
    */
-  mobileActionLayout?: "pageColumns" | "table";
+  mobileAction?: ReactNode;
   noun: string;
+  /**
+   * Clears applied filters from beside the count. Pass it only while filters
+   * apply; narrow screens use the Filters drawer's own Clear filters.
+   */
+  onClear?: () => void;
   pluralNoun?: string;
   onExport?: () => void;
   onSortChange: (value: string) => void;
@@ -57,9 +60,9 @@ export type ListToolbarProps = {
 export function ListToolbar({
   count,
   mobileAction,
-  mobileActionLayout = "table",
   noun,
   pluralNoun = `${noun}s`,
+  onClear,
   onExport,
   onSortChange,
   onViewChange,
@@ -76,15 +79,35 @@ export function ListToolbar({
         Boolean(mobileAction) && styles.toolbarWithMobileAction,
       )}
     >
-      <p aria-live="polite" {...stylex.props(styles.count)}>
-        <strong {...stylex.props(styles.countValue)}>
-          {count.toLocaleString("en-US")} {count === 1 ? noun : pluralNoun}
-        </strong>
-        {total !== undefined ? (
-          <span
-            {...stylex.props(foundationStyles.metadata, styles.countDetail)}
-          >
-            of {total.toLocaleString("en-US")}
+      <p {...stylex.props(styles.count)}>
+        <span aria-live="polite" {...stylex.props(styles.countText)}>
+          <strong {...stylex.props(styles.countValue)}>
+            {count.toLocaleString("en-US")} {count === 1 ? noun : pluralNoun}
+          </strong>
+          {total !== undefined ? (
+            <span
+              {...stylex.props(foundationStyles.metadata, styles.countDetail)}
+            >
+              of {total.toLocaleString("en-US")}
+            </span>
+          ) : null}
+        </span>
+        {onClear ? (
+          <span {...stylex.props(foundationStyles.metadata, styles.clear)}>
+            <span aria-hidden="true" {...stylex.props(styles.countDetail)}>
+              ·
+            </span>
+            <button
+              onClick={onClear}
+              type="button"
+              {...stylex.props(
+                foundationStyles.metadata,
+                textLinkStyles.link,
+                styles.clearButton,
+              )}
+            >
+              Clear filters
+            </button>
           </span>
         ) : null}
       </p>
@@ -94,18 +117,12 @@ export function ListToolbar({
           {...stylex.props(
             foundationStyles.metadata,
             styles.status,
-            Boolean(mobileAction) &&
-              mobileActionStyles[mobileActionLayout].status,
+            Boolean(mobileAction) && styles.statusWithMobileAction,
           )}
         >
           {pending ? "Updating…" : null}
         </span>
-        <span
-          {...stylex.props(
-            Boolean(mobileAction) &&
-              mobileActionStyles[mobileActionLayout].sort,
-          )}
-        >
+        <span {...stylex.props(Boolean(mobileAction) && styles.wideSort)}>
           <ListSort
             noun={pluralNoun}
             onChange={onSortChange}
@@ -126,11 +143,7 @@ export function ListToolbar({
           />
         ) : null}
         {mobileAction ? (
-          <span
-            {...stylex.props(mobileActionStyles[mobileActionLayout].action)}
-          >
-            {mobileAction}
-          </span>
+          <span {...stylex.props(styles.mobileAction)}>{mobileAction}</span>
         ) : null}
       </div>
     </div>
@@ -140,24 +153,21 @@ export function ListToolbar({
 /**
  * Reserves the toolbar while its list loads: the count line, the sort control,
  * the list/table toggle with `view`, and the narrow-screen filters button with
- * `mobileActionLayout`, each at its finished size.
+ * `mobileAction`, each at its finished size.
  */
 export function ListToolbarLoading({
-  mobileActionLayout,
+  mobileAction = false,
   view = false,
 }: {
-  mobileActionLayout?: ListToolbarProps["mobileActionLayout"];
+  mobileAction?: boolean;
   view?: boolean;
 }) {
-  const mobile = mobileActionLayout
-    ? mobileActionStyles[mobileActionLayout]
-    : undefined;
   return (
     <div
       aria-hidden="true"
       {...stylex.props(
         styles.toolbar,
-        Boolean(mobile) && styles.toolbarWithMobileAction,
+        mobileAction && styles.toolbarWithMobileAction,
       )}
     >
       <p {...stylex.props(styles.count)}>
@@ -170,10 +180,10 @@ export function ListToolbarLoading({
           {...stylex.props(
             foundationStyles.metadata,
             styles.status,
-            mobile?.status,
+            mobileAction && styles.statusWithMobileAction,
           )}
         />
-        <span {...stylex.props(mobile?.sort)}>
+        <span {...stylex.props(mobileAction && styles.wideSort)}>
           <span
             {...stylex.props(foundationStyles.fieldLabel, styles.sortLabel)}
           >
@@ -187,8 +197,8 @@ export function ListToolbarLoading({
             <span {...stylex.props(styles.loadingIconButton)} />
           </span>
         ) : null}
-        {mobile ? (
-          <span {...stylex.props(mobile.action)}>
+        {mobileAction ? (
+          <span {...stylex.props(styles.mobileAction)}>
             <span {...stylex.props(styles.loadingFiltersButton)} />
           </span>
         ) : null}
@@ -467,6 +477,25 @@ const styles = stylex.create({
     gap: space.x2,
     margin: 0,
   },
+  countText: {
+    display: "inline-flex",
+    minWidth: 0,
+    alignItems: "baseline",
+    gap: space.x2,
+  },
+  // A text link after the count; narrow screens clear from the Filters drawer.
+  clear: {
+    display: { default: "inline-flex", [PAGE_NARROW]: "none" },
+    alignItems: "baseline",
+    gap: space.x2,
+  },
+  clearButton: {
+    padding: 0,
+    borderWidth: 0,
+    backgroundColor: "transparent",
+    whiteSpace: "nowrap",
+    cursor: "pointer",
+  },
   countValue: {
     color: colors.ink,
     whiteSpace: "nowrap",
@@ -518,11 +547,6 @@ const styles = stylex.create({
     flexShrink: 0,
     gap: space.x1,
   },
-  statusWithMobileAction: {
-    [TABLE_NARROW]: {
-      minWidth: 0,
-    },
-  },
   sortLabel: {
     display: "flex",
     alignItems: "center",
@@ -534,30 +558,18 @@ const styles = stylex.create({
     flexDirection: "column",
     alignItems: "stretch",
   },
-  wideSort: {
-    display: "inline-flex",
-    [TABLE_NARROW]: {
-      display: "none",
-    },
-  },
-  mobileAction: {
-    display: "none",
-    [TABLE_NARROW]: {
-      display: "inline-flex",
-    },
-  },
-  pageStatusWithMobileAction: {
+  statusWithMobileAction: {
     [PAGE_NARROW]: {
       minWidth: 0,
     },
   },
-  pageWideSort: {
+  wideSort: {
     display: "inline-flex",
     [PAGE_NARROW]: {
       display: "none",
     },
   },
-  pageMobileAction: {
+  mobileAction: {
     display: "none",
     [PAGE_NARROW]: {
       display: "inline-flex",
@@ -677,16 +689,3 @@ const styles = stylex.create({
     fontVariantNumeric: "tabular-nums",
   },
 });
-
-const mobileActionStyles = {
-  pageColumns: {
-    action: styles.pageMobileAction,
-    sort: styles.pageWideSort,
-    status: styles.pageStatusWithMobileAction,
-  },
-  table: {
-    action: styles.mobileAction,
-    sort: styles.wideSort,
-    status: styles.statusWithMobileAction,
-  },
-};

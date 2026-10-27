@@ -205,33 +205,25 @@ function FilterQueryForm({
 }
 
 /**
- * The filter sidebar beside a list or table: search first, then facet groups,
- * then Clear filters. It has no heading; the search label and group headings
- * say what each part does. Pages hide it on narrow screens, where ListControls
+ * The filter sidebar beside a list or table: search first, then facet groups.
+ * It has no heading; the search label and group headings say what each part
+ * does. ListToolbar offers Clear filters beside the result count. Pages hide it on narrow screens, where ListControls
  * shows the same search and groups in its drawer.
  */
 export function FilterRail({
   ariaLabel,
   children,
-  onClear,
   search,
 }: {
   ariaLabel?: string;
   /** Facet groups. */
   children?: ReactNode;
-  /** Pass only while a filter or search is applied. */
-  onClear?: () => void;
   search?: ReactNode;
 }) {
   return (
     <section aria-label={ariaLabel} {...stylex.props(styles.rail)}>
       {search}
       {children}
-      {onClear ? (
-        <Button onClick={onClear} size="sm" variant="text">
-          Clear filters
-        </Button>
-      ) : null}
     </section>
   );
 }
@@ -278,6 +270,11 @@ export type FacetGroupProps = {
   label: string;
   onChange: (value: string) => void;
   options: readonly FacetGroupOption[];
+  /**
+   * One option is always selected, as in a view switch: choosing it again does
+   * nothing and it shows no × to clear it.
+   */
+  required?: boolean;
   selected?: string;
   /** A short, non-interactive fact about the whole group, such as a median. */
   summary?: ReactNode;
@@ -289,6 +286,7 @@ export function FacetGroup({
   label,
   onChange,
   options,
+  required = false,
   selected,
   summary,
   total,
@@ -309,8 +307,12 @@ export function FacetGroup({
         {options.map((option) => {
           const isSelected = selected === option.value;
           const rowProps = {
+            clearable: !required,
             label: option.label,
-            onClick: () => onChange(isSelected ? "" : option.value),
+            onClick: () => {
+              if (isSelected && required) return;
+              onChange(isSelected ? "" : option.value);
+            },
             selected: isSelected,
           };
 

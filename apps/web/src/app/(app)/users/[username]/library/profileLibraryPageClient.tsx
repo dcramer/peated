@@ -228,12 +228,7 @@ export function ProfileLibraryPageClient() {
         statsQuery.isPending ? (
           <ProfileLibraryFiltersLoading />
         ) : (
-          <MemberListFilters
-            {...groupProps}
-            onClear={clearFilters}
-            query={displayedInput.query}
-            search={search}
-          />
+          <MemberListFilters {...groupProps} search={search} />
         )
       }
     >
@@ -256,8 +251,11 @@ export function ProfileLibraryPageClient() {
                 sortOptions={sortOptions}
               />
             }
-            mobileActionLayout="pageColumns"
             noun="bottle"
+            // An empty result offers its own Clear filters.
+            onClear={
+              activeFilterCount && items.length ? clearFilters : undefined
+            }
             onSortChange={(value) => setParam("sort", value)}
             onViewChange={(value) =>
               setParam("view", value === "table" ? value : "")
