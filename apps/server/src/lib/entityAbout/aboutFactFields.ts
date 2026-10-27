@@ -18,6 +18,7 @@ export const ABOUT_FACT_FIELD_LIST = [
   "condensers",
   "spiritCharacter",
   "mainUse",
+  "maturation",
 ] as const;
 
 export type AboutFactField = (typeof ABOUT_FACT_FIELD_LIST)[number];
@@ -151,6 +152,14 @@ export const ABOUT_FACT_FIELDS = {
     label: "Mainly used for",
     description:
       "What most of its spirit goes into now, when a quote says most does, such as the owner's blends; a blend it is one of many malts in is not its main use",
+    type: "text",
+    unit: null,
+    kinds: ["distillery"],
+  },
+  maturation: {
+    label: "Maturation",
+    description:
+      "Where and how its spirit ages, such as in its own dunnage warehouses, at another site, or in a hot climate that speeds ageing",
     type: "text",
     unit: null,
     kinds: ["distillery"],

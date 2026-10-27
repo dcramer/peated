@@ -25,7 +25,8 @@ The document holds:
 - **Site facts**: typed facts about a production site, such as the number of
   stills or the water source, and how it makes its spirit: malting, peating,
   washbacks, fermentation time, distillation, still shape, and condensers,
-  and what its spirit is mainly used for, such as a named blend.
+  what its spirit is mainly used for, such as a named blend, and where and
+  how it ages.
   These undated details can only reach the page as site facts, since every
   sentence cites a fact. `apps/server/src/lib/entityAbout/aboutFactFields.ts`
   lists them. Adding one is one entry there; a text value must appear word for
