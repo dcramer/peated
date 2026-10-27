@@ -39,7 +39,9 @@ and keeps its saved proposal. Repairing an already assigned review uses the
 same assessment; only a moderator's repair may replace the current Bottle.
 Completed unresolved attempts, including ignored inputs, appear in the
 Moderation Inbox. A moderator can read the saved evidence, assign an existing
-Bottle, or request a new check. A missing Bottle can be added through the
+Bottle, or request a new check. Reviews matched before runs were saved have no
+saved decision, so the review page also lists catalog candidates for the
+review's name from `GET /bottles/create-candidates`, which makes no model call. A missing Bottle can be added through the
 catalog form before assignment. Assignment publishes a staged review only
 when its source is approved; it never restores removed content.
 

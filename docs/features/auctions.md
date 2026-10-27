@@ -95,7 +95,9 @@ admin retry. Detail runs do not count as listing refreshes in source health.
 Deployment does not request details for existing review lots.
 
 Moderators review unresolved lots, including ended lots, in the Inbox. Protected
-lot details and saved-run APIs provide source facts and evidence. The UI sends
+lot details and saved-run APIs provide source facts and evidence. The lot page
+shows the lot image and sale result, and lists the active Bottles the saved
+check considered; choosing one assigns just the lot. The UI sends
 the observed fingerprint, previous Bottle ID, and check ID. "Assign this lot"
 changes only the lot. "Assign and remember name" also accepts a normalized Bottle
 reference, but requires a current `global_alias` match and its suggested Bottle.

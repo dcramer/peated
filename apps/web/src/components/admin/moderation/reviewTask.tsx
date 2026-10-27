@@ -9,10 +9,12 @@ import {
 } from "@peated/web/components/admin/adminContent.stylex";
 import { AdminTextareaField } from "@peated/web/components/admin/adminForm.stylex";
 import { AdminAlert as Alert } from "@peated/web/components/admin/adminUtility.stylex";
+import { BottleMatchList } from "@peated/web/components/bottleMatchList.stylex";
 import { TextLink } from "@peated/web/components/textLink.stylex";
 import { useORPC } from "@peated/web/lib/orpc/context";
 import {
   useMutation,
+  useQuery,
   useQueryClient,
   useSuspenseQuery,
 } from "@tanstack/react-query";
@@ -61,6 +63,12 @@ export default function ReviewTask({
   const { data: item } = useSuspenseQuery(
     orpc.externalReviews.resolution.queryOptions({
       input: { externalReview: task.source.reviewId },
+    }),
+  );
+  // Catalog search, not a model call: many reviews have no saved decision.
+  const candidates = useQuery(
+    orpc.bottles.createCandidates.queryOptions({
+      input: { name: item.review.name, limit: 5 },
     }),
   );
   const update = useMutation(orpc.externalReviews.update.mutationOptions());
@@ -121,7 +129,7 @@ export default function ReviewTask({
       ) : decision?.rationale ? (
         <p>{decision.rationale}</p>
       ) : (
-        <p>No supported matching decision is available.</p>
+        <p>No matching decision was saved for this review.</p>
       )}
       {decision?.confidenceBasis?.unresolvedRisks.length ? (
         <ul>
@@ -146,6 +154,36 @@ export default function ReviewTask({
           </AdminDetails>
         </AdminSection>
       ) : null}
+      <AdminSection title="Possible bottles">
+        {candidates.isPending ? (
+          <p role="status">Searching the catalog…</p>
+        ) : candidates.isError ? (
+          <p role="status">
+            The catalog search failed. Use Choose a bottle instead.
+          </p>
+        ) : candidates.data.results.length ? (
+          <>
+            <p>
+              Found by searching the catalog for this review&rsquo;s name.
+              Choose one only if the review is about that bottle.
+            </p>
+            <BottleMatchList
+              bottles={candidates.data.results}
+              onUse={(bottle) =>
+                void finish(
+                  () => update.mutateAsync(reviewAssignment(item, bottle.id)),
+                  "Review assigned.",
+                ).catch(showError)
+              }
+              pendingBottleId={
+                update.isPending ? (update.variables?.bottle ?? null) : null
+              }
+            />
+          </>
+        ) : (
+          <p role="status">No similar bottles found.</p>
+        )}
+      </AdminSection>
       {error ? <Alert type="error">{error}</Alert> : null}
       <ModerationActions>
         <Button
