@@ -75,6 +75,7 @@ their records remain. Test-case corrections are separate from classifier changes
 | [C35: Remove copied eval examples](./C35-remove-copied-eval-examples.md)             | Remove nine eval inputs copied into the extractor's examples                            | Accepted by policy: Octomore 13.1 3/3 to 0/3; other cases within noise                 |
 | [C36: Extractor naming rule](./C36-extractor-naming-rule.md)                         | Align the extractor's name fields with the naming rule                                  | Accepted: 107 vs 99 of 132; Octomore extracts whole but still declines                 |
 | [C37: Decision vocabulary](./C37-decision-vocabulary.md)                             | Define `webEvidence` values and which fields can conflict                               | Entity rule accepted alone: 191 vs 189; `webEvidence` definitions rejected: 185 vs 191 |
+| [C38: Release name defines a Bottle](./C38-release-name-defines-bottle.md)           | Treat a release name kept in `name` as defining a distinct Bottle                       | Accepted: 307 vs 304 of 351; no wrong matches vs 3; Elijah Craig Cask Strength 1/3     |
 
 C09 and C10 add narrow checks after Luna, and C11 removes model work for an
 identity Peated has already accepted. The measurement and test-case corrections

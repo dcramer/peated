@@ -10,7 +10,7 @@
     "extractedIdentity": {
       "brand": "High West",
       "bottler": null,
-      "expression": "A Midwinter Night's Dram",
+      "expression": "A Midwinter Night's Dram Act 10 Scene 4",
       "series": "A Midwinter Night's Dram",
       "distillery": ["High West"],
       "category": "rye",
@@ -20,7 +20,7 @@
       "vintage_year": null,
       "cask_strength": null,
       "single_cask": null,
-      "edition": "Act 10 Scene 4"
+      "edition": null
     },
     "imageEvidence": {
       "sourceImageId": "high-west-midwinter-act-10-scene-4",
@@ -46,18 +46,13 @@
           "sourceExtractorIndexes": [0]
         },
         "expression": {
-          "value": "A Midwinter Night's Dram",
+          "value": "A Midwinter Night's Dram Act 10 Scene 4",
           "confidence": 0.98,
           "sourceExtractorIndexes": [0]
         },
         "abv": {
           "value": 49.3,
           "confidence": 0.98,
-          "sourceExtractorIndexes": [0]
-        },
-        "edition": {
-          "value": "Act 10 Scene 4",
-          "confidence": 0.97,
           "sourceExtractorIndexes": [0]
         }
       },

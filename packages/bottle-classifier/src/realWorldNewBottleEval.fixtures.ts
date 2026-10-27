@@ -169,10 +169,9 @@ const REAL_WORLD_NEW_BOTTLE_EVAL_OVERRIDES: NewBottleEvalOverrides = {
     input: {
       extractedIdentity: buildExtractedIdentity({
         brand: "Highland Park",
-        expression: "Cask Strength",
+        expression: "Cask Strength No. 5",
         distillery: ["Highland Park"],
         category: "single_malt",
-        edition: "No. 5",
       }),
       initialCandidates: [highlandParkCaskStrengthParent],
     },
