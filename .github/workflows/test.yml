@@ -356,11 +356,16 @@ jobs:
           done
           exit "$failed"
   e2e:
-    name: "test / web e2e"
+    name: "test / web e2e (${{ matrix.shard }}/${{ matrix.total }})"
     runs-on: ubuntu-latest
     timeout-minutes: 15
     needs: changes
     if: github.event_name == 'push' || needs.changes.outputs.ci == 'true' || needs.changes.outputs.e2e == 'true' || needs.changes.outputs.repo == 'true'
+    strategy:
+      fail-fast: false
+      matrix:
+        shard: [1, 2]
+        total: [2]
     steps:
       - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
         with:
@@ -388,4 +393,4 @@ jobs:
       - name: Install Playwright browser
         run: pnpm --dir apps/web exec playwright install chromium
       - name: Run e2e tests
-        run: pnpm test:e2e
+        run: pnpm --dir apps/web test:e2e --shard=${{ matrix.shard }}/${{ matrix.total }}
