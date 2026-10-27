@@ -95,7 +95,7 @@ function trimToStatedPrecision(quotes: readonly string[], date: string) {
   const m = `0?${Number(month)}`;
   // Pages often glue a word to a number, as in "Incorporated on11 November".
   const spaced = quotes.map((quote) =>
-    quote.replace(/(\p{L})(\p{N})/gu, "$1 $2"),
+    expandJapaneseEras(quote).replace(/(\p{L})(\p{N})/gu, "$1 $2"),
   );
   // A quote that names another year is about another date, so its month or
   // day does not count; a timeline quote with no year can.
@@ -517,6 +517,29 @@ function expandYearRanges(value: string) {
   return years.length ? `${value} ${years.join(" ")}` : value;
 }
 
+// Japanese pages often give a year in the era calendar, as in "昭和42年" for
+// 1967. Each Western year is added after the text, like a year range's end.
+const JAPANESE_ERA_START = {
+  明治: 1867,
+  大正: 1911,
+  昭和: 1925,
+  平成: 1988,
+  令和: 2018,
+} as const;
+
+function expandJapaneseEras(value: string) {
+  const years = [
+    ...value.matchAll(/(明治|大正|昭和|平成|令和)\s*(元|\d{1,2})\s*年/g),
+  ].map(([, era, n]) =>
+    String(
+      // SAFETY: the pattern only matches the era names that are this object's keys.
+      JAPANESE_ERA_START[era as keyof typeof JAPANESE_ERA_START] +
+        (n === "元" ? 1 : Number(n)),
+    ),
+  );
+  return years.length ? `${value} ${years.join(" ")}` : value;
+}
+
 // Pages write small counts as words: "two wash stills" states 2. Only a
 // number written as one word from two to twelve is read; "one" is left out
 // because pages use it in many other ways. A run of number words such as
@@ -677,7 +700,9 @@ function containsNumber(text: string, number: string) {
   const pattern = new RegExp(
     `(?<!\\d|\\d\\.)${number.replace(".", "\\.")}(?!\\d|\\.\\d)`,
   );
-  const written = stripThousands(expandYearRanges(writeNumberWords(text)));
+  const written = stripThousands(
+    expandJapaneseEras(expandYearRanges(writeNumberWords(text))),
+  );
   return pattern.test(written) || pattern.test(expandLargeNumbers(written));
 }
 
