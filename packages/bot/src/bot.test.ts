@@ -1,7 +1,7 @@
 import { describe, expect, test } from "vitest";
 import { createPeatedBot } from "./bot";
 import { BOT_USER_AGENT } from "./identity";
-import { type BotSite, createMemorySiteStore } from "./sites";
+import { type BotSiteSettings, createMemoryCache } from "./sites";
 
 const FIRECRAWL = { apiKey: "test-key", apiUrl: "https://firecrawl.test" };
 const NOW = new Date("2026-10-27T12:00:00Z");
@@ -62,25 +62,38 @@ function setup(
     sites: initial = {},
     firecrawl = FIRECRAWL,
   }: {
-    sites?: Record<string, Partial<BotSite>>;
+    sites?: Record<string, Partial<BotSiteSettings>>;
     firecrawl?: typeof FIRECRAWL | null;
   } = {},
 ) {
   const network = createNetwork(routes);
-  const sites = createMemorySiteStore(initial);
+  const clock = { now: NOW };
+  const sites = new Map(
+    Object.entries(initial).map(([origin, site]) => [
+      origin,
+      { robotsException: false, blocked: false, ...site },
+    ]),
+  );
+  const botWalls: string[] = [];
   const bot = createPeatedBot({
-    sites,
+    cache: createMemoryCache(() => clock.now),
+    getSite: async (origin) =>
+      sites.get(origin) ?? { robotsException: false, blocked: false },
+    onBotWall: async (origin) => {
+      botWalls.push(origin);
+      sites.set(origin, { robotsException: false, blocked: true });
+    },
     firecrawl,
     privateJwk: null,
     fetch: network.fetch,
-    now: () => NOW,
+    now: () => clock.now,
   });
-  return { ...network, sites, ...bot };
+  return { ...network, clock, botWalls, ...bot };
 }
 
 describe("readPage", () => {
   test("reads a page directly as PeatedBot and caches robots.txt", async () => {
-    const { readPage, sent, sites } = setup({
+    const { readPage, sent, clock } = setup({
       "https://shop.example/robots.txt": text("User-agent: *\nAllow: /"),
       "https://shop.example/a": text("<html>A</html>"),
       "https://shop.example/b": text("<html>B</html>"),
@@ -101,9 +114,10 @@ describe("readPage", () => {
     expect(sent("https://shop.example/a")[0]?.headers.get("user-agent")).toBe(
       BOT_USER_AGENT,
     );
-    expect(
-      (await sites.get("https://shop.example"))?.robots?.expiresAt,
-    ).toEqual(new Date("2026-10-28T12:00:00Z"));
+
+    clock.now = new Date("2026-10-28T12:00:01Z");
+    await readPage({ url: "https://shop.example/b", format: "html" });
+    expect(sent("https://shop.example/robots.txt")).toHaveLength(2);
   });
 
   test("does not read a page robots.txt disallows, by any route", async () => {
@@ -165,7 +179,7 @@ describe("readPage", () => {
   });
 
   test("marks a website blocked at a bot wall and reads it through Firecrawl after that", async () => {
-    const { readPage, sent, sites, firecrawlBodies } = setup({
+    const { readPage, sent, botWalls, firecrawlBodies } = setup({
       "https://shop.example/robots.txt": text("User-agent: *\nAllow: /"),
       "https://shop.example/a": text("Just a moment...", {
         status: 403,
@@ -184,7 +198,7 @@ describe("readPage", () => {
       content: "<html>https://shop.example/a</html>",
       route: "firecrawl",
     });
-    expect((await sites.get("https://shop.example"))?.blockedAt).toEqual(NOW);
+    expect(botWalls).toEqual(["https://shop.example"]);
 
     await readPage({ url: "https://shop.example/b", format: "html" });
     expect(sent("https://shop.example/b")).toHaveLength(0);
@@ -199,7 +213,7 @@ describe("readPage", () => {
   });
 
   test("never bypasses a plain 403 or a login", async () => {
-    const { readPage, firecrawlBodies, sites } = setup({
+    const { readPage, firecrawlBodies, botWalls } = setup({
       "https://shop.example/robots.txt": text("User-agent: *\nAllow: /"),
       "https://shop.example/forbidden": text("no", { status: 403 }),
       "https://shop.example/account": text("log in", { status: 401 }),
@@ -217,7 +231,7 @@ describe("readPage", () => {
     ).resolves.toMatchObject({ status: "refused", reason: "login_required" });
 
     expect(await firecrawlBodies("scrape")).toEqual([]);
-    expect((await sites.get("https://shop.example"))?.blockedAt).toBeNull();
+    expect(botWalls).toEqual([]);
   });
 
   test("reads robots.txt through Firecrawl when it sits behind the bot wall", async () => {

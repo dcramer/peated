@@ -16,9 +16,10 @@ import {
   ROBOTS_MAX_BYTES,
   robotsAllowsUrl,
   type RobotsRules,
+  RobotsRulesSchema,
 } from "./robots";
 import { signRequest } from "./signing";
-import { type BotSiteStore, NEW_BOT_SITE } from "./sites";
+import type { BotCache, BotSiteSettings } from "./sites";
 
 const MAX_REDIRECTS = 5;
 const DEFAULT_TIMEOUT_MS = 20_000;
@@ -176,12 +177,18 @@ function robotsText(body: string) {
     .replace(/&amp;/g, "&");
 }
 
+function robotsCacheKey(origin: string) {
+  return `peatedbot:robots:${origin}`;
+}
+
 /**
  * Creates PeatedBot's page reader and web search. Every read follows the
  * blocked websites policy in `docs/policies/blocked-websites.md`.
  */
 export function createPeatedBot({
-  sites,
+  cache,
+  getSite,
+  onBotWall,
   firecrawl,
   privateJwk,
   fetch: fetchOverride,
@@ -189,7 +196,15 @@ export function createPeatedBot({
   timeoutMs = DEFAULT_TIMEOUT_MS,
   maxBytes = DEFAULT_MAX_BYTES,
 }: {
-  sites: BotSiteStore;
+  /** Holds robots.txt rules for 24 hours. */
+  cache: BotCache;
+  /** Looks up a website's settings, which the caller stores. */
+  getSite: (origin: string) => Promise<BotSiteSettings>;
+  /**
+   * Called when a direct read of `origin` hits a bot wall. The caller should
+   * store the website as blocked so later reads go through Firecrawl.
+   */
+  onBotWall: (origin: string) => Promise<void>;
   /** Required for markdown reads, search, and reading past a bot wall. */
   firecrawl: FirecrawlConfig | null;
   /** The `PEATED_BOT_PRIVATE_JWK` secret. Requests stay unsigned without it. */
@@ -202,10 +217,6 @@ export function createPeatedBot({
 }) {
   const directFetch = fetchOverride ?? fetchPublicUrl;
   const serviceFetch = fetchOverride ?? fetch;
-
-  async function getSite(origin: string) {
-    return (await sites.get(origin)) ?? NEW_BOT_SITE;
-  }
 
   async function fetchDirect(
     start: URL,
@@ -325,14 +336,30 @@ export function createPeatedBot({
     return "unavailable";
   }
 
-  /** Returns a refusal, or null when robots.txt allows reading `url`. */
-  async function checkRobots(url: URL): Promise<PageRead | null> {
-    const site = await getSite(url.origin);
-    // Robots.txt exceptions are recorded by an admin for one website.
-    if (site.robotsException) return null;
+  async function getCachedRobotsRules(origin: string) {
+    const cached = await cache.get(robotsCacheKey(origin));
+    if (cached === null) return null;
+    let value: unknown;
+    try {
+      value = JSON.parse(cached);
+    } catch {
+      // A damaged cache entry is treated as missing and fetched again.
+      return null;
+    }
+    const parsed = RobotsRulesSchema.safeParse(value);
+    return parsed.success ? parsed.data : null;
+  }
 
-    let rules =
-      site.robots && site.robots.expiresAt > now() ? site.robots.rules : null;
+  /** Returns a refusal, or null when robots.txt allows reading `url`. */
+  async function checkRobots(
+    url: URL,
+    site?: BotSiteSettings,
+  ): Promise<PageRead | null> {
+    const settings = site ?? (await getSite(url.origin));
+    // Robots.txt exceptions are recorded by an admin for one website.
+    if (settings.robotsException) return null;
+
+    let rules: RobotsRules | null = await getCachedRobotsRules(url.origin);
     if (!rules) {
       const fetched = await fetchRobotsRules(url);
       if (fetched === "not_public") {
@@ -346,10 +373,10 @@ export function createPeatedBot({
         };
       }
       rules = fetched;
-      await sites.saveRobots(
-        url.origin,
-        rules,
-        new Date(now().getTime() + ROBOTS_CACHE_MS),
+      await cache.set(
+        robotsCacheKey(url.origin),
+        JSON.stringify(rules),
+        ROBOTS_CACHE_MS,
       );
     }
     if (!robotsAllowsUrl(rules, url)) {
@@ -436,7 +463,7 @@ export function createPeatedBot({
       accept: "text/html,application/xhtml+xml,*/*;q=0.8",
       limit: maxBytes,
       truncate: false,
-      beforeRedirect: checkRobots,
+      beforeRedirect: (next) => checkRobots(next),
     });
     switch (outcome.kind) {
       case "ok":
@@ -450,7 +477,7 @@ export function createPeatedBot({
       case "refused":
         return outcome.read;
       case "bot_wall":
-        await sites.markBlocked(outcome.url.origin, now());
+        await onBotWall(outcome.url.origin);
         return await readWithFirecrawl(url, "html");
       case "status":
         if (outcome.status === 401) {
@@ -503,12 +530,12 @@ export function createPeatedBot({
       throw new Error("PeatedBot needs Firecrawl to read pages as markdown.");
     }
 
-    const refusal = await checkRobots(url);
+    const site = await getSite(url.origin);
+    const refusal = await checkRobots(url, site);
     if (refusal) return refusal;
 
     if (format === "markdown") return await readWithFirecrawl(url, format);
-    const site = await getSite(url.origin);
-    if (site.blockedAt) return await readWithFirecrawl(url, format);
+    if (site.blocked) return await readWithFirecrawl(url, format);
     return await readDirect(url);
   }
 

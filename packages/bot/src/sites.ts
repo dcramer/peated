@@ -1,53 +1,36 @@
-import type { RobotsRules } from "./robots";
+/**
+ * Where PeatedBot keeps short-lived values, such as robots.txt rules. The
+ * server backs it with Redis. A value may disappear at any time.
+ */
+export type BotCache = {
+  get(key: string): Promise<string | null>;
+  set(key: string, value: string, ttlMs: number): Promise<void>;
+};
 
-/** What PeatedBot remembers about one website, keyed by its origin. */
-export type BotSite = {
+/**
+ * One website's long-term settings. The caller stores them; PeatedBot only
+ * reads them and reports changes through `onBotWall`.
+ */
+export type BotSiteSettings = {
   /** An admin's recorded robots.txt exception for this website. */
   robotsException: boolean;
-  /** The website's cached robots.txt rules, or null before the first check. */
-  robots: { rules: RobotsRules; expiresAt: Date } | null;
-  /** When a direct request last hit a bot wall. Null means read directly. */
-  blockedAt: Date | null;
+  /** A direct request hit a bot wall, so reads go through Firecrawl. */
+  blocked: boolean;
 };
 
-/** Where PeatedBot keeps website settings between reads. */
-export type BotSiteStore = {
-  get(origin: string): Promise<BotSite | null>;
-  saveRobots(
-    origin: string,
-    rules: RobotsRules,
-    expiresAt: Date,
-  ): Promise<void>;
-  markBlocked(origin: string, blockedAt: Date): Promise<void>;
-};
-
-/** A website PeatedBot has not seen yet. */
-export const NEW_BOT_SITE: BotSite = {
-  robotsException: false,
-  robots: null,
-  blockedAt: null,
-};
-
-/** Keeps website settings in memory, for tests, evals, and local scripts. */
-export function createMemorySiteStore(
-  initial: Record<string, Partial<BotSite>> = {},
-): BotSiteStore {
-  const sites = new Map<string, BotSite>(
-    Object.entries(initial).map(([origin, site]) => [
-      origin,
-      { ...NEW_BOT_SITE, ...site },
-    ]),
-  );
-  const update = (origin: string, change: Partial<BotSite>) => {
-    sites.set(origin, { ...NEW_BOT_SITE, ...sites.get(origin), ...change });
-  };
+/** Keeps cached values in memory, for tests, evals, and local scripts. */
+export function createMemoryCache(
+  now: () => Date = () => new Date(),
+): BotCache {
+  const values = new Map<string, { value: string; expiresAt: number }>();
   return {
-    get: async (origin) => sites.get(origin) ?? null,
-    saveRobots: async (origin, rules, expiresAt) => {
-      update(origin, { robots: { rules, expiresAt } });
+    get: async (key) => {
+      const entry = values.get(key);
+      if (!entry || entry.expiresAt <= now().getTime()) return null;
+      return entry.value;
     },
-    markBlocked: async (origin, blockedAt) => {
-      update(origin, { blockedAt });
+    set: async (key, value, ttlMs) => {
+      values.set(key, { value, expiresAt: now().getTime() + ttlMs });
     },
   };
 }

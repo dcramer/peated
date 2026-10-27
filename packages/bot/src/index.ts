@@ -23,7 +23,7 @@ export {
 } from "./robots";
 export { signRequest } from "./signing";
 export {
-  createMemorySiteStore,
-  type BotSite,
-  type BotSiteStore,
+  createMemoryCache,
+  type BotCache,
+  type BotSiteSettings,
 } from "./sites";

@@ -8,7 +8,9 @@ read follows the [blocked websites policy](../../docs/policies/blocked-websites.
 import { createPeatedBot } from "@peated/bot";
 
 const bot = createPeatedBot({
-  sites, // where website settings are kept
+  cache, // short-lived values, backed by Redis on the server
+  getSite, // (origin) => the caller's settings for one website
+  onBotWall, // (origin) => the caller stores the website as blocked
   firecrawl: { apiKey, apiUrl }, // or null
   privateJwk, // PEATED_BOT_PRIVATE_JWK, or null to send unsigned requests
 });
@@ -62,11 +64,19 @@ disallows it.
 `searchWeb` returns links, titles, and descriptions from Firecrawl search. It
 does not read the pages. Read a result with `readPage` to use it.
 
-## Website settings
+## Cache and website settings
 
-`sites` is a `BotSiteStore` that keeps, for each website origin, its cached
-robots.txt rules, any robots.txt exception, and when it was marked blocked. Use
-`createMemorySiteStore` in tests, evals, and local scripts.
+PeatedBot does not use a database. It keeps short-lived values in `cache`, a
+`BotCache` with `get` and `set`. Robots.txt rules are cached there for 24
+hours. The server backs the cache with Redis; tests, evals, and local scripts
+use `createMemoryCache`. A missing or damaged entry is fetched again. Errors
+from the cache throw, so a server cache that should fall back when Redis is
+down must do that itself.
+
+Long-term settings for each website belong to the caller. PeatedBot asks for
+them with `getSite(origin)`: whether an admin made a robots.txt exception, and
+whether the website is blocked. When a direct read hits a bot wall, PeatedBot
+calls `onBotWall(origin)` so the caller can store the website as blocked.
 
 ## Request signing
 
