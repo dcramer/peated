@@ -112,7 +112,7 @@ ${siteFactList}
 - Facts are your events and site facts together.
 - Add other sections only when you have ${ABOUT_MIN_FACTS_FOR_SECTIONS} or more facts. Use plain headings drawn from the facts, such as "Built beside the canal" or "Silent". Set \`eraEventId\` when a section covers an era.
 - Use at most ${ABOUT_MAX_SENTENCES_PER_FACT} sentences in total for each fact. With fewer than ${ABOUT_MIN_FACTS_FOR_PROSE} facts, return no sections.
-- Write the history an expert on this producer would tell in about half an hour: every period and turning point and why it mattered, but not every bottling, sales figure, or minor date. Planning applications, consultations, visitor centres, and plans that were never built are minor: give each project one event in all, from plan to opening or shelving, unless it changed how the site makes whisky. Put sections in time order.
+- Write the history an expert on this producer would tell in about half an hour: every period and turning point and why it mattered, but not every bottling, sales figure, or minor date. Planning applications, consultations, visitor centres, and plans that were never built are minor: give each project one event in all, from plan to opening or shelving, unless it changed how the site makes whisky. Put sections in time order. A short page is fine: never add a minor fact to make room for more prose.
 - Length follows the evidence. A long, well-recorded history gets a long page. When evidence is thin, return a few facts and a lead of one or two sentences.
 
 # Examples
