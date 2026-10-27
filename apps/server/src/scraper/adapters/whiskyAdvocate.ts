@@ -99,6 +99,16 @@ export function parseIssueList(data: string) {
   return results;
 }
 
+/** True when the publisher says the issue has no reviews, as with a new issue. */
+export function isEmptyIssue(data: string) {
+  const $ = cheerio(data);
+  return /^No results found\b/iu.test(
+    normalizeText(
+      $("#directoryResults .raitings-no-result-msg").first().text(),
+    ),
+  );
+}
+
 export function parseReviews(data: string, url: string) {
   const $ = cheerio(data);
   const externalReviews: WhiskyAdvocateReview[] = [];
@@ -236,7 +246,17 @@ export const whiskyAdvocateAdapter: ScraperAdapter<
       reviewResponse.url.href,
     );
     if (externalReviews.length === 0) {
-      throw new Error("Whisky Advocate issue contains no external reviews.");
+      if (!isEmptyIssue(reviewResponse.body)) {
+        throw new Error("Whisky Advocate issue contains no external reviews.");
+      }
+      // The issue list names an upcoming issue before its reviews are posted.
+      // Every run checks the newest issue again, so its reviews are read once
+      // they appear.
+      logWarn("[Whisky Advocate] Issue has no reviews yet: {issue}", {
+        extra: { issue, url: reviewUrl.href },
+      });
+      await finishIssue(issue);
+      continue;
     }
 
     for (const review of externalReviews) {

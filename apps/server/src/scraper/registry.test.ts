@@ -98,6 +98,11 @@ test("registers each built-in scraper source with its target", () => {
   expect(
     scraperRegistry.targets.get("smwsa")?.origins.map(({ origin }) => origin),
   ).toEqual(["https://newmake.smwsa.com", "https://smwsa.com"]);
+  expect(
+    scraperRegistry.targets
+      .get("cadenheads")
+      ?.origins.map(({ origin }) => origin),
+  ).toEqual(["https://www.cadenhead.shop", "https://www.cadenhead.scot"]);
   expect(EXTERNAL_SITE_DEFINITIONS.bourbonculture.initialRunEvery).toBe(1440);
   expectHourlyLimit("bourbonculture", 10);
   expect(scraperRegistry.targets.get("bruichladdich")).toBeDefined();

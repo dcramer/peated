@@ -60,6 +60,14 @@ use the model queue's existing pause and retry handling; other errors fail the
 job. Failed rechecks remain visible for manual resolution or rechecking and do
 not depend on another scraper import to recover.
 
+A review whose first match attempt failed has no completed answer, so it is not
+in the Inbox and the recheck route rejects it. Scrapers do not read a finished
+article again, so nothing else retries it. A moderator queues these reviews
+with `POST /external-reviews/match-pending`, which takes up to 100 pending
+reviews after `afterId`. Repeat with each returned `nextAfterId` until it is
+null. Each queued review uses one classifier request, so check the first page's
+results before queueing the rest.
+
 Stopping publication hides its reviews without deleting them or stopping
 collection. Only a moderator can change publication. Peated records the change
 in the audit log.
