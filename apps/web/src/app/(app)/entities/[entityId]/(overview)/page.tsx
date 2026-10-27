@@ -55,8 +55,10 @@ export default async function EntityPage(props: {
 
   if (entityHasBottleCatalog(entity)) {
     const bottleQueries = [
-      entityOverviewQueries.popularBottles(orpc, entity),
       entityOverviewQueries.releases(orpc, entity),
+      ...(entity.kind === "distillery"
+        ? [entityOverviewQueries.latestBottlings(orpc, entity)]
+        : []),
     ];
     prefetches.push(
       queryClient.prefetchQuery({
@@ -74,9 +76,6 @@ export default async function EntityPage(props: {
 
   if (entity.kind === "distillery") {
     prefetches.push(
-      queryClient.prefetchQuery(
-        entityOverviewQueries.seriesByBottleCount(orpc, entity),
-      ),
       queryClient.prefetchQuery(
         entityOverviewQueries.recentReviewsAndTastings(orpc, entity),
       ),

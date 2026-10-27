@@ -16,12 +16,22 @@ bottom:
 
 1. The About lead, with its sources.
 2. The timeline of names and producing years.
-3. A short catalog band: a company's brands, distilleries, and bottlers;
-   latest releases; Series; other bottlings.
+3. One catalog list, since the newest Bottles are usually what readers want.
+   It shows 4 rows and links to the full list on its tab:
+   - Distillery: its latest releases. A distillery with no releases of its
+     own shows the latest bottlings of its spirit, independents included.
+   - Brand or bottler: its latest releases.
+   - Company: its largest group of brands, distilleries, or bottlers.
+   - No Bottles yet: a prompt to add one.
+
+   Series, other bottlings, and the rest of a company's portfolio live on
+   their tabs.
+
 4. The History: the About sections, then the vintage and release-year charts.
-   The first 3 sections show; the rest wait behind a "Show the full history"
-   button and stay in the page's HTML.
-5. Recent activity.
+   When more than 4 sections exist, the first 3 show and the rest wait behind
+   a "Show the full history" button; they stay in the page's HTML. A "Sources
+   disagree" note is folded to one line until a reader opens it.
+5. Recent activity, for distilleries.
 6. Sources: a count and the date they were checked. The list opens with a
    button, or when a reader follows a citation number to it.
 

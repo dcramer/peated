@@ -66,7 +66,8 @@ nothing stored can go stale:
 
 - A fact needs at least one source.
 - When sources state different values, the page shows the chosen value and a
-  "Sources disagree" note with each value and its sources. The writer cites
+  "Sources disagree" note with each value and its sources. The note is folded
+  to one line until a reader opens it. The writer cites
   only real disagreements: it leaves off a value that agreed facts rule out, a
   value only a weak source gives, and an older plant value that a newer dated
   page replaces. Values where one is

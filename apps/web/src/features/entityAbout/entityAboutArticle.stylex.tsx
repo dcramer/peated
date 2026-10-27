@@ -85,11 +85,15 @@ function Disagreement({
   numbers: Map<string, number>;
 }) {
   if (!event.disagreement) return null;
+  // Folded to one line, so a section with several notes stays readable.
   return (
-    <aside {...stylex.props(styles.disagreement)}>
-      <p {...stylex.props(foundationStyles.fieldLabel, styles.noteLabel)}>
-        Sources disagree: {getDisagreementTopic(event)}
-      </p>
+    <details {...stylex.props(styles.disagreement)}>
+      <summary
+        {...stylex.props(foundationStyles.metadata, styles.disagreementSummary)}
+      >
+        Sources disagree: {getDisagreementTopic(event)}. This page uses{" "}
+        {event.date.slice(0, 4)}.
+      </summary>
       <ul {...stylex.props(styles.disagreementList)}>
         {event.disagreement.values.map((entry) => (
           <li
@@ -101,10 +105,7 @@ function Disagreement({
           </li>
         ))}
       </ul>
-      <p {...stylex.props(foundationStyles.metadata, styles.muted)}>
-        This page uses {event.date.slice(0, 4)}.
-      </p>
-    </aside>
+    </details>
   );
 }
 
@@ -248,12 +249,16 @@ export function EntityAboutHistory({
       section={section}
     />
   ));
-  const hiddenSections = sections.slice(ABOUT_VISIBLE_SECTIONS);
+  // A button that would hide a single section is not worth the click.
+  const hiddenSections =
+    sections.length > ABOUT_VISIBLE_SECTIONS + 1
+      ? sections.slice(ABOUT_VISIBLE_SECTIONS)
+      : [];
   if (!sections.length && !showVintages && !showReleaseYears) return null;
 
   return (
     <article id="history" {...stylex.props(styles.article)}>
-      {sections.slice(0, ABOUT_VISIBLE_SECTIONS)}
+      {sections.slice(0, sections.length - hiddenSections.length)}
       {hiddenSections.length ? (
         <ShowMore
           label={`Show the full history (${hiddenSections.length} more ${
@@ -453,21 +458,21 @@ const styles = stylex.create({
     textDecoration: { default: "none", ":hover": "underline" },
     paddingInline: "1px",
   },
-  noteLabel: {
-    margin: 0,
-  },
   disagreement: {
-    display: "flex",
-    flexDirection: "column",
-    gap: space.x1,
-    padding: space.x3,
+    paddingBlock: space.x2,
+    paddingInline: space.x3,
     borderWidth: "1px",
     borderStyle: "solid",
     borderColor: colors.sectionRule,
     borderRadius: "4px",
   },
+  disagreementSummary: {
+    color: colors.inkMuted,
+    cursor: "pointer",
+  },
   disagreementList: {
-    margin: 0,
+    marginTop: space.x2,
+    marginBottom: 0,
     paddingLeft: space.x4,
   },
   sources: {
