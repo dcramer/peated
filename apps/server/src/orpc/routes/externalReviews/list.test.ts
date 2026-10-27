@@ -598,6 +598,14 @@ describe("GET /external-reviews", () => {
     expect(unknownResults.results.every(({ bottle }) => bottle === null)).toBe(
       true,
     );
+
+    const recentUnknownResults = await routerClient.externalReviews.list(
+      { onlyUnknown: true, site: site.type },
+      { context: { user } },
+    );
+    expect(recentUnknownResults.results.map(({ id }) => id)).toEqual([
+      unresolved.id,
+    ]);
   });
 
   test("requires a moderator for unknown reviews even with a Bottle filter", async ({

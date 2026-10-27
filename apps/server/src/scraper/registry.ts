@@ -235,6 +235,11 @@ export const scraperRegistry = createScraperRegistry({
           origin: "https://www.cadenhead.shop",
           robots: { mode: "enforce" },
         },
+        // Cadenhead's redirects its original shop and robots.txt here.
+        {
+          origin: "https://www.cadenhead.scot",
+          robots: { mode: "enforce" },
+        },
       ],
     }),
     defineScrapeTarget({

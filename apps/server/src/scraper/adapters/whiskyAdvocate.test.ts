@@ -439,6 +439,63 @@ test("resumes an issue from its saved reviews", async () => {
   );
 });
 
+test("skips a newest issue that has no reviews yet and continues", async () => {
+  const searchHtml = await loadFixture("whiskyadvocate", "empty-search.html");
+  const issueHtml = keepFirstIssues(searchHtml, 2);
+  const $ = cheerio(searchHtml);
+  $("#directoryResults .raitings-no-result-msg").text(
+    "No results found. Please try other search criteria",
+  );
+  const emptyIssueHtml = $.html();
+  const reviewHtml = await loadFixture("whiskyadvocate", "bottle-list.html");
+  const articleHtml = await loadFixture("whiskyadvocate", "review-page.html");
+  const issues = parseIssueList(issueHtml);
+  const newestIssue = issues[0];
+  const observations: ScraperObservation<WhiskyAdvocateObservation>[] = [];
+  const request = vi.fn(async ({ url }: { url: URL }) => {
+    const issue = url.searchParams.get("custom_rating_issue[0]");
+    return {
+      url,
+      status: 200,
+      headers: {},
+      body:
+        url.pathname !== "/ratings-reviews"
+          ? articleHtml
+          : issue === newestIssue
+            ? emptyIssueHtml
+            : issue
+              ? reviewHtml
+              : issueHtml,
+    };
+  });
+  const checkpoint = vi.fn();
+
+  await whiskyAdvocateAdapter({
+    cursor: null,
+    session: {
+      request,
+      emit: async (observation) => {
+        observations.push(observation);
+      },
+      checkpoint,
+      remainingRequests: () => 400,
+    },
+  });
+
+  expect(observations).toHaveLength(166);
+  expect(checkpoint).toHaveBeenNthCalledWith(
+    1,
+    expect.objectContaining({
+      completedIssues: [newestIssue],
+      issue: null,
+      newestIssue: { issue: newestIssue, reviewUrls: [] },
+    }),
+  );
+  expect(checkpoint).toHaveBeenLastCalledWith(
+    expect.objectContaining({ completedIssues: issues, issue: null }),
+  );
+});
+
 test("fails when the newest issue has no review results", async () => {
   const issueHtml = keepFirstIssues(
     await loadFixture("whiskyadvocate", "empty-search.html"),

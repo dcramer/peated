@@ -40,7 +40,9 @@ export default implement(externalReviewListContract).handler(async function ({
     baseWhere.push(eq(externalReviewArticles.externalSiteId, site.id));
   }
 
-  if (sort === "recent") {
+  // The public recent feed shows matched, dated reviews. Unknown reviews have
+  // no Bottle, so that filter would always return nothing for them.
+  if (sort === "recent" && !input.onlyUnknown) {
     baseWhere.push(
       isNotNull(externalReviews.bottleId),
       isNotNull(externalReviewArticles.publishedAt),
