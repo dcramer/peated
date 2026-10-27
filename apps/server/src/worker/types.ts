@@ -6,7 +6,6 @@ export type JobName =
   | "CapturePriceImage"
   | "CleanupPendingUploads"
   | "CleanupWrongPhotoMatchPhotos"
-  | "GenerateBottleDetails"
   | "GenerateCountryDetails"
   | "GenerateEntityDetails"
   | "GenerateEntityPronunciationAudio"

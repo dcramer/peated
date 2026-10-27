@@ -22,10 +22,6 @@ test("dispatches derived work for the supplied Bottle", async ({
 
   await onBottleChange({ bottleId: bottle.id });
 
-  expect(workerClient.pushJob).not.toHaveBeenCalledWith(
-    "GenerateBottleDetails",
-    expect.anything(),
-  );
   expect(workerClient.runJob).toHaveBeenCalledWith("IndexBottleSearch", {
     bottleId: bottle.id,
   });
@@ -36,19 +32,17 @@ test("dispatches derived work for the supplied Bottle", async ({
   );
 });
 
-test("generates details only when explicitly requested", async ({
+test("still indexes jobs queued with the old generateDetails flag", async ({
   fixtures,
 }) => {
   const bottle = await fixtures.Bottle();
 
   await onBottleChange({ bottleId: bottle.id, generateDetails: true });
 
-  expect(workerClient.pushJob).toHaveBeenCalledWith("GenerateBottleDetails", {
-    bottleId: bottle.id,
-  });
   expect(workerClient.runJob).toHaveBeenCalledWith("IndexBottleSearch", {
     bottleId: bottle.id,
   });
+  expect(workerClient.pushJob).toHaveBeenCalledTimes(1);
 });
 
 test("skips stale work for a deleted Bottle", async () => {

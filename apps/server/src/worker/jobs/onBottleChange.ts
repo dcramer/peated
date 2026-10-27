@@ -7,7 +7,10 @@ import type { UpdateBottleStatsJobArgs } from "./updateBottleStats";
 export const OnBottleChangeJobArgsSchema = z
   .object({
     bottleId: z.number().int().positive(),
-    generateDetails: z.boolean().default(false),
+    // Deploy rule (docs/operations/deployments.md): an API released before
+    // generated Bottle details were removed still sends this flag. Accept and
+    // ignore it until that API and its queued jobs are gone, then delete it.
+    generateDetails: z.boolean().optional(),
   })
   .strict();
 
@@ -32,8 +35,7 @@ export function buildBottleChangeStatsJob(
 }
 
 export default async (input: JobPayload) => {
-  const { bottleId, generateDetails } =
-    OnBottleChangeJobArgsSchema.parse(input);
+  const { bottleId } = OnBottleChangeJobArgsSchema.parse(input);
 
   const bottle = await db.query.bottles.findFirst({
     columns: { id: true },
@@ -43,11 +45,6 @@ export default async (input: JobPayload) => {
   // this queued work is stale, so no derived Bottle state remains to update.
   if (!bottle) return;
 
-  // Generated details wait on a model, so they run on the models queue; the
-  // resulting patch queues another change, which re-indexes the Bottle.
-  if (generateDetails) {
-    await pushJob("GenerateBottleDetails", { bottleId });
-  }
   await runJob("IndexBottleSearch", { bottleId });
   const statsJob = buildBottleChangeStatsJob(bottleId);
   await pushJob(statsJob.name, statsJob.args, statsJob.opts);

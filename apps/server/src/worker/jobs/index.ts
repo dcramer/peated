@@ -4,7 +4,6 @@ import capturePriceImage from "./capturePriceImage";
 import cleanupPendingUploads from "./cleanupPendingUploads";
 import cleanupWrongPhotoMatchPhotos from "./cleanupWrongPhotoMatchPhotos";
 import createMissingBottles from "./createMissingBottles";
-import generateBottleDetails from "./generateBottleDetails";
 import generateCountryDetails from "./generateCountryDetails";
 import generateEntityDetails from "./generateEntityDetails";
 import generateEntityPronunciationAudio from "./generateEntityPronunciationAudio";
@@ -61,10 +60,6 @@ registry.add("ResolveAuctionLot", resolveAuctionLot, {
 });
 registry.add("CleanupPendingUploads", cleanupPendingUploads);
 registry.add("CleanupWrongPhotoMatchPhotos", cleanupWrongPhotoMatchPhotos);
-registry.add("GenerateBottleDetails", generateBottleDetails, {
-  queueName: "models",
-  unique: true,
-});
 registry.add("GenerateCountryDetails", generateCountryDetails, {
   queueName: "models",
 });
