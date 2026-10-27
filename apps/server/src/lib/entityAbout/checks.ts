@@ -613,8 +613,8 @@ function writeNumberWords(value: string) {
 
 // Capacities and prices are often written in millions or billions: "1.6m
 // litres" and "1.6 million litres" state 1600000, "£1.2bn" and "1.2 billion"
-// state 1200000000. An "m" or "bn" must touch the number, so "1887 M." and
-// "20 m" are not millions.
+// state 1200000000, and "200k lpa" states 200000. A "k", "m" or "bn" must
+// touch the number, so "1887 M." and "20 m" are not millions.
 function expandLargeNumbers(value: string) {
   // "mlpa" or "mla" is million litres of (pure) alcohol: "4.8 mlpa", "6.5mla",
   // or a table label such as "Capacity (mlpa) 3.4", where an "i" info icon
@@ -628,9 +628,13 @@ function expandLargeNumbers(value: string) {
       millionLitres(n),
     )
     .replace(
-      /\b(\d+(?:\.\d+)?)(m|\s*million|bn|\s*billion)\b/gi,
+      /\b(\d+(?:\.\d+)?)(k|m|\s*million|bn|\s*billion)\b/gi,
       (_, n: string, unit: string) =>
-        String(Math.round(Number(n) * (/b/i.test(unit) ? 1e9 : 1e6))),
+        String(
+          Math.round(
+            Number(n) * (/b/i.test(unit) ? 1e9 : /k/i.test(unit) ? 1e3 : 1e6),
+          ),
+        ),
     );
 }
 

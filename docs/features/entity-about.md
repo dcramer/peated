@@ -158,7 +158,7 @@ it:
   quote from the same page as one the current page already has, and state
   the citation's value. A fact stands only when a kept quote states its year
   (or number); a short range such as "1931-38" states both years, the words
-  two to twelve state their numbers, "1.6m" and "1.6 mlpa" (million litres of pure alcohol) state 1600000 and "£1.2bn" 1200000000, and a dated
+  two to twelve state their numbers, "200k" states 200000, "1.6m" and "1.6 mlpa" (million litres of pure alcohol) state 1600000, and "£1.2bn" 1200000000, and a dated
   article's publication date counts when its year is on the page read or the
   current page has the same date. An event's month or day that no quote
   states is trimmed, so the date keeps only the year or month the quotes give.
