@@ -11,6 +11,7 @@ import rebuildPronunciationAudio from "./rebuild-pronunciation-audio";
 import rebuildSearch from "./rebuild-search";
 import reports from "./reports";
 import scraperActivity from "./scraper-activity";
+import syncEntityDescriptions from "./sync-entity-descriptions";
 import writeEntityAbout from "./write-entity-about";
 import wrongPhotoMatches from "./wrongPhotoMatches";
 
@@ -27,6 +28,7 @@ export default base.tag("admin").router({
   rebuildPronunciationAudio,
   reports,
   scraperActivity,
+  syncEntityDescriptions,
   wrongPhotoMatches,
   writeEntityAbout,
 });
