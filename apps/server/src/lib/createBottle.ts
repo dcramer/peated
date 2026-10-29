@@ -9,7 +9,10 @@ import {
   normalizeBottleReferenceKey,
   stripDuplicateBrandPrefixFromBottleName,
 } from "@peated/bottle-classifier/normalize";
-import { parseReferenceName as parseSmwsReferenceName } from "@peated/bottle-classifier/smws";
+import {
+  isNonWhiskySmwsCode,
+  parseReferenceName as parseSmwsReferenceName,
+} from "@peated/bottle-classifier/smws";
 import { type CatalogVerificationCreationSource } from "@peated/catalog-verifier";
 import { db, type AnyTransaction } from "@peated/server/db";
 import type {
@@ -260,6 +263,13 @@ async function prepareBottleCreateInTransaction(
     bottler: bottleData.bottler ?? null,
   };
   const attemptedSmwsCode = getSmwsCodeForBottleIdentity(attemptedSmwsIdentity);
+  // Peated records whisky only (owner: catalog maintainers). An SMWS code
+  // says when a Society bottle is rum, gin or brandy, whatever made it.
+  if (attemptedSmwsCode && isNonWhiskySmwsCode(attemptedSmwsCode)) {
+    throw new BottleCreateBadRequestError(
+      `SMWS ${attemptedSmwsCode} is not whisky, and Peated records whisky only.`,
+    );
+  }
   const existingSmwsBottleId = await findConflictingSmwsBottleId(
     tx,
     attemptedSmwsIdentity,

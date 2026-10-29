@@ -4,6 +4,7 @@ import {
   SMWS_DISTILLERY_CODES,
   composeExactCaskCodeFromComponents,
   getCategoryFromCask,
+  isNonWhiskySmwsCode,
   parseDetailsFromName,
   parseReferenceName,
 } from "./smws";
@@ -19,6 +20,15 @@ describe("smws", () => {
       distiller: "Dailuaine",
       name: "41.176 Baristaliscious",
     });
+  });
+
+  test("names rum, gin, cognac and armagnac codes as not whisky", () => {
+    for (const code of ["R11.9", "GN3.4", "C3.1", "A2.2", "gn5"]) {
+      expect(isNonWhiskySmwsCode(code)).toBe(true);
+    }
+    for (const code of ["41.176", "RW3.6", "CW2.1", "B7.7", "G9.6", "SM0.1"]) {
+      expect(isNonWhiskySmwsCode(code)).toBe(false);
+    }
   });
 
   test("maps SMWS cask codes to categories", () => {

@@ -469,6 +469,41 @@ describe("Bottle creation", () => {
     );
   });
 
+  test("refuses Society rum, gin and brandy because they are not whisky", async ({
+    defaults,
+    fixtures,
+  }) => {
+    const context = contextFor(defaults.user);
+    const smws = await fixtures.Entity({
+      kind: "bottler",
+      name: "SMWS Spirit Guard Society",
+      shortName: "SMWS",
+    });
+
+    await expect(
+      createBottle({
+        context,
+        input: {
+          name: "R11.9 Banana bonanza",
+          brand: smws.id,
+          bottler: smws.id,
+          singleCask: true,
+        },
+      }),
+    ).rejects.toBeInstanceOf(BottleCreateBadRequestError);
+
+    const whisky = await createBottle({
+      context,
+      input: {
+        name: "RW3.6 Truly a flavour bomb",
+        brand: smws.id,
+        bottler: smws.id,
+        singleCask: true,
+      },
+    });
+    expect(whisky.bottle.id).toBeGreaterThan(0);
+  });
+
   test("returns only Bottle-native identity when reusing an exact structured identity", async ({
     defaults,
     fixtures,

@@ -531,6 +531,11 @@ canonical name, and the previous canonical name remains a reference. Its
 canonical Bottle name is `<distillery number>.<cask number> <subtitle>`. Exact
 traits stay in structured fields and are not appended to that name.
 
+Peated records whisky only. SMWS also bottles rum (`R`), gin (`GN`), cognac
+(`C`) and armagnac (`A`) under its own codes. The SMWS scrapers skip those
+codes, and Bottle creation refuses them from any source. Rye (`RW`) and corn
+whisky (`CW`) codes are whisky.
+
 ## Activity Identity
 
 Tastings, reviews, collection entries, flights, prices, references,

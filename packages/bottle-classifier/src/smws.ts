@@ -294,6 +294,19 @@ export const SMWS_CATEGORY_LIST = [
   ["A", "Armagnac"],
 ];
 
+// Peated records whisky only (owner: catalog maintainers). These prefixes in
+// SMWS_CATEGORY_LIST are rum, gin, cognac and armagnac.
+const SMWS_NON_WHISKY_PREFIXES = new Set(["R", "GN", "C", "A"]);
+
+/**
+ * Whether an SMWS code, such as `R11.9` or `GN3`, names a spirit that is not
+ * whisky. Rye (`RW`) and corn whisky (`CW`) codes are whisky.
+ */
+export function isNonWhiskySmwsCode(code: string): boolean {
+  const prefix = /^([A-Z]*)\d/iu.exec(code.trim())?.[1]?.toUpperCase();
+  return prefix ? SMWS_NON_WHISKY_PREFIXES.has(prefix) : false;
+}
+
 export function getCategoryFromCask(caskNumber: string): Category | null {
   if (caskNumber.startsWith("GN")) {
     return null;
