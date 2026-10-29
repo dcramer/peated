@@ -11,13 +11,19 @@ export function parseScotchWhiskyAuctionDetails(html: string) {
   if (!name || !$(".lotinfo .descr").length)
     throw new Error("Auction lot detail facts are missing.");
   const facts: Partial<BottleExtractedDetails> = {};
+  // A page with conflicting facts, such as a two-bottle set, leaves them unknown.
+  const conflicts = new Set<keyof BottleExtractedDetails | "volume">();
   let volume: number | null = null;
   function setFact<K extends keyof BottleExtractedDetails>(
     key: K,
     value: BottleExtractedDetails[K],
   ) {
-    if (facts[key] != null && facts[key] !== value)
-      throw new Error(`Conflicting auction detail fact: ${key}.`);
+    if (conflicts.has(key)) return;
+    if (facts[key] != null && facts[key] !== value) {
+      conflicts.add(key);
+      delete facts[key];
+      return;
+    }
     facts[key] = value;
   }
   for (const element of $(".lotinfo .descr p").toArray()) {
@@ -55,10 +61,11 @@ export function parseScotchWhiskyAuctionDetails(html: string) {
         Number(strength[2]) *
         ({ ml: 1, cl: 10, l: 1000 }[strength[3].toLowerCase()] ?? 0);
       if (abv > 0 && abv <= 100) setFact("abv", abv);
-      if (Number.isInteger(ml) && ml > 0) {
-        if (volume !== null && volume !== ml)
-          throw new Error("Conflicting auction detail volume.");
-        volume = ml;
+      if (Number.isInteger(ml) && ml > 0 && !conflicts.has("volume")) {
+        if (volume !== null && volume !== ml) {
+          conflicts.add("volume");
+          volume = null;
+        } else volume = ml;
       }
     }
     const count = text.match(/^Bottle Number:\s*(\d+)\s*\/\s*(\d+)$/i);

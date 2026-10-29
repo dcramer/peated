@@ -102,8 +102,11 @@ Detail facts never refresh availability or change prices. Changed facts produce
 a new matching fingerprint and check; earlier checks and results stay saved.
 Each request records the lot version, check ID, request time, and source URL to
 reject old responses. Assignments made during a read stay intact. The saved
-`details` run can resume interrupted work; a failed run requires an explicit
-admin retry. Detail runs do not count as listing refreshes in source health.
+`details` run can resume interrupted work. When a run fails, the lot it stopped
+on needs an explicit admin retry; the scheduler reads the lots it never reached
+in a later run. Conflicting facts on one page, such as two strengths in a
+two-bottle set, stay unknown instead of failing the run. Detail runs do not
+count as listing refreshes in source health.
 Deployment does not request details for existing review lots.
 
 Moderators review unresolved lots, including ended lots, in the Inbox. Protected
@@ -138,8 +141,7 @@ queue `ResolveAuctionLot` on the models queue. Dispatch failures leave pending
 work that can be submitted again. Rechecks do not collect auction indexes.
 Setting `refreshSourceDetails` requests fresh Scotch Whisky Auctions details
 instead of applying
-the old check. This also retries a terminally failed detail run for the selected
-unresolved lots. The same batch versions and administrator access are required.
+the old check. This also retries a lot left behind by a failed detail run. The same batch versions and administrator access are required.
 
 An evidence-backed creation proposal uses the same canonical Bottle creation
 as other sources. Creation and lot assignment commit together; an exact duplicate

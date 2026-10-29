@@ -137,8 +137,9 @@ remembered name reused by a later lot, and a reference conflict that changes
 neither the lot nor reference.
 
 If dispatch fails, re-fetch pending lots and resubmit their current versions.
-Do not clear saved checks or force new model runs. Failed detail runs keep their
-lot links until an administrator explicitly requests fresh details.
+Do not clear saved checks or force new model runs. A failed detail run keeps
+its link only on the lot it stopped on, until an administrator explicitly
+requests fresh details. Its other unread lots go back to the scheduler.
 
 ## Stop or roll back
 
