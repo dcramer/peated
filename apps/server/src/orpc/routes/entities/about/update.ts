@@ -2,6 +2,7 @@ import { db } from "@peated/server/db";
 import { entities } from "@peated/server/db/schema";
 import { getUserActorForDatabase } from "@peated/server/lib/actors";
 import { updateEntityDescription } from "@peated/server/lib/entityAbout/description";
+import { updateEntityFoundingYear } from "@peated/server/lib/entityAbout/foundingYear";
 import { saveEntityAbout } from "@peated/server/lib/entityAbout/store";
 import { procedure } from "@peated/server/orpc";
 import { withAboutRouteErrors } from "@peated/server/orpc/errors";
@@ -58,6 +59,7 @@ export default procedure
           actor,
         });
         await updateEntityDescription(tx, entity, result, actor);
+        await updateEntityFoundingYear(tx, entity, result, actor);
         return result;
       });
       return await serialize(

@@ -144,6 +144,24 @@ export function getPublishedLeadText(
 }
 
 /**
+ * The year of the published page's one shown `opened` event, or null for a
+ * hidden page, no such event, more than one, or sources that disagree on its
+ * date. Founding year rule (owner: docs/features/entity-about.md): a weak or
+ * conflicting year stays unknown.
+ */
+export function getPublishedFoundingYear(
+  item: StoredEntityAbout | null,
+  linkedEntities: ReadonlyMap<number, AboutLinkedEntity>,
+) {
+  if (item?.status !== "published") return null;
+  const opened = toPublicEntityAbout(item, linkedEntities).events.filter(
+    (event) => event.kind === "opened",
+  );
+  if (opened.length !== 1 || opened[0]!.disagreement) return null;
+  return Number.parseInt(opened[0]!.date.slice(0, 4), 10);
+}
+
+/**
  * Whether the Entity page shows the About document. Display rule (owner:
  * docs/features/entity-about.md): it is published and has enough to show,
  * counted the way the page itself shows it.

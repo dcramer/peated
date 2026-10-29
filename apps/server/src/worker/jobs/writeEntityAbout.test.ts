@@ -112,6 +112,26 @@ describe("writeEntityAbout", () => {
     expect(saved?.description).toBe("Brora opened in 1819. It closed in 1983.");
   });
 
+  test("replaces a stored founding year with the cited one", async ({
+    fixtures,
+  }) => {
+    const entity = await fixtures.Entity({
+      kind: "distillery",
+      yearEstablished: 1820,
+    });
+
+    await writeEntityAbout(
+      { entityId: entity.id },
+      services(async () => ({ draft: goodDraft, pagesRead: [page] })),
+    );
+
+    const [saved] = await db
+      .select({ yearEstablished: entities.yearEstablished })
+      .from(entities)
+      .where(eq(entities.id, entity.id));
+    expect(saved?.yearEstablished).toBe(1819);
+  });
+
   test("keeps a description a person wrote", async ({ fixtures }) => {
     const entity = await fixtures.Entity({
       kind: "distillery",

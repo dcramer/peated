@@ -171,7 +171,8 @@ also review the target Entity's catalog record. Create a distillery Entity for
 a production site the producer names (identity model rule 6) before creating
 its Bottles. Fill supported names, kind,
 status, owner, description and source, establishment year, official website,
-and origin country, region, address, and location. For a Distillery, location is
+and origin country, region, address, and location. A published About page
+later replaces the establishment year with the year it cites. For a Distillery, location is
 the production site. Do not use a later headquarters or office. Review aliases
 and exact references. Follow
 [Entity Images](./entity-images.md) for reusable images and attribution. Do not

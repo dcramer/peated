@@ -1,8 +1,7 @@
 import { zodTextFormat } from "openai/helpers/zod";
 import { describe, expect, test } from "vitest";
-import { z } from "zod";
 import { OpenAICountryDetailsSchema } from "../worker/jobs/generateCountryDetails";
-import { OpenAIEntityDetailsValidationSchema } from "../worker/jobs/generateEntityDetails";
+import { OpenAIEntityDetailsSchema } from "../worker/jobs/generateEntityDetails";
 import { OpenAIRegionDetailsSchema } from "../worker/jobs/generateRegionDetails";
 import { buildStructuredResponseSpanContext } from "./openai";
 
@@ -28,10 +27,7 @@ test("uses GenAI workflow semantics for structured responses", () => {
 describe("openai structured output schemas", () => {
   test("compile to strict json schema without optional fields", () => {
     expect(() =>
-      zodTextFormat(
-        OpenAIEntityDetailsValidationSchema,
-        "generate_entity_details",
-      ),
+      zodTextFormat(OpenAIEntityDetailsSchema, "generate_entity_details"),
     ).not.toThrow();
     expect(() =>
       zodTextFormat(OpenAICountryDetailsSchema, "generate_country_details"),
@@ -39,11 +35,5 @@ describe("openai structured output schemas", () => {
     expect(() =>
       zodTextFormat(OpenAIRegionDetailsSchema, "generate_region_details"),
     ).not.toThrow();
-  });
-
-  test("does not emit unsupported uri formats for generated entity websites", () => {
-    const jsonSchema = z.toJSONSchema(OpenAIEntityDetailsValidationSchema);
-
-    expect(JSON.stringify(jsonSchema)).not.toContain('"format":"uri"');
   });
 });

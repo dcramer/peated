@@ -27,6 +27,7 @@ import {
   type AboutPageRead,
 } from "@peated/server/lib/entityAbout/checks";
 import { updateEntityDescription } from "@peated/server/lib/entityAbout/description";
+import { updateEntityFoundingYear } from "@peated/server/lib/entityAbout/foundingYear";
 import {
   EntityAboutVersionError,
   EntityAboutWriteError,
@@ -270,6 +271,7 @@ export async function writeEntityAbout(
         checkedOn: services.now().toISOString().slice(0, 10),
       });
       await updateEntityDescription(tx, entity, result, actor);
+      await updateEntityFoundingYear(tx, entity, result, actor);
       return result;
     });
   } catch (error) {

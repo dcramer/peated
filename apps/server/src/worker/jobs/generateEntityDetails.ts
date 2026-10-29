@@ -1,13 +1,11 @@
 import config from "@peated/server/config";
-import { BOT_USER_AGENT } from "@peated/server/constants";
 import { db } from "@peated/server/db";
 import type { Entity } from "@peated/server/db/schema";
 import { changes, entities } from "@peated/server/db/schema";
 import { getPeatedSystemActor } from "@peated/server/lib/actors";
-import { logError, logTelemetryError, logWarn } from "@peated/server/lib/log";
+import { logError, logWarn } from "@peated/server/lib/log";
 import { getStructuredResponse } from "@peated/server/lib/openai";
 import { withSentryConversation } from "@peated/server/lib/openaiClient";
-import { EntityKindEnum } from "@peated/server/schemas";
 import {
   EntityPronunciationIpaSchema,
   EntityPronunciationSchema,
@@ -39,34 +37,13 @@ function generatePrompt(entity: InputEntity) {
   } else if (entity.country) {
     infoLines.push(`Location: ${entity.country.name}`);
   }
-  if (entity.yearEstablished) {
-    infoLines.push(`Year Established: ${entity.yearEstablished}`);
-  }
-  if (entity.website) {
-    infoLines.push(`Website: ${entity.website}`);
-  }
   if (entity.kind) {
     infoLines.push(`Kind: ${entity.kind}`);
   }
 
   const sections = [
-    `Generate structured details for this whisky producer or brand:\n\n${entity.name}`,
+    `Say how people pronounce the name of this whisky producer or brand:\n\n${entity.name}`,
     infoLines.length ? `Known context:\n- ${infoLines.join("\n- ")}` : null,
-    [
-      "'description' should be two short paragraphs separated by newlines.",
-      "Focus on history, origin, and what the producer or brand is broadly known for today.",
-      "Do not call it an entity.",
-      `Mention former names only if a previous name for ${entity.name} is well established.`,
-    ].join(" "),
-    [
-      "'yearEstablished' should be the founding year only when it is confidently known; otherwise return null.",
-    ].join(" "),
-    [
-      "'website' should be the official HTTPS website only when it is confidently known; otherwise return null.",
-    ].join(" "),
-    [
-      "'kind' must be the best single identity from: brand, distillery, bottler, company.",
-    ].join(" "),
     [
       `'pronunciation' should say how people say ${entity.name} in plain English respelling: lowercase syllables joined by hyphens, words split by spaces, and the stressed syllable in capitals when it is confidently known, like "glen GEER-ee" for Glen Garioch.`,
       "Use only letters, spaces, hyphens, and apostrophes.",
@@ -78,27 +55,7 @@ function generatePrompt(entity: InputEntity) {
   return sections.filter(Boolean).join("\n\n");
 }
 
-const EntityEstablishedYearSchema = z
-  .preprocess((value) => {
-    const text = z.string().trim().min(1).safeParse(value);
-    return text.success ? Number.parseInt(text.data, 10) : value;
-  }, z.number().nullable())
-  .default(null);
-
 export const OpenAIEntityDetailsSchema = z.object({
-  description: z.string().nullable().default(null),
-  yearEstablished: EntityEstablishedYearSchema,
-  website: z.string().trim().nullable().default(null),
-  kind: EntityKindEnum,
-  pronunciation: z.string().nullable().default(null),
-  pronunciationIpa: z.string().nullable().default(null),
-});
-
-export const OpenAIEntityDetailsValidationSchema = z.object({
-  description: z.string().nullable().default(null),
-  yearEstablished: EntityEstablishedYearSchema,
-  website: z.string().trim().nullable().default(null),
-  kind: EntityKindEnum,
   pronunciation: z.string().nullable().default(null),
   pronunciationIpa: z.string().nullable().default(null),
 });
@@ -123,7 +80,7 @@ const defaultEntityDetailsModel: EntityDetailsModel = async (
         "getGeneratedEntityDetails",
         prompt,
         OpenAIEntityDetailsSchema,
-        OpenAIEntityDetailsValidationSchema,
+        undefined,
         undefined,
         {
           entity: {
@@ -188,15 +145,10 @@ export async function generateEntityDetails(
   });
   if (!entity) return;
 
-  // Description rule (owner: docs/features/entity-about.md): descriptions
-  // come from sourced About leads, never from a model's memory, so this job
-  // fills only the other details.
-  if (
-    entity.yearEstablished &&
-    entity.website &&
-    entity.pronunciation &&
-    entity.pronunciationIpa
-  ) {
+  // Sourcing rule (owner: docs/features/entity-about.md): descriptions and
+  // founding years come from sourced About pages, never from a model's
+  // memory, so this job fills only the pronunciation.
+  if (entity.pronunciation && entity.pronunciationIpa) {
     return;
   }
 
@@ -207,12 +159,6 @@ export async function generateEntityDetails(
   }
   const data: Partial<typeof entities.$inferInsert> = {};
 
-  if (!entity.yearEstablished && result.yearEstablished) {
-    data.yearEstablished = result.yearEstablished;
-  }
-
-  if (!entity.website && result.website) data.website = result.website;
-
   if (!entity.pronunciation && result.pronunciation) {
     data.pronunciation = result.pronunciation;
   }
@@ -221,27 +167,6 @@ export async function generateEntityDetails(
   }
 
   if (Object.keys(data).length === 0) return;
-
-  if (data.website) {
-    try {
-      await fetch(data.website, {
-        headers: {
-          "User-Agent": BOT_USER_AGENT,
-        },
-        signal: AbortSignal.timeout(10_000),
-      });
-    } catch (err) {
-      logTelemetryError(err, {
-        extra: {
-          entityId,
-          website: data.website,
-          message: "Discarded website as possible hallucination",
-        },
-      });
-      // dont allow LLMs to hallucinate fake URLs
-      data.website = null;
-    }
-  }
 
   const actor = await getPeatedSystemActor();
 
