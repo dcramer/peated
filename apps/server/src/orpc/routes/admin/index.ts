@@ -2,6 +2,7 @@ import { base } from "../..";
 import catalogCoverage from "./catalog-coverage";
 import clearBottleDescriptions from "./clear-bottle-descriptions";
 import clearEntityDescriptions from "./clear-entity-descriptions";
+import clearGuessedEntityDetails from "./clear-guessed-entity-details";
 import content from "./content";
 import moderation from "./moderation";
 import oauthClients from "./oauth-clients";
@@ -16,6 +17,7 @@ import wrongPhotoMatches from "./wrongPhotoMatches";
 export default base.tag("admin").router({
   clearBottleDescriptions,
   clearEntityDescriptions,
+  clearGuessedEntityDetails,
   catalogCoverage,
   content,
   moderation,
