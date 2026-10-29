@@ -4,8 +4,8 @@ import type { Entity } from "@peated/server/db/schema";
 import { changes, entities } from "@peated/server/db/schema";
 import { getPeatedSystemActor } from "@peated/server/lib/actors";
 import { logError, logWarn } from "@peated/server/lib/log";
-import { getStructuredResponse } from "@peated/server/lib/openai";
 import { withSentryConversation } from "@peated/server/lib/openaiClient";
+import { getStructuredResponse } from "@peated/server/lib/structuredResponse";
 import {
   EntityPronunciationIpaSchema,
   EntityPronunciationSchema,
@@ -56,8 +56,8 @@ function generatePrompt(entity: InputEntity) {
 }
 
 export const OpenAIEntityDetailsSchema = z.object({
-  pronunciation: z.string().nullable().default(null),
-  pronunciationIpa: z.string().nullable().default(null),
+  pronunciation: z.string().nullable(),
+  pronunciationIpa: z.string().nullable(),
 });
 
 export type GeneratedEntityDetails = z.infer<typeof OpenAIEntityDetailsSchema>;
@@ -76,19 +76,17 @@ const defaultEntityDetailsModel: EntityDetailsModel = async (
   await withSentryConversation(
     conversationId,
     async () =>
-      await getStructuredResponse(
-        "getGeneratedEntityDetails",
+      await getStructuredResponse({
+        pipelineName: "getGeneratedEntityDetails",
         prompt,
-        OpenAIEntityDetailsSchema,
-        undefined,
-        undefined,
-        {
+        schema: OpenAIEntityDetailsSchema,
+        logContext: {
           entity: {
             id: entity.id,
             name: entity.name,
           },
         },
-      ),
+      }),
   );
 
 export async function getGeneratedEntityDetails(

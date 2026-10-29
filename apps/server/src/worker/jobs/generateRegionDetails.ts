@@ -2,8 +2,8 @@ import config from "@peated/server/config";
 import { db } from "@peated/server/db";
 import { regions } from "@peated/server/db/schema";
 import { logWarn } from "@peated/server/lib/log";
-import { getStructuredResponse } from "@peated/server/lib/openai";
 import { withSentryConversation } from "@peated/server/lib/openaiClient";
+import { getStructuredResponse } from "@peated/server/lib/structuredResponse";
 import { type Region } from "@peated/server/types";
 import type { JobPayload } from "@peated/server/worker/types";
 import { eq } from "drizzle-orm";
@@ -33,7 +33,7 @@ function generatePrompt(region: InputRegion) {
 }
 
 export const OpenAIRegionDetailsSchema = z.object({
-  description: z.string().nullable().default(null),
+  description: z.string().nullable(),
 });
 
 export type GeneratedRegionDetails = z.infer<typeof OpenAIRegionDetailsSchema>;
@@ -48,13 +48,11 @@ export async function getGeneratedRegionDetails(
   return await withSentryConversation(
     conversationId,
     async () =>
-      await getStructuredResponse(
-        "getGeneratedRegionDetails",
-        generatePrompt(region),
-        OpenAIRegionDetailsSchema,
-        undefined,
-        undefined,
-        {
+      await getStructuredResponse({
+        pipelineName: "getGeneratedRegionDetails",
+        prompt: generatePrompt(region),
+        schema: OpenAIRegionDetailsSchema,
+        logContext: {
           region: {
             id: region.id,
             slug: region.slug,
@@ -66,7 +64,7 @@ export async function getGeneratedRegionDetails(
             name: region.country.slug,
           },
         },
-      ),
+      }),
   );
 }
 
