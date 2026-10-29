@@ -66,10 +66,10 @@ typography:
     letterSpacing: -0.04em
   section-heading:
     fontFamily: Hanken Grotesk
-    fontSize: 20px
+    fontSize: 26px
     fontWeight: 700
-    lineHeight: 1.2
-    letterSpacing: -0.025em
+    lineHeight: 1.15
+    letterSpacing: -0.03em
   row-title:
     fontFamily: Hanken Grotesk
     fontSize: 18px
@@ -272,8 +272,10 @@ border.
 - **IBM Plex Mono** is available for rare values that must align as code-like
   data. Normal metadata and field labels use Karla.
 - Section headings use `SectionHeading` in every column. Heading levels express
-  document structure and share one visual treatment. Do not add compact,
-  uppercase, or page-specific section heading variants.
+  document structure and share one visual treatment. Keep section headings
+  clearly larger than row titles so a heading never reads as the first row,
+  even where rows have no thumbnail. Do not add compact, uppercase, or
+  page-specific section heading variants.
 - Typeahead group names are control labels, not page sections. Use the field
   label role for these groups and compact row titles for their results. Bottle
   suggestions keep standard thumbnails and identity details with 8px row padding.
@@ -285,7 +287,7 @@ border.
 | ------------------- | ------- | ------ | -------------------- | -------- |
 | Page title          | Display | 700    | 40–72px / 0.95       | -0.045em |
 | Compact page title  | Display | 700    | 32–40px / 1.1        | -0.04em  |
-| Section heading     | Display | 700    | 20px / 1.2           | -0.025em |
+| Section heading     | Display | 700    | 26px / 1.15          | -0.03em  |
 | Row title           | Display | 700    | 18px / 1.25          | -0.025em |
 | Compact row title   | Display | 700    | 15px / 1.25          | -0.025em |
 | Prose               | Reading | 400    | 16px / 1.65          | normal   |
