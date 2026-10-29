@@ -185,6 +185,9 @@ number.
 An automatic create makes one independently complete Bottle in a new singleton
 group. It creates no BottleRelease. It may reuse an active Bottle only when the
 complete stored name and identity agree.
+If another check created a matching Bottle for the same Brand while this one
+ran, the proposal stays pending instead; see
+[stale automatic creates](bottle-reference-resolution.md#stale-automatic-creates).
 
 ## Images And Observations
 

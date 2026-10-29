@@ -70,6 +70,8 @@ export const bottleCheckOriginEnum = pgEnum(
 export const bottleCheckCloseReasonEnum = pgEnum("bottle_check_close_reason", [
   "dismissed",
   "resolved_manually",
+  // Set only by the hourly cleanup when nothing in the check can be acted on.
+  "no_longer_actionable",
 ]);
 
 export const bottleOperationStatusEnum = pgEnum("bottle_operation_status", [

@@ -484,6 +484,71 @@ test.for(["unsupported", "reuse", "concurrent", "stale", "changed check"])(
   },
 );
 
+test.for(["unseen", "seen", "conflicting", "older"] as const)(
+  "a create with a %s same-Brand sibling",
+  async (sibling, { fixtures }) => {
+    const site = await fixtures.ExternalSite({ type: "masterofmalt" });
+    const brand = await fixtures.Entity({ name: "Example", kind: "brand" });
+    const lot = await importedLot(site.id);
+    // Another check created this Bottle while the lot's check ran.
+    const existing = await fixtures.Bottle({
+      name: "Twelve",
+      brandId: brand.id,
+      category: "single_malt",
+      statedAge: 12,
+      abv: sibling === "conflicting" ? 43 : null,
+    });
+    if (sibling === "older")
+      await db
+        .update(bottles)
+        .set({ createdAt: new Date(Date.now() - 86_400_000) })
+        .where(eq(bottles.id, existing.id));
+    const candidate = await getBottleCandidateById(existing.id);
+    const result = createDecidedBottleClassification({
+      decision: {
+        action: "create_bottle",
+        matchedBottleId: null,
+        candidateBottleIds: [],
+        identityScope: "product",
+        referenceScope: "none",
+        rationale: "A missing marketed release.",
+        observation: null,
+        confidenceBasis: { webEvidence: "supportive", unresolvedRisks: [] },
+        proposedBottle: {
+          name: "12-year-old",
+          brand: { id: brand.id, name: brand.name },
+          distillers: [],
+          bottler: null,
+          series: null,
+          category: "single_malt",
+          statedAge: 12,
+          abv: 46,
+          edition: null,
+          caskStrength: null,
+          singleCask: null,
+          vintageYear: null,
+          releaseYear: null,
+          maturation: null,
+          caskNumber: null,
+          outturn: null,
+        },
+      },
+      artifacts: {
+        candidates: sibling === "seen" && candidate ? [candidate] : [],
+      },
+    });
+    await saveMatch(lot, result);
+    await applySavedAuctionLotMatch(lot.id, lot.sourceFingerprint);
+
+    const stale = sibling === "unseen";
+    expect(await db.query.auctionLots.findFirst()).toMatchObject({
+      matchStatus: stale ? "review" : "matched",
+      bottleId: stale ? null : expect.any(Number),
+    });
+    expect(await db.query.bottles.findMany()).toHaveLength(stale ? 1 : 2);
+  },
+);
+
 test("unsupported saved check schemas stay in review rather than calling the model again", async ({
   fixtures,
 }) => {

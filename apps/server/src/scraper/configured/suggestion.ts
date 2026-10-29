@@ -2,7 +2,7 @@ import config from "@peated/server/config";
 import { db } from "@peated/server/db";
 import { scrapeSourceRevisions, scrapeSources } from "@peated/server/db/schema";
 import {
-  createOpenAIAgentClient,
+  createOpenAIClient,
   isModelServiceUnavailable,
 } from "@peated/server/lib/openaiClient";
 import { and, eq } from "drizzle-orm";
@@ -229,7 +229,7 @@ export type RequestScrapeSourceModel = (
 
 /** Keeps provider storage off and records complete public-site model calls. */
 async function requestAi(input: SetupAgentModelRequest) {
-  const client = createOpenAIAgentClient({ workload: "scraper" });
+  const client = createOpenAIClient({ workload: "scraper" });
   return await client.responses.create({
     model: config.SCRAPER_SETUP_MODEL,
     instructions: input.instructions,

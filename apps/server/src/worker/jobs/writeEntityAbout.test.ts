@@ -1,10 +1,10 @@
 import type { AboutDraft } from "@peated/server/agents/entityAbout/draftSchema";
 import type { EntityAboutWriter } from "@peated/server/agents/entityAbout/writer";
 import { db } from "@peated/server/db";
-import { entities } from "@peated/server/db/schema";
+import { changes, entities } from "@peated/server/db/schema";
 import { getEntityAbout } from "@peated/server/lib/entityAbout/store";
 import { routerClient } from "@peated/server/orpc/router";
-import { eq } from "drizzle-orm";
+import { desc, eq } from "drizzle-orm";
 import { vi } from "vitest";
 
 import { draftEntityAbout, writeEntityAbout } from "./writeEntityAbout";
@@ -151,9 +151,39 @@ describe("writeEntityAbout", () => {
     expect(saved?.description).toBe("Written by a moderator.");
   });
 
-  test("keeps descriptions it did not write", async ({ fixtures }) => {
-    // Unknown origin: written before descriptions recorded who wrote them.
-    const unknown = await fixtures.Entity({
+  test("replaces a description no person wrote", async ({ fixtures }) => {
+    // Unknown origin: no change records a person setting this text.
+    const entity = await fixtures.Entity({ kind: "distillery" });
+    await db
+      .update(entities)
+      .set({ description: "An older description.", descriptionSrc: null })
+      .where(eq(entities.id, entity.id));
+
+    await writeEntityAbout(
+      { entityId: entity.id },
+      services(async () => ({ draft: goodDraft, pagesRead: [page] })),
+    );
+
+    const [saved] = await db
+      .select()
+      .from(entities)
+      .where(eq(entities.id, entity.id));
+    expect(saved?.description).toBe("Brora opened in 1819. It closed in 1983.");
+    expect(saved?.descriptionSrc).toBe("generated");
+    const history = await db
+      .select({ data: changes.data })
+      .from(changes)
+      .where(eq(changes.objectId, entity.id))
+      .orderBy(desc(changes.id));
+    const change = history.find(({ data }) => "description" in data);
+    expect(change?.data).toMatchObject({
+      before: { description: "An older description.", descriptionSrc: null },
+    });
+  });
+
+  test("keeps an older description a person set", async ({ fixtures }) => {
+    // Its origin was never recorded, but a person created the Entity with it.
+    const person = await fixtures.Entity({
       kind: "distillery",
       description: "An older description.",
       descriptionSrc: null,
@@ -162,7 +192,7 @@ describe("writeEntityAbout", () => {
     const hidden = await fixtures.Entity({ kind: "distillery" });
     await fixtures.EntityAbout({ entityId: hidden.id, status: "hidden" });
 
-    for (const entity of [unknown, hidden]) {
+    for (const entity of [person, hidden]) {
       await writeEntityAbout(
         { entityId: entity.id },
         services(async () => ({ draft: goodDraft, pagesRead: [page] })),
@@ -173,7 +203,7 @@ describe("writeEntityAbout", () => {
       .select({ id: entities.id, description: entities.description })
       .from(entities);
     const byId = new Map(rows.map((row) => [row.id, row.description]));
-    expect(byId.get(unknown.id)).toBe("An older description.");
+    expect(byId.get(person.id)).toBe("An older description.");
     expect(byId.get(hidden.id)).toBe(hidden.description);
   });
 

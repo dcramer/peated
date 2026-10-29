@@ -126,8 +126,8 @@ with the first-listed source's value.
 ### Requirement: Entity history events
 
 The About page SHALL describe history with its own events. The Entity's
-history timeline SHALL stay in `entity_event` as a separate widget, and the
-writer SHALL read it as leads. An About event SHALL have a kind, a date of a
+history timeline SHALL stay in `entity_event`, which the writer SHALL read as
+leads; the public page does not show it. An About event SHALL have a kind, a date of a
 year, a year and month, or a full date, an optional end date, optional text,
 and one or more citations. Event kinds SHALL include `opened`, `closed`, `mothballed`,
 `reopened`, `acquired`, `renamed`, `era`, and `generic`. A `renamed` event

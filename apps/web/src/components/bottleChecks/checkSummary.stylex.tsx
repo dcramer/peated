@@ -44,6 +44,8 @@ export function getBottleCheckState(check: BottleCheck): string {
   if (check.closedAt) {
     if (check.closeReason === "resolved_manually") return "Resolved manually";
     if (check.closeReason === "dismissed") return "Dismissed";
+    if (check.closeReason === "no_longer_actionable")
+      return "Closed automatically";
     return "Closed";
   }
   if (!check.schemaSupported) return "Unsupported schema";

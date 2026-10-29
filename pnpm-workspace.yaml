@@ -31,10 +31,10 @@ catalog:
   jsx-email: ^3.2.1
   pg: ^8.20.0
   prettier: ^3.8.1
-  "@sentry/core": 10.76.2
-  "@sentry/hono": 10.76.2
-  "@sentry/nextjs": 10.76.2
-  "@sentry/node": 10.76.2
+  "@sentry/core": 11.10.0
+  "@sentry/hono": 11.10.0
+  "@sentry/nextjs": 11.10.0
+  "@sentry/node": 11.10.0
   "@logtape/hono": 2.2.3
   "@logtape/logtape": 2.2.3
   "@logtape/redaction": 2.2.3
@@ -88,6 +88,22 @@ overrides:
 
 minimumReleaseAgeExclude:
   - zod@4.5.4
+  - '@sentry/browser-utils@11.10.0'
+  - '@sentry/browser@11.10.0'
+  - '@sentry/bundler-plugins@11.10.0'
+  - '@sentry/cloudflare@11.10.0'
+  - '@sentry/core@11.10.0'
+  - '@sentry/feedback@11.10.0'
+  - '@sentry/hono@11.10.0'
+  - '@sentry/nextjs@11.10.0'
+  - '@sentry/node@11.10.0'
+  - '@sentry/opentelemetry@11.10.0'
+  - '@sentry/react@11.10.0'
+  - '@sentry/replay-canvas@11.10.0'
+  - '@sentry/replay@11.10.0'
+  - '@sentry/server-runtime-injection@11.10.0'
+  - '@sentry/server-utils@11.10.0'
+  - '@sentry/vercel-edge@11.10.0'
 
 patchedDependencies:
   # Sensitive data policy (docs/policies/sensitive-data.md): DrizzleQueryError

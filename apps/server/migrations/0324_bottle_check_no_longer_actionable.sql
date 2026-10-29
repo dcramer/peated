@@ -1,0 +1,1 @@
+ALTER TYPE "public"."bottle_check_close_reason" ADD VALUE 'no_longer_actionable';

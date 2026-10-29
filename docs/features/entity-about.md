@@ -226,9 +226,14 @@ destination's next version can draw on them.
 ## Descriptions
 
 A save that publishes a lead, from a writer run or a moderator's edit,
-replaces an empty or generated Entity description. A description a person wrote, or one written before Peated
-recorded who wrote descriptions, stays. A hidden page never changes the
-description. After the writer has covered every distillery and brand,
+replaces the Entity's description unless a person wrote it. A person wrote it
+when it is marked as theirs, or, for a description from before Peated
+recorded who wrote descriptions, when the last change that set a description
+was theirs, including the change that created the Entity. The change keeps the
+old text in `before`. A hidden page never changes the description.
+`/admin/catalog/sync-entity-descriptions` applies the same rule to every
+published page, for pages saved before the rule replaced older descriptions;
+run it with `dryRun` first. After the writer has covered every distillery and brand,
 `/admin/catalog/clear-entity-descriptions` clears each generated description
 that is not the published lead, so no unsourced description remains.
 Descriptions a person wrote stay.
