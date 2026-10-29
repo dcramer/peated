@@ -1,5 +1,6 @@
 import config from "@peated/server/config";
 import * as Sentry from "@sentry/node";
+import { APICallError, RetryError } from "ai";
 import OpenAI from "openai";
 import { afterEach, describe, expect, test } from "vitest";
 import {
@@ -98,6 +99,70 @@ describe("isModelServiceUnavailable", () => {
       cause: apiError(402),
     });
     expect(isModelServiceUnavailable(wrapped)).toBe(true);
+  });
+
+  describe("AI SDK errors", () => {
+    function apiCallError(statusCode?: number, isRetryable = false) {
+      return new APICallError({
+        message: "rejected",
+        url: "https://ai-gateway.vercel.sh/v3/ai/language-model",
+        requestBodyValues: {},
+        statusCode,
+        isRetryable,
+      });
+    }
+
+    // The gateway wraps the call error in its own error class, and that class
+    // does not match the status: a 400 can arrive as an internal server error.
+    function gatewayError(cause: APICallError) {
+      return new Error("Gateway request failed", { cause });
+    }
+
+    test.each([402, 408, 429, 500, 503])(
+      "treats a %i response as temporary",
+      (status) => {
+        expect(
+          isModelServiceUnavailable(gatewayError(apiCallError(status))),
+        ).toBe(true);
+      },
+    );
+
+    test.each([400, 401, 404, 422])(
+      "treats a %i response as a bug",
+      (status) => {
+        expect(
+          isModelServiceUnavailable(gatewayError(apiCallError(status))),
+        ).toBe(false);
+      },
+    );
+
+    test("treats a lost connection as temporary", () => {
+      expect(
+        isModelServiceUnavailable(gatewayError(apiCallError(undefined, true))),
+      ).toBe(true);
+    });
+
+    test("treats a call that failed before sending as a bug", () => {
+      expect(isModelServiceUnavailable(apiCallError(undefined, false))).toBe(
+        false,
+      );
+    });
+
+    test("checks the last error after retries run out", () => {
+      const retried = (lastError: Error) =>
+        new RetryError({
+          message: "Failed after 3 attempts",
+          reason: "maxRetriesExceeded",
+          errors: [lastError, lastError, lastError],
+        });
+
+      expect(
+        isModelServiceUnavailable(retried(gatewayError(apiCallError(503)))),
+      ).toBe(true);
+      expect(
+        isModelServiceUnavailable(retried(gatewayError(apiCallError(401)))),
+      ).toBe(false);
+    });
   });
 
   test("ignores errors from other sources", () => {
