@@ -1,0 +1,19 @@
+{
+  "writtenAt": "2026-10-29T19:26:31.424Z",
+  "toolName": "read_page",
+  "input": {
+    "url": "https://www.scotchwhiskyauctions.com/auctions/231-the-182nd-auction/891827-glenlivet-gm-generations-70-year-old-sample-presentation-set/"
+  },
+  "output": {
+    "page": {
+      "url": "https://www.scotchwhiskyauctions.com/auctions/231-the-182nd-auction/891827-glenlivet-gm-generations-70-year-old-sample-presentation-set/",
+      "title": "GLENLIVET G&M GENERATIONS 70 YEAR OLD SAMPLE PRESENTATION SET | The 182nd Auction | Scotch Whisky Auctions",
+      "description": null,
+      "text": "[Skip to menu](https://www.scotchwhiskyauctions.com/auctions/231-the-182nd-auction/891827-glenlivet-gm-generations-70-year-old-sample-presentation-set/#menu) [Skip to content](https://www.scotchwhiskyauctions.com/auctions/231-the-182nd-auction/891827-glenlivet-gm-generations-70-year-old-sample-presentation-set/#contentstart)\n\nAre you the legal age to buy alcohol in your country?YesNo\n\n [Free valuations](https://wa.me/+447538638525/?text=I%20would%20like%20a%20free%20valuation)\n\nShow/hide cookie info\n\n**This site may set cookies for essential tasks, such as tracking whether you are signed in.**\n\nWe would also like to set analytics cookies to better understand our users’ behaviour.\n\n[Read our cookies policy](https://www.scotchwhiskyauctions.com/privacy/)\n\nAcceptReject"
+    }
+  },
+  "metadata": {
+    "cacheKey": "1f48c625a49ae5e7ec9fb625b70e81b4d3f5285c8a7d2707dc1c818d4f57dbe1",
+    "mode": "auto"
+  }
+}

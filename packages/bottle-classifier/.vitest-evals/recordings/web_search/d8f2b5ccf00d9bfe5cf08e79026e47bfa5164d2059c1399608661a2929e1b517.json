@@ -1,0 +1,96 @@
+{
+  "writtenAt": "2026-10-29T18:33:42.624Z",
+  "toolName": "web_search",
+  "input": {
+    "queries": [
+      "Compass Box Hedonism² 49% 648 bottles release official product",
+      "\"Hedonism²\" \"648\" Compass Box whisky"
+    ]
+  },
+  "output": {
+    "evidence": [
+      {
+        "provider": "firecrawl",
+        "query": "Compass Box Hedonism² 49% 648 bottles release official product",
+        "summary": "A unique and award-winning Blended Grain Scotch Whisky. Rare and old this is a whisky that will appeal to both the ardent whisky enthusiast and newcomers alike. Hedonism 2026 is the oldest and rarest Hedonism we have ever released, with components aged up to 31 years. Bottled November 2025. : 13, 218. Bottled at 46% ... Product Specifications ; Department. Liquor ; Type. Scotch ; Varietal. Grain Whisky ; Size. 700ML ; Vintage. 2026. The new label has been pushed out. Hedonism is an exception, where they have started to do a release each year featuring a different female ... Hedonism 2026 is th",
+        "results": [
+          {
+            "title": "Hedonism",
+            "url": "https://www.compassboxwhisky.com/en-us/products/hedonism-copy",
+            "domain": "compassboxwhisky.com",
+            "description": "A unique and award-winning Blended Grain Scotch Whisky. Rare and old this is a whisky that will appeal to both the ardent whisky enthusiast and newcomers alike.",
+            "extraSnippets": []
+          },
+          {
+            "title": "Hedonism 2026",
+            "url": "https://www.compassboxwhisky.com/en-us/products/hedonism-2026",
+            "domain": "compassboxwhisky.com",
+            "description": "Hedonism 2026 is the oldest and rarest Hedonism we have ever released, with components aged up to 31 years. Bottled November 2025. : 13, 218. Bottled at 46% ...",
+            "extraSnippets": []
+          },
+          {
+            "title": "Compass Box Hedonism Limited Annual Release Grain ...",
+            "url": "https://www.binnys.com/spirits/scotch/compass-box-hedonism-limited-annual-release-grain-whisky-176432/",
+            "domain": "binnys.com",
+            "description": "Product Specifications ; Department. Liquor ; Type. Scotch ; Varietal. Grain Whisky ; Size. 700ML ; Vintage. 2026.",
+            "extraSnippets": []
+          },
+          {
+            "title": "Compass Box - Hedonism 2026 : r/Scotch",
+            "url": "https://www.reddit.com/r/Scotch/comments/1mvmpkm/compass_box_hedonism_2026/",
+            "domain": "reddit.com",
+            "description": "The new label has been pushed out. Hedonism is an exception, where they have started to do a release each year featuring a different female ...",
+            "extraSnippets": []
+          },
+          {
+            "title": "Hedonism 2026 Blended Grain Scotch Whisky",
+            "url": "https://www.youtube.com/watch?v=O5Z8HQKRMwU",
+            "domain": "youtube.com",
+            "description": "Hedonism 2026 is the oldest and rarest Hedonism we have ever released, crafted from some of our most mature grain whiskies, with components ...",
+            "extraSnippets": []
+          },
+          {
+            "title": "How Angela D'Orazio Created Compass Box Hedonism 2026",
+            "url": "https://whiskyadvocate.com/compass-box-hedonism-2026",
+            "domain": "whiskyadvocate.com",
+            "description": "Compass Box Hedonism 2026 Release is bottled at 46% and priced at $165. The release of 13,218 bottles is available globally beginning February 24th.",
+            "extraSnippets": []
+          }
+        ]
+      },
+      {
+        "provider": "firecrawl",
+        "query": "\"Hedonism²\" \"648\" Compass Box whisky",
+        "summary": "With over a decade of experience handling and storing fine wines and spirits, the facility maintains strict temperature and humidity controls to ensure your ... Compass Box (CB); Bottled: 2023; Stated Age: 23 years; Number of bottles: 648 ... Whisky reviews for Hedonism² 23-year-old CB. One user has left a ... 1. Whisky Details. Whisky ID. WB226721. Category. Blended Grain. Bottler. Compass Box. Bottled. 2023. Stated Age. 23 years old. Number of bottles. 648. Strength.",
+        "results": [
+          {
+            "title": "Compass Box Hedonism² (Exclusive to Hedonism Wines)",
+            "url": "https://hedonism.co.uk/products/compass-box-hedonism-exclusive-to-hedonism-wines",
+            "domain": "hedonism.co.uk",
+            "description": "With over a decade of experience handling and storing fine wines and spirits, the facility maintains strict temperature and humidity controls to ensure your ...",
+            "extraSnippets": []
+          },
+          {
+            "title": "Hedonism² 23-year-old CB - Ratings and Reviews",
+            "url": "https://www.whiskybase.com/whiskies/whisky/226721/hedonism-23-year-old-cb",
+            "domain": "whiskybase.com",
+            "description": "Compass Box (CB); Bottled: 2023; Stated Age: 23 years; Number of bottles: 648 ... Whisky reviews for Hedonism² 23-year-old CB. One user has left a ...",
+            "extraSnippets": []
+          },
+          {
+            "title": "Hedonism² 23-year-old CB - Market Value and Price Insights",
+            "url": "https://www.whiskystats.com/whisky/226721",
+            "domain": "whiskystats.com",
+            "description": "1. Whisky Details. Whisky ID. WB226721. Category. Blended Grain. Bottler. Compass Box. Bottled. 2023. Stated Age. 23 years old. Number of bottles. 648. Strength.",
+            "extraSnippets": []
+          }
+        ]
+      }
+    ],
+    "errors": []
+  },
+  "metadata": {
+    "cacheKey": "d8f2b5ccf00d9bfe5cf08e79026e47bfa5164d2059c1399608661a2929e1b517",
+    "mode": "auto"
+  }
+}

@@ -1,0 +1,117 @@
+{
+  "writtenAt": "2026-10-29T18:41:12.723Z",
+  "toolName": "web_search",
+  "input": {
+    "queries": [
+      "Willett Family Estate Single Barrel Bourbon barrel 4769 5 year 64.2%",
+      "\"Willett\" \"4769\" bourbon"
+    ]
+  },
+  "output": {
+    "evidence": [
+      {
+        "provider": "firecrawl",
+        "query": "Willett Family Estate Single Barrel Bourbon barrel 4769 5 year 64.2%",
+        "summary": "At 129.6 proof, barrel #4763 is notably high-proof for a 5-year expression — a reflection of how aggressively the specific barrel's position in Willett's ... Willett Family Estate Small Batch Bourbon is a blend of two classic Willett family mash bills, thoughtfully commingled to create a distinct and balanced ... Palate - Vanilla, caramel, charcoal, black pepper, that new makey note (which again is a bit fleeting), dark chocolate. Full bodied. Nicely ... Single Barrel Bourbon Purchase Info: $118 for a 750 mL … 59.2% ABV Nose: Toffee, cocoa and oak. Mouth: Hot and spicy but sweet as well. The b",
+        "results": [
+          {
+            "title": "Willett Family Estate Single Barrel Bourbon 5 Year #4763",
+            "url": "https://woodencork.com/products/willett-family-estate-single-barrel-bourbon-5-year-old-4763-129-6-proof",
+            "domain": "woodencork.com",
+            "description": "At 129.6 proof, barrel #4763 is notably high-proof for a 5-year expression — a reflection of how aggressively the specific barrel's position in Willett's ...",
+            "extraSnippets": []
+          },
+          {
+            "title": "Willett Family Estate Small Batch 4 Year Bourbon",
+            "url": "https://www.kentuckybourbonwhiskey.com/whiskey/willett-family-estate/",
+            "domain": "kentuckybourbonwhiskey.com",
+            "description": "Willett Family Estate Small Batch Bourbon is a blend of two classic Willett family mash bills, thoughtfully commingled to create a distinct and balanced ...",
+            "extraSnippets": []
+          },
+          {
+            "title": "Review 235: Willett Family Estate 5 Year Bourbon",
+            "url": "https://www.reddit.com/r/bourbon/comments/9j6hrv/review_235_willett_family_estate_5_year_bourbon/",
+            "domain": "reddit.com",
+            "description": "Palate - Vanilla, caramel, charcoal, black pepper, that new makey note (which again is a bit fleeting), dark chocolate. Full bodied. Nicely ...",
+            "extraSnippets": []
+          },
+          {
+            "title": "Willett Family Estate Bottled Single Barrel Rye and Bourbon",
+            "url": "https://www.bourbonguy.com/blog/2016/5/10/willett-family-estate-bottled-whiskies-revisited",
+            "domain": "bourbonguy.com",
+            "description": "Single Barrel Bourbon Purchase Info: $118 for a 750 mL … 59.2% ABV Nose: Toffee, cocoa and oak. Mouth: Hot and spicy but sweet as well.",
+            "extraSnippets": []
+          },
+          {
+            "title": "Comparison: Willett 5 Year Single Barrel Bourbon ...",
+            "url": "https://the-right-spirit.com/2019/08/30/comparison-willett-5-year-single-barrel-bourbon-willett-4-year-small-batch-rye/",
+            "domain": "the-right-spirit.com",
+            "description": "The bourbon's mash bill is “barely legal,” meaning at 52% corn it's just a breath above the 51% minimum to be bourbon. The small batch rye's ...",
+            "extraSnippets": []
+          },
+          {
+            "title": "Willett Family Estate 16 Year Single Barrel Straight ...",
+            "url": "https://whiskyandwhiskey.com/products/willett-family-estate-16-year-bourbon-750ml",
+            "domain": "whiskyandwhiskey.com",
+            "description": "Willett Family Estate 16 Year Old Single Barrel Straight Bourbon Whiskey 750ML — 45% ABV — USA. Sale price$4,707.99. Bottled at 45% ABV and presented in a 750 ...",
+            "extraSnippets": []
+          }
+        ]
+      },
+      {
+        "provider": "firecrawl",
+        "query": "\"Willett\" \"4769\" bourbon",
+        "summary": "Explore Willett 05-year-old, a 5-year-old whisky at 64.2% ABV, with ratings, reviews and bottle details. # Willett Family Estate 5 Year Old Single Barrel Bourbon #4769 / Healthy Spirits  208150\nAbv\n\n64.2%\n\n75cl\n\nUK\n\n[Log in](https://whiskyauctioneer.com/user/login/ajax?destination=/whisky-lot/208150/willett-family-estate-5-year-old-single-barrel-bourbon-4769-healthy-spirits) [Register](https://whiskyauctioneer.com/user/register)\n\n[Bidding advice](https://whiskyauctioneer.com/whisky-lot/208150/willett-family-estate-5-year-old-single-barrel-bourbon-4769-healthy-spirits#)\n\n### Bottle Details\n**Wi",
+        "results": [
+          {
+            "title": "Willett 05-year-old - Ratings and Reviews",
+            "url": "https://www.whiskybase.com/whiskies/whisky/150553/willett-05-year-old",
+            "domain": "whiskybase.com",
+            "description": "Explore Willett 05-year-old, a 5-year-old whisky at 64.2% ABV, with ratings, reviews and bottle details.",
+            "extraSnippets": []
+          },
+          {
+            "title": "Willett Family Estate 5 Year Old Single Barrel Bourbon #4769 / ...",
+            "url": "https://whiskyauctioneer.com/whisky-lot/208150/willett-family-estate-5-year-old-single-barrel-bourbon-4769-healthy-spirits",
+            "domain": "whiskyauctioneer.com",
+            "description": "# Willett Family Estate 5 Year Old Single Barrel Bourbon #4769 / Healthy Spirits  208150\nAbv\n\n64.2%\n\n75cl\n\nUK\n\n[Log in](https://whiskyauctioneer.com/user/login/ajax?destination=/whisky-lot/208150/willett-family-estate-5-",
+            "extraSnippets": []
+          },
+          {
+            "title": "Willett Family Estate (WFE) Bottle Info & Mash Bills",
+            "url": "https://www.bourbonex.com/forums/topic/319/willett-family-estate-wfe-bottle-info-mash-bills",
+            "domain": "bourbonex.com",
+            "description": "#3681 WFE Bourbon 14yr 119 Willett WFE Bourbon 122 Friends & Family bottle for Willett bar soft opening ... #4769 WFE Bourbon 5yr 128.4 Healthy ...",
+            "extraSnippets": []
+          },
+          {
+            "title": "Willett Family Estate 27 Year Single Barrel Bourbon (Barrel 2877)",
+            "url": "https://www.unicornauctions.com/auction/6afaa384-a612-4769-801f-4ce1f574f466/lot/9bf77c2c-f0db-42d7-bd44-87ce710788dc",
+            "domain": "unicornauctions.com",
+            "description": "Willett Family Estate 27 Year Single Barrel Bourbon (Barrel 2877). Bourbon. Result. $4,600. Sold. Estimate. $3,000-$4,000.",
+            "extraSnippets": []
+          },
+          {
+            "title": "4749, 4784(DarylProof), 4779(Will-Lit), 4778 I was ...",
+            "url": "https://www.instagram.com/p/C79X4CbsDxA/",
+            "domain": "instagram.com",
+            "description": "... 4769 7) 4784 8. 4761 9) 4755 10) 4756 Finals 1 ... A couple weeks ago, a local bourbon buddy decided to host an insane Willett event….",
+            "extraSnippets": []
+          },
+          {
+            "title": "Willett Distillery - Peated",
+            "url": "https://peated.com/distillers/502-willett-distillery",
+            "domain": "peated.com",
+            "description": "Willett Family Estate 6-year-old Single Barrel Bourbon 123.6 Proof. Bourbon. 6 ... Willett Single Barrel Family Estate - Barrel #4769. Single Malt. 5 years ...",
+            "extraSnippets": []
+          }
+        ]
+      }
+    ],
+    "errors": []
+  },
+  "metadata": {
+    "cacheKey": "2dae752b5b0793bef3356d0b2a82927108fca988f108e7e4dc83a8b8a4634757",
+    "mode": "auto"
+  }
+}

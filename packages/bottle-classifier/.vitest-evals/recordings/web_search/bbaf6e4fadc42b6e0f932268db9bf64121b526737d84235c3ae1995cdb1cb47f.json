@@ -1,0 +1,65 @@
+{
+  "writtenAt": "2026-10-29T18:51:26.432Z",
+  "toolName": "web_search",
+  "input": {
+    "queries": ["Kyrö \"RW6.5\" whisky \"Appley ever after\" distillery"]
+  },
+  "output": {
+    "evidence": [
+      {
+        "provider": "firecrawl",
+        "query": "Kyrö \"RW6.5\" whisky \"Appley ever after\" distillery",
+        "summary": "52.3 % Vol. WB Rating: 85.33. Kyrö 2018 SMWS RW6.5. Bottler: The Scotch Malt Whisky Society. Bottling serie: Appley ever after. Vintage: 11.01.2018. Bottled ... SMWS. RW6.5 Appley ever after - 2024 Release. Single cask. Log a tastingAdd to Library. ABV: 56.0%. Age: 6 years. Cask: 1st fill #3 char barrel. View whisky · Kyrö 2018 SMWS RW6.5. Kyrö Distillery Company. Kyrö 2018 SMWS RW6.5 Appley ever after. Vintage: 2018. View whisky · Kyrö 2018 SMWS RW6.6. Kyrö ... See bottle details for SMWS RW6.5 Appley ever after in the Peated whisky database. キュロ 6年 RW6.5 “Appley ever after” Google検索 ; 6 年 ·",
+        "results": [
+          {
+            "title": "Kyrö Distillery Company",
+            "url": "https://www.whiskybase.com/whiskies/distillery/84066/whiskies?language=en",
+            "domain": "whiskybase.com",
+            "description": "52.3 % Vol. WB Rating: 85.33. Kyrö 2018 SMWS RW6.5. Bottler: The Scotch Malt Whisky Society. Bottling serie: Appley ever after. Vintage: 11.01.2018. Bottled ...",
+            "extraSnippets": []
+          },
+          {
+            "title": "SMWS RW6.5 Appley ever after releases - Peated",
+            "url": "https://peated.com/bottles/43260/similar",
+            "domain": "peated.com",
+            "description": "SMWS. RW6.5 Appley ever after - 2024 Release. Single cask. Log a tastingAdd to Library. ABV: 56.0%. Age: 6 years. Cask: 1st fill #3 char barrel.",
+            "extraSnippets": []
+          },
+          {
+            "title": "Kyrö – 90 bottlings",
+            "url": "https://www.whiskybase.com/whiskies/brand/82778/whiskies",
+            "domain": "whiskybase.com",
+            "description": "View whisky · Kyrö 2018 SMWS RW6.5. Kyrö Distillery Company. Kyrö 2018 SMWS RW6.5 Appley ever after. Vintage: 2018. View whisky · Kyrö 2018 SMWS RW6.6. Kyrö ...",
+            "extraSnippets": []
+          },
+          {
+            "title": "SMWS RW6.5 Appley ever after | Peated",
+            "url": "https://peated.com/bottles/43260-smws-rw-6-5-appley-ever-after/tastings",
+            "domain": "peated.com",
+            "description": "See bottle details for SMWS RW6.5 Appley ever after in the Peated whisky database.",
+            "extraSnippets": []
+          },
+          {
+            "title": "キュロ 6年 RW6.5 “Appley ever after”",
+            "url": "https://whiskies.wiki/whisky/w19656/",
+            "domain": "whiskies.wiki",
+            "description": "キュロ 6年 RW6.5 “Appley ever after” Google検索 ; 6 年 · ファーストフィル #3 チャー バレル · 56.0 % · 700 ml · ザ・スコッチモルトウイスキー・ ...",
+            "extraSnippets": []
+          },
+          {
+            "title": "Kyrö 2018 SMWS RW6.5 - Ratings and Reviews",
+            "url": "https://www.whiskybase.com/whiskies/whisky/264892/kyr-2018-smws-rw65",
+            "domain": "whiskybase.com",
+            "description": "Appley ever after; Vintage: 11.01.2018; Bottled: 2024; Stated Age: 06 years; Cask Type: 1st Fill #3 Char Barrel; Cask number: RW6.5; Number of ...",
+            "extraSnippets": []
+          }
+        ]
+      }
+    ],
+    "errors": []
+  },
+  "metadata": {
+    "cacheKey": "bbaf6e4fadc42b6e0f932268db9bf64121b526737d84235c3ae1995cdb1cb47f",
+    "mode": "auto"
+  }
+}

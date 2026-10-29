@@ -1,0 +1,67 @@
+{
+  "writtenAt": "2026-10-29T19:37:35.101Z",
+  "toolName": "web_search",
+  "input": {
+    "queries": [
+      "Hibiki 21 Year Old official Suntory whisky product 43% blended whisky distilleries Yamazaki Hakushu Chita"
+    ]
+  },
+  "output": {
+    "evidence": [
+      {
+        "provider": "firecrawl",
+        "query": "Hibiki 21 Year Old official Suntory whisky product 43% blended whisky distilleries Yamazaki Hakushu Chita",
+        "summary": "# Hibiki 21 Years Old\n43% ABV · 70cl\n\nThis product meets the standards set out by the Japan Spirits & Liqueurs Makers Association for labeling Japanese Whisky.\n\n## A prized Japanese whisky\nA prestigious blend that unites the single malts from the Yamazaki and Hakushu Distilleries with smooth grain whiskies from Chita Distillery is aged for a minimum 21 years in American bourbon oak casks and European sherry casks, culminating in the special marriage of Japanese Mizunara oak. This exceptional blend comprises meticulously selected malt whiskies from Yamazaki and Hakushu distilleries, combined wi",
+        "results": [
+          {
+            "title": "Hibiki® 21 | Japanese Whisky",
+            "url": "https://house.suntory.com/hibiki-whisky/hibiki-21-years-old",
+            "domain": "house.suntory.com",
+            "description": "# Hibiki 21 Years Old\n43% ABV · 70cl\n\nThis product meets the standards set out by the Japan Spirits & Liqueurs Makers Association for labeling Japanese Whisky.\n\n## A prized Japanese whisky\nA prestigious blend that unites",
+            "extraSnippets": []
+          },
+          {
+            "title": "Hibiki 21 Year Old Blended Whisky",
+            "url": "https://www.winex.com/hibiki-21-year-old-blended-whisky-1.html",
+            "domain": "winex.com",
+            "description": "This exceptional blend comprises meticulously selected malt whiskies from Yamazaki and Hakushu distilleries, combined with grain whisky from Chita ...",
+            "extraSnippets": []
+          },
+          {
+            "title": "Review #147 – Hibiki 21 Year Old : r/worldwhisky",
+            "url": "https://www.reddit.com/r/worldwhisky/comments/z43agv/review_147_hibiki_21_year_old/",
+            "domain": "reddit.com",
+            "description": "The Hibiki brand was only launched in 1989. And Hibiki 21 Year is a Blended Japanese Whisky, made up of both malt and grain whiskies. So how ...",
+            "extraSnippets": []
+          },
+          {
+            "title": "Best local price for Hibiki 21 Year Old Blended Whisky",
+            "url": "https://www.wine-searcher.com/find/hibiki+21+old+blend+whisky+japan",
+            "domain": "wine-searcher.com",
+            "description": "This award-winning blend harmoniously combines rare and meticulously selected whiskies from the Suntory Whisky House, each aged for a minimum of 21 years. Known ...",
+            "extraSnippets": []
+          },
+          {
+            "title": "Hibiki 21 Years Old",
+            "url": "https://tastersclub.com/products/hibiki-21-years-old",
+            "domain": "tastersclub.com",
+            "description": "This exceptional blend marries carefully selected malt and grain whiskies from Yamazaki, Hakushu, and Chita distilleries, creating layers of honey, dried ...",
+            "extraSnippets": []
+          },
+          {
+            "title": "Hibiki® Blended Japanese Whisky",
+            "url": "https://house.suntory.com/hibiki-whisky",
+            "domain": "house.suntory.com",
+            "description": "# Hibiki Whisky\n## The pinnacle of whisky  blending\nYamazaki Distillery\n\nHakushu Distillery\n\nChita Distillery",
+            "extraSnippets": []
+          }
+        ]
+      }
+    ],
+    "errors": []
+  },
+  "metadata": {
+    "cacheKey": "d609e389b1bea566e54541b020091e465eca90ccf0e7a69b03d1b2fd2af23077",
+    "mode": "auto"
+  }
+}

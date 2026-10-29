@@ -1,0 +1,39 @@
+{
+  "writtenAt": "2026-10-29T19:27:29.400Z",
+  "toolName": "web_search",
+  "input": {
+    "queries": [
+      "\"892052\" \"Writers' Tears\" whisky auction",
+      "\"Writer’s Tears\" \"The 182nd Auction\" Scotch Whisky Auctions"
+    ]
+  },
+  "output": {
+    "evidence": [
+      {
+        "provider": "firecrawl",
+        "query": "\"892052\" \"Writers' Tears\" whisky auction",
+        "summary": null,
+        "results": []
+      },
+      {
+        "provider": "firecrawl",
+        "query": "\"Writer’s Tears\" \"The 182nd Auction\" Scotch Whisky Auctions",
+        "summary": "[Skip to menu](https://www.scotchwhiskyauctions.com/auctions/231-the-182nd-auction/892052-writers-tears/#menu) [Skip to content](https://www.scotchwhiskyauctions.com/auctions/231-the-182nd-auction/892052-writers-tears/#contentstart)",
+        "results": [
+          {
+            "title": "Writer's Tears | The 182nd Auction",
+            "url": "https://www.scotchwhiskyauctions.com/auctions/231-the-182nd-auction/892052-writers-tears/",
+            "domain": "scotchwhiskyauctions.com",
+            "description": "[Skip to menu](https://www.scotchwhiskyauctions.com/auctions/231-the-182nd-auction/892052-writers-tears/#menu) [Skip to content](https://www.scotchwhiskyauctions.com/auctions/231-the-182nd-auction/892052-writers-tears/#c",
+            "extraSnippets": []
+          }
+        ]
+      }
+    ],
+    "errors": []
+  },
+  "metadata": {
+    "cacheKey": "a85b4053cbc71ace0f9e038a05ab91dd5d5018586639d67e27a0791182770a26",
+    "mode": "auto"
+  }
+}

@@ -1,0 +1,67 @@
+{
+  "writtenAt": "2026-10-29T18:23:27.154Z",
+  "toolName": "web_search",
+  "input": {
+    "queries": [
+      "Four Roses official Single Barrel Barrel Strength bourbon product barrel strength single barrel variable proof barrel number"
+    ]
+  },
+  "output": {
+    "evidence": [
+      {
+        "provider": "firecrawl",
+        "query": "Four Roses official Single Barrel Barrel Strength bourbon product barrel strength single barrel variable proof barrel number",
+        "summary": "[Skip to main content](https://www.fourrosesbourbon.com/bourbon/single-barrel#main-content)\n\n# Single Barrel OBSV\n![](https://www.fourrosesbourbon.com/_next/image?url=https%3A%2F%2Ffour-roses.files.svdcdn.com%2Fproduction%2Fimages%2Fbourbons%2Fsingle-barrel.png%3Fdm%3D1757960470&w=2560&q=75)![](https://www.fourrosesbourbon.com/_next/image?url=https%3A%2F%2Ffour-roses.files.svdcdn.com%2Fproduction%2Fimages%2Fbourbons%2FWeb_FR-Single-Barrel.png%3Fdm%3D1757960461&w=2560&q=75)\n\n100 Proof / Aged 7 - 9 Years\n\nfind nearby\n\n![](https://www.fourrosesbourbon.com/_next/image?url=https%3A%2F%2Ffour-roses.",
+        "results": [
+          {
+            "title": "Single Barrel OBSV",
+            "url": "https://www.fourrosesbourbon.com/bourbon/single-barrel",
+            "domain": "fourrosesbourbon.com",
+            "description": "[Skip to main content](https://www.fourrosesbourbon.com/bourbon/single-barrel#main-content)\n\n# Single Barrel OBSV\n![](https://www.fourrosesbourbon.com/_next/image?url=https%3A%2F%2Ffour-roses.files.svdcdn.com%2Fproductio",
+            "extraSnippets": []
+          },
+          {
+            "title": "Four Roses Single Barrel Cask Strength Bourbon",
+            "url": "https://www.youtube.com/watch?v=K-S7lFyqFto",
+            "domain": "youtube.com",
+            "description": "Day 10 finds us with a Four Roses Single Barrel picked by Master Distillery Brentt Elliott at cask strength! It is an OBSQ recipe at 115.6° ...",
+            "extraSnippets": []
+          },
+          {
+            "title": "Four Roses Single Barrel Barrel Strength Bourbon Review",
+            "url": "https://www.amongstthewhiskey.com/post/four-roses-single-barrel-barrel-strength-bourbon-review",
+            "domain": "amongstthewhiskey.com",
+            "description": "top of page\n\nSearch\n\n_Four Roses Friday is upon us!_ _Hoping it hits the spot._\n\n_Some information from the trip:_\n\nThanks Brent!\n\n_Now let's see what I think of it (as one of the lucky few who were able to get one!)._\n\n",
+            "extraSnippets": []
+          },
+          {
+            "title": "Four Roses 'Private Selection' Single Barrel Strength ...",
+            "url": "https://www.wine-searcher.com/find/four+roses+prvt+select+single+barrel+strength+straight+bourbon+whisky+kentucky+usa",
+            "domain": "wine-searcher.com",
+            "description": "Find the best local price for Four Roses 'Private Selection' Single Barrel Strength Kentucky Straight Bourbon Whiskey, USA. Avg Price (ex-tax) $103 / 750ml.",
+            "extraSnippets": []
+          },
+          {
+            "title": "Four Roses Single Barrel Bourbon Review",
+            "url": "https://thebourbonculture.com/whiskey-reviews/four-roses-single-barrel-bourbon-review/",
+            "domain": "thebourbonculture.com",
+            "description": "[Skip to Content](https://thebourbonculture.com/whiskey-reviews/four-roses-single-barrel-bourbon-review/#content)\n\nFrom my early days as a bourbon drinker, there has really only been one Four Roses bottle I’ve purchased ",
+            "extraSnippets": []
+          },
+          {
+            "title": "Four Roses Barrel Strength – Proof Preferences ? : r/bourbon",
+            "url": "https://www.reddit.com/r/bourbon/comments/39q05f/four_roses_barrel_strength_proof_preferences/",
+            "domain": "reddit.com",
+            "description": "in general the \"it's a single barrel product and there are so many variables barrel to barrel that proof is hard to isolate as a factor\" answers ...",
+            "extraSnippets": []
+          }
+        ]
+      }
+    ],
+    "errors": []
+  },
+  "metadata": {
+    "cacheKey": "bd31e33e3e859a6c6b7949be6a1a2272db35f4271bab69ed5439e1bffcca587a",
+    "mode": "auto"
+  }
+}

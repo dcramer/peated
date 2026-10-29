@@ -1,0 +1,117 @@
+{
+  "writtenAt": "2026-10-29T18:38:28.406Z",
+  "toolName": "web_search",
+  "input": {
+    "queries": [
+      "Mars Komagatake 2022 50% single malt whisky official product name",
+      "Komagatake 2022 edition 50% Mars Shinshu distillery whisky"
+    ]
+  },
+  "output": {
+    "evidence": [
+      {
+        "provider": "firecrawl",
+        "query": "Mars Komagatake 2022 50% single malt whisky official product name",
+        "summary": "The Mars Komagatake Limited Edition 2022 is a Japanese single malt whisky from the Shinshu distillery. This limited edition matured in sherry, ... Produced at Mars Shinshu Distillery and aged in bourbon, port, and sherry casks, this has a nose of pepper, ground ginger, cumin, sea salt, ... The Mars KOMAGATAKE Single Malt Japanese Whisky Limited Edition 2022 is a bottling full of character from the Mars Shinshu Distillery, Bottled at a powerful 50 ... This release from 2022 was aged in a combination of ex-bourbon, sherry and Port wine casks, creating a silky and nutty whiskey with notes of exot",
+        "results": [
+          {
+            "title": "Mars Komagatake Limited Edition 2022 (50%) - Dramtime",
+            "url": "https://www.dramtime.eu/product/mars-komagatake-limited-edition-2022/",
+            "domain": "dramtime.eu",
+            "description": "The Mars Komagatake Limited Edition 2022 is a Japanese single malt whisky from the Shinshu distillery. This limited edition matured in sherry, ...",
+            "extraSnippets": []
+          },
+          {
+            "title": "Mars Komagatake (2022 Edition), 50%",
+            "url": "https://whiskyadvocate.com/Mars-Komagatake-2022-Edition-50",
+            "domain": "whiskyadvocate.com",
+            "description": "Produced at Mars Shinshu Distillery and aged in bourbon, port, and sherry casks, this has a nose of pepper, ground ginger, cumin, sea salt, ...",
+            "extraSnippets": []
+          },
+          {
+            "title": "Mars KOMAGATAKE Single Malt Japanese Whisky Limited ...",
+            "url": "https://northwestdrinks.com/product/mars-komagatake-single-malt-japanese-whisky-limited-edition-2022-50-vol-07l-in-gift-box/",
+            "domain": "northwestdrinks.com",
+            "description": "The Mars KOMAGATAKE Single Malt Japanese Whisky Limited Edition 2022 is a bottling full of character from the Mars Shinshu Distillery, Bottled at a powerful 50 ...",
+            "extraSnippets": []
+          },
+          {
+            "title": "Mars Komagatake - 2022 Edition",
+            "url": "https://www.thewhiskyexchange.com/p/71681/mars-komagatake-2022-edition",
+            "domain": "thewhiskyexchange.com",
+            "description": "This release from 2022 was aged in a combination of ex-bourbon, sherry and Port wine casks, creating a silky and nutty whiskey with notes of exotic fruits, ...",
+            "extraSnippets": []
+          },
+          {
+            "title": "Mars Komagatake Single Malt 2022 Edition, Bourbon & Port ...",
+            "url": "https://www.maltiply.com/search-whisky/whisky/mars-komagatake-single-malt-2022-edition-bourbon-port-sherry-cask-50",
+            "domain": "maltiply.com",
+            "description": "Komagatake 2022 Edition is a non-age-statement Japanese single malt from Nagano, matured in ex-bourbon, sherry and port casks and bottled at 50% ABV.",
+            "extraSnippets": []
+          },
+          {
+            "title": "Mars Komagatake Single Malt (Mars Shinshu Distillery) ...",
+            "url": "https://88bamboo.co/blogs/whisky-reviews/mars-komagatake-single-malt-mars-shinshu-distillery-2023-edition-50-abv",
+            "domain": "88bamboo.co",
+            "description": "Mars Komagatake Single Malt (Mars Shinshu Distillery) 2023 Edition, 50% ABV · Nose: Approachable and refined, with a very delightful perfumy ...",
+            "extraSnippets": []
+          }
+        ]
+      },
+      {
+        "provider": "firecrawl",
+        "query": "Komagatake 2022 edition 50% Mars Shinshu distillery whisky",
+        "summary": "Japan - 50% - The Komagatake Single Malt is Mars Distillery's annual single malt that showcase the depth generated in this Nagano based ... Alcohol by Volume: 50% (from a bottle split) It's floral and sweet, with lots of marshmallows. Honey on Irish soda bread. Maybe a hint of smoke ... Region: Japan Single Malt. ABV: 50%. Bottled in 2022. Citrus fruit and honey with subtle herbal tea. Medium-bodied, syrupy, candied citrus peel ... Mars Komagatake Single Malt (Mars Shinshu Distillery) 2023 Edition, 50% ABV · Nose: Approachable and refined, with a very delightful perfumy ... # Single Malt Whisk",
+        "results": [
+          {
+            "title": "Mars Single Malt Whiskey | Total Wine & More",
+            "url": "https://www.totalwine.com/theme/mars-single-malt-whiskey",
+            "domain": "totalwine.com",
+            "description": "Japan - 50% - The Komagatake Single Malt is Mars Distillery's annual single malt that showcase the depth generated in this Nagano based ...",
+            "extraSnippets": []
+          },
+          {
+            "title": "Mars Komagatake 2022 Edition",
+            "url": "http://www.divingforpearlsblog.com/2025/03/mars-komagatake-2022-edition.html",
+            "domain": "divingforpearlsblog.com",
+            "description": "Alcohol by Volume: 50% (from a bottle split) It's floral and sweet, with lots of marshmallows. Honey on Irish soda bread. Maybe a hint of smoke ...",
+            "extraSnippets": []
+          },
+          {
+            "title": "Mars Komagatake 2022 Edition",
+            "url": "https://maltrunners.com/2024/03/26/mars-komagatake-2022-edition/",
+            "domain": "maltrunners.com",
+            "description": "Region: Japan Single Malt. ABV: 50%. Bottled in 2022. Citrus fruit and honey with subtle herbal tea. Medium-bodied, syrupy, candied citrus peel ...",
+            "extraSnippets": []
+          },
+          {
+            "title": "Mars Komagatake Single Malt (Mars Shinshu Distillery) ...",
+            "url": "https://88bamboo.co/blogs/whisky-reviews/mars-komagatake-single-malt-mars-shinshu-distillery-2023-edition-50-abv",
+            "domain": "88bamboo.co",
+            "description": "Mars Komagatake Single Malt (Mars Shinshu Distillery) 2023 Edition, 50% ABV · Nose: Approachable and refined, with a very delightful perfumy ...",
+            "extraSnippets": []
+          },
+          {
+            "title": "Single Malt Whisky 'Komagatake Edition 2022'",
+            "url": "https://www.skurnik.com/sku/single-malt-whisky-komagatake-limited-edition-2018-mars-shinshu-5/",
+            "domain": "skurnik.com",
+            "description": "# Single Malt Whisky 'Komagatake Edition 2022'\n## Single Malt Whisky 'Komagatake Edition 2022'\n- Non-chill filtered; 50% ABV",
+            "extraSnippets": []
+          },
+          {
+            "title": "Mars Komagatake (2022 Edition), 50%",
+            "url": "https://whiskyadvocate.com/Mars-Komagatake-2022-Edition-50",
+            "domain": "whiskyadvocate.com",
+            "description": "# Mars Komagatake (2022 Edition), 50%\nPrice: $155.00● Issue: Winter 2022 ● Reviewer: Jonny McCormick ● Category: Japanese Single Malt\n\n[Buy Now](https://whiskyadvocate.com/Mars-Komagatake-2022-Edition-50)\n\nProduced at Ma",
+            "extraSnippets": []
+          }
+        ]
+      }
+    ],
+    "errors": []
+  },
+  "metadata": {
+    "cacheKey": "3864e91f309c2a2a8bd30ce59b90701e7fde0a3de72d5549b18e042f4e56ec0c",
+    "mode": "auto"
+  }
+}

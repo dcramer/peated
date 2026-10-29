@@ -1,0 +1,117 @@
+{
+  "writtenAt": "2026-10-29T18:35:23.135Z",
+  "toolName": "web_search",
+  "input": {
+    "queries": [
+      "High West A Midwinter Night's Dram Act 10 Scene 4 49.3% label release 2022",
+      "High West Midwinter Night's Dram Act 10 Scene 4 product title official"
+    ]
+  },
+  "output": {
+    "evidence": [
+      {
+        "provider": "firecrawl",
+        "query": "High West A Midwinter Night's Dram Act 10 Scene 4 49.3% label release 2022",
+        "summary": "High West confirmed that their own rye whiskey is aged four to seven years for Rendezvous Rye and A Midwinter Night's Dram from 2019 onwards. ABV: 49.3% Proof: 98.6. Nose Brandied cherries, fig jam, sun-dried raisins, dried orange peel, baking spice, French oak toast. A Midwinter Night's Dram, High West Distillery, Act 10, Scene 4. A blend of straight rye whiskeys finished in port barrels. 49.3% alc./ vol. High West A Midwinter Night's Dram (Act 10, Scene 4), 49.3%. Price: $150.00 ○ Issue: Spring 2023 ○ Reviewer: Ted Simmons ○ Category: Rye ... Creamy and light on the palate, with Grape-Nuts,",
+        "results": [
+          {
+            "title": "A Midwinter Night's Dram (Act 10, Scene 4) Scoresheet & ...",
+            "url": "https://thewhiskeyramble.com/2023/12/01/a-midwinter-nights-dram-act-10-scene-4-scoresheet-review/",
+            "domain": "thewhiskeyramble.com",
+            "description": "High West confirmed that their own rye whiskey is aged four to seven years for Rendezvous Rye and A Midwinter Night's Dram from 2019 onwards.",
+            "extraSnippets": []
+          },
+          {
+            "title": "A Midwinter Nights Dram",
+            "url": "https://highwest.com/pages/a-midwinter-nights-dram",
+            "domain": "highwest.com",
+            "description": "ABV: 49.3% Proof: 98.6. Nose Brandied cherries, fig jam, sun-dried raisins, dried orange peel, baking spice, French oak toast.",
+            "extraSnippets": []
+          },
+          {
+            "title": "Review 003 - A Midwinter Night's Dram, Act 10, Scene 4",
+            "url": "https://www.reddit.com/r/bourbon/comments/195819a/review_003_a_midwinter_nights_dram_act_10_scene_4/",
+            "domain": "reddit.com",
+            "description": "A Midwinter Night's Dram, High West Distillery, Act 10, Scene 4. A blend of straight rye whiskeys finished in port barrels. 49.3% alc./ vol.",
+            "extraSnippets": []
+          },
+          {
+            "title": "High West A Midwinter Night's Dram (Act 10, Scene 4), 49.3%",
+            "url": "https://whiskyadvocate.com/High-West-A-Midwinter-Night-s-Dram-Act-10-Scene-4-49-3",
+            "domain": "whiskyadvocate.com",
+            "description": "High West A Midwinter Night's Dram (Act 10, Scene 4), 49.3%. Price: $150.00 ○ Issue: Spring 2023 ○ Reviewer: Ted Simmons ○ Category: Rye ...",
+            "extraSnippets": []
+          },
+          {
+            "title": "High West Distillery A Midwinter Night's Dram Act 10 Scene 4",
+            "url": "http://www.bottleshop.com/products/14031849/high-west-distillery-a-midwinter-night-s-dram-act-10-scene-4",
+            "domain": "bottleshop.com",
+            "description": "Creamy and light on the palate, with Grape-Nuts, cherry ice cream, dried herbs, and honey. The finish is long and flavorful, with waves of vanilla cream and ...",
+            "extraSnippets": []
+          },
+          {
+            "title": "High West A Midwinter Night's Dram - An Exploration of ...",
+            "url": "https://www.amongstthewhiskey.com/post/high-west-a-midwinter-night-s-dram-an-exploration-of-differences-between-scenes-of-the-same-act",
+            "domain": "amongstthewhiskey.com",
+            "description": "2022's release, Act 10, dropped around Massachusetts in the latter part of the year in preparation for some great sips in the colder months. I ...",
+            "extraSnippets": []
+          }
+        ]
+      },
+      {
+        "provider": "firecrawl",
+        "query": "High West Midwinter Night's Dram Act 10 Scene 4 product title official",
+        "summary": "High West confirmed that their own rye whiskey is aged four to seven years for Rendezvous Rye and A Midwinter Night's Dram from 2019 onwards. Creamy and light on the palate, with Grape-Nuts, cherry ice cream, dried herbs, and honey. The finish is long and flavorful, with waves of vanilla cream and ... High West Distillery Midwinter Nights Dram Act 10 Scene 4 750ml. SKU: 21559 750ml 1 Add to Cart $299.99 You Save $50.00 (17%) $249.99 Available for: Shipping A Midwinter Night's Dram, High West Distillery, Act 10, Scene 4. A blend of straight rye whiskeys finished in port barrels. 49.3% alc./ vol",
+        "results": [
+          {
+            "title": "A Midwinter Night's Dram (Act 10, Scene 4) Scoresheet & ...",
+            "url": "https://thewhiskeyramble.com/2023/12/01/a-midwinter-nights-dram-act-10-scene-4-scoresheet-review/",
+            "domain": "thewhiskeyramble.com",
+            "description": "High West confirmed that their own rye whiskey is aged four to seven years for Rendezvous Rye and A Midwinter Night's Dram from 2019 onwards.",
+            "extraSnippets": []
+          },
+          {
+            "title": "High West Distillery A Midwinter Night's Dram Act 10 Scene 4",
+            "url": "http://www.bottleshop.com/products/14031849/high-west-distillery-a-midwinter-night-s-dram-act-10-scene-4",
+            "domain": "bottleshop.com",
+            "description": "Creamy and light on the palate, with Grape-Nuts, cherry ice cream, dried herbs, and honey. The finish is long and flavorful, with waves of vanilla cream and ...",
+            "extraSnippets": []
+          },
+          {
+            "title": "High West Distillery Midwinter Nights Dram Act 10 Scene 4",
+            "url": "http://www.rockwineandspirits.com/products/14332057/high-west-distillery-midwinter-nights-dram-act-10-scene-4",
+            "domain": "rockwineandspirits.com",
+            "description": "High West Distillery Midwinter Nights Dram Act 10 Scene 4 750ml. SKU: 21559 750ml 1 Add to Cart $299.99 You Save $50.00 (17%) $249.99 Available for: Shipping",
+            "extraSnippets": []
+          },
+          {
+            "title": "Review 003 - A Midwinter Night's Dram, Act 10, Scene 4",
+            "url": "https://www.reddit.com/r/bourbon/comments/195819a/review_003_a_midwinter_nights_dram_act_10_scene_4/",
+            "domain": "reddit.com",
+            "description": "A Midwinter Night's Dram, High West Distillery, Act 10, Scene 4. A blend of straight rye whiskeys finished in port barrels. 49.3% alc./ vol.",
+            "extraSnippets": []
+          },
+          {
+            "title": "High West A Midwinter Night's Dram (Act 10, Scene 4), 49.3%",
+            "url": "https://whiskyadvocate.com/High-West-A-Midwinter-Night-s-Dram-Act-10-Scene-4-49-3",
+            "domain": "whiskyadvocate.com",
+            "description": "High West A Midwinter Night's Dram (Act 10, Scene 4), 49.3% Price: $150.00. Rich dark fruit highlights a pungent nose of blood orange, baked apples, and plums, ...",
+            "extraSnippets": []
+          },
+          {
+            "title": "High West Distillery A Midwinter Night's Dram Act 10 Scene 4",
+            "url": "https://sf.flatiron-wines.com/products/high-west-distillery-a-midwinter-nights-dram-act-10-scene-1",
+            "domain": "sf.flatiron-wines.com",
+            "description": "A limited Annual release from High West. Aged in French oak Port barrels. Shipping. Every step of the journey is managed to uphold the integrity of each ...",
+            "extraSnippets": []
+          }
+        ]
+      }
+    ],
+    "errors": []
+  },
+  "metadata": {
+    "cacheKey": "a401f78f17facdce66b720a14c576d8654507454bf512f1bcacd42031ea16258",
+    "mode": "auto"
+  }
+}

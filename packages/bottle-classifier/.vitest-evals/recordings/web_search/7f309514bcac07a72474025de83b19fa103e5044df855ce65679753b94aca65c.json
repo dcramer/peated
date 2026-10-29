@@ -1,0 +1,67 @@
+{
+  "writtenAt": "2026-10-29T18:29:44.975Z",
+  "toolName": "web_search",
+  "input": {
+    "queries": [
+      "Talisker 2001 The Distillers Edition official 2001 2013 bottling 45.8% Amoroso cask"
+    ]
+  },
+  "output": {
+    "evidence": [
+      {
+        "provider": "firecrawl",
+        "query": "Talisker 2001 The Distillers Edition official 2001 2013 bottling 45.8% Amoroso cask",
+        "summary": "The 2001 vintage of Talisker's Distillers Edition, which is double matured, with the finish taking place in Amoroso casks, similar in style to sweet oloroso ... ## ![Talisker Distillers Edition 2001 / 2012](https://www.whiskynotes.be/upload/Talisker-2001-Distillers-Edition_8F91/Untitled-1.jpg)Talisker 2001 ‘Distillers Edition’   (45,8%, OB 2012, Amoroso sherry finish)\nSets off on coastal aromas and lots of oranges. Tobacco leaves. Trademark pepper but in a mild way.\n\n**Finish:** long, spicy with hints of pepper, dried fruits and herbs.\n\nPrices tend to go from € 45 to around € 65.\n\nScore: **87/",
+        "results": [
+          {
+            "title": "Talisker 2001 Distillers Edition - Bot.2012 Scotch Whisky",
+            "url": "https://www.thewhiskyexchange.com/p/22187/talisker-2001-distillers-edition-bot2012",
+            "domain": "thewhiskyexchange.com",
+            "description": "The 2001 vintage of Talisker's Distillers Edition, which is double matured, with the finish taking place in Amoroso casks, similar in style to sweet oloroso ...",
+            "extraSnippets": []
+          },
+          {
+            "title": "Talisker 2001 Distillers Edition",
+            "url": "https://www.whiskynotes.be/2013/talisker/talisker-2001-distillers-edition/",
+            "domain": "whiskynotes.be",
+            "description": "## ![Talisker Distillers Edition 2001 / 2012](https://www.whiskynotes.be/upload/Talisker-2001-Distillers-Edition_8F91/Untitled-1.jpg)Talisker 2001 ‘Distillers Edition’   (45,8%, OB 2012, Amoroso sherry finish)\nSets off o",
+            "extraSnippets": []
+          },
+          {
+            "title": "r/Scotch - Talisker - The Distillers Edition",
+            "url": "https://www.reddit.com/r/Scotch/comments/2swigk/talisker_the_distillers_edition/",
+            "domain": "reddit.com",
+            "description": "Talisker Distillers Edition 45.8% ABV. $80 USD. Distilled in 2001 and bottled in 2012. Served in a Glencairn. Color: Pretty damn amber. Nose ...",
+            "extraSnippets": []
+          },
+          {
+            "title": "Talisker 2001 The Distillers Edition 45.8% - Whiskyshop",
+            "url": "https://rarevintagewhisky.nl/en/Talisker-2001-The-Distillers-Edition-45.8",
+            "domain": "rarevintagewhisky.nl",
+            "description": "# Talisker 2001 The Distillers Edition 45.8%\n![Talisker 2001 The Distillers Edition 45.8%](https://rarevintagewhisky.nl/Files/10/349000/349023/ProductPhotos/MaxContent/2010440232.jpg)\n\nTalisker 2001 The Distillers Editio",
+            "extraSnippets": []
+          },
+          {
+            "title": "Talisker Distillers Edition 1988/2001 (45.8%, OB, TD-S: 5CO)",
+            "url": "https://masterquill.com/2012/06/17/talisker-distillers-edition-19882001-45-8-ob-td-s-5co/",
+            "domain": "masterquill.com",
+            "description": "Taste: it's a Talisker all right. It seems to be less peaty, added licorice and more woody. The Amoroso casks do give off some extra wood. If ...",
+            "extraSnippets": []
+          },
+          {
+            "title": "Talisker Single Malt Scotch Whisky from the Islands",
+            "url": "https://www.whiskyfun.com/Talisker.html",
+            "domain": "whiskyfun.com",
+            "description": "Stills: 4 (2 wash, 2 spirit) (45.8%, OB, bottled 2005) Bottled 2001, 6000 bottles) Edition (45.8%, OB) (45.8%, OB, Amoroso finish) Cask of Distinction,",
+            "extraSnippets": []
+          }
+        ]
+      }
+    ],
+    "errors": []
+  },
+  "metadata": {
+    "cacheKey": "7f309514bcac07a72474025de83b19fa103e5044df855ce65679753b94aca65c",
+    "mode": "auto"
+  }
+}

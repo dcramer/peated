@@ -1,0 +1,67 @@
+{
+  "writtenAt": "2026-10-29T19:22:55.255Z",
+  "toolName": "web_search",
+  "input": {
+    "queries": [
+      "Wild Turkey Rare Breed Rye official product 56.1% barrel proof title"
+    ]
+  },
+  "output": {
+    "evidence": [
+      {
+        "provider": "firecrawl",
+        "query": "Wild Turkey Rare Breed Rye official product 56.1% barrel proof title",
+        "summary": "Wild Turkey Rare Breed Rye is a barrel proof, non-chill-filtered blend of 4-,6-, and 8-year-old Kentucky Straight Rye from Wild Turkey Distillery. # Wild Turkey Rare Breed Rye\nThis will be the first permanent rye product from Wild Turkey, coming in at barrel proof and non chill filtered all the way.\n\n## **Wild Turkey Rare Breed Rye: Specs**\n**Proof:** 112.2 (56.1% ABV) Wild Turkey has added an extension to their Barrel Proof lineup known as Rare Breed with a non-chill filtered Rye. Bottled at 112.2 proof, this ... Rare Breed Rye is non-chill filtered and contains a blend of four-, six-, and ei",
+        "results": [
+          {
+            "title": "Rare Breed Rye: barrel proof rye whiskey",
+            "url": "https://www.wildturkeybourbon.com/en-us/products/rare-breed-rye/",
+            "domain": "wildturkeybourbon.com",
+            "description": "Wild Turkey Rare Breed Rye is a barrel proof, non-chill-filtered blend of 4-,6-, and 8-year-old Kentucky Straight Rye from Wild Turkey Distillery.",
+            "extraSnippets": []
+          },
+          {
+            "title": "Wild Turkey Rare Breed Rye Review",
+            "url": "https://www.whiskeyinmyweddingring.com/reviews/wild-turkey-rare-breed-rye",
+            "domain": "whiskeyinmyweddingring.com",
+            "description": "# Wild Turkey Rare Breed Rye\nThis will be the first permanent rye product from Wild Turkey, coming in at barrel proof and non chill filtered all the way.\n\n## **Wild Turkey Rare Breed Rye: Specs**\n**Proof:** 112.2 (56.1% ",
+            "extraSnippets": []
+          },
+          {
+            "title": "Wild Turkey Rare Breed Rye Review",
+            "url": "https://www.youtube.com/watch?v=LqpYY_nIRco",
+            "domain": "youtube.com",
+            "description": "Wild Turkey has added an extension to their Barrel Proof lineup known as Rare Breed with a non-chill filtered Rye. Bottled at 112.2 proof, this ...",
+            "extraSnippets": []
+          },
+          {
+            "title": "Rare Breed Rye (2024)",
+            "url": "https://rarebird101.com/2024/04/24/rare-breed-rye-2024/",
+            "domain": "rarebird101.com",
+            "description": "Rare Breed Rye is non-chill filtered and contains a blend of four-, six-, and eight-year-old barrels. Proof: 112.2 Age: blend of 4-, 6-, and 8- ...",
+            "extraSnippets": []
+          },
+          {
+            "title": "Wild Turkey Rare Breed Rye Has Officially Landed!",
+            "url": "https://www.reddit.com/r/bourbon/comments/goa8q3/wild_turkey_rare_breed_rye_has_officially_landed/",
+            "domain": "reddit.com",
+            "description": "Wild Turkey Rare Breed Barrel Proof Rye. Non-chill. Proof (56.1% abv) Color: Light amber color, viscous, coats the glass well. Nose: Caramel, ...",
+            "extraSnippets": []
+          },
+          {
+            "title": "Rare Breed Rye: barrel proof rye whiskey",
+            "url": "https://www.wildturkeybourbon.com/en-us/products/rare-breed-rye/?bvstate=pg%3A4%2Fct%3Ar",
+            "domain": "wildturkeybourbon.com",
+            "description": "Wild Turkey Rare Breed Rye is a barrel proof, non-chill-filtered blend of 4-,6-, and 8-year-old Kentucky Straight Rye from Wild Turkey Distillery.",
+            "extraSnippets": []
+          }
+        ]
+      }
+    ],
+    "errors": []
+  },
+  "metadata": {
+    "cacheKey": "7bc45dfc1340e8e1a1a7920318e68072093ad5c06b1f047745ad36f644d3d26d",
+    "mode": "auto"
+  }
+}

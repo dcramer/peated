@@ -1,0 +1,67 @@
+{
+  "writtenAt": "2026-10-29T19:21:50.277Z",
+  "toolName": "web_search",
+  "input": {
+    "queries": [
+      "Springbank 10 Year Old 46% ABV official product age 10 year old"
+    ]
+  },
+  "output": {
+    "evidence": [
+      {
+        "provider": "firecrawl",
+        "query": "Springbank 10 Year Old 46% ABV official product age 10 year old",
+        "summary": "The Springbank 10 Year Old is a celebrated single malt Scotch whisky from the Campbeltown region, known for its depth and unique character. Age Statement: 10 Years. Strength: 46% ABV. Cask Makeup: Ex-bourbon and ex-sherry casks. Details: Not chill filtered, no color added. Tasting ... The Springbank 10 Year Old Whisky has been matured in a classic combination of ex-bourbon and ex-sherry casks. Enjoy this slightly peated flagship whisky as ... Springbank 10 year old, 46%. Price: $68.00 ○ Issue: Fall 2007 ○ Reviewer: John Hansell ○ Category: Single Malt Scotch. Buy Now. Thick barley and viscous",
+        "results": [
+          {
+            "title": "Springbank 10 Year Old Single Malt Scotch Whisky",
+            "url": "https://www.divinecellar.com/en/whisky/2544-springbank-10-year-old-single-malt-scotch-whisky-0610854107062.html",
+            "domain": "divinecellar.com",
+            "description": "The Springbank 10 Year Old is a celebrated single malt Scotch whisky from the Campbeltown region, known for its depth and unique character.",
+            "extraSnippets": []
+          },
+          {
+            "title": "r/Scotch - Review #172 - Springbank 10 Year",
+            "url": "https://www.reddit.com/r/Scotch/comments/181b8yc/review_172_springbank_10_year/",
+            "domain": "reddit.com",
+            "description": "Age Statement: 10 Years. Strength: 46% ABV. Cask Makeup: Ex-bourbon and ex-sherry casks. Details: Not chill filtered, no color added. Tasting ...",
+            "extraSnippets": []
+          },
+          {
+            "title": "Springbank 10 Year Old Single Malt Whisky 46%",
+            "url": "https://whiskyinternationalonline.com/products/springbank-10-year-old-whisky-46",
+            "domain": "whiskyinternationalonline.com",
+            "description": "The Springbank 10 Year Old Whisky has been matured in a classic combination of ex-bourbon and ex-sherry casks. Enjoy this slightly peated flagship whisky as ...",
+            "extraSnippets": []
+          },
+          {
+            "title": "Springbank 10 year old, 46%",
+            "url": "https://whiskyadvocate.com/Springbank-10-year-old-46",
+            "domain": "whiskyadvocate.com",
+            "description": "Springbank 10 year old, 46%. Price: $68.00 ○ Issue: Fall 2007 ○ Reviewer: John Hansell ○ Category: Single Malt Scotch. Buy Now. Thick barley and viscous ...",
+            "extraSnippets": []
+          },
+          {
+            "title": "Is Springbank STILL WORTH the HYPE?? Springbank 10 ...",
+            "url": "https://www.youtube.com/watch?v=bohWKSMk0lU",
+            "domain": "youtube.com",
+            "description": "Springbank 10 Year Old is one of the most talked about whiskies in the Scotch world, and for good reason. Hailing from the legendary ...",
+            "extraSnippets": []
+          },
+          {
+            "title": "Springbank 10 Year Scotch 700ml",
+            "url": "https://bevmo.com/products/192959",
+            "domain": "bevmo.com",
+            "description": "Our 10-year-old provides the perfect introduction to the Springbank range ... Product details. Size 700ml; ABV 46.0%; Country United Kingdom; SKU 192959 ...",
+            "extraSnippets": []
+          }
+        ]
+      }
+    ],
+    "errors": []
+  },
+  "metadata": {
+    "cacheKey": "a814a6fbe6fca78682b1232d5c78512bb620c4858a43e0470e1861ec049ea3bd",
+    "mode": "auto"
+  }
+}

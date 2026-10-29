@@ -1,0 +1,117 @@
+{
+  "writtenAt": "2026-10-29T19:04:50.564Z",
+  "toolName": "web_search",
+  "input": {
+    "queries": [
+      "Ardbeg 2006 cask 2787 Feis Ile 2023 16 year old ABV 56.8 official",
+      "Ardbeg cask 2787 Feis Ile 2023 623 bottles label 16-year-old"
+    ]
+  },
+  "output": {
+    "evidence": [
+      {
+        "provider": "firecrawl",
+        "query": "Ardbeg 2006 cask 2787 Feis Ile 2023 16 year old ABV 56.8 official",
+        "summary": "Explore Ardbeg 2006, a 16-year-old whisky at 56.8% ABV, with ratings, reviews and bottle details. Released for Islay's 2023 Fèis Ìle celebrations, this 16-year-old single cask Ardbeg was distilled in July 2006 and matured in a second-fill oloroso sherry ... Released for Islay's 2023 Fèis Ìle celebrations, this 16-year-old single cask Ardbeg was distilled in July 2006 and matured in a second-fill oloroso sherry butt ... Ardbeg 16 Year Old 2006 vintage Islay single malt Scotch whisky. Single 2nd fill Oloroso sherry butt #2787 bottled February 2023 for Ardbeg Day 2023. For Feis Ile 2023, Ardbeg r",
+        "results": [
+          {
+            "title": "Ardbeg 2006 - Ratings and Reviews",
+            "url": "https://www.whiskybase.com/whiskies/whisky/233071/ardbeg-2006",
+            "domain": "whiskybase.com",
+            "description": "Explore Ardbeg 2006, a 16-year-old whisky at 56.8% ABV, with ratings, reviews and bottle details.",
+            "extraSnippets": []
+          },
+          {
+            "title": "Ardbeg 16 Year Old 2006 Cask #2787 - Feis lle 2023 ...",
+            "url": "https://caskcartel.com/es-gb/collections/free-shipping/products/ardbeg-16-year-old-2006-cask-2787-feis-lle-2023-single-malt-scotch-whisky-700ml",
+            "domain": "caskcartel.com",
+            "description": "Released for Islay's 2023 Fèis Ìle celebrations, this 16-year-old single cask Ardbeg was distilled in July 2006 and matured in a second-fill oloroso sherry ...",
+            "extraSnippets": []
+          },
+          {
+            "title": "Second Fill Oloroso Sherry Butt (Fèis Ìle 2023) 70cl Whisky",
+            "url": "https://www.masterofmalt.com/whiskies/ardbeg/ardbeg-16-year-old-2006-cask-2787-feis-ile-2023-whisky/",
+            "domain": "masterofmalt.com",
+            "description": "Released for Islay's 2023 Fèis Ìle celebrations, this 16-year-old single cask Ardbeg was distilled in July 2006 and matured in a second-fill oloroso sherry butt ...",
+            "extraSnippets": []
+          },
+          {
+            "title": "Ardbeg 16 Year Old 2006 Islay Festival 2023 Single Cask",
+            "url": "https://www.thewhiskybarrel.com/products/ardbeg-16-year-old-2006-islay-festival-2023-single-cask",
+            "domain": "thewhiskybarrel.com",
+            "description": "Ardbeg 16 Year Old 2006 vintage Islay single malt Scotch whisky. Single 2nd fill Oloroso sherry butt #2787 bottled February 2023 for Ardbeg Day 2023.",
+            "extraSnippets": []
+          },
+          {
+            "title": "Ardbeg Day Single Cask No. 2787 - Islay Whisky Reviews",
+            "url": "https://islaywhiskyreviews.com/blog/ardbeg-day-single-cask-no-2787",
+            "domain": "islaywhiskyreviews.com",
+            "description": "For Feis Ile 2023, Ardbeg released a single cask whisky, Ardbeg Day Single Cask No. 2787, matured for 16 years in a refill Oloroso sherry cask.",
+            "extraSnippets": []
+          },
+          {
+            "title": "Ardbeg 2006 - Single Cask No. 2787",
+            "url": "https://whiskyhunter.net/base/ardbeg-2006-single-cask-no-2787-700-ml-568-vol",
+            "domain": "whiskyhunter.net",
+            "description": "Bottle Ardbeg - 16 Year Old 2006 - Oloroso Sherry Butt #2787 - Fèis Ìle 2023. PAST The Grand Whisky Auction UK. Winning Bid420.0 £. DateApril 2025. Bottle ...",
+            "extraSnippets": []
+          }
+        ]
+      },
+      {
+        "provider": "firecrawl",
+        "query": "Ardbeg cask 2787 Feis Ile 2023 623 bottles label 16-year-old",
+        "summary": "Ardbeg 16 Year Old 2006 vintage Islay single malt Scotch whisky. Single 2nd fill Oloroso sherry butt #2787 bottled February 2023 for Ardbeg Day 2023. 623 ... Released for Islay's 2023 Fèis Ìle celebrations, this 16-year-old single cask Ardbeg was distilled in July 2006 and matured in a second-fill oloroso sherry ... Released for Islay's 2023 Fèis Ìle celebrations, this 16-year-old single cask Ardbeg was distilled in July 2006 and matured in a second-fill ... For Feis Ile 2023, Ardbeg released a single cask whisky, Ardbeg Day Single Cask No. 2787, matured for 16 years in a refill Oloroso sherry",
+        "results": [
+          {
+            "title": "Ardbeg 16 Year Old 2006 Islay Festival 2023 Single Cask",
+            "url": "https://www.thewhiskybarrel.com/products/ardbeg-16-year-old-2006-islay-festival-2023-single-cask",
+            "domain": "thewhiskybarrel.com",
+            "description": "Ardbeg 16 Year Old 2006 vintage Islay single malt Scotch whisky. Single 2nd fill Oloroso sherry butt #2787 bottled February 2023 for Ardbeg Day 2023. 623 ...",
+            "extraSnippets": []
+          },
+          {
+            "title": "Second Fill Oloroso Sherry Butt (Fèis Ìle 2023) 70cl Whisky",
+            "url": "https://www.masterofmalt.com/whiskies/ardbeg/ardbeg-16-year-old-2006-cask-2787-feis-ile-2023-whisky/",
+            "domain": "masterofmalt.com",
+            "description": "Released for Islay's 2023 Fèis Ìle celebrations, this 16-year-old single cask Ardbeg was distilled in July 2006 and matured in a second-fill oloroso sherry ...",
+            "extraSnippets": []
+          },
+          {
+            "title": "Ardbeg 16 Year Old 2006 Cask #2787 - Feis lle 2023 ...",
+            "url": "https://caskcartel.com/products/ardbeg-16-year-old-2006-cask-2787-feis-lle-2023-single-malt-scotch-whisky-700ml",
+            "domain": "caskcartel.com",
+            "description": "Released for Islay's 2023 Fèis Ìle celebrations, this 16-year-old single cask Ardbeg was distilled in July 2006 and matured in a second-fill ...",
+            "extraSnippets": []
+          },
+          {
+            "title": "Ardbeg Day Single Cask No. 2787 - Islay Whisky Reviews",
+            "url": "https://islaywhiskyreviews.com/blog/ardbeg-day-single-cask-no-2787",
+            "domain": "islaywhiskyreviews.com",
+            "description": "For Feis Ile 2023, Ardbeg released a single cask whisky, Ardbeg Day Single Cask No. 2787, matured for 16 years in a refill Oloroso sherry cask.",
+            "extraSnippets": []
+          },
+          {
+            "title": "Feis Ile 2023 Day Eight - Ardbeg Day Recap (6/3) : r/Scotch",
+            "url": "https://www.reddit.com/r/Scotch/comments/13zid12/feis_ile_2023_day_eight_ardbeg_day_recap_63/",
+            "domain": "reddit.com",
+            "description": "This year's open day single cask release (495 pounds) was an 11.5-year-old whisky aged in a first-fill amontillado sherry cask. Even at that ...",
+            "extraSnippets": []
+          },
+          {
+            "title": "Ardbeg 2006 16 Year Old Feis Ile 2023 Single Cask No. ...",
+            "url": "https://thewhiskyarchive.com.au/products/ardbeg-2006-16-year-old-feis-ile-2023-single-cask-no-2787-ardbeg",
+            "domain": "thewhiskyarchive.com.au",
+            "description": "A richly sherried Feis Ile 2023 Ardbeg single cask matured for 16 years in Oloroso sherry oak. Natural cask strength and limited to 623 bottles.",
+            "extraSnippets": []
+          }
+        ]
+      }
+    ],
+    "errors": []
+  },
+  "metadata": {
+    "cacheKey": "7ead13455db29177de43183ac60950ded3bf8d61e3cbca5c15674f7ddd7d31b5",
+    "mode": "auto"
+  }
+}

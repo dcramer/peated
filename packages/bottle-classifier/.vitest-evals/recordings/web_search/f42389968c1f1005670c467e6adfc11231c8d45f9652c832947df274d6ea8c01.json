@@ -1,0 +1,67 @@
+{
+  "writtenAt": "2026-10-29T18:28:46.332Z",
+  "toolName": "web_search",
+  "input": {
+    "queries": [
+      "Octomore 13.1 official Bruichladdich 5 year 59.2% cask maturation release"
+    ]
+  },
+  "output": {
+    "evidence": [
+      {
+        "provider": "firecrawl",
+        "query": "Octomore 13.1 official Bruichladdich 5 year 59.2% cask maturation release",
+        "summary": "USD 230 Age Statement: 5 Years Strength: 59.2% ABV Cask. Concerto barley, peated to 137.3 PPM DICH OCTOMORE 13.1 750ML for only $249.99. matured in the highest quality American oak casks Octomore 13.1 5 Year Old Single Malt. Availability: In Stock $219.99 13.1 Aged: 5 Years PPM: 137.3 59.2% ABV - 118.4 Proof 750ml (202)-333-2847 2022 Octomore 13.1 (part of the Bruichladdich family) which was matured to a nutty 137.3 ppm and bottled at 59.2% abv in a beautiful black ... The first of three 2022 Octomores, the 13.1 is peated to 137.3 ppm and aged in ex-bourbon casks. What casks was Octomore 13.1",
+        "results": [
+          {
+            "title": "Review #27 - Bruichladdich Octomore 13.1 : r/Scotch",
+            "url": "https://www.reddit.com/r/Scotch/comments/ym1d21/review_27_bruichladdich_octomore_131/",
+            "domain": "reddit.com",
+            "description": "USD 230 Age Statement: 5 Years Strength: 59.2% ABV Cask. Concerto barley, peated to 137.3 PPM",
+            "extraSnippets": []
+          },
+          {
+            "title": "BRUICHLADDICH OCTOMORE 13.1 59.2% 750ML ISLAY ...",
+            "url": "https://www.hitimewine.net/bruichladdich-octomore-13.1-59.2-750ml-islay-single-malt-scotch-whisky-121905",
+            "domain": "hitimewine.net",
+            "description": "DICH OCTOMORE 13.1 750ML for only $249.99. matured in the highest quality American oak casks",
+            "extraSnippets": []
+          },
+          {
+            "title": "Bruichladdich Octomore 13.1 5 Year Old Single Malt",
+            "url": "https://potomacwines.com/en-gb/product/spirits/scotch-whisky/bruichladdich-octomore-13-1-5-year-old-single-malt?limit=50",
+            "domain": "potomacwines.com",
+            "description": "Octomore 13.1 5 Year Old Single Malt. Availability: In Stock $219.99 13.1 Aged: 5 Years PPM: 137.3 59.2% ABV - 118.4 Proof 750ml (202)-333-2847",
+            "extraSnippets": []
+          },
+          {
+            "title": "I'm thinking of going mad .... fancy coming along .... ...",
+            "url": "https://www.instagram.com/p/DeSExiPRIEO/",
+            "domain": "instagram.com",
+            "description": "2022 Octomore 13.1 (part of the Bruichladdich family) which was matured to a nutty 137.3 ppm and bottled at 59.2% abv in a beautiful black ...",
+            "extraSnippets": []
+          },
+          {
+            "title": "Review #27 - Bruichladdich Octomore 13.1",
+            "url": "https://www.memywifeandwhisky.com/reviews/review-27-bruichladdich-octomore-131",
+            "domain": "memywifeandwhisky.com",
+            "description": "The first of three 2022 Octomores, the 13.1 is peated to 137.3 ppm and aged in ex-bourbon casks.",
+            "extraSnippets": []
+          },
+          {
+            "title": "Bruichladdich Octomore 13.1 Scotch 750ml",
+            "url": "https://www.liquoronbroadway.com/products/bruichladdich-octomore-13-1-single-malt-scotch",
+            "domain": "liquoronbroadway.com",
+            "description": "What casks was Octomore 13.1 matured in? It was matured in first fill American oak casks, which add vanilla, coconut and honeyed sweetness to balance the smoke.",
+            "extraSnippets": []
+          }
+        ]
+      }
+    ],
+    "errors": []
+  },
+  "metadata": {
+    "cacheKey": "f42389968c1f1005670c467e6adfc11231c8d45f9652c832947df274d6ea8c01",
+    "mode": "auto"
+  }
+}

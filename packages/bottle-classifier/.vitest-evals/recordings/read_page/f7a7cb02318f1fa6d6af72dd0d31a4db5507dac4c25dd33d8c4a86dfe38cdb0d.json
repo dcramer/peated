@@ -1,0 +1,19 @@
+{
+  "writtenAt": "2026-10-29T19:04:55.330Z",
+  "toolName": "read_page",
+  "input": {
+    "url": "https://www.scotchwhiskyauctions.com/auctions/231-the-182nd-auction/890444-ardbeg-2006-single-cask-2787-feis-ile-2023/"
+  },
+  "output": {
+    "page": {
+      "url": "https://www.scotchwhiskyauctions.com/auctions/231-the-182nd-auction/890444-ardbeg-2006-single-cask-2787-feis-ile-2023/",
+      "title": "Ardbeg 2006 Single Cask #2787 Feis Ile 2023 | The 182nd Auction | Scotch Whisky Auctions",
+      "description": null,
+      "text": "[Skip to menu](https://www.scotchwhiskyauctions.com/auctions/231-the-182nd-auction/890444-ardbeg-2006-single-cask-2787-feis-ile-2023/#menu) [Skip to content](https://www.scotchwhiskyauctions.com/auctions/231-the-182nd-auction/890444-ardbeg-2006-single-cask-2787-feis-ile-2023/#contentstart)\n\nAre you the legal age to buy alcohol in your country?YesNo\n\n [Free valuations](https://wa.me/+447538638525/?text=I%20would%20like%20a%20free%20valuation)\n\nShow/hide cookie info\n\n**This site may set cookies for essential tasks, such as tracking whether you are signed in.**\n\nWe would also like to set analytics cookies to better understand our users’ behaviour.\n\n[Read our cookies policy](https://www.scotchwhiskyauctions.com/privacy/)\n\nAcceptReject"
+    }
+  },
+  "metadata": {
+    "cacheKey": "f7a7cb02318f1fa6d6af72dd0d31a4db5507dac4c25dd33d8c4a86dfe38cdb0d",
+    "mode": "auto"
+  }
+}

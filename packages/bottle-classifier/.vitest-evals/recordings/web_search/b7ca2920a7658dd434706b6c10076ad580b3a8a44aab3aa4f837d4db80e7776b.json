@@ -1,0 +1,65 @@
+{
+  "writtenAt": "2026-10-29T19:41:06.482Z",
+  "toolName": "web_search",
+  "input": {
+    "queries": ["SMWS \"10.258\" \"Quo vadis?\" whisky"]
+  },
+  "output": {
+    "evidence": [
+      {
+        "provider": "firecrawl",
+        "query": "SMWS \"10.258\" \"Quo vadis?\" whisky",
+        "summary": "Get into the good stuff with the world's most distinctive Scotch whisky, bottled straight from the cask ... 10.258. Quo vadis? $155. Sold out. Out of Stock. Tasting review of Quo Vadis? (SMWS 10.258, Bunnahabhain, Islay, 9 years, 58.1% ABV). Nose: The whisky presents barbecued lobster meat and ... SMWS 10.258 Quo vadis? is a single malt whisky with a stated age of 9 years, offering a deep and rich flavor profile reminiscent of dried fruits. # SMWS 10.258\nQuo Vadis?\n\nSMWS Code\n\n10.258\n\n## Tasting Notes\nThe whisky presents barbecued lobster meat and flame-grilled cheese scallops, followed by swe",
+        "results": [
+          {
+            "title": "Quo vadis?",
+            "url": "https://smwsa.com/products/cask-no-10-258",
+            "domain": "smwsa.com",
+            "description": "Get into the good stuff with the world's most distinctive Scotch whisky, bottled straight from the cask ... 10.258. Quo vadis? $155. Sold out. Out of Stock.",
+            "extraSnippets": []
+          },
+          {
+            "title": "Quo Vadis? — SMWS 10.258 Review",
+            "url": "https://www.whiskygoodness.com/reviews/quo-vadis",
+            "domain": "whiskygoodness.com",
+            "description": "Tasting review of Quo Vadis? (SMWS 10.258, Bunnahabhain, Islay, 9 years, 58.1% ABV). Nose: The whisky presents barbecued lobster meat and ...",
+            "extraSnippets": []
+          },
+          {
+            "title": "SMWS 10.258 Quo vadis? | Peated",
+            "url": "https://peated.com/bottles/25608",
+            "domain": "peated.com",
+            "description": "SMWS 10.258 Quo vadis? is a single malt whisky with a stated age of 9 years, offering a deep and rich flavor profile reminiscent of dried fruits.",
+            "extraSnippets": []
+          },
+          {
+            "title": "SMWS 10.258 Quo Vadis? — Bunnahabhain Review",
+            "url": "https://www.whiskygoodness.com/smws/10/10.258",
+            "domain": "whiskygoodness.com",
+            "description": "# SMWS 10.258\nQuo Vadis?\n\nSMWS Code\n\n10.258\n\n## Tasting Notes\nThe whisky presents barbecued lobster meat and flame-grilled cheese scallops, followed by sweeter notes of crème brûlée and pecan pie.\n\n[Read Full Review](htt",
+            "extraSnippets": []
+          },
+          {
+            "title": "10.258 Quo Vadis?",
+            "url": "https://www.smws.com.tw/product/detail/2c9980848bc76e8f018bcbabaad00059",
+            "domain": "smws.com.tw",
+            "description": "10.258 Quo Vadis? · 風味特點 Peated中度泥煤 · 酒款名稱 你往何處去？ · 橡木桶編號 10.258 · 酒精濃度 58.1% · 年份 9 · 蒸餾日期 2013/10/17 · 橡木桶類型 Bourbon 波本桶 ...",
+            "extraSnippets": []
+          },
+          {
+            "title": "Bunnahabhain 2013 SMWS 10.258 - 평가 및 리뷰",
+            "url": "https://www.whiskybase.com/ko/whiskies/whisky/242975/bunnahabhain-2013-smws-10258",
+            "domain": "whiskybase.com",
+            "description": "The Scotch Malt Whisky Society ... The Scotch Malt Whisky Society (SMWS); 병입자 시리즈: Quo vadis? ... Bunnahabhain 2013 SMWS 10.258을 위한 위스키 리뷰.",
+            "extraSnippets": []
+          }
+        ]
+      }
+    ],
+    "errors": []
+  },
+  "metadata": {
+    "cacheKey": "b7ca2920a7658dd434706b6c10076ad580b3a8a44aab3aa4f837d4db80e7776b",
+    "mode": "auto"
+  }
+}

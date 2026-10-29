@@ -1,0 +1,67 @@
+{
+  "writtenAt": "2026-10-29T18:27:57.567Z",
+  "toolName": "web_search",
+  "input": {
+    "queries": [
+      "Maker's Mark official Kentucky Straight Bourbon Whisky product 45% ABV distillery name label"
+    ]
+  },
+  "output": {
+    "evidence": [
+      {
+        "provider": "firecrawl",
+        "query": "Maker's Mark official Kentucky Straight Bourbon Whisky product 45% ABV distillery name label",
+        "summary": "Made with soft red winter wheat, Maker's Mark® is a full-flavored bourbon handcrafted the way our founder intended. Shop our Kentucky Straight Bourbon. Maker's Mark is a small-batch bourbon whisky produced in Loretto, Kentucky, by Suntory Global Spirits. It is bottled at 90 U.S. proof (45% alcohol by volume) ©2026 Maker's Mark Distillery, PBC, Loretto, KY. Maker's Mark® Kentucky Straight Bourbon Whisky, 45% Alc./Vol. recycle. Glass bottles and any relevant paper ... Smooth, full-bodied flavor and a distinct hand-dipped red wax seal define our bourbon bottles. Mark® Kentucky Straight Bourbon Wh",
+        "results": [
+          {
+            "title": "Maker's Mark: Kentucky Straight Bourbon",
+            "url": "https://www.makersmark.com/en-us/bourbons/makers-mark",
+            "domain": "makersmark.com",
+            "description": "Made with soft red winter wheat, Maker's Mark® is a full-flavored bourbon handcrafted the way our founder intended. Shop our Kentucky Straight Bourbon.",
+            "extraSnippets": []
+          },
+          {
+            "title": "Maker's Mark",
+            "url": "https://en.wikipedia.org/wiki/Maker%27s_Mark",
+            "domain": "en.wikipedia.org",
+            "description": "Maker's Mark is a small-batch bourbon whisky produced in Loretto, Kentucky, by Suntory Global Spirits. It is bottled at 90 U.S. proof (45% alcohol by volume)",
+            "extraSnippets": []
+          },
+          {
+            "title": "Our Kentucky Bourbon Whisky Range - Maker's Mark",
+            "url": "https://www.makersmark.com/en-us/bourbons",
+            "domain": "makersmark.com",
+            "description": "©2026 Maker's Mark Distillery, PBC, Loretto, KY. Maker's Mark® Kentucky Straight Bourbon Whisky, 45% Alc./Vol. recycle. Glass bottles and any relevant paper ...",
+            "extraSnippets": []
+          },
+          {
+            "title": "Handmade Kentucky Bourbon Whisky | Maker's Mark®",
+            "url": "https://www.makersmark.com/en-us/",
+            "domain": "makersmark.com",
+            "description": "Smooth, full-bodied flavor and a distinct hand-dipped red wax seal define our bourbon bottles. Mark® Kentucky Straight Bourbon Whisky, 45% Alc./Vol. recycle",
+            "extraSnippets": []
+          },
+          {
+            "title": "Maker's Mark Kentucky Straight Bourbon Whisky",
+            "url": "https://www.passionspirits.com/makers-mark-kentucky-straight-bourbon-750ml",
+            "domain": "passionspirits.com",
+            "description": "Distilled, Aged and Bottled by the Maker's Mark Distillery, Inc., Star Hill Farm, Loretto, Kentucky, USA. A Beam Suntory Company. Bourbon Whiskey | 45% ABV | ...",
+            "extraSnippets": []
+          },
+          {
+            "title": "Maker's Mark - Bourbon - Kentucky",
+            "url": "https://whiskylodge.com/en/bourbons/453-maker-s-mark--0085246342978.html",
+            "domain": "whiskylodge.com",
+            "description": "# Maker's Mark\nOn the American label, it is designated as Whisky rather than Whiskey, unlike most other Bourbons.\n\nUnited States, Kentucky Straight Bourbon\n\n70 cl, 45 %Vol\n\nBourbon,\n\n|  |  |\n|-|-|\n| Type / Subtype | Bour",
+            "extraSnippets": []
+          }
+        ]
+      }
+    ],
+    "errors": []
+  },
+  "metadata": {
+    "cacheKey": "e2c7019840cb0d3ff8abd90961b0fa4daec5b6d5cf2e8177611b0ed83dbc5720",
+    "mode": "auto"
+  }
+}

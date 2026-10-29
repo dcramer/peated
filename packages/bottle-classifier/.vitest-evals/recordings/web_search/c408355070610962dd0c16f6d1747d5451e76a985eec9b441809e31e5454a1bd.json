@@ -1,0 +1,82 @@
+{
+  "writtenAt": "2026-10-29T18:43:12.975Z",
+  "toolName": "web_search",
+  "input": {
+    "queries": [
+      "site:whiskyadvocate.com/Duncan-Taylor-distilled-at-Glenlivet-1968-Vintage-35-year-old-43-1 Duncan Taylor Glenlivet 1968 35 year 43.1",
+      "Duncan Taylor Glenlivet 1968 Vintage 35-year-old 43.1% whisky"
+    ]
+  },
+  "output": {
+    "evidence": [
+      {
+        "provider": "firecrawl",
+        "query": "site:whiskyadvocate.com/Duncan-Taylor-distilled-at-Glenlivet-1968-Vintage-35-year-old-43-1 Duncan Taylor Glenlivet 1968 35 year 43.1",
+        "summary": "![](https://whiskyadvocate.com/?resize=1290&crop=237x21,0x0)\n\n# Duncan Taylor (distilled at Glenlivet) 1968 Vintage 35 year old, 43.1%\nPrice: $155.00● Issue: Fall 2004 ● Reviewer: John Hansell ● Category: Single Malt Scotch\n\n[Buy Now](https://whiskyadvocate.com/Duncan-Taylor-distilled-at-Glenlivet-1968-Vintage-35-year-old-43-1)\n\nYounger bottlings of Glenlivet are often quite elegant and subtle. But such finesse isn't always evident in older expressions, which often become dominated by sherry and oak. This one, at 35 years of age, demonstrates plenty of elegance and finesse. What impresses me m",
+        "results": [
+          {
+            "title": "Duncan Taylor (distilled at Glenlivet) 1968 Vintage 35 year ...",
+            "url": "https://whiskyadvocate.com/Duncan-Taylor-distilled-at-Glenlivet-1968-Vintage-35-year-old-43-1",
+            "domain": "whiskyadvocate.com",
+            "description": "![](https://whiskyadvocate.com/?resize=1290&crop=237x21,0x0)\n\n# Duncan Taylor (distilled at Glenlivet) 1968 Vintage 35 year old, 43.1%\nPrice: $155.00● Issue: Fall 2004 ● Reviewer: John Hansell ● Category: Single Malt Sco",
+            "extraSnippets": []
+          }
+        ]
+      },
+      {
+        "provider": "firecrawl",
+        "query": "Duncan Taylor Glenlivet 1968 Vintage 35-year-old 43.1% whisky",
+        "summary": "# Duncan Taylor (distilled at Glenlivet) 1968 Vintage 35 year old, 43.1%\nPrice: $155.00● Issue: Fall 2004 ● Reviewer: John Hansell ● Category: Single Malt Scotch\n\n[Buy Now](https://whiskyadvocate.com/Duncan-Taylor-distilled-at-Glenlivet-1968-Vintage-35-year-old-43-1)\n\nYounger bottlings of Glenlivet are often quite elegant and subtle. But such finesse isn't always evident in older expressions, which often become dominated by sherry and oak. This one, at 35 years of age, demonstrates plenty of elegance and finesse. What impresses me most about this whisky is that you wouldn't know it was 35 year",
+        "results": [
+          {
+            "title": "Duncan Taylor (distilled at Glenlivet) 1968 Vintage 35 year ...",
+            "url": "https://whiskyadvocate.com/Duncan-Taylor-distilled-at-Glenlivet-1968-Vintage-35-year-old-43-1",
+            "domain": "whiskyadvocate.com",
+            "description": "# Duncan Taylor (distilled at Glenlivet) 1968 Vintage 35 year old, 43.1%\nPrice: $155.00● Issue: Fall 2004 ● Reviewer: John Hansell ● Category: Single Malt Scotch\n\n[Buy Now](https://whiskyadvocate.com/Duncan-Taylor-distil",
+            "extraSnippets": []
+          },
+          {
+            "title": "Glenlivet 1968 38 Year Old Duncan Taylor",
+            "url": "https://www.whiskymarketplace.com/whiskies/glenlivet-1968-38-year-old-duncan-taylor-speyside-single-malt-scotch",
+            "domain": "whiskymarketplace.com",
+            "description": "A Scotch Whisky distilled by Glenlivet and then matured for 38 years before bottling. This can be considered a higher strength whisky, with an ABV of 50.9%.",
+            "extraSnippets": []
+          },
+          {
+            "title": "Glenlivet 1968 35 Year Old Cask #2840 Duncan Taylor",
+            "url": "https://www.thewhiskyexchange.com/p/69375/glenlivet-1968-35-year-old-cask-2840-duncan-taylor",
+            "domain": "thewhiskyexchange.com",
+            "description": "Glenlivet 1968 35 Year Old Cask #2840 Duncan Taylor. Speyside Single Malt Scotch Whisky; Duncan Taylor. 70cl / 43.6%. Scratch ...",
+            "extraSnippets": []
+          },
+          {
+            "title": "Glenlivet 1968 37 Year (Duncan Taylor Lonach) | Reviews",
+            "url": "https://distiller.com/spirits/the-glenlivet-1968-37-year-duncan-taylor-lonach/tastes",
+            "domain": "distiller.com",
+            "description": "Despite the age, there was almost no oak. There were big floral notes, fresh apples, pears, peaches, apricot, and a soft cinnamon spiciness in the background.",
+            "extraSnippets": []
+          },
+          {
+            "title": "Duncan Taylor Glenlivet 1968 35-year-old - Peated",
+            "url": "https://peated.com/bottles/65832-duncan-taylor-glenlivet-1968-35-year-old",
+            "domain": "peated.com",
+            "description": "Duncan Taylor Glenlivet 1968 Vintage 35-year-old is a Speyside single malt Scotch whisky bottled at a notably mature age. ... 43.1%. Age: 35 years. Vintage ...",
+            "extraSnippets": []
+          },
+          {
+            "title": "1968 Glenlivet, 34 year old, Duncan Taylor Single Malt ...",
+            "url": "https://shop.klwines.com/products/details/1005357",
+            "domain": "shop.klwines.com",
+            "description": "1968 Glenlivet, 34 year old, Duncan Taylor Single Malt Whisky (750ml) ... This item is out of stock, would you like to save it and be notified when it's back?",
+            "extraSnippets": []
+          }
+        ]
+      }
+    ],
+    "errors": []
+  },
+  "metadata": {
+    "cacheKey": "c408355070610962dd0c16f6d1747d5451e76a985eec9b441809e31e5454a1bd",
+    "mode": "auto"
+  }
+}

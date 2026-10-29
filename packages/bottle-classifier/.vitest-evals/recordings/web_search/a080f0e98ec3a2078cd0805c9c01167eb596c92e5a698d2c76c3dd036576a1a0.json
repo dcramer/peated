@@ -1,0 +1,67 @@
+{
+  "writtenAt": "2026-10-29T19:07:02.979Z",
+  "toolName": "web_search",
+  "input": {
+    "queries": [
+      "SMWS 1.285 \"Party in the afternoon\" 63.4 11 year old Glenfarclas",
+      "SMWS \"Maverick's 40\" 1.285 cask 285 bottle"
+    ]
+  },
+  "output": {
+    "evidence": [
+      {
+        "provider": "firecrawl",
+        "query": "SMWS 1.285 \"Party in the afternoon\" 63.4 11 year old Glenfarclas",
+        "summary": "2023 release · 11 years · 63.4% ABV. Serving: Neat. Lost power so the only ... SMWS 1.285 Party in the afternoon — tasting by dcramer | Peated. Glenfarclas ; 21-year-old Okura Tokyo Exclusive Edition · 1.285 Party in the afternoon. 17 years·63.4% ABV·2023 release. 63.4% ABV·2023 release ; 1 · 1 ... SMWS 1.285 Party in the afternoon · Glenfarclas · Single Malt. 2023 release · 11 years · 63.4% ABV · Glenfarclas 1988 CA Authentic Collection · Bottled by ... The Scotch Malt Whisky Society · 1.285 Party in the afternoon - 2023 Release. Single Malt · 17 years · 63.4% ABV · 1 tasting. The Scotch Malt",
+        "results": [
+          {
+            "title": "SMWS 1.285 Party in the afternoon — tasting by dcramer",
+            "url": "https://peated.com/tastings/157-smws-1-285-party-in-the-afternoon",
+            "domain": "peated.com",
+            "description": "2023 release · 11 years · 63.4% ABV. Serving: Neat. Lost power so the only ... SMWS 1.285 Party in the afternoon — tasting by dcramer | Peated.",
+            "extraSnippets": []
+          },
+          {
+            "title": "Whiskies from Glenfarclas - Peated",
+            "url": "https://peated.com/entities/976/bottles?sort=-tastings",
+            "domain": "peated.com",
+            "description": "Glenfarclas ; 21-year-old Okura Tokyo Exclusive Edition · 1.285 Party in the afternoon. 17 years·63.4% ABV·2023 release. 63.4% ABV·2023 release ; 1 · 1 ...",
+            "extraSnippets": []
+          },
+          {
+            "title": "Glenfarclas — Whisky distillery - Peated",
+            "url": "https://peated.com/distillers/976-glenfarclas",
+            "domain": "peated.com",
+            "description": "SMWS 1.285 Party in the afternoon · Glenfarclas · Single Malt. 2023 release · 11 years · 63.4% ABV · Glenfarclas 1988 CA Authentic Collection · Bottled by ...",
+            "extraSnippets": []
+          },
+          {
+            "title": "Whisky Bottles | Peated",
+            "url": "https://peated.com/bottles?category=single_malt&cursor=2&minRating=1",
+            "domain": "peated.com",
+            "description": "The Scotch Malt Whisky Society · 1.285 Party in the afternoon - 2023 Release. Single Malt · 17 years · 63.4% ABV · 1 tasting. The Scotch Malt Whisky Society.",
+            "extraSnippets": []
+          },
+          {
+            "title": "Search Whisky Bottles | Peated",
+            "url": "https://peated.com/bottles?category=single_malt&cursor=2",
+            "domain": "peated.com",
+            "description": "SMWS · 1.285 Party in the afternoon. 17 years·63.4% ABV·2023 release ... 10 years · Springbank · 11-year-old Local Barley. 1, 11 years ... Glenfarclas · 25-year-old ...",
+            "extraSnippets": []
+          }
+        ]
+      },
+      {
+        "provider": "firecrawl",
+        "query": "SMWS \"Maverick's 40\" 1.285 cask 285 bottle",
+        "summary": null,
+        "results": []
+      }
+    ],
+    "errors": []
+  },
+  "metadata": {
+    "cacheKey": "a080f0e98ec3a2078cd0805c9c01167eb596c92e5a698d2c76c3dd036576a1a0",
+    "mode": "auto"
+  }
+}

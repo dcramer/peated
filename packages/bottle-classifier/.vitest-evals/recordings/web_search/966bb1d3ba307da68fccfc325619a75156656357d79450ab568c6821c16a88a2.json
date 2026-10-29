@@ -1,0 +1,67 @@
+{
+  "writtenAt": "2026-10-29T19:19:07.160Z",
+  "toolName": "web_search",
+  "input": {
+    "queries": [
+      "Hudson Whiskey Back Room Deal New York Straight Rye Whiskey Finished In Peated Scotch Barrels official product ABV Hudson"
+    ]
+  },
+  "output": {
+    "evidence": [
+      {
+        "provider": "firecrawl",
+        "query": "Hudson Whiskey Back Room Deal New York Straight Rye Whiskey Finished In Peated Scotch Barrels official product ABV Hudson",
+        "summary": "Hudson Back Room Deal $55.00 Free Shipping! New York Straight Rye Whiskey finished in peated Scotch barrels … vanilla, apricot, and brown sugar. Certified ... New York Straight Rye Whiskey Finished in Peated Scotch Barrels Aged a minimum of 3 years 95% Rye / 5% Malted Barley ABV 46% - 92 Proof A bit of smoke, a bit ... Finished, 46% Price: $55.00 … nose opens up to honey, caramel, and some pleasant mustiness, late wave of sweet and savory spices. The finish is short and hot, ... # Back Room Deal\n[Buy It](https://www.hudsonwhiskey.com/en-US/buy-hudson-whiskey/#e40)\n\nWe send our ex-bourbon barre",
+        "results": [
+          {
+            "title": "Hudson Back Room Deal",
+            "url": "https://shop.hudsonwhiskey.com/products/Hudson-Back-Room-Deal-p667109531",
+            "domain": "shop.hudsonwhiskey.com",
+            "description": "Hudson Back Room Deal $55.00 Free Shipping! New York Straight Rye Whiskey finished in peated Scotch barrels … vanilla, apricot, and brown sugar. Certified ...",
+            "extraSnippets": []
+          },
+          {
+            "title": "Hudson Whiskey NY Back Room Deal Rye Whiskey",
+            "url": "https://internetwines.com/products/hudson-whiskey-ny-back-room-deal-rye-whiskey",
+            "domain": "internetwines.com",
+            "description": "New York Straight Rye Whiskey Finished in Peated Scotch Barrels Aged a minimum of 3 years 95% Rye / 5% Malted Barley ABV 46% - 92 Proof A bit of smoke, a bit ...",
+            "extraSnippets": []
+          },
+          {
+            "title": "Hudson Whiskey Back Room Deal Peated Scotch Barrel ...",
+            "url": "https://whiskyadvocate.com/Hudson-Whiskey-Back-Room-Deal-Peated-Scotch-Barrel-Finished-46",
+            "domain": "whiskyadvocate.com",
+            "description": "Finished, 46% Price: $55.00 … nose opens up to honey, caramel, and some pleasant mustiness, late wave of sweet and savory spices. The finish is short and hot, ...",
+            "extraSnippets": []
+          },
+          {
+            "title": "Backroom Deal | Hudson Peated Rye Whiskey",
+            "url": "https://www.hudsonwhiskey.com/en-US/our-range/backroom-deal-peated/",
+            "domain": "hudsonwhiskey.com",
+            "description": "# Back Room Deal\n[Buy It](https://www.hudsonwhiskey.com/en-US/buy-hudson-whiskey/#e40)\n\nWe send our ex-bourbon barrels across the Atlantic where they’re used to age peated whiskey, then emptied and returned to our distil",
+            "extraSnippets": []
+          },
+          {
+            "title": "Hudson Whiskey NY Back Room Deal Straight Rye Whiskey",
+            "url": "https://www.caskers.com/hudson-whiskey-ny-back-room-deal-straight-rye-whiskey/",
+            "domain": "caskers.com",
+            "description": "straight rye whiskey, aged ・ finished in Peated Scotch barrels, This limited-edition release is bottled at 46% ABV. $59.99 ・ 46% ABV.",
+            "extraSnippets": []
+          },
+          {
+            "title": "Hudson Whiskey Back Room Deal | Reviews",
+            "url": "https://distiller.com/spirits/hudson-whiskey-back-room-deal/tastes?page=1&require_note=true&sort=lowest_rated",
+            "domain": "distiller.com",
+            "description": "The finish is fairly long with very light smoke at the tail end. A very easy going and easy to drink rye, the ex-Scotch aging adds an ...",
+            "extraSnippets": []
+          }
+        ]
+      }
+    ],
+    "errors": []
+  },
+  "metadata": {
+    "cacheKey": "966bb1d3ba307da68fccfc325619a75156656357d79450ab568c6821c16a88a2",
+    "mode": "auto"
+  }
+}

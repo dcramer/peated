@@ -1,0 +1,67 @@
+{
+  "writtenAt": "2026-10-29T18:26:23.181Z",
+  "toolName": "web_search",
+  "input": {
+    "queries": [
+      "Lagavulin Distillers Edition official product vintage Pedro Ximenez cask finish release year"
+    ]
+  },
+  "output": {
+    "evidence": [
+      {
+        "provider": "firecrawl",
+        "query": "Lagavulin Distillers Edition official product vintage Pedro Ximenez cask finish release year",
+        "summary": "Released and bottled in 2022, this special edition undergoes a carefully managed double maturation, with a secondary maturation in PX-seasoned casks adding ... Lagavulin releases an annual 'Distiller's Edition' single malt. Pedro Ximenez-seasoned sherry casks. This was first released in the late 1990s, ... The 2001 vintage of Lagavulin's Distillers Edition, bottled in 2017. Is double-matured and finished in Pedro Ximénez sherry casks. Built in 1816, Lagavulin The Distillers Edition 18 Year Old, Pedro Ximenez Sherry Cask, Batch No. lgv.4/463, 1997, 43% ; Vintage: 1979 ; Bottled: 1997 ; ABV: 43%",
+        "results": [
+          {
+            "title": "Lagavulin Distillers Edition 2022 Release",
+            "url": "https://www.thewhiskybarrel.com/products/lagavulin-distillers-edition-2022-release",
+            "domain": "thewhiskybarrel.com",
+            "description": "Released and bottled in 2022, this special edition undergoes a carefully managed double maturation, with a secondary maturation in PX-seasoned casks adding ...",
+            "extraSnippets": []
+          },
+          {
+            "title": "r/Scotch - Review #204 - Lagavulin Distiller's Edition",
+            "url": "https://www.reddit.com/r/Scotch/comments/199s2zi/review_204_lagavulin_distillers_edition/",
+            "domain": "reddit.com",
+            "description": "Lagavulin releases an annual 'Distiller's Edition' single malt. Pedro Ximenez-seasoned sherry casks. This was first released in the late 1990s, ...",
+            "extraSnippets": []
+          },
+          {
+            "title": "Lagavulin Distillers Edition | 700ML",
+            "url": "https://caskcartel.com/products/lagavulin-distillers-edition-700ml",
+            "domain": "caskcartel.com",
+            "description": "The 2001 vintage of Lagavulin's Distillers Edition, bottled in 2017. Is double-matured and finished in Pedro Ximénez sherry casks. Built in 1816,",
+            "extraSnippets": []
+          },
+          {
+            "title": "Lagavulin The Distillers Edition 18 Year Old, Pedro Ximenez ...",
+            "url": "https://www.maltiply.com/search-whisky/whisky/lagavulin-the-distillers-edition-18-year-old-pedro-ximenez-sherry-cask-batch-no-lgv-4-463-1997-43",
+            "domain": "maltiply.com",
+            "description": "Lagavulin The Distillers Edition 18 Year Old, Pedro Ximenez Sherry Cask, Batch No. lgv.4/463, 1997, 43% ; Vintage: 1979 ; Bottled: 1997 ; ABV: 43% ; Volume: 70cl.",
+            "extraSnippets": []
+          },
+          {
+            "title": "Lagavulin Distillers Edition (2023, USA)",
+            "url": "http://www.divingforpearlsblog.com/2024/08/lagavulin-distillers-edition-2023-usa.html",
+            "domain": "divingforpearlsblog.com",
+            "description": "a vintage listed, as well as the release year, on its label. It was 16-18 years old, until 2020 it dropped to a 14-15yo. 2022 Diageo removed ...",
+            "extraSnippets": []
+          },
+          {
+            "title": "Lagavulin's Distillers Edition was first introduced in 1997 ...",
+            "url": "https://www.instagram.com/p/DRaCB7KDoxI/",
+            "domain": "instagram.com",
+            "description": "Lagavulin's Distillers Edition was first introduced in 1997 with spirit laid down in 1979. in ex-Pedro Jimenez (PX) wood casks for up to an ...",
+            "extraSnippets": []
+          }
+        ]
+      }
+    ],
+    "errors": []
+  },
+  "metadata": {
+    "cacheKey": "14c4a9b6508cf0666a6edd0cfa021c4165bcafb0fbdeec594736648e229e70b8",
+    "mode": "auto"
+  }
+}

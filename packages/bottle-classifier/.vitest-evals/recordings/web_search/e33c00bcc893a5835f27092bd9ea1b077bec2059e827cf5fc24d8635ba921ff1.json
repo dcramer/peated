@@ -1,0 +1,67 @@
+{
+  "writtenAt": "2026-10-29T18:28:53.894Z",
+  "toolName": "web_search",
+  "input": {
+    "queries": [
+      "site:bruichladdich.com Octomore 13.1 59.2% 5 years first fill bourbon casks"
+    ]
+  },
+  "output": {
+    "evidence": [
+      {
+        "provider": "firecrawl",
+        "query": "site:bruichladdich.com Octomore 13.1 59.2% 5 years first fill bourbon casks",
+        "summary": "OCTOMORE Super-Heavily. E: 65% first fill American whiskey casks, 10% second fill. STRENGTH: 50% ABV OCTOMORE ... filled into first-fill Bourbon barrels in 2013 and matured for 4 years. In 2017, spirit re-casked into Pomerol casks and matured for the next 5 years ... Bruichladdich Islay Barley 2014 has been predominantly matured in first-fill bourbon casks (80%) along with a combination of second-fill sherry butts (5%) OCTOMORE Super-Heavily Peated Whisky Range ... MATURATION PROFILE: 84% first fill bourbon casks, 8% second fill Virgin oak and 8% second fill wine casks. The Organic Barley 2012",
+        "results": [
+          {
+            "title": "Port Charlotte 10 | Bruichladdich Distillery US",
+            "url": "https://us.bruichladdich.com/products/port-charlotte-10",
+            "domain": "us.bruichladdich.com",
+            "description": "OCTOMORE Super-Heavily. E: 65% first fill American whiskey casks, 10% second fill. STRENGTH: 50% ABV",
+            "extraSnippets": []
+          },
+          {
+            "title": "Port Charlotte PMC:01 2013",
+            "url": "https://www.bruichladdich.com/products/port-charlotte-pmc-01",
+            "domain": "bruichladdich.com",
+            "description": "OCTOMORE ... filled into first-fill Bourbon barrels in 2013 and matured for 4 years. In 2017, spirit re-casked into Pomerol casks and matured for the next 5 years ...",
+            "extraSnippets": []
+          },
+          {
+            "title": "Bruichladdich Islay Barley 2014",
+            "url": "https://us.bruichladdich.com/products/bruichladdich-islay-barley-2014",
+            "domain": "us.bruichladdich.com",
+            "description": "Bruichladdich Islay Barley 2014 has been predominantly matured in first-fill bourbon casks (80%) along with a combination of second-fill sherry butts (5%)",
+            "extraSnippets": []
+          },
+          {
+            "title": "Port Charlotte Islay Barley 2014",
+            "url": "https://us.bruichladdich.com/products/port-charlotte-islay-barley-2014",
+            "domain": "us.bruichladdich.com",
+            "description": "OCTOMORE Super-Heavily Peated Whisky Range ... MATURATION PROFILE: 84% first fill bourbon casks, 8% second fill Virgin oak and 8% second fill wine casks.",
+            "extraSnippets": []
+          },
+          {
+            "title": "Bruichladdich Organic Barley 2012",
+            "url": "https://www.bruichladdich.com/products/bruichladdich-organic-barley-2012",
+            "domain": "bruichladdich.com",
+            "description": "The Organic Barley 2012 has matured in 100% first-fill bourbon barrels STRENGTH: 50% ABV FARMS: Mid Coul Farm, Inverness NUTRITIONAL",
+            "extraSnippets": []
+          },
+          {
+            "title": "Bruichladdich Bere Barley 2013",
+            "url": "https://www.bruichladdich.com/products/bruichladdich-bere-barley-2013",
+            "domain": "bruichladdich.com",
+            "description": "Bruichladdich Bere Barley 2013 is a testament to this complex cereal. Matured in a combination of first-fill bourbon barrels and second-fill Pauillac wine casks ...",
+            "extraSnippets": []
+          }
+        ]
+      }
+    ],
+    "errors": []
+  },
+  "metadata": {
+    "cacheKey": "e33c00bcc893a5835f27092bd9ea1b077bec2059e827cf5fc24d8635ba921ff1",
+    "mode": "auto"
+  }
+}

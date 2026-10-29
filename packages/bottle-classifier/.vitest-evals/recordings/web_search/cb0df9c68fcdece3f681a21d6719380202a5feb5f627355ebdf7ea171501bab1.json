@@ -1,0 +1,65 @@
+{
+  "writtenAt": "2026-10-29T19:10:10.220Z",
+  "toolName": "web_search",
+  "input": {
+    "queries": ["Pōkeno Exploration Series No. 1 Totara Cask whisky 40% ABV"]
+  },
+  "output": {
+    "evidence": [
+      {
+        "provider": "firecrawl",
+        "query": "Pōkeno Exploration Series No. 1 Totara Cask whisky 40% ABV",
+        "summary": "Bottled at 46% abv. notes of creamy coconut, sweet scented sap, ripe white peach, and freshly cut wood. Pokeno Exploration Series No. 1 Totara Cask Single Malt Whisky is a 46% Single Malt Whisky from New Zealand. It is packaged in a 700ml bottle. Finished in 200-liter totara casks—a hard, straight-grained indigenous wood—the nose has toasted coconut, cinnamon bark, macaroons, fragrant floral notes, Bottled at 46% ABV, Pōkeno Totara Cask offers notes of coconut, white peach, bitter lemon and dark chocolate. Pokeno Exploration Series No. 1 'Totara Cask' Single Malt Whisky ; Style: Whisky - Singl",
+        "results": [
+          {
+            "title": "Pokeno Exploration Series No 1, Totara",
+            "url": "https://www.whiskyshopusa.com/pokeno-exploration-series-no-1-totara-cask/",
+            "domain": "whiskyshopusa.com",
+            "description": "Bottled at 46% abv. notes of creamy coconut, sweet scented sap, ripe white peach, and freshly cut wood.",
+            "extraSnippets": []
+          },
+          {
+            "title": "Pokeno Exploration Series No 1 Totara Cask Single Malt ...",
+            "url": "https://www.frootbat.com/p/372466/pokeno-exploration-series-no-1-totara-cask-single-malt-whisky",
+            "domain": "frootbat.com",
+            "description": "Pokeno Exploration Series No. 1 Totara Cask Single Malt Whisky is a 46% Single Malt Whisky from New Zealand. It is packaged in a 700ml bottle.",
+            "extraSnippets": []
+          },
+          {
+            "title": "Pokeno Exploration Series No. 01 Totara Cask, 46%",
+            "url": "https://whiskyadvocate.com/Pokeno-Exploration-Series-No-01-Totara-Cask-46",
+            "domain": "whiskyadvocate.com",
+            "description": "Finished in 200-liter totara casks—a hard, straight-grained indigenous wood—the nose has toasted coconut, cinnamon bark, macaroons, fragrant floral notes,",
+            "extraSnippets": []
+          },
+          {
+            "title": "Totara Cask | New Zealand Single Malt Whisky | Before You Buy",
+            "url": "https://www.youtube.com/shorts/kS8d6iVNavg",
+            "domain": "youtube.com",
+            "description": "Bottled at 46% ABV, Pōkeno Totara Cask offers notes of coconut, white peach, bitter lemon and dark chocolate.",
+            "extraSnippets": []
+          },
+          {
+            "title": "Pokeno Exploration Series No. 1 'Totara Cask' Single Malt ...",
+            "url": "https://www.wine-searcher.com/find/pokeno+exploration+series+no+one+totara+cask+single+malt+whisky+new+zealand/1/usa",
+            "domain": "wine-searcher.com",
+            "description": "Pokeno Exploration Series No. 1 'Totara Cask' Single Malt Whisky ; Style: Whisky - Single Malt ; Region: New Zealand ; Score: 85-90 pts ; Price: $ 80-150.",
+            "extraSnippets": []
+          },
+          {
+            "title": "Pōkeno Exploration Series No. 01 Totara Cask | Buy",
+            "url": "https://chipsliquor.com/collections/whiskey/products/pokeno-whisky-company-exploration-series-no-01-totara-cask",
+            "domain": "chipsliquor.com",
+            "description": "Pōkeno Exploration Series No. 01, the first whisky ever matured in native New Zealand tōtara wood. Floral, honey, orchard fruit. 46%, 700ml.",
+            "extraSnippets": []
+          }
+        ]
+      }
+    ],
+    "errors": []
+  },
+  "metadata": {
+    "cacheKey": "cb0df9c68fcdece3f681a21d6719380202a5feb5f627355ebdf7ea171501bab1",
+    "mode": "auto"
+  }
+}

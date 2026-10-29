@@ -1,0 +1,46 @@
+{
+  "writtenAt": "2026-10-29T18:51:08.544Z",
+  "toolName": "web_search",
+  "input": {
+    "queries": [
+      "SMWS \"RW6.5\" \"Appley ever after\" 2024 release November outturn"
+    ]
+  },
+  "output": {
+    "evidence": [
+      {
+        "provider": "firecrawl",
+        "query": "SMWS \"RW6.5\" \"Appley ever after\" 2024 release November outturn",
+        "summary": "WS RW6.5 Appley ever. RW6.5 Release Nov 15, 2024. A public record of whisky bottles, critic scores, and tasting notes from the people who drank them. RW6.5 Appley ever after. Age 6 years DISTILLED. The soft sweetness of overripe apples, ready to be transformed into cider, Sorry item is out Of stock Appley ever after. CASK NO.RW6.5; REGIONFinland; Age6 years; ABV56.0%; CASK1st fill #3 char barrel; SpiritRye Whisky. £80.00. In Stock. LOGIN TO ...",
+        "results": [
+          {
+            "title": "SMWS RW6.5 Appley ever after - Peated",
+            "url": "https://peated.com/bottles/43260-smws-rw-6-5-appley-ever-after",
+            "domain": "peated.com",
+            "description": "WS RW6.5 Appley ever. RW6.5 Release Nov 15, 2024. A public record of whisky bottles, critic scores, and tasting notes from the people who drank them.",
+            "extraSnippets": []
+          },
+          {
+            "title": "Appley ever after - SMWS",
+            "url": "https://smws.eu/appley-ever-after/",
+            "domain": "smws.eu",
+            "description": "RW6.5 Appley ever after. Age 6 years DISTILLED. The soft sweetness of overripe apples, ready to be transformed into cider, Sorry item is out Of stock",
+            "extraSnippets": []
+          },
+          {
+            "title": "Search the Scotch Malt Whisky Range of Single Cask ...",
+            "url": "https://smws.com/all-whisky/?distillery_code=&filter-page=11&max-price=2499&min-price=45&page=2&per-page=8&sort=featured",
+            "domain": "smws.com",
+            "description": "Appley ever after. CASK NO.RW6.5; REGIONFinland; Age6 years; ABV56.0%; CASK1st fill #3 char barrel; SpiritRye Whisky. £80.00. In Stock. LOGIN TO ...",
+            "extraSnippets": []
+          }
+        ]
+      }
+    ],
+    "errors": []
+  },
+  "metadata": {
+    "cacheKey": "44af3a880f584a9d15cbed9b4e238a4d1567419d1357075019ab5581548331ce",
+    "mode": "auto"
+  }
+}

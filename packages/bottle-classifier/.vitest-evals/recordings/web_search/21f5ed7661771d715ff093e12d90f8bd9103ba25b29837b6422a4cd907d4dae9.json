@@ -1,0 +1,65 @@
+{
+  "writtenAt": "2026-10-29T18:31:20.975Z",
+  "toolName": "web_search",
+  "input": {
+    "queries": ["Watchpost whiskey Westland Distillery 42.5% ABV"]
+  },
+  "output": {
+    "evidence": [
+      {
+        "provider": "firecrawl",
+        "query": "Watchpost whiskey Westland Distillery 42.5% ABV",
+        "summary": "It hits that perfect balance that gives hard-headed whisky connoisseurs satisfaction with rich flavor and complexity, while also being accessible and enjoyable ... 8-year American blended whiskey from Seattle's Westland — five-malt single malt blended with ex-bourbon grain whiskey, 42.5% ABV. It is bottled at 42.5% ABV and positioned as an everyday whiskey meant for sharing, outdoor experiences, and casual drinking occasions. Watchpost Whiskey (SRP: $37.99, 42.5/% ABV), an American blended whiskey deeply rooted in the landscape, values, and culture of Washington ... Watchpost is a new blended",
+        "results": [
+          {
+            "title": "Watchpost Whiskey",
+            "url": "https://westlanddistillery.com/products/watchpost-whiskey",
+            "domain": "westlanddistillery.com",
+            "description": "It hits that perfect balance that gives hard-headed whisky connoisseurs satisfaction with rich flavor and complexity, while also being accessible and enjoyable ...",
+            "extraSnippets": []
+          },
+          {
+            "title": "Westland Watchpost | 8-Year American Blended Whiskey",
+            "url": "https://woodencork.com/products/westland-distillery-8-years-old-watchpost-an-american-blended-whiskey",
+            "domain": "woodencork.com",
+            "description": "8-year American blended whiskey from Seattle's Westland — five-malt single malt blended with ex-bourbon grain whiskey, 42.5% ABV.",
+            "extraSnippets": []
+          },
+          {
+            "title": "Watchpost 8-Year Blended Whiskey - Westland Distillery",
+            "url": "https://www.royalbatch.com/watchpost-8-year-blended-whiskey-by-westland-distillery",
+            "domain": "royalbatch.com",
+            "description": "It is bottled at 42.5% ABV and positioned as an everyday whiskey meant for sharing, outdoor experiences, and casual drinking occasions.",
+            "extraSnippets": []
+          },
+          {
+            "title": "Announcing Watchpost American Blended Whiskey From ...",
+            "url": "https://sipmagazine.com/announcing-watchpost-american-blended-whiskey-from-the-team-at-westland-distillery/",
+            "domain": "sipmagazine.com",
+            "description": "Watchpost Whiskey (SRP: $37.99, 42.5/% ABV), an American blended whiskey deeply rooted in the landscape, values, and culture of Washington ...",
+            "extraSnippets": []
+          },
+          {
+            "title": "Watchpost Whiskey - thewhiskeywench",
+            "url": "https://thewhiskeywench.com/2026/06/12/watchpost-whiskey/",
+            "domain": "thewhiskeywench.com",
+            "description": "Watchpost is a new blended whiskey from Washington's own Westland Distillery. aged for 8-years. ABV: 42.5% | Cost: $35-$40. It is easy, ...",
+            "extraSnippets": []
+          },
+          {
+            "title": "Westland Distillery Co. Watchpost Whiskey",
+            "url": "https://shop.yokesfreshmarkets.com/store/yokes-fresh-market/products/81360384-westland-distillery-co-whiskey-watchpost",
+            "domain": "shop.yokesfreshmarkets.com",
+            "description": "Current price: $41.99$41.99. Dry Fly Whiskey, Straight, Washington Wheat Current price: $35.99$35 42.5% alcohol by volume. Item pricing and availability may ...",
+            "extraSnippets": []
+          }
+        ]
+      }
+    ],
+    "errors": []
+  },
+  "metadata": {
+    "cacheKey": "21f5ed7661771d715ff093e12d90f8bd9103ba25b29837b6422a4cd907d4dae9",
+    "mode": "auto"
+  }
+}

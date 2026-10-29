@@ -1,0 +1,68 @@
+{
+  "writtenAt": "2026-10-29T18:44:42.115Z",
+  "toolName": "web_search",
+  "input": {
+    "queries": [
+      "\"Glen Breton\" \"cask 665\" 21 year 43% Casker's",
+      "\"Glen Breton 21\" \"Casker's\" barrel selected 665"
+    ]
+  },
+  "output": {
+    "evidence": [
+      {
+        "provider": "firecrawl",
+        "query": "\"Glen Breton\" \"cask 665\" 21 year 43% Casker's",
+        "summary": "# Glen Breton 21 year old (cask 665), 43%\nPrice: $300.00● Issue: Canadian\n\n[Buy Now](https://whiskyadvocate.com/Glen-Breton-21-year-old-cask-665-43)\n\nCelebrating its 25th anniversary this year, Glenora distillery has certainly hit its stride. This clean, grassy 21 year old tastes like nothing so much as a top Speyside scotch. Fresh hay notes and a slightly effervescent spiciness give the feel, but not the taste, of hot black licorice. Barrel selected by Mike Brisebois for Casker's whisky club. Good stuff, Glenora! _(Distillery only)_ GLEN BRETON 24 YEAR SINGLE CASK BOTTLED FOR CASKERS OF OTTAW",
+        "results": [
+          {
+            "title": "Glen Breton 21 year old (cask 665), 43%",
+            "url": "https://whiskyadvocate.com/Glen-Breton-21-year-old-cask-665-43",
+            "domain": "whiskyadvocate.com",
+            "description": "# Glen Breton 21 year old (cask 665), 43%\nPrice: $300.00● Issue: Canadian\n\n[Buy Now](https://whiskyadvocate.com/Glen-Breton-21-year-old-cask-665-43)\n\nCelebrating its 25th anniversary this year, Glenora distillery has cer",
+            "extraSnippets": []
+          },
+          {
+            "title": "The Glenlivet Helios Single Cask Edition, named to signify ...",
+            "url": "https://www.instagram.com/p/BAKiVJXCRDo/",
+            "domain": "instagram.com",
+            "description": "GLEN BRETON 24 YEAR SINGLE CASK BOTTLED FOR CASKERS OF OTTAWA WINS SILVER MEDAL AT THE 2020 CANADIAN WHISKY AWARDS. ... Our first edition Cask 665 a 21 year ex- ...",
+            "extraSnippets": []
+          },
+          {
+            "title": "Very Olde St. Nick 13yo Ancient Cask American Oak ...",
+            "url": "https://www.spiritradar.com/whisky-db/very-olde-st.-nick-13yo-ancient-cask-american-oak-japan-50.25-percent-750ml/",
+            "domain": "spiritradar.com",
+            "description": "Glen Breton Rare 21yo American Oak Cask #665 Caskers of Ottawa 43% 750ml ...",
+            "extraSnippets": []
+          },
+          {
+            "title": "Caskersofottawa@gmail.com | #Ottawa whisky lovers! Our first ...",
+            "url": "https://www.instagram.com/p/BBajZAhiRGY/",
+            "domain": "instagram.com",
+            "description": "GLEN BRETON 24 YEAR SINGLE CASK BOTTLED FOR ... Altough it's 66% (cask strength) over the 21yo that's 43 ... Our first edition Cask 665 a 21 year ex-bourbon ...",
+            "extraSnippets": []
+          }
+        ]
+      },
+      {
+        "provider": "firecrawl",
+        "query": "\"Glen Breton 21\" \"Casker's\" barrel selected 665",
+        "summary": "# Glen Breton 21 year old (cask 665), 43%\nBarrel selected by Mike Brisebois for Casker's whisky club.",
+        "results": [
+          {
+            "title": "Glen Breton 21 year old (cask 665), 43%",
+            "url": "https://whiskyadvocate.com/Glen-Breton-21-year-old-cask-665-43",
+            "domain": "whiskyadvocate.com",
+            "description": null,
+            "extraSnippets": []
+          }
+        ]
+      }
+    ],
+    "errors": []
+  },
+  "metadata": {
+    "cacheKey": "ecd00f2479d0f32683df6027627aaaec047a2136888ba49bf90ffbdd621c320b",
+    "mode": "auto"
+  }
+}

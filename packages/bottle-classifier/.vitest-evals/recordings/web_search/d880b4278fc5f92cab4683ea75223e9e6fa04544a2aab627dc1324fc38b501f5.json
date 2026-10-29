@@ -1,0 +1,82 @@
+{
+  "writtenAt": "2026-10-29T18:45:44.977Z",
+  "toolName": "web_search",
+  "input": {
+    "queries": [
+      "site:whiskyadvocate.com/Gordon-MacPhail-distilled-at-Rosebank-1989-Vintage-10-year-old-40 Gordon MacPhail Rosebank 1989 10-year-old 40%",
+      "Gordon & MacPhail Rosebank 1989 Vintage 10-year-old 40% ABV"
+    ]
+  },
+  "output": {
+    "evidence": [
+      {
+        "provider": "firecrawl",
+        "query": "site:whiskyadvocate.com/Gordon-MacPhail-distilled-at-Rosebank-1989-Vintage-10-year-old-40 Gordon MacPhail Rosebank 1989 10-year-old 40%",
+        "summary": "![](https://whiskyadvocate.com/?resize=1290&crop=237x21,0x0)\n\n# Gordon & MacPhail (distilled at Rosebank) 1989 Vintage, 10 year old, 40%\nPrice: $50.00● Issue: Summer 2003 ● Reviewer: John Hansell ● Category: Single Malt Scotch\n\n[Buy Now](https://whiskyadvocate.com/Gordon-MacPhail-distilled-at-Rosebank-1989-Vintage-10-year-old-40)\n\nStraw gold color. A very aromatic whisky, with dry, delicate herbal, floral notes. Light and soft in body. Gentle on the palate-delicately sweet and fruity up front, then becoming dry with herbal, spice notes.",
+        "results": [
+          {
+            "title": "Gordon & MacPhail (distilled at Rosebank) 1989 Vintage, ...",
+            "url": "https://whiskyadvocate.com/Gordon-MacPhail-distilled-at-Rosebank-1989-Vintage-10-year-old-40",
+            "domain": "whiskyadvocate.com",
+            "description": "![](https://whiskyadvocate.com/?resize=1290&crop=237x21,0x0)\n\n# Gordon & MacPhail (distilled at Rosebank) 1989 Vintage, 10 year old, 40%\nPrice: $50.00● Issue: Summer 2003 ● Reviewer: John Hansell ● Category: Single Malt ",
+            "extraSnippets": []
+          }
+        ]
+      },
+      {
+        "provider": "firecrawl",
+        "query": "Gordon & MacPhail Rosebank 1989 Vintage 10-year-old 40% ABV",
+        "summary": "# Gordon & MacPhail (distilled at Rosebank) 1989 Vintage, 10 year old, 40%\nSingle Malt Scotch\n\nStraw gold color. A very aromatic whisky, with dry, delicate herbal, floral notes. This 14 year old Scotch whisky was distilled by Rosebank in the year 1989. It was then bottled and released by the highly acclaimed bottler Gordon ... A 1989 vintage Rosebank released by independent bottlers Gordon & Macphail as part of their Rare Old series of whiskies. The distillery closed in 1993 and ... Find the best local price for 1989 Gordon & MacPhail Rare Old Rosebank Single Malt Scotch Whisky, Lowlands, Scot",
+        "results": [
+          {
+            "title": "Gordon & MacPhail (distilled at Rosebank) 1989 Vintage, ...",
+            "url": "https://whiskyadvocate.com/Gordon-MacPhail-distilled-at-Rosebank-1989-Vintage-10-year-old-40",
+            "domain": "whiskyadvocate.com",
+            "description": "# Gordon & MacPhail (distilled at Rosebank) 1989 Vintage, 10 year old, 40%\nSingle Malt Scotch\n\nStraw gold color. A very aromatic whisky, with dry, delicate herbal, floral notes.",
+            "extraSnippets": []
+          },
+          {
+            "title": "Rosebank 1989 Connoisseurs Choice Gordon & Macphail",
+            "url": "https://www.whiskymarketplace.com/whiskies/rosebank-1989-connoisseurs-choice-gordon-and-macphail",
+            "domain": "whiskymarketplace.com",
+            "description": "This 14 year old Scotch whisky was distilled by Rosebank in the year 1989. It was then bottled and released by the highly acclaimed bottler Gordon ...",
+            "extraSnippets": []
+          },
+          {
+            "title": "Rosebank 1989 Rare Old Gordon & Macphail",
+            "url": "https://www.thewhiskyexchange.com/p/24168/rosebank-1989-rare-old-gordon-macphail",
+            "domain": "thewhiskyexchange.com",
+            "description": "A 1989 vintage Rosebank released by independent bottlers Gordon & Macphail as part of their Rare Old series of whiskies. The distillery closed in 1993 and ...",
+            "extraSnippets": []
+          },
+          {
+            "title": "1989 Gordon & MacPhail Rare Old Rosebank Single Malt ...",
+            "url": "https://www.wine-searcher.com/find/gordon+mc+phail+rare+old+rosebank+single+malt+scotch+whisky+lowland+scotland/1989",
+            "domain": "wine-searcher.com",
+            "description": "Find the best local price for 1989 Gordon & MacPhail Rare Old Rosebank Single Malt Scotch Whisky, Lowlands, Scotland. Avg Price (ex-tax) $833 / 750ml.",
+            "extraSnippets": []
+          },
+          {
+            "title": "Rosebank 1989 10 Year Old, Gordon & MacPhail ...",
+            "url": "https://www.thewhiskyvault.com/rosebank-1989-10-year-old-gordon--macphail-connoisseurs-choice-2000-bottling---us-import-25741-p.asp",
+            "domain": "thewhiskyvault.com",
+            "description": "This 10 year old single malt was laid down at the Rosebank distillery in 1989 and bottled for the revered Connoisseurs Choice series from Gordon & MacPhail ...",
+            "extraSnippets": []
+          },
+          {
+            "title": "19/012 CC CS Rosebank 1989 55% (WW/UK)",
+            "url": "https://www.gordonandmacphail.com/our-whiskies/19012-cc-cs-rosebank-1989-55-wwuk",
+            "domain": "gordonandmacphail.com",
+            "description": "Floral and herbal notes transform into aniseed with a slight chilli edge. Sweet honey and orange zest flavours with traces of grass lead to roasted coffee and ...",
+            "extraSnippets": []
+          }
+        ]
+      }
+    ],
+    "errors": []
+  },
+  "metadata": {
+    "cacheKey": "d880b4278fc5f92cab4683ea75223e9e6fa04544a2aab627dc1324fc38b501f5",
+    "mode": "auto"
+  }
+}

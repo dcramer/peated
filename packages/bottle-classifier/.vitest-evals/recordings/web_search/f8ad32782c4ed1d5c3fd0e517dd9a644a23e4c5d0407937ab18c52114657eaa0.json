@@ -1,0 +1,96 @@
+{
+  "writtenAt": "2026-10-29T19:38:44.768Z",
+  "toolName": "web_search",
+  "input": {
+    "queries": [
+      "site:laphroaig.com Càirdeas Warehouse 1 2022 52.2% Laphroaig official",
+      "Laphroaig Cairdeas Warehouse 1 52.2% 2022 release official product"
+    ]
+  },
+  "output": {
+    "evidence": [
+      {
+        "provider": "firecrawl",
+        "query": "site:laphroaig.com Càirdeas Warehouse 1 2022 52.2% Laphroaig official",
+        "summary": "The Cairdeas 2022 is matured in our Islay warehouse and is flavoured with peat, smoke and sea salt. Purchase our distinctive whisky today. Made by fully maturing our iconic Islay single malt in French Oak casks, Exclusive Càirdeas 2022 Warehouse 1 Whisky. SIZE 70 CL 52.2% VOL Càirdeas. Argyll & ... Exclusive Càirdeas 2022 Warehouse 1 Whisky … 70 CL 52.2% VOL. Among these releases is our exclusive Càirdeas, revealed every year at Fèis Ìle on Islay. Learn ...",
+        "results": [
+          {
+            "title": "Laphroaig Cairdeas 2022 | Peaty & Smoky Whisky",
+            "url": "https://www.laphroaig.com/whiskies/cairdeas-2022-warehouse-1-whisky",
+            "domain": "laphroaig.com",
+            "description": "The Cairdeas 2022 is matured in our Islay warehouse and is flavoured with peat, smoke and sea salt. Purchase our distinctive whisky today.",
+            "extraSnippets": []
+          },
+          {
+            "title": "Friends of Laphroaig Collection",
+            "url": "https://www.laphroaig.com/en-gb/whiskies/FOL-exclusives",
+            "domain": "laphroaig.com",
+            "description": "Made by fully maturing our iconic Islay single malt in French Oak casks, Exclusive Càirdeas 2022 Warehouse 1 Whisky. SIZE 70 CL 52.2% VOL Càirdeas. Argyll & ...",
+            "extraSnippets": []
+          },
+          {
+            "title": "Iconic Whisky Collection",
+            "url": "https://www.laphroaig.com/en-gb/whiskies/iconic",
+            "domain": "laphroaig.com",
+            "description": "Exclusive Càirdeas 2022 Warehouse 1 Whisky … 70 CL 52.2% VOL. Among these releases is our exclusive Càirdeas, revealed every year at Fèis Ìle on Islay. Learn ...",
+            "extraSnippets": []
+          }
+        ]
+      },
+      {
+        "provider": "firecrawl",
+        "query": "Laphroaig Cairdeas Warehouse 1 52.2% 2022 release official product",
+        "summary": "The Cairdeas 2022 is matured in our Islay warehouse and is flavoured with peat, smoke and sea salt. Purchase our distinctive whisky today. Laphroaig Cairdeas Warehouse 1 2022 750ML is a cask strength Islay single malt Scotch whisky bottled at 52.2% ABV (104.4 proof). Aged in ex-Bourbon barrels, the final product was bottled at a fixed strength of 52.2%, giving it an extra punch. Here's a preview of what ... Laphroaig Cairdeas Warehouse 1 (2022 Release) $99.99 Matured in Laphroaig's iconic warehouse … flavors of peat, smoke, and sea salt. BV 52.2% Size 750 mL Laphroaig Cairdeas, 2022 Release (5",
+        "results": [
+          {
+            "title": "Laphroaig Cairdeas 2022 | Peaty & Smoky Whisky",
+            "url": "https://www.laphroaig.com/whiskies/cairdeas-2022-warehouse-1-whisky",
+            "domain": "laphroaig.com",
+            "description": "The Cairdeas 2022 is matured in our Islay warehouse and is flavoured with peat, smoke and sea salt. Purchase our distinctive whisky today.",
+            "extraSnippets": []
+          },
+          {
+            "title": "Laphroaig Cairdeas Warehouse 1 2022 750ML",
+            "url": "https://theliquorbarn.com/products/laphroaig-cairdeas-warehouse-1-2022-750ml",
+            "domain": "theliquorbarn.com",
+            "description": "Laphroaig Cairdeas Warehouse 1 2022 750ML is a cask strength Islay single malt Scotch whisky bottled at 52.2% ABV (104.4 proof).",
+            "extraSnippets": []
+          },
+          {
+            "title": "Laphroaig Càirdeas 2022 “Warehouse 1” Is Coming!",
+            "url": "https://www.reddit.com/r/Scotch/comments/uzlb48/laphroaig_c%C3%A0irdeas_2022_warehouse_1_is_coming/",
+            "domain": "reddit.com",
+            "description": "Aged in ex-Bourbon barrels, the final product was bottled at a fixed strength of 52.2%, giving it an extra punch. Here's a preview of what ...",
+            "extraSnippets": []
+          },
+          {
+            "title": "Laphroaig Cairdeas Warehouse 1 (2022 Release)",
+            "url": "https://norfolkwineandspirits.com/shop/laphroaig-cairdeas-warehouse-1-2022-release/",
+            "domain": "norfolkwineandspirits.com",
+            "description": "Laphroaig Cairdeas Warehouse 1 (2022 Release) $99.99 Matured in Laphroaig's iconic warehouse … flavors of peat, smoke, and sea salt. BV 52.2% Size 750 mL",
+            "extraSnippets": []
+          },
+          {
+            "title": "Laphroaig Cairdeas 2022, Warehouse No. 1",
+            "url": "https://myannoyingopinions.com/2022/11/28/laphroaig-cairdeas-2022-release/",
+            "domain": "myannoyingopinions.com",
+            "description": "Laphroaig Cairdeas, 2022 Release (52.2%; ex-bourbon casks; lemon, vanilla and brine. A good bite at 52.2% and rich texture. out is vanilla and ...",
+            "extraSnippets": []
+          },
+          {
+            "title": "Laphroaig Cairdeas \"Warehouse 1\" (2022) Review. PLUS",
+            "url": "https://www.youtube.com/watch?v=MOaxjE3YNak",
+            "domain": "youtube.com",
+            "description": "We review the newest Laphroaig Cairdeas Warehouse 1 release (2022). Matured in Makers Mark ex-bourbon barrels.",
+            "extraSnippets": []
+          }
+        ]
+      }
+    ],
+    "errors": []
+  },
+  "metadata": {
+    "cacheKey": "f8ad32782c4ed1d5c3fd0e517dd9a644a23e4c5d0407937ab18c52114657eaa0",
+    "mode": "auto"
+  }
+}

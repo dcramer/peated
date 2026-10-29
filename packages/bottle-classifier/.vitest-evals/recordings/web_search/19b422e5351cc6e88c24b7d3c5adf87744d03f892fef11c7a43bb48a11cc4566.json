@@ -1,0 +1,117 @@
+{
+  "writtenAt": "2026-10-29T19:13:56.775Z",
+  "toolName": "web_search",
+  "input": {
+    "queries": [
+      "That Boutique-y Whisky Company Paul John 6 year old 54.7 Batch 4 whisky label",
+      "That Boutique-y Whisky Company Paul John Batch 4 6 year old 54.7% ABV"
+    ]
+  },
+  "output": {
+    "evidence": [
+      {
+        "provider": "firecrawl",
+        "query": "That Boutique-y Whisky Company Paul John 6 year old 54.7 Batch 4 whisky label",
+        "summary": "Great to see an age statement on this second Boutique-y Paul John release. It's aromatic, with hoisin sauce, sweet plums, clove, black pepper, ... Nose: Smoky peat, caramel and a hint of sea salt. Palate: Chocolate ice-cream (with dark chocolate chips), joined by another waft of peaty embers. Finish: Red ... It's the third batch of Paul John Indian single malt whisky independently bottled by That Boutique-y Whisky Company! Palate: Oily cereal, sultanas, hints of tropical fruit and mixed berries. Dangerously drinkable at 49.5%. Finish: Mixed nuts, calves leather and ... Review of a 6 year-old P",
+        "results": [
+          {
+            "title": "That Boutique-y Whisky Company Paul John 6 year old ...",
+            "url": "https://whiskyadvocate.com/That-Boutique-y-Whisky-Company-Paul-John-6-year-old-batch-2-54-7",
+            "domain": "whiskyadvocate.com",
+            "description": "Great to see an age statement on this second Boutique-y Paul John release. It's aromatic, with hoisin sauce, sweet plums, clove, black pepper, ...",
+            "extraSnippets": []
+          },
+          {
+            "title": "Paul John 6 Year Old, by That Boutique-y Whisky ...",
+            "url": "https://www.whiskyshopusa.com/paul-john-6-year-old-by-that-boutique-y-whisky-company/",
+            "domain": "whiskyshopusa.com",
+            "description": "Nose: Smoky peat, caramel and a hint of sea salt. Palate: Chocolate ice-cream (with dark chocolate chips), joined by another waft of peaty embers. Finish: Red ...",
+            "extraSnippets": []
+          },
+          {
+            "title": "That Boutique-y Whisky Company Paul John 6 Year Old ...",
+            "url": "https://caskcartel.com/products/that-boutique-y-whisky-company-paul-john-6-year-old-batch-3-single-malt-indian-whisky-500ml",
+            "domain": "caskcartel.com",
+            "description": "It's the third batch of Paul John Indian single malt whisky independently bottled by That Boutique-y Whisky Company!",
+            "extraSnippets": []
+          },
+          {
+            "title": "That Boutique-y Whisky Company Adds Age Statements",
+            "url": "https://www.masterofmalt.com/blog/post/that-boutique-y-whisky-company-launches-age-statements/",
+            "domain": "masterofmalt.com",
+            "description": "Palate: Oily cereal, sultanas, hints of tropical fruit and mixed berries. Dangerously drinkable at 49.5%. Finish: Mixed nuts, calves leather and ...",
+            "extraSnippets": []
+          },
+          {
+            "title": "Paul John 6 Years (Boutique-y Whisky) - WhiskyNotes",
+            "url": "https://www.whiskynotes.be/2019/world/paul-john-6-years-boutiquey-whisky/",
+            "domain": "whiskynotes.be",
+            "description": "Review of a 6 year-old Paul John whisky, an independent bottling from That Boutique-y Whisky Company. Interesting Indian single malt with a ...",
+            "extraSnippets": []
+          },
+          {
+            "title": "That Boutique-Y Whisky Co. 'Paul John' 6 Year Old Single ...",
+            "url": "https://craftshack.com/products/that-boutique-y-whisky-co-paul-john-6-year-old-single-malt-indian-whisky",
+            "domain": "craftshack.com",
+            "description": "Indian Single Malt Whisky | 52.9% ABV. Commercial Description: It's the third batch of Paul John Indian single malt whisky independently bottled by That ...",
+            "extraSnippets": []
+          }
+        ]
+      },
+      {
+        "provider": "firecrawl",
+        "query": "That Boutique-y Whisky Company Paul John Batch 4 6 year old 54.7% ABV",
+        "summary": "Great to see an age statement on this second Boutique-y Paul John release. It's aromatic, with hoisin sauce, sweet plums, clove, black pepper, ... It's the third batch of Paul John Indian single malt whisky independently bottled by That Boutique-y Whisky Company! DISTILLERY: Paul John ABV: 47.6% AGE: 6 Years CAT: Single Malt Indian Whisky BATCH: #6 RRP: £109.95. Nose: A rush of Bonfire Night aromas - particularly smoky embers and toffee apples. After a few minutes, the peat becomes ever-so-slightly coastal. Palate: Peat ... Paul John Brilliance. 46% ABV. Bourbon cask ; Paul John Classic. ~6 ye",
+        "results": [
+          {
+            "title": "That Boutique-y Whisky Company Paul John 6 year old ...",
+            "url": "https://whiskyadvocate.com/That-Boutique-y-Whisky-Company-Paul-John-6-year-old-batch-2-54-7",
+            "domain": "whiskyadvocate.com",
+            "description": "Great to see an age statement on this second Boutique-y Paul John release. It's aromatic, with hoisin sauce, sweet plums, clove, black pepper, ...",
+            "extraSnippets": []
+          },
+          {
+            "title": "That Boutique-y Whisky Company Paul John 6 Year Old ...",
+            "url": "https://caskcartel.com/products/that-boutique-y-whisky-company-paul-john-6-year-old-batch-3-single-malt-indian-whisky-500ml",
+            "domain": "caskcartel.com",
+            "description": "It's the third batch of Paul John Indian single malt whisky independently bottled by That Boutique-y Whisky Company!",
+            "extraSnippets": []
+          },
+          {
+            "title": "Paul John B6, 6 Year Old",
+            "url": "https://www.thatboutiqueywhiskycompany.com/tbwc-at-the-movies/paul-john",
+            "domain": "thatboutiqueywhiskycompany.com",
+            "description": "DISTILLERY: Paul John ABV: 47.6% AGE: 6 Years CAT: Single Malt Indian Whisky BATCH: #6 RRP: £109.95.",
+            "extraSnippets": []
+          },
+          {
+            "title": "That Boutique-Y Whisky Co. 'Paul John' 6 Year Old Single ...",
+            "url": "https://craftshack.com/products/that-boutique-y-whisky-co-paul-john-6-year-old-single-malt-indian-whisky",
+            "domain": "craftshack.com",
+            "description": "Nose: A rush of Bonfire Night aromas - particularly smoky embers and toffee apples. After a few minutes, the peat becomes ever-so-slightly coastal. Palate: Peat ...",
+            "extraSnippets": []
+          },
+          {
+            "title": "Paul John 5-Part Review (Brilliance, Classic, Edited, Bold ...",
+            "url": "https://www.reddit.com/r/worldwhisky/comments/71gj3b/review_6266_paul_john_5part_review_brilliance/",
+            "domain": "reddit.com",
+            "description": "Paul John Brilliance. 46% ABV. Bourbon cask ; Paul John Classic. ~6 years. 55.2% ABV ; Paul John Edited. ~6 years. 46% ABV ; Paul John Bold. 46%.",
+            "extraSnippets": []
+          },
+          {
+            "title": "Paul John 6yo – Batch 3 – That Boutique-y Whisky Company",
+            "url": "https://ocdwhisky.wordpress.com/2017/03/18/paul-john-6yo-that-boutique-y-whisky-company/",
+            "domain": "ocdwhisky.wordpress.com",
+            "description": "Palate.. Instantly smokey and drying with a little spicy kick. The smoke and spice lead you into hints of white chocolate, toffee apples and a ...",
+            "extraSnippets": []
+          }
+        ]
+      }
+    ],
+    "errors": []
+  },
+  "metadata": {
+    "cacheKey": "19b422e5351cc6e88c24b7d3c5adf87744d03f892fef11c7a43bb48a11cc4566",
+    "mode": "auto"
+  }
+}

@@ -1,0 +1,117 @@
+{
+  "writtenAt": "2026-10-29T18:24:44.062Z",
+  "toolName": "web_search",
+  "input": {
+    "queries": [
+      "Highland Park Cask Strength No. 5 official release product ABV title",
+      "Highland Park Cask Strength Release No. 5 whisky"
+    ]
+  },
+  "output": {
+    "evidence": [
+      {
+        "provider": "firecrawl",
+        "query": "Highland Park Cask Strength No. 5 official release product ABV title",
+        "summary": "ABV: 129.4 Proof (64.7%) Mashbill: 100% malted barley. Age: No Age Statement on bottle. MSRP: $100. Availability: Nationally, but limited ... The 64.7% ABV, even though it's clearly high, still kicks pretty hard even for me. As good as this tastes, Highland Park Cask Strength Batch 5 frequently feels ... 5 Release for $99.99 ✓ (64.7% ABV) *Please note that the ABV of this bottle may vary $99.99 $99.99 Bottled straight from the cask, 129.4 Proof/64.7% ABV - 700ml Highland Park Cask Strength, which boasts an eye-watering strength of 63.9% ABV. potentially closer to 70% ABV. Dark and fruity with",
+        "results": [
+          {
+            "title": "Highland Park Cask Strength Release No. 5 - Barleycorn Drinks",
+            "url": "https://www.barleycorndrinks.com/barleycorn-review-highland-park-cask-strength-release-no-5/",
+            "domain": "barleycorndrinks.com",
+            "description": "ABV: 129.4 Proof (64.7%) Mashbill: 100% malted barley. Age: No Age Statement on bottle. MSRP: $100. Availability: Nationally, but limited ...",
+            "extraSnippets": []
+          },
+          {
+            "title": "Highland Park Cask Strength Batch 5 Review [In Depth]",
+            "url": "https://www.thewhiskeyshelf.com/highland-park-cask-strength-batch-5-review/",
+            "domain": "thewhiskeyshelf.com",
+            "description": "The 64.7% ABV, even though it's clearly high, still kicks pretty hard even for me. As good as this tastes, Highland Park Cask Strength Batch 5 frequently feels ...",
+            "extraSnippets": []
+          },
+          {
+            "title": "Highland Park Cask Strength No. 5 Release",
+            "url": "https://www.caskers.com/highland-park-cask-strength-no-5-highland-park-cask-strength-no-5-release/",
+            "domain": "caskers.com",
+            "description": "5 Release for $99.99 ✓ (64.7% ABV) *Please note that the ABV of this bottle may vary $99.99",
+            "extraSnippets": []
+          },
+          {
+            "title": "Highland Park Cask Strength Release No. 5",
+            "url": "https://internetwines.com/products/highland-park-cask-strength-release-no-1",
+            "domain": "internetwines.com",
+            "description": "$99.99 Bottled straight from the cask, 129.4 Proof/64.7% ABV - 700ml",
+            "extraSnippets": []
+          },
+          {
+            "title": "Review #960 - Highland Park Cask Strength : r/Scotch",
+            "url": "https://www.reddit.com/r/Scotch/comments/1wsgcx4/review_960_highland_park_cask_strength/",
+            "domain": "reddit.com",
+            "description": "Highland Park Cask Strength, which boasts an eye-watering strength of 63.9% ABV. potentially closer to 70% ABV. Dark and fruity with strong ...",
+            "extraSnippets": []
+          },
+          {
+            "title": "Highland Park Cask Strength Release No. 5 Single Malt ...",
+            "url": "https://lovescotch.com/products/highland-park-cask-strength-release-no-5-single-malt-scotch-whisky",
+            "domain": "lovescotch.com",
+            "description": "Bottled at a robust 64.7% ABV without the addition of water, it exemplifies a harmonious blend of classic craftsmanship and contemporary flavor exploration. The ...",
+            "extraSnippets": []
+          }
+        ]
+      },
+      {
+        "provider": "firecrawl",
+        "query": "Highland Park Cask Strength Release No. 5 whisky",
+        "summary": "These “sweet, dark, dessert sherry wine matured in these casks, helps deliver notes of spicy, sun-dried fruits and cloves to the final whisky.”. [Skip to content](https://www.missionliquor.com/products/highland-park-single-malt-whisky-cask-strength-release-no-5-750ml#MainContent)\n\n## Your Cart\n![Highland Park Single Malt Whisky Cask Strength Release No.5 750ml-0](https://www.missionliquor.com/cdn/shop/files/Highland-Park-Single-Malt-Whisky-Cask-Strength-Release-No.jpg?v=1728579598&width=1920)\n\n## Highland Park Single Malt Whisky Cask Strength Release No.5 750ml\nNo reviews\n\n$92.99\n\nSKU: 56938",
+        "results": [
+          {
+            "title": "Highland Park Cask Strength Release No. 5 - Barleycorn Drinks",
+            "url": "https://www.barleycorndrinks.com/barleycorn-review-highland-park-cask-strength-release-no-5/",
+            "domain": "barleycorndrinks.com",
+            "description": "These “sweet, dark, dessert sherry wine matured in these casks, helps deliver notes of spicy, sun-dried fruits and cloves to the final whisky.”.",
+            "extraSnippets": []
+          },
+          {
+            "title": "Highland Park Single Malt Whisky Cask Strength Release ...",
+            "url": "https://www.missionliquor.com/products/highland-park-single-malt-whisky-cask-strength-release-no-5-750ml",
+            "domain": "missionliquor.com",
+            "description": "[Skip to content](https://www.missionliquor.com/products/highland-park-single-malt-whisky-cask-strength-release-no-5-750ml#MainContent)\n\n## Your Cart\n![Highland Park Single Malt Whisky Cask Strength Release No.5 750ml-0]",
+            "extraSnippets": []
+          },
+          {
+            "title": "Highland Park Cask Strength No.5 Scotch Whisky",
+            "url": "https://www.totalwine.com/spirits/scotch/single-malt/highland-park-cask-strength-no5-scotch-whisky/p/2126253987",
+            "domain": "totalwine.com",
+            "description": "Scotland - 64.7% - Bottled 'straight from cask' to amplify key strands of the whisky's profile. Matured predominantly in 1st fill, sherry seasoned European oak ...",
+            "extraSnippets": []
+          },
+          {
+            "title": "Highland Park Cask Strength (Batch 5), 64.7%",
+            "url": "https://whiskyadvocate.com/Highland-Park-Cask-Strength-Batch-5-64-7",
+            "domain": "whiskyadvocate.com",
+            "description": "This edition of Highland Park's boldest release was matured in a combination of first-fill sherry, bourbon, and sherry-seasoned American oak, ...",
+            "extraSnippets": []
+          },
+          {
+            "title": "Highland Park Cask Strength No. 5 Release",
+            "url": "https://www.caskers.com/highland-park-cask-strength-no-5-highland-park-cask-strength-no-5-release/",
+            "domain": "caskers.com",
+            "description": "Get Highland Park Cask Strength No. 5 Release for $99.99 ✓ Earn up to 5% back in discounts & save on shipping with Caskers Rewards.",
+            "extraSnippets": []
+          },
+          {
+            "title": "Highland Park Cask Strength No.5 Single Malt Scotch Whisky",
+            "url": "https://www.youtube.com/watch?v=rxy8MrGtJPk",
+            "domain": "youtube.com",
+            "description": "In this video Erik Wait reviews the Highland Park Cask Strength No. 5 Single Malt Scotch Whisky. Check out Erik Wait's review of Highland ...",
+            "extraSnippets": []
+          }
+        ]
+      }
+    ],
+    "errors": []
+  },
+  "metadata": {
+    "cacheKey": "f1b65ef5a4b9eec4dca63db8a871bc9775668f2490514600dd716a3ccb6c15d8",
+    "mode": "auto"
+  }
+}

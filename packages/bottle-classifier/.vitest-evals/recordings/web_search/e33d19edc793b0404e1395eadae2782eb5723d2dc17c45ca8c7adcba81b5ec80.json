@@ -1,0 +1,24 @@
+{
+  "writtenAt": "2026-10-29T19:42:33.357Z",
+  "toolName": "web_search",
+  "input": {
+    "queries": [
+      "\"North Pier Ember\" \"Release 7\" whisky 46% Aster Glen Distillery"
+    ]
+  },
+  "output": {
+    "evidence": [
+      {
+        "provider": "firecrawl",
+        "query": "\"North Pier Ember\" \"Release 7\" whisky 46% Aster Glen Distillery",
+        "summary": null,
+        "results": []
+      }
+    ],
+    "errors": []
+  },
+  "metadata": {
+    "cacheKey": "e33d19edc793b0404e1395eadae2782eb5723d2dc17c45ca8c7adcba81b5ec80",
+    "mode": "auto"
+  }
+}

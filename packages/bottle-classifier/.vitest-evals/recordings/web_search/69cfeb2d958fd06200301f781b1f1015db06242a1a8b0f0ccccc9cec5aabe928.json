@@ -1,0 +1,117 @@
+{
+  "writtenAt": "2026-10-29T19:15:00.635Z",
+  "toolName": "web_search",
+  "input": {
+    "queries": [
+      "The Glenlivet Caribbean Reserve official product name 40% rum cask",
+      "The Glenlivet Caribbean Reserve Rum Barrel Selection 40% name label"
+    ]
+  },
+  "output": {
+    "evidence": [
+      {
+        "provider": "firecrawl",
+        "query": "The Glenlivet Caribbean Reserve official product name 40% rum cask",
+        "summary": "CASK. Selectively finished in Caribbean rum barrels. ; NOSE. Sweet notes of pear and apple meet a fabulous tropical twist of ripe banana in syrup. ; PALATE. Rich ... Smooth on the palate, relatively light-bodied, and easygoing, with clear rum notes, fudge, honey, cereal, and developing bitter orange. Cinnamon and oak char in ... Glenlivet Caribbean Reserve 750ML is a rum-cask-finished Speyside single malt Scotch whisky bottled at 40% ABV in a 750ml bottle. This non-age-statement ... An unmarked, unnamed bottle from a Mysterious Bastard arrives. Rex & Daniel decide to do the only prudent thing",
+        "results": [
+          {
+            "title": "Caribbean Reserve Single Malt Scotch Whisky",
+            "url": "https://www.theglenlivet.com/en-us/whisky/caribbean-reserve/",
+            "domain": "theglenlivet.com",
+            "description": "CASK. Selectively finished in Caribbean rum barrels. ; NOSE. Sweet notes of pear and apple meet a fabulous tropical twist of ripe banana in syrup. ; PALATE. Rich ...",
+            "extraSnippets": []
+          },
+          {
+            "title": "Glenlivet Caribbean Reserve, 40%",
+            "url": "https://whiskyadvocate.com/Glenlivet-Caribbean-Reserve-40",
+            "domain": "whiskyadvocate.com",
+            "description": "Smooth on the palate, relatively light-bodied, and easygoing, with clear rum notes, fudge, honey, cereal, and developing bitter orange. Cinnamon and oak char in ...",
+            "extraSnippets": []
+          },
+          {
+            "title": "Glenlivet Caribbean Reserve 750ML - The Liquor Barn",
+            "url": "https://theliquorbarn.com/products/glenlivet-caribbean-reserve-750ml",
+            "domain": "theliquorbarn.com",
+            "description": "Glenlivet Caribbean Reserve 750ML is a rum-cask-finished Speyside single malt Scotch whisky bottled at 40% ABV in a 750ml bottle. This non-age-statement ...",
+            "extraSnippets": []
+          },
+          {
+            "title": "Glenlivet Caribbean Cask Review",
+            "url": "https://www.youtube.com/watch?v=7gJAYhOhwI0",
+            "domain": "youtube.com",
+            "description": "An unmarked, unnamed bottle from a Mysterious Bastard arrives. Rex & Daniel decide to do the only prudent thing and sample it.",
+            "extraSnippets": []
+          },
+          {
+            "title": "Glenlivet Scotch Single Malt Caribbean Reserve Rum ...",
+            "url": "https://www.remedyliquor.com/products/glenlivet-scotch-single-malt-caribbean-reserve-rum-barrel-selection-750ml",
+            "domain": "remedyliquor.com",
+            "description": "Glenlivet Scotch Single Malt Caribbean Reserve Rum Barrel Selection 750ml.",
+            "extraSnippets": []
+          },
+          {
+            "title": "Rum-Cask Whisky Cocktails with a Caribbean Twist",
+            "url": "https://www.theglenlivet.com/en-us/our-community/articles/rum-cask-cocktails/",
+            "domain": "theglenlivet.com",
+            "description": "Discover 6 whisky cocktails made with The Glenlivet Caribbean Reserve and 12 Year Old Jamaica Edition, two exclusive whiskies part finished in rum casks.",
+            "extraSnippets": []
+          }
+        ]
+      },
+      {
+        "provider": "firecrawl",
+        "query": "The Glenlivet Caribbean Reserve Rum Barrel Selection 40% name label",
+        "summary": "# Caribbean Reserve\n40% Region: Banffshire, Scotland. Aging: No Age Statement – Selectively Finished In Caribbean Rum Barrels. ABV: 40%. Proof: 80. Price: $50. The Glenlivet Caribbean Reserve, a single malt whisky aged in Caribbean rum casks. Glenlivet Caribbean Reserve @40%vol: ABV: 40% Origin: Ballindaloch, Scotland. Glenlivet Caribbean Reserve - \"Murder She Wrote\" ABV: 40% Origin: Ballindaloch, Scotland. Watery AF, ... Caribbean Reserve Rum Barrel Selection 750ml. Regular price $28.99 USD Regular price $30.99 USD Sale … a well-balanced, exceptionally smooth whisky. Avg Price (ex-tax) $45 /",
+        "results": [
+          {
+            "title": "Caribbean Reserve Single Malt Scotch Whisky",
+            "url": "https://www.theglenlivet.com/en-us/whisky/caribbean-reserve/",
+            "domain": "theglenlivet.com",
+            "description": "# Caribbean Reserve\n40%",
+            "extraSnippets": []
+          },
+          {
+            "title": "Glenlivet Caribbean Reserve Review - Rum Barrel Selection",
+            "url": "https://secretwhiskeysociety.com/glenlivet-caribbean-reserve-review-rum-barrel-selection/",
+            "domain": "secretwhiskeysociety.com",
+            "description": "Region: Banffshire, Scotland. Aging: No Age Statement – Selectively Finished In Caribbean Rum Barrels. ABV: 40%. Proof: 80. Price: $50.",
+            "extraSnippets": []
+          },
+          {
+            "title": "The Glenlivet Caribbean Reserve Single Malt Scotch Whisky ...",
+            "url": "https://www.youtube.com/watch?v=p1Er5wOQ82w",
+            "domain": "youtube.com",
+            "description": "The Glenlivet Caribbean Reserve, a single malt whisky aged in Caribbean rum casks. Glenlivet Caribbean Reserve @40%vol:",
+            "extraSnippets": []
+          },
+          {
+            "title": "Spirit Review #119 : Glenlivet Caribbean Reserve : r/Scotch",
+            "url": "https://www.reddit.com/r/Scotch/comments/10flpsx/spirit_review_119_glenlivet_caribbean_reserve/",
+            "domain": "reddit.com",
+            "description": "ABV: 40% Origin: Ballindaloch, Scotland. Glenlivet Caribbean Reserve - \"Murder She Wrote\" ABV: 40% Origin: Ballindaloch, Scotland. Watery AF, ...",
+            "extraSnippets": []
+          },
+          {
+            "title": "Glenlivet Scotch Single Malt Caribbean Reserve Rum ...",
+            "url": "https://www.remedyliquor.com/products/glenlivet-scotch-single-malt-caribbean-reserve-rum-barrel-selection-750ml",
+            "domain": "remedyliquor.com",
+            "description": "Caribbean Reserve Rum Barrel Selection 750ml. Regular price $28.99 USD Regular price $30.99 USD Sale … a well-balanced, exceptionally smooth whisky.",
+            "extraSnippets": []
+          },
+          {
+            "title": "The Glenlivet Caribbean Reserve Single Malt Scotch Whisky",
+            "url": "https://www.wine-searcher.com/find/the+glenlivet+caribbean+rsrv+single+malt+scotch+whisky+speyside+scotland/1/south+africa",
+            "domain": "wine-searcher.com",
+            "description": "Avg Price (ex-tax) $45 / 750ml. The nose is sweet with cane sugar, tropical fruits, malt, coconut, and banoffee pie. $33 .97 / 1000ml ex. Rum Barrel Selection ...",
+            "extraSnippets": []
+          }
+        ]
+      }
+    ],
+    "errors": []
+  },
+  "metadata": {
+    "cacheKey": "69cfeb2d958fd06200301f781b1f1015db06242a1a8b0f0ccccc9cec5aabe928",
+    "mode": "auto"
+  }
+}

@@ -1,0 +1,117 @@
+{
+  "writtenAt": "2026-10-29T18:22:02.353Z",
+  "toolName": "web_search",
+  "input": {
+    "queries": [
+      "Elijah Craig \"Cask Strength\" \"Barrel Proof\" official product",
+      "Elijah Craig Cask Strength bourbon bottle label Heaven Hill"
+    ]
+  },
+  "output": {
+    "evidence": [
+      {
+        "provider": "firecrawl",
+        "query": "Elijah Craig \"Cask Strength\" \"Barrel Proof\" official product",
+        "summary": "Just tried some Elijah Craig 130 proof barrel proof and I have to say I'm not impressed. 100% Larceny Barrel proof any lot I have tried beats ... Elijah Craig Barrel Proof Batches bring you bourbon in its purest form—bold, unfiltered, and straight from the barrel. Known for its remarkable strength and ... Elijah Craig Barrel Proof, the panel's highest-ranked cask-strength bourbon, at $69.99. In stock now. Shop the picks. Browse all bourbon. The Elijah Craig Barrel Proof program releases three batches annually. Each batch reflects a different barrel selection at its natural cask strength — no .",
+        "results": [
+          {
+            "title": "Why I don't buy Elijah Craig Barrel Proof batches anymore",
+            "url": "https://www.reddit.com/r/bourbon/comments/xjaosg/why_i_dont_buy_elijah_craig_barrel_proof_batches/",
+            "domain": "reddit.com",
+            "description": "Just tried some Elijah Craig 130 proof barrel proof and I have to say I'm not impressed. 100% Larceny Barrel proof any lot I have tried beats ...",
+            "extraSnippets": []
+          },
+          {
+            "title": "Elijah Craig Barrel Proof Bourbon Whiskey",
+            "url": "https://spiritedgifts.com/elijah-craig-12-year-barrel-proof-bourbon",
+            "domain": "spiritedgifts.com",
+            "description": "Elijah Craig Barrel Proof Batches bring you bourbon in its purest form—bold, unfiltered, and straight from the barrel. Known for its remarkable strength and ...",
+            "extraSnippets": []
+          },
+          {
+            "title": "The Best Barrel-Proof Bourbons, Ranked (2026)",
+            "url": "https://thebourboncentral.com/pages/barrel-proof-bourbons-ranked",
+            "domain": "thebourboncentral.com",
+            "description": "Elijah Craig Barrel Proof, the panel's highest-ranked cask-strength bourbon, at $69.99. In stock now. Shop the picks. Browse all bourbon.",
+            "extraSnippets": []
+          },
+          {
+            "title": "Elijah Craig Barrel Proof Batch 2",
+            "url": "https://woodencork.com/products/elijah-craig-barrel-proof-kentucky-straight-bourbon-whiskey-batch-2",
+            "domain": "woodencork.com",
+            "description": "The Elijah Craig Barrel Proof program releases three batches annually. Each batch reflects a different barrel selection at its natural cask strength — no ...",
+            "extraSnippets": []
+          },
+          {
+            "title": "Elijah Craig 12 Year Barrel Proof Bourbon Batch H-40",
+            "url": "https://www.nestorliquor.com/products/elijah-craig-12-year-barrel-proof-bourbon-batch-h-40",
+            "domain": "nestorliquor.com",
+            "description": "Elijah Craig Barrel Proof Batch H-40 — uncut, unfiltered bourbon at 124.4 proof, aged 12 years 8 months. Rare cask-strength release, shop now.",
+            "extraSnippets": []
+          },
+          {
+            "title": "Elijah Craig Barrel Proof: The Old Labels",
+            "url": "https://www.whiskeyinmyweddingring.com/reviews/elijah-craig-barrel-proof-old-label",
+            "domain": "whiskeyinmyweddingring.com",
+            "description": "# Elijah Craig Barrel Proof: The Old Labels\n## **The Pirate Bottle**\nSeeing the success of the first release, Heaven Hill decided to make it official, with a new saddle-leather label, red “Barrel Proof” lettering, hand-w",
+            "extraSnippets": []
+          }
+        ]
+      },
+      {
+        "provider": "firecrawl",
+        "query": "Elijah Craig Cask Strength bourbon bottle label Heaven Hill",
+        "summary": "Elijah Craig Barrel Proof is a bold and honest expression of what charred oak barrel aging can do for Bourbon, 18-year-old bourbon with 30-year-old liquid ... ## Discover The    Greatness Within\nElijah Craig© Kentucky Straight Bourbon Whiskey. Finish: Long, warm, and lingering. Expect cinnamon, oak, and sweet heat that seems to last forever. ⭐ Rating: 4.8 / 5. This isn't just ... The difference is especially pronounced in the flavors, where Elijah Craig has more sweet, fruity, and oaky depth, a more viscous mouthfeel, and ... Elijah Craig 21-Year-Old Single Barrel is available exclusively at t",
+        "results": [
+          {
+            "title": "Elijah Craig Barrel Proof",
+            "url": "https://heavenhilldistillery.com/elijah-craig-barrel-proof.php",
+            "domain": "heavenhilldistillery.com",
+            "description": "Elijah Craig Barrel Proof is a bold and honest expression of what charred oak barrel aging can do for Bourbon, 18-year-old bourbon with 30-year-old liquid ...",
+            "extraSnippets": []
+          },
+          {
+            "title": "Elijah Craig | Barrel Proof",
+            "url": "https://elijahcraig.com/barrel-proof",
+            "domain": "elijahcraig.com",
+            "description": "## Discover The    Greatness Within\nElijah Craig© Kentucky Straight Bourbon Whiskey.",
+            "extraSnippets": []
+          },
+          {
+            "title": "🥃 Elijah Craig Barrel Proof – My Own Bottle from Heaven ...",
+            "url": "https://www.instagram.com/p/DN6nwOmj6bg/",
+            "domain": "instagram.com",
+            "description": "Finish: Long, warm, and lingering. Expect cinnamon, oak, and sweet heat that seems to last forever. ⭐ Rating: 4.8 / 5. This isn't just ...",
+            "extraSnippets": []
+          },
+          {
+            "title": "Elijah Craig Small Batch vs Heaven Hill 7 Year Bottled ...",
+            "url": "https://www.reddit.com/r/bourbon/comments/mw5m3v/heaven_hill_bourbon_comparison_elijah_craig_small/",
+            "domain": "reddit.com",
+            "description": "The difference is especially pronounced in the flavors, where Elijah Craig has more sweet, fruity, and oaky depth, a more viscous mouthfeel, and ...",
+            "extraSnippets": []
+          },
+          {
+            "title": "Elijah Craig Expands Single Barrel Lineup with Rare 21- ...",
+            "url": "https://heavenhill.com/news-and-notes/elijah-craig-expands-single-barrel-lineup-with-rare-21-year-old-release/",
+            "domain": "heavenhill.com",
+            "description": "Elijah Craig 21-Year-Old Single Barrel is available exclusively at the Heaven Hill Bourbon Experience for an MSRP of $299.99, while supplies ...",
+            "extraSnippets": []
+          },
+          {
+            "title": "Elijah Craig Small Batch Bourbon",
+            "url": "https://heavenhilldistillery.com/elijah-craig-small-batch.php",
+            "domain": "heavenhilldistillery.com",
+            "description": "Elijah Craig Small Batch is the signature Bourbon bearing. Proof: 94 Proof Age: 8-12 Years Old",
+            "extraSnippets": []
+          }
+        ]
+      }
+    ],
+    "errors": []
+  },
+  "metadata": {
+    "cacheKey": "b8b62ebfab0bcc1c344b3da2c7ebd731c7de4a86f7bc519e8567b66b91dd3b02",
+    "mode": "auto"
+  }
+}

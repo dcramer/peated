@@ -1,0 +1,117 @@
+{
+  "writtenAt": "2026-10-29T19:21:10.199Z",
+  "toolName": "web_search",
+  "input": {
+    "queries": [
+      "Glenmorangie \"Quinta Ruban\" \"4th Edition\" 14 year old",
+      "Glenmorangie The Quinta Ruban 14 Years Old official 46% bourbon port casks"
+    ]
+  },
+  "output": {
+    "evidence": [
+      {
+        "provider": "firecrawl",
+        "query": "Glenmorangie \"Quinta Ruban\" \"4th Edition\" 14 year old",
+        "summary": "The Glenmorangie 14 Quinta Ruban - 4th Edition, a fine single malt from the Scottish Highlands, is characterised by its careful maturation and classic ... Glenmorangie; Quinta Ruban - 4th Edition. Glenmorangie 14-year-old. Overall rating: 84.69/100; ratings: 1125. Whiskybase ID: WB130718; Category ... What is wrong with Quinta Ruban 14? Couple years ago I gifted ... 4th Edition - 14 yo. 5th Edition - 14 yo. ResidentProduct8910. OP •. 2y ... Glenmorangie Quinta Ruban 14 Year Old 4th Edition Single Malt Scotch Whisky at Skull & Barrel, in Melbourne, Australia. Free Shipping for orders over $200.",
+        "results": [
+          {
+            "title": "Glenmorangie 14 Years Old Quinta Ruban - 4th Edition",
+            "url": "https://spiritory.com/glenmorangie-14-years-old-quinta-ruban-4th-edition-130718",
+            "domain": "spiritory.com",
+            "description": "The Glenmorangie 14 Quinta Ruban - 4th Edition, a fine single malt from the Scottish Highlands, is characterised by its careful maturation and classic ...",
+            "extraSnippets": []
+          },
+          {
+            "title": "Glenmorangie 14-year-old - Ratings and Reviews",
+            "url": "https://www.whiskybase.com/whiskies/whisky/130718/glenmorangie-14-year-old",
+            "domain": "whiskybase.com",
+            "description": "Glenmorangie; Quinta Ruban - 4th Edition. Glenmorangie 14-year-old. Overall rating: 84.69/100; ratings: 1125. Whiskybase ID: WB130718; Category ...",
+            "extraSnippets": []
+          },
+          {
+            "title": "What is wrong with Quinta Ruban 14? : r/Scotch",
+            "url": "https://www.reddit.com/r/Scotch/comments/1gd6m8g/what_is_wrong_with_quinta_ruban_14/",
+            "domain": "reddit.com",
+            "description": "What is wrong with Quinta Ruban 14? Couple years ago I gifted ... 4th Edition - 14 yo. 5th Edition - 14 yo. ResidentProduct8910. OP •. 2y ...",
+            "extraSnippets": []
+          },
+          {
+            "title": "Glenmorangie The Quinta Ruban 14 Year Old 4th Edition ...",
+            "url": "https://www.skullandbarrel.com.au/glenmorangie-the-quinta-ruban-14-year-old-4th-edit",
+            "domain": "skullandbarrel.com.au",
+            "description": "Glenmorangie Quinta Ruban 14 Year Old 4th Edition Single Malt Scotch Whisky at Skull & Barrel, in Melbourne, Australia. Free Shipping for orders over $200.",
+            "extraSnippets": []
+          },
+          {
+            "title": "Glenmorangie 14-year-old - Market Value and Price Insights",
+            "url": "https://www.whiskystats.com/whisky/205965",
+            "domain": "whiskystats.com",
+            "description": "Bottler. Distillery Bottling ; Bottling serie. Quinta Ruban - 4th Edition ; Bottled. 13.05.2021 ; Stated Age. 14 years old ; Casktype. Port Cask Finish.",
+            "extraSnippets": []
+          },
+          {
+            "title": "Glenmorangie 14 years - Quinta Ruban* – B-Spirit",
+            "url": "https://www.b-spirit.eu/product/glenmorangie-14-years-quinta-ruban/",
+            "domain": "b-spirit.eu",
+            "description": "Bottler: Glenmorangie. Serie: 4th Edition. Cask Type: Ex-Bourbon, Ruby Port Pipe Finish. 46,0%. 70cl. 3 in stock. Glenmorangie 14 years - Quinta Ruban* ...",
+            "extraSnippets": []
+          }
+        ]
+      },
+      {
+        "provider": "firecrawl",
+        "query": "Glenmorangie The Quinta Ruban 14 Years Old official 46% bourbon port casks",
+        "summary": "14 year old single malt whisky matured in port casks. ABV: 46.0% | Volume: Walnut and black pepper. Mandarin orange and melted marshmallow. Dark chocolate bar ... Age: 14 years ABV: 46% (Non-Chill Filtered) Aged in Cask: ex-bourbon, and ex-ruby port. Aromas of candy, vanilla, chocolate and fruits. Medium with chocolate ... $112 CAD in Ontario. Maturation: Aged at least 14 years. Initially matured in American Oak bourbon barrels, then finished in ruby port casks . After its initial maturation in ex-bourbon barrels, it's finished in Ruby Port casks, which we expect to bring fruit-forward richnes",
+        "results": [
+          {
+            "title": "The Quinta Ruban 14 Years Old",
+            "url": "https://www.glenmorangie.com/en-us/products/the-quinta-ruban",
+            "domain": "glenmorangie.com",
+            "description": "14 year old single malt whisky matured in port casks. ABV: 46.0% | Volume: Walnut and black pepper. Mandarin orange and melted marshmallow. Dark chocolate bar ...",
+            "extraSnippets": []
+          },
+          {
+            "title": "Glenmorangie Quinta Ruban 14 Year Old: A rich and easy ...",
+            "url": "https://thewhiskyknights.com/glenmorangie-quinta-ruban-14/",
+            "domain": "thewhiskyknights.com",
+            "description": "Age: 14 years ABV: 46% (Non-Chill Filtered) Aged in Cask: ex-bourbon, and ex-ruby port. Aromas of candy, vanilla, chocolate and fruits. Medium with chocolate ...",
+            "extraSnippets": []
+          },
+          {
+            "title": "r/Scotch - Review #874 - Glenmorangie 14 Quinta Ruban",
+            "url": "https://www.reddit.com/r/Scotch/comments/12xm6z5/review_874_glenmorangie_14_quinta_ruban/",
+            "domain": "reddit.com",
+            "description": "$112 CAD in Ontario. Maturation: Aged at least 14 years. Initially matured in American Oak bourbon barrels, then finished in ruby port casks .",
+            "extraSnippets": []
+          },
+          {
+            "title": "Glenmorangie Quinta Ruban Highland Single Malt Scotch",
+            "url": "https://www.filmwhiskey.com/blog/whisky-review-glenmorangie-quinta-ruban-highland-single-malt-scotch/",
+            "domain": "filmwhiskey.com",
+            "description": "After its initial maturation in ex-bourbon barrels, it's finished in Ruby Port casks, which we expect to bring fruit-forward richness and depth.",
+            "extraSnippets": []
+          },
+          {
+            "title": "Glenmorangie Quinta Ruban 14 Year Single Malt Scotch",
+            "url": "https://www.totalwine.com/spirits/scotch/single-malt/glenmorangie-quinta-ruban-14-year-single-malt-scotch/p/220061750",
+            "domain": "totalwine.com",
+            "description": "Quinta Ruban 14 year has spent 10 years maturing in American white oak casks, before being transferred into specially selected ruby port pipes from the Quintas",
+            "extraSnippets": []
+          },
+          {
+            "title": "Glenmorangie 14 Year Old The Quinta Ruban - Port Cask ...",
+            "url": "https://www.finedrams.com/glenmorangie-14-year-old-the-quinta-ruban-port-cask-finish-whisky.html",
+            "domain": "finedrams.com",
+            "description": "Glenmorangie 14 Year Old The Quinta Ruban - Port Cask Finish. 70 cl, 46% · Cherry · Citrus rind · Dark chocolate · Dessert wine · Raspberry ...",
+            "extraSnippets": []
+          }
+        ]
+      }
+    ],
+    "errors": []
+  },
+  "metadata": {
+    "cacheKey": "062ecd408232a15a8230012eb074159203a3bfe3919d96aa4fdc7e118f68ec11",
+    "mode": "auto"
+  }
+}

@@ -1,0 +1,22 @@
+{
+  "writtenAt": "2026-10-29T18:37:42.300Z",
+  "toolName": "web_search",
+  "input": {
+    "queries": ["\"The Exclusive Malts\" \"Islay\" \"1661\" 2007 8 year old"]
+  },
+  "output": {
+    "evidence": [
+      {
+        "provider": "firecrawl",
+        "query": "\"The Exclusive Malts\" \"Islay\" \"1661\" 2007 8 year old",
+        "summary": null,
+        "results": []
+      }
+    ],
+    "errors": []
+  },
+  "metadata": {
+    "cacheKey": "cdeae82dd157c7cbb6d550c3edcf2a91b424b53d472ba8d86a8e8eb975c1aeaf",
+    "mode": "auto"
+  }
+}

@@ -1,0 +1,67 @@
+{
+  "writtenAt": "2026-10-29T18:58:37.333Z",
+  "toolName": "web_search",
+  "input": {
+    "queries": [
+      "site:russellsreserve.com \"Single Barrel Rye\" \"Wild Turkey\" distillery produced"
+    ]
+  },
+  "output": {
+    "evidence": [
+      {
+        "provider": "firecrawl",
+        "query": "site:russellsreserve.com \"Single Barrel Rye\" \"Wild Turkey\" distillery produced",
+        "summary": "6 Year Old Rye · Russell's Reserve. Single Barrel Rye ... Russell's Reserve Single Barrel Bourbon is a exceptional representation of Wild Turkey's dedication to ... To celebrate Jimmy's 45 years of service at the Wild Turkey Distillery in ... This same year, Eddie also releases Russell's Reserve Single Barrel Rye ... ... Wild Turkey distillery. Bottled at 110 proof(can very with private barrels)and non-chill filtered, this bourbon brings serious flavor without overwhelming heat. We are proud to call the iconic Wild Turkey Distilling Co. our home. Come ... Russell's Reserve Single Barrel Rye. R",
+        "results": [
+          {
+            "title": "Single Barrel Bourbon",
+            "url": "https://www.russellsreserve.com/en-us/our-products/single-barrel-bourbon/?bvstate=pg%3A3%2Fct%3Ar",
+            "domain": "russellsreserve.com",
+            "description": "6 Year Old Rye · Russell's Reserve. Single Barrel Rye ... Russell's Reserve Single Barrel Bourbon is a exceptional representation of Wild Turkey's dedication to ...",
+            "extraSnippets": []
+          },
+          {
+            "title": "A History of Excellence and Traditions",
+            "url": "https://www.russellsreserve.com/en-us/our-story/",
+            "domain": "russellsreserve.com",
+            "description": "To celebrate Jimmy's 45 years of service at the Wild Turkey Distillery in ... This same year, Eddie also releases Russell's Reserve Single Barrel Rye ...",
+            "extraSnippets": []
+          },
+          {
+            "title": "Single Barrel Bourbon",
+            "url": "https://www.russellsreserve.com/en-us/our-products/single-barrel-bourbon/?bvstate=pg%3A2%2Fct%3Ar",
+            "domain": "russellsreserve.com",
+            "description": "... Wild Turkey distillery. Bottled at 110 proof(can very with private barrels)and non-chill filtered, this bourbon brings serious flavor without overwhelming heat.",
+            "extraSnippets": []
+          },
+          {
+            "title": "Visit Our Distillery in Lawrenceburg, KY",
+            "url": "https://www.russellsreserve.com/en-us/visit-us/",
+            "domain": "russellsreserve.com",
+            "description": "We are proud to call the iconic Wild Turkey Distilling Co. our home. Come ... Russell's Reserve Single Barrel Rye. Russell's Reserve Single Barrel ...",
+            "extraSnippets": []
+          },
+          {
+            "title": "Single Rickhouse Collection 2026: Limited Edition Bourbon",
+            "url": "https://www.russellsreserve.com/en-us/our-products/single-rickhouse/",
+            "domain": "russellsreserve.com",
+            "description": "# PREVIOUS SINGLE RICKHOUSE RELEASES\n## More to discover\n[![Russell's Reserve](https://www.russellsreserve.com/app/themes/campari-wdf/assets/images/placeholderbgtransparent.webp)\\\n\\\n**Single Barrel Rye**](https://www.rus",
+            "extraSnippets": []
+          },
+          {
+            "title": "6 Year Old Rye Whiskey",
+            "url": "https://www.russellsreserve.com/en-us/our-products/6-year-old-rye/",
+            "domain": "russellsreserve.com",
+            "description": "# 6 Year Old Rye Whiskey\n## More to discover\n[![Russell's Reserve](https://www.russellsreserve.com/app/themes/campari-wdf/assets/images/placeholderbgtransparent.webp)\\\n\\\n**Single Barrel Rye**](https://www.russellsreserve",
+            "extraSnippets": []
+          }
+        ]
+      }
+    ],
+    "errors": []
+  },
+  "metadata": {
+    "cacheKey": "7047b8149872c42a0e1790d16dd8e53deb0e88fb9f2316eefa643176deab1fd4",
+    "mode": "auto"
+  }
+}

@@ -1,0 +1,67 @@
+{
+  "writtenAt": "2026-10-29T18:58:22.654Z",
+  "toolName": "web_search",
+  "input": {
+    "queries": [
+      "Russell's Reserve Single Barrel Rye official 52% Wild Turkey product"
+    ]
+  },
+  "output": {
+    "evidence": [
+      {
+        "provider": "firecrawl",
+        "query": "Russell's Reserve Single Barrel Rye official 52% Wild Turkey product",
+        "summary": "Bourbons first, ryes second. This is a modern offering from Wild Turkey with the higher entry proof. It is diluted to 104 pf and sold as a ... Each hand-selected barrel of our Kentucky straight rye whiskey is individually bottled at 104 proof and non-chill filtered to retain the color and rich flavor ... The Single Barrel is bottled at 52% ABV. It's not quite barrel proof (it is water-downed) but it is high-proof. There's bite. There's character. Russell's Reserve is a super-premium product line of Wild Turkey of which there are four core whiskey expressions: RR 6 Year Old Rye, ... Our single",
+        "results": [
+          {
+            "title": "Community Review #51: Russell's Reserve Single Barrel Rye",
+            "url": "https://www.reddit.com/r/bourbon/comments/7gvpd1/community_review_51_russells_reserve_single/",
+            "domain": "reddit.com",
+            "description": "Bourbons first, ryes second. This is a modern offering from Wild Turkey with the higher entry proof. It is diluted to 104 pf and sold as a ...",
+            "extraSnippets": []
+          },
+          {
+            "title": "Single Barrel Rye Whiskey",
+            "url": "https://www.russellsreserve.com/en-us/our-products/single-barrel-rye/",
+            "domain": "russellsreserve.com",
+            "description": "Each hand-selected barrel of our Kentucky straight rye whiskey is individually bottled at 104 proof and non-chill filtered to retain the color and rich flavor ...",
+            "extraSnippets": []
+          },
+          {
+            "title": "Russell's Reserve Straight Rye Single Barrel Review",
+            "url": "http://whisky.buzz/blog/russells-reserve-straight-rye-single-barrel-review-the-fancy-wild-turkey",
+            "domain": "whisky.buzz",
+            "description": "The Single Barrel is bottled at 52% ABV. It's not quite barrel proof (it is water-downed) but it is high-proof. There's bite. There's character.",
+            "extraSnippets": []
+          },
+          {
+            "title": "Russell's Reserve Single Barrel Rye (Loch & Key #40, 2016)",
+            "url": "https://rarebird101.com/2017/06/16/russells-reserve-single-barrel-rye-loch-key-40-2016/",
+            "domain": "rarebird101.com",
+            "description": "Russell's Reserve is a super-premium product line of Wild Turkey of which there are four core whiskey expressions: RR 6 Year Old Rye, ...",
+            "extraSnippets": []
+          },
+          {
+            "title": "Bourbon & Rye Whiskey",
+            "url": "https://www.russellsreserve.com/en-us/our-products/",
+            "domain": "russellsreserve.com",
+            "description": "Our single barrel whiskeys are made from the smallest possible volume, a single barrel. Each barrel is a singular expression that reflects its own distinct ...",
+            "extraSnippets": []
+          },
+          {
+            "title": "Russell's Reserve Single Barrel Rye",
+            "url": "https://www.bourbonguy.com/blog/2016/6/30/russells-reserve-single-barrel-rye",
+            "domain": "bourbonguy.com",
+            "description": "It is a non-chill filtered rye whiskey bottled at 52% ABV. And it is delicious. Russell's Reserve Single Barrel Rye. Purchase Info: $59.99 for a ...",
+            "extraSnippets": []
+          }
+        ]
+      }
+    ],
+    "errors": []
+  },
+  "metadata": {
+    "cacheKey": "f3ca0bb6a03555f617e6c70a27ca30726db1b89c3c52659c711a343d5d65b688",
+    "mode": "auto"
+  }
+}

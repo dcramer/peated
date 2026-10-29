@@ -1,0 +1,24 @@
+{
+  "writtenAt": "2026-10-29T19:36:02.106Z",
+  "toolName": "web_search",
+  "input": {
+    "queries": [
+      "\"Ember Ledger\" \"Batch 24\" bourbon 58.0% West Crown Distillery"
+    ]
+  },
+  "output": {
+    "evidence": [
+      {
+        "provider": "firecrawl",
+        "query": "\"Ember Ledger\" \"Batch 24\" bourbon 58.0% West Crown Distillery",
+        "summary": null,
+        "results": []
+      }
+    ],
+    "errors": []
+  },
+  "metadata": {
+    "cacheKey": "c4f68867f6c838c52c4c5055c0cd77ba741dd481eac48ccba9e9353dce9095ed",
+    "mode": "auto"
+  }
+}

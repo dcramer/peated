@@ -1,0 +1,67 @@
+{
+  "writtenAt": "2026-10-29T18:30:42.072Z",
+  "toolName": "web_search",
+  "input": {
+    "queries": [
+      "The Whistler Bodega Cask Single Malt Irish Whiskey official product ABV Boann distillery maturation"
+    ]
+  },
+  "output": {
+    "evidence": [
+      {
+        "provider": "firecrawl",
+        "query": "The Whistler Bodega Cask Single Malt Irish Whiskey official product ABV Boann distillery maturation",
+        "summary": "The Whiskeys in their line-up are aged in first fill Bourbon barrels before being finished in hand selected Oloroso Sherry casks, for two years. The Sherry cask ... [Skip to content](https://www.boanndistillery.ie/our-spirits/the-whistler-range/#mainBody) The Whistler Triple Oak (40% ABV | SRP $29.99) blends single pot still, single malt, and single grain whiskeys matured in bourbon, Oloroso ... The Whistler is a relatively new Irish whiskey brand from Boann Distillery, sourcing while they mature their own stock. comes in at 43% ABV. Avg Price (ex-tax) $72 / 750ml. this has a rich, lush nose o",
+        "results": [
+          {
+            "title": "The Whistler",
+            "url": "https://flaviar.com/collections/the-whistler",
+            "domain": "flaviar.com",
+            "description": "The Whiskeys in their line-up are aged in first fill Bourbon barrels before being finished in hand selected Oloroso Sherry casks, for two years. The Sherry cask ...",
+            "extraSnippets": []
+          },
+          {
+            "title": "Bodega Cask - The Whistler Whiskey Range",
+            "url": "https://thewhistlerwhiskey.com/whiskey/bodega-cask/",
+            "domain": "thewhistlerwhiskey.com",
+            "description": "[Skip to content](https://www.boanndistillery.ie/our-spirits/the-whistler-range/#mainBody)",
+            "extraSnippets": []
+          },
+          {
+            "title": "The Whistler Unveils New Triple Oak Irish Whiskey and ...",
+            "url": "https://www.bevnet.com/pr/2026/10/28/the-whistler-unveils-new-triple-oak-irish-whiskey-and-premium-packaging-across-its-trilogy",
+            "domain": "bevnet.com",
+            "description": "The Whistler Triple Oak (40% ABV | SRP $29.99) blends single pot still, single malt, and single grain whiskeys matured in bourbon, Oloroso ...",
+            "extraSnippets": []
+          },
+          {
+            "title": "The Whistler's take on the 'classic' Irish whiskey formula ...",
+            "url": "https://www.reddit.com/r/irishwhiskey/comments/126irqh/the_whistlers_take_on_the_classic_irish_whiskey/",
+            "domain": "reddit.com",
+            "description": "The Whistler is a relatively new Irish whiskey brand from Boann Distillery, sourcing while they mature their own stock. comes in at 43% ABV.",
+            "extraSnippets": []
+          },
+          {
+            "title": "The Whistler Bodega Cask Single Malt Irish Whiskey",
+            "url": "https://www.wine-searcher.com/find/the+whistler+cask+single+malt+whisky+ireland",
+            "domain": "wine-searcher.com",
+            "description": "Avg Price (ex-tax) $72 / 750ml. this has a rich, lush nose of sherry wood, baked orange, pepper, ground ginger, orange bitters, ABV 46% Production",
+            "extraSnippets": []
+          },
+          {
+            "title": "The Whistler Bodega Cask 5 Year Old Irish Whiskey",
+            "url": "https://dramfellows.com/products/the-whistler-5-year-old-bodega-cask-irish-whiskey",
+            "domain": "dramfellows.com",
+            "description": "Bottled at 46% ABV (92 proof). Non-chill filtered for richer mouthfeel and character. Triple distilled at Boann Distillery, Ireland. 700mL bottle – perfect for ...",
+            "extraSnippets": []
+          }
+        ]
+      }
+    ],
+    "errors": []
+  },
+  "metadata": {
+    "cacheKey": "51fdd3bf9f405adf8068d48dcbf3c4e02e54a82b8d5f8dd7aad54adc0041064a",
+    "mode": "auto"
+  }
+}

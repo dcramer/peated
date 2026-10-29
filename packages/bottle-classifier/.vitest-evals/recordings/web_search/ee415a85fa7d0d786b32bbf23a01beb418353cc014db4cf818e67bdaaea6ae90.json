@@ -1,0 +1,24 @@
+{
+  "writtenAt": "2026-10-29T19:40:44.611Z",
+  "toolName": "web_search",
+  "input": {
+    "queries": [
+      "Proof and Wood \"The Representative\" bourbon 58.0% 4 year MGP"
+    ]
+  },
+  "output": {
+    "evidence": [
+      {
+        "provider": "firecrawl",
+        "query": "Proof and Wood \"The Representative\" bourbon 58.0% 4 year MGP",
+        "summary": null,
+        "results": []
+      }
+    ],
+    "errors": []
+  },
+  "metadata": {
+    "cacheKey": "ee415a85fa7d0d786b32bbf23a01beb418353cc014db4cf818e67bdaaea6ae90",
+    "mode": "auto"
+  }
+}

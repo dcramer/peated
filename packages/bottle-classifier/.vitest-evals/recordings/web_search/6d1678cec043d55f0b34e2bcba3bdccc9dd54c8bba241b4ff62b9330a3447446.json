@@ -1,0 +1,117 @@
+{
+  "writtenAt": "2026-10-29T19:09:47.287Z",
+  "toolName": "web_search",
+  "input": {
+    "queries": [
+      "Pappy Van Winkle's Family Reserve 15 year 107 proof official Old Rip Van Winkle Buffalo Trace distillery produced",
+      "Pappy Van Winkle 15 year Family Reserve label Old Rip Van Winkle Distillery Buffalo Trace 53.5%"
+    ]
+  },
+  "output": {
+    "evidence": [
+      {
+        "provider": "firecrawl",
+        "query": "Pappy Van Winkle's Family Reserve 15 year 107 proof official Old Rip Van Winkle Buffalo Trace distillery produced",
+        "summary": "Explore Pappy Van Winkle 15 Year from Buffalo Trace Distillery. Wheated-recipe bourbon aged 15 years in deep-char oak for caramel, vanilla and leather ... Pappy Van Winkle's Family Reserve 15 Year is a wheated bourbon from the Old Rip Van Winkle Distillery, aged fifteen years and bottled at 53.5% (107 proof). ## Hi, are you at least AGED 21 years?\n### Tasting Notes\n- Pappy Van Winkle's    Family Reserve15 Year\n\n- Old Rip Van Winkle 10 Year\n- Pappy Van Winkle's  Family Reserve 15 Year\n\n# Our   Whiskey\n## Pappy Van Winkle's    Family Reserve15 Year\n15yr • 107 proof • $299.99 msrp # Pappy Van Win",
+        "results": [
+          {
+            "title": "Pappy Van Winkle 15 Year",
+            "url": "https://www.buffalotracedistillery.com/our-brands/van-winkle/pappy-van-winkle-15-year/",
+            "domain": "buffalotracedistillery.com",
+            "description": "Explore Pappy Van Winkle 15 Year from Buffalo Trace Distillery. Wheated-recipe bourbon aged 15 years in deep-char oak for caramel, vanilla and leather ...",
+            "extraSnippets": []
+          },
+          {
+            "title": "Pappy Van Winkle Family Reserve 15 Year Bourbon | NYC",
+            "url": "https://theliquorstore.com/products/old-rip-van-winkle-distillery-pappy-van-winkles-family-reserve-15-years-old-kentucky-straight-bourbon-whiskey-107-proof-750ml",
+            "domain": "theliquorstore.com",
+            "description": "Pappy Van Winkle's Family Reserve 15 Year is a wheated bourbon from the Old Rip Van Winkle Distillery, aged fifteen years and bottled at 53.5% (107 proof).",
+            "extraSnippets": []
+          },
+          {
+            "title": "Our Whiskeys | Discover Old Rip Van Winkle's Fine Bourbon",
+            "url": "https://oldripvanwinkle.com/whiskey/",
+            "domain": "oldripvanwinkle.com",
+            "description": "## Hi, are you at least AGED 21 years?\n### Tasting Notes\n- Pappy Van Winkle's    Family Reserve15 Year\n\n- Old Rip Van Winkle 10 Year\n- Pappy Van Winkle's  Family Reserve 15 Year\n\n# Our   Whiskey\n## Pappy Van Winkle's    ",
+            "extraSnippets": []
+          },
+          {
+            "title": "Pappy Van Winkle's Family Reserve",
+            "url": "https://en.wikipedia.org/wiki/Pappy_Van_Winkle%27s_Family_Reserve",
+            "domain": "en.wikipedia.org",
+            "description": "# Pappy Van Winkle's Family Reserve\nNot to be confused with [Old Rip Van Winkle](https://en.wikipedia.org/wiki/Old_Rip_Van_Winkle).\n\n| Manufacturer | [Sazerac Company](https://en.wikipedia.org/wiki/Sazerac_Company) | | R",
+            "extraSnippets": []
+          },
+          {
+            "title": "Pappy Van Winkle | 10, 12, 15, 20 & 23 Year + Stitzel-Weller",
+            "url": "https://woodencork.com/collections/pappy-van-winkle",
+            "domain": "woodencork.com",
+            "description": "The Pappy Van Winkle's Family Reserve 15 Year (107 proof) is the most recognized expression in bourbon culture. The 20 Year (90.4 proof) is regarded by serious ...",
+            "extraSnippets": []
+          },
+          {
+            "title": "Old Rip Van Winkle 15 yr 107 proof *THE TRUTH",
+            "url": "https://www.straightbourbon.com/community/topic/3446-old-rip-van-winkle-15-yr-107-proof-the-truth/",
+            "domain": "straightbourbon.com",
+            "description": "It's all essentially the same whiskey, Stitzel-Weller wheated bourbon. Problem is, that distillery closed in 1992 (or thereabouts, may have been ...",
+            "extraSnippets": []
+          }
+        ]
+      },
+      {
+        "provider": "firecrawl",
+        "query": "Pappy Van Winkle 15 year Family Reserve label Old Rip Van Winkle Distillery Buffalo Trace 53.5%",
+        "summary": "Explore Van Winkle from Buffalo Trace Distillery. A celebrated bourbon family offering rich heritage, refined aging and high complexity. Old Rip Van Winkle. ... The Pappy Van Winkle's Family Reserve 15 Year (107 proof) is the most recognized expression in bourbon culture. The 20 Year (90.4 proof) is regarded by serious ... ## Hi, are you at least AGED 21 years?\n### Tasting Notes\n- Pappy Van Winkle's    Family Reserve15 Year\n\n- Old Rip Van Winkle 10 Year\n- Pappy Van Winkle's  Family Reserve 15 Year\n\n# Our   Whiskey\n## Pappy Van Winkle's    Family Reserve15 Year\n15yr • 107 proof • $299.99 msrp W",
+        "results": [
+          {
+            "title": "Van Winkle",
+            "url": "https://www.buffalotracedistillery.com/our-brands/van-winkle/",
+            "domain": "buffalotracedistillery.com",
+            "description": "Explore Van Winkle from Buffalo Trace Distillery. A celebrated bourbon family offering rich heritage, refined aging and high complexity. Old Rip Van Winkle. ...",
+            "extraSnippets": []
+          },
+          {
+            "title": "Pappy Van Winkle | 10, 12, 15, 20 & 23 Year + Stitzel-Weller",
+            "url": "https://woodencork.com/collections/pappy-van-winkle",
+            "domain": "woodencork.com",
+            "description": "The Pappy Van Winkle's Family Reserve 15 Year (107 proof) is the most recognized expression in bourbon culture. The 20 Year (90.4 proof) is regarded by serious ...",
+            "extraSnippets": []
+          },
+          {
+            "title": "Our Whiskeys | Discover Old Rip Van Winkle's Fine Bourbon",
+            "url": "https://oldripvanwinkle.com/whiskey/",
+            "domain": "oldripvanwinkle.com",
+            "description": "## Hi, are you at least AGED 21 years?\n### Tasting Notes\n- Pappy Van Winkle's    Family Reserve15 Year\n\n- Old Rip Van Winkle 10 Year\n- Pappy Van Winkle's  Family Reserve 15 Year\n\n# Our   Whiskey\n## Pappy Van Winkle's    ",
+            "extraSnippets": []
+          },
+          {
+            "title": "Pappy Van Winkle 15 Year",
+            "url": "https://www.buffalotracedistillery.com/our-brands/van-winkle/pappy-van-winkle-15-year/",
+            "domain": "buffalotracedistillery.com",
+            "description": "Wheated-recipe bourbon aged 15 years in deep-char oak for caramel, vanilla and leather ... An elegant and sweet aroma with caramel corn and vanilla. ...",
+            "extraSnippets": []
+          },
+          {
+            "title": "Best local price for Old Rip Van Winkle 'Pappy ...",
+            "url": "https://www.wine-searcher.com/find/old+rip+van+winkel+pappy+fmly+rsrv+fifteen+straight+bourbon+whisky+kentucky+usa",
+            "domain": "wine-searcher.com",
+            "description": "The bourbon is characterized by its deep notes of caramel, vanilla, and dark fruit, complemented by hints of oak, spice, and a touch of smoke. The aging process ...",
+            "extraSnippets": []
+          },
+          {
+            "title": "Old Rip Van Winkle 10 Year",
+            "url": "https://www.buffalotracedistillery.com/our-brands/van-winkle/old-rip-van-winkle-10-year/",
+            "domain": "buffalotracedistillery.com",
+            "description": "A sweet vanilla nose with caramel, pecan and oak wood. (53.5%) Mash Wheated Mash Style. RATING: 95 points (Exceptional)",
+            "extraSnippets": []
+          }
+        ]
+      }
+    ],
+    "errors": []
+  },
+  "metadata": {
+    "cacheKey": "6d1678cec043d55f0b34e2bcba3bdccc9dd54c8bba241b4ff62b9330a3447446",
+    "mode": "auto"
+  }
+}
