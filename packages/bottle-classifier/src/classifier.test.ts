@@ -1,3 +1,4 @@
+import { RunContext } from "@openai/agents";
 import OpenAI from "openai";
 import { describe, expect, test, vi } from "vitest";
 import {
@@ -24,7 +25,12 @@ import {
   type BottleClassificationArtifacts,
 } from "./contract";
 import { buildBottleCandidate } from "./evalFixtureBuilders";
-import { buildPageOpeningEvidence, type BottleClassifierWeb } from "./tools";
+import {
+  buildPageOpeningEvidence,
+  createBottleWebSearchBudget,
+  createReadPageTools,
+  type BottleClassifierWeb,
+} from "./tools";
 
 function nativeAgentResult({
   finalOutput,
@@ -1112,6 +1118,62 @@ describe("createBottleClassifier", () => {
 
     expect(reasoning.artifacts.searchEvidence).toEqual([webSearchEvidence]);
     expect(reasoning.decision).toMatchObject({});
+  });
+
+  test("records no search evidence when find_in_page finds nothing", async () => {
+    const pageUrl = "https://www.ardbeg.com/en-us/whisky/uigeadail";
+    const web: BottleClassifierWeb = {
+      readPage: async () => ({
+        status: "ok",
+        url: pageUrl,
+        title: "Ardbeg Uigeadail",
+        description: null,
+        publishedTime: null,
+        content: "Ardbeg Uigeadail is bottled at 54.2% ABV.",
+        route: "firecrawl",
+      }),
+      searchWeb: async () => ({ status: "ok", results: [] }),
+    };
+    const [readPage, findInPage] = createReadPageTools({
+      web,
+      budget: createBottleWebSearchBudget(1),
+    });
+    await readPage!.invoke(new RunContext(), JSON.stringify({ url: pageUrl }));
+    const miss = await findInPage!.invoke(
+      new RunContext(),
+      JSON.stringify({ url: pageUrl, query: "sherry" }),
+    );
+    const preparedRun = await prepareBottleClassifierAgentRun(
+      {
+        client: TEST_OPENAI_CLIENT,
+        model: "test-model",
+        maxSearchQueries: 2,
+        adapters: {
+          searchBottles: vi.fn(async () => []),
+        },
+      },
+      {
+        reference: { name: "Ardbeg Uigeadail" },
+        extractedIdentity: null,
+        initialCandidates: [],
+      },
+    );
+
+    const reasoning = preparedRun.getAgentResult({
+      finalOutput: noMatchAgentDecision(),
+      newItems: [
+        {
+          type: "tool_call_output_item",
+          rawItem: {
+            type: "function_call_result",
+            name: "find_in_page",
+            output: JSON.stringify(miss),
+          },
+        },
+      ],
+    });
+
+    expect(reasoning.artifacts.searchEvidence).toEqual([]);
   });
 
   test("auto ignores obvious non-whisky references when extraction fails", async () => {

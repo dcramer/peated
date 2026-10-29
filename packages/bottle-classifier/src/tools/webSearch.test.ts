@@ -308,8 +308,8 @@ describe("read_page and find_in_page", () => {
     expect(onEvidence).toHaveBeenCalledTimes(2);
   });
 
-  test("returns no passages when the term is not on the page", async () => {
-    const { readPage, findInPage } = tools({
+  test("says when the term is not on the page and records no evidence", async () => {
+    const { readPage, findInPage, onEvidence } = tools({
       [pageUrl]: okPage(pageUrl, longPage),
     });
     await readPage.invoke(runContext, JSON.stringify({ url: pageUrl }));
@@ -319,7 +319,11 @@ describe("read_page and find_in_page", () => {
         runContext,
         JSON.stringify({ url: pageUrl, query: "sherry" }),
       ),
-    ).resolves.toEqual({ url: pageUrl, query: "sherry", passages: [] });
+    ).resolves.toEqual({
+      url: pageUrl,
+      message: '"sherry" is not on this page',
+    });
+    expect(onEvidence).toHaveBeenCalledTimes(1);
   });
 
   test("asks for a read before finding in a page", async () => {

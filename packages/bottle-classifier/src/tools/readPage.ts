@@ -180,8 +180,13 @@ export function createReadPageTools({
             return budget.getExhaustedError("page_find");
           }
           const passages = findPagePassages(page.text, args.query);
+          // A miss is not search evidence. It has no `query` field, so the
+          // run's evidence merge cannot parse it as an empty evidence record.
           if (passages.length === 0) {
-            return { url: page.url, query: args.query, passages };
+            return {
+              url: page.url,
+              message: `"${args.query}" is not on this page`,
+            };
           }
           const evidence = BottleSearchEvidenceSchema.parse({
             provider: "firecrawl",
