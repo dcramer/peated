@@ -1,12 +1,11 @@
 import config from "@peated/server/config";
+import { createLanguageModel } from "@peated/server/lib/aiSdkModels";
 import {
-  createOpenAIClient,
   isAIGatewayConfigured,
+  withSentryConversation,
 } from "@peated/server/lib/openaiClient";
-import { instrumentOpenAIResponsesCall } from "@peated/server/lib/openaiResponsesTelemetry";
-import * as Sentry from "@sentry/node";
+import { generateText, Output } from "ai";
 import { randomUUID } from "node:crypto";
-import { zodTextFormat } from "openai/helpers/zod";
 import { z } from "zod";
 
 const MODEL = "openai/gpt-5.6-luna";
@@ -31,24 +30,6 @@ const INSTRUCTIONS = [
   "Return only the requested JSON.",
 ].join("\n");
 
-type OpenAIClient = ReturnType<typeof createOpenAIClient>;
-type ClipRequest = Omit<
-  Parameters<OpenAIClient["responses"]["create"]>[0],
-  "stream"
-> & { stream?: false };
-type ClipResponse = {
-  id: string;
-  model: string;
-  output_text: string;
-  service_tier?: string | null;
-  usage?: {
-    input_tokens: number;
-    input_tokens_details: { cached_tokens: number };
-    output_tokens: number;
-    output_tokens_details: { reasoning_tokens: number };
-  } | null;
-};
-
 export interface ReviewClipServices {
   enabled: () => boolean;
   generate: (reviewText: string) => Promise<ReviewClipResult | null>;
@@ -57,55 +38,33 @@ export interface ReviewClipServices {
 
 const reviewClipServices: ReviewClipServices = {
   enabled: () => config.EXTERNAL_REVIEW_CLIPS_ENABLED,
-  generate: async (reviewText) => {
-    const client = createOpenAIClient({ workload: "scraper" });
-    const response = await instrumentOpenAIResponsesCall({
-      baseURL: config.AI_GATEWAY_HOST,
-      conversationId: `external_review_clip:${randomUUID()}`,
-      model: MODEL,
-      callback: async (reportResponse) => {
-        // Review text stays out of Sentry; the span above records no content.
-        const result: ClipResponse = await Sentry.suppressTracing(() =>
-          client.responses.create({
-            model: MODEL,
-            instructions: INSTRUCTIONS,
-            input: JSON.stringify({ reviewText }),
-            text: {
-              format: zodTextFormat(
-                ReviewClipResultSchema,
-                "external_review_clip",
-              ),
-            },
-            max_output_tokens: 300,
-            store: false,
-            reasoning: { effort: "low" },
-          } satisfies ClipRequest),
-        );
-        reportResponse({
-          response: {
-            id: result.id,
-            model: result.model,
-            serviceTier: result.service_tier ?? null,
+  generate: async (reviewText) =>
+    await withSentryConversation(
+      `external_review_clip:${randomUUID()}`,
+      async () => {
+        const result = await generateText({
+          model: createLanguageModel({ model: MODEL, workload: "scraper" }),
+          instructions: INSTRUCTIONS,
+          prompt: JSON.stringify({ reviewText }),
+          output: Output.object({
+            schema: ReviewClipResultSchema,
+            name: "external_review_clip",
+          }),
+          maxOutputTokens: 300,
+          reasoning: "low",
+          providerOptions: { openai: { store: false } },
+          // Review clip rule (docs/features/external-reviews.md): model input
+          // is not recorded in traces. Sentry still records the call, its
+          // model, and token counts.
+          telemetry: {
+            functionId: "external_review_clip",
+            recordInputs: false,
+            recordOutputs: false,
           },
-          usage: result.usage
-            ? {
-                inputTokens: result.usage.input_tokens,
-                cachedInputTokens:
-                  result.usage.input_tokens_details.cached_tokens,
-                outputTokens: result.usage.output_tokens,
-                reasoningTokens:
-                  result.usage.output_tokens_details.reasoning_tokens,
-              }
-            : null,
         });
-        return result;
+        return result.output;
       },
-    });
-    const parsed = ReviewClipResultSchema.safeParse(
-      JSON.parse(response.output_text),
-    );
-    return parsed.success ? parsed.data : null;
-  },
+    ),
   isConfigured: () => isAIGatewayConfigured("scraper"),
 };
 
