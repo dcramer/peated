@@ -46,11 +46,6 @@ and what is still unknown. The page itself is stored data; its events and
 - Licenses: Historic Environment Scotland text is Crown copyright and
   Wikipedia text is CC BY-SA. Link and cite; don't copy.
 
-## Production record gaps
-
-- E0116 `status` is still empty. It should be `active` (reopened 19 May 2021).
-  Fix it in a catalog pass under `docs/operations/catalog-maintenance.md`.
-
 ## Still unknown
 
 - The rename month and year from a primary record.

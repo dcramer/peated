@@ -414,8 +414,9 @@ be that lead, recorded as generated. The Overview SHALL show the lead with its
 citations in place of the description. The system SHALL NOT write a description
 from a model's memory. After the About writer has covered every Distillery
 and Brand, an administrator cleanup SHALL clear each generated description
-that is not its published lead. A description a moderator wrote SHALL NOT be
-replaced or cleared by the pipeline or the cleanup.
+that is not its published lead. A description a person wrote SHALL NOT be
+replaced or cleared by the pipeline or the cleanup; for a description whose
+origin was never recorded, the last change that set a description decides.
 
 #### Scenario: Lead published
 
@@ -428,6 +429,12 @@ replaced or cleared by the pipeline or the cleanup.
 - **WHEN** a moderator saves a new lead for a distillery with a generated
   description
 - **THEN** the distillery's description becomes the new lead
+
+#### Scenario: Older description of unknown origin
+
+- **WHEN** the pipeline publishes a lead for a distillery whose description
+  predates recorded origins and no person's change set it
+- **THEN** the description becomes the lead and the change keeps the old text
 
 #### Scenario: Moderator-written description
 
