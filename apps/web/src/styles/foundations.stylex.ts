@@ -53,10 +53,10 @@ export const foundationStyles = stylex.create({
   sectionHeading: {
     margin: 0,
     fontFamily: fonts.display,
-    fontSize: "20px",
+    fontSize: "26px",
     fontWeight: 700,
-    letterSpacing: "-0.025em",
-    lineHeight: 1.2,
+    letterSpacing: "-0.03em",
+    lineHeight: 1.15,
   },
   rowTitle: {
     margin: 0,
