@@ -1,0 +1,67 @@
+{
+  "writtenAt": "2026-10-29T18:55:45.860Z",
+  "toolName": "web_search",
+  "input": {
+    "queries": [
+      "Glendalough Double Barrel Irish whiskey ReserveBar ABV cask matured official product"
+    ]
+  },
+  "output": {
+    "evidence": [
+      {
+        "provider": "firecrawl",
+        "query": "Glendalough Double Barrel Irish whiskey ReserveBar ABV cask matured official product",
+        "summary": "$28.99 Size 750 ML. Irish Whiskey ABV 42% Country IRELAND … with butterscotch, honey and caramel from the Bourbon cask. This globally awarded, single grain ... $52.62 Size 750 ML. ABV 43% Country IRELAND. Sweet and citrus with vanilla, caramel, banana, treacle notes … first matured in ex-bourbon casks, # Glendalough Double Barrel Irish Whiskey\n- 42% ABV (84 Proof)\n- 750 ML\n\nGlendalough Double Barrel Irish Whiskey, 750 ml This is a single grain whiskey, was aged in bourbon barrels, it's the Oloroso sherry finish. It's non-chill filtered and comes in at 42%ABV, 38·20\n\n# Comments Section\nYes.\n\n[!",
+        "results": [
+          {
+            "title": "Glendalough Double Barrel",
+            "url": "https://www.reservebar.com/products/glendalough-double-barrel/GROUPING-98272",
+            "domain": "reservebar.com",
+            "description": "$28.99 Size 750 ML. Irish Whiskey ABV 42% Country IRELAND … with butterscotch, honey and caramel from the Bourbon cask. This globally awarded, single grain ...",
+            "extraSnippets": []
+          },
+          {
+            "title": "Glendalough Pot Still Irish Whiskey",
+            "url": "https://www.reservebar.com/products/glendalough-pot-still-irish-whiskey/GROUPING-1485338",
+            "domain": "reservebar.com",
+            "description": "$52.62 Size 750 ML. ABV 43% Country IRELAND. Sweet and citrus with vanilla, caramel, banana, treacle notes … first matured in ex-bourbon casks,",
+            "extraSnippets": []
+          },
+          {
+            "title": "Glendalough Double Barrel Irish Whiskey - 750 ML",
+            "url": "https://www.ohlq.com/liquor/whiskey/irish/blend/glendalough-double-barrel-irish-whiskey",
+            "domain": "ohlq.com",
+            "description": "# Glendalough Double Barrel Irish Whiskey\n- 42% ABV (84 Proof)\n- 750 ML\n\nGlendalough Double Barrel Irish Whiskey, 750 ml",
+            "extraSnippets": []
+          },
+          {
+            "title": "Glendalough Double Barrel Whiskey REVIEW",
+            "url": "https://www.youtube.com/watch?v=yhj7H_KpLDs",
+            "domain": "youtube.com",
+            "description": "This is a single grain whiskey, was aged in bourbon barrels, it's the Oloroso sherry finish. It's non-chill filtered and comes in at 42%ABV,",
+            "extraSnippets": []
+          },
+          {
+            "title": "r/irishwhiskey - Glendalough Single Grain Double Barrel",
+            "url": "https://www.reddit.com/r/irishwhiskey/comments/1p4f8aw/glendalough_single_grain_double_barrel/",
+            "domain": "reddit.com",
+            "description": "38·20\n\n# Comments Section\nYes.\n\n[![](https://styles.redditmedia.com/t5_2t6e7/styles/communityIcon_zqqr6s37sjlc1.jpg?width=64&frame=1&auto=webp&s=24445de759bcbb9f71dd579d354c9e99eef22f03)\\\n\\\nr/irishwhiskey](https://www.re",
+            "extraSnippets": []
+          },
+          {
+            "title": "Glendalough Double Barrel",
+            "url": "https://us.glendaloughdistillery.com/whiskey/double-barrel/",
+            "domain": "us.glendaloughdistillery.com",
+            "description": "# Glendalough Double Barrel\nOur Double Barrel Irish Whiskey begins its maturation process in flame-charred ex Bourbon American oak. It is finished in Oloroso casks from Montilla, a small town found in the rolling hills o",
+            "extraSnippets": []
+          }
+        ]
+      }
+    ],
+    "errors": []
+  },
+  "metadata": {
+    "cacheKey": "e616d32de359645242051bf841d192c537c142f84bafe066fd47fb557ed8763c",
+    "mode": "auto"
+  }
+}

@@ -1,0 +1,89 @@
+{
+  "writtenAt": "2026-10-29T19:39:43.997Z",
+  "toolName": "web_search",
+  "input": {
+    "queries": [
+      "Pōkeno \"Single Cask\" \"Pedro Ximénez\" 55.8 340 2019 whisky",
+      "Pokeno 4 year Pedro Ximenez Sherry single cask 55.8% 340 bottles"
+    ]
+  },
+  "output": {
+    "evidence": [
+      {
+        "provider": "firecrawl",
+        "query": "Pōkeno \"Single Cask\" \"Pedro Ximénez\" 55.8 340 2019 whisky",
+        "summary": "Pōkeno US Exclusive PX Sherry Single Cask #71 ... The incredible Single Malt found in Pōkeno PX Sherry Cask #71 has had a full maturation for 4 years in a PX ... Pedro Ximénez (1)‎. Tinta Negra (1)‎. Tinta Roriz ... Sansibar WhiskyOrkney Single Malt 1999- 2021 22 Jahre Finest Whisky ... Penny BluePenny Blue Single Cask ...",
+        "results": [
+          {
+            "title": "Pōkeno Whisky",
+            "url": "https://impexbev.com/pokeno-whisky/",
+            "domain": "impexbev.com",
+            "description": "Pōkeno US Exclusive PX Sherry Single Cask #71 ... The incredible Single Malt found in Pōkeno PX Sherry Cask #71 has had a full maturation for 4 years in a PX ...",
+            "extraSnippets": []
+          },
+          {
+            "title": "Von 1880 bis 2024 fast alles da – Seite 15",
+            "url": "https://www.blue-cask.com/collections/von-1880-bis-2024-fast-alles-da?page=15",
+            "domain": "blue-cask.com",
+            "description": "Pedro Ximénez (1)‎. Tinta Negra (1)‎. Tinta Roriz ... Sansibar WhiskyOrkney Single Malt 1999- 2021 22 Jahre Finest Whisky ... Penny BluePenny Blue Single Cask ...",
+            "extraSnippets": []
+          }
+        ]
+      },
+      {
+        "provider": "firecrawl",
+        "query": "Pokeno 4 year Pedro Ximenez Sherry single cask 55.8% 340 bottles",
+        "summary": "(55.8%) $124.99 The incredible Single Malt found in Pōkeno had a full maturation for 4 years … 336 bottles In stock Pokeno - PX Sherry (Single Cask) US$115.99. Matured for 4 years in a PX sherry cask from Miguel Martin. US Exclusive Single Cask – 336 bottles 700ml, 55.8% ABV ... Pōkeno Single Cask No. 71, a cask-strength New Zealand single malt aged 4 years in a PX sherry cask at 56.5%. Raisins, toffee, chocolate. 700ml. The incredible Single Malt found in Pōkeno PX Sherry Cask #71 has had a full maturation for 4 years in a PX Sherry Cask from Miguel Martin. The result is a ... Find the best l",
+        "results": [
+          {
+            "title": "Pōkeno US Exclusive PX Sherry Single Cask #71 (55.8%)",
+            "url": "https://norfolkwineandspirits.com/shop/pokeno-us-exclusive-px-sherry-single-cask-71-55-8/",
+            "domain": "norfolkwineandspirits.com",
+            "description": "(55.8%) $124.99 The incredible Single Malt found in Pōkeno had a full maturation for 4 years … 336 bottles In stock",
+            "extraSnippets": []
+          },
+          {
+            "title": "Pokeno - PX Sherry (Single Cask)",
+            "url": "https://www.drinqy.com/shop/p/pokeno-origin-acmb2",
+            "domain": "drinqy.com",
+            "description": "Pokeno - PX Sherry (Single Cask) US$115.99. Matured for 4 years in a PX sherry cask from Miguel Martin. US Exclusive Single Cask – 336 bottles 700ml, 55.8% ABV ...",
+            "extraSnippets": []
+          },
+          {
+            "title": "Pōkeno Single Cask No. 71 PX Sherry Cask - Chips Liquor",
+            "url": "https://chipsliquor.com/products/pokeno-whisky-company-4-years-old-cask-no-71-px-sherry-cask-single-cask",
+            "domain": "chipsliquor.com",
+            "description": "Pōkeno Single Cask No. 71, a cask-strength New Zealand single malt aged 4 years in a PX sherry cask at 56.5%. Raisins, toffee, chocolate. 700ml.",
+            "extraSnippets": []
+          },
+          {
+            "title": "Pōkeno Whisky",
+            "url": "https://jvsimports.com/pokeno-whisky/",
+            "domain": "jvsimports.com",
+            "description": "The incredible Single Malt found in Pōkeno PX Sherry Cask #71 has had a full maturation for 4 years in a PX Sherry Cask from Miguel Martin. The result is a ...",
+            "extraSnippets": []
+          },
+          {
+            "title": "Pokeno Single Cask PX Sherry Cask Finish Single Malt ...",
+            "url": "https://www.wine-searcher.com/find/pokeno+single+cask+pedro+ximenez+sherry+malt+whisky+new+zealand/1/usa",
+            "domain": "wine-searcher.com",
+            "description": "Find the best local price for Pokeno Single Cask PX Sherry Cask Finish Single Malt Whisky, New Zealand. Avg Price (ex-tax) $126 / 750ml.",
+            "extraSnippets": []
+          },
+          {
+            "title": "Pokeno PX Sherry Cask New Zealand Single Malt",
+            "url": "https://southlyndale.com/pokeno-px-sherry-cask-new-zealand-single-malt.html",
+            "domain": "southlyndale.com",
+            "description": "Pokeno PX Sherry Cask New Zealand Single Malt Whisky 700ml. Rapid pickup & home delivery available. $124.99 In stock SKU 9203220204",
+            "extraSnippets": []
+          }
+        ]
+      }
+    ],
+    "errors": []
+  },
+  "metadata": {
+    "cacheKey": "936fd196db35d03a2115a3d8ba7934d7cc0b879dbed0d8c7d2a8b7b05f22e21a",
+    "mode": "auto"
+  }
+}

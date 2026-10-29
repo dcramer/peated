@@ -1,0 +1,74 @@
+{
+  "writtenAt": "2026-10-29T19:06:00.418Z",
+  "toolName": "web_search",
+  "input": {
+    "queries": [
+      "site:scotchwhiskyauctions.com/auctions/231-the-182nd-auction/889000-macallan-quest \"Macallan Quest\" ABV",
+      "The Macallan Quest 40% Quest Collection release 2017 bottle"
+    ]
+  },
+  "output": {
+    "evidence": [
+      {
+        "provider": "firecrawl",
+        "query": "site:scotchwhiskyauctions.com/auctions/231-the-182nd-auction/889000-macallan-quest \"Macallan Quest\" ABV",
+        "summary": null,
+        "results": []
+      },
+      {
+        "provider": "firecrawl",
+        "query": "The Macallan Quest 40% Quest Collection release 2017 bottle",
+        "summary": "The Quest Collection is available to purchase as a full range from The Macallan Online Shop. Celebrating the desire to journey further for the finest oak. There are four bottles in the Macallan Quest collection. These are: Macallan Quest, 70cl, 40% ABV ... The collection was announced in 2017 ... The bottle contains a combination of American bourbon casks, sherry seasoned European and America oak casks and Macallan Hogsheads. American bourbon casks are combined with hand-picked sherry seasoned European and American oak casks, and hogshead, to deliver a character of fresh flavours of ... Which",
+        "results": [
+          {
+            "title": "The Quest Collection",
+            "url": "https://www.themacallan.com/en-us/single-malt-scotch-whisky/quest-collection",
+            "domain": "themacallan.com",
+            "description": "The Quest Collection is available to purchase as a full range from The Macallan Online Shop. Celebrating the desire to journey further for the finest oak.",
+            "extraSnippets": []
+          },
+          {
+            "title": "Is It Time To Invest In The Macallan Quest Collection?",
+            "url": "https://marklittler.com/is-it-time-to-invest-in-the-macallan-quest-collection-everything-you-need-to-know/",
+            "domain": "marklittler.com",
+            "description": "There are four bottles in the Macallan Quest collection. These are: Macallan Quest, 70cl, 40% ABV ... The collection was announced in 2017 ...",
+            "extraSnippets": []
+          },
+          {
+            "title": "Review 005: Macallan Quest - Single Malt Scotch",
+            "url": "https://www.reddit.com/r/Scotch/comments/1hs2z5p/review_005_macallan_quest_40_nas_single_malt/",
+            "domain": "reddit.com",
+            "description": "The bottle contains a combination of American bourbon casks, sherry seasoned European and America oak casks and Macallan Hogsheads.",
+            "extraSnippets": []
+          },
+          {
+            "title": "The Macallan Quest Collection",
+            "url": "https://www.themacallan.com/en/experience-the-macallan/whisky-cocktail-recipes/a-moment-with-the-macallan-quest",
+            "domain": "themacallan.com",
+            "description": "American bourbon casks are combined with hand-picked sherry seasoned European and American oak casks, and hogshead, to deliver a character of fresh flavours of ...",
+            "extraSnippets": []
+          },
+          {
+            "title": "Macallan Quest Collection Explained: Quest, Lumina, Terra & ...",
+            "url": "https://www.youtube.com/watch?v=TEF1_f_a-os",
+            "domain": "youtube.com",
+            "description": "Which Macallan Quest Collection bottle should you consider at duty free? Mark compares Quest, Lumina, Terra and Enigma—the four ...",
+            "extraSnippets": []
+          },
+          {
+            "title": "Macallan Quest Collection",
+            "url": "https://www.musthavemalts.com/product/macallan-quest-collection/",
+            "domain": "musthavemalts.com",
+            "description": "This amazing set includes all four bottles in the Global Travel Retail Exclusive series: Quest, Lumina, Terra and Enigma.",
+            "extraSnippets": []
+          }
+        ]
+      }
+    ],
+    "errors": []
+  },
+  "metadata": {
+    "cacheKey": "3450b473a2643c8d05fa7dc1f8620b66ab02453093c4eeb5a696db9eb8f0ec1c",
+    "mode": "auto"
+  }
+}

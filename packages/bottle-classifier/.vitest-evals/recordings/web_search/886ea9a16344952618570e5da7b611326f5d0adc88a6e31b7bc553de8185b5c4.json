@@ -1,0 +1,117 @@
+{
+  "writtenAt": "2026-10-29T18:32:21.555Z",
+  "toolName": "web_search",
+  "input": {
+    "queries": [
+      "Woodford Reserve official Double Double Oaked bourbon product 45.2% ABV",
+      "Woodford Reserve Double Double Oaked bottle release product details proof annual release"
+    ]
+  },
+  "output": {
+    "evidence": [
+      {
+        "provider": "firecrawl",
+        "query": "Woodford Reserve official Double Double Oaked bourbon product 45.2% ABV",
+        "summary": "## Frequently Asked Questions\nThe finished bourbon is bottled at 90.4 proof (45.2% ABV). “This handcrafted, double-barreled bourbon has a deep richness unlike any other American Whiskey on the market or anything you've tasted from Woodford Reserve.”. Our most indulgent double-barreled expression. This bourbon undergoes an extended slumber in a second, custom-crafted barrel. Deeply toasted and lightly ... Barrel finishing comes at a cost, but when Woodford Double Oaked can be purchased by most consumers for $60-$70, it's hard to justify that an ... Woodford Reserve Double Oaked in 45.2% or 43.2",
+        "results": [
+          {
+            "title": "Premium Kentucky Bourbon & Gifts - Woodford Reserve",
+            "url": "https://shop.woodfordreserve.com/",
+            "domain": "shop.woodfordreserve.com",
+            "description": "## Frequently Asked Questions\nThe finished bourbon is bottled at 90.4 proof (45.2% ABV).",
+            "extraSnippets": []
+          },
+          {
+            "title": "Double Double Oaked",
+            "url": "https://www.woodfordreserve.com/whiskey/double-double-oaked/",
+            "domain": "woodfordreserve.com",
+            "description": "“This handcrafted, double-barreled bourbon has a deep richness unlike any other American Whiskey on the market or anything you've tasted from Woodford Reserve.”.",
+            "extraSnippets": []
+          },
+          {
+            "title": "Woodford Reserve Double Double Oaked Straight ...",
+            "url": "https://bevmo.com/products/256909",
+            "domain": "bevmo.com",
+            "description": "Our most indulgent double-barreled expression. This bourbon undergoes an extended slumber in a second, custom-crafted barrel. Deeply toasted and lightly ...",
+            "extraSnippets": []
+          },
+          {
+            "title": "Woodford Reserve Double Double Oaked Bourbon Review",
+            "url": "https://www.breakingbourbon.com/review/woodford-reserve-double-double-oak-bourbon",
+            "domain": "breakingbourbon.com",
+            "description": "Barrel finishing comes at a cost, but when Woodford Double Oaked can be purchased by most consumers for $60-$70, it's hard to justify that an ...",
+            "extraSnippets": []
+          },
+          {
+            "title": "Why is e.g. Woodford Reserve Double Oaked in 45.2% or ...",
+            "url": "https://www.reddit.com/r/whiskey/comments/raj702/why_is_eg_woodford_reserve_double_oaked_in_452_or/",
+            "domain": "reddit.com",
+            "description": "Woodford Reserve Double Oaked in 45.2% or 43.2% This is especially likely to show up for the middle and lower shelf products as they are more ...",
+            "extraSnippets": []
+          },
+          {
+            "title": "Woodford Reserve Double Double Oaked",
+            "url": "https://www.nestorliquor.com/products/woodford-reserve-double-double-oaked",
+            "domain": "nestorliquor.com",
+            "description": "Bottled at 90.4 proof (45.2% ABV), Double Double Oaked offers deep caramel, dark chocolate, and toasted oak aromas, leading into luxurious layers of dried fruit ...",
+            "extraSnippets": []
+          }
+        ]
+      },
+      {
+        "provider": "firecrawl",
+        "query": "Woodford Reserve Double Double Oaked bottle release product details proof annual release",
+        "summary": "## Double Double Oaked\nThis bourbon undergoes an extended slumber in a second, custom-crafted barrel. Deeply toasted and lightly charred, it unlocks an unparalleled depth of flavor – a richness and complexity rarely encountered in American whiskey.\n\nVideo Player\n\n00:00\n\n00:00\n\n00:00\n\n[1. \\\n\\\n\\\nWoodford Reserve’s Double Double Oaked](https://www.woodfordreserve.com/wp-content/uploads/2023/01/Woodford-Reserves-Double-Double-Oaked.mp4)\n\n0:41\n\n“This handcrafted, double-barreled bourbon has a deep richness unlike any other American Whiskey on the market or anything you’ve tasted from Woodford Reser",
+        "results": [
+          {
+            "title": "Double Double Oaked",
+            "url": "https://www.woodfordreserve.com/whiskey/double-double-oaked/",
+            "domain": "woodfordreserve.com",
+            "description": "## Double Double Oaked\nThis bourbon undergoes an extended slumber in a second, custom-crafted barrel. Deeply toasted and lightly charred, it unlocks an unparalleled depth of flavor – a richness and complexity rarely enco",
+            "extraSnippets": []
+          },
+          {
+            "title": "Woodford Reserve Double Double Oaked release Jan. 14 ...",
+            "url": "https://www.kentucky.com/lexgoeat/bourbon/article314302706.html",
+            "domain": "kentucky.com",
+            "description": "- The bourbon spends two more years in a second new oak barrel, producing spicier flavor\n\nOne of bourbon’s most-sought-after annual releases is dropping Jan.\n\nWhile supplies last, you can purchase up to two bottles per p",
+            "extraSnippets": []
+          },
+          {
+            "title": "Double day coming: Details on Woodford Reserve's annual ...",
+            "url": "https://www.facebook.com/kentuckycom/posts/double-day-coming-details-on-woodford-reserves-annual-premium-bourbon-release/1325210076309745/",
+            "domain": "facebook.com",
+            "description": "The 700 ml bottle, presented at 90.4 proof, has a manufacturer's suggested retail price of $199.99.",
+            "extraSnippets": []
+          },
+          {
+            "title": "Review #902: Woodford Reserve Double Double Oaked ...",
+            "url": "https://www.reddit.com/r/bourbon/comments/1l2oxfe/review_902_woodford_reserve_double_double_oaked/",
+            "domain": "reddit.com",
+            "description": "still proof of 138, a barrel entry proof of 125 and aged for 4 to 5 years. reaches 100 proof. It is then aged for another year. priced at $200 ...",
+            "extraSnippets": []
+          },
+          {
+            "title": "Woodford Reserve Double Oaked Exclusive Release",
+            "url": "https://www.ohlq.com/ohlq-hub/news-and-lifestyle/ohlq-exclusive/woodford-reserve-august-2026",
+            "domain": "ohlq.com",
+            "description": "These bottles will be available beginning August 17, 2026, priced at $99.99 (plus tax) and will be available until sold out. Purchases are ...",
+            "extraSnippets": []
+          },
+          {
+            "title": "Woodford Reserve Debuts a 90.4-Proof Double Oaked Rye ...",
+            "url": "https://www.foodandwine.com/woodford-reserve-double-oaked-rye-12196951",
+            "domain": "foodandwine.com",
+            "description": "The permanent release arrives nationwide in November 2026, bottled at 90.4 proof and priced at $55 per 750-milliliter bottle.",
+            "extraSnippets": []
+          }
+        ]
+      }
+    ],
+    "errors": []
+  },
+  "metadata": {
+    "cacheKey": "886ea9a16344952618570e5da7b611326f5d0adc88a6e31b7bc553de8185b5c4",
+    "mode": "auto"
+  }
+}

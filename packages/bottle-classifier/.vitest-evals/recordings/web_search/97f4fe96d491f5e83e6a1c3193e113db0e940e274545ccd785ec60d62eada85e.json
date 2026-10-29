@@ -1,0 +1,117 @@
+{
+  "writtenAt": "2026-10-29T19:12:48.090Z",
+  "toolName": "web_search",
+  "input": {
+    "queries": [
+      "Clynelish 14 year old 43% Whisky Advocate Summer 2012 bottle ABV official release",
+      "Clynelish 14-year-old 43% ABV bottling 14 year old Clynelish 43 percent"
+    ]
+  },
+  "output": {
+    "evidence": [
+      {
+        "provider": "firecrawl",
+        "query": "Clynelish 14 year old 43% Whisky Advocate Summer 2012 bottle ABV official release",
+        "summary": "# Clynelish 14 year old, 43%\nSingle Malt Scotch\n\nAhh, Clynelish. Notes of brine, fruit (lemon-lime), and vanilla-accented malt, are the foundation of this whisky. Delicate seaweed, peat, exotic pepper and a hint of citrus ... Summary: This is just a really solid OB core release. Diageo thankfully releases it at 46% and it is still affordable. Coloring added certainly, ... Today I look at one of my favorite whiskies and a favorite bottle amongst the scotch whisky community, the Clynelish 14 year old. Compare prices on Clynelish 14 Year Old from $60. Single Malt Scotch Whisky. 3 offers, US shipp",
+        "results": [
+          {
+            "title": "Clynelish 14 year old, 43%",
+            "url": "https://whiskyadvocate.com/Clynelish-14-year-old-43",
+            "domain": "whiskyadvocate.com",
+            "description": "# Clynelish 14 year old, 43%\nSingle Malt Scotch\n\nAhh, Clynelish.",
+            "extraSnippets": []
+          },
+          {
+            "title": "Clynelish, 14 year old, 46%",
+            "url": "https://whiskyadvocate.com/Clynelish-14-year-old-46",
+            "domain": "whiskyadvocate.com",
+            "description": "Notes of brine, fruit (lemon-lime), and vanilla-accented malt, are the foundation of this whisky. Delicate seaweed, peat, exotic pepper and a hint of citrus ...",
+            "extraSnippets": []
+          },
+          {
+            "title": "Review #28-29 Clynelish 14 and Signatory Vintage ...",
+            "url": "https://www.reddit.com/r/Scotch/comments/ikinmw/review_2829_clynelish_14_and_signatory_vintage/",
+            "domain": "reddit.com",
+            "description": "Summary: This is just a really solid OB core release. Diageo thankfully releases it at 46% and it is still affordable. Coloring added certainly, ...",
+            "extraSnippets": []
+          },
+          {
+            "title": "Whisky Review #42: Clynelish 14 Year | 46%",
+            "url": "https://www.youtube.com/watch?v=VEPGyf64Xxc",
+            "domain": "youtube.com",
+            "description": "Today I look at one of my favorite whiskies and a favorite bottle amongst the scotch whisky community, the Clynelish 14 year old.",
+            "extraSnippets": []
+          },
+          {
+            "title": "Clynelish 14 Year Old | Prices",
+            "url": "https://www.whiskymarketplace.com/whisky/clynelish-14-year-old-highland-single-malt-scotch",
+            "domain": "whiskymarketplace.com",
+            "description": "Compare prices on Clynelish 14 Year Old from $60. Single Malt Scotch Whisky. 3 offers, US shipping. Compare and buy online at Whisky Marketplace US.",
+            "extraSnippets": []
+          },
+          {
+            "title": "You can never have enough of Clynelish 14 in your Scotch ...",
+            "url": "https://www.facebook.com/groups/394354967679102/posts/1962194834228433/",
+            "domain": "facebook.com",
+            "description": "It is a lovely whisky, quite straightforward, too, with some typically waxy Clynelish-notes (even though not too prominent), nice citrus (lemon ...",
+            "extraSnippets": []
+          }
+        ]
+      },
+      {
+        "provider": "firecrawl",
+        "query": "Clynelish 14-year-old 43% ABV bottling 14 year old Clynelish 43 percent",
+        "summary": "6/10 Malty, fruity and a touch of wax; good whisky at a fair price … 14 year old at 43% for £80. Malty, fruity and a touch of wax; good whisky ... Well rather than being bottled at the minimum alcoholic strength of 40% or the slightly better 43% like most of its stable-mates, Clynelish 14- ... Back\n\nSave\n\n# Clynelish 14 year old, 43%\nPrice: $53.00● Issue: Single Malt Scotch\n\n[Buy Now](https://whiskyadvocate.com/Clynelish-14-year-old-43)\n\nAhh, Clynelish. The enigma of the northeast coast. A single malt whose waxy character — and it does smell of snuffed candles — is highly prized by blenders. I",
+        "results": [
+          {
+            "title": "Clynelish 14yo",
+            "url": "https://www.dramface.com/all-reviews/2024/clynelish-14",
+            "domain": "dramface.com",
+            "description": "6/10 Malty, fruity and a touch of wax; good whisky at a fair price … 14 year old at 43% for £80. Malty, fruity and a touch of wax; good whisky ...",
+            "extraSnippets": []
+          },
+          {
+            "title": "Clynelish 14 Year Old Whisky Review!",
+            "url": "http://peatedperfection.blogspot.com/2019/06/clynelish-14-year-old-whisky-review.html",
+            "domain": "peatedperfection.blogspot.com",
+            "description": "Well rather than being bottled at the minimum alcoholic strength of 40% or the slightly better 43% like most of its stable-mates, Clynelish 14- ...",
+            "extraSnippets": []
+          },
+          {
+            "title": "Clynelish 14 year old, 43%",
+            "url": "https://whiskyadvocate.com/Clynelish-14-year-old-43",
+            "domain": "whiskyadvocate.com",
+            "description": "Back\n\nSave\n\n# Clynelish 14 year old, 43%\nPrice: $53.00● Issue: Single Malt Scotch\n\n[Buy Now](https://whiskyadvocate.com/Clynelish-14-year-old-43)\n\nAhh, Clynelish. The enigma of the northeast coast. A single malt whose wa",
+            "extraSnippets": []
+          },
+          {
+            "title": "Clynelish 14 Year Single Malt Scotch Whisky",
+            "url": "https://whiskyandwhiskey.com/products/clynelish-aged-14-years-coastal-highland-single-malt-scotch-whisky-750nl",
+            "domain": "whiskyandwhiskey.com",
+            "description": "The distillers' artistry brings forth a whisky renowned for its waxy texture and elegant balance of maritime freshness, gentle smoke, and sweet, honeyed notes.",
+            "extraSnippets": []
+          },
+          {
+            "title": "Clynelish 14 Year Old | Prices",
+            "url": "https://www.whiskymarketplace.com/whisky/clynelish-14-year-old-highland-single-malt-scotch",
+            "domain": "whiskymarketplace.com",
+            "description": "Compare prices on Clynelish 14 Year Old from $60. Single Malt Scotch Whisky. 3 offers, US shipping. Compare and buy online at Whisky Marketplace US.",
+            "extraSnippets": []
+          },
+          {
+            "title": "r/Scotch - Review #164 - Clynelish 14 Year",
+            "url": "https://www.reddit.com/r/Scotch/comments/17rg7ab/review_164_clynelish_14_year/",
+            "domain": "reddit.com",
+            "description": "Clynelish 14 Year at 46% ABV, Available Price: USD 75 (2023) Age Statement: 14 Years Strength: 46% ABV Tasting. It's a much higher ABV and it's ...",
+            "extraSnippets": []
+          }
+        ]
+      }
+    ],
+    "errors": []
+  },
+  "metadata": {
+    "cacheKey": "97f4fe96d491f5e83e6a1c3193e113db0e940e274545ccd785ec60d62eada85e",
+    "mode": "auto"
+  }
+}

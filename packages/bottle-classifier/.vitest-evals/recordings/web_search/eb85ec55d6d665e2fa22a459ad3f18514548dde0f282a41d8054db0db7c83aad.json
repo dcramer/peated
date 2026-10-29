@@ -1,0 +1,67 @@
+{
+  "writtenAt": "2026-10-29T18:33:06.925Z",
+  "toolName": "web_search",
+  "input": {
+    "queries": [
+      "Woodford Reserve Double Oaked official product 45.2% ABV Kentucky Straight Bourbon Whiskey"
+    ]
+  },
+  "output": {
+    "evidence": [
+      {
+        "provider": "firecrawl",
+        "query": "Woodford Reserve Double Oaked official product 45.2% ABV Kentucky Straight Bourbon Whiskey",
+        "summary": "## Frequently Asked Questions\nThe finished bourbon is bottled at 90.4 proof (45.2% ABV). “This handcrafted, double-barreled bourbon has a deep richness unlike any other American Whiskey on the market or anything you've tasted from Woodford Reserve.”. Uniquely matured in separate, charred oak barrels – the second barrel deeply toasted before a light charring – extracts additional soft, sweet oak character. This bourbon undergoes an extended slumber in a second, custom-crafted barrel. Deeply toasted and lightly charred, it unlocks an unparalleled depth of flavor – ... Today's Whiskey Weather pou",
+        "results": [
+          {
+            "title": "Premium Kentucky Bourbon & Gifts - Woodford Reserve",
+            "url": "https://shop.woodfordreserve.com/",
+            "domain": "shop.woodfordreserve.com",
+            "description": "## Frequently Asked Questions\nThe finished bourbon is bottled at 90.4 proof (45.2% ABV).",
+            "extraSnippets": []
+          },
+          {
+            "title": "Double Double Oaked",
+            "url": "https://www.woodfordreserve.com/whiskey/double-double-oaked/",
+            "domain": "woodfordreserve.com",
+            "description": "“This handcrafted, double-barreled bourbon has a deep richness unlike any other American Whiskey on the market or anything you've tasted from Woodford Reserve.”.",
+            "extraSnippets": []
+          },
+          {
+            "title": "Double Oaked",
+            "url": "https://www.woodfordreserve.com/whiskey/double-oaked/",
+            "domain": "woodfordreserve.com",
+            "description": "Uniquely matured in separate, charred oak barrels – the second barrel deeply toasted before a light charring – extracts additional soft, sweet oak character.",
+            "extraSnippets": []
+          },
+          {
+            "title": "Woodford Reserve Double Double Oaked Straight ...",
+            "url": "https://bevmo.com/products/256909",
+            "domain": "bevmo.com",
+            "description": "This bourbon undergoes an extended slumber in a second, custom-crafted barrel. Deeply toasted and lightly charred, it unlocks an unparalleled depth of flavor – ...",
+            "extraSnippets": []
+          },
+          {
+            "title": "Woodford Reserve Double Oaked Review",
+            "url": "https://www.youtube.com/shorts/IDQ3e6xT-xY",
+            "domain": "youtube.com",
+            "description": "Today's Whiskey Weather pourcast bourbon review is of Woodford Reserve Double Oaked Kentucky Straight Bourbon whiskey, one of the most ...",
+            "extraSnippets": []
+          },
+          {
+            "title": "Woodford Reserve 700ml 45.2% | Bourbon of Kentucky",
+            "url": "https://www.excellencerhum.com/en/bourbon-of-kentucky/2535-whisky-woodford-reserve-452.html",
+            "domain": "excellencerhum.com",
+            "description": "Woodford Reserve Double Oaked is uniquely aged. Indeed, this bourbon undergoes a second passage in deep toasted and lightly toasted new oak barrels, ...",
+            "extraSnippets": []
+          }
+        ]
+      }
+    ],
+    "errors": []
+  },
+  "metadata": {
+    "cacheKey": "eb85ec55d6d665e2fa22a459ad3f18514548dde0f282a41d8054db0db7c83aad",
+    "mode": "auto"
+  }
+}

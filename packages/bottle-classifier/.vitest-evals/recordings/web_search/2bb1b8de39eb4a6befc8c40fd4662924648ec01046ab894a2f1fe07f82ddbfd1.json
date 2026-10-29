@@ -1,0 +1,117 @@
+{
+  "writtenAt": "2026-10-29T18:59:03.644Z",
+  "toolName": "web_search",
+  "input": {
+    "queries": [
+      "Shieldaig Speyside Single Malt 21-year-old Total Wine product 219098750",
+      "Shieldaig Speyside 21 year old single malt whisky 21 year"
+    ]
+  },
+  "output": {
+    "evidence": [
+      {
+        "provider": "firecrawl",
+        "query": "Shieldaig Speyside Single Malt 21-year-old Total Wine product 219098750",
+        "summary": "Whisky $119.99. A stunning malt aged its entire 21-year life in bourbon hogshead casks. Buttery malt and cooked apricots on the nose, hints of spice and pepper ... Shieldaig is a total wine spirits direct scotch and is usually garbage, it's essentially discarded casks from single malt distilleries Find the best local price for Shieldaig 'Speyside' 21 Year Old Single Malt Scotch Whisky, Speyside, Scotland. Avg Price (ex-tax) $121 / 750ml. old Speyside scotch for only $40. Overall it's not bad, just not great. It's a great bottle . The finish on the Scotch was EXTREMELY LONG. Shieldaig 21 Year S",
+        "results": [
+          {
+            "title": "Shieldaig Speyside Single Malt 21Yr Scotch Whisky",
+            "url": "https://www.totalwine.com/spirits/scotch/single-malt/shieldaig-speyside-single-malt-21yr-scotch-whisky/p/219098750",
+            "domain": "totalwine.com",
+            "description": "Whisky $119.99. A stunning malt aged its entire 21-year life in bourbon hogshead casks. Buttery malt and cooked apricots on the nose, hints of spice and pepper ...",
+            "extraSnippets": []
+          },
+          {
+            "title": "Shieldaig Speyside. What changed? : r/Scotch",
+            "url": "https://www.reddit.com/r/Scotch/comments/1bf7ld2/shieldaig_speyside_what_changed/",
+            "domain": "reddit.com",
+            "description": "Shieldaig is a total wine spirits direct scotch and is usually garbage, it's essentially discarded casks from single malt distilleries",
+            "extraSnippets": []
+          },
+          {
+            "title": "Shieldaig 'Speyside' 21 Year Old Single Malt Scotch Whisky",
+            "url": "https://www.wine-searcher.com/find/shieldaig+21+old+single+malt+scotch+whisky+speyside+scotland/1/usa-ok",
+            "domain": "wine-searcher.com",
+            "description": "Find the best local price for Shieldaig 'Speyside' 21 Year Old Single Malt Scotch Whisky, Speyside, Scotland. Avg Price (ex-tax) $121 / 750ml.",
+            "extraSnippets": []
+          },
+          {
+            "title": "Shieldaig Speyside 18 Year Review & Tasting Notes",
+            "url": "https://scotchaddict.com/shieldaig-speyside-18-year-review-tasting-notes.html",
+            "domain": "scotchaddict.com",
+            "description": "old Speyside scotch for only $40. Overall it's not bad, just not great. It's a great bottle . The finish on the Scotch was EXTREMELY LONG.",
+            "extraSnippets": []
+          },
+          {
+            "title": "Shieldaig Speyside Single Malt 18 Year Old - Whisky Mates",
+            "url": "https://www.whiskymates.com/compare/shieldaig-speyside-single-malt-18-year-old/vs/shieldaig-21-year-speyside-single-malt",
+            "domain": "whiskymates.com",
+            "description": "Shieldaig 21 Year Speyside Single Malt $119.99. Shieldaig 21 Year Speyside Single Malt is a high-aged Scotch whisky that is part of a house brand collection ...",
+            "extraSnippets": []
+          },
+          {
+            "title": "Shieldaig Single Malt Scotch Islay Review",
+            "url": "https://www.youtube.com/watch?v=T2QUVxYe490",
+            "domain": "youtube.com",
+            "description": "Shieldaig Single Malt Scotch Islay Finest Old, a whisky that the Total Wine employee tells us embodies the essence of Islay. We'll examine its ...",
+            "extraSnippets": []
+          }
+        ]
+      },
+      {
+        "provider": "firecrawl",
+        "query": "Shieldaig Speyside 21 year old single malt whisky 21 year",
+        "summary": "A stunning malt aged its entire 21-year life in bourbon hogshead casks. Buttery malt and cooked apricots on the nose, hints of spice and pepper on the palate Shieldaig 21 Year Single Malt 750ml for $99.99. Speyside, Scotland - A stunning malt aged its entire 21-year life in bourbon hogshead casks. Buttery malt and ... 21 Year Old Single Malt Scotch Whisky, Speyside, Scotland. Avg Price (ex-tax) $120 / 750ml. 4.5 from 4 User Ratings Style y A couple of awards have been won by ... Matured in Oloroso, PX, and virgin oak casks, the nose offers complex sweetness with chocolate fudge, dried fruits,",
+        "results": [
+          {
+            "title": "Shieldaig Speyside Single Malt 21Yr Scotch Whisky",
+            "url": "https://www.totalwine.com/spirits/scotch/single-malt/shieldaig-speyside-single-malt-21yr-scotch-whisky/p/219098750",
+            "domain": "totalwine.com",
+            "description": "A stunning malt aged its entire 21-year life in bourbon hogshead casks. Buttery malt and cooked apricots on the nose, hints of spice and pepper on the palate",
+            "extraSnippets": []
+          },
+          {
+            "title": "Shieldaig 21 Year Single Malt",
+            "url": "https://cornwallwines.com/shop/product/shieldaig-21-year-single-malt/5ee2bdc23b479231c557814d?option-id=52b0bf70260fbdd06cf96a789e2fe3029c0fd5b0af166d3befb67ebed9857b6d",
+            "domain": "cornwallwines.com",
+            "description": "Shieldaig 21 Year Single Malt 750ml for $99.99. Speyside, Scotland - A stunning malt aged its entire 21-year life in bourbon hogshead casks. Buttery malt and ...",
+            "extraSnippets": []
+          },
+          {
+            "title": "Shieldaig 'Speyside' 21 Year Old Single Malt Scotch Whisky",
+            "url": "https://www.wine-searcher.com/find/shieldaig+21+old+single+malt+scotch+whisky+speyside+scotland",
+            "domain": "wine-searcher.com",
+            "description": "21 Year Old Single Malt Scotch Whisky, Speyside, Scotland. Avg Price (ex-tax) $120 / 750ml. 4.5 from 4 User Ratings Style y A couple of awards have been won by ...",
+            "extraSnippets": []
+          },
+          {
+            "title": "Shieldaig Speyside 21 Year Old Single Malt Scotch Whisky",
+            "url": "https://www.frootbat.com/p/313202/shieldaig-speyside-21-year-old-single-malt-scotch-whisky",
+            "domain": "frootbat.com",
+            "description": "Matured in Oloroso, PX, and virgin oak casks, the nose offers complex sweetness with chocolate fudge, dried fruits, and signature Oloroso spice. The palate is ...",
+            "extraSnippets": []
+          },
+          {
+            "title": "Shieldaig Speyside Single Malt 21Yr",
+            "url": "https://www.bansumwineandliquor.com/product/6249f094da0f517093d6d504",
+            "domain": "bansumwineandliquor.com",
+            "description": "A stunning malt aged its entire 21-year life in bourbon hogshead casks. Buttery malt and cooked apricots on the nose, hints of spice and pepper.",
+            "extraSnippets": []
+          },
+          {
+            "title": "Shieldaig Speyside 21 Year Single Malt Scotch Whiskey",
+            "url": "https://caskcartel.com/products/shieldaig-speyside-21-year-single-malt-scotch-whiskey",
+            "domain": "caskcartel.com",
+            "description": "A stunning malt aged its entire 21-year life in bourbon hogshead casks. Size: 750ML Proof: 86 (43% ABV) Origin: Scotland. Buttery malt and cooked apricots on ...",
+            "extraSnippets": []
+          }
+        ]
+      }
+    ],
+    "errors": []
+  },
+  "metadata": {
+    "cacheKey": "2bb1b8de39eb4a6befc8c40fd4662924648ec01046ab894a2f1fe07f82ddbfd1",
+    "mode": "auto"
+  }
+}

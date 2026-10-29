@@ -1,0 +1,67 @@
+{
+  "writtenAt": "2026-10-29T18:59:43.118Z",
+  "toolName": "web_search",
+  "input": {
+    "queries": [
+      "Total Wine Shieldaig Speyside 30 year old single malt Scotch whisky 219106750 product details ABV brand bottler"
+    ]
+  },
+  "output": {
+    "evidence": [
+      {
+        "provider": "firecrawl",
+        "query": "Total Wine Shieldaig Speyside 30 year old single malt Scotch whisky 219106750 product details ABV brand bottler",
+        "summary": "Scotland- Wonderfully refined with notes of citrus, spice and creamy milk chocolate. Dries nicely and builds with a beautiful nutty, cocoa and fruity finish. A ... Single Malt Scotch Whisky is made from 100 percent malted barley and is the product of just one distillery. This is in contrast to most Scotch Whiskies, ... [Skip to main content](https://www.reddit.com/r/Scotch/comments/1bf7ld2/shieldaig_speyside_what_changed/#main-content)Shieldaig Speyside. What changed? : r/Scotch\n\n[Skip to Sign up](https://www.reddit.com/r/Scotch/comments/1bf7ld2/shieldaig_speyside_what_changed/#left-sidebar-co",
+        "results": [
+          {
+            "title": "Shieldaig Speyside Sin Malt 30Yr Scotch Whisky",
+            "url": "https://www.totalwine.com/spirits/scotch/single-malt/shieldaig-speyside-sin-malt-30yr-scotch-whisky/p/219106750",
+            "domain": "totalwine.com",
+            "description": "Scotland- Wonderfully refined with notes of citrus, spice and creamy milk chocolate. Dries nicely and builds with a beautiful nutty, cocoa and fruity finish. A ...",
+            "extraSnippets": []
+          },
+          {
+            "title": "Single Malt Scotch | Total Wine & More",
+            "url": "https://www.totalwine.com/discover/learn/single-malt-scotch",
+            "domain": "totalwine.com",
+            "description": "Single Malt Scotch Whisky is made from 100 percent malted barley and is the product of just one distillery. This is in contrast to most Scotch Whiskies, ...",
+            "extraSnippets": []
+          },
+          {
+            "title": "Shieldaig Speyside. What changed? : r/Scotch",
+            "url": "https://www.reddit.com/r/Scotch/comments/1bf7ld2/shieldaig_speyside_what_changed/",
+            "domain": "reddit.com",
+            "description": "[Skip to main content](https://www.reddit.com/r/Scotch/comments/1bf7ld2/shieldaig_speyside_what_changed/#main-content)Shieldaig Speyside. What changed? : r/Scotch\n\n[Skip to Sign up](https://www.reddit.com/r/Scotch/commen",
+            "extraSnippets": []
+          },
+          {
+            "title": "The Truth About Big Box Whiskies",
+            "url": "https://whiskyadvocate.com/big-box-whiskies-feature",
+            "domain": "whiskyadvocate.com",
+            "description": "# The Truth About Big Box Whiskies\nShieldaig 18 year old will delight fans of Speyside scotch with its flower bouquet, candied fruit, nuts, and sweet oak flavors. Just as impressive is its bargain price—$47, a fraction o",
+            "extraSnippets": []
+          },
+          {
+            "title": "Teeling 30 Year Old Single Malt vs. Shieldaig ...",
+            "url": "https://www.whiskymates.com/compare/teeling-30-year-old-single-malt/vs/shieldaig-30-year-speyside-single-malt",
+            "domain": "whiskymates.com",
+            "description": "Teeling 30 Year Old Single Malt rates 89.2/100, Shieldaig 30 Year Speyside Single Malt rates 83.8/100. Compare them side by side on rating, value, price, ...",
+            "extraSnippets": []
+          },
+          {
+            "title": "What is Scotch Whisky | Total Wine & More",
+            "url": "https://www.totalwine.com/discover/learn/scotch-whisky-guide",
+            "domain": "totalwine.com",
+            "description": "... Bottle. 4.2478 out of 5 stars. (464). $29.99. Add to Cart. 92. Shieldaig Speyside Single Malt 12Yr Scotch Whisky.",
+            "extraSnippets": []
+          }
+        ]
+      }
+    ],
+    "errors": []
+  },
+  "metadata": {
+    "cacheKey": "6a370c6ca8aa133db58af8299f69e6ff937d61ac6a7e472ba6463f72b73e14b5",
+    "mode": "auto"
+  }
+}

@@ -1,0 +1,67 @@
+{
+  "writtenAt": "2026-10-29T18:25:40.495Z",
+  "toolName": "web_search",
+  "input": {
+    "queries": [
+      "Jura 12-year-old Scotch Whisky official Jura 12 year old single malt product"
+    ]
+  },
+  "output": {
+    "evidence": [
+      {
+        "provider": "firecrawl",
+        "query": "Jura 12-year-old Scotch Whisky official Jura 12 year old single malt product",
+        "summary": "The 12-year-old Jura is also part of the island distillery's ... Old Pulteney 12 Year Old Single Malt Scotch Whisky Review. The Grail ... On the positive side it now has that age statement, but sadly it is still at 40%, chill-filtered and artificially coloured. It spent most of its ... Product Highlights. This is Jura at its most intense and muscular, yet it remains an approachable whisky that makes the perfect accompaniment to a gathering. Jura 12 Year Old from Isle of Jura, Scotland offers fruity peach, citrus and walnut notes, ideal for first-time single malt discovery and sharing. ... Whis",
+        "results": [
+          {
+            "title": "Jura 12 Years | Whisky Review",
+            "url": "https://www.youtube.com/watch?v=2RhbuIreEWA",
+            "domain": "youtube.com",
+            "description": "The 12-year-old Jura is also part of the island distillery's ... Old Pulteney 12 Year Old Single Malt Scotch Whisky Review. The Grail ...",
+            "extraSnippets": []
+          },
+          {
+            "title": "Review #61: Jura 12yo : r/Scotch",
+            "url": "https://www.reddit.com/r/Scotch/comments/1uwzp2e/review_61_jura_12yo/",
+            "domain": "reddit.com",
+            "description": "On the positive side it now has that age statement, but sadly it is still at 40%, chill-filtered and artificially coloured. It spent most of its ...",
+            "extraSnippets": []
+          },
+          {
+            "title": "Jura Single Malt Scotch 12 Year Old",
+            "url": "https://www.finewineandgoodspirits.com/jura-single-malt-scotch-12-year-old/product/000096294",
+            "domain": "finewineandgoodspirits.com",
+            "description": "Product Highlights. This is Jura at its most intense and muscular, yet it remains an approachable whisky that makes the perfect accompaniment to a gathering.",
+            "extraSnippets": []
+          },
+          {
+            "title": "Jura 12 Year Old | Jura Single Malt Whisky - Jura Distillery",
+            "url": "https://www.jurawhisky.com/en-gb/our-whisky/aged-range/12-year-old/",
+            "domain": "jurawhisky.com",
+            "description": "Jura 12 Year Old from Isle of Jura, Scotland offers fruity peach, citrus and walnut notes, ideal for first-time single malt discovery and sharing.",
+            "extraSnippets": []
+          },
+          {
+            "title": "Jura Oloroso Sherry Cask Finish 12 Years | Whisky Review",
+            "url": "https://www.youtube.com/watch?v=eRHK_EGqtZs",
+            "domain": "youtube.com",
+            "description": "... Whisky.com reviews the Jura Oloroso Sherry Cask Finish 12 Years. The Jura Oloroso Sherry Cask Finish is a 12-year matured Single Malt Scotch ...",
+            "extraSnippets": []
+          },
+          {
+            "title": "Jura 12 Year Old Single Malt Scotch Whisky",
+            "url": "https://www.divinecellar.com/en/whisky/2256-jura-12-year-old-single-malt-scotch-whisky.html",
+            "domain": "divinecellar.com",
+            "description": "This single malt whisky from the Isle of Jura is matured for ten years in bourbon casks, before undergoing further refinement in carefully selected aged ...",
+            "extraSnippets": []
+          }
+        ]
+      }
+    ],
+    "errors": []
+  },
+  "metadata": {
+    "cacheKey": "4bf138ba0da8fbedc1c37480a890e7c8ac76098fedd301303da281994ab0f097",
+    "mode": "auto"
+  }
+}

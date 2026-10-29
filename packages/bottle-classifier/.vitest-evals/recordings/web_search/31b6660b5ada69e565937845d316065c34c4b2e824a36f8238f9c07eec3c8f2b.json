@@ -1,0 +1,117 @@
+{
+  "writtenAt": "2026-10-29T18:54:26.933Z",
+  "toolName": "web_search",
+  "input": {
+    "queries": [
+      "Total Wine Creag Isle 12 year old Island Single Malt Scotch Whisky distillery ABV brand producer",
+      "\"Creag Isle\" \"12\" whisky"
+    ]
+  },
+  "output": {
+    "evidence": [
+      {
+        "provider": "firecrawl",
+        "query": "Total Wine Creag Isle 12 year old Island Single Malt Scotch Whisky distillery ABV brand producer",
+        "summary": "This is presented at an unusual 42.2% ABV, still well below the strength we would like to see for a quality presentation. It spends 12 years in ... Scotland-48%-Six Isles brings together exceptional single malts from distilleries on six different Scottish Islands - Skye, Jura, Islay, ... Creag Isle 12 Year Old Single Malt Scotch Whisky, Islands, Scotland. Avg Price (ex-tax) $53 / 750ml. $ 53 / 750ml. International Wine & Spirit Competition. ... This is presented at an unusual 42.2% ABV, still well below the strength we would like to see for a quality presentation. It spends 12 years in ... Sco",
+        "results": [
+          {
+            "title": "Review #111 - Creag Isle 12 Year",
+            "url": "https://www.memywifeandwhisky.com/reviews/review-111-creag-isle-12-year",
+            "domain": "memywifeandwhisky.com",
+            "description": "This is presented at an unusual 42.2% ABV, still well below the strength we would like to see for a quality presentation. It spends 12 years in ...",
+            "extraSnippets": []
+          },
+          {
+            "title": "Isle Of Skye Scotch | Total Wine & More",
+            "url": "https://www.totalwine.com/theme/isle-of-skye-scotch",
+            "domain": "totalwine.com",
+            "description": "Scotland-48%-Six Isles brings together exceptional single malts from distilleries on six different Scottish Islands - Skye, Jura, Islay, ...",
+            "extraSnippets": []
+          },
+          {
+            "title": "Creag Isle 12 Year Old Single Malt Scotch Whisky",
+            "url": "https://www.wine-searcher.com/find/creag+isle+twelve+old+single+malt+scotch+whisky+island+scotland/1/usa",
+            "domain": "wine-searcher.com",
+            "description": "Creag Isle 12 Year Old Single Malt Scotch Whisky, Islands, Scotland. Avg Price (ex-tax) $53 / 750ml. $ 53 / 750ml. International Wine & Spirit Competition. ...",
+            "extraSnippets": []
+          },
+          {
+            "title": "Review #111 - Creag Isle 12 Year : r/Scotch",
+            "url": "https://www.reddit.com/r/Scotch/comments/15h5vhf/review_111_creag_isle_12_year/",
+            "domain": "reddit.com",
+            "description": "This is presented at an unusual 42.2% ABV, still well below the strength we would like to see for a quality presentation. It spends 12 years in ...",
+            "extraSnippets": []
+          },
+          {
+            "title": "What is Scotch Whisky | Total Wine & More",
+            "url": "https://www.totalwine.com/discover/learn/scotch-whisky-guide",
+            "domain": "totalwine.com",
+            "description": "Scotch is a style of whisky, made in Scotland. distilleries, which produce many high-quality single-malt whiskies as well as other Scotch styles. 95 percent ...",
+            "extraSnippets": []
+          },
+          {
+            "title": "Creag Isle 12Yr Island Single Malt Scotch Whisky",
+            "url": "https://www.totalwine.com/spirits/scotch/single-malt/creag-isle-12yr-island-single-malt-scotch-whisky/p/189848750",
+            "domain": "totalwine.com",
+            "description": "Sweet with a noticeable hint of peat, the Creag Isle 12 Year Old is a complex and inviting single malt. Grass and honey notes combine with smoke and wood ...",
+            "extraSnippets": []
+          }
+        ]
+      },
+      {
+        "provider": "firecrawl",
+        "query": "\"Creag Isle\" \"12\" whisky",
+        "summary": "Product Highlights. Islands, Scotland - Sweet with a noticeable hint of peat, the Creag Isle 12 Year Old is a complex and inviting single malt. Here is the Creag Isle 12 Year, a peated single malt that would fall into the 'Island' subcategory of the Highlands. As usual, the distillery is ... Creag Isle 12 Year · Current Locally Available Price: USD 50 (2023) · Age Statement: 12 Years · Strength: 42.2% ABV · Cask Makeup: American oak. Islands, Scotland - Sweet with a noticeable hint of peat, the Creag Isle 12 Year Old is a complex and inviting single malt. Grass and honey notes combine with ...",
+        "results": [
+          {
+            "title": "Creag Isle 12Yr Island Single Malt Scotch Whisky",
+            "url": "https://www.totalwine.com/spirits/scotch/single-malt/creag-isle-12yr-island-single-malt-scotch-whisky/p/189848750",
+            "domain": "totalwine.com",
+            "description": "Product Highlights. Islands, Scotland - Sweet with a noticeable hint of peat, the Creag Isle 12 Year Old is a complex and inviting single malt.",
+            "extraSnippets": []
+          },
+          {
+            "title": "Review #111 - Creag Isle 12 Year : r/Scotch",
+            "url": "https://www.reddit.com/r/Scotch/comments/15h5vhf/review_111_creag_isle_12_year/",
+            "domain": "reddit.com",
+            "description": "Here is the Creag Isle 12 Year, a peated single malt that would fall into the 'Island' subcategory of the Highlands. As usual, the distillery is ...",
+            "extraSnippets": []
+          },
+          {
+            "title": "Review #111 - Creag Isle 12 Year",
+            "url": "https://www.memywifeandwhisky.com/reviews/review-111-creag-isle-12-year",
+            "domain": "memywifeandwhisky.com",
+            "description": "Creag Isle 12 Year · Current Locally Available Price: USD 50 (2023) · Age Statement: 12 Years · Strength: 42.2% ABV · Cask Makeup: American oak.",
+            "extraSnippets": []
+          },
+          {
+            "title": "Creag Isle Islay Single Malt Scotch 12 Year - MGMRun.com",
+            "url": "https://mgmrun.com/shop/product/creag-isle-islay-single-malt-scotch-12-year/5ed0687a48c6ee132dddbe65?option-id=16f9f98df8d2f1e9210912a29d3a5552cc4f984d8a7160a8ffc31ce7d6d9ff93",
+            "domain": "mgmrun.com",
+            "description": "Islands, Scotland - Sweet with a noticeable hint of peat, the Creag Isle 12 Year Old is a complex and inviting single malt. Grass and honey notes combine with ...",
+            "extraSnippets": []
+          },
+          {
+            "title": "Creag Isle - 12 Year Old Single Malt Scotch Whisky 750ml",
+            "url": "https://www.frootbat.com/p/1246/creag-isle-12-year-old-single-malt-scotch-whisky",
+            "domain": "frootbat.com",
+            "description": "An exceptional Creag Isle Single Malt Scotch Whisky from the esteemed Scotland distiller, Creag Isle 12 Year Old Single Malt Scotch Whisky is a high-quality ...",
+            "extraSnippets": []
+          },
+          {
+            "title": "Creag Isle 12 Year Old Single Malt Scotch Whisky",
+            "url": "https://www.wine-searcher.com/find/creag+isle+twelve+old+single+malt+scotch+whisky+island+scotland/1/usa",
+            "domain": "wine-searcher.com",
+            "description": "Find the best local price for Creag Isle 12 Year Old Single Malt Scotch Whisky, Islands, Scotland. Avg Price (ex-tax) $53 / 750ml. Find and shop from stores ...",
+            "extraSnippets": []
+          }
+        ]
+      }
+    ],
+    "errors": []
+  },
+  "metadata": {
+    "cacheKey": "31b6660b5ada69e565937845d316065c34c4b2e824a36f8238f9c07eec3c8f2b",
+    "mode": "auto"
+  }
+}

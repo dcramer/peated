@@ -266,7 +266,9 @@ structured fields, observation versus Bottle identity, whether a candidate is
 too specific, and semantic match or creation.
 
 Its catalog and web tools are read-only. It may inspect local Bottles and
-Entities, run focused web searches, and read a promising page. When web tools
+Entities, run focused web searches, and read a promising page. A page read
+shows the page's opening; `find_in_page` then finds a fact further down the
+same page without another web request. When web tools
 are unavailable, the classifier does not silently substitute another model or
 provider.
 

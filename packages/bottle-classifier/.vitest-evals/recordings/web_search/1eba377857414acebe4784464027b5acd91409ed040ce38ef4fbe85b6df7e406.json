@@ -1,0 +1,117 @@
+{
+  "writtenAt": "2026-10-29T19:03:44.717Z",
+  "toolName": "web_search",
+  "input": {
+    "queries": [
+      "Elijah Craig Barrel Proof Batch C923 13 year 133.0 proof official Heaven Hill",
+      "Elijah Craig C923 batch release age ABV 2023"
+    ]
+  },
+  "output": {
+    "evidence": [
+      {
+        "provider": "firecrawl",
+        "query": "Elijah Craig Barrel Proof Batch C923 13 year 133.0 proof official Heaven Hill",
+        "summary": "retail price is $74.99 … 66.5% ABV. 13 years, 7 months Nose: Strong notes of cocoa, vanilla, and oak with touches of cinnamon and mint ... C923 was bottled at 133.0 proof. This would be the hottest proof. This would be the hottest proof for an ECBP release since C920. In fact, it ... This bottling, marked at 13 years 7 months, 78% Corn, 12% Rye, 10% Malted Barley Proof: 133 (66.5% ABV) Age: 13 Years 7 Months. Price: $74.99 ... C923 is the oldest batch. ABV: 66.5% ABV Age: 13 Years, Bold caramel, cocoa, cherry cola, root beer, peanut brittle, rich oak and tons of ... Barrel Proof is to experien",
+        "results": [
+          {
+            "title": "Elijah Craig Barrel Proof, C923",
+            "url": "https://www.bourbonguy.com/blog/2023/10/10/elijah-craig-barrel-proof-c923",
+            "domain": "bourbonguy.com",
+            "description": "retail price is $74.99 … 66.5% ABV. 13 years, 7 months Nose: Strong notes of cocoa, vanilla, and oak with touches of cinnamon and mint ...",
+            "extraSnippets": []
+          },
+          {
+            "title": "Elijah Craig Barrel Proof Bourbon C923 Review",
+            "url": "https://thebourbonculture.com/whiskey-reviews/elijah-craig-barrel-proof-bourbon-c923-review/",
+            "domain": "thebourbonculture.com",
+            "description": "C923 was bottled at 133.0 proof. This would be the hottest proof. This would be the hottest proof for an ECBP release since C920. In fact, it ...",
+            "extraSnippets": []
+          },
+          {
+            "title": "Elijah Craig Barrel Proof Batch C923",
+            "url": "https://www.whiskeyinmyweddingring.com/reviews/elijah-craig-barrel-proof-batch-c923",
+            "domain": "whiskeyinmyweddingring.com",
+            "description": "This bottling, marked at 13 years 7 months, 78% Corn, 12% Rye, 10% Malted Barley Proof: 133 (66.5% ABV) Age: 13 Years 7 Months. Price: $74.99 ...",
+            "extraSnippets": []
+          },
+          {
+            "title": "Review #2321 - Elijah Craig Barrel Proof 13 Year C923",
+            "url": "https://www.reddit.com/r/bourbon/comments/1f78skw/review_2321_elijah_craig_barrel_proof_13_year_c923/",
+            "domain": "reddit.com",
+            "description": "C923 is the oldest batch. ABV: 66.5% ABV Age: 13 Years, Bold caramel, cocoa, cherry cola, root beer, peanut brittle, rich oak and tons of ...",
+            "extraSnippets": []
+          },
+          {
+            "title": "Elijah Craig | Barrel Proof",
+            "url": "https://elijahcraig.com/barrel-proof",
+            "domain": "elijahcraig.com",
+            "description": "Barrel Proof is to experience Bourbon in its purest form: uncut, straight from the barrel, and without chill filtering. Each bottle is hand labeled with. ...",
+            "extraSnippets": []
+          },
+          {
+            "title": "Elijah Craig Barrel Proof (Batch C923) Review",
+            "url": "https://breakingbourbon.com/review/elijah-craig-barrel-proof-batch-c923",
+            "domain": "breakingbourbon.com",
+            "description": "# Elijah Craig Barrel Proof (Batch C923)\n## IN-DEPTH REVIEW\n**Proof:** 133\n\nAt 133 proof, it's definitely potent, but still remains remarkably expressive and drinkable with its flavors that shine through its proof.",
+            "extraSnippets": []
+          }
+        ]
+      },
+      {
+        "provider": "firecrawl",
+        "query": "Elijah Craig C923 batch release age ABV 2023",
+        "summary": "It stands out due to its age of 13 years and 7 months, making it one of the older batches in the Barrel Proof series. Additionally, it's bottled at a potent 133 ... Craig Barrel Proof release of 2023, C923 is the oldest batch (via age statement) we've seen to date at 13 years and seven months, bottled at ... Bottled at an extraordinary 133 proof (66.5% ABV) and aged for 13 years and 7 months, this 2023 final-batch release pushes boundaries in both intensity and ... Elijah Craig Barrel Proof C923 Bourbon Review! Journey Which 2023 Elijah Craig Barrel Proof is BEST? C923 - 2023 Blind Flight! C92",
+        "results": [
+          {
+            "title": "Elijah Craig Barrel Proof Batch #C923",
+            "url": "https://www.nestorliquor.com/products/elijah-craig-barrel-proof-batch-c923",
+            "domain": "nestorliquor.com",
+            "description": "It stands out due to its age of 13 years and 7 months, making it one of the older batches in the Barrel Proof series. Additionally, it's bottled at a potent 133 ...",
+            "extraSnippets": []
+          },
+          {
+            "title": "Review #2321 - Elijah Craig Barrel Proof 13 Year C923",
+            "url": "https://www.reddit.com/r/bourbon/comments/1f78skw/review_2321_elijah_craig_barrel_proof_13_year_c923/",
+            "domain": "reddit.com",
+            "description": "Craig Barrel Proof release of 2023, C923 is the oldest batch (via age statement) we've seen to date at 13 years and seven months, bottled at ...",
+            "extraSnippets": []
+          },
+          {
+            "title": "Elijah Craig Barrel Proof Batch #C923",
+            "url": "https://worldofwhiskeysale.com/product/elijah-craig-barrel-proof-c923/",
+            "domain": "worldofwhiskeysale.com",
+            "description": "Bottled at an extraordinary 133 proof (66.5% ABV) and aged for 13 years and 7 months, this 2023 final-batch release pushes boundaries in both intensity and ...",
+            "extraSnippets": []
+          },
+          {
+            "title": "Elijah Craig Barrel Proof C923 Bourbon Review! ...",
+            "url": "https://www.youtube.com/watch?v=odChSz3LFWs",
+            "domain": "youtube.com",
+            "description": "Elijah Craig Barrel Proof C923 Bourbon Review! Journey Which 2023 Elijah Craig Barrel Proof is BEST? C923 - 2023 Blind Flight!",
+            "extraSnippets": []
+          },
+          {
+            "title": "Review #238 - Elijah Craig Barrel Proof Batch C923",
+            "url": "https://www.memywifeandwhisky.com/reviews/review-238-elijah-craig-barrel-proof-batch-c923",
+            "domain": "memywifeandwhisky.com",
+            "description": "C923, from September of 2023. 133 proof (66.5% ABV), so flavor delivery. Age Statement: 13 Years Strength: 66.5% ABV",
+            "extraSnippets": []
+          },
+          {
+            "title": "Elijah Craig Barrel Proof Bourbon Batch C923",
+            "url": "https://www.youtube.com/watch?v=rPnfZcFCH6M",
+            "domain": "youtube.com",
+            "description": "A whiskey expert tastes Elijah Craig Barrel Proof Bourbon, Batch C923. At well over 13 years old and 133 proof (on the higher end even for ...",
+            "extraSnippets": []
+          }
+        ]
+      }
+    ],
+    "errors": []
+  },
+  "metadata": {
+    "cacheKey": "1eba377857414acebe4784464027b5acd91409ed040ce38ef4fbe85b6df7e406",
+    "mode": "auto"
+  }
+}

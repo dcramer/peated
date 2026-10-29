@@ -85,12 +85,12 @@ describe("fixed web evidence", () => {
     const executor = createFixedWebSearchExecutor(fixedEvidence());
 
     const first = await executor({
-      toolName: "firecrawl_web_search",
+      toolName: "web_search",
       args: { queries: ["first wording"] },
       execute,
     });
     const second = await executor({
-      toolName: "firecrawl_web_search",
+      toolName: "web_search",
       args: { queries: ["different wording"] },
       execute,
     });
@@ -99,26 +99,26 @@ describe("fixed web evidence", () => {
     expect(execute).not.toHaveBeenCalled();
   });
 
-  test("serves only reviewed pages and never calls live web", async () => {
+  test("serves only reviewed pages, as page text, and never calls live web", async () => {
     const execute = vi.fn();
     const executor = createFixedWebSearchExecutor(fixedEvidence());
 
     await expect(
       executor({
-        toolName: "firecrawl_read_page",
+        toolName: "read_page",
         args: {
           url: `${officialUrl}&utm_source=model`,
-          focus: "Exact Bottle identity",
         },
         execute,
       }),
-    ).resolves.toMatchObject({ summary: "Reviewed page summary." });
+    ).resolves.toMatchObject({
+      page: expect.objectContaining({ text: "Reviewed page summary." }),
+    });
     await expect(
       executor({
-        toolName: "firecrawl_read_page",
+        toolName: "read_page",
         args: {
           url: "https://example.com/products/unreviewed",
-          focus: "Exact Bottle identity",
         },
         execute,
       }),

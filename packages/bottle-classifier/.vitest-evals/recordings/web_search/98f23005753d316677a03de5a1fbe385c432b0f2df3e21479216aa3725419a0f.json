@@ -1,0 +1,67 @@
+{
+  "writtenAt": "2026-10-29T18:42:20.126Z",
+  "toolName": "web_search",
+  "input": {
+    "queries": [
+      "Woodford Reserve 2022 \"Double Double Oaked\" \"45.2%\" release Distillery Series"
+    ]
+  },
+  "output": {
+    "evidence": [
+      {
+        "provider": "firecrawl",
+        "query": "Woodford Reserve 2022 \"Double Double Oaked\" \"45.2%\" release Distillery Series",
+        "summary": "2022 Woodford Reserve Distillery Series Double Double Oaked Straight Bourbon Whiskey 375ml ; Proof: 90.4 (45.2% ABV) ; Age: No age statement — fully mature Double ... Buy Double Double Oaked Straight Bourbon Woodford Reserve 70clml 45.2% ABV at Hard To Find Whisky. # Woodford Reserve Double Oaked, 45.2%\nPrice: $55.00● Issue: Bourbon/Tennessee Whiskey\n\nMore sweetness on the palate, which is rich with cocoa powder, chocolate-covered cherries, cherry cola, and more marshmallow. Toasted oak, cinnamon spice, and black cherry are prominent on the finish, which isn’t the longest but is certainly deca",
+        "results": [
+          {
+            "title": "2022 Woodford Reserve Double Double Oaked Bourbon ...",
+            "url": "https://canawineco.com/products/2022-woodford-reserve-distillery-series-double-double-oaked-straight-bourbon-whiskey-375ml",
+            "domain": "canawineco.com",
+            "description": "2022 Woodford Reserve Distillery Series Double Double Oaked Straight Bourbon Whiskey 375ml ; Proof: 90.4 (45.2% ABV) ; Age: No age statement — fully mature Double ...",
+            "extraSnippets": []
+          },
+          {
+            "title": "Woodford Reserve - Double Double Oaked Straight Bourbon ...",
+            "url": "https://www.htfw.com/woodford-reserve-double-double-oaked-kentucky-straight-bourbon-whiskey",
+            "domain": "htfw.com",
+            "description": "Buy Double Double Oaked Straight Bourbon Woodford Reserve 70clml 45.2% ABV at Hard To Find Whisky.",
+            "extraSnippets": []
+          },
+          {
+            "title": "Woodford Reserve Double Oaked, 45.2% - Whisky Advocate",
+            "url": "https://whiskyadvocate.com/Woodford-Reserve-Double-Oaked_Winter-2023",
+            "domain": "whiskyadvocate.com",
+            "description": "# Woodford Reserve Double Oaked, 45.2%\nPrice: $55.00● Issue: Bourbon/Tennessee Whiskey\n\nMore sweetness on the palate, which is rich with cocoa powder, chocolate-covered cherries, cherry cola, and more marshmallow. Toaste",
+            "extraSnippets": []
+          },
+          {
+            "title": "Woodford Reserve | Double Oaked & Limited Release Bourbon ...",
+            "url": "https://canawineco.com/collections/woodford-reserve",
+            "domain": "canawineco.com",
+            "description": "Distilled in Versailles, Woodford Reserve bourbon encompasses Derby editions, Distillery Series releases, Master's Collection, and the full core lineup.",
+            "extraSnippets": []
+          },
+          {
+            "title": "Woodford Reserve Kentucky Straight Bourbon Whiskey: The ...",
+            "url": "https://www.tastingtable.com/1296368/woodford-reserve-kentucky-straight-bourbon-whiskey-ultimate-bottle-guide/",
+            "domain": "tastingtable.com",
+            "description": "The Distillery Series also includes the Woodford Reserve Double Double Oaked expression. Woodford Reserve Double Oaked Bourbon is aged for a second time in a newly toasted oak barrel.",
+            "extraSnippets": []
+          },
+          {
+            "title": "Bourbon Release Calendar | Breaking Bourbon",
+            "url": "https://www.breakingbourbon.com/release-calendar",
+            "domain": "breakingbourbon.com",
+            "description": "The number one source for always up-to-date Bourbon, Rye and Whiskey release dates for 2026 and beyond.",
+            "extraSnippets": []
+          }
+        ]
+      }
+    ],
+    "errors": []
+  },
+  "metadata": {
+    "cacheKey": "98f23005753d316677a03de5a1fbe385c432b0f2df3e21479216aa3725419a0f",
+    "mode": "auto"
+  }
+}

@@ -1,0 +1,67 @@
+{
+  "writtenAt": "2026-10-29T19:28:04.409Z",
+  "toolName": "web_search",
+  "input": {
+    "queries": [
+      "Jameson Cold Brew Irish Whiskey 30% ABV coffee extract ingredients official product"
+    ]
+  },
+  "output": {
+    "evidence": [
+      {
+        "provider": "firecrawl",
+        "query": "Jameson Cold Brew Irish Whiskey 30% ABV coffee extract ingredients official product",
+        "summary": "# JAMESON COLD BREW\nJameson Cold Brew is a meeting of Arabica beans from Brazil and Colombia with triple-distilled Jameson Irish Whiskey.\n\n## Jameson Cold Brew   around the world\nWhiskey # Jameson Cold Brew Cold Irish Coffee\n## Ingredients for Jameson Cold Brew Irish Coffee\nDemorara sugar syrup\n\nJameson Cold Brew Jameson has just released Cold Brew, a “distinctive\" blend of triple-distilled Irish whiskey with Fairtrade Arabica cold brew extract. Jameson Cold Brew has 30% ABV with 17 mg of caffeine per shot. specific ingredients like Jameson whiskey and Baileys Irish Cream. Jameson uses careful",
+        "results": [
+          {
+            "title": "Jameson Cold Brew",
+            "url": "https://www.jamesonwhiskey.com/en-us/our-whiskey/jameson-cold-brew/",
+            "domain": "jamesonwhiskey.com",
+            "description": "# JAMESON COLD BREW\nJameson Cold Brew is a meeting of Arabica beans from Brazil and Colombia with triple-distilled Jameson Irish Whiskey.\n\n## Jameson Cold Brew   around the world\nWhiskey",
+            "extraSnippets": []
+          },
+          {
+            "title": "Jameson Cold Brew Cold Irish Coffee Recipe",
+            "url": "https://www.jamesonwhiskey.com/en-us/cocktail-recipes/jameson-cold-brew-cold-irish-coffee/",
+            "domain": "jamesonwhiskey.com",
+            "description": "# Jameson Cold Brew Cold Irish Coffee\n## Ingredients for Jameson Cold Brew Irish Coffee\nDemorara sugar syrup\n\nJameson Cold Brew",
+            "extraSnippets": []
+          },
+          {
+            "title": "Jameson Releases 'Cold Brew' Whiskey and Irish Coffee ...",
+            "url": "https://vinepair.com/booze-news/jameson-cold-brew-irish-coffee/",
+            "domain": "vinepair.com",
+            "description": "Jameson has just released Cold Brew, a “distinctive\" blend of triple-distilled Irish whiskey with Fairtrade Arabica cold brew extract.",
+            "extraSnippets": []
+          },
+          {
+            "title": "Whiskey and coffee is not a new concept but Jameson's Cold ...",
+            "url": "https://www.facebook.com/jameshoffmanncoffee/videos/whiskey-and-coffee-is-not-a-new-concept-but-jamesons-cold-brew-does-seem-unusual/904377877962010/",
+            "domain": "facebook.com",
+            "description": "Jameson Cold Brew has 30% ABV with 17 mg of caffeine per shot. specific ingredients like Jameson whiskey and Baileys Irish Cream.",
+            "extraSnippets": []
+          },
+          {
+            "title": "Jameson Cold Brew Irish Whiskey",
+            "url": "https://cooklist.com/product/jameson-cold-brew-750-ml-1653538",
+            "domain": "cooklist.com",
+            "description": "Jameson uses carefully selected ingredients like locally sourced barley from Ireland and water from the Dungourney River",
+            "extraSnippets": []
+          },
+          {
+            "title": "Jameson Cold Brew Coffee Irish Whisky, 750 ml",
+            "url": "https://www.smithsfoodanddrug.com/p/jameson-cold-brew-coffee-irish-whisky/0008043211561",
+            "domain": "smithsfoodanddrug.com",
+            "description": "One 750 mL bottle of Jameson Cold Brew 60 proof or 30% alcohol by volume; Classic whiskey with rich coffee bean notes, vanilla undertones with a full-bodied ...",
+            "extraSnippets": []
+          }
+        ]
+      }
+    ],
+    "errors": []
+  },
+  "metadata": {
+    "cacheKey": "8152afe67a8548dd17673c43321d15804359f491c789b224cb88257297ed422a",
+    "mode": "auto"
+  }
+}

@@ -1,0 +1,24 @@
+{
+  "writtenAt": "2026-10-29T19:31:03.587Z",
+  "toolName": "web_search",
+  "input": {
+    "queries": [
+      "site:woodencork.com/collections/whiskey/products/springbank-aged-25-year-old-750-ml Springbank Aged 25-year-old ABV release details"
+    ]
+  },
+  "output": {
+    "evidence": [
+      {
+        "provider": "firecrawl",
+        "query": "site:woodencork.com/collections/whiskey/products/springbank-aged-25-year-old-750-ml Springbank Aged 25-year-old ABV release details",
+        "summary": null,
+        "results": []
+      }
+    ],
+    "errors": []
+  },
+  "metadata": {
+    "cacheKey": "61c10505c8feb1d8a004fd4b2b774e612c106ca8b74133113c02d88b0bea4fb0",
+    "mode": "auto"
+  }
+}

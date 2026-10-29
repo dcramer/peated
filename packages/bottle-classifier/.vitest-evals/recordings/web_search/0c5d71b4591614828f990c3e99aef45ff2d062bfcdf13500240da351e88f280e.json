@@ -1,0 +1,65 @@
+{
+  "writtenAt": "2026-10-29T19:42:01.687Z",
+  "toolName": "web_search",
+  "input": {
+    "queries": ["\"Harbor Ledger\" \"Batch 24\" bourbon 57.4 OR 58.0 ABV"]
+  },
+  "output": {
+    "evidence": [
+      {
+        "provider": "firecrawl",
+        "query": "\"Harbor Ledger\" \"Batch 24\" bourbon 57.4 OR 58.0 ABV",
+        "summary": "High Rye Bourbon Whiskey; Finished in Australian Apera Sherry Casks; Bourbon Mash Bill: 60% Corn, 36% Rye, 4% Malted Barley. Aged at least 6.5 Years ... Harbor Ledger Group provides professional bookkeeping, payroll support, and financial systems for restaurants, hospitality businesses, and small businesses ... Visit Salem in November (after the tourists drop off), lots of great places to eat, Finz, Sea Level has a great view of the harbor, Ledger Harbor Ledger · Inspiration · What it does · How we built it · Challenges we ran into · Accomplishments that we're proud of · What we learned · What",
+        "results": [
+          {
+            "title": "Batch 24: BRBN DOWNUNDER | Four Gate Whiskey Co.",
+            "url": "https://www.fourgatewhiskey.com/batch-24-brbn-downunder",
+            "domain": "fourgatewhiskey.com",
+            "description": "High Rye Bourbon Whiskey; Finished in Australian Apera Sherry Casks; Bourbon Mash Bill: 60% Corn, 36% Rye, 4% Malted Barley. Aged at least 6.5 Years ...",
+            "extraSnippets": []
+          },
+          {
+            "title": "Harbor Ledger Group | Bookkeeping & Financial Systems for ...",
+            "url": "https://www.harborledgernh.com/",
+            "domain": "harborledgernh.com",
+            "description": "Harbor Ledger Group provides professional bookkeeping, payroll support, and financial systems for restaurants, hospitality businesses, and small businesses ...",
+            "extraSnippets": []
+          },
+          {
+            "title": "Best bakeries, dinner spots, and bars in Burlington, MA and ...",
+            "url": "https://www.facebook.com/groups/2523935997670365/posts/29124564643847472/",
+            "domain": "facebook.com",
+            "description": "Visit Salem in November (after the tourists drop off), lots of great places to eat, Finz, Sea Level has a great view of the harbor, Ledger",
+            "extraSnippets": []
+          },
+          {
+            "title": "Harbor Ledger",
+            "url": "https://devpost.com/software/harbor-ledger",
+            "domain": "devpost.com",
+            "description": "Harbor Ledger · Inspiration · What it does · How we built it · Challenges we ran into · Accomplishments that we're proud of · What we learned · What's ...",
+            "extraSnippets": []
+          },
+          {
+            "title": "Echoes in Everyday Evidence A Harbor Ledger Episode",
+            "url": "https://www.youtube.com/shorts/rT1vztKEmHU",
+            "domain": "youtube.com",
+            "description": "An educational short exploring how a forgotten harbor ledger enriches our understanding of history through documents, artifacts, and oral",
+            "extraSnippets": []
+          },
+          {
+            "title": "HER MAJESTY THE WIFE By @dima.kalentos",
+            "url": "https://www.instagram.com/reel/Dd7h9kYBUDz/",
+            "domain": "instagram.com",
+            "description": "HARBOR LEDGER ✍ Bourbon, Jamaican Rum and Banana are mixed to perfection in this Banger ☠️ 3 Drops Salt Solution 2 Dashes Tiki ...",
+            "extraSnippets": []
+          }
+        ]
+      }
+    ],
+    "errors": []
+  },
+  "metadata": {
+    "cacheKey": "0c5d71b4591614828f990c3e99aef45ff2d062bfcdf13500240da351e88f280e",
+    "mode": "auto"
+  }
+}

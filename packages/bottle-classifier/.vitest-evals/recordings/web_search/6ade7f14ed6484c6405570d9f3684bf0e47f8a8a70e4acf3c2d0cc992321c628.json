@@ -1,0 +1,117 @@
+{
+  "writtenAt": "2026-10-29T19:28:26.817Z",
+  "toolName": "web_search",
+  "input": {
+    "queries": [
+      "Springbank Open Day May 2026 30 year old 47.8% 1,572 bottles bourbon Oloroso rum casks",
+      "Springbank Open Day 30-year-old 2026 47.8% single cask cask strength"
+    ]
+  },
+  "output": {
+    "evidence": [
+      {
+        "provider": "firecrawl",
+        "query": "Springbank Open Day May 2026 30 year old 47.8% 1,572 bottles bourbon Oloroso rum casks",
+        "summary": "2026 Oloroso, bourbon and rum casks with 1572 bottles produced at 47.8% abv nose: figs, bit of dunnage, uhu glue, acetone, chocolate truffles, ... Exclusive Bourbon, Oloroso & Rum Cask Matured. Regular price £489.00 GBP Tax included. of 1,572 bottles produced worldwide. 1,572 bottles produced worldwide. . ... 47.8% Price: £375.00 (35cl) This Springbank release was bottled for the 2026 Open Day after spending 30 years in Bourbon, Oloroso & Rum casks. ... HK$5580 · In Stock · Springbank 30 Year Old whisky from Scotland's Campbeltown region, matured in Bourbon + Oloroso Sherry + Rum Casks, 350ml.",
+        "results": [
+          {
+            "title": "Springbank and kilkerran open day bottles 2026 : r/Scotch",
+            "url": "https://www.reddit.com/r/Scotch/comments/1tmhh9w/springbank_and_kilkerran_open_day_bottles_2026/",
+            "domain": "reddit.com",
+            "description": "2026 Oloroso, bourbon and rum casks with 1572 bottles produced at 47.8% abv nose: figs, bit of dunnage, uhu glue, acetone, chocolate truffles, ...",
+            "extraSnippets": []
+          },
+          {
+            "title": "Springbank 30 Year Old Open Day 2026 Campbeltown ...",
+            "url": "https://whiskysituation.co.uk/products/springbank-30-year-old-open-day-2026-campbeltown-malts-festival-exclusive-bourbon-olorosso-rum-cask-matured-campbeltown-single-malt-scotch-whisky-2026-35cl",
+            "domain": "whiskysituation.co.uk",
+            "description": "Exclusive Bourbon, Oloroso & Rum Cask Matured. Regular price £489.00 GBP Tax included. of 1,572 bottles produced worldwide. 1,572 bottles produced worldwide. . ...",
+            "extraSnippets": []
+          },
+          {
+            "title": "Springbank Open Day 2026 & Longrow Open Day 2026",
+            "url": "https://twowhiskybros.co.uk/blogs/blog/springbank-open-day-2026-longrow-open-day-2026",
+            "domain": "twowhiskybros.co.uk",
+            "description": "47.8% Price: £375.00 (35cl) This Springbank release was bottled for the 2026 Open Day after spending 30 years in Bourbon, Oloroso & Rum casks. ...",
+            "extraSnippets": []
+          },
+          {
+            "title": "Springbank 30 Year Old Open Day - May 2026 Whisky",
+            "url": "https://www.theraremalt.com/products/springbank-30-year-old-open-day-may-2026",
+            "domain": "theraremalt.com",
+            "description": "HK$5580 · In Stock · Springbank 30 Year Old whisky from Scotland's Campbeltown region, matured in Bourbon + Oloroso Sherry + Rum Casks, 350ml.",
+            "extraSnippets": []
+          },
+          {
+            "title": "Springbank - 30 Year Old - Open Day May 2026 (35cl)",
+            "url": "https://www.thegrandwhiskyauction.com/lot-900758/springbank-30-year-old-open-day-may-2026-35cl/",
+            "domain": "thegrandwhiskyauction.com",
+            "description": "This expression was put down to mature in Bourbon, Oloroso & Rum casks for at least 30 years, before being bottled at a strength of 47.8% ABV.",
+            "extraSnippets": []
+          },
+          {
+            "title": "Coming soon.... Springbank 30 Year Old Open Day 2026 ...",
+            "url": "https://www.instagram.com/p/DYVvJxJiHSn/",
+            "domain": "instagram.com",
+            "description": "Exclusive Bourbon, Oloroso & Rum Cask. Available from 21st May 2026 in very limited quantities. May from 10am until 6pm. Good luck!",
+            "extraSnippets": []
+          }
+        ]
+      },
+      {
+        "provider": "firecrawl",
+        "query": "Springbank Open Day 30-year-old 2026 47.8% single cask cask strength",
+        "summary": "All quite harmonious and well married cask elements. On the face of it £375 for a 35cl bottle of 30 year old cask strength Springbank is good ... Springbank 30 Year Old Open Day - May 2026 ; Age. 30 year old ; Production Type. Single malt ; Cask type. Bourbon, oloroso sherry & rum casks ; Region. Campbeltown. Lightly peated and distilled 2.5 times, this youthful Springbank delivers plenty of intensity while showcasing the unmistakable character of one ... The 2026 release draws 85% of its final blend from ex-bourbon barrels — the dominant cask influence for this edition, contributing the waxy,",
+        "results": [
+          {
+            "title": "Springbank and kilkerran open day bottles 2026 : r/Scotch",
+            "url": "https://www.reddit.com/r/Scotch/comments/1tmhh9w/springbank_and_kilkerran_open_day_bottles_2026/",
+            "domain": "reddit.com",
+            "description": "All quite harmonious and well married cask elements. On the face of it £375 for a 35cl bottle of 30 year old cask strength Springbank is good ...",
+            "extraSnippets": []
+          },
+          {
+            "title": "Springbank 30 Year Old Open Day - May 2026",
+            "url": "https://whiskyauctioneer.com/learn/explore-whisky/bottles/springbank-30-year-old-open-day-may-2026",
+            "domain": "whiskyauctioneer.com",
+            "description": "Springbank 30 Year Old Open Day - May 2026 ; Age. 30 year old ; Production Type. Single malt ; Cask type. Bourbon, oloroso sherry & rum casks ; Region. Campbeltown.",
+            "extraSnippets": []
+          },
+          {
+            "title": "Coming soon.... Springbank 30 Year Old Open Day 2026 ...",
+            "url": "https://www.instagram.com/p/DYVvJxJiHSn/",
+            "domain": "instagram.com",
+            "description": "Lightly peated and distilled 2.5 times, this youthful Springbank delivers plenty of intensity while showcasing the unmistakable character of one ...",
+            "extraSnippets": []
+          },
+          {
+            "title": "Springbank 30 Year Old 2026 Release Single Malt Scotch ...",
+            "url": "https://www.blackwellswines.com/products/springbank-30-year-old-release-single-malt-scotch-whiskey",
+            "domain": "blackwellswines.com",
+            "description": "The 2026 release draws 85% of its final blend from ex-bourbon barrels — the dominant cask influence for this edition, contributing the waxy, fruity, honeyed ...",
+            "extraSnippets": []
+          },
+          {
+            "title": "2026 Springbank 30 Year Old Single Malt Scotch Whisky",
+            "url": "https://www.wine-searcher.com/find/spring+bank+thirty+old+single+malt+scotch+whisky+campbeltown+scotland/2026",
+            "domain": "wine-searcher.com",
+            "description": "Find the best local price for 2026 Springbank 30 Year Old Single Malt Scotch Whisky, Campbeltown, Scotland. Avg Price (ex-tax) $2716 / 750ml.",
+            "extraSnippets": []
+          },
+          {
+            "title": "Just unboxed something seriously special…  The Springbank ...",
+            "url": "https://www.instagram.com/reel/DW8_REzjPKR/",
+            "domain": "instagram.com",
+            "description": "1994 Springbank 31 Year Old Vintage (2026 Release) Cask Strength Single Malt Scotch Whisky (700ml) Now available in store & online. August 29 ...",
+            "extraSnippets": []
+          }
+        ]
+      }
+    ],
+    "errors": []
+  },
+  "metadata": {
+    "cacheKey": "6ade7f14ed6484c6405570d9f3684bf0e47f8a8a70e4acf3c2d0cc992321c628",
+    "mode": "auto"
+  }
+}

@@ -1,0 +1,67 @@
+{
+  "writtenAt": "2026-10-29T18:26:57.986Z",
+  "toolName": "web_search",
+  "input": {
+    "queries": [
+      "The Macallan Classic Cut 2021 Edition official product ABV cask strength"
+    ]
+  },
+  "output": {
+    "evidence": [
+      {
+        "provider": "firecrawl",
+        "query": "The Macallan Classic Cut 2021 Edition official product ABV cask strength",
+        "summary": "The 2021 Macallan Limited Edition Classic Cut Single Malt Scotch Whisky is bottled at 102 Proof (51% ABV), the fifth release in the annual limited edition ... They're all in the 40% range of ABV except Classic Cut. benefits hugely from an elevated ABV%, preferably up around 48%. I find the more recent ... The Macallan Classic Cut - 2024 Edition has been bottled at 52.4% ABV and features notes of vanilla, tropical fruit and lemon. ex-bourbon casks. The Macallan's 2021 Classic Cut is bottled at 102 proof, matured in a combination of sherry seasoned American oak and ex-bourbon American oak casks",
+        "results": [
+          {
+            "title": "2021 Macallan Classic Cut Limited Edition Scotch 700ml",
+            "url": "https://canawineco.com/products/2021-macallan-limited-edition-classic-cut-single-malt-scotch-whisky-750ml",
+            "domain": "canawineco.com",
+            "description": "The 2021 Macallan Limited Edition Classic Cut Single Malt Scotch Whisky is bottled at 102 Proof (51% ABV), the fifth release in the annual limited edition ...",
+            "extraSnippets": []
+          },
+          {
+            "title": "If I wanted to buy one Macallan bottle, would Classic Cut ...",
+            "url": "https://www.reddit.com/r/Scotch/comments/1ig41pm/if_i_wanted_to_buy_one_macallan_bottle_would/",
+            "domain": "reddit.com",
+            "description": "They're all in the 40% range of ABV except Classic Cut. benefits hugely from an elevated ABV%, preferably up around 48%. I find the more recent ...",
+            "extraSnippets": []
+          },
+          {
+            "title": "The Macallan Classic Cut 2024, Limited Edition",
+            "url": "https://www.themacallan.com/en-us/single-malt-scotch-whisky/macallan-classic-cut-2024-edition",
+            "domain": "themacallan.com",
+            "description": "The Macallan Classic Cut - 2024 Edition has been bottled at 52.4% ABV and features notes of vanilla, tropical fruit and lemon. ex-bourbon casks.",
+            "extraSnippets": []
+          },
+          {
+            "title": "The Macallan Classic Cut 2021 Edition Highland Single ...",
+            "url": "https://craftshack.com/products/the-macallan-classic-cut-2021-edition-highland-single-malt-scotch-whisky",
+            "domain": "craftshack.com",
+            "description": "The Macallan's 2021 Classic Cut is bottled at 102 proof, matured in a combination of sherry seasoned American oak and ex-bourbon American oak casks",
+            "extraSnippets": []
+          },
+          {
+            "title": "Macallan Classic Cut 2021 - whiskystack",
+            "url": "https://whiskystack.com/en/blogs/anmeldelser/macallan-classic-cut-2021-en-uforglemmelig-whiskyrejse",
+            "domain": "whiskystack.com",
+            "description": "With an alcohol content of 51%, this single malt … ex-bourbon casks and sherry-aged American oak casks, Powerful and complex profile with 51% ...",
+            "extraSnippets": []
+          },
+          {
+            "title": "Macallan Classic Cut 2023 - Batch Strength - Is It Worth Your ...",
+            "url": "https://www.youtube.com/watch?v=a3nj9lfV1cE",
+            "domain": "youtube.com",
+            "description": "Known for its bold flavors and cask strength bottling, ABV, cask. Strength 2021 REVIEW",
+            "extraSnippets": []
+          }
+        ]
+      }
+    ],
+    "errors": []
+  },
+  "metadata": {
+    "cacheKey": "817a995eab3c98369a876e1c9bdb9a2814215a3d5b429fa8816466f0af634cb5",
+    "mode": "auto"
+  }
+}

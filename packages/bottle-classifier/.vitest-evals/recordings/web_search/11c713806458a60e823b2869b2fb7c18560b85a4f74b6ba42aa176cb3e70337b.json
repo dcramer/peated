@@ -1,0 +1,117 @@
+{
+  "writtenAt": "2026-10-29T18:56:32.664Z",
+  "toolName": "web_search",
+  "input": {
+    "queries": [
+      "Masterson's Straight Rye Whiskey French Oak Barrel Finished 10 year old wooden cork",
+      "Masterson's 10 year French Oak Barrel Finished Straight Rye Whiskey label barrel F2-038"
+    ]
+  },
+  "output": {
+    "evidence": [
+      {
+        "provider": "firecrawl",
+        "query": "Masterson's Straight Rye Whiskey French Oak Barrel Finished 10 year old wooden cork",
+        "summary": "This French finished rye is crafted from 100% rye grains. Regular price $9999 $99.99. In stock, ready to ship Backordered, Masterson's 10 Year Old Rye Whiskey Barrel Finished in French Oak $43.99. Size750mL Proof90 (45% ABV) crafted from 100% rye grains … is sweet and malty on the ... Producer: Deutsch Famly Wine & Spirits. Critic tasting note: \"Fruity with dried dates and figs, peaches, peach pits, purple plum pits, and hints of black ... 10 year old straight rye whiskey 90 proof. Masterson's Rye 10 year old straight rye whiskey 90 proof. Very nice. Mild, not too spicy. rye ... Fruity with dr",
+        "results": [
+          {
+            "title": "Masterson's Straight Rye Whiskey French Oak Barrel ...",
+            "url": "https://woodencork.com/products/mastersons-straight-rye-whiskey-french-oak-barrel-finished-10-yr",
+            "domain": "woodencork.com",
+            "description": "This French finished rye is crafted from 100% rye grains. Regular price $9999 $99.99. In stock, ready to ship Backordered,",
+            "extraSnippets": []
+          },
+          {
+            "title": "Masterson's 10YO Rye Whiskey Barrel Finished in French ...",
+            "url": "https://www.caskers.com/masterson-s-10-year-old-rye-whiskey-barrel-finished-in-french-oak/",
+            "domain": "caskers.com",
+            "description": "Masterson's 10 Year Old Rye Whiskey Barrel Finished in French Oak $43.99. Size750mL Proof90 (45% ABV) crafted from 100% rye grains … is sweet and malty on the ...",
+            "extraSnippets": []
+          },
+          {
+            "title": "Masterson's French Oak Barrel Finished 10 Year Old ...",
+            "url": "https://www.wine-searcher.com/find/mastersons+france+oak+barrel+ten+old+straight+rye+whisky+canada",
+            "domain": "wine-searcher.com",
+            "description": "Producer: Deutsch Famly Wine & Spirits. Critic tasting note: \"Fruity with dried dates and figs, peaches, peach pits, purple plum pits, and hints of black ...",
+            "extraSnippets": []
+          },
+          {
+            "title": "Masterson's Rye : r/bourbon",
+            "url": "https://www.reddit.com/r/bourbon/comments/qsll39/mastersons_rye/",
+            "domain": "reddit.com",
+            "description": "10 year old straight rye whiskey 90 proof. Masterson's Rye 10 year old straight rye whiskey 90 proof. Very nice. Mild, not too spicy. rye ...",
+            "extraSnippets": []
+          },
+          {
+            "title": "Review #83 Masterson's 10 yr. Straight Rye",
+            "url": "https://www.reddit.com/r/bourbon/comments/2jssx1/review_83_mastersons_10_yr_straight_rye/",
+            "domain": "reddit.com",
+            "description": null,
+            "extraSnippets": []
+          },
+          {
+            "title": "Reviews # 40-41: Whistlepig & Masterson's 10yr Rye",
+            "url": "https://www.reddit.com/r/bourbon/comments/gpbzmy/reviews_4041_whistlepig_mastersons_10yr_rye/",
+            "domain": "reddit.com",
+            "description": null,
+            "extraSnippets": []
+          }
+        ]
+      },
+      {
+        "provider": "firecrawl",
+        "query": "Masterson's 10 year French Oak Barrel Finished Straight Rye Whiskey label barrel F2-038",
+        "summary": "Barrel F2-038), 45% Price: $65.00. Fruity with dried dates and figs, peaches, peach pits, purple plum pits, and hints of black licorice. Powerful, firm, and ... This French finished rye is crafted from 100% rye grains grown. Price Regular price $9999 $99.99 After ten years of aging, the whiskey is finished in fine grain French oak barrels for 30 days. These barrels were air dried outdoors for two or more years ... Finished 10 Year Old Straight Rye Whisky, Canada. Avg Price (ex-tax) $103 / 750ml. $ 103 / 750ml 4 from 1 User Rating Style Rye Whisky Producer: Deutsch Famly ... 10 year old straigh",
+        "results": [
+          {
+            "title": "Masterson's 10 year old Straight Rye French Oak Finish ...",
+            "url": "https://whiskyadvocate.com/Masterson-s-10-year-old-Straight-Rye-French-Oak-Finish-Barrel-F2-038-45",
+            "domain": "whiskyadvocate.com",
+            "description": "Barrel F2-038), 45% Price: $65.00. Fruity with dried dates and figs, peaches, peach pits, purple plum pits, and hints of black licorice. Powerful, firm, and ...",
+            "extraSnippets": []
+          },
+          {
+            "title": "Masterson's Straight Rye Whiskey French Oak Barrel ...",
+            "url": "https://woodencork.com/products/mastersons-straight-rye-whiskey-french-oak-barrel-finished-10-yr",
+            "domain": "woodencork.com",
+            "description": "This French finished rye is crafted from 100% rye grains grown. Price Regular price $9999 $99.99",
+            "extraSnippets": []
+          },
+          {
+            "title": "Masterson's Straight Rye Whiskey French Oak Barrel ...",
+            "url": "https://burlingtonspirit.com/shop/product/mastersons-straight-rye-whiskey-french-oak-barrel-finished-10-years-old/5a318d154ce3f9139e37778d?option-id=b81ff22e0b9e43de0cc3dad040b81770faea99550f3a8ffe43c0faee7c9629be",
+            "domain": "burlingtonspirit.com",
+            "description": "After ten years of aging, the whiskey is finished in fine grain French oak barrels for 30 days. These barrels were air dried outdoors for two or more years ...",
+            "extraSnippets": []
+          },
+          {
+            "title": "Masterson's French Oak Barrel Finished 10 Year Old ...",
+            "url": "https://www.wine-searcher.com/find/mastersons+france+oak+barrel+ten+old+straight+rye+whisky+canada/1/usa",
+            "domain": "wine-searcher.com",
+            "description": "Finished 10 Year Old Straight Rye Whisky, Canada. Avg Price (ex-tax) $103 / 750ml. $ 103 / 750ml 4 from 1 User Rating Style Rye Whisky Producer: Deutsch Famly ...",
+            "extraSnippets": []
+          },
+          {
+            "title": "Masterson's Rye : r/bourbon",
+            "url": "https://www.reddit.com/r/bourbon/comments/qsll39/mastersons_rye/",
+            "domain": "reddit.com",
+            "description": "10 year old straight rye whiskey 90 proof. Very nice. Mild, not too spicy. amazing Alberta rye barrels.",
+            "extraSnippets": []
+          },
+          {
+            "title": "Masterson's 10 Year Rye French Oak Finished | Buy",
+            "url": "https://chipsliquor.com/products/mastersons-straight-rye-whiskey-french-oak-barrel-finished-10-yr",
+            "domain": "chipsliquor.com",
+            "description": "Masterson's 10 Year Old Straight Rye French Oak Barrel Finished, 100% Canadian rye finished in French oak, 90 proof. Fig, peach, plum.",
+            "extraSnippets": []
+          }
+        ]
+      }
+    ],
+    "errors": []
+  },
+  "metadata": {
+    "cacheKey": "11c713806458a60e823b2869b2fb7c18560b85a4f74b6ba42aa176cb3e70337b",
+    "mode": "auto"
+  }
+}

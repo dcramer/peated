@@ -33,6 +33,11 @@ const search = await bot.searchWeb({ query: "Lagavulin 16" });
 
 Unexpected problems, such as a rejected Firecrawl API key, throw.
 
+A successful read is kept in the cache for an hour, keyed by its address and
+format, so repeat reads of the same page reuse it instead of spending another
+Firecrawl credit. Pages over 1 million characters are not cached. Firecrawl's
+own cache does not help here: it still charges a credit for a cached page.
+
 Before any read, PeatedBot checks the website's robots.txt. It follows the
 `PeatedBot` group, or the `*` group when no group names PeatedBot, and caches
 the rules for 24 hours. A 4xx robots.txt means the website has no rules, except

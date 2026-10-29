@@ -1,0 +1,65 @@
+{
+  "writtenAt": "2026-10-29T19:33:18.639Z",
+  "toolName": "web_search",
+  "input": {
+    "queries": ["\"North Channel\" \"12-year-old\" whisky 46%"]
+  },
+  "output": {
+    "evidence": [
+      {
+        "provider": "firecrawl",
+        "query": "\"North Channel\" \"12-year-old\" whisky 46%",
+        "summary": "Knappogue Castle 12 year old Irish Single Malt, Single Barrel for The Party Source ... North Channel. This is an example of a first-fill bourbon ... Our favourites have to be the Tomatin 12-Year Old ... 46% ABV, promising a unique combination of rich wine ... It spanned both sides of the North Channel ... More info on the Game of Thrones Single Malt Scotch Collection · House Baratheon – Royal Lochnagar 12 Year Old (40% ABV) · House Greyjoy – ... North Channel Brewing Co. North Coast Brewing Co. North Coast Brewing ... Scotch Whisky Commercial Description: Highland Park 12 Year Old Viking ... S",
+        "results": [
+          {
+            "title": "Knappogue Castle 12 year old Irish Single Malt ...",
+            "url": "http://www.divingforpearlsblog.com/2018/07/knappogue-caste-12-year-old-irish.html",
+            "domain": "divingforpearlsblog.com",
+            "description": "Knappogue Castle 12 year old Irish Single Malt, Single Barrel for The Party Source ... North Channel. This is an example of a first-fill bourbon ...",
+            "extraSnippets": []
+          },
+          {
+            "title": "September Tasting – Kinahan's Whiskey Tasting & Supper ...",
+            "url": "https://www.instagram.com/p/DcW3WRIIfAk/",
+            "domain": "instagram.com",
+            "description": "Our favourites have to be the Tomatin 12-Year Old ... 46% ABV, promising a unique combination of rich wine ... It spanned both sides of the North Channel ...",
+            "extraSnippets": []
+          },
+          {
+            "title": "info on the Game of Thrones Single Malt Scotch Collection",
+            "url": "https://www.reddit.com/r/Scotch/comments/90li1c/more_info_on_the_game_of_thrones_single_malt/",
+            "domain": "reddit.com",
+            "description": "More info on the Game of Thrones Single Malt Scotch Collection · House Baratheon – Royal Lochnagar 12 Year Old (40% ABV) · House Greyjoy – ...",
+            "extraSnippets": []
+          },
+          {
+            "title": "All Products in Stock minus SBG – Page 777",
+            "url": "https://craftshack.com/collections/all-products-in-stock?page=777",
+            "domain": "craftshack.com",
+            "description": "North Channel Brewing Co. North Coast Brewing Co. North Coast Brewing ... Scotch Whisky Commercial Description: Highland Park 12 Year Old Viking ...",
+            "extraSnippets": []
+          },
+          {
+            "title": "Scotland – WAYWARD WINE",
+            "url": "https://waywardwine.com/category/wineries-wandered/scotland/",
+            "domain": "waywardwine.com",
+            "description": "Smart lass. 12 Year Old “Original” 43%. The color is medium intense amber gold. The aromas mimic baked pear, shaved ...",
+            "extraSnippets": []
+          },
+          {
+            "title": "Diving for Pearls: Jul 6, 2018",
+            "url": "http://www.divingforpearlsblog.com/2018_07_06_archive.html",
+            "domain": "divingforpearlsblog.com",
+            "description": "$125 for a 12 year old cask strength whisky was a crazy price when I ... North Channel. This is an example of a first-fill bourbon ...",
+            "extraSnippets": []
+          }
+        ]
+      }
+    ],
+    "errors": []
+  },
+  "metadata": {
+    "cacheKey": "07077cbf874c81b4b2f1d7b13bd75e03abed8a09c79fc437ed0590524047e05c",
+    "mode": "auto"
+  }
+}

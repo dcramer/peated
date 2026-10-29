@@ -124,11 +124,18 @@ Model calls use Vercel AI Gateway. A model name without a provider prefix is
 sent to OpenAI; name another provider in full, such as
 `anthropic/claude-haiku-5.5`. GPT-5 and GPT-6 model names receive the
 reasoning effort; other names get a fixed temperature and no reasoning setting.
-Without Firecrawl, the classifier has no web
-tools. Pages are read through Firecrawl's `auto` proxy: a basic request first,
-then its stealth proxy when a site blocks it, under the
-[blocked websites policy](../../docs/policies/blocked-websites.md). The eval config loads the repo-root `.env.local`; shell values take
-precedence.
+The classifier reaches the web only through the `web` option, a
+[PeatedBot](../bot/README.md) page reader and search. Without it, the
+classifier has no web tools. Every read checks robots.txt first, under the
+[blocked websites policy](../../docs/policies/blocked-websites.md). Live model
+checks build PeatedBot from `FIRECRAWL_API_KEY` with an in-memory cache. The
+eval config loads the repo-root `.env.local`; shell values take precedence.
+
+The web tools are `web_search`, `read_page`, and `find_in_page`. `read_page`
+shows the model a page's title, description, and opening text, and keeps the
+page's text for the rest of the run. `find_in_page` returns short passages
+around a word or number the model picks, from a page already read, so it costs
+no web request. A run has one page read and six finds.
 
 ## Commands
 

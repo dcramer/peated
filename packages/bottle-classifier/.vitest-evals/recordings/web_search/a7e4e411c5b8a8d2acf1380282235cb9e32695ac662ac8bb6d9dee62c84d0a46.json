@@ -1,0 +1,117 @@
+{
+  "writtenAt": "2026-10-29T19:18:01.553Z",
+  "toolName": "web_search",
+  "input": {
+    "queries": [
+      "Lagavulin Distillers Edition 2023 release official 2023 product label 2008 vintage ABV",
+      "Lagavulin Distillers Edition 2023 release product name 2023"
+    ]
+  },
+  "output": {
+    "evidence": [
+      {
+        "provider": "firecrawl",
+        "query": "Lagavulin Distillers Edition 2023 release official 2023 product label 2008 vintage ABV",
+        "summary": "Lagavulin releases an annual 'Distiller's Edition' single malt. this is still bottled at 43% ABV. 43% ABV Cask Makeup: Refill American and ... Notes of coal smoke, metal, and wet sheep mix with almond butter, dried cherries, and mint candy in the nose. $85-$160 w/o tax; Lagavulin 12 Year Old Cask Strength, 2007 Release, 56.4% ABV · Lagavulin 12 Year Old Cask Strength, 2008 Release, 56.4% ABV · Lagavulin 12 Year Old Cask ... Lagavulin Distillers Edition 2023 Single Malt Scotch Whisky for $95.99 ✓. Size750mL Proof86 (43% ABV) sherry-seasoned casks. $95.99 ・ $95.99 Out of stock ・ ... Lagavulin Di",
+        "results": [
+          {
+            "title": "r/Scotch - Review #204 - Lagavulin Distiller's Edition",
+            "url": "https://www.reddit.com/r/Scotch/comments/199s2zi/review_204_lagavulin_distillers_edition/",
+            "domain": "reddit.com",
+            "description": "Lagavulin releases an annual 'Distiller's Edition' single malt. this is still bottled at 43% ABV. 43% ABV Cask Makeup: Refill American and ...",
+            "extraSnippets": []
+          },
+          {
+            "title": "Lagavulin Distillers Edition (2023, USA)",
+            "url": "http://www.divingforpearlsblog.com/2024/08/lagavulin-distillers-edition-2023-usa.html",
+            "domain": "divingforpearlsblog.com",
+            "description": "Notes of coal smoke, metal, and wet sheep mix with almond butter, dried cherries, and mint candy in the nose. $85-$160 w/o tax;",
+            "extraSnippets": []
+          },
+          {
+            "title": "An Auctioneer's Guide To Lagavulin",
+            "url": "https://magazine.whisky.auction/how-to/how-to-read-a-lagavulin-label/",
+            "domain": "magazine.whisky.auction",
+            "description": "Lagavulin 12 Year Old Cask Strength, 2007 Release, 56.4% ABV · Lagavulin 12 Year Old Cask Strength, 2008 Release, 56.4% ABV · Lagavulin 12 Year Old Cask ...",
+            "extraSnippets": []
+          },
+          {
+            "title": "Lagavulin Distillers Edition 2023 Single Malt Scotch Whisky",
+            "url": "https://www.caskers.com/lagavulin-distillers-edition-2023-single-malt-scotch-whisky/",
+            "domain": "caskers.com",
+            "description": "Lagavulin Distillers Edition 2023 Single Malt Scotch Whisky for $95.99 ✓. Size750mL Proof86 (43% ABV) sherry-seasoned casks. $95.99 ・ $95.99 Out of stock ・ ...",
+            "extraSnippets": []
+          },
+          {
+            "title": "Lagavulin Distillers Edition (2022) | WhiskyNotes review",
+            "url": "https://www.whiskynotes.be/2023/lagavulin/lagavulin-distillers-edition-2022/",
+            "domain": "whiskynotes.be",
+            "description": "Lagavulin Distillers Edition (2022 release). This Islay single malt Scotch whisky. Even the vintage (and confirmed age) have disappeared. ...",
+            "extraSnippets": []
+          },
+          {
+            "title": "2007 Lagavulin \"Distiller's Edition 2023\" Islay Single Malt ...",
+            "url": "https://www.klwines.com/products/details/1706166",
+            "domain": "klwines.com",
+            "description": "Distilled in 2007, this 2023 Distillers Edition is a single malt Scotch given a second maturation in casks seasoned with Pedro Ximénez sherry, a defining ...",
+            "extraSnippets": []
+          }
+        ]
+      },
+      {
+        "provider": "firecrawl",
+        "query": "Lagavulin Distillers Edition 2023 release product name 2023",
+        "summary": "The cask does much of the talking: bourbon barrels give vanilla and citrus, sherry casks dried fruit and spice. This is the 2023 from Lagavulin Distillers ... Lagavulin releases an annual 'Distiller's Edition' single malt. (2023) Current Locally Available Lagavulin \"Distiller's Edition 2023\" Islay Single Malt Scotch Whisky (750ml) $149.99. Distilled in 2007, this 2023 Distillers Edition is a single malt Scotch. ... Lagavulin Distillers Edition (2023, USA) ; Owner: Diageo ; Region: Southern Islay ; Maturation: bourbon casks first, then Pedro Ximenez casks. Lagavulin Distillers Edition · Lagavul",
+        "results": [
+          {
+            "title": "Lagavulin Distillers Edition 2023 Single Malt Scotch Whisky",
+            "url": "https://blackbearwines.net/products/lagavulin-distillers-edition-2023-single-malt-scotch-whisky-750-ml",
+            "domain": "blackbearwines.net",
+            "description": "The cask does much of the talking: bourbon barrels give vanilla and citrus, sherry casks dried fruit and spice. This is the 2023 from Lagavulin Distillers ...",
+            "extraSnippets": []
+          },
+          {
+            "title": "r/Scotch - Review #204 - Lagavulin Distiller's Edition",
+            "url": "https://www.reddit.com/r/Scotch/comments/199s2zi/review_204_lagavulin_distillers_edition/",
+            "domain": "reddit.com",
+            "description": "Lagavulin releases an annual 'Distiller's Edition' single malt. (2023) Current Locally Available",
+            "extraSnippets": []
+          },
+          {
+            "title": "2007 Lagavulin \"Distiller's Edition 2023\" Islay Single Malt ...",
+            "url": "https://www.klwines.com/products/details/1706166",
+            "domain": "klwines.com",
+            "description": "Lagavulin \"Distiller's Edition 2023\" Islay Single Malt Scotch Whisky (750ml) $149.99. Distilled in 2007, this 2023 Distillers Edition is a single malt Scotch. ...",
+            "extraSnippets": []
+          },
+          {
+            "title": "Lagavulin Distillers Edition (2023, USA)",
+            "url": "http://www.divingforpearlsblog.com/2024/08/lagavulin-distillers-edition-2023-usa.html",
+            "domain": "divingforpearlsblog.com",
+            "description": "Lagavulin Distillers Edition (2023, USA) ; Owner: Diageo ; Region: Southern Islay ; Maturation: bourbon casks first, then Pedro Ximenez casks.",
+            "extraSnippets": []
+          },
+          {
+            "title": "Diageo 2023 Distillers Edition Collection Released",
+            "url": "https://distiller.com/articles/diageo-2023-distillers-edition",
+            "domain": "distiller.com",
+            "description": "Lagavulin Distillers Edition · Lagavulin 16 Year is elevated with PX sherry seasoned casks. SRP $125. Cragganmore Distillers Edition.",
+            "extraSnippets": []
+          },
+          {
+            "title": "Lagavulin Distillers Edition 2023 Single Malt Scotch Whisky",
+            "url": "https://www.caskers.com/lagavulin-distillers-edition-2023-single-malt-scotch-whisky/",
+            "domain": "caskers.com",
+            "description": "Get Lagavulin Distillers Edition 2023 Single Malt Scotch Whisky for $95.99 ✓ Earn up to 5% back in discounts & save on shipping with Caskers Rewards.",
+            "extraSnippets": []
+          }
+        ]
+      }
+    ],
+    "errors": []
+  },
+  "metadata": {
+    "cacheKey": "a7e4e411c5b8a8d2acf1380282235cb9e32695ac662ac8bb6d9dee62c84d0a46",
+    "mode": "auto"
+  }
+}

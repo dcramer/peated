@@ -1,0 +1,67 @@
+{
+  "writtenAt": "2026-10-29T19:29:17.808Z",
+  "toolName": "web_search",
+  "input": {
+    "queries": [
+      "Compass Box \"Spice Tree Extravaganza\" whisky limited edition ABV release distilleries"
+    ]
+  },
+  "output": {
+    "evidence": [
+      {
+        "provider": "firecrawl",
+        "query": "Compass Box \"Spice Tree Extravaganza\" whisky limited edition ABV release distilleries",
+        "summary": "# Spice Tree Extravaganza\n[**Spice Tree Extravaganza**](https://www.compassboxwhisky.com/en-us/products/spice-tree-extraveganza)\n\n46% ABV, Natural Colour, Not Chill-Filtered.\n\n# [www.compassboxwhisky.com](http://www.compassboxwhisky.com) is blocked\n## Welcome!\n![Spice Tree Extravaganza](https://www.compassboxwhisky.com/cdn/shop/files/Spice_Tree_Extravaganza_1600x1600_f531c818-7f42-4409-ae23-48718eb23832.png?v=1727282876&width=1445) # The Spice Tree![The Spice Tree](https://media.scotchwhisky.com/images/media/a27d40bb3423686f5dd090985e6d3e8e.png)\n## The Spice Tree Profile\n### Highland Blended M",
+        "results": [
+          {
+            "title": "Spice Tree Extravaganza",
+            "url": "https://www.compassboxwhisky.com/en-us/products/spice-tree-extraveganza",
+            "domain": "compassboxwhisky.com",
+            "description": "# Spice Tree Extravaganza\n[**Spice Tree Extravaganza**](https://www.compassboxwhisky.com/en-us/products/spice-tree-extraveganza)\n\n46% ABV, Natural Colour, Not Chill-Filtered.\n\n# [www.compassboxwhisky.com](http://www.comp",
+            "extraSnippets": []
+          },
+          {
+            "title": "The Spice Tree | Scotch Whisky",
+            "url": "https://scotchwhisky.com/whiskypedia/2826/the-spice-tree/",
+            "domain": "scotchwhisky.com",
+            "description": "# The Spice Tree![The Spice Tree](https://media.scotchwhisky.com/images/media/a27d40bb3423686f5dd090985e6d3e8e.png)\n## The Spice Tree Profile\n### Highland Blended Malt Scotch Whisky\nA limited edition offshoot – The Spice",
+            "extraSnippets": []
+          },
+          {
+            "title": "Review #457 - Compass Box Spice Tree Extravaganza",
+            "url": "https://www.reddit.com/r/Scotch/comments/fve3lk/review_457_compass_box_spice_tree_extravaganza/",
+            "domain": "reddit.com",
+            "description": "Compass Box Spice Tree Extravaganza. Blended malt scotch whisky. 46% ABV. No colour added, un-chillfiltered. Local Price: Not available in ...",
+            "extraSnippets": []
+          },
+          {
+            "title": "Compass Box Spice Tree Extravaganza Scotch Whisky",
+            "url": "https://www.caskers.com/compass-box-spice-tree-extravaganza-scotch-whisky/",
+            "domain": "caskers.com",
+            "description": "Get Compass Box Spice Tree Extravaganza Scotch Whisky for $316.99 ✓ Earn up to 5% back in discounts & save on shipping with Caskers Rewards.",
+            "extraSnippets": []
+          },
+          {
+            "title": "Tasting Notes: Compass Box – Spice Tree Extravaganza",
+            "url": "https://whiskyunplugged.com/2018/01/22/tasting-notes-compass-box-spice-tree-extravaganza/",
+            "domain": "whiskyunplugged.com",
+            "description": "Tasting Notes: Compass Box – Spice Tree Extravaganza. Released for a limited time only, this special edition bottling celebrates 10 years ...",
+            "extraSnippets": []
+          },
+          {
+            "title": "Compass Box - Spice Tree Extravaganza Blended Scotch ...",
+            "url": "https://www.htfw.com/compass-box-spice-tree-extravaganza-blended-scotch-whisky",
+            "domain": "htfw.com",
+            "description": "Compass Box Spice Tree Extravaganza Blended Scotch Whisky. 70cl · 46% ABV. Compass Box ... Distillery/Brand Compass Box. Alcohol ABV 46% ABV. Year Bottled 2016.",
+            "extraSnippets": []
+          }
+        ]
+      }
+    ],
+    "errors": []
+  },
+  "metadata": {
+    "cacheKey": "fc4355e9402ffa06402168624337f71987db2f26d312daf231fbb9f4ff7f732a",
+    "mode": "auto"
+  }
+}

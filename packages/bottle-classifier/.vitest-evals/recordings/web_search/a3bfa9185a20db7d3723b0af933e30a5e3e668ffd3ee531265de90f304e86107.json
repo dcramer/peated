@@ -1,0 +1,67 @@
+{
+  "writtenAt": "2026-10-29T18:27:25.888Z",
+  "toolName": "web_search",
+  "input": {
+    "queries": [
+      "site:themacallan.com \"Classic Cut\" \"2021 Edition\" Macallan"
+    ]
+  },
+  "output": {
+    "evidence": [
+      {
+        "provider": "firecrawl",
+        "query": "site:themacallan.com \"Classic Cut\" \"2021 Edition\" Macallan",
+        "summary": "Discover the latest addition to The Macallan Classic Cut single malt whisky annual series, 2021 Edition. The Macallan Classic Cut - 2021 Edition. Enter address for price and availability. The Macallan Classic Cut 2020 Edition Bottle and Pack Shot the macallan ... The Macallan Classic Cut - 2021 Edition. Enter address for price and availability. The Macallan Classic Cut 2020 Edition Bottle and Pack Shot the macallan ... The Macallan Classic Cut - 2021 Edition. Enter address for price and availability. The Macallan Classic Cut 2020 Edition Bottle and Pack Shot the macallan ... Entdecken Sie die",
+        "results": [
+          {
+            "title": "The Macallan Classic Cut - 2021 Edition",
+            "url": "https://www.themacallan.com/en/single-malt-scotch-whisky/classic-cut-2021-edition",
+            "domain": "themacallan.com",
+            "description": "Discover the latest addition to The Macallan Classic Cut single malt whisky annual series, 2021 Edition.",
+            "extraSnippets": []
+          },
+          {
+            "title": "Classic Cut Whisky",
+            "url": "https://www.themacallan.com/en/single-malt-scotch-whisky/classic-cut",
+            "domain": "themacallan.com",
+            "description": "The Macallan Classic Cut - 2021 Edition. Enter address for price and availability. The Macallan Classic Cut 2020 Edition Bottle and Pack Shot the macallan ...",
+            "extraSnippets": []
+          },
+          {
+            "title": "Whisky Classic Cut",
+            "url": "https://www.themacallan.com/fr-fr/single-malt-scotch-whisky/classic-cut",
+            "domain": "themacallan.com",
+            "description": "The Macallan Classic Cut - 2021 Edition. Enter address for price and availability. The Macallan Classic Cut 2020 Edition Bottle and Pack Shot the macallan ...",
+            "extraSnippets": []
+          },
+          {
+            "title": "Classic Cut Whisky",
+            "url": "https://www.themacallan.com/de/single-malt-scotch-whisky/classic-cut",
+            "domain": "themacallan.com",
+            "description": "The Macallan Classic Cut - 2021 Edition. Enter address for price and availability. The Macallan Classic Cut 2020 Edition Bottle and Pack Shot the macallan ...",
+            "extraSnippets": []
+          },
+          {
+            "title": "The Macallan Classic Cut - 2021 Edition",
+            "url": "https://www.themacallan.com/de/single-malt-scotch-whisky/classic-cut-2021-edition",
+            "domain": "themacallan.com",
+            "description": "Entdecken Sie die neueste Ausgabe der jährlichen The Macallan Classic Cut Single Malt Whisky Serie, die 2021 Edition.",
+            "extraSnippets": []
+          },
+          {
+            "title": "The Macallan Classic Cut - Edición 2021",
+            "url": "https://www.themacallan.com/es-mx/single-malt-scotch-whisky/classic-cut-2021-edition",
+            "domain": "themacallan.com",
+            "description": "Descubra la última incorporación a la serie anual de whisky de malta The Macallan Classic Cut, Edición 2022 ... The Macallan Classic Cut 2021 Edition 700ml Bottle ...",
+            "extraSnippets": []
+          }
+        ]
+      }
+    ],
+    "errors": []
+  },
+  "metadata": {
+    "cacheKey": "a3bfa9185a20db7d3723b0af933e30a5e3e668ffd3ee531265de90f304e86107",
+    "mode": "auto"
+  }
+}

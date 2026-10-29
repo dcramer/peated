@@ -103,6 +103,7 @@ describe("createBotSource", () => {
         status: "ok",
         url: "https://example.com/a",
         title: "Brora",
+        description: null,
         publishedTime: "2025-08-07T00:15:00+00:00",
         content: "[Brora](https://example.com/brora) was founded in 1819.",
         route: "firecrawl",

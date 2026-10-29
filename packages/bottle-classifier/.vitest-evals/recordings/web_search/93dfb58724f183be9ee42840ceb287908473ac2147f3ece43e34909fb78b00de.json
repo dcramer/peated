@@ -1,0 +1,31 @@
+{
+  "writtenAt": "2026-10-29T19:08:18.195Z",
+  "toolName": "web_search",
+  "input": {
+    "queries": [
+      "\"The Exclusive Malts\" \"1661\" Islay 2007 8 year 57.1",
+      "\"Islay 2007\" \"57.1%\" \"Exclusive Malts\" 1661"
+    ]
+  },
+  "output": {
+    "evidence": [
+      {
+        "provider": "firecrawl",
+        "query": "\"The Exclusive Malts\" \"1661\" Islay 2007 8 year 57.1",
+        "summary": null,
+        "results": []
+      },
+      {
+        "provider": "firecrawl",
+        "query": "\"Islay 2007\" \"57.1%\" \"Exclusive Malts\" 1661",
+        "summary": null,
+        "results": []
+      }
+    ],
+    "errors": []
+  },
+  "metadata": {
+    "cacheKey": "93dfb58724f183be9ee42840ceb287908473ac2147f3ece43e34909fb78b00de",
+    "mode": "auto"
+  }
+}

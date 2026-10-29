@@ -1,0 +1,67 @@
+{
+  "writtenAt": "2026-10-29T18:57:31.743Z",
+  "toolName": "web_search",
+  "input": {
+    "queries": [
+      "Laphroaig 10 Year Old Sherry Oak Finish 48% official product details Just Whisky"
+    ]
+  },
+  "output": {
+    "evidence": [
+      {
+        "provider": "firecrawl",
+        "query": "Laphroaig 10 Year Old Sherry Oak Finish 48% official product details Just Whisky",
+        "summary": "48% vol Whiskies. A fine and full-bodied single malt. Finished in sherry oak casks to layer aromatic honey onto our famous peat smoke. Matured in ex-Bourbon ... ABV: 48% Age: 10 years. Finish: Long, intense, astringent, sweet and rich, slightly more peated. A delicious mix of the aftertaste of seawater, ... 10 Year Old Sherry Oak Finish. SIZE 70 CL 48% VOL. 10 Year Old Sherry Oak Finish. This product is not shippable to your country. Classic peated Islay character married with rich Oloroso sherry sweetness, 48%, 70cl. k finish. Regular price £65.00 … bacon and maple syrup this bottle has a pun",
+        "results": [
+          {
+            "title": "Buy Laphroaig 10 Sherry Oak Peated Scotch Online",
+            "url": "https://www.laphroaig.com/whiskies/10-year-old-sherry-oak-finish",
+            "domain": "laphroaig.com",
+            "description": "48% vol Whiskies. A fine and full-bodied single malt. Finished in sherry oak casks to layer aromatic honey onto our famous peat smoke. Matured in ex-Bourbon ...",
+            "extraSnippets": []
+          },
+          {
+            "title": "{Review #84} Laphroaig 10 Sherry Oak Finish Single Malt ...",
+            "url": "https://www.reddit.com/r/Scotch/comments/1iu6mcd/review_84_laphroaig_10_sherry_oak_finish_single/",
+            "domain": "reddit.com",
+            "description": "ABV: 48% Age: 10 years. Finish: Long, intense, astringent, sweet and rich, slightly more peated. A delicious mix of the aftertaste of seawater, ...",
+            "extraSnippets": []
+          },
+          {
+            "title": "Buy 10 Year Old Single Malt Scotch Whisky",
+            "url": "https://www.laphroaig.com/whiskies/10-year-old",
+            "domain": "laphroaig.com",
+            "description": "10 Year Old Sherry Oak Finish. SIZE 70 CL 48% VOL. 10 Year Old Sherry Oak Finish. This product is not shippable to your country.",
+            "extraSnippets": []
+          },
+          {
+            "title": "Laphroaig 10 Year Old | Sherry Oak Finish | 70cl, 48% ABV",
+            "url": "https://shop.just-whisky.co.uk/products/laphroaig-10-yo-sherry",
+            "domain": "shop.just-whisky.co.uk",
+            "description": "Classic peated Islay character married with rich Oloroso sherry sweetness, 48%, 70cl. k finish. Regular price £65.00 … bacon and maple syrup",
+            "extraSnippets": []
+          },
+          {
+            "title": "Laphroaig 10yo Sherry Oak Finish",
+            "url": "https://www.dramface.com/all-reviews/laphroaig-10-sherry-cask",
+            "domain": "dramface.com",
+            "description": "this bottle has a punchy 8% abv increase … official release, 48% ABV £58 (widely available online) A green glass whisky. Score: 7/10 GG",
+            "extraSnippets": []
+          },
+          {
+            "title": "Laphroaig 10 year old Sherry Oak Finish, 48%",
+            "url": "https://whiskyadvocate.com/Laphroaig-10-year-old-Sherry-Oak-Finish-48",
+            "domain": "whiskyadvocate.com",
+            "description": "The nose is earthy and spicy with mature oak, aged peat, melted caramel, potpourri, sherry, candle wax, musty old library, and wool-filled closet.",
+            "extraSnippets": []
+          }
+        ]
+      }
+    ],
+    "errors": []
+  },
+  "metadata": {
+    "cacheKey": "58b5c8cf54297e5f512dd845d50a511c0c71b21c4d8d3433c2bc0f9e9650c2de",
+    "mode": "auto"
+  }
+}

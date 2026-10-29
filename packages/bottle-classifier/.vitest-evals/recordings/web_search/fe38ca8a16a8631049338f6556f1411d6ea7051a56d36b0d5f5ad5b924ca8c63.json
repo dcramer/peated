@@ -1,0 +1,67 @@
+{
+  "writtenAt": "2026-10-29T19:33:57.328Z",
+  "toolName": "web_search",
+  "input": {
+    "queries": [
+      "Single Cask Nation Mannochmore 173445 Red Wine Barrique 17 year old 2007 2024 53.0 241 bottles"
+    ]
+  },
+  "output": {
+    "evidence": [
+      {
+        "provider": "firecrawl",
+        "query": "Single Cask Nation Mannochmore 173445 Red Wine Barrique 17 year old 2007 2024 53.0 241 bottles",
+        "summary": "![Single Cask Nation Mannochmore 17 Year Red Wine Barrique Speyside Single Malt Whisky](https://www.astorwines.com/images/items/53748.jpg)\n\n# Single Cask Nation Mannochmore 17 Year Red Wine Barrique Speyside Single Malt Whisky - 2007\nItem # 53748\n\nFrom cask #173445 , this was distilled in September of 2007 and bottled in the fall of 2024. This aged for 3.5 years in refill recharred red wine barriques.\n\n$159.99/ Single Bottle\n\nVintage\n\n2007\n\nABV\n\nCountry\n\nScotland\n\nProducer\n\nMannochmore\n\n## More About This Spirit\n### Scotland\n[Check out our Glossary](https://www.astorwines.com/AstorGlossary.asp",
+        "results": [
+          {
+            "title": "Single Cask Nation Mannochmore 17 Year Red Wine ...",
+            "url": "https://astorwines.com/item/53748",
+            "domain": "astorwines.com",
+            "description": "![Single Cask Nation Mannochmore 17 Year Red Wine Barrique Speyside Single Malt Whisky](https://www.astorwines.com/images/items/53748.jpg)\n\n# Single Cask Nation Mannochmore 17 Year Red Wine Barrique Speyside Single Malt ",
+            "extraSnippets": []
+          },
+          {
+            "title": "Mannochmore 2007 - 17 Year 'Red Wine Barrique - Cask ...",
+            "url": "https://www.skurnik.com/sku/mannochmore-2007-17-year-red-wine-barrique-cask-173445-single-cask-nation/",
+            "domain": "skurnik.com",
+            "description": "- [{title}](https://www.skurnik.com/sku/mannochmore-2007-17-year-red-wine-barrique-cask-173445-single-cask-nation/#)\n\n# Mannochmore 2007 - 17 Year 'Red Wine Barrique - Cask 173445'\n## Mannochmore 2007 - 17 Year 'Red Wine",
+            "extraSnippets": []
+          },
+          {
+            "title": "Mannochmore 2007 JWC - Ratings and Reviews",
+            "url": "https://www.whiskybase.com/whiskies/whisky/283558/mannochmore-2007-jwc",
+            "domain": "whiskybase.com",
+            "description": "Explore Mannochmore 2007 JWC, a 17-year-old whisky bottled by Jewish Whisky Company at 53.0% ABV, with ratings, reviews and bottle details.",
+            "extraSnippets": []
+          },
+          {
+            "title": "Single Cask Nation 2007 17 Year Mannochmore ...",
+            "url": "https://tastersclub.com/products/single-cask-nation-2007-17-year-mannochmore-cask-173445",
+            "domain": "tastersclub.com",
+            "description": "The unique maturation process imparts a complex profile that balances sweetness with atmosphere; expect notes of strawberry rhubarb pie and exotic lychee fruit ...",
+            "extraSnippets": []
+          },
+          {
+            "title": "Single Cask Nation Mannochmore - Red Wine Barrique - Peated",
+            "url": "https://peated.com/bottles/45453-single-cask-nation-mannochmore-red-wine-barrique-cask-173445",
+            "domain": "peated.com",
+            "description": "This release was distilled in 2007 and bottled at 17 years old, offering a more concentrated style than standard reduced-strength bottlings. Read more.",
+            "extraSnippets": []
+          },
+          {
+            "title": "Mannochmore 2007 - 17 Year 'Red Wine Barrique",
+            "url": "https://winechateau.com/products/mannochmore-2007-17-year-red-wine-barrique-cask-173445-single-cask-nation",
+            "domain": "winechateau.com",
+            "description": "SIZE SIZE 750ml DESCRIPTION • Single malt Scotch whisky selected and bottled by Single Cask Nation … 100% unpeated barley. Aged 17 years;",
+            "extraSnippets": []
+          }
+        ]
+      }
+    ],
+    "errors": []
+  },
+  "metadata": {
+    "cacheKey": "fe38ca8a16a8631049338f6556f1411d6ea7051a56d36b0d5f5ad5b924ca8c63",
+    "mode": "auto"
+  }
+}

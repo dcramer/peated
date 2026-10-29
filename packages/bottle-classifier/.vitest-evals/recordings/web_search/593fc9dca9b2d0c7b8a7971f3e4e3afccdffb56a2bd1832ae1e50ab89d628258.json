@@ -1,0 +1,110 @@
+{
+  "writtenAt": "2026-10-29T19:30:13.788Z",
+  "toolName": "web_search",
+  "input": {
+    "queries": [
+      "Glenglassaugh \"1978 Rare Cask Release\" \"Batch 1\" 35-year-old",
+      "Glenglassaugh \"1978 Rare Cask Release\" batch 1"
+    ]
+  },
+  "output": {
+    "evidence": [
+      {
+        "provider": "firecrawl",
+        "query": "Glenglassaugh \"1978 Rare Cask Release\" \"Batch 1\" 35-year-old",
+        "summary": "Based on producer information, it is a 35-years-old spirit. The year ... Glenglassaugh 1978 Rare Cask Release Batch 1 Sherry Hogshead #1803 41.6% 700ml ... Batch 1 · 38 years. 3 related releases · Glenglassaugh 1978 Rare Cask Release. Batch 1 · 35 years. 2 related releases · Glenglassaugh 12-year-old. Glenglassaugh 1978 Rare ... Tomatin 30 Year Old Batch #1. 70cl. 46%. 70cl. 46 ... Glenglassaugh 1978 Rare Cask Release, 36, 47.6 % Vol. 700 ml, 337, 3064, 90.21 ... 45.7 % Vol. 700 ml, 2180, –, 80.64. Stauning KAOS Batch 1-2020, 3, 46.0 % Vol ... Batch 1 · 38 years. 3 related releases · Glenglass",
+        "results": [
+          {
+            "title": "Glenglassaugh 1978 Rare Cask Release Batch 1 Sherry ...",
+            "url": "https://www.spiritradar.com/whisky-db/glenglassaugh-1978-rare-cask-release-batch-1-41.6-percent-700ml/",
+            "domain": "spiritradar.com",
+            "description": "Based on producer information, it is a 35-years-old spirit. The year ... Glenglassaugh 1978 Rare Cask Release Batch 1 Sherry Hogshead #1803 41.6% 700ml ...",
+            "extraSnippets": []
+          },
+          {
+            "title": "Glenglassaugh whisky bottles - Peated",
+            "url": "https://peated.com/distillers/255-glenglassaugh/bottles?cursor=1",
+            "domain": "peated.com",
+            "description": "Batch 1 · 38 years. 3 related releases · Glenglassaugh 1978 Rare Cask Release. Batch 1 · 35 years. 2 related releases · Glenglassaugh 12-year-old.",
+            "extraSnippets": []
+          },
+          {
+            "title": "Glenglassaugh 1978 The Chosen Few 33 Year Old / Mhairi ...",
+            "url": "https://whiskyauctioneer.com/learn/explore-whisky/bottles/glenglassaugh-1978-chosen-few-33-year-old-mhairi-mcdonald",
+            "domain": "whiskyauctioneer.com",
+            "description": "Glenglassaugh 1978 Rare ... Tomatin 30 Year Old Batch #1. 70cl. 46%. 70cl. 46 ...",
+            "extraSnippets": []
+          },
+          {
+            "title": "Whisky List - CRANN Whisky Club",
+            "url": "https://crannwhiskyclub.be/whisky-list/",
+            "domain": "crannwhiskyclub.be",
+            "description": "Glenglassaugh 1978 Rare Cask Release, 36, 47.6 % Vol. 700 ml, 337, 3064, 90.21 ... 45.7 % Vol. 700 ml, 2180, –, 80.64. Stauning KAOS Batch 1-2020, 3, 46.0 % Vol ...",
+            "extraSnippets": []
+          },
+          {
+            "title": "Glenglassaugh whisky bottles - Peated",
+            "url": "https://peated.com/distillers/255-glenglassaugh/bottles",
+            "domain": "peated.com",
+            "description": "Batch 1 · 38 years. 3 related releases · Glenglassaugh 1978 Rare Cask Release. Single Malt. Batch 1 · 35 years. 2 related releases · Glenglassaugh 12-year-old.",
+            "extraSnippets": []
+          }
+        ]
+      },
+      {
+        "provider": "firecrawl",
+        "query": "Glenglassaugh \"1978 Rare Cask Release\" batch 1",
+        "summary": "Glenglassaugh 1978 Rare Cask Release - Batch 1. Vintage: 1978. View whisky ... Glenglassaugh 1978 Rare Cask Release - Batch 1. Vintage: 1978. View whisky. Glenglassaugh 1978 Rare Cask Release is a well-aged Highland single malt Scotch whisky, matured for 40 years. Long maturation typically brings greater depth ... Glenglassaugh 1978 Rare Cask Release Batch 1 Port Hogshead #1810 42.9% 700ml information ... This is a whisky limited edition with a total number of 279 bottles. ... Glenglassaugh 1978 Rare Cask Release - SEA Edition 2 41 Year Old 2020 ... Glenglassaugh 1978 Rare Cask Release. Age: 3",
+        "results": [
+          {
+            "title": "Glenglassaugh – 777 bottlings",
+            "url": "https://www.whiskybase.com/whiskies/brand/81459/whiskies",
+            "domain": "whiskybase.com",
+            "description": "Glenglassaugh 1978 Rare Cask Release - Batch 1. Vintage: 1978. View whisky ... Glenglassaugh 1978 Rare Cask Release - Batch 1. Vintage: 1978. View whisky.",
+            "extraSnippets": []
+          },
+          {
+            "title": "Glenglassaugh 1978 Rare Cask Release - Peated",
+            "url": "https://peated.com/bottles/2457-glenglassaugh-1978-rare-cask-release/releases",
+            "domain": "peated.com",
+            "description": "Glenglassaugh 1978 Rare Cask Release is a well-aged Highland single malt Scotch whisky, matured for 40 years. Long maturation typically brings greater depth ...",
+            "extraSnippets": []
+          },
+          {
+            "title": "Glenglassaugh 1978 Rare Cask Release Batch 1 Port ...",
+            "url": "https://www.spiritradar.com/whisky-db/glenglassaugh-1978-rare-cask-release-batch-1-42.9-percent-700ml/",
+            "domain": "spiritradar.com",
+            "description": "Glenglassaugh 1978 Rare Cask Release Batch 1 Port Hogshead #1810 42.9% 700ml information ... This is a whisky limited edition with a total number of 279 bottles.",
+            "extraSnippets": []
+          },
+          {
+            "title": "[COMPRAR] Glenglassaugh 1978 Lanzamiento en barril raro",
+            "url": "https://caskcartel.com/es-au/products/glenglassaugh-1978-rare-cask-release-sea-edition-2-41-year-old-2020-release-cask-6792-single-malt-scotch-whisky-700ml",
+            "domain": "caskcartel.com",
+            "description": "... Glenglassaugh 1978 Rare Cask Release - SEA Edition 2 41 Year Old 2020 ...",
+            "extraSnippets": []
+          },
+          {
+            "title": "Glenglassaugh 1978 Rare Cask Release - Peated",
+            "url": "https://peated.com/bottles/44778-glenglassaugh-1978-rare-cask-release/releases",
+            "domain": "peated.com",
+            "description": "Glenglassaugh 1978 Rare Cask Release. Age: 35 years. Batch: 1. Category: Single Malt. Rate this bottleAdd to Library. This whisky is a distinguished single malt ...",
+            "extraSnippets": []
+          },
+          {
+            "title": "Glenglassaugh 1978 Rare Cask Release Batch 1 Sherry ...",
+            "url": "https://www.spiritradar.com/whisky-db/glenglassaugh-1978-rare-cask-release-batch-1-41.6-percent-700ml/",
+            "domain": "spiritradar.com",
+            "description": "# Glenglassaugh 1978 Rare Cask Release Batch 1 Sherry Hogshead #1803 41.6% 700ml\n## Other bottles from [Glenglassaugh](https://www.spiritradar.com/whisky-db/brands/glenglassaugh/)\n### [Glenglassaugh 40yo Crystal Decanter",
+            "extraSnippets": []
+          }
+        ]
+      }
+    ],
+    "errors": []
+  },
+  "metadata": {
+    "cacheKey": "593fc9dca9b2d0c7b8a7971f3e4e3afccdffb56a2bd1832ae1e50ab89d628258",
+    "mode": "auto"
+  }
+}

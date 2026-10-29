@@ -27,18 +27,19 @@ import {
 import type { ImageBottleEvidence } from "../imageEvidence";
 import type { OpenAIReasoningEffort } from "../openaiModelSettings";
 import type {
+  BottleClassifierWeb,
   BottleProposalCollector,
   BottleWebSearchExecutor,
 } from "../tools";
 import {
   createBottleProposalCollector,
   createBottleProposalTools,
-  createFirecrawlReadPageTool,
-  createFirecrawlWebSearchTool,
   createGetBottleContextTool,
   createGetEntityContextTool,
+  createReadPageTools,
   createSearchBottlesTool,
   createSearchEntitiesTool,
+  createWebSearchTool,
 } from "../tools";
 import type { BottleWebSearchBudget } from "../tools/sharedWebSearch";
 import { webEvidenceUrlsMatch } from "../webEvidenceUrl";
@@ -114,8 +115,7 @@ type BottleCheckRuntimeOptions = {
   reasoningEffort?: OpenAIReasoningEffort;
   imageExtractionModel?: string;
   imageExtractionReasoningEffort?: OpenAIReasoningEffort;
-  firecrawlApiKey?: string | null;
-  firecrawlApiUrl?: string | null;
+  web?: BottleClassifierWeb | null;
   executeWebSearch?: BottleWebSearchExecutor;
   overrides?: {
     extractFromImage?: (
@@ -351,8 +351,9 @@ function mergeToolOutputArtifacts({
   }
 
   if (
-    toolName === "firecrawl_web_search" ||
-    toolName === "firecrawl_read_page"
+    toolName === "web_search" ||
+    toolName === "read_page" ||
+    toolName === "find_in_page"
   ) {
     const batchEvidence = getObjectProperty(normalizedOutput, "evidence");
     if (Array.isArray(batchEvidence)) {
@@ -490,20 +491,18 @@ export function createBottleCheckTools({
           }),
         ]
       : []),
-    ...(allowCandidateExpansion && options.firecrawlApiKey
+    ...(allowCandidateExpansion && options.web
       ? [
-          createFirecrawlWebSearchTool({
-            apiKey: options.firecrawlApiKey,
-            apiUrl: options.firecrawlApiUrl ?? undefined,
+          createWebSearchTool({
+            web: options.web,
             budget: webSearchBudget,
             executeWebSearch: options.executeWebSearch,
             onEvidence: (evidence) => {
               mergeSearchEvidence(state.searchEvidence, evidence);
             },
           }),
-          createFirecrawlReadPageTool({
-            apiKey: options.firecrawlApiKey,
-            apiUrl: options.firecrawlApiUrl ?? undefined,
+          ...createReadPageTools({
+            web: options.web,
             budget: webSearchBudget,
             executeWebSearch: options.executeWebSearch,
             onEvidence: (evidence) => {

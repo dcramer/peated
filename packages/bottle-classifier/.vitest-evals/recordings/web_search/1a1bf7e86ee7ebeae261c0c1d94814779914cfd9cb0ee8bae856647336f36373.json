@@ -1,0 +1,67 @@
+{
+  "writtenAt": "2026-10-29T19:02:29.912Z",
+  "toolName": "web_search",
+  "input": {
+    "queries": [
+      "Johnnie Walker Black Label Islay Origin PR Newswire Islay Origin whisky age 12-year-old"
+    ]
+  },
+  "output": {
+    "evidence": [
+      {
+        "provider": "firecrawl",
+        "query": "Johnnie Walker Black Label Islay Origin PR Newswire Islay Origin whisky age 12-year-old",
+        "summary": "This new collection of four, 12-year-old blended Scotch whiskies ... Johnnie Walker Black Label Islay Origin has a slight spice and is ... Created using only Scotch Whiskies aged for a minimum of 12 years from the four corners of Scotland, Johnnie Walker Black Label has an unmistakably smooth, ... This 12-year-old blended malt takes you on a journey to Scotland's iconic Islay region, where rich smoky flavors meet the sea's wild ... Johnnie Walker Black Label 'Islay Origin' 12 Year Old Blended Malt Scotch Whisky ; Avg Price (ex-tax); $ 110 / 750ml ; Style Malt Whisky ; GA · Stone Mountain. John",
+        "results": [
+          {
+            "title": "Explore the Flavours of Scotland With the Johnnie Walker ...",
+            "url": "https://www.prnewswire.com/news-releases/explore-the-flavours-of-scotland-with-the-johnnie-walker-black-label-origin-series-300878271.html",
+            "domain": "prnewswire.com",
+            "description": "This new collection of four, 12-year-old blended Scotch whiskies ... Johnnie Walker Black Label Islay Origin has a slight spice and is ...",
+            "extraSnippets": []
+          },
+          {
+            "title": "Johnnie Walker Black Label 'Islay Origin' 12 Year Old Blended ...",
+            "url": "https://wineexpo.com/shop/product/johnnie-walker-black-label-islay-origin-12-year-old-blended-malt-scotch-whisky-islay-scotland-1-75-ltr/5521cefa6561310003220300?option-id=10e0077c045cc9f34c3ee9bc6f0cd3d5f08c3b831bb547eed0acdd339b5493de",
+            "domain": "wineexpo.com",
+            "description": "Created using only Scotch Whiskies aged for a minimum of 12 years from the four corners of Scotland, Johnnie Walker Black Label has an unmistakably smooth, ...",
+            "extraSnippets": []
+          },
+          {
+            "title": "\"Elevate your whisky experience with Johnnie Walker Black ...",
+            "url": "https://www.facebook.com/groups/2164457143933719/posts/2262224450823654/",
+            "domain": "facebook.com",
+            "description": "This 12-year-old blended malt takes you on a journey to Scotland's iconic Islay region, where rich smoky flavors meet the sea's wild ...",
+            "extraSnippets": []
+          },
+          {
+            "title": "Johnnie Walker Black Label 'Islay Origin' 12 Year Old ...",
+            "url": "https://www.wine-searcher.com/find/johnny+walker+black+origin+twelve+old+blend+malt+scotch+whisky+islay+scotland/1/usa",
+            "domain": "wine-searcher.com",
+            "description": "Johnnie Walker Black Label 'Islay Origin' 12 Year Old Blended Malt Scotch Whisky ; Avg Price (ex-tax); $ 110 / 750ml ; Style Malt Whisky ; GA · Stone Mountain.",
+            "extraSnippets": []
+          },
+          {
+            "title": "JOHNNIE WALKER BLACK LABEL ORIGIN UNVEILED",
+            "url": "https://www.reddit.com/r/Scotch/comments/c6j1xt/johnnie_walker_black_label_origin_unveiled/",
+            "domain": "reddit.com",
+            "description": "Johnnie Walker has announced the Johnnie Walker Black Label Origin Series – a range of four new regional expressions designed to celebrate the ' ...",
+            "extraSnippets": []
+          },
+          {
+            "title": "Johnnie Walker",
+            "url": "https://en.wikipedia.org/wiki/Johnnie_Walker",
+            "domain": "en.wikipedia.org",
+            "description": "Johnnie Walker\n\n## History\n### Expansion and growth\nThe Old Highland was renamed _Johnnie Walker White Label_[[17]](https://en.wikipedia.org/wiki/Johnnie_Walker#cite_note-17) and made at 6 years old, the Special Old High",
+            "extraSnippets": []
+          }
+        ]
+      }
+    ],
+    "errors": []
+  },
+  "metadata": {
+    "cacheKey": "1a1bf7e86ee7ebeae261c0c1d94814779914cfd9cb0ee8bae856647336f36373",
+    "mode": "auto"
+  }
+}

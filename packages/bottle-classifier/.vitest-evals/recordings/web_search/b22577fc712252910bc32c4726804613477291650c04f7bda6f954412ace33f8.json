@@ -1,0 +1,24 @@
+{
+  "writtenAt": "2026-10-29T18:55:55.257Z",
+  "toolName": "web_search",
+  "input": {
+    "queries": [
+      "site:glendaloughdistillery.com \"Double Barrel\" \"42%\" \"single grain\""
+    ]
+  },
+  "output": {
+    "evidence": [
+      {
+        "provider": "firecrawl",
+        "query": "site:glendaloughdistillery.com \"Double Barrel\" \"42%\" \"single grain\"",
+        "summary": null,
+        "results": []
+      }
+    ],
+    "errors": []
+  },
+  "metadata": {
+    "cacheKey": "b22577fc712252910bc32c4726804613477291650c04f7bda6f954412ace33f8",
+    "mode": "auto"
+  }
+}

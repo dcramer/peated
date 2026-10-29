@@ -1,0 +1,117 @@
+{
+  "writtenAt": "2026-10-29T19:31:56.521Z",
+  "toolName": "web_search",
+  "input": {
+    "queries": [
+      "Jameson Cold Brew official Irish whiskey coffee flavor ingredients 30% ABV",
+      "Jameson Cold Brew whiskey infused coffee flavor product"
+    ]
+  },
+  "output": {
+    "evidence": [
+      {
+        "provider": "firecrawl",
+        "query": "Jameson Cold Brew official Irish whiskey coffee flavor ingredients 30% ABV",
+        "summary": "# JAMESON COLD BREW\nIntense rich coffee bean aromatics combined with vanilla nuttiness of Jameson.\n\nDistinctive, bold and natural with refreshing cold brew coffee impact followed by charred wood from the pot still whiskey contribution on palate.\n\n## Jameson Cold Brew   around the world\nWhiskey Ingredients for Jameson Cold Brew Irish Coffee · 40 ml. Cold Brew Coffee · 10 ml. Demorara sugar syrup · Ice Cubes · 50 ml. Jameson Cold Brew. Buy Now. Jameson Cold Brew has 30% ABV with 17 mg of caffeine per shot. Jameson Releasing Irish Whiskey Flavored With Cold Brew Coffee. 2.6K reactions ... The new",
+        "results": [
+          {
+            "title": "Jameson Cold Brew",
+            "url": "https://www.jamesonwhiskey.com/en-us/our-whiskey/jameson-cold-brew/",
+            "domain": "jamesonwhiskey.com",
+            "description": "# JAMESON COLD BREW\nIntense rich coffee bean aromatics combined with vanilla nuttiness of Jameson.\n\nDistinctive, bold and natural with refreshing cold brew coffee impact followed by charred wood from the pot still whiske",
+            "extraSnippets": []
+          },
+          {
+            "title": "Jameson Cold Brew Cold Irish Coffee Recipe",
+            "url": "https://www.jamesonwhiskey.com/en-us/cocktail-recipes/jameson-cold-brew-cold-irish-coffee/",
+            "domain": "jamesonwhiskey.com",
+            "description": "Ingredients for Jameson Cold Brew Irish Coffee · 40 ml. Cold Brew Coffee · 10 ml. Demorara sugar syrup · Ice Cubes · 50 ml. Jameson Cold Brew. Buy Now.",
+            "extraSnippets": []
+          },
+          {
+            "title": "Whiskey and coffee is not a new concept but Jameson's Cold ...",
+            "url": "https://www.facebook.com/jameshoffmanncoffee/videos/whiskey-and-coffee-is-not-a-new-concept-but-jamesons-cold-brew-does-seem-unusual/904377877962010/",
+            "domain": "facebook.com",
+            "description": "Jameson Cold Brew has 30% ABV with 17 mg of caffeine per shot. Jameson Releasing Irish Whiskey Flavored With Cold Brew Coffee. 2.6K reactions ...",
+            "extraSnippets": []
+          },
+          {
+            "title": "Jameson release new limited-edition cold brew",
+            "url": "https://www.irishcentral.com/culture/food-drink/jameson-cold-brew",
+            "domain": "irishcentral.com",
+            "description": "The new drink combines the taste of traditional, triple-distilled Jameson whiskey with \"hints of toasted oak, dark chocolate, and a rich coffee ...",
+            "extraSnippets": []
+          },
+          {
+            "title": "Anyone here tried Jameson Cold Brew? Verdict?",
+            "url": "https://www.reddit.com/r/irishwhiskey/comments/jgy5h4/anyone_here_tried_jameson_cold_brew_verdict/",
+            "domain": "reddit.com",
+            "description": "It's thinner than kahlua, but similar enough profile to work as a replacement. 30% and mostly tastes of coffee.",
+            "extraSnippets": []
+          },
+          {
+            "title": "Jameson Cold Brew Irish Whiskey & Coffee - 750 Ml",
+            "url": "https://www.starmarket.com/shop/pd/jameson-cold-brew-irish-whiskey-and-coffee-750-ml/960549771",
+            "domain": "starmarket.com",
+            "description": "Jameson uses carefully selected ingredients like locally sourced barley from Ireland and water from the Dungourney River that flows right through its distillery ...",
+            "extraSnippets": []
+          }
+        ]
+      },
+      {
+        "provider": "firecrawl",
+        "query": "Jameson Cold Brew whiskey infused coffee flavor product",
+        "summary": "# JAMESON COLD BREW\nEnjoy the perfectly balanced combination of the smoothest whiskey with the richness of coffee.\n\nIntense rich coffee bean aromatics combined with vanilla nuttiness of Jameson.\n\nDistinctive, bold and natural with refreshing cold brew coffee impact followed by charred wood from the pot still whiskey contribution on palate.\n\n## Jameson Cold Brew   around the world\nWhiskey This one-of-a-kind cold brew whiskey showcases the perfect balance of classic whiskey and rich coffee flavor, a smooth, warming mouthfeel with subtle vanilla ... This is a perfectly balanced combination of our",
+        "results": [
+          {
+            "title": "Jameson Cold Brew",
+            "url": "https://www.jamesonwhiskey.com/en-us/our-whiskey/jameson-cold-brew/",
+            "domain": "jamesonwhiskey.com",
+            "description": "# JAMESON COLD BREW\nEnjoy the perfectly balanced combination of the smoothest whiskey with the richness of coffee.\n\nIntense rich coffee bean aromatics combined with vanilla nuttiness of Jameson.\n\nDistinctive, bold and na",
+            "extraSnippets": []
+          },
+          {
+            "title": "Jameson Cold Brew Coffee Irish Whisky, 750 ml",
+            "url": "https://www.ralphs.com/p/jameson-cold-brew-coffee-irish-whisky/0008043211561",
+            "domain": "ralphs.com",
+            "description": "This one-of-a-kind cold brew whiskey showcases the perfect balance of classic whiskey and rich coffee flavor, a smooth, warming mouthfeel with subtle vanilla ...",
+            "extraSnippets": []
+          },
+          {
+            "title": "JAMESON COLD BREW",
+            "url": "https://beveragewarehousemi.com/products/jameson-cold-brew",
+            "domain": "beveragewarehousemi.com",
+            "description": "This is a perfectly balanced combination of our smooth Irish Whiskey with hints of toasted oak, dark chocolate and a rich coffee aroma. Coffee and Irish whiskey ...",
+            "extraSnippets": []
+          },
+          {
+            "title": "Jameson Cold Brew Cold Irish Coffee Recipe",
+            "url": "https://www.jamesonwhiskey.com/en-us/cocktail-recipes/jameson-cold-brew-cold-irish-coffee/",
+            "domain": "jamesonwhiskey.com",
+            "description": "Ingredients for Jameson Cold Brew Irish Coffee · 40 ml. Cold Brew Coffee · 10 ml. Demorara sugar syrup · Ice Cubes · 50 ml. Jameson Cold Brew. Buy Now.",
+            "extraSnippets": []
+          },
+          {
+            "title": "Anyone here tried Jameson Cold Brew? Verdict?",
+            "url": "https://www.reddit.com/r/irishwhiskey/comments/jgy5h4/anyone_here_tried_jameson_cold_brew_verdict/",
+            "domain": "reddit.com",
+            "description": "I thought it was going to be a liqueur and be slightly sweet, but nope, it's whiskey and black coffee. It's good, and great with cola, but not ...",
+            "extraSnippets": []
+          },
+          {
+            "title": "Jameson Cold Brew Irish Whiskey & Coffee 750ml",
+            "url": "https://3brothersliquor.com/products/jameson-cold-brew-whiskey",
+            "domain": "3brothersliquor.com",
+            "description": "A perfectly balanced combination of triple-distilled Jameson Irish whiskey and natural cold brew coffee flavor, for a rich coffee aroma and a mellow mouthfeel ...",
+            "extraSnippets": []
+          }
+        ]
+      }
+    ],
+    "errors": []
+  },
+  "metadata": {
+    "cacheKey": "3f30f6346149f8d5e29d922f27fb7759f07c576e399fb9b71441b8ee0c961c28",
+    "mode": "auto"
+  }
+}

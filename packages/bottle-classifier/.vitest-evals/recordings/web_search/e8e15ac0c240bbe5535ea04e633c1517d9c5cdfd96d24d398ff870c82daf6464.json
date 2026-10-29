@@ -1,0 +1,22 @@
+{
+  "writtenAt": "2026-10-29T19:35:41.634Z",
+  "toolName": "web_search",
+  "input": {
+    "queries": ["\"Keel and Cooper\" \"Harbor Reserve\" bourbon 56.2% 5 year"]
+  },
+  "output": {
+    "evidence": [
+      {
+        "provider": "firecrawl",
+        "query": "\"Keel and Cooper\" \"Harbor Reserve\" bourbon 56.2% 5 year",
+        "summary": null,
+        "results": []
+      }
+    ],
+    "errors": []
+  },
+  "metadata": {
+    "cacheKey": "e8e15ac0c240bbe5535ea04e633c1517d9c5cdfd96d24d398ff870c82daf6464",
+    "mode": "auto"
+  }
+}

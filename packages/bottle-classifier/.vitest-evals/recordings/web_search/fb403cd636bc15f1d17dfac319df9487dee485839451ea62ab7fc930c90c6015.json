@@ -1,0 +1,117 @@
+{
+  "writtenAt": "2026-10-29T18:46:56.503Z",
+  "toolName": "web_search",
+  "input": {
+    "queries": [
+      "\"Gordon & MacPhail\" \"Rosebank\" \"1535\" \"59.2\" whisky",
+      "\"Gordon & MacPhail Single Cask #1535\" Rosebank 1991 vintage"
+    ]
+  },
+  "output": {
+    "evidence": [
+      {
+        "provider": "firecrawl",
+        "query": "\"Gordon & MacPhail\" \"Rosebank\" \"1535\" \"59.2\" whisky",
+        "summary": "# Gordon & MacPhail Single Cask #1535 (distilled at Rosebank) 1991 Vintage, 59.2% ABV\nPrice: $80.00● Issue: Summer 2004 ● Reviewer: John Hansell ● Category: Single Malt Scotch\n\n[Buy Now](https://whiskyadvocate.com/Gordon-MacPhail-Single-Cask-N1535-distilled-at-Rosebank-1991-Vintage-59-2-ABV)\n\nA very traditional Rosebank-aged in a refill hogshead and bottled fairly young (12 years old). Rosebank is one of the better, yet lesser known Lowland single malts. Since the distillery was closed down in 1993, it will continue being unfamiliar to most, and finding young Rosebanks like this one will becom",
+        "results": [
+          {
+            "title": "Gordon & MacPhail Single Cask #1535 (distilled at ...",
+            "url": "https://whiskyadvocate.com/Gordon-MacPhail-Single-Cask-N1535-distilled-at-Rosebank-1991-Vintage-59-2-ABV",
+            "domain": "whiskyadvocate.com",
+            "description": "# Gordon & MacPhail Single Cask #1535 (distilled at Rosebank) 1991 Vintage, 59.2% ABV\nPrice: $80.00● Issue: Summer 2004 ● Reviewer: John Hansell ● Category: Single Malt Scotch\n\n[Buy Now](https://whiskyadvocate.com/Gordon",
+            "extraSnippets": []
+          },
+          {
+            "title": "Rosebank 1991 GM - Ratings and reviews",
+            "url": "https://www.whiskybase.com/whiskies/whisky/143333/rosebank-1991-gm",
+            "domain": "whiskybase.com",
+            "description": "Rosebank 1991 GM 12 yr. Bottled by Gordon & MacPhail ... 1535; Strength: 59.2 %; Size: 750 ml; Added on: 25 nov ... Whisky reviews for Rosebank 1991 GM. One ...",
+            "extraSnippets": []
+          },
+          {
+            "title": "Gordon & MacPhail Single Cask #1535 (distilled at Rosebank) ...",
+            "url": "https://www.dramatlas.com/whiskies/gordon-macphail-single-cask-1535-distilled-at-rosebank-1991-vintage-59-2-abv",
+            "domain": "dramatlas.com",
+            "description": "Gordon & MacPhail Single Cask #1535 (distilled at Rosebank) 1991 Vintage, 59.2% ABV – Gordon & MacPhail, 59.2% ABV | Reviews, ratings & marketplace on ...",
+            "extraSnippets": []
+          },
+          {
+            "title": "Rosebank 1991 GM Cask Strength #1535 59.2% 750ml",
+            "url": "https://www.spiritradar.com/whisky-db/rosebank-1991-gm-cask-strength-59.2-percent-750ml/",
+            "domain": "spiritradar.com",
+            "description": "Rosebank 1991 GM Cask Strength #1535 59.2% 750ml information. Category. Whisky. Brand. Gordon & Macphail. Distillery. Rosebank. Country.",
+            "extraSnippets": []
+          },
+          {
+            "title": "Ratings & Reviews - Whisky Advocate",
+            "url": "https://whiskyadvocate.com/ratings-reviews/?brand_id=142&search=&submit=",
+            "domain": "whiskyadvocate.com",
+            "description": "88. Single Malt Scotch $500. Learn More. Winter 2014 · Signatory (distilled at Rosebank) ... Gordon & MacPhail (distilled at Rosebank) 1989 ... 1535 (distilled ...",
+            "extraSnippets": []
+          },
+          {
+            "title": "Scotch EDA",
+            "url": "https://www.kaggle.com/code/canismajoris33/scotch-eda",
+            "domain": "kaggle.com",
+            "description": "... Gordon & MacPhail Single Cask #1535 (distilled at Rosebank) 1991 Vintage, 59.2% ABV Name: name, Length: 61, dtype: object ... Blended Malt Scotch Whisky, 96, 325 ...",
+            "extraSnippets": []
+          }
+        ]
+      },
+      {
+        "provider": "firecrawl",
+        "query": "\"Gordon & MacPhail Single Cask #1535\" Rosebank 1991 vintage",
+        "summary": "# Gordon & MacPhail Single Cask #1535 (distilled at Rosebank) 1991 Vintage, 59.2% ABV\nPrice: $80.00● Issue: Summer 2004 ● Reviewer: John Hansell ● Category: Single Malt Scotch\n\n[Buy Now](https://whiskyadvocate.com/Gordon-MacPhail-Single-Cask-N1535-distilled-at-Rosebank-1991-Vintage-59-2-ABV)\n\nA very traditional Rosebank-aged in a refill hogshead and bottled fairly young (12 years old). Rosebank is one of the better, yet lesser known Lowland single malts. Since the distillery was closed down in 1993, it will continue being unfamiliar to most, and finding young Rosebanks like this one will becom",
+        "results": [
+          {
+            "title": "Gordon & MacPhail Single Cask #1535 (distilled at ...",
+            "url": "https://whiskyadvocate.com/Gordon-MacPhail-Single-Cask-N1535-distilled-at-Rosebank-1991-Vintage-59-2-ABV",
+            "domain": "whiskyadvocate.com",
+            "description": "# Gordon & MacPhail Single Cask #1535 (distilled at Rosebank) 1991 Vintage, 59.2% ABV\nPrice: $80.00● Issue: Summer 2004 ● Reviewer: John Hansell ● Category: Single Malt Scotch\n\n[Buy Now](https://whiskyadvocate.com/Gordon",
+            "extraSnippets": []
+          },
+          {
+            "title": "Gordon & MacPhail Single Cask #1535 (distilled at Rosebank) ...",
+            "url": "https://www.dramatlas.com/whiskies/gordon-macphail-single-cask-1535-distilled-at-rosebank-1991-vintage-59-2-abv",
+            "domain": "dramatlas.com",
+            "description": "single malt. Gordon & MacPhail Single Cask #1535 (distilled at Rosebank) 1991 Vintage, 59.2% ABV. Gordon & MacPhail. Community-score—Nog geen reviews.",
+            "extraSnippets": []
+          },
+          {
+            "title": "delicate fruit — Whisky Note | WhiskyUncorked",
+            "url": "https://whiskyuncorked.com/note/delicate-fruit",
+            "domain": "whiskyuncorked.com",
+            "description": "Featured In 3 Whiskies · Danfield's Private · Gordon & MacPhail Single Cask #1535 (distilled at Rosebank) 1991 · King's Crest, 25 year old · Explore · Legal.",
+            "extraSnippets": []
+          },
+          {
+            "title": "Ratings & Reviews - Whisky Advocate",
+            "url": "https://whiskyadvocate.com/ratings-reviews/?brand_id=142&search=&submit=",
+            "domain": "whiskyadvocate.com",
+            "description": "... old, 1990 vintage, Cask # 1509, 56.6%. 82. Single Malt Scotch $100. Learn More. Summer 2007 · Gordon & MacPhail Single Cask #1535 (distilled at Rosebank) 1991 ...",
+            "extraSnippets": []
+          },
+          {
+            "title": "fresh-cut grass — Whisky Note | WhiskyUncorked",
+            "url": "https://whiskyuncorked.com/note/fresh-cut-grass",
+            "domain": "whiskyuncorked.com",
+            "description": "... old, 1991. palate note · G. Gordon & MacPhail. Gordon & MacPhail Single Cask #1535 (distilled at Rosebank) 1991. palate note · M. Murray McDavid (distilled ...",
+            "extraSnippets": []
+          },
+          {
+            "title": "Scotch EDA",
+            "url": "https://www.kaggle.com/code/canismajoris33/scotch-eda",
+            "domain": "kaggle.com",
+            "description": "... old, 1991 vintage, 53.6% ABV 2130 Gordon & MacPhail Single Cask #1535 (distilled at Rosebank) 1991 Vintage, 59.2% ABV Name: name, Length: 61, dtype: object.",
+            "extraSnippets": []
+          }
+        ]
+      }
+    ],
+    "errors": []
+  },
+  "metadata": {
+    "cacheKey": "fb403cd636bc15f1d17dfac319df9487dee485839451ea62ab7fc930c90c6015",
+    "mode": "auto"
+  }
+}

@@ -1,0 +1,67 @@
+{
+  "writtenAt": "2026-10-29T18:22:53.921Z",
+  "toolName": "web_search",
+  "input": {
+    "queries": [
+      "Four Roses Limited Edition Small Batch 2017 official 108 proof blend age release title"
+    ]
+  },
+  "output": {
+    "evidence": [
+      {
+        "provider": "firecrawl",
+        "query": "Four Roses Limited Edition Small Batch 2017 official 108 proof blend age release title",
+        "summary": "108 Proof / Aged 12 – 25 years 2022. This release will also feature a 15-year-old OESK, 15-year-old … 2017 Limited Edition Small Batch 107.3 Proof / Aged ... The blend for this release is 15 year OESK 13 year … 54% ABV; $125; Nose: Sweet caramel, soft spice, red fruits/berries, and hefty dose of oak. ... 2017. MASH BILL – 75% corn, 20% rye, and 5% barley. PROOF – 108. AGE – 20% 15-year, 40% 13-year, and 40% 12-year. DISTILLERY – Four Roses ... Non-chill filtered and bottled at 109.2 proof, the 2026 Limited Edition Small Batch Bourbon combines four hand-selected batches aged 14 to 23 ... The 20",
+        "results": [
+          {
+            "title": "2026 Limited Edition Small Batch Bourbon",
+            "url": "https://www.fourrosesbourbon.com/bourbon/limited-edition",
+            "domain": "fourrosesbourbon.com",
+            "description": "108 Proof / Aged 12 – 25 years 2022. This release will also feature a 15-year-old OESK, 15-year-old … 2017 Limited Edition Small Batch 107.3 Proof / Aged ...",
+            "extraSnippets": []
+          },
+          {
+            "title": "Review #250: Four Roses Limited Edition Small Batch 2017",
+            "url": "https://www.reddit.com/r/bourbon/comments/7s1z6f/review_250_four_roses_limited_edition_small_batch/",
+            "domain": "reddit.com",
+            "description": "The blend for this release is 15 year OESK 13 year … 54% ABV; $125; Nose: Sweet caramel, soft spice, red fruits/berries, and hefty dose of oak. ...",
+            "extraSnippets": []
+          },
+          {
+            "title": "Four Roses Small Batch Limited Edition 2017",
+            "url": "https://the-right-spirit.com/2020/05/29/four-roses-small-batch-limited-edition-2017/",
+            "domain": "the-right-spirit.com",
+            "description": "2017. MASH BILL – 75% corn, 20% rye, and 5% barley. PROOF – 108. AGE – 20% 15-year, 40% 13-year, and 40% 12-year. DISTILLERY – Four Roses ...",
+            "extraSnippets": []
+          },
+          {
+            "title": "Four Roses Set To Launch 2026 Limited Edition Small…",
+            "url": "https://www.fourrosesbourbon.com/news/four-roses-set-to-launch-2026-limited-edition-small-batch-on-october-10",
+            "domain": "fourrosesbourbon.com",
+            "description": "Non-chill filtered and bottled at 109.2 proof, the 2026 Limited Edition Small Batch Bourbon combines four hand-selected batches aged 14 to 23 ...",
+            "extraSnippets": []
+          },
+          {
+            "title": "Four Roses may be a quiet classic in Kentucky bourbon ...",
+            "url": "https://www.facebook.com/robbreport/posts/four-roses-may-be-a-quiet-classic-in-kentucky-bourbon-but-its-annual-limited-edi/1202266585268281/",
+            "domain": "facebook.com",
+            "description": "The 2025 release, its 18th to date, blends 13- and 19-year-old barrels into a deep, layered whiskey bottled at 109 proof, with notes ranging ...",
+            "extraSnippets": []
+          },
+          {
+            "title": "2017 Limited Edition Small Batch",
+            "url": "https://www.fourrosesbourbon.com/bourbon/2017-le-small-batch",
+            "domain": "fourrosesbourbon.com",
+            "description": "Batch 107.3 Proof / Aged Minimum 12-15 Years Tasting Notes Nose Introduces warm aromas of allspice and vanilla bean, mingled with rich apricot and stewed ...",
+            "extraSnippets": []
+          }
+        ]
+      }
+    ],
+    "errors": []
+  },
+  "metadata": {
+    "cacheKey": "823eacaccb4f89f96c86d47ca11c6e9826dea347f0406edd8770a4642e5c09d4",
+    "mode": "auto"
+  }
+}

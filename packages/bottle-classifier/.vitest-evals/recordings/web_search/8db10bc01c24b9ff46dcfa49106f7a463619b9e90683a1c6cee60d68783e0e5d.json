@@ -1,0 +1,67 @@
+{
+  "writtenAt": "2026-10-29T18:42:03.879Z",
+  "toolName": "web_search",
+  "input": {
+    "queries": [
+      "Woodford Reserve Double Double Oaked 2022 release 45.2% Distillery Series official"
+    ]
+  },
+  "output": {
+    "evidence": [
+      {
+        "provider": "firecrawl",
+        "query": "Woodford Reserve Double Double Oaked 2022 release 45.2% Distillery Series official",
+        "summary": "This new release features Woodford Reserve's signature bourbon finished in hand-selected Cabernet Sauvignon barrels, resulting in a complex profile that marries ... Size: 375ml · Proof: 90.4 (45.2% ABV) · Age: No age statement — fully mature Double Oaked finished an additional year in its second barrel · Origin: Versailles, ... The product will be available at Woodford Reserve Distillery starting 10:00 AM EDT, Wednesday, January 18, 2023. Customers are limited to two 375ml bottles. “We ... Double Double Oaked is the result of finishing mature Woodford Reserve Double Oaked for an additional yea",
+        "results": [
+          {
+            "title": "Distillery Series",
+            "url": "https://www.woodfordreserve.com/whiskey/distillery-series/",
+            "domain": "woodfordreserve.com",
+            "description": "This new release features Woodford Reserve's signature bourbon finished in hand-selected Cabernet Sauvignon barrels, resulting in a complex profile that marries ...",
+            "extraSnippets": []
+          },
+          {
+            "title": "2022 Woodford Reserve Double Double Oaked Bourbon ...",
+            "url": "https://canawineco.com/products/2022-woodford-reserve-distillery-series-double-double-oaked-straight-bourbon-whiskey-375ml",
+            "domain": "canawineco.com",
+            "description": "Size: 375ml · Proof: 90.4 (45.2% ABV) · Age: No age statement — fully mature Double Oaked finished an additional year in its second barrel · Origin: Versailles, ...",
+            "extraSnippets": []
+          },
+          {
+            "title": "Woodford Reserve Double Double Oaked Returns as 2023 ...",
+            "url": "https://www.woodfordreserve.com/woodford-reserve-double-double-oaked-returns-as-2023-winter-distillery-series/",
+            "domain": "woodfordreserve.com",
+            "description": "The product will be available at Woodford Reserve Distillery starting 10:00 AM EDT, Wednesday, January 18, 2023. Customers are limited to two 375ml bottles. “We ...",
+            "extraSnippets": []
+          },
+          {
+            "title": "Woodford Reserve Distillery Series Double Double Oak ...",
+            "url": "https://onlineliquor.com/products/woodford-reserve-distillery-series-double-double-oak-375ml",
+            "domain": "onlineliquor.com",
+            "description": "Double Double Oaked is the result of finishing mature Woodford Reserve Double Oaked for an additional year in its second, heavily toasted lightly charred ...",
+            "extraSnippets": []
+          },
+          {
+            "title": "Review #902: Woodford Reserve Double Double Oaked ...",
+            "url": "https://www.reddit.com/r/bourbon/comments/1l2oxfe/review_902_woodford_reserve_double_double_oaked/",
+            "domain": "reddit.com",
+            "description": "It starts as a blend of bourbon distilled on the column stills at the Brown Forman Distillery with a still proof of 138, a barrel entry proof of ...",
+            "extraSnippets": []
+          },
+          {
+            "title": "Double Double Oaked",
+            "url": "https://www.woodfordreserve.com/whiskey/double-double-oaked/",
+            "domain": "woodfordreserve.com",
+            "description": "This bourbon undergoes an extended slumber in a second, custom-crafted barrel. Deeply toasted and lightly charred, it unlocks an unparalleled depth of flavor – ...",
+            "extraSnippets": []
+          }
+        ]
+      }
+    ],
+    "errors": []
+  },
+  "metadata": {
+    "cacheKey": "8db10bc01c24b9ff46dcfa49106f7a463619b9e90683a1c6cee60d68783e0e5d",
+    "mode": "auto"
+  }
+}

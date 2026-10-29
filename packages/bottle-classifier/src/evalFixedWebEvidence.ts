@@ -88,7 +88,7 @@ export function createFixedWebSearchExecutor(
   evidence: FixedWebEvidenceCase,
 ): BottleWebSearchExecutor {
   return async ({ toolName, args }) => {
-    if (toolName === "firecrawl_web_search") {
+    if (toolName === "web_search") {
       return evidence.searchResult;
     }
 
@@ -98,11 +98,20 @@ export function createFixedWebSearchExecutor(
     const page = evidence.pageResults.find((candidate) =>
       webEvidenceUrlsMatch(candidate.url, args.url),
     );
-    return (
-      page?.result ?? {
-        error: `No reviewed fixed page evidence for ${args.url}.`,
-      }
-    );
+    if (!page) {
+      return { error: `No reviewed fixed page evidence for ${args.url}.` };
+    }
+    // A reviewed page's passages stand in for the page's text, so
+    // `find_in_page` searches only what a reviewer saw.
+    const [result] = page.result.results;
+    return {
+      page: {
+        url: page.url,
+        title: result?.title ?? null,
+        description: result?.description ?? null,
+        text: page.result.summary ?? "",
+      },
+    };
   };
 }
 

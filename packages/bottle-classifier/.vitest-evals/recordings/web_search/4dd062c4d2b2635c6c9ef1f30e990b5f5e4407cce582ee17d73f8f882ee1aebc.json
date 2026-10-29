@@ -1,0 +1,117 @@
+{
+  "writtenAt": "2026-10-29T19:16:59.184Z",
+  "toolName": "web_search",
+  "input": {
+    "queries": [
+      "Penelope Bourbon Barrel Strength Batch 11 straight bourbon whiskey official product 11",
+      "Penelope Batch 11 Bourbon Barrel Strength ABV"
+    ]
+  },
+  "output": {
+    "evidence": [
+      {
+        "provider": "firecrawl",
+        "query": "Penelope Bourbon Barrel Strength Batch 11 straight bourbon whiskey official product 11",
+        "summary": "# Penelope Barrel Strength Batch #11 Straight Bourbon Whiskey\nPenelope Barrel Strength Batch #11 Straight Bourbon Whiskey\n\n## Whiskey: Penelope Barrel Strength Batch #11 Straight Bourbon Whiskey\nEach batch is blended from three bourbon mash bills aged in new American oak barrels and completely uncut and non-chill-filtered.\n\n**Proof:** 115.2 (57.6%ABV)\n\n**Distillery:** Penelope\n\n## Detailed Description\nEach batch is blended from three bourbon mash bills aged in new American oak barrels and completely uncut and non-chill-filtered.\n\n# caskcartel.com is blocked\n## Whiskey: Penelope Barrel Strength",
+        "results": [
+          {
+            "title": "Penelope Barrel Strength Batch #11 Straight Bourbon ...",
+            "url": "https://caskcartel.com/products/penelope-barrel-strength-batch-11-straight-bourbon-whiskey",
+            "domain": "caskcartel.com",
+            "description": "# Penelope Barrel Strength Batch #11 Straight Bourbon Whiskey\nPenelope Barrel Strength Batch #11 Straight Bourbon Whiskey\n\n## Whiskey: Penelope Barrel Strength Batch #11 Straight Bourbon Whiskey\nEach batch is blended fro",
+            "extraSnippets": []
+          },
+          {
+            "title": "Penelope Barrel Strength Batch 11 : r/bourbon",
+            "url": "https://www.reddit.com/r/bourbon/comments/131viof/top_of_the_amp_review_43_penelope_barrel_strength/",
+            "domain": "reddit.com",
+            "description": "Finish: cinnamon and clove burn, drops in power quickly but takes a long time to truly die. Thoughts: This stretches 4 year whiskey to the max.",
+            "extraSnippets": []
+          },
+          {
+            "title": "Barrel Strength",
+            "url": "https://shop.penelopebourbon.com/products/barrel-strength",
+            "domain": "shop.penelopebourbon.com",
+            "description": "# Barrel Strength\nPenelope Barrel Strength is bourbon in its purest form.\n\n### Bourbon Facts\nStraight Bourbon Whiskey",
+            "extraSnippets": []
+          },
+          {
+            "title": "Penelope Barrel Strength Batch #11 Straight Bourbon Whiskey",
+            "url": "https://worldofwhiskeysale.com/product/penelope-barrel-strength-batch-11-straight-bourbon-whiskey/",
+            "domain": "worldofwhiskeysale.com",
+            "description": "blended from three bourbon mash bills aged in new American oak barrels and completely uncut and non-chill-filtered. Size: 750ML Proof: 115.2",
+            "extraSnippets": []
+          },
+          {
+            "title": "Featured Press",
+            "url": "https://penelopebourbon.com/featured-press/",
+            "domain": "penelopebourbon.com",
+            "description": "This is a 10-year-old, non-chill-filtered whiskey crafted from a three-grain mashbill of 75% corn, 21% rye and 4% malted barley. Bottled at 98 proof,",
+            "extraSnippets": []
+          },
+          {
+            "title": "Penelope Bourbon 4-Grain and Barrel Strength Review!",
+            "url": "https://www.youtube.com/watch?v=fLJbH573S7g",
+            "domain": "youtube.com",
+            "description": "Today I review the Penelope Bourbon Four Grain 8- proof standard and the impressive Barrel Strength Batch 5! Enjoy the video!",
+            "extraSnippets": []
+          }
+        ]
+      },
+      {
+        "provider": "firecrawl",
+        "query": "Penelope Batch 11 Bourbon Barrel Strength ABV",
+        "summary": "Palate: honey, vanilla, straw, lemon Finish: cinnamon and clove burn, This stretches 4 year whiskey to the max. Strength Bourbon, an uncut, non-chill-filtered four-grain whiskey with caramel syrup and subtle barrel char notes. Regular price $65.00 Sale 56% ABV. Batch 14. Blend of three bourbon mash bills combining to the ratio 74% Corn, 16% Wheat, 7% Rye, and 3% Malted Barley. Milk chocolate, ... It has been aged for three to four years and is 116 proof. available in several states and online for $58.99. 58% ABV. $58.99/750ml. Bottled at ... # Penelope Barrel Strength Batch #11 Straight Bourbo",
+        "results": [
+          {
+            "title": "Penelope Barrel Strength Batch 11 : r/bourbon",
+            "url": "https://www.reddit.com/r/bourbon/comments/131viof/top_of_the_amp_review_43_penelope_barrel_strength/",
+            "domain": "reddit.com",
+            "description": "Palate: honey, vanilla, straw, lemon Finish: cinnamon and clove burn, This stretches 4 year whiskey to the max.",
+            "extraSnippets": []
+          },
+          {
+            "title": "Barrel Strength",
+            "url": "https://shop.penelopebourbon.com/products/barrel-strength",
+            "domain": "shop.penelopebourbon.com",
+            "description": "Strength Bourbon, an uncut, non-chill-filtered four-grain whiskey with caramel syrup and subtle barrel char notes. Regular price $65.00 Sale",
+            "extraSnippets": []
+          },
+          {
+            "title": "Penelope Barrel Strength Bourbon, Batch 14",
+            "url": "https://www.bourbonguy.com/blog/2023/5/25/penelope-barrel-strength-bourbon",
+            "domain": "bourbonguy.com",
+            "description": "56% ABV. Batch 14. Blend of three bourbon mash bills combining to the ratio 74% Corn, 16% Wheat, 7% Rye, and 3% Malted Barley. Milk chocolate, ...",
+            "extraSnippets": []
+          },
+          {
+            "title": "Penelope Barrel Strength Bourbon Review",
+            "url": "https://thebourbonroad.com/blog/penelope-barrel-strength-bourbon-review.html",
+            "domain": "thebourbonroad.com",
+            "description": "It has been aged for three to four years and is 116 proof. available in several states and online for $58.99. 58% ABV. $58.99/750ml. Bottled at ...",
+            "extraSnippets": []
+          },
+          {
+            "title": "Penelope Barrel Strength Batch #11 Straight Bourbon ...",
+            "url": "https://caskcartel.com/products/penelope-barrel-strength-batch-11-straight-bourbon-whiskey",
+            "domain": "caskcartel.com",
+            "description": "# Penelope Barrel Strength Batch #11 Straight Bourbon Whiskey\n## Whiskey: Penelope Barrel Strength Batch #11 Straight Bourbon Whiskey\n**Proof:** 115.2 (57.6%ABV)",
+            "extraSnippets": []
+          },
+          {
+            "title": "Penelope Bourbon evolves its award-winning barrel ...",
+            "url": "https://www.breakingbourbon.com/bourbon-whiskey-press-releases/penelope-bourbon-evolves-its-award-winning-barrel-strength-offerings-with-barrel-strength-7-year",
+            "domain": "breakingbourbon.com",
+            "description": "# Penelope Bourbon evolves its award-winning barrel strength offerings with Barrel Strength 7-Year\n## Press Release\nCompletely uncut and non-chill filtered for enhanced flavor, the result is a stand-out 115.2 proof (57.6",
+            "extraSnippets": []
+          }
+        ]
+      }
+    ],
+    "errors": []
+  },
+  "metadata": {
+    "cacheKey": "4dd062c4d2b2635c6c9ef1f30e990b5f5e4407cce582ee17d73f8f882ee1aebc",
+    "mode": "auto"
+  }
+}

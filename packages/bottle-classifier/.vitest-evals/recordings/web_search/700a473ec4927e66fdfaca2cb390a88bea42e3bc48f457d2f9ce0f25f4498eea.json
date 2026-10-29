@@ -1,0 +1,67 @@
+{
+  "writtenAt": "2026-10-29T19:14:39.026Z",
+  "toolName": "web_search",
+  "input": {
+    "queries": [
+      "Basil Hayden's Kentucky Straight Bourbon Whiskey official product 80 proof 750 ml"
+    ]
+  },
+  "output": {
+    "evidence": [
+      {
+        "provider": "firecrawl",
+        "query": "Basil Hayden's Kentucky Straight Bourbon Whiskey official product 80 proof 750 ml",
+        "summary": "This Kentucky Straight Bourbon carries 80 proof, presenting a harmonious balance that satiates even the most discerning palate. Its nuanced character ... Basil Hayden is bottled at a relatively low 80 proof (40% ABV), which is actually the legal minimum for bourbon. This lower alcohol content was chosen to ... Basil Haydens Whiskey Kentucky Straight Bourbon 750ml. $59.99 $49.99 ; Basil Hayden's Toast Kentucky Straight Bourbon Whiskey 750ml. $75.99 $69.99 ; Basil ... # Basil Hayden® 10 Year Old Bourbon\n## Tasting Notes\n### PROOF\n80 United States, Kentucky. Alcohol/vol, 40%. Proof, 80.00. Artful",
+        "results": [
+          {
+            "title": "Basil Hayden Bourbon 750 Ml",
+            "url": "https://whitehouseliquor.com/spirits/whiskey/basil-hayden-bourbon-750-ml",
+            "domain": "whitehouseliquor.com",
+            "description": "This Kentucky Straight Bourbon carries 80 proof, presenting a harmonious balance that satiates even the most discerning palate. Its nuanced character ...",
+            "extraSnippets": []
+          },
+          {
+            "title": "Basil Hayden Kentucky Straight Bourbon Whiskey",
+            "url": "https://curiada.com/products/basil-hayden-kentucky-straight-bourbon-whiskey",
+            "domain": "curiada.com",
+            "description": "Basil Hayden is bottled at a relatively low 80 proof (40% ABV), which is actually the legal minimum for bourbon. This lower alcohol content was chosen to ...",
+            "extraSnippets": []
+          },
+          {
+            "title": "Basil Hayden - Bourbon, Dark Rye & More",
+            "url": "https://theliquorbros.com/collections/basil-hayden",
+            "domain": "theliquorbros.com",
+            "description": "Basil Haydens Whiskey Kentucky Straight Bourbon 750ml. $59.99 $49.99 ; Basil Hayden's Toast Kentucky Straight Bourbon Whiskey 750ml. $75.99 $69.99 ; Basil ...",
+            "extraSnippets": []
+          },
+          {
+            "title": "Basil Hayden® 10 Year Old Bourbon",
+            "url": "https://www.basilhaydenbourbon.com/whiskies/basil-hayden-10-year-bourbon",
+            "domain": "basilhaydenbourbon.com",
+            "description": "# Basil Hayden® 10 Year Old Bourbon\n## Tasting Notes\n### PROOF\n80",
+            "extraSnippets": []
+          },
+          {
+            "title": "Basil Hayden Kentucky Straight Bourbon Whiskey 1.75L",
+            "url": "http://www.allendalewine.com/products/13389293/basil-hayden-kentucky-straight-bourbon-whiskey",
+            "domain": "allendalewine.com",
+            "description": "United States, Kentucky. Alcohol/vol, 40%. Proof, 80.00. Artfully aged at a relatively mild 80 proof, Basil Hayden's® is as novel and delectable a bourbon ...",
+            "extraSnippets": []
+          },
+          {
+            "title": "Basil Hayden Kentucky Straight Bourbon 750ml (80 Proof)",
+            "url": "https://bevmo.com/products/3543",
+            "domain": "bevmo.com",
+            "description": "This unique, single small-batch bourbon whiskey is blessed with rich hints of peppermint, notes of pepper, slight citrus overtones, and a spicy, warming finish.",
+            "extraSnippets": []
+          }
+        ]
+      }
+    ],
+    "errors": []
+  },
+  "metadata": {
+    "cacheKey": "700a473ec4927e66fdfaca2cb390a88bea42e3bc48f457d2f9ce0f25f4498eea",
+    "mode": "auto"
+  }
+}

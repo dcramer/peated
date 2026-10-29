@@ -1,0 +1,89 @@
+{
+  "writtenAt": "2026-10-29T19:07:51.839Z",
+  "toolName": "web_search",
+  "input": {
+    "queries": [
+      "site:compassboxwhisky.com \"Rogues' Banquet\" whisky ABV blended Scotch",
+      "Compass Box Rogues' Banquet official 2024 release ABV components"
+    ]
+  },
+  "output": {
+    "evidence": [
+      {
+        "provider": "firecrawl",
+        "query": "site:compassboxwhisky.com \"Rogues' Banquet\" whisky ABV blended Scotch",
+        "summary": "Rogues' Banquet boasts flavours of softened tropical fruits, stem ginger and pastry cream. Fragrant yet full-bodied, it has a long and satisfying finish. ## Limited editions\n### [Canvas](https://www.compassboxwhisky.com/en-us/products/canvas)\nBlended Malt Scotch Whisky\n\n### [No Name](https://www.compassboxwhisky.com/en-us/products/no-name)\nBlended Malt Scotch Whisky\n\n### [Phenomenology](https://www.compassboxwhisky.com/en-us/products/phenomenology)\n- ![Rogues' Banquet](https://www.compassboxwhisky.com/cdn/shop/files/RoguesBanquet.png?v=1722005483&width=533)\n\n### [Rogues' Banquet](https://www.c",
+        "results": [
+          {
+            "title": "Rogues' Banquet",
+            "url": "https://www.compassboxwhisky.com/products/rogues-banquet",
+            "domain": "compassboxwhisky.com",
+            "description": "Rogues' Banquet boasts flavours of softened tropical fruits, stem ginger and pastry cream. Fragrant yet full-bodied, it has a long and satisfying finish.",
+            "extraSnippets": []
+          },
+          {
+            "title": "Whiskies – Compass Box",
+            "url": "https://www.compassboxwhisky.com/pages/whiskies",
+            "domain": "compassboxwhisky.com",
+            "description": "## Limited editions\n### [Canvas](https://www.compassboxwhisky.com/en-us/products/canvas)\nBlended Malt Scotch Whisky\n\n### [No Name](https://www.compassboxwhisky.com/en-us/products/no-name)\nBlended Malt Scotch Whisky\n\n### ",
+            "extraSnippets": []
+          }
+        ]
+      },
+      {
+        "provider": "firecrawl",
+        "query": "Compass Box Rogues' Banquet official 2024 release ABV components",
+        "summary": "# Rogues' Banquet\n46% ABV, Natural Colour, Not Chill-Filtered. ABV: 46% Nose: Honeycomb, sweet peach, cereal, vanilla, ginseng, brioche. Citrus, pear, apple, eucalyptus, papaya, ginger, ginseng, malt and a ... Compass Box has launched Rogues' Banquet, 2,400 bottles of the blended whisky available in the U.S., priced at $230.Kilchoman … 47% ABV Price: ... Blended Scotch using Whisky from Miltonduff, North British, Clynelish and Glen Elgin. Matured in Hogshead & Bourbon and coming in at 46% abv. Compass Box makes Scotch whisky with flavour at its heart. We choose every component and every cask,",
+        "results": [
+          {
+            "title": "Rogues' Banquet",
+            "url": "https://www.compassboxwhisky.com/en-us/products/rogues-banquet",
+            "domain": "compassboxwhisky.com",
+            "description": "# Rogues' Banquet\n46% ABV, Natural Colour, Not Chill-Filtered.",
+            "extraSnippets": []
+          },
+          {
+            "title": "Review #21: Compass Box Rogues' Banquet : r/Scotch",
+            "url": "https://www.reddit.com/r/Scotch/comments/1hz7w5y/review_21_compass_box_rogues_banquet/",
+            "domain": "reddit.com",
+            "description": "ABV: 46% Nose: Honeycomb, sweet peach, cereal, vanilla, ginseng, brioche. Citrus, pear, apple, eucalyptus, papaya, ginger, ginseng, malt and a ...",
+            "extraSnippets": []
+          },
+          {
+            "title": "Balcones Lineage, Compass Box Rogues' Banquet & More ...",
+            "url": "https://whiskyadvocate.com/balcones-lineage-compass-box-rogues-banquet-more-new-whisky",
+            "domain": "whiskyadvocate.com",
+            "description": "Compass Box has launched Rogues' Banquet, 2,400 bottles of the blended whisky available in the U.S., priced at $230.Kilchoman … 47% ABV Price: ...",
+            "extraSnippets": []
+          },
+          {
+            "title": "Compass Box Rogues Banquet: Review #233",
+            "url": "https://www.youtube.com/watch?v=mhky9ss8i_0",
+            "domain": "youtube.com",
+            "description": "Blended Scotch using Whisky from Miltonduff, North British, Clynelish and Glen Elgin. Matured in Hogshead & Bourbon and coming in at 46% abv.",
+            "extraSnippets": []
+          },
+          {
+            "title": "Compass Box Whisky",
+            "url": "https://www.compassboxwhisky.com/en-us",
+            "domain": "compassboxwhisky.com",
+            "description": "Compass Box makes Scotch whisky with flavour at its heart. We choose every component and every cask, and we share the full recipe of every whisky we make.",
+            "extraSnippets": []
+          },
+          {
+            "title": "Compass Box \"The Circus\" & \"Enlightenment\" Whiskies ...",
+            "url": "https://www.youtube.com/watch?v=HLDYwc8amvo",
+            "domain": "youtube.com",
+            "description": "“The Circus” is very limited at only 2,490 bottles released. It is bottled at 49% abv and retails around $250. They used four different ...",
+            "extraSnippets": []
+          }
+        ]
+      }
+    ],
+    "errors": []
+  },
+  "metadata": {
+    "cacheKey": "d6fc0647f470abb471da21c0232169c7bfa3e40f973b70e7257e47ef8a95f3c9",
+    "mode": "auto"
+  }
+}

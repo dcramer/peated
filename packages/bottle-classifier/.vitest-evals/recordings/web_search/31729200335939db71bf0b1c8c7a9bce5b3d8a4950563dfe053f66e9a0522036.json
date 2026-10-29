@@ -1,0 +1,47 @@
+{
+  "writtenAt": "2026-10-29T19:00:24.497Z",
+  "toolName": "web_search",
+  "input": {
+    "queries": [
+      "site:decadent-drinks.com/shop/whiskyland-twenty-nine-glenturret-35-years-old Whiskyland Glenturret 35-year-old",
+      "\"Whiskyland Twenty Nine Glenturret\""
+    ]
+  },
+  "output": {
+    "evidence": [
+      {
+        "provider": "firecrawl",
+        "query": "site:decadent-drinks.com/shop/whiskyland-twenty-nine-glenturret-35-years-old Whiskyland Glenturret 35-year-old",
+        "summary": "[Skip to main content](https://decadent-drinks.com/shop/whiskyland-twenty-nine-glenturret-35-years-old#main-content)\n\n# Shop\nJust crack open a dram of this 1990, 35 year old Glenturret that has been rescued from oblivion in the nick of time and marvel at its soft, generous waxiness, its phantasmagoric mineral properties, its luscious white and yellow fruit notes and its general old school glory.",
+        "results": [
+          {
+            "title": "Whiskyland Twenty Nine Glenturret 35 years old",
+            "url": "https://decadent-drinks.com/shop/whiskyland-twenty-nine-glenturret-35-years-old",
+            "domain": "decadent-drinks.com",
+            "description": "[Skip to main content](https://decadent-drinks.com/shop/whiskyland-twenty-nine-glenturret-35-years-old#main-content)\n\n# Shop\nJust crack open a dram of this 1990, 35 year old Glenturret that has been rescued from oblivion",
+            "extraSnippets": []
+          }
+        ]
+      },
+      {
+        "provider": "firecrawl",
+        "query": "\"Whiskyland Twenty Nine Glenturret\"",
+        "summary": "Whiskyland Twenty Nine Glenturret 35 years old. 41.5% ABV. £350.00 (£291.67 exvat). Quantity. 1, 2, 3, 4, 5, 6, 7, 8, 9, 10. WL31- Tamnavullin - Front ...",
+        "results": [
+          {
+            "title": "Shop",
+            "url": "https://decadent-drinks.com/shop?page=2",
+            "domain": "decadent-drinks.com",
+            "description": null,
+            "extraSnippets": []
+          }
+        ]
+      }
+    ],
+    "errors": []
+  },
+  "metadata": {
+    "cacheKey": "31729200335939db71bf0b1c8c7a9bce5b3d8a4950563dfe053f66e9a0522036",
+    "mode": "auto"
+  }
+}

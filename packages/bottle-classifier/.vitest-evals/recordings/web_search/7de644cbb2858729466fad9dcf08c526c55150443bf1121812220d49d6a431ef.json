@@ -1,0 +1,117 @@
+{
+  "writtenAt": "2026-10-29T19:25:55.184Z",
+  "toolName": "web_search",
+  "input": {
+    "queries": [
+      "Wild Turkey Rare Breed Rye official product 56.1% ABV Rare Breed Rye Barrel Proof",
+      "Wild Turkey Rare Breed Rye product name label rye whiskey 112.2 proof"
+    ]
+  },
+  "output": {
+    "evidence": [
+      {
+        "provider": "firecrawl",
+        "query": "Wild Turkey Rare Breed Rye official product 56.1% ABV Rare Breed Rye Barrel Proof",
+        "summary": "Purchase Price: $61.99 for a 750 mL bottle … 56.1% ABV Nose: Mint, a hint of dill, brown sugar, cinnamon, and cedar Mouth: Bright and lively. ... # Wild Turkey Rare Breed Rye\nThis will be the first permanent rye product from Wild Turkey, coming in at barrel proof and non chill filtered all the way.\n\n## **Wild Turkey Rare Breed Rye: Specs**\n**Proof:** 112.2 (56.1% ABV) 5% ABV (so one proof point in either direction). This could give Rare Breed Rye the ability to possibly be as high as 113.2 and as low as 111.2. $40 $55 In stock. A small batch, barrel proof, non-chill filtered blend of select ry",
+        "results": [
+          {
+            "title": "Wild Turkey Rare Breed Rye",
+            "url": "https://www.bourbonguy.com/blog/2020/10/8/wild-turkey-rare-breed-rye",
+            "domain": "bourbonguy.com",
+            "description": "Purchase Price: $61.99 for a 750 mL bottle … 56.1% ABV Nose: Mint, a hint of dill, brown sugar, cinnamon, and cedar Mouth: Bright and lively. ...",
+            "extraSnippets": []
+          },
+          {
+            "title": "Wild Turkey Rare Breed Rye Review",
+            "url": "https://www.whiskeyinmyweddingring.com/reviews/wild-turkey-rare-breed-rye",
+            "domain": "whiskeyinmyweddingring.com",
+            "description": "# Wild Turkey Rare Breed Rye\nThis will be the first permanent rye product from Wild Turkey, coming in at barrel proof and non chill filtered all the way.\n\n## **Wild Turkey Rare Breed Rye: Specs**\n**Proof:** 112.2 (56.1% ",
+            "extraSnippets": []
+          },
+          {
+            "title": "Review #587: Wild Turkey Rare Breed Rye Whiskey",
+            "url": "https://www.reddit.com/r/bourbon/comments/10l5sr5/review_587_wild_turkey_rare_breed_rye_whiskey/",
+            "domain": "reddit.com",
+            "description": "5% ABV (so one proof point in either direction). This could give Rare Breed Rye the ability to possibly be as high as 113.2 and as low as 111.2.",
+            "extraSnippets": []
+          },
+          {
+            "title": "Wild Turkey Rare Breed Barrel Proof Rye 112 Proof 750ml",
+            "url": "https://barrelshoppe.com/products/wild-turkey-rare-breed-barrel-proof-rye",
+            "domain": "barrelshoppe.com",
+            "description": "$40 $55 In stock. A small batch, barrel proof, non-chill filtered blend of select ryes, ly in charred oak barrels,",
+            "extraSnippets": []
+          },
+          {
+            "title": "Rare Breed Rye (2024)",
+            "url": "https://rarebird101.com/2024/04/24/rare-breed-rye-2024/",
+            "domain": "rarebird101.com",
+            "description": "Rare Breed Rye is non-chill filtered and contains a blend of four-, six-, and eight-year-old barrels. Proof: 112.2 Age: blend of 4-, 6-, and 8- ...",
+            "extraSnippets": []
+          },
+          {
+            "title": "Rare Breed Rye: barrel proof rye whiskey",
+            "url": "https://www.wildturkeybourbon.com/en-us/products/rare-breed-rye/",
+            "domain": "wildturkeybourbon.com",
+            "description": "# WILD TURKEY RARE BREED RYE\nA small batch, barrel proof blend of our finest rye whiskey\n\nA small batch, barrel proof, non-chill filtered blend of select ryes, Rare Breed Rye ages perfectly in charred oak barrels, result",
+            "extraSnippets": []
+          }
+        ]
+      },
+      {
+        "provider": "firecrawl",
+        "query": "Wild Turkey Rare Breed Rye product name label rye whiskey 112.2 proof",
+        "summary": "# WILD TURKEY RARE BREED RYE\n4.8\n\nReview our products\n\n## OUR PRODUCTS\n### WILD TURKEY RARE BREED & RARE BREED RYE\nand Rare Breed Rye.\n\n### WILD TURKEY 101 RYE\nA bold rye whiskey\n\n[![WILD TURKEY RARE BREED](https://www.wildturkeybourbon.com/app/uploads/sites/3/2024/05/MAS-23-00440_Wild-Turkey-Rare-Breed-750_CAMP_F-2-scaled.webp)](https://www.wildturkeybourbon.com/en-us/products/rare-breed/)\n\n### WILD TURKEY PRIVATE SELECTION RYE #2\nAn exceptionally limited, high-proof whiskey\n\n[See details](https://www.wildturkeybourbon.com/en-us/products/private-selection-rye-2/) Wild Turkey Rare Breed Rye (2",
+        "results": [
+          {
+            "title": "Rare Breed Rye: barrel proof rye whiskey - Wild Turkey",
+            "url": "https://www.wildturkeybourbon.com/en-us/products/rare-breed-rye/",
+            "domain": "wildturkeybourbon.com",
+            "description": "# WILD TURKEY RARE BREED RYE\n4.8\n\nReview our products\n\n## OUR PRODUCTS\n### WILD TURKEY RARE BREED & RARE BREED RYE\nand Rare Breed Rye.\n\n### WILD TURKEY 101 RYE\nA bold rye whiskey\n\n[![WILD TURKEY RARE BREED](https://www.w",
+            "extraSnippets": []
+          },
+          {
+            "title": "Wild Turkey Rare Breed Rye 112.2 (2021)",
+            "url": "https://rarebird101.com/2021/06/15/wild-turkey-rare-breed-rye-112-2-2021/",
+            "domain": "rarebird101.com",
+            "description": "Wild Turkey Rare Breed Rye (2021) – 112.2 proof, NCF – no age stated (reportedly a blend of four-, six-, and eight-year straight rye whiskeys) – ...",
+            "extraSnippets": []
+          },
+          {
+            "title": "Wild Turkey Rare Breed Rye (112.2 Proof) Review",
+            "url": "https://www.breakingbourbon.com/review/wild-turkey-rare-breed-rye-112-2-proof",
+            "domain": "breakingbourbon.com",
+            "description": "This is the first ever barrel proof rye for the company. It's also non-chilled filtered,",
+            "extraSnippets": []
+          },
+          {
+            "title": "Review #587: Wild Turkey Rare Breed Rye Whiskey",
+            "url": "https://www.reddit.com/r/bourbon/comments/10l5sr5/review_587_wild_turkey_rare_breed_rye_whiskey/",
+            "domain": "reddit.com",
+            "description": null,
+            "extraSnippets": []
+          },
+          {
+            "title": "Review #032: Wild Turkey Rare Breed Rye",
+            "url": "https://www.reddit.com/r/bourbon/comments/1bhf5bc/review_032_wild_turkey_rare_breed_rye/",
+            "domain": "reddit.com",
+            "description": null,
+            "extraSnippets": []
+          },
+          {
+            "title": "Wild Turkey Rare Breed Barrel Proof Rye 112 Proof 750ml",
+            "url": "https://barrelshoppe.com/products/wild-turkey-rare-breed-barrel-proof-rye",
+            "domain": "barrelshoppe.com",
+            "description": "Wild Turkey® Rare Breed Rye is a true masterpiece by Master Distiller Eddie Russell. $40 $55 In stock. A small batch, barrel proof, non-chill filtered blend of ...",
+            "extraSnippets": []
+          }
+        ]
+      }
+    ],
+    "errors": []
+  },
+  "metadata": {
+    "cacheKey": "7de644cbb2858729466fad9dcf08c526c55150443bf1121812220d49d6a431ef",
+    "mode": "auto"
+  }
+}

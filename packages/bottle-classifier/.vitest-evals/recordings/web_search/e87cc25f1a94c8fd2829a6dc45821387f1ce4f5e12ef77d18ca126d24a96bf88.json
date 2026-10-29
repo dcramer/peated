@@ -1,0 +1,67 @@
+{
+  "writtenAt": "2026-10-29T19:24:25.513Z",
+  "toolName": "web_search",
+  "input": {
+    "queries": [
+      "Wild Turkey Rare Breed Rye Barrel Proof 56.1% official product name"
+    ]
+  },
+  "output": {
+    "evidence": [
+      {
+        "provider": "firecrawl",
+        "query": "Wild Turkey Rare Breed Rye Barrel Proof 56.1% official product name",
+        "summary": "Wild Turkey Rare Breed Rye is a barrel proof, non-chill-filtered blend of 4-,6-, and 8-year-old Kentucky Straight Rye from Wild Turkey Distillery. # Wild Turkey Rare Breed Rye\n## **Wild Turkey Rare Breed Rye: Specs**\n**Proof:** 112.2 (56.1% ABV) In addition to being the only Wild Turkey rye released at barrel strength (Master's Keep Cornerstone, at 54.5% ABV, was proofed down) Rare Breed ... Barrel Proof Rye. Proof (56.1% abv) Color: Light amber color, viscous, coats the glass well. Nose: Caramel, mint, sage, black pepper, green ... Wild Turkey has added an extension to their Barrel Proof line",
+        "results": [
+          {
+            "title": "Rare Breed Rye: barrel proof rye whiskey",
+            "url": "https://www.wildturkeybourbon.com/en-us/products/rare-breed-rye/",
+            "domain": "wildturkeybourbon.com",
+            "description": "Wild Turkey Rare Breed Rye is a barrel proof, non-chill-filtered blend of 4-,6-, and 8-year-old Kentucky Straight Rye from Wild Turkey Distillery.",
+            "extraSnippets": []
+          },
+          {
+            "title": "Wild Turkey Rare Breed Rye Review",
+            "url": "https://www.whiskeyinmyweddingring.com/reviews/wild-turkey-rare-breed-rye",
+            "domain": "whiskeyinmyweddingring.com",
+            "description": "# Wild Turkey Rare Breed Rye\n## **Wild Turkey Rare Breed Rye: Specs**\n**Proof:** 112.2 (56.1% ABV)",
+            "extraSnippets": []
+          },
+          {
+            "title": "Rare Breed Rye (2024)",
+            "url": "https://rarebird101.com/2024/04/24/rare-breed-rye-2024/",
+            "domain": "rarebird101.com",
+            "description": "In addition to being the only Wild Turkey rye released at barrel strength (Master's Keep Cornerstone, at 54.5% ABV, was proofed down) Rare Breed ...",
+            "extraSnippets": []
+          },
+          {
+            "title": "Wild Turkey Rare Breed Rye Has Officially Landed!",
+            "url": "https://www.reddit.com/r/bourbon/comments/goa8q3/wild_turkey_rare_breed_rye_has_officially_landed/",
+            "domain": "reddit.com",
+            "description": "Barrel Proof Rye. Proof (56.1% abv) Color: Light amber color, viscous, coats the glass well. Nose: Caramel, mint, sage, black pepper, green ...",
+            "extraSnippets": []
+          },
+          {
+            "title": "Wild Turkey Rare Breed Rye Review",
+            "url": "https://www.youtube.com/watch?v=LqpYY_nIRco",
+            "domain": "youtube.com",
+            "description": "Wild Turkey has added an extension to their Barrel Proof lineup known as Rare Breed with a non-chill filtered Rye. Bottled at 112.2 proof, this ...",
+            "extraSnippets": []
+          },
+          {
+            "title": "Wild Turkey Rare Breed Rye Barrel Proof 750ml",
+            "url": "https://www.missionliquor.com/products/wild-turkey-rare-breed-750ml-1",
+            "domain": "missionliquor.com",
+            "description": "This expression is barrel strength at 112.2 proof. Wild Turkey Rare Breed Rye is a blend of four-, six-, and eight-year-old non-chill filtered ryes.",
+            "extraSnippets": []
+          }
+        ]
+      }
+    ],
+    "errors": []
+  },
+  "metadata": {
+    "cacheKey": "e87cc25f1a94c8fd2829a6dc45821387f1ce4f5e12ef77d18ca126d24a96bf88",
+    "mode": "auto"
+  }
+}

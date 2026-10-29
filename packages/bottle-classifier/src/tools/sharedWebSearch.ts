@@ -1,3 +1,4 @@
+import type { PeatedBot } from "@peated/bot";
 import { z } from "zod";
 import {
   BottleSearchEvidenceSchema,
@@ -6,6 +7,20 @@ import {
 import { canonicalizeWebEvidenceUrl } from "../webEvidenceUrl";
 
 export const BottleWebSearchProviderSchema = z.enum(["openai", "firecrawl"]);
+
+/** How the classifier reaches the web: PeatedBot's page reader and search. */
+export type BottleClassifierWeb = Pick<PeatedBot, "readPage" | "searchWeb">;
+
+/** Web tools whose calls the eval harness records and replays. */
+export type BottleWebToolName = "web_search" | "read_page";
+
+/** One page's text, kept for the run so `find_in_page` can search it. */
+export type BottleWebPage = {
+  url: string;
+  title: string | null;
+  description: string | null;
+  text: string;
+};
 export type BottleWebSearchProvider = z.infer<
   typeof BottleWebSearchProviderSchema
 >;
@@ -16,7 +31,7 @@ const BottleWebSearchQuerySchema = z
   .min(1)
   .max(500)
   .describe(
-    "Focused discovery query for one exact Bottle. Include the brand plus reliable identity anchors. When an extracted age, ABV, year, edition, or cask marker is uncertain or disputed, one formulation may omit only that field so search can surface corrective evidence. Firecrawl supports quoted non-fuzzy fragments for unusual exact markers.",
+    "Focused discovery query for one exact Bottle. Include the brand plus reliable identity anchors. When an extracted age, ABV, year, edition, or cask marker is uncertain or disputed, one formulation may omit only that field so search can surface corrective evidence. Quoted fragments match unusual exact markers.",
   );
 
 export const BottleWebSearchArgsSchema = z.object({
@@ -35,23 +50,30 @@ export const BottleWebSearchArgsSchema = z.object({
     ),
 });
 
+const BottleWebPageUrlSchema = z
+  .string()
+  .url()
+  .refine((value) => ["http:", "https:"].includes(new URL(value).protocol), {
+    message: "URL must use HTTP or HTTPS",
+  });
+
 export const BottleWebReadPageArgsSchema = z.object({
-  url: z
-    .string()
-    .url()
-    .refine((value) => ["http:", "https:"].includes(new URL(value).protocol), {
-      message: "URL must use HTTP or HTTPS",
-    })
-    .describe(
-      "Exact source URL from `reference.url`, or a promising search result consistent with confirmed Bottle traits or differing only on the uncertain trait being resolved. Never use a confirmed conflicting sibling as Suggested Change evidence.",
-    ),
-  focus: z
+  url: BottleWebPageUrlSchema.describe(
+    "Exact source URL from `reference.url`, or a promising search result consistent with confirmed Bottle traits or differing only on the uncertain trait being resolved. Never use a confirmed conflicting sibling as Suggested Change evidence.",
+  ),
+});
+
+export const BottleWebFindInPageArgsSchema = z.object({
+  url: BottleWebPageUrlSchema.describe(
+    "URL of a page already read in this run with `read_page`.",
+  ),
+  query: z
     .string()
     .trim()
-    .min(1)
-    .max(240)
+    .min(2)
+    .max(80)
     .describe(
-      "Short description of the identity-critical fact to locate, such as exact cask code, edition, age, year, or ABV.",
+      "Exact word, number, or short phrase to find on the page, such as `cask`, `48.2%`, `bottled`, `Vol. 3`, or a cask code. Matching ignores case.",
     ),
 });
 
@@ -62,12 +84,18 @@ const MAX_BOTTLE_SEARCH_DESCRIPTION_CHARS = 220;
 const MAX_BOTTLE_SEARCH_EXTRA_SNIPPETS = 1;
 const MAX_BOTTLE_SEARCH_EXTRA_SNIPPET_CHARS = 1200;
 
+/**
+ * One run's web allowance, plus the pages it has read. Pages stay in memory
+ * for the run, so `find_in_page` searches them without reading them again.
+ */
 export type BottleWebSearchBudget = {
   tryConsumeSearch: (queries?: number) => boolean;
   tryConsumePageRead: () => boolean;
-  getExhaustedError: (kind: "search" | "page_read") => {
+  tryConsumePageFind: () => boolean;
+  getExhaustedError: (kind: "search" | "page_read" | "page_find") => {
     error: string;
   };
+  pages: Map<string, BottleWebPage>;
 };
 
 export type BottleWebSearchBatchResult = {
@@ -78,11 +106,12 @@ export type BottleWebSearchBatchResult = {
 export type BottleWebToolResult =
   | BottleSearchEvidence
   | BottleWebSearchBatchResult
+  | { page: BottleWebPage }
   | { error: string };
 
 export type BottleWebSearchExecutor = (input: {
-  toolName: "firecrawl_web_search" | "firecrawl_read_page";
-  args: { queries: string[] } | { url: string; focus: string };
+  toolName: BottleWebToolName;
+  args: { queries: string[] } | { url: string };
   execute: () => Promise<BottleWebToolResult>;
 }) => Promise<BottleWebToolResult>;
 
@@ -96,13 +125,12 @@ export async function executeBottleWebSearchInvocation({
 }: {
   budget: BottleWebSearchBudget;
   budgetUnits?: number;
-  toolName: "firecrawl_web_search" | "firecrawl_read_page";
-  args: { queries: string[] } | { url: string; focus: string };
+  toolName: BottleWebToolName;
+  args: { queries: string[] } | { url: string };
   execute: () => Promise<BottleWebToolResult>;
   executeWebSearch?: BottleWebSearchExecutor;
 }): Promise<BottleWebToolResult> {
-  const budgetKind =
-    toolName === "firecrawl_web_search" ? "search" : "page_read";
+  const budgetKind = toolName === "web_search" ? "search" : "page_read";
   const allowed =
     budgetKind === "search"
       ? budget.tryConsumeSearch(budgetUnits)
@@ -137,12 +165,17 @@ export function hydrateBottleSearchEvidence(
   return true;
 }
 
+// Finds search text already read, so they cost no web request; the limit
+// only bounds the run's turns (agent design policy).
+const MAX_PAGE_FINDS = 6;
+
 export function createBottleWebSearchBudget(
   maxSearchQueries: number,
   maxPageReads = 1,
 ): BottleWebSearchBudget {
   let consumedSearchQueries = 0;
   let consumedPageReads = 0;
+  let consumedPageFinds = 0;
 
   return {
     tryConsumeSearch: (queries = 1) => {
@@ -161,12 +194,23 @@ export function createBottleWebSearchBudget(
       consumedPageReads += 1;
       return true;
     },
+    tryConsumePageFind: () => {
+      if (consumedPageFinds >= MAX_PAGE_FINDS) {
+        return false;
+      }
+
+      consumedPageFinds += 1;
+      return true;
+    },
     getExhaustedError: (kind) => ({
       error:
         kind === "search"
           ? `Web search budget exhausted after ${maxSearchQueries} ${maxSearchQueries === 1 ? "query" : "queries"}`
-          : `Web page-read budget exhausted after ${maxPageReads} ${maxPageReads === 1 ? "page" : "pages"}`,
+          : kind === "page_read"
+            ? `Web page-read budget exhausted after ${maxPageReads} ${maxPageReads === 1 ? "page" : "pages"}`
+            : `Find-in-page budget exhausted after ${MAX_PAGE_FINDS} finds`,
     }),
+    pages: new Map(),
   };
 }
 

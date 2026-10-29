@@ -1,0 +1,74 @@
+{
+  "writtenAt": "2026-10-29T18:55:03.354Z",
+  "toolName": "web_search",
+  "input": {
+    "queries": [
+      "Astor Wines \"Elijah Craig 18-year-old Single Barrel Bourbon\" 45%",
+      "Elijah Craig Single Barrel 18-year-old bourbon 90 proof cask No. 4040"
+    ]
+  },
+  "output": {
+    "evidence": [
+      {
+        "provider": "firecrawl",
+        "query": "Astor Wines \"Elijah Craig 18-year-old Single Barrel Bourbon\" 45%",
+        "summary": null,
+        "results": []
+      },
+      {
+        "provider": "firecrawl",
+        "query": "Elijah Craig Single Barrel 18-year-old bourbon 90 proof cask No. 4040",
+        "summary": "# 18-YEAR-OLD    SINGLE BARREL\n92% The finish isn't particularly long. It has subtle vanilla and aged oak (obviously) with flashes of cinnamon and a touch of leather adding depth. Age: 18 years. Proof: 90 / 45% ABV Mashbill: 75% corn, 13% rye, 12% barley. Tasting Notes: Color - Warm, deep leather. Aroma - Aged oak, spiced vanilla, ... # Elijah Craig 18 Year Old Single Barrel Bourbon\n## Description\n**Proof:** 90 Proof Elijah Craig 18 Year Single Barrel # Elijah Craig Single Barrel (No. 4040) 18 year old, 45%\nPrice: $120.00● Issue: Spring 2016 ● Reviewer: John Hansell ● Category: Bourbon/Tenness",
+        "results": [
+          {
+            "title": "18-Year-Old Single Barrel",
+            "url": "https://elijahcraig.com/18-year-old",
+            "domain": "elijahcraig.com",
+            "description": "# 18-YEAR-OLD    SINGLE BARREL\n92%",
+            "extraSnippets": []
+          },
+          {
+            "title": "Review #4: Elijah Craig 18 Year Single Barrel : r/bourbon",
+            "url": "https://www.reddit.com/r/bourbon/comments/1sdj7qg/review_4_elijah_craig_18_year_single_barrel/",
+            "domain": "reddit.com",
+            "description": "The finish isn't particularly long. It has subtle vanilla and aged oak (obviously) with flashes of cinnamon and a touch of leather adding depth.",
+            "extraSnippets": []
+          },
+          {
+            "title": "Elijah Craig Straight Bourbon Single Barrel 18-Year 90 Proof",
+            "url": "https://seelbachs.com/products/elijah-craig-straight-bourbon-single-barrel-18-year-90-proof",
+            "domain": "seelbachs.com",
+            "description": "Age: 18 years. Proof: 90 / 45% ABV Mashbill: 75% corn, 13% rye, 12% barley. Tasting Notes: Color - Warm, deep leather. Aroma - Aged oak, spiced vanilla, ...",
+            "extraSnippets": []
+          },
+          {
+            "title": "Elijah Craig 18 Year Old Single Barrel Bourbon",
+            "url": "https://onlineliquor.com/products/elijah-craig-18-year-single-barrel-bourbon",
+            "domain": "onlineliquor.com",
+            "description": "# Elijah Craig 18 Year Old Single Barrel Bourbon\n## Description\n**Proof:** 90 Proof",
+            "extraSnippets": []
+          },
+          {
+            "title": "Elijah Craig 18 Year Single Barrel",
+            "url": "https://www.youtube.com/watch?v=82UcrNV7zfA",
+            "domain": "youtube.com",
+            "description": "Elijah Craig 18 Year Single Barrel",
+            "extraSnippets": []
+          },
+          {
+            "title": "Elijah Craig Single Barrel (No. 4040) 18 year old, 45%",
+            "url": "https://whiskyadvocate.com/Elijah-Craig-Single-Barrel-No-4040-18-year-old-45",
+            "domain": "whiskyadvocate.com",
+            "description": "# Elijah Craig Single Barrel (No. 4040) 18 year old, 45%\nPrice: $120.00● Issue: Spring 2016 ● Reviewer: John Hansell ● Category: Bourbon/Tennessee Whiskey\n\n[Buy Now](https://whiskyadvocate.com/Elijah-Craig-Single-Barrel-",
+            "extraSnippets": []
+          }
+        ]
+      }
+    ],
+    "errors": []
+  },
+  "metadata": {
+    "cacheKey": "096e02856828be141609a482218899351e7367bfebfb9fa2ff58844e425e21a6",
+    "mode": "auto"
+  }
+}

@@ -1,0 +1,117 @@
+{
+  "writtenAt": "2026-10-29T19:10:59.689Z",
+  "toolName": "web_search",
+  "input": {
+    "queries": [
+      "\"Trestle Spirit of Eclipse\" whisky 50%",
+      "\"Spirit of Eclipse\" \"Old Trestle\" distilled grain hops"
+    ]
+  },
+  "output": {
+    "evidence": [
+      {
+        "provider": "firecrawl",
+        "query": "\"Trestle Spirit of Eclipse\" whisky 50%",
+        "summary": "Old Trestle Spirit of Eclipse Bourbon Barrel-Aged Imperial Stout 750ml-0. Old ... 100 Proof | 50% ABV. Availability. Information. Origin. Domestic. Region. Old Trestle Spirit of Eclipse Whiskey 750mL. Old Trestle Distillery. Price ... It is bottled at 100 proof (50% ABV), a fuller, higher-strength expression. Old Trestle Spirit of Eclipse Whiskey 750mL. Category: American Whiskey SKU ... It is bottled at 100 proof (50% ABV), a fuller, higher-strength expression. • 50% Cabernet Sauvignon, 50% Merlot WINE: • Clay rich sloping ... 170738 OLD TRESTLE SPIRIT OF ECLIPSE WHISKEY 750. -ML 6 846.00 ...",
+        "results": [
+          {
+            "title": "Old Trestle Spirit of Eclipse Bourbon Barrel-Aged Imperial ...",
+            "url": "https://www.missionliquor.com/products/old-trestle-spirits-of-eclipse-whiskey-750ml",
+            "domain": "missionliquor.com",
+            "description": "Old Trestle Spirit of Eclipse Bourbon Barrel-Aged Imperial Stout 750ml-0. Old ... 100 Proof | 50% ABV. Availability. Information. Origin. Domestic. Region.",
+            "extraSnippets": []
+          },
+          {
+            "title": "Old Trestle Spirit of Eclipse Whiskey 750mL",
+            "url": "https://woodencork.com/products/old-trestle-spirit-of-ecpl-whiskey-750ml",
+            "domain": "woodencork.com",
+            "description": "Old Trestle Spirit of Eclipse Whiskey 750mL. Old Trestle Distillery. Price ... It is bottled at 100 proof (50% ABV), a fuller, higher-strength expression.",
+            "extraSnippets": []
+          },
+          {
+            "title": "Old Trestle Spirit of Eclipse Whiskey 750mL",
+            "url": "https://www.doventonspirits.com/product/old-trestle-spirit-of-eclipse-whiskey-750ml/",
+            "domain": "doventonspirits.com",
+            "description": "Old Trestle Spirit of Eclipse Whiskey 750mL. Category: American Whiskey SKU ... It is bottled at 100 proof (50% ABV), a fuller, higher-strength expression.",
+            "extraSnippets": []
+          },
+          {
+            "title": "Joe Wagner's Copper Cane Legacy | PDF | Wine",
+            "url": "https://www.scribd.com/document/914794604/North-Jan-Feb-2024-digital",
+            "domain": "scribd.com",
+            "description": "• 50% Cabernet Sauvignon, 50% Merlot WINE: • Clay rich sloping ... 170738 OLD TRESTLE SPIRIT OF ECLIPSE WHISKEY 750. -ML 6 846.00 ...",
+            "extraSnippets": []
+          },
+          {
+            "title": "2022 Jack Daniel's Small Batch Special Release Coy Hill ...",
+            "url": "https://www.frostyferment.com/products/2022-jack-daniel-s-small-batch-special-release-coy-hill-high-proof-whiskey-375ml/",
+            "domain": "frostyferment.com",
+            "description": "Old Trestle Spirit of Eclipse Whiskey. $147.59 Original price was: $147.59 ... -50%. Product image. Bird Dog Blackberry Flavored Whiskey. $26.09 Original ...",
+            "extraSnippets": []
+          },
+          {
+            "title": "Ballotin Chocolate Mint Whiskey - Hops Zenith",
+            "url": "https://www.hopszenith.com/products/ballotin-chocolate-mint-whiskey/",
+            "domain": "hopszenith.com",
+            "description": "Old Trestle Spirit of Eclipse Whiskey. $147.59 Original price was: $147.59 ... -50%. Product image · Jack Daniel's Coy Hill Release 2022 750ml. $449.99 ...",
+            "extraSnippets": []
+          }
+        ]
+      },
+      {
+        "provider": "firecrawl",
+        "query": "\"Spirit of Eclipse\" \"Old Trestle\" distilled grain hops",
+        "summary": "# Spirit of Eclipse® Whiskey\nThis ultimate blend was then expertly distilled by Old Trestle Distillery, aged to perfection, and then finished in fresh Eclipse barrels from 5050 Brewing. Old Trestle Spirit of Eclipse Bourbon Barrel-Aged Imperial Stout 750ml. All the best characteristics of a world class whiskey made from a world class barrel aged imperial stout and then finished in the perfectly seasoned barrels of ... ... Spirit of Eclipse, which is their signature whiskey. Old Trestle Rob Galloway / Tahoe Daily Tribune. Other than the Sierra rye whiskey that ... $66.42 Current price is: $66.4",
+        "results": [
+          {
+            "title": "Spirit of Eclipse® Whiskey",
+            "url": "https://www.oldtrestle.com/product-page/spirit-of-eclipse-whiskey",
+            "domain": "oldtrestle.com",
+            "description": "# Spirit of Eclipse® Whiskey\nThis ultimate blend was then expertly distilled by Old Trestle Distillery, aged to perfection, and then finished in fresh Eclipse barrels from 5050 Brewing.",
+            "extraSnippets": []
+          },
+          {
+            "title": "Old Trestle Spirit of Eclipse Bourbon Barrel-Aged Imperial ...",
+            "url": "https://www.missionliquor.com/products/old-trestle-spirits-of-eclipse-whiskey-750ml",
+            "domain": "missionliquor.com",
+            "description": "Old Trestle Spirit of Eclipse Bourbon Barrel-Aged Imperial Stout 750ml.",
+            "extraSnippets": []
+          },
+          {
+            "title": "Old Trestle Spirit of Eclipse Whiskey - Barbank",
+            "url": "https://barbank.com/products/old-trestle-spirit-of-eclipse-whiskey",
+            "domain": "barbank.com",
+            "description": "All the best characteristics of a world class whiskey made from a world class barrel aged imperial stout and then finished in the perfectly seasoned barrels of ...",
+            "extraSnippets": []
+          },
+          {
+            "title": "Spirits of Tahoe; A look at local distilleries around the basin",
+            "url": "https://www.tahoedailytribune.com/news/spirits-of-tahoe-a-look-at-local-distilleries-around-the-basin/",
+            "domain": "tahoedailytribune.com",
+            "description": "... Spirit of Eclipse, which is their signature whiskey. Old Trestle Rob Galloway / Tahoe Daily Tribune. Other than the Sierra rye whiskey that ...",
+            "extraSnippets": []
+          },
+          {
+            "title": "Old Trestle Spirit of Eclipse Whiskey - Hops Zenith",
+            "url": "https://www.hopszenith.com/products/old-trestle-spirit-of-eclipse-whiskey/",
+            "domain": "hopszenith.com",
+            "description": "$66.42 Current price is: $66.42. In stock. Old Trestle Spirit of Eclipse Whiskey quantity. Add to cart. SKU: ...",
+            "extraSnippets": []
+          },
+          {
+            "title": "Joe Wagner's Copper Cane Legacy | PDF | Wine",
+            "url": "https://www.scribd.com/document/914794604/North-Jan-Feb-2024-digital",
+            "domain": "scribd.com",
+            "description": "# Joe Wagner's Copper Cane Legacy\n## Uploaded by\n󰀭EMILION 󰀲󰀰󰀲󰀰DOM DE LA SOLITUDE CHÂTEAUNEUF 󰀭DU󰀭PAPE RÉSERVE SECRÈTE 󰀲󰀰󰀱󰀹\n\nCHÂTEAU PAVEIL DE LUZE\n\nBrewed from the whole hop and nothing but the hop.",
+            "extraSnippets": []
+          }
+        ]
+      }
+    ],
+    "errors": []
+  },
+  "metadata": {
+    "cacheKey": "8d4ff1204dc2c337e2242f555e0d63f5371be769c60625e705bd95541d1666c5",
+    "mode": "auto"
+  }
+}

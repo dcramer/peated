@@ -1,0 +1,74 @@
+{
+  "writtenAt": "2026-10-29T19:26:56.743Z",
+  "toolName": "web_search",
+  "input": {
+    "queries": [
+      "site:scotchwhiskyauctions.com/auctions/231-the-182nd-auction/888632-macallan-classic-cut-2017-release \"Macallan Classic Cut 2017 Release\"",
+      "The Macallan Classic Cut 2017 Edition official 58.4% release label"
+    ]
+  },
+  "output": {
+    "evidence": [
+      {
+        "provider": "firecrawl",
+        "query": "site:scotchwhiskyauctions.com/auctions/231-the-182nd-auction/888632-macallan-classic-cut-2017-release \"Macallan Classic Cut 2017 Release\"",
+        "summary": null,
+        "results": []
+      },
+      {
+        "provider": "firecrawl",
+        "query": "The Macallan Classic Cut 2017 Edition official 58.4% release label",
+        "summary": "Matured in hand-picked sherry seasoned American and European oak casks from Jerez, Spain and then bottled to perfectly unlock its unique flavour profile, this ... The Macallan Classic Cut (2017 Edition), 58.4%. Price: $89.00 ○ Issue: Summer 2018 ○ Reviewer: Gavin Smith ○ Category: Single Malt Scotch. Buy Now. Released ... Label of 2017 The Macallan Limited Edition Classic Cut Single Malt Scotch Whisky ... The Macallan Classic Cut 2017 Limited Edition 750ml 58.4%abv. In stock ... Country: Scotland - Speyside Distillery: The Macallan Type: Single Malt Age: NAS Cask: Oloroso Sherry ABV: 58.4% Pro",
+        "results": [
+          {
+            "title": "The Macallan Classic Cut - 2017 Edition",
+            "url": "https://www.themacallan.com/en-us/single-malt-scotch-whisky/classic-cut-2017-edition",
+            "domain": "themacallan.com",
+            "description": "Matured in hand-picked sherry seasoned American and European oak casks from Jerez, Spain and then bottled to perfectly unlock its unique flavour profile, this ...",
+            "extraSnippets": []
+          },
+          {
+            "title": "The Macallan Classic Cut (2017 Edition), 58.4%",
+            "url": "https://whiskyadvocate.com/The-Macallan-Classic-Cut-2017-Edition-58-4",
+            "domain": "whiskyadvocate.com",
+            "description": "The Macallan Classic Cut (2017 Edition), 58.4%. Price: $89.00 ○ Issue: Summer 2018 ○ Reviewer: Gavin Smith ○ Category: Single Malt Scotch. Buy Now. Released ...",
+            "extraSnippets": []
+          },
+          {
+            "title": "2017 The Macallan Limited Edition Classic Cut Single Malt ...",
+            "url": "https://www.wine-searcher.com/find/the+macallan+ltd+edition+cls+cut+single+malt+scotch+whisky+speyside+highlands+scotland/2017",
+            "domain": "wine-searcher.com",
+            "description": "Label of 2017 The Macallan Limited Edition Classic Cut Single Malt Scotch Whisky ... The Macallan Classic Cut 2017 Limited Edition 750ml 58.4%abv. In stock ...",
+            "extraSnippets": []
+          },
+          {
+            "title": "Macallan Classic Cut 2017 Edition - Whisky Review",
+            "url": "https://www.whiskymonster.com/macallan-classic-cut-2017-whisky-review/",
+            "domain": "whiskymonster.com",
+            "description": "Country: Scotland - Speyside Distillery: The Macallan Type: Single Malt Age: NAS Cask: Oloroso Sherry ABV: 58.4% Proof: 118.4. Price: $120.",
+            "extraSnippets": []
+          },
+          {
+            "title": "Macallan Classic Cut 2017 Review : r/Scotch",
+            "url": "https://www.reddit.com/r/Scotch/comments/18cxmcx/macallan_classic_cut_2017_review/",
+            "domain": "reddit.com",
+            "description": "Macallan Classic Cut 2017 (NAS, 58%) · Nose: Orange marmalade, French toast with cinnamon, prunes and hints of anise. · Palate: Cinnamon, honey ...",
+            "extraSnippets": []
+          },
+          {
+            "title": "Classic Cut Whisky",
+            "url": "https://www.themacallan.com/en-us/single-malt-scotch-whisky/classic-cut",
+            "domain": "themacallan.com",
+            "description": "A series of annual expressions that celebrate The Macallan's ongoing pledge to seek out the remarkable and in doing so create whiskies of unique character.",
+            "extraSnippets": []
+          }
+        ]
+      }
+    ],
+    "errors": []
+  },
+  "metadata": {
+    "cacheKey": "6456b4659759bb9eed9d94eb0cb1d67615f5bd0272020670e9c959929764b8ae",
+    "mode": "auto"
+  }
+}
