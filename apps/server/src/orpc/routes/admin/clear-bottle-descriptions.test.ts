@@ -49,6 +49,7 @@ describe("POST /admin/catalog/clear-bottle-descriptions", () => {
 
     expect(result).toEqual({
       bottleIds: [generated.id],
+      conflicts: [],
       checked: 1,
       remaining: 1,
       nextAfterId: null,
@@ -83,6 +84,7 @@ describe("POST /admin/catalog/clear-bottle-descriptions", () => {
 
     expect(result).toEqual({
       bottleIds: [generated.id],
+      conflicts: [],
       checked: 1,
       remaining: 1,
       nextAfterId: null,
@@ -160,6 +162,7 @@ describe("POST /admin/catalog/clear-bottle-descriptions", () => {
     );
     expect(firstPage).toEqual({
       bottleIds: [first.id],
+      conflicts: [],
       checked: 1,
       remaining: 2,
       nextAfterId: first.id,
@@ -171,10 +174,68 @@ describe("POST /admin/catalog/clear-bottle-descriptions", () => {
     );
     expect(secondPage).toEqual({
       bottleIds: [second.id],
+      conflicts: [],
       checked: 1,
       remaining: 1,
       nextAfterId: null,
     });
+  });
+
+  test("skips a Bottle that duplicates another and reports the pair", async ({
+    fixtures,
+  }) => {
+    const admin = await fixtures.User({ admin: true });
+    const brand = await fixtures.Entity({ kind: "brand" });
+    const original = await fixtures.Bottle({
+      brandId: brand.id,
+      description: "First generated text.",
+      descriptionSrc: "user",
+    });
+    const duplicate = await fixtures.Bottle({
+      brandId: brand.id,
+      description: "A smooth and approachable dram.",
+      descriptionSrc: "generated",
+    });
+    // Old data: two Bottles with the same identity. The save path refuses to
+    // create this pair, so the test copies the identity fields directly.
+    const [identity] = await db
+      .select()
+      .from(bottles)
+      .where(eq(bottles.id, original.id));
+    await db
+      .update(bottles)
+      .set({
+        name: identity!.name,
+        fullName: identity!.fullName,
+        seriesId: identity!.seriesId,
+        edition: identity!.edition,
+        statedAge: identity!.statedAge,
+        noAgeStatement: identity!.noAgeStatement,
+        vintageYear: identity!.vintageYear,
+        bottlingYear: identity!.bottlingYear,
+        releaseYear: identity!.releaseYear,
+        releaseMonth: identity!.releaseMonth,
+        releaseDay: identity!.releaseDay,
+        abv: identity!.abv,
+        singleCask: identity!.singleCask,
+        caskStrength: identity!.caskStrength,
+        caskNumber: identity!.caskNumber,
+        outturn: identity!.outturn,
+      })
+      .where(eq(bottles.id, duplicate.id));
+
+    const result = await routerClient.admin.clearBottleDescriptions(
+      {},
+      { context: { user: admin } },
+    );
+
+    expect(result).toMatchObject({
+      bottleIds: [],
+      conflicts: [{ bottleId: duplicate.id, conflictingBottleId: original.id }],
+    });
+    expect((await descriptions()).get(duplicate.id)?.description).toBe(
+      "A smooth and approachable dram.",
+    );
   });
 
   test("requires administrator access", async ({ fixtures }) => {
