@@ -22,13 +22,8 @@ describe("createOpenAIClient", () => {
     config.AI_GATEWAY_API_KEY = "application-key";
     config.SCRAPER_AI_GATEWAY_API_KEY = "scraper-key";
 
-    const applicationClient = createOpenAIClient({
-      instrumentWithSentry: false,
-    });
-    const scraperClient = createOpenAIClient({
-      instrumentWithSentry: false,
-      workload: "scraper",
-    });
+    const applicationClient = createOpenAIClient();
+    const scraperClient = createOpenAIClient({ workload: "scraper" });
 
     expect(applicationClient.apiKey).toBe("application-key");
     expect(scraperClient.apiKey).toBe("scraper-key");
@@ -40,10 +35,7 @@ describe("createOpenAIClient", () => {
     config.AI_GATEWAY_API_KEY = "application-key";
     config.SCRAPER_AI_GATEWAY_API_KEY = undefined;
 
-    const scraperClient = createOpenAIClient({
-      instrumentWithSentry: false,
-      workload: "scraper",
-    });
+    const scraperClient = createOpenAIClient({ workload: "scraper" });
 
     expect(isAIGatewayConfigured("scraper")).toBe(true);
     expect(scraperClient.apiKey).toBe("application-key");
