@@ -174,6 +174,21 @@ Bottle input. `createOrReuseBottleInTransaction` owns duplicate-safe creation;
 `finalizeCreatedBottle` owns post-commit work. Source code owns its freshness,
 permissions, evidence records, attachment transaction, and history.
 
+### Stale automatic creates
+
+A check can take minutes. While it runs, another check may create the same
+release from slightly different wording, such as a title that drops a cask
+number. An automatic create from an auction lot, store price, or review is
+stale when its proposed Brand gained a Bottle after the check began, the check
+never saw that Bottle, and no populated field conflicts with the proposal under
+the shared field comparison. A stale create makes nothing: the lot stays in
+review, the price proposal stays pending, and the review stays unresolved for a
+moderator. Reusing an exact existing Bottle is never stale. A Brand lock makes
+parallel creates take turns, so only the first can pass.
+`createOrReuseFreshBottleInTransaction` in
+`apps/server/src/lib/unseenSiblingBottle.ts` owns this rule. Photo and tasting
+creates skip it because a person confirms them.
+
 The path is:
 
 1. Keep the source name and available source facts for review.

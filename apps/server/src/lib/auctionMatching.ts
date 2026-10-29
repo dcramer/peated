@@ -28,6 +28,7 @@ import { createBottleCheck } from "./bottleChecks";
 import { findBottleReferenceAssignment } from "./bottleFinder";
 import { BottleAlreadyExistsError } from "./createBottle";
 import { ActiveBottleSelectionError } from "./resolveActiveBottleIds";
+import { StaleBottleCreateError } from "./unseenSiblingBottle";
 
 /** Reuse accepted decisions first; the shared Bottle rules assess new matches and creation. */
 export async function resolveAuctionLot(lotId: number, fingerprint: string) {
@@ -293,7 +294,8 @@ async function applyAuctionLotCheck(
       if (
         !(error instanceof AuctionLotMatchChangedError) &&
         !(error instanceof ActiveBottleSelectionError) &&
-        !(error instanceof BottleAlreadyExistsError)
+        !(error instanceof BottleAlreadyExistsError) &&
+        !(error instanceof StaleBottleCreateError)
       )
         throw error;
     }

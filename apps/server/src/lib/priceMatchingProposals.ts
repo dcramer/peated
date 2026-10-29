@@ -45,10 +45,7 @@ import {
 } from "@peated/server/lib/bottleReferences";
 import type { BottleCreateInput } from "@peated/server/lib/bottleSchemas";
 import { buildClassifierBottleInput } from "@peated/server/lib/classifierDecisionCreateInputs";
-import {
-  createOrReuseBottleInTransaction,
-  finalizeCreatedBottle,
-} from "@peated/server/lib/createBottle";
+import { finalizeCreatedBottle } from "@peated/server/lib/createBottle";
 import { normalizeGtin } from "@peated/server/lib/gtin";
 import {
   recordIncomingBottleDecisionInTransaction,
@@ -72,6 +69,11 @@ import { resolveActiveBottleIds } from "@peated/server/lib/resolveActiveBottleId
 import { resolveStorePriceBottleMatchInTransaction } from "@peated/server/lib/storePriceBottleMatching";
 import { currentStorePriceCondition } from "@peated/server/lib/storePriceValidity";
 import { getAutomationModeratorUser } from "@peated/server/lib/systemUser";
+import {
+  createOrReuseFreshBottleInTransaction,
+  StaleBottleCreateError,
+  type StaleCreateGuard,
+} from "@peated/server/lib/unseenSiblingBottle";
 import type {
   PriceMatchSearchEvidenceSchema,
   StorePriceMatchAutomationAssessment,
@@ -773,6 +775,7 @@ async function createBottleFromStorePriceMatchProposalInTransaction(
     creationSource,
     actor,
     expectedProcessingToken,
+    staleGuard,
   }: {
     proposalId: number;
     bottleInput: BottleCreateInput;
@@ -780,6 +783,7 @@ async function createBottleFromStorePriceMatchProposalInTransaction(
     creationSource: CatalogVerificationCreationSource;
     actor: IncomingBottleDecisionActor;
     expectedProcessingToken?: string;
+    staleGuard?: StaleCreateGuard;
   },
 ) {
   const preflight = await getStorePriceMatchProposalPreflight(tx, proposalId);
@@ -790,11 +794,11 @@ async function createBottleFromStorePriceMatchProposalInTransaction(
   });
 
   const { createResult, bottle: resolvedBottle } =
-    await createOrReuseBottleInTransaction(tx, {
-      creationSource,
-      createdByActorId: writeActor.id,
-      input: bottleInput,
-    });
+    await createOrReuseFreshBottleInTransaction(
+      tx,
+      { creationSource, createdByActorId: writeActor.id, input: bottleInput },
+      staleGuard,
+    );
 
   const proposal = await getStorePriceMatchProposalForReviewInTransaction(tx, {
     proposalId,
@@ -841,6 +845,7 @@ export async function createBottleFromStorePriceMatchProposal(
     creationSource = "price_match_review",
     actor,
     expectedProcessingToken,
+    staleGuard,
   }: {
     proposalId: number;
     bottleInput: BottleCreateInput;
@@ -848,6 +853,8 @@ export async function createBottleFromStorePriceMatchProposal(
     creationSource?: CatalogVerificationCreationSource;
     actor: IncomingBottleDecisionActor;
     expectedProcessingToken?: string;
+    // Automatic creates pass the check's proposal, candidates, and start time.
+    staleGuard?: StaleCreateGuard;
   },
   finalizeBottle: typeof finalizeCreatedBottle = finalizeCreatedBottle,
 ) {
@@ -859,6 +866,7 @@ export async function createBottleFromStorePriceMatchProposal(
       creationSource,
       actor,
       expectedProcessingToken,
+      staleGuard,
     }),
   );
 
@@ -1137,6 +1145,7 @@ export function createStorePriceMatchResolver({
         }
       }
 
+      const classificationStartedAt = new Date();
       const classificationRun = signal
         ? await runReference(classificationInput, { signal })
         : await runReference(classificationInput);
@@ -1303,12 +1312,23 @@ export function createStorePriceMatchResolver({
             creationSource: "price_match_automation",
             actor: await getPeatedSystemActor(),
             expectedProcessingToken: processingToken,
+            staleGuard:
+              classification.decision.action === "create_bottle"
+                ? {
+                    proposedBottle: classification.decision.proposedBottle,
+                    seenBottleIds: candidates.map(({ bottleId }) => bottleId),
+                    checkStartedAt: classificationStartedAt,
+                  }
+                : undefined,
           },
           finalizeBottle,
         );
 
         return await reloadStorePriceMatchProposal(proposal.id);
       } catch (err) {
+        // A stale create stays a pending proposal for a moderator.
+        if (err instanceof StaleBottleCreateError)
+          return await reloadStorePriceMatchProposal(proposal.id);
         logError(err, {
           price: {
             id: price.id,

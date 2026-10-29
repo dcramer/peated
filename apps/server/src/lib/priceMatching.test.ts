@@ -3956,6 +3956,84 @@ describe("priceMatching", () => {
     );
   });
 
+  test("keeps an automatic create pending when an unseen same-Brand Bottle appeared during the check", async ({
+    fixtures,
+  }) => {
+    config.AI_GATEWAY_API_KEY = undefined;
+    await fixtures.User({ username: "dcramer", admin: true, mod: true });
+    const brand = await fixtures.Entity({ name: "Auto Brand", kind: "brand" });
+    const price = await fixtures.StorePrice({
+      bottleId: null,
+      name: "Auto Brand 12 Year Old",
+      imageUrl: null,
+    });
+    classifyBottleReference.mockImplementation(async () => {
+      // Another check creates the same release while this one runs.
+      await fixtures.Bottle({
+        name: "Twelve",
+        brandId: brand.id,
+        statedAge: 12,
+      });
+      return buildMockBottleReferenceClassification({
+        decision: {
+          action: "create_bottle",
+          confidence: 92,
+          rationale: "Web evidence confirms a distinct release.",
+          referenceScope: "global_alias",
+          confidenceBasis: supportiveWebEvidenceConfidenceBasis,
+          suggestedBottleId: null,
+          candidateBottleIds: [],
+          proposedBottle: {
+            name: "12-year-old",
+            series: null,
+            category: "single_malt",
+            edition: null,
+            statedAge: 12,
+            caskStrength: null,
+            singleCask: null,
+            abv: null,
+            vintageYear: null,
+            releaseYear: null,
+            maturation: null,
+            caskNumber: null,
+            outturn: null,
+            brand: { id: brand.id, name: brand.name },
+            distillers: [],
+            bottler: null,
+          },
+        },
+        searchEvidence: [
+          {
+            query: '"Auto Brand" "12 Year Old" official',
+            summary: "The official Auto Brand page confirms the 12 year old.",
+            results: [
+              {
+                title: "Auto Brand 12 Year Old",
+                url: "https://www.autobrand.com/12",
+                domain: "autobrand.com",
+                description:
+                  "The official Auto Brand page confirms the 12 year old.",
+                extraSnippets: [],
+              },
+            ],
+          },
+        ],
+        candidateBottles: [],
+        resolvedEntities: [],
+      });
+    });
+
+    const proposal = await resolveStorePriceMatchProposal(price.id);
+
+    expect(proposal).toMatchObject({
+      status: "pending_review",
+      proposalType: "create_bottle",
+      error: null,
+    });
+    expect(await db.query.bottles.findMany()).toHaveLength(1);
+    expect(finalizeBottle).not.toHaveBeenCalled();
+  });
+
   test("auto creates high-confidence bottles while a retry lease is active", async ({
     fixtures,
   }) => {
