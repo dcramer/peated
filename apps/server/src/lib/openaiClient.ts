@@ -9,7 +9,7 @@ import config from "../config";
 
 export type AIGatewayWorkload = "application" | "scraper";
 
-function getAIGatewayApiKey(workload: AIGatewayWorkload) {
+export function getAIGatewayApiKey(workload: AIGatewayWorkload) {
   return workload === "scraper"
     ? (config.SCRAPER_AI_GATEWAY_API_KEY ?? config.AI_GATEWAY_API_KEY)
     : config.AI_GATEWAY_API_KEY;

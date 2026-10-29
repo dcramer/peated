@@ -88,6 +88,11 @@ long inputs and tool outputs.
   sources split on an event's kind, such as closed and mothballed, the case
   lists each kind. Run it alone with
   `pnpm --filter @peated/server evals -- src/agents/entityAbout/writer.eval.test.ts`.
+- The decision model check, `apps/server/src/lib/decisionModel.eval.test.ts`,
+  also runs with `trigger-evals-scraper`. It only confirms that the model in
+  `DECISION_MODEL` (Jev by default) answers through AI Gateway. A feature that
+  asks a decision model a real question needs its own model check with
+  labeled cases.
 - Ordinary `pnpm test` runs do not call a model.
 
 Exact wording or tool order can be checked when it is the product contract.

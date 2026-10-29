@@ -73,6 +73,7 @@ export default {
     process.env.SCRAPER_AI_GATEWAY_API_KEY?.trim() || undefined,
   SCRAPER_SETUP_MODEL:
     process.env.SCRAPER_SETUP_MODEL?.trim() || "spacexai/grok-4.5",
+  DECISION_MODEL: process.env.DECISION_MODEL?.trim() || "typesafe-ai/jev",
   EXTERNAL_REVIEW_CLIPS_ENABLED:
     externalReviewClipsSetting !== "0" &&
     externalReviewClipsSetting !== "false",
