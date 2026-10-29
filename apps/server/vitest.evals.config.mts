@@ -8,6 +8,7 @@ const packageRoot = fileURLToPath(new URL(".", import.meta.url));
 const workspaceRoot = path.resolve(packageRoot, "../..");
 const AI_ENV_KEYS = [
   "AI_GATEWAY_API_KEY",
+  "DECISION_MODEL",
   "OPENAI_MODEL",
   "SCRAPER_AI_GATEWAY_API_KEY",
   "SCRAPER_SETUP_MODEL",
