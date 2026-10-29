@@ -4,6 +4,7 @@ import { activeBottleWhere } from "@peated/server/lib/activeBottles";
 import { getPeatedSystemActorForDatabase } from "@peated/server/lib/actors";
 import { SystemBottlePatchSchema } from "@peated/server/lib/bottleSchemas";
 import {
+  BottleUpdateConflictError,
   BottleUpdateExpectedBottleStateError,
   bottleUpdateExpectedSelectedBottleState,
   BottleUpdateGraphError,
@@ -53,6 +54,16 @@ export default procedure
       bottleIds: z
         .array(z.number())
         .describe("Bottles cleared, or that would be cleared in a dry run"),
+      conflicts: z
+        .array(
+          z.object({
+            bottleId: z.number(),
+            conflictingBottleId: z.number().nullable(),
+          }),
+        )
+        .describe(
+          "Bottles skipped because they duplicate another Bottle; any edit to them fails until the pair is merged. A dry run cannot find these.",
+        ),
       checked: z.number(),
       remaining: z
         .number()
@@ -85,6 +96,7 @@ export default procedure
     if (input.dryRun) {
       return {
         bottleIds: page.map(({ id }) => id),
+        conflicts: [],
         checked: page.length,
         remaining,
         nextAfterId,
@@ -96,6 +108,10 @@ export default procedure
       descriptionSrc: null,
     });
     const bottleIds: number[] = [];
+    const conflicts: {
+      bottleId: number;
+      conflictingBottleId: number | null;
+    }[] = [];
     for (const bottle of page) {
       let update;
       try {
@@ -146,6 +162,16 @@ export default procedure
         ) {
           continue;
         }
+        // Every Bottle edit rechecks identity, so a Bottle that already
+        // duplicates another cannot change until the pair is merged. It keeps
+        // its description and goes back to the caller for duplicate review.
+        if (error instanceof BottleUpdateConflictError) {
+          conflicts.push({
+            bottleId: bottle.id,
+            conflictingBottleId: error.conflictingBottleId,
+          });
+          continue;
+        }
         throw error;
       }
       if (!update.changed) continue;
@@ -155,6 +181,7 @@ export default procedure
 
     return {
       bottleIds,
+      conflicts,
       checked: page.length,
       remaining,
       nextAfterId,
