@@ -92,6 +92,7 @@
   },
   "dependencies": {
     "@openai/agents": "^0.8.5",
+    "@peated/bot": "workspace:*",
     "@peated/tsconfig": "workspace:*",
     "@sentry/core": "catalog:",
     "openai": "^6.27.0",

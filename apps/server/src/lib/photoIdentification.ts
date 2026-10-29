@@ -283,6 +283,7 @@ export type PhotoIdentificationProgress =
   | { type: "candidates"; candidates: BottleCandidate[] }
   | { type: "step"; step: PhotoIdentificationStep };
 
+const WEB_TOOLS = new Set(["web_search", "read_page", "find_in_page"]);
 const PEATED_LOOKUP_TOOLS = new Set([
   "search_bottles",
   "search_entities",
@@ -300,7 +301,7 @@ function toPhotoIdentificationProgress(
   if (PEATED_LOOKUP_TOOLS.has(event.name)) {
     return { type: "step", step: "checking_peated" };
   }
-  if (event.name.startsWith("firecrawl_")) {
+  if (WEB_TOOLS.has(event.name)) {
     return { type: "step", step: "checking_web" };
   }
   return { type: "step", step: "comparing" };

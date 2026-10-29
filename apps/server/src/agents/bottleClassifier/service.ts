@@ -26,6 +26,7 @@ import {
   withSentryConversation,
   type AIGatewayWorkload,
 } from "@peated/server/lib/openaiClient";
+import { createServerPeatedBot } from "@peated/server/lib/peatedBot";
 import { absoluteUrl } from "@peated/server/lib/urls";
 import { randomUUID } from "node:crypto";
 import {
@@ -94,6 +95,11 @@ export function getBottleClassifier(
   }
 
   const client = createOpenAIClient({ workload });
+  // Scraper-driven classification spends the scraper's Firecrawl credits.
+  const firecrawlApiKey =
+    workload === "scraper"
+      ? (config.SCRAPER_FIRECRAWL_API_KEY ?? config.FIRECRAWL_API_KEY)
+      : config.FIRECRAWL_API_KEY;
 
   const bottleClassifier = createBottleClassifier({
     client,
@@ -103,11 +109,7 @@ export function getBottleClassifier(
     imageExtractionReasoningEffort:
       config.OPENAI_IMAGE_EXTRACTION_REASONING_EFFORT,
     maxSearchQueries: config.BOTTLE_CLASSIFIER_MAX_SEARCH_QUERIES,
-    firecrawlApiKey:
-      workload === "scraper"
-        ? (config.SCRAPER_FIRECRAWL_API_KEY ?? config.FIRECRAWL_API_KEY)
-        : config.FIRECRAWL_API_KEY,
-    firecrawlApiUrl: config.FIRECRAWL_API_URL,
+    web: firecrawlApiKey ? createServerPeatedBot({ firecrawlApiKey }) : null,
     adapters: {
       findInitialCandidates: async ({ reference, extractedIdentity }) =>
         await findBottleReferenceCandidates(

@@ -13,6 +13,17 @@ import {
   prepareBottleAuditAgentRun,
   prepareBottleClassifierAgentRun,
 } from "./classifierRuntime";
+import type { BottleClassifierWeb } from "./tools";
+
+// A web connection the tests never reach: their executors answer every call.
+const TEST_WEB: BottleClassifierWeb = {
+  readPage: async () => {
+    throw new Error("Tests answer page reads through executeWebSearch.");
+  },
+  searchWeb: async () => {
+    throw new Error("Tests answer searches through executeWebSearch.");
+  },
+};
 
 type PreparedRun =
   | Awaited<ReturnType<typeof prepareBottleClassifierAgentRun>>
@@ -237,7 +248,7 @@ describe("Bottle-check context tools", () => {
         client: testClient,
         model: "test-model",
         maxSearchQueries: 1,
-        firecrawlApiKey: "firecrawl-test-key",
+        web: TEST_WEB,
         executeWebSearch: async () => ({
           evidence: [
             {
@@ -273,7 +284,7 @@ describe("Bottle-check context tools", () => {
       },
     );
 
-    await invokePreparedTool(prepared, "firecrawl_web_search", {
+    await invokePreparedTool(prepared, "web_search", {
       queries: ["Laphroaig brand"],
     });
 
@@ -478,9 +489,9 @@ describe("Bottle-check context tools", () => {
         client: testClient,
         model: "test-model",
         maxSearchQueries: 2,
-        firecrawlApiKey: "firecrawl-test-key",
+        web: TEST_WEB,
         executeWebSearch: async ({ toolName, args }) => {
-          expect(toolName).toBe("firecrawl_web_search");
+          expect(toolName).toBe("web_search");
           if (!("queries" in args)) {
             throw new Error("Expected Firecrawl search arguments");
           }
@@ -522,7 +533,7 @@ describe("Bottle-check context tools", () => {
     await invokePreparedTool(prepared, "get_bottle_context", {
       bottleId: canonical.bottleId,
     });
-    await invokePreparedTool(prepared, "firecrawl_web_search", {
+    await invokePreparedTool(prepared, "web_search", {
       queries: ["Laphroaig Cairdeas Warehouse 1 2022 official"],
     });
     events.push("web_result");

@@ -24,6 +24,7 @@ import {
   type BottleClassificationArtifacts,
 } from "./contract";
 import { buildBottleCandidate } from "./evalFixtureBuilders";
+import { buildPageOpeningEvidence, type BottleClassifierWeb } from "./tools";
 
 function nativeAgentResult({
   finalOutput,
@@ -102,6 +103,16 @@ const supportiveWebEvidenceConfidenceBasis = {
   BottleClassifierAgentDecisionInput["confidenceBasis"]
 >;
 
+// A web connection the tests never reach: their executors answer every call.
+const TEST_WEB: BottleClassifierWeb = {
+  readPage: async () => {
+    throw new Error("Tests answer page reads through executeWebSearch.");
+  },
+  searchWeb: async () => {
+    throw new Error("Tests answer searches through executeWebSearch.");
+  },
+};
+
 // Keep this file focused on deterministic classifier boundary behavior.
 // Real-bottle workflow regressions belong in the fixture-driven eval corpus,
 // not in additional mocked classifier behavior tests here.
@@ -113,7 +124,7 @@ function createTestClassifier({
   extractFromText,
   extractFromImageError,
   maxSearchQueries = 2,
-  firecrawlApiKey,
+  web,
   searchBottles = vi.fn(async (): Promise<BottleCandidate[]> => []),
   searchEntities,
   getBottleCandidateById,
@@ -132,7 +143,7 @@ function createTestClassifier({
   extractFromText?: (label: string) => Promise<BottleExtractedDetails | null>;
   extractFromImageError?: Error | null;
   maxSearchQueries?: number;
-  firecrawlApiKey?: string;
+  web?: BottleClassifierWeb;
   searchBottles?: ReturnType<
     typeof vi.fn<
       (args: BottleCandidateSearchInput) => Promise<BottleCandidate[]>
@@ -159,7 +170,7 @@ function createTestClassifier({
       client,
       model: "test-model",
       maxSearchQueries,
-      firecrawlApiKey,
+      web,
       initialSearchEvidence,
       executeWebSearch,
       observeToolEvent,
@@ -990,13 +1001,13 @@ describe("createBottleClassifier", () => {
     expect(preparedRun.runner.config.tracingDisabled).toBe(true);
   });
 
-  test("exposes Firecrawl search and page reading when configured", async () => {
+  test("exposes web search, page reading, and find-in-page when configured", async () => {
     const preparedRun = await prepareBottleClassifierAgentRun(
       {
         client: TEST_OPENAI_CLIENT,
         model: "test-model",
         maxSearchQueries: 2,
-        firecrawlApiKey: "firecrawl-test-key",
+        web: TEST_WEB,
         adapters: {
           searchBottles: vi.fn(async () => []),
         },
@@ -1012,11 +1023,11 @@ describe("createBottleClassifier", () => {
 
     const toolNames = preparedRun.agent.tools.map((tool) => tool.name);
 
-    expect(toolNames).toContain("firecrawl_web_search");
-    expect(toolNames).toContain("firecrawl_read_page");
+    expect(toolNames).toContain("web_search");
+    expect(toolNames).toContain("read_page");
   });
 
-  test("does not expose a web-search substitute without Firecrawl", async () => {
+  test("does not expose web tools without a web connection", async () => {
     const preparedRun = await prepareBottleClassifierAgentRun(
       {
         client: TEST_OPENAI_CLIENT,
@@ -1037,11 +1048,11 @@ describe("createBottleClassifier", () => {
 
     const toolNames = preparedRun.agent.tools.map((tool) => tool.name);
 
-    expect(toolNames).not.toContain("firecrawl_web_search");
-    expect(toolNames).not.toContain("firecrawl_read_page");
+    expect(toolNames).not.toContain("web_search");
+    expect(toolNames).not.toContain("read_page");
   });
 
-  test("rebuilds search artifacts from batched Firecrawl tool output", async () => {
+  test("rebuilds search artifacts from batched web search output", async () => {
     const preparedRun = await prepareBottleClassifierAgentRun(
       {
         client: TEST_OPENAI_CLIENT,
@@ -1089,7 +1100,7 @@ describe("createBottleClassifier", () => {
           type: "tool_call_output_item",
           rawItem: {
             type: "function_call_result",
-            name: "firecrawl_web_search",
+            name: "web_search",
             output: JSON.stringify({
               evidence: [webSearchEvidence],
               errors: [],
@@ -1967,9 +1978,9 @@ describe("createBottleClassifier", () => {
   });
 
   test.each([
-    { label: "without Firecrawl", firecrawlApiKey: undefined },
-    { label: "with Firecrawl", firecrawlApiKey: "firecrawl-test-key" },
-  ])("does not preload web evidence $label", async ({ firecrawlApiKey }) => {
+    { label: "without web tools", web: undefined },
+    { label: "with web tools", web: TEST_WEB },
+  ])("does not preload web evidence $label", async ({ web }) => {
     const executeWebSearch = vi.fn();
     const toolEvents: BottleClassifierToolEvent[] = [];
     const runBottleClassifierAgent = vi.fn(
@@ -1998,7 +2009,7 @@ describe("createBottleClassifier", () => {
     const { classifier } = createTestClassifier({
       extractedIdentity: null,
       maxSearchQueries: 1,
-      firecrawlApiKey,
+      web,
       runBottleClassifierAgent,
       executeWebSearch,
       observeToolEvent: (event) => toolEvents.push(event),
@@ -2017,11 +2028,14 @@ describe("createBottleClassifier", () => {
   });
 
   test("reads the source page before a title-only deterministic creation", async () => {
-    const pageEvidence = createReliableSearchEvidence({
-      query: "Exact source page",
-      summary: "The exact Bottle is 12 years old and bottled at 46% ABV.",
-    });
-    const executeWebSearch = vi.fn(async () => pageEvidence);
+    const page = {
+      url: "https://smws.example/appley-ever-after",
+      title: "Appley ever after",
+      description: null,
+      text: "The exact Bottle is 12 years old and bottled at 46% ABV.",
+    };
+    const pageEvidence = buildPageOpeningEvidence(page);
+    const executeWebSearch = vi.fn(async () => ({ page }));
     const toolEvents: BottleClassifierToolEvent[] = [];
     const runBottleClassifierAgent = vi.fn(
       async ({ searchEvidence, webSearchBudget }): Promise<ReasoningResult> => {
@@ -2040,7 +2054,7 @@ describe("createBottleClassifier", () => {
     );
     const { classifier } = createTestClassifier({
       extractedIdentity: null,
-      firecrawlApiKey: "firecrawl-test-key",
+      web: TEST_WEB,
       runBottleClassifierAgent,
       executeWebSearch,
       observeToolEvent: (event) => toolEvents.push(event),
@@ -2055,7 +2069,7 @@ describe("createBottleClassifier", () => {
 
     expect(executeWebSearch).toHaveBeenCalledWith(
       expect.objectContaining({
-        toolName: "firecrawl_read_page",
+        toolName: "read_page",
         args: expect.objectContaining({
           url: "https://smws.example/appley-ever-after",
         }),
@@ -2067,12 +2081,12 @@ describe("createBottleClassifier", () => {
       {
         type: "tool_call",
         phase: "preparation",
-        name: "firecrawl_read_page",
+        name: "read_page",
       },
       {
         type: "tool_result",
         phase: "preparation",
-        name: "firecrawl_read_page",
+        name: "read_page",
       },
     ]);
     expect(runBottleClassifierAgent).toHaveBeenCalledOnce();
@@ -2101,7 +2115,7 @@ describe("createBottleClassifier", () => {
     );
     const { classifier } = createTestClassifier({
       extractedIdentity: null,
-      firecrawlApiKey: "firecrawl-test-key",
+      web: TEST_WEB,
       runBottleClassifierAgent,
       executeWebSearch,
       observeToolEvent: (event) => toolEvents.push(event),
@@ -2120,7 +2134,7 @@ describe("createBottleClassifier", () => {
     expect(toolEvents[1]).toMatchObject({
       type: "tool_result",
       phase: "preparation",
-      name: "firecrawl_read_page",
+      name: "read_page",
       result: { error: "temporary source-page failure" },
     });
   });
@@ -2139,7 +2153,7 @@ describe("createBottleClassifier", () => {
       }),
     );
     const { classifier } = createTestClassifier({
-      firecrawlApiKey: "firecrawl-test-key",
+      web: TEST_WEB,
       runBottleClassifierAgent,
       executeWebSearch,
     });

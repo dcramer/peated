@@ -8,7 +8,7 @@ describe("web-search eval replay integrity", () => {
   test("accepts successful evidence recordings", () => {
     const recording = {
       writtenAt: "2026-08-01T00:00:00.000Z",
-      toolName: "firecrawl_web_search",
+      toolName: "web_search",
       input: { queries: ["Talisker 2001 Distillers Edition"] },
       output: {
         evidence: [
@@ -55,7 +55,7 @@ describe("web-search eval replay integrity", () => {
     expect(() =>
       sanitizeWebSearchRecording({
         writtenAt: "2026-08-01T00:00:00.000Z",
-        toolName: "firecrawl_web_search",
+        toolName: "web_search",
         input: { queries: ["Talisker 2001 Distillers Edition"] },
         error: { message: "Connection error.", type: "FirecrawlError" },
       }),

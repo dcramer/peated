@@ -1,3 +1,4 @@
+import { z } from "zod";
 import {
   fetchPublicUrl,
   hasNonPublicLiteralAddress,
@@ -25,6 +26,20 @@ const MAX_REDIRECTS = 5;
 const DEFAULT_TIMEOUT_MS = 20_000;
 const DEFAULT_MAX_BYTES = 5 * 1024 * 1024;
 const DEFAULT_SEARCH_LIMIT = 8;
+// Repeat reads of one page within an hour reuse the first read instead of
+// spending another Firecrawl credit. Very large pages are not cached.
+const PAGE_CACHE_MS = 60 * 60_000;
+const PAGE_CACHE_MAX_CHARS = 1_000_000;
+
+const PageReadOkSchema = z.object({
+  status: z.literal("ok"),
+  url: z.string(),
+  title: z.string().nullable(),
+  description: z.string().nullable(),
+  publishedTime: z.string().nullable(),
+  content: z.string(),
+  route: z.enum(["direct", "firecrawl"]),
+});
 
 /**
  * `markdown` returns a page's main text, read through Firecrawl. `html`
@@ -39,6 +54,8 @@ export type PageRead =
       /** The page that was read, after redirects. */
       url: string;
       title: string | null;
+      /** The page's summary from its metadata, when Firecrawl reports one. */
+      description: string | null;
       /** The page's published date or time, when Firecrawl reports one. */
       publishedTime: string | null;
       content: string;
@@ -195,6 +212,20 @@ function robotsText(body: string) {
 
 function robotsCacheKey(origin: string) {
   return `peatedbot:robots:${origin}`;
+}
+
+function pageCacheKey(format: PageFormat, url: URL) {
+  return `peatedbot:page:${format}:${url.href}`;
+}
+
+/** A damaged cache entry reads as missing and is fetched again. */
+function parseCached<T>(value: string, schema: z.ZodType<T>): T | null {
+  try {
+    const parsed = schema.safeParse(JSON.parse(value));
+    return parsed.success ? parsed.data : null;
+  } catch {
+    return null;
+  }
 }
 
 /**
@@ -357,18 +388,16 @@ export function createPeatedBot({
     return "unavailable";
   }
 
+  async function getCachedPage(key: string) {
+    const cached = await cache.get(key);
+    if (cached === null) return null;
+    return parseCached(cached, PageReadOkSchema);
+  }
+
   async function getCachedRobotsRules(origin: string) {
     const cached = await cache.get(robotsCacheKey(origin));
     if (cached === null) return null;
-    let value: unknown;
-    try {
-      value = JSON.parse(cached);
-    } catch {
-      // A damaged cache entry is treated as missing and fetched again.
-      return null;
-    }
-    const parsed = RobotsRulesSchema.safeParse(value);
-    return parsed.success ? parsed.data : null;
+    return parseCached(cached, RobotsRulesSchema);
   }
 
   /** Returns a refusal, or null when robots.txt allows reading `url`. */
@@ -475,6 +504,7 @@ export function createPeatedBot({
       status: "ok",
       url: finalUrl.href,
       title: page.title,
+      description: page.description,
       publishedTime: page.publishedTime,
       content: page.content,
       route: "firecrawl",
@@ -494,6 +524,7 @@ export function createPeatedBot({
           status: "ok",
           url: outcome.url.href,
           title: null,
+          description: null,
           publishedTime: null,
           content: outcome.body,
           route: "direct",
@@ -558,9 +589,18 @@ export function createPeatedBot({
     const refusal = await checkRobots(url, site);
     if (refusal) return refusal;
 
-    if (format === "markdown") return await readWithFirecrawl(url, format);
-    if (site.blocked) return await readWithFirecrawl(url, format);
-    return await readDirect(url);
+    const cacheKey = pageCacheKey(format, url);
+    const cached = await getCachedPage(cacheKey);
+    if (cached) return cached;
+
+    const page =
+      format === "markdown" || site.blocked
+        ? await readWithFirecrawl(url, format)
+        : await readDirect(url);
+    if (page.status === "ok" && page.content.length <= PAGE_CACHE_MAX_CHARS) {
+      await cache.set(cacheKey, JSON.stringify(page), PAGE_CACHE_MS);
+    }
+    return page;
   }
 
   /** Searches the web. Results are links only; read a page to use it. */

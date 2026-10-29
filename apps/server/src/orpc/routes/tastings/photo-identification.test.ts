@@ -617,12 +617,12 @@ describe("POST /tastings/photo-identification", () => {
       });
       options?.onProgress?.({
         type: "tool",
-        name: "firecrawl_web_search",
+        name: "web_search",
         status: "started",
       });
       options?.onProgress?.({
         type: "tool",
-        name: "firecrawl_web_search",
+        name: "web_search",
         status: "finished",
       });
       return { result: classification, modelMetadata: null };

@@ -115,6 +115,7 @@ describe("readPage", () => {
       status: "ok",
       url: "https://shop.example/a",
       title: null,
+      description: null,
       publishedTime: null,
       content: "<html>A</html>",
       route: "direct",
@@ -365,6 +366,7 @@ describe("readPage", () => {
       status: "ok",
       url: "https://shop.example/page",
       title: "T",
+      description: null,
       publishedTime: "2026-09-01T10:00:00Z",
       content: "# Page",
       route: "firecrawl",
@@ -421,6 +423,31 @@ describe("readPage", () => {
       reason: "blocked",
       httpStatus: 403,
     });
+  });
+
+  test("reuses a page read for an hour instead of reading it again", async () => {
+    const { readPage, clock, firecrawlBodies } = setup({
+      "https://shop.example/robots.txt": text("User-agent: *\nAllow: /"),
+      scrape: firecrawlPage({
+        url: "https://shop.example/page",
+        content: "# Page",
+        format: "markdown",
+      }),
+    });
+    const read = () =>
+      readPage({ url: "https://shop.example/page", format: "markdown" });
+
+    await read();
+    clock.now = new Date(NOW.getTime() + 59 * 60_000);
+    await expect(read()).resolves.toMatchObject({
+      status: "ok",
+      content: "# Page",
+    });
+    expect(await firecrawlBodies("scrape")).toHaveLength(1);
+
+    clock.now = new Date(NOW.getTime() + 61 * 60_000);
+    await read();
+    expect(await firecrawlBodies("scrape")).toHaveLength(2);
   });
 
   test("refuses private addresses and addresses with credentials without a request", async () => {

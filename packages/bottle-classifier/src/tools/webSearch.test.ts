@@ -1,34 +1,71 @@
 import { RunContext } from "@openai/agents";
+import type { PageRead, WebSearch } from "@peated/bot";
 import { describe, expect, test, vi } from "vitest";
-import { z } from "zod";
-import {
-  createFirecrawlReadPageTool,
-  extractFirecrawlPageEvidence,
-  runFirecrawlReadPage,
-} from "./firecrawlReadPage";
-import {
-  createFirecrawlWebSearchTool,
-  extractFirecrawlSearchEvidence,
-  runFirecrawlWebSearch,
-} from "./firecrawlWebSearch";
+import { createReadPageTools } from "./readPage";
 import {
   buildBottleSearchEvidence,
   createBottleWebSearchBudget,
+  type BottleClassifierWeb,
   type BottleWebSearchExecutor,
 } from "./sharedWebSearch";
+import { createWebSearchTool, runWebSearch } from "./webSearch";
 
 const runContext = new RunContext();
-const FirecrawlSearchRequestSchema = z.object({
-  query: z.string(),
-  limit: z.number(),
-  sources: z.array(z.string()),
-});
-const FirecrawlScrapeRequestSchema = z.object({
-  formats: z.array(z.object({ type: z.string(), query: z.string() })),
-  proxy: z.string(),
-});
 
-describe("bottleClassifier web search tool", () => {
+/** A fake PeatedBot that answers from fixed pages and search results. */
+function createWeb({
+  pages = {},
+  search = () => ({ status: "ok", results: [] }),
+}: {
+  pages?: Record<string, PageRead>;
+  search?: (query: string) => WebSearch;
+} = {}) {
+  const reads: string[] = [];
+  const searches: Array<{ query: string; limit?: number }> = [];
+  const web: BottleClassifierWeb = {
+    readPage: async ({ url }) => {
+      reads.push(url);
+      return (
+        pages[url] ?? {
+          status: "failed",
+          url,
+          reason: "not_found",
+          httpStatus: 404,
+        }
+      );
+    },
+    searchWeb: async (input) => {
+      searches.push(input);
+      return search(input.query);
+    },
+  };
+  return { web, reads, searches };
+}
+
+function okPage(url: string, content: string, title = "Page"): PageRead {
+  return {
+    status: "ok",
+    url,
+    title,
+    description: "A product page.",
+    publishedTime: null,
+    content,
+    route: "firecrawl",
+  };
+}
+
+function searchResults(...urls: string[]): WebSearch {
+  return {
+    status: "ok",
+    results: urls.map((url) => ({
+      url,
+      title: `Result for ${url}`,
+      description: `Evidence at ${url}`,
+    })),
+  };
+}
+
+describe("web_search", () => {
   test("removes tracking parameters from collected evidence URLs", () => {
     const evidence = buildBottleSearchEvidence({
       provider: "firecrawl",
@@ -48,33 +85,26 @@ describe("bottleClassifier web search tool", () => {
     expect(evidence.results[0]?.url).toBe("https://example.com/bottle");
   });
 
-  test("keeps Firecrawl search results compact until a page is selected", () => {
-    const evidence = extractFirecrawlSearchEvidence(
-      "example distillery private cask",
-      {
-        success: true,
-        data: {
-          web: [
-            {
-              title: "Example Private Cask Review",
-              url: "https://www.whiskyadvocate.com/example-private-cask-review",
-              description:
-                "Whisky Advocate reviews Example Distillery Private Cask.",
-              markdown:
-                "# Example Private Cask\n\nA single cask bottling at 57.1% ABV.",
-            },
-          ],
-        },
-      },
-    );
+  test("searches through PeatedBot and keeps results compact", async () => {
+    const { web, searches } = createWeb({
+      search: () =>
+        searchResults("https://www.whiskyadvocate.com/example-private-cask"),
+    });
 
+    const evidence = await runWebSearch({
+      web,
+      query: "example distillery private cask",
+    });
+
+    expect(searches).toEqual([
+      { query: "example distillery private cask", limit: 8 },
+    ]);
     expect(evidence).toMatchObject({
       provider: "firecrawl",
       query: "example distillery private cask",
-      summary: expect.stringContaining("Whisky Advocate reviews"),
+      summary: expect.stringContaining("Evidence at"),
       results: [
         expect.objectContaining({
-          title: "Example Private Cask Review",
           domain: "whiskyadvocate.com",
           extraSnippets: [],
         }),
@@ -82,61 +112,21 @@ describe("bottleClassifier web search tool", () => {
     });
   });
 
-  test("runs Firecrawl search against the v2 search endpoint", async () => {
-    const fetch = vi.fn().mockResolvedValue({
-      ok: true,
-      json: async () => ({
-        success: true,
-        data: {
-          web: [
-            {
-              title: "Example Private Cask Review",
-              url: "https://www.whiskyadvocate.com/example-private-cask-review",
-              description:
-                "Whisky Advocate reviews Example Distillery Private Cask.",
-              markdown: "Example Distillery Private Cask is 57.1% ABV.",
-            },
-          ],
-        },
+  test("reports a failed search as an error, not empty evidence", async () => {
+    const { web } = createWeb({
+      search: () => ({
+        status: "failed",
+        reason: "service_unavailable",
+        httpStatus: 402,
       }),
     });
-    vi.stubGlobal("fetch", fetch);
 
-    try {
-      const evidence = await runFirecrawlWebSearch({
-        apiKey: "firecrawl-test-key",
-        query: "example distillery private cask",
-      });
-
-      expect(fetch).toHaveBeenCalledTimes(1);
-      expect(fetch).toHaveBeenCalledWith(
-        new URL("https://api.firecrawl.dev/v2/search"),
-        expect.objectContaining({
-          method: "POST",
-          headers: expect.objectContaining({
-            Authorization: "Bearer firecrawl-test-key",
-          }),
-          body: expect.stringContaining("example distillery private cask"),
-        }),
-      );
-      const searchBody = FirecrawlSearchRequestSchema.parse(
-        JSON.parse(String(fetch.mock.calls[0]?.[1]?.body)),
-      );
-      expect(searchBody).toEqual({
-        query: "example distillery private cask",
-        limit: 8,
-        sources: ["web"],
-      });
-      expect("error" in evidence).toBe(false);
-      if ("error" in evidence) return;
-      expect(evidence.results).toHaveLength(1);
-      expect(evidence.summary).toContain("Whisky Advocate reviews");
-    } finally {
-      vi.unstubAllGlobals();
-    }
+    await expect(runWebSearch({ web, query: "q" })).resolves.toEqual({
+      error: "Web search failed (402)",
+    });
   });
 
-  test("replays Firecrawl through the shared execution boundary", async () => {
+  test("replays searches through the shared execution boundary", async () => {
     const evidence = buildBottleSearchEvidence({
       provider: "firecrawl",
       query: "laphroaig cairdeas 2022 warehouse 1",
@@ -156,8 +146,8 @@ describe("bottleClassifier web search tool", () => {
       errors: [],
     }));
     const onEvidence = vi.fn();
-    const tool = createFirecrawlWebSearchTool({
-      apiKey: "firecrawl-test-key",
+    const tool = createWebSearchTool({
+      web: createWeb().web,
       budget: createBottleWebSearchBudget(1),
       executeWebSearch,
       onEvidence,
@@ -165,14 +155,12 @@ describe("bottleClassifier web search tool", () => {
 
     await tool.invoke(
       runContext,
-      JSON.stringify({
-        queries: ["laphroaig cairdeas 2022 warehouse 1"],
-      }),
+      JSON.stringify({ queries: ["laphroaig cairdeas 2022 warehouse 1"] }),
     );
 
     expect(executeWebSearch).toHaveBeenCalledWith(
       expect.objectContaining({
-        toolName: "firecrawl_web_search",
+        toolName: "web_search",
         args: { queries: ["laphroaig cairdeas 2022 warehouse 1"] },
         execute: expect.any(Function),
       }),
@@ -181,268 +169,54 @@ describe("bottleClassifier web search tool", () => {
     expect(onEvidence).toHaveBeenCalledWith(evidence);
   });
 
-  test("charges Firecrawl calls against the search-query budget", async () => {
-    const evidence = buildBottleSearchEvidence({
-      provider: "firecrawl",
-      query: "laphroaig cairdeas 2022 warehouse 1",
-      summary: "Laphroaig confirms the Warehouse 1 release.",
-      results: [],
+  test("charges searches against the search-query budget, once", async () => {
+    const { web, searches } = createWeb({
+      search: () => searchResults("https://www.laphroaig.com/cairdeas"),
     });
-    const executeWebSearch: BottleWebSearchExecutor = vi.fn(async () => ({
-      evidence: [evidence],
-      errors: [],
-    }));
-    const tool = createFirecrawlWebSearchTool({
-      apiKey: "firecrawl-test-key",
+    const tool = createWebSearchTool({
+      web,
       budget: createBottleWebSearchBudget(1),
-      executeWebSearch,
-    });
-    const args = JSON.stringify({
-      queries: ["laphroaig cairdeas 2022 warehouse 1"],
-    });
-
-    await tool.invoke(runContext, args);
-    await expect(tool.invoke(runContext, args)).resolves.toEqual({
-      error: "Web search budget exhausted after 1 query",
-    });
-    expect(executeWebSearch).toHaveBeenCalledOnce();
-  });
-
-  test("does not double-charge when a custom executor delegates live", async () => {
-    const fetch = vi.fn().mockResolvedValue({
-      ok: true,
-      json: async () => ({
-        success: true,
-        data: {
-          web: [
-            {
-              title: "Càirdeas 2022 Warehouse 1 Whisky",
-              url: "https://www.laphroaig.com/whiskies/cairdeas-2022-warehouse-1-whisky",
-              description: "Laphroaig confirms the Warehouse 1 release.",
-            },
-          ],
-        },
-      }),
-    });
-    vi.stubGlobal("fetch", fetch);
-
-    try {
-      const tool = createFirecrawlWebSearchTool({
-        apiKey: "firecrawl-test-key",
-        budget: createBottleWebSearchBudget(1),
-        executeWebSearch: async ({ execute }) => await execute(),
-      });
-
-      await tool.invoke(
-        runContext,
-        JSON.stringify({ queries: ["laphroaig cairdeas warehouse 1"] }),
-      );
-
-      expect(fetch).toHaveBeenCalledOnce();
-      await expect(
-        tool.invoke(
-          runContext,
-          JSON.stringify({
-            queries: ["laphroaig cairdeas warehouse 1 again"],
-          }),
-        ),
-      ).resolves.toEqual({
-        error: "Web search budget exhausted after 1 query",
-      });
-    } finally {
-      vi.unstubAllGlobals();
-    }
-  });
-
-  test("runs up to two focused searches in one tool turn", async () => {
-    const fetch = vi
-      .fn()
-      .mockImplementation(async (_url, init: RequestInit) => {
-        const requestBody = z.string().parse(init.body);
-        const body = z
-          .object({ query: z.string() })
-          .parse(JSON.parse(requestBody));
-        return {
-          ok: true,
-          json: async () => ({
-            success: true,
-            data: {
-              web: [
-                {
-                  title: body.query,
-                  url: `https://example.com/${encodeURIComponent(body.query)}`,
-                  description: `Evidence for ${body.query}`,
-                },
-              ],
-            },
-          }),
-        };
-      });
-    vi.stubGlobal("fetch", fetch);
-
-    try {
-      const tool = createFirecrawlWebSearchTool({
-        apiKey: "firecrawl-test-key",
-        budget: createBottleWebSearchBudget(2),
-      });
-      const result = await tool.invoke(
-        runContext,
-        JSON.stringify({
-          queries: ["example cask 71", "example single cask 2019"],
-        }),
-      );
-
-      expect(fetch).toHaveBeenCalledTimes(2);
-      expect(result).toMatchObject({
-        evidence: [
-          { query: "example cask 71" },
-          { query: "example single cask 2019" },
-        ],
-        errors: [],
-      });
-    } finally {
-      vi.unstubAllGlobals();
-    }
-  });
-
-  test("reads a promising Firecrawl result with a focused page excerpt", async () => {
-    const pageUrl = "https://example.com/pokeno-cask-71";
-    const fetch = vi.fn().mockResolvedValue({
-      ok: true,
-      json: async () => ({
-        success: true,
-        data: {
-          highlights:
-            "Cask No. 71 was distilled in 2019 and bottled at 55.8% ABV.",
-          metadata: {
-            title: "Pōkeno Cask No. 71",
-            description: "A single-cask Pōkeno release.",
-          },
-        },
-      }),
-    });
-    vi.stubGlobal("fetch", fetch);
-
-    try {
-      const evidence = await runFirecrawlReadPage({
-        apiKey: "firecrawl-test-key",
-        url: pageUrl,
-        focus: "Cask No. 71 vintage and ABV",
-      });
-
-      expect(fetch).toHaveBeenCalledWith(
-        new URL("https://api.firecrawl.dev/v2/scrape"),
-        expect.objectContaining({
-          method: "POST",
-          body: expect.stringContaining(pageUrl),
-        }),
-      );
-      const scrapeBody = FirecrawlScrapeRequestSchema.parse(
-        JSON.parse(String(fetch.mock.calls[0]?.[1]?.body)),
-      );
-      expect(scrapeBody.formats).toEqual([
-        {
-          type: "highlights",
-          query: "Cask No. 71 vintage and ABV",
-        },
-      ]);
-      expect(scrapeBody.proxy).toBe("auto");
-      expect(evidence).toMatchObject({
-        provider: "firecrawl",
-        query: "Cask No. 71 vintage and ABV",
-        summary: expect.stringContaining("distilled in 2019"),
-        results: [expect.objectContaining({ url: pageUrl })],
-      });
-    } finally {
-      vi.unstubAllGlobals();
-    }
-  });
-
-  test("replays and hydrates a Firecrawl page read", async () => {
-    const pageUrl = "https://example.com/release";
-    const evidence = extractFirecrawlPageEvidence(pageUrl, "exact edition", {
-      success: true,
-      data: {
-        markdown: "The exact marketed edition is Release No. 2.",
-        metadata: { title: "Release No. 2" },
-      },
-    });
-    const executeWebSearch: BottleWebSearchExecutor = vi.fn(
-      async () => evidence,
-    );
-    const onEvidence = vi.fn();
-    const tool = createFirecrawlReadPageTool({
-      apiKey: "firecrawl-test-key",
-      budget: createBottleWebSearchBudget(1),
-      executeWebSearch,
-      onEvidence,
+      executeWebSearch: async ({ execute }) => await execute(),
     });
 
     await tool.invoke(
       runContext,
-      JSON.stringify({ url: pageUrl, focus: "exact edition" }),
+      JSON.stringify({ queries: ["laphroaig cairdeas warehouse 1"] }),
     );
-
-    expect(executeWebSearch).toHaveBeenCalledWith(
-      expect.objectContaining({
-        toolName: "firecrawl_read_page",
-        args: { url: pageUrl, focus: "exact edition" },
-        execute: expect.any(Function),
-      }),
-    );
-    expect(onEvidence).toHaveBeenCalledWith(evidence);
+    await expect(
+      tool.invoke(
+        runContext,
+        JSON.stringify({ queries: ["laphroaig cairdeas warehouse 1 again"] }),
+      ),
+    ).resolves.toEqual({ error: "Web search budget exhausted after 1 query" });
+    expect(searches).toHaveLength(1);
   });
 
-  test("reserves a page read after the search-query budget is spent", async () => {
-    const budget = createBottleWebSearchBudget(1);
-    const searchExecutor = vi.fn(async () => ({ evidence: [], errors: [] }));
-    const readExecutor = vi.fn(async ({ args }) =>
-      extractFirecrawlPageEvidence(
-        "url" in args ? args.url : "https://example.com/bottle",
-        "focus" in args ? args.focus : "identity",
-        {
-          success: true,
-          data: { markdown: "The bottle is 52.9% ABV." },
-        },
-      ),
-    );
-    const searchTool = createFirecrawlWebSearchTool({
-      apiKey: "firecrawl-test-key",
-      budget,
-      executeWebSearch: searchExecutor,
+  test("runs up to two focused searches in one tool turn", async () => {
+    const { web, searches } = createWeb({
+      search: (query) =>
+        searchResults(`https://example.com/${encodeURIComponent(query)}`),
     });
-    const readTool = createFirecrawlReadPageTool({
-      apiKey: "firecrawl-test-key",
-      budget,
-      executeWebSearch: readExecutor,
+    const tool = createWebSearchTool({
+      web,
+      budget: createBottleWebSearchBudget(2),
     });
 
-    await searchTool.invoke(
+    const result = await tool.invoke(
       runContext,
-      JSON.stringify({ queries: ["the gauldrons eclipse 52.9"] }),
+      JSON.stringify({
+        queries: ["example cask 71", "example single cask 2019"],
+      }),
     );
-    await expect(
-      readTool.invoke(
-        runContext,
-        JSON.stringify({
-          url: "https://www.douglaslaing.com/products/the-gauldrons-eclipse",
-          focus: "ABV",
-        }),
-      ),
-    ).resolves.toMatchObject({ summary: "The bottle is 52.9% ABV." });
-    await expect(
-      readTool.invoke(
-        runContext,
-        JSON.stringify({
-          url: "https://example.com/second-page",
-          focus: "release year",
-        }),
-      ),
-    ).resolves.toEqual({
-      error: "Web page-read budget exhausted after 1 page",
+
+    expect(searches).toHaveLength(2);
+    expect(result).toMatchObject({
+      evidence: [
+        { query: "example cask 71" },
+        { query: "example single cask 2019" },
+      ],
+      errors: [],
     });
-    expect(searchExecutor).toHaveBeenCalledOnce();
-    expect(readExecutor).toHaveBeenCalledOnce();
   });
 
   test("caps bottle search evidence payload size", () => {
@@ -469,5 +243,198 @@ describe("bottleClassifier web search tool", () => {
       expect(result.extraSnippets.length).toBeLessThanOrEqual(1);
       expect((result.extraSnippets[0] ?? "").length).toBeLessThanOrEqual(1200);
     }
+  });
+});
+
+describe("read_page and find_in_page", () => {
+  const pageUrl = "https://example.com/pokeno-cask-71";
+  const longPage = [
+    "# Pōkeno Cask No. 71",
+    "x".repeat(4000),
+    "Distilled in 2019 and bottled at 55.8% ABV from a single ex-bourbon cask.",
+  ].join("\n\n");
+
+  function tools(
+    pages: Record<string, PageRead>,
+    budget = createBottleWebSearchBudget(1),
+  ) {
+    const fake = createWeb({ pages });
+    const onEvidence = vi.fn();
+    const [readPage, findInPage] = createReadPageTools({
+      web: fake.web,
+      budget,
+      onEvidence,
+    });
+    return {
+      ...fake,
+      readPage: readPage!,
+      findInPage: findInPage!,
+      onEvidence,
+    };
+  }
+
+  test("shows the page's opening and finds a fact further down without reading again", async () => {
+    const { readPage, findInPage, reads, onEvidence } = tools({
+      [pageUrl]: okPage(pageUrl, longPage, "Pōkeno Cask No. 71"),
+    });
+
+    const opening = await readPage.invoke(
+      runContext,
+      JSON.stringify({ url: pageUrl }),
+    );
+    expect(opening).toMatchObject({
+      provider: "firecrawl",
+      summary: expect.stringContaining("# Pōkeno Cask No. 71"),
+      results: [
+        expect.objectContaining({
+          url: pageUrl,
+          title: "Pōkeno Cask No. 71",
+          description: "A product page.",
+        }),
+      ],
+    });
+    expect(JSON.stringify(opening)).not.toContain("55.8%");
+
+    const found = await findInPage.invoke(
+      runContext,
+      JSON.stringify({ url: pageUrl, query: "55.8%" }),
+    );
+    expect(found).toMatchObject({
+      query: "55.8%",
+      summary: expect.stringContaining("bottled at 55.8% ABV"),
+      results: [expect.objectContaining({ url: pageUrl })],
+    });
+    expect(reads).toEqual([pageUrl]);
+    expect(onEvidence).toHaveBeenCalledTimes(2);
+  });
+
+  test("returns no passages when the term is not on the page", async () => {
+    const { readPage, findInPage } = tools({
+      [pageUrl]: okPage(pageUrl, longPage),
+    });
+    await readPage.invoke(runContext, JSON.stringify({ url: pageUrl }));
+
+    await expect(
+      findInPage.invoke(
+        runContext,
+        JSON.stringify({ url: pageUrl, query: "sherry" }),
+      ),
+    ).resolves.toEqual({ url: pageUrl, query: "sherry", passages: [] });
+  });
+
+  test("asks for a read before finding in a page", async () => {
+    const { findInPage } = tools({});
+
+    await expect(
+      findInPage.invoke(
+        runContext,
+        JSON.stringify({ url: pageUrl, query: "cask" }),
+      ),
+    ).resolves.toEqual({ error: "Read this page with read_page first" });
+  });
+
+  test("limits finds per run", async () => {
+    const { readPage, findInPage } = tools({
+      [pageUrl]: okPage(pageUrl, longPage),
+    });
+    await readPage.invoke(runContext, JSON.stringify({ url: pageUrl }));
+    const find = () =>
+      findInPage.invoke(
+        runContext,
+        JSON.stringify({ url: pageUrl, query: "cask" }),
+      );
+
+    for (let index = 0; index < 6; index++) await find();
+
+    await expect(find()).resolves.toEqual({
+      error: "Find-in-page budget exhausted after 6 finds",
+    });
+  });
+
+  test("tells the model why a page was not read", async () => {
+    const { readPage } = tools({
+      [pageUrl]: {
+        status: "refused",
+        url: pageUrl,
+        reason: "robots_disallowed",
+      },
+    });
+
+    await expect(
+      readPage.invoke(runContext, JSON.stringify({ url: pageUrl })),
+    ).resolves.toEqual({
+      error: "The website's robots.txt does not allow reading this page",
+    });
+  });
+
+  test("keeps a replayed page so find_in_page can search it", async () => {
+    const executeWebSearch: BottleWebSearchExecutor = vi.fn(async () => ({
+      page: {
+        url: pageUrl,
+        title: "Release No. 2",
+        description: null,
+        text: "The exact marketed edition is Release No. 2.",
+      },
+    }));
+    const budget = createBottleWebSearchBudget(1);
+    const [readPage, findInPage] = createReadPageTools({
+      web: createWeb().web,
+      budget,
+      executeWebSearch,
+    });
+
+    await readPage!.invoke(runContext, JSON.stringify({ url: pageUrl }));
+
+    expect(executeWebSearch).toHaveBeenCalledWith(
+      expect.objectContaining({
+        toolName: "read_page",
+        args: { url: pageUrl },
+      }),
+    );
+    await expect(
+      findInPage!.invoke(
+        runContext,
+        JSON.stringify({ url: pageUrl, query: "release no" }),
+      ),
+    ).resolves.toMatchObject({
+      summary: "The exact marketed edition is Release No. 2.",
+    });
+  });
+
+  test("reserves a page read after the search-query budget is spent", async () => {
+    const budget = createBottleWebSearchBudget(1);
+    const fake = createWeb({
+      pages: {
+        "https://www.douglaslaing.com/products/the-gauldrons-eclipse": okPage(
+          "https://www.douglaslaing.com/products/the-gauldrons-eclipse",
+          "The bottle is 52.9% ABV.",
+        ),
+      },
+      search: () => searchResults("https://example.com/eclipse"),
+    });
+    const searchTool = createWebSearchTool({ web: fake.web, budget });
+    const [readPage] = createReadPageTools({ web: fake.web, budget });
+
+    await searchTool.invoke(
+      runContext,
+      JSON.stringify({ queries: ["the gauldrons eclipse 52.9"] }),
+    );
+    await expect(
+      readPage!.invoke(
+        runContext,
+        JSON.stringify({
+          url: "https://www.douglaslaing.com/products/the-gauldrons-eclipse",
+        }),
+      ),
+    ).resolves.toMatchObject({ summary: "The bottle is 52.9% ABV." });
+    await expect(
+      readPage!.invoke(
+        runContext,
+        JSON.stringify({ url: "https://example.com/second-page" }),
+      ),
+    ).resolves.toEqual({
+      error: "Web page-read budget exhausted after 1 page",
+    });
+    expect(fake.reads).toHaveLength(1);
   });
 });

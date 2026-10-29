@@ -882,6 +882,9 @@ importers:
       '@openai/agents':
         specifier: ^0.8.5
         version: 0.8.5(supports-color@8.1.1)(ws@8.21.3)(zod@4.5.4)
+      '@peated/bot':
+        specifier: workspace:*
+        version: link:../bot
       '@peated/tsconfig':
         specifier: workspace:*
         version: link:../tsconfig

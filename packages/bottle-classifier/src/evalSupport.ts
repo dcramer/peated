@@ -1,3 +1,4 @@
+import { createMemoryCache, createPeatedBot } from "@peated/bot";
 import OpenAI from "openai";
 import type {
   BottleClassifierDataSource,
@@ -63,6 +64,22 @@ export function createEvalOpenAIClient() {
   return client;
 }
 
+/**
+ * PeatedBot for live model checks: Firecrawl when a key is set, an in-memory
+ * cache, and no stored website settings.
+ */
+export function createEvalWeb() {
+  const apiKey = process.env.FIRECRAWL_API_KEY;
+  if (!apiKey) return null;
+  return createPeatedBot({
+    cache: createMemoryCache(),
+    getSite: async () => ({ robotsException: false, blocked: false }),
+    onBotWall: async () => {},
+    firecrawl: { apiKey, apiUrl: process.env.FIRECRAWL_API_URL ?? null },
+    privateJwk: null,
+  });
+}
+
 export function createEvalClassifierOptions(
   dataSource: BottleClassifierDataSource,
 ): CreateBottleClassifierOptions {
@@ -75,8 +92,7 @@ export function createEvalClassifierOptions(
     maxSearchQueries: Number(
       process.env.BOTTLE_CLASSIFIER_EVAL_MAX_SEARCH_QUERIES ?? 2,
     ),
-    firecrawlApiKey: process.env.FIRECRAWL_API_KEY ?? null,
-    firecrawlApiUrl: process.env.FIRECRAWL_API_URL ?? null,
+    web: createEvalWeb(),
     dataSource,
   };
 }

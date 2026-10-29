@@ -97,12 +97,13 @@ import {
   getBottleClassifierRunMetadata,
   type BottleClassifierRunMetadata,
 } from "./runtime/runMetadata";
-import type { BottleWebSearchExecutor } from "./tools";
+import type { BottleClassifierWeb, BottleWebSearchExecutor } from "./tools";
 import {
   createBottleWebSearchBudget,
   executeBottleWebSearchInvocation,
   hydrateBottleSearchEvidence,
-  runFirecrawlReadPage,
+  keepReadPage,
+  runReadPage,
 } from "./tools";
 import type { BottleWebSearchBudget } from "./tools/sharedWebSearch";
 export { createBottleContextLoader } from "./runtime/bottleCheckContext";
@@ -119,11 +120,6 @@ const AUDIT_CLASSIFIER_MAX_TURNS = 18;
 // Tool calls run one at a time, so an audit keeps its last turn for the result.
 const CLASSIFIER_MAX_PROPOSED_OPERATIONS = AUDIT_CLASSIFIER_MAX_TURNS - 1;
 const MAX_CANDIDATE_ENTITY_SEARCH_REQUESTS = 12;
-
-function buildReferencePageFocus(referenceName: string): string {
-  const compactName = referenceName.trim().slice(0, 80);
-  return `Verify the exact product "${compactName}": marketed name, whisky category, age, ABV or proof, release or vintage year, edition, cask or batch code, and single-cask or cask-strength status.`;
-}
 
 export function shouldReadReferencePageBeforeClassification({
   reference,
@@ -310,8 +306,8 @@ type BaseCreateBottleClassifierOptions = {
   imageExtractionModel?: string;
   imageExtractionReasoningEffort?: OpenAIReasoningEffort;
   maxSearchQueries: number;
-  firecrawlApiKey?: string | null;
-  firecrawlApiUrl?: string | null;
+  /** PeatedBot's page reader and search. Without it, the run has no web tools. */
+  web?: BottleClassifierWeb | null;
   // Reviewed evidence collected before this run. Controlled evals use it so
   // prompt variants receive the same source facts.
   initialSearchEvidence?: BottleSearchEvidence[];
@@ -1129,10 +1125,10 @@ export function createBottleClassifier(
     });
     let webSearchBudget = createBottleWebSearchBudget(options.maxSearchQueries);
     const sourceUrl = reference.url;
-    const firecrawlApiKey = options.firecrawlApiKey;
+    const web = options.web;
     if (
       sourceUrl &&
-      firecrawlApiKey &&
+      web &&
       shouldReadReferencePageBeforeClassification({
         reference,
         extractedIdentitySource,
@@ -1141,37 +1137,32 @@ export function createBottleClassifier(
         hasSearchEvidence: preparedArtifacts.searchEvidence.length > 0,
       })
     ) {
-      const args = {
-        url: sourceUrl,
-        focus: buildReferencePageFocus(reference.name),
-      };
+      const args = { url: sourceUrl };
       const toolCallId = `preparation:${randomUUID()}`;
       options.observeToolEvent?.({
         type: "tool_call",
         phase: "preparation",
         id: toolCallId,
-        name: "firecrawl_read_page",
+        name: "read_page",
         arguments: args,
       });
 
       try {
-        const pageResult = await executeBottleWebSearchInvocation({
-          budget: webSearchBudget,
-          toolName: "firecrawl_read_page",
-          args,
-          execute: async () =>
-            await runFirecrawlReadPage({
-              apiKey: firecrawlApiKey,
-              apiUrl: options.firecrawlApiUrl ?? undefined,
-              ...args,
-            }),
-          executeWebSearch: options.executeWebSearch,
-        });
+        const pageResult = keepReadPage(
+          webSearchBudget,
+          await executeBottleWebSearchInvocation({
+            budget: webSearchBudget,
+            toolName: "read_page",
+            args,
+            execute: async () => await runReadPage({ web, url: sourceUrl }),
+            executeWebSearch: options.executeWebSearch,
+          }),
+        );
         options.observeToolEvent?.({
           type: "tool_result",
           phase: "preparation",
           toolCallId,
-          name: "firecrawl_read_page",
+          name: "read_page",
           result: pageResult,
         });
 
@@ -1197,7 +1188,7 @@ export function createBottleClassifier(
           type: "tool_result",
           phase: "preparation",
           toolCallId,
-          name: "firecrawl_read_page",
+          name: "read_page",
           result: {
             error: error instanceof Error ? error.message : String(error),
           },

@@ -77,6 +77,7 @@ import {
 } from "./evalReplay";
 import {
   createEvalClassifierOptions,
+  createEvalWeb,
   evalClassifierModel,
   evalClassifierReasoningEffort,
   hasEvalAIGatewayCredentials,
@@ -85,6 +86,7 @@ import { withEvalModelCallCapture } from "./evalTelemetry";
 import { createLocalCatalogDataSource } from "./localCatalog";
 import { exactBottleIdentityMatches } from "./normalizationEvalScoring";
 import type { RealWorldNewBottleEvalCase } from "./realWorldNewBottleEval.fixtures";
+import type { BottleClassifierWeb } from "./tools";
 
 // Classifier evals: historical per-fixture outcomes and experiment guidance live
 // in ../evals/README.md. Baselines do not change the judges or expected outcomes.
@@ -734,6 +736,17 @@ function createClassifierOptions(testCase: ClassifierScenarioEvalCase) {
   return createEvalClassifierOptions(buildClassifierAdapters(testCase));
 }
 
+// Controlled evals own web I/O. This enables the normal web tools; the fixed
+// executor answers every call, so PeatedBot is never reached.
+const FIXED_EVIDENCE_WEB: BottleClassifierWeb = {
+  readPage: async () => {
+    throw new Error("Fixed web evidence never reads a live page.");
+  },
+  searchWeb: async () => {
+    throw new Error("Fixed web evidence never searches the live web.");
+  },
+};
+
 function createEvalRuntime(fixtureId: string, webEvidenceFile?: string) {
   const toolEvents: TranscriptEvent[] = [];
   const fixedEvidenceFile =
@@ -743,17 +756,14 @@ function createEvalRuntime(fixtureId: string, webEvidenceFile?: string) {
     : null;
   const options: Pick<
     CreateBottleClassifierOptions,
+    | "web"
     | "executeWebSearch"
-    | "firecrawlApiKey"
     | "initialSearchEvidence"
     | "observeReferenceAgentDecision"
     | "observeToolEvent"
     | "overrides"
   > = {
-    // Controlled evals own web I/O. Enable the normal tool schemas; the fixed executor never calls a provider.
-    firecrawlApiKey: fixedEvidence
-      ? "fixed-evidence"
-      : process.env.FIRECRAWL_API_KEY,
+    web: fixedEvidence ? FIXED_EVIDENCE_WEB : createEvalWeb(),
     initialSearchEvidence: fixedEvidence?.searchResult.evidence,
     executeWebSearch: fixedEvidence
       ? createFixedWebSearchExecutor(fixedEvidence)
