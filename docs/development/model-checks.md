@@ -88,11 +88,17 @@ long inputs and tool outputs.
   sources split on an event's kind, such as closed and mothballed, the case
   lists each kind. Run it alone with
   `pnpm --filter @peated/server evals -- src/agents/entityAbout/writer.eval.test.ts`.
-- The decision model check, `apps/server/src/lib/decisionModel.eval.test.ts`,
-  also runs with `trigger-evals-scraper`. It only confirms that the model in
-  `DECISION_MODEL` (Jev by default) answers through AI Gateway. A feature that
-  asks a decision model a real question needs its own model check with
-  labeled cases.
+- The AI SDK model check, `apps/server/src/lib/aiSdkModels.eval.test.ts`,
+  also runs with `trigger-evals-scraper`. It only confirms that the decision
+  model in `DECISION_MODEL` (Jev by default) and the default language model
+  answer through AI Gateway, and that the `reasoning` setting takes effect.
+  A feature that calls one of these models needs its own model check with
+  labeled cases. See [Model Calls](./model-calls.md).
+- The country, region, and Entity detail checks
+  (`apps/server/src/worker/jobs/generate*Details.eval.test.ts`) also run with
+  `trigger-evals-scraper`. They check the structure of each answer and one
+  well-known fact per case, such as Scotland's three-year minimum age. They
+  do not judge the writing.
 - Ordinary `pnpm test` runs do not call a model.
 
 Exact wording or tool order can be checked when it is the product contract.

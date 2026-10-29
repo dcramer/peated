@@ -2,7 +2,9 @@
  * Owns OpenAI client setup and model-call tracing. Trace delivery failures do
  * not change model-call behavior.
  */
+import { GatewayError } from "@ai-sdk/gateway";
 import * as Sentry from "@sentry/node";
+import { RetryError } from "ai";
 import OpenAI from "openai";
 
 import config from "../config";
@@ -38,27 +40,30 @@ export function createOpenAIClient({
   });
 }
 
+function isTemporaryStatus(status: number): boolean {
+  return status === 402 || status === 408 || status === 429 || status >= 500;
+}
+
 /**
  * AI service rule: a spent budget (402), timeout (408), rate limit (429),
  * outage (5xx), or lost connection is temporary, so callers wait and retry.
  * Any other rejection is a bug. Wrapped causes are checked too, because the
- * classifier wraps provider errors.
+ * classifier wraps provider errors. AI SDK calls fail with a gateway error
+ * that carries the status, and spent retries keep the last error.
  */
 export function isModelServiceUnavailable(error: Error): boolean {
   let cause: unknown = error;
   for (let depth = 0; depth < 5 && cause instanceof Error; depth++) {
     if (cause instanceof OpenAI.APIConnectionError) return true;
     if (cause instanceof OpenAI.APIError) {
-      const status = cause.status;
-      return (
-        status === undefined ||
-        status === 402 ||
-        status === 408 ||
-        status === 429 ||
-        status >= 500
-      );
+      return cause.status === undefined || isTemporaryStatus(cause.status);
     }
-    cause = cause.cause;
+    if (GatewayError.isInstance(cause)) {
+      // Gateway class names do not match the cause (a rejected image arrives
+      // as an internal server error with status 400), so read the status.
+      return isTemporaryStatus(cause.statusCode);
+    }
+    cause = RetryError.isInstance(cause) ? cause.lastError : cause.cause;
   }
   return false;
 }

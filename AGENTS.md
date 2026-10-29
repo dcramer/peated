@@ -132,6 +132,7 @@ behavior; research cannot override them.
 - `apps/web/visual/README.md` — Browser screenshot reviews.
 - `docs/development/backend-testing.md` — Backend tests.
 - `docs/development/frontend-testing.md` — Frontend tests.
+- `docs/development/model-calls.md` — Model keys, clients, settings, errors, and tracing.
 - `docs/development/model-checks.md` — Live model checks.
 - `docs/development/orpc-client.md` — Web client use of server routes.
 - `docs/development/orpc-routes.md` — Server route rules.
