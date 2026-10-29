@@ -173,11 +173,11 @@ test("keeps Society batch-family codes separate from single-cask codes", () => {
         </ul></div>
       </article></li>
       <li class="product"><article class="itemSmall"
-        data-item-name="Muscovado meringue"
-        data-item-sku="ARMAGNAC-CASK-1"
-        data-item-type="refill armagnac black oak barrel">
+        data-item-name="No humdrum conundrum"
+        data-item-sku="GRAIN-CASK-1"
+        data-item-type="refill ex-bourbon barrel">
         <div class="itemInfoWrap"><ul>
-          <li><span class="name">CASK NO.</span><span class="value">A9.1</span></li>
+          <li><span class="name">CASK NO.</span><span class="value">G9.6</span></li>
           <li><span class="name">ABV</span><span class="value">51.9%</span></li>
         </ul></div>
       </article></li>
@@ -193,7 +193,7 @@ test("keeps Society batch-family codes separate from single-cask codes", () => {
     { caskNumber: "BAT.14", singleCask: false },
     { caskNumber: "SM0.1", singleCask: false },
     { caskNumber: "TIF.1", singleCask: false },
-    { caskNumber: "A9.1", singleCask: true },
+    { caskNumber: "G9.6", singleCask: true },
   ]);
 });
 
@@ -710,6 +710,56 @@ test("skips gift kits sold under KIT- SKUs", async ({ axiosMock }) => {
   });
 
   expect(items).toHaveLength(0);
+});
+
+test("skips Society rum, gin and brandy, which are not whisky", async ({
+  axiosMock,
+}) => {
+  const url = "https://smws.com/all-whisky?filter-page=1&per-page=128";
+  const payload = z
+    .object({
+      items: z.array(
+        z.object({ sku: z.string(), cask_no: z.string() }).passthrough(),
+      ),
+    })
+    .passthrough()
+    .parse(JSON.parse(await loadFixture("smws", "bottle-list.json")));
+
+  const [template] = payload.items;
+  payload.items = ["R11.9", "GN3.4", "C3.1", "A2.2"].map((code) => ({
+    ...template,
+    sku: `NOT-A-CASK-SKU-${code}`,
+    cask_no: code,
+  }));
+  axiosMock.onGet(url).reply(200, payload);
+
+  const items: any[] = [];
+  await scrapeBottles(url, async (...item) => {
+    items.push(item);
+  });
+
+  expect(items).toHaveLength(0);
+});
+
+test("skips Society rum cards in the archive", () => {
+  const result = parseArchivePage(`
+    <p class="productCount">1 Products</p>
+    <ul class="productGrid">
+      <li class="product">
+        <article class="itemSmall"
+          data-item-name="Banana bonanza"
+          data-item-sku="NOT-A-CASK-SKU">
+          <div class="itemInfoWrap"><ul>
+            <li><span class="name">CASK NO.</span><span class="value">R11.9</span></li>
+            <li><span class="name">ABV</span><span class="value">61.2%</span></li>
+            <li><span class="name">Spirit</span><span class="value">Rum</span></li>
+          </ul></div>
+        </article>
+      </li>
+    </ul>
+  `);
+
+  expect(result.bottles).toEqual([]);
 });
 
 test("prefers a known cask code encoded in the official SKU", async ({

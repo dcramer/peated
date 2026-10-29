@@ -1,6 +1,7 @@
 import { normalizeBottleInput } from "@peated/bottle-classifier/normalize";
 import {
   getCategoryFromCask,
+  isNonWhiskySmwsCode,
   parseDetailsFromName,
   SMWS_DISTILLERY_CODES,
 } from "@peated/bottle-classifier/smws";
@@ -322,6 +323,8 @@ export function parseArchivePage(body: string): ArchivePage {
     if (!societyCode) continue;
     const { caskNumber, edition, distilleryCode } =
       getSmwsCodeIdentity(societyCode);
+    // Peated records whisky only; SMWS codes name its rum, gin and brandy.
+    if (isNonWhiskySmwsCode(caskNumber ?? distilleryCode ?? "")) continue;
     const bundleTitle = /\b(?:case|collection|duo|pack|trio)\b/iu.test(title);
     if (!caskNumber && bundleTitle) continue;
     const details = caskNumber
@@ -699,6 +702,8 @@ export async function scrapeBottles(
 
         const { caskNumber, edition, distilleryCode } =
           getSmwsCodeIdentity(societyCode);
+        // Peated records whisky only; SMWS codes name its rum, gin and brandy.
+        if (isNonWhiskySmwsCode(caskNumber ?? distilleryCode ?? "")) return;
         const details = caskNumber
           ? parseDetailsFromName(`${caskNumber} ${caskName}`)
           : null;
