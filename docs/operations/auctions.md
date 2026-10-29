@@ -20,7 +20,7 @@ It does not rerun the matching backlog.
 
 ## Rollout status
 
-Checked October 24–26, 2026; details in the
+Checked October 24–29, 2026; details in the
 [production check](../research/2026-10-24-auction-production-check.md).
 
 - Done: deploy with `0321_auction_details`; first manual run (October 1);
@@ -34,10 +34,16 @@ Checked October 24–26, 2026; details in the
   bottles sold with a book, print, or coaster stayed. The review queue went
   from 6,190 to 5,883 lots. A title review cannot find a lot whose title hides
   that it is out of scope.
-- Not done: a recheck of the rest of the lots in review (all checked under
-  older rules); the 184th auction, which ended October 11
-  before collection; a current open-auction check and timed full run; an
-  automatic schedule.
+- Done October 27: manual collection run 2037 collected the 184th auction,
+  which ended October 11. It took 4 hours 53 minutes, made 461 requests, and
+  added 4,423 new lots. By October 29, 3,312 of them were matched or ignored
+  without a moderator, 1,080 were in review (728 with no matching Bottle), and
+  31 were still pending. Two of the pending lots were then rechecked and
+  matched. The other 29 were left pending by failed detail runs 2125 and 2169
+  and wait for a fresh-details recheck. The review queue grew to 6,885 lots.
+- Not done: a recheck of the lots in review from the October 1 run (all
+  checked under older rules); a current open-auction check and timed full run;
+  an automatic schedule.
 
 ## Collection checks and scheduling
 
