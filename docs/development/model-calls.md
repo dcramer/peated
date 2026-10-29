@@ -59,9 +59,11 @@ or lost connection is temporary, so the caller waits and retries. Anything else
 is a bug and goes to the error handler. See
 [Error Handling](../policies/error-handling.md).
 
-Gateway error class names do not match the cause. For example, Jev's rejection
-of an image arrives as an internal server error with status 400. The rule reads
-the HTTP status from the `APICallError` in the cause chain instead.
+Every AI SDK call we make fails with a gateway error that carries an HTTP
+status, and the rule reads that status. Gateway error class names do not match
+the cause: Jev's rejection of an image arrives as an internal server error with
+status 400. A failure that never got a response, such as a dropped connection,
+arrives as status 500, so it counts as temporary.
 
 ## Tracing
 

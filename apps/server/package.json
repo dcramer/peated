@@ -20,6 +20,7 @@
     "test:ci": "sh -c 'if [ \"$1\" = \"--\" ]; then shift; fi; dotenv -e .env.test.local -e .env.test -- vitest run --reporter=junit --reporter=default --outputFile=junit.xml \"$@\"' --"
   },
   "dependencies": {
+    "@ai-sdk/gateway": "^4.0.129",
     "@faker-js/faker": "^10.6.0",
     "@google-cloud/storage": "^7.22.0",
     "@googlemaps/google-maps-services-js": "^3.4.2",
