@@ -21,29 +21,20 @@ export function isAIGatewayConfigured(
   return Boolean(getAIGatewayApiKey(workload));
 }
 
+/**
+ * Sentry traces every OpenAI client on its own and records complete model
+ * input and output. To keep a call's content out of Sentry (sensitive-data
+ * rule, docs/policies/sensitive-data.md), run it inside
+ * `Sentry.suppressTracing` and record a content-free span around it.
+ */
 export function createOpenAIClient({
-  instrumentWithSentry = true,
-  recordFullContent = false,
   workload = "application",
 }: {
-  instrumentWithSentry?: boolean;
-  recordFullContent?: boolean;
   workload?: AIGatewayWorkload;
 } = {}): OpenAI {
-  const apiKey = getAIGatewayApiKey(workload);
-  const client = new OpenAI({
-    apiKey,
+  return new OpenAI({
+    apiKey: getAIGatewayApiKey(workload),
     baseURL: config.AI_GATEWAY_HOST,
-  });
-
-  if (!instrumentWithSentry) {
-    return client;
-  }
-
-  return Sentry.instrumentOpenAiClient(client, {
-    enableTruncation: !recordFullContent,
-    recordInputs: true,
-    recordOutputs: true,
   });
 }
 
@@ -70,15 +61,6 @@ export function isModelServiceUnavailable(error: Error): boolean {
     cause = cause.cause;
   }
   return false;
-}
-
-/** Agent clients always record complete model input and output in Sentry. */
-export function createOpenAIAgentClient({
-  workload = "application",
-}: {
-  workload?: AIGatewayWorkload;
-} = {}): OpenAI {
-  return createOpenAIClient({ recordFullContent: true, workload });
 }
 
 /** Run an AI conversation scope without clearing inherited Sentry attribution. */

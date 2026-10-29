@@ -34,7 +34,7 @@
 ## 4. Brora on stored data
 
 - [x] 4.1 Get approval for Brora's production changes under `docs/operations/catalog-maintenance.md`
-- [ ] 4.2 Enter Brora's sources, events, eras, names, site facts, status, and sections through `pnpm cli api`; verify each write by reading it back
+- [x] 4.2 Enter Brora's sources, events, eras, names, site facts, status, and sections through `pnpm cli api`; verify each write by reading it back
 - [x] 4.3 Delete `apps/web/src/features/entityAbout/articles/brora.ts` and the in-code article map
 
 ## 5. Writing rules
@@ -57,13 +57,19 @@
 
 ## 7. Rollout
 
-- [ ] 7.1 Run the job on 20 Entities and read every result; fix the prompt or checks
-- [ ] 7.2 Queue batches by activity
-- [ ] 7.3 After every Distillery and Brand has run, clear the generated descriptions still left
+- [x] 7.1 Run the job on 20 Entities and read every result; fix the prompt or checks (done differently: writers running the production prompt drafted Port Ellen, Lagavulin, and Clynelish first, each with an independent reviewer, and every lesson went into the prompt or checks)
+- [x] 7.2 Queue batches by activity (done differently: the same reviewed writers published every active Scottish distillery and a list of major world distilleries, 190 pages by 2026-10-27)
+- [ ] 7.3 After every Distillery and Brand has run, clear the generated descriptions still left (not yet: no Brand has a page; `docs/features/entity-about.md` keeps this step)
 
 ## 8. Docs and cleanup
 
 - [x] 8.1 Write `docs/features/entity-about.md` and link it from `CLAUDE.md`
 - [x] 8.2 Add the Distillery and Brand history rule to `docs/architecture/whisky-identity-model.md`
-- [ ] 8.3 Trim `docs/research/catalog/2026-10-23-brora-about.md` to sources, traps, and unknowns once Brora's facts are stored
-- [ ] 8.4 Run full `pnpm test`, typechecks, and lint
+- [x] 8.3 Trim `docs/research/catalog/2026-10-23-brora-about.md` to sources, traps, and unknowns once Brora's facts are stored
+- [x] 8.4 Run full `pnpm test`, typechecks, and lint
+
+## 9. One page (PR #1552)
+
+- [x] 9.1 Move About content onto the Overview; redirect `/about` there; drop the About tab, its sitemap, and the `bottlers`, `distillers`, and `sitemap` routes
+- [x] 9.2 Show one catalog list per kind, fold long history, disagreement notes, and sources, and stop showing the `entity_event` timeline
+- [x] 9.3 Write `docs/features/entity-page.md` and update the specs to match

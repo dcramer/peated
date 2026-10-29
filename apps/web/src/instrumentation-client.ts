@@ -7,7 +7,9 @@ import { configureLogging } from "./lib/log";
 
 Sentry.init(SharedSentryConfig);
 
+// Tags reach errors only; spans and logs need the attribute.
 Sentry.setTag("service", "@peated/web");
+Sentry.getGlobalScope().setAttribute("service", "@peated/web");
 configureLogging();
 
 export const onRouterTransitionStart = Sentry.captureRouterTransitionStart;

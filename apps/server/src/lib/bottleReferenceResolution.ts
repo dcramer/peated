@@ -17,10 +17,7 @@ import { externalReviews } from "@peated/server/db/schema";
 import { createBottleCheck } from "@peated/server/lib/bottleChecks";
 import { findBottleReferenceAssignment } from "@peated/server/lib/bottleFinder";
 import type { BottleReferenceIdentitySnapshot } from "@peated/server/lib/bottleReferences";
-import {
-  createOrReuseBottleInTransaction,
-  finalizeCreatedBottle,
-} from "@peated/server/lib/createBottle";
+import { finalizeCreatedBottle } from "@peated/server/lib/createBottle";
 import { logTelemetryError } from "@peated/server/lib/log";
 import { eq } from "drizzle-orm";
 import { assessBottleResolution } from "./bottleMatchingAutomation";
@@ -34,6 +31,10 @@ import {
   ActiveBottleSelectionError,
   resolveActiveBottleIds,
 } from "./resolveActiveBottleIds";
+import {
+  createOrReuseFreshBottleInTransaction,
+  StaleBottleCreateError,
+} from "./unseenSiblingBottle";
 
 export type BottleReferenceResolutionSource =
   | "exact_reference"
@@ -213,9 +214,13 @@ function assertKnownClassifierTarget(
 export async function applyClassifierCreateDecision({
   decision,
   createdByActorId,
+  staleGuard,
 }: {
   decision: ClassifierCreateDecision;
   createdByActorId: number;
+  // Automatic creates pass the check's candidates and start time; a person
+  // confirming a create from a photo or draft does not.
+  staleGuard?: { seenBottleIds: number[]; checkStartedAt: Date };
 }): Promise<{
   bottleId: number;
   createdBottle: boolean;
@@ -223,11 +228,11 @@ export async function applyClassifierCreateDecision({
 }> {
   const input = buildClassifierBottleInput(decision.proposedBottle);
   const result = await db.transaction(async (tx) =>
-    createOrReuseBottleInTransaction(tx, {
-      creationSource: "bottle_classifier",
-      createdByActorId,
-      input,
-    }),
+    createOrReuseFreshBottleInTransaction(
+      tx,
+      { creationSource: "bottle_classifier", createdByActorId, input },
+      staleGuard && { proposedBottle: decision.proposedBottle, ...staleGuard },
+    ),
   );
 
   if (result.createResult) {
@@ -298,6 +303,7 @@ async function resolveBottleReferenceTargetWithClassifier(
   // Source titles carry no structured facts. Supplying an extracted identity
   // here, even an empty one, would make the classifier skip text extraction.
   const classificationInput: ClassifyBottleReferenceInput = { reference };
+  const classificationStartedAt = new Date();
   try {
     classification = await classify(classificationInput);
   } catch (error) {
@@ -390,6 +396,12 @@ async function resolveBottleReferenceTargetWithClassifier(
     const result = await applyClassifierCreateDecision({
       decision: classification.decision,
       createdByActorId,
+      staleGuard: {
+        seenBottleIds: classification.artifacts.candidates.map(
+          ({ bottleId }) => bottleId,
+        ),
+        checkStartedAt: classificationStartedAt,
+      },
     });
     return {
       assignment: result.assignment,
@@ -403,6 +415,19 @@ async function resolveBottleReferenceTargetWithClassifier(
       classification: classificationRun,
     };
   } catch (error) {
+    // A stale create needs a person, like any other unsupported decision.
+    if (error instanceof StaleBottleCreateError)
+      return {
+        assignment: null,
+        source: "unresolved",
+        error: null,
+        confidence: null,
+        model: config.BOTTLE_CLASSIFIER_MODEL,
+        rationale: classification.decision.rationale ?? null,
+        classifierEvidence: null,
+        createdBottle: false,
+        classification: classificationRun,
+      };
     return {
       assignment: null,
       source: "unresolved",

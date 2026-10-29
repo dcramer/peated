@@ -76,6 +76,10 @@ already be classifying. The first check saved for an identity wins: a lot
 that finishes later reuses that check and drops its own result. Identical lots
 therefore cannot each create their own Bottle. Lots whose detail
 facts differ, such as their cask numbers, get separate checks.
+Near-identical lots, such as one whose page omits the cask number, still
+get separate checks. If one of them creates a Bottle while the other runs, the
+other's create goes to review; see
+[stale automatic creates](../architecture/bottle-reference-resolution.md#stale-automatic-creates).
 
 Auction classification sets `readCandidateImages: false` in its saved request.
 It uses the listing title, supplied structured source facts, catalog fields,
