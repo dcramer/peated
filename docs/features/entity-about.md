@@ -233,6 +233,13 @@ description. After the writer has covered every distillery and brand,
 that is not the published lead, so no unsourced description remains.
 Descriptions a person wrote stay.
 
+The prompt is in `apps/server/src/agents/entityAbout/instructions.ts`. Its
+examples are documents people wrote in
+`apps/server/src/lib/entityAbout/examples/`: Rosebank for a distillery and
+Johnnie Walker for a brand. A prompt example cannot be a model-check case, so
+Brora and Clynelish are cases instead. The Brora document stays as the mock
+API's About page.
+
 ## Founding Year
 
 A save that publishes a page with exactly one shown `opened` event sets the
@@ -246,9 +253,12 @@ Peated no longer guesses a founding year or website from a model's memory.
 `GenerateEntityDetails` and the Entity form's Fill pronunciation button fill
 only the pronunciation, since About pages do not cover how a name is said.
 
-The prompt is in `apps/server/src/agents/entityAbout/instructions.ts`. Its
-examples are documents people wrote in
-`apps/server/src/lib/entityAbout/examples/`: Rosebank for a distillery and
-Johnnie Walker for a brand. A prompt example cannot be a model-check case, so
-Brora and Clynelish are cases instead. The Brora document stays as the mock
-API's About page.
+Founding years and websites the old job guessed are cleared with
+`/admin/catalog/clear-guessed-entity-details`; run it with `dryRun` first to
+list them. A value counts as a guess only when the last change to set it was
+one of the job's updates by the Peated actor, touching only fields the job
+wrote, and the Entity still holds that value. A guessed year becomes the
+year a published page cites, when it cites one. Each change keeps the old
+values under `before`. Changes from before July 2026 by user 1 were
+recorded as the Peated actor too, so check the dry run's dates and values
+before running it.
