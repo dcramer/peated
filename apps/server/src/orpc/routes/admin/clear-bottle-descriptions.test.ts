@@ -1,5 +1,10 @@
 import { db } from "@peated/server/db";
-import { bottles, bottleTombstones, changes } from "@peated/server/db/schema";
+import {
+  bottleGroups,
+  bottles,
+  bottleTombstones,
+  changes,
+} from "@peated/server/db/schema";
 import * as workerClient from "@peated/server/lib/test/workerDispatch";
 import { routerClient } from "@peated/server/orpc/router";
 import { and, asc, eq } from "drizzle-orm";
@@ -49,7 +54,7 @@ describe("POST /admin/catalog/clear-bottle-descriptions", () => {
 
     expect(result).toEqual({
       bottleIds: [generated.id],
-      conflicts: [],
+      skipped: [],
       checked: 1,
       remaining: 1,
       nextAfterId: null,
@@ -84,7 +89,7 @@ describe("POST /admin/catalog/clear-bottle-descriptions", () => {
 
     expect(result).toEqual({
       bottleIds: [generated.id],
-      conflicts: [],
+      skipped: [],
       checked: 1,
       remaining: 1,
       nextAfterId: null,
@@ -162,7 +167,7 @@ describe("POST /admin/catalog/clear-bottle-descriptions", () => {
     );
     expect(firstPage).toEqual({
       bottleIds: [first.id],
-      conflicts: [],
+      skipped: [],
       checked: 1,
       remaining: 2,
       nextAfterId: first.id,
@@ -174,7 +179,7 @@ describe("POST /admin/catalog/clear-bottle-descriptions", () => {
     );
     expect(secondPage).toEqual({
       bottleIds: [second.id],
-      conflicts: [],
+      skipped: [],
       checked: 1,
       remaining: 1,
       nextAfterId: null,
@@ -231,9 +236,51 @@ describe("POST /admin/catalog/clear-bottle-descriptions", () => {
 
     expect(result).toMatchObject({
       bottleIds: [],
-      conflicts: [{ bottleId: duplicate.id, conflictingBottleId: original.id }],
+      skipped: [
+        {
+          bottleId: duplicate.id,
+          reason: "duplicate",
+          conflictingBottleId: original.id,
+        },
+      ],
     });
     expect((await descriptions()).get(duplicate.id)?.description).toBe(
+      "A smooth and approachable dram.",
+    );
+  });
+
+  test("skips a Bottle whose stored name breaks a naming rule", async ({
+    fixtures,
+  }) => {
+    const admin = await fixtures.User({ admin: true });
+    const brand = await fixtures.Entity({ kind: "brand", name: "Glenbrand" });
+    const bottle = await fixtures.Bottle({
+      brandId: brand.id,
+      description: "A smooth and approachable dram.",
+      descriptionSrc: "generated",
+    });
+    // Old data: a name that only repeats the brand, which saves now refuse.
+    await db
+      .update(bottleGroups)
+      .set({ name: brand.name })
+      .where(eq(bottleGroups.id, bottle.groupId!));
+
+    const result = await routerClient.admin.clearBottleDescriptions(
+      {},
+      { context: { user: admin } },
+    );
+
+    expect(result).toMatchObject({
+      bottleIds: [],
+      skipped: [
+        {
+          bottleId: bottle.id,
+          reason: "breaks_rule",
+          conflictingBottleId: null,
+        },
+      ],
+    });
+    expect((await descriptions()).get(bottle.id)?.description).toBe(
       "A smooth and approachable dram.",
     );
   });

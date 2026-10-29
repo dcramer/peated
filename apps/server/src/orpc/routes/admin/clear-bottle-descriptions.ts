@@ -8,6 +8,7 @@ import {
   BottleUpdateExpectedBottleStateError,
   bottleUpdateExpectedSelectedBottleState,
   BottleUpdateGraphError,
+  BottleUpdateInputError,
   finalizeBottleUpdate,
   updateBottleInTransaction,
 } from "@peated/server/lib/updateBottle";
@@ -54,15 +55,20 @@ export default procedure
       bottleIds: z
         .array(z.number())
         .describe("Bottles cleared, or that would be cleared in a dry run"),
-      conflicts: z
+      skipped: z
         .array(
           z.object({
             bottleId: z.number(),
-            conflictingBottleId: z.number().nullable(),
+            reason: z.enum(["duplicate", "breaks_rule"]),
+            conflictingBottleId: z
+              .number()
+              .nullable()
+              .describe("The other Bottle, for a duplicate"),
+            message: z.string(),
           }),
         )
         .describe(
-          "Bottles skipped because they duplicate another Bottle; any edit to them fails until the pair is merged. A dry run cannot find these.",
+          "Bottles whose existing data blocks any edit until it is repaired: a duplicate of another Bottle, or a record that breaks a catalog rule. They keep their description. A dry run cannot find these.",
         ),
       checked: z.number(),
       remaining: z
@@ -96,7 +102,7 @@ export default procedure
     if (input.dryRun) {
       return {
         bottleIds: page.map(({ id }) => id),
-        conflicts: [],
+        skipped: [],
         checked: page.length,
         remaining,
         nextAfterId,
@@ -108,9 +114,11 @@ export default procedure
       descriptionSrc: null,
     });
     const bottleIds: number[] = [];
-    const conflicts: {
+    const skipped: {
       bottleId: number;
+      reason: "duplicate" | "breaks_rule";
       conflictingBottleId: number | null;
+      message: string;
     }[] = [];
     for (const bottle of page) {
       let update;
@@ -162,13 +170,25 @@ export default procedure
         ) {
           continue;
         }
-        // Every Bottle edit rechecks identity, so a Bottle that already
-        // duplicates another cannot change until the pair is merged. It keeps
-        // its description and goes back to the caller for duplicate review.
+        // Every Bottle edit rechecks the stored identity and naming rules,
+        // so a Bottle that already duplicates another or breaks a rule cannot
+        // change until it is repaired. It keeps its description and goes back
+        // to the caller for catalog repair.
         if (error instanceof BottleUpdateConflictError) {
-          conflicts.push({
+          skipped.push({
             bottleId: bottle.id,
+            reason: "duplicate",
             conflictingBottleId: error.conflictingBottleId,
+            message: error.message,
+          });
+          continue;
+        }
+        if (error instanceof BottleUpdateInputError) {
+          skipped.push({
+            bottleId: bottle.id,
+            reason: "breaks_rule",
+            conflictingBottleId: null,
+            message: error.message,
           });
           continue;
         }
@@ -181,7 +201,7 @@ export default procedure
 
     return {
       bottleIds,
-      conflicts,
+      skipped,
       checked: page.length,
       remaining,
       nextAfterId,

@@ -164,9 +164,9 @@ first to list what it would clear. A description with no `descriptionSrc`
 stays, since a person may have written it before Peated recorded who wrote
 descriptions. Each clear is saved as a Bottle change that keeps the old text
 under `before`, since the old writer saved its text without a change. A
-Bottle that duplicates another cannot be edited until the pair is merged, so
-the route skips it and lists the pair under `conflicts`; a dry run cannot
-find these.
+Bottle that duplicates another, or whose stored data breaks a catalog rule,
+cannot be edited until it is repaired, so the route skips it and lists it
+under `skipped` with the reason; a dry run cannot find these.
 
 ## Tasting-note flavor profile
 
