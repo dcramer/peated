@@ -49,6 +49,17 @@ operations and can only be closed (`isSupportedBottleCheck` in
 rule, so such a check is one blocked "Unsupported check version" task, not a
 Suggested Change with nothing to review.
 
+Every hour, the worker closes catalog checks with nothing left to act on
+(`closeUnactionableBottleChecks` in
+`apps/server/src/lib/unactionableBottleChecks.ts`). A check closes when it is
+unsupported, or when every open change targets a Bottle or brand that was
+merged or deleted and any findings are about a Bottle that was merged or
+deleted. A change whose targets all exist, findings about a live Bottle, or
+findings on a listing or photo check keep it open. Checks with changes that are
+applying, stale, or failed are left for Background work. Each close records the
+reason "no longer actionable" and a note, with no actor, so History shows why
+it left the Inbox. Moderators cannot choose that reason themselves.
+
 A report task shows who sent the report, who it is about (when a member is
 named), the reason, and a link to the live content. Its actions remove the
 content, delete the comment, suspend the member, and close the report as

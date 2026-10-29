@@ -262,6 +262,9 @@ export async function runWorker() {
     scheduledJob("3 * * * *", "cleanup-wrong-photo-match-photos", async () => {
       await runJob("CleanupWrongPhotoMatchPhotos");
     });
+    scheduledJob("51 * * * *", "close-unactionable-bottle-checks", async () => {
+      await runJob("CloseUnactionableBottleChecks");
+    });
     scheduledJob("7 * * * *", "process-account-deletions", async () => {
       await runJob("ProcessAccountDeletions");
     });

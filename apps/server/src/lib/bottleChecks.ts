@@ -135,7 +135,8 @@ export const BottleCheckCloseReasonSchema = z.enum(
 
 export const CloseBottleCheckInputFields = {
   checkId: PositiveIdSchema,
-  reason: BottleCheckCloseReasonSchema,
+  // "no_longer_actionable" belongs to the automatic cleanup, not moderators.
+  reason: BottleCheckCloseReasonSchema.exclude(["no_longer_actionable"]),
   note: NonEmptyTextSchema.max(2000).optional(),
 } as const;
 
