@@ -193,9 +193,7 @@ async function extractPhotoBottleEvidence({
       callback: async (reportResponse) => {
         const extractor = createWhiskyLabelExtractor({
           // Limit the photo form’s wait; let the user choose when to retry.
-          client: createOpenAIClient({
-            instrumentWithSentry: false,
-          }).withOptions({
+          client: createOpenAIClient().withOptions({
             timeout: 45_000,
             maxRetries: 0,
           }),
@@ -205,9 +203,10 @@ async function extractPhotoBottleEvidence({
           imageReasoningEffort: config.OPENAI_IMAGE_EXTRACTION_REASONING_EFFORT,
           onImageExtractionMetadata: reportResponse,
         });
-        const extraction = await extractor.extractFromImageWithMetadata(
-          await getUploadImageDataUrl(photo.imageUrl),
-          { signal },
+        const imageDataUrl = await getUploadImageDataUrl(photo.imageUrl);
+        // Uploaded photos stay out of Sentry; the span above records no content.
+        const extraction = await Sentry.suppressTracing(() =>
+          extractor.extractFromImageWithMetadata(imageDataUrl, { signal }),
         );
         return {
           extractedIdentity: BottleExtractedDetailsSchema.nullable().parse(
