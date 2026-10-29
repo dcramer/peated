@@ -419,6 +419,12 @@ JSDoc.
   Sidebar bottle lists use the shared sidebar variant with smaller thumbnails,
   compact titles limited to two lines, and trailing details below the identity.
   Recent tastings show their date and rating as supporting details.
+- An Entity without an image shows the illustration for its kind: copper stills
+  for a distillery, a back bar for a brand, a cask warehouse for a bottler, and
+  a head office for a company. They follow the site's other illustrations: deep
+  navy, fine grain, and amber only for whisky, copper, and lit windows. Keep
+  them stylized and free of text, logos, people, and real places, so nobody
+  takes one for a photo of the Entity.
 - State precise values. Do not replace known numbers with vague labels.
 - Do not invent data, rankings, totals, ranges, or derived values in a visual
   component.

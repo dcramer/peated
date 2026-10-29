@@ -38,7 +38,7 @@ bottom:
 
 The sidebar holds facts to check at a glance:
 
-1. Images, or a placeholder.
+1. Images, or the illustration for the Entity's kind when it has none.
 2. Facts: origin, status, founding year, owner, website, short name, then the
    About document's sourced facts.
 3. Owners over time.
