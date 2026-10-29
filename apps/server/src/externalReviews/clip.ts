@@ -4,6 +4,7 @@ import {
   isAIGatewayConfigured,
 } from "@peated/server/lib/openaiClient";
 import { instrumentOpenAIResponsesCall } from "@peated/server/lib/openaiResponsesTelemetry";
+import * as Sentry from "@sentry/node";
 import { randomUUID } from "node:crypto";
 import { zodTextFormat } from "openai/helpers/zod";
 import { z } from "zod";
@@ -57,29 +58,29 @@ export interface ReviewClipServices {
 const reviewClipServices: ReviewClipServices = {
   enabled: () => config.EXTERNAL_REVIEW_CLIPS_ENABLED,
   generate: async (reviewText) => {
-    const client = createOpenAIClient({
-      instrumentWithSentry: false,
-      workload: "scraper",
-    });
+    const client = createOpenAIClient({ workload: "scraper" });
     const response = await instrumentOpenAIResponsesCall({
       baseURL: config.AI_GATEWAY_HOST,
       conversationId: `external_review_clip:${randomUUID()}`,
       model: MODEL,
       callback: async (reportResponse) => {
-        const result: ClipResponse = await client.responses.create({
-          model: MODEL,
-          instructions: INSTRUCTIONS,
-          input: JSON.stringify({ reviewText }),
-          text: {
-            format: zodTextFormat(
-              ReviewClipResultSchema,
-              "external_review_clip",
-            ),
-          },
-          max_output_tokens: 300,
-          store: false,
-          reasoning: { effort: "low" },
-        } satisfies ClipRequest);
+        // Review text stays out of Sentry; the span above records no content.
+        const result: ClipResponse = await Sentry.suppressTracing(() =>
+          client.responses.create({
+            model: MODEL,
+            instructions: INSTRUCTIONS,
+            input: JSON.stringify({ reviewText }),
+            text: {
+              format: zodTextFormat(
+                ReviewClipResultSchema,
+                "external_review_clip",
+              ),
+            },
+            max_output_tokens: 300,
+            store: false,
+            reasoning: { effort: "low" },
+          } satisfies ClipRequest),
+        );
         reportResponse({
           response: {
             id: result.id,
