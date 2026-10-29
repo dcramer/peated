@@ -69,9 +69,12 @@ arrives as status 500, so it counts as temporary.
 
 - Sentry traces every OpenAI SDK and AI SDK call on its own, and records the
   complete input and output.
-- To keep a call's content out of Sentry, run the call inside
-  `Sentry.suppressTracing` and record a span with no content around it. Photo
-  lookup and review clips do this. Uploaded photos and full review text must
-  stay out (see [Sensitive Data](../policies/sensitive-data.md)).
+- Some content must stay out of Sentry, such as uploaded photos and full
+  review text (see [Sensitive Data](../policies/sensitive-data.md)).
+  - For an AI SDK call, set `recordInputs` and `recordOutputs` to `false` in
+    its `telemetry` option. Sentry still records the call, its model, and token
+    counts. Review clips do this.
+  - For an OpenAI SDK call, run the call inside `Sentry.suppressTracing` and
+    record a span with no content around it. Photo lookup does this.
 - Wrap all the calls in one run with `withSentryConversation` so they share a
   conversation ID.
