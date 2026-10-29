@@ -21,10 +21,7 @@ export async function updateEntityFoundingYear(
     about,
     await loadLinkedEntities(tx, [about.document]),
   );
-  // A page can date an opening that has not happened yet.
-  if (yearEstablished === null || yearEstablished > new Date().getFullYear()) {
-    return;
-  }
+  if (yearEstablished === null) return;
   const [current] = await tx
     .select({ yearEstablished: entities.yearEstablished })
     .from(entities)

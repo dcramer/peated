@@ -233,19 +233,6 @@ description. After the writer has covered every distillery and brand,
 that is not the published lead, so no unsourced description remains.
 Descriptions a person wrote stay.
 
-## Founding Year
-
-A save that publishes a page with exactly one shown `opened` event sets the
-Entity's `yearEstablished` to that event's year. The cited year replaces any
-stored year, because Peated does not record who set a stored year, and the
-change keeps the old one under `before`. The year stays as it is when the
-page is hidden, has no `opened` event or more than one, its sources disagree
-on the date, or the year is in the future.
-
-Peated no longer guesses a founding year or website from a model's memory.
-`GenerateEntityDetails` and the Entity form's Fill pronunciation button fill
-only the pronunciation, since About pages do not cover how a name is said.
-
 The prompt is in `apps/server/src/agents/entityAbout/instructions.ts`. Its
 examples are documents people wrote in
 `apps/server/src/lib/entityAbout/examples/`: Rosebank for a distillery and

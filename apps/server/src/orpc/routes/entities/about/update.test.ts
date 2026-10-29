@@ -200,6 +200,23 @@ describe("PUT /entities/:entity/about", () => {
         ]),
       ).resolves.toBe(1820);
     });
+
+    test("keeps the stored year when the opening is still to come", async ({
+      fixtures,
+    }) => {
+      const user = await fixtures.User({ mod: true });
+      const entity = await fixtures.Entity({
+        kind: "distillery",
+        yearEstablished: 1820,
+      });
+      const nextYear = String(new Date().getFullYear() + 1);
+
+      await expect(
+        savePage(user, entity.id, [
+          opened(1, nextYear, [{ sourceId: "s1", statedValue: nextYear }]),
+        ]),
+      ).resolves.toBe(1820);
+    });
   });
 
   test("rejects an edit based on an older version", async ({ fixtures }) => {

@@ -135,6 +135,37 @@ describe("POST /admin/catalog/clear-guessed-entity-details", () => {
     expect((await readEntity(entity.id))?.yearEstablished).toBe(1824);
   });
 
+  test("clears a guessed year when the About page dates a future opening", async ({
+    fixtures,
+  }) => {
+    const admin = await fixtures.User({ admin: true });
+    const entity = await fixtures.Entity({
+      kind: "distillery",
+      yearEstablished: 1823,
+    });
+    await recordGuess(entity.id, { yearEstablished: 1823 });
+    await fixtures.EntityAbout({
+      entityId: entity.id,
+      events: [
+        {
+          id: 1,
+          kind: "opened",
+          date: String(new Date().getFullYear() + 1),
+        },
+      ],
+    });
+
+    const result = await routerClient.admin.clearGuessedEntityDetails(
+      {},
+      { context: { user: admin } },
+    );
+
+    expect(result.guesses).toMatchObject([
+      { field: "yearEstablished", value: 1823, newValue: null },
+    ]);
+    expect((await readEntity(entity.id))?.yearEstablished).toBeNull();
+  });
+
   test("keeps values the job did not set last", async ({ fixtures }) => {
     const admin = await fixtures.User({ admin: true });
     const moderator = await fixtures.User({ mod: true });
