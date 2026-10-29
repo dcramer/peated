@@ -4,8 +4,11 @@ Auction listings belong to a sale occurrence, not a physical bottle. Peated
 links each supported single-bottle lot to one Bottle. The same release
 can have several simultaneous lots or return in a later auction without
 overwriting history. Auctions track single whisky bottles only. Sets,
-multipacks, miniatures, samples (including duty-paid trade samples), glassware
-and other accessories, and other spirits are out of scope.
+multipacks, miniatures, samples (including duty-paid trade samples),
+distillery hand-fills (bottles a visitor fills from a cask at the distillery,
+including Bruichladdich Valinch bottles), glassware and other accessories, and
+other spirits are out of scope. Hand-fills are not marketed releases, so they
+stay out of the catalog, as Catalog Maintenance already says.
 
 ## Stored records
 
