@@ -2,8 +2,8 @@ import config from "@peated/server/config";
 import { db } from "@peated/server/db";
 import { countries } from "@peated/server/db/schema";
 import { logWarn } from "@peated/server/lib/log";
-import { getStructuredResponse } from "@peated/server/lib/openai";
 import { withSentryConversation } from "@peated/server/lib/openaiClient";
+import { getStructuredResponse } from "@peated/server/lib/structuredResponse";
 import { type Country } from "@peated/server/types";
 import type { JobPayload } from "@peated/server/worker/types";
 import { eq } from "drizzle-orm";
@@ -37,8 +37,8 @@ function generatePrompt(country: InputCountry) {
 }
 
 export const OpenAICountryDetailsSchema = z.object({
-  description: z.string().nullable().default(null),
-  summary: z.string().nullable().default(null),
+  description: z.string().nullable(),
+  summary: z.string().nullable(),
 });
 
 export type GeneratedCountryDetails = z.infer<
@@ -51,19 +51,17 @@ export async function getGeneratedCountryDetails(
   return await withSentryConversation(
     `country_details:${country.slug ?? country.name ?? "draft"}`,
     async () =>
-      await getStructuredResponse(
-        "getGeneratedCountryDetails",
-        generatePrompt(country),
-        OpenAICountryDetailsSchema,
-        undefined,
-        undefined,
-        {
+      await getStructuredResponse({
+        pipelineName: "getGeneratedCountryDetails",
+        prompt: generatePrompt(country),
+        schema: OpenAICountryDetailsSchema,
+        logContext: {
           country: {
             id: country.slug,
             name: country.name,
           },
         },
-      ),
+      }),
   );
 }
 
