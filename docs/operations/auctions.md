@@ -41,9 +41,18 @@ Checked October 24–29, 2026; details in the
   31 were still pending. Two of the pending lots were then rechecked and
   matched. The other 29 were left pending by failed detail runs 2125 and 2169
   and wait for a fresh-details recheck. The review queue grew to 6,885 lots.
+- Done October 28–29: distillery hand-fills, including Bruichladdich Valinch,
+  are now out of scope. 146 hand-fill lots were ignored, and 14 hand-fill
+  Bottles were deleted: Bottle 68645 and 13 that matching had created.
+- Done October 29: parallel checks of near-identical lots had created 21
+  duplicate Bottle pairs. Each pair was merged into the older Bottle, and its
+  lots moved with it. Identical lots now share one check, and an automatic
+  create waits for review when another check made a matching Bottle while it
+  ran; see the [auction model](../features/auctions.md#bottle-matching).
 - Not done: a recheck of the lots in review from the October 1 run (all
   checked under older rules); a current open-auction check and timed full run;
-  an automatic schedule.
+  an automatic schedule. About 160 older hand-fill Bottles are still in the
+  catalog.
 
 ## Collection checks and scheduling
 
