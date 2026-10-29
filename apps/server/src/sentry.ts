@@ -7,6 +7,10 @@ import * as Sentry from "@sentry/hono/node";
 import config from "./config";
 import { configureLogging } from "./lib/log";
 
+// Backstop for the SQL-values rule: Drizzle puts bound values in
+// `drizzle.query.params`, but Drizzle 0.45 creates no spans, so this has
+// nothing to remove today. Query spans come from Sentry's Postgres
+// integration, which `dataCollection.databaseQueryData` keeps value-free.
 export function prepareSpan(span: StreamedSpanJSON): StreamedSpanJSON {
   const cleaned = { ...span, attributes: { ...span.attributes } };
   delete cleaned.attributes["drizzle.query.params"];
