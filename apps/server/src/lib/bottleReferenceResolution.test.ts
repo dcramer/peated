@@ -593,6 +593,52 @@ describe("resolveBottleReferenceTarget", () => {
     });
   });
 
+  test("leaves a create unresolved when an unseen same-Brand Bottle appeared during the check", async ({
+    fixtures,
+  }) => {
+    const actor = await getUserActor(await fixtures.User({ admin: true }));
+    const brand = await fixtures.Entity({ name: "Example", kind: "brand" });
+    classifyBottleReferenceMock.mockImplementation(async () => {
+      // Another check creates the same release while this one runs.
+      await fixtures.Bottle({
+        name: "Twelve",
+        brandId: brand.id,
+        statedAge: 12,
+      });
+      return buildClassification({
+        action: "create_bottle",
+        matchedBottleId: null,
+        proposedBottle: {
+          name: "12-year-old",
+          category: "single_malt",
+          statedAge: 12,
+          brand: { id: brand.id, name: brand.name },
+          distillers: [],
+          bottler: null,
+        },
+      });
+    });
+
+    const result = await resolveBottleReferenceTarget({
+      reference: {
+        name: "Example 12 Year Old",
+        url: "https://example.com/12",
+        imageUrl: null,
+        currentBottleId: null,
+      },
+      referenceLookupNames: [],
+      createdByActorId: actor.id,
+    });
+
+    expect(result).toMatchObject({
+      assignment: null,
+      source: "unresolved",
+      error: null,
+      createdBottle: false,
+    });
+    expect(await countBottles()).toBe(1);
+  });
+
   test.for(["match", "create_bottle"] as const)(
     "keeps an unsupported %s unresolved with its evidence",
     async (action, { fixtures }) => {

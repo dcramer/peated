@@ -40,14 +40,18 @@ import {
 } from "./bottleReferences";
 import { buildClassifierBottleInput } from "./classifierDecisionCreateInputs";
 import {
-  createOrReuseBottleInTransaction,
   finalizeCreatedBottle,
+  type createOrReuseBottleInTransaction,
 } from "./createBottle";
 import {
   recordIncomingBottleDecisionInTransaction,
   type IncomingBottleDecisionMetadata,
 } from "./incomingBottleDecisionLog";
 import { resolveActiveBottleIds } from "./resolveActiveBottleIds";
+import {
+  bottleCheckStartedAt,
+  createOrReuseFreshBottleInTransaction,
+} from "./unseenSiblingBottle";
 
 export const AUCTION_FRESHNESS_MS = 6 * 60 * 60_000;
 
@@ -448,13 +452,23 @@ export async function assignAuctionLot({
       )
         throw new AuctionLotMatchChangedError();
       // Auction matching creates before locking the lot: all assignment paths lock Bottle first.
-      creation = await createOrReuseBottleInTransaction(tx, {
-        creationSource: "bottle_classifier",
-        createdByActorId: actor.id,
-        input: buildClassifierBottleInput(
-          evidence.output.decision.proposedBottle,
-        ),
-      });
+      creation = await createOrReuseFreshBottleInTransaction(
+        tx,
+        {
+          creationSource: "bottle_classifier",
+          createdByActorId: actor.id,
+          input: buildClassifierBottleInput(
+            evidence.output.decision.proposedBottle,
+          ),
+        },
+        {
+          proposedBottle: evidence.output.decision.proposedBottle,
+          seenBottleIds: evidence.artifacts.candidates.map(
+            ({ bottleId }) => bottleId,
+          ),
+          checkStartedAt: bottleCheckStartedAt(savedCheck),
+        },
+      );
       bottleId = creation.bottle.id;
     }
     if (bottleId === undefined) throw new AuctionLotMatchChangedError();
