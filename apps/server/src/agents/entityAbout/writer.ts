@@ -2,6 +2,7 @@ import { Agent, OpenAIProvider, Runner } from "@openai/agents";
 import config from "@peated/server/config";
 import type { AboutPageRead } from "@peated/server/lib/entityAbout/checks";
 import { createOpenAIClient } from "@peated/server/lib/openaiClient";
+import { createServerPeatedBot } from "@peated/server/lib/peatedBot";
 
 import { AboutDraftSchema, type AboutDraft } from "./draftSchema";
 import { createEntitySearchTool } from "./entitySearch";
@@ -13,7 +14,7 @@ import {
 import {
   ABOUT_WEB_BUDGET,
   createAboutWebTools,
-  createFirecrawlSource,
+  createBotSource,
   type AboutWebSource,
 } from "./webTools";
 
@@ -85,8 +86,7 @@ export const runEntityAboutWriter = createEntityAboutWriter(() => {
   if (!config.FIRECRAWL_API_KEY) {
     throw new Error("FIRECRAWL_API_KEY is not configured");
   }
-  return createFirecrawlSource({
-    apiKey: config.FIRECRAWL_API_KEY,
-    apiUrl: config.FIRECRAWL_API_URL,
-  });
+  return createBotSource(
+    createServerPeatedBot({ firecrawlApiKey: config.FIRECRAWL_API_KEY }),
+  );
 });

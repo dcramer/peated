@@ -10,26 +10,55 @@ import { colors, space } from "../../../../styles/tokens.stylex";
 const NARROW = "@media (max-width: 759px)";
 const loadingDelays = [0, 1, 2, 3] as const;
 
+/**
+ * Places an Entity page's parts (owner: docs/features/entity-page.md). The
+ * main column reads top to bottom; the sidebar holds facts to check at a
+ * glance. On phones the parts stack in one column, with facts near the top
+ * and sources last.
+ */
 export function EntityOverviewLayout({
-  catalogSections,
-  facts,
+  lead,
+  timeline,
+  catalog,
+  history,
+  activity,
+  sources,
   media,
+  facts,
   relationships,
 }: {
-  catalogSections: ReactNode;
-  facts: ReactNode;
+  lead?: ReactNode;
+  timeline?: ReactNode;
+  catalog: ReactNode;
+  history?: ReactNode;
+  activity?: ReactNode;
+  sources?: ReactNode;
   media: ReactNode;
+  facts: ReactNode;
   relationships: ReactNode;
 }) {
   return (
     <div {...stylex.props(styles.overviewGrid)}>
-      <div {...stylex.props(styles.catalog)}>
-        <div {...stylex.props(styles.facts)}>{facts}</div>
-        <div {...stylex.props(styles.catalogSections)}>{catalogSections}</div>
+      <div {...stylex.props(styles.main)}>
+        {lead ? <div {...stylex.props(styles.lead)}>{lead}</div> : null}
+        {timeline ? (
+          <div {...stylex.props(styles.timeline)}>{timeline}</div>
+        ) : null}
+        <div {...stylex.props(styles.catalog)}>{catalog}</div>
+        {history ? (
+          <div {...stylex.props(styles.history)}>{history}</div>
+        ) : null}
+        {activity ? (
+          <div {...stylex.props(styles.activity)}>{activity}</div>
+        ) : null}
+        {sources ? (
+          <div {...stylex.props(styles.sources)}>{sources}</div>
+        ) : null}
       </div>
 
       <aside {...stylex.props(styles.details)}>
         <div {...stylex.props(styles.media)}>{media}</div>
+        <div {...stylex.props(styles.facts)}>{facts}</div>
         <div {...stylex.props(styles.relationships)}>{relationships}</div>
       </aside>
     </div>
@@ -69,10 +98,9 @@ export function EntityOverviewLoading() {
         media={
           <div aria-hidden="true" {...stylex.props(styles.loadingMedia)} />
         }
-        catalogSections={
+        catalog={
           <div aria-hidden="true" {...stylex.props(styles.loadingSections)}>
             <LoadingSection label="Loading entity releases" rows={4} />
-            <LoadingSection label="Loading bottles" rows={4} />
           </div>
         }
         relationships={
@@ -90,8 +118,9 @@ const styles = stylex.create({
   overviewGrid: {
     display: "grid",
     gridTemplateAreas: {
-      default: '"catalog details"',
-      [NARROW]: '"facts" "media" "catalogSections" "relationships"',
+      default: '"main details"',
+      [NARROW]:
+        '"lead" "media" "facts" "timeline" "catalog" "history" "activity" "relationships" "sources"',
     },
     gridTemplateColumns: {
       default: "minmax(0, 1fr) 336px",
@@ -101,8 +130,8 @@ const styles = stylex.create({
     alignItems: "start",
     columnGap: space.x12,
   },
-  catalog: {
-    gridArea: "catalog",
+  main: {
+    gridArea: "main",
     minWidth: 0,
     paddingTop: space.x4,
     display: {
@@ -116,16 +145,38 @@ const styles = stylex.create({
       [NARROW]: "contents",
     },
   },
-  facts: {
-    gridArea: "facts",
+  lead: {
+    gridArea: "lead",
+    minWidth: 0,
+    paddingBottom: space.x6,
+  },
+  timeline: {
+    gridArea: "timeline",
+    minWidth: 0,
+    paddingTop: { default: 0, [NARROW]: space.x6 },
+  },
+  catalog: {
+    gridArea: "catalog",
     minWidth: 0,
   },
-  catalogSections: {
-    gridArea: "catalogSections",
+  history: {
+    gridArea: "history",
+    minWidth: 0,
+  },
+  activity: {
+    gridArea: "activity",
+    minWidth: 0,
+  },
+  sources: {
+    gridArea: "sources",
     minWidth: 0,
   },
   media: {
     gridArea: "media",
+    minWidth: 0,
+  },
+  facts: {
+    gridArea: "facts",
     minWidth: 0,
   },
   relationships: {
@@ -133,13 +184,10 @@ const styles = stylex.create({
     minWidth: 0,
   },
   loadingFacts: {
-    display: "grid",
-    gridTemplateColumns: {
-      default: "repeat(auto-fit, minmax(160px, 1fr))",
-      "@media (max-width: 559px)": "minmax(0, 1fr)",
-    },
+    display: "flex",
+    flexDirection: "column",
     gap: space.x4,
-    paddingBottom: space.x4,
+    paddingTop: space.x6,
   },
   loadingFact: {
     display: "flex",

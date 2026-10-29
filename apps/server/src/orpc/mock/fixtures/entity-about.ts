@@ -104,34 +104,3 @@ export const mockEntityVintageCounts = new Map([
     },
   ],
 ]);
-
-export const mockEntityBottlerCounts = new Map([
-  [
-    mockBrora.id,
-    {
-      results: [
-        {
-          entity: {
-            id: 9212,
-            name: "The Scotch Malt Whisky Society",
-            kind: "bottler" as const,
-          },
-          count: 23,
-        },
-        {
-          entity: {
-            id: 9208,
-            name: "Gordon & MacPhail",
-            kind: "bottler" as const,
-          },
-          count: 20,
-        },
-        {
-          entity: { id: 9209, name: "Compass Box", kind: "bottler" as const },
-          count: 3,
-        },
-      ],
-      withoutEntity: 26,
-    },
-  ],
-]);

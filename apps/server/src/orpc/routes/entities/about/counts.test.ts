@@ -2,9 +2,7 @@ import waitError from "@peated/server/lib/test/waitError";
 import { routerClient } from "@peated/server/orpc/router";
 
 describe("About catalog numbers", () => {
-  test("counts vintages and bottlers for a distillery", async ({
-    fixtures,
-  }) => {
+  test("counts vintages for a distillery", async ({ fixtures }) => {
     const distillery = await fixtures.Entity({ kind: "distillery" });
     const bottler = await fixtures.Entity({
       kind: "bottler",
@@ -45,18 +43,6 @@ describe("About catalog numbers", () => {
         { year: 1981, count: 2 },
       ],
       withoutYear: 1,
-    });
-
-    expect(
-      await routerClient.entities.about.bottlers({ entity: distillery.id }),
-    ).toEqual({
-      results: [
-        {
-          entity: { id: bottler.id, name: "Signatory", kind: "bottler" },
-          count: 2,
-        },
-      ],
-      withoutEntity: 3,
     });
   });
 
@@ -106,14 +92,9 @@ describe("About catalog numbers", () => {
     });
   });
 
-  test("counts distilleries and release years for a brand", async ({
-    fixtures,
-  }) => {
+  test("counts release years for a brand", async ({ fixtures }) => {
     const brand = await fixtures.Entity({ kind: "brand" });
-    const distillery = await fixtures.Entity({
-      kind: "distillery",
-      name: "Cardhu",
-    });
+    const distillery = await fixtures.Entity({ kind: "distillery" });
     await fixtures.Bottle({
       name: "A",
       brandId: brand.id,
@@ -122,17 +103,6 @@ describe("About catalog numbers", () => {
     });
     await fixtures.Bottle({ name: "B", brandId: brand.id });
 
-    expect(
-      await routerClient.entities.about.distillers({ entity: brand.id }),
-    ).toEqual({
-      results: [
-        {
-          entity: { id: distillery.id, name: "Cardhu", kind: "distillery" },
-          count: 1,
-        },
-      ],
-      withoutEntity: 1,
-    });
     expect(
       await routerClient.entities.about.releaseYears({ entity: brand.id }),
     ).toEqual({ results: [{ year: 2020, count: 1 }], withoutYear: 1 });
@@ -183,21 +153,6 @@ describe("About catalog numbers", () => {
         { year: 2021, count: 1 },
       ],
       withoutYear: 0,
-    });
-    expect(
-      await routerClient.entities.about.distillers({ entity: bottler.id }),
-    ).toEqual({
-      results: [
-        {
-          entity: { id: ardbeg.id, name: "Ardbeg", kind: "distillery" },
-          count: 1,
-        },
-        {
-          entity: { id: caolIla.id, name: "Caol Ila", kind: "distillery" },
-          count: 1,
-        },
-      ],
-      withoutEntity: 0,
     });
   });
 

@@ -203,6 +203,11 @@ export function EntityPageFrameClient({
     entity.kind === "distillery";
   const currentHref = getEntityCurrentHref(entity, pathname);
   const bottleActionLabel = "Add a bottle";
+  // The About lead opens the Overview, so the header leaves out the
+  // description there to show one summary (owner: docs/features/entity-page.md).
+  const showDescription =
+    entity.description &&
+    !(entity.hasAbout && currentHref === getEntityUrl(entity));
 
   return (
     <EntityPageContext.Provider value={entity}>
@@ -226,7 +231,7 @@ export function EntityPageFrameClient({
           }
           actionsPosition="start"
           description={
-            entity.description ? (
+            showDescription && entity.description ? (
               <ExpandableDescription content={entity.description} />
             ) : null
           }

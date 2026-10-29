@@ -80,6 +80,12 @@ them with `getSite(origin)`: whether an admin made a robots.txt exception, and
 whether the website is blocked. When a direct read hits a bot wall, PeatedBot
 calls `onBotWall(origin)` so the caller can store the website as blocked.
 
+On the server, `createServerPeatedBot` in `apps/server/src/lib/peatedBot.ts`
+uses Redis for the cache and the `bot_site` table for website settings. Its
+Redis cache is best effort: a command that fails or takes longer than 250 ms
+acts like a miss, so a Redis outage costs extra robots.txt requests instead of
+stalling reads.
+
 ## Request signing
 
 [PeatedBot request signing](../../docs/operations/peated-bot.md) explains how to

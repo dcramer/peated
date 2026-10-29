@@ -1,7 +1,9 @@
 import type { Outputs } from "@peated/server/orpc/router";
 
 import { BottleList } from "@peated/web/components/bottleList.stylex";
+import { ButtonLink } from "@peated/web/components/button.stylex";
 import {
+  EmptyState,
   LoadingList,
   SectionError,
 } from "@peated/web/components/feedback.stylex";
@@ -14,26 +16,42 @@ import { entityHasBottleCatalog, type Entity } from "./entityPageData";
 
 type BottleList = Outputs["bottles"]["list"];
 
+/**
+ * The one Bottle list on an Entity's Overview: its latest releases (owner:
+ * docs/features/entity-page.md). A distillery with no releases of its own
+ * shows the latest bottlings of its spirit instead.
+ */
 export function EntityReleaseOverview({
+  createBottleHref,
   entity,
   error,
+  latestBottlings,
   pending,
   releaseList,
   retry,
 }: {
+  createBottleHref?: string;
   entity: Entity;
   error: boolean;
+  latestBottlings?: BottleList;
   pending: boolean;
   releaseList?: BottleList;
   retry: () => void;
 }) {
   if (!entityHasBottleCatalog(entity)) return null;
-  const isDistillery = entity.kind === "distillery";
-  const heading = isDistillery
-    ? "Latest distillery releases"
-    : "Latest releases";
+  const ownReleases =
+    entity.kind !== "distillery" || Boolean(releaseList?.results.length);
+  const list = ownReleases ? releaseList : latestBottlings;
+  const heading =
+    entity.kind !== "distillery"
+      ? "Latest releases"
+      : ownReleases
+        ? "Latest distillery releases"
+        : "Latest bottlings";
   const viewAllParams = new URLSearchParams({ sort: "-release" });
-  if (isDistillery) viewAllParams.set("view", "releases");
+  if (entity.kind === "distillery" && ownReleases) {
+    viewAllParams.set("view", "releases");
+  }
 
   if (pending) {
     return (
@@ -53,7 +71,28 @@ export function EntityReleaseOverview({
     );
   }
 
-  if (!releaseList?.results.length) return null;
+  if (!list?.results.length) {
+    const addBottleHref =
+      createBottleHref ??
+      `/bottles/new?${new URLSearchParams({
+        returnTo: getEntityUrl(entity),
+      }).toString()}`;
+
+    return (
+      <PageSection heading="Bottles">
+        <EmptyState
+          action={
+            <ButtonLink href={addBottleHref} size="sm" variant="accent">
+              Add a bottle
+            </ButtonLink>
+          }
+          heading="No bottles yet"
+        >
+          No bottles have been added for {entity.name} yet.
+        </EmptyState>
+      </PageSection>
+    );
+  }
 
   return (
     <PageSection
@@ -62,18 +101,17 @@ export function EntityReleaseOverview({
         <TextLink
           href={`${getEntityUrl(entity)}/bottles?${viewAllParams.toString()}`}
         >
-          View all releases
+          {entity.kind === "distillery" && ownReleases
+            ? "View all releases"
+            : `View all ${entity.totalBottles.toLocaleString("en-US")} bottles`}
         </TextLink>
       }
     >
       <BottleList
-        ariaLabel={
-          isDistillery
-            ? `${entity.name} latest distillery releases`
-            : `${entity.name} latest releases`
-        }
-        items={releaseList.results.map((bottle) =>
+        ariaLabel={`${entity.name} ${heading.toLowerCase()}`}
+        items={list.results.map((bottle) =>
           toBottleListItem(bottle, {
+            includeBottler: !ownReleases,
             includeRatings: true,
             includeRelatedReleases: true,
           }),

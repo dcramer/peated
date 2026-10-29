@@ -1,10 +1,8 @@
 import { tool } from "@openai/agents";
-import { BOT_USER_AGENT } from "@peated/server/constants";
+import type { PageRead, PeatedBot } from "@peated/bot";
 import type { AboutPageRead } from "@peated/server/lib/entityAbout/checks";
 import { z } from "zod";
 
-const FIRECRAWL_API_URL = "https://api.firecrawl.dev";
-const FIRECRAWL_TIMEOUT_MS = 30_000;
 const SEARCH_RESULT_LIMIT = 8;
 // Pages are long; the writer needs the passages, and quotes are checked
 // against exactly this text.
@@ -45,80 +43,6 @@ export type WebBudget = { searches: number; reads: number };
 /** The writer's web allowance for one run. */
 export const ABOUT_WEB_BUDGET: WebBudget = { searches: 32, reads: 48 };
 
-const SearchResponseSchema = z
-  .object({
-    data: z
-      .object({
-        web: z
-          .array(
-            z
-              .object({
-                url: z.string().url(),
-                title: z.string().nullable().optional(),
-                description: z.string().nullable().optional(),
-              })
-              .passthrough(),
-          )
-          .default([]),
-      })
-      .passthrough(),
-  })
-  .passthrough();
-
-const ScrapeResponseSchema = z
-  .object({
-    data: z
-      .object({
-        markdown: z.string().nullable().optional(),
-        metadata: z
-          .object({
-            title: z.string().nullable().optional(),
-            publishedTime: z.string().nullable().optional(),
-            "article:published_time": z.string().nullable().optional(),
-          })
-          .passthrough()
-          .optional(),
-      })
-      .passthrough(),
-  })
-  .passthrough();
-
-type FirecrawlRequest =
-  | {
-      path: "/v2/search";
-      body: { query: string; limit: number; sources: string[] };
-    }
-  | {
-      path: "/v2/scrape";
-      body: {
-        url: string;
-        formats: string[];
-        onlyMainContent: boolean;
-        proxy: string;
-      };
-    };
-
-async function firecrawl(
-  apiKey: string,
-  apiUrl: string,
-  { path, body }: FirecrawlRequest,
-) {
-  const response = await fetch(new URL(path, apiUrl), {
-    method: "POST",
-    signal: AbortSignal.timeout(FIRECRAWL_TIMEOUT_MS),
-    headers: {
-      Authorization: `Bearer ${apiKey}`,
-      "Content-Type": "application/json",
-      "User-Agent": BOT_USER_AGENT,
-    },
-    body: JSON.stringify(body),
-  });
-  if (!response.ok)
-    throw new Error(`Firecrawl ${path} failed (${response.status})`);
-  const payload: unknown = await response.json();
-  return payload;
-}
-
 export type AboutSearchResult = {
   url: string;
   title: string;
@@ -131,51 +55,45 @@ export type AboutWebSource = {
   read: (url: string) => Promise<{ title: string | null; text: string }>;
 };
 
-/** Searches and reads the live web through Firecrawl. */
-export function createFirecrawlSource({
-  apiKey,
-  apiUrl: configuredUrl,
-}: {
-  apiKey: string;
-  /** Defaults to Firecrawl's hosted API. */
-  apiUrl: string | null;
-}): AboutWebSource {
-  const apiUrl = configuredUrl ?? FIRECRAWL_API_URL;
+const REFUSED_READS = {
+  invalid_url: "This address is not a public web page.",
+  not_public: "This address is not a public web page.",
+  robots_disallowed:
+    "The website's robots.txt does not allow reading this page.",
+  robots_unavailable:
+    "The website's robots.txt could not be read, so the page was not read.",
+  login_required: "This page needs a login.",
+} satisfies Record<Extract<PageRead, { status: "refused" }>["reason"], string>;
+
+/** Searches and reads the live web through PeatedBot. */
+export function createBotSource(
+  bot: Pick<PeatedBot, "readPage" | "searchWeb">,
+): AboutWebSource {
   return {
     search: async (query) => {
-      const payload = SearchResponseSchema.parse(
-        await firecrawl(apiKey, apiUrl, {
-          path: "/v2/search",
-          body: { query, limit: SEARCH_RESULT_LIMIT, sources: ["web"] },
-        }),
-      );
-      return payload.data.web.map((result) => ({
-        url: result.url,
-        title: result.title ?? result.url,
-        description: result.description ?? null,
-      }));
+      const search = await bot.searchWeb({ query, limit: SEARCH_RESULT_LIMIT });
+      if (search.status === "failed") {
+        throw new Error(
+          `Search failed${search.httpStatus ? ` (HTTP ${search.httpStatus})` : ""}.`,
+        );
+      }
+      return search.results;
     },
     read: async (url) => {
-      const payload = ScrapeResponseSchema.parse(
-        await firecrawl(apiKey, apiUrl, {
-          path: "/v2/scrape",
-          body: {
-            url,
-            formats: ["markdown"],
-            onlyMainContent: true,
-            // "auto" tries a basic request first and retries through
-            // Firecrawl's stealth proxy only when the site blocks it.
-            proxy: "auto",
-          },
-        }),
-      );
-      const metadata = payload.data.metadata;
+      const page = await bot.readPage({ url, format: "markdown" });
+      if (page.status === "refused") {
+        throw new Error(REFUSED_READS[page.reason]);
+      }
+      if (page.status === "failed") {
+        throw new Error(
+          page.reason === "not_found"
+            ? "Page not found."
+            : `Read failed (${page.reason}${page.httpStatus ? `, HTTP ${page.httpStatus}` : ""}).`,
+        );
+      }
       return {
-        title: metadata?.title ?? null,
-        text: withPublishedDate(
-          toPlainText(payload.data.markdown ?? ""),
-          metadata?.publishedTime ?? metadata?.["article:published_time"],
-        ),
+        title: page.title,
+        text: withPublishedDate(toPlainText(page.content), page.publishedTime),
       };
     },
   };

@@ -5,7 +5,7 @@ import {
   bottleChecks,
   externalSites,
 } from "@peated/server/db/schema";
-import { auctionLotCheckKey } from "@peated/server/lib/auctionMatchEvidence";
+import { isAuctionLotIdentityCheck } from "@peated/server/lib/auctionMatchEvidence";
 import { isMiniatureAuctionLot } from "@peated/server/lib/auctions";
 import { procedure } from "@peated/server/orpc";
 import { requireAdmin } from "@peated/server/orpc/middleware";
@@ -89,13 +89,7 @@ export default procedure
             where: eq(bottleChecks.id, lot.matchCheckId),
           });
           // Reject foreign source/version identities, but leave unsupported old evidence for review.
-          if (
-            !check ||
-            check.sourceKind !== "auction_lot" ||
-            check.sourceId !== String(lot.id) ||
-            check.backgroundEventKey !==
-              auctionLotCheckKey(lot.id, lot.sourceFingerprint)
-          )
+          if (!check || !isAuctionLotIdentityCheck(lot, check))
             throw errors.CONFLICT({
               message:
                 "The saved check no longer belongs to this lot's identity.",

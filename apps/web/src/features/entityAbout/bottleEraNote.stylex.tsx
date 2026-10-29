@@ -40,9 +40,10 @@ export function BottleEraNote({
 
   const context = getEraContext(about, distiller.name, vintageYear);
   if (!context) return null;
-  // Link only when the About tab exists; otherwise the note stands alone.
+  // Link only when the Entity page shows the About history; otherwise the
+  // note stands alone.
   const href = hasEntityAboutPage(about)
-    ? `${getEntityUrl(distiller)}/about`
+    ? `${getEntityUrl(distiller)}#history`
     : null;
   const linked = (text: string) =>
     href ? <TextLink href={href}>{text}</TextLink> : text;
