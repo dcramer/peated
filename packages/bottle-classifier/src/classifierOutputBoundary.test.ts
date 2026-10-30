@@ -1,20 +1,14 @@
-import {
-  Runner,
-  Usage,
-  type Agent,
-  type JsonSchemaDefinition,
-  type Model,
-} from "@openai/agents";
-import OpenAI from "openai";
+import { MockLanguageModelV4 } from "ai/test";
 import { describe, expect, test, vi } from "vitest";
 import { z } from "zod";
-import { createTestLanguageModel } from "./testLanguageModel";
-
 import type { BottleContext } from "./bottleContextContract";
 import {
   prepareBottleAuditAgentRun,
   prepareBottleClassifierAgentRun,
+  type PreparedAgentRequest,
 } from "./classifierRuntime";
+import { runAgent } from "./runtime/agentRun";
+import { agentRunResult, createTestLanguageModel } from "./testLanguageModel";
 
 const JsonValueSchema = z.json();
 type JsonValue = z.infer<typeof JsonValueSchema>;
@@ -67,7 +61,6 @@ const currentBottleContext: BottleContext = {
 };
 
 const classifierOptions = {
-  client: new OpenAI({ apiKey: "test-api-key" }),
   languageModel: createTestLanguageModel().languageModel,
   model: "test-model",
   maxSearchQueries: 0,
@@ -76,76 +69,64 @@ const classifierOptions = {
   },
 };
 
+const NO_USAGE = {
+  inputTokens: {
+    total: 0,
+    noCache: 0,
+    cacheRead: undefined,
+    cacheWrite: undefined,
+  },
+  outputTokens: { total: 0, text: 0, reasoning: undefined },
+};
+
+/**
+ * Runs a prepared agent against a model that searches for `researchTurns`
+ * turns, then answers with `finalOutput`.
+ */
 async function runWithFakeModel(
-  agent: Agent<unknown, JsonSchemaDefinition>,
-  input: string,
+  prepared: PreparedAgentRequest,
   finalOutput: JsonValue,
-  {
-    researchTurns = 0,
-    runOptions,
-  }: {
-    researchTurns?: number;
-    runOptions?: Awaited<
-      ReturnType<typeof prepareBottleClassifierAgentRun>
-    >["runOptions"];
-  } = {},
-): Promise<{
-  outputType: JsonSchemaDefinition;
-  result: unknown;
-  turn: number;
-}> {
-  let outputType: JsonSchemaDefinition | undefined;
+  { researchTurns = 0 }: { researchTurns?: number } = {},
+) {
   let turn = 0;
-  const model: Model = {
-    async getResponse(request) {
+  const model = new MockLanguageModelV4({
+    doGenerate: async () => {
       turn += 1;
-      if (request.outputType === "text") {
-        throw new Error("Expected a JSON schema output type.");
-      }
-      outputType = request.outputType;
       if (turn <= researchTurns) {
         return {
-          usage: new Usage(),
-          output: [
+          content: [
             {
-              type: "function_call",
-              callId: `call-${turn}`,
-              name: "search_bottles",
-              arguments: JSON.stringify({ query: `Example query ${turn}` }),
+              type: "tool-call",
+              toolCallId: `call-${turn}`,
+              toolName: "search_bottles",
+              input: JSON.stringify({ query: `Example query ${turn}` }),
             },
           ],
+          finishReason: { unified: "tool-calls", raw: "tool_calls" },
+          usage: NO_USAGE,
+          warnings: [],
         };
       }
       return {
-        usage: new Usage(),
-        output: [
-          {
-            type: "message",
-            role: "assistant",
-            status: "completed",
-            content: [
-              {
-                type: "output_text",
-                text: JSON.stringify(finalOutput),
-              },
-            ],
-          },
-        ],
+        content: [{ type: "text", text: JSON.stringify(finalOutput) }],
+        finishReason: { unified: "stop", raw: "stop" },
+        usage: NO_USAGE,
+        warnings: [],
       };
     },
-    async *getStreamedResponse() {},
-  };
+  });
 
-  const result = await new Runner({ tracingDisabled: true }).run(
-    agent.clone({ model }),
-    input,
-    runOptions,
-  );
-
-  if (!outputType) {
-    throw new Error("Fake model did not receive an output type");
-  }
-  return { outputType, result, turn };
+  const result = await runAgent({
+    ...prepared,
+    model,
+    functionId: "output_boundary_test",
+    input: prepared.input,
+  });
+  const responseFormat = z
+    .object({ type: z.literal("json"), schema: z.record(z.string(), z.json()) })
+    .passthrough()
+    .parse(model.doGenerateCalls.at(-1)?.responseFormat);
+  return { responseFormat, result, turn };
 }
 
 describe("classifier output boundary", () => {
@@ -161,37 +142,32 @@ describe("classifier output boundary", () => {
     });
     const dynamicInput = JSON.parse(prepared.input);
 
-    const { outputType, result } = await runWithFakeModel(
-      prepared.agent,
-      prepared.input,
-      {
-        action: "no_match",
-        rationale: "No safe local match.",
-        candidateBottleIds: [],
-        identityScope: null,
-        referenceScope: null,
-        observation: null,
-        confidenceBasis: null,
-        matchedBottleId: null,
-        proposedBottle: null,
-      },
-    );
+    const { responseFormat, result } = await runWithFakeModel(prepared, {
+      action: "no_match",
+      rationale: "No safe local match.",
+      candidateBottleIds: [],
+      identityScope: null,
+      referenceScope: null,
+      observation: null,
+      confidenceBasis: null,
+      matchedBottleId: null,
+      proposedBottle: null,
+    });
 
-    expect(outputType).toMatchObject({
-      type: "json_schema",
-      strict: true,
+    expect(responseFormat).toMatchObject({
+      type: "json",
+      name: "bottle_reference_output",
       schema: {
         type: "object",
         additionalProperties: false,
         properties: { action: expect.any(Object) },
       },
     });
-    expect(outputType.schema.properties).not.toHaveProperty(
-      "proposedOperations",
-    );
-    expect(outputType.schema.properties).not.toHaveProperty("identityBasis");
-    expect(outputType.schema.properties).not.toHaveProperty("findings");
-    expect(outputType.schema).toMatchObject({
+    const schema = responseFormat.schema;
+    expect(schema.properties).not.toHaveProperty("proposedOperations");
+    expect(schema.properties).not.toHaveProperty("identityBasis");
+    expect(schema.properties).not.toHaveProperty("findings");
+    expect(schema).toMatchObject({
       properties: {
         proposedBottle: {
           anyOf: expect.arrayContaining([
@@ -207,8 +183,8 @@ describe("classifier output boundary", () => {
         },
       },
     });
-    expect(hasFormatAnnotation(outputType.schema)).toBe(false);
-    expect(prepared.agent.tools.map((tool) => tool.name)).not.toEqual(
+    expect(hasFormatAnnotation(schema)).toBe(false);
+    expect(prepared.tools.map((tool) => tool.name)).not.toEqual(
       expect.arrayContaining([
         "propose_update_bottle",
         "propose_merge_bottles",
@@ -230,30 +206,25 @@ describe("classifier output boundary", () => {
       conversationId: "audit-output-schema-test",
     });
 
-    const { outputType } = await runWithFakeModel(
-      prepared.agent,
-      prepared.input,
-      {
-        summary: "The Bottle is clean.",
-        findings: [],
-      },
-    );
+    const { responseFormat } = await runWithFakeModel(prepared, {
+      summary: "The Bottle is clean.",
+      findings: [],
+    });
 
-    expect(outputType).toMatchObject({
-      type: "json_schema",
-      strict: true,
+    expect(responseFormat).toMatchObject({
+      type: "json",
+      name: "bottle_audit_output",
       schema: { type: "object", additionalProperties: false },
     });
-    expect(outputType.schema.properties).toHaveProperty("summary");
-    expect(outputType.schema.properties).toHaveProperty("findings");
-    expect(outputType.schema.required).toEqual(
+    const schema = responseFormat.schema;
+    expect(schema.properties).toHaveProperty("summary");
+    expect(schema.properties).toHaveProperty("findings");
+    expect(schema.required).toEqual(
       expect.arrayContaining(["summary", "findings"]),
     );
-    expect(outputType.schema.properties).not.toHaveProperty(
-      "proposedOperations",
-    );
-    expect(hasFormatAnnotation(outputType.schema)).toBe(false);
-    expect(prepared.agent.tools.map((tool) => tool.name)).toEqual(
+    expect(schema.properties).not.toHaveProperty("proposedOperations");
+    expect(hasFormatAnnotation(schema)).toBe(false);
+    expect(prepared.tools.map((tool) => tool.name)).toEqual(
       expect.arrayContaining([
         "propose_update_bottle",
         "propose_merge_bottles",
@@ -274,8 +245,8 @@ describe("classifier output boundary", () => {
     });
 
     expect(
-      prepared.getOutput({
-        finalOutput: {
+      prepared.getOutput(
+        agentRunResult({
           summary: "The Bottle needs separate moderator attention.",
           findings: [
             {
@@ -284,8 +255,8 @@ describe("classifier output boundary", () => {
               evidenceRefs: [{ kind: "bottle", bottleId: 45146 }],
             },
           ],
-        },
-      }),
+        }),
+      ),
     ).toMatchObject({
       findings: [
         expect.objectContaining({
@@ -295,20 +266,17 @@ describe("classifier output boundary", () => {
     });
   });
 
-  test("applies canonical defaults after the SDK parses sparse reference JSON", async () => {
+  test("applies canonical defaults to sparse reference JSON", async () => {
     const prepared = await prepareBottleClassifierAgentRun(classifierOptions, {
       reference: { name: "Laphroaig Cairdeas 2022" },
       extractedIdentity: null,
       initialCandidates: [],
     });
-    const { result } = await runWithFakeModel(prepared.agent, prepared.input, {
+    const { result } = await runWithFakeModel(prepared, {
       action: "no_match",
     });
 
-    const runResult = z.object({ finalOutput: z.unknown() }).parse(result);
-    expect(runResult.finalOutput).toEqual({
-      action: "no_match",
-    });
+    expect(result.output).toEqual({ action: "no_match" });
     expect(prepared.getAgentResult(result)).toMatchObject({
       decision: {
         action: "no_match",
@@ -332,8 +300,7 @@ describe("classifier output boundary", () => {
     });
 
     const { result, turn } = await runWithFakeModel(
-      prepared.agent,
-      prepared.input,
+      prepared,
       {
         action: "no_match",
         rationale: "No safe local match.",
@@ -345,11 +312,11 @@ describe("classifier output boundary", () => {
         matchedBottleId: null,
         proposedBottle: null,
       },
-      { researchTurns: 17, runOptions: prepared.runOptions },
+      { researchTurns: 17 },
     );
 
     expect(turn).toBe(18);
-    expect(prepared.runOptions.maxTurns).toBe(turn);
+    expect(prepared.maxTurns).toBe(turn);
     expect(prepared.getAgentResult(result).decision).toMatchObject({
       action: "no_match",
     });
@@ -364,7 +331,7 @@ describe("classifier output boundary", () => {
       signal,
     });
 
-    expect(prepared.runOptions.signal).toBe(signal);
+    expect(prepared.signal).toBe(signal);
   });
 
   test("rejects operation fields in the strict reference result", async () => {
@@ -375,13 +342,13 @@ describe("classifier output boundary", () => {
     });
 
     expect(() =>
-      prepared.getAgentResult({
-        finalOutput: {
+      prepared.getAgentResult(
+        agentRunResult({
           action: "no_match",
           proposedOperations: [],
           findings: [],
-        },
-      }),
+        }),
+      ),
     ).toThrow();
   });
 
@@ -393,8 +360,8 @@ describe("classifier output boundary", () => {
     });
 
     expect(() =>
-      prepared.getOutput({
-        finalOutput: {
+      prepared.getOutput(
+        agentRunResult({
           summary: "A malformed operation must not cross the boundary.",
           proposedOperations: [
             {
@@ -405,8 +372,8 @@ describe("classifier output boundary", () => {
             },
           ],
           findings: [],
-        },
-      }),
+        }),
+      ),
     ).toThrow();
   });
 });

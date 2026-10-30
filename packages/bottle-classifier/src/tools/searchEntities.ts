@@ -1,4 +1,3 @@
-import { tool } from "@openai/agents";
 import {
   EntityResolutionSchema,
   SearchEntitiesArgsSchema,
@@ -7,6 +6,7 @@ import {
   type SearchEntitiesArgs,
 } from "../classifierTypes";
 import { startToolSpan } from "../observability";
+import { strictAgentTool } from "../runtime/agentRun";
 
 export type EntitySearchResult = EntityResolution;
 const SEARCH_ENTITIES_TOOL_DESCRIPTION =
@@ -26,7 +26,7 @@ export function createSearchEntitiesTool(
     searchEntities: async () => [],
   },
 ) {
-  return tool({
+  return strictAgentTool({
     name: "search_entities",
     description: SEARCH_ENTITIES_TOOL_DESCRIPTION,
     parameters: SearchEntitiesArgsSchema,

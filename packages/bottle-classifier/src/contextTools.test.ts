@@ -1,8 +1,6 @@
-import { RunContext } from "@openai/agents";
-import OpenAI from "openai";
 import { describe, expect, test, vi } from "vitest";
 import { z } from "zod";
-import { createTestLanguageModel } from "./testLanguageModel";
+import { agentRunResult, createTestLanguageModel } from "./testLanguageModel";
 
 import type {
   BottleContext,
@@ -32,7 +30,6 @@ type PreparedRun =
 
 type ToolInput = z.infer<typeof ToolInputSchema>;
 const ToolInputSchema = z.json();
-const testClient = new OpenAI({ apiKey: "test-key" });
 const testLanguageModel = createTestLanguageModel().languageModel;
 
 async function invokePreparedTool(
@@ -40,11 +37,11 @@ async function invokePreparedTool(
   name: string,
   input: ToolInput,
 ) {
-  const selected = prepared.agent.tools.find((tool) => tool.name === name);
-  if (!selected || selected.type !== "function") {
+  const selected = prepared.tools.find((tool) => tool.name === name);
+  if (!selected) {
     throw new Error(`Tool ${name} was not found.`);
   }
-  return await selected.invoke(new RunContext(), JSON.stringify(input));
+  return await selected.execute(input, { toolCallId: `call_${name}` });
 }
 
 function bottleContext(): BottleContext {
@@ -117,7 +114,6 @@ describe("Bottle-check context tools", () => {
       rawLabelText: "UNVERIFIED LABEL READING",
     }));
     const classifier = createBottleClassifier({
-      client: testClient,
       languageModel: testLanguageModel,
       model: "test-model",
       maxSearchQueries: 0,
@@ -131,18 +127,16 @@ describe("Bottle-check context tools", () => {
           await invokePreparedTool(prepared, "get_bottle_context", {
             bottleId: source.bottleId,
           });
-          return {
-            finalOutput: {
-              action: "no_match",
-              rationale: "Identity remains unresolved.",
-              candidateBottleIds: [source.bottleId],
-              identityScope: "product",
-              referenceScope: "none",
-              observation: null,
-              matchedBottleId: null,
-              proposedBottle: null,
-            },
-          };
+          return agentRunResult({
+            action: "no_match",
+            rationale: "Identity remains unresolved.",
+            candidateBottleIds: [source.bottleId],
+            identityScope: "product",
+            referenceScope: "none",
+            observation: null,
+            matchedBottleId: null,
+            proposedBottle: null,
+          });
         },
       },
     });
@@ -169,7 +163,6 @@ describe("Bottle-check context tools", () => {
     const currentBottleContext = bottleContext();
     const prepared = prepareBottleAuditAgentRun(
       {
-        client: testClient,
         languageModel: testLanguageModel,
         model: "test-model",
         maxSearchQueries: 0,
@@ -200,9 +193,9 @@ describe("Bottle-check context tools", () => {
     ).toMatchObject({ status: "recorded" });
 
     expect(
-      prepared.getOutput({
-        finalOutput: { summary: "No material Bottle repair is needed." },
-      }).proposedOperations,
+      prepared.getOutput(
+        agentRunResult({ summary: "No material Bottle repair is needed." }),
+      ).proposedOperations,
     ).toEqual([
       expect.objectContaining({
         input: {
@@ -249,7 +242,6 @@ describe("Bottle-check context tools", () => {
     const unrelatedWebUrl = "https://example.com/laphroaig";
     const prepared = prepareBottleAuditAgentRun(
       {
-        client: testClient,
         languageModel: testLanguageModel,
         model: "test-model",
         maxSearchQueries: 1,
@@ -308,16 +300,15 @@ describe("Bottle-check context tools", () => {
       reason: expect.stringContaining('field "edition"'),
     });
     expect(
-      prepared.getOutput({
-        finalOutput: { summary: "No supported replacement remains." },
-      }).proposedOperations,
+      prepared.getOutput(
+        agentRunResult({ summary: "No supported replacement remains." }),
+      ).proposedOperations,
     ).toEqual([]);
   });
 
   test("offers bounded reference context without catalog-change tools", async () => {
     const prepared = await prepareBottleClassifierAgentRun(
       {
-        client: testClient,
         languageModel: testLanguageModel,
         model: "test-model",
         maxSearchQueries: 0,
@@ -336,7 +327,7 @@ describe("Bottle-check context tools", () => {
       },
     );
 
-    const toolNames = prepared.agent.tools.map((tool) => tool.name);
+    const toolNames = prepared.tools.map((tool) => tool.name);
     expect(toolNames).toContain("get_bottle_context");
     expect(toolNames).toContain("get_entity_context");
     expect(toolNames).not.toEqual(
@@ -350,47 +341,25 @@ describe("Bottle-check context tools", () => {
 
     const bottle = bottleContext();
     const entity = entityContext();
-    const reasoning = prepared.getAgentResult({
-      finalOutput: {
-        action: "no_match",
-        rationale: "The source Bottle remains unresolved.",
-        candidateBottleIds: [],
-        identityScope: "product",
-        observation: null,
-        matchedBottleId: null,
-        proposedBottle: null,
-      },
-      newItems: [
+    const reasoning = prepared.getAgentResult(
+      agentRunResult(
         {
-          type: "tool_call_output_item",
-          rawItem: {
-            name: "get_bottle_context",
-            output: JSON.stringify({ context: bottle }),
-          },
+          action: "no_match",
+          rationale: "The source Bottle remains unresolved.",
+          candidateBottleIds: [],
+          identityScope: "product",
+          observation: null,
+          matchedBottleId: null,
+          proposedBottle: null,
         },
-        {
-          type: "tool_call_output_item",
-          rawItem: {
-            name: "get_bottle_context",
-            output: JSON.stringify({ context: bottle }),
-          },
-        },
-        {
-          type: "tool_call_output_item",
-          rawItem: {
-            name: "get_entity_context",
-            output: JSON.stringify({ context: entity }),
-          },
-        },
-        {
-          type: "tool_call_output_item",
-          rawItem: {
-            name: "get_entity_context",
-            output: JSON.stringify({ context: entity }),
-          },
-        },
-      ],
-    });
+        [
+          { name: "get_bottle_context", output: { context: bottle } },
+          { name: "get_bottle_context", output: { context: bottle } },
+          { name: "get_entity_context", output: { context: entity } },
+          { name: "get_entity_context", output: { context: entity } },
+        ],
+      ),
+    );
 
     expect(reasoning.artifacts.bottleContexts).toEqual([bottle]);
     expect(reasoning.artifacts.entityContexts).toEqual([entity]);
@@ -402,7 +371,6 @@ describe("Bottle-check context tools", () => {
   test("omits context tools when their adapters are not configured", async () => {
     const prepared = await prepareBottleClassifierAgentRun(
       {
-        client: testClient,
         languageModel: testLanguageModel,
         model: "test-model",
         maxSearchQueries: 0,
@@ -417,7 +385,7 @@ describe("Bottle-check context tools", () => {
       },
     );
 
-    expect(prepared.agent.tools.map((tool) => tool.name)).not.toEqual(
+    expect(prepared.tools.map((tool) => tool.name)).not.toEqual(
       expect.arrayContaining(["get_bottle_context", "get_entity_context"]),
     );
   });
@@ -437,7 +405,6 @@ describe("Bottle-check context tools", () => {
     ]);
     const prepared = await prepareBottleClassifierAgentRun(
       {
-        client: testClient,
         languageModel: testLanguageModel,
         model: "test-model",
         maxSearchQueries: 2,
@@ -458,7 +425,7 @@ describe("Bottle-check context tools", () => {
       },
     );
 
-    expect(prepared.agent.tools.map((tool) => tool.name)).toEqual([
+    expect(prepared.tools.map((tool) => tool.name)).toEqual([
       "get_bottle_context",
       "get_entity_context",
     ]);
@@ -471,7 +438,7 @@ describe("Bottle-check context tools", () => {
       bottleId: canonical.bottleId,
     });
     expect(
-      prepared.getAgentResult({ finalOutput: { action: "no_match" } }).artifacts
+      prepared.getAgentResult(agentRunResult({ action: "no_match" })).artifacts
         .bottleContexts,
     ).toEqual(expect.arrayContaining([canonical, duplicate]));
   });
@@ -494,7 +461,6 @@ describe("Bottle-check context tools", () => {
     const events: string[] = [];
     const prepared = prepareBottleAuditAgentRun(
       {
-        client: testClient,
         languageModel: testLanguageModel,
         model: "test-model",
         maxSearchQueries: 2,
@@ -569,9 +535,12 @@ describe("Bottle-check context tools", () => {
     });
     expect(events).toEqual(["web_replayed", "web_result", "proposal_result"]);
     expect(
-      prepared.getOutput({
-        finalOutput: { summary: "The duplicate can be merged.", findings: [] },
-      }).proposedOperations,
+      prepared.getOutput(
+        agentRunResult({
+          summary: "The duplicate can be merged.",
+          findings: [],
+        }),
+      ).proposedOperations,
     ).toEqual([
       expect.objectContaining({
         type: "merge_bottles",

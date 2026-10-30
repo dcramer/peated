@@ -32,14 +32,9 @@ import {
   normalizeProposedBottleDraft,
 } from "@peated/bottle-classifier";
 
-// `client` runs the agents; `languageModel` returns an AI SDK model for label
-// extraction, such as `(model) => createLanguageModel({ model })`.
-const classifier = createBottleClassifier({
-  client,
-  languageModel,
-  model,
-  adapters,
-});
+// `languageModel` returns the AI SDK model for a model name, such as
+// `(model) => createLanguageModel({ model })`.
+const classifier = createBottleClassifier({ languageModel, model, adapters });
 
 const result = await classifier.classifyBottleReference({ reference });
 const audit = await classifier.auditBottle({

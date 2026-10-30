@@ -1,12 +1,5 @@
-import {
-  Agent,
-  OpenAIProvider,
-  Runner,
-  type JsonSchemaDefinition,
-  type NonStreamRunOptions,
-} from "@openai/agents";
+import type { JSONSchema7 } from "ai";
 import { randomUUID } from "node:crypto";
-import type OpenAI from "openai";
 import { zodTextFormat } from "openai/helpers/zod";
 import { z } from "zod";
 import { normalizePotentialProofLikeDecision } from "./abv";
@@ -65,6 +58,12 @@ import {
   buildDefaultBottleSearchInput,
 } from "./runtime/agentInput";
 import {
+  runAgent,
+  stripProviderUnsupportedFormats,
+  type AgentRunResult,
+  type AgentTool,
+} from "./runtime/agentRun";
+import {
   bottleContextToCandidate,
   createBottleContextLoader,
 } from "./runtime/bottleCheckContext";
@@ -72,11 +71,10 @@ import {
   buildAgentArtifacts,
   createBottleCheckTools,
   createRunProposalCollector,
-  getAgentFinalOutput,
   keepFindingsWithCollectedEvidence,
   mergeRunResultToolArtifacts,
   mergeSearchEvidence,
-  observeRunnerTools,
+  observeAgentTools,
   sortedBottleCandidates,
   sortedResolvedEntities,
   type BottleClassifierAgentRunState,
@@ -181,26 +179,12 @@ const AgentOutputJsonSchema = z.discriminatedUnion("additionalProperties", [
     .passthrough(),
 ]);
 
-function stripProviderUnsupportedFormats(value: JsonValue): JsonValue {
-  if (Array.isArray(value)) {
-    return value.map(stripProviderUnsupportedFormats);
-  }
-  const objectValue = z.record(z.string(), JsonValueSchema).safeParse(value);
-  if (!objectValue.success) {
-    return value;
-  }
-
-  return Object.fromEntries(
-    Object.entries(objectValue.data).flatMap(([key, child]) =>
-      key === "format" ? [] : [[key, stripProviderUnsupportedFormats(child)]],
-    ),
-  );
-}
+export type AgentOutputType = { name: string; schema: JSONSchema7 };
 
 function createAgentOutputType(
   name: string,
   schema: z.ZodObject,
-): JsonSchemaDefinition {
+): AgentOutputType {
   // The OpenAI helper makes nullable optional fields required on the wire and
   // rejects optional non-nullable fields before the provider request.
   const generatedSchema = zodTextFormat(schema, name).schema;
@@ -210,9 +194,7 @@ function createAgentOutputType(
     JSON.parse(JSON.stringify(generatedSchema)),
   );
   return {
-    type: "json_schema",
     name,
-    strict: true,
     schema: AgentOutputJsonSchema.parse(
       stripProviderUnsupportedFormats(providerSchema),
     ),
@@ -291,17 +273,10 @@ export type BottleClassifierRunOptions = {
 
 export type BottleClassifierAdapters = BottleClassifierDataSource;
 
-export type BottleAgentRunResult = {
-  finalOutput?: unknown;
-  newItems?: unknown[];
-  state?: unknown;
-  runContext?: unknown;
-  usage?: unknown;
-};
+export type BottleAgentRunResult = AgentRunResult;
 
 type BaseCreateBottleClassifierOptions = {
-  client: OpenAI;
-  /** Label extraction model calls; the agents still use `client`. */
+  /** Returns the AI SDK model for each model name the classifier uses. */
   languageModel: WhiskyLabelModel;
   model: string;
   reasoningEffort?: OpenAIReasoningEffort;
@@ -420,21 +395,21 @@ function getBottleClassifierDataSource(
   return dataSource;
 }
 
-type BottleClassifierAgent = Agent<unknown, JsonSchemaDefinition>;
-
-type BottleAuditAgent = Agent<unknown, typeof BottleAuditAgentOutputType>;
-
-export type PreparedBottleClassifierAgentRun = {
-  agent: BottleClassifierAgent;
-  getArtifacts: () => BottleClassificationArtifacts;
-  getAgentResult: (
-    result: Parameters<typeof getAgentFinalOutput>[0],
-  ) => BottleClassifierAgentResult;
+/** One agent run: what the model sees and the turn limit. */
+export type PreparedAgentRequest = {
+  instructions: string;
+  output: AgentOutputType;
   input: string;
+  tools: AgentTool[];
+  maxTurns: number;
+  signal?: AbortSignal;
+};
+
+export type PreparedBottleClassifierAgentRun = PreparedAgentRequest & {
+  getArtifacts: () => BottleClassificationArtifacts;
+  getAgentResult: (result: AgentRunResult) => BottleClassifierAgentResult;
   conversationId: string;
   spanAttributes: AgentSpanAttributes;
-  runOptions: NonStreamRunOptions<unknown, BottleClassifierAgent>;
-  runner: Runner;
   webSearchBudget: BottleWebSearchBudget;
 };
 
@@ -677,48 +652,13 @@ export async function prepareBottleClassifierAgentRun(
     webSearchBudget,
   });
 
-  const agent: BottleClassifierAgent = new Agent({
-    name: "bottle_classifier_reasoner",
-    instructions,
-    model: options.model,
-    modelSettings: {
-      parallelToolCalls: false,
-      ...getStableOpenAISettings(options.model, options.reasoningEffort),
-    },
-    outputType: BottleReferenceAgentOutputType,
-    tools,
-  });
   const resolvedConversationId = buildClassifierConversationId(
     reference,
     conversationId,
   );
-  const runner = new Runner({
-    tracingDisabled: true,
-    modelProvider: new OpenAIProvider({
-      openAIClient: options.client,
-      useResponses: true,
-    }),
-    workflowName: "Bottle Classifier",
-    groupId: resolvedConversationId,
-    traceMetadata: {
-      "gen_ai.conversation.id": resolvedConversationId,
-      source_id:
-        reference.id === undefined || reference.id === null
-          ? "none"
-          : `${reference.id}`,
-      external_site_id:
-        reference.externalSiteId === undefined ||
-        reference.externalSiteId === null
-          ? "none"
-          : `${reference.externalSiteId}`,
-      current_bottle_id: reference.currentBottleId
-        ? `${reference.currentBottleId}`
-        : "none",
-    },
-  });
-  observeRunnerTools(runner, options.observeToolEvent);
+  let observedTools = observeAgentTools(tools, options.observeToolEvent);
   if (onProgress) {
-    observeRunnerTools(runner, (event) => {
+    observedTools = observeAgentTools(observedTools, (event) => {
       onProgress({
         type: "tool",
         name: event.name,
@@ -743,15 +683,12 @@ export async function prepareBottleClassifierAgentRun(
       imageEvidence: normalizedImageEvidence,
       state,
     });
-  const runOptions: PreparedBottleClassifierAgentRun["runOptions"] = {
-    maxTurns: REFERENCE_CLASSIFIER_MAX_TURNS,
-    stream: false,
-  };
-  if (signal) runOptions.signal = signal;
-
   return {
-    agent,
-    runner,
+    instructions,
+    output: BottleReferenceAgentOutputType,
+    tools: observedTools,
+    maxTurns: REFERENCE_CLASSIFIER_MAX_TURNS,
+    signal,
     input,
     conversationId: resolvedConversationId,
     spanAttributes: {
@@ -765,13 +702,12 @@ export async function prepareBottleClassifierAgentRun(
           ? "none"
           : `${reference.currentBottleId}`,
     },
-    runOptions,
     webSearchBudget,
     getArtifacts,
     getAgentResult: (result) => {
       mergeRunResultToolArtifacts(state, result);
 
-      const finalOutput = getAgentFinalOutput(result);
+      const finalOutput = result.output;
       if (!finalOutput) {
         throw new Error("Agent returned empty output");
       }
@@ -784,16 +720,10 @@ export async function prepareBottleClassifierAgentRun(
   };
 }
 
-export type PreparedBottleAuditAgentRun = {
-  agent: BottleAuditAgent;
+export type PreparedBottleAuditAgentRun = PreparedAgentRequest & {
   conversationId: string;
   getArtifacts: () => BottleClassificationArtifacts;
-  getOutput: (
-    result: Parameters<typeof getAgentFinalOutput>[0],
-  ) => BottleAuditAgentOutput;
-  input: string;
-  runOptions: NonStreamRunOptions<unknown, BottleAuditAgent>;
-  runner: Runner;
+  getOutput: (result: AgentRunResult) => BottleAuditAgentOutput;
 };
 
 export function prepareBottleAuditAgentRun(
@@ -862,16 +792,8 @@ export function prepareBottleAuditAgentRun(
     sourceFields: availableSourceEvidenceFields,
     state,
   });
-  const agent: BottleAuditAgent = new Agent({
-    name: "bottle_auditor",
-    instructions: buildBottleAuditInstructions(),
-    model: options.model,
-    modelSettings: {
-      parallelToolCalls: false,
-      ...getStableOpenAISettings(options.model, options.reasoningEffort),
-    },
-    outputType: BottleAuditAgentOutputType,
-    tools: createBottleCheckTools({
+  const tools = observeAgentTools(
+    createBottleCheckTools({
       allowCandidateExpansion: true,
       dataSource,
       options,
@@ -879,22 +801,8 @@ export function prepareBottleAuditAgentRun(
       state,
       webSearchBudget,
     }),
-  });
-  const runner = new Runner({
-    tracingDisabled: true,
-    modelProvider: new OpenAIProvider({
-      openAIClient: options.client,
-      useResponses: true,
-    }),
-    workflowName: "Bottle Audit",
-    groupId: conversationId,
-    traceMetadata: {
-      "gen_ai.conversation.id": conversationId,
-      bottle_id: `${audit.bottleId}`,
-      origin: audit.origin,
-    },
-  });
-  observeRunnerTools(runner, options.observeToolEvent);
+    options.observeToolEvent,
+  );
   const getArtifacts = () =>
     buildAgentArtifacts({
       extractedIdentity: normalizedExtractedIdentity,
@@ -903,8 +811,10 @@ export function prepareBottleAuditAgentRun(
     });
 
   return {
-    agent,
-    runner,
+    instructions: buildBottleAuditInstructions(),
+    output: BottleAuditAgentOutputType,
+    tools,
+    maxTurns: AUDIT_CLASSIFIER_MAX_TURNS,
     input: buildAuditBottleAgentInput({
       audit,
       reference: normalizedReference,
@@ -918,14 +828,10 @@ export function prepareBottleAuditAgentRun(
       availableSourceEvidenceFields,
     }),
     conversationId,
-    runOptions: {
-      maxTurns: AUDIT_CLASSIFIER_MAX_TURNS,
-      stream: false,
-    },
     getArtifacts,
     getOutput: (result) => {
       mergeRunResultToolArtifacts(state, result);
-      const finalOutput = getAgentFinalOutput(result);
+      const finalOutput = result.output;
       if (!finalOutput) {
         throw new Error("Agent returned empty output");
       }
@@ -945,6 +851,27 @@ export function prepareBottleAuditAgentRun(
 export function createBottleClassifier(
   options: CreateBottleClassifierOptions,
 ): BottleClassifier {
+  const runPreparedAgent = async (
+    preparedRun: PreparedAgentRequest,
+    functionId: string,
+  ) => {
+    const settings = getStableOpenAISettings(
+      options.model,
+      options.reasoningEffort,
+    );
+    return await runAgent({
+      model: options.languageModel(options.model),
+      functionId,
+      instructions: preparedRun.instructions,
+      input: preparedRun.input,
+      tools: preparedRun.tools,
+      output: preparedRun.output,
+      maxTurns: preparedRun.maxTurns,
+      temperature: settings.temperature,
+      reasoning: settings.reasoning?.effort,
+      signal: preparedRun.signal,
+    });
+  };
   const extractor = createWhiskyLabelExtractor({
     languageModel: options.languageModel,
     model: options.model,
@@ -1229,11 +1156,7 @@ export function createBottleClassifier(
             ? await options.overrides.runPreparedBottleClassifierAgent(
                 preparedRun,
               )
-            : await preparedRun.runner.run(
-                preparedRun.agent,
-                preparedRun.input,
-                preparedRun.runOptions,
-              );
+            : await runPreparedAgent(preparedRun, "bottle_classifier");
 
           return {
             agentResult: preparedRun.getAgentResult(result),
@@ -1455,11 +1378,7 @@ export function createBottleClassifier(
             const startedAt = performance.now();
             const result = options.overrides?.runPreparedBottleAuditAgent
               ? await options.overrides.runPreparedBottleAuditAgent(preparedRun)
-              : await preparedRun.runner.run(
-                  preparedRun.agent,
-                  preparedRun.input,
-                  preparedRun.runOptions,
-                );
+              : await runPreparedAgent(preparedRun, "bottle_audit");
             const runMetadata = getBottleClassifierRunMetadata({
               result,
               durationMs: performance.now() - startedAt,

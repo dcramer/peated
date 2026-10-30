@@ -1,6 +1,6 @@
-import { tool } from "@openai/agents";
 import type { BottleSearchEvidence } from "../classifierTypes";
 import { startToolSpan } from "../observability";
+import { strictAgentTool } from "../runtime/agentRun";
 import {
   BottleWebSearchArgsSchema,
   buildBottleSearchEvidence,
@@ -31,7 +31,7 @@ export function createWebSearchTool({
   onEvidence?: (evidence: BottleSearchEvidence) => void;
   executeWebSearch?: BottleWebSearchExecutor;
 }) {
-  return tool({
+  return strictAgentTool({
     name: "web_search",
     description: WEB_SEARCH_TOOL_DESCRIPTION,
     parameters: BottleWebSearchArgsSchema,

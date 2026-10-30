@@ -1,10 +1,10 @@
-import { tool } from "@openai/agents";
 import type { PageRead } from "@peated/bot";
 import {
   BottleSearchEvidenceSchema,
   type BottleSearchEvidence,
 } from "../classifierTypes";
 import { startToolSpan } from "../observability";
+import { strictAgentTool } from "../runtime/agentRun";
 import { canonicalizeWebEvidenceUrl } from "../webEvidenceUrl";
 import {
   BottleWebFindInPageArgsSchema,
@@ -134,7 +134,7 @@ export function createReadPageTools({
   onEvidence?: (evidence: BottleSearchEvidence) => void;
   executeWebSearch?: BottleWebSearchExecutor;
 }) {
-  const readPage = tool({
+  const readPage = strictAgentTool({
     name: "read_page",
     description: READ_PAGE_TOOL_DESCRIPTION,
     parameters: BottleWebReadPageArgsSchema,
@@ -162,7 +162,7 @@ export function createReadPageTools({
     },
   });
 
-  const findInPage = tool({
+  const findInPage = strictAgentTool({
     name: "find_in_page",
     description: FIND_IN_PAGE_TOOL_DESCRIPTION,
     parameters: BottleWebFindInPageArgsSchema,

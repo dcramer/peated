@@ -1,5 +1,5 @@
-import { tool } from "@openai/agents";
 import { z } from "zod";
+import { strictAgentTool } from "../runtime/agentRun";
 
 import {
   BottleContextSchema,
@@ -29,7 +29,7 @@ export function createGetBottleContextTool({
   getBottleContext: (bottleId: number) => Promise<BottleContext | null>;
   onContext?: (context: BottleContext) => void;
 }) {
-  return tool({
+  return strictAgentTool({
     name: "get_bottle_context",
     description: GET_BOTTLE_CONTEXT_DESCRIPTION,
     parameters: GetBottleContextArgsSchema,

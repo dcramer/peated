@@ -1,4 +1,3 @@
-import { RunContext } from "@openai/agents";
 import { describe, expect, test } from "vitest";
 import { z } from "zod";
 
@@ -51,10 +50,10 @@ async function invoke(
   input: ToolInput,
 ) {
   const selected = tools.find((candidate) => candidate.name === name);
-  if (!selected || selected.type !== "function") {
+  if (!selected) {
     throw new Error(`Tool ${name} was not found.`);
   }
-  return await selected.invoke(new RunContext(), JSON.stringify(input));
+  return await selected.execute(input, { toolCallId: "call_1" });
 }
 
 describe("Bottle proposal tools", () => {
@@ -77,7 +76,7 @@ describe("Bottle proposal tools", () => {
       expect(proposalTool.description).toContain("recorded | updated");
       expect(proposalTool.description).toContain("status: rejected");
       expect(proposalTool.description).toContain("reason");
-      expect(JSON.stringify(proposalTool.parameters)).not.toContain('"input"');
+      expect(JSON.stringify(proposalTool.inputSchema)).not.toContain('"input"');
     }
 
     const mergeTool = tools.find(
@@ -89,7 +88,7 @@ describe("Bottle proposal tools", () => {
     );
     expect(mergeTool?.description).toContain("when available");
     expect(mergeTool?.description).toContain("alone is insufficient");
-    expect(mergeTool?.parameters).toMatchObject({
+    expect(mergeTool?.inputSchema).toMatchObject({
       properties: {
         sourceBottleId: expect.anything(),
         destinationBottleId: expect.anything(),
@@ -359,7 +358,7 @@ describe("Bottle proposal tools", () => {
       (tool) => tool.name === "propose_update_bottle",
     );
 
-    expect(JSON.stringify(updateTool?.parameters)).toContain("seriesId");
+    expect(JSON.stringify(updateTool?.inputSchema)).toContain("seriesId");
 
     expect(
       await invoke(tools, "propose_update_bottle", {

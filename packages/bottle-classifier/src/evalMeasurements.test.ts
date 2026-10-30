@@ -62,16 +62,15 @@ describe("eval harness measurements", () => {
     const modelMetadata = getBottleClassifierRunMetadata({
       durationMs: 125,
       result: {
-        state: {
-          usage: {
-            requests: 2,
-            inputTokens: 1_000_000,
-            inputTokensDetails: [
-              { cached_tokens: 250_000, cache_write_tokens: 100_000 },
-            ],
-            outputTokens: 100_000,
-            totalTokens: 1_100_000,
-          },
+        output: null,
+        toolResults: [],
+        usage: {
+          requests: 2,
+          inputTokens: 1_000_000,
+          cachedInputTokens: 250_000,
+          cacheWriteTokens: 100_000,
+          outputTokens: 100_000,
+          totalTokens: 1_100_000,
         },
       },
     });
@@ -192,7 +191,7 @@ describe("eval harness measurements", () => {
       model: "gpt-5.4",
       modelMetadata: getBottleClassifierRunMetadata({
         durationMs: 10,
-        result: {},
+        result: { output: null, toolResults: [], usage: { requests: 0 } },
       }),
       totalMs: 12,
     });

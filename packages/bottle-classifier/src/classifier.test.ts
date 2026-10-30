@@ -1,5 +1,3 @@
-import { RunContext } from "@openai/agents";
-import OpenAI from "openai";
 import { describe, expect, test, vi } from "vitest";
 import {
   createBottleClassifier,
@@ -25,7 +23,7 @@ import {
   type BottleClassificationArtifacts,
 } from "./contract";
 import { buildBottleCandidate } from "./evalFixtureBuilders";
-import { createTestLanguageModel } from "./testLanguageModel";
+import { agentRunResult, createTestLanguageModel } from "./testLanguageModel";
 import {
   buildPageOpeningEvidence,
   createBottleWebSearchBudget,
@@ -43,21 +41,16 @@ function nativeAgentResult({
   inputTokens: number;
   outputTokens: number;
   toolNames?: string[];
-}) {
+}): BottleAgentRunResult {
   return {
-    finalOutput,
-    state: {
-      usage: {
-        requests: 1,
-        inputTokens,
-        outputTokens,
-        totalTokens: inputTokens + outputTokens,
-      },
+    output: finalOutput,
+    usage: {
+      requests: 1,
+      inputTokens,
+      outputTokens,
+      totalTokens: inputTokens + outputTokens,
     },
-    newItems: toolNames.map((name) => ({
-      type: "tool_call_output_item",
-      rawItem: { name },
-    })),
+    toolResults: toolNames.map((name) => ({ name, output: null })),
   };
 }
 
@@ -66,7 +59,6 @@ type ReasoningResult = {
   artifacts: Parameters<typeof buildBottleClassificationArtifacts>[0];
 };
 
-const TEST_OPENAI_CLIENT = new OpenAI({ apiKey: "test" });
 const testLanguageModel = createTestLanguageModel().languageModel;
 
 function noMatchAgentDecision() {
@@ -125,7 +117,6 @@ const TEST_WEB: BottleClassifierWeb = {
 // Real-bottle workflow regressions belong in the fixture-driven eval corpus,
 // not in additional mocked classifier behavior tests here.
 function createTestClassifier({
-  client = TEST_OPENAI_CLIENT,
   extractedIdentity = null,
   extractedIdentityFromImage,
   extractedIdentityFromText,
@@ -144,7 +135,6 @@ function createTestClassifier({
   observeReferenceAgentDecision,
   runPreparedBottleClassifierAgent,
 }: {
-  client?: OpenAI;
   extractedIdentity?: BottleExtractedDetails | null;
   extractedIdentityFromImage?: BottleExtractedDetails | null;
   extractedIdentityFromText?: BottleExtractedDetails | null;
@@ -175,7 +165,6 @@ function createTestClassifier({
 }) {
   return {
     classifier: createBottleClassifier({
-      client,
       languageModel: testLanguageModel,
       model: "test-model",
       maxSearchQueries,
@@ -985,36 +974,35 @@ const lagavulinDistillersEdition2023AutumnCandidate: BottleCandidate = {
 };
 
 describe("createBottleClassifier", () => {
-  test("passes explicit GPT-5 reasoning effort to the semantic agent", async () => {
-    const preparedRun = await prepareBottleClassifierAgentRun(
-      {
-        client: TEST_OPENAI_CLIENT,
-        languageModel: testLanguageModel,
-        model: "openai/gpt-5.6-luna",
-        reasoningEffort: "high",
-        maxSearchQueries: 2,
-        adapters: {
-          searchBottles: vi.fn(async () => []),
-        },
-      },
-      {
-        reference: { name: "Ardbeg Uigeadail" },
-        extractedIdentity: null,
-        initialCandidates: [],
-      },
+  test("sends the reasoning effort and one tool call per turn to the model", async () => {
+    const { languageModel, model } = createTestLanguageModel(
+      noMatchAgentDecision(),
     );
-
-    expect(preparedRun.agent.modelSettings).toMatchObject({
-      parallelToolCalls: false,
-      reasoning: { effort: "high" },
+    const classifier = createBottleClassifier({
+      languageModel,
+      model: "openai/gpt-5.6-luna",
+      reasoningEffort: "high",
+      maxSearchQueries: 2,
+      adapters: {
+        searchBottles: vi.fn(async () => []),
+      },
     });
-    expect(preparedRun.runner.config.tracingDisabled).toBe(true);
+
+    await classifier.runBottleReference({
+      reference: { name: "Ardbeg Uigeadail" },
+      extractedIdentity: null,
+      initialCandidates: [],
+    });
+
+    expect(model.doGenerateCalls[0]).toMatchObject({
+      reasoning: "high",
+      providerOptions: { openai: { parallelToolCalls: false } },
+    });
   });
 
   test("exposes web search, page reading, and find-in-page when configured", async () => {
     const preparedRun = await prepareBottleClassifierAgentRun(
       {
-        client: TEST_OPENAI_CLIENT,
         languageModel: testLanguageModel,
         model: "test-model",
         maxSearchQueries: 2,
@@ -1032,7 +1020,7 @@ describe("createBottleClassifier", () => {
       },
     );
 
-    const toolNames = preparedRun.agent.tools.map((tool) => tool.name);
+    const toolNames = preparedRun.tools.map((tool) => tool.name);
 
     expect(toolNames).toContain("web_search");
     expect(toolNames).toContain("read_page");
@@ -1041,7 +1029,6 @@ describe("createBottleClassifier", () => {
   test("does not expose web tools without a web connection", async () => {
     const preparedRun = await prepareBottleClassifierAgentRun(
       {
-        client: TEST_OPENAI_CLIENT,
         languageModel: testLanguageModel,
         model: "test-model",
         maxSearchQueries: 2,
@@ -1058,7 +1045,7 @@ describe("createBottleClassifier", () => {
       },
     );
 
-    const toolNames = preparedRun.agent.tools.map((tool) => tool.name);
+    const toolNames = preparedRun.tools.map((tool) => tool.name);
 
     expect(toolNames).not.toContain("web_search");
     expect(toolNames).not.toContain("read_page");
@@ -1067,7 +1054,6 @@ describe("createBottleClassifier", () => {
   test("rebuilds search artifacts from batched web search output", async () => {
     const preparedRun = await prepareBottleClassifierAgentRun(
       {
-        client: TEST_OPENAI_CLIENT,
         languageModel: testLanguageModel,
         model: "test-model",
         maxSearchQueries: 2,
@@ -1098,30 +1084,25 @@ describe("createBottleClassifier", () => {
       ],
     };
 
-    const reasoning = preparedRun.getAgentResult({
-      finalOutput: {
-        action: "no_match",
-        rationale: "No local candidate was provided.",
-        candidateBottleIds: [],
-        identityScope: "product",
-        observation: null,
-        matchedBottleId: null,
-        proposedBottle: null,
-      },
-      newItems: [
+    const reasoning = preparedRun.getAgentResult(
+      agentRunResult(
         {
-          type: "tool_call_output_item",
-          rawItem: {
-            type: "function_call_result",
-            name: "web_search",
-            output: JSON.stringify({
-              evidence: [webSearchEvidence],
-              errors: [],
-            }),
-          },
+          action: "no_match",
+          rationale: "No local candidate was provided.",
+          candidateBottleIds: [],
+          identityScope: "product",
+          observation: null,
+          matchedBottleId: null,
+          proposedBottle: null,
         },
-      ],
-    });
+        [
+          {
+            name: "web_search",
+            output: { evidence: [webSearchEvidence], errors: [] },
+          },
+        ],
+      ),
+    );
 
     expect(reasoning.artifacts.searchEvidence).toEqual([webSearchEvidence]);
     expect(reasoning.decision).toMatchObject({});
@@ -1145,14 +1126,13 @@ describe("createBottleClassifier", () => {
       web,
       budget: createBottleWebSearchBudget(1),
     });
-    await readPage!.invoke(new RunContext(), JSON.stringify({ url: pageUrl }));
-    const miss = await findInPage!.invoke(
-      new RunContext(),
-      JSON.stringify({ url: pageUrl, query: "sherry" }),
+    await readPage!.execute({ url: pageUrl }, { toolCallId: "call_read" });
+    const miss = await findInPage!.execute(
+      { url: pageUrl, query: "sherry" },
+      { toolCallId: "call_find" },
     );
     const preparedRun = await prepareBottleClassifierAgentRun(
       {
-        client: TEST_OPENAI_CLIENT,
         languageModel: testLanguageModel,
         model: "test-model",
         maxSearchQueries: 2,
@@ -1167,19 +1147,11 @@ describe("createBottleClassifier", () => {
       },
     );
 
-    const reasoning = preparedRun.getAgentResult({
-      finalOutput: noMatchAgentDecision(),
-      newItems: [
-        {
-          type: "tool_call_output_item",
-          rawItem: {
-            type: "function_call_result",
-            name: "find_in_page",
-            output: JSON.stringify(miss),
-          },
-        },
-      ],
-    });
+    const reasoning = preparedRun.getAgentResult(
+      agentRunResult(noMatchAgentDecision(), [
+        { name: "find_in_page", output: miss },
+      ]),
+    );
 
     expect(reasoning.artifacts.searchEvidence).toEqual([]);
   });
@@ -2446,7 +2418,7 @@ describe("createBottleClassifier", () => {
     const signal = new AbortController().signal;
     const runAgent = vi.fn(
       async (preparedRun: PreparedBottleClassifierAgentRun) => {
-        expect(preparedRun.runOptions.signal).toBe(signal);
+        expect(preparedRun.signal).toBe(signal);
         return nativeAgentResult({
           finalOutput: noMatchAgentDecision(),
           inputTokens: 20,
@@ -2478,23 +2450,12 @@ describe("createBottleClassifier", () => {
         expect(progress).toEqual([
           { type: "candidates", candidates: [macallanSherryOakCandidate] },
         ]);
-        // SAFETY: observeRunnerTools reads only the tool name and call ID, so
-        // the runner context, agent, and tool can be partial stand-ins here.
-        preparedRun.runner.emit(
-          "agent_tool_start",
-          {} as never,
-          {} as never,
-          { name: "search_bottles" } as never,
-          { toolCall: { callId: "call-1", arguments: "{}" } } as never,
+        const searchBottles = preparedRun.tools.find(
+          (tool) => tool.name === "search_bottles",
         );
-        // SAFETY: Same stand-ins as the start event above.
-        preparedRun.runner.emit(
-          "agent_tool_end",
-          {} as never,
-          {} as never,
-          { name: "search_bottles" } as never,
-          "[]",
-          { toolCall: { callId: "call-1", arguments: "{}" } } as never,
+        await searchBottles!.execute(
+          { query: "Macallan 12 Sherry Oak" },
+          { toolCallId: "call-1" },
         );
         return nativeAgentResult({
           finalOutput: noMatchAgentDecision(),

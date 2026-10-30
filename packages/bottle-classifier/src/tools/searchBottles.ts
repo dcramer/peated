@@ -1,4 +1,3 @@
-import { tool } from "@openai/agents";
 import { z } from "zod";
 import {
   AgentBottleCandidateSchema,
@@ -7,6 +6,7 @@ import {
   type BottleCandidateSearchInput,
 } from "../classifierTypes";
 import { startToolSpan } from "../observability";
+import { strictAgentTool } from "../runtime/agentRun";
 
 export const SearchBottlesResultSchema = z.object({
   results: z.array(AgentBottleCandidateSchema),
@@ -23,7 +23,7 @@ export function createSearchBottlesTool({
   ) => Promise<BottleCandidate[]>;
   onResults?: (results: BottleCandidate[]) => void;
 }) {
-  return tool({
+  return strictAgentTool({
     name: "search_bottles",
     description: SEARCH_BOTTLES_TOOL_DESCRIPTION,
     parameters: BottleCandidateSearchInputSchema,

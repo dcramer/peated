@@ -1,6 +1,5 @@
-import OpenAI from "openai";
 import { describe, expect, test, vi } from "vitest";
-import { createTestLanguageModel } from "./testLanguageModel";
+import { agentRunResult, createTestLanguageModel } from "./testLanguageModel";
 
 import type {
   BottleContext,
@@ -15,7 +14,6 @@ import type { BottleCandidate } from "./classifierTypes";
 import { buildBottleClassificationArtifacts } from "./contract";
 import { BottleClassificationError } from "./error";
 
-const testClient = new OpenAI({ apiKey: "test-key" });
 const testLanguageModel = createTestLanguageModel().languageModel;
 
 function buildAuditedBottleContext(): BottleContextSource {
@@ -185,7 +183,6 @@ describe("auditBottle", () => {
       },
     );
     const classifier = createBottleClassifier({
-      client: testClient,
       languageModel: testLanguageModel,
       model: "test-model",
       maxSearchQueries: 2,
@@ -288,7 +285,6 @@ describe("auditBottle", () => {
 
   test("requires the read-only Bottle preload capability", async () => {
     const classifier = createBottleClassifier({
-      client: testClient,
       languageModel: testLanguageModel,
       model: "test-model",
       maxSearchQueries: 2,
@@ -333,7 +329,6 @@ describe("auditBottle", () => {
       },
     );
     const classifier = createBottleClassifier({
-      client: testClient,
       languageModel: testLanguageModel,
       model: "test-model",
       maxSearchQueries: 0,
@@ -380,34 +375,27 @@ describe("auditBottle", () => {
       observations: relatedBottleSource.observations,
       publicImages: [],
     };
-    const runAgent = vi.fn(async () => ({
-      finalOutput: {
-        summary: "The audit returned an unsupported finding citation.",
-        findings: [
-          {
-            scope: "bottle",
-            summary: "An uncollected page allegedly establishes a defect.",
-            evidenceRefs: [
-              {
-                kind: "web_result",
-                url: "https://example.com/not-collected",
-              },
-            ],
-          },
-        ],
-      },
-      newItems: [
+    const runAgent = vi.fn(async () =>
+      agentRunResult(
         {
-          type: "tool_call_output_item",
-          rawItem: {
-            name: "get_bottle_context",
-            output: JSON.stringify({ context: relatedBottle }),
-          },
+          summary: "The audit returned an unsupported finding citation.",
+          findings: [
+            {
+              scope: "bottle",
+              summary: "An uncollected page allegedly establishes a defect.",
+              evidenceRefs: [
+                {
+                  kind: "web_result",
+                  url: "https://example.com/not-collected",
+                },
+              ],
+            },
+          ],
         },
-      ],
-    }));
+        [{ name: "get_bottle_context", output: { context: relatedBottle } }],
+      ),
+    );
     const classifier = createBottleClassifier({
-      client: testClient,
       languageModel: testLanguageModel,
       model: "test-model",
       maxSearchQueries: 0,
@@ -439,7 +427,6 @@ describe("auditBottle", () => {
 
   test("accepts any supported audit proposal type", async () => {
     const classifier = createBottleClassifier({
-      client: testClient,
       languageModel: testLanguageModel,
       model: "test-model",
       maxSearchQueries: 0,
@@ -478,7 +465,6 @@ describe("auditBottle", () => {
 
   test("keeps catalog review output out of Reference Classification", async () => {
     const classifier = createBottleClassifier({
-      client: testClient,
       languageModel: testLanguageModel,
       model: "test-model",
       maxSearchQueries: 0,

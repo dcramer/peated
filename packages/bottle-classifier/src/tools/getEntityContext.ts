@@ -1,5 +1,5 @@
-import { tool } from "@openai/agents";
 import { z } from "zod";
+import { strictAgentTool } from "../runtime/agentRun";
 
 import {
   EntityContextSchema,
@@ -29,7 +29,7 @@ export function createGetEntityContextTool({
   getEntityContext: (entityId: number) => Promise<EntityContext | null>;
   onContext?: (context: EntityContext) => void;
 }) {
-  return tool({
+  return strictAgentTool({
     name: "get_entity_context",
     description: GET_ENTITY_CONTEXT_DESCRIPTION,
     parameters: GetEntityContextArgsSchema,

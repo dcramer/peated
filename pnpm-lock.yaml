@@ -527,10 +527,10 @@ importers:
         version: 11.10.0
       '@sentry/hono':
         specifier: 'catalog:'
-        version: 11.10.0(@sentry/cloudflare@11.10.0(vite@8.3.5(@types/node@24.13.2)(esbuild@0.28.2)(jiti@2.7.0)(terser@5.51.2)(tsx@4.23.15)(yaml@2.9.1)))(@sentry/node@11.10.0(rollup@4.62.2)(webpack@5.112.0(@swc/core@1.16.1(@swc/helpers@0.5.23))(clean-css@5.3.3)(csso@5.0.5)(esbuild@0.28.2)(lightningcss@1.33.0)(postcss@8.5.31)(sharp@0.35.5(@types/node@24.13.2))(svgo@3.3.5)))(hono@4.13.13)
+        version: 11.10.0(@sentry/cloudflare@11.10.0(vite@8.3.5(@types/node@24.13.2)(esbuild@0.28.2)(jiti@2.7.0)(terser@5.51.2)(tsx@4.23.15)(yaml@2.9.1)))(@sentry/node@11.10.0(rollup@4.62.2)(webpack@5.112.0(@swc/core@1.16.1(@swc/helpers@0.5.23))(clean-css@5.3.3)(csso@5.0.5)(esbuild@0.25.12)(lightningcss@1.33.0)(postcss@8.5.31)(sharp@0.35.5(@types/node@24.13.2))(svgo@3.3.5)))(hono@4.13.13)
       '@sentry/node':
         specifier: 'catalog:'
-        version: 11.10.0(rollup@4.62.2)(webpack@5.112.0(@swc/core@1.16.1(@swc/helpers@0.5.23))(clean-css@5.3.3)(csso@5.0.5)(esbuild@0.28.2)(lightningcss@1.33.0)(postcss@8.5.31)(sharp@0.35.5(@types/node@24.13.2))(svgo@3.3.5))
+        version: 11.10.0(rollup@4.62.2)(webpack@5.112.0(@swc/core@1.16.1(@swc/helpers@0.5.23))(clean-css@5.3.3)(csso@5.0.5)(esbuild@0.25.12)(lightningcss@1.33.0)(postcss@8.5.31)(sharp@0.35.5(@types/node@24.13.2))(svgo@3.3.5))
       '@simplewebauthn/server':
         specifier: ^13.3.3
         version: 13.3.3
@@ -885,9 +885,6 @@ importers:
 
   packages/bottle-classifier:
     dependencies:
-      '@openai/agents':
-        specifier: ^0.8.5
-        version: 0.8.5(supports-color@8.1.1)(ws@8.21.3)(zod@4.5.4)
       '@peated/bot':
         specifier: workspace:*
         version: link:../bot
@@ -2399,21 +2396,8 @@ packages:
       zod:
         optional: true
 
-  '@openai/agents-core@0.8.5':
-    resolution: {integrity: sha512-qs9mmN+D+UmqEZo3qrvhhIIXIOgSvJPic0v4a+ruq+eYgcQMk3PY8lLcsdQwJit6zf2Wyfv1q2cX5m3jzWZpKw==}
-    peerDependencies:
-      zod: ^4.0.0
-    peerDependenciesMeta:
-      zod:
-        optional: true
-
   '@openai/agents-openai@0.6.0':
     resolution: {integrity: sha512-NTNeC/ycwmEBUQYjmEIuU1qxMJU+ssnfsYwc7KVimk9Xl4rLnRAMnLSvbzNgfC/lYTSk7P8uAWfiBpINrCTBlA==}
-    peerDependencies:
-      zod: ^4.0.0
-
-  '@openai/agents-openai@0.8.5':
-    resolution: {integrity: sha512-cGYmyiVy8ecgf2Vch0L/ekeNo3xuZsuWnRsxyv+w9ai9dgxUifdEQ6G3dtsjMLtmXVHRVGoO7mVBr+tKcilntw==}
     peerDependencies:
       zod: ^4.0.0
 
@@ -2422,18 +2406,8 @@ packages:
     peerDependencies:
       zod: ^4.0.0
 
-  '@openai/agents-realtime@0.8.5':
-    resolution: {integrity: sha512-JqKVsR33OvKtTxRp5Ylhw8WfNvJ49ZIhlhMZlSVKqwR2Ks6JuxqFJ0zM9p7JIbTQDSlAZnmnZJv1qlItaildiQ==}
-    peerDependencies:
-      zod: ^4.0.0
-
   '@openai/agents@0.6.0':
     resolution: {integrity: sha512-1vDTpEu/hxqj4eHZx4cwRz8RKwhzWnJ1+mtIdFhBt20cqCaI3x8NzXB8bG6RPPPYKyWoqlSjDaDhXdauyr584A==}
-    peerDependencies:
-      zod: ^4.0.0
-
-  '@openai/agents@0.8.5':
-    resolution: {integrity: sha512-OFA7XVV1qXE8lzatvQj080KdSArt8utBExFXRfD5B/R7KT0D+AVaKwg6nLoW3Gxb30vRkIUQf+MaW/Wz+gO3Yg==}
     peerDependencies:
       zod: ^4.0.0
 
@@ -11115,13 +11089,13 @@ snapshots:
       '@adobe/css-tools': 4.4.2
       hast-util-select: 6.0.4
       hast-util-to-string: 3.0.1
-      jsx-email: 3.2.1(@emotion/is-prop-valid@0.8.8)(@jsx-email/plugin-inline@2.0.0)(@jsx-email/plugin-minify@2.0.0)(@jsx-email/plugin-pretty@2.0.0)(@types/node@26.1.0)(@types/react-dom@19.2.3(@types/react@19.2.17))(@types/react@19.2.17)(canispam@1.0.0(supports-color@8.1.1))(jiti@2.7.0)(prettier@3.8.1)(react-dom@19.2.7(react@19.2.7))(react@19.2.7)(supports-color@8.1.1)(terser@5.51.2)(tsx@4.23.15)(typescript@5.9.3)(use-sync-external-store@1.6.0(react@19.2.7))(yaml@2.9.1)
+      jsx-email: 3.2.1(@emotion/is-prop-valid@0.8.8)(@jsx-email/plugin-inline@2.0.0)(@jsx-email/plugin-minify@2.0.0)(@jsx-email/plugin-pretty@2.0.0)(@types/node@24.13.2)(@types/react-dom@19.2.3(@types/react@19.2.17))(@types/react@19.2.17)(canispam@1.0.0(supports-color@8.1.1))(jiti@2.7.0)(prettier@3.8.1)(react-dom@19.2.7(react@19.2.7))(react@19.2.7)(supports-color@8.1.1)(terser@5.51.2)(tsx@4.23.15)(typescript@5.9.3)(use-sync-external-store@1.6.0(react@19.2.7))(yaml@2.9.1)
       unist-util-remove: 4.0.0
       unist-util-visit: 5.1.0
 
   '@jsx-email/plugin-minify@2.0.0(jsx-email@3.2.1)':
     dependencies:
-      jsx-email: 3.2.1(@emotion/is-prop-valid@0.8.8)(@jsx-email/plugin-inline@2.0.0)(@jsx-email/plugin-minify@2.0.0)(@jsx-email/plugin-pretty@2.0.0)(@types/node@26.1.0)(@types/react-dom@19.2.3(@types/react@19.2.17))(@types/react@19.2.17)(canispam@1.0.0(supports-color@8.1.1))(jiti@2.7.0)(prettier@3.8.1)(react-dom@19.2.7(react@19.2.7))(react@19.2.7)(supports-color@8.1.1)(terser@5.51.2)(tsx@4.23.15)(typescript@5.9.3)(use-sync-external-store@1.6.0(react@19.2.7))(yaml@2.9.1)
+      jsx-email: 3.2.1(@emotion/is-prop-valid@0.8.8)(@jsx-email/plugin-inline@2.0.0)(@jsx-email/plugin-minify@2.0.0)(@jsx-email/plugin-pretty@2.0.0)(@types/node@24.13.2)(@types/react-dom@19.2.3(@types/react@19.2.17))(@types/react@19.2.17)(canispam@1.0.0(supports-color@8.1.1))(jiti@2.7.0)(prettier@3.8.1)(react-dom@19.2.7(react@19.2.7))(react@19.2.7)(supports-color@8.1.1)(terser@5.51.2)(tsx@4.23.15)(typescript@5.9.3)(use-sync-external-store@1.6.0(react@19.2.7))(yaml@2.9.1)
       rehype-minify-attribute-whitespace: 4.0.1
       rehype-minify-css-style: 4.0.1
       rehype-minify-enumerated-attribute: 5.0.2
@@ -11143,7 +11117,7 @@ snapshots:
 
   '@jsx-email/plugin-pretty@2.0.0(jsx-email@3.2.1)':
     dependencies:
-      jsx-email: 3.2.1(@emotion/is-prop-valid@0.8.8)(@jsx-email/plugin-inline@2.0.0)(@jsx-email/plugin-minify@2.0.0)(@jsx-email/plugin-pretty@2.0.0)(@types/node@26.1.0)(@types/react-dom@19.2.3(@types/react@19.2.17))(@types/react@19.2.17)(canispam@1.0.0(supports-color@8.1.1))(jiti@2.7.0)(prettier@3.8.1)(react-dom@19.2.7(react@19.2.7))(react@19.2.7)(supports-color@8.1.1)(terser@5.51.2)(tsx@4.23.15)(typescript@5.9.3)(use-sync-external-store@1.6.0(react@19.2.7))(yaml@2.9.1)
+      jsx-email: 3.2.1(@emotion/is-prop-valid@0.8.8)(@jsx-email/plugin-inline@2.0.0)(@jsx-email/plugin-minify@2.0.0)(@jsx-email/plugin-pretty@2.0.0)(@types/node@24.13.2)(@types/react-dom@19.2.3(@types/react@19.2.17))(@types/react@19.2.17)(canispam@1.0.0(supports-color@8.1.1))(jiti@2.7.0)(prettier@3.8.1)(react-dom@19.2.7(react@19.2.7))(react@19.2.7)(supports-color@8.1.1)(terser@5.51.2)(tsx@4.23.15)(typescript@5.9.3)(use-sync-external-store@1.6.0(react@19.2.7))(yaml@2.9.1)
       pretty: 2.0.0
 
   '@ladjs/naivebayes@0.1.0(supports-color@8.1.1)':
@@ -11290,32 +11264,9 @@ snapshots:
       - supports-color
       - ws
 
-  '@openai/agents-core@0.8.5(supports-color@8.1.1)(ws@8.21.3)(zod@4.5.4)':
-    dependencies:
-      debug: 4.4.3(supports-color@8.1.1)
-      openai: 6.27.0(ws@8.21.3)(zod@4.5.4)
-    optionalDependencies:
-      '@modelcontextprotocol/sdk': 1.32.1(supports-color@8.1.1)(zod@4.5.4)
-      zod: 4.5.4
-    transitivePeerDependencies:
-      - '@cfworker/json-schema'
-      - supports-color
-      - ws
-
   '@openai/agents-openai@0.6.0(supports-color@8.1.1)(ws@8.21.3)(zod@4.5.4)':
     dependencies:
       '@openai/agents-core': 0.6.0(supports-color@8.1.1)(ws@8.21.3)(zod@4.5.4)
-      debug: 4.4.3(supports-color@8.1.1)
-      openai: 6.27.0(ws@8.21.3)(zod@4.5.4)
-      zod: 4.5.4
-    transitivePeerDependencies:
-      - '@cfworker/json-schema'
-      - supports-color
-      - ws
-
-  '@openai/agents-openai@0.8.5(supports-color@8.1.1)(ws@8.21.3)(zod@4.5.4)':
-    dependencies:
-      '@openai/agents-core': 0.8.5(supports-color@8.1.1)(ws@8.21.3)(zod@4.5.4)
       debug: 4.4.3(supports-color@8.1.1)
       openai: 6.27.0(ws@8.21.3)(zod@4.5.4)
       zod: 4.5.4
@@ -11337,39 +11288,11 @@ snapshots:
       - supports-color
       - utf-8-validate
 
-  '@openai/agents-realtime@0.8.5(supports-color@8.1.1)(zod@4.5.4)':
-    dependencies:
-      '@openai/agents-core': 0.8.5(supports-color@8.1.1)(ws@8.21.3)(zod@4.5.4)
-      '@types/ws': 8.18.1
-      debug: 4.4.3(supports-color@8.1.1)
-      ws: 8.21.3
-      zod: 4.5.4
-    transitivePeerDependencies:
-      - '@cfworker/json-schema'
-      - bufferutil
-      - supports-color
-      - utf-8-validate
-
   '@openai/agents@0.6.0(supports-color@8.1.1)(ws@8.21.3)(zod@4.5.4)':
     dependencies:
       '@openai/agents-core': 0.6.0(supports-color@8.1.1)(ws@8.21.3)(zod@4.5.4)
       '@openai/agents-openai': 0.6.0(supports-color@8.1.1)(ws@8.21.3)(zod@4.5.4)
       '@openai/agents-realtime': 0.6.0(supports-color@8.1.1)(zod@4.5.4)
-      debug: 4.4.3(supports-color@8.1.1)
-      openai: 6.27.0(ws@8.21.3)(zod@4.5.4)
-      zod: 4.5.4
-    transitivePeerDependencies:
-      - '@cfworker/json-schema'
-      - bufferutil
-      - supports-color
-      - utf-8-validate
-      - ws
-
-  '@openai/agents@0.8.5(supports-color@8.1.1)(ws@8.21.3)(zod@4.5.4)':
-    dependencies:
-      '@openai/agents-core': 0.8.5(supports-color@8.1.1)(ws@8.21.3)(zod@4.5.4)
-      '@openai/agents-openai': 0.8.5(supports-color@8.1.1)(ws@8.21.3)(zod@4.5.4)
-      '@openai/agents-realtime': 0.8.5(supports-color@8.1.1)(zod@4.5.4)
       debug: 4.4.3(supports-color@8.1.1)
       openai: 6.27.0(ws@8.21.3)(zod@4.5.4)
       zod: 4.5.4
@@ -12918,6 +12841,19 @@ snapshots:
       '@sentry/replay': 11.10.0
       '@sentry/replay-canvas': 11.10.0
 
+  '@sentry/bundler-plugins@11.10.0(rollup@4.62.2)(webpack@5.112.0(@swc/core@1.16.1(@swc/helpers@0.5.23))(clean-css@5.3.3)(csso@5.0.5)(esbuild@0.25.12)(lightningcss@1.33.0)(postcss@8.5.31)(sharp@0.35.5(@types/node@24.13.2))(svgo@3.3.5))':
+    dependencies:
+      '@sentry/core': 11.10.0
+      dotenv: 17.4.2
+      glob: 13.0.6
+      magic-string: 1.4.3
+      oxc-parser: 0.152.0
+      sentry: 0.45.0
+      supports-color: 8.1.1
+    optionalDependencies:
+      rollup: 4.62.2
+      webpack: 5.112.0(@swc/core@1.16.1(@swc/helpers@0.5.23))(clean-css@5.3.3)(csso@5.0.5)(esbuild@0.25.12)(lightningcss@1.33.0)(postcss@8.5.31)(sharp@0.35.5(@types/node@24.13.2))(svgo@3.3.5)
+
   '@sentry/bundler-plugins@11.10.0(rollup@4.62.2)(webpack@5.112.0(@swc/core@1.16.1(@swc/helpers@0.5.23))(clean-css@5.3.3)(csso@5.0.5)(esbuild@0.28.2)(lightningcss@1.33.0)(postcss@8.5.31)(sharp@0.35.5(@types/node@24.13.2))(svgo@3.3.5))':
     dependencies:
       '@sentry/core': 11.10.0
@@ -12958,7 +12894,7 @@ snapshots:
     dependencies:
       '@sentry/core': 11.10.0
 
-  '@sentry/hono@11.10.0(@sentry/cloudflare@11.10.0(vite@8.3.5(@types/node@24.13.2)(esbuild@0.28.2)(jiti@2.7.0)(terser@5.51.2)(tsx@4.23.15)(yaml@2.9.1)))(@sentry/node@11.10.0(rollup@4.62.2)(webpack@5.112.0(@swc/core@1.16.1(@swc/helpers@0.5.23))(clean-css@5.3.3)(csso@5.0.5)(esbuild@0.28.2)(lightningcss@1.33.0)(postcss@8.5.31)(sharp@0.35.5(@types/node@24.13.2))(svgo@3.3.5)))(hono@4.13.13)':
+  '@sentry/hono@11.10.0(@sentry/cloudflare@11.10.0(vite@8.3.5(@types/node@24.13.2)(esbuild@0.28.2)(jiti@2.7.0)(terser@5.51.2)(tsx@4.23.15)(yaml@2.9.1)))(@sentry/node@11.10.0(rollup@4.62.2)(webpack@5.112.0(@swc/core@1.16.1(@swc/helpers@0.5.23))(clean-css@5.3.3)(csso@5.0.5)(esbuild@0.25.12)(lightningcss@1.33.0)(postcss@8.5.31)(sharp@0.35.5(@types/node@24.13.2))(svgo@3.3.5)))(hono@4.13.13)':
     dependencies:
       '@opentelemetry/api': 1.9.1
       '@sentry/conventions': 0.29.0
@@ -12967,7 +12903,7 @@ snapshots:
       hono: 4.13.13
     optionalDependencies:
       '@sentry/cloudflare': 11.10.0(vite@8.3.5(@types/node@24.13.2)(esbuild@0.28.2)(jiti@2.7.0)(terser@5.51.2)(tsx@4.23.15)(yaml@2.9.1))
-      '@sentry/node': 11.10.0(rollup@4.62.2)(webpack@5.112.0(@swc/core@1.16.1(@swc/helpers@0.5.23))(clean-css@5.3.3)(csso@5.0.5)(esbuild@0.28.2)(lightningcss@1.33.0)(postcss@8.5.31)(sharp@0.35.5(@types/node@24.13.2))(svgo@3.3.5))
+      '@sentry/node': 11.10.0(rollup@4.62.2)(webpack@5.112.0(@swc/core@1.16.1(@swc/helpers@0.5.23))(clean-css@5.3.3)(csso@5.0.5)(esbuild@0.25.12)(lightningcss@1.33.0)(postcss@8.5.31)(sharp@0.35.5(@types/node@24.13.2))(svgo@3.3.5))
 
   '@sentry/nextjs@11.10.0(next@16.4.1(@babel/core@7.29.7(supports-color@8.1.1))(@opentelemetry/api@1.9.1)(@playwright/test@1.60.0)(@types/node@24.13.2)(react-dom@19.2.7(react@19.2.7))(react@19.2.7))(react-router@7.18.4(react-dom@19.2.7(react@19.2.7))(react@19.2.7))(react@19.2.7)(vite@8.3.5(@types/node@24.13.2)(esbuild@0.28.2)(jiti@2.7.0)(terser@5.51.2)(tsx@4.23.15)(yaml@2.9.1))(webpack@5.112.0(@swc/core@1.16.1(@swc/helpers@0.5.23))(clean-css@5.3.3)(csso@5.0.5)(esbuild@0.28.2)(lightningcss@1.33.0)(postcss@8.5.31)(sharp@0.35.5(@types/node@24.13.2))(svgo@3.3.5))':
     dependencies:
@@ -13022,6 +12958,19 @@ snapshots:
       - '@opentelemetry/core'
       - '@opentelemetry/exporter-trace-otlp-http'
       - supports-color
+
+  '@sentry/node@11.10.0(rollup@4.62.2)(webpack@5.112.0(@swc/core@1.16.1(@swc/helpers@0.5.23))(clean-css@5.3.3)(csso@5.0.5)(esbuild@0.25.12)(lightningcss@1.33.0)(postcss@8.5.31)(sharp@0.35.5(@types/node@24.13.2))(svgo@3.3.5))':
+    dependencies:
+      '@opentelemetry/api': 1.9.1
+      '@sentry/bundler-plugins': 11.10.0(rollup@4.62.2)(webpack@5.112.0(@swc/core@1.16.1(@swc/helpers@0.5.23))(clean-css@5.3.3)(csso@5.0.5)(esbuild@0.25.12)(lightningcss@1.33.0)(postcss@8.5.31)(sharp@0.35.5(@types/node@24.13.2))(svgo@3.3.5))
+      '@sentry/conventions': 0.29.0
+      '@sentry/core': 11.10.0
+      '@sentry/opentelemetry': 11.10.0(@opentelemetry/api@1.9.1)
+      '@sentry/server-runtime-injection': 11.10.0
+      '@sentry/server-utils': 11.10.0
+    transitivePeerDependencies:
+      - rollup
+      - webpack
 
   '@sentry/node@11.10.0(rollup@4.62.2)(webpack@5.112.0(@swc/core@1.16.1(@swc/helpers@0.5.23))(clean-css@5.3.3)(csso@5.0.5)(esbuild@0.28.2)(lightningcss@1.33.0)(postcss@8.5.31)(sharp@0.35.5(@types/node@24.13.2))(svgo@3.3.5))':
     dependencies:
@@ -17062,6 +17011,24 @@ snapshots:
 
   minimist@1.2.8: {}
 
+  minimizer-webpack-plugin@5.13.1(@swc/core@1.16.1(@swc/helpers@0.5.23))(clean-css@5.3.3)(csso@5.0.5)(esbuild@0.25.12)(lightningcss@1.33.0)(postcss@8.5.31)(sharp@0.35.5(@types/node@24.13.2))(svgo@3.3.5)(webpack@5.112.0(@swc/core@1.16.1(@swc/helpers@0.5.23))(clean-css@5.3.3)(csso@5.0.5)(esbuild@0.25.12)(lightningcss@1.33.0)(postcss@8.5.31)(sharp@0.35.5(@types/node@24.13.2))(svgo@3.3.5)):
+    dependencies:
+      '@jridgewell/trace-mapping': 0.3.31
+      jest-worker: 27.5.1
+      schema-utils: 4.8.1(webpack@5.112.0(@swc/core@1.16.1(@swc/helpers@0.5.23))(clean-css@5.3.3)(csso@5.0.5)(esbuild@0.25.12)(lightningcss@1.33.0)(postcss@8.5.31)(sharp@0.35.5(@types/node@24.13.2))(svgo@3.3.5))
+      terser: 5.51.2
+      webpack: 5.112.0(@swc/core@1.16.1(@swc/helpers@0.5.23))(clean-css@5.3.3)(csso@5.0.5)(esbuild@0.25.12)(lightningcss@1.33.0)(postcss@8.5.31)(sharp@0.35.5(@types/node@24.13.2))(svgo@3.3.5)
+    optionalDependencies:
+      '@swc/core': 1.16.1(@swc/helpers@0.5.23)
+      clean-css: 5.3.3
+      csso: 5.0.5
+      esbuild: 0.25.12
+      lightningcss: 1.33.0
+      postcss: 8.5.31
+      sharp: 0.35.5(@types/node@24.13.2)
+      svgo: 3.3.5
+    optional: true
+
   minimizer-webpack-plugin@5.13.1(@swc/core@1.16.1(@swc/helpers@0.5.23))(clean-css@5.3.3)(csso@5.0.5)(esbuild@0.28.2)(lightningcss@1.33.0)(postcss@8.5.31)(sharp@0.35.5(@types/node@24.13.2))(svgo@3.3.5)(webpack@5.112.0(@swc/core@1.16.1(@swc/helpers@0.5.23))(clean-css@5.3.3)(csso@5.0.5)(esbuild@0.28.2)(lightningcss@1.33.0)(postcss@8.5.31)(sharp@0.35.5(@types/node@24.13.2))(svgo@3.3.5)):
     dependencies:
       '@jridgewell/trace-mapping': 0.3.31
@@ -18303,6 +18270,16 @@ snapshots:
 
   schema-dts@1.1.5: {}
 
+  schema-utils@4.8.1(webpack@5.112.0(@swc/core@1.16.1(@swc/helpers@0.5.23))(clean-css@5.3.3)(csso@5.0.5)(esbuild@0.25.12)(lightningcss@1.33.0)(postcss@8.5.31)(sharp@0.35.5(@types/node@24.13.2))(svgo@3.3.5)):
+    dependencies:
+      '@types/json-schema': 7.0.15
+      ajv: 8.20.0
+      ajv-formats: 3.0.1(ajv@8.20.0)
+      ajv-keywords: 5.1.0(ajv@8.20.0)
+    optionalDependencies:
+      webpack: 5.112.0(@swc/core@1.16.1(@swc/helpers@0.5.23))(clean-css@5.3.3)(csso@5.0.5)(esbuild@0.25.12)(lightningcss@1.33.0)(postcss@8.5.31)(sharp@0.35.5(@types/node@24.13.2))(svgo@3.3.5)
+    optional: true
+
   schema-utils@4.8.1(webpack@5.112.0(@swc/core@1.16.1(@swc/helpers@0.5.23))(clean-css@5.3.3)(csso@5.0.5)(esbuild@0.28.2)(lightningcss@1.33.0)(postcss@8.5.31)(sharp@0.35.5(@types/node@24.13.2))(svgo@3.3.5)):
     dependencies:
       '@types/json-schema': 7.0.15
@@ -19337,6 +19314,44 @@ snapshots:
     optional: true
 
   webpack-virtual-modules@0.6.2: {}
+
+  webpack@5.112.0(@swc/core@1.16.1(@swc/helpers@0.5.23))(clean-css@5.3.3)(csso@5.0.5)(esbuild@0.25.12)(lightningcss@1.33.0)(postcss@8.5.31)(sharp@0.35.5(@types/node@24.13.2))(svgo@3.3.5):
+    dependencies:
+      '@types/estree': 1.0.9
+      '@types/json-schema': 7.0.15
+      '@webassemblyjs/ast': 1.14.1
+      '@webassemblyjs/wasm-edit': 1.14.1
+      '@webassemblyjs/wasm-parser': 1.14.1
+      browserslist: 4.29.4
+      chrome-trace-event: 1.0.4
+      enhanced-resolve: 5.26.0
+      es-module-lexer: 2.3.1
+      events: 3.3.0
+      graceful-fs: 4.2.11
+      mime-db: 1.54.0
+      minimizer-webpack-plugin: 5.13.1(@swc/core@1.16.1(@swc/helpers@0.5.23))(clean-css@5.3.3)(csso@5.0.5)(esbuild@0.25.12)(lightningcss@1.33.0)(postcss@8.5.31)(sharp@0.35.5(@types/node@24.13.2))(svgo@3.3.5)(webpack@5.112.0(@swc/core@1.16.1(@swc/helpers@0.5.23))(clean-css@5.3.3)(csso@5.0.5)(esbuild@0.25.12)(lightningcss@1.33.0)(postcss@8.5.31)(sharp@0.35.5(@types/node@24.13.2))(svgo@3.3.5))
+      schema-utils: 4.8.1(webpack@5.112.0(@swc/core@1.16.1(@swc/helpers@0.5.23))(clean-css@5.3.3)(csso@5.0.5)(esbuild@0.25.12)(lightningcss@1.33.0)(postcss@8.5.31)(sharp@0.35.5(@types/node@24.13.2))(svgo@3.3.5))
+      tapable: 2.3.3
+      watchpack: 2.6.3
+      webpack-sources: 3.6.0
+    transitivePeerDependencies:
+      - '@minify-html/node'
+      - '@napi-rs/image'
+      - '@swc/core'
+      - '@swc/css'
+      - '@swc/html'
+      - clean-css
+      - cssnano
+      - csso
+      - esbuild
+      - html-minifier-terser
+      - imagemin
+      - lightningcss
+      - postcss
+      - sharp
+      - svgo
+      - uglify-js
+    optional: true
 
   webpack@5.112.0(@swc/core@1.16.1(@swc/helpers@0.5.23))(clean-css@5.3.3)(csso@5.0.5)(esbuild@0.28.2)(lightningcss@1.33.0)(postcss@8.5.31)(sharp@0.35.5(@types/node@24.13.2))(svgo@3.3.5):
     dependencies:

@@ -1,4 +1,3 @@
-import type { ModelSettings } from "@openai/agents";
 import { z } from "zod";
 
 export const DEFAULT_BOTTLE_CLASSIFIER_MODEL = "gpt-6-luna";
@@ -7,17 +6,13 @@ export const DEFAULT_OPENAI_MODEL = "gpt-6-luna";
 export const DEFAULT_OPENAI_IMAGE_EXTRACTION_MODEL = "gpt-6-luna";
 export const DEFAULT_OPENAI_IMAGE_EXTRACTION_REASONING_EFFORT = "high";
 
-type OpenAISdkReasoningEffort = NonNullable<
-  NonNullable<ModelSettings["reasoning"]>["effort"]
->;
-
 export const OPENAI_REASONING_EFFORTS = [
   "none",
   "low",
   "medium",
   "high",
   "xhigh",
-] as const satisfies readonly OpenAISdkReasoningEffort[];
+] as const;
 
 export type OpenAIReasoningEffort = (typeof OPENAI_REASONING_EFFORTS)[number];
 const OpenAIReasoningEffortSchema = z.enum(OPENAI_REASONING_EFFORTS);

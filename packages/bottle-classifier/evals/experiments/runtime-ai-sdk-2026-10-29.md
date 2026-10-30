@@ -1,7 +1,7 @@
 # Classifier runtime on the AI SDK
 
-**Status: part 1 accepted; part 2 in progress.** The plan below was written
-before any results.
+**Status: part 1 accepted; part 2 measured, decision pending.** The plan
+below was written before any results.
 
 ## Expected benefit
 
@@ -86,3 +86,60 @@ Other checks:
 - A failed read during photo lookup still counts as temporary for a timeout,
   an outage, or a rate limit, as it did with the OpenAI SDK.
 - Image URLs pass to the gateway unchanged; the server does not download them.
+
+### Part 2: classifier agent loop
+
+**Decision pending.** Accuracy is within run-to-run noise and cost is lower,
+but the new runtime made two wrong matches across ten runs of the two cases
+involved, against none on main.
+
+Two full-suite pairs on 2026-10-29, each pair started together, with the CI
+evidence snapshot and no live web. Old code ran from a checkout of main at
+`de27fc090`. The table covers the 129 classifier cases.
+
+| Measure                  | Main, run 1 | New, run 1 | Main, run 2 | New, run 2 |
+| ------------------------ | ----------: | ---------: | ----------: | ---------: |
+| Passed                   |     112/129 |    114/129 |     116/129 |    111/129 |
+| Run errors               |           0 |          0 |           0 |          0 |
+| False `no_match` results |           7 |          4 |           3 |          6 |
+| False-positive accepts   |           0 |          1 |           1 |          1 |
+| Model requests           |         472 |        462 |         478 |        483 |
+| Tool calls               |         325 |        315 |         331 |        336 |
+| Input tokens             |   4,223,049 |  4,121,078 |   4,296,086 |  4,423,935 |
+| Cached input tokens      |   3,823,010 |  3,739,135 |   3,913,272 |  4,042,531 |
+| Output tokens            |     247,302 |    228,734 |     244,073 |    223,795 |
+| Reasoning tokens         |     195,328 |    177,046 |     191,644 |    172,648 |
+| Estimated model cost     |     $0.2119 |    $0.1995 |     $0.2090 |    $0.2000 |
+| Median time per case     |      18.1 s |     18.5 s |      22.3 s |     19.6 s |
+| 95th percentile per case |      49.3 s |     46.2 s |      51.2 s |     51.5 s |
+
+Combined, main passed 228 of 258 case-runs and the new runtime 225. Output
+and reasoning tokens fell about 8% and model cost 4–6%.
+
+Results that differed between versions across the two pairs:
+
+- **Better on new:** four existing-match cases (ordinary Ardbeg Ten, the
+  dropped possessive brand, the existing Cadboll Estate 15, and the existing
+  Lagavulin Distillers Edition) passed 2 of 2 on new against 1 of 2 on main.
+  The Proof and Wood audit passed 2 of 2 against 0 of 2.
+- **More conservative on new:** Octomore 13.1 and the 43% Macallan 12
+  creation passed 0 of 2 on new against 2 of 2 on main, once each by
+  returning `no_match` instead of creating.
+- **Safety:** two unsafe accepts appeared on new in run 1. Glen Breton 21
+  matched Bottle 16270 when it should create a new Bottle. The Classic Cut
+  2017 auction title matched Bottle 3277 when it should be `no_match`. Three
+  repeats of each case per version, alternating which version ran first, did
+  not reproduce either: new created Glen Breton twice and returned a safe
+  `no_match` once, and returned `no_match` for Classic Cut all three times.
+  Main passed both all three times. Across five runs of each case, new made
+  each unsafe accept once and main never did.
+
+Runtime changes that reached the model:
+
+- Tool schemas match the Agents library's except that `format` keywords are
+  removed. The gateway's AI SDK route rejects `uri` in strict tool schemas;
+  the old OpenAI-compatible route accepted it.
+- One tool call per turn (`parallelToolCalls: false`), the same turn limits,
+  the same reasoning effort, and the same output schemas.
+- Tool outputs reach the model as JSON objects through the AI SDK instead of
+  strings serialized by the Agents library.

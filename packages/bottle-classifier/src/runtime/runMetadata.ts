@@ -1,4 +1,5 @@
 import { z } from "zod";
+import type { AgentRunResult } from "./agentRun";
 import { getRunCostMetadata } from "./cost";
 
 const NonnegativeIntegerSchema = z.number().int().nonnegative();
@@ -49,83 +50,10 @@ export type BottleClassifierRunMetadata = z.infer<
   typeof BottleClassifierRunMetadataSchema
 >;
 
-const TokenDetailsSchema = z.union([
-  z.record(z.string(), z.number()),
-  z.array(z.record(z.string(), z.number())),
-]);
-const RunUsageSchema = z
-  .object({
-    requests: z.number().optional(),
-    inputTokens: z.number().optional(),
-    outputTokens: z.number().optional(),
-    totalTokens: z.number().optional(),
-    inputTokensDetails: TokenDetailsSchema.optional(),
-    outputTokensDetails: TokenDetailsSchema.optional(),
-  })
-  .passthrough();
-const UsageOwnerSchema = z
-  .object({ usage: RunUsageSchema.optional() })
-  .passthrough();
-const ToolItemSchema = z
-  .object({
-    type: z.string().optional(),
-    name: z.string().optional(),
-    rawItem: z
-      .object({
-        name: z.string().optional(),
-      })
-      .passthrough()
-      .optional(),
-  })
-  .passthrough();
-const RunResultSchema = z
-  .object({
-    state: UsageOwnerSchema.optional(),
-    runContext: UsageOwnerSchema.optional(),
-    usage: RunUsageSchema.optional(),
-    newItems: z.array(ToolItemSchema).optional(),
-  })
-  .passthrough();
-type RunUsage = z.infer<typeof RunUsageSchema>;
-type UsageNumberProperty =
-  | "inputTokens"
-  | "outputTokens"
-  | "requests"
-  | "totalTokens";
-type UsageDetailsProperty = "inputTokensDetails" | "outputTokensDetails";
-
-function numberProperty(
-  usage: RunUsage | undefined,
-  property: UsageNumberProperty,
-): number {
-  const candidate = usage?.[property];
-  const measured = z.number().finite().safeParse(candidate);
-  return measured.success ? measured.data : 0;
-}
-
-function tokenDetail(
-  usage: RunUsage | undefined,
-  detailsProperty: UsageDetailsProperty,
-  keys: string[],
-): number | undefined {
-  const details = usage?.[detailsProperty];
-  const entries = Array.isArray(details) ? details : details ? [details] : [];
-  let measured = false;
-  let total = 0;
-
-  for (const entry of entries) {
-    const value = keys.reduce<number | undefined>(
-      (found, key) => found ?? entry[key],
-      undefined,
-    );
-    const measuredValue = z.number().finite().nonnegative().safeParse(value);
-    if (measuredValue.success) {
-      measured = true;
-      total += measuredValue.data;
-    }
-  }
-
-  return measured ? Math.round(total) : undefined;
+function tokenCount(value: number | undefined): number | undefined {
+  return value !== undefined && Number.isFinite(value) && value >= 0
+    ? Math.round(value)
+    : undefined;
 }
 
 /**
@@ -137,49 +65,22 @@ export function getBottleClassifierRunMetadata({
   durationMs,
   model,
 }: {
-  result: unknown;
+  result: AgentRunResult;
   durationMs: number;
   model?: string;
 }): BottleClassifierRunMetadata {
-  const parsedResult = RunResultSchema.safeParse(result);
-  const runResult = parsedResult.success ? parsedResult.data : {};
-  const usage =
-    runResult.state?.usage ?? runResult.runContext?.usage ?? runResult.usage;
-  const measuredCachedInputTokens = tokenDetail(usage, "inputTokensDetails", [
-    "cached_tokens",
-    "cachedTokens",
-  ]);
-  const measuredCacheWriteTokens = tokenDetail(usage, "inputTokensDetails", [
-    "cache_write_tokens",
-    "cacheWriteTokens",
-  ]);
-  const measuredReasoningTokens = tokenDetail(usage, "outputTokensDetails", [
-    "reasoning_tokens",
-    "reasoningTokens",
-  ]);
-  const toolNames: string[] = [];
-  let toolCallCount = 0;
-  const newItems = runResult.newItems;
-
-  if (Array.isArray(newItems)) {
-    for (const item of newItems) {
-      if (item.type !== "tool_call_output_item") {
-        continue;
-      }
-
-      toolCallCount += 1;
-      const name = item.rawItem?.name ?? item.name;
-      if (name) {
-        toolNames.push(name);
-      }
-    }
-  }
+  const { usage } = result;
+  const measuredCachedInputTokens = tokenCount(usage.cachedInputTokens);
+  const measuredCacheWriteTokens = tokenCount(usage.cacheWriteTokens);
+  const measuredReasoningTokens = tokenCount(usage.reasoningTokens);
+  const toolNames = result.toolResults.map((toolResult) => toolResult.name);
+  const toolCallCount = toolNames.length;
 
   const normalizedUsage: BottleClassifierRunMetadata["usage"] = {
-    requests: numberProperty(usage, "requests"),
-    inputTokens: numberProperty(usage, "inputTokens"),
-    outputTokens: numberProperty(usage, "outputTokens"),
-    totalTokens: numberProperty(usage, "totalTokens"),
+    requests: tokenCount(usage.requests) ?? 0,
+    inputTokens: tokenCount(usage.inputTokens) ?? 0,
+    outputTokens: tokenCount(usage.outputTokens) ?? 0,
+    totalTokens: tokenCount(usage.totalTokens) ?? 0,
   };
   if (measuredCachedInputTokens !== undefined) {
     normalizedUsage.cachedInputTokens = measuredCachedInputTokens;
