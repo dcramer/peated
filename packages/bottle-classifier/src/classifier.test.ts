@@ -25,6 +25,7 @@ import {
   type BottleClassificationArtifacts,
 } from "./contract";
 import { buildBottleCandidate } from "./evalFixtureBuilders";
+import { createTestLanguageModel } from "./testLanguageModel";
 import {
   buildPageOpeningEvidence,
   createBottleWebSearchBudget,
@@ -66,6 +67,7 @@ type ReasoningResult = {
 };
 
 const TEST_OPENAI_CLIENT = new OpenAI({ apiKey: "test" });
+const testLanguageModel = createTestLanguageModel().languageModel;
 
 function noMatchAgentDecision() {
   return {
@@ -174,6 +176,7 @@ function createTestClassifier({
   return {
     classifier: createBottleClassifier({
       client,
+      languageModel: testLanguageModel,
       model: "test-model",
       maxSearchQueries,
       web,
@@ -986,6 +989,7 @@ describe("createBottleClassifier", () => {
     const preparedRun = await prepareBottleClassifierAgentRun(
       {
         client: TEST_OPENAI_CLIENT,
+        languageModel: testLanguageModel,
         model: "openai/gpt-5.6-luna",
         reasoningEffort: "high",
         maxSearchQueries: 2,
@@ -1011,6 +1015,7 @@ describe("createBottleClassifier", () => {
     const preparedRun = await prepareBottleClassifierAgentRun(
       {
         client: TEST_OPENAI_CLIENT,
+        languageModel: testLanguageModel,
         model: "test-model",
         maxSearchQueries: 2,
         web: TEST_WEB,
@@ -1037,6 +1042,7 @@ describe("createBottleClassifier", () => {
     const preparedRun = await prepareBottleClassifierAgentRun(
       {
         client: TEST_OPENAI_CLIENT,
+        languageModel: testLanguageModel,
         model: "test-model",
         maxSearchQueries: 2,
         adapters: {
@@ -1062,6 +1068,7 @@ describe("createBottleClassifier", () => {
     const preparedRun = await prepareBottleClassifierAgentRun(
       {
         client: TEST_OPENAI_CLIENT,
+        languageModel: testLanguageModel,
         model: "test-model",
         maxSearchQueries: 2,
         adapters: {
@@ -1146,6 +1153,7 @@ describe("createBottleClassifier", () => {
     const preparedRun = await prepareBottleClassifierAgentRun(
       {
         client: TEST_OPENAI_CLIENT,
+        languageModel: testLanguageModel,
         model: "test-model",
         maxSearchQueries: 2,
         adapters: {

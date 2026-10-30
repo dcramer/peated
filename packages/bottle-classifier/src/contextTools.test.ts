@@ -2,6 +2,7 @@ import { RunContext } from "@openai/agents";
 import OpenAI from "openai";
 import { describe, expect, test, vi } from "vitest";
 import { z } from "zod";
+import { createTestLanguageModel } from "./testLanguageModel";
 
 import type {
   BottleContext,
@@ -32,6 +33,7 @@ type PreparedRun =
 type ToolInput = z.infer<typeof ToolInputSchema>;
 const ToolInputSchema = z.json();
 const testClient = new OpenAI({ apiKey: "test-key" });
+const testLanguageModel = createTestLanguageModel().languageModel;
 
 async function invokePreparedTool(
   prepared: PreparedRun,
@@ -116,6 +118,7 @@ describe("Bottle-check context tools", () => {
     }));
     const classifier = createBottleClassifier({
       client: testClient,
+      languageModel: testLanguageModel,
       model: "test-model",
       maxSearchQueries: 0,
       adapters: {
@@ -167,6 +170,7 @@ describe("Bottle-check context tools", () => {
     const prepared = prepareBottleAuditAgentRun(
       {
         client: testClient,
+        languageModel: testLanguageModel,
         model: "test-model",
         maxSearchQueries: 0,
         adapters: {
@@ -246,6 +250,7 @@ describe("Bottle-check context tools", () => {
     const prepared = prepareBottleAuditAgentRun(
       {
         client: testClient,
+        languageModel: testLanguageModel,
         model: "test-model",
         maxSearchQueries: 1,
         web: TEST_WEB,
@@ -313,6 +318,7 @@ describe("Bottle-check context tools", () => {
     const prepared = await prepareBottleClassifierAgentRun(
       {
         client: testClient,
+        languageModel: testLanguageModel,
         model: "test-model",
         maxSearchQueries: 0,
         adapters: {
@@ -397,6 +403,7 @@ describe("Bottle-check context tools", () => {
     const prepared = await prepareBottleClassifierAgentRun(
       {
         client: testClient,
+        languageModel: testLanguageModel,
         model: "test-model",
         maxSearchQueries: 0,
         adapters: {
@@ -431,6 +438,7 @@ describe("Bottle-check context tools", () => {
     const prepared = await prepareBottleClassifierAgentRun(
       {
         client: testClient,
+        languageModel: testLanguageModel,
         model: "test-model",
         maxSearchQueries: 2,
         adapters: {
@@ -487,6 +495,7 @@ describe("Bottle-check context tools", () => {
     const prepared = prepareBottleAuditAgentRun(
       {
         client: testClient,
+        languageModel: testLanguageModel,
         model: "test-model",
         maxSearchQueries: 2,
         web: TEST_WEB,

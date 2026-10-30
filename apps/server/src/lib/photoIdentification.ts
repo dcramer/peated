@@ -11,12 +11,9 @@ import {
 } from "@peated/server/agents/bottleClassifier";
 import { resolveExactReferenceBottleRun } from "@peated/server/agents/bottleClassifier/findExactReferenceBottleCandidate";
 import config from "@peated/server/config";
+import { createLanguageModel } from "@peated/server/lib/aiSdkModels";
 import { assessBottleResolution } from "@peated/server/lib/bottleMatchingAutomation";
-import {
-  createOpenAIClient,
-  withSentryConversation,
-} from "@peated/server/lib/openaiClient";
-import { instrumentOpenAIResponsesCall } from "@peated/server/lib/openaiResponsesTelemetry";
+import { withSentryConversation } from "@peated/server/lib/openaiClient";
 import { getUploadImageDataUrl } from "@peated/server/lib/uploads";
 import { absoluteUrl } from "@peated/server/lib/urls";
 import {
@@ -186,36 +183,27 @@ async function extractPhotoBottleEvidence({
 
   const conversationId = `photo_identification:${photo.id}`;
   const extraction = await withSentryConversation(conversationId, async () => {
-    return await instrumentOpenAIResponsesCall({
-      baseURL: config.AI_GATEWAY_HOST,
-      conversationId,
-      model: config.OPENAI_IMAGE_EXTRACTION_MODEL,
-      callback: async (reportResponse) => {
-        const extractor = createWhiskyLabelExtractor({
-          // Limit the photo form’s wait; let the user choose when to retry.
-          client: createOpenAIClient().withOptions({
-            timeout: 45_000,
-            maxRetries: 0,
-          }),
-          model: config.OPENAI_MODEL,
-          reasoningEffort: config.OPENAI_REASONING_EFFORT,
-          imageModel: config.OPENAI_IMAGE_EXTRACTION_MODEL,
-          imageReasoningEffort: config.OPENAI_IMAGE_EXTRACTION_REASONING_EFFORT,
-          onImageExtractionMetadata: reportResponse,
-        });
-        const imageDataUrl = await getUploadImageDataUrl(photo.imageUrl);
-        // Uploaded photos stay out of Sentry; the span above records no content.
-        const extraction = await Sentry.suppressTracing(() =>
-          extractor.extractFromImageWithMetadata(imageDataUrl, { signal }),
-        );
-        return {
-          extractedIdentity: BottleExtractedDetailsSchema.nullable().parse(
-            extraction.result,
-          ),
-          rawLabelText: extraction.rawLabelText,
-        };
-      },
+    const extractor = createWhiskyLabelExtractor({
+      languageModel: (model) => createLanguageModel({ model }),
+      model: config.OPENAI_MODEL,
+      reasoningEffort: config.OPENAI_REASONING_EFFORT,
+      imageModel: config.OPENAI_IMAGE_EXTRACTION_MODEL,
+      imageReasoningEffort: config.OPENAI_IMAGE_EXTRACTION_REASONING_EFFORT,
+      // Limit the photo form’s wait; let the user choose when to retry.
+      limits: { timeoutMs: 45_000, maxRetries: 0 },
     });
+    const imageDataUrl = await getUploadImageDataUrl(photo.imageUrl);
+    // The extractor keeps the uploaded photo and its reading out of Sentry.
+    const extraction = await extractor.extractFromImageWithMetadata(
+      imageDataUrl,
+      { signal },
+    );
+    return {
+      extractedIdentity: BottleExtractedDetailsSchema.nullable().parse(
+        extraction.result,
+      ),
+      rawLabelText: extraction.rawLabelText,
+    };
   });
 
   return {

@@ -1,4 +1,5 @@
 import { createMemoryCache, createPeatedBot } from "@peated/bot";
+import { createGateway, wrapLanguageModel, type LanguageModel } from "ai";
 import OpenAI from "openai";
 import type {
   BottleClassifierDataSource,
@@ -64,6 +65,48 @@ export function createEvalOpenAIClient() {
   return client;
 }
 
+/** An AI SDK model for live model checks that records each call's usage. */
+export function createEvalLanguageModel(modelId: string): LanguageModel {
+  const gateway = createGateway({ apiKey: evalGatewayConfig.apiKey });
+  return wrapLanguageModel({
+    model: gateway(modelId),
+    middleware: {
+      specificationVersion: "v4",
+      wrapGenerate: async ({ doGenerate }) => {
+        const store = getActiveEvalModelCallStore();
+        const startedAt = new Date();
+        const result = await doGenerate();
+        if (store) {
+          const { inputTokens, outputTokens } = result.usage;
+          recordEvalOpenAIResponse({
+            request: { model: modelId },
+            response: {
+              id: result.response?.id,
+              model: result.response?.modelId,
+              usage: {
+                inputTokens: inputTokens.total,
+                outputTokens: outputTokens.total,
+                totalTokens:
+                  (inputTokens.total ?? 0) + (outputTokens.total ?? 0),
+                inputTokensDetails: {
+                  cachedTokens: inputTokens.cacheRead ?? 0,
+                  cacheWriteTokens: inputTokens.cacheWrite ?? 0,
+                },
+                outputTokensDetails: {
+                  reasoningTokens: outputTokens.reasoning ?? 0,
+                },
+              },
+            },
+            startedAt,
+            store,
+          });
+        }
+        return result;
+      },
+    },
+  });
+}
+
 /**
  * PeatedBot for live model checks: Firecrawl when a key is set, an in-memory
  * cache, and no stored website settings.
@@ -85,6 +128,7 @@ export function createEvalClassifierOptions(
 ): CreateBottleClassifierOptions {
   return {
     client: createEvalOpenAIClient(),
+    languageModel: createEvalLanguageModel,
     model: evalClassifierModel,
     reasoningEffort: evalClassifierReasoningEffort,
     imageExtractionModel: evalImageExtractionModel,

@@ -1,81 +1,59 @@
 import { describe, expect, test, vi } from "vitest";
-import {
-  createWhiskyLabelExtractor,
-  type WhiskyLabelClient,
-} from "./extractor";
+import { createWhiskyLabelExtractor } from "./extractor";
+import { createTestLanguageModel } from "./testLanguageModel";
+
+const IMAGE = "data:image/jpeg;base64,dGVzdA==";
 
 describe("createWhiskyLabelExtractor", () => {
-  test("uses image-specific model settings and returns provider usage", async () => {
-    const onImageExtractionMetadata = vi.fn();
-    const create = vi.fn().mockResolvedValue({
-      id: "resp_123",
-      model: "gpt-5.6-luna-2026-07-15",
-      output_text: JSON.stringify({
-        result: null,
-        rawLabelText: "Pokeno CASK NO 71 BOTTLE NO 100",
-      }),
-      service_tier: "default",
-      usage: {
-        input_tokens: 1_000,
-        input_tokens_details: { cached_tokens: 100 },
-        output_tokens: 200,
-        output_tokens_details: { reasoning_tokens: 150 },
-        total_tokens: 1_200,
-      },
+  test("reads an image with the image model and settings and returns usage", async () => {
+    const { model } = createTestLanguageModel({
+      result: null,
+      rawLabelText: "Pokeno CASK NO 71 BOTTLE NO 100",
     });
-    const client = { responses: { create } } satisfies WhiskyLabelClient;
+    const languageModel = vi.fn(() => model);
+    const onImageExtractionMetadata = vi.fn();
     const extractor = createWhiskyLabelExtractor({
-      client,
+      languageModel,
       model: "gpt-5.4",
       imageModel: "gpt-5.6-luna",
       imageReasoningEffort: "high",
       onImageExtractionMetadata,
     });
 
-    const extraction = await extractor.extractFromImageWithMetadata(
-      "data:image/jpeg;base64,dGVzdA==",
-    );
+    const extraction = await extractor.extractFromImageWithMetadata(IMAGE);
 
-    expect(create).toHaveBeenCalledWith(
-      expect.objectContaining({
-        model: "gpt-5.6-luna",
-        reasoning: { effort: "high" },
-        text: {
-          format: expect.objectContaining({
-            type: "json_schema",
-            strict: true,
-            schema: expect.objectContaining({
-              properties: expect.objectContaining({
-                result: expect.objectContaining({
-                  anyOf: expect.arrayContaining([
-                    expect.objectContaining({
-                      type: "object",
-                      properties: expect.objectContaining({
-                        bottling_year: expect.any(Object),
-                      }),
-                      required: expect.arrayContaining(["bottling_year"]),
-                      additionalProperties: false,
-                    }),
-                  ]),
-                }),
-                rawLabelText: expect.any(Object),
+    expect(languageModel).toHaveBeenCalledWith("gpt-5.6-luna");
+    const call = model.doGenerateCalls[0]!;
+    expect(call.reasoning).toBe("high");
+    // Every label field is required, so the model cannot leave one out.
+    expect(call.responseFormat).toMatchObject({
+      type: "json",
+      schema: {
+        required: ["result", "rawLabelText"],
+        properties: {
+          result: {
+            anyOf: expect.arrayContaining([
+              expect.objectContaining({
+                required: expect.arrayContaining(["bottling_year"]),
               }),
-              required: expect.arrayContaining(["result", "rawLabelText"]),
-              additionalProperties: false,
-            }),
-          }),
+            ]),
+          },
         },
-      }),
-      undefined,
-    );
+      },
+    });
+    expect(call.prompt.at(-1)).toMatchObject({
+      role: "user",
+      content: [
+        {
+          type: "file",
+          providerOptions: { openai: { imageDetail: "high" } },
+        },
+      ],
+    });
     expect(extraction).toMatchObject({
       result: null,
       rawLabelText: "Pokeno CASK NO 71 BOTTLE NO 100",
-      response: {
-        id: "resp_123",
-        model: "gpt-5.6-luna-2026-07-15",
-        serviceTier: "default",
-      },
+      response: { id: "resp_123", model: "test-model" },
       usage: {
         inputTokens: 1_000,
         cachedInputTokens: 100,
@@ -93,24 +71,40 @@ describe("createWhiskyLabelExtractor", () => {
     expect(extraction.durationMs).toBeGreaterThanOrEqual(0);
   });
 
-  test("passes a stop signal to the provider request", async () => {
-    const create = vi.fn().mockResolvedValue({
-      id: "resp_123",
-      model: "gpt-5.6-luna",
-      output_text: JSON.stringify({ result: null, rawLabelText: null }),
+  test("passes the caller's stop signal to the model call", async () => {
+    const { languageModel, model } = createTestLanguageModel({
+      result: null,
+      rawLabelText: null,
     });
     const extractor = createWhiskyLabelExtractor({
-      client: { responses: { create } } satisfies WhiskyLabelClient,
-      model: "gpt-5.4",
+      languageModel,
+      model: "gpt-5.6-luna",
     });
-    const signal = new AbortController().signal;
+    const controller = new AbortController();
+    controller.abort();
 
-    await extractor.extractFromImageWithMetadata(
-      "data:image/jpeg;base64,dGVzdA==",
-      { signal },
+    await extractor.extractFromImageWithMetadata(IMAGE, {
+      signal: controller.signal,
+    });
+
+    expect(model.doGenerateCalls[0]?.abortSignal?.aborted).toBe(true);
+  });
+
+  test("does not retry when the caller sets no retries", async () => {
+    const { languageModel, generate } = createTestLanguageModel();
+    generate.mockRejectedValue(
+      Object.assign(new Error("Service unavailable"), { isRetryable: true }),
     );
+    const extractor = createWhiskyLabelExtractor({
+      languageModel,
+      model: "gpt-5.6-luna",
+      limits: { timeoutMs: 45_000, maxRetries: 0 },
+    });
 
-    expect(create).toHaveBeenCalledWith(expect.any(Object), { signal });
+    await expect(extractor.extractFromImageWithMetadata(IMAGE)).rejects.toThrow(
+      "Service unavailable",
+    );
+    expect(generate).toHaveBeenCalledTimes(1);
   });
 
   test("keeps the label reading when the release date is incomplete", async () => {
@@ -137,19 +131,16 @@ describe("createWhiskyLabelExtractor", () => {
       outturn: 200,
       edition: null,
     };
-    const create = vi.fn().mockResolvedValue({
-      id: "resp_123",
-      model: "gpt-5.6-luna",
-      output_text: JSON.stringify({ result, rawLabelText: "AULTMORE" }),
+    const { languageModel } = createTestLanguageModel({
+      result,
+      rawLabelText: "AULTMORE",
     });
     const extractor = createWhiskyLabelExtractor({
-      client: { responses: { create } },
+      languageModel,
       model: "gpt-5.6-luna",
     });
 
-    const extraction = await extractor.extractFromImageWithMetadata(
-      "data:image/jpeg;base64,dGVzdA==",
-    );
+    const extraction = await extractor.extractFromImageWithMetadata(IMAGE);
 
     expect(extraction.result).toEqual({
       ...result,

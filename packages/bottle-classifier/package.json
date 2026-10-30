@@ -95,6 +95,7 @@
     "@peated/bot": "workspace:*",
     "@peated/tsconfig": "workspace:*",
     "@sentry/core": "catalog:",
+    "ai": "^7.0.156",
     "openai": "^6.27.0",
     "zod": "catalog:"
   },

@@ -1,4 +1,3 @@
-import type OpenAI from "openai";
 import {
   BottleContextSchema,
   BottleContextSourceSchema,
@@ -13,6 +12,7 @@ import {
 import {
   createWhiskyLabelExtractor,
   getImageLabelExtractionVersion,
+  type WhiskyLabelModel,
 } from "../extractor";
 import type { OpenAIReasoningEffort } from "../openaiModelSettings";
 
@@ -38,7 +38,7 @@ type BottleContextLoaderDataSource = {
 };
 
 type BottleContextLoaderOptions = {
-  client: OpenAI;
+  languageModel: WhiskyLabelModel;
   model: string;
   reasoningEffort?: OpenAIReasoningEffort;
   imageExtractionModel?: string;
@@ -93,7 +93,7 @@ export function createBottleContextLoader({
   const getBottleContext = dataSource.getBottleContext;
 
   const extractor = createWhiskyLabelExtractor({
-    client: options.client,
+    languageModel: options.languageModel,
     model: options.model,
     reasoningEffort: options.reasoningEffort,
     imageModel: options.imageExtractionModel,
