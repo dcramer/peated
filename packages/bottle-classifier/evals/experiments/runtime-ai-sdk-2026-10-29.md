@@ -1,6 +1,6 @@
 # Classifier runtime on the AI SDK
 
-**Status: part 1 accepted; part 2 measured, decision pending.** The plan
+**Status: both parts accepted.** The plan
 below was written before any results.
 
 ## Expected benefit
@@ -89,9 +89,11 @@ Other checks:
 
 ### Part 2: classifier agent loop
 
-**Decision pending.** Accuracy is within run-to-run noise and cost is lower,
-but the new runtime made two wrong matches across ten runs of the two cases
-involved, against none on main.
+**Accepted by the owner on 2026-10-30, as measured.** Accuracy is within
+run-to-run noise and cost is lower. The new runtime made two wrong matches
+across ten runs of the two cases involved, against none on main; they were
+not measured further. Watch Glen Breton 21 and Classic Cut 2017 in later
+suite runs.
 
 Two full-suite pairs on 2026-10-29, each pair started together, with the CI
 evidence snapshot and no live web. Old code ran from a checkout of main at
