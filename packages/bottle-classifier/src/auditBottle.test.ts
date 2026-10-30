@@ -1,5 +1,6 @@
 import OpenAI from "openai";
 import { describe, expect, test, vi } from "vitest";
+import { createTestLanguageModel } from "./testLanguageModel";
 
 import type {
   BottleContext,
@@ -15,6 +16,7 @@ import { buildBottleClassificationArtifacts } from "./contract";
 import { BottleClassificationError } from "./error";
 
 const testClient = new OpenAI({ apiKey: "test-key" });
+const testLanguageModel = createTestLanguageModel().languageModel;
 
 function buildAuditedBottleContext(): BottleContextSource {
   return {
@@ -184,6 +186,7 @@ describe("auditBottle", () => {
     );
     const classifier = createBottleClassifier({
       client: testClient,
+      languageModel: testLanguageModel,
       model: "test-model",
       maxSearchQueries: 2,
       adapters: {
@@ -286,6 +289,7 @@ describe("auditBottle", () => {
   test("requires the read-only Bottle preload capability", async () => {
     const classifier = createBottleClassifier({
       client: testClient,
+      languageModel: testLanguageModel,
       model: "test-model",
       maxSearchQueries: 2,
       adapters: {
@@ -330,6 +334,7 @@ describe("auditBottle", () => {
     );
     const classifier = createBottleClassifier({
       client: testClient,
+      languageModel: testLanguageModel,
       model: "test-model",
       maxSearchQueries: 0,
       adapters: {
@@ -403,6 +408,7 @@ describe("auditBottle", () => {
     }));
     const classifier = createBottleClassifier({
       client: testClient,
+      languageModel: testLanguageModel,
       model: "test-model",
       maxSearchQueries: 0,
       adapters: {
@@ -434,6 +440,7 @@ describe("auditBottle", () => {
   test("accepts any supported audit proposal type", async () => {
     const classifier = createBottleClassifier({
       client: testClient,
+      languageModel: testLanguageModel,
       model: "test-model",
       maxSearchQueries: 0,
       adapters: {
@@ -472,6 +479,7 @@ describe("auditBottle", () => {
   test("keeps catalog review output out of Reference Classification", async () => {
     const classifier = createBottleClassifier({
       client: testClient,
+      languageModel: testLanguageModel,
       model: "test-model",
       maxSearchQueries: 0,
       adapters: {

@@ -15,6 +15,7 @@ import {
   type SearchEntitiesArgs,
 } from "@peated/bottle-classifier/internal/types";
 import config from "@peated/server/config";
+import { createLanguageModel } from "@peated/server/lib/aiSdkModels";
 import {
   findBottleReferenceCandidates,
   getBottleCandidateById,
@@ -103,6 +104,7 @@ export function getBottleClassifier(
 
   const bottleClassifier = createBottleClassifier({
     client,
+    languageModel: (model) => createLanguageModel({ model, workload }),
     model: config.BOTTLE_CLASSIFIER_MODEL,
     reasoningEffort: config.BOTTLE_CLASSIFIER_REASONING_EFFORT,
     imageExtractionModel: config.OPENAI_IMAGE_EXTRACTION_MODEL,

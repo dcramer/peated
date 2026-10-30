@@ -24,6 +24,7 @@ import {
   type BottleReferenceInput,
   type Finding,
 } from "../contract";
+import type { WhiskyLabelModel } from "../extractor";
 import type { ImageBottleEvidence } from "../imageEvidence";
 import type { OpenAIReasoningEffort } from "../openaiModelSettings";
 import type {
@@ -111,6 +112,7 @@ type BottleClassifierToolObserver = (event: BottleClassifierToolEvent) => void;
 
 type BottleCheckRuntimeOptions = {
   client: OpenAI;
+  languageModel: WhiskyLabelModel;
   model: string;
   reasoningEffort?: OpenAIReasoningEffort;
   imageExtractionModel?: string;

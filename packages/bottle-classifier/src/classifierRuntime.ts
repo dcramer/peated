@@ -43,7 +43,7 @@ import {
   type ProposedOperation,
 } from "./contract";
 import { BottleClassificationError } from "./error";
-import { createWhiskyLabelExtractor } from "./extractor";
+import { createWhiskyLabelExtractor, type WhiskyLabelModel } from "./extractor";
 import type { ImageBottleEvidence } from "./imageEvidence";
 import {
   buildBottleAuditInstructions,
@@ -301,6 +301,8 @@ export type BottleAgentRunResult = {
 
 type BaseCreateBottleClassifierOptions = {
   client: OpenAI;
+  /** Label extraction model calls; the agents still use `client`. */
+  languageModel: WhiskyLabelModel;
   model: string;
   reasoningEffort?: OpenAIReasoningEffort;
   imageExtractionModel?: string;
@@ -944,7 +946,7 @@ export function createBottleClassifier(
   options: CreateBottleClassifierOptions,
 ): BottleClassifier {
   const extractor = createWhiskyLabelExtractor({
-    client: options.client,
+    languageModel: options.languageModel,
     model: options.model,
     reasoningEffort: options.reasoningEffort,
     imageModel: options.imageExtractionModel,

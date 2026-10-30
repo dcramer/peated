@@ -28,7 +28,8 @@ Two libraries call models. Both use the same gateway and keys.
 
 - **OpenAI SDK:** `createOpenAIClient` in `apps/server/src/lib/openaiClient.ts`.
   The Bottle and Entity classifiers and the About writer run on the OpenAI
-  Agents library through this client.
+  Agents library through this client. The Bottle classifier's label extraction
+  uses the AI SDK through the `languageModel` it is given.
 - **AI SDK:** `createLanguageModel` and `createDecisionModel` in
   `apps/server/src/lib/aiSdkModels.ts`. Use these for new single model calls.
 
@@ -73,8 +74,8 @@ arrives as status 500, so it counts as temporary.
   review text (see [Sensitive Data](../policies/sensitive-data.md)).
   - For an AI SDK call, set `recordInputs` and `recordOutputs` to `false` in
     its `telemetry` option. Sentry still records the call, its model, and token
-    counts. Review clips do this.
-  - For an OpenAI SDK call, run the call inside `Sentry.suppressTracing` and
-    record a span with no content around it. Photo lookup does this.
+    counts. Label extraction and review clips do this.
+  - We have no supported way to hide an OpenAI SDK call's content. Move a call
+    that needs it onto the AI SDK.
 - Wrap all the calls in one run with `withSentryConversation` so they share a
   conversation ID.

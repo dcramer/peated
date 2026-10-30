@@ -13,7 +13,7 @@ import {
   formatEvalUsageAnnotation,
 } from "./evalMeasurements";
 import {
-  createEvalOpenAIClient,
+  createEvalLanguageModel,
   evalImageExtractionModel,
   evalImageExtractionReasoningEffort,
   hasEvalAIGatewayCredentials,
@@ -159,7 +159,7 @@ const imageExtractionHarness = createHarness<
     const { result: extractedIdentity, modelCalls } =
       await withEvalModelCallCapture(async () => {
         const extractor = createWhiskyLabelExtractor({
-          client: createEvalOpenAIClient(),
+          languageModel: createEvalLanguageModel,
           model: evalImageExtractionModel,
           reasoningEffort: evalImageExtractionReasoningEffort,
         });

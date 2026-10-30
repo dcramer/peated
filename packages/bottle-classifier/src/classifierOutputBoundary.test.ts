@@ -8,6 +8,7 @@ import {
 import OpenAI from "openai";
 import { describe, expect, test, vi } from "vitest";
 import { z } from "zod";
+import { createTestLanguageModel } from "./testLanguageModel";
 
 import type { BottleContext } from "./bottleContextContract";
 import {
@@ -67,6 +68,7 @@ const currentBottleContext: BottleContext = {
 
 const classifierOptions = {
   client: new OpenAI({ apiKey: "test-api-key" }),
+  languageModel: createTestLanguageModel().languageModel,
   model: "test-model",
   maxSearchQueries: 0,
   adapters: {

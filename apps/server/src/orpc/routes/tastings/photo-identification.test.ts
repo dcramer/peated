@@ -1,3 +1,4 @@
+import { GatewayResponseError } from "@ai-sdk/gateway";
 import { createRouterClient } from "@orpc/server";
 import type {
   BottleClassificationArtifactsSchema,
@@ -1061,6 +1062,14 @@ describe("POST /tastings/photo-identification", () => {
   });
 
   test.for([
+    // Label reading goes through the AI SDK, which reports gateway errors.
+    new GatewayResponseError({
+      message: "Gateway request failed: The operation timed out.",
+      statusCode: 500,
+      cause: new DOMException("The operation timed out.", "TimeoutError"),
+    }),
+    new GatewayResponseError({ message: "Rate limited", statusCode: 429 }),
+    new GatewayResponseError({ message: "Unavailable", statusCode: 503 }),
     new OpenAI.APIConnectionError({ message: "Connection failed" }),
     new OpenAI.APIConnectionTimeoutError(),
     new OpenAI.APIError(429, {}, "Rate limited", new Headers()),

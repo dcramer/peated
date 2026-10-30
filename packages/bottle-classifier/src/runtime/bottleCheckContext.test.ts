@@ -1,7 +1,7 @@
-import OpenAI from "openai";
 import { describe, expect, test, vi } from "vitest";
 
 import type { BottleContextSource } from "../bottleContextContract";
+import { createTestLanguageModel } from "../testLanguageModel";
 import {
   createBottleContextLoader,
   type ImageLabelReading,
@@ -50,40 +50,12 @@ function buildContextSource(): BottleContextSource {
   };
 }
 
-function buildClient() {
-  const create = vi.fn(
-    async () =>
-      new Response(
-        JSON.stringify({
-          id: "resp_1",
-          object: "response",
-          model: "test-model",
-          output: [
-            {
-              type: "message",
-              role: "assistant",
-              content: [
-                {
-                  type: "output_text",
-                  text: JSON.stringify({
-                    result: null,
-                    rawLabelText: "EXAMPLE 10",
-                  }),
-                },
-              ],
-            },
-          ],
-          usage: null,
-        }),
-        { headers: { "content-type": "application/json" } },
-      ),
-  );
-  const client = new OpenAI({
-    apiKey: "test-key",
-    fetch: create,
-    maxRetries: 0,
+function buildModel() {
+  const { languageModel, generate } = createTestLanguageModel({
+    result: null,
+    rawLabelText: "EXAMPLE 10",
   });
-  return { client, create };
+  return { languageModel, create: generate };
 }
 
 describe("createBottleContextLoader", () => {
@@ -103,14 +75,14 @@ describe("createBottleContextLoader", () => {
     ];
     const readImageLabel = vi.fn<ReadImageLabel>();
     const getBottleContextImageInput = vi.fn(async (url: string) => url);
-    const { client, create } = buildClient();
+    const { languageModel, create } = buildModel();
     const loadBottleContext = createBottleContextLoader({
       dataSource: {
         getBottleContext: async () => source,
         getBottleContextImageInput,
         readImageLabel,
       },
-      options: { client, model: "test-model" },
+      options: { languageModel, model: "test-model" },
       readImages: false,
     })!;
 
@@ -145,14 +117,14 @@ describe("createBottleContextLoader", () => {
     const getBottleContextImageInput = vi.fn(
       async (url: string) => `data:image/webp;base64,${btoa(url)}`,
     );
-    const { client, create } = buildClient();
+    const { languageModel, create } = buildModel();
     const loadBottleContext = createBottleContextLoader({
       dataSource: {
         getBottleContext: async () => buildContextSource(),
         getBottleContextImageInput,
         readImageLabel,
       },
-      options: { client, model: "test-model" },
+      options: { languageModel, model: "test-model" },
     })!;
 
     const first = await loadBottleContext(1);
@@ -176,7 +148,7 @@ describe("createBottleContextLoader", () => {
 
   test("saves nothing when the label read fails", async () => {
     const saved = new Map<string, ImageLabelReading>();
-    const { client, create } = buildClient();
+    const { languageModel, create } = buildModel();
     create.mockRejectedValueOnce(new Error("provider down"));
     const loadBottleContext = createBottleContextLoader({
       dataSource: {
@@ -187,7 +159,7 @@ describe("createBottleContextLoader", () => {
           return reading;
         },
       },
-      options: { client, model: "test-model" },
+      options: { languageModel, model: "test-model" },
     })!;
 
     const context = await loadBottleContext(1);
