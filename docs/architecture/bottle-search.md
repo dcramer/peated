@@ -12,6 +12,10 @@ are excluded. Candidate queries read identity fields; only final results receive
 full Bottle serialization. Responses retain the existing Bottle fields and add
 agreements, missing facts, and conflicts.
 
+The limit keeps every Bottle found through the known Brand and expression words,
+even with a conflicting fact. Otherwise a wrong stored fact on the real Bottle ranks
+it below unrelated Brands, and the classifier creates a duplicate it never saw.
+
 The shared comparator orders release evidence before name similarity. Stored
 relationship IDs take precedence over names. Typed fields use the one
 comparison the classifier and automatic matching use (see "Deterministic Code" in

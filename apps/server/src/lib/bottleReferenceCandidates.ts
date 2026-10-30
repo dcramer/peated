@@ -1312,6 +1312,26 @@ async function findBottleReferenceCandidatesWithEmbedding(
   );
 }
 
+/**
+ * Bottle candidate retrieval owns this rule: the limit cannot drop a Bottle from
+ * the known Brand whose name holds the expression. Conflicts sort last, so a wrong
+ * stored fact on the real Bottle would otherwise rank it below unrelated Brands,
+ * and the classifier would create a duplicate it never saw.
+ */
+function keepBrandNameCandidates<T extends BottleCandidate>(
+  candidates: T[],
+  limit: number,
+): T[] {
+  const isBrandName = (candidate: T) => candidate.source.includes("brand");
+  const kept = new Set(
+    [
+      ...candidates.filter(isBrandName),
+      ...candidates.filter((candidate) => !isBrandName(candidate)),
+    ].slice(0, limit),
+  );
+  return candidates.filter((candidate) => kept.has(candidate));
+}
+
 async function searchBottleCandidatesWithEmbedding(
   rawInput: BottleCandidateSearchInputRequest,
   { workload = "application" }: { workload?: AIGatewayWorkload } = {},
@@ -1415,17 +1435,19 @@ async function searchBottleCandidatesWithEmbedding(
     Array.from(candidates.values()),
   );
 
-  return enrichedCandidates
-    .map((candidate) => ({
-      ...candidate,
-      comparison: compareReferenceCandidate(candidate, extractedLabel),
-    }))
-    .sort(
-      (a, b) =>
-        orderBottleCandidateComparisons(a.comparison, b.comparison) ||
-        (b.score ?? 0) - (a.score ?? 0),
-    )
-    .slice(0, input.limit);
+  return keepBrandNameCandidates(
+    enrichedCandidates
+      .map((candidate) => ({
+        ...candidate,
+        comparison: compareReferenceCandidate(candidate, extractedLabel),
+      }))
+      .sort(
+        (a, b) =>
+          orderBottleCandidateComparisons(a.comparison, b.comparison) ||
+          (b.score ?? 0) - (a.score ?? 0),
+      ),
+    input.limit,
+  );
 }
 
 export type BottleEmbeddingCreator = typeof getOpenAIEmbedding;

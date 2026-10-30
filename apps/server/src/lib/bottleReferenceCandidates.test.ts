@@ -265,6 +265,48 @@ test("ranks a same-Brand release by covered words when the scraped title cannot 
   expect(siblingIndex).toBeGreaterThan(0);
 });
 
+test("keeps a same-Brand release with a matching name when a stored fact conflicts", async ({
+  fixtures,
+}) => {
+  config.AI_GATEWAY_API_KEY = undefined;
+  const brand = await fixtures.Entity({ name: "Little Book", kind: "brand" });
+  const release = await fixtures.Bottle({
+    name: "The Infinite - Edition III",
+    brandId: brand.id,
+    category: "blend",
+    edition: "Edition III",
+  });
+  const otherBrand = await fixtures.Entity({
+    name: "Jim Beam",
+    kind: "brand",
+  });
+  for (let index = 0; index < 20; index += 1) {
+    await fixtures.Bottle({
+      name: `Infinite Straight Bourbon Whiskey ${index}`,
+      brandId: otherBrand.id,
+      category: "bourbon",
+    });
+  }
+
+  const results = await searchBottleCandidates({
+    query: "Little Book The Infinite Edition 3 Straight Bourbon Whiskey",
+    brand: "Little Book",
+    expression: "The Infinite",
+    category: "bourbon",
+    edition: "Edition 3",
+    limit: 15,
+  });
+
+  expect(results).toHaveLength(15);
+  expect(results.at(-1)).toMatchObject({
+    bottleId: release.id,
+    source: expect.arrayContaining(["brand"]),
+    comparison: expect.objectContaining({
+      conflicts: expect.arrayContaining(["category"]),
+    }),
+  });
+});
+
 test("does not read a dash in a scraped title as a word exclusion", async ({
   fixtures,
 }) => {
