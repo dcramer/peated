@@ -86,19 +86,28 @@ export async function recordBotWall(origin: string) {
 /**
  * The server's PeatedBot: Redis for the robots.txt cache and Postgres for
  * website settings. Callers choose the Firecrawl key for their workload.
+ * Tests and local previews may replace the network, cache, and clock.
  */
 export function createServerPeatedBot({
   firecrawlApiKey,
+  fetch,
+  cache = createRedisBotCache(),
+  now,
 }: {
   firecrawlApiKey: string | null;
+  fetch?: typeof globalThis.fetch;
+  cache?: BotCache;
+  now?: () => Date;
 }) {
   return createPeatedBot({
-    cache: createRedisBotCache(),
+    cache,
     getSite: getBotSiteSettings,
     onBotWall: recordBotWall,
     firecrawl: firecrawlApiKey
       ? { apiKey: firecrawlApiKey, apiUrl: config.FIRECRAWL_API_URL }
       : null,
     privateJwk: config.PEATED_BOT_PRIVATE_JWK,
+    fetch,
+    now,
   });
 }

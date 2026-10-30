@@ -152,7 +152,7 @@ test("previews an admin-managed source without product writes", async ({
 
   expect(result.run).toMatchObject({
     status: "succeeded",
-    requestCount: 3,
+    requestCount: 2,
     emittedItemCount: 0,
     itemCount: 0,
   });
@@ -231,7 +231,7 @@ test("previews price rules without storing prices", async () => {
 
   expect(result.run).toMatchObject({
     status: "succeeded",
-    requestCount: 3,
+    requestCount: 2,
     emittedItemCount: 0,
     itemCount: 0,
   });
@@ -320,7 +320,7 @@ test("previews a site that exists only in production", async () => {
 
   expect(result.run).toMatchObject({
     status: "succeeded",
-    requestCount: 3,
+    requestCount: 2,
     emittedItemCount: 0,
   });
   expect(result.preview).toEqual({

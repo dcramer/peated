@@ -88,6 +88,8 @@ export const externalSiteRuns = pgTable(
     requestCount: integer("request_count").default(0).notNull(),
     // Null means this run predates request-error tracking.
     requestErrorCount: integer("request_error_count"),
+    // Requests sent through Firecrawl because the website blocks PeatedBot.
+    bypassRequestCount: integer("bypass_request_count").default(0).notNull(),
     retryCount: integer("retry_count").default(0).notNull(),
     rateLimitCount: integer("rate_limit_count").default(0).notNull(),
     recordType: scrapeRecordTypeEnum("record_type"),
@@ -135,6 +137,7 @@ export const externalSiteRuns = pgTable(
           ${table.requestErrorCount} >= 0
           AND ${table.requestErrorCount} <= ${table.requestCount}
         ))
+        AND ${table.bypassRequestCount} >= 0
         AND ${table.retryCount} >= 0
         AND ${table.rateLimitCount} >= 0
         AND ${table.emittedItemCount} >= 0

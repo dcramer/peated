@@ -35,6 +35,7 @@ import {
   ScraperTargetDisabledError,
 } from "./definitions";
 import {
+  ScraperBlockedError,
   ScraperHttpStatusError,
   ScraperRequestError,
   ScraperRequestWaitError,
@@ -95,6 +96,9 @@ function safeRunError(error: Error) {
   }
   if (error instanceof ScraperRobotsDeniedError) {
     return "The source does not allow scraping this page.";
+  }
+  if (error instanceof ScraperBlockedError) {
+    return "The source blocks automated requests, and this request can't go through Firecrawl.";
   }
   if (error instanceof ScraperHttpStatusError) {
     return `The source returned error ${error.status}.`;

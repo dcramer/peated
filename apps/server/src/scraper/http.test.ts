@@ -3,6 +3,7 @@ import config from "@peated/server/config";
 import { BOT_USER_AGENT } from "@peated/server/constants";
 import { db } from "@peated/server/db";
 import {
+  botSites,
   externalSiteRuns,
   externalSites,
   scrapeTargets,
@@ -20,8 +21,10 @@ import {
   defineScrapeTarget,
 } from "./definitions";
 import {
+  createScraperBot,
   parseRetryAfter,
   requestScraperUrl as requestScraperUrlImpl,
+  ScraperBlockedError,
   ScraperRequestError,
   ScraperRequestWaitError,
   type ScraperHttpClock,
@@ -33,10 +36,29 @@ const adapter = async () => {};
 const sink = async () => {};
 const EXECUTION_TOKEN = "owner";
 
-function requestScraperUrl(
-  input: Omit<Parameters<typeof requestScraperUrlImpl>[0], "executionToken">,
-) {
-  return requestScraperUrlImpl({ ...input, executionToken: EXECUTION_TOKEN });
+/**
+ * Sends one scraper request over a fake network. Robots.txt has its own tests
+ * in robots.test.ts, so here every website's robots.txt is a 404: no rules.
+ */
+function requestScraperUrl({
+  fetchImpl,
+  ...input
+}: Omit<
+  Parameters<typeof requestScraperUrlImpl>[0],
+  "executionToken" | "bot"
+> & { fetchImpl: typeof fetch }) {
+  const network: typeof fetch = async (url, init) => {
+    const href = url instanceof Request ? url.url : url.toString();
+    if (new URL(href).pathname === "/robots.txt") {
+      return new Response(null, { status: 404 });
+    }
+    return await fetchImpl(url, init);
+  };
+  return requestScraperUrlImpl({
+    ...input,
+    executionToken: EXECUTION_TOKEN,
+    bot: createScraperBot({ fetchImpl: network, clock: input.clock }),
+  });
 }
 
 function clockAt(value = "2026-08-18T12:00:00Z") {
@@ -342,7 +364,6 @@ test("follows declared redirects and rejects an undeclared redirect before conta
       }),
     )
     .mockResolvedValueOnce(new Response("ok"));
-  const checkRedirect = vi.fn<(url: URL) => Promise<void>>(async () => {});
 
   const response = await requestScraperUrl({
     runId: run.id,
@@ -352,15 +373,11 @@ test("follows declared redirects and rejects an undeclared redirect before conta
       url: new URL("https://example.com/start"),
     },
     registry,
-    checkRedirect,
     fetchImpl,
     clock: clockAt(),
   });
   expect(response.url.origin).toBe("https://static.example.com");
   expect(fetchImpl).toHaveBeenCalledTimes(2);
-  expect(checkRedirect).toHaveBeenCalledExactlyOnceWith(
-    new URL("https://static.example.com/catalog"),
-  );
 
   const [secondRun] = await db
     .update(externalSiteRuns)
@@ -697,4 +714,95 @@ test("parses delta-seconds and HTTP-date Retry-After values", () => {
   );
   expect(parseRetryAfter("invalid", now)).toBeNull();
   expect(parseRetryAfter("Tue, 18 Aug 2026 11:00:00 GMT", now)).toBeNull();
+});
+
+test("marks a website blocked at a bot wall and reads it through Firecrawl, counting the bypass", async () => {
+  const { registry, run } = await setupRuntime();
+  const originalKey = config.SCRAPER_FIRECRAWL_API_KEY;
+  config.SCRAPER_FIRECRAWL_API_KEY = "test-firecrawl-key";
+  const fetchImpl = vi.fn<typeof fetch>(async (input) => {
+    const url = new URL(input instanceof Request ? input.url : input);
+    if (url.origin === "https://api.firecrawl.dev") {
+      return Response.json({
+        success: true,
+        data: {
+          rawHtml: "<html>catalog</html>",
+          metadata: {
+            url: "https://example.com/catalog",
+            statusCode: 200,
+            contentType: "text/html",
+          },
+        },
+      });
+    }
+    return new Response("Just a moment...", {
+      status: 403,
+      headers: { "cf-mitigated": "challenge" },
+    });
+  });
+
+  try {
+    await expect(
+      requestScraperUrl({
+        runId: run.id,
+        sourceKey: "finedrams",
+        request: {
+          target: "operator",
+          url: new URL("https://example.com/catalog"),
+        },
+        registry,
+        fetchImpl,
+        clock: clockAt(),
+      }),
+    ).resolves.toMatchObject({
+      status: 200,
+      headers: { "content-type": "text/html" },
+      body: "<html>catalog</html>",
+    });
+  } finally {
+    config.SCRAPER_FIRECRAWL_API_KEY = originalKey;
+  }
+
+  const [site] = await db.select().from(botSites);
+  expect(site).toMatchObject({
+    origin: "https://example.com",
+    blockedAt: expect.any(Date),
+  });
+  const [runState] = await db
+    .select()
+    .from(externalSiteRuns)
+    .where(eq(externalSiteRuns.id, run.id));
+  expect(runState).toMatchObject({ requestCount: 2, bypassRequestCount: 1 });
+});
+
+test("fails a blocked website's POST instead of sending it through Firecrawl", async () => {
+  const { registry, run } = await setupRuntime({
+    allowedRequestHeaders: ["x-catalog-key"],
+  });
+  const now = new Date();
+  await db.insert(botSites).values({
+    origin: "https://example.com",
+    blockedAt: now,
+    createdAt: now,
+    updatedAt: now,
+  });
+  const fetchImpl = vi.fn<typeof fetch>();
+
+  await expect(
+    requestScraperUrl({
+      runId: run.id,
+      sourceKey: "finedrams",
+      request: {
+        target: "operator",
+        url: new URL("https://example.com/search"),
+        method: "POST",
+        body: '{"page":1}',
+        headers: { "x-catalog-key": "public-key" },
+      },
+      registry,
+      fetchImpl,
+      clock: clockAt(),
+    }),
+  ).rejects.toBeInstanceOf(ScraperBlockedError);
+  expect(fetchImpl).not.toHaveBeenCalled();
 });

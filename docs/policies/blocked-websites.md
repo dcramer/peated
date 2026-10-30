@@ -32,7 +32,11 @@ or paywall.
 - Scrapers send direct PeatedBot requests, signed when
   `PEATED_BOT_PRIVATE_JWK` is configured. When a direct request hits a bot wall,
   the system marks that website as blocked. Later requests to a blocked website
-  go through the bypass service until an admin clears the mark.
+  go through the bypass service until an admin clears the mark. A request the
+  bypass service can't send as is, such as a POST or one with an API key
+  header, fails instead.
+- Images and other files are read directly only, never through the bypass
+  service.
 - Model page-reading tools read through the bypass service.
 - Never bypass logins, paywalls, member-only pages, or other access controls.
   Never send credentials or cookies through a bypass service.

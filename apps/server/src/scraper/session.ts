@@ -3,11 +3,11 @@ import { externalSiteRuns } from "@peated/server/db/schema";
 import { and, eq, sql } from "drizzle-orm";
 import { z } from "zod";
 import {
+  createScraperBot,
   requestScraperUrl,
   type ScraperHttpClock,
   scraperSystemClock,
 } from "./http";
-import { ensureRobotsAllowed } from "./robots";
 import { SCRAPER_RUN_TIMEOUT_MS } from "./runTimeout";
 import type {
   ScraperObservation,
@@ -56,6 +56,7 @@ export function createScraperSession<TCursor, TObservation>({
   clock?: ScraperHttpClock;
 }): ScraperSession<TCursor, TObservation> {
   let remaining = Math.max(0, run.requestLimit - run.sliceRequestCount);
+  const bot = createScraperBot({ fetchImpl, clock });
 
   async function updateOwnedRun(values: { cursor?: unknown }) {
     const now = clock.now();
@@ -83,28 +84,13 @@ export function createScraperSession<TCursor, TObservation>({
   return {
     async request(request: ScraperRequest) {
       try {
-        const checkRobots = async (url: URL) => {
-          await ensureRobotsAllowed({
-            runId: run.id,
-            executionToken,
-            sourceKey: source.key,
-            targetKey: request.target,
-            url,
-            canResumeLater: request.canResumeLater,
-            registry,
-            fetchImpl,
-            clock,
-          });
-        };
-        await checkRobots(request.url);
         return await requestScraperUrl({
           runId: run.id,
           executionToken,
           sourceKey: source.key,
           request,
           registry,
-          checkRedirect: checkRobots,
-          fetchImpl,
+          bot,
           clock,
         });
       } finally {

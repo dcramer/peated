@@ -8,6 +8,7 @@ import {
   scrapeTargets,
   storePrices,
 } from "@peated/server/db/schema";
+import { createServerPeatedBot } from "@peated/server/lib/peatedBot";
 import waitError from "@peated/server/lib/test/waitError";
 import { routerClient } from "@peated/server/orpc/router";
 import { eq } from "drizzle-orm";
@@ -99,10 +100,14 @@ test("health list reports source inventory, runtime, and latest execution", asyn
     origin: "https://decadent-drinks.com",
     targetKey: "decadentdrinks",
     robotsMode: "enforce",
-    robotsState: { status: "missing" },
-    robotsFetchedAt: new Date("2026-08-12T11:00:00.000Z"),
-    robotsExpiresAt: new Date("2026-08-13T11:00:00.000Z"),
   });
+  // PeatedBot caches the website's robots.txt answer, here a 404: no rules.
+  const robotsReadAt = new Date("2026-08-12T11:00:00.000Z");
+  await createServerPeatedBot({
+    firecrawlApiKey: null,
+    fetch: async () => new Response(null, { status: 404 }),
+    now: () => robotsReadAt,
+  }).isAllowedByRobots(new URL("https://decadent-drinks.com/"));
   await db.insert(externalSiteScrapeTargets).values({
     externalSiteId: site.id,
     targetKey: "decadentdrinks",
@@ -167,6 +172,8 @@ test("health list reports source inventory, runtime, and latest execution", asyn
               origin: "https://decadent-drinks.com",
               robotsMode: "enforce",
               robotsStatus: "missing",
+              robotsFetchedAt: "2026-08-12T11:00:00.000Z",
+              robotsExpiresAt: "2026-08-13T11:00:00.000Z",
             },
           ],
         },

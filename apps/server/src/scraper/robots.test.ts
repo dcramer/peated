@@ -1,10 +1,5 @@
-import { parseRobotsRules } from "@peated/bot";
 import { db } from "@peated/server/db";
-import {
-  externalSiteRuns,
-  externalSites,
-  scrapeOrigins,
-} from "@peated/server/db/schema";
+import { externalSiteRuns, externalSites } from "@peated/server/db/schema";
 import { eq } from "drizzle-orm";
 import { vi } from "vitest";
 import { z } from "zod";
@@ -14,22 +9,13 @@ import {
   defineScrapeTarget,
 } from "./definitions";
 import type { ScraperHttpClock } from "./http";
-import {
-  ensureRobotsAllowed as ensureRobotsAllowedImpl,
-  ScraperRobotsDeniedError,
-} from "./robots";
+import { ScraperRobotsDeniedError } from "./robots";
 import { createScraperSession } from "./session";
 import { syncScraperDefinitions } from "./syncDefinitions";
 
 const adapter = async () => {};
 const sink = async () => {};
 const EXECUTION_TOKEN = "owner";
-
-function ensureRobotsAllowed(
-  input: Omit<Parameters<typeof ensureRobotsAllowedImpl>[0], "executionToken">,
-) {
-  return ensureRobotsAllowedImpl({ ...input, executionToken: EXECUTION_TOKEN });
-}
 
 function fixedClock(value = "2026-08-18T12:00:00Z"): ScraperHttpClock {
   let now = new Date(value);
@@ -96,55 +82,81 @@ async function setupRobotsRuntime({
     })
     .returning();
   if (!run) throw new Error("Expected run.");
-  return { registry, run };
-}
-
-test("uses a fresh SQL cache and refuses a disallowed path without contact", async () => {
-  const { registry, run } = await setupRobotsRuntime();
-  const now = new Date("2026-08-18T12:00:00Z");
-  await db
-    .update(scrapeOrigins)
-    .set({
-      robotsState: parseRobotsRules("User-agent: *\nDisallow: /private"),
-      robotsFetchedAt: now,
-      robotsExpiresAt: new Date("2026-08-19T12:00:00Z"),
-    })
-    .where(eq(scrapeOrigins.origin, "https://example.com"));
-  const fetchImpl = vi.fn<typeof fetch>();
-
-  await expect(
-    ensureRobotsAllowed({
-      runId: run.id,
-      sourceKey: "finedrams",
-      targetKey: "operator",
-      url: new URL("https://example.com/private/article"),
-      registry,
-      fetchImpl,
-      clock: fixedClock(),
-    }),
-  ).rejects.toBeInstanceOf(ScraperRobotsDeniedError);
-  expect(fetchImpl).not.toHaveBeenCalled();
-});
-
-test("checks cached robots rules before following a redirect", async () => {
-  const { registry, run } = await setupRobotsRuntime();
-  const now = new Date("2026-08-18T12:00:00Z");
-  await db
-    .update(scrapeOrigins)
-    .set({
-      robotsState: parseRobotsRules("User-agent: *\nDisallow: /private"),
-      robotsFetchedAt: now,
-      robotsExpiresAt: new Date("2026-08-19T12:00:00Z"),
-    })
-    .where(eq(scrapeOrigins.origin, "https://example.com"));
   const source = registry.sources.get("finedrams");
   if (!source) throw new Error("Expected source.");
-  const fetchImpl = vi.fn<typeof fetch>().mockResolvedValueOnce(
-    new Response(null, {
-      status: 302,
-      headers: { location: "/private/article" },
-    }),
+  return { registry, run, source };
+}
+
+/** A fake network keyed by URL; anything else is a test failure. */
+function network(routes: Record<string, () => Response>) {
+  return vi.fn<typeof fetch>(async (input) => {
+    const href = input instanceof Request ? input.url : input.toString();
+    const route = routes[href];
+    if (!route) throw new Error(`Unexpected request: ${href}`);
+    return route();
+  });
+}
+
+function requested(fetchImpl: ReturnType<typeof network>) {
+  return fetchImpl.mock.calls.map(([input]) =>
+    input instanceof Request ? input.url : input.toString(),
   );
+}
+
+async function runRequestCount(runId: number) {
+  const [run] = await db
+    .select({ requestCount: externalSiteRuns.requestCount })
+    .from(externalSiteRuns)
+    .where(eq(externalSiteRuns.id, runId));
+  return run?.requestCount;
+}
+
+test("refuses a path robots.txt disallows without contacting it", async () => {
+  const { registry, run, source } = await setupRobotsRuntime();
+  const fetchImpl = network({
+    "https://example.com/robots.txt": () =>
+      new Response("User-agent: *\nDisallow: /private"),
+    "https://example.com/public": () => new Response("ok"),
+  });
+  const session = createScraperSession({
+    run,
+    source,
+    registry,
+    executionToken: EXECUTION_TOKEN,
+    fetchImpl,
+    clock: fixedClock(),
+  });
+
+  await expect(
+    session.request({
+      target: "operator",
+      url: new URL("https://example.com/private/article"),
+    }),
+  ).rejects.toBeInstanceOf(ScraperRobotsDeniedError);
+  await session.request({
+    target: "operator",
+    url: new URL("https://example.com/public"),
+  });
+
+  // Robots.txt is read once and shared; only the page counts toward the run.
+  expect(requested(fetchImpl)).toEqual([
+    "https://example.com/robots.txt",
+    "https://example.com/public",
+  ]);
+  expect(await runRequestCount(run.id)).toBe(1);
+});
+
+test("checks robots.txt again before following a redirect", async () => {
+  const { registry, run, source } = await setupRobotsRuntime();
+  const fetchImpl = network({
+    "https://example.com/robots.txt": () =>
+      new Response("User-agent: *\nDisallow: /private"),
+    "https://example.com/public/article": () =>
+      new Response(null, {
+        status: 302,
+        headers: { location: "/private/article" },
+      }),
+  });
   const session = createScraperSession({
     run,
     source,
@@ -160,205 +172,79 @@ test("checks cached robots rules before following a redirect", async () => {
       url: new URL("https://example.com/public/article"),
     }),
   ).rejects.toBeInstanceOf(ScraperRobotsDeniedError);
-  expect(fetchImpl).toHaveBeenCalledOnce();
+  expect(requested(fetchImpl)).not.toContain(
+    "https://example.com/private/article",
+  );
 });
 
-test("caches a missing robots document as allowed for the bounded period", async () => {
-  const { registry, run } = await setupRobotsRuntime();
-  const fetchImpl = vi
-    .fn<typeof fetch>()
-    .mockResolvedValue(new Response(null, { status: 404 }));
-  const input = {
-    runId: run.id,
-    sourceKey: "finedrams",
-    targetKey: "operator",
-    url: new URL("https://example.com/catalog"),
+test("waits when robots.txt can't be read", async () => {
+  const { registry, run, source } = await setupRobotsRuntime();
+  const fetchImpl = network({
+    "https://example.com/robots.txt": () => new Response("", { status: 503 }),
+  });
+  const session = createScraperSession({
+    run,
+    source,
     registry,
+    executionToken: EXECUTION_TOKEN,
     fetchImpl,
     clock: fixedClock(),
-  } as const;
-
-  await expect(ensureRobotsAllowed(input)).resolves.toBeUndefined();
-  await expect(ensureRobotsAllowed(input)).resolves.toBeUndefined();
-  expect(fetchImpl).toHaveBeenCalledTimes(1);
-  const [origin] = await db
-    .select()
-    .from(scrapeOrigins)
-    .where(eq(scrapeOrigins.origin, "https://example.com"));
-  expect(origin?.robotsState).toEqual({ status: "missing" });
-  const [runState] = await db
-    .select()
-    .from(externalSiteRuns)
-    .where(eq(externalSiteRuns.id, run.id));
-  expect(runState?.requestCount).toBe(1);
-});
-
-test("treats a refused robots document as no rules", async () => {
-  const { registry, run } = await setupRobotsRuntime();
-  const fetchImpl = vi
-    .fn<typeof fetch>()
-    .mockResolvedValue(new Response("Forbidden", { status: 403 }));
+  });
 
   await expect(
-    ensureRobotsAllowed({
-      runId: run.id,
-      sourceKey: "finedrams",
-      targetKey: "operator",
+    session.request({
+      target: "operator",
       url: new URL("https://example.com/catalog"),
-      registry,
-      fetchImpl,
-      clock: fixedClock(),
-    }),
-  ).resolves.toBeUndefined();
-  const [origin] = await db
-    .select()
-    .from(scrapeOrigins)
-    .where(eq(scrapeOrigins.origin, "https://example.com"));
-  expect(origin?.robotsState).toEqual({ status: "missing" });
-});
-
-test("waits when robots returns a server error", async () => {
-  const { registry, run } = await setupRobotsRuntime();
-  await expect(
-    ensureRobotsAllowed({
-      runId: run.id,
-      sourceKey: "finedrams",
-      targetKey: "operator",
-      url: new URL("https://example.com/catalog"),
-      registry,
-      fetchImpl: vi
-        .fn<typeof fetch>()
-        .mockResolvedValue(new Response(null, { status: 500 })),
-      clock: fixedClock(),
-    }),
-  ).rejects.toMatchObject({ reason: "robots_unavailable" });
-  const [origin] = await db.select().from(scrapeOrigins);
-  expect(origin?.robotsState).toBeNull();
-});
-
-test("waits when robots is unavailable without a fresh decision", async () => {
-  const { registry, run } = await setupRobotsRuntime();
-  await expect(
-    ensureRobotsAllowed({
-      runId: run.id,
-      sourceKey: "finedrams",
-      targetKey: "operator",
-      url: new URL("https://example.com/catalog"),
-      registry,
-      fetchImpl: vi.fn<typeof fetch>().mockRejectedValue(new Error("offline")),
-      clock: fixedClock(),
     }),
   ).rejects.toMatchObject({
     reason: "robots_unavailable",
     nextEligibleAt: new Date("2026-08-18T12:15:00Z"),
   });
-  const [origin] = await db.select().from(scrapeOrigins);
-  expect(origin?.robotsState).toBeNull();
+  expect(requested(fetchImpl)).toEqual(["https://example.com/robots.txt"]);
 });
 
 test("does not report a disabled target as unavailable robots", async () => {
-  const { registry, run } = await setupRobotsRuntime({
+  const { registry, run, source } = await setupRobotsRuntime({
     targetEnabled: false,
   });
-  const fetchImpl = vi.fn<typeof fetch>();
+  const fetchImpl = network({});
+  const session = createScraperSession({
+    run,
+    source,
+    registry,
+    executionToken: EXECUTION_TOKEN,
+    fetchImpl,
+    clock: fixedClock(),
+  });
 
   await expect(
-    ensureRobotsAllowed({
-      runId: run.id,
-      sourceKey: "finedrams",
-      targetKey: "operator",
+    session.request({
+      target: "operator",
       url: new URL("https://example.com/catalog"),
-      registry,
-      fetchImpl,
-      clock: fixedClock(),
     }),
-  ).rejects.toMatchObject({
-    category: "invalid_request",
-  });
+  ).rejects.toMatchObject({ category: "invalid_request" });
   expect(fetchImpl).not.toHaveBeenCalled();
 });
 
-test("reports an undeclared robots redirect instead of retrying it as unavailable", async () => {
-  const { registry, run } = await setupRobotsRuntime();
-  const fetchImpl = vi.fn<typeof fetch>().mockResolvedValue(
-    new Response(null, {
-      status: 301,
-      headers: { location: "https://store.example.com/robots.txt" },
-    }),
-  );
-
-  await expect(
-    ensureRobotsAllowed({
-      runId: run.id,
-      sourceKey: "finedrams",
-      targetKey: "operator",
-      url: new URL("https://example.com/catalog"),
-      registry,
-      fetchImpl,
-      clock: fixedClock(),
-    }),
-  ).rejects.toThrow(
-    "Origin https://store.example.com is not declared for scraper target operator.",
-  );
-  expect(fetchImpl).toHaveBeenCalledTimes(1);
-  const [origin] = await db.select().from(scrapeOrigins);
-  expect(origin?.robotsState).toBeNull();
-});
-
-test("refreshes expired rules and persists parsed rules rather than content", async () => {
-  const { registry, run } = await setupRobotsRuntime();
-  await db
-    .update(scrapeOrigins)
-    .set({
-      robotsState: { status: "missing" },
-      robotsFetchedAt: new Date("2026-08-16T12:00:00Z"),
-      robotsExpiresAt: new Date("2026-08-17T12:00:00Z"),
-    })
-    .where(eq(scrapeOrigins.origin, "https://example.com"));
-
-  await expect(
-    ensureRobotsAllowed({
-      runId: run.id,
-      sourceKey: "finedrams",
-      targetKey: "operator",
-      url: new URL("https://example.com/private"),
-      registry,
-      fetchImpl: vi
-        .fn<typeof fetch>()
-        .mockResolvedValue(
-          new Response("User-agent: *\nDisallow: /private\n# not retained"),
-        ),
-      clock: fixedClock(),
-    }),
-  ).rejects.toBeInstanceOf(ScraperRobotsDeniedError);
-  const [origin] = await db.select().from(scrapeOrigins);
-  expect(origin?.robotsState).toEqual({
-    status: "rules",
-    groups: [
-      {
-        userAgents: ["*"],
-        rules: [{ directive: "disallow", path: "/private" }],
-      },
-    ],
-  });
-  expect(JSON.stringify(origin)).not.toContain("not retained");
-});
-
-test("skips robots only for a reviewed non-crawler API definition", async () => {
-  const { registry, run } = await setupRobotsRuntime({
+test("skips robots.txt only for a reviewed non-crawler API definition", async () => {
+  const { registry, run, source } = await setupRobotsRuntime({
     mode: "not_applicable",
   });
-  const fetchImpl = vi.fn<typeof fetch>();
-  await expect(
-    ensureRobotsAllowed({
-      runId: run.id,
-      sourceKey: "finedrams",
-      targetKey: "operator",
-      url: new URL("https://example.com/catalog"),
-      registry,
-      fetchImpl,
-      clock: fixedClock(),
-    }),
-  ).resolves.toBeUndefined();
-  expect(fetchImpl).not.toHaveBeenCalled();
+  const fetchImpl = network({
+    "https://example.com/catalog": () => new Response("[]"),
+  });
+  const session = createScraperSession({
+    run,
+    source,
+    registry,
+    executionToken: EXECUTION_TOKEN,
+    fetchImpl,
+    clock: fixedClock(),
+  });
+
+  await session.request({
+    target: "operator",
+    url: new URL("https://example.com/catalog"),
+  });
+  expect(requested(fetchImpl)).toEqual(["https://example.com/catalog"]);
 });

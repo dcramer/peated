@@ -9,12 +9,12 @@ import capturePriceImageWithServices, {
   type CapturePriceImageServices,
 } from "./capturePriceImage";
 
-const fetchImage = vi.fn<typeof fetch>();
+const readImage = vi.fn<CapturePriceImageServices["readImage"]>();
 const queueResolution = vi.fn<typeof workerClient.pushJob>();
 const storeImage = vi.fn<typeof uploads.storeFile>();
 const services: CapturePriceImageServices = {
   compressImage: compressAndResizeImage,
-  fetchImage,
+  readImage,
   queueResolution,
   storeImage,
 };
@@ -28,7 +28,12 @@ function capturePriceImage(
 describe("capturePriceImage", () => {
   beforeEach(() => {
     vi.resetAllMocks();
-    fetchImage.mockResolvedValue(new Response("image-bytes"));
+    readImage.mockResolvedValue({
+      status: "ok",
+      url: "https://example.com/image.jpg",
+      contentType: "image/jpeg",
+      body: new TextEncoder().encode("image-bytes"),
+    });
     storeImage.mockResolvedValue("/uploads/price-image.webp");
   });
 
@@ -54,14 +59,34 @@ describe("capturePriceImage", () => {
     });
 
     expect(storeImage).toHaveBeenCalled();
-    expect(fetchImage).toHaveBeenCalledWith(
-      "https://example.com/image.jpg",
-      expect.objectContaining({ signal: expect.any(AbortSignal) }),
-    );
+    expect(readImage).toHaveBeenCalledWith("https://example.com/image.jpg");
     expect(updatedPrice?.imageUrl).toBe("/uploads/price-image.webp");
     expect(updatedBottle?.imageUrl).toBeNull();
     expect(queueResolution).toHaveBeenCalledWith("ResolveStorePriceBottle", {
       priceId: price.id,
     });
+  });
+
+  test("leaves the price without an image when PeatedBot can't read it", async ({
+    fixtures,
+  }) => {
+    const price = await fixtures.StorePrice({ imageUrl: null });
+    readImage.mockResolvedValue({
+      status: "refused",
+      url: "https://example.com/image.jpg",
+      reason: "robots_disallowed",
+    });
+
+    await capturePriceImage({
+      priceId: price.id,
+      imageUrl: "https://example.com/image.jpg",
+    });
+
+    const updatedPrice = await db.query.storePrices.findFirst({
+      where: eq(storePrices.id, price.id),
+    });
+    expect(storeImage).not.toHaveBeenCalled();
+    expect(updatedPrice?.imageUrl).toBeNull();
+    expect(queueResolution).not.toHaveBeenCalled();
   });
 });

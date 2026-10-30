@@ -26,6 +26,7 @@ const ScrapeResponseSchema = z
             url: z.string().nullable().optional(),
             sourceURL: z.string().nullable().optional(),
             statusCode: z.number().nullable().optional(),
+            contentType: z.string().nullable().optional(),
           })
           .passthrough()
           .optional(),
@@ -121,6 +122,8 @@ export type FirecrawlPage = {
   content: string;
   /** The status the website gave Firecrawl. */
   httpStatus: number | null;
+  /** The website's `Content-Type`, when Firecrawl reports it. */
+  contentType: string | null;
 };
 
 /**
@@ -160,6 +163,7 @@ export async function scrapeWithFirecrawl(
       null,
     content: (format === "markdown" ? data.markdown : data.rawHtml) ?? "",
     httpStatus: data.metadata?.statusCode ?? null,
+    contentType: data.metadata?.contentType ?? null,
   };
 }
 

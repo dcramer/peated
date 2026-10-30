@@ -4,7 +4,7 @@ import {
   externalSiteScrapeTargets,
   scrapeTargets,
 } from "@peated/server/db/schema";
-import { and, eq } from "drizzle-orm";
+import { and, eq, sql } from "drizzle-orm";
 import { randomUUID } from "node:crypto";
 import { getRequestDelayMs } from "./definitions";
 
@@ -358,6 +358,39 @@ export async function recordScrapeRequestError({
         .update(externalSiteRuns)
         .set({ requestErrorCount: (run.requestErrorCount ?? 0) + 1 })
         .where(eq(externalSiteRuns.id, runId));
+    });
+  } catch (error) {
+    throw new ScraperCoordinationError(error);
+  }
+}
+
+/**
+ * Counts one request sent through Firecrawl because the website is blocked
+ * (blocked websites policy: record each read's route).
+ */
+export async function recordScrapeBypassRequest({
+  runId,
+  executionToken,
+  database = db,
+}: {
+  runId: number;
+  executionToken: string;
+  database?: CoordinatorDatabase;
+}) {
+  try {
+    await database.transaction(async (tx) => {
+      await tx
+        .update(externalSiteRuns)
+        .set({
+          bypassRequestCount: sql`${externalSiteRuns.bypassRequestCount} + 1`,
+        })
+        .where(
+          and(
+            eq(externalSiteRuns.id, runId),
+            eq(externalSiteRuns.status, "running"),
+            eq(externalSiteRuns.executionToken, executionToken),
+          ),
+        );
     });
   } catch (error) {
     throw new ScraperCoordinationError(error);

@@ -43,6 +43,7 @@ export const ExternalSiteRunSchema = z.object({
   sliceRequestCount: z.number().int().min(0),
   requestCount: z.number().int().min(0),
   requestErrorCount: z.number().int().min(0).nullable(),
+  bypassRequestCount: z.number().int().min(0),
   retryCount: z.number().int().min(0),
   rateLimitCount: z.number().int().min(0),
   recordType: z

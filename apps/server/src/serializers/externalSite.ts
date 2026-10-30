@@ -58,6 +58,7 @@ export function serializeExternalSiteRun(
     sliceRequestCount: item.sliceRequestCount,
     requestCount: item.requestCount,
     requestErrorCount: item.requestErrorCount,
+    bypassRequestCount: item.bypassRequestCount,
     retryCount: item.retryCount,
     rateLimitCount: item.rateLimitCount,
     recordType: item.recordType,

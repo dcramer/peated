@@ -17,6 +17,8 @@ const bot = createPeatedBot({
 
 const page = await bot.readPage({ url, format: "markdown" });
 const search = await bot.searchWeb({ query: "Lagavulin 16" });
+const image = await bot.readFile({ url, accept: "image/*" });
+const response = await bot.request({ url, robots: "follow" });
 ```
 
 ## Reading a page
@@ -66,6 +68,35 @@ robots.txt before it is followed. Firecrawl follows redirects itself, so
 PeatedBot checks the page Firecrawl ended on and drops it when robots.txt
 disallows it.
 
+## Reading a file
+
+`readFile` reads one file, such as an image, directly as PeatedBot. It never
+uses Firecrawl. It follows redirects, checks robots.txt for each address, and
+returns the bytes and content type. A blocked website is not requested, and a
+bot wall marks the website blocked and fails the read.
+
+## Sending one request
+
+`request` is for callers that run their own crawl, such as scrapers. It sends
+one signed request and returns the answer as is, so the caller handles
+redirects, retries, and rate limits. It can send a POST body and extra
+headers.
+
+- `robots: "follow"` checks robots.txt first. `robots: "not_applicable"` skips
+  it, only for an address robots.txt does not cover, such as a website's API,
+  with the reason recorded by the caller.
+- A bot wall marks the website blocked and returns `bot_wall`, so the caller
+  can send the request again.
+- A blocked website's request goes through Firecrawl only when it is a plain
+  GET whose headers Firecrawl can drop, such as `Accept`. Firecrawl gets no
+  request headers, so it never sees credentials. Any other request is refused
+  as `blocked`.
+- A timeout or network failure returns `failed`. Unexpected problems throw.
+
+`isAllowedByRobots` answers the robots.txt question alone, so a caller can
+skip a request before spending anything on it. `getRobotsStatus` returns a
+website's cached rules and when they were read, or null.
+
 ## Searching
 
 `searchWeb` returns links, titles, and descriptions from Firecrawl search. It
@@ -75,7 +106,7 @@ does not read the pages. Read a result with `readPage` to use it.
 
 PeatedBot does not use a database. It keeps short-lived values in `cache`, a
 `BotCache` with `get` and `set`. Robots.txt rules are cached there for 24
-hours. The server backs the cache with Redis; tests, evals, and local scripts
+hours, with the time they were read. The server backs the cache with Redis; tests, evals, and local scripts
 use `createMemoryCache`. A missing or damaged entry is fetched again. Errors
 from the cache throw, so a server cache that should fall back when Redis is
 down must do that itself.

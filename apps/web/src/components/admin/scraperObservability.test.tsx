@@ -73,6 +73,7 @@ const run = {
   sliceRequestCount: 0,
   requestCount: 20,
   requestErrorCount: 4,
+  bypassRequestCount: 0,
   retryCount: 3,
   rateLimitCount: 2,
   recordType: "review",

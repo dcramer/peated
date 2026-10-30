@@ -15,8 +15,10 @@ directly. The files are split by responsibility:
 - `lifecycle.ts` creates runs and sends them to the worker queue;
 - `runs.ts`, `session.ts`, `http.ts`, `robots.ts`, and `coordinator.ts` own
   core execution without importing production registry or worker
-  infrastructure. Public address checks, robots.txt parsing, and request
-  signing come from [`@peated/bot`](../../../../packages/bot/README.md);
+  infrastructure. Every request is sent by
+  [`@peated/bot`](../../../../packages/bot/README.md), which owns public
+  address checks, robots.txt reading and caching, bot walls, and signing;
+  `robots.ts` only decides whether robots.txt applies to an origin;
 - `runTimeout.ts` keeps the database and queue timeouts together. It also says
   how often a worker extends the database timeout during slow work such as AI
   setup;
@@ -346,7 +348,7 @@ once in the runtime instead of repeating them in every source test.
 | Parsed output passes the source's strict schema and is saved by its registered save function.                           | Registry and saving tests.                                                                             |
 | A planned wait keeps the run active. Bad markup and failed saves fail the run.                                          | Runtime and source tests.                                                                              |
 | A source change passes fixture tests and one local run against the public website.                                      | Inspect its saved progress, request count, and parsed results. Use the CI label for live model checks. |
-| The first production run is checked in Admin → Scrapers and Sentry.                                                     | Confirm its status, counts, saved progress, robots state, and any final error.                         |
+| The first production run is checked in Admin → Scrapers and Sentry.                                                     | Confirm its status, counts, saved progress, robots.txt status, and any final error.                    |
 
 Keep source-specific facts in the adapter tests and the owning feature or
 research document. Update a fixture when the publisher changes markup. Do not
@@ -366,8 +368,9 @@ to refresh them without keeping full articles.
   next request time. It is not a failure. When the wait has a cause, such as an
   unreadable robots.txt, the run's error names it.
 - `failed` means invalid data, robots rules, settings, saving, or the remote
-  website stopped that run. Stored errors are brief; detailed unexpected
-  failures belong in Sentry.
+  website stopped that run. A blocked website stops a run when a request can't
+  go through Firecrawl. Stored errors are brief; detailed unexpected failures
+  belong in Sentry.
 
 A source that resumes from its last run continues from the latest finished
 run's saved place, whether that run succeeded or failed. Every checkpoint is a
@@ -383,9 +386,12 @@ or new/seen result appear as not tracked in Admin. Preview and source suggestion
 Admin overview. The overview lists a site as failing only while its latest
 completed collection run failed; the next successful run clears it.
 
-Every network attempt, including robots refreshes and retries, counts toward
-the current worker's request limit. Response bodies are read only up to the
-configured size and are never stored by the runtime.
+Every page request and retry counts toward the current worker's request
+limit, including requests sent through Firecrawl. Robots.txt refreshes do not:
+PeatedBot reads each website's robots.txt at most once a day and shares the
+rules with every reader. `bypassRequestCount` counts the requests that went
+through Firecrawl because the website is blocked. Response bodies are read only
+up to the configured size and are never stored by the runtime.
 
 Planned waits do not count as failed attempts. Other restarts do. A run may last
 up to three days. This gives a historical review import time to finish while
@@ -400,9 +406,15 @@ that fails the price schema is skipped the same way. Neither fails the run.
 Outbound requests identify as `PeatedBot/1.0 (+https://peated.com/bot)`. The
 public page explains Peated's purpose, request controls, and contact path. Do
 not replace it with a browser identity or add credential/cookie forwarding.
-A request sent through a bypass service after a bot wall follows the
+Every scraper request goes through PeatedBot (`@peated/bot`), which checks
+robots.txt, signs the request, and spots bot walls. When a request hits a bot
+wall, PeatedBot marks the website as blocked and the runtime sends the request
+again through Firecrawl. That works only for a plain GET: a POST, or a request
+with headers such as an API key, fails the run as blocked instead. Later
+requests to a blocked website go through Firecrawl until an admin clears the
+mark. This follows the
 [blocked websites policy](../../../../docs/policies/blocked-websites.md).
-When `PEATED_BOT_PRIVATE_JWK` is configured, the shared HTTP transport signs
-each request with Cloudflare Web Bot Auth. Follow the
+When `PEATED_BOT_PRIVATE_JWK` is configured, PeatedBot signs each direct
+request with Cloudflare Web Bot Auth. Follow the
 [PeatedBot request signing runbook](../../../../docs/operations/peated-bot.md)
 for deployment, registration, checks, and key rotation.
