@@ -10,7 +10,10 @@ export default function ExternalSiteRunTelemetry({ run }: { run: Run }) {
       {run.requestLimit.toLocaleString("en-US")} requests ·{" "}
       {run.requestErrorCount === null
         ? "errors not tracked"
-        : `${run.requestErrorCount.toLocaleString("en-US")} errors`}{" "}
+        : `${run.requestErrorCount.toLocaleString("en-US")} errors`}
+      {run.bypassRequestCount
+        ? ` · ${run.bypassRequestCount.toLocaleString("en-US")} through Firecrawl`
+        : ""}{" "}
       · {run.retryCount.toLocaleString("en-US")} retries ·{" "}
       {run.rateLimitCount.toLocaleString("en-US")} slow-downs ·{" "}
       {run.emittedItemCount.toLocaleString("en-US")} records ({" "}

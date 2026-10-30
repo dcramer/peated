@@ -2,6 +2,8 @@ import { z } from "zod";
 
 const FIRECRAWL_API_URL = "https://api.firecrawl.dev";
 const FIRECRAWL_TIMEOUT_MS = 60_000;
+// Extra time to wait for Firecrawl's own timeout answer.
+const FIRECRAWL_WAIT_PADDING_MS = 5_000;
 
 export type FirecrawlConfig = {
   apiKey: string;
@@ -26,6 +28,7 @@ const ScrapeResponseSchema = z
             url: z.string().nullable().optional(),
             sourceURL: z.string().nullable().optional(),
             statusCode: z.number().nullable().optional(),
+            contentType: z.string().nullable().optional(),
           })
           .passthrough()
           .optional(),
@@ -71,6 +74,7 @@ async function callFirecrawl(
   config: FirecrawlConfig,
   fetchImpl: typeof fetch,
   { path, body }: FirecrawlRequest,
+  waitMs = FIRECRAWL_TIMEOUT_MS + FIRECRAWL_WAIT_PADDING_MS,
 ): Promise<{ ok: true; payload: unknown } | FirecrawlFailure> {
   let response: Response;
   try {
@@ -78,7 +82,7 @@ async function callFirecrawl(
       new URL(path, config.apiUrl ?? FIRECRAWL_API_URL),
       {
         method: "POST",
-        signal: AbortSignal.timeout(FIRECRAWL_TIMEOUT_MS + 5_000),
+        signal: AbortSignal.timeout(waitMs),
         headers: {
           Authorization: `Bearer ${config.apiKey}`,
           "Content-Type": "application/json",
@@ -121,28 +125,37 @@ export type FirecrawlPage = {
   content: string;
   /** The status the website gave Firecrawl. */
   httpStatus: number | null;
+  /** The website's `Content-Type`, when Firecrawl reports it. */
+  contentType: string | null;
 };
 
 /**
  * Reads a page through Firecrawl's `auto` proxy: a basic request first, then
  * its enhanced proxy when the website blocks it. Both cost the same credit.
+ * With `timeoutMs`, the whole call, Firecrawl's work included, ends within it.
  */
 export async function scrapeWithFirecrawl(
   config: FirecrawlConfig,
   fetchImpl: typeof fetch,
   url: URL,
   format: "markdown" | "rawHtml",
+  timeoutMs?: number,
 ): Promise<FirecrawlPage | FirecrawlFailure> {
-  const result = await callFirecrawl(config, fetchImpl, {
-    path: "/v2/scrape",
-    body: {
-      url: url.href,
-      formats: [format],
-      onlyMainContent: format === "markdown",
-      proxy: "auto",
-      timeout: FIRECRAWL_TIMEOUT_MS,
+  const result = await callFirecrawl(
+    config,
+    fetchImpl,
+    {
+      path: "/v2/scrape",
+      body: {
+        url: url.href,
+        formats: [format],
+        onlyMainContent: format === "markdown",
+        proxy: "auto",
+        timeout: timeoutMs ?? FIRECRAWL_TIMEOUT_MS,
+      },
     },
-  });
+    timeoutMs,
+  );
   if (!result.ok) return result;
   const { data } = ScrapeResponseSchema.parse(result.payload);
   return {
@@ -160,6 +173,7 @@ export async function scrapeWithFirecrawl(
       null,
     content: (format === "markdown" ? data.markdown : data.rawHtml) ?? "",
     httpStatus: data.metadata?.statusCode ?? null,
+    contentType: data.metadata?.contentType ?? null,
   };
 }
 

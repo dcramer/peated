@@ -1,4 +1,3 @@
-import type { RobotsRules } from "@peated/bot";
 import { sql } from "drizzle-orm";
 import {
   bigint,
@@ -6,7 +5,6 @@ import {
   check,
   index,
   integer,
-  jsonb,
   pgEnum,
   pgTable,
   primaryKey,
@@ -94,9 +92,10 @@ export const scrapeOrigins = pgTable(
     active: boolean("active").default(true).notNull(),
     robotsMode: scrapeOriginRobotsModeEnum("robots_mode").notNull(),
     robotsRationale: text("robots_rationale"),
-    robotsState: jsonb("robots_state").$type<RobotsRules>(),
-    robotsFetchedAt: timestamp("robots_fetched_at"),
-    robotsExpiresAt: timestamp("robots_expires_at"),
+    // robots_state, robots_fetched_at and robots_expires_at are no longer
+    // used: PeatedBot caches robots.txt rules in Redis. They leave the app
+    // schema one deploy before the migration drops them, so running servers
+    // never select a dropped column.
     createdAt: timestamp("created_at").defaultNow().notNull(),
     updatedAt: timestamp("updated_at").defaultNow().notNull(),
   },
@@ -109,16 +108,6 @@ export const scrapeOrigins = pgTable(
       "scrape_origin_robots_rationale_check",
       sql`(${table.robotsMode} = 'enforce' AND ${table.robotsRationale} IS NULL)
         OR (${table.robotsMode} = 'not_applicable' AND ${table.robotsRationale} IS NOT NULL)`,
-    ),
-    check(
-      "scrape_origin_robots_cache_check",
-      sql`(${table.robotsState} IS NULL
-          AND ${table.robotsFetchedAt} IS NULL
-          AND ${table.robotsExpiresAt} IS NULL)
-        OR (${table.robotsState} IS NOT NULL
-          AND ${table.robotsFetchedAt} IS NOT NULL
-          AND ${table.robotsExpiresAt} IS NOT NULL
-          AND ${table.robotsExpiresAt} > ${table.robotsFetchedAt})`,
     ),
     index("scrape_origin_target_idx").on(table.targetKey, table.active),
   ],

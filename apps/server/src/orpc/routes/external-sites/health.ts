@@ -1,3 +1,4 @@
+import { ROBOTS_CACHE_MS } from "@peated/bot";
 import { isExternalReviewSiteKey } from "@peated/server/constants";
 import { db } from "@peated/server/db";
 import {
@@ -15,6 +16,7 @@ import {
   storePrices,
   type ExternalSite,
 } from "@peated/server/db/schema";
+import { createServerPeatedBot } from "@peated/server/lib/peatedBot";
 import { procedure } from "@peated/server/orpc";
 import { requireAdmin } from "@peated/server/orpc/middleware";
 import {
@@ -129,9 +131,6 @@ async function getHealthForSites(
         windowMs: scrapeTargets.windowMs,
         origin: scrapeOrigins.origin,
         robotsMode: scrapeOrigins.robotsMode,
-        robotsState: scrapeOrigins.robotsState,
-        robotsFetchedAt: scrapeOrigins.robotsFetchedAt,
-        robotsExpiresAt: scrapeOrigins.robotsExpiresAt,
       })
       .from(externalSiteScrapeTargets)
       .innerJoin(
@@ -207,6 +206,21 @@ async function getHealthForSites(
     number,
     Map<string, z.infer<typeof ExternalSiteScrapeTargetSchema>>
   >();
+  // Robots.txt rules live in PeatedBot's cache, shared by every reader.
+  const robotsBot = createServerPeatedBot({ firecrawlApiKey: null });
+  const robotsOrigins = new Set(
+    runtimeRows.flatMap((row) =>
+      row.origin && row.robotsMode === "enforce" ? [row.origin] : [],
+    ),
+  );
+  const robotsByOrigin = new Map(
+    await Promise.all(
+      [...robotsOrigins].map(
+        async (origin) =>
+          [origin, await robotsBot.getRobotsStatus(origin)] as const,
+      ),
+    ),
+  );
   const now = Date.now();
   for (const row of runtimeRows) {
     let targets = targetsBySite.get(row.externalSiteId);
@@ -230,15 +244,18 @@ async function getHealthForSites(
       targets.set(row.targetKey, target);
     }
     if (row.origin && row.robotsMode) {
+      const robots = robotsByOrigin.get(row.origin) ?? null;
       target.origins.push({
         origin: row.origin,
         robotsMode: row.robotsMode,
         robotsStatus:
           row.robotsMode === "not_applicable"
             ? "not_applicable"
-            : (row.robotsState?.status ?? "unknown"),
-        robotsFetchedAt: row.robotsFetchedAt?.toISOString() ?? null,
-        robotsExpiresAt: row.robotsExpiresAt?.toISOString() ?? null,
+            : (robots?.rules.status ?? "unknown"),
+        robotsFetchedAt: robots?.fetchedAt.toISOString() ?? null,
+        robotsExpiresAt: robots
+          ? new Date(robots.fetchedAt.getTime() + ROBOTS_CACHE_MS).toISOString()
+          : null,
       });
     }
   }

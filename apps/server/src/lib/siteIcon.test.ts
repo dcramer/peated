@@ -1,10 +1,27 @@
+import { createMemoryCache } from "@peated/bot";
+import { createServerPeatedBot } from "@peated/server/lib/peatedBot";
 import sharp from "sharp";
-import { describe, expect, test, vi } from "vitest";
+import { describe, expect, test, vi, type Mock } from "vitest";
 import {
   downloadSiteIcon,
   findSiteIconDeclarations,
   SiteIconUnavailableError,
 } from "./siteIcon";
+
+/** PeatedBot over a fake network. Its robots.txt is a 404: no rules. */
+function botFor(fetchImpl: typeof fetch) {
+  return createServerPeatedBot({
+    firecrawlApiKey: null,
+    fetch: fetchImpl,
+    cache: createMemoryCache(),
+  });
+}
+
+function pageRequests(fetchImpl: Mock<typeof fetch>) {
+  return fetchImpl.mock.calls
+    .map(([input]) => new URL(input instanceof Request ? input.url : input))
+    .filter((url) => url.pathname !== "/robots.txt");
+}
 
 function response(body: string | Uint8Array, contentType: string) {
   return new Response(body, {
@@ -92,13 +109,13 @@ describe("downloadSiteIcon", () => {
 
     const result = await downloadSiteIcon(
       new URL("https://example.com/archive"),
-      fetchImpl,
+      botFor(fetchImpl),
     );
     const metadata = await sharp(result.data).metadata();
 
     expect(result.sourceUrl).toBe("https://example.com/large.png");
     expect(metadata).toMatchObject({ format: "webp", height: 128, width: 128 });
-    expect(fetchImpl).toHaveBeenCalledTimes(2);
+    expect(pageRequests(fetchImpl)).toHaveLength(2);
   });
 
   test("uses icons from a web app manifest", async () => {
@@ -137,11 +154,11 @@ describe("downloadSiteIcon", () => {
 
     const result = await downloadSiteIcon(
       new URL("https://example.com/"),
-      fetchImpl,
+      botFor(fetchImpl),
     );
 
     expect(result.sourceUrl).toBe("https://example.com/app/icons/site.png");
-    expect(fetchImpl).toHaveBeenCalledTimes(3);
+    expect(pageRequests(fetchImpl)).toHaveLength(3);
   });
 
   test("ignores a broken optional manifest", async () => {
@@ -175,10 +192,34 @@ describe("downloadSiteIcon", () => {
 
     const result = await downloadSiteIcon(
       new URL("https://example.com/"),
-      fetchImpl,
+      botFor(fetchImpl),
     );
 
     expect(result.sourceUrl).toBe("https://example.com/site.png");
+  });
+
+  test("never contacts another website a redirect points to", async () => {
+    const fetchImpl = vi.fn<typeof fetch>(async (input) => {
+      const url = new URL(input instanceof Request ? input.url : input);
+      if (url.hostname === "example.com" && url.pathname === "/") {
+        return new Response(null, {
+          status: 302,
+          headers: { location: "https://other.example/" },
+        });
+      }
+      return new Response(null, { status: 404 });
+    });
+
+    await expect(
+      downloadSiteIcon(new URL("https://example.com/"), botFor(fetchImpl)),
+    ).rejects.toBeInstanceOf(SiteIconUnavailableError);
+    expect(
+      fetchImpl.mock.calls.filter(([input]) =>
+        String(input instanceof Request ? input.url : input).includes(
+          "other.example",
+        ),
+      ),
+    ).toHaveLength(0);
   });
 
   test("reports network failures as an unavailable icon", async () => {
@@ -187,7 +228,7 @@ describe("downloadSiteIcon", () => {
     });
 
     await expect(
-      downloadSiteIcon(new URL("https://example.com/"), fetchImpl),
+      downloadSiteIcon(new URL("https://example.com/"), botFor(fetchImpl)),
     ).rejects.toBeInstanceOf(SiteIconUnavailableError);
   });
 });

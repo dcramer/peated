@@ -1,7 +1,8 @@
-import { defaultHeaders } from "@peated/server/constants";
+import type { FileRead } from "@peated/bot";
 import { db } from "@peated/server/db";
 import { storePrices } from "@peated/server/db/schema";
 import { logInfo, logTelemetryError } from "@peated/server/lib/log";
+import { createServerPeatedBot } from "@peated/server/lib/peatedBot";
 import { compressAndResizeImage, storeFile } from "@peated/server/lib/uploads";
 import { pushJob } from "@peated/server/worker/dispatch";
 import type { JobContext, JobPayload } from "@peated/server/worker/types";
@@ -16,16 +17,27 @@ export const CapturePriceImageJobArgsSchema = z
   })
   .strict();
 
+const MAX_IMAGE_BYTES = 10 * 1024 * 1024;
+
 export interface CapturePriceImageServices {
   compressImage: typeof compressAndResizeImage;
-  fetchImage: typeof fetch;
+  readImage: (url: string) => Promise<FileRead>;
   queueResolution: typeof pushJob;
   storeImage: typeof storeFile;
 }
 
 const capturePriceImageServices: CapturePriceImageServices = {
   compressImage: compressAndResizeImage,
-  fetchImage: fetch,
+  // Images are read directly as PeatedBot, never through Firecrawl. A
+  // retailer that never answers must not hold the queue: the job runs at
+  // concurrency 1 and BullMQ renews its lock for as long as it waits.
+  readImage: async (url) =>
+    await createServerPeatedBot({ firecrawlApiKey: null }).readFile({
+      url,
+      accept: "image/*,*/*;q=0.1",
+      maxBytes: MAX_IMAGE_BYTES,
+      timeoutMs: 30_000,
+    }),
   queueResolution: pushJob,
   storeImage: storeFile,
 };
@@ -41,18 +53,15 @@ async function fetchAndStoreImage(
       imageUrl,
     },
   });
-  // A retailer that never answers must not hold the queue: the job runs at
-  // concurrency 1 and BullMQ renews its lock for as long as it waits.
-  const req = await services.fetchImage(imageUrl, {
-    headers: defaultHeaders(imageUrl),
-    signal: AbortSignal.timeout(30_000),
-  });
-  if (!req.body) return null;
-  const file = Readable.from(readResponseBody(req.body));
-
-  if (!file) return null;
+  const image = await services.readImage(imageUrl);
+  if (image.status !== "ok") {
+    logInfo("Could not read image {imageUrl}: {reason}", {
+      extra: { imageUrl, reason: image.reason },
+    });
+    return null;
+  }
   const fileData = {
-    file,
+    file: Readable.from([Buffer.from(image.body)]),
     filename,
   };
 
@@ -62,21 +71,6 @@ async function fetchAndStoreImage(
     urlPrefix: "/uploads",
     onProcess: (...args) => services.compressImage(...args, undefined, 1024),
   });
-}
-
-async function* readResponseBody(
-  body: ReadableStream<Uint8Array>,
-): AsyncGenerator<Uint8Array> {
-  const reader = body.getReader();
-  try {
-    while (true) {
-      const result = await reader.read();
-      if (result.done) return;
-      yield result.value;
-    }
-  } finally {
-    reader.releaseLock();
-  }
 }
 
 export default async (

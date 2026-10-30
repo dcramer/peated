@@ -1,22 +1,26 @@
 import {
-  BOT_USER_AGENT,
-  fetchPublicUrl,
+  type BotResponse,
+  createMemoryCache,
   hasNonPublicLiteralAddress,
-  isPublicAddressError,
-  signRequest,
+  type PeatedBot,
+  type RobotsCheck,
 } from "@peated/bot";
 import config from "@peated/server/config";
+import { createServerPeatedBot } from "@peated/server/lib/peatedBot";
 import {
   acquireScrapePermit,
   type PermitDenialReason,
+  recordScrapeBypassRequest,
   recordScrapeRateLimit,
   recordScrapeRequestError,
   releaseScrapePermit,
 } from "./coordinator";
 import { resolveScraperOrigin } from "./definitions";
+import { getScraperRobotsMode, ScraperRobotsDeniedError } from "./robots";
 import type { ScraperRegistry, ScraperRequest, ScraperResponse } from "./types";
 
 const MAX_REDIRECTS = 5;
+const ROBOTS_UNAVAILABLE_RETRY_MS = 15 * 60_000;
 const RETRY_BASE_DELAY_MS = 250;
 const MAX_REQUEST_BODY_BYTES = 1024 * 1024;
 const SAFE_REQUEST_HEADERS = new Set([
@@ -68,6 +72,18 @@ export class ScraperHttpStatusError extends Error {
   }
 }
 
+/**
+ * The website blocks PeatedBot, and this request can't go through Firecrawl:
+ * it is not a plain GET, or Firecrawl is not configured or will not read it.
+ */
+export class ScraperBlockedError extends Error {
+  override name = "ScraperBlockedError";
+
+  constructor(readonly origin: string) {
+    super("The website blocks PeatedBot and this request has no other route.");
+  }
+}
+
 export type ScraperRequestErrorCategory =
   | "invalid_request"
   | "redirect_limit"
@@ -97,6 +113,29 @@ export const scraperSystemClock: ScraperHttpClock = {
   random: Math.random,
 };
 
+export type ScraperBot = Pick<PeatedBot, "request" | "isAllowedByRobots">;
+
+/**
+ * Scrapers' PeatedBot. A `fetchImpl` override, used by tests and local
+ * previews, gets an in-memory cache so its robots.txt rules never reach the
+ * shared Redis cache.
+ */
+export function createScraperBot({
+  fetchImpl,
+  clock = scraperSystemClock,
+}: {
+  fetchImpl?: typeof fetch;
+  clock?: ScraperHttpClock;
+} = {}): ScraperBot {
+  return createServerPeatedBot({
+    firecrawlApiKey:
+      config.SCRAPER_FIRECRAWL_API_KEY ?? config.FIRECRAWL_API_KEY,
+    fetch: fetchImpl,
+    cache: fetchImpl ? createMemoryCache(() => clock.now()) : undefined,
+    now: () => clock.now(),
+  });
+}
+
 interface ScraperRequestHeaders {
   [name: string]: string;
 }
@@ -105,9 +144,9 @@ function safeRequestHeaders(
   input: Readonly<Record<string, string>> | undefined,
   allowedRequestHeaders: readonly string[],
 ) {
+  // PeatedBot adds its own User-Agent and signature.
   const headers: ScraperRequestHeaders = {
     Accept: "text/html,application/json;q=0.9,*/*;q=0.8",
-    "User-Agent": BOT_USER_AGENT,
   };
   for (const [name, value] of Object.entries(input ?? {})) {
     if (
@@ -180,17 +219,6 @@ function transientStatus(status: number) {
   return status === 502 || status === 503 || status === 504;
 }
 
-function transportCategory(error: Error): ScraperRequestErrorCategory {
-  if (isPublicAddressError(error)) return "invalid_request";
-  if (
-    error instanceof DOMException &&
-    (error.name === "AbortError" || error.name === "TimeoutError")
-  ) {
-    return "timeout";
-  }
-  return "transport";
-}
-
 function retryDelay(retry: number, random: number) {
   const base = RETRY_BASE_DELAY_MS * 2 ** (retry - 1);
   return Math.round(base + base * 0.25 * random);
@@ -211,6 +239,25 @@ export function parseRetryAfter(
   const timestamp = Date.parse(normalized);
   if (!Number.isFinite(timestamp) || timestamp <= now.getTime()) return null;
   return new Date(timestamp);
+}
+
+function throwRobotsRefusal(
+  reason: Extract<RobotsCheck, { allowed: false }>["reason"],
+  url: URL,
+  clock: ScraperHttpClock,
+): never {
+  switch (reason) {
+    case "robots_disallowed":
+      throw new ScraperRobotsDeniedError(url.origin);
+    case "robots_unavailable":
+      throw new ScraperRequestWaitError(
+        "robots_unavailable",
+        new Date(clock.now().getTime() + ROBOTS_UNAVAILABLE_RETRY_MS),
+      );
+    case "not_public":
+    case "peated_website":
+      throw new ScraperRequestError("invalid_request");
+  }
 }
 
 async function acquireOrDefer({
@@ -270,8 +317,7 @@ export async function requestScraperUrl({
   sourceKey,
   request,
   registry,
-  checkRedirect,
-  fetchImpl = fetchPublicUrl,
+  bot,
   clock = scraperSystemClock,
 }: {
   runId: number;
@@ -279,8 +325,7 @@ export async function requestScraperUrl({
   sourceKey: string;
   request: ScraperRequest;
   registry: ScraperRegistry;
-  checkRedirect?: (url: URL) => Promise<void>;
-  fetchImpl?: typeof fetch;
+  bot: ScraperBot;
   clock?: ScraperHttpClock;
 }): Promise<ScraperResponse> {
   let currentUrl = new URL(request.url);
@@ -311,6 +356,9 @@ export async function requestScraperUrl({
     (name) => !SAFE_REQUEST_HEADERS.has(name.toLowerCase()),
   );
 
+  // A bot wall marks the website blocked, so the request is sent once more,
+  // through Firecrawl when it can be. A second wall means that did not help.
+  let hitBotWall = false;
   for (let redirect = 0; redirect <= MAX_REDIRECTS; redirect += 1) {
     resolveScraperOrigin(registry, sourceKey, request.target, currentUrl);
     if (hasNonPublicLiteralAddress(currentUrl)) {
@@ -322,7 +370,24 @@ export async function requestScraperUrl({
     ) {
       throw new ScraperRequestError("invalid_request");
     }
-    if (redirect > 0) await checkRedirect?.(currentUrl);
+    const robots = await getScraperRobotsMode({
+      registry,
+      sourceKey,
+      targetKey: request.target,
+      url: currentUrl,
+    });
+    if (robots === "unsynced") {
+      throw new ScraperRequestWaitError("robots_unavailable", null);
+    }
+    if (robots === "target_disabled") {
+      throw new ScraperRequestError("invalid_request");
+    }
+    // Check robots.txt before taking a permit, so a refused page costs the
+    // run nothing.
+    if (robots === "follow") {
+      const check = await bot.isAllowedByRobots(currentUrl);
+      if (!check.allowed) throwRobotsRefusal(check.reason, currentUrl, clock);
+    }
     let retry = 0;
 
     while (true) {
@@ -346,43 +411,55 @@ export async function requestScraperUrl({
         }
         throw error;
       }
-      let requestHeaders: Headers;
-      try {
-        requestHeaders = await signRequest({
-          url: currentUrl,
-          headers,
-          created: clock.now(),
-          privateJwk: config.PEATED_BOT_PRIVATE_JWK,
-        });
-      } catch (error) {
+      const release = async (resetRateLimitStreak?: boolean) => {
         await releaseScrapePermit({
           targetKey: request.target,
           token: permit.token,
+          resetRateLimitStreak,
           now: clock.now(),
         });
+      };
+      let result: BotResponse;
+      try {
+        result = await bot.request({
+          url: currentUrl,
+          method,
+          headers,
+          body: request.body,
+          timeoutMs: permit.timeoutMs,
+          robots,
+        });
+      } catch (error) {
+        await release();
         throw error;
       }
-      let response: Response;
-      try {
-        response = await fetchImpl(currentUrl, {
-          method,
-          body: request.body,
-          headers: requestHeaders,
-          redirect: "manual",
-          signal: AbortSignal.timeout(permit.timeoutMs),
-        });
-      } catch (error) {
-        await releaseScrapePermit({
-          targetKey: request.target,
-          token: permit.token,
-          now: clock.now(),
-        });
+
+      if (result.status === "refused") {
+        await release();
+        if (result.reason === "blocked") {
+          throw new ScraperBlockedError(currentUrl.origin);
+        }
+        if (result.reason === "invalid_url") {
+          throw new ScraperRequestError("invalid_request");
+        }
+        throwRobotsRefusal(result.reason, currentUrl, clock);
+      }
+
+      if (result.status === "bot_wall") {
+        await release();
+        if (hitBotWall) throw new ScraperBlockedError(currentUrl.origin);
+        hitBotWall = true;
+        continue;
+      }
+
+      if (result.status === "failed") {
+        await release();
         await recordScrapeRequestError({ runId, executionToken });
-        const category = transportCategory(
-          error instanceof Error ? error : new Error(),
-        );
+        if (result.route === "firecrawl") {
+          await recordScrapeBypassRequest({ runId, executionToken });
+        }
+        const category = result.reason === "timeout" ? "timeout" : "transport";
         const canRetry =
-          category !== "invalid_request" &&
           retry < permit.maxRetries &&
           (method === "GET" || request.retryable === true);
         if (canRetry && permit.remainingRequests <= 0) {
@@ -395,6 +472,28 @@ export async function requestScraperUrl({
         }
         throw new ScraperRequestError(category);
       }
+
+      if (result.route === "firecrawl") {
+        try {
+          await recordScrapeBypassRequest({ runId, executionToken });
+          // Firecrawl follows redirects itself, so the page it ended on must
+          // belong to this target too.
+          if (result.url.href !== currentUrl.href) {
+            resolveScraperOrigin(
+              registry,
+              sourceKey,
+              request.target,
+              result.url,
+            );
+          }
+        } catch (error) {
+          await discardResponse(result.response);
+          await release();
+          throw error;
+        }
+        currentUrl = result.url;
+      }
+      const response = result.response;
 
       const retryAfter = parseRetryAfter(
         response.headers.get("retry-after"),

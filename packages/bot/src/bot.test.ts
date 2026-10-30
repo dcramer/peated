@@ -462,6 +462,38 @@ describe("readPage", () => {
     expect(requests).toHaveLength(0);
   });
 
+  test("never reads Peated's own websites, even after a redirect", async () => {
+    const { readPage, readFile, requests } = setup(
+      {
+        "https://shop.example/robots.txt": text("User-agent: *\nAllow: /"),
+        "https://shop.example/a": text("", {
+          status: 301,
+          headers: { location: "https://peated.com/bottles/1" },
+        }),
+      },
+      { sites: { "https://api.peated.com": { robotsException: true } } },
+    );
+
+    for (const url of [
+      "https://peated.com/bottles/1",
+      "https://api.peated.com/v1/bottles/1",
+      "https://shop.example/a",
+    ]) {
+      await expect(readPage({ url, format: "html" })).resolves.toMatchObject({
+        status: "refused",
+        reason: "peated_website",
+      });
+    }
+    await expect(
+      readFile({ url: "https://api.peated.com/uploads/a.png", accept: "*/*" }),
+    ).resolves.toMatchObject({ status: "refused", reason: "peated_website" });
+    expect(
+      requests.filter((request) =>
+        new URL(request.url).hostname.endsWith("peated.com"),
+      ),
+    ).toHaveLength(0);
+  });
+
   test("reports a bot wall as blocked when Firecrawl is not configured", async () => {
     const { readPage } = setup(
       {
@@ -477,6 +509,303 @@ describe("readPage", () => {
     await expect(
       readPage({ url: "https://shop.example/a", format: "html" }),
     ).resolves.toMatchObject({ status: "failed", reason: "blocked" });
+  });
+
+  test("treats a Vercel security checkpoint as a bot wall", async () => {
+    const { readPage, botWalls } = setup(
+      {
+        "https://shop.example/robots.txt": text("User-agent: *\nAllow: /"),
+        "https://shop.example/a": text("Vercel Security Checkpoint", {
+          status: 429,
+          headers: { "x-vercel-mitigated": "challenge" },
+        }),
+      },
+      { firecrawl: null },
+    );
+
+    await expect(
+      readPage({ url: "https://shop.example/a", format: "html" }),
+    ).resolves.toMatchObject({ status: "failed", reason: "blocked" });
+    expect(botWalls).toEqual(["https://shop.example"]);
+  });
+});
+
+describe("request", () => {
+  const ALLOW_ALL = text("User-agent: *\nAllow: /");
+
+  test("sends one signed request and returns a redirect as is", async () => {
+    const { request, sent } = setup({
+      "https://shop.example/robots.txt": ALLOW_ALL,
+      "https://shop.example/old": text("", {
+        status: 301,
+        headers: { location: "/new" },
+      }),
+    });
+
+    const result = await request({
+      url: new URL("https://shop.example/old"),
+      headers: { Accept: "application/json", "User-Agent": "Spoofed" },
+      robots: "follow",
+    });
+
+    expect(result).toMatchObject({ status: "response", route: "direct" });
+    if (result.status !== "response") throw new Error("Expected a response.");
+    expect(result.response.status).toBe(301);
+    expect(sent("https://shop.example/new")).toHaveLength(0);
+    const sentRequest = sent("https://shop.example/old")[0];
+    expect(sentRequest?.headers.get("user-agent")).toBe(BOT_USER_AGENT);
+    expect(sentRequest?.headers.get("accept")).toBe("application/json");
+  });
+
+  test("does not send a request robots.txt disallows", async () => {
+    const { request, sent } = setup({
+      "https://shop.example/robots.txt": text(
+        "User-agent: *\nDisallow: /private",
+      ),
+    });
+
+    await expect(
+      request({
+        url: new URL("https://shop.example/private/a"),
+        robots: "follow",
+      }),
+    ).resolves.toEqual({ status: "refused", reason: "robots_disallowed" });
+    expect(sent("https://shop.example/private/a")).toHaveLength(0);
+  });
+
+  test("never sends a request to Peated's own websites", async () => {
+    const { request, requests } = setup({});
+
+    await expect(
+      request({
+        url: new URL("https://api.peated.com/v1/bottles"),
+        robots: "not_applicable",
+      }),
+    ).resolves.toEqual({ status: "refused", reason: "peated_website" });
+    expect(requests).toHaveLength(0);
+  });
+
+  test("skips robots.txt only when the caller says it does not apply", async () => {
+    const { request, sent } = setup({
+      "https://api.example/v1/products": text("[]"),
+    });
+
+    await expect(
+      request({
+        url: new URL("https://api.example/v1/products"),
+        method: "POST",
+        body: "{}",
+        robots: "not_applicable",
+      }),
+    ).resolves.toMatchObject({ status: "response", route: "direct" });
+    expect(sent("https://api.example/robots.txt")).toHaveLength(0);
+  });
+
+  test("marks a website blocked at a bot wall, then sends plain GETs through Firecrawl", async () => {
+    const { request, sent, botWalls, firecrawlBodies } = setup({
+      "https://shop.example/robots.txt": ALLOW_ALL,
+      "https://shop.example/a": text("Just a moment...", {
+        status: 403,
+        headers: { "cf-mitigated": "challenge" },
+      }),
+      scrape: async (request) => {
+        const body = await request.clone().json();
+        return Response.json({
+          success: true,
+          data: {
+            rawHtml: '{"products":[]}',
+            metadata: {
+              url: body.url,
+              statusCode: 200,
+              contentType: "application/json",
+            },
+          },
+        });
+      },
+    });
+    const url = new URL("https://shop.example/a");
+
+    await expect(request({ url, robots: "follow" })).resolves.toEqual({
+      status: "bot_wall",
+    });
+    expect(botWalls).toEqual(["https://shop.example"]);
+
+    const result = await request({
+      url,
+      headers: { Accept: "application/json", "If-None-Match": "abc" },
+      timeoutMs: 25_000,
+      robots: "follow",
+    });
+    expect(result).toMatchObject({ status: "response", route: "firecrawl" });
+    if (result.status !== "response") throw new Error("Expected a response.");
+    expect(result.response.headers.get("content-type")).toBe(
+      "application/json",
+    );
+    await expect(result.response.text()).resolves.toBe('{"products":[]}');
+    expect(sent("https://shop.example/a")).toHaveLength(1);
+    // Firecrawl gets the caller's time limit, so a scraper's permit outlasts it.
+    expect(await firecrawlBodies("scrape")).toEqual([
+      expect.objectContaining({
+        url: "https://shop.example/a",
+        timeout: 25_000,
+      }),
+    ]);
+  });
+
+  test("reports a network failure as a failed request instead of throwing", async () => {
+    const { request } = setup({
+      "https://shop.example/robots.txt": ALLOW_ALL,
+      "https://shop.example/a": () => {
+        throw new TypeError("fetch failed");
+      },
+    });
+
+    await expect(
+      request({ url: new URL("https://shop.example/a"), robots: "follow" }),
+    ).resolves.toEqual({
+      status: "failed",
+      route: "direct",
+      reason: "transport",
+      httpStatus: null,
+    });
+  });
+
+  test("refuses a blocked website's request that Firecrawl can't send", async () => {
+    const { request, requests } = setup(
+      { "https://shop.example/robots.txt": ALLOW_ALL },
+      { sites: { "https://shop.example": { blocked: true } } },
+    );
+    const url = new URL("https://shop.example/search");
+
+    for (const input of [
+      { method: "POST" as const, body: "{}" },
+      { headers: { "x-algolia-api-key": "key" } },
+      { directOnly: true },
+    ]) {
+      await expect(
+        request({ url, robots: "follow", ...input }),
+      ).resolves.toEqual({ status: "refused", reason: "blocked" });
+    }
+    expect(
+      requests.filter((request) => !request.url.endsWith("/robots.txt")),
+    ).toHaveLength(0);
+  });
+
+  test("drops a Firecrawl answer that ended on a page robots.txt disallows", async () => {
+    const { request } = setup(
+      {
+        "https://shop.example/robots.txt": text(
+          "User-agent: *\nDisallow: /private",
+        ),
+        scrape: firecrawlPage({
+          url: "https://shop.example/private/a",
+          content: "<html>secret</html>",
+        }),
+      },
+      { sites: { "https://shop.example": { blocked: true } } },
+    );
+
+    await expect(
+      request({ url: new URL("https://shop.example/a"), robots: "follow" }),
+    ).resolves.toEqual({ status: "refused", reason: "robots_disallowed" });
+  });
+
+  test("reports cached robots.txt rules and when they were read", async () => {
+    const { request, getRobotsStatus } = setup({
+      "https://shop.example/robots.txt": ALLOW_ALL,
+      "https://shop.example/a": text("ok"),
+    });
+
+    await expect(getRobotsStatus("https://shop.example")).resolves.toBeNull();
+    await request({ url: new URL("https://shop.example/a"), robots: "follow" });
+    await expect(getRobotsStatus("https://shop.example")).resolves.toEqual({
+      rules: expect.objectContaining({ status: "rules" }),
+      fetchedAt: NOW,
+    });
+  });
+});
+
+describe("readFile", () => {
+  test("reads a file directly after a redirect and keeps its bytes", async () => {
+    const bytes = new Uint8Array([0x89, 0x50, 0x4e, 0x47]);
+    const { readFile, sent } = setup({
+      "https://shop.example/robots.txt": text("User-agent: *\nAllow: /"),
+      "https://shop.example/a.png": text("", {
+        status: 302,
+        headers: { location: "https://cdn.example/a.png" },
+      }),
+      "https://cdn.example/robots.txt": text("User-agent: *\nAllow: /"),
+      "https://cdn.example/a.png": () =>
+        new Response(bytes, { headers: { "content-type": "image/png" } }),
+    });
+
+    await expect(
+      readFile({ url: "https://shop.example/a.png", accept: "image/*" }),
+    ).resolves.toEqual({
+      status: "ok",
+      url: "https://cdn.example/a.png",
+      contentType: "image/png",
+      body: bytes,
+    });
+    expect(sent("https://cdn.example/robots.txt")).toHaveLength(1);
+    expect(
+      sent("https://cdn.example/a.png")[0]?.headers.get("user-agent"),
+    ).toBe(BOT_USER_AGENT);
+  });
+
+  test("stops at a redirect the caller won't follow", async () => {
+    const { readFile, requests } = setup({
+      "https://cdn.example/robots.txt": text("User-agent: *\nAllow: /"),
+      "https://cdn.example/a.png": text("", {
+        status: 302,
+        headers: { location: "https://other.example/a.png" },
+      }),
+    });
+
+    await expect(
+      readFile({
+        url: "https://cdn.example/a.png",
+        accept: "image/*",
+        followRedirect: (url) => url.hostname === "cdn.example",
+      }),
+    ).resolves.toMatchObject({
+      status: "failed",
+      reason: "http_error",
+      httpStatus: 302,
+    });
+    expect(
+      requests.filter((request) => request.url.includes("other.example")),
+    ).toHaveLength(0);
+  });
+
+  test("never reads a file through Firecrawl", async () => {
+    const { readFile, requests, botWalls } = setup(
+      {
+        "https://shop.example/robots.txt": text("User-agent: *\nAllow: /"),
+        "https://walled.example/robots.txt": text("User-agent: *\nAllow: /"),
+        "https://walled.example/a.png": text("Just a moment...", {
+          status: 403,
+          headers: { "cf-mitigated": "challenge" },
+        }),
+      },
+      { sites: { "https://shop.example": { blocked: true } } },
+    );
+
+    await expect(
+      readFile({ url: "https://shop.example/a.png", accept: "image/*" }),
+    ).resolves.toMatchObject({ status: "failed", reason: "blocked" });
+    await expect(
+      readFile({ url: "https://walled.example/a.png", accept: "image/*" }),
+    ).resolves.toMatchObject({ status: "failed", reason: "blocked" });
+    expect(botWalls).toEqual(["https://walled.example"]);
+    expect(
+      requests.filter((request) => request.url.startsWith(FIRECRAWL.apiUrl)),
+    ).toHaveLength(0);
+    expect(
+      requests.filter(
+        (request) => request.url === "https://shop.example/a.png",
+      ),
+    ).toHaveLength(0);
   });
 });
 
@@ -509,6 +838,28 @@ describe("searchWeb", () => {
     expect(await firecrawlBodies("search")).toEqual([
       { query: "lagavulin 16", limit: 8, sources: ["web"] },
     ]);
+  });
+
+  test("drops results on Peated's own websites", async () => {
+    const { searchWeb } = setup({
+      search: () =>
+        Response.json({
+          data: {
+            web: [
+              { url: "https://peated.com/bottles/1", title: "Peated" },
+              { url: "https://www.peated.com/bottles/1", title: "Peated" },
+              { url: "https://notpeated.com/", title: "Other" },
+            ],
+          },
+        }),
+    });
+
+    await expect(searchWeb({ query: "lagavulin 16" })).resolves.toEqual({
+      status: "ok",
+      results: [
+        { url: "https://notpeated.com/", title: "Other", description: null },
+      ],
+    });
   });
 
   test("reports a reply that is not JSON as an unavailable search", async () => {

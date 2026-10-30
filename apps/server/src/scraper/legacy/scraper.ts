@@ -19,6 +19,7 @@ import {
 } from "@peated/server/lib/flatBottleInput";
 import { formatBottleName } from "@peated/server/lib/format";
 import { logError, logInfo, logWarn } from "@peated/server/lib/log";
+import { createServerPeatedBot } from "@peated/server/lib/peatedBot";
 import {
   BottleUpdateConflictError,
   updateBottleAsPeated,
@@ -45,8 +46,21 @@ class PageNotFound extends Error {
   override name = "PageNotFound";
 }
 
-function downloadFileAsBlob(url: string) {
-  return fetch(url).then((res) => res.blob());
+/**
+ * Reads a Bottle image directly as PeatedBot, never through Firecrawl. An
+ * image PeatedBot can't read is skipped.
+ */
+async function downloadImageAsBlob(url: string) {
+  const image = await createServerPeatedBot({ firecrawlApiKey: null }).readFile(
+    { url, accept: "image/*,*/*;q=0.1", timeoutMs: 30_000 },
+  );
+  if (image.status !== "ok") {
+    logInfo("Could not read Bottle image {url}: {reason}", {
+      extra: { url, reason: image.reason },
+    });
+    return null;
+  }
+  return new Blob([image.body], { type: image.contentType ?? undefined });
 }
 
 export async function getUrl(
@@ -220,11 +234,13 @@ export async function persistBottleObservation(
 
   if (resultBottle && !resultBottle.imageUrl && imageUrl) {
     try {
-      const blob = await downloadFileAsBlob(imageUrl);
-      await updateBottleImageAsPeated({
-        bottleId: resultBottle.id,
-        file: blob,
-      });
+      const blob = await downloadImageAsBlob(imageUrl);
+      if (blob) {
+        await updateBottleImageAsPeated({
+          bottleId: resultBottle.id,
+          file: blob,
+        });
+      }
     } catch (error) {
       logError(error, {
         bottle: { id: resultBottle.id, name: resultBottle.fullName },

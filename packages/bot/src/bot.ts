@@ -41,6 +41,11 @@ const PageReadOkSchema = z.object({
   route: z.enum(["direct", "firecrawl"]),
 });
 
+const CachedRobotsSchema = z.object({
+  fetchedAt: z.string().datetime(),
+  rules: RobotsRulesSchema,
+});
+
 /**
  * `markdown` returns a page's main text, read through Firecrawl. `html`
  * returns the page's full HTML, read directly unless the website blocks
@@ -69,6 +74,7 @@ export type PageRead =
       reason:
         | "invalid_url"
         | "not_public"
+        | "peated_website"
         | "robots_disallowed"
         | "robots_unavailable"
         | "login_required";
@@ -89,6 +95,17 @@ export type PageRead =
       httpStatus: number | null;
     };
 
+/** A file read directly, such as an image. */
+export type FileRead =
+  | {
+      status: "ok";
+      /** The file that was read, after redirects. */
+      url: string;
+      contentType: string | null;
+      body: Uint8Array<ArrayBuffer>;
+    }
+  | Extract<PageRead, { status: "refused" | "failed" }>;
+
 export type WebSearch =
   | { status: "ok"; results: SearchResult[] }
   | {
@@ -97,8 +114,101 @@ export type WebSearch =
       httpStatus: number | null;
     };
 
+/**
+ * One HTTP request for a caller that runs its own crawl, such as a scraper. It
+ * does not follow redirects: a direct answer is returned as is, 3xx included.
+ */
+export type BotRequest = {
+  url: URL;
+  method?: "GET" | "POST";
+  /** PeatedBot sets its own `User-Agent` and signature headers. */
+  headers?: Record<string, string>;
+  body?: string;
+  /** How long to wait for the answer, including a read through Firecrawl. */
+  timeoutMs?: number;
+  /**
+   * `not_applicable` skips robots.txt. Use it only for an address robots.txt
+   * does not cover, such as a website's API, and record the reason with the
+   * caller's settings.
+   */
+  robots: "follow" | "not_applicable";
+  /** Never use Firecrawl, even when the website is blocked. For images. */
+  directOnly?: boolean;
+};
+
+export type BotResponse =
+  | {
+      status: "response";
+      /** The address that answered. Firecrawl may have followed redirects. */
+      url: URL;
+      route: "direct" | "firecrawl";
+      response: Response;
+    }
+  | {
+      /** PeatedBot chose not to send the request. */
+      status: "refused";
+      reason:
+        | "invalid_url"
+        | "not_public"
+        | "peated_website"
+        | "robots_disallowed"
+        | "robots_unavailable"
+        /** The website is blocked and this request can't go through Firecrawl. */
+        | "blocked";
+    }
+  | {
+      /** The direct request hit a bot wall. The website is now blocked. */
+      status: "bot_wall";
+    }
+  | {
+      /**
+       * The request got no answer: the website timed out or could not be
+       * reached, or Firecrawl could not answer for a blocked website.
+       */
+      status: "failed";
+      route: "direct" | "firecrawl";
+      reason: "timeout" | "transport" | "service_unavailable";
+      httpStatus: number | null;
+    };
+
+type RobotsRefusal = {
+  status: "refused";
+  url: string;
+  reason:
+    | "not_public"
+    | "peated_website"
+    | "robots_disallowed"
+    | "robots_unavailable";
+};
+
+export type RobotsCheck =
+  | { allowed: true }
+  | { allowed: false; reason: RobotsRefusal["reason"] };
+
+/** The website's robots.txt rules from the cache, and when they were read. */
+export type RobotsStatus = { rules: RobotsRules; fetchedAt: Date };
+
+/**
+ * Request headers Firecrawl may drop without changing which page comes back.
+ * Firecrawl never receives any request headers, so credentials such as an API
+ * key never reach it (blocked websites policy). A request with any other header
+ * stays direct only.
+ */
+const BYPASS_DROPPABLE_HEADERS = new Set([
+  "accept",
+  "accept-language",
+  "if-modified-since",
+  "if-none-match",
+  "referer",
+]);
+
 type DirectOutcome =
-  | { kind: "ok"; url: URL; body: string }
+  | {
+      kind: "ok";
+      url: URL;
+      body: Uint8Array<ArrayBuffer>;
+      contentType: string | null;
+    }
   | { kind: "bot_wall"; url: URL }
   | { kind: "status"; url: URL; status: number }
   | {
@@ -106,12 +216,13 @@ type DirectOutcome =
       url: URL;
       reason:
         | "not_public"
+        | "peated_website"
         | "timeout"
         | "transport"
         | "too_large"
         | "too_many_redirects";
     }
-  | { kind: "refused"; read: PageRead };
+  | { kind: "refused"; read: RobotsRefusal };
 
 /**
  * Bot wall signs. Only specific markers count, so a plain 403 or a login page
@@ -119,8 +230,27 @@ type DirectOutcome =
  */
 function isBotWall(status: number, headers: Headers) {
   if (headers.get("cf-mitigated")?.toLowerCase() === "challenge") return true;
+  if (headers.get("x-vercel-mitigated")?.toLowerCase() === "challenge") {
+    return true;
+  }
   if (status === 403 && headers.has("x-datadome")) return true;
   return false;
+}
+
+function isPeatedHost(hostname: string) {
+  const host = hostname.toLowerCase().replace(/\.$/, "");
+  return host === "peated.com" || host.endsWith(".peated.com");
+}
+
+/**
+ * Why PeatedBot won't contact `url` at all, checked before every request and
+ * redirect. Peated's own websites are never a source (blocked websites
+ * policy): their pages repeat Peated's records, so they are not evidence.
+ */
+function addressRefusal(url: URL): "not_public" | "peated_website" | null {
+  if (hasNonPublicLiteralAddress(url)) return "not_public";
+  if (isPeatedHost(url.hostname)) return "peated_website";
+  return null;
 }
 
 function parseReadableUrl(value: string, base?: URL) {
@@ -136,6 +266,9 @@ function parseReadableUrl(value: string, base?: URL) {
   url.hash = "";
   return url;
 }
+
+// Statuses whose response must not have a body.
+const NULL_BODY_STATUSES = new Set([204, 205, 304]);
 
 async function discard(response: Response) {
   try {
@@ -153,13 +286,13 @@ async function readBody(
   response: Response,
   maxBytes: number,
   { truncate }: { truncate: boolean },
-): Promise<string | null> {
+): Promise<Uint8Array<ArrayBuffer> | null> {
   const length = Number(response.headers.get("content-length"));
   if (!truncate && Number.isFinite(length) && length > maxBytes) {
     await discard(response);
     return null;
   }
-  if (!response.body) return "";
+  if (!response.body) return new Uint8Array();
   const reader = response.body.getReader();
   const chunks: Uint8Array[] = [];
   let total = 0;
@@ -182,7 +315,7 @@ async function readBody(
     body.set(chunk, offset);
     offset += chunk.byteLength;
   }
-  return new TextDecoder().decode(body);
+  return body;
 }
 
 /**
@@ -272,18 +405,21 @@ export function createPeatedBot({
       limit,
       truncate,
       beforeRedirect,
+      followRedirect,
+      timeout = timeoutMs,
     }: {
       accept: string;
       limit: number;
       truncate: boolean;
-      beforeRedirect?: (url: URL) => Promise<PageRead | null>;
+      beforeRedirect?: (url: URL) => Promise<RobotsRefusal | null>;
+      followRedirect?: (url: URL) => boolean;
+      timeout?: number;
     },
   ): Promise<DirectOutcome> {
     let url = start;
     for (let redirect = 0; redirect <= MAX_REDIRECTS; redirect++) {
-      if (hasNonPublicLiteralAddress(url)) {
-        return { kind: "error", url, reason: "not_public" };
-      }
+      const refused = addressRefusal(url);
+      if (refused) return { kind: "error", url, reason: refused };
       if (redirect > 0 && beforeRedirect) {
         const refusal = await beforeRedirect(url);
         if (refusal) return { kind: "refused", read: refusal };
@@ -301,7 +437,7 @@ export function createPeatedBot({
       try {
         response = await directFetch(url, {
           redirect: "manual",
-          signal: AbortSignal.timeout(timeoutMs),
+          signal: AbortSignal.timeout(timeout),
           headers,
         });
       } catch (error) {
@@ -321,7 +457,9 @@ export function createPeatedBot({
       if (response.status >= 300 && response.status < 400 && location) {
         await discard(response);
         const next = parseReadableUrl(location, url);
-        if (!next) return { kind: "status", url, status: response.status };
+        if (!next || (followRedirect && !followRedirect(next))) {
+          return { kind: "status", url, status: response.status };
+        }
         url = next;
         continue;
       }
@@ -333,14 +471,19 @@ export function createPeatedBot({
         await discard(response);
         return { kind: "status", url, status: response.status };
       }
-      let body: string | null;
+      let body: Uint8Array<ArrayBuffer> | null;
       try {
         body = await readBody(response, limit, { truncate });
       } catch {
         return { kind: "error", url, reason: "transport" };
       }
       if (body === null) return { kind: "error", url, reason: "too_large" };
-      return { kind: "ok", url, body };
+      return {
+        kind: "ok",
+        url,
+        body,
+        contentType: response.headers.get("content-type"),
+      };
     }
     return { kind: "error", url, reason: "too_many_redirects" };
   }
@@ -354,7 +497,9 @@ export function createPeatedBot({
       limit: ROBOTS_MAX_BYTES,
       truncate: true,
     });
-    if (outcome.kind === "ok") return parseRobotsRules(outcome.body);
+    if (outcome.kind === "ok") {
+      return parseRobotsRules(new TextDecoder().decode(outcome.body));
+    }
     // A 5xx answer or a failed request leaves the rules unknown, so PeatedBot
     // does not read the page.
     if (outcome.kind === "status") {
@@ -394,22 +539,28 @@ export function createPeatedBot({
     return parseCached(cached, PageReadOkSchema);
   }
 
-  async function getCachedRobotsRules(origin: string) {
+  async function getRobotsStatus(origin: string): Promise<RobotsStatus | null> {
     const cached = await cache.get(robotsCacheKey(origin));
     if (cached === null) return null;
-    return parseCached(cached, RobotsRulesSchema);
+    const entry = parseCached(cached, CachedRobotsSchema);
+    return entry
+      ? { rules: entry.rules, fetchedAt: new Date(entry.fetchedAt) }
+      : null;
   }
 
   /** Returns a refusal, or null when robots.txt allows reading `url`. */
   async function checkRobots(
     url: URL,
     site?: BotSiteSettings,
-  ): Promise<PageRead | null> {
+  ): Promise<RobotsRefusal | null> {
+    const refused = addressRefusal(url);
+    if (refused) return { status: "refused", url: url.href, reason: refused };
     const settings = site ?? (await getSite(url.origin));
     // Robots.txt exceptions are recorded by an admin for one website.
     if (settings.robotsException) return null;
 
-    let rules: RobotsRules | null = await getCachedRobotsRules(url.origin);
+    let rules: RobotsRules | null =
+      (await getRobotsStatus(url.origin))?.rules ?? null;
     if (!rules) {
       const fetched = await fetchRobotsRules(url);
       if (fetched === "not_public") {
@@ -425,7 +576,7 @@ export function createPeatedBot({
       rules = fetched;
       await cache.set(
         robotsCacheKey(url.origin),
-        JSON.stringify(rules),
+        JSON.stringify({ fetchedAt: now().toISOString(), rules }),
         ROBOTS_CACHE_MS,
       );
     }
@@ -486,8 +637,9 @@ export function createPeatedBot({
     // the page when robots.txt disallows it.
     const finalUrl = parseReadableUrl(page.url) ?? url;
     if (finalUrl.href !== url.href) {
-      if (hasNonPublicLiteralAddress(finalUrl)) {
-        return { status: "refused", url: finalUrl.href, reason: "not_public" };
+      const refused = addressRefusal(finalUrl);
+      if (refused) {
+        return { status: "refused", url: finalUrl.href, reason: refused };
       }
       const refusal = await checkRobots(finalUrl);
       if (refusal) return refusal;
@@ -526,7 +678,7 @@ export function createPeatedBot({
           title: null,
           description: null,
           publishedTime: null,
-          content: outcome.body,
+          content: new TextDecoder().decode(outcome.body),
           route: "direct",
         };
       case "refused":
@@ -552,11 +704,115 @@ export function createPeatedBot({
           httpStatus: outcome.status,
         };
       case "error":
-        if (outcome.reason === "not_public") {
+        if (
+          outcome.reason === "not_public" ||
+          outcome.reason === "peated_website"
+        ) {
           return {
             status: "refused",
             url: outcome.url.href,
-            reason: "not_public",
+            reason: outcome.reason,
+          };
+        }
+        return {
+          status: "failed",
+          url: outcome.url.href,
+          reason: outcome.reason,
+          httpStatus: null,
+        };
+    }
+  }
+
+  /**
+   * Reads one file directly, never through Firecrawl, such as an image. It
+   * follows redirects and checks robots.txt for each address. A blocked
+   * website is not requested, and a bot wall marks the website blocked.
+   */
+  async function readFile({
+    url: value,
+    accept,
+    maxBytes: fileMaxBytes = maxBytes,
+    timeoutMs: fileTimeoutMs = timeoutMs,
+    followRedirect,
+  }: {
+    url: string;
+    accept: string;
+    maxBytes?: number;
+    timeoutMs?: number;
+    /**
+     * Whether to follow a redirect to `url`. A redirect it refuses is not
+     * requested, and the read fails with the redirect's status.
+     */
+    followRedirect?: (url: URL) => boolean;
+  }): Promise<FileRead> {
+    const url = parseReadableUrl(value);
+    if (!url) return { status: "refused", url: value, reason: "invalid_url" };
+    const refused = addressRefusal(url);
+    if (refused) return { status: "refused", url: url.href, reason: refused };
+    const site = await getSite(url.origin);
+    const refusal = await checkRobots(url, site);
+    if (refusal) return refusal;
+    if (site.blocked) {
+      return {
+        status: "failed",
+        url: url.href,
+        reason: "blocked",
+        httpStatus: null,
+      };
+    }
+
+    const outcome = await fetchDirect(url, {
+      accept,
+      limit: fileMaxBytes,
+      truncate: false,
+      beforeRedirect: (next) => checkRobots(next),
+      followRedirect,
+      timeout: fileTimeoutMs,
+    });
+    switch (outcome.kind) {
+      case "ok":
+        return {
+          status: "ok",
+          url: outcome.url.href,
+          contentType: outcome.contentType,
+          body: outcome.body,
+        };
+      case "refused":
+        return outcome.read;
+      case "bot_wall":
+        await onBotWall(outcome.url.origin);
+        return {
+          status: "failed",
+          url: outcome.url.href,
+          reason: "blocked",
+          httpStatus: null,
+        };
+      case "status":
+        if (outcome.status === 401) {
+          return {
+            status: "refused",
+            url: outcome.url.href,
+            reason: "login_required",
+          };
+        }
+        return {
+          status: "failed",
+          url: outcome.url.href,
+          reason:
+            outcome.status === 404 || outcome.status === 410
+              ? "not_found"
+              : "http_error",
+          httpStatus: outcome.status,
+        };
+      case "error":
+        if (
+          outcome.reason === "not_public" ||
+          outcome.reason === "peated_website"
+        ) {
+          return {
+            status: "refused",
+            url: outcome.url.href,
+            reason: outcome.reason,
           };
         }
         return {
@@ -578,9 +834,8 @@ export function createPeatedBot({
   }): Promise<PageRead> {
     const url = parseReadableUrl(value);
     if (!url) return { status: "refused", url: value, reason: "invalid_url" };
-    if (hasNonPublicLiteralAddress(url)) {
-      return { status: "refused", url: url.href, reason: "not_public" };
-    }
+    const refused = addressRefusal(url);
+    if (refused) return { status: "refused", url: url.href, reason: refused };
     if (format === "markdown" && !firecrawl) {
       throw new Error("PeatedBot needs Firecrawl to read pages as markdown.");
     }
@@ -601,6 +856,156 @@ export function createPeatedBot({
       await cache.set(cacheKey, JSON.stringify(page), PAGE_CACHE_MS);
     }
     return page;
+  }
+
+  async function requestWithFirecrawl({
+    url,
+    method,
+    headers,
+    body,
+    timeoutMs: requestTimeoutMs,
+    robots,
+    directOnly,
+  }: Required<Omit<BotRequest, "body">> &
+    Pick<BotRequest, "body">): Promise<BotResponse> {
+    const canBypass =
+      !directOnly &&
+      method === "GET" &&
+      body === undefined &&
+      Object.keys(headers).every((name) =>
+        BYPASS_DROPPABLE_HEADERS.has(name.toLowerCase()),
+      );
+    if (!canBypass || !firecrawl)
+      return { status: "refused", reason: "blocked" };
+
+    // The caller's time limit covers Firecrawl too. Scrapers hold a rate
+    // limit permit only that long (scraper permits, apps/server scraper).
+    const page = await scrapeWithFirecrawl(
+      firecrawl,
+      serviceFetch,
+      url,
+      "rawHtml",
+      requestTimeoutMs,
+    );
+    if (!page.ok) {
+      // Firecrawl answers 403 for websites it will not read.
+      if (page.httpStatus === 403)
+        return { status: "refused", reason: "blocked" };
+      return {
+        status: "failed",
+        route: "firecrawl",
+        reason: "service_unavailable",
+        httpStatus: page.httpStatus,
+      };
+    }
+    // Firecrawl follows redirects itself, so check where it ended up.
+    const finalUrl = parseReadableUrl(page.url) ?? url;
+    if (finalUrl.href !== url.href) {
+      const refused = addressRefusal(finalUrl);
+      if (refused) return { status: "refused", reason: refused };
+      if (robots === "follow") {
+        const refusal = await checkRobots(finalUrl);
+        if (refusal) return { status: "refused", reason: refusal.reason };
+      }
+    }
+    const status =
+      page.httpStatus !== null &&
+      page.httpStatus >= 200 &&
+      page.httpStatus <= 599
+        ? page.httpStatus
+        : 200;
+    return {
+      status: "response",
+      url: finalUrl,
+      route: "firecrawl",
+      response: new Response(
+        NULL_BODY_STATUSES.has(status) ? null : page.content,
+        {
+          status,
+          headers: page.contentType ? { "content-type": page.contentType } : {},
+        },
+      ),
+    };
+  }
+
+  /**
+   * Sends one request under robots.txt and the blocked websites policy. A
+   * website that is blocked, or turns out to be, is read through Firecrawl
+   * only for a plain GET; anything else is refused as `blocked`. Unexpected
+   * problems, such as a bad signing key, throw.
+   */
+  async function request({
+    url,
+    method = "GET",
+    headers = {},
+    body,
+    timeoutMs: requestTimeoutMs = timeoutMs,
+    robots,
+    directOnly = false,
+  }: BotRequest): Promise<BotResponse> {
+    const readable = parseReadableUrl(url.href);
+    if (!readable || readable.href !== url.href) {
+      return { status: "refused", reason: "invalid_url" };
+    }
+    const refused = addressRefusal(url);
+    if (refused) return { status: "refused", reason: refused };
+    const site = await getSite(url.origin);
+    if (robots === "follow") {
+      const refusal = await checkRobots(url, site);
+      if (refusal) return { status: "refused", reason: refusal.reason };
+    }
+    if (site.blocked) {
+      return await requestWithFirecrawl({
+        url,
+        method,
+        headers,
+        body,
+        timeoutMs: requestTimeoutMs,
+        robots,
+        directOnly,
+      });
+    }
+
+    const callerHeaders = Object.fromEntries(
+      Object.entries(headers).filter(
+        ([name]) => name.toLowerCase() !== "user-agent",
+      ),
+    );
+    const signed = await signRequest({
+      url,
+      headers: { ...callerHeaders, "User-Agent": BOT_USER_AGENT },
+      created: now(),
+      privateJwk,
+    });
+    let response: Response;
+    try {
+      response = await directFetch(url, {
+        method,
+        body,
+        headers: signed,
+        redirect: "manual",
+        signal: AbortSignal.timeout(requestTimeoutMs),
+      });
+    } catch (error) {
+      if (error instanceof Error && isPublicAddressError(error)) {
+        return { status: "refused", reason: "not_public" };
+      }
+      const timedOut =
+        error instanceof DOMException &&
+        (error.name === "TimeoutError" || error.name === "AbortError");
+      return {
+        status: "failed",
+        route: "direct",
+        reason: timedOut ? "timeout" : "transport",
+        httpStatus: null,
+      };
+    }
+    if (isBotWall(response.status, response.headers)) {
+      await discard(response);
+      await onBotWall(url.origin);
+      return { status: "bot_wall" };
+    }
+    return { status: "response", url, route: "direct", response };
   }
 
   /** Searches the web. Results are links only; read a page to use it. */
@@ -627,10 +1032,33 @@ export function createPeatedBot({
         httpStatus: result.httpStatus,
       };
     }
-    return { status: "ok", results: result.results };
+    return {
+      status: "ok",
+      results: result.results.filter(
+        (item) => !isPeatedHost(new URL(item.url).hostname),
+      ),
+    };
   }
 
-  return { readPage, searchWeb };
+  /**
+   * Whether robots.txt allows reading `url`, for a caller that wants to know
+   * before it spends anything on a request. `request` checks again itself.
+   */
+  async function isAllowedByRobots(url: URL): Promise<RobotsCheck> {
+    const refusal = await checkRobots(url);
+    return refusal
+      ? { allowed: false, reason: refusal.reason }
+      : { allowed: true };
+  }
+
+  return {
+    readPage,
+    readFile,
+    searchWeb,
+    request,
+    isAllowedByRobots,
+    getRobotsStatus,
+  };
 }
 
 export type PeatedBot = ReturnType<typeof createPeatedBot>;

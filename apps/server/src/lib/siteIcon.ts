@@ -1,4 +1,5 @@
-import { BOT_USER_AGENT } from "@peated/server/constants";
+import type { PeatedBot } from "@peated/bot";
+import { createServerPeatedBot } from "@peated/server/lib/peatedBot";
 import { load } from "cheerio";
 import sharp from "sharp";
 import { z } from "zod";
@@ -7,7 +8,6 @@ const SITE_ICON_SIZE = 128;
 const MAX_PAGE_BYTES = 2 * 1024 * 1024;
 const MAX_MANIFEST_BYTES = 256 * 1024;
 const MAX_ICON_BYTES = 2 * 1024 * 1024;
-const MAX_REDIRECTS = 3;
 const MAX_ICON_CANDIDATES = 12;
 export const SITE_ICON_NOT_FOUND_MESSAGE = "No site icon was found.";
 const META_ICON_SIZES = {
@@ -150,96 +150,37 @@ export function findSiteIconDeclarations(html: string, pageUrl: URL) {
   return { icons, manifests };
 }
 
-async function readBounded(response: Response, maximumBytes: number) {
-  const length = response.headers.get("content-length");
-  if (length !== null && Number(length) > maximumBytes) {
-    await response.body?.cancel();
-    throw new SiteIconUnavailableError("Site icon response was too large.");
-  }
-  if (!response.body) return Buffer.alloc(0);
+export type SiteIconBot = Pick<PeatedBot, "readFile">;
 
-  const reader = response.body.getReader();
-  const chunks: Uint8Array[] = [];
-  let total = 0;
-  while (true) {
-    const { done, value } = await reader.read();
-    if (done) break;
-    total += value.byteLength;
-    if (total > maximumBytes) {
-      await reader.cancel();
-      throw new SiteIconUnavailableError("Site icon response was too large.");
-    }
-    chunks.push(value);
-  }
-  return Buffer.concat(chunks, total);
-}
-
+/**
+ * Reads one file directly as PeatedBot. Redirects are followed only within
+ * the source website, so no other website is contacted.
+ */
 async function fetchSameSite(
   initialUrl: URL,
   siteUrl: URL,
   maximumBytes: number,
   accept: string,
-  fetchImpl: typeof fetch,
+  bot: SiteIconBot,
 ) {
-  let url = initialUrl;
-  for (let redirects = 0; redirects <= MAX_REDIRECTS; redirects += 1) {
-    if (
-      !["http:", "https:"].includes(url.protocol) ||
-      url.username ||
-      url.password ||
-      !isSameSite(url, siteUrl)
-    ) {
-      throw new SiteIconUnavailableError(
-        "Site icon URL left the source website.",
-      );
-    }
-    let response: Response;
-    try {
-      response = await fetchImpl(url, {
-        headers: { Accept: accept, "User-Agent": BOT_USER_AGENT },
-        redirect: "manual",
-        signal: AbortSignal.timeout(10_000),
-      });
-    } catch (error) {
-      if (!(error instanceof Error)) throw error;
-      throw new SiteIconUnavailableError("Site icon request failed.", {
-        cause: error,
-      });
-    }
-    if (response.status >= 300 && response.status < 400) {
-      const location = response.headers.get("location");
-      await response.body?.cancel();
-      if (!location || redirects === MAX_REDIRECTS) {
-        throw new SiteIconUnavailableError("Site icon redirect failed.");
-      }
-      try {
-        url = new URL(location, url);
-      } catch (error) {
-        if (!(error instanceof Error)) throw error;
-        throw new SiteIconUnavailableError("Site icon redirect failed.", {
-          cause: error,
-        });
-      }
-      continue;
-    }
-    if (!response.ok) {
-      await response.body?.cancel();
-      throw new SiteIconUnavailableError(
-        `Site icon request returned ${response.status}.`,
-      );
-    }
-    try {
-      return { data: await readBounded(response, maximumBytes), url };
-    } catch (error) {
-      if (error instanceof SiteIconUnavailableError) throw error;
-      if (!(error instanceof Error)) throw error;
-      throw new SiteIconUnavailableError(
-        "Site icon response could not be read.",
-        { cause: error },
-      );
-    }
+  if (!isSameSite(initialUrl, siteUrl)) {
+    throw new SiteIconUnavailableError(
+      "Site icon URL left the source website.",
+    );
   }
-  throw new SiteIconUnavailableError("Site icon redirect failed.");
+  const file = await bot.readFile({
+    url: initialUrl.href,
+    accept,
+    maxBytes: maximumBytes,
+    timeoutMs: 10_000,
+    followRedirect: (url) => isSameSite(url, siteUrl),
+  });
+  if (file.status !== "ok") {
+    throw new SiteIconUnavailableError(
+      `Site icon request was ${file.status}: ${file.reason}.`,
+    );
+  }
+  return { data: Buffer.from(file.body), url: new URL(file.url) };
 }
 
 function parseManifest(data: Buffer) {
@@ -290,7 +231,7 @@ async function normalizeIcon(data: Buffer) {
 /** Downloads the best same-site icon declared by a homepage and returns WebP. */
 export async function downloadSiteIcon(
   pageUrl: URL,
-  fetchImpl: typeof fetch = fetch,
+  bot: SiteIconBot = createServerPeatedBot({ firecrawlApiKey: null }),
 ) {
   const homepageUrl = new URL("/", pageUrl);
   const homepage = await fetchSameSite(
@@ -298,7 +239,7 @@ export async function downloadSiteIcon(
     homepageUrl,
     MAX_PAGE_BYTES,
     "text/html,application/xhtml+xml",
-    fetchImpl,
+    bot,
   );
   const declarations = findSiteIconDeclarations(
     new TextDecoder().decode(homepage.data),
@@ -315,7 +256,7 @@ export async function downloadSiteIcon(
         homepage.url,
         MAX_MANIFEST_BYTES,
         "application/manifest+json,application/json",
-        fetchImpl,
+        bot,
       );
     } catch (error) {
       if (!(error instanceof SiteIconUnavailableError)) throw error;
@@ -353,7 +294,7 @@ export async function downloadSiteIcon(
         homepage.url,
         MAX_ICON_BYTES,
         "image/*,*/*;q=0.1",
-        fetchImpl,
+        bot,
       );
       return {
         data: await normalizeIcon(data),

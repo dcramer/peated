@@ -400,7 +400,8 @@ test("detail cursor resumes after a request-budget wait and removed pages stay r
   const run = (await queueDetails())!;
   await db
     .update(externalSiteRuns)
-    .set({ requestLimit: 2 })
+    // One page per slice: robots.txt refreshes do not count toward the run.
+    .set({ requestLimit: 1 })
     .where(eq(externalSiteRuns.id, run.id));
   const urls: string[] = [];
   const fetchImpl: typeof fetch = async (input) => {
