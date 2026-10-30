@@ -225,8 +225,9 @@ export async function extractFromImageWithMetadata({
       role: "user",
       content: [
         {
-          type: "image",
-          image: imageUrlOrBase64,
+          type: "file",
+          data: imageUrlOrBase64,
+          mediaType: "image",
           providerOptions: { openai: { imageDetail: IMAGE_DETAIL } },
         },
       ],
