@@ -240,15 +240,26 @@ export function observeAgentTools(
         name: agentTool.name,
         arguments: normalizeToolOutputValue(JSON.stringify(input)),
       });
-      const result = await agentTool.execute(input, call);
-      observer({
-        type: "tool_result",
-        phase: "agent",
-        toolCallId: call.toolCallId,
-        name: agentTool.name,
-        result: normalizeToolOutputValue(JSON.stringify(result)),
-      });
-      return result;
+      const reportResult = (result: JsonValue) =>
+        observer({
+          type: "tool_result",
+          phase: "agent",
+          toolCallId: call.toolCallId,
+          name: agentTool.name,
+          result,
+        });
+      try {
+        const result = await agentTool.execute(input, call);
+        reportResult(normalizeToolOutputValue(JSON.stringify(result)));
+        return result;
+      } catch (error) {
+        // The AI SDK hands a failed tool's error to the model and the run
+        // goes on, so every call still gets a result event.
+        reportResult({
+          error: error instanceof Error ? error.message : String(error),
+        });
+        throw error;
+      }
     },
   }));
 }
