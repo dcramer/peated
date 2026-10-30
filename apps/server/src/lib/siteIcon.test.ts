@@ -198,6 +198,30 @@ describe("downloadSiteIcon", () => {
     expect(result.sourceUrl).toBe("https://example.com/site.png");
   });
 
+  test("never contacts another website a redirect points to", async () => {
+    const fetchImpl = vi.fn<typeof fetch>(async (input) => {
+      const url = new URL(input instanceof Request ? input.url : input);
+      if (url.hostname === "example.com" && url.pathname === "/") {
+        return new Response(null, {
+          status: 302,
+          headers: { location: "https://other.example/" },
+        });
+      }
+      return new Response(null, { status: 404 });
+    });
+
+    await expect(
+      downloadSiteIcon(new URL("https://example.com/"), botFor(fetchImpl)),
+    ).rejects.toBeInstanceOf(SiteIconUnavailableError);
+    expect(
+      fetchImpl.mock.calls.filter(([input]) =>
+        String(input instanceof Request ? input.url : input).includes(
+          "other.example",
+        ),
+      ),
+    ).toHaveLength(0);
+  });
+
   test("reports network failures as an unavailable icon", async () => {
     const fetchImpl = vi.fn<typeof fetch>(async () => {
       throw new TypeError("fetch failed");

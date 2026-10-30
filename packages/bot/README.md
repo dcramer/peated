@@ -79,7 +79,9 @@ reads are refused with `peated_website`, and search drops those results.
 `readFile` reads one file, such as an image, directly as PeatedBot. It never
 uses Firecrawl. It follows redirects, checks robots.txt for each address, and
 returns the bytes and content type. A blocked website is not requested, and a
-bot wall marks the website blocked and fails the read.
+bot wall marks the website blocked and fails the read. Pass `followRedirect`
+to limit where redirects may go: a redirect it refuses is not requested, and
+the read fails with the redirect's status.
 
 ## Sending one request
 

@@ -153,8 +153,8 @@ export function findSiteIconDeclarations(html: string, pageUrl: URL) {
 export type SiteIconBot = Pick<PeatedBot, "readFile">;
 
 /**
- * Reads one file directly as PeatedBot. PeatedBot follows redirects, so the
- * file must still end on the source website.
+ * Reads one file directly as PeatedBot. Redirects are followed only within
+ * the source website, so no other website is contacted.
  */
 async function fetchSameSite(
   initialUrl: URL,
@@ -173,19 +173,14 @@ async function fetchSameSite(
     accept,
     maxBytes: maximumBytes,
     timeoutMs: 10_000,
+    followRedirect: (url) => isSameSite(url, siteUrl),
   });
   if (file.status !== "ok") {
     throw new SiteIconUnavailableError(
       `Site icon request was ${file.status}: ${file.reason}.`,
     );
   }
-  const url = new URL(file.url);
-  if (!isSameSite(url, siteUrl)) {
-    throw new SiteIconUnavailableError(
-      "Site icon URL left the source website.",
-    );
-  }
-  return { data: Buffer.from(file.body), url };
+  return { data: Buffer.from(file.body), url: new URL(file.url) };
 }
 
 function parseManifest(data: Buffer) {

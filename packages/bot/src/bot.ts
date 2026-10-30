@@ -405,12 +405,14 @@ export function createPeatedBot({
       limit,
       truncate,
       beforeRedirect,
+      followRedirect,
       timeout = timeoutMs,
     }: {
       accept: string;
       limit: number;
       truncate: boolean;
       beforeRedirect?: (url: URL) => Promise<RobotsRefusal | null>;
+      followRedirect?: (url: URL) => boolean;
       timeout?: number;
     },
   ): Promise<DirectOutcome> {
@@ -455,7 +457,9 @@ export function createPeatedBot({
       if (response.status >= 300 && response.status < 400 && location) {
         await discard(response);
         const next = parseReadableUrl(location, url);
-        if (!next) return { kind: "status", url, status: response.status };
+        if (!next || (followRedirect && !followRedirect(next))) {
+          return { kind: "status", url, status: response.status };
+        }
         url = next;
         continue;
       }
@@ -729,11 +733,17 @@ export function createPeatedBot({
     accept,
     maxBytes: fileMaxBytes = maxBytes,
     timeoutMs: fileTimeoutMs = timeoutMs,
+    followRedirect,
   }: {
     url: string;
     accept: string;
     maxBytes?: number;
     timeoutMs?: number;
+    /**
+     * Whether to follow a redirect to `url`. A redirect it refuses is not
+     * requested, and the read fails with the redirect's status.
+     */
+    followRedirect?: (url: URL) => boolean;
   }): Promise<FileRead> {
     const url = parseReadableUrl(value);
     if (!url) return { status: "refused", url: value, reason: "invalid_url" };
@@ -756,6 +766,7 @@ export function createPeatedBot({
       limit: fileMaxBytes,
       truncate: false,
       beforeRedirect: (next) => checkRobots(next),
+      followRedirect,
       timeout: fileTimeoutMs,
     });
     switch (outcome.kind) {

@@ -753,6 +753,31 @@ describe("readFile", () => {
     ).toBe(BOT_USER_AGENT);
   });
 
+  test("stops at a redirect the caller won't follow", async () => {
+    const { readFile, requests } = setup({
+      "https://cdn.example/robots.txt": text("User-agent: *\nAllow: /"),
+      "https://cdn.example/a.png": text("", {
+        status: 302,
+        headers: { location: "https://other.example/a.png" },
+      }),
+    });
+
+    await expect(
+      readFile({
+        url: "https://cdn.example/a.png",
+        accept: "image/*",
+        followRedirect: (url) => url.hostname === "cdn.example",
+      }),
+    ).resolves.toMatchObject({
+      status: "failed",
+      reason: "http_error",
+      httpStatus: 302,
+    });
+    expect(
+      requests.filter((request) => request.url.includes("other.example")),
+    ).toHaveLength(0);
+  });
+
   test("never reads a file through Firecrawl", async () => {
     const { readFile, requests, botWalls } = setup(
       {
