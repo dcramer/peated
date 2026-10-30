@@ -22,7 +22,12 @@ import { buildEntityClassifierInstructions } from "./instructions";
 import { startAgentSpan } from "./observability";
 import { getDeterministicOpenAISettings } from "./openaiModelSettings";
 import { finalizeEntityClassification } from "./reviewPolicy";
-import { createOpenAIWebSearchTool, createSearchEntitiesTool } from "./tools";
+import {
+  MAX_PAGE_READS,
+  createSearchEntitiesTool,
+  createWebTools,
+  type EntityClassifierWeb,
+} from "./tools";
 
 const ENTITY_CLASSIFIER_MAX_TURNS = 8;
 
@@ -38,6 +43,8 @@ export type CreateEntityClassifierOptions = {
   client: OpenAI;
   model: string;
   maxSearchQueries: number;
+  /** PeatedBot, or null to run without the web. */
+  web: EntityClassifierWeb | null;
   adapters: EntityClassifierAdapters;
   overrides?: {
     runEntityClassifierAgent?: (
@@ -104,10 +111,12 @@ export function createEntityClassifier(
 
     const resolvedEntities = new Map<number, EntityResolution>();
     const searchEvidence: EntityClassificationArtifacts["searchEvidence"] = [];
+    const web = options.maxSearchQueries > 0 ? options.web : null;
     const instructions = buildEntityClassifierInstructions({
       hasEntitySearch: !!options.adapters.searchEntities,
-      hasOpenAIWebSearch: options.maxSearchQueries > 0,
+      hasWebTools: !!web,
       maxSearchQueries: options.maxSearchQueries,
+      maxPageReads: MAX_PAGE_READS,
     });
 
     const tools = [
@@ -126,17 +135,14 @@ export function createEntityClassifier(
             }),
           ]
         : []),
-      ...(options.maxSearchQueries > 0
-        ? [
-            createOpenAIWebSearchTool({
-              client: options.client,
-              maxSearchQueries: options.maxSearchQueries,
-              model: options.model,
-              onEvidence: (evidence) => {
-                searchEvidence.push(evidence);
-              },
-            }),
-          ]
+      ...(web
+        ? createWebTools({
+            web,
+            maxSearchQueries: options.maxSearchQueries,
+            onEvidence: (evidence) => {
+              searchEvidence.push(evidence);
+            },
+          })
         : []),
     ];
 

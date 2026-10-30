@@ -8,7 +8,6 @@ export {
 export {
   buildPageOpeningEvidence,
   createReadPageTools,
-  findPagePassages,
   keepReadPage,
   runReadPage,
 } from "./readPage";

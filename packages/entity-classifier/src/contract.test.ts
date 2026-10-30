@@ -1,5 +1,9 @@
 import { describe, expect, test } from "vitest";
-import { SearchEntitiesArgsSchema } from "./classifierTypes";
+import { z } from "zod";
+import {
+  EntityClassificationAdviceSchema,
+  SearchEntitiesArgsSchema,
+} from "./classifierTypes";
 import {
   ClassifyEntityInputSchema,
   EntityClassificationResultSchema,
@@ -125,4 +129,11 @@ describe("entity classifier contract", () => {
       );
     }
   });
+});
+
+test("gives the model an output schema OpenAI accepts", () => {
+  // OpenAI refuses the whole request when a schema uses `format: uri`.
+  const schema = z.toJSONSchema(EntityClassificationAdviceSchema);
+
+  expect(JSON.stringify(schema)).not.toContain('"format"');
 });

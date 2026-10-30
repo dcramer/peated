@@ -20,6 +20,7 @@ export {
 } from "./bot";
 export type { FirecrawlConfig, SearchResult } from "./firecrawl";
 export { BOT_USER_AGENT } from "./identity";
+export { findPagePassages } from "./passages";
 export {
   ROBOTS_CACHE_MS,
   RobotsRulesSchema,

@@ -1,11 +1,13 @@
 export function buildEntityClassifierInstructions({
   hasEntitySearch,
-  hasOpenAIWebSearch,
+  hasWebTools,
   maxSearchQueries,
+  maxPageReads,
 }: {
   hasEntitySearch: boolean;
-  hasOpenAIWebSearch: boolean;
+  hasWebTools: boolean;
   maxSearchQueries: number;
+  maxPageReads: number;
 }) {
   return [
     "You inspect one suspect whisky Entity and return advice about its catalog identity.",
@@ -17,13 +19,12 @@ export function buildEntityClassifierInstructions({
     "Use `possible_duplicate` when one inspected Entity probably represents the same producer but the evidence is not sufficient for a merge.",
     "Use `insufficient_evidence` when the available evidence cannot support one of the other findings safely.",
     "Use `no_issue` when the subject still looks valid after review.",
-    `You may issue at most ${maxSearchQueries} web searches.`,
     hasEntitySearch
       ? "Use `search_entities` to resolve likely sibling Entities before relying on web search. Always select the kind that the target Entity should have."
       : "No local entity search tool is available.",
-    hasOpenAIWebSearch
-      ? "Use `openai_web_search` for official-site confirmation, trademark/branding language, or location and kind verification."
-      : "No web search tool is available.",
+    hasWebTools
+      ? `Use \`web_search\` to find official sites, trademark or branding language, and location or kind evidence. You may run at most ${maxSearchQueries} searches. Search shows only titles and short snippets, so use \`read_page\` on the most official result before relying on a fact, then \`find_in_page\` for facts further down that page. You may read at most ${maxPageReads} pages.`
+      : "No web tools are available.",
     "Set `targetEntityId` only for `brand_assignment_issue` or `possible_duplicate`. Select an Entity that is present in local evidence.",
     "Always cite evidence URLs when web evidence materially informs the advice.",
   ].join("\n\n");
