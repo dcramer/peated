@@ -74,9 +74,8 @@ arrives as status 500, so it counts as temporary.
   review text (see [Sensitive Data](../policies/sensitive-data.md)).
   - For an AI SDK call, set `recordInputs` and `recordOutputs` to `false` in
     its `telemetry` option. Sentry still records the call, its model, and token
-    counts. Label extraction does this for every image, including photo
-    lookup's.
-  - For an OpenAI SDK call, run the call inside `Sentry.suppressTracing` and
-    record a span with no content around it. Review clips do this.
+    counts. Label extraction and review clips do this.
+  - We have no supported way to hide an OpenAI SDK call's content. Move a call
+    that needs it onto the AI SDK.
 - Wrap all the calls in one run with `withSentryConversation` so they share a
   conversation ID.

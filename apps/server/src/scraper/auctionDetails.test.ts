@@ -487,6 +487,72 @@ test("only requested unresolved lots are batched, with at most 25 and no new run
   expect(await db.query.externalSiteRuns.findMany()).toHaveLength(2);
 });
 
+test.for(["failure", "expired"] as const)(
+  "a detail run %s keeps the lot it stopped on and releases the lots it never read",
+  async (outcome, { fixtures }) => {
+    const site = await fixtures.ExternalSite({
+      type: "scotchwhiskyauctions",
+      runEvery: null,
+    });
+    const lots = [];
+    for (const sourceKey of ["893368", "893369", "893370"]) {
+      const lot = await importedLot(site.id, sourceKey);
+      await requestReview(lot);
+      lots.push(lot);
+    }
+    await syncScraperDefinitions(scraperRegistry);
+    const run = (await queueDetails())!;
+    if (outcome === "expired")
+      await db
+        .update(externalSiteRuns)
+        .set({ createdAt: new Date(Date.now() - 7 * 24 * 60 * 60_000) })
+        .where(eq(externalSiteRuns.id, run.id));
+    const fetchImpl: typeof fetch = async (input) => {
+      const value = input instanceof Request ? input.url : input.toString();
+      if (value.endsWith("/robots.txt"))
+        return new Response("User-agent: *\nAllow: /");
+      return new Response(
+        value.includes("893369-") ? "Unexpected page" : detailHtml,
+      );
+    };
+    const execute = executeScraperRun(
+      { runId: run.id },
+      { registry: scraperRegistry, fetchImpl, clock: testClock() },
+    );
+    if (outcome === "failure") await expect(execute).rejects.toThrow();
+    else await expect(execute).resolves.toMatchObject({ status: "completed" });
+    expect(
+      await db.query.externalSiteRuns.findFirst({
+        where: eq(externalSiteRuns.id, run.id),
+      }),
+    ).toMatchObject({ status: "failed" });
+
+    const [read, stopped, unread] = await Promise.all(
+      lots.map((lot) =>
+        db.query.auctionLots.findFirst({ where: eq(auctionLots.id, lot.id) }),
+      ),
+    );
+    const stoppedAt = outcome === "failure" ? stopped : read;
+    expect(stoppedAt).toMatchObject({
+      sourceDetailsRunId: run.id,
+      sourceDetailsCheckedAt: null,
+    });
+    if (outcome === "failure")
+      expect(read?.sourceDetailsCheckedAt).not.toBeNull();
+    expect(unread).toMatchObject({
+      sourceDetailsRunId: null,
+      sourceDetailsCheckedAt: null,
+    });
+
+    const next = (await queueDetails())!;
+    expect(
+      ScotchWhiskyAuctionDetailsCursorSchema.parse(next.cursor).lots.map(
+        ({ lotId }) => lotId,
+      ),
+    ).toEqual(outcome === "failure" ? [lots[2].id] : [lots[1].id, lots[2].id]);
+  },
+);
+
 test("detail requests preserve assignments made while fetching and reject another source or changed title", async ({
   fixtures,
 }) => {

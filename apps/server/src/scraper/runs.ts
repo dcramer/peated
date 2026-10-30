@@ -11,6 +11,7 @@ import * as Sentry from "@sentry/node";
 import { and, eq, inArray, sql } from "drizzle-orm";
 import { randomUUID } from "node:crypto";
 import { z } from "zod";
+import { releaseUnreadAuctionLotDetails } from "./auctionDetails";
 import { ScrapeSourceParseError } from "./configured/crawl";
 import {
   createScrapeSourceRepairRun,
@@ -168,7 +169,9 @@ async function claimScraperRun({
           executionExpiresAt: null,
         })
         .where(eq(externalSiteRuns.id, runId));
-      if (candidate.run.purpose !== "details")
+      if (candidate.run.purpose === "details")
+        await releaseUnreadAuctionLotDetails(tx, candidate.run);
+      else
         await tx
           .update(externalSites)
           .set({ lastRunAt: now, lastRunId: runId })
@@ -282,6 +285,7 @@ async function failRun(claim: ClaimedRun, error: Error, completedAt: Date) {
       .returning({
         id: externalSiteRuns.id,
         externalSiteId: externalSiteRuns.externalSiteId,
+        cursor: externalSiteRuns.cursor,
       });
     if (!failed) return undefined;
     const repair =
@@ -293,7 +297,9 @@ async function failRun(claim: ClaimedRun, error: Error, completedAt: Date) {
             now: completedAt,
           })
         : null;
-    if (claim.run.purpose !== "details")
+    if (claim.run.purpose === "details")
+      await releaseUnreadAuctionLotDetails(tx, failed);
+    else
       await tx
         .update(externalSites)
         .set({ lastRunAt: completedAt, lastRunId: failed.id })

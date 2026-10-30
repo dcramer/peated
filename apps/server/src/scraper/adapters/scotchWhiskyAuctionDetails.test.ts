@@ -49,14 +49,17 @@ test("unknown, invalid, or conflicting facts are not guessed", () => {
       abv: null,
     },
   });
-  expect(() =>
+  expect(
     parseScotchWhiskyAuctionDetails(
       ardbegDetailPage.replace(
         "</div></div>",
-        "<p>Cask Number: 3773</p></div></div>",
+        "<p>Cask Number: 3773</p><p>Cask Number: 3771</p></div></div>",
       ),
     ),
-  ).toThrow(/Conflicting/);
+  ).toMatchObject({
+    volume: 700,
+    sourceBottleIdentity: { cask_number: null, abv: 59 },
+  });
   expect(() =>
     parseScotchWhiskyAuctionDetails("<main><h1>Age verification</h1></main>"),
   ).toThrow(/missing/);
@@ -65,4 +68,19 @@ test("unknown, invalid, or conflicting facts are not guessed", () => {
       '<main><h1>Unclear whisky</h1><div class="lotinfo"><div class="descr"><p>A story about a whisky from 2009 at 59%.</p></div></div></main>',
     ),
   ).toMatchObject({ volume: null, sourceBottleIdentity: null });
+});
+
+// Lot 184-01425 (Macallan Coronation, 184th auction) checked on 2026-10-29.
+test("a set of two bottles with different strengths leaves strength unknown", () => {
+  expect(
+    parseScotchWhiskyAuctionDetails(`<main><h1>Macallan Coronation</h1>
+<div class="lotinfo"><div class="descr">
+<p>The First Bottle</p><p>Cask Type: American Oak &amp; Sherry</p><p>55.7% ABV / 35cl</p>
+<p>The Second Bottle</p><p>Cask Type: Spanish Sherry</p><p>58.1% ABV / 70cl</p>
+</div></div></main>`),
+  ).toEqual({
+    name: "Macallan Coronation",
+    volume: null,
+    sourceBottleIdentity: null,
+  });
 });

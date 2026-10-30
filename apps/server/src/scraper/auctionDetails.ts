@@ -1,6 +1,7 @@
-import { db } from "@peated/server/db";
+import { db, type AnyDatabase } from "@peated/server/db";
 import { auctionLots, auctions, externalSites } from "@peated/server/db/schema";
 import { and, eq, inArray, isNull, sql } from "drizzle-orm";
+import { ScotchWhiskyAuctionDetailsCursorSchema } from "./adapters/scotchWhiskyAuctions";
 
 /** Returns true while supported detail work is pending. Repeated calls keep the same request. */
 export async function requestAuctionLotDetails(
@@ -25,4 +26,30 @@ export async function requestAuctionLotDetails(
     )
     .returning({ id: auctionLots.id });
   return requested.length > 0;
+}
+
+/**
+ * Auction detail rule (owner: auctions): a failed detail run keeps only the lot
+ * it stopped on, which needs an admin retry. The scheduler reads the lots it
+ * never reached again, so one bad page cannot block the rest of its batch.
+ */
+export async function releaseUnreadAuctionLotDetails(
+  tx: AnyDatabase,
+  run: { id: number; cursor: unknown },
+) {
+  const cursor = ScotchWhiskyAuctionDetailsCursorSchema.parse(run.cursor);
+  const unread = cursor.lots
+    .slice(cursor.lotIndex + 1)
+    .map(({ lotId }) => lotId);
+  if (!unread.length) return;
+  await tx
+    .update(auctionLots)
+    .set({ sourceDetailsRunId: null })
+    .where(
+      and(
+        inArray(auctionLots.id, unread),
+        eq(auctionLots.sourceDetailsRunId, run.id),
+        isNull(auctionLots.sourceDetailsCheckedAt),
+      ),
+    );
 }
