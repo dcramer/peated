@@ -12,8 +12,8 @@ or paywall.
 ## Terms
 
 - A **bot wall** blocks automated requests in general, whoever sends them. A
-  Cloudflare challenge page and a bot protection service's blanket HTTP 403 are
-  bot walls.
+  Cloudflare or Vercel challenge page and a bot protection service's blanket
+  HTTP 403 are bot walls.
 - A **bypass service** reads a page in a way that gets past a bot wall. Peated
   uses Firecrawl's `auto` proxy, which tries a basic request and retries through
   its enhanced proxy when the website blocks it. These requests do not carry
@@ -27,6 +27,8 @@ or paywall.
 - Follow robots.txt for every read, including model page-reading tools. Use the
   `PeatedBot` group, or the `*` group when no group names PeatedBot. Cache each
   website's robots.txt for 24 hours.
+- Never read or search Peated's own websites (`peated.com` and its
+  subdomains). Their pages repeat Peated's records, so they are not evidence.
 - Only an admin may set a robots.txt exception, and only for one website at a
   time, with a written reason.
 - Scrapers send direct PeatedBot requests, signed when

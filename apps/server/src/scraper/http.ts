@@ -3,6 +3,7 @@ import {
   createMemoryCache,
   hasNonPublicLiteralAddress,
   type PeatedBot,
+  type RobotsCheck,
 } from "@peated/bot";
 import config from "@peated/server/config";
 import { createServerPeatedBot } from "@peated/server/lib/peatedBot";
@@ -241,7 +242,7 @@ export function parseRetryAfter(
 }
 
 function throwRobotsRefusal(
-  reason: "not_public" | "robots_disallowed" | "robots_unavailable",
+  reason: Extract<RobotsCheck, { allowed: false }>["reason"],
   url: URL,
   clock: ScraperHttpClock,
 ): never {
@@ -254,6 +255,7 @@ function throwRobotsRefusal(
         new Date(clock.now().getTime() + ROBOTS_UNAVAILABLE_RETRY_MS),
       );
     case "not_public":
+    case "peated_website":
       throw new ScraperRequestError("invalid_request");
   }
 }

@@ -34,6 +34,7 @@ const FIND_IN_PAGE_TOOL_DESCRIPTION =
 const REFUSED_READS = {
   invalid_url: "This address is not a public web page",
   not_public: "This address is not a public web page",
+  peated_website: "Peated's own pages are not a source",
   robots_disallowed:
     "The website's robots.txt does not allow reading this page",
   robots_unavailable:

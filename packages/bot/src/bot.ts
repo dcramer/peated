@@ -74,6 +74,7 @@ export type PageRead =
       reason:
         | "invalid_url"
         | "not_public"
+        | "peated_website"
         | "robots_disallowed"
         | "robots_unavailable"
         | "login_required";
@@ -148,6 +149,7 @@ export type BotResponse =
       reason:
         | "invalid_url"
         | "not_public"
+        | "peated_website"
         | "robots_disallowed"
         | "robots_unavailable"
         /** The website is blocked and this request can't go through Firecrawl. */
@@ -171,7 +173,11 @@ export type BotResponse =
 type RobotsRefusal = {
   status: "refused";
   url: string;
-  reason: "not_public" | "robots_disallowed" | "robots_unavailable";
+  reason:
+    | "not_public"
+    | "peated_website"
+    | "robots_disallowed"
+    | "robots_unavailable";
 };
 
 export type RobotsCheck =
@@ -209,6 +215,7 @@ type DirectOutcome =
       url: URL;
       reason:
         | "not_public"
+        | "peated_website"
         | "timeout"
         | "transport"
         | "too_large"
@@ -222,8 +229,27 @@ type DirectOutcome =
  */
 function isBotWall(status: number, headers: Headers) {
   if (headers.get("cf-mitigated")?.toLowerCase() === "challenge") return true;
+  if (headers.get("x-vercel-mitigated")?.toLowerCase() === "challenge") {
+    return true;
+  }
   if (status === 403 && headers.has("x-datadome")) return true;
   return false;
+}
+
+function isPeatedHost(hostname: string) {
+  const host = hostname.toLowerCase().replace(/\.$/, "");
+  return host === "peated.com" || host.endsWith(".peated.com");
+}
+
+/**
+ * Why PeatedBot won't contact `url` at all, checked before every request and
+ * redirect. Peated's own websites are never a source (blocked websites
+ * policy): their pages repeat Peated's records, so they are not evidence.
+ */
+function addressRefusal(url: URL): "not_public" | "peated_website" | null {
+  if (hasNonPublicLiteralAddress(url)) return "not_public";
+  if (isPeatedHost(url.hostname)) return "peated_website";
+  return null;
 }
 
 function parseReadableUrl(value: string, base?: URL) {
@@ -389,9 +415,8 @@ export function createPeatedBot({
   ): Promise<DirectOutcome> {
     let url = start;
     for (let redirect = 0; redirect <= MAX_REDIRECTS; redirect++) {
-      if (hasNonPublicLiteralAddress(url)) {
-        return { kind: "error", url, reason: "not_public" };
-      }
+      const refused = addressRefusal(url);
+      if (refused) return { kind: "error", url, reason: refused };
       if (redirect > 0 && beforeRedirect) {
         const refusal = await beforeRedirect(url);
         if (refusal) return { kind: "refused", read: refusal };
@@ -523,6 +548,8 @@ export function createPeatedBot({
     url: URL,
     site?: BotSiteSettings,
   ): Promise<RobotsRefusal | null> {
+    const refused = addressRefusal(url);
+    if (refused) return { status: "refused", url: url.href, reason: refused };
     const settings = site ?? (await getSite(url.origin));
     // Robots.txt exceptions are recorded by an admin for one website.
     if (settings.robotsException) return null;
@@ -605,8 +632,9 @@ export function createPeatedBot({
     // the page when robots.txt disallows it.
     const finalUrl = parseReadableUrl(page.url) ?? url;
     if (finalUrl.href !== url.href) {
-      if (hasNonPublicLiteralAddress(finalUrl)) {
-        return { status: "refused", url: finalUrl.href, reason: "not_public" };
+      const refused = addressRefusal(finalUrl);
+      if (refused) {
+        return { status: "refused", url: finalUrl.href, reason: refused };
       }
       const refusal = await checkRobots(finalUrl);
       if (refusal) return refusal;
@@ -671,11 +699,14 @@ export function createPeatedBot({
           httpStatus: outcome.status,
         };
       case "error":
-        if (outcome.reason === "not_public") {
+        if (
+          outcome.reason === "not_public" ||
+          outcome.reason === "peated_website"
+        ) {
           return {
             status: "refused",
             url: outcome.url.href,
-            reason: "not_public",
+            reason: outcome.reason,
           };
         }
         return {
@@ -705,9 +736,8 @@ export function createPeatedBot({
   }): Promise<FileRead> {
     const url = parseReadableUrl(value);
     if (!url) return { status: "refused", url: value, reason: "invalid_url" };
-    if (hasNonPublicLiteralAddress(url)) {
-      return { status: "refused", url: url.href, reason: "not_public" };
-    }
+    const refused = addressRefusal(url);
+    if (refused) return { status: "refused", url: url.href, reason: refused };
     const site = await getSite(url.origin);
     const refusal = await checkRobots(url, site);
     if (refusal) return refusal;
@@ -763,11 +793,14 @@ export function createPeatedBot({
           httpStatus: outcome.status,
         };
       case "error":
-        if (outcome.reason === "not_public") {
+        if (
+          outcome.reason === "not_public" ||
+          outcome.reason === "peated_website"
+        ) {
           return {
             status: "refused",
             url: outcome.url.href,
-            reason: "not_public",
+            reason: outcome.reason,
           };
         }
         return {
@@ -789,9 +822,8 @@ export function createPeatedBot({
   }): Promise<PageRead> {
     const url = parseReadableUrl(value);
     if (!url) return { status: "refused", url: value, reason: "invalid_url" };
-    if (hasNonPublicLiteralAddress(url)) {
-      return { status: "refused", url: url.href, reason: "not_public" };
-    }
+    const refused = addressRefusal(url);
+    if (refused) return { status: "refused", url: url.href, reason: refused };
     if (format === "markdown" && !firecrawl) {
       throw new Error("PeatedBot needs Firecrawl to read pages as markdown.");
     }
@@ -853,9 +885,8 @@ export function createPeatedBot({
     // Firecrawl follows redirects itself, so check where it ended up.
     const finalUrl = parseReadableUrl(page.url) ?? url;
     if (finalUrl.href !== url.href) {
-      if (hasNonPublicLiteralAddress(finalUrl)) {
-        return { status: "refused", reason: "not_public" };
-      }
+      const refused = addressRefusal(finalUrl);
+      if (refused) return { status: "refused", reason: refused };
       if (robots === "follow") {
         const refusal = await checkRobots(finalUrl);
         if (refusal) return { status: "refused", reason: refusal.reason };
@@ -900,9 +931,8 @@ export function createPeatedBot({
     if (!readable || readable.href !== url.href) {
       return { status: "refused", reason: "invalid_url" };
     }
-    if (hasNonPublicLiteralAddress(url)) {
-      return { status: "refused", reason: "not_public" };
-    }
+    const refused = addressRefusal(url);
+    if (refused) return { status: "refused", reason: refused };
     const site = await getSite(url.origin);
     if (robots === "follow") {
       const refusal = await checkRobots(url, site);
@@ -985,7 +1015,12 @@ export function createPeatedBot({
         httpStatus: result.httpStatus,
       };
     }
-    return { status: "ok", results: result.results };
+    return {
+      status: "ok",
+      results: result.results.filter(
+        (item) => !isPeatedHost(new URL(item.url).hostname),
+      ),
+    };
   }
 
   /**

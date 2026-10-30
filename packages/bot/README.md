@@ -59,7 +59,8 @@ The `format` decides the route:
   Firecrawl. Later reads of a blocked website go straight to Firecrawl.
 
 Only specific signs count as a bot wall: a Cloudflare `cf-mitigated: challenge`
-header, or a 403 with DataDome's `x-datadome` header. A plain 403 or a 401 is
+header, a Vercel `x-vercel-mitigated: challenge` header, or a 403 with
+DataDome's `x-datadome` header. A plain 403 or a 401 is
 never sent to Firecrawl.
 
 Direct reads only reach public network addresses. Every new connection checks
@@ -67,6 +68,11 @@ its DNS answer, including after redirects. Each redirect is checked against
 robots.txt before it is followed. Firecrawl follows redirects itself, so
 PeatedBot checks the page Firecrawl ended on and drops it when robots.txt
 disallows it.
+
+PeatedBot never reads, requests, or searches Peated's own websites
+(`peated.com` and its subdomains), even after a redirect or with a robots.txt
+exception. Their pages repeat Peated's records, so they are not evidence. Such
+reads are refused with `peated_website`, and search drops those results.
 
 ## Reading a file
 

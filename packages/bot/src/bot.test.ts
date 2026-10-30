@@ -462,6 +462,38 @@ describe("readPage", () => {
     expect(requests).toHaveLength(0);
   });
 
+  test("never reads Peated's own websites, even after a redirect", async () => {
+    const { readPage, readFile, requests } = setup(
+      {
+        "https://shop.example/robots.txt": text("User-agent: *\nAllow: /"),
+        "https://shop.example/a": text("", {
+          status: 301,
+          headers: { location: "https://peated.com/bottles/1" },
+        }),
+      },
+      { sites: { "https://api.peated.com": { robotsException: true } } },
+    );
+
+    for (const url of [
+      "https://peated.com/bottles/1",
+      "https://api.peated.com/v1/bottles/1",
+      "https://shop.example/a",
+    ]) {
+      await expect(readPage({ url, format: "html" })).resolves.toMatchObject({
+        status: "refused",
+        reason: "peated_website",
+      });
+    }
+    await expect(
+      readFile({ url: "https://api.peated.com/uploads/a.png", accept: "*/*" }),
+    ).resolves.toMatchObject({ status: "refused", reason: "peated_website" });
+    expect(
+      requests.filter((request) =>
+        new URL(request.url).hostname.endsWith("peated.com"),
+      ),
+    ).toHaveLength(0);
+  });
+
   test("reports a bot wall as blocked when Firecrawl is not configured", async () => {
     const { readPage } = setup(
       {
@@ -477,6 +509,24 @@ describe("readPage", () => {
     await expect(
       readPage({ url: "https://shop.example/a", format: "html" }),
     ).resolves.toMatchObject({ status: "failed", reason: "blocked" });
+  });
+
+  test("treats a Vercel security checkpoint as a bot wall", async () => {
+    const { readPage, botWalls } = setup(
+      {
+        "https://shop.example/robots.txt": text("User-agent: *\nAllow: /"),
+        "https://shop.example/a": text("Vercel Security Checkpoint", {
+          status: 429,
+          headers: { "x-vercel-mitigated": "challenge" },
+        }),
+      },
+      { firecrawl: null },
+    );
+
+    await expect(
+      readPage({ url: "https://shop.example/a", format: "html" }),
+    ).resolves.toMatchObject({ status: "failed", reason: "blocked" });
+    expect(botWalls).toEqual(["https://shop.example"]);
   });
 });
 
@@ -521,6 +571,18 @@ describe("request", () => {
       }),
     ).resolves.toEqual({ status: "refused", reason: "robots_disallowed" });
     expect(sent("https://shop.example/private/a")).toHaveLength(0);
+  });
+
+  test("never sends a request to Peated's own websites", async () => {
+    const { request, requests } = setup({});
+
+    await expect(
+      request({
+        url: new URL("https://api.peated.com/v1/bottles"),
+        robots: "not_applicable",
+      }),
+    ).resolves.toEqual({ status: "refused", reason: "peated_website" });
+    expect(requests).toHaveLength(0);
   });
 
   test("skips robots.txt only when the caller says it does not apply", async () => {
@@ -746,6 +808,28 @@ describe("searchWeb", () => {
     expect(await firecrawlBodies("search")).toEqual([
       { query: "lagavulin 16", limit: 8, sources: ["web"] },
     ]);
+  });
+
+  test("drops results on Peated's own websites", async () => {
+    const { searchWeb } = setup({
+      search: () =>
+        Response.json({
+          data: {
+            web: [
+              { url: "https://peated.com/bottles/1", title: "Peated" },
+              { url: "https://www.peated.com/bottles/1", title: "Peated" },
+              { url: "https://notpeated.com/", title: "Other" },
+            ],
+          },
+        }),
+    });
+
+    await expect(searchWeb({ query: "lagavulin 16" })).resolves.toEqual({
+      status: "ok",
+      results: [
+        { url: "https://notpeated.com/", title: "Other", description: null },
+      ],
+    });
   });
 
   test("reports a reply that is not JSON as an unavailable search", async () => {
