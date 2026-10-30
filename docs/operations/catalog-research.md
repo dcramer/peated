@@ -161,6 +161,10 @@ before a pass comes from the earlier `add` or `update` row.
   Organic). Rename the retired Bottle to its exact name first, then merge.
 - Whisky Auctioneer lot text can give the wrong bottling year. Zoom the lot
   photo and trust the label.
+- A Scotch Whisky Auctions lot page links each photo as a small file. The
+  full-size photo is the `-zoom.jpg` file beside it on the same image host,
+  and its label text is readable. Space page reads at least 30 seconds apart,
+  as the auction scraper does.
 - A direct image URL does not record its source page or license. Count image
   identity, source-page provenance, and reuse status separately in the final
   audit.

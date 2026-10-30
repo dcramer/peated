@@ -20,7 +20,7 @@ It does not rerun the matching backlog.
 
 ## Rollout status
 
-Checked October 24–29, 2026; details in the
+Checked October 24–30, 2026; details in the
 [production check](../research/2026-10-24-auction-production-check.md).
 
 - Done: deploy with `0321_auction_details`; first manual run (October 1);
@@ -49,10 +49,23 @@ Checked October 24–29, 2026; details in the
   lots moved with it. Identical lots now share one check, and an automatic
   create waits for review when another check made a matching Bottle while it
   ran; see the [auction model](../features/auctions.md#bottle-matching).
-- Not done: a recheck of the lots in review from the October 1 run (all
-  checked under older rules); a current open-auction check and timed full run;
-  an automatic schedule. About 160 older hand-fill Bottles are still in the
-  catalog.
+- Done October 30: a 65-lot recheck pilot of October 1 lots in review. A local
+  dry run of the current rules on the 3,100 saved match or create decisions
+  passed 1,337 of them. A hand check of 100 random passing lots found about 1
+  in 4 matches doubtful and about 1 in 8 creates possibly duplicating a
+  Bottle, so only 65 clean lots were sent: 23 matches and 42 creates. All 65
+  resolved from their saved checks with no page read or model call. No match
+  was wrong and no new Bottle duplicated one. Nine new Bottles had Brand,
+  Series, or edition choices from the older rules and were repaired by hand
+  ([repair sources](../research/catalog/2026-10-30-auction-pilot-repairs.md)).
+- Not done: the rest of the October 1 lots in review. A lot that stays in
+  review after a default recheck gets a page read, and the new page facts
+  start a classifier run, so a bulk recheck costs about one run per lot it
+  does not resolve. Lots with a no-match decision cannot resolve without a new
+  run. Before sending more saved creates, check their Brand, Series, and
+  edition as well as duplicates. Also not done: a current open-auction check
+  and timed full run; an automatic schedule. About 160 older hand-fill
+  Bottles are still in the catalog.
 
 ## Collection checks and scheduling
 
