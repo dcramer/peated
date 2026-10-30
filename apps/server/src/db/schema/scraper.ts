@@ -92,10 +92,6 @@ export const scrapeOrigins = pgTable(
     active: boolean("active").default(true).notNull(),
     robotsMode: scrapeOriginRobotsModeEnum("robots_mode").notNull(),
     robotsRationale: text("robots_rationale"),
-    // robots_state, robots_fetched_at and robots_expires_at are no longer
-    // used: PeatedBot caches robots.txt rules in Redis. They leave the app
-    // schema one deploy before the migration drops them, so running servers
-    // never select a dropped column.
     createdAt: timestamp("created_at").defaultNow().notNull(),
     updatedAt: timestamp("updated_at").defaultNow().notNull(),
   },
