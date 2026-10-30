@@ -474,24 +474,24 @@ export async function requestScraperUrl({
       }
 
       if (result.route === "firecrawl") {
-        await recordScrapeBypassRequest({ runId, executionToken });
-        // Firecrawl follows redirects itself, so the page it ended on must
-        // belong to this target too.
-        if (result.url.href !== currentUrl.href) {
-          try {
+        try {
+          await recordScrapeBypassRequest({ runId, executionToken });
+          // Firecrawl follows redirects itself, so the page it ended on must
+          // belong to this target too.
+          if (result.url.href !== currentUrl.href) {
             resolveScraperOrigin(
               registry,
               sourceKey,
               request.target,
               result.url,
             );
-          } catch (error) {
-            await discardResponse(result.response);
-            await release();
-            throw error;
           }
-          currentUrl = result.url;
+        } catch (error) {
+          await discardResponse(result.response);
+          await release();
+          throw error;
         }
+        currentUrl = result.url;
       }
       const response = result.response;
 

@@ -124,6 +124,7 @@ export type BotRequest = {
   /** PeatedBot sets its own `User-Agent` and signature headers. */
   headers?: Record<string, string>;
   body?: string;
+  /** How long to wait for the answer, including a read through Firecrawl. */
   timeoutMs?: number;
   /**
    * `not_applicable` skips robots.txt. Use it only for an address robots.txt
@@ -851,9 +852,10 @@ export function createPeatedBot({
     method,
     headers,
     body,
+    timeoutMs: requestTimeoutMs,
     robots,
     directOnly,
-  }: Required<Omit<BotRequest, "body" | "timeoutMs">> &
+  }: Required<Omit<BotRequest, "body">> &
     Pick<BotRequest, "body">): Promise<BotResponse> {
     const canBypass =
       !directOnly &&
@@ -865,11 +867,14 @@ export function createPeatedBot({
     if (!canBypass || !firecrawl)
       return { status: "refused", reason: "blocked" };
 
+    // The caller's time limit covers Firecrawl too. Scrapers hold a rate
+    // limit permit only that long (scraper permits, apps/server scraper).
     const page = await scrapeWithFirecrawl(
       firecrawl,
       serviceFetch,
       url,
       "rawHtml",
+      requestTimeoutMs,
     );
     if (!page.ok) {
       // Firecrawl answers 403 for websites it will not read.
@@ -944,6 +949,7 @@ export function createPeatedBot({
         method,
         headers,
         body,
+        timeoutMs: requestTimeoutMs,
         robots,
         directOnly,
       });

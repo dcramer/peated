@@ -633,6 +633,7 @@ describe("request", () => {
     const result = await request({
       url,
       headers: { Accept: "application/json", "If-None-Match": "abc" },
+      timeoutMs: 25_000,
       robots: "follow",
     });
     expect(result).toMatchObject({ status: "response", route: "firecrawl" });
@@ -642,8 +643,12 @@ describe("request", () => {
     );
     await expect(result.response.text()).resolves.toBe('{"products":[]}');
     expect(sent("https://shop.example/a")).toHaveLength(1);
+    // Firecrawl gets the caller's time limit, so a scraper's permit outlasts it.
     expect(await firecrawlBodies("scrape")).toEqual([
-      expect.objectContaining({ url: "https://shop.example/a" }),
+      expect.objectContaining({
+        url: "https://shop.example/a",
+        timeout: 25_000,
+      }),
     ]);
   });
 
