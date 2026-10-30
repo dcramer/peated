@@ -27,11 +27,12 @@ rules on model-driven features, see
 Two libraries call models. Both use the same gateway and keys.
 
 - **OpenAI SDK:** `createOpenAIClient` in `apps/server/src/lib/openaiClient.ts`.
-  The Bottle and Entity classifiers and the About writer run on the OpenAI
-  Agents library through this client. The Bottle classifier's label extraction
-  uses the AI SDK through the `languageModel` it is given.
+  The Entity classifier and the About writer run on the OpenAI Agents library
+  through this client.
 - **AI SDK:** `createLanguageModel` and `createDecisionModel` in
-  `apps/server/src/lib/aiSdkModels.ts`. Use these for new single model calls.
+  `apps/server/src/lib/aiSdkModels.ts`. Use these for new model calls. The
+  Bottle classifier, including its label extraction, runs on the AI SDK
+  through the `languageModel` it is given.
 
 A decision model answers typed questions about the same input: yes or no, pick
 one, or a score on a scale. It returns probabilities, not text. Ask with

@@ -1,5 +1,3 @@
-import type { Runner } from "@openai/agents";
-import type OpenAI from "openai";
 import { z } from "zod";
 import {
   BottleContextSchema,
@@ -44,6 +42,7 @@ import {
 } from "../tools";
 import type { BottleWebSearchBudget } from "../tools/sharedWebSearch";
 import { webEvidenceUrlsMatch } from "../webEvidenceUrl";
+import type { AgentRunResult, AgentTool } from "./agentRun";
 import {
   bottleContextToCandidate,
   createBottleContextLoader,
@@ -77,21 +76,6 @@ export type BottleClassifierDataSource = {
 const JsonValueSchema = z.json();
 type JsonValue = z.infer<typeof JsonValueSchema>;
 type ToolOutputInput = Parameters<typeof JsonValueSchema.safeParse>[0];
-const AgentRunResultSchema = z.object({
-  finalOutput: z.unknown().optional(),
-  newItems: z.array(z.unknown()).optional(),
-});
-const RunItemSchema = z.object({
-  type: z.string().optional(),
-  name: z.string().optional(),
-  output: z.unknown().optional(),
-  rawItem: z.unknown().optional(),
-});
-const RawRunItemSchema = z.object({
-  name: z.string().optional(),
-  output: z.unknown().optional(),
-});
-
 export type BottleClassifierToolEvent =
   | {
       type: "tool_call";
@@ -111,7 +95,6 @@ export type BottleClassifierToolEvent =
 type BottleClassifierToolObserver = (event: BottleClassifierToolEvent) => void;
 
 type BottleCheckRuntimeOptions = {
-  client: OpenAI;
   languageModel: WhiskyLabelModel;
   model: string;
   reasoningEffort?: OpenAIReasoningEffort;
@@ -238,53 +221,47 @@ function normalizeToolOutputValue(value: ToolOutputInput): JsonValue {
   return null;
 }
 
-export function observeRunnerTools(
-  runner: Runner,
+/** Reports each tool call and result to `observer` as the agent runs. */
+export function observeAgentTools(
+  tools: AgentTool[],
   observer: BottleClassifierToolObserver | undefined,
-) {
+): AgentTool[] {
   if (!observer) {
-    return;
+    return tools;
   }
 
-  runner.on("agent_tool_start", (_context, _agent, tool, { toolCall }) => {
-    const normalizedToolCall = normalizeToolOutputValue(toolCall);
-    const callId =
-      stringProperty(normalizedToolCall, "callId") ??
-      stringProperty(normalizedToolCall, "id");
-    if (!callId) {
-      return;
-    }
-
-    observer({
-      type: "tool_call",
-      phase: "agent",
-      id: callId,
-      name: tool.name,
-      arguments: normalizeToolOutputValue(
-        stringProperty(toolCall, "arguments"),
-      ),
-    });
-  });
-  runner.on(
-    "agent_tool_end",
-    (_context, _agent, tool, result, { toolCall }) => {
-      const normalizedToolCall = normalizeToolOutputValue(toolCall);
-      const callId =
-        stringProperty(normalizedToolCall, "callId") ??
-        stringProperty(normalizedToolCall, "id");
-      if (!callId) {
-        return;
-      }
-
+  return tools.map((agentTool) => ({
+    ...agentTool,
+    execute: async (input, call) => {
       observer({
-        type: "tool_result",
+        type: "tool_call",
         phase: "agent",
-        toolCallId: callId,
-        name: tool.name,
-        result: normalizeToolOutputValue(result),
+        id: call.toolCallId,
+        name: agentTool.name,
+        arguments: normalizeToolOutputValue(JSON.stringify(input)),
       });
+      const reportResult = (result: JsonValue) =>
+        observer({
+          type: "tool_result",
+          phase: "agent",
+          toolCallId: call.toolCallId,
+          name: agentTool.name,
+          result,
+        });
+      try {
+        const result = await agentTool.execute(input, call);
+        reportResult(normalizeToolOutputValue(JSON.stringify(result)));
+        return result;
+      } catch (error) {
+        // The AI SDK hands a failed tool's error to the model and the run
+        // goes on, so every call still gets a result event.
+        reportResult({
+          error: error instanceof Error ? error.message : String(error),
+        });
+        throw error;
+      }
     },
-  );
+  }));
 }
 
 function mergeToolOutputArtifacts({
@@ -377,39 +354,16 @@ function mergeToolOutputArtifacts({
 
 export function mergeRunResultToolArtifacts(
   state: BottleClassifierAgentRunState,
-  result: ToolOutputInput,
+  result: AgentRunResult,
 ) {
-  const parsedResult = AgentRunResultSchema.safeParse(result);
-  if (!parsedResult.success || !parsedResult.data.newItems) {
-    return;
-  }
-
-  for (const item of parsedResult.data.newItems) {
-    const parsedItem = RunItemSchema.safeParse(item);
-    if (
-      !parsedItem.success ||
-      parsedItem.data.type !== "tool_call_output_item"
-    ) {
-      continue;
-    }
-
-    const rawItem = RawRunItemSchema.safeParse(parsedItem.data.rawItem);
+  for (const toolResult of result.toolResults) {
     mergeToolOutputArtifacts({
       state,
-      toolName: rawItem.success
-        ? (rawItem.data.name ?? parsedItem.data.name)
-        : parsedItem.data.name,
-      output: normalizeToolOutputValue(
-        parsedItem.data.output ??
-          (rawItem.success ? rawItem.data.output : undefined),
-      ),
+      toolName: toolResult.name,
+      // The model sees tool output as JSON, so artifacts read the same view.
+      output: normalizeToolOutputValue(JSON.stringify(toolResult.output)),
     });
   }
-}
-
-export function getAgentFinalOutput(result: ToolOutputInput) {
-  const parsedResult = AgentRunResultSchema.safeParse(result);
-  return parsedResult.success ? parsedResult.data.finalOutput : undefined;
 }
 
 export function createBottleCheckTools({

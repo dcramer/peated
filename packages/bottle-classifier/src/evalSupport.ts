@@ -1,6 +1,5 @@
 import { createMemoryCache, createPeatedBot } from "@peated/bot";
 import { createGateway, wrapLanguageModel, type LanguageModel } from "ai";
-import OpenAI from "openai";
 import type {
   BottleClassifierDataSource,
   CreateBottleClassifierOptions,
@@ -25,45 +24,6 @@ export const evalImageExtractionReasoningEffort = resolveOpenAIReasoningEffort(
   evalGatewayConfig.imageExtractionReasoningEffort,
 );
 export const hasEvalAIGatewayCredentials = Boolean(evalGatewayConfig.apiKey);
-
-export function createEvalOpenAIClient() {
-  const client = new OpenAI({
-    apiKey: evalGatewayConfig.apiKey,
-    baseURL: evalGatewayConfig.baseURL,
-  });
-  const originalCreate = client.responses.create.bind(client.responses);
-
-  const instrumentedCreate = (...args: Parameters<typeof originalCreate>) => {
-    const request = args[0];
-    const store = getActiveEvalModelCallStore();
-    const startedAt = new Date();
-    const requestPromise = originalCreate(...args);
-
-    if (store && request?.stream !== true) {
-      void requestPromise.then(
-        (response) => {
-          recordEvalOpenAIResponse({
-            request,
-            response,
-            startedAt,
-            store,
-          });
-        },
-        () => undefined,
-      );
-    }
-
-    return requestPromise;
-  };
-
-  Object.defineProperty(client.responses, "create", {
-    configurable: true,
-    // SAFETY: The wrapper accepts and forwards the exact original parameters and return value.
-    value: instrumentedCreate as typeof client.responses.create,
-  });
-
-  return client;
-}
 
 /** An AI SDK model for live model checks that records each call's usage. */
 export function createEvalLanguageModel(modelId: string): LanguageModel {
@@ -127,7 +87,6 @@ export function createEvalClassifierOptions(
   dataSource: BottleClassifierDataSource,
 ): CreateBottleClassifierOptions {
   return {
-    client: createEvalOpenAIClient(),
     languageModel: createEvalLanguageModel,
     model: evalClassifierModel,
     reasoningEffort: evalClassifierReasoningEffort,

@@ -1,4 +1,3 @@
-import { RunContext } from "@openai/agents";
 import type { PageRead, WebSearch } from "@peated/bot";
 import { describe, expect, test, vi } from "vitest";
 import { createReadPageTools } from "./readPage";
@@ -9,8 +8,6 @@ import {
   type BottleWebSearchExecutor,
 } from "./sharedWebSearch";
 import { createWebSearchTool, runWebSearch } from "./webSearch";
-
-const runContext = new RunContext();
 
 /** A fake PeatedBot that answers from fixed pages and search results. */
 function createWeb({
@@ -153,9 +150,9 @@ describe("web_search", () => {
       onEvidence,
     });
 
-    await tool.invoke(
-      runContext,
-      JSON.stringify({ queries: ["laphroaig cairdeas 2022 warehouse 1"] }),
+    await tool.execute(
+      { queries: ["laphroaig cairdeas 2022 warehouse 1"] },
+      { toolCallId: "call_1" },
     );
 
     expect(executeWebSearch).toHaveBeenCalledWith(
@@ -179,14 +176,14 @@ describe("web_search", () => {
       executeWebSearch: async ({ execute }) => await execute(),
     });
 
-    await tool.invoke(
-      runContext,
-      JSON.stringify({ queries: ["laphroaig cairdeas warehouse 1"] }),
+    await tool.execute(
+      { queries: ["laphroaig cairdeas warehouse 1"] },
+      { toolCallId: "call_1" },
     );
     await expect(
-      tool.invoke(
-        runContext,
-        JSON.stringify({ queries: ["laphroaig cairdeas warehouse 1 again"] }),
+      tool.execute(
+        { queries: ["laphroaig cairdeas warehouse 1 again"] },
+        { toolCallId: "call_1" },
       ),
     ).resolves.toEqual({ error: "Web search budget exhausted after 1 query" });
     expect(searches).toHaveLength(1);
@@ -202,11 +199,11 @@ describe("web_search", () => {
       budget: createBottleWebSearchBudget(2),
     });
 
-    const result = await tool.invoke(
-      runContext,
-      JSON.stringify({
+    const result = await tool.execute(
+      {
         queries: ["example cask 71", "example single cask 2019"],
-      }),
+      },
+      { toolCallId: "call_1" },
     );
 
     expect(searches).toHaveLength(2);
@@ -278,9 +275,9 @@ describe("read_page and find_in_page", () => {
       [pageUrl]: okPage(pageUrl, longPage, "Pōkeno Cask No. 71"),
     });
 
-    const opening = await readPage.invoke(
-      runContext,
-      JSON.stringify({ url: pageUrl }),
+    const opening = await readPage.execute(
+      { url: pageUrl },
+      { toolCallId: "call_1" },
     );
     expect(opening).toMatchObject({
       provider: "firecrawl",
@@ -295,9 +292,9 @@ describe("read_page and find_in_page", () => {
     });
     expect(JSON.stringify(opening)).not.toContain("55.8%");
 
-    const found = await findInPage.invoke(
-      runContext,
-      JSON.stringify({ url: pageUrl, query: "55.8%" }),
+    const found = await findInPage.execute(
+      { url: pageUrl, query: "55.8%" },
+      { toolCallId: "call_1" },
     );
     expect(found).toMatchObject({
       query: "55.8%",
@@ -312,12 +309,12 @@ describe("read_page and find_in_page", () => {
     const { readPage, findInPage, onEvidence } = tools({
       [pageUrl]: okPage(pageUrl, longPage),
     });
-    await readPage.invoke(runContext, JSON.stringify({ url: pageUrl }));
+    await readPage.execute({ url: pageUrl }, { toolCallId: "call_1" });
 
     await expect(
-      findInPage.invoke(
-        runContext,
-        JSON.stringify({ url: pageUrl, query: "sherry" }),
+      findInPage.execute(
+        { url: pageUrl, query: "sherry" },
+        { toolCallId: "call_1" },
       ),
     ).resolves.toEqual({
       url: pageUrl,
@@ -330,9 +327,9 @@ describe("read_page and find_in_page", () => {
     const { findInPage } = tools({});
 
     await expect(
-      findInPage.invoke(
-        runContext,
-        JSON.stringify({ url: pageUrl, query: "cask" }),
+      findInPage.execute(
+        { url: pageUrl, query: "cask" },
+        { toolCallId: "call_1" },
       ),
     ).resolves.toEqual({ error: "Read this page with read_page first" });
   });
@@ -341,11 +338,11 @@ describe("read_page and find_in_page", () => {
     const { readPage, findInPage } = tools({
       [pageUrl]: okPage(pageUrl, longPage),
     });
-    await readPage.invoke(runContext, JSON.stringify({ url: pageUrl }));
+    await readPage.execute({ url: pageUrl }, { toolCallId: "call_1" });
     const find = () =>
-      findInPage.invoke(
-        runContext,
-        JSON.stringify({ url: pageUrl, query: "cask" }),
+      findInPage.execute(
+        { url: pageUrl, query: "cask" },
+        { toolCallId: "call_1" },
       );
 
     for (let index = 0; index < 6; index++) await find();
@@ -365,7 +362,7 @@ describe("read_page and find_in_page", () => {
     });
 
     await expect(
-      readPage.invoke(runContext, JSON.stringify({ url: pageUrl })),
+      readPage.execute({ url: pageUrl }, { toolCallId: "call_1" }),
     ).resolves.toEqual({
       error: "The website's robots.txt does not allow reading this page",
     });
@@ -387,7 +384,7 @@ describe("read_page and find_in_page", () => {
       executeWebSearch,
     });
 
-    await readPage!.invoke(runContext, JSON.stringify({ url: pageUrl }));
+    await readPage!.execute({ url: pageUrl }, { toolCallId: "call_1" });
 
     expect(executeWebSearch).toHaveBeenCalledWith(
       expect.objectContaining({
@@ -396,9 +393,9 @@ describe("read_page and find_in_page", () => {
       }),
     );
     await expect(
-      findInPage!.invoke(
-        runContext,
-        JSON.stringify({ url: pageUrl, query: "release no" }),
+      findInPage!.execute(
+        { url: pageUrl, query: "release no" },
+        { toolCallId: "call_1" },
       ),
     ).resolves.toMatchObject({
       summary: "The exact marketed edition is Release No. 2.",
@@ -419,22 +416,22 @@ describe("read_page and find_in_page", () => {
     const searchTool = createWebSearchTool({ web: fake.web, budget });
     const [readPage] = createReadPageTools({ web: fake.web, budget });
 
-    await searchTool.invoke(
-      runContext,
-      JSON.stringify({ queries: ["the gauldrons eclipse 52.9"] }),
+    await searchTool.execute(
+      { queries: ["the gauldrons eclipse 52.9"] },
+      { toolCallId: "call_1" },
     );
     await expect(
-      readPage!.invoke(
-        runContext,
-        JSON.stringify({
+      readPage!.execute(
+        {
           url: "https://www.douglaslaing.com/products/the-gauldrons-eclipse",
-        }),
+        },
+        { toolCallId: "call_1" },
       ),
     ).resolves.toMatchObject({ summary: "The bottle is 52.9% ABV." });
     await expect(
-      readPage!.invoke(
-        runContext,
-        JSON.stringify({ url: "https://example.com/second-page" }),
+      readPage!.execute(
+        { url: "https://example.com/second-page" },
+        { toolCallId: "call_1" },
       ),
     ).resolves.toEqual({
       error: "Web page-read budget exhausted after 1 page",

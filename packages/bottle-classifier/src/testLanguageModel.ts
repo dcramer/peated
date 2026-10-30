@@ -1,6 +1,7 @@
 import type { JSONValue } from "ai";
 import { MockLanguageModelV4 } from "ai/test";
 import { vi } from "vitest";
+import type { AgentRunResult, AgentToolResult } from "./runtime/agentRun";
 
 type GenerateResult = Awaited<ReturnType<MockLanguageModelV4["doGenerate"]>>;
 
@@ -29,4 +30,12 @@ export function createTestLanguageModel(output: JSONValue = null) {
     supportedUrls: { "*/*": [/.*/] },
   });
   return { model, languageModel: () => model, generate };
+}
+
+/** A finished agent run whose final answer is `output`. */
+export function agentRunResult(
+  output: JSONValue,
+  toolResults: AgentToolResult[] = [],
+): AgentRunResult {
+  return { output, toolResults, usage: { requests: 1 } };
 }

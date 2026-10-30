@@ -1,4 +1,3 @@
-import { RunContext } from "@openai/agents";
 import { describe, expect, test, vi } from "vitest";
 
 import type { BottleCandidate } from "../classifierTypes";
@@ -36,9 +35,9 @@ describe("search_bottles tool", () => {
     const onResults = vi.fn();
     const tool = createSearchBottlesTool({ searchBottles, onResults });
 
-    const result = await tool.invoke(
-      new RunContext(),
-      JSON.stringify({ query: "Laphroaig Cairdeas 2022" }),
+    const result = await tool.execute(
+      { query: "Laphroaig Cairdeas 2022" },
+      { toolCallId: "call_1" },
     );
     const agentEvidence = SearchBottlesResultSchema.parse(result);
 

@@ -1,5 +1,5 @@
-import { tool } from "@openai/agents";
 import { z } from "zod";
+import { strictAgentTool, type AgentTool } from "../runtime/agentRun";
 
 import {
   DEFAULT_MAX_PROPOSED_OPERATIONS,
@@ -365,48 +365,50 @@ function proposalToolDescription(description: string) {
   return `${description} ${PROPOSAL_RESULT_DESCRIPTION}`;
 }
 
-export function createBottleProposalTools(collector: BottleProposalCollector) {
+export function createBottleProposalTools(
+  collector: BottleProposalCollector,
+): AgentTool[] {
   return [
-    tool({
+    {
       name: "propose_update_bottle",
       description: proposalToolDescription(
         "Record one read-only proposal to update one inspected Bottle. Include every supported field change for that Bottle in one sparse patch. Use only after investigating the Bottle and collecting every cited piece of evidence. Remove a populated relationship or change a populated exact field only when evidence for that Bottle shows it is wrong; omission is not enough. One label-image extraction may fill a missing scalar field but cannot replace a populated value without a matching structured Bottle observation or a second agreeing label image. Unstructured web results may inform review but cannot authorize the replacement. Do not propose an update solely for cask type, size, or fill. This does not mutate or approve catalog data.",
       ),
-      parameters: nonStrictJsonSchema(UpdateBottleProposalArgsSchema),
+      inputSchema: nonStrictJsonSchema(UpdateBottleProposalArgsSchema),
       strict: false,
-      execute: (args) =>
+      execute: async (args) =>
         collector.record(
           toStoredOperation("update_bottle", ToolCallPayloadSchema.parse(args)),
         ),
-    }),
-    tool({
+    },
+    strictAgentTool({
       name: "propose_merge_bottles",
       description: proposalToolDescription(
         "Record a read-only proposal to retire one inspected duplicate Bottle into an inspected canonical survivor. Before calling, inspect both records and collect direct authoritative external product evidence of exact equivalence when available; cite that web result. Catalog agreement, an audit note, search rank, or an attached label alone is insufficient. This does not mutate or approve catalog data.",
       ),
       parameters: MergeBottlesProposalArgsSchema,
-      execute: (args) =>
+      execute: async (args) =>
         collector.record(toStoredOperation("merge_bottles", args)),
     }),
-    tool({
+    {
       name: "propose_update_entity",
       description: proposalToolDescription(
         "Record a read-only proposal to update one inspected Entity directly involved in representing the checked Bottle. Use only after collecting every cited piece of evidence. This does not mutate or approve catalog data.",
       ),
-      parameters: nonStrictJsonSchema(UpdateEntityProposalArgsSchema),
+      inputSchema: nonStrictJsonSchema(UpdateEntityProposalArgsSchema),
       strict: false,
-      execute: (args) =>
+      execute: async (args) =>
         collector.record(
           toStoredOperation("update_entity", ToolCallPayloadSchema.parse(args)),
         ),
-    }),
-    tool({
+    },
+    strictAgentTool({
       name: "propose_merge_entities",
       description: proposalToolDescription(
         "Record a read-only proposal to retire one inspected duplicate Entity into an inspected canonical survivor directly related to the checked Bottle. This does not mutate or approve catalog data.",
       ),
       parameters: MergeEntitiesProposalArgsSchema,
-      execute: (args) =>
+      execute: async (args) =>
         collector.record(toStoredOperation("merge_entities", args)),
     }),
   ];

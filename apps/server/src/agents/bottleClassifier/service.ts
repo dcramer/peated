@@ -23,7 +23,6 @@ import {
 } from "@peated/server/lib/bottleReferenceCandidates";
 import { searchClassifierEntities } from "@peated/server/lib/classifierEntitySearch";
 import {
-  createOpenAIClient,
   withSentryConversation,
   type AIGatewayWorkload,
 } from "@peated/server/lib/openaiClient";
@@ -95,7 +94,6 @@ export function getBottleClassifier(
     return existingClassifier;
   }
 
-  const client = createOpenAIClient({ workload });
   // Scraper-driven classification spends the scraper's Firecrawl credits.
   const firecrawlApiKey =
     workload === "scraper"
@@ -103,7 +101,6 @@ export function getBottleClassifier(
       : config.FIRECRAWL_API_KEY;
 
   const bottleClassifier = createBottleClassifier({
-    client,
     languageModel: (model) => createLanguageModel({ model, workload }),
     model: config.BOTTLE_CLASSIFIER_MODEL,
     reasoningEffort: config.BOTTLE_CLASSIFIER_REASONING_EFFORT,

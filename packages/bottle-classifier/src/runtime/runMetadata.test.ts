@@ -5,40 +5,25 @@ import {
 } from "./runMetadata";
 
 describe("getBottleClassifierRunMetadata", () => {
-  test("extracts aggregate usage and tool calls from a native agent result", () => {
+  test("extracts aggregate usage and tool calls from an agent run", () => {
     expect(
       getBottleClassifierRunMetadata({
         durationMs: 123.6,
         result: {
-          state: {
-            usage: {
-              requests: 3,
-              inputTokens: 100,
-              inputTokensDetails: [
-                { cached_tokens: 40, cache_write_tokens: 10 },
-                { cached_tokens: 20 },
-              ],
-              outputTokens: 20,
-              outputTokensDetails: [
-                { reasoning_tokens: 7 },
-                { reasoningTokens: 3 },
-              ],
-              totalTokens: 120,
-            },
+          output: null,
+          usage: {
+            requests: 3,
+            inputTokens: 100,
+            cachedInputTokens: 60,
+            cacheWriteTokens: 10,
+            outputTokens: 20,
+            reasoningTokens: 10,
+            totalTokens: 120,
           },
-          newItems: [
-            {
-              type: "tool_call_output_item",
-              rawItem: { name: "search_bottles" },
-            },
-            {
-              type: "tool_call_output_item",
-              name: "get_bottle_context",
-            },
-            {
-              type: "tool_call_output_item",
-            },
-            { type: "message_output_item" },
+          toolResults: [
+            { name: "search_bottles", output: { results: [] } },
+            { name: "get_bottle_context", output: { context: null } },
+            { name: "web_search", output: { evidence: [] } },
           ],
         },
       }),
@@ -55,7 +40,7 @@ describe("getBottleClassifierRunMetadata", () => {
       },
       toolCalls: {
         count: 3,
-        names: ["search_bottles", "get_bottle_context"],
+        names: ["search_bottles", "get_bottle_context", "web_search"],
       },
     });
   });
@@ -64,7 +49,7 @@ describe("getBottleClassifierRunMetadata", () => {
     expect(
       getBottleClassifierRunMetadata({
         durationMs: -1,
-        result: {},
+        result: { output: null, toolResults: [], usage: { requests: 0 } },
       }),
     ).toEqual({
       agentDurationMs: 0,
@@ -87,10 +72,12 @@ describe("getBottleClassifierRunMetadata", () => {
         durationMs: 50,
         model: "gpt-5.6-terra",
         result: {
+          output: null,
+          toolResults: [],
           usage: {
             requests: 1,
             inputTokens: 1_000,
-            inputTokensDetails: [{ cached_tokens: 400 }],
+            cachedInputTokens: 400,
             outputTokens: 100,
             totalTokens: 1_100,
           },
