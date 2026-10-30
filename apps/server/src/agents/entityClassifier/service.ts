@@ -12,6 +12,7 @@ import {
   createOpenAIClient,
   withSentryConversation,
 } from "@peated/server/lib/openaiClient";
+import { createServerPeatedBot } from "@peated/server/lib/peatedBot";
 
 let entityClassifier: ReturnType<typeof createEntityClassifier> | null = null;
 
@@ -31,6 +32,9 @@ export function getEntityClassifier() {
     client: createOpenAIClient(),
     model: config.OPENAI_MODEL,
     maxSearchQueries: config.ENTITY_CLASSIFIER_MAX_SEARCH_QUERIES,
+    web: config.FIRECRAWL_API_KEY
+      ? createServerPeatedBot({ firecrawlApiKey: config.FIRECRAWL_API_KEY })
+      : null,
     adapters: {
       searchEntities: searchEntityClassifierEntities,
     },

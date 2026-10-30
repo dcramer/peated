@@ -27,7 +27,8 @@ It owns:
 
 1. structured classifier input and output schemas
 2. local sibling-entity lookup tools
-3. optional web-search-backed reasoning
+3. optional web reading through PeatedBot (`web_search`, `read_page`,
+   `find_in_page`)
 4. reviewed advice selection
 
 It does not own queue discovery, ranking, Suggested Changes, Review Operations,
@@ -90,7 +91,7 @@ reassignments, Entity patches, Suggested Changes, or Review Operations.
 `artifacts` contains supporting resolution data such as:
 
 - resolved local entity matches
-- web-search evidence
+- web evidence: search results and passages from pages the run read
 
 ## Invariants
 

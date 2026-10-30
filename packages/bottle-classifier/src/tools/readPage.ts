@@ -1,4 +1,4 @@
-import type { PageRead } from "@peated/bot";
+import { findPagePassages, type PageRead } from "@peated/bot";
 import {
   BottleSearchEvidenceSchema,
   type BottleSearchEvidence,
@@ -22,8 +22,6 @@ import {
 // for the run, and in replay recordings, are cut to a bounded size.
 const PAGE_OPENING_CHARS = 2000;
 const MAX_PAGE_TEXT_CHARS = 100_000;
-const FIND_PASSAGE_CHARS = 300;
-const FIND_PASSAGES = 3;
 
 const READ_PAGE_TOOL_DESCRIPTION =
   "Read the Bottle Reference source page or one promising public search result when the available excerpt does not expose the identity-critical fact. Returns the page's title, description, and opening text. The page stays available to `find_in_page` for the rest of this run, so use that to locate facts further down, such as ABV, age, cask, or bottling details. The page must agree with every confirmed decisive Bottle trait, or differ only on the uncertain trait being resolved; never use a confirmed conflicting sibling as Suggested Change evidence. One page-read allowance is reserved independently from search.";
@@ -89,29 +87,6 @@ export function buildPageOpeningEvidence(
     summary: page.text.slice(0, PAGE_OPENING_CHARS) || null,
     results: [pageResult(page)],
   });
-}
-
-/**
- * Passages around each match of `query` in the page, ignoring case. Each
- * passage is centred on its match and passages never overlap.
- */
-export function findPagePassages(text: string, query: string) {
-  const haystack = text.toLowerCase();
-  const needle = query.trim().toLowerCase();
-  const passages: string[] = [];
-  let from = 0;
-  while (passages.length < FIND_PASSAGES) {
-    const index = haystack.indexOf(needle, from);
-    if (index < 0) break;
-    const start = Math.max(
-      0,
-      index - Math.floor((FIND_PASSAGE_CHARS - needle.length) / 2),
-    );
-    const end = Math.min(text.length, start + FIND_PASSAGE_CHARS);
-    passages.push(text.slice(start, end).replace(/\s+/g, " ").trim());
-    from = end;
-  }
-  return passages;
 }
 
 /** Stores a read page for the run and returns the evidence the model sees. */

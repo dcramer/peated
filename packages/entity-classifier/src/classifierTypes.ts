@@ -114,7 +114,7 @@ export const EntityClassificationSearchEvidenceResultSchema = z
 
 export const EntityClassificationSearchEvidenceSchema = z
   .object({
-    provider: z.literal("openai"),
+    provider: z.literal("firecrawl"),
     query: z.string().trim().min(1),
     summary: z.string().trim().nullable().default(null),
     results: z
