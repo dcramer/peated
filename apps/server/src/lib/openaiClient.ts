@@ -25,9 +25,9 @@ export function isAIGatewayConfigured(
 
 /**
  * Sentry traces every OpenAI client on its own and records complete model
- * input and output. To keep a call's content out of Sentry (sensitive-data
- * rule, docs/policies/sensitive-data.md), run it inside
- * `Sentry.suppressTracing` and record a content-free span around it.
+ * input and output. A call whose content must stay out of Sentry
+ * (sensitive-data rule, docs/policies/sensitive-data.md) belongs on the AI
+ * SDK, which can turn off recording per call.
  */
 export function createOpenAIClient({
   workload = "application",

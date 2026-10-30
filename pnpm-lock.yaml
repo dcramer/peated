@@ -895,7 +895,7 @@ importers:
         specifier: 'catalog:'
         version: 11.10.0
       ai:
-        specifier: ^7.0.156
+        specifier: ^7.0.155
         version: 7.0.156(zod@4.5.4)
       openai:
         specifier: ^6.27.0
