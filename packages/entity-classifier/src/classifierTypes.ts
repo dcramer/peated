@@ -139,7 +139,9 @@ export const EntityClassificationAdviceSchema = z
     kind: EntityClassificationAdviceKindEnum,
     summary: z.string().trim().min(1),
     targetEntityId: z.number().int().nullable().default(null),
-    evidenceUrls: z.array(z.string().url()).default([]),
+    // Model output schemas can't use `format: uri`, and OpenAI refuses the
+    // whole request if they do. Review keeps only URLs the run actually saw.
+    evidenceUrls: z.array(z.string()).default([]),
   })
   .strict();
 
