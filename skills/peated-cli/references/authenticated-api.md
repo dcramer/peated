@@ -37,7 +37,8 @@ pnpm cli api upload-image /bottles/123/image \
 - Omit `/v1`; the client adds it.
 - Start paths with one slash; quote query strings.
 - Validate writes against `https://api.peated.com/spec-full.json` or the owning route.
-- Put JSON bodies in temporary files.
+- Put JSON bodies in temporary files. Relative paths start at the repository
+  root.
 - Use `api upload-image` for multipart image endpoints. The CLI sets the file
   name, media type, and multipart boundary.
 - `--caption` and `--primary` work only with `/entities/<id>/images`.
@@ -53,9 +54,10 @@ pnpm cli api upload-image /bottles/123/image \
 | --------------------- | ------------------------------------------- |
 | Login missing/expired | Run `pnpm cli auth login`                   |
 | `401`/`403`           | Verify account and role; do not bypass auth |
-| `404`                 | Check deployment and omit `/v1`             |
+| `404`                 | Check the deployment and the path           |
 | `409`                 | Re-fetch; do not replay stale input         |
 | Validation error      | Inspect OpenAPI or the route schema         |
 
-Optional-service warnings may precede valid JSON. Use exit status and API
+A failed request prints the API's answer after the error, on a line that
+starts with `API response:`. Optional-service warnings may precede valid JSON. Use exit status and API
 response to determine success.

@@ -46,6 +46,11 @@ function apiUrl(apiServer: string, path: string): URL {
       `Invalid Peated API path: ${path}. Use a path such as /bottles/123.`,
     );
   }
+  if (path === "/v1" || path.startsWith("/v1/")) {
+    throw new Error(
+      `Invalid Peated API path: ${path}. Leave out /v1, which the CLI adds: use ${path.slice(3) || "/"}.`,
+    );
+  }
   const url = new URL(`/v1${path}`, `${normalizeServerUrl(apiServer)}/`);
   if (!url.pathname.startsWith("/v1/")) {
     throw new Error(
