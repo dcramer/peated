@@ -1,6 +1,7 @@
 # Tools And Schemas
 
-Tools use `tool()` from `@openai/agents` with zod schemas.
+Tools use `strictAgentTool()` from `@peated/agent-run` with zod schemas, and
+`agentOutput()` builds the final answer's schema.
 
 ## Tools
 

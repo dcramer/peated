@@ -1,7 +1,8 @@
-import { Agent, OpenAIProvider, Runner } from "@openai/agents";
+import { agentOutput, runAgent } from "@peated/agent-run";
 import config from "@peated/server/config";
+import { createLanguageModel } from "@peated/server/lib/aiSdkModels";
 import type { AboutPageRead } from "@peated/server/lib/entityAbout/checks";
-import { createOpenAIClient } from "@peated/server/lib/openaiClient";
+import { withSentryConversation } from "@peated/server/lib/openaiClient";
 import { createServerPeatedBot } from "@peated/server/lib/peatedBot";
 
 import { AboutDraftSchema, type AboutDraft } from "./draftSchema";
@@ -19,6 +20,8 @@ import {
 } from "./webTools";
 
 const MAX_TURNS = 128;
+
+const AboutDraftOutput = agentOutput("entity_about_draft", AboutDraftSchema);
 
 export type EntityAboutWriterResult = {
   draft: AboutDraft;
@@ -50,31 +53,21 @@ export function createEntityAboutWriter(
       createEntitySearchTool(entitiesFound),
     ];
 
-    const agent = new Agent({
-      name: "entity_about_writer",
-      instructions: ENTITY_ABOUT_INSTRUCTIONS,
-      model: config.OPENAI_MODEL,
-      modelSettings: { parallelToolCalls: false },
-      outputType: AboutDraftSchema,
-      tools,
-    });
-    const runner = new Runner({
-      tracingDisabled: true,
-      modelProvider: new OpenAIProvider({
-        openAIClient: createOpenAIClient(),
-        useResponses: true,
-      }),
-      workflowName: "Entity About Writer",
-      groupId: `entity_about:${input.entityId}`,
-    });
-
-    const result = await runner.run(agent, buildEntityAboutInput(input), {
-      maxTurns: MAX_TURNS,
-    });
-    if (!result.finalOutput)
-      throw new Error("The About writer returned nothing.");
+    const result = await withSentryConversation(
+      `entity_about:${input.entityId}`,
+      () =>
+        runAgent({
+          model: createLanguageModel({ model: config.OPENAI_MODEL }),
+          functionId: "entity_about_writer",
+          instructions: ENTITY_ABOUT_INSTRUCTIONS,
+          input: buildEntityAboutInput(input),
+          tools,
+          output: AboutDraftOutput,
+          maxTurns: MAX_TURNS,
+        }),
+    );
     return {
-      draft: AboutDraftSchema.parse(result.finalOutput),
+      draft: AboutDraftSchema.parse(result.output),
       pagesRead,
       entitiesFound: [...entitiesFound],
     };
