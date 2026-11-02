@@ -130,7 +130,10 @@ in `$XDG_CONFIG_HOME/peated/credentials.json`, or `~/.config/peated` when
 `XDG_CONFIG_HOME` is unset. It never prints the token.
 
 Authenticated API reads produce JSON. Mutations require an interactive
-confirmation or an explicit `--yes`, and JSON bodies are read from files:
+confirmation or an explicit `--yes`, and JSON bodies are read from files.
+Paths leave out `/v1`, which the CLI adds, and relative file paths start at the
+repository root. When the API refuses a request, the CLI prints its answer
+after the error:
 
 ```bash
 pnpm cli api get /bottles/123

@@ -1,10 +1,13 @@
 import { describe, expect, test } from "vitest";
+import { PeatedApiError } from "../api/client";
 import {
   ApiBatchRequestError,
+  apiErrorResponse,
   checkImageUploadOptions,
   parseApiBatchConcurrency,
   parseApiBatchInput,
   parseApiBatchStartIndex,
+  resolveInputPath,
   selectApiResult,
   verifyApiResult,
 } from "./api";
@@ -185,5 +188,55 @@ describe("checkImageUploadOptions", () => {
         idempotencyKey: "upload-1",
       }),
     ).toThrow("/pending-uploads does not accept --caption.");
+  });
+});
+
+describe("apiErrorResponse", () => {
+  const refused = new PeatedApiError(
+    "Peated API POST /admin/catalog/write-entity-about failed with HTTP 400.",
+    400,
+    {
+      code: "BAD_REQUEST",
+      status: 400,
+      message: "The About writer is turned off.",
+    },
+  );
+
+  test("shows why the API refused a request", () => {
+    expect(apiErrorResponse(refused)).toBe(
+      '{"code":"BAD_REQUEST","status":400,"message":"The About writer is turned off."}',
+    );
+  });
+
+  test("cuts a long answer short", () => {
+    const page = "<html>".padEnd(5_000, "x");
+    const response = apiErrorResponse(
+      new PeatedApiError("Peated API GET /bottles/1 failed.", 502, page),
+    );
+
+    expect(response).toHaveLength(2_001);
+    expect(response?.endsWith("…")).toBe(true);
+  });
+
+  test("has nothing to show for an empty answer", () => {
+    expect(
+      apiErrorResponse(
+        new PeatedApiError("Peated API GET /bottles/1 failed.", 500, null),
+      ),
+    ).toBeNull();
+  });
+});
+
+describe("resolveInputPath", () => {
+  test("reads relative paths from where pnpm cli started", () => {
+    expect(
+      resolveInputPath("./change.json", { INIT_CWD: "/home/me/peated" }),
+    ).toBe("/home/me/peated/change.json");
+  });
+
+  test("keeps absolute paths", () => {
+    expect(
+      resolveInputPath("/tmp/change.json", { INIT_CWD: "/home/me/peated" }),
+    ).toBe("/tmp/change.json");
   });
 });

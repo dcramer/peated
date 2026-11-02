@@ -131,9 +131,9 @@ page.
   `delete`.
 - The `writeEntityAbout` worker job writes as the `aboutPipeline` system
   actor. Administrators queue it with `/admin/catalog/write-entity-about`.
-  `ENTITY_ABOUT_WRITER_ENABLED` turns it off; so does a missing
-  `AI_GATEWAY_API_KEY` or `FIRECRAWL_API_KEY`, and the admin route then
-  refuses to queue it.
+  It stays off unless `ENTITY_ABOUT_WRITER_ENABLED` is `1`, and a missing
+  `AI_GATEWAY_API_KEY` or `FIRECRAWL_API_KEY` also turns it off. While it is
+  off, the admin route refuses to queue it.
 - With `dryRun: true` and one `entity`, the same route runs the writer during
   the request and returns the checked page and its errors. It saves nothing
   and queues nothing. Use it to read a draft before a real run publishes it.

@@ -1,12 +1,13 @@
 import program from "@peated/cli/program";
 import { readFile } from "node:fs/promises";
-import { basename, extname } from "node:path";
+import { basename, extname, resolve } from "node:path";
 import { createInterface } from "node:readline/promises";
 import { isDeepStrictEqual } from "node:util";
 import { z } from "zod";
 import {
   PeatedApiValueSchema,
   requestPeatedApi,
+  type PeatedApiError,
   type PeatedApiValue,
 } from "../api/client";
 import {
@@ -51,6 +52,30 @@ export class ApiBatchRequestError extends Error {
       { cause },
     );
   }
+}
+
+const MAX_ERROR_RESPONSE_CHARS = 2_000;
+
+/**
+ * The API's answer to a failed request, such as why it refused, for the
+ * person running the command. Long answers, such as a proxy's HTML page, are
+ * cut short.
+ */
+export function apiErrorResponse({ body }: PeatedApiError): string | null {
+  if (body === null) return null;
+  const textBody = z.string().safeParse(body);
+  const text = textBody.success ? textBody.data : JSON.stringify(body);
+  return text.length > MAX_ERROR_RESPONSE_CHARS
+    ? `${text.slice(0, MAX_ERROR_RESPONSE_CHARS)}…`
+    : text;
+}
+
+/**
+ * Resolves a file path from where the person ran `pnpm cli`. The command runs
+ * inside apps/cli, and pnpm keeps the starting directory in INIT_CWD.
+ */
+export function resolveInputPath(path: string, env = process.env) {
+  return resolve(env.INIT_CWD ?? process.cwd(), path);
 }
 
 export function parseApiBatchInput(contents: string) {
@@ -197,7 +222,7 @@ async function readInput(
 ): Promise<PeatedApiValue | undefined> {
   if (!path) return undefined;
 
-  const contents = await readFile(path, "utf8");
+  const contents = await readFile(resolveInputPath(path), "utf8");
   try {
     return PeatedApiValueSchema.parse(JSON.parse(contents));
   } catch {
@@ -251,7 +276,9 @@ async function runApiBatch(
   inputPath: string,
   options: Pick<ApiCommandOptions, "concurrency" | "from" | "yes">,
 ): Promise<void> {
-  const requests = parseApiBatchInput(await readFile(inputPath, "utf8"));
+  const requests = parseApiBatchInput(
+    await readFile(resolveInputPath(inputPath), "utf8"),
+  );
   const from = parseApiBatchStartIndex(options.from, requests.length);
   const selectedRequests = requests.slice(from);
   const hasMutation = selectedRequests.some(({ method }) => method !== "GET");
@@ -312,7 +339,7 @@ async function runImageUploadCommand(
   const credentials = await requireCredentials();
   if (!options.yes) await confirmMutation("POST", path);
 
-  const contents = await readFile(options.file);
+  const contents = await readFile(resolveInputPath(options.file));
   const body = new FormData();
   body.set(
     "file",

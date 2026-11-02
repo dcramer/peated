@@ -91,4 +91,19 @@ describe("requestPeatedApi", () => {
       ).rejects.toThrow("Invalid Peated API path");
     }
   });
+
+  test("says to leave out /v1, which it adds itself", async () => {
+    const fetch = vi.fn<typeof globalThis.fetch>();
+
+    await expect(
+      requestPeatedApi({
+        accessToken: "secret-token",
+        apiServer: "https://api.peated.com",
+        method: "GET",
+        path: "/v1/entities/1124",
+        fetch,
+      }),
+    ).rejects.toThrow("Leave out /v1, which the CLI adds: use /entities/1124.");
+    expect(fetch).not.toHaveBeenCalled();
+  });
 });
