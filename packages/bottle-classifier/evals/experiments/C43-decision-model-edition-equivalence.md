@@ -79,7 +79,8 @@ One run on 2026-11-02: 151 calls, no failures, total estimated cost $0.0025.
 
 ## Next step
 
-Measure it on real cases before any change: auction lots in review whose
-matched candidate was blocked by an edition conflict, and matches the rule
-let through where both editions are wording only. A separate, deterministic
+Measure it on real cases before any change. The edition comparison is shared
+by every source, so sample saved checks from store listings, critic reviews,
+photos, and auction lots: matches blocked by an edition conflict, and matches
+the rule let through where both editions are wording only. A separate, deterministic
 finding: identical edition text should count as an agreement in the rule.
