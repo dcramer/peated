@@ -1,5 +1,5 @@
+import type { AgentRunResult } from "@peated/agent-run";
 import { z } from "zod";
-import type { AgentRunResult } from "./agentRun";
 import { getRunCostMetadata } from "./cost";
 
 const NonnegativeIntegerSchema = z.number().int().nonnegative();

@@ -19,11 +19,11 @@
     "typecheck": "tsc --noEmit --emitDeclarationOnly false"
   },
   "dependencies": {
-    "@openai/agents": "^0.6.0",
+    "@peated/agent-run": "workspace:*",
     "@peated/bot": "workspace:*",
     "@peated/tsconfig": "workspace:*",
     "@sentry/core": "catalog:",
-    "openai": "^6.27.0",
+    "ai": "^7.0.155",
     "zod": "catalog:"
   },
   "devDependencies": {

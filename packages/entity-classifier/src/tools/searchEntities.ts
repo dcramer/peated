@@ -1,4 +1,4 @@
-import { tool } from "@openai/agents";
+import { strictAgentTool, type AgentTool } from "@peated/agent-run";
 import {
   EntityResolutionSchema,
   SearchEntitiesArgsSchema,
@@ -17,8 +17,8 @@ export function createSearchEntitiesTool({
 }: {
   onResults?: (results: EntityResolution[]) => void;
   searchEntities: (args: SearchEntitiesArgs) => Promise<EntityResolution[]>;
-}) {
-  return tool({
+}): AgentTool {
+  return strictAgentTool({
     name: "search_entities",
     description: SEARCH_ENTITIES_TOOL_DESCRIPTION,
     parameters: SearchEntitiesArgsSchema,
@@ -28,9 +28,8 @@ export function createSearchEntitiesTool({
         description: SEARCH_ENTITIES_TOOL_DESCRIPTION,
         args,
         callback: async () => {
-          const parsedArgs = SearchEntitiesArgsSchema.parse(args);
           const results = SearchEntitiesResultSchema.parse(
-            await searchEntities(parsedArgs),
+            await searchEntities(args),
           );
           onResults?.(results);
           return { results };

@@ -1,3 +1,4 @@
+import type { AgentRunResult, AgentTool } from "@peated/agent-run";
 import { z } from "zod";
 import {
   BottleContextSchema,
@@ -42,7 +43,6 @@ import {
 } from "../tools";
 import type { BottleWebSearchBudget } from "../tools/sharedWebSearch";
 import { webEvidenceUrlsMatch } from "../webEvidenceUrl";
-import type { AgentRunResult, AgentTool } from "./agentRun";
 import {
   bottleContextToCandidate,
   createBottleContextLoader,

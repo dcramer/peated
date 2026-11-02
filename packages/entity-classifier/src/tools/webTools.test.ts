@@ -1,4 +1,4 @@
-import { RunContext } from "@openai/agents";
+import type { AgentTool } from "@peated/agent-run";
 import type { PageRead, WebSearch } from "@peated/bot";
 import { describe, expect, test, vi } from "vitest";
 import type { EntityClassificationSearchEvidence } from "../classifierTypes";
@@ -42,8 +42,8 @@ function setup({
     maxSearchQueries,
     onEvidence: (item) => evidence.push(item),
   });
-  const call = async (tool: typeof webSearch, args: Record<string, string>) =>
-    await tool.invoke(new RunContext({}), JSON.stringify(args));
+  const call = async (tool: AgentTool, args: Record<string, string>) =>
+    await tool.execute(args, { toolCallId: "call-1" });
   return {
     web,
     evidence,

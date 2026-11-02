@@ -1,6 +1,6 @@
+import { strictAgentTool } from "@peated/agent-run";
 import type { BottleSearchEvidence } from "../classifierTypes";
 import { startToolSpan } from "../observability";
-import { strictAgentTool } from "../runtime/agentRun";
 import {
   BottleWebSearchArgsSchema,
   buildBottleSearchEvidence,

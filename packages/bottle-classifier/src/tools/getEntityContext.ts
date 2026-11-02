@@ -1,5 +1,5 @@
+import { strictAgentTool } from "@peated/agent-run";
 import { z } from "zod";
-import { strictAgentTool } from "../runtime/agentRun";
 
 import {
   EntityContextSchema,

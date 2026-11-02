@@ -1,3 +1,4 @@
+import { strictAgentTool } from "@peated/agent-run";
 import {
   EntityResolutionSchema,
   SearchEntitiesArgsSchema,
@@ -6,7 +7,6 @@ import {
   type SearchEntitiesArgs,
 } from "../classifierTypes";
 import { startToolSpan } from "../observability";
-import { strictAgentTool } from "../runtime/agentRun";
 
 export type EntitySearchResult = EntityResolution;
 const SEARCH_ENTITIES_TOOL_DESCRIPTION =

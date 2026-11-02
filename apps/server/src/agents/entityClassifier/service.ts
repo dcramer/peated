@@ -7,11 +7,9 @@ import {
   type SearchEntitiesArgs,
 } from "@peated/entity-classifier";
 import config from "@peated/server/config";
+import { createLanguageModel } from "@peated/server/lib/aiSdkModels";
 import { searchClassifierEntities } from "@peated/server/lib/classifierEntitySearch";
-import {
-  createOpenAIClient,
-  withSentryConversation,
-} from "@peated/server/lib/openaiClient";
+import { withSentryConversation } from "@peated/server/lib/openaiClient";
 import { createServerPeatedBot } from "@peated/server/lib/peatedBot";
 
 let entityClassifier: ReturnType<typeof createEntityClassifier> | null = null;
@@ -29,7 +27,7 @@ export function getEntityClassifier() {
   }
 
   entityClassifier = createEntityClassifier({
-    client: createOpenAIClient(),
+    languageModel: (model) => createLanguageModel({ model }),
     model: config.OPENAI_MODEL,
     maxSearchQueries: config.ENTITY_CLASSIFIER_MAX_SEARCH_QUERIES,
     web: config.FIRECRAWL_API_KEY

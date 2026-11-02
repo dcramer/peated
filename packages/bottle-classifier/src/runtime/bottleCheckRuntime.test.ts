@@ -1,7 +1,7 @@
+import { runAgent, strictAgentTool } from "@peated/agent-run";
 import { MockLanguageModelV4 } from "ai/test";
 import { describe, expect, test } from "vitest";
 import { z } from "zod";
-import { runAgent, strictAgentTool } from "./agentRun";
 import {
   observeAgentTools,
   type BottleClassifierToolEvent,

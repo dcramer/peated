@@ -1,6 +1,11 @@
-import type { JSONSchema7 } from "ai";
+import {
+  agentOutput,
+  runAgent,
+  type AgentOutput,
+  type AgentRunResult,
+  type AgentTool,
+} from "@peated/agent-run";
 import { randomUUID } from "node:crypto";
-import { zodTextFormat } from "openai/helpers/zod";
 import { z } from "zod";
 import { normalizePotentialProofLikeDecision } from "./abv";
 import type { BottleContext, EntityContext } from "./bottleContextContract";
@@ -57,12 +62,6 @@ import {
   buildAuditBottleAgentInput,
   buildDefaultBottleSearchInput,
 } from "./runtime/agentInput";
-import {
-  runAgent,
-  stripProviderUnsupportedFormats,
-  type AgentRunResult,
-  type AgentTool,
-} from "./runtime/agentRun";
 import {
   bottleContextToCandidate,
   createBottleContextLoader,
@@ -155,58 +154,12 @@ const BottleAuditAgentOutputSchema = z
   })
   .strict();
 
-const JsonValueSchema = z.json();
-const JsonObjectSchema = z.record(z.string(), JsonValueSchema);
-type JsonValue = z.infer<typeof JsonValueSchema>;
-const AgentOutputJsonSchema = z.discriminatedUnion("additionalProperties", [
-  z
-    .object({
-      type: z.literal("object"),
-      properties: z.record(z.string(), JsonObjectSchema),
-      required: z.array(z.string()),
-      additionalProperties: z.literal(false),
-      description: z.string().optional(),
-    })
-    .passthrough(),
-  z
-    .object({
-      type: z.literal("object"),
-      properties: z.record(z.string(), JsonObjectSchema),
-      required: z.array(z.string()),
-      additionalProperties: z.literal(true),
-      description: z.string().optional(),
-    })
-    .passthrough(),
-]);
-
-export type AgentOutputType = { name: string; schema: JSONSchema7 };
-
-function createAgentOutputType(
-  name: string,
-  schema: z.ZodObject,
-): AgentOutputType {
-  // The OpenAI helper makes nullable optional fields required on the wire and
-  // rejects optional non-nullable fields before the provider request.
-  const generatedSchema = zodTextFormat(schema, name).schema;
-  // Zod attaches non-JSON Standard Schema metadata to the generated object.
-  // The provider contract owns only its serialized JSON representation.
-  const providerSchema = JsonObjectSchema.parse(
-    JSON.parse(JSON.stringify(generatedSchema)),
-  );
-  return {
-    name,
-    schema: AgentOutputJsonSchema.parse(
-      stripProviderUnsupportedFormats(providerSchema),
-    ),
-  };
-}
-
-const BottleReferenceAgentOutputType = createAgentOutputType(
+const BottleReferenceAgentOutputType = agentOutput(
   "bottle_reference_output",
   BottleReferenceAgentOutputSchema,
 );
 
-const BottleAuditAgentOutputType = createAgentOutputType(
+const BottleAuditAgentOutputType = agentOutput(
   "bottle_audit_output",
   BottleAuditAgentOutputSchema,
 );
@@ -398,7 +351,7 @@ function getBottleClassifierDataSource(
 /** One agent run: what the model sees and the turn limit. */
 export type PreparedAgentRequest = {
   instructions: string;
-  output: AgentOutputType;
+  output: AgentOutput;
   input: string;
   tools: AgentTool[];
   maxTurns: number;

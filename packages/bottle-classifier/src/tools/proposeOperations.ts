@@ -1,5 +1,5 @@
+import { strictAgentTool, type AgentTool } from "@peated/agent-run";
 import { z } from "zod";
-import { strictAgentTool, type AgentTool } from "../runtime/agentRun";
 
 import {
   DEFAULT_MAX_PROPOSED_OPERATIONS,

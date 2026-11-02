@@ -1,4 +1,4 @@
-import { tool } from "@openai/agents";
+import { strictAgentTool, type AgentTool } from "@peated/agent-run";
 import { findPagePassages, type PeatedBot } from "@peated/bot";
 import { z } from "zod";
 import {
@@ -80,13 +80,13 @@ export function createWebTools({
   web: EntityClassifierWeb;
   maxSearchQueries: number;
   onEvidence: (evidence: EntityClassificationSearchEvidence) => void;
-}) {
+}): AgentTool[] {
   let remainingQueries = maxSearchQueries;
   let remainingReads = MAX_PAGE_READS;
   let remainingFinds = MAX_PAGE_FINDS;
   const pages = new Map<string, WebPage>();
 
-  const webSearch = tool({
+  const webSearch = strictAgentTool({
     name: "web_search",
     description: WEB_SEARCH_TOOL_DESCRIPTION,
     parameters: WebSearchArgsSchema,
@@ -126,7 +126,7 @@ export function createWebTools({
     },
   });
 
-  const readPage = tool({
+  const readPage = strictAgentTool({
     name: "read_page",
     description: READ_PAGE_TOOL_DESCRIPTION,
     parameters: ReadPageArgsSchema,
@@ -170,7 +170,7 @@ export function createWebTools({
     },
   });
 
-  const findInPage = tool({
+  const findInPage = strictAgentTool({
     name: "find_in_page",
     description: FIND_IN_PAGE_TOOL_DESCRIPTION,
     parameters: FindInPageArgsSchema,

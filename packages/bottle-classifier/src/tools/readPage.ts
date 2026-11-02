@@ -1,10 +1,10 @@
+import { strictAgentTool } from "@peated/agent-run";
 import { findPagePassages, type PageRead } from "@peated/bot";
 import {
   BottleSearchEvidenceSchema,
   type BottleSearchEvidence,
 } from "../classifierTypes";
 import { startToolSpan } from "../observability";
-import { strictAgentTool } from "../runtime/agentRun";
 import { canonicalizeWebEvidenceUrl } from "../webEvidenceUrl";
 import {
   BottleWebFindInPageArgsSchema,

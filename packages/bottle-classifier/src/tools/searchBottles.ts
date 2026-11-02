@@ -1,3 +1,4 @@
+import { strictAgentTool } from "@peated/agent-run";
 import { z } from "zod";
 import {
   AgentBottleCandidateSchema,
@@ -6,7 +7,6 @@ import {
   type BottleCandidateSearchInput,
 } from "../classifierTypes";
 import { startToolSpan } from "../observability";
-import { strictAgentTool } from "../runtime/agentRun";
 
 export const SearchBottlesResultSchema = z.object({
   results: z.array(AgentBottleCandidateSchema),
