@@ -148,17 +148,27 @@ services are published on different host ports, add an untracked
 `apps/server/.env.test.local` to override `DATABASE_URL` and `REDIS_URL` for
 local test runs.
 
-Worktrees on different branches share `test_peated` by default, so one branch's
-migrations can break another's test run. To give a worktree its own database,
-set a different database name in that worktree's `apps/server/.env.test.local`:
+Each linked git worktree gets its own Postgres test database, so sessions on
+different branches cannot truncate, migrate, or disconnect each other's
+database. When `DATABASE_URL` names the default `test_peated`, even from your
+shell or `.env.test.local`, a worktree at `.claude/worktrees/fix-search-1a2b3c`
+uses `test_peated_fix_search_1a2b3c` instead. The main checkout and CI keep
+`test_peated`. Redis is still shared: tests clear rate-limit and queue keys, so
+a test that depends on Redis can still fail while another worktree's tests run.
+Tools that load `.env.test` outside Vitest, such as a local API started for web
+checks, still use `test_peated`. To choose a different name, set it in that
+worktree's `apps/server/.env.test.local`:
 
 ```shell
 DATABASE_URL=postgresql://postgres:postgres@localhost:15432/test_peated_drafts
 ```
 
 Test setup creates and migrates the database if it does not exist. Use
-lowercase letters, digits, and underscores in the name.
+lowercase letters, digits, and underscores in the name. Worktree databases stay
+after the worktree is removed; drop them when the Docker volume grows.
 
 Values set in your shell win over both files, and `.env.test.local` wins over
 `.env.test`. The `test`, `test:watch`, `test:ci`, and `evals` scripts load the
-files in that order.
+files in that order. Tests empty every table, so they refuse a database whose
+name does not start with `test`. If your shell sets `DATABASE_URL` for
+development, run tests with `env -u DATABASE_URL`.

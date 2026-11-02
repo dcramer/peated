@@ -22,7 +22,7 @@
     "dev:server": "dotenv -e .env.local -- turbo dev --filter=\"./apps/server\"",
     "dev:server:api": "dotenv -e .env.local -- pnpm --filter='./apps/server' dev:api",
     "dev:worker": "dotenv -e .env.local -- pnpm --filter='./apps/server' dev:worker",
-    "cli": "dotenv -e .env.local -- pnpm --filter='./apps/cli' cli",
+    "cli": "dotenv -e .env.local -- pnpm --silent --filter='./apps/cli' cli",
     "db": "dotenv -e .env.local -- pnpm --filter='./apps/cli' cli db",
     "db:migrate": "dotenv -e .env.local -- pnpm --filter='./apps/cli' cli db migrate",
     "db:generate": "dotenv -e .env.local -- pnpm --filter='./apps/server' exec drizzle-kit generate",
@@ -55,7 +55,7 @@
     "evals:classifier:flaky": "pnpm --filter @peated/bottle-classifier evals -- src/classifier.eval.test.ts -t 'Rogues|Spice Tree|matches Laphroaig|restore Pōkeno'",
     "evals:scraper": "pnpm --filter @peated/server evals",
     "test:ci": "CI=true pnpm -r run test:ci",
-    "postinstall": "simple-git-hooks",
+    "postinstall": "test -f .git || simple-git-hooks",
     "format": "prettier --write --cache .",
     "format:check": "prettier --check --cache .",
     "evals:scraper:e2e": "pnpm --filter @peated/server evals -- src/scraper/configured/createScraper.eval.test.ts"

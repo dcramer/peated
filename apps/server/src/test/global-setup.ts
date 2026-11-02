@@ -3,6 +3,7 @@ import pg, { Client } from "pg";
 import { normalizePostgresConnectionString } from "../db/connection";
 import { migrate } from "../db/migrate";
 import * as schema from "../db/schema";
+import { assertTestDatabaseName } from "./database-url";
 
 const TEST_DB_APPLICATION_NAME = "peated-vitest";
 
@@ -16,6 +17,7 @@ function getSetupDatabaseConfig() {
   const parsedUrl = new URL(databaseUrl);
   const applicationDatabaseName =
     parsedUrl.pathname.replace(/^\//, "") || "test_peated";
+  assertTestDatabaseName(applicationDatabaseName);
 
   return {
     applicationDatabaseName,

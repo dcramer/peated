@@ -374,6 +374,7 @@ const subcommand = program
 
 subcommand
   .command("get")
+  .alias("GET")
   .description("Read a Peated API resource")
   .argument("<path>", "API path, such as /bottles/123")
   .action(async (path) => runApiCommand("GET", path, {}));
@@ -416,6 +417,7 @@ subcommand
 for (const method of ["POST", "PUT", "PATCH", "DELETE"] as const) {
   subcommand
     .command(method.toLowerCase())
+    .alias(method)
     .description(`Send an authenticated ${method} request`)
     .argument("<path>", "API path, such as /bottles/123")
     .option("--input <file>", "Read the JSON request body from a file")

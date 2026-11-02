@@ -19,6 +19,10 @@ Peated is a public record of whisky, freely accessible to everyone.
 ## Commands
 
 - Use `pnpm`; versions for pnpm and Node.js are in `package.json`.
+- The agent shell is zsh. Quote globs and strings that start with `=`
+  (`--include='*.ts'`, `echo '---'`), and do not rely on word splitting.
+- Stop a background process by its saved PID. `pkill -f <pattern>` also
+  matches your own shell and other sessions' runs.
 - Common commands: `pnpm install`, `pnpm dev`, `pnpm dev:server`, `pnpm dev:web`,
   `pnpm test`, `pnpm check`, `pnpm lint`, `pnpm typecheck`, `pnpm format`.
 
@@ -82,8 +86,8 @@ Peated is a public record of whisky, freely accessible to everyone.
 - Use `pnpm cli auth ...` for OAuth and `pnpm cli api ...` for production API
   reads and writes. These are the only supported production CLI surfaces.
 - Sentry: organization/project `peated/peated` at `https://peated.sentry.io`.
-  Use [Sentry CLI](https://cli.sentry.dev) (`sentry`) with target detection;
-  specify `peated/peated` only if detection is wrong.
+  Use [Sentry CLI](https://cli.sentry.dev) (`sentry`). Target detection fails
+  in this repo, so pass the target: `sentry issue list peated/peated --limit 5 --json`.
 - Sentry output: `--json`, needed fields, small `--limit`. Full events and requests
   can contain sensitive data.
 

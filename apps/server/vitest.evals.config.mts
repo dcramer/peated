@@ -3,6 +3,10 @@ import path from "node:path";
 import { fileURLToPath } from "node:url";
 import { parseEnv } from "node:util";
 import { defineConfig } from "vitest/config";
+import {
+  linkedWorktreeName,
+  testDatabaseUrl,
+} from "./src/test/database-url.ts";
 
 const packageRoot = fileURLToPath(new URL(".", import.meta.url));
 const workspaceRoot = path.resolve(packageRoot, "../..");
@@ -26,6 +30,13 @@ function applyAiEnvFile(absolutePath: string): void {
 }
 
 applyAiEnvFile(path.resolve(workspaceRoot, ".env.local"));
+
+// Set before global setup and test workers start, so both see the same database.
+const databaseUrl = testDatabaseUrl(
+  process.env.DATABASE_URL,
+  linkedWorktreeName(workspaceRoot),
+);
+if (databaseUrl) process.env.DATABASE_URL = databaseUrl;
 
 export default defineConfig({
   resolve: {

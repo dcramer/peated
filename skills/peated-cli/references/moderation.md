@@ -42,7 +42,7 @@ pnpm cli api batch --input /tmp/peated-batch.json --from 8 --yes
 Read-only batches may run concurrently; mutation batches stay sequential:
 
 ```bash
-pnpm cli api batch --input /tmp/peated-reads.json --concurrency 10
+pnpm cli api batch --input /tmp/peated-reads.json --concurrency 3
 ```
 
 Never resume at a mutation after an indeterminate failure. Re-fetch first,

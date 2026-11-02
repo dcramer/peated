@@ -26,6 +26,17 @@ HTTP, add a permission-checked API route and call it through `pnpm cli api`.
 4. Obtain authorization for the exact mutation scope.
 5. Re-fetch after writes; stop on stale state, conflicts, or changed identity.
 
+## Scripting
+
+- Use `pnpm -s cli api ...` when a program reads the output. On success, stdout
+  holds only JSON; `batch` prints one JSON line per request.
+- Check the exit status before parsing. On failure, stdout holds only pnpm's
+  `[ELIFECYCLE]` line and the error goes to stderr. Never pipe `2>&1` into a
+  parser.
+- Run production read batches at `--concurrency 3` or lower. Higher values
+  caused API 500s and database pool timeouts.
+- A batch file holds at most 500 requests; split larger runs.
+
 Never expose tokens, OAuth codes, authorization headers, or private user data.
 Never infer write permission from a request to inspect, diagnose, or review.
 
