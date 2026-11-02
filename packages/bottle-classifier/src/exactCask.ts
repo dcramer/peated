@@ -93,6 +93,13 @@ export function getMarketedCaskCodeAnchor(
 export function getCandidateMarketedCaskCodeAnchor(
   candidate: BottleCandidate,
 ): string | null {
+  // Cask-specific match rule (docs/architecture/bottle-classifier.md): a
+  // Bottle stored as not a single cask is a vatting, and its cask list does not
+  // pick it out from sibling casks, so the source need not repeat it.
+  if (candidate.singleCask === false) {
+    return null;
+  }
+
   const structuredCode = candidate.caskNumber
     ? normalizeMarketedCaskCode(candidate.caskNumber)
     : null;

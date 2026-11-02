@@ -1828,6 +1828,39 @@ describe("unverified candidate cask codes", () => {
     },
   );
 
+  test("keeps a match to a vatting whose stored cask list the source omits", () => {
+    const candidate: BottleCandidate = {
+      ...existingPrivateCask,
+      fullName: "Example Members Release - 4th Edition",
+      edition: "4th Edition",
+      singleCask: false,
+      caskNumber: "12, 18/2015; 301/2016",
+    };
+
+    expect(
+      finalizeCandidateMatch({
+        candidate,
+        referenceName: "Example Members Release 4th Edition",
+      }),
+    ).toMatchObject({ action: "match", matchedBottleId: candidate.bottleId });
+  });
+
+  test("still downgrades a single-cask match when the source omits its cask code", () => {
+    const candidate: BottleCandidate = {
+      ...existingPrivateCask,
+      fullName: "Example Members Release - Cask 18",
+      singleCask: true,
+      caskNumber: "18/2015",
+    };
+
+    expect(
+      finalizeCandidateMatch({
+        candidate,
+        referenceName: "Example Members Release",
+      }),
+    ).toMatchObject({ action: "no_match", matchedBottleId: null });
+  });
+
   test("keeps a match when the source title carries the same barrel code", () => {
     const candidate: BottleCandidate = {
       ...existingPrivateCask,

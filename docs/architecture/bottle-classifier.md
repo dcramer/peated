@@ -222,7 +222,16 @@ bottler, but a stored Brand of `Canadian` for a Canadian Club Bottle does.
 
 When a matched candidate conflicts with the extracted facts, code adds a
 conflict risk and the Match goes to review. Code never turns that Match into
-No Match. The save-time duplicate check in `apps/server/src/lib/bottleConflicts.ts`
+No Match.
+
+One check is stricter. A single-cask Bottle is one cask among siblings that
+can share a product name, such as one barrel of Elijah Craig 18-year-old
+Single Barrel. When the matched Bottle stores a cask code and the source does
+not show that same code, code turns the Match into No Match
+(`rejectInvalidExistingMatch` in `packages/bottle-classifier/src/reviewPolicy.ts`).
+The source can show the code in its title, extracted facts, the agent's
+observation, or label text. A Bottle stored as not a single cask is a vatting:
+its cask list does not set it apart, so this check skips it. The save-time duplicate check in `apps/server/src/lib/bottleConflicts.ts`
 is separate: it needs every field to be exactly equal before it calls two
 Bottles the same.
 
