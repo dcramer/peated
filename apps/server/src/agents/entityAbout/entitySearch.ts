@@ -1,4 +1,4 @@
-import { tool } from "@openai/agents";
+import { strictAgentTool } from "@peated/agent-run";
 import { searchClassifierEntities } from "@peated/server/lib/classifierEntitySearch";
 import { z } from "zod";
 
@@ -10,7 +10,7 @@ const ENTITY_SEARCH_LIMIT = 5;
  * `entitiesFound`, the only IDs the writer may link.
  */
 export function createEntitySearchTool(entitiesFound: Set<number>) {
-  return tool({
+  return strictAgentTool({
     name: "search_entities",
     description:
       "Search Peated's distilleries, brands, bottlers, and companies by name or alias. Use it to link an owner or another Entity an event names. Results are Peated records, not evidence for facts.",

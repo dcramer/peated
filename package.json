@@ -40,7 +40,7 @@
     "ast-grep:lint": "ast-grep scan",
     "ast-grep:test": "ast-grep test --skip-snapshot-tests",
     "knip": "knip --include files,dependencies,devDependencies,optionalPeerDependencies,unlisted,binaries,unresolved,catalog,catalogReferences",
-    "sherif": "sherif -i @openai/agents",
+    "sherif": "sherif",
     "test": "turbo test",
     "test:all": "turbo test && pnpm --dir apps/web test:e2e",
     "test:web": "pnpm --dir apps/web test",
