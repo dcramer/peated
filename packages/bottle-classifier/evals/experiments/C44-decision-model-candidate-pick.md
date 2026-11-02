@@ -99,6 +99,6 @@ missed Tormore's "14 Year Old" (0.12).
 ## Decision
 
 Keep as a candidate veto, not an anchor. Before building it, measure it on
-saved match decisions from store listings and reviews, which make up most
-classifier volume. A veto only sends a match to review, so it fits the rule
+saved match decisions from store listings and reviews; the Luna comparison
+above covers auction lots only. A veto only sends a match to review, so it fits the rule
 that model confidence can never raise the automation tier.
