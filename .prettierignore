@@ -6,6 +6,7 @@ migrations/
 __fixtures__/
 .agents/
 CLAUDE.md
+.claude/settings.local.json
 # Prettier reads only the root .gitignore; these are ignored in apps/web.
 .next/
 .playwright/

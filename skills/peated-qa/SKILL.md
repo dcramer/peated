@@ -69,7 +69,7 @@ Keep the printed token out of committed docs and final reports. Use
 ## CLI QA
 
 1. Run the changed command through root scripts, not direct `tsx`: `pnpm cli <cmd>`.
-2. For aliases, prefer root scripts when present: `pnpm bottles`, `pnpm entities`, `pnpm tastings`, `pnpm mocks`, `pnpm user`, `pnpm db`.
+2. For aliases, prefer root scripts when present: `pnpm bottles`, `pnpm entities`, `pnpm mocks`, `pnpm user`, `pnpm db`.
 3. Use a harmless local fixture or throwaway record.
 4. Verify stdout/stderr, exit status, and DB/API side effect.
 5. For destructive commands, use dry-run/help first when available; otherwise use local throwaway data only.
@@ -111,9 +111,8 @@ Minimal input-file payload:
 3. Choose the auth primitive before opening the target route:
    - Public/read-only route: no session setup.
    - Normal protected workflow: use the UI login path.
-   - Owner/moderator-only visual check: use the local verification playbook to
-     create a session cookie for the exact user/role being inspected, then
-     reload the target route.
+   - Owner/moderator-only check: log in through the UI as a local user with
+     that role, as `docs/development/local-web-checks.md` describes.
    - Protected mutation: use a real local user and access token/session, not a
      display-only cookie.
 4. Use `agent-browser` for browser checks.
@@ -121,12 +120,12 @@ Minimal input-file payload:
    accessibility snapshots and screenshots.
 6. Verify desktop and mobile widths for changed user-facing flows.
 7. Prefer normal login:
-   `/login?redirectTo=/addBottle` -> `Sign in with Email` -> `Or sign in with a password`.
+   `/login?redirectTo=/addBottle` -> `Continue with email` -> `Or sign in with a password`.
 8. For local protected UI checks, seed a throwaway verified active user with
    `termsAcceptedAt`, then log in through the UI. Do not use bearer-token API
    setup or a manually sealed `_session` cookie for UI QA unless normal UI login
    is blocked by unrelated local service noise.
-9. For moderator flows, set that throwaway user `mod: true`.
+9. For moderator or admin flows, create that throwaway user with `--admin`.
 10. For bottle entry changes, check `/addBottle` and `/bottles/<id>/edit`.
 11. Inspect rendered state, network/API outcome, persistence after reload, and error/empty/loading states when changed.
 12. Clean up throwaway local users/records when done.
@@ -135,7 +134,8 @@ Agent-browser primitives:
 
 - Set the viewport before capture: desktop first, then mobile.
 - Use `snapshot -i -c` to verify reachable controls and table/list structure.
-- Save screenshots under `/tmp` with names that include the route and viewport.
+- Save screenshots under the worktree's gitignored `.cache/` with names that
+  include the route and viewport.
 - For owner-only columns or controls, verify the public state only if it is part
   of the requested behavior; otherwise authenticate first and avoid spending
   time on the wrong state.
