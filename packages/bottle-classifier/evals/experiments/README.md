@@ -120,6 +120,7 @@ their records remain. Test-case corrections are separate from classifier changes
 | [C41: Decision-model scope check](./C41-decision-model-scope-check.md)                 | Ask Jev whether an auction lot sells one whisky bottle                                  | Rejected for automatic ignores: 99% right, but confident misses on the edge cases      |
 | [C42: Narrow scope questions](./C42-narrow-scope-questions.md)                         | Ask Jev ten narrow yes-or-no scope questions in one call                                | Rejected: worse than one pick-one question; cask-finish question missed Longrow Red    |
 | [C43: Decision-model edition equivalence](./C43-decision-model-edition-equivalence.md) | Ask Jev whether two edition texts name the same edition                                 | Promising: no wrong answer at 0.5+ on 151 pairs; confirm on real blocked matches       |
+| [C44: Decision-model candidate pick](./C44-decision-model-candidate-pick.md)           | Ask Jev which candidate the source is, as a second opinion on Luna                      | Mixed: vetoes 5 of 11 wrong matches, holds 4 of 51 right; unsafe as an anchor          |
 
 C09 and C10 add narrow checks after Luna, and C11 removes model work for an
 identity Peated has already accepted. The measurement and test-case corrections
