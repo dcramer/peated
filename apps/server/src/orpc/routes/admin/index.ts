@@ -1,4 +1,5 @@
 import { base } from "../..";
+import botSites from "./bot-sites";
 import catalogCoverage from "./catalog-coverage";
 import clearBottleDescriptions from "./clear-bottle-descriptions";
 import clearEntityDescriptions from "./clear-entity-descriptions";
@@ -16,6 +17,7 @@ import writeEntityAbout from "./write-entity-about";
 import wrongPhotoMatches from "./wrongPhotoMatches";
 
 export default base.tag("admin").router({
+  botSites,
   clearBottleDescriptions,
   clearEntityDescriptions,
   clearGuessedEntityDetails,
