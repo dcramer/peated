@@ -412,7 +412,7 @@ wall, PeatedBot marks the website as blocked and the runtime sends the request
 again through Firecrawl. That works only for a plain GET: a POST, or a request
 with headers such as an API key, fails the run as blocked instead. Later
 requests to a blocked website go through Firecrawl until an admin clears the
-mark. This follows the
+mark in Admin → Scrapers → Website access. This follows the
 [blocked websites policy](../../../../docs/policies/blocked-websites.md).
 When `PEATED_BOT_PRIVATE_JWK` is configured, PeatedBot signs each direct
 request with Cloudflare Web Bot Auth. Follow the

@@ -46,6 +46,7 @@ export default function Page() {
         description="Check what each source has saved and what needs attention."
         actions={
           <AdminActions>
+            <Button href="/admin/website-access">Website access</Button>
             <Button href="/admin/sites/add" variant="accent">
               Add site
             </Button>

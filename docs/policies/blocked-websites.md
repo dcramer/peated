@@ -30,7 +30,8 @@ or paywall.
 - Never read or search Peated's own websites (`peated.com` and its
   subdomains). Their pages repeat Peated's records, so they are not evidence.
 - Only an admin may set a robots.txt exception, and only for one website at a
-  time, with a written reason.
+  time, with a written reason. Admins set and remove exceptions, and clear
+  blocked marks, in Admin → Scrapers → Website access.
 - Scrapers send direct PeatedBot requests, signed when
   `PEATED_BOT_PRIVATE_JWK` is configured. When a direct request hits a bot wall,
   the system marks that website as blocked. Later requests to a blocked website
