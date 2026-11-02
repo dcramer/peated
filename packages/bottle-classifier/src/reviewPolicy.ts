@@ -18,9 +18,7 @@ import type {
 import { BottleClassificationError } from "./error";
 import {
   candidateHasExactCaskCodeAnchor,
-  getCandidateMarketedCaskCodeAnchor,
   getExactCaskCodeAnchor,
-  getMarketedCaskCodeAnchor,
 } from "./exactCask";
 import { compareBottleFields, getBottleFieldConflicts } from "./fieldConflicts";
 import { normalizeString } from "./normalize";
@@ -433,11 +431,9 @@ function addFieldConflictRisk(
 }
 
 function rejectInvalidExistingMatch({
-  reference,
   decision,
   artifacts,
 }: {
-  reference: BottleReferenceInput;
   decision: BottleClassificationDecision;
   artifacts: BottleClassificationArtifacts;
 }): BottleClassificationDecision {
@@ -455,56 +451,6 @@ function rejectInvalidExistingMatch({
       rationale: appendRationale(
         decision.rationale,
         "Server downgraded the existing-match recommendation because the matched target was not present in the reviewed candidates.",
-      ),
-    });
-  }
-
-  const candidateCaskCode = getCandidateMarketedCaskCodeAnchor(target);
-  // SMWS identity rule: a code composed from the label is verified source evidence.
-  const smwsCode = getSmwsCodeAnchor({ reference, decision, artifacts });
-  const allowSourceProgramCode = candidateCaskCode?.includes(".") === true;
-  const sourceCaskCodes = [
-    smwsCode,
-    getMarketedCaskCodeAnchor(reference.name, {
-      allowProgramCode: allowSourceProgramCode,
-    }),
-    getMarketedCaskCodeAnchor(artifacts.extractedIdentity?.cask_number, {
-      allowBareCode: true,
-    }),
-    getMarketedCaskCodeAnchor(artifacts.extractedIdentity?.edition, {
-      allowProgramCode: allowSourceProgramCode,
-    }),
-    getMarketedCaskCodeAnchor(artifacts.extractedIdentity?.expression, {
-      allowProgramCode: allowSourceProgramCode,
-    }),
-    getMarketedCaskCodeAnchor(decision.observation?.caskNumber, {
-      allowBareCode: true,
-    }),
-    getMarketedCaskCodeAnchor(decision.observation?.barrelNumber, {
-      allowBareCode: true,
-    }),
-    getMarketedCaskCodeAnchor(
-      artifacts.imageEvidence?.fieldCandidates.caskNumber?.value,
-      { allowBareCode: true },
-    ),
-    ...(artifacts.imageEvidence?.extractors.flatMap((extractor) =>
-      extractor.textSpans.map((span) =>
-        getMarketedCaskCodeAnchor(span.text, {
-          allowProgramCode: allowSourceProgramCode,
-        }),
-      ),
-    ) ?? []),
-  ].filter((code): code is string => code !== null);
-
-  if (candidateCaskCode && !sourceCaskCodes.includes(candidateCaskCode)) {
-    return createNoMatchDecision({
-      decision,
-      candidateBottleIds: decision.candidateBottleIds,
-      observation: decision.observation,
-      identityScope: decision.identityScope,
-      rationale: appendRationale(
-        decision.rationale,
-        `Server downgraded the existing-match recommendation because candidate cask code ${candidateCaskCode} was not established by the source.`,
       ),
     });
   }
@@ -877,7 +823,6 @@ export function finalizeBottleReferenceClassification({
   // consumers now derive review routing from structured evidence via
   // `deriveAutomationTier`, so review gating no longer lives in this pipeline.
   const reviewedDecision = rejectInvalidExistingMatch({
-    reference,
     decision: agentEvidenceAdjustedDecision,
     artifacts,
   });

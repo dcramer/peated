@@ -224,14 +224,13 @@ When a matched candidate conflicts with the extracted facts, code adds a
 conflict risk and the Match goes to review. Code never turns that Match into
 No Match.
 
-One check is stricter. A single-cask Bottle is one cask among siblings that
-can share a product name, such as one barrel of Elijah Craig 18-year-old
-Single Barrel. When the matched Bottle stores a cask code and the source does
-not show that same code, code turns the Match into No Match
-(`rejectInvalidExistingMatch` in `packages/bottle-classifier/src/reviewPolicy.ts`).
-The source can show the code in its title, extracted facts, the agent's
-observation, or label text. A Bottle stored as not a single cask is a vatting:
-its cask list does not set it apart, so this check skips it. The save-time duplicate check in `apps/server/src/lib/bottleConflicts.ts`
+Whether a source names the one cask behind a single-cask Bottle is also the
+agent's judgment. Code used to turn a Match into No Match when the source did
+not repeat the Bottle's stored cask number. That check misread vattings with a
+stored cask list, cask numbers printed without their fill year, and casks sold
+under a name, and it relied on stored flags that are sometimes wrong. It was
+removed after the agent declined or created correctly for a generic source on
+its own ([C40](../../packages/bottle-classifier/evals/experiments/C40-agent-judges-cask-codes.md)). The save-time duplicate check in `apps/server/src/lib/bottleConflicts.ts`
 is separate: it needs every field to be exactly equal before it calls two
 Bottles the same.
 
