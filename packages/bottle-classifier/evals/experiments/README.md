@@ -77,6 +77,7 @@ their records remain. Test-case corrections are separate from classifier changes
 | [C37: Decision vocabulary](./C37-decision-vocabulary.md)                             | Define `webEvidence` values and which fields can conflict                               | Entity rule accepted alone: 191 vs 189; `webEvidence` definitions rejected: 185 vs 191 |
 | [C38: Release name defines a Bottle](./C38-release-name-defines-bottle.md)           | Treat a release name kept in `name` as defining a distinct Bottle                       | Accepted: 307 vs 304 of 351; no wrong matches vs 3; Elijah Craig Cask Strength 1/3     |
 | [C40: Agent judges cask codes](./C40-agent-judges-cask-codes.md)                     | Remove C09's post-model cask-code check                                                 | Accepted: 56 vs 55 of 60; no wrong matches; C09 targets created 6/6 without it         |
+| [C41: Decision-model scope check](./C41-decision-model-scope-check.md)               | Ask Jev whether an auction lot sells one whisky bottle                                  | Rejected for automatic ignores: 99% right, but confident misses on the edge cases      |
 
 C09 and C10 add narrow checks after Luna, and C11 removes model work for an
 identity Peated has already accepted. The measurement and test-case corrections
