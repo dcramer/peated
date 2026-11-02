@@ -89,6 +89,15 @@ long inputs and tool outputs.
   sources split on an event's kind, such as closed and mothballed, the case
   lists each kind. Run it alone with
   `pnpm --filter @peated/server evals -- src/agents/entityAbout/writer.eval.test.ts`.
+- The Entity classifier check,
+  `apps/server/src/agents/entityClassifier/classifier.eval.test.ts`, is also a
+  server model check that `trigger-evals-scraper` runs. Its 12 cases in
+  `evals/cases.ts` are real Entity rows, each with a recorded source for its
+  answer. Its web tools read only the saved passages in `evals/pages.json`, so
+  it needs no Firecrawl key. It compares the advice kind and target Entity. A
+  safer `insufficient_evidence` still fails a case that has a clear answer.
+  Run it alone with
+  `pnpm --filter @peated/server evals -- src/agents/entityClassifier/classifier.eval.test.ts`.
 - The AI SDK model check, `apps/server/src/lib/aiSdkModels.eval.test.ts`,
   also runs with `trigger-evals-scraper`. It only confirms that the decision
   model in `DECISION_MODEL` (Jev by default) and the default language model

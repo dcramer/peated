@@ -1,5 +1,5 @@
-import { Agent, OpenAIProvider, Runner } from "@openai/agents";
-import type OpenAI from "openai";
+import { agentOutput, runAgent } from "@peated/agent-run";
+import type { LanguageModel } from "ai";
 import {
   EntityClassificationAdviceSchema,
   EntityResolutionSchema,
@@ -30,6 +30,10 @@ import {
 } from "./tools";
 
 const ENTITY_CLASSIFIER_MAX_TURNS = 8;
+const EntityClassifierOutput = agentOutput(
+  "entity_classification_advice",
+  EntityClassificationAdviceSchema,
+);
 
 export type RunEntityClassifierAgentInput = {
   context: EntityClassificationContext;
@@ -40,7 +44,7 @@ export type EntityClassifierAdapters = {
 };
 
 export type CreateEntityClassifierOptions = {
-  client: OpenAI;
+  languageModel: (modelId: string) => LanguageModel;
   model: string;
   maxSearchQueries: number;
   /** PeatedBot, or null to run without the web. */
@@ -146,31 +150,7 @@ export function createEntityClassifier(
         : []),
     ];
 
-    const agent = new Agent({
-      name: "entity_classifier_reasoner",
-      instructions,
-      model: options.model,
-      modelSettings: {
-        parallelToolCalls: false,
-        ...getDeterministicOpenAISettings(options.model),
-      },
-      outputType: EntityClassificationAdviceSchema,
-      tools,
-    });
     const conversationId = `entity:${context.entity.id}`;
-    const runner = new Runner({
-      tracingDisabled: true,
-      modelProvider: new OpenAIProvider({
-        openAIClient: options.client,
-        useResponses: true,
-      }),
-      workflowName: "Entity Classifier",
-      groupId: conversationId,
-      traceMetadata: {
-        "gen_ai.conversation.id": conversationId,
-        entity_id: `${context.entity.id}`,
-      },
-    });
 
     try {
       const result = await startAgentSpan({
@@ -182,13 +162,18 @@ export function createEntityClassifier(
           "entity_classifier.entity_name": context.entity.name,
         },
         callback: async () =>
-          await runner.run(agent, buildAgentInput(context), {
+          await runAgent({
+            model: options.languageModel(options.model),
+            functionId: "entity_classifier",
+            instructions,
+            input: buildAgentInput(context),
+            tools,
+            output: EntityClassifierOutput,
             maxTurns: ENTITY_CLASSIFIER_MAX_TURNS,
+            temperature: getDeterministicOpenAISettings(options.model)
+              .temperature,
           }),
       });
-      if (!result.finalOutput) {
-        throw new Error("Agent returned empty output");
-      }
 
       const artifacts = buildEntityClassificationArtifacts({
         resolvedEntities: Array.from(resolvedEntities.values()).sort(
@@ -198,7 +183,7 @@ export function createEntityClassifier(
       });
       const advice = finalizeEntityClassification({
         context,
-        advice: EntityClassificationAdviceSchema.parse(result.finalOutput),
+        advice: EntityClassificationAdviceSchema.parse(result.output),
         artifacts,
       });
 

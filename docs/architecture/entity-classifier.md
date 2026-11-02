@@ -13,6 +13,9 @@ Server composition lives in:
 
 - `apps/server/src/agents/entityClassifier/service.ts`
 
+The model check is `apps/server/src/agents/entityClassifier/classifier.eval.test.ts`.
+See [Model Checks](../development/model-checks.md).
+
 Suspect-row discovery is separate and remains server-owned:
 
 - `apps/server/src/lib/entityAuditCandidates.ts`

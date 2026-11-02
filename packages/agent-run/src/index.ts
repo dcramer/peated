@@ -9,9 +9,8 @@ import {
   type LanguageModel,
   type ToolSet,
 } from "ai";
-import { zodFunction } from "openai/helpers/zod";
+import { zodFunction, zodTextFormat } from "openai/helpers/zod";
 import { z } from "zod";
-import type { OpenAIReasoningEffort } from "../openaiModelSettings";
 
 export type AgentToolCall = { toolCallId: string };
 
@@ -22,8 +21,8 @@ export type AgentToolInput = JSONValue;
 export type AgentToolOutput = JSONValue;
 
 /**
- * A tool the classifier agents can call. Each tool parses its own input, so
- * the model library only sees the JSON schema.
+ * A tool an agent can call. Each tool parses its own input, so the model
+ * library only sees the JSON schema.
  */
 export type AgentTool = {
   name: string;
@@ -38,6 +37,25 @@ export type AgentTool = {
 const JsonValueSchema = z.json();
 type JsonValue = z.infer<typeof JsonValueSchema>;
 const JsonSchemaObjectSchema = z.record(z.string(), JsonValueSchema);
+// An agent's final answer is always one object with no extra fields.
+const AgentOutputJsonSchema = z.discriminatedUnion("additionalProperties", [
+  z
+    .object({
+      type: z.literal("object"),
+      additionalProperties: z.literal(false),
+      properties: z.record(z.string(), JsonSchemaObjectSchema),
+      required: z.array(z.string()),
+    })
+    .passthrough(),
+  z
+    .object({
+      type: z.literal("object"),
+      additionalProperties: z.literal(true),
+      properties: z.record(z.string(), JsonSchemaObjectSchema),
+      required: z.array(z.string()),
+    })
+    .passthrough(),
+]);
 
 /**
  * Removes `format` keywords. OpenAI strict schemas reject formats such as
@@ -91,6 +109,26 @@ export function strictAgentTool<Input>({
   };
 }
 
+export type AgentOutput = { name: string; schema: JSONSchema7 };
+
+/** The JSON schema a model must answer in, built from `schema`. */
+export function agentOutput(name: string, schema: z.ZodObject): AgentOutput {
+  // The OpenAI helper makes nullable optional fields required on the wire and
+  // rejects optional non-nullable fields before the provider request.
+  const generatedSchema = zodTextFormat(schema, name).schema;
+  // Zod attaches non-JSON Standard Schema metadata to the generated object.
+  // The provider contract owns only its serialized JSON representation.
+  const providerSchema = JsonSchemaObjectSchema.parse(
+    JSON.parse(JSON.stringify(generatedSchema)),
+  );
+  return {
+    name,
+    schema: AgentOutputJsonSchema.parse(
+      stripProviderUnsupportedFormats(providerSchema),
+    ),
+  };
+}
+
 export type AgentRunUsage = {
   requests: number;
   inputTokens?: number;
@@ -115,10 +153,10 @@ export type AgentRunRequest = {
   instructions: string;
   input: string;
   tools: AgentTool[];
-  output: { name: string; schema: JSONSchema7 };
+  output: AgentOutput;
   maxTurns: number;
   temperature?: number;
-  reasoning?: OpenAIReasoningEffort;
+  reasoning?: "none" | "low" | "medium" | "high" | "xhigh";
   signal?: AbortSignal;
 };
 
@@ -137,7 +175,7 @@ function toToolSet(tools: AgentTool[]): ToolSet {
   );
 }
 
-/** Runs one classifier agent: tool calls until a final structured answer. */
+/** Runs one agent: tool calls until a final structured answer. */
 export async function runAgent({
   model,
   functionId,

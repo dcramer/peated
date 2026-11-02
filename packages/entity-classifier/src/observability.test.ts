@@ -76,10 +76,10 @@ describe("observability span contexts", () => {
         attributes: {
           "entity_classifier.entity_id": "42",
         },
-        callback: async () => "done",
+        callback: async () => ({ usage: { requests: 1 } }),
         startSpan: capture.startSpan,
       }),
-    ).resolves.toBe("done");
+    ).resolves.toEqual({ usage: { requests: 1 } });
 
     expect(capture.contexts).toEqual([
       expect.objectContaining({
@@ -102,13 +102,12 @@ describe("observability span contexts", () => {
       name: "Entity Classifier",
       conversationId: "entity:usage",
       callback: async () => ({
-        state: {
-          usage: {
-            inputTokens: 100,
-            inputTokensDetails: [{ cached_tokens: 40 }],
-            outputTokens: 20,
-            outputTokensDetails: [{ reasoning_tokens: 7 }],
-          },
+        usage: {
+          requests: 2,
+          inputTokens: 100,
+          cachedInputTokens: 40,
+          outputTokens: 20,
+          reasoningTokens: 7,
         },
       }),
       startSpan: capture.startSpan,

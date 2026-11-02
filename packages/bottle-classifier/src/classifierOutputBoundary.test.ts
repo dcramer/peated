@@ -1,3 +1,4 @@
+import { runAgent } from "@peated/agent-run";
 import { MockLanguageModelV4 } from "ai/test";
 import { describe, expect, test, vi } from "vitest";
 import { z } from "zod";
@@ -7,7 +8,6 @@ import {
   prepareBottleClassifierAgentRun,
   type PreparedAgentRequest,
 } from "./classifierRuntime";
-import { runAgent } from "./runtime/agentRun";
 import { agentRunResult, createTestLanguageModel } from "./testLanguageModel";
 
 const JsonValueSchema = z.json();

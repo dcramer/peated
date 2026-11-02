@@ -1,7 +1,7 @@
+import type { AgentRunResult, AgentToolResult } from "@peated/agent-run";
 import type { JSONValue } from "ai";
 import { MockLanguageModelV4 } from "ai/test";
 import { vi } from "vitest";
-import type { AgentRunResult, AgentToolResult } from "./runtime/agentRun";
 
 type GenerateResult = Awaited<ReturnType<MockLanguageModelV4["doGenerate"]>>;
 

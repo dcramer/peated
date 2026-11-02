@@ -2,8 +2,8 @@
  * Owns classifier span metadata. Tool payloads are bounded before they reach
  * tracing and callers must keep them limited to public catalog/source data.
  */
+import type { AgentRunUsage } from "@peated/agent-run";
 import { startSpan as startSentrySpan, type Span } from "@sentry/core";
-import { z } from "zod";
 
 const MAX_ATTRIBUTE_LENGTH = 12_000;
 const OPENAI_PROVIDER = "openai";
@@ -22,100 +22,16 @@ function compactJson(value: Parameters<typeof JSON.stringify>[0]): string {
   return `${serialized.slice(0, MAX_ATTRIBUTE_LENGTH)}...`;
 }
 
-const TokenDetailsSchema = z.union([
-  z.record(z.string(), z.number()),
-  z.array(z.record(z.string(), z.number())),
-]);
-const AgentUsageSchema = z
-  .object({
-    inputTokens: z.number().optional(),
-    outputTokens: z.number().optional(),
-    inputTokensDetails: TokenDetailsSchema.optional(),
-    outputTokensDetails: TokenDetailsSchema.optional(),
-  })
-  .passthrough();
-const UsageOwnerSchema = z
-  .object({ usage: AgentUsageSchema.optional() })
-  .passthrough();
-const AgentResultSchema = z
-  .object({
-    state: UsageOwnerSchema.optional(),
-    runContext: UsageOwnerSchema.optional(),
-    usage: AgentUsageSchema.optional(),
-  })
-  .passthrough();
-type AgentResultInput = Parameters<typeof AgentResultSchema.safeParse>[0];
-type AgentUsage = z.infer<typeof AgentUsageSchema>;
-type UsageNumberProperty = "inputTokens" | "outputTokens";
-type UsageDetailsProperty = "inputTokensDetails" | "outputTokensDetails";
-
-function measuredNumber(
-  usage: AgentUsage | undefined,
-  property: UsageNumberProperty,
-): number | undefined {
-  const candidate = usage?.[property];
-  const measured = z.number().finite().safeParse(candidate);
-  return measured.success ? measured.data : undefined;
-}
-
-function usageDetailTotal(
-  usage: AgentUsage | undefined,
-  detailsProperty: UsageDetailsProperty,
-  valueProperties: string[],
-): number | undefined {
-  const details = usage?.[detailsProperty];
-  const entries = Array.isArray(details) ? details : details ? [details] : [];
-  let measured = false;
-  let total = 0;
-
-  for (const entry of entries) {
-    for (const property of valueProperties) {
-      const value = entry[property];
-      if (value !== undefined) {
-        measured = true;
-        total += value;
-        break;
-      }
-    }
-  }
-
-  return measured ? total : undefined;
-}
-
-function getAgentResultUsage(result: AgentResultInput): AgentUsage | undefined {
-  const parsed = AgentResultSchema.safeParse(result);
-  if (!parsed.success) return undefined;
-
-  return (
-    parsed.data.state?.usage ??
-    parsed.data.runContext?.usage ??
-    parsed.data.usage
-  );
-}
-
-function setAgentResultAttributes(
+function setAgentUsageAttributes(
   span: { setAttribute: (key: string, value: string | number) => void },
-  result: AgentResultInput,
+  usage: AgentRunUsage,
 ) {
-  const usage = getAgentResultUsage(result);
   const attributes = {
-    "gen_ai.usage.input_tokens": measuredNumber(usage, "inputTokens"),
-    "gen_ai.usage.cache_read.input_tokens": usageDetailTotal(
-      usage,
-      "inputTokensDetails",
-      ["cached_tokens", "cachedTokens"],
-    ),
-    "gen_ai.usage.cache_creation.input_tokens": usageDetailTotal(
-      usage,
-      "inputTokensDetails",
-      ["cache_write_tokens", "cacheWriteTokens"],
-    ),
-    "gen_ai.usage.output_tokens": measuredNumber(usage, "outputTokens"),
-    "gen_ai.usage.reasoning.output_tokens": usageDetailTotal(
-      usage,
-      "outputTokensDetails",
-      ["reasoning_tokens", "reasoningTokens"],
-    ),
+    "gen_ai.usage.input_tokens": usage.inputTokens,
+    "gen_ai.usage.cache_read.input_tokens": usage.cachedInputTokens,
+    "gen_ai.usage.cache_creation.input_tokens": usage.cacheWriteTokens,
+    "gen_ai.usage.output_tokens": usage.outputTokens,
+    "gen_ai.usage.reasoning.output_tokens": usage.reasoningTokens,
   };
 
   for (const [key, value] of Object.entries(attributes)) {
@@ -189,7 +105,7 @@ const defaultClassifierSpanStarter: ClassifierSpanStarter = async (
  * Wraps a classifier agent run in Sentry's `gen_ai.invoke_agent` span while
  * preserving the caller-owned conversation id.
  */
-export async function startAgentSpan<T>({
+export async function startAgentSpan<T extends { usage: AgentRunUsage }>({
   name,
   conversationId,
   attributes = {},
@@ -206,7 +122,7 @@ export async function startAgentSpan<T>({
     buildAgentSpanContext({ name, conversationId, attributes }),
     async (span) => {
       const result = await callback();
-      setAgentResultAttributes(span, result);
+      setAgentUsageAttributes(span, result.usage);
       return result;
     },
   );

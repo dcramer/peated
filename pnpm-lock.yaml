@@ -855,6 +855,34 @@ importers:
         specifier: 'catalog:'
         version: 4.1.12(@opentelemetry/api@1.9.1)(@types/node@24.13.2)(jsdom@25.0.1(supports-color@8.1.1))(vite@8.3.5(@types/node@24.13.2)(esbuild@0.28.2)(jiti@2.7.0)(terser@5.51.2)(tsx@4.23.15)(yaml@2.9.1))
 
+  packages/agent-run:
+    dependencies:
+      '@peated/tsconfig':
+        specifier: workspace:*
+        version: link:../tsconfig
+      ai:
+        specifier: ^7.0.155
+        version: 7.0.156(zod@4.5.4)
+      openai:
+        specifier: ^6.27.0
+        version: 6.27.0(ws@8.21.3)(zod@4.5.4)
+      zod:
+        specifier: 'catalog:'
+        version: 4.5.4
+    devDependencies:
+      '@types/node':
+        specifier: 'catalog:'
+        version: 24.13.2
+      typescript:
+        specifier: 'catalog:'
+        version: 5.9.3
+      vite:
+        specifier: 'catalog:'
+        version: 8.3.5(@types/node@24.13.2)(esbuild@0.28.2)(jiti@2.7.0)(terser@5.51.2)(tsx@4.23.15)(yaml@2.9.1)
+      vitest:
+        specifier: 'catalog:'
+        version: 4.1.12(@opentelemetry/api@1.9.1)(@types/node@24.13.2)(jsdom@30.1.3)(vite@8.3.5(@types/node@24.13.2)(esbuild@0.28.2)(jiti@2.7.0)(terser@5.51.2)(tsx@4.23.15)(yaml@2.9.1))
+
   packages/bot:
     dependencies:
       '@peated/tsconfig':
@@ -885,6 +913,9 @@ importers:
 
   packages/bottle-classifier:
     dependencies:
+      '@peated/agent-run':
+        specifier: workspace:*
+        version: link:../agent-run
       '@peated/bot':
         specifier: workspace:*
         version: link:../bot
@@ -960,9 +991,9 @@ importers:
 
   packages/entity-classifier:
     dependencies:
-      '@openai/agents':
-        specifier: ^0.6.0
-        version: 0.6.0(supports-color@8.1.1)(ws@8.21.3)(zod@4.5.4)
+      '@peated/agent-run':
+        specifier: workspace:*
+        version: link:../agent-run
       '@peated/bot':
         specifier: workspace:*
         version: link:../bot
@@ -972,9 +1003,9 @@ importers:
       '@sentry/core':
         specifier: 'catalog:'
         version: 11.10.0
-      openai:
-        specifier: ^6.27.0
-        version: 6.27.0(ws@8.21.3)(zod@4.5.4)
+      ai:
+        specifier: ^7.0.155
+        version: 7.0.156(zod@4.5.4)
       zod:
         specifier: 'catalog:'
         version: 4.5.4
@@ -13854,7 +13885,7 @@ snapshots:
 
   '@vitest-evals/core@0.16.1':
     dependencies:
-      zod: 4.5.4
+      zod: 4.6.7
 
   '@vitest-evals/report-ui@0.16.1':
     dependencies:
@@ -15047,8 +15078,8 @@ snapshots:
       '@babel/parser': 7.29.7
       eslint: 10.8.0(jiti@2.7.0)(supports-color@8.1.1)
       hermes-parser: 0.25.1
-      zod: 4.5.4
-      zod-validation-error: 4.0.2(zod@4.5.4)
+      zod: 4.6.7
+      zod-validation-error: 4.0.2(zod@4.6.7)
     transitivePeerDependencies:
       - supports-color
 
@@ -19560,9 +19591,9 @@ snapshots:
       zod: 4.5.4
     optional: true
 
-  zod-validation-error@4.0.2(zod@4.5.4):
+  zod-validation-error@4.0.2(zod@4.6.7):
     dependencies:
-      zod: 4.5.4
+      zod: 4.6.7
 
   zod@3.25.76: {}
 
