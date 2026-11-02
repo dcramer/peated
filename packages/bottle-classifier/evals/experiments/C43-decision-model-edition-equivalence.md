@@ -71,10 +71,10 @@ One run on 2026-11-02: 151 calls, no failures, total estimated cost $0.0025.
   `Committee Release` vs `Ardbeg Day · Fèis Ìle 2019` as different (0.77).
 - Jev's one wrong answer was low-confidence: it called
   `for Nauticus and Royal Mile Whiskies` and
-  `Royal Mile Whiskies & Nauticus Exclusive` different at 0.45. It could not
-  tell `Committee Release` from `Committee Edition`, `for The Whisky
-Exchange` from `The Whisky Exchange Exclusive`, or `Distillery Exclusive`
-  from `Distillery Only`.
+  `Royal Mile Whiskies & Nauticus Exclusive` different at 0.45.
+- It could not tell three pairs: `Committee Release` vs `Committee Edition`,
+  `for The Whisky Exchange` vs `The Whisky Exchange Exclusive`, and
+  `Distillery Exclusive` vs `Distillery Only`.
 - `Cask #2787` vs `Cask 2787 · Fèis Ìle 2023` was right but only at 0.50.
 
 ## Next step
