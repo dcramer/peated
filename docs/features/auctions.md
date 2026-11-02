@@ -8,7 +8,9 @@ multipacks, miniatures, samples (including duty-paid trade samples),
 distillery hand-fills (bottles a visitor fills from a cask at the distillery,
 including Bruichladdich Valinch bottles), glassware and other accessories, and
 other spirits are out of scope. Hand-fills are not marketed releases, so they
-stay out of the catalog, as Catalog Maintenance already says.
+stay out of the catalog, as Catalog Maintenance already says. A bottle sold
+with a book, print, or coaster is still one whisky bottle; a bottle sold with
+glasses or a mini is a set.
 
 ## Stored records
 

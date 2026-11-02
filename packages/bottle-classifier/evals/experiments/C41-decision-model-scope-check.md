@@ -110,7 +110,9 @@ Possible uses that keep a person in the loop: a "likely not one whisky
 bottle" suggestion in the Inbox, or a one-time sweep of the review queue
 with each flag checked by hand.
 
-Open rule question found while labeling: the October 26 title review kept
-bottles sold with a book, print, or coaster, but the agent and moderators
-have ignored such lots since, and the classifier instructions put a bottle
-sold "with glassware or other items" out of scope.
+Rule question found while labeling, settled by the owner on 2026-11-02: a
+bottle sold with a book, print, or coaster is in scope, as the October 26
+title review kept it. A bottle sold with glasses or a mini is a set. The
+classifier instructions still say a Bottle sold "with glassware or other
+items" is out, and the agent and moderators have ignored some book and print
+lots since, so the instructions need a tested change.
