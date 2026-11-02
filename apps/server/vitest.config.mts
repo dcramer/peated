@@ -1,6 +1,9 @@
 import { fileURLToPath } from "node:url";
 import { defineConfig } from "vitest/config";
-import { linkedWorktreeName, testDatabaseUrl } from "./src/test/database-url";
+import {
+  linkedWorktreeName,
+  testDatabaseUrl,
+} from "./src/test/database-url.ts";
 
 // Set before global setup and test workers start, so both see the same database.
 const databaseUrl = testDatabaseUrl(

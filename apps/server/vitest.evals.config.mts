@@ -3,7 +3,10 @@ import path from "node:path";
 import { fileURLToPath } from "node:url";
 import { parseEnv } from "node:util";
 import { defineConfig } from "vitest/config";
-import { linkedWorktreeName, testDatabaseUrl } from "./src/test/database-url";
+import {
+  linkedWorktreeName,
+  testDatabaseUrl,
+} from "./src/test/database-url.ts";
 
 const packageRoot = fileURLToPath(new URL(".", import.meta.url));
 const workspaceRoot = path.resolve(packageRoot, "../..");

@@ -125,7 +125,9 @@ Minimal input-file payload:
    `termsAcceptedAt`, then log in through the UI. Do not use bearer-token API
    setup or a manually sealed `_session` cookie for UI QA unless normal UI login
    is blocked by unrelated local service noise.
-9. For moderator or admin flows, create that throwaway user with `--admin`.
+9. For moderator or admin flows, create that throwaway user with `--admin`,
+   which also sets moderator. No flag creates a moderator who is not an admin,
+   so a route that wrongly requires admin needs a backend test.
 10. For bottle entry changes, check `/addBottle` and `/bottles/<id>/edit`.
 11. Inspect rendered state, network/API outcome, persistence after reload, and error/empty/loading states when changed.
 12. Clean up throwaway local users/records when done.

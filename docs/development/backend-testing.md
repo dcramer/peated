@@ -148,12 +148,16 @@ services are published on different host ports, add an untracked
 `apps/server/.env.test.local` to override `DATABASE_URL` and `REDIS_URL` for
 local test runs.
 
-Each linked git worktree gets its own test database, so sessions on different
-branches cannot truncate, migrate, or disconnect each other's runs. When
-`DATABASE_URL` names the default `test_peated`, a worktree at
-`.claude/worktrees/fix-search-1a2b3c` uses `test_peated_fix_search_1a2b3c`
-instead. The main checkout and CI keep `test_peated`. To choose a name
-yourself, set it in that worktree's `apps/server/.env.test.local`:
+Each linked git worktree gets its own Postgres test database, so sessions on
+different branches cannot truncate, migrate, or disconnect each other's
+database. When `DATABASE_URL` names the default `test_peated`, even from your
+shell or `.env.test.local`, a worktree at `.claude/worktrees/fix-search-1a2b3c`
+uses `test_peated_fix_search_1a2b3c` instead. The main checkout and CI keep
+`test_peated`. Redis is still shared: tests clear rate-limit and queue keys, so
+a test that depends on Redis can still fail while another worktree's tests run.
+Tools that load `.env.test` outside Vitest, such as a local API started for web
+checks, still use `test_peated`. To choose a different name, set it in that
+worktree's `apps/server/.env.test.local`:
 
 ```shell
 DATABASE_URL=postgresql://postgres:postgres@localhost:15432/test_peated_drafts
