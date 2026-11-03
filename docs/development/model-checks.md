@@ -36,8 +36,9 @@ judgment that a repeatable code test cannot prove.
 
 ## Capture a production miss
 
-Store-price and review classifier runs are saved as Bottle checks with the full
-input, decision, and artifacts. To turn a wrong decision into a test case:
+Store-price, review, and auction lot classifier runs are saved as Bottle checks
+with the full input, decision, and artifacts. An auction lot run uses
+`sourceKind=auction_lot` and the lot ID. To turn a wrong decision into a test case:
 
 1. Find the source record. The moderation history entry for the decision gives
    its source kind and ID.

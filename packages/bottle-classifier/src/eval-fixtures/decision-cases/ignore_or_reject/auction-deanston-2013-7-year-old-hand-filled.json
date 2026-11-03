@@ -1,0 +1,1766 @@
+{
+  "id": "auction-deanston-2013-7-year-old-hand-filled",
+  "name": "auction title: a Deanston distillery hand-fill is not a marketed Bottle",
+  "input": {
+    "reference": {
+      "id": 14896,
+      "url": "https://www.scotchwhiskyauctions.com/auctions/234-the-185th-auction/903396-deanston-2013-7-year-old-hand-filled/",
+      "name": "Deanston 2013 7 Year Old Hand Filled",
+      "imageUrl": null,
+      "externalSiteId": 28097,
+      "currentBottleId": null
+    },
+    "extractedIdentity": {
+      "abv": 53.6,
+      "brand": null,
+      "series": null,
+      "bottler": null,
+      "edition": null,
+      "outturn": null,
+      "category": null,
+      "distillery": null,
+      "expression": null,
+      "maturation": null,
+      "stated_age": null,
+      "cask_number": null,
+      "single_cask": null,
+      "release_year": null,
+      "vintage_year": 2013,
+      "bottling_year": 2024,
+      "cask_strength": null
+    },
+    "imageEvidence": null,
+    "initialCandidates": [
+      {
+        "abv": null,
+        "brand": "Deanston",
+        "score": 78.80686,
+        "series": null,
+        "source": ["text", "brand_coverage", "context"],
+        "bottler": null,
+        "edition": null,
+        "outturn": null,
+        "bottleId": 898,
+        "category": "single_malt",
+        "fullName": "Deanston Hand Filled",
+        "reference": null,
+        "statedAge": 12,
+        "caskNumber": null,
+        "comparison": {
+          "missing": ["abv", "vintageYear"],
+          "conflicts": ["statedAge"],
+          "agreements": ["category", "brand", "distillers"]
+        },
+        "distillery": ["Deanston"],
+        "maturation": null,
+        "releaseDay": null,
+        "singleCask": null,
+        "releaseYear": null,
+        "vintageYear": null,
+        "bottlingYear": null,
+        "caskStrength": null,
+        "releaseMonth": null,
+        "familyContext": {
+          "siblingBottles": []
+        }
+      },
+      {
+        "abv": null,
+        "brand": "Deanston",
+        "score": 62.42341,
+        "series": null,
+        "source": ["vector", "text"],
+        "bottler": null,
+        "edition": null,
+        "outturn": null,
+        "bottleId": 16064,
+        "category": "single_malt",
+        "fullName": "Deanston Organic 15-year-old",
+        "reference": "Deanston Organic 15-year-old, 46.3%",
+        "statedAge": 15,
+        "caskNumber": null,
+        "comparison": {
+          "missing": ["abv", "vintageYear"],
+          "conflicts": ["statedAge"],
+          "agreements": ["category", "brand", "distillers"]
+        },
+        "distillery": ["Deanston"],
+        "maturation": null,
+        "releaseDay": null,
+        "singleCask": null,
+        "releaseYear": null,
+        "vintageYear": null,
+        "bottlingYear": null,
+        "caskStrength": null,
+        "releaseMonth": null,
+        "familyContext": {
+          "siblingBottles": []
+        }
+      },
+      {
+        "abv": null,
+        "brand": "Deanston",
+        "score": 55.766758,
+        "series": null,
+        "source": ["text", "brand_coverage"],
+        "bottler": null,
+        "edition": null,
+        "outturn": null,
+        "bottleId": 2415,
+        "category": "single_malt",
+        "fullName": "Deanston 2002 Organic Oloroso Cask Finish",
+        "reference": null,
+        "statedAge": 18,
+        "caskNumber": null,
+        "comparison": {
+          "missing": ["abv", "vintageYear"],
+          "conflicts": ["statedAge"],
+          "agreements": ["category", "brand", "distillers"]
+        },
+        "distillery": ["Deanston"],
+        "maturation": null,
+        "releaseDay": null,
+        "singleCask": null,
+        "releaseYear": null,
+        "vintageYear": null,
+        "bottlingYear": null,
+        "caskStrength": null,
+        "releaseMonth": null,
+        "familyContext": {
+          "siblingBottles": []
+        }
+      },
+      {
+        "abv": 62.75,
+        "brand": "Single Cask Nation",
+        "score": 54.806282,
+        "series": null,
+        "source": ["text"],
+        "bottler": "Single Cask Nation",
+        "edition": null,
+        "outturn": null,
+        "bottleId": 47777,
+        "category": "single_malt",
+        "fullName": "Single Cask Nation Westland 2013 7-year-old",
+        "reference": null,
+        "statedAge": 7,
+        "caskNumber": "437",
+        "comparison": {
+          "missing": [],
+          "conflicts": ["abv", "brand", "distillers"],
+          "agreements": ["category", "statedAge", "vintageYear"]
+        },
+        "distillery": ["Westland Distillery"],
+        "maturation": null,
+        "releaseDay": null,
+        "singleCask": true,
+        "releaseYear": 2021,
+        "vintageYear": 2013,
+        "bottlingYear": 2021,
+        "caskStrength": null,
+        "releaseMonth": null,
+        "familyContext": {
+          "siblingBottles": []
+        }
+      },
+      {
+        "abv": 52.55,
+        "brand": "Single Cask Nation",
+        "score": 54.806282,
+        "series": null,
+        "source": ["text"],
+        "bottler": "Single Cask Nation",
+        "edition": null,
+        "outturn": null,
+        "bottleId": 47776,
+        "category": "single_malt",
+        "fullName": "Single Cask Nation Westland 2013 7-year-old",
+        "reference": null,
+        "statedAge": 7,
+        "caskNumber": "4858",
+        "comparison": {
+          "missing": [],
+          "conflicts": ["abv", "brand", "distillers"],
+          "agreements": ["category", "statedAge", "vintageYear"]
+        },
+        "distillery": ["Westland Distillery"],
+        "maturation": null,
+        "releaseDay": null,
+        "singleCask": true,
+        "releaseYear": 2021,
+        "vintageYear": 2013,
+        "bottlingYear": 2021,
+        "caskStrength": null,
+        "releaseMonth": null,
+        "familyContext": {
+          "siblingBottles": []
+        }
+      },
+      {
+        "abv": null,
+        "brand": "Deanston",
+        "score": 52.86006,
+        "series": null,
+        "source": ["text", "brand_coverage"],
+        "bottler": null,
+        "edition": null,
+        "outturn": null,
+        "bottleId": 2416,
+        "category": "single_malt",
+        "fullName": "Deanston 2006 Fino Cask Finish",
+        "reference": null,
+        "statedAge": 14,
+        "caskNumber": null,
+        "comparison": {
+          "missing": ["abv", "vintageYear"],
+          "conflicts": ["statedAge"],
+          "agreements": ["category", "brand", "distillers"]
+        },
+        "distillery": ["Deanston"],
+        "maturation": null,
+        "releaseDay": null,
+        "singleCask": null,
+        "releaseYear": null,
+        "vintageYear": null,
+        "bottlingYear": null,
+        "caskStrength": null,
+        "releaseMonth": null,
+        "familyContext": {
+          "siblingBottles": []
+        }
+      },
+      {
+        "abv": null,
+        "brand": "The GlenDronach",
+        "score": 50.364017,
+        "series": null,
+        "source": ["text"],
+        "bottler": null,
+        "edition": null,
+        "outturn": null,
+        "bottleId": 1744,
+        "category": "single_malt",
+        "fullName": "The GlenDronach 1994 Hand-filled at the distillery",
+        "reference": null,
+        "statedAge": 26,
+        "caskNumber": null,
+        "comparison": {
+          "missing": ["abv", "vintageYear"],
+          "conflicts": ["statedAge", "brand", "distillers"],
+          "agreements": ["category"]
+        },
+        "distillery": ["The GlenDronach"],
+        "maturation": null,
+        "releaseDay": null,
+        "singleCask": null,
+        "releaseYear": null,
+        "vintageYear": null,
+        "bottlingYear": null,
+        "caskStrength": null,
+        "releaseMonth": null,
+        "familyContext": {
+          "siblingBottles": []
+        }
+      },
+      {
+        "abv": null,
+        "brand": "The GlenDronach",
+        "score": 48.605164,
+        "series": null,
+        "source": ["text"],
+        "bottler": null,
+        "edition": null,
+        "outturn": null,
+        "bottleId": 2065,
+        "category": "single_malt",
+        "fullName": "The GlenDronach 2005 Hand-filled at the distillery",
+        "reference": null,
+        "statedAge": null,
+        "caskNumber": null,
+        "comparison": {
+          "missing": ["statedAge", "abv", "vintageYear"],
+          "conflicts": ["brand", "distillers"],
+          "agreements": ["category"]
+        },
+        "distillery": ["The GlenDronach"],
+        "maturation": null,
+        "releaseDay": null,
+        "singleCask": null,
+        "releaseYear": null,
+        "vintageYear": null,
+        "bottlingYear": null,
+        "caskStrength": null,
+        "releaseMonth": null,
+        "familyContext": {
+          "siblingBottles": []
+        }
+      },
+      {
+        "abv": null,
+        "brand": "Springbank",
+        "score": 47.82245,
+        "series": null,
+        "source": ["text"],
+        "bottler": null,
+        "edition": null,
+        "outturn": null,
+        "bottleId": 410,
+        "category": "single_malt",
+        "fullName": "Springbank Hand Filled Distillery Exclusive",
+        "reference": null,
+        "statedAge": null,
+        "caskNumber": null,
+        "comparison": {
+          "missing": ["statedAge", "abv", "vintageYear"],
+          "conflicts": ["brand", "distillers"],
+          "agreements": ["category"]
+        },
+        "distillery": ["Springbank"],
+        "maturation": null,
+        "releaseDay": null,
+        "singleCask": null,
+        "releaseYear": null,
+        "vintageYear": null,
+        "bottlingYear": null,
+        "caskStrength": null,
+        "releaseMonth": null,
+        "familyContext": {
+          "siblingBottles": []
+        }
+      },
+      {
+        "abv": null,
+        "brand": "Longrow",
+        "score": 47.511467,
+        "series": null,
+        "source": ["text"],
+        "bottler": "Springbank",
+        "edition": null,
+        "outturn": null,
+        "bottleId": 409,
+        "category": "single_malt",
+        "fullName": "Longrow Hand Filled Distillery Exclusive",
+        "reference": null,
+        "statedAge": null,
+        "caskNumber": null,
+        "comparison": {
+          "missing": ["statedAge", "abv", "vintageYear", "distillers"],
+          "conflicts": ["brand"],
+          "agreements": ["category"]
+        },
+        "distillery": [],
+        "maturation": null,
+        "releaseDay": null,
+        "singleCask": null,
+        "releaseYear": null,
+        "vintageYear": null,
+        "bottlingYear": null,
+        "caskStrength": null,
+        "releaseMonth": null,
+        "familyContext": {
+          "siblingBottles": []
+        }
+      },
+      {
+        "abv": 46,
+        "brand": "Signatory Vintage",
+        "score": 47.034187,
+        "series": "The Un-Chillfiltered Collection",
+        "source": ["text"],
+        "bottler": "Signatory Vintage",
+        "edition": null,
+        "outturn": null,
+        "bottleId": 56531,
+        "category": "single_malt",
+        "fullName": "Signatory Vintage Ben Nevis 2013 7-year-old",
+        "reference": null,
+        "statedAge": 7,
+        "caskNumber": "420 & 425",
+        "comparison": {
+          "missing": [],
+          "conflicts": ["abv", "brand", "distillers"],
+          "agreements": ["category", "statedAge", "vintageYear"]
+        },
+        "distillery": ["Ben Nevis"],
+        "maturation": null,
+        "releaseDay": null,
+        "singleCask": false,
+        "releaseYear": null,
+        "vintageYear": 2013,
+        "bottlingYear": null,
+        "caskStrength": null,
+        "releaseMonth": null,
+        "familyContext": {
+          "siblingBottles": []
+        }
+      },
+      {
+        "abv": 58.6,
+        "brand": "A.D. Rattray",
+        "score": 45.48006,
+        "series": "Cask Collection",
+        "source": ["text"],
+        "bottler": "A.D. Rattray",
+        "edition": null,
+        "outturn": 343,
+        "bottleId": 58985,
+        "category": "single_malt",
+        "fullName": "A.D. Rattray Ardmore 2013 7-year-old",
+        "reference": null,
+        "statedAge": 7,
+        "caskNumber": "2092",
+        "comparison": {
+          "missing": [],
+          "conflicts": ["abv", "brand", "distillers"],
+          "agreements": ["category", "statedAge", "vintageYear"]
+        },
+        "distillery": ["Ardmore"],
+        "maturation": "Bourbon Hogshead / Sherry Hogshead",
+        "releaseDay": null,
+        "singleCask": true,
+        "releaseYear": null,
+        "vintageYear": 2013,
+        "bottlingYear": 2020,
+        "caskStrength": true,
+        "releaseMonth": null,
+        "familyContext": {
+          "siblingBottles": []
+        }
+      },
+      {
+        "abv": 59,
+        "brand": "Mars Komagatake Distillery",
+        "score": 45.30387,
+        "series": null,
+        "source": ["text"],
+        "bottler": null,
+        "edition": null,
+        "outturn": 199,
+        "bottleId": 57224,
+        "category": "single_malt",
+        "fullName": "Mars Komagatake Single Cask 2013 No.1663 7-year-old",
+        "reference": null,
+        "statedAge": 7,
+        "caskNumber": "1663",
+        "comparison": {
+          "missing": [],
+          "conflicts": ["abv", "brand", "distillers"],
+          "agreements": ["category", "statedAge", "vintageYear"]
+        },
+        "distillery": ["Mars Komagatake Distillery"],
+        "maturation": "ex-Bourbon Barrel (#1663)",
+        "releaseDay": null,
+        "singleCask": true,
+        "releaseYear": 2021,
+        "vintageYear": 2013,
+        "bottlingYear": 2020,
+        "caskStrength": null,
+        "releaseMonth": 2,
+        "familyContext": {
+          "siblingBottles": []
+        }
+      },
+      {
+        "abv": 52.5,
+        "brand": "Cooper's Choice",
+        "score": 44.915047,
+        "series": null,
+        "source": ["text"],
+        "bottler": "The Vintage Malt Whisky Co Ltd.",
+        "edition": null,
+        "outturn": 228,
+        "bottleId": 68449,
+        "category": "single_malt",
+        "fullName": "Cooper's Choice Ardmore Madeira Finish 2013 7-year-old",
+        "reference": null,
+        "statedAge": 7,
+        "caskNumber": "9374",
+        "comparison": {
+          "missing": [],
+          "conflicts": ["abv", "brand", "distillers"],
+          "agreements": ["category", "statedAge", "vintageYear"]
+        },
+        "distillery": ["Ardmore"],
+        "maturation": "Madeira Cask Finish",
+        "releaseDay": null,
+        "singleCask": true,
+        "releaseYear": null,
+        "vintageYear": 2013,
+        "bottlingYear": 2021,
+        "caskStrength": true,
+        "releaseMonth": null,
+        "familyContext": {
+          "siblingBottles": []
+        }
+      },
+      {
+        "abv": null,
+        "brand": "Bowmore",
+        "score": 44.782146,
+        "series": null,
+        "source": ["text"],
+        "bottler": null,
+        "edition": null,
+        "outturn": null,
+        "bottleId": 2704,
+        "category": "single_malt",
+        "fullName": "Bowmore 1995 Hand-filled at the distillery",
+        "reference": null,
+        "statedAge": null,
+        "caskNumber": null,
+        "comparison": {
+          "missing": ["statedAge", "abv", "vintageYear"],
+          "conflicts": ["brand", "distillers"],
+          "agreements": ["category"]
+        },
+        "distillery": ["Bowmore"],
+        "maturation": null,
+        "releaseDay": null,
+        "singleCask": null,
+        "releaseYear": null,
+        "vintageYear": null,
+        "bottlingYear": null,
+        "caskStrength": null,
+        "releaseMonth": null,
+        "familyContext": {
+          "siblingBottles": []
+        }
+      },
+      {
+        "abv": null,
+        "brand": "Bowmore",
+        "score": 44.782146,
+        "series": null,
+        "source": ["text"],
+        "bottler": null,
+        "edition": null,
+        "outturn": null,
+        "bottleId": 2707,
+        "category": "single_malt",
+        "fullName": "Bowmore 1998 Hand-filled at the distillery",
+        "reference": null,
+        "statedAge": null,
+        "caskNumber": null,
+        "comparison": {
+          "missing": ["statedAge", "abv", "vintageYear"],
+          "conflicts": ["brand", "distillers"],
+          "agreements": ["category"]
+        },
+        "distillery": ["Bowmore"],
+        "maturation": null,
+        "releaseDay": null,
+        "singleCask": null,
+        "releaseYear": null,
+        "vintageYear": null,
+        "bottlingYear": null,
+        "caskStrength": null,
+        "releaseMonth": null,
+        "familyContext": {
+          "siblingBottles": []
+        }
+      },
+      {
+        "abv": null,
+        "brand": "Bowmore",
+        "score": 44.782146,
+        "series": null,
+        "source": ["text"],
+        "bottler": null,
+        "edition": null,
+        "outturn": null,
+        "bottleId": 2353,
+        "category": "single_malt",
+        "fullName": "Bowmore 2004 Hand-filled at the distillery",
+        "reference": null,
+        "statedAge": null,
+        "caskNumber": null,
+        "comparison": {
+          "missing": ["statedAge", "abv", "vintageYear"],
+          "conflicts": ["brand", "distillers"],
+          "agreements": ["category"]
+        },
+        "distillery": ["Bowmore"],
+        "maturation": null,
+        "releaseDay": null,
+        "singleCask": null,
+        "releaseYear": null,
+        "vintageYear": null,
+        "bottlingYear": null,
+        "caskStrength": null,
+        "releaseMonth": null,
+        "familyContext": {
+          "siblingBottles": []
+        }
+      },
+      {
+        "abv": null,
+        "brand": "Reisetbauer",
+        "score": 44.41351,
+        "series": null,
+        "source": ["text"],
+        "bottler": null,
+        "edition": null,
+        "outturn": null,
+        "bottleId": 14240,
+        "category": null,
+        "fullName": "Reisetbauer 7-year-old",
+        "reference": null,
+        "statedAge": 7,
+        "caskNumber": null,
+        "comparison": {
+          "missing": ["category", "abv", "vintageYear", "distillers"],
+          "conflicts": ["brand"],
+          "agreements": ["statedAge"]
+        },
+        "distillery": [],
+        "maturation": null,
+        "releaseDay": null,
+        "singleCask": null,
+        "releaseYear": null,
+        "vintageYear": null,
+        "bottlingYear": null,
+        "caskStrength": null,
+        "releaseMonth": null,
+        "familyContext": {
+          "siblingBottles": []
+        }
+      },
+      {
+        "abv": null,
+        "brand": "Kinsey",
+        "score": 44.2006,
+        "series": null,
+        "source": ["text"],
+        "bottler": null,
+        "edition": null,
+        "outturn": null,
+        "bottleId": 16273,
+        "category": "blend",
+        "fullName": "Kinsey 7-year-old",
+        "reference": null,
+        "statedAge": 7,
+        "caskNumber": null,
+        "comparison": {
+          "missing": ["abv", "vintageYear", "distillers"],
+          "conflicts": ["category", "brand"],
+          "agreements": ["statedAge"]
+        },
+        "distillery": [],
+        "maturation": null,
+        "releaseDay": null,
+        "singleCask": null,
+        "releaseYear": null,
+        "vintageYear": null,
+        "bottlingYear": null,
+        "caskStrength": null,
+        "releaseMonth": null,
+        "familyContext": {
+          "siblingBottles": []
+        }
+      },
+      {
+        "abv": 53.6,
+        "brand": "Scallywag",
+        "score": 27.42847,
+        "series": null,
+        "source": ["text"],
+        "bottler": "Douglas Laing",
+        "edition": null,
+        "outturn": null,
+        "bottleId": 45593,
+        "category": "blend",
+        "fullName": "Scallywag Blended Malt - 12-year-old - 53.6% ABV - Cask Strength",
+        "reference": null,
+        "statedAge": 12,
+        "caskNumber": null,
+        "comparison": {
+          "missing": ["vintageYear"],
+          "conflicts": [],
+          "agreements": ["abv"]
+        },
+        "distillery": [],
+        "maturation": null,
+        "releaseDay": null,
+        "singleCask": null,
+        "releaseYear": null,
+        "vintageYear": null,
+        "bottlingYear": null,
+        "caskStrength": true,
+        "releaseMonth": null,
+        "familyContext": {
+          "siblingBottles": []
+        }
+      },
+      {
+        "abv": 53.6,
+        "brand": "Decadent Drams",
+        "score": 26.78791,
+        "series": null,
+        "source": ["text"],
+        "bottler": "Decadent Drinks",
+        "edition": null,
+        "outturn": 461,
+        "bottleId": 48948,
+        "category": "blend",
+        "fullName": "Decadent Drams Sideburn - 31-year-old - 53.6% ABV - Cask Strength",
+        "reference": null,
+        "statedAge": 31,
+        "caskNumber": null,
+        "comparison": {
+          "missing": ["vintageYear"],
+          "conflicts": [],
+          "agreements": ["abv"]
+        },
+        "distillery": [],
+        "maturation": "1992 refill barrel and 1993 first fill barrel",
+        "releaseDay": null,
+        "singleCask": null,
+        "releaseYear": null,
+        "vintageYear": null,
+        "bottlingYear": 2025,
+        "caskStrength": true,
+        "releaseMonth": null,
+        "familyContext": {
+          "siblingBottles": []
+        }
+      },
+      {
+        "abv": 53.6,
+        "brand": "The Scotch Malt Whisky Society",
+        "score": 26.353174,
+        "series": null,
+        "source": ["text"],
+        "bottler": "The Scotch Malt Whisky Society",
+        "edition": null,
+        "outturn": null,
+        "bottleId": 43271,
+        "category": "single_malt",
+        "fullName": "SMWS 50.119 Gallovidian rhapsody",
+        "reference": null,
+        "statedAge": 34,
+        "caskNumber": "50.119",
+        "comparison": {
+          "missing": [],
+          "conflicts": ["vintageYear"],
+          "agreements": ["abv"]
+        },
+        "distillery": ["Bladnoch"],
+        "maturation": "Refill barrel",
+        "releaseDay": 10,
+        "singleCask": true,
+        "releaseYear": 2025,
+        "vintageYear": 1990,
+        "bottlingYear": null,
+        "caskStrength": null,
+        "releaseMonth": 1,
+        "familyContext": {
+          "siblingBottles": []
+        }
+      },
+      {
+        "abv": 53.6,
+        "brand": "Rare Malts Selection",
+        "score": 26.206673,
+        "series": null,
+        "source": ["text"],
+        "bottler": null,
+        "edition": null,
+        "outturn": 6000,
+        "bottleId": 5343,
+        "category": "single_malt",
+        "fullName": "Rare Malts Selection Bladnoch 1977",
+        "reference": null,
+        "statedAge": 23,
+        "caskNumber": null,
+        "comparison": {
+          "missing": [],
+          "conflicts": ["vintageYear"],
+          "agreements": ["abv"]
+        },
+        "distillery": ["Bladnoch"],
+        "maturation": null,
+        "releaseDay": null,
+        "singleCask": null,
+        "releaseYear": 2001,
+        "vintageYear": 1977,
+        "bottlingYear": 2001,
+        "caskStrength": true,
+        "releaseMonth": 10,
+        "familyContext": {
+          "siblingBottles": []
+        }
+      },
+      {
+        "abv": 53.6,
+        "brand": "The Scotch Malt Whisky Society",
+        "score": 26.165005,
+        "series": null,
+        "source": ["text"],
+        "bottler": "The Scotch Malt Whisky Society",
+        "edition": null,
+        "outturn": null,
+        "bottleId": 43376,
+        "category": "single_malt",
+        "fullName": "SMWS 88.33 Think pink",
+        "reference": null,
+        "statedAge": 15,
+        "caskNumber": "88.33",
+        "comparison": {
+          "missing": [],
+          "conflicts": ["vintageYear"],
+          "agreements": ["abv"]
+        },
+        "distillery": ["Speyburn"],
+        "maturation": "1st fill ex-port barrique",
+        "releaseDay": 7,
+        "singleCask": true,
+        "releaseYear": 2025,
+        "vintageYear": 2009,
+        "bottlingYear": null,
+        "caskStrength": null,
+        "releaseMonth": 3,
+        "familyContext": {
+          "siblingBottles": []
+        }
+      },
+      {
+        "abv": 53.6,
+        "brand": "The Scotch Malt Whisky Society",
+        "score": 26.165005,
+        "series": null,
+        "source": ["text"],
+        "bottler": "The Scotch Malt Whisky Society",
+        "edition": null,
+        "outturn": null,
+        "bottleId": 43459,
+        "category": "single_malt",
+        "fullName": "SMWS 95.106 Strawberry shortcake",
+        "reference": null,
+        "statedAge": 16,
+        "caskNumber": "95.106",
+        "comparison": {
+          "missing": [],
+          "conflicts": ["vintageYear"],
+          "agreements": ["abv"]
+        },
+        "distillery": ["Auchroisk"],
+        "maturation": "1st fill ex-port barrique",
+        "releaseDay": 2,
+        "singleCask": true,
+        "releaseYear": 2025,
+        "vintageYear": 2008,
+        "bottlingYear": null,
+        "caskStrength": null,
+        "releaseMonth": 5,
+        "familyContext": {
+          "siblingBottles": []
+        }
+      },
+      {
+        "abv": 53.6,
+        "brand": "That Boutique-y Whisky Company",
+        "score": 26.036505,
+        "series": null,
+        "source": ["text"],
+        "bottler": "That Boutique-y Whisky Company",
+        "edition": "Batch 1",
+        "outturn": null,
+        "bottleId": 45963,
+        "category": "blend",
+        "fullName": "TBWC Blended Malt #4 - Batch 1 - 6-year-old - 53.6% ABV",
+        "reference": null,
+        "statedAge": 6,
+        "caskNumber": null,
+        "comparison": {
+          "missing": ["vintageYear"],
+          "conflicts": [],
+          "agreements": ["abv"]
+        },
+        "distillery": [],
+        "maturation": null,
+        "releaseDay": null,
+        "singleCask": null,
+        "releaseYear": null,
+        "vintageYear": null,
+        "bottlingYear": null,
+        "caskStrength": null,
+        "releaseMonth": null,
+        "familyContext": {
+          "siblingBottles": []
+        }
+      },
+      {
+        "abv": 53.6,
+        "brand": "Decadent Drams",
+        "score": 25.768568,
+        "series": null,
+        "source": ["text"],
+        "bottler": "Decadent Drinks",
+        "edition": null,
+        "outturn": 114,
+        "bottleId": 46357,
+        "category": "single_malt",
+        "fullName": "Decadent Drams Knockdhu 2006",
+        "reference": null,
+        "statedAge": 20,
+        "caskNumber": null,
+        "comparison": {
+          "missing": [],
+          "conflicts": ["vintageYear"],
+          "agreements": ["abv"]
+        },
+        "distillery": ["Knockdhu"],
+        "maturation": "refill hogshead",
+        "releaseDay": null,
+        "singleCask": true,
+        "releaseYear": 2026,
+        "vintageYear": 2006,
+        "bottlingYear": 2026,
+        "caskStrength": true,
+        "releaseMonth": null,
+        "familyContext": {
+          "siblingBottles": []
+        }
+      },
+      {
+        "abv": 53.6,
+        "brand": "Big Peat",
+        "score": 25.03526,
+        "series": null,
+        "source": ["text"],
+        "bottler": "Douglas Laing",
+        "edition": null,
+        "outturn": null,
+        "bottleId": 65522,
+        "category": "blended_malt",
+        "fullName": "Big Peat Small Batch",
+        "reference": null,
+        "statedAge": null,
+        "caskNumber": null,
+        "comparison": {
+          "missing": ["vintageYear"],
+          "conflicts": [],
+          "agreements": ["abv"]
+        },
+        "distillery": [],
+        "maturation": null,
+        "releaseDay": null,
+        "singleCask": null,
+        "releaseYear": null,
+        "vintageYear": null,
+        "bottlingYear": null,
+        "caskStrength": null,
+        "releaseMonth": null,
+        "familyContext": {
+          "siblingBottles": []
+        }
+      },
+      {
+        "abv": 53.6,
+        "brand": "Ben Nevis",
+        "score": 24.66433,
+        "series": null,
+        "source": ["text"],
+        "bottler": null,
+        "edition": null,
+        "outturn": null,
+        "bottleId": 548,
+        "category": "single_malt",
+        "fullName": "Ben Nevis 23-year-old - 53.6% ABV - Cask Strength",
+        "reference": null,
+        "statedAge": 23,
+        "caskNumber": null,
+        "comparison": {
+          "missing": ["vintageYear"],
+          "conflicts": [],
+          "agreements": ["abv"]
+        },
+        "distillery": ["Ben Nevis"],
+        "maturation": "Hogsheads & Sherry Butt",
+        "releaseDay": null,
+        "singleCask": null,
+        "releaseYear": null,
+        "vintageYear": null,
+        "bottlingYear": 2020,
+        "caskStrength": true,
+        "releaseMonth": null,
+        "familyContext": {
+          "siblingBottles": []
+        }
+      },
+      {
+        "abv": 53.6,
+        "brand": "The Scotch Malt Whisky Society",
+        "score": 24.610146,
+        "series": null,
+        "source": ["text"],
+        "bottler": "The Scotch Malt Whisky Society",
+        "edition": null,
+        "outturn": null,
+        "bottleId": 43625,
+        "category": "single_malt",
+        "fullName": "SMWS 6.83 Chewy-textured meanderings",
+        "reference": null,
+        "statedAge": 17,
+        "caskNumber": "6.83",
+        "comparison": {
+          "missing": [],
+          "conflicts": ["vintageYear"],
+          "agreements": ["abv"]
+        },
+        "distillery": ["Macduff Distillery"],
+        "maturation": "1st fill Spanish oak oloroso hogshead & 1st fill American oak oloroso hogshead",
+        "releaseDay": 5,
+        "singleCask": true,
+        "releaseYear": 2025,
+        "vintageYear": 2007,
+        "bottlingYear": null,
+        "caskStrength": null,
+        "releaseMonth": 9,
+        "familyContext": {
+          "siblingBottles": []
+        }
+      },
+      {
+        "abv": 53.6,
+        "brand": "Gordon & MacPhail",
+        "score": 24.538046,
+        "series": "Connoisseurs Choice Heritage Collection",
+        "source": ["text"],
+        "bottler": "Gordon & MacPhail",
+        "edition": null,
+        "outturn": null,
+        "bottleId": 47468,
+        "category": "single_malt",
+        "fullName": "Gordon & MacPhail Glenlochy 1979 43-year-old",
+        "reference": null,
+        "statedAge": 43,
+        "caskNumber": null,
+        "comparison": {
+          "missing": [],
+          "conflicts": ["vintageYear"],
+          "agreements": ["abv"]
+        },
+        "distillery": ["Glenlochy"],
+        "maturation": "Refill American Hogshead",
+        "releaseDay": null,
+        "singleCask": null,
+        "releaseYear": null,
+        "vintageYear": 1979,
+        "bottlingYear": null,
+        "caskStrength": null,
+        "releaseMonth": null,
+        "familyContext": {
+          "siblingBottles": []
+        }
+      },
+      {
+        "abv": null,
+        "brand": "Chichibu",
+        "score": 23.650969,
+        "series": null,
+        "source": ["text"],
+        "bottler": null,
+        "edition": "2013",
+        "outturn": null,
+        "bottleId": 45030,
+        "category": "single_malt",
+        "fullName": "Chichibu Ichiro's Malt - 2013",
+        "reference": null,
+        "statedAge": 7,
+        "caskNumber": null,
+        "comparison": {
+          "missing": ["abv"],
+          "conflicts": [],
+          "agreements": ["vintageYear"]
+        },
+        "distillery": ["Chichibu"],
+        "maturation": null,
+        "releaseDay": null,
+        "singleCask": null,
+        "releaseYear": null,
+        "vintageYear": 2013,
+        "bottlingYear": null,
+        "caskStrength": null,
+        "releaseMonth": null,
+        "familyContext": {
+          "siblingBottles": [
+            {
+              "abv": null,
+              "edition": null,
+              "outturn": null,
+              "bottleId": 44034,
+              "fullName": "Chichibu Ichiro's Malt",
+              "statedAge": 7,
+              "caskNumber": null,
+              "maturation": null,
+              "releaseDay": null,
+              "singleCask": null,
+              "releaseYear": null,
+              "traitFields": ["statedAge"],
+              "vintageYear": null,
+              "bottlingYear": null,
+              "caskStrength": null,
+              "releaseMonth": null
+            },
+            {
+              "abv": null,
+              "edition": "2010",
+              "outturn": null,
+              "bottleId": 45032,
+              "fullName": "Chichibu Ichiro's Malt - 2010",
+              "statedAge": 10,
+              "caskNumber": null,
+              "maturation": null,
+              "releaseDay": null,
+              "singleCask": null,
+              "releaseYear": null,
+              "traitFields": ["edition", "statedAge", "vintageYear"],
+              "vintageYear": 2010,
+              "bottlingYear": null,
+              "caskStrength": null,
+              "releaseMonth": null
+            },
+            {
+              "abv": null,
+              "edition": "2011",
+              "outturn": null,
+              "bottleId": 45031,
+              "fullName": "Chichibu Ichiro's Malt - 2011",
+              "statedAge": 10,
+              "caskNumber": null,
+              "maturation": null,
+              "releaseDay": null,
+              "singleCask": null,
+              "releaseYear": null,
+              "traitFields": ["edition", "statedAge", "vintageYear"],
+              "vintageYear": 2011,
+              "bottlingYear": null,
+              "caskStrength": null,
+              "releaseMonth": null
+            }
+          ]
+        }
+      },
+      {
+        "abv": 53.6,
+        "brand": "WhiskySponge",
+        "score": 22.7864,
+        "series": null,
+        "source": ["text"],
+        "bottler": "Decadent Drinks",
+        "edition": "Edition No. 32",
+        "outturn": 481,
+        "bottleId": 49024,
+        "category": "single_malt",
+        "fullName": "WhiskySponge Caol Ila - Edition No. 32 - 9-year-old - 53.6% ABV - Cask Strength",
+        "reference": null,
+        "statedAge": 9,
+        "caskNumber": null,
+        "comparison": {
+          "missing": ["vintageYear"],
+          "conflicts": [],
+          "agreements": ["abv"]
+        },
+        "distillery": ["Caol Ila"],
+        "maturation": "Multi-vintage marriage of a refill hogshead (V07) and a rejuvenated hogshead (V11)",
+        "releaseDay": null,
+        "singleCask": false,
+        "releaseYear": null,
+        "vintageYear": null,
+        "bottlingYear": 2021,
+        "caskStrength": true,
+        "releaseMonth": null,
+        "familyContext": {
+          "siblingBottles": []
+        }
+      },
+      {
+        "abv": 53.6,
+        "brand": "Big Peat",
+        "score": 22.74074,
+        "series": null,
+        "source": ["text"],
+        "bottler": "Douglas Laing",
+        "edition": null,
+        "outturn": null,
+        "bottleId": 45862,
+        "category": "blend",
+        "fullName": "Big Peat The Winter Edition Madeira Wine Cask Finish - 2025 Release - 53.6% ABV - Cask Strength - Madeira Cask",
+        "reference": null,
+        "statedAge": null,
+        "caskNumber": null,
+        "comparison": {
+          "missing": ["vintageYear"],
+          "conflicts": [],
+          "agreements": ["abv"]
+        },
+        "distillery": ["Ardbeg", "Caol Ila", "Bowmore", "Port Ellen"],
+        "maturation": "madeira",
+        "releaseDay": null,
+        "singleCask": null,
+        "releaseYear": 2025,
+        "vintageYear": null,
+        "bottlingYear": null,
+        "caskStrength": true,
+        "releaseMonth": null,
+        "familyContext": {
+          "siblingBottles": []
+        }
+      },
+      {
+        "abv": null,
+        "brand": "Deanston",
+        "score": 0.7373297580220024,
+        "series": null,
+        "source": ["vector"],
+        "bottler": null,
+        "edition": null,
+        "outturn": null,
+        "bottleId": 4769,
+        "category": "single_malt",
+        "fullName": "Deanston Virgin Oak Un-Chill Filtered",
+        "reference": "Deanston Virgin Oak Cask Finished, 46.3%",
+        "statedAge": null,
+        "caskNumber": null,
+        "comparison": {
+          "missing": ["statedAge", "abv", "vintageYear"],
+          "conflicts": [],
+          "agreements": ["category", "brand", "distillers"]
+        },
+        "distillery": ["Deanston"],
+        "maturation": null,
+        "releaseDay": null,
+        "singleCask": null,
+        "releaseYear": null,
+        "vintageYear": null,
+        "bottlingYear": null,
+        "caskStrength": null,
+        "releaseMonth": null,
+        "familyContext": {
+          "siblingBottles": []
+        }
+      },
+      {
+        "abv": null,
+        "brand": "Deanston",
+        "score": 0.694367947800837,
+        "series": null,
+        "source": ["vector"],
+        "bottler": null,
+        "edition": null,
+        "outturn": null,
+        "bottleId": 897,
+        "category": "single_malt",
+        "fullName": "Deanston 12-year-old",
+        "reference": "Deanston 12-year-old Oloroso Cask Matured Highland Single Malt Scotch Whisky",
+        "statedAge": 12,
+        "caskNumber": null,
+        "comparison": {
+          "missing": ["abv", "vintageYear"],
+          "conflicts": ["statedAge"],
+          "agreements": ["category", "brand", "distillers"]
+        },
+        "distillery": ["Deanston"],
+        "maturation": null,
+        "releaseDay": null,
+        "singleCask": null,
+        "releaseYear": null,
+        "vintageYear": null,
+        "bottlingYear": null,
+        "caskStrength": null,
+        "releaseMonth": null,
+        "familyContext": {
+          "siblingBottles": []
+        }
+      },
+      {
+        "abv": null,
+        "brand": "Deanston",
+        "score": 0.6938317454599515,
+        "series": null,
+        "source": ["vector"],
+        "bottler": null,
+        "edition": null,
+        "outturn": null,
+        "bottleId": 18270,
+        "category": "single_malt",
+        "fullName": "Deanston 30-year-old",
+        "reference": "Deanston, 30-year-old, 46.7%",
+        "statedAge": 30,
+        "caskNumber": null,
+        "comparison": {
+          "missing": ["abv", "vintageYear"],
+          "conflicts": ["statedAge"],
+          "agreements": ["category", "brand", "distillers"]
+        },
+        "distillery": ["Deanston"],
+        "maturation": null,
+        "releaseDay": null,
+        "singleCask": null,
+        "releaseYear": null,
+        "vintageYear": null,
+        "bottlingYear": null,
+        "caskStrength": null,
+        "releaseMonth": null,
+        "familyContext": {
+          "siblingBottles": []
+        }
+      },
+      {
+        "abv": null,
+        "brand": "Deanston",
+        "score": 0.6905417245015978,
+        "series": null,
+        "source": ["vector"],
+        "bottler": null,
+        "edition": null,
+        "outturn": null,
+        "bottleId": 15986,
+        "category": "single_malt",
+        "fullName": "Deanston 20-year-old Oloroso",
+        "reference": "Deanston 20-year-old Oloroso, 55.3%",
+        "statedAge": 20,
+        "caskNumber": null,
+        "comparison": {
+          "missing": ["abv", "vintageYear"],
+          "conflicts": ["statedAge"],
+          "agreements": ["category", "brand", "distillers"]
+        },
+        "distillery": ["Deanston"],
+        "maturation": null,
+        "releaseDay": null,
+        "singleCask": null,
+        "releaseYear": null,
+        "vintageYear": null,
+        "bottlingYear": null,
+        "caskStrength": null,
+        "releaseMonth": null,
+        "familyContext": {
+          "siblingBottles": []
+        }
+      },
+      {
+        "abv": null,
+        "brand": "Deanston",
+        "score": 0.6884157678743785,
+        "series": null,
+        "source": ["vector"],
+        "bottler": null,
+        "edition": null,
+        "outturn": null,
+        "bottleId": 703,
+        "category": "single_malt",
+        "fullName": "Deanston 18-year-old",
+        "reference": "Deanston 18-year-old, 46.3%",
+        "statedAge": 18,
+        "caskNumber": null,
+        "comparison": {
+          "missing": ["abv", "vintageYear"],
+          "conflicts": ["statedAge"],
+          "agreements": ["category", "brand", "distillers"]
+        },
+        "distillery": ["Deanston"],
+        "maturation": null,
+        "releaseDay": null,
+        "singleCask": null,
+        "releaseYear": null,
+        "vintageYear": null,
+        "bottlingYear": null,
+        "caskStrength": null,
+        "releaseMonth": null,
+        "familyContext": {
+          "siblingBottles": []
+        }
+      },
+      {
+        "abv": null,
+        "brand": "Deanston",
+        "score": 0.6790468474517593,
+        "series": null,
+        "source": ["vector"],
+        "bottler": null,
+        "edition": null,
+        "outturn": null,
+        "bottleId": 14441,
+        "category": "single_malt",
+        "fullName": "Deanston 40-year-old",
+        "reference": "Deanston 40-year-old, 45.6%",
+        "statedAge": 40,
+        "caskNumber": null,
+        "comparison": {
+          "missing": ["abv", "vintageYear"],
+          "conflicts": ["statedAge"],
+          "agreements": ["category", "brand", "distillers"]
+        },
+        "distillery": ["Deanston"],
+        "maturation": null,
+        "releaseDay": null,
+        "singleCask": null,
+        "releaseYear": null,
+        "vintageYear": null,
+        "bottlingYear": null,
+        "caskStrength": null,
+        "releaseMonth": null,
+        "familyContext": {
+          "siblingBottles": []
+        }
+      }
+    ]
+  },
+  "context": {
+    "inspectedBottleIds": [898],
+    "bottleContexts": [
+      {
+        "exact": {
+          "abv": null,
+          "edition": null,
+          "outturn": null,
+          "statedAge": null,
+          "caskNumber": null,
+          "maturation": null,
+          "releaseDay": null,
+          "singleCask": null,
+          "releaseYear": null,
+          "vintageYear": null,
+          "bottlingYear": null,
+          "caskStrength": null,
+          "releaseMonth": null
+        },
+        "shared": {
+          "name": "Hand Filled",
+          "brand": {
+            "name": "Deanston",
+            "entityId": 445
+          },
+          "series": null,
+          "bottler": null,
+          "category": "single_malt",
+          "statedAge": 12,
+          "distillers": [
+            {
+              "name": "Deanston",
+              "entityId": 445
+            }
+          ]
+        },
+        "groupId": 9512,
+        "bottleId": 898,
+        "fullName": "Deanston Hand Filled",
+        "siblings": [],
+        "references": [
+          {
+            "name": "Deanston Hand Filled",
+            "ignored": false
+          }
+        ],
+        "observations": [],
+        "imageSources": []
+      }
+    ],
+    "inspectedEntities": [
+      {
+        "kind": "brand",
+        "name": "Scallywag",
+        "score": 1,
+        "source": ["exact", "text", "prefix", "contained"],
+        "entityId": 1313,
+        "reference": "Scallywag",
+        "shortName": null,
+        "retrievedFor": [
+          {
+            "exact": true,
+            "query": "Scallywag"
+          }
+        ]
+      },
+      {
+        "kind": "bottler",
+        "name": "Douglas Laing",
+        "score": 1,
+        "source": ["exact", "text", "prefix", "contained"],
+        "entityId": 5622,
+        "reference": "Douglas Laing",
+        "shortName": null,
+        "retrievedFor": [
+          {
+            "exact": true,
+            "query": "Douglas Laing"
+          }
+        ]
+      },
+      {
+        "kind": "brand",
+        "name": "Decadent Drams",
+        "score": 1,
+        "source": ["exact", "text", "prefix", "contained"],
+        "entityId": 365681,
+        "reference": "Decadent Drams",
+        "shortName": null,
+        "retrievedFor": [
+          {
+            "exact": true,
+            "query": "Decadent Drams"
+          }
+        ]
+      },
+      {
+        "kind": "bottler",
+        "name": "Decadent Drinks",
+        "score": 1,
+        "source": ["exact", "text", "prefix", "contained"],
+        "entityId": 5775,
+        "reference": "Decadent Drinks",
+        "shortName": null,
+        "retrievedFor": [
+          {
+            "exact": true,
+            "query": "Decadent Drinks"
+          }
+        ]
+      },
+      {
+        "kind": "bottler",
+        "name": "That Boutique-y Whisky Company",
+        "score": 1,
+        "source": ["exact", "text", "prefix", "contained"],
+        "entityId": 5978,
+        "reference": "That Boutique-y Whisky Company",
+        "shortName": "TBWC",
+        "retrievedFor": [
+          {
+            "exact": true,
+            "query": "That Boutique-y Whisky Company"
+          }
+        ]
+      },
+      {
+        "kind": "brand",
+        "name": "Big Peat",
+        "score": 1,
+        "source": ["exact", "text", "prefix", "contained"],
+        "entityId": 24,
+        "reference": "Big Peat",
+        "shortName": null,
+        "retrievedFor": [
+          {
+            "exact": true,
+            "query": "Big Peat"
+          }
+        ]
+      },
+      {
+        "kind": "distillery",
+        "name": "Ben Nevis",
+        "score": 1,
+        "source": ["exact", "text", "prefix", "contained"],
+        "entityId": 29,
+        "reference": "Ben Nevis",
+        "shortName": null,
+        "retrievedFor": [
+          {
+            "exact": true,
+            "query": "Ben Nevis"
+          }
+        ]
+      },
+      {
+        "kind": "distillery",
+        "name": "Chichibu",
+        "score": 1,
+        "source": ["exact", "text", "prefix", "contained"],
+        "entityId": 348,
+        "reference": "Chichibu",
+        "shortName": null,
+        "retrievedFor": [
+          {
+            "exact": true,
+            "query": "Chichibu"
+          }
+        ]
+      },
+      {
+        "kind": "brand",
+        "name": "WhiskySponge",
+        "score": 1,
+        "source": ["exact", "text", "prefix", "contained"],
+        "entityId": 5863,
+        "reference": "WhiskySponge",
+        "shortName": null,
+        "retrievedFor": [
+          {
+            "exact": true,
+            "query": "WhiskySponge"
+          }
+        ]
+      },
+      {
+        "kind": "brand",
+        "name": "Whisky Sponge",
+        "score": 1,
+        "source": ["exact", "contained"],
+        "entityId": 366684,
+        "reference": "Whisky Sponge",
+        "shortName": null,
+        "retrievedFor": [
+          {
+            "exact": true,
+            "query": "WhiskySponge"
+          }
+        ]
+      },
+      {
+        "kind": "distillery",
+        "name": "Caol Ila",
+        "score": 1,
+        "source": ["exact", "text", "prefix", "contained"],
+        "entityId": 366,
+        "reference": "Caol Ila",
+        "shortName": "",
+        "retrievedFor": [
+          {
+            "exact": true,
+            "query": "Caol Ila"
+          }
+        ]
+      },
+      {
+        "kind": "distillery",
+        "name": "Ardbeg",
+        "score": 1,
+        "source": ["exact", "text", "prefix", "contained"],
+        "entityId": 28,
+        "reference": "Ardbeg",
+        "shortName": null,
+        "retrievedFor": [
+          {
+            "exact": true,
+            "query": "Ardbeg"
+          }
+        ]
+      },
+      {
+        "kind": "distillery",
+        "name": "Bowmore",
+        "score": 1,
+        "source": ["exact", "text", "prefix", "contained"],
+        "entityId": 394,
+        "reference": "Bowmore",
+        "shortName": null,
+        "retrievedFor": [
+          {
+            "exact": true,
+            "query": "Bowmore"
+          }
+        ]
+      },
+      {
+        "kind": "bottler",
+        "name": "Chichibu Reiwa Whisky",
+        "score": 0.5,
+        "source": ["text", "prefix"],
+        "entityId": 367660,
+        "reference": "Chichibu Reiwa Whisky",
+        "shortName": null,
+        "retrievedFor": [
+          {
+            "query": "Chichibu"
+          }
+        ]
+      },
+      {
+        "kind": "brand",
+        "name": "Peat",
+        "score": 0.36428571428571427,
+        "source": ["contained"],
+        "entityId": 3671,
+        "reference": "Peat",
+        "shortName": null,
+        "retrievedFor": [
+          {
+            "query": "Big Peat"
+          }
+        ]
+      },
+      {
+        "kind": "bottler",
+        "name": "&Whisky",
+        "score": 0.35,
+        "source": ["contained"],
+        "entityId": 365821,
+        "reference": "&Whisky",
+        "shortName": null,
+        "retrievedFor": [
+          {
+            "query": "That Boutique-y Whisky Company"
+          },
+          {
+            "query": "WhiskySponge"
+          }
+        ]
+      },
+      {
+        "kind": "brand",
+        "name": "Cadée",
+        "score": 0.31153846153846154,
+        "source": ["contained"],
+        "entityId": 367403,
+        "reference": "Cadée",
+        "shortName": null,
+        "retrievedFor": [
+          {
+            "query": "Decadent Drams"
+          },
+          {
+            "query": "Decadent Drinks"
+          }
+        ]
+      },
+      {
+        "kind": "brand",
+        "name": "Dew of Ben Nevis",
+        "score": 0.2,
+        "source": ["text"],
+        "entityId": 164,
+        "reference": null,
+        "shortName": null,
+        "retrievedFor": [
+          {
+            "query": "Ben Nevis"
+          }
+        ]
+      },
+      {
+        "kind": "company",
+        "name": "Morrison Bowmore Distillers Ltd",
+        "score": 0.2,
+        "source": ["text"],
+        "entityId": 5684,
+        "reference": null,
+        "shortName": null,
+        "retrievedFor": [
+          {
+            "query": "Bowmore"
+          }
+        ]
+      }
+    ],
+    "inspectedSeries": []
+  },
+  "provenance": {
+    "source": "production_miss",
+    "verifiedSourceUrls": [
+      "https://www.scotchwhiskyauctions.com/auctions/234-the-185th-auction/903396-deanston-2013-7-year-old-hand-filled/"
+    ],
+    "dbOutcome": {
+      "bottleId": null,
+      "createsBottle": true,
+      "summary": "Production returned create_bottle with the name `2013 7-year-old Hand Filled Organic Fino Cask`."
+    },
+    "notes": "Captured from saved classifier run 34944 (auction_lot 14896, model null, 2026-11-03T10:58:05.682Z). Production rationale: The auction title identifies a Deanston 2013, 7-year-old Hand Filled release. A product-specific retailer result corroborates the Organic Fino Cask description and 53.6% ABV. The inspected Deanston Hand Filled candidate (898) has a conflicting shared age of 12 and does not represent this distinct release, so create a separate Bottle. Checked 2026-11-03. Lot 185-00233 page: Deanston 2013 7 Year Old Hand Filled, distilled 23.08.2013, bottled 23.04.2024, Fino cask, 53.6%, 70cl. The retailer page in the evidence names it Deanston 2013 Hand Filled Organic Fino Cask. Owner rule (2026-10-28): distillery hand-fills are out of auctions and the catalog."
+  },
+  "expected": {
+    "status": "ignored",
+    "summary": "A distillery hand-fill is filled for visitors from a cask at the distillery, not a marketed release. Ignore it instead of creating a Bottle."
+  }
+}
