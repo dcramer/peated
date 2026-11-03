@@ -337,9 +337,13 @@ title, the label, and the trade name it.
 - Keep printed age, vintage, and strength wording that is part of that name:
   `12-year-old`, `1986 30-year-old`, `Barrel Proof`.
 - Keep a release name that people use as the title, such as
-  `Chapter Thirty Two`, `Act 12 Scene 9`, `4th Release`, or `2017 Release`
-  when the producer markets annual releases by year. Keep a marketed cask
-  name, such as `Leo` or `Wasted Degrees`.
+  `Chapter Thirty Two`, `Act 12 Scene 9`, or `4th Release`. Keep a marketed
+  cask name, such as `Leo` or `Wasted Degrees`.
+- A release year lives in `releaseYear`, and the page shows it beside the
+  title. Put it in the name or edition only when the label prints it, as
+  Macallan prints `2024 Release`. When the label prints no year, each year's
+  Bottle keeps the same name and only `releaseYear` tells them apart. Do not
+  add `YYYY Release` to make the name unique.
 - Do not put a cask number, batch code, selection, ABV, or outturn in the name.
   The one exception is an SMWS Bottle, named
   `<distillery number>.<cask number> <subtitle>` (see "Matching And
