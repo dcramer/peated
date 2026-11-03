@@ -388,6 +388,50 @@ test("enriching a previously reviewed lot preserves its saved check and result",
   expect(await db.query.auctionLotResults.findMany()).toHaveLength(1);
 });
 
+test("a later listing check keeps a detail-read lot's identity and match", async ({
+  fixtures,
+}) => {
+  const site = await fixtures.ExternalSite({ type: "scotchwhiskyauctions" });
+  const lot = await importedLot(site.id);
+  await requestReview(lot);
+  const run = (await queueDetails())!;
+  const request = ScotchWhiskyAuctionDetailsCursorSchema.parse(run.cursor)
+    .lots[0];
+  const detailed = (await saveAuctionLotDetails(site.id, {
+    kind: "details",
+    request,
+    ...parseScotchWhiskyAuctionDetails(detailHtml),
+    checkedAt: new Date().toISOString(),
+  }))!;
+  expect(detailed.sourceBottleIdentity).toMatchObject({ cask_number: "3771" });
+  const bottle = await fixtures.Bottle();
+  await assignAuctionLot({
+    lotId: lot.id,
+    bottleId: bottle.id,
+    fingerprint: detailed.sourceFingerprint,
+    expectedBottleId: null,
+  });
+
+  await upsertAuctionObservation(site.id, {
+    auction: {
+      sourceKey: "232",
+      name: "The 183rd auction",
+      url: "https://www.scotchwhiskyauctions.com/auctions/232-the-183rd-auction/",
+    },
+    lot: { sourceKey: "893368", name, url, state: "closed" },
+    observedAt: new Date().toISOString(),
+  });
+
+  expect(
+    await db.query.auctionLots.findFirst({ where: eq(auctionLots.id, lot.id) }),
+  ).toMatchObject({
+    sourceFingerprint: detailed.sourceFingerprint,
+    bottleId: bottle.id,
+    matchStatus: "matched",
+    sourceDetailsCheckedAt: detailed.sourceDetailsCheckedAt,
+  });
+});
+
 test("detail cursor resumes after a request-budget wait and removed pages stay reviewable", async ({
   fixtures,
 }) => {

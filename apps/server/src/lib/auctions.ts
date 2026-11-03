@@ -81,15 +81,29 @@ export function isMiniatureAuctionLot(lot: Pick<AuctionLot, "volume">) {
   return lot.volume !== null && lot.volume <= 100;
 }
 
+const SOURCE_FACT_KEYS = BottleExtractedDetailsSchema.keyof().options;
+
+/**
+ * Auction identity rule (owner: auctions): hash source facts in schema key
+ * order. Postgres jsonb stores keys in its own order, so hashing a stored value
+ * as read would change the fingerprint and reset the lot's match.
+ */
 function identityFingerprint(
   input: Pick<AuctionLot, "name" | "volume" | "sourceBottleIdentity">,
 ) {
+  const facts = input.sourceBottleIdentity;
   return createHash("sha256")
     .update(
       JSON.stringify([
         normalizeBottleReferenceKey(input.name),
         input.volume,
-        input.sourceBottleIdentity,
+        facts &&
+          Object.fromEntries(
+            SOURCE_FACT_KEYS.filter((key) => key in facts).map((key) => [
+              key,
+              facts[key],
+            ]),
+          ),
       ]),
     )
     .digest("hex");
