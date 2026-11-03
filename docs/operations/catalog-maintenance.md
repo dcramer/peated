@@ -115,6 +115,13 @@ Then apply these rules:
   group share a name, so the check does not compare them with each other.
   Entity and Series merges and Brand repairs move Bottles without the check,
   so review same-named releases after a merge.
+- Yearly releases of one expression whose label prints no year, such as each
+  George T. Stagg, belong in one group, so they can share a name. Name one
+  release, then move each other release into its group with
+  `POST /bottles/{bottle}/group` and `{"group": <group id>}`. Clear any
+  release-year edition afterward. The move keeps each Bottle's age, ABV, and
+  years, and removes an emptied group. Edit the Brand, bottler, Series,
+  category, and distillers to match the group first.
 - The server normalizes `name` on create and update: age wording such as
   `22 Years` or `Aged 7 Years` becomes `22-year-old` or `Aged 7-year-old`, so
   write `7-year-old` rather than `Aged 7 Years`. See

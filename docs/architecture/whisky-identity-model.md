@@ -78,8 +78,12 @@ with a later headquarters or office.
   fans out the shared age when the selected Bottle has no exact override.
 - Semantic grouping happens outside ordinary creation. Similar names, a shared
   brand, or a shared BottleSeries may suggest a relationship but do not prove
-  same-expression identity. This release does not ship an automatic regrouping
-  service; independently created Bottles remain in their singleton groups.
+  same-expression identity. Nothing regroups Bottles automatically;
+  independently created Bottles stay in their singleton groups until a
+  moderator moves one into another group with `POST /bottles/{bottle}/group`.
+  The move requires the same Brand, bottler, Series, category, and
+  distillers. The Bottle takes the group's shared name and keeps its own
+  release facts.
 
 There is no parent-versus-release creation decision and no `repair_parent`
 workflow. Discovering another release does not change an existing Bottle's

@@ -12,6 +12,7 @@ import flavorProfile from "./flavor-profile";
 import imageUpdate from "./image-update";
 import list from "./list";
 import merge from "./merge";
+import moveToGroup from "./move-to-group";
 import prices from "./prices";
 import recommendations from "./recommendations";
 import similar from "./similar";
@@ -36,6 +37,7 @@ export default base.tag("bottles").router({
   applyBrandRepairGroup,
   delete: delete_,
   merge,
+  moveToGroup,
   validation,
   recommendations,
   sitemap,
