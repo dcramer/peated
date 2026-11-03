@@ -84,3 +84,7 @@ arrives as status 500, so it counts as temporary.
   tool call. The AI SDK already records it, and a second span counts the calls
   and tokens twice in Sentry. The classifiers add one plain run span for their
   own facts, such as the source and candidate count.
+- An agent's `functionId` is its name in Sentry's agent views
+  (`prepareSpan` in `apps/server/src/sentry.ts` copies it to
+  `gen_ai.agent.name`), so give each agent run a stable one, such as
+  `bottle_classifier`.
