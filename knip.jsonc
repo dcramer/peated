@@ -5,7 +5,8 @@
       // OpenSpec is invoked directly by the repository's change workflow.
       "ignoreDependencies": ["@fission-ai/openspec"],
       // The workflow runs the web workspace's Playwright binary via pnpm --dir.
-      "ignoreBinaries": ["playwright"],
+      // `dev:sentry` runs the separately installed Sentry CLI (see README).
+      "ignoreBinaries": ["playwright", "sentry"],
     },
     "apps/server": {
       // The eval command loads this config through a shell conditional.
