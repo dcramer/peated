@@ -14,6 +14,7 @@
     "build:web": "pnpm build --filter='./apps/web'",
     "dev": "dotenv -e .env.local -- turbo dev",
     "dev:mock": "dotenv -e .env.local -- turbo dev:mock --filter=./apps/server --filter=./apps/web",
+    "dev:sentry": "sentry local run -- pnpm dev",
     "dev:web": "dotenv -e .env.local -- turbo dev --filter=\"./apps/web\"",
     "storybook": "pnpm --filter @peated/web storybook",
     "storybook:build": "pnpm --filter @peated/web storybook:build",

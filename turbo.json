@@ -47,6 +47,8 @@
   ],
   "globalPassThroughEnv": [
     "NODE_ENV",
+    "SENTRY_SPOTLIGHT",
+    "NEXT_PUBLIC_SENTRY_SPOTLIGHT",
     "CI",
     "VERCEL",
     "VERCEL_ENV",
