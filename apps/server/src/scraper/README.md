@@ -97,9 +97,10 @@ must share one request pace. A target may list several web addresses when that
 organization uses more than one host. Do not group sites from their domain
 names alone.
 
-Set `requestsPerHour` for each target. Requests are spread evenly across the
-hour: 120 means one request every 30 seconds. A value above 120 needs a short
-reason.
+Set `requestsPerHour` for each target. The limit paces requests so a site never
+gets a burst from us. Requests are spread evenly across the hour: 120 means one
+request every 30 seconds. A value above 120 needs a short reason. Raise it when
+a source needs more pages than the default allows.
 
 ## Scrape sources
 

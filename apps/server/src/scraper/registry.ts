@@ -178,6 +178,9 @@ export const scraperRegistry = createScraperRegistry({
     defineScrapeTarget({
       key: "scotchwhiskyauctions",
       enabled: true,
+      requestsPerHour: 480,
+      fasterRateReason:
+        "Each auction has about 5,000 lots; listing checks and lot page reads share this limit.",
       origins: [
         {
           origin: "https://www.scotchwhiskyauctions.com",
