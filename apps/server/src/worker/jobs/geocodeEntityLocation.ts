@@ -1,16 +1,10 @@
-import { Client } from "@googlemaps/google-maps-services-js";
 import config from "@peated/server/config";
 import { db } from "@peated/server/db";
-import {
-  changes,
-  entities,
-  type Country,
-  type Entity,
-  type Region,
-} from "@peated/server/db/schema";
+import { changes, entities, type Entity } from "@peated/server/db/schema";
 import { getPeatedSystemActor } from "@peated/server/lib/actors";
 import { logInfo } from "@peated/server/lib/log";
 import type { JobPayload } from "@peated/server/worker/types";
+import axios from "axios";
 import { eq } from "drizzle-orm";
 import { z } from "zod";
 
@@ -21,59 +15,27 @@ export const GeocodeEntityLocationJobArgsSchema = z
   })
   .strict();
 
-async function locateAddress(
-  entity: Entity & { country: Country | null; region: Region | null },
-) {
-  if (!config.GOOGLE_MAPS_API_KEY) {
-    throw new Error("GOOGLE_MAPS_API_KEY is not configured");
-  }
+// Google Geocoding API response: https://developers.google.com/maps/documentation/geocoding/requests-geocoding
+const GeocodeResponseSchema = z.object({
+  status: z.string(),
+  results: z.array(
+    z.object({
+      formatted_address: z.string(),
+      geometry: z.object({
+        location: z.object({ lat: z.number(), lng: z.number() }),
+      }),
+    }),
+  ),
+});
 
-  if (!entity.country) {
-    throw new Error("Need country");
-  }
+async function geocodeAddress(address: string, apiKey: string) {
+  const { data } = await axios.get(
+    "https://maps.googleapis.com/maps/api/geocode/json",
+    { params: { key: apiKey, address } },
+  );
 
-  const client = new Client();
-
-  const result = await client.textSearch({
-    params: {
-      key: config.GOOGLE_MAPS_API_KEY,
-      query: `${entity.name}, ${entity.region ? `${entity.region.name}, ` : ""}${entity.country.name}`,
-    },
-  });
-
-  if (result.data.status != "OK" || !result.data.results.length) {
-    throw new Error(`Failed to identify address of Entity: ${entity.id}`);
-  }
-
-  return result;
-}
-
-async function geocodeAddress(
-  entity: Entity & { country: Country | null; region: Region | null },
-) {
-  if (!config.GOOGLE_MAPS_API_KEY) {
-    throw new Error("GOOGLE_MAPS_API_KEY is not configured");
-  }
-
-  if (!entity.country) {
-    throw new Error("Need country");
-  }
-
-  const client = new Client();
-
-  const query = `${entity.address}, ${entity.region ? entity.region.name + "," : ""} ${entity.country.name}`;
-  const result = await client.geocode({
-    params: {
-      key: config.GOOGLE_MAPS_API_KEY,
-      address: query,
-    },
-  });
-
-  if (result.data.status != "OK" || !result.data.results.length) {
-    throw new Error(`Failed to geocode address of Entity: ${entity.id}`);
-  }
-
-  return result;
+  const result = GeocodeResponseSchema.parse(data);
+  return result.status === "OK" ? (result.results[0] ?? null) : null;
 }
 
 export default async (input: JobPayload) => {
@@ -108,21 +70,12 @@ export default async (input: JobPayload) => {
     return;
   }
 
-  // short circuit if its already bound - we should unset this before
-  // running if we want to re-run
-  const result = entity.address
-    ? await geocodeAddress(entity)
-    : await locateAddress(entity);
-
-  const match = result.data.results[0];
+  const match = await geocodeAddress(
+    `${entity.address}, ${entity.region ? entity.region.name + "," : ""} ${entity.country.name}`,
+    config.GOOGLE_MAPS_API_KEY,
+  );
   if (!match) {
-    throw new Error("Unable to identify address");
-  }
-  if (!match.formatted_address) {
-    throw new Error("Unable to identify address");
-  }
-  if (!match.geometry) {
-    throw new Error("Unable to identify geometry");
+    throw new Error(`Failed to geocode address of Entity: ${entity.id}`);
   }
 
   logInfo("Updating location for entity {entityId}", {

@@ -85,6 +85,13 @@ overrides:
   # workaround from the package's Known Issues (kkomelin/isomorphic-dompurify
   # #394). Remove it when isomorphic-dompurify works without it.
   'isomorphic-dompurify>jsdom': 25.0.1
+  # ESLint, editorconfig (via js-beautify), Sentry's bundler plugins, rimraf,
+  # and Storybook's docgen plugin ask for minimatch 9-10 and glob 10-13. The
+  # fixed releases replace the regex matcher (minimatch globparts DoS) and stop
+  # walking after an abort (glob). Every parent only calls minimatch(),
+  # Minimatch#match, glob, or globSync, which both majors keep; makeRe is gone.
+  'minimatch@<11.0.1': ^11.0.1
+  'glob@>=9.0.0 <14.0.2': ^14.0.2
 
 minimumReleaseAgeExclude:
   - zod@4.5.4
