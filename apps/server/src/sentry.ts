@@ -1,9 +1,11 @@
 /**
- * Server Sentry setup owns span filtering. SQL values and local variables stay
- * out of telemetry; callers still own reporting unexpected failures.
+ * Server Sentry setup owns span filtering and AI SDK agent names. SQL values and
+ * local variables stay out of telemetry; callers still own reporting
+ * unexpected failures.
  */
 import type { StreamedSpanJSON } from "@sentry/core";
 import * as Sentry from "@sentry/hono/node";
+import { z } from "zod";
 import config from "./config";
 import { configureLogging } from "./lib/log";
 
@@ -14,6 +16,20 @@ import { configureLogging } from "./lib/log";
 export function prepareSpan(span: StreamedSpanJSON): StreamedSpanJSON {
   const cleaned = { ...span, attributes: { ...span.attributes } };
   delete cleaned.attributes["drizzle.query.params"];
+  // Sentry names agents by `gen_ai.agent.name`. The AI SDK's agent span
+  // carries the run's `functionId` as `gen_ai.function_id` but not the name,
+  // so without this an AI SDK agent shows unnamed in Sentry's agent views.
+  const functionId = z
+    .string()
+    .min(1)
+    .safeParse(cleaned.attributes["gen_ai.function_id"]);
+  if (
+    cleaned.name.startsWith("invoke_agent ") &&
+    functionId.success &&
+    cleaned.attributes["gen_ai.agent.name"] === undefined
+  ) {
+    cleaned.attributes["gen_ai.agent.name"] = functionId.data;
+  }
   return cleaned;
 }
 
