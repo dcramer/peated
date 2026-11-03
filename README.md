@@ -105,6 +105,20 @@ The worker requires Redis. The default local Redis URL is
 `redis://@localhost:16379`, matching `docker-compose.yml`. For API-only local
 checks, use `pnpm dev:server:api`.
 
+To see local errors, traces, logs, and model calls, run the dev server through
+[Sentry Local](https://cli.sentry.dev) instead:
+
+```bash
+pnpm dev:sentry
+```
+
+This needs the `sentry` command installed. It starts a local Sentry server on
+`localhost:8969` and sends the web app, API, and worker events to it; no Sentry
+account or DSN is needed. Open the viewer with `sentry local --open`, or tail
+events in another terminal with `sentry local`. To run one command this way,
+use `sentry local run -- <command>`, such as
+`sentry local run -- pnpm dev:server:api`.
+
 ## Operations
 
 See [Deployments](./docs/operations/deployments.md) for the production service
