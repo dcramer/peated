@@ -1,0 +1,848 @@
+{
+  "id": "auction-highland-park-hand-filled-distillery-exclusive",
+  "name": "auction title: a Highland Park hand-filled distillery exclusive is not a marketed Bottle",
+  "input": {
+    "reference": {
+      "id": 15903,
+      "url": "https://www.scotchwhiskyauctions.com/auctions/234-the-185th-auction/905528-highland-park-hand-filled-distillery-exclusive/",
+      "name": "Highland Park Hand Filled Distillery Exclusive",
+      "imageUrl": null,
+      "externalSiteId": 28097,
+      "currentBottleId": null
+    },
+    "extractedIdentity": {
+      "abv": 53.3,
+      "brand": null,
+      "series": null,
+      "bottler": null,
+      "edition": null,
+      "outturn": null,
+      "category": null,
+      "distillery": null,
+      "expression": null,
+      "maturation": null,
+      "stated_age": null,
+      "cask_number": null,
+      "single_cask": null,
+      "release_year": null,
+      "vintage_year": null,
+      "cask_strength": null
+    },
+    "imageEvidence": null,
+    "initialCandidates": [
+      {
+        "abv": null,
+        "brand": "Springbank",
+        "score": 64.56987,
+        "series": null,
+        "source": ["text"],
+        "bottler": null,
+        "edition": null,
+        "outturn": null,
+        "bottleId": 410,
+        "category": "single_malt",
+        "fullName": "Springbank Hand Filled Distillery Exclusive",
+        "reference": null,
+        "statedAge": null,
+        "caskNumber": null,
+        "comparison": {
+          "missing": ["abv"],
+          "conflicts": [],
+          "agreements": []
+        },
+        "distillery": ["Springbank"],
+        "maturation": null,
+        "releaseDay": null,
+        "singleCask": null,
+        "releaseYear": null,
+        "vintageYear": null,
+        "bottlingYear": null,
+        "caskStrength": null,
+        "releaseMonth": null,
+        "familyContext": {
+          "siblingBottles": []
+        }
+      },
+      {
+        "abv": null,
+        "brand": "Longrow",
+        "score": 64.14436,
+        "series": null,
+        "source": ["text"],
+        "bottler": "Springbank",
+        "edition": null,
+        "outturn": null,
+        "bottleId": 409,
+        "category": "single_malt",
+        "fullName": "Longrow Hand Filled Distillery Exclusive",
+        "reference": null,
+        "statedAge": null,
+        "caskNumber": null,
+        "comparison": {
+          "missing": ["abv"],
+          "conflicts": [],
+          "agreements": []
+        },
+        "distillery": [],
+        "maturation": null,
+        "releaseDay": null,
+        "singleCask": null,
+        "releaseYear": null,
+        "vintageYear": null,
+        "bottlingYear": null,
+        "caskStrength": null,
+        "releaseMonth": null,
+        "familyContext": {
+          "siblingBottles": []
+        }
+      },
+      {
+        "abv": null,
+        "brand": "Bunnahabhain",
+        "score": 59.324726,
+        "series": null,
+        "source": ["text"],
+        "bottler": null,
+        "edition": null,
+        "outturn": null,
+        "bottleId": 1993,
+        "category": "single_malt",
+        "fullName": "Bunnahabhain 2004 Warehouse 9 - Hand-Filled Exclusive",
+        "reference": null,
+        "statedAge": 16,
+        "caskNumber": null,
+        "comparison": {
+          "missing": ["abv"],
+          "conflicts": [],
+          "agreements": []
+        },
+        "distillery": ["Bunnahabhain"],
+        "maturation": null,
+        "releaseDay": null,
+        "singleCask": null,
+        "releaseYear": null,
+        "vintageYear": null,
+        "bottlingYear": null,
+        "caskStrength": null,
+        "releaseMonth": null,
+        "familyContext": {
+          "siblingBottles": []
+        }
+      },
+      {
+        "abv": null,
+        "brand": "Bunnahabhain",
+        "score": 59.324726,
+        "series": null,
+        "source": ["text"],
+        "bottler": null,
+        "edition": null,
+        "outturn": null,
+        "bottleId": 3100,
+        "category": "single_malt",
+        "fullName": "Bunnahabhain 2005 Warehouse 9 - Hand-filled Exclusive",
+        "reference": null,
+        "statedAge": 15,
+        "caskNumber": null,
+        "comparison": {
+          "missing": ["abv"],
+          "conflicts": [],
+          "agreements": []
+        },
+        "distillery": ["Bunnahabhain"],
+        "maturation": null,
+        "releaseDay": null,
+        "singleCask": null,
+        "releaseYear": null,
+        "vintageYear": null,
+        "bottlingYear": null,
+        "caskStrength": null,
+        "releaseMonth": null,
+        "familyContext": {
+          "siblingBottles": []
+        }
+      },
+      {
+        "abv": null,
+        "brand": "Bunnahabhain",
+        "score": 59.324726,
+        "series": null,
+        "source": ["text"],
+        "bottler": null,
+        "edition": null,
+        "outturn": null,
+        "bottleId": 1265,
+        "category": "single_malt",
+        "fullName": "Bunnahabhain 2007 Warehouse 9 - Hand Filled Exclusive",
+        "reference": null,
+        "statedAge": 14,
+        "caskNumber": null,
+        "comparison": {
+          "missing": ["abv"],
+          "conflicts": [],
+          "agreements": []
+        },
+        "distillery": ["Bunnahabhain"],
+        "maturation": null,
+        "releaseDay": null,
+        "singleCask": null,
+        "releaseYear": null,
+        "vintageYear": null,
+        "bottlingYear": null,
+        "caskStrength": null,
+        "releaseMonth": null,
+        "familyContext": {
+          "siblingBottles": []
+        }
+      },
+      {
+        "abv": null,
+        "brand": "Bunnahabhain",
+        "score": 59.324726,
+        "series": null,
+        "source": ["text"],
+        "bottler": null,
+        "edition": null,
+        "outturn": null,
+        "bottleId": 1678,
+        "category": "single_malt",
+        "fullName": "Bunnahabhain 2007 Warehouse 9 - Hand-Filled Exclusive",
+        "reference": null,
+        "statedAge": 12,
+        "caskNumber": null,
+        "comparison": {
+          "missing": ["abv"],
+          "conflicts": [],
+          "agreements": []
+        },
+        "distillery": ["Bunnahabhain"],
+        "maturation": null,
+        "releaseDay": null,
+        "singleCask": null,
+        "releaseYear": null,
+        "vintageYear": null,
+        "bottlingYear": null,
+        "caskStrength": null,
+        "releaseMonth": null,
+        "familyContext": {
+          "siblingBottles": []
+        }
+      },
+      {
+        "abv": null,
+        "brand": "Bunnahabhain",
+        "score": 59.324726,
+        "series": null,
+        "source": ["text"],
+        "bottler": null,
+        "edition": null,
+        "outturn": null,
+        "bottleId": 1997,
+        "category": "single_malt",
+        "fullName": "Bunnahabhain 2008 Warehouse 9 - Hand-Filled Exclusive",
+        "reference": null,
+        "statedAge": 12,
+        "caskNumber": null,
+        "comparison": {
+          "missing": ["abv"],
+          "conflicts": [],
+          "agreements": []
+        },
+        "distillery": ["Bunnahabhain"],
+        "maturation": null,
+        "releaseDay": null,
+        "singleCask": null,
+        "releaseYear": null,
+        "vintageYear": null,
+        "bottlingYear": null,
+        "caskStrength": null,
+        "releaseMonth": null,
+        "familyContext": {
+          "siblingBottles": []
+        }
+      },
+      {
+        "abv": null,
+        "brand": "Bunnahabhain",
+        "score": 55.82379,
+        "series": null,
+        "source": ["text"],
+        "bottler": null,
+        "edition": null,
+        "outturn": null,
+        "bottleId": 1989,
+        "category": "single_malt",
+        "fullName": "Bunnahabhain 11-year-old Warehouse 9 - Hand-Filled Exclusive",
+        "reference": null,
+        "statedAge": 11,
+        "caskNumber": null,
+        "comparison": {
+          "missing": ["abv"],
+          "conflicts": [],
+          "agreements": []
+        },
+        "distillery": ["Bunnahabhain"],
+        "maturation": null,
+        "releaseDay": null,
+        "singleCask": null,
+        "releaseYear": null,
+        "vintageYear": null,
+        "bottlingYear": null,
+        "caskStrength": null,
+        "releaseMonth": null,
+        "familyContext": {
+          "siblingBottles": []
+        }
+      },
+      {
+        "abv": null,
+        "brand": "Bunnahabhain",
+        "score": 55.82379,
+        "series": null,
+        "source": ["text"],
+        "bottler": null,
+        "edition": null,
+        "outturn": null,
+        "bottleId": 2368,
+        "category": "single_malt",
+        "fullName": "Bunnahabhain 12-year-old Warehouse 9 - Hand-Filled Exclusive",
+        "reference": null,
+        "statedAge": 12,
+        "caskNumber": null,
+        "comparison": {
+          "missing": ["abv"],
+          "conflicts": [],
+          "agreements": []
+        },
+        "distillery": ["Bunnahabhain"],
+        "maturation": null,
+        "releaseDay": null,
+        "singleCask": null,
+        "releaseYear": null,
+        "vintageYear": null,
+        "bottlingYear": null,
+        "caskStrength": null,
+        "releaseMonth": null,
+        "familyContext": {
+          "siblingBottles": []
+        }
+      },
+      {
+        "abv": null,
+        "brand": "Bunnahabhain",
+        "score": 55.82379,
+        "series": null,
+        "source": ["text"],
+        "bottler": null,
+        "edition": null,
+        "outturn": null,
+        "bottleId": 2369,
+        "category": "single_malt",
+        "fullName": "Bunnahabhain 13-year-old Warehouse 9 - Hand-Filled Exclusive",
+        "reference": null,
+        "statedAge": 13,
+        "caskNumber": null,
+        "comparison": {
+          "missing": ["abv"],
+          "conflicts": [],
+          "agreements": []
+        },
+        "distillery": ["Bunnahabhain"],
+        "maturation": null,
+        "releaseDay": null,
+        "singleCask": null,
+        "releaseYear": null,
+        "vintageYear": null,
+        "bottlingYear": null,
+        "caskStrength": null,
+        "releaseMonth": null,
+        "familyContext": {
+          "siblingBottles": []
+        }
+      },
+      {
+        "abv": null,
+        "brand": "Bunnahabhain",
+        "score": 55.82379,
+        "series": null,
+        "source": ["text"],
+        "bottler": null,
+        "edition": null,
+        "outturn": null,
+        "bottleId": 2370,
+        "category": "single_malt",
+        "fullName": "Bunnahabhain 14-year-old Warehouse 9 - Hand-Filled Exclusive",
+        "reference": null,
+        "statedAge": 14,
+        "caskNumber": null,
+        "comparison": {
+          "missing": ["abv"],
+          "conflicts": [],
+          "agreements": []
+        },
+        "distillery": ["Bunnahabhain"],
+        "maturation": null,
+        "releaseDay": null,
+        "singleCask": null,
+        "releaseYear": null,
+        "vintageYear": null,
+        "bottlingYear": null,
+        "caskStrength": null,
+        "releaseMonth": null,
+        "familyContext": {
+          "siblingBottles": []
+        }
+      },
+      {
+        "abv": null,
+        "brand": "Deanston",
+        "score": 50.19168,
+        "series": null,
+        "source": ["text"],
+        "bottler": null,
+        "edition": null,
+        "outturn": null,
+        "bottleId": 898,
+        "category": "single_malt",
+        "fullName": "Deanston Hand Filled",
+        "reference": null,
+        "statedAge": 12,
+        "caskNumber": null,
+        "comparison": {
+          "missing": ["abv"],
+          "conflicts": [],
+          "agreements": []
+        },
+        "distillery": ["Deanston"],
+        "maturation": null,
+        "releaseDay": null,
+        "singleCask": null,
+        "releaseYear": null,
+        "vintageYear": null,
+        "bottlingYear": null,
+        "caskStrength": null,
+        "releaseMonth": null,
+        "familyContext": {
+          "siblingBottles": []
+        }
+      },
+      {
+        "abv": null,
+        "brand": "The GlenDronach",
+        "score": 50.155952,
+        "series": null,
+        "source": ["text"],
+        "bottler": null,
+        "edition": null,
+        "outturn": null,
+        "bottleId": 1744,
+        "category": "single_malt",
+        "fullName": "The GlenDronach 1994 Hand-filled at the distillery",
+        "reference": null,
+        "statedAge": 26,
+        "caskNumber": null,
+        "comparison": {
+          "missing": ["abv"],
+          "conflicts": [],
+          "agreements": []
+        },
+        "distillery": ["The GlenDronach"],
+        "maturation": null,
+        "releaseDay": null,
+        "singleCask": null,
+        "releaseYear": null,
+        "vintageYear": null,
+        "bottlingYear": null,
+        "caskStrength": null,
+        "releaseMonth": null,
+        "familyContext": {
+          "siblingBottles": []
+        }
+      },
+      {
+        "abv": null,
+        "brand": "The GlenDronach",
+        "score": 48.405518,
+        "series": null,
+        "source": ["text"],
+        "bottler": null,
+        "edition": null,
+        "outturn": null,
+        "bottleId": 2065,
+        "category": "single_malt",
+        "fullName": "The GlenDronach 2005 Hand-filled at the distillery",
+        "reference": null,
+        "statedAge": null,
+        "caskNumber": null,
+        "comparison": {
+          "missing": ["abv"],
+          "conflicts": [],
+          "agreements": []
+        },
+        "distillery": ["The GlenDronach"],
+        "maturation": null,
+        "releaseDay": null,
+        "singleCask": null,
+        "releaseYear": null,
+        "vintageYear": null,
+        "bottlingYear": null,
+        "caskStrength": null,
+        "releaseMonth": null,
+        "familyContext": {
+          "siblingBottles": []
+        }
+      },
+      {
+        "abv": null,
+        "brand": "The GlenDronach",
+        "score": 47.876606,
+        "series": null,
+        "source": ["text"],
+        "bottler": null,
+        "edition": null,
+        "outturn": null,
+        "bottleId": 2446,
+        "category": "single_malt",
+        "fullName": "The GlenDronach 1992 Hand-filled at the distillery",
+        "reference": null,
+        "statedAge": 28,
+        "caskNumber": null,
+        "comparison": {
+          "missing": ["abv"],
+          "conflicts": [],
+          "agreements": []
+        },
+        "distillery": ["The GlenDronach"],
+        "maturation": null,
+        "releaseDay": null,
+        "singleCask": null,
+        "releaseYear": null,
+        "vintageYear": null,
+        "bottlingYear": null,
+        "caskStrength": null,
+        "releaseMonth": null,
+        "familyContext": {
+          "siblingBottles": []
+        }
+      },
+      {
+        "abv": null,
+        "brand": "Highland Park",
+        "score": 1,
+        "series": null,
+        "source": ["vector", "context"],
+        "bottler": null,
+        "edition": null,
+        "outturn": null,
+        "bottleId": 44080,
+        "category": "single_malt",
+        "fullName": "Highland Park Cask Strength",
+        "reference": "Highland Park Cask Strength",
+        "statedAge": null,
+        "caskNumber": null,
+        "comparison": {
+          "missing": ["abv"],
+          "conflicts": [],
+          "agreements": ["category", "brand", "distillers"]
+        },
+        "distillery": ["Highland Park"],
+        "maturation": null,
+        "releaseDay": null,
+        "singleCask": null,
+        "releaseYear": null,
+        "vintageYear": null,
+        "bottlingYear": null,
+        "caskStrength": null,
+        "releaseMonth": null,
+        "familyContext": {
+          "siblingBottles": [
+            {
+              "abv": 64.7,
+              "edition": "Release No. 5",
+              "outturn": null,
+              "bottleId": 45101,
+              "fullName": "Highland Park Cask Strength - Release No. 5",
+              "statedAge": null,
+              "caskNumber": null,
+              "maturation": "First-fill sherry-seasoned European oak incl. PX, refill, ex-bourbon and first-fill sherry-seasoned American oak",
+              "releaseDay": null,
+              "singleCask": null,
+              "releaseYear": 2024,
+              "traitFields": ["edition", "releaseYear", "abv", "caskStrength"],
+              "vintageYear": null,
+              "bottlingYear": null,
+              "caskStrength": true,
+              "releaseMonth": null
+            }
+          ]
+        }
+      },
+      {
+        "abv": null,
+        "brand": "Highland Park",
+        "score": 0.742490352215274,
+        "series": null,
+        "source": ["vector"],
+        "bottler": "Highland Park",
+        "edition": null,
+        "outturn": null,
+        "bottleId": 4917,
+        "category": "single_malt",
+        "fullName": "Highland Park 1973 Single Cask - 1973 Vintage",
+        "reference": "Highland Park 1973 Single Cask",
+        "statedAge": 47,
+        "caskNumber": null,
+        "comparison": {
+          "missing": ["abv"],
+          "conflicts": [],
+          "agreements": ["category", "brand", "distillers"]
+        },
+        "distillery": ["Highland Park"],
+        "maturation": null,
+        "releaseDay": null,
+        "singleCask": true,
+        "releaseYear": null,
+        "vintageYear": 1973,
+        "bottlingYear": null,
+        "caskStrength": null,
+        "releaseMonth": null,
+        "familyContext": {
+          "siblingBottles": []
+        }
+      }
+    ]
+  },
+  "context": {
+    "inspectedBottleIds": [44080],
+    "bottleContexts": [
+      {
+        "exact": {
+          "abv": null,
+          "edition": null,
+          "outturn": null,
+          "statedAge": null,
+          "caskNumber": null,
+          "maturation": null,
+          "releaseDay": null,
+          "singleCask": null,
+          "releaseYear": null,
+          "vintageYear": null,
+          "bottlingYear": null,
+          "caskStrength": null,
+          "releaseMonth": null
+        },
+        "shared": {
+          "name": "Cask Strength",
+          "brand": {
+            "name": "Highland Park",
+            "entityId": 438
+          },
+          "series": null,
+          "bottler": null,
+          "category": "single_malt",
+          "statedAge": null,
+          "distillers": [
+            {
+              "name": "Highland Park",
+              "entityId": 438
+            }
+          ]
+        },
+        "groupId": 17903,
+        "bottleId": 44080,
+        "fullName": "Highland Park Cask Strength",
+        "siblings": [
+          {
+            "exact": {
+              "abv": 64.7,
+              "edition": "Release No. 5",
+              "outturn": null,
+              "statedAge": null,
+              "caskNumber": null,
+              "maturation": "First-fill sherry-seasoned European oak incl. PX, refill, ex-bourbon and first-fill sherry-seasoned American oak",
+              "releaseDay": null,
+              "singleCask": null,
+              "releaseYear": 2024,
+              "vintageYear": null,
+              "bottlingYear": null,
+              "caskStrength": true,
+              "releaseMonth": null
+            },
+            "bottleId": 45101,
+            "fullName": "Highland Park Cask Strength - Release No. 5"
+          }
+        ],
+        "references": [
+          {
+            "name": "Highland Park Cask Strength",
+            "ignored": false
+          },
+          {
+            "name": "Highland Park Cask Strength  Robust & Intense",
+            "ignored": false
+          },
+          {
+            "name": "Highland Park Cask Strength Robust & Intense",
+            "ignored": false
+          },
+          {
+            "name": "Highland Park Park Cask Strength",
+            "ignored": false
+          }
+        ],
+        "observations": [
+          {
+            "facts": {
+              "proposalType": "no_match",
+              "proposedBottle": null,
+              "referenceScope": "none"
+            },
+            "rawText": "Highland Park Cask Strength Single Malt Whisky",
+            "sourceKey": "store_price:11758044",
+            "sourceUrl": "https://www.reservebar.com/products/highland-park-cask-strength/GROUPING-1741092.html",
+            "sourceName": "Highland Park Cask Strength Single Malt Whisky",
+            "sourceType": "store_price",
+            "parsedIdentity": {
+              "abv": null,
+              "brand": "Highland Park",
+              "series": null,
+              "edition": null,
+              "category": "single_malt",
+              "cask_type": null,
+              "distillery": ["Highland Park"],
+              "expression": "Cask Strength",
+              "stated_age": null,
+              "single_cask": null,
+              "release_year": null,
+              "vintage_year": null,
+              "cask_strength": true
+            }
+          },
+          {
+            "facts": {
+              "proposalType": "match_existing",
+              "proposedBottle": null,
+              "referenceScope": "none"
+            },
+            "rawText": "Highland Park Single Malt Scotch Whisky Cask Strength Edition",
+            "sourceKey": "store_price:3362",
+            "sourceUrl": "https://woodencork.com/collections/whiskey/products/highland-park-single-malt-scotch-whisky-cask-strength-edition",
+            "sourceName": "Highland Park Single Malt Scotch Whisky Cask Strength Edition",
+            "sourceType": "store_price",
+            "parsedIdentity": null
+          }
+        ],
+        "imageSources": []
+      }
+    ],
+    "inspectedEntities": [
+      {
+        "kind": "distillery",
+        "name": "Springbank",
+        "score": 1,
+        "source": ["exact", "text", "prefix", "contained"],
+        "entityId": 1362,
+        "reference": "Springbank",
+        "shortName": null,
+        "retrievedFor": [
+          {
+            "exact": true,
+            "query": "Springbank"
+          }
+        ]
+      },
+      {
+        "kind": "brand",
+        "name": "Longrow",
+        "score": 1,
+        "source": ["exact", "text", "prefix", "contained"],
+        "entityId": 1152,
+        "reference": "Longrow",
+        "shortName": null,
+        "retrievedFor": [
+          {
+            "exact": true,
+            "query": "Longrow"
+          }
+        ]
+      },
+      {
+        "kind": "distillery",
+        "name": "Bunnahabhain",
+        "score": 1,
+        "source": ["exact", "text", "prefix", "contained"],
+        "entityId": 144,
+        "reference": "Bunnahabhain",
+        "shortName": "",
+        "retrievedFor": [
+          {
+            "exact": true,
+            "query": "Bunnahabhain"
+          }
+        ]
+      },
+      {
+        "kind": "distillery",
+        "name": "Deanston",
+        "score": 1,
+        "source": ["exact", "text", "prefix", "contained"],
+        "entityId": 445,
+        "reference": "Deanston",
+        "shortName": null,
+        "retrievedFor": [
+          {
+            "exact": true,
+            "query": "Deanston"
+          }
+        ]
+      },
+      {
+        "kind": "distillery",
+        "name": "The GlenDronach",
+        "score": 1,
+        "source": ["exact", "text", "prefix", "contained"],
+        "entityId": 973,
+        "reference": "The GlenDronach",
+        "shortName": null,
+        "retrievedFor": [
+          {
+            "exact": true,
+            "query": "The GlenDronach"
+          }
+        ]
+      },
+      {
+        "kind": "distillery",
+        "name": "Highland Park",
+        "score": 1,
+        "source": ["exact", "text", "prefix", "contained"],
+        "entityId": 438,
+        "reference": "Highland Park",
+        "shortName": null,
+        "retrievedFor": [
+          {
+            "exact": true,
+            "query": "Highland Park"
+          }
+        ]
+      }
+    ],
+    "inspectedSeries": []
+  },
+  "provenance": {
+    "source": "production_miss",
+    "verifiedSourceUrls": [
+      "https://www.scotchwhiskyauctions.com/auctions/234-the-185th-auction/905528-highland-park-hand-filled-distillery-exclusive/"
+    ],
+    "dbOutcome": {
+      "bottleId": null,
+      "createsBottle": false,
+      "summary": "Production returned no_match."
+    },
+    "notes": "Captured from saved classifier run 35565 (auction_lot 15903, model null, 2026-11-03T14:47:20.911Z). Production rationale: The source appears to concern one Highland Park whisky Bottle. Existing candidate 44080, Highland Park Cask Strength, is a different named product and is not a safe match. The available evidence does not establish the complete marketed identity well enough to create a Bottle, so this requires review. Checked 2026-11-03. Lot 185-02331 page: Highland Park Hand Filled Distillery Exclusive, 53.3%, 70cl, bottle number 620; no age, cask, or release facts. Owner rule (2026-10-28): distillery hand-fills are out of auctions and the catalog."
+  },
+  "expected": {
+    "status": "ignored",
+    "summary": "A hand-filled distillery exclusive is a visitor hand-fill, not a marketed release. Ignore it instead of leaving it for review."
+  }
+}

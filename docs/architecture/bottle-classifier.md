@@ -39,9 +39,13 @@ reference identifies.
 Peated tracks single whisky Bottles. A source that is something else is
 ignored: another spirit, a flavored whisky or whiskey liqueur, several items
 sold together (a set, multipack, bundle, or a Bottle sold with glassware or
-samples), a miniature, a sample of any size (such as a cask or trade sample), or
-glassware and other accessories. A Bottle in its own box or tin is still one
-Bottle. Scope is about what is sold, not how clearly the source names it: a
+samples), a miniature, a sample of any size (such as a cask or trade sample), a
+distillery hand-fill (a bottle filled by hand from a cask at the distillery for
+a visitor, such as a Bruichladdich Valinch), or glassware and other accessories.
+A hand-fill stays out of scope even with its own label, batch, bottle number, or
+release year. A distillery-only release that the producer bottled for sale is
+still a marketed release. A Bottle in its own box or tin is still one Bottle.
+Scope is about what is sold, not how clearly the source names it: a
 whisky Bottle with unclear identity is `no_match`, not ignored. An ignored
 result has a reason and no decision, and every caller stops tracking that source
 without review.

@@ -175,7 +175,43 @@
     "https://www.jamesonwhiskey.com/en-us/our-whiskey/jameson-cold-brew/",
     "https://www.ralphs.com/p/jameson-cold-brew-coffee-irish-whisky/0008043211561",
     "https://shop.dierbergs.com/store/dierbergs-markets/products/19172463-skrewball-peanut-butter-whiskey-whiskey-peanut-butter-750-ml",
-    "https://www.skrewballwhiskey.com/en/"
+    "https://www.skrewballwhiskey.com/en/",
+    "https://whiskyinternationalonline.com/products/deanston-2013-hand-filled-organic-fino-cask-53-6",
+    "https://www.scotchwhiskyauctions.com/auctions/234-the-185th-auction/903396-deanston-2013-7-year-old-hand-filled/",
+    "https://www.scotchwhiskyauctions.com/auctions/233-the-184th-auction/898970-bruichladdich-valinch-28-chloe-wood-50cl/",
+    "https://www.spiritradar.com/whisky-db/bruichladdich-2005-laddie-crew-valinch-28-chloe-wood-48.8-percent-500ml/",
+    "https://www.whiskybase.com/whiskies/whisky/99343/bruichladdich-2005",
+    "https://www.whiskystats.com/whisky/99343",
+    "https://www.whisky.com/whisky-database/details/bruichladdich-valinch-28-chloe-wood.html",
+    "https://whiskyauctioneer.com/learn/explore-whisky/bottles/bruichladdich-2005-chloe-wood-valinch-12-year-old-sauternes-cask-0?v=84978",
+    "https://www.laddienerd.de/valinches/bruichladdich-lochindaal/2017-releases/",
+    "https://www.bruichladdich.com/products/the-laddie-twelve",
+    "https://whiskyconsultants.com/bruichladdich-the-laddie-valinch-34-2004-2018",
+    "https://www.scotchwhiskyauctions.com/auctions/234-the-185th-auction/908247-lagavulin-12-year-old-hand-filled-batch-002-2025-release/",
+    "https://www.scotchwhiskyauctions.com/auctions/234-the-185th-auction/905528-highland-park-hand-filled-distillery-exclusive/",
+    "https://whiskyinternationalonline.com/collections/collectable-whisky?page=53",
+    "https://www.spiritradar.com/whisky-db/countries/united-kingdom-50/",
+    "https://dornochcastlehotel.com/wp-content/uploads/2025/10/WhiskyList102025.pdf",
+    "http://www.hongkong.intercontinental.com/wp-content/uploads/sites/33/2023/04/HKWF_Dram_List-1.pdf",
+    "https://www.instagram.com/p/DadRnddHImO/?__d=1%3F%2F",
+    "https://gall.dcinside.com/mgallery/board/view/?id=whiskey&no=1535625",
+    "https://www.reddit.com/r/Scotch/comments/1wsgcx4/review_960_highland_park_cask_strength/",
+    "https://royalpalms.com/listing/highland-park-single-cask-7170-single-malt-scotch-whisky",
+    "https://www.instagram.com/reel/DVyasdGjKwA/",
+    "https://www.whisky.com/whisky-database/details/highland-park-distillery-exclusive-cask-strength-6571.html",
+    "https://www.insidehook.com/whiskey/highland-park-cask-strength-heather-whisky-marc-watson",
+    "https://whiskyinternationalonline.com/products/highland-park-cask-strength-release-no-3-64-1",
+    "https://www.scotchwhiskyauctions.com/auctions/234-the-185th-auction/907501-auchentoshan-valinch-2012-release/",
+    "https://whiskyadvocate.com/Auchentoshan-Valinch-2012-57-2",
+    "https://maltrunners.com/2013/08/12/auchentoshan-valinch-2012-edition/",
+    "https://www.reddit.com/r/Scotch/comments/1u1sh1u/review_201_auchentoshan_valinch_single_malt_2012/",
+    "https://caskcartel.com/es-hr/collections/cask-cartel/products/auchentoshan-2012-valinch-limited-edition-single-malt-scotch-whisky",
+    "https://www.youtube.com/watch?v=desarCKvVaU",
+    "https://www.connosr.com/auchentoshan-valinch-2012-release-whisky-reviews-2998",
+    "https://www.masterofmalt.com/whiskies/auchentoshan/auchentoshan-valinch-2012-2nd-release-whisky/",
+    "https://www.reddit.com/r/Scotch/comments/1fakgz/review_3_auchentoshan_valinch_2012/",
+    "https://www.spiritradar.com/whisky-db/auchentoshan-valinch-2012-festival-edition-57.2-percent-700ml/",
+    "https://www.caskers.com/auchentoshan-valinch-limited-edition-single-malt-scotch-whisky/"
   ],
   "cases": {
     "1792-single-barrel": {
@@ -5321,6 +5357,537 @@
         "errors": []
       },
       "pageResults": [],
+      "imageResults": []
+    },
+    "auction-deanston-2013-7-year-old-hand-filled": {
+      "searchResult": {
+        "evidence": [
+          {
+            "query": "\"Deanston 2013 7 Year Old Hand Filled\" whisky 53.6%",
+            "results": [
+              {
+                "url": "https://whiskyinternationalonline.com/products/deanston-2013-hand-filled-organic-fino-cask-53-6",
+                "title": "Deanston 2013 Hand Filled Organic Fino Cask Whisky",
+                "domain": "whiskyinternationalonline.com",
+                "description": null,
+                "extraSnippets": []
+              }
+            ],
+            "summary": "Rating 5.0(1) · 14-day returnsDeanston 2013 7 Year Old Hand Filled Organic Fino Cask Whisky 53.6% ; Region: Highland ; Size: 70cl ; ABV: 53.6% ; Age: 7 Year Old Whisky ; Shipping Weight: 2kg.",
+            "provider": "firecrawl"
+          },
+          {
+            "query": "page opening",
+            "results": [
+              {
+                "url": "https://www.scotchwhiskyauctions.com/auctions/234-the-185th-auction/903396-deanston-2013-7-year-old-hand-filled/",
+                "title": "Deanston 2013 7 Year Old Hand Filled | The 185th Auction | Scotch Whisky Auctions",
+                "domain": "scotchwhiskyauctions.com",
+                "description": null,
+                "extraSnippets": []
+              }
+            ],
+            "summary": "[Skip to menu](https://www.scotchwhiskyauctions.com/auctions/234-the-185th-auction/903396-deanston-2013-7-year-old-hand-filled/#menu) [Skip to content](https://www.scotchwhiskyauctions.com/auctions/234-the-185th-auction/903396-deanston-2013-7-year-old-hand-filled/#contentstart)\n\nAre you the legal age to buy alcohol in your country?YesNo\n\n [Free valuations](https://wa.me/+447538638525/?text=I%20would%20like%20a%20free%20valuation)\n\nShow/hide cookie info\n\n**This site may set cookies for essential tasks, such as tracking whether you are signed in.**\n\nWe would also like to set analytics cookies to better understand our users’ behaviour.\n\n[Read our cookies policy](https://www.scotchwhiskyauctions.com/privacy/)\n\nAcceptReject",
+            "provider": "firecrawl"
+          },
+          {
+            "query": "site:scotchwhiskyauctions.com/auctions/234-the-185th-auction/903396-deanston-2013-7-year-old-hand-filled \"Deanston\" \"2013\" \"7 Year Old\" \"53.6%\"",
+            "results": [],
+            "summary": null,
+            "provider": "firecrawl"
+          }
+        ],
+        "errors": []
+      },
+      "pageResults": [
+        {
+          "url": "https://www.scotchwhiskyauctions.com/auctions/234-the-185th-auction/903396-deanston-2013-7-year-old-hand-filled/",
+          "result": {
+            "provider": "firecrawl",
+            "query": "Reviewed lot description",
+            "summary": "Deanston is housed in a former cotton mill on the banks of the fast-flowing River Teith, in the central Highlands that dates back to the late eighteenth century. The buildings were converted in to a distillery in 1966. It was acquired by Invergordon in 1972, but ceased production in 1982 and was mothballed until 1990. Deanston is now operated by Distell and has managed to retain some old-style features in its kit and distilling regime. Its mash tun is open-topped, while the way the distillery is run – low gravity worts, long fermentation times and slow distillation helps to produce a new make which has a slightly waxy style. Distilled: 23.08.2013 Bottled: 23.04.2024 Cask Type: Fino 53.6% ABV / 70cl",
+            "results": [
+              {
+                "title": "Deanston 2013 7 Year Old Hand Filled | Scotch Whisky Auctions",
+                "url": "https://www.scotchwhiskyauctions.com/auctions/234-the-185th-auction/903396-deanston-2013-7-year-old-hand-filled/",
+                "domain": "www.scotchwhiskyauctions.com",
+                "description": "Lot description passage reviewed 2026-11-03.",
+                "extraSnippets": []
+              }
+            ]
+          }
+        }
+      ],
+      "imageResults": []
+    },
+    "auction-bruichladdich-valinch-28-chloe-wood": {
+      "searchResult": {
+        "evidence": [
+          {
+            "query": "page opening",
+            "results": [
+              {
+                "url": "https://www.scotchwhiskyauctions.com/auctions/233-the-184th-auction/898970-bruichladdich-valinch-28-chloe-wood-50cl/",
+                "title": "Bruichladdich Valinch 28 Chloe Wood 50cl | The 184th Auction | Scotch Whisky Auctions",
+                "domain": "scotchwhiskyauctions.com",
+                "description": null,
+                "extraSnippets": []
+              }
+            ],
+            "summary": "[Skip to menu](https://www.scotchwhiskyauctions.com/auctions/233-the-184th-auction/898970-bruichladdich-valinch-28-chloe-wood-50cl/#menu) [Skip to content](https://www.scotchwhiskyauctions.com/auctions/233-the-184th-auction/898970-bruichladdich-valinch-28-chloe-wood-50cl/#contentstart)\n\nAre you the legal age to buy alcohol in your country?YesNo\n\n [Free valuations](https://wa.me/+447538638525/?text=I%20would%20like%20a%20free%20valuation)\n\nShow/hide cookie info\n\n**This site may set cookies for essential tasks, such as tracking whether you are signed in.**\n\nWe would also like to set analytics cookies to better understand our users’ behaviour.\n\n[Read our cookies policy](https://www.scotchwhiskyauctions.com/privacy/)\n\nAcceptReject",
+            "provider": "firecrawl"
+          },
+          {
+            "query": "Bruichladdich Valinch 28 Chloe Wood cask 780 2005 48.8 444 bottles official release",
+            "results": [
+              {
+                "url": "https://www.spiritradar.com/whisky-db/bruichladdich-2005-laddie-crew-valinch-28-chloe-wood-48.8-percent-500ml/",
+                "title": "Bruichladdich 2005 Laddie Crew Valinch 28 Chloe Wood Sauternes ...",
+                "domain": "spiritradar.com",
+                "description": "This whisky has an alcohol concentration of 48.8 % ABV. The whisky is presented in a 500 ml bottle. The Bruichladdich distillery has a capacity of 1.5 million ...",
+                "extraSnippets": []
+              },
+              {
+                "url": "https://www.whiskybase.com/whiskies/whisky/99343/bruichladdich-2005",
+                "title": "Bruichladdich 2005 - Ratings and reviews | Whiskybase",
+                "domain": "whiskybase.com",
+                "description": "Rating 4.2(20)Aug 10, 2017",
+                "extraSnippets": []
+              },
+              {
+                "url": "https://www.whiskystats.com/whisky/99343",
+                "title": "Bruichladdich 2005 - Market Value and Price Insights - Whiskystats",
+                "domain": "whiskystats.com",
+                "description": "Bottling serie. Laddie Crew Valinch 28 - Chloe Wood. Vintage. 29.06.2005. Bottled. 2017. Stated Age. 12 years old. Casktype. Sauternes Cask. Casknumber. 780.",
+                "extraSnippets": []
+              },
+              {
+                "url": "https://www.whisky.com/whisky-database/details/bruichladdich-valinch-28-chloe-wood.html",
+                "title": "Bruichladdich 12 Years Valinch 28 Chloe Wood - Whisky.com",
+                "domain": "whisky.com",
+                "description": "$22 deliveryBruichladdich 12 Years Valinch 28 Chloe Wood ; Type: Single Malt Whisky ; Age: 12 Years ; ABV: 48.8% ; Bottle size: 0.5 l ; Bottler: Original bottling.",
+                "extraSnippets": []
+              },
+              {
+                "url": "https://whiskyauctioneer.com/learn/explore-whisky/bottles/bruichladdich-2005-chloe-wood-valinch-12-year-old-sauternes-cask-0?v=84978",
+                "title": "Bruichladdich 2005 Chloe Wood Valinch 12 Year Old / Sauternes Cask",
+                "domain": "whiskyauctioneer.com",
+                "description": "Age. 12 Year Old ; Vintage. 2005 ; Production Type. Single malt ; Cask type. Sauternes cask ; Region. Islay.",
+                "extraSnippets": []
+              },
+              {
+                "url": "https://www.laddienerd.de/valinches/bruichladdich-lochindaal/2017-releases/",
+                "title": "2017 - Valinches - Bruichladdich/Lochindaal/…",
+                "domain": "laddienerd.de",
+                "description": "Bruichladdich Valinch ... 29.06.2005 Cask No 780. Cask Type: Sauternes. 48,8%. Release Qty: 444. Release: August 2017. Crew Valinch 28 - Chloe Wood with another ...",
+                "extraSnippets": []
+              }
+            ],
+            "summary": "This whisky has an alcohol concentration of 48.8 % ABV. The whisky is presented in a 500 ml bottle. The Bruichladdich distillery has a capacity of 1.5 million ... Rating 4.2(20)Aug 10, 2017 Bottling serie. Laddie Crew Valinch 28 - Chloe Wood. Vintage. 29.06.2005. Bottled. 2017. Stated Age. 12 years old. Casktype. Sauternes Cask. Casknumber. 780. $22 deliveryBruichladdich 12 Years Valinch 28 Chloe Wood ; Type: Single Malt Whisky ; Age: 12 Years ; ABV: 48.8% ; Bottle size: 0.5 l ; Bottler: Original bottling. Age. 12 Year Old ; Vintage. 2005 ; Production Type. Single malt ; Cask type. Sauternes c",
+            "provider": "firecrawl"
+          },
+          {
+            "query": "Bruichladdich Valinch 28 Chloe Wood 12 year old Laddie Crew label title release 2017 cask 780",
+            "results": [
+              {
+                "url": "https://www.bruichladdich.com/products/the-laddie-twelve",
+                "title": "The Laddie Twelve - Bruichladdich Distillery",
+                "domain": "bruichladdich.com",
+                "description": "The Laddie Twelve is the embodiment of Bruichladdich's distilling philosophy. Patiently distilled on Islay and matured in an unrivalled selection of casks.",
+                "extraSnippets": []
+              },
+              {
+                "url": "https://www.spiritradar.com/whisky-db/bruichladdich-2005-laddie-crew-valinch-28-chloe-wood-48.8-percent-500ml/",
+                "title": "Bruichladdich 2005 Laddie Crew Valinch 28 Chloe Wood Sauternes ...",
+                "domain": "spiritradar.com",
+                "description": "This whisky has an alcohol concentration of 48.8 % ABV. The whisky is presented in a 500 ml bottle. The Bruichladdich distillery has a capacity of 1.5 million ...",
+                "extraSnippets": []
+              },
+              {
+                "url": "https://www.whiskybase.com/whiskies/whisky/99343/bruichladdich-2005",
+                "title": "Bruichladdich 2005 - Ratings and reviews | Whiskybase",
+                "domain": "whiskybase.com",
+                "description": "Rating 4.2(20)Aug 10, 2017",
+                "extraSnippets": []
+              },
+              {
+                "url": "https://www.laddienerd.de/valinches/bruichladdich-lochindaal/2017-releases/",
+                "title": "2017 - Valinches - Bruichladdich/Lochindaal/…",
+                "domain": "laddienerd.de",
+                "description": "Crew Valinch 28 - Chloe Wood. 29.06.2005 Cask No 780. Cask Type: Sauternes. 48,8%. Release Qty: 444. Release: August 2017. Crew Valinch 28 - Chloe Wood with ...",
+                "extraSnippets": []
+              },
+              {
+                "url": "https://www.whisky.com/whisky-database/details/bruichladdich-valinch-28-chloe-wood.html",
+                "title": "Bruichladdich 12 Years Valinch 28 Chloe Wood - Whisky.com",
+                "domain": "whisky.com",
+                "description": "$22 deliveryBruichladdich 12 Years Valinch 28 Chloe Wood ; Type: Single Malt Whisky ; Age: 12 Years ; ABV: 48.8% ; Bottle size: 0.5 l ; Bottler: Original bottling.",
+                "extraSnippets": []
+              },
+              {
+                "url": "https://whiskyconsultants.com/bruichladdich-the-laddie-valinch-34-2004-2018",
+                "title": "Bruichladdich The Laddie Valinch 34 2004-2018 | Tasting Notes",
+                "domain": "whiskyconsultants.com",
+                "description": "Jun 12, 2018",
+                "extraSnippets": []
+              }
+            ],
+            "summary": "The Laddie Twelve is the embodiment of Bruichladdich's distilling philosophy. Patiently distilled on Islay and matured in an unrivalled selection of casks. This whisky has an alcohol concentration of 48.8 % ABV. The whisky is presented in a 500 ml bottle. The Bruichladdich distillery has a capacity of 1.5 million ... Rating 4.2(20)Aug 10, 2017 Crew Valinch 28 - Chloe Wood. 29.06.2005 Cask No 780. Cask Type: Sauternes. 48,8%. Release Qty: 444. Release: August 2017. Crew Valinch 28 - Chloe Wood with ... $22 deliveryBruichladdich 12 Years Valinch 28 Chloe Wood ; Type: Single Malt Whisky ; Age: 12",
+            "provider": "firecrawl"
+          }
+        ],
+        "errors": []
+      },
+      "pageResults": [
+        {
+          "url": "https://www.scotchwhiskyauctions.com/auctions/233-the-184th-auction/898970-bruichladdich-valinch-28-chloe-wood-50cl/",
+          "result": {
+            "provider": "firecrawl",
+            "query": "Reviewed lot description",
+            "summary": "These hand-filled bottlings are available exclusively to visitors to the distillery. Valinchs are by definition only ever at cask strength, from a single barrel, and selected for their individuality. Each Valinch released has its own label and title, usually to commemorate a specific event. This cask was bottled in honour of Brand Academy & Distillery Ambassador Chloe Wood. Distilled: 29.06.2005 Age: 12 Years Old Cask Type: Sauternes Cask Number: 780 48.8% ABV / 50cl Bottle Number: 367 / 444",
+            "results": [
+              {
+                "title": "Bruichladdich Valinch 28 Chloe Wood 50cl | Scotch Whisky Auctions",
+                "url": "https://www.scotchwhiskyauctions.com/auctions/233-the-184th-auction/898970-bruichladdich-valinch-28-chloe-wood-50cl/",
+                "domain": "www.scotchwhiskyauctions.com",
+                "description": "Lot description passage reviewed 2026-11-03.",
+                "extraSnippets": []
+              }
+            ]
+          }
+        }
+      ],
+      "imageResults": []
+    },
+    "auction-lagavulin-12-year-old-hand-filled-batch-002": {
+      "searchResult": {
+        "evidence": [
+          {
+            "query": "page opening",
+            "results": [
+              {
+                "url": "https://www.scotchwhiskyauctions.com/auctions/234-the-185th-auction/908247-lagavulin-12-year-old-hand-filled-batch-002-2025-release/",
+                "title": "Lagavulin 12 Year Old Hand Filled Batch #002 2025 Release | The 185th Auction | Scotch Whisky Auctions",
+                "domain": "scotchwhiskyauctions.com",
+                "description": null,
+                "extraSnippets": []
+              }
+            ],
+            "summary": "[Skip to menu](https://www.scotchwhiskyauctions.com/auctions/234-the-185th-auction/908247-lagavulin-12-year-old-hand-filled-batch-002-2025-release/#menu) [Skip to content](https://www.scotchwhiskyauctions.com/auctions/234-the-185th-auction/908247-lagavulin-12-year-old-hand-filled-batch-002-2025-release/#contentstart)\n\nAre you the legal age to buy alcohol in your country?YesNo\n\n [Free valuations](https://wa.me/+447538638525/?text=I%20would%20like%20a%20free%20valuation)\n\nShow/hide cookie info\n\n**This site may set cookies for essential tasks, such as tracking whether you are signed in.**\n\nWe would also like to set analytics cookies to better understand our users’ behaviour.\n\n[Read our cookies policy](https://www.scotchwhiskyauctions.com/privacy/)\n\nAcceptReject",
+            "provider": "firecrawl"
+          },
+          {
+            "query": "site:scotchwhiskyauctions.com/auctions/234-the-185th-auction/908247 Lagavulin 12 Year Old Hand Filled Batch 002 2025 Release 53.5%",
+            "results": [],
+            "summary": null,
+            "provider": "firecrawl"
+          },
+          {
+            "query": "\"Lagavulin 12 Year Old Hand Filled Batch #002\"",
+            "results": [],
+            "summary": null,
+            "provider": "firecrawl"
+          }
+        ],
+        "errors": []
+      },
+      "pageResults": [
+        {
+          "url": "https://www.scotchwhiskyauctions.com/auctions/234-the-185th-auction/908247-lagavulin-12-year-old-hand-filled-batch-002-2025-release/",
+          "result": {
+            "provider": "firecrawl",
+            "query": "Reviewed lot description",
+            "summary": "Like most Islay malts, Lagavulin is definitely not for the faint hearted. The distillery was officially founded in 1816 (although illicit production on the site most certainly predates that), and produces malt with a signature style of earthy smoke and savoury undertones. 1962 marked a significant point in the distillery’s history, as it was then bought by John Logan Mackie, whose nephew Peter went on to create the White Horse blend with Lagavulin at its heart. The current reception room at the distillery is also the last remaining part of the long lost Malt Mill distillery. These days the distillery, along with White Horse, belong to Diageo. However, it is generally agreed that while Lagavulin’s core range remains reliably excellent, older expressions bearing the White Horse name still have the edge. Bottled: 22.07.2025 Age: 12 Years Old Cask Type: Madeira 53.5% ABV / 70cl Please note creasing to carton.",
+            "results": [
+              {
+                "title": "Lagavulin 12 Year Old Hand Filled Batch #002 2025 Release | Scotch Whisky Auctions",
+                "url": "https://www.scotchwhiskyauctions.com/auctions/234-the-185th-auction/908247-lagavulin-12-year-old-hand-filled-batch-002-2025-release/",
+                "domain": "www.scotchwhiskyauctions.com",
+                "description": "Lot description passage reviewed 2026-11-03.",
+                "extraSnippets": []
+              }
+            ]
+          }
+        }
+      ],
+      "imageResults": []
+    },
+    "auction-highland-park-hand-filled-distillery-exclusive": {
+      "searchResult": {
+        "evidence": [
+          {
+            "query": "page opening",
+            "results": [
+              {
+                "url": "https://www.scotchwhiskyauctions.com/auctions/234-the-185th-auction/905528-highland-park-hand-filled-distillery-exclusive/",
+                "title": "Highland Park Hand Filled Distillery Exclusive | The 185th Auction | Scotch Whisky Auctions",
+                "domain": "scotchwhiskyauctions.com",
+                "description": null,
+                "extraSnippets": []
+              }
+            ],
+            "summary": "[Skip to menu](https://www.scotchwhiskyauctions.com/auctions/234-the-185th-auction/905528-highland-park-hand-filled-distillery-exclusive/#menu) [Skip to content](https://www.scotchwhiskyauctions.com/auctions/234-the-185th-auction/905528-highland-park-hand-filled-distillery-exclusive/#contentstart)\n\nAre you the legal age to buy alcohol in your country?YesNo\n\n [Free valuations](https://wa.me/+447538638525/?text=I%20would%20like%20a%20free%20valuation)\n\nShow/hide cookie info\n\n**This site may set cookies for essential tasks, such as tracking whether you are signed in.**\n\nWe would also like to set analytics cookies to better understand our users’ behaviour.\n\n[Read our cookies policy](https://www.scotchwhiskyauctions.com/privacy/)\n\nAcceptReject",
+            "provider": "firecrawl"
+          },
+          {
+            "query": "\"Highland Park\" \"Hand Filled Distillery Exclusive\" \"53.3%\"",
+            "results": [
+              {
+                "url": "https://whiskyinternationalonline.com/collections/collectable-whisky?page=53",
+                "title": "Collectable Whisky | Shop Investment Grade Bottles – Page 53 ...",
+                "domain": "whiskyinternationalonline.com",
+                "description": "Highland Park (17); Holyrood (1); Inchgower (5) ... Kilkerran Hand Filled Distillery Exclusive 2022 Release 58.7% ... Dalwhinnie Hand Filled 12 YO Re-charred Sherry ...",
+                "extraSnippets": []
+              },
+              {
+                "url": "https://www.spiritradar.com/whisky-db/countries/united-kingdom-50/",
+                "title": "United Kingdom (Page 50) - Countries - Spirit Radar",
+                "domain": "spiritradar.com",
+                "description": "Highland Park 2011 SMWS 4.351 Diet viking 1st Fill Ex-Bourbon Barrel 62.8% 700ml ... Dalwhinnie 12yo Hand Filled Distillery Exclusive Sherry 53.3% 700ml.",
+                "extraSnippets": []
+              },
+              {
+                "url": "https://dornochcastlehotel.com/wp-content/uploads/2025/10/WhiskyList102025.pdf",
+                "title": "[PDF] Whisky List 2025 - Dornoch Castle Hotel",
+                "domain": "dornochcastlehotel.com",
+                "description": "Glen Ord 'Singleton' 11 Year Old, Hand Filled Distillery Exclusive, 55.5% ... Highland Park, IWBoS, FF US Oak / Sherry Puncheon, No.2390, 14 Year Old ...",
+                "extraSnippets": []
+              },
+              {
+                "url": "http://www.hongkong.intercontinental.com/wp-content/uploads/sites/33/2023/04/HKWF_Dram_List-1.pdf",
+                "title": "[PDF] Dram List (By Distilleries)",
+                "domain": "hongkong.intercontinental.com",
+                "description": "Highland Park - Secret Orkney. 15yo AD Rattray Cask Orkney. 2. 46.00%. IB. 1FA20 ... Hand-Filled Distillery-Exclusive. 3. 56.90%. Official. 1FA01. Fine Vintage.",
+                "extraSnippets": []
+              },
+              {
+                "url": "https://www.instagram.com/p/DadRnddHImO/?__d=1%3F%2F",
+                "title": "Linkwood | 2011 - 2025 | James Eadie Single Malt Scotch Whisky 52 ...",
+                "domain": "instagram.com",
+                "description": "Das Highland Park seine Kunden verachtet, zeigt ... 53.3% abv. Highly recommend the whisky ... Blair Athol – Hand Filled Distillery Exclusive – 53.8%",
+                "extraSnippets": []
+              },
+              {
+                "url": "https://gall.dcinside.com/mgallery/board/view/?id=whiskey&no=1535625",
+                "title": "에딘버러 바 추천(개혜자임) - 위스키 마이너 갤러리",
+                "domain": "gall.dcinside.com",
+                "description": "Highland Park 12yo “Viking Honour” 40% £4.00. Highland Park 12yo ... Glenfiddich Hand filled distillery exclusive batch 82 59.4% £12.00.",
+                "extraSnippets": []
+              }
+            ],
+            "summary": "Highland Park (17); Holyrood (1); Inchgower (5) ... Kilkerran Hand Filled Distillery Exclusive 2022 Release 58.7% ... Dalwhinnie Hand Filled 12 YO Re-charred Sherry ... Highland Park 2011 SMWS 4.351 Diet viking 1st Fill Ex-Bourbon Barrel 62.8% 700ml ... Dalwhinnie 12yo Hand Filled Distillery Exclusive Sherry 53.3% 700ml. Glen Ord 'Singleton' 11 Year Old, Hand Filled Distillery Exclusive, 55.5% ... Highland Park, IWBoS, FF US Oak / Sherry Puncheon, No.2390, 14 Year Old ... Highland Park - Secret Orkney. 15yo AD Rattray Cask Orkney. 2. 46.00%. IB. 1FA20 ... Hand-Filled Distillery-Exclusive. 3. 5",
+            "provider": "firecrawl"
+          },
+          {
+            "query": "\"Highland Park Hand Filled Distillery Exclusive\" whisky cask strength",
+            "results": [
+              {
+                "url": "https://www.reddit.com/r/Scotch/comments/1wsgcx4/review_960_highland_park_cask_strength/",
+                "title": "Review #960 - Highland Park Cask Strength : r/Scotch - Reddit",
+                "domain": "reddit.com",
+                "description": "Highland Park Cask Strength, which boasts an eye-watering strength of 63.9% ABV. potentially closer to 70% ABV. s at 90%, 80%, and 70% fill ...Highland Park Cask Strength batch 4 review #4 : r/Scotch - Reddit{Review #177",
+                "extraSnippets": []
+              },
+              {
+                "url": "https://royalpalms.com/listing/highland-park-single-cask-7170-single-malt-scotch-whisky",
+                "title": "Highland Park Single Cask 7170 Single Malt Scotch Whisky",
+                "domain": "royalpalms.com",
+                "description": "Rating 4.2(61) · 30-day returnsAt 125 proof, this robust single malt is a rare and exclusive gem, with only 306 bottles ever produced. Hand Filled Distillery Exclusive",
+                "extraSnippets": []
+              },
+              {
+                "url": "https://www.instagram.com/reel/DVyasdGjKwA/",
+                "title": "What's better than Spring weather … presents from Highland Park in the ...",
+                "domain": "instagram.com",
+                "description": "The whisky itself is a single malt that's been matured for 11 years in refill ex-bourbon casks, then filled into unseasoned American oak for a ...",
+                "extraSnippets": []
+              },
+              {
+                "url": "https://www.whisky.com/whisky-database/details/highland-park-distillery-exclusive-cask-strength-6571.html",
+                "title": "Highland Park 14 Years Distillery Exclusive Cask Strength #6571",
+                "domain": "whisky.com",
+                "description": "$22 deliveryHighland Park 14 Years Distillery Exclusive Cask Strength #6571 ; Type: Single Malt Whisky ; Age: 14 Years ; ABV: 63.8% ; Bottle size: 0.7 l ; Bottler: Original ...",
+                "extraSnippets": []
+              },
+              {
+                "url": "https://www.insidehook.com/whiskey/highland-park-cask-strength-heather-whisky-marc-watson",
+                "title": "The New Era of Highland Park Begins With This Bottle - InsideHook",
+                "domain": "insidehook.com",
+                "description": "Marc Watson on the revamped Highland Park Cask Strength lineup, rejecting tasting notes and why a single malt pairs with D&D.",
+                "extraSnippets": []
+              },
+              {
+                "url": "https://whiskyinternationalonline.com/products/highland-park-cask-strength-release-no-3-64-1",
+                "title": "Highland Park Cask Strength Whisky Release No.3 64.1%",
+                "domain": "whiskyinternationalonline.com",
+                "description": "14-day returnsPrice: £49.95 GBP … flavours of charred oak, heather honey, mango, vanilla cream, pink grapefruit zest and smouldering peat smoke. Size: 70cl ABV: 64.1% ...",
+                "extraSnippets": []
+              }
+            ],
+            "summary": "Highland Park Cask Strength, which boasts an eye-watering strength of 63.9% ABV. potentially closer to 70% ABV. s at 90%, 80%, and 70% fill ...Highland Park Cask Strength batch 4 review #4 : r/Scotch - Reddit{Review #177} Highland Park Cask Strength Batch 4 Single Malt (2023 ...More results from www.reddit.com Rating 4.2(61) · 30-day returnsAt 125 proof, this robust single malt is a rare and exclusive gem, with only 306 bottles ever produced. Hand Filled Distillery Exclusive The whisky itself is a single malt that's been matured for 11 years in refill ex-bourbon casks, then filled into unseaso",
+            "provider": "firecrawl"
+          }
+        ],
+        "errors": []
+      },
+      "pageResults": [
+        {
+          "url": "https://www.scotchwhiskyauctions.com/auctions/234-the-185th-auction/905528-highland-park-hand-filled-distillery-exclusive/",
+          "result": {
+            "provider": "firecrawl",
+            "query": "Reviewed lot description",
+            "summary": "Highland Park remains the most northerly whisky distillery in Scotland, although not by much, as it is little more than a stone’s throw from fellow Orcadian, Scapa. Accounts of the distillery’s genesis vary, and the truth is probably lost to the mists of time, but it is thought that a local farmer named David Robertson founded what we now know as Highland Park distillery in 1798, on the site of an illicit still operated by nefarious smuggler (and former priest) Magnus Eunson. Since its introduction as a single malt in the 1960s, the distillery has been awarded many plaudits, not least of which came from the late, great whisky writer Michael Jackson, who called it “the greatest all rounder in the world of whisky”. It’s characteristic style coming from the use of Sherry casks, along with an often cited heathery sweetness imparted to the spirit by way of the distinct Orcadian peat used during the malting process. 53.3% ABV / 70cl Bottle Number: 620",
+            "results": [
+              {
+                "title": "Highland Park Hand Filled Distillery Exclusive | Scotch Whisky Auctions",
+                "url": "https://www.scotchwhiskyauctions.com/auctions/234-the-185th-auction/905528-highland-park-hand-filled-distillery-exclusive/",
+                "domain": "www.scotchwhiskyauctions.com",
+                "description": "Lot description passage reviewed 2026-11-03.",
+                "extraSnippets": []
+              }
+            ]
+          }
+        }
+      ],
+      "imageResults": []
+    },
+    "auction-auchentoshan-valinch-2012-release": {
+      "searchResult": {
+        "evidence": [
+          {
+            "query": "page opening",
+            "results": [
+              {
+                "url": "https://www.scotchwhiskyauctions.com/auctions/234-the-185th-auction/907501-auchentoshan-valinch-2012-release/",
+                "title": "Auchentoshan Valinch 2012 Release | The 185th Auction | Scotch Whisky Auctions",
+                "domain": "scotchwhiskyauctions.com",
+                "description": null,
+                "extraSnippets": []
+              }
+            ],
+            "summary": "[Skip to menu](https://www.scotchwhiskyauctions.com/auctions/234-the-185th-auction/907501-auchentoshan-valinch-2012-release/#menu) [Skip to content](https://www.scotchwhiskyauctions.com/auctions/234-the-185th-auction/907501-auchentoshan-valinch-2012-release/#contentstart)\n\nAre you the legal age to buy alcohol in your country?YesNo\n\n [Free valuations](https://wa.me/+447538638525/?text=I%20would%20like%20a%20free%20valuation)\n\nShow/hide cookie info\n\n**This site may set cookies for essential tasks, such as tracking whether you are signed in.**\n\nWe would also like to set analytics cookies to better understand our users’ behaviour.\n\n[Read our cookies policy](https://www.scotchwhiskyauctions.com/privacy/)\n\nAcceptReject",
+            "provider": "firecrawl"
+          },
+          {
+            "query": "Auchentoshan Valinch 2012 Release 57.2% ABV official product",
+            "results": [
+              {
+                "url": "https://whiskyadvocate.com/Auchentoshan-Valinch-2012-57-2",
+                "title": "Auchentoshan Valinch 2012, 57.2% - Whisky Advocate",
+                "domain": "whiskyadvocate.com",
+                "description": "This is the second edition of Auchentoshan's cask strength Valinch bottling, which carries no age statement and has been matured in first-fill bourbon casks ...",
+                "extraSnippets": []
+              },
+              {
+                "url": "https://maltrunners.com/2013/08/12/auchentoshan-valinch-2012-edition/",
+                "title": "Auchentoshan Valinch (2012 Edition) - Malt Runners",
+                "domain": "maltrunners.com",
+                "description": "Aug 12, 2013",
+                "extraSnippets": []
+              },
+              {
+                "url": "https://www.reddit.com/r/Scotch/comments/1u1sh1u/review_201_auchentoshan_valinch_single_malt_2012/",
+                "title": "{Review #201} Auchentoshan Valinch Single Malt (2012, 57.2%) [8.1/10 ...",
+                "domain": "reddit.com",
+                "description": "Label: Small-Batch Release · Distillery (Owner): Auchentoshan (Suntory Global Spirits) · ABV: 57.2% · Age: +3 years old (NAS) · Perceived peat/smoke ...Review #3: Auchentoshan Valinch 2012 : r/Scotch - RedditTwelfth revi",
+                "extraSnippets": []
+              },
+              {
+                "url": "https://caskcartel.com/es-hr/collections/cask-cartel/products/auchentoshan-2012-valinch-limited-edition-single-malt-scotch-whisky",
+                "title": "Auchentoshan 2012 Valinch Limited Edition Single Malt Scotch Whisky",
+                "domain": "caskcartel.com",
+                "description": "In stock $50.38 deliveryA limited batch release, the 2012 version is bottled at 114.4 proof and aged in first fill ex-bourbon casks. This is a pumped up version of their ...",
+                "extraSnippets": []
+              },
+              {
+                "url": "https://www.youtube.com/watch?v=desarCKvVaU",
+                "title": "Auchentoshan Valinch 2012 Single Malt Scotch Whisky - YouTube",
+                "domain": "youtube.com",
+                "description": "In review 96, WhiskyWhistle host Mark introduces triple-distilled Lowlander Auchentoshan and reviews its high-powered cask strength number ...",
+                "extraSnippets": []
+              },
+              {
+                "url": "https://www.connosr.com/auchentoshan-valinch-2012-release-whisky-reviews-2998",
+                "title": "Auchentoshan Valinch 2012 Release Reviews - Whisky Connosr",
+                "domain": "connosr.com",
+                "description": "Rating 83%(7)Palate: Sandalwood, some shaved oak, warming, very sweet, and rather dry. a bit of spicy, the ABV is very much felt here,it's untamed. Finish: Sweet stuff , ...",
+                "extraSnippets": []
+              }
+            ],
+            "summary": "This is the second edition of Auchentoshan's cask strength Valinch bottling, which carries no age statement and has been matured in first-fill bourbon casks ... Aug 12, 2013 Label: Small-Batch Release · Distillery (Owner): Auchentoshan (Suntory Global Spirits) · ABV: 57.2% · Age: +3 years old (NAS) · Perceived peat/smoke ...Review #3: Auchentoshan Valinch 2012 : r/Scotch - RedditTwelfth review - Auchentoshan Valinch 2012 : r/Scotch - RedditMore results from www.reddit.com In stock $50.38 deliveryA limited batch release, the 2012 version is bottled at 114.4 proof and aged in first fill ex-bourb",
+            "provider": "firecrawl"
+          },
+          {
+            "query": "Auchentoshan Valinch 2012 release whisky 57.2",
+            "results": [
+              {
+                "url": "https://whiskyadvocate.com/Auchentoshan-Valinch-2012-57-2",
+                "title": "Auchentoshan Valinch 2012, 57.2% - Whisky Advocate",
+                "domain": "whiskyadvocate.com",
+                "description": "This is the second edition of Auchentoshan's cask strength Valinch bottling, which carries no age statement and has been matured in first-fill bourbon casks.",
+                "extraSnippets": []
+              },
+              {
+                "url": "https://www.masterofmalt.com/whiskies/auchentoshan/auchentoshan-valinch-2012-2nd-release-whisky/",
+                "title": "Auchentoshan Valinch (2012 Release) 70cl Whisky - Master Of Malt",
+                "domain": "masterofmalt.com",
+                "description": "Rating 3.5(9) · 2–3 day deliveryAuchentoshan Valinch (2012 Release) 70cl Whisky. Rating:3.5 out of 5 stars. Single Malt Scotch Whisky|70cl|57.2% ... Auchentoshan Valinch (2012 Release) ...",
+                "extraSnippets": []
+              },
+              {
+                "url": "https://www.reddit.com/r/Scotch/comments/1fakgz/review_3_auchentoshan_valinch_2012/",
+                "title": "Review #3: Auchentoshan Valinch 2012 : r/Scotch - Reddit",
+                "domain": "reddit.com",
+                "description": "Auchentoshan Valinch 2012: $65.00, 57.2%abv. So there have been a couple reviews over the last week of this expression but I think they were ...",
+                "extraSnippets": []
+              },
+              {
+                "url": "https://maltrunners.com/2013/08/12/auchentoshan-valinch-2012-edition/",
+                "title": "Auchentoshan Valinch (2012 Edition) - Malt Runners",
+                "domain": "maltrunners.com",
+                "description": "Aug 12, 2013",
+                "extraSnippets": []
+              },
+              {
+                "url": "https://www.spiritradar.com/whisky-db/auchentoshan-valinch-2012-festival-edition-57.2-percent-700ml/",
+                "title": "Auchentoshan Valinch 2012 Festival Edition North American Bourbon ...",
+                "domain": "spiritradar.com",
+                "description": "The whisky has been aged to perfection and released in a limited edition in 2012. This whisky has an alcohol concentration of 57.2 % ABV. The whisky comes in a ...",
+                "extraSnippets": []
+              },
+              {
+                "url": "https://www.caskers.com/auchentoshan-valinch-limited-edition-single-malt-scotch-whisky/",
+                "title": "Auchentoshan Valinch Limited Edition Single Malt Scotch Whisky - Caskers",
+                "domain": "caskers.com",
+                "description": "Out of stockMatured in used bourbon casks, this limited edition scotch was rated one of the Top 5 Single Malt Scotches. rewards-logo. Caskers Rewards Earn up to 5% back ...",
+                "extraSnippets": []
+              }
+            ],
+            "summary": "This is the second edition of Auchentoshan's cask strength Valinch bottling, which carries no age statement and has been matured in first-fill bourbon casks. Rating 3.5(9) · 2–3 day deliveryAuchentoshan Valinch (2012 Release) 70cl Whisky. Rating:3.5 out of 5 stars. Single Malt Scotch Whisky|70cl|57.2% ... Auchentoshan Valinch (2012 Release) ... Auchentoshan Valinch 2012: $65.00, 57.2%abv. So there have been a couple reviews over the last week of this expression but I think they were ... Aug 12, 2013 The whisky has been aged to perfection and released in a limited edition in 2012. This whisky h",
+            "provider": "firecrawl"
+          }
+        ],
+        "errors": []
+      },
+      "pageResults": [
+        {
+          "url": "https://www.scotchwhiskyauctions.com/auctions/234-the-185th-auction/907501-auchentoshan-valinch-2012-release/",
+          "result": {
+            "provider": "firecrawl",
+            "query": "Reviewed lot description",
+            "summary": "Legal whisky-making started here on the banks of the Clyde in 1817 when the Duntocher distillery was built by John Bulloch. As well as being a notoriously challenging tongue twister for American whisky aficionados, Auchentoshan distillery is noteworthy for being one of the few buildings not damaged during the Clydebank Blitz of 1941. Unfortunately one of its warehouses wasn’t so lucky, and the picturesque pond just outside the distillery is actually a bomb crater. It remains the only distillery in Scotland doing 100% triple distillation and one of the very few where all the production is bottled as single malt. Glasgow-based Tennant’s were owners from 1960 to 1969 when they offloaded it to a publican, Eadie Cairns. The upgraded distillery was then sold to Stanley P Morrison in 1984. Since 1994 it has been part of the Beam Suntory portfolio. A superb cask strength Auchentoshan Valinch is named after the giant pipette used to remove whisky from casks for tasting. This whisky is basically the classic at cask strength. Cask Type: Bourbon Oak 57.2% ABV / 70cl",
+            "results": [
+              {
+                "title": "Auchentoshan Valinch 2012 Release | Scotch Whisky Auctions",
+                "url": "https://www.scotchwhiskyauctions.com/auctions/234-the-185th-auction/907501-auchentoshan-valinch-2012-release/",
+                "domain": "www.scotchwhiskyauctions.com",
+                "description": "Lot description passage reviewed 2026-11-03.",
+                "extraSnippets": []
+              }
+            ]
+          }
+        }
+      ],
       "imageResults": []
     }
   }

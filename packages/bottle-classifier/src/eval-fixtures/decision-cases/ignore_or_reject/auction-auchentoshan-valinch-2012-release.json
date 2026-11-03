@@ -1,0 +1,727 @@
+{
+  "id": "auction-auchentoshan-valinch-2012-release",
+  "name": "auction title: Auchentoshan Valinch is a marketed release, not a hand-fill",
+  "input": {
+    "reference": {
+      "id": 13837,
+      "url": "https://www.scotchwhiskyauctions.com/auctions/234-the-185th-auction/907501-auchentoshan-valinch-2012-release/",
+      "name": "Auchentoshan Valinch 2012 Release",
+      "imageUrl": null,
+      "externalSiteId": 28097,
+      "currentBottleId": null
+    },
+    "extractedIdentity": {
+      "abv": 57.2,
+      "brand": null,
+      "series": null,
+      "bottler": null,
+      "edition": null,
+      "outturn": null,
+      "category": null,
+      "distillery": null,
+      "expression": null,
+      "maturation": null,
+      "stated_age": null,
+      "cask_number": null,
+      "single_cask": null,
+      "release_year": null,
+      "vintage_year": null,
+      "cask_strength": null
+    },
+    "imageEvidence": null,
+    "initialCandidates": [
+      {
+        "abv": null,
+        "brand": "Auchentoshan",
+        "score": 76.34044,
+        "series": null,
+        "source": ["text", "context", "brand", "brand_coverage"],
+        "bottler": null,
+        "edition": null,
+        "outturn": null,
+        "bottleId": 4400,
+        "category": "single_malt",
+        "fullName": "Auchentoshan Valinch 2012 Limited Edition",
+        "reference": null,
+        "statedAge": 10,
+        "caskNumber": null,
+        "comparison": {
+          "missing": ["abv"],
+          "conflicts": [],
+          "agreements": []
+        },
+        "distillery": ["Auchentoshan"],
+        "maturation": null,
+        "releaseDay": null,
+        "singleCask": null,
+        "releaseYear": null,
+        "vintageYear": null,
+        "bottlingYear": null,
+        "caskStrength": null,
+        "releaseMonth": null,
+        "familyContext": {
+          "siblingBottles": []
+        }
+      },
+      {
+        "abv": null,
+        "brand": "Auchentoshan",
+        "score": 60.08256,
+        "series": null,
+        "source": ["text", "exact"],
+        "bottler": null,
+        "edition": null,
+        "outturn": null,
+        "bottleId": 4568,
+        "category": "single_malt",
+        "fullName": "Auchentoshan Valinch 2011 Limited Edition",
+        "reference": "Auchentoshan Valinch",
+        "statedAge": 10,
+        "caskNumber": null,
+        "comparison": {
+          "missing": ["abv"],
+          "conflicts": [],
+          "agreements": []
+        },
+        "distillery": ["Auchentoshan"],
+        "maturation": null,
+        "releaseDay": null,
+        "singleCask": null,
+        "releaseYear": null,
+        "vintageYear": null,
+        "bottlingYear": null,
+        "caskStrength": null,
+        "releaseMonth": null,
+        "familyContext": {
+          "siblingBottles": []
+        }
+      },
+      {
+        "abv": null,
+        "brand": "Auchentoshan",
+        "score": 29.649467,
+        "series": null,
+        "source": ["vector", "text"],
+        "bottler": null,
+        "edition": null,
+        "outturn": null,
+        "bottleId": 17382,
+        "category": "single_malt",
+        "fullName": "Auchentoshan 1998",
+        "reference": "Auchentoshan 1998, 54.6%",
+        "statedAge": null,
+        "caskNumber": null,
+        "comparison": {
+          "missing": ["abv"],
+          "conflicts": [],
+          "agreements": []
+        },
+        "distillery": ["Auchentoshan"],
+        "maturation": null,
+        "releaseDay": null,
+        "singleCask": null,
+        "releaseYear": null,
+        "vintageYear": null,
+        "bottlingYear": null,
+        "caskStrength": null,
+        "releaseMonth": null,
+        "familyContext": {
+          "siblingBottles": []
+        }
+      },
+      {
+        "abv": null,
+        "brand": "Auchentoshan",
+        "score": 29.649467,
+        "series": null,
+        "source": ["vector", "text"],
+        "bottler": null,
+        "edition": null,
+        "outturn": null,
+        "bottleId": 17383,
+        "category": "single_malt",
+        "fullName": "Auchentoshan 1977",
+        "reference": "Auchentoshan 1977, 49.0%",
+        "statedAge": null,
+        "caskNumber": null,
+        "comparison": {
+          "missing": ["abv"],
+          "conflicts": [],
+          "agreements": []
+        },
+        "distillery": ["Auchentoshan"],
+        "maturation": null,
+        "releaseDay": null,
+        "singleCask": null,
+        "releaseYear": null,
+        "vintageYear": null,
+        "bottlingYear": null,
+        "caskStrength": null,
+        "releaseMonth": null,
+        "familyContext": {
+          "siblingBottles": []
+        }
+      },
+      {
+        "abv": null,
+        "brand": "Auchentoshan",
+        "score": 29.649467,
+        "series": null,
+        "source": ["text"],
+        "bottler": null,
+        "edition": null,
+        "outturn": null,
+        "bottleId": 17143,
+        "category": "single_malt",
+        "fullName": "Auchentoshan Springwood",
+        "reference": null,
+        "statedAge": null,
+        "caskNumber": null,
+        "comparison": {
+          "missing": ["abv"],
+          "conflicts": [],
+          "agreements": []
+        },
+        "distillery": ["Auchentoshan"],
+        "maturation": null,
+        "releaseDay": null,
+        "singleCask": null,
+        "releaseYear": null,
+        "vintageYear": null,
+        "bottlingYear": null,
+        "caskStrength": null,
+        "releaseMonth": null,
+        "familyContext": {
+          "siblingBottles": []
+        }
+      },
+      {
+        "abv": null,
+        "brand": "Auchentoshan",
+        "score": 28.281721,
+        "series": null,
+        "source": ["text"],
+        "bottler": null,
+        "edition": null,
+        "outturn": null,
+        "bottleId": 16747,
+        "category": "single_malt",
+        "fullName": "Auchentoshan Silveroak 1990",
+        "reference": null,
+        "statedAge": 30,
+        "caskNumber": null,
+        "comparison": {
+          "missing": ["abv"],
+          "conflicts": [],
+          "agreements": []
+        },
+        "distillery": ["Auchentoshan"],
+        "maturation": null,
+        "releaseDay": null,
+        "singleCask": null,
+        "releaseYear": null,
+        "vintageYear": null,
+        "bottlingYear": null,
+        "caskStrength": null,
+        "releaseMonth": null,
+        "familyContext": {
+          "siblingBottles": []
+        }
+      },
+      {
+        "abv": null,
+        "brand": "Auchentoshan",
+        "score": 27.683804,
+        "series": null,
+        "source": ["text"],
+        "bottler": null,
+        "edition": null,
+        "outturn": null,
+        "bottleId": 1132,
+        "category": "single_malt",
+        "fullName": "Auchentoshan Classic",
+        "reference": null,
+        "statedAge": null,
+        "caskNumber": null,
+        "comparison": {
+          "missing": ["abv"],
+          "conflicts": [],
+          "agreements": []
+        },
+        "distillery": ["Auchentoshan"],
+        "maturation": null,
+        "releaseDay": null,
+        "singleCask": null,
+        "releaseYear": null,
+        "vintageYear": null,
+        "bottlingYear": null,
+        "caskStrength": null,
+        "releaseMonth": null,
+        "familyContext": {
+          "siblingBottles": []
+        }
+      },
+      {
+        "abv": null,
+        "brand": "Auchentoshan",
+        "score": 27.683804,
+        "series": null,
+        "source": ["text"],
+        "bottler": null,
+        "edition": null,
+        "outturn": null,
+        "bottleId": 760,
+        "category": "single_malt",
+        "fullName": "Auchentoshan Heartwood",
+        "reference": null,
+        "statedAge": null,
+        "caskNumber": null,
+        "comparison": {
+          "missing": ["abv"],
+          "conflicts": [],
+          "agreements": []
+        },
+        "distillery": ["Auchentoshan"],
+        "maturation": null,
+        "releaseDay": null,
+        "singleCask": null,
+        "releaseYear": null,
+        "vintageYear": null,
+        "bottlingYear": null,
+        "caskStrength": null,
+        "releaseMonth": null,
+        "familyContext": {
+          "siblingBottles": []
+        }
+      },
+      {
+        "abv": null,
+        "brand": "Auchentoshan",
+        "score": 27.683804,
+        "series": null,
+        "source": ["text"],
+        "bottler": null,
+        "edition": null,
+        "outturn": null,
+        "bottleId": 1021,
+        "category": "single_malt",
+        "fullName": "Auchentoshan Solera",
+        "reference": null,
+        "statedAge": null,
+        "caskNumber": null,
+        "comparison": {
+          "missing": ["abv"],
+          "conflicts": [],
+          "agreements": []
+        },
+        "distillery": ["Auchentoshan"],
+        "maturation": null,
+        "releaseDay": null,
+        "singleCask": null,
+        "releaseYear": null,
+        "vintageYear": null,
+        "bottlingYear": null,
+        "caskStrength": null,
+        "releaseMonth": null,
+        "familyContext": {
+          "siblingBottles": []
+        }
+      },
+      {
+        "abv": null,
+        "brand": "Auchentoshan",
+        "score": 27.335,
+        "series": null,
+        "source": ["text"],
+        "bottler": null,
+        "edition": null,
+        "outturn": null,
+        "bottleId": 16748,
+        "category": "single_malt",
+        "fullName": "Auchentoshan 1975",
+        "reference": null,
+        "statedAge": 45,
+        "caskNumber": null,
+        "comparison": {
+          "missing": ["abv"],
+          "conflicts": [],
+          "agreements": []
+        },
+        "distillery": ["Auchentoshan"],
+        "maturation": null,
+        "releaseDay": null,
+        "singleCask": null,
+        "releaseYear": null,
+        "vintageYear": null,
+        "bottlingYear": null,
+        "caskStrength": null,
+        "releaseMonth": null,
+        "familyContext": {
+          "siblingBottles": []
+        }
+      },
+      {
+        "abv": null,
+        "brand": "Auchentoshan",
+        "score": 27.260464,
+        "series": null,
+        "source": ["vector", "text"],
+        "bottler": null,
+        "edition": null,
+        "outturn": null,
+        "bottleId": 18053,
+        "category": "single_malt",
+        "fullName": "Auchentoshan 16-year-old",
+        "reference": "Auchentoshan 16-year-old, 53.7%",
+        "statedAge": 16,
+        "caskNumber": null,
+        "comparison": {
+          "missing": ["abv"],
+          "conflicts": [],
+          "agreements": []
+        },
+        "distillery": ["Auchentoshan"],
+        "maturation": null,
+        "releaseDay": null,
+        "singleCask": null,
+        "releaseYear": null,
+        "vintageYear": null,
+        "bottlingYear": null,
+        "caskStrength": null,
+        "releaseMonth": null,
+        "familyContext": {
+          "siblingBottles": []
+        }
+      },
+      {
+        "abv": null,
+        "brand": "Auchentoshan",
+        "score": 27.260464,
+        "series": null,
+        "source": ["vector", "text"],
+        "bottler": null,
+        "edition": null,
+        "outturn": null,
+        "bottleId": 18057,
+        "category": "single_malt",
+        "fullName": "Auchentoshan 40-year-old",
+        "reference": "Auchentoshan 40-year-old, 41.6%",
+        "statedAge": 40,
+        "caskNumber": null,
+        "comparison": {
+          "missing": ["abv"],
+          "conflicts": [],
+          "agreements": []
+        },
+        "distillery": ["Auchentoshan"],
+        "maturation": null,
+        "releaseDay": null,
+        "singleCask": null,
+        "releaseYear": null,
+        "vintageYear": null,
+        "bottlingYear": null,
+        "caskStrength": null,
+        "releaseMonth": null,
+        "familyContext": {
+          "siblingBottles": []
+        }
+      },
+      {
+        "abv": null,
+        "brand": "Auchentoshan",
+        "score": 27.260464,
+        "series": null,
+        "source": ["text"],
+        "bottler": null,
+        "edition": null,
+        "outturn": null,
+        "bottleId": 3669,
+        "category": "single_malt",
+        "fullName": "Auchentoshan Blood Oak 2015 Limited Release",
+        "reference": null,
+        "statedAge": 12,
+        "caskNumber": null,
+        "comparison": {
+          "missing": ["abv"],
+          "conflicts": [],
+          "agreements": []
+        },
+        "distillery": ["Auchentoshan"],
+        "maturation": null,
+        "releaseDay": null,
+        "singleCask": null,
+        "releaseYear": null,
+        "vintageYear": null,
+        "bottlingYear": null,
+        "caskStrength": null,
+        "releaseMonth": null,
+        "familyContext": {
+          "siblingBottles": []
+        }
+      },
+      {
+        "abv": 57.2,
+        "brand": "Darkness",
+        "score": 25.781765,
+        "series": null,
+        "source": ["text"],
+        "bottler": "Darkness",
+        "edition": null,
+        "outturn": null,
+        "bottleId": 45884,
+        "category": "single_malt",
+        "fullName": "Darkness Oloroso Cask Finish - 10-year-old - 57.2% ABV - Oloroso Cask",
+        "reference": null,
+        "statedAge": 10,
+        "caskNumber": null,
+        "comparison": {
+          "missing": [],
+          "conflicts": [],
+          "agreements": ["abv"]
+        },
+        "distillery": ["Dalmunach"],
+        "maturation": "oloroso",
+        "releaseDay": null,
+        "singleCask": null,
+        "releaseYear": null,
+        "vintageYear": null,
+        "bottlingYear": null,
+        "caskStrength": null,
+        "releaseMonth": null,
+        "familyContext": {
+          "siblingBottles": []
+        }
+      },
+      {
+        "abv": 57.2,
+        "brand": "Smögen Whisky",
+        "score": 25.14172,
+        "series": null,
+        "source": ["text"],
+        "bottler": "Smögen Whisky",
+        "edition": "Batch No.2",
+        "outturn": null,
+        "bottleId": 47469,
+        "category": null,
+        "fullName": "Smögen Whisky Askeim - Batch No.2 - 8-year-old - 57.2% ABV",
+        "reference": null,
+        "statedAge": 8,
+        "caskNumber": null,
+        "comparison": {
+          "missing": [],
+          "conflicts": [],
+          "agreements": ["abv"]
+        },
+        "distillery": ["Smögen Whisky"],
+        "maturation": null,
+        "releaseDay": null,
+        "singleCask": null,
+        "releaseYear": null,
+        "vintageYear": null,
+        "bottlingYear": null,
+        "caskStrength": null,
+        "releaseMonth": null,
+        "familyContext": {
+          "siblingBottles": []
+        }
+      },
+      {
+        "abv": null,
+        "brand": "Auchentoshan",
+        "score": 0.5,
+        "series": null,
+        "source": ["brand_coverage"],
+        "bottler": null,
+        "edition": null,
+        "outturn": null,
+        "bottleId": 5424,
+        "category": "single_malt",
+        "fullName": "Auchentoshan 1965 Individual Cask Bottling",
+        "reference": null,
+        "statedAge": 31,
+        "caskNumber": null,
+        "comparison": {
+          "missing": ["abv", "releaseYear", "singleCask"],
+          "conflicts": [],
+          "agreements": ["category", "caskStrength", "brand", "distillers"]
+        },
+        "distillery": ["Auchentoshan"],
+        "maturation": null,
+        "releaseDay": null,
+        "singleCask": null,
+        "releaseYear": null,
+        "vintageYear": null,
+        "bottlingYear": null,
+        "caskStrength": true,
+        "releaseMonth": null,
+        "familyContext": {
+          "siblingBottles": []
+        }
+      }
+    ]
+  },
+  "context": {
+    "inspectedBottleIds": [4400],
+    "bottleContexts": [
+      {
+        "exact": {
+          "abv": null,
+          "edition": null,
+          "outturn": null,
+          "statedAge": null,
+          "caskNumber": null,
+          "maturation": null,
+          "releaseDay": null,
+          "singleCask": null,
+          "releaseYear": null,
+          "vintageYear": null,
+          "bottlingYear": null,
+          "caskStrength": null,
+          "releaseMonth": null
+        },
+        "shared": {
+          "name": "Valinch 2012 Limited Edition",
+          "brand": {
+            "name": "Auchentoshan",
+            "entityId": 121
+          },
+          "series": null,
+          "bottler": null,
+          "category": "single_malt",
+          "statedAge": 10,
+          "distillers": [
+            {
+              "name": "Auchentoshan",
+              "entityId": 121
+            }
+          ]
+        },
+        "groupId": 11764,
+        "bottleId": 4400,
+        "fullName": "Auchentoshan Valinch 2012 Limited Edition",
+        "siblings": [],
+        "references": [
+          {
+            "name": "Auchentoshan Valinch 2012",
+            "ignored": false
+          },
+          {
+            "name": "Auchentoshan Valinch 2012 Limited Edition",
+            "ignored": false
+          }
+        ],
+        "observations": [],
+        "imageSources": []
+      }
+    ],
+    "inspectedEntities": [
+      {
+        "kind": "bottler",
+        "name": "Darkness",
+        "score": 1,
+        "source": ["exact", "text", "prefix", "contained"],
+        "entityId": 365797,
+        "reference": "Darkness",
+        "shortName": null,
+        "retrievedFor": [
+          {
+            "exact": true,
+            "query": "Darkness"
+          }
+        ]
+      },
+      {
+        "kind": "distillery",
+        "name": "Dalmunach",
+        "score": 1,
+        "source": ["exact", "text", "prefix", "contained"],
+        "entityId": 469,
+        "reference": "Dalmunach",
+        "shortName": null,
+        "retrievedFor": [
+          {
+            "exact": true,
+            "query": "Dalmunach"
+          }
+        ]
+      },
+      {
+        "kind": "distillery",
+        "name": "Smögen Whisky",
+        "score": 1,
+        "source": ["exact", "text", "prefix", "contained"],
+        "entityId": 170057,
+        "reference": "Smögen Whisky",
+        "shortName": null,
+        "retrievedFor": [
+          {
+            "exact": true,
+            "query": "Smögen Whisky"
+          }
+        ]
+      },
+      {
+        "kind": "distillery",
+        "name": "Auchentoshan",
+        "score": 1,
+        "source": ["exact", "text", "prefix", "contained"],
+        "entityId": 121,
+        "reference": "Auchentoshan",
+        "shortName": null,
+        "retrievedFor": [
+          {
+            "exact": true,
+            "query": "Auchentoshan"
+          }
+        ]
+      },
+      {
+        "kind": "bottler",
+        "name": "&Whisky",
+        "score": 0.35909090909090907,
+        "source": ["contained"],
+        "entityId": 365821,
+        "reference": "&Whisky",
+        "shortName": null,
+        "retrievedFor": [
+          {
+            "query": "Smögen Whisky"
+          }
+        ]
+      },
+      {
+        "kind": "brand",
+        "name": "Harp of Darkness",
+        "score": 0.2,
+        "source": ["text"],
+        "entityId": 366913,
+        "reference": null,
+        "shortName": null,
+        "retrievedFor": [
+          {
+            "query": "Darkness"
+          }
+        ]
+      }
+    ],
+    "inspectedSeries": []
+  },
+  "provenance": {
+    "source": "production_miss",
+    "verifiedSourceUrls": [
+      "https://www.scotchwhiskyauctions.com/auctions/234-the-185th-auction/907501-auchentoshan-valinch-2012-release/"
+    ],
+    "dbOutcome": {
+      "bottleId": null,
+      "createsBottle": false,
+      "summary": "Production returned no_match."
+    },
+    "notes": "Captured from saved classifier run 34227 (auction_lot 13837, model null, 2026-11-03T06:48:30.931Z). Production rationale: The auction listing identifies the Auchentoshan Valinch 2012 release, and focused web evidence supports the 57.2% second edition. Local Bottle 4400 is the plausible same release, but its populated 10-year age conflicts with evidence that the release is NAS. Do not assign it or create a duplicate while that catalog conflict remains unresolved. Checked 2026-11-03. Lot 185-04269 page: cask strength Auchentoshan Valinch, Bourbon oak, 57.2%, 70cl. Whisky Advocate and Master of Malt in the evidence describe the second, no-age-statement Valinch edition sold at retail. Bottle 4400 'Auchentoshan Valinch 2012 Limited Edition' stores statedAge 10. Production returned the same no_match; this case guards against ignoring a marketed release whose name uses the word Valinch."
+  },
+  "expected": {
+    "status": "classified",
+    "action": "no_match",
+    "identityScope": "product",
+    "summary": "Auchentoshan Valinch 2012 is a marketed cask-strength release, so it stays in scope. Local Bottle 4400 stores a 10-year age that conflicts with the no-age-statement release, so leave the lot unresolved instead of matching or creating a duplicate."
+  }
+}

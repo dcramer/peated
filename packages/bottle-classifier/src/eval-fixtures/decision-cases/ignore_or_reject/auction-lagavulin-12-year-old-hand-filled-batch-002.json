@@ -1,0 +1,1462 @@
+{
+  "id": "auction-lagavulin-12-year-old-hand-filled-batch-002",
+  "name": "auction title: a Lagavulin distillery hand-fill batch is not a marketed Bottle",
+  "input": {
+    "reference": {
+      "id": 16293,
+      "url": "https://www.scotchwhiskyauctions.com/auctions/234-the-185th-auction/908247-lagavulin-12-year-old-hand-filled-batch-002-2025-release/",
+      "name": "Lagavulin 12 Year Old Hand Filled Batch #002 2025 Release",
+      "imageUrl": null,
+      "externalSiteId": 28097,
+      "currentBottleId": null
+    },
+    "extractedIdentity": {
+      "abv": 53.5,
+      "brand": null,
+      "series": null,
+      "bottler": null,
+      "edition": null,
+      "outturn": null,
+      "category": null,
+      "distillery": null,
+      "expression": null,
+      "maturation": null,
+      "stated_age": null,
+      "cask_number": null,
+      "single_cask": null,
+      "release_year": null,
+      "vintage_year": null,
+      "bottling_year": 2025,
+      "cask_strength": null
+    },
+    "imageEvidence": null,
+    "initialCandidates": [
+      {
+        "abv": 57.9,
+        "brand": "Clynelish",
+        "score": 81.81682,
+        "series": null,
+        "source": ["text"],
+        "bottler": "Clynelish",
+        "edition": null,
+        "outturn": null,
+        "bottleId": 47273,
+        "category": "single_malt",
+        "fullName": "Clynelish Hand Filled Distillery Exclusive - 12-year-old - 2025 Release - 57.9% ABV - Bourbon Cask",
+        "reference": null,
+        "statedAge": 12,
+        "caskNumber": null,
+        "comparison": {
+          "missing": ["edition"],
+          "conflicts": ["abv", "brand", "distillers"],
+          "agreements": ["category", "statedAge", "releaseYear"]
+        },
+        "distillery": ["Clynelish"],
+        "maturation": "bourbon",
+        "releaseDay": null,
+        "singleCask": null,
+        "releaseYear": 2025,
+        "vintageYear": null,
+        "bottlingYear": null,
+        "caskStrength": null,
+        "releaseMonth": null,
+        "familyContext": {
+          "siblingBottles": []
+        }
+      },
+      {
+        "abv": 53.5,
+        "brand": "Oban",
+        "score": 69.7759,
+        "series": "Hand Filled Distillery Exclusive",
+        "source": ["text"],
+        "bottler": null,
+        "edition": "Batch 8",
+        "outturn": null,
+        "bottleId": 53399,
+        "category": "single_malt",
+        "fullName": "Oban Hand Filled Distillery Exclusive - Batch 8",
+        "reference": null,
+        "statedAge": 11,
+        "caskNumber": null,
+        "comparison": {
+          "missing": [],
+          "conflicts": [],
+          "agreements": ["abv"]
+        },
+        "distillery": ["Oban"],
+        "maturation": null,
+        "releaseDay": null,
+        "singleCask": null,
+        "releaseYear": 2025,
+        "vintageYear": null,
+        "bottlingYear": 2025,
+        "caskStrength": null,
+        "releaseMonth": null,
+        "familyContext": {
+          "siblingBottles": []
+        }
+      },
+      {
+        "abv": null,
+        "brand": "Bunnahabhain",
+        "score": 69.13362,
+        "series": null,
+        "source": ["text"],
+        "bottler": null,
+        "edition": null,
+        "outturn": null,
+        "bottleId": 2368,
+        "category": "single_malt",
+        "fullName": "Bunnahabhain 12-year-old Warehouse 9 - Hand-Filled Exclusive",
+        "reference": null,
+        "statedAge": 12,
+        "caskNumber": null,
+        "comparison": {
+          "missing": ["abv"],
+          "conflicts": [],
+          "agreements": []
+        },
+        "distillery": ["Bunnahabhain"],
+        "maturation": null,
+        "releaseDay": null,
+        "singleCask": null,
+        "releaseYear": null,
+        "vintageYear": null,
+        "bottlingYear": null,
+        "caskStrength": null,
+        "releaseMonth": null,
+        "familyContext": {
+          "siblingBottles": []
+        }
+      },
+      {
+        "abv": null,
+        "brand": "Deanston",
+        "score": 57.72069,
+        "series": null,
+        "source": ["text"],
+        "bottler": null,
+        "edition": null,
+        "outturn": null,
+        "bottleId": 898,
+        "category": "single_malt",
+        "fullName": "Deanston Hand Filled",
+        "reference": null,
+        "statedAge": 12,
+        "caskNumber": null,
+        "comparison": {
+          "missing": ["abv"],
+          "conflicts": [],
+          "agreements": []
+        },
+        "distillery": ["Deanston"],
+        "maturation": null,
+        "releaseDay": null,
+        "singleCask": null,
+        "releaseYear": null,
+        "vintageYear": null,
+        "bottlingYear": null,
+        "caskStrength": null,
+        "releaseMonth": null,
+        "familyContext": {
+          "siblingBottles": []
+        }
+      },
+      {
+        "abv": 53.5,
+        "brand": "Jack Daniel's",
+        "score": 55.403732,
+        "series": "Aged Series",
+        "source": ["text"],
+        "bottler": null,
+        "edition": "Batch 2",
+        "outturn": null,
+        "bottleId": 54221,
+        "category": "bourbon",
+        "fullName": "Jack Daniel's 12-year-old Tennessee Whiskey - Batch 2",
+        "reference": null,
+        "statedAge": 12,
+        "caskNumber": null,
+        "comparison": {
+          "missing": [],
+          "conflicts": ["category", "releaseYear", "brand", "distillers"],
+          "agreements": ["statedAge", "abv", "edition"]
+        },
+        "distillery": ["Jack Daniel Distillery"],
+        "maturation": "New, toasted and charred American white oak barrels",
+        "releaseDay": null,
+        "singleCask": null,
+        "releaseYear": 2024,
+        "vintageYear": null,
+        "bottlingYear": null,
+        "caskStrength": null,
+        "releaseMonth": 2,
+        "familyContext": {
+          "siblingBottles": []
+        }
+      },
+      {
+        "abv": 50.7,
+        "brand": "The Glenlivet",
+        "score": 54.154873,
+        "series": null,
+        "source": ["text"],
+        "bottler": null,
+        "edition": "Batch 2",
+        "outturn": null,
+        "bottleId": 62555,
+        "category": "single_malt",
+        "fullName": "The Glenlivet 18-year-old Hand Filled - Batch 2",
+        "reference": null,
+        "statedAge": 18,
+        "caskNumber": null,
+        "comparison": {
+          "missing": ["releaseYear"],
+          "conflicts": ["statedAge", "abv", "brand", "distillers"],
+          "agreements": ["category", "edition"]
+        },
+        "distillery": ["The Glenlivet"],
+        "maturation": null,
+        "releaseDay": null,
+        "singleCask": null,
+        "releaseYear": null,
+        "vintageYear": null,
+        "bottlingYear": null,
+        "caskStrength": null,
+        "releaseMonth": null,
+        "familyContext": {
+          "siblingBottles": []
+        }
+      },
+      {
+        "abv": 56.4,
+        "brand": "Lagavulin",
+        "score": 52.041477,
+        "series": "Special Releases",
+        "source": ["vector", "text", "brand_coverage", "context"],
+        "bottler": null,
+        "edition": null,
+        "outturn": null,
+        "bottleId": 57915,
+        "category": "single_malt",
+        "fullName": "Lagavulin Grain & Embers",
+        "reference": "Lagavulin Grain & Embers 12-year-old, 56.4%",
+        "statedAge": 12,
+        "caskNumber": null,
+        "comparison": {
+          "missing": ["edition"],
+          "conflicts": ["abv"],
+          "agreements": [
+            "category",
+            "statedAge",
+            "releaseYear",
+            "brand",
+            "distillers"
+          ]
+        },
+        "distillery": ["Lagavulin"],
+        "maturation": "A mix of refill casks and sherry-seasoned European oak butts",
+        "releaseDay": null,
+        "singleCask": null,
+        "releaseYear": 2025,
+        "vintageYear": null,
+        "bottlingYear": null,
+        "caskStrength": null,
+        "releaseMonth": null,
+        "familyContext": {
+          "siblingBottles": []
+        }
+      },
+      {
+        "abv": null,
+        "brand": "Lagavulin",
+        "score": 50.998146,
+        "series": null,
+        "source": ["text", "context"],
+        "bottler": null,
+        "edition": null,
+        "outturn": null,
+        "bottleId": 5499,
+        "category": "single_malt",
+        "fullName": "Lagavulin 12-year-old White Horse Distillers Ltd.",
+        "reference": null,
+        "statedAge": 12,
+        "caskNumber": null,
+        "comparison": {
+          "missing": ["abv", "releaseYear", "edition"],
+          "conflicts": [],
+          "agreements": ["category", "statedAge", "brand", "distillers"]
+        },
+        "distillery": ["Lagavulin"],
+        "maturation": null,
+        "releaseDay": null,
+        "singleCask": null,
+        "releaseYear": null,
+        "vintageYear": null,
+        "bottlingYear": null,
+        "caskStrength": null,
+        "releaseMonth": null,
+        "familyContext": {
+          "siblingBottles": []
+        }
+      },
+      {
+        "abv": null,
+        "brand": "Bunnahabhain",
+        "score": 50.741375,
+        "series": null,
+        "source": ["text"],
+        "bottler": null,
+        "edition": null,
+        "outturn": null,
+        "bottleId": 1678,
+        "category": "single_malt",
+        "fullName": "Bunnahabhain 2007 Warehouse 9 - Hand-Filled Exclusive",
+        "reference": null,
+        "statedAge": 12,
+        "caskNumber": null,
+        "comparison": {
+          "missing": ["abv"],
+          "conflicts": [],
+          "agreements": []
+        },
+        "distillery": ["Bunnahabhain"],
+        "maturation": null,
+        "releaseDay": null,
+        "singleCask": null,
+        "releaseYear": null,
+        "vintageYear": null,
+        "bottlingYear": null,
+        "caskStrength": null,
+        "releaseMonth": null,
+        "familyContext": {
+          "siblingBottles": []
+        }
+      },
+      {
+        "abv": null,
+        "brand": "Bunnahabhain",
+        "score": 50.741375,
+        "series": null,
+        "source": ["text"],
+        "bottler": null,
+        "edition": null,
+        "outturn": null,
+        "bottleId": 1997,
+        "category": "single_malt",
+        "fullName": "Bunnahabhain 2008 Warehouse 9 - Hand-Filled Exclusive",
+        "reference": null,
+        "statedAge": 12,
+        "caskNumber": null,
+        "comparison": {
+          "missing": ["abv"],
+          "conflicts": [],
+          "agreements": []
+        },
+        "distillery": ["Bunnahabhain"],
+        "maturation": null,
+        "releaseDay": null,
+        "singleCask": null,
+        "releaseYear": null,
+        "vintageYear": null,
+        "bottlingYear": null,
+        "caskStrength": null,
+        "releaseMonth": null,
+        "familyContext": {
+          "siblingBottles": []
+        }
+      },
+      {
+        "abv": 46.2,
+        "brand": "Glenturret",
+        "score": 50.323334,
+        "series": null,
+        "source": ["text"],
+        "bottler": "Glenturret",
+        "edition": null,
+        "outturn": null,
+        "bottleId": 46010,
+        "category": "single_malt",
+        "fullName": "Glenturret 12-year-old - 2025 Release - 46.2% ABV",
+        "reference": null,
+        "statedAge": 12,
+        "caskNumber": null,
+        "comparison": {
+          "missing": ["edition"],
+          "conflicts": ["abv", "brand", "distillers"],
+          "agreements": ["category", "statedAge", "releaseYear"]
+        },
+        "distillery": ["Glenturret"],
+        "maturation": null,
+        "releaseDay": null,
+        "singleCask": null,
+        "releaseYear": 2025,
+        "vintageYear": null,
+        "bottlingYear": null,
+        "caskStrength": null,
+        "releaseMonth": null,
+        "familyContext": {
+          "siblingBottles": []
+        }
+      },
+      {
+        "abv": null,
+        "brand": "The GlenDronach",
+        "score": 50.16813,
+        "series": null,
+        "source": ["text"],
+        "bottler": null,
+        "edition": null,
+        "outturn": null,
+        "bottleId": 1744,
+        "category": "single_malt",
+        "fullName": "The GlenDronach 1994 Hand-filled at the distillery",
+        "reference": null,
+        "statedAge": 26,
+        "caskNumber": null,
+        "comparison": {
+          "missing": ["abv"],
+          "conflicts": [],
+          "agreements": []
+        },
+        "distillery": ["The GlenDronach"],
+        "maturation": null,
+        "releaseDay": null,
+        "singleCask": null,
+        "releaseYear": null,
+        "vintageYear": null,
+        "bottlingYear": null,
+        "caskStrength": null,
+        "releaseMonth": null,
+        "familyContext": {
+          "siblingBottles": []
+        }
+      },
+      {
+        "abv": 43,
+        "brand": "CRN57°",
+        "score": 49.734234,
+        "series": null,
+        "source": ["text"],
+        "bottler": "The Cairn Distillery",
+        "edition": null,
+        "outturn": null,
+        "bottleId": 47287,
+        "category": "blended_malt",
+        "fullName": "CRN57° 12-year-old",
+        "reference": null,
+        "statedAge": 12,
+        "caskNumber": null,
+        "comparison": {
+          "missing": ["edition", "distillers"],
+          "conflicts": ["category", "abv", "brand"],
+          "agreements": ["statedAge", "releaseYear"]
+        },
+        "distillery": [],
+        "maturation": null,
+        "releaseDay": null,
+        "singleCask": null,
+        "releaseYear": 2025,
+        "vintageYear": null,
+        "bottlingYear": null,
+        "caskStrength": null,
+        "releaseMonth": null,
+        "familyContext": {
+          "siblingBottles": []
+        }
+      },
+      {
+        "abv": 40,
+        "brand": "Canadian Rockies",
+        "score": 48.682262,
+        "series": null,
+        "source": ["text"],
+        "bottler": null,
+        "edition": "Batch 002",
+        "outturn": null,
+        "bottleId": 65305,
+        "category": null,
+        "fullName": "Canadian Rockies 21-year-old - Batch 002",
+        "reference": null,
+        "statedAge": 21,
+        "caskNumber": null,
+        "comparison": {
+          "missing": ["category", "releaseYear", "distillers"],
+          "conflicts": ["statedAge", "abv", "brand"],
+          "agreements": ["edition"]
+        },
+        "distillery": [],
+        "maturation": null,
+        "releaseDay": null,
+        "singleCask": null,
+        "releaseYear": null,
+        "vintageYear": null,
+        "bottlingYear": null,
+        "caskStrength": null,
+        "releaseMonth": null,
+        "familyContext": {
+          "siblingBottles": []
+        }
+      },
+      {
+        "abv": null,
+        "brand": "The GlenDronach",
+        "score": 48.417767,
+        "series": null,
+        "source": ["text"],
+        "bottler": null,
+        "edition": null,
+        "outturn": null,
+        "bottleId": 2065,
+        "category": "single_malt",
+        "fullName": "The GlenDronach 2005 Hand-filled at the distillery",
+        "reference": null,
+        "statedAge": null,
+        "caskNumber": null,
+        "comparison": {
+          "missing": ["abv"],
+          "conflicts": [],
+          "agreements": []
+        },
+        "distillery": ["The GlenDronach"],
+        "maturation": null,
+        "releaseDay": null,
+        "singleCask": null,
+        "releaseYear": null,
+        "vintageYear": null,
+        "bottlingYear": null,
+        "caskStrength": null,
+        "releaseMonth": null,
+        "familyContext": {
+          "siblingBottles": []
+        }
+      },
+      {
+        "abv": null,
+        "brand": "Lagavulin",
+        "score": 48.319138,
+        "series": null,
+        "source": ["text"],
+        "bottler": null,
+        "edition": null,
+        "outturn": null,
+        "bottleId": 5498,
+        "category": "single_malt",
+        "fullName": "Lagavulin 12-year-old White Horse Distillers Ltd. - Specially Selected",
+        "reference": null,
+        "statedAge": 12,
+        "caskNumber": null,
+        "comparison": {
+          "missing": ["abv", "releaseYear", "edition"],
+          "conflicts": [],
+          "agreements": ["category", "statedAge", "brand", "distillers"]
+        },
+        "distillery": ["Lagavulin"],
+        "maturation": null,
+        "releaseDay": null,
+        "singleCask": null,
+        "releaseYear": null,
+        "vintageYear": null,
+        "bottlingYear": null,
+        "caskStrength": null,
+        "releaseMonth": null,
+        "familyContext": {
+          "siblingBottles": []
+        }
+      },
+      {
+        "abv": 48,
+        "brand": "The Notch",
+        "score": 48.108124,
+        "series": null,
+        "source": ["text"],
+        "bottler": null,
+        "edition": "Batch 002",
+        "outturn": null,
+        "bottleId": 64281,
+        "category": "single_malt",
+        "fullName": "The Notch 8-year-old - Batch 002",
+        "reference": null,
+        "statedAge": 8,
+        "caskNumber": null,
+        "comparison": {
+          "missing": ["releaseYear"],
+          "conflicts": ["statedAge", "abv", "brand", "distillers"],
+          "agreements": ["category", "edition"]
+        },
+        "distillery": ["Triple Eight Distillery"],
+        "maturation": null,
+        "releaseDay": null,
+        "singleCask": null,
+        "releaseYear": null,
+        "vintageYear": null,
+        "bottlingYear": null,
+        "caskStrength": null,
+        "releaseMonth": null,
+        "familyContext": {
+          "siblingBottles": []
+        }
+      },
+      {
+        "abv": null,
+        "brand": "The GlenDronach",
+        "score": 47.888176,
+        "series": null,
+        "source": ["text"],
+        "bottler": null,
+        "edition": null,
+        "outturn": null,
+        "bottleId": 2446,
+        "category": "single_malt",
+        "fullName": "The GlenDronach 1992 Hand-filled at the distillery",
+        "reference": null,
+        "statedAge": 28,
+        "caskNumber": null,
+        "comparison": {
+          "missing": ["abv"],
+          "conflicts": [],
+          "agreements": []
+        },
+        "distillery": ["The GlenDronach"],
+        "maturation": null,
+        "releaseDay": null,
+        "singleCask": null,
+        "releaseYear": null,
+        "vintageYear": null,
+        "bottlingYear": null,
+        "caskStrength": null,
+        "releaseMonth": null,
+        "familyContext": {
+          "siblingBottles": []
+        }
+      },
+      {
+        "abv": null,
+        "brand": "The GlenDronach",
+        "score": 47.888176,
+        "series": null,
+        "source": ["text"],
+        "bottler": null,
+        "edition": null,
+        "outturn": null,
+        "bottleId": 1281,
+        "category": "single_malt",
+        "fullName": "The GlenDronach 1993 Hand-filled at the distillery",
+        "reference": null,
+        "statedAge": 27,
+        "caskNumber": null,
+        "comparison": {
+          "missing": ["abv"],
+          "conflicts": [],
+          "agreements": []
+        },
+        "distillery": ["The GlenDronach"],
+        "maturation": null,
+        "releaseDay": null,
+        "singleCask": null,
+        "releaseYear": null,
+        "vintageYear": null,
+        "bottlingYear": null,
+        "caskStrength": null,
+        "releaseMonth": null,
+        "familyContext": {
+          "siblingBottles": []
+        }
+      },
+      {
+        "abv": null,
+        "brand": "The GlenDronach",
+        "score": 47.888176,
+        "series": null,
+        "source": ["text"],
+        "bottler": null,
+        "edition": null,
+        "outturn": null,
+        "bottleId": 3503,
+        "category": "single_malt",
+        "fullName": "The GlenDronach 2004 Hand-filled at the distillery",
+        "reference": null,
+        "statedAge": 16,
+        "caskNumber": null,
+        "comparison": {
+          "missing": ["abv"],
+          "conflicts": [],
+          "agreements": []
+        },
+        "distillery": ["The GlenDronach"],
+        "maturation": null,
+        "releaseDay": null,
+        "singleCask": null,
+        "releaseYear": null,
+        "vintageYear": null,
+        "bottlingYear": null,
+        "caskStrength": null,
+        "releaseMonth": null,
+        "familyContext": {
+          "siblingBottles": []
+        }
+      },
+      {
+        "abv": null,
+        "brand": "Springbank",
+        "score": 47.657555,
+        "series": null,
+        "source": ["text"],
+        "bottler": null,
+        "edition": null,
+        "outturn": null,
+        "bottleId": 410,
+        "category": "single_malt",
+        "fullName": "Springbank Hand Filled Distillery Exclusive",
+        "reference": null,
+        "statedAge": null,
+        "caskNumber": null,
+        "comparison": {
+          "missing": ["abv"],
+          "conflicts": [],
+          "agreements": []
+        },
+        "distillery": ["Springbank"],
+        "maturation": null,
+        "releaseDay": null,
+        "singleCask": null,
+        "releaseYear": null,
+        "vintageYear": null,
+        "bottlingYear": null,
+        "caskStrength": null,
+        "releaseMonth": null,
+        "familyContext": {
+          "siblingBottles": []
+        }
+      },
+      {
+        "abv": null,
+        "brand": "Three Chord",
+        "score": 47.635567,
+        "series": null,
+        "source": ["text"],
+        "bottler": null,
+        "edition": null,
+        "outturn": null,
+        "bottleId": 13400,
+        "category": "bourbon",
+        "fullName": "Three Chord 12-year-old Twelve Bar Reserve Barrel-Proof Straight Bourbon (Batch 0007)",
+        "reference": null,
+        "statedAge": 12,
+        "caskNumber": null,
+        "comparison": {
+          "missing": ["abv", "releaseYear", "edition", "distillers"],
+          "conflicts": ["category", "brand"],
+          "agreements": ["statedAge"]
+        },
+        "distillery": [],
+        "maturation": null,
+        "releaseDay": null,
+        "singleCask": null,
+        "releaseYear": null,
+        "vintageYear": null,
+        "bottlingYear": null,
+        "caskStrength": null,
+        "releaseMonth": null,
+        "familyContext": {
+          "siblingBottles": []
+        }
+      },
+      {
+        "abv": null,
+        "brand": "Longrow",
+        "score": 47.34637,
+        "series": null,
+        "source": ["text"],
+        "bottler": "Springbank",
+        "edition": null,
+        "outturn": null,
+        "bottleId": 409,
+        "category": "single_malt",
+        "fullName": "Longrow Hand Filled Distillery Exclusive",
+        "reference": null,
+        "statedAge": null,
+        "caskNumber": null,
+        "comparison": {
+          "missing": ["abv"],
+          "conflicts": [],
+          "agreements": []
+        },
+        "distillery": [],
+        "maturation": null,
+        "releaseDay": null,
+        "singleCask": null,
+        "releaseYear": null,
+        "vintageYear": null,
+        "bottlingYear": null,
+        "caskStrength": null,
+        "releaseMonth": null,
+        "familyContext": {
+          "siblingBottles": []
+        }
+      },
+      {
+        "abv": null,
+        "brand": "Barrell Rye",
+        "score": 46.579735,
+        "series": null,
+        "source": ["text"],
+        "bottler": null,
+        "edition": null,
+        "outturn": null,
+        "bottleId": 14207,
+        "category": "rye",
+        "fullName": "Barrell Rye Batch 002",
+        "reference": null,
+        "statedAge": null,
+        "caskNumber": null,
+        "comparison": {
+          "missing": ["abv"],
+          "conflicts": [],
+          "agreements": []
+        },
+        "distillery": [],
+        "maturation": null,
+        "releaseDay": null,
+        "singleCask": null,
+        "releaseYear": null,
+        "vintageYear": null,
+        "bottlingYear": null,
+        "caskStrength": null,
+        "releaseMonth": null,
+        "familyContext": {
+          "siblingBottles": []
+        }
+      },
+      {
+        "abv": null,
+        "brand": "Aberlour",
+        "score": 45.66276,
+        "series": null,
+        "source": ["text"],
+        "bottler": null,
+        "edition": null,
+        "outturn": null,
+        "bottleId": 2632,
+        "category": "single_malt",
+        "fullName": "Aberlour 13-year-old Hand Filled at the Distillery",
+        "reference": null,
+        "statedAge": 13,
+        "caskNumber": null,
+        "comparison": {
+          "missing": ["abv"],
+          "conflicts": [],
+          "agreements": []
+        },
+        "distillery": ["Aberlour"],
+        "maturation": null,
+        "releaseDay": null,
+        "singleCask": null,
+        "releaseYear": null,
+        "vintageYear": null,
+        "bottlingYear": null,
+        "caskStrength": null,
+        "releaseMonth": null,
+        "familyContext": {
+          "siblingBottles": []
+        }
+      },
+      {
+        "abv": null,
+        "brand": "Aberlour",
+        "score": 45.66276,
+        "series": null,
+        "source": ["text"],
+        "bottler": null,
+        "edition": null,
+        "outturn": null,
+        "bottleId": 3369,
+        "category": "single_malt",
+        "fullName": "Aberlour 16-year-old Hand Filled at the Distillery",
+        "reference": null,
+        "statedAge": 16,
+        "caskNumber": null,
+        "comparison": {
+          "missing": ["abv"],
+          "conflicts": [],
+          "agreements": []
+        },
+        "distillery": ["Aberlour"],
+        "maturation": null,
+        "releaseDay": null,
+        "singleCask": null,
+        "releaseYear": null,
+        "vintageYear": null,
+        "bottlingYear": null,
+        "caskStrength": null,
+        "releaseMonth": null,
+        "familyContext": {
+          "siblingBottles": []
+        }
+      },
+      {
+        "abv": 60.1,
+        "brand": "Lagg Distillery",
+        "score": 0.7411070054510634,
+        "series": null,
+        "source": ["vector"],
+        "bottler": null,
+        "edition": null,
+        "outturn": null,
+        "bottleId": 47277,
+        "category": "single_malt",
+        "fullName": "Lagg Distillery Hand-filled - 5-year-old - 2019 Vintage - 60.1% ABV - Single Cask - Other Cask - Hogshead - 2nd Fill",
+        "reference": "Lagg Distillery Hand-filled - 5-year-old - 2019 Vintage - 60.1% ABV - Single Cask - Other Cask - Hogshead - 2nd Fill",
+        "statedAge": 5,
+        "caskNumber": null,
+        "comparison": {
+          "missing": ["releaseYear", "edition"],
+          "conflicts": ["statedAge", "abv", "brand", "distillers"],
+          "agreements": ["category"]
+        },
+        "distillery": ["Lagg Distillery"],
+        "maturation": "other",
+        "releaseDay": null,
+        "singleCask": true,
+        "releaseYear": null,
+        "vintageYear": 2019,
+        "bottlingYear": null,
+        "caskStrength": null,
+        "releaseMonth": null,
+        "familyContext": {
+          "siblingBottles": []
+        }
+      },
+      {
+        "abv": null,
+        "brand": "Lagavulin",
+        "score": 0.7344676534779312,
+        "series": "Distillers Edition",
+        "source": ["vector"],
+        "bottler": null,
+        "edition": null,
+        "outturn": null,
+        "bottleId": 44006,
+        "category": "single_malt",
+        "fullName": "Lagavulin Distillers Edition",
+        "reference": "Lagavulin The Distillers Edition 2023 Release",
+        "statedAge": null,
+        "caskNumber": null,
+        "comparison": {
+          "missing": ["statedAge", "abv", "releaseYear", "edition"],
+          "conflicts": [],
+          "agreements": ["category", "brand", "distillers"]
+        },
+        "distillery": ["Lagavulin"],
+        "maturation": null,
+        "releaseDay": null,
+        "singleCask": null,
+        "releaseYear": null,
+        "vintageYear": null,
+        "bottlingYear": null,
+        "caskStrength": null,
+        "releaseMonth": null,
+        "familyContext": {
+          "siblingBottles": [
+            {
+              "abv": 43,
+              "edition": "1997 Release",
+              "outturn": null,
+              "bottleId": 44866,
+              "fullName": "Lagavulin Distillers Edition - 1997 Release",
+              "statedAge": null,
+              "caskNumber": null,
+              "maturation": "Pedro Ximénez-seasoned cask finish",
+              "releaseDay": null,
+              "singleCask": false,
+              "releaseYear": 1997,
+              "traitFields": [
+                "edition",
+                "releaseYear",
+                "vintageYear",
+                "abv",
+                "singleCask",
+                "caskStrength"
+              ],
+              "vintageYear": 1979,
+              "bottlingYear": 1997,
+              "caskStrength": false,
+              "releaseMonth": null
+            },
+            {
+              "abv": 43,
+              "edition": "2006 Release",
+              "outturn": null,
+              "bottleId": 44867,
+              "fullName": "Lagavulin Distillers Edition - 2006 Release",
+              "statedAge": null,
+              "caskNumber": null,
+              "maturation": "Pedro Ximénez-seasoned cask finish",
+              "releaseDay": null,
+              "singleCask": false,
+              "releaseYear": 2006,
+              "traitFields": [
+                "edition",
+                "releaseYear",
+                "vintageYear",
+                "abv",
+                "singleCask",
+                "caskStrength"
+              ],
+              "vintageYear": 1990,
+              "bottlingYear": 2006,
+              "caskStrength": false,
+              "releaseMonth": null
+            },
+            {
+              "abv": 43,
+              "edition": "2007 Release",
+              "outturn": null,
+              "bottleId": 44868,
+              "fullName": "Lagavulin Distillers Edition - 2007 Release",
+              "statedAge": null,
+              "caskNumber": null,
+              "maturation": "Pedro Ximénez-seasoned cask finish",
+              "releaseDay": null,
+              "singleCask": false,
+              "releaseYear": 2007,
+              "traitFields": [
+                "edition",
+                "releaseYear",
+                "vintageYear",
+                "abv",
+                "singleCask",
+                "caskStrength"
+              ],
+              "vintageYear": 1991,
+              "bottlingYear": 2007,
+              "caskStrength": false,
+              "releaseMonth": null
+            },
+            {
+              "abv": 43,
+              "edition": "2009 Release",
+              "outturn": null,
+              "bottleId": 44869,
+              "fullName": "Lagavulin Distillers Edition - 2009 Release",
+              "statedAge": null,
+              "caskNumber": null,
+              "maturation": "Pedro Ximénez-seasoned cask finish",
+              "releaseDay": null,
+              "singleCask": false,
+              "releaseYear": 2009,
+              "traitFields": [
+                "edition",
+                "releaseYear",
+                "vintageYear",
+                "abv",
+                "singleCask",
+                "caskStrength"
+              ],
+              "vintageYear": 1993,
+              "bottlingYear": 2009,
+              "caskStrength": false,
+              "releaseMonth": null
+            },
+            {
+              "abv": 43,
+              "edition": "2010 Release",
+              "outturn": null,
+              "bottleId": 44875,
+              "fullName": "Lagavulin Distillers Edition - 2010 Release",
+              "statedAge": null,
+              "caskNumber": null,
+              "maturation": "Pedro Ximénez-seasoned cask finish",
+              "releaseDay": null,
+              "singleCask": false,
+              "releaseYear": 2010,
+              "traitFields": [
+                "edition",
+                "releaseYear",
+                "vintageYear",
+                "abv",
+                "singleCask",
+                "caskStrength"
+              ],
+              "vintageYear": 1994,
+              "bottlingYear": 2010,
+              "caskStrength": false,
+              "releaseMonth": null
+            },
+            {
+              "abv": 43,
+              "edition": "2011 Release",
+              "outturn": null,
+              "bottleId": 44864,
+              "fullName": "Lagavulin Distillers Edition - 2011 Release",
+              "statedAge": null,
+              "caskNumber": null,
+              "maturation": "Pedro Ximénez-seasoned cask finish",
+              "releaseDay": null,
+              "singleCask": false,
+              "releaseYear": 2011,
+              "traitFields": [
+                "edition",
+                "releaseYear",
+                "vintageYear",
+                "abv",
+                "singleCask",
+                "caskStrength"
+              ],
+              "vintageYear": 1995,
+              "bottlingYear": 2011,
+              "caskStrength": false,
+              "releaseMonth": null
+            },
+            {
+              "abv": 43,
+              "edition": "2012 Release",
+              "outturn": null,
+              "bottleId": 44870,
+              "fullName": "Lagavulin Distillers Edition - 2012 Release",
+              "statedAge": null,
+              "caskNumber": null,
+              "maturation": "Pedro Ximénez-seasoned cask finish",
+              "releaseDay": null,
+              "singleCask": false,
+              "releaseYear": 2012,
+              "traitFields": [
+                "edition",
+                "releaseYear",
+                "vintageYear",
+                "abv",
+                "singleCask",
+                "caskStrength"
+              ],
+              "vintageYear": 1996,
+              "bottlingYear": 2012,
+              "caskStrength": false,
+              "releaseMonth": null
+            },
+            {
+              "abv": 43,
+              "edition": "2013 Release",
+              "outturn": null,
+              "bottleId": 44871,
+              "fullName": "Lagavulin Distillers Edition - 2013 Release",
+              "statedAge": null,
+              "caskNumber": null,
+              "maturation": "Pedro Ximénez-seasoned cask finish",
+              "releaseDay": null,
+              "singleCask": false,
+              "releaseYear": 2013,
+              "traitFields": [
+                "edition",
+                "releaseYear",
+                "vintageYear",
+                "abv",
+                "singleCask",
+                "caskStrength"
+              ],
+              "vintageYear": 1997,
+              "bottlingYear": 2013,
+              "caskStrength": false,
+              "releaseMonth": null
+            }
+          ]
+        }
+      }
+    ]
+  },
+  "context": {
+    "inspectedBottleIds": [5499, 57915],
+    "bottleContexts": [
+      {
+        "exact": {
+          "abv": null,
+          "edition": null,
+          "outturn": null,
+          "statedAge": null,
+          "caskNumber": null,
+          "maturation": null,
+          "releaseDay": null,
+          "singleCask": null,
+          "releaseYear": null,
+          "vintageYear": null,
+          "bottlingYear": null,
+          "caskStrength": null,
+          "releaseMonth": null
+        },
+        "shared": {
+          "name": "12-year-old White Horse Distillers Ltd.",
+          "brand": {
+            "name": "Lagavulin",
+            "entityId": 1124
+          },
+          "series": null,
+          "bottler": null,
+          "category": "single_malt",
+          "statedAge": 12,
+          "distillers": [
+            {
+              "name": "Lagavulin",
+              "entityId": 1124
+            }
+          ]
+        },
+        "groupId": 12383,
+        "bottleId": 5499,
+        "fullName": "Lagavulin 12-year-old White Horse Distillers Ltd.",
+        "siblings": [],
+        "references": [
+          {
+            "name": "Lagavulin 12-year-old White Horse Distillers Ltd.",
+            "ignored": false
+          }
+        ],
+        "observations": [],
+        "imageSources": []
+      },
+      {
+        "exact": {
+          "abv": 56.4,
+          "edition": null,
+          "outturn": null,
+          "statedAge": 12,
+          "caskNumber": null,
+          "maturation": "A mix of refill casks and sherry-seasoned European oak butts",
+          "releaseDay": null,
+          "singleCask": null,
+          "releaseYear": 2025,
+          "vintageYear": null,
+          "bottlingYear": null,
+          "caskStrength": null,
+          "releaseMonth": null
+        },
+        "shared": {
+          "name": "Grain & Embers",
+          "brand": {
+            "name": "Lagavulin",
+            "entityId": 1124
+          },
+          "series": {
+            "name": "Special Releases",
+            "seriesId": 961
+          },
+          "bottler": null,
+          "category": "single_malt",
+          "statedAge": null,
+          "distillers": [
+            {
+              "name": "Lagavulin",
+              "entityId": 1124
+            }
+          ]
+        },
+        "groupId": 30876,
+        "bottleId": 57915,
+        "fullName": "Lagavulin Grain & Embers",
+        "siblings": [],
+        "references": [
+          {
+            "name": "Lagavulin Grain & Embers 12-year-old, 56.4%",
+            "ignored": false
+          }
+        ],
+        "observations": [
+          {
+            "facts": {
+              "proposalType": "create_new",
+              "proposedBottle": {
+                "abv": null,
+                "name": "Grain & Embers",
+                "brand": {
+                  "id": null,
+                  "name": "Lagavulin"
+                },
+                "series": null,
+                "bottler": null,
+                "edition": "2025",
+                "outturn": null,
+                "category": "single_malt",
+                "statedAge": 12,
+                "caskNumber": null,
+                "distillers": [
+                  {
+                    "id": null,
+                    "name": "Lagavulin"
+                  }
+                ],
+                "maturation": null,
+                "releaseDay": null,
+                "singleCask": null,
+                "releaseYear": 2025,
+                "vintageYear": null,
+                "bottlingYear": null,
+                "caskStrength": null,
+                "releaseMonth": null
+              },
+              "referenceScope": "none"
+            },
+            "rawText": "Lagavulin 12-year-old Special Release Grain & Embers Single Malt Whisky 2025",
+            "sourceKey": "store_price:12035107",
+            "sourceUrl": "https://www.missionliquor.com/products/lagavulin-12-year-old-special-release-grain-embers-single-malt-whisky-2025-750ml",
+            "sourceName": "Lagavulin 12-year-old Special Release Grain & Embers Single Malt Whisky 2025",
+            "sourceType": "store_price",
+            "parsedIdentity": null
+          }
+        ],
+        "imageSources": []
+      }
+    ],
+    "inspectedEntities": [
+      {
+        "kind": "distillery",
+        "name": "Oban",
+        "score": 1,
+        "source": ["exact", "text", "prefix", "contained"],
+        "entityId": 1208,
+        "reference": "Oban",
+        "shortName": null,
+        "retrievedFor": [
+          {
+            "exact": true,
+            "query": "Oban"
+          }
+        ]
+      },
+      {
+        "kind": "distillery",
+        "name": "Bunnahabhain",
+        "score": 1,
+        "source": ["exact", "text", "prefix", "contained"],
+        "entityId": 144,
+        "reference": "Bunnahabhain",
+        "shortName": "",
+        "retrievedFor": [
+          {
+            "exact": true,
+            "query": "Bunnahabhain"
+          }
+        ]
+      },
+      {
+        "kind": "distillery",
+        "name": "Deanston",
+        "score": 1,
+        "source": ["exact", "text", "prefix", "contained"],
+        "entityId": 445,
+        "reference": "Deanston",
+        "shortName": null,
+        "retrievedFor": [
+          {
+            "exact": true,
+            "query": "Deanston"
+          }
+        ]
+      },
+      {
+        "kind": "distillery",
+        "name": "The GlenDronach",
+        "score": 1,
+        "source": ["exact", "text", "prefix", "contained"],
+        "entityId": 973,
+        "reference": "The GlenDronach",
+        "shortName": null,
+        "retrievedFor": [
+          {
+            "exact": true,
+            "query": "The GlenDronach"
+          }
+        ]
+      },
+      {
+        "kind": "distillery",
+        "name": "Springbank",
+        "score": 1,
+        "source": ["exact", "text", "prefix", "contained"],
+        "entityId": 1362,
+        "reference": "Springbank",
+        "shortName": null,
+        "retrievedFor": [
+          {
+            "exact": true,
+            "query": "Springbank"
+          }
+        ]
+      },
+      {
+        "kind": "brand",
+        "name": "Longrow",
+        "score": 1,
+        "source": ["exact", "text", "prefix", "contained"],
+        "entityId": 1152,
+        "reference": "Longrow",
+        "shortName": null,
+        "retrievedFor": [
+          {
+            "exact": true,
+            "query": "Longrow"
+          }
+        ]
+      },
+      {
+        "kind": "brand",
+        "name": "Barrell Rye",
+        "score": 1,
+        "source": ["exact", "text", "prefix", "contained"],
+        "entityId": 37,
+        "reference": "Barrell Rye",
+        "shortName": null,
+        "retrievedFor": [
+          {
+            "exact": true,
+            "query": "Barrell Rye"
+          }
+        ]
+      },
+      {
+        "kind": "distillery",
+        "name": "Aberlour",
+        "score": 1,
+        "source": ["exact", "text", "prefix", "contained"],
+        "entityId": 13,
+        "reference": "Aberlour",
+        "shortName": null,
+        "retrievedFor": [
+          {
+            "exact": true,
+            "query": "Aberlour"
+          }
+        ]
+      },
+      {
+        "kind": "bottler",
+        "name": "Barrell Craft Spirits",
+        "score": 0.39,
+        "source": ["contained"],
+        "entityId": 75635,
+        "reference": "Barrel",
+        "shortName": "Barrell",
+        "retrievedFor": [
+          {
+            "query": "Barrell Rye"
+          }
+        ]
+      }
+    ],
+    "inspectedSeries": []
+  },
+  "provenance": {
+    "source": "production_miss",
+    "verifiedSourceUrls": [
+      "https://www.scotchwhiskyauctions.com/auctions/234-the-185th-auction/908247-lagavulin-12-year-old-hand-filled-batch-002-2025-release/"
+    ],
+    "dbOutcome": {
+      "bottleId": null,
+      "createsBottle": false,
+      "summary": "Production returned no_match."
+    },
+    "notes": "Captured from saved classifier run 35837 (auction_lot 16293, model null, 2026-11-03T15:54:24.053Z). Production rationale: No inspected candidate is a safe match: the 2025 Lagavulin Grain & Embers is a different expression at 56.4%, and the White Horse Distillers Ltd. 12-year-old does not represent this hand-filled release. The available evidence is insufficient to create the exact Bottle confidently. Checked 2026-11-03. Lot 185-04994 page: Lagavulin 12 Year Old Hand Filled Batch #002 2025 Release, bottled 22.07.2025, Madeira cask, 53.5%, 70cl. Owner rule (2026-10-28): distillery hand-fills are out of auctions and the catalog."
+  },
+  "expected": {
+    "status": "ignored",
+    "summary": "A batch number and release year do not make a distillery hand-fill a marketed release. Ignore it instead of leaving it for review."
+  }
+}

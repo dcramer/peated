@@ -1,0 +1,2333 @@
+{
+  "id": "auction-bruichladdich-valinch-28-chloe-wood",
+  "name": "auction title: a Bruichladdich Valinch is a distillery hand-fill",
+  "input": {
+    "reference": {
+      "id": 9886,
+      "url": "https://www.scotchwhiskyauctions.com/auctions/233-the-184th-auction/898970-bruichladdich-valinch-28-chloe-wood-50cl/",
+      "name": "Bruichladdich Valinch 28 Chloe Wood 50cl",
+      "imageUrl": null,
+      "externalSiteId": 28097,
+      "currentBottleId": null
+    },
+    "extractedIdentity": {
+      "abv": 48.8,
+      "brand": null,
+      "series": null,
+      "bottler": null,
+      "edition": null,
+      "outturn": 444,
+      "category": null,
+      "distillery": null,
+      "expression": null,
+      "maturation": null,
+      "stated_age": null,
+      "cask_number": "780",
+      "single_cask": null,
+      "release_year": null,
+      "vintage_year": 2005,
+      "cask_strength": null
+    },
+    "imageEvidence": null,
+    "initialCandidates": [
+      {
+        "abv": null,
+        "brand": "Bruichladdich",
+        "score": 56.303986,
+        "series": null,
+        "source": ["text"],
+        "bottler": null,
+        "edition": null,
+        "outturn": null,
+        "bottleId": 1117,
+        "category": "single_malt",
+        "fullName": "Bruichladdich Laddie Classic Edition_01",
+        "reference": null,
+        "statedAge": null,
+        "caskNumber": null,
+        "comparison": {
+          "missing": [
+            "statedAge",
+            "abv",
+            "vintageYear",
+            "releaseYear",
+            "singleCask",
+            "caskNumber",
+            "series"
+          ],
+          "conflicts": [],
+          "agreements": ["category", "brand", "distillers"]
+        },
+        "distillery": ["Bruichladdich"],
+        "maturation": null,
+        "releaseDay": null,
+        "singleCask": null,
+        "releaseYear": null,
+        "vintageYear": null,
+        "bottlingYear": null,
+        "caskStrength": null,
+        "releaseMonth": null,
+        "familyContext": {
+          "siblingBottles": []
+        }
+      },
+      {
+        "abv": null,
+        "brand": "The GlenDronach",
+        "score": 54.447647,
+        "series": null,
+        "source": ["text"],
+        "bottler": "The GlenDronach",
+        "edition": null,
+        "outturn": null,
+        "bottleId": 4050,
+        "category": "single_malt",
+        "fullName": "The GlenDronach 12-year-old Sauternes Cask Finish",
+        "reference": null,
+        "statedAge": 12,
+        "caskNumber": null,
+        "comparison": {
+          "missing": [
+            "abv",
+            "vintageYear",
+            "releaseYear",
+            "singleCask",
+            "caskNumber",
+            "series"
+          ],
+          "conflicts": ["brand", "distillers"],
+          "agreements": ["category", "statedAge"]
+        },
+        "distillery": ["The GlenDronach"],
+        "maturation": null,
+        "releaseDay": null,
+        "singleCask": null,
+        "releaseYear": null,
+        "vintageYear": null,
+        "bottlingYear": null,
+        "caskStrength": null,
+        "releaseMonth": null,
+        "familyContext": {
+          "siblingBottles": []
+        }
+      },
+      {
+        "abv": null,
+        "brand": "BenRiach",
+        "score": 52.65358,
+        "series": null,
+        "source": ["text"],
+        "bottler": null,
+        "edition": null,
+        "outturn": null,
+        "bottleId": 13944,
+        "category": "single_malt",
+        "fullName": "BenRiach Sherry Wood 12-year-old",
+        "reference": null,
+        "statedAge": 12,
+        "caskNumber": null,
+        "comparison": {
+          "missing": [
+            "abv",
+            "vintageYear",
+            "releaseYear",
+            "singleCask",
+            "caskNumber",
+            "series"
+          ],
+          "conflicts": ["brand", "distillers"],
+          "agreements": ["category", "statedAge"]
+        },
+        "distillery": ["BenRiach"],
+        "maturation": null,
+        "releaseDay": null,
+        "singleCask": null,
+        "releaseYear": null,
+        "vintageYear": null,
+        "bottlingYear": null,
+        "caskStrength": null,
+        "releaseMonth": null,
+        "familyContext": {
+          "siblingBottles": []
+        }
+      },
+      {
+        "abv": null,
+        "brand": "Springbank",
+        "score": 52.65358,
+        "series": null,
+        "source": ["text"],
+        "bottler": null,
+        "edition": null,
+        "outturn": null,
+        "bottleId": 16962,
+        "category": "single_malt",
+        "fullName": "Springbank Calvados Wood 12-year-old",
+        "reference": null,
+        "statedAge": 12,
+        "caskNumber": null,
+        "comparison": {
+          "missing": [
+            "abv",
+            "vintageYear",
+            "releaseYear",
+            "singleCask",
+            "caskNumber",
+            "series"
+          ],
+          "conflicts": ["brand", "distillers"],
+          "agreements": ["category", "statedAge"]
+        },
+        "distillery": ["Springbank"],
+        "maturation": null,
+        "releaseDay": null,
+        "singleCask": null,
+        "releaseYear": null,
+        "vintageYear": null,
+        "bottlingYear": null,
+        "caskStrength": null,
+        "releaseMonth": null,
+        "familyContext": {
+          "siblingBottles": []
+        }
+      },
+      {
+        "abv": null,
+        "brand": "GlenAllachie",
+        "score": 50.913467,
+        "series": null,
+        "source": ["text"],
+        "bottler": null,
+        "edition": null,
+        "outturn": null,
+        "bottleId": 12903,
+        "category": "single_malt",
+        "fullName": "GlenAllachie 12-year-old Port Wood Finished",
+        "reference": null,
+        "statedAge": 12,
+        "caskNumber": null,
+        "comparison": {
+          "missing": [
+            "abv",
+            "vintageYear",
+            "releaseYear",
+            "singleCask",
+            "caskNumber",
+            "series"
+          ],
+          "conflicts": ["brand", "distillers"],
+          "agreements": ["category", "statedAge"]
+        },
+        "distillery": ["GlenAllachie"],
+        "maturation": null,
+        "releaseDay": null,
+        "singleCask": null,
+        "releaseYear": null,
+        "vintageYear": null,
+        "bottlingYear": null,
+        "caskStrength": null,
+        "releaseMonth": null,
+        "familyContext": {
+          "siblingBottles": []
+        }
+      },
+      {
+        "abv": null,
+        "brand": "Bruichladdich Port Charlotte",
+        "score": 50.636845,
+        "series": null,
+        "source": ["text", "context"],
+        "bottler": "Bruichladdich",
+        "edition": null,
+        "outturn": null,
+        "bottleId": 2950,
+        "category": "single_malt",
+        "fullName": "Port Charlotte 2005 The Distillery Valinch",
+        "reference": null,
+        "statedAge": 10,
+        "caskNumber": null,
+        "comparison": {
+          "missing": [
+            "abv",
+            "vintageYear",
+            "singleCask",
+            "caskNumber",
+            "series",
+            "distillers"
+          ],
+          "conflicts": ["brand"],
+          "agreements": ["category"]
+        },
+        "distillery": [],
+        "maturation": null,
+        "releaseDay": null,
+        "singleCask": null,
+        "releaseYear": null,
+        "vintageYear": null,
+        "bottlingYear": null,
+        "caskStrength": null,
+        "releaseMonth": null,
+        "familyContext": {
+          "siblingBottles": []
+        }
+      },
+      {
+        "abv": null,
+        "brand": "BenRiach",
+        "score": 48.91856,
+        "series": null,
+        "source": ["text"],
+        "bottler": "BenRiach",
+        "edition": null,
+        "outturn": null,
+        "bottleId": 2686,
+        "category": "single_malt",
+        "fullName": "BenRiach 12-year-old Sherry Wood",
+        "reference": null,
+        "statedAge": 12,
+        "caskNumber": null,
+        "comparison": {
+          "missing": [
+            "abv",
+            "vintageYear",
+            "releaseYear",
+            "singleCask",
+            "caskNumber",
+            "series"
+          ],
+          "conflicts": ["brand", "distillers"],
+          "agreements": ["category", "statedAge"]
+        },
+        "distillery": ["BenRiach"],
+        "maturation": null,
+        "releaseDay": null,
+        "singleCask": null,
+        "releaseYear": null,
+        "vintageYear": null,
+        "bottlingYear": null,
+        "caskStrength": null,
+        "releaseMonth": null,
+        "familyContext": {
+          "siblingBottles": []
+        }
+      },
+      {
+        "abv": null,
+        "brand": "GlenAllachie",
+        "score": 47.447033,
+        "series": null,
+        "source": ["text"],
+        "bottler": "GlenAllachie",
+        "edition": null,
+        "outturn": null,
+        "bottleId": 2054,
+        "category": "single_malt",
+        "fullName": "GlenAllachie 12-year-old Wood Finish Series",
+        "reference": null,
+        "statedAge": 12,
+        "caskNumber": null,
+        "comparison": {
+          "missing": [
+            "abv",
+            "vintageYear",
+            "releaseYear",
+            "singleCask",
+            "caskNumber",
+            "series"
+          ],
+          "conflicts": ["brand", "distillers"],
+          "agreements": ["category", "statedAge"]
+        },
+        "distillery": ["GlenAllachie"],
+        "maturation": null,
+        "releaseDay": null,
+        "singleCask": null,
+        "releaseYear": null,
+        "vintageYear": null,
+        "bottlingYear": null,
+        "caskStrength": null,
+        "releaseMonth": null,
+        "familyContext": {
+          "siblingBottles": []
+        }
+      },
+      {
+        "abv": null,
+        "brand": "Ardmore",
+        "score": 47.424355,
+        "series": null,
+        "source": ["text"],
+        "bottler": null,
+        "edition": null,
+        "outturn": null,
+        "bottleId": 42904,
+        "category": "single_malt",
+        "fullName": "Ardmore Port Wood Finish",
+        "reference": null,
+        "statedAge": 12,
+        "caskNumber": null,
+        "comparison": {
+          "missing": [
+            "abv",
+            "vintageYear",
+            "releaseYear",
+            "singleCask",
+            "caskNumber",
+            "series"
+          ],
+          "conflicts": ["brand", "distillers"],
+          "agreements": ["category", "statedAge"]
+        },
+        "distillery": ["Ardmore"],
+        "maturation": null,
+        "releaseDay": null,
+        "singleCask": null,
+        "releaseYear": null,
+        "vintageYear": null,
+        "bottlingYear": null,
+        "caskStrength": null,
+        "releaseMonth": null,
+        "familyContext": {
+          "siblingBottles": []
+        }
+      },
+      {
+        "abv": null,
+        "brand": "GlenAllachie",
+        "score": 46.64991,
+        "series": null,
+        "source": ["text"],
+        "bottler": "GlenAllachie",
+        "edition": null,
+        "outturn": null,
+        "bottleId": 1733,
+        "category": "single_malt",
+        "fullName": "GlenAllachie 12-year-old Wine Series - Sauternes Wine Cask Finish",
+        "reference": null,
+        "statedAge": 12,
+        "caskNumber": null,
+        "comparison": {
+          "missing": [
+            "abv",
+            "vintageYear",
+            "releaseYear",
+            "singleCask",
+            "caskNumber",
+            "series"
+          ],
+          "conflicts": ["brand", "distillers"],
+          "agreements": ["category", "statedAge"]
+        },
+        "distillery": ["GlenAllachie"],
+        "maturation": null,
+        "releaseDay": null,
+        "singleCask": null,
+        "releaseYear": null,
+        "vintageYear": null,
+        "bottlingYear": null,
+        "caskStrength": null,
+        "releaseMonth": null,
+        "familyContext": {
+          "siblingBottles": []
+        }
+      },
+      {
+        "abv": null,
+        "brand": "Glencadam",
+        "score": 46.372658,
+        "series": null,
+        "source": ["text"],
+        "bottler": null,
+        "edition": null,
+        "outturn": null,
+        "bottleId": 16824,
+        "category": "single_malt",
+        "fullName": "Glencadam The Rather Refined Port Wood Finish 12-year-old",
+        "reference": null,
+        "statedAge": 12,
+        "caskNumber": null,
+        "comparison": {
+          "missing": [
+            "abv",
+            "vintageYear",
+            "releaseYear",
+            "singleCask",
+            "caskNumber",
+            "series"
+          ],
+          "conflicts": ["brand", "distillers"],
+          "agreements": ["category", "statedAge"]
+        },
+        "distillery": ["Glencadam"],
+        "maturation": null,
+        "releaseDay": null,
+        "singleCask": null,
+        "releaseYear": null,
+        "vintageYear": null,
+        "bottlingYear": null,
+        "caskStrength": null,
+        "releaseMonth": null,
+        "familyContext": {
+          "siblingBottles": []
+        }
+      },
+      {
+        "abv": null,
+        "brand": "BenRiach",
+        "score": 46.072052,
+        "series": null,
+        "source": ["text"],
+        "bottler": "BenRiach",
+        "edition": null,
+        "outturn": null,
+        "bottleId": 4572,
+        "category": "single_malt",
+        "fullName": "BenRiach 12-year-old Arumaticus Fumosus - Wood Finish",
+        "reference": null,
+        "statedAge": 12,
+        "caskNumber": null,
+        "comparison": {
+          "missing": [
+            "abv",
+            "vintageYear",
+            "releaseYear",
+            "singleCask",
+            "caskNumber",
+            "series"
+          ],
+          "conflicts": ["brand", "distillers"],
+          "agreements": ["category", "statedAge"]
+        },
+        "distillery": ["BenRiach"],
+        "maturation": null,
+        "releaseDay": null,
+        "singleCask": null,
+        "releaseYear": null,
+        "vintageYear": null,
+        "bottlingYear": null,
+        "caskStrength": null,
+        "releaseMonth": null,
+        "familyContext": {
+          "siblingBottles": []
+        }
+      },
+      {
+        "abv": null,
+        "brand": "BenRiach",
+        "score": 46.072052,
+        "series": null,
+        "source": ["text"],
+        "bottler": "BenRiach",
+        "edition": null,
+        "outturn": null,
+        "bottleId": 5050,
+        "category": "single_malt",
+        "fullName": "BenRiach 12-year-old Importanticus Fumosus - Wood Finish",
+        "reference": null,
+        "statedAge": 12,
+        "caskNumber": null,
+        "comparison": {
+          "missing": [
+            "abv",
+            "vintageYear",
+            "releaseYear",
+            "singleCask",
+            "caskNumber",
+            "series"
+          ],
+          "conflicts": ["brand", "distillers"],
+          "agreements": ["category", "statedAge"]
+        },
+        "distillery": ["BenRiach"],
+        "maturation": null,
+        "releaseDay": null,
+        "singleCask": null,
+        "releaseYear": null,
+        "vintageYear": null,
+        "bottlingYear": null,
+        "caskStrength": null,
+        "releaseMonth": null,
+        "familyContext": {
+          "siblingBottles": []
+        }
+      },
+      {
+        "abv": null,
+        "brand": "BenRiach",
+        "score": 46.072052,
+        "series": null,
+        "source": ["text"],
+        "bottler": "BenRiach",
+        "edition": null,
+        "outturn": null,
+        "bottleId": 4870,
+        "category": "single_malt",
+        "fullName": "BenRiach 12-year-old Matured in Sherry Wood",
+        "reference": null,
+        "statedAge": 12,
+        "caskNumber": null,
+        "comparison": {
+          "missing": [
+            "abv",
+            "vintageYear",
+            "releaseYear",
+            "singleCask",
+            "caskNumber",
+            "series"
+          ],
+          "conflicts": ["brand", "distillers"],
+          "agreements": ["category", "statedAge"]
+        },
+        "distillery": ["BenRiach"],
+        "maturation": null,
+        "releaseDay": null,
+        "singleCask": null,
+        "releaseYear": null,
+        "vintageYear": null,
+        "bottlingYear": null,
+        "caskStrength": null,
+        "releaseMonth": null,
+        "familyContext": {
+          "siblingBottles": []
+        }
+      },
+      {
+        "abv": null,
+        "brand": "GlenAllachie",
+        "score": 46.072052,
+        "series": null,
+        "source": ["text"],
+        "bottler": "GlenAllachie",
+        "edition": null,
+        "outturn": null,
+        "bottleId": 1734,
+        "category": "single_malt",
+        "fullName": "GlenAllachie 12-year-old Ruby Port Wood Finish",
+        "reference": null,
+        "statedAge": 12,
+        "caskNumber": null,
+        "comparison": {
+          "missing": [
+            "abv",
+            "vintageYear",
+            "releaseYear",
+            "singleCask",
+            "caskNumber",
+            "series"
+          ],
+          "conflicts": ["brand", "distillers"],
+          "agreements": ["category", "statedAge"]
+        },
+        "distillery": ["GlenAllachie"],
+        "maturation": null,
+        "releaseDay": null,
+        "singleCask": null,
+        "releaseYear": null,
+        "vintageYear": null,
+        "bottlingYear": null,
+        "caskStrength": null,
+        "releaseMonth": null,
+        "familyContext": {
+          "siblingBottles": []
+        }
+      },
+      {
+        "abv": null,
+        "brand": "The Macallan",
+        "score": 44.07706,
+        "series": "Exceptional Single Cask",
+        "source": ["text"],
+        "bottler": null,
+        "edition": "2017/ESH-6270/12",
+        "outturn": null,
+        "bottleId": 54545,
+        "category": "single_malt",
+        "fullName": "The Macallan Exceptional Single Cask - 2017/ESH-6270/12",
+        "reference": null,
+        "statedAge": null,
+        "caskNumber": null,
+        "comparison": {
+          "missing": ["statedAge", "abv", "vintageYear", "caskNumber"],
+          "conflicts": ["brand", "series", "distillers"],
+          "agreements": ["category", "releaseYear", "singleCask"]
+        },
+        "distillery": ["The Macallan"],
+        "maturation": null,
+        "releaseDay": null,
+        "singleCask": true,
+        "releaseYear": 2017,
+        "vintageYear": null,
+        "bottlingYear": null,
+        "caskStrength": null,
+        "releaseMonth": null,
+        "familyContext": {
+          "siblingBottles": []
+        }
+      },
+      {
+        "abv": 48.8,
+        "brand": "The Whisky Agency",
+        "score": 40.298103,
+        "series": "Made for Friends",
+        "source": ["text"],
+        "bottler": "The Whisky Agency",
+        "edition": null,
+        "outturn": 269,
+        "bottleId": 47532,
+        "category": "single_malt",
+        "fullName": "The Whisky Agency Bowmore 2005",
+        "reference": null,
+        "statedAge": 20,
+        "caskNumber": null,
+        "comparison": {
+          "missing": ["caskNumber"],
+          "conflicts": [],
+          "agreements": ["abv", "vintageYear"]
+        },
+        "distillery": ["Bowmore"],
+        "maturation": "refill sherry hogshead",
+        "releaseDay": null,
+        "singleCask": true,
+        "releaseYear": 2026,
+        "vintageYear": 2005,
+        "bottlingYear": 2026,
+        "caskStrength": true,
+        "releaseMonth": null,
+        "familyContext": {
+          "siblingBottles": []
+        }
+      },
+      {
+        "abv": null,
+        "brand": "Bruichladdich",
+        "score": 40.08398,
+        "series": null,
+        "source": ["text", "context"],
+        "bottler": "Whiskybroker.co.uk",
+        "edition": null,
+        "outturn": null,
+        "bottleId": 630,
+        "category": "single_malt",
+        "fullName": "Bruichladdich 2005 WhB",
+        "reference": null,
+        "statedAge": 15,
+        "caskNumber": null,
+        "comparison": {
+          "missing": [
+            "abv",
+            "vintageYear",
+            "singleCask",
+            "caskNumber",
+            "series"
+          ],
+          "conflicts": [],
+          "agreements": ["category", "brand", "distillers"]
+        },
+        "distillery": ["Bruichladdich"],
+        "maturation": null,
+        "releaseDay": null,
+        "singleCask": null,
+        "releaseYear": null,
+        "vintageYear": null,
+        "bottlingYear": null,
+        "caskStrength": null,
+        "releaseMonth": null,
+        "familyContext": {
+          "siblingBottles": []
+        }
+      },
+      {
+        "abv": null,
+        "brand": "Bruichladdich",
+        "score": 37.699726,
+        "series": null,
+        "source": ["text", "context"],
+        "bottler": null,
+        "edition": null,
+        "outturn": null,
+        "bottleId": 3085,
+        "category": "single_malt",
+        "fullName": "Bruichladdich 2005 Micro-Provenance Series",
+        "reference": null,
+        "statedAge": 15,
+        "caskNumber": null,
+        "comparison": {
+          "missing": [
+            "abv",
+            "vintageYear",
+            "singleCask",
+            "caskNumber",
+            "series"
+          ],
+          "conflicts": [],
+          "agreements": ["category", "brand", "distillers"]
+        },
+        "distillery": ["Bruichladdich"],
+        "maturation": null,
+        "releaseDay": null,
+        "singleCask": null,
+        "releaseYear": null,
+        "vintageYear": null,
+        "bottlingYear": null,
+        "caskStrength": null,
+        "releaseMonth": null,
+        "familyContext": {
+          "siblingBottles": []
+        }
+      },
+      {
+        "abv": null,
+        "brand": "Bruichladdich",
+        "score": 36.844513,
+        "series": null,
+        "source": ["text"],
+        "bottler": "Rest & be Thankful Whisky Company",
+        "edition": null,
+        "outturn": null,
+        "bottleId": 3704,
+        "category": "single_malt",
+        "fullName": "Bruichladdich 2005 RBTW Limited Edition",
+        "reference": null,
+        "statedAge": 10,
+        "caskNumber": null,
+        "comparison": {
+          "missing": [
+            "abv",
+            "vintageYear",
+            "singleCask",
+            "caskNumber",
+            "series"
+          ],
+          "conflicts": [],
+          "agreements": ["category", "brand", "distillers"]
+        },
+        "distillery": ["Bruichladdich"],
+        "maturation": null,
+        "releaseDay": null,
+        "singleCask": null,
+        "releaseYear": null,
+        "vintageYear": null,
+        "bottlingYear": null,
+        "caskStrength": null,
+        "releaseMonth": null,
+        "familyContext": {
+          "siblingBottles": []
+        }
+      },
+      {
+        "abv": null,
+        "brand": "Bruichladdich",
+        "score": 35.86992,
+        "series": "Fèis Ìle",
+        "source": ["text"],
+        "bottler": null,
+        "edition": "Fèis Ìle 2017",
+        "outturn": null,
+        "bottleId": 52125,
+        "category": "single_malt",
+        "fullName": "Bruichladdich Bere Barley Valinch - Fèis Ìle 2017",
+        "reference": null,
+        "statedAge": 9,
+        "caskNumber": null,
+        "comparison": {
+          "missing": ["abv", "caskNumber"],
+          "conflicts": ["vintageYear", "series"],
+          "agreements": ["category", "singleCask", "brand", "distillers"]
+        },
+        "distillery": ["Bruichladdich"],
+        "maturation": null,
+        "releaseDay": null,
+        "singleCask": true,
+        "releaseYear": 2017,
+        "vintageYear": 2008,
+        "bottlingYear": 2017,
+        "caskStrength": true,
+        "releaseMonth": null,
+        "familyContext": {
+          "siblingBottles": []
+        }
+      },
+      {
+        "abv": 55.8,
+        "brand": "WhiskySponge",
+        "score": 35.724472,
+        "series": null,
+        "source": ["text"],
+        "bottler": "Decadent Drinks",
+        "edition": "Edition No. 96",
+        "outturn": 206,
+        "bottleId": 48900,
+        "category": "single_malt",
+        "fullName": "WhiskySponge Bruichladdich 2005 19-year-old - Edition No. 96",
+        "reference": null,
+        "statedAge": 19,
+        "caskNumber": null,
+        "comparison": {
+          "missing": ["caskNumber", "series"],
+          "conflicts": ["abv", "brand"],
+          "agreements": ["category", "vintageYear", "singleCask", "distillers"]
+        },
+        "distillery": ["Bruichladdich"],
+        "maturation": "Matured in a 1st fill bourbon barrel",
+        "releaseDay": null,
+        "singleCask": true,
+        "releaseYear": null,
+        "vintageYear": 2005,
+        "bottlingYear": 2024,
+        "caskStrength": true,
+        "releaseMonth": null,
+        "familyContext": {
+          "siblingBottles": []
+        }
+      },
+      {
+        "abv": 48.8,
+        "brand": "Valinch & Mallet",
+        "score": 35.51151,
+        "series": null,
+        "source": ["text"],
+        "bottler": "Valinch & Mallet",
+        "edition": null,
+        "outturn": null,
+        "bottleId": 62921,
+        "category": "single_malt",
+        "fullName": "Valinch & Mallet Ardmore 8-year-old",
+        "reference": null,
+        "statedAge": 8,
+        "caskNumber": null,
+        "comparison": {
+          "missing": ["vintageYear", "caskNumber", "series"],
+          "conflicts": ["brand", "distillers"],
+          "agreements": ["category", "abv", "singleCask"]
+        },
+        "distillery": ["Ardmore"],
+        "maturation": null,
+        "releaseDay": null,
+        "singleCask": true,
+        "releaseYear": null,
+        "vintageYear": null,
+        "bottlingYear": null,
+        "caskStrength": null,
+        "releaseMonth": null,
+        "familyContext": {
+          "siblingBottles": []
+        }
+      },
+      {
+        "abv": null,
+        "brand": "Bruichladdich",
+        "score": 35.00676,
+        "series": "Fèis Ìle",
+        "source": ["text"],
+        "bottler": null,
+        "edition": "Fèis Ìle 2016",
+        "outturn": null,
+        "bottleId": 52123,
+        "category": "single_malt",
+        "fullName": "Bruichladdich Islay Barley Starchmill Valinch - Fèis Ìle 2016",
+        "reference": null,
+        "statedAge": 8,
+        "caskNumber": null,
+        "comparison": {
+          "missing": ["abv", "caskNumber"],
+          "conflicts": ["vintageYear", "series"],
+          "agreements": ["category", "singleCask", "brand", "distillers"]
+        },
+        "distillery": ["Bruichladdich"],
+        "maturation": null,
+        "releaseDay": null,
+        "singleCask": true,
+        "releaseYear": 2016,
+        "vintageYear": 2008,
+        "bottlingYear": 2016,
+        "caskStrength": true,
+        "releaseMonth": null,
+        "familyContext": {
+          "siblingBottles": []
+        }
+      },
+      {
+        "abv": null,
+        "brand": "Bruichladdich",
+        "score": 33.83015,
+        "series": null,
+        "source": ["text"],
+        "bottler": "The Taste of Whisky",
+        "edition": null,
+        "outturn": null,
+        "bottleId": 2360,
+        "category": "single_malt",
+        "fullName": "Bruichladdich 2005 TTOW Whisky Elements - The Water #3",
+        "reference": null,
+        "statedAge": 15,
+        "caskNumber": null,
+        "comparison": {
+          "missing": [
+            "abv",
+            "vintageYear",
+            "singleCask",
+            "caskNumber",
+            "series"
+          ],
+          "conflicts": [],
+          "agreements": ["category", "brand", "distillers"]
+        },
+        "distillery": ["Bruichladdich"],
+        "maturation": null,
+        "releaseDay": null,
+        "singleCask": null,
+        "releaseYear": null,
+        "vintageYear": null,
+        "bottlingYear": null,
+        "caskStrength": null,
+        "releaseMonth": null,
+        "familyContext": {
+          "siblingBottles": []
+        }
+      },
+      {
+        "abv": null,
+        "brand": "Auchentoshan",
+        "score": 33.196255,
+        "series": null,
+        "source": ["text"],
+        "bottler": "Auchentoshan",
+        "edition": null,
+        "outturn": null,
+        "bottleId": 4568,
+        "category": "single_malt",
+        "fullName": "Auchentoshan Valinch 2011 Limited Edition",
+        "reference": null,
+        "statedAge": 10,
+        "caskNumber": null,
+        "comparison": {
+          "missing": [
+            "abv",
+            "vintageYear",
+            "singleCask",
+            "caskNumber",
+            "series"
+          ],
+          "conflicts": ["brand", "distillers"],
+          "agreements": ["category"]
+        },
+        "distillery": ["Auchentoshan"],
+        "maturation": null,
+        "releaseDay": null,
+        "singleCask": null,
+        "releaseYear": null,
+        "vintageYear": null,
+        "bottlingYear": null,
+        "caskStrength": null,
+        "releaseMonth": null,
+        "familyContext": {
+          "siblingBottles": []
+        }
+      },
+      {
+        "abv": null,
+        "brand": "Bruichladdich Port Charlotte",
+        "score": 33.08073,
+        "series": null,
+        "source": ["text"],
+        "bottler": "Bruichladdich",
+        "edition": null,
+        "outturn": null,
+        "bottleId": 2949,
+        "category": "single_malt",
+        "fullName": "Port Charlotte 2003 The Distillery Valinch",
+        "reference": null,
+        "statedAge": 12,
+        "caskNumber": null,
+        "comparison": {
+          "missing": [
+            "abv",
+            "vintageYear",
+            "singleCask",
+            "caskNumber",
+            "series",
+            "distillers"
+          ],
+          "conflicts": ["brand"],
+          "agreements": ["category"]
+        },
+        "distillery": [],
+        "maturation": null,
+        "releaseDay": null,
+        "singleCask": null,
+        "releaseYear": null,
+        "vintageYear": null,
+        "bottlingYear": null,
+        "caskStrength": null,
+        "releaseMonth": null,
+        "familyContext": {
+          "siblingBottles": []
+        }
+      },
+      {
+        "abv": null,
+        "brand": "Auchentoshan",
+        "score": 32.562057,
+        "series": null,
+        "source": ["text"],
+        "bottler": "Auchentoshan",
+        "edition": null,
+        "outturn": null,
+        "bottleId": 4400,
+        "category": "single_malt",
+        "fullName": "Auchentoshan Valinch 2012 Limited Edition",
+        "reference": null,
+        "statedAge": 10,
+        "caskNumber": null,
+        "comparison": {
+          "missing": [
+            "abv",
+            "vintageYear",
+            "singleCask",
+            "caskNumber",
+            "series"
+          ],
+          "conflicts": ["brand", "distillers"],
+          "agreements": ["category"]
+        },
+        "distillery": ["Auchentoshan"],
+        "maturation": null,
+        "releaseDay": null,
+        "singleCask": null,
+        "releaseYear": null,
+        "vintageYear": null,
+        "bottlingYear": null,
+        "caskStrength": null,
+        "releaseMonth": null,
+        "familyContext": {
+          "siblingBottles": []
+        }
+      },
+      {
+        "abv": 48.8,
+        "brand": "Loch Lomond",
+        "score": 32.009132,
+        "series": null,
+        "source": ["text"],
+        "bottler": null,
+        "edition": null,
+        "outturn": null,
+        "bottleId": 45897,
+        "category": "single_grain",
+        "fullName": "Loch Lomond Coffey Still Distiller's Choice - 48.8% ABV",
+        "reference": null,
+        "statedAge": null,
+        "caskNumber": null,
+        "comparison": {
+          "missing": ["vintageYear", "caskNumber"],
+          "conflicts": [],
+          "agreements": ["abv"]
+        },
+        "distillery": ["Loch Lomond"],
+        "maturation": null,
+        "releaseDay": null,
+        "singleCask": null,
+        "releaseYear": null,
+        "vintageYear": null,
+        "bottlingYear": null,
+        "caskStrength": null,
+        "releaseMonth": null,
+        "familyContext": {
+          "siblingBottles": []
+        }
+      },
+      {
+        "abv": null,
+        "brand": "Teeling",
+        "score": 28.283342,
+        "series": null,
+        "source": ["text"],
+        "bottler": "Teeling Whiskey Company",
+        "edition": null,
+        "outturn": null,
+        "bottleId": 2244,
+        "category": "single_malt",
+        "fullName": "Teeling 28-year-old Vintage Reserve Collection",
+        "reference": null,
+        "statedAge": 28,
+        "caskNumber": null,
+        "comparison": {
+          "missing": [
+            "abv",
+            "vintageYear",
+            "singleCask",
+            "caskNumber",
+            "series",
+            "distillers"
+          ],
+          "conflicts": ["brand"],
+          "agreements": ["category"]
+        },
+        "distillery": [],
+        "maturation": null,
+        "releaseDay": null,
+        "singleCask": null,
+        "releaseYear": null,
+        "vintageYear": null,
+        "bottlingYear": null,
+        "caskStrength": null,
+        "releaseMonth": null,
+        "familyContext": {
+          "siblingBottles": []
+        }
+      },
+      {
+        "abv": 59.3,
+        "brand": "Bruichladdich Port Charlotte",
+        "score": 28.163834,
+        "series": "Fèis Ìle",
+        "source": ["text"],
+        "bottler": "Bruichladdich",
+        "edition": "Fèis Ìle 2018",
+        "outturn": 956,
+        "bottleId": 52126,
+        "category": "single_malt",
+        "fullName": "Port Charlotte The Distillery Valinch - Fèis Ìle 2018",
+        "reference": null,
+        "statedAge": 12,
+        "caskNumber": null,
+        "comparison": {
+          "missing": ["caskNumber"],
+          "conflicts": ["abv", "brand", "series"],
+          "agreements": ["category", "vintageYear", "singleCask", "distillers"]
+        },
+        "distillery": ["Bruichladdich"],
+        "maturation": "Oloroso sherry butt",
+        "releaseDay": null,
+        "singleCask": true,
+        "releaseYear": 2018,
+        "vintageYear": 2005,
+        "bottlingYear": 2018,
+        "caskStrength": true,
+        "releaseMonth": null,
+        "familyContext": {
+          "siblingBottles": []
+        }
+      },
+      {
+        "abv": 48.8,
+        "brand": "That Boutique-y Whisky Company",
+        "score": 27.578518,
+        "series": null,
+        "source": ["text"],
+        "bottler": "That Boutique-y Whisky Company",
+        "edition": "Batch 1",
+        "outturn": null,
+        "bottleId": 46265,
+        "category": "blend",
+        "fullName": "TBWC Blended Malt #6 - Batch 1 - 24-year-old - 48.8% ABV",
+        "reference": null,
+        "statedAge": 24,
+        "caskNumber": null,
+        "comparison": {
+          "missing": ["vintageYear", "caskNumber"],
+          "conflicts": [],
+          "agreements": ["abv"]
+        },
+        "distillery": [],
+        "maturation": null,
+        "releaseDay": null,
+        "singleCask": null,
+        "releaseYear": null,
+        "vintageYear": null,
+        "bottlingYear": null,
+        "caskStrength": null,
+        "releaseMonth": null,
+        "familyContext": {
+          "siblingBottles": []
+        }
+      },
+      {
+        "abv": 50,
+        "brand": "Cù Bòcan",
+        "score": 27.553417,
+        "series": null,
+        "source": ["vector", "text"],
+        "bottler": null,
+        "edition": null,
+        "outturn": 11400,
+        "bottleId": 56600,
+        "category": "single_malt",
+        "fullName": "Cù Bòcan 2005",
+        "reference": "Cù Bòcan 2005 Vintage",
+        "statedAge": null,
+        "caskNumber": null,
+        "comparison": {
+          "missing": ["caskNumber"],
+          "conflicts": ["abv"],
+          "agreements": ["vintageYear"]
+        },
+        "distillery": ["Tomatin"],
+        "maturation": "Bourbon and Sherry casks",
+        "releaseDay": null,
+        "singleCask": false,
+        "releaseYear": null,
+        "vintageYear": 2005,
+        "bottlingYear": null,
+        "caskStrength": null,
+        "releaseMonth": null,
+        "familyContext": {
+          "siblingBottles": []
+        }
+      },
+      {
+        "abv": 55.3,
+        "brand": "Laphroaig",
+        "score": 27.08437,
+        "series": null,
+        "source": ["text"],
+        "bottler": null,
+        "edition": "Vintage 2005",
+        "outturn": 340,
+        "bottleId": 54653,
+        "category": "single_malt",
+        "fullName": "Laphroaig Limited Edition Release - Vintage 2005",
+        "reference": null,
+        "statedAge": 12,
+        "caskNumber": null,
+        "comparison": {
+          "missing": ["caskNumber"],
+          "conflicts": ["abv"],
+          "agreements": ["vintageYear"]
+        },
+        "distillery": ["Laphroaig"],
+        "maturation": null,
+        "releaseDay": null,
+        "singleCask": true,
+        "releaseYear": 2017,
+        "vintageYear": 2005,
+        "bottlingYear": 2017,
+        "caskStrength": true,
+        "releaseMonth": null,
+        "familyContext": {
+          "siblingBottles": []
+        }
+      },
+      {
+        "abv": 55.7,
+        "brand": "Decadent Drinks",
+        "score": 27.010792,
+        "series": null,
+        "source": ["text"],
+        "bottler": "Decadent Drinks",
+        "edition": null,
+        "outturn": 174,
+        "bottleId": 49242,
+        "category": "single_malt",
+        "fullName": "Decadent Drinks Mortlach 2005",
+        "reference": null,
+        "statedAge": 20,
+        "caskNumber": null,
+        "comparison": {
+          "missing": ["caskNumber"],
+          "conflicts": ["abv"],
+          "agreements": ["vintageYear"]
+        },
+        "distillery": ["Mortlach"],
+        "maturation": "First-fill Bourbon Barrel",
+        "releaseDay": null,
+        "singleCask": null,
+        "releaseYear": null,
+        "vintageYear": 2005,
+        "bottlingYear": 2026,
+        "caskStrength": null,
+        "releaseMonth": null,
+        "familyContext": {
+          "siblingBottles": []
+        }
+      },
+      {
+        "abv": null,
+        "brand": "Highland Park",
+        "score": 26.684032,
+        "series": null,
+        "source": ["text"],
+        "bottler": null,
+        "edition": "2005 Vintage",
+        "outturn": null,
+        "bottleId": 44920,
+        "category": "single_malt",
+        "fullName": "Highland Park Single Cask Series - 2005 Vintage",
+        "reference": null,
+        "statedAge": 15,
+        "caskNumber": null,
+        "comparison": {
+          "missing": ["abv", "caskNumber"],
+          "conflicts": [],
+          "agreements": ["vintageYear"]
+        },
+        "distillery": ["Highland Park"],
+        "maturation": null,
+        "releaseDay": null,
+        "singleCask": true,
+        "releaseYear": null,
+        "vintageYear": 2005,
+        "bottlingYear": null,
+        "caskStrength": null,
+        "releaseMonth": null,
+        "familyContext": {
+          "siblingBottles": [
+            {
+              "abv": null,
+              "edition": null,
+              "outturn": null,
+              "bottleId": 44928,
+              "fullName": "Highland Park Single Cask Series",
+              "statedAge": 15,
+              "caskNumber": null,
+              "maturation": null,
+              "releaseDay": null,
+              "singleCask": null,
+              "releaseYear": null,
+              "traitFields": ["statedAge"],
+              "vintageYear": null,
+              "bottlingYear": null,
+              "caskStrength": null,
+              "releaseMonth": null
+            },
+            {
+              "abv": null,
+              "edition": null,
+              "outturn": null,
+              "bottleId": 44011,
+              "fullName": "Highland Park Single Cask Series",
+              "statedAge": null,
+              "caskNumber": null,
+              "maturation": null,
+              "releaseDay": null,
+              "singleCask": null,
+              "releaseYear": null,
+              "traitFields": [],
+              "vintageYear": null,
+              "bottlingYear": null,
+              "caskStrength": null,
+              "releaseMonth": null
+            },
+            {
+              "abv": null,
+              "edition": "2001 Vintage",
+              "outturn": null,
+              "bottleId": 44926,
+              "fullName": "Highland Park Single Cask Series - 2001 Vintage",
+              "statedAge": 18,
+              "caskNumber": null,
+              "maturation": null,
+              "releaseDay": null,
+              "singleCask": true,
+              "releaseYear": null,
+              "traitFields": [
+                "edition",
+                "statedAge",
+                "vintageYear",
+                "singleCask"
+              ],
+              "vintageYear": 2001,
+              "bottlingYear": null,
+              "caskStrength": null,
+              "releaseMonth": null
+            },
+            {
+              "abv": null,
+              "edition": "2003 Vintage",
+              "outturn": null,
+              "bottleId": 44927,
+              "fullName": "Highland Park Single Cask Series - 2003 Vintage",
+              "statedAge": 17,
+              "caskNumber": null,
+              "maturation": null,
+              "releaseDay": null,
+              "singleCask": true,
+              "releaseYear": null,
+              "traitFields": [
+                "edition",
+                "statedAge",
+                "vintageYear",
+                "singleCask"
+              ],
+              "vintageYear": 2003,
+              "bottlingYear": null,
+              "caskStrength": null,
+              "releaseMonth": null
+            },
+            {
+              "abv": null,
+              "edition": "2004 Vintage",
+              "outturn": null,
+              "bottleId": 44921,
+              "fullName": "Highland Park Single Cask Series - 2004 Vintage",
+              "statedAge": 16,
+              "caskNumber": null,
+              "maturation": null,
+              "releaseDay": null,
+              "singleCask": true,
+              "releaseYear": null,
+              "traitFields": [
+                "edition",
+                "statedAge",
+                "vintageYear",
+                "singleCask"
+              ],
+              "vintageYear": 2004,
+              "bottlingYear": null,
+              "caskStrength": null,
+              "releaseMonth": null
+            },
+            {
+              "abv": null,
+              "edition": "2006 Vintage",
+              "outturn": null,
+              "bottleId": 44922,
+              "fullName": "Highland Park Single Cask Series - 2006 Vintage",
+              "statedAge": 14,
+              "caskNumber": null,
+              "maturation": null,
+              "releaseDay": null,
+              "singleCask": true,
+              "releaseYear": null,
+              "traitFields": [
+                "edition",
+                "statedAge",
+                "vintageYear",
+                "singleCask"
+              ],
+              "vintageYear": 2006,
+              "bottlingYear": null,
+              "caskStrength": null,
+              "releaseMonth": null
+            },
+            {
+              "abv": null,
+              "edition": "2007 Vintage",
+              "outturn": null,
+              "bottleId": 44924,
+              "fullName": "Highland Park Single Cask Series - 2007 Vintage",
+              "statedAge": 13,
+              "caskNumber": null,
+              "maturation": null,
+              "releaseDay": null,
+              "singleCask": true,
+              "releaseYear": null,
+              "traitFields": [
+                "edition",
+                "statedAge",
+                "vintageYear",
+                "singleCask"
+              ],
+              "vintageYear": 2007,
+              "bottlingYear": null,
+              "caskStrength": null,
+              "releaseMonth": null
+            },
+            {
+              "abv": null,
+              "edition": "2008 Vintage",
+              "outturn": null,
+              "bottleId": 44923,
+              "fullName": "Highland Park Single Cask Series - 2008 Vintage",
+              "statedAge": 12,
+              "caskNumber": null,
+              "maturation": null,
+              "releaseDay": null,
+              "singleCask": true,
+              "releaseYear": null,
+              "traitFields": [
+                "edition",
+                "statedAge",
+                "vintageYear",
+                "singleCask"
+              ],
+              "vintageYear": 2008,
+              "bottlingYear": null,
+              "caskStrength": null,
+              "releaseMonth": null
+            }
+          ]
+        }
+      },
+      {
+        "abv": null,
+        "brand": "The GlenDronach",
+        "score": 26.270071,
+        "series": null,
+        "source": ["vector", "text"],
+        "bottler": "The GlenDronach",
+        "edition": null,
+        "outturn": null,
+        "bottleId": 2450,
+        "category": "single_malt",
+        "fullName": "The GlenDronach 2005 Cask Bottling - 2005 Vintage",
+        "reference": "The GlenDronach 2005 Cask Bottling - 2005 Vintage",
+        "statedAge": 15,
+        "caskNumber": null,
+        "comparison": {
+          "missing": ["abv", "caskNumber"],
+          "conflicts": [],
+          "agreements": ["vintageYear"]
+        },
+        "distillery": ["The GlenDronach"],
+        "maturation": null,
+        "releaseDay": null,
+        "singleCask": null,
+        "releaseYear": null,
+        "vintageYear": 2005,
+        "bottlingYear": null,
+        "caskStrength": true,
+        "releaseMonth": null,
+        "familyContext": {
+          "siblingBottles": []
+        }
+      },
+      {
+        "abv": 48.8,
+        "brand": "Ardbeg",
+        "score": 25.163952,
+        "series": null,
+        "source": ["text"],
+        "bottler": null,
+        "edition": null,
+        "outturn": null,
+        "bottleId": 53447,
+        "category": "single_malt",
+        "fullName": "Ardbeg Trudernish",
+        "reference": null,
+        "statedAge": 15,
+        "caskNumber": null,
+        "comparison": {
+          "missing": ["vintageYear", "caskNumber"],
+          "conflicts": [],
+          "agreements": ["abv"]
+        },
+        "distillery": ["Ardbeg"],
+        "maturation": "Bourbon, new charred oak and Oloroso sherry casks",
+        "releaseDay": null,
+        "singleCask": null,
+        "releaseYear": null,
+        "vintageYear": null,
+        "bottlingYear": null,
+        "caskStrength": null,
+        "releaseMonth": null,
+        "familyContext": {
+          "siblingBottles": []
+        }
+      },
+      {
+        "abv": null,
+        "brand": "Glenfiddich",
+        "score": 25.086033,
+        "series": null,
+        "source": ["text"],
+        "bottler": null,
+        "edition": null,
+        "outturn": null,
+        "bottleId": 17146,
+        "category": "single_malt",
+        "fullName": "Glenfiddich Cask of Dreams",
+        "reference": null,
+        "statedAge": null,
+        "caskNumber": null,
+        "comparison": {
+          "missing": ["abv", "vintageYear", "caskNumber"],
+          "conflicts": [],
+          "agreements": []
+        },
+        "distillery": ["Glenfiddich"],
+        "maturation": null,
+        "releaseDay": null,
+        "singleCask": null,
+        "releaseYear": null,
+        "vintageYear": null,
+        "bottlingYear": null,
+        "caskStrength": null,
+        "releaseMonth": null,
+        "familyContext": {
+          "siblingBottles": []
+        }
+      },
+      {
+        "abv": 48.8,
+        "brand": "Single Cask Nation",
+        "score": 25.05968,
+        "series": null,
+        "source": ["text"],
+        "bottler": "Single Cask Nation",
+        "edition": "US Retail Release #9",
+        "outturn": null,
+        "bottleId": 47906,
+        "category": "single_malt",
+        "fullName": "Single Cask Nation WOLF Island Take 2 - US Retail Release #9 - 48.8% ABV",
+        "reference": null,
+        "statedAge": null,
+        "caskNumber": null,
+        "comparison": {
+          "missing": ["vintageYear", "caskNumber"],
+          "conflicts": [],
+          "agreements": ["abv"]
+        },
+        "distillery": [],
+        "maturation": "Marriage of six first-fill bourbon casks",
+        "releaseDay": null,
+        "singleCask": false,
+        "releaseYear": null,
+        "vintageYear": null,
+        "bottlingYear": null,
+        "caskStrength": null,
+        "releaseMonth": null,
+        "familyContext": {
+          "siblingBottles": []
+        }
+      },
+      {
+        "abv": 48.8,
+        "brand": "Single Cask Nation",
+        "score": 24.315796,
+        "series": null,
+        "source": ["text"],
+        "bottler": "Single Cask Nation",
+        "edition": "US Retail Release #8",
+        "outturn": 1600,
+        "bottleId": 47902,
+        "category": "single_malt",
+        "fullName": "Single Cask Nation WOLF Island - US Retail Release #8 - 8-year-old - 48.8% ABV",
+        "reference": null,
+        "statedAge": 8,
+        "caskNumber": null,
+        "comparison": {
+          "missing": ["vintageYear", "caskNumber"],
+          "conflicts": [],
+          "agreements": ["abv"]
+        },
+        "distillery": [],
+        "maturation": "Marriage of six first-fill bourbon casks",
+        "releaseDay": null,
+        "singleCask": false,
+        "releaseYear": null,
+        "vintageYear": null,
+        "bottlingYear": 2021,
+        "caskStrength": null,
+        "releaseMonth": null,
+        "familyContext": {
+          "siblingBottles": []
+        }
+      },
+      {
+        "abv": null,
+        "brand": "Evan Williams",
+        "score": 23.900574,
+        "series": null,
+        "source": ["text"],
+        "bottler": null,
+        "edition": null,
+        "outturn": null,
+        "bottleId": 16251,
+        "category": "bourbon",
+        "fullName": "Evan Williams Single Barrel 2005 Vintage (Barrel #292)",
+        "reference": null,
+        "statedAge": null,
+        "caskNumber": null,
+        "comparison": {
+          "missing": ["abv", "caskNumber"],
+          "conflicts": [],
+          "agreements": ["vintageYear"]
+        },
+        "distillery": [],
+        "maturation": null,
+        "releaseDay": null,
+        "singleCask": true,
+        "releaseYear": null,
+        "vintageYear": 2005,
+        "bottlingYear": null,
+        "caskStrength": null,
+        "releaseMonth": null,
+        "familyContext": {
+          "siblingBottles": []
+        }
+      },
+      {
+        "abv": null,
+        "brand": "Balblair",
+        "score": 23.285088,
+        "series": null,
+        "source": ["text"],
+        "bottler": "Balblair",
+        "edition": null,
+        "outturn": null,
+        "bottleId": 2661,
+        "category": "single_malt",
+        "fullName": "Balblair 2005 1st Release",
+        "reference": null,
+        "statedAge": null,
+        "caskNumber": null,
+        "comparison": {
+          "missing": ["abv", "vintageYear", "caskNumber"],
+          "conflicts": [],
+          "agreements": []
+        },
+        "distillery": ["Balblair"],
+        "maturation": null,
+        "releaseDay": null,
+        "singleCask": null,
+        "releaseYear": null,
+        "vintageYear": null,
+        "bottlingYear": null,
+        "caskStrength": null,
+        "releaseMonth": null,
+        "familyContext": {
+          "siblingBottles": []
+        }
+      },
+      {
+        "abv": null,
+        "brand": "Balblair",
+        "score": 0.6477481693048984,
+        "series": null,
+        "source": ["vector"],
+        "bottler": null,
+        "edition": null,
+        "outturn": null,
+        "bottleId": 16205,
+        "category": "single_malt",
+        "fullName": "Balblair 2004 Bourbon Matured",
+        "reference": "Balblair 2004 Bourbon Matured, 46%",
+        "statedAge": null,
+        "caskNumber": null,
+        "comparison": {
+          "missing": ["abv", "vintageYear", "caskNumber"],
+          "conflicts": [],
+          "agreements": []
+        },
+        "distillery": ["Balblair"],
+        "maturation": null,
+        "releaseDay": null,
+        "singleCask": null,
+        "releaseYear": null,
+        "vintageYear": null,
+        "bottlingYear": null,
+        "caskStrength": null,
+        "releaseMonth": null,
+        "familyContext": {
+          "siblingBottles": []
+        }
+      }
+    ]
+  },
+  "context": {
+    "inspectedBottleIds": [630, 2950, 3085],
+    "bottleContexts": [
+      {
+        "exact": {
+          "abv": null,
+          "edition": null,
+          "outturn": null,
+          "statedAge": null,
+          "caskNumber": null,
+          "maturation": null,
+          "releaseDay": null,
+          "singleCask": null,
+          "releaseYear": null,
+          "vintageYear": null,
+          "bottlingYear": null,
+          "caskStrength": null,
+          "releaseMonth": null
+        },
+        "shared": {
+          "name": "2005 WhB",
+          "brand": {
+            "name": "Bruichladdich",
+            "entityId": 192
+          },
+          "series": null,
+          "bottler": {
+            "name": "Whiskybroker.co.uk",
+            "entityId": 5631
+          },
+          "category": "single_malt",
+          "statedAge": 15,
+          "distillers": [
+            {
+              "name": "Bruichladdich",
+              "entityId": 192
+            }
+          ]
+        },
+        "groupId": 9291,
+        "bottleId": 630,
+        "fullName": "Bruichladdich 2005 WhB",
+        "siblings": [],
+        "references": [
+          {
+            "name": "Bruichladdich 2005 WhB",
+            "ignored": false
+          }
+        ],
+        "observations": [],
+        "imageSources": []
+      },
+      {
+        "exact": {
+          "abv": null,
+          "edition": null,
+          "outturn": null,
+          "statedAge": null,
+          "caskNumber": null,
+          "maturation": null,
+          "releaseDay": null,
+          "singleCask": null,
+          "releaseYear": null,
+          "vintageYear": null,
+          "bottlingYear": null,
+          "caskStrength": null,
+          "releaseMonth": null
+        },
+        "shared": {
+          "name": "2005 The Distillery Valinch",
+          "brand": {
+            "name": "Bruichladdich Port Charlotte",
+            "entityId": 1269
+          },
+          "series": null,
+          "bottler": {
+            "name": "Bruichladdich",
+            "entityId": 192
+          },
+          "category": "single_malt",
+          "statedAge": 10,
+          "distillers": []
+        },
+        "groupId": 10887,
+        "bottleId": 2950,
+        "fullName": "Port Charlotte 2005 The Distillery Valinch",
+        "siblings": [],
+        "references": [
+          {
+            "name": "Port Charlotte 2005 The Distillery Valinch",
+            "ignored": false
+          }
+        ],
+        "observations": [],
+        "imageSources": []
+      },
+      {
+        "exact": {
+          "abv": null,
+          "edition": null,
+          "outturn": null,
+          "statedAge": null,
+          "caskNumber": null,
+          "maturation": null,
+          "releaseDay": null,
+          "singleCask": null,
+          "releaseYear": null,
+          "vintageYear": null,
+          "bottlingYear": null,
+          "caskStrength": null,
+          "releaseMonth": null
+        },
+        "shared": {
+          "name": "2005 Micro-Provenance Series",
+          "brand": {
+            "name": "Bruichladdich",
+            "entityId": 192
+          },
+          "series": null,
+          "bottler": null,
+          "category": "single_malt",
+          "statedAge": 15,
+          "distillers": [
+            {
+              "name": "Bruichladdich",
+              "entityId": 192
+            }
+          ]
+        },
+        "groupId": 10964,
+        "bottleId": 3085,
+        "fullName": "Bruichladdich 2005 Micro-Provenance Series",
+        "siblings": [],
+        "references": [
+          {
+            "name": "Bruichladdich 2005 Micro-Provenance Series",
+            "ignored": false
+          }
+        ],
+        "observations": [],
+        "imageSources": []
+      }
+    ],
+    "inspectedEntities": [
+      {
+        "kind": "bottler",
+        "name": "The Whisky Agency",
+        "score": 1,
+        "source": ["exact", "text", "prefix", "contained"],
+        "entityId": 5145,
+        "reference": "The Whisky Agency",
+        "shortName": null,
+        "retrievedFor": [
+          {
+            "exact": true,
+            "query": "The Whisky Agency"
+          }
+        ]
+      },
+      {
+        "kind": "distillery",
+        "name": "Bowmore",
+        "score": 1,
+        "source": ["exact", "text", "prefix", "contained"],
+        "entityId": 394,
+        "reference": "Bowmore",
+        "shortName": null,
+        "retrievedFor": [
+          {
+            "exact": true,
+            "query": "Bowmore"
+          }
+        ]
+      },
+      {
+        "kind": "distillery",
+        "name": "Loch Lomond",
+        "score": 1,
+        "source": ["exact", "text", "prefix", "contained"],
+        "entityId": 1144,
+        "reference": "Loch Lomond",
+        "shortName": null,
+        "retrievedFor": [
+          {
+            "exact": true,
+            "query": "Loch Lomond"
+          }
+        ]
+      },
+      {
+        "kind": "bottler",
+        "name": "That Boutique-y Whisky Company",
+        "score": 1,
+        "source": ["exact", "text", "prefix", "contained"],
+        "entityId": 5978,
+        "reference": "That Boutique-y Whisky Company",
+        "shortName": "TBWC",
+        "retrievedFor": [
+          {
+            "exact": true,
+            "query": "That Boutique-y Whisky Company"
+          }
+        ]
+      },
+      {
+        "kind": "distillery",
+        "name": "Highland Park",
+        "score": 1,
+        "source": ["exact", "text", "prefix", "contained"],
+        "entityId": 438,
+        "reference": "Highland Park",
+        "shortName": null,
+        "retrievedFor": [
+          {
+            "exact": true,
+            "query": "Highland Park"
+          }
+        ]
+      },
+      {
+        "kind": "distillery",
+        "name": "The GlenDronach",
+        "score": 1,
+        "source": ["exact", "text", "prefix", "contained"],
+        "entityId": 973,
+        "reference": "The GlenDronach",
+        "shortName": null,
+        "retrievedFor": [
+          {
+            "exact": true,
+            "query": "The GlenDronach"
+          }
+        ]
+      },
+      {
+        "kind": "distillery",
+        "name": "Ardbeg",
+        "score": 1,
+        "source": ["exact", "text", "prefix", "contained"],
+        "entityId": 28,
+        "reference": "Ardbeg",
+        "shortName": null,
+        "retrievedFor": [
+          {
+            "exact": true,
+            "query": "Ardbeg"
+          }
+        ]
+      },
+      {
+        "kind": "bottler",
+        "name": "Single Cask Nation",
+        "score": 1,
+        "source": ["exact", "text", "prefix", "contained"],
+        "entityId": 365762,
+        "reference": "Single Cask Nation",
+        "shortName": null,
+        "retrievedFor": [
+          {
+            "exact": true,
+            "query": "Single Cask Nation"
+          }
+        ]
+      },
+      {
+        "kind": "brand",
+        "name": "Evan Williams",
+        "score": 1,
+        "source": ["exact", "text", "prefix", "contained"],
+        "entityId": 908,
+        "reference": "Evan Williams",
+        "shortName": null,
+        "retrievedFor": [
+          {
+            "exact": true,
+            "query": "Evan Williams"
+          }
+        ]
+      },
+      {
+        "kind": "distillery",
+        "name": "Glenfiddich",
+        "score": 1,
+        "source": ["exact", "text", "prefix", "contained"],
+        "entityId": 977,
+        "reference": "Glenfiddich",
+        "shortName": null,
+        "retrievedFor": [
+          {
+            "exact": true,
+            "query": "Glenfiddich"
+          }
+        ]
+      },
+      {
+        "kind": "distillery",
+        "name": "Balblair",
+        "score": 1,
+        "source": ["exact", "text", "prefix", "contained"],
+        "entityId": 38,
+        "reference": "Balblair",
+        "shortName": null,
+        "retrievedFor": [
+          {
+            "exact": true,
+            "query": "Balblair"
+          }
+        ]
+      },
+      {
+        "kind": "brand",
+        "name": "Cù Bòcan",
+        "score": 1,
+        "source": ["exact", "text", "prefix", "contained"],
+        "entityId": 365794,
+        "reference": "Cù Bòcan",
+        "shortName": null,
+        "retrievedFor": [
+          {
+            "exact": true,
+            "query": "Cù Bòcan"
+          }
+        ]
+      },
+      {
+        "kind": "distillery",
+        "name": "Bruichladdich",
+        "score": 1,
+        "source": ["exact", "text", "prefix", "contained"],
+        "entityId": 192,
+        "reference": "Bruichladdich",
+        "shortName": "",
+        "retrievedFor": [
+          {
+            "exact": true,
+            "query": "Bruichladdich"
+          }
+        ]
+      },
+      {
+        "kind": "brand",
+        "name": "Croftengea",
+        "score": 0.5,
+        "source": ["text", "prefix"],
+        "entityId": 863,
+        "reference": "Loch Lomond (Croftengea)",
+        "shortName": "",
+        "retrievedFor": [
+          {
+            "query": "Loch Lomond"
+          }
+        ]
+      },
+      {
+        "kind": "brand",
+        "name": "Inchmoan",
+        "score": 0.5,
+        "source": ["text", "prefix"],
+        "entityId": 1052,
+        "reference": "Loch Lomond (Inchmoan)",
+        "shortName": null,
+        "retrievedFor": [
+          {
+            "query": "Loch Lomond"
+          }
+        ]
+      },
+      {
+        "kind": "brand",
+        "name": "Inchmurrin",
+        "score": 0.5,
+        "source": ["text", "prefix"],
+        "entityId": 1053,
+        "reference": "Loch Lomond (Inchmurrin)",
+        "shortName": "",
+        "retrievedFor": [
+          {
+            "query": "Loch Lomond"
+          }
+        ]
+      },
+      {
+        "kind": "company",
+        "name": "Loch Lomond Group",
+        "score": 0.5,
+        "source": ["text", "prefix"],
+        "entityId": 366126,
+        "reference": null,
+        "shortName": null,
+        "retrievedFor": [
+          {
+            "query": "Loch Lomond"
+          }
+        ]
+      },
+      {
+        "kind": "brand",
+        "name": "Bruichladdich Octomore",
+        "score": 0.5,
+        "source": ["text", "prefix"],
+        "entityId": 1210,
+        "reference": "Bruichladdich Octomore",
+        "shortName": "Octomore",
+        "retrievedFor": [
+          {
+            "query": "Bruichladdich"
+          }
+        ]
+      },
+      {
+        "kind": "brand",
+        "name": "Bruichladdich Port Charlotte",
+        "score": 0.5,
+        "source": ["text", "prefix"],
+        "entityId": 1269,
+        "reference": "Bruichladdich Port Charlotte",
+        "shortName": "Port Charlotte",
+        "retrievedFor": [
+          {
+            "query": "Bruichladdich"
+          }
+        ]
+      },
+      {
+        "kind": "brand",
+        "name": "The Single Cask",
+        "score": 0.375,
+        "source": ["contained"],
+        "entityId": 366640,
+        "reference": "Single Cask",
+        "shortName": null,
+        "retrievedFor": [
+          {
+            "query": "Single Cask Nation"
+          }
+        ]
+      },
+      {
+        "kind": "bottler",
+        "name": "Whisky AGE",
+        "score": 0.37,
+        "source": ["contained"],
+        "entityId": 5948,
+        "reference": "Whisky AGE",
+        "shortName": null,
+        "retrievedFor": [
+          {
+            "query": "The Whisky Agency"
+          }
+        ]
+      },
+      {
+        "kind": "bottler",
+        "name": "&Whisky",
+        "score": 0.33,
+        "source": ["contained"],
+        "entityId": 365821,
+        "reference": "&Whisky",
+        "shortName": null,
+        "retrievedFor": [
+          {
+            "query": "The Whisky Agency"
+          },
+          {
+            "query": "That Boutique-y Whisky Company"
+          }
+        ]
+      },
+      {
+        "kind": "company",
+        "name": "Morrison Bowmore Distillers Ltd",
+        "score": 0.2,
+        "source": ["text"],
+        "entityId": 5684,
+        "reference": null,
+        "shortName": null,
+        "retrievedFor": [
+          {
+            "query": "Bowmore"
+          }
+        ]
+      },
+      {
+        "kind": "bottler",
+        "name": "Old Evan Williams Distillery",
+        "score": 0.2,
+        "source": ["text"],
+        "entityId": 365769,
+        "reference": null,
+        "shortName": null,
+        "retrievedFor": [
+          {
+            "query": "Evan Williams"
+          }
+        ]
+      }
+    ],
+    "inspectedSeries": []
+  },
+  "provenance": {
+    "source": "production_miss",
+    "verifiedSourceUrls": [
+      "https://www.scotchwhiskyauctions.com/auctions/233-the-184th-auction/898970-bruichladdich-valinch-28-chloe-wood-50cl/"
+    ],
+    "dbOutcome": {
+      "bottleId": null,
+      "createsBottle": true,
+      "summary": "Production returned create_bottle with the name `12-year-old Valinch 28 Chloe Wood`."
+    },
+    "notes": "Captured from saved classifier run 31941 (auction_lot 9886, model null, 2026-11-02T23:02:48.823Z). Production rationale: The auction listing is for a Bruichladdich Valinch 28 Chloe Wood whisky bottle. Exact-product references support a 12-year-old, 2005 single-cask release from cask 780, bottled at 48.8% ABV with an outturn of 444 and released in August 2017. No inspected local candidate represents this release: Bruichladdich 2005 Micro-Provenance Series, Bruichladdich 2005 WhB, and Port Charlotte 2005 The Distillery Valinch are distinct products. Checked 2026-11-03. Lot 184-00443 page: 'These hand-filled bottlings are available exclusively to visitors to the distillery.' Distilled 29.06.2005, 12 years old, Sauternes cask 780, 48.8%, 50cl, bottle 367/444. Owner rule (2026-10-28): distillery hand-fills, including Bruichladdich Valinch, are out of auctions and the catalog."
+  },
+  "expected": {
+    "status": "ignored",
+    "summary": "The lot page says Valinch bottlings are hand-filled and sold only to distillery visitors. A hand-fill is not a marketed release, so ignore it instead of creating a Bottle."
+  }
+}
