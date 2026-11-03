@@ -2,8 +2,9 @@
 
 Scotch Whisky Auctions (`scotchwhiskyauctions`) is enabled in the scraper
 registry for manual runs. Its initial schedule is null. The target enforces
-robots rules and allows at most 120 requests per hour, spaced at least 30
-seconds apart. Collection follows the scraper's
+robots rules and allows at most 480 requests per hour, spaced at least 7.5
+seconds apart. Listing checks and lot page reads share that limit. Collection
+follows the scraper's
 [public-facts policy](../../apps/server/src/scraper/README.md#responsible-collection-of-public-facts).
 
 ## Deploying this change
@@ -63,15 +64,20 @@ Checked October 24–30, 2026; details in the
   start a classifier run, so a bulk recheck costs about one run per lot it
   does not resolve. Lots with a no-match decision cannot resolve without a new
   run. Before sending more saved creates, check their Brand, Series, and
-  edition as well as duplicates. Also not done: a current open-auction check
-  and timed full run; an automatic schedule. About 160 older hand-fill
-  Bottles are still in the catalog.
+  edition as well as duplicates. About 160 older hand-fill Bottles are still
+  in the catalog.
+- November 2–3, 2026: a manual run of the open 185th auction and the ended
+  184th took 8 hours 8 minutes, made 482 requests at 120 per hour, and saw
+  9,399 lots with no request errors. Four deploys each stalled it about an
+  hour. Pages of the open auction alone took about 255 requests. A watched
+  Bottle's lots sent alerts 34 seconds after collection. The automatic
+  schedule has run every 120 minutes since November 3.
 
 ## Collection checks and scheduling
 
 The first completed production run on October 1, 2026 took 3 hours 51 minutes,
-made 458 requests, and collected 8,965 one-Bottle lots. Automatic collection
-remains off. After deployment, check source health and recent runs:
+made 458 requests, and collected 8,965 one-Bottle lots. After deployment, check
+source health and recent runs:
 
 ```sh
 pnpm cli auth status
@@ -79,7 +85,7 @@ pnpm cli api get /admin/external-sites/scotchwhiskyauctions/health
 pnpm cli api get '/admin/external-sites/scotchwhiskyauctions/runs?limit=5'
 ```
 
-Verify the target is enabled and its schedule remains null. Startup sync applies
+Verify the target is enabled and its schedule is unchanged. Startup sync applies
 registry settings; changing the schedule does not enable a disabled target.
 Check saved outcomes, source links, hammer prices, and Bottle matches. Closed
 lots must not send live-lot alerts.
@@ -99,7 +105,10 @@ Before setting an automatic interval, verify a currently open auction with the
 real parser and measure a completed run. Check that page ordering, bids, closed
 results, and pagination still match the source. The repeat interval must keep
 live lots within the six-hour freshness window, including delays during a run.
-Hourly full scans are not supported by the current request budget.
+It must also leave time for page reads: the source runs one job at a time, and
+page reads start only between listing runs. Most lots in an open auction need a
+page read before they can match. At 120 requests per hour, a 120-minute interval
+left none, and 4,112 live lots of the 185th auction waited.
 
 Bounded checks on October 1–2, 2026 verified Ardbeg cask 3771 detail facts and
 the first page of the open 184th auction through the real scraper. They did not
