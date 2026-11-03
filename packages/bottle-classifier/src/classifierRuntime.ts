@@ -47,7 +47,10 @@ import {
   buildBottleAuditInstructions,
   buildBottleClassifierInstructions,
 } from "./instructions";
-import { startAgentSpan, type AgentSpanAttributes } from "./observability";
+import {
+  startClassifierRunSpan,
+  type ClassifierSpanAttributes,
+} from "./observability";
 import {
   getStableOpenAISettings,
   type OpenAIReasoningEffort,
@@ -362,7 +365,7 @@ export type PreparedBottleClassifierAgentRun = PreparedAgentRequest & {
   getArtifacts: () => BottleClassificationArtifacts;
   getAgentResult: (result: AgentRunResult) => BottleClassifierAgentResult;
   conversationId: string;
-  spanAttributes: AgentSpanAttributes;
+  spanAttributes: ClassifierSpanAttributes;
   webSearchBudget: BottleWebSearchBudget;
 };
 
@@ -645,7 +648,6 @@ export async function prepareBottleClassifierAgentRun(
     input,
     conversationId: resolvedConversationId,
     spanAttributes: {
-      "gen_ai.request.model": options.model,
       "bottle_classifier.reference_id":
         reference.id === undefined || reference.id === null
           ? "none"
@@ -1095,7 +1097,7 @@ export function createBottleClassifier(
     modelMetadata: BottleClassifierRunMetadata;
   }> => {
     try {
-      return await startAgentSpan({
+      return await startClassifierRunSpan({
         name: "Bottle Classifier",
         conversationId: preparedRun.conversationId,
         attributes: {
@@ -1319,11 +1321,10 @@ export function createBottleClassifier(
           currentBottleContext,
           conversationId,
         });
-        const agentRun = await startAgentSpan({
+        const agentRun = await startClassifierRunSpan({
           name: "Bottle Auditor",
           conversationId: preparedRun.conversationId,
           attributes: {
-            "gen_ai.request.model": options.model,
             "bottle_classifier.instruction_mode": "audit",
             "bottle_classifier.current_bottle_id": `${parsedInput.bottleId}`,
           },

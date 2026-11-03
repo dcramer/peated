@@ -1,6 +1,5 @@
 import { strictAgentTool } from "@peated/agent-run";
 import type { BottleSearchEvidence } from "../classifierTypes";
-import { startToolSpan } from "../observability";
 import {
   BottleWebSearchArgsSchema,
   buildBottleSearchEvidence,
@@ -36,56 +35,49 @@ export function createWebSearchTool({
     description: WEB_SEARCH_TOOL_DESCRIPTION,
     parameters: BottleWebSearchArgsSchema,
     execute: async (args) => {
-      return await startToolSpan({
-        name: "web_search",
-        description: WEB_SEARCH_TOOL_DESCRIPTION,
-        args,
-        callback: async () => {
-          let evidenceHydrated = false;
-          const hydrateEvidence = (evidence: BottleSearchEvidence) => {
-            evidenceHydrated = true;
-            onEvidence?.(evidence);
-          };
-          const execute = async (): Promise<BottleWebSearchBatchResult> => {
-            const results = await Promise.all(
-              args.queries.map(async (query) => ({
-                query,
-                result: await runWebSearch({ web, query }),
-              })),
-            );
-            const evidence = results.flatMap(({ result }) =>
-              "error" in result ? [] : [result],
-            );
+      let evidenceHydrated = false;
+      const hydrateEvidence = (evidence: BottleSearchEvidence) => {
+        evidenceHydrated = true;
+        onEvidence?.(evidence);
+      };
+      const execute = async (): Promise<BottleWebSearchBatchResult> => {
+        const results = await Promise.all(
+          args.queries.map(async (query) => ({
+            query,
+            result: await runWebSearch({ web, query }),
+          })),
+        );
+        const evidence = results.flatMap(({ result }) =>
+          "error" in result ? [] : [result],
+        );
 
-            for (const item of evidence) {
-              if (item.results.length > 0) {
-                hydrateEvidence(item);
-              }
-            }
-
-            return {
-              evidence,
-              errors: results.flatMap(({ query, result }) =>
-                "error" in result ? [{ query, error: result.error }] : [],
-              ),
-            };
-          };
-          const result = await executeBottleWebSearchInvocation({
-            budget,
-            budgetUnits: args.queries.length,
-            toolName: "web_search",
-            args,
-            execute,
-            executeWebSearch,
-          });
-
-          if (executeWebSearch && !evidenceHydrated) {
-            hydrateBottleSearchEvidence(result, hydrateEvidence);
+        for (const item of evidence) {
+          if (item.results.length > 0) {
+            hydrateEvidence(item);
           }
+        }
 
-          return result;
-        },
+        return {
+          evidence,
+          errors: results.flatMap(({ query, result }) =>
+            "error" in result ? [{ query, error: result.error }] : [],
+          ),
+        };
+      };
+      const result = await executeBottleWebSearchInvocation({
+        budget,
+        budgetUnits: args.queries.length,
+        toolName: "web_search",
+        args,
+        execute,
+        executeWebSearch,
       });
+
+      if (executeWebSearch && !evidenceHydrated) {
+        hydrateBottleSearchEvidence(result, hydrateEvidence);
+      }
+
+      return result;
     },
   });
 }

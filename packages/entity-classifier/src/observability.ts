@@ -1,95 +1,39 @@
 /**
- * Owns classifier span metadata. Tool payloads are bounded before they reach
- * tracing and callers must keep them limited to public catalog/source data.
+ * Owns classifier span metadata. The AI SDK traces each agent run, model call,
+ * and tool call on its own, with complete input and output, so one run reads as
+ * one agent in Sentry. This span only groups that run and adds classifier facts
+ * such as the Entity being checked. It must not repeat the
+ * AI SDK's agent, tool, or token-usage data.
  */
-import type { AgentRunUsage } from "@peated/agent-run";
 import { startSpan as startSentrySpan, type Span } from "@sentry/core";
 
-const MAX_ATTRIBUTE_LENGTH = 12_000;
-const OPENAI_PROVIDER = "openai";
-
-export type AgentSpanAttributes = Record<
+export type ClassifierSpanAttributes = Record<
   string,
   boolean | number | string | string[] | undefined
 >;
 
-function compactJson(value: Parameters<typeof JSON.stringify>[0]): string {
-  const serialized = JSON.stringify(value) ?? String(value);
-  if (serialized.length <= MAX_ATTRIBUTE_LENGTH) {
-    return serialized;
-  }
-
-  return `${serialized.slice(0, MAX_ATTRIBUTE_LENGTH)}...`;
-}
-
-function setAgentUsageAttributes(
-  span: { setAttribute: (key: string, value: string | number) => void },
-  usage: AgentRunUsage,
-) {
-  const attributes = {
-    "gen_ai.usage.input_tokens": usage.inputTokens,
-    "gen_ai.usage.cache_read.input_tokens": usage.cachedInputTokens,
-    "gen_ai.usage.cache_creation.input_tokens": usage.cacheWriteTokens,
-    "gen_ai.usage.output_tokens": usage.outputTokens,
-    "gen_ai.usage.reasoning.output_tokens": usage.reasoningTokens,
-  };
-
-  for (const [key, value] of Object.entries(attributes)) {
-    if (value !== undefined) {
-      span.setAttribute(key, value);
-    }
-  }
-}
-
-/**
- * Builds `gen_ai.invoke_agent` metadata with the caller-owned conversation id.
- */
-export function buildAgentSpanContext({
+export function buildClassifierRunSpanContext({
   name,
   conversationId,
   attributes = {},
 }: {
   name: string;
   conversationId: string;
-  attributes?: AgentSpanAttributes;
+  attributes?: ClassifierSpanAttributes;
 }) {
   return {
-    op: "gen_ai.invoke_agent",
-    name: `invoke_agent ${name}`,
+    op: "entity_classifier.run",
+    name,
     attributes: {
-      "gen_ai.operation.name": "invoke_agent",
-      "gen_ai.provider.name": OPENAI_PROVIDER,
-      "gen_ai.agent.name": name,
       "gen_ai.conversation.id": conversationId,
       ...attributes,
     },
   };
 }
 
-export function buildToolSpanContext({
-  name,
-  description,
-  args,
-}: {
-  name: string;
-  description: string;
-  args: unknown;
-}) {
-  return {
-    op: "gen_ai.execute_tool",
-    name: `execute_tool ${name}`,
-    attributes: {
-      "gen_ai.operation.name": "execute_tool",
-      "gen_ai.tool.name": name,
-      "gen_ai.tool.description": description,
-      "gen_ai.tool.call.arguments": compactJson(args),
-    },
-  };
-}
-
-export type ClassifierSpanContext =
-  | ReturnType<typeof buildAgentSpanContext>
-  | ReturnType<typeof buildToolSpanContext>;
+export type ClassifierSpanContext = ReturnType<
+  typeof buildClassifierRunSpanContext
+>;
 
 export type ClassifierSpanStarter = <T>(
   context: ClassifierSpanContext,
@@ -101,11 +45,8 @@ const defaultClassifierSpanStarter: ClassifierSpanStarter = async (
   callback,
 ) => await startSentrySpan(context, callback);
 
-/**
- * Wraps a classifier agent run in Sentry's `gen_ai.invoke_agent` span while
- * preserving the caller-owned conversation id.
- */
-export async function startAgentSpan<T extends { usage: AgentRunUsage }>({
+/** Groups one classifier run under its caller-owned conversation id. */
+export async function startClassifierRunSpan<T>({
   name,
   conversationId,
   attributes = {},
@@ -114,40 +55,12 @@ export async function startAgentSpan<T extends { usage: AgentRunUsage }>({
 }: {
   name: string;
   conversationId: string;
-  attributes?: AgentSpanAttributes;
+  attributes?: ClassifierSpanAttributes;
   callback: () => Promise<T>;
   startSpan?: ClassifierSpanStarter;
 }): Promise<T> {
   return await startSpan(
-    buildAgentSpanContext({ name, conversationId, attributes }),
-    async (span) => {
-      const result = await callback();
-      setAgentUsageAttributes(span, result.usage);
-      return result;
-    },
-  );
-}
-
-/** Wraps tool execution and records bounded public catalog/source payloads. */
-export async function startToolSpan<T>({
-  name,
-  description,
-  args,
-  callback,
-  startSpan = defaultClassifierSpanStarter,
-}: {
-  name: string;
-  description: string;
-  args: unknown;
-  callback: () => Promise<T>;
-  startSpan?: ClassifierSpanStarter;
-}): Promise<T> {
-  return await startSpan(
-    buildToolSpanContext({ name, description, args }),
-    async (span) => {
-      const result = await callback();
-      span.setAttribute("gen_ai.tool.call.result", compactJson(result));
-      return result;
-    },
+    buildClassifierRunSpanContext({ name, conversationId, attributes }),
+    async () => await callback(),
   );
 }
