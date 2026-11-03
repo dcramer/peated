@@ -49,8 +49,11 @@ input, decision, and artifacts. To turn a wrong decision into a test case:
    the test case into `src/eval-fixtures/decision-cases/`. The validator rejects
    the draft until you do.
 
-Do not rely on Sentry for this. It keeps only some classifier runs and cuts
-long inputs and tool outputs.
+Sentry also records each classifier run as one conversation, with its complete
+input and every tool call and result, but only for Sentry's retention period.
+`fixtures:draft` reads the saved run, which does not keep the agent's own tool
+results, so add catalog search replies and page passages from the trace by
+hand when a case needs them.
 
 ## Pull request checks
 

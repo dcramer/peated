@@ -5,7 +5,6 @@ import {
   type EntityResolution,
   type SearchEntitiesArgs,
 } from "../classifierTypes";
-import { startToolSpan } from "../observability";
 
 const SearchEntitiesResultSchema = EntityResolutionSchema.array();
 const SEARCH_ENTITIES_TOOL_DESCRIPTION =
@@ -23,18 +22,11 @@ export function createSearchEntitiesTool({
     description: SEARCH_ENTITIES_TOOL_DESCRIPTION,
     parameters: SearchEntitiesArgsSchema,
     execute: async (args) => {
-      return await startToolSpan({
-        name: "search_entities",
-        description: SEARCH_ENTITIES_TOOL_DESCRIPTION,
-        args,
-        callback: async () => {
-          const results = SearchEntitiesResultSchema.parse(
-            await searchEntities(args),
-          );
-          onResults?.(results);
-          return { results };
-        },
-      });
+      const results = SearchEntitiesResultSchema.parse(
+        await searchEntities(args),
+      );
+      onResults?.(results);
+      return { results };
     },
   });
 }

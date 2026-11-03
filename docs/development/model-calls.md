@@ -80,3 +80,7 @@ arrives as status 500, so it counts as temporary.
     that needs it onto the AI SDK.
 - Wrap all the calls in one run with `withSentryConversation` so they share a
   conversation ID.
+- Do not add a manual `gen_ai.*` span for an AI SDK agent run, model call, or
+  tool call. The AI SDK already records it, and a second span counts the calls
+  and tokens twice in Sentry. The classifiers add one plain run span for their
+  own facts, such as the source and candidate count.

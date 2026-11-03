@@ -5,7 +5,6 @@ import {
   BottleContextSchema,
   type BottleContext,
 } from "../bottleContextContract";
-import { startToolSpan } from "../observability";
 
 const GetBottleContextArgsSchema = z
   .object({
@@ -33,20 +32,14 @@ export function createGetBottleContextTool({
     name: "get_bottle_context",
     description: GET_BOTTLE_CONTEXT_DESCRIPTION,
     parameters: GetBottleContextArgsSchema,
-    execute: async ({ bottleId }) =>
-      await startToolSpan({
-        name: "get_bottle_context",
-        description: GET_BOTTLE_CONTEXT_DESCRIPTION,
-        args: { bottleId },
-        callback: async () => {
-          const context = BottleContextSchema.nullable().parse(
-            await getBottleContext(bottleId),
-          );
-          if (context) {
-            onContext?.(context);
-          }
-          return GetBottleContextResultSchema.parse({ context });
-        },
-      }),
+    execute: async ({ bottleId }) => {
+      const context = BottleContextSchema.nullable().parse(
+        await getBottleContext(bottleId),
+      );
+      if (context) {
+        onContext?.(context);
+      }
+      return GetBottleContextResultSchema.parse({ context });
+    },
   });
 }

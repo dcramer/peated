@@ -4,7 +4,6 @@ import {
   BottleSearchEvidenceSchema,
   type BottleSearchEvidence,
 } from "../classifierTypes";
-import { startToolSpan } from "../observability";
 import { canonicalizeWebEvidenceUrl } from "../webEvidenceUrl";
 import {
   BottleWebFindInPageArgsSchema,
@@ -115,26 +114,19 @@ export function createReadPageTools({
     description: READ_PAGE_TOOL_DESCRIPTION,
     parameters: BottleWebReadPageArgsSchema,
     execute: async (args) => {
-      return await startToolSpan({
-        name: "read_page",
-        description: READ_PAGE_TOOL_DESCRIPTION,
-        args,
-        callback: async () => {
-          const result = keepReadPage(
-            budget,
-            await executeBottleWebSearchInvocation({
-              budget,
-              toolName: "read_page",
-              args,
-              execute: async () => await runReadPage({ web, url: args.url }),
-              executeWebSearch,
-            }),
-          );
-          const evidence = BottleSearchEvidenceSchema.safeParse(result);
-          if (evidence.success) onEvidence?.(evidence.data);
-          return result;
-        },
-      });
+      const result = keepReadPage(
+        budget,
+        await executeBottleWebSearchInvocation({
+          budget,
+          toolName: "read_page",
+          args,
+          execute: async () => await runReadPage({ web, url: args.url }),
+          executeWebSearch,
+        }),
+      );
+      const evidence = BottleSearchEvidenceSchema.safeParse(result);
+      if (evidence.success) onEvidence?.(evidence.data);
+      return result;
     },
   });
 
@@ -143,37 +135,30 @@ export function createReadPageTools({
     description: FIND_IN_PAGE_TOOL_DESCRIPTION,
     parameters: BottleWebFindInPageArgsSchema,
     execute: async (args) => {
-      return await startToolSpan({
-        name: "find_in_page",
-        description: FIND_IN_PAGE_TOOL_DESCRIPTION,
-        args,
-        callback: async () => {
-          const page = budget.pages.get(canonicalizeWebEvidenceUrl(args.url));
-          if (!page) {
-            return { error: "Read this page with read_page first" };
-          }
-          if (!budget.tryConsumePageFind()) {
-            return budget.getExhaustedError("page_find");
-          }
-          const passages = findPagePassages(page.text, args.query);
-          // A miss is not search evidence. It has no `query` field, so the
-          // run's evidence merge cannot parse it as an empty evidence record.
-          if (passages.length === 0) {
-            return {
-              url: page.url,
-              message: `"${args.query}" is not on this page`,
-            };
-          }
-          const evidence = BottleSearchEvidenceSchema.parse({
-            provider: "firecrawl",
-            query: args.query,
-            summary: passages.join(" … "),
-            results: [pageResult(page)],
-          });
-          onEvidence?.(evidence);
-          return evidence;
-        },
+      const page = budget.pages.get(canonicalizeWebEvidenceUrl(args.url));
+      if (!page) {
+        return { error: "Read this page with read_page first" };
+      }
+      if (!budget.tryConsumePageFind()) {
+        return budget.getExhaustedError("page_find");
+      }
+      const passages = findPagePassages(page.text, args.query);
+      // A miss is not search evidence. It has no `query` field, so the
+      // run's evidence merge cannot parse it as an empty evidence record.
+      if (passages.length === 0) {
+        return {
+          url: page.url,
+          message: `"${args.query}" is not on this page`,
+        };
+      }
+      const evidence = BottleSearchEvidenceSchema.parse({
+        provider: "firecrawl",
+        query: args.query,
+        summary: passages.join(" … "),
+        results: [pageResult(page)],
       });
+      onEvidence?.(evidence);
+      return evidence;
     },
   });
 

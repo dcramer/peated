@@ -5,7 +5,6 @@ import {
   EntityContextSchema,
   type EntityContext,
 } from "../bottleContextContract";
-import { startToolSpan } from "../observability";
 
 const GetEntityContextArgsSchema = z
   .object({
@@ -33,20 +32,14 @@ export function createGetEntityContextTool({
     name: "get_entity_context",
     description: GET_ENTITY_CONTEXT_DESCRIPTION,
     parameters: GetEntityContextArgsSchema,
-    execute: async ({ entityId }) =>
-      await startToolSpan({
-        name: "get_entity_context",
-        description: GET_ENTITY_CONTEXT_DESCRIPTION,
-        args: { entityId },
-        callback: async () => {
-          const context = EntityContextSchema.nullable().parse(
-            await getEntityContext(entityId),
-          );
-          if (context) {
-            onContext?.(context);
-          }
-          return GetEntityContextResultSchema.parse({ context });
-        },
-      }),
+    execute: async ({ entityId }) => {
+      const context = EntityContextSchema.nullable().parse(
+        await getEntityContext(entityId),
+      );
+      if (context) {
+        onContext?.(context);
+      }
+      return GetEntityContextResultSchema.parse({ context });
+    },
   });
 }

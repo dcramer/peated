@@ -19,7 +19,7 @@ import {
 } from "./contract";
 import { EntityClassificationError } from "./error";
 import { buildEntityClassifierInstructions } from "./instructions";
-import { startAgentSpan } from "./observability";
+import { startClassifierRunSpan } from "./observability";
 import { getDeterministicOpenAISettings } from "./openaiModelSettings";
 import { finalizeEntityClassification } from "./reviewPolicy";
 import {
@@ -153,11 +153,10 @@ export function createEntityClassifier(
     const conversationId = `entity:${context.entity.id}`;
 
     try {
-      const result = await startAgentSpan({
+      const result = await startClassifierRunSpan({
         name: "Entity Classifier",
         conversationId,
         attributes: {
-          "gen_ai.request.model": options.model,
           "entity_classifier.entity_id": `${context.entity.id}`,
           "entity_classifier.entity_name": context.entity.name,
         },

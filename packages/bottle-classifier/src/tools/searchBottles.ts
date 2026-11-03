@@ -6,7 +6,6 @@ import {
   type BottleCandidate,
   type BottleCandidateSearchInput,
 } from "../classifierTypes";
-import { startToolSpan } from "../observability";
 
 export const SearchBottlesResultSchema = z.object({
   results: z.array(AgentBottleCandidateSchema),
@@ -28,17 +27,10 @@ export function createSearchBottlesTool({
     description: SEARCH_BOTTLES_TOOL_DESCRIPTION,
     parameters: BottleCandidateSearchInputSchema,
     execute: async (args) => {
-      return await startToolSpan({
-        name: "search_bottles",
-        description: SEARCH_BOTTLES_TOOL_DESCRIPTION,
-        args,
-        callback: async () => {
-          const results = await searchBottles(args);
-          onResults?.(results);
-          return SearchBottlesResultSchema.parse({
-            results,
-          });
-        },
+      const results = await searchBottles(args);
+      onResults?.(results);
+      return SearchBottlesResultSchema.parse({
+        results,
       });
     },
   });

@@ -68,8 +68,9 @@ Read before changing behavior:
 
 - Separate stable prompt policy from facts, evidence, tool schemas, and validated
   output.
-- Tool spans: bounded public catalog/source evidence only. No private user data,
-  credentials, image bytes, or full provider output.
+- Traces record every tool result in full (see `docs/development/model-calls.md`),
+  so a tool returns only bounded public catalog/source evidence: no private user
+  data, credentials, image bytes, or full provider output.
 - Use realistic eval fixtures for model behavior; unit/integration tests for
   schemas, validation, and post-processing.
 - Fix deterministic rules in code and focused tests, not prompts alone.

@@ -5,7 +5,6 @@ import {
   EntityClassificationSearchEvidenceSchema,
   type EntityClassificationSearchEvidence,
 } from "../classifierTypes";
-import { startToolSpan } from "../observability";
 
 /** How the classifier reaches the web: PeatedBot's page reader and search. */
 export type EntityClassifierWeb = Pick<PeatedBot, "readPage" | "searchWeb">;
@@ -91,38 +90,31 @@ export function createWebTools({
     description: WEB_SEARCH_TOOL_DESCRIPTION,
     parameters: WebSearchArgsSchema,
     execute: async (args) => {
-      return await startToolSpan({
-        name: "web_search",
-        description: WEB_SEARCH_TOOL_DESCRIPTION,
-        args,
-        callback: async () => {
-          if (remainingQueries <= 0) {
-            return { error: "Web search budget exhausted." };
-          }
-          remainingQueries -= 1;
+      if (remainingQueries <= 0) {
+        return { error: "Web search budget exhausted." };
+      }
+      remainingQueries -= 1;
 
-          const search = await web.searchWeb({
-            query: args.query,
-            limit: SEARCH_RESULT_LIMIT,
-          });
-          if (search.status === "failed") {
-            return { error: `Web search failed (${search.reason}).` };
-          }
-          const evidence = EntityClassificationSearchEvidenceSchema.parse({
-            provider: "firecrawl",
-            query: args.query,
-            summary: null,
-            results: search.results.map((result) => ({
-              title: result.title,
-              url: result.url,
-              domain: getResultDomain(result.url),
-              description: result.description,
-            })),
-          });
-          onEvidence(evidence);
-          return evidence;
-        },
+      const search = await web.searchWeb({
+        query: args.query,
+        limit: SEARCH_RESULT_LIMIT,
       });
+      if (search.status === "failed") {
+        return { error: `Web search failed (${search.reason}).` };
+      }
+      const evidence = EntityClassificationSearchEvidenceSchema.parse({
+        provider: "firecrawl",
+        query: args.query,
+        summary: null,
+        results: search.results.map((result) => ({
+          title: result.title,
+          url: result.url,
+          domain: getResultDomain(result.url),
+          description: result.description,
+        })),
+      });
+      onEvidence(evidence);
+      return evidence;
     },
   });
 
@@ -131,42 +123,35 @@ export function createWebTools({
     description: READ_PAGE_TOOL_DESCRIPTION,
     parameters: ReadPageArgsSchema,
     execute: async (args) => {
-      return await startToolSpan({
-        name: "read_page",
-        description: READ_PAGE_TOOL_DESCRIPTION,
-        args,
-        callback: async () => {
-          if (remainingReads <= 0) {
-            return { error: "Page read budget exhausted." };
-          }
-          remainingReads -= 1;
+      if (remainingReads <= 0) {
+        return { error: "Page read budget exhausted." };
+      }
+      remainingReads -= 1;
 
-          const read = await web.readPage({
-            url: args.url,
-            format: "markdown",
-          });
-          if (read.status !== "ok") {
-            return { error: `Page not read (${read.reason}).` };
-          }
-          const page = {
-            url: read.url,
-            title: read.title,
-            description: read.description,
-            text: read.content.trim().slice(0, MAX_PAGE_TEXT_CHARS),
-          };
-          // Redirects can change the address, and the model may use either.
-          pages.set(args.url, page);
-          pages.set(page.url, page);
-
-          const evidence = pageEvidence(
-            page,
-            "page opening",
-            page.text.slice(0, PAGE_OPENING_CHARS),
-          );
-          onEvidence(evidence);
-          return evidence;
-        },
+      const read = await web.readPage({
+        url: args.url,
+        format: "markdown",
       });
+      if (read.status !== "ok") {
+        return { error: `Page not read (${read.reason}).` };
+      }
+      const page = {
+        url: read.url,
+        title: read.title,
+        description: read.description,
+        text: read.content.trim().slice(0, MAX_PAGE_TEXT_CHARS),
+      };
+      // Redirects can change the address, and the model may use either.
+      pages.set(args.url, page);
+      pages.set(page.url, page);
+
+      const evidence = pageEvidence(
+        page,
+        "page opening",
+        page.text.slice(0, PAGE_OPENING_CHARS),
+      );
+      onEvidence(evidence);
+      return evidence;
     },
   });
 
@@ -175,27 +160,20 @@ export function createWebTools({
     description: FIND_IN_PAGE_TOOL_DESCRIPTION,
     parameters: FindInPageArgsSchema,
     execute: async (args) => {
-      return await startToolSpan({
-        name: "find_in_page",
-        description: FIND_IN_PAGE_TOOL_DESCRIPTION,
-        args,
-        callback: async () => {
-          const page = pages.get(args.url);
-          if (!page) return { error: "Read this page with read_page first." };
-          if (remainingFinds <= 0) {
-            return { error: "Find-in-page budget exhausted." };
-          }
-          remainingFinds -= 1;
+      const page = pages.get(args.url);
+      if (!page) return { error: "Read this page with read_page first." };
+      if (remainingFinds <= 0) {
+        return { error: "Find-in-page budget exhausted." };
+      }
+      remainingFinds -= 1;
 
-          const passages = findPagePassages(page.text, args.query);
-          if (passages.length === 0) {
-            return { message: `"${args.query}" is not on this page.` };
-          }
-          const evidence = pageEvidence(page, args.query, passages.join(" … "));
-          onEvidence(evidence);
-          return evidence;
-        },
-      });
+      const passages = findPagePassages(page.text, args.query);
+      if (passages.length === 0) {
+        return { message: `"${args.query}" is not on this page.` };
+      }
+      const evidence = pageEvidence(page, args.query, passages.join(" … "));
+      onEvidence(evidence);
+      return evidence;
     },
   });
 
