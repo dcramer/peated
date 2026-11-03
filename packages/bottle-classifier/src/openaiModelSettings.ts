@@ -5,6 +5,7 @@ export const DEFAULT_BOTTLE_CLASSIFIER_REASONING_EFFORT = "high";
 export const DEFAULT_OPENAI_MODEL = "gpt-6-luna";
 export const DEFAULT_OPENAI_IMAGE_EXTRACTION_MODEL = "gpt-6-luna";
 export const DEFAULT_OPENAI_IMAGE_EXTRACTION_REASONING_EFFORT = "high";
+export const DEFAULT_DECISION_MODEL = "typesafe-ai/jev";
 
 export const OPENAI_REASONING_EFFORTS = [
   "none",

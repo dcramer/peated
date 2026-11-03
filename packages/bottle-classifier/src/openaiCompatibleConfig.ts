@@ -1,6 +1,7 @@
 import {
   DEFAULT_BOTTLE_CLASSIFIER_MODEL,
   DEFAULT_BOTTLE_CLASSIFIER_REASONING_EFFORT,
+  DEFAULT_DECISION_MODEL,
   DEFAULT_OPENAI_IMAGE_EXTRACTION_MODEL,
   DEFAULT_OPENAI_IMAGE_EXTRACTION_REASONING_EFFORT,
   DEFAULT_OPENAI_MODEL,
@@ -15,6 +16,7 @@ type OpenAICompatibleEnvKey =
   | "AI_GATEWAY_API_KEY"
   | "BOTTLE_CLASSIFIER_MODEL"
   | "BOTTLE_CLASSIFIER_REASONING_EFFORT"
+  | "DECISION_MODEL"
   | "NODE_ENV"
   | "OPENAI_EMBEDDING_MODEL"
   | "OPENAI_IMAGE_EXTRACTION_MODEL"
@@ -31,6 +33,7 @@ export type OpenAICompatibleConfig = {
   baseURL: string;
   bottleClassifierModel: string;
   bottleClassifierReasoningEffort: OpenAIReasoningEffort | undefined;
+  decisionModel: string;
   embeddingModel: string;
   imageExtractionModel: string;
   imageExtractionReasoningEffort: OpenAIReasoningEffort | undefined;
@@ -85,6 +88,8 @@ export function resolveOpenAICompatibleConfig(
       nonEmpty(envValue(env, "BOTTLE_CLASSIFIER_REASONING_EFFORT")) ??
         DEFAULT_BOTTLE_CLASSIFIER_REASONING_EFFORT,
     ),
+    decisionModel:
+      nonEmpty(envValue(env, "DECISION_MODEL")) ?? DEFAULT_DECISION_MODEL,
     embeddingModel: gatewayModel(embeddingModel),
     imageExtractionModel: gatewayModel(imageExtractionModel),
     imageExtractionReasoningEffort: parseOpenAIReasoningEffort(

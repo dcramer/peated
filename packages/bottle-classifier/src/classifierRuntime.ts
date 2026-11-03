@@ -5,6 +5,7 @@ import {
   type AgentRunResult,
   type AgentTool,
 } from "@peated/agent-run";
+import type { Experimental_DecisionModel } from "ai";
 import { randomUUID } from "node:crypto";
 import { z } from "zod";
 import { normalizePotentialProofLikeDecision } from "./abv";
@@ -97,6 +98,7 @@ import {
   getBottleClassifierRunMetadata,
   type BottleClassifierRunMetadata,
 } from "./runtime/runMetadata";
+import { getScopePrecheckIgnoreReason } from "./scopePrecheck";
 import type { BottleClassifierWeb, BottleWebSearchExecutor } from "./tools";
 import {
   createBottleWebSearchBudget,
@@ -234,6 +236,12 @@ export type BottleAgentRunResult = AgentRunResult;
 type BaseCreateBottleClassifierOptions = {
   /** Returns the AI SDK model for each model name the classifier uses. */
   languageModel: WhiskyLabelModel;
+  /**
+   * The decision model for the scope pre-check, which ignores clearly
+   * out-of-scope sources before the agent runs. Without it, the agent alone
+   * decides scope.
+   */
+  decisionModel?: Experimental_DecisionModel | null;
   model: string;
   reasoningEffort?: OpenAIReasoningEffort;
   imageExtractionModel?: string;
@@ -930,9 +938,15 @@ export function createBottleClassifier(
     allowAutoIgnore?: boolean;
   }) => {
     const preExtractionAutoIgnoreReason =
-      suppliedExtractedIdentity === undefined && allowAutoIgnore
+      (suppliedExtractedIdentity === undefined && allowAutoIgnore
         ? getPreExtractionAutoIgnoreBottleReferenceReason(reference.name)
-        : null;
+        : null) ??
+      (allowAutoIgnore && options.decisionModel
+        ? await getScopePrecheckIgnoreReason({
+            model: options.decisionModel,
+            title: reference.name,
+          })
+        : null);
     if (preExtractionAutoIgnoreReason) {
       return {
         artifacts: buildBottleClassificationArtifacts({
