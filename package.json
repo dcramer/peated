@@ -99,7 +99,7 @@
     "pnpm": "11.20.0"
   },
   "simple-git-hooks": {
-    "pre-commit": "pnpm exec lint-staged --concurrent false"
+    "pre-commit": "pnpm exec lint-staged --concurrent false && pnpm -s knip"
   },
   "lint-staged": {
     "!(CLAUDE.md|.claude/**)": [
