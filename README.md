@@ -75,6 +75,10 @@ pnpm check
 ```
 
 This checks formatting and common code problems. It does not run all tests.
+Before each commit, a Git hook formats and lints the staged files and runs
+`pnpm knip`, which finds unused files and dependencies, and commands in scripts
+that no dependency provides. The rest of `pnpm check`, such as the typecheck,
+runs only when you call it and in CI.
 
 Setup the database:
 
