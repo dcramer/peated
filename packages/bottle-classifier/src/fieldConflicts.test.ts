@@ -180,6 +180,10 @@ describe("edition conflicts", () => {
     expect(editionConflicts("Release2020", "2020 Release")).toEqual([]);
     expect(editionConflicts("S2B13", "S2 B13")).toEqual([]);
     expect(editionConflicts("Batch03", "Batch 3")).toEqual([]);
+    // The same printed code matches itself, even when one side also prints
+    // its letter as a word.
+    expect(editionConflicts("Cask C12, Batch C", "Cask C12")).toEqual([]);
+    expect(editionConflicts("Batch B1 B", "Batch B1")).toEqual([]);
     expect(
       compareBottleFields({ edition: "Batch3" }, { edition: "Batch 3" }),
     ).toMatchObject({ agreements: ["edition"] });
@@ -338,6 +342,16 @@ describe("compareBottleFields rules for any input", () => {
     fc.assert(
       fc.property(fieldsArb, (fields) => {
         expect(compareBottleFields(fields, fields).conflicts).toEqual([]);
+      }),
+    );
+  });
+
+  test("extra wording without markers never makes a conflict", () => {
+    fc.assert(
+      fc.property(editionArb, wordArb, (edition, word) => {
+        expect(editionOutcome(`${edition} ${word}`, edition)).not.toBe(
+          "conflicts",
+        );
       }),
     );
   });

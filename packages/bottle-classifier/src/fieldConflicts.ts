@@ -66,18 +66,32 @@ function getEditionWords(value: string) {
 }
 
 // A space between letters and a number does not matter: `Batch3` reads as
-// `Batch 3`. Letters glued to a number are dropped only when the other edition
-// spells them as their own word, so codes such as `A123` and `B123` still
-// differ.
+// `Batch 3`. Each marker keeps its printed form and, when the other edition
+// spells its leading letters as their own word, a form without them. Two
+// markers match on either form, so a printed code always matches itself and
+// codes such as `A123` and `B123` still differ.
 function getEditionMarkers(words: string[], otherWords: string[]) {
-  return new Set(
-    words
-      .filter((word) => /\d/.test(word))
-      .map((word) => {
-        const [, letters, rest] = word.match(/^([a-z]+)(\d.*)$/) ?? [];
-        return letters && rest && otherWords.includes(letters) ? rest : word;
-      })
-      .map((word) => word.replace(/(^|[./])0+(?=\d)/g, "$1")),
+  const dropLeadingZeros = (word: string) =>
+    word.replace(/(^|[./])0+(?=\d)/g, "$1");
+  return words
+    .filter((word) => /\d/.test(word))
+    .map((word) => {
+      const [, letters, rest] = word.match(/^([a-z]+)(\d.*)$/) ?? [];
+      return {
+        printed: dropLeadingZeros(word),
+        spaced: dropLeadingZeros(
+          letters && rest && otherWords.includes(letters) ? rest : word,
+        ),
+      };
+    });
+}
+
+type EditionMarker = ReturnType<typeof getEditionMarkers>[number];
+
+function hasMarker(markers: EditionMarker[], marker: EditionMarker) {
+  return markers.some(
+    (other) =>
+      other.printed === marker.printed || other.spaced === marker.spaced,
   );
 }
 
@@ -106,10 +120,10 @@ function compareEditions(left: string, right: string) {
     return "agreement";
   const leftMarkers = getEditionMarkers(leftWords, rightWords);
   const rightMarkers = getEditionMarkers(rightWords, leftWords);
-  const leftOnly = [...leftMarkers].some((m) => !rightMarkers.has(m));
-  const rightOnly = [...rightMarkers].some((m) => !leftMarkers.has(m));
+  const leftOnly = leftMarkers.some((m) => !hasMarker(rightMarkers, m));
+  const rightOnly = rightMarkers.some((m) => !hasMarker(leftMarkers, m));
   if (leftOnly && rightOnly) return "conflict";
-  if (!leftOnly && !rightOnly && leftMarkers.size > 0) return "agreement";
+  if (!leftOnly && !rightOnly && leftMarkers.length > 0) return "agreement";
   return null;
 }
 
