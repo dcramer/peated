@@ -2202,8 +2202,5 @@
     "proposedBottleNameOneOf": ["Cocoa Drift", "Cocoa Drift 11-year-old"],
     "proposedBottleNameExcludes": ["Batch", "35"],
     "summary": "Create SMWS Cocoa Drift, an 11-year-old blended malt at 50%; the batch belongs in edition, not the name."
-  },
-  "knownFailure": {
-    "reason": "The create puts the batch in the name ('Cocoa drift (Batch 35)') instead of the edition."
   }
 }

@@ -1390,9 +1390,5 @@
     "proposedBottleNameOneOf": ["73.8"],
     "proposedBottleDistillerIds": [191],
     "summary": "Create SMWS 73.8 named by its code alone; with no printed subtitle, distillery, vintage, and age stay in their fields."
-  },
-  "knownFailure": {
-    "reason": "The SMWS code path in smwsPolicy.ts decides before the agent runs. It lists every candidate id, so the output schema rejects more than 25 and the run errors. It also builds the name from distillery, vintage, and age instead of the code alone.",
-    "fixedBy": "Let the agent decide SMWS lots. Parse the code into verified facts (distillery number and cask), then let the agent match or create and name the Bottle."
   }
 }

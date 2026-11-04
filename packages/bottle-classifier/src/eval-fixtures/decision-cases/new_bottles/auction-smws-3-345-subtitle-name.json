@@ -1390,9 +1390,5 @@
     "proposedBottleNameExcludes": ["Bowmore", "year-old", "Danish", "Festival"],
     "proposedBottleDistillerIds": [394],
     "summary": "Create SMWS 3.345 named by its code and printed subtitle; age, distillery, and the festival selection stay out of the name."
-  },
-  "knownFailure": {
-    "reason": "The SMWS code path in smwsPolicy.ts decides before the agent runs. It lists every candidate id, so the output schema rejects more than 25 and the run errors. It also builds the name from distillery, vintage, and age instead of the printed subtitle.",
-    "fixedBy": "Let the agent decide SMWS lots. Parse the code into verified facts (distillery number and cask), then let the agent match or create and name the Bottle."
   }
 }

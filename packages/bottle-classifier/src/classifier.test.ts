@@ -2219,118 +2219,6 @@ describe("createBottleClassifier", () => {
     expect(result.decision.action).toBe("no_match");
   });
 
-  test("reads the source page before a title-only deterministic creation", async () => {
-    const page = {
-      url: "https://smws.example/appley-ever-after",
-      title: "Appley ever after",
-      description: null,
-      text: "The exact Bottle is 12 years old and bottled at 46% ABV.",
-    };
-    const pageEvidence = buildPageOpeningEvidence(page);
-    const executeWebSearch = vi.fn(async () => ({ page }));
-    const toolEvents: BottleClassifierToolEvent[] = [];
-    const runBottleClassifierAgent = vi.fn(
-      async ({ searchEvidence, webSearchBudget }): Promise<ReasoningResult> => {
-        expect(searchEvidence).toEqual([pageEvidence]);
-        expect(webSearchBudget?.tryConsumePageRead()).toBe(false);
-        return {
-          decision: noMatchAgentDecision(),
-          artifacts: {
-            extractedIdentity: null,
-            searchEvidence: searchEvidence ?? [],
-            candidates: [],
-            resolvedEntities: [],
-          },
-        };
-      },
-    );
-    const { classifier } = createTestClassifier({
-      extractedIdentity: null,
-      web: TEST_WEB,
-      runBottleClassifierAgent,
-      executeWebSearch,
-      observeToolEvent: (event) => toolEvents.push(event),
-    });
-
-    const result = await classifier.classifyBottleReference({
-      reference: {
-        name: "SMWS RW6.5 Appley ever after",
-        url: "https://smws.example/appley-ever-after",
-      },
-    });
-
-    expect(executeWebSearch).toHaveBeenCalledWith(
-      expect.objectContaining({
-        toolName: "read_page",
-        args: expect.objectContaining({
-          url: "https://smws.example/appley-ever-after",
-        }),
-      }),
-    );
-    expect(
-      toolEvents.map(({ type, phase, name }) => ({ type, phase, name })),
-    ).toEqual([
-      {
-        type: "tool_call",
-        phase: "preparation",
-        name: "read_page",
-      },
-      {
-        type: "tool_result",
-        phase: "preparation",
-        name: "read_page",
-      },
-    ]);
-    expect(runBottleClassifierAgent).toHaveBeenCalledOnce();
-    expect(result.artifacts.searchEvidence).toEqual([pageEvidence]);
-  });
-
-  test("continues with a fresh page allowance when the preparation read fails", async () => {
-    const executeWebSearch = vi.fn(async () => {
-      throw new Error("temporary source-page failure");
-    });
-    const toolEvents: BottleClassifierToolEvent[] = [];
-    const runBottleClassifierAgent = vi.fn(
-      async ({ searchEvidence, webSearchBudget }): Promise<ReasoningResult> => {
-        expect(searchEvidence).toEqual([]);
-        expect(webSearchBudget?.tryConsumePageRead()).toBe(true);
-        return {
-          decision: noMatchAgentDecision(),
-          artifacts: {
-            extractedIdentity: null,
-            searchEvidence: [],
-            candidates: [],
-            resolvedEntities: [],
-          },
-        };
-      },
-    );
-    const { classifier } = createTestClassifier({
-      extractedIdentity: null,
-      web: TEST_WEB,
-      runBottleClassifierAgent,
-      executeWebSearch,
-      observeToolEvent: (event) => toolEvents.push(event),
-    });
-
-    const result = await classifier.classifyBottleReference({
-      reference: {
-        name: "SMWS RW6.5 Appley ever after",
-        url: "https://smws.example/unavailable",
-      },
-    });
-
-    expect(runBottleClassifierAgent).toHaveBeenCalledOnce();
-    expect(result.status).toBe("classified");
-    expect(toolEvents).toHaveLength(2);
-    expect(toolEvents[1]).toMatchObject({
-      type: "tool_result",
-      phase: "preparation",
-      name: "read_page",
-      result: { error: "temporary source-page failure" },
-    });
-  });
-
   test("does not read the page first for a deterministic creation with structured identity", async () => {
     const executeWebSearch = vi.fn();
     const runBottleClassifierAgent = vi.fn(
@@ -5186,75 +5074,6 @@ describe("createBottleClassifier", () => {
     });
   });
 
-  test("passes deterministic SMWS creation through the agent as an identity anchor", async () => {
-    const extractFromText = vi.fn(async (): Promise<BottleExtractedDetails> => {
-      throw new Error(
-        "SMWS deterministic references should not need extraction",
-      );
-    });
-    const runBottleClassifierAgent = vi.fn(
-      async ({
-        identityAnchor,
-        initialCandidates,
-      }): Promise<ReasoningResult> => ({
-        decision: identityAnchor ?? noMatchAgentDecision(),
-        artifacts: buildBottleClassificationArtifacts({
-          candidates: initialCandidates,
-        }),
-      }),
-    );
-    const { classifier } = createTestClassifier({
-      extractFromText,
-      runBottleClassifierAgent,
-    });
-
-    const result = await classifier.classifyBottleReference({
-      reference: {
-        name: "SMWS RW6.5 Sauna Smoke",
-      },
-    });
-
-    expect(result.status).toBe("classified");
-    if (result.status !== "classified") {
-      throw new Error("Expected a classified result");
-    }
-
-    expect(result.decision).toMatchObject({
-      action: "create_bottle",
-      identityScope: "exact_cask",
-      proposedBottle: {
-        name: "RW6.5 Sauna Smoke",
-        category: "rye",
-        singleCask: true,
-        maturation: null,
-        caskNumber: "RW6.5",
-        outturn: null,
-        distillers: [
-          {
-            name: "Kyrö",
-          },
-        ],
-      },
-      observation: {
-        selector: "Sauna Smoke",
-        caskNumber: "RW6.5",
-      },
-      confidenceBasis: {
-        webEvidence: "not_needed",
-      },
-    });
-    expect(runBottleClassifierAgent).toHaveBeenCalledOnce();
-    expect(runBottleClassifierAgent).toHaveBeenCalledWith(
-      expect.objectContaining({
-        identityAnchor: expect.objectContaining({
-          action: "create_bottle",
-          identityScope: "exact_cask",
-        }),
-      }),
-    );
-    expect(extractFromText).not.toHaveBeenCalled();
-  });
-
   test("passes image evidence through to classifier agent overrides", async () => {
     const imageEvidence = {
       sourceImageId: "pending-upload-1",
@@ -5328,82 +5147,10 @@ describe("createBottleClassifier", () => {
     );
   });
 
-  test("passes a deterministic SMWS match through the agent as an identity anchor", async () => {
-    const existingSmwsBottle: BottleCandidate = {
-      bottleId: 6505,
-      reference: "SMWS RW6.5 Appley ever after",
-      fullName: "SMWS RW6.5 Appley ever after",
-      brand: "SMWS",
-      bottler: "The Scotch Malt Whisky Society",
-      series: null,
-      distillery: ["Kyrö"],
-      category: "rye",
-      statedAge: null,
-      edition: null,
-      caskStrength: null,
-      singleCask: true,
-      maturation: null,
-      caskNumber: null,
-      outturn: null,
-      abv: null,
-      vintageYear: null,
-      releaseYear: null,
-      score: 0.99,
-      source: ["exact"],
-    };
+  test("gives the agent an SMWS code as a verified fact, not a decision", async () => {
     const runBottleClassifierAgent = vi.fn(
-      async ({
-        identityAnchor,
-        initialCandidates,
-      }): Promise<ReasoningResult> => ({
-        decision: identityAnchor ?? noMatchAgentDecision(),
-        artifacts: buildBottleClassificationArtifacts({
-          candidates: initialCandidates,
-        }),
-      }),
-    );
-    const getBottleContext = vi.fn(async () => null);
-    const { classifier } = createTestClassifier({
-      getBottleContext,
-      runBottleClassifierAgent,
-    });
-
-    const result = await classifier.classifyBottleReference({
-      reference: {
-        name: "SMWS RW6.5 Sauna Smoke",
-      },
-      initialCandidates: [existingSmwsBottle],
-    });
-
-    expect(result.status).toBe("classified");
-    if (result.status !== "classified") {
-      throw new Error("Expected a classified result");
-    }
-
-    expect(result.decision).toMatchObject({
-      action: "match",
-      identityScope: "exact_cask",
-      matchedBottleId: 6505,
-      observation: {
-        selector: "Sauna Smoke",
-        caskNumber: "RW6.5",
-      },
-    });
-    expect(runBottleClassifierAgent).toHaveBeenCalledWith(
-      expect.objectContaining({
-        identityAnchor: expect.objectContaining({
-          action: "match",
-          matchedBottleId: 6505,
-        }),
-      }),
-    );
-    expect(getBottleContext).not.toHaveBeenCalled();
-  });
-
-  test("keeps bare SMWS code references anchored to the code", async () => {
-    const runBottleClassifierAgent = vi.fn(
-      async ({ identityAnchor }): Promise<ReasoningResult> => ({
-        decision: identityAnchor ?? noMatchAgentDecision(),
+      async (): Promise<ReasoningResult> => ({
+        decision: noMatchAgentDecision(),
         artifacts: buildBottleClassificationArtifacts({}),
       }),
     );
@@ -5412,46 +5159,105 @@ describe("createBottleClassifier", () => {
     });
 
     const result = await classifier.classifyBottleReference({
-      reference: {
-        name: "SMWS 6.53",
-      },
+      reference: { name: "SMWS 6.53" },
     });
 
-    expect(result.status).toBe("classified");
-    if (result.status !== "classified") {
-      throw new Error("Expected a classified result");
-    }
-
-    expect(result.decision).toMatchObject({
-      action: "create_bottle",
-      identityScope: "exact_cask",
-      proposedBottle: {
-        name: "6.53",
-        category: "single_malt",
-        edition: null,
-        singleCask: true,
-        maturation: null,
-        caskNumber: "6.53",
-        outturn: null,
-        distillers: [
-          {
-            name: "Macduff",
-          },
-        ],
-      },
-      observation: {
-        selector: null,
-        caskNumber: "6.53",
-      },
-    });
     expect(runBottleClassifierAgent).toHaveBeenCalledWith(
       expect.objectContaining({
-        identityAnchor: expect.objectContaining({
-          action: "create_bottle",
-          identityScope: "exact_cask",
+        extractedIdentity: expect.objectContaining({
+          brand: "SMWS",
+          cask_number: "6.53",
+          distillery: ["Macduff"],
+          edition: null,
         }),
       }),
     );
+    expect(runBottleClassifierAgent).not.toHaveBeenCalledWith(
+      expect.objectContaining({ identityAnchor: expect.anything() }),
+    );
+    // Code never turns the agent's no_match into a match or a create.
+    expect(result).toMatchObject({
+      status: "classified",
+      decision: { action: "no_match" },
+    });
+  });
+
+  test("leads an SMWS create name with the code and keeps the agent's subtitle", async () => {
+    const runBottleClassifierAgent = vi.fn(
+      async (): Promise<ReasoningResult> => ({
+        decision: {
+          action: "create_bottle",
+          rationale: "No Bottle has this SMWS code.",
+          candidateBottleIds: [],
+          identityScope: "exact_cask",
+          observation: null,
+          matchedBottleId: null,
+          proposedBottle: {
+            name: "By the shore of the wide world",
+            series: null,
+            category: "single_malt",
+            edition: "3.345",
+            statedAge: 18,
+            caskStrength: null,
+            singleCask: true,
+            maturation: null,
+            caskNumber: null,
+            outturn: null,
+            abv: null,
+            vintageYear: null,
+            releaseYear: null,
+            brand: { id: null, name: "SMWS" },
+            distillers: [],
+            bottler: null,
+          },
+        },
+        artifacts: buildBottleClassificationArtifacts({}),
+      }),
+    );
+    const { classifier } = createTestClassifier({
+      runBottleClassifierAgent,
+    });
+
+    const result = await classifier.classifyBottleReference({
+      reference: { name: "SMWS 3.345 Bowmore 18 Year Old" },
+    });
+
+    expect(result).toMatchObject({
+      status: "classified",
+      decision: {
+        action: "create_bottle",
+        proposedBottle: {
+          name: "3.345 By the shore of the wide world",
+          caskNumber: "3.345",
+          edition: null,
+        },
+      },
+    });
+  });
+
+  test("classifies an SMWS source with more than 25 candidates", async () => {
+    const runBottleClassifierAgent = vi.fn(
+      async (): Promise<ReasoningResult> => ({
+        decision: noMatchAgentDecision(),
+        artifacts: buildBottleClassificationArtifacts({}),
+      }),
+    );
+    const { classifier } = createTestClassifier({
+      runBottleClassifierAgent,
+    });
+
+    const result = await classifier.classifyBottleReference({
+      reference: { name: "SMWS 73.8" },
+      initialCandidates: Array.from({ length: 30 }, (_, index) =>
+        buildBottleCandidate({
+          bottleId: index + 1,
+          fullName: `SMWS ${index + 1}.1`,
+          brand: "SMWS",
+        }),
+      ),
+    });
+
+    expect(result.status).toBe("classified");
   });
 
   test("does not treat SMWS ABV values as deterministic cask codes", async () => {

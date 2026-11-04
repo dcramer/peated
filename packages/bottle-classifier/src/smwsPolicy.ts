@@ -1,45 +1,15 @@
-import {
-  BottleClassificationDecisionSchema,
-  type BottleCandidate,
-  type BottleClassificationDecision,
-} from "./classifierTypes";
+import type { BottleClassificationDecision } from "./classifierTypes";
 import type {
   BottleClassificationArtifacts,
   BottleReferenceInput,
 } from "./contract";
-import {
-  candidateHasExactCaskCodeAnchor,
-  getExactCaskCodeAnchor,
-} from "./exactCask";
-import {
-  escapeRegExp,
-  normalizeComparableText,
-  textsOverlap,
-} from "./identityEvidenceCore";
+import { getExactCaskCodeAnchor } from "./exactCask";
+import { normalizeComparableText, textsOverlap } from "./identityEvidenceCore";
 import { normalizeString } from "./normalize";
-import { normalizeObservation } from "./observation";
-import {
-  composeExactCaskCodeFromComponents,
-  parseDetailsFromName as parseSmwsDetailsFromName,
-} from "./smws";
+import { composeExactCaskCodeFromComponents } from "./smws";
 
 const BARE_SMWS_CODE_REFERENCE_PATTERN = /^SMWS\s+([A-Z]*\d+\.\d+)$/i;
 const SMWS_REFERENCE_PATTERN = /\b(?:SMWS|Scotch Malt Whisky Society)\b/i;
-const SMWS_TITLE_NOISE = new Set([
-  "single malt",
-  "single malt scotch whisky",
-  "scotch whisky",
-  "whisky",
-  "cask strength",
-]);
-
-function appendRationale(
-  rationale: string | null,
-  addition: string,
-): string | null {
-  return rationale ? `${rationale} ${addition}` : addition;
-}
-
 export function isSmwsIdentityAnchor(
   value: string | null | undefined,
 ): boolean {
@@ -63,15 +33,6 @@ function getBareSmwsCodeReference(
 
 function textLooksSmws(value: string | null | undefined): boolean {
   return SMWS_REFERENCE_PATTERN.test(value ?? "");
-}
-
-function candidateLooksSmws(candidate: BottleCandidate): boolean {
-  return (
-    isSmwsIdentityAnchor(candidate.brand) ||
-    isSmwsIdentityAnchor(candidate.bottler) ||
-    textLooksSmws(candidate.reference) ||
-    textLooksSmws(candidate.fullName)
-  );
 }
 
 // Collects every SMWS-relevant text fragment (extracted identity, decision
@@ -138,6 +99,7 @@ export function getSmwsCodeAnchor({
   for (const value of [
     decision.observation?.caskNumber,
     reference.name,
+    artifacts.extractedIdentity?.cask_number,
     artifacts.extractedIdentity?.edition,
     artifacts.extractedIdentity?.expression,
     decision.proposedBottle?.edition,
@@ -156,200 +118,12 @@ export function getSmwsCodeAnchor({
   );
 }
 
-function getSmwsReferenceCodeAnchor({
-  reference,
-}: {
-  reference: BottleReferenceInput;
-}): string | null {
-  if (!textLooksSmws(reference.name)) {
-    return null;
-  }
-
-  return (
-    getExactCaskCodeAnchor(reference.name) ??
-    composeExactCaskCodeFromComponents(reference.name)
-  );
-}
-
-function getSmwsCodeTargetCandidate({
-  artifacts,
-  code,
-}: {
-  artifacts: BottleClassificationArtifacts;
-  code: string;
-}): BottleCandidate | null {
-  return (
-    artifacts.candidates
-      .filter(
-        (candidate) =>
-          candidateLooksSmws(candidate) &&
-          candidateHasExactCaskCodeAnchor(candidate, code),
-      )
-      .sort((left, right) => {
-        if (left.source.includes("exact") !== right.source.includes("exact")) {
-          return left.source.includes("exact") ? -1 : 1;
-        }
-
-        return (right.score ?? 0) - (left.score ?? 0);
-      })[0] ?? null
-  );
-}
-
-function getSmwsSelectorFromReference({
-  referenceName,
-  code,
-}: {
-  referenceName: string;
-  code: string;
-}): string | null {
-  const selector = referenceName
-    .replace(SMWS_REFERENCE_PATTERN, "")
-    .replace(new RegExp(`\\b${escapeRegExp(code)}\\b`, "i"), "")
-    .trim();
-
-  return selector || null;
-}
-
-function cleanSmwsTitleCandidate(value: string): string | null {
-  const cleaned = value
-    .replace(/^[\s.,:;/-]+|[\s.,:;/-]+$/g, "")
-    .replace(/\s+/g, " ")
-    .trim();
-
-  if (!cleaned || SMWS_TITLE_NOISE.has(normalizeComparableText(cleaned))) {
-    return null;
-  }
-
-  return cleaned;
-}
-
-function extractSmwsTitleCandidate({
-  value,
-  code,
-  allowCodeLess,
-}: {
-  value: string | null | undefined;
-  code: string;
-  allowCodeLess: boolean;
-}): string | null {
-  const normalizedValue = normalizeString(value ?? "").trim();
-  if (!normalizedValue) {
-    return null;
-  }
-
-  const containsCode =
-    getExactCaskCodeAnchor(normalizedValue) === code ||
-    new RegExp(`\\b${escapeRegExp(code)}\\b`, "i").test(normalizedValue);
-  if (!containsCode && !allowCodeLess) {
-    return null;
-  }
-
-  const withoutIdentityMarkers = normalizedValue
-    .replace(SMWS_REFERENCE_PATTERN, " ")
-    .replace(/\b(?:the\s+)?society\s+cask\s+no\.?\b/gi, " ")
-    .replace(/\bcask\s+no\.?\b/gi, " ")
-    .replace(new RegExp(`\\b${escapeRegExp(code)}\\b\\.?`, "i"), " ");
-
-  return cleanSmwsTitleCandidate(withoutIdentityMarkers);
-}
-
-function getSmwsExactCaskDisplayName({
-  code,
-  extractedIdentity,
-  proposedBottleName,
-  reference,
-}: {
-  code: string;
-  extractedIdentity: BottleClassificationArtifacts["extractedIdentity"];
-  proposedBottleName?: string | null;
-  reference: BottleReferenceInput;
-}): string {
-  const title =
-    extractSmwsTitleCandidate({
-      value: extractedIdentity?.expression,
-      code,
-      allowCodeLess: true,
-    }) ??
-    extractSmwsTitleCandidate({
-      value: proposedBottleName,
-      code,
-      allowCodeLess: true,
-    }) ??
-    extractSmwsTitleCandidate({
-      value: reference.name,
-      code,
-      allowCodeLess: false,
-    });
-
-  return title ? `${code} ${title}` : code;
-}
-
-function buildSmwsExactCaskBottleDraft({
-  artifacts,
-  code,
-  reference,
-}: {
-  artifacts: BottleClassificationArtifacts;
-  code: string;
-  reference: BottleReferenceInput;
-}): NonNullable<BottleClassificationDecision["proposedBottle"]> {
-  const extractedIdentity = artifacts.extractedIdentity;
-  const smwsDetails = parseSmwsDetailsFromName(code);
-  const extractedDistillers = extractedIdentity?.distillery ?? [];
-  const extractedBrand = extractedIdentity?.brand ?? null;
-  const extractedBottler = extractedIdentity?.bottler ?? null;
-  const brandName =
-    extractedBrand && isSmwsIdentityAnchor(extractedBrand)
-      ? extractedBrand
-      : "SMWS";
-  const bottlerName =
-    extractedBottler && isSmwsIdentityAnchor(extractedBottler)
-      ? extractedBottler
-      : "The Scotch Malt Whisky Society";
-  const distillerNames =
-    extractedDistillers.length > 0
-      ? extractedDistillers
-      : [smwsDetails?.distiller ?? null];
-  const distillers = Array.from(new Set(distillerNames))
-    .filter((name): name is string => Boolean(name))
-    .map((name) => ({
-      id: null,
-      name,
-    }));
-
-  return {
-    name: getSmwsExactCaskDisplayName({
-      code,
-      extractedIdentity,
-      reference,
-    }),
-    series: null,
-    category: extractedIdentity?.category ?? smwsDetails?.category ?? null,
-    edition: null,
-    statedAge: extractedIdentity?.stated_age ?? null,
-    caskStrength: extractedIdentity?.cask_strength ?? null,
-    singleCask: true,
-    maturation: extractedIdentity?.maturation ?? null,
-    caskNumber: extractedIdentity?.cask_number ?? code,
-    outturn: extractedIdentity?.outturn ?? null,
-    abv: extractedIdentity?.abv ?? null,
-    vintageYear: extractedIdentity?.vintage_year ?? null,
-    bottlingYear: extractedIdentity?.bottling_year ?? null,
-    releaseYear: extractedIdentity?.release_year ?? null,
-    releaseMonth: extractedIdentity?.release_month ?? null,
-    releaseDay: extractedIdentity?.release_day ?? null,
-    brand: {
-      id: null,
-      name: brandName,
-    },
-    distillers,
-    bottler: {
-      id: null,
-      name: bottlerName,
-    },
-  };
-}
-
+/**
+ * Keeps an SMWS create in the identity model's shape: the code leads the name,
+ * and the code lives in `caskNumber`, not `edition`. The agent writes the
+ * subtitle; this never builds one from other text (Bottle classifier docs,
+ * "SMWS Codes").
+ */
 export function normalizeSmwsExactCaskProposedBottleDraft({
   extractedIdentity,
   proposedBottle,
@@ -370,176 +144,24 @@ export function normalizeSmwsExactCaskProposedBottleDraft({
 
   const smwsCode =
     getBareSmwsCodeReference(reference.name) ??
+    getExactCaskCodeAnchor(proposedBottle.caskNumber) ??
+    getExactCaskCodeAnchor(extractedIdentity?.cask_number) ??
     getExactCaskCodeAnchor(proposedBottle.edition) ??
     getExactCaskCodeAnchor(proposedBottle.name) ??
-    getExactCaskCodeAnchor(extractedIdentity?.edition) ??
-    getExactCaskCodeAnchor(extractedIdentity?.expression) ??
     getExactCaskCodeAnchor(reference.name);
 
-  if (smwsCode) {
-    return {
-      ...proposedBottle,
-      name: getSmwsExactCaskDisplayName({
-        code: smwsCode,
-        extractedIdentity,
-        proposedBottleName: proposedBottle.name,
-        reference,
-      }),
-      edition: null,
-    };
-  }
-
-  const draftCode = proposedBottle.edition ?? extractedIdentity?.edition;
-  if (!draftCode || textsOverlap(proposedBottle.name, draftCode)) {
+  if (!smwsCode) {
     return proposedBottle;
   }
 
+  const name = normalizeString(proposedBottle.name ?? "").trim();
   return {
     ...proposedBottle,
-    name: `${draftCode} ${proposedBottle.name}`.trim(),
+    name:
+      getExactCaskCodeAnchor(name) === smwsCode || textsOverlap(name, smwsCode)
+        ? name
+        : `${smwsCode} ${name}`.trim(),
+    caskNumber: smwsCode,
     edition: null,
   };
-}
-
-export function maybeResolveSmwsExactCaskCodeDecision({
-  reference,
-  decision,
-  artifacts,
-}: {
-  reference: BottleReferenceInput;
-  decision: BottleClassificationDecision;
-  artifacts: BottleClassificationArtifacts;
-}): BottleClassificationDecision | null {
-  const smwsCode = getSmwsCodeAnchor({
-    reference,
-    decision,
-    artifacts,
-  });
-  if (!smwsCode) {
-    return null;
-  }
-
-  const existingTarget = getSmwsCodeTargetCandidate({
-    artifacts,
-    code: smwsCode,
-  });
-  const currentObservation = decision.observation;
-  const observation = normalizeObservation({
-    barrelNumber: currentObservation?.barrelNumber ?? null,
-    selector:
-      currentObservation?.selector ??
-      getSmwsSelectorFromReference({
-        referenceName: reference.name,
-        code: smwsCode,
-      }),
-    caskNumber: currentObservation?.caskNumber ?? smwsCode,
-  });
-
-  if (existingTarget) {
-    return {
-      action: "match",
-      rationale: appendRationale(
-        decision.rationale,
-        "Server matched the SMWS exact-cask code because SMWS bottle identity is anchored by code, not subtitle.",
-      ),
-      candidateBottleIds: Array.from(
-        new Set([...decision.candidateBottleIds, existingTarget.bottleId]),
-      ),
-      identityScope: "exact_cask",
-      observation,
-      matchedBottleId: existingTarget.bottleId,
-      proposedBottle: null,
-    };
-  }
-
-  if (decision.action !== "no_match") {
-    return null;
-  }
-
-  const proposedBottle = buildSmwsExactCaskBottleDraft({
-    artifacts,
-    code: smwsCode,
-    reference,
-  });
-
-  return {
-    action: "create_bottle",
-    rationale: appendRationale(
-      decision.rationale,
-      "Server created the SMWS exact-cask bottle because the SMWS code is the bottle identity anchor and no local bottle uses it.",
-    ),
-    candidateBottleIds: decision.candidateBottleIds,
-    identityScope: "exact_cask",
-    observation,
-    matchedBottleId: null,
-    proposedBottle,
-  };
-}
-
-export function resolveSmwsExactCaskReference({
-  reference,
-  artifacts,
-}: {
-  reference: BottleReferenceInput;
-  artifacts: BottleClassificationArtifacts;
-}): BottleClassificationDecision | null {
-  const smwsCode = getSmwsReferenceCodeAnchor({ reference });
-  if (!smwsCode) {
-    return null;
-  }
-
-  const existingTarget = getSmwsCodeTargetCandidate({
-    artifacts,
-    code: smwsCode,
-  });
-  const observation = normalizeObservation({
-    barrelNumber: null,
-    selector: getSmwsSelectorFromReference({
-      referenceName: reference.name,
-      code: smwsCode,
-    }),
-    caskNumber: smwsCode,
-  });
-  const candidateBottleIds = Array.from(
-    new Set([
-      ...artifacts.candidates.map((candidate) => candidate.bottleId),
-      ...(existingTarget ? [existingTarget.bottleId] : []),
-    ]),
-  );
-  const confidenceBasis: NonNullable<
-    BottleClassificationDecision["confidenceBasis"]
-  > = {
-    unresolvedRisks: [],
-    webEvidence: "not_needed",
-  };
-
-  if (existingTarget) {
-    return BottleClassificationDecisionSchema.parse({
-      action: "match",
-      rationale:
-        "Server matched the SMWS exact-cask code without agent reasoning because SMWS bottle identity is anchored by code.",
-      candidateBottleIds,
-      identityScope: "exact_cask",
-      observation,
-      confidenceBasis,
-      matchedBottleId: existingTarget.bottleId,
-      proposedBottle: null,
-    });
-  }
-
-  return BottleClassificationDecisionSchema.parse({
-    action: "create_bottle",
-    rationale:
-      "Server created the SMWS exact-cask bottle without agent reasoning because the SMWS code is the bottle identity anchor and no local bottle uses it.",
-    candidateBottleIds,
-    identityScope: "exact_cask",
-    observation,
-    confidenceBasis,
-    matchedBottleId: null,
-    proposedBottle: buildSmwsExactCaskBottleDraft({
-      artifacts,
-      code: smwsCode,
-      reference,
-    }),
-  });
 }
