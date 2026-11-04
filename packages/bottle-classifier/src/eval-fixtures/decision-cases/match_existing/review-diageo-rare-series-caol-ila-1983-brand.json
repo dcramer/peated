@@ -941,8 +941,5 @@
     "identityScope": "product",
     "matchedBottleId": 47474,
     "summary": "Diageo's Rare Series is an owner collection across several distilleries, so Rare Series is the Brand and Caol Ila is the Bottle name and distiller. Bottle 47474 has that shape and matches the 42-year-old, 1983, 56.4%, 318-bottle release. A stored Brand of Rare Series is not a conflict, and the candidate photo shows the same bottle. Match 47474."
-  },
-  "knownFailure": {
-    "reason": "The agent calls Brand Rare Series a conflict, though the identity model requires that shape."
   }
 }

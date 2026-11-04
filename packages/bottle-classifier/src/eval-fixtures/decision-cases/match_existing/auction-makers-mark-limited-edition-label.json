@@ -1109,6 +1109,6 @@
     "summary": "Match Maker's Mark Bourbon (42937). The photo shows a seasonal 'Limited Edition Bottle' label on standard Maker's Mark Kentucky Straight Bourbon Whisky at 45%; a special label is the same Bottle."
   },
   "knownFailure": {
-    "reason": "The agent treats a holiday label on the standard bourbon as a possible separate release."
+    "reason": "The label photo is never read: auction runs extract only the lot details (45%), so imageEvidence is empty and the holiday label can't be seen."
   }
 }

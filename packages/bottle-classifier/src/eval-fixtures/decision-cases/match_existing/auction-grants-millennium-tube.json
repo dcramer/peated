@@ -1153,6 +1153,6 @@
     "summary": "Match Grant's Family Reserve (43859). 'Millennium 2000' is printed only on the gift tube; the bottle carries the standard William Grant's The Family Reserve Finest Scotch Whisky label at 40%."
   },
   "knownFailure": {
-    "reason": "The agent treats 'Millennium', printed only on the gift tube, as a possible separate release."
+    "reason": "The label photo is never read: auction runs extract only the lot details (40%), so nothing shows 'Millennium' is printed only on the tube."
   }
 }

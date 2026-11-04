@@ -2080,8 +2080,5 @@
     "proposedBottleNameExcludes": ["Drambusters", "086"],
     "proposedBottleDistillerIds": [867],
     "summary": "Create the Daftmill 2012 single cask 086/2012 bottled in 2022 at 57.7% with edition 'for The Drambusters', the selection the label prints. The cask goes in caskNumber and neither the cask nor the selection goes in the name."
-  },
-  "knownFailure": {
-    "reason": "The create leaves the printed selection 'for The Drambusters' out of the edition."
   }
 }

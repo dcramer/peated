@@ -520,7 +520,27 @@
     "https://theliquorbarn.com/products/yellowstone-recollection-series-bourbon-750ml",
     "https://www.bourbonguy.com/blog/2026/2/25/yellowstone-recollection-bourbon",
     "https://www.bittersandbottles.com/products/yellowstone-recollection-series-8-year-bourbon-whiskey",
-    "https://whiskyadvocate.com/Yellowstone-Recollection-Series-55"
+    "https://whiskyadvocate.com/Yellowstone-Recollection-Series-55",
+    "https://www.scotchwhiskyauctions.com/auctions/232-the-183rd-auction/896088-macallan-concept-number-3-with-print/",
+    "https://www.highlandwhiskyauctions.com/lot-370320/macallan-advertising-poster-framed-1990s-print-1-of-25-prints/auction-44",
+    "https://whiskyauctioneer.com/product/5031345",
+    "https://www.invaluable.com/auction-lot/the-macallan-edition-highland-single-malt-scotch--223-c-b994f32a06",
+    "https://whisky.auction/auctions/lot/65440/macallan-1962",
+    "https://marklittler.com/macallan-archival-series/",
+    "https://www.facebook.com/groups/969079997003708/posts/1903179290260436/",
+    "https://www.scotchwhiskyauctions.com/auctions/232-the-183rd-auction/898376-macallan-peter-till-usa-a3-print/",
+    "https://www.scotchwhiskyauctions.com/auctions/233-the-184th-auction/902894-van-winkle-special-reserve-lot-b-12-year-old-bourbon-2024-release-75cl/",
+    "https://flaskfinewines.com/products/pappy-van-winkle-special-reserve-lot-b-12-year-old-bourbon",
+    "https://www.reddit.com/r/bourbon/comments/1jv80ip/review_524_van_winkle_special_reserve_12_year_lot/",
+    "https://www.buffalotracedistillery.com/our-brands/van-winkle/van-winkle-special-reserve-12-year/",
+    "https://www.memywifeandwhisky.com/reviews/review-524-van-winkle-special-reserve-12-year-lot-b",
+    "https://www.youtube.com/watch?v=xcHL-tqLf9Q",
+    "https://whiskeycaviar.com/products/pappy-van-winkle-special-reserve-12-years-old-lot-b",
+    "https://www.caskers.com/van-winkle-special-reserve-lot-b-12-year-old-bourbon/",
+    "https://www.reddit.com/r/bourbon/comments/1ub1jr3/review_van_winkle_special_reserve_12yr_lot_b_2024/",
+    "https://www.frootbat.com/p/343227/old-rip-van-winkle-van-winkle-special-reserve-12-year-old-lot-b-bourbon",
+    "https://liquorgeeks.com/blogs/news/pappy-van-winkle-12-year-lot-b-the-realistic-guide-for-2027",
+    "https://chipsliquor.com/products/van-winkle-12-year-lot-b-2025-bourbon-whiskey"
   ],
   "cases": {
     "1792-single-barrel": {
@@ -10016,6 +10036,247 @@
               }
             ],
             "summary": "The 30 Year Old Flask Edition is a rare whisky featuring a unique porcelain flask created by an award-winning designer. crème brûlée, vanilla, and butterscotch ... In stock Rating 4.4(20,360)Included in this pack is a porcelain flask, funnel and wooden serving tray, alongside the porcelain bottle of Royal Salute. The limited edition package includes a 30-year-old Royal Salute expression plus a porcelain flask, funnel and wooden serving tray The blue porcelain flask designed by Krassa accompanies the whisky bottle of the same material, and comes with a matching funnel for easy ... In stockJul 2",
+            "provider": "firecrawl"
+          }
+        ],
+        "errors": []
+      },
+      "pageResults": [],
+      "imageResults": []
+    },
+    "auction-macallan-concept-3-with-print": {
+      "searchResult": {
+        "evidence": [
+          {
+            "query": "Confirm the product identity and distinguish whether 'with print' is package/auction wording; find the bottle title or label wording and any release-specific details.",
+            "results": [
+              {
+                "url": "https://www.scotchwhiskyauctions.com/auctions/232-the-183rd-auction/896088-macallan-concept-number-3-with-print/",
+                "title": "Macallan Concept Number 3 With Print | The 183rd Auction | Scotch Whisky Auctions",
+                "domain": "scotchwhiskyauctions.com",
+                "description": null,
+                "extraSnippets": []
+              }
+            ],
+            "summary": null,
+            "provider": "firecrawl"
+          }
+        ],
+        "errors": []
+      },
+      "pageResults": [],
+      "imageResults": [
+        {
+          "url": "https://api.peated.com/uploads/prices-y083oklm2quzw20s6kbhrrwk.webp",
+          "result": {
+            "abv": null,
+            "brand": "Macallan",
+            "series": "Concept",
+            "bottler": null,
+            "edition": null,
+            "outturn": null,
+            "category": "single_malt",
+            "distillery": ["Macallan"],
+            "expression": "Concept Number 3",
+            "maturation": null,
+            "stated_age": null,
+            "cask_number": null,
+            "release_day": null,
+            "single_cask": null,
+            "release_year": null,
+            "vintage_year": null,
+            "bottling_year": null,
+            "cask_strength": null,
+            "release_month": null
+          }
+        }
+      ]
+    },
+    "auction-macallan-peter-till-print-only": {
+      "searchResult": {
+        "evidence": [
+          {
+            "query": "\"Macallan Peter Till USA A3 Print\" Scotch Whisky Auctions",
+            "results": [
+              {
+                "url": "https://www.highlandwhiskyauctions.com/lot-370320/macallan-advertising-poster-framed-1990s-print-1-of-25-prints/auction-44",
+                "title": "Macallan - Advertising Poster - Framed 1990s Print - 1 Of 25 Prints",
+                "domain": "highlandwhiskyauctions.com",
+                "description": "Of 25 Prints at auction. done by artist Peter Till. This is one of 25 ever made. Height 41.5cm & Width 33cm. a single malt Scotch whisky distillery. Bid: £75. ...",
+                "extraSnippets": []
+              },
+              {
+                "url": "https://whiskyauctioneer.com/product/5031345",
+                "title": "Print: Image of Macallan in New York by Peter Till - Whisky Auctioneer",
+                "domain": "whiskyauctioneer.com",
+                "description": "Image of Macallan in New York by Peter Till whisky to your collection? Next auction starts Friday, 28 August. 810,000 lots sold + £300m of whisky",
+                "extraSnippets": []
+              },
+              {
+                "url": "https://www.invaluable.com/auction-lot/the-macallan-edition-highland-single-malt-scotch--223-c-b994f32a06",
+                "title": "The Macallan Edition Highland Single Malt Scotch Whisky Edition No. 3",
+                "domain": "invaluable.com",
+                "description": "Lot 223: The Macallan Edition Highland Single Malt Scotch Whisky Edition No. 3. Est: NT$50,000 TWD - NT$70,000 TWDPassed. Ethereal AuctioneersTaipei City, ...",
+                "extraSnippets": []
+              },
+              {
+                "url": "https://whisky.auction/auctions/lot/65440/macallan-1962",
+                "title": "Macallan 1962 - Lot 65440 - Whisky.Auction",
+                "domain": "whisky.auction",
+                "description": "This Macallan 1962 sold at our online auction for £1,550 Condition Please see images for fill level and label condition.",
+                "extraSnippets": []
+              },
+              {
+                "url": "https://marklittler.com/macallan-archival-series/",
+                "title": "Macallan Archival Series: The Ultimate Guide - Mark Littler",
+                "domain": "marklittler.com",
+                "description": "The Macallan's original print, The Folio 1 retail price was £199 and its highest auction price to date is £ Midda. its highest price at auction ...",
+                "extraSnippets": []
+              },
+              {
+                "url": "https://www.facebook.com/groups/969079997003708/posts/1903179290260436/",
+                "title": "Updated Auction list for the ball a massive thank you to everyone who ...",
+                "domain": "facebook.com",
+                "description": "Updated Auction list for the ball. Silent Auction funds raised so far are £1,275 … auction raised over £2,000",
+                "extraSnippets": []
+              }
+            ],
+            "summary": "Of 25 Prints at auction. done by artist Peter Till. This is one of 25 ever made. Height 41.5cm & Width 33cm. a single malt Scotch whisky distillery. Bid: £75. ... Image of Macallan in New York by Peter Till whisky to your collection? Next auction starts Friday, 28 August. 810,000 lots sold + £300m of whisky Lot 223: The Macallan Edition Highland Single Malt Scotch Whisky Edition No. 3. Est: NT$50,000 TWD - NT$70,000 TWDPassed. Ethereal AuctioneersTaipei City, ... This Macallan 1962 sold at our online auction for £1,550 Condition Please see images for fill level and label condition. The Macalla",
+            "provider": "firecrawl"
+          },
+          {
+            "query": "Confirm whether lot is a whisky bottle or a Peter Till artwork/print, and its full lot description.",
+            "results": [
+              {
+                "url": "https://www.scotchwhiskyauctions.com/auctions/232-the-183rd-auction/898376-macallan-peter-till-usa-a3-print/",
+                "title": "Macallan Peter Till USA A3 Print | The 183rd Auction | Scotch Whisky Auctions",
+                "domain": "scotchwhiskyauctions.com",
+                "description": null,
+                "extraSnippets": []
+              }
+            ],
+            "summary": null,
+            "provider": "firecrawl"
+          }
+        ],
+        "errors": []
+      },
+      "pageResults": [],
+      "imageResults": []
+    },
+    "auction-van-winkle-lot-b-2024-release": {
+      "searchResult": {
+        "evidence": [
+          {
+            "query": "page opening",
+            "results": [
+              {
+                "url": "https://www.scotchwhiskyauctions.com/auctions/233-the-184th-auction/902894-van-winkle-special-reserve-lot-b-12-year-old-bourbon-2024-release-75cl/",
+                "title": "Van Winkle Special Reserve Lot ‘B’ 12 Year Old Bourbon 2024 Release 75cl | The 184th Auction | Scotch Whisky Auctions",
+                "domain": "scotchwhiskyauctions.com",
+                "description": null,
+                "extraSnippets": []
+              }
+            ],
+            "summary": "[Skip to menu](https://www.scotchwhiskyauctions.com/auctions/233-the-184th-auction/902894-van-winkle-special-reserve-lot-b-12-year-old-bourbon-2024-release-75cl/#menu) [Skip to content](https://www.scotchwhiskyauctions.com/auctions/233-the-184th-auction/902894-van-winkle-special-reserve-lot-b-12-year-old-bourbon-2024-release-75cl/#contentstart)\n\nAre you the legal age to buy alcohol in your country?YesNo\n\n [Free valuations](https://wa.me/+447538638525/?text=I%20would%20like%20a%20free%20valuation)\n\nShow/hide cookie info\n\n**This site may set cookies for essential tasks, such as tracking whether you are signed in.**\n\nWe would also like to set analytics cookies to better understand our users’ behaviour.\n\n[Read our cookies policy](https://www.scotchwhiskyauctions.com/privacy/)\n\nAcceptReject",
+            "provider": "firecrawl"
+          },
+          {
+            "query": "Van Winkle Special Reserve Lot B 12 year 2024 release 45.2% bourbon label",
+            "results": [
+              {
+                "url": "https://flaskfinewines.com/products/pappy-van-winkle-special-reserve-lot-b-12-year-old-bourbon",
+                "title": "Van Winkle 12 Year Old Special Reserve Lot B Bourbon - Flask",
+                "domain": "flaskfinewines.com",
+                "description": "In stock Rating 5.0(1)45.2% ABV (90.4 proof), 12-year-old wheated Kentucky straight bourbon. B Special Reserve is released annually in extremely limited, 23-24 release 23-24 $935 … ...",
+                "extraSnippets": []
+              },
+              {
+                "url": "https://www.reddit.com/r/bourbon/comments/1jv80ip/review_524_van_winkle_special_reserve_12_year_lot/",
+                "title": "Review #524 - Van Winkle Special Reserve 12 Year Lot \"B\" : r/bourbon",
+                "domain": "reddit.com",
+                "description": "Back[![](https://styles.redditmedia.com/t5_2rgos/styles/communityIcon_1ut2nw3apwd01.png?width=96&height=96&frame=1&auto=webp&s=8754ac13fb209fb504706675a1a8a934f7b21a9e)\\\n\\\nGo to bourbon](https://www.reddit.com/r/bourbon/",
+                "extraSnippets": []
+              },
+              {
+                "url": "https://www.buffalotracedistillery.com/our-brands/van-winkle/van-winkle-special-reserve-12-year/",
+                "title": "Van Winkle Special Reserve 12 Year - Buffalo Trace Distillery",
+                "domain": "buffalotracedistillery.com",
+                "description": "A 90.4 proof bourbon aged 12 years, mixing honey, oak & Bottled at 90.4 proof, cocoa, fruit and spiced peach. 90.4 (45.2%) Mash Wheated Mash Style Straight -94 ...",
+                "extraSnippets": []
+              },
+              {
+                "url": "https://www.memywifeandwhisky.com/reviews/review-524-van-winkle-special-reserve-12-year-lot-b",
+                "title": "Review #524 - Van Winkle Special Reserve 12 Year Lot \"B\"",
+                "domain": "memywifeandwhisky.com",
+                "description": "# Review #524 - Van Winkle Special Reserve 12 Year Lot \"B\"\n_USA - Bourbon_\n\n**Strength**: 45.2% ABV",
+                "extraSnippets": []
+              },
+              {
+                "url": "https://www.youtube.com/watch?v=xcHL-tqLf9Q",
+                "title": "Van Winkle Special Reserve 12 year Lot \"B\" - YouTube",
+                "domain": "youtube.com",
+                "description": "... bourbon #whiskeytube #whiskey.",
+                "extraSnippets": []
+              },
+              {
+                "url": "https://whiskeycaviar.com/products/pappy-van-winkle-special-reserve-12-years-old-lot-b",
+                "title": "Pappy Van Winkle Special Reserve 12 Year Lot B 750 mL",
+                "domain": "whiskeycaviar.com",
+                "description": "In stock Rating 5.0(6)is a highly sought-after wheated bourbon, ABV: 45.2% (90.4 proof). Aging: Aged 12 years in charred new American oak barrels. Bottle Size: 750mL.",
+                "extraSnippets": []
+              }
+            ],
+            "summary": "In stock Rating 5.0(1)45.2% ABV (90.4 proof), 12-year-old wheated Kentucky straight bourbon. B Special Reserve is released annually in extremely limited, 23-24 release 23-24 $935 … ... Back[![](https://styles.redditmedia.com/t5_2rgos/styles/communityIcon_1ut2nw3apwd01.png?width=96&height=96&frame=1&auto=webp&s=8754ac13fb209fb504706675a1a8a934f7b21a9e)\\\n\\\nGo to bourbon](https://www.reddit.com/r/bourbon/)\n\n# Comments Section\n**Strength**: 45.2% ABV A 90.4 proof bourbon aged 12 years, mixing honey, oak & Bottled at 90.4 proof, cocoa, fruit and spiced peach. 90.4 (45.2%) Mash Wheated Mash Style St",
+            "provider": "firecrawl"
+          },
+          {
+            "query": "2024 Van Winkle Special Reserve 12 Year Old Lot B official release",
+            "results": [
+              {
+                "url": "https://www.memywifeandwhisky.com/reviews/review-524-van-winkle-special-reserve-12-year-lot-b",
+                "title": "Review #524 - Van Winkle Special Reserve 12 Year Lot \"B\"",
+                "domain": "memywifeandwhisky.com",
+                "description": "Apr 9, 2025",
+                "extraSnippets": []
+              },
+              {
+                "url": "https://www.caskers.com/van-winkle-special-reserve-lot-b-12-year-old-bourbon/",
+                "title": "Van Winkle Special Reserve Lot \"B\" 12 Year Old Bourbon Whiskey",
+                "domain": "caskers.com",
+                "description": "Out of stock Rating 2.5(6)Get Van Winkle Special Reserve Lot \"B\" 12 Year Old Bourbon Whiskey for $884.99 ✓ Earn up to 5% back in discounts & save on shipping with Caskers Rewards.",
+                "extraSnippets": []
+              },
+              {
+                "url": "https://www.reddit.com/r/bourbon/comments/1ub1jr3/review_van_winkle_special_reserve_12yr_lot_b_2024/",
+                "title": "Review: Van Winkle Special Reserve 12yr Lot B (2024) : r/bourbon - Reddit",
+                "domain": "reddit.com",
+                "description": "Van Winkle Special Reserve 12 Year, better known as Lot B, the sweet spot between age, drinkability, and oak influence. Nose – Dried peach, ...Review #001 - Van Winkle Special Reserve Lot “B” : r/bourbon - RedditReview #",
+                "extraSnippets": []
+              },
+              {
+                "url": "https://www.frootbat.com/p/343227/old-rip-van-winkle-van-winkle-special-reserve-12-year-old-lot-b-bourbon",
+                "title": "Old Rip Van Winkle Special Reserve 12 Year Old Lot B Bourbon - Frootbat",
+                "domain": "frootbat.com",
+                "description": "In stock Rating 4.8(28)key Alcohol Level: 45.2% Bottle size: 750ml bottle Single vintages available open button. Released yearly in extremely limited quantities,",
+                "extraSnippets": []
+              },
+              {
+                "url": "https://liquorgeeks.com/blogs/news/pappy-van-winkle-12-year-lot-b-the-realistic-guide-for-2027",
+                "title": "Pappy Van Winkle 12 Year Lot B: Allocation & Buying Guide",
+                "domain": "liquorgeeks.com",
+                "description": "Lot \"B\" is the current 12-year expression from the Van Winkle. Original Wheated $1,199.99 USD 's medium-bodied by design, it's a legitimately ...",
+                "extraSnippets": []
+              },
+              {
+                "url": "https://chipsliquor.com/products/van-winkle-12-year-lot-b-2025-bourbon-whiskey",
+                "title": "Van Winkle Special Reserve Lot B 12 Year 2025 | Buy - Chips Liquor",
+                "domain": "chipsliquor.com",
+                "description": "In stock Rating 4.6131Special Reserve is aged twelve years in the Frankfort warehouses and bottled at 90.4 proof; the 2025 release carries the year on the label. Bourbon Culture on ...",
+                "extraSnippets": []
+              }
+            ],
+            "summary": "Apr 9, 2025 Out of stock Rating 2.5(6)Get Van Winkle Special Reserve Lot \"B\" 12 Year Old Bourbon Whiskey for $884.99 ✓ Earn up to 5% back in discounts & save on shipping with Caskers Rewards. Van Winkle Special Reserve 12 Year, better known as Lot B, the sweet spot between age, drinkability, and oak influence. Nose – Dried peach, ...Review #001 - Van Winkle Special Reserve Lot “B” : r/bourbon - RedditReview #524 - Van Winkle Special Reserve 12 Year Lot \"B\" : r/bourbonMore results from www.reddit.com In stock Rating 4.8(28)key Alcohol Level: 45.2% Bottle size: 750ml bottle Single vintages avail",
             "provider": "firecrawl"
           }
         ],

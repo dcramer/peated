@@ -910,8 +910,5 @@
     "proposedBottleNameOneOf": ["15-year-old"],
     "proposedBottleNameExcludes": ["2026", "Release"],
     "summary": "Create the 2026 Springbank 15-year-old with releaseYear 2026 and no year in the name; the general Springbank 15 (872) is too broad for a known release year."
-  },
-  "knownFailure": {
-    "reason": "The agent matches the general Springbank 15 although the source names the 2026 release. A known release year marks its own release."
   }
 }

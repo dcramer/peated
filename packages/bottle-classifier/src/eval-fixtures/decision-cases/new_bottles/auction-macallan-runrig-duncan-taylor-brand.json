@@ -3120,6 +3120,6 @@
     "summary": "Create the Duncan Taylor Macallan 20-year-old, cask D2562, under Brand Duncan Taylor; the event name stays out of the name and the unprinted vintage is not added."
   },
   "knownFailure": {
-    "reason": "The create uses Brand The Macallan instead of the bottler's label, Duncan Taylor. Its name holds an unprinted vintage and an event name."
+    "reason": "The agent finds the bottler, cask, age, and ABV but returns no_match because it can't confirm the exact label wording."
   }
 }

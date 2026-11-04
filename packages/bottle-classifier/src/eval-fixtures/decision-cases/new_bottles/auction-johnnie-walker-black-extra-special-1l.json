@@ -1012,6 +1012,6 @@
     "summary": "Create the 43% Extra Special Black Label as its own Bottle, named Black Label 12-year-old with Extra Special in edition."
   },
   "knownFailure": {
-    "reason": "The create puts 'Extra Special' in the name instead of the edition."
+    "reason": "The create keeps 'Extra Special' in the name; nothing in the evidence tells the agent it is older label wording."
   }
 }

@@ -940,6 +940,6 @@
     "summary": "Match Bowmore The Devil's Casks III (16129). The label photo prints The Devil's Casks Limited Release III at 56.7%; the lot text's 57.6% is a transposed-digit typo, not a separate release."
   },
   "knownFailure": {
-    "reason": "With the label photo, the agent still lets the lot text's 57.6% typo block the match the label's 56.7% settles."
+    "reason": "The label photo is never read: auction runs extract only the lot details (57.6%), so the label's 56.7% can't settle the typo."
   }
 }
