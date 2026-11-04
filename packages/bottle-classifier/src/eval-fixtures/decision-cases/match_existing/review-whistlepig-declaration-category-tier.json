@@ -1,0 +1,1113 @@
+{
+  "id": "review-whistlepig-declaration-category-tier",
+  "name": "Review: WhistlePig Declaration matches and applies automatically despite an extracted 'rye' category",
+  "input": {
+    "reference": {
+      "id": 19034,
+      "url": "https://whiskyadvocate.com/WhistlePig-Declaration-Double-American-Oak-Aged-43",
+      "name": "WhistlePig Declaration Double American Oak Aged, 43%",
+      "imageUrl": null,
+      "externalSiteId": 5,
+      "currentBottleId": null
+    },
+    "extractedIdentity": {
+      "abv": 43,
+      "brand": "WhistlePig",
+      "series": null,
+      "bottler": null,
+      "edition": null,
+      "outturn": null,
+      "category": "rye",
+      "distillery": [],
+      "expression": "Declaration",
+      "maturation": "Double American oak",
+      "stated_age": null,
+      "cask_number": null,
+      "release_day": null,
+      "single_cask": null,
+      "release_year": null,
+      "vintage_year": null,
+      "bottling_year": null,
+      "cask_strength": null,
+      "release_month": null
+    },
+    "imageEvidence": null,
+    "initialCandidates": [
+      {
+        "abv": 43,
+        "brand": "WhistlePig",
+        "score": 76.48074,
+        "series": null,
+        "source": ["text", "brand_coverage", "context"],
+        "bottler": null,
+        "edition": "USA 250th Anniversary Edition",
+        "outturn": null,
+        "bottleId": 63260,
+        "category": "wheat",
+        "fullName": "WhistlePig Declaration Wheat Whiskey - USA 250th Anniversary Edition",
+        "reference": null,
+        "statedAge": null,
+        "caskNumber": null,
+        "comparison": {
+          "missing": [],
+          "conflicts": [],
+          "agreements": ["category", "abv", "brand"]
+        },
+        "distillery": [],
+        "maturation": null,
+        "releaseDay": null,
+        "singleCask": null,
+        "releaseYear": null,
+        "vintageYear": null,
+        "bottlingYear": null,
+        "caskStrength": null,
+        "releaseMonth": null,
+        "familyContext": {
+          "siblingBottles": []
+        }
+      },
+      {
+        "abv": 43,
+        "brand": "WhistlePig",
+        "score": 55.411636,
+        "series": null,
+        "source": ["text", "brand_coverage"],
+        "bottler": null,
+        "edition": null,
+        "outturn": null,
+        "bottleId": 61516,
+        "category": "wheat",
+        "fullName": "WhistlePig CampStock Toasted Barrel Wheat Whiskey",
+        "reference": null,
+        "statedAge": null,
+        "caskNumber": null,
+        "comparison": {
+          "missing": [],
+          "conflicts": [],
+          "agreements": ["category", "abv", "brand"]
+        },
+        "distillery": [],
+        "maturation": "finished in Solo Stove toasted barrels",
+        "releaseDay": null,
+        "singleCask": null,
+        "releaseYear": null,
+        "vintageYear": null,
+        "bottlingYear": null,
+        "caskStrength": null,
+        "releaseMonth": null,
+        "familyContext": {
+          "siblingBottles": []
+        }
+      },
+      {
+        "abv": 43,
+        "brand": "WhistlePig",
+        "score": 51.5857,
+        "series": null,
+        "source": ["text", "brand_coverage"],
+        "bottler": null,
+        "edition": "Liquid Death Edition",
+        "outturn": null,
+        "bottleId": 61961,
+        "category": "wheat",
+        "fullName": "WhistlePig Gravestock Wheat Whiskey - Liquid Death Edition",
+        "reference": null,
+        "statedAge": null,
+        "caskNumber": null,
+        "comparison": {
+          "missing": [],
+          "conflicts": [],
+          "agreements": ["category", "abv", "brand"]
+        },
+        "distillery": [],
+        "maturation": null,
+        "releaseDay": null,
+        "singleCask": null,
+        "releaseYear": null,
+        "vintageYear": null,
+        "bottlingYear": null,
+        "caskStrength": null,
+        "releaseMonth": null,
+        "familyContext": {
+          "siblingBottles": []
+        }
+      },
+      {
+        "abv": null,
+        "brand": "WhistlePig",
+        "score": 43.4216,
+        "series": null,
+        "source": ["vector", "text"],
+        "bottler": null,
+        "edition": null,
+        "outturn": null,
+        "bottleId": 43929,
+        "category": "rye",
+        "fullName": "WhistlePig Whistlepig The Boss Hog XII Feather & Flame New American Oak & Pulque Curado de Cacao Barrel Finished (Barrel No. 10)",
+        "reference": "Whistlepig The Boss Hog XII Feather & Flame New American Oak & Pulque Curado de Cacao Barrel Finished (Barrel No. 10), 52.4%",
+        "statedAge": null,
+        "caskNumber": null,
+        "comparison": {
+          "missing": ["abv"],
+          "conflicts": [],
+          "agreements": ["category", "brand"]
+        },
+        "distillery": [],
+        "maturation": null,
+        "releaseDay": null,
+        "singleCask": true,
+        "releaseYear": null,
+        "vintageYear": null,
+        "bottlingYear": null,
+        "caskStrength": null,
+        "releaseMonth": null,
+        "familyContext": {
+          "siblingBottles": []
+        }
+      },
+      {
+        "abv": null,
+        "brand": "WhistlePig",
+        "score": 43.323647,
+        "series": null,
+        "source": ["vector", "text"],
+        "bottler": null,
+        "edition": null,
+        "outturn": null,
+        "bottleId": 13474,
+        "category": "rye",
+        "fullName": "WhistlePig 18-year-old Double Malt Straight Rye",
+        "reference": "WhistlePig 18-year-old Double Malt Straight Rye (2019 Release), 46%",
+        "statedAge": 18,
+        "caskNumber": null,
+        "comparison": {
+          "missing": ["abv"],
+          "conflicts": [],
+          "agreements": ["category", "brand"]
+        },
+        "distillery": [],
+        "maturation": null,
+        "releaseDay": null,
+        "singleCask": null,
+        "releaseYear": 2019,
+        "vintageYear": null,
+        "bottlingYear": null,
+        "caskStrength": null,
+        "releaseMonth": null,
+        "familyContext": {
+          "siblingBottles": []
+        }
+      },
+      {
+        "abv": 43,
+        "brand": "Prakaan",
+        "score": 41.98621,
+        "series": "Tribura Series",
+        "source": ["text"],
+        "bottler": null,
+        "edition": null,
+        "outturn": null,
+        "bottleId": 46072,
+        "category": "single_malt",
+        "fullName": "Prakaan Double Cask - 43.0% ABV",
+        "reference": null,
+        "statedAge": null,
+        "caskNumber": null,
+        "comparison": {
+          "missing": [],
+          "conflicts": ["category", "brand"],
+          "agreements": ["abv"]
+        },
+        "distillery": ["Prakaan"],
+        "maturation": null,
+        "releaseDay": null,
+        "singleCask": null,
+        "releaseYear": null,
+        "vintageYear": null,
+        "bottlingYear": null,
+        "caskStrength": null,
+        "releaseMonth": null,
+        "familyContext": {
+          "siblingBottles": []
+        }
+      },
+      {
+        "abv": 43,
+        "brand": "Millstone",
+        "score": 37.789192,
+        "series": null,
+        "source": ["text"],
+        "bottler": null,
+        "edition": null,
+        "outturn": null,
+        "bottleId": 55078,
+        "category": "single_malt",
+        "fullName": "Millstone American Oak",
+        "reference": null,
+        "statedAge": 10,
+        "caskNumber": null,
+        "comparison": {
+          "missing": [],
+          "conflicts": ["category", "brand"],
+          "agreements": ["abv"]
+        },
+        "distillery": ["Zuidam Distillery"],
+        "maturation": "American Oak",
+        "releaseDay": null,
+        "singleCask": null,
+        "releaseYear": null,
+        "vintageYear": null,
+        "bottlingYear": null,
+        "caskStrength": null,
+        "releaseMonth": null,
+        "familyContext": {
+          "siblingBottles": []
+        }
+      },
+      {
+        "abv": 43,
+        "brand": "Two Stacks",
+        "score": 37.76381,
+        "series": null,
+        "source": ["text"],
+        "bottler": "Two Stacks",
+        "edition": null,
+        "outturn": null,
+        "bottleId": 46839,
+        "category": "single_pot_still",
+        "fullName": "Two Stacks Single Pot Still - Double Barrel - 43.0% ABV",
+        "reference": null,
+        "statedAge": null,
+        "caskNumber": null,
+        "comparison": {
+          "missing": [],
+          "conflicts": ["category", "brand"],
+          "agreements": ["abv"]
+        },
+        "distillery": [],
+        "maturation": null,
+        "releaseDay": null,
+        "singleCask": null,
+        "releaseYear": null,
+        "vintageYear": null,
+        "bottlingYear": null,
+        "caskStrength": null,
+        "releaseMonth": null,
+        "familyContext": {
+          "siblingBottles": []
+        }
+      },
+      {
+        "abv": 43,
+        "brand": "Gladstone Axe",
+        "score": 37.65414,
+        "series": null,
+        "source": ["text"],
+        "bottler": null,
+        "edition": null,
+        "outturn": null,
+        "bottleId": 64107,
+        "category": "blended_malt",
+        "fullName": "Gladstone Axe American Oak",
+        "reference": null,
+        "statedAge": null,
+        "caskNumber": null,
+        "comparison": {
+          "missing": [],
+          "conflicts": ["category", "brand"],
+          "agreements": ["abv"]
+        },
+        "distillery": [],
+        "maturation": "American oak barrels previously used for bourbon production",
+        "releaseDay": null,
+        "singleCask": false,
+        "releaseYear": null,
+        "vintageYear": null,
+        "bottlingYear": null,
+        "caskStrength": null,
+        "releaseMonth": null,
+        "familyContext": {
+          "siblingBottles": []
+        }
+      },
+      {
+        "abv": null,
+        "brand": "Sagamore Spirit",
+        "score": 37.492325,
+        "series": null,
+        "source": ["text"],
+        "bottler": null,
+        "edition": null,
+        "outturn": null,
+        "bottleId": 13995,
+        "category": "rye",
+        "fullName": "Sagamore Spirit Double Oak Rye",
+        "reference": null,
+        "statedAge": null,
+        "caskNumber": null,
+        "comparison": {
+          "missing": ["abv"],
+          "conflicts": ["brand"],
+          "agreements": ["category"]
+        },
+        "distillery": [],
+        "maturation": null,
+        "releaseDay": null,
+        "singleCask": null,
+        "releaseYear": null,
+        "vintageYear": null,
+        "bottlingYear": null,
+        "caskStrength": null,
+        "releaseMonth": null,
+        "familyContext": {
+          "siblingBottles": []
+        }
+      },
+      {
+        "abv": 43,
+        "brand": "Beverbach",
+        "score": 36.82094,
+        "series": null,
+        "source": ["text"],
+        "bottler": null,
+        "edition": null,
+        "outturn": null,
+        "bottleId": 47049,
+        "category": "single_malt",
+        "fullName": "Beverbach White Oak Cask Finish - 43.0% ABV",
+        "reference": null,
+        "statedAge": null,
+        "caskNumber": null,
+        "comparison": {
+          "missing": [],
+          "conflicts": ["category", "brand"],
+          "agreements": ["abv"]
+        },
+        "distillery": ["Hardenberg Distillery"],
+        "maturation": null,
+        "releaseDay": null,
+        "singleCask": false,
+        "releaseYear": null,
+        "vintageYear": null,
+        "bottlingYear": null,
+        "caskStrength": false,
+        "releaseMonth": null,
+        "familyContext": {
+          "siblingBottles": []
+        }
+      },
+      {
+        "abv": 43,
+        "brand": "Two Stacks",
+        "score": 36.793816,
+        "series": null,
+        "source": ["text"],
+        "bottler": null,
+        "edition": null,
+        "outturn": null,
+        "bottleId": 45292,
+        "category": "single_grain",
+        "fullName": "Two Stacks Double Barrel - 43.0% ABV",
+        "reference": null,
+        "statedAge": null,
+        "caskNumber": null,
+        "comparison": {
+          "missing": [],
+          "conflicts": ["category", "brand"],
+          "agreements": ["abv"]
+        },
+        "distillery": [],
+        "maturation": null,
+        "releaseDay": null,
+        "singleCask": null,
+        "releaseYear": null,
+        "vintageYear": null,
+        "bottlingYear": null,
+        "caskStrength": null,
+        "releaseMonth": null,
+        "familyContext": {
+          "siblingBottles": []
+        }
+      },
+      {
+        "abv": null,
+        "brand": "Middle West Spirits",
+        "score": 36.22747,
+        "series": null,
+        "source": ["text"],
+        "bottler": null,
+        "edition": null,
+        "outturn": null,
+        "bottleId": 15920,
+        "category": null,
+        "fullName": "Middle West Spirits Double Cask Collection OYO Oloroso Wheat (Batch 2)",
+        "reference": null,
+        "statedAge": null,
+        "caskNumber": null,
+        "comparison": {
+          "missing": ["category", "abv"],
+          "conflicts": ["brand"],
+          "agreements": []
+        },
+        "distillery": [],
+        "maturation": null,
+        "releaseDay": null,
+        "singleCask": null,
+        "releaseYear": null,
+        "vintageYear": null,
+        "bottlingYear": null,
+        "caskStrength": null,
+        "releaseMonth": null,
+        "familyContext": {
+          "siblingBottles": []
+        }
+      },
+      {
+        "abv": 43,
+        "brand": "Vê Dê Di",
+        "score": 36.038048,
+        "series": null,
+        "source": ["text"],
+        "bottler": "Vê Dê Di",
+        "edition": null,
+        "outturn": null,
+        "bottleId": 47481,
+        "category": "single_malt",
+        "fullName": "Vê Dê Di Distiller's Choice - 43.0% ABV",
+        "reference": null,
+        "statedAge": null,
+        "caskNumber": null,
+        "comparison": {
+          "missing": [],
+          "conflicts": ["category", "brand"],
+          "agreements": ["abv"]
+        },
+        "distillery": [],
+        "maturation": "sherry, bourbon & new American oak",
+        "releaseDay": null,
+        "singleCask": null,
+        "releaseYear": null,
+        "vintageYear": null,
+        "bottlingYear": null,
+        "caskStrength": null,
+        "releaseMonth": null,
+        "familyContext": {
+          "siblingBottles": []
+        }
+      },
+      {
+        "abv": 43,
+        "brand": "WhistlePig",
+        "score": 35.371807,
+        "series": null,
+        "source": ["text", "brand_coverage"],
+        "bottler": "WhistlePig",
+        "edition": null,
+        "outturn": null,
+        "bottleId": 55177,
+        "category": "rye",
+        "fullName": "WhistlePig SmokeStock Wood Fired Whiskey",
+        "reference": null,
+        "statedAge": 6,
+        "caskNumber": null,
+        "comparison": {
+          "missing": [],
+          "conflicts": [],
+          "agreements": ["category", "abv", "brand"]
+        },
+        "distillery": ["WhistlePig"],
+        "maturation": "American oak No. 3 char barrels; finished with Traeger apple BBQ wood smoke",
+        "releaseDay": null,
+        "singleCask": false,
+        "releaseYear": 2022,
+        "vintageYear": null,
+        "bottlingYear": null,
+        "caskStrength": false,
+        "releaseMonth": null,
+        "familyContext": {
+          "siblingBottles": []
+        }
+      },
+      {
+        "abv": null,
+        "brand": "WhistlePig",
+        "score": 33.527287,
+        "series": null,
+        "source": ["vector", "text"],
+        "bottler": null,
+        "edition": null,
+        "outturn": null,
+        "bottleId": 12854,
+        "category": "rye",
+        "fullName": "WhistlePig Roadstock",
+        "reference": "WhistlePig Roadstock, 43%",
+        "statedAge": null,
+        "caskNumber": null,
+        "comparison": {
+          "missing": ["abv"],
+          "conflicts": [],
+          "agreements": ["category", "brand"]
+        },
+        "distillery": [],
+        "maturation": null,
+        "releaseDay": null,
+        "singleCask": null,
+        "releaseYear": null,
+        "vintageYear": null,
+        "bottlingYear": null,
+        "caskStrength": null,
+        "releaseMonth": null,
+        "familyContext": {
+          "siblingBottles": []
+        }
+      },
+      {
+        "abv": null,
+        "brand": "WhistlePig",
+        "score": 0.757488237122442,
+        "series": null,
+        "source": ["vector"],
+        "bottler": null,
+        "edition": null,
+        "outturn": null,
+        "bottleId": 12945,
+        "category": "rye",
+        "fullName": "WhistlePig 12-year-old Old World",
+        "reference": "WhistlePig 12-year-old Old World, 43%",
+        "statedAge": 12,
+        "caskNumber": null,
+        "comparison": {
+          "missing": ["abv"],
+          "conflicts": [],
+          "agreements": ["category", "brand"]
+        },
+        "distillery": [],
+        "maturation": null,
+        "releaseDay": null,
+        "singleCask": null,
+        "releaseYear": null,
+        "vintageYear": null,
+        "bottlingYear": null,
+        "caskStrength": null,
+        "releaseMonth": null,
+        "familyContext": {
+          "siblingBottles": []
+        }
+      },
+      {
+        "abv": null,
+        "brand": "WhistlePig",
+        "score": 0.7546608892718818,
+        "series": null,
+        "source": ["vector"],
+        "bottler": null,
+        "edition": null,
+        "outturn": null,
+        "bottleId": 14055,
+        "category": "rye",
+        "fullName": "WhistlePig Farmstock Rye Crop 002",
+        "reference": "WhistlePig Farmstock Rye Crop 002, 43%",
+        "statedAge": null,
+        "caskNumber": null,
+        "comparison": {
+          "missing": ["abv"],
+          "conflicts": [],
+          "agreements": ["category", "brand"]
+        },
+        "distillery": [],
+        "maturation": null,
+        "releaseDay": null,
+        "singleCask": null,
+        "releaseYear": null,
+        "vintageYear": null,
+        "bottlingYear": null,
+        "caskStrength": null,
+        "releaseMonth": null,
+        "familyContext": {
+          "siblingBottles": []
+        }
+      },
+      {
+        "abv": null,
+        "brand": "WhistlePig",
+        "score": 0.7497813958686353,
+        "series": null,
+        "source": ["vector"],
+        "bottler": null,
+        "edition": null,
+        "outturn": null,
+        "bottleId": 17526,
+        "category": "rye",
+        "fullName": "WhistlePig 10-year-old Straight Rye",
+        "reference": "WhistlePig 10-year-old Straight Rye, 50%",
+        "statedAge": 10,
+        "caskNumber": null,
+        "comparison": {
+          "missing": ["abv"],
+          "conflicts": [],
+          "agreements": ["category", "brand"]
+        },
+        "distillery": [],
+        "maturation": null,
+        "releaseDay": null,
+        "singleCask": null,
+        "releaseYear": null,
+        "vintageYear": null,
+        "bottlingYear": null,
+        "caskStrength": null,
+        "releaseMonth": null,
+        "familyContext": {
+          "siblingBottles": []
+        }
+      },
+      {
+        "abv": null,
+        "brand": "WhistlePig",
+        "score": 0.7454786606105389,
+        "series": null,
+        "source": ["vector"],
+        "bottler": null,
+        "edition": null,
+        "outturn": null,
+        "bottleId": 14398,
+        "category": "rye",
+        "fullName": "WhistlePig FarmStock Crop 001",
+        "reference": "WhistlePig FarmStock Crop 001, 43%",
+        "statedAge": null,
+        "caskNumber": null,
+        "comparison": {
+          "missing": ["abv"],
+          "conflicts": [],
+          "agreements": ["category", "brand"]
+        },
+        "distillery": [],
+        "maturation": null,
+        "releaseDay": null,
+        "singleCask": null,
+        "releaseYear": null,
+        "vintageYear": null,
+        "bottlingYear": null,
+        "caskStrength": null,
+        "releaseMonth": null,
+        "familyContext": {
+          "siblingBottles": []
+        }
+      },
+      {
+        "abv": null,
+        "brand": "WhistlePig",
+        "score": 0.7386239340675941,
+        "series": null,
+        "source": ["vector"],
+        "bottler": null,
+        "edition": null,
+        "outturn": null,
+        "bottleId": 13559,
+        "category": "rye",
+        "fullName": "WhistlePig FarmStock Rye (Crop 003)",
+        "reference": "WhistlePig FarmStock Rye (Crop 003), 43%",
+        "statedAge": null,
+        "caskNumber": null,
+        "comparison": {
+          "missing": ["abv"],
+          "conflicts": [],
+          "agreements": ["category", "brand"]
+        },
+        "distillery": [],
+        "maturation": null,
+        "releaseDay": null,
+        "singleCask": null,
+        "releaseYear": null,
+        "vintageYear": null,
+        "bottlingYear": null,
+        "caskStrength": null,
+        "releaseMonth": null,
+        "familyContext": {
+          "siblingBottles": []
+        }
+      },
+      {
+        "abv": null,
+        "brand": "WhistlePig",
+        "score": 0.7379588622875217,
+        "series": null,
+        "source": ["vector"],
+        "bottler": null,
+        "edition": null,
+        "outturn": null,
+        "bottleId": 13682,
+        "category": "rye",
+        "fullName": "WhistlePig PiggyBack 6-year-old",
+        "reference": "WhistlePig PiggyBack 6-year-old, 48.28%",
+        "statedAge": 6,
+        "caskNumber": null,
+        "comparison": {
+          "missing": ["abv"],
+          "conflicts": [],
+          "agreements": ["category", "brand"]
+        },
+        "distillery": [],
+        "maturation": null,
+        "releaseDay": null,
+        "singleCask": null,
+        "releaseYear": null,
+        "vintageYear": null,
+        "bottlingYear": null,
+        "caskStrength": null,
+        "releaseMonth": null,
+        "familyContext": {
+          "siblingBottles": []
+        }
+      },
+      {
+        "abv": null,
+        "brand": "WhistlePig",
+        "score": 0.736590233168473,
+        "series": null,
+        "source": ["vector"],
+        "bottler": null,
+        "edition": null,
+        "outturn": null,
+        "bottleId": 12946,
+        "category": "rye",
+        "fullName": "WhistlePig 10-year-old Small Batch",
+        "reference": "WhistlePig 10-year-old Small Batch, 50%",
+        "statedAge": 10,
+        "caskNumber": null,
+        "comparison": {
+          "missing": ["abv"],
+          "conflicts": [],
+          "agreements": ["category", "brand"]
+        },
+        "distillery": [],
+        "maturation": null,
+        "releaseDay": null,
+        "singleCask": null,
+        "releaseYear": null,
+        "vintageYear": null,
+        "bottlingYear": null,
+        "caskStrength": null,
+        "releaseMonth": null,
+        "familyContext": {
+          "siblingBottles": []
+        }
+      },
+      {
+        "abv": null,
+        "brand": "WhistlePig",
+        "score": 0.7151986478194508,
+        "series": null,
+        "source": ["vector"],
+        "bottler": null,
+        "edition": null,
+        "outturn": null,
+        "bottleId": 16660,
+        "category": "rye",
+        "fullName": "WhistlePig The Boss Hog 12-year-old Single Barrel",
+        "reference": "WhistlePig The Boss Hog 12-year-old Single Barrel, 67%",
+        "statedAge": 12,
+        "caskNumber": null,
+        "comparison": {
+          "missing": ["abv"],
+          "conflicts": [],
+          "agreements": ["category", "brand"]
+        },
+        "distillery": [],
+        "maturation": null,
+        "releaseDay": null,
+        "singleCask": true,
+        "releaseYear": null,
+        "vintageYear": null,
+        "bottlingYear": null,
+        "caskStrength": null,
+        "releaseMonth": null,
+        "familyContext": {
+          "siblingBottles": []
+        }
+      },
+      {
+        "abv": null,
+        "brand": "WhistlePig",
+        "score": 0.6985116692745437,
+        "series": null,
+        "source": ["vector"],
+        "bottler": null,
+        "edition": null,
+        "outturn": null,
+        "bottleId": 13870,
+        "category": "rye",
+        "fullName": "WhistlePig The Boss Hog V: The Spirit of Mauve",
+        "reference": "WhistlePig The Boss Hog V: The Spirit of Mauve, 59.5%",
+        "statedAge": null,
+        "caskNumber": null,
+        "comparison": {
+          "missing": ["abv"],
+          "conflicts": [],
+          "agreements": ["category", "brand"]
+        },
+        "distillery": [],
+        "maturation": null,
+        "releaseDay": null,
+        "singleCask": null,
+        "releaseYear": null,
+        "vintageYear": null,
+        "bottlingYear": null,
+        "caskStrength": null,
+        "releaseMonth": null,
+        "familyContext": {
+          "siblingBottles": []
+        }
+      },
+      {
+        "abv": 43,
+        "brand": "WhistlePig",
+        "score": 0.5,
+        "series": "Old World",
+        "source": ["brand_coverage"],
+        "bottler": null,
+        "edition": "Master of Malt Exclusive",
+        "outturn": null,
+        "bottleId": 58262,
+        "category": "rye",
+        "fullName": "WhistlePig 12-year-old Oloroso Cask - Master of Malt Exclusive",
+        "reference": null,
+        "statedAge": 12,
+        "caskNumber": null,
+        "comparison": {
+          "missing": [],
+          "conflicts": [],
+          "agreements": ["category", "abv", "brand"]
+        },
+        "distillery": [],
+        "maturation": "Oloroso sherry butt finish",
+        "releaseDay": null,
+        "singleCask": true,
+        "releaseYear": 2019,
+        "vintageYear": null,
+        "bottlingYear": null,
+        "caskStrength": null,
+        "releaseMonth": null,
+        "familyContext": {
+          "siblingBottles": []
+        }
+      },
+      {
+        "abv": 43,
+        "brand": "WhistlePig",
+        "score": 0.5,
+        "series": null,
+        "source": ["brand_coverage"],
+        "bottler": null,
+        "edition": "Mission Exclusive",
+        "outturn": null,
+        "bottleId": 61962,
+        "category": "rye",
+        "fullName": "WhistlePig Bespoke Barrel 12-year-old Maple Crème Brûlée Cask - Mission Exclusive",
+        "reference": null,
+        "statedAge": 12,
+        "caskNumber": null,
+        "comparison": {
+          "missing": [],
+          "conflicts": [],
+          "agreements": ["category", "abv", "brand"]
+        },
+        "distillery": [],
+        "maturation": null,
+        "releaseDay": null,
+        "singleCask": true,
+        "releaseYear": null,
+        "vintageYear": null,
+        "bottlingYear": null,
+        "caskStrength": null,
+        "releaseMonth": null,
+        "familyContext": {
+          "siblingBottles": []
+        }
+      }
+    ]
+  },
+  "context": {
+    "inspectedBottleIds": [63260],
+    "bottleContexts": [
+      {
+        "exact": {
+          "abv": 43,
+          "edition": "USA 250th Anniversary Edition",
+          "outturn": null,
+          "statedAge": null,
+          "caskNumber": null,
+          "maturation": null,
+          "releaseDay": null,
+          "singleCask": null,
+          "releaseYear": null,
+          "vintageYear": null,
+          "bottlingYear": null,
+          "caskStrength": null,
+          "releaseMonth": null
+        },
+        "shared": {
+          "name": "Declaration Wheat Whiskey",
+          "brand": {
+            "name": "WhistlePig",
+            "entityId": 1488
+          },
+          "series": null,
+          "bottler": null,
+          "category": "wheat",
+          "statedAge": null,
+          "distillers": []
+        },
+        "groupId": 36221,
+        "bottleId": 63260,
+        "fullName": "WhistlePig Declaration Wheat Whiskey - USA 250th Anniversary Edition",
+        "siblings": [],
+        "references": [],
+        "observations": [
+          {
+            "facts": {
+              "proposalType": "create_new",
+              "proposedBottle": {
+                "abv": 43,
+                "name": "Declaration",
+                "brand": {
+                  "id": 1488,
+                  "name": "WhistlePig"
+                },
+                "series": null,
+                "bottler": null,
+                "edition": "USA 250th Anniversary Edition",
+                "outturn": null,
+                "category": "wheat",
+                "statedAge": null,
+                "caskNumber": null,
+                "distillers": [],
+                "maturation": "Double aged in American oak; second finish in wave stave barrels",
+                "releaseDay": null,
+                "singleCask": null,
+                "releaseYear": null,
+                "vintageYear": null,
+                "bottlingYear": null,
+                "caskStrength": null,
+                "releaseMonth": null
+              },
+              "referenceScope": "none"
+            },
+            "rawText": "WhistlePig America's 250th Declaration Wheat Whiskey",
+            "sourceKey": "store_price:12059662",
+            "sourceUrl": "https://kegnbottle.com/products/whistlepig-americas-250th-declaration-wheat-whiskey-750ml",
+            "sourceName": "WhistlePig America's 250th Declaration Wheat Whiskey",
+            "sourceType": "store_price",
+            "parsedIdentity": {
+              "abv": 43,
+              "brand": "WhistlePig",
+              "series": null,
+              "bottler": null,
+              "edition": "USA 250th Anniversary",
+              "outturn": null,
+              "category": "wheat",
+              "distillery": [],
+              "expression": "Declaration",
+              "maturation": "Double aged in new American oak barrels",
+              "stated_age": null,
+              "cask_number": null,
+              "release_day": null,
+              "single_cask": null,
+              "release_year": null,
+              "vintage_year": null,
+              "bottling_year": null,
+              "cask_strength": null,
+              "release_month": null
+            }
+          },
+          {
+            "facts": {
+              "proposalType": "create_new",
+              "proposedBottle": {
+                "abv": null,
+                "name": "Declaration",
+                "brand": {
+                  "id": null,
+                  "name": "WhistlePig"
+                },
+                "series": null,
+                "bottler": null,
+                "edition": "USA 250th Anniversary Edition",
+                "outturn": null,
+                "category": "wheat",
+                "statedAge": null,
+                "caskNumber": null,
+                "distillers": [],
+                "maturation": null,
+                "releaseDay": null,
+                "singleCask": null,
+                "releaseYear": null,
+                "vintageYear": null,
+                "bottlingYear": null,
+                "caskStrength": null,
+                "releaseMonth": null
+              },
+              "referenceScope": "none"
+            },
+            "rawText": "Whistlepig Declaration Wheat Whiskey Usa 250th Anniversary Edition",
+            "sourceKey": "store_price:12041130",
+            "sourceUrl": "https://www.reservebar.com/products/whistlepig-declaration-wheat-whiskey-usa-250-th-anniversary-edition/GROUPING-2563705",
+            "sourceName": "Whistlepig Declaration Wheat Whiskey Usa 250th Anniversary Edition",
+            "sourceType": "store_price",
+            "parsedIdentity": null
+          }
+        ],
+        "imageSources": [
+          {
+            "url": "https://api.peated.com/uploads/prices-saqza4um4y5f4e3lsmgexvsg.webp",
+            "source": {
+              "kind": "bottle"
+            },
+            "sourceUrl": "https://www.reservebar.com/products/whistlepig-declaration-wheat-whiskey-usa-250-th-anniversary-edition/GROUPING-2563705"
+          }
+        ]
+      }
+    ],
+    "inspectedEntities": [
+      {
+        "kind": "distillery",
+        "name": "WhistlePig",
+        "score": 1,
+        "source": ["exact", "text", "prefix", "contained"],
+        "entityId": 1488,
+        "reference": "WhistlePig",
+        "shortName": null,
+        "retrievedFor": [
+          {
+            "exact": true,
+            "query": "WhistlePig"
+          }
+        ]
+      }
+    ],
+    "inspectedSeries": []
+  },
+  "provenance": {
+    "source": "production_miss",
+    "verifiedSourceUrls": [
+      "https://whiskyadvocate.com/WhistlePig-Declaration-Double-American-Oak-Aged-43",
+      "https://www.whistlepigwhiskey.com/whiskeys/declaration-wheat-whiskey"
+    ],
+    "dbOutcome": {
+      "bottleId": 63260,
+      "createsBottle": false,
+      "summary": "Production returned match."
+    },
+    "notes": "Captured from saved classifier run 29682 (review 19034, model openai/gpt-6-luna, 2026-10-28T08:48:19.387Z). Production rationale: Match Bottle 63260. Its inspected label identifies WhistlePig Declaration Wheat Whiskey, USA 250th Anniversary Edition, at 43% ABV, and says it is double aged in new American oak. The Whisky Advocate page identifies the reviewed product as wheat whiskey and ties it to the 250th anniversary; its oak wording describes the maturation rather than a different release. Checked 2026-11-03. Every populated identity fact on Bottle 63260 has a source: Brand WhistlePig (title), name Declaration (title and WhistlePig's 'Declaration Wheat Whiskey' page), ABV 43% (title), category wheat (Whisky Advocate category Wheat Whiskey and the label read), edition USA 250th Anniversary Edition (Whisky Advocate's 'America's 250th birthday' and the label read). It has no bottler, distiller, age, or year to anchor. Production matched 63260 with supportive web evidence and held it only because of the code risk 'Extracted category conflicts with the matched Bottle'; the extracted 'rye' appears nowhere in the source. expectedTier auto fails until that extracted-field risk can yield to source and label evidence."
+  },
+  "expected": {
+    "status": "classified",
+    "action": "match",
+    "identityScope": "product",
+    "matchedBottleId": 63260,
+    "expectedTier": "auto",
+    "summary": "Whisky Advocate files WhistlePig Declaration Double American Oak Aged, 43%, under Wheat Whiskey and says it celebrates America's 250th birthday. Bottle 63260 is WhistlePig Declaration Wheat Whiskey, USA 250th Anniversary Edition, 43%, wheat, and its label reads the same. The extracted 'rye' category is an extraction guess, not a source fact. Every stored identity fact is anchored, so the match should apply automatically."
+  },
+  "knownFailure": {
+    "reason": "reviewPolicy.ts holds the match because an extracted category conflicts, though the source and label anchor every fact."
+  }
+}

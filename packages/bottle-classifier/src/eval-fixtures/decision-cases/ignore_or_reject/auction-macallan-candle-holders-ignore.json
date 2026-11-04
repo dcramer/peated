@@ -1,0 +1,623 @@
+{
+  "id": "auction-macallan-candle-holders-ignore",
+  "name": "Auction lot of three Macallan candle holders is ignored, not no_match",
+  "input": {
+    "reference": {
+      "id": 3195,
+      "url": "https://www.scotchwhiskyauctions.com/auctions/232-the-183rd-auction/898553-macallan-distil-your-world-mexico-edition-candle-holders-x-3/",
+      "name": "Macallan Distil Your World Mexico Edition Candle Holders x 3",
+      "imageUrl": null,
+      "externalSiteId": 28097,
+      "currentBottleId": null
+    },
+    "extractedIdentity": null,
+    "imageEvidence": null,
+    "initialCandidates": [
+      {
+        "abv": null,
+        "brand": "The Macallan",
+        "score": 145.22202,
+        "series": "Distil Your World",
+        "source": ["text", "context"],
+        "bottler": null,
+        "edition": null,
+        "outturn": null,
+        "bottleId": 54609,
+        "category": "single_malt",
+        "fullName": "The Macallan Distil Your World Mexico",
+        "reference": null,
+        "statedAge": null,
+        "caskNumber": null,
+        "comparison": {
+          "missing": [],
+          "conflicts": [],
+          "agreements": []
+        },
+        "distillery": ["The Macallan"],
+        "maturation": null,
+        "releaseDay": null,
+        "singleCask": null,
+        "releaseYear": null,
+        "vintageYear": null,
+        "bottlingYear": null,
+        "caskStrength": null,
+        "releaseMonth": null,
+        "familyContext": {
+          "siblingBottles": []
+        }
+      },
+      {
+        "abv": null,
+        "brand": "The Macallan",
+        "score": 112.444016,
+        "series": "Distil Your World",
+        "source": ["text"],
+        "bottler": null,
+        "edition": null,
+        "outturn": null,
+        "bottleId": 54606,
+        "category": "single_malt",
+        "fullName": "The Macallan Distil Your World Jerez",
+        "reference": null,
+        "statedAge": null,
+        "caskNumber": null,
+        "comparison": {
+          "missing": [],
+          "conflicts": [],
+          "agreements": []
+        },
+        "distillery": ["The Macallan"],
+        "maturation": null,
+        "releaseDay": null,
+        "singleCask": null,
+        "releaseYear": null,
+        "vintageYear": null,
+        "bottlingYear": null,
+        "caskStrength": null,
+        "releaseMonth": null,
+        "familyContext": {
+          "siblingBottles": []
+        }
+      },
+      {
+        "abv": null,
+        "brand": "The Macallan",
+        "score": 112.444016,
+        "series": "Distil Your World",
+        "source": ["text"],
+        "bottler": null,
+        "edition": null,
+        "outturn": null,
+        "bottleId": 54607,
+        "category": "single_malt",
+        "fullName": "The Macallan Distil Your World London",
+        "reference": null,
+        "statedAge": null,
+        "caskNumber": null,
+        "comparison": {
+          "missing": [],
+          "conflicts": [],
+          "agreements": []
+        },
+        "distillery": ["The Macallan"],
+        "maturation": null,
+        "releaseDay": null,
+        "singleCask": null,
+        "releaseYear": null,
+        "vintageYear": null,
+        "bottlingYear": null,
+        "caskStrength": null,
+        "releaseMonth": null,
+        "familyContext": {
+          "siblingBottles": []
+        }
+      },
+      {
+        "abv": null,
+        "brand": "The Macallan",
+        "score": 112.444016,
+        "series": "Distil Your World",
+        "source": ["text"],
+        "bottler": null,
+        "edition": null,
+        "outturn": null,
+        "bottleId": 54620,
+        "category": "single_malt",
+        "fullName": "The Macallan Distil Your World Scotland",
+        "reference": null,
+        "statedAge": null,
+        "caskNumber": null,
+        "comparison": {
+          "missing": [],
+          "conflicts": [],
+          "agreements": []
+        },
+        "distillery": ["The Macallan"],
+        "maturation": null,
+        "releaseDay": null,
+        "singleCask": null,
+        "releaseYear": null,
+        "vintageYear": null,
+        "bottlingYear": null,
+        "caskStrength": null,
+        "releaseMonth": null,
+        "familyContext": {
+          "siblingBottles": []
+        }
+      },
+      {
+        "abv": null,
+        "brand": "The Macallan",
+        "score": 110.33147,
+        "series": "Distil Your World",
+        "source": ["text"],
+        "bottler": null,
+        "edition": null,
+        "outturn": null,
+        "bottleId": 54605,
+        "category": "single_malt",
+        "fullName": "The Macallan Distil Your World Hong Kong",
+        "reference": null,
+        "statedAge": null,
+        "caskNumber": null,
+        "comparison": {
+          "missing": [],
+          "conflicts": [],
+          "agreements": []
+        },
+        "distillery": ["The Macallan"],
+        "maturation": null,
+        "releaseDay": null,
+        "singleCask": null,
+        "releaseYear": null,
+        "vintageYear": null,
+        "bottlingYear": null,
+        "caskStrength": null,
+        "releaseMonth": null,
+        "familyContext": {
+          "siblingBottles": []
+        }
+      },
+      {
+        "abv": null,
+        "brand": "The Macallan",
+        "score": 110.33147,
+        "series": "Distil Your World",
+        "source": ["text"],
+        "bottler": null,
+        "edition": null,
+        "outturn": null,
+        "bottleId": 54614,
+        "category": "single_malt",
+        "fullName": "The Macallan Distil Your World New York",
+        "reference": null,
+        "statedAge": null,
+        "caskNumber": null,
+        "comparison": {
+          "missing": [],
+          "conflicts": [],
+          "agreements": []
+        },
+        "distillery": ["The Macallan"],
+        "maturation": null,
+        "releaseDay": null,
+        "singleCask": null,
+        "releaseYear": null,
+        "vintageYear": null,
+        "bottlingYear": null,
+        "caskStrength": null,
+        "releaseMonth": null,
+        "familyContext": {
+          "siblingBottles": []
+        }
+      },
+      {
+        "abv": 47.2,
+        "brand": "The Macallan",
+        "score": 106.0788,
+        "series": "Distil Your World",
+        "source": ["text"],
+        "bottler": null,
+        "edition": null,
+        "outturn": null,
+        "bottleId": 54615,
+        "category": "single_malt",
+        "fullName": "The Macallan Distil Your World Paris",
+        "reference": null,
+        "statedAge": null,
+        "caskNumber": null,
+        "comparison": {
+          "missing": [],
+          "conflicts": [],
+          "agreements": []
+        },
+        "distillery": ["The Macallan"],
+        "maturation": "Sherry seasoned American and European oak casks, ex-bourbon casks, and Cognac casks",
+        "releaseDay": 26,
+        "singleCask": false,
+        "releaseYear": 2026,
+        "vintageYear": null,
+        "bottlingYear": null,
+        "caskStrength": null,
+        "releaseMonth": 2,
+        "familyContext": {
+          "siblingBottles": []
+        }
+      },
+      {
+        "abv": null,
+        "brand": "The Macallan",
+        "score": 96.37362,
+        "series": null,
+        "source": ["text"],
+        "bottler": null,
+        "edition": null,
+        "outturn": null,
+        "bottleId": 56129,
+        "category": "single_malt",
+        "fullName": "The Macallan Distil Your World Paris Edition",
+        "reference": null,
+        "statedAge": null,
+        "caskNumber": null,
+        "comparison": {
+          "missing": [],
+          "conflicts": [],
+          "agreements": []
+        },
+        "distillery": ["The Macallan"],
+        "maturation": null,
+        "releaseDay": null,
+        "singleCask": null,
+        "releaseYear": null,
+        "vintageYear": null,
+        "bottlingYear": null,
+        "caskStrength": null,
+        "releaseMonth": null,
+        "familyContext": {
+          "siblingBottles": []
+        }
+      },
+      {
+        "abv": null,
+        "brand": "The Macallan",
+        "score": 93.62488,
+        "series": "Distil Your World",
+        "source": ["text"],
+        "bottler": null,
+        "edition": null,
+        "outturn": null,
+        "bottleId": 56130,
+        "category": "single_malt",
+        "fullName": "The Macallan Hong Kong Edition",
+        "reference": null,
+        "statedAge": null,
+        "caskNumber": null,
+        "comparison": {
+          "missing": [],
+          "conflicts": [],
+          "agreements": []
+        },
+        "distillery": ["The Macallan"],
+        "maturation": null,
+        "releaseDay": null,
+        "singleCask": null,
+        "releaseYear": null,
+        "vintageYear": null,
+        "bottlingYear": null,
+        "caskStrength": null,
+        "releaseMonth": null,
+        "familyContext": {
+          "siblingBottles": []
+        }
+      },
+      {
+        "abv": null,
+        "brand": "The Glenlivet",
+        "score": 41.245018,
+        "series": null,
+        "source": ["text"],
+        "bottler": null,
+        "edition": "Gohar World",
+        "outturn": null,
+        "bottleId": 43890,
+        "category": "single_malt",
+        "fullName": "The Glenlivet Mark The Moment - Gohar World",
+        "reference": null,
+        "statedAge": null,
+        "caskNumber": null,
+        "comparison": {
+          "missing": [],
+          "conflicts": [],
+          "agreements": []
+        },
+        "distillery": ["The Glenlivet"],
+        "maturation": null,
+        "releaseDay": null,
+        "singleCask": null,
+        "releaseYear": null,
+        "vintageYear": null,
+        "bottlingYear": null,
+        "caskStrength": null,
+        "releaseMonth": null,
+        "familyContext": {
+          "siblingBottles": []
+        }
+      },
+      {
+        "abv": 45,
+        "brand": "Cut Your Wolf Loose",
+        "score": 40.98868,
+        "series": null,
+        "source": ["text"],
+        "bottler": "Cut Your Wolf Loose",
+        "edition": "Release 20 x Codo",
+        "outturn": 263,
+        "bottleId": 51887,
+        "category": null,
+        "fullName": "Cut Your Wolf Loose Speyside - Release 20 x Codo",
+        "reference": null,
+        "statedAge": 28,
+        "caskNumber": null,
+        "comparison": {
+          "missing": [],
+          "conflicts": [],
+          "agreements": []
+        },
+        "distillery": [],
+        "maturation": "Refill Bourbon Hogshead",
+        "releaseDay": null,
+        "singleCask": true,
+        "releaseYear": null,
+        "vintageYear": null,
+        "bottlingYear": null,
+        "caskStrength": null,
+        "releaseMonth": null,
+        "familyContext": {
+          "siblingBottles": []
+        }
+      },
+      {
+        "abv": 62,
+        "brand": "Cut Your Wolf Loose",
+        "score": 38.70186,
+        "series": null,
+        "source": ["text"],
+        "bottler": "Cut Your Wolf Loose",
+        "edition": "CYWL x Mike Boyd, Release #7",
+        "outturn": null,
+        "bottleId": 51880,
+        "category": "single_malt",
+        "fullName": "Cut Your Wolf Loose Bruichladdich - CYWL x Mike Boyd, Release #7",
+        "reference": null,
+        "statedAge": 14,
+        "caskNumber": null,
+        "comparison": {
+          "missing": [],
+          "conflicts": [],
+          "agreements": []
+        },
+        "distillery": ["Bruichladdich"],
+        "maturation": "First fill bourbon barrel",
+        "releaseDay": null,
+        "singleCask": true,
+        "releaseYear": null,
+        "vintageYear": null,
+        "bottlingYear": null,
+        "caskStrength": true,
+        "releaseMonth": null,
+        "familyContext": {
+          "siblingBottles": []
+        }
+      },
+      {
+        "abv": 40.8,
+        "brand": "The Macallan",
+        "score": 38.67958,
+        "series": "Concept",
+        "source": ["vector", "text"],
+        "bottler": null,
+        "edition": null,
+        "outturn": null,
+        "bottleId": 589,
+        "category": "single_malt",
+        "fullName": "The Macallan Concept Number 3",
+        "reference": "Macallan Concept No. 3",
+        "statedAge": null,
+        "caskNumber": null,
+        "comparison": {
+          "missing": [],
+          "conflicts": [],
+          "agreements": []
+        },
+        "distillery": ["The Macallan"],
+        "maturation": null,
+        "releaseDay": null,
+        "singleCask": null,
+        "releaseYear": 2020,
+        "vintageYear": null,
+        "bottlingYear": null,
+        "caskStrength": null,
+        "releaseMonth": null,
+        "familyContext": {
+          "siblingBottles": []
+        }
+      },
+      {
+        "abv": 49,
+        "brand": "That Boutique-y Whisky Company",
+        "score": 38.42878,
+        "series": "World of Smoke",
+        "source": ["text"],
+        "bottler": "That Boutique-y Whisky Company",
+        "edition": "Batch 3",
+        "outturn": 107,
+        "bottleId": 58344,
+        "category": "single_malt",
+        "fullName": "TBWC Octomore - Batch 3",
+        "reference": null,
+        "statedAge": 6,
+        "caskNumber": null,
+        "comparison": {
+          "missing": [],
+          "conflicts": [],
+          "agreements": []
+        },
+        "distillery": ["Bruichladdich"],
+        "maturation": "Sherry cask finish",
+        "releaseDay": null,
+        "singleCask": null,
+        "releaseYear": 2023,
+        "vintageYear": null,
+        "bottlingYear": null,
+        "caskStrength": null,
+        "releaseMonth": null,
+        "familyContext": {
+          "siblingBottles": []
+        }
+      },
+      {
+        "abv": 49.8,
+        "brand": "Wemyss Malts",
+        "score": 38.102673,
+        "series": null,
+        "source": ["text"],
+        "bottler": "Wemyss Malts",
+        "edition": null,
+        "outturn": 236,
+        "bottleId": 2017,
+        "category": "single_malt",
+        "fullName": "Wemyss Malts Tropical Scented Candle",
+        "reference": null,
+        "statedAge": 22,
+        "caskNumber": null,
+        "comparison": {
+          "missing": [],
+          "conflicts": [],
+          "agreements": []
+        },
+        "distillery": ["Clynelish"],
+        "maturation": "Hogshead",
+        "releaseDay": null,
+        "singleCask": null,
+        "releaseYear": null,
+        "vintageYear": 1997,
+        "bottlingYear": 2020,
+        "caskStrength": null,
+        "releaseMonth": null,
+        "familyContext": {
+          "siblingBottles": []
+        }
+      }
+    ]
+  },
+  "context": {
+    "inspectedBottleIds": [54609],
+    "bottleContexts": [
+      {
+        "exact": {
+          "abv": null,
+          "edition": null,
+          "outturn": null,
+          "statedAge": null,
+          "caskNumber": null,
+          "maturation": null,
+          "releaseDay": null,
+          "singleCask": null,
+          "releaseYear": null,
+          "vintageYear": null,
+          "bottlingYear": null,
+          "caskStrength": null,
+          "releaseMonth": null
+        },
+        "shared": {
+          "name": "Distil Your World Mexico",
+          "brand": {
+            "name": "The Macallan",
+            "entityId": 1157
+          },
+          "series": {
+            "name": "Distil Your World",
+            "seriesId": 715
+          },
+          "bottler": null,
+          "category": "single_malt",
+          "statedAge": null,
+          "distillers": [
+            {
+              "name": "The Macallan",
+              "entityId": 1157
+            }
+          ]
+        },
+        "groupId": 27570,
+        "bottleId": 54609,
+        "fullName": "The Macallan Distil Your World Mexico",
+        "siblings": [],
+        "references": [],
+        "observations": [
+          {
+            "facts": {
+              "proposalType": "match_existing",
+              "proposedBottle": null,
+              "referenceScope": "none"
+            },
+            "rawText": "The Macallan Distil Your World Mexico Edition Single Malt Scotch Whiskey",
+            "sourceKey": "store_price:12060687",
+            "sourceUrl": "https://kegnbottle.com/products/the-macallan-distil-your-world-mexico-edition-single-malt-scotch-whiskey-700ml",
+            "sourceName": "The Macallan Distil Your World Mexico Edition Single Malt Scotch Whiskey",
+            "sourceType": "store_price",
+            "parsedIdentity": {
+              "abv": 48,
+              "brand": "The Macallan",
+              "series": "Distil Your World",
+              "bottler": null,
+              "edition": null,
+              "outturn": null,
+              "category": "single_malt",
+              "distillery": ["The Macallan"],
+              "expression": "Mexico",
+              "maturation": null,
+              "stated_age": null,
+              "cask_number": null,
+              "release_day": null,
+              "single_cask": null,
+              "release_year": null,
+              "vintage_year": null,
+              "bottling_year": null,
+              "cask_strength": null,
+              "release_month": null
+            }
+          }
+        ],
+        "imageSources": [
+          {
+            "url": "https://api.peated.com/uploads/prices-nx40bmzf2zfemtj3r177ibjn.webp",
+            "source": {
+              "kind": "bottle"
+            },
+            "sourceUrl": "https://kegnbottle.com/products/the-macallan-distil-your-world-mexico-edition-single-malt-scotch-whiskey-700ml"
+          }
+        ]
+      }
+    ],
+    "inspectedEntities": [],
+    "inspectedSeries": []
+  },
+  "provenance": {
+    "source": "production_miss",
+    "verifiedSourceUrls": [
+      "https://www.scotchwhiskyauctions.com/auctions/232-the-183rd-auction/898553-macallan-distil-your-world-mexico-edition-candle-holders-x-3/",
+      "https://www.scotchwhiskyauctions.com/auctions/234-the-185th-auction/908389-macallan-distil-your-world-mexico-edition-candle-holders-x-3/"
+    ],
+    "dbOutcome": {
+      "bottleId": null,
+      "createsBottle": false,
+      "summary": "Production returned no_match."
+    },
+    "notes": "Captured from saved classifier run 21339 (auction_lot 3195, model null, 2026-10-02T01:47:38.466Z). Production rationale: The source identifies three candle holders, not a whisky bottle. Bottle 54609 is the related Distil Your World Mexico whisky, but it does not represent this auction lot. Checked 2026-11-03. Lot 183-04738 page: 'Macallan Distil Your World Mexico Edition Candle Holders x 3 ... Please note these holders do not contain any original wax.' No volume or ABV. The same item returned as lot 16810 in the 185th auction, also held as no_match. The production rationale itself said 'The source identifies three candle holders, not a whisky bottle', yet the agent returned no_match instead of ignore. docs/architecture/bottle-classifier.md Scope: glassware and other accessories are ignored."
+  },
+  "expected": {
+    "status": "ignored",
+    "summary": "The lot is three Macallan Distil Your World Mexico candle holders, with no whisky. Merchandise is out of scope, so ignore it instead of returning no_match and sending it to review, even though a related Distil Your World Mexico whisky Bottle exists."
+  }
+}

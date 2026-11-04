@@ -1,0 +1,1148 @@
+{
+  "id": "review-2xo-rappers-delight-category-tier",
+  "name": "Review: 2XO Rapper's Delight Hip-Hop Blend matches despite an extracted 'blend' category",
+  "input": {
+    "reference": {
+      "id": 19003,
+      "url": "https://whiskyadvocate.com/2XO-Rapper-s-Delight-Hip-Hop-Blend-52",
+      "name": "2XO Rapper’s Delight Hip-Hop Blend, 52%",
+      "imageUrl": null,
+      "externalSiteId": 5,
+      "currentBottleId": null
+    },
+    "extractedIdentity": {
+      "abv": 52,
+      "brand": "2XO",
+      "series": null,
+      "bottler": null,
+      "edition": null,
+      "outturn": null,
+      "category": "blend",
+      "distillery": [],
+      "expression": "Rapper’s Delight",
+      "maturation": null,
+      "stated_age": null,
+      "cask_number": null,
+      "release_day": null,
+      "single_cask": null,
+      "release_year": null,
+      "vintage_year": null,
+      "bottling_year": null,
+      "cask_strength": null,
+      "release_month": null
+    },
+    "imageEvidence": null,
+    "initialCandidates": [
+      {
+        "abv": 52,
+        "brand": "2XO Whiskey",
+        "score": 42.682373,
+        "series": "ICON SERIES",
+        "source": ["vector", "text", "brand_coverage"],
+        "bottler": null,
+        "edition": null,
+        "outturn": null,
+        "bottleId": 58030,
+        "category": "bourbon",
+        "fullName": "2XO The Vinyl Blend",
+        "reference": "2XO The Vinyl Blend, 52%",
+        "statedAge": null,
+        "caskNumber": null,
+        "comparison": {
+          "missing": [],
+          "conflicts": ["category", "brand"],
+          "agreements": ["abv"]
+        },
+        "distillery": [],
+        "maturation": null,
+        "releaseDay": null,
+        "singleCask": null,
+        "releaseYear": 2025,
+        "vintageYear": null,
+        "bottlingYear": null,
+        "caskStrength": null,
+        "releaseMonth": 4,
+        "familyContext": {
+          "siblingBottles": []
+        }
+      },
+      {
+        "abv": 52,
+        "brand": "2XO Whiskey",
+        "score": 42.44472,
+        "series": null,
+        "source": ["vector", "text", "brand_coverage"],
+        "bottler": "2XO Whiskey",
+        "edition": null,
+        "outturn": null,
+        "bottleId": 39681,
+        "category": "bourbon",
+        "fullName": "2XO The Innkeeper's Blend",
+        "reference": "2XO The Innkeeper's Blend Whiskey",
+        "statedAge": null,
+        "caskNumber": null,
+        "comparison": {
+          "missing": [],
+          "conflicts": ["category", "brand"],
+          "agreements": ["abv"]
+        },
+        "distillery": [],
+        "maturation": null,
+        "releaseDay": null,
+        "singleCask": null,
+        "releaseYear": null,
+        "vintageYear": null,
+        "bottlingYear": null,
+        "caskStrength": null,
+        "releaseMonth": null,
+        "familyContext": {
+          "siblingBottles": []
+        }
+      },
+      {
+        "abv": 52,
+        "brand": "2XO Whiskey",
+        "score": 41.871437,
+        "series": null,
+        "source": ["text", "brand_coverage", "context"],
+        "bottler": "2XO Whiskey",
+        "edition": null,
+        "outturn": null,
+        "bottleId": 67040,
+        "category": "bourbon",
+        "fullName": "2XO The Hip-Hop Blend",
+        "reference": null,
+        "statedAge": null,
+        "caskNumber": null,
+        "comparison": {
+          "missing": [],
+          "conflicts": ["category", "brand"],
+          "agreements": ["abv"]
+        },
+        "distillery": [],
+        "maturation": null,
+        "releaseDay": null,
+        "singleCask": null,
+        "releaseYear": null,
+        "vintageYear": null,
+        "bottlingYear": null,
+        "caskStrength": null,
+        "releaseMonth": null,
+        "familyContext": {
+          "siblingBottles": []
+        }
+      },
+      {
+        "abv": null,
+        "brand": "2XO Whiskey",
+        "score": 38.38745,
+        "series": null,
+        "source": ["vector", "text", "brand_coverage"],
+        "bottler": "2XO Whiskey",
+        "edition": null,
+        "outturn": null,
+        "bottleId": 39678,
+        "category": "bourbon",
+        "fullName": "2XO American Oak",
+        "reference": "2XO Oak Series American Oak, 46%",
+        "statedAge": null,
+        "caskNumber": null,
+        "comparison": {
+          "missing": ["abv"],
+          "conflicts": ["category", "brand"],
+          "agreements": []
+        },
+        "distillery": [],
+        "maturation": null,
+        "releaseDay": null,
+        "singleCask": null,
+        "releaseYear": null,
+        "vintageYear": null,
+        "bottlingYear": null,
+        "caskStrength": null,
+        "releaseMonth": null,
+        "familyContext": {
+          "siblingBottles": []
+        }
+      },
+      {
+        "abv": null,
+        "brand": "2XO Whiskey",
+        "score": 37.253956,
+        "series": null,
+        "source": ["vector", "text"],
+        "bottler": "2XO Whiskey",
+        "edition": null,
+        "outturn": null,
+        "bottleId": 39684,
+        "category": "bourbon",
+        "fullName": "2XO French Oak",
+        "reference": "2XO Oak Series French Oak, 46%",
+        "statedAge": null,
+        "caskNumber": null,
+        "comparison": {
+          "missing": ["abv"],
+          "conflicts": ["category", "brand"],
+          "agreements": []
+        },
+        "distillery": [],
+        "maturation": null,
+        "releaseDay": null,
+        "singleCask": null,
+        "releaseYear": null,
+        "vintageYear": null,
+        "bottlingYear": null,
+        "caskStrength": null,
+        "releaseMonth": null,
+        "familyContext": {
+          "siblingBottles": []
+        }
+      },
+      {
+        "abv": null,
+        "brand": "2XO Whiskey",
+        "score": 36.7796,
+        "series": null,
+        "source": ["vector", "text", "brand_coverage"],
+        "bottler": null,
+        "edition": "",
+        "outturn": null,
+        "bottleId": 43358,
+        "category": "bourbon",
+        "fullName": "2XO The Sneakerhead Blend",
+        "reference": "2XO The Sneakerhead Blend, 52%",
+        "statedAge": null,
+        "caskNumber": null,
+        "comparison": {
+          "missing": ["abv"],
+          "conflicts": ["category", "brand"],
+          "agreements": []
+        },
+        "distillery": [],
+        "maturation": null,
+        "releaseDay": null,
+        "singleCask": null,
+        "releaseYear": null,
+        "vintageYear": null,
+        "bottlingYear": null,
+        "caskStrength": null,
+        "releaseMonth": null,
+        "familyContext": {
+          "siblingBottles": []
+        }
+      },
+      {
+        "abv": 52,
+        "brand": "Penelope",
+        "score": 33.49394,
+        "series": null,
+        "source": ["text"],
+        "bottler": null,
+        "edition": null,
+        "outturn": null,
+        "bottleId": 46963,
+        "category": "bourbon",
+        "fullName": "Penelope Architect - 52.0% ABV",
+        "reference": null,
+        "statedAge": null,
+        "caskNumber": null,
+        "comparison": {
+          "missing": [],
+          "conflicts": ["category", "brand"],
+          "agreements": ["abv"]
+        },
+        "distillery": [],
+        "maturation": null,
+        "releaseDay": null,
+        "singleCask": null,
+        "releaseYear": null,
+        "vintageYear": null,
+        "bottlingYear": null,
+        "caskStrength": null,
+        "releaseMonth": null,
+        "familyContext": {
+          "siblingBottles": []
+        }
+      },
+      {
+        "abv": 52,
+        "brand": "Lochlea",
+        "score": 32.25691,
+        "series": null,
+        "source": ["text"],
+        "bottler": "Lochlea",
+        "edition": null,
+        "outturn": null,
+        "bottleId": 45859,
+        "category": "single_malt",
+        "fullName": "Lochlea Over & Stout - 52.0% ABV",
+        "reference": null,
+        "statedAge": null,
+        "caskNumber": null,
+        "comparison": {
+          "missing": [],
+          "conflicts": ["category", "brand"],
+          "agreements": ["abv"]
+        },
+        "distillery": ["Lochlea"],
+        "maturation": null,
+        "releaseDay": null,
+        "singleCask": false,
+        "releaseYear": null,
+        "vintageYear": null,
+        "bottlingYear": null,
+        "caskStrength": null,
+        "releaseMonth": null,
+        "familyContext": {
+          "siblingBottles": []
+        }
+      },
+      {
+        "abv": 52,
+        "brand": "Lochlea",
+        "score": 28.41402,
+        "series": null,
+        "source": ["text"],
+        "bottler": "Lochlea",
+        "edition": null,
+        "outturn": null,
+        "bottleId": 46067,
+        "category": "single_malt",
+        "fullName": "Lochlea Overtone Stout Cask Finish - 52.0% ABV - Other Cask",
+        "reference": null,
+        "statedAge": null,
+        "caskNumber": null,
+        "comparison": {
+          "missing": [],
+          "conflicts": ["category", "brand"],
+          "agreements": ["abv"]
+        },
+        "distillery": ["Lochlea"],
+        "maturation": "other",
+        "releaseDay": null,
+        "singleCask": null,
+        "releaseYear": null,
+        "vintageYear": null,
+        "bottlingYear": null,
+        "caskStrength": null,
+        "releaseMonth": null,
+        "familyContext": {
+          "siblingBottles": []
+        }
+      },
+      {
+        "abv": 52,
+        "brand": "WhiskySponge",
+        "score": 26.776922,
+        "series": null,
+        "source": ["text"],
+        "bottler": "Decadent Drinks",
+        "edition": "One",
+        "outturn": null,
+        "bottleId": 49002,
+        "category": "blend",
+        "fullName": "WhiskySponge Equilibrium One - One - 10-year-old - 52.0% ABV",
+        "reference": null,
+        "statedAge": 10,
+        "caskNumber": null,
+        "comparison": {
+          "missing": [],
+          "conflicts": ["brand"],
+          "agreements": ["category", "abv"]
+        },
+        "distillery": [],
+        "maturation": "A balance of sherry and peat",
+        "releaseDay": null,
+        "singleCask": null,
+        "releaseYear": null,
+        "vintageYear": null,
+        "bottlingYear": null,
+        "caskStrength": null,
+        "releaseMonth": null,
+        "familyContext": {
+          "siblingBottles": []
+        }
+      },
+      {
+        "abv": 52,
+        "brand": "Ardnamurchan",
+        "score": 26.711723,
+        "series": null,
+        "source": ["text"],
+        "bottler": "Ardnamurchan",
+        "edition": null,
+        "outturn": null,
+        "bottleId": 45779,
+        "category": "single_malt",
+        "fullName": "Ardnamurchan AD/ Madeira Cask Release - 2025 Release - 52.0% ABV - Madeira Cask",
+        "reference": null,
+        "statedAge": null,
+        "caskNumber": null,
+        "comparison": {
+          "missing": [],
+          "conflicts": ["category", "brand"],
+          "agreements": ["abv"]
+        },
+        "distillery": ["Ardnamurchan"],
+        "maturation": "madeira",
+        "releaseDay": null,
+        "singleCask": null,
+        "releaseYear": 2025,
+        "vintageYear": null,
+        "bottlingYear": null,
+        "caskStrength": null,
+        "releaseMonth": null,
+        "familyContext": {
+          "siblingBottles": []
+        }
+      },
+      {
+        "abv": 52,
+        "brand": "That Boutique-y Whisky Company",
+        "score": 26.21185,
+        "series": null,
+        "source": ["text"],
+        "bottler": "That Boutique-y Whisky Company",
+        "edition": "Batch 10",
+        "outturn": null,
+        "bottleId": 46804,
+        "category": "single_malt",
+        "fullName": "TBWC Macduff - Batch 10 - 10-year-old - 52.0% ABV",
+        "reference": null,
+        "statedAge": 10,
+        "caskNumber": null,
+        "comparison": {
+          "missing": [],
+          "conflicts": ["category", "brand"],
+          "agreements": ["abv"]
+        },
+        "distillery": ["Macduff Distillery"],
+        "maturation": null,
+        "releaseDay": null,
+        "singleCask": null,
+        "releaseYear": null,
+        "vintageYear": null,
+        "bottlingYear": null,
+        "caskStrength": null,
+        "releaseMonth": null,
+        "familyContext": {
+          "siblingBottles": []
+        }
+      },
+      {
+        "abv": 52,
+        "brand": "James E. Pepper",
+        "score": 25.190357,
+        "series": null,
+        "source": ["text"],
+        "bottler": null,
+        "edition": "Fall 2025 Release",
+        "outturn": null,
+        "bottleId": 45494,
+        "category": "bourbon",
+        "fullName": "James E. Pepper Gold Label - Fall 2025 Release - 2025 Release - 52.0% ABV - Cask Strength",
+        "reference": null,
+        "statedAge": null,
+        "caskNumber": null,
+        "comparison": {
+          "missing": [],
+          "conflicts": ["category", "brand"],
+          "agreements": ["abv"]
+        },
+        "distillery": ["James E. Pepper"],
+        "maturation": null,
+        "releaseDay": null,
+        "singleCask": false,
+        "releaseYear": 2025,
+        "vintageYear": null,
+        "bottlingYear": null,
+        "caskStrength": true,
+        "releaseMonth": null,
+        "familyContext": {
+          "siblingBottles": []
+        }
+      },
+      {
+        "abv": 52,
+        "brand": "The Lakes",
+        "score": 25.126482,
+        "series": null,
+        "source": ["text"],
+        "bottler": null,
+        "edition": "No. 7",
+        "outturn": null,
+        "bottleId": 46017,
+        "category": "single_malt",
+        "fullName": "The Lakes The Whiskymaker's Reserve - No. 7 - 2023 Release - 52.0% ABV",
+        "reference": null,
+        "statedAge": null,
+        "caskNumber": null,
+        "comparison": {
+          "missing": [],
+          "conflicts": ["category", "brand"],
+          "agreements": ["abv"]
+        },
+        "distillery": ["The Lakes Distillery"],
+        "maturation": null,
+        "releaseDay": null,
+        "singleCask": null,
+        "releaseYear": 2023,
+        "vintageYear": null,
+        "bottlingYear": null,
+        "caskStrength": null,
+        "releaseMonth": null,
+        "familyContext": {
+          "siblingBottles": []
+        }
+      },
+      {
+        "abv": 52,
+        "brand": "Ardnamurchan",
+        "score": 24.930332,
+        "series": null,
+        "source": ["text"],
+        "bottler": "Ardnamurchan",
+        "edition": null,
+        "outturn": null,
+        "bottleId": 46021,
+        "category": "single_malt",
+        "fullName": "Ardnamurchan AD/ Tokaji Cask Release - 52.0% ABV - Tokaji Cask",
+        "reference": null,
+        "statedAge": null,
+        "caskNumber": null,
+        "comparison": {
+          "missing": [],
+          "conflicts": ["category", "brand"],
+          "agreements": ["abv"]
+        },
+        "distillery": ["Ardnamurchan"],
+        "maturation": "tokaji",
+        "releaseDay": null,
+        "singleCask": false,
+        "releaseYear": null,
+        "vintageYear": null,
+        "bottlingYear": null,
+        "caskStrength": null,
+        "releaseMonth": null,
+        "familyContext": {
+          "siblingBottles": []
+        }
+      },
+      {
+        "abv": 52,
+        "brand": "Thomson",
+        "score": 24.74719,
+        "series": null,
+        "source": ["text"],
+        "bottler": null,
+        "edition": "Limited Edition",
+        "outturn": null,
+        "bottleId": 46263,
+        "category": "single_malt",
+        "fullName": "Thomson Full Noise - Limited Edition - 52.0% ABV - Cask Strength - Bourbon Cask",
+        "reference": null,
+        "statedAge": null,
+        "caskNumber": null,
+        "comparison": {
+          "missing": [],
+          "conflicts": ["category", "brand"],
+          "agreements": ["abv"]
+        },
+        "distillery": ["Thomson"],
+        "maturation": "bourbon",
+        "releaseDay": null,
+        "singleCask": null,
+        "releaseYear": null,
+        "vintageYear": null,
+        "bottlingYear": null,
+        "caskStrength": true,
+        "releaseMonth": null,
+        "familyContext": {
+          "siblingBottles": []
+        }
+      },
+      {
+        "abv": 52,
+        "brand": "Old Orkney",
+        "score": 24.595156,
+        "series": null,
+        "source": ["text"],
+        "bottler": "Decadent Drinks",
+        "edition": "O.O.5",
+        "outturn": null,
+        "bottleId": 48990,
+        "category": "single_malt",
+        "fullName": "Old Orkney Malt - O.O.5 - 19-year-old - 52.0% ABV",
+        "reference": null,
+        "statedAge": 19,
+        "caskNumber": null,
+        "comparison": {
+          "missing": [],
+          "conflicts": ["category", "brand"],
+          "agreements": ["abv"]
+        },
+        "distillery": [],
+        "maturation": "Married from v.05 and v.99 refill hogsheads, then several months in a 3rd fill butt",
+        "releaseDay": null,
+        "singleCask": null,
+        "releaseYear": null,
+        "vintageYear": null,
+        "bottlingYear": 2025,
+        "caskStrength": null,
+        "releaseMonth": null,
+        "familyContext": {
+          "siblingBottles": []
+        }
+      },
+      {
+        "abv": 52,
+        "brand": "Single & Single",
+        "score": 24.51829,
+        "series": "Alter Ego Collection",
+        "source": ["text"],
+        "bottler": "Single & Single",
+        "edition": null,
+        "outturn": null,
+        "bottleId": 46463,
+        "category": "single_malt",
+        "fullName": "Single & Single Highland - 14-year-old - 2008 Vintage - 52.0% ABV - Butt",
+        "reference": null,
+        "statedAge": 14,
+        "caskNumber": null,
+        "comparison": {
+          "missing": [],
+          "conflicts": ["category", "brand"],
+          "agreements": ["abv"]
+        },
+        "distillery": [],
+        "maturation": null,
+        "releaseDay": null,
+        "singleCask": null,
+        "releaseYear": null,
+        "vintageYear": 2008,
+        "bottlingYear": null,
+        "caskStrength": null,
+        "releaseMonth": null,
+        "familyContext": {
+          "siblingBottles": []
+        }
+      },
+      {
+        "abv": 52,
+        "brand": "WhiskySponge",
+        "score": 23.578495,
+        "series": null,
+        "source": ["text"],
+        "bottler": "Decadent Drinks",
+        "edition": "Edition No. 4",
+        "outturn": null,
+        "bottleId": 49249,
+        "category": "single_malt",
+        "fullName": "WhiskySponge Ledaig - Edition No. 4 - 29-year-old - 1995 Vintage - 52.0% ABV",
+        "reference": null,
+        "statedAge": 29,
+        "caskNumber": null,
+        "comparison": {
+          "missing": [],
+          "conflicts": ["category", "brand"],
+          "agreements": ["abv"]
+        },
+        "distillery": ["Tobermory"],
+        "maturation": "Refill Sherry Butt",
+        "releaseDay": null,
+        "singleCask": null,
+        "releaseYear": null,
+        "vintageYear": 1995,
+        "bottlingYear": 2024,
+        "caskStrength": null,
+        "releaseMonth": null,
+        "familyContext": {
+          "siblingBottles": []
+        }
+      },
+      {
+        "abv": null,
+        "brand": "Crown Royal",
+        "score": 0.5830989776509798,
+        "series": null,
+        "source": ["vector"],
+        "bottler": null,
+        "edition": null,
+        "outturn": null,
+        "bottleId": 16671,
+        "category": "blend",
+        "fullName": "Crown Royal XO",
+        "reference": "Crown Royal XO, 40%",
+        "statedAge": null,
+        "caskNumber": null,
+        "comparison": {
+          "missing": ["abv"],
+          "conflicts": ["brand"],
+          "agreements": ["category"]
+        },
+        "distillery": [],
+        "maturation": null,
+        "releaseDay": null,
+        "singleCask": null,
+        "releaseYear": null,
+        "vintageYear": null,
+        "bottlingYear": null,
+        "caskStrength": null,
+        "releaseMonth": null,
+        "familyContext": {
+          "siblingBottles": []
+        }
+      }
+    ]
+  },
+  "context": {
+    "inspectedBottleIds": [67040],
+    "bottleContexts": [
+      {
+        "exact": {
+          "abv": 52,
+          "edition": null,
+          "outturn": null,
+          "statedAge": null,
+          "caskNumber": null,
+          "maturation": null,
+          "releaseDay": null,
+          "singleCask": null,
+          "releaseYear": null,
+          "vintageYear": null,
+          "bottlingYear": null,
+          "caskStrength": null,
+          "releaseMonth": null
+        },
+        "shared": {
+          "name": "The Hip-Hop Blend",
+          "brand": {
+            "name": "2XO Whiskey",
+            "entityId": 75636
+          },
+          "series": null,
+          "bottler": {
+            "name": "2XO Whiskey",
+            "entityId": 75636
+          },
+          "category": "bourbon",
+          "statedAge": null,
+          "distillers": []
+        },
+        "groupId": 40001,
+        "bottleId": 67040,
+        "fullName": "2XO The Hip-Hop Blend",
+        "siblings": [],
+        "references": [],
+        "observations": [
+          {
+            "facts": {
+              "proposalType": "match",
+              "proposedBottle": null,
+              "referenceScope": "none"
+            },
+            "rawText": "2xo Hip-hop Blend",
+            "sourceKey": "store_price:12062202",
+            "sourceUrl": "https://www.reservebar.com/products/2-xo-hip-hop-blend/GROUPING-2578146",
+            "sourceName": "2xo Hip-hop Blend",
+            "sourceType": "store_price",
+            "parsedIdentity": {
+              "abv": 52,
+              "brand": "2XO",
+              "series": null,
+              "bottler": null,
+              "edition": null,
+              "outturn": null,
+              "category": "bourbon",
+              "distillery": [],
+              "expression": "Rapper's Delight",
+              "maturation": null,
+              "stated_age": null,
+              "cask_number": null,
+              "release_day": null,
+              "single_cask": null,
+              "release_year": null,
+              "vintage_year": null,
+              "bottling_year": null,
+              "cask_strength": null,
+              "release_month": null
+            }
+          },
+          {
+            "facts": {
+              "proposalType": "create_bottle",
+              "proposedBottle": {
+                "abv": 52,
+                "name": "The Hip-Hop Blend",
+                "brand": {
+                  "id": 75636,
+                  "name": "2XO Whiskey"
+                },
+                "series": {
+                  "id": null,
+                  "name": "Collectibles Series"
+                },
+                "bottler": {
+                  "id": 75636,
+                  "name": "2XO Whiskey"
+                },
+                "edition": null,
+                "outturn": null,
+                "category": "bourbon",
+                "statedAge": null,
+                "caskNumber": null,
+                "distillers": [],
+                "maturation": null,
+                "releaseDay": null,
+                "singleCask": null,
+                "releaseYear": 2026,
+                "vintageYear": null,
+                "bottlingYear": null,
+                "caskStrength": null,
+                "releaseMonth": 9
+              },
+              "referenceScope": "none"
+            },
+            "rawText": "2XO Rapper's Delight Hip Hop Blend Bourbon Whiskey",
+            "sourceKey": "store_price:12060377",
+            "sourceUrl": "https://kegnbottle.com/products/2xo-rappers-delight-hip-hop-blend-bourbon-whiskey-750ml",
+            "sourceName": "2XO Rapper's Delight Hip Hop Blend Bourbon Whiskey",
+            "sourceType": "store_price",
+            "parsedIdentity": {
+              "abv": null,
+              "brand": "2XO",
+              "series": null,
+              "bottler": null,
+              "edition": null,
+              "outturn": null,
+              "category": "bourbon",
+              "distillery": [],
+              "expression": "Rapper's Delight",
+              "maturation": null,
+              "stated_age": null,
+              "cask_number": null,
+              "release_day": null,
+              "single_cask": null,
+              "release_year": null,
+              "vintage_year": null,
+              "bottling_year": null,
+              "cask_strength": null,
+              "release_month": null
+            }
+          }
+        ],
+        "imageSources": [
+          {
+            "url": "https://api.peated.com/uploads/prices-pe64fhtxm03wouvlpj2n72yk.webp",
+            "source": {
+              "kind": "bottle"
+            },
+            "sourceUrl": "https://kegnbottle.com/products/2xo-rappers-delight-hip-hop-blend-bourbon-whiskey-750ml"
+          }
+        ]
+      }
+    ],
+    "inspectedEntities": [
+      {
+        "kind": "distillery",
+        "name": "2XO Whiskey",
+        "score": 1,
+        "source": ["exact", "text", "prefix", "contained"],
+        "entityId": 75636,
+        "reference": "2XO",
+        "shortName": "2XO",
+        "retrievedFor": [
+          {
+            "exact": true,
+            "query": "2XO"
+          },
+          {
+            "exact": true,
+            "query": "2XO Whiskey"
+          }
+        ]
+      },
+      {
+        "kind": "brand",
+        "name": "WhiskySponge",
+        "score": 1,
+        "source": ["exact", "text", "prefix", "contained"],
+        "entityId": 5863,
+        "reference": "WhiskySponge",
+        "shortName": null,
+        "retrievedFor": [
+          {
+            "exact": true,
+            "query": "WhiskySponge"
+          }
+        ]
+      },
+      {
+        "kind": "brand",
+        "name": "Whisky Sponge",
+        "score": 1,
+        "source": ["exact", "contained"],
+        "entityId": 366684,
+        "reference": "Whisky Sponge",
+        "shortName": null,
+        "retrievedFor": [
+          {
+            "exact": true,
+            "query": "WhiskySponge"
+          }
+        ]
+      },
+      {
+        "kind": "bottler",
+        "name": "Decadent Drinks",
+        "score": 1,
+        "source": ["exact", "text", "prefix", "contained"],
+        "entityId": 5775,
+        "reference": "Decadent Drinks",
+        "shortName": null,
+        "retrievedFor": [
+          {
+            "exact": true,
+            "query": "Decadent Drinks"
+          }
+        ]
+      },
+      {
+        "kind": "brand",
+        "name": "Crown Royal",
+        "score": 1,
+        "source": ["exact", "text", "prefix", "contained"],
+        "entityId": 183,
+        "reference": "Crown Royal",
+        "shortName": null,
+        "retrievedFor": [
+          {
+            "exact": true,
+            "query": "Crown Royal"
+          }
+        ]
+      },
+      {
+        "kind": "brand",
+        "name": "Penelope",
+        "score": 1,
+        "source": ["exact", "text", "prefix", "contained"],
+        "entityId": 354990,
+        "reference": null,
+        "shortName": null,
+        "retrievedFor": [
+          {
+            "exact": true,
+            "query": "Penelope"
+          }
+        ]
+      },
+      {
+        "kind": "distillery",
+        "name": "Lochlea",
+        "score": 1,
+        "source": ["exact", "text", "prefix", "contained"],
+        "entityId": 3337,
+        "reference": "Lochlea",
+        "shortName": null,
+        "retrievedFor": [
+          {
+            "exact": true,
+            "query": "Lochlea"
+          }
+        ]
+      },
+      {
+        "kind": "distillery",
+        "name": "Ardnamurchan",
+        "score": 1,
+        "source": ["exact", "text", "prefix", "contained"],
+        "entityId": 84,
+        "reference": "Ardnamurchan",
+        "shortName": null,
+        "retrievedFor": [
+          {
+            "exact": true,
+            "query": "Ardnamurchan"
+          }
+        ]
+      },
+      {
+        "kind": "bottler",
+        "name": "That Boutique-y Whisky Company",
+        "score": 1,
+        "source": ["exact", "text", "prefix", "contained"],
+        "entityId": 5978,
+        "reference": "That Boutique-y Whisky Company",
+        "shortName": "TBWC",
+        "retrievedFor": [
+          {
+            "exact": true,
+            "query": "That Boutique-y Whisky Company"
+          }
+        ]
+      },
+      {
+        "kind": "distillery",
+        "name": "Macduff Distillery",
+        "score": 1,
+        "source": ["exact", "text", "prefix", "contained"],
+        "entityId": 1160,
+        "reference": "Macduff Distillery",
+        "shortName": "Macduff",
+        "retrievedFor": [
+          {
+            "exact": true,
+            "query": "Macduff Distillery"
+          }
+        ]
+      },
+      {
+        "kind": "brand",
+        "name": "James E. Pepper",
+        "score": 1,
+        "source": ["exact", "text", "prefix", "contained"],
+        "entityId": 3153,
+        "reference": "James E. Pepper",
+        "shortName": null,
+        "retrievedFor": [
+          {
+            "exact": true,
+            "query": "James E. Pepper"
+          }
+        ]
+      },
+      {
+        "kind": "brand",
+        "name": "The Lakes",
+        "score": 1,
+        "source": ["exact", "text", "prefix", "contained"],
+        "entityId": 1412,
+        "reference": "The Lakes",
+        "shortName": null,
+        "retrievedFor": [
+          {
+            "exact": true,
+            "query": "The Lakes"
+          },
+          {
+            "query": "The Lakes Distillery"
+          }
+        ]
+      },
+      {
+        "kind": "distillery",
+        "name": "The Lakes Distillery",
+        "score": 1,
+        "source": ["text", "prefix", "exact", "contained"],
+        "entityId": 1951,
+        "reference": "The Lakes Distillery",
+        "shortName": null,
+        "retrievedFor": [
+          {
+            "query": "The Lakes"
+          },
+          {
+            "exact": true,
+            "query": "The Lakes Distillery"
+          }
+        ]
+      },
+      {
+        "kind": "brand",
+        "name": "Penelope Bourbon",
+        "score": 0.5,
+        "source": ["text", "prefix"],
+        "entityId": 1260,
+        "reference": "Penelope Bourbon",
+        "shortName": null,
+        "retrievedFor": [
+          {
+            "query": "Penelope"
+          }
+        ]
+      },
+      {
+        "kind": "brand",
+        "name": "James E. Pepper 1776",
+        "score": 0.5,
+        "source": ["text", "prefix"],
+        "entityId": 1081,
+        "reference": "James E. Pepper 1776",
+        "shortName": null,
+        "retrievedFor": [
+          {
+            "query": "James E. Pepper"
+          }
+        ]
+      },
+      {
+        "kind": "distillery",
+        "name": "James E. Pepper Distillery",
+        "score": 0.5,
+        "source": ["text", "prefix"],
+        "entityId": 366308,
+        "reference": "James E. Pepper Distillery",
+        "shortName": null,
+        "retrievedFor": [
+          {
+            "query": "James E. Pepper"
+          }
+        ]
+      },
+      {
+        "kind": "bottler",
+        "name": "&Whisky",
+        "score": 0.35,
+        "source": ["contained"],
+        "entityId": 365821,
+        "reference": "&Whisky",
+        "shortName": null,
+        "retrievedFor": [
+          {
+            "query": "WhiskySponge"
+          },
+          {
+            "query": "That Boutique-y Whisky Company"
+          }
+        ]
+      },
+      {
+        "kind": "brand",
+        "name": "Cadée",
+        "score": 0.30714285714285716,
+        "source": ["contained"],
+        "entityId": 367403,
+        "reference": "Cadée",
+        "shortName": null,
+        "retrievedFor": [
+          {
+            "query": "Decadent Drinks"
+          }
+        ]
+      }
+    ],
+    "inspectedSeries": []
+  },
+  "provenance": {
+    "source": "production_miss",
+    "verifiedSourceUrls": [
+      "https://whiskyadvocate.com/2XO-Rapper-s-Delight-Hip-Hop-Blend-52",
+      "https://2xowhiskey.com/the-hip-hop-blend/",
+      "https://www.breakingbourbon.com/review/2xo-rappers-delight-the-hip-hop-blend"
+    ],
+    "dbOutcome": {
+      "bottleId": 67040,
+      "createsBottle": false,
+      "summary": "Production returned match."
+    },
+    "notes": "Captured from saved classifier run 29631 (review 19003, model openai/gpt-6-luna, 2026-10-28T08:30:58.395Z). Production rationale: Match bottle 67040. The inspected catalog record names it “The Hip-Hop Blend” at 52% ABV, and its label evidence includes “Rapper’s Delight” and “THE HIP-HOP BLEND.” The official 2XO page confirms the marketed title and says it was inspired by “Rapper’s Delight”; Whisky Advocate identifies the product as bourbon. These facts support the same marketed product, not a separate release. The source’s extracted category “blend” is corrected by the product-specific evidence. Checked 2026-11-03. 2XO: 'THE HIP-HOP BLEND is the seventh small batch blend release in the ongoing Collectibles Series ... inspired by their hit single: Rapper's Delight.' Breaking Bourbon: 104 proof, July 2026. Production matched 67040 and held it only because of the code risk 'Extracted category conflicts with the matched Bottle.' No expectedTier is set: Bottle 67040 stores bottler 2XO Whiskey (the Brand Entity 75636), and no source in the evidence states who bottled it, so not every identity fact is anchored. Brand, name, ABV (104 proof), and category (Whisky Advocate's category and the candidate label read) are anchored."
+  },
+  "expected": {
+    "status": "classified",
+    "action": "match",
+    "identityScope": "product",
+    "matchedBottleId": 67040,
+    "summary": "The review title is '2XO Rapper's Delight Hip-Hop Blend, 52%' and Whisky Advocate files it under Bourbon. 2XO's page calls it The Hip-Hop Blend, inspired by 'Rapper's Delight', and Bottle 67040 is 2XO The Hip-Hop Blend, bourbon, 52%. The extracted category 'blend' comes from the word Blend in the name. Match 67040."
+  }
+}

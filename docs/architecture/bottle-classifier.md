@@ -45,6 +45,10 @@ a visitor, such as a Bruichladdich Valinch), or glassware and other accessories.
 A hand-fill stays out of scope even with its own label, batch, bottle number, or
 release year. A distillery-only release that the producer bottled for sale is
 still a marketed release. A Bottle in its own box or tin is still one Bottle.
+A miniature holds 100 ml or less; an 18cl, 20cl, or 35cl bottle is a Bottle. A
+release that the producer packs with accessories, such as a flask, funnel,
+tray, or glasses, is a set and out of scope, even when it is the only form of
+that release. A Bottle sold with a book, print, or coaster stays in scope.
 Scope is about what is sold, not how clearly the source names it: a
 whisky Bottle with unclear identity is `no_match`, not ignored. An ignored
 result has a reason and no decision, and every caller stops tracking that source

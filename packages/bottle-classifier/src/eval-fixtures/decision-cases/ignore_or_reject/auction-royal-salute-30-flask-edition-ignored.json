@@ -1,0 +1,810 @@
+{
+  "id": "auction-royal-salute-30-flask-edition-ignored",
+  "name": "Auction lot: Royal Salute 30 The Flask Edition is packed with a funnel and tray, so it is ignored",
+  "input": {
+    "reference": {
+      "id": 14650,
+      "url": "https://www.scotchwhiskyauctions.com/auctions/234-the-185th-auction/903846-chivas-royal-salute-30-year-old-the-flask-edition/",
+      "name": "Chivas Royal Salute 30 Year Old The Flask Edition",
+      "imageUrl": null,
+      "externalSiteId": 28097,
+      "currentBottleId": null
+    },
+    "extractedIdentity": {
+      "abv": 50.1,
+      "brand": null,
+      "series": null,
+      "bottler": null,
+      "edition": null,
+      "outturn": null,
+      "category": null,
+      "distillery": null,
+      "expression": null,
+      "maturation": null,
+      "stated_age": null,
+      "cask_number": null,
+      "single_cask": null,
+      "release_year": null,
+      "vintage_year": null,
+      "cask_strength": null
+    },
+    "imageEvidence": null,
+    "initialCandidates": [
+      {
+        "abv": 40,
+        "brand": "Royal Salute",
+        "score": 57.2246,
+        "series": null,
+        "source": ["text", "brand_coverage", "context"],
+        "bottler": null,
+        "edition": null,
+        "outturn": null,
+        "bottleId": 58533,
+        "category": "blend",
+        "fullName": "Royal Salute Key To The Kingdom",
+        "reference": null,
+        "statedAge": 30,
+        "caskNumber": null,
+        "comparison": {
+          "missing": [],
+          "conflicts": ["abv"],
+          "agreements": ["category", "statedAge", "brand"]
+        },
+        "distillery": [],
+        "maturation": null,
+        "releaseDay": null,
+        "singleCask": null,
+        "releaseYear": null,
+        "vintageYear": null,
+        "bottlingYear": null,
+        "caskStrength": null,
+        "releaseMonth": null,
+        "familyContext": {
+          "siblingBottles": []
+        }
+      },
+      {
+        "abv": 43,
+        "brand": "Royal Salute",
+        "score": 55.17203,
+        "series": null,
+        "source": ["vector", "text"],
+        "bottler": null,
+        "edition": null,
+        "outturn": null,
+        "bottleId": 16203,
+        "category": "blend",
+        "fullName": "Royal Salute 62 Gun Salute",
+        "reference": "Royal Salute 62 Gun Salute, 43%",
+        "statedAge": null,
+        "caskNumber": null,
+        "comparison": {
+          "missing": ["statedAge"],
+          "conflicts": ["abv"],
+          "agreements": ["category", "brand"]
+        },
+        "distillery": [],
+        "maturation": null,
+        "releaseDay": null,
+        "singleCask": null,
+        "releaseYear": null,
+        "vintageYear": null,
+        "bottlingYear": null,
+        "caskStrength": null,
+        "releaseMonth": null,
+        "familyContext": {
+          "siblingBottles": []
+        }
+      },
+      {
+        "abv": null,
+        "brand": "Royal Salute",
+        "score": 52.938248,
+        "series": null,
+        "source": ["vector", "text"],
+        "bottler": null,
+        "edition": null,
+        "outturn": null,
+        "bottleId": 12803,
+        "category": "blend",
+        "fullName": "Royal Salute The Time Series 51-year-old",
+        "reference": "Royal Salute The Time Series 51-year-old, 45.4%",
+        "statedAge": 51,
+        "caskNumber": null,
+        "comparison": {
+          "missing": ["abv"],
+          "conflicts": [],
+          "agreements": []
+        },
+        "distillery": [],
+        "maturation": null,
+        "releaseDay": null,
+        "singleCask": null,
+        "releaseYear": null,
+        "vintageYear": null,
+        "bottlingYear": null,
+        "caskStrength": null,
+        "releaseMonth": null,
+        "familyContext": {
+          "siblingBottles": []
+        }
+      },
+      {
+        "abv": null,
+        "brand": "Royal Salute",
+        "score": 52.938248,
+        "series": null,
+        "source": ["vector", "text"],
+        "bottler": null,
+        "edition": null,
+        "outturn": null,
+        "bottleId": 13308,
+        "category": "blend",
+        "fullName": "Royal Salute 25-year-old The Treasured Blend",
+        "reference": "Royal Salute 25-year-old The Treasured Blend, 40%",
+        "statedAge": 25,
+        "caskNumber": null,
+        "comparison": {
+          "missing": ["abv"],
+          "conflicts": [],
+          "agreements": []
+        },
+        "distillery": [],
+        "maturation": null,
+        "releaseDay": null,
+        "singleCask": null,
+        "releaseYear": null,
+        "vintageYear": null,
+        "bottlingYear": null,
+        "caskStrength": null,
+        "releaseMonth": null,
+        "familyContext": {
+          "siblingBottles": []
+        }
+      },
+      {
+        "abv": null,
+        "brand": "Royal Salute",
+        "score": 52.938248,
+        "series": null,
+        "source": ["text"],
+        "bottler": null,
+        "edition": null,
+        "outturn": null,
+        "bottleId": 13885,
+        "category": "blend",
+        "fullName": "Royal Salute 21-year-old Beach Polo Edition",
+        "reference": null,
+        "statedAge": 21,
+        "caskNumber": null,
+        "comparison": {
+          "missing": ["abv"],
+          "conflicts": [],
+          "agreements": []
+        },
+        "distillery": [],
+        "maturation": null,
+        "releaseDay": null,
+        "singleCask": null,
+        "releaseYear": null,
+        "vintageYear": null,
+        "bottlingYear": null,
+        "caskStrength": null,
+        "releaseMonth": null,
+        "familyContext": {
+          "siblingBottles": []
+        }
+      },
+      {
+        "abv": null,
+        "brand": "Royal Salute",
+        "score": 52.938248,
+        "series": null,
+        "source": ["text", "vector"],
+        "bottler": null,
+        "edition": null,
+        "outturn": null,
+        "bottleId": 12875,
+        "category": "blend",
+        "fullName": "Royal Salute 21-year-old Polo Estancia Edition",
+        "reference": "Royal Salute 21-year-old Polo Estancia Edition, 40%",
+        "statedAge": 21,
+        "caskNumber": null,
+        "comparison": {
+          "missing": ["abv"],
+          "conflicts": [],
+          "agreements": []
+        },
+        "distillery": [],
+        "maturation": null,
+        "releaseDay": null,
+        "singleCask": null,
+        "releaseYear": null,
+        "vintageYear": null,
+        "bottlingYear": null,
+        "caskStrength": null,
+        "releaseMonth": null,
+        "familyContext": {
+          "siblingBottles": []
+        }
+      },
+      {
+        "abv": null,
+        "brand": "Royal Salute",
+        "score": 52.938248,
+        "series": null,
+        "source": ["text", "vector"],
+        "bottler": null,
+        "edition": null,
+        "outturn": null,
+        "bottleId": 13485,
+        "category": "blend",
+        "fullName": "Royal Salute 21-year-old Snow Polo Edition",
+        "reference": "Royal Salute 21-year-old Snow Polo Edition, 46.5%",
+        "statedAge": 21,
+        "caskNumber": null,
+        "comparison": {
+          "missing": ["abv"],
+          "conflicts": [],
+          "agreements": []
+        },
+        "distillery": [],
+        "maturation": null,
+        "releaseDay": null,
+        "singleCask": null,
+        "releaseYear": null,
+        "vintageYear": null,
+        "bottlingYear": null,
+        "caskStrength": null,
+        "releaseMonth": null,
+        "familyContext": {
+          "siblingBottles": []
+        }
+      },
+      {
+        "abv": null,
+        "brand": "Royal Salute",
+        "score": 52.938248,
+        "series": null,
+        "source": ["text", "vector"],
+        "bottler": null,
+        "edition": null,
+        "outturn": null,
+        "bottleId": 13695,
+        "category": "blend",
+        "fullName": "Royal Salute 21-year-old The Lost Blend",
+        "reference": "Royal Salute 21-year-old The Lost Blend, 40%",
+        "statedAge": 21,
+        "caskNumber": null,
+        "comparison": {
+          "missing": ["abv"],
+          "conflicts": [],
+          "agreements": []
+        },
+        "distillery": [],
+        "maturation": null,
+        "releaseDay": null,
+        "singleCask": null,
+        "releaseYear": null,
+        "vintageYear": null,
+        "bottlingYear": null,
+        "caskStrength": null,
+        "releaseMonth": null,
+        "familyContext": {
+          "siblingBottles": []
+        }
+      },
+      {
+        "abv": null,
+        "brand": "Royal Salute",
+        "score": 52.938248,
+        "series": null,
+        "source": ["text", "vector"],
+        "bottler": null,
+        "edition": null,
+        "outturn": null,
+        "bottleId": 14079,
+        "category": "blend",
+        "fullName": "Royal Salute 28-year-old Kew Palace Edition",
+        "reference": "Royal Salute 28-year-old Kew Palace Edition, 40%",
+        "statedAge": 28,
+        "caskNumber": null,
+        "comparison": {
+          "missing": ["abv"],
+          "conflicts": [],
+          "agreements": []
+        },
+        "distillery": [],
+        "maturation": null,
+        "releaseDay": null,
+        "singleCask": null,
+        "releaseYear": null,
+        "vintageYear": null,
+        "bottlingYear": null,
+        "caskStrength": null,
+        "releaseMonth": null,
+        "familyContext": {
+          "siblingBottles": []
+        }
+      },
+      {
+        "abv": null,
+        "brand": "Royal Salute",
+        "score": 52.938248,
+        "series": null,
+        "source": ["text"],
+        "bottler": null,
+        "edition": null,
+        "outturn": null,
+        "bottleId": 17548,
+        "category": "blend",
+        "fullName": "Royal Salute Stone of Destiny, 38-year-old",
+        "reference": null,
+        "statedAge": 38,
+        "caskNumber": null,
+        "comparison": {
+          "missing": ["abv"],
+          "conflicts": [],
+          "agreements": []
+        },
+        "distillery": [],
+        "maturation": null,
+        "releaseDay": null,
+        "singleCask": null,
+        "releaseYear": null,
+        "vintageYear": null,
+        "bottlingYear": null,
+        "caskStrength": null,
+        "releaseMonth": null,
+        "familyContext": {
+          "siblingBottles": []
+        }
+      },
+      {
+        "abv": 54.5,
+        "brand": "Royal Salute",
+        "score": 52.32207,
+        "series": null,
+        "source": ["text"],
+        "bottler": null,
+        "edition": null,
+        "outturn": null,
+        "bottleId": 62699,
+        "category": "blend",
+        "fullName": "Royal Salute The Royal Wedding Edition",
+        "reference": null,
+        "statedAge": null,
+        "caskNumber": null,
+        "comparison": {
+          "missing": ["statedAge"],
+          "conflicts": ["abv"],
+          "agreements": ["category", "brand"]
+        },
+        "distillery": [],
+        "maturation": null,
+        "releaseDay": null,
+        "singleCask": null,
+        "releaseYear": null,
+        "vintageYear": null,
+        "bottlingYear": null,
+        "caskStrength": null,
+        "releaseMonth": null,
+        "familyContext": {
+          "siblingBottles": []
+        }
+      },
+      {
+        "abv": null,
+        "brand": "Royal Salute",
+        "score": 52.13872,
+        "series": null,
+        "source": ["text"],
+        "bottler": null,
+        "edition": null,
+        "outturn": null,
+        "bottleId": 14300,
+        "category": "blend",
+        "fullName": "Royal Salute Special Polo Edition (Batch 21-year-old)",
+        "reference": null,
+        "statedAge": 21,
+        "caskNumber": null,
+        "comparison": {
+          "missing": ["abv"],
+          "conflicts": [],
+          "agreements": []
+        },
+        "distillery": [],
+        "maturation": null,
+        "releaseDay": null,
+        "singleCask": null,
+        "releaseYear": null,
+        "vintageYear": null,
+        "bottlingYear": null,
+        "caskStrength": null,
+        "releaseMonth": null,
+        "familyContext": {
+          "siblingBottles": []
+        }
+      },
+      {
+        "abv": null,
+        "brand": "Royal Salute",
+        "score": 51.366066,
+        "series": null,
+        "source": ["text"],
+        "bottler": null,
+        "edition": null,
+        "outturn": null,
+        "bottleId": 43046,
+        "category": "blend",
+        "fullName": "Royal Salute 21-year-old The Miami Polo Edition",
+        "reference": null,
+        "statedAge": 21,
+        "caskNumber": null,
+        "comparison": {
+          "missing": ["abv"],
+          "conflicts": [],
+          "agreements": []
+        },
+        "distillery": [],
+        "maturation": null,
+        "releaseDay": null,
+        "singleCask": null,
+        "releaseYear": null,
+        "vintageYear": null,
+        "bottlingYear": null,
+        "caskStrength": null,
+        "releaseMonth": null,
+        "familyContext": {
+          "siblingBottles": []
+        }
+      },
+      {
+        "abv": null,
+        "brand": "Royal Salute",
+        "score": 51.366066,
+        "series": null,
+        "source": ["text"],
+        "bottler": null,
+        "edition": null,
+        "outturn": null,
+        "bottleId": 43948,
+        "category": "blend",
+        "fullName": "Royal Salute Kingdom 26-year-old Colheita Port Finish",
+        "reference": null,
+        "statedAge": 26,
+        "caskNumber": null,
+        "comparison": {
+          "missing": ["abv"],
+          "conflicts": [],
+          "agreements": []
+        },
+        "distillery": [],
+        "maturation": null,
+        "releaseDay": null,
+        "singleCask": null,
+        "releaseYear": null,
+        "vintageYear": null,
+        "bottlingYear": null,
+        "caskStrength": null,
+        "releaseMonth": null,
+        "familyContext": {
+          "siblingBottles": []
+        }
+      },
+      {
+        "abv": null,
+        "brand": "Royal Salute",
+        "score": 50.297268,
+        "series": null,
+        "source": ["text"],
+        "bottler": null,
+        "edition": null,
+        "outturn": null,
+        "bottleId": 13571,
+        "category": "blend",
+        "fullName": "Royal Salute 21-year-old The Malts Blend",
+        "reference": null,
+        "statedAge": 21,
+        "caskNumber": null,
+        "comparison": {
+          "missing": ["abv"],
+          "conflicts": [],
+          "agreements": []
+        },
+        "distillery": [],
+        "maturation": null,
+        "releaseDay": null,
+        "singleCask": null,
+        "releaseYear": null,
+        "vintageYear": null,
+        "bottlingYear": null,
+        "caskStrength": null,
+        "releaseMonth": null,
+        "familyContext": {
+          "siblingBottles": []
+        }
+      },
+      {
+        "abv": null,
+        "brand": "Royal Salute",
+        "score": 50.29432,
+        "series": null,
+        "source": ["text"],
+        "bottler": null,
+        "edition": null,
+        "outturn": null,
+        "bottleId": 16814,
+        "category": "blend",
+        "fullName": "Royal Salute The Diamond Tribute",
+        "reference": null,
+        "statedAge": null,
+        "caskNumber": null,
+        "comparison": {
+          "missing": ["abv"],
+          "conflicts": [],
+          "agreements": []
+        },
+        "distillery": [],
+        "maturation": null,
+        "releaseDay": null,
+        "singleCask": null,
+        "releaseYear": null,
+        "vintageYear": null,
+        "bottlingYear": null,
+        "caskStrength": null,
+        "releaseMonth": null,
+        "familyContext": {
+          "siblingBottles": []
+        }
+      },
+      {
+        "abv": null,
+        "brand": "Royal Salute",
+        "score": 50.29432,
+        "series": null,
+        "source": ["text"],
+        "bottler": null,
+        "edition": null,
+        "outturn": null,
+        "bottleId": 16196,
+        "category": "blend",
+        "fullName": "Royal Salute The Eternal Reserve",
+        "reference": null,
+        "statedAge": null,
+        "caskNumber": null,
+        "comparison": {
+          "missing": ["abv"],
+          "conflicts": [],
+          "agreements": []
+        },
+        "distillery": [],
+        "maturation": null,
+        "releaseDay": null,
+        "singleCask": null,
+        "releaseYear": null,
+        "vintageYear": null,
+        "bottlingYear": null,
+        "caskStrength": null,
+        "releaseMonth": null,
+        "familyContext": {
+          "siblingBottles": []
+        }
+      },
+      {
+        "abv": null,
+        "brand": "Royal Salute",
+        "score": 49.895813,
+        "series": null,
+        "source": ["vector", "text"],
+        "bottler": null,
+        "edition": null,
+        "outturn": null,
+        "bottleId": 13417,
+        "category": "blend",
+        "fullName": "Royal Salute 29-year-old Pedro Ximénez Sherry Cask-Finished",
+        "reference": "Royal Salute 29-year-old Pedro Ximénez Sherry Cask-Finished, 40%",
+        "statedAge": 29,
+        "caskNumber": null,
+        "comparison": {
+          "missing": ["abv"],
+          "conflicts": [],
+          "agreements": []
+        },
+        "distillery": [],
+        "maturation": null,
+        "releaseDay": null,
+        "singleCask": null,
+        "releaseYear": null,
+        "vintageYear": null,
+        "bottlingYear": null,
+        "caskStrength": null,
+        "releaseMonth": null,
+        "familyContext": {
+          "siblingBottles": []
+        }
+      },
+      {
+        "abv": null,
+        "brand": "Ballantine's",
+        "score": 46.66692,
+        "series": null,
+        "source": ["text"],
+        "bottler": null,
+        "edition": null,
+        "outturn": null,
+        "bottleId": 16059,
+        "category": "blend",
+        "fullName": "Ballantine's 30-year-old",
+        "reference": null,
+        "statedAge": 30,
+        "caskNumber": null,
+        "comparison": {
+          "missing": ["abv"],
+          "conflicts": ["brand"],
+          "agreements": ["category", "statedAge"]
+        },
+        "distillery": [],
+        "maturation": null,
+        "releaseDay": null,
+        "singleCask": null,
+        "releaseYear": null,
+        "vintageYear": null,
+        "bottlingYear": null,
+        "caskStrength": null,
+        "releaseMonth": null,
+        "familyContext": {
+          "siblingBottles": []
+        }
+      },
+      {
+        "abv": 50.1,
+        "brand": "XOP",
+        "score": 46.07794,
+        "series": null,
+        "source": ["text"],
+        "bottler": "Douglas Laing",
+        "edition": null,
+        "outturn": null,
+        "bottleId": 61864,
+        "category": "single_malt",
+        "fullName": "XOP Macallan 30-year-old",
+        "reference": null,
+        "statedAge": 30,
+        "caskNumber": null,
+        "comparison": {
+          "missing": [],
+          "conflicts": ["category", "brand"],
+          "agreements": ["statedAge", "abv"]
+        },
+        "distillery": ["The Macallan"],
+        "maturation": null,
+        "releaseDay": null,
+        "singleCask": true,
+        "releaseYear": null,
+        "vintageYear": null,
+        "bottlingYear": null,
+        "caskStrength": true,
+        "releaseMonth": null,
+        "familyContext": {
+          "siblingBottles": []
+        }
+      }
+    ]
+  },
+  "context": {
+    "inspectedBottleIds": [58533],
+    "bottleContexts": [
+      {
+        "exact": {
+          "abv": 40,
+          "edition": null,
+          "outturn": null,
+          "statedAge": 30,
+          "caskNumber": null,
+          "maturation": null,
+          "releaseDay": null,
+          "singleCask": null,
+          "releaseYear": null,
+          "vintageYear": null,
+          "bottlingYear": null,
+          "caskStrength": null,
+          "releaseMonth": null
+        },
+        "shared": {
+          "name": "Key To The Kingdom",
+          "brand": {
+            "name": "Royal Salute",
+            "entityId": 1302
+          },
+          "series": null,
+          "bottler": null,
+          "category": "blend",
+          "statedAge": null,
+          "distillers": []
+        },
+        "groupId": 31494,
+        "bottleId": 58533,
+        "fullName": "Royal Salute Key To The Kingdom",
+        "siblings": [],
+        "references": [],
+        "observations": [
+          {
+            "facts": {
+              "proposalType": "create_new",
+              "proposedBottle": {
+                "abv": null,
+                "name": "Key To The Kingdom",
+                "brand": {
+                  "id": null,
+                  "name": "Royal Salute"
+                },
+                "series": null,
+                "bottler": null,
+                "edition": null,
+                "outturn": null,
+                "category": "blend",
+                "statedAge": 30,
+                "caskNumber": null,
+                "distillers": [],
+                "maturation": null,
+                "releaseDay": null,
+                "singleCask": null,
+                "releaseYear": null,
+                "vintageYear": null,
+                "bottlingYear": null,
+                "caskStrength": null,
+                "releaseMonth": null
+              },
+              "referenceScope": "none"
+            },
+            "rawText": "Royal Salute 30-year-old - Key To The Kingdom",
+            "sourceKey": "store_price:12033564",
+            "sourceUrl": "https://www.masterofmalt.com/whiskies/royal-salute/royal-salute-30-year-old-key-to-the-kingdom-whisky/?sku=128971",
+            "sourceName": "Royal Salute 30-year-old - Key To The Kingdom",
+            "sourceType": "store_price",
+            "parsedIdentity": null
+          }
+        ],
+        "imageSources": []
+      }
+    ],
+    "inspectedEntities": [
+      {
+        "kind": "brand",
+        "name": "Royal Salute",
+        "score": 1,
+        "source": ["exact", "text", "prefix", "contained"],
+        "entityId": 1302,
+        "reference": "Royal Salute",
+        "shortName": null,
+        "retrievedFor": [
+          {
+            "exact": true,
+            "query": "Royal Salute"
+          }
+        ]
+      }
+    ],
+    "inspectedSeries": []
+  },
+  "provenance": {
+    "source": "production_miss",
+    "verifiedSourceUrls": [
+      "https://www.scotchwhiskyauctions.com/auctions/234-the-185th-auction/903846-chivas-royal-salute-30-year-old-the-flask-edition/",
+      "https://www.royalsalute.com/en/whisky/30-year-old-the-flask-edition/",
+      "https://scotchwhisky.com/magazine/latest-news/14924/royal-salute-30yo-flask-edition-released",
+      "https://www.htfw.com/royal-salute-the-flask-edition-blended-scotch-30-year-old-whisky"
+    ],
+    "dbOutcome": {
+      "bottleId": null,
+      "createsBottle": false,
+      "summary": "Production returned ignored."
+    },
+    "notes": "Captured from saved classifier run 34795 (auction_lot 14650, model null, 2026-11-03T09:55:24.142Z). Production rationale: none Checked 2026-11-03. Lot page and main photo show only the porcelain flagon: Royal Salute Blended Scotch Whisky, 30 Years Old, The Flask Edition, 50.1% ABV / 70cl. Royal Salute markets The Flask Edition as its own limited 30-year-old blend (Longmorn and Strathisla malts) at 50.1%; \"Flask\" is the product name, not an extra item. No inspected candidate is this release (58533 Key To The Kingdom is a different 40% 30-year-old). Production ignored it, which drops a real Bottle. Owner decision 2026-11-03: a release that the producer packs with accessories (flask, funnel, tray, glasses) is a set and out of scope. Production ignored it, which is correct; this case guards that."
+  },
+  "expected": {
+    "status": "ignored",
+    "summary": "Ignore: the producer packs this release with a porcelain flask, funnel, and serving tray, so it is a set and out of scope, even though the lot photo shows only the flask."
+  }
+}

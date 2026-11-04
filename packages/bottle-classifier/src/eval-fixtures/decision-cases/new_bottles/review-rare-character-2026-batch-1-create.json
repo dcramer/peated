@@ -1,0 +1,2303 @@
+{
+  "id": "review-rare-character-2026-batch-1-create",
+  "name": "Review: Rare Character 2026 Bourbon Batch 1 at 59.79% is a new Bottle",
+  "input": {
+    "reference": {
+      "id": 18998,
+      "url": "https://whiskyadvocate.com/Rare-Character-Limited-Release-Batch-1-2026-59-79",
+      "name": "Rare Character Limited Release (Batch 1; 2026), 59.79%",
+      "imageUrl": null,
+      "externalSiteId": 5,
+      "currentBottleId": null
+    },
+    "extractedIdentity": {
+      "abv": 59.79,
+      "brand": "Rare Character",
+      "series": null,
+      "bottler": "Rare Character",
+      "edition": "Batch 1",
+      "outturn": null,
+      "category": null,
+      "distillery": [],
+      "expression": null,
+      "maturation": null,
+      "stated_age": null,
+      "cask_number": null,
+      "release_day": null,
+      "single_cask": null,
+      "release_year": null,
+      "vintage_year": null,
+      "bottling_year": null,
+      "cask_strength": null,
+      "release_month": null
+    },
+    "imageEvidence": null,
+    "initialCandidates": [
+      {
+        "abv": 57.18,
+        "brand": "Rare Character",
+        "score": 68.97148,
+        "series": null,
+        "source": ["vector", "text", "brand", "brand_coverage", "context"],
+        "bottler": "Rare Character",
+        "edition": "Batch No. 3",
+        "outturn": null,
+        "bottleId": 45498,
+        "category": "bourbon",
+        "fullName": "Rare Character Limited Release - Batch No. 3 - 2025 Release - 57.2% ABV - Cask Strength",
+        "reference": "Rare Character Limited Release - Batch No. 3 - 2025 Release - 57.2% ABV - Cask Strength",
+        "statedAge": null,
+        "caskNumber": null,
+        "comparison": {
+          "missing": [],
+          "conflicts": ["abv", "releaseYear"],
+          "agreements": [
+            "category",
+            "caskStrength",
+            "edition",
+            "brand",
+            "bottler"
+          ]
+        },
+        "distillery": [],
+        "maturation": null,
+        "releaseDay": null,
+        "singleCask": null,
+        "releaseYear": 2025,
+        "vintageYear": null,
+        "bottlingYear": null,
+        "caskStrength": true,
+        "releaseMonth": null,
+        "familyContext": {
+          "siblingBottles": []
+        }
+      },
+      {
+        "abv": 59.8,
+        "brand": "Lochlea",
+        "score": 57.703613,
+        "series": null,
+        "source": ["text"],
+        "bottler": null,
+        "edition": "Batch 3",
+        "outturn": null,
+        "bottleId": 46036,
+        "category": "single_malt",
+        "fullName": "Lochlea Cask Strength - Batch 3 - 59.8% ABV",
+        "reference": null,
+        "statedAge": null,
+        "caskNumber": null,
+        "comparison": {
+          "missing": ["releaseYear", "bottler"],
+          "conflicts": ["category", "abv", "brand"],
+          "agreements": ["caskStrength", "edition"]
+        },
+        "distillery": ["Lochlea"],
+        "maturation": null,
+        "releaseDay": null,
+        "singleCask": null,
+        "releaseYear": null,
+        "vintageYear": null,
+        "bottlingYear": null,
+        "caskStrength": true,
+        "releaseMonth": null,
+        "familyContext": {
+          "siblingBottles": []
+        }
+      },
+      {
+        "abv": 50.5,
+        "brand": "Rare Character",
+        "score": 49.09838,
+        "series": null,
+        "source": ["vector", "text", "brand_coverage", "context"],
+        "bottler": "Rare Character",
+        "edition": "Batch #01",
+        "outturn": null,
+        "bottleId": 56037,
+        "category": "rye",
+        "fullName": "Rare Character Hurst Knoll - Batch #01",
+        "reference": "Hurst Knoll Kentucky Straight Rye Whiskey Batch #01",
+        "statedAge": 7,
+        "caskNumber": null,
+        "comparison": {
+          "missing": [],
+          "conflicts": ["abv"],
+          "agreements": ["edition", "brand", "bottler"]
+        },
+        "distillery": [],
+        "maturation": null,
+        "releaseDay": null,
+        "singleCask": null,
+        "releaseYear": null,
+        "vintageYear": null,
+        "bottlingYear": null,
+        "caskStrength": null,
+        "releaseMonth": null,
+        "familyContext": {
+          "siblingBottles": []
+        }
+      },
+      {
+        "abv": 59.8,
+        "brand": "That Boutique-y Whisky Company",
+        "score": 48.385166,
+        "series": null,
+        "source": ["text"],
+        "bottler": "That Boutique-y Whisky Company",
+        "edition": "Batch #1",
+        "outturn": null,
+        "bottleId": 46170,
+        "category": "bourbon",
+        "fullName": "TBWC Bourbon Whiskey #2 - Batch #1 - 3-year-old - 59.8% ABV - Cask Strength",
+        "reference": null,
+        "statedAge": 3,
+        "caskNumber": null,
+        "comparison": {
+          "missing": ["releaseYear"],
+          "conflicts": ["abv", "brand", "bottler"],
+          "agreements": ["edition"]
+        },
+        "distillery": [],
+        "maturation": null,
+        "releaseDay": null,
+        "singleCask": null,
+        "releaseYear": null,
+        "vintageYear": null,
+        "bottlingYear": null,
+        "caskStrength": true,
+        "releaseMonth": null,
+        "familyContext": {
+          "siblingBottles": []
+        }
+      },
+      {
+        "abv": null,
+        "brand": "Glenglassaugh",
+        "score": 46.72973,
+        "series": null,
+        "source": ["text"],
+        "bottler": "Glenglassaugh",
+        "edition": "Batch 1",
+        "outturn": null,
+        "bottleId": 45076,
+        "category": "single_malt",
+        "fullName": "Glenglassaugh 1975 Rare Cask Release - Batch 1",
+        "reference": null,
+        "statedAge": 38,
+        "caskNumber": null,
+        "comparison": {
+          "missing": ["abv"],
+          "conflicts": ["brand", "bottler"],
+          "agreements": ["edition"]
+        },
+        "distillery": [],
+        "maturation": null,
+        "releaseDay": null,
+        "singleCask": null,
+        "releaseYear": null,
+        "vintageYear": null,
+        "bottlingYear": null,
+        "caskStrength": null,
+        "releaseMonth": null,
+        "familyContext": {
+          "siblingBottles": [
+            {
+              "abv": null,
+              "edition": null,
+              "outturn": null,
+              "bottleId": 44057,
+              "fullName": "Glenglassaugh 1975 Rare Cask Release",
+              "statedAge": 38,
+              "caskNumber": null,
+              "maturation": null,
+              "releaseDay": null,
+              "singleCask": null,
+              "releaseYear": null,
+              "traitFields": ["statedAge"],
+              "vintageYear": null,
+              "bottlingYear": null,
+              "caskStrength": null,
+              "releaseMonth": null
+            },
+            {
+              "abv": null,
+              "edition": "Batch 2",
+              "outturn": null,
+              "bottleId": 45077,
+              "fullName": "Glenglassaugh 1975 Rare Cask Release - Batch 2 - 45-year-old",
+              "statedAge": 45,
+              "caskNumber": null,
+              "maturation": null,
+              "releaseDay": null,
+              "singleCask": null,
+              "releaseYear": null,
+              "traitFields": ["edition", "statedAge"],
+              "vintageYear": null,
+              "bottlingYear": null,
+              "caskStrength": null,
+              "releaseMonth": null
+            }
+          ]
+        }
+      },
+      {
+        "abv": 59.45,
+        "brand": "Smoke Wagon",
+        "score": 44.894363,
+        "series": null,
+        "source": ["text"],
+        "bottler": null,
+        "edition": "Batch 1",
+        "outturn": null,
+        "bottleId": 61663,
+        "category": "bourbon",
+        "fullName": "Smoke Wagon Rare & Limited - Batch 1",
+        "reference": null,
+        "statedAge": 8,
+        "caskNumber": null,
+        "comparison": {
+          "missing": ["bottler"],
+          "conflicts": ["abv", "brand"],
+          "agreements": ["edition"]
+        },
+        "distillery": [],
+        "maturation": null,
+        "releaseDay": null,
+        "singleCask": null,
+        "releaseYear": null,
+        "vintageYear": null,
+        "bottlingYear": null,
+        "caskStrength": null,
+        "releaseMonth": null,
+        "familyContext": {
+          "siblingBottles": []
+        }
+      },
+      {
+        "abv": null,
+        "brand": "Glenglassaugh",
+        "score": 44.337616,
+        "series": null,
+        "source": ["text"],
+        "bottler": "Glenglassaugh",
+        "edition": null,
+        "outturn": null,
+        "bottleId": 4066,
+        "category": "single_malt",
+        "fullName": "Glenglassaugh 1972 Rare Cask Release - (Batch 1)",
+        "reference": null,
+        "statedAge": 48,
+        "caskNumber": null,
+        "comparison": {
+          "missing": ["abv", "edition"],
+          "conflicts": ["brand", "bottler"],
+          "agreements": []
+        },
+        "distillery": ["Glenglassaugh"],
+        "maturation": null,
+        "releaseDay": null,
+        "singleCask": null,
+        "releaseYear": null,
+        "vintageYear": null,
+        "bottlingYear": null,
+        "caskStrength": null,
+        "releaseMonth": null,
+        "familyContext": {
+          "siblingBottles": []
+        }
+      },
+      {
+        "abv": null,
+        "brand": "Glenglassaugh",
+        "score": 44.337616,
+        "series": null,
+        "source": ["text"],
+        "bottler": "Glenglassaugh",
+        "edition": null,
+        "outturn": null,
+        "bottleId": 4067,
+        "category": "single_malt",
+        "fullName": "Glenglassaugh 1973 Rare Cask Release - (Batch 1)",
+        "reference": null,
+        "statedAge": 47,
+        "caskNumber": null,
+        "comparison": {
+          "missing": ["abv", "edition"],
+          "conflicts": ["brand", "bottler"],
+          "agreements": []
+        },
+        "distillery": ["Glenglassaugh"],
+        "maturation": null,
+        "releaseDay": null,
+        "singleCask": null,
+        "releaseYear": null,
+        "vintageYear": null,
+        "bottlingYear": null,
+        "caskStrength": null,
+        "releaseMonth": null,
+        "familyContext": {
+          "siblingBottles": []
+        }
+      },
+      {
+        "abv": null,
+        "brand": "Glenglassaugh",
+        "score": 43.57008,
+        "series": null,
+        "source": ["text"],
+        "bottler": "Glenglassaugh",
+        "edition": "Batch 1",
+        "outturn": null,
+        "bottleId": 44778,
+        "category": "single_malt",
+        "fullName": "Glenglassaugh 1978 Rare Cask Release - Batch 1 - 35-year-old",
+        "reference": null,
+        "statedAge": 35,
+        "caskNumber": null,
+        "comparison": {
+          "missing": ["abv"],
+          "conflicts": ["brand", "bottler"],
+          "agreements": ["edition"]
+        },
+        "distillery": [],
+        "maturation": null,
+        "releaseDay": null,
+        "singleCask": null,
+        "releaseYear": null,
+        "vintageYear": null,
+        "bottlingYear": null,
+        "caskStrength": null,
+        "releaseMonth": null,
+        "familyContext": {
+          "siblingBottles": [
+            {
+              "abv": null,
+              "edition": null,
+              "outturn": null,
+              "bottleId": 2457,
+              "fullName": "Glenglassaugh 1978 Rare Cask Release",
+              "statedAge": 40,
+              "caskNumber": null,
+              "maturation": null,
+              "releaseDay": null,
+              "singleCask": null,
+              "releaseYear": null,
+              "traitFields": ["statedAge"],
+              "vintageYear": null,
+              "bottlingYear": null,
+              "caskStrength": null,
+              "releaseMonth": null
+            }
+          ]
+        }
+      },
+      {
+        "abv": 57.26,
+        "brand": "Rare Character",
+        "score": 40.860146,
+        "series": null,
+        "source": ["text", "brand_coverage"],
+        "bottler": "Rare Character",
+        "edition": null,
+        "outturn": null,
+        "bottleId": 61531,
+        "category": "bourbon",
+        "fullName": "Rare Character Single Barrel Cask Strength Bourbon",
+        "reference": null,
+        "statedAge": 9,
+        "caskNumber": "VT0-009",
+        "comparison": {
+          "missing": ["releaseYear", "edition"],
+          "conflicts": ["abv"],
+          "agreements": ["category", "caskStrength", "brand", "bottler"]
+        },
+        "distillery": [],
+        "maturation": null,
+        "releaseDay": null,
+        "singleCask": true,
+        "releaseYear": null,
+        "vintageYear": null,
+        "bottlingYear": null,
+        "caskStrength": true,
+        "releaseMonth": null,
+        "familyContext": {
+          "siblingBottles": []
+        }
+      },
+      {
+        "abv": 47.5,
+        "brand": "Black Maple Hill",
+        "score": 40.4278,
+        "series": null,
+        "source": ["text"],
+        "bottler": "Rare Character",
+        "edition": "2026 Release",
+        "outturn": null,
+        "bottleId": 62991,
+        "category": "bourbon",
+        "fullName": "Black Maple Hill Small Batch - 2026 Release",
+        "reference": null,
+        "statedAge": null,
+        "caskNumber": null,
+        "comparison": {
+          "missing": ["caskStrength"],
+          "conflicts": ["abv", "edition", "brand"],
+          "agreements": ["category", "releaseYear", "bottler"]
+        },
+        "distillery": [],
+        "maturation": null,
+        "releaseDay": null,
+        "singleCask": null,
+        "releaseYear": 2026,
+        "vintageYear": null,
+        "bottlingYear": null,
+        "caskStrength": null,
+        "releaseMonth": null,
+        "familyContext": {
+          "siblingBottles": []
+        }
+      },
+      {
+        "abv": 47.2,
+        "brand": "The Teuchter",
+        "score": 39.361298,
+        "series": null,
+        "source": ["text"],
+        "bottler": "Decadent Drinks",
+        "edition": "Batch 3",
+        "outturn": null,
+        "bottleId": 47088,
+        "category": "single_malt",
+        "fullName": "The Teuchter Highland Single Malt - Batch 3 - 18-year-old - 2026 Release - 47.2% ABV - Cask Strength",
+        "reference": null,
+        "statedAge": 18,
+        "caskNumber": null,
+        "comparison": {
+          "missing": [],
+          "conflicts": ["category", "abv", "brand", "bottler"],
+          "agreements": ["releaseYear", "caskStrength", "edition"]
+        },
+        "distillery": [],
+        "maturation": "Fully matured in sherrywood",
+        "releaseDay": null,
+        "singleCask": null,
+        "releaseYear": 2026,
+        "vintageYear": null,
+        "bottlingYear": 2026,
+        "caskStrength": true,
+        "releaseMonth": null,
+        "familyContext": {
+          "siblingBottles": []
+        }
+      },
+      {
+        "abv": 60.26,
+        "brand": "Rare Character",
+        "score": 38.336662,
+        "series": "Single Barrel Series",
+        "source": ["text", "brand_coverage"],
+        "bottler": "Rare Character",
+        "edition": "S4B6",
+        "outturn": null,
+        "bottleId": 67141,
+        "category": "bourbon",
+        "fullName": "Rare Character Cask Strength Kentucky Straight Bourbon - S4B6",
+        "reference": null,
+        "statedAge": null,
+        "caskNumber": null,
+        "comparison": {
+          "missing": ["releaseYear"],
+          "conflicts": ["abv", "edition"],
+          "agreements": ["category", "caskStrength", "brand", "bottler"]
+        },
+        "distillery": [],
+        "maturation": null,
+        "releaseDay": null,
+        "singleCask": true,
+        "releaseYear": null,
+        "vintageYear": null,
+        "bottlingYear": null,
+        "caskStrength": true,
+        "releaseMonth": null,
+        "familyContext": {
+          "siblingBottles": []
+        }
+      },
+      {
+        "abv": 47.5,
+        "brand": "Black Maple Hill",
+        "score": 37.290707,
+        "series": null,
+        "source": ["text"],
+        "bottler": "Rare Character",
+        "edition": "2026 Release",
+        "outturn": null,
+        "bottleId": 62987,
+        "category": "bourbon",
+        "fullName": "Black Maple Hill 11-year-old Small Batch - 2026 Release",
+        "reference": null,
+        "statedAge": 11,
+        "caskNumber": null,
+        "comparison": {
+          "missing": ["caskStrength"],
+          "conflicts": ["abv", "edition", "brand"],
+          "agreements": ["category", "releaseYear", "bottler"]
+        },
+        "distillery": [],
+        "maturation": null,
+        "releaseDay": null,
+        "singleCask": null,
+        "releaseYear": 2026,
+        "vintageYear": null,
+        "bottlingYear": null,
+        "caskStrength": null,
+        "releaseMonth": null,
+        "familyContext": {
+          "siblingBottles": []
+        }
+      },
+      {
+        "abv": 61.5,
+        "brand": "Old Cassidy",
+        "score": 35.09288,
+        "series": null,
+        "source": ["vector", "text"],
+        "bottler": "Rare Character",
+        "edition": null,
+        "outturn": null,
+        "bottleId": 55153,
+        "category": "bourbon",
+        "fullName": "Old Cassidy Kentucky Straight Bourbon",
+        "reference": "Old Cassidy (61.5%, OB, Rare Character Whiskey Co., Kentucky Straight Bourbon)",
+        "statedAge": null,
+        "caskNumber": null,
+        "comparison": {
+          "missing": ["edition"],
+          "conflicts": ["abv", "releaseYear", "brand"],
+          "agreements": ["category", "caskStrength", "bottler"]
+        },
+        "distillery": [],
+        "maturation": null,
+        "releaseDay": null,
+        "singleCask": null,
+        "releaseYear": 2025,
+        "vintageYear": null,
+        "bottlingYear": null,
+        "caskStrength": true,
+        "releaseMonth": null,
+        "familyContext": {
+          "siblingBottles": []
+        }
+      },
+      {
+        "abv": 59.8,
+        "brand": "Uncle Nearest",
+        "score": 34.596306,
+        "series": null,
+        "source": ["text"],
+        "bottler": null,
+        "edition": "No. 1",
+        "outturn": null,
+        "bottleId": 64363,
+        "category": "rye",
+        "fullName": "Uncle Nearest Unfiltered Blend - No. 1",
+        "reference": null,
+        "statedAge": null,
+        "caskNumber": null,
+        "comparison": {
+          "missing": ["bottler"],
+          "conflicts": ["abv", "brand"],
+          "agreements": ["edition"]
+        },
+        "distillery": ["Nearest Green Distillery"],
+        "maturation": null,
+        "releaseDay": null,
+        "singleCask": null,
+        "releaseYear": null,
+        "vintageYear": null,
+        "bottlingYear": null,
+        "caskStrength": null,
+        "releaseMonth": null,
+        "familyContext": {
+          "siblingBottles": []
+        }
+      },
+      {
+        "abv": 59.8,
+        "brand": "The Scotch Malt Whisky Society",
+        "score": 34.04077,
+        "series": null,
+        "source": ["text"],
+        "bottler": "The Scotch Malt Whisky Society",
+        "edition": null,
+        "outturn": null,
+        "bottleId": 45424,
+        "category": "single_malt",
+        "fullName": "SMWS 164.3 Strawberry sweetshop implosion",
+        "reference": null,
+        "statedAge": 7,
+        "caskNumber": "164.3",
+        "comparison": {
+          "missing": ["edition"],
+          "conflicts": ["abv", "brand", "bottler"],
+          "agreements": ["releaseYear"]
+        },
+        "distillery": ["Penderyn Distillery"],
+        "maturation": "1st fill STR barrique",
+        "releaseDay": 7,
+        "singleCask": true,
+        "releaseYear": 2026,
+        "vintageYear": 2018,
+        "bottlingYear": null,
+        "caskStrength": null,
+        "releaseMonth": 8,
+        "familyContext": {
+          "siblingBottles": []
+        }
+      },
+      {
+        "abv": 46.7,
+        "brand": "Laphroaig",
+        "score": 33.88675,
+        "series": "The Ian Hunter Story",
+        "source": ["text"],
+        "bottler": null,
+        "edition": "Book 1",
+        "outturn": null,
+        "bottleId": 2524,
+        "category": "single_malt",
+        "fullName": "Laphroaig Unique Character - Book 1",
+        "reference": null,
+        "statedAge": 30,
+        "caskNumber": null,
+        "comparison": {
+          "missing": ["bottler"],
+          "conflicts": ["abv", "brand"],
+          "agreements": ["edition"]
+        },
+        "distillery": ["Laphroaig"],
+        "maturation": "Matured in first-fill American white oak ex-bourbon barrels",
+        "releaseDay": null,
+        "singleCask": false,
+        "releaseYear": 2019,
+        "vintageYear": null,
+        "bottlingYear": null,
+        "caskStrength": null,
+        "releaseMonth": null,
+        "familyContext": {
+          "siblingBottles": []
+        }
+      },
+      {
+        "abv": 57.5,
+        "brand": "JYPSI",
+        "score": 33.751617,
+        "series": "Legacy",
+        "source": ["text"],
+        "bottler": null,
+        "edition": "Batch 1",
+        "outturn": null,
+        "bottleId": 45220,
+        "category": "blend",
+        "fullName": "JYPSI The Journey - Batch 1 - 57.5% ABV",
+        "reference": null,
+        "statedAge": null,
+        "caskNumber": null,
+        "comparison": {
+          "missing": ["bottler"],
+          "conflicts": ["abv", "brand"],
+          "agreements": ["edition"]
+        },
+        "distillery": [],
+        "maturation": null,
+        "releaseDay": null,
+        "singleCask": null,
+        "releaseYear": null,
+        "vintageYear": null,
+        "bottlingYear": null,
+        "caskStrength": null,
+        "releaseMonth": null,
+        "familyContext": {
+          "siblingBottles": []
+        }
+      },
+      {
+        "abv": 46,
+        "brand": "J.J. Corry",
+        "score": 33.63492,
+        "series": null,
+        "source": ["text"],
+        "bottler": null,
+        "edition": "Batch 1",
+        "outturn": null,
+        "bottleId": 44819,
+        "category": "blend",
+        "fullName": "J.J. Corry The Hanson - Batch 1 - 46.0% ABV",
+        "reference": null,
+        "statedAge": null,
+        "caskNumber": null,
+        "comparison": {
+          "missing": ["bottler"],
+          "conflicts": ["abv", "brand"],
+          "agreements": ["edition"]
+        },
+        "distillery": [],
+        "maturation": null,
+        "releaseDay": null,
+        "singleCask": null,
+        "releaseYear": null,
+        "vintageYear": null,
+        "bottlingYear": null,
+        "caskStrength": null,
+        "releaseMonth": null,
+        "familyContext": {
+          "siblingBottles": [
+            {
+              "abv": null,
+              "edition": null,
+              "outturn": null,
+              "bottleId": 13346,
+              "fullName": "J.J. Corry The Hanson",
+              "statedAge": null,
+              "caskNumber": null,
+              "maturation": null,
+              "releaseDay": null,
+              "singleCask": null,
+              "releaseYear": null,
+              "traitFields": [],
+              "vintageYear": null,
+              "bottlingYear": null,
+              "caskStrength": null,
+              "releaseMonth": null
+            }
+          ]
+        }
+      },
+      {
+        "abv": 47.9,
+        "brand": "That Boutique-y Whisky Company",
+        "score": 33.40391,
+        "series": null,
+        "source": ["text"],
+        "bottler": "That Boutique-y Whisky Company",
+        "edition": "Batch 1",
+        "outturn": null,
+        "bottleId": 46228,
+        "category": "single_malt",
+        "fullName": "TBWC Glenrothes - Batch 1 - 47.9% ABV",
+        "reference": null,
+        "statedAge": null,
+        "caskNumber": null,
+        "comparison": {
+          "missing": ["releaseYear"],
+          "conflicts": ["abv", "brand", "bottler"],
+          "agreements": ["edition"]
+        },
+        "distillery": ["The Glenrothes"],
+        "maturation": null,
+        "releaseDay": null,
+        "singleCask": null,
+        "releaseYear": null,
+        "vintageYear": null,
+        "bottlingYear": null,
+        "caskStrength": null,
+        "releaseMonth": null,
+        "familyContext": {
+          "siblingBottles": []
+        }
+      },
+      {
+        "abv": null,
+        "brand": "High West",
+        "score": 33.108196,
+        "series": null,
+        "source": ["text"],
+        "bottler": null,
+        "edition": "Batch 3",
+        "outturn": null,
+        "bottleId": 45052,
+        "category": "blend",
+        "fullName": "High West Valley Tan - Batch 3",
+        "reference": null,
+        "statedAge": null,
+        "caskNumber": null,
+        "comparison": {
+          "missing": ["abv", "releaseYear", "caskStrength", "bottler"],
+          "conflicts": ["category", "brand"],
+          "agreements": ["edition"]
+        },
+        "distillery": [],
+        "maturation": null,
+        "releaseDay": null,
+        "singleCask": null,
+        "releaseYear": null,
+        "vintageYear": null,
+        "bottlingYear": null,
+        "caskStrength": null,
+        "releaseMonth": null,
+        "familyContext": {
+          "siblingBottles": [
+            {
+              "abv": null,
+              "edition": null,
+              "outturn": null,
+              "bottleId": 44043,
+              "fullName": "High West Valley Tan",
+              "statedAge": null,
+              "caskNumber": null,
+              "maturation": null,
+              "releaseDay": null,
+              "singleCask": null,
+              "releaseYear": null,
+              "traitFields": [],
+              "vintageYear": null,
+              "bottlingYear": null,
+              "caskStrength": null,
+              "releaseMonth": null
+            },
+            {
+              "abv": null,
+              "edition": "Batch 2",
+              "outturn": null,
+              "bottleId": 45051,
+              "fullName": "High West Valley Tan - Batch 2",
+              "statedAge": null,
+              "caskNumber": null,
+              "maturation": null,
+              "releaseDay": null,
+              "singleCask": null,
+              "releaseYear": null,
+              "traitFields": ["edition"],
+              "vintageYear": null,
+              "bottlingYear": null,
+              "caskStrength": null,
+              "releaseMonth": null
+            }
+          ]
+        }
+      },
+      {
+        "abv": null,
+        "brand": "The GlenDronach",
+        "score": 33.08033,
+        "series": null,
+        "source": ["text"],
+        "bottler": "The GlenDronach",
+        "edition": "Batch 3",
+        "outturn": null,
+        "bottleId": 44903,
+        "category": "single_malt",
+        "fullName": "The GlenDronach Cask Strength - Batch 3",
+        "reference": null,
+        "statedAge": null,
+        "caskNumber": null,
+        "comparison": {
+          "missing": ["abv", "releaseYear"],
+          "conflicts": ["category", "brand", "bottler"],
+          "agreements": ["caskStrength", "edition"]
+        },
+        "distillery": [],
+        "maturation": null,
+        "releaseDay": null,
+        "singleCask": null,
+        "releaseYear": null,
+        "vintageYear": null,
+        "bottlingYear": null,
+        "caskStrength": true,
+        "releaseMonth": null,
+        "familyContext": {
+          "siblingBottles": [
+            {
+              "abv": null,
+              "edition": null,
+              "outturn": null,
+              "bottleId": 44009,
+              "fullName": "The GlenDronach Cask Strength",
+              "statedAge": null,
+              "caskNumber": null,
+              "maturation": null,
+              "releaseDay": null,
+              "singleCask": null,
+              "releaseYear": null,
+              "traitFields": [],
+              "vintageYear": null,
+              "bottlingYear": null,
+              "caskStrength": null,
+              "releaseMonth": null
+            },
+            {
+              "abv": null,
+              "edition": "Batch 1",
+              "outturn": null,
+              "bottleId": 44901,
+              "fullName": "The GlenDronach Cask Strength - Batch 1",
+              "statedAge": null,
+              "caskNumber": null,
+              "maturation": null,
+              "releaseDay": null,
+              "singleCask": null,
+              "releaseYear": null,
+              "traitFields": ["edition", "caskStrength"],
+              "vintageYear": null,
+              "bottlingYear": null,
+              "caskStrength": true,
+              "releaseMonth": null
+            },
+            {
+              "abv": null,
+              "edition": "Batch 10",
+              "outturn": null,
+              "bottleId": 44910,
+              "fullName": "The GlenDronach Cask Strength - Batch 10 - 10-year-old",
+              "statedAge": 10,
+              "caskNumber": null,
+              "maturation": null,
+              "releaseDay": null,
+              "singleCask": null,
+              "releaseYear": null,
+              "traitFields": ["edition", "statedAge", "caskStrength"],
+              "vintageYear": null,
+              "bottlingYear": null,
+              "caskStrength": true,
+              "releaseMonth": null
+            },
+            {
+              "abv": null,
+              "edition": "Batch 2",
+              "outturn": null,
+              "bottleId": 44902,
+              "fullName": "The GlenDronach Cask Strength - Batch 2",
+              "statedAge": null,
+              "caskNumber": null,
+              "maturation": null,
+              "releaseDay": null,
+              "singleCask": null,
+              "releaseYear": null,
+              "traitFields": ["edition", "caskStrength"],
+              "vintageYear": null,
+              "bottlingYear": null,
+              "caskStrength": true,
+              "releaseMonth": null
+            },
+            {
+              "abv": null,
+              "edition": "Batch 4",
+              "outturn": null,
+              "bottleId": 44905,
+              "fullName": "The GlenDronach Cask Strength - Batch 4 - 12-year-old",
+              "statedAge": 12,
+              "caskNumber": null,
+              "maturation": null,
+              "releaseDay": null,
+              "singleCask": null,
+              "releaseYear": null,
+              "traitFields": ["edition", "statedAge", "caskStrength"],
+              "vintageYear": null,
+              "bottlingYear": null,
+              "caskStrength": true,
+              "releaseMonth": null
+            },
+            {
+              "abv": null,
+              "edition": "Batch 5",
+              "outturn": null,
+              "bottleId": 44904,
+              "fullName": "The GlenDronach Cask Strength - Batch 5 - 10-year-old",
+              "statedAge": 10,
+              "caskNumber": null,
+              "maturation": null,
+              "releaseDay": null,
+              "singleCask": null,
+              "releaseYear": null,
+              "traitFields": ["edition", "statedAge", "caskStrength"],
+              "vintageYear": null,
+              "bottlingYear": null,
+              "caskStrength": true,
+              "releaseMonth": null
+            },
+            {
+              "abv": null,
+              "edition": "Batch 6",
+              "outturn": null,
+              "bottleId": 44906,
+              "fullName": "The GlenDronach Cask Strength - Batch 6",
+              "statedAge": null,
+              "caskNumber": null,
+              "maturation": null,
+              "releaseDay": null,
+              "singleCask": null,
+              "releaseYear": null,
+              "traitFields": ["edition", "caskStrength"],
+              "vintageYear": null,
+              "bottlingYear": null,
+              "caskStrength": true,
+              "releaseMonth": null
+            },
+            {
+              "abv": null,
+              "edition": "Batch 7",
+              "outturn": null,
+              "bottleId": 44907,
+              "fullName": "The GlenDronach Cask Strength - Batch 7",
+              "statedAge": null,
+              "caskNumber": null,
+              "maturation": null,
+              "releaseDay": null,
+              "singleCask": null,
+              "releaseYear": null,
+              "traitFields": ["edition", "caskStrength"],
+              "vintageYear": null,
+              "bottlingYear": null,
+              "caskStrength": true,
+              "releaseMonth": null
+            }
+          ]
+        }
+      },
+      {
+        "abv": null,
+        "brand": "Ballechin",
+        "score": 32.9634,
+        "series": null,
+        "source": ["text"],
+        "bottler": "Edradour",
+        "edition": "Batch 3",
+        "outturn": null,
+        "bottleId": 44970,
+        "category": "single_malt",
+        "fullName": "Ballechin The Discovery Series - Batch 3",
+        "reference": null,
+        "statedAge": null,
+        "caskNumber": null,
+        "comparison": {
+          "missing": ["abv", "releaseYear", "caskStrength"],
+          "conflicts": ["category", "brand", "bottler"],
+          "agreements": ["edition"]
+        },
+        "distillery": [],
+        "maturation": null,
+        "releaseDay": null,
+        "singleCask": null,
+        "releaseYear": null,
+        "vintageYear": null,
+        "bottlingYear": null,
+        "caskStrength": null,
+        "releaseMonth": null,
+        "familyContext": {
+          "siblingBottles": [
+            {
+              "abv": null,
+              "edition": null,
+              "outturn": null,
+              "bottleId": 44018,
+              "fullName": "Ballechin The Discovery Series",
+              "statedAge": null,
+              "caskNumber": null,
+              "maturation": null,
+              "releaseDay": null,
+              "singleCask": null,
+              "releaseYear": null,
+              "traitFields": [],
+              "vintageYear": null,
+              "bottlingYear": null,
+              "caskStrength": null,
+              "releaseMonth": null
+            },
+            {
+              "abv": null,
+              "edition": "Batch 5",
+              "outturn": null,
+              "bottleId": 44971,
+              "fullName": "Ballechin The Discovery Series - Batch 5",
+              "statedAge": null,
+              "caskNumber": null,
+              "maturation": null,
+              "releaseDay": null,
+              "singleCask": null,
+              "releaseYear": null,
+              "traitFields": ["edition"],
+              "vintageYear": null,
+              "bottlingYear": null,
+              "caskStrength": null,
+              "releaseMonth": null
+            },
+            {
+              "abv": null,
+              "edition": "Batch 6",
+              "outturn": null,
+              "bottleId": 44972,
+              "fullName": "Ballechin The Discovery Series - Batch 6",
+              "statedAge": null,
+              "caskNumber": null,
+              "maturation": null,
+              "releaseDay": null,
+              "singleCask": null,
+              "releaseYear": null,
+              "traitFields": ["edition"],
+              "vintageYear": null,
+              "bottlingYear": null,
+              "caskStrength": null,
+              "releaseMonth": null
+            },
+            {
+              "abv": null,
+              "edition": "Batch 7",
+              "outturn": null,
+              "bottleId": 44973,
+              "fullName": "Ballechin The Discovery Series - Batch 7",
+              "statedAge": null,
+              "caskNumber": null,
+              "maturation": null,
+              "releaseDay": null,
+              "singleCask": null,
+              "releaseYear": null,
+              "traitFields": ["edition"],
+              "vintageYear": null,
+              "bottlingYear": null,
+              "caskStrength": null,
+              "releaseMonth": null
+            },
+            {
+              "abv": null,
+              "edition": "Batch 8",
+              "outturn": null,
+              "bottleId": 44974,
+              "fullName": "Ballechin The Discovery Series - Batch 8",
+              "statedAge": null,
+              "caskNumber": null,
+              "maturation": null,
+              "releaseDay": null,
+              "singleCask": null,
+              "releaseYear": null,
+              "traitFields": ["edition"],
+              "vintageYear": null,
+              "bottlingYear": null,
+              "caskStrength": null,
+              "releaseMonth": null
+            }
+          ]
+        }
+      },
+      {
+        "abv": null,
+        "brand": "High West",
+        "score": 32.50325,
+        "series": null,
+        "source": ["text"],
+        "bottler": null,
+        "edition": "Batch 1",
+        "outturn": null,
+        "bottleId": 44985,
+        "category": "blend",
+        "fullName": "High West Bourye - Batch 1",
+        "reference": null,
+        "statedAge": null,
+        "caskNumber": null,
+        "comparison": {
+          "missing": ["abv", "bottler"],
+          "conflicts": ["brand"],
+          "agreements": ["edition"]
+        },
+        "distillery": [],
+        "maturation": null,
+        "releaseDay": null,
+        "singleCask": null,
+        "releaseYear": null,
+        "vintageYear": null,
+        "bottlingYear": null,
+        "caskStrength": null,
+        "releaseMonth": null,
+        "familyContext": {
+          "siblingBottles": [
+            {
+              "abv": null,
+              "edition": null,
+              "outturn": null,
+              "bottleId": 44021,
+              "fullName": "High West Bourye",
+              "statedAge": null,
+              "caskNumber": null,
+              "maturation": null,
+              "releaseDay": null,
+              "singleCask": null,
+              "releaseYear": null,
+              "traitFields": [],
+              "vintageYear": null,
+              "bottlingYear": null,
+              "caskStrength": null,
+              "releaseMonth": null
+            },
+            {
+              "abv": null,
+              "edition": "Batch 1446",
+              "outturn": null,
+              "bottleId": 44986,
+              "fullName": "High West Bourye - Batch 1446",
+              "statedAge": null,
+              "caskNumber": null,
+              "maturation": null,
+              "releaseDay": null,
+              "singleCask": null,
+              "releaseYear": null,
+              "traitFields": ["edition"],
+              "vintageYear": null,
+              "bottlingYear": null,
+              "caskStrength": null,
+              "releaseMonth": null
+            },
+            {
+              "abv": null,
+              "edition": "Batch 17A09",
+              "outturn": null,
+              "bottleId": 44984,
+              "fullName": "High West Bourye - Batch 17A09",
+              "statedAge": null,
+              "caskNumber": null,
+              "maturation": null,
+              "releaseDay": null,
+              "singleCask": null,
+              "releaseYear": null,
+              "traitFields": ["edition"],
+              "vintageYear": null,
+              "bottlingYear": null,
+              "caskStrength": null,
+              "releaseMonth": null
+            },
+            {
+              "abv": null,
+              "edition": "Batch 18K01",
+              "outturn": null,
+              "bottleId": 44987,
+              "fullName": "High West Bourye - Batch 18K01",
+              "statedAge": null,
+              "caskNumber": null,
+              "maturation": null,
+              "releaseDay": null,
+              "singleCask": null,
+              "releaseYear": null,
+              "traitFields": ["edition"],
+              "vintageYear": null,
+              "bottlingYear": null,
+              "caskStrength": null,
+              "releaseMonth": null
+            }
+          ]
+        }
+      },
+      {
+        "abv": 53.1,
+        "brand": "That Boutique-y Whisky Company",
+        "score": 32.314423,
+        "series": null,
+        "source": ["text"],
+        "bottler": "That Boutique-y Whisky Company",
+        "edition": "Batch 1",
+        "outturn": null,
+        "bottleId": 46188,
+        "category": "rye",
+        "fullName": "TBWC Kyrö - Batch 1 - 4-year-old - 53.1% ABV",
+        "reference": null,
+        "statedAge": 4,
+        "caskNumber": null,
+        "comparison": {
+          "missing": ["releaseYear"],
+          "conflicts": ["abv", "brand", "bottler"],
+          "agreements": ["edition"]
+        },
+        "distillery": ["Kyrö"],
+        "maturation": null,
+        "releaseDay": null,
+        "singleCask": null,
+        "releaseYear": null,
+        "vintageYear": null,
+        "bottlingYear": null,
+        "caskStrength": null,
+        "releaseMonth": null,
+        "familyContext": {
+          "siblingBottles": []
+        }
+      },
+      {
+        "abv": 50.7,
+        "brand": "That Boutique-y Whisky Company",
+        "score": 32.216427,
+        "series": null,
+        "source": ["text"],
+        "bottler": "That Boutique-y Whisky Company",
+        "edition": "Batch 1",
+        "outturn": null,
+        "bottleId": 46204,
+        "category": "single_malt",
+        "fullName": "TBWC Copperworks - Batch 1 - 3-year-old - 50.7% ABV",
+        "reference": null,
+        "statedAge": 3,
+        "caskNumber": null,
+        "comparison": {
+          "missing": ["releaseYear"],
+          "conflicts": ["abv", "brand", "bottler"],
+          "agreements": ["edition"]
+        },
+        "distillery": ["Copperworks"],
+        "maturation": null,
+        "releaseDay": null,
+        "singleCask": null,
+        "releaseYear": null,
+        "vintageYear": null,
+        "bottlingYear": null,
+        "caskStrength": null,
+        "releaseMonth": null,
+        "familyContext": {
+          "siblingBottles": []
+        }
+      },
+      {
+        "abv": 46.4,
+        "brand": "That Boutique-y Whisky Company",
+        "score": 32.216427,
+        "series": null,
+        "source": ["text"],
+        "bottler": "That Boutique-y Whisky Company",
+        "edition": "Batch 1",
+        "outturn": null,
+        "bottleId": 46195,
+        "category": "single_malt",
+        "fullName": "TBWC HighGlen - Batch 1 - 3-year-old - 46.4% ABV",
+        "reference": null,
+        "statedAge": 3,
+        "caskNumber": null,
+        "comparison": {
+          "missing": ["releaseYear"],
+          "conflicts": ["abv", "brand", "bottler"],
+          "agreements": ["edition"]
+        },
+        "distillery": ["HighGlen"],
+        "maturation": null,
+        "releaseDay": null,
+        "singleCask": null,
+        "releaseYear": null,
+        "vintageYear": null,
+        "bottlingYear": null,
+        "caskStrength": null,
+        "releaseMonth": null,
+        "familyContext": {
+          "siblingBottles": []
+        }
+      },
+      {
+        "abv": 49.4,
+        "brand": "That Boutique-y Whisky Company",
+        "score": 32.216427,
+        "series": null,
+        "source": ["text"],
+        "bottler": "That Boutique-y Whisky Company",
+        "edition": "Batch 1",
+        "outturn": null,
+        "bottleId": 46208,
+        "category": "single_malt",
+        "fullName": "TBWC Langatun - Batch 1 - 5-year-old - 49.4% ABV",
+        "reference": null,
+        "statedAge": 5,
+        "caskNumber": null,
+        "comparison": {
+          "missing": ["releaseYear"],
+          "conflicts": ["abv", "brand", "bottler"],
+          "agreements": ["edition"]
+        },
+        "distillery": ["Langatun"],
+        "maturation": null,
+        "releaseDay": null,
+        "singleCask": null,
+        "releaseYear": null,
+        "vintageYear": null,
+        "bottlingYear": null,
+        "caskStrength": null,
+        "releaseMonth": null,
+        "familyContext": {
+          "siblingBottles": []
+        }
+      },
+      {
+        "abv": 50.4,
+        "brand": "That Boutique-y Whisky Company",
+        "score": 32.12045,
+        "series": null,
+        "source": ["text"],
+        "bottler": "That Boutique-y Whisky Company",
+        "edition": "Batch 1",
+        "outturn": null,
+        "bottleId": 46938,
+        "category": "single_malt",
+        "fullName": "TBWC Cotswolds - Batch 1 - 3-year-old - 50.4% ABV",
+        "reference": null,
+        "statedAge": 3,
+        "caskNumber": null,
+        "comparison": {
+          "missing": ["releaseYear"],
+          "conflicts": ["abv", "brand", "bottler"],
+          "agreements": ["edition"]
+        },
+        "distillery": ["Cotswolds Distillery"],
+        "maturation": null,
+        "releaseDay": null,
+        "singleCask": null,
+        "releaseYear": null,
+        "vintageYear": null,
+        "bottlingYear": null,
+        "caskStrength": null,
+        "releaseMonth": null,
+        "familyContext": {
+          "siblingBottles": []
+        }
+      },
+      {
+        "abv": 59.1,
+        "brand": "Very Olde St. Nick",
+        "score": 31.969292,
+        "series": null,
+        "source": ["text"],
+        "bottler": "Preservation Distillery",
+        "edition": "Lot #1",
+        "outturn": null,
+        "bottleId": 45497,
+        "category": "bourbon",
+        "fullName": "Very Olde St. Nick Ancient Cask Immaculata - Lot #1 - 2026 Release - 59.1% ABV",
+        "reference": null,
+        "statedAge": null,
+        "caskNumber": null,
+        "comparison": {
+          "missing": [],
+          "conflicts": ["abv", "brand", "bottler"],
+          "agreements": ["releaseYear", "edition"]
+        },
+        "distillery": [],
+        "maturation": null,
+        "releaseDay": null,
+        "singleCask": null,
+        "releaseYear": 2026,
+        "vintageYear": null,
+        "bottlingYear": null,
+        "caskStrength": null,
+        "releaseMonth": null,
+        "familyContext": {
+          "siblingBottles": []
+        }
+      },
+      {
+        "abv": 45,
+        "brand": "O'Danaghers",
+        "score": 31.905178,
+        "series": null,
+        "source": ["text"],
+        "bottler": null,
+        "edition": "Batch 1",
+        "outturn": null,
+        "bottleId": 65170,
+        "category": null,
+        "fullName": "O'Danaghers American - Batch 1",
+        "reference": null,
+        "statedAge": null,
+        "caskNumber": null,
+        "comparison": {
+          "missing": ["releaseYear", "bottler"],
+          "conflicts": ["abv", "brand"],
+          "agreements": ["edition"]
+        },
+        "distillery": ["Dry Fly Distilling"],
+        "maturation": "New American oak, 53-gallon barrel",
+        "releaseDay": null,
+        "singleCask": null,
+        "releaseYear": null,
+        "vintageYear": null,
+        "bottlingYear": null,
+        "caskStrength": null,
+        "releaseMonth": null,
+        "familyContext": {
+          "siblingBottles": []
+        }
+      },
+      {
+        "abv": null,
+        "brand": "Springbank",
+        "score": 31.74564,
+        "series": null,
+        "source": ["text"],
+        "bottler": "Springbank",
+        "edition": "Batch 1",
+        "outturn": null,
+        "bottleId": 45066,
+        "category": "single_malt",
+        "fullName": "Springbank 1997 Vintage - Batch 1",
+        "reference": null,
+        "statedAge": 23,
+        "caskNumber": null,
+        "comparison": {
+          "missing": ["abv"],
+          "conflicts": ["brand", "bottler"],
+          "agreements": ["edition"]
+        },
+        "distillery": ["Springbank"],
+        "maturation": null,
+        "releaseDay": null,
+        "singleCask": null,
+        "releaseYear": null,
+        "vintageYear": 1997,
+        "bottlingYear": null,
+        "caskStrength": null,
+        "releaseMonth": null,
+        "familyContext": {
+          "siblingBottles": [
+            {
+              "abv": null,
+              "edition": null,
+              "outturn": null,
+              "bottleId": 44052,
+              "fullName": "Springbank 1997 Vintage",
+              "statedAge": 23,
+              "caskNumber": null,
+              "maturation": null,
+              "releaseDay": null,
+              "singleCask": null,
+              "releaseYear": null,
+              "traitFields": ["statedAge"],
+              "vintageYear": null,
+              "bottlingYear": null,
+              "caskStrength": null,
+              "releaseMonth": null
+            },
+            {
+              "abv": null,
+              "edition": "Batch 2",
+              "outturn": null,
+              "bottleId": 45067,
+              "fullName": "Springbank 1997 Vintage - Batch 2",
+              "statedAge": 23,
+              "caskNumber": null,
+              "maturation": null,
+              "releaseDay": null,
+              "singleCask": null,
+              "releaseYear": null,
+              "traitFields": ["edition", "statedAge", "vintageYear"],
+              "vintageYear": 1997,
+              "bottlingYear": null,
+              "caskStrength": null,
+              "releaseMonth": null
+            }
+          ]
+        }
+      },
+      {
+        "abv": null,
+        "brand": "Redemption",
+        "score": 31.501099,
+        "series": null,
+        "source": ["text"],
+        "bottler": null,
+        "edition": "Batch 1",
+        "outturn": null,
+        "bottleId": 45135,
+        "category": "bourbon",
+        "fullName": "Redemption High Rye Bourbon - Batch 1",
+        "reference": null,
+        "statedAge": null,
+        "caskNumber": null,
+        "comparison": {
+          "missing": ["abv", "bottler"],
+          "conflicts": ["brand"],
+          "agreements": ["edition"]
+        },
+        "distillery": [],
+        "maturation": null,
+        "releaseDay": null,
+        "singleCask": null,
+        "releaseYear": null,
+        "vintageYear": null,
+        "bottlingYear": null,
+        "caskStrength": null,
+        "releaseMonth": null,
+        "familyContext": {
+          "siblingBottles": [
+            {
+              "abv": null,
+              "edition": null,
+              "outturn": null,
+              "bottleId": 44167,
+              "fullName": "Redemption High Rye Bourbon",
+              "statedAge": null,
+              "caskNumber": null,
+              "maturation": null,
+              "releaseDay": null,
+              "singleCask": null,
+              "releaseYear": null,
+              "traitFields": [],
+              "vintageYear": null,
+              "bottlingYear": null,
+              "caskStrength": null,
+              "releaseMonth": null
+            },
+            {
+              "abv": null,
+              "edition": "Batch 122",
+              "outturn": null,
+              "bottleId": 45136,
+              "fullName": "Redemption High Rye Bourbon - Batch 122",
+              "statedAge": null,
+              "caskNumber": null,
+              "maturation": null,
+              "releaseDay": null,
+              "singleCask": null,
+              "releaseYear": null,
+              "traitFields": ["edition"],
+              "vintageYear": null,
+              "bottlingYear": null,
+              "caskStrength": null,
+              "releaseMonth": null
+            }
+          ]
+        }
+      },
+      {
+        "abv": 62.35,
+        "brand": "Woodford Reserve",
+        "score": 0.7066212722569348,
+        "series": "Master's Collection",
+        "source": ["vector"],
+        "bottler": null,
+        "edition": null,
+        "outturn": null,
+        "bottleId": 45235,
+        "category": "bourbon",
+        "fullName": "Woodford Reserve Batch Proof - 2023 Release - 62.4% ABV - Cask Strength",
+        "reference": "Woodford Reserve Batch Proof - 2023 Release - 62.4% ABV - Cask Strength",
+        "statedAge": null,
+        "caskNumber": null,
+        "comparison": {
+          "missing": ["edition", "bottler"],
+          "conflicts": ["abv", "releaseYear", "brand"],
+          "agreements": ["category", "caskStrength"]
+        },
+        "distillery": ["Woodford Reserve"],
+        "maturation": null,
+        "releaseDay": null,
+        "singleCask": null,
+        "releaseYear": 2023,
+        "vintageYear": null,
+        "bottlingYear": null,
+        "caskStrength": true,
+        "releaseMonth": null,
+        "familyContext": {
+          "siblingBottles": []
+        }
+      },
+      {
+        "abv": 59.65,
+        "brand": "Maker's Mark",
+        "score": 0.7062856408661169,
+        "series": null,
+        "source": ["vector"],
+        "bottler": null,
+        "edition": null,
+        "outturn": null,
+        "bottleId": 56690,
+        "category": "bourbon",
+        "fullName": "Maker's Mark Cellar Aged",
+        "reference": "Maker's Mark Cellar Aged (2024 Release), 59.65%",
+        "statedAge": null,
+        "caskNumber": null,
+        "comparison": {
+          "missing": ["edition", "bottler"],
+          "conflicts": ["abv", "releaseYear", "brand"],
+          "agreements": ["category", "caskStrength"]
+        },
+        "distillery": ["Maker's Mark Distillery"],
+        "maturation": null,
+        "releaseDay": null,
+        "singleCask": null,
+        "releaseYear": 2024,
+        "vintageYear": null,
+        "bottlingYear": null,
+        "caskStrength": true,
+        "releaseMonth": null,
+        "familyContext": {
+          "siblingBottles": []
+        }
+      },
+      {
+        "abv": 57.85,
+        "brand": "Maker's Mark",
+        "score": 0.6974973471874046,
+        "series": null,
+        "source": ["vector"],
+        "bottler": null,
+        "edition": null,
+        "outturn": null,
+        "bottleId": 56689,
+        "category": "bourbon",
+        "fullName": "Maker's Mark Cellar Aged",
+        "reference": "Maker's Mark Cellar Aged (2023 Release), 57.85%",
+        "statedAge": null,
+        "caskNumber": null,
+        "comparison": {
+          "missing": ["edition", "bottler"],
+          "conflicts": ["abv", "releaseYear", "brand"],
+          "agreements": ["category", "caskStrength"]
+        },
+        "distillery": ["Maker's Mark Distillery"],
+        "maturation": null,
+        "releaseDay": null,
+        "singleCask": null,
+        "releaseYear": 2023,
+        "vintageYear": null,
+        "bottlingYear": null,
+        "caskStrength": true,
+        "releaseMonth": null,
+        "familyContext": {
+          "siblingBottles": []
+        }
+      },
+      {
+        "abv": null,
+        "brand": "Barrell Whiskey",
+        "score": 0.69409837306756,
+        "series": null,
+        "source": ["vector"],
+        "bottler": null,
+        "edition": null,
+        "outturn": null,
+        "bottleId": 16237,
+        "category": "blend",
+        "fullName": "Barrell Whiskey Batch 001",
+        "reference": "Barrell Whiskey (Batch 001), 61.25%",
+        "statedAge": null,
+        "caskNumber": null,
+        "comparison": {
+          "missing": ["abv", "edition", "bottler"],
+          "conflicts": ["brand"],
+          "agreements": []
+        },
+        "distillery": [],
+        "maturation": null,
+        "releaseDay": null,
+        "singleCask": null,
+        "releaseYear": null,
+        "vintageYear": null,
+        "bottlingYear": null,
+        "caskStrength": null,
+        "releaseMonth": null,
+        "familyContext": {
+          "siblingBottles": []
+        }
+      },
+      {
+        "abv": null,
+        "brand": "Hochstadter's",
+        "score": 0.6724013094137048,
+        "series": null,
+        "source": ["vector"],
+        "bottler": null,
+        "edition": null,
+        "outturn": null,
+        "bottleId": 16089,
+        "category": "rye",
+        "fullName": "Hochstadter's Vatted Straight Rye Whiskey (Batch 1)",
+        "reference": "Hochstadter's Vatted Straight Rye Whiskey (Batch 1), 50%",
+        "statedAge": null,
+        "caskNumber": null,
+        "comparison": {
+          "missing": ["abv", "edition", "bottler"],
+          "conflicts": ["brand"],
+          "agreements": []
+        },
+        "distillery": [],
+        "maturation": null,
+        "releaseDay": null,
+        "singleCask": null,
+        "releaseYear": null,
+        "vintageYear": null,
+        "bottlingYear": null,
+        "caskStrength": null,
+        "releaseMonth": null,
+        "familyContext": {
+          "siblingBottles": []
+        }
+      }
+    ]
+  },
+  "context": {
+    "inspectedBottleIds": [45498, 56037],
+    "bottleContexts": [
+      {
+        "exact": {
+          "abv": 57.18,
+          "edition": "Batch No. 3",
+          "outturn": null,
+          "statedAge": null,
+          "caskNumber": null,
+          "maturation": null,
+          "releaseDay": null,
+          "singleCask": null,
+          "releaseYear": 2025,
+          "vintageYear": null,
+          "bottlingYear": null,
+          "caskStrength": true,
+          "releaseMonth": null
+        },
+        "shared": {
+          "name": "Limited Release",
+          "brand": {
+            "name": "Rare Character",
+            "entityId": 365784
+          },
+          "series": null,
+          "bottler": {
+            "name": "Rare Character",
+            "entityId": 365784
+          },
+          "category": "bourbon",
+          "statedAge": null,
+          "distillers": []
+        },
+        "groupId": 18458,
+        "bottleId": 45498,
+        "fullName": "Rare Character Limited Release - Batch No. 3 - 2025 Release - 57.2% ABV - Cask Strength",
+        "siblings": [],
+        "references": [
+          {
+            "name": "Rare Character Limited Release - Batch 01 - 2025 Release - 57.2% ABV",
+            "ignored": false
+          },
+          {
+            "name": "Rare Character Limited Release - Batch No. 3 - 2025 Release - 57.2% ABV - Cask Strength",
+            "ignored": false
+          }
+        ],
+        "observations": [
+          {
+            "facts": {
+              "proposalType": "create_new",
+              "proposedBottle": {
+                "abv": 57.2,
+                "name": "Limited Release",
+                "brand": {
+                  "id": null,
+                  "name": "Rare Character"
+                },
+                "series": null,
+                "bottler": null,
+                "edition": "Batch 01",
+                "caskFill": null,
+                "caskSize": null,
+                "caskType": null,
+                "category": "bourbon",
+                "statedAge": null,
+                "distillers": [],
+                "singleCask": null,
+                "releaseYear": 2025,
+                "vintageYear": null,
+                "caskStrength": null
+              }
+            },
+            "rawText": "Rare Character Limited Release Straight Bourbon Whiskey (Batch 01)",
+            "sourceKey": "store_price:12029128",
+            "sourceUrl": "https://www.astorwines.com/item/54660?lt=Search+Results&lid=search_results",
+            "sourceName": "Rare Character Limited Release Straight Bourbon Whiskey (Batch 01)",
+            "sourceType": "store_price",
+            "parsedIdentity": {
+              "abv": null,
+              "brand": "Rare Character",
+              "series": null,
+              "bottler": null,
+              "edition": "Batch 01",
+              "category": "bourbon",
+              "cask_fill": null,
+              "cask_size": null,
+              "cask_type": null,
+              "distillery": [],
+              "expression": "Limited Release",
+              "stated_age": null,
+              "single_cask": null,
+              "release_year": null,
+              "vintage_year": null,
+              "cask_strength": null
+            }
+          }
+        ],
+        "imageSources": [
+          {
+            "url": "https://api.peated.com/uploads/prices-clodsfw8t15yyg0g24px21fa.webp",
+            "source": {
+              "kind": "bottle"
+            },
+            "sourceUrl": null
+          }
+        ]
+      },
+      {
+        "exact": {
+          "abv": 50.5,
+          "edition": "Batch #01",
+          "outturn": null,
+          "statedAge": 7,
+          "caskNumber": null,
+          "maturation": null,
+          "releaseDay": null,
+          "singleCask": null,
+          "releaseYear": null,
+          "vintageYear": null,
+          "bottlingYear": null,
+          "caskStrength": null,
+          "releaseMonth": null
+        },
+        "shared": {
+          "name": "Hurst Knoll",
+          "brand": {
+            "name": "Rare Character",
+            "entityId": 365784
+          },
+          "series": null,
+          "bottler": {
+            "name": "Rare Character",
+            "entityId": 365784
+          },
+          "category": "rye",
+          "statedAge": null,
+          "distillers": []
+        },
+        "groupId": 28998,
+        "bottleId": 56037,
+        "fullName": "Rare Character Hurst Knoll - Batch #01",
+        "siblings": [],
+        "references": [
+          {
+            "name": "Hurst Knoll Kentucky Straight Rye Whiskey Batch #01",
+            "ignored": false
+          }
+        ],
+        "observations": [
+          {
+            "facts": {
+              "proposalType": "match_existing",
+              "proposedBottle": null,
+              "referenceScope": "none"
+            },
+            "rawText": "Hurst Knoll Kentucky Straight Rye Whiskey",
+            "sourceKey": "store_price:12036349",
+            "sourceUrl": "https://www.missionliquor.com/products/hurst-knoll-kentucky-straight-rye-whiskey-750ml",
+            "sourceName": "Hurst Knoll Kentucky Straight Rye Whiskey",
+            "sourceType": "store_price",
+            "parsedIdentity": null
+          }
+        ],
+        "imageSources": [
+          {
+            "url": "https://api.peated.com/uploads/prices-b7hmznv4z3kmwlnwqqlq51id.webp",
+            "source": {
+              "kind": "bottle"
+            },
+            "sourceUrl": "https://www.missionliquor.com/products/hurst-knoll-kentucky-straight-rye-whiskey-750ml"
+          }
+        ]
+      }
+    ],
+    "inspectedEntities": [
+      {
+        "kind": "bottler",
+        "name": "Rare Character",
+        "score": 1,
+        "source": ["exact", "text", "prefix", "contained"],
+        "entityId": 365784,
+        "reference": "Rare Character",
+        "shortName": null,
+        "retrievedFor": [
+          {
+            "exact": true,
+            "query": "Rare Character"
+          }
+        ]
+      },
+      {
+        "kind": "distillery",
+        "name": "High West",
+        "score": 1,
+        "source": ["exact", "text", "prefix", "contained"],
+        "entityId": 1750,
+        "reference": "High West",
+        "shortName": "",
+        "retrievedFor": [
+          {
+            "exact": true,
+            "query": "High West"
+          }
+        ]
+      },
+      {
+        "kind": "brand",
+        "name": "Redemption",
+        "score": 1,
+        "source": ["exact", "text", "prefix", "contained"],
+        "entityId": 1288,
+        "reference": "Redemption",
+        "shortName": null,
+        "retrievedFor": [
+          {
+            "exact": true,
+            "query": "Redemption"
+          }
+        ]
+      },
+      {
+        "kind": "distillery",
+        "name": "Glenglassaugh",
+        "score": 1,
+        "source": ["exact", "text", "prefix", "contained"],
+        "entityId": 255,
+        "reference": "Glenglassaugh",
+        "shortName": null,
+        "retrievedFor": [
+          {
+            "exact": true,
+            "query": "Glenglassaugh"
+          }
+        ]
+      },
+      {
+        "kind": "distillery",
+        "name": "Springbank",
+        "score": 1,
+        "source": ["exact", "text", "prefix", "contained"],
+        "entityId": 1362,
+        "reference": "Springbank",
+        "shortName": null,
+        "retrievedFor": [
+          {
+            "exact": true,
+            "query": "Springbank"
+          }
+        ]
+      },
+      {
+        "kind": "brand",
+        "name": "Barrell Whiskey",
+        "score": 1,
+        "source": ["exact", "text", "prefix", "contained"],
+        "entityId": 391,
+        "reference": "Barrell Whiskey",
+        "shortName": null,
+        "retrievedFor": [
+          {
+            "exact": true,
+            "query": "Barrell Whiskey"
+          }
+        ]
+      },
+      {
+        "kind": "brand",
+        "name": "Hochstadter's",
+        "score": 1,
+        "source": ["exact", "text", "prefix", "contained"],
+        "entityId": 3048,
+        "reference": "Hochstadter's",
+        "shortName": null,
+        "retrievedFor": [
+          {
+            "exact": true,
+            "query": "Hochstadter's"
+          }
+        ]
+      },
+      {
+        "kind": "brand",
+        "name": "Smoke Wagon",
+        "score": 1,
+        "source": ["exact", "text", "prefix", "contained"],
+        "entityId": 1347,
+        "reference": "Smoke Wagon",
+        "shortName": null,
+        "retrievedFor": [
+          {
+            "exact": true,
+            "query": "Smoke Wagon"
+          }
+        ]
+      },
+      {
+        "kind": "brand",
+        "name": "Uncle Nearest",
+        "score": 1,
+        "source": ["exact", "text", "prefix", "contained"],
+        "entityId": 4357,
+        "reference": "Uncle Nearest",
+        "shortName": null,
+        "retrievedFor": [
+          {
+            "exact": true,
+            "query": "Uncle Nearest"
+          }
+        ]
+      },
+      {
+        "kind": "distillery",
+        "name": "Nearest Green Distillery",
+        "score": 1,
+        "source": ["exact", "text", "prefix", "contained"],
+        "entityId": 367266,
+        "reference": "Nearest Green Distillery",
+        "shortName": null,
+        "retrievedFor": [
+          {
+            "exact": true,
+            "query": "Nearest Green Distillery"
+          }
+        ]
+      },
+      {
+        "kind": "distillery",
+        "name": "Laphroaig",
+        "score": 1,
+        "source": ["exact", "text", "prefix", "contained"],
+        "entityId": 1129,
+        "reference": "Laphroaig",
+        "shortName": "",
+        "retrievedFor": [
+          {
+            "exact": true,
+            "query": "Laphroaig"
+          }
+        ]
+      },
+      {
+        "kind": "brand",
+        "name": "JYPSI",
+        "score": 1,
+        "source": ["exact", "text", "prefix", "contained"],
+        "entityId": 365725,
+        "reference": "JYPSI",
+        "shortName": null,
+        "retrievedFor": [
+          {
+            "exact": true,
+            "query": "JYPSI"
+          }
+        ]
+      },
+      {
+        "kind": "bottler",
+        "name": "J.J. Corry",
+        "score": 1,
+        "source": ["exact", "text", "prefix", "contained"],
+        "entityId": 1076,
+        "reference": "J.J. Corry",
+        "shortName": null,
+        "retrievedFor": [
+          {
+            "exact": true,
+            "query": "J.J. Corry"
+          }
+        ]
+      },
+      {
+        "kind": "distillery",
+        "name": "Redemption Distillery",
+        "score": 0.5,
+        "source": ["text", "prefix"],
+        "entityId": 366927,
+        "reference": "Redemption Distillery",
+        "shortName": null,
+        "retrievedFor": [
+          {
+            "query": "Redemption"
+          }
+        ]
+      },
+      {
+        "kind": "company",
+        "name": "Uncle Nearest, Inc.",
+        "score": 0.5,
+        "source": ["text", "prefix"],
+        "entityId": 366444,
+        "reference": "Uncle Nearest, Inc.",
+        "shortName": null,
+        "retrievedFor": [
+          {
+            "query": "Uncle Nearest"
+          }
+        ]
+      },
+      {
+        "kind": "bottler",
+        "name": "Barrell Craft Spirits",
+        "score": 0.35,
+        "source": ["contained"],
+        "entityId": 75635,
+        "reference": "Barrel",
+        "shortName": "Barrell",
+        "retrievedFor": [
+          {
+            "query": "Barrell Whiskey"
+          }
+        ]
+      },
+      {
+        "kind": "company",
+        "name": "D. Johnston & Co. (Laphroaig) Ltd.",
+        "score": 0.2,
+        "source": ["text"],
+        "entityId": 5737,
+        "reference": null,
+        "shortName": null,
+        "retrievedFor": [
+          {
+            "query": "Laphroaig"
+          }
+        ]
+      },
+      {
+        "kind": "brand",
+        "name": "Whiskey Jypsi",
+        "score": 0.2,
+        "source": ["text"],
+        "entityId": 367157,
+        "reference": null,
+        "shortName": null,
+        "retrievedFor": [
+          {
+            "query": "JYPSI"
+          }
+        ]
+      }
+    ],
+    "inspectedSeries": []
+  },
+  "provenance": {
+    "source": "production_miss",
+    "verifiedSourceUrls": [
+      "https://whiskyadvocate.com/Rare-Character-Limited-Release-Batch-1-2026-59-79",
+      "https://rare-character.squarespace.com/rclr",
+      "https://potomacwines.com/en-gb/product/Rare-Character-Batch-No-01-2026-Bourbon"
+    ],
+    "dbOutcome": {
+      "bottleId": null,
+      "createsBottle": false,
+      "summary": "Production returned no_match."
+    },
+    "notes": "Captured from saved classifier run 29626 (review 18998, model openai/gpt-6-luna, 2026-10-28T08:29:25.366Z). Production rationale: The source describes one bourbon bottle, but its Batch 1 and 59.79% ABV combination conflicts with the available official-page result for 2026 Batch 3. The inspected Rare Character Limited Release candidate is Batch No. 3 from 2025, a distinct release, so it is not a safe match. The conflicting release identity also prevents a supported creation. Checked 2026-11-03. The official RCLR page's 2026 table lists Straight Bourbon Batch 1 119.56 / 59.79% (7-16 years), Batch 2 119.94 / 59.97%, Batch 3 119.80 / 59.90%, and separate rye and straight lines. Production read a search snippet as tying 59.79% to Batch 3. Whisky Advocate's category is Bourbon/Tennessee Whiskey. Existing Rare Character Limited Release Bottles use name 'Limited Release' with edition 'Batch N' and Brand Entity 365784; 68981 (Batch 2, 2026) and 68984 (Batch 3, 2026) were created after this run and are not in its candidates."
+  },
+  "expected": {
+    "status": "classified",
+    "action": "create_bottle",
+    "identityScope": "product",
+    "proposedBottle": {
+      "brand": {
+        "id": 365784,
+        "name": "Rare Character"
+      },
+      "edition": "Batch 1",
+      "abv": 59.79,
+      "releaseYear": 2026,
+      "category": "bourbon"
+    },
+    "proposedBottleNameIncludes": ["Limited Release"],
+    "proposedBottleNameExcludes": ["Batch", "2026", "59"],
+    "summary": "Rare Character's own Limited Release page lists 2026 Batch 1 Straight Bourbon at 119.56 proof (59.79%), which matches the review. The local candidate 45498 is the 2025 Batch No. 3 at 57.18%, a different release. Create the 2026 Batch 1 under the existing Limited Release shape, with the batch in edition and the year in releaseYear."
+  }
+}

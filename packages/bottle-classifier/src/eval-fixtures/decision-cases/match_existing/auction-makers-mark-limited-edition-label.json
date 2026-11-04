@@ -1,0 +1,1114 @@
+{
+  "id": "auction-makers-mark-limited-edition-label",
+  "name": "auction lot photo: a Maker's Mark holiday 'Limited Edition Bottle' label is the standard Maker's Mark Bourbon",
+  "input": {
+    "reference": {
+      "id": 17020,
+      "url": "https://www.scotchwhiskyauctions.com/auctions/234-the-185th-auction/906571-makers-mark-limited-edition-bottling/",
+      "name": "Maker’s Mark Limited Edition Bottling",
+      "imageUrl": "https://d3suvtcq00dftb.cloudfront.net/images/c92e7897a93b0307bc3baa3fe1cdbeeb-zoom.jpg",
+      "externalSiteId": 28097,
+      "currentBottleId": null
+    },
+    "extractedIdentity": {
+      "abv": 45,
+      "brand": null,
+      "series": null,
+      "bottler": null,
+      "edition": null,
+      "outturn": null,
+      "category": null,
+      "distillery": null,
+      "expression": null,
+      "maturation": null,
+      "stated_age": null,
+      "cask_number": null,
+      "single_cask": null,
+      "release_year": null,
+      "vintage_year": null,
+      "cask_strength": null
+    },
+    "imageEvidence": null,
+    "initialCandidates": [
+      {
+        "abv": 45,
+        "brand": "Maker's Mark",
+        "score": 65.41983,
+        "series": null,
+        "source": ["text", "brand_coverage", "context"],
+        "bottler": null,
+        "edition": null,
+        "outturn": null,
+        "bottleId": 56453,
+        "category": "bourbon",
+        "fullName": "Maker's Mark Black Wax",
+        "reference": null,
+        "statedAge": null,
+        "caskNumber": null,
+        "comparison": {
+          "missing": [],
+          "conflicts": [],
+          "agreements": ["abv"]
+        },
+        "distillery": ["Maker's Mark Distillery"],
+        "maturation": null,
+        "releaseDay": null,
+        "singleCask": null,
+        "releaseYear": null,
+        "vintageYear": null,
+        "bottlingYear": null,
+        "caskStrength": null,
+        "releaseMonth": null,
+        "familyContext": {
+          "siblingBottles": []
+        }
+      },
+      {
+        "abv": null,
+        "brand": "Maker's Mark",
+        "score": 61.758324,
+        "series": null,
+        "source": ["vector", "text", "brand_coverage"],
+        "bottler": "Maker's Mark",
+        "edition": "",
+        "outturn": null,
+        "bottleId": 42940,
+        "category": "bourbon",
+        "fullName": "Maker's Mark 101 Proof",
+        "reference": "Maker's Mark Limited Edition 101 Proof Kentucky Bourbon",
+        "statedAge": null,
+        "caskNumber": null,
+        "comparison": {
+          "missing": ["abv"],
+          "conflicts": [],
+          "agreements": []
+        },
+        "distillery": ["Maker's Mark Distillery"],
+        "maturation": null,
+        "releaseDay": null,
+        "singleCask": null,
+        "releaseYear": null,
+        "vintageYear": null,
+        "bottlingYear": null,
+        "caskStrength": null,
+        "releaseMonth": null,
+        "familyContext": {
+          "siblingBottles": []
+        }
+      },
+      {
+        "abv": 45,
+        "brand": "Maker's Mark",
+        "score": 61.5842,
+        "series": null,
+        "source": ["vector", "text", "brand_coverage"],
+        "bottler": null,
+        "edition": null,
+        "outturn": null,
+        "bottleId": 69500,
+        "category": "bourbon",
+        "fullName": "Maker's Mark Knicks Championship Edition",
+        "reference": "Maker's Mark Knicks Championship Edition Kentucky Straight Bourbon Whisky",
+        "statedAge": null,
+        "caskNumber": null,
+        "comparison": {
+          "missing": [],
+          "conflicts": [],
+          "agreements": ["abv"]
+        },
+        "distillery": ["Maker's Mark Distillery"],
+        "maturation": null,
+        "releaseDay": null,
+        "singleCask": null,
+        "releaseYear": null,
+        "vintageYear": null,
+        "bottlingYear": null,
+        "caskStrength": null,
+        "releaseMonth": null,
+        "familyContext": {
+          "siblingBottles": []
+        }
+      },
+      {
+        "abv": 55.4,
+        "brand": "Maker's Mark",
+        "score": 61.3913,
+        "series": "Wood Finishing Series",
+        "source": ["vector", "text"],
+        "bottler": null,
+        "edition": null,
+        "outturn": null,
+        "bottleId": 46784,
+        "category": "bourbon",
+        "fullName": "Maker's Mark London Edition",
+        "reference": "Maker's Mark London Edition - 55.4% ABV",
+        "statedAge": null,
+        "caskNumber": null,
+        "comparison": {
+          "missing": [],
+          "conflicts": ["abv"],
+          "agreements": ["category", "brand", "distillers"]
+        },
+        "distillery": ["Maker's Mark Distillery"],
+        "maturation": null,
+        "releaseDay": null,
+        "singleCask": null,
+        "releaseYear": null,
+        "vintageYear": null,
+        "bottlingYear": null,
+        "caskStrength": null,
+        "releaseMonth": null,
+        "familyContext": {
+          "siblingBottles": []
+        }
+      },
+      {
+        "abv": 45,
+        "brand": "Maker's Mark",
+        "score": 60.530594,
+        "series": null,
+        "source": ["vector", "text", "brand_coverage", "context"],
+        "bottler": null,
+        "edition": "",
+        "outturn": null,
+        "bottleId": 42937,
+        "category": "bourbon",
+        "fullName": "Maker's Mark Bourbon",
+        "reference": "Maker's Mark",
+        "statedAge": null,
+        "caskNumber": null,
+        "comparison": {
+          "missing": [],
+          "conflicts": [],
+          "agreements": ["abv"]
+        },
+        "distillery": ["Maker's Mark Distillery"],
+        "maturation": null,
+        "releaseDay": null,
+        "singleCask": false,
+        "releaseYear": null,
+        "vintageYear": null,
+        "bottlingYear": null,
+        "caskStrength": false,
+        "releaseMonth": null,
+        "familyContext": {
+          "siblingBottles": []
+        }
+      },
+      {
+        "abv": null,
+        "brand": "Maker's Mark",
+        "score": 59.86195,
+        "series": null,
+        "source": ["text"],
+        "bottler": null,
+        "edition": null,
+        "outturn": null,
+        "bottleId": 66895,
+        "category": "bourbon",
+        "fullName": "Maker's Mark Cellar Aged",
+        "reference": null,
+        "statedAge": null,
+        "caskNumber": null,
+        "comparison": {
+          "missing": ["abv"],
+          "conflicts": [],
+          "agreements": []
+        },
+        "distillery": ["Maker's Mark Distillery"],
+        "maturation": null,
+        "releaseDay": null,
+        "singleCask": null,
+        "releaseYear": 2026,
+        "vintageYear": null,
+        "bottlingYear": null,
+        "caskStrength": null,
+        "releaseMonth": null,
+        "familyContext": {
+          "siblingBottles": []
+        }
+      },
+      {
+        "abv": 45,
+        "brand": "Maker's Mark",
+        "score": 59.83645,
+        "series": null,
+        "source": ["text", "brand_coverage"],
+        "bottler": null,
+        "edition": "250th Anniversary",
+        "outturn": null,
+        "bottleId": 61507,
+        "category": "bourbon",
+        "fullName": "Maker's Mark Bourbon - 250th Anniversary",
+        "reference": null,
+        "statedAge": null,
+        "caskNumber": null,
+        "comparison": {
+          "missing": [],
+          "conflicts": [],
+          "agreements": ["abv"]
+        },
+        "distillery": ["Maker's Mark Distillery"],
+        "maturation": null,
+        "releaseDay": 1,
+        "singleCask": null,
+        "releaseYear": 2026,
+        "vintageYear": null,
+        "bottlingYear": null,
+        "caskStrength": null,
+        "releaseMonth": 6,
+        "familyContext": {
+          "siblingBottles": []
+        }
+      },
+      {
+        "abv": 45,
+        "brand": "Maker's Mark",
+        "score": 59.83645,
+        "series": null,
+        "source": ["text", "brand_coverage"],
+        "bottler": null,
+        "edition": "Justify 2018",
+        "outturn": null,
+        "bottleId": 57070,
+        "category": "bourbon",
+        "fullName": "Maker's Mark Bourbon - Justify 2018",
+        "reference": null,
+        "statedAge": null,
+        "caskNumber": null,
+        "comparison": {
+          "missing": [],
+          "conflicts": [],
+          "agreements": ["abv"]
+        },
+        "distillery": ["Maker's Mark Distillery"],
+        "maturation": null,
+        "releaseDay": null,
+        "singleCask": null,
+        "releaseYear": 2018,
+        "vintageYear": null,
+        "bottlingYear": null,
+        "caskStrength": null,
+        "releaseMonth": null,
+        "familyContext": {
+          "siblingBottles": []
+        }
+      },
+      {
+        "abv": 45,
+        "brand": "Maker's Mark",
+        "score": 59.83645,
+        "series": null,
+        "source": ["text", "brand_coverage"],
+        "bottler": null,
+        "edition": "2026",
+        "outturn": null,
+        "bottleId": 61600,
+        "category": "bourbon",
+        "fullName": "Maker's Mark Dodgers Limited Edition - 2026",
+        "reference": null,
+        "statedAge": null,
+        "caskNumber": null,
+        "comparison": {
+          "missing": [],
+          "conflicts": [],
+          "agreements": ["abv"]
+        },
+        "distillery": ["Maker's Mark Distillery"],
+        "maturation": null,
+        "releaseDay": null,
+        "singleCask": null,
+        "releaseYear": 2026,
+        "vintageYear": null,
+        "bottlingYear": null,
+        "caskStrength": null,
+        "releaseMonth": null,
+        "familyContext": {
+          "siblingBottles": []
+        }
+      },
+      {
+        "abv": null,
+        "brand": "Maker's Mark",
+        "score": 56.263336,
+        "series": null,
+        "source": ["text"],
+        "bottler": "Maker's Mark",
+        "edition": null,
+        "outturn": null,
+        "bottleId": 459,
+        "category": "bourbon",
+        "fullName": "Maker's Mark Cask Strength",
+        "reference": null,
+        "statedAge": null,
+        "caskNumber": null,
+        "comparison": {
+          "missing": ["abv"],
+          "conflicts": [],
+          "agreements": []
+        },
+        "distillery": ["Maker's Mark Distillery"],
+        "maturation": null,
+        "releaseDay": null,
+        "singleCask": null,
+        "releaseYear": null,
+        "vintageYear": null,
+        "bottlingYear": null,
+        "caskStrength": true,
+        "releaseMonth": null,
+        "familyContext": {
+          "siblingBottles": []
+        }
+      },
+      {
+        "abv": null,
+        "brand": "Maker's Mark",
+        "score": 55.700676,
+        "series": null,
+        "source": ["text", "brand_coverage"],
+        "bottler": null,
+        "edition": "",
+        "outturn": null,
+        "bottleId": 42939,
+        "category": "bourbon",
+        "fullName": "Maker's Mark 46 Cask Strength Limited Edition",
+        "reference": null,
+        "statedAge": null,
+        "caskNumber": null,
+        "comparison": {
+          "missing": ["abv"],
+          "conflicts": [],
+          "agreements": []
+        },
+        "distillery": ["Maker's Mark Distillery"],
+        "maturation": null,
+        "releaseDay": null,
+        "singleCask": null,
+        "releaseYear": null,
+        "vintageYear": null,
+        "bottlingYear": null,
+        "caskStrength": true,
+        "releaseMonth": null,
+        "familyContext": {
+          "siblingBottles": []
+        }
+      },
+      {
+        "abv": null,
+        "brand": "Maker's Mark",
+        "score": 50.808197,
+        "series": "Wood Finishing Series",
+        "source": ["text"],
+        "bottler": null,
+        "edition": null,
+        "outturn": null,
+        "bottleId": 56041,
+        "category": "bourbon",
+        "fullName": "Maker's Mark The Stewards Release",
+        "reference": null,
+        "statedAge": null,
+        "caskNumber": null,
+        "comparison": {
+          "missing": ["abv"],
+          "conflicts": [],
+          "agreements": []
+        },
+        "distillery": ["Maker's Mark Distillery"],
+        "maturation": "unique oak stave finishing",
+        "releaseDay": null,
+        "singleCask": null,
+        "releaseYear": 2026,
+        "vintageYear": null,
+        "bottlingYear": null,
+        "caskStrength": true,
+        "releaseMonth": null,
+        "familyContext": {
+          "siblingBottles": []
+        }
+      },
+      {
+        "abv": null,
+        "brand": "Maker's Mark",
+        "score": 48.982002,
+        "series": null,
+        "source": ["text"],
+        "bottler": null,
+        "edition": "",
+        "outturn": null,
+        "bottleId": 42938,
+        "category": "bourbon",
+        "fullName": "Maker's Mark 46 Cask Strength French Oak Stave",
+        "reference": null,
+        "statedAge": null,
+        "caskNumber": null,
+        "comparison": {
+          "missing": ["abv"],
+          "conflicts": [],
+          "agreements": []
+        },
+        "distillery": ["Maker's Mark Distillery"],
+        "maturation": null,
+        "releaseDay": null,
+        "singleCask": null,
+        "releaseYear": null,
+        "vintageYear": null,
+        "bottlingYear": null,
+        "caskStrength": true,
+        "releaseMonth": null,
+        "familyContext": {
+          "siblingBottles": []
+        }
+      },
+      {
+        "abv": null,
+        "brand": "Maker's Mark",
+        "score": 47.876007,
+        "series": null,
+        "source": ["text"],
+        "bottler": null,
+        "edition": null,
+        "outturn": null,
+        "bottleId": 13504,
+        "category": "bourbon",
+        "fullName": "Maker's Mark Wood Finishing Series: Stave Profile RC6 Kentucky Straight Bourbon",
+        "reference": null,
+        "statedAge": null,
+        "caskNumber": null,
+        "comparison": {
+          "missing": ["abv", "distillers"],
+          "conflicts": [],
+          "agreements": ["category", "brand"]
+        },
+        "distillery": [],
+        "maturation": null,
+        "releaseDay": null,
+        "singleCask": null,
+        "releaseYear": 2019,
+        "vintageYear": null,
+        "bottlingYear": null,
+        "caskStrength": null,
+        "releaseMonth": null,
+        "familyContext": {
+          "siblingBottles": []
+        }
+      },
+      {
+        "abv": null,
+        "brand": "Maker's Mark",
+        "score": 47.36448,
+        "series": "Wood Finishing Series",
+        "source": ["text"],
+        "bottler": null,
+        "edition": null,
+        "outturn": null,
+        "bottleId": 44271,
+        "category": "bourbon",
+        "fullName": "Maker's Mark Wood Finishing Series The Keepers Release",
+        "reference": null,
+        "statedAge": null,
+        "caskNumber": null,
+        "comparison": {
+          "missing": ["abv"],
+          "conflicts": [],
+          "agreements": ["category", "brand", "distillers"]
+        },
+        "distillery": ["Maker's Mark Distillery"],
+        "maturation": null,
+        "releaseDay": null,
+        "singleCask": null,
+        "releaseYear": 2025,
+        "vintageYear": null,
+        "bottlingYear": null,
+        "caskStrength": null,
+        "releaseMonth": null,
+        "familyContext": {
+          "siblingBottles": []
+        }
+      },
+      {
+        "abv": 45,
+        "brand": "Ergaster",
+        "score": 29.728077,
+        "series": null,
+        "source": ["text"],
+        "bottler": null,
+        "edition": null,
+        "outturn": null,
+        "bottleId": 45970,
+        "category": "single_malt",
+        "fullName": "Ergaster Nature - 45.0% ABV",
+        "reference": null,
+        "statedAge": null,
+        "caskNumber": null,
+        "comparison": {
+          "missing": [],
+          "conflicts": [],
+          "agreements": ["abv"]
+        },
+        "distillery": ["Ergaster"],
+        "maturation": null,
+        "releaseDay": null,
+        "singleCask": null,
+        "releaseYear": null,
+        "vintageYear": null,
+        "bottlingYear": null,
+        "caskStrength": null,
+        "releaseMonth": null,
+        "familyContext": {
+          "siblingBottles": []
+        }
+      },
+      {
+        "abv": 45,
+        "brand": "Buffalo Trace Distillery",
+        "score": 0.7002800884190464,
+        "series": null,
+        "source": ["vector"],
+        "bottler": null,
+        "edition": null,
+        "outturn": null,
+        "bottleId": 41256,
+        "category": "bourbon",
+        "fullName": "Buffalo Trace Straight Bourbon",
+        "reference": "Buffalo Trace",
+        "statedAge": null,
+        "caskNumber": null,
+        "comparison": {
+          "missing": [],
+          "conflicts": [],
+          "agreements": ["abv"]
+        },
+        "distillery": ["Buffalo Trace Distillery"],
+        "maturation": null,
+        "releaseDay": null,
+        "singleCask": false,
+        "releaseYear": null,
+        "vintageYear": null,
+        "bottlingYear": null,
+        "caskStrength": false,
+        "releaseMonth": null,
+        "familyContext": {
+          "siblingBottles": []
+        }
+      },
+      {
+        "abv": 45,
+        "brand": "Bulleit",
+        "score": 0.6943128451101679,
+        "series": null,
+        "source": ["vector"],
+        "bottler": null,
+        "edition": null,
+        "outturn": null,
+        "bottleId": 16932,
+        "category": "bourbon",
+        "fullName": "Bulleit Bourbon",
+        "reference": "Bulleit",
+        "statedAge": null,
+        "caskNumber": null,
+        "comparison": {
+          "missing": [],
+          "conflicts": [],
+          "agreements": ["abv"]
+        },
+        "distillery": ["Bulleit Distilling Co."],
+        "maturation": null,
+        "releaseDay": null,
+        "singleCask": null,
+        "releaseYear": null,
+        "vintageYear": null,
+        "bottlingYear": null,
+        "caskStrength": null,
+        "releaseMonth": null,
+        "familyContext": {
+          "siblingBottles": []
+        }
+      }
+    ]
+  },
+  "context": {
+    "inspectedBottleIds": [42937, 56453],
+    "bottleContexts": [
+      {
+        "exact": {
+          "abv": 45,
+          "edition": "",
+          "outturn": null,
+          "statedAge": null,
+          "caskNumber": null,
+          "maturation": null,
+          "releaseDay": null,
+          "singleCask": false,
+          "releaseYear": null,
+          "vintageYear": null,
+          "bottlingYear": null,
+          "caskStrength": false,
+          "releaseMonth": null
+        },
+        "shared": {
+          "name": "Bourbon",
+          "brand": {
+            "name": "Maker's Mark",
+            "entityId": 1166
+          },
+          "series": null,
+          "bottler": null,
+          "category": "bourbon",
+          "statedAge": null,
+          "distillers": [
+            {
+              "name": "Maker's Mark Distillery",
+              "entityId": 366688
+            }
+          ]
+        },
+        "groupId": 16801,
+        "bottleId": 42937,
+        "fullName": "Maker's Mark Bourbon",
+        "siblings": [],
+        "references": [
+          {
+            "name": "Maker's Mark",
+            "ignored": false
+          },
+          {
+            "name": "Maker's Mark, 45%",
+            "ignored": false
+          },
+          {
+            "name": "Maker's Mark Bourbon",
+            "ignored": false
+          },
+          {
+            "name": "Maker's Mark Bourbon Whisky",
+            "ignored": false
+          },
+          {
+            "name": "Maker's Mark Kentucky Straight Bourbon Whiskey",
+            "ignored": false
+          },
+          {
+            "name": "Maker's Mark Kentucky Straight Bourbon Whisky",
+            "ignored": false
+          },
+          {
+            "name": "Maker's Mark Kentucky Straight Bourbon Whisky 1.75 L",
+            "ignored": false
+          },
+          {
+            "name": "Maker's Mark Kentucky Straight Bourbon Whisky 750 ml",
+            "ignored": false
+          }
+        ],
+        "observations": [
+          {
+            "facts": {
+              "proposalType": "match",
+              "proposedBottle": null,
+              "referenceScope": "none"
+            },
+            "rawText": "Maker's Mark Bourbon",
+            "sourceKey": "store_price:12062391",
+            "sourceUrl": "https://www.finedrams.com/maker-s-mark-bourbon-whiskey.html",
+            "sourceName": "Maker's Mark Bourbon",
+            "sourceType": "store_price",
+            "parsedIdentity": null
+          },
+          {
+            "facts": {
+              "proposalType": "match",
+              "proposedBottle": null,
+              "referenceScope": "none"
+            },
+            "rawText": "Maker's Mark Rocks Glass Pack",
+            "sourceKey": "store_price:12061834",
+            "sourceUrl": "https://www.masterofmalt.com/whiskies/makers-mark/makers-mark-rocks-glass-pack-whisky/?sku=148604",
+            "sourceName": "Maker's Mark Rocks Glass Pack",
+            "sourceType": "store_price",
+            "parsedIdentity": {
+              "abv": 45,
+              "brand": "Maker's Mark",
+              "series": null,
+              "bottler": null,
+              "edition": null,
+              "outturn": null,
+              "category": "bourbon",
+              "distillery": ["Maker's Mark Distillery"],
+              "expression": null,
+              "maturation": null,
+              "stated_age": null,
+              "cask_number": null,
+              "release_day": null,
+              "single_cask": null,
+              "release_year": null,
+              "vintage_year": null,
+              "bottling_year": null,
+              "cask_strength": null,
+              "release_month": null
+            }
+          },
+          {
+            "facts": {
+              "proposalType": "match_existing",
+              "proposedBottle": null,
+              "referenceScope": "none"
+            },
+            "rawText": "Maker's Mark Kentucky Straight Bourbon Whiskey",
+            "sourceKey": "store_price:12060844",
+            "sourceUrl": "https://kegnbottle.com/products/makers-mark-kentucky-straight-bourbon-whiskey-750ml",
+            "sourceName": "Maker's Mark Kentucky Straight Bourbon Whiskey",
+            "sourceType": "store_price",
+            "parsedIdentity": null
+          },
+          {
+            "facts": {
+              "proposalType": "match_existing",
+              "proposedBottle": null,
+              "referenceScope": "none"
+            },
+            "rawText": "Maker's Mark Kentucky Straight Bourbon Whiskey",
+            "sourceKey": "store_price:12059586",
+            "sourceUrl": "https://kegnbottle.com/products/makers-mark-1-75-l",
+            "sourceName": "Maker's Mark Kentucky Straight Bourbon Whiskey",
+            "sourceType": "store_price",
+            "parsedIdentity": null
+          },
+          {
+            "facts": {
+              "proposalType": "create_new",
+              "proposedBottle": {
+                "abv": null,
+                "name": "Bourbon",
+                "brand": {
+                  "id": null,
+                  "name": "Maker's Mark"
+                },
+                "series": null,
+                "bottler": null,
+                "edition": "USA 250th Anniversary",
+                "outturn": null,
+                "category": "bourbon",
+                "statedAge": null,
+                "caskNumber": null,
+                "distillers": [
+                  {
+                    "id": null,
+                    "name": "Maker's Mark Distillery"
+                  }
+                ],
+                "maturation": null,
+                "releaseDay": null,
+                "singleCask": null,
+                "releaseYear": null,
+                "vintageYear": null,
+                "bottlingYear": null,
+                "caskStrength": null,
+                "releaseMonth": null
+              },
+              "referenceScope": "none"
+            },
+            "rawText": "Maker's Mark USA 250th Anniversary Bourbon",
+            "sourceKey": "store_price:12035177",
+            "sourceUrl": "https://www.missionliquor.com/products/makers-mark-usa-250th-anniversary-bourbon-750ml",
+            "sourceName": "Maker's Mark USA 250th Anniversary Bourbon",
+            "sourceType": "store_price",
+            "parsedIdentity": null
+          },
+          {
+            "facts": {
+              "proposalType": "create_new",
+              "proposedBottle": {
+                "abv": null,
+                "name": "Bourbon",
+                "brand": {
+                  "id": null,
+                  "name": "Maker's Mark"
+                },
+                "series": null,
+                "bottler": null,
+                "edition": "Los Angeles Dodgers Blue and White Limited Edition",
+                "outturn": null,
+                "category": "bourbon",
+                "statedAge": null,
+                "caskNumber": null,
+                "distillers": [
+                  {
+                    "id": null,
+                    "name": "Maker's Mark Distillery"
+                  }
+                ],
+                "maturation": null,
+                "releaseDay": null,
+                "singleCask": null,
+                "releaseYear": null,
+                "vintageYear": null,
+                "bottlingYear": null,
+                "caskStrength": null,
+                "releaseMonth": null
+              },
+              "referenceScope": "none"
+            },
+            "rawText": "Maker's Mark Los Angeles Dodgers Blue and White Limited Edition",
+            "sourceKey": "store_price:2697",
+            "sourceUrl": "https://woodencork.com/collections/whiskey/products/maker-s-mark-los-angeles-dodgers-blue-and-white-limited-edition",
+            "sourceName": "Maker's Mark Los Angeles Dodgers Blue and White Limited Edition",
+            "sourceType": "store_price",
+            "parsedIdentity": null
+          },
+          {
+            "facts": {
+              "proposalType": "no_match",
+              "proposedBottle": null,
+              "referenceScope": "none"
+            },
+            "rawText": "Maker's Mark",
+            "sourceKey": "store_price:12056938",
+            "sourceUrl": "https://www.thewhiskyworld.com/makers-mark-p2026",
+            "sourceName": "Maker's Mark",
+            "sourceType": "store_price",
+            "parsedIdentity": null
+          },
+          {
+            "facts": {
+              "proposalType": "no_match",
+              "proposedBottle": null,
+              "referenceScope": "none"
+            },
+            "rawText": "Maker's Mark",
+            "sourceKey": "store_price:12030139",
+            "sourceUrl": "https://www.masterofmalt.com/whiskies/makers-mark-whiskey/?sku=2671",
+            "sourceName": "Maker's Mark",
+            "sourceType": "store_price",
+            "parsedIdentity": null
+          }
+        ],
+        "imageSources": []
+      },
+      {
+        "exact": {
+          "abv": 45,
+          "edition": null,
+          "outturn": null,
+          "statedAge": null,
+          "caskNumber": null,
+          "maturation": null,
+          "releaseDay": null,
+          "singleCask": null,
+          "releaseYear": null,
+          "vintageYear": null,
+          "bottlingYear": null,
+          "caskStrength": null,
+          "releaseMonth": null
+        },
+        "shared": {
+          "name": "Black Wax",
+          "brand": {
+            "name": "Maker's Mark",
+            "entityId": 1166
+          },
+          "series": null,
+          "bottler": null,
+          "category": "bourbon",
+          "statedAge": null,
+          "distillers": [
+            {
+              "name": "Maker's Mark Distillery",
+              "entityId": 366688
+            }
+          ]
+        },
+        "groupId": 29414,
+        "bottleId": 56453,
+        "fullName": "Maker's Mark Black Wax",
+        "siblings": [],
+        "references": [],
+        "observations": [
+          {
+            "facts": {
+              "proposalType": "create_new",
+              "proposedBottle": {
+                "abv": 45,
+                "name": "Black Wax",
+                "brand": {
+                  "id": 1166,
+                  "name": "Maker's Mark"
+                },
+                "series": null,
+                "bottler": null,
+                "edition": null,
+                "caskFill": null,
+                "caskSize": null,
+                "caskType": null,
+                "category": "bourbon",
+                "statedAge": null,
+                "distillers": [
+                  {
+                    "id": 1166,
+                    "name": "Maker's Mark"
+                  }
+                ],
+                "singleCask": null,
+                "releaseYear": null,
+                "vintageYear": null,
+                "caskStrength": null
+              },
+              "referenceScope": "none"
+            },
+            "rawText": "Antique Maker's Mark Black Wax Kentucky Straight Bourbon Whiskey",
+            "sourceKey": "store_price:12028995",
+            "sourceUrl": "https://www.astorwines.com/item/55167?lt=Search+Results&lid=search_results",
+            "sourceName": "Antique Maker's Mark Black Wax Kentucky Straight Bourbon Whiskey",
+            "sourceType": "store_price",
+            "parsedIdentity": {
+              "abv": null,
+              "brand": "Maker's Mark",
+              "series": null,
+              "bottler": null,
+              "edition": null,
+              "category": "bourbon",
+              "cask_fill": null,
+              "cask_size": null,
+              "cask_type": null,
+              "distillery": ["Maker's Mark"],
+              "expression": "Black Wax",
+              "stated_age": null,
+              "single_cask": null,
+              "release_year": null,
+              "vintage_year": null,
+              "cask_strength": null
+            }
+          }
+        ],
+        "imageSources": []
+      }
+    ],
+    "inspectedEntities": [
+      {
+        "kind": "brand",
+        "name": "Maker's Mark",
+        "score": 1,
+        "source": ["exact", "text", "prefix", "contained"],
+        "entityId": 1166,
+        "reference": "Maker's Mark",
+        "shortName": null,
+        "retrievedFor": [
+          {
+            "exact": true,
+            "query": "Maker's Mark"
+          },
+          {
+            "query": "Maker's Mark Distillery"
+          }
+        ]
+      },
+      {
+        "kind": "distillery",
+        "name": "Maker's Mark Distillery",
+        "score": 1,
+        "source": ["text", "prefix", "exact", "contained"],
+        "entityId": 366688,
+        "reference": "Maker's Mark Distillery",
+        "shortName": null,
+        "retrievedFor": [
+          {
+            "query": "Maker's Mark"
+          },
+          {
+            "exact": true,
+            "query": "Maker's Mark Distillery"
+          }
+        ]
+      },
+      {
+        "kind": "distillery",
+        "name": "Ergaster",
+        "score": 1,
+        "source": ["exact", "text", "prefix", "contained"],
+        "entityId": 2687,
+        "reference": "Ergaster",
+        "shortName": null,
+        "retrievedFor": [
+          {
+            "exact": true,
+            "query": "Ergaster"
+          }
+        ]
+      },
+      {
+        "kind": "distillery",
+        "name": "Buffalo Trace Distillery",
+        "score": 1,
+        "source": ["exact", "text", "prefix", "contained"],
+        "entityId": 483,
+        "reference": "Buffalo Trace Distillery",
+        "shortName": "Buffalo Trace",
+        "retrievedFor": [
+          {
+            "exact": true,
+            "query": "Buffalo Trace Distillery"
+          }
+        ]
+      },
+      {
+        "kind": "brand",
+        "name": "Bulleit",
+        "score": 1,
+        "source": ["exact", "text", "prefix", "contained"],
+        "entityId": 139,
+        "reference": "Bulleit",
+        "shortName": "",
+        "retrievedFor": [
+          {
+            "exact": true,
+            "query": "Bulleit"
+          },
+          {
+            "query": "Bulleit Distilling Co."
+          }
+        ]
+      },
+      {
+        "kind": "distillery",
+        "name": "Bulleit Distilling Co.",
+        "score": 1,
+        "source": ["text", "prefix", "exact", "contained"],
+        "entityId": 366693,
+        "reference": "Bulleit Distilling Co.",
+        "shortName": null,
+        "retrievedFor": [
+          {
+            "query": "Bulleit"
+          },
+          {
+            "exact": true,
+            "query": "Bulleit Distilling Co."
+          }
+        ]
+      }
+    ],
+    "inspectedSeries": []
+  },
+  "provenance": {
+    "source": "production_miss",
+    "verifiedSourceUrls": [
+      "https://www.scotchwhiskyauctions.com/auctions/234-the-185th-auction/906571-makers-mark-limited-edition-bottling/",
+      "https://d3suvtcq00dftb.cloudfront.net/images/c92e7897a93b0307bc3baa3fe1cdbeeb-zoom.jpg"
+    ],
+    "dbOutcome": {
+      "bottleId": null,
+      "createsBottle": false,
+      "summary": "Production returned no_match: the title 'Limited Edition Bottling' and 45% did not say which Maker's Mark release it was."
+    },
+    "notes": "Saved check 36187, source auction_lot 17020 (lot 185-906571), run 2026-11-03. Not one of the two photo cases named in the request, but the title alone cannot settle it, so this case follows the same pattern: input.reference.imageUrl is set to the lot's first photo at full size and the evidence pack gets its reviewed reading. Production ran without the photo; this case goes in with the change that makes auctions read the lot photo. The photo clearly shows a red holly-and-fir holiday label: 'LIMITED EDITION BOTTLE', 'Maker's Mark', 'Kentucky Straight Bourbon Whisky', '70 cl - alc. 45% vol.', red wax. Another lot photo shows the standard UK back label. The reading keeps the printed 'Limited Edition Bottle' band as the label shows it. The identity model ('A different package does not make a different Bottle') treats a special label as the same Bottle. 42937 is Maker's Mark Bourbon at 45% with no conflicting field. 56453 and the other candidates are different releases."
+  },
+  "expected": {
+    "status": "classified",
+    "action": "match",
+    "identityScope": "product",
+    "matchedBottleId": 42937,
+    "summary": "Match Maker's Mark Bourbon (42937). The photo shows a seasonal 'Limited Edition Bottle' label on standard Maker's Mark Kentucky Straight Bourbon Whisky at 45%; a special label is the same Bottle."
+  },
+  "knownFailure": {
+    "reason": "The agent treats a holiday label on the standard bourbon as a possible separate release."
+  }
+}

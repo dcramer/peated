@@ -1,0 +1,1628 @@
+{
+  "id": "auction-caol-ila-2012-disappearance-create",
+  "name": "auction lot: create Signatory Vintage's Caol Ila 2012 The Disappearance for La Maison du Whisky instead of holding an unrelated 2010 cask",
+  "input": {
+    "reference": {
+      "id": 14470,
+      "url": "https://www.scotchwhiskyauctions.com/auctions/234-the-185th-auction/905629-caol-ila-2012-the-disappearance-signatory-for-lmdw/",
+      "name": "Caol Ila 2012 ‘The Disappearance’ Signatory for LMDW",
+      "imageUrl": null,
+      "externalSiteId": 28097,
+      "currentBottleId": null
+    },
+    "extractedIdentity": {
+      "abv": 46,
+      "brand": null,
+      "series": null,
+      "bottler": null,
+      "edition": null,
+      "outturn": null,
+      "category": null,
+      "distillery": null,
+      "expression": null,
+      "maturation": null,
+      "stated_age": null,
+      "cask_number": null,
+      "single_cask": null,
+      "release_year": null,
+      "vintage_year": null,
+      "cask_strength": null
+    },
+    "imageEvidence": null,
+    "initialCandidates": [
+      {
+        "abv": 46,
+        "brand": "Signatory Vintage",
+        "score": 90.684616,
+        "series": null,
+        "source": ["text", "context"],
+        "bottler": "Signatory Vintage",
+        "edition": null,
+        "outturn": null,
+        "bottleId": 63236,
+        "category": "single_malt",
+        "fullName": "Signatory Vintage Caol Ila 8-year-old",
+        "reference": null,
+        "statedAge": 8,
+        "caskNumber": "318694",
+        "comparison": {
+          "missing": [],
+          "conflicts": [],
+          "agreements": ["abv"]
+        },
+        "distillery": ["Caol Ila"],
+        "maturation": null,
+        "releaseDay": null,
+        "singleCask": true,
+        "releaseYear": null,
+        "vintageYear": null,
+        "bottlingYear": null,
+        "caskStrength": null,
+        "releaseMonth": null,
+        "familyContext": {
+          "siblingBottles": []
+        }
+      },
+      {
+        "abv": 46,
+        "brand": "Signatory Vintage",
+        "score": 80.14871,
+        "series": "Un-Chillfiltered Collection",
+        "source": ["text"],
+        "bottler": "Signatory Vintage",
+        "edition": null,
+        "outturn": null,
+        "bottleId": 68715,
+        "category": "single_malt",
+        "fullName": "Signatory Vintage Caol Ila 2011 8-year-old",
+        "reference": null,
+        "statedAge": 8,
+        "caskNumber": "315836 + 315847",
+        "comparison": {
+          "missing": [],
+          "conflicts": [],
+          "agreements": ["abv"]
+        },
+        "distillery": ["Caol Ila"],
+        "maturation": "Hogshead",
+        "releaseDay": null,
+        "singleCask": false,
+        "releaseYear": null,
+        "vintageYear": 2011,
+        "bottlingYear": 2020,
+        "caskStrength": null,
+        "releaseMonth": null,
+        "familyContext": {
+          "siblingBottles": []
+        }
+      },
+      {
+        "abv": 57.4,
+        "brand": "Single Cask Nation",
+        "score": 72.10881,
+        "series": null,
+        "source": ["text"],
+        "bottler": "Single Cask Nation",
+        "edition": "Global Release #8",
+        "outturn": null,
+        "bottleId": 47971,
+        "category": "single_malt",
+        "fullName": "Single Cask Nation Caol Ila 2015 8-year-old - Global Release #8",
+        "reference": null,
+        "statedAge": 8,
+        "caskNumber": "904023",
+        "comparison": {
+          "missing": ["releaseYear", "caskStrength", "series"],
+          "conflicts": ["abv", "vintageYear", "brand", "bottler"],
+          "agreements": ["category", "statedAge", "singleCask", "distillers"]
+        },
+        "distillery": ["Caol Ila"],
+        "maturation": null,
+        "releaseDay": null,
+        "singleCask": true,
+        "releaseYear": null,
+        "vintageYear": 2015,
+        "bottlingYear": 2024,
+        "caskStrength": null,
+        "releaseMonth": null,
+        "familyContext": {
+          "siblingBottles": []
+        }
+      },
+      {
+        "abv": 46,
+        "brand": "Gordon & MacPhail",
+        "score": 68.940575,
+        "series": null,
+        "source": ["text"],
+        "bottler": "Gordon & MacPhail",
+        "edition": null,
+        "outturn": null,
+        "bottleId": 65714,
+        "category": "single_malt",
+        "fullName": "Gordon & MacPhail Caol Ila 1998 8-year-old",
+        "reference": null,
+        "statedAge": 8,
+        "caskNumber": "12903",
+        "comparison": {
+          "missing": ["releaseYear", "caskStrength", "series"],
+          "conflicts": ["vintageYear", "brand", "bottler"],
+          "agreements": [
+            "category",
+            "statedAge",
+            "abv",
+            "singleCask",
+            "distillers"
+          ]
+        },
+        "distillery": ["Caol Ila"],
+        "maturation": null,
+        "releaseDay": null,
+        "singleCask": true,
+        "releaseYear": null,
+        "vintageYear": 1998,
+        "bottlingYear": null,
+        "caskStrength": null,
+        "releaseMonth": null,
+        "familyContext": {
+          "siblingBottles": []
+        }
+      },
+      {
+        "abv": 58.1,
+        "brand": "Gordon & MacPhail",
+        "score": 68.83589,
+        "series": null,
+        "source": ["text"],
+        "bottler": "Gordon & MacPhail",
+        "edition": null,
+        "outturn": null,
+        "bottleId": 65777,
+        "category": "single_malt",
+        "fullName": "Gordon & MacPhail Caol Ila 1996",
+        "reference": null,
+        "statedAge": 8,
+        "caskNumber": null,
+        "comparison": {
+          "missing": ["releaseYear", "caskStrength", "singleCask", "series"],
+          "conflicts": ["abv", "vintageYear", "brand", "bottler"],
+          "agreements": ["category", "statedAge", "distillers"]
+        },
+        "distillery": ["Caol Ila"],
+        "maturation": null,
+        "releaseDay": null,
+        "singleCask": null,
+        "releaseYear": null,
+        "vintageYear": 1996,
+        "bottlingYear": null,
+        "caskStrength": null,
+        "releaseMonth": null,
+        "familyContext": {
+          "siblingBottles": []
+        }
+      },
+      {
+        "abv": 46,
+        "brand": "The Ultimate",
+        "score": 67.50212,
+        "series": null,
+        "source": ["text"],
+        "bottler": "The Ultimate",
+        "edition": null,
+        "outturn": 327,
+        "bottleId": 68710,
+        "category": "single_malt",
+        "fullName": "The Ultimate Caol Ila 2007 8-year-old",
+        "reference": null,
+        "statedAge": 8,
+        "caskNumber": "315312",
+        "comparison": {
+          "missing": ["releaseYear", "caskStrength", "series"],
+          "conflicts": ["vintageYear", "brand", "bottler"],
+          "agreements": [
+            "category",
+            "statedAge",
+            "abv",
+            "singleCask",
+            "distillers"
+          ]
+        },
+        "distillery": ["Caol Ila"],
+        "maturation": null,
+        "releaseDay": null,
+        "singleCask": true,
+        "releaseYear": null,
+        "vintageYear": 2007,
+        "bottlingYear": 2016,
+        "caskStrength": null,
+        "releaseMonth": null,
+        "familyContext": {
+          "siblingBottles": []
+        }
+      },
+      {
+        "abv": 54.5,
+        "brand": "Obscurities & Curiosities",
+        "score": 66.1265,
+        "series": null,
+        "source": ["vector", "text"],
+        "bottler": "North Star Spirits",
+        "edition": null,
+        "outturn": null,
+        "bottleId": 46298,
+        "category": "single_malt",
+        "fullName": "Obscurities & Curiosities Caol Ila Sherry Octave - 8-year-old - 2014 Vintage - 54.5% ABV",
+        "reference": "Obscurities & Curiosities Caol Ila Sherry Octave - 8-year-old - 2014 Vintage - 54.5% ABV",
+        "statedAge": 8,
+        "caskNumber": null,
+        "comparison": {
+          "missing": ["releaseYear", "caskStrength", "singleCask", "series"],
+          "conflicts": ["abv", "vintageYear", "brand", "bottler"],
+          "agreements": ["category", "statedAge", "distillers"]
+        },
+        "distillery": ["Caol Ila"],
+        "maturation": null,
+        "releaseDay": null,
+        "singleCask": null,
+        "releaseYear": null,
+        "vintageYear": 2014,
+        "bottlingYear": null,
+        "caskStrength": null,
+        "releaseMonth": null,
+        "familyContext": {
+          "siblingBottles": []
+        }
+      },
+      {
+        "abv": 43,
+        "brand": "Signatory Vintage",
+        "score": 63.95896,
+        "series": null,
+        "source": ["vector", "text"],
+        "bottler": "Signatory Vintage",
+        "edition": null,
+        "outturn": null,
+        "bottleId": 69034,
+        "category": "single_malt",
+        "fullName": "Signatory Vintage Caol Ila 1989",
+        "reference": "Signatory 1989 (distilled at Caol Ila)",
+        "statedAge": null,
+        "caskNumber": null,
+        "comparison": {
+          "missing": [
+            "statedAge",
+            "releaseYear",
+            "caskStrength",
+            "singleCask",
+            "series"
+          ],
+          "conflicts": ["abv", "vintageYear"],
+          "agreements": ["category", "brand", "bottler", "distillers"]
+        },
+        "distillery": ["Caol Ila"],
+        "maturation": null,
+        "releaseDay": null,
+        "singleCask": null,
+        "releaseYear": null,
+        "vintageYear": 1989,
+        "bottlingYear": null,
+        "caskStrength": null,
+        "releaseMonth": null,
+        "familyContext": {
+          "siblingBottles": []
+        }
+      },
+      {
+        "abv": 52.5,
+        "brand": "Single Cask Nation",
+        "score": 60.72982,
+        "series": null,
+        "source": ["text"],
+        "bottler": "Single Cask Nation",
+        "edition": "US Retail Release #10",
+        "outturn": null,
+        "bottleId": 47907,
+        "category": "single_malt",
+        "fullName": "Single Cask Nation Caol Ila 2015 8-year-old - US Retail Release #10",
+        "reference": null,
+        "statedAge": 8,
+        "caskNumber": "318785",
+        "comparison": {
+          "missing": ["releaseYear", "caskStrength", "series"],
+          "conflicts": ["abv", "vintageYear", "brand", "bottler"],
+          "agreements": ["category", "statedAge", "singleCask", "distillers"]
+        },
+        "distillery": ["Caol Ila"],
+        "maturation": null,
+        "releaseDay": null,
+        "singleCask": true,
+        "releaseYear": null,
+        "vintageYear": 2015,
+        "bottlingYear": 2023,
+        "caskStrength": null,
+        "releaseMonth": null,
+        "familyContext": {
+          "siblingBottles": []
+        }
+      },
+      {
+        "abv": 46,
+        "brand": "Signatory Vintage",
+        "score": 60.63703,
+        "series": "The Un-Chillfiltered Collection",
+        "source": ["vector", "text"],
+        "bottler": "Signatory Vintage",
+        "edition": null,
+        "outturn": null,
+        "bottleId": 46302,
+        "category": "single_malt",
+        "fullName": "Signatory Vintage Caol Ila 2016",
+        "reference": "Signatory Vintage Caol Ila - 10-year-old - 2026 Release - 2016 Vintage - 46.0% ABV - Other Cask - Butt",
+        "statedAge": 10,
+        "caskNumber": null,
+        "comparison": {
+          "missing": [],
+          "conflicts": [],
+          "agreements": ["abv"]
+        },
+        "distillery": ["Caol Ila"],
+        "maturation": "other",
+        "releaseDay": null,
+        "singleCask": false,
+        "releaseYear": 2026,
+        "vintageYear": 2016,
+        "bottlingYear": null,
+        "caskStrength": null,
+        "releaseMonth": null,
+        "familyContext": {
+          "siblingBottles": []
+        }
+      },
+      {
+        "abv": 46,
+        "brand": "Signatory Vintage",
+        "score": 58.787716,
+        "series": null,
+        "source": ["text"],
+        "bottler": "Signatory Vintage",
+        "edition": null,
+        "outturn": null,
+        "bottleId": 69851,
+        "category": "single_malt",
+        "fullName": "Signatory Vintage Staoisha 2013 8-year-old",
+        "reference": null,
+        "statedAge": 8,
+        "caskNumber": null,
+        "comparison": {
+          "missing": ["releaseYear", "caskStrength", "singleCask", "series"],
+          "conflicts": ["vintageYear", "distillers"],
+          "agreements": ["category", "statedAge", "abv", "brand", "bottler"]
+        },
+        "distillery": ["Bunnahabhain"],
+        "maturation": null,
+        "releaseDay": null,
+        "singleCask": null,
+        "releaseYear": null,
+        "vintageYear": 2013,
+        "bottlingYear": null,
+        "caskStrength": null,
+        "releaseMonth": null,
+        "familyContext": {
+          "siblingBottles": []
+        }
+      },
+      {
+        "abv": 43,
+        "brand": "Caol Ila",
+        "score": 58.342392,
+        "series": null,
+        "source": ["text"],
+        "bottler": null,
+        "edition": null,
+        "outturn": null,
+        "bottleId": 52816,
+        "category": "single_malt",
+        "fullName": "Caol Ila The Distillers Edition",
+        "reference": null,
+        "statedAge": null,
+        "caskNumber": "C-si; 8-472",
+        "comparison": {
+          "missing": [
+            "statedAge",
+            "releaseYear",
+            "caskStrength",
+            "singleCask",
+            "bottler",
+            "series"
+          ],
+          "conflicts": ["abv", "vintageYear", "brand"],
+          "agreements": ["category", "distillers"]
+        },
+        "distillery": ["Caol Ila"],
+        "maturation": "Double matured in Moscatel cask wood",
+        "releaseDay": null,
+        "singleCask": null,
+        "releaseYear": null,
+        "vintageYear": 2000,
+        "bottlingYear": 2012,
+        "caskStrength": null,
+        "releaseMonth": null,
+        "familyContext": {
+          "siblingBottles": []
+        }
+      },
+      {
+        "abv": 48.2,
+        "brand": "Signatory Vintage",
+        "score": 55.71537,
+        "series": null,
+        "source": ["text"],
+        "bottler": "Signatory Vintage",
+        "edition": "Small Batch Edition #8",
+        "outturn": null,
+        "bottleId": 62069,
+        "category": "single_malt",
+        "fullName": "Signatory Vintage Glenallachie 11-year-old - Small Batch Edition #8",
+        "reference": null,
+        "statedAge": 11,
+        "caskNumber": null,
+        "comparison": {
+          "missing": ["releaseYear", "caskStrength", "singleCask", "series"],
+          "conflicts": ["statedAge", "abv", "distillers"],
+          "agreements": ["category", "vintageYear", "brand", "bottler"]
+        },
+        "distillery": ["GlenAllachie"],
+        "maturation": null,
+        "releaseDay": null,
+        "singleCask": null,
+        "releaseYear": null,
+        "vintageYear": 2012,
+        "bottlingYear": null,
+        "caskStrength": null,
+        "releaseMonth": null,
+        "familyContext": {
+          "siblingBottles": []
+        }
+      },
+      {
+        "abv": null,
+        "brand": "Caol Ila",
+        "score": 55.644306,
+        "series": null,
+        "source": ["text"],
+        "bottler": "Morrison Scotch Whisky Distillers",
+        "edition": null,
+        "outturn": null,
+        "bottleId": 1692,
+        "category": "single_malt",
+        "fullName": "Caol Ila 2012 MSWD Càrn Mòr Strictly Limited",
+        "reference": null,
+        "statedAge": 8,
+        "caskNumber": null,
+        "comparison": {
+          "missing": ["abv"],
+          "conflicts": [],
+          "agreements": []
+        },
+        "distillery": ["Caol Ila"],
+        "maturation": null,
+        "releaseDay": null,
+        "singleCask": null,
+        "releaseYear": null,
+        "vintageYear": null,
+        "bottlingYear": null,
+        "caskStrength": null,
+        "releaseMonth": null,
+        "familyContext": {
+          "siblingBottles": []
+        }
+      },
+      {
+        "abv": 46,
+        "brand": "Signatory Vintage",
+        "score": 55.36702,
+        "series": null,
+        "source": ["text"],
+        "bottler": "Signatory Vintage",
+        "edition": null,
+        "outturn": null,
+        "bottleId": 62004,
+        "category": "single_malt",
+        "fullName": "Signatory Vintage Ben Nevis 8-year-old",
+        "reference": null,
+        "statedAge": 8,
+        "caskNumber": "427 & 429",
+        "comparison": {
+          "missing": ["releaseYear", "caskStrength", "series"],
+          "conflicts": ["vintageYear", "singleCask", "distillers"],
+          "agreements": ["category", "statedAge", "abv", "brand", "bottler"]
+        },
+        "distillery": ["Ben Nevis"],
+        "maturation": null,
+        "releaseDay": null,
+        "singleCask": false,
+        "releaseYear": null,
+        "vintageYear": 2013,
+        "bottlingYear": 2021,
+        "caskStrength": null,
+        "releaseMonth": null,
+        "familyContext": {
+          "siblingBottles": []
+        }
+      },
+      {
+        "abv": 46,
+        "brand": "Signatory Vintage",
+        "score": 55.36702,
+        "series": null,
+        "source": ["text"],
+        "bottler": "Signatory Vintage",
+        "edition": null,
+        "outturn": null,
+        "bottleId": 62005,
+        "category": "single_malt",
+        "fullName": "Signatory Vintage Ben Nevis 8-year-old",
+        "reference": null,
+        "statedAge": 8,
+        "caskNumber": "240 & 241",
+        "comparison": {
+          "missing": ["releaseYear", "caskStrength", "series"],
+          "conflicts": ["vintageYear", "singleCask", "distillers"],
+          "agreements": ["category", "statedAge", "abv", "brand", "bottler"]
+        },
+        "distillery": ["Ben Nevis"],
+        "maturation": null,
+        "releaseDay": null,
+        "singleCask": false,
+        "releaseYear": null,
+        "vintageYear": 2014,
+        "bottlingYear": 2023,
+        "caskStrength": null,
+        "releaseMonth": null,
+        "familyContext": {
+          "siblingBottles": []
+        }
+      },
+      {
+        "abv": 46,
+        "brand": "Signatory Vintage",
+        "score": 53.511406,
+        "series": "The Un-Chillfiltered Collection",
+        "source": ["text"],
+        "bottler": "Signatory Vintage",
+        "edition": null,
+        "outturn": null,
+        "bottleId": 46809,
+        "category": "single_malt",
+        "fullName": "Signatory Vintage Whitlaw - 8-year-old - 2026 Release - 2018 Vintage - 46.0% ABV - Pedro Ximenez Cask - Hogshead - 1st Fill",
+        "reference": null,
+        "statedAge": 8,
+        "caskNumber": null,
+        "comparison": {
+          "missing": ["caskStrength", "singleCask"],
+          "conflicts": ["vintageYear", "releaseYear", "series", "distillers"],
+          "agreements": ["category", "statedAge", "abv", "brand", "bottler"]
+        },
+        "distillery": ["Highland Park"],
+        "maturation": "pedro_ximenez",
+        "releaseDay": null,
+        "singleCask": null,
+        "releaseYear": 2026,
+        "vintageYear": 2018,
+        "bottlingYear": null,
+        "caskStrength": null,
+        "releaseMonth": null,
+        "familyContext": {
+          "siblingBottles": []
+        }
+      },
+      {
+        "abv": 58.9,
+        "brand": "The Scotch Malt Whisky Society",
+        "score": 52.91062,
+        "series": null,
+        "source": ["text"],
+        "bottler": "The Scotch Malt Whisky Society",
+        "edition": null,
+        "outturn": 234,
+        "bottleId": 49155,
+        "category": "single_malt",
+        "fullName": "SMWS 93.150 Fishermans jumpers",
+        "reference": null,
+        "statedAge": 8,
+        "caskNumber": "93.150",
+        "comparison": {
+          "missing": ["caskStrength", "series"],
+          "conflicts": ["abv", "brand", "bottler", "distillers"],
+          "agreements": [
+            "category",
+            "statedAge",
+            "vintageYear",
+            "releaseYear",
+            "singleCask"
+          ]
+        },
+        "distillery": ["Glen Scotia"],
+        "maturation": "1st fill ex-bourbon barrel",
+        "releaseDay": 4,
+        "singleCask": true,
+        "releaseYear": 2020,
+        "vintageYear": 2012,
+        "bottlingYear": null,
+        "caskStrength": null,
+        "releaseMonth": 12,
+        "familyContext": {
+          "siblingBottles": []
+        }
+      },
+      {
+        "abv": 55.4,
+        "brand": "Kilchoman",
+        "score": 51.924553,
+        "series": null,
+        "source": ["text"],
+        "bottler": null,
+        "edition": "Uniquely Islay Series – An t-Earrach 2020 #8/9",
+        "outturn": 215,
+        "bottleId": 59497,
+        "category": "single_malt",
+        "fullName": "Kilchoman Bourbon Single Cask 88/2006 - Uniquely Islay Series – An t-Earrach 2020 #8/9",
+        "reference": null,
+        "statedAge": null,
+        "caskNumber": "88/2006",
+        "comparison": {
+          "missing": ["statedAge", "caskStrength", "bottler", "series"],
+          "conflicts": ["abv", "vintageYear", "brand", "distillers"],
+          "agreements": ["category", "releaseYear", "singleCask"]
+        },
+        "distillery": ["Kilchoman"],
+        "maturation": "Refill Ex-Bourbon Barrel",
+        "releaseDay": null,
+        "singleCask": true,
+        "releaseYear": 2020,
+        "vintageYear": 2006,
+        "bottlingYear": 2020,
+        "caskStrength": null,
+        "releaseMonth": null,
+        "familyContext": {
+          "siblingBottles": []
+        }
+      },
+      {
+        "abv": 57.9,
+        "brand": "Special Releases",
+        "score": 51.769703,
+        "series": null,
+        "source": ["text"],
+        "bottler": null,
+        "edition": "2020",
+        "outturn": null,
+        "bottleId": 2237,
+        "category": "single_malt",
+        "fullName": "Special Releases Talisker 8-year-old - 2020",
+        "reference": null,
+        "statedAge": 8,
+        "caskNumber": null,
+        "comparison": {
+          "missing": [
+            "vintageYear",
+            "caskStrength",
+            "singleCask",
+            "bottler",
+            "series"
+          ],
+          "conflicts": ["abv", "brand", "distillers"],
+          "agreements": ["category", "statedAge", "releaseYear"]
+        },
+        "distillery": ["Talisker"],
+        "maturation": "From pot-still Caribbean rum casks",
+        "releaseDay": null,
+        "singleCask": null,
+        "releaseYear": 2020,
+        "vintageYear": null,
+        "bottlingYear": null,
+        "caskStrength": null,
+        "releaseMonth": null,
+        "familyContext": {
+          "siblingBottles": []
+        }
+      },
+      {
+        "abv": 42.1,
+        "brand": "Ohishi Whisky",
+        "score": 51.388172,
+        "series": null,
+        "source": ["text"],
+        "bottler": null,
+        "edition": "2020 Release",
+        "outturn": null,
+        "bottleId": 64699,
+        "category": null,
+        "fullName": "Ohishi Whisky 8-year-old Sherry Cask-Finished - 2020 Release",
+        "reference": null,
+        "statedAge": 8,
+        "caskNumber": null,
+        "comparison": {
+          "missing": [
+            "category",
+            "vintageYear",
+            "caskStrength",
+            "singleCask",
+            "bottler",
+            "series"
+          ],
+          "conflicts": ["abv", "brand", "distillers"],
+          "agreements": ["statedAge", "releaseYear"]
+        },
+        "distillery": ["Ohishi"],
+        "maturation": "Sherry cask-finished",
+        "releaseDay": null,
+        "singleCask": null,
+        "releaseYear": 2020,
+        "vintageYear": null,
+        "bottlingYear": null,
+        "caskStrength": null,
+        "releaseMonth": null,
+        "familyContext": {
+          "siblingBottles": []
+        }
+      },
+      {
+        "abv": 48,
+        "brand": "Mars",
+        "score": 50.961006,
+        "series": null,
+        "source": ["text"],
+        "bottler": null,
+        "edition": null,
+        "outturn": null,
+        "bottleId": 13117,
+        "category": "blend",
+        "fullName": "Mars Asagi Madara",
+        "reference": null,
+        "statedAge": 8,
+        "caskNumber": null,
+        "comparison": {
+          "missing": [
+            "vintageYear",
+            "caskStrength",
+            "singleCask",
+            "bottler",
+            "series"
+          ],
+          "conflicts": ["category", "abv", "brand", "distillers"],
+          "agreements": ["statedAge", "releaseYear"]
+        },
+        "distillery": ["Mars Komagatake Distillery"],
+        "maturation": null,
+        "releaseDay": null,
+        "singleCask": null,
+        "releaseYear": 2020,
+        "vintageYear": null,
+        "bottlingYear": null,
+        "caskStrength": null,
+        "releaseMonth": 9,
+        "familyContext": {
+          "siblingBottles": []
+        }
+      },
+      {
+        "abv": 56.6,
+        "brand": "Kilchoman",
+        "score": 50.776917,
+        "series": null,
+        "source": ["text"],
+        "bottler": null,
+        "edition": "ImpEx Cask Evolution 03/2020",
+        "outturn": 217,
+        "bottleId": 13119,
+        "category": "single_malt",
+        "fullName": "Kilchoman 8-year-old Calvados Finish Single Cask 277/2012 - ImpEx Cask Evolution 03/2020",
+        "reference": null,
+        "statedAge": 8,
+        "caskNumber": "277/2012",
+        "comparison": {
+          "missing": ["caskStrength", "bottler", "series"],
+          "conflicts": ["abv", "releaseYear", "brand", "distillers"],
+          "agreements": ["category", "statedAge", "vintageYear", "singleCask"]
+        },
+        "distillery": ["Kilchoman"],
+        "maturation": "Ex-Bourbon Barrel, Calvados Cask Finish",
+        "releaseDay": null,
+        "singleCask": true,
+        "releaseYear": 2021,
+        "vintageYear": 2012,
+        "bottlingYear": 2020,
+        "caskStrength": null,
+        "releaseMonth": null,
+        "familyContext": {
+          "siblingBottles": []
+        }
+      },
+      {
+        "abv": 46,
+        "brand": "Hepburn's Choice",
+        "score": 48.22514,
+        "series": null,
+        "source": ["text"],
+        "bottler": "Hunter Laing",
+        "edition": null,
+        "outturn": null,
+        "bottleId": 46310,
+        "category": "single_malt",
+        "fullName": "Hepburn's Choice Caol Ila 2010",
+        "reference": null,
+        "statedAge": 12,
+        "caskNumber": null,
+        "comparison": {
+          "missing": [],
+          "conflicts": [],
+          "agreements": ["abv"]
+        },
+        "distillery": ["Caol Ila"],
+        "maturation": null,
+        "releaseDay": null,
+        "singleCask": true,
+        "releaseYear": 2023,
+        "vintageYear": 2010,
+        "bottlingYear": null,
+        "caskStrength": null,
+        "releaseMonth": null,
+        "familyContext": {
+          "siblingBottles": []
+        }
+      },
+      {
+        "abv": 46,
+        "brand": "Signatory Vintage",
+        "score": 48.071915,
+        "series": null,
+        "source": ["vector", "text"],
+        "bottler": "Signatory Vintage",
+        "edition": null,
+        "outturn": 634,
+        "bottleId": 65763,
+        "category": "single_malt",
+        "fullName": "Signatory Vintage Caol Ila 1991",
+        "reference": "Signatory (distilled at Caol Ila), 15-year-old, 1991 vintage, cask #06/324/1&2, 46%",
+        "statedAge": 15,
+        "caskNumber": "06/324/1&2",
+        "comparison": {
+          "missing": [],
+          "conflicts": [],
+          "agreements": ["abv"]
+        },
+        "distillery": ["Caol Ila"],
+        "maturation": null,
+        "releaseDay": null,
+        "singleCask": false,
+        "releaseYear": null,
+        "vintageYear": 1991,
+        "bottlingYear": null,
+        "caskStrength": null,
+        "releaseMonth": null,
+        "familyContext": {
+          "siblingBottles": []
+        }
+      },
+      {
+        "abv": null,
+        "brand": "Signatory Vintage",
+        "score": 44.836845,
+        "series": "Cask Strength Collection",
+        "source": ["text"],
+        "bottler": "Signatory Vintage",
+        "edition": null,
+        "outturn": null,
+        "bottleId": 46299,
+        "category": "single_malt",
+        "fullName": "Signatory Vintage Caol Ila 2010 11-year-old",
+        "reference": null,
+        "statedAge": 11,
+        "caskNumber": null,
+        "comparison": {
+          "missing": ["abv"],
+          "conflicts": [],
+          "agreements": []
+        },
+        "distillery": ["Caol Ila"],
+        "maturation": "other",
+        "releaseDay": null,
+        "singleCask": true,
+        "releaseYear": 2022,
+        "vintageYear": 2010,
+        "bottlingYear": null,
+        "caskStrength": true,
+        "releaseMonth": null,
+        "familyContext": {
+          "siblingBottles": []
+        }
+      },
+      {
+        "abv": 46,
+        "brand": "Double Barrel",
+        "score": 43.576626,
+        "series": null,
+        "source": ["text"],
+        "bottler": "Douglas Laing",
+        "edition": null,
+        "outturn": null,
+        "bottleId": 65556,
+        "category": "blended_malt",
+        "fullName": "Double Barrel Caol Ila/Tamdhu",
+        "reference": null,
+        "statedAge": null,
+        "caskNumber": null,
+        "comparison": {
+          "missing": [],
+          "conflicts": [],
+          "agreements": ["abv"]
+        },
+        "distillery": ["Caol Ila", "Tamdhu"],
+        "maturation": null,
+        "releaseDay": null,
+        "singleCask": null,
+        "releaseYear": null,
+        "vintageYear": null,
+        "bottlingYear": null,
+        "caskStrength": null,
+        "releaseMonth": null,
+        "familyContext": {
+          "siblingBottles": []
+        }
+      },
+      {
+        "abv": null,
+        "brand": "Caol Ila",
+        "score": 42.503735,
+        "series": null,
+        "source": ["vector", "text"],
+        "bottler": null,
+        "edition": null,
+        "outturn": null,
+        "bottleId": 18746,
+        "category": "single_malt",
+        "fullName": "Caol Ila 12-year-old",
+        "reference": "Caol Ila 12-year-old, 43%",
+        "statedAge": 12,
+        "caskNumber": null,
+        "comparison": {
+          "missing": ["abv"],
+          "conflicts": [],
+          "agreements": []
+        },
+        "distillery": ["Caol Ila"],
+        "maturation": null,
+        "releaseDay": null,
+        "singleCask": null,
+        "releaseYear": null,
+        "vintageYear": null,
+        "bottlingYear": null,
+        "caskStrength": null,
+        "releaseMonth": null,
+        "familyContext": {
+          "siblingBottles": []
+        }
+      },
+      {
+        "abv": null,
+        "brand": "Caol Ila",
+        "score": 41.34388,
+        "series": null,
+        "source": ["vector", "text"],
+        "bottler": null,
+        "edition": null,
+        "outturn": null,
+        "bottleId": 17112,
+        "category": "single_malt",
+        "fullName": "Caol Ila Distillers Edition 1998",
+        "reference": "Caol Ila Distillers Edition 1998, 43%",
+        "statedAge": null,
+        "caskNumber": null,
+        "comparison": {
+          "missing": ["abv"],
+          "conflicts": [],
+          "agreements": []
+        },
+        "distillery": ["Caol Ila"],
+        "maturation": null,
+        "releaseDay": null,
+        "singleCask": null,
+        "releaseYear": null,
+        "vintageYear": null,
+        "bottlingYear": null,
+        "caskStrength": null,
+        "releaseMonth": null,
+        "familyContext": {
+          "siblingBottles": []
+        }
+      },
+      {
+        "abv": null,
+        "brand": "Caol Ila",
+        "score": 41.34388,
+        "series": null,
+        "source": ["text"],
+        "bottler": null,
+        "edition": null,
+        "outturn": null,
+        "bottleId": 4761,
+        "category": "single_malt",
+        "fullName": "Caol Ila Moch Islay Single Malt Scotch Whisky",
+        "reference": null,
+        "statedAge": null,
+        "caskNumber": null,
+        "comparison": {
+          "missing": ["abv"],
+          "conflicts": [],
+          "agreements": []
+        },
+        "distillery": ["Caol Ila"],
+        "maturation": null,
+        "releaseDay": null,
+        "singleCask": null,
+        "releaseYear": null,
+        "vintageYear": null,
+        "bottlingYear": null,
+        "caskStrength": null,
+        "releaseMonth": null,
+        "familyContext": {
+          "siblingBottles": []
+        }
+      },
+      {
+        "abv": null,
+        "brand": "Caol Ila",
+        "score": 40.717304,
+        "series": null,
+        "source": ["text"],
+        "bottler": null,
+        "edition": null,
+        "outturn": null,
+        "bottleId": 18750,
+        "category": "single_malt",
+        "fullName": "Caol Ila 18-year-old",
+        "reference": null,
+        "statedAge": 18,
+        "caskNumber": null,
+        "comparison": {
+          "missing": ["abv"],
+          "conflicts": [],
+          "agreements": []
+        },
+        "distillery": ["Caol Ila"],
+        "maturation": null,
+        "releaseDay": null,
+        "singleCask": null,
+        "releaseYear": null,
+        "vintageYear": null,
+        "bottlingYear": null,
+        "caskStrength": null,
+        "releaseMonth": null,
+        "familyContext": {
+          "siblingBottles": []
+        }
+      },
+      {
+        "abv": null,
+        "brand": "Caol Ila",
+        "score": 40.717304,
+        "series": null,
+        "source": ["text"],
+        "bottler": null,
+        "edition": null,
+        "outturn": null,
+        "bottleId": 17500,
+        "category": "single_malt",
+        "fullName": "Caol Ila 25-year-old",
+        "reference": null,
+        "statedAge": 25,
+        "caskNumber": null,
+        "comparison": {
+          "missing": ["abv"],
+          "conflicts": [],
+          "agreements": []
+        },
+        "distillery": ["Caol Ila"],
+        "maturation": null,
+        "releaseDay": null,
+        "singleCask": null,
+        "releaseYear": null,
+        "vintageYear": null,
+        "bottlingYear": null,
+        "caskStrength": null,
+        "releaseMonth": null,
+        "familyContext": {
+          "siblingBottles": []
+        }
+      },
+      {
+        "abv": 46,
+        "brand": "Signatory Vintage",
+        "score": 0.6999644823539964,
+        "series": "The Un-Chillfiltered Collection",
+        "source": ["vector"],
+        "bottler": "Signatory Vintage",
+        "edition": null,
+        "outturn": null,
+        "bottleId": 65655,
+        "category": "single_malt",
+        "fullName": "Signatory Vintage Bowmore 1999",
+        "reference": "Signatory 11-year-old 1999 vintage (distilled at Bowmore)",
+        "statedAge": 11,
+        "caskNumber": null,
+        "comparison": {
+          "missing": [],
+          "conflicts": [],
+          "agreements": ["abv"]
+        },
+        "distillery": ["Bowmore"],
+        "maturation": null,
+        "releaseDay": null,
+        "singleCask": null,
+        "releaseYear": null,
+        "vintageYear": 1999,
+        "bottlingYear": null,
+        "caskStrength": null,
+        "releaseMonth": null,
+        "familyContext": {
+          "siblingBottles": []
+        }
+      },
+      {
+        "abv": 46,
+        "brand": "Signatory Vintage",
+        "score": 0.6911957051873685,
+        "series": null,
+        "source": ["vector"],
+        "bottler": "Signatory Vintage",
+        "edition": null,
+        "outturn": 332,
+        "bottleId": 65767,
+        "category": "single_malt",
+        "fullName": "Signatory Vintage Bowmore 1988",
+        "reference": "Signatory 16-year-old 1988 vintage (Cask #42508, distilled at Bowmore), 46%",
+        "statedAge": 16,
+        "caskNumber": "42508",
+        "comparison": {
+          "missing": ["releaseYear", "caskStrength", "series"],
+          "conflicts": ["statedAge", "vintageYear", "distillers"],
+          "agreements": ["category", "abv", "singleCask", "brand", "bottler"]
+        },
+        "distillery": ["Bowmore"],
+        "maturation": "Single hogshead",
+        "releaseDay": null,
+        "singleCask": true,
+        "releaseYear": null,
+        "vintageYear": 1988,
+        "bottlingYear": null,
+        "caskStrength": null,
+        "releaseMonth": null,
+        "familyContext": {
+          "siblingBottles": []
+        }
+      },
+      {
+        "abv": 46,
+        "brand": "Douglas Laing",
+        "score": 0.6632429895969635,
+        "series": "Provenance",
+        "source": ["vector"],
+        "bottler": "Douglas Laing",
+        "edition": null,
+        "outturn": null,
+        "bottleId": 65265,
+        "category": "single_malt",
+        "fullName": "Douglas Laing Caol Ila 6-year-old",
+        "reference": "Douglas Laing Provenance 6-year-old (distilled at Caol Ila)",
+        "statedAge": 6,
+        "caskNumber": null,
+        "comparison": {
+          "missing": [],
+          "conflicts": [],
+          "agreements": ["abv"]
+        },
+        "distillery": ["Caol Ila"],
+        "maturation": null,
+        "releaseDay": null,
+        "singleCask": null,
+        "releaseYear": null,
+        "vintageYear": null,
+        "bottlingYear": null,
+        "caskStrength": null,
+        "releaseMonth": null,
+        "familyContext": {
+          "siblingBottles": []
+        }
+      },
+      {
+        "abv": 46,
+        "brand": "Signatory Vintage",
+        "score": 0.631578947368421,
+        "series": "The Un-Chillfiltered Collection",
+        "source": ["brand_coverage"],
+        "bottler": "Signatory Vintage",
+        "edition": "Casks #102 & #103",
+        "outturn": null,
+        "bottleId": 54789,
+        "category": "single_malt",
+        "fullName": "Signatory Vintage Linkwood 2012 11-year-old - Casks #102 & #103",
+        "reference": null,
+        "statedAge": 11,
+        "caskNumber": null,
+        "comparison": {
+          "missing": [],
+          "conflicts": [
+            "statedAge",
+            "releaseYear",
+            "singleCask",
+            "series",
+            "distillers"
+          ],
+          "agreements": [
+            "category",
+            "abv",
+            "vintageYear",
+            "caskStrength",
+            "brand",
+            "bottler"
+          ]
+        },
+        "distillery": ["Linkwood"],
+        "maturation": "First-fill Oloroso sherry butts",
+        "releaseDay": null,
+        "singleCask": false,
+        "releaseYear": 2023,
+        "vintageYear": 2012,
+        "bottlingYear": 2023,
+        "caskStrength": false,
+        "releaseMonth": 10,
+        "familyContext": {
+          "siblingBottles": []
+        }
+      }
+    ]
+  },
+  "context": {
+    "inspectedBottleIds": [63236],
+    "bottleContexts": [
+      {
+        "exact": {
+          "abv": 46,
+          "edition": null,
+          "outturn": null,
+          "statedAge": 8,
+          "caskNumber": "318694",
+          "maturation": null,
+          "releaseDay": null,
+          "singleCask": true,
+          "releaseYear": null,
+          "vintageYear": null,
+          "bottlingYear": null,
+          "caskStrength": null,
+          "releaseMonth": null
+        },
+        "shared": {
+          "name": "Caol Ila 8-year-old",
+          "brand": {
+            "name": "Signatory Vintage",
+            "entityId": 5725
+          },
+          "series": null,
+          "bottler": {
+            "name": "Signatory Vintage",
+            "entityId": 5725
+          },
+          "category": "single_malt",
+          "statedAge": null,
+          "distillers": [
+            {
+              "name": "Caol Ila",
+              "entityId": 366
+            }
+          ]
+        },
+        "groupId": 36197,
+        "bottleId": 63236,
+        "fullName": "Signatory Vintage Caol Ila 8-year-old",
+        "siblings": [],
+        "references": [],
+        "observations": [
+          {
+            "facts": {
+              "proposalType": "create_new",
+              "proposedBottle": {
+                "abv": null,
+                "name": "Caol Ila",
+                "brand": {
+                  "id": null,
+                  "name": "Signatory Vintage"
+                },
+                "series": null,
+                "bottler": {
+                  "id": null,
+                  "name": "Signatory Vintage"
+                },
+                "edition": null,
+                "outturn": null,
+                "category": "single_malt",
+                "statedAge": 8,
+                "caskNumber": "318694",
+                "distillers": [
+                  {
+                    "id": null,
+                    "name": "Caol Ila"
+                  }
+                ],
+                "maturation": null,
+                "releaseDay": null,
+                "singleCask": true,
+                "releaseYear": null,
+                "vintageYear": null,
+                "bottlingYear": null,
+                "caskStrength": null,
+                "releaseMonth": null
+              },
+              "referenceScope": "none"
+            },
+            "rawText": "Signatory Single Cask Caol Ila 8-year-old (cask #318694)",
+            "sourceKey": "store_price:12040961",
+            "sourceUrl": "https://www.reservebar.com/products/signatory-single-cask-caol-ila-8-year-cask-318694/GROUPING-1771198",
+            "sourceName": "Signatory Single Cask Caol Ila 8-year-old (cask #318694)",
+            "sourceType": "store_price",
+            "parsedIdentity": null
+          }
+        ],
+        "imageSources": []
+      }
+    ],
+    "inspectedEntities": [
+      {
+        "kind": "bottler",
+        "name": "Signatory Vintage",
+        "score": 1,
+        "source": ["exact", "text", "prefix", "contained"],
+        "entityId": 5725,
+        "reference": "Signatory Vintage",
+        "shortName": null,
+        "retrievedFor": [
+          {
+            "exact": true,
+            "query": "Signatory Vintage"
+          }
+        ]
+      },
+      {
+        "kind": "distillery",
+        "name": "Caol Ila",
+        "score": 1,
+        "source": ["exact", "text", "prefix", "contained"],
+        "entityId": 366,
+        "reference": "Caol Ila",
+        "shortName": "",
+        "retrievedFor": [
+          {
+            "exact": true,
+            "query": "Caol Ila"
+          }
+        ]
+      },
+      {
+        "kind": "brand",
+        "name": "Hepburn's Choice",
+        "score": 1,
+        "source": ["exact", "text", "prefix", "contained"],
+        "entityId": 365900,
+        "reference": "Hepburn's Choice",
+        "shortName": null,
+        "retrievedFor": [
+          {
+            "exact": true,
+            "query": "Hepburn's Choice"
+          }
+        ]
+      },
+      {
+        "kind": "bottler",
+        "name": "Hunter Laing",
+        "score": 1,
+        "source": ["exact", "text", "prefix", "contained"],
+        "entityId": 5733,
+        "reference": "Hunter Laing",
+        "shortName": null,
+        "retrievedFor": [
+          {
+            "exact": true,
+            "query": "Hunter Laing"
+          }
+        ]
+      },
+      {
+        "kind": "brand",
+        "name": "Double Barrel",
+        "score": 1,
+        "source": ["exact", "text", "prefix", "contained"],
+        "entityId": 886,
+        "reference": "Double Barrel",
+        "shortName": null,
+        "retrievedFor": [
+          {
+            "exact": true,
+            "query": "Double Barrel"
+          }
+        ]
+      },
+      {
+        "kind": "bottler",
+        "name": "Douglas Laing",
+        "score": 1,
+        "source": ["exact", "text", "prefix", "contained"],
+        "entityId": 5622,
+        "reference": "Douglas Laing",
+        "shortName": null,
+        "retrievedFor": [
+          {
+            "exact": true,
+            "query": "Douglas Laing"
+          }
+        ]
+      },
+      {
+        "kind": "distillery",
+        "name": "Tamdhu",
+        "score": 1,
+        "source": ["exact", "text", "prefix", "contained"],
+        "entityId": 1386,
+        "reference": "Tamdhu",
+        "shortName": null,
+        "retrievedFor": [
+          {
+            "exact": true,
+            "query": "Tamdhu"
+          }
+        ]
+      },
+      {
+        "kind": "distillery",
+        "name": "Bowmore",
+        "score": 1,
+        "source": ["exact", "text", "prefix", "contained"],
+        "entityId": 394,
+        "reference": "Bowmore",
+        "shortName": null,
+        "retrievedFor": [
+          {
+            "exact": true,
+            "query": "Bowmore"
+          }
+        ]
+      },
+      {
+        "kind": "bottler",
+        "name": "Morrison Scotch Whisky Distillers",
+        "score": 1,
+        "source": ["exact", "text", "prefix", "contained"],
+        "entityId": 5613,
+        "reference": "Morrison Scotch Whisky Distillers",
+        "shortName": "Morrison Distillers",
+        "retrievedFor": [
+          {
+            "exact": true,
+            "query": "Morrison Scotch Whisky Distillers"
+          }
+        ]
+      },
+      {
+        "kind": "bottler",
+        "name": "Barrell Craft Spirits",
+        "score": 0.35,
+        "source": ["contained"],
+        "entityId": 75635,
+        "reference": "Barrel",
+        "shortName": "Barrell",
+        "retrievedFor": [
+          {
+            "query": "Double Barrel"
+          }
+        ]
+      },
+      {
+        "kind": "brand",
+        "name": "Vintage",
+        "score": 0.3375,
+        "source": ["contained"],
+        "entityId": 4392,
+        "reference": "Vintage",
+        "shortName": null,
+        "retrievedFor": [
+          {
+            "query": "Signatory Vintage"
+          }
+        ]
+      },
+      {
+        "kind": "company",
+        "name": "Morrisons",
+        "score": 0.31,
+        "source": ["contained"],
+        "entityId": 366283,
+        "reference": "Morrisons",
+        "shortName": null,
+        "retrievedFor": [
+          {
+            "query": "Morrison Scotch Whisky Distillers"
+          }
+        ]
+      },
+      {
+        "kind": "bottler",
+        "name": "&Whisky",
+        "score": 0.29000000000000004,
+        "source": ["contained"],
+        "entityId": 365821,
+        "reference": "&Whisky",
+        "shortName": null,
+        "retrievedFor": [
+          {
+            "query": "Morrison Scotch Whisky Distillers"
+          }
+        ]
+      },
+      {
+        "kind": "company",
+        "name": "Morrison Bowmore Distillers Ltd",
+        "score": 0.2,
+        "source": ["text"],
+        "entityId": 5684,
+        "reference": null,
+        "shortName": null,
+        "retrievedFor": [
+          {
+            "query": "Bowmore"
+          }
+        ]
+      }
+    ],
+    "inspectedSeries": []
+  },
+  "provenance": {
+    "source": "production_miss",
+    "verifiedSourceUrls": [
+      "https://www.scotchwhiskyauctions.com/auctions/234-the-185th-auction/905629-caol-ila-2012-the-disappearance-signatory-for-lmdw/",
+      "https://d3suvtcq00dftb.cloudfront.net/images/b3f05a86e3c2cf7b2c82e1d31701be1e-zoom.jpg",
+      "https://www.reddit.com/r/Scotch/comments/vbtff0/reviews_192194_six_single_cask_caol_ila_part_2/",
+      "https://whiskyauctioneer.com/learn/explore-whisky/bottles/caol-ila-2012-disappearance"
+    ],
+    "dbOutcome": {
+      "bottleId": null,
+      "createsBottle": false,
+      "summary": "Production returned no_match: it would not create the Bottle while candidate 63236, a Signatory Caol Ila 8-year-old at 46% with cask 318694, stayed unresolved."
+    },
+    "notes": "Saved check 34671, source auction_lot 14470 (lot 185-905629), run 2026-11-03. The lot photo shows Signatory Vintage's label: 'The Disappearance, distilled at Caol Ila Distillery', 'Distilled in 2012, Bottled in 2020', 'Finished in a first fill sherry butt', 'Exclusively for La Maison du Whisky', 70cl, 46%vol. The page says it was bottled in the Chess Investigation series for La Maison du Whisky. The saved web evidence agrees: 8 years old, distilled 2012, bottled 2020, 46%, Signatory for La Maison du Whisky. No age and no cask number are printed, so identityScope is product and the case does not require an age or cask. 63236 (Signatory Vintage Caol Ila 8-year-old, 46%, cask 318694) has a cask number the source does not support and lacks the printed title and selection, so it is a different Bottle; its own photo shows the Un-Chillfiltered Collection, distilled 2010. A catalog search for 'Caol Ila Disappearance' finds no existing Bottle. Brand and bottler are Signatory Vintage (5725) under rule 4 of 'Who Is The Brand, Series, And Bottler'; the La Maison du Whisky selection is the edition, using the doc's own example wording. Doc gap, not decided here: the docs keep a marketed cask name such as 'Leo' in the name, but do not say whether an independent bottler's title sits alone ('The Disappearance') or after the distillery and vintage ('Caol Ila 2012 The Disappearance'). The case only requires 'Disappearance' in the name."
+  },
+  "expected": {
+    "status": "classified",
+    "action": "create_bottle",
+    "identityScope": "product",
+    "matchedBottleId": null,
+    "proposedBottle": {
+      "brand": {
+        "id": 5725
+      },
+      "bottler": {
+        "id": 5725
+      },
+      "category": "single_malt",
+      "abv": 46,
+      "vintageYear": 2012,
+      "bottlingYear": 2020,
+      "edition": "for La Maison du Whisky"
+    },
+    "proposedBottleNameIncludes": ["Disappearance"],
+    "proposedBottleDistillerIds": [366],
+    "summary": "Create Signatory Vintage's Caol Ila 2012 'The Disappearance', bottled 2020 at 46% for La Maison du Whisky. Candidate 63236 is a different Signatory Caol Ila (cask 318694, no title, no selection), so it does not block the create."
+  },
+  "knownFailure": {
+    "reason": "A clearly different candidate (63236, 2010, another series) blocks the create, so the agent returns no_match."
+  }
+}

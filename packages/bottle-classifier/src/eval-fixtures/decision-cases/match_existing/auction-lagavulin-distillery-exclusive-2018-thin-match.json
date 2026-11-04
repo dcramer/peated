@@ -1,0 +1,1151 @@
+{
+  "id": "auction-lagavulin-distillery-exclusive-2018-thin-match",
+  "name": "auction lot: Lagavulin Distillery Exclusive 2018 matches a thin Bottle whose only listing is the 2018 release",
+  "input": {
+    "reference": {
+      "id": 16320,
+      "url": "https://www.scotchwhiskyauctions.com/auctions/234-the-185th-auction/907509-lagavulin-distillery-exclusive-cask-strength-2018-release/",
+      "name": "Lagavulin Distillery Exclusive Cask Strength 2018 Release",
+      "imageUrl": null,
+      "externalSiteId": 28097,
+      "currentBottleId": null
+    },
+    "extractedIdentity": {
+      "abv": 53.5,
+      "brand": null,
+      "series": null,
+      "bottler": null,
+      "edition": null,
+      "outturn": null,
+      "category": null,
+      "distillery": null,
+      "expression": null,
+      "maturation": null,
+      "stated_age": null,
+      "cask_number": null,
+      "single_cask": null,
+      "release_year": null,
+      "vintage_year": null,
+      "cask_strength": null
+    },
+    "imageEvidence": null,
+    "initialCandidates": [
+      {
+        "abv": 53.9,
+        "brand": "Lagavulin",
+        "score": 40.477196,
+        "series": "Fèis Ìle",
+        "source": ["text", "brand_coverage"],
+        "bottler": null,
+        "edition": "Fèis Ìle 2018",
+        "outturn": null,
+        "bottleId": 2878,
+        "category": "single_malt",
+        "fullName": "Lagavulin Natural Cask Strength - Fèis Ìle 2018",
+        "reference": null,
+        "statedAge": 18,
+        "caskNumber": null,
+        "comparison": {
+          "missing": [],
+          "conflicts": ["abv"],
+          "agreements": [
+            "category",
+            "releaseYear",
+            "caskStrength",
+            "brand",
+            "distillers"
+          ]
+        },
+        "distillery": ["Lagavulin"],
+        "maturation": null,
+        "releaseDay": null,
+        "singleCask": null,
+        "releaseYear": 2018,
+        "vintageYear": null,
+        "bottlingYear": 2018,
+        "caskStrength": true,
+        "releaseMonth": null,
+        "familyContext": {
+          "siblingBottles": []
+        }
+      },
+      {
+        "abv": null,
+        "brand": "Lagavulin",
+        "score": 39.67419,
+        "series": null,
+        "source": ["text", "context"],
+        "bottler": null,
+        "edition": null,
+        "outturn": null,
+        "bottleId": 3254,
+        "category": "single_malt",
+        "fullName": "Lagavulin Distillery Exclusive Bottling Islay Single Malt Scotch Whisky",
+        "reference": null,
+        "statedAge": null,
+        "caskNumber": null,
+        "comparison": {
+          "missing": ["abv"],
+          "conflicts": [],
+          "agreements": []
+        },
+        "distillery": ["Lagavulin"],
+        "maturation": null,
+        "releaseDay": null,
+        "singleCask": null,
+        "releaseYear": null,
+        "vintageYear": null,
+        "bottlingYear": null,
+        "caskStrength": null,
+        "releaseMonth": null,
+        "familyContext": {
+          "siblingBottles": []
+        }
+      },
+      {
+        "abv": null,
+        "brand": "Lindores Abbey",
+        "score": 32.630653,
+        "series": null,
+        "source": ["text"],
+        "bottler": "Lindores Abbey",
+        "edition": null,
+        "outturn": null,
+        "bottleId": 1292,
+        "category": "single_malt",
+        "fullName": "Lindores Abbey 2018 The Exclusive Cask",
+        "reference": null,
+        "statedAge": 12,
+        "caskNumber": null,
+        "comparison": {
+          "missing": ["abv", "releaseYear", "caskStrength", "distillers"],
+          "conflicts": ["brand"],
+          "agreements": ["category"]
+        },
+        "distillery": [],
+        "maturation": null,
+        "releaseDay": null,
+        "singleCask": null,
+        "releaseYear": null,
+        "vintageYear": null,
+        "bottlingYear": null,
+        "caskStrength": null,
+        "releaseMonth": null,
+        "familyContext": {
+          "siblingBottles": []
+        }
+      },
+      {
+        "abv": 53.5,
+        "brand": "The Exclusive Malts",
+        "score": 31.692856,
+        "series": null,
+        "source": ["text"],
+        "bottler": "Creative Whisky Company",
+        "edition": null,
+        "outturn": null,
+        "bottleId": 65492,
+        "category": "single_malt",
+        "fullName": "The Exclusive Malts Clynelish 1997 15-year-old",
+        "reference": null,
+        "statedAge": 15,
+        "caskNumber": "6894",
+        "comparison": {
+          "missing": [],
+          "conflicts": [],
+          "agreements": ["abv"]
+        },
+        "distillery": ["Clynelish"],
+        "maturation": null,
+        "releaseDay": null,
+        "singleCask": true,
+        "releaseYear": null,
+        "vintageYear": 1997,
+        "bottlingYear": null,
+        "caskStrength": true,
+        "releaseMonth": null,
+        "familyContext": {
+          "siblingBottles": []
+        }
+      },
+      {
+        "abv": 53.5,
+        "brand": "Arran",
+        "score": 31.272598,
+        "series": null,
+        "source": ["text"],
+        "bottler": "Arran",
+        "edition": "Distillery Exclusive",
+        "outturn": null,
+        "bottleId": 47275,
+        "category": "single_malt",
+        "fullName": "Arran Single Cask - Distillery Exclusive",
+        "reference": null,
+        "statedAge": 13,
+        "caskNumber": "2111/2554",
+        "comparison": {
+          "missing": [],
+          "conflicts": [],
+          "agreements": ["abv"]
+        },
+        "distillery": ["Arran"],
+        "maturation": "bourbon",
+        "releaseDay": null,
+        "singleCask": true,
+        "releaseYear": null,
+        "vintageYear": 2012,
+        "bottlingYear": null,
+        "caskStrength": null,
+        "releaseMonth": null,
+        "familyContext": {
+          "siblingBottles": []
+        }
+      },
+      {
+        "abv": null,
+        "brand": "Lagavulin",
+        "score": 30.963165,
+        "series": "Distillers Edition",
+        "source": ["text", "vector"],
+        "bottler": null,
+        "edition": null,
+        "outturn": null,
+        "bottleId": 44006,
+        "category": "single_malt",
+        "fullName": "Lagavulin Distillers Edition",
+        "reference": "Lagavulin Distillers Edition 2018 Release",
+        "statedAge": null,
+        "caskNumber": null,
+        "comparison": {
+          "missing": ["abv"],
+          "conflicts": [],
+          "agreements": []
+        },
+        "distillery": ["Lagavulin"],
+        "maturation": null,
+        "releaseDay": null,
+        "singleCask": null,
+        "releaseYear": null,
+        "vintageYear": null,
+        "bottlingYear": null,
+        "caskStrength": null,
+        "releaseMonth": null,
+        "familyContext": {
+          "siblingBottles": [
+            {
+              "abv": 43,
+              "edition": "1997 Release",
+              "outturn": null,
+              "bottleId": 44866,
+              "fullName": "Lagavulin Distillers Edition - 1997 Release",
+              "statedAge": null,
+              "caskNumber": null,
+              "maturation": "Pedro Ximénez-seasoned cask finish",
+              "releaseDay": null,
+              "singleCask": false,
+              "releaseYear": 1997,
+              "traitFields": [
+                "edition",
+                "releaseYear",
+                "vintageYear",
+                "abv",
+                "singleCask",
+                "caskStrength"
+              ],
+              "vintageYear": 1979,
+              "bottlingYear": 1997,
+              "caskStrength": false,
+              "releaseMonth": null
+            },
+            {
+              "abv": 43,
+              "edition": "2006 Release",
+              "outturn": null,
+              "bottleId": 44867,
+              "fullName": "Lagavulin Distillers Edition - 2006 Release",
+              "statedAge": null,
+              "caskNumber": null,
+              "maturation": "Pedro Ximénez-seasoned cask finish",
+              "releaseDay": null,
+              "singleCask": false,
+              "releaseYear": 2006,
+              "traitFields": [
+                "edition",
+                "releaseYear",
+                "vintageYear",
+                "abv",
+                "singleCask",
+                "caskStrength"
+              ],
+              "vintageYear": 1990,
+              "bottlingYear": 2006,
+              "caskStrength": false,
+              "releaseMonth": null
+            },
+            {
+              "abv": 43,
+              "edition": "2007 Release",
+              "outturn": null,
+              "bottleId": 44868,
+              "fullName": "Lagavulin Distillers Edition - 2007 Release",
+              "statedAge": null,
+              "caskNumber": null,
+              "maturation": "Pedro Ximénez-seasoned cask finish",
+              "releaseDay": null,
+              "singleCask": false,
+              "releaseYear": 2007,
+              "traitFields": [
+                "edition",
+                "releaseYear",
+                "vintageYear",
+                "abv",
+                "singleCask",
+                "caskStrength"
+              ],
+              "vintageYear": 1991,
+              "bottlingYear": 2007,
+              "caskStrength": false,
+              "releaseMonth": null
+            },
+            {
+              "abv": 43,
+              "edition": "2009 Release",
+              "outturn": null,
+              "bottleId": 44869,
+              "fullName": "Lagavulin Distillers Edition - 2009 Release",
+              "statedAge": null,
+              "caskNumber": null,
+              "maturation": "Pedro Ximénez-seasoned cask finish",
+              "releaseDay": null,
+              "singleCask": false,
+              "releaseYear": 2009,
+              "traitFields": [
+                "edition",
+                "releaseYear",
+                "vintageYear",
+                "abv",
+                "singleCask",
+                "caskStrength"
+              ],
+              "vintageYear": 1993,
+              "bottlingYear": 2009,
+              "caskStrength": false,
+              "releaseMonth": null
+            },
+            {
+              "abv": 43,
+              "edition": "2010 Release",
+              "outturn": null,
+              "bottleId": 44875,
+              "fullName": "Lagavulin Distillers Edition - 2010 Release",
+              "statedAge": null,
+              "caskNumber": null,
+              "maturation": "Pedro Ximénez-seasoned cask finish",
+              "releaseDay": null,
+              "singleCask": false,
+              "releaseYear": 2010,
+              "traitFields": [
+                "edition",
+                "releaseYear",
+                "vintageYear",
+                "abv",
+                "singleCask",
+                "caskStrength"
+              ],
+              "vintageYear": 1994,
+              "bottlingYear": 2010,
+              "caskStrength": false,
+              "releaseMonth": null
+            },
+            {
+              "abv": 43,
+              "edition": "2011 Release",
+              "outturn": null,
+              "bottleId": 44864,
+              "fullName": "Lagavulin Distillers Edition - 2011 Release",
+              "statedAge": null,
+              "caskNumber": null,
+              "maturation": "Pedro Ximénez-seasoned cask finish",
+              "releaseDay": null,
+              "singleCask": false,
+              "releaseYear": 2011,
+              "traitFields": [
+                "edition",
+                "releaseYear",
+                "vintageYear",
+                "abv",
+                "singleCask",
+                "caskStrength"
+              ],
+              "vintageYear": 1995,
+              "bottlingYear": 2011,
+              "caskStrength": false,
+              "releaseMonth": null
+            },
+            {
+              "abv": 43,
+              "edition": "2012 Release",
+              "outturn": null,
+              "bottleId": 44870,
+              "fullName": "Lagavulin Distillers Edition - 2012 Release",
+              "statedAge": null,
+              "caskNumber": null,
+              "maturation": "Pedro Ximénez-seasoned cask finish",
+              "releaseDay": null,
+              "singleCask": false,
+              "releaseYear": 2012,
+              "traitFields": [
+                "edition",
+                "releaseYear",
+                "vintageYear",
+                "abv",
+                "singleCask",
+                "caskStrength"
+              ],
+              "vintageYear": 1996,
+              "bottlingYear": 2012,
+              "caskStrength": false,
+              "releaseMonth": null
+            },
+            {
+              "abv": 43,
+              "edition": "2013 Release",
+              "outturn": null,
+              "bottleId": 44871,
+              "fullName": "Lagavulin Distillers Edition - 2013 Release",
+              "statedAge": null,
+              "caskNumber": null,
+              "maturation": "Pedro Ximénez-seasoned cask finish",
+              "releaseDay": null,
+              "singleCask": false,
+              "releaseYear": 2013,
+              "traitFields": [
+                "edition",
+                "releaseYear",
+                "vintageYear",
+                "abv",
+                "singleCask",
+                "caskStrength"
+              ],
+              "vintageYear": 1997,
+              "bottlingYear": 2013,
+              "caskStrength": false,
+              "releaseMonth": null
+            }
+          ]
+        }
+      },
+      {
+        "abv": 53.5,
+        "brand": "The Exclusive Malts",
+        "score": 29.221445,
+        "series": null,
+        "source": ["text"],
+        "bottler": "Creative Whisky Company",
+        "edition": null,
+        "outturn": null,
+        "bottleId": 61237,
+        "category": "single_malt",
+        "fullName": "The Exclusive Malts Dalmore 13-year-old 2000",
+        "reference": null,
+        "statedAge": 13,
+        "caskNumber": "6952",
+        "comparison": {
+          "missing": [],
+          "conflicts": [],
+          "agreements": ["abv"]
+        },
+        "distillery": ["The Dalmore"],
+        "maturation": null,
+        "releaseDay": null,
+        "singleCask": true,
+        "releaseYear": null,
+        "vintageYear": 2000,
+        "bottlingYear": 2013,
+        "caskStrength": null,
+        "releaseMonth": null,
+        "familyContext": {
+          "siblingBottles": []
+        }
+      },
+      {
+        "abv": null,
+        "brand": "Lagavulin",
+        "score": 26.669928,
+        "series": null,
+        "source": ["text"],
+        "bottler": null,
+        "edition": null,
+        "outturn": null,
+        "bottleId": 800,
+        "category": "single_malt",
+        "fullName": "Lagavulin 08",
+        "reference": null,
+        "statedAge": 8,
+        "caskNumber": null,
+        "comparison": {
+          "missing": ["abv"],
+          "conflicts": [],
+          "agreements": []
+        },
+        "distillery": ["Lagavulin"],
+        "maturation": null,
+        "releaseDay": null,
+        "singleCask": null,
+        "releaseYear": null,
+        "vintageYear": null,
+        "bottlingYear": null,
+        "caskStrength": null,
+        "releaseMonth": null,
+        "familyContext": {
+          "siblingBottles": []
+        }
+      },
+      {
+        "abv": null,
+        "brand": "Lagavulin",
+        "score": 26.541832,
+        "series": null,
+        "source": ["vector", "text"],
+        "bottler": null,
+        "edition": null,
+        "outturn": null,
+        "bottleId": 4321,
+        "category": "single_malt",
+        "fullName": "Lagavulin Triple Matured Edition Limited Edition",
+        "reference": "Lagavulin Triple Matured Edition, 48%",
+        "statedAge": null,
+        "caskNumber": null,
+        "comparison": {
+          "missing": ["abv"],
+          "conflicts": [],
+          "agreements": []
+        },
+        "distillery": ["Lagavulin"],
+        "maturation": null,
+        "releaseDay": null,
+        "singleCask": null,
+        "releaseYear": null,
+        "vintageYear": null,
+        "bottlingYear": null,
+        "caskStrength": null,
+        "releaseMonth": null,
+        "familyContext": {
+          "siblingBottles": []
+        }
+      },
+      {
+        "abv": null,
+        "brand": "Lagavulin",
+        "score": 26.090067,
+        "series": null,
+        "source": ["vector", "text"],
+        "bottler": null,
+        "edition": null,
+        "outturn": null,
+        "bottleId": 3563,
+        "category": "single_malt",
+        "fullName": "Lagavulin 25-year-old 200 Years of Lagavulin Distillery Managers",
+        "reference": "Lagavulin 25-year-old, 50.9%",
+        "statedAge": 25,
+        "caskNumber": null,
+        "comparison": {
+          "missing": ["abv"],
+          "conflicts": [],
+          "agreements": []
+        },
+        "distillery": ["Lagavulin"],
+        "maturation": null,
+        "releaseDay": null,
+        "singleCask": null,
+        "releaseYear": null,
+        "vintageYear": null,
+        "bottlingYear": null,
+        "caskStrength": null,
+        "releaseMonth": null,
+        "familyContext": {
+          "siblingBottles": []
+        }
+      },
+      {
+        "abv": 53.5,
+        "brand": "Darkness",
+        "score": 25.257584,
+        "series": null,
+        "source": ["text"],
+        "bottler": "Darkness",
+        "edition": null,
+        "outturn": null,
+        "bottleId": 46251,
+        "category": "single_malt",
+        "fullName": "Darkness Oloroso Cask Finish - 20-year-old - 53.5% ABV - Oloroso Cask",
+        "reference": null,
+        "statedAge": 20,
+        "caskNumber": null,
+        "comparison": {
+          "missing": [],
+          "conflicts": [],
+          "agreements": ["abv"]
+        },
+        "distillery": [],
+        "maturation": "oloroso",
+        "releaseDay": null,
+        "singleCask": null,
+        "releaseYear": null,
+        "vintageYear": null,
+        "bottlingYear": null,
+        "caskStrength": null,
+        "releaseMonth": null,
+        "familyContext": {
+          "siblingBottles": []
+        }
+      },
+      {
+        "abv": null,
+        "brand": "Lagavulin",
+        "score": 24.968506,
+        "series": null,
+        "source": ["text"],
+        "bottler": null,
+        "edition": null,
+        "outturn": null,
+        "bottleId": 5009,
+        "category": "single_malt",
+        "fullName": "Lagavulin 1995 Limited Edition",
+        "reference": null,
+        "statedAge": 25,
+        "caskNumber": null,
+        "comparison": {
+          "missing": ["abv"],
+          "conflicts": [],
+          "agreements": []
+        },
+        "distillery": ["Lagavulin"],
+        "maturation": null,
+        "releaseDay": null,
+        "singleCask": null,
+        "releaseYear": null,
+        "vintageYear": null,
+        "bottlingYear": null,
+        "caskStrength": null,
+        "releaseMonth": null,
+        "familyContext": {
+          "siblingBottles": []
+        }
+      },
+      {
+        "abv": null,
+        "brand": "Lagavulin",
+        "score": 24.968506,
+        "series": null,
+        "source": ["text"],
+        "bottler": null,
+        "edition": null,
+        "outturn": null,
+        "bottleId": 2879,
+        "category": "single_malt",
+        "fullName": "Lagavulin 1997 Select Cask",
+        "reference": null,
+        "statedAge": 16,
+        "caskNumber": null,
+        "comparison": {
+          "missing": ["abv"],
+          "conflicts": [],
+          "agreements": []
+        },
+        "distillery": ["Lagavulin"],
+        "maturation": null,
+        "releaseDay": null,
+        "singleCask": null,
+        "releaseYear": null,
+        "vintageYear": null,
+        "bottlingYear": null,
+        "caskStrength": null,
+        "releaseMonth": null,
+        "familyContext": {
+          "siblingBottles": []
+        }
+      },
+      {
+        "abv": 53.5,
+        "brand": "Chichibu",
+        "score": 24.863781,
+        "series": null,
+        "source": ["text"],
+        "bottler": "Chichibu",
+        "edition": "2025 Edition",
+        "outturn": 840,
+        "bottleId": 47646,
+        "category": "single_malt",
+        "fullName": "Chichibu Taiwan Edition - 2025 Edition - 53.5% ABV",
+        "reference": null,
+        "statedAge": null,
+        "caskNumber": null,
+        "comparison": {
+          "missing": [],
+          "conflicts": [],
+          "agreements": ["abv"]
+        },
+        "distillery": ["Chichibu"],
+        "maturation": "bourbon barrel and virgin oak hogshead",
+        "releaseDay": null,
+        "singleCask": false,
+        "releaseYear": 2025,
+        "vintageYear": null,
+        "bottlingYear": null,
+        "caskStrength": null,
+        "releaseMonth": null,
+        "familyContext": {
+          "siblingBottles": []
+        }
+      },
+      {
+        "abv": 53.5,
+        "brand": "Jack Daniel's",
+        "score": 24.703712,
+        "series": "Tennessee Travelers",
+        "source": ["text"],
+        "bottler": null,
+        "edition": null,
+        "outturn": null,
+        "bottleId": 45562,
+        "category": "rye",
+        "fullName": "Jack Daniel's Bold & Spicy",
+        "reference": null,
+        "statedAge": null,
+        "caskNumber": null,
+        "comparison": {
+          "missing": [],
+          "conflicts": [],
+          "agreements": ["abv"]
+        },
+        "distillery": ["Jack Daniel Distillery"],
+        "maturation": null,
+        "releaseDay": null,
+        "singleCask": null,
+        "releaseYear": null,
+        "vintageYear": null,
+        "bottlingYear": null,
+        "caskStrength": null,
+        "releaseMonth": null,
+        "familyContext": {
+          "siblingBottles": []
+        }
+      },
+      {
+        "abv": null,
+        "brand": "Lagavulin",
+        "score": 24.323223,
+        "series": null,
+        "source": ["text"],
+        "bottler": null,
+        "edition": null,
+        "outturn": null,
+        "bottleId": 17983,
+        "category": "single_malt",
+        "fullName": "Lagavulin Distillers' Edition 1991 Vintage",
+        "reference": null,
+        "statedAge": null,
+        "caskNumber": null,
+        "comparison": {
+          "missing": ["abv"],
+          "conflicts": [],
+          "agreements": []
+        },
+        "distillery": ["Lagavulin"],
+        "maturation": null,
+        "releaseDay": null,
+        "singleCask": null,
+        "releaseYear": null,
+        "vintageYear": 1991,
+        "bottlingYear": null,
+        "caskStrength": null,
+        "releaseMonth": null,
+        "familyContext": {
+          "siblingBottles": []
+        }
+      },
+      {
+        "abv": null,
+        "brand": "Starward",
+        "score": 24.155338,
+        "series": null,
+        "source": ["text"],
+        "bottler": null,
+        "edition": null,
+        "outturn": null,
+        "bottleId": 43096,
+        "category": "single_malt",
+        "fullName": "Starward Lagavulin Cask Finished Single Malt",
+        "reference": null,
+        "statedAge": null,
+        "caskNumber": null,
+        "comparison": {
+          "missing": ["abv"],
+          "conflicts": [],
+          "agreements": []
+        },
+        "distillery": [],
+        "maturation": null,
+        "releaseDay": null,
+        "singleCask": null,
+        "releaseYear": null,
+        "vintageYear": null,
+        "bottlingYear": null,
+        "caskStrength": null,
+        "releaseMonth": null,
+        "familyContext": {
+          "siblingBottles": []
+        }
+      }
+    ]
+  },
+  "context": {
+    "inspectedBottleIds": [3254],
+    "bottleContexts": [
+      {
+        "exact": {
+          "abv": null,
+          "edition": null,
+          "outturn": null,
+          "statedAge": null,
+          "caskNumber": null,
+          "maturation": null,
+          "releaseDay": null,
+          "singleCask": null,
+          "releaseYear": null,
+          "vintageYear": null,
+          "bottlingYear": null,
+          "caskStrength": null,
+          "releaseMonth": null
+        },
+        "shared": {
+          "name": "Distillery Exclusive Bottling Islay Single Malt Scotch Whisky",
+          "brand": {
+            "name": "Lagavulin",
+            "entityId": 1124
+          },
+          "series": null,
+          "bottler": null,
+          "category": "single_malt",
+          "statedAge": null,
+          "distillers": [
+            {
+              "name": "Lagavulin",
+              "entityId": 1124
+            }
+          ]
+        },
+        "groupId": 11072,
+        "bottleId": 3254,
+        "fullName": "Lagavulin Distillery Exclusive Bottling Islay Single Malt Scotch Whisky",
+        "siblings": [],
+        "references": [
+          {
+            "name": "Lagavulin Distillery Exclusive Bottling  Islay Single Malt Scotch Whisky",
+            "ignored": false
+          },
+          {
+            "name": "Lagavulin Distillery Exclusive Bottling Islay Single Malt Scotch Whisky",
+            "ignored": false
+          }
+        ],
+        "observations": [
+          {
+            "facts": {
+              "proposalType": "match",
+              "proposedBottle": null,
+              "referenceScope": "none"
+            },
+            "rawText": "Lagavulin Distillery Exclusive",
+            "sourceKey": "store_price:12062044",
+            "sourceUrl": "https://www.masterofmalt.com/whiskies/lagavulin/lagavulin-distillery-exclusive-2018-release-whisky/?sku=148085",
+            "sourceName": "Lagavulin Distillery Exclusive",
+            "sourceType": "store_price",
+            "parsedIdentity": {
+              "abv": null,
+              "brand": "Lagavulin",
+              "series": null,
+              "bottler": null,
+              "edition": null,
+              "outturn": null,
+              "category": "single_malt",
+              "distillery": ["Lagavulin"],
+              "expression": "Distillers Exclusive Bottling",
+              "maturation": null,
+              "stated_age": null,
+              "cask_number": null,
+              "release_day": null,
+              "single_cask": null,
+              "release_year": null,
+              "vintage_year": null,
+              "bottling_year": 2018,
+              "cask_strength": true,
+              "release_month": null
+            }
+          }
+        ],
+        "imageSources": []
+      }
+    ],
+    "inspectedEntities": [
+      {
+        "kind": "brand",
+        "name": "The Exclusive Malts",
+        "score": 1,
+        "source": ["exact", "text", "prefix", "contained"],
+        "entityId": 365679,
+        "reference": "The Exclusive Malts",
+        "shortName": null,
+        "retrievedFor": [
+          {
+            "exact": true,
+            "query": "The Exclusive Malts"
+          }
+        ]
+      },
+      {
+        "kind": "bottler",
+        "name": "Creative Whisky Company",
+        "score": 1,
+        "source": ["exact", "text", "prefix", "contained"],
+        "entityId": 5569,
+        "reference": "Creative Whisky Company",
+        "shortName": null,
+        "retrievedFor": [
+          {
+            "exact": true,
+            "query": "Creative Whisky Company"
+          }
+        ]
+      },
+      {
+        "kind": "distillery",
+        "name": "Clynelish",
+        "score": 1,
+        "source": ["exact", "text", "prefix", "contained"],
+        "entityId": 843,
+        "reference": "Clynelish",
+        "shortName": null,
+        "retrievedFor": [
+          {
+            "exact": true,
+            "query": "Clynelish"
+          }
+        ]
+      },
+      {
+        "kind": "brand",
+        "name": "Arran",
+        "score": 1,
+        "source": ["exact", "text", "prefix", "contained"],
+        "entityId": 112,
+        "reference": "Arran",
+        "shortName": null,
+        "retrievedFor": [
+          {
+            "exact": true,
+            "query": "Arran"
+          }
+        ]
+      },
+      {
+        "kind": "distillery",
+        "name": "The Dalmore",
+        "score": 1,
+        "source": ["exact", "text", "prefix", "contained"],
+        "entityId": 870,
+        "reference": "The Dalmore",
+        "shortName": "Dalmore",
+        "retrievedFor": [
+          {
+            "exact": true,
+            "query": "The Dalmore"
+          }
+        ]
+      },
+      {
+        "kind": "bottler",
+        "name": "Darkness",
+        "score": 1,
+        "source": ["exact", "text", "prefix", "contained"],
+        "entityId": 365797,
+        "reference": "Darkness",
+        "shortName": null,
+        "retrievedFor": [
+          {
+            "exact": true,
+            "query": "Darkness"
+          }
+        ]
+      },
+      {
+        "kind": "distillery",
+        "name": "Chichibu",
+        "score": 1,
+        "source": ["exact", "text", "prefix", "contained"],
+        "entityId": 348,
+        "reference": "Chichibu",
+        "shortName": null,
+        "retrievedFor": [
+          {
+            "exact": true,
+            "query": "Chichibu"
+          }
+        ]
+      },
+      {
+        "kind": "brand",
+        "name": "Jack Daniel's",
+        "score": 1,
+        "source": ["exact", "text", "prefix", "contained"],
+        "entityId": 1079,
+        "reference": "Jack Daniel's",
+        "shortName": null,
+        "retrievedFor": [
+          {
+            "exact": true,
+            "query": "Jack Daniel's"
+          }
+        ]
+      },
+      {
+        "kind": "distillery",
+        "name": "Jack Daniel Distillery",
+        "score": 1,
+        "source": ["exact", "text", "prefix", "contained"],
+        "entityId": 366689,
+        "reference": "Jack Daniel Distillery",
+        "shortName": null,
+        "retrievedFor": [
+          {
+            "exact": true,
+            "query": "Jack Daniel Distillery"
+          }
+        ]
+      },
+      {
+        "kind": "distillery",
+        "name": "Lagavulin",
+        "score": 1,
+        "source": ["exact", "text", "prefix", "contained"],
+        "entityId": 1124,
+        "reference": "Lagavulin",
+        "shortName": null,
+        "retrievedFor": [
+          {
+            "exact": true,
+            "query": "Lagavulin"
+          }
+        ]
+      },
+      {
+        "kind": "distillery",
+        "name": "Starward",
+        "score": 1,
+        "source": ["exact", "text", "prefix", "contained"],
+        "entityId": 1370,
+        "reference": "Starward",
+        "shortName": null,
+        "retrievedFor": [
+          {
+            "exact": true,
+            "query": "Starward"
+          }
+        ]
+      },
+      {
+        "kind": "company",
+        "name": "Whisk-e Limited",
+        "score": 0.5,
+        "source": ["text", "prefix"],
+        "entityId": 5381,
+        "reference": "Arran Japan Limited",
+        "shortName": null,
+        "retrievedFor": [
+          {
+            "query": "Arran"
+          }
+        ]
+      },
+      {
+        "kind": "bottler",
+        "name": "Chichibu Reiwa Whisky",
+        "score": 0.5,
+        "source": ["text", "prefix"],
+        "entityId": 367660,
+        "reference": "Chichibu Reiwa Whisky",
+        "shortName": null,
+        "retrievedFor": [
+          {
+            "query": "Chichibu"
+          }
+        ]
+      },
+      {
+        "kind": "bottler",
+        "name": "&Whisky",
+        "score": 0.30714285714285716,
+        "source": ["contained"],
+        "entityId": 365821,
+        "reference": "&Whisky",
+        "shortName": null,
+        "retrievedFor": [
+          {
+            "query": "Creative Whisky Company"
+          }
+        ]
+      },
+      {
+        "kind": "company",
+        "name": "Isle of Arran Distillers",
+        "score": 0.2,
+        "source": ["text"],
+        "entityId": 5872,
+        "reference": null,
+        "shortName": "Isle of Arran",
+        "retrievedFor": [
+          {
+            "query": "Arran"
+          }
+        ]
+      },
+      {
+        "kind": "brand",
+        "name": "Harp of Darkness",
+        "score": 0.2,
+        "source": ["text"],
+        "entityId": 366913,
+        "reference": null,
+        "shortName": null,
+        "retrievedFor": [
+          {
+            "query": "Darkness"
+          }
+        ]
+      }
+    ],
+    "inspectedSeries": []
+  },
+  "provenance": {
+    "source": "production_miss",
+    "verifiedSourceUrls": [
+      "https://www.scotchwhiskyauctions.com/auctions/234-the-185th-auction/907509-lagavulin-distillery-exclusive-cask-strength-2018-release/",
+      "https://www.masterofmalt.com/whiskies/lagavulin/lagavulin-distillery-exclusive-2018-release-whisky/?sku=148085"
+    ],
+    "dbOutcome": {
+      "bottleId": 3254,
+      "createsBottle": false,
+      "summary": "Production returned match."
+    },
+    "notes": "Captured from saved classifier run 35850 (auction_lot 16320, model null, 2026-11-03T15:57:33.618Z). Production rationale: Match to inspected Bottle 3254. Its context includes an observation from the same 2018 Lagavulin Distillery Exclusive product listing, identifying it as bottled in 2018 and cask strength. Focused web results corroborate the 53.5% ABV and 2018 cask-strength release. The candidate omits those details, but has no conflicting populated traits. Checked 2026-11-03. Lot page: Lagavulin Distillery Exclusive, Bottled 2018, STR/Bourbon, 53.5% ABV, one of 6,000 bottles. 3254 \"Lagavulin Distillery Exclusive Bottling\" stores no age, ABV, or year. Its one observation is the Master of Malt listing \"Lagavulin Distillery Exclusive 2018 Release\" (store_price 12062044), parsed as bottled 2018 and cask strength. Owner rule (2026-11-03): match a thin Bottle when there is enough information to figure it out, the way a person would. A person sees that the only thing ever tied to 3254 is the 2018 release, that no populated field conflicts, and that the per-year siblings that exist (70154 for 2017 at 54.1%, 63652 Batch 1 for 2023 at 56.5%) are other years, so 3254 is the 2018 Bottle. Production matched 3254 automatically, which is the expected outcome; this case guards that behavior. 3254 should later get releaseYear 2018 and 53.5% stored."
+  },
+  "expected": {
+    "status": "classified",
+    "action": "match",
+    "identityScope": "product",
+    "matchedBottleId": 3254,
+    "expectedTier": "auto",
+    "summary": "Match 3254 and apply it on its own. The Bottle stores no year or ABV, but its only listing is the 2018 release, and nothing on it conflicts with the 2018 lot."
+  }
+}

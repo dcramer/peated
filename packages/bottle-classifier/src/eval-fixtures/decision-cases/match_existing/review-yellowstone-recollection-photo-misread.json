@@ -1,0 +1,1313 @@
+{
+  "id": "review-yellowstone-recollection-photo-misread",
+  "name": "Review: a blurry candidate photo read must not override agreeing source and stored ABV (Yellowstone Recollection)",
+  "input": {
+    "reference": {
+      "id": 19010,
+      "url": "https://whiskyadvocate.com/Yellowstone-Recollection-Series-55",
+      "name": "Yellowstone Recollection Series, 55%",
+      "imageUrl": null,
+      "externalSiteId": 5,
+      "currentBottleId": null
+    },
+    "extractedIdentity": {
+      "abv": 55,
+      "brand": "Yellowstone",
+      "series": "Recollection Series",
+      "bottler": null,
+      "edition": null,
+      "outturn": null,
+      "category": "bourbon",
+      "distillery": ["Limestone Branch Distillery"],
+      "expression": null,
+      "maturation": null,
+      "stated_age": null,
+      "cask_number": null,
+      "release_day": null,
+      "single_cask": null,
+      "release_year": null,
+      "vintage_year": null,
+      "bottling_year": null,
+      "cask_strength": null,
+      "release_month": null
+    },
+    "imageEvidence": null,
+    "initialCandidates": [
+      {
+        "abv": 55,
+        "brand": "Yellowstone",
+        "score": 117.6145,
+        "series": "Recollection Series",
+        "source": ["text", "brand_coverage", "context", "brand"],
+        "bottler": null,
+        "edition": null,
+        "outturn": null,
+        "bottleId": 63937,
+        "category": "bourbon",
+        "fullName": "Yellowstone Recollection",
+        "reference": null,
+        "statedAge": 8,
+        "caskNumber": null,
+        "comparison": {
+          "missing": [],
+          "conflicts": [],
+          "agreements": ["category", "abv", "brand", "series", "distillers"]
+        },
+        "distillery": ["Limestone Branch Distillery"],
+        "maturation": null,
+        "releaseDay": null,
+        "singleCask": null,
+        "releaseYear": 2026,
+        "vintageYear": null,
+        "bottlingYear": null,
+        "caskStrength": null,
+        "releaseMonth": 2,
+        "familyContext": {
+          "siblingBottles": []
+        }
+      },
+      {
+        "abv": null,
+        "brand": "Lux Row Distillers",
+        "score": 84.59216,
+        "series": null,
+        "source": ["text"],
+        "bottler": null,
+        "edition": null,
+        "outturn": null,
+        "bottleId": 13599,
+        "category": "bourbon",
+        "fullName": "Lux Row Distillers 12-year-old Double Barrel Kentucky Straight Bourbon",
+        "reference": null,
+        "statedAge": 12,
+        "caskNumber": null,
+        "comparison": {
+          "missing": ["abv", "releaseYear", "series", "distillers"],
+          "conflicts": ["statedAge", "brand"],
+          "agreements": ["category"]
+        },
+        "distillery": [],
+        "maturation": null,
+        "releaseDay": null,
+        "singleCask": null,
+        "releaseYear": null,
+        "vintageYear": null,
+        "bottlingYear": null,
+        "caskStrength": null,
+        "releaseMonth": null,
+        "familyContext": {
+          "siblingBottles": []
+        }
+      },
+      {
+        "abv": 50.5,
+        "brand": "Yellowstone",
+        "score": 67.40166,
+        "series": null,
+        "source": ["vector", "text", "brand_coverage"],
+        "bottler": null,
+        "edition": "2026",
+        "outturn": null,
+        "bottleId": 56229,
+        "category": "bourbon",
+        "fullName": "Yellowstone Limited Edition - 2026",
+        "reference": "Yellowstone Limited Edition, 2026",
+        "statedAge": null,
+        "caskNumber": null,
+        "comparison": {
+          "missing": ["series"],
+          "conflicts": ["abv"],
+          "agreements": ["category", "brand", "distillers"]
+        },
+        "distillery": ["Limestone Branch Distillery"],
+        "maturation": "Kentucky straight bourbons finished separately in ruby Port and tawny Port casks",
+        "releaseDay": null,
+        "singleCask": false,
+        "releaseYear": 2026,
+        "vintageYear": null,
+        "bottlingYear": null,
+        "caskStrength": null,
+        "releaseMonth": null,
+        "familyContext": {
+          "siblingBottles": []
+        }
+      },
+      {
+        "abv": 55,
+        "brand": "Duncan Taylor",
+        "score": 52.53821,
+        "series": "The Octave",
+        "source": ["text"],
+        "bottler": "Duncan Taylor",
+        "edition": null,
+        "outturn": null,
+        "bottleId": 46430,
+        "category": "single_malt",
+        "fullName": "Duncan Taylor Glenlossie 2017",
+        "reference": null,
+        "statedAge": 8,
+        "caskNumber": null,
+        "comparison": {
+          "missing": [],
+          "conflicts": ["category", "brand", "series", "distillers"],
+          "agreements": ["statedAge", "abv", "releaseYear"]
+        },
+        "distillery": ["Glenlossie"],
+        "maturation": "pedro_ximenez",
+        "releaseDay": null,
+        "singleCask": true,
+        "releaseYear": 2026,
+        "vintageYear": 2017,
+        "bottlingYear": null,
+        "caskStrength": null,
+        "releaseMonth": null,
+        "familyContext": {
+          "siblingBottles": []
+        }
+      },
+      {
+        "abv": 53.5,
+        "brand": "Yellowstone",
+        "score": 51.13758,
+        "series": null,
+        "source": ["text", "brand_coverage"],
+        "bottler": null,
+        "edition": null,
+        "outturn": null,
+        "bottleId": 61657,
+        "category": "bourbon",
+        "fullName": "Yellowstone Small Batch 107",
+        "reference": null,
+        "statedAge": 6,
+        "caskNumber": null,
+        "comparison": {
+          "missing": ["series"],
+          "conflicts": ["abv"],
+          "agreements": ["category", "brand", "distillers"]
+        },
+        "distillery": ["Limestone Branch Distillery"],
+        "maturation": null,
+        "releaseDay": null,
+        "singleCask": null,
+        "releaseYear": null,
+        "vintageYear": null,
+        "bottlingYear": null,
+        "caskStrength": null,
+        "releaseMonth": null,
+        "familyContext": {
+          "siblingBottles": []
+        }
+      },
+      {
+        "abv": 40,
+        "brand": "Inver House Distillers Ltd.",
+        "score": 50.125244,
+        "series": null,
+        "source": ["text"],
+        "bottler": null,
+        "edition": null,
+        "outturn": null,
+        "bottleId": 68936,
+        "category": null,
+        "fullName": "Inver House Distillers Ltd. 8-year-old Pure Malt",
+        "reference": null,
+        "statedAge": 8,
+        "caskNumber": null,
+        "comparison": {
+          "missing": ["category", "releaseYear", "series", "distillers"],
+          "conflicts": ["abv", "brand"],
+          "agreements": ["statedAge"]
+        },
+        "distillery": [],
+        "maturation": null,
+        "releaseDay": null,
+        "singleCask": null,
+        "releaseYear": null,
+        "vintageYear": null,
+        "bottlingYear": null,
+        "caskStrength": null,
+        "releaseMonth": null,
+        "familyContext": {
+          "siblingBottles": []
+        }
+      },
+      {
+        "abv": 52.5,
+        "brand": "Yellowstone",
+        "score": 48.905033,
+        "series": null,
+        "source": ["text", "brand_coverage"],
+        "bottler": null,
+        "edition": "2025",
+        "outturn": null,
+        "bottleId": 61646,
+        "category": "bourbon",
+        "fullName": "Yellowstone Limited Edition - 2025",
+        "reference": null,
+        "statedAge": 10,
+        "caskNumber": null,
+        "comparison": {
+          "missing": ["series"],
+          "conflicts": ["abv"],
+          "agreements": ["category", "brand", "distillers"]
+        },
+        "distillery": ["Limestone Branch Distillery"],
+        "maturation": null,
+        "releaseDay": null,
+        "singleCask": null,
+        "releaseYear": 2025,
+        "vintageYear": null,
+        "bottlingYear": null,
+        "caskStrength": null,
+        "releaseMonth": null,
+        "familyContext": {
+          "siblingBottles": []
+        }
+      },
+      {
+        "abv": null,
+        "brand": "Master of Malt",
+        "score": 47.532993,
+        "series": null,
+        "source": ["text"],
+        "bottler": null,
+        "edition": null,
+        "outturn": null,
+        "bottleId": 16615,
+        "category": "blend",
+        "fullName": "Master of Malt Secret Bottlings Series 8-year-old",
+        "reference": null,
+        "statedAge": 8,
+        "caskNumber": null,
+        "comparison": {
+          "missing": ["abv", "releaseYear", "series", "distillers"],
+          "conflicts": ["category", "brand"],
+          "agreements": ["statedAge"]
+        },
+        "distillery": [],
+        "maturation": null,
+        "releaseDay": null,
+        "singleCask": null,
+        "releaseYear": null,
+        "vintageYear": null,
+        "bottlingYear": null,
+        "caskStrength": null,
+        "releaseMonth": null,
+        "familyContext": {
+          "siblingBottles": []
+        }
+      },
+      {
+        "abv": 40,
+        "brand": "Old Charter",
+        "score": 45.260715,
+        "series": null,
+        "source": ["text"],
+        "bottler": "Old Charter Distillery Co.",
+        "edition": null,
+        "outturn": null,
+        "bottleId": 45499,
+        "category": "bourbon",
+        "fullName": "Old Charter 8 - 8-year-old - 40.0% ABV",
+        "reference": null,
+        "statedAge": 8,
+        "caskNumber": null,
+        "comparison": {
+          "missing": ["releaseYear", "series", "distillers"],
+          "conflicts": ["abv", "brand"],
+          "agreements": ["category", "statedAge"]
+        },
+        "distillery": [],
+        "maturation": null,
+        "releaseDay": null,
+        "singleCask": null,
+        "releaseYear": null,
+        "vintageYear": null,
+        "bottlingYear": null,
+        "caskStrength": null,
+        "releaseMonth": null,
+        "familyContext": {
+          "siblingBottles": []
+        }
+      },
+      {
+        "abv": null,
+        "brand": "Kaiyo",
+        "score": 43.736553,
+        "series": null,
+        "source": ["text"],
+        "bottler": null,
+        "edition": null,
+        "outturn": null,
+        "bottleId": 24636,
+        "category": "blend",
+        "fullName": "Kaiyo Wood Library Series The Ramu 8-year-old Rum Barrel Finish",
+        "reference": null,
+        "statedAge": 8,
+        "caskNumber": null,
+        "comparison": {
+          "missing": ["abv", "releaseYear", "series", "distillers"],
+          "conflicts": ["category", "brand"],
+          "agreements": ["statedAge"]
+        },
+        "distillery": [],
+        "maturation": null,
+        "releaseDay": null,
+        "singleCask": null,
+        "releaseYear": null,
+        "vintageYear": null,
+        "bottlingYear": null,
+        "caskStrength": null,
+        "releaseMonth": null,
+        "familyContext": {
+          "siblingBottles": []
+        }
+      },
+      {
+        "abv": 50.5,
+        "brand": "Yellowstone",
+        "score": 43.632042,
+        "series": null,
+        "source": ["text", "brand_coverage"],
+        "bottler": null,
+        "edition": "2023",
+        "outturn": null,
+        "bottleId": 63981,
+        "category": "bourbon",
+        "fullName": "Yellowstone Limited Edition - 2023",
+        "reference": null,
+        "statedAge": null,
+        "caskNumber": null,
+        "comparison": {
+          "missing": ["series"],
+          "conflicts": ["abv"],
+          "agreements": ["category", "brand", "distillers"]
+        },
+        "distillery": ["Limestone Branch Distillery"],
+        "maturation": "Blend of 7-year, 13-year and 16-year aged bourbons finished in Tokaji casks",
+        "releaseDay": null,
+        "singleCask": false,
+        "releaseYear": 2023,
+        "vintageYear": null,
+        "bottlingYear": null,
+        "caskStrength": null,
+        "releaseMonth": 8,
+        "familyContext": {
+          "siblingBottles": []
+        }
+      },
+      {
+        "abv": 50.5,
+        "brand": "Yellowstone",
+        "score": 43.560585,
+        "series": null,
+        "source": ["text", "brand_coverage"],
+        "bottler": null,
+        "edition": "2021",
+        "outturn": null,
+        "bottleId": 63402,
+        "category": "bourbon",
+        "fullName": "Yellowstone Limited Edition - 2021",
+        "reference": null,
+        "statedAge": null,
+        "caskNumber": null,
+        "comparison": {
+          "missing": ["series"],
+          "conflicts": ["abv"],
+          "agreements": ["category", "brand", "distillers"]
+        },
+        "distillery": ["Limestone Branch Distillery"],
+        "maturation": "Blend of 7- and 15-year-old bourbons; the 7-year-old bourbon is finished in Amarone casks.",
+        "releaseDay": null,
+        "singleCask": false,
+        "releaseYear": 2021,
+        "vintageYear": null,
+        "bottlingYear": null,
+        "caskStrength": null,
+        "releaseMonth": null,
+        "familyContext": {
+          "siblingBottles": []
+        }
+      },
+      {
+        "abv": 45,
+        "brand": "Buffalo Trace Distillery",
+        "score": 43.499485,
+        "series": null,
+        "source": ["text"],
+        "bottler": "Buffalo Trace Distillery",
+        "edition": null,
+        "outturn": null,
+        "bottleId": 45470,
+        "category": "bourbon",
+        "fullName": "Buffalo Trace Astor Select Single Barrel - 8-year-old - 2026 Release - 2018 Vintage - 45.0% ABV",
+        "reference": null,
+        "statedAge": 8,
+        "caskNumber": null,
+        "comparison": {
+          "missing": ["series"],
+          "conflicts": ["abv", "brand", "distillers"],
+          "agreements": ["category", "statedAge", "releaseYear"]
+        },
+        "distillery": ["Buffalo Trace Distillery"],
+        "maturation": null,
+        "releaseDay": null,
+        "singleCask": true,
+        "releaseYear": 2026,
+        "vintageYear": 2018,
+        "bottlingYear": null,
+        "caskStrength": null,
+        "releaseMonth": null,
+        "familyContext": {
+          "siblingBottles": []
+        }
+      },
+      {
+        "abv": 50.5,
+        "brand": "Yellowstone",
+        "score": 42.129555,
+        "series": null,
+        "source": ["vector", "text", "brand_coverage"],
+        "bottler": null,
+        "edition": "2024",
+        "outturn": null,
+        "bottleId": 61397,
+        "category": "bourbon",
+        "fullName": "Yellowstone Limited Edition - 2024",
+        "reference": "Yellowstone Limited Edition Cognac and Brandy Cask Finished (2024 Release), 50.5%",
+        "statedAge": null,
+        "caskNumber": null,
+        "comparison": {
+          "missing": ["series"],
+          "conflicts": ["abv"],
+          "agreements": ["category", "brand", "distillers"]
+        },
+        "distillery": ["Limestone Branch Distillery"],
+        "maturation": "Blend featuring 7- and 17-year-old bourbons; double finished in French brandy and cognac casks",
+        "releaseDay": null,
+        "singleCask": false,
+        "releaseYear": 2024,
+        "vintageYear": null,
+        "bottlingYear": null,
+        "caskStrength": null,
+        "releaseMonth": 9,
+        "familyContext": {
+          "siblingBottles": []
+        }
+      },
+      {
+        "abv": null,
+        "brand": "Millstone",
+        "score": 41.319473,
+        "series": null,
+        "source": ["text"],
+        "bottler": null,
+        "edition": null,
+        "outturn": null,
+        "bottleId": 17478,
+        "category": "single_malt",
+        "fullName": "Millstone 8-year-old",
+        "reference": null,
+        "statedAge": 8,
+        "caskNumber": null,
+        "comparison": {
+          "missing": ["abv", "releaseYear", "series", "distillers"],
+          "conflicts": ["category", "brand"],
+          "agreements": ["statedAge"]
+        },
+        "distillery": [],
+        "maturation": null,
+        "releaseDay": null,
+        "singleCask": null,
+        "releaseYear": null,
+        "vintageYear": null,
+        "bottlingYear": null,
+        "caskStrength": null,
+        "releaseMonth": null,
+        "familyContext": {
+          "siblingBottles": []
+        }
+      },
+      {
+        "abv": null,
+        "brand": "Strathcolm",
+        "score": 41.319473,
+        "series": null,
+        "source": ["text"],
+        "bottler": null,
+        "edition": null,
+        "outturn": null,
+        "bottleId": 13663,
+        "category": "single_grain",
+        "fullName": "Strathcolm 8-year-old",
+        "reference": null,
+        "statedAge": 8,
+        "caskNumber": null,
+        "comparison": {
+          "missing": ["abv", "releaseYear", "series", "distillers"],
+          "conflicts": ["category", "brand"],
+          "agreements": ["statedAge"]
+        },
+        "distillery": [],
+        "maturation": null,
+        "releaseDay": null,
+        "singleCask": null,
+        "releaseYear": null,
+        "vintageYear": null,
+        "bottlingYear": null,
+        "caskStrength": null,
+        "releaseMonth": null,
+        "familyContext": {
+          "siblingBottles": []
+        }
+      },
+      {
+        "abv": 55,
+        "brand": "Hardin's Creek",
+        "score": 35.923107,
+        "series": "Warehouse Series",
+        "source": ["text"],
+        "bottler": "James B. Beam Distilling Co.",
+        "edition": null,
+        "outturn": null,
+        "bottleId": 45501,
+        "category": "bourbon",
+        "fullName": "Hardin's Creek Warehouse G - 11-year-old - 55.0% ABV",
+        "reference": null,
+        "statedAge": 11,
+        "caskNumber": null,
+        "comparison": {
+          "missing": [],
+          "conflicts": ["brand", "series", "distillers"],
+          "agreements": ["category", "abv"]
+        },
+        "distillery": ["James B. Beam Distilling Co."],
+        "maturation": null,
+        "releaseDay": null,
+        "singleCask": null,
+        "releaseYear": null,
+        "vintageYear": null,
+        "bottlingYear": null,
+        "caskStrength": null,
+        "releaseMonth": null,
+        "familyContext": {
+          "siblingBottles": []
+        }
+      },
+      {
+        "abv": null,
+        "brand": "Branch Point",
+        "score": 35.250538,
+        "series": null,
+        "source": ["text"],
+        "bottler": null,
+        "edition": null,
+        "outturn": null,
+        "bottleId": 11916,
+        "category": null,
+        "fullName": "Branch Point Trit",
+        "reference": null,
+        "statedAge": null,
+        "caskNumber": null,
+        "comparison": {
+          "missing": ["category", "abv", "series"],
+          "conflicts": ["brand", "distillers"],
+          "agreements": []
+        },
+        "distillery": ["Branch Point"],
+        "maturation": null,
+        "releaseDay": null,
+        "singleCask": null,
+        "releaseYear": null,
+        "vintageYear": null,
+        "bottlingYear": null,
+        "caskStrength": null,
+        "releaseMonth": null,
+        "familyContext": {
+          "siblingBottles": []
+        }
+      },
+      {
+        "abv": 55,
+        "brand": "Hardin's Creek",
+        "score": 35.184128,
+        "series": "Rickhouse Series",
+        "source": ["text"],
+        "bottler": "James B. Beam Distilling Co.",
+        "edition": null,
+        "outturn": null,
+        "bottleId": 45478,
+        "category": "bourbon",
+        "fullName": "Hardin's Creek From Warehouse W - 11-year-old - 55.0% ABV",
+        "reference": null,
+        "statedAge": 11,
+        "caskNumber": null,
+        "comparison": {
+          "missing": [],
+          "conflicts": ["brand", "series", "distillers"],
+          "agreements": ["category", "abv"]
+        },
+        "distillery": ["James B. Beam Distilling Co."],
+        "maturation": null,
+        "releaseDay": null,
+        "singleCask": null,
+        "releaseYear": null,
+        "vintageYear": null,
+        "bottlingYear": null,
+        "caskStrength": null,
+        "releaseMonth": null,
+        "familyContext": {
+          "siblingBottles": []
+        }
+      },
+      {
+        "abv": null,
+        "brand": "Town Branch",
+        "score": 34.742634,
+        "series": null,
+        "source": ["text"],
+        "bottler": null,
+        "edition": null,
+        "outturn": null,
+        "bottleId": 13685,
+        "category": "bourbon",
+        "fullName": "Town Branch Kentucky Straight Bourbon",
+        "reference": null,
+        "statedAge": null,
+        "caskNumber": null,
+        "comparison": {
+          "missing": ["abv", "series", "distillers"],
+          "conflicts": ["brand"],
+          "agreements": ["category"]
+        },
+        "distillery": [],
+        "maturation": null,
+        "releaseDay": null,
+        "singleCask": null,
+        "releaseYear": null,
+        "vintageYear": null,
+        "bottlingYear": null,
+        "caskStrength": null,
+        "releaseMonth": null,
+        "familyContext": {
+          "siblingBottles": []
+        }
+      },
+      {
+        "abv": 55,
+        "brand": "Yellowstone",
+        "score": 34.675583,
+        "series": null,
+        "source": ["text"],
+        "bottler": null,
+        "edition": "ReserveBar S1B21",
+        "outturn": null,
+        "bottleId": 63114,
+        "category": "bourbon",
+        "fullName": "Yellowstone Single Barrel Bourbon - ReserveBar S1B21",
+        "reference": null,
+        "statedAge": null,
+        "caskNumber": null,
+        "comparison": {
+          "missing": ["series", "distillers"],
+          "conflicts": [],
+          "agreements": ["category", "abv", "brand"]
+        },
+        "distillery": [],
+        "maturation": null,
+        "releaseDay": null,
+        "singleCask": true,
+        "releaseYear": null,
+        "vintageYear": null,
+        "bottlingYear": null,
+        "caskStrength": null,
+        "releaseMonth": null,
+        "familyContext": {
+          "siblingBottles": []
+        }
+      },
+      {
+        "abv": null,
+        "brand": "Town Branch",
+        "score": 34.353683,
+        "series": null,
+        "source": ["text"],
+        "bottler": null,
+        "edition": null,
+        "outturn": null,
+        "bottleId": 43872,
+        "category": "bourbon",
+        "fullName": "Town Branch True Cask",
+        "reference": null,
+        "statedAge": null,
+        "caskNumber": null,
+        "comparison": {
+          "missing": ["abv", "series"],
+          "conflicts": ["brand", "distillers"],
+          "agreements": ["category"]
+        },
+        "distillery": ["Town Branch"],
+        "maturation": null,
+        "releaseDay": null,
+        "singleCask": null,
+        "releaseYear": null,
+        "vintageYear": null,
+        "bottlingYear": null,
+        "caskStrength": true,
+        "releaseMonth": null,
+        "familyContext": {
+          "siblingBottles": []
+        }
+      },
+      {
+        "abv": null,
+        "brand": "Yellowstone",
+        "score": 32.296288,
+        "series": null,
+        "source": ["vector", "text"],
+        "bottler": null,
+        "edition": null,
+        "outturn": null,
+        "bottleId": 44017,
+        "category": "bourbon",
+        "fullName": "Yellowstone Limited Edition",
+        "reference": "Yellowstone 9-year-old Limited Edition Kentucky Straight (2019 Release)",
+        "statedAge": null,
+        "caskNumber": null,
+        "comparison": {
+          "missing": ["abv", "series", "distillers"],
+          "conflicts": [],
+          "agreements": ["category", "brand"]
+        },
+        "distillery": [],
+        "maturation": null,
+        "releaseDay": null,
+        "singleCask": null,
+        "releaseYear": null,
+        "vintageYear": null,
+        "bottlingYear": null,
+        "caskStrength": null,
+        "releaseMonth": null,
+        "familyContext": {
+          "siblingBottles": [
+            {
+              "abv": 52.5,
+              "edition": "2015",
+              "outturn": 6000,
+              "bottleId": 44965,
+              "fullName": "Yellowstone Limited Edition - 2015",
+              "statedAge": 7,
+              "caskNumber": null,
+              "maturation": "A blend of 7- and 12-year-old rye bourbons and 7-year-old wheated bourbon.",
+              "releaseDay": null,
+              "singleCask": false,
+              "releaseYear": 2015,
+              "traitFields": [
+                "edition",
+                "statedAge",
+                "releaseYear",
+                "abv",
+                "singleCask"
+              ],
+              "vintageYear": null,
+              "bottlingYear": null,
+              "caskStrength": null,
+              "releaseMonth": null
+            },
+            {
+              "abv": 50.5,
+              "edition": "2016",
+              "outturn": 7000,
+              "bottleId": 44966,
+              "fullName": "Yellowstone Limited Edition - 2016",
+              "statedAge": 7,
+              "caskNumber": null,
+              "maturation": "A blend of 7- and 12-year-old bourbons finished in new toasted wine barrels.",
+              "releaseDay": null,
+              "singleCask": false,
+              "releaseYear": 2016,
+              "traitFields": [
+                "edition",
+                "statedAge",
+                "releaseYear",
+                "abv",
+                "singleCask"
+              ],
+              "vintageYear": null,
+              "bottlingYear": null,
+              "caskStrength": null,
+              "releaseMonth": null
+            },
+            {
+              "abv": 50.5,
+              "edition": "2018",
+              "outturn": 12000,
+              "bottleId": 44967,
+              "fullName": "Yellowstone Limited Edition - 2018",
+              "statedAge": 4,
+              "caskNumber": null,
+              "maturation": "A blend of 4- to 12-year-old bourbons finished in #3 char wine casks.",
+              "releaseDay": null,
+              "singleCask": false,
+              "releaseYear": 2018,
+              "traitFields": [
+                "edition",
+                "statedAge",
+                "releaseYear",
+                "abv",
+                "singleCask"
+              ],
+              "vintageYear": null,
+              "bottlingYear": null,
+              "caskStrength": null,
+              "releaseMonth": null
+            },
+            {
+              "abv": 50.5,
+              "edition": "2019",
+              "outturn": 12500,
+              "bottleId": 44968,
+              "fullName": "Yellowstone Limited Edition - 2019",
+              "statedAge": 9,
+              "caskNumber": null,
+              "maturation": "A blend of 9- and 12-year-old bourbons.",
+              "releaseDay": null,
+              "singleCask": false,
+              "releaseYear": 2019,
+              "traitFields": [
+                "edition",
+                "statedAge",
+                "releaseYear",
+                "abv",
+                "singleCask"
+              ],
+              "vintageYear": null,
+              "bottlingYear": null,
+              "caskStrength": null,
+              "releaseMonth": null
+            },
+            {
+              "abv": 50.5,
+              "edition": "2020 Armagnac Cask-Finished",
+              "outturn": null,
+              "bottleId": 44969,
+              "fullName": "Yellowstone Limited Edition - 2020 Armagnac Cask-Finished",
+              "statedAge": 7,
+              "caskNumber": null,
+              "maturation": "7-year-old bourbon finished for about five months in Armagnac casks.",
+              "releaseDay": null,
+              "singleCask": false,
+              "releaseYear": 2020,
+              "traitFields": [
+                "edition",
+                "statedAge",
+                "releaseYear",
+                "abv",
+                "singleCask"
+              ],
+              "vintageYear": null,
+              "bottlingYear": null,
+              "caskStrength": null,
+              "releaseMonth": null
+            }
+          ]
+        }
+      },
+      {
+        "abv": null,
+        "brand": "Yellowstone",
+        "score": 31.860962,
+        "series": null,
+        "source": ["vector", "text"],
+        "bottler": null,
+        "edition": null,
+        "outturn": null,
+        "bottleId": 43064,
+        "category": "bourbon",
+        "fullName": "Yellowstone Special Finishes Collection Rum Cask Finished",
+        "reference": "Yellowstone Special Finishes Collection Rum Cask Finished, 50%",
+        "statedAge": null,
+        "caskNumber": null,
+        "comparison": {
+          "missing": ["abv", "series", "distillers"],
+          "conflicts": [],
+          "agreements": ["category", "brand"]
+        },
+        "distillery": [],
+        "maturation": null,
+        "releaseDay": null,
+        "singleCask": null,
+        "releaseYear": null,
+        "vintageYear": null,
+        "bottlingYear": null,
+        "caskStrength": null,
+        "releaseMonth": null,
+        "familyContext": {
+          "siblingBottles": []
+        }
+      },
+      {
+        "abv": 46.5,
+        "brand": "Yellowstone",
+        "score": 0.7081406259875687,
+        "series": null,
+        "source": ["vector"],
+        "bottler": null,
+        "edition": null,
+        "outturn": null,
+        "bottleId": 46978,
+        "category": "bourbon",
+        "fullName": "Yellowstone Select - 46.5% ABV",
+        "reference": "Yellowstone Select - 46.5% ABV",
+        "statedAge": null,
+        "caskNumber": null,
+        "comparison": {
+          "missing": ["statedAge", "releaseYear", "series", "distillers"],
+          "conflicts": ["abv"],
+          "agreements": ["category", "brand"]
+        },
+        "distillery": [],
+        "maturation": null,
+        "releaseDay": null,
+        "singleCask": null,
+        "releaseYear": null,
+        "vintageYear": null,
+        "bottlingYear": null,
+        "caskStrength": null,
+        "releaseMonth": null,
+        "familyContext": {
+          "siblingBottles": []
+        }
+      },
+      {
+        "abv": 57.5,
+        "brand": "Yellowstone",
+        "score": 0.375,
+        "series": null,
+        "source": ["brand_coverage"],
+        "bottler": null,
+        "edition": "Ask For Danny - Bourbon Pursuit & Keg N Bottle Barrel Pick",
+        "outturn": null,
+        "bottleId": 61882,
+        "category": "bourbon",
+        "fullName": "Yellowstone Hand Picked Single Barrel Bourbon - Ask For Danny - Bourbon Pursuit & Keg N Bottle Barrel Pick",
+        "reference": null,
+        "statedAge": null,
+        "caskNumber": "7849720",
+        "comparison": {
+          "missing": ["statedAge", "releaseYear", "series"],
+          "conflicts": ["abv", "distillers"],
+          "agreements": ["category", "brand"]
+        },
+        "distillery": ["Limestone Branch Distillery"],
+        "maturation": null,
+        "releaseDay": null,
+        "singleCask": true,
+        "releaseYear": null,
+        "vintageYear": null,
+        "bottlingYear": 2022,
+        "caskStrength": null,
+        "releaseMonth": null,
+        "familyContext": {
+          "siblingBottles": []
+        }
+      },
+      {
+        "abv": 54.5,
+        "brand": "Yellowstone",
+        "score": 0.375,
+        "series": null,
+        "source": ["brand_coverage"],
+        "bottler": null,
+        "edition": "Backseat Tooters - Bourbon Pursuit & Keg N Bottle Barrel Pick",
+        "outturn": null,
+        "bottleId": 61878,
+        "category": "bourbon",
+        "fullName": "Yellowstone Hand Picked Single Barrel Bourbon - Backseat Tooters - Bourbon Pursuit & Keg N Bottle Barrel Pick",
+        "reference": null,
+        "statedAge": null,
+        "caskNumber": "7849759",
+        "comparison": {
+          "missing": ["statedAge", "releaseYear", "series"],
+          "conflicts": ["abv", "distillers"],
+          "agreements": ["category", "brand"]
+        },
+        "distillery": ["Limestone Branch Distillery"],
+        "maturation": null,
+        "releaseDay": null,
+        "singleCask": true,
+        "releaseYear": null,
+        "vintageYear": null,
+        "bottlingYear": 2022,
+        "caskStrength": null,
+        "releaseMonth": null,
+        "familyContext": {
+          "siblingBottles": []
+        }
+      }
+    ]
+  },
+  "context": {
+    "inspectedBottleIds": [63937],
+    "bottleContexts": [
+      {
+        "exact": {
+          "abv": 55,
+          "edition": null,
+          "outturn": null,
+          "statedAge": 8,
+          "caskNumber": null,
+          "maturation": null,
+          "releaseDay": null,
+          "singleCask": null,
+          "releaseYear": 2026,
+          "vintageYear": null,
+          "bottlingYear": null,
+          "caskStrength": null,
+          "releaseMonth": 2
+        },
+        "shared": {
+          "name": "Recollection",
+          "brand": {
+            "name": "Yellowstone",
+            "entityId": 415
+          },
+          "series": {
+            "name": "Recollection Series",
+            "seriesId": 1123
+          },
+          "bottler": null,
+          "category": "bourbon",
+          "statedAge": null,
+          "distillers": [
+            {
+              "name": "Limestone Branch Distillery",
+              "entityId": 1803
+            }
+          ]
+        },
+        "groupId": 36898,
+        "bottleId": 63937,
+        "fullName": "Yellowstone Recollection",
+        "siblings": [],
+        "references": [],
+        "observations": [
+          {
+            "facts": {
+              "proposalType": "create_new",
+              "proposedBottle": {
+                "abv": 55,
+                "name": "Recollection",
+                "brand": {
+                  "id": 415,
+                  "name": "Yellowstone"
+                },
+                "series": {
+                  "id": null,
+                  "name": "Recollection Series"
+                },
+                "bottler": null,
+                "edition": null,
+                "outturn": null,
+                "category": "bourbon",
+                "statedAge": 8,
+                "caskNumber": null,
+                "distillers": [
+                  {
+                    "id": 1803,
+                    "name": "Limestone Branch Distillery"
+                  }
+                ],
+                "maturation": null,
+                "releaseDay": null,
+                "singleCask": null,
+                "releaseYear": 2026,
+                "vintageYear": null,
+                "bottlingYear": null,
+                "caskStrength": null,
+                "releaseMonth": 2
+              },
+              "referenceScope": "none"
+            },
+            "rawText": "Yellowstone 8-year-old Recollection Bourbon Whiskey",
+            "sourceKey": "store_price:12060246",
+            "sourceUrl": "https://kegnbottle.com/products/yellowstone-8-year-recollection-bourbon-whiskey-750ml",
+            "sourceName": "Yellowstone 8-year-old Recollection Bourbon Whiskey",
+            "sourceType": "store_price",
+            "parsedIdentity": {
+              "abv": null,
+              "brand": "Yellowstone",
+              "series": "Barrel Collection",
+              "bottler": null,
+              "edition": null,
+              "outturn": null,
+              "category": "bourbon",
+              "distillery": [],
+              "expression": null,
+              "maturation": null,
+              "stated_age": null,
+              "cask_number": null,
+              "release_day": null,
+              "single_cask": null,
+              "release_year": null,
+              "vintage_year": null,
+              "bottling_year": null,
+              "cask_strength": null,
+              "release_month": null
+            }
+          }
+        ],
+        "imageSources": [
+          {
+            "url": "https://api.peated.com/uploads/prices-pb4kwz9dxfyitg0j688tqb4f.webp",
+            "source": {
+              "kind": "bottle"
+            },
+            "sourceUrl": "https://kegnbottle.com/products/yellowstone-8-year-recollection-bourbon-whiskey-750ml"
+          }
+        ]
+      }
+    ],
+    "inspectedEntities": [
+      {
+        "kind": "brand",
+        "name": "Yellowstone",
+        "score": 1,
+        "source": ["exact", "text", "prefix", "contained"],
+        "entityId": 415,
+        "reference": "Yellowstone",
+        "shortName": null,
+        "retrievedFor": [
+          {
+            "exact": true,
+            "query": "Yellowstone"
+          }
+        ]
+      },
+      {
+        "kind": "distillery",
+        "name": "Limestone Branch Distillery",
+        "score": 1,
+        "source": ["exact", "text", "prefix", "contained"],
+        "entityId": 1803,
+        "reference": "Limestone Branch Distillery",
+        "shortName": null,
+        "retrievedFor": [
+          {
+            "exact": true,
+            "query": "Limestone Branch Distillery"
+          }
+        ]
+      },
+      {
+        "kind": "brand",
+        "name": "Hardin's Creek",
+        "score": 1,
+        "source": ["exact", "text", "prefix", "contained"],
+        "entityId": 365656,
+        "reference": "Hardin's Creek",
+        "shortName": null,
+        "retrievedFor": [
+          {
+            "exact": true,
+            "query": "Hardin's Creek"
+          }
+        ]
+      },
+      {
+        "kind": "distillery",
+        "name": "James B. Beam Distilling Co.",
+        "score": 1,
+        "source": ["exact", "text", "prefix", "contained"],
+        "entityId": 365659,
+        "reference": "James B. Beam Distilling Co.",
+        "shortName": null,
+        "retrievedFor": [
+          {
+            "exact": true,
+            "query": "James B. Beam Distilling Co."
+          }
+        ]
+      },
+      {
+        "kind": "brand",
+        "name": "Town Branch",
+        "score": 1,
+        "source": ["exact", "text", "prefix", "contained"],
+        "entityId": 4330,
+        "reference": "Town Branch",
+        "shortName": null,
+        "retrievedFor": [
+          {
+            "exact": true,
+            "query": "Town Branch"
+          }
+        ]
+      },
+      {
+        "kind": "distillery",
+        "name": "Branch Point",
+        "score": 1,
+        "source": ["exact", "text", "prefix", "contained"],
+        "entityId": 29392,
+        "reference": "Branch Point",
+        "shortName": null,
+        "retrievedFor": [
+          {
+            "exact": true,
+            "query": "Branch Point"
+          }
+        ]
+      },
+      {
+        "kind": "distillery",
+        "name": "Town Branch Distillery",
+        "score": 0.5,
+        "source": ["text", "prefix"],
+        "entityId": 366968,
+        "reference": "Town Branch Distillery",
+        "shortName": null,
+        "retrievedFor": [
+          {
+            "query": "Town Branch"
+          }
+        ]
+      },
+      {
+        "kind": "distillery",
+        "name": "Beam",
+        "score": 0.2863636363636364,
+        "source": ["contained"],
+        "entityId": 2201,
+        "reference": "Beam",
+        "shortName": null,
+        "retrievedFor": [
+          {
+            "query": "James B. Beam Distilling Co."
+          }
+        ]
+      }
+    ],
+    "inspectedSeries": []
+  },
+  "provenance": {
+    "source": "production_miss",
+    "verifiedSourceUrls": [
+      "https://whiskyadvocate.com/Yellowstone-Recollection-Series-55",
+      "https://api.peated.com/uploads/prices-pb4kwz9dxfyitg0j688tqb4f.webp"
+    ],
+    "dbOutcome": {
+      "bottleId": null,
+      "createsBottle": false,
+      "summary": "Production returned no_match."
+    },
+    "notes": "Captured from saved classifier run 29644 (review 19010, model openai/gpt-6-luna, 2026-10-28T08:34:52.163Z). Production rationale: The source identifies Yellowstone Recollection Series at 55% ABV, and web evidence supports a 55% Recollection release. Candidate 63937 has matching catalog metadata, but its associated label evidence conflicts on ABV, so assignment is not safe and a duplicate creation is not supported. Checked 2026-11-03. Bottle 63937's image (prices-pb4kwz9dxfyitg0j688tqb4f.webp) is a Yellowstone Recollection bottle; its neck label reads 'RECOLLECTION' and its front label reads 'Kentucky Straight Bourbon Whiskey, 8 YEARS, PROOF 110, 55%'. Production's 93-proof read was a misread of that low-resolution image. Whisky Advocate (Fall 2026) prints 55%. Owner note (2026-11-03): reading text from a photo always has a higher error margin, so a clear source and the stored fact win when they agree."
+  },
+  "expected": {
+    "status": "classified",
+    "action": "match",
+    "identityScope": "product",
+    "matchedBottleId": 63937,
+    "summary": "The review title gives Yellowstone Recollection Series at 55%, and Bottle 63937 stores Yellowstone Recollection, Recollection Series, 8-year-old, 55%, 2026. The agent read its candidate photo as 93 proof, but the label prints 8 years, 110 proof, 55%. A photo read has a higher error margin than clear text, so it must not override a source and a stored ABV that agree. Match 63937."
+  }
+}

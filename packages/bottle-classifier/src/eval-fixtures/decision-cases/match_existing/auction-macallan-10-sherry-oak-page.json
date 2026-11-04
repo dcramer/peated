@@ -1,0 +1,1627 @@
+{
+  "id": "auction-macallan-10-sherry-oak-page",
+  "name": "auction lot photo: the label's sherry oak wording picks The Macallan 10-year-old Sherry Oak over Fine Oak",
+  "input": {
+    "reference": {
+      "id": 16615,
+      "url": "https://www.scotchwhiskyauctions.com/auctions/234-the-185th-auction/904787-macallan-10-year-old/",
+      "name": "Macallan 10 Year Old",
+      "imageUrl": "https://d3suvtcq00dftb.cloudfront.net/images/97a88cf38d2719a17d848c84b366778c-zoom.jpg",
+      "externalSiteId": 28097,
+      "currentBottleId": null
+    },
+    "extractedIdentity": {
+      "abv": 40,
+      "brand": null,
+      "series": null,
+      "bottler": null,
+      "edition": null,
+      "outturn": null,
+      "category": null,
+      "distillery": null,
+      "expression": null,
+      "maturation": null,
+      "stated_age": null,
+      "cask_number": null,
+      "single_cask": null,
+      "release_year": null,
+      "vintage_year": null,
+      "cask_strength": null
+    },
+    "imageEvidence": null,
+    "initialCandidates": [
+      {
+        "abv": 40,
+        "brand": "Isle of Jura",
+        "score": 49.647446,
+        "series": null,
+        "source": ["text"],
+        "bottler": null,
+        "edition": null,
+        "outturn": null,
+        "bottleId": 45943,
+        "category": "single_malt",
+        "fullName": "Isle of Jura Origin - 10-year-old - 40.0% ABV - Oloroso Cask",
+        "reference": null,
+        "statedAge": 10,
+        "caskNumber": null,
+        "comparison": {
+          "missing": [],
+          "conflicts": [],
+          "agreements": ["abv"]
+        },
+        "distillery": ["Isle of Jura"],
+        "maturation": "oloroso",
+        "releaseDay": null,
+        "singleCask": null,
+        "releaseYear": null,
+        "vintageYear": null,
+        "bottlingYear": null,
+        "caskStrength": null,
+        "releaseMonth": null,
+        "familyContext": {
+          "siblingBottles": []
+        }
+      },
+      {
+        "abv": 40,
+        "brand": "The Macallan",
+        "score": 49.62272,
+        "series": null,
+        "source": ["text", "brand_coverage", "context"],
+        "bottler": null,
+        "edition": null,
+        "outturn": null,
+        "bottleId": 69121,
+        "category": "single_malt",
+        "fullName": "The Macallan Speaker Martin's 10-year-old",
+        "reference": null,
+        "statedAge": 10,
+        "caskNumber": null,
+        "comparison": {
+          "missing": [],
+          "conflicts": [],
+          "agreements": ["abv"]
+        },
+        "distillery": ["The Macallan"],
+        "maturation": null,
+        "releaseDay": null,
+        "singleCask": null,
+        "releaseYear": null,
+        "vintageYear": null,
+        "bottlingYear": null,
+        "caskStrength": null,
+        "releaseMonth": null,
+        "familyContext": {
+          "siblingBottles": []
+        }
+      },
+      {
+        "abv": 40,
+        "brand": "anCnoc",
+        "score": 49.22444,
+        "series": null,
+        "source": ["text"],
+        "bottler": null,
+        "edition": null,
+        "outturn": null,
+        "bottleId": 45882,
+        "category": "single_malt",
+        "fullName": "anCnoc Peated - 10-year-old - 40.0% ABV - Bourbon Cask",
+        "reference": null,
+        "statedAge": 10,
+        "caskNumber": null,
+        "comparison": {
+          "missing": [],
+          "conflicts": [],
+          "agreements": ["abv"]
+        },
+        "distillery": ["Knockdhu"],
+        "maturation": "bourbon",
+        "releaseDay": null,
+        "singleCask": null,
+        "releaseYear": null,
+        "vintageYear": null,
+        "bottlingYear": null,
+        "caskStrength": null,
+        "releaseMonth": null,
+        "familyContext": {
+          "siblingBottles": []
+        }
+      },
+      {
+        "abv": 40,
+        "brand": "The Macallan",
+        "score": 47.818916,
+        "series": "Sherry Oak Collection",
+        "source": ["text", "context", "brand_coverage"],
+        "bottler": null,
+        "edition": null,
+        "outturn": null,
+        "bottleId": 1105,
+        "category": "single_malt",
+        "fullName": "The Macallan 10-year-old",
+        "reference": null,
+        "statedAge": 10,
+        "caskNumber": null,
+        "comparison": {
+          "missing": [],
+          "conflicts": [],
+          "agreements": ["abv"]
+        },
+        "distillery": ["The Macallan"],
+        "maturation": "Sherry wood",
+        "releaseDay": null,
+        "singleCask": false,
+        "releaseYear": null,
+        "vintageYear": null,
+        "bottlingYear": null,
+        "caskStrength": null,
+        "releaseMonth": null,
+        "familyContext": {
+          "siblingBottles": []
+        }
+      },
+      {
+        "abv": 40,
+        "brand": "The Macallan",
+        "score": 47.350784,
+        "series": "Fine Oak",
+        "source": ["vector", "text", "context", "brand_coverage"],
+        "bottler": null,
+        "edition": null,
+        "outturn": null,
+        "bottleId": 5182,
+        "category": "single_malt",
+        "fullName": "The Macallan Fine Oak",
+        "reference": "The Macallan 10-year-old Fine Oak, 40%",
+        "statedAge": 10,
+        "caskNumber": null,
+        "comparison": {
+          "missing": [],
+          "conflicts": [],
+          "agreements": ["abv"]
+        },
+        "distillery": ["The Macallan"],
+        "maturation": "Sherry seasoned European and American oak casks and ex-bourbon American oak casks",
+        "releaseDay": null,
+        "singleCask": null,
+        "releaseYear": null,
+        "vintageYear": null,
+        "bottlingYear": null,
+        "caskStrength": null,
+        "releaseMonth": null,
+        "familyContext": {
+          "siblingBottles": []
+        }
+      },
+      {
+        "abv": 40,
+        "brand": "Isle of Jura",
+        "score": 45.48072,
+        "series": null,
+        "source": ["text"],
+        "bottler": null,
+        "edition": null,
+        "outturn": null,
+        "bottleId": 44114,
+        "category": "single_malt",
+        "fullName": "Isle of Jura 10-year-old - 40.0% ABV - Oloroso Cask",
+        "reference": null,
+        "statedAge": 10,
+        "caskNumber": null,
+        "comparison": {
+          "missing": [],
+          "conflicts": [],
+          "agreements": ["abv"]
+        },
+        "distillery": ["Isle of Jura"],
+        "maturation": "oloroso",
+        "releaseDay": null,
+        "singleCask": null,
+        "releaseYear": null,
+        "vintageYear": null,
+        "bottlingYear": null,
+        "caskStrength": null,
+        "releaseMonth": null,
+        "familyContext": {
+          "siblingBottles": []
+        }
+      },
+      {
+        "abv": 40,
+        "brand": "The Macallan",
+        "score": 45.360695,
+        "series": "Edrington 25 Years Of Service",
+        "source": ["text", "brand_coverage", "context"],
+        "bottler": null,
+        "edition": null,
+        "outturn": null,
+        "bottleId": 69113,
+        "category": "single_malt",
+        "fullName": "The Macallan 10-year-old",
+        "reference": null,
+        "statedAge": 10,
+        "caskNumber": null,
+        "comparison": {
+          "missing": [],
+          "conflicts": [],
+          "agreements": ["abv"]
+        },
+        "distillery": ["The Macallan"],
+        "maturation": "Sherry casks",
+        "releaseDay": null,
+        "singleCask": null,
+        "releaseYear": null,
+        "vintageYear": null,
+        "bottlingYear": null,
+        "caskStrength": null,
+        "releaseMonth": null,
+        "familyContext": {
+          "siblingBottles": []
+        }
+      },
+      {
+        "abv": 40,
+        "brand": "Master of Malt",
+        "score": 44.101284,
+        "series": null,
+        "source": ["text"],
+        "bottler": "Master of Malt",
+        "edition": null,
+        "outturn": null,
+        "bottleId": 45638,
+        "category": "single_malt",
+        "fullName": "Master of Malt A Secret Speyside Distillery - 10-year-old - 40.0% ABV",
+        "reference": null,
+        "statedAge": 10,
+        "caskNumber": null,
+        "comparison": {
+          "missing": [],
+          "conflicts": [],
+          "agreements": ["abv"]
+        },
+        "distillery": [],
+        "maturation": null,
+        "releaseDay": null,
+        "singleCask": false,
+        "releaseYear": null,
+        "vintageYear": null,
+        "bottlingYear": null,
+        "caskStrength": null,
+        "releaseMonth": null,
+        "familyContext": {
+          "siblingBottles": []
+        }
+      },
+      {
+        "abv": null,
+        "brand": "The Macallan",
+        "score": 43.484463,
+        "series": null,
+        "source": ["text"],
+        "bottler": null,
+        "edition": null,
+        "outturn": null,
+        "bottleId": 5098,
+        "category": "single_malt",
+        "fullName": "The Macallan Cask Strength",
+        "reference": null,
+        "statedAge": 10,
+        "caskNumber": null,
+        "comparison": {
+          "missing": ["abv"],
+          "conflicts": [],
+          "agreements": ["category", "statedAge", "brand", "distillers"]
+        },
+        "distillery": ["The Macallan"],
+        "maturation": "Sherry oak casks",
+        "releaseDay": null,
+        "singleCask": false,
+        "releaseYear": null,
+        "vintageYear": null,
+        "bottlingYear": null,
+        "caskStrength": true,
+        "releaseMonth": null,
+        "familyContext": {
+          "siblingBottles": []
+        }
+      },
+      {
+        "abv": 40,
+        "brand": "Laphroaig",
+        "score": 38.54469,
+        "series": null,
+        "source": ["text"],
+        "bottler": null,
+        "edition": null,
+        "outturn": null,
+        "bottleId": 54469,
+        "category": "single_malt",
+        "fullName": "Laphroaig 10-year-old",
+        "reference": null,
+        "statedAge": 10,
+        "caskNumber": null,
+        "comparison": {
+          "missing": [],
+          "conflicts": ["brand", "distillers"],
+          "agreements": ["category", "statedAge", "abv"]
+        },
+        "distillery": ["Laphroaig"],
+        "maturation": "Matured for 10 years in ex-bourbon barrels",
+        "releaseDay": null,
+        "singleCask": false,
+        "releaseYear": null,
+        "vintageYear": null,
+        "bottlingYear": null,
+        "caskStrength": false,
+        "releaseMonth": null,
+        "familyContext": {
+          "siblingBottles": []
+        }
+      },
+      {
+        "abv": 40,
+        "brand": "Glenturret",
+        "score": 38.304604,
+        "series": null,
+        "source": ["text"],
+        "bottler": null,
+        "edition": null,
+        "outturn": null,
+        "bottleId": 65631,
+        "category": "single_malt",
+        "fullName": "Glenturret 10-year-old",
+        "reference": null,
+        "statedAge": 10,
+        "caskNumber": null,
+        "comparison": {
+          "missing": [],
+          "conflicts": ["brand", "distillers"],
+          "agreements": ["category", "statedAge", "abv"]
+        },
+        "distillery": ["Glenturret"],
+        "maturation": null,
+        "releaseDay": null,
+        "singleCask": null,
+        "releaseYear": null,
+        "vintageYear": null,
+        "bottlingYear": null,
+        "caskStrength": null,
+        "releaseMonth": null,
+        "familyContext": {
+          "siblingBottles": []
+        }
+      },
+      {
+        "abv": 40,
+        "brand": "Talisker",
+        "score": 38.304604,
+        "series": null,
+        "source": ["text"],
+        "bottler": null,
+        "edition": null,
+        "outturn": null,
+        "bottleId": 68960,
+        "category": "single_malt",
+        "fullName": "Talisker 10-year-old",
+        "reference": null,
+        "statedAge": 10,
+        "caskNumber": null,
+        "comparison": {
+          "missing": [],
+          "conflicts": ["brand", "distillers"],
+          "agreements": ["category", "statedAge", "abv"]
+        },
+        "distillery": ["Talisker"],
+        "maturation": null,
+        "releaseDay": null,
+        "singleCask": null,
+        "releaseYear": null,
+        "vintageYear": null,
+        "bottlingYear": null,
+        "caskStrength": null,
+        "releaseMonth": null,
+        "familyContext": {
+          "siblingBottles": []
+        }
+      },
+      {
+        "abv": 40,
+        "brand": "The Deveron",
+        "score": 37.746178,
+        "series": null,
+        "source": ["text"],
+        "bottler": null,
+        "edition": null,
+        "outturn": null,
+        "bottleId": 65163,
+        "category": "single_malt",
+        "fullName": "The Deveron 10-year-old",
+        "reference": null,
+        "statedAge": 10,
+        "caskNumber": null,
+        "comparison": {
+          "missing": [],
+          "conflicts": ["brand", "distillers"],
+          "agreements": ["category", "statedAge", "abv"]
+        },
+        "distillery": ["Macduff Distillery"],
+        "maturation": null,
+        "releaseDay": null,
+        "singleCask": null,
+        "releaseYear": 2015,
+        "vintageYear": null,
+        "bottlingYear": null,
+        "caskStrength": null,
+        "releaseMonth": null,
+        "familyContext": {
+          "siblingBottles": []
+        }
+      },
+      {
+        "abv": 40,
+        "brand": "Yamazaki",
+        "score": 36.65319,
+        "series": null,
+        "source": ["text"],
+        "bottler": null,
+        "edition": null,
+        "outturn": null,
+        "bottleId": 5123,
+        "category": "single_malt",
+        "fullName": "Yamazaki 10-year-old",
+        "reference": null,
+        "statedAge": 10,
+        "caskNumber": null,
+        "comparison": {
+          "missing": [],
+          "conflicts": ["brand", "distillers"],
+          "agreements": ["category", "statedAge", "abv"]
+        },
+        "distillery": ["Yamazaki"],
+        "maturation": null,
+        "releaseDay": null,
+        "singleCask": null,
+        "releaseYear": 1995,
+        "vintageYear": null,
+        "bottlingYear": null,
+        "caskStrength": null,
+        "releaseMonth": null,
+        "familyContext": {
+          "siblingBottles": []
+        }
+      },
+      {
+        "abv": 40,
+        "brand": "Lismore",
+        "score": 36.36278,
+        "series": null,
+        "source": ["text"],
+        "bottler": null,
+        "edition": null,
+        "outturn": null,
+        "bottleId": 56245,
+        "category": "single_malt",
+        "fullName": "Lismore 10-year-old",
+        "reference": null,
+        "statedAge": 10,
+        "caskNumber": null,
+        "comparison": {
+          "missing": ["distillers"],
+          "conflicts": ["brand"],
+          "agreements": ["category", "statedAge", "abv"]
+        },
+        "distillery": [],
+        "maturation": null,
+        "releaseDay": null,
+        "singleCask": null,
+        "releaseYear": null,
+        "vintageYear": null,
+        "bottlingYear": null,
+        "caskStrength": null,
+        "releaseMonth": null,
+        "familyContext": {
+          "siblingBottles": []
+        }
+      },
+      {
+        "abv": 40,
+        "brand": "Longmorn",
+        "score": 36.36278,
+        "series": null,
+        "source": ["text"],
+        "bottler": null,
+        "edition": null,
+        "outturn": null,
+        "bottleId": 67988,
+        "category": "single_malt",
+        "fullName": "Longmorn 10-year-old",
+        "reference": null,
+        "statedAge": 10,
+        "caskNumber": null,
+        "comparison": {
+          "missing": [],
+          "conflicts": ["brand", "distillers"],
+          "agreements": ["category", "statedAge", "abv"]
+        },
+        "distillery": ["Longmorn"],
+        "maturation": null,
+        "releaseDay": null,
+        "singleCask": null,
+        "releaseYear": null,
+        "vintageYear": null,
+        "bottlingYear": null,
+        "caskStrength": null,
+        "releaseMonth": null,
+        "familyContext": {
+          "siblingBottles": []
+        }
+      },
+      {
+        "abv": 40,
+        "brand": "Islay Gold",
+        "score": 36.1303,
+        "series": null,
+        "source": ["text"],
+        "bottler": null,
+        "edition": null,
+        "outturn": null,
+        "bottleId": 44216,
+        "category": "single_malt",
+        "fullName": "Islay Gold 10-year-old",
+        "reference": null,
+        "statedAge": 10,
+        "caskNumber": null,
+        "comparison": {
+          "missing": ["distillers"],
+          "conflicts": ["brand"],
+          "agreements": ["category", "statedAge", "abv"]
+        },
+        "distillery": [],
+        "maturation": null,
+        "releaseDay": null,
+        "singleCask": null,
+        "releaseYear": null,
+        "vintageYear": null,
+        "bottlingYear": null,
+        "caskStrength": null,
+        "releaseMonth": null,
+        "familyContext": {
+          "siblingBottles": []
+        }
+      },
+      {
+        "abv": 40,
+        "brand": "Glenmorangie",
+        "score": 36.00263,
+        "series": null,
+        "source": ["text"],
+        "bottler": null,
+        "edition": null,
+        "outturn": null,
+        "bottleId": 5371,
+        "category": "single_malt",
+        "fullName": "Glenmorangie 10-year-old",
+        "reference": null,
+        "statedAge": 10,
+        "caskNumber": null,
+        "comparison": {
+          "missing": [],
+          "conflicts": ["brand", "distillers"],
+          "agreements": ["category", "statedAge", "abv"]
+        },
+        "distillery": ["Glenmorangie"],
+        "maturation": null,
+        "releaseDay": null,
+        "singleCask": null,
+        "releaseYear": null,
+        "vintageYear": null,
+        "bottlingYear": null,
+        "caskStrength": null,
+        "releaseMonth": null,
+        "familyContext": {
+          "siblingBottles": []
+        }
+      },
+      {
+        "abv": 40,
+        "brand": "Highland Park",
+        "score": 35.728195,
+        "series": null,
+        "source": ["text"],
+        "bottler": null,
+        "edition": null,
+        "outturn": null,
+        "bottleId": 990,
+        "category": "single_malt",
+        "fullName": "Highland Park 10-year-old",
+        "reference": null,
+        "statedAge": 10,
+        "caskNumber": null,
+        "comparison": {
+          "missing": [],
+          "conflicts": ["brand", "distillers"],
+          "agreements": ["category", "statedAge", "abv"]
+        },
+        "distillery": ["Highland Park"],
+        "maturation": null,
+        "releaseDay": null,
+        "singleCask": null,
+        "releaseYear": null,
+        "vintageYear": null,
+        "bottlingYear": null,
+        "caskStrength": null,
+        "releaseMonth": null,
+        "familyContext": {
+          "siblingBottles": []
+        }
+      },
+      {
+        "abv": 40,
+        "brand": "Tomatin",
+        "score": 35.682407,
+        "series": null,
+        "source": ["text"],
+        "bottler": null,
+        "edition": null,
+        "outturn": null,
+        "bottleId": 66841,
+        "category": "single_malt",
+        "fullName": "Tomatin 10-year-old",
+        "reference": null,
+        "statedAge": 10,
+        "caskNumber": null,
+        "comparison": {
+          "missing": [],
+          "conflicts": ["brand", "distillers"],
+          "agreements": ["category", "statedAge", "abv"]
+        },
+        "distillery": ["Tomatin"],
+        "maturation": "Bourbon casks",
+        "releaseDay": null,
+        "singleCask": null,
+        "releaseYear": 2025,
+        "vintageYear": null,
+        "bottlingYear": null,
+        "caskStrength": null,
+        "releaseMonth": null,
+        "familyContext": {
+          "siblingBottles": []
+        }
+      },
+      {
+        "abv": 40,
+        "brand": "Glen Burn",
+        "score": 35.050472,
+        "series": null,
+        "source": ["text"],
+        "bottler": null,
+        "edition": null,
+        "outturn": null,
+        "bottleId": 68814,
+        "category": "single_malt",
+        "fullName": "Glen Burn 10-year-old",
+        "reference": null,
+        "statedAge": 10,
+        "caskNumber": null,
+        "comparison": {
+          "missing": ["distillers"],
+          "conflicts": ["brand"],
+          "agreements": ["category", "statedAge", "abv"]
+        },
+        "distillery": [],
+        "maturation": null,
+        "releaseDay": null,
+        "singleCask": null,
+        "releaseYear": null,
+        "vintageYear": null,
+        "bottlingYear": null,
+        "caskStrength": null,
+        "releaseMonth": null,
+        "familyContext": {
+          "siblingBottles": []
+        }
+      },
+      {
+        "abv": 40,
+        "brand": "Hakushu Distillery",
+        "score": 35.050472,
+        "series": null,
+        "source": ["text"],
+        "bottler": null,
+        "edition": null,
+        "outturn": null,
+        "bottleId": 51774,
+        "category": "single_malt",
+        "fullName": "Hakushu Distillery 10-year-old",
+        "reference": null,
+        "statedAge": 10,
+        "caskNumber": null,
+        "comparison": {
+          "missing": [],
+          "conflicts": ["brand", "distillers"],
+          "agreements": ["category", "statedAge", "abv"]
+        },
+        "distillery": ["Hakushu Distillery"],
+        "maturation": null,
+        "releaseDay": null,
+        "singleCask": null,
+        "releaseYear": null,
+        "vintageYear": null,
+        "bottlingYear": null,
+        "caskStrength": null,
+        "releaseMonth": null,
+        "familyContext": {
+          "siblingBottles": []
+        }
+      },
+      {
+        "abv": 40,
+        "brand": "Loch Dhu",
+        "score": 34.882874,
+        "series": null,
+        "source": ["text"],
+        "bottler": null,
+        "edition": null,
+        "outturn": null,
+        "bottleId": 69093,
+        "category": "single_malt",
+        "fullName": "Loch Dhu 10-year-old",
+        "reference": null,
+        "statedAge": 10,
+        "caskNumber": null,
+        "comparison": {
+          "missing": [],
+          "conflicts": ["brand", "distillers"],
+          "agreements": ["category", "statedAge", "abv"]
+        },
+        "distillery": ["Mannochmore"],
+        "maturation": null,
+        "releaseDay": null,
+        "singleCask": null,
+        "releaseYear": null,
+        "vintageYear": null,
+        "bottlingYear": null,
+        "caskStrength": null,
+        "releaseMonth": null,
+        "familyContext": {
+          "siblingBottles": []
+        }
+      },
+      {
+        "abv": 40,
+        "brand": "Black Bottle",
+        "score": 29.494656,
+        "series": null,
+        "source": ["text"],
+        "bottler": null,
+        "edition": "Islay Jazz Festival 2002",
+        "outturn": null,
+        "bottleId": 46429,
+        "category": "blend",
+        "fullName": "Black Bottle 10-year-old - Islay Jazz Festival 2002 - 2002 Release - 40.0% ABV",
+        "reference": null,
+        "statedAge": 10,
+        "caskNumber": null,
+        "comparison": {
+          "missing": [],
+          "conflicts": [],
+          "agreements": ["abv"]
+        },
+        "distillery": [],
+        "maturation": null,
+        "releaseDay": null,
+        "singleCask": null,
+        "releaseYear": 2002,
+        "vintageYear": null,
+        "bottlingYear": null,
+        "caskStrength": null,
+        "releaseMonth": null,
+        "familyContext": {
+          "siblingBottles": []
+        }
+      },
+      {
+        "abv": 40,
+        "brand": "Old Charter",
+        "score": 27.534678,
+        "series": null,
+        "source": ["text"],
+        "bottler": "Old Charter Distillery Co.",
+        "edition": null,
+        "outturn": null,
+        "bottleId": 45499,
+        "category": "bourbon",
+        "fullName": "Old Charter 8 - 8-year-old - 40.0% ABV",
+        "reference": null,
+        "statedAge": 8,
+        "caskNumber": null,
+        "comparison": {
+          "missing": [],
+          "conflicts": [],
+          "agreements": ["abv"]
+        },
+        "distillery": [],
+        "maturation": null,
+        "releaseDay": null,
+        "singleCask": null,
+        "releaseYear": null,
+        "vintageYear": null,
+        "bottlingYear": null,
+        "caskStrength": null,
+        "releaseMonth": null,
+        "familyContext": {
+          "siblingBottles": []
+        }
+      },
+      {
+        "abv": 40,
+        "brand": "Isle of Jura",
+        "score": 26.709152,
+        "series": null,
+        "source": ["text"],
+        "bottler": null,
+        "edition": null,
+        "outturn": null,
+        "bottleId": 46590,
+        "category": "single_malt",
+        "fullName": "Isle of Jura 13-year-old - 40.0% ABV - Bourbon Cask",
+        "reference": null,
+        "statedAge": 13,
+        "caskNumber": null,
+        "comparison": {
+          "missing": [],
+          "conflicts": [],
+          "agreements": ["abv"]
+        },
+        "distillery": ["Isle of Jura"],
+        "maturation": "bourbon",
+        "releaseDay": null,
+        "singleCask": null,
+        "releaseYear": null,
+        "vintageYear": null,
+        "bottlingYear": null,
+        "caskStrength": null,
+        "releaseMonth": null,
+        "familyContext": {
+          "siblingBottles": []
+        }
+      },
+      {
+        "abv": 40,
+        "brand": "The Macallan",
+        "score": 26.469484,
+        "series": null,
+        "source": ["text"],
+        "bottler": null,
+        "edition": null,
+        "outturn": null,
+        "bottleId": 5275,
+        "category": "single_malt",
+        "fullName": "The Macallan 7-year-old",
+        "reference": null,
+        "statedAge": 7,
+        "caskNumber": null,
+        "comparison": {
+          "missing": [],
+          "conflicts": [],
+          "agreements": ["abv"]
+        },
+        "distillery": ["The Macallan"],
+        "maturation": null,
+        "releaseDay": null,
+        "singleCask": false,
+        "releaseYear": null,
+        "vintageYear": null,
+        "bottlingYear": null,
+        "caskStrength": null,
+        "releaseMonth": null,
+        "familyContext": {
+          "siblingBottles": []
+        }
+      },
+      {
+        "abv": 40,
+        "brand": "Highland Fusilier",
+        "score": 26.428951,
+        "series": null,
+        "source": ["text"],
+        "bottler": "Gordon & MacPhail",
+        "edition": null,
+        "outturn": null,
+        "bottleId": 46226,
+        "category": "blend",
+        "fullName": "Highland Fusilier 5-year-old - 40.0% ABV",
+        "reference": null,
+        "statedAge": 5,
+        "caskNumber": null,
+        "comparison": {
+          "missing": [],
+          "conflicts": [],
+          "agreements": ["abv"]
+        },
+        "distillery": [],
+        "maturation": null,
+        "releaseDay": null,
+        "singleCask": null,
+        "releaseYear": null,
+        "vintageYear": null,
+        "bottlingYear": null,
+        "caskStrength": null,
+        "releaseMonth": null,
+        "familyContext": {
+          "siblingBottles": []
+        }
+      },
+      {
+        "abv": 40,
+        "brand": "Old Williamsburg",
+        "score": 26.017355,
+        "series": null,
+        "source": ["text"],
+        "bottler": null,
+        "edition": null,
+        "outturn": null,
+        "bottleId": 47037,
+        "category": "bourbon",
+        "fullName": "Old Williamsburg Bourbon - 40.0% ABV",
+        "reference": null,
+        "statedAge": null,
+        "caskNumber": null,
+        "comparison": {
+          "missing": [],
+          "conflicts": [],
+          "agreements": ["abv"]
+        },
+        "distillery": [],
+        "maturation": null,
+        "releaseDay": null,
+        "singleCask": null,
+        "releaseYear": null,
+        "vintageYear": null,
+        "bottlingYear": null,
+        "caskStrength": null,
+        "releaseMonth": null,
+        "familyContext": {
+          "siblingBottles": []
+        }
+      },
+      {
+        "abv": 40,
+        "brand": "Grábrók",
+        "score": 25.737919,
+        "series": null,
+        "source": ["text"],
+        "bottler": null,
+        "edition": null,
+        "outturn": null,
+        "bottleId": 46037,
+        "category": "blend",
+        "fullName": "Grábrók Blended Whisky - 8-year-old - 40.0% ABV",
+        "reference": null,
+        "statedAge": 8,
+        "caskNumber": null,
+        "comparison": {
+          "missing": [],
+          "conflicts": [],
+          "agreements": ["abv"]
+        },
+        "distillery": [],
+        "maturation": null,
+        "releaseDay": null,
+        "singleCask": null,
+        "releaseYear": null,
+        "vintageYear": null,
+        "bottlingYear": null,
+        "caskStrength": null,
+        "releaseMonth": null,
+        "familyContext": {
+          "siblingBottles": []
+        }
+      },
+      {
+        "abv": 40,
+        "brand": "The Macallan",
+        "score": 0.8158702403575261,
+        "series": "1824 Series",
+        "source": ["vector"],
+        "bottler": null,
+        "edition": null,
+        "outturn": null,
+        "bottleId": 16996,
+        "category": "single_malt",
+        "fullName": "The Macallan Amber",
+        "reference": "The Macallan Amber, 40%",
+        "statedAge": null,
+        "caskNumber": null,
+        "comparison": {
+          "missing": ["statedAge"],
+          "conflicts": [],
+          "agreements": ["category", "abv", "brand", "distillers"]
+        },
+        "distillery": ["The Macallan"],
+        "maturation": null,
+        "releaseDay": null,
+        "singleCask": null,
+        "releaseYear": null,
+        "vintageYear": null,
+        "bottlingYear": null,
+        "caskStrength": null,
+        "releaseMonth": null,
+        "familyContext": {
+          "siblingBottles": []
+        }
+      },
+      {
+        "abv": 40,
+        "brand": "The Macallan",
+        "score": 0.7594306404902322,
+        "series": "1824 Collection",
+        "source": ["vector"],
+        "bottler": null,
+        "edition": null,
+        "outturn": null,
+        "bottleId": 4939,
+        "category": "single_malt",
+        "fullName": "The Macallan Select Oak",
+        "reference": "The Macallan Select Oak, 40%",
+        "statedAge": null,
+        "caskNumber": null,
+        "comparison": {
+          "missing": ["statedAge"],
+          "conflicts": [],
+          "agreements": ["category", "abv", "brand", "distillers"]
+        },
+        "distillery": ["The Macallan"],
+        "maturation": null,
+        "releaseDay": null,
+        "singleCask": null,
+        "releaseYear": 2012,
+        "vintageYear": null,
+        "bottlingYear": null,
+        "caskStrength": null,
+        "releaseMonth": null,
+        "familyContext": {
+          "siblingBottles": []
+        }
+      }
+    ]
+  },
+  "context": {
+    "inspectedBottleIds": [1105, 5182, 69113, 69121],
+    "bottleContexts": [
+      {
+        "exact": {
+          "abv": 40,
+          "edition": null,
+          "outturn": null,
+          "statedAge": null,
+          "caskNumber": null,
+          "maturation": "Sherry wood",
+          "releaseDay": null,
+          "singleCask": false,
+          "releaseYear": null,
+          "vintageYear": null,
+          "bottlingYear": null,
+          "caskStrength": null,
+          "releaseMonth": null
+        },
+        "shared": {
+          "name": "10-year-old",
+          "brand": {
+            "name": "The Macallan",
+            "entityId": 1157
+          },
+          "series": {
+            "name": "Sherry Oak Collection",
+            "seriesId": 113
+          },
+          "bottler": null,
+          "category": "single_malt",
+          "statedAge": 10,
+          "distillers": [
+            {
+              "name": "The Macallan",
+              "entityId": 1157
+            }
+          ]
+        },
+        "groupId": 9671,
+        "bottleId": 1105,
+        "fullName": "The Macallan 10-year-old",
+        "siblings": [],
+        "references": [
+          {
+            "name": "The Macallan 10-year-old",
+            "ignored": false
+          }
+        ],
+        "observations": [
+          {
+            "facts": {
+              "proposalType": "create_new",
+              "proposedBottle": {
+                "abv": null,
+                "name": "Sherry Oak",
+                "brand": {
+                  "id": null,
+                  "name": "The Macallan"
+                },
+                "series": {
+                  "id": null,
+                  "name": "Sherry Oak Collection"
+                },
+                "bottler": null,
+                "edition": null,
+                "outturn": null,
+                "category": "single_malt",
+                "statedAge": 10,
+                "caskNumber": null,
+                "distillers": [
+                  {
+                    "id": null,
+                    "name": "The Macallan"
+                  }
+                ],
+                "maturation": "Sherry seasoned oak casks",
+                "releaseDay": null,
+                "singleCask": null,
+                "releaseYear": null,
+                "vintageYear": null,
+                "bottlingYear": null,
+                "caskStrength": null,
+                "releaseMonth": null
+              },
+              "referenceScope": "none"
+            },
+            "rawText": "The Macallan 10-year-old Sherry Oak - Late 2000s",
+            "sourceKey": "store_price:12057904",
+            "sourceUrl": "https://www.masterofmalt.com/whiskies/the-macallan/the-macallan-10-year-old-whisky/?sku=2538",
+            "sourceName": "The Macallan 10-year-old Sherry Oak - Late 2000s",
+            "sourceType": "store_price",
+            "parsedIdentity": null
+          },
+          {
+            "facts": {
+              "proposalType": "create_new",
+              "proposedBottle": {
+                "abv": null,
+                "name": "Sherry Oak",
+                "brand": {
+                  "id": null,
+                  "name": "The Macallan"
+                },
+                "series": {
+                  "id": null,
+                  "name": "Sherry Oak Collection"
+                },
+                "bottler": null,
+                "edition": null,
+                "outturn": null,
+                "category": "single_malt",
+                "statedAge": 10,
+                "caskNumber": null,
+                "distillers": [
+                  {
+                    "id": null,
+                    "name": "The Macallan"
+                  }
+                ],
+                "maturation": null,
+                "releaseDay": null,
+                "singleCask": null,
+                "releaseYear": null,
+                "vintageYear": null,
+                "bottlingYear": null,
+                "caskStrength": null,
+                "releaseMonth": null
+              },
+              "referenceScope": "none"
+            },
+            "rawText": "Macallan 10-year-old - Sherry Oak",
+            "sourceKey": "store_price:12056780",
+            "sourceUrl": "https://www.thewhiskyworld.com/macallan-10-year-old-sherry-oak-p5813",
+            "sourceName": "Macallan 10-year-old - Sherry Oak",
+            "sourceType": "store_price",
+            "parsedIdentity": null
+          }
+        ],
+        "imageSources": []
+      },
+      {
+        "exact": {
+          "abv": 40,
+          "edition": null,
+          "outturn": null,
+          "statedAge": null,
+          "caskNumber": null,
+          "maturation": "Sherry seasoned European and American oak casks and ex-bourbon American oak casks",
+          "releaseDay": null,
+          "singleCask": null,
+          "releaseYear": null,
+          "vintageYear": null,
+          "bottlingYear": null,
+          "caskStrength": null,
+          "releaseMonth": null
+        },
+        "shared": {
+          "name": "Fine Oak",
+          "brand": {
+            "name": "The Macallan",
+            "entityId": 1157
+          },
+          "series": {
+            "name": "Fine Oak",
+            "seriesId": 725
+          },
+          "bottler": null,
+          "category": "single_malt",
+          "statedAge": 10,
+          "distillers": [
+            {
+              "name": "The Macallan",
+              "entityId": 1157
+            }
+          ]
+        },
+        "groupId": 12187,
+        "bottleId": 5182,
+        "fullName": "The Macallan Fine Oak",
+        "siblings": [],
+        "references": [
+          {
+            "name": "The Macallan 10-year-old Fine Oak",
+            "ignored": false
+          },
+          {
+            "name": "The Macallan 10-year-old Fine Oak, 40%",
+            "ignored": false
+          }
+        ],
+        "observations": [
+          {
+            "facts": {
+              "proposalType": "match_existing",
+              "proposedBottle": null,
+              "referenceScope": "none"
+            },
+            "rawText": "The Macallan 10-year-old Fine Oak - Pre 2008",
+            "sourceKey": "store_price:12032919",
+            "sourceUrl": "https://www.masterofmalt.com/whiskies/the-macallan/the-macallan-10-year-old-fine-oak-pre-2008-whisky/?sku=132681",
+            "sourceName": "The Macallan 10-year-old Fine Oak - Pre 2008",
+            "sourceType": "store_price",
+            "parsedIdentity": null
+          },
+          {
+            "facts": {
+              "proposalType": "no_match",
+              "proposedBottle": null
+            },
+            "rawText": "The Macallan 10-year-old Fine Oak",
+            "sourceKey": "store_price:12032669",
+            "sourceUrl": "https://www.masterofmalt.com/whiskies/the-macallan/the-macallan-fine-oak-10-year-old-whisky/?sku=2535",
+            "sourceName": "The Macallan 10-year-old Fine Oak",
+            "sourceType": "store_price",
+            "parsedIdentity": null
+          }
+        ],
+        "imageSources": []
+      },
+      {
+        "exact": {
+          "abv": 40,
+          "edition": null,
+          "outturn": null,
+          "statedAge": 10,
+          "caskNumber": null,
+          "maturation": "Sherry casks",
+          "releaseDay": null,
+          "singleCask": null,
+          "releaseYear": null,
+          "vintageYear": null,
+          "bottlingYear": null,
+          "caskStrength": null,
+          "releaseMonth": null
+        },
+        "shared": {
+          "name": "10-year-old",
+          "brand": {
+            "name": "The Macallan",
+            "entityId": 1157
+          },
+          "series": {
+            "name": "Edrington 25 Years Of Service",
+            "seriesId": 1417
+          },
+          "bottler": null,
+          "category": "single_malt",
+          "statedAge": null,
+          "distillers": [
+            {
+              "name": "The Macallan",
+              "entityId": 1157
+            }
+          ]
+        },
+        "groupId": 42074,
+        "bottleId": 69113,
+        "fullName": "The Macallan 10-year-old",
+        "siblings": [],
+        "references": [],
+        "observations": [],
+        "imageSources": []
+      },
+      {
+        "exact": {
+          "abv": 40,
+          "edition": null,
+          "outturn": null,
+          "statedAge": 10,
+          "caskNumber": null,
+          "maturation": null,
+          "releaseDay": null,
+          "singleCask": null,
+          "releaseYear": null,
+          "vintageYear": null,
+          "bottlingYear": null,
+          "caskStrength": null,
+          "releaseMonth": null
+        },
+        "shared": {
+          "name": "Speaker Martin's 10-year-old",
+          "brand": {
+            "name": "The Macallan",
+            "entityId": 1157
+          },
+          "series": null,
+          "bottler": null,
+          "category": "single_malt",
+          "statedAge": null,
+          "distillers": [
+            {
+              "name": "The Macallan",
+              "entityId": 1157
+            }
+          ]
+        },
+        "groupId": 42082,
+        "bottleId": 69121,
+        "fullName": "The Macallan Speaker Martin's 10-year-old",
+        "siblings": [],
+        "references": [],
+        "observations": [],
+        "imageSources": []
+      }
+    ],
+    "inspectedEntities": [
+      {
+        "kind": "distillery",
+        "name": "Isle of Jura",
+        "score": 1,
+        "source": ["exact", "text", "prefix", "contained"],
+        "entityId": 1071,
+        "reference": "Isle of Jura",
+        "shortName": null,
+        "retrievedFor": [
+          {
+            "exact": true,
+            "query": "Isle of Jura"
+          }
+        ]
+      },
+      {
+        "kind": "distillery",
+        "name": "The Macallan",
+        "score": 1,
+        "source": ["exact", "text", "prefix", "contained"],
+        "entityId": 1157,
+        "reference": "The Macallan",
+        "shortName": null,
+        "retrievedFor": [
+          {
+            "exact": true,
+            "query": "The Macallan"
+          }
+        ]
+      },
+      {
+        "kind": "brand",
+        "name": "anCnoc",
+        "score": 1,
+        "source": ["exact", "text", "prefix", "contained"],
+        "entityId": 35,
+        "reference": "anCnoc",
+        "shortName": null,
+        "retrievedFor": [
+          {
+            "exact": true,
+            "query": "anCnoc"
+          }
+        ]
+      },
+      {
+        "kind": "distillery",
+        "name": "Knockdhu",
+        "score": 1,
+        "source": ["text", "exact", "prefix", "contained"],
+        "entityId": 1116,
+        "reference": "Knockdhu",
+        "shortName": null,
+        "retrievedFor": [
+          {
+            "query": "anCnoc"
+          },
+          {
+            "exact": true,
+            "query": "Knockdhu"
+          }
+        ]
+      },
+      {
+        "kind": "bottler",
+        "name": "Master of Malt",
+        "score": 1,
+        "source": ["exact", "text", "prefix", "contained"],
+        "entityId": 6075,
+        "reference": "Master of Malt",
+        "shortName": null,
+        "retrievedFor": [
+          {
+            "exact": true,
+            "query": "Master of Malt"
+          }
+        ]
+      },
+      {
+        "kind": "brand",
+        "name": "Black Bottle",
+        "score": 1,
+        "source": ["exact", "text", "prefix", "contained"],
+        "entityId": 392,
+        "reference": "Black Bottle",
+        "shortName": null,
+        "retrievedFor": [
+          {
+            "exact": true,
+            "query": "Black Bottle"
+          }
+        ]
+      },
+      {
+        "kind": "brand",
+        "name": "Old Charter",
+        "score": 1,
+        "source": ["exact", "text", "prefix", "contained"],
+        "entityId": 3565,
+        "reference": "Old Charter",
+        "shortName": null,
+        "retrievedFor": [
+          {
+            "exact": true,
+            "query": "Old Charter"
+          },
+          {
+            "query": "Old Charter Distillery Co."
+          }
+        ]
+      },
+      {
+        "kind": "bottler",
+        "name": "Old Charter Distillery Co.",
+        "score": 1,
+        "source": ["text", "prefix", "exact", "contained"],
+        "entityId": 365791,
+        "reference": "Old Charter Distillery Co.",
+        "shortName": null,
+        "retrievedFor": [
+          {
+            "query": "Old Charter"
+          },
+          {
+            "exact": true,
+            "query": "Old Charter Distillery Co."
+          }
+        ]
+      },
+      {
+        "kind": "brand",
+        "name": "Highland Fusilier",
+        "score": 1,
+        "source": ["exact", "text", "prefix", "contained"],
+        "entityId": 1027,
+        "reference": "Highland Fusilier",
+        "shortName": null,
+        "retrievedFor": [
+          {
+            "exact": true,
+            "query": "Highland Fusilier"
+          }
+        ]
+      },
+      {
+        "kind": "bottler",
+        "name": "Gordon & MacPhail",
+        "score": 1,
+        "source": ["exact", "text", "prefix", "contained"],
+        "entityId": 5645,
+        "reference": "Gordon & MacPhail",
+        "shortName": null,
+        "retrievedFor": [
+          {
+            "exact": true,
+            "query": "Gordon & MacPhail"
+          }
+        ]
+      },
+      {
+        "kind": "brand",
+        "name": "Old Williamsburg",
+        "score": 1,
+        "source": ["exact", "text", "prefix", "contained"],
+        "entityId": 365994,
+        "reference": "Old Williamsburg",
+        "shortName": null,
+        "retrievedFor": [
+          {
+            "exact": true,
+            "query": "Old Williamsburg"
+          }
+        ]
+      },
+      {
+        "kind": "brand",
+        "name": "Grábrók",
+        "score": 1,
+        "source": ["exact", "text", "prefix", "contained"],
+        "entityId": 365866,
+        "reference": "Grábrók",
+        "shortName": null,
+        "retrievedFor": [
+          {
+            "exact": true,
+            "query": "Grábrók"
+          }
+        ]
+      },
+      {
+        "kind": "distillery",
+        "name": "Black Bottle Distillery",
+        "score": 0.5,
+        "source": ["text", "prefix"],
+        "entityId": 367626,
+        "reference": "Black Bottle Distillery",
+        "shortName": null,
+        "retrievedFor": [
+          {
+            "query": "Black Bottle"
+          }
+        ]
+      }
+    ],
+    "inspectedSeries": []
+  },
+  "provenance": {
+    "source": "production_miss",
+    "verifiedSourceUrls": [
+      "https://www.scotchwhiskyauctions.com/auctions/234-the-185th-auction/904787-macallan-10-year-old/",
+      "https://d3suvtcq00dftb.cloudfront.net/images/97a88cf38d2719a17d848c84b366778c-zoom.jpg"
+    ],
+    "dbOutcome": {
+      "bottleId": null,
+      "createsBottle": false,
+      "summary": "Production returned no_match: the title and 40% did not separate Sherry Oak 10 (1105) from Fine Oak 10 (5182) and two other 10-year-old releases."
+    },
+    "notes": "Saved check 36026, source auction_lot 16615 (lot 185-904787, lot number 185-01610). This is a second 'Macallan 10 Year Old' lot in the same auction, not lot 16620 judged earlier. Its page text says only '10 Years Old', '40% ABV / 70cl' and that the 10-year-old was discontinued in 2013; it does not say Sherry Oak, so the photo is what settles it. This case therefore follows the photo-case pattern even though the fixture id says 'page': input.reference.imageUrl is set to the lot's first photo at full size, and the evidence pack gets that photo's reviewed reading. Production ran without the photo; this case goes in with the change that makes auctions read the lot photo. The photo clearly shows the bottle and carton: The Macallan, Highland Single Malt Scotch Whisky, 10 Ten Years Old, 'Exclusively matured in selected sherry oak casks from Jerez, Spain', 700 ml. The bottle's ABV print is too small to read with confidence, so the reading leaves abv empty; the scraper's 40% stays in extractedIdentity. 1105 is The Macallan 10-year-old, Series Sherry Oak Collection, 40%. 5182 is the Fine Oak 10-year-old at 40%; 69113 and 69121 are special releases."
+  },
+  "expected": {
+    "status": "classified",
+    "action": "match",
+    "identityScope": "product",
+    "matchedBottleId": 1105,
+    "summary": "Match The Macallan 10-year-old in the Sherry Oak range (1105). The label prints 'exclusively matured in selected sherry oak casks from Jerez, Spain', which rules out the Fine Oak 10 (5182) at the same age and ABV."
+  },
+  "knownFailure": {
+    "reason": "With the label photo printing sherry oak, the agent still can't choose between Sherry Oak and Fine Oak."
+  }
+}

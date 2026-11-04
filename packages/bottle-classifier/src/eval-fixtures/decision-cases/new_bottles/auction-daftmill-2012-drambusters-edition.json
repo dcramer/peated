@@ -1,0 +1,2087 @@
+{
+  "id": "auction-daftmill-2012-drambusters-edition",
+  "name": "auction lot: the Daftmill 2012 single cask create keeps the printed 'for The Drambusters' selection in edition",
+  "input": {
+    "reference": {
+      "id": 14809,
+      "url": "https://www.scotchwhiskyauctions.com/auctions/234-the-185th-auction/906947-daftmill-2012-single-cask-86-for-the-drambusters/",
+      "name": "Daftmill 2012 Single Cask #86 For The Drambusters",
+      "imageUrl": null,
+      "externalSiteId": 28097,
+      "currentBottleId": null
+    },
+    "extractedIdentity": {
+      "abv": 57.7,
+      "brand": null,
+      "series": null,
+      "bottler": null,
+      "edition": null,
+      "outturn": 341,
+      "category": null,
+      "distillery": null,
+      "expression": null,
+      "maturation": null,
+      "stated_age": null,
+      "cask_number": "086",
+      "single_cask": null,
+      "release_year": null,
+      "vintage_year": null,
+      "cask_strength": null
+    },
+    "imageEvidence": null,
+    "initialCandidates": [
+      {
+        "abv": 57,
+        "brand": "Kilchoman",
+        "score": 58.47985,
+        "series": null,
+        "source": ["text"],
+        "bottler": null,
+        "edition": "for Beija-Flor",
+        "outturn": 268,
+        "bottleId": 59919,
+        "category": "single_malt",
+        "fullName": "Kilchoman PX Finish Single Cask 42/2012 - for Beija-Flor",
+        "reference": null,
+        "statedAge": 5,
+        "caskNumber": "42/2012",
+        "comparison": {
+          "missing": ["caskStrength"],
+          "conflicts": ["abv", "caskNumber", "brand", "distillers"],
+          "agreements": ["category", "vintageYear", "singleCask"]
+        },
+        "distillery": ["Kilchoman"],
+        "maturation": "1st Fill Ex-Bourbon Barrel, PX Finish",
+        "releaseDay": null,
+        "singleCask": true,
+        "releaseYear": null,
+        "vintageYear": 2012,
+        "bottlingYear": 2017,
+        "caskStrength": null,
+        "releaseMonth": null,
+        "familyContext": {
+          "siblingBottles": []
+        }
+      },
+      {
+        "abv": 55.6,
+        "brand": "Kilchoman",
+        "score": 58.322014,
+        "series": null,
+        "source": ["text"],
+        "bottler": null,
+        "edition": "for HNWS Taiwan",
+        "outturn": 270,
+        "bottleId": 59985,
+        "category": "single_malt",
+        "fullName": "Kilchoman PX Finish Single Cask 626/2012 - for HNWS Taiwan",
+        "reference": null,
+        "statedAge": 6,
+        "caskNumber": "626/2012",
+        "comparison": {
+          "missing": ["caskStrength"],
+          "conflicts": ["abv", "caskNumber", "brand", "distillers"],
+          "agreements": ["category", "vintageYear", "singleCask"]
+        },
+        "distillery": ["Kilchoman"],
+        "maturation": "1st Fill Ex-Bourbon Barrel, PX Sherry Finish",
+        "releaseDay": null,
+        "singleCask": true,
+        "releaseYear": null,
+        "vintageYear": 2012,
+        "bottlingYear": 2018,
+        "caskStrength": null,
+        "releaseMonth": null,
+        "familyContext": {
+          "siblingBottles": []
+        }
+      },
+      {
+        "abv": 56.5,
+        "brand": "Kilchoman",
+        "score": 57.96063,
+        "series": null,
+        "source": ["text"],
+        "bottler": null,
+        "edition": "for Berry Bros. & Rudd",
+        "outturn": 326,
+        "bottleId": 59973,
+        "category": "single_malt",
+        "fullName": "Kilchoman \"unpeated\" Sherry Hogshead 553/2012 - for Berry Bros. & Rudd",
+        "reference": null,
+        "statedAge": 7,
+        "caskNumber": "553/2012",
+        "comparison": {
+          "missing": ["caskStrength"],
+          "conflicts": ["abv", "caskNumber", "brand", "distillers"],
+          "agreements": ["category", "vintageYear", "singleCask"]
+        },
+        "distillery": ["Kilchoman"],
+        "maturation": "Oloroso Sherry Hogshead",
+        "releaseDay": null,
+        "singleCask": true,
+        "releaseYear": null,
+        "vintageYear": 2012,
+        "bottlingYear": 2019,
+        "caskStrength": null,
+        "releaseMonth": null,
+        "familyContext": {
+          "siblingBottles": []
+        }
+      },
+      {
+        "abv": 57,
+        "brand": "Kilchoman",
+        "score": 57.776577,
+        "series": null,
+        "source": ["text"],
+        "bottler": null,
+        "edition": "for The Malt Vault, 1st Anniversary",
+        "outturn": 260,
+        "bottleId": 59918,
+        "category": "single_malt",
+        "fullName": "Kilchoman PX Sherry Finish Single Cask 41/2012 - for The Malt Vault, 1st Anniversary",
+        "reference": null,
+        "statedAge": 6,
+        "caskNumber": "41/2012",
+        "comparison": {
+          "missing": ["caskStrength"],
+          "conflicts": ["abv", "caskNumber", "brand", "distillers"],
+          "agreements": ["category", "vintageYear", "singleCask"]
+        },
+        "distillery": ["Kilchoman"],
+        "maturation": "1st Fill Ex-Bourbon Barrel, PX Finish",
+        "releaseDay": null,
+        "singleCask": true,
+        "releaseYear": null,
+        "vintageYear": 2012,
+        "bottlingYear": 2018,
+        "caskStrength": null,
+        "releaseMonth": null,
+        "familyContext": {
+          "siblingBottles": []
+        }
+      },
+      {
+        "abv": 58.5,
+        "brand": "Kilchoman",
+        "score": 56.887215,
+        "series": null,
+        "source": ["text"],
+        "bottler": null,
+        "edition": "for Warehouse Liquors (Chicago)",
+        "outturn": null,
+        "bottleId": 59937,
+        "category": "single_malt",
+        "fullName": "Kilchoman Sherry Hogshead Single Cask 204/2012 - for Warehouse Liquors (Chicago)",
+        "reference": null,
+        "statedAge": 7,
+        "caskNumber": "204/2012",
+        "comparison": {
+          "missing": ["caskStrength"],
+          "conflicts": ["abv", "caskNumber", "brand", "distillers"],
+          "agreements": ["category", "vintageYear", "singleCask"]
+        },
+        "distillery": ["Kilchoman"],
+        "maturation": "Oloroso Sherry Hogshead",
+        "releaseDay": null,
+        "singleCask": true,
+        "releaseYear": null,
+        "vintageYear": 2012,
+        "bottlingYear": 2019,
+        "caskStrength": null,
+        "releaseMonth": null,
+        "familyContext": {
+          "siblingBottles": []
+        }
+      },
+      {
+        "abv": 61.1,
+        "brand": "GlenAllachie",
+        "score": 55.26103,
+        "series": null,
+        "source": ["text"],
+        "bottler": null,
+        "edition": null,
+        "outturn": 358,
+        "bottleId": 67009,
+        "category": "single_malt",
+        "fullName": "GlenAllachie 11-year-old 2012 - PX Hogshead",
+        "reference": null,
+        "statedAge": 11,
+        "caskNumber": "3033",
+        "comparison": {
+          "missing": ["caskStrength", "edition"],
+          "conflicts": ["abv", "caskNumber", "brand", "distillers"],
+          "agreements": ["category", "vintageYear", "singleCask"]
+        },
+        "distillery": ["GlenAllachie"],
+        "maturation": "Pedro Ximénez sherry hogshead",
+        "releaseDay": null,
+        "singleCask": true,
+        "releaseYear": null,
+        "vintageYear": 2012,
+        "bottlingYear": 2024,
+        "caskStrength": null,
+        "releaseMonth": null,
+        "familyContext": {
+          "siblingBottles": []
+        }
+      },
+      {
+        "abv": 56.3,
+        "brand": "Kilchoman",
+        "score": 53.923668,
+        "series": null,
+        "source": ["text"],
+        "bottler": null,
+        "edition": "for Cinderella Whisky Fair 2020",
+        "outturn": 331,
+        "bottleId": 60693,
+        "category": "single_malt",
+        "fullName": "Kilchoman \"unpeated\" Sherry Hogshead Single Cask 554/2012 - for Cinderella Whisky Fair 2020",
+        "reference": null,
+        "statedAge": 7,
+        "caskNumber": "554/2012",
+        "comparison": {
+          "missing": ["caskStrength"],
+          "conflicts": ["abv", "caskNumber", "brand", "distillers"],
+          "agreements": ["category", "vintageYear", "singleCask"]
+        },
+        "distillery": ["Kilchoman"],
+        "maturation": "Oloroso Sherry Hogshead",
+        "releaseDay": null,
+        "singleCask": true,
+        "releaseYear": null,
+        "vintageYear": 2012,
+        "bottlingYear": 2019,
+        "caskStrength": null,
+        "releaseMonth": null,
+        "familyContext": {
+          "siblingBottles": []
+        }
+      },
+      {
+        "abv": 58.6,
+        "brand": "Adelphi",
+        "score": 53.222946,
+        "series": null,
+        "source": ["text"],
+        "bottler": "Adelphi",
+        "edition": null,
+        "outturn": 234,
+        "bottleId": 47590,
+        "category": "single_malt",
+        "fullName": "Adelphi Benriach 2012",
+        "reference": null,
+        "statedAge": 13,
+        "caskNumber": "38",
+        "comparison": {
+          "missing": ["edition"],
+          "conflicts": ["abv", "caskNumber", "brand", "distillers"],
+          "agreements": [
+            "category",
+            "vintageYear",
+            "caskStrength",
+            "singleCask"
+          ]
+        },
+        "distillery": ["BenRiach"],
+        "maturation": "first-fill PX sherry cask",
+        "releaseDay": null,
+        "singleCask": true,
+        "releaseYear": 2025,
+        "vintageYear": 2012,
+        "bottlingYear": null,
+        "caskStrength": true,
+        "releaseMonth": null,
+        "familyContext": {
+          "siblingBottles": []
+        }
+      },
+      {
+        "abv": 56.4,
+        "brand": "Kilchoman",
+        "score": 53.13633,
+        "series": null,
+        "source": ["text"],
+        "bottler": null,
+        "edition": "for Y´s Cask, Toko – Tokyo",
+        "outturn": null,
+        "bottleId": 59917,
+        "category": "single_malt",
+        "fullName": "Kilchoman PX Finish Single Cask 39/2012 - for Y´s Cask, Toko – Tokyo",
+        "reference": null,
+        "statedAge": 6,
+        "caskNumber": "39/2012",
+        "comparison": {
+          "missing": ["caskStrength"],
+          "conflicts": ["abv", "caskNumber", "brand", "distillers"],
+          "agreements": ["category", "vintageYear", "singleCask"]
+        },
+        "distillery": ["Kilchoman"],
+        "maturation": "Ex-Bourbon Barrel, PX Sherry Finish",
+        "releaseDay": null,
+        "singleCask": true,
+        "releaseYear": null,
+        "vintageYear": 2012,
+        "bottlingYear": 2018,
+        "caskStrength": null,
+        "releaseMonth": null,
+        "familyContext": {
+          "siblingBottles": []
+        }
+      },
+      {
+        "abv": 57,
+        "brand": "Kilchoman",
+        "score": 51.55766,
+        "series": null,
+        "source": ["text"],
+        "bottler": null,
+        "edition": "for The Liquor Control Board of Ontario",
+        "outturn": null,
+        "bottleId": 59915,
+        "category": "single_malt",
+        "fullName": "Kilchoman PX Finish Single Cask 37/2012 - for The Liquor Control Board of Ontario",
+        "reference": null,
+        "statedAge": 5,
+        "caskNumber": "37/2012",
+        "comparison": {
+          "missing": ["caskStrength"],
+          "conflicts": ["abv", "caskNumber", "brand", "distillers"],
+          "agreements": ["category", "vintageYear", "singleCask"]
+        },
+        "distillery": ["Kilchoman"],
+        "maturation": "Ex-Bourbon Barrel, PX Sherry Finish",
+        "releaseDay": null,
+        "singleCask": true,
+        "releaseYear": null,
+        "vintageYear": 2012,
+        "bottlingYear": 2018,
+        "caskStrength": null,
+        "releaseMonth": null,
+        "familyContext": {
+          "siblingBottles": []
+        }
+      },
+      {
+        "abv": 56.2,
+        "brand": "Kilchoman",
+        "score": 51.291138,
+        "series": null,
+        "source": ["text"],
+        "bottler": null,
+        "edition": "for Jack Rose Dining Saloon (Washington, DC)",
+        "outturn": null,
+        "bottleId": 59974,
+        "category": "single_malt",
+        "fullName": "Kilchoman Slightly Peated Sherry Hogshead 555/2012 - for Jack Rose Dining Saloon (Washington, DC)",
+        "reference": null,
+        "statedAge": 7,
+        "caskNumber": "555/2012",
+        "comparison": {
+          "missing": ["caskStrength"],
+          "conflicts": ["abv", "caskNumber", "brand", "distillers"],
+          "agreements": ["category", "vintageYear", "singleCask"]
+        },
+        "distillery": ["Kilchoman"],
+        "maturation": "Oloroso Sherry Hogshead",
+        "releaseDay": null,
+        "singleCask": true,
+        "releaseYear": null,
+        "vintageYear": 2012,
+        "bottlingYear": 2020,
+        "caskStrength": null,
+        "releaseMonth": null,
+        "familyContext": {
+          "siblingBottles": []
+        }
+      },
+      {
+        "abv": 56,
+        "brand": "Kilchoman",
+        "score": 50.99215,
+        "series": null,
+        "source": ["text"],
+        "bottler": null,
+        "edition": "for The W Club",
+        "outturn": 258,
+        "bottleId": 59942,
+        "category": "single_malt",
+        "fullName": "Kilchoman Pedro Ximénez Sherry Cask Finish 237/2012 - for The W Club",
+        "reference": null,
+        "statedAge": 8,
+        "caskNumber": "237/2012",
+        "comparison": {
+          "missing": ["caskStrength"],
+          "conflicts": ["abv", "caskNumber", "brand", "distillers"],
+          "agreements": ["category", "vintageYear", "singleCask"]
+        },
+        "distillery": ["Kilchoman"],
+        "maturation": "1st Fill Ex-Bourbon Barrel, PX Sherry Cask Finish",
+        "releaseDay": null,
+        "singleCask": true,
+        "releaseYear": null,
+        "vintageYear": 2012,
+        "bottlingYear": 2021,
+        "caskStrength": null,
+        "releaseMonth": null,
+        "familyContext": {
+          "siblingBottles": []
+        }
+      },
+      {
+        "abv": 57.7,
+        "brand": "Kilchoman",
+        "score": 48.542152,
+        "series": null,
+        "source": ["text"],
+        "bottler": null,
+        "edition": "for Spec´s",
+        "outturn": null,
+        "bottleId": 60317,
+        "category": "single_malt",
+        "fullName": "Kilchoman Rum Finish Single Cask 213/2012 - for Spec´s",
+        "reference": null,
+        "statedAge": 6,
+        "caskNumber": "213/2012",
+        "comparison": {
+          "missing": [],
+          "conflicts": ["caskNumber", "brand", "distillers"],
+          "agreements": ["category", "abv", "vintageYear", "singleCask"]
+        },
+        "distillery": ["Kilchoman"],
+        "maturation": "Ex-Bourbon Barrel, Barbados Rum Cask Finish",
+        "releaseDay": null,
+        "singleCask": true,
+        "releaseYear": null,
+        "vintageYear": 2012,
+        "bottlingYear": 2019,
+        "caskStrength": null,
+        "releaseMonth": null,
+        "familyContext": {
+          "siblingBottles": []
+        }
+      },
+      {
+        "abv": 57.7,
+        "brand": "Kilchoman",
+        "score": 47.06091,
+        "series": null,
+        "source": ["text"],
+        "bottler": null,
+        "edition": "for Whisk-e Ltd, Japan",
+        "outturn": null,
+        "bottleId": 59921,
+        "category": "single_malt",
+        "fullName": "Kilchoman Single Bourbon Cask 80/2012 - for Whisk-e Ltd, Japan",
+        "reference": null,
+        "statedAge": 5,
+        "caskNumber": "80/2012",
+        "comparison": {
+          "missing": ["caskStrength"],
+          "conflicts": ["caskNumber", "brand", "distillers"],
+          "agreements": ["category", "abv", "vintageYear", "singleCask"]
+        },
+        "distillery": ["Kilchoman"],
+        "maturation": "Ex-Bourbon Barrel",
+        "releaseDay": null,
+        "singleCask": true,
+        "releaseYear": null,
+        "vintageYear": 2012,
+        "bottlingYear": 2017,
+        "caskStrength": null,
+        "releaseMonth": null,
+        "familyContext": {
+          "siblingBottles": []
+        }
+      },
+      {
+        "abv": 53,
+        "brand": "Decadent Drams",
+        "score": 46.911995,
+        "series": null,
+        "source": ["text"],
+        "bottler": "Decadent Drinks",
+        "edition": null,
+        "outturn": null,
+        "bottleId": 47416,
+        "category": "single_malt",
+        "fullName": "Decadent Drams Ben Nevis 2012",
+        "reference": null,
+        "statedAge": 12,
+        "caskNumber": null,
+        "comparison": {
+          "missing": ["caskStrength", "edition", "caskNumber"],
+          "conflicts": ["abv", "brand", "distillers"],
+          "agreements": ["category", "vintageYear", "singleCask"]
+        },
+        "distillery": ["Ben Nevis"],
+        "maturation": "Plain oak, then five years additionally in fresh sherrywood",
+        "releaseDay": null,
+        "singleCask": true,
+        "releaseYear": 2025,
+        "vintageYear": 2012,
+        "bottlingYear": 2025,
+        "caskStrength": null,
+        "releaseMonth": null,
+        "familyContext": {
+          "siblingBottles": []
+        }
+      },
+      {
+        "abv": 48.2,
+        "brand": "Edradour",
+        "score": 46.052685,
+        "series": null,
+        "source": ["text"],
+        "bottler": null,
+        "edition": null,
+        "outturn": null,
+        "bottleId": 45602,
+        "category": "single_malt",
+        "fullName": "Edradour Small Batch Sauternes Cask - 11-year-old - 2012 Vintage - 48.2% ABV - Sauternes Cask - Hogshead - 1st Fill",
+        "reference": null,
+        "statedAge": 11,
+        "caskNumber": null,
+        "comparison": {
+          "missing": ["caskStrength", "singleCask", "edition", "caskNumber"],
+          "conflicts": ["abv", "brand", "distillers"],
+          "agreements": ["category", "vintageYear"]
+        },
+        "distillery": ["Edradour"],
+        "maturation": "sauternes",
+        "releaseDay": null,
+        "singleCask": null,
+        "releaseYear": null,
+        "vintageYear": 2012,
+        "bottlingYear": null,
+        "caskStrength": null,
+        "releaseMonth": null,
+        "familyContext": {
+          "siblingBottles": []
+        }
+      },
+      {
+        "abv": 48.2,
+        "brand": "GreatDrams",
+        "score": 45.9673,
+        "series": null,
+        "source": ["text"],
+        "bottler": "GreatDrams",
+        "edition": null,
+        "outturn": null,
+        "bottleId": 46214,
+        "category": "single_malt",
+        "fullName": "GreatDrams Benrinnes 2012",
+        "reference": null,
+        "statedAge": 9,
+        "caskNumber": null,
+        "comparison": {
+          "missing": ["caskStrength", "singleCask", "edition", "caskNumber"],
+          "conflicts": ["abv", "brand", "distillers"],
+          "agreements": ["category", "vintageYear"]
+        },
+        "distillery": ["Benrinnes"],
+        "maturation": "oloroso",
+        "releaseDay": null,
+        "singleCask": null,
+        "releaseYear": null,
+        "vintageYear": 2012,
+        "bottlingYear": null,
+        "caskStrength": null,
+        "releaseMonth": null,
+        "familyContext": {
+          "siblingBottles": []
+        }
+      },
+      {
+        "abv": 59,
+        "brand": "Clydebuilt",
+        "score": 45.84607,
+        "series": null,
+        "source": ["text"],
+        "bottler": "Ardgowan",
+        "edition": null,
+        "outturn": null,
+        "bottleId": 46645,
+        "category": "single_malt",
+        "fullName": "Clydebuilt 2012 Oloroso Single Cask",
+        "reference": null,
+        "statedAge": null,
+        "caskNumber": "76",
+        "comparison": {
+          "missing": ["caskStrength", "edition", "distillers"],
+          "conflicts": ["abv", "caskNumber", "brand"],
+          "agreements": ["category", "vintageYear", "singleCask"]
+        },
+        "distillery": [],
+        "maturation": "oloroso",
+        "releaseDay": null,
+        "singleCask": true,
+        "releaseYear": null,
+        "vintageYear": 2012,
+        "bottlingYear": null,
+        "caskStrength": null,
+        "releaseMonth": null,
+        "familyContext": {
+          "siblingBottles": []
+        }
+      },
+      {
+        "abv": 57.7,
+        "brand": "The Scotch Malt Whisky Society",
+        "score": 43.984436,
+        "series": null,
+        "source": ["text"],
+        "bottler": "The Scotch Malt Whisky Society",
+        "edition": null,
+        "outturn": null,
+        "bottleId": 43547,
+        "category": "single_malt",
+        "fullName": "SMWS 59.92 To top it off",
+        "reference": null,
+        "statedAge": 13,
+        "caskNumber": "59.92",
+        "comparison": {
+          "missing": ["edition"],
+          "conflicts": ["caskNumber", "brand", "distillers"],
+          "agreements": ["category", "abv", "vintageYear", "singleCask"]
+        },
+        "distillery": ["Teaninich"],
+        "maturation": "1st fill ex-bourbon hogshead",
+        "releaseDay": 4,
+        "singleCask": true,
+        "releaseYear": 2025,
+        "vintageYear": 2012,
+        "bottlingYear": null,
+        "caskStrength": null,
+        "releaseMonth": 7,
+        "familyContext": {
+          "siblingBottles": []
+        }
+      },
+      {
+        "abv": null,
+        "brand": "Daftmill",
+        "score": 32.959824,
+        "series": null,
+        "source": ["vector", "text"],
+        "bottler": null,
+        "edition": null,
+        "outturn": null,
+        "bottleId": 14114,
+        "category": "single_malt",
+        "fullName": "Daftmill Inaugural Release 2005",
+        "reference": "Daftmill Inaugural Release 2005, 55.8%",
+        "statedAge": null,
+        "caskNumber": null,
+        "comparison": {
+          "missing": [
+            "abv",
+            "vintageYear",
+            "singleCask",
+            "edition",
+            "caskNumber"
+          ],
+          "conflicts": [],
+          "agreements": ["category", "brand", "distillers"]
+        },
+        "distillery": ["Daftmill"],
+        "maturation": null,
+        "releaseDay": null,
+        "singleCask": null,
+        "releaseYear": null,
+        "vintageYear": null,
+        "bottlingYear": null,
+        "caskStrength": null,
+        "releaseMonth": null,
+        "familyContext": {
+          "siblingBottles": []
+        }
+      },
+      {
+        "abv": null,
+        "brand": "Daftmill",
+        "score": 32.78163,
+        "series": null,
+        "source": ["vector", "text"],
+        "bottler": null,
+        "edition": null,
+        "outturn": null,
+        "bottleId": 1708,
+        "category": "single_malt",
+        "fullName": "Daftmill 2010 Summer (Batch Release)",
+        "reference": "Daftmill 2010 Summer Release",
+        "statedAge": 10,
+        "caskNumber": null,
+        "comparison": {
+          "missing": [
+            "abv",
+            "vintageYear",
+            "singleCask",
+            "edition",
+            "caskNumber"
+          ],
+          "conflicts": [],
+          "agreements": ["category", "brand", "distillers"]
+        },
+        "distillery": ["Daftmill"],
+        "maturation": null,
+        "releaseDay": null,
+        "singleCask": null,
+        "releaseYear": null,
+        "vintageYear": null,
+        "bottlingYear": null,
+        "caskStrength": null,
+        "releaseMonth": null,
+        "familyContext": {
+          "siblingBottles": []
+        }
+      },
+      {
+        "abv": null,
+        "brand": "Daftmill",
+        "score": 32.38432,
+        "series": null,
+        "source": ["text"],
+        "bottler": null,
+        "edition": null,
+        "outturn": null,
+        "bottleId": 2765,
+        "category": "single_malt",
+        "fullName": "Daftmill 2006 Winter (Batch Release)",
+        "reference": null,
+        "statedAge": null,
+        "caskNumber": null,
+        "comparison": {
+          "missing": [
+            "abv",
+            "vintageYear",
+            "singleCask",
+            "edition",
+            "caskNumber"
+          ],
+          "conflicts": [],
+          "agreements": ["category", "brand", "distillers"]
+        },
+        "distillery": ["Daftmill"],
+        "maturation": null,
+        "releaseDay": null,
+        "singleCask": null,
+        "releaseYear": null,
+        "vintageYear": null,
+        "bottlingYear": null,
+        "caskStrength": null,
+        "releaseMonth": null,
+        "familyContext": {
+          "siblingBottles": []
+        }
+      },
+      {
+        "abv": null,
+        "brand": "Daftmill",
+        "score": 32.094364,
+        "series": null,
+        "source": ["text"],
+        "bottler": null,
+        "edition": null,
+        "outturn": null,
+        "bottleId": 2764,
+        "category": "single_malt",
+        "fullName": "Daftmill 2006 Summer (Batch Release)",
+        "reference": null,
+        "statedAge": 12,
+        "caskNumber": null,
+        "comparison": {
+          "missing": [
+            "abv",
+            "vintageYear",
+            "singleCask",
+            "edition",
+            "caskNumber"
+          ],
+          "conflicts": [],
+          "agreements": ["category", "brand", "distillers"]
+        },
+        "distillery": ["Daftmill"],
+        "maturation": null,
+        "releaseDay": null,
+        "singleCask": null,
+        "releaseYear": null,
+        "vintageYear": null,
+        "bottlingYear": null,
+        "caskStrength": null,
+        "releaseMonth": null,
+        "familyContext": {
+          "siblingBottles": []
+        }
+      },
+      {
+        "abv": null,
+        "brand": "Daftmill",
+        "score": 32.094364,
+        "series": null,
+        "source": ["text"],
+        "bottler": null,
+        "edition": null,
+        "outturn": null,
+        "bottleId": 2408,
+        "category": "single_malt",
+        "fullName": "Daftmill 2007 Winter (Batch Release)",
+        "reference": null,
+        "statedAge": 12,
+        "caskNumber": null,
+        "comparison": {
+          "missing": [
+            "abv",
+            "vintageYear",
+            "singleCask",
+            "edition",
+            "caskNumber"
+          ],
+          "conflicts": [],
+          "agreements": ["category", "brand", "distillers"]
+        },
+        "distillery": ["Daftmill"],
+        "maturation": null,
+        "releaseDay": null,
+        "singleCask": null,
+        "releaseYear": null,
+        "vintageYear": null,
+        "bottlingYear": null,
+        "caskStrength": null,
+        "releaseMonth": null,
+        "familyContext": {
+          "siblingBottles": []
+        }
+      },
+      {
+        "abv": null,
+        "brand": "Daftmill",
+        "score": 32.094364,
+        "series": null,
+        "source": ["text"],
+        "bottler": null,
+        "edition": null,
+        "outturn": null,
+        "bottleId": 2410,
+        "category": "single_malt",
+        "fullName": "Daftmill 2008 Summer (Batch Release)",
+        "reference": null,
+        "statedAge": 12,
+        "caskNumber": null,
+        "comparison": {
+          "missing": [
+            "abv",
+            "vintageYear",
+            "singleCask",
+            "edition",
+            "caskNumber"
+          ],
+          "conflicts": [],
+          "agreements": ["category", "brand", "distillers"]
+        },
+        "distillery": ["Daftmill"],
+        "maturation": null,
+        "releaseDay": null,
+        "singleCask": null,
+        "releaseYear": null,
+        "vintageYear": null,
+        "bottlingYear": null,
+        "caskStrength": null,
+        "releaseMonth": null,
+        "familyContext": {
+          "siblingBottles": []
+        }
+      },
+      {
+        "abv": null,
+        "brand": "Daftmill",
+        "score": 32.094364,
+        "series": null,
+        "source": ["text"],
+        "bottler": null,
+        "edition": null,
+        "outturn": null,
+        "bottleId": 2026,
+        "category": "single_malt",
+        "fullName": "Daftmill 2008 Winter (Batch Release)",
+        "reference": null,
+        "statedAge": 12,
+        "caskNumber": null,
+        "comparison": {
+          "missing": [
+            "abv",
+            "vintageYear",
+            "singleCask",
+            "edition",
+            "caskNumber"
+          ],
+          "conflicts": [],
+          "agreements": ["category", "brand", "distillers"]
+        },
+        "distillery": ["Daftmill"],
+        "maturation": null,
+        "releaseDay": null,
+        "singleCask": null,
+        "releaseYear": null,
+        "vintageYear": null,
+        "bottlingYear": null,
+        "caskStrength": null,
+        "releaseMonth": null,
+        "familyContext": {
+          "siblingBottles": []
+        }
+      },
+      {
+        "abv": null,
+        "brand": "Daftmill",
+        "score": 32.094364,
+        "series": null,
+        "source": ["text"],
+        "bottler": null,
+        "edition": null,
+        "outturn": null,
+        "bottleId": 2027,
+        "category": "single_malt",
+        "fullName": "Daftmill 2009 Summer (Batch Release)",
+        "reference": null,
+        "statedAge": 10,
+        "caskNumber": null,
+        "comparison": {
+          "missing": [
+            "abv",
+            "vintageYear",
+            "singleCask",
+            "edition",
+            "caskNumber"
+          ],
+          "conflicts": [],
+          "agreements": ["category", "brand", "distillers"]
+        },
+        "distillery": ["Daftmill"],
+        "maturation": null,
+        "releaseDay": null,
+        "singleCask": null,
+        "releaseYear": null,
+        "vintageYear": null,
+        "bottlingYear": null,
+        "caskStrength": null,
+        "releaseMonth": null,
+        "familyContext": {
+          "siblingBottles": []
+        }
+      },
+      {
+        "abv": null,
+        "brand": "Daftmill",
+        "score": 30.151794,
+        "series": null,
+        "source": ["text"],
+        "bottler": null,
+        "edition": null,
+        "outturn": null,
+        "bottleId": 2024,
+        "category": "single_malt",
+        "fullName": "Daftmill 2006 Single Cask",
+        "reference": null,
+        "statedAge": 14,
+        "caskNumber": null,
+        "comparison": {
+          "missing": ["abv", "vintageYear", "edition", "caskNumber"],
+          "conflicts": [],
+          "agreements": ["category", "singleCask", "brand", "distillers"]
+        },
+        "distillery": ["Daftmill"],
+        "maturation": null,
+        "releaseDay": null,
+        "singleCask": true,
+        "releaseYear": null,
+        "vintageYear": null,
+        "bottlingYear": null,
+        "caskStrength": null,
+        "releaseMonth": null,
+        "familyContext": {
+          "siblingBottles": []
+        }
+      },
+      {
+        "abv": null,
+        "brand": "Daftmill",
+        "score": 30.151794,
+        "series": null,
+        "source": ["text"],
+        "bottler": null,
+        "edition": null,
+        "outturn": null,
+        "bottleId": 1707,
+        "category": "single_malt",
+        "fullName": "Daftmill 2008 Single Cask",
+        "reference": null,
+        "statedAge": 12,
+        "caskNumber": null,
+        "comparison": {
+          "missing": ["abv", "vintageYear", "edition", "caskNumber"],
+          "conflicts": [],
+          "agreements": ["category", "singleCask", "brand", "distillers"]
+        },
+        "distillery": ["Daftmill"],
+        "maturation": null,
+        "releaseDay": null,
+        "singleCask": true,
+        "releaseYear": null,
+        "vintageYear": null,
+        "bottlingYear": null,
+        "caskStrength": null,
+        "releaseMonth": null,
+        "familyContext": {
+          "siblingBottles": []
+        }
+      },
+      {
+        "abv": null,
+        "brand": "Daftmill",
+        "score": 30.151794,
+        "series": null,
+        "source": ["text"],
+        "bottler": null,
+        "edition": null,
+        "outturn": null,
+        "bottleId": 1391,
+        "category": "single_malt",
+        "fullName": "Daftmill 2009 Single Cask",
+        "reference": null,
+        "statedAge": 12,
+        "caskNumber": null,
+        "comparison": {
+          "missing": ["abv", "vintageYear", "edition", "caskNumber"],
+          "conflicts": [],
+          "agreements": ["category", "singleCask", "brand", "distillers"]
+        },
+        "distillery": ["Daftmill"],
+        "maturation": null,
+        "releaseDay": null,
+        "singleCask": true,
+        "releaseYear": null,
+        "vintageYear": null,
+        "bottlingYear": null,
+        "caskStrength": null,
+        "releaseMonth": null,
+        "familyContext": {
+          "siblingBottles": []
+        }
+      },
+      {
+        "abv": null,
+        "brand": "Daftmill",
+        "score": 29.553448,
+        "series": null,
+        "source": ["vector", "text"],
+        "bottler": null,
+        "edition": null,
+        "outturn": null,
+        "bottleId": 13532,
+        "category": "single_malt",
+        "fullName": "Daftmill 12-year-old (Summer 2006 Batch)",
+        "reference": "Daftmill 12-year-old (Summer 2006 Batch), 46%",
+        "statedAge": 12,
+        "caskNumber": null,
+        "comparison": {
+          "missing": [
+            "abv",
+            "vintageYear",
+            "singleCask",
+            "edition",
+            "caskNumber"
+          ],
+          "conflicts": [],
+          "agreements": ["category", "brand", "distillers"]
+        },
+        "distillery": ["Daftmill"],
+        "maturation": null,
+        "releaseDay": null,
+        "singleCask": null,
+        "releaseYear": null,
+        "vintageYear": null,
+        "bottlingYear": null,
+        "caskStrength": null,
+        "releaseMonth": null,
+        "familyContext": {
+          "siblingBottles": []
+        }
+      },
+      {
+        "abv": null,
+        "brand": "Daftmill",
+        "score": 29.47107,
+        "series": null,
+        "source": ["text"],
+        "bottler": null,
+        "edition": null,
+        "outturn": null,
+        "bottleId": 1390,
+        "category": "single_malt",
+        "fullName": "Daftmill 2006 Cask Strength",
+        "reference": null,
+        "statedAge": 14,
+        "caskNumber": null,
+        "comparison": {
+          "missing": [
+            "abv",
+            "vintageYear",
+            "singleCask",
+            "edition",
+            "caskNumber"
+          ],
+          "conflicts": [],
+          "agreements": ["category", "brand", "distillers"]
+        },
+        "distillery": ["Daftmill"],
+        "maturation": null,
+        "releaseDay": null,
+        "singleCask": null,
+        "releaseYear": null,
+        "vintageYear": null,
+        "bottlingYear": null,
+        "caskStrength": true,
+        "releaseMonth": null,
+        "familyContext": {
+          "siblingBottles": []
+        }
+      },
+      {
+        "abv": 57.7,
+        "brand": "Bruges Whisky",
+        "score": 26.324306,
+        "series": "Ryggia",
+        "source": ["text"],
+        "bottler": "Bruges Whisky Company",
+        "edition": null,
+        "outturn": null,
+        "bottleId": 47086,
+        "category": "single_malt",
+        "fullName": "Bruges Whisky Fino Sherry - 2026 Release - 57.7% ABV - Single Cask",
+        "reference": null,
+        "statedAge": null,
+        "caskNumber": null,
+        "comparison": {
+          "missing": ["caskNumber"],
+          "conflicts": [],
+          "agreements": ["abv"]
+        },
+        "distillery": ["Bruges Whisky Company"],
+        "maturation": null,
+        "releaseDay": null,
+        "singleCask": true,
+        "releaseYear": 2026,
+        "vintageYear": null,
+        "bottlingYear": null,
+        "caskStrength": null,
+        "releaseMonth": null,
+        "familyContext": {
+          "siblingBottles": []
+        }
+      },
+      {
+        "abv": 57.7,
+        "brand": "Mossburn",
+        "score": 24.997196,
+        "series": "The Cask Collaboration Series",
+        "source": ["text"],
+        "bottler": null,
+        "edition": null,
+        "outturn": null,
+        "bottleId": 45873,
+        "category": "blend",
+        "fullName": "Mossburn Foursquare Rum Cask Finish - 12-year-old - 57.7% ABV",
+        "reference": null,
+        "statedAge": 12,
+        "caskNumber": null,
+        "comparison": {
+          "missing": ["caskNumber"],
+          "conflicts": [],
+          "agreements": ["abv"]
+        },
+        "distillery": [],
+        "maturation": null,
+        "releaseDay": null,
+        "singleCask": null,
+        "releaseYear": null,
+        "vintageYear": null,
+        "bottlingYear": null,
+        "caskStrength": null,
+        "releaseMonth": null,
+        "familyContext": {
+          "siblingBottles": []
+        }
+      },
+      {
+        "abv": 57.7,
+        "brand": "Kilkerran",
+        "score": 24.668749,
+        "series": null,
+        "source": ["text"],
+        "bottler": null,
+        "edition": null,
+        "outturn": null,
+        "bottleId": 45996,
+        "category": "single_malt",
+        "fullName": "Kilkerran Bourbon Cask Matured - 8-year-old - 57.7% ABV - Cask Strength - Bourbon Cask",
+        "reference": null,
+        "statedAge": 8,
+        "caskNumber": null,
+        "comparison": {
+          "missing": ["caskNumber"],
+          "conflicts": [],
+          "agreements": ["abv"]
+        },
+        "distillery": ["Glengyle"],
+        "maturation": "bourbon",
+        "releaseDay": null,
+        "singleCask": null,
+        "releaseYear": null,
+        "vintageYear": null,
+        "bottlingYear": null,
+        "caskStrength": true,
+        "releaseMonth": null,
+        "familyContext": {
+          "siblingBottles": []
+        }
+      },
+      {
+        "abv": 57.7,
+        "brand": "Ardnamurchan",
+        "score": 24.291496,
+        "series": null,
+        "source": ["text"],
+        "bottler": null,
+        "edition": null,
+        "outturn": null,
+        "bottleId": 46697,
+        "category": "single_malt",
+        "fullName": "Ardnamurchan AD/ Cask Strength Release",
+        "reference": null,
+        "statedAge": null,
+        "caskNumber": null,
+        "comparison": {
+          "missing": ["caskNumber"],
+          "conflicts": [],
+          "agreements": ["abv"]
+        },
+        "distillery": ["Ardnamurchan"],
+        "maturation": null,
+        "releaseDay": null,
+        "singleCask": null,
+        "releaseYear": 2025,
+        "vintageYear": null,
+        "bottlingYear": null,
+        "caskStrength": true,
+        "releaseMonth": null,
+        "familyContext": {
+          "siblingBottles": []
+        }
+      },
+      {
+        "abv": 57.7,
+        "brand": "Redwood Empire",
+        "score": 20.24688,
+        "series": null,
+        "source": ["text"],
+        "bottler": null,
+        "edition": null,
+        "outturn": null,
+        "bottleId": 61470,
+        "category": "rye",
+        "fullName": "Redwood Empire Emerald Giant Cask Strength",
+        "reference": null,
+        "statedAge": null,
+        "caskNumber": null,
+        "comparison": {
+          "missing": ["caskNumber"],
+          "conflicts": [],
+          "agreements": ["abv"]
+        },
+        "distillery": [],
+        "maturation": null,
+        "releaseDay": null,
+        "singleCask": null,
+        "releaseYear": 2024,
+        "vintageYear": null,
+        "bottlingYear": null,
+        "caskStrength": true,
+        "releaseMonth": null,
+        "familyContext": {
+          "siblingBottles": []
+        }
+      },
+      {
+        "abv": null,
+        "brand": "Ichiro's Malt",
+        "score": 19.285677,
+        "series": null,
+        "source": ["text"],
+        "bottler": null,
+        "edition": null,
+        "outturn": null,
+        "bottleId": 16509,
+        "category": "single_malt",
+        "fullName": "Ichiro's Malt The Joker (distilled at Hanyu)",
+        "reference": null,
+        "statedAge": null,
+        "caskNumber": null,
+        "comparison": {
+          "missing": ["abv", "caskNumber"],
+          "conflicts": [],
+          "agreements": []
+        },
+        "distillery": [],
+        "maturation": null,
+        "releaseDay": null,
+        "singleCask": null,
+        "releaseYear": null,
+        "vintageYear": null,
+        "bottlingYear": null,
+        "caskStrength": null,
+        "releaseMonth": null,
+        "familyContext": {
+          "siblingBottles": []
+        }
+      },
+      {
+        "abv": 57.7,
+        "brand": "WhiskySponge",
+        "score": 18.272503,
+        "series": null,
+        "source": ["text"],
+        "bottler": "Decadent Drinks",
+        "edition": "Edition No. 39",
+        "outturn": 532,
+        "bottleId": 49042,
+        "category": "single_malt",
+        "fullName": "WhiskySponge Clynelish 1995 26-year-old - Edition No. 39",
+        "reference": null,
+        "statedAge": 26,
+        "caskNumber": null,
+        "comparison": {
+          "missing": ["caskNumber"],
+          "conflicts": [],
+          "agreements": ["abv"]
+        },
+        "distillery": ["Clynelish"],
+        "maturation": "Matured in a refill sherry butt",
+        "releaseDay": null,
+        "singleCask": true,
+        "releaseYear": null,
+        "vintageYear": 1995,
+        "bottlingYear": 2021,
+        "caskStrength": true,
+        "releaseMonth": null,
+        "familyContext": {
+          "siblingBottles": []
+        }
+      },
+      {
+        "abv": 57.7,
+        "brand": "North Star Spirits",
+        "score": 18.143986,
+        "series": "Cask Series",
+        "source": ["text"],
+        "bottler": "North Star Spirits",
+        "edition": null,
+        "outturn": null,
+        "bottleId": 46898,
+        "category": "single_malt",
+        "fullName": "North Star Spirits Aultmore 2013",
+        "reference": null,
+        "statedAge": 12,
+        "caskNumber": null,
+        "comparison": {
+          "missing": ["caskNumber"],
+          "conflicts": [],
+          "agreements": ["abv"]
+        },
+        "distillery": ["Aultmore"],
+        "maturation": null,
+        "releaseDay": null,
+        "singleCask": true,
+        "releaseYear": 2025,
+        "vintageYear": 2013,
+        "bottlingYear": null,
+        "caskStrength": true,
+        "releaseMonth": null,
+        "familyContext": {
+          "siblingBottles": []
+        }
+      },
+      {
+        "abv": 57.7,
+        "brand": "Bruichladdich Octomore",
+        "score": 17.158669,
+        "series": null,
+        "source": ["text"],
+        "bottler": null,
+        "edition": null,
+        "outturn": null,
+        "bottleId": 40879,
+        "category": "single_malt",
+        "fullName": "Octomore 14.2",
+        "reference": null,
+        "statedAge": 5,
+        "caskNumber": null,
+        "comparison": {
+          "missing": ["caskNumber"],
+          "conflicts": [],
+          "agreements": ["abv"]
+        },
+        "distillery": ["Bruichladdich"],
+        "maturation": "Oloroso sherry and Amarone wine casks, brought together in French oak",
+        "releaseDay": null,
+        "singleCask": null,
+        "releaseYear": 2023,
+        "vintageYear": 2017,
+        "bottlingYear": null,
+        "caskStrength": null,
+        "releaseMonth": 9,
+        "familyContext": {
+          "siblingBottles": []
+        }
+      },
+      {
+        "abv": 57.7,
+        "brand": "The Exclusive Malts",
+        "score": 16.74986,
+        "series": null,
+        "source": ["text"],
+        "bottler": "Creative Whisky Company",
+        "edition": null,
+        "outturn": null,
+        "bottleId": 65298,
+        "category": "single_malt",
+        "fullName": "The Exclusive Malts Speyside 10-year-old 2004",
+        "reference": null,
+        "statedAge": 10,
+        "caskNumber": null,
+        "comparison": {
+          "missing": ["caskNumber"],
+          "conflicts": [],
+          "agreements": ["abv"]
+        },
+        "distillery": [],
+        "maturation": "Port cask",
+        "releaseDay": null,
+        "singleCask": null,
+        "releaseYear": null,
+        "vintageYear": 2004,
+        "bottlingYear": null,
+        "caskStrength": true,
+        "releaseMonth": null,
+        "familyContext": {
+          "siblingBottles": []
+        }
+      },
+      {
+        "abv": 57.7,
+        "brand": "William Cadenhead's",
+        "score": 7.2219815,
+        "series": null,
+        "source": ["text"],
+        "bottler": "William Cadenhead's",
+        "edition": null,
+        "outturn": null,
+        "bottleId": 68701,
+        "category": "blended_malt",
+        "fullName": "Cadenhead's Sherry Cask Blended Malt",
+        "reference": null,
+        "statedAge": null,
+        "caskNumber": null,
+        "comparison": {
+          "missing": ["caskNumber"],
+          "conflicts": [],
+          "agreements": ["abv"]
+        },
+        "distillery": [],
+        "maturation": "Sherry cask",
+        "releaseDay": null,
+        "singleCask": null,
+        "releaseYear": null,
+        "vintageYear": null,
+        "bottlingYear": null,
+        "caskStrength": null,
+        "releaseMonth": null,
+        "familyContext": {
+          "siblingBottles": []
+        }
+      },
+      {
+        "abv": 57.7,
+        "brand": "The London Distillery Company",
+        "score": 7.2219815,
+        "series": null,
+        "source": ["text"],
+        "bottler": null,
+        "edition": null,
+        "outturn": null,
+        "bottleId": 62520,
+        "category": "single_malt",
+        "fullName": "The London Distillery Company Embarque",
+        "reference": null,
+        "statedAge": null,
+        "caskNumber": null,
+        "comparison": {
+          "missing": ["caskNumber"],
+          "conflicts": [],
+          "agreements": ["abv"]
+        },
+        "distillery": ["The London Distillery Company"],
+        "maturation": null,
+        "releaseDay": null,
+        "singleCask": null,
+        "releaseYear": null,
+        "vintageYear": null,
+        "bottlingYear": null,
+        "caskStrength": null,
+        "releaseMonth": null,
+        "familyContext": {
+          "siblingBottles": []
+        }
+      },
+      {
+        "abv": 57.7,
+        "brand": "Special Releases",
+        "score": 6.7318497,
+        "series": null,
+        "source": ["text"],
+        "bottler": null,
+        "edition": "2005",
+        "outturn": null,
+        "bottleId": 49826,
+        "category": "single_malt",
+        "fullName": "Special Releases Lagavulin - 2005",
+        "reference": null,
+        "statedAge": 12,
+        "caskNumber": null,
+        "comparison": {
+          "missing": ["caskNumber"],
+          "conflicts": [],
+          "agreements": ["abv"]
+        },
+        "distillery": ["Lagavulin"],
+        "maturation": null,
+        "releaseDay": null,
+        "singleCask": null,
+        "releaseYear": 2005,
+        "vintageYear": null,
+        "bottlingYear": null,
+        "caskStrength": null,
+        "releaseMonth": null,
+        "familyContext": {
+          "siblingBottles": []
+        }
+      },
+      {
+        "abv": 57.7,
+        "brand": "Darkness",
+        "score": 6.6195383,
+        "series": null,
+        "source": ["text"],
+        "bottler": "Darkness",
+        "edition": null,
+        "outturn": null,
+        "bottleId": 63474,
+        "category": "single_malt",
+        "fullName": "Darkness Islay Single Malt 13-year-old Oloroso Cask Finish",
+        "reference": null,
+        "statedAge": 13,
+        "caskNumber": null,
+        "comparison": {
+          "missing": ["caskNumber"],
+          "conflicts": [],
+          "agreements": ["abv"]
+        },
+        "distillery": [],
+        "maturation": null,
+        "releaseDay": null,
+        "singleCask": null,
+        "releaseYear": null,
+        "vintageYear": null,
+        "bottlingYear": null,
+        "caskStrength": null,
+        "releaseMonth": null,
+        "familyContext": {
+          "siblingBottles": []
+        }
+      },
+      {
+        "abv": 57.7,
+        "brand": "Claxton's",
+        "score": 6.5109134,
+        "series": null,
+        "source": ["text"],
+        "bottler": "Claxton's",
+        "edition": null,
+        "outturn": 300,
+        "bottleId": 69590,
+        "category": "single_malt",
+        "fullName": "Claxton's Glenglassaugh 2018",
+        "reference": null,
+        "statedAge": 5,
+        "caskNumber": null,
+        "comparison": {
+          "missing": ["caskNumber"],
+          "conflicts": [],
+          "agreements": ["abv"]
+        },
+        "distillery": ["Glenglassaugh"],
+        "maturation": "First-fill Pedro Ximénez hogshead",
+        "releaseDay": null,
+        "singleCask": null,
+        "releaseYear": null,
+        "vintageYear": 2018,
+        "bottlingYear": 2023,
+        "caskStrength": null,
+        "releaseMonth": null,
+        "familyContext": {
+          "siblingBottles": []
+        }
+      },
+      {
+        "abv": 58,
+        "brand": "Dràm Mòr",
+        "score": 0.671571978900951,
+        "series": null,
+        "source": ["vector"],
+        "bottler": "Dràm Mòr",
+        "edition": null,
+        "outturn": null,
+        "bottleId": 46489,
+        "category": "single_malt",
+        "fullName": "Dràm Mòr Macduff 2012",
+        "reference": "Dràm Mòr Macduff - Cask No. 900047 - 9-year-old - 2012 Vintage - 58.0% ABV - Single Cask - Cask Strength - Other Cask - Butt - Refill",
+        "statedAge": 9,
+        "caskNumber": "900047",
+        "comparison": {
+          "missing": ["edition"],
+          "conflicts": ["abv", "caskNumber", "brand", "distillers"],
+          "agreements": [
+            "category",
+            "vintageYear",
+            "caskStrength",
+            "singleCask"
+          ]
+        },
+        "distillery": ["Macduff Distillery"],
+        "maturation": "other",
+        "releaseDay": null,
+        "singleCask": true,
+        "releaseYear": null,
+        "vintageYear": 2012,
+        "bottlingYear": null,
+        "caskStrength": true,
+        "releaseMonth": null,
+        "familyContext": {
+          "siblingBottles": []
+        }
+      },
+      {
+        "abv": 46,
+        "brand": "Glen Scotia",
+        "score": 0.6624931710059824,
+        "series": null,
+        "source": ["vector"],
+        "bottler": null,
+        "edition": null,
+        "outturn": null,
+        "bottleId": 53122,
+        "category": "single_malt",
+        "fullName": "Glen Scotia Double Cask",
+        "reference": "Glen Scotia Double Cask, 46%",
+        "statedAge": null,
+        "caskNumber": null,
+        "comparison": {
+          "missing": [
+            "vintageYear",
+            "caskStrength",
+            "singleCask",
+            "edition",
+            "caskNumber"
+          ],
+          "conflicts": ["abv", "brand", "distillers"],
+          "agreements": ["category"]
+        },
+        "distillery": ["Glen Scotia"],
+        "maturation": "Matured in first-fill bourbon casks and finished for 12 months in PX sherry casks",
+        "releaseDay": null,
+        "singleCask": null,
+        "releaseYear": null,
+        "vintageYear": null,
+        "bottlingYear": null,
+        "caskStrength": null,
+        "releaseMonth": null,
+        "familyContext": {
+          "siblingBottles": []
+        }
+      },
+      {
+        "abv": 59,
+        "brand": "Edradour",
+        "score": 0.6536859023604864,
+        "series": null,
+        "source": ["vector"],
+        "bottler": null,
+        "edition": "Batch 7",
+        "outturn": null,
+        "bottleId": 63301,
+        "category": "single_malt",
+        "fullName": "Edradour Cask Strength 12-year-old Oloroso Sherry Butts - Batch 7",
+        "reference": "Edradour 12-year-old Cask Strength - 1st fill Oloroso Sherry Butts (Batch 7)",
+        "statedAge": 12,
+        "caskNumber": null,
+        "comparison": {
+          "missing": ["vintageYear", "singleCask", "caskNumber"],
+          "conflicts": ["abv", "brand", "distillers"],
+          "agreements": ["category", "caskStrength"]
+        },
+        "distillery": ["Edradour"],
+        "maturation": null,
+        "releaseDay": null,
+        "singleCask": null,
+        "releaseYear": null,
+        "vintageYear": null,
+        "bottlingYear": null,
+        "caskStrength": true,
+        "releaseMonth": null,
+        "familyContext": {
+          "siblingBottles": []
+        }
+      }
+    ]
+  },
+  "context": {
+    "inspectedBottleIds": [],
+    "bottleContexts": [],
+    "inspectedEntities": [
+      {
+        "kind": "brand",
+        "name": "Bruges Whisky",
+        "score": 1,
+        "source": ["exact", "text", "prefix", "contained"],
+        "entityId": 366018,
+        "reference": "Bruges Whisky",
+        "shortName": null,
+        "retrievedFor": [
+          {
+            "exact": true,
+            "query": "Bruges Whisky"
+          },
+          {
+            "query": "Bruges Whisky Company"
+          }
+        ]
+      },
+      {
+        "kind": "distillery",
+        "name": "Bruges Whisky Company",
+        "score": 1,
+        "source": ["text", "prefix", "exact", "contained"],
+        "entityId": 2361,
+        "reference": "Bruges Whisky Company",
+        "shortName": null,
+        "retrievedFor": [
+          {
+            "query": "Bruges Whisky"
+          },
+          {
+            "exact": true,
+            "query": "Bruges Whisky Company"
+          }
+        ]
+      },
+      {
+        "kind": "bottler",
+        "name": "Mossburn",
+        "score": 1,
+        "source": ["exact", "text", "prefix", "contained"],
+        "entityId": 355037,
+        "reference": "Mossburn - Distillers & Blenders",
+        "shortName": null,
+        "retrievedFor": [
+          {
+            "exact": true,
+            "query": "Mossburn"
+          }
+        ]
+      },
+      {
+        "kind": "brand",
+        "name": "Kilkerran",
+        "score": 1,
+        "source": ["exact", "text", "prefix", "contained"],
+        "entityId": 1103,
+        "reference": "Kilkerran",
+        "shortName": null,
+        "retrievedFor": [
+          {
+            "exact": true,
+            "query": "Kilkerran"
+          }
+        ]
+      },
+      {
+        "kind": "distillery",
+        "name": "Glengyle",
+        "score": 1,
+        "source": ["exact", "text", "prefix", "contained"],
+        "entityId": 243,
+        "reference": "Glengyle",
+        "shortName": null,
+        "retrievedFor": [
+          {
+            "exact": true,
+            "query": "Glengyle"
+          }
+        ]
+      },
+      {
+        "kind": "distillery",
+        "name": "Ardnamurchan",
+        "score": 1,
+        "source": ["exact", "text", "prefix", "contained"],
+        "entityId": 84,
+        "reference": "Ardnamurchan",
+        "shortName": null,
+        "retrievedFor": [
+          {
+            "exact": true,
+            "query": "Ardnamurchan"
+          }
+        ]
+      },
+      {
+        "kind": "brand",
+        "name": "Redwood Empire",
+        "score": 1,
+        "source": ["exact", "text", "prefix", "contained"],
+        "entityId": 3792,
+        "reference": "Redwood Empire",
+        "shortName": null,
+        "retrievedFor": [
+          {
+            "exact": true,
+            "query": "Redwood Empire"
+          }
+        ]
+      },
+      {
+        "kind": "brand",
+        "name": "WhiskySponge",
+        "score": 1,
+        "source": ["exact", "text", "prefix", "contained"],
+        "entityId": 5863,
+        "reference": "WhiskySponge",
+        "shortName": null,
+        "retrievedFor": [
+          {
+            "exact": true,
+            "query": "WhiskySponge"
+          }
+        ]
+      },
+      {
+        "kind": "brand",
+        "name": "Whisky Sponge",
+        "score": 1,
+        "source": ["exact", "contained"],
+        "entityId": 366684,
+        "reference": "Whisky Sponge",
+        "shortName": null,
+        "retrievedFor": [
+          {
+            "exact": true,
+            "query": "WhiskySponge"
+          }
+        ]
+      },
+      {
+        "kind": "bottler",
+        "name": "Decadent Drinks",
+        "score": 1,
+        "source": ["exact", "text", "prefix", "contained"],
+        "entityId": 5775,
+        "reference": "Decadent Drinks",
+        "shortName": null,
+        "retrievedFor": [
+          {
+            "exact": true,
+            "query": "Decadent Drinks"
+          }
+        ]
+      },
+      {
+        "kind": "distillery",
+        "name": "Clynelish",
+        "score": 1,
+        "source": ["exact", "text", "prefix", "contained"],
+        "entityId": 843,
+        "reference": "Clynelish",
+        "shortName": null,
+        "retrievedFor": [
+          {
+            "exact": true,
+            "query": "Clynelish"
+          }
+        ]
+      },
+      {
+        "kind": "bottler",
+        "name": "North Star Spirits",
+        "score": 1,
+        "source": ["exact", "text", "prefix", "contained"],
+        "entityId": 5739,
+        "reference": "North Star Spirits",
+        "shortName": null,
+        "retrievedFor": [
+          {
+            "exact": true,
+            "query": "North Star Spirits"
+          }
+        ]
+      },
+      {
+        "kind": "distillery",
+        "name": "Aultmore",
+        "score": 1,
+        "source": ["exact", "text", "prefix", "contained"],
+        "entityId": 191,
+        "reference": "Aultmore",
+        "shortName": null,
+        "retrievedFor": [
+          {
+            "exact": true,
+            "query": "Aultmore"
+          }
+        ]
+      },
+      {
+        "kind": "distillery",
+        "name": "Daftmill",
+        "score": 1,
+        "source": ["exact", "text", "prefix", "contained"],
+        "entityId": 867,
+        "reference": "Daftmill",
+        "shortName": null,
+        "retrievedFor": [
+          {
+            "exact": true,
+            "query": "Daftmill"
+          }
+        ]
+      },
+      {
+        "kind": "distillery",
+        "name": "Redwood Empire Distilling",
+        "score": 0.5,
+        "source": ["text", "prefix"],
+        "entityId": 367248,
+        "reference": "Redwood Empire Distilling",
+        "shortName": null,
+        "retrievedFor": [
+          {
+            "query": "Redwood Empire"
+          }
+        ]
+      },
+      {
+        "kind": "brand",
+        "name": "Swhisky",
+        "score": 0.3666666666666667,
+        "source": ["contained"],
+        "entityId": 4115,
+        "reference": "Swhisky",
+        "shortName": null,
+        "retrievedFor": [
+          {
+            "query": "Bruges Whisky"
+          },
+          {
+            "query": "Bruges Whisky Company"
+          }
+        ]
+      },
+      {
+        "kind": "bottler",
+        "name": "&Whisky",
+        "score": 0.35,
+        "source": ["contained"],
+        "entityId": 365821,
+        "reference": "&Whisky",
+        "shortName": null,
+        "retrievedFor": [
+          {
+            "query": "Bruges Whisky"
+          },
+          {
+            "query": "Bruges Whisky Company"
+          },
+          {
+            "query": "WhiskySponge"
+          }
+        ]
+      },
+      {
+        "kind": "brand",
+        "name": "Cadée",
+        "score": 0.30714285714285716,
+        "source": ["contained"],
+        "entityId": 367403,
+        "reference": "Cadée",
+        "shortName": null,
+        "retrievedFor": [
+          {
+            "query": "Decadent Drinks"
+          }
+        ]
+      }
+    ],
+    "inspectedSeries": []
+  },
+  "provenance": {
+    "source": "production_miss",
+    "verifiedSourceUrls": [
+      "https://www.scotchwhiskyauctions.com/auctions/234-the-185th-auction/906947-daftmill-2012-single-cask-86-for-the-drambusters/",
+      "https://d3suvtcq00dftb.cloudfront.net/images/71c4131f4eb99c47f353d0f9b0725126-zoom.jpg"
+    ],
+    "dbOutcome": {
+      "bottleId": null,
+      "createsBottle": true,
+      "summary": "Production returned create_bottle named `2012 Single Cask` with cask 086/2012, 57.7%, vintage 2012, bottled 2022, and edition null. It was held for review; no Bottle was created."
+    },
+    "notes": "Saved check 34892, source auction_lot 14809 (lot 185-906947, lot number 185-03723, bottle 303 of 341). This is a second bottle of the same cask in the same auction, not lot 14810 judged earlier. The lot photo of the label clearly shows 'Single Cask', 'Bottled exclusively for The Drambusters', 'Cask No. 086/2012', 'Bottle No. 303 of 341', '2012', 'Distilled in 2012, bottled in 2022', 700ml, alc. 57.7% vol. The page gives Distilled 2012, Bottled 2022, Cask Number 086, Cask Type PX Sherry, 57.7%. Rule 5 of 'Who Is The Brand, Series, And Bottler' puts a selection for a customer in edition with the label's words (`for La Maison du Whisky`). Without it the proposal is a generic 'Daftmill 2012 Single Cask', which other 2012 single casks would share; the catalog already keeps such selections apart, for example 69910 'Daftmill 2011 13-year-old Single Cask - For Royal Mile Whiskies'. Catalog searches for 'Daftmill single cask', 'Daftmill 2012' and 'Daftmill Drambusters' find no Bottle for this cask; 57971 is the 46% 2012 Summer Batch Release. The edition check is an exact string. The case uses the doc's lower-case 'for' form; the catalog's 69910 uses 'For', so a capital F would fail this case and is a naming question, not an identity error."
+  },
+  "expected": {
+    "status": "classified",
+    "action": "create_bottle",
+    "identityScope": "exact_cask",
+    "matchedBottleId": null,
+    "proposedBottle": {
+      "brand": {
+        "id": 867
+      },
+      "category": "single_malt",
+      "abv": 57.7,
+      "vintageYear": 2012,
+      "bottlingYear": 2022,
+      "singleCask": true,
+      "caskNumber": "086/2012",
+      "edition": "for The Drambusters"
+    },
+    "proposedBottleNameIncludes": ["2012"],
+    "proposedBottleNameExcludes": ["Drambusters", "086"],
+    "proposedBottleDistillerIds": [867],
+    "summary": "Create the Daftmill 2012 single cask 086/2012 bottled in 2022 at 57.7% with edition 'for The Drambusters', the selection the label prints. The cask goes in caskNumber and neither the cask nor the selection goes in the name."
+  },
+  "knownFailure": {
+    "reason": "The create leaves the printed selection 'for The Drambusters' out of the edition."
+  }
+}

@@ -1,0 +1,1017 @@
+{
+  "id": "auction-johnnie-walker-black-extra-special-1l",
+  "name": "auction lot: Johnnie Walker Black Label Extra Special 1L keeps Extra Special in edition",
+  "input": {
+    "reference": {
+      "id": 16020,
+      "url": "https://www.scotchwhiskyauctions.com/auctions/234-the-185th-auction/906037-johnnie-walker-12-year-old-black-label-extra-special-1l/",
+      "name": "Johnnie Walker 12 Year Old Black Label Extra Special 1L",
+      "imageUrl": null,
+      "externalSiteId": 28097,
+      "currentBottleId": null
+    },
+    "extractedIdentity": {
+      "abv": 43,
+      "brand": null,
+      "series": null,
+      "bottler": null,
+      "edition": null,
+      "outturn": null,
+      "category": null,
+      "distillery": null,
+      "expression": null,
+      "maturation": null,
+      "stated_age": null,
+      "cask_number": null,
+      "single_cask": null,
+      "release_year": null,
+      "vintage_year": null,
+      "cask_strength": null
+    },
+    "imageEvidence": null,
+    "initialCandidates": [
+      {
+        "abv": null,
+        "brand": "Johnnie Walker",
+        "score": 124.03051,
+        "series": null,
+        "source": ["vector", "text", "context", "brand_coverage"],
+        "bottler": null,
+        "edition": null,
+        "outturn": null,
+        "bottleId": 16252,
+        "category": "blend",
+        "fullName": "Johnnie Walker Black Label 12-year-old",
+        "reference": "Johnnie Walker Black Label 12-year-old, 40%",
+        "statedAge": 12,
+        "caskNumber": null,
+        "comparison": {
+          "missing": ["abv"],
+          "conflicts": [],
+          "agreements": []
+        },
+        "distillery": [],
+        "maturation": null,
+        "releaseDay": null,
+        "singleCask": null,
+        "releaseYear": null,
+        "vintageYear": null,
+        "bottlingYear": null,
+        "caskStrength": null,
+        "releaseMonth": null,
+        "familyContext": {
+          "siblingBottles": []
+        }
+      },
+      {
+        "abv": null,
+        "brand": "Johnnie Walker",
+        "score": 104.01889,
+        "series": null,
+        "source": ["text"],
+        "bottler": "John Walker & Sons",
+        "edition": null,
+        "outturn": null,
+        "bottleId": 6127,
+        "category": "blend",
+        "fullName": "Johnnie Walker Black Label Islay Origin",
+        "reference": null,
+        "statedAge": 12,
+        "caskNumber": null,
+        "comparison": {
+          "missing": ["abv"],
+          "conflicts": [],
+          "agreements": []
+        },
+        "distillery": [],
+        "maturation": null,
+        "releaseDay": null,
+        "singleCask": null,
+        "releaseYear": null,
+        "vintageYear": null,
+        "bottlingYear": null,
+        "caskStrength": null,
+        "releaseMonth": null,
+        "familyContext": {
+          "siblingBottles": []
+        }
+      },
+      {
+        "abv": null,
+        "brand": "Johnnie Walker",
+        "score": 94.687416,
+        "series": null,
+        "source": ["vector", "text"],
+        "bottler": null,
+        "edition": null,
+        "outturn": null,
+        "bottleId": 13607,
+        "category": "blend",
+        "fullName": "Johnnie Walker Black Label Speyside Origin",
+        "reference": "Johnnie Walker Black Label Speyside Origin, 42%",
+        "statedAge": null,
+        "caskNumber": null,
+        "comparison": {
+          "missing": ["abv"],
+          "conflicts": [],
+          "agreements": []
+        },
+        "distillery": [],
+        "maturation": null,
+        "releaseDay": null,
+        "singleCask": null,
+        "releaseYear": null,
+        "vintageYear": null,
+        "bottlingYear": null,
+        "caskStrength": null,
+        "releaseMonth": null,
+        "familyContext": {
+          "siblingBottles": []
+        }
+      },
+      {
+        "abv": null,
+        "brand": "Johnnie Walker",
+        "score": 94.687416,
+        "series": null,
+        "source": ["vector", "text"],
+        "bottler": null,
+        "edition": null,
+        "outturn": null,
+        "bottleId": 13606,
+        "category": "blend",
+        "fullName": "Johnnie Walker Black Label Lowlands Origin",
+        "reference": "Johnnie Walker Black Label Lowlands Origin, 42%",
+        "statedAge": null,
+        "caskNumber": null,
+        "comparison": {
+          "missing": ["abv"],
+          "conflicts": [],
+          "agreements": []
+        },
+        "distillery": [],
+        "maturation": null,
+        "releaseDay": null,
+        "singleCask": null,
+        "releaseYear": null,
+        "vintageYear": null,
+        "bottlingYear": null,
+        "caskStrength": null,
+        "releaseMonth": null,
+        "familyContext": {
+          "siblingBottles": []
+        }
+      },
+      {
+        "abv": null,
+        "brand": "Johnnie Walker",
+        "score": 91.59389,
+        "series": null,
+        "source": ["vector", "text"],
+        "bottler": null,
+        "edition": null,
+        "outturn": null,
+        "bottleId": 14094,
+        "category": "blend",
+        "fullName": "Johnnie Walker Black Label Triple Cask Edition",
+        "reference": "Johnnie Walker Black Label Triple Cask Edition, 40%",
+        "statedAge": null,
+        "caskNumber": null,
+        "comparison": {
+          "missing": ["abv"],
+          "conflicts": [],
+          "agreements": []
+        },
+        "distillery": [],
+        "maturation": null,
+        "releaseDay": null,
+        "singleCask": null,
+        "releaseYear": null,
+        "vintageYear": null,
+        "bottlingYear": null,
+        "caskStrength": null,
+        "releaseMonth": null,
+        "familyContext": {
+          "siblingBottles": []
+        }
+      },
+      {
+        "abv": null,
+        "brand": "Johnnie Walker",
+        "score": 91.59389,
+        "series": null,
+        "source": ["text"],
+        "bottler": null,
+        "edition": null,
+        "outturn": null,
+        "bottleId": 14256,
+        "category": "blend",
+        "fullName": "Johnnie Walker Black Label The Director's Cut",
+        "reference": null,
+        "statedAge": null,
+        "caskNumber": null,
+        "comparison": {
+          "missing": ["abv"],
+          "conflicts": [],
+          "agreements": []
+        },
+        "distillery": [],
+        "maturation": null,
+        "releaseDay": null,
+        "singleCask": null,
+        "releaseYear": null,
+        "vintageYear": null,
+        "bottlingYear": null,
+        "caskStrength": null,
+        "releaseMonth": null,
+        "familyContext": {
+          "siblingBottles": []
+        }
+      },
+      {
+        "abv": null,
+        "brand": "Johnnie Walker",
+        "score": 88.269,
+        "series": null,
+        "source": ["text"],
+        "bottler": null,
+        "edition": null,
+        "outturn": null,
+        "bottleId": 13608,
+        "category": "blend",
+        "fullName": "Johnnie Walker Black Label Highlands Origin",
+        "reference": null,
+        "statedAge": null,
+        "caskNumber": null,
+        "comparison": {
+          "missing": ["abv"],
+          "conflicts": [],
+          "agreements": []
+        },
+        "distillery": [],
+        "maturation": null,
+        "releaseDay": null,
+        "singleCask": null,
+        "releaseYear": null,
+        "vintageYear": null,
+        "bottlingYear": null,
+        "caskStrength": null,
+        "releaseMonth": null,
+        "familyContext": {
+          "siblingBottles": []
+        }
+      },
+      {
+        "abv": 43,
+        "brand": "Johnnie Walker",
+        "score": 85.55812,
+        "series": null,
+        "source": ["vector", "text"],
+        "bottler": null,
+        "edition": null,
+        "outturn": null,
+        "bottleId": 45339,
+        "category": "blend",
+        "fullName": "Johnnie Walker Black Cask - 43.0% ABV - Bourbon Cask",
+        "reference": "Johnnie Walker Black Cask Bourbon Cask Aged",
+        "statedAge": null,
+        "caskNumber": null,
+        "comparison": {
+          "missing": [],
+          "conflicts": [],
+          "agreements": ["abv"]
+        },
+        "distillery": [],
+        "maturation": "bourbon",
+        "releaseDay": null,
+        "singleCask": null,
+        "releaseYear": null,
+        "vintageYear": null,
+        "bottlingYear": null,
+        "caskStrength": null,
+        "releaseMonth": null,
+        "familyContext": {
+          "siblingBottles": []
+        }
+      },
+      {
+        "abv": null,
+        "brand": "Label 5",
+        "score": 82.60101,
+        "series": null,
+        "source": ["text"],
+        "bottler": null,
+        "edition": null,
+        "outturn": null,
+        "bottleId": 16468,
+        "category": "blend",
+        "fullName": "Label 5 Extra Premium 12-year-old",
+        "reference": null,
+        "statedAge": 12,
+        "caskNumber": null,
+        "comparison": {
+          "missing": ["abv"],
+          "conflicts": ["brand"],
+          "agreements": ["category", "statedAge"]
+        },
+        "distillery": [],
+        "maturation": null,
+        "releaseDay": null,
+        "singleCask": null,
+        "releaseYear": null,
+        "vintageYear": null,
+        "bottlingYear": null,
+        "caskStrength": null,
+        "releaseMonth": null,
+        "familyContext": {
+          "siblingBottles": []
+        }
+      },
+      {
+        "abv": 43,
+        "brand": "Johnnie Walker",
+        "score": 79.28932,
+        "series": "Blue Label",
+        "source": ["text"],
+        "bottler": null,
+        "edition": null,
+        "outturn": null,
+        "bottleId": 68971,
+        "category": "blend",
+        "fullName": "Johnnie Walker Azure",
+        "reference": null,
+        "statedAge": null,
+        "caskNumber": null,
+        "comparison": {
+          "missing": [],
+          "conflicts": [],
+          "agreements": ["abv"]
+        },
+        "distillery": [],
+        "maturation": null,
+        "releaseDay": null,
+        "singleCask": null,
+        "releaseYear": null,
+        "vintageYear": null,
+        "bottlingYear": null,
+        "caskStrength": null,
+        "releaseMonth": null,
+        "familyContext": {
+          "siblingBottles": []
+        }
+      },
+      {
+        "abv": null,
+        "brand": "Johnnie Walker",
+        "score": 75.63612,
+        "series": null,
+        "source": ["text"],
+        "bottler": null,
+        "edition": null,
+        "outturn": null,
+        "bottleId": 14011,
+        "category": "blend",
+        "fullName": "Johnnie Walker Gold Label Reserve",
+        "reference": null,
+        "statedAge": null,
+        "caskNumber": null,
+        "comparison": {
+          "missing": ["abv"],
+          "conflicts": [],
+          "agreements": []
+        },
+        "distillery": [],
+        "maturation": null,
+        "releaseDay": null,
+        "singleCask": null,
+        "releaseYear": null,
+        "vintageYear": null,
+        "bottlingYear": null,
+        "caskStrength": null,
+        "releaseMonth": null,
+        "familyContext": {
+          "siblingBottles": []
+        }
+      },
+      {
+        "abv": 43,
+        "brand": "Johnnie Walker",
+        "score": 74.55435,
+        "series": "Blue Label",
+        "source": ["text"],
+        "bottler": null,
+        "edition": null,
+        "outturn": null,
+        "bottleId": 69007,
+        "category": "blend",
+        "fullName": "Johnnie Walker Oldest",
+        "reference": null,
+        "statedAge": null,
+        "caskNumber": null,
+        "comparison": {
+          "missing": [],
+          "conflicts": [],
+          "agreements": ["abv"]
+        },
+        "distillery": [],
+        "maturation": null,
+        "releaseDay": null,
+        "singleCask": null,
+        "releaseYear": null,
+        "vintageYear": null,
+        "bottlingYear": null,
+        "caskStrength": null,
+        "releaseMonth": null,
+        "familyContext": {
+          "siblingBottles": []
+        }
+      },
+      {
+        "abv": 43,
+        "brand": "Johnnie Walker",
+        "score": 73.26932,
+        "series": null,
+        "source": ["text"],
+        "bottler": null,
+        "edition": "Elusive Umami",
+        "outturn": null,
+        "bottleId": 57874,
+        "category": "blend",
+        "fullName": "Johnnie Walker Blue Label - Elusive Umami",
+        "reference": null,
+        "statedAge": null,
+        "caskNumber": null,
+        "comparison": {
+          "missing": [],
+          "conflicts": [],
+          "agreements": ["abv"]
+        },
+        "distillery": [],
+        "maturation": null,
+        "releaseDay": null,
+        "singleCask": false,
+        "releaseYear": null,
+        "vintageYear": null,
+        "bottlingYear": null,
+        "caskStrength": null,
+        "releaseMonth": null,
+        "familyContext": {
+          "siblingBottles": []
+        }
+      },
+      {
+        "abv": null,
+        "brand": "Johnnie Walker",
+        "score": 72.95558,
+        "series": null,
+        "source": ["text"],
+        "bottler": null,
+        "edition": null,
+        "outturn": null,
+        "bottleId": 14179,
+        "category": "blend",
+        "fullName": "Johnnie Walker Blenders' Cask Finish 12-year-old (Batch Sherry)",
+        "reference": null,
+        "statedAge": 12,
+        "caskNumber": null,
+        "comparison": {
+          "missing": ["abv"],
+          "conflicts": [],
+          "agreements": ["category", "statedAge", "brand"]
+        },
+        "distillery": [],
+        "maturation": null,
+        "releaseDay": null,
+        "singleCask": null,
+        "releaseYear": null,
+        "vintageYear": null,
+        "bottlingYear": null,
+        "caskStrength": null,
+        "releaseMonth": null,
+        "familyContext": {
+          "siblingBottles": []
+        }
+      },
+      {
+        "abv": 43,
+        "brand": "Johnnie Walker",
+        "score": 70.55975,
+        "series": "Cobalt Series",
+        "source": ["text"],
+        "bottler": null,
+        "edition": "Ice Chalet",
+        "outturn": null,
+        "bottleId": 57893,
+        "category": "blend",
+        "fullName": "Johnnie Walker Blue Label - Ice Chalet",
+        "reference": null,
+        "statedAge": null,
+        "caskNumber": null,
+        "comparison": {
+          "missing": [],
+          "conflicts": [],
+          "agreements": ["abv"]
+        },
+        "distillery": ["Brora", "Dalwhinnie", "Clynelish"],
+        "maturation": null,
+        "releaseDay": null,
+        "singleCask": false,
+        "releaseYear": 2024,
+        "vintageYear": null,
+        "bottlingYear": null,
+        "caskStrength": null,
+        "releaseMonth": null,
+        "familyContext": {
+          "siblingBottles": []
+        }
+      },
+      {
+        "abv": 43,
+        "brand": "Johnnie Walker",
+        "score": 63.867058,
+        "series": null,
+        "source": ["text"],
+        "bottler": null,
+        "edition": "Year of the Monkey",
+        "outturn": null,
+        "bottleId": 68408,
+        "category": "blend",
+        "fullName": "Johnnie Walker Blue Label - Year of the Monkey",
+        "reference": null,
+        "statedAge": null,
+        "caskNumber": null,
+        "comparison": {
+          "missing": [],
+          "conflicts": [],
+          "agreements": ["abv"]
+        },
+        "distillery": [],
+        "maturation": null,
+        "releaseDay": null,
+        "singleCask": false,
+        "releaseYear": 2016,
+        "vintageYear": null,
+        "bottlingYear": null,
+        "caskStrength": null,
+        "releaseMonth": null,
+        "familyContext": {
+          "siblingBottles": []
+        }
+      },
+      {
+        "abv": 43,
+        "brand": "Johnnie Walker",
+        "score": 62.286983,
+        "series": null,
+        "source": ["text"],
+        "bottler": null,
+        "edition": null,
+        "outturn": null,
+        "bottleId": 56132,
+        "category": "blend",
+        "fullName": "Johnnie Walker Blue Label King George V",
+        "reference": null,
+        "statedAge": null,
+        "caskNumber": null,
+        "comparison": {
+          "missing": [],
+          "conflicts": [],
+          "agreements": ["abv"]
+        },
+        "distillery": [],
+        "maturation": null,
+        "releaseDay": null,
+        "singleCask": null,
+        "releaseYear": null,
+        "vintageYear": null,
+        "bottlingYear": null,
+        "caskStrength": null,
+        "releaseMonth": null,
+        "familyContext": {
+          "siblingBottles": []
+        }
+      }
+    ]
+  },
+  "context": {
+    "inspectedBottleIds": [16252],
+    "bottleContexts": [
+      {
+        "exact": {
+          "abv": null,
+          "edition": null,
+          "outturn": null,
+          "statedAge": null,
+          "caskNumber": null,
+          "maturation": null,
+          "releaseDay": null,
+          "singleCask": null,
+          "releaseYear": null,
+          "vintageYear": null,
+          "bottlingYear": null,
+          "caskStrength": null,
+          "releaseMonth": null
+        },
+        "shared": {
+          "name": "Black Label 12-year-old",
+          "brand": {
+            "name": "Johnnie Walker",
+            "entityId": 1093
+          },
+          "series": null,
+          "bottler": null,
+          "category": "blend",
+          "statedAge": 12,
+          "distillers": []
+        },
+        "groupId": 14660,
+        "bottleId": 16252,
+        "fullName": "Johnnie Walker Black Label 12-year-old",
+        "siblings": [],
+        "references": [
+          {
+            "name": "Johnnie Walker Black Label 12-year-old",
+            "ignored": false
+          },
+          {
+            "name": "Johnnie Walker Black Label 12-year-old, 40%",
+            "ignored": false
+          },
+          {
+            "name": "Johnnie Walker Black Label 1.75L",
+            "ignored": false
+          }
+        ],
+        "observations": [
+          {
+            "facts": {
+              "proposalType": "match",
+              "proposedBottle": null,
+              "referenceScope": "none"
+            },
+            "rawText": "Johnnie Walker Black Label Blended Scotch Whisky With Two Highball Glasses",
+            "sourceKey": "store_price:12062234",
+            "sourceUrl": "https://www.reservebar.com/products/johnnie-walker-black-label-blended-scotch-whisky-with-two-highball-glasses/GROUPING-1763153",
+            "sourceName": "Johnnie Walker Black Label Blended Scotch Whisky With Two Highball Glasses",
+            "sourceType": "store_price",
+            "parsedIdentity": {
+              "abv": null,
+              "brand": "Johnnie Walker",
+              "series": null,
+              "bottler": null,
+              "edition": null,
+              "outturn": null,
+              "category": "blend",
+              "distillery": [],
+              "expression": "Black Label",
+              "maturation": null,
+              "stated_age": 12,
+              "cask_number": null,
+              "release_day": null,
+              "single_cask": null,
+              "release_year": null,
+              "vintage_year": null,
+              "bottling_year": null,
+              "cask_strength": null,
+              "release_month": null
+            }
+          },
+          {
+            "facts": {
+              "proposalType": "match",
+              "proposedBottle": null,
+              "referenceScope": "none"
+            },
+            "rawText": "Johnnie Walker Black Label 12-year-old",
+            "sourceKey": "store_price:12061852",
+            "sourceUrl": "https://www.finedrams.com/johnnie-walker-black-label-12-year-old-whisky.html",
+            "sourceName": "Johnnie Walker Black Label 12-year-old",
+            "sourceType": "store_price",
+            "parsedIdentity": null
+          },
+          {
+            "facts": {
+              "proposalType": "match_existing",
+              "proposedBottle": null,
+              "referenceScope": "none"
+            },
+            "rawText": "Johnnie Walker Black Label Blended Scotch Whisky",
+            "sourceKey": "store_price:12060022",
+            "sourceUrl": "https://kegnbottle.com/products/johnnie-walker-black-label-1-l-copy",
+            "sourceName": "Johnnie Walker Black Label Blended Scotch Whisky",
+            "sourceType": "store_price",
+            "parsedIdentity": {
+              "abv": null,
+              "brand": "Johnnie Walker",
+              "series": null,
+              "bottler": null,
+              "edition": null,
+              "outturn": null,
+              "category": "blend",
+              "distillery": [],
+              "expression": "Black Label",
+              "maturation": null,
+              "stated_age": 12,
+              "cask_number": null,
+              "release_day": null,
+              "single_cask": null,
+              "release_year": null,
+              "vintage_year": null,
+              "bottling_year": null,
+              "cask_strength": null,
+              "release_month": null
+            }
+          },
+          {
+            "facts": {
+              "proposalType": "create_new",
+              "proposedBottle": {
+                "abv": null,
+                "name": "Black Label",
+                "brand": {
+                  "id": null,
+                  "name": "Johnnie Walker"
+                },
+                "series": null,
+                "bottler": null,
+                "edition": "x Squid Game Limited Edition",
+                "outturn": null,
+                "category": "blend",
+                "statedAge": null,
+                "caskNumber": null,
+                "distillers": [],
+                "maturation": null,
+                "releaseDay": null,
+                "singleCask": null,
+                "releaseYear": null,
+                "vintageYear": null,
+                "bottlingYear": null,
+                "caskStrength": null,
+                "releaseMonth": null
+              },
+              "referenceScope": "none"
+            },
+            "rawText": "Johnnie Walker Black Label x Squid Game Limited Edition Blended Scotch Whisky",
+            "sourceKey": "store_price:11827940",
+            "sourceUrl": "https://www.reservebar.com/products/johnnie-walker-black-label-x-squid-game-limited-edition-blended-scotch-whisky/GROUPING-2488543",
+            "sourceName": "Johnnie Walker Black Label x Squid Game Limited Edition Blended Scotch Whisky",
+            "sourceType": "store_price",
+            "parsedIdentity": null
+          },
+          {
+            "facts": {
+              "proposalType": "match_existing",
+              "proposedBottle": null,
+              "referenceScope": "none"
+            },
+            "rawText": "Johnnie Walker Black Label Blended Scotch Whisky",
+            "sourceKey": "store_price:12058954",
+            "sourceUrl": "https://kegnbottle.com/products/johnnie-walker-black-label-750-ml",
+            "sourceName": "Johnnie Walker Black Label Blended Scotch Whisky",
+            "sourceType": "store_price",
+            "parsedIdentity": {
+              "abv": null,
+              "brand": "Johnnie Walker",
+              "series": null,
+              "bottler": null,
+              "edition": null,
+              "outturn": null,
+              "category": "blend",
+              "distillery": [],
+              "expression": "Black Label",
+              "maturation": null,
+              "stated_age": 12,
+              "cask_number": null,
+              "release_day": null,
+              "single_cask": null,
+              "release_year": null,
+              "vintage_year": null,
+              "bottling_year": null,
+              "cask_strength": null,
+              "release_month": null
+            }
+          },
+          {
+            "facts": {
+              "proposalType": "create_new",
+              "proposedBottle": {
+                "abv": null,
+                "name": "Black Label 12-year-old",
+                "brand": {
+                  "id": null,
+                  "name": "Johnnie Walker"
+                },
+                "series": null,
+                "bottler": null,
+                "edition": "Air Ink Bangkok Edition",
+                "outturn": null,
+                "category": "blend",
+                "statedAge": 12,
+                "caskNumber": null,
+                "distillers": [],
+                "maturation": null,
+                "releaseDay": null,
+                "singleCask": null,
+                "releaseYear": null,
+                "vintageYear": null,
+                "bottlingYear": null,
+                "caskStrength": null,
+                "releaseMonth": null
+              },
+              "referenceScope": "none"
+            },
+            "rawText": "Johnnie Walker Black Label 12-year-old - Air Ink Bangkok Edition",
+            "sourceKey": "store_price:12033772",
+            "sourceUrl": "https://www.masterofmalt.com/whiskies/johnnie-walker/johnnie-walker-12-year-old-black-bangkok-air-ink-whisky/?sku=133096",
+            "sourceName": "Johnnie Walker Black Label 12-year-old - Air Ink Bangkok Edition",
+            "sourceType": "store_price",
+            "parsedIdentity": null
+          },
+          {
+            "facts": {
+              "proposalType": "create_new",
+              "proposedBottle": {
+                "abv": null,
+                "name": "Black Label",
+                "brand": {
+                  "id": null,
+                  "name": "Johnnie Walker"
+                },
+                "series": null,
+                "bottler": null,
+                "edition": "Air Ink Mexico City Edition",
+                "outturn": null,
+                "category": "blend",
+                "statedAge": 12,
+                "caskNumber": null,
+                "distillers": [],
+                "maturation": null,
+                "releaseDay": null,
+                "singleCask": null,
+                "releaseYear": null,
+                "vintageYear": null,
+                "bottlingYear": null,
+                "caskStrength": null,
+                "releaseMonth": null
+              },
+              "referenceScope": "none"
+            },
+            "rawText": "Johnnie Walker Black Label 12-year-old - Air Ink Mexico City Edition",
+            "sourceKey": "store_price:12033747",
+            "sourceUrl": "https://www.masterofmalt.com/whiskies/johnnie-walker/johnnie-walker-black-label-12-year-old-air-ink-mexico-city-edition-whisky/?sku=142223",
+            "sourceName": "Johnnie Walker Black Label 12-year-old - Air Ink Mexico City Edition",
+            "sourceType": "store_price",
+            "parsedIdentity": null
+          },
+          {
+            "facts": {
+              "proposalType": "create_new",
+              "proposedBottle": {
+                "abv": null,
+                "name": "Black Label",
+                "brand": {
+                  "id": null,
+                  "name": "Johnnie Walker"
+                },
+                "series": null,
+                "bottler": null,
+                "edition": "Air Ink San José Edition",
+                "outturn": null,
+                "category": "blend",
+                "statedAge": 12,
+                "caskNumber": null,
+                "distillers": [],
+                "maturation": null,
+                "releaseDay": null,
+                "singleCask": null,
+                "releaseYear": null,
+                "vintageYear": null,
+                "bottlingYear": null,
+                "caskStrength": null,
+                "releaseMonth": null
+              },
+              "referenceScope": "none"
+            },
+            "rawText": "Johnnie Walker Black Label 12-year-old - Air Ink San José Edition",
+            "sourceKey": "store_price:12033745",
+            "sourceUrl": "https://www.masterofmalt.com/whiskies/johnnie-walker/johnnie-walker-black-label-12-year-old-air-ink-san-jose-edition-whisky/?sku=142224",
+            "sourceName": "Johnnie Walker Black Label 12-year-old - Air Ink San José Edition",
+            "sourceType": "store_price",
+            "parsedIdentity": null
+          }
+        ],
+        "imageSources": []
+      }
+    ],
+    "inspectedEntities": [
+      {
+        "kind": "brand",
+        "name": "Johnnie Walker",
+        "score": 1,
+        "source": ["exact", "text", "prefix", "contained"],
+        "entityId": 1093,
+        "reference": "Johnnie Walker",
+        "shortName": null,
+        "retrievedFor": [
+          {
+            "exact": true,
+            "query": "Johnnie Walker"
+          }
+        ]
+      },
+      {
+        "kind": "distillery",
+        "name": "Brora",
+        "score": 1,
+        "source": ["exact", "text", "prefix", "contained"],
+        "entityId": 116,
+        "reference": "Brora",
+        "shortName": null,
+        "retrievedFor": [
+          {
+            "exact": true,
+            "query": "Brora"
+          }
+        ]
+      },
+      {
+        "kind": "distillery",
+        "name": "Dalwhinnie",
+        "score": 1,
+        "source": ["exact", "text", "prefix", "contained"],
+        "entityId": 515,
+        "reference": "Dalwhinnie",
+        "shortName": null,
+        "retrievedFor": [
+          {
+            "exact": true,
+            "query": "Dalwhinnie"
+          }
+        ]
+      },
+      {
+        "kind": "distillery",
+        "name": "Clynelish",
+        "score": 1,
+        "source": ["exact", "text", "prefix", "contained"],
+        "entityId": 843,
+        "reference": "Clynelish",
+        "shortName": null,
+        "retrievedFor": [
+          {
+            "exact": true,
+            "query": "Clynelish"
+          }
+        ]
+      },
+      {
+        "kind": "brand",
+        "name": "John Walker & Sons",
+        "score": 1,
+        "source": ["exact", "text", "prefix", "contained"],
+        "entityId": 1091,
+        "reference": "John Walker & Sons",
+        "shortName": null,
+        "retrievedFor": [
+          {
+            "exact": true,
+            "query": "John Walker & Sons"
+          }
+        ]
+      }
+    ],
+    "inspectedSeries": []
+  },
+  "provenance": {
+    "source": "production_miss",
+    "verifiedSourceUrls": [
+      "https://www.scotchwhiskyauctions.com/auctions/234-the-185th-auction/906037-johnnie-walker-12-year-old-black-label-extra-special-1l/"
+    ],
+    "dbOutcome": {
+      "bottleId": null,
+      "createsBottle": true,
+      "summary": "Production returned create_bottle with the name `Black Label Extra Special 12-year-old`."
+    },
+    "notes": "Captured from saved classifier run 35652 (auction_lot 16020, model null, 2026-11-03T15:11:08.327Z). Production rationale: The auction listing is for one whisky bottle. Exact-product evidence supports Johnnie Walker Black Label Extra Special, 12 years old, at 43% ABV. The closest local candidate, Bottle 16252, is referenced as 40%, so it does not represent this 43% release; no inspected candidate represents the complete source identity. Checked 2026-11-03. Lot page and photo: Johnnie Walker Black Label Old Scotch Whisky, neck label \"Extra Special Aged 12 Years\", Duty Free, 43% vol, 1 litre, in a tin. Modern Black Label is 40%; 16252 Johnnie Walker Black Label 12-year-old stores no ABV. The identity model keeps the expression name for an older label generation and puts the distinguishing printed wording in edition. Production created \"Black Label Extra Special 12-year-old\" with no edition."
+  },
+  "expected": {
+    "status": "classified",
+    "action": "create_bottle",
+    "identityScope": "product",
+    "matchedBottleId": null,
+    "proposedBottle": {
+      "brand": {
+        "id": 1093
+      },
+      "statedAge": 12,
+      "abv": 43,
+      "edition": "Extra Special"
+    },
+    "proposedBottleNameIncludes": ["Black Label"],
+    "proposedBottleNameExcludes": ["Extra Special"],
+    "summary": "Create the 43% Extra Special Black Label as its own Bottle, named Black Label 12-year-old with Extra Special in edition."
+  },
+  "knownFailure": {
+    "reason": "The create puts 'Extra Special' in the name instead of the edition."
+  }
+}
