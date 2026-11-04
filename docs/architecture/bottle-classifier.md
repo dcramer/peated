@@ -207,7 +207,8 @@ through `deriveAutomationTier`.
 
 The contract has no numeric confidence score. The model records typed
 `unresolvedRisks`, its evidence judgment, and its action. Any unresolved risk
-forces review. Code derives `auto` or `review` from action risk, structured
+forces review. So does web evidence the agent judged `conflicting`, even with
+a verified anchor, because a person settles evidence that disagrees. Code derives `auto` or `review` from action risk, structured
 evidence, and verified anchors; model-supplied confidence cannot raise that
 tier.
 
@@ -231,11 +232,15 @@ bottler, but a stored Brand of `Canadian` for a Canadian Club Bottle does.
 - An edition is compared only by its markers, the words that contain a digit
   (a year, batch number, or code such as `S2B13`). Numbers joined by `.` or
   `/`, with any letters after them, stay one marker: `1.1` is neither `1.2`
-  nor `1`, and `1.2a` is not `1.2b`. Accents, `No.`, and
-  leading zeros do not change a marker. Editions conflict only when each side has a
-  marker the other lacks: `Batch 3` and `Batch 4` conflict; `2017 Release` and
-  `2017 Edition` agree; `Cask #2787` and `Cask 2787 · Fèis Ìle 2023` do not
-  conflict. The wording is left to the agent.
+  nor `1`, and `1.2a` is not `1.2b`. Accents, `No.`, and leading zeros do not
+  change a marker. Nor does a space between letters and a number: `Batch3`
+  reads as `Batch 3`, and `S2B13` as `S2 B13`. Letters glued to a number are
+  dropped only when the other edition spells them as their own word, so
+  `A123` and `B123` still differ, and so do `1 2` and `12`. Editions conflict
+  only when each side has a marker the other lacks: `Batch 3` and `Batch 4`
+  conflict; `2017 Release` and `2017 Edition` agree; `Cask #2787` and
+  `Cask 2787 · Fèis Ìle 2023` do not conflict. The wording is left to the
+  agent.
 
 When a matched candidate conflicts with the extracted facts, code adds a
 conflict risk and the Match goes to review. Code never turns that Match into

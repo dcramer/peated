@@ -101,6 +101,7 @@
   },
   "devDependencies": {
     "@types/node": "catalog:",
+    "fast-check": "^4.10.2",
     "tinyrainbow": "^2.0.0",
     "typescript": "catalog:",
     "vite": "catalog:",
