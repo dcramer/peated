@@ -195,6 +195,26 @@ describe("assessBottleResolution", () => {
     });
   });
 
+  test("reviews a decision with conflicting web evidence despite an anchor", () => {
+    expect(
+      assess({ webEvidence: "conflicting", readListingImage: true }),
+    ).toEqual({
+      automationEligible: false,
+      automationBlockers: ["the classifier found conflicting web evidence"],
+    });
+    expect(
+      assess({
+        action: "match",
+        currentBottleId: 1,
+        suggestedBottleId: 1,
+        candidates: [buildCandidate()],
+        proposedBottle: null,
+        identityScope: "exact_cask",
+        webEvidence: "conflicting",
+      }),
+    ).toMatchObject({ automationEligible: false });
+  });
+
   test("reviews a create that contradicts the store's structured facts", () => {
     expect(
       assess({ sourceBottleIdentity: buildExtractedLabel({ abv: 46 }) }),

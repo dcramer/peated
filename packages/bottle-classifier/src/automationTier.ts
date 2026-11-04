@@ -108,11 +108,16 @@ function comparableReferenceName(value: string): string {
     .trim();
 }
 
-/** Any unresolved risk forces review; otherwise the action needs an anchor. */
+/**
+ * Any unresolved risk or conflicting web evidence forces review; otherwise the
+ * action needs an anchor.
+ */
 export function deriveAutomationTier(
   input: AutomationTierInput,
 ): AutomationTier {
-  if (input.hasUnresolvedRisks) {
+  // Deterministic code rule (owner: Bottle classifier): when the agent judges
+  // the web evidence conflicting, a person settles it, even with an anchor.
+  if (input.hasUnresolvedRisks || input.webEvidence === "conflicting") {
     return "review";
   }
 

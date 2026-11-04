@@ -85,9 +85,11 @@ export function assessBottleResolution({
     automationBlockers.push(
       hasUnresolvedRisks
         ? "the classifier reported unresolved risks"
-        : replacesCurrentAssignment
-          ? "it replaces the listing's current Bottle"
-          : "the classifier found no supporting evidence",
+        : decision.confidenceBasis?.webEvidence === "conflicting"
+          ? "the classifier found conflicting web evidence"
+          : replacesCurrentAssignment
+            ? "it replaces the listing's current Bottle"
+            : "the classifier found no supporting evidence",
     );
   return {
     automationEligible: automationBlockers.length === 0,
