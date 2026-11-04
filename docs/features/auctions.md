@@ -8,7 +8,9 @@ multipacks, miniatures, samples (including duty-paid trade samples),
 distillery hand-fills (bottles a visitor fills from a cask at the distillery,
 including Bruichladdich Valinch bottles), glassware and other accessories, and
 other spirits are out of scope. Hand-fills are not marketed releases, so they
-stay out of the catalog, as Catalog Maintenance already says.
+stay out of the catalog, as Catalog Maintenance already says. A bottle sold
+with a book, print, or coaster is still one whisky bottle; a bottle sold with
+glasses or a mini is a set.
 
 ## Stored records
 
@@ -128,7 +130,12 @@ whole save. The moderator can still assign just the lot.
 version checks. It clears any assignment, records the moderator and time, and logs an unassign
 decision in History when the lot had a Bottle. Ignored lots leave the Inbox,
 rechecks skip them, and assignment rejects them, so a stale screen cannot undo
-the decision. Only a later source identity change reopens the lot for matching.
+the decision. A later source identity change reopens the lot for matching.
+
+A moderator can also reopen an ignored lot that turns out to be one whisky
+bottle, with `POST /auction-lots/{lot}/reopen` and the lot's current source
+fingerprint and saved check. The lot returns to review with its saved check
+and no Bottle, and a moderator assigns it. Reopening makes no model call.
 
 A source identity change clears the assignment and check link. Correcting a
 reference invalidates assignments made from it, not direct moderator decisions.
@@ -154,7 +161,8 @@ in history. Unsupported proposals stay in review. Auction matching never edits
 existing catalog facts, copies source images, or automatically accepts new
 references. When the classifier finds that a lot is out of scope, the lot
 becomes `ignored`, just as with "Ignore lot": it leaves the Inbox, rechecks skip
-it, and assignment rejects it until a source identity change reopens it.
+it, and assignment rejects it until a source identity change or a moderator
+reopens it.
 
 Bottle merges move lots, alert references, and watches to the replacement Bottle;
 duplicate member watches collapse, preserving the earlier subscription time.

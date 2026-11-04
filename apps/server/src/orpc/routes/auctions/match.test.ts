@@ -669,3 +669,75 @@ describe("POST /auction-lots/{lot}/ignore", () => {
     });
   });
 });
+
+describe("POST /auction-lots/{lot}/reopen", () => {
+  test("a moderator reopens an ignored lot, which returns to review and can be matched", async ({
+    fixtures,
+  }) => {
+    const data = await reviewedLot(fixtures);
+    const versions = {
+      lot: data.lot.id,
+      fingerprint: data.lot.sourceFingerprint,
+      expectedCheckId: data.check.id,
+    };
+    await routerClient.auctions.ignore(
+      { ...versions, expectedBottleId: null },
+      { context: data.context },
+    );
+    await routerClient.auctions.reopen(versions, { context: data.context });
+    expect(await db.query.auctionLots.findFirst()).toMatchObject({
+      bottleId: null,
+      matchStatus: "review",
+      matchCheckId: data.check.id,
+      matchedById: null,
+      matchedAt: null,
+    });
+    const queue = await routerClient.auctions.matchQueue(
+      {},
+      { context: data.context },
+    );
+    expect(queue.results.map(({ id }) => id)).toEqual([data.lot.id]);
+    await routerClient.auctions.match(data.input, { context: data.context });
+    expect(await db.query.auctionLots.findFirst()).toMatchObject({
+      bottleId: data.bottle.id,
+      matchStatus: "matched",
+    });
+  });
+
+  test("stale versions, a lot that is not ignored, and non-moderators are rejected", async ({
+    fixtures,
+  }) => {
+    const data = await reviewedLot(fixtures);
+    const versions = {
+      lot: data.lot.id,
+      fingerprint: data.lot.sourceFingerprint,
+      expectedCheckId: data.check.id,
+    };
+    await expect(
+      routerClient.auctions.reopen(versions, { context: data.context }),
+    ).rejects.toThrow(/not ignored/i);
+    await routerClient.auctions.ignore(
+      { ...versions, expectedBottleId: null },
+      { context: data.context },
+    );
+    const member = await fixtures.User();
+    await expect(
+      routerClient.auctions.reopen(versions, { context: { user: member } }),
+    ).rejects.toThrow();
+    await expect(
+      routerClient.auctions.reopen(
+        { ...versions, fingerprint: "older-version" },
+        { context: data.context },
+      ),
+    ).rejects.toThrow(/changed/i);
+    await expect(
+      routerClient.auctions.reopen(
+        { ...versions, expectedCheckId: null },
+        { context: data.context },
+      ),
+    ).rejects.toThrow(/changed/i);
+    expect(await db.query.auctionLots.findFirst()).toMatchObject({
+      matchStatus: "ignored",
+    });
+  });
+});
