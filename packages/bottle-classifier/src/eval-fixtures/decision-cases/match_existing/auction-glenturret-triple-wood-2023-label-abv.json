@@ -6,7 +6,7 @@
       "id": 15710,
       "url": "https://www.scotchwhiskyauctions.com/auctions/234-the-185th-auction/904492-glenturret-triple-wood-2023-release/",
       "name": "Glenturret Triple Wood 2023 Release",
-      "imageUrl": "https://d3suvtcq00dftb.cloudfront.net/images/f8d981a314a99c5bd9fa3853ad0100d8-zoom.jpg",
+      "imageUrl": null,
       "externalSiteId": 28097,
       "currentBottleId": null
     },
@@ -28,7 +28,65 @@
       "vintage_year": null,
       "cask_strength": null
     },
-    "imageEvidence": null,
+    "imageEvidence": {
+      "sourceImageId": "auction_lot:15710",
+      "extractors": [
+        {
+          "kind": "vision",
+          "model": "openai/gpt-6-luna",
+          "confidence": 0.75,
+          "textSpans": [
+            {
+              "text": "The GLENTURRET\nHIGHLAND SINGLE MALT SCOTCH WHISKY\nTRIPLE WOOD\nSCOTLAND'S OLDEST WORKING DISTILLERY\nSINCE 1763\n2023 RELEASE\nTASTING NOTES\nTOFFEE APPLE, CITRUS and FRESHLY CUT OAK. Gentle WOOD SPICES. GINGER with VANILLA leads to a light, soft, FRUITY finale.\n70cl\nPRODUCT OF SCOTLAND\n43%vol\n17 years - Who knew!\n\nBox: The GLENTURRET\nHIGHLAND SINGLE MALT SCOTCH WHISKY\n2023 RELEASE\nTRIPLE WOOD\nDISTILLED BY THE GLENTURRET DISTILLERY\nTHE HOSH, CRIEFF, PERTHSHIRE, SCOTLAND\nGLENTURRET DISTILLERY\nSINCE 1763",
+              "confidence": 0.75
+            }
+          ],
+          "observations": [
+            "Read whisky label identity from the auction lot photo."
+          ]
+        }
+      ],
+      "fieldCandidates": {
+        "brand": {
+          "value": "The Glenturret",
+          "confidence": 0.75,
+          "sourceExtractorIndexes": [0]
+        },
+        "expression": {
+          "value": "Triple Wood",
+          "confidence": 0.75,
+          "sourceExtractorIndexes": [0]
+        },
+        "distillery": {
+          "value": ["The Glenturret Distillery"],
+          "confidence": 0.75,
+          "sourceExtractorIndexes": [0]
+        },
+        "category": {
+          "value": "single_malt",
+          "confidence": 0.75,
+          "sourceExtractorIndexes": [0]
+        },
+        "abv": {
+          "value": 43,
+          "confidence": 0.75,
+          "sourceExtractorIndexes": [0]
+        },
+        "releaseYear": {
+          "value": 2023,
+          "confidence": 0.75,
+          "sourceExtractorIndexes": [0]
+        }
+      },
+      "photoSuitability": {
+        "isSingleBottlePhoto": true,
+        "labelReadable": true,
+        "suitableAsTastingImage": false,
+        "suitableAsBottleImage": false,
+        "reason": null
+      },
+      "conflicts": []
+    },
     "initialCandidates": [
       {
         "abv": 45,
@@ -1235,7 +1293,7 @@
       "createsBottle": false,
       "summary": "Production returned no_match: it held candidate 45557 because the lot's structured ABV (45%) conflicted with the stored 43%."
     },
-    "notes": "Saved check 35444, source auction_lot 15710 (Scotch Whisky Auctions 185th auction, lot 185-904492), run 2026-11-03. Production ran without the lot photo: input.reference.imageUrl was null. This case sets it to the lot's first photo at full size and adds that photo's reviewed label reading to the evidence pack; it goes in with the change that makes auctions read the lot photo. The lot's stored sourceImageUrl is the 224px `-med` copy of the same image, too small to read the ABV, so that change needs the `-zoom` (1500px) size. The photo clearly shows the bottle and carton: The Glenturret, Highland Single Malt Scotch Whisky, Triple Wood, 2023 Release, 70cl, 43%vol, and the carton's 'Distilled by The Glenturret Distillery'. The engraving '17 years - Who knew!' on the bottle base is a personal engraving, not an age statement, and is left out of the reading. The lot text and the scraper's structured ABV say 45%, which matches the 2025 Release (46005, 45%), not the 2023 Release. The printed label settles it: 45557 is the same release and no stored field conflicts."
+    "notes": "Saved check 35444, source auction_lot 15710 (Scotch Whisky Auctions 185th auction, lot 185-904492), run 2026-11-03. Production ran without the lot photo: input.reference.imageUrl was null. This case sets it to the lot's first photo at full size and adds that photo's reviewed label reading to the evidence pack; it goes in with the change that makes auctions read the lot photo. The lot's stored sourceImageUrl is the 224px `-med` copy of the same image, too small to read the ABV, so that change needs the `-zoom` (1500px) size. The photo clearly shows the bottle and carton: The Glenturret, Highland Single Malt Scotch Whisky, Triple Wood, 2023 Release, 70cl, 43%vol, and the carton's 'Distilled by The Glenturret Distillery'. The engraving '17 years - Who knew!' on the bottle base is a personal engraving, not an age statement, and is left out of the reading. The lot text and the scraper's structured ABV say 45%, which matches the 2025 Release (46005, 45%), not the 2023 Release. The printed label settles it: 45557 is the same release and no stored field conflicts. 2026-11-04: auction matching now sends the lot photo as imageEvidence (production shape since the photo-reading change), so reference.imageUrl is null and imageEvidence holds a live openai/gpt-6-luna reading of the -zoom photo (43%vol, 2023 Release)."
   },
   "expected": {
     "status": "classified",

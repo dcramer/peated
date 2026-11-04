@@ -1,7 +1,7 @@
 {
   "name": "Reviewed classifier CI evidence",
   "reviewedAt": "2026-11-03",
-  "notes": "Fixed external evidence for every classifier and audit case. Search/page material is retained from the reviewed evidence packs C01, C02, C04, C05, C06, C24, C26, stable-name-examples, black-label-islay-origin, and the Glenfarclas review pack, plus the cited additions. Source-image re-reads retain the captured upstream extraction where provided, including known extraction errors; classifier judgment must still handle those errors. Empty search evidence explicitly marks local-input-only cases, not a missing provider response. Expected actions, Bottle IDs, and assertions are not used to construct this data. Standalone label-extraction evals still run against checked-in images and the live extraction model. Candidate-image observations retain valid captured tool results from CI run 39285550059, reviewed against the fixture source notes. Glendalough and Russell's Reserve source labels were visually reviewed on October 20, 2026; Ardbeg retains the exact label fields already verified by its curated regression. Direct source-page reads retain the exact captured title and, where already documented, review issue/byline/price metadata. These bounded source excerpts add no facts from expected outputs. 2026-10-25: the Jameson Cold Brew and Skrewball cases gained producer and retailer search results showing added flavor, the sources M02 cites, after those cases began expecting ignored under the owner scope ruling.",
+  "notes": "Fixed external evidence for every classifier and audit case. Search/page material is retained from the reviewed evidence packs C01, C02, C04, C05, C06, C24, C26, stable-name-examples, black-label-islay-origin, and the Glenfarclas review pack, plus the cited additions. Source-image re-reads retain the captured upstream extraction where provided, including known extraction errors; classifier judgment must still handle those errors. Empty search evidence explicitly marks local-input-only cases, not a missing provider response. Expected actions, Bottle IDs, and assertions are not used to construct this data. Standalone label-extraction evals still run against checked-in images and the live extraction model. Candidate-image observations retain valid captured tool results from CI run 39285550059, reviewed against the fixture source notes. Glendalough and Russell's Reserve source labels were visually reviewed on October 20, 2026; Ardbeg retains the exact label fields already verified by its curated regression. Direct source-page reads retain the exact captured title and, where already documented, review issue/byline/price metadata. These bounded source excerpts add no facts from expected outputs. 2026-10-25: the Jameson Cold Brew and Skrewball cases gained producer and retailer search results showing added flavor, the sources M02 cites, after those cases began expecting ignored under the owner scope ruling. 2026-11-04: Scotch Whisky Auctions lot page readings now hold the lot heading and description that the server reads from the page HTML, replacing Firecrawl's age-gate text.",
   "sources": [
     "http://www.divingforpearlsblog.com/2022_10_17_archive.html",
     "https://api.peated.com/uploads/bottle-releases/bottle_release-414-pending-upload-e2dv003m0knz9un4uoswa5ml.webp",
@@ -5716,7 +5716,7 @@
                 "extraSnippets": []
               }
             ],
-            "summary": "[Skip to menu](https://www.scotchwhiskyauctions.com/auctions/234-the-185th-auction/903396-deanston-2013-7-year-old-hand-filled/#menu) [Skip to content](https://www.scotchwhiskyauctions.com/auctions/234-the-185th-auction/903396-deanston-2013-7-year-old-hand-filled/#contentstart)\n\nAre you the legal age to buy alcohol in your country?YesNo\n\n [Free valuations](https://wa.me/+447538638525/?text=I%20would%20like%20a%20free%20valuation)\n\nShow/hide cookie info\n\n**This site may set cookies for essential tasks, such as tracking whether you are signed in.**\n\nWe would also like to set analytics cookies to better understand our users’ behaviour.\n\n[Read our cookies policy](https://www.scotchwhiskyauctions.com/privacy/)\n\nAcceptReject",
+            "summary": "# Deanston 2013 7 Year Old Hand Filled\n\nLot number: 185-00233\n\nDeanston is housed in a former cotton mill on the banks of the fast-flowing River Teith, in the central Highlands that dates back to the late eighteenth century. The buildings were converted in to a distillery in 1966. It was acquired by Invergordon in 1972, but ceased production in 1982 and was mothballed until 1990.\n\nDeanston is now operated by Distell and has managed to retain some old-style features in its kit and distilling regime. Its mash tun is open-topped, while the way the distillery is run – low gravity worts, long fermentation times and slow distillation helps to produce a new make which has a slightly waxy style.\n\nDistilled: 23.08.2013\n\nBottled: 23.04.2024\n\nCask Type: Fino\n\n53.6% ABV / 70cl\n\nPlease examine all images of the lot, any packaging and labels carefully and satisfy yourself as to their condition before making a bid.",
             "provider": "firecrawl"
           },
           {
@@ -5763,7 +5763,7 @@
                 "extraSnippets": []
               }
             ],
-            "summary": "[Skip to menu](https://www.scotchwhiskyauctions.com/auctions/233-the-184th-auction/898970-bruichladdich-valinch-28-chloe-wood-50cl/#menu) [Skip to content](https://www.scotchwhiskyauctions.com/auctions/233-the-184th-auction/898970-bruichladdich-valinch-28-chloe-wood-50cl/#contentstart)\n\nAre you the legal age to buy alcohol in your country?YesNo\n\n [Free valuations](https://wa.me/+447538638525/?text=I%20would%20like%20a%20free%20valuation)\n\nShow/hide cookie info\n\n**This site may set cookies for essential tasks, such as tracking whether you are signed in.**\n\nWe would also like to set analytics cookies to better understand our users’ behaviour.\n\n[Read our cookies policy](https://www.scotchwhiskyauctions.com/privacy/)\n\nAcceptReject",
+            "summary": "# Bruichladdich Valinch 28 Chloe Wood 50cl\n\nLot number: 184-00443\n\nThese hand-filled bottlings are available exclusively to visitors to the distillery. Valinchs are by definition only ever at cask strength, from a single barrel, and selected for their individuality. Each Valinch released has its own label and title, usually to commemorate a specific event.\n\nThis cask was bottled in honour of Brand Academy & Distillery Ambassador Chloe Wood.\n\nDistilled: 29.06.2005\n\nAge: 12 Years Old\n\nCask Type: Sauternes\n\nCask Number: 780\n\n48.8% ABV / 50cl\n\nBottle Number: 367 / 444\n\nPlease examine all images of the lot, any packaging and labels carefully and satisfy yourself as to their condition before making a bid.",
             "provider": "firecrawl"
           },
           {
@@ -5902,7 +5902,7 @@
                 "extraSnippets": []
               }
             ],
-            "summary": "[Skip to menu](https://www.scotchwhiskyauctions.com/auctions/234-the-185th-auction/908247-lagavulin-12-year-old-hand-filled-batch-002-2025-release/#menu) [Skip to content](https://www.scotchwhiskyauctions.com/auctions/234-the-185th-auction/908247-lagavulin-12-year-old-hand-filled-batch-002-2025-release/#contentstart)\n\nAre you the legal age to buy alcohol in your country?YesNo\n\n [Free valuations](https://wa.me/+447538638525/?text=I%20would%20like%20a%20free%20valuation)\n\nShow/hide cookie info\n\n**This site may set cookies for essential tasks, such as tracking whether you are signed in.**\n\nWe would also like to set analytics cookies to better understand our users’ behaviour.\n\n[Read our cookies policy](https://www.scotchwhiskyauctions.com/privacy/)\n\nAcceptReject",
+            "summary": "# Lagavulin 12 Year Old Hand Filled Batch #002 2025 Release\n\nLot number: 185-04994\n\nLike most Islay malts, Lagavulin is definitely not for the faint hearted. The distillery was officially founded in 1816 (although illicit production on the site most certainly predates that), and produces malt with a signature style of earthy smoke and savoury undertones. 1962 marked a significant point in the distillery’s history, as it was then bought by John Logan Mackie, whose nephew Peter went on to create the White Horse blend with Lagavulin at its heart. The current reception room at the distillery is also the last remaining part of the long lost Malt Mill distillery.\n\nThese days the distillery, along with White Horse, belong to Diageo. However, it is generally agreed that while Lagavulin’s core range remains reliably excellent, older expressions bearing the White Horse name still have the edge.\n\nBottled: 22.07.2025\n\nAge: 12 Years Old\n\nCask Type: Madeira\n\n53.5% ABV / 70cl\n\nPlease note creasing to carton.\n\nPlease examine all images of the lot, any packaging and labels carefully and satisfy yourself as to their condition before making a bid.",
             "provider": "firecrawl"
           },
           {
@@ -5955,7 +5955,7 @@
                 "extraSnippets": []
               }
             ],
-            "summary": "[Skip to menu](https://www.scotchwhiskyauctions.com/auctions/234-the-185th-auction/905528-highland-park-hand-filled-distillery-exclusive/#menu) [Skip to content](https://www.scotchwhiskyauctions.com/auctions/234-the-185th-auction/905528-highland-park-hand-filled-distillery-exclusive/#contentstart)\n\nAre you the legal age to buy alcohol in your country?YesNo\n\n [Free valuations](https://wa.me/+447538638525/?text=I%20would%20like%20a%20free%20valuation)\n\nShow/hide cookie info\n\n**This site may set cookies for essential tasks, such as tracking whether you are signed in.**\n\nWe would also like to set analytics cookies to better understand our users’ behaviour.\n\n[Read our cookies policy](https://www.scotchwhiskyauctions.com/privacy/)\n\nAcceptReject",
+            "summary": "# Highland Park Hand Filled Distillery Exclusive\n\nLot number: 185-02331\n\nHighland Park remains the most northerly whisky distillery in Scotland, although not by much, as it is little more than a stone’s throw from fellow Orcadian, Scapa. Accounts of the distillery’s genesis vary, and the truth is probably lost to the mists of time, but it is thought that a local farmer named David Robertson founded what we now know as Highland Park distillery in 1798, on the site of an illicit still operated by nefarious smuggler (and former priest) Magnus Eunson.\n\nSince its introduction as a single malt in the 1960s, the distillery has been awarded many plaudits, not least of which came from the late, great whisky writer Michael Jackson, who called it “the greatest all rounder in the world of whisky”. It’s characteristic style coming from the use of Sherry casks, along with an often cited heathery sweetness imparted to the spirit by way of the distinct Orcadian peat used during the malting process.\n\n53.3% ABV / 70cl\n\nBottle Number: 620\n\nPlease examine all images of the lot, any packaging and labels carefully and satisfy yourself as to their condition before making a bid.",
             "provider": "firecrawl"
           },
           {
@@ -6094,7 +6094,7 @@
                 "extraSnippets": []
               }
             ],
-            "summary": "[Skip to menu](https://www.scotchwhiskyauctions.com/auctions/234-the-185th-auction/907501-auchentoshan-valinch-2012-release/#menu) [Skip to content](https://www.scotchwhiskyauctions.com/auctions/234-the-185th-auction/907501-auchentoshan-valinch-2012-release/#contentstart)\n\nAre you the legal age to buy alcohol in your country?YesNo\n\n [Free valuations](https://wa.me/+447538638525/?text=I%20would%20like%20a%20free%20valuation)\n\nShow/hide cookie info\n\n**This site may set cookies for essential tasks, such as tracking whether you are signed in.**\n\nWe would also like to set analytics cookies to better understand our users’ behaviour.\n\n[Read our cookies policy](https://www.scotchwhiskyauctions.com/privacy/)\n\nAcceptReject",
+            "summary": "# Auchentoshan Valinch 2012 Release\n\nLot number: 185-04269\n\nLegal whisky-making started here on the banks of the Clyde in 1817 when the Duntocher distillery was built by John Bulloch. As well as being a notoriously challenging tongue twister for American whisky aficionados, Auchentoshan distillery is noteworthy for being one of the few buildings not damaged during the Clydebank Blitz of 1941. Unfortunately one of its warehouses wasn’t so lucky, and the picturesque pond just outside the distillery is actually a bomb crater. It remains the only distillery in Scotland doing 100% triple distillation and one of the very few where all the production is bottled as single malt.\n\nGlasgow-based Tennant’s were owners from 1960 to 1969 when they offloaded it to a publican, Eadie Cairns. The upgraded distillery was then sold to Stanley P Morrison in 1984. Since 1994 it has been part of the Beam Suntory portfolio.\n\nA superb cask strength Auchentoshan Valinch is named after the giant pipette used to remove whisky from casks for tasting. This whisky is basically the classic at cask strength.\n\nCask Type: Bourbon Oak\n\n57.2% ABV / 70cl\n\nPlease examine all images of the lot, any packaging and labels carefully and satisfy yourself as to their condition before making a bid.",
             "provider": "firecrawl"
           },
           {
@@ -6233,7 +6233,7 @@
                 "extraSnippets": []
               }
             ],
-            "summary": "[Skip to menu](https://www.scotchwhiskyauctions.com/auctions/234-the-185th-auction/904747-balvenie-12-year-old-doublewood-20cl/#menu) [Skip to content](https://www.scotchwhiskyauctions.com/auctions/234-the-185th-auction/904747-balvenie-12-year-old-doublewood-20cl/#contentstart)\n\nAre you the legal age to buy alcohol in your country?YesNo\n\n [Free valuations](https://wa.me/+447538638525/?text=I%20would%20like%20a%20free%20valuation)\n\nShow/hide cookie info\n\n**This site may set cookies for essential tasks, such as tracking whether you are signed in.**\n\nWe would also like to set analytics cookies to better understand our users’ behaviour.\n\n[Read our cookies policy](https://www.scotchwhiskyauctions.com/privacy/)\n\nAcceptReject",
+            "summary": "# Balvenie 12 Year Old DoubleWood 20cl\n\nLot number: 185-01570\n\nBuilt by the Grant family in Dufftown, and situated next door to sister distillery Glenfiddich, Balvenie is at the heart of Grant’s range of blends. Despite their proximity and shared water source, the style of spirit produced by the pair are quite different, with Balvenie producing a sweeter, more honeyed and very lightly peated new make spirit.\n\nIt wasn’t until 1990, when Kininvie distillery was able to shoulder some of the responsibility for blending stock production, that Balvenie was really able to push forward as a single malt. The distillery quickly distinguished itself through use of innovative maturation processes, and was a pioneer of cask “finishing” with the introduction of it’s DoubleWood expression in 1993. Balvenie is also one of the few remaining distilleries still using on site maltings, although today this only meets a small percentage of its requirements.\n\nAfter an initial period of maturation in Bourbon casks, the DoubleWood is transferred to Sherry casks to add some spicy, dried fruit notes to its flavour profile.\n\nAge: 12 Years Old\n\nCask Type: Bourbon & Sherry Casks\n\n40% ABV / 20cl\n\nPlease examine all images of the lot, any packaging and labels carefully and satisfy yourself as to their condition before making a bid.",
             "provider": "firecrawl"
           },
           {
@@ -6316,7 +6316,25 @@
         ],
         "errors": []
       },
-      "pageResults": [],
+      "pageResults": [
+        {
+          "url": "https://www.scotchwhiskyauctions.com/auctions/234-the-185th-auction/904747-balvenie-12-year-old-doublewood-20cl/",
+          "result": {
+            "query": "page opening",
+            "results": [
+              {
+                "url": "https://www.scotchwhiskyauctions.com/auctions/234-the-185th-auction/904747-balvenie-12-year-old-doublewood-20cl/",
+                "title": "Balvenie 12 Year Old DoubleWood 20cl | The 185th Auction | Scotch Whisky Auctions",
+                "domain": "scotchwhiskyauctions.com",
+                "description": null,
+                "extraSnippets": []
+              }
+            ],
+            "summary": "# Balvenie 12 Year Old DoubleWood 20cl\n\nLot number: 185-01570\n\nBuilt by the Grant family in Dufftown, and situated next door to sister distillery Glenfiddich, Balvenie is at the heart of Grant’s range of blends. Despite their proximity and shared water source, the style of spirit produced by the pair are quite different, with Balvenie producing a sweeter, more honeyed and very lightly peated new make spirit.\n\nIt wasn’t until 1990, when Kininvie distillery was able to shoulder some of the responsibility for blending stock production, that Balvenie was really able to push forward as a single malt. The distillery quickly distinguished itself through use of innovative maturation processes, and was a pioneer of cask “finishing” with the introduction of it’s DoubleWood expression in 1993. Balvenie is also one of the few remaining distilleries still using on site maltings, although today this only meets a small percentage of its requirements.\n\nAfter an initial period of maturation in Bourbon casks, the DoubleWood is transferred to Sherry casks to add some spicy, dried fruit notes to its flavour profile.\n\nAge: 12 Years Old\n\nCask Type: Bourbon & Sherry Casks\n\n40% ABV / 20cl\n\nPlease examine all images of the lot, any packaging and labels carefully and satisfy yourself as to their condition before making a bid.",
+            "provider": "firecrawl"
+          }
+        }
+      ],
       "imageResults": []
     },
     "auction-balvenie-tun-1509-batch-6-tier": {
@@ -6333,13 +6351,31 @@
                 "extraSnippets": []
               }
             ],
-            "summary": "[Skip to menu](https://www.scotchwhiskyauctions.com/auctions/234-the-185th-auction/905739-balvenie-tun-1509-batch-6/#menu) [Skip to content](https://www.scotchwhiskyauctions.com/auctions/234-the-185th-auction/905739-balvenie-tun-1509-batch-6/#contentstart)\n\nAre you the legal age to buy alcohol in your country?YesNo\n\n [Free valuations](https://wa.me/+447538638525/?text=I%20would%20like%20a%20free%20valuation)\n\nShow/hide cookie info\n\n**This site may set cookies for essential tasks, such as tracking whether you are signed in.**\n\nWe would also like to set analytics cookies to better understand our users’ behaviour.\n\n[Read our cookies policy](https://www.scotchwhiskyauctions.com/privacy/)\n\nAcceptReject",
+            "summary": "# Balvenie Tun 1509 Batch #6\n\nLot number: 185-02541\n\nBuilt by the Grant family in Dufftown, and situated next door to sister distillery Glenfiddich, Balvenie is at the heart of Grant’s range of blends. Despite their proximity and shared water source, the style of spirit produced by the pair are quite different, with Balvenie producing a sweeter, more honeyed and very lightly peated new make spirit.\n\nIt wasn’t until 1990, when Kininvie distillery was able to shoulder some of the responsibility for blending stock production, that Balvenie was really able to push forward as a single malt. The distillery quickly distinguished itself through use of innovative maturation processes, and was a pioneer of cask “finishing” with the introduction of it’s DoubleWood expression in 1993. Balvenie is also one of the few remaining distilleries still using on site maltings, although today this only meets a small percentage of its requirements.\n\nDue to the success of The Tun 1401 series, a bigger vat was needed. Tun 1509 is four times the size, and the first release is a combination of 35 American oak barrels and seven European oak sherry butts, left to marry for a few months.\n\nBatch #6\n\n50.4% ABV / 70cl\n\nPlease examine all images of the lot, any packaging and labels carefully and satisfy yourself as to their condition before making a bid.",
             "provider": "firecrawl"
           }
         ],
         "errors": []
       },
-      "pageResults": [],
+      "pageResults": [
+        {
+          "url": "https://www.scotchwhiskyauctions.com/auctions/234-the-185th-auction/905739-balvenie-tun-1509-batch-6/",
+          "result": {
+            "query": "page opening",
+            "results": [
+              {
+                "url": "https://www.scotchwhiskyauctions.com/auctions/234-the-185th-auction/905739-balvenie-tun-1509-batch-6/",
+                "title": "Balvenie Tun 1509 Batch #6 | The 185th Auction | Scotch Whisky Auctions",
+                "domain": "scotchwhiskyauctions.com",
+                "description": null,
+                "extraSnippets": []
+              }
+            ],
+            "summary": "# Balvenie Tun 1509 Batch #6\n\nLot number: 185-02541\n\nBuilt by the Grant family in Dufftown, and situated next door to sister distillery Glenfiddich, Balvenie is at the heart of Grant’s range of blends. Despite their proximity and shared water source, the style of spirit produced by the pair are quite different, with Balvenie producing a sweeter, more honeyed and very lightly peated new make spirit.\n\nIt wasn’t until 1990, when Kininvie distillery was able to shoulder some of the responsibility for blending stock production, that Balvenie was really able to push forward as a single malt. The distillery quickly distinguished itself through use of innovative maturation processes, and was a pioneer of cask “finishing” with the introduction of it’s DoubleWood expression in 1993. Balvenie is also one of the few remaining distilleries still using on site maltings, although today this only meets a small percentage of its requirements.\n\nDue to the success of The Tun 1401 series, a bigger vat was needed. Tun 1509 is four times the size, and the first release is a combination of 35 American oak barrels and seven European oak sherry butts, left to marry for a few months.\n\nBatch #6\n\n50.4% ABV / 70cl\n\nPlease examine all images of the lot, any packaging and labels carefully and satisfy yourself as to their condition before making a bid.",
+            "provider": "firecrawl"
+          }
+        }
+      ],
       "imageResults": []
     },
     "auction-beneagles-kestrel-decanter-20cl": {
@@ -6356,7 +6392,7 @@
                 "extraSnippets": []
               }
             ],
-            "summary": "[Skip to menu](https://www.scotchwhiskyauctions.com/auctions/234-the-185th-auction/904041-beneagles-kestrel-ceramic-decanter-20cl/#menu) [Skip to content](https://www.scotchwhiskyauctions.com/auctions/234-the-185th-auction/904041-beneagles-kestrel-ceramic-decanter-20cl/#contentstart)\n\nAre you the legal age to buy alcohol in your country?YesNo\n\n [Free valuations](https://wa.me/+447538638525/?text=I%20would%20like%20a%20free%20valuation)\n\nShow/hide cookie info\n\n**This site may set cookies for essential tasks, such as tracking whether you are signed in.**\n\nWe would also like to set analytics cookies to better understand our users’ behaviour.\n\n[Read our cookies policy](https://www.scotchwhiskyauctions.com/privacy/)\n\nAcceptReject",
+            "summary": "# Beneagles Kestrel Ceramic Decanter 20cl\n\nLot number: 185-00869\n\nIn 1908 Peter Thomson established his first grocery store in Perth with his own brand, Peter Thomson’s Whisky. As his chain expanded to four shops, demand for his blend increased until he decided to rename it Beneagles after the Gleneagles Hotel, which was being built just outside Auchterarder by the Caledonian Railway Company. Beneagles was created in 1922 and constructed largely from Speyside malts with a far higher proportion of them than is the norm today.\n\nIn 1969 the innovative development of a range of Beswick and Wade whisky ceramics brought the Beneagles name to a wider public, especially abroad.\n\n40% ABV / 20cl\n\nPlease examine all images of the lot, any packaging and labels carefully and satisfy yourself as to their condition before making a bid.",
             "provider": "firecrawl"
           },
           {
@@ -6460,7 +6496,25 @@
         ],
         "errors": []
       },
-      "pageResults": [],
+      "pageResults": [
+        {
+          "url": "https://www.scotchwhiskyauctions.com/auctions/234-the-185th-auction/904041-beneagles-kestrel-ceramic-decanter-20cl/",
+          "result": {
+            "query": "page opening",
+            "results": [
+              {
+                "url": "https://www.scotchwhiskyauctions.com/auctions/234-the-185th-auction/904041-beneagles-kestrel-ceramic-decanter-20cl/",
+                "title": "Beneagles Kestrel Ceramic Decanter 20cl | The 185th Auction | Scotch Whisky Auctions",
+                "domain": "scotchwhiskyauctions.com",
+                "description": null,
+                "extraSnippets": []
+              }
+            ],
+            "summary": "# Beneagles Kestrel Ceramic Decanter 20cl\n\nLot number: 185-00869\n\nIn 1908 Peter Thomson established his first grocery store in Perth with his own brand, Peter Thomson’s Whisky. As his chain expanded to four shops, demand for his blend increased until he decided to rename it Beneagles after the Gleneagles Hotel, which was being built just outside Auchterarder by the Caledonian Railway Company. Beneagles was created in 1922 and constructed largely from Speyside malts with a far higher proportion of them than is the norm today.\n\nIn 1969 the innovative development of a range of Beswick and Wade whisky ceramics brought the Beneagles name to a wider public, especially abroad.\n\n40% ABV / 20cl\n\nPlease examine all images of the lot, any packaging and labels carefully and satisfy yourself as to their condition before making a bid.",
+            "provider": "firecrawl"
+          }
+        }
+      ],
       "imageResults": []
     },
     "auction-bowmore-devils-casks-iii-label-abv": {
@@ -6526,7 +6580,7 @@
                 "extraSnippets": []
               }
             ],
-            "summary": "[Skip to menu](https://www.scotchwhiskyauctions.com/auctions/234-the-185th-auction/906117-bowmore-devils-cask-10-year-old-batch-3/#menu) [Skip to content](https://www.scotchwhiskyauctions.com/auctions/234-the-185th-auction/906117-bowmore-devils-cask-10-year-old-batch-3/#contentstart)\n\nAre you the legal age to buy alcohol in your country?YesNo\n\n [Free valuations](https://wa.me/+447538638525/?text=I%20would%20like%20a%20free%20valuation)\n\nShow/hide cookie info\n\n**This site may set cookies for essential tasks, such as tracking whether you are signed in.**\n\nWe would also like to set analytics cookies to better understand our users’ behaviour.\n\n[Read our cookies policy](https://www.scotchwhiskyauctions.com/privacy/)\n\nAcceptReject",
+            "summary": "# Bowmore Devil’s Cask 10 Year Old Batch #3\n\nLot number: 185-02902\n\nYou all know the legend of the Devil in the church by now. Just in case you missed it it:\n\nLegend has it that the Devil once visited the church in Bowmore. If you have ever seen it, you’ll know that the church is circular, built that way (so it’s said) so there would be no corner in which the Devil could hide. One day the local congregation spotted the Devil and chased him down through the village, into the gates of Bowmore Distillery. Here, the warehousemen were filling casks and loading them aboard the paddle steamer, The Maid of Islay. Gates and doors locked tight shut, every inch of the distillery was searched, but to no avail. As legend goes, the devil escaped in a cask of Bowmore bound for the mainland.\n\nWith the first and second release selling out like hot cakes, this release looks like it will go the same way. The devilishly dark side of the Bowmore is here in this edition too, thanks to first fill PX and Oloroso sherry casks being used to mature the whisky.\n\nDevil’s Cask #3\n\nBottled: 2015\n\nAge: 10 Years Old\n\nCask Type: Oloroso / PX Sherry\n\n57.6% ABV / 70cl\n\nPlease examine the images of the bottle, packaging and labels carefully and satisfy yourself as to their condition before making a bid.",
             "provider": "firecrawl"
           },
           {
@@ -6538,7 +6592,25 @@
         ],
         "errors": []
       },
-      "pageResults": [],
+      "pageResults": [
+        {
+          "url": "https://www.scotchwhiskyauctions.com/auctions/234-the-185th-auction/906117-bowmore-devils-cask-10-year-old-batch-3/",
+          "result": {
+            "query": "page opening",
+            "results": [
+              {
+                "url": "https://www.scotchwhiskyauctions.com/auctions/234-the-185th-auction/906117-bowmore-devils-cask-10-year-old-batch-3/",
+                "title": "Bowmore Devil’s Cask 10 Year Old Batch #3 | The 185th Auction | Scotch Whisky Auctions",
+                "domain": "scotchwhiskyauctions.com",
+                "description": null,
+                "extraSnippets": []
+              }
+            ],
+            "summary": "# Bowmore Devil’s Cask 10 Year Old Batch #3\n\nLot number: 185-02902\n\nYou all know the legend of the Devil in the church by now. Just in case you missed it it:\n\nLegend has it that the Devil once visited the church in Bowmore. If you have ever seen it, you’ll know that the church is circular, built that way (so it’s said) so there would be no corner in which the Devil could hide. One day the local congregation spotted the Devil and chased him down through the village, into the gates of Bowmore Distillery. Here, the warehousemen were filling casks and loading them aboard the paddle steamer, The Maid of Islay. Gates and doors locked tight shut, every inch of the distillery was searched, but to no avail. As legend goes, the devil escaped in a cask of Bowmore bound for the mainland.\n\nWith the first and second release selling out like hot cakes, this release looks like it will go the same way. The devilishly dark side of the Bowmore is here in this edition too, thanks to first fill PX and Oloroso sherry casks being used to mature the whisky.\n\nDevil’s Cask #3\n\nBottled: 2015\n\nAge: 10 Years Old\n\nCask Type: Oloroso / PX Sherry\n\n57.6% ABV / 70cl\n\nPlease examine the images of the bottle, packaging and labels carefully and satisfy yourself as to their condition before making a bid.",
+            "provider": "firecrawl"
+          }
+        }
+      ],
       "imageResults": []
     },
     "auction-brora-1972-cc-bottled-1993": {
@@ -6555,7 +6627,7 @@
                 "extraSnippets": []
               }
             ],
-            "summary": "[Skip to menu](https://www.scotchwhiskyauctions.com/auctions/234-the-185th-auction/904104-brora-1972-connoisseurs-choice/#menu) [Skip to content](https://www.scotchwhiskyauctions.com/auctions/234-the-185th-auction/904104-brora-1972-connoisseurs-choice/#contentstart)\n\nAre you the legal age to buy alcohol in your country?YesNo\n\n [Free valuations](https://wa.me/+447538638525/?text=I%20would%20like%20a%20free%20valuation)\n\nShow/hide cookie info\n\n**This site may set cookies for essential tasks, such as tracking whether you are signed in.**\n\nWe would also like to set analytics cookies to better understand our users’ behaviour.\n\n[Read our cookies policy](https://www.scotchwhiskyauctions.com/privacy/)\n\nAcceptReject",
+            "summary": "# Brora 1972 Connoisseurs Choice\n\nLot number: 185-00932\n\nBuilt in 1819 and originally named Clynelish, Brora is one of Scotland’s Highland Clearance Distilleries. Built by the Duke of Sutherland as part of his new business enterprise, which brutally evicted some 15000 farmers from their homes as part of a cruel economic experiment that was happening all over the Highlands.\n\nDespite this somewhat inauspicious birth, the distillery eventually found its feet and by 1930 was owned by John Walker and DCL. With the demand for blends skyrocketing after World War 2, production was at an all time high and in 1967 the decision was taken to replace it with a newer, larger distillery next door (which for the time being was known as Clynelish 2).\n\nThis wasn’t the end for the distillery though. After just a year of silence, production resumed at the old site making peated whisky to cover a shortfall during Caol Ila’s reconstruction, and in 1975 it was officially named Brora (because frankly having two distilleries with the same name was just stupid). Sadly it didn’t last, and in 1983 the distillery finally closed. Casks still remain slumbering in their warehouses, and are drip fed to the market in the form of Diageo’s Special Releases and the occasional indy bottling.\n\nConnoisseurs Choice is one of the most easily recognised ranges from the independent bottler Gordon & MacPhail. This range was launched by George Urquhart - one of the first of four generations of the family to build Gordon & MacPhail - back in the 1960s; a period where most malts were used in blends so this was quite an unusual move for the company. Perhaps due to the popularity surrounding blends, this range did well as the exception by showcasing some distilleries which had never before been bottled as single malts and thus, it has proved to be a hit for more than 35 years.\n\nThis impressive vintage was distilled during a vital period in the distillery’s history when some exceptionally dry weather on Islay caused",
             "provider": "firecrawl"
           },
           {
@@ -6667,7 +6739,7 @@
                 "extraSnippets": []
               }
             ],
-            "summary": "[Skip to menu](https://www.scotchwhiskyauctions.com/auctions/234-the-185th-auction/904104-brora-1972-connoisseurs-choice/#menu) [Skip to content](https://www.scotchwhiskyauctions.com/auctions/234-the-185th-auction/904104-brora-1972-connoisseurs-choice/#contentstart) Are you the legal age to buy alc",
+            "summary": "# Brora 1972 Connoisseurs Choice Lot number: 185-00932 Built in 1819 and originally named Clynelish, Brora is one of Scotland’s Highland Clearance Distilleries. Built by the Duke of Sutherland as part of his new business enterprise, which brutally evicted some 15000 farmers from their homes as par … production resumed at the old site making peated whisky to cover a shortfall during Caol Ila’s reconstruction, and in 1975 it was officially named Brora (because frankly having two distilleries with the same name was just stupid). Sadly it didn’t last, and in 1983 the distillery finally closed. Cask … lly dry weather on Islay caused concern for the industry and heavily peated Islay malts were in short supply. Looking to this mainland distillery, Brora’s phenol levels were increased to compensate for this shortage until the end of the 1970’s. Distilled: 1972 Bottled: 1993 40% ABV / 70cl Please",
             "provider": "firecrawl"
           }
         ],
@@ -6708,7 +6780,7 @@
                 "extraSnippets": []
               }
             ],
-            "summary": "[Skip to menu](https://www.scotchwhiskyauctions.com/auctions/234-the-185th-auction/905629-caol-ila-2012-the-disappearance-signatory-for-lmdw/#menu) [Skip to content](https://www.scotchwhiskyauctions.com/auctions/234-the-185th-auction/905629-caol-ila-2012-the-disappearance-signatory-for-lmdw/#contentstart)\n\nAre you the legal age to buy alcohol in your country?YesNo\n\n [Free valuations](https://wa.me/+447538638525/?text=I%20would%20like%20a%20free%20valuation)\n\nShow/hide cookie info\n\n**This site may set cookies for essential tasks, such as tracking whether you are signed in.**\n\nWe would also like to set analytics cookies to better understand our users’ behaviour.\n\n[Read our cookies policy](https://www.scotchwhiskyauctions.com/privacy/)\n\nAcceptReject",
+            "summary": "# Caol Ila 2012 ‘The Disappearance’ Signatory for LMDW\n\nLot number: 185-02431\n\nSignatory was founded by Andrew Symington in 1999. After discovering single cask single malt whisky while managing Prestonfield House Hotel, Andrew bought his first cask, a Glenlivet 1968, and is now one of the largest independent bottlers in Scotland. As of 2002, Signatory Vintage Whisky company became the owner of the Edradour distillery in Perthshire.\n\nBottled as part of the Chess Investigation series for La Maison Du Whisky\n\nCaol Ila - ‘The Disappearance’\n\nDistilled: 2012\n\nBottled: 2020\n\nCask Type: 1st Fill Sherry Butt\n\n46% ABV / 70cl\n\nPlease note minor wear to tube\n\nPlease examine all images of the lot, any packaging and labels carefully and satisfy yourself as to their condition before making a bid.",
             "provider": "firecrawl"
           },
           {
@@ -6805,7 +6877,25 @@
         ],
         "errors": []
       },
-      "pageResults": [],
+      "pageResults": [
+        {
+          "url": "https://www.scotchwhiskyauctions.com/auctions/234-the-185th-auction/905629-caol-ila-2012-the-disappearance-signatory-for-lmdw/",
+          "result": {
+            "query": "page opening",
+            "results": [
+              {
+                "url": "https://www.scotchwhiskyauctions.com/auctions/234-the-185th-auction/905629-caol-ila-2012-the-disappearance-signatory-for-lmdw/",
+                "title": "Caol Ila 2012 ‘The Disappearance’ Signatory for LMDW | The 185th Auction | Scotch Whisky Auctions",
+                "domain": "scotchwhiskyauctions.com",
+                "description": null,
+                "extraSnippets": []
+              }
+            ],
+            "summary": "# Caol Ila 2012 ‘The Disappearance’ Signatory for LMDW\n\nLot number: 185-02431\n\nSignatory was founded by Andrew Symington in 1999. After discovering single cask single malt whisky while managing Prestonfield House Hotel, Andrew bought his first cask, a Glenlivet 1968, and is now one of the largest independent bottlers in Scotland. As of 2002, Signatory Vintage Whisky company became the owner of the Edradour distillery in Perthshire.\n\nBottled as part of the Chess Investigation series for La Maison Du Whisky\n\nCaol Ila - ‘The Disappearance’\n\nDistilled: 2012\n\nBottled: 2020\n\nCask Type: 1st Fill Sherry Butt\n\n46% ABV / 70cl\n\nPlease note minor wear to tube\n\nPlease examine all images of the lot, any packaging and labels carefully and satisfy yourself as to their condition before making a bid.",
+            "provider": "firecrawl"
+          }
+        }
+      ],
       "imageResults": []
     },
     "auction-chichibu-london-2020-brand": {
@@ -6822,7 +6912,7 @@
                 "extraSnippets": []
               }
             ],
-            "summary": "[Skip to menu](https://www.scotchwhiskyauctions.com/auctions/234-the-185th-auction/907361-chichibu-london-edition-2020/#menu) [Skip to content](https://www.scotchwhiskyauctions.com/auctions/234-the-185th-auction/907361-chichibu-london-edition-2020/#contentstart)\n\nAre you the legal age to buy alcohol in your country?YesNo\n\n [Free valuations](https://wa.me/+447538638525/?text=I%20would%20like%20a%20free%20valuation)\n\nShow/hide cookie info\n\n**This site may set cookies for essential tasks, such as tracking whether you are signed in.**\n\nWe would also like to set analytics cookies to better understand our users’ behaviour.\n\n[Read our cookies policy](https://www.scotchwhiskyauctions.com/privacy/)\n\nAcceptReject",
+            "summary": "# Chichibu London Edition 2020\n\nLot number: 185-04129\n\nFrom its Mizunara wash backs and small stills with steep lyne arms to the fact that the mashman uses a wooden paddle to stir the mash, Chichibu is a hands-on distillery with quality as an intrinsic focus. With the ground now broken on a blending room, and an off-site cooperage, Ichiro Akuto’s distillery - formed from the ashes of his grandfather’s Hanyu distillery - is one of the finest producers in Japan. With the perfect climate of humid summers and cold winters, Chichibu is an ideal location for whisky production and has become a huge part of the Japanese whisky revolution.\n\nThis is Chichibu Ichiro’s Malt London Edition 2020.\n\n53.5% ABV / 70cl\n\nBottle Number: 310 / 1736\n\nPlease examine all images of the lot, any packaging and labels carefully and satisfy yourself as to their condition before making a bid.",
             "provider": "firecrawl"
           },
           {
@@ -6926,7 +7016,25 @@
         ],
         "errors": []
       },
-      "pageResults": [],
+      "pageResults": [
+        {
+          "url": "https://www.scotchwhiskyauctions.com/auctions/234-the-185th-auction/907361-chichibu-london-edition-2020/",
+          "result": {
+            "query": "page opening",
+            "results": [
+              {
+                "url": "https://www.scotchwhiskyauctions.com/auctions/234-the-185th-auction/907361-chichibu-london-edition-2020/",
+                "title": "Chichibu London Edition 2020 | The 185th Auction | Scotch Whisky Auctions",
+                "domain": "scotchwhiskyauctions.com",
+                "description": null,
+                "extraSnippets": []
+              }
+            ],
+            "summary": "# Chichibu London Edition 2020\n\nLot number: 185-04129\n\nFrom its Mizunara wash backs and small stills with steep lyne arms to the fact that the mashman uses a wooden paddle to stir the mash, Chichibu is a hands-on distillery with quality as an intrinsic focus. With the ground now broken on a blending room, and an off-site cooperage, Ichiro Akuto’s distillery - formed from the ashes of his grandfather’s Hanyu distillery - is one of the finest producers in Japan. With the perfect climate of humid summers and cold winters, Chichibu is an ideal location for whisky production and has become a huge part of the Japanese whisky revolution.\n\nThis is Chichibu Ichiro’s Malt London Edition 2020.\n\n53.5% ABV / 70cl\n\nBottle Number: 310 / 1736\n\nPlease examine all images of the lot, any packaging and labels carefully and satisfy yourself as to their condition before making a bid.",
+            "provider": "firecrawl"
+          }
+        }
+      ],
       "imageResults": []
     },
     "auction-clynelish-2013-sr26129-prefix": {
@@ -6943,7 +7051,7 @@
                 "extraSnippets": []
               }
             ],
-            "summary": "[Skip to menu](https://www.scotchwhiskyauctions.com/auctions/234-the-185th-auction/904996-clynelish-2013-13-year-old-thompson-bros-for-dornoch-castle/#menu) [Skip to content](https://www.scotchwhiskyauctions.com/auctions/234-the-185th-auction/904996-clynelish-2013-13-year-old-thompson-bros-for-dornoch-castle/#contentstart)\n\nAre you the legal age to buy alcohol in your country?YesNo\n\n [Free valuations](https://wa.me/+447538638525/?text=I%20would%20like%20a%20free%20valuation)\n\nShow/hide cookie info\n\n**This site may set cookies for essential tasks, such as tracking whether you are signed in.**\n\nWe would also like to set analytics cookies to better understand our users’ behaviour.\n\n[Read our cookies policy](https://www.scotchwhiskyauctions.com/privacy/)\n\nAcceptReject",
+            "summary": "# Clynelish 2013 13 Year Old Thompson Bros For Dornoch Castle\n\nLot number: 185-01819\n\nAfter establishing one of the World’s leading whisky bars in Dornoch, Phil and Simon Thompson - better known as the Thompson Brothers - decided to take it a step further and start making their own whisky and gin on the site at the Dornoch Castle Hotel. Born from successful crowdfunding and a worldwide love of whisky, Dornoch’s first whisky distillery was formed. While waiting for the whisky to mature in their casks, the brothers kept busy by releasing an Organic Highland Gin as well as acting as an independent bottler of other distilleries’ spirits.\n\nClynelish\n\nDistilled: 29.04.2013\n\nAge: 13 Years Old\n\nCask Type: First-Fill Bourbon Hogshead\n\nCask Number: 26129\n\n55.4% ABV / 70cl\n\nBottle Number: One of 219 Bottles\n\nPlease examine all images of the lot, any packaging and labels carefully and satisfy yourself as to their condition before making a bid.",
             "provider": "firecrawl"
           },
           {
@@ -7068,7 +7176,25 @@
         ],
         "errors": []
       },
-      "pageResults": [],
+      "pageResults": [
+        {
+          "url": "https://www.scotchwhiskyauctions.com/auctions/234-the-185th-auction/904996-clynelish-2013-13-year-old-thompson-bros-for-dornoch-castle/",
+          "result": {
+            "query": "page opening",
+            "results": [
+              {
+                "url": "https://www.scotchwhiskyauctions.com/auctions/234-the-185th-auction/904996-clynelish-2013-13-year-old-thompson-bros-for-dornoch-castle/",
+                "title": "Clynelish 2013 13 Year Old Thompson Bros For Dornoch Castle | The 185th Auction | Scotch Whisky Auctions",
+                "domain": "scotchwhiskyauctions.com",
+                "description": null,
+                "extraSnippets": []
+              }
+            ],
+            "summary": "# Clynelish 2013 13 Year Old Thompson Bros For Dornoch Castle\n\nLot number: 185-01819\n\nAfter establishing one of the World’s leading whisky bars in Dornoch, Phil and Simon Thompson - better known as the Thompson Brothers - decided to take it a step further and start making their own whisky and gin on the site at the Dornoch Castle Hotel. Born from successful crowdfunding and a worldwide love of whisky, Dornoch’s first whisky distillery was formed. While waiting for the whisky to mature in their casks, the brothers kept busy by releasing an Organic Highland Gin as well as acting as an independent bottler of other distilleries’ spirits.\n\nClynelish\n\nDistilled: 29.04.2013\n\nAge: 13 Years Old\n\nCask Type: First-Fill Bourbon Hogshead\n\nCask Number: 26129\n\n55.4% ABV / 70cl\n\nBottle Number: One of 219 Bottles\n\nPlease examine all images of the lot, any packaging and labels carefully and satisfy yourself as to their condition before making a bid.",
+            "provider": "firecrawl"
+          }
+        }
+      ],
       "imageResults": []
     },
     "auction-daftmill-2012-drambusters-edition": {
@@ -7085,7 +7211,7 @@
                 "extraSnippets": []
               }
             ],
-            "summary": "[Skip to menu](https://www.scotchwhiskyauctions.com/auctions/234-the-185th-auction/906947-daftmill-2012-single-cask-86-for-the-drambusters/#menu) [Skip to content](https://www.scotchwhiskyauctions.com/auctions/234-the-185th-auction/906947-daftmill-2012-single-cask-86-for-the-drambusters/#contentstart)\n\nAre you the legal age to buy alcohol in your country?YesNo\n\n [Free valuations](https://wa.me/+447538638525/?text=I%20would%20like%20a%20free%20valuation)\n\nShow/hide cookie info\n\n**This site may set cookies for essential tasks, such as tracking whether you are signed in.**\n\nWe would also like to set analytics cookies to better understand our users’ behaviour.\n\n[Read our cookies policy](https://www.scotchwhiskyauctions.com/privacy/)\n\nAcceptReject",
+            "summary": "# Daftmill 2012 Single Cask #86 For The Drambusters\n\nLot number: 185-03723\n\nDaftmill Farmhouse was granted a license in 2003 allowing its first distillation to take place in December 2005. As an independent distiller, owner Francis Cuthbert’s main aim was to produce a light Lowland whisky, but - as the site is still an active farm - the distillery has a silent season in spring and autumn whilst work happens in the fields.\n\nBottled exclusively for Drambusters\n\nSingle Cask\n\nDistilled: 2012\n\nBottled: 2022\n\nCask Number: 086\n\nCask Type: PX Sherry\n\n57.7% ABV / 70cl\n\nBottle Number: 303 / 341\n\nPlease note minor wear to label\n\nPlease note some wax seals are prone to cracking in varying temperatures and transport conditions, therefore - as stated in our terms and conditions - we do not accept liability should these seals be found to show signs of splitting on delivery.\n\nPlease examine all images of the lot, any packaging and labels carefully and satisfy yourself as to their condition before making a bid.",
             "provider": "firecrawl"
           },
           {
@@ -7140,7 +7266,25 @@
         ],
         "errors": []
       },
-      "pageResults": [],
+      "pageResults": [
+        {
+          "url": "https://www.scotchwhiskyauctions.com/auctions/234-the-185th-auction/906947-daftmill-2012-single-cask-86-for-the-drambusters/",
+          "result": {
+            "query": "page opening",
+            "results": [
+              {
+                "url": "https://www.scotchwhiskyauctions.com/auctions/234-the-185th-auction/906947-daftmill-2012-single-cask-86-for-the-drambusters/",
+                "title": "Daftmill 2012 Single Cask #86 For The Drambusters | The 185th Auction | Scotch Whisky Auctions",
+                "domain": "scotchwhiskyauctions.com",
+                "description": null,
+                "extraSnippets": []
+              }
+            ],
+            "summary": "# Daftmill 2012 Single Cask #86 For The Drambusters\n\nLot number: 185-03723\n\nDaftmill Farmhouse was granted a license in 2003 allowing its first distillation to take place in December 2005. As an independent distiller, owner Francis Cuthbert’s main aim was to produce a light Lowland whisky, but - as the site is still an active farm - the distillery has a silent season in spring and autumn whilst work happens in the fields.\n\nBottled exclusively for Drambusters\n\nSingle Cask\n\nDistilled: 2012\n\nBottled: 2022\n\nCask Number: 086\n\nCask Type: PX Sherry\n\n57.7% ABV / 70cl\n\nBottle Number: 303 / 341\n\nPlease note minor wear to label\n\nPlease note some wax seals are prone to cracking in varying temperatures and transport conditions, therefore - as stated in our terms and conditions - we do not accept liability should these seals be found to show signs of splitting on delivery.\n\nPlease examine all images of the lot, any packaging and labels carefully and satisfy yourself as to their condition before making a bid.",
+            "provider": "firecrawl"
+          }
+        }
+      ],
       "imageResults": []
     },
     "auction-glenturret-triple-wood-2023-label-abv": {
@@ -7157,7 +7301,7 @@
                 "extraSnippets": []
               }
             ],
-            "summary": "[Skip to menu](https://www.scotchwhiskyauctions.com/auctions/234-the-185th-auction/904492-glenturret-triple-wood-2023-release/#menu) [Skip to content](https://www.scotchwhiskyauctions.com/auctions/234-the-185th-auction/904492-glenturret-triple-wood-2023-release/#contentstart)\n\nAre you the legal age to buy alcohol in your country?YesNo\n\n [Free valuations](https://wa.me/+447538638525/?text=I%20would%20like%20a%20free%20valuation)\n\nShow/hide cookie info\n\n**This site may set cookies for essential tasks, such as tracking whether you are signed in.**\n\nWe would also like to set analytics cookies to better understand our users’ behaviour.\n\n[Read our cookies policy](https://www.scotchwhiskyauctions.com/privacy/)\n\nAcceptReject",
+            "summary": "# Glenturret Triple Wood 2023 Release\n\nLot number: 185-01318\n\nCrafted at Scotland’s Oldest Working Distillery since 1763 entirely by hand in exclusive small batches, The Glenturret single malt is defined by its outstanding quality and exquisite taste. Located in the ‘Hosh’, just outside Crieff, the distillery is surrounded by the beautiful Perthshire countryside. In March 2019, the Glenturret Distillery was purchased by a joint venture led by The Lalique Group. This latest sale in the distillery’s history brings forth a new beginning for Scotland’s Oldest Working Distillery. Preserving the traditional methods of whisky making continue to be at the heart of the brand however there is an exciting and imaginative reinvention of this historic site taking place.\n\nThe distillery is now home to The Glenturret Lalique Boutique, the first of its kind in Scotland and The Glenturret Lalique Restaurant, recently awarded its second Michelin Star. This must-see destination is brimming with history and experiences to delight visitors all year round.\n\nTriple Wood\n\nBottled: 2023\n\nCask Type: American & European Oak Sherry Casks & Bourbon Casks\n\n45% ABV / 70cl\n\nPlease examine all images of the lot, any packaging and labels carefully and satisfy yourself as to their condition before making a bid.",
             "provider": "firecrawl"
           },
           {
@@ -7269,37 +7413,32 @@
                 "extraSnippets": []
               }
             ],
-            "summary": "[Skip to menu](https://www.scotchwhiskyauctions.com/auctions/234-the-185th-auction/904492-glenturret-triple-wood-2023-release/#menu) [Skip to content](https://www.scotchwhiskyauctions.com/auctions/234-the-185th-auction/904492-glenturret-triple-wood-2023-release/#contentstart) Are you the legal age",
+            "summary": "# Glenturret Triple Wood 2023 Release Lot number: 185-01318 Crafted at Scotland’s Oldest Working Distillery since 1763 entirely by hand in exclusive small batches, The Glenturret single malt is defined by its outstanding quality and exquisite taste. Located in the ‘Hosh’, just outside Crieff, the … second Michelin Star. This must-see destination is brimming with history and experiences to delight visitors all year round. Triple Wood Bottled: 2023 Cask Type: American & European Oak Sherry Casks & Bourbon Casks 45% ABV / 70cl Please examine all images of the lot, any packaging and labels ca",
             "provider": "firecrawl"
           }
         ],
         "errors": []
       },
-      "pageResults": [],
-      "imageResults": [
+      "pageResults": [
         {
-          "url": "https://d3suvtcq00dftb.cloudfront.net/images/f8d981a314a99c5bd9fa3853ad0100d8-zoom.jpg",
+          "url": "https://www.scotchwhiskyauctions.com/auctions/234-the-185th-auction/904492-glenturret-triple-wood-2023-release/",
           "result": {
-            "brand": "The Glenturret",
-            "bottler": null,
-            "expression": "Triple Wood",
-            "series": null,
-            "distillery": ["The Glenturret"],
-            "category": "single_malt",
-            "stated_age": null,
-            "abv": 43,
-            "release_year": 2023,
-            "vintage_year": null,
-            "bottling_year": null,
-            "cask_strength": null,
-            "single_cask": null,
-            "maturation": null,
-            "cask_number": null,
-            "outturn": null,
-            "edition": "2023 Release"
+            "query": "page opening",
+            "results": [
+              {
+                "url": "https://www.scotchwhiskyauctions.com/auctions/234-the-185th-auction/904492-glenturret-triple-wood-2023-release/",
+                "title": "Glenturret Triple Wood 2023 Release | The 185th Auction | Scotch Whisky Auctions",
+                "domain": "scotchwhiskyauctions.com",
+                "description": null,
+                "extraSnippets": []
+              }
+            ],
+            "summary": "# Glenturret Triple Wood 2023 Release\n\nLot number: 185-01318\n\nCrafted at Scotland’s Oldest Working Distillery since 1763 entirely by hand in exclusive small batches, The Glenturret single malt is defined by its outstanding quality and exquisite taste. Located in the ‘Hosh’, just outside Crieff, the distillery is surrounded by the beautiful Perthshire countryside. In March 2019, the Glenturret Distillery was purchased by a joint venture led by The Lalique Group. This latest sale in the distillery’s history brings forth a new beginning for Scotland’s Oldest Working Distillery. Preserving the traditional methods of whisky making continue to be at the heart of the brand however there is an exciting and imaginative reinvention of this historic site taking place.\n\nThe distillery is now home to The Glenturret Lalique Boutique, the first of its kind in Scotland and The Glenturret Lalique Restaurant, recently awarded its second Michelin Star. This must-see destination is brimming with history and experiences to delight visitors all year round.\n\nTriple Wood\n\nBottled: 2023\n\nCask Type: American & European Oak Sherry Casks & Bourbon Casks\n\n45% ABV / 70cl\n\nPlease examine all images of the lot, any packaging and labels carefully and satisfy yourself as to their condition before making a bid.",
+            "provider": "firecrawl"
           }
         }
-      ]
+      ],
+      "imageResults": []
     },
     "auction-grants-millennium-tube": {
       "searchResult": {
@@ -7364,7 +7503,7 @@
                 "extraSnippets": []
               }
             ],
-            "summary": "[Skip to menu](https://www.scotchwhiskyauctions.com/auctions/234-the-185th-auction/904090-grants-millennium-family-reserve/#menu) [Skip to content](https://www.scotchwhiskyauctions.com/auctions/234-the-185th-auction/904090-grants-millennium-family-reserve/#contentstart)\n\nAre you the legal age to buy alcohol in your country?YesNo\n\n [Free valuations](https://wa.me/+447538638525/?text=I%20would%20like%20a%20free%20valuation)\n\nShow/hide cookie info\n\n**This site may set cookies for essential tasks, such as tracking whether you are signed in.**\n\nWe would also like to set analytics cookies to better understand our users’ behaviour.\n\n[Read our cookies policy](https://www.scotchwhiskyauctions.com/privacy/)\n\nAcceptReject",
+            "summary": "# Grant’s Millennium Family Reserve\n\nLot number: 185-00918\n\nLaunched by William Grant, founder of the Glenfiddich distillery, in 1898 Grant’s is Scotland’s oldest continuously family-run, blended whisky maker. William’s rise from cattle herder to whisky baron is one of the great tales in Scotch.\n\n40% ABV / 70cl\n\nPlease note minor tube wear, rusting to tin lid and tube inner\n\nPlease examine all images of the lot, any packaging and labels carefully and satisfy yourself as to their condition before making a bid.",
             "provider": "firecrawl"
           },
           {
@@ -7378,7 +7517,7 @@
                 "extraSnippets": []
               }
             ],
-            "summary": "[Skip to menu](https://www.scotchwhiskyauctions.com/auctions/234-the-185th-auction/904090-grants-millennium-family-reserve/#menu) [Skip to content](https://www.scotchwhiskyauctions.com/auctions/234-the-185th-auction/904090-grants-millennium-family-reserve/#contentstart) Are you the legal age to buy",
+            "summary": "# Grant’s Millennium Family Reserve Lot number: 185-00918 Launched by William Grant, founder of the Glenfiddich distillery, in 1898 Grant’s is Scotland’s oldest continuously family-run, blended whisky maker. William’s rise from cattle herder to whisky baron is one of the great tales in Scotch. 40",
             "provider": "firecrawl"
           },
           {
@@ -7390,7 +7529,25 @@
         ],
         "errors": []
       },
-      "pageResults": [],
+      "pageResults": [
+        {
+          "url": "https://www.scotchwhiskyauctions.com/auctions/234-the-185th-auction/904090-grants-millennium-family-reserve/",
+          "result": {
+            "query": "page opening",
+            "results": [
+              {
+                "url": "https://www.scotchwhiskyauctions.com/auctions/234-the-185th-auction/904090-grants-millennium-family-reserve/",
+                "title": "Grant’s Millennium Family Reserve | The 185th Auction | Scotch Whisky Auctions",
+                "domain": "scotchwhiskyauctions.com",
+                "description": null,
+                "extraSnippets": []
+              }
+            ],
+            "summary": "# Grant’s Millennium Family Reserve\n\nLot number: 185-00918\n\nLaunched by William Grant, founder of the Glenfiddich distillery, in 1898 Grant’s is Scotland’s oldest continuously family-run, blended whisky maker. William’s rise from cattle herder to whisky baron is one of the great tales in Scotch.\n\n40% ABV / 70cl\n\nPlease note minor tube wear, rusting to tin lid and tube inner\n\nPlease examine all images of the lot, any packaging and labels carefully and satisfy yourself as to their condition before making a bid.",
+            "provider": "firecrawl"
+          }
+        }
+      ],
       "imageResults": []
     },
     "auction-hades-28-with-print-in-scope": {
@@ -7407,7 +7564,7 @@
                 "extraSnippets": []
               }
             ],
-            "summary": "[Skip to menu](https://www.scotchwhiskyauctions.com/auctions/234-the-185th-auction/905402-speyside-single-malt-28-year-old-hades-platinum-cask-with-print/#menu) [Skip to content](https://www.scotchwhiskyauctions.com/auctions/234-the-185th-auction/905402-speyside-single-malt-28-year-old-hades-platinum-cask-with-print/#contentstart)\n\nAre you the legal age to buy alcohol in your country?YesNo\n\n [Free valuations](https://wa.me/+447538638525/?text=I%20would%20like%20a%20free%20valuation)\n\nShow/hide cookie info\n\n**This site may set cookies for essential tasks, such as tracking whether you are signed in.**\n\nWe would also like to set analytics cookies to better understand our users’ behaviour.\n\n[Read our cookies policy](https://www.scotchwhiskyauctions.com/privacy/)\n\nAcceptReject",
+            "summary": "# Speyside Single Malt 28 Year Old Hades Platinum Cask With Print\n\nLot number: 185-02214\n\nPlatinum Cask was established by the team behind Fah Mai Holdings in 2017 as an extension of their Rare Whisky Collection. The Fah Mai Rare Whisky Collection is a collection of rare and collectible single malt whisky, some of which is made up of ageing whisky still in its cask. This part of the collection is handled by Platinum Cask.\n\nThe Olympians Series from Platinum Cask is a limited release set of 12 single cask bottlings. Each bottling represents one of the original Greek Gods, focusing on showcasing some of the more unusual and characterful casks from their collection.\n\nHades - Speyside (Near Dufftown)\n\nAge: 28 Years Old\n\n52.9% ABV / 70cl\n\nBottle Number: 73 / 126\n\nPlease examine all images of the lot, any packaging and labels carefully and satisfy yourself as to their condition before making a bid.",
             "provider": "firecrawl"
           },
           {
@@ -7519,13 +7676,31 @@
                 "extraSnippets": []
               }
             ],
-            "summary": "Skip to menu](https://www.scotchwhiskyauctions.com/auctions/234-the-185th-auction/905402-speyside-single-malt-28-year-old-hades-platinum-cask-with-print/#menu) [Skip to content](https://www.scotchwhiskyauctions.com/auctions/234-the-185th-auction/905402-speyside-single-malt-28-year-old-hades-platinum … p to content](https://www.scotchwhiskyauctions.com/auctions/234-the-185th-auction/905402-speyside-single-malt-28-year-old-hades-platinum-cask-with-print/#contentstart) Are you the legal age to buy alcohol in your country?YesNo [Free valuations](https://wa.me/+447538638525/?text=I%20would%20like%2",
+            "summary": "# Speyside Single Malt 28 Year Old Hades Platinum Cask With Print Lot number: 185-02214 Platinum Cask was established by the team behind Fah Mai Holdings in 2017 as an extension of their Rare Whisky Collection. The Fah Mai Rare Whisky Collection is a collection of rare and collectible single malt",
             "provider": "firecrawl"
           }
         ],
         "errors": []
       },
-      "pageResults": [],
+      "pageResults": [
+        {
+          "url": "https://www.scotchwhiskyauctions.com/auctions/234-the-185th-auction/905402-speyside-single-malt-28-year-old-hades-platinum-cask-with-print/",
+          "result": {
+            "query": "page opening",
+            "results": [
+              {
+                "url": "https://www.scotchwhiskyauctions.com/auctions/234-the-185th-auction/905402-speyside-single-malt-28-year-old-hades-platinum-cask-with-print/",
+                "title": "Speyside Single Malt 28 Year Old Hades Platinum Cask With Print | The 185th Auction | Scotch Whisky Auctions",
+                "domain": "scotchwhiskyauctions.com",
+                "description": null,
+                "extraSnippets": []
+              }
+            ],
+            "summary": "# Speyside Single Malt 28 Year Old Hades Platinum Cask With Print\n\nLot number: 185-02214\n\nPlatinum Cask was established by the team behind Fah Mai Holdings in 2017 as an extension of their Rare Whisky Collection. The Fah Mai Rare Whisky Collection is a collection of rare and collectible single malt whisky, some of which is made up of ageing whisky still in its cask. This part of the collection is handled by Platinum Cask.\n\nThe Olympians Series from Platinum Cask is a limited release set of 12 single cask bottlings. Each bottling represents one of the original Greek Gods, focusing on showcasing some of the more unusual and characterful casks from their collection.\n\nHades - Speyside (Near Dufftown)\n\nAge: 28 Years Old\n\n52.9% ABV / 70cl\n\nBottle Number: 73 / 126\n\nPlease examine all images of the lot, any packaging and labels carefully and satisfy yourself as to their condition before making a bid.",
+            "provider": "firecrawl"
+          }
+        }
+      ],
       "imageResults": []
     },
     "auction-johnnie-walker-black-extra-special-1l": {
@@ -7542,7 +7717,7 @@
                 "extraSnippets": []
               }
             ],
-            "summary": "[Skip to menu](https://www.scotchwhiskyauctions.com/auctions/234-the-185th-auction/906037-johnnie-walker-12-year-old-black-label-extra-special-1l/#menu) [Skip to content](https://www.scotchwhiskyauctions.com/auctions/234-the-185th-auction/906037-johnnie-walker-12-year-old-black-label-extra-special-1l/#contentstart)\n\nAre you the legal age to buy alcohol in your country?YesNo\n\n [Free valuations](https://wa.me/+447538638525/?text=I%20would%20like%20a%20free%20valuation)\n\nShow/hide cookie info\n\n**This site may set cookies for essential tasks, such as tracking whether you are signed in.**\n\nWe would also like to set analytics cookies to better understand our users’ behaviour.\n\n[Read our cookies policy](https://www.scotchwhiskyauctions.com/privacy/)\n\nAcceptReject",
+            "summary": "# Johnnie Walker 12 Year Old Black Label Extra Special 1L\n\nLot number: 185-02837\n\nWith its distinctive square bottle, its label angled precisely at 24° and the iconic Striding Man, Johnnie Walker is the world’s best selling Scotch whisky retailing more than 20 million cases a year. It was first created in Kilmarnock in 1865 and is now available in almost every country in the world with the establishment of significant ‘Houses’ across Asia. Between 1906 & 1909 John Walker’s grandsons introduced the colour names which the bottles still bear to this day with the Blue Label - introduced in 1992 - being the rarest.\n\nAge: 12 Years Old\n\n43% ABV / 1L\n\nPlease note the tin has a sticky residue\n\nPlease examine all images of the lot, any packaging and labels carefully and satisfy yourself as to their condition before making a bid.",
             "provider": "firecrawl"
           },
           {
@@ -7646,7 +7821,25 @@
         ],
         "errors": []
       },
-      "pageResults": [],
+      "pageResults": [
+        {
+          "url": "https://www.scotchwhiskyauctions.com/auctions/234-the-185th-auction/906037-johnnie-walker-12-year-old-black-label-extra-special-1l/",
+          "result": {
+            "query": "page opening",
+            "results": [
+              {
+                "url": "https://www.scotchwhiskyauctions.com/auctions/234-the-185th-auction/906037-johnnie-walker-12-year-old-black-label-extra-special-1l/",
+                "title": "Johnnie Walker 12 Year Old Black Label Extra Special 1L | The 185th Auction | Scotch Whisky Auctions",
+                "domain": "scotchwhiskyauctions.com",
+                "description": null,
+                "extraSnippets": []
+              }
+            ],
+            "summary": "# Johnnie Walker 12 Year Old Black Label Extra Special 1L\n\nLot number: 185-02837\n\nWith its distinctive square bottle, its label angled precisely at 24° and the iconic Striding Man, Johnnie Walker is the world’s best selling Scotch whisky retailing more than 20 million cases a year. It was first created in Kilmarnock in 1865 and is now available in almost every country in the world with the establishment of significant ‘Houses’ across Asia. Between 1906 & 1909 John Walker’s grandsons introduced the colour names which the bottles still bear to this day with the Blue Label - introduced in 1992 - being the rarest.\n\nAge: 12 Years Old\n\n43% ABV / 1L\n\nPlease note the tin has a sticky residue\n\nPlease examine all images of the lot, any packaging and labels carefully and satisfy yourself as to their condition before making a bid.",
+            "provider": "firecrawl"
+          }
+        }
+      ],
       "imageResults": []
     },
     "auction-kilkerran-hp-batch-9-abv-rounding": {
@@ -7663,7 +7856,7 @@
                 "extraSnippets": []
               }
             ],
-            "summary": "[Skip to menu](https://www.scotchwhiskyauctions.com/auctions/234-the-185th-auction/907522-kilkerran-heavily-peated-batch-9/#menu) [Skip to content](https://www.scotchwhiskyauctions.com/auctions/234-the-185th-auction/907522-kilkerran-heavily-peated-batch-9/#contentstart)\n\nAre you the legal age to buy alcohol in your country?YesNo\n\n [Free valuations](https://wa.me/+447538638525/?text=I%20would%20like%20a%20free%20valuation)\n\nShow/hide cookie info\n\n**This site may set cookies for essential tasks, such as tracking whether you are signed in.**\n\nWe would also like to set analytics cookies to better understand our users’ behaviour.\n\n[Read our cookies policy](https://www.scotchwhiskyauctions.com/privacy/)\n\nAcceptReject",
+            "summary": "# Kilkerran Heavily Peated Batch #9\n\nLot number: 185-04290\n\nFor a period, Campbeltown was the undisputed Whisky Capital of the World, boasting over 30 distilleries operating simultaneously at its peak. Locally available peat, barley and coal, coupled with a quick steamship service to Glasgow meant this thriving industry lasted into the early 20th Century. Alas; ultimately (and perhaps inevitably) it proved unsustainable, and by 1935 the bubble had well and truly burst, with only Springbank and Glen Scotia distilleries remaining.\n\nThis remained the case until 2004 when the long dormant Glengyle distillery finally reopened its doors; its acquisition by Springbank and Cadenhead’s parent company (J&A Mitchell) marking Campbeltown’s establishment as a fully fledged whisky region in the eyes of the Scotch Whisky Association.\n\nThe whisky distilled there is bottled under the name Kilkerran (the Gaelic name for Campbeltown) in order to differentiate it from the Glengyle vatted malt produced by Loch Lomond distillery, and since 2009 there have been a series of “work in progress” releases, culminating in the release of a 12 Year Old expression in 2016.\n\nBatch Number: 9\n\n59.2% ABV / 70cl\n\nPlease examine all images of the lot, any packaging and labels carefully and satisfy yourself as to their condition before making a bid.",
             "provider": "firecrawl"
           },
           {
@@ -7718,7 +7911,25 @@
         ],
         "errors": []
       },
-      "pageResults": [],
+      "pageResults": [
+        {
+          "url": "https://www.scotchwhiskyauctions.com/auctions/234-the-185th-auction/907522-kilkerran-heavily-peated-batch-9/",
+          "result": {
+            "query": "page opening",
+            "results": [
+              {
+                "url": "https://www.scotchwhiskyauctions.com/auctions/234-the-185th-auction/907522-kilkerran-heavily-peated-batch-9/",
+                "title": "Kilkerran Heavily Peated Batch #9 | The 185th Auction | Scotch Whisky Auctions",
+                "domain": "scotchwhiskyauctions.com",
+                "description": null,
+                "extraSnippets": []
+              }
+            ],
+            "summary": "# Kilkerran Heavily Peated Batch #9\n\nLot number: 185-04290\n\nFor a period, Campbeltown was the undisputed Whisky Capital of the World, boasting over 30 distilleries operating simultaneously at its peak. Locally available peat, barley and coal, coupled with a quick steamship service to Glasgow meant this thriving industry lasted into the early 20th Century. Alas; ultimately (and perhaps inevitably) it proved unsustainable, and by 1935 the bubble had well and truly burst, with only Springbank and Glen Scotia distilleries remaining.\n\nThis remained the case until 2004 when the long dormant Glengyle distillery finally reopened its doors; its acquisition by Springbank and Cadenhead’s parent company (J&A Mitchell) marking Campbeltown’s establishment as a fully fledged whisky region in the eyes of the Scotch Whisky Association.\n\nThe whisky distilled there is bottled under the name Kilkerran (the Gaelic name for Campbeltown) in order to differentiate it from the Glengyle vatted malt produced by Loch Lomond distillery, and since 2009 there have been a series of “work in progress” releases, culminating in the release of a 12 Year Old expression in 2016.\n\nBatch Number: 9\n\n59.2% ABV / 70cl\n\nPlease examine all images of the lot, any packaging and labels carefully and satisfy yourself as to their condition before making a bid.",
+            "provider": "firecrawl"
+          }
+        }
+      ],
       "imageResults": []
     },
     "auction-lagavulin-distillery-exclusive-2018-thin-match": {
@@ -7735,7 +7946,7 @@
                 "extraSnippets": []
               }
             ],
-            "summary": "[Skip to menu](https://www.scotchwhiskyauctions.com/auctions/234-the-185th-auction/907509-lagavulin-distillery-exclusive-cask-strength-2018-release/#menu) [Skip to content](https://www.scotchwhiskyauctions.com/auctions/234-the-185th-auction/907509-lagavulin-distillery-exclusive-cask-strength-2018-release/#contentstart)\n\nAre you the legal age to buy alcohol in your country?YesNo\n\n [Free valuations](https://wa.me/+447538638525/?text=I%20would%20like%20a%20free%20valuation)\n\nShow/hide cookie info\n\n**This site may set cookies for essential tasks, such as tracking whether you are signed in.**\n\nWe would also like to set analytics cookies to better understand our users’ behaviour.\n\n[Read our cookies policy](https://www.scotchwhiskyauctions.com/privacy/)\n\nAcceptReject",
+            "summary": "# Lagavulin Distillery Exclusive Cask Strength 2018 Release\n\nLot number: 185-04277\n\nLike most Islay malts, Lagavulin is definitely not for the faint hearted. The distillery was officially founded in 1816 (although illicit production on the site most certainly predates that), and produces malt with a signature style of earthy smoke and savoury undertones. 1962 marked a significant point in the distillery’s history, as it was then bought by John Logan Mackie, whose nephew Peter went on to create the White Horse blend with Lagavulin at its heart.\n\nThese days the distillery, along with White Horse, belong to Diageo. However, it is generally agreed that while Lagavulin’s core range remains reliably excellent, older expressions bearing the White Horse name still have the edge.\n\nAvailable only from the distillery, it is rumoured that it was created from the remnants of whisky from a previous bottling run of Distiller’s Edition. It was then re-casked and given a couple of extra years maturation. Released at natural cask strength.\n\nBottled: 2018\n\nCask Type: STR / Bourbon\n\n53.5% ABV / 70cl\n\nBottle Number: One of only 6000 bottles released\n\nPlease examine all images of the lot, any packaging and labels carefully and satisfy yourself as to their condition before making a bid.",
             "provider": "firecrawl"
           },
           {
@@ -7839,7 +8050,25 @@
         ],
         "errors": []
       },
-      "pageResults": [],
+      "pageResults": [
+        {
+          "url": "https://www.scotchwhiskyauctions.com/auctions/234-the-185th-auction/907509-lagavulin-distillery-exclusive-cask-strength-2018-release/",
+          "result": {
+            "query": "page opening",
+            "results": [
+              {
+                "url": "https://www.scotchwhiskyauctions.com/auctions/234-the-185th-auction/907509-lagavulin-distillery-exclusive-cask-strength-2018-release/",
+                "title": "Lagavulin Distillery Exclusive Cask Strength 2018 Release | The 185th Auction | Scotch Whisky Auctions",
+                "domain": "scotchwhiskyauctions.com",
+                "description": null,
+                "extraSnippets": []
+              }
+            ],
+            "summary": "# Lagavulin Distillery Exclusive Cask Strength 2018 Release\n\nLot number: 185-04277\n\nLike most Islay malts, Lagavulin is definitely not for the faint hearted. The distillery was officially founded in 1816 (although illicit production on the site most certainly predates that), and produces malt with a signature style of earthy smoke and savoury undertones. 1962 marked a significant point in the distillery’s history, as it was then bought by John Logan Mackie, whose nephew Peter went on to create the White Horse blend with Lagavulin at its heart.\n\nThese days the distillery, along with White Horse, belong to Diageo. However, it is generally agreed that while Lagavulin’s core range remains reliably excellent, older expressions bearing the White Horse name still have the edge.\n\nAvailable only from the distillery, it is rumoured that it was created from the remnants of whisky from a previous bottling run of Distiller’s Edition. It was then re-casked and given a couple of extra years maturation. Released at natural cask strength.\n\nBottled: 2018\n\nCask Type: STR / Bourbon\n\n53.5% ABV / 70cl\n\nBottle Number: One of only 6000 bottles released\n\nPlease examine all images of the lot, any packaging and labels carefully and satisfy yourself as to their condition before making a bid.",
+            "provider": "firecrawl"
+          }
+        }
+      ],
       "imageResults": []
     },
     "auction-loch-lomond-open-152-duplicate": {
@@ -7948,7 +8177,7 @@
                 "extraSnippets": []
               }
             ],
-            "summary": "[Skip to menu](https://www.scotchwhiskyauctions.com/auctions/234-the-185th-auction/904787-macallan-10-year-old/#menu) [Skip to content](https://www.scotchwhiskyauctions.com/auctions/234-the-185th-auction/904787-macallan-10-year-old/#contentstart)\n\nAre you the legal age to buy alcohol in your country?YesNo\n\n [Free valuations](https://wa.me/+447538638525/?text=I%20would%20like%20a%20free%20valuation)\n\nShow/hide cookie info\n\n**This site may set cookies for essential tasks, such as tracking whether you are signed in.**\n\nWe would also like to set analytics cookies to better understand our users’ behaviour.\n\n[Read our cookies policy](https://www.scotchwhiskyauctions.com/privacy/)\n\nAcceptReject",
+            "summary": "# Macallan 10 Year Old\n\nLot number: 185-01610\n\nThe Macallan distillery was founded in 1824 by Alexander Reid, a barley farmer and school teacher. Now owned by the Edrington Group, The Macallan prides itself on its Six Pillars, which include its curiously small stills, very narrow ‘cut’ of new make spirit and exceptional cask management. It is the most sought after whisky for collectors, regularly setting records at auctions all round the world.\n\nA new £140 million subterranean distillery and visitor centre on the Easter Elchies estate was opened to the public in the summer of 2018 and has since won several awards for its architectural quality; with its exciting features including glass walls of vintage whiskies, a circular pod of copper pot stills, and a Boutique reflecting those in Dubai and Heathrow airports.\n\n10 Year Old:\n\nA staple part of the distillery’s core range, the extremely accessible Macallan 10-Year-Old Sherry Oak would have introduced many a newcomer to the wonderful world of whisky. Sadly, it was discontinued in 2013 to make way for the non-age-statement 1824 series. As a result, the once humble 10-Year-Old has gone on to become highly sought after on the second-hand market.\n\nAge: 10 Years Old\n\n40% ABV / 70cl\n\nPlease note wear to carton\n\nPlease examine the images of the bottle, any packaging and labels carefully and satisfy yourself as to their condition before making a bid.",
             "provider": "firecrawl"
           },
           {
@@ -8009,7 +8238,25 @@
         ],
         "errors": []
       },
-      "pageResults": [],
+      "pageResults": [
+        {
+          "url": "https://www.scotchwhiskyauctions.com/auctions/234-the-185th-auction/904787-macallan-10-year-old/",
+          "result": {
+            "query": "page opening",
+            "results": [
+              {
+                "url": "https://www.scotchwhiskyauctions.com/auctions/234-the-185th-auction/904787-macallan-10-year-old/",
+                "title": "Macallan 10 Year Old | The 185th Auction | Scotch Whisky Auctions",
+                "domain": "scotchwhiskyauctions.com",
+                "description": null,
+                "extraSnippets": []
+              }
+            ],
+            "summary": "# Macallan 10 Year Old\n\nLot number: 185-01610\n\nThe Macallan distillery was founded in 1824 by Alexander Reid, a barley farmer and school teacher. Now owned by the Edrington Group, The Macallan prides itself on its Six Pillars, which include its curiously small stills, very narrow ‘cut’ of new make spirit and exceptional cask management. It is the most sought after whisky for collectors, regularly setting records at auctions all round the world.\n\nA new £140 million subterranean distillery and visitor centre on the Easter Elchies estate was opened to the public in the summer of 2018 and has since won several awards for its architectural quality; with its exciting features including glass walls of vintage whiskies, a circular pod of copper pot stills, and a Boutique reflecting those in Dubai and Heathrow airports.\n\n10 Year Old:\n\nA staple part of the distillery’s core range, the extremely accessible Macallan 10-Year-Old Sherry Oak would have introduced many a newcomer to the wonderful world of whisky. Sadly, it was discontinued in 2013 to make way for the non-age-statement 1824 series. As a result, the once humble 10-Year-Old has gone on to become highly sought after on the second-hand market.\n\nAge: 10 Years Old\n\n40% ABV / 70cl\n\nPlease note wear to carton\n\nPlease examine the images of the bottle, any packaging and labels carefully and satisfy yourself as to their condition before making a bid.",
+            "provider": "firecrawl"
+          }
+        }
+      ],
       "imageResults": []
     },
     "auction-macallan-candle-holders-ignore": {
@@ -8150,13 +8397,31 @@
                 "extraSnippets": []
               }
             ],
-            "summary": "[Skip to menu](https://www.scotchwhiskyauctions.com/auctions/234-the-185th-auction/904783-macallan-classic-cut-2021-release/#menu) [Skip to content](https://www.scotchwhiskyauctions.com/auctions/234-the-185th-auction/904783-macallan-classic-cut-2021-release/#contentstart)\n\nAre you the legal age to buy alcohol in your country?YesNo\n\n [Free valuations](https://wa.me/+447538638525/?text=I%20would%20like%20a%20free%20valuation)\n\nShow/hide cookie info\n\n**This site may set cookies for essential tasks, such as tracking whether you are signed in.**\n\nWe would also like to set analytics cookies to better understand our users’ behaviour.\n\n[Read our cookies policy](https://www.scotchwhiskyauctions.com/privacy/)\n\nAcceptReject",
+            "summary": "# Macallan Classic Cut 2021 Release\n\nLot number: 185-01606\n\nThe Macallan distillery was founded in 1824 by Alexander Reid, a barley farmer and school teacher. Now owned by the Edrington Group, The Macallan prides itself on its Six Pillars, which include its curiously small stills, very narrow ‘cut’ of new make spirit and exceptional cask management. It is the most sought after whisky for collectors, regularly setting records at auctions all round the world.\n\nA new £140 million subterranean distillery and visitor centre on the Easter Elchies estate was opened to the public in the summer of 2018 and has since won several awards for its architectural quality; with its exciting features including glass walls of vintage whiskies, a circular pod of copper pot stills, and a Boutique reflecting those in Dubai and Heathrow airports.\n\nClassic Cut:\n\nStarted in 2017, the Classic Cut is a series of annual releases which, according to the distillery, celebrates their ongoing commitment to seek out the extraordinary. We’re not entirely sure what that means, but it sounds good. The overall presentation is certainly evocative of their older cask strength releases, and the Classic Cut seems to occupy that place in the range.\n\nBottled: 2021\n\nCask Type: Sherry Casks\n\n51% ABV / 70cl\n\nPlease note creasing to carton.\n\nPlease examine all images of the lot, any packaging and labels carefully and satisfy yourself as to their condition before making a bid.",
             "provider": "firecrawl"
           }
         ],
         "errors": []
       },
-      "pageResults": [],
+      "pageResults": [
+        {
+          "url": "https://www.scotchwhiskyauctions.com/auctions/234-the-185th-auction/904783-macallan-classic-cut-2021-release/",
+          "result": {
+            "query": "page opening",
+            "results": [
+              {
+                "url": "https://www.scotchwhiskyauctions.com/auctions/234-the-185th-auction/904783-macallan-classic-cut-2021-release/",
+                "title": "Macallan Classic Cut 2021 Release | The 185th Auction | Scotch Whisky Auctions",
+                "domain": "scotchwhiskyauctions.com",
+                "description": null,
+                "extraSnippets": []
+              }
+            ],
+            "summary": "# Macallan Classic Cut 2021 Release\n\nLot number: 185-01606\n\nThe Macallan distillery was founded in 1824 by Alexander Reid, a barley farmer and school teacher. Now owned by the Edrington Group, The Macallan prides itself on its Six Pillars, which include its curiously small stills, very narrow ‘cut’ of new make spirit and exceptional cask management. It is the most sought after whisky for collectors, regularly setting records at auctions all round the world.\n\nA new £140 million subterranean distillery and visitor centre on the Easter Elchies estate was opened to the public in the summer of 2018 and has since won several awards for its architectural quality; with its exciting features including glass walls of vintage whiskies, a circular pod of copper pot stills, and a Boutique reflecting those in Dubai and Heathrow airports.\n\nClassic Cut:\n\nStarted in 2017, the Classic Cut is a series of annual releases which, according to the distillery, celebrates their ongoing commitment to seek out the extraordinary. We’re not entirely sure what that means, but it sounds good. The overall presentation is certainly evocative of their older cask strength releases, and the Classic Cut seems to occupy that place in the range.\n\nBottled: 2021\n\nCask Type: Sherry Casks\n\n51% ABV / 70cl\n\nPlease note creasing to carton.\n\nPlease examine all images of the lot, any packaging and labels carefully and satisfy yourself as to their condition before making a bid.",
+            "provider": "firecrawl"
+          }
+        }
+      ],
       "imageResults": []
     },
     "auction-macallan-runrig-duncan-taylor-brand": {
@@ -8173,7 +8438,7 @@
                 "extraSnippets": []
               }
             ],
-            "summary": "[Skip to menu](https://www.scotchwhiskyauctions.com/auctions/234-the-185th-auction/903755-macallan-20-year-old-runrig-beat-the-dram-loch-ness-2007/#menu) [Skip to content](https://www.scotchwhiskyauctions.com/auctions/234-the-185th-auction/903755-macallan-20-year-old-runrig-beat-the-dram-loch-ness-2007/#contentstart)\n\nAre you the legal age to buy alcohol in your country?YesNo\n\n [Free valuations](https://wa.me/+447538638525/?text=I%20would%20like%20a%20free%20valuation)\n\nShow/hide cookie info\n\n**This site may set cookies for essential tasks, such as tracking whether you are signed in.**\n\nWe would also like to set analytics cookies to better understand our users’ behaviour.\n\n[Read our cookies policy](https://www.scotchwhiskyauctions.com/privacy/)\n\nAcceptReject",
+            "summary": "# Macallan 20 Year Old Runrig Beat the Dram Loch Ness 2007\n\nLot number: 185-00592\n\nDuncan Taylor & Company presides over the ownership of one of the largest privately-held collections of Scotch whisky casks. Though the company’s origins lie in Glasgow as a whisky merchant and broker, its headquarters are in the North East of Scotland - close to Speyside - and it has complete control of the entire production process; from cask selection and management, through “in-house” product and packaging design to its own “under bond” bottling facilities.\n\nA 20 year old Macallan available exclusively at the “2007 Loch Ness Beat The Dram” event headlined by Runrig.\n\nOne of only 500 individually numbered bottles including a certificate signed by the Runrig band members.\n\nCask Number: D2562\n\n46% ABV / 70cl\n\nBottle Number: 355 / 500\n\nPlease note minor scuffing to tube.\n\nPlease examine the images of the bottle, any packaging and labels carefully and satisfy yourself as to their condition before making a bid.",
             "provider": "firecrawl"
           },
           {
@@ -8298,7 +8563,25 @@
         ],
         "errors": []
       },
-      "pageResults": [],
+      "pageResults": [
+        {
+          "url": "https://www.scotchwhiskyauctions.com/auctions/234-the-185th-auction/903755-macallan-20-year-old-runrig-beat-the-dram-loch-ness-2007/",
+          "result": {
+            "query": "page opening",
+            "results": [
+              {
+                "url": "https://www.scotchwhiskyauctions.com/auctions/234-the-185th-auction/903755-macallan-20-year-old-runrig-beat-the-dram-loch-ness-2007/",
+                "title": "Macallan 20 Year Old Runrig Beat the Dram Loch Ness 2007 | The 185th Auction | Scotch Whisky Auctions",
+                "domain": "scotchwhiskyauctions.com",
+                "description": null,
+                "extraSnippets": []
+              }
+            ],
+            "summary": "# Macallan 20 Year Old Runrig Beat the Dram Loch Ness 2007\n\nLot number: 185-00592\n\nDuncan Taylor & Company presides over the ownership of one of the largest privately-held collections of Scotch whisky casks. Though the company’s origins lie in Glasgow as a whisky merchant and broker, its headquarters are in the North East of Scotland - close to Speyside - and it has complete control of the entire production process; from cask selection and management, through “in-house” product and packaging design to its own “under bond” bottling facilities.\n\nA 20 year old Macallan available exclusively at the “2007 Loch Ness Beat The Dram” event headlined by Runrig.\n\nOne of only 500 individually numbered bottles including a certificate signed by the Runrig band members.\n\nCask Number: D2562\n\n46% ABV / 70cl\n\nBottle Number: 355 / 500\n\nPlease note minor scuffing to tube.\n\nPlease examine the images of the bottle, any packaging and labels carefully and satisfy yourself as to their condition before making a bid.",
+            "provider": "firecrawl"
+          }
+        }
+      ],
       "imageResults": []
     },
     "auction-makers-mark-limited-edition-label": {
@@ -8315,7 +8598,7 @@
                 "extraSnippets": []
               }
             ],
-            "summary": "[Skip to menu](https://www.scotchwhiskyauctions.com/auctions/234-the-185th-auction/906571-makers-mark-limited-edition-bottling/#menu) [Skip to content](https://www.scotchwhiskyauctions.com/auctions/234-the-185th-auction/906571-makers-mark-limited-edition-bottling/#contentstart)\n\nAre you the legal age to buy alcohol in your country?YesNo\n\n [Free valuations](https://wa.me/+447538638525/?text=I%20would%20like%20a%20free%20valuation)\n\nShow/hide cookie info\n\n**This site may set cookies for essential tasks, such as tracking whether you are signed in.**\n\nWe would also like to set analytics cookies to better understand our users’ behaviour.\n\n[Read our cookies policy](https://www.scotchwhiskyauctions.com/privacy/)\n\nAcceptReject",
+            "summary": "# Maker’s Mark Limited Edition Bottling\n\nLot number: 185-03352\n\nFounded in 1954, Makers Mark is a family run distillery. The ‘SIV’ symbol stamped on the bottle symbolises the family ownership, ‘S’ stands for the Samuels family. ‘IV’ states that Bill Sr was the 4th generation distiller. years later, Bill Jr discovered his father was actually a 6th generation distiller.\n\nMakers Mark don’t mind sharing exactly what goes into their spirit, 70% Corn, 16% Soft Red Winter Wheat and 14% Malted Barley.\n\nSealing each bottle is a time consuming task as each bottle is hand-dipped into their signature red wax, and has been since 1958.\n\n45% ABV / 70cl\n\nPlease note condition of labels\n\nPlease note some wax seals are prone to cracking in varying temperatures and transport conditions, therefore - as stated in our terms and conditions - we do not accept liability should these seals be found to show signs of splitting on delivery.\n\nPlease examine all images of the lot, any packaging and labels carefully and satisfy yourself as to their condition before making a bid.",
             "provider": "firecrawl"
           },
           {
@@ -8433,7 +8716,25 @@
         ],
         "errors": []
       },
-      "pageResults": [],
+      "pageResults": [
+        {
+          "url": "https://www.scotchwhiskyauctions.com/auctions/234-the-185th-auction/906571-makers-mark-limited-edition-bottling/",
+          "result": {
+            "query": "page opening",
+            "results": [
+              {
+                "url": "https://www.scotchwhiskyauctions.com/auctions/234-the-185th-auction/906571-makers-mark-limited-edition-bottling/",
+                "title": "Maker’s Mark Limited Edition Bottling | The 185th Auction | Scotch Whisky Auctions",
+                "domain": "scotchwhiskyauctions.com",
+                "description": null,
+                "extraSnippets": []
+              }
+            ],
+            "summary": "# Maker’s Mark Limited Edition Bottling\n\nLot number: 185-03352\n\nFounded in 1954, Makers Mark is a family run distillery. The ‘SIV’ symbol stamped on the bottle symbolises the family ownership, ‘S’ stands for the Samuels family. ‘IV’ states that Bill Sr was the 4th generation distiller. years later, Bill Jr discovered his father was actually a 6th generation distiller.\n\nMakers Mark don’t mind sharing exactly what goes into their spirit, 70% Corn, 16% Soft Red Winter Wheat and 14% Malted Barley.\n\nSealing each bottle is a time consuming task as each bottle is hand-dipped into their signature red wax, and has been since 1958.\n\n45% ABV / 70cl\n\nPlease note condition of labels\n\nPlease note some wax seals are prone to cracking in varying temperatures and transport conditions, therefore - as stated in our terms and conditions - we do not accept liability should these seals be found to show signs of splitting on delivery.\n\nPlease examine all images of the lot, any packaging and labels carefully and satisfy yourself as to their condition before making a bid.",
+            "provider": "firecrawl"
+          }
+        }
+      ],
       "imageResults": []
     },
     "auction-port-ellen-1983-provenance-brand": {
@@ -8450,7 +8751,7 @@
                 "extraSnippets": []
               }
             ],
-            "summary": "[Skip to menu](https://www.scotchwhiskyauctions.com/auctions/234-the-185th-auction/904345-port-ellen-1983-24-year-old-provenance/#menu) [Skip to content](https://www.scotchwhiskyauctions.com/auctions/234-the-185th-auction/904345-port-ellen-1983-24-year-old-provenance/#contentstart)\n\nAre you the legal age to buy alcohol in your country?YesNo\n\n [Free valuations](https://wa.me/+447538638525/?text=I%20would%20like%20a%20free%20valuation)\n\nShow/hide cookie info\n\n**This site may set cookies for essential tasks, such as tracking whether you are signed in.**\n\nWe would also like to set analytics cookies to better understand our users’ behaviour.\n\n[Read our cookies policy](https://www.scotchwhiskyauctions.com/privacy/)\n\nAcceptReject",
+            "summary": "# Port Ellen 1983 24 Year Old Provenance\n\nLot number: 185-01171\n\nOpened in 1824, Port Ellen was managed in its early days by 21 year old John Ramsay (imagine running a distillery at 21!). A shrewd businessman, Ramsay became a partner in the steamer boat company that made supply runs between the island and the city of Glasgow. This no doubt played a part in the town of Port Ellen also becoming the defacto ferry terminal.\n\nIn 1925 the distillery was acquired by DCL, but it always played second fiddle to bigger siblings, Caol Ila and Lagavulin. Production during this period came in fits and starts, and in 1983 during a downturn in global demand for Scotch, DCL decided to pull the plug on the runt of their litter. However, while the distillery itself may be gone, stocks of Port Ellen whisky remain; and thanks to the use of refill casks to create a signature style less oaked than it’s contemporaries (and one that ages extremely well), demand amongst collectors and connoisseurs continues to soar as supply dwindles.\n\nDirector of Malts Fred Laing believes that the provenance of a whisky’s constituent ingredients is vital in the production of something of great quality and character; therefore, the Provenance range of small batch bottlings from Douglas Laing is a sturdy portfolio of spirits from Scotland’s great distilleries. Within the range, there are ‘Young & Feisty’ bottlings and aged expressions.\n\nPort Ellen\n\nDistilled: 1983\n\nBottled: 2008\n\nAge: 24 Years Old\n\nCask Type: Refill Sherry Butt\n\nCask Number: 4127\n\n46% ABV / 70cl\n\nPlease examine all images of the lot, any packaging and labels carefully and satisfy yourself as to their condition before making a bid.",
             "provider": "firecrawl"
           },
           {
@@ -8554,7 +8855,25 @@
         ],
         "errors": []
       },
-      "pageResults": [],
+      "pageResults": [
+        {
+          "url": "https://www.scotchwhiskyauctions.com/auctions/234-the-185th-auction/904345-port-ellen-1983-24-year-old-provenance/",
+          "result": {
+            "query": "page opening",
+            "results": [
+              {
+                "url": "https://www.scotchwhiskyauctions.com/auctions/234-the-185th-auction/904345-port-ellen-1983-24-year-old-provenance/",
+                "title": "Port Ellen 1983 24 Year Old Provenance | The 185th Auction | Scotch Whisky Auctions",
+                "domain": "scotchwhiskyauctions.com",
+                "description": null,
+                "extraSnippets": []
+              }
+            ],
+            "summary": "# Port Ellen 1983 24 Year Old Provenance\n\nLot number: 185-01171\n\nOpened in 1824, Port Ellen was managed in its early days by 21 year old John Ramsay (imagine running a distillery at 21!). A shrewd businessman, Ramsay became a partner in the steamer boat company that made supply runs between the island and the city of Glasgow. This no doubt played a part in the town of Port Ellen also becoming the defacto ferry terminal.\n\nIn 1925 the distillery was acquired by DCL, but it always played second fiddle to bigger siblings, Caol Ila and Lagavulin. Production during this period came in fits and starts, and in 1983 during a downturn in global demand for Scotch, DCL decided to pull the plug on the runt of their litter. However, while the distillery itself may be gone, stocks of Port Ellen whisky remain; and thanks to the use of refill casks to create a signature style less oaked than it’s contemporaries (and one that ages extremely well), demand amongst collectors and connoisseurs continues to soar as supply dwindles.\n\nDirector of Malts Fred Laing believes that the provenance of a whisky’s constituent ingredients is vital in the production of something of great quality and character; therefore, the Provenance range of small batch bottlings from Douglas Laing is a sturdy portfolio of spirits from Scotland’s great distilleries. Within the range, there are ‘Young & Feisty’ bottlings and aged expressions.\n\nPort Ellen\n\nDistilled: 1983\n\nBottled: 2008\n\nAge: 24 Years Old\n\nCask Type: Refill Sherry Butt\n\nCask Number: 4127\n\n46% ABV / 70cl\n\nPlease examine all images of the lot, any packaging and labels carefully and satisfy yourself as to their condition before making a bid.",
+            "provider": "firecrawl"
+          }
+        }
+      ],
       "imageResults": []
     },
     "auction-smws-3-345-subtitle-name": {
@@ -8571,7 +8890,7 @@
                 "extraSnippets": []
               }
             ],
-            "summary": "[Skip to menu](https://www.scotchwhiskyauctions.com/auctions/234-the-185th-auction/906167-smws-3345-bowmore-18-year-old-for-the-danish-smws-festival-2023/#menu) [Skip to content](https://www.scotchwhiskyauctions.com/auctions/234-the-185th-auction/906167-smws-3345-bowmore-18-year-old-for-the-danish-smws-festival-2023/#contentstart)\n\nAre you the legal age to buy alcohol in your country?YesNo\n\n [Free valuations](https://wa.me/+447538638525/?text=I%20would%20like%20a%20free%20valuation)\n\nShow/hide cookie info\n\n**This site may set cookies for essential tasks, such as tracking whether you are signed in.**\n\nWe would also like to set analytics cookies to better understand our users’ behaviour.\n\n[Read our cookies policy](https://www.scotchwhiskyauctions.com/privacy/)\n\nAcceptReject",
+            "summary": "# SMWS 3.345 Bowmore 18 Year Old For The Danish SMWS Festival 2023\n\nLot number: 185-02952\n\nThe Scotch Malt Whisky Society was founded in Edinburgh in 1983 by Phillip &lsquo;Pip&rsquo; Hills who, while travelling around Scotland in the 1970s, fell in love with whiskies drawn straight from the cask. After he expanded his syndicate the Society was purchased by Glenmorangie PLC in 2004. In 2015, the Society was sold back to private investors. In June 2021, the private owners floated the holding company The Artisanal Spirits Company plc on the Alternative Investment Market of the London Stock Exchange.\n\nIt has a unique code system where the first number refers to the distillery and the second refers to the cask from which the bottle comes. SMWS also offers the largest range of distilleries of any independent bottler. These curiously named drams really do have something for every whisky lover!\n\nBy the shore of the wide world\n\nAge: 18 Years Old\n\n57.4% ABV / 70cl\n\nBottle Number: One of only 255 bottles released\n\nPlease examine all images of the lot, any packaging and labels carefully and satisfy yourself as to their condition before making a bid.",
             "provider": "firecrawl"
           },
           {
@@ -8675,7 +8994,25 @@
         ],
         "errors": []
       },
-      "pageResults": [],
+      "pageResults": [
+        {
+          "url": "https://www.scotchwhiskyauctions.com/auctions/234-the-185th-auction/906167-smws-3345-bowmore-18-year-old-for-the-danish-smws-festival-2023/",
+          "result": {
+            "query": "page opening",
+            "results": [
+              {
+                "url": "https://www.scotchwhiskyauctions.com/auctions/234-the-185th-auction/906167-smws-3345-bowmore-18-year-old-for-the-danish-smws-festival-2023/",
+                "title": "SMWS 3.345 Bowmore 18 Year Old For The Danish SMWS Festival 2023 | The 185th Auction | Scotch Whisky Auctions",
+                "domain": "scotchwhiskyauctions.com",
+                "description": null,
+                "extraSnippets": []
+              }
+            ],
+            "summary": "# SMWS 3.345 Bowmore 18 Year Old For The Danish SMWS Festival 2023\n\nLot number: 185-02952\n\nThe Scotch Malt Whisky Society was founded in Edinburgh in 1983 by Phillip &lsquo;Pip&rsquo; Hills who, while travelling around Scotland in the 1970s, fell in love with whiskies drawn straight from the cask. After he expanded his syndicate the Society was purchased by Glenmorangie PLC in 2004. In 2015, the Society was sold back to private investors. In June 2021, the private owners floated the holding company The Artisanal Spirits Company plc on the Alternative Investment Market of the London Stock Exchange.\n\nIt has a unique code system where the first number refers to the distillery and the second refers to the cask from which the bottle comes. SMWS also offers the largest range of distilleries of any independent bottler. These curiously named drams really do have something for every whisky lover!\n\nBy the shore of the wide world\n\nAge: 18 Years Old\n\n57.4% ABV / 70cl\n\nBottle Number: One of only 255 bottles released\n\nPlease examine all images of the lot, any packaging and labels carefully and satisfy yourself as to their condition before making a bid.",
+            "provider": "firecrawl"
+          }
+        }
+      ],
       "imageResults": []
     },
     "auction-smws-73-8-no-subtitle-name": {
@@ -8692,7 +9029,7 @@
                 "extraSnippets": []
               }
             ],
-            "summary": "[Skip to menu](https://www.scotchwhiskyauctions.com/auctions/234-the-185th-auction/903491-smws-738-aultmore-1989-13-year-old/#menu) [Skip to content](https://www.scotchwhiskyauctions.com/auctions/234-the-185th-auction/903491-smws-738-aultmore-1989-13-year-old/#contentstart)\n\nAre you the legal age to buy alcohol in your country?YesNo\n\n [Free valuations](https://wa.me/+447538638525/?text=I%20would%20like%20a%20free%20valuation)\n\nShow/hide cookie info\n\n**This site may set cookies for essential tasks, such as tracking whether you are signed in.**\n\nWe would also like to set analytics cookies to better understand our users’ behaviour.\n\n[Read our cookies policy](https://www.scotchwhiskyauctions.com/privacy/)\n\nAcceptReject",
+            "summary": "# SMWS 73.8 Aultmore 1989 13 Year Old\n\nLot number: 185-00328\n\nThe Scotch Malt Whisky Society was founded in Edinburgh in 1983 by Phillip ‘Pip’ Hills who, while travelling around Scotland in the 1970s, fell in love with whiskies drawn straight from the cask. After convincing some friends to buy a cask of Glenfarclas he expanded his syndicate and in 2004 the Society was purchased by Glenmorangie PLC.\n\nIt has a unique code system where the first number refers to the distillery and the second refers to the cask from which the bottle comes. SMWS also offers the largest range of distilleries of any independent bottler.\n\nAultmore\n\nDistilled: May 1989\n\nBottled: June 2002\n\nAge: 13 Years Old\n\n60.1% ABV / 70cl\n\nPlease note wear to box.\n\nPlease examine the images of the bottle, any packaging and labels carefully and satisfy yourself as to their condition before making a bid.",
             "provider": "firecrawl"
           },
           {
@@ -8796,7 +9133,25 @@
         ],
         "errors": []
       },
-      "pageResults": [],
+      "pageResults": [
+        {
+          "url": "https://www.scotchwhiskyauctions.com/auctions/234-the-185th-auction/903491-smws-738-aultmore-1989-13-year-old/",
+          "result": {
+            "query": "page opening",
+            "results": [
+              {
+                "url": "https://www.scotchwhiskyauctions.com/auctions/234-the-185th-auction/903491-smws-738-aultmore-1989-13-year-old/",
+                "title": "SMWS 73.8 Aultmore 1989 13 Year Old | The 185th Auction | Scotch Whisky Auctions",
+                "domain": "scotchwhiskyauctions.com",
+                "description": null,
+                "extraSnippets": []
+              }
+            ],
+            "summary": "# SMWS 73.8 Aultmore 1989 13 Year Old\n\nLot number: 185-00328\n\nThe Scotch Malt Whisky Society was founded in Edinburgh in 1983 by Phillip ‘Pip’ Hills who, while travelling around Scotland in the 1970s, fell in love with whiskies drawn straight from the cask. After convincing some friends to buy a cask of Glenfarclas he expanded his syndicate and in 2004 the Society was purchased by Glenmorangie PLC.\n\nIt has a unique code system where the first number refers to the distillery and the second refers to the cask from which the bottle comes. SMWS also offers the largest range of distilleries of any independent bottler.\n\nAultmore\n\nDistilled: May 1989\n\nBottled: June 2002\n\nAge: 13 Years Old\n\n60.1% ABV / 70cl\n\nPlease note wear to box.\n\nPlease examine the images of the bottle, any packaging and labels carefully and satisfy yourself as to their condition before making a bid.",
+            "provider": "firecrawl"
+          }
+        }
+      ],
       "imageResults": []
     },
     "auction-smws-cocoa-drift-batch-35-edition": {
@@ -8813,7 +9168,7 @@
                 "extraSnippets": []
               }
             ],
-            "summary": "[Skip to menu](https://www.scotchwhiskyauctions.com/auctions/234-the-185th-auction/904423-smws-cocoa-drift-11-year-old-blended-malt-batch-35/#menu) [Skip to content](https://www.scotchwhiskyauctions.com/auctions/234-the-185th-auction/904423-smws-cocoa-drift-11-year-old-blended-malt-batch-35/#contentstart)\n\nAre you the legal age to buy alcohol in your country?YesNo\n\n [Free valuations](https://wa.me/+447538638525/?text=I%20would%20like%20a%20free%20valuation)\n\nShow/hide cookie info\n\n**This site may set cookies for essential tasks, such as tracking whether you are signed in.**\n\nWe would also like to set analytics cookies to better understand our users’ behaviour.\n\n[Read our cookies policy](https://www.scotchwhiskyauctions.com/privacy/)\n\nAcceptReject",
+            "summary": "# SMWS Cocoa Drift 11 Year Old Blended Malt Batch #35\n\nLot number: 185-01249\n\nThe Scotch Malt Whisky Society was founded in Edinburgh in 1983 by Phillip ‘Pip’ Hills who, while travelling around Scotland in the 1970’s, fell in love with whiskies drawn straight from the cask. After convincing some friends to buy a cask of Glenfarclas he expanded his syndicate and in 2004 the Society was purchased by Glenmorangie PLC.\n\nIt has a unique code system where the first number refers to the distillery and the second refers to the cask from which the bottle comes. SMWS also offers the largest range of distilleries of any independent bottler.\n\nCocoa Drift\n\nBatch #35\n\nAge: 11 Years Old\n\nCask Type: Society Solera (Sherry Hogsheads)\n\n50% ABV / 70cl\n\nPlease examine all images of the lot, any packaging and labels carefully and satisfy yourself as to their condition before making a bid.",
             "provider": "firecrawl"
           },
           {
@@ -8917,7 +9272,25 @@
         ],
         "errors": []
       },
-      "pageResults": [],
+      "pageResults": [
+        {
+          "url": "https://www.scotchwhiskyauctions.com/auctions/234-the-185th-auction/904423-smws-cocoa-drift-11-year-old-blended-malt-batch-35/",
+          "result": {
+            "query": "page opening",
+            "results": [
+              {
+                "url": "https://www.scotchwhiskyauctions.com/auctions/234-the-185th-auction/904423-smws-cocoa-drift-11-year-old-blended-malt-batch-35/",
+                "title": "SMWS Cocoa Drift 11 Year Old Blended Malt Batch #35 | The 185th Auction | Scotch Whisky Auctions",
+                "domain": "scotchwhiskyauctions.com",
+                "description": null,
+                "extraSnippets": []
+              }
+            ],
+            "summary": "# SMWS Cocoa Drift 11 Year Old Blended Malt Batch #35\n\nLot number: 185-01249\n\nThe Scotch Malt Whisky Society was founded in Edinburgh in 1983 by Phillip ‘Pip’ Hills who, while travelling around Scotland in the 1970’s, fell in love with whiskies drawn straight from the cask. After convincing some friends to buy a cask of Glenfarclas he expanded his syndicate and in 2004 the Society was purchased by Glenmorangie PLC.\n\nIt has a unique code system where the first number refers to the distillery and the second refers to the cask from which the bottle comes. SMWS also offers the largest range of distilleries of any independent bottler.\n\nCocoa Drift\n\nBatch #35\n\nAge: 11 Years Old\n\nCask Type: Society Solera (Sherry Hogsheads)\n\n50% ABV / 70cl\n\nPlease examine all images of the lot, any packaging and labels carefully and satisfy yourself as to their condition before making a bid.",
+            "provider": "firecrawl"
+          }
+        }
+      ],
       "imageResults": []
     },
     "auction-springbank-15-2026-release-not-generic": {
@@ -9817,7 +10190,7 @@
                 "extraSnippets": []
               }
             ],
-            "summary": "[Skip to menu](https://www.scotchwhiskyauctions.com/auctions/234-the-185th-auction/903846-chivas-royal-salute-30-year-old-the-flask-edition/#menu) [Skip to content](https://www.scotchwhiskyauctions.com/auctions/234-the-185th-auction/903846-chivas-royal-salute-30-year-old-the-flask-edition/#contentstart)\n\nAre you the legal age to buy alcohol in your country?YesNo\n\n [Free valuations](https://wa.me/+447538638525/?text=I%20would%20like%20a%20free%20valuation)\n\nShow/hide cookie info\n\n**This site may set cookies for essential tasks, such as tracking whether you are signed in.**\n\nWe would also like to set analytics cookies to better understand our users’ behaviour.\n\n[Read our cookies policy](https://www.scotchwhiskyauctions.com/privacy/)\n\nAcceptReject",
+            "summary": "# Chivas Royal Salute 30 Year Old The Flask Edition\n\nLot number: 185-00682\n\nChivas Regal is one of the most famous and prestigious premium spirit brands in the world and the initial release was a 25 Year Old designed to appeal to the high society of the US with its higher and more complex malt content setting it apart from other blends. At the heart of the blend are the finest aged Speyside malts, including Strathisla.\n\nInitially grown from John Forrest’s grocery and spirit shop in Aberdeen - and taking its name from James Chivas who took over in 1838 - the company has gone from strength to strength. Chivas Regal now sells over 30 million bottles a year - meaning that approximately every couple of seconds, 24 hours a day, 365 days a year, somebody somewhere is enjoying a Chivas Regal.\n\nAge: 30 Years Old\n\n50.1% ABV / 70cl\n\nPlease examine all images of the lot, any packaging and labels carefully and satisfy yourself as to their condition before making a bid.",
             "provider": "firecrawl"
           },
           {
@@ -9949,7 +10322,25 @@
         ],
         "errors": []
       },
-      "pageResults": [],
+      "pageResults": [
+        {
+          "url": "https://www.scotchwhiskyauctions.com/auctions/234-the-185th-auction/903846-chivas-royal-salute-30-year-old-the-flask-edition/",
+          "result": {
+            "query": "page opening",
+            "results": [
+              {
+                "url": "https://www.scotchwhiskyauctions.com/auctions/234-the-185th-auction/903846-chivas-royal-salute-30-year-old-the-flask-edition/",
+                "title": "Chivas Royal Salute 30 Year Old The Flask Edition | The 185th Auction | Scotch Whisky Auctions",
+                "domain": "scotchwhiskyauctions.com",
+                "description": null,
+                "extraSnippets": []
+              }
+            ],
+            "summary": "# Chivas Royal Salute 30 Year Old The Flask Edition\n\nLot number: 185-00682\n\nChivas Regal is one of the most famous and prestigious premium spirit brands in the world and the initial release was a 25 Year Old designed to appeal to the high society of the US with its higher and more complex malt content setting it apart from other blends. At the heart of the blend are the finest aged Speyside malts, including Strathisla.\n\nInitially grown from John Forrest’s grocery and spirit shop in Aberdeen - and taking its name from James Chivas who took over in 1838 - the company has gone from strength to strength. Chivas Regal now sells over 30 million bottles a year - meaning that approximately every couple of seconds, 24 hours a day, 365 days a year, somebody somewhere is enjoying a Chivas Regal.\n\nAge: 30 Years Old\n\n50.1% ABV / 70cl\n\nPlease examine all images of the lot, any packaging and labels carefully and satisfy yourself as to their condition before making a bid.",
+            "provider": "firecrawl"
+          }
+        }
+      ],
       "imageResults": []
     },
     "auction-macallan-concept-3-with-print": {
@@ -10086,7 +10477,7 @@
                 "extraSnippets": []
               }
             ],
-            "summary": "[Skip to menu](https://www.scotchwhiskyauctions.com/auctions/233-the-184th-auction/902894-van-winkle-special-reserve-lot-b-12-year-old-bourbon-2024-release-75cl/#menu) [Skip to content](https://www.scotchwhiskyauctions.com/auctions/233-the-184th-auction/902894-van-winkle-special-reserve-lot-b-12-year-old-bourbon-2024-release-75cl/#contentstart)\n\nAre you the legal age to buy alcohol in your country?YesNo\n\n [Free valuations](https://wa.me/+447538638525/?text=I%20would%20like%20a%20free%20valuation)\n\nShow/hide cookie info\n\n**This site may set cookies for essential tasks, such as tracking whether you are signed in.**\n\nWe would also like to set analytics cookies to better understand our users’ behaviour.\n\n[Read our cookies policy](https://www.scotchwhiskyauctions.com/privacy/)\n\nAcceptReject",
+            "summary": "# Van Winkle Special Reserve Lot ‘B’ 12 Year Old Bourbon 2024 Release 75cl\n\nLot number: 184-04224\n\nJulian P. “ Pappy” Van Winkle Sr. truly was a wise man who kicked off a family of fine bourbon makers with his mantra to make the spirit “at a profit if we can, at a loss if we must, but always a fine bourbon”. In 1893, he set out as a travelling salesman for W. L. Weller & Sons until eventually he and a friend saved up to purchase what would become known as the Stitzel-Weller Distillery. They quickly became known for their wheated bourbon production and Pappy remained involved in the business until his passing at 91 years old.\n\nAfter taking over management and moving to a new base, his son, Julian Jr. resurrected a pre-Prohibition label called Old Rip Van Winkle using stocks from the old distillery. The brand was then passed down a further generation in 1981 and now Julian III and his son continue to run operations and production of the Van Winkle label at the Buffalo Trace Distillery.\n\nFrom Van Winkle themselves:\n\n“Proof Van Winkle Special Reserve is the perfect combination of age and proof. This sweet, full bodied whiskey has been described by some as “Nectar”. We agree! The 12 years of aging and medium proof of 90.4 seem to be just right in creating a very pleasant drink of whiskey. This fine bourbon can compete with any excellent cognac as an after dinner drink. The overall impression is rich and deep. “Well crafted…elegant, stately…balanced beautifully””.\n\nAge: 12 Years Old\n\n45.2% ABV / 75cl\n\nPlease examine all images of the lot, any packaging and labels carefully and satisfy yourself as to their condition before making a bid.",
             "provider": "firecrawl"
           },
           {
@@ -10190,7 +10581,25 @@
         ],
         "errors": []
       },
-      "pageResults": [],
+      "pageResults": [
+        {
+          "url": "https://www.scotchwhiskyauctions.com/auctions/233-the-184th-auction/902894-van-winkle-special-reserve-lot-b-12-year-old-bourbon-2024-release-75cl/",
+          "result": {
+            "query": "page opening",
+            "results": [
+              {
+                "url": "https://www.scotchwhiskyauctions.com/auctions/233-the-184th-auction/902894-van-winkle-special-reserve-lot-b-12-year-old-bourbon-2024-release-75cl/",
+                "title": "Van Winkle Special Reserve Lot ‘B’ 12 Year Old Bourbon 2024 Release 75cl | The 184th Auction | Scotch Whisky Auctions",
+                "domain": "scotchwhiskyauctions.com",
+                "description": null,
+                "extraSnippets": []
+              }
+            ],
+            "summary": "# Van Winkle Special Reserve Lot ‘B’ 12 Year Old Bourbon 2024 Release 75cl\n\nLot number: 184-04224\n\nJulian P. “ Pappy” Van Winkle Sr. truly was a wise man who kicked off a family of fine bourbon makers with his mantra to make the spirit “at a profit if we can, at a loss if we must, but always a fine bourbon”. In 1893, he set out as a travelling salesman for W. L. Weller & Sons until eventually he and a friend saved up to purchase what would become known as the Stitzel-Weller Distillery. They quickly became known for their wheated bourbon production and Pappy remained involved in the business until his passing at 91 years old.\n\nAfter taking over management and moving to a new base, his son, Julian Jr. resurrected a pre-Prohibition label called Old Rip Van Winkle using stocks from the old distillery. The brand was then passed down a further generation in 1981 and now Julian III and his son continue to run operations and production of the Van Winkle label at the Buffalo Trace Distillery.\n\nFrom Van Winkle themselves:\n\n“Proof Van Winkle Special Reserve is the perfect combination of age and proof. This sweet, full bodied whiskey has been described by some as “Nectar”. We agree! The 12 years of aging and medium proof of 90.4 seem to be just right in creating a very pleasant drink of whiskey. This fine bourbon can compete with any excellent cognac as an after dinner drink. The overall impression is rich and deep. “Well crafted…elegant, stately…balanced beautifully””.\n\nAge: 12 Years Old\n\n45.2% ABV / 75cl\n\nPlease examine all images of the lot, any packaging and labels carefully and satisfy yourself as to their condition before making a bid.",
+            "provider": "firecrawl"
+          }
+        }
+      ],
       "imageResults": []
     }
   }

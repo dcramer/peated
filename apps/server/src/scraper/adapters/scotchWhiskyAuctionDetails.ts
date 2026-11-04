@@ -4,6 +4,32 @@ import {
 } from "@peated/bottle-classifier/contract";
 import { load } from "cheerio";
 
+/**
+ * Returns a lot page's heading and description as text for a classifier page
+ * read, or null when the page has no lot. Every lot page ships its
+ * description in the HTML, then a script blanks the page behind an age
+ * question, so a reader that runs scripts, such as Firecrawl, gets only the
+ * question. The text is read for one classifier run and never saved on the lot.
+ */
+export function readScotchWhiskyAuctionLotPage(html: string) {
+  const $ = load(html);
+  const name = $("main h1").first().text().trim();
+  const description = $(".lotinfo .descr").first();
+  if (!name || !description.length) return null;
+  const lines = [`# ${name}`];
+  const lotNumber = $(".lotinfo .lotno").first().text().trim();
+  if (lotNumber) lines.push(lotNumber);
+  const paragraphs = description.find("p").toArray();
+  for (const element of paragraphs.length ? paragraphs : [description]) {
+    const text = $(element).text().replace(/\s+/g, " ").trim();
+    if (text) lines.push(text);
+  }
+  return {
+    title: $("title").first().text().trim() || null,
+    content: lines.join("\n\n"),
+  };
+}
+
 /** SWA collection keeps explicit identity facts, not descriptions, tasting notes, or graph prices. */
 export function parseScotchWhiskyAuctionDetails(html: string) {
   const $ = load(html);

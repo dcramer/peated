@@ -106,6 +106,14 @@ classified from its title and details. A timeout or failed reading fails the
 job so it retries. Each classified lot adds one image reading; reused
 references, saved checks, and identical lots add none.
 
+When the classifier reads a Scotch Whisky Auctions lot page, the server reads
+the page's HTML directly as PeatedBot and passes only the lot heading, lot
+number, and description. The page's script hides the lot behind an age
+question, so a Firecrawl read returns only that question (see the
+[blocked websites policy](../policies/blocked-websites.md)). The lot record
+keeps no description; like any page read, the saved check keeps the page
+opening the model saw as evidence.
+
 For a new Scotch Whisky Auctions lot without an accepted reference, a saved check,
 or structured source facts, matching requests one detail-page read before the
 first classification. The lot stays pending while those facts are collected.
