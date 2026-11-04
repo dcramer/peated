@@ -24,9 +24,12 @@ import { compareBottleFields, getBottleFieldConflicts } from "./fieldConflicts";
 import { normalizeString } from "./normalize";
 import { normalizeObservation } from "./observation";
 import {
+  getCandidateSmwsCodes,
   getSmwsCodeAnchor,
-  maybeResolveSmwsExactCaskCodeDecision,
+  getSourceSmwsCode,
+  isSmwsIdentityAnchor,
   normalizeSmwsExactCaskProposedBottleDraft,
+  smwsSubtitleIsPrinted,
 } from "./smwsPolicy";
 
 // These deterministic patterns are only reject/scope guards. They must not grow
@@ -199,7 +202,9 @@ function maybeRejectExactCaskCreateDuplicate({
 
   const exactCaskAnchor =
     getExactCaskCodeAnchor(decision.observation?.caskNumber) ??
+    getExactCaskCodeAnchor(decision.proposedBottle?.caskNumber) ??
     getExactCaskCodeAnchor(decision.proposedBottle?.name) ??
+    getExactCaskCodeAnchor(artifacts.extractedIdentity?.cask_number) ??
     getExactCaskCodeAnchor(artifacts.extractedIdentity?.edition) ??
     getExactCaskCodeAnchor(artifacts.extractedIdentity?.expression);
 
@@ -782,6 +787,95 @@ export function getAutoIgnoreBottleReferenceReason(
   return getPreExtractionAutoIgnoreBottleReferenceReason(referenceName);
 }
 
+/**
+ * SMWS identity rule (owner: Bottle classifier): when the source title prints
+ * an SMWS code, that code decides which Bottle the source can be. A match
+ * must select an SMWS Bottle with the same code. A create must carry that code
+ * under the SMWS Brand, and no candidate may already have it. Anything else
+ * goes to review. A subtitle the source does not print is a risk, so the
+ * create waits for review instead of applying automatically
+ * (`docs/architecture/bottle-classifier.md`, "SMWS Codes").
+ */
+function enforceSmwsSourceCode({
+  reference,
+  agentDecision,
+  decision,
+  artifacts,
+}: {
+  reference: BottleReferenceInput;
+  agentDecision: BottleClassifierAgentDecision;
+  decision: BottleClassificationDecision;
+  artifacts: BottleClassificationArtifacts;
+}): BottleClassificationDecision {
+  const code = getSourceSmwsCode(reference);
+  if (!code) return decision;
+  const downgrade = (reason: string, candidateBottleIds: number[] = []) =>
+    createNoMatchDecision({
+      decision,
+      candidateBottleIds: Array.from(
+        new Set([...decision.candidateBottleIds, ...candidateBottleIds]),
+      ),
+      observation: decision.observation,
+      identityScope: "exact_cask",
+      rationale: appendRationale(
+        decision.rationale,
+        `Server downgraded the decision because ${reason}.`,
+      ),
+    });
+
+  if (decision.action === "match") {
+    const target = getMatchedTarget(decision, artifacts.candidates);
+    return target && getCandidateSmwsCodes(target).includes(code)
+      ? decision
+      : downgrade(
+          `the matched Bottle does not carry the source's SMWS code ${code}`,
+        );
+  }
+
+  const proposedBottle = decision.proposedBottle;
+  if (decision.action !== "create_bottle" || !proposedBottle) return decision;
+  const agentCode =
+    getExactCaskCodeAnchor(agentDecision.proposedBottle?.caskNumber) ??
+    getExactCaskCodeAnchor(agentDecision.proposedBottle?.name);
+  if (agentCode && agentCode !== code)
+    return downgrade(
+      `the proposed cask ${agentCode} is not the source's SMWS code ${code}`,
+    );
+  if (!isSmwsIdentityAnchor(proposedBottle.brand.name))
+    return downgrade("an SMWS Bottle's Brand must be SMWS");
+  const existing = artifacts.candidates.find((candidate) =>
+    getCandidateSmwsCodes(candidate).includes(code),
+  );
+  if (existing)
+    return downgrade(
+      `Bottle ${existing.bottleId} already carries the SMWS code ${code}`,
+      [existing.bottleId],
+    );
+
+  const subtitle = proposedBottle.name
+    .replace(new RegExp(`^${escapeRegExp(code)}\\b`, "i"), "")
+    .trim();
+  if (!subtitle || smwsSubtitleIsPrinted({ subtitle, reference, artifacts }))
+    return decision;
+  const confidenceBasis = decision.confidenceBasis ?? {
+    unresolvedRisks: [],
+    webEvidence: "not_used" as const,
+  };
+  return {
+    ...decision,
+    confidenceBasis: {
+      ...confidenceBasis,
+      unresolvedRisks: [
+        ...confidenceBasis.unresolvedRisks,
+        {
+          category: "identity_ambiguity",
+          note: `The SMWS subtitle "${subtitle}" is not printed in the source.`,
+        },
+      ],
+    },
+  };
+}
+
 export function finalizeBottleReferenceClassification({
   reference,
   decision,
@@ -800,17 +894,11 @@ export function finalizeBottleReferenceClassification({
     decision: parsedDecision,
     artifacts,
   });
-  const smwsCodeAdjustedDecision =
-    maybeResolveSmwsExactCaskCodeDecision({
-      reference,
+  const exactCaskAdjustedDecision =
+    maybeRejectExactCaskCreateDuplicate({
       decision: sanitizedDecision,
       artifacts,
     }) ?? sanitizedDecision;
-  const exactCaskAdjustedDecision =
-    maybeRejectExactCaskCreateDuplicate({
-      decision: smwsCodeAdjustedDecision,
-      artifacts,
-    }) ?? smwsCodeAdjustedDecision;
   const agentEvidenceAdjustedDecision = {
     ...exactCaskAdjustedDecision,
     confidenceBasis:
@@ -822,8 +910,13 @@ export function finalizeBottleReferenceClassification({
   // were retired with numeric confidence and the confidence band. Automated
   // consumers now derive review routing from structured evidence via
   // `deriveAutomationTier`, so review gating no longer lives in this pipeline.
-  const reviewedDecision = rejectInvalidExistingMatch({
-    decision: agentEvidenceAdjustedDecision,
+  const reviewedDecision = enforceSmwsSourceCode({
+    reference,
+    agentDecision: parsedDecision,
+    decision: rejectInvalidExistingMatch({
+      decision: agentEvidenceAdjustedDecision,
+      artifacts,
+    }),
     artifacts,
   });
 

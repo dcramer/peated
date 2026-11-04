@@ -239,35 +239,6 @@ describe("buildAgentInput", () => {
     expect(input).not.toHaveProperty("availableSourceEvidenceFields");
   });
 
-  test("serializes a deterministic identity anchor without a phase handoff", () => {
-    const input = JSON.parse(
-      buildAgentInput({
-        reference: { name: "SMWS 95.71" },
-        extractedIdentity: null,
-        initialCandidates: [],
-        currentBottle: null,
-        hasExactReferenceMatch: false,
-        identityAnchor: {
-          action: "match",
-          rationale: "The SMWS code is a closed identity anchor.",
-          candidateBottleIds: [95],
-          identityScope: "exact_cask",
-          referenceScope: "none",
-          observation: null,
-          confidenceBasis: null,
-          matchedBottleId: 95,
-          proposedBottle: null,
-        },
-      }),
-    );
-
-    expect(input.identityAnchor).toMatchObject({
-      action: "match",
-      matchedBottleId: 95,
-    });
-    expect(input).not.toHaveProperty("phase");
-  });
-
   test("keeps exact-query provenance out of agent input", () => {
     const input = JSON.parse(
       buildAgentInput({

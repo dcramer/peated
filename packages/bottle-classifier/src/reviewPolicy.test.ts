@@ -1581,7 +1581,7 @@ describe("finalizeBottleReferenceClassification", () => {
     });
   });
 
-  test("keeps the extracted SMWS title in exact-cask create proposals", () => {
+  test("never turns an SMWS no_match into a create", () => {
     const result = finalizeBottleReferenceClassification({
       reference: {
         name: "Bottle photo upload",
@@ -1618,16 +1618,11 @@ describe("finalizeBottleReferenceClassification", () => {
       }),
     });
 
+    // Bottle classifier rule: code may not upgrade the agent's decision, even
+    // when an SMWS code is readable.
     expect(result).toMatchObject({
-      action: "create_bottle",
-      identityScope: "exact_cask",
-      proposedBottle: {
-        name: "95.71 Prepare for Winter",
-        edition: null,
-        statedAge: 14,
-        abv: 57,
-        vintageYear: 2007,
-      },
+      action: "no_match",
+      proposedBottle: null,
     });
   });
 
@@ -1852,7 +1847,7 @@ describe("cask-specific matches", () => {
     );
   });
 
-  test("keeps an SMWS match when the source code is composed from label components", () => {
+  test("keeps the agent's SMWS match when the source code is composed from label components", () => {
     const candidate: BottleCandidate = {
       ...existingPrivateCask,
       bottleId: 11940,
@@ -1875,9 +1870,143 @@ describe("cask-specific matches", () => {
       }),
     ).toMatchObject({
       action: "match",
-      identityScope: "exact_cask",
       matchedBottleId: 11940,
-      observation: { caskNumber: "1.285" },
     });
+  });
+});
+
+describe("SMWS source codes", () => {
+  const reference = { name: "SMWS 3.345 By the shore of the wide world" };
+  const smwsCandidate = (
+    bottleId: number,
+    fullName: string,
+  ): BottleCandidate => ({
+    ...existingPrivateCask,
+    bottleId,
+    fullName,
+    brand: "SMWS",
+    bottler: "The Scotch Malt Whisky Society",
+    caskNumber: null,
+  });
+  const createDecision = (
+    overrides: {
+      name?: string;
+      caskNumber?: string | null;
+      brand?: string;
+    } = {},
+  ): BottleClassifierAgentDecisionInput => ({
+    action: "create_bottle",
+    rationale: "No local Bottle has this SMWS code.",
+    candidateBottleIds: [],
+    identityScope: "exact_cask",
+    observation: null,
+    matchedBottleId: null,
+    proposedBottle: {
+      name: overrides.name ?? "3.345 By the shore of the wide world",
+      series: null,
+      category: "single_malt",
+      edition: null,
+      statedAge: null,
+      caskStrength: true,
+      singleCask: true,
+      maturation: null,
+      caskNumber: overrides.caskNumber ?? "3.345",
+      outturn: null,
+      abv: null,
+      vintageYear: null,
+      releaseYear: null,
+      brand: { id: null, name: overrides.brand ?? "SMWS" },
+      distillers: [],
+      bottler: { id: null, name: "The Scotch Malt Whisky Society" },
+    },
+  });
+  const finalize = (
+    decision: BottleClassifierAgentDecisionInput,
+    candidates: BottleCandidate[] = [],
+  ) =>
+    finalizeBottleReferenceClassification({
+      reference,
+      decision,
+      artifacts: buildBottleClassificationArtifacts({ candidates }),
+    });
+
+  test("rejects a match to an SMWS Bottle with another code, even with no stored cask number", () => {
+    const result = finalize(
+      {
+        action: "match",
+        rationale: "Same distillery and subtitle wording.",
+        candidateBottleIds: [354],
+        identityScope: "exact_cask",
+        observation: null,
+        matchedBottleId: 354,
+        proposedBottle: null,
+      },
+      [smwsCandidate(354, "SMWS 3.354 By the shore")],
+    );
+
+    expect(result).toMatchObject({ action: "no_match", matchedBottleId: null });
+  });
+
+  test("keeps a match to the SMWS Bottle with the same code", () => {
+    const result = finalize(
+      {
+        action: "match",
+        rationale: "The code matches.",
+        candidateBottleIds: [345],
+        identityScope: "exact_cask",
+        observation: null,
+        matchedBottleId: 345,
+        proposedBottle: null,
+      },
+      [smwsCandidate(345, "SMWS 3.345 An older subtitle")],
+    );
+
+    expect(result).toMatchObject({ action: "match", matchedBottleId: 345 });
+  });
+
+  test("rejects a create when a candidate already has the code under another subtitle", () => {
+    const result = finalize(createDecision(), [
+      smwsCandidate(345, "SMWS 3.345 An older subtitle"),
+    ]);
+
+    expect(result).toMatchObject({
+      action: "no_match",
+      candidateBottleIds: [345],
+    });
+  });
+
+  test("rejects a create whose cask number is not the title's code", () => {
+    expect(
+      finalize(
+        createDecision({
+          name: "3.354 By the shore of the wide world",
+          caskNumber: "3.354",
+        }),
+      ),
+    ).toMatchObject({ action: "no_match", proposedBottle: null });
+  });
+
+  test("rejects an SMWS create under another Brand", () => {
+    expect(finalize(createDecision({ brand: "Bowmore" }))).toMatchObject({
+      action: "no_match",
+      proposedBottle: null,
+    });
+  });
+
+  test("holds a create for review when the source does not print its subtitle", () => {
+    const printed = finalize(createDecision());
+    expect(printed).toMatchObject({
+      action: "create_bottle",
+      proposedBottle: { name: "3.345 By the shore of the wide world" },
+    });
+    expect(printed.confidenceBasis?.unresolvedRisks ?? []).toEqual([]);
+
+    const written = finalize(
+      createDecision({ name: "3.345 Bowmore 18 Year Old For The Danish Fest" }),
+    );
+    expect(written).toMatchObject({ action: "create_bottle" });
+    expect(written.confidenceBasis?.unresolvedRisks).toEqual([
+      expect.objectContaining({ category: "identity_ambiguity" }),
+    ]);
   });
 });

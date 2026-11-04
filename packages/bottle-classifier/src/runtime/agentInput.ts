@@ -3,7 +3,6 @@ import {
   BottleCandidateSearchInputSchema,
   type BottleCandidate,
   type BottleCandidateSearchInput,
-  type BottleClassificationDecision,
   type BottleExtractedDetails,
   type BottleSearchEvidence,
   type EntityResolution,
@@ -33,7 +32,6 @@ export function buildAgentInput({
   hasExactReferenceMatch,
   searchEvidence = [],
   resolvedEntities = [],
-  identityAnchor = null,
 }: {
   reference: BottleReferenceInput;
   extractedIdentity: BottleExtractedDetails | null;
@@ -43,7 +41,6 @@ export function buildAgentInput({
   hasExactReferenceMatch: boolean;
   searchEvidence?: BottleSearchEvidence[];
   resolvedEntities?: EntityResolution[];
-  identityAnchor?: BottleClassificationDecision | null;
 }): string {
   /**
    * The model should see the reference facts used for identity, extracted
@@ -75,7 +72,6 @@ export function buildAgentInput({
       localEntitySearch: {
         results: resolvedEntities.map(buildAgentEntityResolution),
       },
-      identityAnchor,
     },
     null,
     2,
@@ -91,7 +87,6 @@ export function buildAuditBottleAgentInput({
   currentBottleContext,
   searchEvidence = [],
   resolvedEntities = [],
-  identityAnchor = null,
   availableSourceEvidenceFields,
 }: {
   audit: AuditBottleInput;
@@ -102,7 +97,6 @@ export function buildAuditBottleAgentInput({
   currentBottleContext: BottleContext;
   searchEvidence?: BottleSearchEvidence[];
   resolvedEntities?: EntityResolution[];
-  identityAnchor?: BottleClassificationDecision | null;
   availableSourceEvidenceFields: readonly string[];
 }): string {
   return JSON.stringify(
@@ -133,7 +127,6 @@ export function buildAuditBottleAgentInput({
       webEvidence: {
         results: searchEvidence,
       },
-      identityAnchor,
       availableSourceEvidenceFields,
     },
     null,

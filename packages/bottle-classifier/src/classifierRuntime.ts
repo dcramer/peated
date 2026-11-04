@@ -89,24 +89,15 @@ import {
   mergeBottleCandidate,
   mergeResolvedEntity,
 } from "./runtime/candidates";
-import {
-  applyDeterministicIdentitySeed,
-  getDeterministicIdentitySeed,
-  resolveDeterministicBottleReference,
-} from "./runtime/deterministic";
+import { applyDeterministicIdentitySeed } from "./runtime/deterministic";
 import {
   getBottleClassifierRunMetadata,
   type BottleClassifierRunMetadata,
 } from "./runtime/runMetadata";
 import { getScopePrecheckIgnoreReason } from "./scopePrecheck";
+import { resolveSmwsExactCodeMatch } from "./smwsPolicy";
 import type { BottleClassifierWeb, BottleWebSearchExecutor } from "./tools";
-import {
-  createBottleWebSearchBudget,
-  executeBottleWebSearchInvocation,
-  hydrateBottleSearchEvidence,
-  keepReadPage,
-  runReadPage,
-} from "./tools";
+import { createBottleWebSearchBudget } from "./tools";
 import type { BottleWebSearchBudget } from "./tools/sharedWebSearch";
 export { createBottleContextLoader } from "./runtime/bottleCheckContext";
 export type {
@@ -122,28 +113,6 @@ const AUDIT_CLASSIFIER_MAX_TURNS = 18;
 // Tool calls run one at a time, so an audit keeps its last turn for the result.
 const CLASSIFIER_MAX_PROPOSED_OPERATIONS = AUDIT_CLASSIFIER_MAX_TURNS - 1;
 const MAX_CANDIDATE_ENTITY_SEARCH_REQUESTS = 12;
-
-export function shouldReadReferencePageBeforeClassification({
-  reference,
-  extractedIdentitySource,
-  deterministicDecision,
-  candidateExpansion,
-  hasSearchEvidence,
-}: {
-  reference: BottleReferenceInput;
-  extractedIdentitySource: "image" | "text" | "structured" | null;
-  deterministicDecision: BottleClassificationDecision | null;
-  candidateExpansion: CandidateExpansionMode;
-  hasSearchEvidence: boolean;
-}): boolean {
-  return Boolean(
-    reference.url &&
-    candidateExpansion === "open" &&
-    !hasSearchEvidence &&
-    deterministicDecision?.action === "create_bottle" &&
-    extractedIdentitySource === "text",
-  );
-}
 
 export type BottleClassifierAgentResult = {
   decision: BottleClassifierAgentDecisionInput;
@@ -182,7 +151,6 @@ export type RunBottleAuditAgentInput = {
   imageEvidence?: ImageBottleEvidence | null;
   initialCandidates?: BottleCandidate[];
   resolvedEntities?: EntityResolution[];
-  identityAnchor?: BottleClassificationDecision | null;
   webSearchBudget?: BottleWebSearchBudget;
   currentBottleContext: BottleContext;
   conversationId: string;
@@ -205,7 +173,6 @@ export type RunBottleClassifierAgentInput = {
   readCandidateImages?: boolean;
   searchEvidence?: BottleSearchEvidence[];
   resolvedEntities?: EntityResolution[];
-  identityAnchor?: BottleClassificationDecision | null;
   webSearchBudget?: BottleWebSearchBudget;
   signal?: AbortSignal;
   onProgress?: BottleClassifierProgressObserver;
@@ -551,7 +518,6 @@ export async function prepareBottleClassifierAgentRun(
     readCandidateImages = true,
     searchEvidence = [],
     resolvedEntities = [],
-    identityAnchor = null,
     webSearchBudget: inputWebSearchBudget,
     conversationId,
     signal,
@@ -639,7 +605,6 @@ export async function prepareBottleClassifierAgentRun(
     hasExactReferenceMatch,
     searchEvidence: state.searchEvidence,
     resolvedEntities: sortedResolvedEntities(state.resolvedEntities),
-    identityAnchor,
   });
   const getArtifacts = () =>
     buildAgentArtifacts({
@@ -698,7 +663,6 @@ export function prepareBottleAuditAgentRun(
     imageEvidence,
     initialCandidates,
     resolvedEntities = [],
-    identityAnchor = null,
     webSearchBudget: inputWebSearchBudget,
     currentBottleContext,
     conversationId,
@@ -787,7 +751,6 @@ export function prepareBottleAuditAgentRun(
       currentBottleContext,
       searchEvidence: state.searchEvidence,
       resolvedEntities: sortedResolvedEntities(state.resolvedEntities),
-      identityAnchor,
       availableSourceEvidenceFields,
     }),
     conversationId,
@@ -956,21 +919,17 @@ export function createBottleClassifier(
           searchEvidence: options.initialSearchEvidence ?? [],
         }),
         autoIgnoreReason: preExtractionAutoIgnoreReason,
-        deterministicDecision: null,
         webSearchBudget: createBottleWebSearchBudget(options.maxSearchQueries),
       };
     }
 
-    const deterministicIdentitySeed = getDeterministicIdentitySeed(reference);
     const extractedReference =
       suppliedExtractedIdentity !== undefined
         ? {
             identity: suppliedExtractedIdentity,
             source: suppliedExtractedIdentitySource ?? null,
           }
-        : deterministicIdentitySeed
-          ? { identity: deterministicIdentitySeed, source: "text" as const }
-          : await extractBottleReferenceIdentityWithSource(reference);
+        : await extractBottleReferenceIdentityWithSource(reference);
     const rawExtractedIdentity = extractedReference.identity;
     const extractedIdentitySource: "image" | "text" | "structured" | null =
       extractedReference.source;
@@ -993,7 +952,6 @@ export function createBottleClassifier(
       return {
         artifacts: preparedArtifacts,
         autoIgnoreReason,
-        deterministicDecision: null,
         webSearchBudget: createBottleWebSearchBudget(options.maxSearchQueries),
       };
     }
@@ -1007,10 +965,6 @@ export function createBottleClassifier(
       ...preparedArtifacts,
       candidates,
     });
-    const deterministicDecision = resolveDeterministicBottleReference({
-      reference,
-      artifacts: preparedArtifacts,
-    });
     const resolvedEntities = await collectInitialResolvedEntities({
       candidateExpansion,
       extractedIdentity,
@@ -1021,85 +975,12 @@ export function createBottleClassifier(
       ...preparedArtifacts,
       resolvedEntities,
     });
-    let webSearchBudget = createBottleWebSearchBudget(options.maxSearchQueries);
-    const sourceUrl = reference.url;
-    const web = options.web;
-    if (
-      sourceUrl &&
-      web &&
-      shouldReadReferencePageBeforeClassification({
-        reference,
-        extractedIdentitySource,
-        deterministicDecision,
-        candidateExpansion,
-        hasSearchEvidence: preparedArtifacts.searchEvidence.length > 0,
-      })
-    ) {
-      const args = { url: sourceUrl };
-      const toolCallId = `preparation:${randomUUID()}`;
-      options.observeToolEvent?.({
-        type: "tool_call",
-        phase: "preparation",
-        id: toolCallId,
-        name: "read_page",
-        arguments: args,
-      });
-
-      try {
-        const pageResult = keepReadPage(
-          webSearchBudget,
-          await executeBottleWebSearchInvocation({
-            budget: webSearchBudget,
-            toolName: "read_page",
-            args,
-            execute: async () => await runReadPage({ web, url: sourceUrl }),
-            executeWebSearch: options.executeWebSearch,
-          }),
-        );
-        options.observeToolEvent?.({
-          type: "tool_result",
-          phase: "preparation",
-          toolCallId,
-          name: "read_page",
-          result: pageResult,
-        });
-
-        const searchEvidence = [...preparedArtifacts.searchEvidence];
-        const evidenceAdded = hydrateBottleSearchEvidence(
-          pageResult,
-          (evidence) => {
-            mergeSearchEvidence(searchEvidence, evidence);
-          },
-        );
-        if (evidenceAdded) {
-          preparedArtifacts = buildBottleClassificationArtifacts({
-            ...preparedArtifacts,
-            searchEvidence,
-          });
-        } else {
-          webSearchBudget = createBottleWebSearchBudget(
-            options.maxSearchQueries,
-          );
-        }
-      } catch (error) {
-        options.observeToolEvent?.({
-          type: "tool_result",
-          phase: "preparation",
-          toolCallId,
-          name: "read_page",
-          result: {
-            error: error instanceof Error ? error.message : String(error),
-          },
-        });
-        // Bottle classifier owns this rule: an optional source read cannot
-        // block classification or consume the agent's page-read allowance.
-        webSearchBudget = createBottleWebSearchBudget(options.maxSearchQueries);
-      }
-    }
+    const webSearchBudget = createBottleWebSearchBudget(
+      options.maxSearchQueries,
+    );
     return {
       artifacts: preparedArtifacts,
       autoIgnoreReason: null,
-      deterministicDecision,
       webSearchBudget,
     };
   };
@@ -1157,7 +1038,6 @@ export function createBottleClassifier(
     readCandidateImages = true,
     searchEvidence = [],
     resolvedEntities = [],
-    identityAnchor = null,
     webSearchBudget,
     conversationId,
     signal,
@@ -1179,7 +1059,6 @@ export function createBottleClassifier(
         readCandidateImages,
         searchEvidence,
         resolvedEntities,
-        identityAnchor,
         webSearchBudget,
       });
 
@@ -1213,7 +1092,6 @@ export function createBottleClassifier(
       readCandidateImages,
       searchEvidence,
       resolvedEntities,
-      identityAnchor,
       webSearchBudget,
       signal,
       onProgress,
@@ -1310,7 +1188,6 @@ export function createBottleClassifier(
           initialCandidates,
           resolvedEntities: artifacts.resolvedEntities,
           searchEvidence: artifacts.searchEvidence,
-          identityAnchor: preparedEvidence.deterministicDecision,
           webSearchBudget: preparedEvidence.webSearchBudget,
           currentBottleContext,
           conversationId,
@@ -1330,7 +1207,6 @@ export function createBottleClassifier(
           initialCandidates,
           resolvedEntities: artifacts.resolvedEntities,
           searchEvidence: artifacts.searchEvidence,
-          identityAnchor: preparedEvidence.deterministicDecision,
           webSearchBudget: preparedEvidence.webSearchBudget,
           currentBottleContext,
           conversationId,
@@ -1424,6 +1300,22 @@ export function createBottleClassifier(
         };
       }
 
+      const smwsMatch = resolveSmwsExactCodeMatch({
+        reference: parsedInput.reference,
+        candidates: artifacts.candidates,
+      });
+      if (smwsMatch) {
+        return {
+          result: BottleClassificationResultSchema.parse(
+            createDecidedBottleClassification({
+              decision: smwsMatch,
+              artifacts,
+            }),
+          ),
+          modelMetadata: null,
+        };
+      }
+
       const agentInput: RunBottleClassifierAgentInput = {
         reference: parsedInput.reference,
         conversationId,
@@ -1434,7 +1326,6 @@ export function createBottleClassifier(
         readCandidateImages: parsedInput.readCandidateImages,
         searchEvidence: artifacts.searchEvidence,
         resolvedEntities: artifacts.resolvedEntities,
-        identityAnchor: preparedEvidence.deterministicDecision,
         webSearchBudget: preparedEvidence.webSearchBudget,
       };
       if (runOptions.signal) agentInput.signal = runOptions.signal;
