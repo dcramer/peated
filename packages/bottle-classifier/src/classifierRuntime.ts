@@ -95,6 +95,7 @@ import {
   type BottleClassifierRunMetadata,
 } from "./runtime/runMetadata";
 import { getScopePrecheckIgnoreReason } from "./scopePrecheck";
+import { resolveSmwsExactCodeMatch } from "./smwsPolicy";
 import type { BottleClassifierWeb, BottleWebSearchExecutor } from "./tools";
 import { createBottleWebSearchBudget } from "./tools";
 import type { BottleWebSearchBudget } from "./tools/sharedWebSearch";
@@ -1294,6 +1295,22 @@ export function createBottleClassifier(
               preparedEvidence.autoIgnoreReason,
               artifacts,
             ),
+          ),
+          modelMetadata: null,
+        };
+      }
+
+      const smwsMatch = resolveSmwsExactCodeMatch({
+        reference: parsedInput.reference,
+        candidates: artifacts.candidates,
+      });
+      if (smwsMatch) {
+        return {
+          result: BottleClassificationResultSchema.parse(
+            createDecidedBottleClassification({
+              decision: smwsMatch,
+              artifacts,
+            }),
           ),
           modelMetadata: null,
         };

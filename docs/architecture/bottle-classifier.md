@@ -287,9 +287,22 @@ Code must not invent or choose a subtitle, generalize this rule to another
 bottler's casks or batches, use fuzzy names to prove a match, or choose a
 BottleGroup. The code's facts reach the agent as extracted identity: Brand
 SMWS, the code as `cask_number`, and the distillery and category from the code
-table. Text extraction still runs. The agent matches, creates, and names the
-Bottle; code then only puts the code first in a create's name and keeps it out
-of `edition`. Code never turns an agent's `no_match` into a match or a create.
+table. Text extraction still runs.
+
+When exactly one SMWS candidate carries the code the source title prints, code
+matches it with no model call: the code names one cask, even after the Society
+renames its subtitle. Otherwise the agent matches, creates, and names the
+Bottle, and code checks its decision against the title's code:
+
+- a match must select an SMWS Bottle with the same code;
+- a create must carry that code under the SMWS Brand, and no candidate may
+  already have it;
+- a create whose subtitle the source, its label, or captured search evidence
+  does not print goes to review.
+
+Anything else becomes `no_match`. Code then only puts the code first in a
+create's name and keeps it out of `edition`. Code never turns an agent's
+`no_match` into a match or a create.
 
 ## Agent And Tool Boundary
 

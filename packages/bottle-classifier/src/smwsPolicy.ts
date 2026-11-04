@@ -1,12 +1,24 @@
-import type { BottleClassificationDecision } from "./classifierTypes";
+import {
+  BottleClassificationDecisionSchema,
+  type BottleCandidate,
+  type BottleClassificationDecision,
+} from "./classifierTypes";
 import type {
   BottleClassificationArtifacts,
   BottleReferenceInput,
 } from "./contract";
 import { getExactCaskCodeAnchor } from "./exactCask";
-import { normalizeComparableText, textsOverlap } from "./identityEvidenceCore";
+import {
+  containsComparablePhrase,
+  normalizeComparableText,
+  textsOverlap,
+} from "./identityEvidenceCore";
 import { normalizeString } from "./normalize";
-import { composeExactCaskCodeFromComponents } from "./smws";
+import { normalizeObservation } from "./observation";
+import {
+  composeExactCaskCodeFromComponents,
+  parseReferenceName as parseSmwsReferenceName,
+} from "./smws";
 
 const BARE_SMWS_CODE_REFERENCE_PATTERN = /^SMWS\s+([A-Z]*\d+\.\d+)$/i;
 const SMWS_REFERENCE_PATTERN = /\b(?:SMWS|Scotch Malt Whisky Society)\b/i;
@@ -33,6 +45,106 @@ function getBareSmwsCodeReference(
 
 function textLooksSmws(value: string | null | undefined): boolean {
   return SMWS_REFERENCE_PATTERN.test(value ?? "");
+}
+
+function candidateLooksSmws(candidate: BottleCandidate): boolean {
+  return (
+    isSmwsIdentityAnchor(candidate.brand) ||
+    isSmwsIdentityAnchor(candidate.bottler) ||
+    textLooksSmws(candidate.reference) ||
+    textLooksSmws(candidate.fullName)
+  );
+}
+
+/** The SMWS code the source title prints or composes, read by closed syntax. */
+export function getSourceSmwsCode(
+  reference: Pick<BottleReferenceInput, "name">,
+): string | null {
+  return parseSmwsReferenceName(reference.name)?.code ?? null;
+}
+
+/** The SMWS codes a candidate carries in its cask number, name, or reference. */
+export function getCandidateSmwsCodes(candidate: BottleCandidate): string[] {
+  if (!candidateLooksSmws(candidate)) return [];
+  return Array.from(
+    new Set(
+      [candidate.caskNumber, candidate.fullName, candidate.reference]
+        .map((value) => getExactCaskCodeAnchor(value))
+        .filter((code): code is string => code !== null),
+    ),
+  );
+}
+
+/**
+ * SMWS identity rule (owner: Bottle classifier): an SMWS code names one cask.
+ * When exactly one SMWS candidate carries the code the source title prints,
+ * that candidate is the Bottle, with no model call. This never creates: a new
+ * code goes to the agent, which writes the name.
+ */
+export function resolveSmwsExactCodeMatch({
+  reference,
+  candidates,
+}: {
+  reference: BottleReferenceInput;
+  candidates: BottleCandidate[];
+}): BottleClassificationDecision | null {
+  const code = getSourceSmwsCode(reference);
+  if (!code) return null;
+  const bottleIds = Array.from(
+    new Set(
+      candidates
+        .filter((candidate) => getCandidateSmwsCodes(candidate).includes(code))
+        .map((candidate) => candidate.bottleId),
+    ),
+  );
+  if (bottleIds.length !== 1) return null;
+  return BottleClassificationDecisionSchema.parse({
+    action: "match",
+    rationale: `The source's SMWS code ${code} names one cask, and Bottle ${bottleIds[0]} is the only SMWS Bottle with that code.`,
+    candidateBottleIds: bottleIds,
+    identityScope: "exact_cask",
+    observation: normalizeObservation({
+      barrelNumber: null,
+      selector: null,
+      caskNumber: code,
+    }),
+    confidenceBasis: { unresolvedRisks: [], webEvidence: "not_needed" },
+    matchedBottleId: bottleIds[0],
+    proposedBottle: null,
+  });
+}
+
+/**
+ * True when the subtitle appears word for word in the source title, its label
+ * reading, or captured search evidence, so the agent did not write it.
+ */
+export function smwsSubtitleIsPrinted({
+  subtitle,
+  reference,
+  artifacts,
+}: {
+  subtitle: string;
+  reference: BottleReferenceInput;
+  artifacts: BottleClassificationArtifacts;
+}): boolean {
+  const needle = normalizeComparableText(subtitle);
+  return [
+    reference.name,
+    artifacts.extractedIdentity?.expression,
+    ...(artifacts.imageEvidence?.extractors.flatMap((extractor) =>
+      extractor.textSpans.map((span) => span.text),
+    ) ?? []),
+    ...artifacts.searchEvidence.flatMap((evidence) => [
+      evidence.summary,
+      ...evidence.results.flatMap((result) => [
+        result.title,
+        result.description,
+        ...result.extraSnippets,
+      ]),
+    ]),
+  ].some((text) =>
+    containsComparablePhrase(normalizeComparableText(text), needle),
+  );
 }
 
 // Collects every SMWS-relevant text fragment (extracted identity, decision
@@ -144,8 +256,8 @@ export function normalizeSmwsExactCaskProposedBottleDraft({
 
   const smwsCode =
     getBareSmwsCodeReference(reference.name) ??
-    getExactCaskCodeAnchor(proposedBottle.caskNumber) ??
     getExactCaskCodeAnchor(extractedIdentity?.cask_number) ??
+    getExactCaskCodeAnchor(proposedBottle.caskNumber) ??
     getExactCaskCodeAnchor(proposedBottle.edition) ??
     getExactCaskCodeAnchor(proposedBottle.name) ??
     getExactCaskCodeAnchor(reference.name);

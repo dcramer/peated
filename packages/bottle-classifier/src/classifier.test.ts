@@ -5260,6 +5260,72 @@ describe("createBottleClassifier", () => {
     expect(result.status).toBe("classified");
   });
 
+  test("matches the one SMWS Bottle with the title's code without a model call", async () => {
+    const runBottleClassifierAgent = vi.fn(
+      async (): Promise<ReasoningResult> => ({
+        decision: noMatchAgentDecision(),
+        artifacts: buildBottleClassificationArtifacts({}),
+      }),
+    );
+    const { classifier } = createTestClassifier({
+      runBottleClassifierAgent,
+    });
+
+    const result = await classifier.classifyBottleReference({
+      reference: { name: "SMWS 73.8 Aultmore 1989 13 Year Old" },
+      initialCandidates: [
+        ...Array.from({ length: 30 }, (_, index) =>
+          buildBottleCandidate({
+            bottleId: index + 1,
+            fullName: `SMWS 73.${index + 10}`,
+            brand: "SMWS",
+          }),
+        ),
+        buildBottleCandidate({
+          bottleId: 99,
+          fullName: "SMWS 73.8 A renamed subtitle",
+          brand: "SMWS",
+        }),
+      ],
+    });
+
+    expect(runBottleClassifierAgent).not.toHaveBeenCalled();
+    expect(result).toMatchObject({
+      status: "classified",
+      decision: {
+        action: "match",
+        matchedBottleId: 99,
+        candidateBottleIds: [99],
+        identityScope: "exact_cask",
+      },
+    });
+  });
+
+  test("leaves two SMWS Bottles with the same code to the agent", async () => {
+    const runBottleClassifierAgent = vi.fn(
+      async (): Promise<ReasoningResult> => ({
+        decision: noMatchAgentDecision(),
+        artifacts: buildBottleClassificationArtifacts({}),
+      }),
+    );
+    const { classifier } = createTestClassifier({
+      runBottleClassifierAgent,
+    });
+
+    await classifier.classifyBottleReference({
+      reference: { name: "SMWS 73.8" },
+      initialCandidates: [98, 99].map((bottleId) =>
+        buildBottleCandidate({
+          bottleId,
+          fullName: `SMWS 73.8 Subtitle ${bottleId}`,
+          brand: "SMWS",
+        }),
+      ),
+    });
+
+    expect(runBottleClassifierAgent).toHaveBeenCalledOnce();
+  });
+
   test("does not treat SMWS ABV values as deterministic cask codes", async () => {
     const runBottleClassifierAgent = vi.fn(
       async (): Promise<ReasoningResult> => ({
