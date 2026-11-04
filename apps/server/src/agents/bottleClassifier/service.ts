@@ -40,6 +40,7 @@ import {
   readBottleClassifierImageLabel,
 } from "./contextAdapters";
 import { resolveExactReferenceBottleRun } from "./findExactReferenceBottleCandidate";
+import { createBottleClassifierWeb } from "./web";
 
 const bottleClassifiers: Partial<
   Record<AIGatewayWorkload, ReturnType<typeof createBottleClassifier>>
@@ -117,7 +118,9 @@ export function getBottleClassifier(
     imageExtractionReasoningEffort:
       config.OPENAI_IMAGE_EXTRACTION_REASONING_EFFORT,
     maxSearchQueries: config.BOTTLE_CLASSIFIER_MAX_SEARCH_QUERIES,
-    web: firecrawlApiKey ? createServerPeatedBot({ firecrawlApiKey }) : null,
+    web: firecrawlApiKey
+      ? createBottleClassifierWeb(createServerPeatedBot({ firecrawlApiKey }))
+      : null,
     adapters: {
       findInitialCandidates: async ({ reference, extractedIdentity }) =>
         await findBottleReferenceCandidates(

@@ -138,7 +138,9 @@ The web tools are `web_search`, `read_page`, and `find_in_page`. `read_page`
 shows the model a page's title, description, and opening text, and keeps the
 page's text for the rest of the run. `find_in_page` returns short passages
 around a word or number the model picks, from a page already read, so it costs
-no web request. A run has one page read and six finds.
+no web request. A run has one page read and six finds. The server's `web`
+reads Scotch Whisky Auctions lot pages from their HTML, because their age
+question hides the lot from Firecrawl.
 
 ## Commands
 

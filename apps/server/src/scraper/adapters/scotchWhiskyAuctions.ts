@@ -57,6 +57,23 @@ function sourceUrl(path: string) {
   return url;
 }
 
+/** True for a Scotch Whisky Auctions lot page address. */
+export function isScotchWhiskyAuctionsLotUrl(value: string) {
+  let url: URL;
+  try {
+    url = new URL(value);
+  } catch (error) {
+    if (error instanceof TypeError) return false;
+    throw error;
+  }
+  return (
+    url.origin === ORIGIN &&
+    !url.username &&
+    !url.password &&
+    /^\/auctions\/\d+-[^/]+\/\d+-[^/]+\/$/.test(url.pathname)
+  );
+}
+
 function lotImageUrl(style: string | undefined) {
   const path = style?.match(
     /background-image\s*:\s*url\(\s*(?:'([^']+)'|"([^"]+)"|([^\s)]+))\s*\)/i,
@@ -248,7 +265,7 @@ export const scotchWhiskyAuctionsAdapter: ScraperAdapter<
     while (state.lotIndex < state.lots.length) {
       const request = state.lots[state.lotIndex];
       const url = sourceUrl(request.url);
-      if (!/^\/auctions\/\d+-[^/]+\/\d+-[^/]+\/$/.test(url.pathname))
+      if (!isScotchWhiskyAuctionsLotUrl(url.toString()))
         throw new Error("Auction detail URL must identify a lot.");
       let facts: ReturnType<typeof parseScotchWhiskyAuctionDetails> | null =
         null;

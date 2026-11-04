@@ -1496,7 +1496,7 @@
       "createsBottle": false,
       "summary": "Production returned ignored."
     },
-    "notes": "Captured from saved classifier run 36684 (auction_lot 17650, model null, 2026-11-03T21:50:04.062Z). Production rationale: none Checked 2026-11-03. Lot 185-02214 page: Platinum Cask (Fah Mai Holdings) Olympians Series, a limited set of 12 single cask bottlings; 'Hades - Speyside (Near Dufftown)', Age 28 Years Old, 52.9% ABV / 70cl, Bottle Number 73 / 126. Catalog searches for 'Platinum Cask Hades', 'Hades 28', and 'Olympians' return no Bottle, and no Platinum Cask Entity exists, so the case does not fix a Brand id. docs/operations/auctions.md (October 26 title review): bottles sold with a book, print, or coaster stayed in scope; only glassware, minis, and other accessories sold as a set were ignored. The expectation leaves category out: the lot title says Speyside single malt, while one retailer in the evidence calls it a teaspooned Burnside."
+    "notes": "Captured from saved classifier run 36684 (auction_lot 17650, model null, 2026-11-03T21:50:04.062Z). Production rationale: none Checked 2026-11-03. Lot 185-02214 page: Platinum Cask (Fah Mai Holdings) Olympians Series, a limited set of 12 single cask bottlings; 'Hades - Speyside (Near Dufftown)', Age 28 Years Old, 52.9% ABV / 70cl, Bottle Number 73 / 126. Catalog searches for 'Platinum Cask Hades', 'Hades 28', and 'Olympians' return no Bottle, and no Platinum Cask Entity exists, so the case does not fix a Brand id. docs/operations/auctions.md (October 26 title review): bottles sold with a book, print, or coaster stayed in scope; only glassware, minis, and other accessories sold as a set were ignored. The expectation leaves category out: the lot title says Speyside single malt, while one retailer in the evidence calls it a teaspooned Burnside. 2026-11-04: the lot page now reaches the classifier as lot text instead of the Firecrawl age gate, so its single-cask statement is evidence."
   },
   "expected": {
     "status": "classified",
@@ -1508,8 +1508,5 @@
     },
     "proposedBottleNameIncludes": ["Hades"],
     "summary": "One 70cl bottle of Platinum Cask's Olympians Series 'Hades', a 28-year-old Speyside whisky at 52.9%, bottle 73 of 126, sold with a print. A bottle sold with a print is still one whisky Bottle, so do not ignore it. No local Bottle covers it, so create it with the marketed cask name Hades, the printed age, and the ABV."
-  },
-  "knownFailure": {
-    "reason": "In scope now, but identityScope comes back product: only the lot page says Hades is one of 12 single casks, and auction page reads return the age gate."
   }
 }

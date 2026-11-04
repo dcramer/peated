@@ -40,7 +40,12 @@ or paywall.
   header, fails instead.
 - Images and other files are read directly only, never through the bypass
   service.
-- Model page-reading tools read through the bypass service.
+- Model page-reading tools read through the bypass service. One exception:
+  the Bottle classifier reads a Scotch Whisky Auctions lot page as HTML, which
+  goes direct unless the website is marked blocked. The page's script hides
+  the lot behind an age question, and the bypass service runs that script, so
+  it would return only the question. `createBottleClassifierWeb`
+  (`apps/server/src/agents/bottleClassifier/web.ts`) owns this exception.
 - Never bypass logins, paywalls, member-only pages, or other access controls.
   Never send credentials or cookies through a bypass service.
 - Bypassed requests count toward the same request limits, caching, and run

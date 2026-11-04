@@ -28,7 +28,90 @@
       "vintage_year": null,
       "cask_strength": null
     },
-    "imageEvidence": null,
+    "imageEvidence": {
+      "sourceImageId": "auction_lot:14809",
+      "extractors": [
+        {
+          "kind": "vision",
+          "model": "openai/gpt-6-luna",
+          "confidence": 0.75,
+          "textSpans": [
+            {
+              "text": "SINGLE FARM ESTATE\nLOWLAND SINGLE MALT SCOTCH WHISKY\nDAFTMILL\nA family owned and operated seasonal distillery, located in the heart of the Kingdom of Fife.\nSINGLE CASK\nBottled exclusively for The Drambusters\nCASK No. 086/2012\nBOTTLE No. 303 of 341\n2012\nDistilled in 2012, bottled in 2022\n700ml\nFrancis & Ian Cuthbert\nalc 57.7% vol\nBROWN, DISTILLED, MATURED AND BOTTLED IN FIFE.",
+              "confidence": 0.75
+            }
+          ],
+          "observations": [
+            "Read whisky label identity from the auction lot photo."
+          ]
+        }
+      ],
+      "fieldCandidates": {
+        "brand": {
+          "value": "Daftmill",
+          "confidence": 0.75,
+          "sourceExtractorIndexes": [0]
+        },
+        "series": {
+          "value": "Single Farm Estate",
+          "confidence": 0.75,
+          "sourceExtractorIndexes": [0]
+        },
+        "distillery": {
+          "value": ["Daftmill"],
+          "confidence": 0.75,
+          "sourceExtractorIndexes": [0]
+        },
+        "category": {
+          "value": "single_malt",
+          "confidence": 0.75,
+          "sourceExtractorIndexes": [0]
+        },
+        "abv": {
+          "value": 57.7,
+          "confidence": 0.75,
+          "sourceExtractorIndexes": [0]
+        },
+        "vintageYear": {
+          "value": 2012,
+          "confidence": 0.75,
+          "sourceExtractorIndexes": [0]
+        },
+        "bottlingYear": {
+          "value": 2022,
+          "confidence": 0.75,
+          "sourceExtractorIndexes": [0]
+        },
+        "edition": {
+          "value": "Bottled exclusively for The Drambusters",
+          "confidence": 0.75,
+          "sourceExtractorIndexes": [0]
+        },
+        "caskNumber": {
+          "value": "086/2012",
+          "confidence": 0.75,
+          "sourceExtractorIndexes": [0]
+        },
+        "outturn": {
+          "value": 341,
+          "confidence": 0.75,
+          "sourceExtractorIndexes": [0]
+        },
+        "singleCask": {
+          "value": true,
+          "confidence": 0.75,
+          "sourceExtractorIndexes": [0]
+        }
+      },
+      "photoSuitability": {
+        "isSingleBottlePhoto": true,
+        "labelReadable": true,
+        "suitableAsTastingImage": false,
+        "suitableAsBottleImage": false,
+        "reason": null
+      },
+      "conflicts": []
+    },
     "initialCandidates": [
       {
         "abv": 57,
@@ -2057,7 +2140,7 @@
       "createsBottle": true,
       "summary": "Production returned create_bottle named `2012 Single Cask` with cask 086/2012, 57.7%, vintage 2012, bottled 2022, and edition null. It was held for review; no Bottle was created."
     },
-    "notes": "Saved check 34892, source auction_lot 14809 (lot 185-906947, lot number 185-03723, bottle 303 of 341). This is a second bottle of the same cask in the same auction, not lot 14810 judged earlier. The lot photo of the label clearly shows 'Single Cask', 'Bottled exclusively for The Drambusters', 'Cask No. 086/2012', 'Bottle No. 303 of 341', '2012', 'Distilled in 2012, bottled in 2022', 700ml, alc. 57.7% vol. The page gives Distilled 2012, Bottled 2022, Cask Number 086, Cask Type PX Sherry, 57.7%. Rule 5 of 'Who Is The Brand, Series, And Bottler' puts a selection for a customer in edition with the label's words (`for La Maison du Whisky`). Without it the proposal is a generic 'Daftmill 2012 Single Cask', which other 2012 single casks would share; the catalog already keeps such selections apart, for example 69910 'Daftmill 2011 13-year-old Single Cask - For Royal Mile Whiskies'. Catalog searches for 'Daftmill single cask', 'Daftmill 2012' and 'Daftmill Drambusters' find no Bottle for this cask; 57971 is the 46% 2012 Summer Batch Release. The edition check is an exact string. The case uses the doc's lower-case 'for' form; the catalog's 69910 uses 'For', so a capital F would fail this case and is a naming question, not an identity error."
+    "notes": "Saved check 34892, source auction_lot 14809 (lot 185-906947, lot number 185-03723, bottle 303 of 341). This is a second bottle of the same cask in the same auction, not lot 14810 judged earlier. The lot photo of the label clearly shows 'Single Cask', 'Bottled exclusively for The Drambusters', 'Cask No. 086/2012', 'Bottle No. 303 of 341', '2012', 'Distilled in 2012, bottled in 2022', 700ml, alc. 57.7% vol. The page gives Distilled 2012, Bottled 2022, Cask Number 086, Cask Type PX Sherry, 57.7%. Rule 5 of 'Who Is The Brand, Series, And Bottler' puts a selection for a customer in edition with the label's words (`for La Maison du Whisky`). Without it the proposal is a generic 'Daftmill 2012 Single Cask', which other 2012 single casks would share; the catalog already keeps such selections apart, for example 69910 'Daftmill 2011 13-year-old Single Cask - For Royal Mile Whiskies'. Catalog searches for 'Daftmill single cask', 'Daftmill 2012' and 'Daftmill Drambusters' find no Bottle for this cask; 57971 is the 46% 2012 Summer Batch Release. The edition check is an exact string. The case uses the doc's lower-case 'for' form; the catalog's 69910 uses 'For', so a capital F would fail this case and is a naming question, not an identity error. 2026-11-04: auction matching now reads the lot photo, so imageEvidence holds a live openai/gpt-6-luna reading of the -zoom photo (b6904ae9…, Cask No. 086/2012), and the lot page reading holds the lot text ('Cask Number: 086')."
   },
   "expected": {
     "status": "classified",
