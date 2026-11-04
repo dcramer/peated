@@ -1,0 +1,868 @@
+{
+  "id": "auction-balvenie-12-doublewood-20cl-not-miniature",
+  "name": "auction lot: Balvenie 12 DoubleWood 20cl is a real Bottle, not a miniature",
+  "input": {
+    "reference": {
+      "id": 13900,
+      "url": "https://www.scotchwhiskyauctions.com/auctions/234-the-185th-auction/904747-balvenie-12-year-old-doublewood-20cl/",
+      "name": "Balvenie 12 Year Old DoubleWood 20cl",
+      "imageUrl": null,
+      "externalSiteId": 28097,
+      "currentBottleId": null
+    },
+    "extractedIdentity": {
+      "abv": 40,
+      "brand": null,
+      "series": null,
+      "bottler": null,
+      "edition": null,
+      "outturn": null,
+      "category": null,
+      "distillery": null,
+      "expression": null,
+      "maturation": null,
+      "stated_age": null,
+      "cask_number": null,
+      "single_cask": null,
+      "release_year": null,
+      "vintage_year": null,
+      "cask_strength": null
+    },
+    "imageEvidence": null,
+    "initialCandidates": [
+      {
+        "abv": 40,
+        "brand": "The Balvenie",
+        "score": 73.05563,
+        "series": null,
+        "source": ["vector", "text"],
+        "bottler": null,
+        "edition": "Victo Ngai Limited Edition",
+        "outturn": null,
+        "bottleId": 47023,
+        "category": "single_malt",
+        "fullName": "The Balvenie DoubleWood - Victo Ngai Limited Edition - 12-year-old - 40.0% ABV",
+        "reference": "The Balvenie DoubleWood - Victo Ngai Limited Edition - 12-year-old - 40.0% ABV",
+        "statedAge": 12,
+        "caskNumber": null,
+        "comparison": {
+          "missing": [],
+          "conflicts": [],
+          "agreements": ["abv"]
+        },
+        "distillery": ["The Balvenie"],
+        "maturation": null,
+        "releaseDay": null,
+        "singleCask": null,
+        "releaseYear": null,
+        "vintageYear": null,
+        "bottlingYear": null,
+        "caskStrength": null,
+        "releaseMonth": null,
+        "familyContext": {
+          "siblingBottles": []
+        }
+      },
+      {
+        "abv": 40,
+        "brand": "The Balvenie",
+        "score": 40.377857,
+        "series": null,
+        "source": ["text"],
+        "bottler": null,
+        "edition": "Batch #5",
+        "outturn": null,
+        "bottleId": 68551,
+        "category": "single_malt",
+        "fullName": "The Balvenie Signature 12-year-old - Batch #5",
+        "reference": null,
+        "statedAge": 12,
+        "caskNumber": null,
+        "comparison": {
+          "missing": [],
+          "conflicts": [],
+          "agreements": ["abv"]
+        },
+        "distillery": ["The Balvenie"],
+        "maturation": null,
+        "releaseDay": null,
+        "singleCask": null,
+        "releaseYear": null,
+        "vintageYear": null,
+        "bottlingYear": null,
+        "caskStrength": null,
+        "releaseMonth": null,
+        "familyContext": {
+          "siblingBottles": []
+        }
+      },
+      {
+        "abv": 40,
+        "brand": "SPEY",
+        "score": 38.18068,
+        "series": null,
+        "source": ["text"],
+        "bottler": "Speyside Distillery",
+        "edition": null,
+        "outturn": null,
+        "bottleId": 45820,
+        "category": "single_malt",
+        "fullName": "SPEY Red Scarlet - 12-year-old - 40.0% ABV",
+        "reference": null,
+        "statedAge": 12,
+        "caskNumber": null,
+        "comparison": {
+          "missing": [],
+          "conflicts": [],
+          "agreements": ["abv"]
+        },
+        "distillery": ["Speyside Distillery"],
+        "maturation": null,
+        "releaseDay": null,
+        "singleCask": null,
+        "releaseYear": null,
+        "vintageYear": null,
+        "bottlingYear": null,
+        "caskStrength": null,
+        "releaseMonth": null,
+        "familyContext": {
+          "siblingBottles": []
+        }
+      },
+      {
+        "abv": 40,
+        "brand": "Old Parr",
+        "score": 38.06391,
+        "series": null,
+        "source": ["text"],
+        "bottler": null,
+        "edition": null,
+        "outturn": null,
+        "bottleId": 45523,
+        "category": "blend",
+        "fullName": "Old Parr 12-year-old - 40.0% ABV",
+        "reference": null,
+        "statedAge": 12,
+        "caskNumber": null,
+        "comparison": {
+          "missing": [],
+          "conflicts": [],
+          "agreements": ["abv"]
+        },
+        "distillery": [],
+        "maturation": null,
+        "releaseDay": null,
+        "singleCask": null,
+        "releaseYear": null,
+        "vintageYear": null,
+        "bottlingYear": null,
+        "caskStrength": null,
+        "releaseMonth": null,
+        "familyContext": {
+          "siblingBottles": []
+        }
+      },
+      {
+        "abv": 40,
+        "brand": "Highland Queen",
+        "score": 36.20368,
+        "series": null,
+        "source": ["text"],
+        "bottler": null,
+        "edition": null,
+        "outturn": null,
+        "bottleId": 16522,
+        "category": "blend",
+        "fullName": "Highland Queen 12-year-old - 40.0% ABV",
+        "reference": null,
+        "statedAge": 12,
+        "caskNumber": null,
+        "comparison": {
+          "missing": [],
+          "conflicts": [],
+          "agreements": ["abv"]
+        },
+        "distillery": [],
+        "maturation": null,
+        "releaseDay": null,
+        "singleCask": null,
+        "releaseYear": null,
+        "vintageYear": null,
+        "bottlingYear": null,
+        "caskStrength": null,
+        "releaseMonth": null,
+        "familyContext": {
+          "siblingBottles": []
+        }
+      },
+      {
+        "abv": 40,
+        "brand": "Glenfiddich",
+        "score": 36.09983,
+        "series": null,
+        "source": ["text"],
+        "bottler": null,
+        "edition": null,
+        "outturn": null,
+        "bottleId": 45637,
+        "category": "single_malt",
+        "fullName": "Glenfiddich 12-year-old American Oak - 40.0% ABV - Oak Cask",
+        "reference": null,
+        "statedAge": 12,
+        "caskNumber": null,
+        "comparison": {
+          "missing": [],
+          "conflicts": [],
+          "agreements": ["abv"]
+        },
+        "distillery": ["Glenfiddich"],
+        "maturation": "oak",
+        "releaseDay": null,
+        "singleCask": null,
+        "releaseYear": null,
+        "vintageYear": null,
+        "bottlingYear": null,
+        "caskStrength": null,
+        "releaseMonth": null,
+        "familyContext": {
+          "siblingBottles": []
+        }
+      },
+      {
+        "abv": 40,
+        "brand": "Tomatin",
+        "score": 36.09983,
+        "series": null,
+        "source": ["text"],
+        "bottler": "Tomatin",
+        "edition": null,
+        "outturn": null,
+        "bottleId": 47009,
+        "category": "single_malt",
+        "fullName": "Tomatin 12-year-old Sherry Cask - 40.0% ABV - Other Cask",
+        "reference": null,
+        "statedAge": 12,
+        "caskNumber": null,
+        "comparison": {
+          "missing": [],
+          "conflicts": [],
+          "agreements": ["abv"]
+        },
+        "distillery": ["Tomatin"],
+        "maturation": "other",
+        "releaseDay": null,
+        "singleCask": null,
+        "releaseYear": null,
+        "vintageYear": null,
+        "bottlingYear": null,
+        "caskStrength": null,
+        "releaseMonth": null,
+        "familyContext": {
+          "siblingBottles": []
+        }
+      },
+      {
+        "abv": 40,
+        "brand": "Cragganmore",
+        "score": 35.661507,
+        "series": null,
+        "source": ["vector", "text"],
+        "bottler": null,
+        "edition": null,
+        "outturn": null,
+        "bottleId": 45434,
+        "category": "single_malt",
+        "fullName": "Cragganmore 12-year-old - 40.0% ABV",
+        "reference": "Cragganmore 12-year-old, 40%,",
+        "statedAge": 12,
+        "caskNumber": null,
+        "comparison": {
+          "missing": [],
+          "conflicts": [],
+          "agreements": ["abv"]
+        },
+        "distillery": ["Cragganmore"],
+        "maturation": null,
+        "releaseDay": null,
+        "singleCask": false,
+        "releaseYear": null,
+        "vintageYear": null,
+        "bottlingYear": null,
+        "caskStrength": false,
+        "releaseMonth": null,
+        "familyContext": {
+          "siblingBottles": []
+        }
+      },
+      {
+        "abv": 40,
+        "brand": "Bowmore",
+        "score": 35.111168,
+        "series": null,
+        "source": ["text"],
+        "bottler": "Bowmore",
+        "edition": null,
+        "outturn": null,
+        "bottleId": 45781,
+        "category": "single_malt",
+        "fullName": "Bowmore Sherry Oak Cask - 12-year-old - 40.0% ABV - Oloroso Cask",
+        "reference": null,
+        "statedAge": 12,
+        "caskNumber": null,
+        "comparison": {
+          "missing": [],
+          "conflicts": [],
+          "agreements": ["abv"]
+        },
+        "distillery": ["Bowmore"],
+        "maturation": "oloroso",
+        "releaseDay": null,
+        "singleCask": null,
+        "releaseYear": null,
+        "vintageYear": null,
+        "bottlingYear": null,
+        "caskStrength": null,
+        "releaseMonth": null,
+        "familyContext": {
+          "siblingBottles": []
+        }
+      },
+      {
+        "abv": 40,
+        "brand": "MacPhail's",
+        "score": 35.018944,
+        "series": null,
+        "source": ["text"],
+        "bottler": "Gordon & MacPhail",
+        "edition": null,
+        "outturn": null,
+        "bottleId": 45846,
+        "category": "single_malt",
+        "fullName": "MacPhail's Speyside Single Malt Scotch Whisky - 12-year-old - 40.0% ABV",
+        "reference": null,
+        "statedAge": 12,
+        "caskNumber": null,
+        "comparison": {
+          "missing": [],
+          "conflicts": [],
+          "agreements": ["abv"]
+        },
+        "distillery": [],
+        "maturation": null,
+        "releaseDay": null,
+        "singleCask": null,
+        "releaseYear": null,
+        "vintageYear": null,
+        "bottlingYear": null,
+        "caskStrength": null,
+        "releaseMonth": null,
+        "familyContext": {
+          "siblingBottles": []
+        }
+      },
+      {
+        "abv": 40,
+        "brand": "Old Pulteney",
+        "score": 34.939392,
+        "series": null,
+        "source": ["text"],
+        "bottler": null,
+        "edition": "Pre-2018",
+        "outturn": null,
+        "bottleId": 46200,
+        "category": "single_malt",
+        "fullName": "Old Pulteney 12-year-old - Pre-2018 - 40.0% ABV",
+        "reference": null,
+        "statedAge": 12,
+        "caskNumber": null,
+        "comparison": {
+          "missing": [],
+          "conflicts": [],
+          "agreements": ["abv"]
+        },
+        "distillery": ["Pulteney Distillery"],
+        "maturation": null,
+        "releaseDay": null,
+        "singleCask": null,
+        "releaseYear": null,
+        "vintageYear": null,
+        "bottlingYear": null,
+        "caskStrength": null,
+        "releaseMonth": null,
+        "familyContext": {
+          "siblingBottles": []
+        }
+      },
+      {
+        "abv": 40,
+        "brand": "Canadian Club",
+        "score": 34.300804,
+        "series": null,
+        "source": ["text"],
+        "bottler": null,
+        "edition": null,
+        "outturn": null,
+        "bottleId": 17344,
+        "category": "blend",
+        "fullName": "Canadian Club Classic 12 - 40.0% ABV",
+        "reference": null,
+        "statedAge": 12,
+        "caskNumber": null,
+        "comparison": {
+          "missing": [],
+          "conflicts": [],
+          "agreements": ["abv"]
+        },
+        "distillery": [],
+        "maturation": null,
+        "releaseDay": null,
+        "singleCask": null,
+        "releaseYear": null,
+        "vintageYear": null,
+        "bottlingYear": null,
+        "caskStrength": null,
+        "releaseMonth": null,
+        "familyContext": {
+          "siblingBottles": []
+        }
+      },
+      {
+        "abv": 40,
+        "brand": "Johnnie Walker",
+        "score": 31.695322,
+        "series": null,
+        "source": ["text"],
+        "bottler": null,
+        "edition": "Squid Game Edition",
+        "outturn": null,
+        "bottleId": 45649,
+        "category": "blend",
+        "fullName": "Johnnie Walker Black Label - Squid Game Edition - 12-year-old - 40.0% ABV",
+        "reference": null,
+        "statedAge": 12,
+        "caskNumber": null,
+        "comparison": {
+          "missing": [],
+          "conflicts": [],
+          "agreements": ["abv"]
+        },
+        "distillery": [],
+        "maturation": null,
+        "releaseDay": null,
+        "singleCask": null,
+        "releaseYear": null,
+        "vintageYear": null,
+        "bottlingYear": null,
+        "caskStrength": null,
+        "releaseMonth": null,
+        "familyContext": {
+          "siblingBottles": []
+        }
+      },
+      {
+        "abv": 40,
+        "brand": "Tomintoul",
+        "score": 30.052084,
+        "series": null,
+        "source": ["text"],
+        "bottler": null,
+        "edition": "Limited 2012 Edition",
+        "outturn": null,
+        "bottleId": 46725,
+        "category": "single_malt",
+        "fullName": "Tomintoul Oloroso Sherry Cask - Limited 2012 Edition - 12-year-old - 40.0% ABV - Oloroso Cask",
+        "reference": null,
+        "statedAge": 12,
+        "caskNumber": null,
+        "comparison": {
+          "missing": [],
+          "conflicts": [],
+          "agreements": ["abv"]
+        },
+        "distillery": ["Tomintoul"],
+        "maturation": "oloroso",
+        "releaseDay": null,
+        "singleCask": null,
+        "releaseYear": null,
+        "vintageYear": null,
+        "bottlingYear": null,
+        "caskStrength": null,
+        "releaseMonth": null,
+        "familyContext": {
+          "siblingBottles": []
+        }
+      },
+      {
+        "abv": 40,
+        "brand": "Old Charter",
+        "score": 28.245483,
+        "series": null,
+        "source": ["text"],
+        "bottler": "Old Charter Distillery Co.",
+        "edition": null,
+        "outturn": null,
+        "bottleId": 45499,
+        "category": "bourbon",
+        "fullName": "Old Charter 8 - 8-year-old - 40.0% ABV",
+        "reference": null,
+        "statedAge": 8,
+        "caskNumber": null,
+        "comparison": {
+          "missing": [],
+          "conflicts": [],
+          "agreements": ["abv"]
+        },
+        "distillery": [],
+        "maturation": null,
+        "releaseDay": null,
+        "singleCask": null,
+        "releaseYear": null,
+        "vintageYear": null,
+        "bottlingYear": null,
+        "caskStrength": null,
+        "releaseMonth": null,
+        "familyContext": {
+          "siblingBottles": []
+        }
+      }
+    ]
+  },
+  "context": {
+    "inspectedBottleIds": [],
+    "bottleContexts": [],
+    "inspectedEntities": [
+      {
+        "kind": "distillery",
+        "name": "The Balvenie",
+        "score": 1,
+        "source": ["exact", "text", "prefix", "contained"],
+        "entityId": 8463,
+        "reference": "The Balvenie",
+        "shortName": null,
+        "retrievedFor": [
+          {
+            "exact": true,
+            "query": "The Balvenie"
+          }
+        ]
+      },
+      {
+        "kind": "brand",
+        "name": "SPEY",
+        "score": 1,
+        "source": ["exact", "text", "prefix", "contained"],
+        "entityId": 1353,
+        "reference": "SPEY",
+        "shortName": null,
+        "retrievedFor": [
+          {
+            "exact": true,
+            "query": "SPEY"
+          },
+          {
+            "query": "Speyside Distillery"
+          }
+        ]
+      },
+      {
+        "kind": "distillery",
+        "name": "Speyside Distillery",
+        "score": 1,
+        "source": ["exact", "prefix", "contained"],
+        "entityId": 1356,
+        "reference": "Speyside Distillery",
+        "shortName": null,
+        "retrievedFor": [
+          {
+            "exact": true,
+            "query": "Speyside Distillery"
+          }
+        ]
+      },
+      {
+        "kind": "brand",
+        "name": "Old Parr",
+        "score": 1,
+        "source": ["exact", "text", "prefix", "contained"],
+        "entityId": 3598,
+        "reference": "Old Parr",
+        "shortName": null,
+        "retrievedFor": [
+          {
+            "exact": true,
+            "query": "Old Parr"
+          }
+        ]
+      },
+      {
+        "kind": "brand",
+        "name": "Highland Queen",
+        "score": 1,
+        "source": ["exact", "text", "prefix", "contained"],
+        "entityId": 1030,
+        "reference": "Highland Queen",
+        "shortName": null,
+        "retrievedFor": [
+          {
+            "exact": true,
+            "query": "Highland Queen"
+          }
+        ]
+      },
+      {
+        "kind": "distillery",
+        "name": "Glenfiddich",
+        "score": 1,
+        "source": ["exact", "text", "prefix", "contained"],
+        "entityId": 977,
+        "reference": "Glenfiddich",
+        "shortName": null,
+        "retrievedFor": [
+          {
+            "exact": true,
+            "query": "Glenfiddich"
+          }
+        ]
+      },
+      {
+        "kind": "distillery",
+        "name": "Tomatin",
+        "score": 1,
+        "source": ["exact", "text", "prefix", "contained"],
+        "entityId": 1443,
+        "reference": "Tomatin",
+        "shortName": null,
+        "retrievedFor": [
+          {
+            "exact": true,
+            "query": "Tomatin"
+          }
+        ]
+      },
+      {
+        "kind": "distillery",
+        "name": "Cragganmore",
+        "score": 1,
+        "source": ["exact", "text", "prefix", "contained"],
+        "entityId": 859,
+        "reference": "Cragganmore",
+        "shortName": null,
+        "retrievedFor": [
+          {
+            "exact": true,
+            "query": "Cragganmore"
+          }
+        ]
+      },
+      {
+        "kind": "distillery",
+        "name": "Bowmore",
+        "score": 1,
+        "source": ["exact", "text", "prefix", "contained"],
+        "entityId": 394,
+        "reference": "Bowmore",
+        "shortName": null,
+        "retrievedFor": [
+          {
+            "exact": true,
+            "query": "Bowmore"
+          }
+        ]
+      },
+      {
+        "kind": "brand",
+        "name": "MacPhail's",
+        "score": 1,
+        "source": ["exact", "text", "prefix", "contained"],
+        "entityId": 1165,
+        "reference": "MacPhail's",
+        "shortName": null,
+        "retrievedFor": [
+          {
+            "exact": true,
+            "query": "MacPhail's"
+          }
+        ]
+      },
+      {
+        "kind": "bottler",
+        "name": "Gordon & MacPhail",
+        "score": 1,
+        "source": ["exact", "text", "prefix", "contained"],
+        "entityId": 5645,
+        "reference": "Gordon & MacPhail",
+        "shortName": null,
+        "retrievedFor": [
+          {
+            "exact": true,
+            "query": "Gordon & MacPhail"
+          }
+        ]
+      },
+      {
+        "kind": "brand",
+        "name": "Old Pulteney",
+        "score": 1,
+        "source": ["exact", "text", "prefix", "contained"],
+        "entityId": 1227,
+        "reference": "Old Pulteney",
+        "shortName": null,
+        "retrievedFor": [
+          {
+            "exact": true,
+            "query": "Old Pulteney"
+          }
+        ]
+      },
+      {
+        "kind": "brand",
+        "name": "Spey River",
+        "score": 0.5,
+        "source": ["text", "prefix"],
+        "entityId": 4020,
+        "reference": "Spey River",
+        "shortName": null,
+        "retrievedFor": [
+          {
+            "query": "SPEY"
+          }
+        ]
+      },
+      {
+        "kind": "brand",
+        "name": "Spey Royal",
+        "score": 0.5,
+        "source": ["text", "prefix"],
+        "entityId": 4021,
+        "reference": "Spey Royal",
+        "shortName": null,
+        "retrievedFor": [
+          {
+            "query": "SPEY"
+          }
+        ]
+      },
+      {
+        "kind": "brand",
+        "name": "Speyside Region Malt",
+        "score": 0.5,
+        "source": ["prefix"],
+        "entityId": 1358,
+        "reference": null,
+        "shortName": null,
+        "retrievedFor": [
+          {
+            "query": "SPEY"
+          }
+        ]
+      },
+      {
+        "kind": "company",
+        "name": "Speyside Distillers Company",
+        "score": 0.5,
+        "source": ["prefix"],
+        "entityId": 5752,
+        "reference": null,
+        "shortName": null,
+        "retrievedFor": [
+          {
+            "query": "SPEY"
+          }
+        ]
+      },
+      {
+        "kind": "brand",
+        "name": "An Iconic Speyside Distillery",
+        "score": 0.2,
+        "source": ["text"],
+        "entityId": 2093,
+        "reference": null,
+        "shortName": null,
+        "retrievedFor": [
+          {
+            "query": "Speyside Distillery"
+          }
+        ]
+      },
+      {
+        "kind": "brand",
+        "name": "An Undisclosed Speyside Distillery",
+        "score": 0.2,
+        "source": ["text"],
+        "entityId": 2097,
+        "reference": null,
+        "shortName": null,
+        "retrievedFor": [
+          {
+            "query": "Speyside Distillery"
+          }
+        ]
+      },
+      {
+        "kind": "brand",
+        "name": "A Secret Speyside Distillery",
+        "score": 0.2,
+        "source": ["text"],
+        "entityId": 39,
+        "reference": null,
+        "shortName": null,
+        "retrievedFor": [
+          {
+            "query": "Speyside Distillery"
+          }
+        ]
+      },
+      {
+        "kind": "brand",
+        "name": "Grand Old Parr",
+        "score": 0.2,
+        "source": ["text"],
+        "entityId": 158,
+        "reference": null,
+        "shortName": null,
+        "retrievedFor": [
+          {
+            "query": "Old Parr"
+          }
+        ]
+      },
+      {
+        "kind": "company",
+        "name": "Morrison Bowmore Distillers Ltd",
+        "score": 0.2,
+        "source": ["text"],
+        "entityId": 5684,
+        "reference": null,
+        "shortName": null,
+        "retrievedFor": [
+          {
+            "query": "Bowmore"
+          }
+        ]
+      }
+    ],
+    "inspectedSeries": []
+  },
+  "provenance": {
+    "source": "production_miss",
+    "verifiedSourceUrls": [
+      "https://www.scotchwhiskyauctions.com/auctions/234-the-185th-auction/904747-balvenie-12-year-old-doublewood-20cl/"
+    ],
+    "dbOutcome": {
+      "bottleId": null,
+      "createsBottle": false,
+      "summary": "Production returned ignored."
+    },
+    "notes": "Captured from saved classifier run 34277 (auction_lot 13900, model null, 2026-11-03T07:00:20.854Z). Production rationale: none Checked 2026-11-03. Lot page: Balvenie 12 Year Old DoubleWood, 40% ABV / 20cl. Owner rule (2026-11-03): more than 100 ml is a real Bottle; only 100 ml or less is a miniature. The identity model says volume does not make a different Bottle. 11834 \"The Balvenie DoubleWood\" stores age 12 and no ABV, so nothing conflicts with the 40% lot. 64159 \"The Balvenie 12-year-old DoubleWood\" stores 43% (the US strength), which conflicts. 11834 is not in the observed candidates; the agent can find it with its search tools. Production ignored the lot."
+  },
+  "expected": {
+    "status": "classified",
+    "action": "match",
+    "identityScope": "product",
+    "matchedBottleId": 11834,
+    "summary": "A 20cl bottle is above the 100 ml miniature line, so it is in scope. Match The Balvenie DoubleWood 12-year-old (11834); size does not make a different Bottle."
+  },
+  "knownFailure": {
+    "reason": "The agent's instructions give no miniature size, so it ignores a 20cl bottle. More than 100 ml is in scope."
+  }
+}

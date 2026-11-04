@@ -1,0 +1,917 @@
+{
+  "id": "auction-springbank-15-2026-release-not-generic",
+  "name": "auction lot: Springbank 15 \"2026 Release\" is its own yearly release, not the general Springbank 15",
+  "input": {
+    "reference": {
+      "id": 8425,
+      "url": "https://www.scotchwhiskyauctions.com/auctions/231-the-182nd-auction/890697-springbank-15-year-old-2026-release/",
+      "name": "Springbank 15 Year Old 2026 Release",
+      "imageUrl": null,
+      "externalSiteId": 28097,
+      "currentBottleId": null
+    },
+    "extractedIdentity": {
+      "abv": 46,
+      "brand": null,
+      "series": null,
+      "bottler": null,
+      "edition": null,
+      "outturn": null,
+      "category": null,
+      "distillery": null,
+      "expression": null,
+      "maturation": null,
+      "stated_age": null,
+      "cask_number": null,
+      "single_cask": null,
+      "release_year": null,
+      "vintage_year": null,
+      "cask_strength": null
+    },
+    "imageEvidence": null,
+    "initialCandidates": [
+      {
+        "abv": 46,
+        "brand": "Springbank",
+        "score": 64.805695,
+        "series": null,
+        "source": ["vector", "text", "exact", "context", "brand_coverage"],
+        "bottler": null,
+        "edition": null,
+        "outturn": null,
+        "bottleId": 872,
+        "category": "single_malt",
+        "fullName": "Springbank 15",
+        "reference": "Springbank 15-year-old",
+        "statedAge": 15,
+        "caskNumber": null,
+        "comparison": {
+          "missing": [],
+          "conflicts": [],
+          "agreements": ["abv"]
+        },
+        "distillery": ["Springbank"],
+        "maturation": "100% Sherry",
+        "releaseDay": null,
+        "singleCask": null,
+        "releaseYear": null,
+        "vintageYear": null,
+        "bottlingYear": null,
+        "caskStrength": null,
+        "releaseMonth": null,
+        "familyContext": {
+          "siblingBottles": []
+        }
+      },
+      {
+        "abv": 46,
+        "brand": "Tamdhu",
+        "score": 57.306473,
+        "series": null,
+        "source": ["text"],
+        "bottler": null,
+        "edition": null,
+        "outturn": null,
+        "bottleId": 46233,
+        "category": "single_malt",
+        "fullName": "Tamdhu Sherry Cask Matured - 15-year-old - 46.0% ABV - Oloroso Cask",
+        "reference": null,
+        "statedAge": 15,
+        "caskNumber": null,
+        "comparison": {
+          "missing": [],
+          "conflicts": [],
+          "agreements": ["abv"]
+        },
+        "distillery": ["Tamdhu"],
+        "maturation": "oloroso",
+        "releaseDay": null,
+        "singleCask": null,
+        "releaseYear": null,
+        "vintageYear": null,
+        "bottlingYear": null,
+        "caskStrength": null,
+        "releaseMonth": null,
+        "familyContext": {
+          "siblingBottles": []
+        }
+      },
+      {
+        "abv": 46,
+        "brand": "The GlenDronach",
+        "score": 57.110023,
+        "series": null,
+        "source": ["text"],
+        "bottler": "The GlenDronach",
+        "edition": null,
+        "outturn": null,
+        "bottleId": 45997,
+        "category": "single_malt",
+        "fullName": "The GlenDronach Revival - 15-year-old - 46.0% ABV",
+        "reference": null,
+        "statedAge": 15,
+        "caskNumber": null,
+        "comparison": {
+          "missing": [],
+          "conflicts": [],
+          "agreements": ["abv"]
+        },
+        "distillery": ["The GlenDronach"],
+        "maturation": null,
+        "releaseDay": null,
+        "singleCask": null,
+        "releaseYear": null,
+        "vintageYear": null,
+        "bottlingYear": null,
+        "caskStrength": null,
+        "releaseMonth": null,
+        "familyContext": {
+          "siblingBottles": []
+        }
+      },
+      {
+        "abv": 46,
+        "brand": "Laphroaig",
+        "score": 54.43274,
+        "series": null,
+        "source": ["text"],
+        "bottler": null,
+        "edition": "2026 Release",
+        "outturn": null,
+        "bottleId": 54410,
+        "category": "single_malt",
+        "fullName": "Laphroaig 15-year-old - 2026 Release",
+        "reference": null,
+        "statedAge": 15,
+        "caskNumber": null,
+        "comparison": {
+          "missing": ["singleCask"],
+          "conflicts": ["brand", "distillers"],
+          "agreements": ["category", "statedAge", "abv", "releaseYear"]
+        },
+        "distillery": ["Laphroaig"],
+        "maturation": "american_oak",
+        "releaseDay": null,
+        "singleCask": null,
+        "releaseYear": 2026,
+        "vintageYear": null,
+        "bottlingYear": 2026,
+        "caskStrength": null,
+        "releaseMonth": null,
+        "familyContext": {
+          "siblingBottles": []
+        }
+      },
+      {
+        "abv": 46,
+        "brand": "Glenfarclas",
+        "score": 52.36119,
+        "series": null,
+        "source": ["text"],
+        "bottler": null,
+        "edition": null,
+        "outturn": null,
+        "bottleId": 46677,
+        "category": "single_malt",
+        "fullName": "Glenfarclas Cheltenham Bottling - 15-year-old - 46.0% ABV",
+        "reference": null,
+        "statedAge": 15,
+        "caskNumber": null,
+        "comparison": {
+          "missing": [],
+          "conflicts": [],
+          "agreements": ["abv"]
+        },
+        "distillery": ["Glenfarclas"],
+        "maturation": null,
+        "releaseDay": null,
+        "singleCask": null,
+        "releaseYear": null,
+        "vintageYear": null,
+        "bottlingYear": null,
+        "caskStrength": null,
+        "releaseMonth": null,
+        "familyContext": {
+          "siblingBottles": []
+        }
+      },
+      {
+        "abv": 46,
+        "brand": "Glencadam",
+        "score": 50.856953,
+        "series": null,
+        "source": ["text"],
+        "bottler": null,
+        "edition": null,
+        "outturn": null,
+        "bottleId": 45436,
+        "category": "single_malt",
+        "fullName": "Glencadam The Rather Dignified - 15-year-old - 46.0% ABV",
+        "reference": null,
+        "statedAge": 15,
+        "caskNumber": null,
+        "comparison": {
+          "missing": [],
+          "conflicts": [],
+          "agreements": ["abv"]
+        },
+        "distillery": ["Glencadam"],
+        "maturation": null,
+        "releaseDay": null,
+        "singleCask": null,
+        "releaseYear": null,
+        "vintageYear": null,
+        "bottlingYear": null,
+        "caskStrength": null,
+        "releaseMonth": null,
+        "familyContext": {
+          "siblingBottles": []
+        }
+      },
+      {
+        "abv": 46,
+        "brand": "Gordon & MacPhail",
+        "score": 49.148224,
+        "series": "Distillery Labels",
+        "source": ["text"],
+        "bottler": "Gordon & MacPhail",
+        "edition": null,
+        "outturn": null,
+        "bottleId": 45365,
+        "category": "single_malt",
+        "fullName": "Gordon & MacPhail Linkwood - 15-year-old - 46.0% ABV",
+        "reference": null,
+        "statedAge": 15,
+        "caskNumber": null,
+        "comparison": {
+          "missing": [],
+          "conflicts": [],
+          "agreements": ["abv"]
+        },
+        "distillery": ["Linkwood"],
+        "maturation": null,
+        "releaseDay": null,
+        "singleCask": null,
+        "releaseYear": null,
+        "vintageYear": null,
+        "bottlingYear": null,
+        "caskStrength": null,
+        "releaseMonth": null,
+        "familyContext": {
+          "siblingBottles": []
+        }
+      },
+      {
+        "abv": 46,
+        "brand": "Bushmills",
+        "score": 48.961914,
+        "series": null,
+        "source": ["text"],
+        "bottler": "Bushmills",
+        "edition": null,
+        "outturn": null,
+        "bottleId": 46745,
+        "category": "single_malt",
+        "fullName": "Bushmills Bourbon Cask - 15-year-old - 46.0% ABV - Bourbon Cask",
+        "reference": null,
+        "statedAge": 15,
+        "caskNumber": null,
+        "comparison": {
+          "missing": [],
+          "conflicts": [],
+          "agreements": ["abv"]
+        },
+        "distillery": ["Bushmills"],
+        "maturation": "bourbon",
+        "releaseDay": null,
+        "singleCask": null,
+        "releaseYear": null,
+        "vintageYear": null,
+        "bottlingYear": null,
+        "caskStrength": null,
+        "releaseMonth": null,
+        "familyContext": {
+          "siblingBottles": []
+        }
+      },
+      {
+        "abv": 46,
+        "brand": "Tomintoul",
+        "score": 46.59394,
+        "series": null,
+        "source": ["text"],
+        "bottler": "Tomintoul",
+        "edition": null,
+        "outturn": null,
+        "bottleId": 46260,
+        "category": "single_malt",
+        "fullName": "Tomintoul Portwood Finish - 15-year-old - 2006 Vintage - 46.0% ABV - Port Pipe",
+        "reference": null,
+        "statedAge": 15,
+        "caskNumber": null,
+        "comparison": {
+          "missing": [],
+          "conflicts": [],
+          "agreements": ["abv"]
+        },
+        "distillery": ["Tomintoul"],
+        "maturation": null,
+        "releaseDay": null,
+        "singleCask": null,
+        "releaseYear": null,
+        "vintageYear": 2006,
+        "bottlingYear": null,
+        "caskStrength": null,
+        "releaseMonth": null,
+        "familyContext": {
+          "siblingBottles": []
+        }
+      },
+      {
+        "abv": 46,
+        "brand": "Highland Queen",
+        "score": 46.495132,
+        "series": null,
+        "source": ["text"],
+        "bottler": null,
+        "edition": null,
+        "outturn": null,
+        "bottleId": 14309,
+        "category": "single_malt",
+        "fullName": "Highland Queen Majesty",
+        "reference": null,
+        "statedAge": 15,
+        "caskNumber": null,
+        "comparison": {
+          "missing": [],
+          "conflicts": [],
+          "agreements": ["abv"]
+        },
+        "distillery": [],
+        "maturation": null,
+        "releaseDay": null,
+        "singleCask": false,
+        "releaseYear": null,
+        "vintageYear": null,
+        "bottlingYear": null,
+        "caskStrength": false,
+        "releaseMonth": null,
+        "familyContext": {
+          "siblingBottles": []
+        }
+      },
+      {
+        "abv": 46,
+        "brand": "Glencadam",
+        "score": 45.29032,
+        "series": null,
+        "source": ["text"],
+        "bottler": null,
+        "edition": null,
+        "outturn": null,
+        "bottleId": 46278,
+        "category": "single_malt",
+        "fullName": "Glencadam Reserva de Madeira - 15-year-old - 2008 Vintage - 46.0% ABV - Madeira Cask",
+        "reference": null,
+        "statedAge": 15,
+        "caskNumber": null,
+        "comparison": {
+          "missing": [],
+          "conflicts": [],
+          "agreements": ["abv"]
+        },
+        "distillery": ["Glencadam"],
+        "maturation": "madeira",
+        "releaseDay": null,
+        "singleCask": null,
+        "releaseYear": null,
+        "vintageYear": 2008,
+        "bottlingYear": null,
+        "caskStrength": null,
+        "releaseMonth": null,
+        "familyContext": {
+          "siblingBottles": []
+        }
+      },
+      {
+        "abv": 46,
+        "brand": "Murray McDavid",
+        "score": 45.29032,
+        "series": "Osprey",
+        "source": ["text"],
+        "bottler": "Murray McDavid",
+        "edition": null,
+        "outturn": null,
+        "bottleId": 45819,
+        "category": "single_malt",
+        "fullName": "Murray McDavid Bourbon Cask Finish - 15-year-old - 46.0% ABV - Bourbon Cask",
+        "reference": null,
+        "statedAge": 15,
+        "caskNumber": null,
+        "comparison": {
+          "missing": [],
+          "conflicts": [],
+          "agreements": ["abv"]
+        },
+        "distillery": ["Glentauchers"],
+        "maturation": "bourbon",
+        "releaseDay": null,
+        "singleCask": null,
+        "releaseYear": null,
+        "vintageYear": null,
+        "bottlingYear": null,
+        "caskStrength": null,
+        "releaseMonth": null,
+        "familyContext": {
+          "siblingBottles": []
+        }
+      },
+      {
+        "abv": 46,
+        "brand": "Curious Whiskies",
+        "score": 44.05961,
+        "series": null,
+        "source": ["text"],
+        "bottler": "Curious Whiskies",
+        "edition": null,
+        "outturn": null,
+        "bottleId": 46184,
+        "category": "single_malt",
+        "fullName": "Curious Whiskies Craigellachie 2009",
+        "reference": null,
+        "statedAge": 15,
+        "caskNumber": null,
+        "comparison": {
+          "missing": [],
+          "conflicts": [],
+          "agreements": ["abv"]
+        },
+        "distillery": ["Craigellachie"],
+        "maturation": null,
+        "releaseDay": null,
+        "singleCask": null,
+        "releaseYear": null,
+        "vintageYear": 2009,
+        "bottlingYear": null,
+        "caskStrength": null,
+        "releaseMonth": null,
+        "familyContext": {
+          "siblingBottles": []
+        }
+      },
+      {
+        "abv": 46,
+        "brand": "Tomatin",
+        "score": 43.62189,
+        "series": "Sherry Collection",
+        "source": ["text"],
+        "bottler": "Tomatin",
+        "edition": null,
+        "outturn": null,
+        "bottleId": 46239,
+        "category": "single_malt",
+        "fullName": "Tomatin Palo Cortado Edition",
+        "reference": null,
+        "statedAge": 15,
+        "caskNumber": null,
+        "comparison": {
+          "missing": ["releaseYear", "singleCask"],
+          "conflicts": ["brand", "distillers"],
+          "agreements": ["category", "statedAge", "abv"]
+        },
+        "distillery": ["Tomatin"],
+        "maturation": "palo_cortado",
+        "releaseDay": null,
+        "singleCask": null,
+        "releaseYear": null,
+        "vintageYear": 2008,
+        "bottlingYear": null,
+        "caskStrength": null,
+        "releaseMonth": null,
+        "familyContext": {
+          "siblingBottles": []
+        }
+      },
+      {
+        "abv": 46,
+        "brand": "Tomintoul",
+        "score": 43.409576,
+        "series": null,
+        "source": ["text"],
+        "bottler": null,
+        "edition": null,
+        "outturn": null,
+        "bottleId": 46243,
+        "category": "single_malt",
+        "fullName": "Tomintoul Tawny Port Cask Finish - 15-year-old - 2008 Vintage - 46.0% ABV - Tawny Port Cask - Barrique",
+        "reference": null,
+        "statedAge": 15,
+        "caskNumber": null,
+        "comparison": {
+          "missing": [],
+          "conflicts": [],
+          "agreements": ["abv"]
+        },
+        "distillery": ["Tomintoul"],
+        "maturation": "tawny_port",
+        "releaseDay": null,
+        "singleCask": null,
+        "releaseYear": null,
+        "vintageYear": 2008,
+        "bottlingYear": null,
+        "caskStrength": null,
+        "releaseMonth": null,
+        "familyContext": {
+          "siblingBottles": []
+        }
+      },
+      {
+        "abv": 46,
+        "brand": "Living Souls",
+        "score": 32.532547,
+        "series": null,
+        "source": ["text"],
+        "bottler": "Living Souls",
+        "edition": "Batch 2",
+        "outturn": null,
+        "bottleId": 45681,
+        "category": "blend",
+        "fullName": "Living Souls Blended Scotch Whisky - Batch 2 - 15-year-old - 46.0% ABV",
+        "reference": null,
+        "statedAge": 15,
+        "caskNumber": null,
+        "comparison": {
+          "missing": [],
+          "conflicts": [],
+          "agreements": ["abv"]
+        },
+        "distillery": [],
+        "maturation": null,
+        "releaseDay": null,
+        "singleCask": null,
+        "releaseYear": null,
+        "vintageYear": null,
+        "bottlingYear": null,
+        "caskStrength": null,
+        "releaseMonth": null,
+        "familyContext": {
+          "siblingBottles": []
+        }
+      },
+      {
+        "abv": 46,
+        "brand": "Signatory Vintage",
+        "score": 31.34439,
+        "series": "The Un-Chillfiltered Collection",
+        "source": ["text"],
+        "bottler": "Signatory Vintage",
+        "edition": null,
+        "outturn": null,
+        "bottleId": 45755,
+        "category": "single_grain",
+        "fullName": "Signatory Vintage Port Dundas 2010 15-year-old",
+        "reference": null,
+        "statedAge": 15,
+        "caskNumber": null,
+        "comparison": {
+          "missing": [],
+          "conflicts": [],
+          "agreements": ["abv"]
+        },
+        "distillery": ["Port Dundas"],
+        "maturation": null,
+        "releaseDay": null,
+        "singleCask": null,
+        "releaseYear": null,
+        "vintageYear": 2010,
+        "bottlingYear": null,
+        "caskStrength": null,
+        "releaseMonth": null,
+        "familyContext": {
+          "siblingBottles": []
+        }
+      }
+    ]
+  },
+  "context": {
+    "inspectedBottleIds": [872],
+    "bottleContexts": [
+      {
+        "exact": {
+          "abv": 46,
+          "edition": null,
+          "outturn": null,
+          "statedAge": null,
+          "caskNumber": null,
+          "maturation": "100% Sherry",
+          "releaseDay": null,
+          "singleCask": null,
+          "releaseYear": null,
+          "vintageYear": null,
+          "bottlingYear": null,
+          "caskStrength": null,
+          "releaseMonth": null
+        },
+        "shared": {
+          "name": "15",
+          "brand": {
+            "name": "Springbank",
+            "entityId": 1362
+          },
+          "series": null,
+          "bottler": null,
+          "category": "single_malt",
+          "statedAge": 15,
+          "distillers": [
+            {
+              "name": "Springbank",
+              "entityId": 1362
+            }
+          ]
+        },
+        "groupId": 9492,
+        "bottleId": 872,
+        "fullName": "Springbank 15",
+        "siblings": [],
+        "references": [
+          {
+            "name": "Springbank 15-year-old",
+            "ignored": false
+          },
+          {
+            "name": "Springbank 15-year-old, 46%",
+            "ignored": false
+          },
+          {
+            "name": "Springbank 15-year-old (46%, OB, black label, early 1990s)",
+            "ignored": false
+          },
+          {
+            "name": "Springbank 15-year-old Scotch",
+            "ignored": false
+          },
+          {
+            "name": "Springbank 15-year-old Single Malt",
+            "ignored": false
+          }
+        ],
+        "observations": [
+          {
+            "facts": {
+              "proposalType": "no_match",
+              "proposedBottle": null,
+              "referenceScope": "none"
+            },
+            "rawText": "Springbank 15-year-old - Early 2000s",
+            "sourceKey": "store_price:12033600",
+            "sourceUrl": "https://www.masterofmalt.com/whiskies/springbank/springbank-15-year-old-2000s-whisky/?sku=117323",
+            "sourceName": "Springbank 15-year-old - Early 2000s",
+            "sourceType": "store_price",
+            "parsedIdentity": null
+          },
+          {
+            "facts": {
+              "proposalType": "no_match",
+              "proposedBottle": null,
+              "referenceScope": "none"
+            },
+            "rawText": "Springbank 15-year-old",
+            "sourceKey": "store_price:12057824",
+            "sourceUrl": "https://www.masterofmalt.com/whiskies/springbank-15-year-old-whisky/?sku=2595",
+            "sourceName": "Springbank 15-year-old",
+            "sourceType": "store_price",
+            "parsedIdentity": null
+          },
+          {
+            "facts": {
+              "proposalType": "no_match",
+              "proposedBottle": null
+            },
+            "rawText": "Springbank 15-year-old Single Malt",
+            "sourceKey": "store_price:12041544",
+            "sourceUrl": "https://www.healthyspirits.com/products/springbank-15-year-single-malt-700ml",
+            "sourceName": "Springbank 15-year-old Single Malt",
+            "sourceType": "store_price",
+            "parsedIdentity": null
+          }
+        ],
+        "imageSources": []
+      }
+    ],
+    "inspectedEntities": [
+      {
+        "kind": "distillery",
+        "name": "Springbank",
+        "score": 1,
+        "source": ["exact", "text", "prefix", "contained"],
+        "entityId": 1362,
+        "reference": "Springbank",
+        "shortName": null,
+        "retrievedFor": [
+          {
+            "exact": true,
+            "query": "Springbank"
+          }
+        ]
+      },
+      {
+        "kind": "distillery",
+        "name": "The GlenDronach",
+        "score": 1,
+        "source": ["exact", "text", "prefix", "contained"],
+        "entityId": 973,
+        "reference": "The GlenDronach",
+        "shortName": null,
+        "retrievedFor": [
+          {
+            "exact": true,
+            "query": "The GlenDronach"
+          }
+        ]
+      },
+      {
+        "kind": "distillery",
+        "name": "Glenfarclas",
+        "score": 1,
+        "source": ["exact", "text", "prefix", "contained"],
+        "entityId": 976,
+        "reference": "Glenfarclas",
+        "shortName": null,
+        "retrievedFor": [
+          {
+            "exact": true,
+            "query": "Glenfarclas"
+          }
+        ]
+      },
+      {
+        "kind": "distillery",
+        "name": "Glencadam",
+        "score": 1,
+        "source": ["exact", "text", "prefix", "contained"],
+        "entityId": 114,
+        "reference": "Glencadam",
+        "shortName": null,
+        "retrievedFor": [
+          {
+            "exact": true,
+            "query": "Glencadam"
+          }
+        ]
+      },
+      {
+        "kind": "bottler",
+        "name": "Gordon & MacPhail",
+        "score": 1,
+        "source": ["exact", "text", "prefix", "contained"],
+        "entityId": 5645,
+        "reference": "Gordon & MacPhail",
+        "shortName": null,
+        "retrievedFor": [
+          {
+            "exact": true,
+            "query": "Gordon & MacPhail"
+          }
+        ]
+      },
+      {
+        "kind": "distillery",
+        "name": "Linkwood",
+        "score": 1,
+        "source": ["exact", "text", "prefix", "contained"],
+        "entityId": 145,
+        "reference": "Linkwood",
+        "shortName": null,
+        "retrievedFor": [
+          {
+            "exact": true,
+            "query": "Linkwood"
+          }
+        ]
+      },
+      {
+        "kind": "distillery",
+        "name": "Tamdhu",
+        "score": 1,
+        "source": ["exact", "text", "prefix", "contained"],
+        "entityId": 1386,
+        "reference": "Tamdhu",
+        "shortName": null,
+        "retrievedFor": [
+          {
+            "exact": true,
+            "query": "Tamdhu"
+          }
+        ]
+      },
+      {
+        "kind": "distillery",
+        "name": "Bushmills",
+        "score": 1,
+        "source": ["exact", "text", "prefix", "contained"],
+        "entityId": 102,
+        "reference": "Bushmills",
+        "shortName": "",
+        "retrievedFor": [
+          {
+            "exact": true,
+            "query": "Bushmills"
+          }
+        ]
+      },
+      {
+        "kind": "distillery",
+        "name": "Tomintoul",
+        "score": 1,
+        "source": ["exact", "text", "prefix", "contained"],
+        "entityId": 174,
+        "reference": "Tomintoul",
+        "shortName": null,
+        "retrievedFor": [
+          {
+            "exact": true,
+            "query": "Tomintoul"
+          }
+        ]
+      },
+      {
+        "kind": "bottler",
+        "name": "Murray McDavid",
+        "score": 1,
+        "source": ["exact", "text", "prefix", "contained"],
+        "entityId": 5670,
+        "reference": "Murray McDavid",
+        "shortName": null,
+        "retrievedFor": [
+          {
+            "exact": true,
+            "query": "Murray McDavid"
+          }
+        ]
+      },
+      {
+        "kind": "distillery",
+        "name": "Glentauchers",
+        "score": 1,
+        "source": ["exact", "text", "prefix", "contained"],
+        "entityId": 132,
+        "reference": "Glentauchers",
+        "shortName": null,
+        "retrievedFor": [
+          {
+            "exact": true,
+            "query": "Glentauchers"
+          }
+        ]
+      },
+      {
+        "kind": "brand",
+        "name": "Highland Queen",
+        "score": 1,
+        "source": ["exact", "text", "prefix", "contained"],
+        "entityId": 1030,
+        "reference": "Highland Queen",
+        "shortName": null,
+        "retrievedFor": [
+          {
+            "exact": true,
+            "query": "Highland Queen"
+          }
+        ]
+      }
+    ],
+    "inspectedSeries": []
+  },
+  "provenance": {
+    "source": "production_miss",
+    "verifiedSourceUrls": [
+      "https://www.scotchwhiskyauctions.com/auctions/231-the-182nd-auction/890697-springbank-15-year-old-2026-release/"
+    ],
+    "dbOutcome": {
+      "bottleId": 872,
+      "createsBottle": false,
+      "summary": "Production returned match."
+    },
+    "notes": "Captured from saved classifier run 27879 (auction_lot 8425, model null, 2026-10-25T16:33:18.400Z). Production rationale: The auction title identifies Springbank 15-year-old at 46% ABV. The available web result describes the 2026 release as Springbank’s core 15-year-old expression; no evidence establishes “2026 Release” as a distinct producer-marketed edition. Inspected Bottle 872 matches the expression, age, ABV, and Springbank distillery. The auction listing’s title is not reusable as a global alias. Checked 2026-11-03. Lot 8425 page (182nd auction): Springbank 15 Year Old, 46% ABV / 70cl; the source title gives the 2026 release. Owner rule (2026-11-03): not every label prints the release year, but when the source tells us the year, it is its own release with releaseYear set and the year kept out of the name. 872 \"Springbank 15\" has no year, so it is too broad for a known 2026 release. At run time no Bottle covered a 2026 Springbank 15: none of the observed candidates has releaseYear 2026 for Springbank. Bottle 69640 (Springbank 15-year-old, 46%, releaseYear 2026) was created later, on 2026-11-03T02:51Z, so in this captured catalog the right answer is a create shaped like it. The same miss repeated on lots 17770 and 17780 in the 185th auction, which matched 872 and should now point at 69640. Sibling per-year Bottles exist for 2021 (70354), 2022 (69229), 2023 (70355), 2024 (69230), and 2025 (69231)."
+  },
+  "expected": {
+    "status": "classified",
+    "action": "create_bottle",
+    "identityScope": "product",
+    "matchedBottleId": null,
+    "proposedBottle": {
+      "brand": {
+        "id": 1362
+      },
+      "statedAge": 15,
+      "abv": 46,
+      "releaseYear": 2026
+    },
+    "proposedBottleNameOneOf": ["15-year-old"],
+    "proposedBottleNameExcludes": ["2026", "Release"],
+    "summary": "Create the 2026 Springbank 15-year-old with releaseYear 2026 and no year in the name; the general Springbank 15 (872) is too broad for a known release year."
+  },
+  "knownFailure": {
+    "reason": "The agent matches the general Springbank 15 although the source names the 2026 release. A known release year marks its own release."
+  }
+}

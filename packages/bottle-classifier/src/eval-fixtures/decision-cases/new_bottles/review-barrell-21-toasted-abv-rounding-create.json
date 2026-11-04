@@ -1,0 +1,1274 @@
+{
+  "id": "review-barrell-21-toasted-abv-rounding-create",
+  "name": "Review: Barrell 21-year-old Toasted Single Barrel is a create; 62.2% vs 62.28% is rounding",
+  "input": {
+    "reference": {
+      "id": 18983,
+      "url": "https://whiskyadvocate.com/Barrell-21-year-old-Toasted-Single-Barrel-Extra-Strength-62-2",
+      "name": "Barrell 21 year old Toasted Single Barrel Extra Strength, 62.2%",
+      "imageUrl": null,
+      "externalSiteId": 5,
+      "currentBottleId": null
+    },
+    "extractedIdentity": {
+      "abv": 62.2,
+      "brand": "Barrell",
+      "series": null,
+      "bottler": "Barrell Craft Spirits",
+      "edition": null,
+      "outturn": null,
+      "category": null,
+      "distillery": [],
+      "expression": "Toasted Single Barrel Extra Strength",
+      "maturation": null,
+      "stated_age": 21,
+      "cask_number": null,
+      "release_day": null,
+      "single_cask": true,
+      "release_year": null,
+      "vintage_year": null,
+      "bottling_year": null,
+      "cask_strength": true,
+      "release_month": null
+    },
+    "imageEvidence": null,
+    "initialCandidates": [
+      {
+        "abv": 50.29,
+        "brand": "Barrell Craft Spirits",
+        "score": 73.45667,
+        "series": "Gray Label",
+        "source": ["text", "context"],
+        "bottler": "Barrell Craft Spirits",
+        "edition": null,
+        "outturn": null,
+        "bottleId": 64375,
+        "category": "bourbon",
+        "fullName": "Barrell Bourbon",
+        "reference": null,
+        "statedAge": null,
+        "caskNumber": null,
+        "comparison": {
+          "missing": ["statedAge", "caskStrength", "singleCask"],
+          "conflicts": ["abv", "brand"],
+          "agreements": ["category", "bottler"]
+        },
+        "distillery": [],
+        "maturation": null,
+        "releaseDay": null,
+        "singleCask": null,
+        "releaseYear": 2022,
+        "vintageYear": null,
+        "bottlingYear": null,
+        "caskStrength": null,
+        "releaseMonth": null,
+        "familyContext": {
+          "siblingBottles": []
+        }
+      },
+      {
+        "abv": null,
+        "brand": "Three Chord",
+        "score": 53.755505,
+        "series": null,
+        "source": ["text"],
+        "bottler": null,
+        "edition": null,
+        "outturn": null,
+        "bottleId": 43964,
+        "category": "bourbon",
+        "fullName": "Three Chord Flipside Triple Wood Toasted French Oak and American Oak Barrel Finished",
+        "reference": null,
+        "statedAge": null,
+        "caskNumber": null,
+        "comparison": {
+          "missing": [
+            "statedAge",
+            "abv",
+            "caskStrength",
+            "singleCask",
+            "bottler"
+          ],
+          "conflicts": ["brand"],
+          "agreements": ["category"]
+        },
+        "distillery": [],
+        "maturation": null,
+        "releaseDay": null,
+        "singleCask": null,
+        "releaseYear": null,
+        "vintageYear": null,
+        "bottlingYear": null,
+        "caskStrength": null,
+        "releaseMonth": null,
+        "familyContext": {
+          "siblingBottles": []
+        }
+      },
+      {
+        "abv": null,
+        "brand": "Ballantine's",
+        "score": 53.389984,
+        "series": null,
+        "source": ["text"],
+        "bottler": null,
+        "edition": null,
+        "outturn": null,
+        "bottleId": 14351,
+        "category": "blend",
+        "fullName": "Ballantine's 21-year-old Signature Oak Edition",
+        "reference": null,
+        "statedAge": 21,
+        "caskNumber": null,
+        "comparison": {
+          "missing": ["abv", "caskStrength", "singleCask", "bottler"],
+          "conflicts": ["category", "brand"],
+          "agreements": ["statedAge"]
+        },
+        "distillery": [],
+        "maturation": null,
+        "releaseDay": null,
+        "singleCask": null,
+        "releaseYear": null,
+        "vintageYear": null,
+        "bottlingYear": null,
+        "caskStrength": null,
+        "releaseMonth": null,
+        "familyContext": {
+          "siblingBottles": []
+        }
+      },
+      {
+        "abv": null,
+        "brand": "Pike Creek",
+        "score": 48.478226,
+        "series": null,
+        "source": ["text"],
+        "bottler": null,
+        "edition": null,
+        "outturn": null,
+        "bottleId": 14000,
+        "category": "single_grain",
+        "fullName": "Pike Creek 21-year-old European Oak Finish",
+        "reference": null,
+        "statedAge": 21,
+        "caskNumber": null,
+        "comparison": {
+          "missing": ["abv", "caskStrength", "singleCask", "bottler"],
+          "conflicts": ["category", "brand"],
+          "agreements": ["statedAge"]
+        },
+        "distillery": [],
+        "maturation": null,
+        "releaseDay": null,
+        "singleCask": null,
+        "releaseYear": null,
+        "vintageYear": null,
+        "bottlingYear": null,
+        "caskStrength": null,
+        "releaseMonth": null,
+        "familyContext": {
+          "siblingBottles": []
+        }
+      },
+      {
+        "abv": null,
+        "brand": "Barrell Craft Spirits",
+        "score": 48.194508,
+        "series": null,
+        "source": ["text"],
+        "bottler": null,
+        "edition": null,
+        "outturn": null,
+        "bottleId": 39658,
+        "category": "bourbon",
+        "fullName": "Barrell Dovetail",
+        "reference": null,
+        "statedAge": null,
+        "caskNumber": null,
+        "comparison": {
+          "missing": [
+            "statedAge",
+            "abv",
+            "caskStrength",
+            "singleCask",
+            "bottler"
+          ],
+          "conflicts": ["brand"],
+          "agreements": ["category"]
+        },
+        "distillery": [],
+        "maturation": null,
+        "releaseDay": null,
+        "singleCask": null,
+        "releaseYear": null,
+        "vintageYear": null,
+        "bottlingYear": null,
+        "caskStrength": null,
+        "releaseMonth": null,
+        "familyContext": {
+          "siblingBottles": []
+        }
+      },
+      {
+        "abv": null,
+        "brand": "Barrell Craft Spirits",
+        "score": 47.0285,
+        "series": null,
+        "source": ["text"],
+        "bottler": null,
+        "edition": null,
+        "outturn": null,
+        "bottleId": 39665,
+        "category": "bourbon",
+        "fullName": "Barrell Armida",
+        "reference": null,
+        "statedAge": null,
+        "caskNumber": null,
+        "comparison": {
+          "missing": [
+            "statedAge",
+            "abv",
+            "caskStrength",
+            "singleCask",
+            "bottler"
+          ],
+          "conflicts": ["brand"],
+          "agreements": ["category"]
+        },
+        "distillery": [],
+        "maturation": null,
+        "releaseDay": null,
+        "singleCask": null,
+        "releaseYear": null,
+        "vintageYear": null,
+        "bottlingYear": null,
+        "caskStrength": null,
+        "releaseMonth": null,
+        "familyContext": {
+          "siblingBottles": []
+        }
+      },
+      {
+        "abv": 53.5,
+        "brand": "Mary Dowling",
+        "score": 45.72204,
+        "series": null,
+        "source": ["text"],
+        "bottler": null,
+        "edition": null,
+        "outturn": null,
+        "bottleId": 64183,
+        "category": "bourbon",
+        "fullName": "Mary Dowling Toasted Double Oak Barrel",
+        "reference": null,
+        "statedAge": null,
+        "caskNumber": null,
+        "comparison": {
+          "missing": ["statedAge", "singleCask", "bottler"],
+          "conflicts": ["abv", "brand"],
+          "agreements": ["category", "caskStrength"]
+        },
+        "distillery": [],
+        "maturation": null,
+        "releaseDay": null,
+        "singleCask": null,
+        "releaseYear": null,
+        "vintageYear": null,
+        "bottlingYear": null,
+        "caskStrength": true,
+        "releaseMonth": null,
+        "familyContext": {
+          "siblingBottles": []
+        }
+      },
+      {
+        "abv": null,
+        "brand": "Orphan Barrel",
+        "score": 45.60237,
+        "series": null,
+        "source": ["text"],
+        "bottler": null,
+        "edition": null,
+        "outturn": null,
+        "bottleId": 16179,
+        "category": "bourbon",
+        "fullName": "Orphan Barrel Rhetoric 21-year-old",
+        "reference": null,
+        "statedAge": 21,
+        "caskNumber": null,
+        "comparison": {
+          "missing": ["abv", "caskStrength", "singleCask", "bottler"],
+          "conflicts": ["brand"],
+          "agreements": ["statedAge"]
+        },
+        "distillery": [],
+        "maturation": null,
+        "releaseDay": null,
+        "singleCask": null,
+        "releaseYear": null,
+        "vintageYear": null,
+        "bottlingYear": null,
+        "caskStrength": null,
+        "releaseMonth": null,
+        "familyContext": {
+          "siblingBottles": []
+        }
+      },
+      {
+        "abv": null,
+        "brand": "Barrell Craft Spirits",
+        "score": 45.436413,
+        "series": null,
+        "source": ["text"],
+        "bottler": null,
+        "edition": null,
+        "outturn": null,
+        "bottleId": 44089,
+        "category": "bourbon",
+        "fullName": "Barrell Bourbon",
+        "reference": null,
+        "statedAge": null,
+        "caskNumber": null,
+        "comparison": {
+          "missing": [
+            "statedAge",
+            "abv",
+            "caskStrength",
+            "singleCask",
+            "bottler"
+          ],
+          "conflicts": ["brand"],
+          "agreements": ["category"]
+        },
+        "distillery": [],
+        "maturation": null,
+        "releaseDay": null,
+        "singleCask": null,
+        "releaseYear": null,
+        "vintageYear": null,
+        "bottlingYear": null,
+        "caskStrength": null,
+        "releaseMonth": null,
+        "familyContext": {
+          "siblingBottles": [
+            {
+              "abv": null,
+              "edition": "Batch 34",
+              "outturn": null,
+              "bottleId": 45113,
+              "fullName": "Barrell Bourbon - Batch 34",
+              "statedAge": null,
+              "caskNumber": null,
+              "maturation": null,
+              "releaseDay": null,
+              "singleCask": null,
+              "releaseYear": null,
+              "traitFields": ["edition"],
+              "vintageYear": null,
+              "bottlingYear": null,
+              "caskStrength": null,
+              "releaseMonth": null
+            }
+          ]
+        }
+      },
+      {
+        "abv": null,
+        "brand": "The Antiquary",
+        "score": 44.254524,
+        "series": null,
+        "source": ["text"],
+        "bottler": null,
+        "edition": null,
+        "outturn": null,
+        "bottleId": 17807,
+        "category": "blend",
+        "fullName": "The Antiquary 21-year-old",
+        "reference": null,
+        "statedAge": 21,
+        "caskNumber": null,
+        "comparison": {
+          "missing": ["abv", "caskStrength", "singleCask", "bottler"],
+          "conflicts": ["brand"],
+          "agreements": ["statedAge"]
+        },
+        "distillery": [],
+        "maturation": null,
+        "releaseDay": null,
+        "singleCask": null,
+        "releaseYear": null,
+        "vintageYear": null,
+        "bottlingYear": null,
+        "caskStrength": null,
+        "releaseMonth": null,
+        "familyContext": {
+          "siblingBottles": []
+        }
+      },
+      {
+        "abv": null,
+        "brand": "Woodford Reserve",
+        "score": 44.208176,
+        "series": null,
+        "source": ["text"],
+        "bottler": null,
+        "edition": null,
+        "outturn": null,
+        "bottleId": 43962,
+        "category": "bourbon",
+        "fullName": "Woodford Reserve Master's Collection Sweet Oak (Series No. 21)",
+        "reference": null,
+        "statedAge": null,
+        "caskNumber": null,
+        "comparison": {
+          "missing": [
+            "statedAge",
+            "abv",
+            "caskStrength",
+            "singleCask",
+            "bottler"
+          ],
+          "conflicts": ["brand"],
+          "agreements": ["category"]
+        },
+        "distillery": [],
+        "maturation": null,
+        "releaseDay": null,
+        "singleCask": null,
+        "releaseYear": null,
+        "vintageYear": null,
+        "bottlingYear": null,
+        "caskStrength": null,
+        "releaseMonth": null,
+        "familyContext": {
+          "siblingBottles": []
+        }
+      },
+      {
+        "abv": null,
+        "brand": "Glengoyne",
+        "score": 43.822464,
+        "series": null,
+        "source": ["text"],
+        "bottler": null,
+        "edition": null,
+        "outturn": null,
+        "bottleId": 847,
+        "category": "single_malt",
+        "fullName": "Glengoyne 21-year-old",
+        "reference": null,
+        "statedAge": 21,
+        "caskNumber": null,
+        "comparison": {
+          "missing": ["abv", "caskStrength", "singleCask", "bottler"],
+          "conflicts": ["brand"],
+          "agreements": ["statedAge"]
+        },
+        "distillery": ["Glengoyne"],
+        "maturation": null,
+        "releaseDay": null,
+        "singleCask": null,
+        "releaseYear": null,
+        "vintageYear": null,
+        "bottlingYear": null,
+        "caskStrength": null,
+        "releaseMonth": null,
+        "familyContext": {
+          "siblingBottles": []
+        }
+      },
+      {
+        "abv": null,
+        "brand": "Inchmurrin",
+        "score": 43.822464,
+        "series": null,
+        "source": ["text"],
+        "bottler": null,
+        "edition": null,
+        "outturn": null,
+        "bottleId": 16884,
+        "category": "single_malt",
+        "fullName": "Inchmurrin 21-year-old",
+        "reference": null,
+        "statedAge": 21,
+        "caskNumber": null,
+        "comparison": {
+          "missing": ["abv", "caskStrength", "singleCask", "bottler"],
+          "conflicts": ["brand"],
+          "agreements": ["statedAge"]
+        },
+        "distillery": [],
+        "maturation": null,
+        "releaseDay": null,
+        "singleCask": null,
+        "releaseYear": null,
+        "vintageYear": null,
+        "bottlingYear": null,
+        "caskStrength": null,
+        "releaseMonth": null,
+        "familyContext": {
+          "siblingBottles": []
+        }
+      },
+      {
+        "abv": null,
+        "brand": "Kilbeggan",
+        "score": 43.822464,
+        "series": null,
+        "source": ["text"],
+        "bottler": null,
+        "edition": null,
+        "outturn": null,
+        "bottleId": 16323,
+        "category": "blend",
+        "fullName": "Kilbeggan 21-year-old",
+        "reference": null,
+        "statedAge": 21,
+        "caskNumber": null,
+        "comparison": {
+          "missing": ["abv", "caskStrength", "singleCask", "bottler"],
+          "conflicts": ["brand"],
+          "agreements": ["statedAge"]
+        },
+        "distillery": [],
+        "maturation": null,
+        "releaseDay": null,
+        "singleCask": null,
+        "releaseYear": null,
+        "vintageYear": null,
+        "bottlingYear": null,
+        "caskStrength": null,
+        "releaseMonth": null,
+        "familyContext": {
+          "siblingBottles": []
+        }
+      },
+      {
+        "abv": null,
+        "brand": "Tomintoul",
+        "score": 43.822464,
+        "series": null,
+        "source": ["text"],
+        "bottler": null,
+        "edition": null,
+        "outturn": null,
+        "bottleId": 13299,
+        "category": "single_malt",
+        "fullName": "Tomintoul 21-year-old",
+        "reference": null,
+        "statedAge": 21,
+        "caskNumber": null,
+        "comparison": {
+          "missing": ["abv", "caskStrength", "singleCask", "bottler"],
+          "conflicts": ["brand"],
+          "agreements": ["statedAge"]
+        },
+        "distillery": ["Tomintoul"],
+        "maturation": null,
+        "releaseDay": null,
+        "singleCask": null,
+        "releaseYear": null,
+        "vintageYear": null,
+        "bottlingYear": null,
+        "caskStrength": null,
+        "releaseMonth": null,
+        "familyContext": {
+          "siblingBottles": []
+        }
+      },
+      {
+        "abv": null,
+        "brand": "The Glenlivet",
+        "score": 43.430084,
+        "series": null,
+        "source": ["text"],
+        "bottler": null,
+        "edition": null,
+        "outturn": null,
+        "bottleId": 5077,
+        "category": "single_malt",
+        "fullName": "The Glenlivet 21-year-old Archive",
+        "reference": null,
+        "statedAge": 21,
+        "caskNumber": null,
+        "comparison": {
+          "missing": ["abv", "caskStrength", "singleCask", "bottler"],
+          "conflicts": ["brand"],
+          "agreements": ["statedAge"]
+        },
+        "distillery": ["The Glenlivet"],
+        "maturation": null,
+        "releaseDay": null,
+        "singleCask": null,
+        "releaseYear": null,
+        "vintageYear": null,
+        "bottlingYear": null,
+        "caskStrength": null,
+        "releaseMonth": null,
+        "familyContext": {
+          "siblingBottles": []
+        }
+      },
+      {
+        "abv": null,
+        "brand": "Barrowman's",
+        "score": 43.007187,
+        "series": null,
+        "source": ["text"],
+        "bottler": null,
+        "edition": "",
+        "outturn": null,
+        "bottleId": 43344,
+        "category": "blend",
+        "fullName": "Barrowman's 21-year-old",
+        "reference": null,
+        "statedAge": 21,
+        "caskNumber": null,
+        "comparison": {
+          "missing": ["abv", "caskStrength", "singleCask", "bottler"],
+          "conflicts": ["brand"],
+          "agreements": ["statedAge"]
+        },
+        "distillery": [],
+        "maturation": null,
+        "releaseDay": null,
+        "singleCask": null,
+        "releaseYear": null,
+        "vintageYear": null,
+        "bottlingYear": null,
+        "caskStrength": null,
+        "releaseMonth": null,
+        "familyContext": {
+          "siblingBottles": []
+        }
+      },
+      {
+        "abv": null,
+        "brand": "Bushmills",
+        "score": 42.94543,
+        "series": null,
+        "source": ["text"],
+        "bottler": null,
+        "edition": null,
+        "outturn": null,
+        "bottleId": 41261,
+        "category": "single_malt",
+        "fullName": "Bushmills 21-year-old",
+        "reference": null,
+        "statedAge": 21,
+        "caskNumber": null,
+        "comparison": {
+          "missing": ["abv", "caskStrength", "singleCask", "bottler"],
+          "conflicts": ["brand"],
+          "agreements": ["statedAge"]
+        },
+        "distillery": ["Bushmills"],
+        "maturation": null,
+        "releaseDay": null,
+        "singleCask": null,
+        "releaseYear": null,
+        "vintageYear": null,
+        "bottlingYear": null,
+        "caskStrength": null,
+        "releaseMonth": null,
+        "familyContext": {
+          "siblingBottles": [
+            {
+              "abv": null,
+              "edition": null,
+              "outturn": null,
+              "bottleId": 4756,
+              "fullName": "Bushmills 21-year-old Rare - Matured in Three Woods",
+              "statedAge": 21,
+              "caskNumber": null,
+              "maturation": null,
+              "releaseDay": null,
+              "singleCask": null,
+              "releaseYear": null,
+              "traitFields": ["statedAge"],
+              "vintageYear": null,
+              "bottlingYear": null,
+              "caskStrength": null,
+              "releaseMonth": null
+            }
+          ]
+        }
+      },
+      {
+        "abv": null,
+        "brand": "Aberfeldy",
+        "score": 42.378212,
+        "series": null,
+        "source": ["text"],
+        "bottler": null,
+        "edition": null,
+        "outturn": null,
+        "bottleId": 42866,
+        "category": "single_malt",
+        "fullName": "Aberfeldy 21-year-old",
+        "reference": null,
+        "statedAge": 21,
+        "caskNumber": null,
+        "comparison": {
+          "missing": ["abv", "caskStrength", "singleCask", "bottler"],
+          "conflicts": ["brand"],
+          "agreements": ["statedAge"]
+        },
+        "distillery": ["Aberfeldy"],
+        "maturation": null,
+        "releaseDay": null,
+        "singleCask": null,
+        "releaseYear": null,
+        "vintageYear": null,
+        "bottlingYear": null,
+        "caskStrength": null,
+        "releaseMonth": null,
+        "familyContext": {
+          "siblingBottles": []
+        }
+      },
+      {
+        "abv": null,
+        "brand": "Hirsch",
+        "score": 42.33283,
+        "series": null,
+        "source": ["text"],
+        "bottler": null,
+        "edition": null,
+        "outturn": null,
+        "bottleId": 18306,
+        "category": "rye",
+        "fullName": "Hirsch Rye, 21-year-old",
+        "reference": null,
+        "statedAge": 21,
+        "caskNumber": null,
+        "comparison": {
+          "missing": ["abv", "caskStrength", "singleCask", "bottler"],
+          "conflicts": ["brand"],
+          "agreements": ["statedAge"]
+        },
+        "distillery": [],
+        "maturation": null,
+        "releaseDay": null,
+        "singleCask": null,
+        "releaseYear": null,
+        "vintageYear": null,
+        "bottlingYear": null,
+        "caskStrength": null,
+        "releaseMonth": null,
+        "familyContext": {
+          "siblingBottles": []
+        }
+      },
+      {
+        "abv": null,
+        "brand": "Rittenhouse",
+        "score": 42.33283,
+        "series": null,
+        "source": ["text"],
+        "bottler": null,
+        "edition": null,
+        "outturn": null,
+        "bottleId": 18298,
+        "category": "rye",
+        "fullName": "Rittenhouse Rye 21-year-old",
+        "reference": null,
+        "statedAge": 21,
+        "caskNumber": null,
+        "comparison": {
+          "missing": ["abv", "caskStrength", "singleCask", "bottler"],
+          "conflicts": ["brand"],
+          "agreements": ["statedAge"]
+        },
+        "distillery": [],
+        "maturation": null,
+        "releaseDay": null,
+        "singleCask": null,
+        "releaseYear": null,
+        "vintageYear": null,
+        "bottlingYear": null,
+        "caskStrength": null,
+        "releaseMonth": null,
+        "familyContext": {
+          "siblingBottles": []
+        }
+      },
+      {
+        "abv": null,
+        "brand": "Vintage",
+        "score": 42.33283,
+        "series": null,
+        "source": ["text"],
+        "bottler": null,
+        "edition": null,
+        "outturn": null,
+        "bottleId": 18464,
+        "category": "bourbon",
+        "fullName": "Vintage Bourbon, 21-year-old",
+        "reference": null,
+        "statedAge": 21,
+        "caskNumber": null,
+        "comparison": {
+          "missing": ["abv", "caskStrength", "singleCask", "bottler"],
+          "conflicts": ["brand"],
+          "agreements": ["statedAge"]
+        },
+        "distillery": [],
+        "maturation": null,
+        "releaseDay": null,
+        "singleCask": null,
+        "releaseYear": null,
+        "vintageYear": null,
+        "bottlingYear": null,
+        "caskStrength": null,
+        "releaseMonth": null,
+        "familyContext": {
+          "siblingBottles": []
+        }
+      },
+      {
+        "abv": null,
+        "brand": "Vintage",
+        "score": 42.33283,
+        "series": null,
+        "source": ["text"],
+        "bottler": null,
+        "edition": null,
+        "outturn": null,
+        "bottleId": 18290,
+        "category": "rye",
+        "fullName": "Vintage Rye, 21-year-old",
+        "reference": null,
+        "statedAge": 21,
+        "caskNumber": null,
+        "comparison": {
+          "missing": ["abv", "caskStrength", "singleCask", "bottler"],
+          "conflicts": ["brand"],
+          "agreements": ["statedAge"]
+        },
+        "distillery": [],
+        "maturation": null,
+        "releaseDay": null,
+        "singleCask": null,
+        "releaseYear": null,
+        "vintageYear": null,
+        "bottlingYear": null,
+        "caskStrength": null,
+        "releaseMonth": null,
+        "familyContext": {
+          "siblingBottles": []
+        }
+      },
+      {
+        "abv": null,
+        "brand": "The Glenlivet",
+        "score": 42.2823,
+        "series": null,
+        "source": ["text"],
+        "bottler": null,
+        "edition": null,
+        "outturn": null,
+        "bottleId": 19268,
+        "category": "single_malt",
+        "fullName": "The Glenlivet Archive 21-year-old",
+        "reference": null,
+        "statedAge": 21,
+        "caskNumber": null,
+        "comparison": {
+          "missing": ["abv", "caskStrength", "singleCask", "bottler"],
+          "conflicts": ["brand"],
+          "agreements": ["statedAge"]
+        },
+        "distillery": ["The Glenlivet"],
+        "maturation": null,
+        "releaseDay": null,
+        "singleCask": null,
+        "releaseYear": null,
+        "vintageYear": null,
+        "bottlingYear": null,
+        "caskStrength": null,
+        "releaseMonth": null,
+        "familyContext": {
+          "siblingBottles": []
+        }
+      }
+    ]
+  },
+  "context": {
+    "inspectedBottleIds": [64375],
+    "bottleContexts": [
+      {
+        "exact": {
+          "abv": 50.29,
+          "edition": null,
+          "outturn": null,
+          "statedAge": null,
+          "caskNumber": null,
+          "maturation": null,
+          "releaseDay": null,
+          "singleCask": null,
+          "releaseYear": 2022,
+          "vintageYear": null,
+          "bottlingYear": null,
+          "caskStrength": null,
+          "releaseMonth": null
+        },
+        "shared": {
+          "name": "Bourbon",
+          "brand": {
+            "name": "Barrell Craft Spirits",
+            "entityId": 75635
+          },
+          "series": {
+            "name": "Gray Label",
+            "seriesId": 783
+          },
+          "bottler": {
+            "name": "Barrell Craft Spirits",
+            "entityId": 75635
+          },
+          "category": "bourbon",
+          "statedAge": null,
+          "distillers": []
+        },
+        "groupId": 37336,
+        "bottleId": 64375,
+        "fullName": "Barrell Bourbon",
+        "siblings": [],
+        "references": [
+          {
+            "name": "Barrell Craft Spirits",
+            "ignored": false
+          },
+          {
+            "name": "Barrell Craft Spirits (2022 Release), 50.29%",
+            "ignored": false
+          }
+        ],
+        "observations": [],
+        "imageSources": []
+      }
+    ],
+    "inspectedEntities": [
+      {
+        "kind": "bottler",
+        "name": "Barrell Craft Spirits",
+        "score": 1,
+        "source": ["exact", "text", "prefix", "contained"],
+        "entityId": 75635,
+        "reference": "Barrell Bourbon",
+        "shortName": "Barrell",
+        "retrievedFor": [
+          {
+            "exact": true,
+            "query": "Barrell"
+          },
+          {
+            "exact": true,
+            "query": "Barrell Craft Spirits"
+          },
+          {
+            "query": "Orphan Barrel"
+          }
+        ]
+      },
+      {
+        "kind": "brand",
+        "name": "Orphan Barrel",
+        "score": 1,
+        "source": ["exact", "text", "prefix", "contained"],
+        "entityId": 6081,
+        "reference": "Orphan Barrel",
+        "shortName": null,
+        "retrievedFor": [
+          {
+            "exact": true,
+            "query": "Orphan Barrel"
+          }
+        ]
+      },
+      {
+        "kind": "brand",
+        "name": "The Antiquary",
+        "score": 1,
+        "source": ["exact", "text", "prefix", "contained"],
+        "entityId": 1401,
+        "reference": "The Antiquary",
+        "shortName": null,
+        "retrievedFor": [
+          {
+            "exact": true,
+            "query": "The Antiquary"
+          }
+        ]
+      },
+      {
+        "kind": "distillery",
+        "name": "Glengoyne",
+        "score": 1,
+        "source": ["exact", "text", "prefix", "contained"],
+        "entityId": 979,
+        "reference": "Glengoyne",
+        "shortName": null,
+        "retrievedFor": [
+          {
+            "exact": true,
+            "query": "Glengoyne"
+          }
+        ]
+      },
+      {
+        "kind": "brand",
+        "name": "Inchmurrin",
+        "score": 1,
+        "source": ["exact", "text", "prefix", "contained"],
+        "entityId": 1053,
+        "reference": "Inchmurrin",
+        "shortName": "",
+        "retrievedFor": [
+          {
+            "exact": true,
+            "query": "Inchmurrin"
+          }
+        ]
+      },
+      {
+        "kind": "brand",
+        "name": "Kilbeggan",
+        "score": 1,
+        "source": ["exact", "text", "prefix", "contained"],
+        "entityId": 170,
+        "reference": "Kilbeggan",
+        "shortName": null,
+        "retrievedFor": [
+          {
+            "exact": true,
+            "query": "Kilbeggan"
+          }
+        ]
+      },
+      {
+        "kind": "distillery",
+        "name": "Tomintoul",
+        "score": 1,
+        "source": ["exact", "text", "prefix", "contained"],
+        "entityId": 174,
+        "reference": "Tomintoul",
+        "shortName": null,
+        "retrievedFor": [
+          {
+            "exact": true,
+            "query": "Tomintoul"
+          }
+        ]
+      },
+      {
+        "kind": "distillery",
+        "name": "The Glenlivet",
+        "score": 1,
+        "source": ["exact", "text", "prefix", "contained"],
+        "entityId": 244,
+        "reference": "The Glenlivet",
+        "shortName": null,
+        "retrievedFor": [
+          {
+            "exact": true,
+            "query": "The Glenlivet"
+          }
+        ]
+      },
+      {
+        "kind": "brand",
+        "name": "Barrowman's",
+        "score": 1,
+        "source": ["exact", "text", "prefix", "contained"],
+        "entityId": 192489,
+        "reference": null,
+        "shortName": null,
+        "retrievedFor": [
+          {
+            "exact": true,
+            "query": "Barrowman's"
+          }
+        ]
+      },
+      {
+        "kind": "distillery",
+        "name": "Bushmills",
+        "score": 1,
+        "source": ["exact", "text", "prefix", "contained"],
+        "entityId": 102,
+        "reference": "Bushmills",
+        "shortName": "",
+        "retrievedFor": [
+          {
+            "exact": true,
+            "query": "Bushmills"
+          }
+        ]
+      },
+      {
+        "kind": "distillery",
+        "name": "Aberfeldy",
+        "score": 1,
+        "source": ["exact", "text", "prefix", "contained"],
+        "entityId": 42,
+        "reference": "Aberfeldy",
+        "shortName": null,
+        "retrievedFor": [
+          {
+            "exact": true,
+            "query": "Aberfeldy"
+          }
+        ]
+      },
+      {
+        "kind": "brand",
+        "name": "Hirsch",
+        "score": 1,
+        "source": ["exact", "text", "prefix", "contained"],
+        "entityId": 1035,
+        "reference": "Hirsch",
+        "shortName": null,
+        "retrievedFor": [
+          {
+            "exact": true,
+            "query": "Hirsch"
+          }
+        ]
+      },
+      {
+        "kind": "brand",
+        "name": "Rittenhouse",
+        "score": 1,
+        "source": ["exact", "text", "prefix", "contained"],
+        "entityId": 1292,
+        "reference": "Rittenhouse",
+        "shortName": null,
+        "retrievedFor": [
+          {
+            "exact": true,
+            "query": "Rittenhouse"
+          }
+        ]
+      },
+      {
+        "kind": "brand",
+        "name": "Barrell Rye",
+        "score": 0.5,
+        "source": ["text", "prefix"],
+        "entityId": 37,
+        "reference": "Barrell Rye",
+        "shortName": null,
+        "retrievedFor": [
+          {
+            "query": "Barrell"
+          }
+        ]
+      },
+      {
+        "kind": "brand",
+        "name": "Barrell Whiskey",
+        "score": 0.5,
+        "source": ["text", "prefix"],
+        "entityId": 391,
+        "reference": "Barrell Whiskey",
+        "shortName": null,
+        "retrievedFor": [
+          {
+            "query": "Barrell"
+          }
+        ]
+      },
+      {
+        "kind": "distillery",
+        "name": "Kilbeggan Distillery",
+        "score": 0.5,
+        "source": ["text", "prefix"],
+        "entityId": 1781,
+        "reference": "Kilbeggan Distillery",
+        "shortName": "",
+        "retrievedFor": [
+          {
+            "query": "Kilbeggan"
+          }
+        ]
+      },
+      {
+        "kind": "brand",
+        "name": "Hirsch Selection",
+        "score": 0.5,
+        "source": ["text", "prefix"],
+        "entityId": 3045,
+        "reference": "Hirsch Selection",
+        "shortName": null,
+        "retrievedFor": [
+          {
+            "query": "Hirsch"
+          }
+        ]
+      },
+      {
+        "kind": "distillery",
+        "name": "The Macallan",
+        "score": 0.2,
+        "source": ["text"],
+        "entityId": 1157,
+        "reference": null,
+        "shortName": null,
+        "retrievedFor": [
+          {
+            "query": "The Glenlivet"
+          }
+        ]
+      },
+      {
+        "kind": "brand",
+        "name": "A.H. Hirsch",
+        "score": 0.2,
+        "source": ["text"],
+        "entityId": 2045,
+        "reference": null,
+        "shortName": null,
+        "retrievedFor": [
+          {
+            "query": "Hirsch"
+          }
+        ]
+      }
+    ],
+    "inspectedSeries": []
+  },
+  "provenance": {
+    "source": "production_miss",
+    "verifiedSourceUrls": [
+      "https://whiskyadvocate.com/Barrell-21-year-old-Toasted-Single-Barrel-Extra-Strength-62-2",
+      "https://thewhiskeywash.com/whiskey-news/barrell-craft-spirits-launches-21-year-toasted-single-barrel-bourbon/",
+      "https://distiller.com/spirits/barrell-bourbon-21-year-toasted-single-barrel"
+    ],
+    "dbOutcome": {
+      "bottleId": null,
+      "createsBottle": false,
+      "summary": "Production returned no_match."
+    },
+    "notes": "Captured from saved classifier run 29604 (review 18983, model openai/gpt-6-luna, 2026-10-28T08:21:43.134Z). Production rationale: The producer identifies a 21 Year Toasted Single Barrel bourbon, but its stated proof does not resolve the reference's different ABV. No inspected local Bottle represents this exact release; the plausible Barrell candidate is a different Gray Label Bourbon. Do not create or assign a Bottle while the identity-critical ABV conflict remains unresolved. Checked 2026-11-03. Barrell released 108 bottles of the 21 Year Toasted Single Barrel on December 9, at $199.99; Distiller lists 62.28% ABV, and production's own rationale cites the producer's 124.56 proof. Whisky Advocate (Fall 2026, 93 points) prints 62.2%. Catalog search 'Barrell Toasted' returns 47441 (20-year-old Toasted, 54.88%), 58111 Toasted Vantage, and 43942, none of which is this release. The expectation does not pin the exact ABV value, because the source prints 62.2 and the producer 62.28."
+  },
+  "expected": {
+    "status": "classified",
+    "action": "create_bottle",
+    "identityScope": "exact_cask",
+    "proposedBottle": {
+      "brand": {
+        "id": 75635,
+        "name": "Barrell Craft Spirits"
+      },
+      "statedAge": 21,
+      "category": "bourbon",
+      "singleCask": true
+    },
+    "proposedBottleNameIncludes": ["Toasted"],
+    "proposedBottleNameExcludes": ["62"],
+    "summary": "Whisky Advocate's 62.2% is the producer's 124.56 proof (62.28%) rounded down, not a different release. No local Bottle covers the 21-year-old Toasted Single Barrel (Bottle 47441 is the 20-year-old at 54.88%; 64375 is a Gray Label blend), so create it. Keep ABV out of the name."
+  }
+}

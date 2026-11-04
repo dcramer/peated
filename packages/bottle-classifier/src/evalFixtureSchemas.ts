@@ -225,6 +225,25 @@ function validateExplicitBottleContextCoverage({
   }
 }
 
+/**
+ * Marks a case whose expected answer is right but the classifier does not
+ * reach yet. Default eval runs leave it out, so the pass rate covers only cases
+ * expected to pass; the change that fixes it removes the mark.
+ */
+export const classifierEvalKnownFailureSchema = z
+  .object({
+    reason: z
+      .string()
+      .min(1)
+      .describe("Why the classifier misses this case today."),
+    fixedBy: z
+      .string()
+      .min(1)
+      .optional()
+      .describe("The change expected to fix it, such as a pull request."),
+  })
+  .strict();
+
 export const classifierEvalFixtureSchema = z
   .object({
     id: z.string().min(1),
@@ -249,6 +268,7 @@ export const classifierEvalFixtureSchema = z
     }),
     provenance: evalFixtureProvenanceSchema.optional(),
     expected: classifierEvalExpectationSchema,
+    knownFailure: classifierEvalKnownFailureSchema.optional(),
   })
   .strict()
   .superRefine((value, ctx) => {

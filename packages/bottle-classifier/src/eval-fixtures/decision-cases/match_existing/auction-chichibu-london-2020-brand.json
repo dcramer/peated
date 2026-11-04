@@ -1,0 +1,1209 @@
+{
+  "id": "auction-chichibu-london-2020-brand",
+  "name": "auction lot: 'Ichiro's Malt' in retailer titles does not conflict with Chichibu as the Brand of London Edition 2020",
+  "input": {
+    "reference": {
+      "id": 14580,
+      "url": "https://www.scotchwhiskyauctions.com/auctions/234-the-185th-auction/907361-chichibu-london-edition-2020/",
+      "name": "Chichibu London Edition 2020",
+      "imageUrl": null,
+      "externalSiteId": 28097,
+      "currentBottleId": null
+    },
+    "extractedIdentity": {
+      "abv": 53.5,
+      "brand": null,
+      "series": null,
+      "bottler": null,
+      "edition": null,
+      "outturn": 1736,
+      "category": null,
+      "distillery": null,
+      "expression": null,
+      "maturation": null,
+      "stated_age": null,
+      "cask_number": null,
+      "single_cask": null,
+      "release_year": null,
+      "vintage_year": null,
+      "cask_strength": null
+    },
+    "imageEvidence": null,
+    "initialCandidates": [
+      {
+        "abv": 53.5,
+        "brand": "Chichibu",
+        "score": 76.64942,
+        "series": null,
+        "source": ["text", "context"],
+        "bottler": null,
+        "edition": "2020",
+        "outturn": 1736,
+        "bottleId": 58518,
+        "category": "single_malt",
+        "fullName": "Chichibu London Edition - 2020",
+        "reference": null,
+        "statedAge": null,
+        "caskNumber": null,
+        "comparison": {
+          "missing": [],
+          "conflicts": [],
+          "agreements": ["abv"]
+        },
+        "distillery": ["Chichibu"],
+        "maturation": "Bourbon and ex-peated whisky casks, including casks fitted with Mizunara oak heads",
+        "releaseDay": null,
+        "singleCask": false,
+        "releaseYear": 2020,
+        "vintageYear": null,
+        "bottlingYear": null,
+        "caskStrength": null,
+        "releaseMonth": null,
+        "familyContext": {
+          "siblingBottles": []
+        }
+      },
+      {
+        "abv": 50.5,
+        "brand": "Ichiro's Malt",
+        "score": 74.36549,
+        "series": null,
+        "source": ["text", "brand", "brand_coverage"],
+        "bottler": null,
+        "edition": "2026",
+        "outturn": 2220,
+        "bottleId": 68375,
+        "category": "single_malt",
+        "fullName": "Ichiro's Chichibu London Edition - 2026",
+        "reference": null,
+        "statedAge": null,
+        "caskNumber": null,
+        "comparison": {
+          "missing": [],
+          "conflicts": ["abv", "releaseYear", "edition"],
+          "agreements": ["category", "singleCask", "brand", "distillers"]
+        },
+        "distillery": ["Chichibu"],
+        "maturation": null,
+        "releaseDay": null,
+        "singleCask": false,
+        "releaseYear": 2026,
+        "vintageYear": null,
+        "bottlingYear": null,
+        "caskStrength": null,
+        "releaseMonth": null,
+        "familyContext": {
+          "siblingBottles": []
+        }
+      },
+      {
+        "abv": 48.5,
+        "brand": "Ichiro's Malt",
+        "score": 74.36549,
+        "series": null,
+        "source": ["text", "brand", "brand_coverage"],
+        "bottler": null,
+        "edition": "2019",
+        "outturn": 1405,
+        "bottleId": 68731,
+        "category": "single_malt",
+        "fullName": "Ichiro's Chichibu London Edition - 2019",
+        "reference": null,
+        "statedAge": null,
+        "caskNumber": null,
+        "comparison": {
+          "missing": ["singleCask"],
+          "conflicts": ["abv", "releaseYear", "edition"],
+          "agreements": ["category", "brand", "distillers"]
+        },
+        "distillery": ["Chichibu"],
+        "maturation": null,
+        "releaseDay": null,
+        "singleCask": null,
+        "releaseYear": 2019,
+        "vintageYear": null,
+        "bottlingYear": null,
+        "caskStrength": null,
+        "releaseMonth": null,
+        "familyContext": {
+          "siblingBottles": []
+        }
+      },
+      {
+        "abv": null,
+        "brand": "Ichiro's Malt",
+        "score": 61.087128,
+        "series": null,
+        "source": ["text", "vector", "brand_coverage"],
+        "bottler": null,
+        "edition": null,
+        "outturn": null,
+        "bottleId": 44058,
+        "category": "single_malt",
+        "fullName": "Ichiro's Chichibu Peated The U.S. Edition",
+        "reference": "Chichibu Ichiro's Malt Peated U.S. Edition (2020 Release)",
+        "statedAge": null,
+        "caskNumber": null,
+        "comparison": {
+          "missing": ["abv"],
+          "conflicts": [],
+          "agreements": []
+        },
+        "distillery": ["Chichibu"],
+        "maturation": null,
+        "releaseDay": null,
+        "singleCask": null,
+        "releaseYear": null,
+        "vintageYear": null,
+        "bottlingYear": null,
+        "caskStrength": null,
+        "releaseMonth": null,
+        "familyContext": {
+          "siblingBottles": [
+            {
+              "abv": 55.5,
+              "edition": "2020",
+              "outturn": 2109,
+              "bottleId": 45078,
+              "fullName": "Ichiro's Chichibu Peated The U.S. Edition - 2020",
+              "statedAge": 5,
+              "caskNumber": null,
+              "maturation": "Bourbon, ex-bourbon, ex-Chibidaru, and ex-wine casks",
+              "releaseDay": null,
+              "singleCask": false,
+              "releaseYear": 2020,
+              "traitFields": [
+                "edition",
+                "statedAge",
+                "releaseYear",
+                "abv",
+                "singleCask"
+              ],
+              "vintageYear": null,
+              "bottlingYear": null,
+              "caskStrength": null,
+              "releaseMonth": null
+            }
+          ]
+        }
+      },
+      {
+        "abv": null,
+        "brand": "Chichibu",
+        "score": 57.544807,
+        "series": null,
+        "source": ["text"],
+        "bottler": null,
+        "edition": null,
+        "outturn": null,
+        "bottleId": 44034,
+        "category": "single_malt",
+        "fullName": "Chichibu Ichiro's Malt",
+        "reference": null,
+        "statedAge": 7,
+        "caskNumber": null,
+        "comparison": {
+          "missing": ["abv", "releaseYear", "singleCask", "edition"],
+          "conflicts": ["brand"],
+          "agreements": ["category", "distillers"]
+        },
+        "distillery": ["Chichibu"],
+        "maturation": null,
+        "releaseDay": null,
+        "singleCask": null,
+        "releaseYear": null,
+        "vintageYear": null,
+        "bottlingYear": null,
+        "caskStrength": null,
+        "releaseMonth": null,
+        "familyContext": {
+          "siblingBottles": [
+            {
+              "abv": null,
+              "edition": "2010",
+              "outturn": null,
+              "bottleId": 45032,
+              "fullName": "Chichibu Ichiro's Malt - 2010",
+              "statedAge": 10,
+              "caskNumber": null,
+              "maturation": null,
+              "releaseDay": null,
+              "singleCask": null,
+              "releaseYear": null,
+              "traitFields": ["edition", "statedAge", "vintageYear"],
+              "vintageYear": 2010,
+              "bottlingYear": null,
+              "caskStrength": null,
+              "releaseMonth": null
+            },
+            {
+              "abv": null,
+              "edition": "2011",
+              "outturn": null,
+              "bottleId": 45031,
+              "fullName": "Chichibu Ichiro's Malt - 2011",
+              "statedAge": 10,
+              "caskNumber": null,
+              "maturation": null,
+              "releaseDay": null,
+              "singleCask": null,
+              "releaseYear": null,
+              "traitFields": ["edition", "statedAge", "vintageYear"],
+              "vintageYear": 2011,
+              "bottlingYear": null,
+              "caskStrength": null,
+              "releaseMonth": null
+            },
+            {
+              "abv": null,
+              "edition": "2013",
+              "outturn": null,
+              "bottleId": 45030,
+              "fullName": "Chichibu Ichiro's Malt - 2013",
+              "statedAge": 7,
+              "caskNumber": null,
+              "maturation": null,
+              "releaseDay": null,
+              "singleCask": null,
+              "releaseYear": null,
+              "traitFields": ["edition", "statedAge", "vintageYear"],
+              "vintageYear": 2013,
+              "bottlingYear": null,
+              "caskStrength": null,
+              "releaseMonth": null
+            }
+          ]
+        }
+      },
+      {
+        "abv": null,
+        "brand": "Chichibu",
+        "score": 54.38956,
+        "series": null,
+        "source": ["text"],
+        "bottler": null,
+        "edition": null,
+        "outturn": null,
+        "bottleId": 4011,
+        "category": "single_malt",
+        "fullName": "Chichibu Ichiro's Malt - Chibidaru",
+        "reference": null,
+        "statedAge": 10,
+        "caskNumber": null,
+        "comparison": {
+          "missing": ["abv", "releaseYear", "singleCask", "edition"],
+          "conflicts": ["brand"],
+          "agreements": ["category", "distillers"]
+        },
+        "distillery": ["Chichibu"],
+        "maturation": null,
+        "releaseDay": null,
+        "singleCask": null,
+        "releaseYear": null,
+        "vintageYear": 2010,
+        "bottlingYear": null,
+        "caskStrength": null,
+        "releaseMonth": null,
+        "familyContext": {
+          "siblingBottles": []
+        }
+      },
+      {
+        "abv": null,
+        "brand": "Chichibu",
+        "score": 52.3398,
+        "series": null,
+        "source": ["text"],
+        "bottler": null,
+        "edition": null,
+        "outturn": null,
+        "bottleId": 4241,
+        "category": "single_malt",
+        "fullName": "Chichibu Ichiro's Malt - Port Pipe",
+        "reference": null,
+        "statedAge": 10,
+        "caskNumber": null,
+        "comparison": {
+          "missing": ["abv", "releaseYear", "singleCask", "edition"],
+          "conflicts": ["brand"],
+          "agreements": ["category", "distillers"]
+        },
+        "distillery": ["Chichibu"],
+        "maturation": null,
+        "releaseDay": null,
+        "singleCask": null,
+        "releaseYear": null,
+        "vintageYear": 2009,
+        "bottlingYear": null,
+        "caskStrength": null,
+        "releaseMonth": null,
+        "familyContext": {
+          "siblingBottles": []
+        }
+      },
+      {
+        "abv": 53.5,
+        "brand": "Chichibu",
+        "score": 51.75966,
+        "series": null,
+        "source": ["text"],
+        "bottler": null,
+        "edition": "2020",
+        "outturn": 701,
+        "bottleId": 58543,
+        "category": "single_malt",
+        "fullName": "Chichibu Taiwan Edition - 2020",
+        "reference": null,
+        "statedAge": null,
+        "caskNumber": null,
+        "comparison": {
+          "missing": [],
+          "conflicts": [],
+          "agreements": ["abv"]
+        },
+        "distillery": ["Chichibu"],
+        "maturation": "Bourbon barrels, Madeira hogsheads and Chibidaru casks",
+        "releaseDay": null,
+        "singleCask": false,
+        "releaseYear": 2020,
+        "vintageYear": null,
+        "bottlingYear": 2020,
+        "caskStrength": null,
+        "releaseMonth": null,
+        "familyContext": {
+          "siblingBottles": []
+        }
+      },
+      {
+        "abv": null,
+        "brand": "Ichiro's Malt",
+        "score": 49.750584,
+        "series": null,
+        "source": ["vector", "text"],
+        "bottler": null,
+        "edition": null,
+        "outturn": null,
+        "bottleId": 44037,
+        "category": "single_malt",
+        "fullName": "Ichiro's Chichibu The U.S. Edition",
+        "reference": "Chichibu Ichiro's Malt - The U.S. Edition 2022 Release",
+        "statedAge": null,
+        "caskNumber": null,
+        "comparison": {
+          "missing": ["abv", "releaseYear", "singleCask", "edition"],
+          "conflicts": [],
+          "agreements": ["category", "brand", "distillers"]
+        },
+        "distillery": ["Chichibu"],
+        "maturation": null,
+        "releaseDay": null,
+        "singleCask": null,
+        "releaseYear": null,
+        "vintageYear": null,
+        "bottlingYear": null,
+        "caskStrength": null,
+        "releaseMonth": null,
+        "familyContext": {
+          "siblingBottles": [
+            {
+              "abv": 55.5,
+              "edition": "2019",
+              "outturn": 1556,
+              "bottleId": 45039,
+              "fullName": "Ichiro's Chichibu The U.S. Edition - 2019",
+              "statedAge": null,
+              "caskNumber": null,
+              "maturation": "Ex-bourbon casks",
+              "releaseDay": null,
+              "singleCask": false,
+              "releaseYear": 2019,
+              "traitFields": ["edition", "releaseYear", "abv", "singleCask"],
+              "vintageYear": null,
+              "bottlingYear": null,
+              "caskStrength": null,
+              "releaseMonth": null
+            },
+            {
+              "abv": 53.5,
+              "edition": "2022",
+              "outturn": 2233,
+              "bottleId": 45038,
+              "fullName": "Ichiro's Chichibu The U.S. Edition - 2022",
+              "statedAge": null,
+              "caskNumber": null,
+              "maturation": "Hogshead, ex-IPA, ex-imperial stout, and ex-hopped cider casks",
+              "releaseDay": null,
+              "singleCask": false,
+              "releaseYear": 2022,
+              "traitFields": ["edition", "releaseYear", "abv", "singleCask"],
+              "vintageYear": null,
+              "bottlingYear": null,
+              "caskStrength": null,
+              "releaseMonth": null
+            }
+          ]
+        }
+      },
+      {
+        "abv": null,
+        "brand": "Ichiro's Malt",
+        "score": 46.902706,
+        "series": null,
+        "source": ["text"],
+        "bottler": null,
+        "edition": null,
+        "outturn": null,
+        "bottleId": 16190,
+        "category": "single_malt",
+        "fullName": "Ichiro's Malt Peated (distilled at Chichibu)",
+        "reference": null,
+        "statedAge": null,
+        "caskNumber": null,
+        "comparison": {
+          "missing": [
+            "abv",
+            "releaseYear",
+            "singleCask",
+            "edition",
+            "distillers"
+          ],
+          "conflicts": [],
+          "agreements": ["category", "brand"]
+        },
+        "distillery": [],
+        "maturation": null,
+        "releaseDay": null,
+        "singleCask": null,
+        "releaseYear": null,
+        "vintageYear": null,
+        "bottlingYear": null,
+        "caskStrength": null,
+        "releaseMonth": null,
+        "familyContext": {
+          "siblingBottles": []
+        }
+      },
+      {
+        "abv": 53.5,
+        "brand": "Chichibu",
+        "score": 45.585808,
+        "series": null,
+        "source": ["vector", "text"],
+        "bottler": "Chichibu",
+        "edition": "2025 Edition",
+        "outturn": 840,
+        "bottleId": 47646,
+        "category": "single_malt",
+        "fullName": "Chichibu Taiwan Edition - 2025 Edition - 53.5% ABV",
+        "reference": "Chichibu Taiwan Edition - 2025 Edition - 53.5% ABV",
+        "statedAge": null,
+        "caskNumber": null,
+        "comparison": {
+          "missing": [],
+          "conflicts": [],
+          "agreements": ["abv"]
+        },
+        "distillery": ["Chichibu"],
+        "maturation": "bourbon barrel and virgin oak hogshead",
+        "releaseDay": null,
+        "singleCask": false,
+        "releaseYear": 2025,
+        "vintageYear": null,
+        "bottlingYear": null,
+        "caskStrength": null,
+        "releaseMonth": null,
+        "familyContext": {
+          "siblingBottles": []
+        }
+      },
+      {
+        "abv": null,
+        "brand": "Chichibu",
+        "score": 36.656982,
+        "series": null,
+        "source": ["text"],
+        "bottler": null,
+        "edition": "2013 Release",
+        "outturn": null,
+        "bottleId": 45008,
+        "category": "single_malt",
+        "fullName": "Chichibu Ichiro's Malt - The Peated - 2013 Release",
+        "reference": null,
+        "statedAge": null,
+        "caskNumber": null,
+        "comparison": {
+          "missing": ["abv"],
+          "conflicts": [],
+          "agreements": []
+        },
+        "distillery": ["Chichibu"],
+        "maturation": null,
+        "releaseDay": null,
+        "singleCask": null,
+        "releaseYear": 2013,
+        "vintageYear": null,
+        "bottlingYear": null,
+        "caskStrength": null,
+        "releaseMonth": null,
+        "familyContext": {
+          "siblingBottles": [
+            {
+              "abv": null,
+              "edition": null,
+              "outturn": null,
+              "bottleId": 44027,
+              "fullName": "Chichibu Ichiro's Malt - The Peated",
+              "statedAge": null,
+              "caskNumber": null,
+              "maturation": null,
+              "releaseDay": null,
+              "singleCask": null,
+              "releaseYear": null,
+              "traitFields": [],
+              "vintageYear": null,
+              "bottlingYear": null,
+              "caskStrength": null,
+              "releaseMonth": null
+            },
+            {
+              "abv": 62.5,
+              "edition": "2011 Release",
+              "outturn": null,
+              "bottleId": 45009,
+              "fullName": "Chichibu Ichiro's Malt - The Peated - 2011 Release",
+              "statedAge": null,
+              "caskNumber": null,
+              "maturation": null,
+              "releaseDay": null,
+              "singleCask": null,
+              "releaseYear": 2011,
+              "traitFields": ["edition", "releaseYear", "vintageYear", "abv"],
+              "vintageYear": 2011,
+              "bottlingYear": 2015,
+              "caskStrength": null,
+              "releaseMonth": null
+            },
+            {
+              "abv": 50.5,
+              "edition": "2012 Release",
+              "outturn": null,
+              "bottleId": 45010,
+              "fullName": "Chichibu Ichiro's Malt - The Peated - 2012 Release",
+              "statedAge": null,
+              "caskNumber": null,
+              "maturation": null,
+              "releaseDay": null,
+              "singleCask": null,
+              "releaseYear": 2012,
+              "traitFields": ["edition", "releaseYear", "vintageYear", "abv"],
+              "vintageYear": 2009,
+              "bottlingYear": 2012,
+              "caskStrength": null,
+              "releaseMonth": null
+            }
+          ]
+        }
+      },
+      {
+        "abv": 53.5,
+        "brand": "Ichiro's Malt",
+        "score": 29.087809,
+        "series": null,
+        "source": ["text"],
+        "bottler": null,
+        "edition": "2022",
+        "outturn": 11000,
+        "bottleId": 51695,
+        "category": "single_malt",
+        "fullName": "Ichiro's Chichibu The Peated - 2022",
+        "reference": null,
+        "statedAge": null,
+        "caskNumber": null,
+        "comparison": {
+          "missing": [],
+          "conflicts": [],
+          "agreements": ["abv"]
+        },
+        "distillery": ["Chichibu"],
+        "maturation": "Bourbon barrels",
+        "releaseDay": null,
+        "singleCask": false,
+        "releaseYear": 2022,
+        "vintageYear": null,
+        "bottlingYear": null,
+        "caskStrength": null,
+        "releaseMonth": null,
+        "familyContext": {
+          "siblingBottles": []
+        }
+      },
+      {
+        "abv": 53.5,
+        "brand": "The Scotch Malt Whisky Society",
+        "score": 28.638275,
+        "series": null,
+        "source": ["text"],
+        "bottler": "The Scotch Malt Whisky Society",
+        "edition": null,
+        "outturn": 283,
+        "bottleId": 48814,
+        "category": "single_malt",
+        "fullName": "SMWS 68.51 Sacher Torte and Simnel cake",
+        "reference": null,
+        "statedAge": 14,
+        "caskNumber": "68.51",
+        "comparison": {
+          "missing": [],
+          "conflicts": [],
+          "agreements": ["abv"]
+        },
+        "distillery": ["Blair Athol"],
+        "maturation": "1st fill ex-oloroso sherry hogshead",
+        "releaseDay": 4,
+        "singleCask": true,
+        "releaseYear": 2020,
+        "vintageYear": 2006,
+        "bottlingYear": null,
+        "caskStrength": null,
+        "releaseMonth": 12,
+        "familyContext": {
+          "siblingBottles": []
+        }
+      },
+      {
+        "abv": 53.5,
+        "brand": "Ichiro's Malt",
+        "score": 28.521702,
+        "series": null,
+        "source": ["text"],
+        "bottler": null,
+        "edition": "2026",
+        "outturn": null,
+        "bottleId": 51691,
+        "category": "single_malt",
+        "fullName": "Ichiro's Chichibu Distillery II Hint of Sherry - 2026",
+        "reference": null,
+        "statedAge": null,
+        "caskNumber": null,
+        "comparison": {
+          "missing": [],
+          "conflicts": [],
+          "agreements": ["abv"]
+        },
+        "distillery": ["Chichibu"],
+        "maturation": "Ex-bourbon and sherry casks",
+        "releaseDay": null,
+        "singleCask": false,
+        "releaseYear": 2026,
+        "vintageYear": null,
+        "bottlingYear": null,
+        "caskStrength": null,
+        "releaseMonth": null,
+        "familyContext": {
+          "siblingBottles": []
+        }
+      },
+      {
+        "abv": null,
+        "brand": "Chichibu",
+        "score": 28.469414,
+        "series": null,
+        "source": ["text"],
+        "bottler": null,
+        "edition": null,
+        "outturn": null,
+        "bottleId": 503,
+        "category": "single_malt",
+        "fullName": "Chichibu Port Pipe",
+        "reference": null,
+        "statedAge": 8,
+        "caskNumber": null,
+        "comparison": {
+          "missing": ["abv"],
+          "conflicts": [],
+          "agreements": []
+        },
+        "distillery": ["Chichibu"],
+        "maturation": null,
+        "releaseDay": null,
+        "singleCask": null,
+        "releaseYear": null,
+        "vintageYear": 2012,
+        "bottlingYear": null,
+        "caskStrength": null,
+        "releaseMonth": null,
+        "familyContext": {
+          "siblingBottles": [
+            {
+              "abv": null,
+              "edition": null,
+              "outturn": null,
+              "bottleId": 16804,
+              "fullName": "Chichibu Port Pipe",
+              "statedAge": 8,
+              "caskNumber": null,
+              "maturation": null,
+              "releaseDay": null,
+              "singleCask": null,
+              "releaseYear": null,
+              "traitFields": ["statedAge", "vintageYear"],
+              "vintageYear": 2009,
+              "bottlingYear": null,
+              "caskStrength": null,
+              "releaseMonth": null
+            }
+          ]
+        }
+      },
+      {
+        "abv": 53.5,
+        "brand": "Ichiro's Malt",
+        "score": 28.305534,
+        "series": null,
+        "source": ["vector", "text"],
+        "bottler": null,
+        "edition": "2021",
+        "outturn": 2150,
+        "bottleId": 45191,
+        "category": "single_malt",
+        "fullName": "Ichiro's Chichibu The U.S. Edition - 2021",
+        "reference": "Ichiro's Chichibu The U.S. Edition - 2021",
+        "statedAge": null,
+        "caskNumber": null,
+        "comparison": {
+          "missing": [],
+          "conflicts": [],
+          "agreements": ["abv"]
+        },
+        "distillery": ["Chichibu"],
+        "maturation": "New American oak, first-fill bourbon, and new hogshead casks",
+        "releaseDay": null,
+        "singleCask": false,
+        "releaseYear": 2021,
+        "vintageYear": null,
+        "bottlingYear": null,
+        "caskStrength": null,
+        "releaseMonth": null,
+        "familyContext": {
+          "siblingBottles": []
+        }
+      },
+      {
+        "abv": 53.5,
+        "brand": "Ichiro's Malt",
+        "score": 28.181456,
+        "series": null,
+        "source": ["text"],
+        "bottler": null,
+        "edition": "2022",
+        "outturn": 2233,
+        "bottleId": 45038,
+        "category": "single_malt",
+        "fullName": "Ichiro's Chichibu The U.S. Edition - 2022",
+        "reference": null,
+        "statedAge": null,
+        "caskNumber": null,
+        "comparison": {
+          "missing": [],
+          "conflicts": [],
+          "agreements": ["abv"]
+        },
+        "distillery": ["Chichibu"],
+        "maturation": "Hogshead, ex-IPA, ex-imperial stout, and ex-hopped cider casks",
+        "releaseDay": null,
+        "singleCask": false,
+        "releaseYear": 2022,
+        "vintageYear": null,
+        "bottlingYear": null,
+        "caskStrength": null,
+        "releaseMonth": null,
+        "familyContext": {
+          "siblingBottles": [
+            {
+              "abv": null,
+              "edition": null,
+              "outturn": null,
+              "bottleId": 44037,
+              "fullName": "Ichiro's Chichibu The U.S. Edition",
+              "statedAge": null,
+              "caskNumber": null,
+              "maturation": null,
+              "releaseDay": null,
+              "singleCask": null,
+              "releaseYear": null,
+              "traitFields": [],
+              "vintageYear": null,
+              "bottlingYear": null,
+              "caskStrength": null,
+              "releaseMonth": null
+            },
+            {
+              "abv": 55.5,
+              "edition": "2019",
+              "outturn": 1556,
+              "bottleId": 45039,
+              "fullName": "Ichiro's Chichibu The U.S. Edition - 2019",
+              "statedAge": null,
+              "caskNumber": null,
+              "maturation": "Ex-bourbon casks",
+              "releaseDay": null,
+              "singleCask": false,
+              "releaseYear": 2019,
+              "traitFields": ["edition", "releaseYear", "abv", "singleCask"],
+              "vintageYear": null,
+              "bottlingYear": null,
+              "caskStrength": null,
+              "releaseMonth": null
+            }
+          ]
+        }
+      },
+      {
+        "abv": 53.5,
+        "brand": "Chichibu",
+        "score": 28.035154,
+        "series": null,
+        "source": ["text"],
+        "bottler": null,
+        "edition": "2014 Release",
+        "outturn": null,
+        "bottleId": 63643,
+        "category": "single_malt",
+        "fullName": "Chichibu Ichiro's Malt - Chibidaru - 2014 Release",
+        "reference": null,
+        "statedAge": null,
+        "caskNumber": null,
+        "comparison": {
+          "missing": [],
+          "conflicts": [],
+          "agreements": ["abv"]
+        },
+        "distillery": ["Chichibu"],
+        "maturation": null,
+        "releaseDay": null,
+        "singleCask": null,
+        "releaseYear": 2014,
+        "vintageYear": 2010,
+        "bottlingYear": 2014,
+        "caskStrength": null,
+        "releaseMonth": null,
+        "familyContext": {
+          "siblingBottles": []
+        }
+      },
+      {
+        "abv": null,
+        "brand": "Chichibu",
+        "score": 28.010841,
+        "series": null,
+        "source": ["vector", "text"],
+        "bottler": null,
+        "edition": null,
+        "outturn": null,
+        "bottleId": 16802,
+        "category": "single_malt",
+        "fullName": "Chichibu Chibidaru",
+        "reference": "Chichibu Chibidaru 2009, 54.5%",
+        "statedAge": null,
+        "caskNumber": null,
+        "comparison": {
+          "missing": ["abv"],
+          "conflicts": [],
+          "agreements": []
+        },
+        "distillery": ["Chichibu"],
+        "maturation": null,
+        "releaseDay": null,
+        "singleCask": null,
+        "releaseYear": null,
+        "vintageYear": 2009,
+        "bottlingYear": null,
+        "caskStrength": null,
+        "releaseMonth": null,
+        "familyContext": {
+          "siblingBottles": []
+        }
+      },
+      {
+        "abv": 53.5,
+        "brand": "Chichibu",
+        "score": 27.7667,
+        "series": null,
+        "source": ["text"],
+        "bottler": null,
+        "edition": "2021 Edition",
+        "outturn": null,
+        "bottleId": 63657,
+        "category": "single_malt",
+        "fullName": "Chichibu Ichiro's Malt - Paris Edition - 2021 Edition",
+        "reference": null,
+        "statedAge": null,
+        "caskNumber": null,
+        "comparison": {
+          "missing": [],
+          "conflicts": [],
+          "agreements": ["abv"]
+        },
+        "distillery": ["Chichibu"],
+        "maturation": null,
+        "releaseDay": null,
+        "singleCask": null,
+        "releaseYear": 2021,
+        "vintageYear": null,
+        "bottlingYear": null,
+        "caskStrength": null,
+        "releaseMonth": null,
+        "familyContext": {
+          "siblingBottles": []
+        }
+      },
+      {
+        "abv": 53.5,
+        "brand": "Ichiro's Malt",
+        "score": 26.950375,
+        "series": null,
+        "source": ["text"],
+        "bottler": null,
+        "edition": "2023",
+        "outturn": 2640,
+        "bottleId": 45194,
+        "category": "single_malt",
+        "fullName": "Ichiro's Chichibu The U.S. Edition - 2023",
+        "reference": null,
+        "statedAge": null,
+        "caskNumber": null,
+        "comparison": {
+          "missing": [],
+          "conflicts": [],
+          "agreements": ["abv"]
+        },
+        "distillery": ["Chichibu"],
+        "maturation": "T5 virgin French oak, Mizunara hogshead, sherry, and Chibidaru casks",
+        "releaseDay": null,
+        "singleCask": false,
+        "releaseYear": 2023,
+        "vintageYear": null,
+        "bottlingYear": null,
+        "caskStrength": null,
+        "releaseMonth": null,
+        "familyContext": {
+          "siblingBottles": []
+        }
+      }
+    ]
+  },
+  "context": {
+    "inspectedBottleIds": [58518],
+    "bottleContexts": [
+      {
+        "exact": {
+          "abv": 53.5,
+          "edition": "2020",
+          "outturn": 1736,
+          "statedAge": null,
+          "caskNumber": null,
+          "maturation": "Bourbon and ex-peated whisky casks, including casks fitted with Mizunara oak heads",
+          "releaseDay": null,
+          "singleCask": false,
+          "releaseYear": 2020,
+          "vintageYear": null,
+          "bottlingYear": null,
+          "caskStrength": null,
+          "releaseMonth": null
+        },
+        "shared": {
+          "name": "London Edition",
+          "brand": {
+            "name": "Chichibu",
+            "entityId": 348
+          },
+          "series": null,
+          "bottler": null,
+          "category": "single_malt",
+          "statedAge": null,
+          "distillers": [
+            {
+              "name": "Chichibu",
+              "entityId": 348
+            }
+          ]
+        },
+        "groupId": 31479,
+        "bottleId": 58518,
+        "fullName": "Chichibu London Edition - 2020",
+        "siblings": [],
+        "references": [],
+        "observations": [
+          {
+            "facts": {
+              "proposalType": "create_new",
+              "proposedBottle": {
+                "abv": null,
+                "name": "London Edition",
+                "brand": {
+                  "id": null,
+                  "name": "Ichiro's Malt"
+                },
+                "series": null,
+                "bottler": null,
+                "edition": "2020",
+                "outturn": null,
+                "category": "single_malt",
+                "statedAge": null,
+                "caskNumber": null,
+                "distillers": [
+                  {
+                    "id": null,
+                    "name": "Chichibu"
+                  }
+                ],
+                "maturation": null,
+                "releaseDay": null,
+                "singleCask": null,
+                "releaseYear": null,
+                "vintageYear": null,
+                "bottlingYear": null,
+                "caskStrength": null,
+                "releaseMonth": null
+              },
+              "referenceScope": "none"
+            },
+            "rawText": "Chichibu London Edition 2020",
+            "sourceKey": "store_price:12033517",
+            "sourceUrl": "https://www.masterofmalt.com/whiskies/ichiro/ichiros-malt-chichibu-london-edition-2020-whisky/?sku=124278",
+            "sourceName": "Chichibu London Edition 2020",
+            "sourceType": "store_price",
+            "parsedIdentity": null
+          }
+        ],
+        "imageSources": []
+      }
+    ],
+    "inspectedEntities": [
+      {
+        "kind": "distillery",
+        "name": "Chichibu",
+        "score": 1,
+        "source": ["exact", "text", "prefix", "contained"],
+        "entityId": 348,
+        "reference": "Chichibu",
+        "shortName": null,
+        "retrievedFor": [
+          {
+            "exact": true,
+            "query": "Chichibu"
+          }
+        ]
+      },
+      {
+        "kind": "brand",
+        "name": "Ichiro's Malt",
+        "score": 1,
+        "source": ["exact", "text", "prefix", "contained"],
+        "entityId": 1047,
+        "reference": "Ichiro's Malt",
+        "shortName": "Ichiro's",
+        "retrievedFor": [
+          {
+            "exact": true,
+            "query": "Ichiro's Malt"
+          }
+        ]
+      },
+      {
+        "kind": "bottler",
+        "name": "The Scotch Malt Whisky Society",
+        "score": 1,
+        "source": ["exact", "text", "prefix", "contained"],
+        "entityId": 4263,
+        "reference": "The Scotch Malt Whisky Society",
+        "shortName": "SMWS",
+        "retrievedFor": [
+          {
+            "exact": true,
+            "query": "The Scotch Malt Whisky Society"
+          }
+        ]
+      },
+      {
+        "kind": "distillery",
+        "name": "Blair Athol",
+        "score": 1,
+        "source": ["exact", "text", "prefix", "contained"],
+        "entityId": 92,
+        "reference": "Blair Athol",
+        "shortName": null,
+        "retrievedFor": [
+          {
+            "exact": true,
+            "query": "Blair Athol"
+          }
+        ]
+      },
+      {
+        "kind": "bottler",
+        "name": "Chichibu Reiwa Whisky",
+        "score": 0.5,
+        "source": ["text", "prefix"],
+        "entityId": 367660,
+        "reference": "Chichibu Reiwa Whisky",
+        "shortName": null,
+        "retrievedFor": [
+          {
+            "query": "Chichibu"
+          }
+        ]
+      },
+      {
+        "kind": "bottler",
+        "name": "The Whisky Society",
+        "score": 0.35,
+        "source": ["contained"],
+        "entityId": 367612,
+        "reference": "Whisky Society",
+        "shortName": null,
+        "retrievedFor": [
+          {
+            "query": "The Scotch Malt Whisky Society"
+          }
+        ]
+      },
+      {
+        "kind": "bottler",
+        "name": "&Whisky",
+        "score": 0.29615384615384616,
+        "source": ["contained"],
+        "entityId": 365821,
+        "reference": "&Whisky",
+        "shortName": null,
+        "retrievedFor": [
+          {
+            "query": "The Scotch Malt Whisky Society"
+          }
+        ]
+      }
+    ],
+    "inspectedSeries": []
+  },
+  "provenance": {
+    "source": "production_miss",
+    "verifiedSourceUrls": [
+      "https://www.scotchwhiskyauctions.com/auctions/234-the-185th-auction/907361-chichibu-london-edition-2020/",
+      "https://www.whiskyfun.com/2020/Another-wee-bag-of-Chichibu.html",
+      "https://www.japanesedrams.com/products/ichiros-malt-chichibu-2020-london-edition-700ml"
+    ],
+    "dbOutcome": {
+      "bottleId": null,
+      "createsBottle": false,
+      "summary": "Production returned no_match: it found 58518 but held it because retailer titles say Ichiro's Malt while the Bottle stores Chichibu as Brand."
+    },
+    "notes": "Saved check 34751, source auction_lot 14580 (lot 185-907361), run 2026-11-03. The scraper supplied 53.5% and an outturn of 1,736. Whiskyfun lists Chichibu 'London Edition 2020' (53.5%, OB, 1736 bottles) and Japanese Drams gives 1,736 bottles. 58518 stores London Edition, edition 2020, releaseYear 2020, 53.5%, Brand and distiller Chichibu (348). docs/architecture/whisky-identity-model.md, 'Who Is The Brand, Series, And Bottler', rule 1 names Chichibu (owner Venture Whisky) as a distillery's own line whose distillery Entity is the Brand. 'Ichiro's Malt' is the owner's house label wording on retailer titles, not a conflicting stored field."
+  },
+  "expected": {
+    "status": "classified",
+    "action": "match",
+    "identityScope": "product",
+    "matchedBottleId": 58518,
+    "summary": "Match Chichibu London Edition 2020 (58518). Every release fact agrees (2020, 53.5%, 1,736 bottles), and the identity model makes the Chichibu distillery Entity the Brand of its own line, so 'Ichiro's Malt' in retailer titles is no conflict."
+  }
+}

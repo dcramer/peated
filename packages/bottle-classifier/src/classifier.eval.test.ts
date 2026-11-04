@@ -1079,6 +1079,21 @@ function isSelectedFixture(fixtureId: string) {
   return selectedFixtureIds.size === 0 || selectedFixtureIds.has(fixtureId);
 }
 
+const includeKnownFailures =
+  process.env.BOTTLE_CLASSIFIER_EVAL_INCLUDE_KNOWN_FAILURES === "1";
+
+// A known failure stays out of default runs so the gate's pass rate covers
+// only cases expected to pass. It still runs when selected by id or when
+// BOTTLE_CLASSIFIER_EVAL_INCLUDE_KNOWN_FAILURES=1.
+function isRunnableScenarioCase({
+  kind,
+  testCase,
+}: ClassifierScenarioEvalCase) {
+  if (!isSelectedFixture(testCase.fixtureId)) return false;
+  if (kind !== "decision" || testCase.knownFailure === undefined) return true;
+  return includeKnownFailures || selectedFixtureIds.has(testCase.fixtureId);
+}
+
 const SCENARIO_CONFIG: Array<{
   label: string;
   scenario: LiveClassifierEvalScenario;
@@ -1108,7 +1123,7 @@ const SCENARIO_CONFIG: Array<{
 
 for (const { label, scenario, threshold } of SCENARIO_CONFIG) {
   const cases = getClassifierLiveEvalCases(scenario)
-    .filter((testCase) => isSelectedFixture(testCase.testCase.fixtureId))
+    .filter(isRunnableScenarioCase)
     .map((testCase) => ({
       name: getScenarioEvalName(testCase),
       testCase,

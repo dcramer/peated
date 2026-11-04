@@ -3,7 +3,10 @@ import { fileURLToPath } from "node:url";
 import type { z } from "zod";
 import type { BottleCandidate } from "./classifierTypes";
 import type { ClassifyBottleReferenceInput } from "./contract";
-import type { classifierEvalExpectationSchema } from "./evalFixtureSchemas";
+import type {
+  classifierEvalExpectationSchema,
+  classifierEvalKnownFailureSchema,
+} from "./evalFixtureSchemas";
 import {
   classifierEvalFixtureSchema,
   listFixtureFiles,
@@ -32,6 +35,7 @@ export type ClassifierEvalCase = {
   searchResponses?: SearchResponseFixture[];
   context: ClassifierEvalContext;
   expected: ClassifierEvalExpectation;
+  knownFailure?: z.infer<typeof classifierEvalKnownFailureSchema>;
 };
 
 const fixtureDir = fileURLToPath(
@@ -52,6 +56,7 @@ function loadFixtureFiles(): ClassifierEvalCase[] {
       searchResponses: fixture.searchResponses,
       context: fixture.context,
       expected: fixture.expected,
+      knownFailure: fixture.knownFailure,
     };
   });
 }

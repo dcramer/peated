@@ -1,0 +1,1158 @@
+{
+  "id": "auction-grants-millennium-tube",
+  "name": "auction lot photo: Grant's 'Millennium' is the gift tube on the standard Grant's Family Reserve",
+  "input": {
+    "reference": {
+      "id": 15730,
+      "url": "https://www.scotchwhiskyauctions.com/auctions/234-the-185th-auction/904090-grants-millennium-family-reserve/",
+      "name": "Grant’s Millennium Family Reserve",
+      "imageUrl": "https://d3suvtcq00dftb.cloudfront.net/images/164e91dce0fc752767cd123ab6ea3c34-zoom.jpg",
+      "externalSiteId": 28097,
+      "currentBottleId": null
+    },
+    "extractedIdentity": {
+      "abv": 40,
+      "brand": null,
+      "series": null,
+      "bottler": null,
+      "edition": null,
+      "outturn": null,
+      "category": null,
+      "distillery": null,
+      "expression": null,
+      "maturation": null,
+      "stated_age": null,
+      "cask_number": null,
+      "single_cask": null,
+      "release_year": null,
+      "vintage_year": null,
+      "cask_strength": null
+    },
+    "imageEvidence": null,
+    "initialCandidates": [
+      {
+        "abv": null,
+        "brand": "Grant's",
+        "score": 81.2048,
+        "series": null,
+        "source": ["text", "brand_coverage", "context"],
+        "bottler": null,
+        "edition": null,
+        "outturn": null,
+        "bottleId": 43859,
+        "category": "blend",
+        "fullName": "Grant's Family Reserve",
+        "reference": null,
+        "statedAge": null,
+        "caskNumber": null,
+        "comparison": {
+          "missing": ["abv"],
+          "conflicts": [],
+          "agreements": ["category", "brand"]
+        },
+        "distillery": [],
+        "maturation": null,
+        "releaseDay": null,
+        "singleCask": null,
+        "releaseYear": null,
+        "vintageYear": null,
+        "bottlingYear": null,
+        "caskStrength": null,
+        "releaseMonth": null,
+        "familyContext": {
+          "siblingBottles": []
+        }
+      },
+      {
+        "abv": 40,
+        "brand": "Glenfiddich",
+        "score": 49.041893,
+        "series": null,
+        "source": ["text"],
+        "bottler": null,
+        "edition": null,
+        "outturn": null,
+        "bottleId": 53212,
+        "category": "single_malt",
+        "fullName": "Glenfiddich Millennium Reserve",
+        "reference": null,
+        "statedAge": 21,
+        "caskNumber": null,
+        "comparison": {
+          "missing": [],
+          "conflicts": [],
+          "agreements": ["abv"]
+        },
+        "distillery": ["Glenfiddich"],
+        "maturation": null,
+        "releaseDay": null,
+        "singleCask": null,
+        "releaseYear": 1999,
+        "vintageYear": null,
+        "bottlingYear": null,
+        "caskStrength": null,
+        "releaseMonth": null,
+        "familyContext": {
+          "siblingBottles": []
+        }
+      },
+      {
+        "abv": 40,
+        "brand": "Glenfiddich",
+        "score": 46.77449,
+        "series": null,
+        "source": ["text"],
+        "bottler": null,
+        "edition": null,
+        "outturn": null,
+        "bottleId": 53219,
+        "category": "single_malt",
+        "fullName": "Glenfiddich Reserve - Third Millennium",
+        "reference": null,
+        "statedAge": 15,
+        "caskNumber": null,
+        "comparison": {
+          "missing": [],
+          "conflicts": [],
+          "agreements": ["abv"]
+        },
+        "distillery": ["Glenfiddich"],
+        "maturation": null,
+        "releaseDay": null,
+        "singleCask": null,
+        "releaseYear": 2000,
+        "vintageYear": 1984,
+        "bottlingYear": 2000,
+        "caskStrength": null,
+        "releaseMonth": null,
+        "familyContext": {
+          "siblingBottles": []
+        }
+      },
+      {
+        "abv": null,
+        "brand": "Grant's",
+        "score": 42.8401,
+        "series": null,
+        "source": ["vector", "text", "brand_coverage"],
+        "bottler": null,
+        "edition": null,
+        "outturn": null,
+        "bottleId": 16485,
+        "category": "blend",
+        "fullName": "Grant's Signature",
+        "reference": "Grant's Signature, 40%",
+        "statedAge": null,
+        "caskNumber": null,
+        "comparison": {
+          "missing": ["abv"],
+          "conflicts": [],
+          "agreements": ["category", "brand"]
+        },
+        "distillery": [],
+        "maturation": null,
+        "releaseDay": null,
+        "singleCask": null,
+        "releaseYear": null,
+        "vintageYear": null,
+        "bottlingYear": null,
+        "caskStrength": null,
+        "releaseMonth": null,
+        "familyContext": {
+          "siblingBottles": []
+        }
+      },
+      {
+        "abv": null,
+        "brand": "Grant's",
+        "score": 42.8401,
+        "series": null,
+        "source": ["vector", "text", "brand_coverage"],
+        "bottler": null,
+        "edition": null,
+        "outturn": null,
+        "bottleId": 16486,
+        "category": "blend",
+        "fullName": "Grant's Voyager",
+        "reference": "Grant's Voyager, 40%",
+        "statedAge": null,
+        "caskNumber": null,
+        "comparison": {
+          "missing": ["abv"],
+          "conflicts": [],
+          "agreements": ["category", "brand"]
+        },
+        "distillery": [],
+        "maturation": null,
+        "releaseDay": null,
+        "singleCask": null,
+        "releaseYear": null,
+        "vintageYear": null,
+        "bottlingYear": null,
+        "caskStrength": null,
+        "releaseMonth": null,
+        "familyContext": {
+          "siblingBottles": []
+        }
+      },
+      {
+        "abv": null,
+        "brand": "Grant's",
+        "score": 41.23925,
+        "series": null,
+        "source": ["vector", "text", "brand_coverage"],
+        "bottler": null,
+        "edition": null,
+        "outturn": null,
+        "bottleId": 14026,
+        "category": "blend",
+        "fullName": "Grant's Triple Wood",
+        "reference": "Grant's Triple Wood, 40%",
+        "statedAge": null,
+        "caskNumber": null,
+        "comparison": {
+          "missing": ["abv"],
+          "conflicts": [],
+          "agreements": ["category", "brand"]
+        },
+        "distillery": [],
+        "maturation": null,
+        "releaseDay": null,
+        "singleCask": null,
+        "releaseYear": null,
+        "vintageYear": null,
+        "bottlingYear": null,
+        "caskStrength": null,
+        "releaseMonth": null,
+        "familyContext": {
+          "siblingBottles": []
+        }
+      },
+      {
+        "abv": null,
+        "brand": "Grant's",
+        "score": 39.402363,
+        "series": null,
+        "source": ["vector", "text", "brand_coverage"],
+        "bottler": null,
+        "edition": null,
+        "outturn": null,
+        "bottleId": 16991,
+        "category": "blend",
+        "fullName": "Grant's 25-year-old",
+        "reference": "Grant's 25-year-old, 40%",
+        "statedAge": 25,
+        "caskNumber": null,
+        "comparison": {
+          "missing": ["abv"],
+          "conflicts": [],
+          "agreements": ["category", "brand"]
+        },
+        "distillery": [],
+        "maturation": null,
+        "releaseDay": null,
+        "singleCask": null,
+        "releaseYear": null,
+        "vintageYear": null,
+        "bottlingYear": null,
+        "caskStrength": null,
+        "releaseMonth": null,
+        "familyContext": {
+          "siblingBottles": []
+        }
+      },
+      {
+        "abv": 40,
+        "brand": "Canadian Club",
+        "score": 38.941322,
+        "series": null,
+        "source": ["text"],
+        "bottler": null,
+        "edition": null,
+        "outturn": null,
+        "bottleId": 17346,
+        "category": "blend",
+        "fullName": "Canadian Club Reserve - 40.0% ABV",
+        "reference": null,
+        "statedAge": null,
+        "caskNumber": null,
+        "comparison": {
+          "missing": [],
+          "conflicts": [],
+          "agreements": ["abv"]
+        },
+        "distillery": [],
+        "maturation": null,
+        "releaseDay": null,
+        "singleCask": null,
+        "releaseYear": null,
+        "vintageYear": null,
+        "bottlingYear": null,
+        "caskStrength": null,
+        "releaseMonth": null,
+        "familyContext": {
+          "siblingBottles": []
+        }
+      },
+      {
+        "abv": 40,
+        "brand": "The Glenlivet",
+        "score": 38.792427,
+        "series": "Triple Cask Matured",
+        "source": ["text"],
+        "bottler": null,
+        "edition": null,
+        "outturn": null,
+        "bottleId": 46732,
+        "category": "single_malt",
+        "fullName": "The Glenlivet White Oak Reserve - 40.0% ABV",
+        "reference": null,
+        "statedAge": null,
+        "caskNumber": null,
+        "comparison": {
+          "missing": [],
+          "conflicts": [],
+          "agreements": ["abv"]
+        },
+        "distillery": ["The Glenlivet"],
+        "maturation": null,
+        "releaseDay": null,
+        "singleCask": null,
+        "releaseYear": null,
+        "vintageYear": null,
+        "bottlingYear": null,
+        "caskStrength": null,
+        "releaseMonth": null,
+        "familyContext": {
+          "siblingBottles": []
+        }
+      },
+      {
+        "abv": null,
+        "brand": "Grant's",
+        "score": 38.062717,
+        "series": null,
+        "source": ["vector", "text", "brand_coverage"],
+        "bottler": null,
+        "edition": null,
+        "outturn": null,
+        "bottleId": 16990,
+        "category": "blend",
+        "fullName": "Grant's 18-year-old Rare",
+        "reference": "Grant's 18-year-old Rare, 40%",
+        "statedAge": 18,
+        "caskNumber": null,
+        "comparison": {
+          "missing": ["abv"],
+          "conflicts": [],
+          "agreements": ["category", "brand"]
+        },
+        "distillery": [],
+        "maturation": null,
+        "releaseDay": null,
+        "singleCask": null,
+        "releaseYear": null,
+        "vintageYear": null,
+        "bottlingYear": null,
+        "caskStrength": null,
+        "releaseMonth": null,
+        "familyContext": {
+          "siblingBottles": []
+        }
+      },
+      {
+        "abv": 40,
+        "brand": "Johnson Reserve",
+        "score": 37.732933,
+        "series": null,
+        "source": ["text"],
+        "bottler": "Johnson Reserve",
+        "edition": "2022 Edition",
+        "outturn": null,
+        "bottleId": 60246,
+        "category": "single_malt",
+        "fullName": "Johnson Reserve Family Reserve - 2022 Edition",
+        "reference": null,
+        "statedAge": null,
+        "caskNumber": null,
+        "comparison": {
+          "missing": [],
+          "conflicts": [],
+          "agreements": ["abv"]
+        },
+        "distillery": [],
+        "maturation": "Peated whisky, Californian red wine, Italian red wine, Cognac, brandy, Mizunara oak and virgin French oak casks",
+        "releaseDay": null,
+        "singleCask": null,
+        "releaseYear": null,
+        "vintageYear": null,
+        "bottlingYear": 2022,
+        "caskStrength": null,
+        "releaseMonth": null,
+        "familyContext": {
+          "siblingBottles": []
+        }
+      },
+      {
+        "abv": 40,
+        "brand": "Glen Finloch",
+        "score": 37.62266,
+        "series": null,
+        "source": ["text"],
+        "bottler": "Jean Boyer",
+        "edition": null,
+        "outturn": null,
+        "bottleId": 45729,
+        "category": "blend",
+        "fullName": "Glen Finloch Peaty Reserve - 40.0% ABV",
+        "reference": null,
+        "statedAge": null,
+        "caskNumber": null,
+        "comparison": {
+          "missing": [],
+          "conflicts": [],
+          "agreements": ["abv"]
+        },
+        "distillery": [],
+        "maturation": null,
+        "releaseDay": null,
+        "singleCask": null,
+        "releaseYear": null,
+        "vintageYear": null,
+        "bottlingYear": null,
+        "caskStrength": null,
+        "releaseMonth": null,
+        "familyContext": {
+          "siblingBottles": []
+        }
+      },
+      {
+        "abv": 40,
+        "brand": "The Glenrothes",
+        "score": 37.512596,
+        "series": null,
+        "source": ["vector", "text"],
+        "bottler": null,
+        "edition": null,
+        "outturn": null,
+        "bottleId": 45442,
+        "category": "single_malt",
+        "fullName": "The Glenrothes Bourbon Cask Reserve - 40.0% ABV - Bourbon Cask",
+        "reference": "Glenrothes Bourbon Cask Reserve, 40%",
+        "statedAge": null,
+        "caskNumber": null,
+        "comparison": {
+          "missing": [],
+          "conflicts": [],
+          "agreements": ["abv"]
+        },
+        "distillery": ["The Glenrothes"],
+        "maturation": "bourbon",
+        "releaseDay": null,
+        "singleCask": null,
+        "releaseYear": null,
+        "vintageYear": null,
+        "bottlingYear": null,
+        "caskStrength": null,
+        "releaseMonth": null,
+        "familyContext": {
+          "siblingBottles": []
+        }
+      },
+      {
+        "abv": 40,
+        "brand": "Lismore",
+        "score": 35.302284,
+        "series": null,
+        "source": ["text"],
+        "bottler": null,
+        "edition": null,
+        "outturn": null,
+        "bottleId": 45707,
+        "category": "blend",
+        "fullName": "Lismore Special Reserve - 5-year-old - 40.0% ABV",
+        "reference": null,
+        "statedAge": 5,
+        "caskNumber": null,
+        "comparison": {
+          "missing": [],
+          "conflicts": [],
+          "agreements": ["abv"]
+        },
+        "distillery": [],
+        "maturation": null,
+        "releaseDay": null,
+        "singleCask": null,
+        "releaseYear": null,
+        "vintageYear": null,
+        "bottlingYear": null,
+        "caskStrength": null,
+        "releaseMonth": null,
+        "familyContext": {
+          "siblingBottles": []
+        }
+      },
+      {
+        "abv": 40,
+        "brand": "Glencadam",
+        "score": 34.524475,
+        "series": null,
+        "source": ["text"],
+        "bottler": "Glencadam",
+        "edition": null,
+        "outturn": null,
+        "bottleId": 45437,
+        "category": "single_malt",
+        "fullName": "Glencadam American Oak Reserve - 40.0% ABV - Bourbon Cask - Barrel",
+        "reference": null,
+        "statedAge": null,
+        "caskNumber": null,
+        "comparison": {
+          "missing": [],
+          "conflicts": [],
+          "agreements": ["abv"]
+        },
+        "distillery": ["Glencadam"],
+        "maturation": "bourbon",
+        "releaseDay": null,
+        "singleCask": false,
+        "releaseYear": null,
+        "vintageYear": null,
+        "bottlingYear": null,
+        "caskStrength": false,
+        "releaseMonth": null,
+        "familyContext": {
+          "siblingBottles": []
+        }
+      },
+      {
+        "abv": 40,
+        "brand": "Lismore",
+        "score": 33.804657,
+        "series": null,
+        "source": ["text"],
+        "bottler": "William Lundie & Co.",
+        "edition": null,
+        "outturn": null,
+        "bottleId": 46840,
+        "category": "blend",
+        "fullName": "Lismore Special Reserve - 18-year-old - 40.0% ABV",
+        "reference": null,
+        "statedAge": 18,
+        "caskNumber": null,
+        "comparison": {
+          "missing": [],
+          "conflicts": [],
+          "agreements": ["abv"]
+        },
+        "distillery": [],
+        "maturation": null,
+        "releaseDay": null,
+        "singleCask": null,
+        "releaseYear": null,
+        "vintageYear": null,
+        "bottlingYear": null,
+        "caskStrength": null,
+        "releaseMonth": null,
+        "familyContext": {
+          "siblingBottles": []
+        }
+      },
+      {
+        "abv": 40,
+        "brand": "Bushmills",
+        "score": 33.028755,
+        "series": "Steamship Collection",
+        "source": ["text"],
+        "bottler": null,
+        "edition": null,
+        "outturn": null,
+        "bottleId": 45573,
+        "category": "single_malt",
+        "fullName": "Bushmills Rum Cask Reserve - 40.0% ABV",
+        "reference": null,
+        "statedAge": null,
+        "caskNumber": null,
+        "comparison": {
+          "missing": [],
+          "conflicts": [],
+          "agreements": ["abv"]
+        },
+        "distillery": ["Bushmills"],
+        "maturation": null,
+        "releaseDay": null,
+        "singleCask": null,
+        "releaseYear": null,
+        "vintageYear": null,
+        "bottlingYear": null,
+        "caskStrength": null,
+        "releaseMonth": null,
+        "familyContext": {
+          "siblingBottles": []
+        }
+      },
+      {
+        "abv": 40,
+        "brand": "Glenmorangie",
+        "score": 32.93395,
+        "series": null,
+        "source": ["text"],
+        "bottler": null,
+        "edition": null,
+        "outturn": null,
+        "bottleId": 56712,
+        "category": "single_malt",
+        "fullName": "Glenmorangie Millennium Malt",
+        "reference": null,
+        "statedAge": 12,
+        "caskNumber": null,
+        "comparison": {
+          "missing": [],
+          "conflicts": [],
+          "agreements": ["abv"]
+        },
+        "distillery": ["Glenmorangie"],
+        "maturation": "First Fill Casks",
+        "releaseDay": null,
+        "singleCask": null,
+        "releaseYear": null,
+        "vintageYear": null,
+        "bottlingYear": null,
+        "caskStrength": null,
+        "releaseMonth": null,
+        "familyContext": {
+          "siblingBottles": []
+        }
+      },
+      {
+        "abv": 40,
+        "brand": "Glenfiddich",
+        "score": 32.709774,
+        "series": null,
+        "source": ["text"],
+        "bottler": null,
+        "edition": null,
+        "outturn": null,
+        "bottleId": 53218,
+        "category": "single_malt",
+        "fullName": "Glenfiddich Millennium Vintage",
+        "reference": null,
+        "statedAge": 12,
+        "caskNumber": null,
+        "comparison": {
+          "missing": [],
+          "conflicts": [],
+          "agreements": ["abv"]
+        },
+        "distillery": ["Glenfiddich"],
+        "maturation": null,
+        "releaseDay": null,
+        "singleCask": null,
+        "releaseYear": 2012,
+        "vintageYear": 2000,
+        "bottlingYear": 2012,
+        "caskStrength": null,
+        "releaseMonth": null,
+        "familyContext": {
+          "siblingBottles": []
+        }
+      },
+      {
+        "abv": 40,
+        "brand": "The Irishman",
+        "score": 31.96673,
+        "series": null,
+        "source": ["text"],
+        "bottler": "Walsh Whiskey",
+        "edition": null,
+        "outturn": null,
+        "bottleId": 46911,
+        "category": "blend",
+        "fullName": "The Irishman The Harvest - 40.0% ABV - Bourbon Cask",
+        "reference": null,
+        "statedAge": null,
+        "caskNumber": null,
+        "comparison": {
+          "missing": [],
+          "conflicts": [],
+          "agreements": ["abv"]
+        },
+        "distillery": [],
+        "maturation": "bourbon",
+        "releaseDay": null,
+        "singleCask": null,
+        "releaseYear": null,
+        "vintageYear": null,
+        "bottlingYear": null,
+        "caskStrength": null,
+        "releaseMonth": null,
+        "familyContext": {
+          "siblingBottles": []
+        }
+      },
+      {
+        "abv": 40,
+        "brand": "The Glenrothes",
+        "score": 0.6715851555412363,
+        "series": null,
+        "source": ["vector"],
+        "bottler": null,
+        "edition": null,
+        "outturn": null,
+        "bottleId": 954,
+        "category": "single_malt",
+        "fullName": "The Glenrothes Vintage Reserve",
+        "reference": "Glenrothes Vintage Reserve, 40%",
+        "statedAge": null,
+        "caskNumber": null,
+        "comparison": {
+          "missing": [],
+          "conflicts": [],
+          "agreements": ["abv"]
+        },
+        "distillery": ["The Glenrothes"],
+        "maturation": null,
+        "releaseDay": null,
+        "singleCask": null,
+        "releaseYear": null,
+        "vintageYear": null,
+        "bottlingYear": null,
+        "caskStrength": null,
+        "releaseMonth": null,
+        "familyContext": {
+          "siblingBottles": []
+        }
+      },
+      {
+        "abv": 40,
+        "brand": "Clan MacGregor",
+        "score": 0.6677197112855375,
+        "series": null,
+        "source": ["vector"],
+        "bottler": null,
+        "edition": null,
+        "outturn": null,
+        "bottleId": 56806,
+        "category": "blend",
+        "fullName": "Clan MacGregor Blended Scotch Whisky",
+        "reference": "Clan MacGregor, 40%",
+        "statedAge": null,
+        "caskNumber": null,
+        "comparison": {
+          "missing": [],
+          "conflicts": ["brand"],
+          "agreements": ["category", "abv"]
+        },
+        "distillery": [],
+        "maturation": null,
+        "releaseDay": null,
+        "singleCask": false,
+        "releaseYear": null,
+        "vintageYear": null,
+        "bottlingYear": null,
+        "caskStrength": null,
+        "releaseMonth": null,
+        "familyContext": {
+          "siblingBottles": []
+        }
+      },
+      {
+        "abv": 40,
+        "brand": "Highland Queen",
+        "score": 0.6636344888918759,
+        "series": null,
+        "source": ["vector"],
+        "bottler": null,
+        "edition": null,
+        "outturn": null,
+        "bottleId": 16523,
+        "category": "blend",
+        "fullName": "Highland Queen 1561 - 40.0% ABV",
+        "reference": "Highland Queen 1561 - 40.0% ABV",
+        "statedAge": 30,
+        "caskNumber": null,
+        "comparison": {
+          "missing": [],
+          "conflicts": ["brand"],
+          "agreements": ["category", "abv"]
+        },
+        "distillery": [],
+        "maturation": null,
+        "releaseDay": null,
+        "singleCask": null,
+        "releaseYear": null,
+        "vintageYear": null,
+        "bottlingYear": null,
+        "caskStrength": null,
+        "releaseMonth": null,
+        "familyContext": {
+          "siblingBottles": []
+        }
+      },
+      {
+        "abv": 40,
+        "brand": "The Famous Grouse",
+        "score": 0.6619847154227114,
+        "series": null,
+        "source": ["vector"],
+        "bottler": null,
+        "edition": null,
+        "outturn": null,
+        "bottleId": 47033,
+        "category": "blend",
+        "fullName": "The Famous Grouse Blended Scotch Whisky",
+        "reference": "The Famous Grouse",
+        "statedAge": null,
+        "caskNumber": null,
+        "comparison": {
+          "missing": [],
+          "conflicts": ["brand"],
+          "agreements": ["category", "abv"]
+        },
+        "distillery": [],
+        "maturation": null,
+        "releaseDay": null,
+        "singleCask": false,
+        "releaseYear": null,
+        "vintageYear": null,
+        "bottlingYear": null,
+        "caskStrength": false,
+        "releaseMonth": null,
+        "familyContext": {
+          "siblingBottles": []
+        }
+      },
+      {
+        "abv": 40,
+        "brand": "The Famous Grouse",
+        "score": 0.655387249366994,
+        "series": null,
+        "source": ["vector"],
+        "bottler": null,
+        "edition": null,
+        "outturn": null,
+        "bottleId": 65219,
+        "category": "blend",
+        "fullName": "The Famous Grouse Mellow Gold",
+        "reference": "Famous Grouse Mellow Gold",
+        "statedAge": null,
+        "caskNumber": null,
+        "comparison": {
+          "missing": [],
+          "conflicts": ["brand"],
+          "agreements": ["category", "abv"]
+        },
+        "distillery": [],
+        "maturation": null,
+        "releaseDay": null,
+        "singleCask": null,
+        "releaseYear": null,
+        "vintageYear": null,
+        "bottlingYear": null,
+        "caskStrength": null,
+        "releaseMonth": null,
+        "familyContext": {
+          "siblingBottles": []
+        }
+      }
+    ]
+  },
+  "context": {
+    "inspectedBottleIds": [43859],
+    "bottleContexts": [
+      {
+        "exact": {
+          "abv": null,
+          "edition": null,
+          "outturn": null,
+          "statedAge": null,
+          "caskNumber": null,
+          "maturation": null,
+          "releaseDay": null,
+          "singleCask": null,
+          "releaseYear": null,
+          "vintageYear": null,
+          "bottlingYear": null,
+          "caskStrength": null,
+          "releaseMonth": null
+        },
+        "shared": {
+          "name": "Family Reserve",
+          "brand": {
+            "name": "Grant's",
+            "entityId": 999
+          },
+          "series": null,
+          "bottler": null,
+          "category": "blend",
+          "statedAge": null,
+          "distillers": []
+        },
+        "groupId": 17695,
+        "bottleId": 43859,
+        "fullName": "Grant's Family Reserve",
+        "siblings": [],
+        "references": [
+          {
+            "name": "Grant's Family Reserve",
+            "ignored": false
+          },
+          {
+            "name": "Grant's Family Reserve Blended Scotch Whisky",
+            "ignored": false
+          }
+        ],
+        "observations": [
+          {
+            "facts": {
+              "proposalType": "match",
+              "proposedBottle": null,
+              "referenceScope": "none"
+            },
+            "rawText": "Grant's Family Reserve",
+            "sourceKey": "store_price:12061597",
+            "sourceUrl": "https://www.finedrams.com/grants-family-reserve-blended-whisky.html",
+            "sourceName": "Grant's Family Reserve",
+            "sourceType": "store_price",
+            "parsedIdentity": null
+          }
+        ],
+        "imageSources": []
+      }
+    ],
+    "inspectedEntities": [
+      {
+        "kind": "distillery",
+        "name": "Glenfiddich",
+        "score": 1,
+        "source": ["exact", "text", "prefix", "contained"],
+        "entityId": 977,
+        "reference": "Glenfiddich",
+        "shortName": null,
+        "retrievedFor": [
+          {
+            "exact": true,
+            "query": "Glenfiddich"
+          }
+        ]
+      },
+      {
+        "kind": "brand",
+        "name": "Canadian Club",
+        "score": 1,
+        "source": ["exact", "text", "prefix", "contained"],
+        "entityId": 539,
+        "reference": "Canadian Club",
+        "shortName": null,
+        "retrievedFor": [
+          {
+            "exact": true,
+            "query": "Canadian Club"
+          }
+        ]
+      },
+      {
+        "kind": "distillery",
+        "name": "The Glenlivet",
+        "score": 1,
+        "source": ["exact", "text", "prefix", "contained"],
+        "entityId": 244,
+        "reference": "The Glenlivet",
+        "shortName": null,
+        "retrievedFor": [
+          {
+            "exact": true,
+            "query": "The Glenlivet"
+          }
+        ]
+      },
+      {
+        "kind": "bottler",
+        "name": "Johnson Reserve",
+        "score": 1,
+        "source": ["exact", "text", "prefix", "contained"],
+        "entityId": 367061,
+        "reference": "Johnson Reserve",
+        "shortName": null,
+        "retrievedFor": [
+          {
+            "exact": true,
+            "query": "Johnson Reserve"
+          }
+        ]
+      },
+      {
+        "kind": "brand",
+        "name": "Glen Finloch",
+        "score": 1,
+        "source": ["exact", "text", "prefix", "contained"],
+        "entityId": 365816,
+        "reference": "Glen Finloch",
+        "shortName": null,
+        "retrievedFor": [
+          {
+            "exact": true,
+            "query": "Glen Finloch"
+          }
+        ]
+      },
+      {
+        "kind": "bottler",
+        "name": "Jean Boyer",
+        "score": 1,
+        "source": ["exact", "text", "prefix", "contained"],
+        "entityId": 5115,
+        "reference": "Jean Boyer",
+        "shortName": null,
+        "retrievedFor": [
+          {
+            "exact": true,
+            "query": "Jean Boyer"
+          }
+        ]
+      },
+      {
+        "kind": "distillery",
+        "name": "The Glenrothes",
+        "score": 1,
+        "source": ["exact", "text", "prefix", "contained"],
+        "entityId": 985,
+        "reference": "The Glenrothes",
+        "shortName": null,
+        "retrievedFor": [
+          {
+            "exact": true,
+            "query": "The Glenrothes"
+          }
+        ]
+      },
+      {
+        "kind": "brand",
+        "name": "Lismore",
+        "score": 1,
+        "source": ["exact", "text", "prefix", "contained"],
+        "entityId": 1141,
+        "reference": "Lismore",
+        "shortName": null,
+        "retrievedFor": [
+          {
+            "exact": true,
+            "query": "Lismore"
+          }
+        ]
+      },
+      {
+        "kind": "distillery",
+        "name": "Glencadam",
+        "score": 1,
+        "source": ["exact", "text", "prefix", "contained"],
+        "entityId": 114,
+        "reference": "Glencadam",
+        "shortName": null,
+        "retrievedFor": [
+          {
+            "exact": true,
+            "query": "Glencadam"
+          }
+        ]
+      },
+      {
+        "kind": "bottler",
+        "name": "William Lundie & Co.",
+        "score": 1,
+        "source": ["exact", "text", "prefix", "contained"],
+        "entityId": 5970,
+        "reference": "William Lundie & Co.",
+        "shortName": null,
+        "retrievedFor": [
+          {
+            "exact": true,
+            "query": "William Lundie & Co."
+          }
+        ]
+      },
+      {
+        "kind": "distillery",
+        "name": "Bushmills",
+        "score": 1,
+        "source": ["exact", "text", "prefix", "contained"],
+        "entityId": 102,
+        "reference": "Bushmills",
+        "shortName": "",
+        "retrievedFor": [
+          {
+            "exact": true,
+            "query": "Bushmills"
+          }
+        ]
+      },
+      {
+        "kind": "distillery",
+        "name": "Glenmorangie",
+        "score": 1,
+        "source": ["exact", "text", "prefix", "contained"],
+        "entityId": 984,
+        "reference": "Glenmorangie",
+        "shortName": null,
+        "retrievedFor": [
+          {
+            "exact": true,
+            "query": "Glenmorangie"
+          }
+        ]
+      },
+      {
+        "kind": "company",
+        "name": "The Glenmorangie Company",
+        "score": 0.5,
+        "source": ["text", "prefix"],
+        "entityId": 366510,
+        "reference": "Glenmorangie Company",
+        "shortName": null,
+        "retrievedFor": [
+          {
+            "query": "Glenmorangie"
+          }
+        ]
+      },
+      {
+        "kind": "distillery",
+        "name": "The Macallan",
+        "score": 0.2,
+        "source": ["text"],
+        "entityId": 1157,
+        "reference": null,
+        "shortName": null,
+        "retrievedFor": [
+          {
+            "query": "The Glenlivet"
+          }
+        ]
+      }
+    ],
+    "inspectedSeries": []
+  },
+  "provenance": {
+    "source": "production_miss",
+    "verifiedSourceUrls": [
+      "https://www.scotchwhiskyauctions.com/auctions/234-the-185th-auction/904090-grants-millennium-family-reserve/",
+      "https://d3suvtcq00dftb.cloudfront.net/images/164e91dce0fc752767cd123ab6ea3c34-zoom.jpg"
+    ],
+    "dbOutcome": {
+      "bottleId": null,
+      "createsBottle": false,
+      "summary": "Production returned no_match: the agent could not tell whether 'Millennium' named a separate release or described the standard Family Reserve."
+    },
+    "notes": "Saved check 35462, source auction_lot 15730 (lot 185-904090), run 2026-11-03. Not one of the two photo cases named in the request, but the title alone cannot settle it, so this case follows the same pattern: input.reference.imageUrl is set to the lot's first photo at full size and the evidence pack gets its reviewed reading. Production ran without the photo; this case goes in with the change that makes auctions read the lot photo. The photo clearly shows a gold tube printed 'William Grant's The Family Reserve Millennium Finest Scotch Whisky' with a faint '2000', and a bottle label printed 'William Grant's The Family Reserve Finest Scotch Whisky'. The reading covers the bottle label only; the tube is packaging. The bottle's '40%vol.' is small and faint, so the reading leaves abv empty; the scraper's 40% stays in extractedIdentity. The identity model treats a gift box or tin as the same Bottle, and the printed name and strength match the standard Family Reserve. 43859 (Grant's Family Reserve, blend) has no conflicting field."
+  },
+  "expected": {
+    "status": "classified",
+    "action": "match",
+    "identityScope": "product",
+    "matchedBottleId": 43859,
+    "summary": "Match Grant's Family Reserve (43859). 'Millennium 2000' is printed only on the gift tube; the bottle carries the standard William Grant's The Family Reserve Finest Scotch Whisky label at 40%."
+  },
+  "knownFailure": {
+    "reason": "The agent treats 'Millennium', printed only on the gift tube, as a possible separate release."
+  }
+}

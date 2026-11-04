@@ -1,0 +1,685 @@
+{
+  "id": "review-blackadder-edradour-1976-vintage-not-cask",
+  "name": "Review: a printed vintage in a candidate name is not a cask code (Blackadder Raw Cask Edradour 1976)",
+  "input": {
+    "reference": {
+      "id": 19060,
+      "url": "https://whiskyadvocate.com/Blackadder-Raw-Cask-distilled-at-Edradour-1976-49-4",
+      "name": "Blackadder Raw Cask (distilled at Edradour), 1976, 49.4%",
+      "imageUrl": null,
+      "externalSiteId": 5,
+      "currentBottleId": null
+    },
+    "extractedIdentity": {
+      "abv": 49.4,
+      "brand": "Blackadder",
+      "series": "Raw Cask",
+      "bottler": "Blackadder",
+      "edition": null,
+      "outturn": null,
+      "category": null,
+      "distillery": ["Edradour"],
+      "expression": null,
+      "maturation": null,
+      "stated_age": null,
+      "cask_number": null,
+      "release_day": null,
+      "single_cask": null,
+      "release_year": null,
+      "vintage_year": 1976,
+      "bottling_year": null,
+      "cask_strength": null,
+      "release_month": null
+    },
+    "imageEvidence": null,
+    "initialCandidates": [
+      {
+        "abv": null,
+        "brand": "Blackadder",
+        "score": 101.8737,
+        "series": null,
+        "source": ["text", "context"],
+        "bottler": null,
+        "edition": null,
+        "outturn": null,
+        "bottleId": 19110,
+        "category": "single_malt",
+        "fullName": "Blackadder Raw Cask 1976 (distilled at Edradour)",
+        "reference": null,
+        "statedAge": null,
+        "caskNumber": null,
+        "comparison": {
+          "missing": ["abv", "vintageYear", "bottler", "series", "distillers"],
+          "conflicts": [],
+          "agreements": ["brand"]
+        },
+        "distillery": [],
+        "maturation": null,
+        "releaseDay": null,
+        "singleCask": null,
+        "releaseYear": null,
+        "vintageYear": null,
+        "bottlingYear": null,
+        "caskStrength": null,
+        "releaseMonth": null,
+        "familyContext": {
+          "siblingBottles": []
+        }
+      },
+      {
+        "abv": null,
+        "brand": "Blackadder",
+        "score": 51.86936,
+        "series": null,
+        "source": ["text"],
+        "bottler": null,
+        "edition": null,
+        "outturn": null,
+        "bottleId": 12924,
+        "category": "single_malt",
+        "fullName": "Blackadder Raw Cask Peat Reek 10-year-old",
+        "reference": null,
+        "statedAge": 10,
+        "caskNumber": null,
+        "comparison": {
+          "missing": ["abv", "vintageYear", "bottler", "series", "distillers"],
+          "conflicts": [],
+          "agreements": ["brand"]
+        },
+        "distillery": [],
+        "maturation": null,
+        "releaseDay": null,
+        "singleCask": null,
+        "releaseYear": null,
+        "vintageYear": null,
+        "bottlingYear": null,
+        "caskStrength": null,
+        "releaseMonth": null,
+        "familyContext": {
+          "siblingBottles": []
+        }
+      },
+      {
+        "abv": null,
+        "brand": "Blackadder",
+        "score": 50.803345,
+        "series": null,
+        "source": ["vector", "text"],
+        "bottler": null,
+        "edition": null,
+        "outturn": null,
+        "bottleId": 12925,
+        "category": "single_malt",
+        "fullName": "Blackadder Raw Cask Red Snake [Cask ref: Redneck 111]",
+        "reference": "Blackadder Raw Cask Red Snake [Cask ref: Redneck 111], 60.2%",
+        "statedAge": null,
+        "caskNumber": null,
+        "comparison": {
+          "missing": ["abv", "vintageYear", "bottler", "series", "distillers"],
+          "conflicts": [],
+          "agreements": ["brand"]
+        },
+        "distillery": [],
+        "maturation": null,
+        "releaseDay": null,
+        "singleCask": null,
+        "releaseYear": null,
+        "vintageYear": null,
+        "bottlingYear": null,
+        "caskStrength": null,
+        "releaseMonth": null,
+        "familyContext": {
+          "siblingBottles": []
+        }
+      },
+      {
+        "abv": null,
+        "brand": "Blackadder",
+        "score": 48.393997,
+        "series": null,
+        "source": ["text"],
+        "bottler": null,
+        "edition": null,
+        "outturn": null,
+        "bottleId": 13271,
+        "category": "blend",
+        "fullName": "Blackadder 9-year-old Raw Cask Smoking Islay",
+        "reference": null,
+        "statedAge": 9,
+        "caskNumber": null,
+        "comparison": {
+          "missing": ["abv", "vintageYear", "bottler", "series", "distillers"],
+          "conflicts": [],
+          "agreements": ["brand"]
+        },
+        "distillery": [],
+        "maturation": null,
+        "releaseDay": null,
+        "singleCask": null,
+        "releaseYear": null,
+        "vintageYear": null,
+        "bottlingYear": null,
+        "caskStrength": null,
+        "releaseMonth": null,
+        "familyContext": {
+          "siblingBottles": []
+        }
+      },
+      {
+        "abv": null,
+        "brand": "Blackadder",
+        "score": 48.393997,
+        "series": null,
+        "source": ["text"],
+        "bottler": null,
+        "edition": null,
+        "outturn": null,
+        "bottleId": 12926,
+        "category": "blend",
+        "fullName": "Blackadder Raw Cask Smoking Islay 10-year-old",
+        "reference": null,
+        "statedAge": 10,
+        "caskNumber": null,
+        "comparison": {
+          "missing": ["abv", "vintageYear", "bottler", "series", "distillers"],
+          "conflicts": [],
+          "agreements": ["brand"]
+        },
+        "distillery": [],
+        "maturation": null,
+        "releaseDay": null,
+        "singleCask": null,
+        "releaseYear": null,
+        "vintageYear": null,
+        "bottlingYear": null,
+        "caskStrength": null,
+        "releaseMonth": null,
+        "familyContext": {
+          "siblingBottles": []
+        }
+      },
+      {
+        "abv": null,
+        "brand": "Blackadder",
+        "score": 47.834465,
+        "series": null,
+        "source": ["text"],
+        "bottler": null,
+        "edition": null,
+        "outturn": null,
+        "bottleId": 12922,
+        "category": "single_malt",
+        "fullName": "Blackadder Raw Cask Red Snake [Cask ref: Redneck 110]",
+        "reference": null,
+        "statedAge": null,
+        "caskNumber": null,
+        "comparison": {
+          "missing": ["abv", "vintageYear", "bottler", "series", "distillers"],
+          "conflicts": [],
+          "agreements": ["brand"]
+        },
+        "distillery": [],
+        "maturation": null,
+        "releaseDay": null,
+        "singleCask": null,
+        "releaseYear": null,
+        "vintageYear": null,
+        "bottlingYear": null,
+        "caskStrength": null,
+        "releaseMonth": null,
+        "familyContext": {
+          "siblingBottles": []
+        }
+      },
+      {
+        "abv": null,
+        "brand": "Blackadder",
+        "score": 47.40452,
+        "series": null,
+        "source": ["vector", "text"],
+        "bottler": null,
+        "edition": null,
+        "outturn": null,
+        "bottleId": 12923,
+        "category": "single_malt",
+        "fullName": "Blackadder Raw Cask 12-year-old 2009 (Distilled at Blair Athol)",
+        "reference": "Blackadder Raw Cask 12-year-old 2009 (Distilled at Blair Athol), 59.1%",
+        "statedAge": 12,
+        "caskNumber": null,
+        "comparison": {
+          "missing": ["abv", "vintageYear", "bottler", "series", "distillers"],
+          "conflicts": [],
+          "agreements": ["brand"]
+        },
+        "distillery": [],
+        "maturation": null,
+        "releaseDay": null,
+        "singleCask": null,
+        "releaseYear": null,
+        "vintageYear": null,
+        "bottlingYear": null,
+        "caskStrength": null,
+        "releaseMonth": null,
+        "familyContext": {
+          "siblingBottles": []
+        }
+      },
+      {
+        "abv": null,
+        "brand": "Blackadder",
+        "score": 46.725594,
+        "series": null,
+        "source": ["vector", "text"],
+        "bottler": null,
+        "edition": null,
+        "outturn": null,
+        "bottleId": 13459,
+        "category": "single_malt",
+        "fullName": "Blackadder 11-year-old Raw Cask Balmenach 2008 Single Cask (Cask No. 14)",
+        "reference": "Blackadder 11-year-old Raw Cask Balmenach 2008 Single Cask (Cask No. 14), 58.5%",
+        "statedAge": 11,
+        "caskNumber": null,
+        "comparison": {
+          "missing": ["abv", "vintageYear", "bottler", "series", "distillers"],
+          "conflicts": [],
+          "agreements": ["brand"]
+        },
+        "distillery": [],
+        "maturation": null,
+        "releaseDay": null,
+        "singleCask": true,
+        "releaseYear": null,
+        "vintageYear": null,
+        "bottlingYear": null,
+        "caskStrength": null,
+        "releaseMonth": null,
+        "familyContext": {
+          "siblingBottles": []
+        }
+      },
+      {
+        "abv": null,
+        "brand": "Blackadder",
+        "score": 43.686882,
+        "series": null,
+        "source": ["text"],
+        "bottler": null,
+        "edition": null,
+        "outturn": null,
+        "bottleId": 13458,
+        "category": "blend",
+        "fullName": "Blackadder 22-year-old Raw Cask Westport Single Cask (No. 3293)",
+        "reference": null,
+        "statedAge": 22,
+        "caskNumber": null,
+        "comparison": {
+          "missing": ["abv", "vintageYear", "bottler", "series", "distillers"],
+          "conflicts": [],
+          "agreements": ["brand"]
+        },
+        "distillery": [],
+        "maturation": null,
+        "releaseDay": null,
+        "singleCask": true,
+        "releaseYear": null,
+        "vintageYear": null,
+        "bottlingYear": null,
+        "caskStrength": null,
+        "releaseMonth": null,
+        "familyContext": {
+          "siblingBottles": []
+        }
+      },
+      {
+        "abv": null,
+        "brand": "Ledaig",
+        "score": 33.401253,
+        "series": null,
+        "source": ["text"],
+        "bottler": "Blackadder",
+        "edition": null,
+        "outturn": null,
+        "bottleId": 2532,
+        "category": "single_malt",
+        "fullName": "Ledaig 2001 BA Raw Cask",
+        "reference": null,
+        "statedAge": 17,
+        "caskNumber": null,
+        "comparison": {
+          "missing": ["abv", "vintageYear", "series", "distillers"],
+          "conflicts": ["brand"],
+          "agreements": ["bottler"]
+        },
+        "distillery": [],
+        "maturation": null,
+        "releaseDay": null,
+        "singleCask": null,
+        "releaseYear": null,
+        "vintageYear": null,
+        "bottlingYear": null,
+        "caskStrength": null,
+        "releaseMonth": null,
+        "familyContext": {
+          "siblingBottles": []
+        }
+      },
+      {
+        "abv": null,
+        "brand": "Tomintoul",
+        "score": 31.455036,
+        "series": null,
+        "source": ["text"],
+        "bottler": "Tomintoul",
+        "edition": null,
+        "outturn": null,
+        "bottleId": 4380,
+        "category": "single_malt",
+        "fullName": "Tomintoul 1976 Vintage",
+        "reference": null,
+        "statedAge": 40,
+        "caskNumber": null,
+        "comparison": {
+          "missing": ["abv", "series"],
+          "conflicts": ["brand", "bottler", "distillers"],
+          "agreements": ["vintageYear"]
+        },
+        "distillery": ["Tomintoul"],
+        "maturation": null,
+        "releaseDay": null,
+        "singleCask": null,
+        "releaseYear": null,
+        "vintageYear": 1976,
+        "bottlingYear": null,
+        "caskStrength": null,
+        "releaseMonth": null,
+        "familyContext": {
+          "siblingBottles": []
+        }
+      },
+      {
+        "abv": null,
+        "brand": "Blackadder",
+        "score": 0.7853359103846901,
+        "series": null,
+        "source": ["vector"],
+        "bottler": null,
+        "edition": null,
+        "outturn": null,
+        "bottleId": 13270,
+        "category": "single_grain",
+        "fullName": "Blackadder 32-year-old 1988 (Distilled at Invergordon)",
+        "reference": "Blackadder 32-year-old 1988 (Distilled at Invergordon), 51.5%",
+        "statedAge": 32,
+        "caskNumber": null,
+        "comparison": {
+          "missing": ["abv", "vintageYear", "bottler", "series", "distillers"],
+          "conflicts": [],
+          "agreements": ["brand"]
+        },
+        "distillery": [],
+        "maturation": null,
+        "releaseDay": null,
+        "singleCask": null,
+        "releaseYear": null,
+        "vintageYear": null,
+        "bottlingYear": null,
+        "caskStrength": null,
+        "releaseMonth": null,
+        "familyContext": {
+          "siblingBottles": []
+        }
+      },
+      {
+        "abv": null,
+        "brand": "Blackadder",
+        "score": 0.7827639182652305,
+        "series": null,
+        "source": ["vector"],
+        "bottler": null,
+        "edition": null,
+        "outturn": null,
+        "bottleId": 13269,
+        "category": "single_grain",
+        "fullName": "Blackadder 31-year-old 1988 (Distilled at Cambus)",
+        "reference": "Blackadder 31-year-old 1988 (Distilled at Cambus), 46.1%",
+        "statedAge": 31,
+        "caskNumber": null,
+        "comparison": {
+          "missing": ["abv", "vintageYear", "bottler", "series", "distillers"],
+          "conflicts": [],
+          "agreements": ["brand"]
+        },
+        "distillery": [],
+        "maturation": null,
+        "releaseDay": null,
+        "singleCask": null,
+        "releaseYear": null,
+        "vintageYear": null,
+        "bottlingYear": null,
+        "caskStrength": null,
+        "releaseMonth": null,
+        "familyContext": {
+          "siblingBottles": []
+        }
+      },
+      {
+        "abv": null,
+        "brand": "Blackadder",
+        "score": 0.7404750957770883,
+        "series": null,
+        "source": ["vector"],
+        "bottler": null,
+        "edition": null,
+        "outturn": null,
+        "bottleId": 12927,
+        "category": "single_malt",
+        "fullName": "Blackadder Sherry Snake (Cask SS03)",
+        "reference": "Blackadder Sherry Snake (Cask SS03), 58.2%",
+        "statedAge": null,
+        "caskNumber": null,
+        "comparison": {
+          "missing": ["abv", "vintageYear", "bottler", "series", "distillers"],
+          "conflicts": [],
+          "agreements": ["brand"]
+        },
+        "distillery": [],
+        "maturation": null,
+        "releaseDay": null,
+        "singleCask": null,
+        "releaseYear": null,
+        "vintageYear": null,
+        "bottlingYear": null,
+        "caskStrength": null,
+        "releaseMonth": null,
+        "familyContext": {
+          "siblingBottles": []
+        }
+      },
+      {
+        "abv": null,
+        "brand": "The Balvenie",
+        "score": 0.6789055701714665,
+        "series": null,
+        "source": ["vector"],
+        "bottler": null,
+        "edition": null,
+        "outturn": null,
+        "bottleId": 17783,
+        "category": "single_malt",
+        "fullName": "The Balvenie Vintage Cask 1976 vintage",
+        "reference": "The Balvenie Vintage Cask 1976 vintage, 53%",
+        "statedAge": 44,
+        "caskNumber": null,
+        "comparison": {
+          "missing": ["abv", "bottler", "series"],
+          "conflicts": ["brand", "distillers"],
+          "agreements": ["vintageYear"]
+        },
+        "distillery": ["The Balvenie"],
+        "maturation": null,
+        "releaseDay": null,
+        "singleCask": null,
+        "releaseYear": null,
+        "vintageYear": 1976,
+        "bottlingYear": null,
+        "caskStrength": null,
+        "releaseMonth": null,
+        "familyContext": {
+          "siblingBottles": []
+        }
+      }
+    ]
+  },
+  "context": {
+    "inspectedBottleIds": [19110],
+    "bottleContexts": [
+      {
+        "exact": {
+          "abv": null,
+          "edition": null,
+          "outturn": null,
+          "statedAge": null,
+          "caskNumber": null,
+          "maturation": null,
+          "releaseDay": null,
+          "singleCask": null,
+          "releaseYear": null,
+          "vintageYear": null,
+          "bottlingYear": null,
+          "caskStrength": null,
+          "releaseMonth": null
+        },
+        "shared": {
+          "name": "Raw Cask 1976 (distilled at Edradour)",
+          "brand": {
+            "name": "Blackadder",
+            "entityId": 6004
+          },
+          "series": null,
+          "bottler": null,
+          "category": "single_malt",
+          "statedAge": null,
+          "distillers": []
+        },
+        "groupId": 16090,
+        "bottleId": 19110,
+        "fullName": "Blackadder Raw Cask 1976 (distilled at Edradour)",
+        "siblings": [],
+        "references": [
+          {
+            "name": "Blackadder Raw Cask 1976 (distilled at Edradour)",
+            "ignored": false
+          },
+          {
+            "name": "Blackadder Raw Cask (distilled at Edradour), 1976",
+            "ignored": false
+          }
+        ],
+        "observations": [],
+        "imageSources": []
+      }
+    ],
+    "inspectedEntities": [
+      {
+        "kind": "bottler",
+        "name": "Blackadder",
+        "score": 1,
+        "source": ["exact", "text", "prefix", "contained"],
+        "entityId": 6004,
+        "reference": "Blackadder",
+        "shortName": null,
+        "retrievedFor": [
+          {
+            "exact": true,
+            "query": "Blackadder"
+          }
+        ]
+      },
+      {
+        "kind": "distillery",
+        "name": "Edradour",
+        "score": 1,
+        "source": ["exact", "text", "prefix", "contained"],
+        "entityId": 405,
+        "reference": "Edradour",
+        "shortName": null,
+        "retrievedFor": [
+          {
+            "exact": true,
+            "query": "Edradour"
+          }
+        ]
+      },
+      {
+        "kind": "distillery",
+        "name": "The Balvenie",
+        "score": 1,
+        "source": ["exact", "text", "prefix", "contained"],
+        "entityId": 8463,
+        "reference": "The Balvenie",
+        "shortName": null,
+        "retrievedFor": [
+          {
+            "exact": true,
+            "query": "The Balvenie"
+          }
+        ]
+      },
+      {
+        "kind": "distillery",
+        "name": "Tomintoul",
+        "score": 1,
+        "source": ["exact", "text", "prefix", "contained"],
+        "entityId": 174,
+        "reference": "Tomintoul",
+        "shortName": null,
+        "retrievedFor": [
+          {
+            "exact": true,
+            "query": "Tomintoul"
+          }
+        ]
+      },
+      {
+        "kind": "brand",
+        "name": "Ledaig",
+        "score": 1,
+        "source": ["exact", "text", "prefix", "contained"],
+        "entityId": 1135,
+        "reference": "Ledaig",
+        "shortName": null,
+        "retrievedFor": [
+          {
+            "exact": true,
+            "query": "Ledaig"
+          }
+        ]
+      }
+    ],
+    "inspectedSeries": []
+  },
+  "provenance": {
+    "source": "production_miss",
+    "verifiedSourceUrls": [
+      "https://whiskyadvocate.com/Blackadder-Raw-Cask-distilled-at-Edradour-1976-49-4",
+      "https://www.scotchwhiskyauctions.com/auctions/60_the-29th-auction/20904_edradour-1976-blackadder-raw-cask-75cl/"
+    ],
+    "dbOutcome": {
+      "bottleId": null,
+      "createsBottle": false,
+      "summary": "Production returned no_match."
+    },
+    "notes": "Captured from saved classifier run 29726 (review 19060, model openai/gpt-6-luna, 2026-10-28T09:01:50.789Z). Production rationale: The source title identifies Blackadder Raw Cask distilled at Edradour, 1976. Inspected Bottle 19110 has the matching name and Brand and already accepts a corresponding reference. Its missing ABV and distillery fields are not conflicts, so it is safe to match. Server downgraded the existing-match recommendation because candidate cask code 1976 was not established by the source. Checked 2026-11-03. Auction records describe one Blackadder Raw Cask Edradour 1976: distilled May 1976, bottled December 2000 at 24 years, sherry hogshead, 49.4%, 232 bottles, a 750ml US import, which fits the Fall 2002 Whisky Advocate review. Bottle 19110 stores caskNumber null, so the guard took '1976' from the name. This case passes once PR #1587 lands; it fails before that change. Bottle 19110's stored record still needs repair (name shape, Edradour as distiller, vintage, ABV), but none of its populated facts conflict."
+  },
+  "expected": {
+    "status": "classified",
+    "action": "match",
+    "identityScope": "product",
+    "matchedBottleId": 19110,
+    "summary": "The review names Blackadder Raw Cask, Edradour, 1976, 49.4%, and Bottle 19110 is 'Blackadder Raw Cask 1976 (distilled at Edradour)'. The classifier matched it, but the server cask-code guard read 1976 in the candidate name as a cask code the source did not establish. 1976 is the vintage, which the source prints. Match 19110."
+  },
+  "knownFailure": {
+    "reason": "The server cask-code check reads the vintage 1976 in the candidate name as a cask code and downgrades a right match.",
+    "fixedBy": "PR #1587"
+  }
+}

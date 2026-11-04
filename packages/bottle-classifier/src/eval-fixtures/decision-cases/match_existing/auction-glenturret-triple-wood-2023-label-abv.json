@@ -1,0 +1,1247 @@
+{
+  "id": "auction-glenturret-triple-wood-2023-label-abv",
+  "name": "auction lot photo: the label's 43% settles Glenturret Triple Wood 2023 Release against the lot text's 45%",
+  "input": {
+    "reference": {
+      "id": 15710,
+      "url": "https://www.scotchwhiskyauctions.com/auctions/234-the-185th-auction/904492-glenturret-triple-wood-2023-release/",
+      "name": "Glenturret Triple Wood 2023 Release",
+      "imageUrl": "https://d3suvtcq00dftb.cloudfront.net/images/f8d981a314a99c5bd9fa3853ad0100d8-zoom.jpg",
+      "externalSiteId": 28097,
+      "currentBottleId": null
+    },
+    "extractedIdentity": {
+      "abv": 45,
+      "brand": null,
+      "series": null,
+      "bottler": null,
+      "edition": null,
+      "outturn": null,
+      "category": null,
+      "distillery": null,
+      "expression": null,
+      "maturation": null,
+      "stated_age": null,
+      "cask_number": null,
+      "single_cask": null,
+      "release_year": null,
+      "vintage_year": null,
+      "cask_strength": null
+    },
+    "imageEvidence": null,
+    "initialCandidates": [
+      {
+        "abv": 45,
+        "brand": "Glenturret",
+        "score": 90.2923,
+        "series": null,
+        "source": ["vector", "text", "brand", "brand_coverage"],
+        "bottler": "Glenturret",
+        "edition": "2025 Release",
+        "outturn": null,
+        "bottleId": 46005,
+        "category": "single_malt",
+        "fullName": "Glenturret Triple Wood - 2025 Release - 2025 Release - 45.0% ABV",
+        "reference": "Glenturret Triple Wood (2025 Release)",
+        "statedAge": null,
+        "caskNumber": null,
+        "comparison": {
+          "missing": [],
+          "conflicts": [],
+          "agreements": ["abv"]
+        },
+        "distillery": ["Glenturret"],
+        "maturation": null,
+        "releaseDay": null,
+        "singleCask": null,
+        "releaseYear": 2025,
+        "vintageYear": null,
+        "bottlingYear": null,
+        "caskStrength": null,
+        "releaseMonth": null,
+        "familyContext": {
+          "siblingBottles": []
+        }
+      },
+      {
+        "abv": 43,
+        "brand": "Glenturret",
+        "score": 87.9818,
+        "series": null,
+        "source": ["vector", "text", "brand", "brand_coverage", "context"],
+        "bottler": null,
+        "edition": "2023 Release",
+        "outturn": null,
+        "bottleId": 45557,
+        "category": "single_malt",
+        "fullName": "Glenturret Triple Wood - 2023 Release",
+        "reference": "The Glenturret Triple Wood - 2023 Release - 2023 Release - 43.0% ABV",
+        "statedAge": null,
+        "caskNumber": null,
+        "comparison": {
+          "missing": [],
+          "conflicts": ["abv"],
+          "agreements": [
+            "category",
+            "releaseYear",
+            "edition",
+            "brand",
+            "distillers"
+          ]
+        },
+        "distillery": ["Glenturret"],
+        "maturation": null,
+        "releaseDay": null,
+        "singleCask": null,
+        "releaseYear": 2023,
+        "vintageYear": null,
+        "bottlingYear": null,
+        "caskStrength": null,
+        "releaseMonth": null,
+        "familyContext": {
+          "siblingBottles": []
+        }
+      },
+      {
+        "abv": 46,
+        "brand": "Glenturret",
+        "score": 74.38132,
+        "series": null,
+        "source": ["vector", "text", "brand"],
+        "bottler": null,
+        "edition": null,
+        "outturn": null,
+        "bottleId": 65245,
+        "category": "single_malt",
+        "fullName": "Glenturret Triple Wood",
+        "reference": "Glenturret Triple Wood, 46%",
+        "statedAge": null,
+        "caskNumber": null,
+        "comparison": {
+          "missing": ["releaseYear", "edition"],
+          "conflicts": ["abv"],
+          "agreements": ["category", "brand", "distillers"]
+        },
+        "distillery": ["Glenturret"],
+        "maturation": "first-fill Spanish oak sherry butts, refill American oak hogsheads, first-fill bourbon barrels",
+        "releaseDay": null,
+        "singleCask": null,
+        "releaseYear": null,
+        "vintageYear": null,
+        "bottlingYear": null,
+        "caskStrength": null,
+        "releaseMonth": null,
+        "familyContext": {
+          "siblingBottles": []
+        }
+      },
+      {
+        "abv": null,
+        "brand": "Glenturret",
+        "score": 72.34845,
+        "series": null,
+        "source": ["vector", "text", "brand", "exact"],
+        "bottler": null,
+        "edition": null,
+        "outturn": null,
+        "bottleId": 16289,
+        "category": "single_malt",
+        "fullName": "Glenturret Triple Wood",
+        "reference": "Glenturret Triple Wood",
+        "statedAge": null,
+        "caskNumber": null,
+        "comparison": {
+          "missing": ["abv", "releaseYear", "edition"],
+          "conflicts": [],
+          "agreements": ["category", "brand", "distillers"]
+        },
+        "distillery": ["Glenturret"],
+        "maturation": null,
+        "releaseDay": null,
+        "singleCask": null,
+        "releaseYear": null,
+        "vintageYear": null,
+        "bottlingYear": null,
+        "caskStrength": null,
+        "releaseMonth": null,
+        "familyContext": {
+          "siblingBottles": []
+        }
+      },
+      {
+        "abv": 43,
+        "brand": "Glenturret",
+        "score": 61.656654,
+        "series": null,
+        "source": ["text", "brand", "brand_coverage"],
+        "bottler": null,
+        "edition": "2024 Edition",
+        "outturn": null,
+        "bottleId": 56516,
+        "category": "single_malt",
+        "fullName": "Glenturret Triple Wood - 2024 Edition",
+        "reference": null,
+        "statedAge": null,
+        "caskNumber": null,
+        "comparison": {
+          "missing": [],
+          "conflicts": ["abv", "releaseYear", "edition"],
+          "agreements": ["category", "brand", "distillers"]
+        },
+        "distillery": ["Glenturret"],
+        "maturation": null,
+        "releaseDay": null,
+        "singleCask": null,
+        "releaseYear": 2024,
+        "vintageYear": null,
+        "bottlingYear": null,
+        "caskStrength": null,
+        "releaseMonth": null,
+        "familyContext": {
+          "siblingBottles": []
+        }
+      },
+      {
+        "abv": null,
+        "brand": "Ardmore",
+        "score": 44.74124,
+        "series": null,
+        "source": ["text"],
+        "bottler": null,
+        "edition": null,
+        "outturn": null,
+        "bottleId": 42903,
+        "category": "single_malt",
+        "fullName": "Ardmore Triple Wood",
+        "reference": null,
+        "statedAge": null,
+        "caskNumber": null,
+        "comparison": {
+          "missing": ["abv", "releaseYear", "edition"],
+          "conflicts": ["brand", "distillers"],
+          "agreements": ["category"]
+        },
+        "distillery": ["Ardmore"],
+        "maturation": null,
+        "releaseDay": null,
+        "singleCask": null,
+        "releaseYear": null,
+        "vintageYear": null,
+        "bottlingYear": null,
+        "caskStrength": null,
+        "releaseMonth": null,
+        "familyContext": {
+          "siblingBottles": []
+        }
+      },
+      {
+        "abv": 48.4,
+        "brand": "Glenturret",
+        "score": 41.60435,
+        "series": null,
+        "source": ["vector", "text", "brand_coverage"],
+        "bottler": null,
+        "edition": "2023 Release",
+        "outturn": null,
+        "bottleId": 57961,
+        "category": "single_malt",
+        "fullName": "Glenturret Peat Smoked - 2023 Release",
+        "reference": "Glenturret 10-year-old Peat Smoked (2023 Release), 48.4%",
+        "statedAge": 10,
+        "caskNumber": null,
+        "comparison": {
+          "missing": [],
+          "conflicts": ["abv"],
+          "agreements": [
+            "category",
+            "releaseYear",
+            "edition",
+            "brand",
+            "distillers"
+          ]
+        },
+        "distillery": ["Glenturret"],
+        "maturation": null,
+        "releaseDay": null,
+        "singleCask": null,
+        "releaseYear": 2023,
+        "vintageYear": null,
+        "bottlingYear": null,
+        "caskStrength": null,
+        "releaseMonth": null,
+        "familyContext": {
+          "siblingBottles": []
+        }
+      },
+      {
+        "abv": 42.7,
+        "brand": "Glenturret",
+        "score": 40.654,
+        "series": null,
+        "source": ["text", "brand_coverage"],
+        "bottler": null,
+        "edition": "2023 Release",
+        "outturn": null,
+        "bottleId": 62605,
+        "category": "single_malt",
+        "fullName": "Glenturret 30-year-old - 2023 Release",
+        "reference": null,
+        "statedAge": 30,
+        "caskNumber": null,
+        "comparison": {
+          "missing": [],
+          "conflicts": ["abv"],
+          "agreements": [
+            "category",
+            "releaseYear",
+            "edition",
+            "brand",
+            "distillers"
+          ]
+        },
+        "distillery": ["Glenturret"],
+        "maturation": null,
+        "releaseDay": null,
+        "singleCask": null,
+        "releaseYear": 2023,
+        "vintageYear": null,
+        "bottlingYear": null,
+        "caskStrength": null,
+        "releaseMonth": null,
+        "familyContext": {
+          "siblingBottles": []
+        }
+      },
+      {
+        "abv": 42.8,
+        "brand": "Glenturret",
+        "score": 38.85521,
+        "series": null,
+        "source": ["text", "brand_coverage"],
+        "bottler": null,
+        "edition": "2023 Release",
+        "outturn": 185,
+        "bottleId": 64112,
+        "category": "single_malt",
+        "fullName": "Glenturret Highland Single Malt Scotch Whisky - 2023 Release",
+        "reference": null,
+        "statedAge": 35,
+        "caskNumber": null,
+        "comparison": {
+          "missing": [],
+          "conflicts": ["abv"],
+          "agreements": [
+            "category",
+            "releaseYear",
+            "edition",
+            "brand",
+            "distillers"
+          ]
+        },
+        "distillery": ["Glenturret"],
+        "maturation": null,
+        "releaseDay": null,
+        "singleCask": null,
+        "releaseYear": 2023,
+        "vintageYear": null,
+        "bottlingYear": null,
+        "caskStrength": null,
+        "releaseMonth": null,
+        "familyContext": {
+          "siblingBottles": []
+        }
+      },
+      {
+        "abv": 45,
+        "brand": "Ergaster",
+        "score": 30.471212,
+        "series": null,
+        "source": ["text"],
+        "bottler": null,
+        "edition": null,
+        "outturn": null,
+        "bottleId": 45970,
+        "category": "single_malt",
+        "fullName": "Ergaster Nature - 45.0% ABV",
+        "reference": null,
+        "statedAge": null,
+        "caskNumber": null,
+        "comparison": {
+          "missing": [],
+          "conflicts": [],
+          "agreements": ["abv"]
+        },
+        "distillery": ["Ergaster"],
+        "maturation": null,
+        "releaseDay": null,
+        "singleCask": null,
+        "releaseYear": null,
+        "vintageYear": null,
+        "bottlingYear": null,
+        "caskStrength": null,
+        "releaseMonth": null,
+        "familyContext": {
+          "siblingBottles": []
+        }
+      },
+      {
+        "abv": 45,
+        "brand": "Benchmark",
+        "score": 29.26025,
+        "series": null,
+        "source": ["text"],
+        "bottler": null,
+        "edition": null,
+        "outturn": null,
+        "bottleId": 45467,
+        "category": "bourbon",
+        "fullName": "Benchmark Small Batch - 45.0% ABV",
+        "reference": null,
+        "statedAge": null,
+        "caskNumber": null,
+        "comparison": {
+          "missing": [],
+          "conflicts": [],
+          "agreements": ["abv"]
+        },
+        "distillery": ["Buffalo Trace Distillery"],
+        "maturation": null,
+        "releaseDay": null,
+        "singleCask": null,
+        "releaseYear": null,
+        "vintageYear": null,
+        "bottlingYear": null,
+        "caskStrength": null,
+        "releaseMonth": null,
+        "familyContext": {
+          "siblingBottles": []
+        }
+      },
+      {
+        "abv": 45,
+        "brand": "Glynnevan",
+        "score": 29.158142,
+        "series": null,
+        "source": ["text"],
+        "bottler": null,
+        "edition": null,
+        "outturn": null,
+        "bottleId": 64971,
+        "category": "rye",
+        "fullName": "Glynnevan Cabot Triple Barrelled",
+        "reference": null,
+        "statedAge": null,
+        "caskNumber": null,
+        "comparison": {
+          "missing": [],
+          "conflicts": [],
+          "agreements": ["abv"]
+        },
+        "distillery": [],
+        "maturation": "Finished in freshly drained oak barrels used to mature Fortress Rum",
+        "releaseDay": null,
+        "singleCask": null,
+        "releaseYear": null,
+        "vintageYear": null,
+        "bottlingYear": null,
+        "caskStrength": null,
+        "releaseMonth": null,
+        "familyContext": {
+          "siblingBottles": []
+        }
+      },
+      {
+        "abv": null,
+        "brand": "Glenturret",
+        "score": 29.152084,
+        "series": null,
+        "source": ["text"],
+        "bottler": null,
+        "edition": null,
+        "outturn": null,
+        "bottleId": 16290,
+        "category": "single_malt",
+        "fullName": "Glenturret Peated Edition",
+        "reference": null,
+        "statedAge": null,
+        "caskNumber": null,
+        "comparison": {
+          "missing": ["abv", "releaseYear", "edition"],
+          "conflicts": [],
+          "agreements": ["category", "brand", "distillers"]
+        },
+        "distillery": ["Glenturret"],
+        "maturation": null,
+        "releaseDay": null,
+        "singleCask": null,
+        "releaseYear": null,
+        "vintageYear": null,
+        "bottlingYear": null,
+        "caskStrength": null,
+        "releaseMonth": null,
+        "familyContext": {
+          "siblingBottles": []
+        }
+      },
+      {
+        "abv": null,
+        "brand": "Glenturret",
+        "score": 29.152084,
+        "series": null,
+        "source": ["text"],
+        "bottler": null,
+        "edition": null,
+        "outturn": null,
+        "bottleId": 16291,
+        "category": "single_malt",
+        "fullName": "Glenturret Sherry Edition",
+        "reference": null,
+        "statedAge": null,
+        "caskNumber": null,
+        "comparison": {
+          "missing": ["abv", "releaseYear", "edition"],
+          "conflicts": [],
+          "agreements": ["category", "brand", "distillers"]
+        },
+        "distillery": ["Glenturret"],
+        "maturation": null,
+        "releaseDay": null,
+        "singleCask": null,
+        "releaseYear": null,
+        "vintageYear": null,
+        "bottlingYear": null,
+        "caskStrength": null,
+        "releaseMonth": null,
+        "familyContext": {
+          "siblingBottles": []
+        }
+      },
+      {
+        "abv": 45,
+        "brand": "Hillrock",
+        "score": 28.72052,
+        "series": null,
+        "source": ["text"],
+        "bottler": null,
+        "edition": null,
+        "outturn": null,
+        "bottleId": 47195,
+        "category": "rye",
+        "fullName": "Hillrock Estate Double Cask Rye - 45.0% ABV",
+        "reference": null,
+        "statedAge": null,
+        "caskNumber": null,
+        "comparison": {
+          "missing": [],
+          "conflicts": [],
+          "agreements": ["abv"]
+        },
+        "distillery": ["Hillrock"],
+        "maturation": null,
+        "releaseDay": null,
+        "singleCask": false,
+        "releaseYear": null,
+        "vintageYear": null,
+        "bottlingYear": null,
+        "caskStrength": null,
+        "releaseMonth": null,
+        "familyContext": {
+          "siblingBottles": []
+        }
+      },
+      {
+        "abv": 45,
+        "brand": "Ergaster",
+        "score": 28.45788,
+        "series": null,
+        "source": ["text"],
+        "bottler": null,
+        "edition": null,
+        "outturn": null,
+        "bottleId": 46189,
+        "category": "single_malt",
+        "fullName": "Ergaster Tourbé 003 Biologique - 45.0% ABV",
+        "reference": null,
+        "statedAge": null,
+        "caskNumber": null,
+        "comparison": {
+          "missing": [],
+          "conflicts": [],
+          "agreements": ["abv"]
+        },
+        "distillery": ["Ergaster"],
+        "maturation": null,
+        "releaseDay": null,
+        "singleCask": null,
+        "releaseYear": null,
+        "vintageYear": null,
+        "bottlingYear": null,
+        "caskStrength": null,
+        "releaseMonth": null,
+        "familyContext": {
+          "siblingBottles": []
+        }
+      },
+      {
+        "abv": 45,
+        "brand": "First Call",
+        "score": 28.45788,
+        "series": null,
+        "source": ["text"],
+        "bottler": null,
+        "edition": null,
+        "outturn": null,
+        "bottleId": 45224,
+        "category": "bourbon",
+        "fullName": "First Call Break Maiden - 45.0% ABV",
+        "reference": null,
+        "statedAge": null,
+        "caskNumber": null,
+        "comparison": {
+          "missing": [],
+          "conflicts": [],
+          "agreements": ["abv"]
+        },
+        "distillery": [],
+        "maturation": null,
+        "releaseDay": null,
+        "singleCask": null,
+        "releaseYear": null,
+        "vintageYear": null,
+        "bottlingYear": null,
+        "caskStrength": null,
+        "releaseMonth": null,
+        "familyContext": {
+          "siblingBottles": []
+        }
+      },
+      {
+        "abv": 45,
+        "brand": "Reservoir",
+        "score": 28.376225,
+        "series": null,
+        "source": ["text"],
+        "bottler": null,
+        "edition": null,
+        "outturn": null,
+        "bottleId": 46883,
+        "category": "bourbon",
+        "fullName": "Reservoir Hunter & Scott Bourbon - 45.0% ABV",
+        "reference": null,
+        "statedAge": null,
+        "caskNumber": null,
+        "comparison": {
+          "missing": [],
+          "conflicts": [],
+          "agreements": ["abv"]
+        },
+        "distillery": ["Reservoir Distillery"],
+        "maturation": null,
+        "releaseDay": null,
+        "singleCask": null,
+        "releaseYear": null,
+        "vintageYear": null,
+        "bottlingYear": null,
+        "caskStrength": null,
+        "releaseMonth": null,
+        "familyContext": {
+          "siblingBottles": []
+        }
+      },
+      {
+        "abv": 45,
+        "brand": "Elvis Whiskey",
+        "score": 28.296444,
+        "series": null,
+        "source": ["text"],
+        "bottler": "Grain & Barrel Spirits",
+        "edition": null,
+        "outturn": null,
+        "bottleId": 46941,
+        "category": null,
+        "fullName": "Elvis Whiskey Tiger Man - 45.0% ABV",
+        "reference": null,
+        "statedAge": null,
+        "caskNumber": null,
+        "comparison": {
+          "missing": [],
+          "conflicts": [],
+          "agreements": ["abv"]
+        },
+        "distillery": [],
+        "maturation": null,
+        "releaseDay": null,
+        "singleCask": null,
+        "releaseYear": null,
+        "vintageYear": null,
+        "bottlingYear": null,
+        "caskStrength": null,
+        "releaseMonth": null,
+        "familyContext": {
+          "siblingBottles": []
+        }
+      },
+      {
+        "abv": 45,
+        "brand": "Artesia",
+        "score": 28.218475,
+        "series": null,
+        "source": ["text"],
+        "bottler": null,
+        "edition": null,
+        "outturn": null,
+        "bottleId": 46454,
+        "category": "single_malt",
+        "fullName": "Artesia Sherry - 45.0% ABV - Other Cask",
+        "reference": null,
+        "statedAge": null,
+        "caskNumber": null,
+        "comparison": {
+          "missing": [],
+          "conflicts": [],
+          "agreements": ["abv"]
+        },
+        "distillery": ["T.O.S Distillerie"],
+        "maturation": "other",
+        "releaseDay": null,
+        "singleCask": null,
+        "releaseYear": null,
+        "vintageYear": null,
+        "bottlingYear": null,
+        "caskStrength": null,
+        "releaseMonth": null,
+        "familyContext": {
+          "siblingBottles": []
+        }
+      },
+      {
+        "abv": 45,
+        "brand": "Elvis Whiskey",
+        "score": 28.218475,
+        "series": null,
+        "source": ["text"],
+        "bottler": "Grain & Barrel Spirits",
+        "edition": null,
+        "outturn": null,
+        "bottleId": 46905,
+        "category": "rye",
+        "fullName": "Elvis Whiskey The King - 45.0% ABV",
+        "reference": null,
+        "statedAge": null,
+        "caskNumber": null,
+        "comparison": {
+          "missing": [],
+          "conflicts": [],
+          "agreements": ["abv"]
+        },
+        "distillery": [],
+        "maturation": null,
+        "releaseDay": null,
+        "singleCask": null,
+        "releaseYear": null,
+        "vintageYear": null,
+        "bottlingYear": null,
+        "caskStrength": null,
+        "releaseMonth": null,
+        "familyContext": {
+          "siblingBottles": []
+        }
+      },
+      {
+        "abv": 45,
+        "brand": "Circumstance",
+        "score": 27.401827,
+        "series": null,
+        "source": ["text"],
+        "bottler": "Circumstance Distillery",
+        "edition": null,
+        "outturn": null,
+        "bottleId": 45854,
+        "category": "single_grain",
+        "fullName": "Circumstance Single Grain Estate Whisky - 45.0% ABV",
+        "reference": null,
+        "statedAge": null,
+        "caskNumber": null,
+        "comparison": {
+          "missing": [],
+          "conflicts": [],
+          "agreements": ["abv"]
+        },
+        "distillery": ["Circumstance Distillery"],
+        "maturation": null,
+        "releaseDay": null,
+        "singleCask": null,
+        "releaseYear": null,
+        "vintageYear": null,
+        "bottlingYear": null,
+        "caskStrength": null,
+        "releaseMonth": null,
+        "familyContext": {
+          "siblingBottles": []
+        }
+      },
+      {
+        "abv": 45,
+        "brand": "Glenfarclas",
+        "score": 27.401827,
+        "series": null,
+        "source": ["text"],
+        "bottler": "Glenfarclas",
+        "edition": null,
+        "outturn": null,
+        "bottleId": 45516,
+        "category": "single_malt",
+        "fullName": "Glenfarclas Private Reserve - 2021 Release - 45.0% ABV",
+        "reference": null,
+        "statedAge": null,
+        "caskNumber": null,
+        "comparison": {
+          "missing": [],
+          "conflicts": [],
+          "agreements": ["abv"]
+        },
+        "distillery": ["Glenfarclas"],
+        "maturation": null,
+        "releaseDay": null,
+        "singleCask": null,
+        "releaseYear": 2021,
+        "vintageYear": null,
+        "bottlingYear": null,
+        "caskStrength": null,
+        "releaseMonth": null,
+        "familyContext": {
+          "siblingBottles": []
+        }
+      },
+      {
+        "abv": 45,
+        "brand": "Monsieur Balthazar",
+        "score": 27.401827,
+        "series": null,
+        "source": ["text"],
+        "bottler": null,
+        "edition": null,
+        "outturn": null,
+        "bottleId": 46796,
+        "category": "single_malt",
+        "fullName": "Monsieur Balthazar Aumance - 45.0% ABV - Sauternes Cask",
+        "reference": null,
+        "statedAge": null,
+        "caskNumber": null,
+        "comparison": {
+          "missing": [],
+          "conflicts": [],
+          "agreements": ["abv"]
+        },
+        "distillery": ["Monsieur Balthazar"],
+        "maturation": "sauternes",
+        "releaseDay": null,
+        "singleCask": null,
+        "releaseYear": null,
+        "vintageYear": null,
+        "bottlingYear": null,
+        "caskStrength": null,
+        "releaseMonth": null,
+        "familyContext": {
+          "siblingBottles": []
+        }
+      },
+      {
+        "abv": 45,
+        "brand": "Griffo",
+        "score": 27.32561,
+        "series": null,
+        "source": ["text"],
+        "bottler": "Griffo Distillery",
+        "edition": null,
+        "outturn": null,
+        "bottleId": 47225,
+        "category": "blend",
+        "fullName": "Griffo Stout Barreled - 45.0% ABV - Other Cask",
+        "reference": null,
+        "statedAge": null,
+        "caskNumber": null,
+        "comparison": {
+          "missing": [],
+          "conflicts": [],
+          "agreements": ["abv"]
+        },
+        "distillery": ["Griffo Distillery"],
+        "maturation": "other",
+        "releaseDay": null,
+        "singleCask": false,
+        "releaseYear": null,
+        "vintageYear": null,
+        "bottlingYear": null,
+        "caskStrength": null,
+        "releaseMonth": null,
+        "familyContext": {
+          "siblingBottles": []
+        }
+      }
+    ]
+  },
+  "context": {
+    "inspectedBottleIds": [45557],
+    "bottleContexts": [
+      {
+        "exact": {
+          "abv": 43,
+          "edition": "2023 Release",
+          "outturn": null,
+          "statedAge": null,
+          "caskNumber": null,
+          "maturation": null,
+          "releaseDay": null,
+          "singleCask": null,
+          "releaseYear": 2023,
+          "vintageYear": null,
+          "bottlingYear": null,
+          "caskStrength": null,
+          "releaseMonth": null
+        },
+        "shared": {
+          "name": "Triple Wood",
+          "brand": {
+            "name": "Glenturret",
+            "entityId": 987
+          },
+          "series": null,
+          "bottler": null,
+          "category": "single_malt",
+          "statedAge": null,
+          "distillers": [
+            {
+              "name": "Glenturret",
+              "entityId": 987
+            }
+          ]
+        },
+        "groupId": 18517,
+        "bottleId": 45557,
+        "fullName": "Glenturret Triple Wood - 2023 Release",
+        "siblings": [],
+        "references": [
+          {
+            "name": "Glenturret Triple Wood - 2023 Release - 2023 Release - 43.0% ABV",
+            "ignored": false
+          },
+          {
+            "name": "The Glenturret Triple Wood - 2023 Release - 2023 Release - 43.0% ABV",
+            "ignored": false
+          }
+        ],
+        "observations": [
+          {
+            "facts": {
+              "proposalType": "no_match",
+              "proposedBottle": null,
+              "referenceScope": "none"
+            },
+            "rawText": "The Glenturret 2023 Edition Triple Wood Highland Single Malt Scotch Whisky",
+            "sourceKey": "store_price:11949293",
+            "sourceUrl": "https://www.astorwines.com/item/50327",
+            "sourceName": "The Glenturret 2023 Edition Triple Wood Highland Single Malt Scotch Whisky",
+            "sourceType": "store_price",
+            "parsedIdentity": null
+          },
+          {
+            "facts": {
+              "proposalType": "create_new",
+              "proposedBottle": {
+                "abv": 43,
+                "name": "Triple Wood",
+                "brand": {
+                  "id": 987,
+                  "name": "Glenturret"
+                },
+                "series": null,
+                "bottler": {
+                  "id": 987,
+                  "name": "Glenturret"
+                },
+                "edition": "2023 Release",
+                "caskFill": null,
+                "caskSize": null,
+                "caskType": null,
+                "category": "single_malt",
+                "statedAge": null,
+                "distillers": [
+                  {
+                    "id": 987,
+                    "name": "Glenturret"
+                  }
+                ],
+                "singleCask": null,
+                "releaseYear": 2023,
+                "vintageYear": null,
+                "caskStrength": null
+              }
+            },
+            "rawText": "Glenturret Triple Wood -",
+            "sourceKey": "store_price:12029293",
+            "sourceUrl": "https://www.finedrams.com/glenturret-triple-wood-whisky-2023-release.html",
+            "sourceName": "Glenturret Triple Wood -",
+            "sourceType": "store_price",
+            "parsedIdentity": {
+              "abv": 43,
+              "brand": "The Glenturret",
+              "series": null,
+              "bottler": null,
+              "edition": null,
+              "category": "single_malt",
+              "cask_fill": null,
+              "cask_size": null,
+              "cask_type": null,
+              "distillery": ["Glenturret"],
+              "expression": "Triple Wood",
+              "stated_age": null,
+              "single_cask": null,
+              "release_year": null,
+              "vintage_year": null,
+              "cask_strength": null
+            }
+          }
+        ],
+        "imageSources": []
+      }
+    ],
+    "inspectedEntities": [
+      {
+        "kind": "distillery",
+        "name": "Glenturret",
+        "score": 1,
+        "source": ["exact", "text", "prefix", "contained"],
+        "entityId": 987,
+        "reference": "Glenturret",
+        "shortName": null,
+        "retrievedFor": [
+          {
+            "exact": true,
+            "query": "Glenturret"
+          }
+        ]
+      },
+      {
+        "kind": "distillery",
+        "name": "Ergaster",
+        "score": 1,
+        "source": ["exact", "text", "prefix", "contained"],
+        "entityId": 2687,
+        "reference": "Ergaster",
+        "shortName": null,
+        "retrievedFor": [
+          {
+            "exact": true,
+            "query": "Ergaster"
+          }
+        ]
+      },
+      {
+        "kind": "brand",
+        "name": "Benchmark",
+        "score": 1,
+        "source": ["exact", "text", "prefix", "contained"],
+        "entityId": 2227,
+        "reference": "Benchmark",
+        "shortName": null,
+        "retrievedFor": [
+          {
+            "exact": true,
+            "query": "Benchmark"
+          }
+        ]
+      },
+      {
+        "kind": "distillery",
+        "name": "Buffalo Trace Distillery",
+        "score": 1,
+        "source": ["exact", "text", "prefix", "contained"],
+        "entityId": 483,
+        "reference": "Buffalo Trace Distillery",
+        "shortName": "Buffalo Trace",
+        "retrievedFor": [
+          {
+            "exact": true,
+            "query": "Buffalo Trace Distillery"
+          }
+        ]
+      },
+      {
+        "kind": "brand",
+        "name": "Glynnevan",
+        "score": 1,
+        "source": ["exact", "text", "prefix", "contained"],
+        "entityId": 367423,
+        "reference": "Glynnevan",
+        "shortName": null,
+        "retrievedFor": [
+          {
+            "exact": true,
+            "query": "Glynnevan"
+          }
+        ]
+      },
+      {
+        "kind": "distillery",
+        "name": "Hillrock",
+        "score": 1,
+        "source": ["exact", "text", "prefix", "contained"],
+        "entityId": 3037,
+        "reference": "Hillrock",
+        "shortName": null,
+        "retrievedFor": [
+          {
+            "exact": true,
+            "query": "Hillrock"
+          }
+        ]
+      },
+      {
+        "kind": "brand",
+        "name": "First Call",
+        "score": 1,
+        "source": ["exact", "text", "prefix", "contained"],
+        "entityId": 356569,
+        "reference": null,
+        "shortName": null,
+        "retrievedFor": [
+          {
+            "exact": true,
+            "query": "First Call"
+          }
+        ]
+      },
+      {
+        "kind": "brand",
+        "name": "Reservoir",
+        "score": 1,
+        "source": ["exact", "text", "prefix", "contained"],
+        "entityId": 1290,
+        "reference": "Reservoir",
+        "shortName": null,
+        "retrievedFor": [
+          {
+            "exact": true,
+            "query": "Reservoir"
+          },
+          {
+            "query": "Reservoir Distillery"
+          }
+        ]
+      },
+      {
+        "kind": "distillery",
+        "name": "Reservoir Distillery",
+        "score": 1,
+        "source": ["text", "prefix", "exact", "contained"],
+        "entityId": 1885,
+        "reference": "Reservoir Distillery",
+        "shortName": null,
+        "retrievedFor": [
+          {
+            "query": "Reservoir"
+          },
+          {
+            "exact": true,
+            "query": "Reservoir Distillery"
+          }
+        ]
+      },
+      {
+        "kind": "brand",
+        "name": "Elvis Whiskey",
+        "score": 1,
+        "source": ["exact", "text", "prefix", "contained"],
+        "entityId": 365995,
+        "reference": "Elvis Whiskey",
+        "shortName": null,
+        "retrievedFor": [
+          {
+            "exact": true,
+            "query": "Elvis Whiskey"
+          }
+        ]
+      },
+      {
+        "kind": "bottler",
+        "name": "Grain & Barrel Spirits",
+        "score": 1,
+        "source": ["exact", "text", "prefix", "contained"],
+        "entityId": 366002,
+        "reference": "Grain & Barrel Spirits",
+        "shortName": null,
+        "retrievedFor": [
+          {
+            "exact": true,
+            "query": "Grain & Barrel Spirits"
+          }
+        ]
+      },
+      {
+        "kind": "brand",
+        "name": "Artesia",
+        "score": 1,
+        "source": ["exact", "text", "prefix", "contained"],
+        "entityId": 365945,
+        "reference": "Artesia",
+        "shortName": null,
+        "retrievedFor": [
+          {
+            "exact": true,
+            "query": "Artesia"
+          }
+        ]
+      },
+      {
+        "kind": "bottler",
+        "name": "Barrell Craft Spirits",
+        "score": 0.31666666666666665,
+        "source": ["contained"],
+        "entityId": 75635,
+        "reference": "Barrel",
+        "shortName": "Barrell",
+        "retrievedFor": [
+          {
+            "query": "Grain & Barrel Spirits"
+          }
+        ]
+      },
+      {
+        "kind": "distillery",
+        "name": "Grain",
+        "score": 0.3055555555555556,
+        "source": ["contained"],
+        "entityId": 2925,
+        "reference": "Grain",
+        "shortName": null,
+        "retrievedFor": [
+          {
+            "query": "Grain & Barrel Spirits"
+          }
+        ]
+      }
+    ],
+    "inspectedSeries": []
+  },
+  "provenance": {
+    "source": "production_miss",
+    "verifiedSourceUrls": [
+      "https://www.scotchwhiskyauctions.com/auctions/234-the-185th-auction/904492-glenturret-triple-wood-2023-release/",
+      "https://d3suvtcq00dftb.cloudfront.net/images/f8d981a314a99c5bd9fa3853ad0100d8-zoom.jpg"
+    ],
+    "dbOutcome": {
+      "bottleId": null,
+      "createsBottle": false,
+      "summary": "Production returned no_match: it held candidate 45557 because the lot's structured ABV (45%) conflicted with the stored 43%."
+    },
+    "notes": "Saved check 35444, source auction_lot 15710 (Scotch Whisky Auctions 185th auction, lot 185-904492), run 2026-11-03. Production ran without the lot photo: input.reference.imageUrl was null. This case sets it to the lot's first photo at full size and adds that photo's reviewed label reading to the evidence pack; it goes in with the change that makes auctions read the lot photo. The lot's stored sourceImageUrl is the 224px `-med` copy of the same image, too small to read the ABV, so that change needs the `-zoom` (1500px) size. The photo clearly shows the bottle and carton: The Glenturret, Highland Single Malt Scotch Whisky, Triple Wood, 2023 Release, 70cl, 43%vol, and the carton's 'Distilled by The Glenturret Distillery'. The engraving '17 years - Who knew!' on the bottle base is a personal engraving, not an age statement, and is left out of the reading. The lot text and the scraper's structured ABV say 45%, which matches the 2025 Release (46005, 45%), not the 2023 Release. The printed label settles it: 45557 is the same release and no stored field conflicts."
+  },
+  "expected": {
+    "status": "classified",
+    "action": "match",
+    "identityScope": "product",
+    "matchedBottleId": 45557,
+    "summary": "Match Glenturret Triple Wood 2023 Release (45557). The label photo prints 2023 Release and 43%vol, which agree with the stored Bottle; the lot text's 45% is a typo, and 45% belongs to the 2025 Release (46005)."
+  }
+}

@@ -1,0 +1,3125 @@
+{
+  "id": "auction-macallan-runrig-duncan-taylor-brand",
+  "name": "auction lot: Macallan Runrig Beat the Dram is a Duncan Taylor bottling",
+  "input": {
+    "reference": {
+      "id": 16710,
+      "url": "https://www.scotchwhiskyauctions.com/auctions/234-the-185th-auction/903755-macallan-20-year-old-runrig-beat-the-dram-loch-ness-2007/",
+      "name": "Macallan 20 Year Old Runrig Beat the Dram Loch Ness 2007",
+      "imageUrl": null,
+      "externalSiteId": 28097,
+      "currentBottleId": null
+    },
+    "extractedIdentity": {
+      "abv": 46,
+      "brand": null,
+      "series": null,
+      "bottler": null,
+      "edition": null,
+      "outturn": 500,
+      "category": null,
+      "distillery": null,
+      "expression": null,
+      "maturation": null,
+      "stated_age": null,
+      "cask_number": "D2562",
+      "single_cask": null,
+      "release_year": null,
+      "vintage_year": null,
+      "cask_strength": null
+    },
+    "imageEvidence": null,
+    "initialCandidates": [
+      {
+        "abv": 46,
+        "brand": "Duncan Taylor",
+        "score": 74.35399,
+        "series": "NC2",
+        "source": ["vector", "text"],
+        "bottler": "Duncan Taylor",
+        "edition": null,
+        "outturn": null,
+        "bottleId": 65678,
+        "category": "single_malt",
+        "fullName": "Duncan Taylor Glenlivet 1987",
+        "reference": "Duncan Taylor 1987 vintage 22-year-old (distilled at Glenlivet)",
+        "statedAge": 22,
+        "caskNumber": null,
+        "comparison": {
+          "missing": ["releaseYear", "caskNumber"],
+          "conflicts": ["statedAge", "singleCask", "distillers"],
+          "agreements": ["category", "abv", "vintageYear", "brand", "bottler"]
+        },
+        "distillery": ["The Glenlivet"],
+        "maturation": null,
+        "releaseDay": null,
+        "singleCask": false,
+        "releaseYear": null,
+        "vintageYear": 1987,
+        "bottlingYear": null,
+        "caskStrength": null,
+        "releaseMonth": null,
+        "familyContext": {
+          "siblingBottles": []
+        }
+      },
+      {
+        "abv": 55.7,
+        "brand": "Duncan Taylor",
+        "score": 66.71613,
+        "series": "Rare Auld",
+        "source": ["vector", "text"],
+        "bottler": "Duncan Taylor",
+        "edition": null,
+        "outturn": null,
+        "bottleId": 65600,
+        "category": "single_malt",
+        "fullName": "Duncan Taylor Bunnahabhain 1987",
+        "reference": "Duncan Taylor Rare Auld Range 1987 vintage 24-year-old (distilled at Bunnahabhain)",
+        "statedAge": 24,
+        "caskNumber": null,
+        "comparison": {
+          "missing": ["releaseYear", "singleCask", "caskNumber"],
+          "conflicts": ["statedAge", "abv", "distillers"],
+          "agreements": ["category", "vintageYear", "brand", "bottler"]
+        },
+        "distillery": ["Bunnahabhain"],
+        "maturation": null,
+        "releaseDay": null,
+        "singleCask": null,
+        "releaseYear": null,
+        "vintageYear": 1987,
+        "bottlingYear": null,
+        "caskStrength": null,
+        "releaseMonth": null,
+        "familyContext": {
+          "siblingBottles": []
+        }
+      },
+      {
+        "abv": 46,
+        "brand": "First Cask",
+        "score": 62.150314,
+        "series": null,
+        "source": ["text"],
+        "bottler": "Direct Wines",
+        "edition": null,
+        "outturn": null,
+        "bottleId": 70057,
+        "category": "single_malt",
+        "fullName": "First Cask Glenkinchie 1987 20-year-old",
+        "reference": null,
+        "statedAge": 20,
+        "caskNumber": "2839",
+        "comparison": {
+          "missing": ["releaseYear"],
+          "conflicts": ["caskNumber", "brand", "distillers"],
+          "agreements": [
+            "category",
+            "statedAge",
+            "abv",
+            "vintageYear",
+            "singleCask"
+          ]
+        },
+        "distillery": ["Glenkinchie"],
+        "maturation": null,
+        "releaseDay": null,
+        "singleCask": true,
+        "releaseYear": null,
+        "vintageYear": 1987,
+        "bottlingYear": null,
+        "caskStrength": null,
+        "releaseMonth": null,
+        "familyContext": {
+          "siblingBottles": []
+        }
+      },
+      {
+        "abv": 46,
+        "brand": "William Cadenhead's",
+        "score": 60.08297,
+        "series": null,
+        "source": ["text"],
+        "bottler": "William Cadenhead's",
+        "edition": null,
+        "outturn": null,
+        "bottleId": 67795,
+        "category": "single_malt",
+        "fullName": "Cadenhead's Macallan 1962 20-year-old",
+        "reference": null,
+        "statedAge": 20,
+        "caskNumber": null,
+        "comparison": {
+          "missing": ["releaseYear", "singleCask", "caskNumber"],
+          "conflicts": ["vintageYear", "brand"],
+          "agreements": ["category", "statedAge", "abv", "distillers"]
+        },
+        "distillery": ["The Macallan"],
+        "maturation": null,
+        "releaseDay": null,
+        "singleCask": null,
+        "releaseYear": null,
+        "vintageYear": 1962,
+        "bottlingYear": 1983,
+        "caskStrength": null,
+        "releaseMonth": null,
+        "familyContext": {
+          "siblingBottles": []
+        }
+      },
+      {
+        "abv": 46,
+        "brand": "William Cadenhead's",
+        "score": 60.08297,
+        "series": null,
+        "source": ["text"],
+        "bottler": "William Cadenhead's",
+        "edition": null,
+        "outturn": null,
+        "bottleId": 67796,
+        "category": "single_malt",
+        "fullName": "Cadenhead's Macallan 1962 20-year-old",
+        "reference": null,
+        "statedAge": 20,
+        "caskNumber": null,
+        "comparison": {
+          "missing": ["releaseYear", "singleCask", "caskNumber"],
+          "conflicts": ["vintageYear", "brand"],
+          "agreements": ["category", "statedAge", "abv", "distillers"]
+        },
+        "distillery": ["The Macallan"],
+        "maturation": null,
+        "releaseDay": null,
+        "singleCask": null,
+        "releaseYear": null,
+        "vintageYear": 1962,
+        "bottlingYear": 1982,
+        "caskStrength": null,
+        "releaseMonth": null,
+        "familyContext": {
+          "siblingBottles": []
+        }
+      },
+      {
+        "abv": 58.4,
+        "brand": "Special Releases",
+        "score": 57.922604,
+        "series": null,
+        "source": ["text"],
+        "bottler": null,
+        "edition": "2007",
+        "outturn": 5124,
+        "bottleId": 5076,
+        "category": "single_malt",
+        "fullName": "Special Releases Glenkinchie - 2007",
+        "reference": null,
+        "statedAge": 20,
+        "caskNumber": null,
+        "comparison": {
+          "missing": ["vintageYear", "caskNumber"],
+          "conflicts": ["brand", "distillers"],
+          "agreements": ["category", "statedAge"]
+        },
+        "distillery": ["Glenkinchie"],
+        "maturation": null,
+        "releaseDay": null,
+        "singleCask": null,
+        "releaseYear": 2007,
+        "vintageYear": null,
+        "bottlingYear": null,
+        "caskStrength": null,
+        "releaseMonth": null,
+        "familyContext": {
+          "siblingBottles": []
+        }
+      },
+      {
+        "abv": 46,
+        "brand": "Duncan Taylor",
+        "score": 51.491962,
+        "series": null,
+        "source": ["vector", "text"],
+        "bottler": "Duncan Taylor",
+        "edition": null,
+        "outturn": null,
+        "bottleId": 65797,
+        "category": "single_malt",
+        "fullName": "Duncan Taylor Bruichladdich 1969",
+        "reference": "Duncan Taylor 34-year-old 1969 Vintage (distilled at Bruichladdich)",
+        "statedAge": 34,
+        "caskNumber": null,
+        "comparison": {
+          "missing": ["releaseYear", "singleCask", "caskNumber"],
+          "conflicts": ["statedAge", "vintageYear", "distillers"],
+          "agreements": ["category", "abv", "brand", "bottler"]
+        },
+        "distillery": ["Bruichladdich"],
+        "maturation": null,
+        "releaseDay": null,
+        "singleCask": null,
+        "releaseYear": null,
+        "vintageYear": 1969,
+        "bottlingYear": null,
+        "caskStrength": null,
+        "releaseMonth": null,
+        "familyContext": {
+          "siblingBottles": []
+        }
+      },
+      {
+        "abv": 46,
+        "brand": "Duncan Taylor",
+        "score": 51.491962,
+        "series": null,
+        "source": ["text"],
+        "bottler": "Duncan Taylor",
+        "edition": null,
+        "outturn": null,
+        "bottleId": 65675,
+        "category": "single_malt",
+        "fullName": "Duncan Taylor Bunnahabhain 1997",
+        "reference": null,
+        "statedAge": 12,
+        "caskNumber": null,
+        "comparison": {
+          "missing": ["releaseYear", "singleCask", "caskNumber"],
+          "conflicts": ["statedAge", "vintageYear", "distillers"],
+          "agreements": ["category", "abv", "brand", "bottler"]
+        },
+        "distillery": ["Bunnahabhain"],
+        "maturation": null,
+        "releaseDay": null,
+        "singleCask": null,
+        "releaseYear": null,
+        "vintageYear": 1997,
+        "bottlingYear": null,
+        "caskStrength": null,
+        "releaseMonth": null,
+        "familyContext": {
+          "siblingBottles": []
+        }
+      },
+      {
+        "abv": 45.2,
+        "brand": "Pappy Van Winkle's",
+        "score": 51.154747,
+        "series": null,
+        "source": ["text"],
+        "bottler": null,
+        "edition": "2007 Release",
+        "outturn": null,
+        "bottleId": 62955,
+        "category": "bourbon",
+        "fullName": "Pappy Van Winkle's Family Reserve 20-year-old - 2007 Release",
+        "reference": null,
+        "statedAge": 20,
+        "caskNumber": null,
+        "comparison": {
+          "missing": ["vintageYear", "singleCask", "caskNumber", "bottler"],
+          "conflicts": ["category", "abv", "brand", "distillers"],
+          "agreements": ["statedAge", "releaseYear"]
+        },
+        "distillery": ["Stitzel-Weller Distillery"],
+        "maturation": null,
+        "releaseDay": null,
+        "singleCask": null,
+        "releaseYear": 2007,
+        "vintageYear": null,
+        "bottlingYear": null,
+        "caskStrength": null,
+        "releaseMonth": null,
+        "familyContext": {
+          "siblingBottles": []
+        }
+      },
+      {
+        "abv": 46,
+        "brand": "BenRiach",
+        "score": 49.92682,
+        "series": null,
+        "source": ["text"],
+        "bottler": null,
+        "edition": null,
+        "outturn": null,
+        "bottleId": 65791,
+        "category": "single_malt",
+        "fullName": "BenRiach 20-year-old",
+        "reference": null,
+        "statedAge": 20,
+        "caskNumber": null,
+        "comparison": {
+          "missing": ["vintageYear", "caskNumber"],
+          "conflicts": ["brand", "distillers"],
+          "agreements": ["category", "statedAge"]
+        },
+        "distillery": ["BenRiach"],
+        "maturation": null,
+        "releaseDay": null,
+        "singleCask": null,
+        "releaseYear": null,
+        "vintageYear": null,
+        "bottlingYear": null,
+        "caskStrength": null,
+        "releaseMonth": null,
+        "familyContext": {
+          "siblingBottles": []
+        }
+      },
+      {
+        "abv": 46,
+        "brand": "Duncan Taylor",
+        "score": 49.609386,
+        "series": null,
+        "source": ["text"],
+        "bottler": "Duncan Taylor",
+        "edition": null,
+        "outturn": null,
+        "bottleId": 65225,
+        "category": "single_malt",
+        "fullName": "Duncan Taylor Bunnahabhain 25-year-old",
+        "reference": null,
+        "statedAge": 25,
+        "caskNumber": null,
+        "comparison": {
+          "missing": ["vintageYear", "releaseYear", "singleCask", "caskNumber"],
+          "conflicts": ["statedAge", "distillers"],
+          "agreements": ["category", "abv", "brand", "bottler"]
+        },
+        "distillery": ["Bunnahabhain"],
+        "maturation": null,
+        "releaseDay": null,
+        "singleCask": null,
+        "releaseYear": null,
+        "vintageYear": null,
+        "bottlingYear": null,
+        "caskStrength": null,
+        "releaseMonth": null,
+        "familyContext": {
+          "siblingBottles": []
+        }
+      },
+      {
+        "abv": 44.8,
+        "brand": "The Macallan",
+        "score": 49.115013,
+        "series": "TIME : SPACE Collection",
+        "source": ["text", "context"],
+        "bottler": null,
+        "edition": null,
+        "outturn": null,
+        "bottleId": 68361,
+        "category": "single_malt",
+        "fullName": "The Macallan TIME : SPACE Sherry Cask 20-year-old",
+        "reference": null,
+        "statedAge": 20,
+        "caskNumber": null,
+        "comparison": {
+          "missing": ["vintageYear", "caskNumber"],
+          "conflicts": ["brand", "distillers"],
+          "agreements": ["category", "statedAge"]
+        },
+        "distillery": ["The Macallan"],
+        "maturation": null,
+        "releaseDay": null,
+        "singleCask": null,
+        "releaseYear": null,
+        "vintageYear": null,
+        "bottlingYear": null,
+        "caskStrength": null,
+        "releaseMonth": null,
+        "familyContext": {
+          "siblingBottles": []
+        }
+      },
+      {
+        "abv": 46,
+        "brand": "Duncan Taylor",
+        "score": 49.027603,
+        "series": "NC2",
+        "source": ["text"],
+        "bottler": "Duncan Taylor",
+        "edition": null,
+        "outturn": null,
+        "bottleId": 65622,
+        "category": "single_malt",
+        "fullName": "Duncan Taylor Springbank 13-year-old",
+        "reference": null,
+        "statedAge": 13,
+        "caskNumber": null,
+        "comparison": {
+          "missing": ["vintageYear", "releaseYear", "singleCask", "caskNumber"],
+          "conflicts": ["statedAge", "distillers"],
+          "agreements": ["category", "abv", "brand", "bottler"]
+        },
+        "distillery": ["Springbank"],
+        "maturation": null,
+        "releaseDay": null,
+        "singleCask": null,
+        "releaseYear": null,
+        "vintageYear": null,
+        "bottlingYear": null,
+        "caskStrength": null,
+        "releaseMonth": null,
+        "familyContext": {
+          "siblingBottles": []
+        }
+      },
+      {
+        "abv": null,
+        "brand": "Talisker",
+        "score": 48.634823,
+        "series": null,
+        "source": ["text"],
+        "bottler": null,
+        "edition": null,
+        "outturn": null,
+        "bottleId": 18934,
+        "category": "single_malt",
+        "fullName": "Talisker 20-year-old",
+        "reference": null,
+        "statedAge": 20,
+        "caskNumber": null,
+        "comparison": {
+          "missing": ["vintageYear", "caskNumber"],
+          "conflicts": ["brand", "distillers"],
+          "agreements": ["category", "statedAge"]
+        },
+        "distillery": ["Talisker"],
+        "maturation": null,
+        "releaseDay": null,
+        "singleCask": null,
+        "releaseYear": null,
+        "vintageYear": null,
+        "bottlingYear": null,
+        "caskStrength": null,
+        "releaseMonth": null,
+        "familyContext": {
+          "siblingBottles": []
+        }
+      },
+      {
+        "abv": 46,
+        "brand": "Duncan Taylor",
+        "score": 48.28456,
+        "series": "Dimensions",
+        "source": ["text"],
+        "bottler": "Duncan Taylor",
+        "edition": null,
+        "outturn": null,
+        "bottleId": 65590,
+        "category": "single_malt",
+        "fullName": "Duncan Taylor Auchentoshan 1998",
+        "reference": null,
+        "statedAge": 13,
+        "caskNumber": null,
+        "comparison": {
+          "missing": ["releaseYear", "singleCask", "caskNumber"],
+          "conflicts": ["statedAge", "vintageYear", "distillers"],
+          "agreements": ["category", "abv", "brand", "bottler"]
+        },
+        "distillery": ["Auchentoshan"],
+        "maturation": null,
+        "releaseDay": null,
+        "singleCask": null,
+        "releaseYear": null,
+        "vintageYear": 1998,
+        "bottlingYear": null,
+        "caskStrength": null,
+        "releaseMonth": null,
+        "familyContext": {
+          "siblingBottles": []
+        }
+      },
+      {
+        "abv": 46,
+        "brand": "Whisky Galore",
+        "score": 48.12542,
+        "series": null,
+        "source": ["text"],
+        "bottler": "Duncan Taylor",
+        "edition": null,
+        "outturn": null,
+        "bottleId": 18730,
+        "category": "single_malt",
+        "fullName": "Whisky Galore 16-year-old 1987 vintage - 2004 Release - 1987 Vintage - 46.0% ABV - Single Cask",
+        "reference": null,
+        "statedAge": 16,
+        "caskNumber": null,
+        "comparison": {
+          "missing": ["caskNumber"],
+          "conflicts": ["statedAge", "releaseYear", "brand", "distillers"],
+          "agreements": [
+            "category",
+            "abv",
+            "vintageYear",
+            "singleCask",
+            "bottler"
+          ]
+        },
+        "distillery": ["Bowmore"],
+        "maturation": "Sherry cask",
+        "releaseDay": null,
+        "singleCask": true,
+        "releaseYear": 2004,
+        "vintageYear": 1987,
+        "bottlingYear": 2004,
+        "caskStrength": null,
+        "releaseMonth": null,
+        "familyContext": {
+          "siblingBottles": []
+        }
+      },
+      {
+        "abv": 51.6,
+        "brand": "Duncan Taylor",
+        "score": 47.982506,
+        "series": null,
+        "source": ["text"],
+        "bottler": "Duncan Taylor",
+        "edition": null,
+        "outturn": null,
+        "bottleId": 65247,
+        "category": "single_malt",
+        "fullName": "Duncan Taylor Longmorn",
+        "reference": null,
+        "statedAge": 18,
+        "caskNumber": null,
+        "comparison": {
+          "missing": ["vintageYear", "releaseYear", "singleCask", "caskNumber"],
+          "conflicts": ["statedAge", "abv", "distillers"],
+          "agreements": ["category", "brand", "bottler"]
+        },
+        "distillery": ["Longmorn"],
+        "maturation": null,
+        "releaseDay": null,
+        "singleCask": null,
+        "releaseYear": null,
+        "vintageYear": null,
+        "bottlingYear": null,
+        "caskStrength": null,
+        "releaseMonth": null,
+        "familyContext": {
+          "siblingBottles": []
+        }
+      },
+      {
+        "abv": 46,
+        "brand": "Duncan Taylor",
+        "score": 47.90657,
+        "series": "NC2",
+        "source": ["text"],
+        "bottler": "Duncan Taylor",
+        "edition": null,
+        "outturn": null,
+        "bottleId": 65670,
+        "category": "single_malt",
+        "fullName": "Duncan Taylor Aberlour 16-year-old",
+        "reference": null,
+        "statedAge": 16,
+        "caskNumber": null,
+        "comparison": {
+          "missing": ["vintageYear", "releaseYear", "singleCask", "caskNumber"],
+          "conflicts": ["statedAge", "distillers"],
+          "agreements": ["category", "abv", "brand", "bottler"]
+        },
+        "distillery": ["Aberlour"],
+        "maturation": null,
+        "releaseDay": null,
+        "singleCask": null,
+        "releaseYear": null,
+        "vintageYear": null,
+        "bottlingYear": null,
+        "caskStrength": null,
+        "releaseMonth": null,
+        "familyContext": {
+          "siblingBottles": []
+        }
+      },
+      {
+        "abv": 46,
+        "brand": "Duncan Taylor",
+        "score": 47.8741,
+        "series": "NC2",
+        "source": ["vector", "text"],
+        "bottler": "Duncan Taylor",
+        "edition": null,
+        "outturn": null,
+        "bottleId": 65676,
+        "category": "single_malt",
+        "fullName": "Duncan Taylor Glen Scotia 1981",
+        "reference": "Duncan Taylor NC2 1981 vintage 18-year-old (distilled at Glen Scotia)",
+        "statedAge": 18,
+        "caskNumber": null,
+        "comparison": {
+          "missing": ["releaseYear", "singleCask", "caskNumber"],
+          "conflicts": ["statedAge", "vintageYear", "distillers"],
+          "agreements": ["category", "abv", "brand", "bottler"]
+        },
+        "distillery": ["Glen Scotia"],
+        "maturation": null,
+        "releaseDay": null,
+        "singleCask": null,
+        "releaseYear": null,
+        "vintageYear": 1981,
+        "bottlingYear": null,
+        "caskStrength": null,
+        "releaseMonth": null,
+        "familyContext": {
+          "siblingBottles": []
+        }
+      },
+      {
+        "abv": 46,
+        "brand": "First Cask",
+        "score": 47.551308,
+        "series": null,
+        "source": ["text"],
+        "bottler": "First Cask",
+        "edition": null,
+        "outturn": null,
+        "bottleId": 63764,
+        "category": "single_malt",
+        "fullName": "First Cask Glenkinchie 20-year-old",
+        "reference": null,
+        "statedAge": 20,
+        "caskNumber": "2850",
+        "comparison": {
+          "missing": ["releaseYear"],
+          "conflicts": ["caskNumber", "brand", "distillers"],
+          "agreements": [
+            "category",
+            "statedAge",
+            "abv",
+            "vintageYear",
+            "singleCask"
+          ]
+        },
+        "distillery": ["Glenkinchie"],
+        "maturation": null,
+        "releaseDay": null,
+        "singleCask": true,
+        "releaseYear": null,
+        "vintageYear": 1987,
+        "bottlingYear": null,
+        "caskStrength": null,
+        "releaseMonth": null,
+        "familyContext": {
+          "siblingBottles": []
+        }
+      },
+      {
+        "abv": 46,
+        "brand": "Bladnoch",
+        "score": 47.159447,
+        "series": null,
+        "source": ["text"],
+        "bottler": null,
+        "edition": null,
+        "outturn": null,
+        "bottleId": 58372,
+        "category": "single_malt",
+        "fullName": "Bladnoch 20-year-old",
+        "reference": null,
+        "statedAge": 20,
+        "caskNumber": null,
+        "comparison": {
+          "missing": ["vintageYear", "caskNumber"],
+          "conflicts": ["brand", "distillers"],
+          "agreements": ["category", "statedAge"]
+        },
+        "distillery": ["Bladnoch"],
+        "maturation": null,
+        "releaseDay": null,
+        "singleCask": null,
+        "releaseYear": null,
+        "vintageYear": null,
+        "bottlingYear": null,
+        "caskStrength": null,
+        "releaseMonth": null,
+        "familyContext": {
+          "siblingBottles": []
+        }
+      },
+      {
+        "abv": 53.2,
+        "brand": "Duncan Taylor",
+        "score": 47.08202,
+        "series": null,
+        "source": ["text"],
+        "bottler": "Duncan Taylor",
+        "edition": null,
+        "outturn": null,
+        "bottleId": 65251,
+        "category": "single_malt",
+        "fullName": "Duncan Taylor Aultmore 6-year-old",
+        "reference": null,
+        "statedAge": 6,
+        "caskNumber": null,
+        "comparison": {
+          "missing": ["vintageYear", "releaseYear", "singleCask", "caskNumber"],
+          "conflicts": ["statedAge", "abv", "distillers"],
+          "agreements": ["category", "brand", "bottler"]
+        },
+        "distillery": ["Aultmore"],
+        "maturation": null,
+        "releaseDay": null,
+        "singleCask": null,
+        "releaseYear": null,
+        "vintageYear": null,
+        "bottlingYear": null,
+        "caskStrength": null,
+        "releaseMonth": null,
+        "familyContext": {
+          "siblingBottles": []
+        }
+      },
+      {
+        "abv": 52.8,
+        "brand": "Duncan Taylor",
+        "score": 47.08202,
+        "series": null,
+        "source": ["text"],
+        "bottler": "Duncan Taylor",
+        "edition": null,
+        "outturn": null,
+        "bottleId": 65249,
+        "category": "single_malt",
+        "fullName": "Duncan Taylor GlenAllachie 6-year-old",
+        "reference": null,
+        "statedAge": 6,
+        "caskNumber": null,
+        "comparison": {
+          "missing": ["vintageYear", "releaseYear", "singleCask", "caskNumber"],
+          "conflicts": ["statedAge", "abv", "distillers"],
+          "agreements": ["category", "brand", "bottler"]
+        },
+        "distillery": ["GlenAllachie"],
+        "maturation": null,
+        "releaseDay": null,
+        "singleCask": null,
+        "releaseYear": null,
+        "vintageYear": null,
+        "bottlingYear": null,
+        "caskStrength": null,
+        "releaseMonth": null,
+        "familyContext": {
+          "siblingBottles": []
+        }
+      },
+      {
+        "abv": 54.8,
+        "brand": "Duncan Taylor",
+        "score": 47.08202,
+        "series": null,
+        "source": ["text"],
+        "bottler": "Duncan Taylor",
+        "edition": null,
+        "outturn": null,
+        "bottleId": 65254,
+        "category": "single_malt",
+        "fullName": "Duncan Taylor Glentauchers 8-year-old",
+        "reference": null,
+        "statedAge": 8,
+        "caskNumber": null,
+        "comparison": {
+          "missing": ["vintageYear", "releaseYear", "singleCask", "caskNumber"],
+          "conflicts": ["statedAge", "abv", "distillers"],
+          "agreements": ["category", "brand", "bottler"]
+        },
+        "distillery": ["Glentauchers"],
+        "maturation": null,
+        "releaseDay": null,
+        "singleCask": null,
+        "releaseYear": null,
+        "vintageYear": null,
+        "bottlingYear": null,
+        "caskStrength": null,
+        "releaseMonth": null,
+        "familyContext": {
+          "siblingBottles": []
+        }
+      },
+      {
+        "abv": null,
+        "brand": "Milford",
+        "score": 46.935135,
+        "series": null,
+        "source": ["text"],
+        "bottler": null,
+        "edition": null,
+        "outturn": null,
+        "bottleId": 17363,
+        "category": "single_malt",
+        "fullName": "Milford 20-year-old",
+        "reference": null,
+        "statedAge": 20,
+        "caskNumber": null,
+        "comparison": {
+          "missing": ["vintageYear", "caskNumber", "distillers"],
+          "conflicts": ["brand"],
+          "agreements": ["category", "statedAge"]
+        },
+        "distillery": [],
+        "maturation": null,
+        "releaseDay": null,
+        "singleCask": null,
+        "releaseYear": null,
+        "vintageYear": null,
+        "bottlingYear": null,
+        "caskStrength": null,
+        "releaseMonth": null,
+        "familyContext": {
+          "siblingBottles": []
+        }
+      },
+      {
+        "abv": 43,
+        "brand": "The Macallan",
+        "score": 46.066444,
+        "series": "Sherry Oak Collection",
+        "source": ["text", "brand_coverage"],
+        "bottler": null,
+        "edition": "1987 Vintage",
+        "outturn": null,
+        "bottleId": 55003,
+        "category": "single_malt",
+        "fullName": "The Macallan Sherry Oak - 1987 Vintage",
+        "reference": null,
+        "statedAge": 18,
+        "caskNumber": null,
+        "comparison": {
+          "missing": [],
+          "conflicts": [],
+          "agreements": ["category", "vintageYear", "brand", "distillers"]
+        },
+        "distillery": ["The Macallan"],
+        "maturation": "Sherry seasoned oak casks",
+        "releaseDay": null,
+        "singleCask": false,
+        "releaseYear": null,
+        "vintageYear": 1987,
+        "bottlingYear": null,
+        "caskStrength": null,
+        "releaseMonth": null,
+        "familyContext": {
+          "siblingBottles": []
+        }
+      },
+      {
+        "abv": 46,
+        "brand": "Bruichladdich",
+        "score": 45.38432,
+        "series": null,
+        "source": ["text"],
+        "bottler": null,
+        "edition": "Third Edition",
+        "outturn": null,
+        "bottleId": 5209,
+        "category": "single_malt",
+        "fullName": "Bruichladdich 20-year-old - Third Edition",
+        "reference": null,
+        "statedAge": 20,
+        "caskNumber": null,
+        "comparison": {
+          "missing": ["vintageYear", "releaseYear", "singleCask", "caskNumber"],
+          "conflicts": ["brand", "distillers"],
+          "agreements": ["category", "statedAge", "abv"]
+        },
+        "distillery": ["Bruichladdich"],
+        "maturation": "Bourbon casks with a Madeira cask finish",
+        "releaseDay": null,
+        "singleCask": null,
+        "releaseYear": null,
+        "vintageYear": null,
+        "bottlingYear": null,
+        "caskStrength": null,
+        "releaseMonth": null,
+        "familyContext": {
+          "siblingBottles": []
+        }
+      },
+      {
+        "abv": null,
+        "brand": "Deanston",
+        "score": 45.236,
+        "series": null,
+        "source": ["text"],
+        "bottler": null,
+        "edition": null,
+        "outturn": null,
+        "bottleId": 15986,
+        "category": "single_malt",
+        "fullName": "Deanston 20-year-old Oloroso",
+        "reference": null,
+        "statedAge": 20,
+        "caskNumber": null,
+        "comparison": {
+          "missing": ["vintageYear", "caskNumber"],
+          "conflicts": ["brand", "distillers"],
+          "agreements": ["category", "statedAge"]
+        },
+        "distillery": ["Deanston"],
+        "maturation": null,
+        "releaseDay": null,
+        "singleCask": null,
+        "releaseYear": null,
+        "vintageYear": null,
+        "bottlingYear": null,
+        "caskStrength": null,
+        "releaseMonth": null,
+        "familyContext": {
+          "siblingBottles": []
+        }
+      },
+      {
+        "abv": 46,
+        "brand": "Bruichladdich",
+        "score": 44.935055,
+        "series": null,
+        "source": ["text"],
+        "bottler": null,
+        "edition": "3rd Edition",
+        "outturn": null,
+        "bottleId": 65779,
+        "category": "single_malt",
+        "fullName": "Bruichladdich 20-year-old - 3rd Edition",
+        "reference": null,
+        "statedAge": 20,
+        "caskNumber": null,
+        "comparison": {
+          "missing": ["vintageYear", "releaseYear", "singleCask", "caskNumber"],
+          "conflicts": ["brand", "distillers"],
+          "agreements": ["category", "statedAge", "abv"]
+        },
+        "distillery": ["Bruichladdich"],
+        "maturation": null,
+        "releaseDay": null,
+        "singleCask": null,
+        "releaseYear": null,
+        "vintageYear": null,
+        "bottlingYear": null,
+        "caskStrength": null,
+        "releaseMonth": null,
+        "familyContext": {
+          "siblingBottles": []
+        }
+      },
+      {
+        "abv": null,
+        "brand": "BenRiach",
+        "score": 44.85074,
+        "series": null,
+        "source": ["vector", "text"],
+        "bottler": null,
+        "edition": null,
+        "outturn": null,
+        "bottleId": 3685,
+        "category": "single_malt",
+        "fullName": "BenRiach 20-year-old Dark Blue Label",
+        "reference": "Benriach 20-year-old Single Malt Whiskey",
+        "statedAge": 20,
+        "caskNumber": null,
+        "comparison": {
+          "missing": ["vintageYear", "caskNumber"],
+          "conflicts": ["brand", "distillers"],
+          "agreements": ["category", "statedAge"]
+        },
+        "distillery": ["BenRiach"],
+        "maturation": null,
+        "releaseDay": null,
+        "singleCask": null,
+        "releaseYear": null,
+        "vintageYear": null,
+        "bottlingYear": null,
+        "caskStrength": null,
+        "releaseMonth": null,
+        "familyContext": {
+          "siblingBottles": []
+        }
+      },
+      {
+        "abv": null,
+        "brand": "Bowmore",
+        "score": 43.9534,
+        "series": null,
+        "source": ["text"],
+        "bottler": null,
+        "edition": null,
+        "outturn": null,
+        "bottleId": 556,
+        "category": "single_malt",
+        "fullName": "Bowmore 20-year-old",
+        "reference": null,
+        "statedAge": 20,
+        "caskNumber": null,
+        "comparison": {
+          "missing": ["vintageYear", "caskNumber"],
+          "conflicts": ["brand", "distillers"],
+          "agreements": ["category", "statedAge"]
+        },
+        "distillery": ["Bowmore"],
+        "maturation": null,
+        "releaseDay": null,
+        "singleCask": null,
+        "releaseYear": null,
+        "vintageYear": null,
+        "bottlingYear": null,
+        "caskStrength": null,
+        "releaseMonth": null,
+        "familyContext": {
+          "siblingBottles": []
+        }
+      },
+      {
+        "abv": null,
+        "brand": "Tobermory",
+        "score": 43.9534,
+        "series": null,
+        "source": ["text"],
+        "bottler": null,
+        "edition": null,
+        "outturn": null,
+        "bottleId": 875,
+        "category": "single_malt",
+        "fullName": "Tobermory 20-year-old",
+        "reference": null,
+        "statedAge": 20,
+        "caskNumber": null,
+        "comparison": {
+          "missing": ["vintageYear", "caskNumber"],
+          "conflicts": ["brand", "distillers"],
+          "agreements": ["category", "statedAge"]
+        },
+        "distillery": ["Tobermory"],
+        "maturation": null,
+        "releaseDay": null,
+        "singleCask": null,
+        "releaseYear": null,
+        "vintageYear": null,
+        "bottlingYear": null,
+        "caskStrength": null,
+        "releaseMonth": null,
+        "familyContext": {
+          "siblingBottles": []
+        }
+      },
+      {
+        "abv": null,
+        "brand": "Tullibardine",
+        "score": 43.9534,
+        "series": null,
+        "source": ["text"],
+        "bottler": null,
+        "edition": null,
+        "outturn": null,
+        "bottleId": 1013,
+        "category": "single_malt",
+        "fullName": "Tullibardine 20-year-old",
+        "reference": null,
+        "statedAge": 20,
+        "caskNumber": null,
+        "comparison": {
+          "missing": ["vintageYear", "caskNumber"],
+          "conflicts": ["brand", "distillers"],
+          "agreements": ["category", "statedAge"]
+        },
+        "distillery": ["Tullibardine"],
+        "maturation": null,
+        "releaseDay": null,
+        "singleCask": null,
+        "releaseYear": null,
+        "vintageYear": null,
+        "bottlingYear": null,
+        "caskStrength": null,
+        "releaseMonth": null,
+        "familyContext": {
+          "siblingBottles": []
+        }
+      },
+      {
+        "abv": null,
+        "brand": "Ledaig",
+        "score": 43.798183,
+        "series": null,
+        "source": ["text"],
+        "bottler": "Tobermory",
+        "edition": null,
+        "outturn": null,
+        "bottleId": 1236,
+        "category": "single_malt",
+        "fullName": "Ledaig 20-year-old",
+        "reference": null,
+        "statedAge": 20,
+        "caskNumber": null,
+        "comparison": {
+          "missing": ["vintageYear", "caskNumber", "distillers"],
+          "conflicts": ["brand"],
+          "agreements": ["category", "statedAge"]
+        },
+        "distillery": [],
+        "maturation": null,
+        "releaseDay": null,
+        "singleCask": null,
+        "releaseYear": null,
+        "vintageYear": null,
+        "bottlingYear": null,
+        "caskStrength": null,
+        "releaseMonth": null,
+        "familyContext": {
+          "siblingBottles": []
+        }
+      },
+      {
+        "abv": null,
+        "brand": "Bruichladdich",
+        "score": 43.669662,
+        "series": null,
+        "source": ["text"],
+        "bottler": null,
+        "edition": null,
+        "outturn": null,
+        "bottleId": 18614,
+        "category": "single_malt",
+        "fullName": "Bruichladdich 20-year-old (2nd Edition)",
+        "reference": null,
+        "statedAge": 20,
+        "caskNumber": null,
+        "comparison": {
+          "missing": ["vintageYear", "caskNumber"],
+          "conflicts": ["brand", "distillers"],
+          "agreements": ["category", "statedAge"]
+        },
+        "distillery": ["Bruichladdich"],
+        "maturation": null,
+        "releaseDay": null,
+        "singleCask": null,
+        "releaseYear": null,
+        "vintageYear": null,
+        "bottlingYear": null,
+        "caskStrength": null,
+        "releaseMonth": null,
+        "familyContext": {
+          "siblingBottles": []
+        }
+      },
+      {
+        "abv": 46,
+        "brand": "William Cadenhead's",
+        "score": 43.527092,
+        "series": null,
+        "source": ["text"],
+        "bottler": "William Cadenhead's",
+        "edition": null,
+        "outturn": null,
+        "bottleId": 67775,
+        "category": "single_malt",
+        "fullName": "Cadenhead's Aberlour 1963 20-year-old",
+        "reference": null,
+        "statedAge": 20,
+        "caskNumber": null,
+        "comparison": {
+          "missing": ["releaseYear", "singleCask", "caskNumber"],
+          "conflicts": ["vintageYear", "brand", "distillers"],
+          "agreements": ["category", "statedAge", "abv"]
+        },
+        "distillery": ["Aberlour"],
+        "maturation": null,
+        "releaseDay": null,
+        "singleCask": null,
+        "releaseYear": null,
+        "vintageYear": 1963,
+        "bottlingYear": 1984,
+        "caskStrength": null,
+        "releaseMonth": null,
+        "familyContext": {
+          "siblingBottles": []
+        }
+      },
+      {
+        "abv": 46,
+        "brand": "William Cadenhead's",
+        "score": 43.527092,
+        "series": null,
+        "source": ["text"],
+        "bottler": "William Cadenhead's",
+        "edition": null,
+        "outturn": null,
+        "bottleId": 67745,
+        "category": "single_malt",
+        "fullName": "Cadenhead's Glentauchers 1965 20-year-old",
+        "reference": null,
+        "statedAge": 20,
+        "caskNumber": null,
+        "comparison": {
+          "missing": ["releaseYear", "singleCask", "caskNumber"],
+          "conflicts": ["vintageYear", "brand", "distillers"],
+          "agreements": ["category", "statedAge", "abv"]
+        },
+        "distillery": ["Glentauchers"],
+        "maturation": null,
+        "releaseDay": null,
+        "singleCask": null,
+        "releaseYear": null,
+        "vintageYear": 1965,
+        "bottlingYear": 1985,
+        "caskStrength": null,
+        "releaseMonth": null,
+        "familyContext": {
+          "siblingBottles": []
+        }
+      },
+      {
+        "abv": null,
+        "brand": "Glen Deveron",
+        "score": 43.358807,
+        "series": null,
+        "source": ["text"],
+        "bottler": "Macduff Distillery",
+        "edition": null,
+        "outturn": null,
+        "bottleId": 4258,
+        "category": "single_malt",
+        "fullName": "Glen Deveron 20-year-old Royal Burgh Collection",
+        "reference": null,
+        "statedAge": 20,
+        "caskNumber": null,
+        "comparison": {
+          "missing": ["vintageYear", "caskNumber", "distillers"],
+          "conflicts": ["brand"],
+          "agreements": ["category", "statedAge"]
+        },
+        "distillery": [],
+        "maturation": null,
+        "releaseDay": null,
+        "singleCask": null,
+        "releaseYear": null,
+        "vintageYear": null,
+        "bottlingYear": null,
+        "caskStrength": null,
+        "releaseMonth": null,
+        "familyContext": {
+          "siblingBottles": []
+        }
+      },
+      {
+        "abv": 46,
+        "brand": "William Cadenhead's",
+        "score": 43.34561,
+        "series": null,
+        "source": ["text"],
+        "bottler": "William Cadenhead's",
+        "edition": null,
+        "outturn": null,
+        "bottleId": 67195,
+        "category": "single_malt",
+        "fullName": "Cadenhead's Ord 1962 20-year-old",
+        "reference": null,
+        "statedAge": 20,
+        "caskNumber": null,
+        "comparison": {
+          "missing": ["releaseYear", "singleCask", "caskNumber"],
+          "conflicts": ["vintageYear", "brand", "distillers"],
+          "agreements": ["category", "statedAge", "abv"]
+        },
+        "distillery": ["Glen Ord"],
+        "maturation": null,
+        "releaseDay": null,
+        "singleCask": null,
+        "releaseYear": null,
+        "vintageYear": 1962,
+        "bottlingYear": 1983,
+        "caskStrength": null,
+        "releaseMonth": null,
+        "familyContext": {
+          "siblingBottles": []
+        }
+      },
+      {
+        "abv": 46,
+        "brand": "Kirkland Signature",
+        "score": 42.54771,
+        "series": null,
+        "source": ["text"],
+        "bottler": null,
+        "edition": null,
+        "outturn": null,
+        "bottleId": 64931,
+        "category": "single_malt",
+        "fullName": "Kirkland Signature 20-year-old Sherry Cask Finish Speyside",
+        "reference": null,
+        "statedAge": 20,
+        "caskNumber": null,
+        "comparison": {
+          "missing": [
+            "vintageYear",
+            "releaseYear",
+            "singleCask",
+            "caskNumber",
+            "distillers"
+          ],
+          "conflicts": ["brand"],
+          "agreements": ["category", "statedAge", "abv"]
+        },
+        "distillery": [],
+        "maturation": "Sherry cask finish",
+        "releaseDay": null,
+        "singleCask": null,
+        "releaseYear": null,
+        "vintageYear": null,
+        "bottlingYear": null,
+        "caskStrength": null,
+        "releaseMonth": null,
+        "familyContext": {
+          "siblingBottles": []
+        }
+      },
+      {
+        "abv": 46,
+        "brand": "Littlemill",
+        "score": 42.26537,
+        "series": "Finest Collection",
+        "source": ["text"],
+        "bottler": "Hart Brothers",
+        "edition": null,
+        "outturn": null,
+        "bottleId": 69611,
+        "category": "single_malt",
+        "fullName": "Littlemill 1992 20-year-old",
+        "reference": null,
+        "statedAge": 20,
+        "caskNumber": null,
+        "comparison": {
+          "missing": ["releaseYear", "singleCask", "caskNumber"],
+          "conflicts": ["vintageYear", "brand", "distillers"],
+          "agreements": ["category", "statedAge", "abv"]
+        },
+        "distillery": ["Littlemill"],
+        "maturation": null,
+        "releaseDay": null,
+        "singleCask": null,
+        "releaseYear": null,
+        "vintageYear": 1992,
+        "bottlingYear": 2012,
+        "caskStrength": null,
+        "releaseMonth": null,
+        "familyContext": {
+          "siblingBottles": []
+        }
+      },
+      {
+        "abv": null,
+        "brand": "The Glenrothes",
+        "score": 34.946922,
+        "series": null,
+        "source": ["vector", "text"],
+        "bottler": null,
+        "edition": null,
+        "outturn": null,
+        "bottleId": 18258,
+        "category": "single_malt",
+        "fullName": "The Glenrothes othes, 1987 vintage",
+        "reference": "The Glenrothes othes, 1987 vintage - 1987 Vintage",
+        "statedAge": null,
+        "caskNumber": null,
+        "comparison": {
+          "missing": [],
+          "conflicts": ["brand", "distillers"],
+          "agreements": ["category", "vintageYear"]
+        },
+        "distillery": ["The Glenrothes"],
+        "maturation": null,
+        "releaseDay": null,
+        "singleCask": null,
+        "releaseYear": null,
+        "vintageYear": 1987,
+        "bottlingYear": null,
+        "caskStrength": null,
+        "releaseMonth": null,
+        "familyContext": {
+          "siblingBottles": []
+        }
+      },
+      {
+        "abv": 43,
+        "brand": "The Glenrothes",
+        "score": 33.242718,
+        "series": null,
+        "source": ["vector", "text"],
+        "bottler": null,
+        "edition": null,
+        "outturn": null,
+        "bottleId": 62582,
+        "category": "single_malt",
+        "fullName": "The Glenrothes 1987",
+        "reference": "Glenrothes, 1987 vintage, 43%",
+        "statedAge": null,
+        "caskNumber": null,
+        "comparison": {
+          "missing": [],
+          "conflicts": ["brand", "distillers"],
+          "agreements": ["category", "vintageYear"]
+        },
+        "distillery": ["The Glenrothes"],
+        "maturation": null,
+        "releaseDay": null,
+        "singleCask": null,
+        "releaseYear": null,
+        "vintageYear": 1987,
+        "bottlingYear": 2005,
+        "caskStrength": null,
+        "releaseMonth": null,
+        "familyContext": {
+          "siblingBottles": []
+        }
+      },
+      {
+        "abv": 43,
+        "brand": "The Glenrothes",
+        "score": 28.568306,
+        "series": null,
+        "source": ["vector", "text"],
+        "bottler": null,
+        "edition": null,
+        "outturn": null,
+        "bottleId": 62581,
+        "category": "single_malt",
+        "fullName": "The Glenrothes 1987",
+        "reference": "The Glenrothes, 1987, 43%",
+        "statedAge": null,
+        "caskNumber": null,
+        "comparison": {
+          "missing": [],
+          "conflicts": ["brand", "distillers"],
+          "agreements": ["category", "vintageYear"]
+        },
+        "distillery": ["The Glenrothes"],
+        "maturation": null,
+        "releaseDay": null,
+        "singleCask": null,
+        "releaseYear": null,
+        "vintageYear": 1987,
+        "bottlingYear": 1999,
+        "caskStrength": null,
+        "releaseMonth": null,
+        "familyContext": {
+          "siblingBottles": []
+        }
+      },
+      {
+        "abv": 46,
+        "brand": "Glenmorangie",
+        "score": 27.653782,
+        "series": null,
+        "source": ["text"],
+        "bottler": null,
+        "edition": null,
+        "outturn": null,
+        "bottleId": 18248,
+        "category": "single_malt",
+        "fullName": "Glenmorangie Margaux Cask Finish 18-year-old 1987 Vintage",
+        "reference": null,
+        "statedAge": 18,
+        "caskNumber": null,
+        "comparison": {
+          "missing": [],
+          "conflicts": ["brand", "distillers"],
+          "agreements": ["category", "vintageYear"]
+        },
+        "distillery": ["Glenmorangie"],
+        "maturation": "Margaux wine cask finish",
+        "releaseDay": null,
+        "singleCask": null,
+        "releaseYear": null,
+        "vintageYear": 1987,
+        "bottlingYear": 2006,
+        "caskStrength": null,
+        "releaseMonth": null,
+        "familyContext": {
+          "siblingBottles": []
+        }
+      },
+      {
+        "abv": 43,
+        "brand": "Knockando",
+        "score": 27.345818,
+        "series": null,
+        "source": ["text"],
+        "bottler": null,
+        "edition": null,
+        "outturn": null,
+        "bottleId": 69063,
+        "category": "single_malt",
+        "fullName": "Knockando 1987",
+        "reference": null,
+        "statedAge": 12,
+        "caskNumber": null,
+        "comparison": {
+          "missing": [],
+          "conflicts": ["brand", "distillers"],
+          "agreements": ["category", "vintageYear"]
+        },
+        "distillery": ["Knockando"],
+        "maturation": null,
+        "releaseDay": null,
+        "singleCask": null,
+        "releaseYear": null,
+        "vintageYear": 1987,
+        "bottlingYear": null,
+        "caskStrength": null,
+        "releaseMonth": null,
+        "familyContext": {
+          "siblingBottles": []
+        }
+      },
+      {
+        "abv": 55.3,
+        "brand": "Signatory Vintage",
+        "score": 26.865665,
+        "series": null,
+        "source": ["text"],
+        "bottler": "Signatory Vintage",
+        "edition": null,
+        "outturn": null,
+        "bottleId": 65997,
+        "category": "single_malt",
+        "fullName": "Signatory Vintage Clynelish 1987 17-year-old",
+        "reference": null,
+        "statedAge": 17,
+        "caskNumber": "990326",
+        "comparison": {
+          "missing": [],
+          "conflicts": ["brand", "distillers"],
+          "agreements": ["category", "vintageYear"]
+        },
+        "distillery": ["Clynelish"],
+        "maturation": "Refill butt",
+        "releaseDay": null,
+        "singleCask": null,
+        "releaseYear": null,
+        "vintageYear": 1987,
+        "bottlingYear": 2005,
+        "caskStrength": null,
+        "releaseMonth": null,
+        "familyContext": {
+          "siblingBottles": []
+        }
+      },
+      {
+        "abv": 55.8,
+        "brand": "Signatory Vintage",
+        "score": 26.865665,
+        "series": null,
+        "source": ["text"],
+        "bottler": "Signatory Vintage",
+        "edition": null,
+        "outturn": 302,
+        "bottleId": 66000,
+        "category": "single_malt",
+        "fullName": "Signatory Vintage Clynelish 1987 18-year-old",
+        "reference": null,
+        "statedAge": 18,
+        "caskNumber": "990328",
+        "comparison": {
+          "missing": [],
+          "conflicts": ["brand", "distillers"],
+          "agreements": ["category", "vintageYear"]
+        },
+        "distillery": ["Clynelish"],
+        "maturation": "Refill butt",
+        "releaseDay": null,
+        "singleCask": null,
+        "releaseYear": null,
+        "vintageYear": 1987,
+        "bottlingYear": 2006,
+        "caskStrength": null,
+        "releaseMonth": null,
+        "familyContext": {
+          "siblingBottles": []
+        }
+      },
+      {
+        "abv": 48.3,
+        "brand": "A.D. Rattray",
+        "score": 26.543394,
+        "series": "Vintage Cask Collection",
+        "source": ["text"],
+        "bottler": "A.D. Rattray",
+        "edition": null,
+        "outturn": 243,
+        "bottleId": 59140,
+        "category": "single_malt",
+        "fullName": "A.D. Rattray Bunnahabhain 1987",
+        "reference": null,
+        "statedAge": 30,
+        "caskNumber": "1298",
+        "comparison": {
+          "missing": [],
+          "conflicts": ["brand", "distillers"],
+          "agreements": ["category", "vintageYear"]
+        },
+        "distillery": ["Bunnahabhain"],
+        "maturation": "Bourbon Hogshead",
+        "releaseDay": null,
+        "singleCask": true,
+        "releaseYear": null,
+        "vintageYear": 1987,
+        "bottlingYear": 2017,
+        "caskStrength": null,
+        "releaseMonth": null,
+        "familyContext": {
+          "siblingBottles": []
+        }
+      },
+      {
+        "abv": 59.9,
+        "brand": "William Cadenhead's",
+        "score": 25.77375,
+        "series": null,
+        "source": ["text"],
+        "bottler": "William Cadenhead's",
+        "edition": null,
+        "outturn": null,
+        "bottleId": 69028,
+        "category": "single_malt",
+        "fullName": "Cadenhead's Dalmore 1987 13-year-old",
+        "reference": null,
+        "statedAge": 13,
+        "caskNumber": null,
+        "comparison": {
+          "missing": [],
+          "conflicts": ["brand", "distillers"],
+          "agreements": ["category", "vintageYear"]
+        },
+        "distillery": ["The Dalmore"],
+        "maturation": null,
+        "releaseDay": null,
+        "singleCask": null,
+        "releaseYear": null,
+        "vintageYear": 1987,
+        "bottlingYear": 2000,
+        "caskStrength": null,
+        "releaseMonth": null,
+        "familyContext": {
+          "siblingBottles": []
+        }
+      },
+      {
+        "abv": 40,
+        "brand": "Gordon & MacPhail",
+        "score": 25.66135,
+        "series": null,
+        "source": ["text"],
+        "bottler": "Gordon & MacPhail",
+        "edition": null,
+        "outturn": null,
+        "bottleId": 66499,
+        "category": "single_malt",
+        "fullName": "Gordon & MacPhail Ardmore 1987",
+        "reference": null,
+        "statedAge": null,
+        "caskNumber": null,
+        "comparison": {
+          "missing": [],
+          "conflicts": ["brand", "distillers"],
+          "agreements": ["category", "vintageYear"]
+        },
+        "distillery": ["Ardmore"],
+        "maturation": null,
+        "releaseDay": null,
+        "singleCask": null,
+        "releaseYear": null,
+        "vintageYear": 1987,
+        "bottlingYear": 2001,
+        "caskStrength": null,
+        "releaseMonth": null,
+        "familyContext": {
+          "siblingBottles": []
+        }
+      },
+      {
+        "abv": 45.8,
+        "brand": "Talisker",
+        "score": 25.27061,
+        "series": null,
+        "source": ["text"],
+        "bottler": null,
+        "edition": null,
+        "outturn": null,
+        "bottleId": 58588,
+        "category": "single_malt",
+        "fullName": "Talisker Distillers Edition 1987",
+        "reference": null,
+        "statedAge": null,
+        "caskNumber": null,
+        "comparison": {
+          "missing": [],
+          "conflicts": ["brand", "distillers"],
+          "agreements": ["category", "vintageYear"]
+        },
+        "distillery": ["Talisker"],
+        "maturation": "Double matured in Amoroso cask wood",
+        "releaseDay": null,
+        "singleCask": null,
+        "releaseYear": null,
+        "vintageYear": 1987,
+        "bottlingYear": 2000,
+        "caskStrength": null,
+        "releaseMonth": null,
+        "familyContext": {
+          "siblingBottles": []
+        }
+      },
+      {
+        "abv": 59,
+        "brand": "Scott's Selection",
+        "score": 25.169632,
+        "series": null,
+        "source": ["text"],
+        "bottler": "Scott's Selection",
+        "edition": null,
+        "outturn": null,
+        "bottleId": 69044,
+        "category": "single_malt",
+        "fullName": "Scott's Selection Bladnoch 1987",
+        "reference": null,
+        "statedAge": null,
+        "caskNumber": null,
+        "comparison": {
+          "missing": [],
+          "conflicts": ["brand", "distillers"],
+          "agreements": ["category", "vintageYear"]
+        },
+        "distillery": ["Bladnoch"],
+        "maturation": null,
+        "releaseDay": null,
+        "singleCask": null,
+        "releaseYear": null,
+        "vintageYear": 1987,
+        "bottlingYear": 1999,
+        "caskStrength": null,
+        "releaseMonth": null,
+        "familyContext": {
+          "siblingBottles": []
+        }
+      },
+      {
+        "abv": 49.5,
+        "brand": "William Cadenhead's",
+        "score": 24.578022,
+        "series": "Small Batch",
+        "source": ["text"],
+        "bottler": "William Cadenhead's",
+        "edition": null,
+        "outturn": 402,
+        "bottleId": 68010,
+        "category": "single_malt",
+        "fullName": "Cadenhead's Longmorn 1987",
+        "reference": null,
+        "statedAge": 26,
+        "caskNumber": null,
+        "comparison": {
+          "missing": [],
+          "conflicts": ["brand", "distillers"],
+          "agreements": ["category", "vintageYear"]
+        },
+        "distillery": ["Longmorn"],
+        "maturation": null,
+        "releaseDay": null,
+        "singleCask": null,
+        "releaseYear": null,
+        "vintageYear": 1987,
+        "bottlingYear": 2013,
+        "caskStrength": null,
+        "releaseMonth": null,
+        "familyContext": {
+          "siblingBottles": []
+        }
+      },
+      {
+        "abv": 51.5,
+        "brand": "Old Particular",
+        "score": 24.464645,
+        "series": null,
+        "source": ["text"],
+        "bottler": "Douglas Laing",
+        "edition": null,
+        "outturn": null,
+        "bottleId": 65165,
+        "category": "single_malt",
+        "fullName": "Old Particular Glenturret 1987",
+        "reference": null,
+        "statedAge": 28,
+        "caskNumber": null,
+        "comparison": {
+          "missing": [],
+          "conflicts": ["brand", "distillers"],
+          "agreements": ["category", "vintageYear"]
+        },
+        "distillery": ["Glenturret"],
+        "maturation": "single refill hogshead",
+        "releaseDay": null,
+        "singleCask": true,
+        "releaseYear": 2016,
+        "vintageYear": 1987,
+        "bottlingYear": null,
+        "caskStrength": null,
+        "releaseMonth": null,
+        "familyContext": {
+          "siblingBottles": []
+        }
+      },
+      {
+        "abv": 40,
+        "brand": "Gordon & MacPhail",
+        "score": 24.131363,
+        "series": "Distillery Labels",
+        "source": ["text"],
+        "bottler": "Gordon & MacPhail",
+        "edition": null,
+        "outturn": null,
+        "bottleId": 66570,
+        "category": "single_malt",
+        "fullName": "Gordon & MacPhail Ardmore 1987",
+        "reference": null,
+        "statedAge": null,
+        "caskNumber": null,
+        "comparison": {
+          "missing": [],
+          "conflicts": ["brand", "distillers"],
+          "agreements": ["category", "vintageYear"]
+        },
+        "distillery": ["Ardmore"],
+        "maturation": null,
+        "releaseDay": null,
+        "singleCask": null,
+        "releaseYear": null,
+        "vintageYear": 1987,
+        "bottlingYear": 2003,
+        "caskStrength": null,
+        "releaseMonth": null,
+        "familyContext": {
+          "siblingBottles": []
+        }
+      },
+      {
+        "abv": 40,
+        "brand": "Gordon & MacPhail",
+        "score": 24.131363,
+        "series": "Connoisseurs Choice",
+        "source": ["text"],
+        "bottler": "Gordon & MacPhail",
+        "edition": null,
+        "outturn": null,
+        "bottleId": 66447,
+        "category": "single_malt",
+        "fullName": "Gordon & MacPhail Bladnoch 1987",
+        "reference": null,
+        "statedAge": null,
+        "caskNumber": null,
+        "comparison": {
+          "missing": [],
+          "conflicts": ["brand", "distillers"],
+          "agreements": ["category", "vintageYear"]
+        },
+        "distillery": ["Bladnoch"],
+        "maturation": null,
+        "releaseDay": null,
+        "singleCask": null,
+        "releaseYear": null,
+        "vintageYear": 1987,
+        "bottlingYear": 2000,
+        "caskStrength": null,
+        "releaseMonth": null,
+        "familyContext": {
+          "siblingBottles": []
+        }
+      },
+      {
+        "abv": 40,
+        "brand": "Gordon & MacPhail",
+        "score": 24.131363,
+        "series": "Connoisseurs Choice",
+        "source": ["text"],
+        "bottler": "Gordon & MacPhail",
+        "edition": null,
+        "outturn": null,
+        "bottleId": 66421,
+        "category": "single_malt",
+        "fullName": "Gordon & MacPhail Bladnoch 1987",
+        "reference": null,
+        "statedAge": null,
+        "caskNumber": null,
+        "comparison": {
+          "missing": [],
+          "conflicts": ["brand", "distillers"],
+          "agreements": ["category", "vintageYear"]
+        },
+        "distillery": ["Bladnoch"],
+        "maturation": null,
+        "releaseDay": null,
+        "singleCask": null,
+        "releaseYear": null,
+        "vintageYear": 1987,
+        "bottlingYear": 1999,
+        "caskStrength": null,
+        "releaseMonth": null,
+        "familyContext": {
+          "siblingBottles": []
+        }
+      },
+      {
+        "abv": 47.8,
+        "brand": "The Exclusive Malts",
+        "score": 23.3727,
+        "series": null,
+        "source": ["text"],
+        "bottler": "Creative Whisky Company",
+        "edition": null,
+        "outturn": null,
+        "bottleId": 65327,
+        "category": "single_malt",
+        "fullName": "The Exclusive Malts Bunnahabhain 1987",
+        "reference": null,
+        "statedAge": 26,
+        "caskNumber": "2784",
+        "comparison": {
+          "missing": [],
+          "conflicts": ["brand", "distillers"],
+          "agreements": ["category", "vintageYear"]
+        },
+        "distillery": ["Bunnahabhain"],
+        "maturation": null,
+        "releaseDay": null,
+        "singleCask": true,
+        "releaseYear": null,
+        "vintageYear": 1987,
+        "bottlingYear": 2014,
+        "caskStrength": null,
+        "releaseMonth": null,
+        "familyContext": {
+          "siblingBottles": []
+        }
+      },
+      {
+        "abv": 46,
+        "brand": "Murray McDavid",
+        "score": 23.296814,
+        "series": null,
+        "source": ["text"],
+        "bottler": "Murray McDavid",
+        "edition": null,
+        "outturn": null,
+        "bottleId": 19234,
+        "category": "single_malt",
+        "fullName": "Murray McDavid Leapfrog 1987 12-year-old",
+        "reference": null,
+        "statedAge": 12,
+        "caskNumber": null,
+        "comparison": {
+          "missing": [],
+          "conflicts": ["brand", "distillers"],
+          "agreements": ["category", "vintageYear"]
+        },
+        "distillery": ["Laphroaig"],
+        "maturation": "Bourbon cask",
+        "releaseDay": null,
+        "singleCask": null,
+        "releaseYear": null,
+        "vintageYear": 1987,
+        "bottlingYear": null,
+        "caskStrength": null,
+        "releaseMonth": null,
+        "familyContext": {
+          "siblingBottles": []
+        }
+      },
+      {
+        "abv": 53.7,
+        "brand": "Glenfiddich",
+        "score": 23.240133,
+        "series": "Archive Collection",
+        "source": ["text"],
+        "bottler": null,
+        "edition": null,
+        "outturn": 75,
+        "bottleId": 53225,
+        "category": "single_malt",
+        "fullName": "Glenfiddich 1987",
+        "reference": null,
+        "statedAge": 35,
+        "caskNumber": "20025",
+        "comparison": {
+          "missing": [],
+          "conflicts": ["brand", "distillers"],
+          "agreements": ["category", "vintageYear"]
+        },
+        "distillery": ["Glenfiddich"],
+        "maturation": "American oak hogshead",
+        "releaseDay": null,
+        "singleCask": true,
+        "releaseYear": 2023,
+        "vintageYear": 1987,
+        "bottlingYear": 2023,
+        "caskStrength": true,
+        "releaseMonth": null,
+        "familyContext": {
+          "siblingBottles": []
+        }
+      },
+      {
+        "abv": 54.1,
+        "brand": "Glenmorangie",
+        "score": 23.098871,
+        "series": null,
+        "source": ["text"],
+        "bottler": null,
+        "edition": null,
+        "outturn": 258,
+        "bottleId": 66679,
+        "category": "single_malt",
+        "fullName": "Glenmorangie 1987 Natural Cask Strength",
+        "reference": null,
+        "statedAge": null,
+        "caskNumber": "6813",
+        "comparison": {
+          "missing": [],
+          "conflicts": ["brand", "distillers"],
+          "agreements": ["category", "vintageYear"]
+        },
+        "distillery": ["Glenmorangie"],
+        "maturation": null,
+        "releaseDay": null,
+        "singleCask": true,
+        "releaseYear": null,
+        "vintageYear": 1987,
+        "bottlingYear": 2004,
+        "caskStrength": true,
+        "releaseMonth": null,
+        "familyContext": {
+          "siblingBottles": []
+        }
+      },
+      {
+        "abv": 46,
+        "brand": "Rozelieures",
+        "score": 22.518696,
+        "series": null,
+        "source": ["text"],
+        "bottler": null,
+        "edition": null,
+        "outturn": null,
+        "bottleId": 45609,
+        "category": "single_malt",
+        "fullName": "Rozelieures Fumé Collection - 46.0% ABV",
+        "reference": null,
+        "statedAge": null,
+        "caskNumber": null,
+        "comparison": {
+          "missing": ["caskNumber"],
+          "conflicts": [],
+          "agreements": ["abv"]
+        },
+        "distillery": ["Rozelieures"],
+        "maturation": null,
+        "releaseDay": null,
+        "singleCask": null,
+        "releaseYear": null,
+        "vintageYear": null,
+        "bottlingYear": null,
+        "caskStrength": null,
+        "releaseMonth": null,
+        "familyContext": {
+          "siblingBottles": []
+        }
+      },
+      {
+        "abv": 46,
+        "brand": "Broken Bones Distillery",
+        "score": 22.018784,
+        "series": null,
+        "source": ["text"],
+        "bottler": null,
+        "edition": null,
+        "outturn": null,
+        "bottleId": 46355,
+        "category": "single_malt",
+        "fullName": "Broken Bones Distillery TWIS - 46.0% ABV",
+        "reference": null,
+        "statedAge": null,
+        "caskNumber": null,
+        "comparison": {
+          "missing": ["caskNumber"],
+          "conflicts": [],
+          "agreements": ["abv"]
+        },
+        "distillery": ["Broken Bones Distillery"],
+        "maturation": null,
+        "releaseDay": null,
+        "singleCask": null,
+        "releaseYear": null,
+        "vintageYear": null,
+        "bottlingYear": null,
+        "caskStrength": null,
+        "releaseMonth": null,
+        "familyContext": {
+          "siblingBottles": []
+        }
+      },
+      {
+        "abv": 46,
+        "brand": "Egan's",
+        "score": 21.87998,
+        "series": null,
+        "source": ["text"],
+        "bottler": null,
+        "edition": null,
+        "outturn": null,
+        "bottleId": 46902,
+        "category": "single_malt",
+        "fullName": "Egan's Endeavour - 46.0% ABV",
+        "reference": null,
+        "statedAge": null,
+        "caskNumber": null,
+        "comparison": {
+          "missing": ["caskNumber"],
+          "conflicts": [],
+          "agreements": ["abv"]
+        },
+        "distillery": [],
+        "maturation": null,
+        "releaseDay": null,
+        "singleCask": null,
+        "releaseYear": null,
+        "vintageYear": null,
+        "bottlingYear": null,
+        "caskStrength": null,
+        "releaseMonth": null,
+        "familyContext": {
+          "siblingBottles": []
+        }
+      },
+      {
+        "abv": 46,
+        "brand": "Yamazakura",
+        "score": 21.87998,
+        "series": null,
+        "source": ["text"],
+        "bottler": null,
+        "edition": null,
+        "outturn": null,
+        "bottleId": 47002,
+        "category": "blend",
+        "fullName": "Yamazakura Peated - 46.0% ABV",
+        "reference": null,
+        "statedAge": null,
+        "caskNumber": null,
+        "comparison": {
+          "missing": ["caskNumber"],
+          "conflicts": [],
+          "agreements": ["abv"]
+        },
+        "distillery": [],
+        "maturation": null,
+        "releaseDay": null,
+        "singleCask": null,
+        "releaseYear": null,
+        "vintageYear": null,
+        "bottlingYear": null,
+        "caskStrength": null,
+        "releaseMonth": null,
+        "familyContext": {
+          "siblingBottles": []
+        }
+      },
+      {
+        "abv": 46,
+        "brand": "Kirkjuvagr",
+        "score": 21.772854,
+        "series": null,
+        "source": ["text"],
+        "bottler": "Orkney Distilling",
+        "edition": null,
+        "outturn": null,
+        "bottleId": 45890,
+        "category": "blend",
+        "fullName": "Kirkjuvagr Fara - 46.0% ABV",
+        "reference": null,
+        "statedAge": null,
+        "caskNumber": null,
+        "comparison": {
+          "missing": ["caskNumber"],
+          "conflicts": [],
+          "agreements": ["abv"]
+        },
+        "distillery": [],
+        "maturation": null,
+        "releaseDay": null,
+        "singleCask": null,
+        "releaseYear": null,
+        "vintageYear": null,
+        "bottlingYear": null,
+        "caskStrength": null,
+        "releaseMonth": null,
+        "familyContext": {
+          "siblingBottles": []
+        }
+      },
+      {
+        "abv": 46,
+        "brand": "Moncreiffe",
+        "score": 21.772854,
+        "series": null,
+        "source": ["text"],
+        "bottler": "Moncreiffe & Co.",
+        "edition": null,
+        "outturn": null,
+        "bottleId": 45961,
+        "category": "blend",
+        "fullName": "Moncreiffe Signature - 46.0% ABV",
+        "reference": null,
+        "statedAge": null,
+        "caskNumber": null,
+        "comparison": {
+          "missing": ["caskNumber"],
+          "conflicts": [],
+          "agreements": ["abv"]
+        },
+        "distillery": [],
+        "maturation": null,
+        "releaseDay": null,
+        "singleCask": null,
+        "releaseYear": null,
+        "vintageYear": null,
+        "bottlingYear": null,
+        "caskStrength": null,
+        "releaseMonth": null,
+        "familyContext": {
+          "siblingBottles": []
+        }
+      },
+      {
+        "abv": 46,
+        "brand": "Smokehead",
+        "score": 21.721157,
+        "series": null,
+        "source": ["text"],
+        "bottler": "Ian Macleod Distillers",
+        "edition": null,
+        "outturn": null,
+        "bottleId": 45642,
+        "category": "single_malt",
+        "fullName": "Smokehead Unfiltered - 46.0% ABV",
+        "reference": null,
+        "statedAge": null,
+        "caskNumber": null,
+        "comparison": {
+          "missing": ["caskNumber"],
+          "conflicts": [],
+          "agreements": ["abv"]
+        },
+        "distillery": [],
+        "maturation": null,
+        "releaseDay": null,
+        "singleCask": null,
+        "releaseYear": null,
+        "vintageYear": null,
+        "bottlingYear": null,
+        "caskStrength": null,
+        "releaseMonth": null,
+        "familyContext": {
+          "siblingBottles": []
+        }
+      },
+      {
+        "abv": 46,
+        "brand": "Micil Distillery",
+        "score": 21.646614,
+        "series": null,
+        "source": ["text"],
+        "bottler": "Micil Distillery",
+        "edition": null,
+        "outturn": null,
+        "bottleId": 45826,
+        "category": "blend",
+        "fullName": "Micil Distillery Inverin Small Batch - 46.0% ABV",
+        "reference": null,
+        "statedAge": null,
+        "caskNumber": null,
+        "comparison": {
+          "missing": ["caskNumber"],
+          "conflicts": [],
+          "agreements": ["abv"]
+        },
+        "distillery": [],
+        "maturation": null,
+        "releaseDay": null,
+        "singleCask": null,
+        "releaseYear": null,
+        "vintageYear": null,
+        "bottlingYear": null,
+        "caskStrength": null,
+        "releaseMonth": null,
+        "familyContext": {
+          "siblingBottles": []
+        }
+      },
+      {
+        "abv": 46,
+        "brand": "Adelphi",
+        "score": 21.110212,
+        "series": null,
+        "source": ["text"],
+        "bottler": "Adelphi",
+        "edition": null,
+        "outturn": null,
+        "bottleId": 45647,
+        "category": "blend",
+        "fullName": "Adelphi Maclean's Nose - 46.0% ABV",
+        "reference": null,
+        "statedAge": null,
+        "caskNumber": null,
+        "comparison": {
+          "missing": ["caskNumber"],
+          "conflicts": [],
+          "agreements": ["abv"]
+        },
+        "distillery": [],
+        "maturation": null,
+        "releaseDay": null,
+        "singleCask": null,
+        "releaseYear": null,
+        "vintageYear": null,
+        "bottlingYear": null,
+        "caskStrength": null,
+        "releaseMonth": null,
+        "familyContext": {
+          "siblingBottles": []
+        }
+      },
+      {
+        "abv": 46,
+        "brand": "Lochlea",
+        "score": 21.110212,
+        "series": null,
+        "source": ["text"],
+        "bottler": null,
+        "edition": null,
+        "outturn": null,
+        "bottleId": 45808,
+        "category": "single_malt",
+        "fullName": "Lochlea Dark Briar - 46.0% ABV",
+        "reference": null,
+        "statedAge": null,
+        "caskNumber": null,
+        "comparison": {
+          "missing": ["caskNumber"],
+          "conflicts": [],
+          "agreements": ["abv"]
+        },
+        "distillery": ["Lochlea"],
+        "maturation": null,
+        "releaseDay": null,
+        "singleCask": null,
+        "releaseYear": null,
+        "vintageYear": null,
+        "bottlingYear": null,
+        "caskStrength": null,
+        "releaseMonth": null,
+        "familyContext": {
+          "siblingBottles": []
+        }
+      },
+      {
+        "abv": 46,
+        "brand": "Lindores Abbey",
+        "score": 21.057285,
+        "series": null,
+        "source": ["text"],
+        "bottler": null,
+        "edition": null,
+        "outturn": null,
+        "bottleId": 45754,
+        "category": "single_malt",
+        "fullName": "Lindores Abbey 1494 - 46.0% ABV",
+        "reference": null,
+        "statedAge": null,
+        "caskNumber": null,
+        "comparison": {
+          "missing": ["caskNumber"],
+          "conflicts": [],
+          "agreements": ["abv"]
+        },
+        "distillery": ["Lindores Abbey"],
+        "maturation": null,
+        "releaseDay": null,
+        "singleCask": null,
+        "releaseYear": null,
+        "vintageYear": null,
+        "bottlingYear": null,
+        "caskStrength": null,
+        "releaseMonth": null,
+        "familyContext": {
+          "siblingBottles": []
+        }
+      },
+      {
+        "abv": 46,
+        "brand": "Loch Lomond",
+        "score": 21.057285,
+        "series": null,
+        "source": ["text"],
+        "bottler": null,
+        "edition": null,
+        "outturn": null,
+        "bottleId": 45698,
+        "category": "single_grain",
+        "fullName": "Loch Lomond Grainstorm - 46.0% ABV",
+        "reference": null,
+        "statedAge": null,
+        "caskNumber": null,
+        "comparison": {
+          "missing": ["caskNumber"],
+          "conflicts": [],
+          "agreements": ["abv"]
+        },
+        "distillery": ["Loch Lomond"],
+        "maturation": null,
+        "releaseDay": null,
+        "singleCask": null,
+        "releaseYear": null,
+        "vintageYear": null,
+        "bottlingYear": null,
+        "caskStrength": null,
+        "releaseMonth": null,
+        "familyContext": {
+          "siblingBottles": []
+        }
+      },
+      {
+        "abv": 46,
+        "brand": "Scarabus",
+        "score": 21.00559,
+        "series": null,
+        "source": ["text"],
+        "bottler": "Hunter Laing",
+        "edition": null,
+        "outturn": null,
+        "bottleId": 46163,
+        "category": "single_malt",
+        "fullName": "Scarabus Cigar Malt - 46.0% ABV",
+        "reference": null,
+        "statedAge": null,
+        "caskNumber": null,
+        "comparison": {
+          "missing": ["caskNumber"],
+          "conflicts": [],
+          "agreements": ["abv"]
+        },
+        "distillery": [],
+        "maturation": null,
+        "releaseDay": null,
+        "singleCask": null,
+        "releaseYear": null,
+        "vintageYear": null,
+        "bottlingYear": null,
+        "caskStrength": null,
+        "releaseMonth": null,
+        "familyContext": {
+          "siblingBottles": []
+        }
+      },
+      {
+        "abv": 46,
+        "brand": "Turntable",
+        "score": 21.00559,
+        "series": null,
+        "source": ["text"],
+        "bottler": "Turntable Spirits",
+        "edition": null,
+        "outturn": null,
+        "bottleId": 45935,
+        "category": "blend",
+        "fullName": "Turntable Smokin' Riff - 46.0% ABV",
+        "reference": null,
+        "statedAge": null,
+        "caskNumber": null,
+        "comparison": {
+          "missing": ["caskNumber"],
+          "conflicts": [],
+          "agreements": ["abv"]
+        },
+        "distillery": [],
+        "maturation": null,
+        "releaseDay": null,
+        "singleCask": null,
+        "releaseYear": null,
+        "vintageYear": null,
+        "bottlingYear": null,
+        "caskStrength": null,
+        "releaseMonth": null,
+        "familyContext": {
+          "siblingBottles": []
+        }
+      },
+      {
+        "abv": 46,
+        "brand": "Mac-Talla",
+        "score": 20.857468,
+        "series": null,
+        "source": ["text"],
+        "bottler": "Morrison Scotch Whisky Distillers",
+        "edition": null,
+        "outturn": null,
+        "bottleId": 46944,
+        "category": "single_malt",
+        "fullName": "Mac-Talla Flora - 46.0% ABV",
+        "reference": null,
+        "statedAge": null,
+        "caskNumber": null,
+        "comparison": {
+          "missing": ["caskNumber"],
+          "conflicts": [],
+          "agreements": ["abv"]
+        },
+        "distillery": [],
+        "maturation": null,
+        "releaseDay": null,
+        "singleCask": null,
+        "releaseYear": null,
+        "vintageYear": null,
+        "bottlingYear": null,
+        "caskStrength": null,
+        "releaseMonth": null,
+        "familyContext": {
+          "siblingBottles": []
+        }
+      },
+      {
+        "abv": null,
+        "brand": "The Macallan",
+        "score": 0.6654956006012964,
+        "series": "Rare Cask",
+        "source": ["vector"],
+        "bottler": null,
+        "edition": null,
+        "outturn": null,
+        "bottleId": 3870,
+        "category": "single_malt",
+        "fullName": "The Macallan Rare Cask Black 1824 Masters Series",
+        "reference": "The Macallan Rare Cask",
+        "statedAge": null,
+        "caskNumber": null,
+        "comparison": {
+          "missing": [
+            "statedAge",
+            "abv",
+            "vintageYear",
+            "releaseYear",
+            "singleCask",
+            "caskNumber"
+          ],
+          "conflicts": [],
+          "agreements": ["category", "brand", "distillers"]
+        },
+        "distillery": ["The Macallan"],
+        "maturation": null,
+        "releaseDay": null,
+        "singleCask": null,
+        "releaseYear": null,
+        "vintageYear": null,
+        "bottlingYear": null,
+        "caskStrength": null,
+        "releaseMonth": null,
+        "familyContext": {
+          "siblingBottles": []
+        }
+      },
+      {
+        "abv": null,
+        "brand": "The GlenDronach",
+        "score": 0.6577272370431806,
+        "series": null,
+        "source": ["vector"],
+        "bottler": "The GlenDronach",
+        "edition": "Batch 2",
+        "outturn": null,
+        "bottleId": 44795,
+        "category": "single_malt",
+        "fullName": "The GlenDronach 1990 Single Cask - Batch 2 - 20-year-old",
+        "reference": "Glendronach 1990 Single Cask - Batch 2 - 20-year-old",
+        "statedAge": 20,
+        "caskNumber": null,
+        "comparison": {
+          "missing": ["vintageYear", "caskNumber", "distillers"],
+          "conflicts": ["brand"],
+          "agreements": ["category", "statedAge"]
+        },
+        "distillery": [],
+        "maturation": null,
+        "releaseDay": null,
+        "singleCask": true,
+        "releaseYear": null,
+        "vintageYear": null,
+        "bottlingYear": null,
+        "caskStrength": null,
+        "releaseMonth": null,
+        "familyContext": {
+          "siblingBottles": [
+            {
+              "abv": null,
+              "edition": null,
+              "outturn": null,
+              "bottleId": 3166,
+              "fullName": "The GlenDronach 1990 Single Cask",
+              "statedAge": 30,
+              "caskNumber": null,
+              "maturation": null,
+              "releaseDay": null,
+              "singleCask": true,
+              "releaseYear": null,
+              "traitFields": ["statedAge", "singleCask"],
+              "vintageYear": null,
+              "bottlingYear": null,
+              "caskStrength": null,
+              "releaseMonth": null
+            },
+            {
+              "abv": null,
+              "edition": "Batch 11",
+              "outturn": null,
+              "bottleId": 44796,
+              "fullName": "The GlenDronach 1990 Single Cask - Batch 11",
+              "statedAge": 30,
+              "caskNumber": null,
+              "maturation": null,
+              "releaseDay": null,
+              "singleCask": true,
+              "releaseYear": null,
+              "traitFields": ["edition", "statedAge", "singleCask"],
+              "vintageYear": null,
+              "bottlingYear": null,
+              "caskStrength": null,
+              "releaseMonth": null
+            }
+          ]
+        }
+      }
+    ]
+  },
+  "context": {
+    "inspectedBottleIds": [68361],
+    "bottleContexts": [
+      {
+        "exact": {
+          "abv": 44.8,
+          "edition": null,
+          "outturn": null,
+          "statedAge": 20,
+          "caskNumber": null,
+          "maturation": null,
+          "releaseDay": null,
+          "singleCask": null,
+          "releaseYear": null,
+          "vintageYear": null,
+          "bottlingYear": null,
+          "caskStrength": null,
+          "releaseMonth": null
+        },
+        "shared": {
+          "name": "TIME : SPACE Sherry Cask 20-year-old",
+          "brand": {
+            "name": "The Macallan",
+            "entityId": 1157
+          },
+          "series": {
+            "name": "TIME : SPACE Collection",
+            "seriesId": 721
+          },
+          "bottler": null,
+          "category": "single_malt",
+          "statedAge": null,
+          "distillers": [
+            {
+              "name": "The Macallan",
+              "entityId": 1157
+            }
+          ]
+        },
+        "groupId": 41322,
+        "bottleId": 68361,
+        "fullName": "The Macallan TIME : SPACE Sherry Cask 20-year-old",
+        "siblings": [],
+        "references": [],
+        "observations": [
+          {
+            "facts": {
+              "proposalType": "match",
+              "proposedBottle": null,
+              "referenceScope": "none"
+            },
+            "rawText": "Macallan Time : Space Sherry Cask",
+            "sourceKey": "store_price:12062731",
+            "sourceUrl": "https://www.thewhiskyworld.com/macallan-time-space-sherry-cask-p18616",
+            "sourceName": "Macallan Time : Space Sherry Cask",
+            "sourceType": "store_price",
+            "parsedIdentity": {
+              "abv": null,
+              "brand": "The Macallan",
+              "series": null,
+              "bottler": null,
+              "edition": null,
+              "outturn": null,
+              "category": "single_malt",
+              "distillery": ["The Macallan"],
+              "expression": "Time : Space Sherry Cask",
+              "maturation": null,
+              "stated_age": null,
+              "cask_number": null,
+              "release_day": null,
+              "single_cask": null,
+              "release_year": null,
+              "vintage_year": null,
+              "bottling_year": null,
+              "cask_strength": null,
+              "release_month": null
+            }
+          },
+          {
+            "facts": {
+              "proposalType": "create_bottle",
+              "proposedBottle": {
+                "abv": 44.8,
+                "name": "TIME : SPACE Sherry Cask 20-year-old",
+                "brand": {
+                  "id": 1157,
+                  "name": "The Macallan"
+                },
+                "series": {
+                  "id": null,
+                  "name": "TIME : SPACE Collection"
+                },
+                "bottler": null,
+                "edition": null,
+                "outturn": null,
+                "category": "single_malt",
+                "statedAge": 20,
+                "caskNumber": null,
+                "distillers": [
+                  {
+                    "id": 1157,
+                    "name": "The Macallan"
+                  }
+                ],
+                "maturation": null,
+                "releaseDay": null,
+                "singleCask": null,
+                "releaseYear": null,
+                "vintageYear": null,
+                "bottlingYear": null,
+                "caskStrength": null,
+                "releaseMonth": null
+              },
+              "referenceScope": "none"
+            },
+            "rawText": "The Macallan Time Space Mastery Sherry Cask Single Malt Whisky",
+            "sourceKey": "store_price:12062647",
+            "sourceUrl": "https://www.missionliquor.com/products/the-macallan-time-space-mastery-sherry-cask-single-malt-whisky-700ml-limit-1",
+            "sourceName": "The Macallan Time Space Mastery Sherry Cask Single Malt Whisky",
+            "sourceType": "store_price",
+            "parsedIdentity": {
+              "abv": 44.8,
+              "brand": "The Macallan",
+              "series": "Time:Space",
+              "bottler": null,
+              "edition": null,
+              "outturn": null,
+              "category": "single_malt",
+              "distillery": ["The Macallan"],
+              "expression": "Sherry Cask",
+              "maturation": "Sherry cask",
+              "stated_age": null,
+              "cask_number": null,
+              "release_day": null,
+              "single_cask": null,
+              "release_year": null,
+              "vintage_year": null,
+              "bottling_year": null,
+              "cask_strength": null,
+              "release_month": null
+            }
+          }
+        ],
+        "imageSources": []
+      }
+    ],
+    "inspectedEntities": [
+      {
+        "kind": "brand",
+        "name": "Rozelieures",
+        "score": 1,
+        "source": ["exact", "text", "prefix", "contained"],
+        "entityId": 933,
+        "reference": "Rozelieures",
+        "shortName": null,
+        "retrievedFor": [
+          {
+            "exact": true,
+            "query": "Rozelieures"
+          }
+        ]
+      },
+      {
+        "kind": "distillery",
+        "name": "Broken Bones Distillery",
+        "score": 1,
+        "source": ["exact", "text", "prefix", "contained"],
+        "entityId": 2358,
+        "reference": "Broken Bones Distillery",
+        "shortName": null,
+        "retrievedFor": [
+          {
+            "exact": true,
+            "query": "Broken Bones Distillery"
+          }
+        ]
+      },
+      {
+        "kind": "brand",
+        "name": "Egan's",
+        "score": 1,
+        "source": ["exact", "text", "prefix", "contained"],
+        "entityId": 2665,
+        "reference": "Egan's",
+        "shortName": null,
+        "retrievedFor": [
+          {
+            "exact": true,
+            "query": "Egan's"
+          }
+        ]
+      },
+      {
+        "kind": "brand",
+        "name": "Yamazakura",
+        "score": 1,
+        "source": ["exact", "text", "prefix", "contained"],
+        "entityId": 376,
+        "reference": "Yamazakura",
+        "shortName": null,
+        "retrievedFor": [
+          {
+            "exact": true,
+            "query": "Yamazakura"
+          }
+        ]
+      },
+      {
+        "kind": "brand",
+        "name": "Kirkjuvagr",
+        "score": 1,
+        "source": ["exact", "text", "prefix", "contained"],
+        "entityId": 365844,
+        "reference": "Kirkjuvagr",
+        "shortName": null,
+        "retrievedFor": [
+          {
+            "exact": true,
+            "query": "Kirkjuvagr"
+          }
+        ]
+      },
+      {
+        "kind": "bottler",
+        "name": "Orkney Distilling",
+        "score": 1,
+        "source": ["exact", "text", "prefix", "contained"],
+        "entityId": 365845,
+        "reference": "Orkney Distilling",
+        "shortName": null,
+        "retrievedFor": [
+          {
+            "exact": true,
+            "query": "Orkney Distilling"
+          }
+        ]
+      },
+      {
+        "kind": "brand",
+        "name": "Moncreiffe",
+        "score": 1,
+        "source": ["exact", "text", "prefix", "contained"],
+        "entityId": 3468,
+        "reference": "Moncreiffe",
+        "shortName": null,
+        "retrievedFor": [
+          {
+            "exact": true,
+            "query": "Moncreiffe"
+          },
+          {
+            "query": "Moncreiffe & Co."
+          }
+        ]
+      },
+      {
+        "kind": "bottler",
+        "name": "Moncreiffe & Co.",
+        "score": 1,
+        "source": ["text", "prefix", "exact", "contained"],
+        "entityId": 5851,
+        "reference": "Moncreiffe & Co.",
+        "shortName": null,
+        "retrievedFor": [
+          {
+            "query": "Moncreiffe"
+          },
+          {
+            "exact": true,
+            "query": "Moncreiffe & Co."
+          }
+        ]
+      },
+      {
+        "kind": "brand",
+        "name": "Smokehead",
+        "score": 1,
+        "source": ["exact", "text", "prefix", "contained"],
+        "entityId": 1348,
+        "reference": "Smokehead",
+        "shortName": null,
+        "retrievedFor": [
+          {
+            "exact": true,
+            "query": "Smokehead"
+          }
+        ]
+      },
+      {
+        "kind": "company",
+        "name": "Ian Macleod Distillers",
+        "score": 1,
+        "source": ["exact", "text", "prefix", "contained"],
+        "entityId": 5658,
+        "reference": "Ian Macleod Distillers",
+        "shortName": null,
+        "retrievedFor": [
+          {
+            "exact": true,
+            "query": "Ian Macleod Distillers"
+          }
+        ]
+      },
+      {
+        "kind": "distillery",
+        "name": "Micil Distillery",
+        "score": 1,
+        "source": ["exact", "text", "prefix", "contained"],
+        "entityId": 3454,
+        "reference": "Micil Distillery",
+        "shortName": null,
+        "retrievedFor": [
+          {
+            "exact": true,
+            "query": "Micil Distillery"
+          }
+        ]
+      },
+      {
+        "kind": "bottler",
+        "name": "Adelphi",
+        "score": 1,
+        "source": ["exact", "text", "prefix", "contained"],
+        "entityId": 5575,
+        "reference": "Adelphi",
+        "shortName": null,
+        "retrievedFor": [
+          {
+            "exact": true,
+            "query": "Adelphi"
+          }
+        ]
+      },
+      {
+        "kind": "distillery",
+        "name": "The Macallan",
+        "score": 1,
+        "source": ["exact", "text", "prefix", "contained"],
+        "entityId": 1157,
+        "reference": "The Macallan",
+        "shortName": null,
+        "retrievedFor": [
+          {
+            "exact": true,
+            "query": "The Macallan"
+          }
+        ]
+      },
+      {
+        "kind": "bottler",
+        "name": "Duncan Taylor",
+        "score": 1,
+        "source": ["exact", "text", "prefix", "contained"],
+        "entityId": 5632,
+        "reference": "Duncan Taylor",
+        "shortName": null,
+        "retrievedFor": [
+          {
+            "exact": true,
+            "query": "Duncan Taylor"
+          }
+        ]
+      },
+      {
+        "kind": "brand",
+        "name": "Kura",
+        "score": 0.33,
+        "source": ["contained"],
+        "entityId": 366724,
+        "reference": "Kura",
+        "shortName": null,
+        "retrievedFor": [
+          {
+            "query": "Yamazakura"
+          }
+        ]
+      }
+    ],
+    "inspectedSeries": []
+  },
+  "provenance": {
+    "source": "production_miss",
+    "verifiedSourceUrls": [
+      "https://www.scotchwhiskyauctions.com/auctions/234-the-185th-auction/903755-macallan-20-year-old-runrig-beat-the-dram-loch-ness-2007/",
+      "https://www.thewhiskybarrel.com/products/macallan-20-year-old-runrig-beat-the-dram-2007",
+      "https://www.abbeywhisky.com/products/macallan-runrig-beat-the-dram-2007-20-year-old"
+    ],
+    "dbOutcome": {
+      "bottleId": null,
+      "createsBottle": true,
+      "summary": "Production returned create_bottle with the name `Macallan 1987 20-year-old Runrig Beat the Dram Loch Ness`."
+    },
+    "notes": "Captured from saved classifier run 36073 (auction_lot 16710, model null, 2026-11-03T17:38:52.916Z). Production rationale: Create the exact Macallan single-cask release: product-specific results support a 1987–2007, 20-year-old whisky at 46% ABV, cask D2562, one of 500 bottles, bottled by Duncan Taylor for the Runrig Beat the Dram Loch Ness event. The inspected Macallan candidate is a different TIME : SPACE release with a conflicting ABV and expression; no local candidate represents this bottle. Checked 2026-11-03. Lot photo label: \"Runrig Beat the Dram Loch Ness 2007, Saturday 18th August\", Speyside single malt, distilled at Macallan, aged 20 years, Cask No. D2562, Bottle 355/500, \"specially selected and bottled by Duncan Taylor & Co. Ltd\", 46% vol, 700ml. The label prints no vintage. Identity model rule 4: the label names Duncan Taylor as the bottler, so Duncan Taylor is the Brand and Macallan the name and distiller; with no printed vintage the name uses the age. Production set Brand The Macallan with bottler Duncan Taylor and named it \"Macallan 1987 20-year-old Runrig Beat the Dram Loch Ness\"."
+  },
+  "expected": {
+    "status": "classified",
+    "action": "create_bottle",
+    "identityScope": "exact_cask",
+    "matchedBottleId": null,
+    "proposedBottle": {
+      "brand": {
+        "id": 5632
+      },
+      "statedAge": 20,
+      "abv": 46,
+      "caskNumber": "D2562"
+    },
+    "proposedBottleNameOneOf": ["Macallan 20-year-old"],
+    "proposedBottleNameExcludes": ["Runrig", "1987"],
+    "proposedBottleDistillerIds": [1157],
+    "summary": "Create the Duncan Taylor Macallan 20-year-old, cask D2562, under Brand Duncan Taylor; the event name stays out of the name and the unprinted vintage is not added."
+  },
+  "knownFailure": {
+    "reason": "The create uses Brand The Macallan instead of the bottler's label, Duncan Taylor. Its name holds an unprinted vintage and an event name."
+  }
+}

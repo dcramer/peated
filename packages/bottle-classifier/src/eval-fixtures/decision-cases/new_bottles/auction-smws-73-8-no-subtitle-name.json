@@ -1,0 +1,1398 @@
+{
+  "id": "auction-smws-73-8-no-subtitle-name",
+  "name": "auction lot: SMWS 73.8 with no printed subtitle is named by its code",
+  "input": {
+    "reference": {
+      "id": 17560,
+      "url": "https://www.scotchwhiskyauctions.com/auctions/234-the-185th-auction/903491-smws-738-aultmore-1989-13-year-old/",
+      "name": "SMWS 73.8 Aultmore 1989 13 Year Old",
+      "imageUrl": null,
+      "externalSiteId": 28097,
+      "currentBottleId": null
+    },
+    "extractedIdentity": {
+      "abv": 60.1,
+      "brand": "SMWS",
+      "series": null,
+      "bottler": "The Scotch Malt Whisky Society",
+      "edition": "73.8",
+      "outturn": null,
+      "category": "single_malt",
+      "distillery": ["Aultmore"],
+      "expression": "73.8 Aultmore 1989 13 Year Old",
+      "maturation": null,
+      "stated_age": null,
+      "cask_number": null,
+      "single_cask": true,
+      "release_year": null,
+      "vintage_year": null,
+      "cask_strength": null
+    },
+    "imageEvidence": null,
+    "initialCandidates": [
+      {
+        "abv": null,
+        "brand": "Bruichladdich",
+        "score": 60.9207,
+        "series": null,
+        "source": ["text"],
+        "bottler": null,
+        "edition": null,
+        "outturn": null,
+        "bottleId": 18810,
+        "category": "single_malt",
+        "fullName": "Bruichladdich Full Strength 1989 vintage 13-year-old",
+        "reference": null,
+        "statedAge": 13,
+        "caskNumber": null,
+        "comparison": {
+          "missing": ["abv", "singleCask", "edition", "bottler"],
+          "conflicts": ["brand", "distillers"],
+          "agreements": ["category"]
+        },
+        "distillery": ["Bruichladdich"],
+        "maturation": null,
+        "releaseDay": null,
+        "singleCask": null,
+        "releaseYear": null,
+        "vintageYear": 1989,
+        "bottlingYear": null,
+        "caskStrength": null,
+        "releaseMonth": null,
+        "familyContext": {
+          "siblingBottles": []
+        }
+      },
+      {
+        "abv": null,
+        "brand": "Montgomerie's",
+        "score": 59.045742,
+        "series": null,
+        "source": ["text"],
+        "bottler": null,
+        "edition": null,
+        "outturn": null,
+        "bottleId": 19095,
+        "category": "single_malt",
+        "fullName": "Montgomerie's 13-year-old 1989 Vintage (distilled at Macallan)",
+        "reference": null,
+        "statedAge": 13,
+        "caskNumber": null,
+        "comparison": {
+          "missing": ["abv", "singleCask", "edition", "bottler", "distillers"],
+          "conflicts": ["brand"],
+          "agreements": ["category"]
+        },
+        "distillery": [],
+        "maturation": null,
+        "releaseDay": null,
+        "singleCask": null,
+        "releaseYear": null,
+        "vintageYear": 1989,
+        "bottlingYear": null,
+        "caskStrength": null,
+        "releaseMonth": null,
+        "familyContext": {
+          "siblingBottles": []
+        }
+      },
+      {
+        "abv": 50,
+        "brand": "That Boutique-y Whisky Company",
+        "score": 55.55979,
+        "series": null,
+        "source": ["text"],
+        "bottler": "That Boutique-y Whisky Company",
+        "edition": "Batch 18",
+        "outturn": null,
+        "bottleId": 46481,
+        "category": "single_malt",
+        "fullName": "TBWC Aultmore - Batch 18 - 13-year-old - 50.0% ABV",
+        "reference": null,
+        "statedAge": 13,
+        "caskNumber": null,
+        "comparison": {
+          "missing": ["vintageYear", "singleCask", "caskNumber"],
+          "conflicts": ["abv", "brand", "bottler"],
+          "agreements": ["category", "statedAge", "distillers"]
+        },
+        "distillery": ["Aultmore"],
+        "maturation": null,
+        "releaseDay": null,
+        "singleCask": null,
+        "releaseYear": null,
+        "vintageYear": null,
+        "bottlingYear": null,
+        "caskStrength": null,
+        "releaseMonth": null,
+        "familyContext": {
+          "siblingBottles": []
+        }
+      },
+      {
+        "abv": null,
+        "brand": "Murray McDavid",
+        "score": 53.797745,
+        "series": null,
+        "source": ["text"],
+        "bottler": null,
+        "edition": null,
+        "outturn": null,
+        "bottleId": 19075,
+        "category": "single_malt",
+        "fullName": "Murray McDavid 13-year-old (distilled at Isle of Jura 1989 Vintage)",
+        "reference": null,
+        "statedAge": 13,
+        "caskNumber": null,
+        "comparison": {
+          "missing": ["abv", "singleCask", "edition", "bottler", "distillers"],
+          "conflicts": ["brand"],
+          "agreements": ["category"]
+        },
+        "distillery": [],
+        "maturation": null,
+        "releaseDay": null,
+        "singleCask": null,
+        "releaseYear": null,
+        "vintageYear": 1989,
+        "bottlingYear": null,
+        "caskStrength": null,
+        "releaseMonth": null,
+        "familyContext": {
+          "siblingBottles": []
+        }
+      },
+      {
+        "abv": 40,
+        "brand": "Gordon & MacPhail",
+        "score": 43.219986,
+        "series": "Connoisseurs Choice",
+        "source": ["text"],
+        "bottler": "Gordon & MacPhail",
+        "edition": null,
+        "outturn": null,
+        "bottleId": 66344,
+        "category": "single_malt",
+        "fullName": "Gordon & MacPhail Aultmore 1989",
+        "reference": null,
+        "statedAge": null,
+        "caskNumber": null,
+        "comparison": {
+          "missing": ["statedAge", "singleCask", "caskNumber"],
+          "conflicts": ["abv", "brand", "bottler"],
+          "agreements": ["category", "vintageYear", "distillers"]
+        },
+        "distillery": ["Aultmore"],
+        "maturation": null,
+        "releaseDay": null,
+        "singleCask": null,
+        "releaseYear": null,
+        "vintageYear": 1989,
+        "bottlingYear": 2001,
+        "caskStrength": null,
+        "releaseMonth": null,
+        "familyContext": {
+          "siblingBottles": []
+        }
+      },
+      {
+        "abv": 43,
+        "brand": "Gordon & MacPhail",
+        "score": 43.219986,
+        "series": "Connoisseurs Choice",
+        "source": ["text"],
+        "bottler": "Gordon & MacPhail",
+        "edition": null,
+        "outturn": null,
+        "bottleId": 66383,
+        "category": "single_malt",
+        "fullName": "Gordon & MacPhail Aultmore 1989",
+        "reference": null,
+        "statedAge": null,
+        "caskNumber": null,
+        "comparison": {
+          "missing": ["statedAge", "singleCask", "caskNumber"],
+          "conflicts": ["abv", "brand", "bottler"],
+          "agreements": ["category", "vintageYear", "distillers"]
+        },
+        "distillery": ["Aultmore"],
+        "maturation": null,
+        "releaseDay": null,
+        "singleCask": null,
+        "releaseYear": null,
+        "vintageYear": 1989,
+        "bottlingYear": 2003,
+        "caskStrength": null,
+        "releaseMonth": null,
+        "familyContext": {
+          "siblingBottles": []
+        }
+      },
+      {
+        "abv": 61.4,
+        "brand": "Darkness",
+        "score": 41.56211,
+        "series": null,
+        "source": ["text"],
+        "bottler": "Darkness",
+        "edition": null,
+        "outturn": null,
+        "bottleId": 46107,
+        "category": "single_malt",
+        "fullName": "Darkness Oloroso Cask Finish - 13-year-old - 61.4% ABV - Oloroso Cask",
+        "reference": null,
+        "statedAge": 13,
+        "caskNumber": null,
+        "comparison": {
+          "missing": ["vintageYear", "singleCask", "caskNumber"],
+          "conflicts": ["abv", "brand", "bottler"],
+          "agreements": ["category", "statedAge", "distillers"]
+        },
+        "distillery": ["Aultmore"],
+        "maturation": "oloroso",
+        "releaseDay": null,
+        "singleCask": null,
+        "releaseYear": null,
+        "vintageYear": null,
+        "bottlingYear": null,
+        "caskStrength": null,
+        "releaseMonth": null,
+        "familyContext": {
+          "siblingBottles": []
+        }
+      },
+      {
+        "abv": 43,
+        "brand": "Tomintoul",
+        "score": 41.321896,
+        "series": null,
+        "source": ["text"],
+        "bottler": null,
+        "edition": null,
+        "outturn": null,
+        "bottleId": 45893,
+        "category": "single_malt",
+        "fullName": "Tomintoul 13-year-old - 43.0% ABV",
+        "reference": null,
+        "statedAge": 13,
+        "caskNumber": null,
+        "comparison": {
+          "missing": ["vintageYear", "singleCask", "caskNumber", "bottler"],
+          "conflicts": ["abv", "brand", "distillers"],
+          "agreements": ["category", "statedAge"]
+        },
+        "distillery": ["Tomintoul"],
+        "maturation": null,
+        "releaseDay": null,
+        "singleCask": null,
+        "releaseYear": null,
+        "vintageYear": null,
+        "bottlingYear": null,
+        "caskStrength": null,
+        "releaseMonth": null,
+        "familyContext": {
+          "siblingBottles": []
+        }
+      },
+      {
+        "abv": null,
+        "brand": "Springbank",
+        "score": 40.629326,
+        "series": null,
+        "source": ["text"],
+        "bottler": null,
+        "edition": null,
+        "outturn": null,
+        "bottleId": 16112,
+        "category": "single_malt",
+        "fullName": "Springbank Green 13-year-old",
+        "reference": null,
+        "statedAge": 13,
+        "caskNumber": null,
+        "comparison": {
+          "missing": ["abv", "singleCask", "edition", "bottler"],
+          "conflicts": ["brand", "distillers"],
+          "agreements": ["category"]
+        },
+        "distillery": ["Springbank"],
+        "maturation": null,
+        "releaseDay": null,
+        "singleCask": null,
+        "releaseYear": null,
+        "vintageYear": null,
+        "bottlingYear": null,
+        "caskStrength": null,
+        "releaseMonth": null,
+        "familyContext": {
+          "siblingBottles": []
+        }
+      },
+      {
+        "abv": 46,
+        "brand": "Glencadam",
+        "score": 40.240765,
+        "series": null,
+        "source": ["text"],
+        "bottler": null,
+        "edition": null,
+        "outturn": null,
+        "bottleId": 45838,
+        "category": "single_malt",
+        "fullName": "Glencadam 13-year-old The Reawakening",
+        "reference": null,
+        "statedAge": 13,
+        "caskNumber": null,
+        "comparison": {
+          "missing": ["vintageYear", "singleCask", "caskNumber", "bottler"],
+          "conflicts": ["abv", "brand", "distillers"],
+          "agreements": ["category", "statedAge"]
+        },
+        "distillery": ["Glencadam"],
+        "maturation": null,
+        "releaseDay": null,
+        "singleCask": null,
+        "releaseYear": 2017,
+        "vintageYear": null,
+        "bottlingYear": null,
+        "caskStrength": null,
+        "releaseMonth": null,
+        "familyContext": {
+          "siblingBottles": []
+        }
+      },
+      {
+        "abv": 40,
+        "brand": "Isle of Jura",
+        "score": 40.16573,
+        "series": null,
+        "source": ["text"],
+        "bottler": null,
+        "edition": null,
+        "outturn": null,
+        "bottleId": 46590,
+        "category": "single_malt",
+        "fullName": "Isle of Jura 13-year-old - 40.0% ABV - Bourbon Cask",
+        "reference": null,
+        "statedAge": 13,
+        "caskNumber": null,
+        "comparison": {
+          "missing": ["vintageYear", "singleCask", "caskNumber", "bottler"],
+          "conflicts": ["abv", "brand", "distillers"],
+          "agreements": ["category", "statedAge"]
+        },
+        "distillery": ["Isle of Jura"],
+        "maturation": "bourbon",
+        "releaseDay": null,
+        "singleCask": null,
+        "releaseYear": null,
+        "vintageYear": null,
+        "bottlingYear": null,
+        "caskStrength": null,
+        "releaseMonth": null,
+        "familyContext": {
+          "siblingBottles": []
+        }
+      },
+      {
+        "abv": null,
+        "brand": "World Whiskey Society",
+        "score": 39.599846,
+        "series": null,
+        "source": ["text"],
+        "bottler": "World Whiskey Society",
+        "edition": null,
+        "outturn": null,
+        "bottleId": 64085,
+        "category": "single_malt",
+        "fullName": "World Whiskey Society Aultmore 1990",
+        "reference": null,
+        "statedAge": 32,
+        "caskNumber": null,
+        "comparison": {
+          "missing": ["abv", "edition"],
+          "conflicts": ["brand", "bottler"],
+          "agreements": ["category", "singleCask", "distillers"]
+        },
+        "distillery": ["Aultmore"],
+        "maturation": null,
+        "releaseDay": null,
+        "singleCask": true,
+        "releaseYear": null,
+        "vintageYear": 1990,
+        "bottlingYear": null,
+        "caskStrength": null,
+        "releaseMonth": null,
+        "familyContext": {
+          "siblingBottles": []
+        }
+      },
+      {
+        "abv": 46,
+        "brand": "Glencadam",
+        "score": 39.196083,
+        "series": null,
+        "source": ["text"],
+        "bottler": null,
+        "edition": null,
+        "outturn": null,
+        "bottleId": 63877,
+        "category": "single_malt",
+        "fullName": "Glencadam 13-year-old",
+        "reference": null,
+        "statedAge": 13,
+        "caskNumber": null,
+        "comparison": {
+          "missing": ["vintageYear", "singleCask", "caskNumber", "bottler"],
+          "conflicts": ["abv", "brand", "distillers"],
+          "agreements": ["category", "statedAge"]
+        },
+        "distillery": ["Glencadam"],
+        "maturation": null,
+        "releaseDay": null,
+        "singleCask": null,
+        "releaseYear": null,
+        "vintageYear": null,
+        "bottlingYear": null,
+        "caskStrength": null,
+        "releaseMonth": null,
+        "familyContext": {
+          "siblingBottles": []
+        }
+      },
+      {
+        "abv": null,
+        "brand": "Distillery 291",
+        "score": 39.032963,
+        "series": null,
+        "source": ["text"],
+        "bottler": null,
+        "edition": "Batch 13",
+        "outturn": null,
+        "bottleId": 44981,
+        "category": null,
+        "fullName": "291 E - Batch 13",
+        "reference": null,
+        "statedAge": null,
+        "caskNumber": null,
+        "comparison": {
+          "missing": [
+            "category",
+            "statedAge",
+            "abv",
+            "vintageYear",
+            "singleCask",
+            "caskNumber",
+            "bottler"
+          ],
+          "conflicts": ["brand", "distillers"],
+          "agreements": []
+        },
+        "distillery": ["Distillery 291"],
+        "maturation": null,
+        "releaseDay": null,
+        "singleCask": null,
+        "releaseYear": null,
+        "vintageYear": null,
+        "bottlingYear": null,
+        "caskStrength": null,
+        "releaseMonth": null,
+        "familyContext": {
+          "siblingBottles": [
+            {
+              "abv": null,
+              "edition": null,
+              "outturn": null,
+              "bottleId": 44020,
+              "fullName": "291 E",
+              "statedAge": null,
+              "caskNumber": null,
+              "maturation": null,
+              "releaseDay": null,
+              "singleCask": null,
+              "releaseYear": null,
+              "traitFields": [],
+              "vintageYear": null,
+              "bottlingYear": null,
+              "caskStrength": null,
+              "releaseMonth": null
+            },
+            {
+              "abv": null,
+              "edition": "Batch 12",
+              "outturn": null,
+              "bottleId": 44980,
+              "fullName": "291 E - Batch 12",
+              "statedAge": null,
+              "caskNumber": null,
+              "maturation": null,
+              "releaseDay": null,
+              "singleCask": null,
+              "releaseYear": null,
+              "traitFields": ["edition"],
+              "vintageYear": null,
+              "bottlingYear": null,
+              "caskStrength": null,
+              "releaseMonth": null
+            },
+            {
+              "abv": null,
+              "edition": "Batch 14",
+              "outturn": null,
+              "bottleId": 44982,
+              "fullName": "291 E - Batch 14",
+              "statedAge": null,
+              "caskNumber": null,
+              "maturation": null,
+              "releaseDay": null,
+              "singleCask": null,
+              "releaseYear": null,
+              "traitFields": ["edition"],
+              "vintageYear": null,
+              "bottlingYear": null,
+              "caskStrength": null,
+              "releaseMonth": null
+            },
+            {
+              "abv": null,
+              "edition": "Batch 15",
+              "outturn": null,
+              "bottleId": 44983,
+              "fullName": "291 E - Batch 15",
+              "statedAge": null,
+              "caskNumber": null,
+              "maturation": null,
+              "releaseDay": null,
+              "singleCask": null,
+              "releaseYear": null,
+              "traitFields": ["edition"],
+              "vintageYear": null,
+              "bottlingYear": null,
+              "caskStrength": null,
+              "releaseMonth": null
+            }
+          ]
+        }
+      },
+      {
+        "abv": null,
+        "brand": "Wild Scotsman",
+        "score": 38.956955,
+        "series": null,
+        "source": ["text"],
+        "bottler": null,
+        "edition": null,
+        "outturn": null,
+        "bottleId": 17989,
+        "category": "single_malt",
+        "fullName": "Wild Scotsman 1994 vintage, 13-year-old (distilled at Mortlach)",
+        "reference": null,
+        "statedAge": 13,
+        "caskNumber": null,
+        "comparison": {
+          "missing": [
+            "abv",
+            "singleCask",
+            "caskNumber",
+            "bottler",
+            "distillers"
+          ],
+          "conflicts": ["vintageYear", "brand"],
+          "agreements": ["category", "statedAge"]
+        },
+        "distillery": [],
+        "maturation": null,
+        "releaseDay": null,
+        "singleCask": null,
+        "releaseYear": null,
+        "vintageYear": 1994,
+        "bottlingYear": null,
+        "caskStrength": null,
+        "releaseMonth": null,
+        "familyContext": {
+          "siblingBottles": []
+        }
+      },
+      {
+        "abv": null,
+        "brand": "The GlenDronach",
+        "score": 38.551125,
+        "series": null,
+        "source": ["text"],
+        "bottler": "The GlenDronach",
+        "edition": "Batch 13",
+        "outturn": null,
+        "bottleId": 44788,
+        "category": "single_malt",
+        "fullName": "The GlenDronach 1993 Single Cask - Batch 13 - 27-year-old",
+        "reference": null,
+        "statedAge": 27,
+        "caskNumber": null,
+        "comparison": {
+          "missing": ["abv", "vintageYear", "caskNumber", "distillers"],
+          "conflicts": ["statedAge", "brand", "bottler"],
+          "agreements": ["category", "singleCask"]
+        },
+        "distillery": [],
+        "maturation": null,
+        "releaseDay": null,
+        "singleCask": true,
+        "releaseYear": null,
+        "vintageYear": null,
+        "bottlingYear": null,
+        "caskStrength": null,
+        "releaseMonth": null,
+        "familyContext": {
+          "siblingBottles": [
+            {
+              "abv": null,
+              "edition": null,
+              "outturn": null,
+              "bottleId": 2800,
+              "fullName": "The GlenDronach 1993 Single Cask",
+              "statedAge": 25,
+              "caskNumber": null,
+              "maturation": null,
+              "releaseDay": null,
+              "singleCask": true,
+              "releaseYear": null,
+              "traitFields": ["statedAge", "singleCask"],
+              "vintageYear": null,
+              "bottlingYear": null,
+              "caskStrength": null,
+              "releaseMonth": null
+            },
+            {
+              "abv": null,
+              "edition": "Batch 14",
+              "outturn": null,
+              "bottleId": 44787,
+              "fullName": "The GlenDronach 1993 Single Cask - Batch 14 - 23-year-old",
+              "statedAge": 23,
+              "caskNumber": null,
+              "maturation": null,
+              "releaseDay": null,
+              "singleCask": true,
+              "releaseYear": null,
+              "traitFields": ["edition", "statedAge", "singleCask"],
+              "vintageYear": null,
+              "bottlingYear": null,
+              "caskStrength": null,
+              "releaseMonth": null
+            },
+            {
+              "abv": null,
+              "edition": "Batch 8",
+              "outturn": null,
+              "bottleId": 44785,
+              "fullName": "The GlenDronach 1993 Single Cask - Batch 8",
+              "statedAge": 25,
+              "caskNumber": null,
+              "maturation": null,
+              "releaseDay": null,
+              "singleCask": true,
+              "releaseYear": null,
+              "traitFields": ["edition", "statedAge", "singleCask"],
+              "vintageYear": null,
+              "bottlingYear": null,
+              "caskStrength": null,
+              "releaseMonth": null
+            },
+            {
+              "abv": null,
+              "edition": "Batch 9",
+              "outturn": null,
+              "bottleId": 44786,
+              "fullName": "The GlenDronach 1993 Single Cask - Batch 9 - 27-year-old",
+              "statedAge": 27,
+              "caskNumber": null,
+              "maturation": null,
+              "releaseDay": null,
+              "singleCask": true,
+              "releaseYear": null,
+              "traitFields": ["edition", "statedAge", "singleCask"],
+              "vintageYear": null,
+              "bottlingYear": null,
+              "caskStrength": null,
+              "releaseMonth": null
+            }
+          ]
+        }
+      },
+      {
+        "abv": null,
+        "brand": "Springbank",
+        "score": 38.18428,
+        "series": null,
+        "source": ["text"],
+        "bottler": null,
+        "edition": null,
+        "outturn": null,
+        "bottleId": 3898,
+        "category": "single_malt",
+        "fullName": "Springbank 13-year-old Green",
+        "reference": null,
+        "statedAge": 13,
+        "caskNumber": null,
+        "comparison": {
+          "missing": ["abv", "singleCask", "edition", "bottler"],
+          "conflicts": ["brand", "distillers"],
+          "agreements": ["category"]
+        },
+        "distillery": ["Springbank"],
+        "maturation": null,
+        "releaseDay": null,
+        "singleCask": null,
+        "releaseYear": null,
+        "vintageYear": null,
+        "bottlingYear": null,
+        "caskStrength": null,
+        "releaseMonth": null,
+        "familyContext": {
+          "siblingBottles": []
+        }
+      },
+      {
+        "abv": null,
+        "brand": "William Cadenhead's",
+        "score": 37.84806,
+        "series": null,
+        "source": ["text"],
+        "bottler": "William Cadenhead's",
+        "edition": null,
+        "outturn": null,
+        "bottleId": 41267,
+        "category": "single_malt",
+        "fullName": "Cadenhead's 13-year-old (dstilled at Glenburgie-Glenlivet)",
+        "reference": null,
+        "statedAge": 13,
+        "caskNumber": null,
+        "comparison": {
+          "missing": ["abv", "singleCask", "edition"],
+          "conflicts": ["brand", "bottler", "distillers"],
+          "agreements": ["category"]
+        },
+        "distillery": ["The Glenlivet", "Glenburgie"],
+        "maturation": null,
+        "releaseDay": null,
+        "singleCask": null,
+        "releaseYear": null,
+        "vintageYear": null,
+        "bottlingYear": null,
+        "caskStrength": null,
+        "releaseMonth": null,
+        "familyContext": {
+          "siblingBottles": []
+        }
+      },
+      {
+        "abv": null,
+        "brand": "The Glenrothes",
+        "score": 37.827686,
+        "series": null,
+        "source": ["text"],
+        "bottler": null,
+        "edition": null,
+        "outturn": null,
+        "bottleId": 2843,
+        "category": "single_malt",
+        "fullName": "The Glenrothes 13-year-old Halloween Edition 2018",
+        "reference": null,
+        "statedAge": 13,
+        "caskNumber": null,
+        "comparison": {
+          "missing": ["abv", "singleCask", "edition", "bottler"],
+          "conflicts": ["brand", "distillers"],
+          "agreements": ["category"]
+        },
+        "distillery": ["The Glenrothes"],
+        "maturation": null,
+        "releaseDay": null,
+        "singleCask": null,
+        "releaseYear": null,
+        "vintageYear": null,
+        "bottlingYear": null,
+        "caskStrength": null,
+        "releaseMonth": null,
+        "familyContext": {
+          "siblingBottles": []
+        }
+      },
+      {
+        "abv": 60.3,
+        "brand": "The Scotch Malt Whisky Society",
+        "score": 1,
+        "series": null,
+        "source": ["brand_coverage", "context"],
+        "bottler": "The Scotch Malt Whisky Society",
+        "edition": null,
+        "outturn": null,
+        "bottleId": 51050,
+        "category": "single_malt",
+        "fullName": "SMWS 73.115 Peace and tranquility",
+        "reference": null,
+        "statedAge": 16,
+        "caskNumber": "73.115",
+        "comparison": {
+          "missing": ["edition"],
+          "conflicts": ["abv", "brand"],
+          "agreements": ["category", "singleCask", "bottler", "distillers"]
+        },
+        "distillery": ["Aultmore"],
+        "maturation": "Refill hogshead",
+        "releaseDay": null,
+        "singleCask": true,
+        "releaseYear": null,
+        "vintageYear": 2002,
+        "bottlingYear": null,
+        "caskStrength": null,
+        "releaseMonth": null,
+        "familyContext": {
+          "siblingBottles": []
+        }
+      },
+      {
+        "abv": 59,
+        "brand": "The Scotch Malt Whisky Society",
+        "score": 0.875,
+        "series": null,
+        "source": ["brand_coverage"],
+        "bottler": "The Scotch Malt Whisky Society",
+        "edition": null,
+        "outturn": 230,
+        "bottleId": 48996,
+        "category": "single_malt",
+        "fullName": "SMWS 73.130 Sticks and stones",
+        "reference": null,
+        "statedAge": 10,
+        "caskNumber": "73.130",
+        "comparison": {
+          "missing": ["edition"],
+          "conflicts": ["abv", "brand"],
+          "agreements": ["category", "singleCask", "bottler", "distillers"]
+        },
+        "distillery": ["Aultmore"],
+        "maturation": "2nd fill ex-bourbon barrel",
+        "releaseDay": 4,
+        "singleCask": true,
+        "releaseYear": 2022,
+        "vintageYear": 2011,
+        "bottlingYear": null,
+        "caskStrength": null,
+        "releaseMonth": 2,
+        "familyContext": {
+          "siblingBottles": []
+        }
+      },
+      {
+        "abv": 62,
+        "brand": "The Scotch Malt Whisky Society",
+        "score": 0.875,
+        "series": null,
+        "source": ["brand_coverage"],
+        "bottler": "The Scotch Malt Whisky Society",
+        "edition": null,
+        "outturn": null,
+        "bottleId": 48998,
+        "category": "single_malt",
+        "fullName": "SMWS 73.131 A waft of summer sensuality",
+        "reference": null,
+        "statedAge": 10,
+        "caskNumber": "73.131",
+        "comparison": {
+          "missing": ["edition"],
+          "conflicts": ["abv", "brand"],
+          "agreements": ["category", "singleCask", "bottler", "distillers"]
+        },
+        "distillery": ["Aultmore"],
+        "maturation": "1st fill ex-bourbon barrel",
+        "releaseDay": 9,
+        "singleCask": true,
+        "releaseYear": 2022,
+        "vintageYear": 2011,
+        "bottlingYear": null,
+        "caskStrength": null,
+        "releaseMonth": 12,
+        "familyContext": {
+          "siblingBottles": []
+        }
+      },
+      {
+        "abv": 62,
+        "brand": "The Scotch Malt Whisky Society",
+        "score": 0.875,
+        "series": null,
+        "source": ["brand_coverage"],
+        "bottler": "The Scotch Malt Whisky Society",
+        "edition": null,
+        "outturn": null,
+        "bottleId": 51054,
+        "category": "single_malt",
+        "fullName": "SMWS 73.133 A romp in a meadow",
+        "reference": null,
+        "statedAge": 10,
+        "caskNumber": "73.133",
+        "comparison": {
+          "missing": ["edition"],
+          "conflicts": ["abv", "brand"],
+          "agreements": ["category", "singleCask", "bottler", "distillers"]
+        },
+        "distillery": ["Aultmore"],
+        "maturation": "First-fill barrel",
+        "releaseDay": null,
+        "singleCask": true,
+        "releaseYear": null,
+        "vintageYear": 2011,
+        "bottlingYear": null,
+        "caskStrength": null,
+        "releaseMonth": null,
+        "familyContext": {
+          "siblingBottles": []
+        }
+      },
+      {
+        "abv": 62.2,
+        "brand": "The Scotch Malt Whisky Society",
+        "score": 0.875,
+        "series": null,
+        "source": ["brand_coverage"],
+        "bottler": "The Scotch Malt Whisky Society",
+        "edition": null,
+        "outturn": null,
+        "bottleId": 49000,
+        "category": "single_malt",
+        "fullName": "SMWS 73.135 Cutting logs with a daisy chainsaw",
+        "reference": null,
+        "statedAge": 10,
+        "caskNumber": "73.135",
+        "comparison": {
+          "missing": ["edition"],
+          "conflicts": ["abv", "brand"],
+          "agreements": ["category", "singleCask", "bottler", "distillers"]
+        },
+        "distillery": ["Aultmore"],
+        "maturation": "1st fill ex-bourbon barrel",
+        "releaseDay": 2,
+        "singleCask": true,
+        "releaseYear": 2022,
+        "vintageYear": 2011,
+        "bottlingYear": null,
+        "caskStrength": null,
+        "releaseMonth": 6,
+        "familyContext": {
+          "siblingBottles": []
+        }
+      },
+      {
+        "abv": 61.9,
+        "brand": "The Scotch Malt Whisky Society",
+        "score": 0.875,
+        "series": null,
+        "source": ["brand_coverage"],
+        "bottler": "The Scotch Malt Whisky Society",
+        "edition": null,
+        "outturn": null,
+        "bottleId": 49001,
+        "category": "single_malt",
+        "fullName": "SMWS 73.136 Uplifting vibe",
+        "reference": null,
+        "statedAge": 10,
+        "caskNumber": "73.136",
+        "comparison": {
+          "missing": ["edition"],
+          "conflicts": ["abv", "brand"],
+          "agreements": ["category", "singleCask", "bottler", "distillers"]
+        },
+        "distillery": ["Aultmore"],
+        "maturation": "1st fill ex-bourbon barrel",
+        "releaseDay": 1,
+        "singleCask": true,
+        "releaseYear": 2022,
+        "vintageYear": 2011,
+        "bottlingYear": null,
+        "caskStrength": null,
+        "releaseMonth": 7,
+        "familyContext": {
+          "siblingBottles": []
+        }
+      },
+      {
+        "abv": 62.5,
+        "brand": "The Scotch Malt Whisky Society",
+        "score": 0.875,
+        "series": null,
+        "source": ["brand_coverage"],
+        "bottler": "The Scotch Malt Whisky Society",
+        "edition": null,
+        "outturn": null,
+        "bottleId": 49003,
+        "category": "single_malt",
+        "fullName": "SMWS 73.137 Sweet grapefruit rose wine",
+        "reference": null,
+        "statedAge": 10,
+        "caskNumber": "73.137",
+        "comparison": {
+          "missing": ["edition"],
+          "conflicts": ["abv", "brand"],
+          "agreements": ["category", "singleCask", "bottler", "distillers"]
+        },
+        "distillery": ["Aultmore"],
+        "maturation": "1st fill ex-bourbon barrel",
+        "releaseDay": 16,
+        "singleCask": true,
+        "releaseYear": 2023,
+        "vintageYear": 2011,
+        "bottlingYear": null,
+        "caskStrength": null,
+        "releaseMonth": 6,
+        "familyContext": {
+          "siblingBottles": []
+        }
+      }
+    ]
+  },
+  "context": {
+    "inspectedBottleIds": [51050],
+    "bottleContexts": [
+      {
+        "exact": {
+          "abv": 60.3,
+          "edition": null,
+          "outturn": null,
+          "statedAge": 16,
+          "caskNumber": "73.115",
+          "maturation": "Refill hogshead",
+          "releaseDay": null,
+          "singleCask": true,
+          "releaseYear": null,
+          "vintageYear": 2002,
+          "bottlingYear": null,
+          "caskStrength": null,
+          "releaseMonth": null
+        },
+        "shared": {
+          "name": "73.115 Peace and tranquility",
+          "brand": {
+            "name": "The Scotch Malt Whisky Society",
+            "entityId": 4263
+          },
+          "series": null,
+          "bottler": {
+            "name": "The Scotch Malt Whisky Society",
+            "entityId": 4263
+          },
+          "category": "single_malt",
+          "statedAge": null,
+          "distillers": [
+            {
+              "name": "Aultmore",
+              "entityId": 191
+            }
+          ]
+        },
+        "groupId": 24010,
+        "bottleId": 51050,
+        "fullName": "SMWS 73.115 Peace and tranquility",
+        "siblings": [],
+        "references": [
+          {
+            "name": "SMWS 73.115 Peace and tranquility",
+            "ignored": false
+          }
+        ],
+        "observations": [],
+        "imageSources": []
+      }
+    ],
+    "inspectedEntities": [
+      {
+        "kind": "bottler",
+        "name": "The Scotch Malt Whisky Society",
+        "score": 1,
+        "source": ["exact", "text", "prefix", "contained"],
+        "entityId": 4263,
+        "reference": "The Scotch Malt Whisky Society",
+        "shortName": "SMWS",
+        "retrievedFor": [
+          {
+            "exact": true,
+            "query": "SMWS"
+          },
+          {
+            "exact": true,
+            "query": "The Scotch Malt Whisky Society"
+          }
+        ]
+      },
+      {
+        "kind": "distillery",
+        "name": "Aultmore",
+        "score": 1,
+        "source": ["exact", "text", "prefix", "contained"],
+        "entityId": 191,
+        "reference": "Aultmore",
+        "shortName": null,
+        "retrievedFor": [
+          {
+            "exact": true,
+            "query": "Aultmore"
+          }
+        ]
+      },
+      {
+        "kind": "brand",
+        "name": "World Whiskey Society",
+        "score": 1,
+        "source": ["exact", "text", "prefix", "contained"],
+        "entityId": 367050,
+        "reference": "World Whiskey Society",
+        "shortName": null,
+        "retrievedFor": [
+          {
+            "exact": true,
+            "query": "World Whiskey Society"
+          }
+        ]
+      },
+      {
+        "kind": "brand",
+        "name": "Montgomerie's",
+        "score": 1,
+        "source": ["exact", "text", "prefix", "contained"],
+        "entityId": 6035,
+        "reference": "Montgomerie's",
+        "shortName": null,
+        "retrievedFor": [
+          {
+            "exact": true,
+            "query": "Montgomerie's"
+          }
+        ]
+      },
+      {
+        "kind": "bottler",
+        "name": "Murray McDavid",
+        "score": 1,
+        "source": ["exact", "text", "prefix", "contained"],
+        "entityId": 5670,
+        "reference": "Murray McDavid",
+        "shortName": null,
+        "retrievedFor": [
+          {
+            "exact": true,
+            "query": "Murray McDavid"
+          }
+        ]
+      },
+      {
+        "kind": "distillery",
+        "name": "Bruichladdich",
+        "score": 1,
+        "source": ["exact", "text", "prefix", "contained"],
+        "entityId": 192,
+        "reference": "Bruichladdich",
+        "shortName": "",
+        "retrievedFor": [
+          {
+            "exact": true,
+            "query": "Bruichladdich"
+          }
+        ]
+      },
+      {
+        "kind": "distillery",
+        "name": "Springbank",
+        "score": 1,
+        "source": ["exact", "text", "prefix", "contained"],
+        "entityId": 1362,
+        "reference": "Springbank",
+        "shortName": null,
+        "retrievedFor": [
+          {
+            "exact": true,
+            "query": "Springbank"
+          }
+        ]
+      },
+      {
+        "kind": "distillery",
+        "name": "The Glenrothes",
+        "score": 1,
+        "source": ["exact", "text", "prefix", "contained"],
+        "entityId": 985,
+        "reference": "The Glenrothes",
+        "shortName": null,
+        "retrievedFor": [
+          {
+            "exact": true,
+            "query": "The Glenrothes"
+          }
+        ]
+      },
+      {
+        "kind": "bottler",
+        "name": "William Cadenhead's",
+        "score": 1,
+        "source": ["exact", "text", "prefix", "contained"],
+        "entityId": 336,
+        "reference": "William Cadenhead's",
+        "shortName": "Cadenhead's",
+        "retrievedFor": [
+          {
+            "exact": true,
+            "query": "William Cadenhead's"
+          }
+        ]
+      },
+      {
+        "kind": "distillery",
+        "name": "The Glenlivet",
+        "score": 1,
+        "source": ["exact", "text", "prefix", "contained"],
+        "entityId": 244,
+        "reference": "The Glenlivet",
+        "shortName": null,
+        "retrievedFor": [
+          {
+            "exact": true,
+            "query": "The Glenlivet"
+          }
+        ]
+      },
+      {
+        "kind": "distillery",
+        "name": "Glenburgie",
+        "score": 1,
+        "source": ["exact", "text", "prefix", "contained"],
+        "entityId": 968,
+        "reference": "Glenburgie",
+        "shortName": null,
+        "retrievedFor": [
+          {
+            "exact": true,
+            "query": "Glenburgie"
+          }
+        ]
+      },
+      {
+        "kind": "brand",
+        "name": "Bruichladdich Octomore",
+        "score": 0.5,
+        "source": ["text", "prefix"],
+        "entityId": 1210,
+        "reference": "Bruichladdich Octomore",
+        "shortName": "Octomore",
+        "retrievedFor": [
+          {
+            "query": "Bruichladdich"
+          }
+        ]
+      },
+      {
+        "kind": "brand",
+        "name": "Bruichladdich Port Charlotte",
+        "score": 0.5,
+        "source": ["text", "prefix"],
+        "entityId": 1269,
+        "reference": "Bruichladdich Port Charlotte",
+        "shortName": "Port Charlotte",
+        "retrievedFor": [
+          {
+            "query": "Bruichladdich"
+          }
+        ]
+      },
+      {
+        "kind": "bottler",
+        "name": "The Whisky Society",
+        "score": 0.35,
+        "source": ["contained"],
+        "entityId": 367612,
+        "reference": "Whisky Society",
+        "shortName": null,
+        "retrievedFor": [
+          {
+            "query": "The Scotch Malt Whisky Society"
+          }
+        ]
+      },
+      {
+        "kind": "brand",
+        "name": "Cadée",
+        "score": 0.29705882352941176,
+        "source": ["contained"],
+        "entityId": 367403,
+        "reference": "Cadée",
+        "shortName": null,
+        "retrievedFor": [
+          {
+            "query": "William Cadenhead's"
+          }
+        ]
+      },
+      {
+        "kind": "bottler",
+        "name": "&Whisky",
+        "score": 0.29615384615384616,
+        "source": ["contained"],
+        "entityId": 365821,
+        "reference": "&Whisky",
+        "shortName": null,
+        "retrievedFor": [
+          {
+            "query": "The Scotch Malt Whisky Society"
+          }
+        ]
+      },
+      {
+        "kind": "distillery",
+        "name": "The Macallan",
+        "score": 0.2,
+        "source": ["text"],
+        "entityId": 1157,
+        "reference": null,
+        "shortName": null,
+        "retrievedFor": [
+          {
+            "query": "The Glenlivet"
+          }
+        ]
+      }
+    ],
+    "inspectedSeries": []
+  },
+  "provenance": {
+    "source": "production_miss",
+    "verifiedSourceUrls": [
+      "https://www.scotchwhiskyauctions.com/auctions/234-the-185th-auction/903491-smws-738-aultmore-1989-13-year-old/"
+    ],
+    "dbOutcome": {
+      "bottleId": null,
+      "createsBottle": true,
+      "summary": "Production returned create_bottle with the name `73.8 Aultmore 1989 13-year-old`."
+    },
+    "notes": "Captured from saved classifier run 36611 (auction_lot 17560, model null, 2026-11-03T21:31:01.654Z). Production rationale: The source is a single marketed SMWS Aultmore bottling. The auction title identifies cask 73.8, Aultmore, 1989, and 13 years; focused exact-product results corroborate 60.1% ABV and bottling in 2002. The inspected SMWS entity context supports The Scotch Malt Whisky Society as both Brand and bottler, and Aultmore as the distillery. No local candidate represents this exact release. Checked 2026-11-03. Lot page: SMWS 73.8 Aultmore, Distilled May 1989, Bottled June 2002, 13 years old, 60.1% ABV / 70cl; no subtitle shown. Owner rule (2026-11-03): an SMWS Bottle with no printed subtitle is named by its code alone. The identity model already says not to invent a subtitle or append traits. Production named it \"73.8 Aultmore 1989 13-year-old\". No Bottle exists for 73.8."
+  },
+  "expected": {
+    "status": "classified",
+    "action": "create_bottle",
+    "identityScope": "exact_cask",
+    "matchedBottleId": null,
+    "proposedBottle": {
+      "name": "73.8",
+      "brand": {
+        "id": 4263
+      },
+      "caskNumber": "73.8",
+      "statedAge": 13,
+      "abv": 60.1,
+      "vintageYear": 1989
+    },
+    "proposedBottleNameOneOf": ["73.8"],
+    "proposedBottleDistillerIds": [191],
+    "summary": "Create SMWS 73.8 named by its code alone; with no printed subtitle, distillery, vintage, and age stay in their fields."
+  },
+  "knownFailure": {
+    "reason": "The SMWS code path in smwsPolicy.ts decides before the agent runs. It lists every candidate id, so the output schema rejects more than 25 and the run errors. It also builds the name from distillery, vintage, and age instead of the code alone.",
+    "fixedBy": "Let the agent decide SMWS lots. Parse the code into verified facts (distillery number and cask), then let the agent match or create and name the Bottle."
+  }
+}

@@ -1,0 +1,1865 @@
+{
+  "id": "auction-port-ellen-1983-provenance-brand",
+  "name": "auction lot: Port Ellen 1983 Provenance uses the bottler label as Brand",
+  "input": {
+    "reference": {
+      "id": 17300,
+      "url": "https://www.scotchwhiskyauctions.com/auctions/234-the-185th-auction/904345-port-ellen-1983-24-year-old-provenance/",
+      "name": "Port Ellen 1983 24 Year Old Provenance",
+      "imageUrl": null,
+      "externalSiteId": 28097,
+      "currentBottleId": null
+    },
+    "extractedIdentity": {
+      "abv": 46,
+      "brand": null,
+      "series": null,
+      "bottler": null,
+      "edition": null,
+      "outturn": null,
+      "category": null,
+      "distillery": null,
+      "expression": null,
+      "maturation": null,
+      "stated_age": null,
+      "cask_number": "4127",
+      "single_cask": null,
+      "release_year": null,
+      "vintage_year": null,
+      "cask_strength": null
+    },
+    "imageEvidence": null,
+    "initialCandidates": [
+      {
+        "abv": 46,
+        "brand": "Port Ellen",
+        "score": 135.85799,
+        "series": "Provenance",
+        "source": ["text", "context", "brand", "brand_coverage"],
+        "bottler": "Douglas McGibbon",
+        "edition": null,
+        "outturn": null,
+        "bottleId": 69624,
+        "category": "single_malt",
+        "fullName": "Port Ellen 1983 24-year-old",
+        "reference": null,
+        "statedAge": 24,
+        "caskNumber": "3977",
+        "comparison": {
+          "missing": [],
+          "conflicts": ["caskNumber"],
+          "agreements": [
+            "category",
+            "statedAge",
+            "abv",
+            "vintageYear",
+            "singleCask",
+            "distillers"
+          ]
+        },
+        "distillery": ["Port Ellen"],
+        "maturation": null,
+        "releaseDay": null,
+        "singleCask": true,
+        "releaseYear": null,
+        "vintageYear": 1983,
+        "bottlingYear": 2007,
+        "caskStrength": null,
+        "releaseMonth": null,
+        "familyContext": {
+          "siblingBottles": []
+        }
+      },
+      {
+        "abv": null,
+        "brand": "Port Ellen",
+        "score": 98.4034,
+        "series": null,
+        "source": ["text", "brand_coverage"],
+        "bottler": "Douglas McGibbon",
+        "edition": null,
+        "outturn": null,
+        "bottleId": 4843,
+        "category": "single_malt",
+        "fullName": "Port Ellen 1983 McG McGibbon's Provenance",
+        "reference": null,
+        "statedAge": 18,
+        "caskNumber": null,
+        "comparison": {
+          "missing": ["abv", "vintageYear", "singleCask", "caskNumber"],
+          "conflicts": ["statedAge"],
+          "agreements": ["category", "distillers"]
+        },
+        "distillery": ["Port Ellen"],
+        "maturation": null,
+        "releaseDay": null,
+        "singleCask": null,
+        "releaseYear": null,
+        "vintageYear": null,
+        "bottlingYear": null,
+        "caskStrength": null,
+        "releaseMonth": null,
+        "familyContext": {
+          "siblingBottles": []
+        }
+      },
+      {
+        "abv": null,
+        "brand": "Port Ellen",
+        "score": 75.960754,
+        "series": null,
+        "source": ["text", "brand_coverage"],
+        "bottler": "Douglas McGibbon",
+        "edition": null,
+        "outturn": null,
+        "bottleId": 5379,
+        "category": "single_malt",
+        "fullName": "Port Ellen 1981 McG McGibbon's Provenance",
+        "reference": null,
+        "statedAge": 18,
+        "caskNumber": null,
+        "comparison": {
+          "missing": [
+            "abv",
+            "vintageYear",
+            "singleCask",
+            "caskNumber",
+            "series"
+          ],
+          "conflicts": ["statedAge"],
+          "agreements": ["category", "brand", "bottler", "distillers"]
+        },
+        "distillery": ["Port Ellen"],
+        "maturation": null,
+        "releaseDay": null,
+        "singleCask": null,
+        "releaseYear": null,
+        "vintageYear": null,
+        "bottlingYear": null,
+        "caskStrength": null,
+        "releaseMonth": null,
+        "familyContext": {
+          "siblingBottles": []
+        }
+      },
+      {
+        "abv": null,
+        "brand": "Port Ellen",
+        "score": 75.960754,
+        "series": null,
+        "source": ["text", "brand_coverage"],
+        "bottler": "Douglas McGibbon",
+        "edition": null,
+        "outturn": null,
+        "bottleId": 5025,
+        "category": "single_malt",
+        "fullName": "Port Ellen 1982 McG McGibbon's Provenance",
+        "reference": null,
+        "statedAge": 38,
+        "caskNumber": null,
+        "comparison": {
+          "missing": [
+            "abv",
+            "vintageYear",
+            "singleCask",
+            "caskNumber",
+            "series"
+          ],
+          "conflicts": ["statedAge"],
+          "agreements": ["category", "brand", "bottler", "distillers"]
+        },
+        "distillery": ["Port Ellen"],
+        "maturation": null,
+        "releaseDay": null,
+        "singleCask": null,
+        "releaseYear": null,
+        "vintageYear": null,
+        "bottlingYear": null,
+        "caskStrength": null,
+        "releaseMonth": null,
+        "familyContext": {
+          "siblingBottles": []
+        }
+      },
+      {
+        "abv": null,
+        "brand": "Port Ellen",
+        "score": 71.66662,
+        "series": null,
+        "source": ["text"],
+        "bottler": "Douglas of Drumlanrig",
+        "edition": null,
+        "outturn": null,
+        "bottleId": 1070,
+        "category": "single_malt",
+        "fullName": "Port Ellen 1983 DoD",
+        "reference": null,
+        "statedAge": 35,
+        "caskNumber": null,
+        "comparison": {
+          "missing": ["abv", "vintageYear", "singleCask", "caskNumber"],
+          "conflicts": ["statedAge"],
+          "agreements": ["category", "distillers"]
+        },
+        "distillery": ["Port Ellen"],
+        "maturation": null,
+        "releaseDay": null,
+        "singleCask": null,
+        "releaseYear": null,
+        "vintageYear": null,
+        "bottlingYear": null,
+        "caskStrength": null,
+        "releaseMonth": null,
+        "familyContext": {
+          "siblingBottles": []
+        }
+      },
+      {
+        "abv": 46,
+        "brand": "Douglas Laing",
+        "score": 68.76811,
+        "series": "Single Minded",
+        "source": ["text"],
+        "bottler": "Douglas Laing",
+        "edition": null,
+        "outturn": null,
+        "bottleId": 65250,
+        "category": "single_malt",
+        "fullName": "Douglas Laing Speyside 24-year-old",
+        "reference": null,
+        "statedAge": 24,
+        "caskNumber": null,
+        "comparison": {
+          "missing": ["vintageYear", "caskNumber", "distillers"],
+          "conflicts": [],
+          "agreements": ["category", "statedAge", "abv", "singleCask"]
+        },
+        "distillery": [],
+        "maturation": null,
+        "releaseDay": null,
+        "singleCask": true,
+        "releaseYear": null,
+        "vintageYear": null,
+        "bottlingYear": null,
+        "caskStrength": null,
+        "releaseMonth": null,
+        "familyContext": {
+          "siblingBottles": []
+        }
+      },
+      {
+        "abv": null,
+        "brand": "Port Ellen",
+        "score": 66.381,
+        "series": null,
+        "source": ["text"],
+        "bottler": "Norse Cask Selection",
+        "edition": null,
+        "outturn": null,
+        "bottleId": 1128,
+        "category": "single_malt",
+        "fullName": "Port Ellen 1983 NCS",
+        "reference": null,
+        "statedAge": 25,
+        "caskNumber": null,
+        "comparison": {
+          "missing": [
+            "abv",
+            "vintageYear",
+            "singleCask",
+            "caskNumber",
+            "series"
+          ],
+          "conflicts": ["statedAge", "bottler"],
+          "agreements": ["category", "brand", "distillers"]
+        },
+        "distillery": ["Port Ellen"],
+        "maturation": null,
+        "releaseDay": null,
+        "singleCask": null,
+        "releaseYear": null,
+        "vintageYear": null,
+        "bottlingYear": null,
+        "caskStrength": null,
+        "releaseMonth": null,
+        "familyContext": {
+          "siblingBottles": []
+        }
+      },
+      {
+        "abv": 46,
+        "brand": "Douglas Laing",
+        "score": 53.36227,
+        "series": "Provenance",
+        "source": ["text"],
+        "bottler": "Douglas McGibbon",
+        "edition": "Young & Feisty",
+        "outturn": null,
+        "bottleId": 58660,
+        "category": "single_malt",
+        "fullName": "Douglas Laing Talisker - Young & Feisty",
+        "reference": null,
+        "statedAge": null,
+        "caskNumber": null,
+        "comparison": {
+          "missing": ["statedAge", "vintageYear", "singleCask", "caskNumber"],
+          "conflicts": ["brand", "distillers"],
+          "agreements": ["category", "abv", "bottler", "series"]
+        },
+        "distillery": ["Talisker"],
+        "maturation": null,
+        "releaseDay": null,
+        "singleCask": null,
+        "releaseYear": null,
+        "vintageYear": null,
+        "bottlingYear": 2014,
+        "caskStrength": null,
+        "releaseMonth": null,
+        "familyContext": {
+          "siblingBottles": []
+        }
+      },
+      {
+        "abv": null,
+        "brand": "Benromach",
+        "score": 53.06096,
+        "series": null,
+        "source": ["text"],
+        "bottler": null,
+        "edition": null,
+        "outturn": null,
+        "bottleId": 18519,
+        "category": "single_malt",
+        "fullName": "Benromach 24-year-old",
+        "reference": null,
+        "statedAge": 24,
+        "caskNumber": null,
+        "comparison": {
+          "missing": ["abv", "vintageYear", "singleCask", "caskNumber"],
+          "conflicts": ["distillers"],
+          "agreements": ["category", "statedAge"]
+        },
+        "distillery": ["Benromach"],
+        "maturation": null,
+        "releaseDay": null,
+        "singleCask": null,
+        "releaseYear": null,
+        "vintageYear": null,
+        "bottlingYear": null,
+        "caskStrength": null,
+        "releaseMonth": null,
+        "familyContext": {
+          "siblingBottles": []
+        }
+      },
+      {
+        "abv": null,
+        "brand": "Glenkinchie",
+        "score": 53.06096,
+        "series": null,
+        "source": ["text"],
+        "bottler": null,
+        "edition": null,
+        "outturn": null,
+        "bottleId": 15899,
+        "category": "single_malt",
+        "fullName": "Glenkinchie 24-year-old",
+        "reference": null,
+        "statedAge": 24,
+        "caskNumber": null,
+        "comparison": {
+          "missing": ["abv", "vintageYear", "singleCask", "caskNumber"],
+          "conflicts": ["distillers"],
+          "agreements": ["category", "statedAge"]
+        },
+        "distillery": ["Glenkinchie"],
+        "maturation": null,
+        "releaseDay": null,
+        "singleCask": null,
+        "releaseYear": null,
+        "vintageYear": null,
+        "bottlingYear": null,
+        "caskStrength": null,
+        "releaseMonth": null,
+        "familyContext": {
+          "siblingBottles": []
+        }
+      },
+      {
+        "abv": 46.5,
+        "brand": "Fettercairn",
+        "score": 52.80052,
+        "series": null,
+        "source": ["text"],
+        "bottler": null,
+        "edition": null,
+        "outturn": null,
+        "bottleId": 58172,
+        "category": "single_malt",
+        "fullName": "Fettercairn 24-year-old",
+        "reference": null,
+        "statedAge": 24,
+        "caskNumber": null,
+        "comparison": {
+          "missing": ["vintageYear", "singleCask", "caskNumber"],
+          "conflicts": ["abv", "distillers"],
+          "agreements": ["category", "statedAge"]
+        },
+        "distillery": ["Fettercairn"],
+        "maturation": null,
+        "releaseDay": null,
+        "singleCask": null,
+        "releaseYear": null,
+        "vintageYear": null,
+        "bottlingYear": null,
+        "caskStrength": null,
+        "releaseMonth": null,
+        "familyContext": {
+          "siblingBottles": []
+        }
+      },
+      {
+        "abv": 46,
+        "brand": "anCnoc",
+        "score": 52.596237,
+        "series": null,
+        "source": ["text"],
+        "bottler": "Knockdhu",
+        "edition": null,
+        "outturn": null,
+        "bottleId": 887,
+        "category": "single_malt",
+        "fullName": "anCnoc 24-year-old",
+        "reference": null,
+        "statedAge": 24,
+        "caskNumber": null,
+        "comparison": {
+          "missing": ["vintageYear", "singleCask", "caskNumber", "distillers"],
+          "conflicts": [],
+          "agreements": ["category", "statedAge", "abv"]
+        },
+        "distillery": [],
+        "maturation": null,
+        "releaseDay": null,
+        "singleCask": null,
+        "releaseYear": null,
+        "vintageYear": null,
+        "bottlingYear": null,
+        "caskStrength": null,
+        "releaseMonth": null,
+        "familyContext": {
+          "siblingBottles": []
+        }
+      },
+      {
+        "abv": null,
+        "brand": "Highland Park",
+        "score": 51.584164,
+        "series": null,
+        "source": ["text"],
+        "bottler": null,
+        "edition": null,
+        "outturn": null,
+        "bottleId": 18658,
+        "category": "single_malt",
+        "fullName": "Highland Park 24-year-old 1980 vintage - 1980 Vintage",
+        "reference": null,
+        "statedAge": 24,
+        "caskNumber": null,
+        "comparison": {
+          "missing": ["abv", "singleCask", "caskNumber"],
+          "conflicts": ["vintageYear", "distillers"],
+          "agreements": ["category", "statedAge"]
+        },
+        "distillery": ["Highland Park"],
+        "maturation": null,
+        "releaseDay": null,
+        "singleCask": null,
+        "releaseYear": null,
+        "vintageYear": 1980,
+        "bottlingYear": null,
+        "caskStrength": null,
+        "releaseMonth": null,
+        "familyContext": {
+          "siblingBottles": []
+        }
+      },
+      {
+        "abv": null,
+        "brand": "Port Ellen",
+        "score": 51.347748,
+        "series": null,
+        "source": ["text"],
+        "bottler": null,
+        "edition": null,
+        "outturn": null,
+        "bottleId": 17726,
+        "category": "single_malt",
+        "fullName": "Port Ellen 29-year-old",
+        "reference": null,
+        "statedAge": 29,
+        "caskNumber": null,
+        "comparison": {
+          "missing": [
+            "abv",
+            "vintageYear",
+            "singleCask",
+            "caskNumber",
+            "bottler",
+            "series"
+          ],
+          "conflicts": ["statedAge"],
+          "agreements": ["category", "brand", "distillers"]
+        },
+        "distillery": ["Port Ellen"],
+        "maturation": null,
+        "releaseDay": null,
+        "singleCask": null,
+        "releaseYear": null,
+        "vintageYear": null,
+        "bottlingYear": null,
+        "caskStrength": null,
+        "releaseMonth": null,
+        "familyContext": {
+          "siblingBottles": []
+        }
+      },
+      {
+        "abv": null,
+        "brand": "The GlenDronach",
+        "score": 51.037277,
+        "series": null,
+        "source": ["text"],
+        "bottler": null,
+        "edition": null,
+        "outturn": null,
+        "bottleId": 2805,
+        "category": "single_malt",
+        "fullName": "The GlenDronach 24-year-old Grandeur",
+        "reference": null,
+        "statedAge": 24,
+        "caskNumber": null,
+        "comparison": {
+          "missing": ["abv", "vintageYear", "singleCask", "caskNumber"],
+          "conflicts": ["distillers"],
+          "agreements": ["category", "statedAge"]
+        },
+        "distillery": ["The GlenDronach"],
+        "maturation": null,
+        "releaseDay": null,
+        "singleCask": null,
+        "releaseYear": null,
+        "vintageYear": null,
+        "bottlingYear": null,
+        "caskStrength": null,
+        "releaseMonth": null,
+        "familyContext": {
+          "siblingBottles": [
+            {
+              "abv": null,
+              "edition": "Batch 9",
+              "outturn": null,
+              "bottleId": 44793,
+              "fullName": "The GlenDronach 24-year-old Grandeur - Batch 9",
+              "statedAge": 24,
+              "caskNumber": null,
+              "maturation": null,
+              "releaseDay": null,
+              "singleCask": null,
+              "releaseYear": null,
+              "traitFields": ["edition", "statedAge"],
+              "vintageYear": null,
+              "bottlingYear": null,
+              "caskStrength": null,
+              "releaseMonth": null
+            }
+          ]
+        }
+      },
+      {
+        "abv": null,
+        "brand": "The Glenrothes",
+        "score": 51.037277,
+        "series": null,
+        "source": ["text"],
+        "bottler": null,
+        "edition": null,
+        "outturn": null,
+        "bottleId": 44198,
+        "category": "single_malt",
+        "fullName": "The Glenrothes 24-year-old Lustau",
+        "reference": null,
+        "statedAge": 24,
+        "caskNumber": null,
+        "comparison": {
+          "missing": ["abv", "vintageYear", "singleCask", "caskNumber"],
+          "conflicts": ["distillers"],
+          "agreements": ["category", "statedAge"]
+        },
+        "distillery": ["The Glenrothes"],
+        "maturation": null,
+        "releaseDay": null,
+        "singleCask": null,
+        "releaseYear": null,
+        "vintageYear": null,
+        "bottlingYear": null,
+        "caskStrength": null,
+        "releaseMonth": null,
+        "familyContext": {
+          "siblingBottles": []
+        }
+      },
+      {
+        "abv": null,
+        "brand": "Teeling",
+        "score": 50.976925,
+        "series": null,
+        "source": ["text"],
+        "bottler": "Teeling Whiskey Company",
+        "edition": null,
+        "outturn": null,
+        "bottleId": 3634,
+        "category": "single_malt",
+        "fullName": "Teeling 24-year-old Vintage Reserve",
+        "reference": null,
+        "statedAge": 24,
+        "caskNumber": null,
+        "comparison": {
+          "missing": [
+            "abv",
+            "vintageYear",
+            "singleCask",
+            "caskNumber",
+            "distillers"
+          ],
+          "conflicts": [],
+          "agreements": ["category", "statedAge"]
+        },
+        "distillery": [],
+        "maturation": null,
+        "releaseDay": null,
+        "singleCask": null,
+        "releaseYear": null,
+        "vintageYear": null,
+        "bottlingYear": null,
+        "caskStrength": null,
+        "releaseMonth": null,
+        "familyContext": {
+          "siblingBottles": []
+        }
+      },
+      {
+        "abv": null,
+        "brand": "Teeling",
+        "score": 49.930126,
+        "series": null,
+        "source": ["text"],
+        "bottler": null,
+        "edition": null,
+        "outturn": null,
+        "bottleId": 14424,
+        "category": "single_malt",
+        "fullName": "Teeling Vintage Reserve Collection 24-year-old",
+        "reference": null,
+        "statedAge": 24,
+        "caskNumber": null,
+        "comparison": {
+          "missing": [
+            "abv",
+            "vintageYear",
+            "singleCask",
+            "caskNumber",
+            "distillers"
+          ],
+          "conflicts": [],
+          "agreements": ["category", "statedAge"]
+        },
+        "distillery": [],
+        "maturation": null,
+        "releaseDay": null,
+        "singleCask": null,
+        "releaseYear": null,
+        "vintageYear": null,
+        "bottlingYear": null,
+        "caskStrength": null,
+        "releaseMonth": null,
+        "familyContext": {
+          "siblingBottles": []
+        }
+      },
+      {
+        "abv": 46,
+        "brand": "Teeling",
+        "score": 49.662697,
+        "series": null,
+        "source": ["text"],
+        "bottler": null,
+        "edition": null,
+        "outturn": null,
+        "bottleId": 63212,
+        "category": "single_malt",
+        "fullName": "Teeling 24-year-old Single Malt",
+        "reference": null,
+        "statedAge": 24,
+        "caskNumber": null,
+        "comparison": {
+          "missing": ["vintageYear", "singleCask", "caskNumber", "distillers"],
+          "conflicts": [],
+          "agreements": ["category", "statedAge", "abv"]
+        },
+        "distillery": [],
+        "maturation": null,
+        "releaseDay": null,
+        "singleCask": null,
+        "releaseYear": null,
+        "vintageYear": null,
+        "bottlingYear": null,
+        "caskStrength": null,
+        "releaseMonth": null,
+        "familyContext": {
+          "siblingBottles": []
+        }
+      },
+      {
+        "abv": null,
+        "brand": "Teeling",
+        "score": 49.433594,
+        "series": null,
+        "source": ["text"],
+        "bottler": "Teeling Whiskey Company",
+        "edition": null,
+        "outturn": null,
+        "bottleId": 3348,
+        "category": "single_malt",
+        "fullName": "Teeling 24-year-old Vintage Reserve Collection",
+        "reference": null,
+        "statedAge": 24,
+        "caskNumber": null,
+        "comparison": {
+          "missing": [
+            "abv",
+            "vintageYear",
+            "singleCask",
+            "caskNumber",
+            "distillers"
+          ],
+          "conflicts": [],
+          "agreements": ["category", "statedAge"]
+        },
+        "distillery": [],
+        "maturation": null,
+        "releaseDay": null,
+        "singleCask": null,
+        "releaseYear": null,
+        "vintageYear": null,
+        "bottlingYear": null,
+        "caskStrength": null,
+        "releaseMonth": null,
+        "familyContext": {
+          "siblingBottles": []
+        }
+      },
+      {
+        "abv": null,
+        "brand": "Adelphi",
+        "score": 49.33847,
+        "series": null,
+        "source": ["text"],
+        "bottler": "Adelphi",
+        "edition": null,
+        "outturn": null,
+        "bottleId": 42889,
+        "category": "single_malt",
+        "fullName": "Adelphi Bunnahabahain 24-year-old",
+        "reference": null,
+        "statedAge": 24,
+        "caskNumber": null,
+        "comparison": {
+          "missing": ["abv", "singleCask", "caskNumber"],
+          "conflicts": ["vintageYear", "distillers"],
+          "agreements": ["category", "statedAge"]
+        },
+        "distillery": ["Bunnahabhain"],
+        "maturation": null,
+        "releaseDay": null,
+        "singleCask": null,
+        "releaseYear": null,
+        "vintageYear": 1998,
+        "bottlingYear": null,
+        "caskStrength": null,
+        "releaseMonth": null,
+        "familyContext": {
+          "siblingBottles": []
+        }
+      },
+      {
+        "abv": 46,
+        "brand": "William Cadenhead's",
+        "score": 49.00591,
+        "series": null,
+        "source": ["text"],
+        "bottler": "William Cadenhead's",
+        "edition": null,
+        "outturn": null,
+        "bottleId": 67681,
+        "category": "single_malt",
+        "fullName": "Cadenhead's Ben Nevis 24-year-old",
+        "reference": null,
+        "statedAge": 24,
+        "caskNumber": null,
+        "comparison": {
+          "missing": ["vintageYear", "singleCask", "caskNumber"],
+          "conflicts": ["distillers"],
+          "agreements": ["category", "statedAge", "abv"]
+        },
+        "distillery": ["Ben Nevis"],
+        "maturation": null,
+        "releaseDay": null,
+        "singleCask": null,
+        "releaseYear": null,
+        "vintageYear": null,
+        "bottlingYear": null,
+        "caskStrength": null,
+        "releaseMonth": null,
+        "familyContext": {
+          "siblingBottles": []
+        }
+      },
+      {
+        "abv": 46,
+        "brand": "William Cadenhead's",
+        "score": 48.797806,
+        "series": null,
+        "source": ["text"],
+        "bottler": "William Cadenhead's",
+        "edition": null,
+        "outturn": null,
+        "bottleId": 67669,
+        "category": "single_malt",
+        "fullName": "Cadenhead's Balmenach 1961 24-year-old",
+        "reference": null,
+        "statedAge": 24,
+        "caskNumber": null,
+        "comparison": {
+          "missing": ["singleCask", "caskNumber"],
+          "conflicts": ["vintageYear", "distillers"],
+          "agreements": ["category", "statedAge", "abv"]
+        },
+        "distillery": ["Balmenach"],
+        "maturation": null,
+        "releaseDay": null,
+        "singleCask": null,
+        "releaseYear": null,
+        "vintageYear": 1961,
+        "bottlingYear": null,
+        "caskStrength": null,
+        "releaseMonth": null,
+        "familyContext": {
+          "siblingBottles": []
+        }
+      },
+      {
+        "abv": 46,
+        "brand": "William Cadenhead's",
+        "score": 48.594772,
+        "series": null,
+        "source": ["text"],
+        "bottler": "William Cadenhead's",
+        "edition": null,
+        "outturn": null,
+        "bottleId": 67200,
+        "category": "single_malt",
+        "fullName": "Cadenhead's Ord 1962 24-year-old",
+        "reference": null,
+        "statedAge": 24,
+        "caskNumber": null,
+        "comparison": {
+          "missing": ["singleCask", "caskNumber"],
+          "conflicts": ["vintageYear", "distillers"],
+          "agreements": ["category", "statedAge", "abv"]
+        },
+        "distillery": ["Glen Ord"],
+        "maturation": null,
+        "releaseDay": null,
+        "singleCask": null,
+        "releaseYear": null,
+        "vintageYear": 1962,
+        "bottlingYear": 1987,
+        "caskStrength": null,
+        "releaseMonth": null,
+        "familyContext": {
+          "siblingBottles": []
+        }
+      },
+      {
+        "abv": 40,
+        "brand": "Glen Marnoch",
+        "score": 47.593468,
+        "series": null,
+        "source": ["text"],
+        "bottler": null,
+        "edition": null,
+        "outturn": null,
+        "bottleId": 62340,
+        "category": "single_malt",
+        "fullName": "Glen Marnoch 24-year-old",
+        "reference": null,
+        "statedAge": 24,
+        "caskNumber": null,
+        "comparison": {
+          "missing": ["vintageYear", "singleCask", "caskNumber", "distillers"],
+          "conflicts": ["abv"],
+          "agreements": ["category", "statedAge"]
+        },
+        "distillery": [],
+        "maturation": null,
+        "releaseDay": null,
+        "singleCask": null,
+        "releaseYear": null,
+        "vintageYear": null,
+        "bottlingYear": null,
+        "caskStrength": null,
+        "releaseMonth": null,
+        "familyContext": {
+          "siblingBottles": []
+        }
+      },
+      {
+        "abv": 46,
+        "brand": "Rozelieures",
+        "score": 22.050589,
+        "series": null,
+        "source": ["text"],
+        "bottler": null,
+        "edition": null,
+        "outturn": null,
+        "bottleId": 45609,
+        "category": "single_malt",
+        "fullName": "Rozelieures Fumé Collection - 46.0% ABV",
+        "reference": null,
+        "statedAge": null,
+        "caskNumber": null,
+        "comparison": {
+          "missing": ["caskNumber"],
+          "conflicts": [],
+          "agreements": ["abv"]
+        },
+        "distillery": ["Rozelieures"],
+        "maturation": null,
+        "releaseDay": null,
+        "singleCask": null,
+        "releaseYear": null,
+        "vintageYear": null,
+        "bottlingYear": null,
+        "caskStrength": null,
+        "releaseMonth": null,
+        "familyContext": {
+          "siblingBottles": []
+        }
+      },
+      {
+        "abv": 46,
+        "brand": "Broken Bones Distillery",
+        "score": 21.562912,
+        "series": null,
+        "source": ["text"],
+        "bottler": null,
+        "edition": null,
+        "outturn": null,
+        "bottleId": 46355,
+        "category": "single_malt",
+        "fullName": "Broken Bones Distillery TWIS - 46.0% ABV",
+        "reference": null,
+        "statedAge": null,
+        "caskNumber": null,
+        "comparison": {
+          "missing": ["caskNumber"],
+          "conflicts": [],
+          "agreements": ["abv"]
+        },
+        "distillery": ["Broken Bones Distillery"],
+        "maturation": null,
+        "releaseDay": null,
+        "singleCask": null,
+        "releaseYear": null,
+        "vintageYear": null,
+        "bottlingYear": null,
+        "caskStrength": null,
+        "releaseMonth": null,
+        "familyContext": {
+          "siblingBottles": []
+        }
+      },
+      {
+        "abv": 46,
+        "brand": "Egan's",
+        "score": 21.417953,
+        "series": null,
+        "source": ["text"],
+        "bottler": null,
+        "edition": null,
+        "outturn": null,
+        "bottleId": 46902,
+        "category": "single_malt",
+        "fullName": "Egan's Endeavour - 46.0% ABV",
+        "reference": null,
+        "statedAge": null,
+        "caskNumber": null,
+        "comparison": {
+          "missing": ["caskNumber"],
+          "conflicts": [],
+          "agreements": ["abv"]
+        },
+        "distillery": [],
+        "maturation": null,
+        "releaseDay": null,
+        "singleCask": null,
+        "releaseYear": null,
+        "vintageYear": null,
+        "bottlingYear": null,
+        "caskStrength": null,
+        "releaseMonth": null,
+        "familyContext": {
+          "siblingBottles": []
+        }
+      },
+      {
+        "abv": 46,
+        "brand": "Yamazakura",
+        "score": 21.417953,
+        "series": null,
+        "source": ["text"],
+        "bottler": null,
+        "edition": null,
+        "outturn": null,
+        "bottleId": 47002,
+        "category": "blend",
+        "fullName": "Yamazakura Peated - 46.0% ABV",
+        "reference": null,
+        "statedAge": null,
+        "caskNumber": null,
+        "comparison": {
+          "missing": ["caskNumber"],
+          "conflicts": [],
+          "agreements": ["abv"]
+        },
+        "distillery": [],
+        "maturation": null,
+        "releaseDay": null,
+        "singleCask": null,
+        "releaseYear": null,
+        "vintageYear": null,
+        "bottlingYear": null,
+        "caskStrength": null,
+        "releaseMonth": null,
+        "familyContext": {
+          "siblingBottles": []
+        }
+      },
+      {
+        "abv": 46,
+        "brand": "Kirkjuvagr",
+        "score": 21.311745,
+        "series": null,
+        "source": ["text"],
+        "bottler": "Orkney Distilling",
+        "edition": null,
+        "outturn": null,
+        "bottleId": 45890,
+        "category": "blend",
+        "fullName": "Kirkjuvagr Fara - 46.0% ABV",
+        "reference": null,
+        "statedAge": null,
+        "caskNumber": null,
+        "comparison": {
+          "missing": ["caskNumber"],
+          "conflicts": [],
+          "agreements": ["abv"]
+        },
+        "distillery": [],
+        "maturation": null,
+        "releaseDay": null,
+        "singleCask": null,
+        "releaseYear": null,
+        "vintageYear": null,
+        "bottlingYear": null,
+        "caskStrength": null,
+        "releaseMonth": null,
+        "familyContext": {
+          "siblingBottles": []
+        }
+      },
+      {
+        "abv": 46,
+        "brand": "Moncreiffe",
+        "score": 21.311745,
+        "series": null,
+        "source": ["text"],
+        "bottler": "Moncreiffe & Co.",
+        "edition": null,
+        "outturn": null,
+        "bottleId": 45961,
+        "category": "blend",
+        "fullName": "Moncreiffe Signature - 46.0% ABV",
+        "reference": null,
+        "statedAge": null,
+        "caskNumber": null,
+        "comparison": {
+          "missing": ["caskNumber"],
+          "conflicts": [],
+          "agreements": ["abv"]
+        },
+        "distillery": [],
+        "maturation": null,
+        "releaseDay": null,
+        "singleCask": null,
+        "releaseYear": null,
+        "vintageYear": null,
+        "bottlingYear": null,
+        "caskStrength": null,
+        "releaseMonth": null,
+        "familyContext": {
+          "siblingBottles": []
+        }
+      },
+      {
+        "abv": 46,
+        "brand": "Smokehead",
+        "score": 21.26049,
+        "series": null,
+        "source": ["text"],
+        "bottler": "Ian Macleod Distillers",
+        "edition": null,
+        "outturn": null,
+        "bottleId": 45642,
+        "category": "single_malt",
+        "fullName": "Smokehead Unfiltered - 46.0% ABV",
+        "reference": null,
+        "statedAge": null,
+        "caskNumber": null,
+        "comparison": {
+          "missing": ["caskNumber"],
+          "conflicts": [],
+          "agreements": ["abv"]
+        },
+        "distillery": [],
+        "maturation": null,
+        "releaseDay": null,
+        "singleCask": null,
+        "releaseYear": null,
+        "vintageYear": null,
+        "bottlingYear": null,
+        "caskStrength": null,
+        "releaseMonth": null,
+        "familyContext": {
+          "siblingBottles": []
+        }
+      },
+      {
+        "abv": 46,
+        "brand": "Micil Distillery",
+        "score": 21.201477,
+        "series": null,
+        "source": ["text"],
+        "bottler": "Micil Distillery",
+        "edition": null,
+        "outturn": null,
+        "bottleId": 45826,
+        "category": "blend",
+        "fullName": "Micil Distillery Inverin Small Batch - 46.0% ABV",
+        "reference": null,
+        "statedAge": null,
+        "caskNumber": null,
+        "comparison": {
+          "missing": ["caskNumber"],
+          "conflicts": [],
+          "agreements": ["abv"]
+        },
+        "distillery": [],
+        "maturation": null,
+        "releaseDay": null,
+        "singleCask": null,
+        "releaseYear": null,
+        "vintageYear": null,
+        "bottlingYear": null,
+        "caskStrength": null,
+        "releaseMonth": null,
+        "familyContext": {
+          "siblingBottles": []
+        }
+      },
+      {
+        "abv": 46,
+        "brand": "Adelphi",
+        "score": 20.669998,
+        "series": null,
+        "source": ["text"],
+        "bottler": "Adelphi",
+        "edition": null,
+        "outturn": null,
+        "bottleId": 45647,
+        "category": "blend",
+        "fullName": "Adelphi Maclean's Nose - 46.0% ABV",
+        "reference": null,
+        "statedAge": null,
+        "caskNumber": null,
+        "comparison": {
+          "missing": ["caskNumber"],
+          "conflicts": [],
+          "agreements": ["abv"]
+        },
+        "distillery": [],
+        "maturation": null,
+        "releaseDay": null,
+        "singleCask": null,
+        "releaseYear": null,
+        "vintageYear": null,
+        "bottlingYear": null,
+        "caskStrength": null,
+        "releaseMonth": null,
+        "familyContext": {
+          "siblingBottles": []
+        }
+      },
+      {
+        "abv": 46,
+        "brand": "Lochlea",
+        "score": 20.669998,
+        "series": null,
+        "source": ["text"],
+        "bottler": null,
+        "edition": null,
+        "outturn": null,
+        "bottleId": 45808,
+        "category": "single_malt",
+        "fullName": "Lochlea Dark Briar - 46.0% ABV",
+        "reference": null,
+        "statedAge": null,
+        "caskNumber": null,
+        "comparison": {
+          "missing": ["caskNumber"],
+          "conflicts": [],
+          "agreements": ["abv"]
+        },
+        "distillery": ["Lochlea"],
+        "maturation": null,
+        "releaseDay": null,
+        "singleCask": null,
+        "releaseYear": null,
+        "vintageYear": null,
+        "bottlingYear": null,
+        "caskStrength": null,
+        "releaseMonth": null,
+        "familyContext": {
+          "siblingBottles": []
+        }
+      },
+      {
+        "abv": 46,
+        "brand": "Lindores Abbey",
+        "score": 20.617525,
+        "series": null,
+        "source": ["text"],
+        "bottler": null,
+        "edition": null,
+        "outturn": null,
+        "bottleId": 45754,
+        "category": "single_malt",
+        "fullName": "Lindores Abbey 1494 - 46.0% ABV",
+        "reference": null,
+        "statedAge": null,
+        "caskNumber": null,
+        "comparison": {
+          "missing": ["caskNumber"],
+          "conflicts": [],
+          "agreements": ["abv"]
+        },
+        "distillery": ["Lindores Abbey"],
+        "maturation": null,
+        "releaseDay": null,
+        "singleCask": null,
+        "releaseYear": null,
+        "vintageYear": null,
+        "bottlingYear": null,
+        "caskStrength": null,
+        "releaseMonth": null,
+        "familyContext": {
+          "siblingBottles": []
+        }
+      },
+      {
+        "abv": 46,
+        "brand": "Loch Lomond",
+        "score": 20.617525,
+        "series": null,
+        "source": ["text"],
+        "bottler": null,
+        "edition": null,
+        "outturn": null,
+        "bottleId": 45698,
+        "category": "single_grain",
+        "fullName": "Loch Lomond Grainstorm - 46.0% ABV",
+        "reference": null,
+        "statedAge": null,
+        "caskNumber": null,
+        "comparison": {
+          "missing": ["caskNumber"],
+          "conflicts": [],
+          "agreements": ["abv"]
+        },
+        "distillery": ["Loch Lomond"],
+        "maturation": null,
+        "releaseDay": null,
+        "singleCask": null,
+        "releaseYear": null,
+        "vintageYear": null,
+        "bottlingYear": null,
+        "caskStrength": null,
+        "releaseMonth": null,
+        "familyContext": {
+          "siblingBottles": []
+        }
+      },
+      {
+        "abv": 46,
+        "brand": "Scarabus",
+        "score": 20.566269,
+        "series": null,
+        "source": ["text"],
+        "bottler": "Hunter Laing",
+        "edition": null,
+        "outturn": null,
+        "bottleId": 46163,
+        "category": "single_malt",
+        "fullName": "Scarabus Cigar Malt - 46.0% ABV",
+        "reference": null,
+        "statedAge": null,
+        "caskNumber": null,
+        "comparison": {
+          "missing": ["caskNumber"],
+          "conflicts": [],
+          "agreements": ["abv"]
+        },
+        "distillery": [],
+        "maturation": null,
+        "releaseDay": null,
+        "singleCask": null,
+        "releaseYear": null,
+        "vintageYear": null,
+        "bottlingYear": null,
+        "caskStrength": null,
+        "releaseMonth": null,
+        "familyContext": {
+          "siblingBottles": []
+        }
+      },
+      {
+        "abv": 46,
+        "brand": "Turntable",
+        "score": 20.566269,
+        "series": null,
+        "source": ["text"],
+        "bottler": "Turntable Spirits",
+        "edition": null,
+        "outturn": null,
+        "bottleId": 45935,
+        "category": "blend",
+        "fullName": "Turntable Smokin' Riff - 46.0% ABV",
+        "reference": null,
+        "statedAge": null,
+        "caskNumber": null,
+        "comparison": {
+          "missing": ["caskNumber"],
+          "conflicts": [],
+          "agreements": ["abv"]
+        },
+        "distillery": [],
+        "maturation": null,
+        "releaseDay": null,
+        "singleCask": null,
+        "releaseYear": null,
+        "vintageYear": null,
+        "bottlingYear": null,
+        "caskStrength": null,
+        "releaseMonth": null,
+        "familyContext": {
+          "siblingBottles": []
+        }
+      },
+      {
+        "abv": 46,
+        "brand": "Mac-Talla",
+        "score": 20.419395,
+        "series": null,
+        "source": ["text"],
+        "bottler": "Morrison Scotch Whisky Distillers",
+        "edition": null,
+        "outturn": null,
+        "bottleId": 46944,
+        "category": "single_malt",
+        "fullName": "Mac-Talla Flora - 46.0% ABV",
+        "reference": null,
+        "statedAge": null,
+        "caskNumber": null,
+        "comparison": {
+          "missing": ["caskNumber"],
+          "conflicts": [],
+          "agreements": ["abv"]
+        },
+        "distillery": [],
+        "maturation": null,
+        "releaseDay": null,
+        "singleCask": null,
+        "releaseYear": null,
+        "vintageYear": null,
+        "bottlingYear": null,
+        "caskStrength": null,
+        "releaseMonth": null,
+        "familyContext": {
+          "siblingBottles": []
+        }
+      },
+      {
+        "abv": null,
+        "brand": "Port Ellen",
+        "score": 0.7476762095820012,
+        "series": null,
+        "source": ["vector"],
+        "bottler": null,
+        "edition": null,
+        "outturn": null,
+        "bottleId": 16724,
+        "category": "single_malt",
+        "fullName": "Port Ellen 34-year-old",
+        "reference": "Port Ellen 34-year-old, 55%",
+        "statedAge": 34,
+        "caskNumber": null,
+        "comparison": {
+          "missing": [
+            "abv",
+            "vintageYear",
+            "singleCask",
+            "caskNumber",
+            "bottler",
+            "series"
+          ],
+          "conflicts": ["statedAge"],
+          "agreements": ["category", "brand", "distillers"]
+        },
+        "distillery": ["Port Ellen"],
+        "maturation": null,
+        "releaseDay": null,
+        "singleCask": null,
+        "releaseYear": null,
+        "vintageYear": null,
+        "bottlingYear": null,
+        "caskStrength": null,
+        "releaseMonth": null,
+        "familyContext": {
+          "siblingBottles": []
+        }
+      },
+      {
+        "abv": null,
+        "brand": "Port Ellen",
+        "score": 0.7231684137443402,
+        "series": null,
+        "source": ["vector"],
+        "bottler": null,
+        "edition": null,
+        "outturn": null,
+        "bottleId": 17608,
+        "category": "single_malt",
+        "fullName": "Port Ellen 30-year-old",
+        "reference": "Port Ellen, 30-year-old (2009 Release), 57.7%,",
+        "statedAge": 30,
+        "caskNumber": null,
+        "comparison": {
+          "missing": [
+            "abv",
+            "vintageYear",
+            "singleCask",
+            "caskNumber",
+            "bottler",
+            "series"
+          ],
+          "conflicts": ["statedAge"],
+          "agreements": ["category", "brand", "distillers"]
+        },
+        "distillery": ["Port Ellen"],
+        "maturation": null,
+        "releaseDay": null,
+        "singleCask": null,
+        "releaseYear": 2009,
+        "vintageYear": null,
+        "bottlingYear": null,
+        "caskStrength": null,
+        "releaseMonth": null,
+        "familyContext": {
+          "siblingBottles": []
+        }
+      },
+      {
+        "abv": null,
+        "brand": "Port Ellen",
+        "score": 0.7127042244045916,
+        "series": null,
+        "source": ["vector"],
+        "bottler": null,
+        "edition": null,
+        "outturn": null,
+        "bottleId": 17016,
+        "category": "single_malt",
+        "fullName": "Port Ellen 32-year-old",
+        "reference": "Port Ellen 32-year-old (11th release) Special Releases 2011, 53.9%",
+        "statedAge": 32,
+        "caskNumber": null,
+        "comparison": {
+          "missing": [
+            "abv",
+            "vintageYear",
+            "singleCask",
+            "caskNumber",
+            "bottler",
+            "series"
+          ],
+          "conflicts": ["statedAge"],
+          "agreements": ["category", "brand", "distillers"]
+        },
+        "distillery": ["Port Ellen"],
+        "maturation": null,
+        "releaseDay": null,
+        "singleCask": null,
+        "releaseYear": null,
+        "vintageYear": null,
+        "bottlingYear": null,
+        "caskStrength": null,
+        "releaseMonth": null,
+        "familyContext": {
+          "siblingBottles": []
+        }
+      }
+    ]
+  },
+  "context": {
+    "inspectedBottleIds": [69624],
+    "bottleContexts": [
+      {
+        "exact": {
+          "abv": 46,
+          "edition": null,
+          "outturn": null,
+          "statedAge": 24,
+          "caskNumber": "3977",
+          "maturation": null,
+          "releaseDay": null,
+          "singleCask": true,
+          "releaseYear": null,
+          "vintageYear": 1983,
+          "bottlingYear": 2007,
+          "caskStrength": null,
+          "releaseMonth": null
+        },
+        "shared": {
+          "name": "1983 24-year-old",
+          "brand": {
+            "name": "Port Ellen",
+            "entityId": 1271
+          },
+          "series": {
+            "name": "Provenance",
+            "seriesId": 1463
+          },
+          "bottler": {
+            "name": "Douglas McGibbon",
+            "entityId": 5845
+          },
+          "category": "single_malt",
+          "statedAge": null,
+          "distillers": [
+            {
+              "name": "Port Ellen",
+              "entityId": 1271
+            }
+          ]
+        },
+        "groupId": 42585,
+        "bottleId": 69624,
+        "fullName": "Port Ellen 1983 24-year-old",
+        "siblings": [],
+        "references": [],
+        "observations": [],
+        "imageSources": []
+      }
+    ],
+    "inspectedEntities": [
+      {
+        "kind": "brand",
+        "name": "Rozelieures",
+        "score": 1,
+        "source": ["exact", "text", "prefix", "contained"],
+        "entityId": 933,
+        "reference": "Rozelieures",
+        "shortName": null,
+        "retrievedFor": [
+          {
+            "exact": true,
+            "query": "Rozelieures"
+          }
+        ]
+      },
+      {
+        "kind": "distillery",
+        "name": "Broken Bones Distillery",
+        "score": 1,
+        "source": ["exact", "text", "prefix", "contained"],
+        "entityId": 2358,
+        "reference": "Broken Bones Distillery",
+        "shortName": null,
+        "retrievedFor": [
+          {
+            "exact": true,
+            "query": "Broken Bones Distillery"
+          }
+        ]
+      },
+      {
+        "kind": "brand",
+        "name": "Egan's",
+        "score": 1,
+        "source": ["exact", "text", "prefix", "contained"],
+        "entityId": 2665,
+        "reference": "Egan's",
+        "shortName": null,
+        "retrievedFor": [
+          {
+            "exact": true,
+            "query": "Egan's"
+          }
+        ]
+      },
+      {
+        "kind": "brand",
+        "name": "Yamazakura",
+        "score": 1,
+        "source": ["exact", "text", "prefix", "contained"],
+        "entityId": 376,
+        "reference": "Yamazakura",
+        "shortName": null,
+        "retrievedFor": [
+          {
+            "exact": true,
+            "query": "Yamazakura"
+          }
+        ]
+      },
+      {
+        "kind": "brand",
+        "name": "Kirkjuvagr",
+        "score": 1,
+        "source": ["exact", "text", "prefix", "contained"],
+        "entityId": 365844,
+        "reference": "Kirkjuvagr",
+        "shortName": null,
+        "retrievedFor": [
+          {
+            "exact": true,
+            "query": "Kirkjuvagr"
+          }
+        ]
+      },
+      {
+        "kind": "bottler",
+        "name": "Orkney Distilling",
+        "score": 1,
+        "source": ["exact", "text", "prefix", "contained"],
+        "entityId": 365845,
+        "reference": "Orkney Distilling",
+        "shortName": null,
+        "retrievedFor": [
+          {
+            "exact": true,
+            "query": "Orkney Distilling"
+          }
+        ]
+      },
+      {
+        "kind": "brand",
+        "name": "Moncreiffe",
+        "score": 1,
+        "source": ["exact", "text", "prefix", "contained"],
+        "entityId": 3468,
+        "reference": "Moncreiffe",
+        "shortName": null,
+        "retrievedFor": [
+          {
+            "exact": true,
+            "query": "Moncreiffe"
+          },
+          {
+            "query": "Moncreiffe & Co."
+          }
+        ]
+      },
+      {
+        "kind": "bottler",
+        "name": "Moncreiffe & Co.",
+        "score": 1,
+        "source": ["text", "prefix", "exact", "contained"],
+        "entityId": 5851,
+        "reference": "Moncreiffe & Co.",
+        "shortName": null,
+        "retrievedFor": [
+          {
+            "query": "Moncreiffe"
+          },
+          {
+            "exact": true,
+            "query": "Moncreiffe & Co."
+          }
+        ]
+      },
+      {
+        "kind": "brand",
+        "name": "Smokehead",
+        "score": 1,
+        "source": ["exact", "text", "prefix", "contained"],
+        "entityId": 1348,
+        "reference": "Smokehead",
+        "shortName": null,
+        "retrievedFor": [
+          {
+            "exact": true,
+            "query": "Smokehead"
+          }
+        ]
+      },
+      {
+        "kind": "company",
+        "name": "Ian Macleod Distillers",
+        "score": 1,
+        "source": ["exact", "text", "prefix", "contained"],
+        "entityId": 5658,
+        "reference": "Ian Macleod Distillers",
+        "shortName": null,
+        "retrievedFor": [
+          {
+            "exact": true,
+            "query": "Ian Macleod Distillers"
+          }
+        ]
+      },
+      {
+        "kind": "distillery",
+        "name": "Micil Distillery",
+        "score": 1,
+        "source": ["exact", "text", "prefix", "contained"],
+        "entityId": 3454,
+        "reference": "Micil Distillery",
+        "shortName": null,
+        "retrievedFor": [
+          {
+            "exact": true,
+            "query": "Micil Distillery"
+          }
+        ]
+      },
+      {
+        "kind": "bottler",
+        "name": "Adelphi",
+        "score": 1,
+        "source": ["exact", "text", "prefix", "contained"],
+        "entityId": 5575,
+        "reference": "Adelphi",
+        "shortName": null,
+        "retrievedFor": [
+          {
+            "exact": true,
+            "query": "Adelphi"
+          }
+        ]
+      },
+      {
+        "kind": "bottler",
+        "name": "Douglas McGibbon",
+        "score": 1,
+        "source": ["exact", "text", "prefix", "contained"],
+        "entityId": 5845,
+        "reference": "Douglas McGibbon",
+        "shortName": null,
+        "retrievedFor": [
+          {
+            "exact": true,
+            "query": "Douglas McGibbon"
+          }
+        ]
+      },
+      {
+        "kind": "distillery",
+        "name": "Port Ellen",
+        "score": 1,
+        "source": ["exact", "text", "prefix", "contained"],
+        "entityId": 1271,
+        "reference": "Port Ellen",
+        "shortName": null,
+        "retrievedFor": [
+          {
+            "exact": true,
+            "query": "Port Ellen"
+          }
+        ]
+      },
+      {
+        "kind": "brand",
+        "name": "Kura",
+        "score": 0.33,
+        "source": ["contained"],
+        "entityId": 366724,
+        "reference": "Kura",
+        "shortName": null,
+        "retrievedFor": [
+          {
+            "query": "Yamazakura"
+          }
+        ]
+      }
+    ],
+    "inspectedSeries": []
+  },
+  "provenance": {
+    "source": "production_miss",
+    "verifiedSourceUrls": [
+      "https://www.scotchwhiskyauctions.com/auctions/234-the-185th-auction/904345-port-ellen-1983-24-year-old-provenance/"
+    ],
+    "dbOutcome": {
+      "bottleId": null,
+      "createsBottle": true,
+      "summary": "Production returned create_bottle with the name `1983 24-year-old`."
+    },
+    "notes": "Captured from saved classifier run 36397 (auction_lot 17300, model null, 2026-11-03T20:08:10.073Z). Production rationale: The auction reference identifies a Port Ellen 1983 24-year-old Provenance bottling from cask 4127. Public product results support the 46% ABV and cask identifier. The inspected local candidate 69624 is a different single-cask bottling, cask 3977, so it is not a safe match. Checked 2026-11-03. Lot page and photo: The McGibbon's Provenance, Port Ellen Distillery, Distilled Spring 1983, Bottled Winter 2008, over 24 years, one refill butt DMG Ref 4127, 46%, bottled by Douglas McGibbon & Co. Ltd. Identity model rule 4: the independent bottler's label (Provenance) is the Brand, the distillery is the name and distiller. Production set Brand Port Ellen with Series Provenance. Other Provenance Port Ellen 1983 Bottles exist (4843, 53445), so the age may be added to the name."
+  },
+  "expected": {
+    "status": "classified",
+    "action": "create_bottle",
+    "identityScope": "exact_cask",
+    "matchedBottleId": null,
+    "proposedBottle": {
+      "brand": {
+        "id": 366639
+      },
+      "vintageYear": 1983,
+      "statedAge": 24,
+      "abv": 46,
+      "caskNumber": "4127"
+    },
+    "proposedBottleNameOneOf": [
+      "Port Ellen 1983",
+      "Port Ellen 1983 24-year-old"
+    ],
+    "proposedBottleDistillerIds": [1271],
+    "summary": "Create the Provenance Port Ellen 1983 under Brand Provenance, not Brand Port Ellen; cask 4127 in its field."
+  },
+  "knownFailure": {
+    "reason": "The create uses Brand Port Ellen instead of the bottler's label, Provenance."
+  }
+}

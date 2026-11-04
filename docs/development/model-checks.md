@@ -23,6 +23,12 @@ judgment that a repeatable code test cannot prove.
   verify the subject, state the intended outcome, and record its source.
 - Keep the production test case after a fix. Add a second case with different
   concrete values to prove the general rule.
+- A decision case whose expected answer is right but not reached yet gets
+  `knownFailure: { reason, fixedBy }`. Default runs and CI leave it out, so
+  the pass rate covers only cases expected to pass. It runs when selected by
+  id or with `BOTTLE_CLASSIFIER_EVAL_INCLUDE_KNOWN_FAILURES=1`. The change
+  that fixes it removes the mark, and the case must then pass. Never mark a
+  case only to raise the pass rate.
 - Commit replay recordings required by a deliberate test case or test runner change.
   Do not record a provider failure as empty evidence.
 - For a controlled classifier comparison, give both variants the same reviewed

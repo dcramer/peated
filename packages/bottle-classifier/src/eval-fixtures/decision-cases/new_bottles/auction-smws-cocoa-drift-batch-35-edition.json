@@ -1,0 +1,2209 @@
+{
+  "id": "auction-smws-cocoa-drift-batch-35-edition",
+  "name": "auction lot: SMWS Cocoa Drift keeps the batch out of the name",
+  "input": {
+    "reference": {
+      "id": 17580,
+      "url": "https://www.scotchwhiskyauctions.com/auctions/234-the-185th-auction/904423-smws-cocoa-drift-11-year-old-blended-malt-batch-35/",
+      "name": "SMWS Cocoa Drift 11 Year Old Blended Malt Batch #35",
+      "imageUrl": null,
+      "externalSiteId": 28097,
+      "currentBottleId": null
+    },
+    "extractedIdentity": {
+      "abv": 50,
+      "brand": null,
+      "series": null,
+      "bottler": null,
+      "edition": null,
+      "outturn": null,
+      "category": null,
+      "distillery": null,
+      "expression": null,
+      "maturation": null,
+      "stated_age": null,
+      "cask_number": null,
+      "single_cask": null,
+      "release_year": null,
+      "vintage_year": null,
+      "cask_strength": null
+    },
+    "imageEvidence": null,
+    "initialCandidates": [
+      {
+        "abv": 50,
+        "brand": "Glaschu Spirits Co",
+        "score": 70.83439,
+        "series": null,
+        "source": ["text"],
+        "bottler": "Glaschu Spirits Co",
+        "edition": null,
+        "outturn": null,
+        "bottleId": 46457,
+        "category": "single_malt",
+        "fullName": "Glaschu Spirits Co Braeval 2014",
+        "reference": null,
+        "statedAge": 11,
+        "caskNumber": null,
+        "comparison": {
+          "missing": ["edition"],
+          "conflicts": ["category", "brand", "bottler"],
+          "agreements": ["statedAge", "abv"]
+        },
+        "distillery": ["Braeval"],
+        "maturation": "pedro_ximenez",
+        "releaseDay": null,
+        "singleCask": null,
+        "releaseYear": 2025,
+        "vintageYear": 2014,
+        "bottlingYear": null,
+        "caskStrength": null,
+        "releaseMonth": null,
+        "familyContext": {
+          "siblingBottles": []
+        }
+      },
+      {
+        "abv": 50,
+        "brand": "Elevenses",
+        "score": 56.73018,
+        "series": null,
+        "source": ["text"],
+        "bottler": "Keeble Cask Company",
+        "edition": null,
+        "outturn": null,
+        "bottleId": 46889,
+        "category": "single_malt",
+        "fullName": "Elevenses Teaninich 2013",
+        "reference": null,
+        "statedAge": 11,
+        "caskNumber": null,
+        "comparison": {
+          "missing": ["edition"],
+          "conflicts": ["category", "brand", "bottler"],
+          "agreements": ["statedAge", "abv"]
+        },
+        "distillery": ["Teaninich"],
+        "maturation": "bourbon",
+        "releaseDay": null,
+        "singleCask": false,
+        "releaseYear": 2025,
+        "vintageYear": 2013,
+        "bottlingYear": null,
+        "caskStrength": null,
+        "releaseMonth": null,
+        "familyContext": {
+          "siblingBottles": []
+        }
+      },
+      {
+        "abv": 62.7,
+        "brand": "Old Particular",
+        "score": 54.87011,
+        "series": null,
+        "source": ["text"],
+        "bottler": "Douglas Laing",
+        "edition": "for DeinWhisky.de",
+        "outturn": null,
+        "bottleId": 47342,
+        "category": "single_malt",
+        "fullName": "Old Particular Bowmore 2014 11-year-old - for DeinWhisky.de",
+        "reference": null,
+        "statedAge": 11,
+        "caskNumber": null,
+        "comparison": {
+          "missing": ["series"],
+          "conflicts": ["category", "abv", "brand", "bottler"],
+          "agreements": ["statedAge", "vintageYear", "releaseYear"]
+        },
+        "distillery": ["Bowmore"],
+        "maturation": "bourbon",
+        "releaseDay": null,
+        "singleCask": true,
+        "releaseYear": 2025,
+        "vintageYear": 2014,
+        "bottlingYear": null,
+        "caskStrength": null,
+        "releaseMonth": null,
+        "familyContext": {
+          "siblingBottles": []
+        }
+      },
+      {
+        "abv": 51.1,
+        "brand": "Decadent Drams",
+        "score": 54.57509,
+        "series": null,
+        "source": ["text"],
+        "bottler": "Decadent Drinks",
+        "edition": null,
+        "outturn": 320,
+        "bottleId": 46377,
+        "category": "single_malt",
+        "fullName": "Decadent Drams Millstone - 11-year-old - 2025 Release - 2014 Vintage - 51.1% ABV - Single Cask - Cask Strength",
+        "reference": null,
+        "statedAge": 11,
+        "caskNumber": null,
+        "comparison": {
+          "missing": ["edition", "series"],
+          "conflicts": ["category", "abv", "brand", "bottler"],
+          "agreements": ["statedAge", "vintageYear", "releaseYear"]
+        },
+        "distillery": ["Zuidam Distillery"],
+        "maturation": "A 1ST FILL PX SHERRY HOGSHEAD",
+        "releaseDay": null,
+        "singleCask": true,
+        "releaseYear": 2025,
+        "vintageYear": 2014,
+        "bottlingYear": 2025,
+        "caskStrength": true,
+        "releaseMonth": null,
+        "familyContext": {
+          "siblingBottles": []
+        }
+      },
+      {
+        "abv": 60.2,
+        "brand": "The Scotch Malt Whisky Society",
+        "score": 51.795,
+        "series": null,
+        "source": ["text"],
+        "bottler": "The Scotch Malt Whisky Society",
+        "edition": null,
+        "outturn": null,
+        "bottleId": 48108,
+        "category": "single_malt",
+        "fullName": "SMWS 5.141 Tropical paradise",
+        "reference": null,
+        "statedAge": 11,
+        "caskNumber": "5.141",
+        "comparison": {
+          "missing": ["edition", "series"],
+          "conflicts": ["category", "abv"],
+          "agreements": [
+            "statedAge",
+            "vintageYear",
+            "releaseYear",
+            "brand",
+            "bottler"
+          ]
+        },
+        "distillery": ["Auchentoshan"],
+        "maturation": "refill ex-rum barrel",
+        "releaseDay": 4,
+        "singleCask": true,
+        "releaseYear": 2025,
+        "vintageYear": 2014,
+        "bottlingYear": null,
+        "caskStrength": null,
+        "releaseMonth": 7,
+        "familyContext": {
+          "siblingBottles": []
+        }
+      },
+      {
+        "abv": 61.6,
+        "brand": "Woodrow's of Edinburgh",
+        "score": 51.78418,
+        "series": null,
+        "source": ["text"],
+        "bottler": "Woodrow's of Edinburgh",
+        "edition": null,
+        "outturn": null,
+        "bottleId": 46683,
+        "category": "single_malt",
+        "fullName": "Woodrow's of Edinburgh Glenrothes 2014",
+        "reference": null,
+        "statedAge": 11,
+        "caskNumber": "7390A-H",
+        "comparison": {
+          "missing": ["edition", "series"],
+          "conflicts": ["category", "abv", "brand", "bottler"],
+          "agreements": ["statedAge", "vintageYear", "releaseYear"]
+        },
+        "distillery": ["The Glenrothes"],
+        "maturation": null,
+        "releaseDay": null,
+        "singleCask": true,
+        "releaseYear": 2025,
+        "vintageYear": 2014,
+        "bottlingYear": null,
+        "caskStrength": null,
+        "releaseMonth": null,
+        "familyContext": {
+          "siblingBottles": []
+        }
+      },
+      {
+        "abv": 50,
+        "brand": "Living Souls",
+        "score": 51.55505,
+        "series": null,
+        "source": ["text"],
+        "bottler": "Living Souls",
+        "edition": null,
+        "outturn": null,
+        "bottleId": 46093,
+        "category": "single_malt",
+        "fullName": "Living Souls Laphroaig - 11-year-old - 50.0% ABV - Bourbon Cask - Refill",
+        "reference": null,
+        "statedAge": 11,
+        "caskNumber": null,
+        "comparison": {
+          "missing": [],
+          "conflicts": [],
+          "agreements": ["abv"]
+        },
+        "distillery": ["Laphroaig"],
+        "maturation": "bourbon",
+        "releaseDay": null,
+        "singleCask": null,
+        "releaseYear": null,
+        "vintageYear": null,
+        "bottlingYear": null,
+        "caskStrength": null,
+        "releaseMonth": null,
+        "familyContext": {
+          "siblingBottles": []
+        }
+      },
+      {
+        "abv": 48.1,
+        "brand": "Thompson Bros.",
+        "score": 51.363655,
+        "series": null,
+        "source": ["text"],
+        "bottler": "Thompson Bros",
+        "edition": null,
+        "outturn": 223,
+        "bottleId": 47299,
+        "category": "single_malt",
+        "fullName": "Thompson Bros. Clynelish 2014",
+        "reference": null,
+        "statedAge": 11,
+        "caskNumber": null,
+        "comparison": {
+          "missing": ["releaseYear", "edition", "series"],
+          "conflicts": ["category", "abv", "brand", "bottler"],
+          "agreements": ["statedAge", "vintageYear"]
+        },
+        "distillery": ["Clynelish"],
+        "maturation": "Refill hogshead",
+        "releaseDay": null,
+        "singleCask": null,
+        "releaseYear": null,
+        "vintageYear": 2014,
+        "bottlingYear": 2025,
+        "caskStrength": null,
+        "releaseMonth": null,
+        "familyContext": {
+          "siblingBottles": []
+        }
+      },
+      {
+        "abv": 48.5,
+        "brand": "Cask Masters",
+        "score": 50.117714,
+        "series": "Golden Proof",
+        "source": ["text"],
+        "bottler": "Brave New Spirits",
+        "edition": null,
+        "outturn": null,
+        "bottleId": 47230,
+        "category": "single_malt",
+        "fullName": "Cask Masters Inchmurrin",
+        "reference": null,
+        "statedAge": 11,
+        "caskNumber": "76/2014",
+        "comparison": {
+          "missing": ["edition"],
+          "conflicts": ["category", "abv", "brand", "bottler", "series"],
+          "agreements": ["statedAge", "vintageYear", "releaseYear"]
+        },
+        "distillery": ["Loch Lomond"],
+        "maturation": "bourbon",
+        "releaseDay": null,
+        "singleCask": true,
+        "releaseYear": 2025,
+        "vintageYear": 2014,
+        "bottlingYear": null,
+        "caskStrength": false,
+        "releaseMonth": null,
+        "familyContext": {
+          "siblingBottles": []
+        }
+      },
+      {
+        "abv": 60,
+        "brand": "Smögen Whisky",
+        "score": 48.800846,
+        "series": null,
+        "source": ["text"],
+        "bottler": null,
+        "edition": "for The Whisky Blues",
+        "outturn": 280,
+        "bottleId": 47472,
+        "category": "single_malt",
+        "fullName": "Smögen Whisky Single Cask 2014 11-year-old - for The Whisky Blues",
+        "reference": null,
+        "statedAge": 11,
+        "caskNumber": "12",
+        "comparison": {
+          "missing": ["bottler", "series"],
+          "conflicts": ["category", "abv", "brand"],
+          "agreements": ["statedAge", "vintageYear", "releaseYear"]
+        },
+        "distillery": ["Smögen Whisky"],
+        "maturation": "1st fill bourbon barrel",
+        "releaseDay": null,
+        "singleCask": true,
+        "releaseYear": 2025,
+        "vintageYear": 2014,
+        "bottlingYear": null,
+        "caskStrength": null,
+        "releaseMonth": null,
+        "familyContext": {
+          "siblingBottles": []
+        }
+      },
+      {
+        "abv": 62.4,
+        "brand": "Old Particular",
+        "score": 48.734993,
+        "series": null,
+        "source": ["text"],
+        "bottler": "Douglas Laing",
+        "edition": null,
+        "outturn": 220,
+        "bottleId": 52617,
+        "category": "single_malt",
+        "fullName": "Old Particular Bowmore 2014 11-year-old",
+        "reference": null,
+        "statedAge": 11,
+        "caskNumber": "19582",
+        "comparison": {
+          "missing": ["releaseYear", "edition", "series"],
+          "conflicts": ["category", "abv", "brand", "bottler"],
+          "agreements": ["statedAge", "vintageYear"]
+        },
+        "distillery": ["Bowmore"],
+        "maturation": "Refill bourbon barrel",
+        "releaseDay": null,
+        "singleCask": true,
+        "releaseYear": null,
+        "vintageYear": 2014,
+        "bottlingYear": 2025,
+        "caskStrength": null,
+        "releaseMonth": null,
+        "familyContext": {
+          "siblingBottles": []
+        }
+      },
+      {
+        "abv": 50,
+        "brand": "Elevenses",
+        "score": 48.46106,
+        "series": null,
+        "source": ["text"],
+        "bottler": "Keeble Cask Company",
+        "edition": null,
+        "outturn": null,
+        "bottleId": 46887,
+        "category": "single_malt",
+        "fullName": "Elevenses Speyburn 2014",
+        "reference": null,
+        "statedAge": 10,
+        "caskNumber": null,
+        "comparison": {
+          "missing": ["edition", "series"],
+          "conflicts": ["category", "statedAge", "brand", "bottler"],
+          "agreements": ["abv", "vintageYear", "releaseYear"]
+        },
+        "distillery": ["Speyburn"],
+        "maturation": "bourbon",
+        "releaseDay": null,
+        "singleCask": true,
+        "releaseYear": 2025,
+        "vintageYear": 2014,
+        "bottlingYear": null,
+        "caskStrength": null,
+        "releaseMonth": null,
+        "familyContext": {
+          "siblingBottles": []
+        }
+      },
+      {
+        "abv": 50,
+        "brand": "Kilchoman",
+        "score": 47.89392,
+        "series": null,
+        "source": ["text"],
+        "bottler": null,
+        "edition": "2025 Edition",
+        "outturn": 12000,
+        "bottleId": 59475,
+        "category": "single_malt",
+        "fullName": "Kilchoman 100% Islay Sherry Cask Matured 11-year-old - 2025 Edition",
+        "reference": null,
+        "statedAge": 11,
+        "caskNumber": null,
+        "comparison": {
+          "missing": ["vintageYear", "bottler", "series"],
+          "conflicts": ["category", "edition", "brand"],
+          "agreements": ["statedAge", "abv", "releaseYear"]
+        },
+        "distillery": ["Kilchoman"],
+        "maturation": "16 oloroso sherry butts",
+        "releaseDay": null,
+        "singleCask": false,
+        "releaseYear": 2025,
+        "vintageYear": null,
+        "bottlingYear": 2025,
+        "caskStrength": null,
+        "releaseMonth": 10,
+        "familyContext": {
+          "siblingBottles": []
+        }
+      },
+      {
+        "abv": 59.1,
+        "brand": "Benromach",
+        "score": 47.748306,
+        "series": null,
+        "source": ["text"],
+        "bottler": null,
+        "edition": null,
+        "outturn": 299,
+        "bottleId": 47314,
+        "category": "single_malt",
+        "fullName": "Benromach Single Cask 2014",
+        "reference": null,
+        "statedAge": 11,
+        "caskNumber": "675",
+        "comparison": {
+          "missing": ["edition", "bottler", "series"],
+          "conflicts": ["category", "abv", "brand"],
+          "agreements": ["statedAge", "vintageYear", "releaseYear"]
+        },
+        "distillery": ["Benromach"],
+        "maturation": "other",
+        "releaseDay": null,
+        "singleCask": true,
+        "releaseYear": 2025,
+        "vintageYear": 2014,
+        "bottlingYear": null,
+        "caskStrength": null,
+        "releaseMonth": null,
+        "familyContext": {
+          "siblingBottles": []
+        }
+      },
+      {
+        "abv": 54.1,
+        "brand": "William Cadenhead's",
+        "score": 47.62465,
+        "series": null,
+        "source": ["text"],
+        "bottler": "William Cadenhead's",
+        "edition": null,
+        "outturn": null,
+        "bottleId": 69778,
+        "category": "single_malt",
+        "fullName": "Cadenhead's Benrinnes 2014 11-year-old In The Courtyard",
+        "reference": null,
+        "statedAge": 11,
+        "caskNumber": null,
+        "comparison": {
+          "missing": ["releaseYear", "edition", "series"],
+          "conflicts": ["category", "abv", "brand", "bottler"],
+          "agreements": ["statedAge", "vintageYear"]
+        },
+        "distillery": ["Benrinnes"],
+        "maturation": "Palo Cortado hogshead",
+        "releaseDay": null,
+        "singleCask": null,
+        "releaseYear": null,
+        "vintageYear": 2014,
+        "bottlingYear": 2025,
+        "caskStrength": null,
+        "releaseMonth": null,
+        "familyContext": {
+          "siblingBottles": []
+        }
+      },
+      {
+        "abv": 50,
+        "brand": "Elevenses",
+        "score": 47.17312,
+        "series": null,
+        "source": ["text"],
+        "bottler": "Keeble Cask Company",
+        "edition": null,
+        "outturn": null,
+        "bottleId": 63452,
+        "category": "single_malt",
+        "fullName": "Elevenses Secret Highlands 11-year-old",
+        "reference": null,
+        "statedAge": 11,
+        "caskNumber": null,
+        "comparison": {
+          "missing": ["edition"],
+          "conflicts": ["category", "brand", "bottler"],
+          "agreements": ["statedAge", "abv"]
+        },
+        "distillery": [],
+        "maturation": null,
+        "releaseDay": null,
+        "singleCask": null,
+        "releaseYear": 2025,
+        "vintageYear": 2014,
+        "bottlingYear": null,
+        "caskStrength": null,
+        "releaseMonth": null,
+        "familyContext": {
+          "siblingBottles": []
+        }
+      },
+      {
+        "abv": 55.9,
+        "brand": "Rare Find",
+        "score": 46.76003,
+        "series": null,
+        "source": ["text"],
+        "bottler": "Gleann Mor",
+        "edition": null,
+        "outturn": null,
+        "bottleId": 46086,
+        "category": "single_malt",
+        "fullName": "Rare Find Glenglassaugh 2014",
+        "reference": null,
+        "statedAge": 11,
+        "caskNumber": "155",
+        "comparison": {
+          "missing": ["releaseYear", "edition", "series"],
+          "conflicts": ["category", "abv", "brand", "bottler"],
+          "agreements": ["statedAge", "vintageYear"]
+        },
+        "distillery": ["Glenglassaugh"],
+        "maturation": null,
+        "releaseDay": null,
+        "singleCask": true,
+        "releaseYear": null,
+        "vintageYear": 2014,
+        "bottlingYear": null,
+        "caskStrength": null,
+        "releaseMonth": null,
+        "familyContext": {
+          "siblingBottles": []
+        }
+      },
+      {
+        "abv": 56.8,
+        "brand": "Dràm Mòr",
+        "score": 46.74613,
+        "series": null,
+        "source": ["text"],
+        "bottler": "Dràm Mòr",
+        "edition": null,
+        "outturn": null,
+        "bottleId": 69456,
+        "category": "single_malt",
+        "fullName": "Dràm Mòr Glen Moray 2014 11-year-old",
+        "reference": null,
+        "statedAge": 11,
+        "caskNumber": "155",
+        "comparison": {
+          "missing": ["releaseYear", "edition", "series"],
+          "conflicts": ["category", "abv", "brand", "bottler"],
+          "agreements": ["statedAge", "vintageYear"]
+        },
+        "distillery": ["Glen Moray"],
+        "maturation": "first-fill Madeira hogshead",
+        "releaseDay": null,
+        "singleCask": true,
+        "releaseYear": null,
+        "vintageYear": 2014,
+        "bottlingYear": null,
+        "caskStrength": null,
+        "releaseMonth": null,
+        "familyContext": {
+          "siblingBottles": []
+        }
+      },
+      {
+        "abv": null,
+        "brand": "Mayor Pingree",
+        "score": 46.60526,
+        "series": null,
+        "source": ["text"],
+        "bottler": null,
+        "edition": null,
+        "outturn": null,
+        "bottleId": 13783,
+        "category": "bourbon",
+        "fullName": "Mayor Pingree 11-year-old Straight (Batch 3)",
+        "reference": null,
+        "statedAge": 11,
+        "caskNumber": null,
+        "comparison": {
+          "missing": ["abv", "edition", "bottler"],
+          "conflicts": ["category", "brand"],
+          "agreements": ["statedAge"]
+        },
+        "distillery": [],
+        "maturation": null,
+        "releaseDay": null,
+        "singleCask": null,
+        "releaseYear": null,
+        "vintageYear": null,
+        "bottlingYear": null,
+        "caskStrength": null,
+        "releaseMonth": null,
+        "familyContext": {
+          "siblingBottles": []
+        }
+      },
+      {
+        "abv": 50,
+        "brand": "The Scotch Malt Whisky Society",
+        "score": 46.156624,
+        "series": null,
+        "source": ["text", "brand_coverage"],
+        "bottler": "The Scotch Malt Whisky Society",
+        "edition": null,
+        "outturn": 1446,
+        "bottleId": 49510,
+        "category": "blended_malt",
+        "fullName": "SMWS BAT.11 The Tar Pit",
+        "reference": null,
+        "statedAge": 9,
+        "caskNumber": "BAT.11",
+        "comparison": {
+          "missing": [],
+          "conflicts": [],
+          "agreements": ["abv"]
+        },
+        "distillery": [],
+        "maturation": "Ex-Pedro Ximenes butts & ex-bourbon hogsheads",
+        "releaseDay": 30,
+        "singleCask": false,
+        "releaseYear": 2020,
+        "vintageYear": 2011,
+        "bottlingYear": null,
+        "caskStrength": null,
+        "releaseMonth": 11,
+        "familyContext": {
+          "siblingBottles": []
+        }
+      },
+      {
+        "abv": 55.3,
+        "brand": "Kentucky Owl",
+        "score": 46.12053,
+        "series": null,
+        "source": ["text"],
+        "bottler": null,
+        "edition": null,
+        "outturn": null,
+        "bottleId": 14175,
+        "category": "rye",
+        "fullName": "Kentucky Owl Rye 11-year-old (Batch 1)",
+        "reference": null,
+        "statedAge": 11,
+        "caskNumber": null,
+        "comparison": {
+          "missing": ["edition", "bottler"],
+          "conflicts": ["category", "abv", "brand"],
+          "agreements": ["statedAge"]
+        },
+        "distillery": [],
+        "maturation": null,
+        "releaseDay": null,
+        "singleCask": null,
+        "releaseYear": 2017,
+        "vintageYear": null,
+        "bottlingYear": null,
+        "caskStrength": null,
+        "releaseMonth": null,
+        "familyContext": {
+          "siblingBottles": []
+        }
+      },
+      {
+        "abv": 57.5,
+        "brand": "Tomatin",
+        "score": 45.922424,
+        "series": null,
+        "source": ["text"],
+        "bottler": null,
+        "edition": "Distillery Exclusive",
+        "outturn": null,
+        "bottleId": 69304,
+        "category": "single_malt",
+        "fullName": "Tomatin 2014 11-year-old - Distillery Exclusive",
+        "reference": null,
+        "statedAge": 11,
+        "caskNumber": "56519",
+        "comparison": {
+          "missing": ["releaseYear", "bottler", "series"],
+          "conflicts": ["category", "abv", "brand"],
+          "agreements": ["statedAge", "vintageYear"]
+        },
+        "distillery": ["Tomatin"],
+        "maturation": "Madeira Tinta Negra cask",
+        "releaseDay": null,
+        "singleCask": true,
+        "releaseYear": null,
+        "vintageYear": 2014,
+        "bottlingYear": 2025,
+        "caskStrength": null,
+        "releaseMonth": null,
+        "familyContext": {
+          "siblingBottles": []
+        }
+      },
+      {
+        "abv": 60.3,
+        "brand": "Lady of the Glen",
+        "score": 45.641045,
+        "series": null,
+        "source": ["text"],
+        "bottler": "Lady of the Glen",
+        "edition": null,
+        "outturn": 279,
+        "bottleId": 52644,
+        "category": "single_malt",
+        "fullName": "Lady of the Glen Mannochmore 2014 11-year-old",
+        "reference": null,
+        "statedAge": 11,
+        "caskNumber": "10367",
+        "comparison": {
+          "missing": ["releaseYear", "edition", "series"],
+          "conflicts": ["category", "abv", "brand", "bottler"],
+          "agreements": ["statedAge", "vintageYear"]
+        },
+        "distillery": ["Mannochmore"],
+        "maturation": "Bourbon hogshead",
+        "releaseDay": null,
+        "singleCask": true,
+        "releaseYear": null,
+        "vintageYear": 2014,
+        "bottlingYear": 2025,
+        "caskStrength": null,
+        "releaseMonth": null,
+        "familyContext": {
+          "siblingBottles": []
+        }
+      },
+      {
+        "abv": 48.2,
+        "brand": "Edradour",
+        "score": 45.475998,
+        "series": null,
+        "source": ["text"],
+        "bottler": null,
+        "edition": null,
+        "outturn": null,
+        "bottleId": 46042,
+        "category": "single_malt",
+        "fullName": "Edradour St. Michael Eppan Lagrein Cask Finish - 11-year-old - 2014 Vintage - 48.2% ABV - Other Cask - 1st Fill",
+        "reference": null,
+        "statedAge": 11,
+        "caskNumber": null,
+        "comparison": {
+          "missing": ["releaseYear", "edition", "bottler", "series"],
+          "conflicts": ["category", "abv", "brand"],
+          "agreements": ["statedAge", "vintageYear"]
+        },
+        "distillery": ["Edradour"],
+        "maturation": "other",
+        "releaseDay": null,
+        "singleCask": false,
+        "releaseYear": null,
+        "vintageYear": 2014,
+        "bottlingYear": null,
+        "caskStrength": null,
+        "releaseMonth": null,
+        "familyContext": {
+          "siblingBottles": []
+        }
+      },
+      {
+        "abv": 50.9,
+        "brand": "Kentucky Owl",
+        "score": 44.928093,
+        "series": null,
+        "source": ["text"],
+        "bottler": null,
+        "edition": null,
+        "outturn": null,
+        "bottleId": 14009,
+        "category": "rye",
+        "fullName": "Kentucky Owl 11-year-old Straight Rye (Batch 2)",
+        "reference": null,
+        "statedAge": 11,
+        "caskNumber": null,
+        "comparison": {
+          "missing": ["edition", "bottler"],
+          "conflicts": ["category", "abv", "brand"],
+          "agreements": ["statedAge"]
+        },
+        "distillery": [],
+        "maturation": null,
+        "releaseDay": null,
+        "singleCask": null,
+        "releaseYear": null,
+        "vintageYear": null,
+        "bottlingYear": null,
+        "caskStrength": null,
+        "releaseMonth": null,
+        "familyContext": {
+          "siblingBottles": []
+        }
+      },
+      {
+        "abv": 46,
+        "brand": "Kilchoman",
+        "score": 41.88206,
+        "series": null,
+        "source": ["text"],
+        "bottler": null,
+        "edition": null,
+        "outturn": null,
+        "bottleId": 45764,
+        "category": "single_malt",
+        "fullName": "Kilchoman Rockside 11-year-old",
+        "reference": null,
+        "statedAge": 11,
+        "caskNumber": null,
+        "comparison": {
+          "missing": ["edition", "bottler"],
+          "conflicts": ["category", "abv", "brand"],
+          "agreements": ["statedAge"]
+        },
+        "distillery": ["Kilchoman"],
+        "maturation": "Bourbon barrels and oloroso sherry casks",
+        "releaseDay": null,
+        "singleCask": false,
+        "releaseYear": 2026,
+        "vintageYear": null,
+        "bottlingYear": null,
+        "caskStrength": null,
+        "releaseMonth": 6,
+        "familyContext": {
+          "siblingBottles": []
+        }
+      },
+      {
+        "abv": null,
+        "brand": "Springbank",
+        "score": 40.465946,
+        "series": null,
+        "source": ["text"],
+        "bottler": null,
+        "edition": null,
+        "outturn": null,
+        "bottleId": 1556,
+        "category": "single_malt",
+        "fullName": "Springbank 11-year-old Local Barley",
+        "reference": null,
+        "statedAge": 11,
+        "caskNumber": null,
+        "comparison": {
+          "missing": ["abv", "edition", "bottler"],
+          "conflicts": ["category", "brand"],
+          "agreements": ["statedAge"]
+        },
+        "distillery": ["Springbank"],
+        "maturation": null,
+        "releaseDay": null,
+        "singleCask": null,
+        "releaseYear": null,
+        "vintageYear": null,
+        "bottlingYear": null,
+        "caskStrength": null,
+        "releaseMonth": null,
+        "familyContext": {
+          "siblingBottles": []
+        }
+      },
+      {
+        "abv": 46.7,
+        "brand": "Bladnoch",
+        "score": 40.128876,
+        "series": null,
+        "source": ["text"],
+        "bottler": null,
+        "edition": null,
+        "outturn": null,
+        "bottleId": 1975,
+        "category": "single_malt",
+        "fullName": "Bladnoch 11-year-old",
+        "reference": null,
+        "statedAge": 11,
+        "caskNumber": null,
+        "comparison": {
+          "missing": ["edition", "bottler"],
+          "conflicts": ["category", "abv", "brand"],
+          "agreements": ["statedAge"]
+        },
+        "distillery": ["Bladnoch"],
+        "maturation": null,
+        "releaseDay": null,
+        "singleCask": null,
+        "releaseYear": 2020,
+        "vintageYear": null,
+        "bottlingYear": null,
+        "caskStrength": null,
+        "releaseMonth": null,
+        "familyContext": {
+          "siblingBottles": []
+        }
+      },
+      {
+        "abv": 50,
+        "brand": "Old Potrero",
+        "score": 40.091614,
+        "series": null,
+        "source": ["text"],
+        "bottler": null,
+        "edition": null,
+        "outturn": null,
+        "bottleId": 65783,
+        "category": "rye",
+        "fullName": "Old Potrero Hotaling's Bottling 11-year-old",
+        "reference": null,
+        "statedAge": 11,
+        "caskNumber": null,
+        "comparison": {
+          "missing": ["edition", "bottler"],
+          "conflicts": ["category", "brand"],
+          "agreements": ["statedAge", "abv"]
+        },
+        "distillery": ["Hotaling & Co."],
+        "maturation": null,
+        "releaseDay": null,
+        "singleCask": null,
+        "releaseYear": null,
+        "vintageYear": null,
+        "bottlingYear": null,
+        "caskStrength": null,
+        "releaseMonth": null,
+        "familyContext": {
+          "siblingBottles": []
+        }
+      },
+      {
+        "abv": null,
+        "brand": "Elijah Craig",
+        "score": 39.733078,
+        "series": null,
+        "source": ["text"],
+        "bottler": null,
+        "edition": "Batch B524",
+        "outturn": null,
+        "bottleId": 45100,
+        "category": "bourbon",
+        "fullName": "Elijah Craig 11-year-old 2 month old Barrel Proof - Batch B524 - Cask Strength",
+        "reference": null,
+        "statedAge": 11,
+        "caskNumber": null,
+        "comparison": {
+          "missing": ["abv", "bottler"],
+          "conflicts": ["category", "edition", "brand"],
+          "agreements": ["statedAge"]
+        },
+        "distillery": [],
+        "maturation": null,
+        "releaseDay": null,
+        "singleCask": null,
+        "releaseYear": null,
+        "vintageYear": null,
+        "bottlingYear": null,
+        "caskStrength": true,
+        "releaseMonth": null,
+        "familyContext": {
+          "siblingBottles": [
+            {
+              "abv": null,
+              "edition": null,
+              "outturn": null,
+              "bottleId": 44079,
+              "fullName": "Elijah Craig 11-year-old 2 month old Barrel Proof",
+              "statedAge": 11,
+              "caskNumber": null,
+              "maturation": null,
+              "releaseDay": null,
+              "singleCask": null,
+              "releaseYear": null,
+              "traitFields": ["statedAge"],
+              "vintageYear": null,
+              "bottlingYear": null,
+              "caskStrength": null,
+              "releaseMonth": null
+            }
+          ]
+        }
+      },
+      {
+        "abv": 50,
+        "brand": "The Scotch Malt Whisky Society",
+        "score": 38.933372,
+        "series": null,
+        "source": ["text", "brand_coverage"],
+        "bottler": "The Scotch Malt Whisky Society",
+        "edition": null,
+        "outturn": 2130,
+        "bottleId": 49752,
+        "category": "blended_malt",
+        "fullName": "SMWS BAT.13 Tabanco Time",
+        "reference": null,
+        "statedAge": 11,
+        "caskNumber": "BAT.13",
+        "comparison": {
+          "missing": [],
+          "conflicts": [],
+          "agreements": ["abv"]
+        },
+        "distillery": [],
+        "maturation": "Ex-Oloroso butts & Ex-Pedro Ximenes hogsheads",
+        "releaseDay": 19,
+        "singleCask": false,
+        "releaseYear": 2021,
+        "vintageYear": 2009,
+        "bottlingYear": null,
+        "caskStrength": null,
+        "releaseMonth": 11,
+        "familyContext": {
+          "siblingBottles": []
+        }
+      },
+      {
+        "abv": null,
+        "brand": "Boondocks",
+        "score": 38.592148,
+        "series": null,
+        "source": ["text"],
+        "bottler": null,
+        "edition": null,
+        "outturn": null,
+        "bottleId": 15935,
+        "category": null,
+        "fullName": "Boondocks 11-year-old American Whiskey",
+        "reference": null,
+        "statedAge": 11,
+        "caskNumber": null,
+        "comparison": {
+          "missing": ["category", "abv", "edition", "bottler"],
+          "conflicts": ["brand"],
+          "agreements": ["statedAge"]
+        },
+        "distillery": [],
+        "maturation": null,
+        "releaseDay": null,
+        "singleCask": null,
+        "releaseYear": null,
+        "vintageYear": null,
+        "bottlingYear": null,
+        "caskStrength": null,
+        "releaseMonth": null,
+        "familyContext": {
+          "siblingBottles": []
+        }
+      },
+      {
+        "abv": 50,
+        "brand": "William Cadenhead's",
+        "score": 38.504047,
+        "series": null,
+        "source": ["text"],
+        "bottler": "William Cadenhead's",
+        "edition": null,
+        "outturn": null,
+        "bottleId": 61655,
+        "category": "single_malt",
+        "fullName": "Cadenhead's Glen Garioch 11-year-old",
+        "reference": null,
+        "statedAge": 11,
+        "caskNumber": null,
+        "comparison": {
+          "missing": ["edition"],
+          "conflicts": ["category", "brand", "bottler"],
+          "agreements": ["statedAge", "abv"]
+        },
+        "distillery": [],
+        "maturation": "bourbon casks, half finished in Fino sherry casks",
+        "releaseDay": null,
+        "singleCask": null,
+        "releaseYear": null,
+        "vintageYear": 2013,
+        "bottlingYear": null,
+        "caskStrength": null,
+        "releaseMonth": null,
+        "familyContext": {
+          "siblingBottles": []
+        }
+      },
+      {
+        "abv": 50,
+        "brand": "That Boutique-y Whisky Company",
+        "score": 36.265038,
+        "series": null,
+        "source": ["text"],
+        "bottler": "That Boutique-y Whisky Company",
+        "edition": "Batch 18",
+        "outturn": null,
+        "bottleId": 46481,
+        "category": "single_malt",
+        "fullName": "TBWC Aultmore - Batch 18 - 13-year-old - 50.0% ABV",
+        "reference": null,
+        "statedAge": 13,
+        "caskNumber": null,
+        "comparison": {
+          "missing": [],
+          "conflicts": [],
+          "agreements": ["abv"]
+        },
+        "distillery": ["Aultmore"],
+        "maturation": null,
+        "releaseDay": null,
+        "singleCask": null,
+        "releaseYear": null,
+        "vintageYear": null,
+        "bottlingYear": null,
+        "caskStrength": null,
+        "releaseMonth": null,
+        "familyContext": {
+          "siblingBottles": []
+        }
+      },
+      {
+        "abv": 50,
+        "brand": "The Scotch Malt Whisky Society",
+        "score": 36.086723,
+        "series": null,
+        "source": ["text"],
+        "bottler": "The Scotch Malt Whisky Society",
+        "edition": "Batch 41",
+        "outturn": null,
+        "bottleId": 49747,
+        "category": "single_grain",
+        "fullName": "SMWS Incognito - Batch 41",
+        "reference": null,
+        "statedAge": 9,
+        "caskNumber": null,
+        "comparison": {
+          "missing": [],
+          "conflicts": [],
+          "agreements": ["abv"]
+        },
+        "distillery": [],
+        "maturation": "matured in heavily charred 24-month air seasoned new oak barrel",
+        "releaseDay": 3,
+        "singleCask": false,
+        "releaseYear": 2026,
+        "vintageYear": 2016,
+        "bottlingYear": null,
+        "caskStrength": null,
+        "releaseMonth": 7,
+        "familyContext": {
+          "siblingBottles": []
+        }
+      },
+      {
+        "abv": 50,
+        "brand": "Wilderness Trail Distillery",
+        "score": 36.037277,
+        "series": null,
+        "source": ["text"],
+        "bottler": null,
+        "edition": null,
+        "outturn": null,
+        "bottleId": 46225,
+        "category": "rye",
+        "fullName": "Wilderness Trail Distillery Small Batch Rye - 50.0% ABV",
+        "reference": null,
+        "statedAge": null,
+        "caskNumber": null,
+        "comparison": {
+          "missing": [],
+          "conflicts": [],
+          "agreements": ["abv"]
+        },
+        "distillery": ["Wilderness Trail Distillery"],
+        "maturation": null,
+        "releaseDay": null,
+        "singleCask": null,
+        "releaseYear": null,
+        "vintageYear": null,
+        "bottlingYear": null,
+        "caskStrength": null,
+        "releaseMonth": null,
+        "familyContext": {
+          "siblingBottles": []
+        }
+      },
+      {
+        "abv": 50,
+        "brand": "The Scotch Malt Whisky Society",
+        "score": 35.563297,
+        "series": null,
+        "source": ["vector", "text", "brand_coverage"],
+        "bottler": "The Scotch Malt Whisky Society",
+        "edition": "Batch 12",
+        "outturn": null,
+        "bottleId": 49522,
+        "category": "blended_malt",
+        "fullName": "SMWS Clementine confit - Batch 12",
+        "reference": "SMWS Batch 12",
+        "statedAge": 10,
+        "caskNumber": null,
+        "comparison": {
+          "missing": [],
+          "conflicts": [],
+          "agreements": ["abv"]
+        },
+        "distillery": [],
+        "maturation": "New Caucasian & American oak barriques",
+        "releaseDay": null,
+        "singleCask": false,
+        "releaseYear": null,
+        "vintageYear": 2010,
+        "bottlingYear": null,
+        "caskStrength": null,
+        "releaseMonth": null,
+        "familyContext": {
+          "siblingBottles": []
+        }
+      },
+      {
+        "abv": 50,
+        "brand": "Knob Creek",
+        "score": 35.39998,
+        "series": null,
+        "source": ["text"],
+        "bottler": null,
+        "edition": "Release No. KC001",
+        "outturn": null,
+        "bottleId": 45482,
+        "category": "bourbon",
+        "fullName": "Knob Creek Small Batch - Release No. KC001 - 21-year-old - 50.0% ABV",
+        "reference": null,
+        "statedAge": 21,
+        "caskNumber": null,
+        "comparison": {
+          "missing": [],
+          "conflicts": [],
+          "agreements": ["abv"]
+        },
+        "distillery": [],
+        "maturation": null,
+        "releaseDay": null,
+        "singleCask": null,
+        "releaseYear": null,
+        "vintageYear": null,
+        "bottlingYear": null,
+        "caskStrength": null,
+        "releaseMonth": null,
+        "familyContext": {
+          "siblingBottles": []
+        }
+      },
+      {
+        "abv": 50,
+        "brand": "J.J. Corry",
+        "score": 34.914486,
+        "series": null,
+        "source": ["text"],
+        "bottler": "J.J. Corry",
+        "edition": "Batch 3",
+        "outturn": null,
+        "bottleId": 46888,
+        "category": "blend",
+        "fullName": "J.J. Corry The Battalion - Batch 3 - 6-year-old - 50.0% ABV",
+        "reference": null,
+        "statedAge": 6,
+        "caskNumber": null,
+        "comparison": {
+          "missing": [],
+          "conflicts": [],
+          "agreements": ["abv"]
+        },
+        "distillery": [],
+        "maturation": null,
+        "releaseDay": null,
+        "singleCask": false,
+        "releaseYear": null,
+        "vintageYear": null,
+        "bottlingYear": null,
+        "caskStrength": null,
+        "releaseMonth": null,
+        "familyContext": {
+          "siblingBottles": []
+        }
+      },
+      {
+        "abv": 50,
+        "brand": "The Scotch Malt Whisky Society",
+        "score": 34.58313,
+        "series": null,
+        "source": ["text"],
+        "bottler": "The Scotch Malt Whisky Society",
+        "edition": null,
+        "outturn": 1367,
+        "bottleId": 49655,
+        "category": "single_malt",
+        "fullName": "SMWS Pomegranate gremolata",
+        "reference": null,
+        "statedAge": 14,
+        "caskNumber": null,
+        "comparison": {
+          "missing": [],
+          "conflicts": [],
+          "agreements": ["abv"]
+        },
+        "distillery": [],
+        "maturation": "1st fill Chinkapin oak barrels with a heavy toast and a medium char",
+        "releaseDay": null,
+        "singleCask": false,
+        "releaseYear": null,
+        "vintageYear": 2006,
+        "bottlingYear": null,
+        "caskStrength": null,
+        "releaseMonth": null,
+        "familyContext": {
+          "siblingBottles": []
+        }
+      },
+      {
+        "abv": 50,
+        "brand": "Canadian Rockies",
+        "score": 34.185486,
+        "series": null,
+        "source": ["text"],
+        "bottler": null,
+        "edition": null,
+        "outturn": null,
+        "bottleId": 56626,
+        "category": "single_grain",
+        "fullName": "Canadian Rockies 35-year-old",
+        "reference": null,
+        "statedAge": 35,
+        "caskNumber": null,
+        "comparison": {
+          "missing": [],
+          "conflicts": [],
+          "agreements": ["abv"]
+        },
+        "distillery": ["Highwood Distillers"],
+        "maturation": null,
+        "releaseDay": null,
+        "singleCask": false,
+        "releaseYear": null,
+        "vintageYear": null,
+        "bottlingYear": null,
+        "caskStrength": false,
+        "releaseMonth": null,
+        "familyContext": {
+          "siblingBottles": []
+        }
+      },
+      {
+        "abv": 50,
+        "brand": "The Scotch Malt Whisky Society",
+        "score": 33.78783,
+        "series": null,
+        "source": ["text"],
+        "bottler": "The Scotch Malt Whisky Society",
+        "edition": "Batch 42",
+        "outturn": null,
+        "bottleId": 49748,
+        "category": "single_malt",
+        "fullName": "SMWS Highland peaty potion - Batch 42",
+        "reference": null,
+        "statedAge": 10,
+        "caskNumber": null,
+        "comparison": {
+          "missing": [],
+          "conflicts": [],
+          "agreements": ["abv"]
+        },
+        "distillery": [],
+        "maturation": "1st fill barrels and oloroso & pedro ximenez butts",
+        "releaseDay": 7,
+        "singleCask": false,
+        "releaseYear": 2026,
+        "vintageYear": 2015,
+        "bottlingYear": null,
+        "caskStrength": null,
+        "releaseMonth": 8,
+        "familyContext": {
+          "siblingBottles": []
+        }
+      },
+      {
+        "abv": 50,
+        "brand": "Wilderness Trail Distillery",
+        "score": 33.730118,
+        "series": null,
+        "source": ["text"],
+        "bottler": null,
+        "edition": null,
+        "outturn": null,
+        "bottleId": 46099,
+        "category": "bourbon",
+        "fullName": "Wilderness Trail Distillery Small Batch Bottled-in-Bond - 50.0% ABV",
+        "reference": null,
+        "statedAge": null,
+        "caskNumber": null,
+        "comparison": {
+          "missing": [],
+          "conflicts": [],
+          "agreements": ["abv"]
+        },
+        "distillery": ["Wilderness Trail Distillery"],
+        "maturation": null,
+        "releaseDay": null,
+        "singleCask": null,
+        "releaseYear": null,
+        "vintageYear": null,
+        "bottlingYear": null,
+        "caskStrength": false,
+        "releaseMonth": null,
+        "familyContext": {
+          "siblingBottles": []
+        }
+      },
+      {
+        "abv": 50,
+        "brand": "Strathearn",
+        "score": 33.541485,
+        "series": null,
+        "source": ["text"],
+        "bottler": "Douglas Laing",
+        "edition": "Batch 03",
+        "outturn": null,
+        "bottleId": 45366,
+        "category": "single_malt",
+        "fullName": "Strathearn Triple Cask Matured - Batch 03 - 50.0% ABV",
+        "reference": null,
+        "statedAge": null,
+        "caskNumber": null,
+        "comparison": {
+          "missing": [],
+          "conflicts": [],
+          "agreements": ["abv"]
+        },
+        "distillery": ["Strathearn"],
+        "maturation": null,
+        "releaseDay": null,
+        "singleCask": null,
+        "releaseYear": null,
+        "vintageYear": null,
+        "bottlingYear": null,
+        "caskStrength": null,
+        "releaseMonth": null,
+        "familyContext": {
+          "siblingBottles": []
+        }
+      },
+      {
+        "abv": 50,
+        "brand": "Woodrow's of Edinburgh",
+        "score": 32.14877,
+        "series": null,
+        "source": ["text"],
+        "bottler": "Woodrow's of Edinburgh",
+        "edition": "Batch 2",
+        "outturn": null,
+        "bottleId": 45895,
+        "category": "blend",
+        "fullName": "Woodrow's of Edinburgh Warehouse Blend - Batch 2 - 50.0% ABV",
+        "reference": null,
+        "statedAge": null,
+        "caskNumber": null,
+        "comparison": {
+          "missing": [],
+          "conflicts": [],
+          "agreements": ["abv"]
+        },
+        "distillery": ["Glen Elgin", "Glen Ord", "Highland Park"],
+        "maturation": null,
+        "releaseDay": null,
+        "singleCask": false,
+        "releaseYear": null,
+        "vintageYear": null,
+        "bottlingYear": null,
+        "caskStrength": null,
+        "releaseMonth": null,
+        "familyContext": {
+          "siblingBottles": []
+        }
+      },
+      {
+        "abv": 50,
+        "brand": "The Scotch Malt Whisky Society",
+        "score": 1,
+        "series": null,
+        "source": ["vector", "brand_coverage", "context"],
+        "bottler": "The Scotch Malt Whisky Society",
+        "edition": "Batch 39",
+        "outturn": null,
+        "bottleId": 51610,
+        "category": "blended_malt",
+        "fullName": "SMWS The Five Regions - Batch 39",
+        "reference": "SMWS The Five Regions",
+        "statedAge": 11,
+        "caskNumber": null,
+        "comparison": {
+          "missing": [],
+          "conflicts": ["edition"],
+          "agreements": ["category", "statedAge", "abv", "brand", "bottler"]
+        },
+        "distillery": [],
+        "maturation": "Second & Refill hogsheads and American oak PX, Spanish oak oloroso, HTMC & bourbon barrels",
+        "releaseDay": null,
+        "singleCask": false,
+        "releaseYear": null,
+        "vintageYear": 2014,
+        "bottlingYear": null,
+        "caskStrength": null,
+        "releaseMonth": null,
+        "familyContext": {
+          "siblingBottles": []
+        }
+      },
+      {
+        "abv": 50,
+        "brand": "The Scotch Malt Whisky Society",
+        "score": 0.7445440501265721,
+        "series": null,
+        "source": ["vector"],
+        "bottler": "The Scotch Malt Whisky Society",
+        "edition": "Batch 15",
+        "outturn": null,
+        "bottleId": 51593,
+        "category": "blended_malt",
+        "fullName": "SMWS Smokus fruticosus - Batch 15",
+        "reference": "SMWS Batch 15",
+        "statedAge": 10,
+        "caskNumber": null,
+        "comparison": {
+          "missing": [],
+          "conflicts": ["statedAge", "edition"],
+          "agreements": ["category", "abv", "brand", "bottler"]
+        },
+        "distillery": [],
+        "maturation": "Bourbon barrels, Pedro Ximenez butts & Oloroso hogsheads",
+        "releaseDay": null,
+        "singleCask": false,
+        "releaseYear": null,
+        "vintageYear": 2011,
+        "bottlingYear": null,
+        "caskStrength": null,
+        "releaseMonth": null,
+        "familyContext": {
+          "siblingBottles": []
+        }
+      },
+      {
+        "abv": 50,
+        "brand": "The Scotch Malt Whisky Society",
+        "score": 0.7333333333333333,
+        "series": null,
+        "source": ["brand_coverage"],
+        "bottler": "The Scotch Malt Whisky Society",
+        "edition": null,
+        "outturn": 2130,
+        "bottleId": 53061,
+        "category": "blended_malt",
+        "fullName": "SMWS BAT.13 Tabanco Time",
+        "reference": null,
+        "statedAge": 11,
+        "caskNumber": "BAT.13",
+        "comparison": {
+          "missing": ["edition"],
+          "conflicts": [],
+          "agreements": ["category", "statedAge", "abv", "brand", "bottler"]
+        },
+        "distillery": [],
+        "maturation": "Ex-Oloroso butts & Ex-Pedro Ximenes hogsheads",
+        "releaseDay": 19,
+        "singleCask": false,
+        "releaseYear": 2021,
+        "vintageYear": null,
+        "bottlingYear": null,
+        "caskStrength": null,
+        "releaseMonth": 11,
+        "familyContext": {
+          "siblingBottles": []
+        }
+      },
+      {
+        "abv": 50,
+        "brand": "The Scotch Malt Whisky Society",
+        "score": 0.7333333333333333,
+        "series": null,
+        "source": ["vector", "brand_coverage"],
+        "bottler": "The Scotch Malt Whisky Society",
+        "edition": null,
+        "outturn": 1496,
+        "bottleId": 49509,
+        "category": "blended_malt",
+        "fullName": "SMWS BAT.10 Spice Cannon",
+        "reference": "SMWS Batch 10!!",
+        "statedAge": 10,
+        "caskNumber": "BAT.10",
+        "comparison": {
+          "missing": ["edition"],
+          "conflicts": ["statedAge"],
+          "agreements": ["category", "abv", "brand", "bottler"]
+        },
+        "distillery": [],
+        "maturation": "Ex-oloroso & ex-Pedro Ximenes casks",
+        "releaseDay": null,
+        "singleCask": false,
+        "releaseYear": null,
+        "vintageYear": 2009,
+        "bottlingYear": null,
+        "caskStrength": null,
+        "releaseMonth": null,
+        "familyContext": {
+          "siblingBottles": []
+        }
+      },
+      {
+        "abv": 50,
+        "brand": "The Scotch Malt Whisky Society",
+        "score": 0.7333333333333333,
+        "series": null,
+        "source": ["brand_coverage"],
+        "bottler": "The Scotch Malt Whisky Society",
+        "edition": null,
+        "outturn": 1,
+        "bottleId": 49759,
+        "category": "blended_malt",
+        "fullName": "SMWS Baked In",
+        "reference": null,
+        "statedAge": 14,
+        "caskNumber": null,
+        "comparison": {
+          "missing": ["edition"],
+          "conflicts": ["statedAge"],
+          "agreements": ["category", "abv", "brand", "bottler"]
+        },
+        "distillery": [],
+        "maturation": "1st fill Bourbon & Cabernet Sauvignon barrels & hogsheads",
+        "releaseDay": null,
+        "singleCask": false,
+        "releaseYear": null,
+        "vintageYear": 2007,
+        "bottlingYear": null,
+        "caskStrength": null,
+        "releaseMonth": null,
+        "familyContext": {
+          "siblingBottles": []
+        }
+      },
+      {
+        "abv": 50,
+        "brand": "The Scotch Malt Whisky Society",
+        "score": 0.7333333333333333,
+        "series": null,
+        "source": ["brand_coverage"],
+        "bottler": "The Scotch Malt Whisky Society",
+        "edition": null,
+        "outturn": null,
+        "bottleId": 69213,
+        "category": "blended_malt",
+        "fullName": "SMWS Fruit bomb (Batch 40)",
+        "reference": null,
+        "statedAge": 10,
+        "caskNumber": null,
+        "comparison": {
+          "missing": ["edition"],
+          "conflicts": ["statedAge"],
+          "agreements": ["category", "abv", "brand", "bottler"]
+        },
+        "distillery": [],
+        "maturation": null,
+        "releaseDay": null,
+        "singleCask": null,
+        "releaseYear": null,
+        "vintageYear": null,
+        "bottlingYear": null,
+        "caskStrength": null,
+        "releaseMonth": null,
+        "familyContext": {
+          "siblingBottles": []
+        }
+      },
+      {
+        "abv": 50,
+        "brand": "The Scotch Malt Whisky Society",
+        "score": 0.7333333333333333,
+        "series": null,
+        "source": ["brand_coverage"],
+        "bottler": "The Scotch Malt Whisky Society",
+        "edition": "Batch 1",
+        "outturn": 1937,
+        "bottleId": 9403,
+        "category": "blended_malt",
+        "fullName": "SMWS Exotic Cargo - Batch 1",
+        "reference": null,
+        "statedAge": 10,
+        "caskNumber": null,
+        "comparison": {
+          "missing": [],
+          "conflicts": ["statedAge", "edition"],
+          "agreements": ["category", "abv", "brand", "bottler"]
+        },
+        "distillery": [],
+        "maturation": "1st fill Spanish oak ex-sherry hogshead",
+        "releaseDay": null,
+        "singleCask": false,
+        "releaseYear": 2017,
+        "vintageYear": 2006,
+        "bottlingYear": null,
+        "caskStrength": null,
+        "releaseMonth": null,
+        "familyContext": {
+          "siblingBottles": []
+        }
+      },
+      {
+        "abv": 50,
+        "brand": "The Scotch Malt Whisky Society",
+        "score": 0.7182607405566571,
+        "series": null,
+        "source": ["vector"],
+        "bottler": "The Scotch Malt Whisky Society",
+        "edition": "Batch 30",
+        "outturn": null,
+        "bottleId": 51611,
+        "category": "single_malt",
+        "fullName": "SMWS Skooshy stroopwafel - Batch 30",
+        "reference": "SMWS Stroop it up!",
+        "statedAge": 11,
+        "caskNumber": null,
+        "comparison": {
+          "missing": [],
+          "conflicts": ["category", "edition"],
+          "agreements": ["statedAge", "abv", "brand", "bottler"]
+        },
+        "distillery": [],
+        "maturation": "Refill hogsheads & First-fill European oak PX butts",
+        "releaseDay": null,
+        "singleCask": false,
+        "releaseYear": null,
+        "vintageYear": 2013,
+        "bottlingYear": null,
+        "caskStrength": null,
+        "releaseMonth": null,
+        "familyContext": {
+          "siblingBottles": []
+        }
+      },
+      {
+        "abv": 58.4,
+        "brand": "The Scotch Malt Whisky Society",
+        "score": 0.708155141651673,
+        "series": null,
+        "source": ["vector"],
+        "bottler": "The Scotch Malt Whisky Society",
+        "edition": null,
+        "outturn": null,
+        "bottleId": 51606,
+        "category": "blended_malt",
+        "fullName": "SMWS The wandering",
+        "reference": "SMWS The wandering",
+        "statedAge": 10,
+        "caskNumber": null,
+        "comparison": {
+          "missing": ["edition", "series"],
+          "conflicts": ["statedAge", "abv"],
+          "agreements": [
+            "category",
+            "vintageYear",
+            "releaseYear",
+            "brand",
+            "bottler"
+          ]
+        },
+        "distillery": [],
+        "maturation": "Barrels & hogsheads - Bourbon, Oloroso, PX & heavy toast medium char",
+        "releaseDay": null,
+        "singleCask": false,
+        "releaseYear": 2025,
+        "vintageYear": 2014,
+        "bottlingYear": null,
+        "caskStrength": null,
+        "releaseMonth": null,
+        "familyContext": {
+          "siblingBottles": []
+        }
+      },
+      {
+        "abv": 60.1,
+        "brand": "The Scotch Malt Whisky Society",
+        "score": 0.6190476190476191,
+        "series": null,
+        "source": ["brand_coverage"],
+        "bottler": "The Scotch Malt Whisky Society",
+        "edition": null,
+        "outturn": null,
+        "bottleId": 43654,
+        "category": "single_malt",
+        "fullName": "SMWS 1.299 Jazz porridge",
+        "reference": null,
+        "statedAge": 11,
+        "caskNumber": "1.299",
+        "comparison": {
+          "missing": ["edition", "series"],
+          "conflicts": ["category", "abv"],
+          "agreements": [
+            "statedAge",
+            "vintageYear",
+            "releaseYear",
+            "brand",
+            "bottler"
+          ]
+        },
+        "distillery": ["Glenfarclas"],
+        "maturation": "1st Fill Ex-Bourbon Barrel",
+        "releaseDay": 3,
+        "singleCask": true,
+        "releaseYear": 2025,
+        "vintageYear": 2014,
+        "bottlingYear": null,
+        "caskStrength": null,
+        "releaseMonth": 10,
+        "familyContext": {
+          "siblingBottles": []
+        }
+      }
+    ]
+  },
+  "context": {
+    "inspectedBottleIds": [51610],
+    "bottleContexts": [
+      {
+        "exact": {
+          "abv": 50,
+          "edition": "Batch 39",
+          "outturn": null,
+          "statedAge": 11,
+          "caskNumber": null,
+          "maturation": "Second & Refill hogsheads and American oak PX, Spanish oak oloroso, HTMC & bourbon barrels",
+          "releaseDay": null,
+          "singleCask": false,
+          "releaseYear": null,
+          "vintageYear": 2014,
+          "bottlingYear": null,
+          "caskStrength": null,
+          "releaseMonth": null
+        },
+        "shared": {
+          "name": "The Five Regions",
+          "brand": {
+            "name": "The Scotch Malt Whisky Society",
+            "entityId": 4263
+          },
+          "series": null,
+          "bottler": {
+            "name": "The Scotch Malt Whisky Society",
+            "entityId": 4263
+          },
+          "category": "blended_malt",
+          "statedAge": null,
+          "distillers": []
+        },
+        "groupId": 24570,
+        "bottleId": 51610,
+        "fullName": "SMWS The Five Regions - Batch 39",
+        "siblings": [],
+        "references": [
+          {
+            "name": "SMWS The Five Regions",
+            "ignored": false
+          }
+        ],
+        "observations": [],
+        "imageSources": []
+      }
+    ],
+    "inspectedEntities": [
+      {
+        "kind": "bottler",
+        "name": "Living Souls",
+        "score": 1,
+        "source": ["exact", "text", "prefix", "contained"],
+        "entityId": 365801,
+        "reference": "Living Souls",
+        "shortName": null,
+        "retrievedFor": [
+          {
+            "exact": true,
+            "query": "Living Souls"
+          }
+        ]
+      },
+      {
+        "kind": "distillery",
+        "name": "Laphroaig",
+        "score": 1,
+        "source": ["exact", "text", "prefix", "contained"],
+        "entityId": 1129,
+        "reference": "Laphroaig",
+        "shortName": "",
+        "retrievedFor": [
+          {
+            "exact": true,
+            "query": "Laphroaig"
+          }
+        ]
+      },
+      {
+        "kind": "bottler",
+        "name": "The Scotch Malt Whisky Society",
+        "score": 1,
+        "source": ["exact", "text", "prefix", "contained"],
+        "entityId": 4263,
+        "reference": "The Scotch Malt Whisky Society",
+        "shortName": "SMWS",
+        "retrievedFor": [
+          {
+            "exact": true,
+            "query": "The Scotch Malt Whisky Society"
+          }
+        ]
+      },
+      {
+        "kind": "bottler",
+        "name": "That Boutique-y Whisky Company",
+        "score": 1,
+        "source": ["exact", "text", "prefix", "contained"],
+        "entityId": 5978,
+        "reference": "That Boutique-y Whisky Company",
+        "shortName": "TBWC",
+        "retrievedFor": [
+          {
+            "exact": true,
+            "query": "That Boutique-y Whisky Company"
+          }
+        ]
+      },
+      {
+        "kind": "distillery",
+        "name": "Aultmore",
+        "score": 1,
+        "source": ["exact", "text", "prefix", "contained"],
+        "entityId": 191,
+        "reference": "Aultmore",
+        "shortName": null,
+        "retrievedFor": [
+          {
+            "exact": true,
+            "query": "Aultmore"
+          }
+        ]
+      },
+      {
+        "kind": "distillery",
+        "name": "Wilderness Trail Distillery",
+        "score": 1,
+        "source": ["exact", "text", "prefix", "contained"],
+        "entityId": 374,
+        "reference": "Wilderness Trail Distillery",
+        "shortName": null,
+        "retrievedFor": [
+          {
+            "exact": true,
+            "query": "Wilderness Trail Distillery"
+          }
+        ]
+      },
+      {
+        "kind": "brand",
+        "name": "Knob Creek",
+        "score": 1,
+        "source": ["exact", "text", "prefix", "contained"],
+        "entityId": 1114,
+        "reference": "Knob Creek",
+        "shortName": null,
+        "retrievedFor": [
+          {
+            "exact": true,
+            "query": "Knob Creek"
+          }
+        ]
+      },
+      {
+        "kind": "bottler",
+        "name": "J.J. Corry",
+        "score": 1,
+        "source": ["exact", "text", "prefix", "contained"],
+        "entityId": 1076,
+        "reference": "J.J. Corry",
+        "shortName": null,
+        "retrievedFor": [
+          {
+            "exact": true,
+            "query": "J.J. Corry"
+          }
+        ]
+      },
+      {
+        "kind": "brand",
+        "name": "Canadian Rockies",
+        "score": 1,
+        "source": ["exact", "text", "prefix", "contained"],
+        "entityId": 366546,
+        "reference": "Canadian Rockies",
+        "shortName": null,
+        "retrievedFor": [
+          {
+            "exact": true,
+            "query": "Canadian Rockies"
+          }
+        ]
+      },
+      {
+        "kind": "distillery",
+        "name": "Highwood Distillers",
+        "score": 1,
+        "source": ["exact", "text", "prefix", "contained"],
+        "entityId": 1753,
+        "reference": "Highwood Distillers",
+        "shortName": null,
+        "retrievedFor": [
+          {
+            "exact": true,
+            "query": "Highwood Distillers"
+          }
+        ]
+      },
+      {
+        "kind": "distillery",
+        "name": "Strathearn",
+        "score": 1,
+        "source": ["exact", "text", "prefix", "contained"],
+        "entityId": 280,
+        "reference": "Strathearn",
+        "shortName": null,
+        "retrievedFor": [
+          {
+            "exact": true,
+            "query": "Strathearn"
+          }
+        ]
+      },
+      {
+        "kind": "bottler",
+        "name": "Douglas Laing",
+        "score": 1,
+        "source": ["exact", "text", "prefix", "contained"],
+        "entityId": 5622,
+        "reference": "Douglas Laing",
+        "shortName": null,
+        "retrievedFor": [
+          {
+            "exact": true,
+            "query": "Douglas Laing"
+          }
+        ]
+      },
+      {
+        "kind": "bottler",
+        "name": "The Whisky Society",
+        "score": 0.35,
+        "source": ["contained"],
+        "entityId": 367612,
+        "reference": "Whisky Society",
+        "shortName": null,
+        "retrievedFor": [
+          {
+            "query": "The Scotch Malt Whisky Society"
+          }
+        ]
+      },
+      {
+        "kind": "brand",
+        "name": "Highwood",
+        "score": 0.3388888888888889,
+        "source": ["contained"],
+        "entityId": 367472,
+        "reference": "Highwood",
+        "shortName": null,
+        "retrievedFor": [
+          {
+            "query": "Highwood Distillers"
+          }
+        ]
+      },
+      {
+        "kind": "bottler",
+        "name": "&Whisky",
+        "score": 0.29615384615384616,
+        "source": ["contained"],
+        "entityId": 365821,
+        "reference": "&Whisky",
+        "shortName": null,
+        "retrievedFor": [
+          {
+            "query": "The Scotch Malt Whisky Society"
+          },
+          {
+            "query": "That Boutique-y Whisky Company"
+          }
+        ]
+      },
+      {
+        "kind": "company",
+        "name": "D. Johnston & Co. (Laphroaig) Ltd.",
+        "score": 0.2,
+        "source": ["text"],
+        "entityId": 5737,
+        "reference": null,
+        "shortName": null,
+        "retrievedFor": [
+          {
+            "query": "Laphroaig"
+          }
+        ]
+      }
+    ],
+    "inspectedSeries": []
+  },
+  "provenance": {
+    "source": "production_miss",
+    "verifiedSourceUrls": [
+      "https://www.scotchwhiskyauctions.com/auctions/234-the-185th-auction/904423-smws-cocoa-drift-11-year-old-blended-malt-batch-35/"
+    ],
+    "dbOutcome": {
+      "bottleId": null,
+      "createsBottle": true,
+      "summary": "Production returned create_bottle with the name `Cocoa drift 11-year-old (Batch 35)`."
+    },
+    "notes": "Captured from saved classifier run 36629 (auction_lot 17580, model null, 2026-11-03T21:35:34.630Z). Production rationale: The auction source sells one whisky Bottle. The SMWS product listing supports Cocoa drift, Batch 35, blended malt, 11 years, 50% ABV, and Society Solera; its product details also give a 2014 distillation year. No inspected local candidate is this release: Bottle 51610 is The Five Regions, Batch 39. Create the distinct Batch 35 Bottle. Checked 2026-11-03. Lot page and photo: The Scotch Malt Whisky Society \"Cocoa Drift\", blended malt Scotch whisky, 11 years aged, drawn from the SMWS whisky solera, 50.0% vol, 70cl; title says Batch #35. The identity model keeps batch codes out of the name. Production named it \"Cocoa drift 11-year-old (Batch 35)\". No Cocoa Drift Bottle exists; 51610 is a different SMWS blend (The Five Regions)."
+  },
+  "expected": {
+    "status": "classified",
+    "action": "create_bottle",
+    "identityScope": "product",
+    "matchedBottleId": null,
+    "proposedBottle": {
+      "brand": {
+        "id": 4263
+      },
+      "statedAge": 11,
+      "abv": 50
+    },
+    "proposedBottleNameOneOf": ["Cocoa Drift", "Cocoa Drift 11-year-old"],
+    "proposedBottleNameExcludes": ["Batch", "35"],
+    "summary": "Create SMWS Cocoa Drift, an 11-year-old blended malt at 50%; the batch belongs in edition, not the name."
+  },
+  "knownFailure": {
+    "reason": "The create puts the batch in the name ('Cocoa drift (Batch 35)') instead of the edition."
+  }
+}

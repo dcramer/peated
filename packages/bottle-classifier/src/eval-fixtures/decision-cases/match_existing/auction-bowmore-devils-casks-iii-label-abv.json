@@ -1,0 +1,945 @@
+{
+  "id": "auction-bowmore-devils-casks-iii-label-abv",
+  "name": "auction lot photo: the label's 56.7% settles Bowmore The Devil's Casks III against the lot text's 57.6%",
+  "input": {
+    "reference": {
+      "id": 14230,
+      "url": "https://www.scotchwhiskyauctions.com/auctions/234-the-185th-auction/906117-bowmore-devils-cask-10-year-old-batch-3/",
+      "name": "Bowmore Devil’s Cask 10 Year Old Batch #3",
+      "imageUrl": "https://d3suvtcq00dftb.cloudfront.net/images/afc468e6047e17346ceb9e3f2121b1fc-zoom.jpg",
+      "externalSiteId": 28097,
+      "currentBottleId": null
+    },
+    "extractedIdentity": {
+      "abv": 57.6,
+      "brand": null,
+      "series": null,
+      "bottler": null,
+      "edition": null,
+      "outturn": null,
+      "category": null,
+      "distillery": null,
+      "expression": null,
+      "maturation": null,
+      "stated_age": null,
+      "cask_number": null,
+      "single_cask": null,
+      "release_year": null,
+      "vintage_year": null,
+      "cask_strength": null
+    },
+    "imageEvidence": null,
+    "initialCandidates": [
+      {
+        "abv": null,
+        "brand": "Bowmore",
+        "score": 69.76065,
+        "series": null,
+        "source": ["vector", "text", "context"],
+        "bottler": null,
+        "edition": null,
+        "outturn": null,
+        "bottleId": 16833,
+        "category": "single_malt",
+        "fullName": "Bowmore Devil's Casks 10-year-old",
+        "reference": "Bowmore Devil's Casks 10-year-old, 56.9%",
+        "statedAge": 10,
+        "caskNumber": null,
+        "comparison": {
+          "missing": ["abv"],
+          "conflicts": [],
+          "agreements": []
+        },
+        "distillery": ["Bowmore"],
+        "maturation": null,
+        "releaseDay": null,
+        "singleCask": null,
+        "releaseYear": null,
+        "vintageYear": null,
+        "bottlingYear": null,
+        "caskStrength": null,
+        "releaseMonth": null,
+        "familyContext": {
+          "siblingBottles": []
+        }
+      },
+      {
+        "abv": null,
+        "brand": "Bowmore",
+        "score": 67.47511,
+        "series": null,
+        "source": ["vector", "text", "context"],
+        "bottler": null,
+        "edition": null,
+        "outturn": null,
+        "bottleId": 16547,
+        "category": "single_malt",
+        "fullName": "Bowmore Devil's Cask (Batch 2)",
+        "reference": "Bowmore Devil's Cask Batch 2, 56.3%",
+        "statedAge": null,
+        "caskNumber": null,
+        "comparison": {
+          "missing": ["abv"],
+          "conflicts": [],
+          "agreements": []
+        },
+        "distillery": ["Bowmore"],
+        "maturation": null,
+        "releaseDay": null,
+        "singleCask": null,
+        "releaseYear": null,
+        "vintageYear": null,
+        "bottlingYear": null,
+        "caskStrength": null,
+        "releaseMonth": null,
+        "familyContext": {
+          "siblingBottles": []
+        }
+      },
+      {
+        "abv": null,
+        "brand": "Bowmore",
+        "score": 66.757545,
+        "series": null,
+        "source": ["text"],
+        "bottler": null,
+        "edition": null,
+        "outturn": null,
+        "bottleId": 4218,
+        "category": "single_malt",
+        "fullName": "Bowmore 10-year-old The Devil's Casks - Small Batch Release",
+        "reference": null,
+        "statedAge": 10,
+        "caskNumber": null,
+        "comparison": {
+          "missing": ["abv"],
+          "conflicts": [],
+          "agreements": []
+        },
+        "distillery": ["Bowmore"],
+        "maturation": null,
+        "releaseDay": null,
+        "singleCask": null,
+        "releaseYear": null,
+        "vintageYear": null,
+        "bottlingYear": null,
+        "caskStrength": null,
+        "releaseMonth": null,
+        "familyContext": {
+          "siblingBottles": []
+        }
+      },
+      {
+        "abv": null,
+        "brand": "Bowmore",
+        "score": 65.13377,
+        "series": null,
+        "source": ["vector", "text"],
+        "bottler": null,
+        "edition": null,
+        "outturn": null,
+        "bottleId": 17193,
+        "category": "single_malt",
+        "fullName": "Bowmore 10-year-old Tempest (Batch 3)",
+        "reference": "Bowmore 10-year-old Tempest (Batch 3), 55.6%",
+        "statedAge": 10,
+        "caskNumber": null,
+        "comparison": {
+          "missing": ["abv"],
+          "conflicts": [],
+          "agreements": []
+        },
+        "distillery": ["Bowmore"],
+        "maturation": null,
+        "releaseDay": null,
+        "singleCask": null,
+        "releaseYear": null,
+        "vintageYear": null,
+        "bottlingYear": null,
+        "caskStrength": null,
+        "releaseMonth": null,
+        "familyContext": {
+          "siblingBottles": []
+        }
+      },
+      {
+        "abv": null,
+        "brand": "Bowmore",
+        "score": 64.989136,
+        "series": null,
+        "source": ["text"],
+        "bottler": null,
+        "edition": null,
+        "outturn": null,
+        "bottleId": 3980,
+        "category": "single_malt",
+        "fullName": "Bowmore 10-year-old The Devil's Casks - Small Batch Release II",
+        "reference": null,
+        "statedAge": 10,
+        "caskNumber": null,
+        "comparison": {
+          "missing": ["abv"],
+          "conflicts": [],
+          "agreements": []
+        },
+        "distillery": ["Bowmore"],
+        "maturation": null,
+        "releaseDay": null,
+        "singleCask": null,
+        "releaseYear": null,
+        "vintageYear": null,
+        "bottlingYear": null,
+        "caskStrength": null,
+        "releaseMonth": null,
+        "familyContext": {
+          "siblingBottles": []
+        }
+      },
+      {
+        "abv": null,
+        "brand": "Bowmore",
+        "score": 54.009277,
+        "series": null,
+        "source": ["text"],
+        "bottler": null,
+        "edition": null,
+        "outturn": null,
+        "bottleId": 3416,
+        "category": "single_malt",
+        "fullName": "Bowmore 10-year-old Inspired by the Devil's Casks Series",
+        "reference": null,
+        "statedAge": 10,
+        "caskNumber": null,
+        "comparison": {
+          "missing": ["abv"],
+          "conflicts": [],
+          "agreements": []
+        },
+        "distillery": ["Bowmore"],
+        "maturation": null,
+        "releaseDay": null,
+        "singleCask": null,
+        "releaseYear": null,
+        "vintageYear": null,
+        "bottlingYear": null,
+        "caskStrength": null,
+        "releaseMonth": null,
+        "familyContext": {
+          "siblingBottles": []
+        }
+      },
+      {
+        "abv": null,
+        "brand": "Bowmore",
+        "score": 53.9573,
+        "series": null,
+        "source": ["vector", "text"],
+        "bottler": null,
+        "edition": "Batch 3",
+        "outturn": null,
+        "bottleId": 45026,
+        "category": "single_malt",
+        "fullName": "Bowmore Laimrig - Batch 3",
+        "reference": "Bowmore 15-year-old Laimrig, 53.7%",
+        "statedAge": 15,
+        "caskNumber": null,
+        "comparison": {
+          "missing": ["abv"],
+          "conflicts": [],
+          "agreements": []
+        },
+        "distillery": ["Bowmore"],
+        "maturation": null,
+        "releaseDay": null,
+        "singleCask": null,
+        "releaseYear": null,
+        "vintageYear": null,
+        "bottlingYear": null,
+        "caskStrength": null,
+        "releaseMonth": null,
+        "familyContext": {
+          "siblingBottles": [
+            {
+              "abv": null,
+              "edition": "Batch 2",
+              "outturn": null,
+              "bottleId": 45024,
+              "fullName": "Bowmore Laimrig - Batch 2",
+              "statedAge": 15,
+              "caskNumber": null,
+              "maturation": null,
+              "releaseDay": null,
+              "singleCask": null,
+              "releaseYear": null,
+              "traitFields": ["edition", "statedAge"],
+              "vintageYear": null,
+              "bottlingYear": null,
+              "caskStrength": null,
+              "releaseMonth": null
+            },
+            {
+              "abv": null,
+              "edition": "Batch 4",
+              "outturn": null,
+              "bottleId": 45025,
+              "fullName": "Bowmore Laimrig - Batch 4",
+              "statedAge": 15,
+              "caskNumber": null,
+              "maturation": null,
+              "releaseDay": null,
+              "singleCask": null,
+              "releaseYear": null,
+              "traitFields": ["edition", "statedAge"],
+              "vintageYear": null,
+              "bottlingYear": null,
+              "caskStrength": null,
+              "releaseMonth": null
+            },
+            {
+              "abv": 54.4,
+              "edition": "Fèis Ìle 2011",
+              "outturn": 500,
+              "bottleId": 44032,
+              "fullName": "Bowmore Laimrig - Fèis Ìle 2011",
+              "statedAge": 15,
+              "caskNumber": null,
+              "maturation": null,
+              "releaseDay": null,
+              "singleCask": null,
+              "releaseYear": 2011,
+              "traitFields": ["edition", "statedAge", "releaseYear", "abv"],
+              "vintageYear": null,
+              "bottlingYear": 2011,
+              "caskStrength": null,
+              "releaseMonth": null
+            }
+          ]
+        }
+      },
+      {
+        "abv": null,
+        "brand": "Bowmore",
+        "score": 53.120796,
+        "series": null,
+        "source": ["vector", "text", "context"],
+        "bottler": null,
+        "edition": null,
+        "outturn": null,
+        "bottleId": 16129,
+        "category": "single_malt",
+        "fullName": "Bowmore The Devil's Casks III",
+        "reference": "Bowmore The Devil's Casks III, 56.7%",
+        "statedAge": null,
+        "caskNumber": null,
+        "comparison": {
+          "missing": ["abv"],
+          "conflicts": [],
+          "agreements": []
+        },
+        "distillery": ["Bowmore"],
+        "maturation": null,
+        "releaseDay": null,
+        "singleCask": null,
+        "releaseYear": null,
+        "vintageYear": null,
+        "bottlingYear": null,
+        "caskStrength": null,
+        "releaseMonth": null,
+        "familyContext": {
+          "siblingBottles": []
+        }
+      },
+      {
+        "abv": null,
+        "brand": "Bowmore",
+        "score": 46.853394,
+        "series": null,
+        "source": ["text"],
+        "bottler": null,
+        "edition": null,
+        "outturn": null,
+        "bottleId": 4580,
+        "category": "single_malt",
+        "fullName": "Bowmore Tempest Small Batch Release No. 3",
+        "reference": null,
+        "statedAge": 10,
+        "caskNumber": null,
+        "comparison": {
+          "missing": ["abv"],
+          "conflicts": [],
+          "agreements": []
+        },
+        "distillery": ["Bowmore"],
+        "maturation": null,
+        "releaseDay": null,
+        "singleCask": null,
+        "releaseYear": null,
+        "vintageYear": null,
+        "bottlingYear": null,
+        "caskStrength": null,
+        "releaseMonth": null,
+        "familyContext": {
+          "siblingBottles": []
+        }
+      },
+      {
+        "abv": 57.6,
+        "brand": "Single Cask Nation",
+        "score": 44.95802,
+        "series": null,
+        "source": ["text"],
+        "bottler": "Single Cask Nation",
+        "edition": "US Retail Release #3",
+        "outturn": null,
+        "bottleId": 47856,
+        "category": "single_malt",
+        "fullName": "Single Cask Nation Croftengea 2007 - US Retail Release #3",
+        "reference": null,
+        "statedAge": 10,
+        "caskNumber": "196",
+        "comparison": {
+          "missing": [],
+          "conflicts": [],
+          "agreements": ["abv"]
+        },
+        "distillery": ["Croftengea"],
+        "maturation": null,
+        "releaseDay": null,
+        "singleCask": true,
+        "releaseYear": null,
+        "vintageYear": 2007,
+        "bottlingYear": 2017,
+        "caskStrength": null,
+        "releaseMonth": null,
+        "familyContext": {
+          "siblingBottles": []
+        }
+      },
+      {
+        "abv": null,
+        "brand": "Bowmore",
+        "score": 43.57241,
+        "series": null,
+        "source": ["text"],
+        "bottler": null,
+        "edition": null,
+        "outturn": null,
+        "bottleId": 3699,
+        "category": "single_malt",
+        "fullName": "Bowmore The Devil's Casks - Limited Release III Limited Edition",
+        "reference": null,
+        "statedAge": null,
+        "caskNumber": null,
+        "comparison": {
+          "missing": ["abv"],
+          "conflicts": [],
+          "agreements": []
+        },
+        "distillery": ["Bowmore"],
+        "maturation": null,
+        "releaseDay": null,
+        "singleCask": null,
+        "releaseYear": null,
+        "vintageYear": null,
+        "bottlingYear": null,
+        "caskStrength": null,
+        "releaseMonth": null,
+        "familyContext": {
+          "siblingBottles": []
+        }
+      },
+      {
+        "abv": null,
+        "brand": "Arran",
+        "score": 43.12809,
+        "series": null,
+        "source": ["text"],
+        "bottler": "Arran",
+        "edition": null,
+        "outturn": null,
+        "bottleId": 3961,
+        "category": "single_malt",
+        "fullName": "Arran The Devil's Punch Bowl 3 Limited Edition",
+        "reference": null,
+        "statedAge": null,
+        "caskNumber": null,
+        "comparison": {
+          "missing": ["abv"],
+          "conflicts": [],
+          "agreements": []
+        },
+        "distillery": [],
+        "maturation": null,
+        "releaseDay": null,
+        "singleCask": null,
+        "releaseYear": null,
+        "vintageYear": null,
+        "bottlingYear": null,
+        "caskStrength": null,
+        "releaseMonth": null,
+        "familyContext": {
+          "siblingBottles": []
+        }
+      },
+      {
+        "abv": 57.6,
+        "brand": "Single Cask Nation",
+        "score": 37.821854,
+        "series": null,
+        "source": ["text"],
+        "bottler": "Single Cask Nation",
+        "edition": "Global Release #3",
+        "outturn": null,
+        "bottleId": 47947,
+        "category": "single_malt",
+        "fullName": "Single Cask Nation Paul John 2016 - Global Release #3",
+        "reference": null,
+        "statedAge": 4,
+        "caskNumber": "7498",
+        "comparison": {
+          "missing": [],
+          "conflicts": [],
+          "agreements": ["abv"]
+        },
+        "distillery": ["Paul John"],
+        "maturation": null,
+        "releaseDay": null,
+        "singleCask": true,
+        "releaseYear": null,
+        "vintageYear": 2016,
+        "bottlingYear": 2021,
+        "caskStrength": null,
+        "releaseMonth": null,
+        "familyContext": {
+          "siblingBottles": []
+        }
+      },
+      {
+        "abv": 57.6,
+        "brand": "Edradour",
+        "score": 36.511707,
+        "series": null,
+        "source": ["text"],
+        "bottler": "Edradour",
+        "edition": "Batch 2",
+        "outturn": null,
+        "bottleId": 45582,
+        "category": "single_malt",
+        "fullName": "Edradour Cask Strength - Batch 2 - 12-year-old - 2011 Vintage - 57.6% ABV - Oloroso Cask - Butt",
+        "reference": null,
+        "statedAge": 12,
+        "caskNumber": null,
+        "comparison": {
+          "missing": [],
+          "conflicts": [],
+          "agreements": ["abv"]
+        },
+        "distillery": ["Edradour"],
+        "maturation": "oloroso",
+        "releaseDay": null,
+        "singleCask": false,
+        "releaseYear": null,
+        "vintageYear": 2011,
+        "bottlingYear": null,
+        "caskStrength": true,
+        "releaseMonth": null,
+        "familyContext": {
+          "siblingBottles": []
+        }
+      },
+      {
+        "abv": 57.6,
+        "brand": "Single Cask Nation",
+        "score": 35.409996,
+        "series": null,
+        "source": ["text"],
+        "bottler": "Single Cask Nation",
+        "edition": null,
+        "outturn": null,
+        "bottleId": 47770,
+        "category": "single_malt",
+        "fullName": "Single Cask Nation Caol Ila 2010 10-year-old",
+        "reference": null,
+        "statedAge": 10,
+        "caskNumber": "314028",
+        "comparison": {
+          "missing": [],
+          "conflicts": [],
+          "agreements": ["abv"]
+        },
+        "distillery": ["Caol Ila"],
+        "maturation": null,
+        "releaseDay": null,
+        "singleCask": true,
+        "releaseYear": 2021,
+        "vintageYear": 2010,
+        "bottlingYear": 2021,
+        "caskStrength": null,
+        "releaseMonth": null,
+        "familyContext": {
+          "siblingBottles": []
+        }
+      }
+    ]
+  },
+  "context": {
+    "inspectedBottleIds": [16129, 16547, 16833],
+    "bottleContexts": [
+      {
+        "exact": {
+          "abv": null,
+          "edition": null,
+          "outturn": null,
+          "statedAge": null,
+          "caskNumber": null,
+          "maturation": null,
+          "releaseDay": null,
+          "singleCask": null,
+          "releaseYear": null,
+          "vintageYear": null,
+          "bottlingYear": null,
+          "caskStrength": null,
+          "releaseMonth": null
+        },
+        "shared": {
+          "name": "The Devil's Casks III",
+          "brand": {
+            "name": "Bowmore",
+            "entityId": 394
+          },
+          "series": null,
+          "bottler": null,
+          "category": "single_malt",
+          "statedAge": null,
+          "distillers": [
+            {
+              "name": "Bowmore",
+              "entityId": 394
+            }
+          ]
+        },
+        "groupId": 14551,
+        "bottleId": 16129,
+        "fullName": "Bowmore The Devil's Casks III",
+        "siblings": [],
+        "references": [
+          {
+            "name": "Bowmore The Devil's Casks III",
+            "ignored": false
+          },
+          {
+            "name": "Bowmore The Devil's Casks III, 56.7%",
+            "ignored": false
+          }
+        ],
+        "observations": [],
+        "imageSources": []
+      },
+      {
+        "exact": {
+          "abv": null,
+          "edition": null,
+          "outturn": null,
+          "statedAge": null,
+          "caskNumber": null,
+          "maturation": null,
+          "releaseDay": null,
+          "singleCask": null,
+          "releaseYear": null,
+          "vintageYear": null,
+          "bottlingYear": null,
+          "caskStrength": null,
+          "releaseMonth": null
+        },
+        "shared": {
+          "name": "Devil's Cask (Batch 2)",
+          "brand": {
+            "name": "Bowmore",
+            "entityId": 394
+          },
+          "series": null,
+          "bottler": null,
+          "category": "single_malt",
+          "statedAge": null,
+          "distillers": [
+            {
+              "name": "Bowmore",
+              "entityId": 394
+            }
+          ]
+        },
+        "groupId": 14901,
+        "bottleId": 16547,
+        "fullName": "Bowmore Devil's Cask (Batch 2)",
+        "siblings": [],
+        "references": [
+          {
+            "name": "Bowmore Devil's Cask (Batch 2)",
+            "ignored": false
+          },
+          {
+            "name": "Bowmore Devil's Cask Batch 2",
+            "ignored": false
+          },
+          {
+            "name": "Bowmore Devil's Cask Batch 2, 56.3%",
+            "ignored": false
+          }
+        ],
+        "observations": [],
+        "imageSources": []
+      },
+      {
+        "exact": {
+          "abv": null,
+          "edition": null,
+          "outturn": null,
+          "statedAge": null,
+          "caskNumber": null,
+          "maturation": null,
+          "releaseDay": null,
+          "singleCask": null,
+          "releaseYear": null,
+          "vintageYear": null,
+          "bottlingYear": null,
+          "caskStrength": null,
+          "releaseMonth": null
+        },
+        "shared": {
+          "name": "Devil's Casks 10-year-old",
+          "brand": {
+            "name": "Bowmore",
+            "entityId": 394
+          },
+          "series": null,
+          "bottler": null,
+          "category": "single_malt",
+          "statedAge": 10,
+          "distillers": [
+            {
+              "name": "Bowmore",
+              "entityId": 394
+            }
+          ]
+        },
+        "groupId": 15157,
+        "bottleId": 16833,
+        "fullName": "Bowmore Devil's Casks 10-year-old",
+        "siblings": [],
+        "references": [
+          {
+            "name": "Bowmore Devil's Casks 10-year-old",
+            "ignored": false
+          },
+          {
+            "name": "Bowmore Devil's Casks 10-year-old, 56.9%",
+            "ignored": false
+          }
+        ],
+        "observations": [],
+        "imageSources": []
+      }
+    ],
+    "inspectedEntities": [
+      {
+        "kind": "bottler",
+        "name": "Single Cask Nation",
+        "score": 1,
+        "source": ["exact", "text", "prefix", "contained"],
+        "entityId": 365762,
+        "reference": "Single Cask Nation",
+        "shortName": null,
+        "retrievedFor": [
+          {
+            "exact": true,
+            "query": "Single Cask Nation"
+          }
+        ]
+      },
+      {
+        "kind": "brand",
+        "name": "Croftengea",
+        "score": 1,
+        "source": ["exact", "text", "prefix", "contained"],
+        "entityId": 863,
+        "reference": "Croftengea",
+        "shortName": "",
+        "retrievedFor": [
+          {
+            "exact": true,
+            "query": "Croftengea"
+          }
+        ]
+      },
+      {
+        "kind": "brand",
+        "name": "Paul John",
+        "score": 1,
+        "source": ["exact", "text", "prefix", "contained"],
+        "entityId": 1252,
+        "reference": "Paul John",
+        "shortName": "",
+        "retrievedFor": [
+          {
+            "exact": true,
+            "query": "Paul John"
+          }
+        ]
+      },
+      {
+        "kind": "distillery",
+        "name": "Edradour",
+        "score": 1,
+        "source": ["exact", "text", "prefix", "contained"],
+        "entityId": 405,
+        "reference": "Edradour",
+        "shortName": null,
+        "retrievedFor": [
+          {
+            "exact": true,
+            "query": "Edradour"
+          }
+        ]
+      },
+      {
+        "kind": "distillery",
+        "name": "Caol Ila",
+        "score": 1,
+        "source": ["exact", "text", "prefix", "contained"],
+        "entityId": 366,
+        "reference": "Caol Ila",
+        "shortName": "",
+        "retrievedFor": [
+          {
+            "exact": true,
+            "query": "Caol Ila"
+          }
+        ]
+      },
+      {
+        "kind": "distillery",
+        "name": "Bowmore",
+        "score": 1,
+        "source": ["exact", "text", "prefix", "contained"],
+        "entityId": 394,
+        "reference": "Bowmore",
+        "shortName": null,
+        "retrievedFor": [
+          {
+            "exact": true,
+            "query": "Bowmore"
+          }
+        ]
+      },
+      {
+        "kind": "brand",
+        "name": "Arran",
+        "score": 1,
+        "source": ["exact", "text", "prefix", "contained"],
+        "entityId": 112,
+        "reference": "Arran",
+        "shortName": null,
+        "retrievedFor": [
+          {
+            "exact": true,
+            "query": "Arran"
+          }
+        ]
+      },
+      {
+        "kind": "distillery",
+        "name": "Paul John Distillery",
+        "score": 0.5,
+        "source": ["text", "prefix"],
+        "entityId": 366602,
+        "reference": "Paul John Distillery",
+        "shortName": null,
+        "retrievedFor": [
+          {
+            "query": "Paul John"
+          }
+        ]
+      },
+      {
+        "kind": "company",
+        "name": "Whisk-e Limited",
+        "score": 0.5,
+        "source": ["text", "prefix"],
+        "entityId": 5381,
+        "reference": "Arran Japan Limited",
+        "shortName": null,
+        "retrievedFor": [
+          {
+            "query": "Arran"
+          }
+        ]
+      },
+      {
+        "kind": "brand",
+        "name": "The Single Cask",
+        "score": 0.375,
+        "source": ["contained"],
+        "entityId": 366640,
+        "reference": "Single Cask",
+        "shortName": null,
+        "retrievedFor": [
+          {
+            "query": "Single Cask Nation"
+          }
+        ]
+      },
+      {
+        "kind": "company",
+        "name": "Morrison Bowmore Distillers Ltd",
+        "score": 0.2,
+        "source": ["text"],
+        "entityId": 5684,
+        "reference": null,
+        "shortName": null,
+        "retrievedFor": [
+          {
+            "query": "Bowmore"
+          }
+        ]
+      },
+      {
+        "kind": "company",
+        "name": "Isle of Arran Distillers",
+        "score": 0.2,
+        "source": ["text"],
+        "entityId": 5872,
+        "reference": null,
+        "shortName": "Isle of Arran",
+        "retrievedFor": [
+          {
+            "query": "Arran"
+          }
+        ]
+      }
+    ],
+    "inspectedSeries": []
+  },
+  "provenance": {
+    "source": "production_miss",
+    "verifiedSourceUrls": [
+      "https://www.scotchwhiskyauctions.com/auctions/234-the-185th-auction/906117-bowmore-devils-cask-10-year-old-batch-3/",
+      "https://d3suvtcq00dftb.cloudfront.net/images/afc468e6047e17346ceb9e3f2121b1fc-zoom.jpg"
+    ],
+    "dbOutcome": {
+      "bottleId": null,
+      "createsBottle": false,
+      "summary": "Production returned no_match: it named 16129 as the strongest candidate but held it because the lot's structured ABV (57.6%) conflicted with a 56.7% reference."
+    },
+    "notes": "Saved check 34500, source auction_lot 14230 (lot 185-906117), run 2026-11-03. Production ran without the lot photo: input.reference.imageUrl was null. This case sets it to the lot's first photo at full size and adds that photo's reviewed label reading; it goes in with the change that makes auctions read the lot photo. The stored sourceImageUrl is the 224px `-med` copy, too small to read the ABV. The photo clearly shows the bottle and carton: Bowmore Islay Single Malt Scotch Whisky, The Devil's Casks, Limited Release III, Double the Devil, a marriage of first fill Oloroso & Pedro Ximenez sherry casks, non chill-filtered, 700 ml, alc. 56.7% vol. The front prints no age; the title's '10 Year Old' is the auction's wording. 16833 (The Devil's Casks 10-year-old, the first release) and 16547 (Batch 2) are the other releases. 16129 has no stored ABV, so nothing conflicts with the label."
+  },
+  "expected": {
+    "status": "classified",
+    "action": "match",
+    "identityScope": "product",
+    "matchedBottleId": 16129,
+    "summary": "Match Bowmore The Devil's Casks III (16129). The label photo prints The Devil's Casks Limited Release III at 56.7%; the lot text's 57.6% is a transposed-digit typo, not a separate release."
+  },
+  "knownFailure": {
+    "reason": "With the label photo, the agent still lets the lot text's 57.6% typo block the match the label's 56.7% settles."
+  }
+}

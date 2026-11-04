@@ -1,0 +1,948 @@
+{
+  "id": "review-diageo-rare-series-caol-ila-1983-brand",
+  "name": "Review: Rare Series is the Brand for a Caol Ila 1983 owner collection release",
+  "input": {
+    "reference": {
+      "id": 19058,
+      "url": "https://whiskyadvocate.com/Diageo-Rare-Series-42-year-old-Caol-Ila-1983-Vintage-56-4",
+      "name": "Diageo Rare Series 42 year old Caol Ila 1983 Vintage, 56.4%",
+      "imageUrl": null,
+      "externalSiteId": 5,
+      "currentBottleId": null
+    },
+    "extractedIdentity": {
+      "abv": 56.4,
+      "brand": "Caol Ila",
+      "series": "Rare Series",
+      "bottler": null,
+      "edition": null,
+      "outturn": null,
+      "category": null,
+      "distillery": ["Caol Ila"],
+      "expression": null,
+      "maturation": null,
+      "stated_age": 42,
+      "cask_number": null,
+      "release_day": null,
+      "single_cask": null,
+      "release_year": null,
+      "vintage_year": 1983,
+      "bottling_year": null,
+      "cask_strength": null,
+      "release_month": null
+    },
+    "imageEvidence": null,
+    "initialCandidates": [
+      {
+        "abv": 56.4,
+        "brand": "Rare Series",
+        "score": 203.60638,
+        "series": null,
+        "source": ["vector", "text", "context"],
+        "bottler": null,
+        "edition": null,
+        "outturn": 318,
+        "bottleId": 47474,
+        "category": "single_malt",
+        "fullName": "Rare Series Caol Ila 1983",
+        "reference": "Caol Ila Rare Series - 42-year-old - 2026 Release - 1983 Vintage - 56.4% ABV",
+        "statedAge": 42,
+        "caskNumber": null,
+        "comparison": {
+          "missing": ["series"],
+          "conflicts": ["brand"],
+          "agreements": ["statedAge", "abv", "vintageYear", "distillers"]
+        },
+        "distillery": ["Caol Ila"],
+        "maturation": "American oak casks, married in European oak puncheons",
+        "releaseDay": 30,
+        "singleCask": false,
+        "releaseYear": 2026,
+        "vintageYear": 1983,
+        "bottlingYear": 2026,
+        "caskStrength": null,
+        "releaseMonth": 4,
+        "familyContext": {
+          "siblingBottles": []
+        }
+      },
+      {
+        "abv": 49.5,
+        "brand": "Rare Series",
+        "score": 119.89047,
+        "series": null,
+        "source": ["text", "vector"],
+        "bottler": null,
+        "edition": null,
+        "outturn": 160,
+        "bottleId": 47488,
+        "category": "single_malt",
+        "fullName": "Rare Series Clynelish 1983",
+        "reference": "Clynelish 42-year-old 1983/2026 (49.5%, OB, Rare Series, refill American oak hogshead, 160 bottles)",
+        "statedAge": 42,
+        "caskNumber": null,
+        "comparison": {
+          "missing": ["series"],
+          "conflicts": ["abv", "brand", "distillers"],
+          "agreements": ["statedAge", "vintageYear"]
+        },
+        "distillery": ["Clynelish"],
+        "maturation": "Refill American oak hogsheads",
+        "releaseDay": 30,
+        "singleCask": false,
+        "releaseYear": 2026,
+        "vintageYear": 1983,
+        "bottlingYear": 2026,
+        "caskStrength": null,
+        "releaseMonth": 4,
+        "familyContext": {
+          "siblingBottles": []
+        }
+      },
+      {
+        "abv": null,
+        "brand": "Caol Ila",
+        "score": 62.224163,
+        "series": null,
+        "source": ["text", "brand"],
+        "bottler": "Bladnoch Forum",
+        "edition": null,
+        "outturn": null,
+        "bottleId": 1052,
+        "category": "single_malt",
+        "fullName": "Caol Ila 1983 BF",
+        "reference": null,
+        "statedAge": 18,
+        "caskNumber": null,
+        "comparison": {
+          "missing": ["abv", "vintageYear", "series"],
+          "conflicts": ["statedAge"],
+          "agreements": ["brand", "distillers"]
+        },
+        "distillery": ["Caol Ila"],
+        "maturation": null,
+        "releaseDay": null,
+        "singleCask": null,
+        "releaseYear": null,
+        "vintageYear": null,
+        "bottlingYear": null,
+        "caskStrength": null,
+        "releaseMonth": null,
+        "familyContext": {
+          "siblingBottles": []
+        }
+      },
+      {
+        "abv": null,
+        "brand": "Caol Ila",
+        "score": 59.153564,
+        "series": null,
+        "source": ["text", "brand"],
+        "bottler": "Wemyss Malts",
+        "edition": null,
+        "outturn": null,
+        "bottleId": 2736,
+        "category": "single_malt",
+        "fullName": "Caol Ila 1983 Wy Smoky Nectar",
+        "reference": null,
+        "statedAge": null,
+        "caskNumber": null,
+        "comparison": {
+          "missing": ["statedAge", "abv", "vintageYear", "series"],
+          "conflicts": [],
+          "agreements": ["brand", "distillers"]
+        },
+        "distillery": ["Caol Ila"],
+        "maturation": null,
+        "releaseDay": null,
+        "singleCask": null,
+        "releaseYear": null,
+        "vintageYear": null,
+        "bottlingYear": null,
+        "caskStrength": null,
+        "releaseMonth": null,
+        "familyContext": {
+          "siblingBottles": []
+        }
+      },
+      {
+        "abv": null,
+        "brand": "Lonach",
+        "score": 55.282738,
+        "series": null,
+        "source": ["text"],
+        "bottler": null,
+        "edition": null,
+        "outturn": null,
+        "bottleId": 17658,
+        "category": "single_malt",
+        "fullName": "Lonach 42-year-old (distilled at Strathisla)",
+        "reference": null,
+        "statedAge": 42,
+        "caskNumber": null,
+        "comparison": {
+          "missing": ["abv", "vintageYear", "series", "distillers"],
+          "conflicts": ["brand"],
+          "agreements": ["statedAge"]
+        },
+        "distillery": [],
+        "maturation": null,
+        "releaseDay": null,
+        "singleCask": null,
+        "releaseYear": null,
+        "vintageYear": null,
+        "bottlingYear": null,
+        "caskStrength": null,
+        "releaseMonth": null,
+        "familyContext": {
+          "siblingBottles": []
+        }
+      },
+      {
+        "abv": null,
+        "brand": "Wigle",
+        "score": 54.66765,
+        "series": null,
+        "source": ["text"],
+        "bottler": null,
+        "edition": null,
+        "outturn": null,
+        "bottleId": 16476,
+        "category": "rye",
+        "fullName": "Wigle Small Cask Series Rye",
+        "reference": null,
+        "statedAge": null,
+        "caskNumber": null,
+        "comparison": {
+          "missing": [
+            "statedAge",
+            "abv",
+            "vintageYear",
+            "series",
+            "distillers"
+          ],
+          "conflicts": ["brand"],
+          "agreements": []
+        },
+        "distillery": [],
+        "maturation": null,
+        "releaseDay": null,
+        "singleCask": null,
+        "releaseYear": null,
+        "vintageYear": null,
+        "bottlingYear": null,
+        "caskStrength": null,
+        "releaseMonth": null,
+        "familyContext": {
+          "siblingBottles": []
+        }
+      },
+      {
+        "abv": 49.3,
+        "brand": "The Singleton of Glen Ord",
+        "score": 51.75586,
+        "series": "The Forgotten Drop Series",
+        "source": ["text"],
+        "bottler": null,
+        "edition": null,
+        "outturn": 600,
+        "bottleId": 67334,
+        "category": "single_malt",
+        "fullName": "The Singleton of Glen Ord 42-year-old",
+        "reference": null,
+        "statedAge": 42,
+        "caskNumber": null,
+        "comparison": {
+          "missing": ["vintageYear"],
+          "conflicts": ["abv", "brand", "series", "distillers"],
+          "agreements": ["statedAge"]
+        },
+        "distillery": ["Glen Ord"],
+        "maturation": "Amontillado sherry cask finish",
+        "releaseDay": null,
+        "singleCask": null,
+        "releaseYear": 2018,
+        "vintageYear": null,
+        "bottlingYear": 2018,
+        "caskStrength": true,
+        "releaseMonth": null,
+        "familyContext": {
+          "siblingBottles": []
+        }
+      },
+      {
+        "abv": null,
+        "brand": "Canadian Club",
+        "score": 51.68731,
+        "series": null,
+        "source": ["text"],
+        "bottler": null,
+        "edition": null,
+        "outturn": null,
+        "bottleId": 13750,
+        "category": null,
+        "fullName": "Canadian Club Chronicles 42-year-old The Dock Man",
+        "reference": null,
+        "statedAge": 42,
+        "caskNumber": null,
+        "comparison": {
+          "missing": ["abv", "vintageYear", "series", "distillers"],
+          "conflicts": ["brand"],
+          "agreements": ["statedAge"]
+        },
+        "distillery": [],
+        "maturation": null,
+        "releaseDay": null,
+        "singleCask": null,
+        "releaseYear": null,
+        "vintageYear": null,
+        "bottlingYear": null,
+        "caskStrength": null,
+        "releaseMonth": null,
+        "familyContext": {
+          "siblingBottles": []
+        }
+      },
+      {
+        "abv": null,
+        "brand": "That Boutique-y Whisky Company",
+        "score": 49.95626,
+        "series": null,
+        "source": ["text"],
+        "bottler": null,
+        "edition": null,
+        "outturn": null,
+        "bottleId": 14333,
+        "category": "single_grain",
+        "fullName": "TBWC 42-year-old (distilled at Invergordon)",
+        "reference": null,
+        "statedAge": 42,
+        "caskNumber": null,
+        "comparison": {
+          "missing": ["abv", "vintageYear", "series", "distillers"],
+          "conflicts": ["brand"],
+          "agreements": ["statedAge"]
+        },
+        "distillery": [],
+        "maturation": null,
+        "releaseDay": null,
+        "singleCask": null,
+        "releaseYear": null,
+        "vintageYear": null,
+        "bottlingYear": null,
+        "caskStrength": null,
+        "releaseMonth": null,
+        "familyContext": {
+          "siblingBottles": []
+        }
+      },
+      {
+        "abv": null,
+        "brand": "Orphan Barrel",
+        "score": 48.010536,
+        "series": null,
+        "source": ["text"],
+        "bottler": null,
+        "edition": null,
+        "outturn": null,
+        "bottleId": 14476,
+        "category": null,
+        "fullName": "Orphan Barrel Whoop & Holler",
+        "reference": null,
+        "statedAge": null,
+        "caskNumber": null,
+        "comparison": {
+          "missing": [
+            "category",
+            "statedAge",
+            "abv",
+            "vintageYear",
+            "releaseYear",
+            "singleCask",
+            "series",
+            "distillers"
+          ],
+          "conflicts": ["brand"],
+          "agreements": []
+        },
+        "distillery": [],
+        "maturation": null,
+        "releaseDay": null,
+        "singleCask": null,
+        "releaseYear": null,
+        "vintageYear": null,
+        "bottlingYear": null,
+        "caskStrength": null,
+        "releaseMonth": null,
+        "familyContext": {
+          "siblingBottles": []
+        }
+      },
+      {
+        "abv": null,
+        "brand": "Ransom",
+        "score": 47.957886,
+        "series": null,
+        "source": ["text"],
+        "bottler": null,
+        "edition": null,
+        "outturn": null,
+        "bottleId": 11883,
+        "category": null,
+        "fullName": "Ransom WhipperSnapper",
+        "reference": null,
+        "statedAge": null,
+        "caskNumber": null,
+        "comparison": {
+          "missing": [
+            "statedAge",
+            "abv",
+            "vintageYear",
+            "series",
+            "distillers"
+          ],
+          "conflicts": ["brand"],
+          "agreements": []
+        },
+        "distillery": [],
+        "maturation": null,
+        "releaseDay": null,
+        "singleCask": null,
+        "releaseYear": null,
+        "vintageYear": null,
+        "bottlingYear": null,
+        "caskStrength": null,
+        "releaseMonth": null,
+        "familyContext": {
+          "siblingBottles": []
+        }
+      },
+      {
+        "abv": null,
+        "brand": "Fettercairn",
+        "score": 47.280582,
+        "series": null,
+        "source": ["text"],
+        "bottler": null,
+        "edition": null,
+        "outturn": null,
+        "bottleId": 16426,
+        "category": "single_malt",
+        "fullName": "Fettercairn Fasque",
+        "reference": null,
+        "statedAge": null,
+        "caskNumber": null,
+        "comparison": {
+          "missing": ["statedAge", "abv", "vintageYear", "series"],
+          "conflicts": ["brand", "distillers"],
+          "agreements": []
+        },
+        "distillery": ["Fettercairn"],
+        "maturation": null,
+        "releaseDay": null,
+        "singleCask": null,
+        "releaseYear": null,
+        "vintageYear": null,
+        "bottlingYear": null,
+        "caskStrength": null,
+        "releaseMonth": null,
+        "familyContext": {
+          "siblingBottles": []
+        }
+      },
+      {
+        "abv": null,
+        "brand": "Caol Ila",
+        "score": 47.145386,
+        "series": null,
+        "source": ["text"],
+        "bottler": "North Star Spirits",
+        "edition": null,
+        "outturn": null,
+        "bottleId": 2009,
+        "category": "single_malt",
+        "fullName": "Caol Ila 2009 NSS Cask Series 011",
+        "reference": null,
+        "statedAge": 11,
+        "caskNumber": null,
+        "comparison": {
+          "missing": ["abv", "vintageYear", "series"],
+          "conflicts": ["statedAge"],
+          "agreements": ["brand", "distillers"]
+        },
+        "distillery": ["Caol Ila"],
+        "maturation": null,
+        "releaseDay": null,
+        "singleCask": null,
+        "releaseYear": null,
+        "vintageYear": null,
+        "bottlingYear": null,
+        "caskStrength": null,
+        "releaseMonth": null,
+        "familyContext": {
+          "siblingBottles": []
+        }
+      },
+      {
+        "abv": null,
+        "brand": "Caol Ila",
+        "score": 47.08627,
+        "series": null,
+        "source": ["vector", "text"],
+        "bottler": null,
+        "edition": null,
+        "outturn": null,
+        "bottleId": 18746,
+        "category": "single_malt",
+        "fullName": "Caol Ila 12-year-old",
+        "reference": "Caol Ila 12-year-old, 43%",
+        "statedAge": 12,
+        "caskNumber": null,
+        "comparison": {
+          "missing": ["abv", "vintageYear", "series"],
+          "conflicts": ["statedAge"],
+          "agreements": ["brand", "distillers"]
+        },
+        "distillery": ["Caol Ila"],
+        "maturation": null,
+        "releaseDay": null,
+        "singleCask": null,
+        "releaseYear": null,
+        "vintageYear": null,
+        "bottlingYear": null,
+        "caskStrength": null,
+        "releaseMonth": null,
+        "familyContext": {
+          "siblingBottles": []
+        }
+      },
+      {
+        "abv": 44.1,
+        "brand": "That Boutique-y Whisky Company",
+        "score": 46.81131,
+        "series": null,
+        "source": ["text"],
+        "bottler": "That Boutique-y Whisky Company",
+        "edition": "Batch 1",
+        "outturn": null,
+        "bottleId": 58422,
+        "category": "blend",
+        "fullName": "TBWC Cutler & Stubbs 42-year-old - Batch 1",
+        "reference": null,
+        "statedAge": 42,
+        "caskNumber": null,
+        "comparison": {
+          "missing": ["vintageYear", "series", "distillers"],
+          "conflicts": ["abv", "brand"],
+          "agreements": ["statedAge"]
+        },
+        "distillery": [],
+        "maturation": null,
+        "releaseDay": null,
+        "singleCask": null,
+        "releaseYear": null,
+        "vintageYear": null,
+        "bottlingYear": null,
+        "caskStrength": null,
+        "releaseMonth": null,
+        "familyContext": {
+          "siblingBottles": []
+        }
+      },
+      {
+        "abv": null,
+        "brand": "Caol Ila",
+        "score": 0.7406038112699231,
+        "series": null,
+        "source": ["vector"],
+        "bottler": null,
+        "edition": null,
+        "outturn": null,
+        "bottleId": 17112,
+        "category": "single_malt",
+        "fullName": "Caol Ila Distillers Edition 1998",
+        "reference": "Caol Ila Distillers Edition 1998, 43%",
+        "statedAge": null,
+        "caskNumber": null,
+        "comparison": {
+          "missing": ["statedAge", "abv", "vintageYear", "series"],
+          "conflicts": [],
+          "agreements": ["brand", "distillers"]
+        },
+        "distillery": ["Caol Ila"],
+        "maturation": null,
+        "releaseDay": null,
+        "singleCask": null,
+        "releaseYear": null,
+        "vintageYear": null,
+        "bottlingYear": null,
+        "caskStrength": null,
+        "releaseMonth": null,
+        "familyContext": {
+          "siblingBottles": []
+        }
+      }
+    ]
+  },
+  "context": {
+    "inspectedBottleIds": [47474],
+    "bottleContexts": [
+      {
+        "exact": {
+          "abv": 56.4,
+          "edition": null,
+          "outturn": 318,
+          "statedAge": null,
+          "caskNumber": null,
+          "maturation": "American oak casks, married in European oak puncheons",
+          "releaseDay": 30,
+          "singleCask": false,
+          "releaseYear": 2026,
+          "vintageYear": 1983,
+          "bottlingYear": 2026,
+          "caskStrength": null,
+          "releaseMonth": 4
+        },
+        "shared": {
+          "name": "Caol Ila 1983",
+          "brand": {
+            "name": "Rare Series",
+            "entityId": 366604
+          },
+          "series": null,
+          "bottler": null,
+          "category": "single_malt",
+          "statedAge": 42,
+          "distillers": [
+            {
+              "name": "Caol Ila",
+              "entityId": 366
+            }
+          ]
+        },
+        "groupId": 20434,
+        "bottleId": 47474,
+        "fullName": "Rare Series Caol Ila 1983",
+        "siblings": [],
+        "references": [
+          {
+            "name": "Caol Ila 42-year-old 1983/2026 (56.4%, OB, Rare Series, refill American oak hogshead and European oak puncheons, 318 bottles)",
+            "ignored": false
+          },
+          {
+            "name": "Caol Ila Rare Series - 42-year-old - 2026 Release - 1983 Vintage - 56.4% ABV",
+            "ignored": false
+          }
+        ],
+        "observations": [],
+        "imageSources": [
+          {
+            "url": "https://api.peated.com/uploads/bottles-bif0lvssvymk0owbq0tqnel9.webp",
+            "source": {
+              "kind": "bottle"
+            },
+            "sourceUrl": null
+          }
+        ]
+      }
+    ],
+    "inspectedEntities": [
+      {
+        "kind": "distillery",
+        "name": "Caol Ila",
+        "score": 1,
+        "source": ["exact", "text", "prefix", "contained"],
+        "entityId": 366,
+        "reference": "Caol Ila",
+        "shortName": "",
+        "retrievedFor": [
+          {
+            "exact": true,
+            "query": "Caol Ila"
+          }
+        ]
+      },
+      {
+        "kind": "brand",
+        "name": "Rare Series",
+        "score": 1,
+        "source": ["exact", "text", "prefix", "contained"],
+        "entityId": 366604,
+        "reference": "Rare Series",
+        "shortName": null,
+        "retrievedFor": [
+          {
+            "exact": true,
+            "query": "Rare Series"
+          }
+        ]
+      },
+      {
+        "kind": "brand",
+        "name": "Lonach",
+        "score": 1,
+        "source": ["exact", "text", "prefix", "contained"],
+        "entityId": 3346,
+        "reference": "Lonach",
+        "shortName": null,
+        "retrievedFor": [
+          {
+            "exact": true,
+            "query": "Lonach"
+          }
+        ]
+      },
+      {
+        "kind": "brand",
+        "name": "Canadian Club",
+        "score": 1,
+        "source": ["exact", "text", "prefix", "contained"],
+        "entityId": 539,
+        "reference": "Canadian Club",
+        "shortName": null,
+        "retrievedFor": [
+          {
+            "exact": true,
+            "query": "Canadian Club"
+          }
+        ]
+      },
+      {
+        "kind": "bottler",
+        "name": "That Boutique-y Whisky Company",
+        "score": 1,
+        "source": ["exact", "text", "prefix", "contained"],
+        "entityId": 5978,
+        "reference": "That Boutique-y Whisky Company",
+        "shortName": "TBWC",
+        "retrievedFor": [
+          {
+            "exact": true,
+            "query": "That Boutique-y Whisky Company"
+          }
+        ]
+      },
+      {
+        "kind": "brand",
+        "name": "Wemyss Malts",
+        "score": 1,
+        "source": ["exact", "text", "prefix", "contained"],
+        "entityId": 5718,
+        "reference": "Wemyss Malts",
+        "shortName": null,
+        "retrievedFor": [
+          {
+            "exact": true,
+            "query": "Wemyss Malts"
+          }
+        ]
+      },
+      {
+        "kind": "distillery",
+        "name": "Wigle",
+        "score": 1,
+        "source": ["exact", "text", "prefix", "contained"],
+        "entityId": 1497,
+        "reference": "Wigle",
+        "shortName": null,
+        "retrievedFor": [
+          {
+            "exact": true,
+            "query": "Wigle"
+          }
+        ]
+      },
+      {
+        "kind": "distillery",
+        "name": "Ransom",
+        "score": 1,
+        "source": ["exact", "text", "prefix", "contained"],
+        "entityId": 3772,
+        "reference": "Ransom",
+        "shortName": null,
+        "retrievedFor": [
+          {
+            "exact": true,
+            "query": "Ransom"
+          }
+        ]
+      },
+      {
+        "kind": "distillery",
+        "name": "Fettercairn",
+        "score": 1,
+        "source": ["exact", "text", "prefix", "contained"],
+        "entityId": 916,
+        "reference": "Fettercairn",
+        "shortName": null,
+        "retrievedFor": [
+          {
+            "exact": true,
+            "query": "Fettercairn"
+          }
+        ]
+      },
+      {
+        "kind": "distillery",
+        "name": "Clynelish",
+        "score": 1,
+        "source": ["exact", "text", "prefix", "contained"],
+        "entityId": 843,
+        "reference": "Clynelish",
+        "shortName": null,
+        "retrievedFor": [
+          {
+            "exact": true,
+            "query": "Clynelish"
+          }
+        ]
+      },
+      {
+        "kind": "brand",
+        "name": "The Singleton of Glen Ord",
+        "score": 1,
+        "source": ["exact", "text", "prefix", "contained"],
+        "entityId": 1426,
+        "reference": "The Singleton of Glen Ord",
+        "shortName": null,
+        "retrievedFor": [
+          {
+            "exact": true,
+            "query": "The Singleton of Glen Ord"
+          },
+          {
+            "query": "Glen Ord"
+          }
+        ]
+      },
+      {
+        "kind": "distillery",
+        "name": "Glen Ord",
+        "score": 1,
+        "source": ["contained", "exact", "text", "prefix"],
+        "entityId": 242,
+        "reference": "Glen Ord",
+        "shortName": null,
+        "retrievedFor": [
+          {
+            "query": "The Singleton of Glen Ord"
+          },
+          {
+            "exact": true,
+            "query": "Glen Ord"
+          }
+        ]
+      },
+      {
+        "kind": "bottler",
+        "name": "Bladnoch Forum",
+        "score": 1,
+        "source": ["exact", "text", "prefix", "contained"],
+        "entityId": 5595,
+        "reference": "Bladnoch Forum",
+        "shortName": null,
+        "retrievedFor": [
+          {
+            "exact": true,
+            "query": "Bladnoch Forum"
+          }
+        ]
+      },
+      {
+        "kind": "bottler",
+        "name": "North Star Spirits",
+        "score": 1,
+        "source": ["exact", "text", "prefix", "contained"],
+        "entityId": 5739,
+        "reference": "North Star Spirits",
+        "shortName": null,
+        "retrievedFor": [
+          {
+            "exact": true,
+            "query": "North Star Spirits"
+          }
+        ]
+      },
+      {
+        "kind": "brand",
+        "name": "Ransom The Emerald 1865",
+        "score": 0.5,
+        "source": ["text", "prefix"],
+        "entityId": 4191,
+        "reference": "Ransom The Emerald 1865",
+        "shortName": null,
+        "retrievedFor": [
+          {
+            "query": "Ransom"
+          }
+        ]
+      },
+      {
+        "kind": "distillery",
+        "name": "Bladnoch",
+        "score": 0.3730769230769231,
+        "source": ["contained"],
+        "entityId": 110,
+        "reference": "Bladnoch",
+        "shortName": null,
+        "retrievedFor": [
+          {
+            "query": "Bladnoch Forum"
+          }
+        ]
+      },
+      {
+        "kind": "bottler",
+        "name": "&Whisky",
+        "score": 0.29615384615384616,
+        "source": ["contained"],
+        "entityId": 365821,
+        "reference": "&Whisky",
+        "shortName": null,
+        "retrievedFor": [
+          {
+            "query": "That Boutique-y Whisky Company"
+          }
+        ]
+      },
+      {
+        "kind": "brand",
+        "name": "King's Ransom",
+        "score": 0.2,
+        "source": ["text"],
+        "entityId": 3244,
+        "reference": null,
+        "shortName": null,
+        "retrievedFor": [
+          {
+            "query": "Ransom"
+          }
+        ]
+      }
+    ],
+    "inspectedSeries": []
+  },
+  "provenance": {
+    "source": "production_miss",
+    "verifiedSourceUrls": [
+      "https://whiskyadvocate.com/Diageo-Rare-Series-42-year-old-Caol-Ila-1983-Vintage-56-4",
+      "https://api.peated.com/uploads/bottles-bif0lvssvymk0owbq0tqnel9.webp"
+    ],
+    "dbOutcome": {
+      "bottleId": null,
+      "createsBottle": false,
+      "summary": "Production returned no_match."
+    },
+    "notes": "Captured from saved classifier run 29721 (review 19058, model openai/gpt-6-luna, 2026-10-28T09:00:07.774Z). Production rationale: The source is one whisky Bottle: the 42-year-old Caol Ila distilled in 1983 for Diageo's Rare Series, at 56.4% ABV. The official product page supports Caol Ila 1983 and the Rare Series designation; focused web results support the age, strength, and 318-bottle outturn. Candidate 47474 agrees on the key release traits, but its stored Brand conflicts with the product evidence, so it is not safe to assign without separate Bottle Review. No duplicate Bottle is proposed. Checked 2026-11-03. docs/architecture/whisky-identity-model.md, 'Who Is The Brand, Series, And Bottler' rule 3, names Rare Series as an owner collection whose Brand is the collection and whose Bottle name is the distillery. Bottle 47474: Brand Rare Series (Entity 366604), distiller Caol Ila (Entity 366), 42-year-old, vintage 1983, 56.4%, outturn 318, 2026. Its image shows 'Caol Ila 1983, aged 42 years, one of 318'; the ABV text is too small to read, so production's 50.6% read is unreliable. Whisky Advocate (Fall 2026) prints 42-year-old, 1983, 56.4%."
+  },
+  "expected": {
+    "status": "classified",
+    "action": "match",
+    "identityScope": "product",
+    "matchedBottleId": 47474,
+    "summary": "Diageo's Rare Series is an owner collection across several distilleries, so Rare Series is the Brand and Caol Ila is the Bottle name and distiller. Bottle 47474 has that shape and matches the 42-year-old, 1983, 56.4%, 318-bottle release. A stored Brand of Rare Series is not a conflict, and the candidate photo shows the same bottle. Match 47474."
+  },
+  "knownFailure": {
+    "reason": "The agent calls Brand Rare Series a conflict, though the identity model requires that shape."
+  }
+}

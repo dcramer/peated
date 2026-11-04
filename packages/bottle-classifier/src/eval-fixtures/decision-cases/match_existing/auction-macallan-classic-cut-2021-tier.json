@@ -1,0 +1,853 @@
+{
+  "id": "auction-macallan-classic-cut-2021-tier",
+  "name": "auction lot: an exact Macallan Classic Cut 2021 match with every fact anchored applies on its own",
+  "input": {
+    "reference": {
+      "id": 16788,
+      "url": "https://www.scotchwhiskyauctions.com/auctions/234-the-185th-auction/904783-macallan-classic-cut-2021-release/",
+      "name": "Macallan Classic Cut 2021 Release",
+      "imageUrl": null,
+      "externalSiteId": 28097,
+      "currentBottleId": null
+    },
+    "extractedIdentity": {
+      "abv": 51,
+      "brand": null,
+      "series": null,
+      "bottler": null,
+      "edition": null,
+      "outturn": null,
+      "category": null,
+      "distillery": null,
+      "expression": null,
+      "maturation": null,
+      "stated_age": null,
+      "cask_number": null,
+      "single_cask": null,
+      "release_year": null,
+      "vintage_year": null,
+      "cask_strength": null
+    },
+    "imageEvidence": null,
+    "initialCandidates": [
+      {
+        "abv": 51,
+        "brand": "The Macallan",
+        "score": 71.67941,
+        "series": "Classic Cut",
+        "source": ["text", "context"],
+        "bottler": null,
+        "edition": "2021 Edition",
+        "outturn": null,
+        "bottleId": 1832,
+        "category": "single_malt",
+        "fullName": "The Macallan Classic Cut - 2021 Edition",
+        "reference": null,
+        "statedAge": null,
+        "caskNumber": null,
+        "comparison": {
+          "missing": [],
+          "conflicts": [],
+          "agreements": ["abv"]
+        },
+        "distillery": ["The Macallan"],
+        "maturation": "Sherry-seasoned American oak and ex-bourbon American oak casks",
+        "releaseDay": null,
+        "singleCask": false,
+        "releaseYear": 2021,
+        "vintageYear": null,
+        "bottlingYear": null,
+        "caskStrength": null,
+        "releaseMonth": null,
+        "familyContext": {
+          "siblingBottles": []
+        }
+      },
+      {
+        "abv": 51,
+        "brand": "Bonnington",
+        "score": 31.6403,
+        "series": null,
+        "source": ["text"],
+        "bottler": null,
+        "edition": null,
+        "outturn": null,
+        "bottleId": 45874,
+        "category": "single_malt",
+        "fullName": "Bonnington Peated Muscat Matured - 51.0% ABV - Muscat Cask",
+        "reference": null,
+        "statedAge": null,
+        "caskNumber": null,
+        "comparison": {
+          "missing": [],
+          "conflicts": [],
+          "agreements": ["abv"]
+        },
+        "distillery": ["Bonnington Distillery"],
+        "maturation": "muscat",
+        "releaseDay": null,
+        "singleCask": null,
+        "releaseYear": null,
+        "vintageYear": null,
+        "bottlingYear": null,
+        "caskStrength": null,
+        "releaseMonth": null,
+        "familyContext": {
+          "siblingBottles": []
+        }
+      },
+      {
+        "abv": 51,
+        "brand": "High Coast Whisky",
+        "score": 31.153759,
+        "series": "Silent Mills Collection",
+        "source": ["text"],
+        "bottler": null,
+        "edition": "03",
+        "outturn": null,
+        "bottleId": 46368,
+        "category": "single_malt",
+        "fullName": "High Coast Whisky Svanö - 03 - 2021 Release - 51.0% ABV",
+        "reference": null,
+        "statedAge": null,
+        "caskNumber": null,
+        "comparison": {
+          "missing": [],
+          "conflicts": [],
+          "agreements": ["abv"]
+        },
+        "distillery": ["High Coast Distillery"],
+        "maturation": null,
+        "releaseDay": null,
+        "singleCask": null,
+        "releaseYear": 2021,
+        "vintageYear": null,
+        "bottlingYear": null,
+        "caskStrength": null,
+        "releaseMonth": null,
+        "familyContext": {
+          "siblingBottles": []
+        }
+      },
+      {
+        "abv": null,
+        "brand": "Armorik",
+        "score": 28.229,
+        "series": null,
+        "source": ["text"],
+        "bottler": null,
+        "edition": null,
+        "outturn": null,
+        "bottleId": 17216,
+        "category": "single_malt",
+        "fullName": "Armorik Classic",
+        "reference": null,
+        "statedAge": null,
+        "caskNumber": null,
+        "comparison": {
+          "missing": ["abv"],
+          "conflicts": [],
+          "agreements": []
+        },
+        "distillery": [],
+        "maturation": null,
+        "releaseDay": null,
+        "singleCask": null,
+        "releaseYear": null,
+        "vintageYear": null,
+        "bottlingYear": null,
+        "caskStrength": null,
+        "releaseMonth": null,
+        "familyContext": {
+          "siblingBottles": []
+        }
+      },
+      {
+        "abv": null,
+        "brand": "Shieldaig",
+        "score": 28.06191,
+        "series": null,
+        "source": ["text"],
+        "bottler": null,
+        "edition": null,
+        "outturn": null,
+        "bottleId": 16877,
+        "category": "blend",
+        "fullName": "Shieldaig Classic",
+        "reference": null,
+        "statedAge": null,
+        "caskNumber": null,
+        "comparison": {
+          "missing": ["abv"],
+          "conflicts": [],
+          "agreements": []
+        },
+        "distillery": [],
+        "maturation": null,
+        "releaseDay": null,
+        "singleCask": null,
+        "releaseYear": null,
+        "vintageYear": null,
+        "bottlingYear": null,
+        "caskStrength": null,
+        "releaseMonth": null,
+        "familyContext": {
+          "siblingBottles": []
+        }
+      },
+      {
+        "abv": null,
+        "brand": "Glenglassaugh",
+        "score": 27.314003,
+        "series": null,
+        "source": ["text"],
+        "bottler": null,
+        "edition": null,
+        "outturn": null,
+        "bottleId": 711,
+        "category": "single_malt",
+        "fullName": "Glenglassaugh Octaves Classic (Batch 2)",
+        "reference": null,
+        "statedAge": null,
+        "caskNumber": null,
+        "comparison": {
+          "missing": ["abv"],
+          "conflicts": [],
+          "agreements": []
+        },
+        "distillery": ["Glenglassaugh"],
+        "maturation": null,
+        "releaseDay": null,
+        "singleCask": null,
+        "releaseYear": null,
+        "vintageYear": null,
+        "bottlingYear": null,
+        "caskStrength": null,
+        "releaseMonth": null,
+        "familyContext": {
+          "siblingBottles": []
+        }
+      },
+      {
+        "abv": null,
+        "brand": "SLYRS",
+        "score": 27.314003,
+        "series": null,
+        "source": ["text"],
+        "bottler": null,
+        "edition": null,
+        "outturn": null,
+        "bottleId": 12959,
+        "category": "single_malt",
+        "fullName": "SLYRS Classic Single Malt",
+        "reference": null,
+        "statedAge": null,
+        "caskNumber": null,
+        "comparison": {
+          "missing": ["abv"],
+          "conflicts": [],
+          "agreements": []
+        },
+        "distillery": [],
+        "maturation": null,
+        "releaseDay": null,
+        "singleCask": null,
+        "releaseYear": null,
+        "vintageYear": null,
+        "bottlingYear": null,
+        "caskStrength": null,
+        "releaseMonth": null,
+        "familyContext": {
+          "siblingBottles": []
+        }
+      },
+      {
+        "abv": null,
+        "brand": "The Glenrothes",
+        "score": 26.67701,
+        "series": null,
+        "source": ["text"],
+        "bottler": null,
+        "edition": null,
+        "outturn": null,
+        "bottleId": 2848,
+        "category": "single_malt",
+        "fullName": "The Glenrothes Whisky Maker's Cut The Soleo Collection",
+        "reference": null,
+        "statedAge": null,
+        "caskNumber": null,
+        "comparison": {
+          "missing": ["abv"],
+          "conflicts": [],
+          "agreements": []
+        },
+        "distillery": ["The Glenrothes"],
+        "maturation": null,
+        "releaseDay": null,
+        "singleCask": null,
+        "releaseYear": null,
+        "vintageYear": null,
+        "bottlingYear": null,
+        "caskStrength": null,
+        "releaseMonth": null,
+        "familyContext": {
+          "siblingBottles": []
+        }
+      },
+      {
+        "abv": null,
+        "brand": "Bruichladdich",
+        "score": 26.566978,
+        "series": null,
+        "source": ["text"],
+        "bottler": null,
+        "edition": null,
+        "outturn": null,
+        "bottleId": 1117,
+        "category": "single_malt",
+        "fullName": "Bruichladdich Laddie Classic Edition_01",
+        "reference": null,
+        "statedAge": null,
+        "caskNumber": null,
+        "comparison": {
+          "missing": ["abv"],
+          "conflicts": [],
+          "agreements": []
+        },
+        "distillery": ["Bruichladdich"],
+        "maturation": null,
+        "releaseDay": null,
+        "singleCask": null,
+        "releaseYear": null,
+        "vintageYear": null,
+        "bottlingYear": null,
+        "caskStrength": null,
+        "releaseMonth": null,
+        "familyContext": {
+          "siblingBottles": []
+        }
+      },
+      {
+        "abv": 51,
+        "brand": "GlenAllachie",
+        "score": 26.423077,
+        "series": null,
+        "source": ["text"],
+        "bottler": "Unkiltered Spirits",
+        "edition": null,
+        "outturn": null,
+        "bottleId": 46034,
+        "category": "single_malt",
+        "fullName": "GlenAllachie The Smooth Operator - 13-year-old - 51.0% ABV - Single Cask - Oloroso Cask - Hogshead",
+        "reference": null,
+        "statedAge": 13,
+        "caskNumber": null,
+        "comparison": {
+          "missing": [],
+          "conflicts": [],
+          "agreements": ["abv"]
+        },
+        "distillery": ["GlenAllachie"],
+        "maturation": "oloroso",
+        "releaseDay": null,
+        "singleCask": true,
+        "releaseYear": null,
+        "vintageYear": null,
+        "bottlingYear": null,
+        "caskStrength": null,
+        "releaseMonth": null,
+        "familyContext": {
+          "siblingBottles": []
+        }
+      },
+      {
+        "abv": null,
+        "brand": "Two Stacks",
+        "score": 26.273678,
+        "series": null,
+        "source": ["text"],
+        "bottler": null,
+        "edition": null,
+        "outturn": null,
+        "bottleId": 13092,
+        "category": "blend",
+        "fullName": "Two Stacks The First Cut",
+        "reference": null,
+        "statedAge": null,
+        "caskNumber": null,
+        "comparison": {
+          "missing": ["abv"],
+          "conflicts": [],
+          "agreements": []
+        },
+        "distillery": [],
+        "maturation": null,
+        "releaseDay": null,
+        "singleCask": null,
+        "releaseYear": null,
+        "vintageYear": null,
+        "bottlingYear": null,
+        "caskStrength": null,
+        "releaseMonth": null,
+        "familyContext": {
+          "siblingBottles": []
+        }
+      },
+      {
+        "abv": null,
+        "brand": "Jim Beam",
+        "score": 26.128233,
+        "series": null,
+        "source": ["text"],
+        "bottler": null,
+        "edition": null,
+        "outturn": null,
+        "bottleId": 14258,
+        "category": "bourbon",
+        "fullName": "Jim Beam Distiller's Cut",
+        "reference": null,
+        "statedAge": null,
+        "caskNumber": null,
+        "comparison": {
+          "missing": ["abv"],
+          "conflicts": [],
+          "agreements": []
+        },
+        "distillery": [],
+        "maturation": null,
+        "releaseDay": null,
+        "singleCask": null,
+        "releaseYear": null,
+        "vintageYear": null,
+        "bottlingYear": null,
+        "caskStrength": null,
+        "releaseMonth": null,
+        "familyContext": {
+          "siblingBottles": []
+        }
+      },
+      {
+        "abv": null,
+        "brand": "Label 5",
+        "score": 25.954025,
+        "series": null,
+        "source": ["text"],
+        "bottler": null,
+        "edition": null,
+        "outturn": null,
+        "bottleId": 16470,
+        "category": "blend",
+        "fullName": "Label 5 Classic Black",
+        "reference": null,
+        "statedAge": null,
+        "caskNumber": null,
+        "comparison": {
+          "missing": ["abv"],
+          "conflicts": [],
+          "agreements": []
+        },
+        "distillery": [],
+        "maturation": null,
+        "releaseDay": null,
+        "singleCask": null,
+        "releaseYear": null,
+        "vintageYear": null,
+        "bottlingYear": null,
+        "caskStrength": null,
+        "releaseMonth": null,
+        "familyContext": {
+          "siblingBottles": []
+        }
+      },
+      {
+        "abv": null,
+        "brand": "Kavalan",
+        "score": 25.61953,
+        "series": null,
+        "source": ["text"],
+        "bottler": "Kavalan",
+        "edition": null,
+        "outturn": null,
+        "bottleId": 992,
+        "category": "single_malt",
+        "fullName": "Kavalan Classic",
+        "reference": null,
+        "statedAge": null,
+        "caskNumber": null,
+        "comparison": {
+          "missing": ["abv"],
+          "conflicts": [],
+          "agreements": []
+        },
+        "distillery": [],
+        "maturation": null,
+        "releaseDay": null,
+        "singleCask": null,
+        "releaseYear": null,
+        "vintageYear": null,
+        "bottlingYear": null,
+        "caskStrength": null,
+        "releaseMonth": null,
+        "familyContext": {
+          "siblingBottles": []
+        }
+      },
+      {
+        "abv": 51,
+        "brand": "Nulu",
+        "score": 24.744835,
+        "series": null,
+        "source": ["text"],
+        "bottler": "Prohibition Craft Spirits",
+        "edition": "Batch 9",
+        "outturn": null,
+        "bottleId": 47185,
+        "category": "bourbon",
+        "fullName": "Nulu Reserve Straight Bourbon Whiskey - Batch 9 - 4-year-old - 51.0% ABV - Cask Strength",
+        "reference": null,
+        "statedAge": 4,
+        "caskNumber": null,
+        "comparison": {
+          "missing": [],
+          "conflicts": [],
+          "agreements": ["abv"]
+        },
+        "distillery": ["MGP Distillery"],
+        "maturation": null,
+        "releaseDay": null,
+        "singleCask": null,
+        "releaseYear": null,
+        "vintageYear": null,
+        "bottlingYear": null,
+        "caskStrength": true,
+        "releaseMonth": null,
+        "familyContext": {
+          "siblingBottles": []
+        }
+      }
+    ]
+  },
+  "context": {
+    "inspectedBottleIds": [1832],
+    "bottleContexts": [
+      {
+        "exact": {
+          "abv": 51,
+          "edition": "2021 Edition",
+          "outturn": null,
+          "statedAge": null,
+          "caskNumber": null,
+          "maturation": "Sherry-seasoned American oak and ex-bourbon American oak casks",
+          "releaseDay": null,
+          "singleCask": false,
+          "releaseYear": 2021,
+          "vintageYear": null,
+          "bottlingYear": null,
+          "caskStrength": null,
+          "releaseMonth": null
+        },
+        "shared": {
+          "name": "Classic Cut",
+          "brand": {
+            "name": "The Macallan",
+            "entityId": 1157
+          },
+          "series": {
+            "name": "Classic Cut",
+            "seriesId": 731
+          },
+          "bottler": null,
+          "category": "single_malt",
+          "statedAge": null,
+          "distillers": [
+            {
+              "name": "The Macallan",
+              "entityId": 1157
+            }
+          ]
+        },
+        "groupId": 10159,
+        "bottleId": 1832,
+        "fullName": "The Macallan Classic Cut - 2021 Edition",
+        "siblings": [],
+        "references": [
+          {
+            "name": "The Macallan Classic Cut Limited 2021 Edition",
+            "ignored": false
+          }
+        ],
+        "observations": [
+          {
+            "facts": {
+              "proposalType": "no_match",
+              "proposedBottle": null,
+              "referenceScope": "none"
+            },
+            "rawText": "The Macallan Classic Cut (2021 Edition)",
+            "sourceKey": "store_price:12033413",
+            "sourceUrl": "https://www.masterofmalt.com/whiskies/the-macallan/the-macallan-classic-cut-2021-edition-whisky/?sku=122216",
+            "sourceName": "The Macallan Classic Cut (2021 Edition)",
+            "sourceType": "store_price",
+            "parsedIdentity": null
+          },
+          {
+            "facts": {
+              "proposalType": "match_existing",
+              "proposedBottle": null,
+              "referenceScope": "none"
+            },
+            "rawText": "The Macallan Classic Cut 2021 Edition",
+            "sourceKey": "store_price:3416",
+            "sourceUrl": "https://woodencork.com/collections/whiskey/products/the-macallan-classic-cut-2021-edition",
+            "sourceName": "The Macallan Classic Cut 2021 Edition",
+            "sourceType": "store_price",
+            "parsedIdentity": null
+          }
+        ],
+        "imageSources": []
+      }
+    ],
+    "inspectedEntities": [
+      {
+        "kind": "distillery",
+        "name": "The Macallan",
+        "score": 1,
+        "source": ["exact", "text", "prefix", "contained"],
+        "entityId": 1157,
+        "reference": "The Macallan",
+        "shortName": null,
+        "retrievedFor": [
+          {
+            "exact": true,
+            "query": "The Macallan"
+          }
+        ]
+      },
+      {
+        "kind": "brand",
+        "name": "Bonnington",
+        "score": 1,
+        "source": ["exact", "text", "prefix", "contained"],
+        "entityId": 365839,
+        "reference": "Bonnington",
+        "shortName": null,
+        "retrievedFor": [
+          {
+            "exact": true,
+            "query": "Bonnington"
+          },
+          {
+            "query": "Bonnington Distillery"
+          }
+        ]
+      },
+      {
+        "kind": "distillery",
+        "name": "Bonnington Distillery",
+        "score": 1,
+        "source": ["text", "prefix", "exact", "contained"],
+        "entityId": 365840,
+        "reference": "Bonnington Distillery",
+        "shortName": null,
+        "retrievedFor": [
+          {
+            "query": "Bonnington"
+          },
+          {
+            "exact": true,
+            "query": "Bonnington Distillery"
+          }
+        ]
+      },
+      {
+        "kind": "brand",
+        "name": "High Coast Whisky",
+        "score": 1,
+        "source": ["exact", "text", "prefix", "contained"],
+        "entityId": 1023,
+        "reference": "High Coast Whisky",
+        "shortName": null,
+        "retrievedFor": [
+          {
+            "exact": true,
+            "query": "High Coast Whisky"
+          }
+        ]
+      },
+      {
+        "kind": "distillery",
+        "name": "High Coast Distillery",
+        "score": 1,
+        "source": ["exact", "text", "prefix", "contained"],
+        "entityId": 1749,
+        "reference": "High Coast Distillery",
+        "shortName": null,
+        "retrievedFor": [
+          {
+            "exact": true,
+            "query": "High Coast Distillery"
+          }
+        ]
+      },
+      {
+        "kind": "distillery",
+        "name": "GlenAllachie",
+        "score": 1,
+        "source": ["exact", "text", "prefix", "contained"],
+        "entityId": 123,
+        "reference": "Glenallachie",
+        "shortName": null,
+        "retrievedFor": [
+          {
+            "exact": true,
+            "query": "GlenAllachie"
+          }
+        ]
+      },
+      {
+        "kind": "bottler",
+        "name": "Unkiltered Spirits",
+        "score": 1,
+        "source": ["exact", "text", "prefix", "contained"],
+        "entityId": 365865,
+        "reference": "Unkiltered Spirits",
+        "shortName": null,
+        "retrievedFor": [
+          {
+            "exact": true,
+            "query": "Unkiltered Spirits"
+          }
+        ]
+      },
+      {
+        "kind": "brand",
+        "name": "Nulu",
+        "score": 1,
+        "source": ["exact", "text", "prefix", "contained"],
+        "entityId": 1207,
+        "reference": "Nulu",
+        "shortName": null,
+        "retrievedFor": [
+          {
+            "exact": true,
+            "query": "Nulu"
+          }
+        ]
+      },
+      {
+        "kind": "distillery",
+        "name": "Prohibition Craft Spirits",
+        "score": 1,
+        "source": ["exact", "text", "prefix", "contained"],
+        "entityId": 6096,
+        "reference": "Prohibition Craft Spirits",
+        "shortName": null,
+        "retrievedFor": [
+          {
+            "exact": true,
+            "query": "Prohibition Craft Spirits"
+          }
+        ]
+      },
+      {
+        "kind": "distillery",
+        "name": "MGP Distillery",
+        "score": 1,
+        "source": ["exact", "text", "prefix", "contained"],
+        "entityId": 32266,
+        "reference": "MGP Distillery",
+        "shortName": "MGP",
+        "retrievedFor": [
+          {
+            "exact": true,
+            "query": "MGP Distillery"
+          }
+        ]
+      },
+      {
+        "kind": "brand",
+        "name": "Armorik",
+        "score": 1,
+        "source": ["exact", "text", "prefix", "contained"],
+        "entityId": 33,
+        "reference": "Armorik",
+        "shortName": null,
+        "retrievedFor": [
+          {
+            "exact": true,
+            "query": "Armorik"
+          }
+        ]
+      },
+      {
+        "kind": "brand",
+        "name": "Shieldaig",
+        "score": 1,
+        "source": ["exact", "text", "prefix", "contained"],
+        "entityId": 3943,
+        "reference": "Shieldaig",
+        "shortName": null,
+        "retrievedFor": [
+          {
+            "exact": true,
+            "query": "Shieldaig"
+          }
+        ]
+      },
+      {
+        "kind": "company",
+        "name": "The GlenAllachie Distillers Company",
+        "score": 0.5,
+        "source": ["text", "prefix"],
+        "entityId": 366077,
+        "reference": "GlenAllachie Distillers Company",
+        "shortName": null,
+        "retrievedFor": [
+          {
+            "query": "GlenAllachie"
+          }
+        ]
+      },
+      {
+        "kind": "bottler",
+        "name": "&Whisky",
+        "score": 0.33,
+        "source": ["contained"],
+        "entityId": 365821,
+        "reference": "&Whisky",
+        "shortName": null,
+        "retrievedFor": [
+          {
+            "query": "High Coast Whisky"
+          }
+        ]
+      }
+    ],
+    "inspectedSeries": []
+  },
+  "provenance": {
+    "source": "production_miss",
+    "verifiedSourceUrls": [
+      "https://www.scotchwhiskyauctions.com/auctions/234-the-185th-auction/904783-macallan-classic-cut-2021-release/",
+      "https://www.spiritradar.com/whisky-db/macallan-classic-cut-limited-2021-edition-51-percent-700ml/",
+      "https://shop.just-whisky.co.uk/products/the-macallan-classic-cut-2021-edition-70cl-51-abv"
+    ],
+    "dbOutcome": {
+      "bottleId": 1832,
+      "createsBottle": false,
+      "summary": "Production matched 1832 with no unresolved risks but recorded web evidence 'not_used', so the tier rule held it for review."
+    },
+    "notes": "Saved check 36093, source auction_lot 16788 (lot 185-904783, lot number 185-01606), a second Classic Cut 2021 lot in the same auction, not lot 16790 judged earlier. Its page gives Bottled 2021, Sherry Casks, 51% ABV / 70cl. Post-filter tier case. expectedTier is auto because every identity fact is anchored: the title prints Macallan, Classic Cut and 2021; the scraper's structured 51% equals the stored 51%; 1832 stores Series Classic Cut, edition 2021 Edition, releaseYear 2021. Each Classic Cut year is a separate annual release at its own strength (for example 2017 at 58.4%, 2022 at 52.5%), so year plus ABV leaves one Bottle. No populated field conflicts and the agent reported no risk. The only reason for review was 'not_used': the agent did not judge the evidence. Local and source evidence settle this match ('not_needed'). One US retailer lists 51.2% for 2021; most listings and the lot say 51%. That is a 0.2 listing difference, and the case's evidence holds no web search, so it does not enter the run."
+  },
+  "expected": {
+    "status": "classified",
+    "action": "match",
+    "identityScope": "product",
+    "matchedBottleId": 1832,
+    "expectedTier": "auto",
+    "summary": "Match The Macallan Classic Cut 2021 Edition (1832) and apply it without review: the title prints the 2021 year, the lot's 51% equals the stored ABV, and every other Classic Cut year has a different ABV."
+  },
+  "knownFailure": {
+    "reason": "The post-filter holds a match whose year and ABV are both anchored, only because web evidence was rated weak."
+  }
+}

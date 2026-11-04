@@ -1,0 +1,593 @@
+{
+  "id": "auction-beneagles-kestrel-decanter-20cl",
+  "name": "auction lot: Beneagles Kestrel 20cl ceramic decanter is a real Bottle",
+  "input": {
+    "reference": {
+      "id": 14010,
+      "url": "https://www.scotchwhiskyauctions.com/auctions/234-the-185th-auction/904041-beneagles-kestrel-ceramic-decanter-20cl/",
+      "name": "Beneagles Kestrel Ceramic Decanter 20cl",
+      "imageUrl": null,
+      "externalSiteId": 28097,
+      "currentBottleId": null
+    },
+    "extractedIdentity": {
+      "abv": 40,
+      "brand": null,
+      "series": null,
+      "bottler": null,
+      "edition": null,
+      "outturn": null,
+      "category": null,
+      "distillery": null,
+      "expression": null,
+      "maturation": null,
+      "stated_age": null,
+      "cask_number": null,
+      "single_cask": null,
+      "release_year": null,
+      "vintage_year": null,
+      "cask_strength": null
+    },
+    "imageEvidence": null,
+    "initialCandidates": [
+      {
+        "abv": 40,
+        "brand": "Beneagles",
+        "score": 48.97847,
+        "series": null,
+        "source": ["text"],
+        "bottler": null,
+        "edition": null,
+        "outturn": null,
+        "bottleId": 68560,
+        "category": "blend",
+        "fullName": "Beneagles Merlin",
+        "reference": null,
+        "statedAge": null,
+        "caskNumber": null,
+        "comparison": {
+          "missing": [],
+          "conflicts": [],
+          "agreements": ["abv"]
+        },
+        "distillery": [],
+        "maturation": null,
+        "releaseDay": null,
+        "singleCask": null,
+        "releaseYear": null,
+        "vintageYear": null,
+        "bottlingYear": null,
+        "caskStrength": null,
+        "releaseMonth": null,
+        "familyContext": {
+          "siblingBottles": []
+        }
+      },
+      {
+        "abv": 40,
+        "brand": "Beneagles",
+        "score": 48.97847,
+        "series": null,
+        "source": ["text"],
+        "bottler": null,
+        "edition": null,
+        "outturn": null,
+        "bottleId": 68561,
+        "category": "blend",
+        "fullName": "Beneagles Osprey",
+        "reference": null,
+        "statedAge": null,
+        "caskNumber": null,
+        "comparison": {
+          "missing": [],
+          "conflicts": [],
+          "agreements": ["abv"]
+        },
+        "distillery": [],
+        "maturation": null,
+        "releaseDay": null,
+        "singleCask": false,
+        "releaseYear": null,
+        "vintageYear": null,
+        "bottlingYear": null,
+        "caskStrength": false,
+        "releaseMonth": null,
+        "familyContext": {
+          "siblingBottles": []
+        }
+      },
+      {
+        "abv": 40,
+        "brand": "Beneagles",
+        "score": 44.67435,
+        "series": "Scottish Owls",
+        "source": ["text"],
+        "bottler": null,
+        "edition": null,
+        "outturn": null,
+        "bottleId": 68562,
+        "category": "blend",
+        "fullName": "Beneagles Tawny Owl",
+        "reference": null,
+        "statedAge": null,
+        "caskNumber": null,
+        "comparison": {
+          "missing": [],
+          "conflicts": [],
+          "agreements": ["abv"]
+        },
+        "distillery": [],
+        "maturation": null,
+        "releaseDay": null,
+        "singleCask": null,
+        "releaseYear": null,
+        "vintageYear": null,
+        "bottlingYear": null,
+        "caskStrength": null,
+        "releaseMonth": null,
+        "familyContext": {
+          "siblingBottles": []
+        }
+      },
+      {
+        "abv": 40,
+        "brand": "Bell's",
+        "score": 39.379967,
+        "series": "Great Scottish Inventors",
+        "source": ["text"],
+        "bottler": null,
+        "edition": "James Watt Christmas Decanter",
+        "outturn": null,
+        "bottleId": 46793,
+        "category": "blend",
+        "fullName": "Bell's Extra Special - James Watt Christmas Decanter - 8-year-old - 2002 Release - 40.0% ABV",
+        "reference": null,
+        "statedAge": 8,
+        "caskNumber": null,
+        "comparison": {
+          "missing": [],
+          "conflicts": [],
+          "agreements": ["abv"]
+        },
+        "distillery": [],
+        "maturation": null,
+        "releaseDay": null,
+        "singleCask": null,
+        "releaseYear": 2002,
+        "vintageYear": null,
+        "bottlingYear": null,
+        "caskStrength": null,
+        "releaseMonth": null,
+        "familyContext": {
+          "siblingBottles": []
+        }
+      },
+      {
+        "abv": 40,
+        "brand": "Bell's",
+        "score": 33.26899,
+        "series": null,
+        "source": ["text"],
+        "bottler": null,
+        "edition": "1995",
+        "outturn": null,
+        "bottleId": 63772,
+        "category": "blend",
+        "fullName": "Bell's Christmas Decanter - 1995",
+        "reference": null,
+        "statedAge": null,
+        "caskNumber": null,
+        "comparison": {
+          "missing": [],
+          "conflicts": [],
+          "agreements": ["abv"]
+        },
+        "distillery": [],
+        "maturation": null,
+        "releaseDay": null,
+        "singleCask": null,
+        "releaseYear": 1995,
+        "vintageYear": null,
+        "bottlingYear": null,
+        "caskStrength": null,
+        "releaseMonth": null,
+        "familyContext": {
+          "siblingBottles": []
+        }
+      },
+      {
+        "abv": 40,
+        "brand": "Bell's",
+        "score": 31.750164,
+        "series": null,
+        "source": ["text"],
+        "bottler": null,
+        "edition": null,
+        "outturn": null,
+        "bottleId": 53131,
+        "category": "blend",
+        "fullName": "Bell's Christmas Decanter",
+        "reference": null,
+        "statedAge": null,
+        "caskNumber": null,
+        "comparison": {
+          "missing": [],
+          "conflicts": [],
+          "agreements": ["abv"]
+        },
+        "distillery": [],
+        "maturation": null,
+        "releaseDay": null,
+        "singleCask": null,
+        "releaseYear": 2006,
+        "vintageYear": null,
+        "bottlingYear": null,
+        "caskStrength": null,
+        "releaseMonth": null,
+        "familyContext": {
+          "siblingBottles": []
+        }
+      },
+      {
+        "abv": 40,
+        "brand": "Bell's",
+        "score": 29.73383,
+        "series": null,
+        "source": ["text"],
+        "bottler": null,
+        "edition": "1994",
+        "outturn": null,
+        "bottleId": 63774,
+        "category": "blend",
+        "fullName": "Bell's Christmas Decanter - 1994",
+        "reference": null,
+        "statedAge": null,
+        "caskNumber": null,
+        "comparison": {
+          "missing": [],
+          "conflicts": [],
+          "agreements": ["abv"]
+        },
+        "distillery": [],
+        "maturation": null,
+        "releaseDay": null,
+        "singleCask": null,
+        "releaseYear": 1994,
+        "vintageYear": null,
+        "bottlingYear": null,
+        "caskStrength": null,
+        "releaseMonth": null,
+        "familyContext": {
+          "siblingBottles": []
+        }
+      },
+      {
+        "abv": 40,
+        "brand": "Bell's",
+        "score": 29.73383,
+        "series": null,
+        "source": ["text"],
+        "bottler": null,
+        "edition": "1996",
+        "outturn": null,
+        "bottleId": 63773,
+        "category": "blend",
+        "fullName": "Bell's Christmas Decanter - 1996",
+        "reference": null,
+        "statedAge": null,
+        "caskNumber": null,
+        "comparison": {
+          "missing": [],
+          "conflicts": [],
+          "agreements": ["abv"]
+        },
+        "distillery": [],
+        "maturation": null,
+        "releaseDay": null,
+        "singleCask": null,
+        "releaseYear": 1996,
+        "vintageYear": null,
+        "bottlingYear": null,
+        "caskStrength": null,
+        "releaseMonth": null,
+        "familyContext": {
+          "siblingBottles": []
+        }
+      },
+      {
+        "abv": 40,
+        "brand": "Bell's",
+        "score": 29.73383,
+        "series": null,
+        "source": ["text"],
+        "bottler": null,
+        "edition": "1997",
+        "outturn": null,
+        "bottleId": 63770,
+        "category": "blend",
+        "fullName": "Bell's Christmas Decanter - 1997",
+        "reference": null,
+        "statedAge": null,
+        "caskNumber": null,
+        "comparison": {
+          "missing": [],
+          "conflicts": [],
+          "agreements": ["abv"]
+        },
+        "distillery": [],
+        "maturation": null,
+        "releaseDay": null,
+        "singleCask": null,
+        "releaseYear": 1997,
+        "vintageYear": null,
+        "bottlingYear": null,
+        "caskStrength": null,
+        "releaseMonth": null,
+        "familyContext": {
+          "siblingBottles": []
+        }
+      },
+      {
+        "abv": 40,
+        "brand": "Bell's",
+        "score": 29.73383,
+        "series": null,
+        "source": ["text"],
+        "bottler": null,
+        "edition": "1998",
+        "outturn": null,
+        "bottleId": 63776,
+        "category": "blend",
+        "fullName": "Bell's Christmas Decanter - 1998",
+        "reference": null,
+        "statedAge": null,
+        "caskNumber": null,
+        "comparison": {
+          "missing": [],
+          "conflicts": [],
+          "agreements": ["abv"]
+        },
+        "distillery": [],
+        "maturation": null,
+        "releaseDay": null,
+        "singleCask": null,
+        "releaseYear": 1998,
+        "vintageYear": null,
+        "bottlingYear": null,
+        "caskStrength": null,
+        "releaseMonth": null,
+        "familyContext": {
+          "siblingBottles": []
+        }
+      },
+      {
+        "abv": 40,
+        "brand": "Bell's",
+        "score": 29.73383,
+        "series": null,
+        "source": ["text"],
+        "bottler": null,
+        "edition": "2000",
+        "outturn": null,
+        "bottleId": 63775,
+        "category": "blend",
+        "fullName": "Bell's Christmas Decanter - 2000",
+        "reference": null,
+        "statedAge": null,
+        "caskNumber": null,
+        "comparison": {
+          "missing": [],
+          "conflicts": [],
+          "agreements": ["abv"]
+        },
+        "distillery": [],
+        "maturation": null,
+        "releaseDay": null,
+        "singleCask": null,
+        "releaseYear": 2000,
+        "vintageYear": null,
+        "bottlingYear": null,
+        "caskStrength": null,
+        "releaseMonth": null,
+        "familyContext": {
+          "siblingBottles": []
+        }
+      },
+      {
+        "abv": 40,
+        "brand": "Bell's",
+        "score": 29.07417,
+        "series": null,
+        "source": ["text"],
+        "bottler": null,
+        "edition": "2004",
+        "outturn": null,
+        "bottleId": 63771,
+        "category": "blend",
+        "fullName": "Bell's Christmas Decanter - 2004",
+        "reference": null,
+        "statedAge": 8,
+        "caskNumber": null,
+        "comparison": {
+          "missing": [],
+          "conflicts": [],
+          "agreements": ["abv"]
+        },
+        "distillery": [],
+        "maturation": null,
+        "releaseDay": null,
+        "singleCask": null,
+        "releaseYear": 2004,
+        "vintageYear": null,
+        "bottlingYear": null,
+        "caskStrength": null,
+        "releaseMonth": null,
+        "familyContext": {
+          "siblingBottles": []
+        }
+      },
+      {
+        "abv": 40,
+        "brand": "Bell's",
+        "score": 27.192404,
+        "series": null,
+        "source": ["text"],
+        "bottler": null,
+        "edition": "2000",
+        "outturn": null,
+        "bottleId": 63778,
+        "category": "blend",
+        "fullName": "Bell's Queen Mother 100th Birthday Decanter - 2000",
+        "reference": null,
+        "statedAge": null,
+        "caskNumber": null,
+        "comparison": {
+          "missing": [],
+          "conflicts": [],
+          "agreements": ["abv"]
+        },
+        "distillery": [],
+        "maturation": null,
+        "releaseDay": null,
+        "singleCask": null,
+        "releaseYear": 2000,
+        "vintageYear": null,
+        "bottlingYear": null,
+        "caskStrength": null,
+        "releaseMonth": null,
+        "familyContext": {
+          "siblingBottles": []
+        }
+      },
+      {
+        "abv": 40,
+        "brand": "Bell's",
+        "score": 27.192404,
+        "series": null,
+        "source": ["text"],
+        "bottler": null,
+        "edition": "2001",
+        "outturn": null,
+        "bottleId": 63780,
+        "category": "blend",
+        "fullName": "Bell's The Queen's 75th Birthday Decanter - 2001",
+        "reference": null,
+        "statedAge": null,
+        "caskNumber": null,
+        "comparison": {
+          "missing": [],
+          "conflicts": [],
+          "agreements": ["abv"]
+        },
+        "distillery": [],
+        "maturation": null,
+        "releaseDay": null,
+        "singleCask": null,
+        "releaseYear": 2001,
+        "vintageYear": null,
+        "bottlingYear": null,
+        "caskStrength": null,
+        "releaseMonth": null,
+        "familyContext": {
+          "siblingBottles": []
+        }
+      },
+      {
+        "abv": 40,
+        "brand": "Bell's",
+        "score": 26.448706,
+        "series": null,
+        "source": ["text"],
+        "bottler": null,
+        "edition": "1998",
+        "outturn": null,
+        "bottleId": 63777,
+        "category": "blend",
+        "fullName": "Bell's Prince of Wales 50th Birthday Decanter - 1998",
+        "reference": null,
+        "statedAge": null,
+        "caskNumber": null,
+        "comparison": {
+          "missing": [],
+          "conflicts": [],
+          "agreements": ["abv"]
+        },
+        "distillery": [],
+        "maturation": null,
+        "releaseDay": null,
+        "singleCask": null,
+        "releaseYear": 1998,
+        "vintageYear": null,
+        "bottlingYear": null,
+        "caskStrength": null,
+        "releaseMonth": null,
+        "familyContext": {
+          "siblingBottles": []
+        }
+      }
+    ]
+  },
+  "context": {
+    "inspectedBottleIds": [],
+    "bottleContexts": [],
+    "inspectedEntities": [
+      {
+        "kind": "brand",
+        "name": "Beneagles",
+        "score": 1,
+        "source": ["exact", "text", "prefix", "contained"],
+        "entityId": 501,
+        "reference": "Beneagles",
+        "shortName": null,
+        "retrievedFor": [
+          {
+            "exact": true,
+            "query": "Beneagles"
+          }
+        ]
+      },
+      {
+        "kind": "brand",
+        "name": "Bell's",
+        "score": 1,
+        "source": ["exact", "text", "prefix", "contained"],
+        "entityId": 31,
+        "reference": "Bell's",
+        "shortName": null,
+        "retrievedFor": [
+          {
+            "exact": true,
+            "query": "Bell's"
+          }
+        ]
+      }
+    ],
+    "inspectedSeries": []
+  },
+  "provenance": {
+    "source": "production_miss",
+    "verifiedSourceUrls": [
+      "https://www.scotchwhiskyauctions.com/auctions/234-the-185th-auction/904041-beneagles-kestrel-ceramic-decanter-20cl/"
+    ],
+    "dbOutcome": {
+      "bottleId": null,
+      "createsBottle": false,
+      "summary": "Production returned ignored."
+    },
+    "notes": "Captured from saved classifier run 34346 (auction_lot 14010, model null, 2026-11-03T07:21:31.883Z). Production rationale: none Checked 2026-11-03. Lot page: Beneagles blended Scotch in a Beswick/Wade ceramic decanter, Kestrel, 40% ABV / 20cl. Owner rule (2026-11-03): more than 100 ml is a real Bottle. Peated already holds sibling Beneagles decanters as Bottles under Brand Beneagles (501), named by the bird: 68560 Merlin, 68561 Osprey, 68562 Tawny Owl (all observed candidates) and 69759 Peregrine Falcon. No Kestrel Bottle exists. Production ignored the lot."
+  },
+  "expected": {
+    "status": "classified",
+    "action": "create_bottle",
+    "identityScope": "product",
+    "matchedBottleId": null,
+    "proposedBottle": {
+      "brand": {
+        "id": 501
+      },
+      "abv": 40
+    },
+    "proposedBottleNameOneOf": ["Kestrel"],
+    "summary": "A 20cl ceramic decanter of Beneagles blended Scotch is one Bottle above the 100 ml miniature line. Create Beneagles Kestrel, as the sibling bird decanters are catalogued."
+  }
+}

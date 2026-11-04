@@ -1,0 +1,1398 @@
+{
+  "id": "auction-smws-3-345-subtitle-name",
+  "name": "auction lot: SMWS 3.345 is named by code and printed subtitle",
+  "input": {
+    "reference": {
+      "id": 17500,
+      "url": "https://www.scotchwhiskyauctions.com/auctions/234-the-185th-auction/906167-smws-3345-bowmore-18-year-old-for-the-danish-smws-festival-2023/",
+      "name": "SMWS 3.345 Bowmore 18 Year Old For The Danish SMWS Festival 2023",
+      "imageUrl": null,
+      "externalSiteId": 28097,
+      "currentBottleId": null
+    },
+    "extractedIdentity": {
+      "abv": 57.4,
+      "brand": "SMWS",
+      "series": null,
+      "bottler": "The Scotch Malt Whisky Society",
+      "edition": "3.345",
+      "outturn": null,
+      "category": "single_malt",
+      "distillery": ["Bowmore"],
+      "expression": "3.345 Bowmore 18 Year Old For The Danish SMWS Festival 2023",
+      "maturation": null,
+      "stated_age": null,
+      "cask_number": null,
+      "single_cask": true,
+      "release_year": null,
+      "vintage_year": null,
+      "cask_strength": null
+    },
+    "imageEvidence": null,
+    "initialCandidates": [
+      {
+        "abv": null,
+        "brand": "Bowmore",
+        "score": 55.166428,
+        "series": null,
+        "source": ["text"],
+        "bottler": null,
+        "edition": null,
+        "outturn": null,
+        "bottleId": 1979,
+        "category": "single_malt",
+        "fullName": "Bowmore 18-year-old Limited Edition",
+        "reference": null,
+        "statedAge": 18,
+        "caskNumber": null,
+        "comparison": {
+          "missing": ["abv", "singleCask", "edition", "bottler"],
+          "conflicts": ["brand"],
+          "agreements": ["category", "distillers"]
+        },
+        "distillery": ["Bowmore"],
+        "maturation": null,
+        "releaseDay": null,
+        "singleCask": null,
+        "releaseYear": null,
+        "vintageYear": null,
+        "bottlingYear": null,
+        "caskStrength": null,
+        "releaseMonth": null,
+        "familyContext": {
+          "siblingBottles": []
+        }
+      },
+      {
+        "abv": null,
+        "brand": "Bowmore",
+        "score": 55.032272,
+        "series": null,
+        "source": ["text"],
+        "bottler": null,
+        "edition": null,
+        "outturn": null,
+        "bottleId": 773,
+        "category": "single_malt",
+        "fullName": "Bowmore 18-year-old",
+        "reference": null,
+        "statedAge": 18,
+        "caskNumber": null,
+        "comparison": {
+          "missing": ["abv", "singleCask", "edition", "bottler"],
+          "conflicts": ["brand"],
+          "agreements": ["category", "distillers"]
+        },
+        "distillery": ["Bowmore"],
+        "maturation": null,
+        "releaseDay": null,
+        "singleCask": null,
+        "releaseYear": null,
+        "vintageYear": null,
+        "bottlingYear": null,
+        "caskStrength": null,
+        "releaseMonth": null,
+        "familyContext": {
+          "siblingBottles": []
+        }
+      },
+      {
+        "abv": null,
+        "brand": "Arran",
+        "score": 53.92805,
+        "series": null,
+        "source": ["text"],
+        "bottler": "Arran",
+        "edition": null,
+        "outturn": null,
+        "bottleId": 3664,
+        "category": "single_malt",
+        "fullName": "Arran 18-year-old Pure by nature",
+        "reference": null,
+        "statedAge": 18,
+        "caskNumber": null,
+        "comparison": {
+          "missing": [
+            "abv",
+            "vintageYear",
+            "releaseYear",
+            "singleCask",
+            "caskNumber",
+            "distillers"
+          ],
+          "conflicts": ["brand", "bottler"],
+          "agreements": ["category", "statedAge"]
+        },
+        "distillery": [],
+        "maturation": null,
+        "releaseDay": null,
+        "singleCask": null,
+        "releaseYear": null,
+        "vintageYear": null,
+        "bottlingYear": null,
+        "caskStrength": null,
+        "releaseMonth": null,
+        "familyContext": {
+          "siblingBottles": []
+        }
+      },
+      {
+        "abv": 51,
+        "brand": "World Whiskey Society",
+        "score": 52.74216,
+        "series": null,
+        "source": ["text"],
+        "bottler": "World Whiskey Society",
+        "edition": null,
+        "outturn": null,
+        "bottleId": 61491,
+        "category": "single_malt",
+        "fullName": "World Whiskey Society Double Barrel Finished",
+        "reference": null,
+        "statedAge": null,
+        "caskNumber": null,
+        "comparison": {
+          "missing": [
+            "statedAge",
+            "vintageYear",
+            "releaseYear",
+            "singleCask",
+            "caskNumber",
+            "distillers"
+          ],
+          "conflicts": ["abv", "brand", "bottler"],
+          "agreements": ["category"]
+        },
+        "distillery": [],
+        "maturation": "finished in bourbon and Port Ruby casks",
+        "releaseDay": null,
+        "singleCask": null,
+        "releaseYear": null,
+        "vintageYear": null,
+        "bottlingYear": null,
+        "caskStrength": null,
+        "releaseMonth": null,
+        "familyContext": {
+          "siblingBottles": []
+        }
+      },
+      {
+        "abv": null,
+        "brand": "Talisker",
+        "score": 52.34999,
+        "series": null,
+        "source": ["text"],
+        "bottler": null,
+        "edition": null,
+        "outturn": null,
+        "bottleId": 4551,
+        "category": "single_malt",
+        "fullName": "Talisker 18-year-old Made by the Sea",
+        "reference": null,
+        "statedAge": 18,
+        "caskNumber": null,
+        "comparison": {
+          "missing": [
+            "abv",
+            "vintageYear",
+            "releaseYear",
+            "singleCask",
+            "caskNumber",
+            "bottler"
+          ],
+          "conflicts": ["brand", "distillers"],
+          "agreements": ["category", "statedAge"]
+        },
+        "distillery": ["Talisker"],
+        "maturation": null,
+        "releaseDay": null,
+        "singleCask": null,
+        "releaseYear": null,
+        "vintageYear": null,
+        "bottlingYear": null,
+        "caskStrength": null,
+        "releaseMonth": null,
+        "familyContext": {
+          "siblingBottles": []
+        }
+      },
+      {
+        "abv": 46.8,
+        "brand": "Fettercairn",
+        "score": 52.12282,
+        "series": null,
+        "source": ["text"],
+        "bottler": null,
+        "edition": "2023 Release",
+        "outturn": null,
+        "bottleId": 62293,
+        "category": "single_malt",
+        "fullName": "Fettercairn 18-year-old - 2023 Release",
+        "reference": null,
+        "statedAge": 18,
+        "caskNumber": null,
+        "comparison": {
+          "missing": ["singleCask", "caskNumber", "bottler"],
+          "conflicts": ["abv", "brand", "distillers"],
+          "agreements": ["category", "statedAge", "releaseYear"]
+        },
+        "distillery": ["Fettercairn"],
+        "maturation": null,
+        "releaseDay": null,
+        "singleCask": null,
+        "releaseYear": 2023,
+        "vintageYear": null,
+        "bottlingYear": null,
+        "caskStrength": null,
+        "releaseMonth": null,
+        "familyContext": {
+          "siblingBottles": []
+        }
+      },
+      {
+        "abv": 56.2,
+        "brand": "The Scotch Malt Whisky Society",
+        "score": 52.121243,
+        "series": null,
+        "source": ["text", "brand_coverage"],
+        "bottler": "The Scotch Malt Whisky Society",
+        "edition": null,
+        "outturn": null,
+        "bottleId": 48043,
+        "category": "single_malt",
+        "fullName": "SMWS 3.341 Spirit of gratitude and benevolence",
+        "reference": null,
+        "statedAge": 18,
+        "caskNumber": "3.341",
+        "comparison": {
+          "missing": ["edition"],
+          "conflicts": ["abv", "brand"],
+          "agreements": ["category", "singleCask", "bottler", "distillers"]
+        },
+        "distillery": ["Bowmore"],
+        "maturation": "2nd fill ex-bourbon hogshead",
+        "releaseDay": 6,
+        "singleCask": true,
+        "releaseYear": 2023,
+        "vintageYear": 2004,
+        "bottlingYear": null,
+        "caskStrength": null,
+        "releaseMonth": 1,
+        "familyContext": {
+          "siblingBottles": []
+        }
+      },
+      {
+        "abv": null,
+        "brand": "Bowmore",
+        "score": 50.651375,
+        "series": null,
+        "source": ["text"],
+        "bottler": null,
+        "edition": null,
+        "outturn": null,
+        "bottleId": 3066,
+        "category": "single_malt",
+        "fullName": "Bowmore 18-year-old The Vintner's Trilogy - Manzanilla Cask",
+        "reference": null,
+        "statedAge": 18,
+        "caskNumber": null,
+        "comparison": {
+          "missing": ["abv", "singleCask", "edition", "bottler"],
+          "conflicts": ["brand"],
+          "agreements": ["category", "distillers"]
+        },
+        "distillery": ["Bowmore"],
+        "maturation": null,
+        "releaseDay": null,
+        "singleCask": null,
+        "releaseYear": null,
+        "vintageYear": null,
+        "bottlingYear": null,
+        "caskStrength": null,
+        "releaseMonth": null,
+        "familyContext": {
+          "siblingBottles": []
+        }
+      },
+      {
+        "abv": 43,
+        "brand": "Bowmore",
+        "score": 50.261227,
+        "series": null,
+        "source": ["text"],
+        "bottler": null,
+        "edition": null,
+        "outturn": null,
+        "bottleId": 1656,
+        "category": "single_malt",
+        "fullName": "Bowmore 18-year-old Deep & Complex - Aston Martin Edition",
+        "reference": null,
+        "statedAge": 18,
+        "caskNumber": null,
+        "comparison": {
+          "missing": ["releaseYear", "singleCask", "caskNumber", "bottler"],
+          "conflicts": ["abv", "brand"],
+          "agreements": ["category", "statedAge", "distillers"]
+        },
+        "distillery": ["Bowmore"],
+        "maturation": null,
+        "releaseDay": null,
+        "singleCask": null,
+        "releaseYear": null,
+        "vintageYear": null,
+        "bottlingYear": null,
+        "caskStrength": null,
+        "releaseMonth": null,
+        "familyContext": {
+          "siblingBottles": []
+        }
+      },
+      {
+        "abv": null,
+        "brand": "The Whisky Exchange",
+        "score": 50.11509,
+        "series": null,
+        "source": ["text"],
+        "bottler": null,
+        "edition": null,
+        "outturn": null,
+        "bottleId": 17194,
+        "category": "single_malt",
+        "fullName": "The Whisky Exchange Masterpieces Range 18-year-old 1990 vintage (distilled at Bowmore)",
+        "reference": null,
+        "statedAge": 18,
+        "caskNumber": null,
+        "comparison": {
+          "missing": ["abv", "singleCask", "edition", "bottler", "distillers"],
+          "conflicts": ["brand"],
+          "agreements": ["category"]
+        },
+        "distillery": [],
+        "maturation": null,
+        "releaseDay": null,
+        "singleCask": null,
+        "releaseYear": null,
+        "vintageYear": 1990,
+        "bottlingYear": null,
+        "caskStrength": null,
+        "releaseMonth": null,
+        "familyContext": {
+          "siblingBottles": []
+        }
+      },
+      {
+        "abv": 57.4,
+        "brand": "The Scotch Malt Whisky Society",
+        "score": 49.45057,
+        "series": null,
+        "source": ["text"],
+        "bottler": "The Scotch Malt Whisky Society",
+        "edition": null,
+        "outturn": 202,
+        "bottleId": 49164,
+        "category": "single_malt",
+        "fullName": "SMWS 93.168 Defies belief!",
+        "reference": null,
+        "statedAge": 18,
+        "caskNumber": "93.168",
+        "comparison": {
+          "missing": ["edition"],
+          "conflicts": ["brand", "distillers"],
+          "agreements": ["category", "abv", "singleCask", "bottler"]
+        },
+        "distillery": ["Glen Scotia"],
+        "maturation": "Refill ex-bourbon hogshead",
+        "releaseDay": 26,
+        "singleCask": true,
+        "releaseYear": 2021,
+        "vintageYear": 2003,
+        "bottlingYear": null,
+        "caskStrength": null,
+        "releaseMonth": 8,
+        "familyContext": {
+          "siblingBottles": []
+        }
+      },
+      {
+        "abv": 54.8,
+        "brand": "Claxton's",
+        "score": 47.117702,
+        "series": null,
+        "source": ["text"],
+        "bottler": "Claxton's",
+        "edition": null,
+        "outturn": 216,
+        "bottleId": 64186,
+        "category": "single_malt",
+        "fullName": "Claxton's Tomintoul 18-year-old",
+        "reference": null,
+        "statedAge": 18,
+        "caskNumber": null,
+        "comparison": {
+          "missing": ["vintageYear", "releaseYear", "caskNumber"],
+          "conflicts": ["abv", "brand", "bottler", "distillers"],
+          "agreements": ["category", "statedAge", "singleCask"]
+        },
+        "distillery": ["Tomintoul"],
+        "maturation": "Oloroso hogshead",
+        "releaseDay": null,
+        "singleCask": true,
+        "releaseYear": null,
+        "vintageYear": null,
+        "bottlingYear": null,
+        "caskStrength": null,
+        "releaseMonth": null,
+        "familyContext": {
+          "siblingBottles": []
+        }
+      },
+      {
+        "abv": 43,
+        "brand": "The Dalmore",
+        "score": 46.186104,
+        "series": "Principal Collection",
+        "source": ["text"],
+        "bottler": null,
+        "edition": null,
+        "outturn": null,
+        "bottleId": 405,
+        "category": "single_malt",
+        "fullName": "Dalmore 18-year-old",
+        "reference": null,
+        "statedAge": 18,
+        "caskNumber": null,
+        "comparison": {
+          "missing": [
+            "vintageYear",
+            "releaseYear",
+            "singleCask",
+            "caskNumber",
+            "bottler"
+          ],
+          "conflicts": ["abv", "brand", "distillers"],
+          "agreements": ["category", "statedAge"]
+        },
+        "distillery": ["The Dalmore"],
+        "maturation": "American white oak ex-Bourbon casks and aged Matusalem Oloroso Sherry casks.",
+        "releaseDay": null,
+        "singleCask": null,
+        "releaseYear": null,
+        "vintageYear": null,
+        "bottlingYear": null,
+        "caskStrength": null,
+        "releaseMonth": null,
+        "familyContext": {
+          "siblingBottles": []
+        }
+      },
+      {
+        "abv": 43,
+        "brand": "Lismore",
+        "score": 44.821835,
+        "series": null,
+        "source": ["text"],
+        "bottler": null,
+        "edition": null,
+        "outturn": null,
+        "bottleId": 46930,
+        "category": "single_malt",
+        "fullName": "Lismore 18-year-old - 43.0% ABV",
+        "reference": null,
+        "statedAge": 18,
+        "caskNumber": null,
+        "comparison": {
+          "missing": [
+            "vintageYear",
+            "releaseYear",
+            "singleCask",
+            "caskNumber",
+            "bottler",
+            "distillers"
+          ],
+          "conflicts": ["abv", "brand"],
+          "agreements": ["category", "statedAge"]
+        },
+        "distillery": [],
+        "maturation": null,
+        "releaseDay": null,
+        "singleCask": null,
+        "releaseYear": null,
+        "vintageYear": null,
+        "bottlingYear": null,
+        "caskStrength": null,
+        "releaseMonth": null,
+        "familyContext": {
+          "siblingBottles": []
+        }
+      },
+      {
+        "abv": 43,
+        "brand": "Bowmore",
+        "score": 44.423298,
+        "series": null,
+        "source": ["text"],
+        "bottler": null,
+        "edition": "Aston Martin Edition #6",
+        "outturn": null,
+        "bottleId": 68640,
+        "category": "single_malt",
+        "fullName": "Bowmore 18-year-old Deep & Complex - Aston Martin Edition #6",
+        "reference": null,
+        "statedAge": 18,
+        "caskNumber": null,
+        "comparison": {
+          "missing": ["releaseYear", "singleCask", "caskNumber", "bottler"],
+          "conflicts": ["abv", "brand"],
+          "agreements": ["category", "statedAge", "distillers"]
+        },
+        "distillery": ["Bowmore"],
+        "maturation": null,
+        "releaseDay": null,
+        "singleCask": null,
+        "releaseYear": null,
+        "vintageYear": null,
+        "bottlingYear": null,
+        "caskStrength": null,
+        "releaseMonth": null,
+        "familyContext": {
+          "siblingBottles": []
+        }
+      },
+      {
+        "abv": 46.5,
+        "brand": "Living Souls",
+        "score": 44.219826,
+        "series": null,
+        "source": ["text"],
+        "bottler": "Living Souls",
+        "edition": null,
+        "outturn": null,
+        "bottleId": 46153,
+        "category": "single_malt",
+        "fullName": "Living Souls Speyburn - 18-year-old - 46.5% ABV - Bourbon Cask - Barrel - 1st Fill",
+        "reference": null,
+        "statedAge": 18,
+        "caskNumber": null,
+        "comparison": {
+          "missing": ["vintageYear", "releaseYear", "singleCask", "caskNumber"],
+          "conflicts": ["abv", "brand", "bottler", "distillers"],
+          "agreements": ["category", "statedAge"]
+        },
+        "distillery": ["Speyburn"],
+        "maturation": "bourbon",
+        "releaseDay": null,
+        "singleCask": null,
+        "releaseYear": null,
+        "vintageYear": null,
+        "bottlingYear": null,
+        "caskStrength": null,
+        "releaseMonth": null,
+        "familyContext": {
+          "siblingBottles": []
+        }
+      },
+      {
+        "abv": 43,
+        "brand": "Bowmore",
+        "score": 43.60829,
+        "series": null,
+        "source": ["text"],
+        "bottler": null,
+        "edition": "Aston Martin Edition #3",
+        "outturn": null,
+        "bottleId": 68639,
+        "category": "single_malt",
+        "fullName": "Bowmore 18-year-old Deep & Complex - Aston Martin Edition #3",
+        "reference": null,
+        "statedAge": 18,
+        "caskNumber": null,
+        "comparison": {
+          "missing": ["releaseYear", "singleCask", "caskNumber", "bottler"],
+          "conflicts": ["abv", "brand"],
+          "agreements": ["category", "statedAge", "distillers"]
+        },
+        "distillery": ["Bowmore"],
+        "maturation": "Oloroso & Pedro Ximénez sherry casks",
+        "releaseDay": null,
+        "singleCask": null,
+        "releaseYear": null,
+        "vintageYear": null,
+        "bottlingYear": null,
+        "caskStrength": null,
+        "releaseMonth": null,
+        "familyContext": {
+          "siblingBottles": []
+        }
+      },
+      {
+        "abv": 43,
+        "brand": "Bowmore",
+        "score": 43.430557,
+        "series": null,
+        "source": ["text"],
+        "bottler": null,
+        "edition": "Aston Martin Edition #9",
+        "outturn": null,
+        "bottleId": 68641,
+        "category": "single_malt",
+        "fullName": "Bowmore 18-year-old Deep & Complex - Aston Martin Edition #9",
+        "reference": null,
+        "statedAge": 18,
+        "caskNumber": null,
+        "comparison": {
+          "missing": [
+            "vintageYear",
+            "releaseYear",
+            "singleCask",
+            "caskNumber",
+            "bottler"
+          ],
+          "conflicts": ["abv", "brand"],
+          "agreements": ["category", "statedAge", "distillers"]
+        },
+        "distillery": ["Bowmore"],
+        "maturation": "Oloroso and Pedro Ximénez sherry casks",
+        "releaseDay": null,
+        "singleCask": null,
+        "releaseYear": null,
+        "vintageYear": null,
+        "bottlingYear": null,
+        "caskStrength": null,
+        "releaseMonth": null,
+        "familyContext": {
+          "siblingBottles": []
+        }
+      },
+      {
+        "abv": null,
+        "brand": "Dewar's",
+        "score": 43.113045,
+        "series": null,
+        "source": ["text"],
+        "bottler": null,
+        "edition": null,
+        "outturn": null,
+        "bottleId": 14265,
+        "category": "blend",
+        "fullName": "Dewar's 18-year-old The Vintage",
+        "reference": null,
+        "statedAge": 18,
+        "caskNumber": null,
+        "comparison": {
+          "missing": [
+            "abv",
+            "vintageYear",
+            "releaseYear",
+            "singleCask",
+            "caskNumber",
+            "bottler",
+            "distillers"
+          ],
+          "conflicts": ["category", "brand"],
+          "agreements": ["statedAge"]
+        },
+        "distillery": [],
+        "maturation": null,
+        "releaseDay": null,
+        "singleCask": null,
+        "releaseYear": null,
+        "vintageYear": null,
+        "bottlingYear": null,
+        "caskStrength": null,
+        "releaseMonth": null,
+        "familyContext": {
+          "siblingBottles": []
+        }
+      },
+      {
+        "abv": 44,
+        "brand": "Isle of Jura",
+        "score": 42.795387,
+        "series": null,
+        "source": ["text"],
+        "bottler": null,
+        "edition": null,
+        "outturn": null,
+        "bottleId": 45444,
+        "category": "single_malt",
+        "fullName": "Isle of Jura 18-year-old - 44.0% ABV",
+        "reference": null,
+        "statedAge": 18,
+        "caskNumber": null,
+        "comparison": {
+          "missing": [
+            "vintageYear",
+            "releaseYear",
+            "singleCask",
+            "caskNumber",
+            "bottler"
+          ],
+          "conflicts": ["abv", "brand", "distillers"],
+          "agreements": ["category", "statedAge"]
+        },
+        "distillery": ["Isle of Jura"],
+        "maturation": null,
+        "releaseDay": null,
+        "singleCask": null,
+        "releaseYear": null,
+        "vintageYear": null,
+        "bottlingYear": null,
+        "caskStrength": null,
+        "releaseMonth": null,
+        "familyContext": {
+          "siblingBottles": []
+        }
+      },
+      {
+        "abv": 52.8,
+        "brand": "Bowmore",
+        "score": 42.791405,
+        "series": "Fèis Ìle",
+        "source": ["text"],
+        "bottler": null,
+        "edition": "2023",
+        "outturn": 3500,
+        "bottleId": 52078,
+        "category": "single_malt",
+        "fullName": "Bowmore Fèis Ìle Release - 2023",
+        "reference": null,
+        "statedAge": 18,
+        "caskNumber": null,
+        "comparison": {
+          "missing": ["singleCask", "caskNumber", "bottler"],
+          "conflicts": ["abv", "brand"],
+          "agreements": ["category", "statedAge", "releaseYear", "distillers"]
+        },
+        "distillery": ["Bowmore"],
+        "maturation": null,
+        "releaseDay": null,
+        "singleCask": null,
+        "releaseYear": 2023,
+        "vintageYear": 2005,
+        "bottlingYear": 2023,
+        "caskStrength": null,
+        "releaseMonth": null,
+        "familyContext": {
+          "siblingBottles": []
+        }
+      },
+      {
+        "abv": null,
+        "brand": "Bunnahabhain",
+        "score": 41.867706,
+        "series": null,
+        "source": ["text"],
+        "bottler": null,
+        "edition": null,
+        "outturn": null,
+        "bottleId": 11928,
+        "category": "single_malt",
+        "fullName": "Bunnahabhain 18-year-old",
+        "reference": null,
+        "statedAge": 18,
+        "caskNumber": null,
+        "comparison": {
+          "missing": ["abv", "singleCask", "edition", "bottler"],
+          "conflicts": ["brand", "distillers"],
+          "agreements": ["category"]
+        },
+        "distillery": ["Bunnahabhain"],
+        "maturation": null,
+        "releaseDay": null,
+        "singleCask": null,
+        "releaseYear": null,
+        "vintageYear": null,
+        "bottlingYear": null,
+        "caskStrength": null,
+        "releaseMonth": null,
+        "familyContext": {
+          "siblingBottles": []
+        }
+      },
+      {
+        "abv": null,
+        "brand": "Deanston",
+        "score": 41.867706,
+        "series": null,
+        "source": ["text"],
+        "bottler": null,
+        "edition": null,
+        "outturn": null,
+        "bottleId": 703,
+        "category": "single_malt",
+        "fullName": "Deanston 18-year-old",
+        "reference": null,
+        "statedAge": 18,
+        "caskNumber": null,
+        "comparison": {
+          "missing": ["abv", "singleCask", "edition", "bottler"],
+          "conflicts": ["brand", "distillers"],
+          "agreements": ["category"]
+        },
+        "distillery": ["Deanston"],
+        "maturation": null,
+        "releaseDay": null,
+        "singleCask": null,
+        "releaseYear": null,
+        "vintageYear": null,
+        "bottlingYear": null,
+        "caskStrength": null,
+        "releaseMonth": null,
+        "familyContext": {
+          "siblingBottles": []
+        }
+      },
+      {
+        "abv": null,
+        "brand": "Tullibardine",
+        "score": 41.867706,
+        "series": null,
+        "source": ["text"],
+        "bottler": null,
+        "edition": null,
+        "outturn": null,
+        "bottleId": 34674,
+        "category": "single_malt",
+        "fullName": "Tullibardine 18-year-old",
+        "reference": null,
+        "statedAge": 18,
+        "caskNumber": null,
+        "comparison": {
+          "missing": ["abv", "singleCask", "edition", "bottler"],
+          "conflicts": ["brand", "distillers"],
+          "agreements": ["category"]
+        },
+        "distillery": ["Tullibardine"],
+        "maturation": null,
+        "releaseDay": null,
+        "singleCask": null,
+        "releaseYear": null,
+        "vintageYear": null,
+        "bottlingYear": null,
+        "caskStrength": null,
+        "releaseMonth": null,
+        "familyContext": {
+          "siblingBottles": []
+        }
+      },
+      {
+        "abv": null,
+        "brand": "Deerstalker",
+        "score": 41.82342,
+        "series": null,
+        "source": ["text"],
+        "bottler": null,
+        "edition": null,
+        "outturn": null,
+        "bottleId": 17542,
+        "category": "single_malt",
+        "fullName": "Deerstalker 18-year-old",
+        "reference": null,
+        "statedAge": 18,
+        "caskNumber": null,
+        "comparison": {
+          "missing": ["abv", "singleCask", "edition", "bottler", "distillers"],
+          "conflicts": ["brand"],
+          "agreements": ["category"]
+        },
+        "distillery": [],
+        "maturation": null,
+        "releaseDay": null,
+        "singleCask": null,
+        "releaseYear": null,
+        "vintageYear": null,
+        "bottlingYear": null,
+        "caskStrength": null,
+        "releaseMonth": null,
+        "familyContext": {
+          "siblingBottles": []
+        }
+      },
+      {
+        "abv": null,
+        "brand": "Balblair",
+        "score": 41.63434,
+        "series": null,
+        "source": ["text"],
+        "bottler": null,
+        "edition": null,
+        "outturn": null,
+        "bottleId": 626,
+        "category": "single_malt",
+        "fullName": "Balblair 18-year-old",
+        "reference": null,
+        "statedAge": 18,
+        "caskNumber": null,
+        "comparison": {
+          "missing": ["abv", "singleCask", "edition", "bottler"],
+          "conflicts": ["brand", "distillers"],
+          "agreements": ["category"]
+        },
+        "distillery": ["Balblair"],
+        "maturation": null,
+        "releaseDay": null,
+        "singleCask": null,
+        "releaseYear": null,
+        "vintageYear": null,
+        "bottlingYear": null,
+        "caskStrength": null,
+        "releaseMonth": null,
+        "familyContext": {
+          "siblingBottles": []
+        }
+      },
+      {
+        "abv": null,
+        "brand": "Springbank",
+        "score": 41.480713,
+        "series": null,
+        "source": ["text"],
+        "bottler": "Artful Dodger Whisky Collective",
+        "edition": null,
+        "outturn": null,
+        "bottleId": 679,
+        "category": "single_malt",
+        "fullName": "Springbank 18-year-old",
+        "reference": null,
+        "statedAge": 18,
+        "caskNumber": null,
+        "comparison": {
+          "missing": ["abv", "singleCask", "edition"],
+          "conflicts": ["brand", "bottler", "distillers"],
+          "agreements": ["category"]
+        },
+        "distillery": ["Springbank"],
+        "maturation": null,
+        "releaseDay": null,
+        "singleCask": null,
+        "releaseYear": null,
+        "vintageYear": null,
+        "bottlingYear": null,
+        "caskStrength": null,
+        "releaseMonth": null,
+        "familyContext": {
+          "siblingBottles": []
+        }
+      },
+      {
+        "abv": 63.8,
+        "brand": "The Scotch Malt Whisky Society",
+        "score": 0.7392780015512854,
+        "series": null,
+        "source": ["vector"],
+        "bottler": "The Scotch Malt Whisky Society",
+        "edition": null,
+        "outturn": null,
+        "bottleId": 19450,
+        "category": "single_malt",
+        "fullName": "SMWS 4.379 Cliffside harbour",
+        "reference": "SMWS 4.379 Cliffside harbour",
+        "statedAge": 18,
+        "caskNumber": "4.379",
+        "comparison": {
+          "missing": [],
+          "conflicts": ["abv", "caskNumber", "distillers"],
+          "agreements": [
+            "category",
+            "statedAge",
+            "vintageYear",
+            "releaseYear",
+            "singleCask",
+            "brand",
+            "bottler"
+          ]
+        },
+        "distillery": ["Highland Park"],
+        "maturation": "refill oloroso butt",
+        "releaseDay": 15,
+        "singleCask": true,
+        "releaseYear": 2023,
+        "vintageYear": 2004,
+        "bottlingYear": null,
+        "caskStrength": null,
+        "releaseMonth": 9,
+        "familyContext": {
+          "siblingBottles": []
+        }
+      },
+      {
+        "abv": 57.9,
+        "brand": "The Scotch Malt Whisky Society",
+        "score": 0.7368421052631579,
+        "series": null,
+        "source": ["vector", "brand_coverage"],
+        "bottler": "The Scotch Malt Whisky Society",
+        "edition": null,
+        "outturn": null,
+        "bottleId": 49974,
+        "category": "single_malt",
+        "fullName": "SMWS 3.349 A whirlpool of flavor",
+        "reference": "SMWS 3.349 A whirlpool of flavor",
+        "statedAge": 18,
+        "caskNumber": "3.349",
+        "comparison": {
+          "missing": ["edition"],
+          "conflicts": ["abv", "brand"],
+          "agreements": ["category", "singleCask", "bottler", "distillers"]
+        },
+        "distillery": ["Bowmore"],
+        "maturation": "Second-fill hogshead",
+        "releaseDay": null,
+        "singleCask": true,
+        "releaseYear": null,
+        "vintageYear": 2004,
+        "bottlingYear": null,
+        "caskStrength": null,
+        "releaseMonth": null,
+        "familyContext": {
+          "siblingBottles": []
+        }
+      },
+      {
+        "abv": 57.1,
+        "brand": "The Scotch Malt Whisky Society",
+        "score": 0.7368421052631579,
+        "series": null,
+        "source": ["vector", "brand_coverage"],
+        "bottler": "The Scotch Malt Whisky Society",
+        "edition": null,
+        "outturn": null,
+        "bottleId": 12198,
+        "category": "single_malt",
+        "fullName": "SMWS 3.350 Gladrags of yesteryear",
+        "reference": "SMWS 3.350 Gladrags of yesteryear",
+        "statedAge": 19,
+        "caskNumber": "3.350",
+        "comparison": {
+          "missing": ["edition"],
+          "conflicts": ["abv", "brand"],
+          "agreements": ["category", "singleCask", "bottler", "distillers"]
+        },
+        "distillery": ["Bowmore"],
+        "maturation": "2nd fill ex-bourbon hogshead",
+        "releaseDay": 13,
+        "singleCask": true,
+        "releaseYear": 2023,
+        "vintageYear": 2004,
+        "bottlingYear": null,
+        "caskStrength": null,
+        "releaseMonth": 12,
+        "familyContext": {
+          "siblingBottles": []
+        }
+      },
+      {
+        "abv": 57.4,
+        "brand": "The Scotch Malt Whisky Society",
+        "score": 0.7253560877576416,
+        "series": null,
+        "source": ["vector"],
+        "bottler": "The Scotch Malt Whisky Society",
+        "edition": null,
+        "outturn": null,
+        "bottleId": 49972,
+        "category": "single_malt",
+        "fullName": "SMWS 3.336 Sublime maritime",
+        "reference": "SMWS 3.336 Sublime maritime",
+        "statedAge": 17,
+        "caskNumber": "3.336",
+        "comparison": {
+          "missing": ["edition"],
+          "conflicts": ["brand"],
+          "agreements": [
+            "category",
+            "abv",
+            "singleCask",
+            "bottler",
+            "distillers"
+          ]
+        },
+        "distillery": ["Bowmore"],
+        "maturation": "Second-fill hogshead",
+        "releaseDay": null,
+        "singleCask": true,
+        "releaseYear": null,
+        "vintageYear": 2004,
+        "bottlingYear": null,
+        "caskStrength": null,
+        "releaseMonth": null,
+        "familyContext": {
+          "siblingBottles": []
+        }
+      }
+    ]
+  },
+  "context": {
+    "inspectedBottleIds": [],
+    "bottleContexts": [],
+    "inspectedEntities": [
+      {
+        "kind": "bottler",
+        "name": "The Scotch Malt Whisky Society",
+        "score": 1,
+        "source": ["exact", "text", "prefix", "contained"],
+        "entityId": 4263,
+        "reference": "The Scotch Malt Whisky Society",
+        "shortName": "SMWS",
+        "retrievedFor": [
+          {
+            "exact": true,
+            "query": "SMWS"
+          },
+          {
+            "exact": true,
+            "query": "The Scotch Malt Whisky Society"
+          }
+        ]
+      },
+      {
+        "kind": "distillery",
+        "name": "Bowmore",
+        "score": 1,
+        "source": ["exact", "text", "prefix", "contained"],
+        "entityId": 394,
+        "reference": "Bowmore",
+        "shortName": null,
+        "retrievedFor": [
+          {
+            "exact": true,
+            "query": "Bowmore"
+          }
+        ]
+      },
+      {
+        "kind": "distillery",
+        "name": "Glen Scotia",
+        "score": 1,
+        "source": ["exact", "text", "prefix", "contained"],
+        "entityId": 964,
+        "reference": "Glen Scotia",
+        "shortName": null,
+        "retrievedFor": [
+          {
+            "exact": true,
+            "query": "Glen Scotia"
+          }
+        ]
+      },
+      {
+        "kind": "bottler",
+        "name": "The Whisky Exchange",
+        "score": 1,
+        "source": ["exact", "text", "prefix", "contained"],
+        "entityId": 5952,
+        "reference": "The Whisky Exchange",
+        "shortName": null,
+        "retrievedFor": [
+          {
+            "exact": true,
+            "query": "The Whisky Exchange"
+          }
+        ]
+      },
+      {
+        "kind": "brand",
+        "name": "Deerstalker",
+        "score": 1,
+        "source": ["exact", "text", "prefix", "contained"],
+        "entityId": 2576,
+        "reference": "Deerstalker",
+        "shortName": null,
+        "retrievedFor": [
+          {
+            "exact": true,
+            "query": "Deerstalker"
+          }
+        ]
+      },
+      {
+        "kind": "distillery",
+        "name": "Bunnahabhain",
+        "score": 1,
+        "source": ["exact", "text", "prefix", "contained"],
+        "entityId": 144,
+        "reference": "Bunnahabhain",
+        "shortName": "",
+        "retrievedFor": [
+          {
+            "exact": true,
+            "query": "Bunnahabhain"
+          }
+        ]
+      },
+      {
+        "kind": "distillery",
+        "name": "Deanston",
+        "score": 1,
+        "source": ["exact", "text", "prefix", "contained"],
+        "entityId": 445,
+        "reference": "Deanston",
+        "shortName": null,
+        "retrievedFor": [
+          {
+            "exact": true,
+            "query": "Deanston"
+          }
+        ]
+      },
+      {
+        "kind": "distillery",
+        "name": "Tullibardine",
+        "score": 1,
+        "source": ["exact", "text", "prefix", "contained"],
+        "entityId": 1450,
+        "reference": "Tullibardine",
+        "shortName": null,
+        "retrievedFor": [
+          {
+            "exact": true,
+            "query": "Tullibardine"
+          }
+        ]
+      },
+      {
+        "kind": "distillery",
+        "name": "Balblair",
+        "score": 1,
+        "source": ["exact", "text", "prefix", "contained"],
+        "entityId": 38,
+        "reference": "Balblair",
+        "shortName": null,
+        "retrievedFor": [
+          {
+            "exact": true,
+            "query": "Balblair"
+          }
+        ]
+      },
+      {
+        "kind": "distillery",
+        "name": "Springbank",
+        "score": 1,
+        "source": ["exact", "text", "prefix", "contained"],
+        "entityId": 1362,
+        "reference": "Springbank",
+        "shortName": null,
+        "retrievedFor": [
+          {
+            "exact": true,
+            "query": "Springbank"
+          }
+        ]
+      },
+      {
+        "kind": "bottler",
+        "name": "Artful Dodger Whisky Collective",
+        "score": 1,
+        "source": ["exact", "text", "prefix", "contained"],
+        "entityId": 5995,
+        "reference": "Artful Dodger Whisky Collective",
+        "shortName": null,
+        "retrievedFor": [
+          {
+            "exact": true,
+            "query": "Artful Dodger Whisky Collective"
+          }
+        ]
+      },
+      {
+        "kind": "bottler",
+        "name": "The Whisky Society",
+        "score": 0.35,
+        "source": ["contained"],
+        "entityId": 367612,
+        "reference": "Whisky Society",
+        "shortName": null,
+        "retrievedFor": [
+          {
+            "query": "The Scotch Malt Whisky Society"
+          }
+        ]
+      },
+      {
+        "kind": "bottler",
+        "name": "&Whisky",
+        "score": 0.3205882352941177,
+        "source": ["contained"],
+        "entityId": 365821,
+        "reference": "&Whisky",
+        "shortName": null,
+        "retrievedFor": [
+          {
+            "query": "The Scotch Malt Whisky Society"
+          },
+          {
+            "query": "The Whisky Exchange"
+          },
+          {
+            "query": "Artful Dodger Whisky Collective"
+          }
+        ]
+      },
+      {
+        "kind": "distillery",
+        "name": "Ærø Whisky",
+        "score": 0.3,
+        "source": ["contained"],
+        "entityId": 4533,
+        "reference": "Ærø Whisky",
+        "shortName": null,
+        "retrievedFor": [
+          {
+            "query": "Artful Dodger Whisky Collective"
+          }
+        ]
+      },
+      {
+        "kind": "company",
+        "name": "Morrison Bowmore Distillers Ltd",
+        "score": 0.2,
+        "source": ["text"],
+        "entityId": 5684,
+        "reference": null,
+        "shortName": null,
+        "retrievedFor": [
+          {
+            "query": "Bowmore"
+          }
+        ]
+      }
+    ],
+    "inspectedSeries": []
+  },
+  "provenance": {
+    "source": "production_miss",
+    "verifiedSourceUrls": [
+      "https://www.scotchwhiskyauctions.com/auctions/234-the-185th-auction/906167-smws-3345-bowmore-18-year-old-for-the-danish-smws-festival-2023/"
+    ],
+    "dbOutcome": {
+      "bottleId": null,
+      "createsBottle": true,
+      "summary": "Production returned create_bottle with the name `3.345 Bowmore 18-year-old For The Danish Festival`."
+    },
+    "notes": "Captured from saved classifier run 36553 (auction_lot 17500, model null, 2026-11-03T21:18:08.854Z). Production rationale: Create the exact-cask SMWS release: product-specific search results identify Bowmore 3.345 as “By the shore of the wide world,” an 18-year-old, 2004-vintage bottling at 57.4% ABV, bottled for the 2023 Danish festival. No local candidate has cask number 3.345; nearby SMWS Bowmore candidates have different cask numbers. Checked 2026-11-03. Lot page: SMWS 3.345, subtitle \"By the shore of the wide world\", 18 years old, 57.4% ABV / 70cl, one of 255 bottles. The identity model names an SMWS Bottle <code> <subtitle> and keeps distillery, age, and selection out of the name. Production named it \"3.345 Bowmore 18-year-old For The Danish Festival\". No Bottle exists for 3.345."
+  },
+  "expected": {
+    "status": "classified",
+    "action": "create_bottle",
+    "identityScope": "exact_cask",
+    "matchedBottleId": null,
+    "proposedBottle": {
+      "brand": {
+        "id": 4263
+      },
+      "caskNumber": "3.345",
+      "statedAge": 18,
+      "abv": 57.4
+    },
+    "proposedBottleNameOneOf": ["3.345 By the shore of the wide world"],
+    "proposedBottleNameExcludes": ["Bowmore", "year-old", "Danish", "Festival"],
+    "proposedBottleDistillerIds": [394],
+    "summary": "Create SMWS 3.345 named by its code and printed subtitle; age, distillery, and the festival selection stay out of the name."
+  },
+  "knownFailure": {
+    "reason": "The SMWS code path in smwsPolicy.ts decides before the agent runs. It lists every candidate id, so the output schema rejects more than 25 and the run errors. It also builds the name from distillery, vintage, and age instead of the printed subtitle.",
+    "fixedBy": "Let the agent decide SMWS lots. Parse the code into verified facts (distillery number and cask), then let the agent match or create and name the Bottle."
+  }
+}

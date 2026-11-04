@@ -1,0 +1,944 @@
+{
+  "id": "auction-brora-1972-cc-bottled-1993",
+  "name": "auction lot page: 'Bottled: 1993' picks the Gordon & MacPhail Connoisseurs Choice Brora 1972 bottled in 1993",
+  "input": {
+    "reference": {
+      "id": 14250,
+      "url": "https://www.scotchwhiskyauctions.com/auctions/234-the-185th-auction/904104-brora-1972-connoisseurs-choice/",
+      "name": "Brora 1972 Connoisseurs Choice",
+      "imageUrl": null,
+      "externalSiteId": 28097,
+      "currentBottleId": null
+    },
+    "extractedIdentity": {
+      "abv": 40,
+      "brand": null,
+      "series": null,
+      "bottler": null,
+      "edition": null,
+      "outturn": null,
+      "category": null,
+      "distillery": null,
+      "expression": null,
+      "maturation": null,
+      "stated_age": null,
+      "cask_number": null,
+      "single_cask": null,
+      "release_year": null,
+      "vintage_year": null,
+      "cask_strength": null
+    },
+    "imageEvidence": null,
+    "initialCandidates": [
+      {
+        "abv": 40,
+        "brand": "Gordon & MacPhail",
+        "score": 79.206116,
+        "series": "Connoisseurs Choice",
+        "source": ["text", "context"],
+        "bottler": "Gordon & MacPhail",
+        "edition": null,
+        "outturn": null,
+        "bottleId": 55933,
+        "category": "single_malt",
+        "fullName": "Gordon & MacPhail Brora 1972",
+        "reference": null,
+        "statedAge": null,
+        "caskNumber": null,
+        "comparison": {
+          "missing": [],
+          "conflicts": [],
+          "agreements": ["abv"]
+        },
+        "distillery": ["Brora"],
+        "maturation": null,
+        "releaseDay": null,
+        "singleCask": null,
+        "releaseYear": null,
+        "vintageYear": 1972,
+        "bottlingYear": 1996,
+        "caskStrength": null,
+        "releaseMonth": null,
+        "familyContext": {
+          "siblingBottles": []
+        }
+      },
+      {
+        "abv": 40,
+        "brand": "Gordon & MacPhail",
+        "score": 79.206116,
+        "series": "Connoisseurs Choice",
+        "source": ["text", "context"],
+        "bottler": "Gordon & MacPhail",
+        "edition": null,
+        "outturn": null,
+        "bottleId": 55931,
+        "category": "single_malt",
+        "fullName": "Gordon & MacPhail Brora 1972",
+        "reference": null,
+        "statedAge": null,
+        "caskNumber": null,
+        "comparison": {
+          "missing": [],
+          "conflicts": [],
+          "agreements": ["abv"]
+        },
+        "distillery": ["Brora"],
+        "maturation": null,
+        "releaseDay": null,
+        "singleCask": null,
+        "releaseYear": null,
+        "vintageYear": 1972,
+        "bottlingYear": 1994,
+        "caskStrength": null,
+        "releaseMonth": null,
+        "familyContext": {
+          "siblingBottles": []
+        }
+      },
+      {
+        "abv": 40,
+        "brand": "Gordon & MacPhail",
+        "score": 79.206116,
+        "series": "Connoisseurs Choice",
+        "source": ["text", "context"],
+        "bottler": "Gordon & MacPhail",
+        "edition": null,
+        "outturn": null,
+        "bottleId": 55930,
+        "category": "single_malt",
+        "fullName": "Gordon & MacPhail Brora 1972",
+        "reference": null,
+        "statedAge": null,
+        "caskNumber": null,
+        "comparison": {
+          "missing": [],
+          "conflicts": [],
+          "agreements": ["abv"]
+        },
+        "distillery": ["Brora"],
+        "maturation": null,
+        "releaseDay": null,
+        "singleCask": null,
+        "releaseYear": null,
+        "vintageYear": 1972,
+        "bottlingYear": 1993,
+        "caskStrength": null,
+        "releaseMonth": null,
+        "familyContext": {
+          "siblingBottles": []
+        }
+      },
+      {
+        "abv": 40,
+        "brand": "Gordon & MacPhail",
+        "score": 79.206116,
+        "series": "Connoisseurs Choice",
+        "source": ["text", "context"],
+        "bottler": "Gordon & MacPhail",
+        "edition": null,
+        "outturn": null,
+        "bottleId": 55932,
+        "category": "single_malt",
+        "fullName": "Gordon & MacPhail Brora 1972",
+        "reference": null,
+        "statedAge": null,
+        "caskNumber": null,
+        "comparison": {
+          "missing": [],
+          "conflicts": [],
+          "agreements": ["abv"]
+        },
+        "distillery": ["Brora"],
+        "maturation": null,
+        "releaseDay": null,
+        "singleCask": null,
+        "releaseYear": null,
+        "vintageYear": 1972,
+        "bottlingYear": 1995,
+        "caskStrength": null,
+        "releaseMonth": null,
+        "familyContext": {
+          "siblingBottles": []
+        }
+      },
+      {
+        "abv": 40,
+        "brand": "Gordon & MacPhail",
+        "score": 79.206116,
+        "series": "Connoisseurs Choice",
+        "source": ["text", "context"],
+        "bottler": "Gordon & MacPhail",
+        "edition": null,
+        "outturn": null,
+        "bottleId": 55934,
+        "category": "single_malt",
+        "fullName": "Gordon & MacPhail Brora 1972",
+        "reference": null,
+        "statedAge": null,
+        "caskNumber": null,
+        "comparison": {
+          "missing": [],
+          "conflicts": [],
+          "agreements": ["abv"]
+        },
+        "distillery": ["Brora"],
+        "maturation": null,
+        "releaseDay": null,
+        "singleCask": null,
+        "releaseYear": null,
+        "vintageYear": 1972,
+        "bottlingYear": 1997,
+        "caskStrength": null,
+        "releaseMonth": null,
+        "familyContext": {
+          "siblingBottles": []
+        }
+      },
+      {
+        "abv": 40,
+        "brand": "Gordon & MacPhail",
+        "score": 79.206116,
+        "series": "Connoisseurs Choice",
+        "source": ["text", "context"],
+        "bottler": "Gordon & MacPhail",
+        "edition": null,
+        "outturn": null,
+        "bottleId": 55805,
+        "category": "single_malt",
+        "fullName": "Gordon & MacPhail Brora 1972",
+        "reference": null,
+        "statedAge": null,
+        "caskNumber": null,
+        "comparison": {
+          "missing": [],
+          "conflicts": [],
+          "agreements": ["abv"]
+        },
+        "distillery": ["Brora"],
+        "maturation": null,
+        "releaseDay": null,
+        "singleCask": null,
+        "releaseYear": null,
+        "vintageYear": 1972,
+        "bottlingYear": 1992,
+        "caskStrength": null,
+        "releaseMonth": null,
+        "familyContext": {
+          "siblingBottles": []
+        }
+      },
+      {
+        "abv": 40,
+        "brand": "Gordon & MacPhail",
+        "score": 58.298744,
+        "series": "Connoisseurs Choice",
+        "source": ["text"],
+        "bottler": "Gordon & MacPhail",
+        "edition": null,
+        "outturn": null,
+        "bottleId": 66614,
+        "category": "single_malt",
+        "fullName": "Gordon & MacPhail Glenlossie 1972",
+        "reference": null,
+        "statedAge": null,
+        "caskNumber": null,
+        "comparison": {
+          "missing": [],
+          "conflicts": [],
+          "agreements": ["abv"]
+        },
+        "distillery": ["Glenlossie"],
+        "maturation": null,
+        "releaseDay": null,
+        "singleCask": null,
+        "releaseYear": null,
+        "vintageYear": 1972,
+        "bottlingYear": 1991,
+        "caskStrength": null,
+        "releaseMonth": null,
+        "familyContext": {
+          "siblingBottles": []
+        }
+      },
+      {
+        "abv": 40,
+        "brand": "Gordon & MacPhail",
+        "score": 58.298744,
+        "series": "Connoisseurs Choice",
+        "source": ["text"],
+        "bottler": "Gordon & MacPhail",
+        "edition": null,
+        "outturn": null,
+        "bottleId": 60758,
+        "category": "single_malt",
+        "fullName": "Gordon & MacPhail Millburn 1972",
+        "reference": null,
+        "statedAge": null,
+        "caskNumber": null,
+        "comparison": {
+          "missing": [],
+          "conflicts": [],
+          "agreements": ["abv"]
+        },
+        "distillery": ["Millburn"],
+        "maturation": null,
+        "releaseDay": null,
+        "singleCask": null,
+        "releaseYear": null,
+        "vintageYear": 1972,
+        "bottlingYear": 1995,
+        "caskStrength": null,
+        "releaseMonth": null,
+        "familyContext": {
+          "siblingBottles": []
+        }
+      },
+      {
+        "abv": 40,
+        "brand": "Gordon & MacPhail",
+        "score": 58.298744,
+        "series": "Connoisseurs Choice",
+        "source": ["text"],
+        "bottler": "Gordon & MacPhail",
+        "edition": null,
+        "outturn": null,
+        "bottleId": 67656,
+        "category": "single_malt",
+        "fullName": "Gordon & MacPhail Oban 1972",
+        "reference": null,
+        "statedAge": null,
+        "caskNumber": null,
+        "comparison": {
+          "missing": [],
+          "conflicts": [],
+          "agreements": ["abv"]
+        },
+        "distillery": ["Oban"],
+        "maturation": null,
+        "releaseDay": null,
+        "singleCask": null,
+        "releaseYear": null,
+        "vintageYear": 1972,
+        "bottlingYear": 1992,
+        "caskStrength": null,
+        "releaseMonth": null,
+        "familyContext": {
+          "siblingBottles": []
+        }
+      },
+      {
+        "abv": 40,
+        "brand": "Gordon & MacPhail",
+        "score": 57.26317,
+        "series": "Connoisseurs Choice",
+        "source": ["text"],
+        "bottler": "Gordon & MacPhail",
+        "edition": null,
+        "outturn": null,
+        "bottleId": 52288,
+        "category": "single_malt",
+        "fullName": "Gordon & MacPhail Brora 1982",
+        "reference": null,
+        "statedAge": null,
+        "caskNumber": null,
+        "comparison": {
+          "missing": [],
+          "conflicts": [],
+          "agreements": ["abv"]
+        },
+        "distillery": ["Brora"],
+        "maturation": null,
+        "releaseDay": null,
+        "singleCask": null,
+        "releaseYear": null,
+        "vintageYear": 1982,
+        "bottlingYear": 2000,
+        "caskStrength": null,
+        "releaseMonth": null,
+        "familyContext": {
+          "siblingBottles": []
+        }
+      },
+      {
+        "abv": 40,
+        "brand": "Gordon & MacPhail",
+        "score": 57.26317,
+        "series": "Connoisseurs Choice",
+        "source": ["text"],
+        "bottler": "Gordon & MacPhail",
+        "edition": null,
+        "outturn": null,
+        "bottleId": 55936,
+        "category": "single_malt",
+        "fullName": "Gordon & MacPhail Brora 1982",
+        "reference": null,
+        "statedAge": null,
+        "caskNumber": null,
+        "comparison": {
+          "missing": [],
+          "conflicts": [],
+          "agreements": ["abv"]
+        },
+        "distillery": ["Brora"],
+        "maturation": null,
+        "releaseDay": null,
+        "singleCask": null,
+        "releaseYear": null,
+        "vintageYear": 1982,
+        "bottlingYear": 1997,
+        "caskStrength": null,
+        "releaseMonth": null,
+        "familyContext": {
+          "siblingBottles": []
+        }
+      },
+      {
+        "abv": 40,
+        "brand": "Gordon & MacPhail",
+        "score": 57.26317,
+        "series": "Connoisseurs Choice",
+        "source": ["text"],
+        "bottler": "Gordon & MacPhail",
+        "edition": null,
+        "outturn": null,
+        "bottleId": 67868,
+        "category": "single_malt",
+        "fullName": "Gordon & MacPhail Brora 1982",
+        "reference": null,
+        "statedAge": null,
+        "caskNumber": null,
+        "comparison": {
+          "missing": [],
+          "conflicts": [],
+          "agreements": ["abv"]
+        },
+        "distillery": ["Brora"],
+        "maturation": null,
+        "releaseDay": null,
+        "singleCask": null,
+        "releaseYear": null,
+        "vintageYear": 1982,
+        "bottlingYear": 1999,
+        "caskStrength": null,
+        "releaseMonth": null,
+        "familyContext": {
+          "siblingBottles": []
+        }
+      },
+      {
+        "abv": 40,
+        "brand": "Gordon & MacPhail",
+        "score": 57.26317,
+        "series": "Connoisseurs Choice",
+        "source": ["text"],
+        "bottler": "Gordon & MacPhail",
+        "edition": null,
+        "outturn": null,
+        "bottleId": 55938,
+        "category": "single_malt",
+        "fullName": "Gordon & MacPhail Brora 1982",
+        "reference": null,
+        "statedAge": null,
+        "caskNumber": null,
+        "comparison": {
+          "missing": [],
+          "conflicts": [],
+          "agreements": ["abv"]
+        },
+        "distillery": ["Brora"],
+        "maturation": null,
+        "releaseDay": null,
+        "singleCask": null,
+        "releaseYear": null,
+        "vintageYear": 1982,
+        "bottlingYear": 2002,
+        "caskStrength": null,
+        "releaseMonth": null,
+        "familyContext": {
+          "siblingBottles": []
+        }
+      },
+      {
+        "abv": 40,
+        "brand": "Gordon & MacPhail",
+        "score": 56.278355,
+        "series": "Connoisseurs Choice",
+        "source": ["text"],
+        "bottler": "Gordon & MacPhail",
+        "edition": null,
+        "outturn": null,
+        "bottleId": 52365,
+        "category": "single_malt",
+        "fullName": "Gordon & MacPhail Royal Brackla 1972",
+        "reference": null,
+        "statedAge": null,
+        "caskNumber": null,
+        "comparison": {
+          "missing": [],
+          "conflicts": [],
+          "agreements": ["abv"]
+        },
+        "distillery": ["Royal Brackla"],
+        "maturation": null,
+        "releaseDay": null,
+        "singleCask": null,
+        "releaseYear": null,
+        "vintageYear": 1972,
+        "bottlingYear": null,
+        "caskStrength": null,
+        "releaseMonth": null,
+        "familyContext": {
+          "siblingBottles": []
+        }
+      },
+      {
+        "abv": 40,
+        "brand": "Gordon & MacPhail",
+        "score": 52.639027,
+        "series": "Connoisseurs Choice",
+        "source": ["text"],
+        "bottler": "Gordon & MacPhail",
+        "edition": null,
+        "outturn": null,
+        "bottleId": 60998,
+        "category": "single_malt",
+        "fullName": "Gordon & MacPhail Ledaig 10-year-old 1972",
+        "reference": null,
+        "statedAge": 10,
+        "caskNumber": null,
+        "comparison": {
+          "missing": [],
+          "conflicts": [],
+          "agreements": ["abv"]
+        },
+        "distillery": ["Tobermory"],
+        "maturation": null,
+        "releaseDay": null,
+        "singleCask": null,
+        "releaseYear": null,
+        "vintageYear": 1972,
+        "bottlingYear": null,
+        "caskStrength": null,
+        "releaseMonth": null,
+        "familyContext": {
+          "siblingBottles": []
+        }
+      }
+    ]
+  },
+  "context": {
+    "inspectedBottleIds": [55805, 55930, 55931, 55932, 55933, 55934],
+    "bottleContexts": [
+      {
+        "exact": {
+          "abv": 40,
+          "edition": null,
+          "outturn": null,
+          "statedAge": null,
+          "caskNumber": null,
+          "maturation": null,
+          "releaseDay": null,
+          "singleCask": null,
+          "releaseYear": null,
+          "vintageYear": 1972,
+          "bottlingYear": 1992,
+          "caskStrength": null,
+          "releaseMonth": null
+        },
+        "shared": {
+          "name": "Brora 1972",
+          "brand": {
+            "name": "Gordon & MacPhail",
+            "entityId": 5645
+          },
+          "series": {
+            "name": "Connoisseurs Choice",
+            "seriesId": 97
+          },
+          "bottler": {
+            "name": "Gordon & MacPhail",
+            "entityId": 5645
+          },
+          "category": "single_malt",
+          "statedAge": null,
+          "distillers": [
+            {
+              "name": "Brora",
+              "entityId": 116
+            }
+          ]
+        },
+        "groupId": 28766,
+        "bottleId": 55805,
+        "fullName": "Gordon & MacPhail Brora 1972",
+        "siblings": [],
+        "references": [],
+        "observations": [],
+        "imageSources": []
+      },
+      {
+        "exact": {
+          "abv": 40,
+          "edition": null,
+          "outturn": null,
+          "statedAge": null,
+          "caskNumber": null,
+          "maturation": null,
+          "releaseDay": null,
+          "singleCask": null,
+          "releaseYear": null,
+          "vintageYear": 1972,
+          "bottlingYear": 1993,
+          "caskStrength": null,
+          "releaseMonth": null
+        },
+        "shared": {
+          "name": "Brora 1972",
+          "brand": {
+            "name": "Gordon & MacPhail",
+            "entityId": 5645
+          },
+          "series": {
+            "name": "Connoisseurs Choice",
+            "seriesId": 97
+          },
+          "bottler": {
+            "name": "Gordon & MacPhail",
+            "entityId": 5645
+          },
+          "category": "single_malt",
+          "statedAge": null,
+          "distillers": [
+            {
+              "name": "Brora",
+              "entityId": 116
+            }
+          ]
+        },
+        "groupId": 28891,
+        "bottleId": 55930,
+        "fullName": "Gordon & MacPhail Brora 1972",
+        "siblings": [],
+        "references": [],
+        "observations": [],
+        "imageSources": []
+      },
+      {
+        "exact": {
+          "abv": 40,
+          "edition": null,
+          "outturn": null,
+          "statedAge": null,
+          "caskNumber": null,
+          "maturation": null,
+          "releaseDay": null,
+          "singleCask": null,
+          "releaseYear": null,
+          "vintageYear": 1972,
+          "bottlingYear": 1994,
+          "caskStrength": null,
+          "releaseMonth": null
+        },
+        "shared": {
+          "name": "Brora 1972",
+          "brand": {
+            "name": "Gordon & MacPhail",
+            "entityId": 5645
+          },
+          "series": {
+            "name": "Connoisseurs Choice",
+            "seriesId": 97
+          },
+          "bottler": {
+            "name": "Gordon & MacPhail",
+            "entityId": 5645
+          },
+          "category": "single_malt",
+          "statedAge": null,
+          "distillers": [
+            {
+              "name": "Brora",
+              "entityId": 116
+            }
+          ]
+        },
+        "groupId": 28892,
+        "bottleId": 55931,
+        "fullName": "Gordon & MacPhail Brora 1972",
+        "siblings": [],
+        "references": [],
+        "observations": [],
+        "imageSources": []
+      },
+      {
+        "exact": {
+          "abv": 40,
+          "edition": null,
+          "outturn": null,
+          "statedAge": null,
+          "caskNumber": null,
+          "maturation": null,
+          "releaseDay": null,
+          "singleCask": null,
+          "releaseYear": null,
+          "vintageYear": 1972,
+          "bottlingYear": 1995,
+          "caskStrength": null,
+          "releaseMonth": null
+        },
+        "shared": {
+          "name": "Brora 1972",
+          "brand": {
+            "name": "Gordon & MacPhail",
+            "entityId": 5645
+          },
+          "series": {
+            "name": "Connoisseurs Choice",
+            "seriesId": 97
+          },
+          "bottler": {
+            "name": "Gordon & MacPhail",
+            "entityId": 5645
+          },
+          "category": "single_malt",
+          "statedAge": null,
+          "distillers": [
+            {
+              "name": "Brora",
+              "entityId": 116
+            }
+          ]
+        },
+        "groupId": 28893,
+        "bottleId": 55932,
+        "fullName": "Gordon & MacPhail Brora 1972",
+        "siblings": [],
+        "references": [],
+        "observations": [],
+        "imageSources": []
+      },
+      {
+        "exact": {
+          "abv": 40,
+          "edition": null,
+          "outturn": null,
+          "statedAge": null,
+          "caskNumber": null,
+          "maturation": null,
+          "releaseDay": null,
+          "singleCask": null,
+          "releaseYear": null,
+          "vintageYear": 1972,
+          "bottlingYear": 1996,
+          "caskStrength": null,
+          "releaseMonth": null
+        },
+        "shared": {
+          "name": "Brora 1972",
+          "brand": {
+            "name": "Gordon & MacPhail",
+            "entityId": 5645
+          },
+          "series": {
+            "name": "Connoisseurs Choice",
+            "seriesId": 97
+          },
+          "bottler": {
+            "name": "Gordon & MacPhail",
+            "entityId": 5645
+          },
+          "category": "single_malt",
+          "statedAge": null,
+          "distillers": [
+            {
+              "name": "Brora",
+              "entityId": 116
+            }
+          ]
+        },
+        "groupId": 28894,
+        "bottleId": 55933,
+        "fullName": "Gordon & MacPhail Brora 1972",
+        "siblings": [],
+        "references": [],
+        "observations": [],
+        "imageSources": []
+      },
+      {
+        "exact": {
+          "abv": 40,
+          "edition": null,
+          "outturn": null,
+          "statedAge": null,
+          "caskNumber": null,
+          "maturation": null,
+          "releaseDay": null,
+          "singleCask": null,
+          "releaseYear": null,
+          "vintageYear": 1972,
+          "bottlingYear": 1997,
+          "caskStrength": null,
+          "releaseMonth": null
+        },
+        "shared": {
+          "name": "Brora 1972",
+          "brand": {
+            "name": "Gordon & MacPhail",
+            "entityId": 5645
+          },
+          "series": {
+            "name": "Connoisseurs Choice",
+            "seriesId": 97
+          },
+          "bottler": {
+            "name": "Gordon & MacPhail",
+            "entityId": 5645
+          },
+          "category": "single_malt",
+          "statedAge": null,
+          "distillers": [
+            {
+              "name": "Brora",
+              "entityId": 116
+            }
+          ]
+        },
+        "groupId": 28895,
+        "bottleId": 55934,
+        "fullName": "Gordon & MacPhail Brora 1972",
+        "siblings": [],
+        "references": [],
+        "observations": [],
+        "imageSources": []
+      }
+    ],
+    "inspectedEntities": [
+      {
+        "kind": "bottler",
+        "name": "Gordon & MacPhail",
+        "score": 1,
+        "source": ["exact", "text", "prefix", "contained"],
+        "entityId": 5645,
+        "reference": "Gordon & MacPhail",
+        "shortName": null,
+        "retrievedFor": [
+          {
+            "exact": true,
+            "query": "Gordon & MacPhail"
+          }
+        ]
+      },
+      {
+        "kind": "distillery",
+        "name": "Brora",
+        "score": 1,
+        "source": ["exact", "text", "prefix", "contained"],
+        "entityId": 116,
+        "reference": "Brora",
+        "shortName": null,
+        "retrievedFor": [
+          {
+            "exact": true,
+            "query": "Brora"
+          }
+        ]
+      },
+      {
+        "kind": "distillery",
+        "name": "Glenlossie",
+        "score": 1,
+        "source": ["exact", "text", "prefix", "contained"],
+        "entityId": 983,
+        "reference": "Glenlossie",
+        "shortName": null,
+        "retrievedFor": [
+          {
+            "exact": true,
+            "query": "Glenlossie"
+          }
+        ]
+      },
+      {
+        "kind": "distillery",
+        "name": "Millburn",
+        "score": 1,
+        "source": ["exact", "text", "prefix", "contained"],
+        "entityId": 1183,
+        "reference": "Millburn",
+        "shortName": null,
+        "retrievedFor": [
+          {
+            "exact": true,
+            "query": "Millburn"
+          }
+        ]
+      },
+      {
+        "kind": "distillery",
+        "name": "Oban",
+        "score": 1,
+        "source": ["exact", "text", "prefix", "contained"],
+        "entityId": 1208,
+        "reference": "Oban",
+        "shortName": null,
+        "retrievedFor": [
+          {
+            "exact": true,
+            "query": "Oban"
+          }
+        ]
+      },
+      {
+        "kind": "distillery",
+        "name": "Royal Brackla",
+        "score": 1,
+        "source": ["exact", "text", "prefix", "contained"],
+        "entityId": 1300,
+        "reference": "Royal Brackla",
+        "shortName": null,
+        "retrievedFor": [
+          {
+            "exact": true,
+            "query": "Royal Brackla"
+          }
+        ]
+      },
+      {
+        "kind": "distillery",
+        "name": "Tobermory",
+        "score": 1,
+        "source": ["exact", "text", "prefix", "contained"],
+        "entityId": 1441,
+        "reference": "Tobermory",
+        "shortName": null,
+        "retrievedFor": [
+          {
+            "exact": true,
+            "query": "Tobermory"
+          }
+        ]
+      }
+    ],
+    "inspectedSeries": []
+  },
+  "provenance": {
+    "source": "production_miss",
+    "verifiedSourceUrls": [
+      "https://www.scotchwhiskyauctions.com/auctions/234-the-185th-auction/904104-brora-1972-connoisseurs-choice/"
+    ],
+    "dbOutcome": {
+      "bottleId": null,
+      "createsBottle": false,
+      "summary": "Production returned no_match: six local Brora 1972 Connoisseurs Choice Bottles differ only by bottling year (1992 to 1997) and the agent did not know which one the lot was."
+    },
+    "notes": "Saved check 34521, source auction_lot 14250 (lot 185-904104), run 2026-11-03. Production's read of the Scotch Whisky Auctions lot page returned only the site's age gate and cookie banner (the saved page opening is about 720 characters, under the 2,000-character opening limit, and find_in_page hits only the URL), so the agent never saw the lot's detail fields. The page's own HTML states 'Distilled: 1972', 'Bottled: 1993', '40% ABV / 70cl' and names Gordon & MacPhail's Connoisseurs Choice. This case adds those passages as the reviewed page result for the lot URL, so it tests what the agent does once the page read gets past the age gate. Without that fix the agent still cannot see the bottling year, and no_match would remain the safe answer. 55930 stores vintage 1972, bottlingYear 1993, 40%, Brand and bottler Gordon & MacPhail, Series Connoisseurs Choice, distiller Brora. The other five candidates have bottling years 1992, 1994, 1995, 1996 and 1997. Doc gap, not decided here: the classifier doc says a different bottling year alone does not prove a separate Bottle, while the catalog keeps one Bottle per bottling year. 55930 is right under either reading."
+  },
+  "expected": {
+    "status": "classified",
+    "action": "match",
+    "identityScope": "product",
+    "matchedBottleId": 55930,
+    "summary": "Match Gordon & MacPhail Connoisseurs Choice Brora 1972 bottled in 1993 (55930). The lot page states Distilled 1972, Bottled 1993, 40%, which picks the one candidate with bottlingYear 1993 out of six 1972 Connoisseurs Choice Bottles."
+  }
+}

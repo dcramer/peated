@@ -1,0 +1,1683 @@
+{
+  "id": "auction-balvenie-tun-1509-batch-6-tier",
+  "name": "auction lot: an exact Balvenie Tun 1509 Batch 6 match with every fact anchored applies on its own",
+  "input": {
+    "reference": {
+      "id": 13960,
+      "url": "https://www.scotchwhiskyauctions.com/auctions/234-the-185th-auction/905739-balvenie-tun-1509-batch-6/",
+      "name": "Balvenie Tun 1509 Batch #6",
+      "imageUrl": null,
+      "externalSiteId": 28097,
+      "currentBottleId": null
+    },
+    "extractedIdentity": {
+      "abv": 50.4,
+      "brand": null,
+      "series": null,
+      "bottler": null,
+      "edition": null,
+      "outturn": null,
+      "category": null,
+      "distillery": null,
+      "expression": null,
+      "maturation": null,
+      "stated_age": null,
+      "cask_number": null,
+      "single_cask": null,
+      "release_year": null,
+      "vintage_year": null,
+      "cask_strength": null
+    },
+    "imageEvidence": null,
+    "initialCandidates": [
+      {
+        "abv": 50.4,
+        "brand": "The Balvenie",
+        "score": 141.88416,
+        "series": "Tun 1509",
+        "source": ["vector", "text", "exact", "context"],
+        "bottler": null,
+        "edition": "Batch 6",
+        "outturn": null,
+        "bottleId": 53359,
+        "category": "single_malt",
+        "fullName": "The Balvenie Tun 1509 - Batch 6",
+        "reference": "Balvenie Tun 1509 (Batch 6)",
+        "statedAge": null,
+        "caskNumber": null,
+        "comparison": {
+          "missing": [],
+          "conflicts": [],
+          "agreements": ["abv"]
+        },
+        "distillery": ["The Balvenie"],
+        "maturation": null,
+        "releaseDay": null,
+        "singleCask": null,
+        "releaseYear": 2019,
+        "vintageYear": null,
+        "bottlingYear": null,
+        "caskStrength": null,
+        "releaseMonth": null,
+        "familyContext": {
+          "siblingBottles": []
+        }
+      },
+      {
+        "abv": 51.7,
+        "brand": "The Balvenie",
+        "score": 109.02654,
+        "series": "Tun 1509",
+        "source": ["vector", "text"],
+        "bottler": null,
+        "edition": "Batch 4",
+        "outturn": null,
+        "bottleId": 44978,
+        "category": "single_malt",
+        "fullName": "The Balvenie Tun 1509 - Batch 4",
+        "reference": "The Balvenie Tun 1509 (Batch 4)",
+        "statedAge": null,
+        "caskNumber": null,
+        "comparison": {
+          "missing": [],
+          "conflicts": ["abv"],
+          "agreements": []
+        },
+        "distillery": ["The Balvenie"],
+        "maturation": null,
+        "releaseDay": null,
+        "singleCask": null,
+        "releaseYear": 2017,
+        "vintageYear": null,
+        "bottlingYear": null,
+        "caskStrength": null,
+        "releaseMonth": null,
+        "familyContext": {
+          "siblingBottles": [
+            {
+              "abv": null,
+              "edition": null,
+              "outturn": null,
+              "bottleId": 44019,
+              "fullName": "The Balvenie Tun 1509",
+              "statedAge": null,
+              "caskNumber": null,
+              "maturation": null,
+              "releaseDay": null,
+              "singleCask": null,
+              "releaseYear": null,
+              "traitFields": [],
+              "vintageYear": null,
+              "bottlingYear": null,
+              "caskStrength": null,
+              "releaseMonth": null
+            },
+            {
+              "abv": 47.1,
+              "edition": "Batch 1",
+              "outturn": null,
+              "bottleId": 44975,
+              "fullName": "The Balvenie Tun 1509 - Batch 1",
+              "statedAge": null,
+              "caskNumber": null,
+              "maturation": null,
+              "releaseDay": null,
+              "singleCask": null,
+              "releaseYear": 2014,
+              "traitFields": ["edition", "releaseYear", "abv"],
+              "vintageYear": null,
+              "bottlingYear": null,
+              "caskStrength": null,
+              "releaseMonth": null
+            },
+            {
+              "abv": 50.3,
+              "edition": "Batch 2",
+              "outturn": null,
+              "bottleId": 44976,
+              "fullName": "The Balvenie Tun 1509 - Batch 2",
+              "statedAge": null,
+              "caskNumber": null,
+              "maturation": null,
+              "releaseDay": null,
+              "singleCask": null,
+              "releaseYear": 2015,
+              "traitFields": ["edition", "releaseYear", "abv"],
+              "vintageYear": null,
+              "bottlingYear": null,
+              "caskStrength": null,
+              "releaseMonth": null
+            },
+            {
+              "abv": 52.2,
+              "edition": "Batch 3",
+              "outturn": null,
+              "bottleId": 44977,
+              "fullName": "The Balvenie Tun 1509 - Batch 3",
+              "statedAge": null,
+              "caskNumber": null,
+              "maturation": null,
+              "releaseDay": null,
+              "singleCask": null,
+              "releaseYear": 2016,
+              "traitFields": ["edition", "releaseYear", "abv"],
+              "vintageYear": null,
+              "bottlingYear": null,
+              "caskStrength": null,
+              "releaseMonth": null
+            },
+            {
+              "abv": 52.6,
+              "edition": "Batch 5",
+              "outturn": null,
+              "bottleId": 44979,
+              "fullName": "The Balvenie Tun 1509 - Batch 5",
+              "statedAge": null,
+              "caskNumber": null,
+              "maturation": null,
+              "releaseDay": null,
+              "singleCask": null,
+              "releaseYear": 2018,
+              "traitFields": ["edition", "releaseYear", "abv"],
+              "vintageYear": null,
+              "bottlingYear": null,
+              "caskStrength": null,
+              "releaseMonth": null
+            }
+          ]
+        }
+      },
+      {
+        "abv": 47.1,
+        "brand": "The Balvenie",
+        "score": 107.78649,
+        "series": "Tun 1509",
+        "source": ["vector", "text"],
+        "bottler": null,
+        "edition": "Batch 1",
+        "outturn": null,
+        "bottleId": 44975,
+        "category": "single_malt",
+        "fullName": "The Balvenie Tun 1509 - Batch 1",
+        "reference": "The Balvenie Tun 1509, 47.1%",
+        "statedAge": null,
+        "caskNumber": null,
+        "comparison": {
+          "missing": [],
+          "conflicts": ["abv"],
+          "agreements": []
+        },
+        "distillery": ["The Balvenie"],
+        "maturation": null,
+        "releaseDay": null,
+        "singleCask": null,
+        "releaseYear": 2014,
+        "vintageYear": null,
+        "bottlingYear": null,
+        "caskStrength": null,
+        "releaseMonth": null,
+        "familyContext": {
+          "siblingBottles": [
+            {
+              "abv": null,
+              "edition": null,
+              "outturn": null,
+              "bottleId": 44019,
+              "fullName": "The Balvenie Tun 1509",
+              "statedAge": null,
+              "caskNumber": null,
+              "maturation": null,
+              "releaseDay": null,
+              "singleCask": null,
+              "releaseYear": null,
+              "traitFields": [],
+              "vintageYear": null,
+              "bottlingYear": null,
+              "caskStrength": null,
+              "releaseMonth": null
+            },
+            {
+              "abv": 50.3,
+              "edition": "Batch 2",
+              "outturn": null,
+              "bottleId": 44976,
+              "fullName": "The Balvenie Tun 1509 - Batch 2",
+              "statedAge": null,
+              "caskNumber": null,
+              "maturation": null,
+              "releaseDay": null,
+              "singleCask": null,
+              "releaseYear": 2015,
+              "traitFields": ["edition", "releaseYear", "abv"],
+              "vintageYear": null,
+              "bottlingYear": null,
+              "caskStrength": null,
+              "releaseMonth": null
+            },
+            {
+              "abv": 52.2,
+              "edition": "Batch 3",
+              "outturn": null,
+              "bottleId": 44977,
+              "fullName": "The Balvenie Tun 1509 - Batch 3",
+              "statedAge": null,
+              "caskNumber": null,
+              "maturation": null,
+              "releaseDay": null,
+              "singleCask": null,
+              "releaseYear": 2016,
+              "traitFields": ["edition", "releaseYear", "abv"],
+              "vintageYear": null,
+              "bottlingYear": null,
+              "caskStrength": null,
+              "releaseMonth": null
+            },
+            {
+              "abv": 51.7,
+              "edition": "Batch 4",
+              "outturn": null,
+              "bottleId": 44978,
+              "fullName": "The Balvenie Tun 1509 - Batch 4",
+              "statedAge": null,
+              "caskNumber": null,
+              "maturation": null,
+              "releaseDay": null,
+              "singleCask": null,
+              "releaseYear": 2017,
+              "traitFields": ["edition", "releaseYear", "abv"],
+              "vintageYear": null,
+              "bottlingYear": null,
+              "caskStrength": null,
+              "releaseMonth": null
+            },
+            {
+              "abv": 52.6,
+              "edition": "Batch 5",
+              "outturn": null,
+              "bottleId": 44979,
+              "fullName": "The Balvenie Tun 1509 - Batch 5",
+              "statedAge": null,
+              "caskNumber": null,
+              "maturation": null,
+              "releaseDay": null,
+              "singleCask": null,
+              "releaseYear": 2018,
+              "traitFields": ["edition", "releaseYear", "abv"],
+              "vintageYear": null,
+              "bottlingYear": null,
+              "caskStrength": null,
+              "releaseMonth": null
+            }
+          ]
+        }
+      },
+      {
+        "abv": null,
+        "brand": "The Balvenie",
+        "score": 99.68713,
+        "series": "Tun 1509",
+        "source": ["text"],
+        "bottler": null,
+        "edition": null,
+        "outturn": null,
+        "bottleId": 44019,
+        "category": "single_malt",
+        "fullName": "The Balvenie Tun 1509",
+        "reference": null,
+        "statedAge": null,
+        "caskNumber": null,
+        "comparison": {
+          "missing": ["abv"],
+          "conflicts": [],
+          "agreements": []
+        },
+        "distillery": ["The Balvenie"],
+        "maturation": null,
+        "releaseDay": null,
+        "singleCask": null,
+        "releaseYear": null,
+        "vintageYear": null,
+        "bottlingYear": null,
+        "caskStrength": null,
+        "releaseMonth": null,
+        "familyContext": {
+          "siblingBottles": [
+            {
+              "abv": 47.1,
+              "edition": "Batch 1",
+              "outturn": null,
+              "bottleId": 44975,
+              "fullName": "The Balvenie Tun 1509 - Batch 1",
+              "statedAge": null,
+              "caskNumber": null,
+              "maturation": null,
+              "releaseDay": null,
+              "singleCask": null,
+              "releaseYear": 2014,
+              "traitFields": ["edition", "releaseYear", "abv"],
+              "vintageYear": null,
+              "bottlingYear": null,
+              "caskStrength": null,
+              "releaseMonth": null
+            },
+            {
+              "abv": 50.3,
+              "edition": "Batch 2",
+              "outturn": null,
+              "bottleId": 44976,
+              "fullName": "The Balvenie Tun 1509 - Batch 2",
+              "statedAge": null,
+              "caskNumber": null,
+              "maturation": null,
+              "releaseDay": null,
+              "singleCask": null,
+              "releaseYear": 2015,
+              "traitFields": ["edition", "releaseYear", "abv"],
+              "vintageYear": null,
+              "bottlingYear": null,
+              "caskStrength": null,
+              "releaseMonth": null
+            },
+            {
+              "abv": 52.2,
+              "edition": "Batch 3",
+              "outturn": null,
+              "bottleId": 44977,
+              "fullName": "The Balvenie Tun 1509 - Batch 3",
+              "statedAge": null,
+              "caskNumber": null,
+              "maturation": null,
+              "releaseDay": null,
+              "singleCask": null,
+              "releaseYear": 2016,
+              "traitFields": ["edition", "releaseYear", "abv"],
+              "vintageYear": null,
+              "bottlingYear": null,
+              "caskStrength": null,
+              "releaseMonth": null
+            },
+            {
+              "abv": 51.7,
+              "edition": "Batch 4",
+              "outturn": null,
+              "bottleId": 44978,
+              "fullName": "The Balvenie Tun 1509 - Batch 4",
+              "statedAge": null,
+              "caskNumber": null,
+              "maturation": null,
+              "releaseDay": null,
+              "singleCask": null,
+              "releaseYear": 2017,
+              "traitFields": ["edition", "releaseYear", "abv"],
+              "vintageYear": null,
+              "bottlingYear": null,
+              "caskStrength": null,
+              "releaseMonth": null
+            },
+            {
+              "abv": 52.6,
+              "edition": "Batch 5",
+              "outturn": null,
+              "bottleId": 44979,
+              "fullName": "The Balvenie Tun 1509 - Batch 5",
+              "statedAge": null,
+              "caskNumber": null,
+              "maturation": null,
+              "releaseDay": null,
+              "singleCask": null,
+              "releaseYear": 2018,
+              "traitFields": ["edition", "releaseYear", "abv"],
+              "vintageYear": null,
+              "bottlingYear": null,
+              "caskStrength": null,
+              "releaseMonth": null
+            }
+          ]
+        }
+      },
+      {
+        "abv": 50.4,
+        "brand": "The Balvenie",
+        "score": 73.104416,
+        "series": "Tun 1401",
+        "source": ["text"],
+        "bottler": null,
+        "edition": "Batch 4",
+        "outturn": 2500,
+        "bottleId": 53362,
+        "category": "single_malt",
+        "fullName": "The Balvenie Tun 1401 - Batch 4",
+        "reference": null,
+        "statedAge": null,
+        "caskNumber": null,
+        "comparison": {
+          "missing": [],
+          "conflicts": [],
+          "agreements": ["abv"]
+        },
+        "distillery": ["The Balvenie"],
+        "maturation": null,
+        "releaseDay": null,
+        "singleCask": null,
+        "releaseYear": 2012,
+        "vintageYear": null,
+        "bottlingYear": null,
+        "caskStrength": null,
+        "releaseMonth": null,
+        "familyContext": {
+          "siblingBottles": []
+        }
+      },
+      {
+        "abv": 50.4,
+        "brand": "That Boutique-y Whisky Company",
+        "score": 40.282116,
+        "series": null,
+        "source": ["text"],
+        "bottler": "That Boutique-y Whisky Company",
+        "edition": "Batch 1",
+        "outturn": null,
+        "bottleId": 46938,
+        "category": "single_malt",
+        "fullName": "TBWC Cotswolds - Batch 1 - 3-year-old - 50.4% ABV",
+        "reference": null,
+        "statedAge": 3,
+        "caskNumber": null,
+        "comparison": {
+          "missing": [],
+          "conflicts": [],
+          "agreements": ["abv"]
+        },
+        "distillery": ["Cotswolds Distillery"],
+        "maturation": null,
+        "releaseDay": null,
+        "singleCask": null,
+        "releaseYear": null,
+        "vintageYear": null,
+        "bottlingYear": null,
+        "caskStrength": null,
+        "releaseMonth": null,
+        "familyContext": {
+          "siblingBottles": []
+        }
+      },
+      {
+        "abv": null,
+        "brand": "The Balvenie",
+        "score": 35.38174,
+        "series": null,
+        "source": ["text"],
+        "bottler": null,
+        "edition": null,
+        "outturn": null,
+        "bottleId": 17201,
+        "category": "single_malt",
+        "fullName": "The Balvenie 40-year-old (Batch 2)",
+        "reference": null,
+        "statedAge": 40,
+        "caskNumber": null,
+        "comparison": {
+          "missing": ["abv"],
+          "conflicts": [],
+          "agreements": []
+        },
+        "distillery": ["The Balvenie"],
+        "maturation": null,
+        "releaseDay": null,
+        "singleCask": null,
+        "releaseYear": null,
+        "vintageYear": null,
+        "bottlingYear": null,
+        "caskStrength": null,
+        "releaseMonth": null,
+        "familyContext": {
+          "siblingBottles": []
+        }
+      },
+      {
+        "abv": null,
+        "brand": "The Balvenie",
+        "score": 34.093567,
+        "series": null,
+        "source": ["text"],
+        "bottler": null,
+        "edition": "Batch 1",
+        "outturn": null,
+        "bottleId": 45132,
+        "category": "single_malt",
+        "fullName": "The Balvenie Signature 12-year-old - Batch 1",
+        "reference": null,
+        "statedAge": 12,
+        "caskNumber": null,
+        "comparison": {
+          "missing": ["abv"],
+          "conflicts": [],
+          "agreements": []
+        },
+        "distillery": ["The Balvenie"],
+        "maturation": null,
+        "releaseDay": null,
+        "singleCask": null,
+        "releaseYear": null,
+        "vintageYear": null,
+        "bottlingYear": null,
+        "caskStrength": null,
+        "releaseMonth": null,
+        "familyContext": {
+          "siblingBottles": [
+            {
+              "abv": null,
+              "edition": null,
+              "outturn": null,
+              "bottleId": 44164,
+              "fullName": "The Balvenie Signature 12-year-old",
+              "statedAge": 12,
+              "caskNumber": null,
+              "maturation": null,
+              "releaseDay": null,
+              "singleCask": null,
+              "releaseYear": null,
+              "traitFields": ["statedAge"],
+              "vintageYear": null,
+              "bottlingYear": null,
+              "caskStrength": null,
+              "releaseMonth": null
+            }
+          ]
+        }
+      },
+      {
+        "abv": 50.4,
+        "brand": "Single Cask Nation",
+        "score": 33.664642,
+        "series": null,
+        "source": ["text"],
+        "bottler": "Single Cask Nation",
+        "edition": "US Retail Release #6",
+        "outturn": null,
+        "bottleId": 47877,
+        "category": "single_malt",
+        "fullName": "Single Cask Nation Ben Nevis 1996 23-year-old - US Retail Release #6",
+        "reference": null,
+        "statedAge": 23,
+        "caskNumber": "1839",
+        "comparison": {
+          "missing": [],
+          "conflicts": [],
+          "agreements": ["abv"]
+        },
+        "distillery": ["Ben Nevis"],
+        "maturation": null,
+        "releaseDay": null,
+        "singleCask": true,
+        "releaseYear": null,
+        "vintageYear": 1996,
+        "bottlingYear": 2019,
+        "caskStrength": null,
+        "releaseMonth": null,
+        "familyContext": {
+          "siblingBottles": []
+        }
+      },
+      {
+        "abv": null,
+        "brand": "The GlenDronach",
+        "score": 32.96682,
+        "series": null,
+        "source": ["text"],
+        "bottler": "The GlenDronach",
+        "edition": "Batch 6",
+        "outturn": null,
+        "bottleId": 44906,
+        "category": "single_malt",
+        "fullName": "The GlenDronach Cask Strength - Batch 6",
+        "reference": null,
+        "statedAge": null,
+        "caskNumber": null,
+        "comparison": {
+          "missing": ["abv"],
+          "conflicts": [],
+          "agreements": []
+        },
+        "distillery": [],
+        "maturation": null,
+        "releaseDay": null,
+        "singleCask": null,
+        "releaseYear": null,
+        "vintageYear": null,
+        "bottlingYear": null,
+        "caskStrength": true,
+        "releaseMonth": null,
+        "familyContext": {
+          "siblingBottles": [
+            {
+              "abv": null,
+              "edition": null,
+              "outturn": null,
+              "bottleId": 44009,
+              "fullName": "The GlenDronach Cask Strength",
+              "statedAge": null,
+              "caskNumber": null,
+              "maturation": null,
+              "releaseDay": null,
+              "singleCask": null,
+              "releaseYear": null,
+              "traitFields": [],
+              "vintageYear": null,
+              "bottlingYear": null,
+              "caskStrength": null,
+              "releaseMonth": null
+            },
+            {
+              "abv": null,
+              "edition": "Batch 1",
+              "outturn": null,
+              "bottleId": 44901,
+              "fullName": "The GlenDronach Cask Strength - Batch 1",
+              "statedAge": null,
+              "caskNumber": null,
+              "maturation": null,
+              "releaseDay": null,
+              "singleCask": null,
+              "releaseYear": null,
+              "traitFields": ["edition", "caskStrength"],
+              "vintageYear": null,
+              "bottlingYear": null,
+              "caskStrength": true,
+              "releaseMonth": null
+            },
+            {
+              "abv": null,
+              "edition": "Batch 10",
+              "outturn": null,
+              "bottleId": 44910,
+              "fullName": "The GlenDronach Cask Strength - Batch 10 - 10-year-old",
+              "statedAge": 10,
+              "caskNumber": null,
+              "maturation": null,
+              "releaseDay": null,
+              "singleCask": null,
+              "releaseYear": null,
+              "traitFields": ["edition", "statedAge", "caskStrength"],
+              "vintageYear": null,
+              "bottlingYear": null,
+              "caskStrength": true,
+              "releaseMonth": null
+            },
+            {
+              "abv": null,
+              "edition": "Batch 2",
+              "outturn": null,
+              "bottleId": 44902,
+              "fullName": "The GlenDronach Cask Strength - Batch 2",
+              "statedAge": null,
+              "caskNumber": null,
+              "maturation": null,
+              "releaseDay": null,
+              "singleCask": null,
+              "releaseYear": null,
+              "traitFields": ["edition", "caskStrength"],
+              "vintageYear": null,
+              "bottlingYear": null,
+              "caskStrength": true,
+              "releaseMonth": null
+            },
+            {
+              "abv": null,
+              "edition": "Batch 3",
+              "outturn": null,
+              "bottleId": 44903,
+              "fullName": "The GlenDronach Cask Strength - Batch 3",
+              "statedAge": null,
+              "caskNumber": null,
+              "maturation": null,
+              "releaseDay": null,
+              "singleCask": null,
+              "releaseYear": null,
+              "traitFields": ["edition", "caskStrength"],
+              "vintageYear": null,
+              "bottlingYear": null,
+              "caskStrength": true,
+              "releaseMonth": null
+            },
+            {
+              "abv": null,
+              "edition": "Batch 4",
+              "outturn": null,
+              "bottleId": 44905,
+              "fullName": "The GlenDronach Cask Strength - Batch 4 - 12-year-old",
+              "statedAge": 12,
+              "caskNumber": null,
+              "maturation": null,
+              "releaseDay": null,
+              "singleCask": null,
+              "releaseYear": null,
+              "traitFields": ["edition", "statedAge", "caskStrength"],
+              "vintageYear": null,
+              "bottlingYear": null,
+              "caskStrength": true,
+              "releaseMonth": null
+            },
+            {
+              "abv": null,
+              "edition": "Batch 5",
+              "outturn": null,
+              "bottleId": 44904,
+              "fullName": "The GlenDronach Cask Strength - Batch 5 - 10-year-old",
+              "statedAge": 10,
+              "caskNumber": null,
+              "maturation": null,
+              "releaseDay": null,
+              "singleCask": null,
+              "releaseYear": null,
+              "traitFields": ["edition", "statedAge", "caskStrength"],
+              "vintageYear": null,
+              "bottlingYear": null,
+              "caskStrength": true,
+              "releaseMonth": null
+            },
+            {
+              "abv": null,
+              "edition": "Batch 7",
+              "outturn": null,
+              "bottleId": 44907,
+              "fullName": "The GlenDronach Cask Strength - Batch 7",
+              "statedAge": null,
+              "caskNumber": null,
+              "maturation": null,
+              "releaseDay": null,
+              "singleCask": null,
+              "releaseYear": null,
+              "traitFields": ["edition", "caskStrength"],
+              "vintageYear": null,
+              "bottlingYear": null,
+              "caskStrength": true,
+              "releaseMonth": null
+            }
+          ]
+        }
+      },
+      {
+        "abv": null,
+        "brand": "Ballechin",
+        "score": 32.8223,
+        "series": null,
+        "source": ["text"],
+        "bottler": "Edradour",
+        "edition": "Batch 6",
+        "outturn": null,
+        "bottleId": 44972,
+        "category": "single_malt",
+        "fullName": "Ballechin The Discovery Series - Batch 6",
+        "reference": null,
+        "statedAge": null,
+        "caskNumber": null,
+        "comparison": {
+          "missing": ["abv"],
+          "conflicts": [],
+          "agreements": []
+        },
+        "distillery": [],
+        "maturation": null,
+        "releaseDay": null,
+        "singleCask": null,
+        "releaseYear": null,
+        "vintageYear": null,
+        "bottlingYear": null,
+        "caskStrength": null,
+        "releaseMonth": null,
+        "familyContext": {
+          "siblingBottles": [
+            {
+              "abv": null,
+              "edition": null,
+              "outturn": null,
+              "bottleId": 44018,
+              "fullName": "Ballechin The Discovery Series",
+              "statedAge": null,
+              "caskNumber": null,
+              "maturation": null,
+              "releaseDay": null,
+              "singleCask": null,
+              "releaseYear": null,
+              "traitFields": [],
+              "vintageYear": null,
+              "bottlingYear": null,
+              "caskStrength": null,
+              "releaseMonth": null
+            },
+            {
+              "abv": null,
+              "edition": "Batch 3",
+              "outturn": null,
+              "bottleId": 44970,
+              "fullName": "Ballechin The Discovery Series - Batch 3",
+              "statedAge": null,
+              "caskNumber": null,
+              "maturation": null,
+              "releaseDay": null,
+              "singleCask": null,
+              "releaseYear": null,
+              "traitFields": ["edition"],
+              "vintageYear": null,
+              "bottlingYear": null,
+              "caskStrength": null,
+              "releaseMonth": null
+            },
+            {
+              "abv": null,
+              "edition": "Batch 5",
+              "outturn": null,
+              "bottleId": 44971,
+              "fullName": "Ballechin The Discovery Series - Batch 5",
+              "statedAge": null,
+              "caskNumber": null,
+              "maturation": null,
+              "releaseDay": null,
+              "singleCask": null,
+              "releaseYear": null,
+              "traitFields": ["edition"],
+              "vintageYear": null,
+              "bottlingYear": null,
+              "caskStrength": null,
+              "releaseMonth": null
+            },
+            {
+              "abv": null,
+              "edition": "Batch 7",
+              "outturn": null,
+              "bottleId": 44973,
+              "fullName": "Ballechin The Discovery Series - Batch 7",
+              "statedAge": null,
+              "caskNumber": null,
+              "maturation": null,
+              "releaseDay": null,
+              "singleCask": null,
+              "releaseYear": null,
+              "traitFields": ["edition"],
+              "vintageYear": null,
+              "bottlingYear": null,
+              "caskStrength": null,
+              "releaseMonth": null
+            },
+            {
+              "abv": null,
+              "edition": "Batch 8",
+              "outturn": null,
+              "bottleId": 44974,
+              "fullName": "Ballechin The Discovery Series - Batch 8",
+              "statedAge": null,
+              "caskNumber": null,
+              "maturation": null,
+              "releaseDay": null,
+              "singleCask": null,
+              "releaseYear": null,
+              "traitFields": ["edition"],
+              "vintageYear": null,
+              "bottlingYear": null,
+              "caskStrength": null,
+              "releaseMonth": null
+            }
+          ]
+        }
+      },
+      {
+        "abv": null,
+        "brand": "Kilkerran",
+        "score": 31.18284,
+        "series": null,
+        "source": ["text"],
+        "bottler": "Glengyle",
+        "edition": "Batch 6",
+        "outturn": null,
+        "bottleId": 44935,
+        "category": "single_malt",
+        "fullName": "Kilkerran Heavily Peated Peat in Progress - Batch 6",
+        "reference": null,
+        "statedAge": null,
+        "caskNumber": null,
+        "comparison": {
+          "missing": ["abv"],
+          "conflicts": [],
+          "agreements": []
+        },
+        "distillery": [],
+        "maturation": null,
+        "releaseDay": null,
+        "singleCask": null,
+        "releaseYear": null,
+        "vintageYear": null,
+        "bottlingYear": null,
+        "caskStrength": null,
+        "releaseMonth": null,
+        "familyContext": {
+          "siblingBottles": [
+            {
+              "abv": null,
+              "edition": null,
+              "outturn": null,
+              "bottleId": 44012,
+              "fullName": "Kilkerran Heavily Peated Peat in Progress",
+              "statedAge": null,
+              "caskNumber": null,
+              "maturation": null,
+              "releaseDay": null,
+              "singleCask": null,
+              "releaseYear": null,
+              "traitFields": [],
+              "vintageYear": null,
+              "bottlingYear": null,
+              "caskStrength": null,
+              "releaseMonth": null
+            },
+            {
+              "abv": null,
+              "edition": "Batch 1",
+              "outturn": null,
+              "bottleId": 44930,
+              "fullName": "Kilkerran Heavily Peated Peat in Progress - Batch 1",
+              "statedAge": null,
+              "caskNumber": null,
+              "maturation": null,
+              "releaseDay": null,
+              "singleCask": null,
+              "releaseYear": null,
+              "traitFields": ["edition"],
+              "vintageYear": null,
+              "bottlingYear": null,
+              "caskStrength": null,
+              "releaseMonth": null
+            },
+            {
+              "abv": null,
+              "edition": "Batch 2",
+              "outturn": null,
+              "bottleId": 44929,
+              "fullName": "Kilkerran Heavily Peated Peat in Progress - Batch 2",
+              "statedAge": null,
+              "caskNumber": null,
+              "maturation": null,
+              "releaseDay": null,
+              "singleCask": null,
+              "releaseYear": null,
+              "traitFields": ["edition"],
+              "vintageYear": null,
+              "bottlingYear": null,
+              "caskStrength": null,
+              "releaseMonth": null
+            },
+            {
+              "abv": null,
+              "edition": "Batch 3",
+              "outturn": null,
+              "bottleId": 44931,
+              "fullName": "Kilkerran Heavily Peated Peat in Progress - Batch 3",
+              "statedAge": null,
+              "caskNumber": null,
+              "maturation": null,
+              "releaseDay": null,
+              "singleCask": null,
+              "releaseYear": null,
+              "traitFields": ["edition"],
+              "vintageYear": null,
+              "bottlingYear": null,
+              "caskStrength": null,
+              "releaseMonth": null
+            },
+            {
+              "abv": null,
+              "edition": "Batch 4",
+              "outturn": null,
+              "bottleId": 44933,
+              "fullName": "Kilkerran Heavily Peated Peat in Progress - Batch 4",
+              "statedAge": null,
+              "caskNumber": null,
+              "maturation": null,
+              "releaseDay": null,
+              "singleCask": null,
+              "releaseYear": null,
+              "traitFields": ["edition"],
+              "vintageYear": null,
+              "bottlingYear": null,
+              "caskStrength": null,
+              "releaseMonth": null
+            },
+            {
+              "abv": null,
+              "edition": "Batch 5",
+              "outturn": null,
+              "bottleId": 44932,
+              "fullName": "Kilkerran Heavily Peated Peat in Progress - Batch 5",
+              "statedAge": null,
+              "caskNumber": null,
+              "maturation": null,
+              "releaseDay": null,
+              "singleCask": null,
+              "releaseYear": null,
+              "traitFields": ["edition"],
+              "vintageYear": null,
+              "bottlingYear": null,
+              "caskStrength": null,
+              "releaseMonth": null
+            },
+            {
+              "abv": null,
+              "edition": "Batch 7",
+              "outturn": null,
+              "bottleId": 44934,
+              "fullName": "Kilkerran Heavily Peated Peat in Progress - Batch 7",
+              "statedAge": null,
+              "caskNumber": null,
+              "maturation": null,
+              "releaseDay": null,
+              "singleCask": null,
+              "releaseYear": null,
+              "traitFields": ["edition"],
+              "vintageYear": null,
+              "bottlingYear": null,
+              "caskStrength": null,
+              "releaseMonth": null
+            }
+          ]
+        }
+      },
+      {
+        "abv": null,
+        "brand": "The GlenDronach",
+        "score": 30.680344,
+        "series": null,
+        "source": ["text"],
+        "bottler": "The GlenDronach",
+        "edition": "Batch 6",
+        "outturn": null,
+        "bottleId": 44999,
+        "category": "single_malt",
+        "fullName": "The GlenDronach 1971 Single Cask - Batch 6 - 30-year-old",
+        "reference": null,
+        "statedAge": 30,
+        "caskNumber": null,
+        "comparison": {
+          "missing": ["abv"],
+          "conflicts": [],
+          "agreements": []
+        },
+        "distillery": [],
+        "maturation": null,
+        "releaseDay": null,
+        "singleCask": true,
+        "releaseYear": null,
+        "vintageYear": null,
+        "bottlingYear": null,
+        "caskStrength": null,
+        "releaseMonth": null,
+        "familyContext": {
+          "siblingBottles": [
+            {
+              "abv": null,
+              "edition": null,
+              "outturn": null,
+              "bottleId": 44024,
+              "fullName": "The GlenDronach 1971 Single Cask",
+              "statedAge": null,
+              "caskNumber": null,
+              "maturation": null,
+              "releaseDay": null,
+              "singleCask": null,
+              "releaseYear": null,
+              "traitFields": [],
+              "vintageYear": null,
+              "bottlingYear": null,
+              "caskStrength": null,
+              "releaseMonth": null
+            },
+            {
+              "abv": null,
+              "edition": null,
+              "outturn": null,
+              "bottleId": 45000,
+              "fullName": "The GlenDronach 1971 Single Cask - 38-year-old",
+              "statedAge": 38,
+              "caskNumber": null,
+              "maturation": null,
+              "releaseDay": null,
+              "singleCask": null,
+              "releaseYear": null,
+              "traitFields": ["statedAge"],
+              "vintageYear": null,
+              "bottlingYear": null,
+              "caskStrength": null,
+              "releaseMonth": null
+            },
+            {
+              "abv": null,
+              "edition": "Batch 1",
+              "outturn": null,
+              "bottleId": 44996,
+              "fullName": "The GlenDronach 1971 Single Cask - Batch 1 - 38-year-old",
+              "statedAge": 38,
+              "caskNumber": null,
+              "maturation": null,
+              "releaseDay": null,
+              "singleCask": true,
+              "releaseYear": null,
+              "traitFields": ["edition", "statedAge", "singleCask"],
+              "vintageYear": null,
+              "bottlingYear": null,
+              "caskStrength": null,
+              "releaseMonth": null
+            },
+            {
+              "abv": null,
+              "edition": "Batch 2",
+              "outturn": null,
+              "bottleId": 44997,
+              "fullName": "The GlenDronach 1971 Single Cask - Batch 2 - 30-year-old",
+              "statedAge": 30,
+              "caskNumber": null,
+              "maturation": null,
+              "releaseDay": null,
+              "singleCask": true,
+              "releaseYear": null,
+              "traitFields": ["edition", "statedAge", "singleCask"],
+              "vintageYear": null,
+              "bottlingYear": null,
+              "caskStrength": null,
+              "releaseMonth": null
+            },
+            {
+              "abv": null,
+              "edition": "Batch 4",
+              "outturn": null,
+              "bottleId": 44998,
+              "fullName": "The GlenDronach 1971 Single Cask - Batch 4 - 49-year-old",
+              "statedAge": 49,
+              "caskNumber": null,
+              "maturation": null,
+              "releaseDay": null,
+              "singleCask": true,
+              "releaseYear": null,
+              "traitFields": ["edition", "statedAge", "singleCask"],
+              "vintageYear": null,
+              "bottlingYear": null,
+              "caskStrength": null,
+              "releaseMonth": null
+            }
+          ]
+        }
+      },
+      {
+        "abv": null,
+        "brand": "The Blended Whisky Company",
+        "score": 30.479977,
+        "series": null,
+        "source": ["text"],
+        "bottler": "The Blended Whisky Company",
+        "edition": "Batch 6",
+        "outturn": null,
+        "bottleId": 45050,
+        "category": "blend",
+        "fullName": "The Blended Whisky Company The Lost Distilleries Blend - Batch 6",
+        "reference": null,
+        "statedAge": null,
+        "caskNumber": null,
+        "comparison": {
+          "missing": ["abv"],
+          "conflicts": [],
+          "agreements": []
+        },
+        "distillery": [],
+        "maturation": null,
+        "releaseDay": null,
+        "singleCask": null,
+        "releaseYear": null,
+        "vintageYear": null,
+        "bottlingYear": null,
+        "caskStrength": null,
+        "releaseMonth": null,
+        "familyContext": {
+          "siblingBottles": [
+            {
+              "abv": null,
+              "edition": null,
+              "outturn": null,
+              "bottleId": 44042,
+              "fullName": "The Blended Whisky Company The Lost Distilleries Blend",
+              "statedAge": null,
+              "caskNumber": null,
+              "maturation": null,
+              "releaseDay": null,
+              "singleCask": null,
+              "releaseYear": null,
+              "traitFields": [],
+              "vintageYear": null,
+              "bottlingYear": null,
+              "caskStrength": null,
+              "releaseMonth": null
+            },
+            {
+              "abv": null,
+              "edition": "Batch 4",
+              "outturn": null,
+              "bottleId": 45049,
+              "fullName": "The Blended Whisky Company The Lost Distilleries Blend - Batch 4",
+              "statedAge": null,
+              "caskNumber": null,
+              "maturation": null,
+              "releaseDay": null,
+              "singleCask": null,
+              "releaseYear": null,
+              "traitFields": ["edition"],
+              "vintageYear": null,
+              "bottlingYear": null,
+              "caskStrength": null,
+              "releaseMonth": null
+            }
+          ]
+        }
+      },
+      {
+        "abv": null,
+        "brand": "The Scotch Malt Whisky Society",
+        "score": 30.152695,
+        "series": null,
+        "source": ["text"],
+        "bottler": "The Scotch Malt Whisky Society",
+        "edition": "Batch 6",
+        "outturn": null,
+        "bottleId": 51590,
+        "category": "blended_malt",
+        "fullName": "SMWS The Beachcomber - Batch 6",
+        "reference": null,
+        "statedAge": 7,
+        "caskNumber": null,
+        "comparison": {
+          "missing": ["abv"],
+          "conflicts": [],
+          "agreements": []
+        },
+        "distillery": [],
+        "maturation": "First-fill barrels",
+        "releaseDay": null,
+        "singleCask": false,
+        "releaseYear": null,
+        "vintageYear": null,
+        "bottlingYear": null,
+        "caskStrength": null,
+        "releaseMonth": null,
+        "familyContext": {
+          "siblingBottles": []
+        }
+      }
+    ]
+  },
+  "context": {
+    "inspectedBottleIds": [53359],
+    "bottleContexts": [
+      {
+        "exact": {
+          "abv": 50.4,
+          "edition": "Batch 6",
+          "outturn": null,
+          "statedAge": null,
+          "caskNumber": null,
+          "maturation": null,
+          "releaseDay": null,
+          "singleCask": null,
+          "releaseYear": 2019,
+          "vintageYear": null,
+          "bottlingYear": null,
+          "caskStrength": null,
+          "releaseMonth": null
+        },
+        "shared": {
+          "name": "Tun 1509",
+          "brand": {
+            "name": "The Balvenie",
+            "entityId": 8463
+          },
+          "series": {
+            "name": "Tun 1509",
+            "seriesId": 600
+          },
+          "bottler": null,
+          "category": "single_malt",
+          "statedAge": null,
+          "distillers": [
+            {
+              "name": "The Balvenie",
+              "entityId": 8463
+            }
+          ]
+        },
+        "groupId": 26320,
+        "bottleId": 53359,
+        "fullName": "The Balvenie Tun 1509 - Batch 6",
+        "siblings": [],
+        "references": [
+          {
+            "name": "Balvenie Tun 1509 (Batch 6)",
+            "ignored": false
+          },
+          {
+            "name": "Balvenie Tun 1509 (Batch 6), 50.4%",
+            "ignored": false
+          }
+        ],
+        "observations": [
+          {
+            "facts": {
+              "proposalType": "no_match",
+              "proposedBottle": null,
+              "referenceScope": "none"
+            },
+            "rawText": "The Balvenie Tun 1509 (Batch 6)",
+            "sourceKey": "store_price:3108",
+            "sourceUrl": "https://woodencork.com/collections/whiskey/products/the-balvenie-tun-1509-batch-5",
+            "sourceName": "The Balvenie Tun 1509 (Batch 6)",
+            "sourceType": "store_price",
+            "parsedIdentity": null
+          }
+        ],
+        "imageSources": []
+      }
+    ],
+    "inspectedEntities": [
+      {
+        "kind": "distillery",
+        "name": "The Balvenie",
+        "score": 1,
+        "source": ["exact", "text", "prefix", "contained"],
+        "entityId": 8463,
+        "reference": "The Balvenie",
+        "shortName": null,
+        "retrievedFor": [
+          {
+            "exact": true,
+            "query": "The Balvenie"
+          }
+        ]
+      },
+      {
+        "kind": "bottler",
+        "name": "That Boutique-y Whisky Company",
+        "score": 1,
+        "source": ["exact", "text", "prefix", "contained"],
+        "entityId": 5978,
+        "reference": "That Boutique-y Whisky Company",
+        "shortName": "TBWC",
+        "retrievedFor": [
+          {
+            "exact": true,
+            "query": "That Boutique-y Whisky Company"
+          }
+        ]
+      },
+      {
+        "kind": "distillery",
+        "name": "Cotswolds Distillery",
+        "score": 1,
+        "source": ["exact", "text", "prefix", "contained"],
+        "entityId": 226,
+        "reference": "Cotswolds Distillery",
+        "shortName": null,
+        "retrievedFor": [
+          {
+            "exact": true,
+            "query": "Cotswolds Distillery"
+          }
+        ]
+      },
+      {
+        "kind": "bottler",
+        "name": "Single Cask Nation",
+        "score": 1,
+        "source": ["exact", "text", "prefix", "contained"],
+        "entityId": 365762,
+        "reference": "Single Cask Nation",
+        "shortName": null,
+        "retrievedFor": [
+          {
+            "exact": true,
+            "query": "Single Cask Nation"
+          }
+        ]
+      },
+      {
+        "kind": "distillery",
+        "name": "Ben Nevis",
+        "score": 1,
+        "source": ["exact", "text", "prefix", "contained"],
+        "entityId": 29,
+        "reference": "Ben Nevis",
+        "shortName": null,
+        "retrievedFor": [
+          {
+            "exact": true,
+            "query": "Ben Nevis"
+          }
+        ]
+      },
+      {
+        "kind": "distillery",
+        "name": "The GlenDronach",
+        "score": 1,
+        "source": ["exact", "text", "prefix", "contained"],
+        "entityId": 973,
+        "reference": "The GlenDronach",
+        "shortName": null,
+        "retrievedFor": [
+          {
+            "exact": true,
+            "query": "The GlenDronach"
+          }
+        ]
+      },
+      {
+        "kind": "brand",
+        "name": "Ballechin",
+        "score": 1,
+        "source": ["exact", "text", "prefix", "contained"],
+        "entityId": 30,
+        "reference": "Ballechin",
+        "shortName": null,
+        "retrievedFor": [
+          {
+            "exact": true,
+            "query": "Ballechin"
+          }
+        ]
+      },
+      {
+        "kind": "distillery",
+        "name": "Edradour",
+        "score": 1,
+        "source": ["exact", "text", "prefix", "contained"],
+        "entityId": 405,
+        "reference": "Edradour",
+        "shortName": null,
+        "retrievedFor": [
+          {
+            "exact": true,
+            "query": "Edradour"
+          }
+        ]
+      },
+      {
+        "kind": "brand",
+        "name": "Kilkerran",
+        "score": 1,
+        "source": ["exact", "text", "prefix", "contained"],
+        "entityId": 1103,
+        "reference": "Kilkerran",
+        "shortName": null,
+        "retrievedFor": [
+          {
+            "exact": true,
+            "query": "Kilkerran"
+          }
+        ]
+      },
+      {
+        "kind": "distillery",
+        "name": "Glengyle",
+        "score": 1,
+        "source": ["exact", "text", "prefix", "contained"],
+        "entityId": 243,
+        "reference": "Glengyle",
+        "shortName": null,
+        "retrievedFor": [
+          {
+            "exact": true,
+            "query": "Glengyle"
+          }
+        ]
+      },
+      {
+        "kind": "bottler",
+        "name": "The Blended Whisky Company",
+        "score": 1,
+        "source": ["exact", "text", "prefix", "contained"],
+        "entityId": 5963,
+        "reference": "The Blended Whisky Company",
+        "shortName": null,
+        "retrievedFor": [
+          {
+            "exact": true,
+            "query": "The Blended Whisky Company"
+          }
+        ]
+      },
+      {
+        "kind": "bottler",
+        "name": "The Scotch Malt Whisky Society",
+        "score": 1,
+        "source": ["exact", "text", "prefix", "contained"],
+        "entityId": 4263,
+        "reference": "The Scotch Malt Whisky Society",
+        "shortName": "SMWS",
+        "retrievedFor": [
+          {
+            "exact": true,
+            "query": "The Scotch Malt Whisky Society"
+          }
+        ]
+      },
+      {
+        "kind": "brand",
+        "name": "The Single Cask",
+        "score": 0.375,
+        "source": ["contained"],
+        "entityId": 366640,
+        "reference": "Single Cask",
+        "shortName": null,
+        "retrievedFor": [
+          {
+            "query": "Single Cask Nation"
+          }
+        ]
+      },
+      {
+        "kind": "bottler",
+        "name": "Blended Whisky",
+        "score": 0.3630434782608696,
+        "source": ["contained"],
+        "entityId": 2298,
+        "reference": "Blended Whisky",
+        "shortName": null,
+        "retrievedFor": [
+          {
+            "query": "The Blended Whisky Company"
+          }
+        ]
+      },
+      {
+        "kind": "bottler",
+        "name": "The Whisky Society",
+        "score": 0.35,
+        "source": ["contained"],
+        "entityId": 367612,
+        "reference": "Whisky Society",
+        "shortName": null,
+        "retrievedFor": [
+          {
+            "query": "The Scotch Malt Whisky Society"
+          }
+        ]
+      },
+      {
+        "kind": "brand",
+        "name": "Cotswolds",
+        "score": 0.3447368421052632,
+        "source": ["contained"],
+        "entityId": 856,
+        "reference": "Cotswolds",
+        "shortName": null,
+        "retrievedFor": [
+          {
+            "query": "Cotswolds Distillery"
+          }
+        ]
+      },
+      {
+        "kind": "bottler",
+        "name": "&Whisky",
+        "score": 0.3021739130434783,
+        "source": ["contained"],
+        "entityId": 365821,
+        "reference": "&Whisky",
+        "shortName": null,
+        "retrievedFor": [
+          {
+            "query": "That Boutique-y Whisky Company"
+          },
+          {
+            "query": "The Blended Whisky Company"
+          },
+          {
+            "query": "The Scotch Malt Whisky Society"
+          }
+        ]
+      },
+      {
+        "kind": "brand",
+        "name": "Dew of Ben Nevis",
+        "score": 0.2,
+        "source": ["text"],
+        "entityId": 164,
+        "reference": null,
+        "shortName": null,
+        "retrievedFor": [
+          {
+            "query": "Ben Nevis"
+          }
+        ]
+      }
+    ],
+    "inspectedSeries": []
+  },
+  "provenance": {
+    "source": "production_miss",
+    "verifiedSourceUrls": [
+      "https://www.scotchwhiskyauctions.com/auctions/234-the-185th-auction/905739-balvenie-tun-1509-batch-6/",
+      "https://scotchwhisky.com/magazine/latest-news/27438/balvenie-releases-tun-1509-batch-6",
+      "https://www.thewhiskyexchange.com/p/51383"
+    ],
+    "dbOutcome": {
+      "bottleId": 53359,
+      "createsBottle": false,
+      "summary": "Production matched 53359 with no unresolved risks but rated web evidence 'weak', so the tier rule held it for review."
+    },
+    "notes": "Saved check 34309, source auction_lot 13960 (lot 185-905739), run 2026-11-03. Post-filter tier case. expectedTier is auto because every identity fact is anchored: the title prints Balvenie, Tun 1509 and Batch #6; the scraper's structured 50.4% (also on the lot page, '50.4% ABV / 70cl') equals the stored 50.4%; 53359 stores Series Tun 1509 (a numbered series of eight batches) and edition Batch 6. Batch 6 is a closed release number, and product pages agree it is 50.4% (2019). No populated field conflicts. The agent's own check found no risk, so the only reason for review was the web judgment 'weak'. Local and source evidence settle this match, which the tier rule accepts as 'not_needed'. Note: production's page read returned only the site's age gate, so the agent did not see the page text; the case does not need it."
+  },
+  "expected": {
+    "status": "classified",
+    "action": "match",
+    "identityScope": "product",
+    "matchedBottleId": 53359,
+    "expectedTier": "auto",
+    "summary": "Match The Balvenie Tun 1509 Batch 6 (53359) and apply it without review: the title prints the batch, the lot's 50.4% equals the stored ABV, and no risk remains."
+  },
+  "knownFailure": {
+    "reason": "The post-filter holds a match whose batch and ABV are both anchored, only because no web evidence was used."
+  }
+}

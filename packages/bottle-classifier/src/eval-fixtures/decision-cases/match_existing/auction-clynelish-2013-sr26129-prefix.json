@@ -1,0 +1,1762 @@
+{
+  "id": "auction-clynelish-2013-sr26129-prefix",
+  "name": "auction lot: a cask number printed SR26129 and listed as 26129 is the same Thompson Bros Clynelish 2013 cask",
+  "input": {
+    "reference": {
+      "id": 14670,
+      "url": "https://www.scotchwhiskyauctions.com/auctions/234-the-185th-auction/904996-clynelish-2013-13-year-old-thompson-bros-for-dornoch-castle/",
+      "name": "Clynelish 2013 13 Year Old Thompson Bros For Dornoch Castle",
+      "imageUrl": null,
+      "externalSiteId": 28097,
+      "currentBottleId": null
+    },
+    "extractedIdentity": {
+      "abv": 55.4,
+      "brand": null,
+      "series": null,
+      "bottler": null,
+      "edition": null,
+      "outturn": null,
+      "category": null,
+      "distillery": null,
+      "expression": null,
+      "maturation": null,
+      "stated_age": null,
+      "cask_number": "26129",
+      "single_cask": null,
+      "release_year": null,
+      "vintage_year": 2013,
+      "cask_strength": null
+    },
+    "imageEvidence": null,
+    "initialCandidates": [
+      {
+        "abv": 55.4,
+        "brand": "Thompson Bros.",
+        "score": 142.17499,
+        "series": null,
+        "source": ["text", "brand", "brand_coverage", "context", "current"],
+        "bottler": "Thompson Bros",
+        "edition": null,
+        "outturn": 219,
+        "bottleId": 69562,
+        "category": "single_malt",
+        "fullName": "Thompson Bros. Clynelish 2013 13-year-old",
+        "reference": null,
+        "statedAge": 13,
+        "caskNumber": "SR26129",
+        "comparison": {
+          "missing": ["edition"],
+          "conflicts": ["caskNumber", "bottler"],
+          "agreements": [
+            "category",
+            "statedAge",
+            "abv",
+            "vintageYear",
+            "brand",
+            "distillers"
+          ]
+        },
+        "distillery": ["Clynelish"],
+        "maturation": null,
+        "releaseDay": null,
+        "singleCask": true,
+        "releaseYear": null,
+        "vintageYear": 2013,
+        "bottlingYear": null,
+        "caskStrength": null,
+        "releaseMonth": null,
+        "familyContext": {
+          "siblingBottles": []
+        }
+      },
+      {
+        "abv": 50.5,
+        "brand": "Thompson Bros.",
+        "score": 92.04849,
+        "series": null,
+        "source": ["vector", "text", "brand", "brand_coverage"],
+        "bottler": "Thompson Bros",
+        "edition": null,
+        "outturn": 344,
+        "bottleId": 47301,
+        "category": "single_malt",
+        "fullName": "Thompson Bros. Clynelish 2013 12-year-old",
+        "reference": "Clynelish 12-year-old 2013 (50,5%, Thompson Brothers for Dornoch Castle 25th Anniversary 2025, rejuvenated Hungarian oak barrique #314380, 344 btl.)",
+        "statedAge": 12,
+        "caskNumber": "314380",
+        "comparison": {
+          "missing": ["edition"],
+          "conflicts": ["statedAge", "abv", "caskNumber", "bottler"],
+          "agreements": ["category", "vintageYear", "brand", "distillers"]
+        },
+        "distillery": ["Clynelish"],
+        "maturation": "Rejuvenated Hungarian oak barrique",
+        "releaseDay": null,
+        "singleCask": true,
+        "releaseYear": 2025,
+        "vintageYear": 2013,
+        "bottlingYear": 2025,
+        "caskStrength": null,
+        "releaseMonth": null,
+        "familyContext": {
+          "siblingBottles": []
+        }
+      },
+      {
+        "abv": 52.2,
+        "brand": "Thompson Bros.",
+        "score": 91.40541,
+        "series": null,
+        "source": ["text", "brand_coverage"],
+        "bottler": "Thompson Bros.",
+        "edition": null,
+        "outturn": null,
+        "bottleId": 46095,
+        "category": "single_malt",
+        "fullName": "Thompson Bros. Inchmurrin - 13-year-old - 2013 Vintage - 52.2% ABV",
+        "reference": null,
+        "statedAge": 13,
+        "caskNumber": null,
+        "comparison": {
+          "missing": ["edition", "caskNumber"],
+          "conflicts": ["abv", "distillers"],
+          "agreements": [
+            "category",
+            "statedAge",
+            "vintageYear",
+            "brand",
+            "bottler"
+          ]
+        },
+        "distillery": ["Loch Lomond"],
+        "maturation": null,
+        "releaseDay": null,
+        "singleCask": false,
+        "releaseYear": null,
+        "vintageYear": 2013,
+        "bottlingYear": null,
+        "caskStrength": null,
+        "releaseMonth": null,
+        "familyContext": {
+          "siblingBottles": []
+        }
+      },
+      {
+        "abv": 49.1,
+        "brand": "Thompson Bros.",
+        "score": 79.50609,
+        "series": null,
+        "source": ["vector", "text", "brand", "brand_coverage"],
+        "bottler": "Thompson Bros",
+        "edition": "Hogmanay bottling",
+        "outturn": 613,
+        "bottleId": 47300,
+        "category": "single_malt",
+        "fullName": "Thompson Bros. Clynelish 2013 12-year-old - Hogmanay bottling",
+        "reference": "Clynelish 2013 12-year-old (49.1%, Thompson Bros, 613 bts.)",
+        "statedAge": 12,
+        "caskNumber": null,
+        "comparison": {
+          "missing": ["caskNumber"],
+          "conflicts": ["statedAge", "abv", "bottler"],
+          "agreements": ["category", "vintageYear", "brand", "distillers"]
+        },
+        "distillery": ["Clynelish"],
+        "maturation": "Dechar French and American oak hogsheads",
+        "releaseDay": null,
+        "singleCask": false,
+        "releaseYear": 2026,
+        "vintageYear": 2013,
+        "bottlingYear": 2026,
+        "caskStrength": null,
+        "releaseMonth": null,
+        "familyContext": {
+          "siblingBottles": []
+        }
+      },
+      {
+        "abv": 54.9,
+        "brand": "Thompson Bros.",
+        "score": 78.72414,
+        "series": null,
+        "source": ["vector", "text", "brand_coverage"],
+        "bottler": "Thompson Bros.",
+        "edition": null,
+        "outturn": null,
+        "bottleId": 63285,
+        "category": "single_malt",
+        "fullName": "Thompson Bros. Caol Ila 13-year-old",
+        "reference": "Caol Ila Single Malt Scotch Whisky, 2013, 13-year-old, 70CL, 54.9%ABV",
+        "statedAge": 13,
+        "caskNumber": null,
+        "comparison": {
+          "missing": ["edition", "caskNumber"],
+          "conflicts": ["abv", "distillers"],
+          "agreements": [
+            "category",
+            "statedAge",
+            "vintageYear",
+            "brand",
+            "bottler"
+          ]
+        },
+        "distillery": ["Caol Ila"],
+        "maturation": null,
+        "releaseDay": null,
+        "singleCask": null,
+        "releaseYear": null,
+        "vintageYear": 2013,
+        "bottlingYear": null,
+        "caskStrength": null,
+        "releaseMonth": null,
+        "familyContext": {
+          "siblingBottles": []
+        }
+      },
+      {
+        "abv": 53.4,
+        "brand": "Thompson Bros.",
+        "score": 73.3009,
+        "series": null,
+        "source": ["text"],
+        "bottler": "Thompson Bros",
+        "edition": null,
+        "outturn": 228,
+        "bottleId": 68828,
+        "category": "single_malt",
+        "fullName": "Thompson Bros. Glen Moray 2007 13-year-old",
+        "reference": null,
+        "statedAge": 13,
+        "caskNumber": null,
+        "comparison": {
+          "missing": ["edition", "caskNumber"],
+          "conflicts": ["abv", "vintageYear", "bottler", "distillers"],
+          "agreements": ["category", "statedAge", "brand"]
+        },
+        "distillery": ["Glen Moray"],
+        "maturation": null,
+        "releaseDay": null,
+        "singleCask": true,
+        "releaseYear": null,
+        "vintageYear": 2007,
+        "bottlingYear": null,
+        "caskStrength": null,
+        "releaseMonth": null,
+        "familyContext": {
+          "siblingBottles": []
+        }
+      },
+      {
+        "abv": 53.7,
+        "brand": "Thompson Bros.",
+        "score": 68.07457,
+        "series": null,
+        "source": ["text"],
+        "bottler": "Thompson Bros.",
+        "edition": null,
+        "outturn": null,
+        "bottleId": 46136,
+        "category": "single_malt",
+        "fullName": "Thompson Bros. Benriach 2013",
+        "reference": null,
+        "statedAge": 12,
+        "caskNumber": null,
+        "comparison": {
+          "missing": ["caskNumber"],
+          "conflicts": ["abv"],
+          "agreements": ["vintageYear"]
+        },
+        "distillery": ["BenRiach"],
+        "maturation": "other",
+        "releaseDay": null,
+        "singleCask": null,
+        "releaseYear": null,
+        "vintageYear": 2013,
+        "bottlingYear": null,
+        "caskStrength": null,
+        "releaseMonth": null,
+        "familyContext": {
+          "siblingBottles": []
+        }
+      },
+      {
+        "abv": 57.2,
+        "brand": "The Scotch Malt Whisky Society",
+        "score": 66.628815,
+        "series": null,
+        "source": ["text"],
+        "bottler": "The Scotch Malt Whisky Society",
+        "edition": null,
+        "outturn": null,
+        "bottleId": 45408,
+        "category": "single_malt",
+        "fullName": "SMWS 41.191 Zingy stardust",
+        "reference": null,
+        "statedAge": 13,
+        "caskNumber": "41.191",
+        "comparison": {
+          "missing": [],
+          "conflicts": ["abv", "caskNumber", "brand", "bottler", "distillers"],
+          "agreements": [
+            "category",
+            "statedAge",
+            "vintageYear",
+            "releaseYear",
+            "singleCask"
+          ]
+        },
+        "distillery": ["Dailuaine"],
+        "maturation": "1st fill ex- bourbon hogshead & 1st fill american oak ex-oloroso hogshead",
+        "releaseDay": 7,
+        "singleCask": true,
+        "releaseYear": 2026,
+        "vintageYear": 2013,
+        "bottlingYear": null,
+        "caskStrength": null,
+        "releaseMonth": 8,
+        "familyContext": {
+          "siblingBottles": []
+        }
+      },
+      {
+        "abv": 45.5,
+        "brand": "Thompson Bros.",
+        "score": 62.972187,
+        "series": null,
+        "source": ["text"],
+        "bottler": "Thompson Bros.",
+        "edition": "Hermanos Thompson",
+        "outturn": null,
+        "bottleId": 47456,
+        "category": "single_malt",
+        "fullName": "Thompson Bros. Highland Malt - Hermanos Thompson - 10-year-old - 2026 Release - 45.5% ABV",
+        "reference": null,
+        "statedAge": 10,
+        "caskNumber": null,
+        "comparison": {
+          "missing": ["vintageYear", "singleCask", "caskNumber", "distillers"],
+          "conflicts": ["statedAge", "abv"],
+          "agreements": ["category", "releaseYear", "brand", "bottler"]
+        },
+        "distillery": [],
+        "maturation": "finished in a manzanilla cask",
+        "releaseDay": null,
+        "singleCask": null,
+        "releaseYear": 2026,
+        "vintageYear": null,
+        "bottlingYear": null,
+        "caskStrength": null,
+        "releaseMonth": null,
+        "familyContext": {
+          "siblingBottles": []
+        }
+      },
+      {
+        "abv": 54.7,
+        "brand": "Thompson Bros.",
+        "score": 61.0028,
+        "series": null,
+        "source": ["vector", "text"],
+        "bottler": "Thompson Bros",
+        "edition": null,
+        "outturn": 312,
+        "bottleId": 63287,
+        "category": "single_malt",
+        "fullName": "Thompson Bros. Glen Ord 2012",
+        "reference": "Glen Ord Single Malt Scotch Whisky, 2012, 13-year-old, 70CL, 54.7%ABV",
+        "statedAge": 13,
+        "caskNumber": null,
+        "comparison": {
+          "missing": ["edition", "caskNumber"],
+          "conflicts": ["abv", "vintageYear", "bottler", "distillers"],
+          "agreements": ["category", "statedAge", "brand"]
+        },
+        "distillery": ["Glen Ord"],
+        "maturation": "Decharred and recharred hogshead",
+        "releaseDay": null,
+        "singleCask": true,
+        "releaseYear": null,
+        "vintageYear": 2012,
+        "bottlingYear": 2026,
+        "caskStrength": null,
+        "releaseMonth": null,
+        "familyContext": {
+          "siblingBottles": []
+        }
+      },
+      {
+        "abv": 54.9,
+        "brand": "Thompson Bros.",
+        "score": 59.278038,
+        "series": null,
+        "source": ["text"],
+        "bottler": "Thompson Bros.",
+        "edition": null,
+        "outturn": null,
+        "bottleId": 47414,
+        "category": "single_malt",
+        "fullName": "Thompson Bros. Glentauchers 2013",
+        "reference": null,
+        "statedAge": 11,
+        "caskNumber": null,
+        "comparison": {
+          "missing": ["edition", "caskNumber"],
+          "conflicts": ["statedAge", "abv", "distillers"],
+          "agreements": ["category", "vintageYear", "brand", "bottler"]
+        },
+        "distillery": ["Glentauchers"],
+        "maturation": "bourbon",
+        "releaseDay": null,
+        "singleCask": null,
+        "releaseYear": 2024,
+        "vintageYear": 2013,
+        "bottlingYear": null,
+        "caskStrength": null,
+        "releaseMonth": null,
+        "familyContext": {
+          "siblingBottles": []
+        }
+      },
+      {
+        "abv": 40,
+        "brand": "The Glenlivet",
+        "score": 58.19761,
+        "series": null,
+        "source": ["text"],
+        "bottler": null,
+        "edition": null,
+        "outturn": null,
+        "bottleId": 45606,
+        "category": "single_malt",
+        "fullName": "The Glenlivet First Fill American Oak - 13-year-old - 40.0% ABV - Oak Cask - 1st Fill",
+        "reference": null,
+        "statedAge": 13,
+        "caskNumber": null,
+        "comparison": {
+          "missing": [
+            "vintageYear",
+            "releaseYear",
+            "singleCask",
+            "caskNumber",
+            "bottler"
+          ],
+          "conflicts": ["abv", "brand", "distillers"],
+          "agreements": ["category", "statedAge"]
+        },
+        "distillery": ["The Glenlivet"],
+        "maturation": "oak",
+        "releaseDay": null,
+        "singleCask": null,
+        "releaseYear": null,
+        "vintageYear": null,
+        "bottlingYear": null,
+        "caskStrength": null,
+        "releaseMonth": null,
+        "familyContext": {
+          "siblingBottles": []
+        }
+      },
+      {
+        "abv": 46,
+        "brand": "Signatory Vintage",
+        "score": 57.22445,
+        "series": "The Un-Chillfiltered Collection",
+        "source": ["text"],
+        "bottler": "Signatory Vintage",
+        "edition": null,
+        "outturn": null,
+        "bottleId": 46993,
+        "category": "single_malt",
+        "fullName": "Signatory Vintage Auchentoshan 2013 13-year-old",
+        "reference": null,
+        "statedAge": 13,
+        "caskNumber": null,
+        "comparison": {
+          "missing": ["caskNumber"],
+          "conflicts": ["abv"],
+          "agreements": ["vintageYear"]
+        },
+        "distillery": ["Auchentoshan"],
+        "maturation": null,
+        "releaseDay": null,
+        "singleCask": null,
+        "releaseYear": null,
+        "vintageYear": 2013,
+        "bottlingYear": null,
+        "caskStrength": null,
+        "releaseMonth": null,
+        "familyContext": {
+          "siblingBottles": []
+        }
+      },
+      {
+        "abv": 54.9,
+        "brand": "WhiskyHeroes",
+        "score": 55.69536,
+        "series": null,
+        "source": ["text"],
+        "bottler": "Brave New Spirits",
+        "edition": null,
+        "outturn": null,
+        "bottleId": 46505,
+        "category": "single_malt",
+        "fullName": "WhiskyHeroes Evening Blaze - 13-year-old - 54.9% ABV - Single Cask - Cask Strength - Oloroso Cask - Hogshead - 1st Fill",
+        "reference": null,
+        "statedAge": 13,
+        "caskNumber": null,
+        "comparison": {
+          "missing": ["vintageYear", "releaseYear", "caskNumber"],
+          "conflicts": ["abv", "brand", "bottler", "distillers"],
+          "agreements": ["category", "statedAge", "singleCask"]
+        },
+        "distillery": ["Benrinnes"],
+        "maturation": "oloroso",
+        "releaseDay": null,
+        "singleCask": true,
+        "releaseYear": null,
+        "vintageYear": null,
+        "bottlingYear": null,
+        "caskStrength": true,
+        "releaseMonth": null,
+        "familyContext": {
+          "siblingBottles": []
+        }
+      },
+      {
+        "abv": 51.9,
+        "brand": "WhiskyHeroes",
+        "score": 54.63852,
+        "series": null,
+        "source": ["text"],
+        "bottler": "Brave New Spirits",
+        "edition": null,
+        "outturn": null,
+        "bottleId": 46141,
+        "category": "single_malt",
+        "fullName": "WhiskyHeroes Captain Shug and the Second Sight - 13-year-old - 2012 Vintage - 51.9% ABV - Single Cask - Amontilado Cask - Hogshead - 1st Fill",
+        "reference": null,
+        "statedAge": 13,
+        "caskNumber": null,
+        "comparison": {
+          "missing": ["releaseYear", "caskNumber"],
+          "conflicts": ["abv", "vintageYear", "brand", "bottler", "distillers"],
+          "agreements": ["category", "statedAge", "singleCask"]
+        },
+        "distillery": ["Teaninich"],
+        "maturation": "amontilado",
+        "releaseDay": null,
+        "singleCask": true,
+        "releaseYear": null,
+        "vintageYear": 2012,
+        "bottlingYear": null,
+        "caskStrength": null,
+        "releaseMonth": null,
+        "familyContext": {
+          "siblingBottles": []
+        }
+      },
+      {
+        "abv": 54.7,
+        "brand": "Thompson Bros.",
+        "score": 53.171272,
+        "series": null,
+        "source": ["text"],
+        "bottler": "Thompson Bros",
+        "edition": null,
+        "outturn": null,
+        "bottleId": 68544,
+        "category": "single_malt",
+        "fullName": "Thompson Bros. Aultmore 2009",
+        "reference": null,
+        "statedAge": 13,
+        "caskNumber": null,
+        "comparison": {
+          "missing": ["edition", "caskNumber"],
+          "conflicts": ["abv", "vintageYear", "bottler", "distillers"],
+          "agreements": ["category", "statedAge", "brand"]
+        },
+        "distillery": ["Aultmore"],
+        "maturation": null,
+        "releaseDay": null,
+        "singleCask": null,
+        "releaseYear": null,
+        "vintageYear": 2009,
+        "bottlingYear": null,
+        "caskStrength": null,
+        "releaseMonth": null,
+        "familyContext": {
+          "siblingBottles": []
+        }
+      },
+      {
+        "abv": 57.1,
+        "brand": "Thompson Bros.",
+        "score": 53.10439,
+        "series": null,
+        "source": ["text"],
+        "bottler": "Thompson Bros",
+        "edition": null,
+        "outturn": 94,
+        "bottleId": 69556,
+        "category": "single_malt",
+        "fullName": "Thompson Bros. Caol Ila 2013 9-year-old - Error 502 Bad Gateway",
+        "reference": null,
+        "statedAge": 9,
+        "caskNumber": null,
+        "comparison": {
+          "missing": ["edition", "caskNumber"],
+          "conflicts": ["statedAge", "abv", "bottler", "distillers"],
+          "agreements": ["category", "vintageYear", "brand"]
+        },
+        "distillery": ["Caol Ila"],
+        "maturation": "Refill Hogshead then refill Sherry Octave",
+        "releaseDay": null,
+        "singleCask": null,
+        "releaseYear": null,
+        "vintageYear": 2013,
+        "bottlingYear": null,
+        "caskStrength": null,
+        "releaseMonth": null,
+        "familyContext": {
+          "siblingBottles": []
+        }
+      },
+      {
+        "abv": 57.2,
+        "brand": "William Cadenhead's",
+        "score": 52.32187,
+        "series": null,
+        "source": ["text"],
+        "bottler": "William Cadenhead's",
+        "edition": null,
+        "outturn": 294,
+        "bottleId": 65961,
+        "category": "single_malt",
+        "fullName": "Cadenhead's Clynelish 1992 13-year-old",
+        "reference": null,
+        "statedAge": 13,
+        "caskNumber": null,
+        "comparison": {
+          "missing": ["edition", "caskNumber"],
+          "conflicts": ["abv", "vintageYear", "brand", "bottler"],
+          "agreements": ["category", "statedAge", "distillers"]
+        },
+        "distillery": ["Clynelish"],
+        "maturation": "Bourbon hogshead",
+        "releaseDay": null,
+        "singleCask": null,
+        "releaseYear": null,
+        "vintageYear": 1992,
+        "bottlingYear": 2006,
+        "caskStrength": null,
+        "releaseMonth": null,
+        "familyContext": {
+          "siblingBottles": []
+        }
+      },
+      {
+        "abv": 52,
+        "brand": "Thompson Bros.",
+        "score": 52.136616,
+        "series": null,
+        "source": ["text"],
+        "bottler": "Thompson Bros",
+        "edition": null,
+        "outturn": 636,
+        "bottleId": 69086,
+        "category": "single_malt",
+        "fullName": "Thompson Bros. Linkwood 2008",
+        "reference": null,
+        "statedAge": 13,
+        "caskNumber": null,
+        "comparison": {
+          "missing": ["edition", "caskNumber"],
+          "conflicts": ["abv", "vintageYear", "bottler", "distillers"],
+          "agreements": ["category", "statedAge", "brand"]
+        },
+        "distillery": ["Linkwood"],
+        "maturation": "Refill American Oak Butt",
+        "releaseDay": null,
+        "singleCask": null,
+        "releaseYear": null,
+        "vintageYear": 2008,
+        "bottlingYear": null,
+        "caskStrength": null,
+        "releaseMonth": null,
+        "familyContext": {
+          "siblingBottles": []
+        }
+      },
+      {
+        "abv": 57.1,
+        "brand": "Signatory Vintage",
+        "score": 51.942398,
+        "series": "100 Proof Edition",
+        "source": ["text"],
+        "bottler": "Signatory Vintage",
+        "edition": "Edition #78",
+        "outturn": null,
+        "bottleId": 45765,
+        "category": "single_malt",
+        "fullName": "Signatory Vintage Benrinnes 2012 - Edition #78",
+        "reference": null,
+        "statedAge": 13,
+        "caskNumber": null,
+        "comparison": {
+          "missing": ["singleCask", "caskNumber"],
+          "conflicts": ["abv", "vintageYear", "brand", "bottler", "distillers"],
+          "agreements": ["category", "statedAge", "releaseYear"]
+        },
+        "distillery": ["Benrinnes"],
+        "maturation": "oloroso",
+        "releaseDay": null,
+        "singleCask": null,
+        "releaseYear": 2026,
+        "vintageYear": 2012,
+        "bottlingYear": null,
+        "caskStrength": null,
+        "releaseMonth": null,
+        "familyContext": {
+          "siblingBottles": []
+        }
+      },
+      {
+        "abv": 50,
+        "brand": "Thompson Bros.",
+        "score": 50.97081,
+        "series": null,
+        "source": ["text"],
+        "bottler": "Thompson Bros",
+        "edition": null,
+        "outturn": null,
+        "bottleId": 69680,
+        "category": "single_malt",
+        "fullName": "Thompson Bros. Ardmore 2009",
+        "reference": null,
+        "statedAge": 13,
+        "caskNumber": null,
+        "comparison": {
+          "missing": ["edition", "caskNumber"],
+          "conflicts": ["abv", "vintageYear", "bottler", "distillers"],
+          "agreements": ["category", "statedAge", "brand"]
+        },
+        "distillery": ["Ardmore"],
+        "maturation": "Single refill ex-bourbon barrel",
+        "releaseDay": null,
+        "singleCask": true,
+        "releaseYear": null,
+        "vintageYear": 2009,
+        "bottlingYear": 2023,
+        "caskStrength": null,
+        "releaseMonth": null,
+        "familyContext": {
+          "siblingBottles": []
+        }
+      },
+      {
+        "abv": 46,
+        "brand": "Signatory Vintage",
+        "score": 49.59166,
+        "series": "The Un-Chillfiltered Collection",
+        "source": ["text"],
+        "bottler": "Signatory Vintage",
+        "edition": null,
+        "outturn": null,
+        "bottleId": 65786,
+        "category": "single_malt",
+        "fullName": "Signatory Vintage Clynelish 1991",
+        "reference": null,
+        "statedAge": 13,
+        "caskNumber": null,
+        "comparison": {
+          "missing": ["edition", "caskNumber"],
+          "conflicts": ["abv", "vintageYear", "brand", "bottler"],
+          "agreements": ["category", "statedAge", "distillers"]
+        },
+        "distillery": ["Clynelish"],
+        "maturation": null,
+        "releaseDay": null,
+        "singleCask": null,
+        "releaseYear": null,
+        "vintageYear": 1991,
+        "bottlingYear": null,
+        "caskStrength": null,
+        "releaseMonth": null,
+        "familyContext": {
+          "siblingBottles": []
+        }
+      },
+      {
+        "abv": 54.9,
+        "brand": "Thompson Bros.",
+        "score": 48.844757,
+        "series": null,
+        "source": ["text"],
+        "bottler": "Thompson Bros.",
+        "edition": null,
+        "outturn": null,
+        "bottleId": 63288,
+        "category": "single_malt",
+        "fullName": "Thompson Bros. Ben Nevis 12-year-old",
+        "reference": null,
+        "statedAge": 12,
+        "caskNumber": null,
+        "comparison": {
+          "missing": ["edition", "caskNumber"],
+          "conflicts": ["statedAge", "abv", "distillers"],
+          "agreements": ["category", "vintageYear", "brand", "bottler"]
+        },
+        "distillery": ["Ben Nevis"],
+        "maturation": null,
+        "releaseDay": null,
+        "singleCask": null,
+        "releaseYear": null,
+        "vintageYear": 2013,
+        "bottlingYear": null,
+        "caskStrength": null,
+        "releaseMonth": null,
+        "familyContext": {
+          "siblingBottles": []
+        }
+      },
+      {
+        "abv": 56.7,
+        "brand": "Thompson Bros.",
+        "score": 48.844757,
+        "series": null,
+        "source": ["text"],
+        "bottler": "Thompson Bros.",
+        "edition": null,
+        "outturn": null,
+        "bottleId": 63284,
+        "category": "single_malt",
+        "fullName": "Thompson Bros. Glen Scotia 12-year-old",
+        "reference": null,
+        "statedAge": 12,
+        "caskNumber": null,
+        "comparison": {
+          "missing": ["edition", "caskNumber"],
+          "conflicts": ["statedAge", "abv", "distillers"],
+          "agreements": ["category", "vintageYear", "brand", "bottler"]
+        },
+        "distillery": ["Glen Scotia"],
+        "maturation": null,
+        "releaseDay": null,
+        "singleCask": null,
+        "releaseYear": null,
+        "vintageYear": 2013,
+        "bottlingYear": null,
+        "caskStrength": null,
+        "releaseMonth": null,
+        "familyContext": {
+          "siblingBottles": []
+        }
+      },
+      {
+        "abv": 48.2,
+        "brand": "Signatory Vintage",
+        "score": 48.73719,
+        "series": "Small Batch Edition",
+        "source": ["text"],
+        "bottler": "Signatory Vintage",
+        "edition": "Small Batch Edition #13",
+        "outturn": null,
+        "bottleId": 45614,
+        "category": "single_malt",
+        "fullName": "Signatory Vintage Speyside (TAM) - Small Batch Edition #13 - 11-year-old - 2013 Vintage - 48.2% ABV - Other Cask - Hogshead - 1st Fill",
+        "reference": null,
+        "statedAge": 11,
+        "caskNumber": null,
+        "comparison": {
+          "missing": ["caskNumber"],
+          "conflicts": ["statedAge", "abv", "brand", "bottler", "distillers"],
+          "agreements": ["category", "vintageYear"]
+        },
+        "distillery": ["Tamnavulin"],
+        "maturation": "other",
+        "releaseDay": null,
+        "singleCask": false,
+        "releaseYear": null,
+        "vintageYear": 2013,
+        "bottlingYear": null,
+        "caskStrength": null,
+        "releaseMonth": null,
+        "familyContext": {
+          "siblingBottles": []
+        }
+      },
+      {
+        "abv": null,
+        "brand": "Dornoch",
+        "score": 48.56997,
+        "series": null,
+        "source": ["text"],
+        "bottler": "Thompson Bros.",
+        "edition": null,
+        "outturn": null,
+        "bottleId": 406,
+        "category": "single_malt",
+        "fullName": "Dornoch 2017 PST",
+        "reference": null,
+        "statedAge": 10,
+        "caskNumber": null,
+        "comparison": {
+          "missing": [
+            "abv",
+            "vintageYear",
+            "edition",
+            "caskNumber",
+            "distillers"
+          ],
+          "conflicts": ["statedAge", "brand"],
+          "agreements": ["category", "bottler"]
+        },
+        "distillery": [],
+        "maturation": null,
+        "releaseDay": null,
+        "singleCask": null,
+        "releaseYear": null,
+        "vintageYear": null,
+        "bottlingYear": null,
+        "caskStrength": null,
+        "releaseMonth": null,
+        "familyContext": {
+          "siblingBottles": []
+        }
+      },
+      {
+        "abv": 55.4,
+        "brand": "Watashi Whisky",
+        "score": 35.81935,
+        "series": null,
+        "source": ["text"],
+        "bottler": null,
+        "edition": null,
+        "outturn": 60,
+        "bottleId": 47617,
+        "category": "single_malt",
+        "fullName": "Watashi Whisky Blair Athol 2013",
+        "reference": null,
+        "statedAge": 11,
+        "caskNumber": "311957C",
+        "comparison": {
+          "missing": [],
+          "conflicts": ["caskNumber"],
+          "agreements": ["abv", "vintageYear"]
+        },
+        "distillery": ["Blair Athol"],
+        "maturation": "2nd fill Madeira",
+        "releaseDay": null,
+        "singleCask": true,
+        "releaseYear": 2024,
+        "vintageYear": 2013,
+        "bottlingYear": null,
+        "caskStrength": null,
+        "releaseMonth": null,
+        "familyContext": {
+          "siblingBottles": []
+        }
+      },
+      {
+        "abv": 55.4,
+        "brand": "The Whisky Exchange",
+        "score": 29.590176,
+        "series": "The Zodiac",
+        "source": ["text"],
+        "bottler": "The Whisky Exchange",
+        "edition": "Aries",
+        "outturn": 335,
+        "bottleId": 47449,
+        "category": "single_malt",
+        "fullName": "The Whisky Exchange Staoisha - Aries - 12-year-old - 2025 Release - 2013 Vintage - 55.4% ABV - Single Cask",
+        "reference": null,
+        "statedAge": 12,
+        "caskNumber": "128",
+        "comparison": {
+          "missing": [],
+          "conflicts": ["caskNumber"],
+          "agreements": ["abv", "vintageYear"]
+        },
+        "distillery": ["Bunnahabhain"],
+        "maturation": "Oloroso hogshead",
+        "releaseDay": null,
+        "singleCask": true,
+        "releaseYear": 2025,
+        "vintageYear": 2013,
+        "bottlingYear": null,
+        "caskStrength": null,
+        "releaseMonth": null,
+        "familyContext": {
+          "siblingBottles": []
+        }
+      },
+      {
+        "abv": 55.4,
+        "brand": "Maker's Mark",
+        "score": 25.594664,
+        "series": "Wood Finishing Series",
+        "source": ["text"],
+        "bottler": null,
+        "edition": null,
+        "outturn": null,
+        "bottleId": 46784,
+        "category": "bourbon",
+        "fullName": "Maker's Mark London Edition",
+        "reference": null,
+        "statedAge": null,
+        "caskNumber": null,
+        "comparison": {
+          "missing": ["vintageYear", "caskNumber"],
+          "conflicts": [],
+          "agreements": ["abv"]
+        },
+        "distillery": ["Maker's Mark Distillery"],
+        "maturation": null,
+        "releaseDay": null,
+        "singleCask": null,
+        "releaseYear": null,
+        "vintageYear": null,
+        "bottlingYear": null,
+        "caskStrength": null,
+        "releaseMonth": null,
+        "familyContext": {
+          "siblingBottles": []
+        }
+      },
+      {
+        "abv": null,
+        "brand": "Chichibu",
+        "score": 23.647095,
+        "series": null,
+        "source": ["text"],
+        "bottler": null,
+        "edition": "2013",
+        "outturn": null,
+        "bottleId": 45030,
+        "category": "single_malt",
+        "fullName": "Chichibu Ichiro's Malt - 2013",
+        "reference": null,
+        "statedAge": 7,
+        "caskNumber": null,
+        "comparison": {
+          "missing": ["abv", "caskNumber"],
+          "conflicts": [],
+          "agreements": ["vintageYear"]
+        },
+        "distillery": ["Chichibu"],
+        "maturation": null,
+        "releaseDay": null,
+        "singleCask": null,
+        "releaseYear": null,
+        "vintageYear": 2013,
+        "bottlingYear": null,
+        "caskStrength": null,
+        "releaseMonth": null,
+        "familyContext": {
+          "siblingBottles": [
+            {
+              "abv": null,
+              "edition": null,
+              "outturn": null,
+              "bottleId": 44034,
+              "fullName": "Chichibu Ichiro's Malt",
+              "statedAge": 7,
+              "caskNumber": null,
+              "maturation": null,
+              "releaseDay": null,
+              "singleCask": null,
+              "releaseYear": null,
+              "traitFields": ["statedAge"],
+              "vintageYear": null,
+              "bottlingYear": null,
+              "caskStrength": null,
+              "releaseMonth": null
+            },
+            {
+              "abv": null,
+              "edition": "2010",
+              "outturn": null,
+              "bottleId": 45032,
+              "fullName": "Chichibu Ichiro's Malt - 2010",
+              "statedAge": 10,
+              "caskNumber": null,
+              "maturation": null,
+              "releaseDay": null,
+              "singleCask": null,
+              "releaseYear": null,
+              "traitFields": ["edition", "statedAge", "vintageYear"],
+              "vintageYear": 2010,
+              "bottlingYear": null,
+              "caskStrength": null,
+              "releaseMonth": null
+            },
+            {
+              "abv": null,
+              "edition": "2011",
+              "outturn": null,
+              "bottleId": 45031,
+              "fullName": "Chichibu Ichiro's Malt - 2011",
+              "statedAge": 10,
+              "caskNumber": null,
+              "maturation": null,
+              "releaseDay": null,
+              "singleCask": null,
+              "releaseYear": null,
+              "traitFields": ["edition", "statedAge", "vintageYear"],
+              "vintageYear": 2011,
+              "bottlingYear": null,
+              "caskStrength": null,
+              "releaseMonth": null
+            }
+          ]
+        }
+      },
+      {
+        "abv": 54.3,
+        "brand": "Decadent Drams",
+        "score": 23.544775,
+        "series": null,
+        "source": ["text"],
+        "bottler": "Decadent Drinks",
+        "edition": null,
+        "outturn": 291,
+        "bottleId": 48986,
+        "category": "single_malt",
+        "fullName": "Decadent Drams Glenturret 2013",
+        "reference": null,
+        "statedAge": 12,
+        "caskNumber": null,
+        "comparison": {
+          "missing": ["caskNumber"],
+          "conflicts": ["abv"],
+          "agreements": ["vintageYear"]
+        },
+        "distillery": ["Glenturret"],
+        "maturation": "re-charred hogshead",
+        "releaseDay": null,
+        "singleCask": null,
+        "releaseYear": null,
+        "vintageYear": 2013,
+        "bottlingYear": 2025,
+        "caskStrength": null,
+        "releaseMonth": null,
+        "familyContext": {
+          "siblingBottles": []
+        }
+      },
+      {
+        "abv": 57.1,
+        "brand": "Decadent Drams",
+        "score": 23.42629,
+        "series": null,
+        "source": ["text"],
+        "bottler": "Decadent Drinks",
+        "edition": null,
+        "outturn": 377,
+        "bottleId": 48974,
+        "category": "single_malt",
+        "fullName": "Decadent Drams Bunnahabhain 2013",
+        "reference": null,
+        "statedAge": 12,
+        "caskNumber": null,
+        "comparison": {
+          "missing": ["caskNumber"],
+          "conflicts": ["abv"],
+          "agreements": ["vintageYear"]
+        },
+        "distillery": ["Bunnahabhain"],
+        "maturation": "Matured in refill wood then sherrywood",
+        "releaseDay": null,
+        "singleCask": null,
+        "releaseYear": null,
+        "vintageYear": 2013,
+        "bottlingYear": 2025,
+        "caskStrength": null,
+        "releaseMonth": null,
+        "familyContext": {
+          "siblingBottles": []
+        }
+      },
+      {
+        "abv": 55.4,
+        "brand": "Old Particular",
+        "score": 23.414995,
+        "series": "Fanatical About Flavour",
+        "source": ["text"],
+        "bottler": "Douglas Laing",
+        "edition": null,
+        "outturn": null,
+        "bottleId": 46405,
+        "category": "single_grain",
+        "fullName": "Old Particular Secret Grain - 20-year-old - 2025 Release - 2004 Vintage - 55.4% ABV - Cask Strength - Pedro Ximenez Cask",
+        "reference": null,
+        "statedAge": 20,
+        "caskNumber": null,
+        "comparison": {
+          "missing": ["caskNumber"],
+          "conflicts": ["vintageYear"],
+          "agreements": ["abv"]
+        },
+        "distillery": [],
+        "maturation": "pedro_ximenez",
+        "releaseDay": null,
+        "singleCask": null,
+        "releaseYear": 2025,
+        "vintageYear": 2004,
+        "bottlingYear": null,
+        "caskStrength": true,
+        "releaseMonth": null,
+        "familyContext": {
+          "siblingBottles": []
+        }
+      },
+      {
+        "abv": 51.5,
+        "brand": "That Boutique-y Whisky Company",
+        "score": 23.239676,
+        "series": null,
+        "source": ["text"],
+        "bottler": "That Boutique-y Whisky Company",
+        "edition": null,
+        "outturn": null,
+        "bottleId": 46286,
+        "category": "single_malt",
+        "fullName": "TBWC Strathisla 2013",
+        "reference": null,
+        "statedAge": 10,
+        "caskNumber": null,
+        "comparison": {
+          "missing": ["caskNumber"],
+          "conflicts": ["abv"],
+          "agreements": ["vintageYear"]
+        },
+        "distillery": ["Strathisla"],
+        "maturation": null,
+        "releaseDay": null,
+        "singleCask": false,
+        "releaseYear": null,
+        "vintageYear": 2013,
+        "bottlingYear": null,
+        "caskStrength": true,
+        "releaseMonth": null,
+        "familyContext": {
+          "siblingBottles": []
+        }
+      },
+      {
+        "abv": 53,
+        "brand": "Decadent Drams",
+        "score": 22.549625,
+        "series": null,
+        "source": ["text"],
+        "bottler": "Decadent Drinks",
+        "edition": null,
+        "outturn": null,
+        "bottleId": 48981,
+        "category": "single_malt",
+        "fullName": "Decadent Drams Old Pulteney 2013",
+        "reference": null,
+        "statedAge": 11,
+        "caskNumber": null,
+        "comparison": {
+          "missing": ["caskNumber"],
+          "conflicts": ["abv"],
+          "agreements": ["vintageYear"]
+        },
+        "distillery": ["Pulteney Distillery"],
+        "maturation": "1st fill Bourbon barrel",
+        "releaseDay": null,
+        "singleCask": null,
+        "releaseYear": null,
+        "vintageYear": 2013,
+        "bottlingYear": 2025,
+        "caskStrength": null,
+        "releaseMonth": null,
+        "familyContext": {
+          "siblingBottles": []
+        }
+      },
+      {
+        "abv": 55.4,
+        "brand": "WhiskySponge",
+        "score": 22.509499,
+        "series": null,
+        "source": ["text"],
+        "bottler": "Decadent Drinks",
+        "edition": "Special Edition",
+        "outturn": 50,
+        "bottleId": 48856,
+        "category": "single_malt",
+        "fullName": "WhiskySponge Bladnoch 1990 33-year-old - Special Edition",
+        "reference": null,
+        "statedAge": 33,
+        "caskNumber": null,
+        "comparison": {
+          "missing": ["caskNumber"],
+          "conflicts": ["vintageYear"],
+          "agreements": ["abv"]
+        },
+        "distillery": ["Bladnoch"],
+        "maturation": "Refill Bourbon Barrel",
+        "releaseDay": null,
+        "singleCask": null,
+        "releaseYear": null,
+        "vintageYear": 1990,
+        "bottlingYear": 2023,
+        "caskStrength": true,
+        "releaseMonth": null,
+        "familyContext": {
+          "siblingBottles": []
+        }
+      },
+      {
+        "abv": 55.4,
+        "brand": "Lady of the Glen",
+        "score": 21.944595,
+        "series": null,
+        "source": ["text"],
+        "bottler": "Lady of the Glen",
+        "edition": null,
+        "outturn": null,
+        "bottleId": 61693,
+        "category": "single_malt",
+        "fullName": "Lady of the Glen Aultmore 2013",
+        "reference": null,
+        "statedAge": 11,
+        "caskNumber": null,
+        "comparison": {
+          "missing": ["caskNumber"],
+          "conflicts": [],
+          "agreements": ["abv", "vintageYear"]
+        },
+        "distillery": ["Aultmore"],
+        "maturation": null,
+        "releaseDay": null,
+        "singleCask": null,
+        "releaseYear": null,
+        "vintageYear": 2013,
+        "bottlingYear": null,
+        "caskStrength": null,
+        "releaseMonth": null,
+        "familyContext": {
+          "siblingBottles": []
+        }
+      },
+      {
+        "abv": 55.4,
+        "brand": "Kilchoman",
+        "score": 21.668081,
+        "series": null,
+        "source": ["text"],
+        "bottler": null,
+        "edition": "for Japan",
+        "outturn": null,
+        "bottleId": 60040,
+        "category": "single_malt",
+        "fullName": "Kilchoman Sauternes Single Cask Finish 753/2013 - for Japan",
+        "reference": null,
+        "statedAge": 8,
+        "caskNumber": "753/2013",
+        "comparison": {
+          "missing": [],
+          "conflicts": ["caskNumber"],
+          "agreements": ["abv", "vintageYear"]
+        },
+        "distillery": ["Kilchoman"],
+        "maturation": "Ex-Bourbon Barrel, Sauternes Cask Finish",
+        "releaseDay": null,
+        "singleCask": true,
+        "releaseYear": null,
+        "vintageYear": 2013,
+        "bottlingYear": 2022,
+        "caskStrength": null,
+        "releaseMonth": null,
+        "familyContext": {
+          "siblingBottles": []
+        }
+      },
+      {
+        "abv": 55.4,
+        "brand": "Kilchoman",
+        "score": 21.250671,
+        "series": null,
+        "source": ["text"],
+        "bottler": null,
+        "edition": "for Korea",
+        "outturn": 147,
+        "bottleId": 60174,
+        "category": "single_malt",
+        "fullName": "Kilchoman Port Quarter Cask Finish 2111/2013 - for Korea",
+        "reference": null,
+        "statedAge": 7,
+        "caskNumber": "2111/2013",
+        "comparison": {
+          "missing": [],
+          "conflicts": ["caskNumber"],
+          "agreements": ["abv", "vintageYear"]
+        },
+        "distillery": ["Kilchoman"],
+        "maturation": "1st Fill Ex-Bourbon Barrel, Ruby Port Quarter Cask Finish",
+        "releaseDay": null,
+        "singleCask": true,
+        "releaseYear": null,
+        "vintageYear": 2013,
+        "bottlingYear": 2020,
+        "caskStrength": null,
+        "releaseMonth": null,
+        "familyContext": {
+          "siblingBottles": []
+        }
+      },
+      {
+        "abv": 44.5,
+        "brand": "Thompson Bros.",
+        "score": 0.8001984527328626,
+        "series": null,
+        "source": ["vector"],
+        "bottler": "Thompson Bros.",
+        "edition": null,
+        "outturn": 504,
+        "bottleId": 56073,
+        "category": "single_malt",
+        "fullName": "Thompson Bros. Highland Single Malt Scotch Whisky",
+        "reference": "Thompson Bros Highland Single Malt Scotch Whisky, 19-year-old, 70CL, 44.5% ABV",
+        "statedAge": 19,
+        "caskNumber": null,
+        "comparison": {
+          "missing": [
+            "vintageYear",
+            "releaseYear",
+            "singleCask",
+            "caskNumber",
+            "distillers"
+          ],
+          "conflicts": ["statedAge", "abv"],
+          "agreements": ["category", "brand", "bottler"]
+        },
+        "distillery": [],
+        "maturation": "1st Fill Bourbon Barrels",
+        "releaseDay": null,
+        "singleCask": null,
+        "releaseYear": null,
+        "vintageYear": null,
+        "bottlingYear": null,
+        "caskStrength": null,
+        "releaseMonth": null,
+        "familyContext": {
+          "siblingBottles": []
+        }
+      }
+    ]
+  },
+  "context": {
+    "inspectedBottleIds": [69562],
+    "bottleContexts": [
+      {
+        "exact": {
+          "abv": 55.4,
+          "edition": null,
+          "outturn": 219,
+          "statedAge": 13,
+          "caskNumber": "SR26129",
+          "maturation": null,
+          "releaseDay": null,
+          "singleCask": true,
+          "releaseYear": null,
+          "vintageYear": 2013,
+          "bottlingYear": null,
+          "caskStrength": null,
+          "releaseMonth": null
+        },
+        "shared": {
+          "name": "Clynelish 2013 13-year-old",
+          "brand": {
+            "name": "Thompson Bros.",
+            "entityId": 365820
+          },
+          "series": null,
+          "bottler": {
+            "name": "Thompson Bros",
+            "entityId": 367034
+          },
+          "category": "single_malt",
+          "statedAge": null,
+          "distillers": [
+            {
+              "name": "Clynelish",
+              "entityId": 843
+            }
+          ]
+        },
+        "groupId": 42523,
+        "bottleId": 69562,
+        "fullName": "Thompson Bros. Clynelish 2013 13-year-old",
+        "siblings": [],
+        "references": [],
+        "observations": [],
+        "imageSources": []
+      }
+    ],
+    "inspectedEntities": [
+      {
+        "kind": "bottler",
+        "name": "Lady of the Glen",
+        "score": 1,
+        "source": ["exact", "text", "prefix", "contained"],
+        "entityId": 5474,
+        "reference": "Lady of the Glen",
+        "shortName": null,
+        "retrievedFor": [
+          {
+            "exact": true,
+            "query": "Lady of the Glen"
+          }
+        ]
+      },
+      {
+        "kind": "distillery",
+        "name": "Aultmore",
+        "score": 1,
+        "source": ["exact", "text", "prefix", "contained"],
+        "entityId": 191,
+        "reference": "Aultmore",
+        "shortName": null,
+        "retrievedFor": [
+          {
+            "exact": true,
+            "query": "Aultmore"
+          }
+        ]
+      },
+      {
+        "kind": "brand",
+        "name": "Maker's Mark",
+        "score": 1,
+        "source": ["exact", "text", "prefix", "contained"],
+        "entityId": 1166,
+        "reference": "Maker's Mark",
+        "shortName": null,
+        "retrievedFor": [
+          {
+            "exact": true,
+            "query": "Maker's Mark"
+          },
+          {
+            "query": "Maker's Mark Distillery"
+          }
+        ]
+      },
+      {
+        "kind": "distillery",
+        "name": "Maker's Mark Distillery",
+        "score": 1,
+        "source": ["text", "prefix", "exact", "contained"],
+        "entityId": 366688,
+        "reference": "Maker's Mark Distillery",
+        "shortName": null,
+        "retrievedFor": [
+          {
+            "query": "Maker's Mark"
+          },
+          {
+            "exact": true,
+            "query": "Maker's Mark Distillery"
+          }
+        ]
+      },
+      {
+        "kind": "distillery",
+        "name": "Chichibu",
+        "score": 1,
+        "source": ["exact", "text", "prefix", "contained"],
+        "entityId": 348,
+        "reference": "Chichibu",
+        "shortName": null,
+        "retrievedFor": [
+          {
+            "exact": true,
+            "query": "Chichibu"
+          }
+        ]
+      },
+      {
+        "kind": "brand",
+        "name": "Watashi Whisky",
+        "score": 1,
+        "source": ["exact", "text", "prefix", "contained"],
+        "entityId": 366052,
+        "reference": "Watashi Whisky",
+        "shortName": null,
+        "retrievedFor": [
+          {
+            "exact": true,
+            "query": "Watashi Whisky"
+          }
+        ]
+      },
+      {
+        "kind": "distillery",
+        "name": "Blair Athol",
+        "score": 1,
+        "source": ["exact", "text", "prefix", "contained"],
+        "entityId": 92,
+        "reference": "Blair Athol",
+        "shortName": null,
+        "retrievedFor": [
+          {
+            "exact": true,
+            "query": "Blair Athol"
+          }
+        ]
+      },
+      {
+        "kind": "bottler",
+        "name": "The Whisky Exchange",
+        "score": 1,
+        "source": ["exact", "text", "prefix", "contained"],
+        "entityId": 5952,
+        "reference": "The Whisky Exchange",
+        "shortName": null,
+        "retrievedFor": [
+          {
+            "exact": true,
+            "query": "The Whisky Exchange"
+          }
+        ]
+      },
+      {
+        "kind": "distillery",
+        "name": "Bunnahabhain",
+        "score": 1,
+        "source": ["exact", "text", "prefix", "contained"],
+        "entityId": 144,
+        "reference": "Bunnahabhain",
+        "shortName": "",
+        "retrievedFor": [
+          {
+            "exact": true,
+            "query": "Bunnahabhain"
+          }
+        ]
+      },
+      {
+        "kind": "distillery",
+        "name": "Kilchoman",
+        "score": 1,
+        "source": ["exact", "text", "prefix", "contained"],
+        "entityId": 175,
+        "reference": "Kilchoman",
+        "shortName": "",
+        "retrievedFor": [
+          {
+            "exact": true,
+            "query": "Kilchoman"
+          }
+        ]
+      },
+      {
+        "kind": "brand",
+        "name": "Decadent Drams",
+        "score": 1,
+        "source": ["exact", "text", "prefix", "contained"],
+        "entityId": 365681,
+        "reference": "Decadent Drams",
+        "shortName": null,
+        "retrievedFor": [
+          {
+            "exact": true,
+            "query": "Decadent Drams"
+          }
+        ]
+      },
+      {
+        "kind": "bottler",
+        "name": "Decadent Drinks",
+        "score": 1,
+        "source": ["exact", "text", "prefix", "contained"],
+        "entityId": 5775,
+        "reference": "Decadent Drinks",
+        "shortName": null,
+        "retrievedFor": [
+          {
+            "exact": true,
+            "query": "Decadent Drinks"
+          }
+        ]
+      },
+      {
+        "kind": "bottler",
+        "name": "Chichibu Reiwa Whisky",
+        "score": 0.5,
+        "source": ["text", "prefix"],
+        "entityId": 367660,
+        "reference": "Chichibu Reiwa Whisky",
+        "shortName": null,
+        "retrievedFor": [
+          {
+            "query": "Chichibu"
+          }
+        ]
+      },
+      {
+        "kind": "bottler",
+        "name": "&Whisky",
+        "score": 0.3423076923076923,
+        "source": ["contained"],
+        "entityId": 365821,
+        "reference": "&Whisky",
+        "shortName": null,
+        "retrievedFor": [
+          {
+            "query": "Watashi Whisky"
+          },
+          {
+            "query": "The Whisky Exchange"
+          }
+        ]
+      },
+      {
+        "kind": "brand",
+        "name": "Cadée",
+        "score": 0.31153846153846154,
+        "source": ["contained"],
+        "entityId": 367403,
+        "reference": "Cadée",
+        "shortName": null,
+        "retrievedFor": [
+          {
+            "query": "Decadent Drams"
+          },
+          {
+            "query": "Decadent Drinks"
+          }
+        ]
+      }
+    ],
+    "inspectedSeries": []
+  },
+  "provenance": {
+    "source": "production_miss",
+    "verifiedSourceUrls": [
+      "https://www.scotchwhiskyauctions.com/auctions/234-the-185th-auction/904996-clynelish-2013-13-year-old-thompson-bros-for-dornoch-castle/"
+    ],
+    "dbOutcome": {
+      "bottleId": null,
+      "createsBottle": false,
+      "summary": "The agent matched 69562 (exact_cask, web evidence supportive, no risks), but the server's cask-code check downgraded it to no_match because the source cask '26129' lacked the stored 'SR' prefix."
+    },
+    "notes": "Saved check 34813, source auction_lot 14670 (lot 185-904996), run 2026-11-03. This is a post-filter case: the classifier's decision was right and the code downgrade made it wrong. It passes once PR #1587 lands. The lot page gives distilled 29.04.2013, cask 26129, first-fill bourbon hogshead, one of 219 bottles, 55.4%. The lot photo's label prints 'Specially bottled for Dornoch Castle', 'Thompson Bros.', 'Vintage 2013', 'Aged 13 years in a 1st fill Bourbon hogshead', 'Cask no. SR26129', 'one of 219 Bottles', 55.4%. 69562 stores caskNumber SR26129, vintage 2013, age 13, 55.4%, Brand Thompson Bros., distiller Clynelish. The scraper's '26129' is the same cask with the prefix dropped."
+  },
+  "expected": {
+    "status": "classified",
+    "action": "match",
+    "identityScope": "exact_cask",
+    "matchedBottleId": 69562,
+    "summary": "Match Thompson Bros. Clynelish 2013 13-year-old, cask SR26129 (69562). The lot lists cask 26129; the label prints SR26129, and the vintage, age, 55.4% and 219-bottle outturn all agree."
+  },
+  "knownFailure": {
+    "reason": "The server cask-code check downgrades a right match when the source leaves out the SR prefix.",
+    "fixedBy": "PR #1587"
+  }
+}

@@ -1,0 +1,1192 @@
+{
+  "id": "auction-loch-lomond-open-152-duplicate",
+  "name": "auction lot: Loch Lomond Open 152nd Royal Troon matches the existing 2024 Open Special Edition",
+  "input": {
+    "reference": {
+      "id": 16500,
+      "url": "https://www.scotchwhiskyauctions.com/auctions/234-the-185th-auction/904441-loch-lomond-chardonnay-finish-the-open-152nd-royal-troon/",
+      "name": "Loch Lomond Chardonnay Finish The Open 152nd Royal Troon",
+      "imageUrl": null,
+      "externalSiteId": 28097,
+      "currentBottleId": null
+    },
+    "extractedIdentity": {
+      "abv": 46,
+      "brand": null,
+      "series": null,
+      "bottler": null,
+      "edition": null,
+      "outturn": null,
+      "category": null,
+      "distillery": null,
+      "expression": null,
+      "maturation": null,
+      "stated_age": null,
+      "cask_number": null,
+      "single_cask": null,
+      "release_year": null,
+      "vintage_year": null,
+      "cask_strength": null
+    },
+    "imageEvidence": null,
+    "initialCandidates": [
+      {
+        "abv": null,
+        "brand": "Loch Lomond",
+        "score": 103.18144,
+        "series": null,
+        "source": ["vector", "text", "context"],
+        "bottler": null,
+        "edition": null,
+        "outturn": null,
+        "bottleId": 34686,
+        "category": "single_malt",
+        "fullName": "Loch Lomond The Open Special Edition 2024",
+        "reference": "Loch Lomond The Open Special Edition 2024, 46%",
+        "statedAge": null,
+        "caskNumber": null,
+        "comparison": {
+          "missing": ["abv"],
+          "conflicts": [],
+          "agreements": []
+        },
+        "distillery": ["Loch Lomond"],
+        "maturation": null,
+        "releaseDay": null,
+        "singleCask": null,
+        "releaseYear": null,
+        "vintageYear": null,
+        "bottlingYear": null,
+        "caskStrength": null,
+        "releaseMonth": null,
+        "familyContext": {
+          "siblingBottles": []
+        }
+      },
+      {
+        "abv": 46,
+        "brand": "Loch Lomond",
+        "score": 87.828674,
+        "series": null,
+        "source": ["text"],
+        "bottler": null,
+        "edition": "154th Royal Birkdale",
+        "outturn": null,
+        "bottleId": 45752,
+        "category": "single_malt",
+        "fullName": "Loch Lomond The Open Special Edition - 154th Royal Birkdale - 2026 Release - 46.0% ABV",
+        "reference": null,
+        "statedAge": null,
+        "caskNumber": null,
+        "comparison": {
+          "missing": [],
+          "conflicts": [],
+          "agreements": ["abv"]
+        },
+        "distillery": ["Loch Lomond"],
+        "maturation": null,
+        "releaseDay": null,
+        "singleCask": null,
+        "releaseYear": 2026,
+        "vintageYear": null,
+        "bottlingYear": null,
+        "caskStrength": null,
+        "releaseMonth": null,
+        "familyContext": {
+          "siblingBottles": []
+        }
+      },
+      {
+        "abv": 46,
+        "brand": "Loch Lomond",
+        "score": 80.70294,
+        "series": null,
+        "source": ["vector", "text", "context"],
+        "bottler": "Loch Lomond",
+        "edition": "153rd Royal Portrush",
+        "outturn": null,
+        "bottleId": 46942,
+        "category": "single_malt",
+        "fullName": "Loch Lomond The Open Special Edition - 153rd Royal Portrush - 2025 Release - 46.0% ABV - Other Cask - 1st Fill",
+        "reference": "Loch Lomond The Open Special Edition - 153rd Royal Portrush - 2025 Release - 46.0% ABV - Other Cask - 1st Fill",
+        "statedAge": null,
+        "caskNumber": null,
+        "comparison": {
+          "missing": [],
+          "conflicts": [],
+          "agreements": ["abv"]
+        },
+        "distillery": ["Loch Lomond"],
+        "maturation": "other",
+        "releaseDay": null,
+        "singleCask": false,
+        "releaseYear": 2025,
+        "vintageYear": null,
+        "bottlingYear": null,
+        "caskStrength": null,
+        "releaseMonth": null,
+        "familyContext": {
+          "siblingBottles": []
+        }
+      },
+      {
+        "abv": 46,
+        "brand": "Loch Lomond",
+        "score": 80.117485,
+        "series": null,
+        "source": ["text"],
+        "bottler": null,
+        "edition": "151st Royal Liverpool",
+        "outturn": null,
+        "bottleId": 67169,
+        "category": "single_malt",
+        "fullName": "Loch Lomond The Open Special Edition - 151st Royal Liverpool",
+        "reference": null,
+        "statedAge": null,
+        "caskNumber": null,
+        "comparison": {
+          "missing": [],
+          "conflicts": [],
+          "agreements": ["abv"]
+        },
+        "distillery": ["Loch Lomond"],
+        "maturation": "finished in Rioja Red Wine casks",
+        "releaseDay": null,
+        "singleCask": null,
+        "releaseYear": 2023,
+        "vintageYear": null,
+        "bottlingYear": null,
+        "caskStrength": null,
+        "releaseMonth": null,
+        "familyContext": {
+          "siblingBottles": []
+        }
+      },
+      {
+        "abv": 46,
+        "brand": "Loch Lomond",
+        "score": 77.2116,
+        "series": null,
+        "source": ["text"],
+        "bottler": null,
+        "edition": null,
+        "outturn": null,
+        "bottleId": 45646,
+        "category": "single_malt",
+        "fullName": "Loch Lomond Steam & Fire",
+        "reference": null,
+        "statedAge": null,
+        "caskNumber": null,
+        "comparison": {
+          "missing": [],
+          "conflicts": [],
+          "agreements": ["abv"]
+        },
+        "distillery": ["Loch Lomond"],
+        "maturation": "oak",
+        "releaseDay": null,
+        "singleCask": null,
+        "releaseYear": null,
+        "vintageYear": null,
+        "bottlingYear": null,
+        "caskStrength": null,
+        "releaseMonth": null,
+        "familyContext": {
+          "siblingBottles": []
+        }
+      },
+      {
+        "abv": 46,
+        "brand": "Loch Lomond",
+        "score": 67.494865,
+        "series": null,
+        "source": ["text"],
+        "bottler": null,
+        "edition": null,
+        "outturn": null,
+        "bottleId": 45698,
+        "category": "single_grain",
+        "fullName": "Loch Lomond Grainstorm - 46.0% ABV",
+        "reference": null,
+        "statedAge": null,
+        "caskNumber": null,
+        "comparison": {
+          "missing": [],
+          "conflicts": [],
+          "agreements": ["abv"]
+        },
+        "distillery": ["Loch Lomond"],
+        "maturation": null,
+        "releaseDay": null,
+        "singleCask": null,
+        "releaseYear": null,
+        "vintageYear": null,
+        "bottlingYear": null,
+        "caskStrength": null,
+        "releaseMonth": null,
+        "familyContext": {
+          "siblingBottles": []
+        }
+      },
+      {
+        "abv": null,
+        "brand": "Loch Lomond",
+        "score": 65.45351,
+        "series": null,
+        "source": ["vector", "text"],
+        "bottler": null,
+        "edition": null,
+        "outturn": null,
+        "bottleId": 43035,
+        "category": "single_malt",
+        "fullName": "Loch Lomond The Open 24-year-old Manzanilla Sherry Wood",
+        "reference": "Loch Lomond The Open 24-year-old Manzanilla Sherry Wood, 47.1%",
+        "statedAge": 24,
+        "caskNumber": null,
+        "comparison": {
+          "missing": ["abv"],
+          "conflicts": [],
+          "agreements": []
+        },
+        "distillery": ["Loch Lomond"],
+        "maturation": null,
+        "releaseDay": null,
+        "singleCask": null,
+        "releaseYear": null,
+        "vintageYear": null,
+        "bottlingYear": null,
+        "caskStrength": null,
+        "releaseMonth": null,
+        "familyContext": {
+          "siblingBottles": []
+        }
+      },
+      {
+        "abv": 46,
+        "brand": "Loch Lomond",
+        "score": 65.361145,
+        "series": null,
+        "source": ["text"],
+        "bottler": null,
+        "edition": null,
+        "outturn": null,
+        "bottleId": 45674,
+        "category": "single_grain",
+        "fullName": "Loch Lomond Grainstorm Peated - 46.0% ABV",
+        "reference": null,
+        "statedAge": null,
+        "caskNumber": null,
+        "comparison": {
+          "missing": [],
+          "conflicts": [],
+          "agreements": ["abv"]
+        },
+        "distillery": ["Loch Lomond"],
+        "maturation": null,
+        "releaseDay": null,
+        "singleCask": null,
+        "releaseYear": null,
+        "vintageYear": null,
+        "bottlingYear": null,
+        "caskStrength": null,
+        "releaseMonth": null,
+        "familyContext": {
+          "siblingBottles": []
+        }
+      },
+      {
+        "abv": null,
+        "brand": "Loch Lomond",
+        "score": 60.012783,
+        "series": null,
+        "source": ["vector", "text"],
+        "bottler": null,
+        "edition": null,
+        "outturn": null,
+        "bottleId": 13713,
+        "category": "single_malt",
+        "fullName": "Loch Lomond 2002 Kerr Cellars Red Wine Cask-Finished",
+        "reference": "Loch Lomond 2002 Kerr Cellars Red Wine Cask-Finished, 48.1%",
+        "statedAge": null,
+        "caskNumber": null,
+        "comparison": {
+          "missing": ["abv", "releaseYear"],
+          "conflicts": [],
+          "agreements": ["category", "brand", "distillers"]
+        },
+        "distillery": ["Loch Lomond"],
+        "maturation": null,
+        "releaseDay": null,
+        "singleCask": null,
+        "releaseYear": null,
+        "vintageYear": null,
+        "bottlingYear": null,
+        "caskStrength": null,
+        "releaseMonth": null,
+        "familyContext": {
+          "siblingBottles": []
+        }
+      },
+      {
+        "abv": 46,
+        "brand": "Bruichladdich",
+        "score": 54.89014,
+        "series": "Links",
+        "source": ["text"],
+        "bottler": null,
+        "edition": null,
+        "outturn": null,
+        "bottleId": 53588,
+        "category": "single_malt",
+        "fullName": "Bruichladdich Links III: The 18th Green, Royal Troon",
+        "reference": null,
+        "statedAge": 14,
+        "caskNumber": null,
+        "comparison": {
+          "missing": [],
+          "conflicts": [],
+          "agreements": ["abv"]
+        },
+        "distillery": ["Bruichladdich"],
+        "maturation": null,
+        "releaseDay": null,
+        "singleCask": null,
+        "releaseYear": 2004,
+        "vintageYear": null,
+        "bottlingYear": 2004,
+        "caskStrength": null,
+        "releaseMonth": null,
+        "familyContext": {
+          "siblingBottles": []
+        }
+      },
+      {
+        "abv": 46,
+        "brand": "Loch Lomond",
+        "score": 53.52172,
+        "series": null,
+        "source": ["vector", "text"],
+        "bottler": null,
+        "edition": null,
+        "outturn": null,
+        "bottleId": 58455,
+        "category": "single_malt",
+        "fullName": "Loch Lomond 25-year-old",
+        "reference": "Loch Lomond 25-year-old",
+        "statedAge": 25,
+        "caskNumber": null,
+        "comparison": {
+          "missing": [],
+          "conflicts": [],
+          "agreements": ["abv"]
+        },
+        "distillery": ["Loch Lomond"],
+        "maturation": "First-fill, refill and re-charred American oak casks",
+        "releaseDay": null,
+        "singleCask": false,
+        "releaseYear": null,
+        "vintageYear": null,
+        "bottlingYear": null,
+        "caskStrength": null,
+        "releaseMonth": null,
+        "familyContext": {
+          "siblingBottles": []
+        }
+      },
+      {
+        "abv": 46,
+        "brand": "Teeling",
+        "score": 51.41483,
+        "series": null,
+        "source": ["text"],
+        "bottler": null,
+        "edition": null,
+        "outturn": null,
+        "bottleId": 56417,
+        "category": "single_malt",
+        "fullName": "Teeling Chardonnay Wine Cask",
+        "reference": null,
+        "statedAge": null,
+        "caskNumber": null,
+        "comparison": {
+          "missing": ["releaseYear", "distillers"],
+          "conflicts": ["brand"],
+          "agreements": ["category", "abv"]
+        },
+        "distillery": [],
+        "maturation": null,
+        "releaseDay": null,
+        "singleCask": null,
+        "releaseYear": null,
+        "vintageYear": null,
+        "bottlingYear": null,
+        "caskStrength": null,
+        "releaseMonth": null,
+        "familyContext": {
+          "siblingBottles": []
+        }
+      },
+      {
+        "abv": null,
+        "brand": "Loch Lomond",
+        "score": 48.94423,
+        "series": null,
+        "source": ["text"],
+        "bottler": null,
+        "edition": null,
+        "outturn": null,
+        "bottleId": 2154,
+        "category": "single_malt",
+        "fullName": "Loch Lomond 14-year-old Fruit and Cinnamon",
+        "reference": null,
+        "statedAge": 14,
+        "caskNumber": null,
+        "comparison": {
+          "missing": ["abv"],
+          "conflicts": [],
+          "agreements": []
+        },
+        "distillery": ["Loch Lomond"],
+        "maturation": null,
+        "releaseDay": null,
+        "singleCask": null,
+        "releaseYear": null,
+        "vintageYear": null,
+        "bottlingYear": null,
+        "caskStrength": null,
+        "releaseMonth": null,
+        "familyContext": {
+          "siblingBottles": []
+        }
+      },
+      {
+        "abv": null,
+        "brand": "Loch Lomond",
+        "score": 48.34015,
+        "series": null,
+        "source": ["text"],
+        "bottler": null,
+        "edition": null,
+        "outturn": null,
+        "bottleId": 867,
+        "category": "single_grain",
+        "fullName": "Loch Lomond Single Grain",
+        "reference": null,
+        "statedAge": null,
+        "caskNumber": null,
+        "comparison": {
+          "missing": ["abv"],
+          "conflicts": [],
+          "agreements": []
+        },
+        "distillery": ["Loch Lomond"],
+        "maturation": null,
+        "releaseDay": null,
+        "singleCask": null,
+        "releaseYear": null,
+        "vintageYear": null,
+        "bottlingYear": null,
+        "caskStrength": null,
+        "releaseMonth": null,
+        "familyContext": {
+          "siblingBottles": []
+        }
+      },
+      {
+        "abv": null,
+        "brand": "Loch Lomond",
+        "score": 47.556213,
+        "series": null,
+        "source": ["text"],
+        "bottler": null,
+        "edition": null,
+        "outturn": null,
+        "bottleId": 2155,
+        "category": "single_malt",
+        "fullName": "Loch Lomond 18-year-old Fruit and Spice",
+        "reference": null,
+        "statedAge": 18,
+        "caskNumber": null,
+        "comparison": {
+          "missing": ["abv"],
+          "conflicts": [],
+          "agreements": []
+        },
+        "distillery": ["Loch Lomond"],
+        "maturation": null,
+        "releaseDay": null,
+        "singleCask": null,
+        "releaseYear": null,
+        "vintageYear": null,
+        "bottlingYear": null,
+        "caskStrength": null,
+        "releaseMonth": null,
+        "familyContext": {
+          "siblingBottles": []
+        }
+      },
+      {
+        "abv": null,
+        "brand": "Loch Lomond",
+        "score": 46.796204,
+        "series": null,
+        "source": ["text"],
+        "bottler": null,
+        "edition": null,
+        "outturn": null,
+        "bottleId": 1822,
+        "category": "single_malt",
+        "fullName": "Loch Lomond 2008 Exclusive Cask",
+        "reference": null,
+        "statedAge": null,
+        "caskNumber": null,
+        "comparison": {
+          "missing": ["abv"],
+          "conflicts": [],
+          "agreements": []
+        },
+        "distillery": ["Loch Lomond"],
+        "maturation": null,
+        "releaseDay": null,
+        "singleCask": null,
+        "releaseYear": null,
+        "vintageYear": null,
+        "bottlingYear": null,
+        "caskStrength": null,
+        "releaseMonth": null,
+        "familyContext": {
+          "siblingBottles": []
+        }
+      },
+      {
+        "abv": 46,
+        "brand": "Kinahan's",
+        "score": 46.307346,
+        "series": null,
+        "source": ["text"],
+        "bottler": null,
+        "edition": null,
+        "outturn": null,
+        "bottleId": 46937,
+        "category": "single_malt",
+        "fullName": "Kinahan's Heritage - American Oak - 46.0% ABV - Bourbon Cask",
+        "reference": null,
+        "statedAge": null,
+        "caskNumber": null,
+        "comparison": {
+          "missing": ["releaseYear", "distillers"],
+          "conflicts": ["brand"],
+          "agreements": ["category", "abv"]
+        },
+        "distillery": [],
+        "maturation": "bourbon",
+        "releaseDay": null,
+        "singleCask": null,
+        "releaseYear": null,
+        "vintageYear": null,
+        "bottlingYear": null,
+        "caskStrength": null,
+        "releaseMonth": null,
+        "familyContext": {
+          "siblingBottles": []
+        }
+      },
+      {
+        "abv": null,
+        "brand": "Loch Lomond",
+        "score": 46.263737,
+        "series": null,
+        "source": ["text"],
+        "bottler": null,
+        "edition": null,
+        "outturn": null,
+        "bottleId": 456,
+        "category": "single_malt",
+        "fullName": "Loch Lomond 21-year-old",
+        "reference": null,
+        "statedAge": 21,
+        "caskNumber": null,
+        "comparison": {
+          "missing": ["abv", "releaseYear"],
+          "conflicts": [],
+          "agreements": ["category", "brand", "distillers"]
+        },
+        "distillery": ["Loch Lomond"],
+        "maturation": null,
+        "releaseDay": null,
+        "singleCask": null,
+        "releaseYear": null,
+        "vintageYear": null,
+        "bottlingYear": null,
+        "caskStrength": null,
+        "releaseMonth": null,
+        "familyContext": {
+          "siblingBottles": []
+        }
+      },
+      {
+        "abv": null,
+        "brand": "Loch Lomond",
+        "score": 45.716743,
+        "series": null,
+        "source": ["vector", "text"],
+        "bottler": null,
+        "edition": null,
+        "outturn": null,
+        "bottleId": 15832,
+        "category": "single_malt",
+        "fullName": "Loch Lomond 12-year-old",
+        "reference": "Loch Lomond 12-year-old, 46%",
+        "statedAge": 12,
+        "caskNumber": null,
+        "comparison": {
+          "missing": ["abv", "releaseYear"],
+          "conflicts": [],
+          "agreements": ["category", "brand", "distillers"]
+        },
+        "distillery": ["Loch Lomond"],
+        "maturation": null,
+        "releaseDay": null,
+        "singleCask": null,
+        "releaseYear": null,
+        "vintageYear": null,
+        "bottlingYear": null,
+        "caskStrength": null,
+        "releaseMonth": null,
+        "familyContext": {
+          "siblingBottles": []
+        }
+      },
+      {
+        "abv": null,
+        "brand": "Loch Lomond",
+        "score": 45.257202,
+        "series": null,
+        "source": ["text"],
+        "bottler": null,
+        "edition": null,
+        "outturn": null,
+        "bottleId": 3273,
+        "category": "single_malt",
+        "fullName": "Loch Lomond 18-year-old Single Malt Scotch Whisky",
+        "reference": null,
+        "statedAge": 18,
+        "caskNumber": null,
+        "comparison": {
+          "missing": ["abv", "releaseYear"],
+          "conflicts": [],
+          "agreements": ["category", "brand", "distillers"]
+        },
+        "distillery": ["Loch Lomond"],
+        "maturation": null,
+        "releaseDay": null,
+        "singleCask": null,
+        "releaseYear": null,
+        "vintageYear": null,
+        "bottlingYear": null,
+        "caskStrength": null,
+        "releaseMonth": null,
+        "familyContext": {
+          "siblingBottles": []
+        }
+      },
+      {
+        "abv": 46,
+        "brand": "Kilchoman",
+        "score": 43.871307,
+        "series": null,
+        "source": ["vector", "text"],
+        "bottler": null,
+        "edition": "2024 Edition",
+        "outturn": null,
+        "bottleId": 43032,
+        "category": "single_malt",
+        "fullName": "Kilchoman Loch Gorm - 2024 Edition",
+        "reference": "Kilchoman Loch Gorm (2024 Edition), 46%",
+        "statedAge": null,
+        "caskNumber": null,
+        "comparison": {
+          "missing": [],
+          "conflicts": ["brand", "distillers"],
+          "agreements": ["category", "abv", "releaseYear"]
+        },
+        "distillery": ["Kilchoman"],
+        "maturation": "Oloroso sherry casks",
+        "releaseDay": null,
+        "singleCask": false,
+        "releaseYear": 2024,
+        "vintageYear": 2014,
+        "bottlingYear": 2024,
+        "caskStrength": null,
+        "releaseMonth": null,
+        "familyContext": {
+          "siblingBottles": []
+        }
+      },
+      {
+        "abv": 46,
+        "brand": "Campbeltown Loch",
+        "score": 38.852203,
+        "series": null,
+        "source": ["vector", "text"],
+        "bottler": null,
+        "edition": null,
+        "outturn": null,
+        "bottleId": 45348,
+        "category": "blended_malt",
+        "fullName": "Campbeltown Loch Blended Malt Scotch Whisky",
+        "reference": "Campbeltown Loch Blended Malt Scotch Whisky - 46.0% ABV",
+        "statedAge": null,
+        "caskNumber": null,
+        "comparison": {
+          "missing": [],
+          "conflicts": [],
+          "agreements": ["abv"]
+        },
+        "distillery": ["Springbank"],
+        "maturation": null,
+        "releaseDay": null,
+        "singleCask": false,
+        "releaseYear": null,
+        "vintageYear": null,
+        "bottlingYear": null,
+        "caskStrength": null,
+        "releaseMonth": null,
+        "familyContext": {
+          "siblingBottles": []
+        }
+      },
+      {
+        "abv": 46,
+        "brand": "Lochlea",
+        "score": 0.6819820681949571,
+        "series": null,
+        "source": ["vector"],
+        "bottler": null,
+        "edition": "Third Crop",
+        "outturn": null,
+        "bottleId": 58095,
+        "category": "single_malt",
+        "fullName": "Lochlea Harvest Edition - Third Crop",
+        "reference": "Lochlea Harvest Edition Bourbon, Port, & Sherry Cask Matured (Third Crop), 46%",
+        "statedAge": null,
+        "caskNumber": null,
+        "comparison": {
+          "missing": [],
+          "conflicts": ["brand", "distillers"],
+          "agreements": ["category", "abv", "releaseYear"]
+        },
+        "distillery": ["Lochlea"],
+        "maturation": "Double matured in refill bourbon barrels and port hogsheads, alongside an oloroso sherry butt",
+        "releaseDay": null,
+        "singleCask": false,
+        "releaseYear": 2024,
+        "vintageYear": null,
+        "bottlingYear": null,
+        "caskStrength": null,
+        "releaseMonth": null,
+        "familyContext": {
+          "siblingBottles": []
+        }
+      }
+    ]
+  },
+  "context": {
+    "inspectedBottleIds": [34686, 46942],
+    "bottleContexts": [
+      {
+        "exact": {
+          "abv": null,
+          "edition": null,
+          "outturn": null,
+          "statedAge": null,
+          "caskNumber": null,
+          "maturation": null,
+          "releaseDay": null,
+          "singleCask": null,
+          "releaseYear": null,
+          "vintageYear": null,
+          "bottlingYear": null,
+          "caskStrength": null,
+          "releaseMonth": null
+        },
+        "shared": {
+          "name": "The Open Special Edition 2024",
+          "brand": {
+            "name": "Loch Lomond",
+            "entityId": 1144
+          },
+          "series": null,
+          "bottler": null,
+          "category": "single_malt",
+          "statedAge": null,
+          "distillers": [
+            {
+              "name": "Loch Lomond",
+              "entityId": 1144
+            }
+          ]
+        },
+        "groupId": 16339,
+        "bottleId": 34686,
+        "fullName": "Loch Lomond The Open Special Edition 2024",
+        "siblings": [],
+        "references": [
+          {
+            "name": "Loch Lomond The Open Special Edition 2024",
+            "ignored": false
+          },
+          {
+            "name": "Loch Lomond The Open Special Edition 2024, 46%",
+            "ignored": false
+          },
+          {
+            "name": "Loch Lomond The Open Special Edition Single Malt Scotch Whisky",
+            "ignored": false
+          }
+        ],
+        "observations": [
+          {
+            "facts": {
+              "proposalType": "match_existing",
+              "releaseFacts": {},
+              "creationTarget": null,
+              "proposedBottle": null,
+              "proposedRelease": null
+            },
+            "rawText": "Loch Lomond The Open Special Edition Single Malt Scotch Whisky",
+            "sourceKey": "store_price:2057",
+            "sourceUrl": "https://woodencork.com/collections/whiskey/products/loch-lomond-the-open-special-edition-single-malt-scotch-whisky",
+            "sourceName": "Loch Lomond The Open Special Edition Single Malt Scotch Whisky",
+            "sourceType": "store_price",
+            "parsedIdentity": {
+              "abv": null,
+              "brand": "Loch Lomond",
+              "series": null,
+              "bottler": null,
+              "edition": null,
+              "category": "single_malt",
+              "cask_fill": null,
+              "cask_size": null,
+              "cask_type": null,
+              "distillery": ["Loch Lomond"],
+              "expression": "The Open Special Edition",
+              "stated_age": null,
+              "single_cask": null,
+              "release_year": null,
+              "vintage_year": null,
+              "cask_strength": null
+            }
+          }
+        ],
+        "imageSources": []
+      },
+      {
+        "exact": {
+          "abv": 46,
+          "edition": "153rd Royal Portrush",
+          "outturn": null,
+          "statedAge": null,
+          "caskNumber": null,
+          "maturation": "other",
+          "releaseDay": null,
+          "singleCask": false,
+          "releaseYear": 2025,
+          "vintageYear": null,
+          "bottlingYear": null,
+          "caskStrength": null,
+          "releaseMonth": null
+        },
+        "shared": {
+          "name": "The Open Special Edition",
+          "brand": {
+            "name": "Loch Lomond",
+            "entityId": 1144
+          },
+          "series": null,
+          "bottler": {
+            "name": "Loch Lomond",
+            "entityId": 1144
+          },
+          "category": "single_malt",
+          "statedAge": null,
+          "distillers": [
+            {
+              "name": "Loch Lomond",
+              "entityId": 1144
+            }
+          ]
+        },
+        "groupId": 19902,
+        "bottleId": 46942,
+        "fullName": "Loch Lomond The Open Special Edition - 153rd Royal Portrush - 2025 Release - 46.0% ABV - Other Cask - 1st Fill",
+        "siblings": [],
+        "references": [
+          {
+            "name": "Loch Lomond The Open Special Edition - 153rd Royal Portrush - 2025 Release - 46.0% ABV - Other Cask - 1st Fill",
+            "ignored": false
+          }
+        ],
+        "observations": [
+          {
+            "facts": {
+              "proposalType": "match_existing",
+              "proposedBottle": null,
+              "referenceScope": "none"
+            },
+            "rawText": "Loch Lomond The Open Special Edition -",
+            "sourceKey": "store_price:12056740",
+            "sourceUrl": "https://www.thewhiskyworld.com/loch-lomond-the-open-special-edition-2025-release-p16391",
+            "sourceName": "Loch Lomond The Open Special Edition -",
+            "sourceType": "store_price",
+            "parsedIdentity": null
+          },
+          {
+            "facts": {
+              "proposalType": "create_new",
+              "proposedBottle": {
+                "abv": 46,
+                "name": "The Open Special Edition",
+                "brand": {
+                  "id": 1144,
+                  "name": "Loch Lomond"
+                },
+                "series": null,
+                "bottler": {
+                  "id": 1144,
+                  "name": "Loch Lomond"
+                },
+                "edition": "153rd Royal Portrush",
+                "caskFill": "1st_fill",
+                "caskSize": null,
+                "caskType": "other",
+                "category": "single_malt",
+                "statedAge": null,
+                "distillers": [
+                  {
+                    "id": 1144,
+                    "name": "Loch Lomond"
+                  }
+                ],
+                "singleCask": false,
+                "releaseYear": 2025,
+                "vintageYear": null,
+                "caskStrength": null
+              }
+            },
+            "rawText": "Loch Lomond The Open Special Edition 2025",
+            "sourceKey": "store_price:12030886",
+            "sourceUrl": "https://www.masterofmalt.com/whiskies/loch-lomond/loch-lomond-open-special-edition-2025-whisky/?sku=139064",
+            "sourceName": "Loch Lomond The Open Special Edition 2025",
+            "sourceType": "store_price",
+            "parsedIdentity": {
+              "abv": 46,
+              "brand": "Loch Lomond",
+              "series": "The Open",
+              "bottler": null,
+              "edition": "153rd Royal Portrush",
+              "category": "single_malt",
+              "cask_fill": null,
+              "cask_size": null,
+              "cask_type": "other",
+              "distillery": ["Loch Lomond"],
+              "expression": "The Open Special Edition",
+              "stated_age": null,
+              "single_cask": false,
+              "release_year": null,
+              "vintage_year": null,
+              "cask_strength": false
+            }
+          }
+        ],
+        "imageSources": []
+      }
+    ],
+    "inspectedEntities": [
+      {
+        "kind": "distillery",
+        "name": "Loch Lomond",
+        "score": 1,
+        "source": ["exact", "text", "prefix", "contained"],
+        "entityId": 1144,
+        "reference": "Loch Lomond",
+        "shortName": null,
+        "retrievedFor": [
+          {
+            "exact": true,
+            "query": "Loch Lomond"
+          }
+        ]
+      },
+      {
+        "kind": "distillery",
+        "name": "Bruichladdich",
+        "score": 1,
+        "source": ["exact", "text", "prefix", "contained"],
+        "entityId": 192,
+        "reference": "Bruichladdich",
+        "shortName": "",
+        "retrievedFor": [
+          {
+            "exact": true,
+            "query": "Bruichladdich"
+          }
+        ]
+      },
+      {
+        "kind": "brand",
+        "name": "Campbeltown Loch",
+        "score": 1,
+        "source": ["exact", "text", "prefix", "contained"],
+        "entityId": 418,
+        "reference": "Campbeltown Loch",
+        "shortName": null,
+        "retrievedFor": [
+          {
+            "exact": true,
+            "query": "Campbeltown Loch"
+          }
+        ]
+      },
+      {
+        "kind": "distillery",
+        "name": "Springbank",
+        "score": 1,
+        "source": ["exact", "text", "prefix", "contained"],
+        "entityId": 1362,
+        "reference": "Springbank",
+        "shortName": null,
+        "retrievedFor": [
+          {
+            "exact": true,
+            "query": "Springbank"
+          }
+        ]
+      },
+      {
+        "kind": "brand",
+        "name": "Croftengea",
+        "score": 0.5,
+        "source": ["text", "prefix"],
+        "entityId": 863,
+        "reference": "Loch Lomond (Croftengea)",
+        "shortName": "",
+        "retrievedFor": [
+          {
+            "query": "Loch Lomond"
+          }
+        ]
+      },
+      {
+        "kind": "brand",
+        "name": "Inchmoan",
+        "score": 0.5,
+        "source": ["text", "prefix"],
+        "entityId": 1052,
+        "reference": "Loch Lomond (Inchmoan)",
+        "shortName": null,
+        "retrievedFor": [
+          {
+            "query": "Loch Lomond"
+          }
+        ]
+      },
+      {
+        "kind": "brand",
+        "name": "Inchmurrin",
+        "score": 0.5,
+        "source": ["text", "prefix"],
+        "entityId": 1053,
+        "reference": "Loch Lomond (Inchmurrin)",
+        "shortName": "",
+        "retrievedFor": [
+          {
+            "query": "Loch Lomond"
+          }
+        ]
+      },
+      {
+        "kind": "company",
+        "name": "Loch Lomond Group",
+        "score": 0.5,
+        "source": ["text", "prefix"],
+        "entityId": 366126,
+        "reference": null,
+        "shortName": null,
+        "retrievedFor": [
+          {
+            "query": "Loch Lomond"
+          }
+        ]
+      },
+      {
+        "kind": "brand",
+        "name": "Bruichladdich Octomore",
+        "score": 0.5,
+        "source": ["text", "prefix"],
+        "entityId": 1210,
+        "reference": "Bruichladdich Octomore",
+        "shortName": "Octomore",
+        "retrievedFor": [
+          {
+            "query": "Bruichladdich"
+          }
+        ]
+      },
+      {
+        "kind": "brand",
+        "name": "Bruichladdich Port Charlotte",
+        "score": 0.5,
+        "source": ["text", "prefix"],
+        "entityId": 1269,
+        "reference": "Bruichladdich Port Charlotte",
+        "shortName": "Port Charlotte",
+        "retrievedFor": [
+          {
+            "query": "Bruichladdich"
+          }
+        ]
+      },
+      {
+        "kind": "bottler",
+        "name": "The Campbeltown Loch Whisky Company",
+        "score": 0.5,
+        "source": ["text", "prefix"],
+        "entityId": 5580,
+        "reference": "Campbeltown Loch Whisky Company",
+        "shortName": null,
+        "retrievedFor": [
+          {
+            "query": "Campbeltown Loch"
+          }
+        ]
+      }
+    ],
+    "inspectedSeries": []
+  },
+  "provenance": {
+    "source": "production_miss",
+    "verifiedSourceUrls": [
+      "https://www.scotchwhiskyauctions.com/auctions/234-the-185th-auction/904441-loch-lomond-chardonnay-finish-the-open-152nd-royal-troon/",
+      "https://lochlomondgroup.com/products/open-special-edition-2024",
+      "https://www.royalmilewhiskies.com/loch-lomond-open-special-edition-2024-chardonnay-finish-46-70cl/",
+      "https://dramface.com/all-reviews/2024/loch-lomond-the-open-special-edition-2024"
+    ],
+    "dbOutcome": {
+      "bottleId": null,
+      "createsBottle": true,
+      "summary": "Production returned create_bottle with the name `The Open Special Edition Chardonnay Finish`."
+    },
+    "notes": "Captured from saved classifier run 35972 (auction_lot 16500, model null, 2026-11-03T17:07:01.292Z). Production rationale: The auction listing identifies the 152nd Open at Royal Troon Chardonnay-finish Loch Lomond whisky. A product-specific retailer page confirms the 2024 special edition, 46% ABV, and maturation in American oak casks followed by Chardonnay wine casks. Existing Bottle 34686 is only a generic 2024 Open Special Edition; the finish distinguishes this marketed release, so it is not a safe match. Checked 2026-11-03. Lot page: 152nd Open Championship Royal Troon, Chardonnay wine casks, 46% ABV / 70cl. The 152nd Open was played at Royal Troon in 2024; Loch Lomond's Open Special Edition 2024 is that 46% Chardonnay-finish release. Candidate 34686 \"Loch Lomond The Open Special Edition 2024\" (no stored facts, nothing conflicting) is the same Bottle. Production created 70178, a duplicate."
+  },
+  "expected": {
+    "status": "classified",
+    "action": "match",
+    "identityScope": "product",
+    "matchedBottleId": 34686,
+    "summary": "Match 34686: the 152nd Open at Royal Troon is the 2024 Open, and 34686 is the Loch Lomond Open Special Edition 2024. Do not create a duplicate."
+  },
+  "knownFailure": {
+    "reason": "The agent creates a duplicate even though candidate 34686 is the same release."
+  }
+}

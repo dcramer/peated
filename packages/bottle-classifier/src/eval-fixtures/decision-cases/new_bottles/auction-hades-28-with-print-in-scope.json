@@ -1,0 +1,1515 @@
+{
+  "id": "auction-hades-28-with-print-in-scope",
+  "name": "Auction lot sold with a print stays in scope and creates the Platinum Cask Hades 28-year-old",
+  "input": {
+    "reference": {
+      "id": 17650,
+      "url": "https://www.scotchwhiskyauctions.com/auctions/234-the-185th-auction/905402-speyside-single-malt-28-year-old-hades-platinum-cask-with-print/",
+      "name": "Speyside Single Malt 28 Year Old Hades Platinum Cask With Print",
+      "imageUrl": null,
+      "externalSiteId": 28097,
+      "currentBottleId": null
+    },
+    "extractedIdentity": {
+      "abv": 52.9,
+      "brand": null,
+      "series": null,
+      "bottler": null,
+      "edition": null,
+      "outturn": 126,
+      "category": null,
+      "distillery": null,
+      "expression": null,
+      "maturation": null,
+      "stated_age": null,
+      "cask_number": null,
+      "single_cask": null,
+      "release_year": null,
+      "vintage_year": null,
+      "cask_strength": null
+    },
+    "imageEvidence": null,
+    "initialCandidates": [
+      {
+        "abv": null,
+        "brand": "The GlenDronach",
+        "score": 64.64453,
+        "series": null,
+        "source": ["text"],
+        "bottler": null,
+        "edition": null,
+        "outturn": null,
+        "bottleId": 68864,
+        "category": "single_malt",
+        "fullName": "The GlenDronach 1993 28-year-old",
+        "reference": null,
+        "statedAge": 28,
+        "caskNumber": "7099",
+        "comparison": {
+          "missing": ["abv", "releaseYear", "bottler", "series"],
+          "conflicts": ["category", "brand", "distillers"],
+          "agreements": ["statedAge", "vintageYear"]
+        },
+        "distillery": ["The GlenDronach"],
+        "maturation": null,
+        "releaseDay": null,
+        "singleCask": true,
+        "releaseYear": null,
+        "vintageYear": 1993,
+        "bottlingYear": 2022,
+        "caskStrength": null,
+        "releaseMonth": null,
+        "familyContext": {
+          "siblingBottles": []
+        }
+      },
+      {
+        "abv": 48.8,
+        "brand": "Thompson Bros.",
+        "score": 63.57371,
+        "series": null,
+        "source": ["text"],
+        "bottler": "Thompson Bros",
+        "edition": null,
+        "outturn": null,
+        "bottleId": 69316,
+        "category": "single_malt",
+        "fullName": "Thompson Bros. Tullibardine 1993 28-year-old",
+        "reference": null,
+        "statedAge": 28,
+        "caskNumber": null,
+        "comparison": {
+          "missing": ["releaseYear", "series"],
+          "conflicts": ["category", "abv", "brand", "bottler", "distillers"],
+          "agreements": ["statedAge", "vintageYear"]
+        },
+        "distillery": ["Tullibardine"],
+        "maturation": null,
+        "releaseDay": null,
+        "singleCask": true,
+        "releaseYear": null,
+        "vintageYear": 1993,
+        "bottlingYear": null,
+        "caskStrength": null,
+        "releaseMonth": null,
+        "familyContext": {
+          "siblingBottles": []
+        }
+      },
+      {
+        "abv": null,
+        "brand": "Teeling",
+        "score": 62.87262,
+        "series": null,
+        "source": ["text"],
+        "bottler": "Teeling Whiskey Company",
+        "edition": null,
+        "outturn": null,
+        "bottleId": 2244,
+        "category": "single_malt",
+        "fullName": "Teeling 28-year-old Vintage Reserve Collection",
+        "reference": null,
+        "statedAge": 28,
+        "caskNumber": null,
+        "comparison": {
+          "missing": ["abv"],
+          "conflicts": [],
+          "agreements": []
+        },
+        "distillery": [],
+        "maturation": null,
+        "releaseDay": null,
+        "singleCask": null,
+        "releaseYear": null,
+        "vintageYear": null,
+        "bottlingYear": null,
+        "caskStrength": null,
+        "releaseMonth": null,
+        "familyContext": {
+          "siblingBottles": []
+        }
+      },
+      {
+        "abv": 51.9,
+        "brand": "WhiskySponge",
+        "score": 59.795837,
+        "series": null,
+        "source": ["text"],
+        "bottler": "Decadent Drinks",
+        "edition": "Edition No. 62",
+        "outturn": 314,
+        "bottleId": 48722,
+        "category": "single_malt",
+        "fullName": "WhiskySponge Glen Keith 1993 28-year-old - Edition No. 62",
+        "reference": null,
+        "statedAge": 28,
+        "caskNumber": "V91 and V93",
+        "comparison": {
+          "missing": ["releaseYear", "series"],
+          "conflicts": ["category", "abv", "brand", "bottler", "distillers"],
+          "agreements": ["statedAge", "vintageYear"]
+        },
+        "distillery": ["Glen Keith"],
+        "maturation": "Matured in a refill barrel (V91) and a refill hogshead (V93)",
+        "releaseDay": null,
+        "singleCask": false,
+        "releaseYear": null,
+        "vintageYear": 1993,
+        "bottlingYear": 2022,
+        "caskStrength": null,
+        "releaseMonth": null,
+        "familyContext": {
+          "siblingBottles": []
+        }
+      },
+      {
+        "abv": 51.9,
+        "brand": "The GlenDronach",
+        "score": 58.535152,
+        "series": null,
+        "source": ["text"],
+        "bottler": null,
+        "edition": null,
+        "outturn": null,
+        "bottleId": 68391,
+        "category": "single_malt",
+        "fullName": "The GlenDronach 1993 28-year-old Oloroso Sherry Puncheon",
+        "reference": null,
+        "statedAge": 28,
+        "caskNumber": "7100",
+        "comparison": {
+          "missing": ["releaseYear", "bottler", "series"],
+          "conflicts": ["category", "abv", "brand", "distillers"],
+          "agreements": ["statedAge", "vintageYear"]
+        },
+        "distillery": ["The GlenDronach"],
+        "maturation": "Oloroso sherry puncheon",
+        "releaseDay": null,
+        "singleCask": true,
+        "releaseYear": null,
+        "vintageYear": 1993,
+        "bottlingYear": null,
+        "caskStrength": null,
+        "releaseMonth": null,
+        "familyContext": {
+          "siblingBottles": []
+        }
+      },
+      {
+        "abv": 54.1,
+        "brand": "Gordon & MacPhail",
+        "score": 57.279915,
+        "series": "Connoisseurs Choice",
+        "source": ["text"],
+        "bottler": "Gordon & MacPhail",
+        "edition": null,
+        "outturn": 517,
+        "bottleId": 60962,
+        "category": "single_malt",
+        "fullName": "Gordon & MacPhail Ledaig 1993 28-year-old",
+        "reference": null,
+        "statedAge": 28,
+        "caskNumber": "703",
+        "comparison": {
+          "missing": ["releaseYear"],
+          "conflicts": [
+            "category",
+            "abv",
+            "brand",
+            "bottler",
+            "series",
+            "distillers"
+          ],
+          "agreements": ["statedAge", "vintageYear"]
+        },
+        "distillery": ["Tobermory"],
+        "maturation": "Refill Sherry butt",
+        "releaseDay": null,
+        "singleCask": null,
+        "releaseYear": null,
+        "vintageYear": 1993,
+        "bottlingYear": 2021,
+        "caskStrength": true,
+        "releaseMonth": null,
+        "familyContext": {
+          "siblingBottles": []
+        }
+      },
+      {
+        "abv": 44.7,
+        "brand": "WhiskySponge",
+        "score": 57.038902,
+        "series": null,
+        "source": ["text"],
+        "bottler": "Decadent Drinks",
+        "edition": "Edition No. 59A",
+        "outturn": 261,
+        "bottleId": 48720,
+        "category": "blend",
+        "fullName": "WhiskySponge Cream Of Sponge - Edition No. 59A - 28-year-old - 1993 Vintage - 44.7% ABV",
+        "reference": null,
+        "statedAge": 28,
+        "caskNumber": null,
+        "comparison": {
+          "missing": ["releaseYear", "series", "distillers"],
+          "conflicts": ["category", "abv", "brand", "bottler"],
+          "agreements": ["statedAge", "vintageYear"]
+        },
+        "distillery": [],
+        "maturation": "refill hogshead",
+        "releaseDay": null,
+        "singleCask": null,
+        "releaseYear": null,
+        "vintageYear": 1993,
+        "bottlingYear": 2022,
+        "caskStrength": false,
+        "releaseMonth": null,
+        "familyContext": {
+          "siblingBottles": []
+        }
+      },
+      {
+        "abv": null,
+        "brand": "Fettercairn",
+        "score": 54.440926,
+        "series": null,
+        "source": ["text"],
+        "bottler": null,
+        "edition": null,
+        "outturn": null,
+        "bottleId": 13530,
+        "category": "single_malt",
+        "fullName": "Fettercairn 28-year-old",
+        "reference": null,
+        "statedAge": 28,
+        "caskNumber": null,
+        "comparison": {
+          "missing": ["abv"],
+          "conflicts": [],
+          "agreements": []
+        },
+        "distillery": ["Fettercairn"],
+        "maturation": null,
+        "releaseDay": null,
+        "singleCask": null,
+        "releaseYear": null,
+        "vintageYear": null,
+        "bottlingYear": null,
+        "caskStrength": null,
+        "releaseMonth": null,
+        "familyContext": {
+          "siblingBottles": []
+        }
+      },
+      {
+        "abv": 40,
+        "brand": "Glen Deveron",
+        "score": 53.90207,
+        "series": null,
+        "source": ["text"],
+        "bottler": null,
+        "edition": null,
+        "outturn": null,
+        "bottleId": 62313,
+        "category": "single_malt",
+        "fullName": "Glen Deveron 28-year-old Royal Burgh Collection",
+        "reference": null,
+        "statedAge": 28,
+        "caskNumber": null,
+        "comparison": {
+          "missing": ["vintageYear", "releaseYear", "bottler", "series"],
+          "conflicts": ["category", "abv", "brand", "distillers"],
+          "agreements": ["statedAge"]
+        },
+        "distillery": ["Macduff Distillery"],
+        "maturation": null,
+        "releaseDay": null,
+        "singleCask": null,
+        "releaseYear": null,
+        "vintageYear": null,
+        "bottlingYear": null,
+        "caskStrength": null,
+        "releaseMonth": null,
+        "familyContext": {
+          "siblingBottles": []
+        }
+      },
+      {
+        "abv": 46.1,
+        "brand": "WhiskySponge",
+        "score": 53.553604,
+        "series": null,
+        "source": ["text"],
+        "bottler": "Decadent Drinks",
+        "edition": "Edition No. 59B",
+        "outturn": 286,
+        "bottleId": 48733,
+        "category": "blend",
+        "fullName": "WhiskySponge Pride Of Sponge - Edition No. 59B - 28-year-old - 1993 Vintage - 46.1% ABV - Single Cask",
+        "reference": null,
+        "statedAge": 28,
+        "caskNumber": null,
+        "comparison": {
+          "missing": ["releaseYear", "series", "distillers"],
+          "conflicts": ["category", "abv", "brand", "bottler"],
+          "agreements": ["statedAge", "vintageYear"]
+        },
+        "distillery": [],
+        "maturation": "Matured in a refill hogshead",
+        "releaseDay": null,
+        "singleCask": true,
+        "releaseYear": null,
+        "vintageYear": 1993,
+        "bottlingYear": 2022,
+        "caskStrength": null,
+        "releaseMonth": null,
+        "familyContext": {
+          "siblingBottles": []
+        }
+      },
+      {
+        "abv": null,
+        "brand": "John Walker & Sons",
+        "score": 53.29848,
+        "series": null,
+        "source": ["text"],
+        "bottler": null,
+        "edition": null,
+        "outturn": null,
+        "bottleId": 13900,
+        "category": "blend",
+        "fullName": "John Walker & Sons Private Collection 28-year-old Midnight Blend (2018)",
+        "reference": null,
+        "statedAge": 28,
+        "caskNumber": null,
+        "comparison": {
+          "missing": [
+            "abv",
+            "vintageYear",
+            "releaseYear",
+            "bottler",
+            "series",
+            "distillers"
+          ],
+          "conflicts": ["category", "brand"],
+          "agreements": ["statedAge"]
+        },
+        "distillery": [],
+        "maturation": null,
+        "releaseDay": null,
+        "singleCask": null,
+        "releaseYear": null,
+        "vintageYear": null,
+        "bottlingYear": null,
+        "caskStrength": null,
+        "releaseMonth": null,
+        "familyContext": {
+          "siblingBottles": []
+        }
+      },
+      {
+        "abv": 50.7,
+        "brand": "WhiskySponge",
+        "score": 52.27346,
+        "series": null,
+        "source": ["text"],
+        "bottler": "Decadent Drinks",
+        "edition": "Edition No. 53",
+        "outturn": 178,
+        "bottleId": 49072,
+        "category": "single_malt",
+        "fullName": "WhiskySponge Inchmurrin - Edition No. 53 - 28-year-old - 1993 Vintage - 50.7% ABV - Single Cask - Cask Strength",
+        "reference": null,
+        "statedAge": 28,
+        "caskNumber": null,
+        "comparison": {
+          "missing": ["releaseYear", "series"],
+          "conflicts": ["category", "abv", "brand", "bottler", "distillers"],
+          "agreements": ["statedAge", "vintageYear"]
+        },
+        "distillery": ["Loch Lomond"],
+        "maturation": "refill hogshead",
+        "releaseDay": null,
+        "singleCask": true,
+        "releaseYear": null,
+        "vintageYear": 1993,
+        "bottlingYear": 2022,
+        "caskStrength": true,
+        "releaseMonth": null,
+        "familyContext": {
+          "siblingBottles": []
+        }
+      },
+      {
+        "abv": null,
+        "brand": "Port Ellen",
+        "score": 52.21336,
+        "series": null,
+        "source": ["text"],
+        "bottler": null,
+        "edition": null,
+        "outturn": null,
+        "bottleId": 17986,
+        "category": "single_malt",
+        "fullName": "Port Ellen 1979 vintage, 28-year-old",
+        "reference": null,
+        "statedAge": 28,
+        "caskNumber": null,
+        "comparison": {
+          "missing": ["abv", "releaseYear", "bottler", "series"],
+          "conflicts": ["category", "vintageYear", "brand", "distillers"],
+          "agreements": ["statedAge"]
+        },
+        "distillery": ["Port Ellen"],
+        "maturation": null,
+        "releaseDay": null,
+        "singleCask": null,
+        "releaseYear": null,
+        "vintageYear": 1979,
+        "bottlingYear": null,
+        "caskStrength": null,
+        "releaseMonth": null,
+        "familyContext": {
+          "siblingBottles": []
+        }
+      },
+      {
+        "abv": 40,
+        "brand": "Aberfeldy",
+        "score": 50.632538,
+        "series": null,
+        "source": ["text"],
+        "bottler": null,
+        "edition": null,
+        "outturn": null,
+        "bottleId": 58765,
+        "category": "single_malt",
+        "fullName": "Aberfeldy 28-year-old",
+        "reference": null,
+        "statedAge": 28,
+        "caskNumber": null,
+        "comparison": {
+          "missing": ["vintageYear", "releaseYear", "bottler", "series"],
+          "conflicts": ["category", "abv", "brand", "distillers"],
+          "agreements": ["statedAge"]
+        },
+        "distillery": ["Aberfeldy"],
+        "maturation": null,
+        "releaseDay": null,
+        "singleCask": null,
+        "releaseYear": null,
+        "vintageYear": null,
+        "bottlingYear": null,
+        "caskStrength": null,
+        "releaseMonth": null,
+        "familyContext": {
+          "siblingBottles": []
+        }
+      },
+      {
+        "abv": null,
+        "brand": "Redbreast",
+        "score": 50.577316,
+        "series": null,
+        "source": ["text"],
+        "bottler": null,
+        "edition": null,
+        "outturn": null,
+        "bottleId": 13310,
+        "category": "single_pot_still",
+        "fullName": "Redbreast Dream Cask 28-year-old",
+        "reference": null,
+        "statedAge": 28,
+        "caskNumber": null,
+        "comparison": {
+          "missing": ["abv"],
+          "conflicts": [],
+          "agreements": []
+        },
+        "distillery": [],
+        "maturation": null,
+        "releaseDay": null,
+        "singleCask": null,
+        "releaseYear": null,
+        "vintageYear": null,
+        "bottlingYear": null,
+        "caskStrength": null,
+        "releaseMonth": null,
+        "familyContext": {
+          "siblingBottles": []
+        }
+      },
+      {
+        "abv": 43.5,
+        "brand": "The Dalmore",
+        "score": 50.452427,
+        "series": null,
+        "source": ["text"],
+        "bottler": null,
+        "edition": null,
+        "outturn": null,
+        "bottleId": 60794,
+        "category": "single_malt",
+        "fullName": "Dalmore 28-year-old",
+        "reference": null,
+        "statedAge": 28,
+        "caskNumber": null,
+        "comparison": {
+          "missing": ["vintageYear", "releaseYear", "bottler", "series"],
+          "conflicts": ["category", "abv", "brand", "distillers"],
+          "agreements": ["statedAge"]
+        },
+        "distillery": ["The Dalmore"],
+        "maturation": null,
+        "releaseDay": null,
+        "singleCask": null,
+        "releaseYear": null,
+        "vintageYear": null,
+        "bottlingYear": null,
+        "caskStrength": null,
+        "releaseMonth": null,
+        "familyContext": {
+          "siblingBottles": []
+        }
+      },
+      {
+        "abv": 40.3,
+        "brand": "Claxton's",
+        "score": 50.084972,
+        "series": null,
+        "source": ["text"],
+        "bottler": "Claxton's",
+        "edition": null,
+        "outturn": null,
+        "bottleId": 64195,
+        "category": "single_grain",
+        "fullName": "Claxton's Strathclyde 28-year-old",
+        "reference": null,
+        "statedAge": 28,
+        "caskNumber": null,
+        "comparison": {
+          "missing": ["vintageYear", "releaseYear", "series"],
+          "conflicts": ["category", "abv", "brand", "bottler", "distillers"],
+          "agreements": ["statedAge"]
+        },
+        "distillery": ["Strathclyde"],
+        "maturation": "Oloroso hogshead",
+        "releaseDay": null,
+        "singleCask": null,
+        "releaseYear": null,
+        "vintageYear": null,
+        "bottlingYear": null,
+        "caskStrength": null,
+        "releaseMonth": null,
+        "familyContext": {
+          "siblingBottles": []
+        }
+      },
+      {
+        "abv": null,
+        "brand": "Convalmore",
+        "score": 49.378494,
+        "series": null,
+        "source": ["text"],
+        "bottler": null,
+        "edition": null,
+        "outturn": null,
+        "bottleId": 17326,
+        "category": "single_malt",
+        "fullName": "Convalmore 1977 28-year-old",
+        "reference": null,
+        "statedAge": 28,
+        "caskNumber": null,
+        "comparison": {
+          "missing": ["abv"],
+          "conflicts": [],
+          "agreements": []
+        },
+        "distillery": ["Convalmore"],
+        "maturation": null,
+        "releaseDay": null,
+        "singleCask": null,
+        "releaseYear": null,
+        "vintageYear": null,
+        "bottlingYear": null,
+        "caskStrength": null,
+        "releaseMonth": null,
+        "familyContext": {
+          "siblingBottles": []
+        }
+      },
+      {
+        "abv": 52.9,
+        "brand": "Murray McDavid",
+        "score": 48.92605,
+        "series": null,
+        "source": ["text"],
+        "bottler": "Murray McDavid",
+        "edition": "Mission Gold",
+        "outturn": null,
+        "bottleId": 63319,
+        "category": "single_malt",
+        "fullName": "Murray McDavid Strathmill 28-year-old - Mission Gold",
+        "reference": null,
+        "statedAge": 28,
+        "caskNumber": null,
+        "comparison": {
+          "missing": [],
+          "conflicts": [],
+          "agreements": ["abv"]
+        },
+        "distillery": ["Strathmill"],
+        "maturation": null,
+        "releaseDay": null,
+        "singleCask": null,
+        "releaseYear": null,
+        "vintageYear": 1996,
+        "bottlingYear": null,
+        "caskStrength": null,
+        "releaseMonth": null,
+        "familyContext": {
+          "siblingBottles": []
+        }
+      },
+      {
+        "abv": null,
+        "brand": "Port Askaig",
+        "score": 48.83802,
+        "series": null,
+        "source": ["text"],
+        "bottler": "Elixir Distillers",
+        "edition": null,
+        "outturn": null,
+        "bottleId": 672,
+        "category": "single_malt",
+        "fullName": "Port Askaig 28-year-old",
+        "reference": null,
+        "statedAge": 28,
+        "caskNumber": null,
+        "comparison": {
+          "missing": ["abv"],
+          "conflicts": [],
+          "agreements": []
+        },
+        "distillery": [],
+        "maturation": null,
+        "releaseDay": null,
+        "singleCask": null,
+        "releaseYear": null,
+        "vintageYear": null,
+        "bottlingYear": null,
+        "caskStrength": null,
+        "releaseMonth": null,
+        "familyContext": {
+          "siblingBottles": []
+        }
+      },
+      {
+        "abv": 43,
+        "brand": "Glen Keith",
+        "score": 48.83802,
+        "series": null,
+        "source": ["text"],
+        "bottler": null,
+        "edition": null,
+        "outturn": null,
+        "bottleId": 61635,
+        "category": "single_malt",
+        "fullName": "Glen Keith 28-year-old",
+        "reference": null,
+        "statedAge": 28,
+        "caskNumber": null,
+        "comparison": {
+          "missing": ["vintageYear", "releaseYear", "bottler", "series"],
+          "conflicts": ["category", "abv", "brand", "distillers"],
+          "agreements": ["statedAge"]
+        },
+        "distillery": ["Glen Keith"],
+        "maturation": null,
+        "releaseDay": null,
+        "singleCask": null,
+        "releaseYear": null,
+        "vintageYear": null,
+        "bottlingYear": null,
+        "caskStrength": null,
+        "releaseMonth": null,
+        "familyContext": {
+          "siblingBottles": []
+        }
+      },
+      {
+        "abv": null,
+        "brand": "The Singleton of Dufftown",
+        "score": 48.679302,
+        "series": null,
+        "source": ["text"],
+        "bottler": null,
+        "edition": null,
+        "outturn": null,
+        "bottleId": 16721,
+        "category": "single_malt",
+        "fullName": "The Singleton of Dufftown 28-year-old",
+        "reference": null,
+        "statedAge": 28,
+        "caskNumber": null,
+        "comparison": {
+          "missing": [
+            "abv",
+            "vintageYear",
+            "releaseYear",
+            "bottler",
+            "series",
+            "distillers"
+          ],
+          "conflicts": ["category", "brand"],
+          "agreements": ["statedAge"]
+        },
+        "distillery": [],
+        "maturation": null,
+        "releaseDay": null,
+        "singleCask": null,
+        "releaseYear": null,
+        "vintageYear": null,
+        "bottlingYear": null,
+        "caskStrength": null,
+        "releaseMonth": null,
+        "familyContext": {
+          "siblingBottles": []
+        }
+      },
+      {
+        "abv": null,
+        "brand": "Springbank",
+        "score": 47.869553,
+        "series": null,
+        "source": ["text"],
+        "bottler": null,
+        "edition": null,
+        "outturn": null,
+        "bottleId": 1883,
+        "category": "single_malt",
+        "fullName": "Springbank 28-year-old Society Bottling",
+        "reference": null,
+        "statedAge": 28,
+        "caskNumber": null,
+        "comparison": {
+          "missing": ["abv", "vintageYear", "releaseYear", "bottler", "series"],
+          "conflicts": ["category", "brand", "distillers"],
+          "agreements": ["statedAge"]
+        },
+        "distillery": ["Springbank"],
+        "maturation": null,
+        "releaseDay": null,
+        "singleCask": null,
+        "releaseYear": null,
+        "vintageYear": null,
+        "bottlingYear": null,
+        "caskStrength": null,
+        "releaseMonth": null,
+        "familyContext": {
+          "siblingBottles": []
+        }
+      },
+      {
+        "abv": null,
+        "brand": "Midleton",
+        "score": 47.749992,
+        "series": null,
+        "source": ["text"],
+        "bottler": null,
+        "edition": null,
+        "outturn": null,
+        "bottleId": 43939,
+        "category": null,
+        "fullName": "Midleton Very Rare 200th Anniversary 28-year-old",
+        "reference": null,
+        "statedAge": 28,
+        "caskNumber": null,
+        "comparison": {
+          "missing": [
+            "category",
+            "abv",
+            "vintageYear",
+            "releaseYear",
+            "bottler",
+            "series",
+            "distillers"
+          ],
+          "conflicts": ["brand"],
+          "agreements": ["statedAge"]
+        },
+        "distillery": [],
+        "maturation": null,
+        "releaseDay": null,
+        "singleCask": null,
+        "releaseYear": null,
+        "vintageYear": null,
+        "bottlingYear": null,
+        "caskStrength": null,
+        "releaseMonth": null,
+        "familyContext": {
+          "siblingBottles": []
+        }
+      },
+      {
+        "abv": null,
+        "brand": "Bunnahabhain",
+        "score": 47.51342,
+        "series": null,
+        "source": ["text"],
+        "bottler": "Wemyss Malts",
+        "edition": null,
+        "outturn": null,
+        "bottleId": 2001,
+        "category": "single_malt",
+        "fullName": "Bunnahabhain 28-year-old Untold Riches",
+        "reference": null,
+        "statedAge": 28,
+        "caskNumber": null,
+        "comparison": {
+          "missing": ["abv", "vintageYear", "releaseYear", "series"],
+          "conflicts": ["category", "brand", "bottler", "distillers"],
+          "agreements": ["statedAge"]
+        },
+        "distillery": ["Bunnahabhain"],
+        "maturation": null,
+        "releaseDay": null,
+        "singleCask": null,
+        "releaseYear": null,
+        "vintageYear": null,
+        "bottlingYear": null,
+        "caskStrength": null,
+        "releaseMonth": null,
+        "familyContext": {
+          "siblingBottles": []
+        }
+      },
+      {
+        "abv": null,
+        "brand": "Royal Salute",
+        "score": 47.38363,
+        "series": null,
+        "source": ["text"],
+        "bottler": null,
+        "edition": null,
+        "outturn": null,
+        "bottleId": 14079,
+        "category": "blend",
+        "fullName": "Royal Salute 28-year-old Kew Palace Edition",
+        "reference": null,
+        "statedAge": 28,
+        "caskNumber": null,
+        "comparison": {
+          "missing": [
+            "abv",
+            "vintageYear",
+            "releaseYear",
+            "bottler",
+            "series",
+            "distillers"
+          ],
+          "conflicts": ["category", "brand"],
+          "agreements": ["statedAge"]
+        },
+        "distillery": [],
+        "maturation": null,
+        "releaseDay": null,
+        "singleCask": null,
+        "releaseYear": null,
+        "vintageYear": null,
+        "bottlingYear": null,
+        "caskStrength": null,
+        "releaseMonth": null,
+        "familyContext": {
+          "siblingBottles": []
+        }
+      },
+      {
+        "abv": null,
+        "brand": "Glengoyne",
+        "score": 46.465637,
+        "series": null,
+        "source": ["text"],
+        "bottler": null,
+        "edition": null,
+        "outturn": null,
+        "bottleId": 2830,
+        "category": "single_malt",
+        "fullName": "Glengoyne 28-year-old Spirit Of Oak",
+        "reference": null,
+        "statedAge": 28,
+        "caskNumber": null,
+        "comparison": {
+          "missing": ["abv", "vintageYear", "releaseYear", "bottler", "series"],
+          "conflicts": ["category", "brand", "distillers"],
+          "agreements": ["statedAge"]
+        },
+        "distillery": ["Glengoyne"],
+        "maturation": null,
+        "releaseDay": null,
+        "singleCask": null,
+        "releaseYear": null,
+        "vintageYear": null,
+        "bottlingYear": null,
+        "caskStrength": null,
+        "releaseMonth": null,
+        "familyContext": {
+          "siblingBottles": []
+        }
+      },
+      {
+        "abv": 52.9,
+        "brand": "Murray McDavid",
+        "score": 45.931046,
+        "series": "Mission Gold",
+        "source": ["text"],
+        "bottler": "Murray McDavid",
+        "edition": null,
+        "outturn": 573,
+        "bottleId": 69475,
+        "category": "blended_malt",
+        "fullName": "Murray McDavid La Girafe Chic 28-year-old 1997",
+        "reference": null,
+        "statedAge": 28,
+        "caskNumber": null,
+        "comparison": {
+          "missing": [],
+          "conflicts": [],
+          "agreements": ["abv"]
+        },
+        "distillery": ["Glenmorangie"],
+        "maturation": "Margaux red wine and Pedro Ximénez sherry casks",
+        "releaseDay": null,
+        "singleCask": null,
+        "releaseYear": null,
+        "vintageYear": 1997,
+        "bottlingYear": 2026,
+        "caskStrength": null,
+        "releaseMonth": null,
+        "familyContext": {
+          "siblingBottles": []
+        }
+      },
+      {
+        "abv": 58.1,
+        "brand": "Old & Rare",
+        "score": 43.44812,
+        "series": "Platinum Selection",
+        "source": ["text"],
+        "bottler": "Douglas Laing",
+        "edition": null,
+        "outturn": 120,
+        "bottleId": 55839,
+        "category": "single_malt",
+        "fullName": "Old & Rare Brora 1981 28-year-old",
+        "reference": null,
+        "statedAge": 28,
+        "caskNumber": null,
+        "comparison": {
+          "missing": [],
+          "conflicts": ["abv"],
+          "agreements": []
+        },
+        "distillery": ["Brora"],
+        "maturation": "Sherry cask",
+        "releaseDay": null,
+        "singleCask": true,
+        "releaseYear": null,
+        "vintageYear": 1981,
+        "bottlingYear": 2009,
+        "caskStrength": true,
+        "releaseMonth": null,
+        "familyContext": {
+          "siblingBottles": []
+        }
+      },
+      {
+        "abv": null,
+        "brand": "The GlenDronach",
+        "score": 33.65929,
+        "series": null,
+        "source": ["text"],
+        "bottler": null,
+        "edition": null,
+        "outturn": null,
+        "bottleId": 4457,
+        "category": "single_malt",
+        "fullName": "The GlenDronach 16-year-old Platinum",
+        "reference": null,
+        "statedAge": 16,
+        "caskNumber": null,
+        "comparison": {
+          "missing": ["abv"],
+          "conflicts": [],
+          "agreements": []
+        },
+        "distillery": ["The GlenDronach"],
+        "maturation": null,
+        "releaseDay": null,
+        "singleCask": null,
+        "releaseYear": null,
+        "vintageYear": null,
+        "bottlingYear": null,
+        "caskStrength": null,
+        "releaseMonth": null,
+        "familyContext": {
+          "siblingBottles": []
+        }
+      },
+      {
+        "abv": null,
+        "brand": "15 Stars",
+        "score": 30.860062,
+        "series": null,
+        "source": ["text"],
+        "bottler": "15 Stars",
+        "edition": null,
+        "outturn": null,
+        "bottleId": 42839,
+        "category": "bourbon",
+        "fullName": "15 Stars Platinum",
+        "reference": null,
+        "statedAge": null,
+        "caskNumber": null,
+        "comparison": {
+          "missing": ["abv"],
+          "conflicts": [],
+          "agreements": []
+        },
+        "distillery": [],
+        "maturation": null,
+        "releaseDay": null,
+        "singleCask": null,
+        "releaseYear": null,
+        "vintageYear": null,
+        "bottlingYear": null,
+        "caskStrength": null,
+        "releaseMonth": null,
+        "familyContext": {
+          "siblingBottles": []
+        }
+      },
+      {
+        "abv": null,
+        "brand": "Old & Rare",
+        "score": 30.830696,
+        "series": "Platinum Selection",
+        "source": ["text"],
+        "bottler": "Douglas Laing",
+        "edition": null,
+        "outturn": 261,
+        "bottleId": 68708,
+        "category": "single_malt",
+        "fullName": "Old & Rare Caol Ila 1979",
+        "reference": null,
+        "statedAge": 28,
+        "caskNumber": null,
+        "comparison": {
+          "missing": ["abv"],
+          "conflicts": [],
+          "agreements": []
+        },
+        "distillery": ["Caol Ila"],
+        "maturation": null,
+        "releaseDay": null,
+        "singleCask": null,
+        "releaseYear": null,
+        "vintageYear": 1979,
+        "bottlingYear": null,
+        "caskStrength": null,
+        "releaseMonth": null,
+        "familyContext": {
+          "siblingBottles": []
+        }
+      },
+      {
+        "abv": null,
+        "brand": "Johnnie Walker",
+        "score": 29.587353,
+        "series": null,
+        "source": ["text"],
+        "bottler": "John Walker & Sons",
+        "edition": null,
+        "outturn": null,
+        "bottleId": 4493,
+        "category": "blend",
+        "fullName": "Johnnie Walker Platinum Label Blended Scotch Whisky",
+        "reference": null,
+        "statedAge": 18,
+        "caskNumber": null,
+        "comparison": {
+          "missing": ["abv"],
+          "conflicts": [],
+          "agreements": []
+        },
+        "distillery": [],
+        "maturation": null,
+        "releaseDay": null,
+        "singleCask": null,
+        "releaseYear": null,
+        "vintageYear": null,
+        "bottlingYear": null,
+        "caskStrength": null,
+        "releaseMonth": null,
+        "familyContext": {
+          "siblingBottles": []
+        }
+      },
+      {
+        "abv": null,
+        "brand": "Big Peat",
+        "score": 29.512375,
+        "series": null,
+        "source": ["text"],
+        "bottler": null,
+        "edition": null,
+        "outturn": null,
+        "bottleId": 13942,
+        "category": "blend",
+        "fullName": "Big Peat Platinum 26-year-old",
+        "reference": null,
+        "statedAge": 26,
+        "caskNumber": null,
+        "comparison": {
+          "missing": ["abv"],
+          "conflicts": [],
+          "agreements": []
+        },
+        "distillery": [],
+        "maturation": null,
+        "releaseDay": null,
+        "singleCask": null,
+        "releaseYear": null,
+        "vintageYear": null,
+        "bottlingYear": null,
+        "caskStrength": null,
+        "releaseMonth": null,
+        "familyContext": {
+          "siblingBottles": []
+        }
+      },
+      {
+        "abv": null,
+        "brand": "The Speyside",
+        "score": 29.007023,
+        "series": null,
+        "source": ["text"],
+        "bottler": null,
+        "edition": null,
+        "outturn": null,
+        "bottleId": 18790,
+        "category": "single_malt",
+        "fullName": "The Speyside 12-year-old old, 43% ABV",
+        "reference": null,
+        "statedAge": 12,
+        "caskNumber": null,
+        "comparison": {
+          "missing": ["abv"],
+          "conflicts": [],
+          "agreements": []
+        },
+        "distillery": [],
+        "maturation": null,
+        "releaseDay": null,
+        "singleCask": null,
+        "releaseYear": null,
+        "vintageYear": null,
+        "bottlingYear": null,
+        "caskStrength": null,
+        "releaseMonth": null,
+        "familyContext": {
+          "siblingBottles": []
+        }
+      },
+      {
+        "abv": null,
+        "brand": "Shieldaig",
+        "score": 26.960615,
+        "series": null,
+        "source": ["text"],
+        "bottler": null,
+        "edition": null,
+        "outturn": null,
+        "bottleId": 44266,
+        "category": "single_malt",
+        "fullName": "Shieldaig Speyside 30-year-old",
+        "reference": null,
+        "statedAge": 30,
+        "caskNumber": null,
+        "comparison": {
+          "missing": ["abv"],
+          "conflicts": [],
+          "agreements": []
+        },
+        "distillery": [],
+        "maturation": null,
+        "releaseDay": null,
+        "singleCask": null,
+        "releaseYear": null,
+        "vintageYear": null,
+        "bottlingYear": null,
+        "caskStrength": null,
+        "releaseMonth": null,
+        "familyContext": {
+          "siblingBottles": []
+        }
+      }
+    ]
+  },
+  "context": {
+    "inspectedBottleIds": [],
+    "bottleContexts": [],
+    "inspectedEntities": [
+      {
+        "kind": "bottler",
+        "name": "Murray McDavid",
+        "score": 1,
+        "source": ["exact", "text", "prefix", "contained"],
+        "entityId": 5670,
+        "reference": "Murray McDavid",
+        "shortName": null,
+        "retrievedFor": [
+          {
+            "exact": true,
+            "query": "Murray McDavid"
+          }
+        ]
+      },
+      {
+        "kind": "distillery",
+        "name": "Strathmill",
+        "score": 1,
+        "source": ["exact", "text", "prefix", "contained"],
+        "entityId": 1380,
+        "reference": "Strathmill",
+        "shortName": null,
+        "retrievedFor": [
+          {
+            "exact": true,
+            "query": "Strathmill"
+          }
+        ]
+      },
+      {
+        "kind": "distillery",
+        "name": "Glenmorangie",
+        "score": 1,
+        "source": ["exact", "text", "prefix", "contained"],
+        "entityId": 984,
+        "reference": "Glenmorangie",
+        "shortName": null,
+        "retrievedFor": [
+          {
+            "exact": true,
+            "query": "Glenmorangie"
+          }
+        ]
+      },
+      {
+        "kind": "distillery",
+        "name": "The GlenDronach",
+        "score": 1,
+        "source": ["exact", "text", "prefix", "contained"],
+        "entityId": 973,
+        "reference": "The GlenDronach",
+        "shortName": null,
+        "retrievedFor": [
+          {
+            "exact": true,
+            "query": "The GlenDronach"
+          }
+        ]
+      },
+      {
+        "kind": "bottler",
+        "name": "15 Stars",
+        "score": 1,
+        "source": ["exact", "text", "prefix", "contained"],
+        "entityId": 86095,
+        "reference": null,
+        "shortName": null,
+        "retrievedFor": [
+          {
+            "exact": true,
+            "query": "15 Stars"
+          }
+        ]
+      },
+      {
+        "kind": "brand",
+        "name": "Old & Rare",
+        "score": 1,
+        "source": ["exact", "text", "prefix", "contained"],
+        "entityId": 366645,
+        "reference": "Old & Rare",
+        "shortName": null,
+        "retrievedFor": [
+          {
+            "exact": true,
+            "query": "Old & Rare"
+          }
+        ]
+      },
+      {
+        "kind": "bottler",
+        "name": "Douglas Laing",
+        "score": 1,
+        "source": ["exact", "text", "prefix", "contained"],
+        "entityId": 5622,
+        "reference": "Douglas Laing",
+        "shortName": null,
+        "retrievedFor": [
+          {
+            "exact": true,
+            "query": "Douglas Laing"
+          }
+        ]
+      },
+      {
+        "kind": "distillery",
+        "name": "Caol Ila",
+        "score": 1,
+        "source": ["exact", "text", "prefix", "contained"],
+        "entityId": 366,
+        "reference": "Caol Ila",
+        "shortName": "",
+        "retrievedFor": [
+          {
+            "exact": true,
+            "query": "Caol Ila"
+          }
+        ]
+      },
+      {
+        "kind": "distillery",
+        "name": "Fettercairn",
+        "score": 1,
+        "source": ["exact", "text", "prefix", "contained"],
+        "entityId": 916,
+        "reference": "Fettercairn",
+        "shortName": null,
+        "retrievedFor": [
+          {
+            "exact": true,
+            "query": "Fettercairn"
+          }
+        ]
+      },
+      {
+        "kind": "brand",
+        "name": "Johnnie Walker",
+        "score": 1,
+        "source": ["exact", "text", "prefix", "contained"],
+        "entityId": 1093,
+        "reference": "Johnnie Walker",
+        "shortName": null,
+        "retrievedFor": [
+          {
+            "exact": true,
+            "query": "Johnnie Walker"
+          }
+        ]
+      },
+      {
+        "kind": "brand",
+        "name": "John Walker & Sons",
+        "score": 1,
+        "source": ["exact", "text", "prefix", "contained"],
+        "entityId": 1091,
+        "reference": "John Walker & Sons",
+        "shortName": null,
+        "retrievedFor": [
+          {
+            "exact": true,
+            "query": "John Walker & Sons"
+          }
+        ]
+      },
+      {
+        "kind": "brand",
+        "name": "Big Peat",
+        "score": 1,
+        "source": ["exact", "text", "prefix", "contained"],
+        "entityId": 24,
+        "reference": "Big Peat",
+        "shortName": null,
+        "retrievedFor": [
+          {
+            "exact": true,
+            "query": "Big Peat"
+          }
+        ]
+      },
+      {
+        "kind": "company",
+        "name": "The Glenmorangie Company",
+        "score": 0.5,
+        "source": ["text", "prefix"],
+        "entityId": 366510,
+        "reference": "Glenmorangie Company",
+        "shortName": null,
+        "retrievedFor": [
+          {
+            "query": "Glenmorangie"
+          }
+        ]
+      },
+      {
+        "kind": "company",
+        "name": "Fah Mai Holdings Limited",
+        "score": 0.5,
+        "source": ["text", "prefix"],
+        "entityId": 366472,
+        "reference": "Fah Mai Holdings Limited",
+        "shortName": null,
+        "retrievedFor": [
+          {
+            "query": "Fah Mai Holdings"
+          }
+        ]
+      },
+      {
+        "kind": "brand",
+        "name": "Peat",
+        "score": 0.36428571428571427,
+        "source": ["contained"],
+        "entityId": 3671,
+        "reference": "Peat",
+        "shortName": null,
+        "retrievedFor": [
+          {
+            "query": "Big Peat"
+          }
+        ]
+      }
+    ],
+    "inspectedSeries": []
+  },
+  "provenance": {
+    "source": "production_miss",
+    "verifiedSourceUrls": [
+      "https://www.scotchwhiskyauctions.com/auctions/234-the-185th-auction/905402-speyside-single-malt-28-year-old-hades-platinum-cask-with-print/",
+      "https://fahmaiholdings.com/platinum-cask/"
+    ],
+    "dbOutcome": {
+      "bottleId": null,
+      "createsBottle": false,
+      "summary": "Production returned ignored."
+    },
+    "notes": "Captured from saved classifier run 36684 (auction_lot 17650, model null, 2026-11-03T21:50:04.062Z). Production rationale: none Checked 2026-11-03. Lot 185-02214 page: Platinum Cask (Fah Mai Holdings) Olympians Series, a limited set of 12 single cask bottlings; 'Hades - Speyside (Near Dufftown)', Age 28 Years Old, 52.9% ABV / 70cl, Bottle Number 73 / 126. Catalog searches for 'Platinum Cask Hades', 'Hades 28', and 'Olympians' return no Bottle, and no Platinum Cask Entity exists, so the case does not fix a Brand id. docs/operations/auctions.md (October 26 title review): bottles sold with a book, print, or coaster stayed in scope; only glassware, minis, and other accessories sold as a set were ignored. The expectation leaves category out: the lot title says Speyside single malt, while one retailer in the evidence calls it a teaspooned Burnside."
+  },
+  "expected": {
+    "status": "classified",
+    "action": "create_bottle",
+    "identityScope": "exact_cask",
+    "proposedBottle": {
+      "statedAge": 28,
+      "abv": 52.9
+    },
+    "proposedBottleNameIncludes": ["Hades"],
+    "summary": "One 70cl bottle of Platinum Cask's Olympians Series 'Hades', a 28-year-old Speyside whisky at 52.9%, bottle 73 of 126, sold with a print. A bottle sold with a print is still one whisky Bottle, so do not ignore it. No local Bottle covers it, so create it with the marketed cask name Hades, the printed age, and the ABV."
+  },
+  "knownFailure": {
+    "reason": "The agent treats 'With Print' as a bundle. A bottle sold with a print stays in scope."
+  }
+}
