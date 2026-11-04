@@ -37,6 +37,7 @@ describe("resolveOpenAICompatibleConfig", () => {
       baseURL: "https://ai-gateway.vercel.sh/v1",
       bottleClassifierModel: "openai/gpt-6-luna",
       bottleClassifierReasoningEffort: "high",
+      decisionModel: "typesafe-ai/jev",
       embeddingModel: "openai/text-embedding-3-large",
       imageExtractionModel: "openai/gpt-6-luna",
       imageExtractionReasoningEffort: "high",

@@ -15,7 +15,10 @@ import {
   type SearchEntitiesArgs,
 } from "@peated/bottle-classifier/internal/types";
 import config from "@peated/server/config";
-import { createLanguageModel } from "@peated/server/lib/aiSdkModels";
+import {
+  createDecisionModel,
+  createLanguageModel,
+} from "@peated/server/lib/aiSdkModels";
 import {
   findBottleReferenceCandidates,
   getBottleCandidateById,
@@ -23,6 +26,7 @@ import {
 } from "@peated/server/lib/bottleReferenceCandidates";
 import { searchClassifierEntities } from "@peated/server/lib/classifierEntitySearch";
 import {
+  isAIGatewayConfigured,
   withSentryConversation,
   type AIGatewayWorkload,
 } from "@peated/server/lib/openaiClient";
@@ -102,6 +106,11 @@ export function getBottleClassifier(
 
   const bottleClassifier = createBottleClassifier({
     languageModel: (model) => createLanguageModel({ model, workload }),
+    // Production requires a gateway key at startup; tests and local runs
+    // without one skip the scope pre-check.
+    decisionModel: isAIGatewayConfigured(workload)
+      ? createDecisionModel({ workload })
+      : null,
     model: config.BOTTLE_CLASSIFIER_MODEL,
     reasoningEffort: config.BOTTLE_CLASSIFIER_REASONING_EFFORT,
     imageExtractionModel: config.OPENAI_IMAGE_EXTRACTION_MODEL,

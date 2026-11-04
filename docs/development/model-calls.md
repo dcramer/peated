@@ -38,7 +38,9 @@ A decision model answers typed questions about the same input: yes or no, pick
 one, or a score on a scale. It returns probabilities, not text. Ask with
 `experimental_decide` from `ai`. `DECISION_MODEL` picks the model and defaults
 to TypeSafe AI's Jev. Jev reads text only and rejects images. The `decide` API
-is experimental, so check its contract when you upgrade `ai`.
+is experimental, so check its contract when you upgrade `ai`. The Bottle
+classifier's scope pre-check uses it; see
+[Bottle Classifier](../architecture/bottle-classifier.md#scope).
 
 ## AI SDK Settings
 

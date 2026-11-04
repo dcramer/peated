@@ -1,3 +1,4 @@
+import type { Experimental_DecisionQuestion } from "ai";
 import { describe, expect, test, vi } from "vitest";
 import {
   createBottleClassifier,
@@ -134,6 +135,7 @@ function createTestClassifier({
   observeToolEvent,
   observeReferenceAgentDecision,
   runPreparedBottleClassifierAgent,
+  decisionModel,
 }: {
   extractedIdentity?: BottleExtractedDetails | null;
   extractedIdentityFromImage?: BottleExtractedDetails | null;
@@ -162,10 +164,12 @@ function createTestClassifier({
   runPreparedBottleClassifierAgent?: (
     preparedRun: PreparedBottleClassifierAgentRun,
   ) => Promise<BottleAgentRunResult>;
+  decisionModel?: CreateBottleClassifierOptions["decisionModel"];
 }) {
   return {
     classifier: createBottleClassifier({
       languageModel: testLanguageModel,
+      decisionModel,
       model: "test-model",
       maxSearchQueries,
       web,
@@ -202,6 +206,57 @@ function createTestClassifier({
       },
     }),
     searchBottles,
+  };
+}
+
+/** A decision model that gives one scope answer, or refuses to answer. */
+function createScopeDecisionModel(
+  answer: { choice: string; probability: number } | "refusal",
+) {
+  const doDecide = vi.fn(
+    async ({
+      questions,
+    }: {
+      questions: Readonly<Record<string, Experimental_DecisionQuestion>>;
+    }) => {
+      if (answer === "refusal") {
+        return {
+          answers: { scope: { type: "refusal" as const } },
+          warnings: [],
+        };
+      }
+      const scope = questions.scope;
+      if (scope?.type !== "choice") throw new Error("Expected a choice.");
+      // A complete distribution: the rest of the probability goes to one
+      // other choice.
+      const choices = Object.keys(scope.criteria);
+      const rest = choices.find((choice) => choice !== answer.choice)!;
+      const probabilities = Object.fromEntries(
+        choices.map((choice) => [choice, 0]),
+      );
+      probabilities[answer.choice] = answer.probability;
+      probabilities[rest] = 1 - answer.probability;
+      return {
+        answers: {
+          scope: {
+            type: "choice" as const,
+            choice: answer.choice,
+            probabilities,
+          },
+        },
+        warnings: [],
+      };
+    },
+  );
+  return {
+    model: {
+      specificationVersion: "v4" as const,
+      provider: "test",
+      modelId: "test-decision-model",
+      supportedQuestionTypes: ["choice" as const],
+      doDecide,
+    },
+    doDecide,
   };
 }
 
@@ -1203,6 +1258,101 @@ describe("createBottleClassifier", () => {
     });
     expect(searchBottles).not.toHaveBeenCalled();
     expect(runBottleClassifierAgent).not.toHaveBeenCalled();
+  });
+
+  test("the scope pre-check ignores a clear hand-fill before extracting identity", async () => {
+    const runBottleClassifierAgent = vi.fn();
+    const searchBottles = vi.fn(async (): Promise<BottleCandidate[]> => []);
+    const extractFromText = vi.fn(async () => null);
+    const { model, doDecide } = createScopeDecisionModel({
+      choice: "hand_fill",
+      probability: 0.82,
+    });
+    const { classifier } = createTestClassifier({
+      extractFromText,
+      searchBottles,
+      runBottleClassifierAgent,
+      decisionModel: model,
+    });
+
+    const result = await classifier.classifyBottleReference({
+      reference: { name: "Deanston 2013 7 Year Old Hand Filled" },
+      // Auction lots supply source facts; the pre-check still runs.
+      extractedIdentity: buffaloTraceStraightBourbonIdentity,
+    });
+
+    expect(result).toMatchObject({
+      status: "ignored",
+      reason:
+        "The scope pre-check found a distillery hand-fill, not one whisky Bottle (confidence 0.82).",
+    });
+    expect(doDecide).toHaveBeenCalledWith(
+      expect.objectContaining({
+        state: [
+          {
+            type: "json",
+            value: { title: "Deanston 2013 7 Year Old Hand Filled" },
+          },
+        ],
+      }),
+    );
+    expect(extractFromText).not.toHaveBeenCalled();
+    expect(searchBottles).not.toHaveBeenCalled();
+    expect(runBottleClassifierAgent).not.toHaveBeenCalled();
+  });
+
+  test.each([
+    // These answers were confidently wrong on real Bottles, so they never
+    // ignore.
+    { choice: "several_items", probability: 1 },
+    { choice: "not_a_drink", probability: 1 },
+    { choice: "other_spirit", probability: 1 },
+    // A hand-fill answer must clear 0.7.
+    { choice: "hand_fill", probability: 0.6 },
+    { choice: "one_whisky_bottle", probability: 1 },
+  ])(
+    "the scope pre-check leaves $choice at $probability to the agent",
+    async (answer) => {
+      const runBottleClassifierAgent = vi.fn(
+        async (): Promise<ReasoningResult> => ({
+          decision: noMatchAgentDecision(),
+          artifacts: {},
+        }),
+      );
+      const { classifier } = createTestClassifier({
+        extractedIdentity: buffaloTraceStraightBourbonIdentity,
+        runBottleClassifierAgent,
+        decisionModel: createScopeDecisionModel(answer).model,
+      });
+
+      const result = await classifier.classifyBottleReference({
+        reference: { name: "Buffalo Trace Kentucky Straight Bourbon" },
+      });
+
+      expect(result.status).toBe("classified");
+      expect(runBottleClassifierAgent).toHaveBeenCalledOnce();
+    },
+  );
+
+  test("a scope pre-check refusal leaves scope to the agent", async () => {
+    const runBottleClassifierAgent = vi.fn(
+      async (): Promise<ReasoningResult> => ({
+        decision: noMatchAgentDecision(),
+        artifacts: {},
+      }),
+    );
+    const { classifier } = createTestClassifier({
+      extractedIdentity: buffaloTraceStraightBourbonIdentity,
+      runBottleClassifierAgent,
+      decisionModel: createScopeDecisionModel("refusal").model,
+    });
+
+    const result = await classifier.classifyBottleReference({
+      reference: { name: "Buffalo Trace Kentucky Straight Bourbon" },
+    });
+
+    expect(result.status).toBe("classified");
+    expect(runBottleClassifierAgent).toHaveBeenCalledOnce();
   });
 
   test("auto ignores multi-pack listings before extracting bottle identity", async () => {

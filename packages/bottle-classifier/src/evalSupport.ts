@@ -1,5 +1,10 @@
 import { createMemoryCache, createPeatedBot } from "@peated/bot";
-import { createGateway, wrapLanguageModel, type LanguageModel } from "ai";
+import {
+  createGateway,
+  wrapLanguageModel,
+  type Experimental_DecisionModel,
+  type LanguageModel,
+} from "ai";
 import type {
   BottleClassifierDataSource,
   CreateBottleClassifierOptions,
@@ -24,6 +29,13 @@ export const evalImageExtractionReasoningEffort = resolveOpenAIReasoningEffort(
   evalGatewayConfig.imageExtractionReasoningEffort,
 );
 export const hasEvalAIGatewayCredentials = Boolean(evalGatewayConfig.apiKey);
+
+/** The decision model for the scope pre-check in live model checks. */
+export function createEvalDecisionModel(): Experimental_DecisionModel {
+  return createGateway({ apiKey: evalGatewayConfig.apiKey }).decisionModel(
+    evalGatewayConfig.decisionModel,
+  );
+}
 
 /** An AI SDK model for live model checks that records each call's usage. */
 export function createEvalLanguageModel(modelId: string): LanguageModel {
@@ -88,6 +100,7 @@ export function createEvalClassifierOptions(
 ): CreateBottleClassifierOptions {
   return {
     languageModel: createEvalLanguageModel,
+    decisionModel: createEvalDecisionModel(),
     model: evalClassifierModel,
     reasoningEffort: evalClassifierReasoningEffort,
     imageExtractionModel: evalImageExtractionModel,

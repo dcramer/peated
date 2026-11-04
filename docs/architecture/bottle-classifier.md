@@ -56,6 +56,19 @@ it into the ignored result, so a saved decision is always `match`,
 the agent runs (see Agent And Tool Boundary). Do not add phrase or keyword rules
 for scope; improve the agent's evidence or instructions instead.
 
+Before the agent runs, a scope pre-check asks a decision model (Jev by default)
+what the source sells, from its title alone. It saves classifier work on
+sources that are clearly out of scope, and it runs the same way for store
+listings, auction lots, reviews, photo lookups, and Bottle submissions. It can
+only ignore: a hand-fill, sample, or miniature answer at 0.7 or more, or a
+flavored whisky or liqueur answer at 0.9 or more, becomes an ignored result
+whose reason names the answer and its confidence. Every other answer goes to
+the agent unchanged. Another drink, a set, and merchandise never ignore here,
+because the decision model gave those answers with high confidence to real
+whisky Bottles, such as whisky finished in port casks. A refused answer also
+goes to the agent. Audits skip the pre-check. The cutoffs, their measurements,
+and the model check live in `packages/bottle-classifier/src/scopePrecheck*`.
+
 A flavored product is ignored only with product evidence that flavor was added.
 A flavor-adjacent word in a name is not enough. The agent ignores an
 out-of-scope source even when Peated already has a Bottle for it.
@@ -285,7 +298,8 @@ read is recorded and classification continues with a fresh page-read allowance.
 Explicit bundle, multi-bottle, and damaged-condition names are ignored before
 text extraction. A clear non-whisky category word or packaging-only gift-set
 name is ignored after extraction finds no whisky identity. These existing rules
-skip the agent; every other scope judgment belongs to the agent. An exact stored
+and the scope pre-check skip the agent; every other scope judgment belongs to
+the agent. An exact stored
 reference may use the preflight above. All other reference decisions use one bounded agent loop.
 Deterministic identifiers such as SMWS are input anchors, not bypasses.
 
