@@ -1581,7 +1581,7 @@ describe("finalizeBottleReferenceClassification", () => {
     });
   });
 
-  test("keeps the extracted SMWS title in exact-cask create proposals", () => {
+  test("never turns an SMWS no_match into a create", () => {
     const result = finalizeBottleReferenceClassification({
       reference: {
         name: "Bottle photo upload",
@@ -1618,16 +1618,11 @@ describe("finalizeBottleReferenceClassification", () => {
       }),
     });
 
+    // Bottle classifier rule: code may not upgrade the agent's decision, even
+    // when an SMWS code is readable.
     expect(result).toMatchObject({
-      action: "create_bottle",
-      identityScope: "exact_cask",
-      proposedBottle: {
-        name: "95.71 Prepare for Winter",
-        edition: null,
-        statedAge: 14,
-        abv: 57,
-        vintageYear: 2007,
-      },
+      action: "no_match",
+      proposedBottle: null,
     });
   });
 
@@ -1875,7 +1870,7 @@ describe("unverified candidate cask codes", () => {
     ).toMatchObject({ action: "match", matchedBottleId: candidate.bottleId });
   });
 
-  test("keeps an SMWS match when the source code is composed from label components", () => {
+  test("keeps the agent's SMWS match when the source code is composed from label components", () => {
     const candidate: BottleCandidate = {
       ...existingPrivateCask,
       bottleId: 11940,
@@ -1898,9 +1893,7 @@ describe("unverified candidate cask codes", () => {
       }),
     ).toMatchObject({
       action: "match",
-      identityScope: "exact_cask",
       matchedBottleId: 11940,
-      observation: { caskNumber: "1.285" },
     });
   });
 

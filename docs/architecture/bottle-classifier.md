@@ -264,8 +264,11 @@ Code may:
 
 Code must not invent or choose a subtitle, generalize this rule to another
 bottler's casks or batches, use fuzzy names to prove a match, or choose a
-BottleGroup. The SMWS anchor is supplied to the agent; it does not replace the
-agent run.
+BottleGroup. The code's facts reach the agent as extracted identity: Brand
+SMWS, the code as `cask_number`, and the distillery and category from the code
+table. Text extraction still runs. The agent matches, creates, and names the
+Bottle; code then only puts the code first in a create's name and keeps it out
+of `edition`. Code never turns an agent's `no_match` into a match or a create.
 
 ## Agent And Tool Boundary
 
@@ -279,12 +282,6 @@ shows the page's opening; `find_in_page` then finds a fact further down the
 same page without another web request. When web tools
 are unavailable, the classifier does not silently substitute another model or
 provider.
-
-For a title-derived deterministic creation with a source URL and no supplied
-web evidence, the classifier may read that exact page before the agent runs. This
-fills supported creation facts after local code has settled Bottle identity. It
-does not run for structured input or a deterministic match. A failed or empty
-read is recorded and classification continues with a fresh page-read allowance.
 
 Explicit bundle, multi-bottle, and damaged-condition names are ignored before
 text extraction. A clear non-whisky category word or packaging-only gift-set

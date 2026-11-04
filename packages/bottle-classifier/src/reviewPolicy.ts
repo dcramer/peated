@@ -27,7 +27,6 @@ import { normalizeString } from "./normalize";
 import { normalizeObservation } from "./observation";
 import {
   getSmwsCodeAnchor,
-  maybeResolveSmwsExactCaskCodeDecision,
   normalizeSmwsExactCaskProposedBottleDraft,
 } from "./smwsPolicy";
 
@@ -854,17 +853,11 @@ export function finalizeBottleReferenceClassification({
     decision: parsedDecision,
     artifacts,
   });
-  const smwsCodeAdjustedDecision =
-    maybeResolveSmwsExactCaskCodeDecision({
-      reference,
+  const exactCaskAdjustedDecision =
+    maybeRejectExactCaskCreateDuplicate({
       decision: sanitizedDecision,
       artifacts,
     }) ?? sanitizedDecision;
-  const exactCaskAdjustedDecision =
-    maybeRejectExactCaskCreateDuplicate({
-      decision: smwsCodeAdjustedDecision,
-      artifacts,
-    }) ?? smwsCodeAdjustedDecision;
   const agentEvidenceAdjustedDecision = {
     ...exactCaskAdjustedDecision,
     confidenceBasis:
