@@ -6,7 +6,7 @@
       "id": 17020,
       "url": "https://www.scotchwhiskyauctions.com/auctions/234-the-185th-auction/906571-makers-mark-limited-edition-bottling/",
       "name": "Maker’s Mark Limited Edition Bottling",
-      "imageUrl": "https://d3suvtcq00dftb.cloudfront.net/images/c92e7897a93b0307bc3baa3fe1cdbeeb-zoom.jpg",
+      "imageUrl": null,
       "externalSiteId": 28097,
       "currentBottleId": null
     },
@@ -28,7 +28,55 @@
       "vintage_year": null,
       "cask_strength": null
     },
-    "imageEvidence": null,
+    "imageEvidence": {
+      "sourceImageId": "auction_lot:17020",
+      "extractors": [
+        {
+          "kind": "vision",
+          "model": "openai/gpt-6-luna",
+          "confidence": 0.75,
+          "textSpans": [
+            {
+              "text": "LIMITED EDITION BOTTLE\nMaker's Mark\nKENTUCKY STRAIGHT BOURBON WHISKY\n70 cl • alc. 45% vol.",
+              "confidence": 0.75
+            }
+          ],
+          "observations": [
+            "Read whisky label identity from the auction lot photo."
+          ]
+        }
+      ],
+      "fieldCandidates": {
+        "brand": {
+          "value": "Maker's Mark",
+          "confidence": 0.75,
+          "sourceExtractorIndexes": [0]
+        },
+        "distillery": {
+          "value": ["Maker's Mark"],
+          "confidence": 0.75,
+          "sourceExtractorIndexes": [0]
+        },
+        "category": {
+          "value": "bourbon",
+          "confidence": 0.75,
+          "sourceExtractorIndexes": [0]
+        },
+        "abv": {
+          "value": 45,
+          "confidence": 0.75,
+          "sourceExtractorIndexes": [0]
+        }
+      },
+      "photoSuitability": {
+        "isSingleBottlePhoto": true,
+        "labelReadable": true,
+        "suitableAsTastingImage": false,
+        "suitableAsBottleImage": false,
+        "reason": null
+      },
+      "conflicts": []
+    },
     "initialCandidates": [
       {
         "abv": 45,
@@ -1099,7 +1147,7 @@
       "createsBottle": false,
       "summary": "Production returned no_match: the title 'Limited Edition Bottling' and 45% did not say which Maker's Mark release it was."
     },
-    "notes": "Saved check 36187, source auction_lot 17020 (lot 185-906571), run 2026-11-03. Not one of the two photo cases named in the request, but the title alone cannot settle it, so this case follows the same pattern: input.reference.imageUrl is set to the lot's first photo at full size and the evidence pack gets its reviewed reading. Production ran without the photo; this case goes in with the change that makes auctions read the lot photo. The photo clearly shows a red holly-and-fir holiday label: 'LIMITED EDITION BOTTLE', 'Maker's Mark', 'Kentucky Straight Bourbon Whisky', '70 cl - alc. 45% vol.', red wax. Another lot photo shows the standard UK back label. The reading keeps the printed 'Limited Edition Bottle' band as the label shows it. The identity model ('A different package does not make a different Bottle') treats a special label as the same Bottle. 42937 is Maker's Mark Bourbon at 45% with no conflicting field. 56453 and the other candidates are different releases."
+    "notes": "Saved check 36187, source auction_lot 17020 (lot 185-906571), run 2026-11-03. Not one of the two photo cases named in the request, but the title alone cannot settle it, so this case follows the same pattern: input.reference.imageUrl is set to the lot's first photo at full size and the evidence pack gets its reviewed reading. Production ran without the photo; this case goes in with the change that makes auctions read the lot photo. The photo clearly shows a red holly-and-fir holiday label: 'LIMITED EDITION BOTTLE', 'Maker's Mark', 'Kentucky Straight Bourbon Whisky', '70 cl - alc. 45% vol.', red wax. Another lot photo shows the standard UK back label. The reading keeps the printed 'Limited Edition Bottle' band as the label shows it. The identity model ('A different package does not make a different Bottle') treats a special label as the same Bottle. 42937 is Maker's Mark Bourbon at 45% with no conflicting field. 56453 and the other candidates are different releases. Production ran without the photo. input.imageEvidence is openai/gpt-6-luna's live reading on 2026-11-04 of the lot photo's 1500px copy (https://d3suvtcq00dftb.cloudfront.net/images/c92e7897a93b0307bc3baa3fe1cdbeeb-zoom.jpg), in the shape auction matching sends since lot photos are read."
   },
   "expected": {
     "status": "classified",
@@ -1107,8 +1155,5 @@
     "identityScope": "product",
     "matchedBottleId": 42937,
     "summary": "Match Maker's Mark Bourbon (42937). The photo shows a seasonal 'Limited Edition Bottle' label on standard Maker's Mark Kentucky Straight Bourbon Whisky at 45%; a special label is the same Bottle."
-  },
-  "knownFailure": {
-    "reason": "The label photo is never read: auction runs extract only the lot details (45%), so imageEvidence is empty and the holiday label can't be seen."
   }
 }

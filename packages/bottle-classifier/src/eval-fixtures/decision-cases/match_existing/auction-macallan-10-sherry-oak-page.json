@@ -6,7 +6,7 @@
       "id": 16615,
       "url": "https://www.scotchwhiskyauctions.com/auctions/234-the-185th-auction/904787-macallan-10-year-old/",
       "name": "Macallan 10 Year Old",
-      "imageUrl": "https://d3suvtcq00dftb.cloudfront.net/images/97a88cf38d2719a17d848c84b366778c-zoom.jpg",
+      "imageUrl": null,
       "externalSiteId": 28097,
       "currentBottleId": null
     },
@@ -28,7 +28,65 @@
       "vintage_year": null,
       "cask_strength": null
     },
-    "imageEvidence": null,
+    "imageEvidence": {
+      "sourceImageId": "auction_lot:16615",
+      "extractors": [
+        {
+          "kind": "vision",
+          "model": "openai/gpt-6-luna",
+          "confidence": 0.75,
+          "textSpans": [
+            {
+              "text": "The Macallan. EST. 1824. Highland Single Malt Scotch Whisky. 10 years old. Exclusively matured in selected sherry oak casks from Jerez, Spain. Distilled and bottled by The Macallan Distillers Ltd, Easter Elchies, Craigellachie, Scotland. Product of Scotland. 70cl. 40%. Box text: Colour: Pale Gold | Age: 10 years old. Nose: A hint of sweet toffee, balanced with dried fruit and sherry. Palate: Smooth, with dried fruit, sherry sweetness and wood smoke. Finish: Dried fruit, rich sweet toffee and a hint of wood spice.",
+              "confidence": 0.75
+            }
+          ],
+          "observations": [
+            "Read whisky label identity from the auction lot photo."
+          ]
+        }
+      ],
+      "fieldCandidates": {
+        "brand": {
+          "value": "The Macallan",
+          "confidence": 0.75,
+          "sourceExtractorIndexes": [0]
+        },
+        "distillery": {
+          "value": ["The Macallan"],
+          "confidence": 0.75,
+          "sourceExtractorIndexes": [0]
+        },
+        "category": {
+          "value": "single_malt",
+          "confidence": 0.75,
+          "sourceExtractorIndexes": [0]
+        },
+        "statedAge": {
+          "value": 10,
+          "confidence": 0.75,
+          "sourceExtractorIndexes": [0]
+        },
+        "abv": {
+          "value": 40,
+          "confidence": 0.75,
+          "sourceExtractorIndexes": [0]
+        },
+        "maturation": {
+          "value": "Selected sherry oak casks from Jerez, Spain",
+          "confidence": 0.75,
+          "sourceExtractorIndexes": [0]
+        }
+      },
+      "photoSuitability": {
+        "isSingleBottlePhoto": true,
+        "labelReadable": true,
+        "suitableAsTastingImage": false,
+        "suitableAsBottleImage": false,
+        "reason": null
+      },
+      "conflicts": []
+    },
     "initialCandidates": [
       {
         "abv": 40,
@@ -1612,7 +1670,7 @@
       "createsBottle": false,
       "summary": "Production returned no_match: the title and 40% did not separate Sherry Oak 10 (1105) from Fine Oak 10 (5182) and two other 10-year-old releases."
     },
-    "notes": "Saved check 36026, source auction_lot 16615 (lot 185-904787, lot number 185-01610). This is a second 'Macallan 10 Year Old' lot in the same auction, not lot 16620 judged earlier. Its page text says only '10 Years Old', '40% ABV / 70cl' and that the 10-year-old was discontinued in 2013; it does not say Sherry Oak, so the photo is what settles it. This case therefore follows the photo-case pattern even though the fixture id says 'page': input.reference.imageUrl is set to the lot's first photo at full size, and the evidence pack gets that photo's reviewed reading. Production ran without the photo; this case goes in with the change that makes auctions read the lot photo. The photo clearly shows the bottle and carton: The Macallan, Highland Single Malt Scotch Whisky, 10 Ten Years Old, 'Exclusively matured in selected sherry oak casks from Jerez, Spain', 700 ml. The bottle's ABV print is too small to read with confidence, so the reading leaves abv empty; the scraper's 40% stays in extractedIdentity. 1105 is The Macallan 10-year-old, Series Sherry Oak Collection, 40%. 5182 is the Fine Oak 10-year-old at 40%; 69113 and 69121 are special releases."
+    "notes": "Saved check 36026, source auction_lot 16615 (lot 185-904787, lot number 185-01610). This is a second 'Macallan 10 Year Old' lot in the same auction, not lot 16620 judged earlier. Its page text says only '10 Years Old', '40% ABV / 70cl' and that the 10-year-old was discontinued in 2013; it does not say Sherry Oak, so the photo is what settles it. This case therefore follows the photo-case pattern even though the fixture id says 'page': input.reference.imageUrl is set to the lot's first photo at full size, and the evidence pack gets that photo's reviewed reading. Production ran without the photo; this case goes in with the change that makes auctions read the lot photo. The photo clearly shows the bottle and carton: The Macallan, Highland Single Malt Scotch Whisky, 10 Ten Years Old, 'Exclusively matured in selected sherry oak casks from Jerez, Spain', 700 ml. The bottle's ABV print is too small to read with confidence, so the reading leaves abv empty; the scraper's 40% stays in extractedIdentity. 1105 is The Macallan 10-year-old, Series Sherry Oak Collection, 40%. 5182 is the Fine Oak 10-year-old at 40%; 69113 and 69121 are special releases. Production ran without the photo. input.imageEvidence is openai/gpt-6-luna's live reading on 2026-11-04 of the lot photo's 1500px copy (https://d3suvtcq00dftb.cloudfront.net/images/97a88cf38d2719a17d848c84b366778c-zoom.jpg), in the shape auction matching sends since lot photos are read."
   },
   "expected": {
     "status": "classified",
@@ -1620,8 +1678,5 @@
     "identityScope": "product",
     "matchedBottleId": 1105,
     "summary": "Match The Macallan 10-year-old in the Sherry Oak range (1105). The label prints 'exclusively matured in selected sherry oak casks from Jerez, Spain', which rules out the Fine Oak 10 (5182) at the same age and ABV."
-  },
-  "knownFailure": {
-    "reason": "The label photo is never read: auction runs extract only the lot details (40%), so the sherry oak wording can't be seen."
   }
 }

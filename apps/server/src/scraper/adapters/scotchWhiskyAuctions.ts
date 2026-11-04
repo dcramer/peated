@@ -79,6 +79,18 @@ function lotImageUrl(style: string | undefined) {
   return undefined;
 }
 
+/**
+ * Returns the 1500px copy of a lot's photo. Index tiles link the 224px `-med`
+ * copy, which is too small to read label text; the same image is published
+ * with a `-zoom` suffix. Other photo links come back unchanged.
+ */
+export function scotchWhiskyAuctionsLabelImageUrl(imageUrl: string) {
+  const url = new URL(imageUrl);
+  if (url.origin !== IMAGE_ORIGIN) return imageUrl;
+  url.pathname = url.pathname.replace(/-med(\.\w+)$/, "-zoom$1");
+  return url.toString();
+}
+
 export function parseScotchWhiskyAuctionsIndex(
   html: string,
   scope: "recent" | "current" = "recent",

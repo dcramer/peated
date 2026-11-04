@@ -65,6 +65,7 @@ const BOTTLE_EVIDENCE_POLICY = [
     `Compare identity components in this order: ${MATCH_COMPONENT_PRIORITY.join(", ")}.`,
     "Use explicit source and label fields first, then local Bottle and Entity context, then focused web evidence for missing or disputed identity-critical facts.",
     "Structured extraction is evidence, not authority. Use raw label text or focused external evidence to corroborate uncertain numeric or coded characters before you rely on them.",
+    "A photo reading in `imageEvidence` can misread small or worn label text. Use its label text for printed wording, and its facts to fill what the source leaves out or to settle a source typo that a stored fact confirms. A photo reading alone never overrides a source fact and a stored fact that agree.",
     "A missing source field or missing candidate enrichment is not a conflict. A stored Brand, category, age, or other field can be wrong. Inspect a plausible candidate and use authoritative exact-product evidence before you decide that it conflicts with the Bottle Reference.",
     "Candidate names, aliases, relationships, and returned order retrieve possibilities. They do not prove identity.",
     "Judge web evidence by product specificity, independence, and corroboration. The originating retailer can support extraction but does not prove creation by itself.",

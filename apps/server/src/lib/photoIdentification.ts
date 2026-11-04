@@ -73,16 +73,22 @@ function maybeField<T extends boolean | number | string | string[]>(
 /**
  * Converts reviewed label extraction output into the image-evidence contract
  * consumed by the bottle classifier and returned by photo identification.
+ * An auction lot photo is read for facts only: Peated never reuses a source's
+ * photo as a Bottle or tasting image.
  */
 export function buildPhotoEvidenceFromExtractedIdentity({
   photo,
   extractedIdentity,
   rawLabelText = null,
+  source = "upload",
 }: {
-  photo: PhotoIdentificationImage;
+  photo: Pick<PhotoIdentificationImage, "id">;
   extractedIdentity: BottleExtractedDetails | null;
   rawLabelText?: string | null;
+  source?: "upload" | "auction_lot";
 }): ImageBottleEvidence {
+  const photoName =
+    source === "auction_lot" ? "auction lot photo" : "uploaded bottle photo";
   const labelParts = [
     extractedIdentity?.brand,
     extractedIdentity?.expression,
@@ -122,8 +128,8 @@ export function buildPhotoEvidenceFromExtractedIdentity({
               ]
             : [],
         observations: extractedIdentity
-          ? ["Read whisky label identity from the uploaded bottle photo."]
-          : ["No reliable bottle identity was read from the uploaded photo."],
+          ? [`Read whisky label identity from the ${photoName}.`]
+          : [`No reliable bottle identity was read from the ${photoName}.`],
       },
     ],
     fieldCandidates: {
@@ -148,8 +154,8 @@ export function buildPhotoEvidenceFromExtractedIdentity({
     photoSuitability: {
       isSingleBottlePhoto: Boolean(extractedIdentity),
       labelReadable: Boolean(extractedIdentity),
-      suitableAsTastingImage: true,
-      suitableAsBottleImage: Boolean(extractedIdentity),
+      suitableAsTastingImage: source === "upload",
+      suitableAsBottleImage: source === "upload" && Boolean(extractedIdentity),
       reason: extractedIdentity
         ? null
         : "No reliable label identity was extracted from the photo.",
