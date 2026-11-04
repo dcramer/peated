@@ -1,5 +1,8 @@
 # C09: reject an unverified cask-code match
 
+**Superseded by [C40](./C40-agent-judges-cask-codes.md)**, which removed the
+check on 2026-11-02.
+
 **Accepted.** The deterministic guard blocks both recorded unsafe match shapes
 without changing model calls, tokens, or model time.
 

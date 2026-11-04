@@ -1708,7 +1708,7 @@ describe("finalizeBottleReferenceClassification", () => {
   });
 });
 
-describe("unverified candidate cask codes", () => {
+describe("cask-specific matches", () => {
   function finalizeCandidateMatch({
     candidate,
     referenceName,
@@ -1816,63 +1816,40 @@ describe("unverified candidate cask codes", () => {
     ],
   ];
 
+  // Cask-specific identity is the agent's judgment (C40). Code only adds a
+  // conflict risk when the source shows a different cask number.
   test.each(uncodedSourceCases)(
-    "downgrades a match when %s omits the candidate's cask code",
+    "keeps the agent's match when %s omits the candidate's cask code",
     (referenceName, candidate) => {
       expect(
         finalizeCandidateMatch({ candidate, referenceName }),
       ).toMatchObject({
-        action: "no_match",
-        matchedBottleId: null,
+        action: "match",
+        matchedBottleId: candidate.bottleId,
       });
     },
   );
 
-  test("keeps a match when the source title carries the same barrel code", () => {
-    const candidate: BottleCandidate = {
-      ...existingPrivateCask,
-      fullName: "Example Single Barrel (Barrel No. 4769)",
-      caskNumber: "4769",
-    };
-
-    expect(
-      finalizeCandidateMatch({
-        candidate,
-        referenceName: "Example Single Barrel Barrel No. 4769",
-      }),
-    ).toMatchObject({ action: "match", matchedBottleId: candidate.bottleId });
-  });
-
-  test("keeps a match when structured source extraction carries the code", () => {
+  test("adds a conflict risk when the source shows a different cask number", () => {
     const candidate: BottleCandidate = {
       ...existingPrivateCask,
       fullName: "Example Single Barrel (Barrel F2-038)",
       caskNumber: "F2-038",
     };
 
-    expect(
-      finalizeCandidateMatch({
-        candidate,
-        referenceName: "Example Single Barrel",
-        extractedCaskNumber: "F2-038",
-      }),
-    ).toMatchObject({ action: "match", matchedBottleId: candidate.bottleId });
-  });
+    const result = finalizeCandidateMatch({
+      candidate,
+      referenceName: "Example Single Barrel",
+      extractedCaskNumber: "F2-039",
+    });
 
-  test("keeps a match when the reviewed observation carries the barrel code", () => {
-    const candidate: BottleCandidate = {
-      ...existingPrivateCask,
-      fullName: "Example Single Barrel (Barrel F2-038)",
-      caskNumber: "F2-038",
-    };
-
-    expect(
-      finalizeCandidateMatch({
-        candidate,
-        referenceName: "Example Single Barrel",
-        observationBarrelNumber: "F2-038",
-      }),
-    ).toMatchObject({ action: "match", matchedBottleId: candidate.bottleId });
+    expect(result).toMatchObject({
+      action: "match",
+      matchedBottleId: candidate.bottleId,
+    });
+    expect(result.confidenceBasis?.unresolvedRisks).toContainEqual(
+      expect.objectContaining({ category: "trait_conflict" }),
+    );
   });
 
   test("keeps an SMWS match when the source code is composed from label components", () => {
@@ -1902,21 +1879,5 @@ describe("unverified candidate cask codes", () => {
       matchedBottleId: 11940,
       observation: { caskNumber: "1.285" },
     });
-  });
-
-  test.each([
-    "Example Cask Strength No. 5",
-    "Example Barrel Strength (Batch 11)",
-    "Example Single Barrel 18-year-old",
-  ])("keeps non-cask identifier match %s", (fullName) => {
-    const candidate: BottleCandidate = {
-      ...existingPrivateCask,
-      fullName,
-      singleCask: fullName.includes("Single Barrel") ? true : null,
-    };
-
-    expect(
-      finalizeCandidateMatch({ candidate, referenceName: fullName }),
-    ).toMatchObject({ action: "match", matchedBottleId: candidate.bottleId });
   });
 });
