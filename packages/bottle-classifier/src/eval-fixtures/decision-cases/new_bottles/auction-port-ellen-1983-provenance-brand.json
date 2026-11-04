@@ -1822,6 +1822,21 @@
             "query": "Yamazakura"
           }
         ]
+      },
+      {
+        "kind": "brand",
+        "name": "Provenance",
+        "score": 1,
+        "source": ["exact", "text", "prefix", "contained"],
+        "entityId": 366639,
+        "reference": "Provenance",
+        "shortName": null,
+        "retrievedFor": [
+          {
+            "exact": true,
+            "query": "Provenance"
+          }
+        ]
       }
     ],
     "inspectedSeries": []
@@ -1836,7 +1851,7 @@
       "createsBottle": true,
       "summary": "Production returned create_bottle with the name `1983 24-year-old`."
     },
-    "notes": "Captured from saved classifier run 36397 (auction_lot 17300, model null, 2026-11-03T20:08:10.073Z). Production rationale: The auction reference identifies a Port Ellen 1983 24-year-old Provenance bottling from cask 4127. Public product results support the 46% ABV and cask identifier. The inspected local candidate 69624 is a different single-cask bottling, cask 3977, so it is not a safe match. Checked 2026-11-03. Lot page and photo: The McGibbon's Provenance, Port Ellen Distillery, Distilled Spring 1983, Bottled Winter 2008, over 24 years, one refill butt DMG Ref 4127, 46%, bottled by Douglas McGibbon & Co. Ltd. Identity model rule 4: the independent bottler's label (Provenance) is the Brand, the distillery is the name and distiller. Production set Brand Port Ellen with Series Provenance. Other Provenance Port Ellen 1983 Bottles exist (4843, 53445), so the age may be added to the name."
+    "notes": "Captured from saved classifier run 36397 (auction_lot 17300, model null, 2026-11-03T20:08:10.073Z). Production rationale: The auction reference identifies a Port Ellen 1983 24-year-old Provenance bottling from cask 4127. Public product results support the 46% ABV and cask identifier. The inspected local candidate 69624 is a different single-cask bottling, cask 3977, so it is not a safe match. Checked 2026-11-03. Lot page and photo: The McGibbon's Provenance, Port Ellen Distillery, Distilled Spring 1983, Bottled Winter 2008, over 24 years, one refill butt DMG Ref 4127, 46%, bottled by Douglas McGibbon & Co. Ltd. Identity model rule 4: the independent bottler's label (Provenance) is the Brand, the distillery is the name and distiller. Production set Brand Port Ellen with Series Provenance. Other Provenance Port Ellen 1983 Bottles exist (4843, 53445), so the age may be added to the name. The Provenance Brand Entity (366639) is added to the searchable Entities by hand: production retrieval never ran an Entity search for Provenance, and a search for it returns 366639."
   },
   "expected": {
     "status": "classified",
@@ -1860,6 +1875,6 @@
     "summary": "Create the Provenance Port Ellen 1983 under Brand Provenance, not Brand Port Ellen; cask 4127 in its field."
   },
   "knownFailure": {
-    "reason": "The create uses Brand Port Ellen instead of the bottler's label, Provenance."
+    "reason": "The agent never searches for the Provenance Brand and uses the bottler Douglas McGibbon as Brand, with Provenance as a Series."
   }
 }

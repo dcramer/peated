@@ -1622,6 +1622,6 @@
     "summary": "Match The Macallan 10-year-old in the Sherry Oak range (1105). The label prints 'exclusively matured in selected sherry oak casks from Jerez, Spain', which rules out the Fine Oak 10 (5182) at the same age and ABV."
   },
   "knownFailure": {
-    "reason": "With the label photo printing sherry oak, the agent still can't choose between Sherry Oak and Fine Oak."
+    "reason": "The label photo is never read: auction runs extract only the lot details (40%), so the sherry oak wording can't be seen."
   }
 }

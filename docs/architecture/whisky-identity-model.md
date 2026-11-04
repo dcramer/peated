@@ -344,6 +344,10 @@ title, the label, and the trade name it.
   Macallan prints `2024 Release`. When the label prints no year, each year's
   Bottle keeps the same name and only `releaseYear` tells them apart. Do not
   add `YYYY Release` to make the name unique.
+- A source that names a release by its year, such as `2026 Release`, is that
+  year's release even when the label does not print the year. Set
+  `releaseYear`; a Bottle of the same expression with no release year does
+  not cover it. A bottle code or bottling date alone does not name a release.
 - Do not put a cask number, batch code, selection, ABV, or outturn in the name.
   The one exception is an SMWS Bottle, named
   `<distillery number>.<cask number> <subtitle>` (see "Matching And
@@ -372,14 +376,17 @@ alone does not add it.
 
 **`edition`** is a release fact as the producer's title or label prints it:
 `Batch 24`, `Batch 22/030`, `S2B13`, `for La Maison du Whisky`,
-`K&L Exclusive`. Preserve the printed words. Narrative prose can confirm that
+`K&L Exclusive`. Preserve the printed words and their capitals: a label
+that prints `Bottled exclusively for The Drambusters` gives
+`for The Drambusters`. Narrative prose can confirm that
 a code identifies a marketed release, but it cannot add a word to the edition:
 when the title and label show `4.2` and prose calls it "release 4.2," store
 `4.2`.
 A printed batch or lot code is not an edition when the producer sells one
-ongoing product without batch-specific marketing. A selection that only a
-retailer listing states, and the label does not, is source evidence, not an
-edition.
+ongoing product without batch-specific marketing. A selection counts as
+printed when the label or producer shows it, or when the source and an
+independent source both name who the release was bottled for. A selection
+that only the selling retailer states is source evidence, not an edition.
 
 **`caskNumber`** holds a printed cask or barrel identifier without words such
 as `Cask No.` or `Barrel No.`: `14300`, `3448+3450`, or the SMWS code `1.302`.
@@ -438,7 +445,9 @@ distillery. Brand answers one question only: the name people buy under.
    code or a selection the label prints (`for La Maison du Whisky`) is the
    `edition`. The bottler's own ranges are Series under that Brand. The
    Scotch Malt Whisky Society, The Heart Cut, Gordon & MacPhail, Old
-   Particular, and The Ghost Series follow this rule. A bottler Entity may be
+   Particular, and The Ghost Series follow this rule. When evidence names the
+   bottler but no separate label, the bottler is the Brand. The distillery
+   is never the Brand of an independent bottling. A bottler Entity may be
    owned by a company Entity.
 5. **A selection of an official bottling.** When a retailer, importer,
    distributor, festival, bar, hotel, or private buyer selects a cask or

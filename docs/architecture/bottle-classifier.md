@@ -48,7 +48,8 @@ still a marketed release. A Bottle in its own box or tin is still one Bottle.
 A miniature holds 100 ml or less; an 18cl, 20cl, or 35cl bottle is a Bottle. A
 release that the producer packs with accessories, such as a flask, funnel,
 tray, or glasses, is a set and out of scope, even when it is the only form of
-that release. A Bottle sold with a book, print, or coaster stays in scope.
+that release. A Bottle sold with a book, print, or coaster stays in scope. A
+print, book, or other item sold without the whisky is merchandise.
 Scope is about what is sold, not how clearly the source names it: a
 whisky Bottle with unclear identity is `no_match`, not ignored. An ignored
 result has a reason and no decision, and every caller stops tracking that source
