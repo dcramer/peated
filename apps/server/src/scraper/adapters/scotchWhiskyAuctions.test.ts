@@ -10,6 +10,7 @@ import {
   parseScotchWhiskyAuctionPage,
   parseScotchWhiskyAuctionsIndex,
   scotchWhiskyAuctionsAdapter,
+  scotchWhiskyAuctionsLabelImageUrl,
 } from "./scotchWhiskyAuctions";
 
 const auction = {
@@ -69,6 +70,22 @@ test("retains the exact published photo link without inventing a larger image UR
       html.replace(imageUrl, "/images/example-med.jpg"),
       auction,
     ).items[0].lot.imageUrl,
+  ).toBe("https://www.scotchwhiskyauctions.com/images/example-med.jpg");
+});
+
+test("reads labels from the published 1500px copy of a lot photo", () => {
+  expect(
+    scotchWhiskyAuctionsLabelImageUrl(
+      "https://d3suvtcq00dftb.cloudfront.net/images/3245b62843e278810e3789a39f58a216-med.jpg",
+    ),
+  ).toBe(
+    "https://d3suvtcq00dftb.cloudfront.net/images/3245b62843e278810e3789a39f58a216-zoom.jpg",
+  );
+  // Only the image host publishes the larger copy.
+  expect(
+    scotchWhiskyAuctionsLabelImageUrl(
+      "https://www.scotchwhiskyauctions.com/images/example-med.jpg",
+    ),
   ).toBe("https://www.scotchwhiskyauctions.com/images/example-med.jpg");
 });
 

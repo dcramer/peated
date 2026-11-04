@@ -153,7 +153,10 @@ once per extractor version and saved (`image_label_extraction`). Each upload
 gets a new file name, so an image URL always shows the same image and later
 inspections reuse the saved reading. A change to the
 image model, reasoning effort, prompt, response schema, or model library is a
-new version and reads the label again. A failed read is not saved.
+new version and reads the label again. A failed read is not saved. Auction
+matching saves its lot-photo readings the same way; it sends them as the
+request's `imageEvidence`, not as the reference image, so they never replace
+the listing's own facts (see [auctions](../features/auctions.md#bottle-matching)).
 
 During an audit:
 

@@ -6539,30 +6539,7 @@
         "errors": []
       },
       "pageResults": [],
-      "imageResults": [
-        {
-          "url": "https://d3suvtcq00dftb.cloudfront.net/images/afc468e6047e17346ceb9e3f2121b1fc-zoom.jpg",
-          "result": {
-            "brand": "Bowmore",
-            "bottler": null,
-            "expression": "The Devil's Casks",
-            "series": null,
-            "distillery": ["Bowmore"],
-            "category": "single_malt",
-            "stated_age": null,
-            "abv": 56.7,
-            "release_year": null,
-            "vintage_year": null,
-            "bottling_year": null,
-            "cask_strength": null,
-            "single_cask": null,
-            "maturation": "A marriage of first fill Oloroso & Pedro Ximenez sherry casks",
-            "cask_number": null,
-            "outturn": null,
-            "edition": "Limited Release III"
-          }
-        }
-      ]
+      "imageResults": []
     },
     "auction-brora-1972-cc-bottled-1993": {
       "searchResult": {
@@ -7414,30 +7391,7 @@
         "errors": []
       },
       "pageResults": [],
-      "imageResults": [
-        {
-          "url": "https://d3suvtcq00dftb.cloudfront.net/images/164e91dce0fc752767cd123ab6ea3c34-zoom.jpg",
-          "result": {
-            "brand": "William Grant's",
-            "bottler": null,
-            "expression": "The Family Reserve",
-            "series": null,
-            "distillery": null,
-            "category": "blend",
-            "stated_age": null,
-            "abv": null,
-            "release_year": null,
-            "vintage_year": null,
-            "bottling_year": null,
-            "cask_strength": null,
-            "single_cask": null,
-            "maturation": null,
-            "cask_number": null,
-            "outturn": null,
-            "edition": null
-          }
-        }
-      ]
+      "imageResults": []
     },
     "auction-hades-28-with-print-in-scope": {
       "searchResult": {
@@ -8056,30 +8010,7 @@
         "errors": []
       },
       "pageResults": [],
-      "imageResults": [
-        {
-          "url": "https://d3suvtcq00dftb.cloudfront.net/images/97a88cf38d2719a17d848c84b366778c-zoom.jpg",
-          "result": {
-            "brand": "The Macallan",
-            "bottler": null,
-            "expression": null,
-            "series": null,
-            "distillery": null,
-            "category": "single_malt",
-            "stated_age": 10,
-            "abv": null,
-            "release_year": null,
-            "vintage_year": null,
-            "bottling_year": null,
-            "cask_strength": null,
-            "single_cask": null,
-            "maturation": "Exclusively matured in selected sherry oak casks from Jerez, Spain",
-            "cask_number": null,
-            "outturn": null,
-            "edition": null
-          }
-        }
-      ]
+      "imageResults": []
     },
     "auction-macallan-candle-holders-ignore": {
       "searchResult": {
@@ -8503,30 +8434,7 @@
         "errors": []
       },
       "pageResults": [],
-      "imageResults": [
-        {
-          "url": "https://d3suvtcq00dftb.cloudfront.net/images/c92e7897a93b0307bc3baa3fe1cdbeeb-zoom.jpg",
-          "result": {
-            "brand": "Maker's Mark",
-            "bottler": null,
-            "expression": null,
-            "series": null,
-            "distillery": null,
-            "category": "bourbon",
-            "stated_age": null,
-            "abv": 45,
-            "release_year": null,
-            "vintage_year": null,
-            "bottling_year": null,
-            "cask_strength": null,
-            "single_cask": null,
-            "maturation": null,
-            "cask_number": null,
-            "outturn": null,
-            "edition": "Limited Edition Bottle"
-          }
-        }
-      ]
+      "imageResults": []
     },
     "auction-port-ellen-1983-provenance-brand": {
       "searchResult": {

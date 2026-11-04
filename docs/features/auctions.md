@@ -83,10 +83,26 @@ other's create goes to review; see
 
 Auction classification sets `readCandidateImages: false` in its saved request.
 It uses the listing title, supplied structured source facts, catalog fields,
-references, observations, and bounded source research. It does not automatically
-read catalog photos or load their saved label readings. Published thumbnails
-remain moderator review links, not extraction inputs. Missing batch or cask
-evidence still requires review; a generic candidate's photo cannot fill that gap.
+references, observations, bounded source research, and a reading of the lot's
+own photo. It does not read catalog photos or load their saved label readings.
+Missing batch or cask evidence still requires review; a generic candidate's
+photo cannot fill that gap.
+
+Before the first classification, matching reads the label on the lot's photo
+through PeatedBot. Scotch Whisky Auctions index tiles link a 224px copy that is
+too small to read, so matching reads the same image's published 1500px copy.
+The reading goes to the classifier as image evidence beside the title and
+details, never in place of them. It is weaker than those facts: it can fill a
+fact they leave out or settle a typo that a stored fact confirms, but alone it
+never overrides a source fact and a stored fact that agree, and it does not by
+itself let a decision apply automatically. Only the reading is saved, once per
+image and extractor version (see
+[the classifier's saved label readings](../architecture/bottle-classifier.md));
+the photo stays a moderator review link and is never copied into the catalog.
+A photo that is gone, refused, blocked, or too large is skipped, and the lot is
+classified from its title and details. A timeout or failed reading fails the
+job so it retries. Each classified lot adds one image reading; reused
+references, saved checks, and identical lots add none.
 
 For a new Scotch Whisky Auctions lot without an accepted reference, a saved check,
 or structured source facts, matching requests one detail-page read before the

@@ -128,9 +128,9 @@ result history, and notification rules.
 
 ## Matching rollout
 
-Matching uses listing text and explicit facts, not automatic photo readings.
-Source photo links remain available to moderators; they are not copied into
-the catalog. See the [auction model](../features/auctions.md#bottle-matching)
+Matching uses listing text, explicit facts, and a label reading of each
+classified lot's own photo. Source photo links remain available to moderators;
+they are not copied into the catalog. See the [auction model](../features/auctions.md#bottle-matching)
 for matching and detail-collection rules.
 
 Choose up to 100 unresolved lots from `GET /auction-lots/match-queue`. Read each

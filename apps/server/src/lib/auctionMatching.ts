@@ -14,6 +14,7 @@ import {
 import { requestAuctionLotDetails } from "@peated/server/scraper";
 import { pushJob } from "@peated/server/worker/dispatch";
 import { and, asc, eq, inArray, isNull, ne, sql } from "drizzle-orm";
+import { readAuctionLotPhotoEvidence } from "./auctionLotPhoto";
 import {
   assessAuctionMatch,
   auctionLotCheckKey,
@@ -140,7 +141,9 @@ async function resolveAuctionLotMatch(
       ),
     });
     if (!lot) return true;
-    // Auction matching uses listing text and facts; photos remain review links.
+    // Auction matching reads the lot photo's label as weaker evidence beside
+    // the listing text and facts; the photo itself stays a review link.
+    const imageEvidence = await readAuctionLotPhotoEvidence(lot);
     const input: ClassifyBottleReferenceInput = {
       readCandidateImages: false,
       reference: {
@@ -152,6 +155,7 @@ async function resolveAuctionLotMatch(
         currentBottleId: null,
       },
     };
+    if (imageEvidence) input.imageEvidence = imageEvidence;
     if (lot.sourceBottleIdentity) {
       input.extractedIdentity = lot.sourceBottleIdentity;
       input.extractedIdentitySource = "structured";
