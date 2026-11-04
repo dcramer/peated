@@ -14,11 +14,13 @@ import {
   bottles,
   type AuctionLot,
 } from "@peated/server/db/schema";
+import { buildPhotoEvidenceFromExtractedIdentity } from "@peated/server/lib/photoIdentification";
 import { routerClient } from "@peated/server/orpc/router";
 import * as scraper from "@peated/server/scraper";
 import { eq } from "drizzle-orm";
 import { afterEach, vi } from "vitest";
 import applyAuctionLotMatchJob from "../worker/jobs/applyAuctionLotMatch";
+import * as auctionLotPhoto from "./auctionLotPhoto";
 import { auctionLotCheckKey } from "./auctionMatchEvidence";
 import {
   applySavedAuctionLotMatch,
@@ -210,6 +212,75 @@ test("unresolved classifier output remains reviewable and repeat-safe", async ({
   ).toMatchObject({
     readCandidateImages: false,
   });
+});
+
+test("the lot photo's label reading reaches the classifier as photo evidence", async ({
+  fixtures,
+}) => {
+  const site = await fixtures.ExternalSite({ type: "masterofmalt" });
+  const { lot } = await upsertAuctionObservation(site.id, {
+    auction: {
+      sourceKey: "1",
+      name: "Example auction",
+      url: "https://example.com/auction",
+    },
+    lot: {
+      sourceKey: "1",
+      name: "Unknown whisky",
+      url: "https://example.com/lot",
+      imageUrl: "https://example.com/thumbnail.jpg",
+      state: "closed",
+    },
+    observedAt: new Date().toISOString(),
+  });
+  const imageEvidence = buildPhotoEvidenceFromExtractedIdentity({
+    photo: { id: `auction_lot:${lot.id}` },
+    extractedIdentity: null,
+    source: "auction_lot",
+  });
+  const readPhoto = vi
+    .spyOn(auctionLotPhoto, "readAuctionLotPhotoEvidence")
+    .mockResolvedValue(imageEvidence);
+  const run = vi
+    .spyOn(classifier, "runScrapedBottleReference")
+    .mockResolvedValue({
+      result: createDecidedBottleClassification({
+        decision: {
+          action: "no_match",
+          rationale: "Not enough evidence.",
+          candidateBottleIds: [],
+          identityScope: "product",
+          observation: null,
+          matchedBottleId: null,
+          proposedBottle: null,
+        },
+        artifacts: {},
+      }),
+      modelMetadata: {
+        agentDurationMs: 0,
+        usage: { requests: 0, inputTokens: 0, outputTokens: 0, totalTokens: 0 },
+        toolCalls: { count: 0, names: [] },
+      },
+    });
+
+  await resolveAuctionLot(lot.id, lot.sourceFingerprint);
+
+  expect(readPhoto).toHaveBeenCalledWith(
+    expect.objectContaining({
+      id: lot.id,
+      imageUrl: "https://example.com/thumbnail.jpg",
+    }),
+  );
+  // The photo is evidence beside the lot text; it never becomes the
+  // reference image the classifier extracts from.
+  expect(run).toHaveBeenCalledWith({
+    readCandidateImages: false,
+    imageEvidence,
+    reference: expect.objectContaining({ imageUrl: null }),
+  });
+  expect(
+    (await db.query.bottleChecks.findFirst())?.inputSnapshot,
+  ).toMatchObject({ imageEvidence: JSON.parse(JSON.stringify(imageEvidence)) });
 });
 
 test("ignored classifier output stays ignored after a retry", async ({

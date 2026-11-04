@@ -528,8 +528,379 @@
     ]
   },
   "context": {
-    "inspectedBottleIds": [],
-    "bottleContexts": [],
+    "inspectedBottleIds": [11834, 64159, 47023],
+    "bottleContexts": [
+      {
+        "exact": {
+          "abv": null,
+          "edition": null,
+          "outturn": null,
+          "statedAge": null,
+          "caskNumber": null,
+          "maturation": "American oak ex-bourbon casks, finished in Spanish oak ex-Oloroso sherry casks",
+          "releaseDay": null,
+          "singleCask": null,
+          "releaseYear": 1993,
+          "vintageYear": null,
+          "bottlingYear": null,
+          "caskStrength": null,
+          "releaseMonth": null
+        },
+        "shared": {
+          "name": "DoubleWood",
+          "brand": {
+            "name": "The Balvenie",
+            "entityId": 8463
+          },
+          "series": {
+            "name": "Cask Finishes",
+            "seriesId": 22
+          },
+          "bottler": null,
+          "category": "single_malt",
+          "statedAge": 12,
+          "distillers": [
+            {
+              "name": "The Balvenie",
+              "entityId": 8463
+            }
+          ]
+        },
+        "groupId": 12520,
+        "bottleId": 11834,
+        "fullName": "The Balvenie DoubleWood",
+        "siblings": [],
+        "references": [
+          {
+            "name": "Balvenie 12-year-old Double Wood",
+            "ignored": false
+          },
+          {
+            "name": "Balvenie 12-year-old DoubleWood",
+            "ignored": false
+          },
+          {
+            "name": "Balvenie DoubleWood 12-year-old",
+            "ignored": false
+          },
+          {
+            "name": "Balvenie Doublewood 12-year-old Scotch",
+            "ignored": false
+          },
+          {
+            "name": "Balvenie Doublewood 12-year-old Single Malt Whisky",
+            "ignored": false
+          },
+          {
+            "name": "Balvenie Doublewood 12-year-old Speyside Single Malt Scotch Whisky",
+            "ignored": false
+          },
+          {
+            "name": "Balvenie Doublewood 12 Yr. Scotch",
+            "ignored": false
+          },
+          {
+            "name": "The Balvenie 12-year-old DoubleWood",
+            "ignored": false
+          },
+          {
+            "name": "The Balvenie DoubleWood 12 Single Malt Scotch Whisky",
+            "ignored": false
+          },
+          {
+            "name": "The Balvenie Doublewood – Aged 12-year-old",
+            "ignored": false
+          }
+        ],
+        "observations": [
+          {
+            "facts": {
+              "proposalType": "match",
+              "proposedBottle": null,
+              "referenceScope": "none"
+            },
+            "rawText": "Balvenie 12-year-old DoubleWood",
+            "sourceKey": "store_price:12061540",
+            "sourceUrl": "https://www.finedrams.com/balvenie-12-year-old-doublewood-whisky.html",
+            "sourceName": "Balvenie 12-year-old DoubleWood",
+            "sourceType": "store_price",
+            "parsedIdentity": null
+          },
+          {
+            "facts": {
+              "proposalType": "match_existing",
+              "proposedBottle": null,
+              "referenceScope": "none"
+            },
+            "rawText": "The Balvenie 12-year-old Doublewood Single Malt Scotch Whiskey",
+            "sourceKey": "store_price:12058754",
+            "sourceUrl": "https://kegnbottle.com/products/the-balvenie-12-year-doublewood-750-ml",
+            "sourceName": "The Balvenie 12-year-old Doublewood Single Malt Scotch Whiskey",
+            "sourceType": "store_price",
+            "parsedIdentity": {
+              "abv": null,
+              "brand": "The Balvenie",
+              "series": null,
+              "bottler": null,
+              "edition": null,
+              "outturn": null,
+              "category": "single_malt",
+              "distillery": ["The Balvenie"],
+              "expression": "DoubleWood",
+              "maturation": "Traditional whisky casks, sherry casks",
+              "stated_age": 12,
+              "cask_number": null,
+              "release_day": null,
+              "single_cask": null,
+              "release_year": null,
+              "vintage_year": null,
+              "bottling_year": null,
+              "cask_strength": null,
+              "release_month": null
+            }
+          },
+          {
+            "facts": {
+              "proposalType": "no_match",
+              "proposedBottle": null,
+              "referenceScope": "none"
+            },
+            "rawText": "Balvenie 12-year-old - DoubleWood",
+            "sourceKey": "store_price:12036820",
+            "sourceUrl": "https://www.thewhiskyworld.com/balvenie-12-year-old-doublewood-p141",
+            "sourceName": "Balvenie 12-year-old - DoubleWood",
+            "sourceType": "store_price",
+            "parsedIdentity": null
+          },
+          {
+            "facts": {
+              "proposalType": "no_match",
+              "proposedBottle": null,
+              "referenceScope": "none"
+            },
+            "rawText": "Balvenie DoubleWood 12-year-old",
+            "sourceKey": "store_price:12030486",
+            "sourceUrl": "https://www.masterofmalt.com/whiskies/balvenie/balvenie-doublewood-12-year-old-whisky/?sku=1767",
+            "sourceName": "Balvenie DoubleWood 12-year-old",
+            "sourceType": "store_price",
+            "parsedIdentity": null
+          },
+          {
+            "facts": {
+              "referenceScope": "global_alias",
+              "proposalType": "match_existing",
+              "proposedBottle": null
+            },
+            "rawText": "Balvenie Doublewood 12-year-old Single Malt Whisky",
+            "sourceKey": "store_price:12034194",
+            "sourceUrl": "https://www.missionliquor.com/products/balvenie-doublewood-12-years-750ml-1",
+            "sourceName": "Balvenie Doublewood 12-year-old Single Malt Whisky",
+            "sourceType": "store_price",
+            "parsedIdentity": null
+          },
+          {
+            "facts": {
+              "proposalType": "match_existing",
+              "releaseFacts": {},
+              "creationTarget": null,
+              "proposedBottle": null,
+              "proposedRelease": null
+            },
+            "rawText": "The Balvenie DoubleWood 12 Single Malt Scotch Whisky",
+            "sourceKey": "store_price:11143335",
+            "sourceUrl": "https://www.totalwine.com/spirits/scotch/single-malt/the-balvenie-doublewood-12-single-malt-scotch-whisky/p/5484750?s=1805&igrules=true",
+            "sourceName": "The Balvenie DoubleWood 12 Single Malt Scotch Whisky",
+            "sourceType": "store_price",
+            "parsedIdentity": {
+              "abv": null,
+              "brand": "The Balvenie",
+              "series": null,
+              "bottler": null,
+              "edition": null,
+              "category": "single_malt",
+              "cask_fill": null,
+              "cask_size": null,
+              "cask_type": null,
+              "distillery": ["Balvenie"],
+              "expression": "DoubleWood",
+              "stated_age": 12,
+              "single_cask": null,
+              "release_year": null,
+              "vintage_year": null,
+              "cask_strength": null
+            }
+          }
+        ],
+        "imageSources": []
+      },
+      {
+        "exact": {
+          "abv": 43,
+          "edition": null,
+          "outturn": null,
+          "statedAge": null,
+          "caskNumber": null,
+          "maturation": "Bourbon barrels, finished in European oak sherry casks",
+          "releaseDay": null,
+          "singleCask": null,
+          "releaseYear": 1993,
+          "vintageYear": null,
+          "bottlingYear": null,
+          "caskStrength": null,
+          "releaseMonth": null
+        },
+        "shared": {
+          "name": "12-year-old DoubleWood",
+          "brand": {
+            "name": "The Balvenie",
+            "entityId": 8463
+          },
+          "series": {
+            "name": "Cask Finishes",
+            "seriesId": 22
+          },
+          "bottler": null,
+          "category": "single_malt",
+          "statedAge": 12,
+          "distillers": [
+            {
+              "name": "The Balvenie",
+              "entityId": 8463
+            }
+          ]
+        },
+        "groupId": 37120,
+        "bottleId": 64159,
+        "fullName": "The Balvenie 12-year-old DoubleWood",
+        "siblings": [],
+        "references": [
+          {
+            "name": "Balvenie 12-year-old DoubleWood, 43%",
+            "ignored": false
+          },
+          {
+            "name": "Balvenie DoubleWood 12-year-old, 43%",
+            "ignored": false
+          }
+        ],
+        "observations": [],
+        "imageSources": []
+      },
+      {
+        "exact": {
+          "abv": 40,
+          "edition": "Victo Ngai Limited Edition",
+          "outturn": null,
+          "statedAge": 12,
+          "caskNumber": null,
+          "maturation": null,
+          "releaseDay": null,
+          "singleCask": null,
+          "releaseYear": null,
+          "vintageYear": null,
+          "bottlingYear": null,
+          "caskStrength": null,
+          "releaseMonth": null
+        },
+        "shared": {
+          "name": "DoubleWood",
+          "brand": {
+            "name": "The Balvenie",
+            "entityId": 8463
+          },
+          "series": null,
+          "bottler": null,
+          "category": "single_malt",
+          "statedAge": null,
+          "distillers": [
+            {
+              "name": "The Balvenie",
+              "entityId": 8463
+            }
+          ]
+        },
+        "groupId": 19983,
+        "bottleId": 47023,
+        "fullName": "The Balvenie DoubleWood - Victo Ngai Limited Edition - 12-year-old - 40.0% ABV",
+        "siblings": [],
+        "references": [
+          {
+            "name": "The Balvenie DoubleWood - Victo Ngai Limited Edition - 12-year-old - 40.0% ABV",
+            "ignored": false
+          }
+        ],
+        "observations": [
+          {
+            "facts": {
+              "proposalType": "no_match",
+              "proposedBottle": null,
+              "referenceScope": "none"
+            },
+            "rawText": "Balvenie 12-year-old - DoubleWood - Victo Ngai Limited Edition",
+            "sourceKey": "store_price:12036819",
+            "sourceUrl": "https://www.thewhiskyworld.com/balvenie-12-year-old-doublewood-victo-ngai-limited-edition-p18077",
+            "sourceName": "Balvenie 12-year-old - DoubleWood - Victo Ngai Limited Edition",
+            "sourceType": "store_price",
+            "parsedIdentity": null
+          },
+          {
+            "facts": {
+              "proposalType": "create_new",
+              "proposedBottle": {
+                "abv": 40,
+                "name": "DoubleWood",
+                "brand": {
+                  "id": 8463,
+                  "name": "The Balvenie"
+                },
+                "series": null,
+                "bottler": null,
+                "edition": "Victo Ngai Limited Edition",
+                "caskFill": null,
+                "caskSize": null,
+                "caskType": null,
+                "category": "single_malt",
+                "statedAge": 12,
+                "distillers": [
+                  {
+                    "id": 8463,
+                    "name": "The Balvenie"
+                  }
+                ],
+                "singleCask": null,
+                "releaseYear": null,
+                "vintageYear": null,
+                "caskStrength": null
+              }
+            },
+            "rawText": "Balvenie DoubleWood 12-year-old Victo Ngai Limited Edition",
+            "sourceKey": "store_price:12030571",
+            "sourceUrl": "https://www.masterofmalt.com/whiskies/balvenie/balvenie-doublewood-12-year-old-victo-ngai-limited-edition-whisky/?sku=146198",
+            "sourceName": "Balvenie DoubleWood 12-year-old Victo Ngai Limited Edition",
+            "sourceType": "store_price",
+            "parsedIdentity": {
+              "abv": 40,
+              "brand": "The Balvenie",
+              "series": null,
+              "bottler": null,
+              "edition": null,
+              "category": "single_malt",
+              "cask_fill": null,
+              "cask_size": null,
+              "cask_type": "oak",
+              "distillery": ["The Balvenie Distillery"],
+              "expression": "DoubleWood",
+              "stated_age": 12,
+              "single_cask": null,
+              "release_year": null,
+              "vintage_year": null,
+              "cask_strength": null
+            }
+          }
+        ],
+        "imageSources": []
+      }
+    ],
     "inspectedEntities": [
       {
         "kind": "distillery",
@@ -853,7 +1224,7 @@
       "createsBottle": false,
       "summary": "Production returned ignored."
     },
-    "notes": "Captured from saved classifier run 34277 (auction_lot 13900, model null, 2026-11-03T07:00:20.854Z). Production rationale: none Checked 2026-11-03. Lot page: Balvenie 12 Year Old DoubleWood, 40% ABV / 20cl. Owner rule (2026-11-03): more than 100 ml is a real Bottle; only 100 ml or less is a miniature. The identity model says volume does not make a different Bottle. 11834 \"The Balvenie DoubleWood\" stores age 12 and no ABV, so nothing conflicts with the 40% lot. 64159 \"The Balvenie 12-year-old DoubleWood\" stores 43% (the US strength), which conflicts. 11834 is not in the observed candidates; the agent can find it with its search tools. Production ignored the lot."
+    "notes": "Captured from saved classifier run 34277 (auction_lot 13900, model null, 2026-11-03T07:00:20.854Z). Production rationale: none Checked 2026-11-03. Lot page: Balvenie 12 Year Old DoubleWood, 40% ABV / 20cl. Owner rule (2026-11-03): more than 100 ml is a real Bottle; only 100 ml or less is a miniature. The identity model says volume does not make a different Bottle. 11834 \"The Balvenie DoubleWood\" stores age 12 and no ABV, so nothing conflicts with the 40% lot. 64159 \"The Balvenie 12-year-old DoubleWood\" stores 43% (the US strength), which conflicts. 11834 is not in the observed candidates. The saved search reply and Bottle contexts for 11834, 64159, and 47023 come from saved run 34280 (auction_lot 13901, a Balvenie DoubleWood lot in the same auction), because production ignored this lot before any search. Production ignored the lot."
   },
   "expected": {
     "status": "classified",
@@ -862,7 +1233,110 @@
     "matchedBottleId": 11834,
     "summary": "A 20cl bottle is above the 100 ml miniature line, so it is in scope. Match The Balvenie DoubleWood 12-year-old (11834); size does not make a different Bottle."
   },
-  "knownFailure": {
-    "reason": "The agent's instructions give no miniature size, so it ignores a 20cl bottle. More than 100 ml is in scope."
-  }
+  "searchResponses": [
+    {
+      "when": ["doublewood"],
+      "results": [
+        {
+          "abv": null,
+          "brand": "The Balvenie",
+          "score": 95.25454,
+          "series": "Cask Finishes",
+          "source": ["vector", "text", "context", "brand_coverage"],
+          "bottler": null,
+          "edition": null,
+          "outturn": null,
+          "bottleId": 11834,
+          "category": "single_malt",
+          "fullName": "The Balvenie DoubleWood",
+          "reference": "Balvenie Doublewood 12-year-old Single Malt Whisky",
+          "statedAge": 12,
+          "caskNumber": null,
+          "comparison": {
+            "missing": ["abv"],
+            "conflicts": [],
+            "agreements": []
+          },
+          "distillery": ["The Balvenie"],
+          "maturation": "American oak ex-bourbon casks, finished in Spanish oak ex-Oloroso sherry casks",
+          "releaseDay": null,
+          "singleCask": null,
+          "releaseYear": 1993,
+          "vintageYear": null,
+          "bottlingYear": null,
+          "caskStrength": null,
+          "releaseMonth": null,
+          "familyContext": {
+            "siblingBottles": []
+          }
+        },
+        {
+          "abv": 43,
+          "brand": "The Balvenie",
+          "score": 91.11911,
+          "series": "Cask Finishes",
+          "source": ["vector", "text", "brand_coverage", "context"],
+          "bottler": null,
+          "edition": null,
+          "outturn": null,
+          "bottleId": 64159,
+          "category": "single_malt",
+          "fullName": "The Balvenie 12-year-old DoubleWood",
+          "reference": "Balvenie 12-year-old DoubleWood, 43%",
+          "statedAge": 12,
+          "caskNumber": null,
+          "comparison": {
+            "missing": ["edition"],
+            "conflicts": [],
+            "agreements": ["category", "statedAge", "brand", "distillers"]
+          },
+          "distillery": ["The Balvenie"],
+          "maturation": "Bourbon barrels, finished in European oak sherry casks",
+          "releaseDay": null,
+          "singleCask": null,
+          "releaseYear": 1993,
+          "vintageYear": null,
+          "bottlingYear": null,
+          "caskStrength": null,
+          "releaseMonth": null,
+          "familyContext": {
+            "siblingBottles": []
+          }
+        },
+        {
+          "abv": 40,
+          "brand": "The Balvenie",
+          "score": 82.90584,
+          "series": null,
+          "source": ["vector", "text", "context", "brand_coverage"],
+          "bottler": null,
+          "edition": "Victo Ngai Limited Edition",
+          "outturn": null,
+          "bottleId": 47023,
+          "category": "single_malt",
+          "fullName": "The Balvenie DoubleWood - Victo Ngai Limited Edition - 12-year-old - 40.0% ABV",
+          "reference": "The Balvenie DoubleWood - Victo Ngai Limited Edition - 12-year-old - 40.0% ABV",
+          "statedAge": 12,
+          "caskNumber": null,
+          "comparison": {
+            "missing": [],
+            "conflicts": [],
+            "agreements": ["abv"]
+          },
+          "distillery": ["The Balvenie"],
+          "maturation": null,
+          "releaseDay": null,
+          "singleCask": null,
+          "releaseYear": null,
+          "vintageYear": null,
+          "bottlingYear": null,
+          "caskStrength": null,
+          "releaseMonth": null,
+          "familyContext": {
+            "siblingBottles": []
+          }
+        }
+      ]
+    }
+  ]
 }

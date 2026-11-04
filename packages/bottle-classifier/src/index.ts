@@ -110,7 +110,10 @@ export type {
   UpdateEntityOperation,
 } from "./contract";
 export { BottleClassificationError } from "./error";
-export { createWhiskyLabelExtractor } from "./extractor";
+export {
+  createWhiskyLabelExtractor,
+  getImageLabelExtractionVersion,
+} from "./extractor";
 export {
   ImageBottleEvidenceConflictSchema,
   ImageBottleEvidenceSchema,

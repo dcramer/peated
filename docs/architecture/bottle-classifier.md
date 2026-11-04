@@ -48,7 +48,8 @@ still a marketed release. A Bottle in its own box or tin is still one Bottle.
 A miniature holds 100 ml or less; an 18cl, 20cl, or 35cl bottle is a Bottle. A
 release that the producer packs with accessories, such as a flask, funnel,
 tray, or glasses, is a set and out of scope, even when it is the only form of
-that release. A Bottle sold with a book, print, or coaster stays in scope.
+that release. A Bottle sold with a book, print, or coaster stays in scope. A
+print, book, or other item sold without the whisky is merchandise.
 Scope is about what is sold, not how clearly the source names it: a
 whisky Bottle with unclear identity is `no_match`, not ignored. An ignored
 result has a reason and no decision, and every caller stops tracking that source
@@ -165,7 +166,10 @@ once per extractor version and saved (`image_label_extraction`). Each upload
 gets a new file name, so an image URL always shows the same image and later
 inspections reuse the saved reading. A change to the
 image model, reasoning effort, prompt, response schema, or model library is a
-new version and reads the label again. A failed read is not saved.
+new version and reads the label again. A failed read is not saved. Auction
+matching saves its lot-photo readings the same way; it sends them as the
+request's `imageEvidence`, not as the reference image, so they never replace
+the listing's own facts (see [auctions](../features/auctions.md#bottle-matching)).
 
 During an audit:
 

@@ -1510,6 +1510,6 @@
     "summary": "One 70cl bottle of Platinum Cask's Olympians Series 'Hades', a 28-year-old Speyside whisky at 52.9%, bottle 73 of 126, sold with a print. A bottle sold with a print is still one whisky Bottle, so do not ignore it. No local Bottle covers it, so create it with the marketed cask name Hades, the printed age, and the ABV."
   },
   "knownFailure": {
-    "reason": "The agent treats 'With Print' as a bundle. A bottle sold with a print stays in scope."
+    "reason": "In scope now, but identityScope comes back product: only the lot page says Hades is one of 12 single casks, and auction page reads return the age gate."
   }
 }

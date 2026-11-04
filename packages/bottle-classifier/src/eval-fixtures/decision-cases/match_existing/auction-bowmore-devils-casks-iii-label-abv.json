@@ -6,7 +6,7 @@
       "id": 14230,
       "url": "https://www.scotchwhiskyauctions.com/auctions/234-the-185th-auction/906117-bowmore-devils-cask-10-year-old-batch-3/",
       "name": "Bowmore Devil’s Cask 10 Year Old Batch #3",
-      "imageUrl": "https://d3suvtcq00dftb.cloudfront.net/images/afc468e6047e17346ceb9e3f2121b1fc-zoom.jpg",
+      "imageUrl": null,
       "externalSiteId": 28097,
       "currentBottleId": null
     },
@@ -28,7 +28,65 @@
       "vintage_year": null,
       "cask_strength": null
     },
-    "imageEvidence": null,
+    "imageEvidence": {
+      "sourceImageId": "auction_lot:14230",
+      "extractors": [
+        {
+          "kind": "vision",
+          "model": "openai/gpt-6-luna",
+          "confidence": 0.75,
+          "textSpans": [
+            {
+              "text": "ESTD 1779\nBOWMORE\nISLAY\nSINGLE MALT\nSCOTCH WHISKY\nDEVILISH DESIRE SWELLS FROM THE MARRIAGE OF OLOROSO SHERRY & PEDRO XIMENEZ SHERRY CASKS, BEARING DARK, EXOTIC FRUITS WITH ANGELICA & ALLURING TREACLE TOFFEE.\nTHE DEVIL'S CASKS®\nLIMITED RELEASE III\nTHE FIRST ISLAY MALT\nDOUBLE THE DEVIL\nA MARRIAGE OF FIRST FILL OLOROSO & PEDRO XIMENEZ SHERRY CASKS\nNON CHILL-FILTERED\nDISTILLED AND BOTTLED IN SCOTLAND\nBOWMORE DISTILLERY\nBOWMORE ISLAY PA43 7JS\n700 ml e\nalc. 56.7% vol.",
+              "confidence": 0.75
+            }
+          ],
+          "observations": [
+            "Read whisky label identity from the auction lot photo."
+          ]
+        }
+      ],
+      "fieldCandidates": {
+        "brand": {
+          "value": "Bowmore",
+          "confidence": 0.75,
+          "sourceExtractorIndexes": [0]
+        },
+        "expression": {
+          "value": "The Devil's Casks III: Double the Devil",
+          "confidence": 0.75,
+          "sourceExtractorIndexes": [0]
+        },
+        "distillery": {
+          "value": ["Bowmore"],
+          "confidence": 0.75,
+          "sourceExtractorIndexes": [0]
+        },
+        "category": {
+          "value": "single_malt",
+          "confidence": 0.75,
+          "sourceExtractorIndexes": [0]
+        },
+        "abv": {
+          "value": 56.7,
+          "confidence": 0.75,
+          "sourceExtractorIndexes": [0]
+        },
+        "maturation": {
+          "value": "First fill Oloroso and Pedro Ximenez sherry casks",
+          "confidence": 0.75,
+          "sourceExtractorIndexes": [0]
+        }
+      },
+      "photoSuitability": {
+        "isSingleBottlePhoto": true,
+        "labelReadable": true,
+        "suitableAsTastingImage": false,
+        "suitableAsBottleImage": false,
+        "reason": null
+      },
+      "conflicts": []
+    },
     "initialCandidates": [
       {
         "abv": null,
@@ -930,7 +988,7 @@
       "createsBottle": false,
       "summary": "Production returned no_match: it named 16129 as the strongest candidate but held it because the lot's structured ABV (57.6%) conflicted with a 56.7% reference."
     },
-    "notes": "Saved check 34500, source auction_lot 14230 (lot 185-906117), run 2026-11-03. Production ran without the lot photo: input.reference.imageUrl was null. This case sets it to the lot's first photo at full size and adds that photo's reviewed label reading; it goes in with the change that makes auctions read the lot photo. The stored sourceImageUrl is the 224px `-med` copy, too small to read the ABV. The photo clearly shows the bottle and carton: Bowmore Islay Single Malt Scotch Whisky, The Devil's Casks, Limited Release III, Double the Devil, a marriage of first fill Oloroso & Pedro Ximenez sherry casks, non chill-filtered, 700 ml, alc. 56.7% vol. The front prints no age; the title's '10 Year Old' is the auction's wording. 16833 (The Devil's Casks 10-year-old, the first release) and 16547 (Batch 2) are the other releases. 16129 has no stored ABV, so nothing conflicts with the label."
+    "notes": "Saved check 34500, source auction_lot 14230 (lot 185-906117), run 2026-11-03. Production ran without the lot photo: input.reference.imageUrl was null. This case sets it to the lot's first photo at full size and adds that photo's reviewed label reading; it goes in with the change that makes auctions read the lot photo. The stored sourceImageUrl is the 224px `-med` copy, too small to read the ABV. The photo clearly shows the bottle and carton: Bowmore Islay Single Malt Scotch Whisky, The Devil's Casks, Limited Release III, Double the Devil, a marriage of first fill Oloroso & Pedro Ximenez sherry casks, non chill-filtered, 700 ml, alc. 56.7% vol. The front prints no age; the title's '10 Year Old' is the auction's wording. 16833 (The Devil's Casks 10-year-old, the first release) and 16547 (Batch 2) are the other releases. 16129 has no stored ABV, so nothing conflicts with the label. Production ran without the photo. input.imageEvidence is openai/gpt-6-luna's live reading on 2026-11-04 of the lot photo's 1500px copy (https://d3suvtcq00dftb.cloudfront.net/images/afc468e6047e17346ceb9e3f2121b1fc-zoom.jpg), in the shape auction matching sends since lot photos are read."
   },
   "expected": {
     "status": "classified",
@@ -938,8 +996,5 @@
     "identityScope": "product",
     "matchedBottleId": 16129,
     "summary": "Match Bowmore The Devil's Casks III (16129). The label photo prints The Devil's Casks Limited Release III at 56.7%; the lot text's 57.6% is a transposed-digit typo, not a separate release."
-  },
-  "knownFailure": {
-    "reason": "With the label photo, the agent still lets the lot text's 57.6% typo block the match the label's 56.7% settles."
   }
 }

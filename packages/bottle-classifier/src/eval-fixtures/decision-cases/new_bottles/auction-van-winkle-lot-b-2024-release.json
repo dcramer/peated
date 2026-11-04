@@ -1,0 +1,1304 @@
+{
+  "id": "auction-van-winkle-lot-b-2024-release",
+  "name": "auction lot: Van Winkle Special Reserve Lot B '2024 Release' is that year's release, not the general Lot B or the 2025 release",
+  "input": {
+    "reference": {
+      "id": 13241,
+      "url": "https://www.scotchwhiskyauctions.com/auctions/233-the-184th-auction/902894-van-winkle-special-reserve-lot-b-12-year-old-bourbon-2024-release-75cl/",
+      "name": "Van Winkle Special Reserve Lot ‘B’ 12 Year Old Bourbon 2024 Release 75cl",
+      "imageUrl": null,
+      "externalSiteId": 28097,
+      "currentBottleId": null
+    },
+    "extractedIdentity": {
+      "abv": 45.2,
+      "brand": null,
+      "series": null,
+      "bottler": null,
+      "edition": null,
+      "outturn": null,
+      "category": null,
+      "distillery": null,
+      "expression": null,
+      "maturation": null,
+      "stated_age": null,
+      "cask_number": null,
+      "single_cask": null,
+      "release_year": null,
+      "vintage_year": null,
+      "cask_strength": null
+    },
+    "imageEvidence": null,
+    "initialCandidates": [
+      {
+        "abv": 45.2,
+        "brand": "Van Winkle",
+        "score": 168.55814,
+        "series": null,
+        "source": ["text", "context", "brand", "brand_coverage"],
+        "bottler": null,
+        "edition": "Lot B",
+        "outturn": null,
+        "bottleId": 44138,
+        "category": "bourbon",
+        "fullName": "Van Winkle Special Reserve - Lot B",
+        "reference": null,
+        "statedAge": 12,
+        "caskNumber": null,
+        "comparison": {
+          "missing": [],
+          "conflicts": [],
+          "agreements": ["abv"]
+        },
+        "distillery": ["Buffalo Trace Distillery"],
+        "maturation": null,
+        "releaseDay": null,
+        "singleCask": null,
+        "releaseYear": null,
+        "vintageYear": null,
+        "bottlingYear": null,
+        "caskStrength": null,
+        "releaseMonth": null,
+        "familyContext": {
+          "siblingBottles": []
+        }
+      },
+      {
+        "abv": 45.2,
+        "brand": "Van Winkle",
+        "score": 155.00853,
+        "series": null,
+        "source": ["text", "context", "brand", "brand_coverage"],
+        "bottler": null,
+        "edition": "Lot B",
+        "outturn": null,
+        "bottleId": 69322,
+        "category": "bourbon",
+        "fullName": "Van Winkle Special Reserve 12-year-old - Lot B",
+        "reference": null,
+        "statedAge": 12,
+        "caskNumber": null,
+        "comparison": {
+          "missing": [],
+          "conflicts": [],
+          "agreements": ["abv"]
+        },
+        "distillery": ["Buffalo Trace Distillery"],
+        "maturation": null,
+        "releaseDay": null,
+        "singleCask": null,
+        "releaseYear": 2025,
+        "vintageYear": null,
+        "bottlingYear": null,
+        "caskStrength": null,
+        "releaseMonth": null,
+        "familyContext": {
+          "siblingBottles": []
+        }
+      },
+      {
+        "abv": 45.2,
+        "brand": "Van Winkle",
+        "score": 123.9375,
+        "series": null,
+        "source": ["text", "brand", "brand_coverage"],
+        "bottler": null,
+        "edition": "Lot A",
+        "outturn": null,
+        "bottleId": 52767,
+        "category": "bourbon",
+        "fullName": "Van Winkle Special Reserve - Lot A",
+        "reference": null,
+        "statedAge": 12,
+        "caskNumber": null,
+        "comparison": {
+          "missing": [],
+          "conflicts": [],
+          "agreements": ["abv"]
+        },
+        "distillery": [],
+        "maturation": null,
+        "releaseDay": null,
+        "singleCask": null,
+        "releaseYear": null,
+        "vintageYear": 1979,
+        "bottlingYear": null,
+        "caskStrength": null,
+        "releaseMonth": null,
+        "familyContext": {
+          "siblingBottles": []
+        }
+      },
+      {
+        "abv": 45.2,
+        "brand": "Pappy Van Winkle's",
+        "score": 95.67638,
+        "series": null,
+        "source": ["vector", "text"],
+        "bottler": null,
+        "edition": null,
+        "outturn": null,
+        "bottleId": 11867,
+        "category": "bourbon",
+        "fullName": "Pappy Van Winkle's Family Reserve",
+        "reference": "Pappy Van Winkle's 20-year-old Family Reserve",
+        "statedAge": 20,
+        "caskNumber": null,
+        "comparison": {
+          "missing": [],
+          "conflicts": [],
+          "agreements": ["abv"]
+        },
+        "distillery": ["Buffalo Trace Distillery"],
+        "maturation": null,
+        "releaseDay": null,
+        "singleCask": null,
+        "releaseYear": null,
+        "vintageYear": null,
+        "bottlingYear": null,
+        "caskStrength": null,
+        "releaseMonth": null,
+        "familyContext": {
+          "siblingBottles": []
+        }
+      },
+      {
+        "abv": 45.2,
+        "brand": "Van Winkle",
+        "score": 82.734085,
+        "series": null,
+        "source": ["text"],
+        "bottler": null,
+        "edition": null,
+        "outturn": null,
+        "bottleId": 52763,
+        "category": "bourbon",
+        "fullName": "Van Winkle Family Reserve",
+        "reference": null,
+        "statedAge": 14,
+        "caskNumber": null,
+        "comparison": {
+          "missing": [],
+          "conflicts": [],
+          "agreements": ["abv"]
+        },
+        "distillery": ["Stitzel-Weller Distillery"],
+        "maturation": null,
+        "releaseDay": null,
+        "singleCask": null,
+        "releaseYear": null,
+        "vintageYear": 1970,
+        "bottlingYear": null,
+        "caskStrength": null,
+        "releaseMonth": null,
+        "familyContext": {
+          "siblingBottles": []
+        }
+      },
+      {
+        "abv": 45.7,
+        "brand": "Van Winkle",
+        "score": 82.55368,
+        "series": null,
+        "source": ["text", "brand", "brand_coverage"],
+        "bottler": null,
+        "edition": "Corti Brothers",
+        "outturn": null,
+        "bottleId": 52768,
+        "category": "bourbon",
+        "fullName": "Van Winkle Special Reserve - Corti Brothers",
+        "reference": null,
+        "statedAge": 19,
+        "caskNumber": null,
+        "comparison": {
+          "missing": ["releaseYear"],
+          "conflicts": ["statedAge", "abv", "distillers"],
+          "agreements": ["category", "brand"]
+        },
+        "distillery": ["Stitzel-Weller Distillery"],
+        "maturation": null,
+        "releaseDay": null,
+        "singleCask": null,
+        "releaseYear": null,
+        "vintageYear": 1975,
+        "bottlingYear": null,
+        "caskStrength": null,
+        "releaseMonth": null,
+        "familyContext": {
+          "siblingBottles": []
+        }
+      },
+      {
+        "abv": null,
+        "brand": "Buffalo Trace Distillery",
+        "score": 67.91573,
+        "series": null,
+        "source": ["text"],
+        "bottler": null,
+        "edition": null,
+        "outturn": null,
+        "bottleId": 18310,
+        "category": "bourbon",
+        "fullName": "Buffalo Trace Experimental Collection Twice Barreled, 12-year-old",
+        "reference": null,
+        "statedAge": 12,
+        "caskNumber": null,
+        "comparison": {
+          "missing": ["abv", "releaseYear", "edition"],
+          "conflicts": ["brand"],
+          "agreements": ["category", "statedAge", "distillers"]
+        },
+        "distillery": ["Buffalo Trace Distillery"],
+        "maturation": null,
+        "releaseDay": null,
+        "singleCask": null,
+        "releaseYear": null,
+        "vintageYear": null,
+        "bottlingYear": null,
+        "caskStrength": null,
+        "releaseMonth": null,
+        "familyContext": {
+          "siblingBottles": []
+        }
+      },
+      {
+        "abv": null,
+        "brand": "Buffalo Trace Distillery",
+        "score": 67.41942,
+        "series": null,
+        "source": ["text"],
+        "bottler": null,
+        "edition": null,
+        "outturn": null,
+        "bottleId": 16607,
+        "category": "bourbon",
+        "fullName": "Buffalo Trace Experimental Collection 12-year-old bourbon from floor #9",
+        "reference": null,
+        "statedAge": 12,
+        "caskNumber": null,
+        "comparison": {
+          "missing": ["abv", "releaseYear", "edition"],
+          "conflicts": ["brand"],
+          "agreements": ["category", "statedAge", "distillers"]
+        },
+        "distillery": ["Buffalo Trace Distillery"],
+        "maturation": null,
+        "releaseDay": null,
+        "singleCask": null,
+        "releaseYear": null,
+        "vintageYear": null,
+        "bottlingYear": null,
+        "caskStrength": null,
+        "releaseMonth": null,
+        "familyContext": {
+          "siblingBottles": []
+        }
+      },
+      {
+        "abv": null,
+        "brand": "Buffalo Trace Distillery",
+        "score": 64.53551,
+        "series": null,
+        "source": ["text"],
+        "bottler": null,
+        "edition": null,
+        "outturn": null,
+        "bottleId": 16608,
+        "category": "bourbon",
+        "fullName": "Buffalo Trace Experimental Collection 12-year-old bourbon from floor #1",
+        "reference": null,
+        "statedAge": 12,
+        "caskNumber": null,
+        "comparison": {
+          "missing": ["abv", "releaseYear", "edition"],
+          "conflicts": ["brand"],
+          "agreements": ["category", "statedAge", "distillers"]
+        },
+        "distillery": ["Buffalo Trace Distillery"],
+        "maturation": null,
+        "releaseDay": null,
+        "singleCask": null,
+        "releaseYear": null,
+        "vintageYear": null,
+        "bottlingYear": null,
+        "caskStrength": null,
+        "releaseMonth": null,
+        "familyContext": {
+          "siblingBottles": []
+        }
+      },
+      {
+        "abv": null,
+        "brand": "Buffalo Trace Distillery",
+        "score": 64.53551,
+        "series": null,
+        "source": ["text"],
+        "bottler": null,
+        "edition": null,
+        "outturn": null,
+        "bottleId": 16609,
+        "category": "bourbon",
+        "fullName": "Buffalo Trace Experimental Collection 12-year-old bourbon from floor #5",
+        "reference": null,
+        "statedAge": 12,
+        "caskNumber": null,
+        "comparison": {
+          "missing": ["abv", "releaseYear", "edition"],
+          "conflicts": ["brand"],
+          "agreements": ["category", "statedAge", "distillers"]
+        },
+        "distillery": ["Buffalo Trace Distillery"],
+        "maturation": null,
+        "releaseDay": null,
+        "singleCask": null,
+        "releaseYear": null,
+        "vintageYear": null,
+        "bottlingYear": null,
+        "caskStrength": null,
+        "releaseMonth": null,
+        "familyContext": {
+          "siblingBottles": []
+        }
+      },
+      {
+        "abv": 45.2,
+        "brand": "Pappy Van Winkle's",
+        "score": 63.70672,
+        "series": null,
+        "source": ["text"],
+        "bottler": null,
+        "edition": null,
+        "outturn": null,
+        "bottleId": 69623,
+        "category": "bourbon",
+        "fullName": "Pappy Van Winkle's Family Reserve 20-year-old",
+        "reference": null,
+        "statedAge": 20,
+        "caskNumber": null,
+        "comparison": {
+          "missing": [],
+          "conflicts": [],
+          "agreements": ["abv"]
+        },
+        "distillery": ["Buffalo Trace Distillery"],
+        "maturation": null,
+        "releaseDay": null,
+        "singleCask": null,
+        "releaseYear": 2024,
+        "vintageYear": null,
+        "bottlingYear": null,
+        "caskStrength": null,
+        "releaseMonth": null,
+        "familyContext": {
+          "siblingBottles": []
+        }
+      },
+      {
+        "abv": null,
+        "brand": "Buffalo Trace Distillery",
+        "score": 62.98876,
+        "series": null,
+        "source": ["text"],
+        "bottler": null,
+        "edition": null,
+        "outturn": null,
+        "bottleId": 16434,
+        "category": "bourbon",
+        "fullName": "Buffalo Trace Experimental Collection 12-year-old wheated bourbon from floor #1",
+        "reference": null,
+        "statedAge": 12,
+        "caskNumber": null,
+        "comparison": {
+          "missing": ["abv", "releaseYear", "edition"],
+          "conflicts": ["brand"],
+          "agreements": ["category", "statedAge", "distillers"]
+        },
+        "distillery": ["Buffalo Trace Distillery"],
+        "maturation": null,
+        "releaseDay": null,
+        "singleCask": null,
+        "releaseYear": null,
+        "vintageYear": null,
+        "bottlingYear": null,
+        "caskStrength": null,
+        "releaseMonth": null,
+        "familyContext": {
+          "siblingBottles": []
+        }
+      },
+      {
+        "abv": null,
+        "brand": "Buffalo Trace Distillery",
+        "score": 62.98876,
+        "series": null,
+        "source": ["text"],
+        "bottler": null,
+        "edition": null,
+        "outturn": null,
+        "bottleId": 16433,
+        "category": "bourbon",
+        "fullName": "Buffalo Trace Experimental Collection 12-year-old wheated bourbon from floor #5",
+        "reference": null,
+        "statedAge": 12,
+        "caskNumber": null,
+        "comparison": {
+          "missing": ["abv", "releaseYear", "edition"],
+          "conflicts": ["brand"],
+          "agreements": ["category", "statedAge", "distillers"]
+        },
+        "distillery": ["Buffalo Trace Distillery"],
+        "maturation": null,
+        "releaseDay": null,
+        "singleCask": null,
+        "releaseYear": null,
+        "vintageYear": null,
+        "bottlingYear": null,
+        "caskStrength": null,
+        "releaseMonth": null,
+        "familyContext": {
+          "siblingBottles": []
+        }
+      },
+      {
+        "abv": null,
+        "brand": "Buffalo Trace Distillery",
+        "score": 62.98876,
+        "series": null,
+        "source": ["text"],
+        "bottler": null,
+        "edition": null,
+        "outturn": null,
+        "bottleId": 16435,
+        "category": "bourbon",
+        "fullName": "Buffalo Trace Experimental Collection 12-year-old wheated bourbon from floor #9",
+        "reference": null,
+        "statedAge": 12,
+        "caskNumber": null,
+        "comparison": {
+          "missing": ["abv", "releaseYear", "edition"],
+          "conflicts": ["brand"],
+          "agreements": ["category", "statedAge", "distillers"]
+        },
+        "distillery": ["Buffalo Trace Distillery"],
+        "maturation": null,
+        "releaseDay": null,
+        "singleCask": null,
+        "releaseYear": null,
+        "vintageYear": null,
+        "bottlingYear": null,
+        "caskStrength": null,
+        "releaseMonth": null,
+        "familyContext": {
+          "siblingBottles": []
+        }
+      },
+      {
+        "abv": 62.9,
+        "brand": "W.L. Weller",
+        "score": 52.715843,
+        "series": "Buffalo Trace Antique Collection",
+        "source": ["vector", "text"],
+        "bottler": null,
+        "edition": "2024 Release",
+        "outturn": null,
+        "bottleId": 58250,
+        "category": "bourbon",
+        "fullName": "W.L. Weller William Larue Weller - 2024 Release",
+        "reference": "William Larue Weller (Buffalo Trace Antique Collection 2024), 62.9%",
+        "statedAge": null,
+        "caskNumber": null,
+        "comparison": {
+          "missing": ["statedAge"],
+          "conflicts": ["abv", "brand"],
+          "agreements": ["category", "releaseYear", "edition", "distillers"]
+        },
+        "distillery": ["Buffalo Trace Distillery"],
+        "maturation": "Aged over twelve years on the lower floor of a rick warehouse at Buffalo Trace Distillery",
+        "releaseDay": null,
+        "singleCask": null,
+        "releaseYear": 2024,
+        "vintageYear": null,
+        "bottlingYear": null,
+        "caskStrength": true,
+        "releaseMonth": null,
+        "familyContext": {
+          "siblingBottles": []
+        }
+      },
+      {
+        "abv": 45.2,
+        "brand": "Woodford Reserve",
+        "score": 47.56043,
+        "series": null,
+        "source": ["text"],
+        "bottler": null,
+        "edition": null,
+        "outturn": null,
+        "bottleId": 46919,
+        "category": null,
+        "fullName": "Woodford Reserve Wheat Whiskey - 45.2% ABV",
+        "reference": null,
+        "statedAge": null,
+        "caskNumber": null,
+        "comparison": {
+          "missing": [],
+          "conflicts": [],
+          "agreements": ["abv"]
+        },
+        "distillery": ["Woodford Reserve"],
+        "maturation": null,
+        "releaseDay": null,
+        "singleCask": null,
+        "releaseYear": null,
+        "vintageYear": null,
+        "bottlingYear": null,
+        "caskStrength": null,
+        "releaseMonth": null,
+        "familyContext": {
+          "siblingBottles": []
+        }
+      },
+      {
+        "abv": 45.2,
+        "brand": "Woodford Reserve",
+        "score": 45.71122,
+        "series": "Distillery Series",
+        "source": ["text"],
+        "bottler": null,
+        "edition": "2025 Release",
+        "outturn": null,
+        "bottleId": 56000,
+        "category": "single_malt",
+        "fullName": "Woodford Reserve American Single Malt Whiskey - 2025 Release",
+        "reference": null,
+        "statedAge": 12,
+        "caskNumber": null,
+        "comparison": {
+          "missing": [],
+          "conflicts": [],
+          "agreements": ["abv"]
+        },
+        "distillery": ["Woodford Reserve"],
+        "maturation": null,
+        "releaseDay": null,
+        "singleCask": null,
+        "releaseYear": 2025,
+        "vintageYear": null,
+        "bottlingYear": null,
+        "caskStrength": null,
+        "releaseMonth": null,
+        "familyContext": {
+          "siblingBottles": []
+        }
+      },
+      {
+        "abv": 45.2,
+        "brand": "Pappy Van Winkle's",
+        "score": 45.414192,
+        "series": null,
+        "source": ["text"],
+        "bottler": null,
+        "edition": "2016 Release",
+        "outturn": null,
+        "bottleId": 69163,
+        "category": "bourbon",
+        "fullName": "Pappy Van Winkle's Family Reserve 20-year-old - 2016 Release",
+        "reference": null,
+        "statedAge": 20,
+        "caskNumber": null,
+        "comparison": {
+          "missing": [],
+          "conflicts": [],
+          "agreements": ["abv"]
+        },
+        "distillery": [],
+        "maturation": null,
+        "releaseDay": null,
+        "singleCask": null,
+        "releaseYear": 2016,
+        "vintageYear": null,
+        "bottlingYear": null,
+        "caskStrength": null,
+        "releaseMonth": null,
+        "familyContext": {
+          "siblingBottles": []
+        }
+      },
+      {
+        "abv": 45.2,
+        "brand": "Pappy Van Winkle's",
+        "score": 44.670288,
+        "series": null,
+        "source": ["text"],
+        "bottler": null,
+        "edition": "2007 Release",
+        "outturn": null,
+        "bottleId": 62955,
+        "category": "bourbon",
+        "fullName": "Pappy Van Winkle's Family Reserve 20-year-old - 2007 Release",
+        "reference": null,
+        "statedAge": 20,
+        "caskNumber": null,
+        "comparison": {
+          "missing": [],
+          "conflicts": [],
+          "agreements": ["abv"]
+        },
+        "distillery": ["Stitzel-Weller Distillery"],
+        "maturation": null,
+        "releaseDay": null,
+        "singleCask": null,
+        "releaseYear": 2007,
+        "vintageYear": null,
+        "bottlingYear": null,
+        "caskStrength": null,
+        "releaseMonth": null,
+        "familyContext": {
+          "siblingBottles": []
+        }
+      },
+      {
+        "abv": 45.2,
+        "brand": "Pappy Van Winkle's",
+        "score": 44.670288,
+        "series": null,
+        "source": ["text"],
+        "bottler": null,
+        "edition": "2008 Release",
+        "outturn": null,
+        "bottleId": 62918,
+        "category": "bourbon",
+        "fullName": "Pappy Van Winkle's Family Reserve 20-year-old - 2008 Release",
+        "reference": null,
+        "statedAge": 20,
+        "caskNumber": null,
+        "comparison": {
+          "missing": [],
+          "conflicts": [],
+          "agreements": ["abv"]
+        },
+        "distillery": ["Stitzel-Weller Distillery"],
+        "maturation": null,
+        "releaseDay": null,
+        "singleCask": null,
+        "releaseYear": 2008,
+        "vintageYear": null,
+        "bottlingYear": null,
+        "caskStrength": null,
+        "releaseMonth": null,
+        "familyContext": {
+          "siblingBottles": []
+        }
+      },
+      {
+        "abv": 45.2,
+        "brand": "Pappy Van Winkle's",
+        "score": 44.670288,
+        "series": null,
+        "source": ["text"],
+        "bottler": null,
+        "edition": "2009 Release",
+        "outturn": null,
+        "bottleId": 62945,
+        "category": "bourbon",
+        "fullName": "Pappy Van Winkle's Family Reserve 20-year-old - 2009 Release",
+        "reference": null,
+        "statedAge": 20,
+        "caskNumber": null,
+        "comparison": {
+          "missing": [],
+          "conflicts": [],
+          "agreements": ["abv"]
+        },
+        "distillery": ["Stitzel-Weller Distillery"],
+        "maturation": null,
+        "releaseDay": null,
+        "singleCask": null,
+        "releaseYear": 2009,
+        "vintageYear": null,
+        "bottlingYear": null,
+        "caskStrength": null,
+        "releaseMonth": null,
+        "familyContext": {
+          "siblingBottles": []
+        }
+      },
+      {
+        "abv": 45.2,
+        "brand": "Pappy Van Winkle's",
+        "score": 44.670288,
+        "series": null,
+        "source": ["text"],
+        "bottler": null,
+        "edition": "2011 Release",
+        "outturn": null,
+        "bottleId": 62899,
+        "category": "bourbon",
+        "fullName": "Pappy Van Winkle's Family Reserve 20-year-old - 2011 Release",
+        "reference": null,
+        "statedAge": 20,
+        "caskNumber": null,
+        "comparison": {
+          "missing": [],
+          "conflicts": [],
+          "agreements": ["abv"]
+        },
+        "distillery": ["Stitzel-Weller Distillery"],
+        "maturation": null,
+        "releaseDay": null,
+        "singleCask": null,
+        "releaseYear": 2011,
+        "vintageYear": null,
+        "bottlingYear": null,
+        "caskStrength": null,
+        "releaseMonth": null,
+        "familyContext": {
+          "siblingBottles": []
+        }
+      },
+      {
+        "abv": 45.2,
+        "brand": "Pappy Van Winkle's",
+        "score": 44.670288,
+        "series": null,
+        "source": ["text"],
+        "bottler": null,
+        "edition": "2012 Release",
+        "outturn": null,
+        "bottleId": 62971,
+        "category": "bourbon",
+        "fullName": "Pappy Van Winkle's Family Reserve 20-year-old - 2012 Release",
+        "reference": null,
+        "statedAge": 20,
+        "caskNumber": null,
+        "comparison": {
+          "missing": [],
+          "conflicts": [],
+          "agreements": ["abv"]
+        },
+        "distillery": ["Stitzel-Weller Distillery"],
+        "maturation": null,
+        "releaseDay": null,
+        "singleCask": null,
+        "releaseYear": 2012,
+        "vintageYear": null,
+        "bottlingYear": null,
+        "caskStrength": null,
+        "releaseMonth": null,
+        "familyContext": {
+          "siblingBottles": []
+        }
+      },
+      {
+        "abv": 45.2,
+        "brand": "Pappy Van Winkle's",
+        "score": 44.670288,
+        "series": null,
+        "source": ["text"],
+        "bottler": null,
+        "edition": "2025 Release",
+        "outturn": null,
+        "bottleId": 69164,
+        "category": "bourbon",
+        "fullName": "Pappy Van Winkle's Family Reserve 20-year-old - 2025 Release",
+        "reference": null,
+        "statedAge": 20,
+        "caskNumber": null,
+        "comparison": {
+          "missing": [],
+          "conflicts": [],
+          "agreements": ["abv"]
+        },
+        "distillery": ["Buffalo Trace Distillery"],
+        "maturation": null,
+        "releaseDay": null,
+        "singleCask": null,
+        "releaseYear": 2025,
+        "vintageYear": null,
+        "bottlingYear": null,
+        "caskStrength": null,
+        "releaseMonth": null,
+        "familyContext": {
+          "siblingBottles": []
+        }
+      },
+      {
+        "abv": 60.6,
+        "brand": "Woodford Reserve",
+        "score": 0.6831503010880695,
+        "series": "Master's Collection",
+        "source": ["vector"],
+        "bottler": null,
+        "edition": "2024 Release",
+        "outturn": null,
+        "bottleId": 58198,
+        "category": "bourbon",
+        "fullName": "Woodford Reserve Batch Proof - 2024 Release",
+        "reference": "Woodford Reserve Master's Collection Batch Proof (2024 Release), 59.75%,",
+        "statedAge": null,
+        "caskNumber": null,
+        "comparison": {
+          "missing": ["statedAge"],
+          "conflicts": ["abv", "brand", "distillers"],
+          "agreements": ["category", "releaseYear", "edition"]
+        },
+        "distillery": ["Woodford Reserve"],
+        "maturation": null,
+        "releaseDay": null,
+        "singleCask": null,
+        "releaseYear": 2024,
+        "vintageYear": null,
+        "bottlingYear": null,
+        "caskStrength": null,
+        "releaseMonth": null,
+        "familyContext": {
+          "siblingBottles": []
+        }
+      }
+    ]
+  },
+  "context": {
+    "inspectedBottleIds": [44138, 69322],
+    "bottleContexts": [
+      {
+        "exact": {
+          "abv": 45.2,
+          "edition": "Lot B",
+          "outturn": null,
+          "statedAge": null,
+          "caskNumber": null,
+          "maturation": null,
+          "releaseDay": null,
+          "singleCask": null,
+          "releaseYear": null,
+          "vintageYear": null,
+          "bottlingYear": null,
+          "caskStrength": null,
+          "releaseMonth": null
+        },
+        "shared": {
+          "name": "Special Reserve",
+          "brand": {
+            "name": "Van Winkle",
+            "entityId": 1462
+          },
+          "series": null,
+          "bottler": null,
+          "category": "bourbon",
+          "statedAge": 12,
+          "distillers": [
+            {
+              "name": "Buffalo Trace Distillery",
+              "entityId": 483
+            }
+          ]
+        },
+        "groupId": 17960,
+        "bottleId": 44138,
+        "fullName": "Van Winkle Special Reserve - Lot B",
+        "siblings": [],
+        "references": [
+          {
+            "name": "Van Winkle Special Reserve 12-year-old Lot B",
+            "ignored": false
+          },
+          {
+            "name": "Van Winkle Special Reserve - Lot B",
+            "ignored": false
+          }
+        ],
+        "observations": [
+          {
+            "facts": {
+              "proposalType": "no_match",
+              "proposedBottle": null,
+              "referenceScope": "none"
+            },
+            "rawText": "Pappy Van Winkle 12-year-old Bourbon Whiskey",
+            "sourceKey": "store_price:12058710",
+            "sourceUrl": "https://kegnbottle.com/products/pappy-van-winkle-special-reserve-12-year-old-kentucky-straight-bourbon-whiskey",
+            "sourceName": "Pappy Van Winkle 12-year-old Bourbon Whiskey",
+            "sourceType": "store_price",
+            "parsedIdentity": {
+              "abv": 45.2,
+              "brand": "Van Winkle",
+              "series": null,
+              "bottler": null,
+              "edition": "Lot \"B\"",
+              "outturn": null,
+              "category": "bourbon",
+              "distillery": ["Old Rip Van Winkle Distillery"],
+              "expression": "Special Reserve",
+              "maturation": null,
+              "stated_age": 12,
+              "cask_number": null,
+              "release_day": null,
+              "single_cask": null,
+              "release_year": null,
+              "vintage_year": null,
+              "bottling_year": null,
+              "cask_strength": null,
+              "release_month": null
+            }
+          },
+          {
+            "facts": {
+              "proposalType": "create_new",
+              "proposedBottle": {
+                "abv": null,
+                "name": "12-year-old",
+                "brand": {
+                  "id": null,
+                  "name": "Old Rip Van Winkle"
+                },
+                "series": null,
+                "bottler": null,
+                "edition": null,
+                "outturn": null,
+                "category": null,
+                "statedAge": 12,
+                "caskNumber": null,
+                "distillers": [],
+                "maturation": null,
+                "releaseDay": null,
+                "singleCask": null,
+                "releaseYear": null,
+                "vintageYear": null,
+                "bottlingYear": null,
+                "caskStrength": null,
+                "releaseMonth": null
+              },
+              "referenceScope": "none"
+            },
+            "rawText": "Old Rip Van Winkle Aged 12-year-old",
+            "sourceKey": "store_price:12040259",
+            "sourceUrl": "https://www.reservebar.com/products/old-rip-van-winkle-aged-12-years/GROUPING-46276",
+            "sourceName": "Old Rip Van Winkle Aged 12-year-old",
+            "sourceType": "store_price",
+            "parsedIdentity": null
+          },
+          {
+            "facts": {
+              "proposalType": "create_new",
+              "proposedBottle": {
+                "abv": null,
+                "name": "Kentucky Straight Bourbon Whiskey",
+                "brand": {
+                  "id": null,
+                  "name": "Old Rip Van Winkle"
+                },
+                "series": null,
+                "bottler": null,
+                "edition": null,
+                "outturn": null,
+                "category": "bourbon",
+                "statedAge": 12,
+                "caskNumber": null,
+                "distillers": [],
+                "maturation": null,
+                "releaseDay": null,
+                "singleCask": null,
+                "releaseYear": null,
+                "vintageYear": null,
+                "bottlingYear": null,
+                "caskStrength": null,
+                "releaseMonth": null
+              },
+              "referenceScope": "none"
+            },
+            "rawText": "Old Rip Van Winkle 12-year-old Kentucky Straight Bourbon Whiskey",
+            "sourceKey": "store_price:11757693",
+            "sourceUrl": "https://www.reservebar.com/products/old-rip-van-winkle-aged-12-years/GROUPING-46276.html",
+            "sourceName": "Old Rip Van Winkle 12-year-old Kentucky Straight Bourbon Whiskey",
+            "sourceType": "store_price",
+            "parsedIdentity": null
+          },
+          {
+            "facts": {
+              "proposalType": "no_match",
+              "proposedBottle": null,
+              "referenceScope": "none"
+            },
+            "rawText": "Van Winkle Special Reserve 12-year-old",
+            "sourceKey": "store_price:12034530",
+            "sourceUrl": "https://www.missionliquor.com/products/van-winkle-special-reserve-12yr-750ml-1",
+            "sourceName": "Van Winkle Special Reserve 12-year-old",
+            "sourceType": "store_price",
+            "parsedIdentity": null
+          },
+          {
+            "facts": {
+              "proposalType": "create_new",
+              "releaseFacts": {
+                "abv": 45.2,
+                "edition": "Lot B",
+                "statedAge": 12
+              },
+              "creationTarget": "bottle",
+              "proposedBottle": {
+                "abv": 45.2,
+                "name": "Special Reserve",
+                "brand": {
+                  "id": null,
+                  "name": "Van Winkle"
+                },
+                "series": null,
+                "bottler": null,
+                "edition": "Lot B",
+                "caskFill": null,
+                "caskSize": null,
+                "caskType": null,
+                "category": "bourbon",
+                "statedAge": 12,
+                "distillers": [
+                  {
+                    "id": null,
+                    "name": "Buffalo Trace"
+                  }
+                ],
+                "singleCask": null,
+                "releaseYear": null,
+                "vintageYear": null,
+                "caskStrength": null
+              },
+              "proposedRelease": null
+            },
+            "rawText": "Van Winkle Special Reserve 12-year-old Lot B",
+            "sourceKey": "store_price:525",
+            "sourceUrl": "https://woodencork.com/collections/whiskey/products/van-winkle-special-reserve-12-years-old",
+            "sourceName": "Van Winkle Special Reserve 12-year-old Lot B",
+            "sourceType": "store_price",
+            "parsedIdentity": {
+              "abv": null,
+              "brand": "Van Winkle",
+              "series": null,
+              "bottler": null,
+              "edition": "Lot B",
+              "category": "bourbon",
+              "cask_fill": null,
+              "cask_size": null,
+              "cask_type": null,
+              "distillery": ["Buffalo Trace"],
+              "expression": "Special Reserve",
+              "stated_age": 12,
+              "single_cask": null,
+              "release_year": null,
+              "vintage_year": null,
+              "cask_strength": null
+            }
+          }
+        ],
+        "imageSources": []
+      },
+      {
+        "exact": {
+          "abv": 45.2,
+          "edition": "Lot B",
+          "outturn": null,
+          "statedAge": 12,
+          "caskNumber": null,
+          "maturation": null,
+          "releaseDay": null,
+          "singleCask": null,
+          "releaseYear": 2025,
+          "vintageYear": null,
+          "bottlingYear": null,
+          "caskStrength": null,
+          "releaseMonth": null
+        },
+        "shared": {
+          "name": "Special Reserve 12-year-old",
+          "brand": {
+            "name": "Van Winkle",
+            "entityId": 1462
+          },
+          "series": null,
+          "bottler": null,
+          "category": "bourbon",
+          "statedAge": null,
+          "distillers": [
+            {
+              "name": "Buffalo Trace Distillery",
+              "entityId": 483
+            }
+          ]
+        },
+        "groupId": 42283,
+        "bottleId": 69322,
+        "fullName": "Van Winkle Special Reserve 12-year-old - Lot B",
+        "siblings": [],
+        "references": [],
+        "observations": [],
+        "imageSources": []
+      }
+    ],
+    "inspectedEntities": [
+      {
+        "kind": "brand",
+        "name": "Van Winkle",
+        "score": 1,
+        "source": ["exact", "text", "prefix", "contained"],
+        "entityId": 1462,
+        "reference": "Van Winkle",
+        "shortName": null,
+        "retrievedFor": [
+          {
+            "exact": true,
+            "query": "Van Winkle"
+          },
+          {
+            "query": "Pappy Van Winkle's"
+          }
+        ]
+      },
+      {
+        "kind": "distillery",
+        "name": "Buffalo Trace Distillery",
+        "score": 1,
+        "source": ["exact", "text", "prefix", "contained"],
+        "entityId": 483,
+        "reference": "Buffalo Trace Distillery",
+        "shortName": "Buffalo Trace",
+        "retrievedFor": [
+          {
+            "exact": true,
+            "query": "Buffalo Trace Distillery"
+          }
+        ]
+      },
+      {
+        "kind": "brand",
+        "name": "Pappy Van Winkle's",
+        "score": 1,
+        "source": ["exact", "text", "prefix", "contained"],
+        "entityId": 1249,
+        "reference": "Pappy Van Winkle's",
+        "shortName": null,
+        "retrievedFor": [
+          {
+            "exact": true,
+            "query": "Pappy Van Winkle's"
+          }
+        ]
+      },
+      {
+        "kind": "distillery",
+        "name": "Stitzel-Weller Distillery",
+        "score": 1,
+        "source": ["exact", "text", "prefix", "contained"],
+        "entityId": 1926,
+        "reference": "Stitzel-Weller Distillery",
+        "shortName": null,
+        "retrievedFor": [
+          {
+            "exact": true,
+            "query": "Stitzel-Weller Distillery"
+          }
+        ]
+      },
+      {
+        "kind": "distillery",
+        "name": "Woodford Reserve",
+        "score": 1,
+        "source": ["exact", "text", "prefix", "contained"],
+        "entityId": 1512,
+        "reference": "Woodford Reserve",
+        "shortName": "",
+        "retrievedFor": [
+          {
+            "exact": true,
+            "query": "Woodford Reserve"
+          }
+        ]
+      },
+      {
+        "kind": "brand",
+        "name": "Weller",
+        "score": 0.3021739130434783,
+        "source": ["contained"],
+        "entityId": 1479,
+        "reference": "Weller",
+        "shortName": null,
+        "retrievedFor": [
+          {
+            "query": "Stitzel-Weller Distillery"
+          }
+        ]
+      },
+      {
+        "kind": "bottler",
+        "name": "Julian Van Winkle III",
+        "score": 0.2,
+        "source": ["text"],
+        "entityId": 365721,
+        "reference": null,
+        "shortName": null,
+        "retrievedFor": [
+          {
+            "query": "Van Winkle"
+          }
+        ]
+      },
+      {
+        "kind": "brand",
+        "name": "Old Rip Van Winkle",
+        "score": 0.2,
+        "source": ["text"],
+        "entityId": 1231,
+        "reference": null,
+        "shortName": null,
+        "retrievedFor": [
+          {
+            "query": "Van Winkle"
+          }
+        ]
+      },
+      {
+        "kind": "company",
+        "name": "Old Rip Van Winkle Distillery",
+        "score": 0.2,
+        "source": ["text"],
+        "entityId": 366146,
+        "reference": null,
+        "shortName": null,
+        "retrievedFor": [
+          {
+            "query": "Van Winkle"
+          }
+        ]
+      }
+    ],
+    "inspectedSeries": []
+  },
+  "provenance": {
+    "source": "production_miss",
+    "verifiedSourceUrls": [
+      "https://www.scotchwhiskyauctions.com/auctions/233-the-184th-auction/902894-van-winkle-special-reserve-lot-b-12-year-old-bourbon-2024-release-75cl/",
+      "https://www.buffalotracedistillery.com/our-brands/van-winkle/van-winkle-special-reserve-12-year/"
+    ],
+    "dbOutcome": {
+      "bottleId": null,
+      "createsBottle": false,
+      "summary": "Production returned no_match."
+    },
+    "notes": "Captured from saved classifier run 33865 (auction_lot 13241, model null, 2026-11-03T03:28:24.322Z). Production rationale: The source is one whisky bottle. Its title supports Van Winkle Special Reserve Lot B, 12-year-old bourbon, and 2024 release, but the year’s status as a distinct marketed release is unresolved. Candidate 69322 conflicts on year, while candidate 44138 lacks a year and cannot safely be confirmed as the exact release. No safe match or supported create action. Checked 2026-11-04. Buffalo Trace lists Van Winkle Special Reserve 12-year-old at 90.4 proof (45.2%). The 2024 year comes from the lot title; Peated already holds a 2025 release of the same Bottle. Bottle 69322 is the same expression with releaseYear 2025, and 44138 has no release year. Second case for the release-year rule, with values different from Springbank 15 2026."
+  },
+  "expected": {
+    "status": "classified",
+    "action": "create_bottle",
+    "identityScope": "product",
+    "matchedBottleId": null,
+    "proposedBottle": {
+      "brand": {
+        "id": 1462
+      },
+      "statedAge": 12,
+      "abv": 45.2,
+      "releaseYear": 2024,
+      "edition": "Lot B"
+    },
+    "proposedBottleNameIncludes": ["Special Reserve"],
+    "proposedBottleNameExcludes": ["2024", "Release"],
+    "summary": "Create the 2024 Van Winkle Special Reserve 12-year-old Lot B at 45.2% with releaseYear 2024 and no year in the name. Lot B 44138 has no release year, so it is too broad for a named 2024 release, and 69322 is the 2025 release."
+  }
+}

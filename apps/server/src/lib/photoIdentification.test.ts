@@ -12,10 +12,7 @@ import {
 describe("photo identification", () => {
   test("preserves raw label text as image evidence", () => {
     const imageEvidence = buildPhotoEvidenceFromExtractedIdentity({
-      photo: {
-        id: "pending-image",
-        imageUrl: "https://example.com/bottle.jpg",
-      },
+      photo: { id: "pending-image" },
       extractedIdentity: BottleExtractedDetailsSchema.parse({
         brand: "Example",
         expression: "Whisky",
@@ -35,10 +32,7 @@ describe("photo identification", () => {
 
   test("keeps cask facts read from the label", () => {
     const imageEvidence = buildPhotoEvidenceFromExtractedIdentity({
-      photo: {
-        id: "pending-image",
-        imageUrl: "https://example.com/bottle.jpg",
-      },
+      photo: { id: "pending-image" },
       extractedIdentity: BottleExtractedDetailsSchema.parse({
         brand: "Example",
         expression: "Single Cask",

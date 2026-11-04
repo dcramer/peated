@@ -1,0 +1,710 @@
+{
+  "id": "auction-macallan-concept-3-with-print",
+  "name": "auction lot: Macallan Concept Number 3 sold with a print matches the Bottle",
+  "input": {
+    "reference": {
+      "id": 3191,
+      "url": "https://www.scotchwhiskyauctions.com/auctions/232-the-183rd-auction/896088-macallan-concept-number-3-with-print/",
+      "name": "Macallan Concept Number 3 With Print",
+      "imageUrl": null,
+      "externalSiteId": 28097,
+      "currentBottleId": null
+    },
+    "extractedIdentity": {
+      "abv": null,
+      "brand": "The Macallan",
+      "series": null,
+      "bottler": null,
+      "edition": "Number 3",
+      "outturn": null,
+      "category": "single_malt",
+      "distillery": ["The Macallan"],
+      "expression": "Concept",
+      "maturation": null,
+      "stated_age": null,
+      "cask_number": null,
+      "release_day": null,
+      "single_cask": null,
+      "release_year": null,
+      "vintage_year": null,
+      "bottling_year": null,
+      "cask_strength": null,
+      "release_month": null
+    },
+    "imageEvidence": null,
+    "initialCandidates": [
+      {
+        "abv": 40.8,
+        "brand": "The Macallan",
+        "score": 105.2997,
+        "series": "Concept",
+        "source": ["vector", "text", "brand", "brand_coverage", "context"],
+        "bottler": null,
+        "edition": null,
+        "outturn": null,
+        "bottleId": 589,
+        "category": "single_malt",
+        "fullName": "The Macallan Concept Number 3",
+        "reference": "Macallan Concept No. 3",
+        "statedAge": null,
+        "caskNumber": null,
+        "comparison": {
+          "missing": ["edition"],
+          "conflicts": [],
+          "agreements": ["category", "brand", "distillers"]
+        },
+        "distillery": ["The Macallan"],
+        "maturation": null,
+        "releaseDay": null,
+        "singleCask": null,
+        "releaseYear": 2020,
+        "vintageYear": null,
+        "bottlingYear": null,
+        "caskStrength": null,
+        "releaseMonth": null,
+        "familyContext": {
+          "siblingBottles": []
+        }
+      },
+      {
+        "abv": 40,
+        "brand": "The Macallan",
+        "score": 85.35331,
+        "series": "Concept",
+        "source": ["text", "brand", "brand_coverage"],
+        "bottler": null,
+        "edition": null,
+        "outturn": null,
+        "bottleId": 722,
+        "category": "single_malt",
+        "fullName": "The Macallan Concept Number 1",
+        "reference": null,
+        "statedAge": null,
+        "caskNumber": null,
+        "comparison": {
+          "missing": ["edition"],
+          "conflicts": [],
+          "agreements": ["category", "brand", "distillers"]
+        },
+        "distillery": ["The Macallan"],
+        "maturation": null,
+        "releaseDay": null,
+        "singleCask": null,
+        "releaseYear": 2018,
+        "vintageYear": null,
+        "bottlingYear": null,
+        "caskStrength": null,
+        "releaseMonth": null,
+        "familyContext": {
+          "siblingBottles": []
+        }
+      },
+      {
+        "abv": 40,
+        "brand": "The Macallan",
+        "score": 83.01502,
+        "series": "Concept",
+        "source": ["vector", "text", "brand", "brand_coverage"],
+        "bottler": null,
+        "edition": null,
+        "outturn": null,
+        "bottleId": 661,
+        "category": "single_malt",
+        "fullName": "The Macallan Concept Number 2",
+        "reference": "The Macallan Concept No.2 2019",
+        "statedAge": null,
+        "caskNumber": null,
+        "comparison": {
+          "missing": ["edition"],
+          "conflicts": [],
+          "agreements": ["category", "brand", "distillers"]
+        },
+        "distillery": ["The Macallan"],
+        "maturation": null,
+        "releaseDay": null,
+        "singleCask": null,
+        "releaseYear": 2019,
+        "vintageYear": null,
+        "bottlingYear": null,
+        "caskStrength": null,
+        "releaseMonth": null,
+        "familyContext": {
+          "siblingBottles": []
+        }
+      },
+      {
+        "abv": 40,
+        "brand": "The Macallan",
+        "score": 53.312263,
+        "series": null,
+        "source": ["text", "brand", "brand_coverage"],
+        "bottler": null,
+        "edition": null,
+        "outturn": null,
+        "bottleId": 62541,
+        "category": "single_malt",
+        "fullName": "The Macallan Concept No. 1",
+        "reference": null,
+        "statedAge": null,
+        "caskNumber": null,
+        "comparison": {
+          "missing": ["edition"],
+          "conflicts": [],
+          "agreements": ["category", "brand", "distillers"]
+        },
+        "distillery": ["The Macallan"],
+        "maturation": null,
+        "releaseDay": null,
+        "singleCask": null,
+        "releaseYear": null,
+        "vintageYear": null,
+        "bottlingYear": null,
+        "caskStrength": null,
+        "releaseMonth": null,
+        "familyContext": {
+          "siblingBottles": []
+        }
+      },
+      {
+        "abv": 48.3,
+        "brand": "The Macallan",
+        "score": 37.424892,
+        "series": "Edition Series",
+        "source": ["vector", "text"],
+        "bottler": null,
+        "edition": null,
+        "outturn": null,
+        "bottleId": 3278,
+        "category": "single_malt",
+        "fullName": "The Macallan Edition No. 3",
+        "reference": "The Macallan Edition No. 3, 48.3%",
+        "statedAge": null,
+        "caskNumber": null,
+        "comparison": {
+          "missing": ["edition"],
+          "conflicts": [],
+          "agreements": ["category", "brand", "distillers"]
+        },
+        "distillery": ["The Macallan"],
+        "maturation": null,
+        "releaseDay": null,
+        "singleCask": null,
+        "releaseYear": 2017,
+        "vintageYear": null,
+        "bottlingYear": null,
+        "caskStrength": null,
+        "releaseMonth": null,
+        "familyContext": {
+          "siblingBottles": []
+        }
+      },
+      {
+        "abv": null,
+        "brand": "The Macallan",
+        "score": 34.630753,
+        "series": "Archival Series",
+        "source": ["text"],
+        "bottler": null,
+        "edition": null,
+        "outturn": null,
+        "bottleId": 54623,
+        "category": "single_malt",
+        "fullName": "The Macallan Folio 3",
+        "reference": null,
+        "statedAge": null,
+        "caskNumber": null,
+        "comparison": {
+          "missing": ["edition"],
+          "conflicts": [],
+          "agreements": ["category", "brand", "distillers"]
+        },
+        "distillery": ["The Macallan"],
+        "maturation": null,
+        "releaseDay": null,
+        "singleCask": null,
+        "releaseYear": null,
+        "vintageYear": null,
+        "bottlingYear": null,
+        "caskStrength": null,
+        "releaseMonth": null,
+        "familyContext": {
+          "siblingBottles": []
+        }
+      },
+      {
+        "abv": 43,
+        "brand": "The Macallan",
+        "score": 21.16603,
+        "series": null,
+        "source": ["vector", "text"],
+        "bottler": null,
+        "edition": null,
+        "outturn": null,
+        "bottleId": 662,
+        "category": "single_malt",
+        "fullName": "The Macallan Estate",
+        "reference": "The Macallan Estate",
+        "statedAge": null,
+        "caskNumber": null,
+        "comparison": {
+          "missing": ["edition"],
+          "conflicts": [],
+          "agreements": ["category", "brand", "distillers"]
+        },
+        "distillery": ["The Macallan"],
+        "maturation": "Sherry-seasoned oak casks",
+        "releaseDay": null,
+        "singleCask": false,
+        "releaseYear": 2019,
+        "vintageYear": null,
+        "bottlingYear": null,
+        "caskStrength": null,
+        "releaseMonth": null,
+        "familyContext": {
+          "siblingBottles": []
+        }
+      },
+      {
+        "abv": 48,
+        "brand": "The Macallan",
+        "score": 0.7132118726079194,
+        "series": "Edition Series",
+        "source": ["vector"],
+        "bottler": null,
+        "edition": null,
+        "outturn": null,
+        "bottleId": 3869,
+        "category": "single_malt",
+        "fullName": "The Macallan Edition No. 1",
+        "reference": "The Macallan Edition No. 1",
+        "statedAge": null,
+        "caskNumber": null,
+        "comparison": {
+          "missing": ["edition"],
+          "conflicts": [],
+          "agreements": ["category", "brand", "distillers"]
+        },
+        "distillery": ["The Macallan"],
+        "maturation": null,
+        "releaseDay": null,
+        "singleCask": null,
+        "releaseYear": 2015,
+        "vintageYear": null,
+        "bottlingYear": null,
+        "caskStrength": null,
+        "releaseMonth": null,
+        "familyContext": {
+          "siblingBottles": []
+        }
+      },
+      {
+        "abv": null,
+        "brand": "The Macallan",
+        "score": 0.7066466890493477,
+        "series": "Rare Cask",
+        "source": ["vector"],
+        "bottler": null,
+        "edition": null,
+        "outturn": null,
+        "bottleId": 3870,
+        "category": "single_malt",
+        "fullName": "The Macallan Rare Cask Black 1824 Masters Series",
+        "reference": "The Macallan Rare Cask",
+        "statedAge": null,
+        "caskNumber": null,
+        "comparison": {
+          "missing": ["edition"],
+          "conflicts": [],
+          "agreements": ["category", "brand", "distillers"]
+        },
+        "distillery": ["The Macallan"],
+        "maturation": null,
+        "releaseDay": null,
+        "singleCask": null,
+        "releaseYear": null,
+        "vintageYear": null,
+        "bottlingYear": null,
+        "caskStrength": null,
+        "releaseMonth": null,
+        "familyContext": {
+          "siblingBottles": []
+        }
+      },
+      {
+        "abv": 40,
+        "brand": "The Macallan",
+        "score": 0.701581797503685,
+        "series": "Quest Collection",
+        "source": ["vector"],
+        "bottler": null,
+        "edition": null,
+        "outturn": null,
+        "bottleId": 805,
+        "category": "single_malt",
+        "fullName": "The Macallan Quest",
+        "reference": "The Macallan Quest",
+        "statedAge": null,
+        "caskNumber": null,
+        "comparison": {
+          "missing": ["edition"],
+          "conflicts": [],
+          "agreements": ["category", "brand", "distillers"]
+        },
+        "distillery": ["The Macallan"],
+        "maturation": null,
+        "releaseDay": null,
+        "singleCask": null,
+        "releaseYear": 2017,
+        "vintageYear": null,
+        "bottlingYear": null,
+        "caskStrength": null,
+        "releaseMonth": null,
+        "familyContext": {
+          "siblingBottles": []
+        }
+      },
+      {
+        "abv": 48.4,
+        "brand": "The Macallan",
+        "score": 0.6809014230429066,
+        "series": "Edition Series",
+        "source": ["vector"],
+        "bottler": null,
+        "edition": null,
+        "outturn": null,
+        "bottleId": 2910,
+        "category": "single_malt",
+        "fullName": "The Macallan Edition No. 4",
+        "reference": "Macallan Edition No. 4",
+        "statedAge": null,
+        "caskNumber": null,
+        "comparison": {
+          "missing": ["edition"],
+          "conflicts": [],
+          "agreements": ["category", "brand", "distillers"]
+        },
+        "distillery": ["The Macallan"],
+        "maturation": null,
+        "releaseDay": null,
+        "singleCask": null,
+        "releaseYear": 2018,
+        "vintageYear": null,
+        "bottlingYear": null,
+        "caskStrength": null,
+        "releaseMonth": null,
+        "familyContext": {
+          "siblingBottles": []
+        }
+      },
+      {
+        "abv": 48.5,
+        "brand": "The Macallan",
+        "score": 0.6779841036005306,
+        "series": "Edition Series",
+        "source": ["vector"],
+        "bottler": null,
+        "edition": null,
+        "outturn": null,
+        "bottleId": 13505,
+        "category": "single_malt",
+        "fullName": "The Macallan Edition No. 5",
+        "reference": "Macallan Edition No. 5",
+        "statedAge": null,
+        "caskNumber": null,
+        "comparison": {
+          "missing": ["edition"],
+          "conflicts": [],
+          "agreements": ["category", "brand", "distillers"]
+        },
+        "distillery": ["The Macallan"],
+        "maturation": null,
+        "releaseDay": null,
+        "singleCask": null,
+        "releaseYear": 2019,
+        "vintageYear": null,
+        "bottlingYear": null,
+        "caskStrength": null,
+        "releaseMonth": null,
+        "familyContext": {
+          "siblingBottles": []
+        }
+      },
+      {
+        "abv": null,
+        "brand": "The Macallan",
+        "score": 0.677020091233325,
+        "series": "TIME : SPACE Collection",
+        "source": ["vector"],
+        "bottler": null,
+        "edition": null,
+        "outturn": null,
+        "bottleId": 54647,
+        "category": "single_malt",
+        "fullName": "The Macallan TIME : SPACE Mastery",
+        "reference": "Macallan Time:Space Mastery, 43.6%",
+        "statedAge": null,
+        "caskNumber": null,
+        "comparison": {
+          "missing": ["edition"],
+          "conflicts": [],
+          "agreements": ["category", "brand", "distillers"]
+        },
+        "distillery": ["The Macallan"],
+        "maturation": null,
+        "releaseDay": null,
+        "singleCask": null,
+        "releaseYear": null,
+        "vintageYear": null,
+        "bottlingYear": null,
+        "caskStrength": null,
+        "releaseMonth": null,
+        "familyContext": {
+          "siblingBottles": []
+        }
+      },
+      {
+        "abv": null,
+        "brand": "The Macallan",
+        "score": 0.6686772508972831,
+        "series": "Double Cask Collection",
+        "source": ["vector"],
+        "bottler": null,
+        "edition": null,
+        "outturn": null,
+        "bottleId": 44083,
+        "category": "single_malt",
+        "fullName": "The Macallan Double Cask",
+        "reference": "The Macallan 30-year-old Double Cask",
+        "statedAge": 30,
+        "caskNumber": null,
+        "comparison": {
+          "missing": ["edition"],
+          "conflicts": [],
+          "agreements": ["category", "brand", "distillers"]
+        },
+        "distillery": ["The Macallan"],
+        "maturation": "Sherry seasoned American and European oak casks",
+        "releaseDay": null,
+        "singleCask": null,
+        "releaseYear": null,
+        "vintageYear": null,
+        "bottlingYear": null,
+        "caskStrength": null,
+        "releaseMonth": null,
+        "familyContext": {
+          "siblingBottles": [
+            {
+              "abv": 43,
+              "edition": "2021 Release",
+              "outturn": null,
+              "bottleId": 45105,
+              "fullName": "The Macallan Double Cask - 2021 Release",
+              "statedAge": 30,
+              "caskNumber": null,
+              "maturation": "Sherry seasoned American and European oak casks",
+              "releaseDay": null,
+              "singleCask": false,
+              "releaseYear": 2021,
+              "traitFields": [
+                "edition",
+                "statedAge",
+                "releaseYear",
+                "abv",
+                "singleCask"
+              ],
+              "vintageYear": null,
+              "bottlingYear": null,
+              "caskStrength": null,
+              "releaseMonth": null
+            }
+          ]
+        }
+      },
+      {
+        "abv": 40,
+        "brand": "The Macallan",
+        "score": 0.6666666666666666,
+        "series": "Sherry Oak Collection",
+        "source": ["brand_coverage"],
+        "bottler": null,
+        "edition": null,
+        "outturn": null,
+        "bottleId": 1105,
+        "category": "single_malt",
+        "fullName": "The Macallan 10-year-old",
+        "reference": null,
+        "statedAge": 10,
+        "caskNumber": null,
+        "comparison": {
+          "missing": ["edition"],
+          "conflicts": [],
+          "agreements": ["category", "brand", "distillers"]
+        },
+        "distillery": ["The Macallan"],
+        "maturation": "Sherry wood",
+        "releaseDay": null,
+        "singleCask": false,
+        "releaseYear": null,
+        "vintageYear": null,
+        "bottlingYear": null,
+        "caskStrength": null,
+        "releaseMonth": null,
+        "familyContext": {
+          "siblingBottles": []
+        }
+      }
+    ]
+  },
+  "context": {
+    "inspectedBottleIds": [589],
+    "bottleContexts": [
+      {
+        "exact": {
+          "abv": 40.8,
+          "edition": null,
+          "outturn": null,
+          "statedAge": null,
+          "caskNumber": null,
+          "maturation": null,
+          "releaseDay": null,
+          "singleCask": null,
+          "releaseYear": 2020,
+          "vintageYear": null,
+          "bottlingYear": null,
+          "caskStrength": null,
+          "releaseMonth": null
+        },
+        "shared": {
+          "name": "Concept Number 3",
+          "brand": {
+            "name": "The Macallan",
+            "entityId": 1157
+          },
+          "series": {
+            "name": "Concept",
+            "seriesId": 732
+          },
+          "bottler": null,
+          "category": "single_malt",
+          "statedAge": null,
+          "distillers": [
+            {
+              "name": "The Macallan",
+              "entityId": 1157
+            }
+          ]
+        },
+        "groupId": 9255,
+        "bottleId": 589,
+        "fullName": "The Macallan Concept Number 3",
+        "siblings": [],
+        "references": [
+          {
+            "name": "Macallan Concept No. 3",
+            "ignored": false
+          },
+          {
+            "name": "The Macallan Concept Number 3",
+            "ignored": false
+          }
+        ],
+        "observations": [
+          {
+            "facts": {
+              "proposalType": "no_match",
+              "proposedBottle": null,
+              "referenceScope": "none"
+            },
+            "rawText": "The Macallan Concept No.3 2020",
+            "sourceKey": "store_price:12058271",
+            "sourceUrl": "https://www.masterofmalt.com/whiskies/the-macallan/the-macallan-concept-no3-whisky/?sku=118008",
+            "sourceName": "The Macallan Concept No.3 2020",
+            "sourceType": "store_price",
+            "parsedIdentity": {
+              "abv": null,
+              "brand": "The Macallan",
+              "series": "Concept",
+              "bottler": null,
+              "edition": null,
+              "outturn": null,
+              "category": "single_malt",
+              "distillery": ["The Macallan"],
+              "expression": "Concept No. 3",
+              "maturation": null,
+              "stated_age": null,
+              "cask_number": null,
+              "release_day": null,
+              "single_cask": null,
+              "release_year": 2020,
+              "vintage_year": null,
+              "bottling_year": null,
+              "cask_strength": null,
+              "release_month": null
+            }
+          },
+          {
+            "facts": {
+              "proposalType": "match_existing",
+              "proposedBottle": null,
+              "referenceScope": "global_alias"
+            },
+            "rawText": "Macallan Concept No. 3",
+            "sourceKey": "store_price:12056840",
+            "sourceUrl": "https://www.thewhiskyworld.com/macallan-concept-no-3-p9610",
+            "sourceName": "Macallan Concept No. 3",
+            "sourceType": "store_price",
+            "parsedIdentity": null
+          }
+        ],
+        "imageSources": [
+          {
+            "url": "https://api.peated.com/uploads/prices-y083oklm2quzw20s6kbhrrwk.webp",
+            "source": {
+              "kind": "bottle"
+            },
+            "sourceUrl": "https://www.thewhiskyworld.com/macallan-concept-no-3-p9610"
+          }
+        ]
+      }
+    ],
+    "inspectedEntities": [
+      {
+        "kind": "distillery",
+        "name": "The Macallan",
+        "score": 1,
+        "source": ["exact", "text", "prefix", "contained"],
+        "entityId": 1157,
+        "reference": "The Macallan",
+        "shortName": null,
+        "retrievedFor": [
+          {
+            "exact": true,
+            "query": "The Macallan"
+          }
+        ]
+      }
+    ],
+    "inspectedSeries": []
+  },
+  "provenance": {
+    "source": "production_miss",
+    "verifiedSourceUrls": [
+      "https://www.scotchwhiskyauctions.com/auctions/232-the-183rd-auction/896088-macallan-concept-number-3-with-print/",
+      "https://whiskymag.com/articles/the-macallan-unveils-concept-no-3/",
+      "https://www.just-whisky.co.uk/july-2021/107401-macallan-concept-number-3-2020-david-carson-giclee-art-prints-5010314309961.html"
+    ],
+    "dbOutcome": {
+      "bottleId": 589,
+      "createsBottle": false,
+      "summary": "Production returned match."
+    },
+    "notes": "Captured from saved classifier run 21335 (auction_lot 3191, model null, 2026-10-02T01:46:54.462Z). Production rationale: The source title identifies Macallan Concept Number 3; “With Print” describes the auction lot, not a distinct whisky release. Candidate 589 has the matching Concept Number 3 identity, and its inspected label evidence reads “THE MACALLAN” and “CONCEPT NUMBER 3.” The source provides no conflicting release traits. Checked 2026-11-04. Concept No. 3 is the 2020 David Carson travel retail release at 40.8%; some were sold with Giclée art prints. Production matched correctly; this case guards the rule that a Bottle sold with a print stays in scope, with values different from the Hades print case."
+  },
+  "expected": {
+    "status": "classified",
+    "action": "match",
+    "identityScope": "product",
+    "matchedBottleId": 589,
+    "summary": "Match The Macallan Concept Number 3 (589), the 2020 travel retail release at 40.8%. A Bottle sold with a print is still one whisky Bottle, so do not ignore it."
+  }
+}

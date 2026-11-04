@@ -6,7 +6,7 @@
       "id": 15730,
       "url": "https://www.scotchwhiskyauctions.com/auctions/234-the-185th-auction/904090-grants-millennium-family-reserve/",
       "name": "Grant’s Millennium Family Reserve",
-      "imageUrl": "https://d3suvtcq00dftb.cloudfront.net/images/164e91dce0fc752767cd123ab6ea3c34-zoom.jpg",
+      "imageUrl": null,
       "externalSiteId": 28097,
       "currentBottleId": null
     },
@@ -28,7 +28,60 @@
       "vintage_year": null,
       "cask_strength": null
     },
-    "imageEvidence": null,
+    "imageEvidence": {
+      "sourceImageId": "auction_lot:15730",
+      "extractors": [
+        {
+          "kind": "vision",
+          "model": "openai/gpt-6-luna",
+          "confidence": 0.75,
+          "textSpans": [
+            {
+              "text": "William Grant's\nThe Family Reserve\nFinest Scotch Whisky\nAn Independent Family Company for Five Generations\nMatured, Blended & Bottled by William Grant & Sons Limited\nThe Glenfiddich & Balvenie Distilleries\nBanffshire, Scotland\n40% vol\nProduct of Scotland\n99130522\nTin: MILLENNIUM",
+              "confidence": 0.75
+            }
+          ],
+          "observations": [
+            "Read whisky label identity from the auction lot photo."
+          ]
+        }
+      ],
+      "fieldCandidates": {
+        "brand": {
+          "value": "William Grant's",
+          "confidence": 0.75,
+          "sourceExtractorIndexes": [0]
+        },
+        "expression": {
+          "value": "Millennium",
+          "confidence": 0.75,
+          "sourceExtractorIndexes": [0]
+        },
+        "distillery": {
+          "value": ["Glenfiddich", "Balvenie"],
+          "confidence": 0.75,
+          "sourceExtractorIndexes": [0]
+        },
+        "category": {
+          "value": "blend",
+          "confidence": 0.75,
+          "sourceExtractorIndexes": [0]
+        },
+        "abv": {
+          "value": 40,
+          "confidence": 0.75,
+          "sourceExtractorIndexes": [0]
+        }
+      },
+      "photoSuitability": {
+        "isSingleBottlePhoto": true,
+        "labelReadable": true,
+        "suitableAsTastingImage": false,
+        "suitableAsBottleImage": false,
+        "reason": null
+      },
+      "conflicts": []
+    },
     "initialCandidates": [
       {
         "abv": null,
@@ -1143,7 +1196,7 @@
       "createsBottle": false,
       "summary": "Production returned no_match: the agent could not tell whether 'Millennium' named a separate release or described the standard Family Reserve."
     },
-    "notes": "Saved check 35462, source auction_lot 15730 (lot 185-904090), run 2026-11-03. Not one of the two photo cases named in the request, but the title alone cannot settle it, so this case follows the same pattern: input.reference.imageUrl is set to the lot's first photo at full size and the evidence pack gets its reviewed reading. Production ran without the photo; this case goes in with the change that makes auctions read the lot photo. The photo clearly shows a gold tube printed 'William Grant's The Family Reserve Millennium Finest Scotch Whisky' with a faint '2000', and a bottle label printed 'William Grant's The Family Reserve Finest Scotch Whisky'. The reading covers the bottle label only; the tube is packaging. The bottle's '40%vol.' is small and faint, so the reading leaves abv empty; the scraper's 40% stays in extractedIdentity. The identity model treats a gift box or tin as the same Bottle, and the printed name and strength match the standard Family Reserve. 43859 (Grant's Family Reserve, blend) has no conflicting field."
+    "notes": "Saved check 35462, source auction_lot 15730 (lot 185-904090), run 2026-11-03. Not one of the two photo cases named in the request, but the title alone cannot settle it, so this case follows the same pattern: input.reference.imageUrl is set to the lot's first photo at full size and the evidence pack gets its reviewed reading. Production ran without the photo; this case goes in with the change that makes auctions read the lot photo. The photo clearly shows a gold tube printed 'William Grant's The Family Reserve Millennium Finest Scotch Whisky' with a faint '2000', and a bottle label printed 'William Grant's The Family Reserve Finest Scotch Whisky'. The reading covers the bottle label only; the tube is packaging. The bottle's '40%vol.' is small and faint, so the reading leaves abv empty; the scraper's 40% stays in extractedIdentity. The identity model treats a gift box or tin as the same Bottle, and the printed name and strength match the standard Family Reserve. 43859 (Grant's Family Reserve, blend) has no conflicting field. Production ran without the photo. input.imageEvidence is openai/gpt-6-luna's live reading on 2026-11-04 of the lot photo's 1500px copy (https://d3suvtcq00dftb.cloudfront.net/images/164e91dce0fc752767cd123ab6ea3c34-zoom.jpg), in the shape auction matching sends since lot photos are read."
   },
   "expected": {
     "status": "classified",
@@ -1151,8 +1204,5 @@
     "identityScope": "product",
     "matchedBottleId": 43859,
     "summary": "Match Grant's Family Reserve (43859). 'Millennium 2000' is printed only on the gift tube; the bottle carries the standard William Grant's The Family Reserve Finest Scotch Whisky label at 40%."
-  },
-  "knownFailure": {
-    "reason": "The agent treats 'Millennium', printed only on the gift tube, as a possible separate release."
   }
 }
