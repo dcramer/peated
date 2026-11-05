@@ -155,7 +155,7 @@ export default function OperationsOverview({
             value={inboxCounts.all}
           />
           <dl {...stylex.props(styles.statusList)}>
-            <StatusRow label="Listings" value={inboxCounts.listing} />
+            <StatusRow label="Incoming" value={inboxCounts.incoming} />
             <StatusRow label="Catalog" value={inboxCounts.catalog} />
             <StatusRow label="Community" value={inboxCounts.community} />
           </dl>

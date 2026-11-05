@@ -352,11 +352,11 @@ describe("PUT /auction-lots/{lot}/bottle", () => {
     expect(tasks.results).toEqual([
       expect.objectContaining({
         key: `auction_lot:${data.lot.id}`,
-        category: "listing",
+        category: "incoming",
         source: { kind: "auction_lot", lotId: data.lot.id },
       }),
     ]);
-    expect(tasks.counts).toMatchObject({ all: 1, listing: 1 });
+    expect(tasks.counts).toMatchObject({ all: 1, incoming: 1 });
     expect(
       await routerClient.admin.moderation.task(
         { key: `auction_lot:${data.lot.id}` },
@@ -379,7 +379,7 @@ describe("PUT /auction-lots/{lot}/bottle", () => {
     expect(history.results).toEqual([
       expect.objectContaining({
         title: data.lot.name,
-        category: "listing",
+        category: "incoming",
         outcome: "match",
       }),
     ]);

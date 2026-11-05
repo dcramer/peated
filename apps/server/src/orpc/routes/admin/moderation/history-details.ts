@@ -83,7 +83,7 @@ export default procedure
         event: {
           key: input.key,
           kind: "incoming_decision",
-          category: "listing",
+          category: "incoming",
           title: log.name,
           outcome: log.decision.replaceAll("_", " "),
           actor,

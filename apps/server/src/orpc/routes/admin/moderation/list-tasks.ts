@@ -16,7 +16,7 @@ export default procedure
     path: "/admin/moderation/tasks",
     summary: "List moderation tasks",
     description:
-      "List pending moderation decisions for imported listings, catalog changes, and member reports. Requires a moderator or administrator.",
+      "List pending moderation decisions for incoming store listings, auction lots, and imported reviews, catalog changes, and member reports. Ignored sources are not listed here; see `GET /admin/moderation/ignored`. Requires a moderator or administrator.",
     operationId: "listModerationTasks",
   })
   .input(ModerationTaskListInputSchema)
@@ -30,7 +30,7 @@ export default procedure
       results: page,
       counts: {
         all: allTasks.length,
-        listing: allTasks.filter(({ category }) => category === "listing")
+        incoming: allTasks.filter(({ category }) => category === "incoming")
           .length,
         catalog: allTasks.filter(({ category }) => category === "catalog")
           .length,

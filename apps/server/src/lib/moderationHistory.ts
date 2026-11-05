@@ -16,7 +16,7 @@ import { and, isNotNull, sql, type SQL } from "drizzle-orm";
 
 type ModerationHistoryInput = {
   query?: string;
-  category?: "listing" | "catalog" | "community";
+  category?: "incoming" | "catalog" | "community";
   outcome?: string;
   actor?: string;
   offset: number;
@@ -60,7 +60,7 @@ export async function queryModerationHistory(
       SELECT
         'incoming:' || ${incomingBottleDecisionLogs.id} AS key,
         'incoming_decision'::text AS kind,
-        'listing'::text AS category,
+        'incoming'::text AS category,
         ${incomingBottleDecisionLogs.name} AS title,
         REPLACE(${incomingBottleDecisionLogs.decision}::text, '_', ' ') AS outcome,
         ${actors.displayName} AS actor,

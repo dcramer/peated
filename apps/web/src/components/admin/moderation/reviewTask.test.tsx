@@ -75,7 +75,7 @@ describe("ReviewTask assignment errors", () => {
     const task = {
       key: `external_review:${item.review.id}`,
       kind: "external_review",
-      category: "listing",
+      category: "incoming",
       state: "ready",
       inconclusive: true,
       title: item.review.name,

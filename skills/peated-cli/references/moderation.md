@@ -12,7 +12,7 @@ pnpm cli api get /prices/PRICE_ID/match-proposal
 pnpm cli api get /prices/match-queue/retry-runs/active
 pnpm cli api get '/bottles/create-candidates?name=Port%20Charlotte%2018&statedAge=18&limit=5'
 pnpm cli api get '/bottles?query=Port%20Charlotte%2018&limit=12'
-pnpm cli api get '/admin/moderation/history?category=listing&limit=100&cursor=1'
+pnpm cli api get '/admin/moderation/history?category=incoming&limit=100&cursor=1'
 ```
 
 Queue filters: `kind=create_bottle|match|errored`,

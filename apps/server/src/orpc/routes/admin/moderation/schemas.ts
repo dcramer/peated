@@ -8,8 +8,9 @@ export const ModerationTaskKindSchema = z.enum([
   "finding",
   "report",
 ]);
+// Incoming sources are store listings, auction lots, and imported reviews.
 export const ModerationTaskCategorySchema = z.enum([
-  "listing",
+  "incoming",
   "catalog",
   "community",
 ]);
@@ -95,7 +96,7 @@ export const ModerationTaskListResponseSchema = z
     counts: z
       .object({
         all: z.number().int().min(0),
-        listing: z.number().int().min(0),
+        incoming: z.number().int().min(0),
         catalog: z.number().int().min(0),
         community: z.number().int().min(0),
         blocked: z.number().int().min(0),

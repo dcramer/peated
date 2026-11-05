@@ -8,13 +8,18 @@ these pages under Moderation:
   dismissed. An open row opens its Inbox task; a closed row opens its History
   entry. Decisions happen in the Inbox, not here.
 - **History** shows finished decisions.
+- **Ignored** lists store listings, auction lots, and imported reviews that are
+  ignored now, newest first, with the reason and who ignored them. A source
+  the classifier ignored has no person. Moderators use it to find wrong
+  ignores and send them back to review.
 - **Reviews** and **Tastings** list member content so a moderator can read it
   and remove what should not appear on Peated.
 
 **Background work** (`/admin/background-work`) shows failures and retries. It
 sits under System in the sidebar because it is about the machinery, not about
-decisions, and only administrators see it. The admin overview shows its live
-totals alongside scraper activity.
+decisions, and only administrators have it in their sidebar. Its API
+(`GET /admin/background-work`) is open to moderators, because the admin
+overview shows its live totals alongside scraper activity.
 
 The workspace reads each item from the feature that owns it. It does not copy
 those records into a second task system.
@@ -22,7 +27,8 @@ those records into a second task system.
 ## Inbox
 
 The Inbox includes open store-price proposals, completed unresolved critic-review matches, reviewable auction lots, Bottle or Entity changes waiting
-for review, unresolved findings, and open member reports. Work that is still
+for review, unresolved findings, and open member reports. Store listings,
+auction lots, and reviews share the **Incoming** filter. Work that is still
 running, failed, stale, or waiting to retry belongs in Background work until it
 needs a person to decide. A store-price proposal appears only while the store
 still shows the listing; see `docs/architecture/store-price-matching.md`.
@@ -79,8 +85,10 @@ and detail views with a clear route back to the same filtered list.
 
 ## History And Background Work
 
-History combines completed listing decisions, reviewed catalog changes,
-closed checks, and closed reports. Show only facts recorded by those sources. Label a missing actor
+History combines completed incoming decisions, reviewed catalog changes,
+closed checks, and closed reports. A moderator's ignore of a listing or auction
+lot is an `ignore` decision with the moderator's reason; ignores the
+classifier made are on Ignored, not in History. Show only facts recorded by those sources. Label a missing actor
 or reason as unavailable.
 
 The admin overview shows open Inbox decisions separately from failed and active

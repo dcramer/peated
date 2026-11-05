@@ -86,7 +86,7 @@ async function reviewTasks(
   return reviews.map((review) => ({
     key: `external_review:${review.id}`,
     kind: "external_review",
-    category: "listing",
+    category: "incoming",
     state: "ready",
     inconclusive: true,
     title: review.name,
@@ -122,7 +122,7 @@ async function auctionTasks(lotId?: number): Promise<ModerationTaskSummary[]> {
   return rows.map((row) => ({
     key: `auction_lot:${row.id}`,
     kind: "auction_lot",
-    category: "listing",
+    category: "incoming",
     state: "ready",
     inconclusive: row.action === "no_match",
     title: row.name,
@@ -206,7 +206,7 @@ function listingTask({
   return {
     key: `listing:${proposal.id}`,
     kind: "listing",
-    category: "listing",
+    category: "incoming",
     state: proposal.status === "errored" ? "blocked" : "ready",
     inconclusive:
       proposal.status === "pending_review" &&
@@ -485,7 +485,7 @@ export function filterModerationTasks(
   tasks: ModerationTaskSummary[],
   input: {
     query?: string;
-    category?: "listing" | "catalog" | "community";
+    category?: "incoming" | "catalog" | "community";
     blocked?: boolean;
     inconclusive?: boolean;
   },

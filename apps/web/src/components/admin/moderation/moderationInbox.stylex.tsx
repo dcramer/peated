@@ -141,9 +141,9 @@ export function ModerationInboxContent({
       href: filterHref({ category: null, blocked: null, inconclusive: null }),
     },
     {
-      label: `Listings ${data.counts.listing}`,
-      active: category === "listing",
-      href: filterHref({ category: "listing", inconclusive: null }),
+      label: `Incoming ${data.counts.incoming}`,
+      active: category === "incoming",
+      href: filterHref({ category: "incoming", inconclusive: null }),
     },
     {
       label: `Catalog ${data.counts.catalog}`,

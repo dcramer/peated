@@ -108,7 +108,7 @@ describe("admin moderation tasks", () => {
     ]);
     expect(result.counts).toMatchObject({
       all: 3,
-      listing: 1,
+      incoming: 1,
       catalog: 2,
       blocked: 1,
       inconclusive: 0,
