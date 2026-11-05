@@ -2,6 +2,7 @@ import { db } from "@peated/server/db";
 import {
   bottleChecks,
   bottleOperations,
+  externalReviews,
   storePriceMatchAttempts,
   storePriceMatchProposals,
 } from "@peated/server/db/schema";
@@ -392,6 +393,56 @@ describe("admin moderation tasks", () => {
     expect(details.audit).toMatchObject({
       schemaSupported: false,
       canClose: true,
+    });
+  });
+  test("leaves ignored reviews out of the list but still opens them by link", async ({
+    fixtures,
+  }) => {
+    const mod = await fixtures.User({ mod: true });
+    const attemptedAt = new Date("2026-11-04T00:00:00Z");
+    const reviewWithCheck = async (name: string, status: string) => {
+      const review = await fixtures.ExternalReview({ name, bottleId: null });
+      await db
+        .update(externalReviews)
+        .set({ bottleNoMatchAt: attemptedAt })
+        .where(eq(externalReviews.id, review.id));
+      await db.insert(bottleChecks).values({
+        intent: "resolve_reference",
+        sourceKind: "review",
+        sourceId: String(review.id),
+        subjectKey: `review:${review.id}`,
+        schemaVersion: BOTTLE_CHECK_SCHEMA_VERSION,
+        inputSnapshot: {},
+        output:
+          status === "ignored"
+            ? { status, reason: "A whisky liqueur.", artifacts: {} }
+            : {
+                status,
+                decision: { action: "no_match", rationale: "No fit." },
+                artifacts: {},
+              },
+        createdAt: attemptedAt,
+      });
+      return review;
+    };
+    const ignored = await reviewWithCheck("Liqueur Review", "ignored");
+    const unresolved = await reviewWithCheck("Unresolved Review", "classified");
+
+    const { results, counts } = await routerClient.admin.moderation.listTasks(
+      undefined,
+      { context: { user: mod } },
+    );
+    expect(results.map(({ key }) => key)).toEqual([
+      `external_review:${unresolved.id}`,
+    ]);
+    expect(counts.all).toBe(1);
+    await expect(
+      routerClient.admin.moderation.task(
+        { key: `external_review:${ignored.id}` },
+        { context: { user: mod } },
+      ),
+    ).resolves.toMatchObject({
+      task: { key: `external_review:${ignored.id}` },
     });
   });
 });

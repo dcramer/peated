@@ -20,6 +20,7 @@ import {
   type ActionableBottleCheckSummary,
 } from "@peated/server/lib/bottleChecks";
 import { isSupportedBottleCheck } from "@peated/server/lib/bottleCheckSchemaVersion";
+import { latestReviewCheckIgnoredCondition } from "@peated/server/lib/externalReviewResolution";
 import { toCurrentProposalType } from "@peated/server/lib/priceMatchingStatus";
 import {
   CATALOG_REPORT_OBJECT_TYPES,
@@ -39,6 +40,7 @@ import {
   isNotNull,
   isNull,
   lte,
+  not,
   or,
   sql,
 } from "drizzle-orm";
@@ -71,6 +73,12 @@ async function reviewTasks(
         isNull(externalReviews.removedAt),
         isNotNull(externalReviews.bottleNoMatchAt),
         reviewId === undefined ? undefined : eq(externalReviews.id, reviewId),
+        // An ignored review leaves the Inbox, as listings and auction lots
+        // do. A direct link to its task still opens it, so a moderator can
+        // assign a Bottle after a wrong ignore.
+        reviewId === undefined
+          ? not(latestReviewCheckIgnoredCondition())
+          : undefined,
       ),
     )
     .orderBy(asc(externalReviews.bottleNoMatchAt), asc(externalReviews.id))

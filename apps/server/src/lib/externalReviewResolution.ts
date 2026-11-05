@@ -27,6 +27,23 @@ export function reviewResolutionVersionMatches(
   );
 }
 
+/**
+ * Review matching rule (owner: external reviews): an unresolved review is
+ * ignored when its latest saved check ignored it. Reviews keep no ignored
+ * state of their own, so the Inbox and the ignored list both read this.
+ */
+export function latestReviewCheckIgnoredCondition() {
+  return sql`COALESCE((
+    SELECT latest.output->>'status'
+    FROM ${bottleChecks} AS latest
+    WHERE latest.intent = 'resolve_reference'
+      AND latest.source_kind = 'review'
+      AND latest.source_id = ${externalReviews.id}::text
+    ORDER BY latest.created_at DESC, latest.id DESC
+    LIMIT 1
+  ), '') = 'ignored'`;
+}
+
 // Review matching versions use the milliseconds exposed by JavaScript and the API.
 // PostgreSQL can retain extra precision from older attempts written with NOW().
 export function reviewResolutionAttemptCondition(attemptedAt: Date | null) {

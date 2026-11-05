@@ -40,7 +40,7 @@ describe("external review resolution", () => {
     ).rejects.toThrow("Unauthorized.");
   });
 
-  test("completed unresolved reviews reach the Inbox with saved evidence and leave after assignment", async ({
+  test("ignored reviews leave the Inbox for the ignored list, still open by link, and can be assigned", async ({
     fixtures,
   }) => {
     const mod = await fixtures.User({ mod: true });
@@ -78,10 +78,17 @@ describe("external review resolution", () => {
     const inbox = await routerClient.admin.moderation.listTasks(undefined, {
       context: { user: mod },
     });
-    expect(inbox.results).toEqual([
+    expect(inbox.results).toEqual([]);
+    const ignored = await routerClient.admin.moderation.listIgnored(
+      { kind: "external_review" },
+      { context: { user: mod } },
+    );
+    expect(ignored.results).toEqual([
       expect.objectContaining({
         key,
         source: { kind: "external_review", reviewId: review.id },
+        reason:
+          "Reference is a bundle or multi-bottle listing, not a single bottle listing.",
       }),
     ]);
     await expect(
@@ -121,6 +128,14 @@ describe("external review resolution", () => {
     await expect(
       routerClient.admin.moderation.task({ key }, { context: { user: mod } }),
     ).rejects.toThrow("no longer needs attention");
+    expect(
+      (
+        await routerClient.admin.moderation.listIgnored(
+          {},
+          { context: { user: mod } },
+        )
+      ).results,
+    ).toEqual([]);
   });
 
   test("pending, removed and assigned reviews stay out; staged unresolved reviews remain reviewable", async ({
