@@ -81,6 +81,7 @@ their records remain. Test-case corrections are separate from classifier changes
 | [C42: Narrow scope questions](./C42-narrow-scope-questions.md)                         | Ask Jev ten narrow yes-or-no scope questions in one call                                | Rejected: worse than one pick-one question; cask-finish question missed Longrow Red    |
 | [C43: Decision-model edition equivalence](./C43-decision-model-edition-equivalence.md) | Ask Jev whether two edition texts name the same edition                                 | Promising: no wrong answer at 0.5+ on 151 pairs; confirm on real blocked matches       |
 | [C44: Decision-model candidate pick](./C44-decision-model-candidate-pick.md)           | Ask Jev which candidate the source is, as a second opinion on Luna                      | Mixed: vetoes 5 of 11 wrong matches, holds 4 of 51 right; unsafe as an anchor          |
+| [C45: Parallel tool calls](./C45-parallel-tool-calls.md)                               | Let the classification agent request several read-only tool calls per turn              | Rejected: no speed gain; accuracy 77/105 versus 80/105, within noise                   |
 
 C09 and C10 add narrow checks after Luna, and C11 removes model work for an
 identity Peated has already accepted. The measurement and test-case corrections
@@ -88,11 +89,12 @@ below make comparisons more accurate and repeatable.
 
 ## Model comparisons
 
-| Comparison                                                             | Change                                                   | Decision                                                                                   |
-| ---------------------------------------------------------------------- | -------------------------------------------------------- | ------------------------------------------------------------------------------------------ |
-| [GPT-6 Luna, 2026-09-22](./model-gpt-6-luna-2026-09-22.md)             | Replace GPT 5.6 Luna high with GPT-6 Luna high           | Accepted: same 79/105, 30.8% lower model cost, slower cases, more web calls                |
-| [Claude Haiku 5.5, 2026-10-10](./model-claude-haiku-5-5-2026-10-10.md) | Replace GPT-6 Luna high with Claude Haiku 5.5 high       | Rejected: 48/115 against 90/115, 17 run errors, 21.4% higher cost per completed case       |
-| [Runtime on the AI SDK, 2026-10-29](./runtime-ai-sdk-2026-10-29.md)    | Run label extraction, then the agent loop, on the AI SDK | Accepted: label extraction even; agent loop within noise (225 vs 228 of 258) at lower cost |
+| Comparison                                                             | Change                                                               | Decision                                                                                   |
+| ---------------------------------------------------------------------- | -------------------------------------------------------------------- | ------------------------------------------------------------------------------------------ |
+| [GPT-6 Luna, 2026-09-22](./model-gpt-6-luna-2026-09-22.md)             | Replace GPT 5.6 Luna high with GPT-6 Luna high                       | Accepted: same 79/105, 30.8% lower model cost, slower cases, more web calls                |
+| [Claude Haiku 5.5, 2026-10-10](./model-claude-haiku-5-5-2026-10-10.md) | Replace GPT-6 Luna high with Claude Haiku 5.5 high                   | Rejected: 48/115 against 90/115, 17 run errors, 21.4% higher cost per completed case       |
+| [Runtime on the AI SDK, 2026-10-29](./runtime-ai-sdk-2026-10-29.md)    | Run label extraction, then the agent loop, on the AI SDK             | Accepted: label extraction even; agent loop within noise (225 vs 228 of 258) at lower cost |
+| [GPT-6 Luna effort, 2026-10-20](./effort-gpt-6-luna-2026-10-20.md)     | Lower label-reading and classifier effort from high to medium or low | Stopped: label reading stays high (repeated ABV miss); classifier comparison out of date   |
 
 ## Measurement changes
 
