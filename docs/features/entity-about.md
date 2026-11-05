@@ -178,7 +178,7 @@ it:
 - When sources disagree on a date or number, the chosen value must be one a
   source states.
 - Length limits depend on how many facts are shown: at most 2 sentences for
-  each fact, and at most 4 in the lead. No sentence is over 30 words. No banned phrases, from
+  each fact, and at most 4 in the lead, but no more lead sentences than facts. No sentence is over 30 words. No banned phrases, from
   `apps/server/src/lib/entityAbout/bannedPhrases.ts`.
 
 Site facts that do not apply to the Entity's kind are dropped, and the
