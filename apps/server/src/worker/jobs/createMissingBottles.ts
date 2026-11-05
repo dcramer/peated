@@ -19,6 +19,7 @@ import {
   finalizeBottleReferenceAssignment,
   StaleBottleReferenceReviewIdentityError,
 } from "@peated/server/lib/bottleReferences";
+import { logBottleResolution } from "@peated/server/lib/bottleResolutionLog";
 import { dispatchBottleStatsRecompute } from "@peated/server/lib/dispatchBottleStatsRecompute";
 import {
   ExternalReviewResolutionVersionSchema,
@@ -138,6 +139,25 @@ export async function createMissingBottles(
 
       const resolvedAssignment = resolution.assignment;
       const bottleId = resolvedAssignment?.bottleId ?? null;
+      const classified = resolution.classification?.result;
+      if (!resolution.error)
+        logBottleResolution({
+          sourceKind: "review",
+          sourceId: review.id,
+          outcome: bottleId
+            ? "automatic"
+            : classified?.status === "ignored"
+              ? "ignored"
+              : "review",
+          action: !classified
+            ? resolution.source === "exact_reference"
+              ? "match"
+              : null
+            : classified.status === "classified"
+              ? classified.decision.action
+              : "ignore",
+          automationBlockers: resolution.automationBlockers,
+        });
       if (bottleId) {
         logInfo("Resolved bottle for review {reviewId}", {
           extra: {

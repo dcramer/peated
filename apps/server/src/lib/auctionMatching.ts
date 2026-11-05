@@ -27,6 +27,7 @@ import {
 } from "./auctions";
 import { createBottleCheck } from "./bottleChecks";
 import { findBottleReferenceAssignment } from "./bottleFinder";
+import { logBottleResolution } from "./bottleResolutionLog";
 import { BottleAlreadyExistsError } from "./createBottle";
 import { ActiveBottleSelectionError } from "./resolveActiveBottleIds";
 import { StaleBottleCreateError } from "./unseenSiblingBottle";
@@ -293,6 +294,13 @@ async function applyAuctionLotCheck(
         automatic: true as const,
         referenceName: assessment.referenceName ?? undefined,
       });
+      logBottleResolution({
+        sourceKind: "auction_lot",
+        sourceId: lotId,
+        checkId: check.id,
+        outcome: "automatic",
+        action: assessment.bottleId !== null ? "match" : "create_bottle",
+      });
       return true;
     } catch (error) {
       if (
@@ -305,11 +313,12 @@ async function applyAuctionLotCheck(
     }
   }
   const evidence = readAuctionMatchEvidence(current, check);
-  await db
+  const ignored = evidence?.output.status === "ignored";
+  const [held] = await db
     .update(auctionLots)
     .set({
       matchCheckId: check.id,
-      matchStatus: evidence?.output.status === "ignored" ? "ignored" : "review",
+      matchStatus: ignored ? "ignored" : "review",
     })
     .where(
       and(
@@ -319,7 +328,21 @@ async function applyAuctionLotCheck(
         eq(auctionLots.matchCheckId, check.id),
         isNull(auctionLots.bottleId),
       ),
-    );
+    )
+    .returning({ id: auctionLots.id });
+  if (held)
+    logBottleResolution({
+      sourceKind: "auction_lot",
+      sourceId: lotId,
+      checkId: check.id,
+      outcome: ignored ? "ignored" : "review",
+      action: !evidence
+        ? null
+        : evidence.output.status === "classified"
+          ? evidence.output.decision.action
+          : "ignore",
+      automationBlockers: assessment?.automationBlockers,
+    });
   await requestAuctionLotDetails(lotId, fingerprint);
   return true;
 }

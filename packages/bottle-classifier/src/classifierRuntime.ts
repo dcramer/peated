@@ -49,8 +49,10 @@ import {
   buildBottleClassifierInstructions,
 } from "./instructions";
 import {
+  recordReferenceRunOutcome,
   startClassifierRunSpan,
   type ClassifierSpanAttributes,
+  type ReferenceRunPath,
 } from "./observability";
 import {
   getStableOpenAISettings,
@@ -900,16 +902,19 @@ export function createBottleClassifier(
     candidateExpansion: CandidateExpansionMode;
     allowAutoIgnore?: boolean;
   }) => {
-    const preExtractionAutoIgnoreReason =
-      (suppliedExtractedIdentity === undefined && allowAutoIgnore
+    const ruleIgnoreReason =
+      suppliedExtractedIdentity === undefined && allowAutoIgnore
         ? getPreExtractionAutoIgnoreBottleReferenceReason(reference.name)
-        : null) ??
-      (allowAutoIgnore && options.decisionModel
+        : null;
+    const precheckIgnoreReason =
+      !ruleIgnoreReason && allowAutoIgnore && options.decisionModel
         ? await getScopePrecheckIgnoreReason({
             model: options.decisionModel,
             title: reference.name,
           })
-        : null);
+        : null;
+    const preExtractionAutoIgnoreReason =
+      ruleIgnoreReason ?? precheckIgnoreReason;
     if (preExtractionAutoIgnoreReason) {
       return {
         artifacts: buildBottleClassificationArtifacts({
@@ -919,6 +924,9 @@ export function createBottleClassifier(
           searchEvidence: options.initialSearchEvidence ?? [],
         }),
         autoIgnoreReason: preExtractionAutoIgnoreReason,
+        autoIgnorePath: ruleIgnoreReason
+          ? ("rule" as const)
+          : ("scope_precheck" as const),
         webSearchBudget: createBottleWebSearchBudget(options.maxSearchQueries),
       };
     }
@@ -952,6 +960,7 @@ export function createBottleClassifier(
       return {
         artifacts: preparedArtifacts,
         autoIgnoreReason,
+        autoIgnorePath: "rule" as const,
         webSearchBudget: createBottleWebSearchBudget(options.maxSearchQueries),
       };
     }
@@ -981,6 +990,7 @@ export function createBottleClassifier(
     return {
       artifacts: preparedArtifacts,
       autoIgnoreReason: null,
+      autoIgnorePath: null,
       webSearchBudget,
     };
   };
@@ -1268,6 +1278,14 @@ export function createBottleClassifier(
     input: AuditBottleInput,
   ): Promise<AuditBottleResult> => (await runBottleAudit(input)).result;
 
+  const recordedRun = (
+    path: ReferenceRunPath,
+    run: BottleReferenceRun,
+  ): BottleReferenceRun => {
+    recordReferenceRunOutcome({ path, result: run.result });
+    return run;
+  };
+
   const runBottleReference = async (
     input: ClassifyBottleReferenceInput,
     runOptions: BottleClassifierRunOptions = {},
@@ -1289,7 +1307,7 @@ export function createBottleClassifier(
       });
       artifacts = preparedEvidence.artifacts;
       if (preparedEvidence.autoIgnoreReason) {
-        return {
+        return recordedRun(preparedEvidence.autoIgnorePath ?? "rule", {
           result: BottleClassificationResultSchema.parse(
             createIgnoredReferenceClassification(
               preparedEvidence.autoIgnoreReason,
@@ -1297,7 +1315,7 @@ export function createBottleClassifier(
             ),
           ),
           modelMetadata: null,
-        };
+        });
       }
 
       const smwsMatch = resolveSmwsExactCodeMatch({
@@ -1305,7 +1323,7 @@ export function createBottleClassifier(
         candidates: artifacts.candidates,
       });
       if (smwsMatch) {
-        return {
+        return recordedRun("smws_code", {
           result: BottleClassificationResultSchema.parse(
             createDecidedBottleClassification({
               decision: smwsMatch,
@@ -1313,7 +1331,7 @@ export function createBottleClassifier(
             }),
           ),
           modelMetadata: null,
-        };
+        });
       }
 
       const agentInput: RunBottleClassifierAgentInput = {
@@ -1349,7 +1367,7 @@ export function createBottleClassifier(
       // Scope is the agent's judgment: anything that is not one whisky Bottle
       // is ignored, and callers stop tracking the source.
       if (agentResult.decision.action === "ignore") {
-        return {
+        return recordedRun("agent", {
           result: BottleClassificationResultSchema.parse(
             createIgnoredReferenceClassification(
               agentResult.decision.rationale?.trim() ||
@@ -1358,7 +1376,7 @@ export function createBottleClassifier(
             ),
           ),
           modelMetadata: agentRun.modelMetadata,
-        };
+        });
       }
       const finalized = await finalizeBottleClassifierAgentResult({
         reference: parsedInput.reference,
@@ -1366,7 +1384,7 @@ export function createBottleClassifier(
       });
       artifacts = finalized.artifacts;
 
-      return {
+      return recordedRun("agent", {
         result: BottleClassificationResultSchema.parse(
           createDecidedBottleClassification({
             decision: finalized.decision,
@@ -1374,7 +1392,7 @@ export function createBottleClassifier(
           }),
         ),
         modelMetadata: agentRun.modelMetadata,
-      };
+      });
     } catch (error) {
       if (error instanceof BottleClassificationError) {
         throw error;

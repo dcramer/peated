@@ -56,6 +56,7 @@ import OpenAI from "openai";
 import pg from "pg";
 import { afterEach, beforeEach, describe, expect, test, vi } from "vitest";
 import { z } from "zod";
+import * as resolutionLog from "./bottleResolutionLog";
 
 const { Client } = pg;
 type NodePgClient = InstanceType<typeof Client>;
@@ -2896,12 +2897,19 @@ describe("priceMatching", () => {
       }),
     );
 
+    const logResolution = vi.spyOn(resolutionLog, "logBottleResolution");
     const proposal = await resolveStorePriceMatchProposal(price.id);
 
     expect(classifyBottleReference).toHaveBeenCalledOnce();
     expect(proposal.status).toBe("ignored");
     expect(proposal.proposalType).toBe("no_match");
     expect(proposal.enteredQueueAt).toBeNull();
+    expect(logResolution).toHaveBeenCalledWith({
+      sourceKind: "store_price",
+      sourceId: price.id,
+      outcome: "ignored",
+      action: "ignore",
+    });
   });
 
   test("routes unsupported novelty flavored-whiskey listings through the classifier", async ({

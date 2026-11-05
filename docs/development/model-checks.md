@@ -37,8 +37,41 @@ judgment that a repeatable code test cannot prove.
 - A decision fixture may set `webEvidenceFile` to a package-relative reviewed
   evidence pack. This makes its evidence available in CI without web credentials.
   `BOTTLE_CLASSIFIER_EVAL_FIXED_EVIDENCE_FILE` overrides that fixture default.
-- Run focused model checks while changing model behavior. Run the full suite
-  once at a deliberate full-suite run.
+- A behavior change keeps its targeted model check, and the pull request's
+  `trigger-evals` run proves it once. Do not rerun model checks locally to
+  compare variants or to measure production; use Sentry (see below).
+
+## Measure production
+
+Production classifier behavior is measured from Sentry, not by rerunning
+model checks. Every reference run, on every path, has one
+`bottle_classifier.reference` span with these fields:
+
+- `bottle_classifier.path`: what settled it, `rule`, `scope_precheck`,
+  `smws_code`, `exact_reference`, or `agent`.
+- `bottle_classifier.status` and `bottle_classifier.action`: `classified` or
+  `ignored`, and `match`, `create_bottle`, `no_match`, or `ignore`.
+- `bottle_classifier.identity_scope`, `bottle_classifier.web_evidence`,
+  `bottle_classifier.risk_categories`, `bottle_classifier.risk_count`, and
+  `bottle_classifier.candidate_count`.
+- `bottle_classifier.workload`: `application` or `scraper`.
+
+The span's root transaction names the source, such as
+`bullmq.resolveauctionlot` for auction lots, `bullmq.resolvestorepricebottle`
+for store listings, and `bullmq.createmissingbottles` for reviews. The AI SDK's
+spans under it carry model calls, tool calls, tokens, and time.
+
+Each listing, auction lot, and review also logs `Bottle resolution recorded`
+with `sourceKind`, `sourceId`, `outcome` (`automatic`, `review`, or `ignored`),
+`action`, and `automationBlockers`, the reasons the shared Bottle resolution
+check held a decision for review. Count these in Sentry Logs for the
+automation rate and its causes by source.
+
+Example, runs by path and action over a week:
+
+```bash
+sentry api "/organizations/peated/events/?dataset=spans&field=bottle_classifier.path&field=bottle_classifier.action&field=count()&query=span.op:bottle_classifier.reference&statsPeriod=7d"
+```
 
 ## Capture a production miss
 

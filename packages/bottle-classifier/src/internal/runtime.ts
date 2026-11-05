@@ -11,3 +11,7 @@ export {
   type RunBottleAuditAgentInput,
   type RunBottleClassifierAgentInput,
 } from "../classifierRuntime";
+export {
+  recordReferenceRunOutcome,
+  type ReferenceRunPath,
+} from "../observability";
