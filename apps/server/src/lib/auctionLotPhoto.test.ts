@@ -9,6 +9,7 @@ import {
 } from "./auctionLotPhoto";
 
 const originalAIGatewayApiKey = config.AI_GATEWAY_API_KEY;
+const originalScraperAIGatewayApiKey = config.SCRAPER_AI_GATEWAY_API_KEY;
 const thumbnailUrl =
   "https://d3suvtcq00dftb.cloudfront.net/images/c92e7897a93b0307bc3baa3fe1cdbeeb-med.jpg";
 const labelUrl =
@@ -20,6 +21,7 @@ beforeEach(() => {
 
 afterEach(() => {
   config.AI_GATEWAY_API_KEY = originalAIGatewayApiKey;
+  config.SCRAPER_AI_GATEWAY_API_KEY = originalScraperAIGatewayApiKey;
 });
 
 function createServices(
@@ -113,18 +115,55 @@ test("a photo the source no longer serves leaves the lot without photo evidence"
   expect(await db.select().from(imageLabelExtractions)).toEqual([]);
 });
 
-test("a temporary photo read failure throws so the job retries", async () => {
+test("a photo the source keeps rejecting leaves the lot without photo evidence", async () => {
   const services = createServices({
     status: "failed",
     url: labelUrl,
-    reason: "timeout",
-    httpStatus: null,
+    reason: "http_error",
+    httpStatus: 400,
   });
 
-  await expect(
-    readAuctionLotPhotoEvidence({ id: 1, imageUrl: thumbnailUrl }, services),
-  ).rejects.toThrow("timeout");
-  expect(await db.select().from(imageLabelExtractions)).toEqual([]);
+  expect(
+    await readAuctionLotPhotoEvidence(
+      { id: 1, imageUrl: thumbnailUrl },
+      services,
+    ),
+  ).toBeNull();
+  expect(services.readLabel).not.toHaveBeenCalled();
+});
+
+test.each([
+  { reason: "timeout" as const, httpStatus: null },
+  { reason: "http_error" as const, httpStatus: 503 },
+  { reason: "http_error" as const, httpStatus: 429 },
+])(
+  "a temporary photo read failure ($reason $httpStatus) throws so the job retries",
+  async ({ reason, httpStatus }) => {
+    const services = createServices({
+      status: "failed",
+      url: labelUrl,
+      reason,
+      httpStatus,
+    });
+
+    await expect(
+      readAuctionLotPhotoEvidence({ id: 1, imageUrl: thumbnailUrl }, services),
+    ).rejects.toThrow(reason);
+    expect(await db.select().from(imageLabelExtractions)).toEqual([]);
+  },
+);
+
+test("reads the photo with only the scraper's AI key", async () => {
+  config.AI_GATEWAY_API_KEY = undefined;
+  config.SCRAPER_AI_GATEWAY_API_KEY = "scraper-key";
+  const services = createServices(okRead);
+
+  expect(
+    await readAuctionLotPhotoEvidence(
+      { id: 1, imageUrl: thumbnailUrl },
+      services,
+    ),
+  ).not.toBeNull();
 });
 
 test("a failed label reading throws and is not saved", async () => {

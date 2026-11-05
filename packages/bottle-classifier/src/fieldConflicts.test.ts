@@ -184,6 +184,7 @@ describe("edition conflicts", () => {
     // its letter as a word.
     expect(editionConflicts("Cask C12, Batch C", "Cask C12")).toEqual([]);
     expect(editionConflicts("Batch B1 B", "Batch B1")).toEqual([]);
+    expect(editionConflicts("Cask A 12, 2019", "A12 2019")).toEqual([]);
     expect(
       compareBottleFields({ edition: "Batch3" }, { edition: "Batch 3" }),
     ).toMatchObject({ agreements: ["edition"] });
@@ -194,6 +195,10 @@ describe("edition conflicts", () => {
     expect(editionConflicts("A123", "B123")).toEqual(["edition"]);
     expect(editionConflicts("S2B13", "S2B14")).toEqual(["edition"]);
     expect(editionConflicts("Batch 1 2", "Batch 12")).toEqual(["edition"]);
+    // Letters printed elsewhere on the label do not turn `A12` into `B12`.
+    expect(editionConflicts("Batch B, Cask A12", "Batch A, Cask B12")).toEqual([
+      "edition",
+    ]);
   });
 
   test("leaves wording without markers to the classifier", () => {

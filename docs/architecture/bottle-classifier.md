@@ -243,8 +243,11 @@ bottler, but a stored Brand of `Canadian` for a Canadian Club Bottle does.
   nor `1`, and `1.2a` is not `1.2b`. Accents, `No.`, and leading zeros do not
   change a marker. Nor does a space between letters and a number: `Batch3`
   reads as `Batch 3`, and `S2B13` as `S2 B13`. Letters glued to a number are
-  dropped only when the other edition spells them as their own word, so
-  `A123` and `B123` still differ, and so do `1 2` and `12`. Editions conflict
+  dropped only when the other edition spells them as their own word, and
+  only to match a number printed without letters: `Cask A 12` matches `A12`,
+  but `A123` and `B123` still differ, even when each edition prints the
+  other's letter (`Batch B, Cask A12` and `Batch A, Cask B12`), and so do
+  `1 2` and `12`. Editions conflict
   only when each side has a marker the other lacks: `Batch 3` and `Batch 4`
   conflict; `2017 Release` and `2017 Edition` agree; `Cask #2787` and
   `Cask 2787 · Fèis Ìle 2023` do not conflict. The wording is left to the
