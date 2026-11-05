@@ -286,6 +286,21 @@ describe("admin moderation tasks", () => {
       finalStatus: "ignored",
       reviewedById: admin.id,
     });
+    const decisions = await db.query.incomingBottleDecisionLogs.findMany();
+    expect(decisions).toMatchObject([
+      {
+        proposalId: inconclusive!.id,
+        decision: "ignore",
+        bottleId: null,
+        rationale: "Ignored as inconclusive in bulk.",
+        metadata: { resolutionSource: "moderator_bulk_ignore" },
+      },
+    ]);
+    const history = await routerClient.admin.moderation.listHistory(
+      { outcome: "ignore" },
+      { context: { user: admin } },
+    );
+    expect(history.results).toHaveLength(1);
   });
 
   test("projects findings only after independent operations are resolved", async ({

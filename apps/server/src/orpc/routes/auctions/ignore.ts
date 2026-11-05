@@ -13,7 +13,7 @@ export default procedure
     path: "/auction-lots/{lot}/ignore",
     summary: "Ignore an auction lot",
     description:
-      "Ignore a lot that is not one whisky bottle, such as a sample, glassware, or another spirit, after checking its source fingerprint, assignment, and saved check. Clears any assignment. Requires a moderator.",
+      "Ignore a lot that is not one whisky bottle, such as a sample, glassware, or another spirit, after checking its source fingerprint, assignment, and saved check. Clears any assignment and records the ignore as a moderator decision with its optional reason. Requires a moderator.",
     operationId: "ignoreAuctionLot",
   })
   .input(
@@ -23,6 +23,7 @@ export default procedure
         fingerprint: z.string().min(1),
         expectedBottleId: z.number().int().positive().nullable(),
         expectedCheckId: z.number().int().positive().nullable(),
+        reason: z.string().trim().min(1).max(500).optional(),
       })
       .strict(),
   )
@@ -34,6 +35,7 @@ export default procedure
         fingerprint: input.fingerprint,
         expectedBottleId: input.expectedBottleId,
         expectedCheckId: input.expectedCheckId,
+        reason: input.reason,
         userId: context.user.id,
       });
     } catch (error) {

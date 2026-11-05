@@ -27,6 +27,7 @@ import {
   bottleObservations,
   bottleReferences,
   bottles,
+  incomingBottleDecisionLogs,
   storePriceMatchAttempts,
   storePriceMatchProposals,
   storePrices,
@@ -184,6 +185,15 @@ export class UnknownStorePriceMatchProposalError extends Error {
   constructor(proposalId: number) {
     super(`Price match proposal not found (${proposalId}).`);
     this.name = "UnknownStorePriceMatchProposalError";
+  }
+}
+
+export class StorePriceMatchProposalChangedError extends Error {
+  constructor(readonly proposalId: number) {
+    super(
+      `Price match proposal ${proposalId} changed. Reload it before deciding.`,
+    );
+    this.name = "StorePriceMatchProposalChangedError";
   }
 }
 
@@ -1832,25 +1842,50 @@ export async function applyApprovedStorePriceMatch({
 }
 
 /**
- * Commits the canonical Bottle update and proposal approval atomically, then
- * runs both retained finalizers only after that transaction commits.
+ * A moderator ignores a listing they reviewed. The update time they saw must
+ * still match, so a listing that changed since is not ignored by mistake, and
+ * the ignore is recorded as a decision with the moderator's reason.
  */
 export async function ignoreStorePriceMatchProposal({
   proposalId,
+  expectedUpdatedAt,
+  reason,
   reviewedById,
   actor,
 }: {
   proposalId: number;
+  expectedUpdatedAt: Date;
+  reason?: string;
   reviewedById: number;
   actor: IncomingBottleDecisionActor;
 }) {
   await db.transaction(async (tx) => {
-    await getStorePriceMatchProposalForReviewInTransaction(tx, {
-      proposalId,
-    });
+    const proposal = await getStorePriceMatchProposalForReviewInTransaction(
+      tx,
+      { proposalId },
+    );
+    if (proposal.updatedAt.getTime() !== expectedUpdatedAt.getTime()) {
+      throw new StorePriceMatchProposalChangedError(proposalId);
+    }
 
-    await getPriceMatchWriteActorForDatabase(tx, actor, {
+    const writeActor = await getPriceMatchWriteActorForDatabase(tx, actor, {
       userId: reviewedById,
+    });
+    await recordIncomingBottleDecisionInTransaction(tx, {
+      sourceKind: "store_price",
+      sourceId: proposal.price.id,
+      proposalId,
+      externalSiteId: proposal.price.externalSiteId,
+      name: proposal.price.name,
+      url: proposal.price.url,
+      actor: writeActor,
+      bottleId: null,
+      decision: "ignore",
+      rationale: reason ?? null,
+      metadata: {
+        resolutionSource: "moderator_ignore",
+        proposalType: proposal.proposalType,
+      },
     });
 
     await tx
@@ -1883,7 +1918,7 @@ export async function ignoreInconclusiveStorePriceMatchProposals({
   actor: IncomingBottleDecisionActor;
 }): Promise<number> {
   return await db.transaction(async (tx) => {
-    await getPriceMatchWriteActorForDatabase(tx, actor, {
+    const writeActor = await getPriceMatchWriteActorForDatabase(tx, actor, {
       userId: reviewedById,
     });
 
@@ -1935,6 +1970,19 @@ export async function ignoreInconclusiveStorePriceMatchProposals({
           WHERE ${inArray(storePriceMatchAttempts.proposalId, proposalIds)}
           GROUP BY ${storePriceMatchAttempts.proposalId}
         )
+      `);
+      // Each bulk ignore is a moderator decision, like a single ignore.
+      await tx.execute(sql`
+        INSERT INTO ${incomingBottleDecisionLogs}
+          (source_kind, source_id, proposal_id, external_site_id, name, url, decision, actor_id, bottle_id, rationale, metadata)
+        SELECT
+          'store_price', ${storePrices.id}, ${storePriceMatchProposals.id}, ${storePrices.externalSiteId},
+          ${storePrices.name}, ${storePrices.url}, 'ignore', ${writeActor.id}, NULL,
+          'Ignored as inconclusive in bulk.',
+          ${JSON.stringify({ resolutionSource: "moderator_bulk_ignore", proposalType: "no_match" })}::jsonb
+        FROM ${storePriceMatchProposals}
+        INNER JOIN ${storePrices} ON ${storePrices.id} = ${storePriceMatchProposals.priceId}
+        WHERE ${inArray(storePriceMatchProposals.id, proposalIds)}
       `);
     }
 

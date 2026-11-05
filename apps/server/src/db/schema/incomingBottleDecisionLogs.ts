@@ -42,6 +42,8 @@ export const incomingBottleDecisionTypeEnum = pgEnum(
     // TODO(prices): Drop match_existing once migration 0302 has rewritten it.
     "match",
     "unassign",
+    // A moderator ignored the source as not one whisky bottle.
+    "ignore",
   ],
 );
 export const incomingBottleDecisionLogs = pgTable(

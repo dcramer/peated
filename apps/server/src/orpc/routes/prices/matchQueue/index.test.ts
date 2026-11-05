@@ -58,7 +58,11 @@ describe("price match queue", () => {
 
     const resolveError = await waitError(
       routerClient.prices.matchQueue.resolve(
-        { proposal: 1, action: "ignore" },
+        {
+          proposal: 1,
+          action: "ignore",
+          expectedUpdatedAt: new Date().toISOString(),
+        },
         { context: { user } },
       ),
     );
@@ -3012,10 +3016,24 @@ describe("price match queue", () => {
       })
       .returning();
 
+    const stale = await waitError(
+      routerClient.prices.matchQueue.resolve(
+        {
+          proposal: proposal.id,
+          action: "ignore",
+          expectedUpdatedAt: "2000-01-01T00:00:00.000Z",
+        },
+        { context: { user } },
+      ),
+    );
+    expect(stale).toMatchObject({ status: 409 });
+
     await routerClient.prices.matchQueue.resolve(
       {
         proposal: proposal.id,
         action: "ignore",
+        expectedUpdatedAt: proposal.updatedAt.toISOString(),
+        reason: "A gift box with two glasses.",
       },
       { context: { user } },
     );
@@ -3027,6 +3045,16 @@ describe("price match queue", () => {
     expect(updatedProposal).toMatchObject({
       status: "ignored",
       reviewedById: user.id,
+    });
+    expect(
+      await db.query.incomingBottleDecisionLogs.findFirst({
+        where: eq(incomingBottleDecisionLogs.proposalId, proposal.id),
+      }),
+    ).toMatchObject({
+      decision: "ignore",
+      bottleId: null,
+      rationale: "A gift box with two glasses.",
+      metadata: { resolutionSource: "moderator_ignore" },
     });
   });
 

@@ -213,6 +213,60 @@ describe("GET /admin/moderation/ignored", () => {
     ]);
   });
 
+  test("shows a moderator's reason for an ignore they made", async ({
+    fixtures,
+  }) => {
+    const mod = await fixtures.User({ mod: true, username: "reason-mod" });
+    const { proposal } = await listing(fixtures, "Gift Set With Glasses", {
+      status: "pending_review",
+    });
+    await routerClient.prices.matchQueue.resolve(
+      {
+        proposal: proposal.id,
+        action: "ignore",
+        expectedUpdatedAt: proposal.updatedAt.toISOString(),
+        reason: "A gift set with two glasses.",
+      },
+      { context: { user: mod } },
+    );
+
+    // A moderator matched this lot once; the classifier ignored it later.
+    const lot = await auctionLot(fixtures, "Miniature Set");
+    const lotCheck = await saveCheck(
+      "auction_lot",
+      lot.id,
+      ignoredOutput("A set of miniatures, not one whisky Bottle."),
+      new Date("2026-11-03T00:00:00Z"),
+    );
+    await db
+      .update(auctionLots)
+      .set({
+        matchCheckId: lotCheck.id,
+        matchStatus: "ignored",
+        matchedById: mod.id,
+        matchedAt: new Date("2026-10-01T00:00:00Z"),
+      })
+      .where(eq(auctionLots.id, lot.id));
+
+    const { results } = await routerClient.admin.moderation.listIgnored(
+      {},
+      { context: { user: mod } },
+    );
+    expect(results).toMatchObject([
+      {
+        key: `listing:${proposal.id}`,
+        reason: "A gift set with two glasses.",
+        ignoredBy: "reason-mod",
+      },
+      {
+        key: `auction_lot:${lot.id}`,
+        reason: "A set of miniatures, not one whisky Bottle.",
+        ignoredBy: null,
+        ignoredAt: "2026-11-03T00:00:00.000Z",
+      },
+    ]);
+  });
+
   test("leaves out sources that are not ignored now", async ({ fixtures }) => {
     const mod = await fixtures.User({ mod: true });
 

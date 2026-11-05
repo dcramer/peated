@@ -564,6 +564,7 @@ describe("POST /auction-lots/{lot}/ignore", () => {
         fingerprint: data.lot.sourceFingerprint,
         expectedBottleId: data.bottle.id,
         expectedCheckId: data.check.id,
+        reason: "A 5cl sample, not one bottle.",
       },
       { context: data.context },
     );
@@ -580,8 +581,9 @@ describe("POST /auction-lots/{lot}/ignore", () => {
       .limit(1);
     expect(latest).toMatchObject({
       sourceKind: "auction_lot",
-      decision: "unassign",
+      decision: "ignore",
       bottleId: null,
+      rationale: "A 5cl sample, not one bottle.",
       metadata: {
         resolutionSource: "moderator_ignore",
         previousBottleId: data.bottle.id,

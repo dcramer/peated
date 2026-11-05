@@ -669,12 +669,14 @@ export async function ignoreAuctionLot({
   fingerprint,
   expectedBottleId,
   expectedCheckId,
+  reason,
   userId,
 }: {
   lotId: number;
   fingerprint: string;
   expectedBottleId: number | null;
   expectedCheckId: number | null;
+  reason?: string;
   userId: number;
 }) {
   return await db.transaction(async (tx) => {
@@ -696,27 +698,26 @@ export async function ignoreAuctionLot({
       lot.matchStatus === "ignored"
     )
       throw new AuctionLotMatchChangedError();
-    if (lot.bottleId !== null) {
-      const auction = await tx.query.auctions.findFirst({
-        where: eq(auctions.id, lot.auctionId),
-      });
-      if (!auction) throw new Error("Auction lot has no auction.");
-      await recordIncomingBottleDecisionInTransaction(tx, {
-        sourceKind: "auction_lot",
-        sourceId: lot.id,
-        externalSiteId: auction.externalSiteId,
-        name: lot.name,
-        url: lot.url,
-        actor: await getUserActorByIdForDatabase(tx, userId),
-        bottleId: null,
-        decision: "unassign",
-        rationale: "Ignored: the lot is not one whisky bottle.",
-        metadata: {
-          resolutionSource: "moderator_ignore",
-          previousBottleId: lot.bottleId,
-        },
-      });
-    }
+    const auction = await tx.query.auctions.findFirst({
+      where: eq(auctions.id, lot.auctionId),
+    });
+    if (!auction) throw new Error("Auction lot has no auction.");
+    // Every moderator ignore is a decision, with or without a Bottle to clear.
+    await recordIncomingBottleDecisionInTransaction(tx, {
+      sourceKind: "auction_lot",
+      sourceId: lot.id,
+      externalSiteId: auction.externalSiteId,
+      name: lot.name,
+      url: lot.url,
+      actor: await getUserActorByIdForDatabase(tx, userId),
+      bottleId: null,
+      decision: "ignore",
+      rationale: reason ?? "Ignored: the lot is not one whisky bottle.",
+      metadata: {
+        resolutionSource: "moderator_ignore",
+        previousBottleId: lot.bottleId,
+      },
+    });
     const [updated] = await tx
       .update(auctionLots)
       .set({

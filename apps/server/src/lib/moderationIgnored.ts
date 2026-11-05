@@ -6,12 +6,13 @@ import {
   externalReviewArticles,
   externalReviews,
   externalSites,
+  incomingBottleDecisionLogs,
   storePriceMatchProposals,
   storePrices,
   users,
 } from "@peated/server/db/schema";
 import type { IgnoredSource } from "@peated/server/orpc/routes/admin/moderation/schemas";
-import { and, sql, type SQL } from "drizzle-orm";
+import { and, sql, type AnyColumn, type SQL } from "drizzle-orm";
 
 type IgnoredSourceInput = {
   query?: string;
@@ -54,6 +55,20 @@ function latestCheck(sourceKind: string, sourceId: SQL) {
   )`;
 }
 
+// A moderator's latest ignore decision for a source, joined LATERAL, for the
+// reason they gave.
+function latestIgnoreDecision(sourceKind: string, sourceId: SQL | AnyColumn) {
+  return sql`LATERAL (
+    SELECT decision.rationale
+    FROM ${incomingBottleDecisionLogs} AS decision
+    WHERE decision.source_kind = ${sourceKind}
+      AND decision.source_id = ${sourceId}
+      AND decision.decision = 'ignore'
+    ORDER BY decision.id DESC
+    LIMIT 1
+  )`;
+}
+
 /**
  * Lists sources that are ignored now, newest first, so moderators can sample
  * wrong ignores. Each source owns its ignored state: a listing's proposal
@@ -91,7 +106,10 @@ export async function queryIgnoredSources(
         ${storePrices.name} AS title,
         ${externalSites.name} AS "sourceLabel",
         ${storePrices.url} AS url,
-        listing_check.reason AS reason,
+        CASE
+          WHEN ${users.id} IS NULL THEN listing_check.reason
+          ELSE listing_decision.rationale
+        END AS reason,
         ${users.username} AS "ignoredBy",
         COALESCE(
           ${storePriceMatchProposals.reviewedAt},
@@ -105,6 +123,7 @@ export async function queryIgnoredSources(
         ON ${externalSites.id} = ${storePrices.externalSiteId}
       LEFT JOIN ${users} ON ${users.id} = ${storePriceMatchProposals.reviewedById}
       LEFT JOIN ${latestCheck("store_price", sql`${storePrices.id}::text`)} AS listing_check ON TRUE
+      LEFT JOIN ${latestIgnoreDecision("store_price", storePrices.id)} AS listing_decision ON TRUE
       WHERE ${storePriceMatchProposals.status} = 'ignored'
         AND ${storePrices.hidden} = false
 
@@ -118,16 +137,27 @@ export async function queryIgnoredSources(
         ${auctionLots.name} AS title,
         ${externalSites.name} AS "sourceLabel",
         ${auctionLots.url} AS url,
+        -- A saved check that ignored the lot means the classifier did; a
+        -- moderator can only ignore a lot that is not ignored yet.
         CASE
           WHEN lot_check.output->>'status' = 'ignored' THEN lot_check.output->>'reason'
+          ELSE lot_decision.rationale
         END AS reason,
-        ${users.username} AS "ignoredBy",
-        COALESCE(${auctionLots.matchedAt}, lot_check.completed_at, lot_check.created_at, ${auctionLots.firstSeenAt}) AS "ignoredAt"
+        CASE
+          WHEN lot_check.output->>'status' = 'ignored' THEN NULL
+          ELSE ${users.username}
+        END AS "ignoredBy",
+        CASE
+          WHEN lot_check.output->>'status' = 'ignored'
+            THEN COALESCE(lot_check.completed_at, lot_check.created_at)
+          ELSE COALESCE(${auctionLots.matchedAt}, ${auctionLots.firstSeenAt})
+        END AS "ignoredAt"
       FROM ${auctionLots}
       INNER JOIN ${auctions} ON ${auctions.id} = ${auctionLots.auctionId}
       INNER JOIN ${externalSites} ON ${externalSites.id} = ${auctions.externalSiteId}
       LEFT JOIN ${bottleChecks} AS lot_check ON lot_check.id = ${auctionLots.matchCheckId}
       LEFT JOIN ${users} ON ${users.id} = ${auctionLots.matchedById}
+      LEFT JOIN ${latestIgnoreDecision("auction_lot", auctionLots.id)} AS lot_decision ON TRUE
       WHERE ${auctionLots.matchStatus} = 'ignored'
 
       UNION ALL

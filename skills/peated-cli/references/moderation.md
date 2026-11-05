@@ -73,10 +73,16 @@ with what you checked:
 A reason is saved on the decision even when nothing differs, so send one
 whenever the evidence is not obvious from the listing.
 
-Ignore body:
+Ignore body. Send the proposal `updatedAt` from its details; a proposal that
+changed since returns `409`. The reason is saved on the ignore decision.
 
 ```json
-{ "proposal": 123, "action": "ignore" }
+{
+  "proposal": 123,
+  "action": "ignore",
+  "expectedUpdatedAt": "2026-10-10T20:00:00.000Z",
+  "reason": "A gift set with two glasses, not one bottle."
+}
 ```
 
 ```bash
