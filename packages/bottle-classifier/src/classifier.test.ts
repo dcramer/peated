@@ -1,3 +1,4 @@
+import * as Sentry from "@sentry/core";
 import type { Experimental_DecisionQuestion } from "ai";
 import { describe, expect, test, vi } from "vitest";
 import {
@@ -5547,5 +5548,89 @@ describe("createBottleClassifier", () => {
       proposedBottle: null,
     });
     expect(result).not.toHaveProperty("proposedOperations");
+  });
+});
+
+describe("reference run outcome", () => {
+  // Each run records what settled it on the caller's span, so production
+  // outcomes can be counted in Sentry.
+  async function recordedPath(
+    run: (
+      classifier: ReturnType<typeof createTestClassifier>["classifier"],
+    ) => Promise<
+      Awaited<
+        ReturnType<
+          ReturnType<
+            typeof createTestClassifier
+          >["classifier"]["classifyBottleReference"]
+        >
+      >
+    >,
+    options: Parameters<typeof createTestClassifier>[0] = {},
+  ) {
+    const setAttributes = vi.fn();
+    const span = Sentry.startInactiveSpan({ name: "test reference run" });
+    span.setAttributes = setAttributes;
+    const { classifier } = createTestClassifier(options);
+    await Sentry.withActiveSpan(span, async () => await run(classifier));
+    return setAttributes.mock.calls.map(
+      ([attributes]) => attributes["bottle_classifier.path"],
+    );
+  }
+
+  test("records a rule ignore, a scope pre-check ignore, an SMWS code match, and an agent decision", async () => {
+    expect(
+      await recordedPath((classifier) =>
+        classifier.classifyBottleReference({
+          reference: { name: "Buffalo Trace Trilogy Set" },
+        }),
+      ),
+    ).toEqual(["rule"]);
+
+    expect(
+      await recordedPath(
+        (classifier) =>
+          classifier.classifyBottleReference({
+            reference: { name: "Deanston 2013 7 Year Old Hand Filled" },
+          }),
+        {
+          decisionModel: createScopeDecisionModel({
+            choice: "hand_fill",
+            probability: 0.82,
+          }).model,
+        },
+      ),
+    ).toEqual(["scope_precheck"]);
+
+    expect(
+      await recordedPath((classifier) =>
+        classifier.classifyBottleReference({
+          reference: { name: "SMWS 73.8 Aultmore 1989 13 Year Old" },
+          initialCandidates: [
+            buildBottleCandidate({
+              bottleId: 99,
+              fullName: "SMWS 73.8 A renamed subtitle",
+              brand: "SMWS",
+            }),
+          ],
+        }),
+      ),
+    ).toEqual(["smws_code"]);
+
+    expect(
+      await recordedPath(
+        (classifier) =>
+          classifier.classifyBottleReference({
+            reference: { name: "Buffalo Trace Kentucky Straight Bourbon" },
+          }),
+        {
+          extractedIdentity: buffaloTraceStraightBourbonIdentity,
+          runBottleClassifierAgent: async () => ({
+            decision: noMatchAgentDecision(),
+            artifacts: {},
+          }),
+        },
+      ),
+    ).toEqual(["agent"]);
   });
 });

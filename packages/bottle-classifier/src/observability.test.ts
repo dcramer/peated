@@ -1,10 +1,15 @@
 import type { Span } from "@sentry/core";
 import * as Sentry from "@sentry/core";
-import { describe, expect, test } from "vitest";
+import { describe, expect, test, vi } from "vitest";
+import {
+  createDecidedBottleClassification,
+  createIgnoredBottleClassification,
+} from "./contract";
 import {
   buildClassifierRunSpanContext,
   type ClassifierSpanContext,
   type ClassifierSpanStarter,
+  recordReferenceRunOutcome,
   startClassifierRunSpan,
 } from "./observability";
 
@@ -59,5 +64,82 @@ describe("classifier run span", () => {
         (key) => key.startsWith("gen_ai.") && key !== "gen_ai.conversation.id",
       ),
     ).toEqual([]);
+  });
+});
+
+describe("reference run outcome", () => {
+  test("records the path, decision, and open risk categories as fixed values", () => {
+    const span = { setAttributes: vi.fn() };
+    recordReferenceRunOutcome({
+      path: "agent",
+      span,
+      result: createDecidedBottleClassification({
+        decision: {
+          action: "match",
+          matchedBottleId: 7,
+          candidateBottleIds: [7, 8],
+          rationale: "The label names this release.",
+          identityScope: "product",
+          referenceScope: "none",
+          observation: null,
+          proposedBottle: null,
+          confidenceBasis: {
+            webEvidence: "supportive",
+            unresolvedRisks: [
+              { category: "identity_ambiguity", note: "Two ages." },
+              { category: "trait_conflict", note: "ABV differs." },
+              { category: "identity_ambiguity", note: "Two labels." },
+            ],
+          },
+        },
+        artifacts: {},
+      }),
+    });
+
+    expect(span.setAttributes).toHaveBeenCalledWith({
+      "bottle_classifier.path": "agent",
+      "bottle_classifier.status": "classified",
+      "bottle_classifier.action": "match",
+      "bottle_classifier.identity_scope": "product",
+      "bottle_classifier.web_evidence": "supportive",
+      "bottle_classifier.risk_categories": [
+        "identity_ambiguity",
+        "trait_conflict",
+      ],
+      "bottle_classifier.risk_count": 3,
+      "bottle_classifier.candidate_count": 0,
+    });
+  });
+
+  test("records an ignore without its reason text", () => {
+    const span = { setAttributes: vi.fn() };
+    recordReferenceRunOutcome({
+      path: "scope_precheck",
+      span,
+      result: createIgnoredBottleClassification({
+        reason: "The scope pre-check found a sample.",
+        artifacts: {},
+      }),
+    });
+
+    const [attributes] = span.setAttributes.mock.calls[0]!;
+    expect(attributes).toMatchObject({
+      "bottle_classifier.path": "scope_precheck",
+      "bottle_classifier.status": "ignored",
+      "bottle_classifier.action": "ignore",
+    });
+    expect(JSON.stringify(attributes)).not.toContain("sample");
+  });
+
+  test("does nothing without a span", () => {
+    expect(() =>
+      recordReferenceRunOutcome({
+        path: "rule",
+        result: createIgnoredBottleClassification({
+          reason: "A bundle.",
+          artifacts: {},
+        }),
+      }),
+    ).not.toThrow();
   });
 });

@@ -8,7 +8,10 @@ import type {
   BottleClassifierRunOptions,
   RunBottleClassifierAgentInput,
 } from "@peated/bottle-classifier/internal/runtime";
-import { createBottleClassifier } from "@peated/bottle-classifier/internal/runtime";
+import {
+  createBottleClassifier,
+  recordReferenceRunOutcome,
+} from "@peated/bottle-classifier/internal/runtime";
 import {
   EntityResolutionSchema,
   SearchEntitiesArgsSchema,
@@ -32,6 +35,7 @@ import {
 } from "@peated/server/lib/openaiClient";
 import { createServerPeatedBot } from "@peated/server/lib/peatedBot";
 import { absoluteUrl } from "@peated/server/lib/urls";
+import { startSpan } from "@sentry/node";
 import { randomUUID } from "node:crypto";
 import {
   getBottleClassifierContext,
@@ -158,25 +162,46 @@ async function runBottleReferenceForWorkload(
     input.conversationId,
   );
 
-  return await withReferenceConversation(conversationId, async () => {
-    const exactReferenceRun = await resolveExactReferenceBottleRun({
-      ...input,
-      reference,
-      conversationId,
-    });
-    if (exactReferenceRun) {
-      return exactReferenceRun;
-    }
+  return await withReferenceConversation(
+    conversationId,
+    async () =>
+      // Every source's reference run, on every path, gets one span; the
+      // classifier records how it ended there. The root transaction, such as
+      // the queue job, names the source.
+      await startSpan(
+        {
+          op: "bottle_classifier.reference",
+          name: "Classify Bottle reference",
+          attributes: {
+            "gen_ai.conversation.id": conversationId,
+            "bottle_classifier.workload": workload,
+          },
+        },
+        async () => {
+          const exactReferenceRun = await resolveExactReferenceBottleRun({
+            ...input,
+            reference,
+            conversationId,
+          });
+          if (exactReferenceRun) {
+            recordReferenceRunOutcome({
+              path: "exact_reference",
+              result: exactReferenceRun.result,
+            });
+            return exactReferenceRun;
+          }
 
-    return await getBottleClassifier(workload).runBottleReference(
-      {
-        ...input,
-        reference,
-        conversationId,
-      },
-      options,
-    );
-  });
+          return await getBottleClassifier(workload).runBottleReference(
+            {
+              ...input,
+              reference,
+              conversationId,
+            },
+            options,
+          );
+        },
+      ),
+  );
 }
 
 export async function classifyBottleReference(
