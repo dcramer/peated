@@ -230,6 +230,70 @@ export const ModerationAutomationResponseSchema = z
   })
   .strict();
 
+export const IgnoredSourceKindSchema = z.enum([
+  "listing",
+  "auction_lot",
+  "external_review",
+]);
+
+export const IgnoredSourceSchema = z
+  .object({
+    key: z.string().regex(/^(listing|auction_lot|external_review):\d+$/),
+    kind: IgnoredSourceKindSchema,
+    source: z.discriminatedUnion("kind", [
+      z
+        .object({
+          kind: z.literal("listing"),
+          proposalId: z.number().int().positive(),
+          priceId: z.number().int().positive(),
+        })
+        .strict(),
+      z
+        .object({
+          kind: z.literal("auction_lot"),
+          lotId: z.number().int().positive(),
+        })
+        .strict(),
+      z
+        .object({
+          kind: z.literal("external_review"),
+          reviewId: z.number().int().positive(),
+        })
+        .strict(),
+    ]),
+    title: z.string(),
+    sourceLabel: z.string(),
+    url: z.string().nullable(),
+    reason: z.string().nullable(),
+    ignoredBy: z.string().nullable(),
+    ignoredAt: z.string().datetime(),
+  })
+  .strict();
+
+export const IgnoredSourceListInputSchema = z
+  .object({
+    cursor: z.coerce.number().int().positive().max(100).default(1),
+    limit: z.coerce.number().int().positive().max(100).default(50),
+    query: z.string().trim().max(200).optional(),
+    kind: IgnoredSourceKindSchema.optional(),
+    ignoredBy: z.enum(["automatic", "moderator"]).optional(),
+  })
+  .strict()
+  .default({ cursor: 1, limit: 50 });
+
+export const IgnoredSourceListResponseSchema = z
+  .object({
+    results: z.array(IgnoredSourceSchema),
+    rel: z
+      .object({
+        nextCursor: z.number().int().positive().nullable(),
+        prevCursor: z.number().int().positive().nullable(),
+      })
+      .strict(),
+  })
+  .strict();
+
+export type IgnoredSource = z.infer<typeof IgnoredSourceSchema>;
 export type ModerationTaskSummary = z.infer<typeof ModerationTaskSummarySchema>;
 export type ModerationHistorySummary = z.infer<
   typeof ModerationHistorySummarySchema
