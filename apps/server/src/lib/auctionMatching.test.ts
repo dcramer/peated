@@ -29,6 +29,7 @@ import {
 import { assignAuctionLot, upsertAuctionObservation } from "./auctions";
 import { createBottleCheck } from "./bottleChecks";
 import { getBottleCandidateById } from "./bottleReferenceCandidates";
+import * as resolutionLog from "./bottleResolutionLog";
 import { pushJob } from "./test/workerDispatch";
 
 async function importedLot(
@@ -187,6 +188,7 @@ test("unresolved classifier output remains reviewable and repeat-safe", async ({
         toolCalls: { count: 0, names: [] },
       },
     });
+  const logResolution = vi.spyOn(resolutionLog, "logBottleResolution");
   await resolveAuctionLot(lot.id, lot.sourceFingerprint);
   expect(run).toHaveBeenCalledWith({
     readCandidateImages: false,
@@ -200,6 +202,14 @@ test("unresolved classifier output remains reviewable and repeat-safe", async ({
     bottleId: null,
     matchStatus: "review",
   });
+  expect(logResolution).toHaveBeenCalledWith(
+    expect.objectContaining({
+      sourceKind: "auction_lot",
+      sourceId: lot.id,
+      outcome: "review",
+      action: "no_match",
+    }),
+  );
   await db
     .update(auctionLots)
     .set({ matchStatus: "pending" })
@@ -315,7 +325,16 @@ test("ignored classifier output stays ignored after a retry", async ({
         toolCalls: { count: 0, names: [] },
       },
     });
+  const logResolution = vi.spyOn(resolutionLog, "logBottleResolution");
   await resolveAuctionLot(lot.id, lot.sourceFingerprint);
+  expect(logResolution).toHaveBeenCalledWith(
+    expect.objectContaining({
+      sourceKind: "auction_lot",
+      sourceId: lot.id,
+      outcome: "ignored",
+      action: "ignore",
+    }),
+  );
   await db
     .update(auctionLots)
     .set({ matchStatus: "pending" })

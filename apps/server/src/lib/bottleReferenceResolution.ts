@@ -56,6 +56,8 @@ export type BottleReferenceAssignment = {
 
 export type BottleReferenceResolution = {
   assignment: BottleReferenceAssignment | null;
+  // Why the shared Bottle resolution check held a classifier decision.
+  automationBlockers?: string[];
   source: BottleReferenceResolutionSource;
   error: Error | null;
   confidence: number | null;
@@ -346,24 +348,26 @@ async function resolveBottleReferenceTargetWithClassifier(
       classification.decision,
     );
 
+    const assessment = assessBottleResolution({
+      decision: classification.decision,
+      candidates: classification.artifacts.candidates,
+      currentBottleId: reference.currentBottleId ?? null,
+      referenceName: reference.name,
+      allowReplacement,
+      sourceBottleIdentity:
+        classification.artifacts.extractedIdentitySource === "image"
+          ? classification.artifacts.extractedIdentity
+          : null,
+      readListingImage:
+        classification.artifacts.extractedIdentitySource === "image",
+    });
     if (
       classification.decision.action === "no_match" ||
-      !assessBottleResolution({
-        decision: classification.decision,
-        candidates: classification.artifacts.candidates,
-        currentBottleId: reference.currentBottleId ?? null,
-        referenceName: reference.name,
-        allowReplacement,
-        sourceBottleIdentity:
-          classification.artifacts.extractedIdentitySource === "image"
-            ? classification.artifacts.extractedIdentity
-            : null,
-        readListingImage:
-          classification.artifacts.extractedIdentitySource === "image",
-      }).automationEligible
+      !assessment.automationEligible
     ) {
       return {
         assignment: null,
+        automationBlockers: assessment.automationBlockers,
         source: "unresolved",
         error: null,
         confidence: decisionConfidence,

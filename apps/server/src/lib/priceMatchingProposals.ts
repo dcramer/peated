@@ -44,6 +44,7 @@ import {
   fillMissingBottleImage,
   finalizeBottleReferenceAssignment,
 } from "@peated/server/lib/bottleReferences";
+import { logBottleResolution } from "@peated/server/lib/bottleResolutionLog";
 import type { BottleCreateInput } from "@peated/server/lib/bottleSchemas";
 import { buildClassifierBottleInput } from "@peated/server/lib/classifierDecisionCreateInputs";
 import { finalizeCreatedBottle } from "@peated/server/lib/createBottle";
@@ -1209,6 +1210,12 @@ export function createStorePriceMatchResolver({
 
           return proposal;
         });
+        logBottleResolution({
+          sourceKind: "store_price",
+          sourceId: price.id,
+          outcome: "ignored",
+          action: "ignore",
+        });
         return ignoredProposal;
       }
 
@@ -1274,6 +1281,13 @@ export function createStorePriceMatchResolver({
 
       const shouldAutoApprove =
         decision.action === "match" && automationAssessment.automationEligible;
+      logBottleResolution({
+        sourceKind: "store_price",
+        sourceId: price.id,
+        outcome: shouldAutoApprove || shouldAutoCreate ? "automatic" : "review",
+        action: classification.decision.action,
+        automationBlockers: automationAssessment.automationBlockers,
+      });
       if (!shouldAutoApprove && !shouldAutoCreate) {
         return proposal;
       }

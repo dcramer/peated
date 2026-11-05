@@ -12,6 +12,7 @@ import {
 } from "@peated/server/db/schema";
 import { getPeatedSystemActor } from "@peated/server/lib/actors";
 import { listActionableBottleChecks } from "@peated/server/lib/bottleChecks";
+import * as resolutionLog from "@peated/server/lib/bottleResolutionLog";
 import * as workerClient from "@peated/server/lib/test/workerDispatch";
 import { routerClient } from "@peated/server/orpc/router";
 import {
@@ -583,10 +584,20 @@ describe("createMissingBottles", () => {
       url: "https://example.com/no-match-review",
     });
 
+    const logResolution = vi.spyOn(resolutionLog, "logBottleResolution");
     await createMissingBottles({ reviewId: review.id });
     await createMissingBottles({ reviewId: review.id });
 
     expect(classifyBottleReferenceMock).toHaveBeenCalledTimes(1);
+    expect(logResolution).toHaveBeenCalledOnce();
+    expect(logResolution).toHaveBeenCalledWith(
+      expect.objectContaining({
+        sourceKind: "review",
+        sourceId: review.id,
+        outcome: "review",
+        action: "no_match",
+      }),
+    );
     const marked = await db.query.externalReviews.findFirst({
       where: eq(externalReviews.id, review.id),
     });
@@ -976,8 +987,17 @@ describe("createMissingBottles", () => {
       ),
     );
 
+    const logResolution = vi.spyOn(resolutionLog, "logBottleResolution");
     await createMissingBottles({ reviewId: review.id });
 
+    expect(logResolution).toHaveBeenCalledWith(
+      expect.objectContaining({
+        sourceKind: "review",
+        sourceId: review.id,
+        outcome: "automatic",
+        action: "match",
+      }),
+    );
     expect(
       await db.query.externalReviews.findFirst({
         where: eq(externalReviews.id, review.id),
