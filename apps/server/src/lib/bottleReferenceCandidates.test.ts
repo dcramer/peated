@@ -4,8 +4,9 @@ import {
 } from "@peated/bottle-classifier/internal/types";
 import config from "@peated/server/config";
 import { db } from "@peated/server/db";
-import { bottleTombstones } from "@peated/server/db/schema";
+import { bottleReferences, bottleTombstones } from "@peated/server/db/schema";
 import type * as Fixtures from "@peated/server/lib/test/fixtures";
+import { eq } from "drizzle-orm";
 import { afterEach, expect, test, vi } from "vitest";
 import {
   createBottleCandidateLookup,
@@ -364,7 +365,7 @@ async function brandWithOtherBottles(
   const brand = await fixtures.Entity({ name, kind: "distillery" });
   const otherNames = [
     "12-year-old",
-    "15-year-old",
+    "17-year-old",
     "18-year-old",
     "21-year-old",
     "25-year-old",
@@ -498,6 +499,13 @@ test("returns every release of an aged expression, not only the one with an exac
     brandId: brand.id,
     statedAge: 15,
   });
+
+  expect(
+    await db
+      .select({ bottleId: bottleReferences.bottleId })
+      .from(bottleReferences)
+      .where(eq(bottleReferences.name, "Laphroaig 15-year-old")),
+  ).toEqual([{ bottleId: original.id }]);
 
   const candidates = await findBottleReferenceCandidates(
     { name: "Laphroaig 15-year-old" },
