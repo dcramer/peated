@@ -50,6 +50,7 @@ export class BottleGroupMoveError extends Error {
 export type BottleGroupMoveResult = {
   bottle: Bottle;
   changed: boolean;
+  changedReferenceNames: string[];
 };
 
 async function getGroupDistillerIds(tx: AnyTransaction, groupId: number) {
@@ -164,7 +165,7 @@ export async function moveBottleToGroupInTransaction(
     );
   }
   if (sourceGroupId === groupId) {
-    return { bottle, changed: false };
+    return { bottle, changed: false, changedReferenceNames: [] };
   }
 
   const [sourceDistillerIds, targetDistillerIds] = await Promise.all([
@@ -219,17 +220,21 @@ export async function moveBottleToGroupInTransaction(
     loadEntity(tx, target.brandId),
     target.bottlerId === null ? null : loadEntity(tx, target.bottlerId),
   ]);
+  let changedReferenceNames: string[];
   try {
-    await reserveBottleIdentitiesInTransaction(tx, {
-      candidates: [
-        {
-          bottleId,
-          current: { ...bottle, brand, bottler },
-          desired: { ...bottle, ...materialized, brand, bottler },
-        },
-      ],
-      assignedByActorId: actorId,
-    });
+    ({ changedReferenceNames } = await reserveBottleIdentitiesInTransaction(
+      tx,
+      {
+        candidates: [
+          {
+            bottleId,
+            current: { ...bottle, brand, bottler },
+            desired: { ...bottle, ...materialized, brand, bottler },
+          },
+        ],
+        assignedByActorId: actorId,
+      },
+    ));
   } catch (error) {
     if (error instanceof BottleIdentityConflictError) {
       throw new BottleGroupMoveError(
@@ -306,7 +311,7 @@ export async function moveBottleToGroupInTransaction(
     },
   ]);
 
-  return { bottle: moved, changed: true };
+  return { bottle: moved, changed: true, changedReferenceNames };
 }
 
 /** Authorizes, commits, and reindexes one move between BottleGroups. */
@@ -338,6 +343,18 @@ export async function moveBottleToGroup({
       await pushJob("OnBottleChange", { bottleId });
     } catch (error) {
       logError(error, { extra: { bottleId } });
+    }
+  }
+  // A renamed SMWS Bottle keeps its old name as an exact reference; those
+  // references are indexed after commit, as in updateBottle.
+  for (const name of result.changedReferenceNames) {
+    try {
+      await pushJob("OnBottleReferenceChange", { name });
+    } catch (error) {
+      logError(error, {
+        bottle: { id: bottleId },
+        bottleReference: { name },
+      });
     }
   }
   return result;
