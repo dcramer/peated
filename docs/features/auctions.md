@@ -101,9 +101,11 @@ itself let a decision apply automatically. Only the reading is saved, once per
 image and extractor version (see
 [the classifier's saved label readings](../architecture/bottle-classifier.md));
 the photo stays a moderator review link and is never copied into the catalog.
-A photo that is gone, refused, blocked, or too large is skipped, and the lot is
-classified from its title and details. A timeout or failed reading fails the
-job so it retries. Each classified lot adds one image reading; reused
+A photo that is gone, refused, blocked, too large, or rejected with a client
+error is skipped, and the lot is classified from its title and details. A
+timeout, server error, rate limit, or failed reading fails the job so it
+retries. The reading uses the scraper's AI key, like the rest of auction
+matching. Each classified lot adds one image reading; reused
 references, saved checks, and identical lots add none.
 
 When the classifier reads a Scotch Whisky Auctions lot page, the server reads

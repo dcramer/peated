@@ -68,8 +68,10 @@ function getEditionWords(value: string) {
 // A space between letters and a number does not matter: `Batch3` reads as
 // `Batch 3`. Each marker keeps its printed form and, when the other edition
 // spells its leading letters as their own word, a form without them. Two
-// markers match on either form, so a printed code always matches itself and
-// codes such as `A123` and `B123` still differ.
+// markers match on their printed form, or when one was printed without
+// letters and equals the other's form without them. So a printed code always
+// matches itself, `Cask A 12` matches `A12`, and codes such as `A123` and
+// `B123` still differ, even when each edition prints the other's letter.
 function getEditionMarkers(words: string[], otherWords: string[]) {
   const dropLeadingZeros = (word: string) =>
     word.replace(/(^|[./])0+(?=\d)/g, "$1");
@@ -91,7 +93,9 @@ type EditionMarker = ReturnType<typeof getEditionMarkers>[number];
 function hasMarker(markers: EditionMarker[], marker: EditionMarker) {
   return markers.some(
     (other) =>
-      other.printed === marker.printed || other.spaced === marker.spaced,
+      other.printed === marker.printed ||
+      (other.spaced === marker.spaced &&
+        (other.spaced === other.printed || marker.spaced === marker.printed)),
   );
 }
 

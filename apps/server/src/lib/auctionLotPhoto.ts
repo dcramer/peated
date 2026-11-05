@@ -12,6 +12,7 @@ import { readBottleClassifierImageLabel } from "@peated/server/agents/bottleClas
 import config from "@peated/server/config";
 import { createLanguageModel } from "@peated/server/lib/aiSdkModels";
 import { logInfo } from "@peated/server/lib/log";
+import { isAIGatewayConfigured } from "@peated/server/lib/openaiClient";
 import { createServerPeatedBot } from "@peated/server/lib/peatedBot";
 import { buildPhotoEvidenceFromExtractedIdentity } from "@peated/server/lib/photoIdentification";
 import { scotchWhiskyAuctionsLabelImageUrl } from "@peated/server/scraper/adapters/scotchWhiskyAuctions";
@@ -39,7 +40,10 @@ const auctionLotPhotoServices: AuctionLotPhotoServices = {
     }),
   readLabel: async (imageDataUrl) => {
     const extraction = await createWhiskyLabelExtractor({
-      languageModel: (model) => createLanguageModel({ model }),
+      // Auction lots are scraped, so their photo readings spend the scraper's
+      // AI key, like the classifier run they feed.
+      languageModel: (model) =>
+        createLanguageModel({ model, workload: "scraper" }),
       model: config.OPENAI_MODEL,
       reasoningEffort: config.OPENAI_REASONING_EFFORT,
       imageModel: config.OPENAI_IMAGE_EXTRACTION_MODEL,
@@ -56,24 +60,36 @@ const auctionLotPhotoServices: AuctionLotPhotoServices = {
 
 class AuctionLotPhotoUnavailableError extends Error {}
 
-// A photo that is gone, blocked, or too large will not read on a retry.
-const LASTING_READ_FAILURES = new Set(["not_found", "blocked", "too_large"]);
+// A photo that is gone, blocked, too large, or rejected with a client error
+// will not read on a retry. Server errors, timeouts (408), and rate limits
+// (429) are temporary.
+function isLastingReadFailure(image: Extract<FileRead, { status: "failed" }>) {
+  if (["not_found", "blocked", "too_large"].includes(image.reason)) return true;
+  return (
+    image.reason === "http_error" &&
+    image.httpStatus !== null &&
+    image.httpStatus >= 400 &&
+    image.httpStatus < 500 &&
+    image.httpStatus !== 408 &&
+    image.httpStatus !== 429
+  );
+}
 
 /**
  * Reads the label on an auction lot's photo for the classifier.
  *
  * Auction matching rule (owner: auctions): the photo is evidence for facts
  * only. Peated never stores or shows it, and only the label reading is saved,
- * so each photo is read once. A photo that is gone, refused, blocked, or too
- * large returns null, and the lot is classified from its title and details
- * alone. A temporary read failure or a failed label reading throws, so the
+ * so each photo is read once. A photo that is gone, refused, blocked, too
+ * large, or rejected with a client error returns null, and the lot is
+ * classified from its title and details alone. A temporary read failure or a failed label reading throws, so the
  * matching job retries it.
  */
 export async function readAuctionLotPhotoEvidence(
   { id, imageUrl }: { id: number; imageUrl: string | null },
   services: AuctionLotPhotoServices = auctionLotPhotoServices,
 ): Promise<ImageBottleEvidence | null> {
-  if (!imageUrl || !config.AI_GATEWAY_API_KEY) return null;
+  if (!imageUrl || !isAIGatewayConfigured("scraper")) return null;
 
   const labelImageUrl = scotchWhiskyAuctionsLabelImageUrl(imageUrl);
   let reading: LabelReading;
@@ -94,10 +110,7 @@ export async function readAuctionLotPhotoEvidence(
             `data:${contentType};base64,${Buffer.from(image.body).toString("base64")}`,
           );
         }
-        if (
-          image.status === "refused" ||
-          LASTING_READ_FAILURES.has(image.reason)
-        )
+        if (image.status === "refused" || isLastingReadFailure(image))
           throw new AuctionLotPhotoUnavailableError(image.reason);
         throw new Error(
           `Could not read auction lot photo ${labelImageUrl}: ${image.reason}`,
