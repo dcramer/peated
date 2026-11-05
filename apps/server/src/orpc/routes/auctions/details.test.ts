@@ -1,4 +1,7 @@
-import { createDecidedBottleClassification } from "@peated/bottle-classifier/contract";
+import {
+  createDecidedBottleClassification,
+  createIgnoredBottleClassification,
+} from "@peated/bottle-classifier/contract";
 import { db } from "@peated/server/db";
 import { auctionLots, bottleTombstones } from "@peated/server/db/schema";
 import { auctionLotCheckKey } from "@peated/server/lib/auctionMatchEvidence";
@@ -87,5 +90,49 @@ describe("GET /auction-lots/{lot}", () => {
       second.id,
       first.id,
     ]);
+  });
+  test("shows why the saved check ignored a lot", async ({ fixtures }) => {
+    const moderator = await fixtures.User({ mod: true });
+    const site = await fixtures.ExternalSite();
+    const { lot } = await upsertAuctionObservation(site.id, {
+      auction: {
+        sourceKey: "1",
+        name: "Auction",
+        url: "https://example.com/auction",
+      },
+      lot: {
+        sourceKey: "1",
+        name: "Distillery Hand-Fill 20cl",
+        url: "https://example.com/lot",
+        state: "closed",
+      },
+      observedAt: new Date().toISOString(),
+    });
+    const { check } = await createBottleCheck({
+      intent: "resolve_reference",
+      sourceKind: "auction_lot",
+      sourceId: lot.id,
+      backgroundEventKey: auctionLotCheckKey(lot.id, lot.sourceFingerprint),
+      input: { reference: { id: lot.id, name: lot.name, url: lot.url } },
+      result: createIgnoredBottleClassification({
+        reason: "A distillery hand-fill, not one whisky Bottle.",
+        artifacts: {},
+      }),
+    });
+    await db
+      .update(auctionLots)
+      .set({ matchCheckId: check.id, matchStatus: "ignored" })
+      .where(eq(auctionLots.id, lot.id));
+
+    const details = await routerClient.auctions.details(
+      { lot: lot.id },
+      { context: { user: moderator } },
+    );
+
+    expect(details).toMatchObject({
+      matchStatus: "ignored",
+      decision: null,
+      ignoreReason: "A distillery hand-fill, not one whisky Bottle.",
+    });
   });
 });

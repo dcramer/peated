@@ -45,6 +45,12 @@ export default procedure
         suggestedBottle: BottleSchema.nullable(),
         candidateBottles: z.array(BottleSchema),
         decision: BottleClassificationDecisionSchema.nullable(),
+        ignoreReason: z
+          .string()
+          .nullable()
+          .describe(
+            "Why the saved check ignored the lot, when it did. A moderator's ignore reason is in moderation History.",
+          ),
         artifacts: BottleClassificationArtifactsSchema.nullable(),
         canRememberReference: z.boolean(),
       })
@@ -120,6 +126,8 @@ export default procedure
         context.user,
       ),
       decision,
+      ignoreReason:
+        evidence?.output.status === "ignored" ? evidence.output.reason : null,
       artifacts: evidence?.artifacts ?? null,
       canRememberReference:
         decision?.action === "match" &&
