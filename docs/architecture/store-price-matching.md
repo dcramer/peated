@@ -124,6 +124,11 @@ a saved Bottle reference would assign the same Bottle again; correct that
 reference first. It does not remove an image the listing gave the Bottle or
 retire a Bottle that a create made; those need a Bottle edit or merge.
 
+The same route also reopens an ignored proposal, such as a wrong automatic
+ignore found on the ignored list (`GET /admin/moderation/ignored`), with the
+same version checks. The listing returns to review as an open question and
+the reopen is recorded as an `unassign` decision.
+
 Price lists return price IDs, and the queue lists only proposals that still
 need review. To find the proposal behind a price, a moderator calls
 `GET /prices/{price}/match-proposal`. It returns the price's one proposal in
