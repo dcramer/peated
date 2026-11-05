@@ -37,9 +37,11 @@ Bottle assessment as prices, auctions, and photos, before assigning a review or
 creating a Bottle. A decision that needs review leaves the source unresolved
 and keeps its saved proposal. Repairing an already assigned review uses the
 same assessment; only a moderator's repair may replace the current Bottle.
-Completed unresolved attempts, including ignored inputs, appear in the
-Moderation Inbox. A moderator can read the saved evidence, assign an existing
-Bottle, or request a new check. Reviews matched before runs were saved have no
+Completed unresolved attempts appear in the Moderation Inbox. A review whose
+latest check ignored it leaves the Inbox, as ignored listings and auction lots
+do, and appears in the ignored list (`GET /admin/moderation/ignored`) with that
+check's reason; its Inbox task still opens from that list. A moderator can read
+the saved evidence, assign an existing Bottle, or request a new check. Reviews matched before runs were saved have no
 saved decision, so the review page also lists catalog candidates for the
 review's name from `GET /bottles/create-candidates`, which makes no model call. A missing Bottle can be added through the
 catalog form before assignment. Assignment publishes a staged review only

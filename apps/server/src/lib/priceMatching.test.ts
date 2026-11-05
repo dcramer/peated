@@ -5293,6 +5293,9 @@ describe("priceMatching", () => {
 
     await ignoreStorePriceMatchProposal({
       proposalId: proposal.id,
+      expectedUpdatedAt: (await db.query.storePriceMatchProposals.findFirst({
+        where: eq(storePriceMatchProposals.id, proposal.id),
+      }))!.updatedAt,
       reviewedById: reviewer.id,
       actor: await getUserActor(reviewer),
     });
@@ -5329,6 +5332,7 @@ describe("priceMatching", () => {
     await expect(
       ignoreStorePriceMatchProposal({
         proposalId: proposal.id,
+        expectedUpdatedAt: proposal.updatedAt,
         reviewedById: reviewer.id,
         actor: await getUserActor(otherUser),
       }),

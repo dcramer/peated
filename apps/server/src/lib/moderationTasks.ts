@@ -20,6 +20,7 @@ import {
   type ActionableBottleCheckSummary,
 } from "@peated/server/lib/bottleChecks";
 import { isSupportedBottleCheck } from "@peated/server/lib/bottleCheckSchemaVersion";
+import { latestReviewCheckIgnoredCondition } from "@peated/server/lib/externalReviewResolution";
 import { toCurrentProposalType } from "@peated/server/lib/priceMatchingStatus";
 import {
   CATALOG_REPORT_OBJECT_TYPES,
@@ -39,6 +40,7 @@ import {
   isNotNull,
   isNull,
   lte,
+  not,
   or,
   sql,
 } from "drizzle-orm";
@@ -71,6 +73,12 @@ async function reviewTasks(
         isNull(externalReviews.removedAt),
         isNotNull(externalReviews.bottleNoMatchAt),
         reviewId === undefined ? undefined : eq(externalReviews.id, reviewId),
+        // An ignored review leaves the Inbox, as listings and auction lots
+        // do. A direct link to its task still opens it, so a moderator can
+        // assign a Bottle after a wrong ignore.
+        reviewId === undefined
+          ? not(latestReviewCheckIgnoredCondition())
+          : undefined,
       ),
     )
     .orderBy(asc(externalReviews.bottleNoMatchAt), asc(externalReviews.id))
@@ -78,7 +86,7 @@ async function reviewTasks(
   return reviews.map((review) => ({
     key: `external_review:${review.id}`,
     kind: "external_review",
-    category: "listing",
+    category: "incoming",
     state: "ready",
     inconclusive: true,
     title: review.name,
@@ -114,7 +122,7 @@ async function auctionTasks(lotId?: number): Promise<ModerationTaskSummary[]> {
   return rows.map((row) => ({
     key: `auction_lot:${row.id}`,
     kind: "auction_lot",
-    category: "listing",
+    category: "incoming",
     state: "ready",
     inconclusive: row.action === "no_match",
     title: row.name,
@@ -198,7 +206,7 @@ function listingTask({
   return {
     key: `listing:${proposal.id}`,
     kind: "listing",
-    category: "listing",
+    category: "incoming",
     state: proposal.status === "errored" ? "blocked" : "ready",
     inconclusive:
       proposal.status === "pending_review" &&
@@ -477,7 +485,7 @@ export function filterModerationTasks(
   tasks: ModerationTaskSummary[],
   input: {
     query?: string;
-    category?: "listing" | "catalog" | "community";
+    category?: "incoming" | "catalog" | "community";
     blocked?: boolean;
     inconclusive?: boolean;
   },

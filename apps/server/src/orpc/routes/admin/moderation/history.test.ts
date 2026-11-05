@@ -115,7 +115,7 @@ describe("admin moderation history", () => {
     expect(secondPage.rel).toEqual({ nextCursor: null, prevCursor: 1 });
 
     const listingHistory = await routerClient.admin.moderation.listHistory(
-      { category: "listing", query: "history listing" },
+      { category: "incoming", query: "history listing" },
       { context: { user: admin } },
     );
     expect(listingHistory.results.map(({ key }) => key)).toEqual([

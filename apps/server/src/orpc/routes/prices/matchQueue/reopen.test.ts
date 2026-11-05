@@ -119,6 +119,70 @@ describe("POST /prices/match-queue/{proposal}/reopen", () => {
     ).toMatchObject({ bottleId: target.id, matchedReferenceId: null });
   });
 
+  test("reopens an ignored listing for review and leaves the ignored list", async ({
+    fixtures,
+  }) => {
+    const user = await fixtures.User({ mod: true });
+    const price = await fixtures.StorePrice({
+      bottleId: null,
+      name: "Ardbeg Ten Years Old",
+      sourceFingerprint: "unchanged-source",
+    });
+    const [proposal] = await db
+      .insert(storePriceMatchProposals)
+      .values({
+        priceId: price.id,
+        status: "ignored",
+        proposalType: "no_match",
+      })
+      .returning();
+    const input = {
+      proposal: proposal.id,
+      expectedUpdatedAt: proposal.updatedAt.toISOString(),
+      expectedSourceFingerprint: price.sourceFingerprint,
+    };
+    expect(
+      await waitError(
+        routerClient.prices.matchQueue.reopen(
+          { ...input, expectedUpdatedAt: "2000-01-01T00:00:00.000Z" },
+          { context: { user } },
+        ),
+      ),
+    ).toMatchObject({ status: 409 });
+
+    await routerClient.prices.matchQueue.reopen(input, { context: { user } });
+
+    expect(
+      await db.query.storePriceMatchProposals.findFirst({
+        where: eq(storePriceMatchProposals.id, proposal.id),
+      }),
+    ).toMatchObject({
+      status: "pending_review",
+      proposalType: "no_match",
+      rationale:
+        "A moderator reopened this ignored listing. Review the source before assigning a Bottle.",
+    });
+    expect(
+      await db.query.incomingBottleDecisionLogs.findFirst({
+        where: eq(incomingBottleDecisionLogs.proposalId, proposal.id),
+      }),
+    ).toMatchObject({
+      decision: "unassign",
+      rationale: "Reopened an ignored listing for moderator review.",
+    });
+    const tasks = await routerClient.admin.moderation.listTasks(undefined, {
+      context: { user },
+    });
+    expect(tasks.results.map(({ key }) => key)).toContain(
+      `listing:${proposal.id}`,
+    );
+    const ignored = await routerClient.admin.moderation.listIgnored(
+      {},
+      { context: { user } },
+    );
+    expect(ignored.results).toEqual([]);
+  });
+
   test("does not reopen an assigned price or an active evaluation", async ({
     fixtures,
   }) => {

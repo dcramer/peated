@@ -10,7 +10,7 @@ import type { priceMatchProposalHistory } from "./reopenStorePriceMatches";
 
 export type IncomingBottleDecisionType = Extract<
   IncomingBottleDecisionLog["decision"],
-  "match" | "create_bottle" | "unassign"
+  "match" | "create_bottle" | "unassign" | "ignore"
 >;
 export type IncomingBottleDecisionSourceKind =
   IncomingBottleDecisionLog["sourceKind"];
@@ -103,8 +103,8 @@ export async function recordIncomingBottleDecisionInTransaction(
   if (actor.type === "user" && !actor.userId) {
     throw new Error(`User actor ${actor.id} is missing user attribution.`);
   }
-  if (decision === "unassign" && bottleId !== null) {
-    throw new Error("An unassignment decision cannot assign a Bottle.");
+  if ((decision === "unassign" || decision === "ignore") && bottleId !== null) {
+    throw new Error(`An ${decision} decision cannot assign a Bottle.`);
   }
 
   // Matching owns retry safety: serialize decisions for one source, not its lifetime.

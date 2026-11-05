@@ -26,6 +26,7 @@ export function priceMatchProposalHistory(proposal: StorePriceMatchProposal) {
 export async function reopenStorePriceMatchesInTransaction(
   tx: AnyTransaction,
   priceIds: number[],
+  rationale = "The previous match was invalidated. Review the source before assigning a Bottle.",
 ) {
   if (!priceIds.length) return [];
   const previous = await tx
@@ -44,8 +45,7 @@ export async function reopenStorePriceMatchesInTransaction(
       automationAssessment: null,
       confidence: null,
       proposedBottle: null,
-      rationale:
-        "The previous match was invalidated. Review the source before assigning a Bottle.",
+      rationale,
       error: null,
       processingToken: null,
       processingQueuedAt: null,

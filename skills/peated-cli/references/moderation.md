@@ -12,7 +12,7 @@ pnpm cli api get /prices/PRICE_ID/match-proposal
 pnpm cli api get /prices/match-queue/retry-runs/active
 pnpm cli api get '/bottles/create-candidates?name=Port%20Charlotte%2018&statedAge=18&limit=5'
 pnpm cli api get '/bottles?query=Port%20Charlotte%2018&limit=12'
-pnpm cli api get '/admin/moderation/history?category=listing&limit=100&cursor=1'
+pnpm cli api get '/admin/moderation/history?category=incoming&limit=100&cursor=1'
 ```
 
 Queue filters: `kind=create_bottle|match|errored`,
@@ -73,10 +73,16 @@ with what you checked:
 A reason is saved on the decision even when nothing differs, so send one
 whenever the evidence is not obvious from the listing.
 
-Ignore body:
+Ignore body. Send the proposal `updatedAt` from its details; a proposal that
+changed since returns `409`. The reason is saved on the ignore decision.
 
 ```json
-{ "proposal": 123, "action": "ignore" }
+{
+  "proposal": 123,
+  "action": "ignore",
+  "expectedUpdatedAt": "2026-10-10T20:00:00.000Z",
+  "reason": "A gift set with two glasses, not one bottle."
+}
 ```
 
 ```bash

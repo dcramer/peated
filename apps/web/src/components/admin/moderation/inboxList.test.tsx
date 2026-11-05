@@ -36,7 +36,7 @@ const reportTask = {
 const listingTask = {
   key: "listing:7",
   kind: "listing",
-  category: "listing",
+  category: "incoming",
   state: "blocked",
   inconclusive: false,
   title: "Mystery whisky listing",
@@ -57,9 +57,9 @@ describe("Moderation Inbox list", () => {
           kind: "auction_lot",
           source: { kind: "auction_lot", lotId: 44 },
         },
-        new URLSearchParams("category=listing"),
+        new URLSearchParams("category=incoming"),
       ),
-    ).toBe("/admin/moderation/inbox/auction_lot/44?category=listing");
+    ).toBe("/admin/moderation/inbox/auction_lot/44?category=incoming");
   });
   test("renders compact task questions, counts, and selected state", () => {
     const html = renderToStaticMarkup(
@@ -68,7 +68,7 @@ describe("Moderation Inbox list", () => {
           results: [listingTask, operationTask, reportTask],
           counts: {
             all: 3,
-            listing: 1,
+            incoming: 1,
             catalog: 1,
             community: 1,
             blocked: 1,
@@ -85,7 +85,7 @@ describe("Moderation Inbox list", () => {
     expect(html).toContain("Apply these changes to the brand or producer?");
     expect(html).toContain("How should this listing be resolved?");
     expect(html).toContain("Does this content break the rules?");
-    expect(html).toContain("Listings 1");
+    expect(html).toContain("Incoming 1");
     expect(html).toContain("Catalog 1");
     expect(html).toContain("Community 1");
     expect(html).toContain('aria-current="true"');
@@ -115,7 +115,7 @@ describe("Moderation Inbox list", () => {
           results: [listingTask],
           counts: {
             all: 201,
-            listing: 201,
+            incoming: 201,
             catalog: 0,
             community: 0,
             blocked: 1,
@@ -125,7 +125,7 @@ describe("Moderation Inbox list", () => {
         }}
         pathname="/admin/moderation/inbox/listing/7"
         searchParams={
-          new URLSearchParams("category=listing&query=whisky&cursor=2")
+          new URLSearchParams("category=incoming&query=whisky&cursor=2")
         }
         selectedKey="listing:7"
       />,
@@ -133,10 +133,10 @@ describe("Moderation Inbox list", () => {
 
     expect(html).toContain("Page 2");
     expect(html).toContain(
-      'href="/admin/moderation/inbox?category=listing&amp;query=whisky&amp;cursor=1"',
+      'href="/admin/moderation/inbox?category=incoming&amp;query=whisky&amp;cursor=1"',
     );
     expect(html).toContain(
-      'href="/admin/moderation/inbox?category=listing&amp;query=whisky&amp;cursor=3"',
+      'href="/admin/moderation/inbox?category=incoming&amp;query=whisky&amp;cursor=3"',
     );
   });
 });

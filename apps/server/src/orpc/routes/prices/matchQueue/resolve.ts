@@ -8,6 +8,7 @@ import {
   ignoreStorePriceMatchProposal,
   StorePriceMatchNeedsReasonError,
   StorePriceMatchProposalAlreadyProcessingError,
+  StorePriceMatchProposalChangedError,
   StorePriceMatchProposalIdentityChangedError,
   StorePriceMatchProposalNotReviewableError,
   UnknownStorePriceMatchProposalError,
@@ -30,6 +31,12 @@ const InputSchema = z.discriminatedUnion("action", [
     .object({
       proposal: z.coerce.number().int().positive(),
       action: z.literal("ignore"),
+      expectedUpdatedAt: z.iso
+        .datetime()
+        .describe(
+          "The proposal `updatedAt` the moderator reviewed. A proposal that changed since is not ignored.",
+        ),
+      reason: z.string().trim().min(1).max(500).optional(),
     })
     .strict(),
 ]);
@@ -41,7 +48,7 @@ export default procedure
     path: "/prices/match-queue/{proposal}",
     summary: "Resolve price match queue item",
     description:
-      "Approve or ignore a store price match proposal. A match to a Bottle that differs from the listing's saved facts needs a reason. Requires moderator privileges",
+      "Approve or ignore a store price match proposal. A match to a Bottle that differs from the listing's saved facts needs a reason. An ignore is recorded as a moderator decision with its optional reason. Requires moderator privileges.",
     operationId: "resolvePriceMatchQueueItem",
   })
   .input(InputSchema)
@@ -61,6 +68,8 @@ export default procedure
 
       await ignoreStorePriceMatchProposal({
         proposalId: input.proposal,
+        expectedUpdatedAt: new Date(input.expectedUpdatedAt),
+        reason: input.reason,
         reviewedById: context.user.id,
         actor: await getUserActor(context.user),
       });
@@ -73,6 +82,9 @@ export default procedure
       }
       if (err instanceof StorePriceMatchNeedsReasonError) {
         throw errors.BAD_REQUEST({ message: err.message });
+      }
+      if (err instanceof StorePriceMatchProposalChangedError) {
+        throw errors.CONFLICT({ message: err.message });
       }
       if (err instanceof StorePriceMatchProposalNotReviewableError) {
         throw errors.CONFLICT({

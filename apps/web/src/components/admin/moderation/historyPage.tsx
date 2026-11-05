@@ -133,7 +133,7 @@ export default function HistoryPage({ selectedKey }: { selectedKey?: string }) {
   };
   if (query) input.query = query;
   if (
-    category === "listing" ||
+    category === "incoming" ||
     category === "catalog" ||
     category === "community"
   )
@@ -160,7 +160,7 @@ export default function HistoryPage({ selectedKey }: { selectedKey?: string }) {
             name="category"
             options={[
               { value: "", label: "All work" },
-              { value: "listing", label: "Listings" },
+              { value: "incoming", label: "Incoming" },
               { value: "catalog", label: "Catalog" },
               { value: "community", label: "Community" },
             ]}

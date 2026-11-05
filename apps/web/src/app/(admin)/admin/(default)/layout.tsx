@@ -19,6 +19,7 @@ const navigationGroups = [
       { href: "/admin/moderation/inbox", label: "Inbox" },
       { href: "/admin/moderation/reports", label: "Reports" },
       { href: "/admin/moderation/history", label: "History" },
+      { href: "/admin/moderation/ignored", label: "Ignored" },
       { href: "/admin/reviews", label: "Reviews" },
       { href: "/admin/tastings", label: "Tastings" },
     ],

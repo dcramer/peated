@@ -22,9 +22,9 @@ export default procedure
   .route({
     method: "POST",
     path: "/prices/match-queue/{proposal}/reopen",
-    summary: "Reopen an approved price match",
+    summary: "Reopen a price match",
     description:
-      "Return an approved proposal to moderator review. Supply expectedBottleId and a reason to also clear a wrong Bottle match. Requires moderator privileges. Does not run automatic matching.",
+      "Return an approved or ignored proposal to moderator review. Supply expectedBottleId and a reason to also clear a wrong Bottle match. Requires moderator privileges. Does not run automatic matching.",
     operationId: "reopenPriceMatchQueueItem",
   })
   .input(
@@ -57,8 +57,12 @@ export default procedure
       if (!row)
         throw errors.NOT_FOUND({ message: "Price match proposal not found." });
       const previousBottleId = row.price.bottleId;
+      // Store price matching owns this rule: a moderator can undo an approval
+      // or an ignore, such as a wrong automatic ignore found on the ignored
+      // list. Either returns the listing to review without a model call.
+      const wasIgnored = row.proposal.status === "ignored";
       if (
-        row.proposal.status !== "approved" ||
+        (row.proposal.status !== "approved" && !wasIgnored) ||
         previousBottleId !== input.expectedBottleId ||
         row.proposal.updatedAt.getTime() !==
           new Date(input.expectedUpdatedAt).getTime() ||
@@ -67,7 +71,7 @@ export default procedure
       ) {
         throw errors.CONFLICT({
           message:
-            "The approved proposal or its source changed. Reload it before reopening.",
+            "The proposal or its source changed. Reload it before reopening.",
         });
       }
       if (previousBottleId !== null) {
@@ -113,14 +117,22 @@ export default procedure
         decision: "unassign",
         rationale:
           input.reason ??
-          "Reopened an already-cleared approval for moderator review.",
+          (wasIgnored
+            ? "Reopened an ignored listing for moderator review."
+            : "Reopened an already-cleared approval for moderator review."),
         metadata: {
           resolutionSource: "moderator_reopen",
           previousBottleId,
           previousProposal: priceMatchProposalHistory(row.proposal),
         },
       });
-      await reopenStorePriceMatchesInTransaction(tx, [row.price.id]);
+      await reopenStorePriceMatchesInTransaction(
+        tx,
+        [row.price.id],
+        wasIgnored
+          ? "A moderator reopened this ignored listing. Review the source before assigning a Bottle."
+          : undefined,
+      );
     });
     return {};
   });

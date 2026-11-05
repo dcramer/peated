@@ -106,7 +106,7 @@ export default function InboxPage() {
   };
   if (query) input.query = query;
   if (
-    category === "listing" ||
+    category === "incoming" ||
     category === "catalog" ||
     category === "community"
   ) {

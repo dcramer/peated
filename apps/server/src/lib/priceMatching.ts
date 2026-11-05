@@ -10,6 +10,7 @@ export {
   InvalidStorePriceMatchProposalTypeError,
   StorePriceMatchNeedsReasonError,
   StorePriceMatchProposalAlreadyProcessingError,
+  StorePriceMatchProposalChangedError,
   StorePriceMatchProposalIdentityChangedError,
   StorePriceMatchProposalNotReviewableError,
   UnknownStorePriceMatchProposalError,

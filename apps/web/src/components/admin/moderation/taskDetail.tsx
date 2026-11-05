@@ -421,7 +421,11 @@ function ListingTask({
           onClick={() =>
             void finish(
               () =>
-                resolve.mutateAsync({ proposal: item.id, action: "ignore" }),
+                resolve.mutateAsync({
+                  proposal: item.id,
+                  action: "ignore",
+                  expectedUpdatedAt: item.updatedAt,
+                }),
               "Listing ignored.",
             )
           }

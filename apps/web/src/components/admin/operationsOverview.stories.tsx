@@ -25,7 +25,7 @@ const meta = {
   args: {
     inboxCounts: {
       all: 23,
-      listing: 18,
+      incoming: 18,
       catalog: 5,
       community: 0,
       blocked: 2,
@@ -85,7 +85,7 @@ export const Quiet: Story = {
   args: {
     inboxCounts: {
       all: 0,
-      listing: 0,
+      incoming: 0,
       catalog: 0,
       community: 0,
       blocked: 0,

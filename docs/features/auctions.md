@@ -153,8 +153,8 @@ Both writes commit together; an ignored or conflicting reference rejects the
 whole save. The moderator can still assign just the lot.
 
 "Ignore lot" marks a lot that is not one whisky bottle as ignored, with the same
-version checks. It clears any assignment, records the moderator and time, and logs an unassign
-decision in History when the lot had a Bottle. Ignored lots leave the Inbox,
+version checks and an optional reason. It clears any assignment, records the
+moderator and time, and logs an `ignore` decision with the reason in History. Ignored lots leave the Inbox,
 rechecks skip them, and assignment rejects them, so a stale screen cannot undo
 the decision. A later source identity change reopens the lot for matching.
 
