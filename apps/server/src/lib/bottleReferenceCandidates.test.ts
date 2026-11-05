@@ -4,7 +4,9 @@ import {
 } from "@peated/bottle-classifier/internal/types";
 import config from "@peated/server/config";
 import { db } from "@peated/server/db";
-import { bottleTombstones } from "@peated/server/db/schema";
+import { bottleReferences, bottleTombstones } from "@peated/server/db/schema";
+import type * as Fixtures from "@peated/server/lib/test/fixtures";
+import { eq } from "drizzle-orm";
 import { afterEach, expect, test, vi } from "vitest";
 import {
   createBottleCandidateLookup,
@@ -327,4 +329,213 @@ test("does not read a dash in a scraped title as a word exclusion", async ({
       source: expect.arrayContaining(["text"]),
     }),
   );
+});
+
+// Candidate retrieval shapes behind wrong store-listing matches (September 2026):
+// the moderator's Bottle never reached the classifier, so it matched another.
+// Each Brand gets enough other Bottles that the candidate limits apply.
+function sourceLabel(
+  overrides: Partial<Parameters<typeof findBottleReferenceCandidates>[1]>,
+) {
+  return {
+    brand: null,
+    bottler: null,
+    expression: null,
+    series: null,
+    distillery: null,
+    category: null,
+    stated_age: null,
+    abv: null,
+    release_year: null,
+    vintage_year: null,
+    maturation: null,
+    cask_number: null,
+    outturn: null,
+    cask_strength: null,
+    single_cask: null,
+    edition: null,
+    ...overrides,
+  };
+}
+
+async function brandWithOtherBottles(
+  fixtures: Pick<typeof Fixtures, "Entity" | "Bottle">,
+  name: string,
+) {
+  const brand = await fixtures.Entity({ name, kind: "distillery" });
+  const otherNames = [
+    "12-year-old",
+    "17-year-old",
+    "18-year-old",
+    "21-year-old",
+    "25-year-old",
+    "Sherry Cask",
+    "Port Cask Finish",
+    "Peated",
+    "Cask Strength - Batch 1",
+    "Cask Strength - Batch 2",
+    "Single Cask",
+    "Distillery Exclusive",
+    "Founder's Reserve",
+    "Double Wood",
+    "Triple Cask",
+    "Reserve",
+    "Heritage",
+    "Rare Cask",
+    "Limited Release",
+    "Signature",
+  ];
+  for (const otherName of otherNames)
+    await fixtures.Bottle({ name: otherName, brandId: brand.id });
+  return brand;
+}
+
+test("finds a Bottle whose stored name still carries strength and cask wording", async ({
+  fixtures,
+}) => {
+  config.AI_GATEWAY_API_KEY = undefined;
+  const brand = await brandWithOtherBottles(fixtures, "Tomintoul");
+  const release = await fixtures.Bottle({
+    name: "Madeira Cask Finish - 40.0% ABV - Madeira Cask",
+    brandId: brand.id,
+    abv: 40,
+  });
+
+  const candidates = await findBottleReferenceCandidates(
+    { name: "Tomintoul Madeira Wine Cask Finish" },
+    sourceLabel({ brand: "Tomintoul", expression: "Madeira Wine Cask Finish" }),
+  );
+
+  expect(candidates.map(({ bottleId }) => bottleId)).toContain(release.id);
+});
+
+test("returns both releases of an expression when the source gives no strength", async ({
+  fixtures,
+}) => {
+  config.AI_GATEWAY_API_KEY = undefined;
+  const brand = await brandWithOtherBottles(fixtures, "Tomintoul");
+  const older = await fixtures.Bottle({
+    name: "Madeira Cask Finish - 40.0% ABV - Madeira Cask",
+    brandId: brand.id,
+    abv: 40,
+  });
+  const newer = await fixtures.Bottle({
+    name: "Madeira Cask Finish",
+    brandId: brand.id,
+    abv: 46,
+  });
+
+  const candidates = await findBottleReferenceCandidates(
+    { name: "Tomintoul Madeira Wine Cask Finish" },
+    sourceLabel({ brand: "Tomintoul", expression: "Madeira Wine Cask Finish" }),
+  );
+
+  expect(candidates.map(({ bottleId }) => bottleId)).toEqual(
+    expect.arrayContaining([older.id, newer.id]),
+  );
+});
+
+test("finds an aged Bottle whose stored name writes the age as a bare number", async ({
+  fixtures,
+}) => {
+  config.AI_GATEWAY_API_KEY = undefined;
+  const brand = await brandWithOtherBottles(fixtures, "GlenAllachie");
+  const bottle = await fixtures.Bottle({
+    name: "08",
+    brandId: brand.id,
+    statedAge: 8,
+  });
+
+  const candidates = await findBottleReferenceCandidates(
+    { name: "Glenallachie 8-year-old Single Malt Whisky" },
+    sourceLabel({ brand: "GlenAllachie", stated_age: 8 }),
+  );
+
+  expect(candidates.map(({ bottleId }) => bottleId)).toContain(bottle.id);
+});
+
+test("keeps a better-named Bottle when another holds an accepted reference for a similar name", async ({
+  fixtures,
+}) => {
+  config.AI_GATEWAY_API_KEY = undefined;
+  const brand = await brandWithOtherBottles(fixtures, "Glen Moray");
+  const elginClassic = await fixtures.Bottle({
+    name: "Elgin Classic",
+    brandId: brand.id,
+  });
+  await fixtures.BottleReference({
+    bottleId: elginClassic.id,
+    name: "Glen Moray Elgin Classic Chardonnay Cask Finish Scotch Whiskey",
+  });
+  const chardonnay = await fixtures.Bottle({
+    name: "Chardonnay Finish - 40.0% ABV - Chardonnay Cask",
+    brandId: brand.id,
+    abv: 40,
+  });
+
+  const candidates = await findBottleReferenceCandidates(
+    { name: "Glen Moray Chardonnay Cask Single Malt Scotch Whiskey" },
+    sourceLabel({ brand: "Glen Moray", expression: "Chardonnay Cask" }),
+  );
+
+  expect(candidates.map(({ bottleId }) => bottleId)).toContain(chardonnay.id);
+});
+
+test("returns every release of an aged expression, not only the one with an exact reference", async ({
+  fixtures,
+}) => {
+  config.AI_GATEWAY_API_KEY = undefined;
+  const brand = await brandWithOtherBottles(fixtures, "Laphroaig");
+  const original = await fixtures.Bottle({
+    name: "15-year-old",
+    brandId: brand.id,
+    statedAge: 15,
+  });
+  // Creating the Bottle accepts its full name, "Laphroaig 15-year-old", as an
+  // exact reference.
+  const relaunch = await fixtures.Bottle({
+    name: "15-year-old",
+    edition: "2026 Release",
+    brandId: brand.id,
+    statedAge: 15,
+  });
+
+  expect(
+    await db
+      .select({ bottleId: bottleReferences.bottleId })
+      .from(bottleReferences)
+      .where(eq(bottleReferences.name, "Laphroaig 15-year-old")),
+  ).toEqual([{ bottleId: original.id }]);
+
+  const candidates = await findBottleReferenceCandidates(
+    { name: "Laphroaig 15-year-old" },
+    sourceLabel({ brand: "Laphroaig", stated_age: 15 }),
+  );
+
+  expect(candidates.map(({ bottleId }) => bottleId)).toEqual(
+    expect.arrayContaining([original.id, relaunch.id]),
+  );
+});
+
+test("finds the plain expression beside its cask-finish edition", async ({
+  fixtures,
+}) => {
+  config.AI_GATEWAY_API_KEY = undefined;
+  const brand = await brandWithOtherBottles(fixtures, "Jameson");
+  const plain = await fixtures.Bottle({
+    name: "Triple Triple",
+    brandId: brand.id,
+  });
+  await fixtures.Bottle({
+    name: "Triple Triple Marsala Cask Edition - 40.0% ABV - Marsala Cask",
+    brandId: brand.id,
+    abv: 40,
+  });
+
+  const candidates = await findBottleReferenceCandidates(
+    { name: "Jameson Triple Triple Irish Whiskey" },
+    sourceLabel({ brand: "Jameson", expression: "Triple Triple" }),
+  );
+
+  expect(candidates.map(({ bottleId }) => bottleId)).toContain(plain.id);
 });
