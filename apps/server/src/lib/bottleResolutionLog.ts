@@ -37,7 +37,8 @@ export function logBottleResolution({
       checkId,
       outcome,
       action,
-      automationBlockers,
+      // Sentry Logs keep only text and numbers, so the reasons are one value.
+      automationBlockers: automationBlockers.join("; ") || "none",
     },
   });
 }
