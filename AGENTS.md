@@ -172,7 +172,7 @@ behavior; research cannot override them.
 - `docs/operations/bottle-reference-migrations-0253-0255.md` — Bottle Reference migration and rollback.
 - `docs/operations/catalog-maintenance.md` — Research, merge, and edit production Bottles.
 - `docs/operations/catalog-research.md` — Find and assess catalog evidence.
-- `docs/operations/deployments.md` — Vercel, Render, and PlanetScale deploy checks.
+- `docs/operations/deployments.md` — Vercel, Render, and PlanetScale deploy checks; Google Cloud key rotation.
 - `docs/operations/entity-images.md` — Add or replace production Entity images.
 - `docs/operations/events.md` — Add, fix, or retire whisky events.
 - `docs/operations/external-review-sources.md` — Add, publish, stop, or remove a review source.
