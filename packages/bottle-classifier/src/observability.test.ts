@@ -102,10 +102,7 @@ describe("reference run outcome", () => {
       "bottle_classifier.action": "match",
       "bottle_classifier.identity_scope": "product",
       "bottle_classifier.web_evidence": "supportive",
-      "bottle_classifier.risk_categories": [
-        "identity_ambiguity",
-        "trait_conflict",
-      ],
+      "bottle_classifier.risk_categories": "identity_ambiguity,trait_conflict",
       "bottle_classifier.risk_count": 3,
       "bottle_classifier.candidate_count": 0,
     });

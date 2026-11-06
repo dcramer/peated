@@ -106,6 +106,8 @@ export function recordReferenceRunOutcome({
     "bottle_classifier.identity_scope": decision?.identityScope ?? undefined,
     "bottle_classifier.web_evidence":
       decision?.confidenceBasis?.webEvidence ?? undefined,
+    // Sentry keeps only text and numbers on spans, so a list is one sorted,
+    // comma-joined value that groups the same way every time.
     "bottle_classifier.risk_categories": decision?.confidenceBasis
       ? [
           ...new Set(
@@ -113,7 +115,9 @@ export function recordReferenceRunOutcome({
               ({ category }) => category,
             ),
           ),
-        ].sort()
+        ]
+          .sort()
+          .join(",") || "none"
       : undefined,
     "bottle_classifier.risk_count":
       decision?.confidenceBasis?.unresolvedRisks.length ?? 0,

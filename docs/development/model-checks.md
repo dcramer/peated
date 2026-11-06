@@ -52,8 +52,10 @@ model checks. Every reference run, on every path, has one
 - `bottle_classifier.status` and `bottle_classifier.action`: `classified` or
   `ignored`, and `match`, `create_bottle`, `no_match`, or `ignore`.
 - `bottle_classifier.identity_scope`, `bottle_classifier.web_evidence`,
-  `bottle_classifier.risk_categories`, `bottle_classifier.risk_count`, and
-  `bottle_classifier.candidate_count`.
+  `bottle_classifier.risk_count`, and `bottle_classifier.candidate_count`.
+- `bottle_classifier.risk_categories`: the open risk categories, sorted and
+  joined with commas, or `none`. Sentry keeps only text and numbers, so lists
+  are sent as one value.
 - `bottle_classifier.workload`: `application` or `scraper`.
 
 The span's root transaction names the source, such as
@@ -64,7 +66,7 @@ spans under it carry model calls, tool calls, tokens, and time.
 Each listing, auction lot, and review also logs `Bottle resolution recorded`
 with `sourceKind`, `sourceId`, `outcome` (`automatic`, `review`, or `ignored`),
 `action`, and `automationBlockers`, the reasons the shared Bottle resolution
-check held a decision for review. Count these in Sentry Logs for the
+check held a decision for review, joined with `; `, or `none`. Count these in Sentry Logs for the
 automation rate and its causes by source.
 
 Example, runs by path and action over a week:
