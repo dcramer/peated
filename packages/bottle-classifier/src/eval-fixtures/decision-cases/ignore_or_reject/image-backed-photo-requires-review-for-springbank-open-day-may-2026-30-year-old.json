@@ -166,6 +166,10 @@
     "expectedTier": "review",
     "verifyEligible": false,
     "suggestedNextStep": "manual_search",
+    "blockedBottle": {
+      "bottleId": 44256,
+      "fields": ["singleCask"]
+    },
     "summary": "Return no_match for catalog review. Bottle 44256 is the exact marketed Open Day product, but its populated singleCask=true field conflicts with evidence that the release is a multi-cask vatting; do not assign it or create a duplicate until Bottle Review corrects the row."
   },
   "localCatalog": {

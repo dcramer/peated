@@ -570,12 +570,10 @@ export async function createBottleCheck(
   }
   if (
     input.intent === "audit_bottle" &&
-    input.input.origin === "post_user_creation" &&
+    input.input.origin !== "moderator" &&
     !input.backgroundEventKey
   ) {
-    throw new Error(
-      "Post-user-creation Bottle checks require a background event key.",
-    );
+    throw new Error("Background Bottle checks require a background event key.");
   }
   if (input.intent === "resolve_reference") {
     if (input.sourceKind === "store_price" && !input.storePrice) {
@@ -736,11 +734,35 @@ export async function getCurrentModeratorBottleAudit(
   rawBottleId: number,
   database: AnyDatabase = db,
 ): Promise<BottleCheckWithOperations | null> {
+  return await findCurrentBottleAudit({
+    bottleId: rawBottleId,
+    origin: "moderator",
+    database,
+  });
+}
+
+/** The newest open audit of a Bottle, from any origin, with work left. */
+export async function getCurrentBottleAudit(
+  rawBottleId: number,
+  database: AnyDatabase = db,
+): Promise<BottleCheckWithOperations | null> {
+  return await findCurrentBottleAudit({ bottleId: rawBottleId, database });
+}
+
+async function findCurrentBottleAudit({
+  bottleId: rawBottleId,
+  origin,
+  database,
+}: {
+  bottleId: number;
+  origin?: "moderator";
+  database: AnyDatabase;
+}): Promise<BottleCheckWithOperations | null> {
   const bottleId = PositiveIdSchema.parse(rawBottleId);
   const checks = await database.query.bottleChecks.findMany({
     where: and(
       eq(bottleChecks.intent, "audit_bottle"),
-      eq(bottleChecks.origin, "moderator"),
+      origin ? eq(bottleChecks.origin, origin) : undefined,
       eq(bottleChecks.bottleId, bottleId),
       isNull(bottleChecks.closedAt),
     ),

@@ -34,6 +34,7 @@ import repairEntityBottleCounts from "./repairEntityBottleCounts";
 import repairLocationBottleCounts from "./repairLocationBottleCounts";
 import resolveAuctionLot from "./resolveAuctionLot";
 import resolveStorePriceBottle from "./resolveStorePriceBottle";
+import reviewBlockedBottle from "./reviewBlockedBottle";
 import runScraper from "./runScraper";
 import updateBottleStats from "./updateBottleStats";
 import updateCountryStats from "./updateCountryStats";
@@ -147,6 +148,10 @@ registry.add("UpdateExternalReviews", updateExternalReviews, {
   unique: true,
 });
 registry.add("UpdateRegionStats", updateRegionStats, { unique: true });
+registry.add("ReviewBlockedBottle", reviewBlockedBottle, {
+  queueName: "models",
+  unique: true,
+});
 registry.add("VerifyBottleCreation", verifyBottleCreation, {
   queueName: "models",
   unique: true,

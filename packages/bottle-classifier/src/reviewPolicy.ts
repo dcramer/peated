@@ -3,6 +3,7 @@ import { normalizeProposedBottleDraft } from "./bottleCreationDrafts";
 import {
   BottleClassificationDecisionSchema,
   BottleClassifierAgentDecisionSchema,
+  type BlockedBottle,
   type BottleCandidate,
   type BottleClassificationDecision,
   type BottleClassifierAgentDecision,
@@ -876,6 +877,38 @@ function enforceSmwsSourceCode({
   };
 }
 
+/**
+ * Blocked Bottle rule (owner: Bottle classifier). The agent may name the
+ * source's own Bottle when evidence contradicts its stored fields. Code keeps
+ * that claim only on the agent's own `no_match`, and only for a candidate the
+ * agent inspected in this run, because the server starts a Bottle Review for
+ * it. A match that code downgraded never names a Blocked Bottle.
+ */
+function getAcceptedBlockedBottle({
+  agentDecision,
+  artifacts,
+}: {
+  agentDecision: BottleClassifierAgentDecision;
+  artifacts: BottleClassificationArtifacts;
+}): BlockedBottle | null {
+  const blockedBottle = agentDecision.blockedBottle;
+  if (!blockedBottle || agentDecision.action !== "no_match") return null;
+
+  const isInspectedCandidate =
+    artifacts.candidates.some(
+      (candidate) => candidate.bottleId === blockedBottle.bottleId,
+    ) &&
+    artifacts.bottleContexts.some(
+      (context) => context.bottleId === blockedBottle.bottleId,
+    );
+  if (!isInspectedCandidate) return null;
+
+  return {
+    ...blockedBottle,
+    fields: [...new Set(blockedBottle.fields)],
+  };
+}
+
 export function finalizeBottleReferenceClassification({
   reference,
   decision,
@@ -920,7 +953,7 @@ export function finalizeBottleReferenceClassification({
     artifacts,
   });
 
-  return BottleClassificationDecisionSchema.parse({
+  const finalDecision: BottleClassificationDecision = {
     ...reviewedDecision,
     referenceScope:
       reviewedDecision.referenceScope ??
@@ -928,5 +961,14 @@ export function finalizeBottleReferenceClassification({
       "none",
     confidenceBasis:
       reviewedDecision.confidenceBasis ?? parsedDecision.confidenceBasis,
-  });
+  };
+  if (finalDecision.action === "no_match") {
+    const blockedBottle = getAcceptedBlockedBottle({
+      agentDecision: parsedDecision,
+      artifacts,
+    });
+    if (blockedBottle) finalDecision.blockedBottle = blockedBottle;
+  }
+
+  return BottleClassificationDecisionSchema.parse(finalDecision);
 }

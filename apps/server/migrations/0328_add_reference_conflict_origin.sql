@@ -1,0 +1,1 @@
+ALTER TYPE "public"."bottle_check_origin" ADD VALUE 'reference_conflict';

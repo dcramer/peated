@@ -34,6 +34,32 @@ Catalog correction is separate from reference resolution. A reference result
 never includes a Suggested Change. An audit never changes which Bottle a
 reference identifies.
 
+### Blocked Bottle
+
+Sometimes an inspected candidate is the source's exact Bottle, but evidence
+contradicts one of its stored fields, such as a bottler on an official
+release, a wrong age, or a wrong ABV. The result is still `no_match`, so code
+never assigns a record that is wrong. The agent also returns `blockedBottle`:
+the Bottle ID, each stored field that the evidence contradicts, and a note
+with the stored value, the value the evidence shows, and its source.
+
+Code keeps `blockedBottle` only on the agent's own `no_match`, and only for a
+candidate that the agent inspected in that run
+(`getAcceptedBlockedBottle` in `packages/bottle-classifier/src/reviewPolicy.ts`).
+For every source, the server then queues one Bottle Review for that Bottle
+(`ReviewBlockedBottle`). That audit has the origin `reference_conflict`, gets
+the classifier's note, and follows the normal audit rules below. A moderator
+approves each Suggested Change, as for any audit.
+
+The review is saved under a key built from the Bottle and the current stored
+values of the flagged fields. Many sources that name the same conflict share
+one review. A moderator who rejects or closes it is not asked again until
+those stored values change. No review starts while another open audit of the
+Bottle has work left.
+
+The sources that named the Bottle stay in review. Running them again after the
+fix is applied is not built yet; a moderator rechecks them by hand.
+
 ## Scope
 
 Peated tracks single whisky Bottles. A source that is something else is

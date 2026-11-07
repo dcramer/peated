@@ -572,6 +572,47 @@ export const BottleConfidenceBasisSchema = z
   })
   .strict();
 
+// Stored Bottle fields that source evidence can contradict on the source's
+// own Bottle. Names follow the Bottle Review patch fields.
+export const BLOCKED_BOTTLE_FIELDS = [
+  "name",
+  "brand",
+  "bottler",
+  "distillers",
+  "series",
+  "category",
+  "statedAge",
+  "abv",
+  "edition",
+  "vintageYear",
+  "bottlingYear",
+  "releaseYear",
+  "caskNumber",
+  "caskStrength",
+  "singleCask",
+] as const;
+
+export const BlockedBottleSchema = z
+  .object({
+    bottleId: z
+      .number()
+      .int()
+      .describe("The inspected candidate that is the source's Bottle."),
+    fields: z
+      .array(z.enum(BLOCKED_BOTTLE_FIELDS))
+      .min(1)
+      .describe("Each stored field that the evidence contradicts."),
+    note: z
+      .string()
+      .trim()
+      .min(1)
+      .max(1000)
+      .describe(
+        "For each field, the stored value, the value the evidence shows, and where the evidence comes from.",
+      ),
+  })
+  .strict();
+
 const BottleClassifierDecisionBaseSchema = z
   .object({
     rationale: z.string().nullable().default(null),
@@ -606,6 +647,9 @@ const NoMatchDecisionSchema = BottleClassifierDecisionBaseSchema.extend({
   action: z.literal("no_match"),
   matchedBottleId: z.null().default(null),
   proposedBottle: z.null().default(null),
+  // Set only when the source is an inspected candidate whose stored fields
+  // evidence contradicts. The server starts a Bottle Review for it.
+  blockedBottle: BlockedBottleSchema.nullable().optional(),
 });
 
 export const BottleClassificationDecisionSchema = z.discriminatedUnion(
@@ -649,6 +693,11 @@ export const BottleClassifierAgentDecisionSchema = z
       .default(null)
       .describe(
         "Required for create_bottle. A create draft describes one independently complete Bottle, including every supported marketed release trait; unknown optional fields may remain null.",
+      ),
+    blockedBottle: BlockedBottleSchema.nullable()
+      .default(null)
+      .describe(
+        "Only with no_match. Set it when an inspected candidate is the source's exact Bottle, but evidence contradicts one or more of its stored fields. Leave it null when identity is unclear.",
       ),
   })
   .strict();
@@ -713,5 +762,6 @@ export type BottleClassifierAgentDecisionInput = Omit<
   referenceScope?: ReferenceScope | null;
 };
 export type BottleObservation = z.infer<typeof BottleObservationSchema>;
+export type BlockedBottle = z.infer<typeof BlockedBottleSchema>;
 export type EntityResolution = z.infer<typeof EntityResolutionSchema>;
 export type ProposedBottle = z.infer<typeof ProposedBottleSchema>;

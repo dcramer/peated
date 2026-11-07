@@ -14,6 +14,7 @@ import {
   BottleContextSourceSchema,
 } from "./bottleContextContract";
 import {
+  BLOCKED_BOTTLE_FIELDS,
   BottleCandidateSchema,
   BottleExtractedDetailsSchema,
   CategoryEnum,
@@ -122,6 +123,16 @@ export const classifierEvalExpectationSchema = z
       .min(1)
       .optional(),
     expectedTier: z.enum(["auto", "review"]).optional(),
+    // The Bottle that a no_match blocks, and the stored fields that must be
+    // among its flagged fields. `null` expects no Blocked Bottle.
+    blockedBottle: z
+      .object({
+        bottleId: z.number().int(),
+        fields: z.array(z.enum(BLOCKED_BOTTLE_FIELDS)).min(1),
+      })
+      .strict()
+      .nullable()
+      .optional(),
     verifyEligible: z.boolean().optional(),
     suggestedNextStep: z
       .enum(["confirm_match", "confirm_create", "manual_search"])
@@ -153,6 +164,14 @@ export const classifierEvalExpectationSchema = z
         code: z.ZodIssueCode.custom,
         message: "Classified fixtures must expect an identity scope.",
         path: ["identityScope"],
+      });
+    }
+
+    if (value.blockedBottle && value.action !== "no_match") {
+      ctx.addIssue({
+        code: z.ZodIssueCode.custom,
+        message: "`blockedBottle` requires `action = no_match`.",
+        path: ["blockedBottle"],
       });
     }
 

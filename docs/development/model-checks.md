@@ -29,6 +29,10 @@ judgment that a repeatable code test cannot prove.
   id or with `BOTTLE_CLASSIFIER_EVAL_INCLUDE_KNOWN_FAILURES=1`. The change
   that fixes it removes the mark, and the case must then pass. Never mark a
   case only to raise the pass rate.
+- A `no_match` case for the right Bottle with a wrong stored field sets
+  `expected.blockedBottle` to that Bottle and the fields that must be flagged.
+  A `no_match` case for unclear identity may set it to `null`, so a needless
+  Bottle Review fails the case.
 - Commit replay recordings required by a deliberate test case or test runner change.
   Do not record a provider failure as empty evidence.
 - For a controlled classifier comparison, give both variants the same reviewed
@@ -67,7 +71,11 @@ Each listing, auction lot, and review also logs `Bottle resolution recorded`
 with `sourceKind`, `sourceId`, `outcome` (`automatic`, `review`, or `ignored`),
 `action`, and `automationBlockers`, the reasons the shared Bottle resolution
 check held a decision for review, joined with `; `, or `none`. Count these in Sentry Logs for the
-automation rate and its causes by source.
+automation rate and its causes by source. `sourceId` and `checkId` are numbers,
+so a query names them as `tags[sourceId,number]`; a plain `sourceId` field
+returns nothing. Count distinct sources with
+`count_unique(tags[sourceId,number])`, because an auction lot logs again each
+time a collection sees it pending.
 
 Example, runs by path and action over a week:
 

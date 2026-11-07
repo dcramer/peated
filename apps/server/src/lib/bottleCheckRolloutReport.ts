@@ -1,5 +1,6 @@
 import {
   BottleClassifierRunMetadataSchema,
+  type AuditBottleOrigin,
   type ProposedOperationType,
 } from "@peated/bottle-classifier";
 import { db, type AnyDatabase } from "@peated/server/db";
@@ -28,7 +29,7 @@ type RolloutOperation = {
 
 export type BottleCheckRolloutRow = {
   intent: "resolve_reference" | "audit_bottle";
-  origin: "source" | "moderator" | "post_user_creation";
+  origin: "source" | AuditBottleOrigin;
   schemaVersion: number;
   model: string | null;
   modelMetadata: unknown;
