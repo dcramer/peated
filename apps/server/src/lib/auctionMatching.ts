@@ -28,7 +28,10 @@ import {
 import { createBottleCheck } from "./bottleChecks";
 import { findBottleReferenceAssignment } from "./bottleFinder";
 import { logBottleResolution } from "./bottleResolutionLog";
-import { BottleAlreadyExistsError } from "./createBottle";
+import {
+  BottleAlreadyExistsError,
+  BottleCreateBadRequestError,
+} from "./createBottle";
 import { ActiveBottleSelectionError } from "./resolveActiveBottleIds";
 import { StaleBottleCreateError } from "./unseenSiblingBottle";
 
@@ -281,6 +284,7 @@ async function applyAuctionLotCheck(
     .returning();
   if (!current) return true;
   const assessment = assessAuctionMatch(current, check);
+  const automationBlockers = [...(assessment?.automationBlockers ?? [])];
   if (assessment?.automationEligible) {
     try {
       await assignAuctionLot({
@@ -303,7 +307,15 @@ async function applyAuctionLotCheck(
       });
       return true;
     } catch (error) {
-      if (
+      // Auction matching rule (owner: auctions): a create that a catalog rule
+      // refuses, such as a name that needs its age, goes to review with the
+      // rule's reason. Throwing would fail the job on every retry and leave
+      // the lot pending.
+      if (error instanceof BottleCreateBadRequestError) {
+        automationBlockers.push(
+          `the automatic Bottle create was refused: ${error.message}`,
+        );
+      } else if (
         !(error instanceof AuctionLotMatchChangedError) &&
         !(error instanceof ActiveBottleSelectionError) &&
         !(error instanceof BottleAlreadyExistsError) &&
@@ -341,7 +353,7 @@ async function applyAuctionLotCheck(
         : evidence.output.status === "classified"
           ? evidence.output.decision.action
           : "ignore",
-      automationBlockers: assessment?.automationBlockers,
+      automationBlockers,
     });
   await requestAuctionLotDetails(lotId, fingerprint);
   return true;

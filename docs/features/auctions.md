@@ -82,6 +82,9 @@ Near-identical lots, such as one whose page omits the cask number, still
 get separate checks. If one of them creates a Bottle while the other runs, the
 other's create goes to review; see
 [stale automatic creates](../architecture/bottle-reference-resolution.md#stale-automatic-creates).
+An automatic create that a catalog rule refuses, such as a name that must add
+its age because another Bottle of the Brand has the same title, also goes to
+review. The refusal is logged as the lot's review reason.
 
 Auction classification sets `readCandidateImages: false` in its saved request.
 It uses the listing title, supplied structured source facts, catalog fields,

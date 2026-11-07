@@ -264,7 +264,8 @@ test("the lot photo's label reading reaches the classifier as photo evidence", a
           matchedBottleId: null,
           proposedBottle: null,
         },
-        artifacts: {},
+        // The runtime copies the photo reading into the saved artifacts.
+        artifacts: { imageEvidence },
       }),
       modelMetadata: {
         agentDurationMs: 0,
@@ -288,9 +289,13 @@ test("the lot photo's label reading reaches the classifier as photo evidence", a
     imageEvidence,
     reference: expect.objectContaining({ imageUrl: null }),
   });
-  expect(
-    (await db.query.bottleChecks.findFirst())?.inputSnapshot,
-  ).toMatchObject({ imageEvidence: JSON.parse(JSON.stringify(imageEvidence)) });
+  const savedCheck = await db.query.bottleChecks.findFirst();
+  expect(savedCheck?.inputSnapshot).toMatchObject({
+    imageEvidence: JSON.parse(JSON.stringify(imageEvidence)),
+  });
+  expect(savedCheck?.artifacts).toMatchObject({
+    imageEvidence: JSON.parse(JSON.stringify(imageEvidence)),
+  });
 });
 
 test("ignored classifier output stays ignored after a retry", async ({
@@ -638,6 +643,76 @@ test.for(["unseen", "seen", "conflicting", "older"] as const)(
     expect(await db.query.bottles.findMany()).toHaveLength(stale ? 1 : 2);
   },
 );
+
+test("a create that breaks a naming rule stays in review instead of failing the job", async ({
+  fixtures,
+}) => {
+  const site = await fixtures.ExternalSite({ type: "masterofmalt" });
+  const brand = await fixtures.Entity({ name: "Example", kind: "brand" });
+  const lot = await importedLot(site.id);
+  // Same Brand and title with a different age: the naming rule asks for the
+  // age in each name, so the automatic create is refused.
+  await fixtures.Bottle({
+    name: "Single Cask",
+    brandId: brand.id,
+    category: "single_malt",
+    statedAge: 10,
+  });
+  const result = createDecidedBottleClassification({
+    decision: {
+      action: "create_bottle",
+      matchedBottleId: null,
+      candidateBottleIds: [],
+      identityScope: "product",
+      referenceScope: "none",
+      rationale: "A missing marketed release.",
+      observation: null,
+      confidenceBasis: { webEvidence: "supportive", unresolvedRisks: [] },
+      proposedBottle: {
+        name: "Single Cask",
+        brand: { id: brand.id, name: brand.name },
+        distillers: [],
+        bottler: null,
+        series: null,
+        category: "single_malt",
+        statedAge: 12,
+        abv: 46,
+        edition: null,
+        caskStrength: null,
+        singleCask: null,
+        vintageYear: null,
+        releaseYear: null,
+        maturation: null,
+        caskNumber: null,
+        outturn: null,
+      },
+    },
+    artifacts: {},
+  });
+  const check = await saveMatch(lot, result);
+  const logResolution = vi.spyOn(resolutionLog, "logBottleResolution");
+
+  await expect(
+    applyAuctionLotMatchJob({
+      lotId: lot.id,
+      fingerprint: lot.sourceFingerprint,
+    }),
+  ).resolves.toBeUndefined();
+
+  expect(await db.query.auctionLots.findFirst()).toMatchObject({
+    bottleId: null,
+    matchCheckId: check.id,
+    matchStatus: "review",
+  });
+  expect(await db.query.bottles.findMany()).toHaveLength(1);
+  expect(logResolution).toHaveBeenCalledWith(
+    expect.objectContaining({
+      outcome: "review",
+      action: "create_bottle",
+      automationBlockers: [expect.stringContaining("with a different age")],
+    }),
+  );
+});
 
 test("unsupported saved check schemas stay in review rather than calling the model again", async ({
   fixtures,
