@@ -457,6 +457,33 @@ function evaluateDecisionContract(
     );
   }
 
+  if (expected.blockedBottle !== undefined) {
+    const blockedBottle =
+      result.decision.action === "no_match"
+        ? (result.decision.blockedBottle ?? null)
+        : null;
+    if (expected.blockedBottle === null) {
+      if (blockedBottle) {
+        failures.push(
+          `blockedBottle expected none but got Bottle ${blockedBottle.bottleId}`,
+        );
+      }
+    } else if (blockedBottle?.bottleId !== expected.blockedBottle.bottleId) {
+      failures.push(
+        `blockedBottle expected Bottle ${expected.blockedBottle.bottleId} but got ${blockedBottle?.bottleId ?? "none"}`,
+      );
+    } else {
+      const missingFields = expected.blockedBottle.fields.filter(
+        (field) => !blockedBottle.fields.includes(field),
+      );
+      if (missingFields.length) {
+        failures.push(
+          `blockedBottle fields missing ${missingFields.join(", ")}; got ${blockedBottle.fields.join(", ")}`,
+        );
+      }
+    }
+  }
+
   if (expected.expectedTier !== undefined) {
     const derivedTier = getDerivedAutomationTier(testCase, result);
     if (derivedTier !== expected.expectedTier) {

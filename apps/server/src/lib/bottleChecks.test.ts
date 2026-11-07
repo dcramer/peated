@@ -484,7 +484,7 @@ describe("Bottle check persistence", () => {
         }),
       ),
     ).rejects.toThrow(
-      "Post-user-creation Bottle checks require a background event key.",
+      "Background Bottle checks require a background event key.",
     );
 
     expect(

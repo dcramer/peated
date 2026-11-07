@@ -1,5 +1,7 @@
 import { describe, expect, test } from "vitest";
+import { BottleContextSchema } from "./bottleContextContract";
 import type {
+  BlockedBottle,
   BottleCandidate,
   BottleClassifierAgentDecisionInput,
 } from "./classifierTypes";
@@ -2008,5 +2010,104 @@ describe("SMWS source codes", () => {
     expect(written.confidenceBasis?.unresolvedRisks).toEqual([
       expect.objectContaining({ category: "identity_ambiguity" }),
     ]);
+  });
+});
+
+describe("blocked Bottle", () => {
+  const kilkerranBatch3: BottleCandidate = {
+    ...existingPrivateCask,
+    bottleId: 44931,
+    fullName: "Kilkerran Heavily Peated - Batch 3",
+    brand: "Kilkerran",
+    bottler: "Glengyle",
+    singleCask: null,
+    edition: "Batch 3",
+  };
+  const inspectedContext = BottleContextSchema.parse({
+    bottleId: kilkerranBatch3.bottleId,
+    fullName: kilkerranBatch3.fullName,
+    groupId: 1,
+    shared: {
+      name: "Heavily Peated",
+      statedAge: null,
+      series: null,
+      category: "single_malt",
+      brand: { entityId: 1103, name: "Kilkerran" },
+      distillers: [],
+      bottler: { entityId: 243, name: "Glengyle" },
+    },
+    exact: {
+      edition: "Batch 3",
+      statedAge: null,
+      abv: null,
+      singleCask: null,
+      caskStrength: null,
+      vintageYear: null,
+      releaseYear: null,
+      caskNumber: null,
+      maturation: null,
+      outturn: null,
+    },
+    siblings: [],
+    references: [],
+    observations: [],
+    publicImages: [],
+  });
+  const blockedBottle: BlockedBottle = {
+    bottleId: kilkerranBatch3.bottleId,
+    fields: ["bottler", "bottler"],
+    note: "Stored bottler is Glengyle. The product page shows an official Kilkerran release, with no bottler.",
+  };
+
+  function finalizeBlocked({
+    action = "no_match",
+    bottleContexts = [inspectedContext],
+  }: {
+    action?: "no_match" | "match";
+    bottleContexts?: (typeof inspectedContext)[];
+  } = {}) {
+    return finalizeBottleReferenceClassification({
+      reference: { name: "Kilkerran Heavily Peated" },
+      decision: {
+        action,
+        rationale: "Batch 3 is the source's Bottle, but its bottler is wrong.",
+        candidateBottleIds: [kilkerranBatch3.bottleId],
+        identityScope: "product",
+        observation: null,
+        matchedBottleId: action === "match" ? kilkerranBatch3.bottleId : null,
+        proposedBottle: null,
+        blockedBottle,
+      },
+      artifacts: buildBottleClassificationArtifacts({
+        candidates: [kilkerranBatch3],
+        bottleContexts,
+      }),
+    });
+  }
+
+  test("keeps the Blocked Bottle on a no_match for an inspected candidate", () => {
+    expect(finalizeBlocked()).toMatchObject({
+      action: "no_match",
+      matchedBottleId: null,
+      blockedBottle: {
+        bottleId: kilkerranBatch3.bottleId,
+        fields: ["bottler"],
+        note: blockedBottle.note,
+      },
+    });
+  });
+
+  test("drops a Blocked Bottle the agent did not inspect", () => {
+    const result = finalizeBlocked({ bottleContexts: [] });
+
+    expect(result.action).toBe("no_match");
+    expect(result).not.toHaveProperty("blockedBottle");
+  });
+
+  test("never adds a Blocked Bottle to a match", () => {
+    const result = finalizeBlocked({ action: "match" });
+
+    expect(result.action).toBe("match");
+    expect(result).not.toHaveProperty("blockedBottle");
   });
 });

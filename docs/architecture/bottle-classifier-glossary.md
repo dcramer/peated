@@ -19,6 +19,8 @@ concept.
 | **No Match**                 | The system cannot identify a Bottle safely.                                         | `no_match`                |
 | **Bottler**                  | A business that independently selects and releases whisky made by another producer. | `bottler`                 |
 | **Suggested Change**         | An untrusted catalog change from an agent.                                          | `ProposedOperation`       |
+| **Bottle Review**            | An audit that checks one existing Bottle and returns Suggested Changes.             | `auditBottle`             |
+| **Blocked Bottle**           | The source's exact Bottle, when evidence contradicts some of its stored fields.     | `blockedBottle`           |
 | **Review Operation**         | A change that the server validated and checked for permission before it runs.       | `ReviewOperation`         |
 
 Use the term in the first column in prompts and technical documentation. Use

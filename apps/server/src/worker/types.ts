@@ -44,6 +44,7 @@ export type JobName =
   | "UpdateEntityStats"
   | "UpdateExternalReviews"
   | "UpdateRegionStats"
+  | "ReviewBlockedBottle"
   | "VerifyBottleCreation"
   | "VerifyEntityCreation";
 

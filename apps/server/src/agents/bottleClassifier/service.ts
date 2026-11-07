@@ -37,6 +37,7 @@ import { createServerPeatedBot } from "@peated/server/lib/peatedBot";
 import { absoluteUrl } from "@peated/server/lib/urls";
 import { startSpan } from "@sentry/node";
 import { randomUUID } from "node:crypto";
+import { queueBlockedBottleReview } from "./blockedBottleReview";
 import {
   getBottleClassifierContext,
   getBottleClassifierImageInput,
@@ -191,7 +192,7 @@ async function runBottleReferenceForWorkload(
             return exactReferenceRun;
           }
 
-          return await getBottleClassifier(workload).runBottleReference(
+          const run = await getBottleClassifier(workload).runBottleReference(
             {
               ...input,
               reference,
@@ -199,6 +200,8 @@ async function runBottleReferenceForWorkload(
             },
             options,
           );
+          await queueBlockedBottleReview(run.result);
+          return run;
         },
       ),
   );

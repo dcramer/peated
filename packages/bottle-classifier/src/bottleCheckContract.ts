@@ -32,6 +32,9 @@ export const BottleCheckIntentSchema = z.enum([
 export const AuditBottleOriginSchema = z.enum([
   "moderator",
   "post_user_creation",
+  // A reference classifier run found this Bottle is the source's Bottle, but
+  // evidence contradicts some of its stored fields.
+  "reference_conflict",
 ]);
 
 export const AuditBottleInputSchema = z

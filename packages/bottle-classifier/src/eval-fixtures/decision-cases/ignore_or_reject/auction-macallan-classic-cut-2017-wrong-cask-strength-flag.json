@@ -1527,6 +1527,10 @@
     "action": "no_match",
     "identityScope": "product",
     "expectedTier": "review",
+    "blockedBottle": {
+      "bottleId": 3277,
+      "fields": ["caskStrength"]
+    },
     "summary": "Bottle 3277 is the right release, but it stores caskStrength=false while the release is bottled at cask strength. Leave the lot for Bottle Review; do not match or create a duplicate."
   }
 }

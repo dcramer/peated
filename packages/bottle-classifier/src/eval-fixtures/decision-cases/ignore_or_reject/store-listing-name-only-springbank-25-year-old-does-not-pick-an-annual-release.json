@@ -130,6 +130,7 @@
     "status": "classified",
     "action": "no_match",
     "identityScope": "product",
+    "blockedBottle": null,
     "summary": "Springbank releases its 25-year-old as separate annual vattings with different bottle counts and cask mixes. A name-only listing cannot choose one, and the broad legacy rows do not cover a specific release, so leave it for review."
   },
   "provenance": {

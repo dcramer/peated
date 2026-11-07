@@ -13,6 +13,7 @@ import {
 import { eq } from "drizzle-orm";
 import { afterEach, describe, expect, test, vi } from "vitest";
 import {
+  runBlockedBottleAudit as runBlockedBottleAuditWithService,
   runModeratorBottleAudit as runModeratorBottleAuditWithService,
   runPostUserCreationBottleAudit as runPostUserCreationBottleAuditWithService,
 } from "./auditBottle";
@@ -38,6 +39,12 @@ function runPostUserCreationBottleAudit(
     input,
     auditBottleWithServerAdapters,
   );
+}
+
+function runBlockedBottleAudit(
+  input: Parameters<typeof runBlockedBottleAuditWithService>[0],
+) {
+  return runBlockedBottleAuditWithService(input, auditBottleWithServerAdapters);
 }
 
 async function auditResult({
@@ -495,6 +502,97 @@ describe("server-owned Bottle audit workflows", () => {
         .from(bottleChecks)
         .where(eq(bottleChecks.backgroundEventKey, input.backgroundEventKey)),
     ).toHaveLength(1);
+  });
+
+  test("starts one Bottle Review for a Blocked Bottle and reuses it for the same conflict", async ({
+    fixtures,
+  }) => {
+    const bottle = await fixtures.Bottle({ edition: null, abv: 46 });
+    auditBottleWithServerAdapters.mockResolvedValue({
+      result: await auditResult({ bottleId: bottle.id }),
+      modelMetadata: null,
+    });
+    const input = {
+      bottleId: bottle.id,
+      fields: ["abv" as const],
+      note: "Stored ABV is 46%. The producer page shows 45%.",
+    };
+
+    const first = await runBlockedBottleAudit(input);
+    const second = await runBlockedBottleAudit({
+      ...input,
+      note: "Another listing also shows 45%.",
+    });
+
+    expect(first).toMatchObject({
+      created: true,
+      check: { intent: "audit_bottle", origin: "reference_conflict" },
+    });
+    expect(first?.check.backgroundEventKey).toMatch(
+      new RegExp(`^blocked_bottle:${bottle.id}:`),
+    );
+    expect(second).toMatchObject({
+      created: false,
+      check: { id: first?.check.id },
+    });
+    expect(auditBottleWithServerAdapters).toHaveBeenCalledExactlyOnceWith({
+      bottleId: bottle.id,
+      origin: "reference_conflict",
+      note: expect.stringContaining(input.note),
+    });
+  });
+
+  test("asks again for a Blocked Bottle only after its flagged field changes", async ({
+    fixtures,
+  }) => {
+    const bottle = await fixtures.Bottle({ edition: null, abv: 46 });
+    auditBottleWithServerAdapters.mockResolvedValue({
+      result: await auditResult({ bottleId: bottle.id }),
+      modelMetadata: null,
+    });
+    const input = {
+      bottleId: bottle.id,
+      fields: ["abv" as const],
+      note: "Stored ABV is 46%. The producer page shows 45%.",
+    };
+    const first = await runBlockedBottleAudit(input);
+    // A moderator closes the review without changing the Bottle.
+    await db
+      .update(bottleChecks)
+      .set({ closedAt: new Date(), closeReason: "dismissed" })
+      .where(eq(bottleChecks.id, first!.check.id));
+
+    const afterDismissal = await runBlockedBottleAudit(input);
+    await db.update(bottles).set({ abv: 47 }).where(eq(bottles.id, bottle.id));
+    const afterChange = await runBlockedBottleAudit(input);
+
+    expect(afterDismissal).toMatchObject({
+      created: false,
+      check: { id: first?.check.id },
+    });
+    expect(afterChange).toMatchObject({ created: true });
+    expect(afterChange?.check.id).not.toBe(first?.check.id);
+    expect(auditBottleWithServerAdapters).toHaveBeenCalledTimes(2);
+  });
+
+  test("skips a Blocked Bottle review while another open audit covers the Bottle", async ({
+    fixtures,
+  }) => {
+    const bottle = await fixtures.Bottle({ edition: null });
+    auditBottleWithServerAdapters.mockResolvedValue({
+      result: await auditResult({ bottleId: bottle.id }),
+      modelMetadata: null,
+    });
+    await runModeratorBottleAudit({ bottleId: bottle.id });
+
+    await expect(
+      runBlockedBottleAudit({
+        bottleId: bottle.id,
+        fields: ["bottler"],
+        note: "Stored bottler conflicts with the producer page.",
+      }),
+    ).resolves.toBeNull();
+    expect(auditBottleWithServerAdapters).toHaveBeenCalledTimes(1);
   });
 
   test("keeps the existing reference-classification entrypoint exported", () => {

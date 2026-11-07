@@ -102,7 +102,9 @@ export function BottleCheckOrigin({
     <span>
       {check.origin === "post_user_creation"
         ? "Post-create audit"
-        : "Moderator audit"}
+        : check.origin === "reference_conflict"
+          ? "Stored field conflict"
+          : "Moderator audit"}
     </span>
   );
 }

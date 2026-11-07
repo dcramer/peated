@@ -722,6 +722,10 @@
     "status": "classified",
     "action": "no_match",
     "identityScope": "product",
+    "blockedBottle": {
+      "bottleId": 4400,
+      "fields": ["statedAge"]
+    },
     "summary": "Auchentoshan Valinch 2012 is a marketed cask-strength release, so it stays in scope. Local Bottle 4400 stores a 10-year age that conflicts with the no-age-statement release, so leave the lot unresolved instead of matching or creating a duplicate."
   }
 }

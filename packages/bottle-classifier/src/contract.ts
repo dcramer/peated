@@ -100,10 +100,12 @@ export type {
   EntityContextBottleSample,
 } from "./bottleContextContract";
 export {
+  BLOCKED_BOTTLE_FIELDS,
+  BlockedBottleSchema,
   BottleCandidateSchema,
   BottleExtractedDetailsSchema,
 } from "./classifierTypes";
-export type { BottleExtractedDetails } from "./classifierTypes";
+export type { BlockedBottle, BottleExtractedDetails } from "./classifierTypes";
 export {
   ImageBottleEvidenceConflictSchema,
   ImageBottleEvidenceSchema,
