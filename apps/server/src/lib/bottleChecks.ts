@@ -481,7 +481,13 @@ function sanitizeBottleCheckValue(value: BottleCheckInputValue): JsonValue {
   );
 }
 
-export function sanitizeBottleCheckInput(
+/**
+ * Prepares a check's input, output, or artifacts for JSON storage. Schema
+ * output may hold unset optional fields as `undefined`; JSON drops them, so
+ * storage drops them too instead of failing the save after the model ran.
+ * Inline images are replaced by their size.
+ */
+function toStoredBottleCheckJson(
   value: BottleCheckInputCandidate,
 ): Record<string, JsonValue> {
   return JsonObjectSchema.parse(sanitizeBottleCheckValue(value));
@@ -648,9 +654,9 @@ export async function createBottleCheck(
         subjectKey,
         backgroundEventKey: input.backgroundEventKey,
         schemaVersion: BOTTLE_CHECK_SCHEMA_VERSION,
-        inputSnapshot: sanitizeBottleCheckInput(input.input),
-        output: JsonObjectSchema.parse(output),
-        artifacts: JsonObjectSchema.parse(artifacts),
+        inputSnapshot: toStoredBottleCheckJson(input.input),
+        output: toStoredBottleCheckJson(output),
+        artifacts: toStoredBottleCheckJson(artifacts),
         model: input.model,
         modelMetadata: input.modelMetadata
           ? JsonObjectSchema.parse(input.modelMetadata)
