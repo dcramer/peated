@@ -988,7 +988,7 @@
   "expected": {
     "status": "classified",
     "action": "match",
-    "identityScope": "product",
+    "identityScope": "exact_cask",
     "matchedBottleId": 62785,
     "expectedTier": "auto",
     "summary": "Match Gordon & MacPhail Tormore 2006 (62785) automatically. The title and the Master of Malt page name cask 703012 at 60.9% ABV, 211 bottles, which agree with the stored Bottle; the photo reading of cask 7812 is wrong."
