@@ -1,0 +1,798 @@
+{
+  "id": "store-yamazaki-18-mizunara-2024-stock-photo-abv",
+  "name": "store listing photo: a stock photo of the standard Yamazaki 18 (43%) does not hold the 48% Mizunara Tsukuriwake 2024 match",
+  "input": {
+    "reference": {
+      "id": 12063288,
+      "url": "https://www.masterofmalt.com/whiskies/yamazaki/yamazaki-tsukuriwake-2024-18-year-old-mizunara-whisky/?sku=136528",
+      "name": "Yamazaki 18-year-old Mizunara - Tsukuriwake 2024",
+      "imageUrl": null,
+      "externalSiteId": 32,
+      "currentBottleId": null
+    },
+    "extractedIdentity": {
+      "abv": 43,
+      "brand": "Yamazaki",
+      "series": null,
+      "bottler": null,
+      "edition": "2024 Edition",
+      "outturn": null,
+      "category": "single_malt",
+      "distillery": ["Yamazaki Distillery"],
+      "expression": "Mizunara",
+      "maturation": "Mizunara Japanese oak cask",
+      "stated_age": 18,
+      "cask_number": null,
+      "release_day": null,
+      "single_cask": null,
+      "release_year": null,
+      "vintage_year": null,
+      "bottling_year": null,
+      "cask_strength": null,
+      "release_month": null
+    },
+    "extractedIdentitySource": "image",
+    "imageEvidence": null,
+    "initialCandidates": [
+      {
+        "abv": 48,
+        "brand": "Yamazaki",
+        "score": 91.30072,
+        "series": "Tsukuriwake",
+        "source": ["vector", "text", "brand_coverage", "context"],
+        "bottler": null,
+        "edition": "2024 Tsukuriwake Edition",
+        "outturn": null,
+        "bottleId": 54095,
+        "category": "single_malt",
+        "fullName": "Yamazaki Mizunara 18-year-old - 2024 Tsukuriwake Edition",
+        "reference": "Yamazaki 18-year-old Mizunara (2024 Tsukuriwake Edition), 48%",
+        "statedAge": 18,
+        "caskNumber": null,
+        "comparison": {
+          "missing": [],
+          "conflicts": ["abv", "distillers"],
+          "agreements": ["category", "statedAge", "edition", "brand"]
+        },
+        "distillery": ["Yamazaki"],
+        "maturation": "Mizunara oak casks",
+        "releaseDay": null,
+        "singleCask": null,
+        "releaseYear": 2024,
+        "vintageYear": null,
+        "bottlingYear": null,
+        "caskStrength": null,
+        "releaseMonth": null,
+        "familyContext": {
+          "siblingBottles": []
+        }
+      },
+      {
+        "abv": 43,
+        "brand": "Yamazaki",
+        "score": 88.28406,
+        "series": null,
+        "source": ["vector", "text", "brand_coverage"],
+        "bottler": null,
+        "edition": null,
+        "outturn": null,
+        "bottleId": 14506,
+        "category": "single_malt",
+        "fullName": "Yamazaki 18-year-old",
+        "reference": "Yamazaki 18-year-old - 43.0% ABV",
+        "statedAge": 18,
+        "caskNumber": null,
+        "comparison": {
+          "missing": ["edition"],
+          "conflicts": ["distillers"],
+          "agreements": ["category", "statedAge", "abv", "brand"]
+        },
+        "distillery": ["Yamazaki"],
+        "maturation": null,
+        "releaseDay": null,
+        "singleCask": null,
+        "releaseYear": 1992,
+        "vintageYear": null,
+        "bottlingYear": null,
+        "caskStrength": null,
+        "releaseMonth": null,
+        "familyContext": {
+          "siblingBottles": []
+        }
+      },
+      {
+        "abv": 43,
+        "brand": "Lismore",
+        "score": 61.715443,
+        "series": null,
+        "source": ["text"],
+        "bottler": null,
+        "edition": null,
+        "outturn": null,
+        "bottleId": 46930,
+        "category": "single_malt",
+        "fullName": "Lismore 18-year-old - 43.0% ABV",
+        "reference": null,
+        "statedAge": 18,
+        "caskNumber": null,
+        "comparison": {
+          "missing": ["edition", "distillers"],
+          "conflicts": ["brand"],
+          "agreements": ["category", "statedAge", "abv"]
+        },
+        "distillery": [],
+        "maturation": null,
+        "releaseDay": null,
+        "singleCask": null,
+        "releaseYear": null,
+        "vintageYear": null,
+        "bottlingYear": null,
+        "caskStrength": null,
+        "releaseMonth": null,
+        "familyContext": {
+          "siblingBottles": []
+        }
+      },
+      {
+        "abv": 43,
+        "brand": "Hakushu Distillery",
+        "score": 53.98307,
+        "series": null,
+        "source": ["text"],
+        "bottler": null,
+        "edition": null,
+        "outturn": null,
+        "bottleId": 3789,
+        "category": "single_malt",
+        "fullName": "Hakushu Distillery 18-year-old",
+        "reference": null,
+        "statedAge": 18,
+        "caskNumber": null,
+        "comparison": {
+          "missing": ["edition"],
+          "conflicts": ["brand", "distillers"],
+          "agreements": ["category", "statedAge", "abv"]
+        },
+        "distillery": ["Hakushu Distillery"],
+        "maturation": null,
+        "releaseDay": null,
+        "singleCask": null,
+        "releaseYear": null,
+        "vintageYear": null,
+        "bottlingYear": null,
+        "caskStrength": null,
+        "releaseMonth": null,
+        "familyContext": {
+          "siblingBottles": []
+        }
+      },
+      {
+        "abv": 43,
+        "brand": "Auchentoshan",
+        "score": 53.473015,
+        "series": null,
+        "source": ["text"],
+        "bottler": null,
+        "edition": null,
+        "outturn": null,
+        "bottleId": 47555,
+        "category": "single_malt",
+        "fullName": "Auchentoshan 18-year-old",
+        "reference": null,
+        "statedAge": 18,
+        "caskNumber": null,
+        "comparison": {
+          "missing": ["edition"],
+          "conflicts": ["brand", "distillers"],
+          "agreements": ["category", "statedAge", "abv"]
+        },
+        "distillery": ["Auchentoshan"],
+        "maturation": null,
+        "releaseDay": null,
+        "singleCask": false,
+        "releaseYear": null,
+        "vintageYear": null,
+        "bottlingYear": null,
+        "caskStrength": false,
+        "releaseMonth": null,
+        "familyContext": {
+          "siblingBottles": []
+        }
+      },
+      {
+        "abv": 43,
+        "brand": "The Dalmore",
+        "score": 53.260902,
+        "series": "Principal Collection",
+        "source": ["text"],
+        "bottler": null,
+        "edition": "2024 Edition",
+        "outturn": null,
+        "bottleId": 56514,
+        "category": "single_malt",
+        "fullName": "Dalmore 18-year-old - 2024 Edition",
+        "reference": null,
+        "statedAge": 18,
+        "caskNumber": null,
+        "comparison": {
+          "missing": [],
+          "conflicts": ["brand", "distillers"],
+          "agreements": ["category", "statedAge", "abv", "edition"]
+        },
+        "distillery": ["The Dalmore"],
+        "maturation": null,
+        "releaseDay": null,
+        "singleCask": null,
+        "releaseYear": 2024,
+        "vintageYear": null,
+        "bottlingYear": null,
+        "caskStrength": null,
+        "releaseMonth": null,
+        "familyContext": {
+          "siblingBottles": []
+        }
+      },
+      {
+        "abv": 48,
+        "brand": "Yamazaki",
+        "score": 50.75131,
+        "series": null,
+        "source": ["vector", "text", "brand"],
+        "bottler": null,
+        "edition": null,
+        "outturn": null,
+        "bottleId": 51644,
+        "category": "single_malt",
+        "fullName": "Yamazaki Mizunara",
+        "reference": "Yamazaki Mizunara, 48%",
+        "statedAge": null,
+        "caskNumber": null,
+        "comparison": {
+          "missing": ["statedAge", "edition"],
+          "conflicts": ["abv", "distillers"],
+          "agreements": ["category", "brand"]
+        },
+        "distillery": ["Yamazaki"],
+        "maturation": null,
+        "releaseDay": 25,
+        "singleCask": null,
+        "releaseYear": 2012,
+        "vintageYear": null,
+        "bottlingYear": null,
+        "caskStrength": null,
+        "releaseMonth": 9,
+        "familyContext": {
+          "siblingBottles": []
+        }
+      },
+      {
+        "abv": 43,
+        "brand": "The Macallan",
+        "score": 48.240295,
+        "series": "Sherry Oak Collection",
+        "source": ["text"],
+        "bottler": null,
+        "edition": null,
+        "outturn": null,
+        "bottleId": 1830,
+        "category": "single_malt",
+        "fullName": "The Macallan Sherry Oak",
+        "reference": null,
+        "statedAge": 18,
+        "caskNumber": null,
+        "comparison": {
+          "missing": ["edition"],
+          "conflicts": ["brand", "distillers"],
+          "agreements": ["category", "statedAge", "abv"]
+        },
+        "distillery": ["The Macallan"],
+        "maturation": "Sherry seasoned oak casks",
+        "releaseDay": null,
+        "singleCask": false,
+        "releaseYear": null,
+        "vintageYear": null,
+        "bottlingYear": null,
+        "caskStrength": null,
+        "releaseMonth": null,
+        "familyContext": {
+          "siblingBottles": []
+        }
+      },
+      {
+        "abv": 43,
+        "brand": "The Macallan",
+        "score": 48.127007,
+        "series": "Fine Oak",
+        "source": ["text"],
+        "bottler": null,
+        "edition": null,
+        "outturn": null,
+        "bottleId": 4520,
+        "category": "single_malt",
+        "fullName": "The Macallan Fine Oak",
+        "reference": null,
+        "statedAge": 18,
+        "caskNumber": null,
+        "comparison": {
+          "missing": ["edition"],
+          "conflicts": ["brand", "distillers"],
+          "agreements": ["category", "statedAge", "abv"]
+        },
+        "distillery": ["The Macallan"],
+        "maturation": "Sherry seasoned European and American oak casks and ex-bourbon American oak casks",
+        "releaseDay": null,
+        "singleCask": null,
+        "releaseYear": null,
+        "vintageYear": null,
+        "bottlingYear": null,
+        "caskStrength": null,
+        "releaseMonth": null,
+        "familyContext": {
+          "siblingBottles": []
+        }
+      },
+      {
+        "abv": null,
+        "brand": "Kaiyo",
+        "score": 46.66032,
+        "series": null,
+        "source": ["text"],
+        "bottler": null,
+        "edition": null,
+        "outturn": null,
+        "bottleId": 13773,
+        "category": null,
+        "fullName": "Kaiyo Mizunara Oak",
+        "reference": null,
+        "statedAge": null,
+        "caskNumber": null,
+        "comparison": {
+          "missing": ["category", "statedAge", "abv", "edition", "distillers"],
+          "conflicts": ["brand"],
+          "agreements": []
+        },
+        "distillery": [],
+        "maturation": null,
+        "releaseDay": null,
+        "singleCask": null,
+        "releaseYear": null,
+        "vintageYear": null,
+        "bottlingYear": null,
+        "caskStrength": null,
+        "releaseMonth": null,
+        "familyContext": {
+          "siblingBottles": []
+        }
+      },
+      {
+        "abv": 48,
+        "brand": "Yamazaki",
+        "score": 46.18259,
+        "series": null,
+        "source": ["text", "brand"],
+        "bottler": null,
+        "edition": null,
+        "outturn": null,
+        "bottleId": 51641,
+        "category": "single_malt",
+        "fullName": "Yamazaki Mizunara",
+        "reference": null,
+        "statedAge": null,
+        "caskNumber": null,
+        "comparison": {
+          "missing": ["statedAge", "edition"],
+          "conflicts": ["abv", "distillers"],
+          "agreements": ["category", "brand"]
+        },
+        "distillery": ["Yamazaki"],
+        "maturation": null,
+        "releaseDay": 29,
+        "singleCask": null,
+        "releaseYear": 2011,
+        "vintageYear": null,
+        "bottlingYear": null,
+        "caskStrength": null,
+        "releaseMonth": 11,
+        "familyContext": {
+          "siblingBottles": []
+        }
+      },
+      {
+        "abv": 48,
+        "brand": "Yamazaki",
+        "score": 46.18259,
+        "series": null,
+        "source": ["text", "brand"],
+        "bottler": null,
+        "edition": null,
+        "outturn": null,
+        "bottleId": 51648,
+        "category": "single_malt",
+        "fullName": "Yamazaki Mizunara",
+        "reference": null,
+        "statedAge": null,
+        "caskNumber": null,
+        "comparison": {
+          "missing": ["statedAge", "edition"],
+          "conflicts": ["abv", "distillers"],
+          "agreements": ["category", "brand"]
+        },
+        "distillery": ["Yamazaki"],
+        "maturation": null,
+        "releaseDay": null,
+        "singleCask": null,
+        "releaseYear": 2013,
+        "vintageYear": null,
+        "bottlingYear": null,
+        "caskStrength": null,
+        "releaseMonth": null,
+        "familyContext": {
+          "siblingBottles": []
+        }
+      },
+      {
+        "abv": 48,
+        "brand": "Yamazaki",
+        "score": 46.18259,
+        "series": null,
+        "source": ["text", "brand"],
+        "bottler": null,
+        "edition": null,
+        "outturn": null,
+        "bottleId": 51651,
+        "category": "single_malt",
+        "fullName": "Yamazaki Mizunara",
+        "reference": null,
+        "statedAge": null,
+        "caskNumber": null,
+        "comparison": {
+          "missing": ["statedAge", "edition"],
+          "conflicts": ["abv", "distillers"],
+          "agreements": ["category", "brand"]
+        },
+        "distillery": ["Yamazaki"],
+        "maturation": null,
+        "releaseDay": 22,
+        "singleCask": null,
+        "releaseYear": 2014,
+        "vintageYear": null,
+        "bottlingYear": null,
+        "caskStrength": null,
+        "releaseMonth": 4,
+        "familyContext": {
+          "siblingBottles": []
+        }
+      },
+      {
+        "abv": 48,
+        "brand": "Yamazaki",
+        "score": 46.18259,
+        "series": null,
+        "source": ["text", "brand"],
+        "bottler": null,
+        "edition": null,
+        "outturn": null,
+        "bottleId": 51638,
+        "category": "single_malt",
+        "fullName": "Yamazaki Mizunara",
+        "reference": null,
+        "statedAge": null,
+        "caskNumber": null,
+        "comparison": {
+          "missing": ["statedAge", "edition"],
+          "conflicts": ["abv", "distillers"],
+          "agreements": ["category", "brand"]
+        },
+        "distillery": ["Yamazaki"],
+        "maturation": null,
+        "releaseDay": null,
+        "singleCask": null,
+        "releaseYear": 2010,
+        "vintageYear": null,
+        "bottlingYear": null,
+        "caskStrength": null,
+        "releaseMonth": null,
+        "familyContext": {
+          "siblingBottles": []
+        }
+      },
+      {
+        "abv": 43,
+        "brand": "Bowmore",
+        "score": 45.373127,
+        "series": "Sherry Oak Collection",
+        "source": ["text"],
+        "bottler": null,
+        "edition": null,
+        "outturn": null,
+        "bottleId": 58076,
+        "category": "single_malt",
+        "fullName": "Bowmore Sherry Oak Cask",
+        "reference": null,
+        "statedAge": 18,
+        "caskNumber": null,
+        "comparison": {
+          "missing": ["edition"],
+          "conflicts": ["brand", "distillers"],
+          "agreements": ["category", "statedAge", "abv"]
+        },
+        "distillery": ["Bowmore"],
+        "maturation": "Aged in hand-selected ex-Bourbon and Oloroso sherry casks, with a Pedro Ximenez Sherry cask finish",
+        "releaseDay": null,
+        "singleCask": false,
+        "releaseYear": null,
+        "vintageYear": null,
+        "bottlingYear": null,
+        "caskStrength": null,
+        "releaseMonth": null,
+        "familyContext": {
+          "siblingBottles": []
+        }
+      }
+    ]
+  },
+  "context": {
+    "inspectedBottleIds": [54095],
+    "bottleContexts": [
+      {
+        "exact": {
+          "abv": 48,
+          "edition": "2024 Tsukuriwake Edition",
+          "outturn": null,
+          "statedAge": 18,
+          "caskNumber": null,
+          "maturation": "Mizunara oak casks",
+          "releaseDay": null,
+          "singleCask": null,
+          "releaseYear": 2024,
+          "vintageYear": null,
+          "bottlingYear": null,
+          "caskStrength": null,
+          "releaseMonth": null
+        },
+        "shared": {
+          "name": "Mizunara 18-year-old",
+          "brand": {
+            "name": "Yamazaki",
+            "entityId": 493
+          },
+          "series": {
+            "name": "Tsukuriwake",
+            "seriesId": 674
+          },
+          "bottler": null,
+          "category": "single_malt",
+          "statedAge": null,
+          "distillers": [
+            {
+              "name": "Yamazaki",
+              "entityId": 493
+            }
+          ]
+        },
+        "groupId": 27056,
+        "bottleId": 54095,
+        "fullName": "Yamazaki Mizunara 18-year-old - 2024 Tsukuriwake Edition",
+        "siblings": [],
+        "references": [
+          {
+            "name": "Yamazaki 18-year-old Mizunara (2024 Tsukuriwake Edition), 48%",
+            "ignored": false
+          }
+        ],
+        "observations": [
+          {
+            "facts": {
+              "proposalType": "create_new",
+              "proposedBottle": {
+                "abv": 48,
+                "name": "Mizunara 18-year-old",
+                "brand": {
+                  "id": null,
+                  "name": "Yamazaki"
+                },
+                "series": null,
+                "bottler": null,
+                "edition": "Tsukuriwake 2024",
+                "outturn": null,
+                "category": "single_malt",
+                "statedAge": 18,
+                "caskNumber": null,
+                "distillers": [
+                  {
+                    "id": null,
+                    "name": "Yamazaki"
+                  }
+                ],
+                "maturation": "Mizunara oak casks",
+                "releaseDay": null,
+                "singleCask": null,
+                "releaseYear": 2024,
+                "vintageYear": null,
+                "bottlingYear": null,
+                "caskStrength": null,
+                "releaseMonth": null
+              },
+              "referenceScope": "none"
+            },
+            "rawText": "Yamazaki 18-year-old Mizunara - Tsukuriwake 2024",
+            "sourceKey": "store_price:12057715",
+            "sourceUrl": "https://www.thewhiskyworld.com/yamazaki-18-year-old-mizunara-tsukuriwake-2024-p15380",
+            "sourceName": "Yamazaki 18-year-old Mizunara - Tsukuriwake 2024",
+            "sourceType": "store_price",
+            "parsedIdentity": null
+          }
+        ],
+        "imageSources": [
+          {
+            "url": "https://api.peated.com/uploads/prices-orzs4niyoof45cjurlf5wqo2.webp",
+            "source": {
+              "kind": "bottle"
+            },
+            "sourceUrl": "https://www.thewhiskyworld.com/yamazaki-18-year-old-mizunara-tsukuriwake-2024-p15380"
+          }
+        ]
+      }
+    ],
+    "inspectedEntities": [
+      {
+        "kind": "distillery",
+        "name": "Yamazaki",
+        "score": 1,
+        "source": ["exact", "text", "prefix", "contained"],
+        "entityId": 493,
+        "reference": "Yamazaki",
+        "shortName": "",
+        "retrievedFor": [
+          {
+            "exact": true,
+            "query": "Yamazaki"
+          },
+          {
+            "query": "Yamazaki Distillery"
+          }
+        ]
+      },
+      {
+        "kind": "distillery",
+        "name": "The Dalmore",
+        "score": 1,
+        "source": ["exact", "text", "prefix", "contained"],
+        "entityId": 870,
+        "reference": "The Dalmore",
+        "shortName": "Dalmore",
+        "retrievedFor": [
+          {
+            "exact": true,
+            "query": "The Dalmore"
+          }
+        ]
+      },
+      {
+        "kind": "brand",
+        "name": "Lismore",
+        "score": 1,
+        "source": ["exact", "text", "prefix", "contained"],
+        "entityId": 1141,
+        "reference": "Lismore",
+        "shortName": null,
+        "retrievedFor": [
+          {
+            "exact": true,
+            "query": "Lismore"
+          }
+        ]
+      },
+      {
+        "kind": "distillery",
+        "name": "Hakushu Distillery",
+        "score": 1,
+        "source": ["exact", "text", "prefix", "contained"],
+        "entityId": 1007,
+        "reference": "Hakushu Distillery",
+        "shortName": null,
+        "retrievedFor": [
+          {
+            "exact": true,
+            "query": "Hakushu Distillery"
+          }
+        ]
+      },
+      {
+        "kind": "distillery",
+        "name": "Auchentoshan",
+        "score": 1,
+        "source": ["exact", "text", "prefix", "contained"],
+        "entityId": 121,
+        "reference": "Auchentoshan",
+        "shortName": null,
+        "retrievedFor": [
+          {
+            "exact": true,
+            "query": "Auchentoshan"
+          }
+        ]
+      },
+      {
+        "kind": "distillery",
+        "name": "The Macallan",
+        "score": 1,
+        "source": ["exact", "text", "prefix", "contained"],
+        "entityId": 1157,
+        "reference": "The Macallan",
+        "shortName": null,
+        "retrievedFor": [
+          {
+            "exact": true,
+            "query": "The Macallan"
+          }
+        ]
+      },
+      {
+        "kind": "distillery",
+        "name": "Bowmore",
+        "score": 1,
+        "source": ["exact", "text", "prefix", "contained"],
+        "entityId": 394,
+        "reference": "Bowmore",
+        "shortName": null,
+        "retrievedFor": [
+          {
+            "exact": true,
+            "query": "Bowmore"
+          }
+        ]
+      },
+      {
+        "kind": "brand",
+        "name": "Kaiyo",
+        "score": 1,
+        "source": ["exact", "text", "prefix", "contained"],
+        "entityId": 1096,
+        "reference": "Kaiyo",
+        "shortName": null,
+        "retrievedFor": [
+          {
+            "exact": true,
+            "query": "Kaiyo"
+          }
+        ]
+      },
+      {
+        "kind": "company",
+        "name": "Morrison Bowmore Distillers Ltd",
+        "score": 0.2,
+        "source": ["text"],
+        "entityId": 5684,
+        "reference": null,
+        "shortName": null,
+        "retrievedFor": [
+          {
+            "query": "Bowmore"
+          }
+        ]
+      }
+    ],
+    "inspectedSeries": []
+  },
+  "provenance": {
+    "source": "production_miss",
+    "verifiedSourceUrls": [
+      "https://www.masterofmalt.com/whiskies/yamazaki/yamazaki-tsukuriwake-2024-18-year-old-mizunara-whisky/?sku=136528"
+    ],
+    "dbOutcome": {
+      "bottleId": 54095,
+      "createsBottle": false,
+      "summary": "Production returned match 54095 but held it for review: code added a trait_conflict risk because the photo-read ABV (43%) differed from the stored 48%."
+    },
+    "notes": "Captured from saved classifier run 37328 (store_price 12063288, model openai/gpt-6-luna, 2026-11-07T01:03:13.806Z). Production rationale: The Master of Malt page identifies the source as Yamazaki 18 Year Old Mizunara (2024 Tsukuriwake Edition) and states 48% ABV. This confirms the exact product represented by Bottle 54095; the extracted 43% ABV is incorrect. Verified 2026-11-08 on the Master of Malt page: \"Yamazaki 18 Year Old Mizunara (2024 Tsukuriwake Edition)\", bottled at 48% ABV. The listing photo is a stock photo of the standard Yamazaki 18 at 43%. The agent already called the photo ABV wrong; only the code-level photo conflict check held the match."
+  },
+  "expected": {
+    "status": "classified",
+    "action": "match",
+    "identityScope": "product",
+    "matchedBottleId": 54095,
+    "expectedTier": "auto",
+    "summary": "Match Yamazaki Mizunara 18-year-old 2024 Tsukuriwake Edition (54095) automatically. The listing photo was read at 43%, the standard Yamazaki 18 (14506); the title and the Master of Malt page name the Mizunara Tsukuriwake 2024 at 48%, which agrees with the stored Bottle."
+  }
+}

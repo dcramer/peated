@@ -239,6 +239,25 @@ describe("buildAgentInput", () => {
     expect(input).not.toHaveProperty("availableSourceEvidenceFields");
   });
 
+  test("tells the agent what the extracted identity was read from", () => {
+    const build = (
+      extractedIdentitySource?: "image" | "text" | "structured" | null,
+    ) =>
+      JSON.parse(
+        buildAgentInput({
+          reference: { name: "Yamazaki 18-year-old Mizunara" },
+          extractedIdentity: null,
+          extractedIdentitySource,
+          initialCandidates: [],
+          currentBottle: null,
+          hasExactReferenceMatch: false,
+        }),
+      ).extractedIdentitySource;
+
+    expect(build("image")).toBe("image");
+    expect(build()).toBeNull();
+  });
+
   test("keeps exact-query provenance out of agent input", () => {
     const input = JSON.parse(
       buildAgentInput({

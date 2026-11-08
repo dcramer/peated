@@ -1498,7 +1498,7 @@ describe("finalizeBottleReferenceClassification", () => {
     ).toMatchObject({ action: "match", matchedBottleId: 9900 });
   });
 
-  test.each(["image", "text", "structured", null] as const)(
+  test.each(["text", "structured", null] as const)(
     "keeps a %s-source ABV conflict as a Match that needs review",
     (source) => {
       expect(
@@ -1523,6 +1523,22 @@ describe("finalizeBottleReferenceClassification", () => {
       });
     },
   );
+
+  test("leaves a photo-read ABV conflict to the agent's judgment", () => {
+    expect(
+      finalizeBottleReferenceClassification(
+        buildAbvMatchInput({
+          extractedAbv: 43,
+          candidateAbv: 48,
+          source: "image",
+        }),
+      ),
+    ).toMatchObject({
+      action: "match",
+      matchedBottleId: 9901,
+      confidenceBasis: { unresolvedRisks: [] },
+    });
+  });
 
   test("keeps a matching extracted ABV without adding a risk", () => {
     const result = finalizeBottleReferenceClassification(

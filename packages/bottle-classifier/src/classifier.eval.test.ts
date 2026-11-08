@@ -198,11 +198,13 @@ function getDerivedAutomationTier(
         result.artifacts.candidates,
         testCase.input.reference.name,
       ),
-    // Image-backed fixtures either pre-seed `input.imageEvidence` or carry only
-    // `reference.imageUrl` and rely on live extraction; both mean the run has
-    // primary label/image evidence, matching the photo-identification consumer.
+    // Image-backed fixtures pre-seed `input.imageEvidence`, carry a saved
+    // photo extraction (`extractedIdentitySource: "image"`), or carry only
+    // `reference.imageUrl` and rely on live extraction; each means the run has
+    // primary label/image evidence, matching the production consumers.
     hasPrimaryLabelOrImageEvidence:
       testCase.input.imageEvidence != null ||
+      testCase.input.extractedIdentitySource === "image" ||
       Boolean(testCase.input.reference.imageUrl),
   });
 }

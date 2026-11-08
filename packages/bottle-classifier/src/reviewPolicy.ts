@@ -461,6 +461,14 @@ function rejectInvalidExistingMatch({
     });
   }
 
+  // A source photo is evidence for the agent to weigh, not a hard check: it can
+  // be a stock photo of a sibling Bottle or a misread digit, and the agent
+  // already compared it with the source name and page (owner decision,
+  // 2026-11-08). Facts read from source text or data still hold the Match.
+  if (artifacts.extractedIdentitySource === "image") {
+    return decision;
+  }
+
   const conflicts = getBottleFieldConflicts(
     artifacts.extractedIdentity,
     target,

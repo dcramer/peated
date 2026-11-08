@@ -79,6 +79,7 @@ const SHARED_INPUT_MAP = [
   "`reference.name` is the observed source label. Treat it as evidence, not as canonical Bottle identity.",
   "`reference.url` is the source page. `reference.imageUrl` identifies the submitted image; use `extractedIdentity` and any `imageEvidence` for its readable content.",
   "`extractedIdentity` is a structured extraction from the source. It can be incomplete or wrong. Its `expression` omits age and style words and is not the Bottle name.",
+  "`extractedIdentitySource` tells what `extractedIdentity` was read from: `image` is the source photo, `text` is `reference.name`, and `structured` is data the source supplied. A source photo is evidence like a photo reading: it can show a different Bottle, such as a retailer stock photo, or misread a digit. Weigh its facts against `reference.name`, the source page, and stored facts.",
   "`imageEvidence.fieldCandidates` contains image-derived field guesses. Use `photoSuitability` and `conflicts` to judge whether the image evidence is reliable.",
   "A public image `sourceUrl` identifies the page that supplied the image. Read that page when its producer title or product text is needed to confirm canonical name or edition wording.",
   "`localSearch.candidates` contains existing Bottle candidates. `bottleId` is the catalog id, `fullName` is the display name, and `reference` is the accepted name that retrieval matched.",

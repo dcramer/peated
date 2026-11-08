@@ -9,6 +9,7 @@ import {
 } from "../classifierTypes";
 import type {
   AuditBottleInput,
+  BottleClassificationArtifacts,
   BottleContext,
   BottleReferenceInput,
 } from "../contract";
@@ -26,6 +27,7 @@ function buildAgentEntityResolution(entity: EntityResolution) {
 export function buildAgentInput({
   reference,
   extractedIdentity,
+  extractedIdentitySource = null,
   imageEvidence,
   initialCandidates,
   currentBottle,
@@ -35,6 +37,7 @@ export function buildAgentInput({
 }: {
   reference: BottleReferenceInput;
   extractedIdentity: BottleExtractedDetails | null;
+  extractedIdentitySource?: BottleClassificationArtifacts["extractedIdentitySource"];
   imageEvidence?: ImageBottleEvidence | null;
   initialCandidates: BottleCandidate[];
   currentBottle: BottleCandidate | null;
@@ -59,6 +62,7 @@ export function buildAgentInput({
         ? AgentBottleCandidateSchema.parse(currentBottle)
         : null,
       extractedIdentity,
+      extractedIdentitySource,
       imageEvidence: imageEvidence ?? null,
       localSearch: {
         hasExactReferenceMatch,

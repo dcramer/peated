@@ -271,6 +271,9 @@ export const classifierEvalFixtureSchema = z
       .object({
         reference: BottleReferenceInputSchema,
         extractedIdentity: BottleExtractedDetailsSchema.nullable().optional(),
+        extractedIdentitySource: z
+          .enum(["image", "text", "structured"])
+          .optional(),
         imageEvidence: ImageBottleEvidenceSchema.nullable().optional(),
         initialCandidates: z.array(BottleCandidateSchema).optional(),
         candidateExpansion: CandidateExpansionModeSchema.optional(),
