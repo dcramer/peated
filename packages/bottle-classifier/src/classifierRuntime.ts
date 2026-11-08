@@ -169,6 +169,7 @@ export type RunBottleClassifierAgentInput = {
   reference: BottleReferenceInput;
   conversationId?: string;
   extractedIdentity?: BottleExtractedDetails | null;
+  extractedIdentitySource?: BottleClassificationArtifacts["extractedIdentitySource"];
   imageEvidence?: ImageBottleEvidence | null;
   initialCandidates?: BottleCandidate[];
   candidateExpansion?: CandidateExpansionMode;
@@ -514,6 +515,7 @@ export async function prepareBottleClassifierAgentRun(
   {
     reference,
     extractedIdentity,
+    extractedIdentitySource = null,
     imageEvidence,
     initialCandidates = [],
     candidateExpansion = "open",
@@ -601,6 +603,7 @@ export async function prepareBottleClassifierAgentRun(
   const input = buildAgentInput({
     reference,
     extractedIdentity: normalizedExtractedIdentity,
+    extractedIdentitySource,
     imageEvidence: normalizedImageEvidence,
     initialCandidates,
     currentBottle,
@@ -1338,6 +1341,7 @@ export function createBottleClassifier(
         reference: parsedInput.reference,
         conversationId,
         extractedIdentity: artifacts.extractedIdentity,
+        extractedIdentitySource: artifacts.extractedIdentitySource,
         imageEvidence: artifacts.imageEvidence,
         initialCandidates: artifacts.candidates,
         candidateExpansion: parsedInput.candidateExpansion,

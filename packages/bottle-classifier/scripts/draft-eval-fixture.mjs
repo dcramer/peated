@@ -9,7 +9,7 @@
 // label evidence for controlled comparisons. A person must still verify the
 // Bottle online, write `expected`, and complete `provenance`; the fixture
 // validator rejects the draft until they do.
-import { readFile, writeFile } from "node:fs/promises";
+import { mkdir, readFile, writeFile } from "node:fs/promises";
 import { join } from "node:path";
 
 const [runPath, fixtureId, outDir] = process.argv.slice(2);
@@ -54,6 +54,7 @@ const fixture = {
   input: {
     reference: input.reference,
     extractedIdentity: artifacts.extractedIdentity ?? null,
+    extractedIdentitySource: artifacts.extractedIdentitySource ?? undefined,
     imageEvidence: artifacts.imageEvidence ?? null,
     initialCandidates: artifacts.candidates ?? [],
   },
@@ -98,6 +99,7 @@ const evidence = {
   },
 };
 
+await mkdir(outDir, { recursive: true });
 await writeFile(
   join(outDir, `${fixtureId}.json`),
   `${JSON.stringify(fixture, null, 2)}\n`,

@@ -283,6 +283,14 @@ When a matched candidate conflicts with the extracted facts, code adds a
 conflict risk and the Match goes to review. Code never turns that Match into
 No Match.
 
+Facts read from the source photo (`extractedIdentitySource: "image"`) are
+evidence for the agent, not a code check. A store photo is often a stock
+photo of a sibling Bottle, and small digits are often misread. The agent
+input says where the facts came from, and the agent weighs them against the
+source name, the source page, and the stored facts. Code adds no conflict risk
+for photo facts. Facts read from the source name or supplied as source data
+still add one.
+
 Whether a source names the one cask behind a single-cask Bottle is also the
 agent's judgment. Code used to turn a Match into No Match when the source did
 not repeat the Bottle's stored cask number. That check misread vattings with a

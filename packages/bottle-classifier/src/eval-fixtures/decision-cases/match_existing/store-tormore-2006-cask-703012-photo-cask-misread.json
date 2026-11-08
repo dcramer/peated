@@ -1,0 +1,996 @@
+{
+  "id": "store-tormore-2006-cask-703012-photo-cask-misread",
+  "name": "store listing photo: a photo-read cask 7812 does not hold the Tormore 2006 cask 703012 match named in the title",
+  "input": {
+    "reference": {
+      "id": 12063232,
+      "url": "https://www.masterofmalt.com/whiskies/tormore/tormore-17-year-old-2006-cask-703012-connoisseurs-choice-gordon-and-macphail-whisky/?sku=134601",
+      "name": "Tormore 17-year-old 2006 - Connoisseurs Choice (cask 703012) (Gordon & MacPhail)",
+      "imageUrl": null,
+      "externalSiteId": 32,
+      "currentBottleId": null
+    },
+    "extractedIdentity": {
+      "abv": 60.9,
+      "brand": "Gordon & MacPhail",
+      "series": "Connoisseurs Choice",
+      "bottler": "Gordon & MacPhail",
+      "edition": null,
+      "outturn": 211,
+      "category": "single_malt",
+      "distillery": ["Tormore"],
+      "expression": null,
+      "maturation": "Refill Bourbon Barrel",
+      "stated_age": 17,
+      "cask_number": "7812",
+      "release_day": null,
+      "single_cask": true,
+      "release_year": null,
+      "vintage_year": 2006,
+      "bottling_year": 2024,
+      "cask_strength": true,
+      "release_month": null
+    },
+    "extractedIdentitySource": "image",
+    "imageEvidence": null,
+    "initialCandidates": [
+      {
+        "abv": 60.9,
+        "brand": "Gordon & MacPhail",
+        "score": 143.79129,
+        "series": "Connoisseurs Choice",
+        "source": ["text", "brand_coverage", "context", "brand"],
+        "bottler": "Gordon & MacPhail",
+        "edition": null,
+        "outturn": null,
+        "bottleId": 62785,
+        "category": "single_malt",
+        "fullName": "Gordon & MacPhail Tormore 2006",
+        "reference": null,
+        "statedAge": 17,
+        "caskNumber": "703012",
+        "comparison": {
+          "missing": [],
+          "conflicts": ["caskNumber"],
+          "agreements": [
+            "category",
+            "statedAge",
+            "abv",
+            "vintageYear",
+            "caskStrength",
+            "singleCask",
+            "brand",
+            "bottler",
+            "series",
+            "distillers"
+          ]
+        },
+        "distillery": ["Tormore"],
+        "maturation": null,
+        "releaseDay": null,
+        "singleCask": true,
+        "releaseYear": null,
+        "vintageYear": 2006,
+        "bottlingYear": null,
+        "caskStrength": true,
+        "releaseMonth": null,
+        "familyContext": {
+          "siblingBottles": []
+        }
+      },
+      {
+        "abv": 40,
+        "brand": "Gordon & MacPhail",
+        "score": 93.11913,
+        "series": "Connoisseurs Choice",
+        "source": ["text"],
+        "bottler": "Gordon & MacPhail",
+        "edition": null,
+        "outturn": null,
+        "bottleId": 66158,
+        "category": "single_malt",
+        "fullName": "Gordon & MacPhail Balblair 1964 17-year-old",
+        "reference": null,
+        "statedAge": 17,
+        "caskNumber": null,
+        "comparison": {
+          "missing": ["caskStrength", "singleCask", "caskNumber"],
+          "conflicts": ["abv", "vintageYear", "distillers"],
+          "agreements": ["category", "statedAge", "brand", "bottler", "series"]
+        },
+        "distillery": ["Balblair"],
+        "maturation": null,
+        "releaseDay": null,
+        "singleCask": null,
+        "releaseYear": null,
+        "vintageYear": 1964,
+        "bottlingYear": null,
+        "caskStrength": null,
+        "releaseMonth": null,
+        "familyContext": {
+          "siblingBottles": []
+        }
+      },
+      {
+        "abv": 40,
+        "brand": "Gordon & MacPhail",
+        "score": 93.11913,
+        "series": "Connoisseurs Choice",
+        "source": ["text"],
+        "bottler": "Gordon & MacPhail",
+        "edition": null,
+        "outturn": null,
+        "bottleId": 66591,
+        "category": "single_malt",
+        "fullName": "Gordon & MacPhail Glenlossie 1968 17-year-old",
+        "reference": null,
+        "statedAge": 17,
+        "caskNumber": null,
+        "comparison": {
+          "missing": ["caskStrength", "singleCask", "caskNumber"],
+          "conflicts": ["abv", "vintageYear", "distillers"],
+          "agreements": ["category", "statedAge", "brand", "bottler", "series"]
+        },
+        "distillery": ["Glenlossie"],
+        "maturation": null,
+        "releaseDay": null,
+        "singleCask": null,
+        "releaseYear": null,
+        "vintageYear": 1968,
+        "bottlingYear": null,
+        "caskStrength": null,
+        "releaseMonth": null,
+        "familyContext": {
+          "siblingBottles": []
+        }
+      },
+      {
+        "abv": 40,
+        "brand": "Gordon & MacPhail",
+        "score": 93.11913,
+        "series": "Connoisseurs Choice",
+        "source": ["text"],
+        "bottler": "Gordon & MacPhail",
+        "edition": null,
+        "outturn": null,
+        "bottleId": 67653,
+        "category": "single_malt",
+        "fullName": "Gordon & MacPhail Oban 1972 17-year-old",
+        "reference": null,
+        "statedAge": 17,
+        "caskNumber": null,
+        "comparison": {
+          "missing": ["caskStrength", "singleCask", "caskNumber"],
+          "conflicts": ["abv", "vintageYear", "distillers"],
+          "agreements": ["category", "statedAge", "brand", "bottler", "series"]
+        },
+        "distillery": ["Oban"],
+        "maturation": null,
+        "releaseDay": null,
+        "singleCask": null,
+        "releaseYear": null,
+        "vintageYear": 1972,
+        "bottlingYear": null,
+        "caskStrength": null,
+        "releaseMonth": null,
+        "familyContext": {
+          "siblingBottles": []
+        }
+      },
+      {
+        "abv": 58.3,
+        "brand": "Gordon & MacPhail",
+        "score": 80.3195,
+        "series": "Connoisseurs Choice",
+        "source": ["text"],
+        "bottler": "Gordon & MacPhail",
+        "edition": null,
+        "outturn": null,
+        "bottleId": 46316,
+        "category": "single_malt",
+        "fullName": "Gordon & MacPhail Caol Ila 2006",
+        "reference": null,
+        "statedAge": 17,
+        "caskNumber": "306193",
+        "comparison": {
+          "missing": [],
+          "conflicts": ["abv", "caskNumber", "distillers"],
+          "agreements": [
+            "category",
+            "statedAge",
+            "vintageYear",
+            "caskStrength",
+            "singleCask",
+            "brand",
+            "bottler",
+            "series"
+          ]
+        },
+        "distillery": ["Caol Ila"],
+        "maturation": "other",
+        "releaseDay": null,
+        "singleCask": true,
+        "releaseYear": 2024,
+        "vintageYear": 2006,
+        "bottlingYear": null,
+        "caskStrength": true,
+        "releaseMonth": null,
+        "familyContext": {
+          "siblingBottles": []
+        }
+      },
+      {
+        "abv": 56.5,
+        "brand": "Gordon & MacPhail",
+        "score": 79.01551,
+        "series": "Connoisseurs Choice",
+        "source": ["text"],
+        "bottler": "Gordon & MacPhail",
+        "edition": null,
+        "outturn": null,
+        "bottleId": 60960,
+        "category": "single_malt",
+        "fullName": "Gordon & MacPhail Ledaig 2006",
+        "reference": null,
+        "statedAge": null,
+        "caskNumber": null,
+        "comparison": {
+          "missing": ["statedAge", "caskStrength", "singleCask", "caskNumber"],
+          "conflicts": ["abv", "distillers"],
+          "agreements": [
+            "category",
+            "vintageYear",
+            "brand",
+            "bottler",
+            "series"
+          ]
+        },
+        "distillery": ["Tobermory"],
+        "maturation": "First fill Sherry hogshead",
+        "releaseDay": null,
+        "singleCask": null,
+        "releaseYear": null,
+        "vintageYear": 2006,
+        "bottlingYear": 2024,
+        "caskStrength": null,
+        "releaseMonth": null,
+        "familyContext": {
+          "siblingBottles": []
+        }
+      },
+      {
+        "abv": 46,
+        "brand": "Gordon & MacPhail",
+        "score": 77.971275,
+        "series": "Connoisseurs Choice",
+        "source": ["text"],
+        "bottler": "Gordon & MacPhail",
+        "edition": null,
+        "outturn": null,
+        "bottleId": 66321,
+        "category": "single_malt",
+        "fullName": "Gordon & MacPhail Blair Athol 2006",
+        "reference": null,
+        "statedAge": null,
+        "caskNumber": null,
+        "comparison": {
+          "missing": ["statedAge", "caskStrength", "caskNumber"],
+          "conflicts": ["abv", "singleCask", "distillers"],
+          "agreements": [
+            "category",
+            "vintageYear",
+            "brand",
+            "bottler",
+            "series"
+          ]
+        },
+        "distillery": ["Blair Athol"],
+        "maturation": "First Fill Sherry Butt and Refill Sherry Hogshead",
+        "releaseDay": null,
+        "singleCask": false,
+        "releaseYear": null,
+        "vintageYear": 2006,
+        "bottlingYear": 2015,
+        "caskStrength": null,
+        "releaseMonth": null,
+        "familyContext": {
+          "siblingBottles": []
+        }
+      },
+      {
+        "abv": 60.3,
+        "brand": "Gordon & MacPhail",
+        "score": 77.824585,
+        "series": "Connoisseurs Choice",
+        "source": ["text", "brand_coverage"],
+        "bottler": "Gordon & MacPhail",
+        "edition": null,
+        "outturn": null,
+        "bottleId": 62038,
+        "category": "single_malt",
+        "fullName": "Gordon & MacPhail Highland Park 2006",
+        "reference": null,
+        "statedAge": 17,
+        "caskNumber": "4270",
+        "comparison": {
+          "missing": [],
+          "conflicts": ["abv", "caskNumber", "distillers"],
+          "agreements": [
+            "category",
+            "statedAge",
+            "vintageYear",
+            "caskStrength",
+            "singleCask",
+            "brand",
+            "bottler",
+            "series"
+          ]
+        },
+        "distillery": ["Highland Park"],
+        "maturation": null,
+        "releaseDay": null,
+        "singleCask": true,
+        "releaseYear": null,
+        "vintageYear": 2006,
+        "bottlingYear": 2024,
+        "caskStrength": true,
+        "releaseMonth": null,
+        "familyContext": {
+          "siblingBottles": []
+        }
+      },
+      {
+        "abv": 58.2,
+        "brand": "Gordon & MacPhail",
+        "score": 75.9749,
+        "series": "Connoisseurs Choice",
+        "source": ["text"],
+        "bottler": "Gordon & MacPhail",
+        "edition": null,
+        "outturn": null,
+        "bottleId": 60956,
+        "category": "single_malt",
+        "fullName": "Gordon & MacPhail Ledaig 2006",
+        "reference": null,
+        "statedAge": null,
+        "caskNumber": null,
+        "comparison": {
+          "missing": ["statedAge", "singleCask", "caskNumber"],
+          "conflicts": ["abv", "distillers"],
+          "agreements": [
+            "category",
+            "vintageYear",
+            "caskStrength",
+            "brand",
+            "bottler",
+            "series"
+          ]
+        },
+        "distillery": ["Tobermory"],
+        "maturation": "First fill Sherry hogshead",
+        "releaseDay": null,
+        "singleCask": null,
+        "releaseYear": null,
+        "vintageYear": 2006,
+        "bottlingYear": 2019,
+        "caskStrength": true,
+        "releaseMonth": null,
+        "familyContext": {
+          "siblingBottles": []
+        }
+      },
+      {
+        "abv": 46,
+        "brand": "Hepburn's Choice",
+        "score": 75.76305,
+        "series": null,
+        "source": ["text"],
+        "bottler": "Hunter Laing",
+        "edition": null,
+        "outturn": null,
+        "bottleId": 46458,
+        "category": "single_malt",
+        "fullName": "Hepburn's Choice Knockdhu 2006",
+        "reference": null,
+        "statedAge": 17,
+        "caskNumber": null,
+        "comparison": {
+          "missing": ["caskStrength", "caskNumber", "series"],
+          "conflicts": ["abv", "brand", "bottler", "distillers"],
+          "agreements": ["category", "statedAge", "vintageYear", "singleCask"]
+        },
+        "distillery": ["Knockdhu"],
+        "maturation": null,
+        "releaseDay": null,
+        "singleCask": true,
+        "releaseYear": 2023,
+        "vintageYear": 2006,
+        "bottlingYear": null,
+        "caskStrength": null,
+        "releaseMonth": null,
+        "familyContext": {
+          "siblingBottles": []
+        }
+      },
+      {
+        "abv": 46,
+        "brand": "Gordon & MacPhail",
+        "score": 73.58047,
+        "series": "Connoisseurs Choice",
+        "source": ["text"],
+        "bottler": "Gordon & MacPhail",
+        "edition": null,
+        "outturn": null,
+        "bottleId": 65246,
+        "category": "single_malt",
+        "fullName": "Gordon & MacPhail Arran 2006",
+        "reference": null,
+        "statedAge": null,
+        "caskNumber": null,
+        "comparison": {
+          "missing": ["statedAge", "caskStrength", "singleCask", "caskNumber"],
+          "conflicts": ["abv", "distillers"],
+          "agreements": [
+            "category",
+            "vintageYear",
+            "brand",
+            "bottler",
+            "series"
+          ]
+        },
+        "distillery": ["Lochranza"],
+        "maturation": "First-fill bourbon barrels",
+        "releaseDay": null,
+        "singleCask": null,
+        "releaseYear": null,
+        "vintageYear": 2006,
+        "bottlingYear": 2015,
+        "caskStrength": null,
+        "releaseMonth": null,
+        "familyContext": {
+          "siblingBottles": []
+        }
+      },
+      {
+        "abv": 40,
+        "brand": "Gordon & MacPhail",
+        "score": 71.35138,
+        "series": "Connoisseurs Choice",
+        "source": ["text"],
+        "bottler": "Gordon & MacPhail",
+        "edition": null,
+        "outturn": null,
+        "bottleId": 67242,
+        "category": "single_malt",
+        "fullName": "Gordon & MacPhail Laphroaig 1967",
+        "reference": null,
+        "statedAge": 17,
+        "caskNumber": null,
+        "comparison": {
+          "missing": ["caskStrength", "singleCask", "caskNumber"],
+          "conflicts": ["abv", "vintageYear", "distillers"],
+          "agreements": ["category", "statedAge", "brand", "bottler", "series"]
+        },
+        "distillery": ["Laphroaig"],
+        "maturation": null,
+        "releaseDay": null,
+        "singleCask": null,
+        "releaseYear": null,
+        "vintageYear": 1967,
+        "bottlingYear": null,
+        "caskStrength": null,
+        "releaseMonth": null,
+        "familyContext": {
+          "siblingBottles": []
+        }
+      },
+      {
+        "abv": 40,
+        "brand": "Gordon & MacPhail",
+        "score": 71.35138,
+        "series": "Connoisseurs Choice",
+        "source": ["text"],
+        "bottler": "Gordon & MacPhail",
+        "edition": null,
+        "outturn": null,
+        "bottleId": 67661,
+        "category": "single_malt",
+        "fullName": "Gordon & MacPhail Oban 1968",
+        "reference": null,
+        "statedAge": 17,
+        "caskNumber": null,
+        "comparison": {
+          "missing": ["caskStrength", "singleCask", "caskNumber"],
+          "conflicts": ["abv", "vintageYear", "distillers"],
+          "agreements": ["category", "statedAge", "brand", "bottler", "series"]
+        },
+        "distillery": ["Oban"],
+        "maturation": null,
+        "releaseDay": null,
+        "singleCask": null,
+        "releaseYear": null,
+        "vintageYear": 1968,
+        "bottlingYear": null,
+        "caskStrength": null,
+        "releaseMonth": null,
+        "familyContext": {
+          "siblingBottles": []
+        }
+      },
+      {
+        "abv": 56.3,
+        "brand": "Gordon & MacPhail",
+        "score": 65.94687,
+        "series": "Connoisseurs Choice",
+        "source": ["text"],
+        "bottler": "Gordon & MacPhail",
+        "edition": "Itinéraires",
+        "outturn": null,
+        "bottleId": 65985,
+        "category": "single_malt",
+        "fullName": "Gordon & MacPhail Clynelish 2008 - Itinéraires",
+        "reference": null,
+        "statedAge": 17,
+        "caskNumber": null,
+        "comparison": {
+          "missing": ["caskStrength", "singleCask", "caskNumber"],
+          "conflicts": ["abv", "vintageYear", "distillers"],
+          "agreements": ["category", "statedAge", "brand", "bottler", "series"]
+        },
+        "distillery": ["Clynelish"],
+        "maturation": "First-fill bourbon barrel",
+        "releaseDay": null,
+        "singleCask": null,
+        "releaseYear": null,
+        "vintageYear": 2008,
+        "bottlingYear": 2025,
+        "caskStrength": null,
+        "releaseMonth": null,
+        "familyContext": {
+          "siblingBottles": []
+        }
+      },
+      {
+        "abv": 46,
+        "brand": "Douglas Laing",
+        "score": 0.7428331759048008,
+        "series": "Premier Barrel",
+        "source": ["vector"],
+        "bottler": "Douglas Laing",
+        "edition": null,
+        "outturn": 310,
+        "bottleId": 47382,
+        "category": "single_malt",
+        "fullName": "Douglas Laing Tormore",
+        "reference": "Douglas Laing Tormore - 12-year-old - 46.0% ABV - Single Cask",
+        "statedAge": 12,
+        "caskNumber": null,
+        "comparison": {
+          "missing": ["vintageYear", "caskStrength", "caskNumber"],
+          "conflicts": ["statedAge", "abv", "brand", "bottler", "series"],
+          "agreements": ["category", "singleCask", "distillers"]
+        },
+        "distillery": ["Tormore"],
+        "maturation": null,
+        "releaseDay": null,
+        "singleCask": true,
+        "releaseYear": null,
+        "vintageYear": null,
+        "bottlingYear": null,
+        "caskStrength": null,
+        "releaseMonth": null,
+        "familyContext": {
+          "siblingBottles": []
+        }
+      },
+      {
+        "abv": 43,
+        "brand": "Tormore",
+        "score": 0.7184869856229164,
+        "series": null,
+        "source": ["vector"],
+        "bottler": null,
+        "edition": null,
+        "outturn": null,
+        "bottleId": 47000,
+        "category": "single_malt",
+        "fullName": "Tormore Timeless - 43.0% ABV - Bourbon Cask",
+        "reference": "Tormore Timeless - 43.0% ABV - Bourbon Cask",
+        "statedAge": null,
+        "caskNumber": null,
+        "comparison": {
+          "missing": [
+            "statedAge",
+            "vintageYear",
+            "caskStrength",
+            "singleCask",
+            "caskNumber",
+            "bottler",
+            "series"
+          ],
+          "conflicts": ["abv", "brand"],
+          "agreements": ["category", "distillers"]
+        },
+        "distillery": ["Tormore"],
+        "maturation": "bourbon",
+        "releaseDay": null,
+        "singleCask": null,
+        "releaseYear": null,
+        "vintageYear": null,
+        "bottlingYear": null,
+        "caskStrength": null,
+        "releaseMonth": null,
+        "familyContext": {
+          "siblingBottles": []
+        }
+      }
+    ]
+  },
+  "context": {
+    "inspectedBottleIds": [62785],
+    "bottleContexts": [
+      {
+        "exact": {
+          "abv": 60.9,
+          "edition": null,
+          "outturn": null,
+          "statedAge": 17,
+          "caskNumber": "703012",
+          "maturation": null,
+          "releaseDay": null,
+          "singleCask": true,
+          "releaseYear": null,
+          "vintageYear": 2006,
+          "bottlingYear": null,
+          "caskStrength": true,
+          "releaseMonth": null
+        },
+        "shared": {
+          "name": "Tormore 2006",
+          "brand": {
+            "name": "Gordon & MacPhail",
+            "entityId": 5645
+          },
+          "series": {
+            "name": "Connoisseurs Choice",
+            "seriesId": 97
+          },
+          "bottler": {
+            "name": "Gordon & MacPhail",
+            "entityId": 5645
+          },
+          "category": "single_malt",
+          "statedAge": null,
+          "distillers": [
+            {
+              "name": "Tormore",
+              "entityId": 1445
+            }
+          ]
+        },
+        "groupId": 35746,
+        "bottleId": 62785,
+        "fullName": "Gordon & MacPhail Tormore 2006",
+        "siblings": [],
+        "references": [],
+        "observations": [
+          {
+            "facts": {
+              "proposalType": "create_new",
+              "proposedBottle": {
+                "abv": null,
+                "name": "Tormore",
+                "brand": {
+                  "id": null,
+                  "name": "Connoisseurs Choice"
+                },
+                "series": null,
+                "bottler": {
+                  "id": null,
+                  "name": "Gordon & MacPhail"
+                },
+                "edition": null,
+                "outturn": null,
+                "category": "single_malt",
+                "statedAge": 17,
+                "caskNumber": "703012",
+                "distillers": [
+                  {
+                    "id": null,
+                    "name": "Tormore"
+                  }
+                ],
+                "maturation": null,
+                "releaseDay": null,
+                "singleCask": true,
+                "releaseYear": null,
+                "vintageYear": 2006,
+                "bottlingYear": null,
+                "caskStrength": null,
+                "releaseMonth": null
+              },
+              "referenceScope": "none"
+            },
+            "rawText": "Tormore 2006 - 17-year-old - Cask #703012 - Connoisseurs Choice",
+            "sourceKey": "store_price:12057630",
+            "sourceUrl": "https://www.thewhiskyworld.com/tormore-2006-17-year-old-cask-703012-connoisseurs-choice-p14832",
+            "sourceName": "Tormore 2006 - 17-year-old - Cask #703012 - Connoisseurs Choice",
+            "sourceType": "store_price",
+            "parsedIdentity": null
+          }
+        ],
+        "imageSources": [
+          {
+            "url": "https://api.peated.com/uploads/prices-xhl05kjqn84sr4ue3mfsvqw5.webp",
+            "source": {
+              "kind": "bottle"
+            },
+            "sourceUrl": "https://www.thewhiskyworld.com/tormore-2006-17-year-old-cask-703012-connoisseurs-choice-p14832"
+          }
+        ]
+      }
+    ],
+    "inspectedEntities": [
+      {
+        "kind": "bottler",
+        "name": "Gordon & MacPhail",
+        "score": 1,
+        "source": ["exact", "text", "prefix", "contained"],
+        "entityId": 5645,
+        "reference": "Gordon & MacPhail",
+        "shortName": null,
+        "retrievedFor": [
+          {
+            "exact": true,
+            "query": "Gordon & MacPhail"
+          }
+        ]
+      },
+      {
+        "kind": "brand",
+        "name": "Connoisseurs Choice",
+        "score": 1,
+        "source": ["exact", "text", "prefix", "contained"],
+        "entityId": 367684,
+        "reference": "Connoisseurs Choice",
+        "shortName": null,
+        "retrievedFor": [
+          {
+            "exact": true,
+            "query": "Connoisseurs Choice"
+          }
+        ]
+      },
+      {
+        "kind": "distillery",
+        "name": "Tormore",
+        "score": 1,
+        "source": ["exact", "text", "prefix", "contained"],
+        "entityId": 1445,
+        "reference": "Tormore",
+        "shortName": null,
+        "retrievedFor": [
+          {
+            "exact": true,
+            "query": "Tormore"
+          }
+        ]
+      },
+      {
+        "kind": "brand",
+        "name": "Hepburn's Choice",
+        "score": 1,
+        "source": ["exact", "text", "prefix", "contained"],
+        "entityId": 365900,
+        "reference": "Hepburn's Choice",
+        "shortName": null,
+        "retrievedFor": [
+          {
+            "exact": true,
+            "query": "Hepburn's Choice"
+          }
+        ]
+      },
+      {
+        "kind": "bottler",
+        "name": "Hunter Laing",
+        "score": 1,
+        "source": ["exact", "text", "prefix", "contained"],
+        "entityId": 5733,
+        "reference": "Hunter Laing",
+        "shortName": null,
+        "retrievedFor": [
+          {
+            "exact": true,
+            "query": "Hunter Laing"
+          }
+        ]
+      },
+      {
+        "kind": "distillery",
+        "name": "Knockdhu",
+        "score": 1,
+        "source": ["exact", "text", "prefix", "contained"],
+        "entityId": 1116,
+        "reference": "Knockdhu",
+        "shortName": null,
+        "retrievedFor": [
+          {
+            "exact": true,
+            "query": "Knockdhu"
+          }
+        ]
+      },
+      {
+        "kind": "distillery",
+        "name": "Tobermory",
+        "score": 1,
+        "source": ["exact", "text", "prefix", "contained"],
+        "entityId": 1441,
+        "reference": "Tobermory",
+        "shortName": null,
+        "retrievedFor": [
+          {
+            "exact": true,
+            "query": "Tobermory"
+          }
+        ]
+      },
+      {
+        "kind": "distillery",
+        "name": "Lochranza",
+        "score": 1,
+        "source": ["exact", "text", "prefix", "contained"],
+        "entityId": 1146,
+        "reference": "Lochranza",
+        "shortName": null,
+        "retrievedFor": [
+          {
+            "exact": true,
+            "query": "Lochranza"
+          }
+        ]
+      },
+      {
+        "kind": "distillery",
+        "name": "Caol Ila",
+        "score": 1,
+        "source": ["exact", "text", "prefix", "contained"],
+        "entityId": 366,
+        "reference": "Caol Ila",
+        "shortName": "",
+        "retrievedFor": [
+          {
+            "exact": true,
+            "query": "Caol Ila"
+          }
+        ]
+      },
+      {
+        "kind": "distillery",
+        "name": "Highland Park",
+        "score": 1,
+        "source": ["exact", "text", "prefix", "contained"],
+        "entityId": 438,
+        "reference": "Highland Park",
+        "shortName": null,
+        "retrievedFor": [
+          {
+            "exact": true,
+            "query": "Highland Park"
+          }
+        ]
+      },
+      {
+        "kind": "distillery",
+        "name": "Balblair",
+        "score": 1,
+        "source": ["exact", "text", "prefix", "contained"],
+        "entityId": 38,
+        "reference": "Balblair",
+        "shortName": null,
+        "retrievedFor": [
+          {
+            "exact": true,
+            "query": "Balblair"
+          }
+        ]
+      },
+      {
+        "kind": "distillery",
+        "name": "Glenlossie",
+        "score": 1,
+        "source": ["exact", "text", "prefix", "contained"],
+        "entityId": 983,
+        "reference": "Glenlossie",
+        "shortName": null,
+        "retrievedFor": [
+          {
+            "exact": true,
+            "query": "Glenlossie"
+          }
+        ]
+      },
+      {
+        "kind": "distillery",
+        "name": "Oban",
+        "score": 1,
+        "source": ["exact", "text", "prefix", "contained"],
+        "entityId": 1208,
+        "reference": "Oban",
+        "shortName": null,
+        "retrievedFor": [
+          {
+            "exact": true,
+            "query": "Oban"
+          }
+        ]
+      },
+      {
+        "kind": "distillery",
+        "name": "Blair Athol",
+        "score": 1,
+        "source": ["exact", "text", "prefix", "contained"],
+        "entityId": 92,
+        "reference": "Blair Athol",
+        "shortName": null,
+        "retrievedFor": [
+          {
+            "exact": true,
+            "query": "Blair Athol"
+          }
+        ]
+      },
+      {
+        "kind": "distillery",
+        "name": "Laphroaig",
+        "score": 1,
+        "source": ["exact", "text", "prefix", "contained"],
+        "entityId": 1129,
+        "reference": "Laphroaig",
+        "shortName": "",
+        "retrievedFor": [
+          {
+            "exact": true,
+            "query": "Laphroaig"
+          }
+        ]
+      },
+      {
+        "kind": "company",
+        "name": "D. Johnston & Co. (Laphroaig) Ltd.",
+        "score": 0.2,
+        "source": ["text"],
+        "entityId": 5737,
+        "reference": null,
+        "shortName": null,
+        "retrievedFor": [
+          {
+            "query": "Laphroaig"
+          }
+        ]
+      }
+    ],
+    "inspectedSeries": []
+  },
+  "provenance": {
+    "source": "production_miss",
+    "verifiedSourceUrls": [
+      "https://www.masterofmalt.com/whiskies/tormore/tormore-17-year-old-2006-cask-703012-connoisseurs-choice-gordon-and-macphail-whisky/?sku=134601"
+    ],
+    "dbOutcome": {
+      "bottleId": 62785,
+      "createsBottle": false,
+      "summary": "Production returned match 62785 but held it for review: code added a trait_conflict risk because the photo-read cask number (7812) differed from the stored 703012."
+    },
+    "notes": "Captured from saved classifier run 37266 (store_price 12063232, model openai/gpt-6-luna, 2026-11-07T00:48:53.398Z). Production rationale: The Master of Malt product title and page identify the 17-year-old 2006 Tormore as cask 703012; the page also confirms 60.9% ABV and 211 bottles. The extracted cask number 7812 is inconsistent with that product evidence. Inspected Bottle 62785 matches the confirmed cask and other populated identity traits. Verified 2026-11-08 on the Master of Malt page: distilled 2006, refill bourbon barrel cask 703012, 17 years, 211 bottles, 60.9% ABV. The agent already called the photo cask number wrong; only the code-level photo conflict check held the match."
+  },
+  "expected": {
+    "status": "classified",
+    "action": "match",
+    "identityScope": "exact_cask",
+    "matchedBottleId": 62785,
+    "expectedTier": "auto",
+    "summary": "Match Gordon & MacPhail Tormore 2006 (62785) automatically. The title and the Master of Malt page name cask 703012 at 60.9% ABV, 211 bottles, which agree with the stored Bottle; the photo reading of cask 7812 is wrong."
+  }
+}
