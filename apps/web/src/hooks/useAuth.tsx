@@ -8,6 +8,12 @@ type Auth = {
   setUser: (user: User | null) => void;
   user: User | null;
   isLoggedIn: boolean;
+  /**
+   * Re-reads the account from the API. Returns true after sending a member
+   * whose session was rejected or suspended to sign in or the suspension
+   * screen.
+   */
+  refreshAccount: () => Promise<boolean>;
 };
 
 const AuthContext = createContext<Auth>({
@@ -17,13 +23,16 @@ const AuthContext = createContext<Auth>({
   },
   user: null,
   isLoggedIn: false,
+  refreshAccount: async () => false,
 });
 
 export const AuthProvider = ({
   user,
+  refreshAccount,
   children,
 }: {
   user: User | null;
+  refreshAccount: Auth["refreshAccount"];
   children: any;
 }) => {
   const [value, setValue] = useState<User | null>(user);
@@ -40,6 +49,7 @@ export const AuthProvider = ({
         user: value,
         setUser: setValue,
         isLoggedIn: !!value,
+        refreshAccount,
       }}
     >
       {children}

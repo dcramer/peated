@@ -43,8 +43,8 @@ export default function Providers({
   }, 60000);
 
   // The API said the account changed (token gone, account deleted, or
-  // suspended). Refresh the session once for all in-flight requests and
-  // route on what comes back.
+  // suspended), or a server-rendered page failed for a signed-in member.
+  // Refresh the session once for all callers and route on what comes back.
   const handleAccountStateError = useCallback(async () => {
     if (accountStateHandlingRef.current) return accountStateHandlingRef.current;
 
@@ -96,7 +96,10 @@ export default function Providers({
       onAccountStateError={handleAccountStateError}
     >
       <ReactQueryStreamedHydration>
-        <AuthProvider user={session.user}>
+        <AuthProvider
+          user={session.user}
+          refreshAccount={handleAccountStateError}
+        >
           <FlashMessages>{children}</FlashMessages>
         </AuthProvider>
       </ReactQueryStreamedHydration>

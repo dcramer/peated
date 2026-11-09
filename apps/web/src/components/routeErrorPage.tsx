@@ -7,6 +7,7 @@ import {
   CapturedFailurePage,
   OfflinePage,
 } from "@peated/web/components/errors/errorPages.stylex";
+import useAuth from "@peated/web/hooks/useAuth";
 
 const MAX_STACK_FRAMES = 40;
 const MAX_STACK_LENGTH = 8_000;
@@ -66,8 +67,25 @@ export default function RouteErrorPage({
   );
   const stack = useMemo(() => projectSafeStack(error), [error]);
   const [sentryEventId, setSentryEventId] = useState<string>();
+  const { isLoggedIn, refreshAccount } = useAuth();
+  // Server components cannot clear a session, so a page the API refused
+  // (rejected token, deleted or suspended account) arrives here. Check the
+  // account before calling it a failure.
+  const [accountChecked, setAccountChecked] = useState(!isLoggedIn);
 
   useEffect(() => {
+    if (!isLoggedIn) return;
+    let active = true;
+    void refreshAccount().then((movedAway) => {
+      if (active && !movedAway) setAccountChecked(true);
+    });
+    return () => {
+      active = false;
+    };
+  }, [error, isLoggedIn, refreshAccount]);
+
+  useEffect(() => {
+    if (!accountChecked) return;
     try {
       const eventId = Sentry.captureException(error, {
         tags: error.digest
@@ -84,11 +102,13 @@ export default function RouteErrorPage({
       setSentryEventId(undefined);
       // Telemetry must not prevent the owning error boundary from recovering.
     }
-  }, [error]);
+  }, [accountChecked, error]);
 
   if (!isOnline) {
     return <OfflinePage onRetry={reset} />;
   }
+
+  if (!accountChecked) return null;
 
   return (
     <CapturedFailurePage

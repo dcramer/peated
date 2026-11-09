@@ -89,12 +89,13 @@ as its access token: 7 days from sign-in, however active the member is.
 - Saving the cookie (for example, the hourly account refresh) extends the
   cookie's lifetime but never the token's.
 - The API can also reject a token that has not expired, such as one for a
-  deleted account. The browser's account-state handler (see Suspension) and
-  the OAuth approve action refresh the session on `UNAUTHORIZED` or
-  `ACCOUNT_SUSPENDED`, which clears a rejected session, then route on the
-  result. Server components cannot write cookies, so a server-rendered page
-  that calls an authenticated route with a rejected token fails until one of
-  those refreshes runs.
+  deleted account. The browser's account-state handler (see Suspension)
+  refreshes the session, which clears a rejected one, and routes on the
+  result. Server components cannot write cookies, so when a server-rendered
+  page or server action fails for a signed-in member, the route error page
+  runs that same handler before it shows a failure. The OAuth approve action
+  handles `UNAUTHORIZED` and `ACCOUNT_SUSPENDED` itself, so the person returns
+  to the same authorization request without an error.
 
 ## Suspension
 
@@ -198,6 +199,8 @@ member removes it in their Apple ID settings. Revocation needs
 - user fields: `apps/server/src/db/schema/users.ts`
 - token signing and verification: `apps/server/src/lib/auth.ts`
 - web session cookie and token expiry: `apps/web/src/lib/session.server.ts`
+- web account-state handler: `apps/web/src/app/providers/providers.tsx`, also
+  run by `apps/web/src/components/routeErrorPage.tsx`
 - Apple identity token verification and revocation: `apps/server/src/lib/apple.ts`
 - account deletion: `apps/server/src/lib/accountDeletion.ts`,
   `apps/server/src/orpc/routes/users/delete.ts`,
