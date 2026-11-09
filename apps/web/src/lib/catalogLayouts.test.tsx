@@ -60,7 +60,10 @@ describe.each([
       .mockResolvedValueOnce(Response.json({ json: publicRecord }))
       .mockResolvedValueOnce(Response.json({ json: memberRecord }));
     vi.stubGlobal("fetch", fetchMock);
-    const result = await withNextRequest("test-member", render);
+    const result = await withNextRequest(
+      { accessToken: "test-member" },
+      render,
+    );
     expect(fetchMock).toHaveBeenCalledTimes(2);
     expect(result.props.children[1].props[prop]).toEqual(memberRecord);
   });

@@ -25,11 +25,15 @@ const previewProps = {
 };
 
 function getPageBottleList(input: Parameters<typeof loadBottleList>[0]) {
-  return withNextRequest(accessToken, () => loadBottleList(input));
+  return withNextRequest(accessToken ? { accessToken } : null, () =>
+    loadBottleList(input),
+  );
 }
 
 function getPageEntityCatalog(entity: number) {
-  return withNextRequest(accessToken, () => loadEntityCatalog(entity));
+  return withNextRequest(accessToken ? { accessToken } : null, () =>
+    loadEntityCatalog(entity),
+  );
 }
 
 const fetchMock = vi.fn<typeof fetch>();
@@ -158,10 +162,16 @@ describe("public catalog page reads", () => {
 
 it("serves the same anonymous stats snapshot to visitors and members", async () => {
   const first = await (
-    await withNextRequest(accessToken, getStatsResponse)
+    await withNextRequest(
+      accessToken ? { accessToken } : null,
+      getStatsResponse,
+    )
   ).json();
   accessToken = "test-member";
-  const second = await withNextRequest(accessToken, getStatsResponse);
+  const second = await withNextRequest(
+    accessToken ? { accessToken } : null,
+    getStatsResponse,
+  );
   expect(await second.json()).toEqual(first);
   expect(second.headers.get("cache-control")).toBe("no-store");
   expect(fetchMock).toHaveBeenCalledTimes(1);

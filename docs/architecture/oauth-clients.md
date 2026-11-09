@@ -9,7 +9,9 @@ clients. OAuth lets a user approve a client without giving it their password.
   request to its token exchange.
 - Each redirect address must be registered by an administrator.
 - Authorization happens at `https://peated.com/oauth/authorize` with the
-  existing Peated browser session.
+  existing Peated browser session. If that session is missing, expired, or
+  rejected by the API, the person signs in again and returns to the same
+  authorization request.
 - Authorization codes are stored only as digests, expire after two minutes, and
   can be exchanged once at `POST https://api.peated.com/oauth/token`.
 - A successful exchange returns the normal seven-day bearer token. It adds no

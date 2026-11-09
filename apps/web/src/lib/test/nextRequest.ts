@@ -8,7 +8,7 @@ import {
   type ResolvedCacheLifeProfiles,
 } from "next/dist/server/config-shared";
 import { NextRequest } from "next/server";
-import { sessionOptions } from "../session.server";
+import { type SessionData, sessionOptions } from "../session.server";
 
 // Next fills the default profile's `stale` from `staleTimes.static` when it
 // loads config. Match that so the work store gets resolved profiles.
@@ -22,15 +22,14 @@ const cacheLifeProfiles: ResolvedCacheLifeProfiles = {
 
 /** Runs server reads with real Next request cookies and the application's session reader. */
 export async function withNextRequest<T>(
-  accessToken: string | null,
+  session: Partial<SessionData> | null,
   read: () => Promise<T>,
 ) {
   const headers = new Headers();
-  if (accessToken) {
-    const value = await sealData(
-      { accessToken },
-      { password: sessionOptions.password },
-    );
+  if (session) {
+    const value = await sealData(session, {
+      password: sessionOptions.password,
+    });
     headers.set("cookie", `${sessionOptions.cookieName}=${value}`);
   }
   const request = new NextRequest("http://localhost/", { headers });
