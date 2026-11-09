@@ -1,6 +1,6 @@
 {
-  "id": "auction-springbank-14-port-private-cask-no-match",
-  "name": "Springbank 14 Year Old Fresh Port Wood Private Bottling: no cask or strength, so no safe match or create",
+  "id": "auction-springbank-14-fresh-port-private-bottling-create",
+  "name": "Springbank 14 Year Old Fresh Port Wood Private Bottling: create the one private bottling the label shows",
   "input": {
     "reference": {
       "id": 3949,
@@ -32,7 +32,64 @@
       "release_month": null
     },
     "extractedIdentitySource": "text",
-    "imageEvidence": null,
+    "imageEvidence": {
+      "sourceImageId": "auction_lot:3949",
+      "extractors": [
+        {
+          "kind": "vision",
+          "confidence": 0.75,
+          "textSpans": [
+            {
+              "text": "SPRINGBANK\nSingle Malt Scotch Whisky\nSPRINGBANK DISTILLERY\nPrivate Bottling\nSingle Cask\nFresh Port Wood\n14 Year Old\nDistilled by J. & A. MITCHELL & CO. LTD.\nSpringbank Distillery Campbeltown Scotland\n70cl\nPRODUCT OF SCOTLAND\nCask Strength",
+              "confidence": 0.75
+            }
+          ],
+          "observations": [
+            "Read whisky label identity from the auction lot photo."
+          ]
+        }
+      ],
+      "fieldCandidates": {
+        "brand": {
+          "value": "Springbank",
+          "confidence": 0.75,
+          "sourceExtractorIndexes": [0]
+        },
+        "distillery": {
+          "value": ["Springbank"],
+          "confidence": 0.75,
+          "sourceExtractorIndexes": [0]
+        },
+        "category": {
+          "value": "single_malt",
+          "confidence": 0.75,
+          "sourceExtractorIndexes": [0]
+        },
+        "statedAge": {
+          "value": 14,
+          "confidence": 0.75,
+          "sourceExtractorIndexes": [0]
+        },
+        "singleCask": {
+          "value": true,
+          "confidence": 0.75,
+          "sourceExtractorIndexes": [0]
+        },
+        "caskStrength": {
+          "value": true,
+          "confidence": 0.75,
+          "sourceExtractorIndexes": [0]
+        }
+      },
+      "photoSuitability": {
+        "isSingleBottlePhoto": true,
+        "labelReadable": true,
+        "suitableAsTastingImage": false,
+        "suitableAsBottleImage": false,
+        "reason": null
+      },
+      "conflicts": []
+    },
     "initialCandidates": [
       {
         "abv": null,
@@ -737,23 +794,38 @@
   "provenance": {
     "source": "production_miss",
     "verifiedSourceUrls": [
-      "https://www.scotchwhiskyauctions.com/auctions/232-the-183rd-auction/896293-springbank-14-year-old-fresh-port-wood-private-bottling/"
+      "https://www.scotchwhiskyauctions.com/auctions/232-the-183rd-auction/896293-springbank-14-year-old-fresh-port-wood-private-bottling/",
+      "https://d3suvtcq00dftb.cloudfront.net/images/625de99386f99325a53c160d8336e66d-zoom.jpg"
     ],
     "dbOutcome": {
       "bottleId": null,
       "createsBottle": false,
       "summary": "Production returned no_match."
     },
-    "notes": "Captured from saved classifier run 22023 (auction_lot 3949, model null, 2026-10-02T04:30:27.250Z). Production rationale: No safe match or supported creation. Candidate 735 is only a generic Springbank 14-year-old, while the auction listing describes Fresh Port Wood and a private bottling. The page read exposed no further label details, so creating a distinct Bottle or assigning bottler and canonical title would require unsupported assumptions. Expected outcome checked against the lot page on 2026-11-09 and a judged review of the 185th auction on 2026-11-03."
+    "notes": "Captured from saved classifier run 22023 (auction_lot 3949, model null, 2026-10-02T04:30:27.250Z). Production rationale: No safe match or supported creation. Candidate 735 is only a generic Springbank 14-year-old, while the auction listing describes Fresh Port Wood and a private bottling. The page read exposed no further label details, so creating a distinct Bottle or assigning bottler and canonical title would require unsupported assumptions. The run predates lot-photo reading (#1608), so this case adds a reviewed transcription of the lot's first photo at full size, in the shape production's label reading takes; no extractor ran on this lot. The label prints Private Bottling, Single Cask, Fresh Port Wood, 14 Year Old, 70cl and Cask Strength, with no cask number, owner, date or ABV. 18 lots in the 182nd to 185th auctions (3949-3953, 8396-8399, 12678-12681, 17739-17743) carry the same label and the same lot text, including Scotch Whisky Auctions' note of a Springbank bottling statement giving about 46.5%, so they are one consignor's stock of one private bottling. Owner decision 2026-11-09: this label is one Bottle. Production has no such Bottle (searched 2026-11-09); older Springbank private bottlings such as 1557 use the older naming shape with Private Bottling in the name."
   },
   "expected": {
     "status": "classified",
-    "action": "no_match",
-    "identityScope": "product",
-    "blockedBottle": null,
-    "summary": "Leave it for a person. Springbank bottled many private port casks; with no cask number, dates, or printed strength the release cannot be named. The generic 14-year-old (735) is not this private bottling, and nothing stored is wrong."
+    "action": "create_bottle",
+    "identityScope": "exact_cask",
+    "matchedBottleId": null,
+    "proposedBottle": {
+      "brand": {
+        "id": 1362
+      },
+      "category": "single_malt",
+      "statedAge": 14,
+      "edition": "Private Bottling",
+      "singleCask": true,
+      "caskStrength": true,
+      "abv": null,
+      "vintageYear": null
+    },
+    "proposedBottleNameIncludes": ["Fresh Port Wood"],
+    "proposedBottleDistillerIds": [1362],
+    "summary": "Create Springbank 14-year-old Fresh Port Wood with edition Private Bottling, single cask and cask strength. The label prints the selection, so it is the edition, not part of the name. Leave ABV empty: the label prints none, and the auction house's 46.5% is approximate. The generic 14-year-old (735) and the 14-year-old Bourbon Wood (3331) are other Bottles."
   },
   "knownFailure": {
-    "reason": "Now that the lot page is readable, the agent creates a generic Springbank 14-year-old Fresh Port Wood, drops Private Bottling, and so lumps separate private casks into one Bottle."
+    "reason": "The agent creates the right single-cask, cask-strength Bottle but leaves edition empty: the naming rule names only selections that say who they were for, so it does not treat a printed Private Bottling as one."
   }
 }
