@@ -752,5 +752,8 @@
     "identityScope": "product",
     "blockedBottle": null,
     "summary": "Leave it for a person. Springbank bottled many private port casks; with no cask number, dates, or printed strength the release cannot be named. The generic 14-year-old (735) is not this private bottling, and nothing stored is wrong."
+  },
+  "knownFailure": {
+    "reason": "Now that the lot page is readable, the agent creates a generic Springbank 14-year-old Fresh Port Wood, drops Private Bottling, and so lumps separate private casks into one Bottle."
   }
 }

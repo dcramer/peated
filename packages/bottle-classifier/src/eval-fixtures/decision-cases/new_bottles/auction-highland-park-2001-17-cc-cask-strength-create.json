@@ -2220,7 +2220,7 @@
   "expected": {
     "status": "classified",
     "action": "create_bottle",
-    "identityScope": "product",
+    "identityScope": "exact_cask",
     "matchedBottleId": null,
     "proposedBottle": {
       "brand": {
@@ -2234,6 +2234,6 @@
     },
     "proposedBottleNameIncludes": ["Highland Park", "2001"],
     "proposedBottleDistillerIds": [438],
-    "summary": "Create Gordon & MacPhail Connoisseurs Choice Highland Park 2001, 17 years old, bottled 10.04.2019, batch 19/066, 54.9%, 163 bottles. The lot page gives every fact. Candidate 62038 is a 2006 vintage at 60.3% and 44926 is an official Single Cask Series Bottle, so neither blocks the create."
+    "summary": "Create Gordon & MacPhail Connoisseurs Choice Highland Park 2001, 17 years old, bottled 10.04.2019, cask 19/066 (Gordon & MacPhail prints it as a batch number; The Whisky Exchange, which sold this bottling, lists it as the cask number of one first-fill bourbon barrel), 54.9%, 163 bottles. The lot page gives every fact. Candidate 62038 is a 2006 vintage at 60.3% and 44926 is an official Single Cask Series Bottle, so neither blocks the create."
   }
 }

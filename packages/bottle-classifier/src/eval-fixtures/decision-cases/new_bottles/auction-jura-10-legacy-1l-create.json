@@ -1233,5 +1233,8 @@
     "proposedBottleNameIncludes": ["Legacy"],
     "proposedBottleDistillerIdOneOf": [1071],
     "summary": "Create Isle of Jura Legacy 10-year-old at 40%. The lot page calls it the old style 10 year old Jura Legacy and the label prints Legacy, so it is its own marketed Bottle. The plain 10-year-old candidates (447, 44114) do not cover it; 1 litre is packaging."
+  },
+  "knownFailure": {
+    "reason": "The agent cannot tell from the saved evidence whether Legacy names a marketed release, so it returns no_match instead of creating Jura 10 Legacy."
   }
 }

@@ -1088,5 +1088,8 @@
     },
     "proposedBottleDistillerIdOneOf": [1160],
     "summary": "Create Glen Deveron 10-year-old at 40%. The lot page and label give no vintage, so the 1989 10-year-old (68815) is too specific, and The Deveron 10-year-old (65163) is the 2015 rebrand under another Brand."
+  },
+  "knownFailure": {
+    "reason": "The agent treats the stored 1989-vintage Glen Deveron 10 (68815) as a possible match even though the lot prints no vintage, so it will neither match nor create."
   }
 }

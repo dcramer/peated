@@ -964,5 +964,8 @@
     "proposedBottleNameIncludes": ["Lochside", "1991"],
     "proposedBottleDistillerIds": [1147],
     "summary": "Create Gordon & MacPhail Connoisseurs Choice Lochside 1991, bottled 09.2006, 43%, refill bourbon barrel. The catalog keeps the 2005 (58742) and 2010 (58638) bottlings as separate Bottles, so the 2006 bottling needs its own."
+  },
+  "knownFailure": {
+    "reason": "The agent does not treat a different bottling year as a separate release, so stored 1991 Lochside Bottles bottled in 2005 and 2010 stop the create."
   }
 }
