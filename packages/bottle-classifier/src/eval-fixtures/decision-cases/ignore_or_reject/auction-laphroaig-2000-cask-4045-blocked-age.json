@@ -1,0 +1,879 @@
+{
+  "id": "auction-laphroaig-2000-cask-4045-blocked-age",
+  "name": "Laphroaig 2000 Single Cask #4045 Protectors of the Peat: right cask, but a worked-out stored age",
+  "input": {
+    "reference": {
+      "id": 16370,
+      "url": "https://www.scotchwhiskyauctions.com/auctions/234-the-185th-auction/903999-laphroaig-2000-23-year-old-single-cask-4045-for-protectors-of-the-peat/",
+      "name": "Laphroaig 2000 23 Year Old Single Cask #4045 For Protectors Of The Peat",
+      "imageUrl": null,
+      "externalSiteId": 28097,
+      "currentBottleId": null
+    },
+    "extractedIdentity": {
+      "abv": 51.9,
+      "brand": null,
+      "series": null,
+      "bottler": null,
+      "edition": null,
+      "outturn": 196,
+      "category": null,
+      "distillery": null,
+      "expression": null,
+      "maturation": null,
+      "stated_age": null,
+      "cask_number": "4045",
+      "single_cask": null,
+      "release_year": null,
+      "vintage_year": null,
+      "bottling_year": 2023,
+      "cask_strength": null
+    },
+    "extractedIdentitySource": "structured",
+    "imageEvidence": null,
+    "initialCandidates": [
+      {
+        "abv": 51.9,
+        "brand": "Laphroaig",
+        "score": 30.933302,
+        "series": null,
+        "source": ["text", "context"],
+        "bottler": null,
+        "edition": "Release 3 - Protectors of the Peat",
+        "outturn": 196,
+        "bottleId": 54570,
+        "category": "single_malt",
+        "fullName": "Laphroaig Single Cask Release - Release 3 - Protectors of the Peat",
+        "reference": null,
+        "statedAge": 22,
+        "caskNumber": "4045",
+        "comparison": {
+          "missing": [],
+          "conflicts": [],
+          "agreements": ["abv", "caskNumber"]
+        },
+        "distillery": ["Laphroaig"],
+        "maturation": "First-fill ex-bourbon cask",
+        "releaseDay": null,
+        "singleCask": true,
+        "releaseYear": 2023,
+        "vintageYear": 2000,
+        "bottlingYear": 2023,
+        "caskStrength": true,
+        "releaseMonth": null,
+        "familyContext": {
+          "siblingBottles": []
+        }
+      },
+      {
+        "abv": 51.9,
+        "brand": "Thompson Bros.",
+        "score": 25.406471,
+        "series": null,
+        "source": ["text"],
+        "bottler": "Thompson Bros",
+        "edition": null,
+        "outturn": 178,
+        "bottleId": 69570,
+        "category": "single_malt",
+        "fullName": "Thompson Bros. Bruichladdich 2003",
+        "reference": null,
+        "statedAge": 23,
+        "caskNumber": null,
+        "comparison": {
+          "missing": ["caskNumber"],
+          "conflicts": [],
+          "agreements": ["abv"]
+        },
+        "distillery": ["Bruichladdich"],
+        "maturation": "Refill hogshead",
+        "releaseDay": null,
+        "singleCask": true,
+        "releaseYear": null,
+        "vintageYear": 2003,
+        "bottlingYear": null,
+        "caskStrength": null,
+        "releaseMonth": null,
+        "familyContext": {
+          "siblingBottles": []
+        }
+      },
+      {
+        "abv": 51.9,
+        "brand": "GlenAllachie",
+        "score": 24.997356,
+        "series": null,
+        "source": ["text"],
+        "bottler": null,
+        "edition": "Batch 7",
+        "outturn": null,
+        "bottleId": 47140,
+        "category": "single_malt",
+        "fullName": "GlenAllachie Cask Strength - Batch 7",
+        "reference": null,
+        "statedAge": 21,
+        "caskNumber": null,
+        "comparison": {
+          "missing": ["caskNumber"],
+          "conflicts": [],
+          "agreements": ["abv"]
+        },
+        "distillery": ["GlenAllachie"],
+        "maturation": null,
+        "releaseDay": null,
+        "singleCask": null,
+        "releaseYear": null,
+        "vintageYear": null,
+        "bottlingYear": null,
+        "caskStrength": true,
+        "releaseMonth": null,
+        "familyContext": {
+          "siblingBottles": []
+        }
+      },
+      {
+        "abv": 51.9,
+        "brand": "Rare Malts Selection",
+        "score": 23.400425,
+        "series": null,
+        "source": ["text"],
+        "bottler": null,
+        "edition": null,
+        "outturn": null,
+        "bottleId": 5218,
+        "category": "single_malt",
+        "fullName": "Rare Malts Selection Glen Mhor 1976",
+        "reference": null,
+        "statedAge": 28,
+        "caskNumber": null,
+        "comparison": {
+          "missing": ["caskNumber"],
+          "conflicts": [],
+          "agreements": ["abv"]
+        },
+        "distillery": ["Glen Mhor"],
+        "maturation": null,
+        "releaseDay": null,
+        "singleCask": null,
+        "releaseYear": 2005,
+        "vintageYear": 1976,
+        "bottlingYear": 2005,
+        "caskStrength": true,
+        "releaseMonth": 10,
+        "familyContext": {
+          "siblingBottles": []
+        }
+      },
+      {
+        "abv": 51.9,
+        "brand": "WhiskyHeroes",
+        "score": 22.956436,
+        "series": null,
+        "source": ["text"],
+        "bottler": "Brave New Spirits",
+        "edition": null,
+        "outturn": null,
+        "bottleId": 46141,
+        "category": "single_malt",
+        "fullName": "WhiskyHeroes Captain Shug and the Second Sight - 13-year-old - 2012 Vintage - 51.9% ABV - Single Cask - Amontilado Cask - Hogshead - 1st Fill",
+        "reference": null,
+        "statedAge": 13,
+        "caskNumber": null,
+        "comparison": {
+          "missing": ["caskNumber"],
+          "conflicts": [],
+          "agreements": ["abv"]
+        },
+        "distillery": ["Teaninich"],
+        "maturation": "amontilado",
+        "releaseDay": null,
+        "singleCask": true,
+        "releaseYear": null,
+        "vintageYear": 2012,
+        "bottlingYear": null,
+        "caskStrength": null,
+        "releaseMonth": null,
+        "familyContext": {
+          "siblingBottles": []
+        }
+      },
+      {
+        "abv": 51.9,
+        "brand": "The Whisky Agency",
+        "score": 22.722654,
+        "series": "Perfect Dram",
+        "source": ["text"],
+        "bottler": "The Whisky Agency",
+        "edition": null,
+        "outturn": null,
+        "bottleId": 47123,
+        "category": "single_malt",
+        "fullName": "The Whisky Agency Tomatin 1976",
+        "reference": null,
+        "statedAge": 34,
+        "caskNumber": null,
+        "comparison": {
+          "missing": ["caskNumber"],
+          "conflicts": [],
+          "agreements": ["abv"]
+        },
+        "distillery": ["Tomatin"],
+        "maturation": "other",
+        "releaseDay": null,
+        "singleCask": null,
+        "releaseYear": 2011,
+        "vintageYear": 1976,
+        "bottlingYear": null,
+        "caskStrength": null,
+        "releaseMonth": null,
+        "familyContext": {
+          "siblingBottles": []
+        }
+      },
+      {
+        "abv": 51.9,
+        "brand": "Rabbit Hole",
+        "score": 22.433233,
+        "series": "Founder's Collection",
+        "source": ["text"],
+        "bottler": null,
+        "edition": null,
+        "outturn": null,
+        "bottleId": 61398,
+        "category": "rye",
+        "fullName": "Rabbit Hole Boxergrail",
+        "reference": null,
+        "statedAge": 8,
+        "caskNumber": null,
+        "comparison": {
+          "missing": ["caskNumber"],
+          "conflicts": [],
+          "agreements": ["abv"]
+        },
+        "distillery": ["Rabbit Hole"],
+        "maturation": "wood-fired, toasted & charred new American Oak barrels",
+        "releaseDay": null,
+        "singleCask": null,
+        "releaseYear": 2024,
+        "vintageYear": null,
+        "bottlingYear": null,
+        "caskStrength": true,
+        "releaseMonth": null,
+        "familyContext": {
+          "siblingBottles": []
+        }
+      },
+      {
+        "abv": 51.9,
+        "brand": "Prima & Ultima",
+        "score": 21.71954,
+        "series": null,
+        "source": ["text"],
+        "bottler": null,
+        "edition": "Third Release",
+        "outturn": 1024,
+        "bottleId": 49803,
+        "category": "single_malt",
+        "fullName": "Prima & Ultima Talisker 1984 - Third Release",
+        "reference": null,
+        "statedAge": 37,
+        "caskNumber": null,
+        "comparison": {
+          "missing": ["caskNumber"],
+          "conflicts": [],
+          "agreements": ["abv"]
+        },
+        "distillery": ["Talisker"],
+        "maturation": null,
+        "releaseDay": null,
+        "singleCask": false,
+        "releaseYear": 2022,
+        "vintageYear": 1984,
+        "bottlingYear": 2021,
+        "caskStrength": true,
+        "releaseMonth": null,
+        "familyContext": {
+          "siblingBottles": []
+        }
+      },
+      {
+        "abv": 51.9,
+        "brand": "Douglas Laing",
+        "score": 21.67027,
+        "series": "Xtra Old Particular",
+        "source": ["text"],
+        "bottler": "Douglas Laing",
+        "edition": null,
+        "outturn": null,
+        "bottleId": 45367,
+        "category": "single_malt",
+        "fullName": "Douglas Laing Arran 1997",
+        "reference": null,
+        "statedAge": 26,
+        "caskNumber": null,
+        "comparison": {
+          "missing": ["caskNumber"],
+          "conflicts": [],
+          "agreements": ["abv"]
+        },
+        "distillery": ["Arran"],
+        "maturation": null,
+        "releaseDay": null,
+        "singleCask": true,
+        "releaseYear": null,
+        "vintageYear": 1997,
+        "bottlingYear": null,
+        "caskStrength": true,
+        "releaseMonth": null,
+        "familyContext": {
+          "siblingBottles": []
+        }
+      },
+      {
+        "abv": 51.9,
+        "brand": "CRN57°",
+        "score": 21.0699,
+        "series": null,
+        "source": ["text"],
+        "bottler": "The Cairn Distillery",
+        "edition": null,
+        "outturn": null,
+        "bottleId": 47289,
+        "category": "blended_malt",
+        "fullName": "CRN57° 30-year-old",
+        "reference": null,
+        "statedAge": 30,
+        "caskNumber": null,
+        "comparison": {
+          "missing": ["caskNumber"],
+          "conflicts": [],
+          "agreements": ["abv"]
+        },
+        "distillery": [],
+        "maturation": null,
+        "releaseDay": null,
+        "singleCask": null,
+        "releaseYear": 2025,
+        "vintageYear": null,
+        "bottlingYear": null,
+        "caskStrength": true,
+        "releaseMonth": null,
+        "familyContext": {
+          "siblingBottles": []
+        }
+      },
+      {
+        "abv": 51.9,
+        "brand": "Signatory Vintage",
+        "score": 19.742111,
+        "series": null,
+        "source": ["text"],
+        "bottler": "Signatory Vintage",
+        "edition": null,
+        "outturn": null,
+        "bottleId": 65782,
+        "category": "single_malt",
+        "fullName": "Signatory Vintage Bowmore 1970",
+        "reference": null,
+        "statedAge": 35,
+        "caskNumber": null,
+        "comparison": {
+          "missing": ["caskNumber"],
+          "conflicts": [],
+          "agreements": ["abv"]
+        },
+        "distillery": ["Bowmore"],
+        "maturation": null,
+        "releaseDay": null,
+        "singleCask": null,
+        "releaseYear": null,
+        "vintageYear": 1970,
+        "bottlingYear": null,
+        "caskStrength": null,
+        "releaseMonth": null,
+        "familyContext": {
+          "siblingBottles": []
+        }
+      },
+      {
+        "abv": 51.9,
+        "brand": "Glen Garioch",
+        "score": 18.96458,
+        "series": "The Renaissance",
+        "source": ["text"],
+        "bottler": null,
+        "edition": "1st Chapter",
+        "outturn": null,
+        "bottleId": 4035,
+        "category": "single_malt",
+        "fullName": "Glen Garioch The Renaissance - 1st Chapter",
+        "reference": null,
+        "statedAge": 15,
+        "caskNumber": null,
+        "comparison": {
+          "missing": ["caskNumber"],
+          "conflicts": [],
+          "agreements": ["abv"]
+        },
+        "distillery": ["Glen Garioch"],
+        "maturation": null,
+        "releaseDay": null,
+        "singleCask": null,
+        "releaseYear": null,
+        "vintageYear": null,
+        "bottlingYear": 2014,
+        "caskStrength": null,
+        "releaseMonth": null,
+        "familyContext": {
+          "siblingBottles": []
+        }
+      },
+      {
+        "abv": 51.9,
+        "brand": "Thompson Bros.",
+        "score": 18.838257,
+        "series": null,
+        "source": ["text"],
+        "bottler": "Thompson Bros.",
+        "edition": null,
+        "outturn": null,
+        "bottleId": 63286,
+        "category": "single_malt",
+        "fullName": "Thompson Bros. Glentauchers 20-year-old",
+        "reference": null,
+        "statedAge": 20,
+        "caskNumber": null,
+        "comparison": {
+          "missing": ["caskNumber"],
+          "conflicts": [],
+          "agreements": ["abv"]
+        },
+        "distillery": ["Glentauchers"],
+        "maturation": null,
+        "releaseDay": null,
+        "singleCask": null,
+        "releaseYear": null,
+        "vintageYear": 2006,
+        "bottlingYear": null,
+        "caskStrength": null,
+        "releaseMonth": null,
+        "familyContext": {
+          "siblingBottles": []
+        }
+      },
+      {
+        "abv": 51.9,
+        "brand": "Special Releases",
+        "score": 16.675941,
+        "series": null,
+        "source": ["text"],
+        "bottler": null,
+        "edition": "2017",
+        "outturn": 3000,
+        "bottleId": 3078,
+        "category": "single_malt",
+        "fullName": "Special Releases Brora 1982 - 2017",
+        "reference": null,
+        "statedAge": 34,
+        "caskNumber": null,
+        "comparison": {
+          "missing": ["caskNumber"],
+          "conflicts": [],
+          "agreements": ["abv"]
+        },
+        "distillery": ["Brora"],
+        "maturation": "refill American oak hogsheads",
+        "releaseDay": null,
+        "singleCask": null,
+        "releaseYear": 2017,
+        "vintageYear": 1982,
+        "bottlingYear": 2017,
+        "caskStrength": true,
+        "releaseMonth": null,
+        "familyContext": {
+          "siblingBottles": []
+        }
+      },
+      {
+        "abv": 51.9,
+        "brand": "Old Particular",
+        "score": 16.642075,
+        "series": null,
+        "source": ["text"],
+        "bottler": "Douglas Laing",
+        "edition": null,
+        "outturn": null,
+        "bottleId": 65053,
+        "category": "single_grain",
+        "fullName": "Old Particular Port Dundas 1990 26-year-old",
+        "reference": null,
+        "statedAge": 26,
+        "caskNumber": null,
+        "comparison": {
+          "missing": ["caskNumber"],
+          "conflicts": [],
+          "agreements": ["abv"]
+        },
+        "distillery": ["Port Dundas"],
+        "maturation": null,
+        "releaseDay": null,
+        "singleCask": null,
+        "releaseYear": null,
+        "vintageYear": 1990,
+        "bottlingYear": null,
+        "caskStrength": null,
+        "releaseMonth": null,
+        "familyContext": {
+          "siblingBottles": []
+        }
+      }
+    ]
+  },
+  "context": {
+    "inspectedBottleIds": [54570],
+    "bottleContexts": [
+      {
+        "exact": {
+          "abv": 51.9,
+          "edition": "Release 3 - Protectors of the Peat",
+          "outturn": 196,
+          "statedAge": 22,
+          "caskNumber": "4045",
+          "maturation": "First-fill ex-bourbon cask",
+          "releaseDay": null,
+          "singleCask": true,
+          "releaseYear": 2023,
+          "vintageYear": 2000,
+          "bottlingYear": 2023,
+          "caskStrength": true,
+          "releaseMonth": null
+        },
+        "shared": {
+          "name": "Single Cask Release",
+          "brand": {
+            "name": "Laphroaig",
+            "entityId": 1129
+          },
+          "series": null,
+          "bottler": null,
+          "category": "single_malt",
+          "statedAge": null,
+          "distillers": [
+            {
+              "name": "Laphroaig",
+              "entityId": 1129
+            }
+          ]
+        },
+        "groupId": 27531,
+        "bottleId": 54570,
+        "fullName": "Laphroaig Single Cask Release - Release 3 - Protectors of the Peat",
+        "siblings": [],
+        "references": [],
+        "observations": [],
+        "imageSources": []
+      }
+    ],
+    "inspectedEntities": [
+      {
+        "kind": "distillery",
+        "name": "Laphroaig",
+        "score": 1,
+        "source": ["exact", "text", "prefix", "contained"],
+        "entityId": 1129,
+        "reference": "Laphroaig",
+        "shortName": "",
+        "retrievedFor": [
+          {
+            "exact": true,
+            "query": "Laphroaig"
+          }
+        ]
+      },
+      {
+        "kind": "brand",
+        "name": "Thompson Bros.",
+        "score": 1,
+        "source": ["exact", "text", "prefix", "contained"],
+        "entityId": 365820,
+        "reference": "Thompson Bros.",
+        "shortName": null,
+        "retrievedFor": [
+          {
+            "exact": true,
+            "query": "Thompson Bros."
+          },
+          {
+            "exact": true,
+            "query": "Thompson Bros"
+          }
+        ]
+      },
+      {
+        "kind": "bottler",
+        "name": "Thompson Bros",
+        "score": 1,
+        "source": ["exact", "text", "contained", "prefix"],
+        "entityId": 367034,
+        "reference": "Thompson Bros",
+        "shortName": null,
+        "retrievedFor": [
+          {
+            "exact": true,
+            "query": "Thompson Bros."
+          },
+          {
+            "exact": true,
+            "query": "Thompson Bros"
+          }
+        ]
+      },
+      {
+        "kind": "distillery",
+        "name": "Bruichladdich",
+        "score": 1,
+        "source": ["exact", "text", "prefix", "contained"],
+        "entityId": 192,
+        "reference": "Bruichladdich",
+        "shortName": "",
+        "retrievedFor": [
+          {
+            "exact": true,
+            "query": "Bruichladdich"
+          }
+        ]
+      },
+      {
+        "kind": "distillery",
+        "name": "GlenAllachie",
+        "score": 1,
+        "source": ["exact", "text", "prefix", "contained"],
+        "entityId": 123,
+        "reference": "Glenallachie",
+        "shortName": null,
+        "retrievedFor": [
+          {
+            "exact": true,
+            "query": "GlenAllachie"
+          }
+        ]
+      },
+      {
+        "kind": "brand",
+        "name": "Rare Malts Selection",
+        "score": 1,
+        "source": ["exact", "text", "prefix", "contained"],
+        "entityId": 366603,
+        "reference": "Rare Malts Selection",
+        "shortName": null,
+        "retrievedFor": [
+          {
+            "exact": true,
+            "query": "Rare Malts Selection"
+          }
+        ]
+      },
+      {
+        "kind": "distillery",
+        "name": "Glen Mhor",
+        "score": 1,
+        "source": ["exact", "text", "prefix", "contained"],
+        "entityId": 135,
+        "reference": "Glen Mhor",
+        "shortName": null,
+        "retrievedFor": [
+          {
+            "exact": true,
+            "query": "Glen Mhor"
+          }
+        ]
+      },
+      {
+        "kind": "brand",
+        "name": "WhiskyHeroes",
+        "score": 1,
+        "source": ["exact", "text", "prefix", "contained"],
+        "entityId": 365881,
+        "reference": "WhiskyHeroes",
+        "shortName": null,
+        "retrievedFor": [
+          {
+            "exact": true,
+            "query": "WhiskyHeroes"
+          }
+        ]
+      },
+      {
+        "kind": "bottler",
+        "name": "Brave New Spirits",
+        "score": 1,
+        "source": ["exact", "text", "prefix", "contained"],
+        "entityId": 5514,
+        "reference": "Brave New Spirits",
+        "shortName": null,
+        "retrievedFor": [
+          {
+            "exact": true,
+            "query": "Brave New Spirits"
+          }
+        ]
+      },
+      {
+        "kind": "distillery",
+        "name": "Teaninich",
+        "score": 1,
+        "source": ["exact", "text", "prefix", "contained"],
+        "entityId": 516,
+        "reference": "Teaninich",
+        "shortName": null,
+        "retrievedFor": [
+          {
+            "exact": true,
+            "query": "Teaninich"
+          }
+        ]
+      },
+      {
+        "kind": "bottler",
+        "name": "The Whisky Agency",
+        "score": 1,
+        "source": ["exact", "text", "prefix", "contained"],
+        "entityId": 5145,
+        "reference": "The Whisky Agency",
+        "shortName": null,
+        "retrievedFor": [
+          {
+            "exact": true,
+            "query": "The Whisky Agency"
+          }
+        ]
+      },
+      {
+        "kind": "distillery",
+        "name": "Tomatin",
+        "score": 1,
+        "source": ["exact", "text", "prefix", "contained"],
+        "entityId": 1443,
+        "reference": "Tomatin",
+        "shortName": null,
+        "retrievedFor": [
+          {
+            "exact": true,
+            "query": "Tomatin"
+          }
+        ]
+      },
+      {
+        "kind": "brand",
+        "name": "Bruichladdich Octomore",
+        "score": 0.5,
+        "source": ["text", "prefix"],
+        "entityId": 1210,
+        "reference": "Bruichladdich Octomore",
+        "shortName": "Octomore",
+        "retrievedFor": [
+          {
+            "query": "Bruichladdich"
+          }
+        ]
+      },
+      {
+        "kind": "brand",
+        "name": "Bruichladdich Port Charlotte",
+        "score": 0.5,
+        "source": ["text", "prefix"],
+        "entityId": 1269,
+        "reference": "Bruichladdich Port Charlotte",
+        "shortName": "Port Charlotte",
+        "retrievedFor": [
+          {
+            "query": "Bruichladdich"
+          }
+        ]
+      },
+      {
+        "kind": "company",
+        "name": "The GlenAllachie Distillers Company",
+        "score": 0.5,
+        "source": ["text", "prefix"],
+        "entityId": 366077,
+        "reference": "GlenAllachie Distillers Company",
+        "shortName": null,
+        "retrievedFor": [
+          {
+            "query": "GlenAllachie"
+          }
+        ]
+      },
+      {
+        "kind": "bottler",
+        "name": "Whisky AGE",
+        "score": 0.37,
+        "source": ["contained"],
+        "entityId": 5948,
+        "reference": "Whisky AGE",
+        "shortName": null,
+        "retrievedFor": [
+          {
+            "query": "The Whisky Agency"
+          }
+        ]
+      },
+      {
+        "kind": "bottler",
+        "name": "&Whisky",
+        "score": 0.35,
+        "source": ["contained"],
+        "entityId": 365821,
+        "reference": "&Whisky",
+        "shortName": null,
+        "retrievedFor": [
+          {
+            "query": "WhiskyHeroes"
+          },
+          {
+            "query": "The Whisky Agency"
+          }
+        ]
+      },
+      {
+        "kind": "company",
+        "name": "D. Johnston & Co. (Laphroaig) Ltd.",
+        "score": 0.2,
+        "source": ["text"],
+        "entityId": 5737,
+        "reference": null,
+        "shortName": null,
+        "retrievedFor": [
+          {
+            "query": "Laphroaig"
+          }
+        ]
+      }
+    ],
+    "inspectedSeries": []
+  },
+  "provenance": {
+    "source": "production_miss",
+    "verifiedSourceUrls": [
+      "https://www.scotchwhiskyauctions.com/auctions/234-the-185th-auction/903999-laphroaig-2000-23-year-old-single-cask-4045-for-protectors-of-the-peat/"
+    ],
+    "dbOutcome": {
+      "bottleId": null,
+      "createsBottle": false,
+      "summary": "Production returned no_match without filing a repair."
+    },
+    "notes": "Captured from saved classifier run 35874 (auction_lot 16370, model null, 2026-11-03T16:04:24.727Z). Production rationale: The source is a single-cask Laphroaig whisky. Candidate 54570 agrees on cask 4045 and other release details, but its populated 22-year age conflicts with the source's 23-year title. Because the age conflict could affect bottle identity, do not assign or create a duplicate pending review. Expected outcome checked against the lot page on 2026-11-09 and a judged review of the 185th auction on 2026-11-03."
+  },
+  "expected": {
+    "status": "classified",
+    "action": "no_match",
+    "identityScope": "exact_cask",
+    "expectedTier": "review",
+    "blockedBottle": {
+      "bottleId": 54570,
+      "fields": ["statedAge"]
+    },
+    "summary": "Bottle 54570 is cask 4045, distilled 2000, 51.9%, for Protectors of the Peat. It stores statedAge 22 while the lot says 23; the label prints only the year, so both ages are worked out from dates. Leave it for Bottle Review rather than create a duplicate."
+  }
+}

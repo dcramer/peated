@@ -1,0 +1,1085 @@
+{
+  "id": "auction-spey-1986-15-no-match",
+  "name": "Spey 1986 15 Year Old: a 1986 vintage cannot be Speyside Distillery's SPEY 15",
+  "input": {
+    "reference": {
+      "id": 17610,
+      "url": "https://www.scotchwhiskyauctions.com/auctions/234-the-185th-auction/905240-spey-1986-15-year-old/",
+      "name": "Spey 1986 15 Year Old",
+      "imageUrl": null,
+      "externalSiteId": 28097,
+      "currentBottleId": null
+    },
+    "extractedIdentity": {
+      "abv": 40,
+      "brand": null,
+      "series": null,
+      "bottler": null,
+      "edition": null,
+      "outturn": null,
+      "category": null,
+      "distillery": null,
+      "expression": null,
+      "maturation": null,
+      "stated_age": null,
+      "cask_number": null,
+      "single_cask": null,
+      "release_year": null,
+      "vintage_year": null,
+      "cask_strength": null
+    },
+    "extractedIdentitySource": "structured",
+    "imageEvidence": null,
+    "initialCandidates": [
+      {
+        "abv": 40,
+        "brand": "SPEY",
+        "score": 71.15449,
+        "series": null,
+        "source": ["text", "context", "brand_coverage"],
+        "bottler": null,
+        "edition": null,
+        "outturn": null,
+        "bottleId": 62716,
+        "category": "single_malt",
+        "fullName": "SPEY 15-year-old",
+        "reference": null,
+        "statedAge": 15,
+        "caskNumber": null,
+        "comparison": {
+          "missing": [],
+          "conflicts": [],
+          "agreements": ["abv"]
+        },
+        "distillery": ["Speyside Distillery"],
+        "maturation": null,
+        "releaseDay": null,
+        "singleCask": null,
+        "releaseYear": null,
+        "vintageYear": null,
+        "bottlingYear": null,
+        "caskStrength": null,
+        "releaseMonth": null,
+        "familyContext": {
+          "siblingBottles": []
+        }
+      },
+      {
+        "abv": 40,
+        "brand": "MacPhail's",
+        "score": 64.27457,
+        "series": null,
+        "source": ["vector", "text"],
+        "bottler": "Gordon & MacPhail",
+        "edition": null,
+        "outturn": null,
+        "bottleId": 46539,
+        "category": "single_malt",
+        "fullName": "MacPhail's Speyside Single Malt Scotch Whisky - 15-year-old - 40.0% ABV",
+        "reference": "MacPhail's Speyside Single Malt Scotch Whisky - 15-year-old - 40.0% ABV",
+        "statedAge": 15,
+        "caskNumber": null,
+        "comparison": {
+          "missing": [],
+          "conflicts": [],
+          "agreements": ["abv"]
+        },
+        "distillery": [],
+        "maturation": null,
+        "releaseDay": null,
+        "singleCask": null,
+        "releaseYear": null,
+        "vintageYear": null,
+        "bottlingYear": null,
+        "caskStrength": null,
+        "releaseMonth": null,
+        "familyContext": {
+          "siblingBottles": []
+        }
+      },
+      {
+        "abv": 40,
+        "brand": "Cardhu",
+        "score": 59.118294,
+        "series": null,
+        "source": ["text"],
+        "bottler": null,
+        "edition": null,
+        "outturn": null,
+        "bottleId": 4604,
+        "category": "single_malt",
+        "fullName": "Cardhu 15-year-old",
+        "reference": null,
+        "statedAge": 15,
+        "caskNumber": null,
+        "comparison": {
+          "missing": ["vintageYear"],
+          "conflicts": ["brand", "distillers"],
+          "agreements": ["category", "statedAge", "abv"]
+        },
+        "distillery": ["Cardhu"],
+        "maturation": null,
+        "releaseDay": null,
+        "singleCask": null,
+        "releaseYear": 2011,
+        "vintageYear": null,
+        "bottlingYear": null,
+        "caskStrength": null,
+        "releaseMonth": null,
+        "familyContext": {
+          "siblingBottles": []
+        }
+      },
+      {
+        "abv": null,
+        "brand": "Murray McDavid",
+        "score": 57.65223,
+        "series": null,
+        "source": ["text"],
+        "bottler": null,
+        "edition": null,
+        "outturn": null,
+        "bottleId": 19040,
+        "category": "single_malt",
+        "fullName": "Murray McDavid 1986, 15-year-old (distilled at Bruichladdich)",
+        "reference": null,
+        "statedAge": 15,
+        "caskNumber": null,
+        "comparison": {
+          "missing": ["abv", "vintageYear", "distillers"],
+          "conflicts": ["brand"],
+          "agreements": ["category", "statedAge"]
+        },
+        "distillery": [],
+        "maturation": null,
+        "releaseDay": null,
+        "singleCask": null,
+        "releaseYear": null,
+        "vintageYear": null,
+        "bottlingYear": null,
+        "caskStrength": null,
+        "releaseMonth": null,
+        "familyContext": {
+          "siblingBottles": []
+        }
+      },
+      {
+        "abv": 40,
+        "brand": "Glen Moray",
+        "score": 49.534615,
+        "series": null,
+        "source": ["text"],
+        "bottler": null,
+        "edition": null,
+        "outturn": null,
+        "bottleId": 46830,
+        "category": "single_malt",
+        "fullName": "Glen Moray 15-year-old Edinburgh Homecoming Edition",
+        "reference": null,
+        "statedAge": 15,
+        "caskNumber": null,
+        "comparison": {
+          "missing": [],
+          "conflicts": [],
+          "agreements": ["abv"]
+        },
+        "distillery": ["Glen Moray"],
+        "maturation": null,
+        "releaseDay": null,
+        "singleCask": null,
+        "releaseYear": null,
+        "vintageYear": null,
+        "bottlingYear": null,
+        "caskStrength": null,
+        "releaseMonth": null,
+        "familyContext": {
+          "siblingBottles": []
+        }
+      },
+      {
+        "abv": 40,
+        "brand": "SPEY",
+        "score": 49.372498,
+        "series": null,
+        "source": ["text"],
+        "bottler": null,
+        "edition": null,
+        "outturn": null,
+        "bottleId": 45820,
+        "category": "single_malt",
+        "fullName": "SPEY 12-year-old",
+        "reference": null,
+        "statedAge": 12,
+        "caskNumber": null,
+        "comparison": {
+          "missing": [],
+          "conflicts": [],
+          "agreements": ["abv"]
+        },
+        "distillery": ["Speyside Distillery"],
+        "maturation": null,
+        "releaseDay": null,
+        "singleCask": null,
+        "releaseYear": null,
+        "vintageYear": null,
+        "bottlingYear": null,
+        "caskStrength": null,
+        "releaseMonth": null,
+        "familyContext": {
+          "siblingBottles": []
+        }
+      },
+      {
+        "abv": 40,
+        "brand": "The Singleton of Dufftown",
+        "score": 48.18093,
+        "series": null,
+        "source": ["text"],
+        "bottler": null,
+        "edition": null,
+        "outturn": null,
+        "bottleId": 45798,
+        "category": "single_malt",
+        "fullName": "The Singleton of Dufftown Fruity Decadence - 15-year-old - 40.0% ABV",
+        "reference": null,
+        "statedAge": 15,
+        "caskNumber": null,
+        "comparison": {
+          "missing": [],
+          "conflicts": [],
+          "agreements": ["abv"]
+        },
+        "distillery": ["Dufftown Distillery"],
+        "maturation": null,
+        "releaseDay": null,
+        "singleCask": null,
+        "releaseYear": null,
+        "vintageYear": null,
+        "bottlingYear": null,
+        "caskStrength": null,
+        "releaseMonth": null,
+        "familyContext": {
+          "siblingBottles": []
+        }
+      },
+      {
+        "abv": 40,
+        "brand": "Tomintoul",
+        "score": 47.509636,
+        "series": null,
+        "source": ["text"],
+        "bottler": null,
+        "edition": null,
+        "outturn": null,
+        "bottleId": 46566,
+        "category": "single_malt",
+        "fullName": "Tomintoul With a Peaty Tang - 15-year-old - 40.0% ABV - Oak Cask",
+        "reference": null,
+        "statedAge": 15,
+        "caskNumber": null,
+        "comparison": {
+          "missing": [],
+          "conflicts": [],
+          "agreements": ["abv"]
+        },
+        "distillery": ["Tomintoul"],
+        "maturation": "oak",
+        "releaseDay": null,
+        "singleCask": null,
+        "releaseYear": null,
+        "vintageYear": null,
+        "bottlingYear": null,
+        "caskStrength": null,
+        "releaseMonth": null,
+        "familyContext": {
+          "siblingBottles": []
+        }
+      },
+      {
+        "abv": 40,
+        "brand": "SPEY",
+        "score": 43.630783,
+        "series": null,
+        "source": ["vector", "text"],
+        "bottler": null,
+        "edition": null,
+        "outturn": null,
+        "bottleId": 47010,
+        "category": "single_malt",
+        "fullName": "SPEY Chairman's Choice - 40.0% ABV - Pedro Ximenez Cask",
+        "reference": "SPEY Chairman's Choice - 40.0% ABV - Pedro Ximenez Cask",
+        "statedAge": null,
+        "caskNumber": null,
+        "comparison": {
+          "missing": [],
+          "conflicts": [],
+          "agreements": ["abv"]
+        },
+        "distillery": [],
+        "maturation": "pedro_ximenez",
+        "releaseDay": null,
+        "singleCask": null,
+        "releaseYear": null,
+        "vintageYear": null,
+        "bottlingYear": null,
+        "caskStrength": null,
+        "releaseMonth": null,
+        "familyContext": {
+          "siblingBottles": []
+        }
+      },
+      {
+        "abv": 40,
+        "brand": "Speymhor",
+        "score": 40.60779,
+        "series": null,
+        "source": ["text"],
+        "bottler": null,
+        "edition": null,
+        "outturn": null,
+        "bottleId": 61784,
+        "category": "single_malt",
+        "fullName": "Speymhor 15-year-old",
+        "reference": null,
+        "statedAge": 15,
+        "caskNumber": null,
+        "comparison": {
+          "missing": ["vintageYear", "distillers"],
+          "conflicts": ["brand"],
+          "agreements": ["category", "statedAge", "abv"]
+        },
+        "distillery": [],
+        "maturation": null,
+        "releaseDay": null,
+        "singleCask": null,
+        "releaseYear": null,
+        "vintageYear": null,
+        "bottlingYear": null,
+        "caskStrength": null,
+        "releaseMonth": null,
+        "familyContext": {
+          "siblingBottles": []
+        }
+      },
+      {
+        "abv": 40,
+        "brand": "Glen Deveron",
+        "score": 38.78949,
+        "series": null,
+        "source": ["text"],
+        "bottler": null,
+        "edition": null,
+        "outturn": null,
+        "bottleId": 69969,
+        "category": "single_malt",
+        "fullName": "Glen Deveron 15-year-old",
+        "reference": null,
+        "statedAge": 15,
+        "caskNumber": null,
+        "comparison": {
+          "missing": ["vintageYear"],
+          "conflicts": ["brand", "distillers"],
+          "agreements": ["category", "statedAge", "abv"]
+        },
+        "distillery": ["Macduff Distillery"],
+        "maturation": null,
+        "releaseDay": null,
+        "singleCask": null,
+        "releaseYear": null,
+        "vintageYear": null,
+        "bottlingYear": null,
+        "caskStrength": null,
+        "releaseMonth": null,
+        "familyContext": {
+          "siblingBottles": []
+        }
+      },
+      {
+        "abv": 40,
+        "brand": "The Antiquary",
+        "score": 35.89431,
+        "series": null,
+        "source": ["text"],
+        "bottler": null,
+        "edition": null,
+        "outturn": null,
+        "bottleId": 45695,
+        "category": "blend",
+        "fullName": "The Antiquary Claret Casks - 15-year-old - 40.0% ABV - Bordeaux Cask",
+        "reference": null,
+        "statedAge": 15,
+        "caskNumber": null,
+        "comparison": {
+          "missing": [],
+          "conflicts": [],
+          "agreements": ["abv"]
+        },
+        "distillery": [],
+        "maturation": "bordeaux",
+        "releaseDay": null,
+        "singleCask": null,
+        "releaseYear": null,
+        "vintageYear": null,
+        "bottlingYear": null,
+        "caskStrength": null,
+        "releaseMonth": null,
+        "familyContext": {
+          "siblingBottles": []
+        }
+      },
+      {
+        "abv": 40,
+        "brand": "Timberman",
+        "score": 34.057644,
+        "series": null,
+        "source": ["text"],
+        "bottler": "Debowa",
+        "edition": null,
+        "outturn": null,
+        "bottleId": 45952,
+        "category": "blend",
+        "fullName": "Timberman Blended Malt Scotch Whisky - 15-year-old - 40.0% ABV - Oak Cask - Barrel",
+        "reference": null,
+        "statedAge": 15,
+        "caskNumber": null,
+        "comparison": {
+          "missing": [],
+          "conflicts": [],
+          "agreements": ["abv"]
+        },
+        "distillery": [],
+        "maturation": "oak",
+        "releaseDay": null,
+        "singleCask": null,
+        "releaseYear": null,
+        "vintageYear": null,
+        "bottlingYear": null,
+        "caskStrength": null,
+        "releaseMonth": null,
+        "familyContext": {
+          "siblingBottles": []
+        }
+      },
+      {
+        "abv": 40,
+        "brand": "Glen Deveron",
+        "score": 33.236813,
+        "series": null,
+        "source": ["text"],
+        "bottler": null,
+        "edition": null,
+        "outturn": null,
+        "bottleId": 69971,
+        "category": "single_malt",
+        "fullName": "Glen Deveron 1986 10-year-old",
+        "reference": null,
+        "statedAge": 10,
+        "caskNumber": null,
+        "comparison": {
+          "missing": [],
+          "conflicts": [],
+          "agreements": ["abv"]
+        },
+        "distillery": ["Macduff Distillery"],
+        "maturation": null,
+        "releaseDay": null,
+        "singleCask": null,
+        "releaseYear": null,
+        "vintageYear": 1986,
+        "bottlingYear": null,
+        "caskStrength": null,
+        "releaseMonth": null,
+        "familyContext": {
+          "siblingBottles": []
+        }
+      },
+      {
+        "abv": 40,
+        "brand": "Gordon & MacPhail",
+        "score": 30.678188,
+        "series": null,
+        "source": ["text"],
+        "bottler": "Gordon & MacPhail",
+        "edition": null,
+        "outturn": null,
+        "bottleId": 70270,
+        "category": "single_malt",
+        "fullName": "Gordon & MacPhail Scapa 1986",
+        "reference": null,
+        "statedAge": null,
+        "caskNumber": null,
+        "comparison": {
+          "missing": [],
+          "conflicts": [],
+          "agreements": ["abv"]
+        },
+        "distillery": ["Scapa"],
+        "maturation": null,
+        "releaseDay": null,
+        "singleCask": null,
+        "releaseYear": null,
+        "vintageYear": 1986,
+        "bottlingYear": null,
+        "caskStrength": null,
+        "releaseMonth": null,
+        "familyContext": {
+          "siblingBottles": []
+        }
+      },
+      {
+        "abv": 40,
+        "brand": "Gordon & MacPhail",
+        "score": 28.954487,
+        "series": "Connoisseurs Choice",
+        "source": ["text"],
+        "bottler": "Gordon & MacPhail",
+        "edition": null,
+        "outturn": null,
+        "bottleId": 66427,
+        "category": "single_malt",
+        "fullName": "Gordon & MacPhail Bladnoch 1986",
+        "reference": null,
+        "statedAge": null,
+        "caskNumber": null,
+        "comparison": {
+          "missing": [],
+          "conflicts": [],
+          "agreements": ["abv"]
+        },
+        "distillery": ["Bladnoch"],
+        "maturation": null,
+        "releaseDay": null,
+        "singleCask": null,
+        "releaseYear": null,
+        "vintageYear": 1986,
+        "bottlingYear": 1998,
+        "caskStrength": null,
+        "releaseMonth": null,
+        "familyContext": {
+          "siblingBottles": []
+        }
+      },
+      {
+        "abv": 40,
+        "brand": "Gordon & MacPhail",
+        "score": 28.954487,
+        "series": "Connoisseurs Choice",
+        "source": ["text"],
+        "bottler": "Gordon & MacPhail",
+        "edition": null,
+        "outturn": null,
+        "bottleId": 66430,
+        "category": "single_malt",
+        "fullName": "Gordon & MacPhail Bladnoch 1986",
+        "reference": null,
+        "statedAge": null,
+        "caskNumber": null,
+        "comparison": {
+          "missing": [],
+          "conflicts": [],
+          "agreements": ["abv"]
+        },
+        "distillery": ["Bladnoch"],
+        "maturation": null,
+        "releaseDay": null,
+        "singleCask": null,
+        "releaseYear": null,
+        "vintageYear": 1986,
+        "bottlingYear": 1996,
+        "caskStrength": null,
+        "releaseMonth": null,
+        "familyContext": {
+          "siblingBottles": []
+        }
+      },
+      {
+        "abv": 40,
+        "brand": "The Dalmore",
+        "score": 28.907621,
+        "series": "Rivers Collection",
+        "source": ["text"],
+        "bottler": null,
+        "edition": "Season 2011",
+        "outturn": null,
+        "bottleId": 60835,
+        "category": "single_malt",
+        "fullName": "Dalmore Spey Dram - Season 2011",
+        "reference": null,
+        "statedAge": null,
+        "caskNumber": null,
+        "comparison": {
+          "missing": [],
+          "conflicts": [],
+          "agreements": ["abv"]
+        },
+        "distillery": ["The Dalmore"],
+        "maturation": null,
+        "releaseDay": null,
+        "singleCask": null,
+        "releaseYear": 2011,
+        "vintageYear": null,
+        "bottlingYear": null,
+        "caskStrength": null,
+        "releaseMonth": null,
+        "familyContext": {
+          "siblingBottles": []
+        }
+      },
+      {
+        "abv": 40,
+        "brand": "Gordon & MacPhail",
+        "score": 28.178196,
+        "series": "Spirit of Scotland",
+        "source": ["text"],
+        "bottler": "Gordon & MacPhail",
+        "edition": null,
+        "outturn": null,
+        "bottleId": 66443,
+        "category": "single_malt",
+        "fullName": "Gordon & MacPhail Bladnoch 1986",
+        "reference": null,
+        "statedAge": null,
+        "caskNumber": null,
+        "comparison": {
+          "missing": [],
+          "conflicts": [],
+          "agreements": ["abv"]
+        },
+        "distillery": ["Bladnoch"],
+        "maturation": null,
+        "releaseDay": null,
+        "singleCask": null,
+        "releaseYear": null,
+        "vintageYear": 1986,
+        "bottlingYear": 1997,
+        "caskStrength": null,
+        "releaseMonth": null,
+        "familyContext": {
+          "siblingBottles": []
+        }
+      }
+    ]
+  },
+  "context": {
+    "inspectedBottleIds": [62716],
+    "bottleContexts": [
+      {
+        "exact": {
+          "abv": 40,
+          "edition": null,
+          "outturn": null,
+          "statedAge": 15,
+          "caskNumber": null,
+          "maturation": null,
+          "releaseDay": null,
+          "singleCask": null,
+          "releaseYear": null,
+          "vintageYear": null,
+          "bottlingYear": null,
+          "caskStrength": null,
+          "releaseMonth": null
+        },
+        "shared": {
+          "name": "15-year-old",
+          "brand": {
+            "name": "SPEY",
+            "entityId": 1353
+          },
+          "series": null,
+          "bottler": null,
+          "category": "single_malt",
+          "statedAge": null,
+          "distillers": [
+            {
+              "name": "Speyside Distillery",
+              "entityId": 1356
+            }
+          ]
+        },
+        "groupId": 35677,
+        "bottleId": 62716,
+        "fullName": "SPEY 15-year-old",
+        "siblings": [],
+        "references": [],
+        "observations": [
+          {
+            "facts": {
+              "proposalType": "create_new",
+              "proposedBottle": {
+                "abv": null,
+                "name": "15-year-old",
+                "brand": {
+                  "id": null,
+                  "name": "SPEY"
+                },
+                "series": null,
+                "bottler": null,
+                "edition": null,
+                "outturn": null,
+                "category": "single_malt",
+                "statedAge": 15,
+                "caskNumber": null,
+                "distillers": [
+                  {
+                    "id": null,
+                    "name": "Speyside Distillery"
+                  }
+                ],
+                "maturation": null,
+                "releaseDay": null,
+                "singleCask": null,
+                "releaseYear": null,
+                "vintageYear": null,
+                "bottlingYear": null,
+                "caskStrength": null,
+                "releaseMonth": null
+              },
+              "referenceScope": "none"
+            },
+            "rawText": "Spey 15-year-old",
+            "sourceKey": "store_price:12057305",
+            "sourceUrl": "https://www.thewhiskyworld.com/spey-15-year-old-p18410",
+            "sourceName": "Spey 15-year-old",
+            "sourceType": "store_price",
+            "parsedIdentity": null
+          }
+        ],
+        "imageSources": []
+      }
+    ],
+    "inspectedEntities": [
+      {
+        "kind": "brand",
+        "name": "SPEY",
+        "score": 1,
+        "source": ["exact", "text", "prefix", "contained"],
+        "entityId": 1353,
+        "reference": "SPEY",
+        "shortName": null,
+        "retrievedFor": [
+          {
+            "exact": true,
+            "query": "SPEY"
+          },
+          {
+            "query": "Speyside Distillery"
+          }
+        ]
+      },
+      {
+        "kind": "distillery",
+        "name": "Speyside Distillery",
+        "score": 1,
+        "source": ["exact", "prefix", "contained"],
+        "entityId": 1356,
+        "reference": "Speyside Distillery",
+        "shortName": null,
+        "retrievedFor": [
+          {
+            "exact": true,
+            "query": "Speyside Distillery"
+          }
+        ]
+      },
+      {
+        "kind": "brand",
+        "name": "MacPhail's",
+        "score": 1,
+        "source": ["exact", "text", "prefix", "contained"],
+        "entityId": 1165,
+        "reference": "MacPhail's",
+        "shortName": null,
+        "retrievedFor": [
+          {
+            "exact": true,
+            "query": "MacPhail's"
+          }
+        ]
+      },
+      {
+        "kind": "bottler",
+        "name": "Gordon & MacPhail",
+        "score": 1,
+        "source": ["exact", "text", "prefix", "contained"],
+        "entityId": 5645,
+        "reference": "Gordon & MacPhail",
+        "shortName": null,
+        "retrievedFor": [
+          {
+            "exact": true,
+            "query": "Gordon & MacPhail"
+          }
+        ]
+      },
+      {
+        "kind": "brand",
+        "name": "The Antiquary",
+        "score": 1,
+        "source": ["exact", "text", "prefix", "contained"],
+        "entityId": 1401,
+        "reference": "The Antiquary",
+        "shortName": null,
+        "retrievedFor": [
+          {
+            "exact": true,
+            "query": "The Antiquary"
+          }
+        ]
+      },
+      {
+        "kind": "brand",
+        "name": "The Singleton of Dufftown",
+        "score": 1,
+        "source": ["exact", "text", "prefix", "contained"],
+        "entityId": 1425,
+        "reference": "The Singleton of Dufftown",
+        "shortName": null,
+        "retrievedFor": [
+          {
+            "exact": true,
+            "query": "The Singleton of Dufftown"
+          }
+        ]
+      },
+      {
+        "kind": "distillery",
+        "name": "Dufftown Distillery",
+        "score": 1,
+        "source": ["exact", "text", "prefix", "contained"],
+        "entityId": 258,
+        "reference": "Dufftown Distillery",
+        "shortName": null,
+        "retrievedFor": [
+          {
+            "exact": true,
+            "query": "Dufftown Distillery"
+          }
+        ]
+      },
+      {
+        "kind": "distillery",
+        "name": "Glen Moray",
+        "score": 1,
+        "source": ["exact", "text", "prefix", "contained"],
+        "entityId": 129,
+        "reference": "Glen Moray",
+        "shortName": null,
+        "retrievedFor": [
+          {
+            "exact": true,
+            "query": "Glen Moray"
+          }
+        ]
+      },
+      {
+        "kind": "distillery",
+        "name": "Tomintoul",
+        "score": 1,
+        "source": ["exact", "text", "prefix", "contained"],
+        "entityId": 174,
+        "reference": "Tomintoul",
+        "shortName": null,
+        "retrievedFor": [
+          {
+            "exact": true,
+            "query": "Tomintoul"
+          }
+        ]
+      },
+      {
+        "kind": "brand",
+        "name": "Timberman",
+        "score": 1,
+        "source": ["exact", "text", "prefix", "contained"],
+        "entityId": 365852,
+        "reference": "Timberman",
+        "shortName": null,
+        "retrievedFor": [
+          {
+            "exact": true,
+            "query": "Timberman"
+          }
+        ]
+      },
+      {
+        "kind": "bottler",
+        "name": "Debowa",
+        "score": 1,
+        "source": ["exact", "text", "prefix", "contained"],
+        "entityId": 365853,
+        "reference": "Debowa",
+        "shortName": null,
+        "retrievedFor": [
+          {
+            "exact": true,
+            "query": "Debowa"
+          }
+        ]
+      },
+      {
+        "kind": "brand",
+        "name": "Glen Deveron",
+        "score": 1,
+        "source": ["exact", "text", "prefix", "contained"],
+        "entityId": 950,
+        "reference": "Glen Deveron",
+        "shortName": null,
+        "retrievedFor": [
+          {
+            "exact": true,
+            "query": "Glen Deveron"
+          }
+        ]
+      },
+      {
+        "kind": "brand",
+        "name": "Spey River",
+        "score": 0.5,
+        "source": ["text", "prefix"],
+        "entityId": 4020,
+        "reference": "Spey River",
+        "shortName": null,
+        "retrievedFor": [
+          {
+            "query": "SPEY"
+          }
+        ]
+      },
+      {
+        "kind": "brand",
+        "name": "Spey Royal",
+        "score": 0.5,
+        "source": ["text", "prefix"],
+        "entityId": 4021,
+        "reference": "Spey Royal",
+        "shortName": null,
+        "retrievedFor": [
+          {
+            "query": "SPEY"
+          }
+        ]
+      },
+      {
+        "kind": "brand",
+        "name": "Speyside Region Malt",
+        "score": 0.5,
+        "source": ["prefix"],
+        "entityId": 1358,
+        "reference": null,
+        "shortName": null,
+        "retrievedFor": [
+          {
+            "query": "SPEY"
+          }
+        ]
+      },
+      {
+        "kind": "company",
+        "name": "Speyside Distillers Company",
+        "score": 0.5,
+        "source": ["prefix"],
+        "entityId": 5752,
+        "reference": null,
+        "shortName": null,
+        "retrievedFor": [
+          {
+            "query": "SPEY"
+          }
+        ]
+      },
+      {
+        "kind": "brand",
+        "name": "The Deveron",
+        "score": 0.3772727272727273,
+        "source": ["contained"],
+        "entityId": 1405,
+        "reference": "Deveron",
+        "shortName": null,
+        "retrievedFor": [
+          {
+            "query": "Glen Deveron"
+          }
+        ]
+      },
+      {
+        "kind": "distillery",
+        "name": "Dufftown",
+        "score": 0.3388888888888889,
+        "source": ["contained"],
+        "entityId": 366568,
+        "reference": "Dufftown",
+        "shortName": null,
+        "retrievedFor": [
+          {
+            "query": "The Singleton of Dufftown"
+          },
+          {
+            "query": "Dufftown Distillery"
+          }
+        ]
+      },
+      {
+        "kind": "brand",
+        "name": "An Iconic Speyside Distillery",
+        "score": 0.2,
+        "source": ["text"],
+        "entityId": 2093,
+        "reference": null,
+        "shortName": null,
+        "retrievedFor": [
+          {
+            "query": "Speyside Distillery"
+          }
+        ]
+      },
+      {
+        "kind": "brand",
+        "name": "An Undisclosed Speyside Distillery",
+        "score": 0.2,
+        "source": ["text"],
+        "entityId": 2097,
+        "reference": null,
+        "shortName": null,
+        "retrievedFor": [
+          {
+            "query": "Speyside Distillery"
+          }
+        ]
+      },
+      {
+        "kind": "brand",
+        "name": "A Secret Speyside Distillery",
+        "score": 0.2,
+        "source": ["text"],
+        "entityId": 39,
+        "reference": null,
+        "shortName": null,
+        "retrievedFor": [
+          {
+            "query": "Speyside Distillery"
+          }
+        ]
+      }
+    ],
+    "inspectedSeries": []
+  },
+  "provenance": {
+    "source": "production_miss",
+    "verifiedSourceUrls": [
+      "https://www.scotchwhiskyauctions.com/auctions/234-the-185th-auction/905240-spey-1986-15-year-old/"
+    ],
+    "dbOutcome": {
+      "bottleId": null,
+      "createsBottle": false,
+      "summary": "Production returned no_match."
+    },
+    "notes": "Captured from saved classifier run 36653 (auction_lot 17610, model null, 2026-11-03T21:41:21.111Z). Production rationale: The source concerns one whisky Bottle, not an out-of-scope item. Available evidence identifies a 1986 vintage and 15-year age, which distinguish it from the generic SPEY 15-year-old candidate. However, the exact marketed identity and producer relationships remain unresolved, so neither matching nor creating a Bottle is supported. Expected outcome checked against the lot page on 2026-11-09 and a judged review of the 185th auction on 2026-11-03."
+  },
+  "expected": {
+    "status": "classified",
+    "action": "no_match",
+    "identityScope": "product",
+    "blockedBottle": null,
+    "summary": "Do not match 62716. SPEY 15-year-old is from Speyside Distillery, which produced its first spirit in 1990, so a 1986 vintage is a different whisky. The lot does not show who distilled it, so a person decides."
+  }
+}

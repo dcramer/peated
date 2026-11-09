@@ -1,0 +1,928 @@
+{
+  "id": "auction-kilchoman-2013-cask-21-match",
+  "name": "Kilchoman 2013 10 Year Old Single Cask #21: cask 21 distilled 2013 is cask 21/2013",
+  "input": {
+    "reference": {
+      "id": 16150,
+      "url": "https://www.scotchwhiskyauctions.com/auctions/234-the-185th-auction/905664-kilchoman-2013-10-year-old-100-islay-single-cask-21/",
+      "name": "Kilchoman 2013 10 Year Old 100% Islay Single Cask #21",
+      "imageUrl": null,
+      "externalSiteId": 28097,
+      "currentBottleId": null
+    },
+    "extractedIdentity": {
+      "abv": 55.4,
+      "brand": null,
+      "series": null,
+      "bottler": null,
+      "edition": null,
+      "outturn": null,
+      "category": null,
+      "distillery": null,
+      "expression": null,
+      "maturation": null,
+      "stated_age": null,
+      "cask_number": "21",
+      "single_cask": null,
+      "release_year": null,
+      "vintage_year": 2013,
+      "bottling_year": 2023,
+      "cask_strength": null
+    },
+    "extractedIdentitySource": "structured",
+    "imageEvidence": null,
+    "initialCandidates": [
+      {
+        "abv": 55.4,
+        "brand": "Watashi Whisky",
+        "score": 35.80274,
+        "series": null,
+        "source": ["text"],
+        "bottler": null,
+        "edition": null,
+        "outturn": 60,
+        "bottleId": 47617,
+        "category": "single_malt",
+        "fullName": "Watashi Whisky Blair Athol 2013",
+        "reference": null,
+        "statedAge": 11,
+        "caskNumber": "311957C",
+        "comparison": {
+          "missing": [],
+          "conflicts": ["caskNumber"],
+          "agreements": ["abv", "vintageYear"]
+        },
+        "distillery": ["Blair Athol"],
+        "maturation": "2nd fill Madeira",
+        "releaseDay": null,
+        "singleCask": true,
+        "releaseYear": 2024,
+        "vintageYear": 2013,
+        "bottlingYear": null,
+        "caskStrength": null,
+        "releaseMonth": null,
+        "familyContext": {
+          "siblingBottles": []
+        }
+      },
+      {
+        "abv": 55.4,
+        "brand": "Kilchoman",
+        "score": 34.556442,
+        "series": null,
+        "source": ["text", "context"],
+        "bottler": null,
+        "edition": "for Royal Mile Whiskies",
+        "outturn": 245,
+        "bottleId": 60162,
+        "category": "single_malt",
+        "fullName": "Kilchoman 100% Islay 10-year-old Single Cask 21/2013 - for Royal Mile Whiskies",
+        "reference": null,
+        "statedAge": 10,
+        "caskNumber": "21/2013",
+        "comparison": {
+          "missing": [],
+          "conflicts": ["caskNumber"],
+          "agreements": ["abv", "vintageYear"]
+        },
+        "distillery": ["Kilchoman"],
+        "maturation": "Ex-Bourbon Barrel",
+        "releaseDay": null,
+        "singleCask": true,
+        "releaseYear": null,
+        "vintageYear": 2013,
+        "bottlingYear": 2023,
+        "caskStrength": null,
+        "releaseMonth": null,
+        "familyContext": {
+          "siblingBottles": []
+        }
+      },
+      {
+        "abv": 55.4,
+        "brand": "WhiskySponge",
+        "score": 31.835632,
+        "series": null,
+        "source": ["text"],
+        "bottler": "Decadent Drinks",
+        "edition": "Edition No. 91",
+        "outturn": 250,
+        "bottleId": 48880,
+        "category": "single_malt",
+        "fullName": "WhiskySponge Glen Garioch 2003 - Edition No. 91",
+        "reference": null,
+        "statedAge": 21,
+        "caskNumber": null,
+        "comparison": {
+          "missing": ["caskNumber"],
+          "conflicts": ["vintageYear"],
+          "agreements": ["abv"]
+        },
+        "distillery": ["Glen Garioch"],
+        "maturation": "First Fill Bourbon Barrel",
+        "releaseDay": null,
+        "singleCask": null,
+        "releaseYear": null,
+        "vintageYear": 2003,
+        "bottlingYear": 2024,
+        "caskStrength": true,
+        "releaseMonth": null,
+        "familyContext": {
+          "siblingBottles": []
+        }
+      },
+      {
+        "abv": 55.4,
+        "brand": "Special Releases",
+        "score": 31.822334,
+        "series": null,
+        "source": ["text"],
+        "bottler": null,
+        "edition": "2024",
+        "outturn": null,
+        "bottleId": 47060,
+        "category": "single_malt",
+        "fullName": "Special Releases Benrinnes - Grand Crescendo - 2024",
+        "reference": null,
+        "statedAge": 21,
+        "caskNumber": null,
+        "comparison": {
+          "missing": ["vintageYear", "caskNumber"],
+          "conflicts": [],
+          "agreements": ["abv"]
+        },
+        "distillery": ["Benrinnes"],
+        "maturation": null,
+        "releaseDay": null,
+        "singleCask": false,
+        "releaseYear": 2024,
+        "vintageYear": null,
+        "bottlingYear": null,
+        "caskStrength": true,
+        "releaseMonth": null,
+        "familyContext": {
+          "siblingBottles": []
+        }
+      },
+      {
+        "abv": 55.4,
+        "brand": "The Whisky Exchange",
+        "score": 29.571829,
+        "series": "The Zodiac",
+        "source": ["text"],
+        "bottler": "The Whisky Exchange",
+        "edition": "Aries",
+        "outturn": 335,
+        "bottleId": 47449,
+        "category": "single_malt",
+        "fullName": "The Whisky Exchange Staoisha - Aries - 12-year-old - 2025 Release - 2013 Vintage - 55.4% ABV - Single Cask",
+        "reference": null,
+        "statedAge": 12,
+        "caskNumber": "128",
+        "comparison": {
+          "missing": [],
+          "conflicts": ["caskNumber"],
+          "agreements": ["abv", "vintageYear"]
+        },
+        "distillery": ["Bunnahabhain"],
+        "maturation": "Oloroso hogshead",
+        "releaseDay": null,
+        "singleCask": true,
+        "releaseYear": 2025,
+        "vintageYear": 2013,
+        "bottlingYear": null,
+        "caskStrength": null,
+        "releaseMonth": null,
+        "familyContext": {
+          "siblingBottles": []
+        }
+      },
+      {
+        "abv": 55.4,
+        "brand": "Maker's Mark",
+        "score": 25.610859,
+        "series": "Wood Finishing Series",
+        "source": ["text"],
+        "bottler": null,
+        "edition": null,
+        "outturn": null,
+        "bottleId": 46784,
+        "category": "bourbon",
+        "fullName": "Maker's Mark London Edition",
+        "reference": null,
+        "statedAge": null,
+        "caskNumber": null,
+        "comparison": {
+          "missing": ["vintageYear", "caskNumber"],
+          "conflicts": [],
+          "agreements": ["abv"]
+        },
+        "distillery": ["Maker's Mark Distillery"],
+        "maturation": null,
+        "releaseDay": null,
+        "singleCask": null,
+        "releaseYear": null,
+        "vintageYear": null,
+        "bottlingYear": null,
+        "caskStrength": null,
+        "releaseMonth": null,
+        "familyContext": {
+          "siblingBottles": []
+        }
+      },
+      {
+        "abv": null,
+        "brand": "Vintage",
+        "score": 23.880157,
+        "series": null,
+        "source": ["text"],
+        "bottler": null,
+        "edition": null,
+        "outturn": null,
+        "bottleId": 18464,
+        "category": "bourbon",
+        "fullName": "Vintage Bourbon, 21-year-old",
+        "reference": null,
+        "statedAge": 21,
+        "caskNumber": null,
+        "comparison": {
+          "missing": ["abv", "vintageYear", "caskNumber"],
+          "conflicts": [],
+          "agreements": []
+        },
+        "distillery": [],
+        "maturation": null,
+        "releaseDay": null,
+        "singleCask": null,
+        "releaseYear": null,
+        "vintageYear": null,
+        "bottlingYear": null,
+        "caskStrength": null,
+        "releaseMonth": null,
+        "familyContext": {
+          "siblingBottles": []
+        }
+      },
+      {
+        "abv": null,
+        "brand": "Vintage",
+        "score": 23.880157,
+        "series": null,
+        "source": ["text"],
+        "bottler": null,
+        "edition": null,
+        "outturn": null,
+        "bottleId": 18290,
+        "category": "rye",
+        "fullName": "Vintage Rye, 21-year-old",
+        "reference": null,
+        "statedAge": 21,
+        "caskNumber": null,
+        "comparison": {
+          "missing": ["abv", "vintageYear", "caskNumber"],
+          "conflicts": [],
+          "agreements": []
+        },
+        "distillery": [],
+        "maturation": null,
+        "releaseDay": null,
+        "singleCask": null,
+        "releaseYear": null,
+        "vintageYear": null,
+        "bottlingYear": null,
+        "caskStrength": null,
+        "releaseMonth": null,
+        "familyContext": {
+          "siblingBottles": []
+        }
+      },
+      {
+        "abv": null,
+        "brand": "Chichibu",
+        "score": 23.680573,
+        "series": null,
+        "source": ["text"],
+        "bottler": null,
+        "edition": "2013",
+        "outturn": null,
+        "bottleId": 45030,
+        "category": "single_malt",
+        "fullName": "Chichibu Ichiro's Malt - 2013",
+        "reference": null,
+        "statedAge": 7,
+        "caskNumber": null,
+        "comparison": {
+          "missing": ["abv", "caskNumber"],
+          "conflicts": [],
+          "agreements": ["vintageYear"]
+        },
+        "distillery": ["Chichibu"],
+        "maturation": null,
+        "releaseDay": null,
+        "singleCask": null,
+        "releaseYear": null,
+        "vintageYear": 2013,
+        "bottlingYear": null,
+        "caskStrength": null,
+        "releaseMonth": null,
+        "familyContext": {
+          "siblingBottles": [
+            {
+              "abv": null,
+              "edition": null,
+              "outturn": null,
+              "bottleId": 44034,
+              "fullName": "Chichibu Ichiro's Malt",
+              "statedAge": 7,
+              "caskNumber": null,
+              "maturation": null,
+              "releaseDay": null,
+              "singleCask": null,
+              "releaseYear": null,
+              "traitFields": ["statedAge"],
+              "vintageYear": null,
+              "bottlingYear": null,
+              "caskStrength": null,
+              "releaseMonth": null
+            },
+            {
+              "abv": null,
+              "edition": "2010",
+              "outturn": null,
+              "bottleId": 45032,
+              "fullName": "Chichibu Ichiro's Malt - 2010",
+              "statedAge": 10,
+              "caskNumber": null,
+              "maturation": null,
+              "releaseDay": null,
+              "singleCask": null,
+              "releaseYear": null,
+              "traitFields": ["edition", "statedAge", "vintageYear"],
+              "vintageYear": 2010,
+              "bottlingYear": null,
+              "caskStrength": null,
+              "releaseMonth": null
+            },
+            {
+              "abv": null,
+              "edition": "2011",
+              "outturn": null,
+              "bottleId": 45031,
+              "fullName": "Chichibu Ichiro's Malt - 2011",
+              "statedAge": 10,
+              "caskNumber": null,
+              "maturation": null,
+              "releaseDay": null,
+              "singleCask": null,
+              "releaseYear": null,
+              "traitFields": ["edition", "statedAge", "vintageYear"],
+              "vintageYear": 2011,
+              "bottlingYear": null,
+              "caskStrength": null,
+              "releaseMonth": null
+            }
+          ]
+        }
+      },
+      {
+        "abv": 54.3,
+        "brand": "Decadent Drams",
+        "score": 23.584042,
+        "series": null,
+        "source": ["text"],
+        "bottler": "Decadent Drinks",
+        "edition": null,
+        "outturn": 291,
+        "bottleId": 48986,
+        "category": "single_malt",
+        "fullName": "Decadent Drams Glenturret 2013",
+        "reference": null,
+        "statedAge": 12,
+        "caskNumber": null,
+        "comparison": {
+          "missing": ["caskNumber"],
+          "conflicts": ["abv"],
+          "agreements": ["vintageYear"]
+        },
+        "distillery": ["Glenturret"],
+        "maturation": "re-charred hogshead",
+        "releaseDay": null,
+        "singleCask": null,
+        "releaseYear": null,
+        "vintageYear": 2013,
+        "bottlingYear": 2025,
+        "caskStrength": null,
+        "releaseMonth": null,
+        "familyContext": {
+          "siblingBottles": []
+        }
+      },
+      {
+        "abv": 57.1,
+        "brand": "Decadent Drams",
+        "score": 23.465113,
+        "series": null,
+        "source": ["text"],
+        "bottler": "Decadent Drinks",
+        "edition": null,
+        "outturn": 377,
+        "bottleId": 48974,
+        "category": "single_malt",
+        "fullName": "Decadent Drams Bunnahabhain 2013",
+        "reference": null,
+        "statedAge": 12,
+        "caskNumber": null,
+        "comparison": {
+          "missing": ["caskNumber"],
+          "conflicts": ["abv"],
+          "agreements": ["vintageYear"]
+        },
+        "distillery": ["Bunnahabhain"],
+        "maturation": "Matured in refill wood then sherrywood",
+        "releaseDay": null,
+        "singleCask": null,
+        "releaseYear": null,
+        "vintageYear": 2013,
+        "bottlingYear": 2025,
+        "caskStrength": null,
+        "releaseMonth": null,
+        "familyContext": {
+          "siblingBottles": []
+        }
+      },
+      {
+        "abv": 55.4,
+        "brand": "Old Particular",
+        "score": 23.419512,
+        "series": "Fanatical About Flavour",
+        "source": ["text"],
+        "bottler": "Douglas Laing",
+        "edition": null,
+        "outturn": null,
+        "bottleId": 46405,
+        "category": "single_grain",
+        "fullName": "Old Particular Secret Grain - 20-year-old - 2025 Release - 2004 Vintage - 55.4% ABV - Cask Strength - Pedro Ximenez Cask",
+        "reference": null,
+        "statedAge": 20,
+        "caskNumber": null,
+        "comparison": {
+          "missing": ["caskNumber"],
+          "conflicts": ["vintageYear"],
+          "agreements": ["abv"]
+        },
+        "distillery": [],
+        "maturation": "pedro_ximenez",
+        "releaseDay": null,
+        "singleCask": null,
+        "releaseYear": 2025,
+        "vintageYear": 2004,
+        "bottlingYear": null,
+        "caskStrength": true,
+        "releaseMonth": null,
+        "familyContext": {
+          "siblingBottles": []
+        }
+      },
+      {
+        "abv": 51.5,
+        "brand": "That Boutique-y Whisky Company",
+        "score": 23.27782,
+        "series": null,
+        "source": ["text"],
+        "bottler": "That Boutique-y Whisky Company",
+        "edition": null,
+        "outturn": null,
+        "bottleId": 46286,
+        "category": "single_malt",
+        "fullName": "TBWC Strathisla 2013",
+        "reference": null,
+        "statedAge": 10,
+        "caskNumber": null,
+        "comparison": {
+          "missing": ["caskNumber"],
+          "conflicts": ["abv"],
+          "agreements": ["vintageYear"]
+        },
+        "distillery": ["Strathisla"],
+        "maturation": null,
+        "releaseDay": null,
+        "singleCask": false,
+        "releaseYear": null,
+        "vintageYear": 2013,
+        "bottlingYear": null,
+        "caskStrength": true,
+        "releaseMonth": null,
+        "familyContext": {
+          "siblingBottles": []
+        }
+      },
+      {
+        "abv": 55.4,
+        "brand": "Lady of the Glen",
+        "score": 21.951672,
+        "series": null,
+        "source": ["text"],
+        "bottler": "Lady of the Glen",
+        "edition": null,
+        "outturn": null,
+        "bottleId": 61693,
+        "category": "single_malt",
+        "fullName": "Lady of the Glen Aultmore 2013",
+        "reference": null,
+        "statedAge": 11,
+        "caskNumber": null,
+        "comparison": {
+          "missing": ["caskNumber"],
+          "conflicts": [],
+          "agreements": ["abv", "vintageYear"]
+        },
+        "distillery": ["Aultmore"],
+        "maturation": null,
+        "releaseDay": null,
+        "singleCask": null,
+        "releaseYear": null,
+        "vintageYear": 2013,
+        "bottlingYear": null,
+        "caskStrength": null,
+        "releaseMonth": null,
+        "familyContext": {
+          "siblingBottles": []
+        }
+      },
+      {
+        "abv": 55.4,
+        "brand": "Kilchoman",
+        "score": 21.670902,
+        "series": null,
+        "source": ["text"],
+        "bottler": null,
+        "edition": "for Japan",
+        "outturn": null,
+        "bottleId": 60040,
+        "category": "single_malt",
+        "fullName": "Kilchoman Sauternes Single Cask Finish 753/2013 - for Japan",
+        "reference": null,
+        "statedAge": 8,
+        "caskNumber": "753/2013",
+        "comparison": {
+          "missing": [],
+          "conflicts": ["caskNumber"],
+          "agreements": ["abv", "vintageYear"]
+        },
+        "distillery": ["Kilchoman"],
+        "maturation": "Ex-Bourbon Barrel, Sauternes Cask Finish",
+        "releaseDay": null,
+        "singleCask": true,
+        "releaseYear": null,
+        "vintageYear": 2013,
+        "bottlingYear": 2022,
+        "caskStrength": null,
+        "releaseMonth": null,
+        "familyContext": {
+          "siblingBottles": []
+        }
+      }
+    ]
+  },
+  "context": {
+    "inspectedBottleIds": [60162],
+    "bottleContexts": [
+      {
+        "exact": {
+          "abv": 55.4,
+          "edition": "for Royal Mile Whiskies",
+          "outturn": 245,
+          "statedAge": 10,
+          "caskNumber": "21/2013",
+          "maturation": "Ex-Bourbon Barrel",
+          "releaseDay": null,
+          "singleCask": true,
+          "releaseYear": null,
+          "vintageYear": 2013,
+          "bottlingYear": 2023,
+          "caskStrength": null,
+          "releaseMonth": null
+        },
+        "shared": {
+          "name": "100% Islay 10-year-old Single Cask 21/2013",
+          "brand": {
+            "name": "Kilchoman",
+            "entityId": 175
+          },
+          "series": null,
+          "bottler": null,
+          "category": "single_malt",
+          "statedAge": null,
+          "distillers": [
+            {
+              "name": "Kilchoman",
+              "entityId": 175
+            }
+          ]
+        },
+        "groupId": 33123,
+        "bottleId": 60162,
+        "fullName": "Kilchoman 100% Islay 10-year-old Single Cask 21/2013 - for Royal Mile Whiskies",
+        "siblings": [],
+        "references": [],
+        "observations": [],
+        "imageSources": []
+      }
+    ],
+    "inspectedEntities": [
+      {
+        "kind": "bottler",
+        "name": "Lady of the Glen",
+        "score": 1,
+        "source": ["exact", "text", "prefix", "contained"],
+        "entityId": 5474,
+        "reference": "Lady of the Glen",
+        "shortName": null,
+        "retrievedFor": [
+          {
+            "exact": true,
+            "query": "Lady of the Glen"
+          }
+        ]
+      },
+      {
+        "kind": "distillery",
+        "name": "Aultmore",
+        "score": 1,
+        "source": ["exact", "text", "prefix", "contained"],
+        "entityId": 191,
+        "reference": "Aultmore",
+        "shortName": null,
+        "retrievedFor": [
+          {
+            "exact": true,
+            "query": "Aultmore"
+          }
+        ]
+      },
+      {
+        "kind": "brand",
+        "name": "Special Releases",
+        "score": 1,
+        "source": ["exact", "text", "prefix", "contained"],
+        "entityId": 366607,
+        "reference": "Special Releases",
+        "shortName": null,
+        "retrievedFor": [
+          {
+            "exact": true,
+            "query": "Special Releases"
+          }
+        ]
+      },
+      {
+        "kind": "distillery",
+        "name": "Benrinnes",
+        "score": 1,
+        "source": ["exact", "text", "prefix", "contained"],
+        "entityId": 89,
+        "reference": "Benrinnes",
+        "shortName": null,
+        "retrievedFor": [
+          {
+            "exact": true,
+            "query": "Benrinnes"
+          }
+        ]
+      },
+      {
+        "kind": "brand",
+        "name": "Maker's Mark",
+        "score": 1,
+        "source": ["exact", "text", "prefix", "contained"],
+        "entityId": 1166,
+        "reference": "Maker's Mark",
+        "shortName": null,
+        "retrievedFor": [
+          {
+            "exact": true,
+            "query": "Maker's Mark"
+          },
+          {
+            "query": "Maker's Mark Distillery"
+          }
+        ]
+      },
+      {
+        "kind": "distillery",
+        "name": "Maker's Mark Distillery",
+        "score": 1,
+        "source": ["text", "prefix", "exact", "contained"],
+        "entityId": 366688,
+        "reference": "Maker's Mark Distillery",
+        "shortName": null,
+        "retrievedFor": [
+          {
+            "query": "Maker's Mark"
+          },
+          {
+            "exact": true,
+            "query": "Maker's Mark Distillery"
+          }
+        ]
+      },
+      {
+        "kind": "distillery",
+        "name": "Chichibu",
+        "score": 1,
+        "source": ["exact", "text", "prefix", "contained"],
+        "entityId": 348,
+        "reference": "Chichibu",
+        "shortName": null,
+        "retrievedFor": [
+          {
+            "exact": true,
+            "query": "Chichibu"
+          }
+        ]
+      },
+      {
+        "kind": "brand",
+        "name": "Vintage",
+        "score": 1,
+        "source": ["exact", "text", "prefix", "contained"],
+        "entityId": 4392,
+        "reference": "Vintage",
+        "shortName": null,
+        "retrievedFor": [
+          {
+            "exact": true,
+            "query": "Vintage"
+          }
+        ]
+      },
+      {
+        "kind": "brand",
+        "name": "Watashi Whisky",
+        "score": 1,
+        "source": ["exact", "text", "prefix", "contained"],
+        "entityId": 366052,
+        "reference": "Watashi Whisky",
+        "shortName": null,
+        "retrievedFor": [
+          {
+            "exact": true,
+            "query": "Watashi Whisky"
+          }
+        ]
+      },
+      {
+        "kind": "distillery",
+        "name": "Blair Athol",
+        "score": 1,
+        "source": ["exact", "text", "prefix", "contained"],
+        "entityId": 92,
+        "reference": "Blair Athol",
+        "shortName": null,
+        "retrievedFor": [
+          {
+            "exact": true,
+            "query": "Blair Athol"
+          }
+        ]
+      },
+      {
+        "kind": "distillery",
+        "name": "Kilchoman",
+        "score": 1,
+        "source": ["exact", "text", "prefix", "contained"],
+        "entityId": 175,
+        "reference": "Kilchoman",
+        "shortName": "",
+        "retrievedFor": [
+          {
+            "exact": true,
+            "query": "Kilchoman"
+          }
+        ]
+      },
+      {
+        "kind": "bottler",
+        "name": "The Whisky Exchange",
+        "score": 1,
+        "source": ["exact", "text", "prefix", "contained"],
+        "entityId": 5952,
+        "reference": "The Whisky Exchange",
+        "shortName": null,
+        "retrievedFor": [
+          {
+            "exact": true,
+            "query": "The Whisky Exchange"
+          }
+        ]
+      },
+      {
+        "kind": "bottler",
+        "name": "Chichibu Reiwa Whisky",
+        "score": 0.5,
+        "source": ["text", "prefix"],
+        "entityId": 367660,
+        "reference": "Chichibu Reiwa Whisky",
+        "shortName": null,
+        "retrievedFor": [
+          {
+            "query": "Chichibu"
+          }
+        ]
+      },
+      {
+        "kind": "bottler",
+        "name": "The Vintage Malt Whisky Co Ltd.",
+        "score": 0.5,
+        "source": ["text", "prefix"],
+        "entityId": 5843,
+        "reference": "Vintage Malt Whisky Co Ltd.",
+        "shortName": null,
+        "retrievedFor": [
+          {
+            "query": "Vintage"
+          }
+        ]
+      },
+      {
+        "kind": "bottler",
+        "name": "Vintage Bottlers",
+        "score": 0.5,
+        "source": ["text", "prefix"],
+        "entityId": 5991,
+        "reference": "Vintage Bottlers",
+        "shortName": null,
+        "retrievedFor": [
+          {
+            "query": "Vintage"
+          }
+        ]
+      },
+      {
+        "kind": "brand",
+        "name": "Vintage Islay",
+        "score": 0.5,
+        "source": ["prefix"],
+        "entityId": 4394,
+        "reference": "Vintage Islay",
+        "shortName": null,
+        "retrievedFor": [
+          {
+            "query": "Vintage"
+          }
+        ]
+      },
+      {
+        "kind": "brand",
+        "name": "Vintage Campbeltown",
+        "score": 0.5,
+        "source": ["prefix"],
+        "entityId": 4393,
+        "reference": "Vintage Campbeltown",
+        "shortName": null,
+        "retrievedFor": [
+          {
+            "query": "Vintage"
+          }
+        ]
+      },
+      {
+        "kind": "bottler",
+        "name": "&Whisky",
+        "score": 0.3423076923076923,
+        "source": ["contained"],
+        "entityId": 365821,
+        "reference": "&Whisky",
+        "shortName": null,
+        "retrievedFor": [
+          {
+            "query": "Watashi Whisky"
+          },
+          {
+            "query": "The Whisky Exchange"
+          }
+        ]
+      }
+    ],
+    "inspectedSeries": []
+  },
+  "provenance": {
+    "source": "production_miss",
+    "verifiedSourceUrls": [
+      "https://www.scotchwhiskyauctions.com/auctions/234-the-185th-auction/905664-kilchoman-2013-10-year-old-100-islay-single-cask-21/"
+    ],
+    "dbOutcome": {
+      "bottleId": null,
+      "createsBottle": false,
+      "summary": "Production returned no_match: the server downgraded the agent's match because the source did not print 21/2013."
+    },
+    "notes": "Captured from saved classifier run 35745 (auction_lot 16150, model null, 2026-11-03T15:31:41.996Z). Production rationale: The auction listing identifies the Kilchoman 2013 10-year-old 100% Islay single cask #21. Exact-product search results identify this as Kilchoman cask 21/2013 for Royal Mile Whiskies at 55.4% ABV, consistent with inspected Bottle 60162, including its age, vintage, bottling year, cask, and outturn. The auction listing is a retailer reference, not a global alias. Server downgraded the existing-match recommendation because candidate cask code 21/2013 was not established by the source. Expected outcome checked against the lot page on 2026-11-09 and a judged review of the 185th auction on 2026-11-03."
+  },
+  "expected": {
+    "status": "classified",
+    "action": "match",
+    "identityScope": "exact_cask",
+    "matchedBottleId": 60162,
+    "summary": "Match 60162. Kilchoman numbers casks as number/year, so cask 21 distilled 24.01.2013 is cask 21/2013. Strength (55.4%), age (10), and bottling (2023) agree."
+  }
+}

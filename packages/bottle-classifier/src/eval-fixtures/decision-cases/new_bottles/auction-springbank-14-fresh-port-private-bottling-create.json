@@ -1,0 +1,831 @@
+{
+  "id": "auction-springbank-14-fresh-port-private-bottling-create",
+  "name": "Springbank 14 Year Old Fresh Port Wood Private Bottling: create the one private bottling the label shows",
+  "input": {
+    "reference": {
+      "id": 3949,
+      "url": "https://www.scotchwhiskyauctions.com/auctions/232-the-183rd-auction/896293-springbank-14-year-old-fresh-port-wood-private-bottling/",
+      "name": "Springbank 14 Year Old Fresh Port Wood Private Bottling",
+      "imageUrl": null,
+      "externalSiteId": 28097,
+      "currentBottleId": null
+    },
+    "extractedIdentity": {
+      "abv": null,
+      "brand": "Springbank",
+      "series": null,
+      "bottler": null,
+      "edition": null,
+      "outturn": null,
+      "category": "single_malt",
+      "distillery": ["Springbank"],
+      "expression": "Fresh Port Wood",
+      "maturation": "Fresh port wood",
+      "stated_age": 14,
+      "cask_number": null,
+      "release_day": null,
+      "single_cask": null,
+      "release_year": null,
+      "vintage_year": null,
+      "bottling_year": null,
+      "cask_strength": null,
+      "release_month": null
+    },
+    "extractedIdentitySource": "text",
+    "imageEvidence": {
+      "sourceImageId": "auction_lot:3949",
+      "extractors": [
+        {
+          "kind": "vision",
+          "confidence": 0.75,
+          "textSpans": [
+            {
+              "text": "SPRINGBANK\nSingle Malt Scotch Whisky\nSPRINGBANK DISTILLERY\nPrivate Bottling\nSingle Cask\nFresh Port Wood\n14 Year Old\nDistilled by J. & A. MITCHELL & CO. LTD.\nSpringbank Distillery Campbeltown Scotland\n70cl\nPRODUCT OF SCOTLAND\nCask Strength",
+              "confidence": 0.75
+            }
+          ],
+          "observations": [
+            "Read whisky label identity from the auction lot photo."
+          ]
+        }
+      ],
+      "fieldCandidates": {
+        "brand": {
+          "value": "Springbank",
+          "confidence": 0.75,
+          "sourceExtractorIndexes": [0]
+        },
+        "distillery": {
+          "value": ["Springbank"],
+          "confidence": 0.75,
+          "sourceExtractorIndexes": [0]
+        },
+        "category": {
+          "value": "single_malt",
+          "confidence": 0.75,
+          "sourceExtractorIndexes": [0]
+        },
+        "statedAge": {
+          "value": 14,
+          "confidence": 0.75,
+          "sourceExtractorIndexes": [0]
+        },
+        "singleCask": {
+          "value": true,
+          "confidence": 0.75,
+          "sourceExtractorIndexes": [0]
+        },
+        "caskStrength": {
+          "value": true,
+          "confidence": 0.75,
+          "sourceExtractorIndexes": [0]
+        }
+      },
+      "photoSuitability": {
+        "isSingleBottlePhoto": true,
+        "labelReadable": true,
+        "suitableAsTastingImage": false,
+        "suitableAsBottleImage": false,
+        "reason": null
+      },
+      "conflicts": []
+    },
+    "initialCandidates": [
+      {
+        "abv": null,
+        "brand": "Springbank",
+        "score": 74.85433,
+        "series": null,
+        "source": ["text", "brand_coverage"],
+        "bottler": "Springbank",
+        "edition": null,
+        "outturn": null,
+        "bottleId": 3331,
+        "category": "single_malt",
+        "fullName": "Springbank 14-year-old Bourbon Wood",
+        "reference": null,
+        "statedAge": 14,
+        "caskNumber": null,
+        "comparison": {
+          "missing": ["distillers"],
+          "conflicts": [],
+          "agreements": ["category", "statedAge", "brand"]
+        },
+        "distillery": [],
+        "maturation": null,
+        "releaseDay": null,
+        "singleCask": null,
+        "releaseYear": null,
+        "vintageYear": null,
+        "bottlingYear": null,
+        "caskStrength": null,
+        "releaseMonth": null,
+        "familyContext": {
+          "siblingBottles": []
+        }
+      },
+      {
+        "abv": null,
+        "brand": "Springbank",
+        "score": 60.401237,
+        "series": null,
+        "source": ["text", "brand_coverage", "context"],
+        "bottler": "Springbank",
+        "edition": null,
+        "outturn": null,
+        "bottleId": 735,
+        "category": "single_malt",
+        "fullName": "Springbank 14-year-old",
+        "reference": null,
+        "statedAge": 14,
+        "caskNumber": null,
+        "comparison": {
+          "missing": [],
+          "conflicts": [],
+          "agreements": ["category", "statedAge", "brand", "distillers"]
+        },
+        "distillery": ["Springbank"],
+        "maturation": null,
+        "releaseDay": null,
+        "singleCask": null,
+        "releaseYear": null,
+        "vintageYear": null,
+        "bottlingYear": null,
+        "caskStrength": null,
+        "releaseMonth": null,
+        "familyContext": {
+          "siblingBottles": []
+        }
+      },
+      {
+        "abv": 57.1,
+        "brand": "Springbank",
+        "score": 58.745827,
+        "series": null,
+        "source": ["text"],
+        "bottler": null,
+        "edition": "Springbank Society",
+        "outturn": 576,
+        "bottleId": 63649,
+        "category": "single_malt",
+        "fullName": "Springbank 14-year-old - Springbank Society",
+        "reference": null,
+        "statedAge": 14,
+        "caskNumber": null,
+        "comparison": {
+          "missing": [],
+          "conflicts": [],
+          "agreements": ["category", "statedAge", "brand", "distillers"]
+        },
+        "distillery": ["Springbank"],
+        "maturation": null,
+        "releaseDay": null,
+        "singleCask": null,
+        "releaseYear": null,
+        "vintageYear": 1995,
+        "bottlingYear": 2010,
+        "caskStrength": null,
+        "releaseMonth": null,
+        "familyContext": {
+          "siblingBottles": []
+        }
+      },
+      {
+        "abv": null,
+        "brand": "Springbank",
+        "score": 56.062576,
+        "series": null,
+        "source": ["text"],
+        "bottler": "Springbank",
+        "edition": null,
+        "outturn": null,
+        "bottleId": 2967,
+        "category": "single_malt",
+        "fullName": "Springbank 14-year-old Single Cask",
+        "reference": null,
+        "statedAge": 14,
+        "caskNumber": null,
+        "comparison": {
+          "missing": ["distillers"],
+          "conflicts": [],
+          "agreements": ["category", "statedAge", "brand"]
+        },
+        "distillery": [],
+        "maturation": null,
+        "releaseDay": null,
+        "singleCask": true,
+        "releaseYear": null,
+        "vintageYear": null,
+        "bottlingYear": null,
+        "caskStrength": null,
+        "releaseMonth": null,
+        "familyContext": {
+          "siblingBottles": []
+        }
+      },
+      {
+        "abv": null,
+        "brand": "Springbank",
+        "score": 54.941025,
+        "series": null,
+        "source": ["text", "brand_coverage"],
+        "bottler": "Springbank",
+        "edition": null,
+        "outturn": null,
+        "bottleId": 4700,
+        "category": "single_malt",
+        "fullName": "Springbank 14-year-old Cask Strength",
+        "reference": null,
+        "statedAge": 14,
+        "caskNumber": null,
+        "comparison": {
+          "missing": ["distillers"],
+          "conflicts": [],
+          "agreements": ["category", "statedAge", "brand"]
+        },
+        "distillery": [],
+        "maturation": null,
+        "releaseDay": null,
+        "singleCask": null,
+        "releaseYear": null,
+        "vintageYear": null,
+        "bottlingYear": null,
+        "caskStrength": true,
+        "releaseMonth": null,
+        "familyContext": {
+          "siblingBottles": []
+        }
+      },
+      {
+        "abv": null,
+        "brand": "Port Askaig",
+        "score": 54.67488,
+        "series": null,
+        "source": ["text"],
+        "bottler": null,
+        "edition": null,
+        "outturn": null,
+        "bottleId": 14085,
+        "category": "single_malt",
+        "fullName": "Port Askaig 14-year-old Bourbon Cask",
+        "reference": null,
+        "statedAge": 14,
+        "caskNumber": null,
+        "comparison": {
+          "missing": ["distillers"],
+          "conflicts": ["brand"],
+          "agreements": ["category", "statedAge"]
+        },
+        "distillery": [],
+        "maturation": null,
+        "releaseDay": null,
+        "singleCask": null,
+        "releaseYear": null,
+        "vintageYear": null,
+        "bottlingYear": null,
+        "caskStrength": null,
+        "releaseMonth": null,
+        "familyContext": {
+          "siblingBottles": []
+        }
+      },
+      {
+        "abv": 54.8,
+        "brand": "Springbank",
+        "score": 53.907463,
+        "series": null,
+        "source": ["vector", "text"],
+        "bottler": "Springbank",
+        "edition": "Manzanilla Cask #259",
+        "outturn": 546,
+        "bottleId": 56596,
+        "category": "single_malt",
+        "fullName": "Springbank 14-year-old - Manzanilla Cask #259",
+        "reference": "Springbank 14-year-old Manzanilla Cask (#259)",
+        "statedAge": 14,
+        "caskNumber": "259",
+        "comparison": {
+          "missing": [],
+          "conflicts": [],
+          "agreements": ["category", "statedAge", "brand", "distillers"]
+        },
+        "distillery": ["Springbank"],
+        "maturation": "Manzanilla sherry cask",
+        "releaseDay": null,
+        "singleCask": true,
+        "releaseYear": 2011,
+        "vintageYear": 1996,
+        "bottlingYear": 2011,
+        "caskStrength": true,
+        "releaseMonth": null,
+        "familyContext": {
+          "siblingBottles": []
+        }
+      },
+      {
+        "abv": 55.4,
+        "brand": "Springbank",
+        "score": 53.100323,
+        "series": null,
+        "source": ["vector", "text", "brand_coverage"],
+        "bottler": "Springbank",
+        "edition": "Amontillado Cask #305",
+        "outturn": 524,
+        "bottleId": 56594,
+        "category": "single_malt",
+        "fullName": "Springbank 14-year-old - Amontillado Cask #305",
+        "reference": "Springbank 14-year-old - Amontillado Cask #305",
+        "statedAge": 14,
+        "caskNumber": "305",
+        "comparison": {
+          "missing": [],
+          "conflicts": [],
+          "agreements": ["category", "statedAge", "brand", "distillers"]
+        },
+        "distillery": ["Springbank"],
+        "maturation": "Amontillado sherry cask",
+        "releaseDay": null,
+        "singleCask": true,
+        "releaseYear": 2011,
+        "vintageYear": 1996,
+        "bottlingYear": 2011,
+        "caskStrength": true,
+        "releaseMonth": null,
+        "familyContext": {
+          "siblingBottles": []
+        }
+      },
+      {
+        "abv": 55.3,
+        "brand": "Springbank",
+        "score": 53.100323,
+        "series": null,
+        "source": ["vector", "text"],
+        "bottler": "Springbank",
+        "edition": "Fino Cask #265",
+        "outturn": null,
+        "bottleId": 56595,
+        "category": "single_malt",
+        "fullName": "Springbank 14-year-old - Fino Cask #265",
+        "reference": "Springbank 14-year-old - Fino Cask #265",
+        "statedAge": 14,
+        "caskNumber": "265",
+        "comparison": {
+          "missing": [],
+          "conflicts": [],
+          "agreements": ["category", "statedAge", "brand", "distillers"]
+        },
+        "distillery": ["Springbank"],
+        "maturation": "Fino sherry cask",
+        "releaseDay": null,
+        "singleCask": true,
+        "releaseYear": 2011,
+        "vintageYear": 1996,
+        "bottlingYear": 2011,
+        "caskStrength": true,
+        "releaseMonth": null,
+        "familyContext": {
+          "siblingBottles": []
+        }
+      },
+      {
+        "abv": 56.2,
+        "brand": "Springbank",
+        "score": 53.100323,
+        "series": null,
+        "source": ["vector", "text"],
+        "bottler": "Springbank",
+        "edition": "Oloroso Cask #268",
+        "outturn": 546,
+        "bottleId": 56597,
+        "category": "single_malt",
+        "fullName": "Springbank 14-year-old - Oloroso Cask #268",
+        "reference": "Springbank 14-year-old - Oloroso Cask #268",
+        "statedAge": 14,
+        "caskNumber": "268",
+        "comparison": {
+          "missing": [],
+          "conflicts": [],
+          "agreements": ["category", "statedAge", "brand", "distillers"]
+        },
+        "distillery": ["Springbank"],
+        "maturation": "Oloroso sherry cask",
+        "releaseDay": null,
+        "singleCask": true,
+        "releaseYear": 2011,
+        "vintageYear": 1996,
+        "bottlingYear": 2011,
+        "caskStrength": true,
+        "releaseMonth": null,
+        "familyContext": {
+          "siblingBottles": []
+        }
+      },
+      {
+        "abv": null,
+        "brand": "GlenAllachie",
+        "score": 43.6304,
+        "series": null,
+        "source": ["text"],
+        "bottler": null,
+        "edition": null,
+        "outturn": null,
+        "bottleId": 12985,
+        "category": "single_malt",
+        "fullName": "GlenAllachie 14-year-old Port Pipe ImpEx Single Cask 2006 (No. 7862)",
+        "reference": null,
+        "statedAge": 14,
+        "caskNumber": null,
+        "comparison": {
+          "missing": ["distillers"],
+          "conflicts": ["brand"],
+          "agreements": ["category", "statedAge"]
+        },
+        "distillery": [],
+        "maturation": null,
+        "releaseDay": null,
+        "singleCask": true,
+        "releaseYear": null,
+        "vintageYear": null,
+        "bottlingYear": null,
+        "caskStrength": null,
+        "releaseMonth": null,
+        "familyContext": {
+          "siblingBottles": []
+        }
+      },
+      {
+        "abv": null,
+        "brand": "Scapa",
+        "score": 43.442345,
+        "series": null,
+        "source": ["text"],
+        "bottler": "Scapa",
+        "edition": null,
+        "outturn": null,
+        "bottleId": 1163,
+        "category": "single_malt",
+        "fullName": "Scapa 14-year-old",
+        "reference": null,
+        "statedAge": 14,
+        "caskNumber": null,
+        "comparison": {
+          "missing": ["distillers"],
+          "conflicts": ["brand"],
+          "agreements": ["category", "statedAge"]
+        },
+        "distillery": [],
+        "maturation": null,
+        "releaseDay": null,
+        "singleCask": null,
+        "releaseYear": null,
+        "vintageYear": null,
+        "bottlingYear": null,
+        "caskStrength": null,
+        "releaseMonth": null,
+        "familyContext": {
+          "siblingBottles": []
+        }
+      },
+      {
+        "abv": null,
+        "brand": "Longrow",
+        "score": 42.02925,
+        "series": null,
+        "source": ["text"],
+        "bottler": null,
+        "edition": null,
+        "outturn": null,
+        "bottleId": 17909,
+        "category": "single_malt",
+        "fullName": "Longrow 14-year-old",
+        "reference": null,
+        "statedAge": 14,
+        "caskNumber": null,
+        "comparison": {
+          "missing": ["distillers"],
+          "conflicts": ["brand"],
+          "agreements": ["category", "statedAge"]
+        },
+        "distillery": [],
+        "maturation": null,
+        "releaseDay": null,
+        "singleCask": null,
+        "releaseYear": null,
+        "vintageYear": null,
+        "bottlingYear": null,
+        "caskStrength": null,
+        "releaseMonth": null,
+        "familyContext": {
+          "siblingBottles": []
+        }
+      },
+      {
+        "abv": null,
+        "brand": "Arran",
+        "score": 41.245018,
+        "series": null,
+        "source": ["text"],
+        "bottler": null,
+        "edition": null,
+        "outturn": null,
+        "bottleId": 1083,
+        "category": "single_malt",
+        "fullName": "Arran 14-year-old",
+        "reference": null,
+        "statedAge": 14,
+        "caskNumber": null,
+        "comparison": {
+          "missing": ["distillers"],
+          "conflicts": ["brand"],
+          "agreements": ["category", "statedAge"]
+        },
+        "distillery": [],
+        "maturation": null,
+        "releaseDay": null,
+        "singleCask": null,
+        "releaseYear": null,
+        "vintageYear": null,
+        "bottlingYear": null,
+        "caskStrength": null,
+        "releaseMonth": null,
+        "familyContext": {
+          "siblingBottles": []
+        }
+      },
+      {
+        "abv": 57.4,
+        "brand": "Springbank",
+        "score": 0.7777777777777778,
+        "series": null,
+        "source": ["brand_coverage"],
+        "bottler": null,
+        "edition": "drinks.com.tw 25th Anniversary",
+        "outturn": null,
+        "bottleId": 53516,
+        "category": "single_malt",
+        "fullName": "Springbank Single Cask - drinks.com.tw 25th Anniversary",
+        "reference": null,
+        "statedAge": 14,
+        "caskNumber": "997",
+        "comparison": {
+          "missing": [],
+          "conflicts": [],
+          "agreements": ["category", "statedAge", "brand", "distillers"]
+        },
+        "distillery": ["Springbank"],
+        "maturation": "Fresh Sherry cask",
+        "releaseDay": null,
+        "singleCask": true,
+        "releaseYear": 2018,
+        "vintageYear": 2003,
+        "bottlingYear": 2018,
+        "caskStrength": true,
+        "releaseMonth": null,
+        "familyContext": {
+          "siblingBottles": []
+        }
+      }
+    ]
+  },
+  "context": {
+    "inspectedBottleIds": [735],
+    "bottleContexts": [
+      {
+        "exact": {
+          "abv": null,
+          "edition": null,
+          "outturn": null,
+          "statedAge": null,
+          "caskNumber": null,
+          "maturation": null,
+          "releaseDay": null,
+          "singleCask": null,
+          "releaseYear": null,
+          "vintageYear": null,
+          "bottlingYear": null,
+          "caskStrength": null,
+          "releaseMonth": null
+        },
+        "shared": {
+          "name": "14-year-old",
+          "brand": {
+            "name": "Springbank",
+            "entityId": 1362
+          },
+          "series": null,
+          "bottler": {
+            "name": "Springbank",
+            "entityId": 1362
+          },
+          "category": "single_malt",
+          "statedAge": 14,
+          "distillers": [
+            {
+              "name": "Springbank",
+              "entityId": 1362
+            }
+          ]
+        },
+        "groupId": 9375,
+        "bottleId": 735,
+        "fullName": "Springbank 14-year-old",
+        "siblings": [],
+        "references": [
+          {
+            "name": "Springbank 14-year-old",
+            "ignored": false
+          }
+        ],
+        "observations": [],
+        "imageSources": []
+      }
+    ],
+    "inspectedEntities": [
+      {
+        "kind": "distillery",
+        "name": "Springbank",
+        "score": 1,
+        "source": ["exact", "text", "prefix", "contained"],
+        "entityId": 1362,
+        "reference": "Springbank",
+        "shortName": null,
+        "retrievedFor": [
+          {
+            "exact": true,
+            "query": "Springbank"
+          }
+        ]
+      },
+      {
+        "kind": "brand",
+        "name": "Port Askaig",
+        "score": 1,
+        "source": ["exact", "text", "prefix", "contained"],
+        "entityId": 1268,
+        "reference": "Port Askaig",
+        "shortName": null,
+        "retrievedFor": [
+          {
+            "exact": true,
+            "query": "Port Askaig"
+          }
+        ]
+      },
+      {
+        "kind": "distillery",
+        "name": "GlenAllachie",
+        "score": 1,
+        "source": ["exact", "text", "prefix", "contained"],
+        "entityId": 123,
+        "reference": "Glenallachie",
+        "shortName": null,
+        "retrievedFor": [
+          {
+            "exact": true,
+            "query": "GlenAllachie"
+          }
+        ]
+      },
+      {
+        "kind": "distillery",
+        "name": "Scapa",
+        "score": 1,
+        "source": ["exact", "text", "prefix", "contained"],
+        "entityId": 1314,
+        "reference": "Scapa",
+        "shortName": null,
+        "retrievedFor": [
+          {
+            "exact": true,
+            "query": "Scapa"
+          }
+        ]
+      },
+      {
+        "kind": "brand",
+        "name": "Longrow",
+        "score": 1,
+        "source": ["exact", "text", "prefix", "contained"],
+        "entityId": 1152,
+        "reference": "Longrow",
+        "shortName": null,
+        "retrievedFor": [
+          {
+            "exact": true,
+            "query": "Longrow"
+          }
+        ]
+      },
+      {
+        "kind": "brand",
+        "name": "Arran",
+        "score": 1,
+        "source": ["exact", "text", "prefix", "contained"],
+        "entityId": 112,
+        "reference": "Arran",
+        "shortName": null,
+        "retrievedFor": [
+          {
+            "exact": true,
+            "query": "Arran"
+          }
+        ]
+      },
+      {
+        "kind": "company",
+        "name": "The GlenAllachie Distillers Company",
+        "score": 0.5,
+        "source": ["text", "prefix"],
+        "entityId": 366077,
+        "reference": "GlenAllachie Distillers Company",
+        "shortName": null,
+        "retrievedFor": [
+          {
+            "query": "GlenAllachie"
+          }
+        ]
+      },
+      {
+        "kind": "company",
+        "name": "Whisk-e Limited",
+        "score": 0.5,
+        "source": ["text", "prefix"],
+        "entityId": 5381,
+        "reference": "Arran Japan Limited",
+        "shortName": null,
+        "retrievedFor": [
+          {
+            "query": "Arran"
+          }
+        ]
+      },
+      {
+        "kind": "brand",
+        "name": "Askaig",
+        "score": 0.37,
+        "source": ["contained"],
+        "entityId": 2128,
+        "reference": "Askaig",
+        "shortName": null,
+        "retrievedFor": [
+          {
+            "query": "Port Askaig"
+          }
+        ]
+      },
+      {
+        "kind": "company",
+        "name": "Isle of Arran Distillers",
+        "score": 0.2,
+        "source": ["text"],
+        "entityId": 5872,
+        "reference": null,
+        "shortName": "Isle of Arran",
+        "retrievedFor": [
+          {
+            "query": "Arran"
+          }
+        ]
+      }
+    ],
+    "inspectedSeries": []
+  },
+  "provenance": {
+    "source": "production_miss",
+    "verifiedSourceUrls": [
+      "https://www.scotchwhiskyauctions.com/auctions/232-the-183rd-auction/896293-springbank-14-year-old-fresh-port-wood-private-bottling/",
+      "https://d3suvtcq00dftb.cloudfront.net/images/625de99386f99325a53c160d8336e66d-zoom.jpg"
+    ],
+    "dbOutcome": {
+      "bottleId": null,
+      "createsBottle": false,
+      "summary": "Production returned no_match."
+    },
+    "notes": "Captured from saved classifier run 22023 (auction_lot 3949, model null, 2026-10-02T04:30:27.250Z). Production rationale: No safe match or supported creation. Candidate 735 is only a generic Springbank 14-year-old, while the auction listing describes Fresh Port Wood and a private bottling. The page read exposed no further label details, so creating a distinct Bottle or assigning bottler and canonical title would require unsupported assumptions. The run predates lot-photo reading (#1608), so this case adds a reviewed transcription of the lot's first photo at full size, in the shape production's label reading takes; no extractor ran on this lot. The label prints Private Bottling, Single Cask, Fresh Port Wood, 14 Year Old, 70cl and Cask Strength, with no cask number, owner, date or ABV. 18 lots in the 182nd to 185th auctions (3949-3953, 8396-8399, 12678-12681, 17739-17743) carry the same label and the same lot text, including Scotch Whisky Auctions' note of a Springbank bottling statement giving about 46.5%, so they are one consignor's stock of one private bottling. Owner decision 2026-11-09: this label is one Bottle. Production has no such Bottle (searched 2026-11-09); older Springbank private bottlings such as 1557 use the older naming shape with Private Bottling in the name."
+  },
+  "expected": {
+    "status": "classified",
+    "action": "create_bottle",
+    "identityScope": "exact_cask",
+    "matchedBottleId": null,
+    "proposedBottle": {
+      "brand": {
+        "id": 1362
+      },
+      "category": "single_malt",
+      "statedAge": 14,
+      "edition": "Private Bottling",
+      "singleCask": true,
+      "caskStrength": true,
+      "abv": null,
+      "vintageYear": null
+    },
+    "proposedBottleNameIncludes": ["Fresh Port Wood"],
+    "proposedBottleDistillerIds": [1362],
+    "summary": "Create Springbank 14-year-old Fresh Port Wood with edition Private Bottling, single cask and cask strength. The label prints the selection, so it is the edition, not part of the name. Leave ABV empty: the label prints none, and the auction house's 46.5% is approximate. The generic 14-year-old (735) and the 14-year-old Bourbon Wood (3331) are other Bottles."
+  },
+  "knownFailure": {
+    "reason": "The agent creates the right single-cask, cask-strength Bottle but leaves edition empty: the naming rule names only selections that say who they were for, so it does not treat a printed Private Bottling as one."
+  }
+}

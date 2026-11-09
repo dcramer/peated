@@ -1,0 +1,1365 @@
+{
+  "id": "auction-springbank-2000-25-create",
+  "name": "Springbank 2000 25 Year Old: create the 2000 vintage; the undated 25-year-olds are too broad",
+  "input": {
+    "reference": {
+      "id": 17820,
+      "url": "https://www.scotchwhiskyauctions.com/auctions/234-the-185th-auction/905121-springbank-2000-25-year-old/",
+      "name": "Springbank 2000 25 Year Old",
+      "imageUrl": null,
+      "externalSiteId": 28097,
+      "currentBottleId": null
+    },
+    "extractedIdentity": {
+      "abv": 44.5,
+      "brand": null,
+      "series": null,
+      "bottler": null,
+      "edition": null,
+      "outturn": null,
+      "category": null,
+      "distillery": null,
+      "expression": null,
+      "maturation": null,
+      "stated_age": null,
+      "cask_number": null,
+      "single_cask": null,
+      "release_year": null,
+      "vintage_year": null,
+      "cask_strength": null
+    },
+    "extractedIdentitySource": "structured",
+    "imageEvidence": null,
+    "initialCandidates": [
+      {
+        "abv": null,
+        "brand": "Springbank",
+        "score": 62.825832,
+        "series": null,
+        "source": ["vector", "text", "context"],
+        "bottler": null,
+        "edition": null,
+        "outturn": null,
+        "bottleId": 469,
+        "category": "single_malt",
+        "fullName": "Springbank 25-year-old",
+        "reference": "Springbank 25-year-old",
+        "statedAge": 25,
+        "caskNumber": null,
+        "comparison": {
+          "missing": ["abv"],
+          "conflicts": [],
+          "agreements": []
+        },
+        "distillery": ["Springbank"],
+        "maturation": null,
+        "releaseDay": null,
+        "singleCask": null,
+        "releaseYear": null,
+        "vintageYear": null,
+        "bottlingYear": null,
+        "caskStrength": null,
+        "releaseMonth": null,
+        "familyContext": {
+          "siblingBottles": []
+        }
+      },
+      {
+        "abv": null,
+        "brand": "Springbank",
+        "score": 58.5153,
+        "series": null,
+        "source": ["text", "context"],
+        "bottler": null,
+        "edition": null,
+        "outturn": null,
+        "bottleId": 1563,
+        "category": "single_malt",
+        "fullName": "Springbank 25-year-old Limited Edition",
+        "reference": null,
+        "statedAge": 25,
+        "caskNumber": null,
+        "comparison": {
+          "missing": ["abv"],
+          "conflicts": [],
+          "agreements": []
+        },
+        "distillery": ["Springbank"],
+        "maturation": null,
+        "releaseDay": null,
+        "singleCask": null,
+        "releaseYear": null,
+        "vintageYear": null,
+        "bottlingYear": null,
+        "caskStrength": null,
+        "releaseMonth": null,
+        "familyContext": {
+          "siblingBottles": []
+        }
+      },
+      {
+        "abv": null,
+        "brand": "Port Askaig",
+        "score": 46.40661,
+        "series": null,
+        "source": ["text"],
+        "bottler": null,
+        "edition": null,
+        "outturn": null,
+        "bottleId": 17690,
+        "category": "single_malt",
+        "fullName": "Port Askaig 25-year-old",
+        "reference": null,
+        "statedAge": 25,
+        "caskNumber": null,
+        "comparison": {
+          "missing": ["abv", "vintageYear", "distillers"],
+          "conflicts": ["brand"],
+          "agreements": ["category", "statedAge"]
+        },
+        "distillery": [],
+        "maturation": null,
+        "releaseDay": null,
+        "singleCask": null,
+        "releaseYear": null,
+        "vintageYear": null,
+        "bottlingYear": null,
+        "caskStrength": null,
+        "releaseMonth": null,
+        "familyContext": {
+          "siblingBottles": []
+        }
+      },
+      {
+        "abv": null,
+        "brand": "Samuel Gelston's",
+        "score": 46.16555,
+        "series": null,
+        "source": ["text"],
+        "bottler": null,
+        "edition": null,
+        "outturn": null,
+        "bottleId": 14072,
+        "category": "single_malt",
+        "fullName": "Samuel Gelston's 25-year-old",
+        "reference": null,
+        "statedAge": 25,
+        "caskNumber": null,
+        "comparison": {
+          "missing": ["abv", "vintageYear", "distillers"],
+          "conflicts": ["brand"],
+          "agreements": ["category", "statedAge"]
+        },
+        "distillery": [],
+        "maturation": null,
+        "releaseDay": null,
+        "singleCask": null,
+        "releaseYear": null,
+        "vintageYear": null,
+        "bottlingYear": null,
+        "caskStrength": null,
+        "releaseMonth": null,
+        "familyContext": {
+          "siblingBottles": []
+        }
+      },
+      {
+        "abv": null,
+        "brand": "SPEY",
+        "score": 45.903145,
+        "series": null,
+        "source": ["text"],
+        "bottler": null,
+        "edition": null,
+        "outturn": null,
+        "bottleId": 15838,
+        "category": "single_malt",
+        "fullName": "SPEY Speyburn 25-year-old",
+        "reference": null,
+        "statedAge": 25,
+        "caskNumber": null,
+        "comparison": {
+          "missing": ["abv", "vintageYear", "distillers"],
+          "conflicts": ["brand"],
+          "agreements": ["category", "statedAge"]
+        },
+        "distillery": [],
+        "maturation": null,
+        "releaseDay": null,
+        "singleCask": null,
+        "releaseYear": null,
+        "vintageYear": null,
+        "bottlingYear": null,
+        "caskStrength": null,
+        "releaseMonth": null,
+        "familyContext": {
+          "siblingBottles": []
+        }
+      },
+      {
+        "abv": null,
+        "brand": "Ardmore",
+        "score": 45.903145,
+        "series": null,
+        "source": ["text"],
+        "bottler": null,
+        "edition": null,
+        "outturn": null,
+        "bottleId": 17502,
+        "category": "single_malt",
+        "fullName": "Ardmore 25-year-old",
+        "reference": null,
+        "statedAge": 25,
+        "caskNumber": null,
+        "comparison": {
+          "missing": ["abv", "vintageYear"],
+          "conflicts": ["brand", "distillers"],
+          "agreements": ["category", "statedAge"]
+        },
+        "distillery": ["Ardmore"],
+        "maturation": null,
+        "releaseDay": null,
+        "singleCask": null,
+        "releaseYear": null,
+        "vintageYear": null,
+        "bottlingYear": null,
+        "caskStrength": null,
+        "releaseMonth": null,
+        "familyContext": {
+          "siblingBottles": []
+        }
+      },
+      {
+        "abv": null,
+        "brand": "Benromach",
+        "score": 45.903145,
+        "series": null,
+        "source": ["text"],
+        "bottler": null,
+        "edition": null,
+        "outturn": null,
+        "bottleId": 18513,
+        "category": "single_malt",
+        "fullName": "Benromach 25-year-old",
+        "reference": null,
+        "statedAge": 25,
+        "caskNumber": null,
+        "comparison": {
+          "missing": ["abv", "vintageYear"],
+          "conflicts": ["brand", "distillers"],
+          "agreements": ["category", "statedAge"]
+        },
+        "distillery": ["Benromach"],
+        "maturation": null,
+        "releaseDay": null,
+        "singleCask": null,
+        "releaseYear": null,
+        "vintageYear": null,
+        "bottlingYear": null,
+        "caskStrength": null,
+        "releaseMonth": null,
+        "familyContext": {
+          "siblingBottles": []
+        }
+      },
+      {
+        "abv": null,
+        "brand": "Scapa",
+        "score": 45.903145,
+        "series": null,
+        "source": ["text"],
+        "bottler": null,
+        "edition": null,
+        "outturn": null,
+        "bottleId": 18497,
+        "category": "single_malt",
+        "fullName": "Scapa 25-year-old",
+        "reference": null,
+        "statedAge": 25,
+        "caskNumber": null,
+        "comparison": {
+          "missing": ["abv", "vintageYear"],
+          "conflicts": ["brand", "distillers"],
+          "agreements": ["category", "statedAge"]
+        },
+        "distillery": ["Scapa"],
+        "maturation": null,
+        "releaseDay": null,
+        "singleCask": null,
+        "releaseYear": null,
+        "vintageYear": null,
+        "bottlingYear": null,
+        "caskStrength": null,
+        "releaseMonth": null,
+        "familyContext": {
+          "siblingBottles": []
+        }
+      },
+      {
+        "abv": null,
+        "brand": "Longrow",
+        "score": 44.208195,
+        "series": null,
+        "source": ["text"],
+        "bottler": "Springbank",
+        "edition": null,
+        "outturn": null,
+        "bottleId": 1230,
+        "category": "single_malt",
+        "fullName": "Longrow 1974",
+        "reference": null,
+        "statedAge": 25,
+        "caskNumber": null,
+        "comparison": {
+          "missing": ["abv", "vintageYear", "distillers"],
+          "conflicts": ["brand"],
+          "agreements": ["category", "statedAge"]
+        },
+        "distillery": [],
+        "maturation": null,
+        "releaseDay": null,
+        "singleCask": null,
+        "releaseYear": null,
+        "vintageYear": null,
+        "bottlingYear": null,
+        "caskStrength": null,
+        "releaseMonth": null,
+        "familyContext": {
+          "siblingBottles": []
+        }
+      },
+      {
+        "abv": null,
+        "brand": "Arran",
+        "score": 43.463737,
+        "series": null,
+        "source": ["text"],
+        "bottler": "Arran",
+        "edition": null,
+        "outturn": null,
+        "bottleId": 541,
+        "category": "single_malt",
+        "fullName": "Arran 25-year-old",
+        "reference": null,
+        "statedAge": 25,
+        "caskNumber": null,
+        "comparison": {
+          "missing": ["abv", "vintageYear", "distillers"],
+          "conflicts": ["brand"],
+          "agreements": ["category", "statedAge"]
+        },
+        "distillery": [],
+        "maturation": null,
+        "releaseDay": null,
+        "singleCask": null,
+        "releaseYear": null,
+        "vintageYear": null,
+        "bottlingYear": null,
+        "caskStrength": null,
+        "releaseMonth": null,
+        "familyContext": {
+          "siblingBottles": []
+        }
+      },
+      {
+        "abv": null,
+        "brand": "Springbank",
+        "score": 41.70753,
+        "series": null,
+        "source": ["text", "brand"],
+        "bottler": null,
+        "edition": null,
+        "outturn": null,
+        "bottleId": 1558,
+        "category": "single_malt",
+        "fullName": "Springbank 2000 Starkicker",
+        "reference": null,
+        "statedAge": 20,
+        "caskNumber": null,
+        "comparison": {
+          "missing": ["abv"],
+          "conflicts": [],
+          "agreements": []
+        },
+        "distillery": ["Springbank"],
+        "maturation": null,
+        "releaseDay": null,
+        "singleCask": null,
+        "releaseYear": null,
+        "vintageYear": null,
+        "bottlingYear": null,
+        "caskStrength": null,
+        "releaseMonth": null,
+        "familyContext": {
+          "siblingBottles": []
+        }
+      },
+      {
+        "abv": 44.5,
+        "brand": "Outwalker",
+        "score": 35.27346,
+        "series": null,
+        "source": ["text"],
+        "bottler": null,
+        "edition": null,
+        "outturn": null,
+        "bottleId": 46909,
+        "category": "blend",
+        "fullName": "Outwalker The Restless Spirit - 44.5% ABV",
+        "reference": null,
+        "statedAge": null,
+        "caskNumber": null,
+        "comparison": {
+          "missing": [],
+          "conflicts": [],
+          "agreements": ["abv"]
+        },
+        "distillery": [],
+        "maturation": null,
+        "releaseDay": null,
+        "singleCask": null,
+        "releaseYear": null,
+        "vintageYear": null,
+        "bottlingYear": null,
+        "caskStrength": null,
+        "releaseMonth": null,
+        "familyContext": {
+          "siblingBottles": []
+        }
+      },
+      {
+        "abv": 44.5,
+        "brand": "Distillerie de Wambrechies",
+        "score": 35.259155,
+        "series": null,
+        "source": ["text"],
+        "bottler": null,
+        "edition": null,
+        "outturn": null,
+        "bottleId": 46186,
+        "category": "single_malt",
+        "fullName": "Distillerie de Wambrechies Madeira Cask Matured - 44.5% ABV",
+        "reference": null,
+        "statedAge": null,
+        "caskNumber": null,
+        "comparison": {
+          "missing": [],
+          "conflicts": [],
+          "agreements": ["abv"]
+        },
+        "distillery": ["Distillerie de Wambrechies"],
+        "maturation": "madeira",
+        "releaseDay": null,
+        "singleCask": null,
+        "releaseYear": null,
+        "vintageYear": null,
+        "bottlingYear": null,
+        "caskStrength": null,
+        "releaseMonth": null,
+        "familyContext": {
+          "siblingBottles": []
+        }
+      },
+      {
+        "abv": 44.5,
+        "brand": "William Cadenhead's",
+        "score": 33.7686,
+        "series": null,
+        "source": ["text"],
+        "bottler": "William Cadenhead's",
+        "edition": null,
+        "outturn": null,
+        "bottleId": 47490,
+        "category": "single_malt",
+        "fullName": "Cadenhead's Dallas Dhu 1962 26-year-old",
+        "reference": null,
+        "statedAge": 26,
+        "caskNumber": null,
+        "comparison": {
+          "missing": [],
+          "conflicts": [],
+          "agreements": ["abv"]
+        },
+        "distillery": ["Dallas Dhu"],
+        "maturation": null,
+        "releaseDay": null,
+        "singleCask": null,
+        "releaseYear": null,
+        "vintageYear": 1962,
+        "bottlingYear": 1989,
+        "caskStrength": null,
+        "releaseMonth": null,
+        "familyContext": {
+          "siblingBottles": []
+        }
+      },
+      {
+        "abv": 44.5,
+        "brand": "The Dalmore",
+        "score": 29.766594,
+        "series": "Ensemble Collection",
+        "source": ["text"],
+        "bottler": null,
+        "edition": null,
+        "outturn": null,
+        "bottleId": 45588,
+        "category": "single_malt",
+        "fullName": "Dalmore The Quintet",
+        "reference": null,
+        "statedAge": null,
+        "caskNumber": null,
+        "comparison": {
+          "missing": [],
+          "conflicts": [],
+          "agreements": ["abv"]
+        },
+        "distillery": ["The Dalmore"],
+        "maturation": "American white oak ex-bourbon, then Moscatel, Malmsey Madeira, Matusalem sherry, Port and Cabernet Sauvignon casks",
+        "releaseDay": null,
+        "singleCask": null,
+        "releaseYear": null,
+        "vintageYear": null,
+        "bottlingYear": null,
+        "caskStrength": null,
+        "releaseMonth": null,
+        "familyContext": {
+          "siblingBottles": []
+        }
+      },
+      {
+        "abv": 44.5,
+        "brand": "Murray McDavid",
+        "score": 29.698997,
+        "series": "Cask Craft",
+        "source": ["text"],
+        "bottler": "Murray McDavid",
+        "edition": null,
+        "outturn": null,
+        "bottleId": 47155,
+        "category": "single_malt",
+        "fullName": "Murray McDavid Benrinnes Rich & Fruity Port Finish - 44.5% ABV - Barrique",
+        "reference": null,
+        "statedAge": null,
+        "caskNumber": null,
+        "comparison": {
+          "missing": [],
+          "conflicts": [],
+          "agreements": ["abv"]
+        },
+        "distillery": ["Benrinnes"],
+        "maturation": null,
+        "releaseDay": null,
+        "singleCask": null,
+        "releaseYear": null,
+        "vintageYear": null,
+        "bottlingYear": null,
+        "caskStrength": null,
+        "releaseMonth": null,
+        "familyContext": {
+          "siblingBottles": []
+        }
+      },
+      {
+        "abv": 44.5,
+        "brand": "Murray McDavid",
+        "score": 29.589828,
+        "series": "Cask Craft",
+        "source": ["text"],
+        "bottler": "Murray McDavid",
+        "edition": null,
+        "outturn": null,
+        "bottleId": 45770,
+        "category": "single_malt",
+        "fullName": "Murray McDavid Croftengea Smoky & Fruity Port & Madeira Finish - 44.5% ABV",
+        "reference": null,
+        "statedAge": null,
+        "caskNumber": null,
+        "comparison": {
+          "missing": [],
+          "conflicts": [],
+          "agreements": ["abv"]
+        },
+        "distillery": ["Loch Lomond"],
+        "maturation": null,
+        "releaseDay": null,
+        "singleCask": null,
+        "releaseYear": null,
+        "vintageYear": null,
+        "bottlingYear": null,
+        "caskStrength": null,
+        "releaseMonth": null,
+        "familyContext": {
+          "siblingBottles": []
+        }
+      },
+      {
+        "abv": 44.5,
+        "brand": "Murray McDavid",
+        "score": 29.000183,
+        "series": "Cask Craft",
+        "source": ["text"],
+        "bottler": "Murray McDavid",
+        "edition": null,
+        "outturn": null,
+        "bottleId": 47376,
+        "category": "single_malt",
+        "fullName": "Murray McDavid Strathdearn Fruity & Spicy - 2022 Release - 44.5% ABV - Oloroso Cask",
+        "reference": null,
+        "statedAge": null,
+        "caskNumber": null,
+        "comparison": {
+          "missing": [],
+          "conflicts": [],
+          "agreements": ["abv"]
+        },
+        "distillery": ["Tomatin"],
+        "maturation": "oloroso",
+        "releaseDay": null,
+        "singleCask": null,
+        "releaseYear": 2022,
+        "vintageYear": null,
+        "bottlingYear": null,
+        "caskStrength": null,
+        "releaseMonth": null,
+        "familyContext": {
+          "siblingBottles": []
+        }
+      },
+      {
+        "abv": 44.5,
+        "brand": "Murray McDavid",
+        "score": 28.881397,
+        "series": "Cask Craft",
+        "source": ["text"],
+        "bottler": "Murray McDavid",
+        "edition": null,
+        "outturn": null,
+        "bottleId": 45651,
+        "category": "single_malt",
+        "fullName": "Murray McDavid Fruity & Sweet Madeira Finish - 44.5% ABV - Madeira Cask - Barrique",
+        "reference": null,
+        "statedAge": null,
+        "caskNumber": null,
+        "comparison": {
+          "missing": [],
+          "conflicts": [],
+          "agreements": ["abv"]
+        },
+        "distillery": ["Inchgower"],
+        "maturation": "madeira",
+        "releaseDay": null,
+        "singleCask": null,
+        "releaseYear": null,
+        "vintageYear": null,
+        "bottlingYear": null,
+        "caskStrength": null,
+        "releaseMonth": null,
+        "familyContext": {
+          "siblingBottles": []
+        }
+      },
+      {
+        "abv": 44.5,
+        "brand": "Claxton's",
+        "score": 28.566998,
+        "series": null,
+        "source": ["text"],
+        "bottler": "Claxton's",
+        "edition": "Dalswinton Series",
+        "outturn": null,
+        "bottleId": 62727,
+        "category": "single_malt",
+        "fullName": "Claxton's Springbank 30-year-old - Dalswinton Series",
+        "reference": null,
+        "statedAge": 30,
+        "caskNumber": null,
+        "comparison": {
+          "missing": [],
+          "conflicts": [],
+          "agreements": ["abv"]
+        },
+        "distillery": ["Springbank"],
+        "maturation": null,
+        "releaseDay": null,
+        "singleCask": null,
+        "releaseYear": null,
+        "vintageYear": 1993,
+        "bottlingYear": null,
+        "caskStrength": null,
+        "releaseMonth": null,
+        "familyContext": {
+          "siblingBottles": []
+        }
+      },
+      {
+        "abv": 44.5,
+        "brand": "Pure Scot",
+        "score": 27.78357,
+        "series": null,
+        "source": ["text"],
+        "bottler": null,
+        "edition": null,
+        "outturn": null,
+        "bottleId": 47266,
+        "category": "blend",
+        "fullName": "Pure Scot Midnight Peat - 44.5% ABV",
+        "reference": null,
+        "statedAge": null,
+        "caskNumber": null,
+        "comparison": {
+          "missing": [],
+          "conflicts": [],
+          "agreements": ["abv"]
+        },
+        "distillery": [],
+        "maturation": null,
+        "releaseDay": null,
+        "singleCask": false,
+        "releaseYear": null,
+        "vintageYear": null,
+        "bottlingYear": null,
+        "caskStrength": false,
+        "releaseMonth": null,
+        "familyContext": {
+          "siblingBottles": []
+        }
+      },
+      {
+        "abv": 44.5,
+        "brand": "Thompson Bros.",
+        "score": 27.566034,
+        "series": null,
+        "source": ["text"],
+        "bottler": "Thompson Bros.",
+        "edition": null,
+        "outturn": 504,
+        "bottleId": 56073,
+        "category": "single_malt",
+        "fullName": "Thompson Bros. Highland Single Malt Scotch Whisky",
+        "reference": null,
+        "statedAge": 19,
+        "caskNumber": null,
+        "comparison": {
+          "missing": [],
+          "conflicts": [],
+          "agreements": ["abv"]
+        },
+        "distillery": [],
+        "maturation": "1st Fill Bourbon Barrels",
+        "releaseDay": null,
+        "singleCask": null,
+        "releaseYear": null,
+        "vintageYear": null,
+        "bottlingYear": null,
+        "caskStrength": null,
+        "releaseMonth": null,
+        "familyContext": {
+          "siblingBottles": []
+        }
+      },
+      {
+        "abv": 44.5,
+        "brand": "Murray McDavid",
+        "score": 26.87539,
+        "series": "Cask Craft",
+        "source": ["text"],
+        "bottler": "Murray McDavid",
+        "edition": null,
+        "outturn": null,
+        "bottleId": 45661,
+        "category": "single_malt",
+        "fullName": "Murray McDavid Glen Elgin Smoke & Citrus Peated Finish - 44.5% ABV - Bourbon Cask - Hogshead - Refill",
+        "reference": null,
+        "statedAge": null,
+        "caskNumber": null,
+        "comparison": {
+          "missing": [],
+          "conflicts": [],
+          "agreements": ["abv"]
+        },
+        "distillery": ["Glen Elgin"],
+        "maturation": "bourbon",
+        "releaseDay": null,
+        "singleCask": null,
+        "releaseYear": null,
+        "vintageYear": null,
+        "bottlingYear": null,
+        "caskStrength": null,
+        "releaseMonth": null,
+        "familyContext": {
+          "siblingBottles": []
+        }
+      },
+      {
+        "abv": 54.2,
+        "brand": "Springbank",
+        "score": 0.8,
+        "series": null,
+        "source": ["brand", "brand_coverage"],
+        "bottler": null,
+        "edition": "For UK Customers",
+        "outturn": 540,
+        "bottleId": 69236,
+        "category": "single_malt",
+        "fullName": "Springbank 2000 16-year-old Single Cask - For UK Customers",
+        "reference": null,
+        "statedAge": 16,
+        "caskNumber": null,
+        "comparison": {
+          "missing": [],
+          "conflicts": ["statedAge", "abv"],
+          "agreements": ["category", "vintageYear", "brand", "distillers"]
+        },
+        "distillery": ["Springbank"],
+        "maturation": "single fresh sherry butt",
+        "releaseDay": null,
+        "singleCask": true,
+        "releaseYear": null,
+        "vintageYear": 2000,
+        "bottlingYear": 2016,
+        "caskStrength": true,
+        "releaseMonth": null,
+        "familyContext": {
+          "siblingBottles": []
+        }
+      },
+      {
+        "abv": null,
+        "brand": "Springbank",
+        "score": null,
+        "series": null,
+        "source": ["brand"],
+        "bottler": null,
+        "edition": null,
+        "outturn": null,
+        "bottleId": 4547,
+        "category": "single_malt",
+        "fullName": "Springbank 2000 Calvados Wood Expressions",
+        "reference": null,
+        "statedAge": 20,
+        "caskNumber": null,
+        "comparison": {
+          "missing": ["abv", "vintageYear"],
+          "conflicts": ["statedAge"],
+          "agreements": ["category", "brand", "distillers"]
+        },
+        "distillery": ["Springbank"],
+        "maturation": null,
+        "releaseDay": null,
+        "singleCask": null,
+        "releaseYear": null,
+        "vintageYear": null,
+        "bottlingYear": null,
+        "caskStrength": null,
+        "releaseMonth": null,
+        "familyContext": {
+          "siblingBottles": []
+        }
+      },
+      {
+        "abv": null,
+        "brand": "Springbank",
+        "score": null,
+        "series": null,
+        "source": ["brand"],
+        "bottler": null,
+        "edition": null,
+        "outturn": null,
+        "bottleId": 1559,
+        "category": "single_malt",
+        "fullName": "Springbank 2000 Private Bottling",
+        "reference": null,
+        "statedAge": 20,
+        "caskNumber": null,
+        "comparison": {
+          "missing": ["abv", "vintageYear"],
+          "conflicts": ["statedAge"],
+          "agreements": ["category", "brand", "distillers"]
+        },
+        "distillery": ["Springbank"],
+        "maturation": null,
+        "releaseDay": null,
+        "singleCask": null,
+        "releaseYear": null,
+        "vintageYear": null,
+        "bottlingYear": null,
+        "caskStrength": null,
+        "releaseMonth": null,
+        "familyContext": {
+          "siblingBottles": []
+        }
+      },
+      {
+        "abv": null,
+        "brand": "Springbank",
+        "score": null,
+        "series": null,
+        "source": ["brand"],
+        "bottler": "The Whisky Kingdom",
+        "edition": null,
+        "outturn": null,
+        "bottleId": 2232,
+        "category": "single_malt",
+        "fullName": "Springbank 2000 TWK for Wu Dram Clan",
+        "reference": null,
+        "statedAge": 20,
+        "caskNumber": null,
+        "comparison": {
+          "missing": ["abv", "vintageYear"],
+          "conflicts": ["statedAge"],
+          "agreements": ["category", "brand", "distillers"]
+        },
+        "distillery": ["Springbank"],
+        "maturation": null,
+        "releaseDay": null,
+        "singleCask": null,
+        "releaseYear": null,
+        "vintageYear": null,
+        "bottlingYear": null,
+        "caskStrength": null,
+        "releaseMonth": null,
+        "familyContext": {
+          "siblingBottles": []
+        }
+      }
+    ]
+  },
+  "context": {
+    "inspectedBottleIds": [469, 1563],
+    "bottleContexts": [
+      {
+        "exact": {
+          "abv": null,
+          "edition": null,
+          "outturn": null,
+          "statedAge": null,
+          "caskNumber": null,
+          "maturation": null,
+          "releaseDay": null,
+          "singleCask": null,
+          "releaseYear": null,
+          "vintageYear": null,
+          "bottlingYear": null,
+          "caskStrength": null,
+          "releaseMonth": null
+        },
+        "shared": {
+          "name": "25-year-old",
+          "brand": {
+            "name": "Springbank",
+            "entityId": 1362
+          },
+          "series": null,
+          "bottler": null,
+          "category": "single_malt",
+          "statedAge": 25,
+          "distillers": [
+            {
+              "name": "Springbank",
+              "entityId": 1362
+            }
+          ]
+        },
+        "groupId": 9158,
+        "bottleId": 469,
+        "fullName": "Springbank 25-year-old",
+        "siblings": [],
+        "references": [
+          {
+            "name": "Springbank 25-year-old",
+            "ignored": false
+          },
+          {
+            "name": "Springbank 25-year-old (2019 Release)",
+            "ignored": false
+          },
+          {
+            "name": "Springbank 25-year-old Single Malt Scotch",
+            "ignored": false
+          },
+          {
+            "name": "Springbank Aged 25-year-old",
+            "ignored": false
+          }
+        ],
+        "observations": [
+          {
+            "facts": {
+              "proposalType": "no_match",
+              "proposedBottle": null
+            },
+            "rawText": "Springbank 25-year-old",
+            "sourceKey": "store_price:12034074",
+            "sourceUrl": "https://www.masterofmalt.com/whiskies/springbank/springbank-25-year-old-bottled-2016-whisky/?sku=121598",
+            "sourceName": "Springbank 25-year-old",
+            "sourceType": "store_price",
+            "parsedIdentity": null
+          },
+          {
+            "facts": {
+              "proposalType": "match_existing",
+              "releaseFacts": {},
+              "creationTarget": null,
+              "proposedBottle": null,
+              "proposedRelease": null
+            },
+            "rawText": "Springbank Aged 25-year-old",
+            "sourceKey": "store_price:11336852",
+            "sourceUrl": "https://woodencork.com/collections/whiskey/products/springbank-aged-25-year-old-750-ml",
+            "sourceName": "Springbank Aged 25-year-old",
+            "sourceType": "store_price",
+            "parsedIdentity": {
+              "abv": null,
+              "brand": "Springbank",
+              "series": null,
+              "bottler": null,
+              "edition": null,
+              "category": null,
+              "cask_fill": null,
+              "cask_size": null,
+              "cask_type": null,
+              "distillery": ["Springbank"],
+              "expression": null,
+              "stated_age": 25,
+              "single_cask": null,
+              "release_year": null,
+              "vintage_year": null,
+              "cask_strength": null
+            }
+          }
+        ],
+        "imageSources": []
+      },
+      {
+        "exact": {
+          "abv": null,
+          "edition": null,
+          "outturn": null,
+          "statedAge": null,
+          "caskNumber": null,
+          "maturation": null,
+          "releaseDay": null,
+          "singleCask": null,
+          "releaseYear": null,
+          "vintageYear": null,
+          "bottlingYear": null,
+          "caskStrength": null,
+          "releaseMonth": null
+        },
+        "shared": {
+          "name": "25-year-old Limited Edition",
+          "brand": {
+            "name": "Springbank",
+            "entityId": 1362
+          },
+          "series": null,
+          "bottler": null,
+          "category": "single_malt",
+          "statedAge": 25,
+          "distillers": [
+            {
+              "name": "Springbank",
+              "entityId": 1362
+            }
+          ]
+        },
+        "groupId": 9990,
+        "bottleId": 1563,
+        "fullName": "Springbank 25-year-old Limited Edition",
+        "siblings": [],
+        "references": [
+          {
+            "name": "Springbank 25-year-old Limited Edition",
+            "ignored": false
+          }
+        ],
+        "observations": [],
+        "imageSources": []
+      }
+    ],
+    "inspectedEntities": [
+      {
+        "kind": "brand",
+        "name": "Outwalker",
+        "score": 1,
+        "source": ["exact", "text", "prefix", "contained"],
+        "entityId": 365997,
+        "reference": "Outwalker",
+        "shortName": null,
+        "retrievedFor": [
+          {
+            "exact": true,
+            "query": "Outwalker"
+          }
+        ]
+      },
+      {
+        "kind": "distillery",
+        "name": "Distillerie de Wambrechies",
+        "score": 1,
+        "source": ["exact", "text", "prefix", "contained"],
+        "entityId": 4414,
+        "reference": "Distillerie de Wambrechies",
+        "shortName": null,
+        "retrievedFor": [
+          {
+            "exact": true,
+            "query": "Distillerie de Wambrechies"
+          }
+        ]
+      },
+      {
+        "kind": "bottler",
+        "name": "William Cadenhead's",
+        "score": 1,
+        "source": ["exact", "text", "prefix", "contained"],
+        "entityId": 336,
+        "reference": "William Cadenhead's",
+        "shortName": "Cadenhead's",
+        "retrievedFor": [
+          {
+            "exact": true,
+            "query": "William Cadenhead's"
+          }
+        ]
+      },
+      {
+        "kind": "distillery",
+        "name": "Dallas Dhu",
+        "score": 1,
+        "source": ["exact", "text", "prefix", "contained"],
+        "entityId": 869,
+        "reference": "Dallas Dhu",
+        "shortName": null,
+        "retrievedFor": [
+          {
+            "exact": true,
+            "query": "Dallas Dhu"
+          }
+        ]
+      },
+      {
+        "kind": "distillery",
+        "name": "The Dalmore",
+        "score": 1,
+        "source": ["exact", "text", "prefix", "contained"],
+        "entityId": 870,
+        "reference": "The Dalmore",
+        "shortName": "Dalmore",
+        "retrievedFor": [
+          {
+            "exact": true,
+            "query": "The Dalmore"
+          }
+        ]
+      },
+      {
+        "kind": "bottler",
+        "name": "Murray McDavid",
+        "score": 1,
+        "source": ["exact", "text", "prefix", "contained"],
+        "entityId": 5670,
+        "reference": "Murray McDavid",
+        "shortName": null,
+        "retrievedFor": [
+          {
+            "exact": true,
+            "query": "Murray McDavid"
+          }
+        ]
+      },
+      {
+        "kind": "distillery",
+        "name": "Benrinnes",
+        "score": 1,
+        "source": ["exact", "text", "prefix", "contained"],
+        "entityId": 89,
+        "reference": "Benrinnes",
+        "shortName": null,
+        "retrievedFor": [
+          {
+            "exact": true,
+            "query": "Benrinnes"
+          }
+        ]
+      },
+      {
+        "kind": "distillery",
+        "name": "Loch Lomond",
+        "score": 1,
+        "source": ["exact", "text", "prefix", "contained"],
+        "entityId": 1144,
+        "reference": "Loch Lomond",
+        "shortName": null,
+        "retrievedFor": [
+          {
+            "exact": true,
+            "query": "Loch Lomond"
+          }
+        ]
+      },
+      {
+        "kind": "distillery",
+        "name": "Tomatin",
+        "score": 1,
+        "source": ["exact", "text", "prefix", "contained"],
+        "entityId": 1443,
+        "reference": "Tomatin",
+        "shortName": null,
+        "retrievedFor": [
+          {
+            "exact": true,
+            "query": "Tomatin"
+          }
+        ]
+      },
+      {
+        "kind": "distillery",
+        "name": "Inchgower",
+        "score": 1,
+        "source": ["exact", "text", "prefix", "contained"],
+        "entityId": 1051,
+        "reference": "Inchgower",
+        "shortName": null,
+        "retrievedFor": [
+          {
+            "exact": true,
+            "query": "Inchgower"
+          }
+        ]
+      },
+      {
+        "kind": "bottler",
+        "name": "Claxton's",
+        "score": 1,
+        "source": ["exact", "text", "prefix", "contained"],
+        "entityId": 6077,
+        "reference": "Claxton's",
+        "shortName": null,
+        "retrievedFor": [
+          {
+            "exact": true,
+            "query": "Claxton's"
+          }
+        ]
+      },
+      {
+        "kind": "distillery",
+        "name": "Springbank",
+        "score": 1,
+        "source": ["exact", "text", "prefix", "contained"],
+        "entityId": 1362,
+        "reference": "Springbank",
+        "shortName": null,
+        "retrievedFor": [
+          {
+            "exact": true,
+            "query": "Springbank"
+          }
+        ]
+      },
+      {
+        "kind": "brand",
+        "name": "Croftengea",
+        "score": 0.5,
+        "source": ["text", "prefix"],
+        "entityId": 863,
+        "reference": "Loch Lomond (Croftengea)",
+        "shortName": "",
+        "retrievedFor": [
+          {
+            "query": "Loch Lomond"
+          }
+        ]
+      },
+      {
+        "kind": "brand",
+        "name": "Inchmoan",
+        "score": 0.5,
+        "source": ["text", "prefix"],
+        "entityId": 1052,
+        "reference": "Loch Lomond (Inchmoan)",
+        "shortName": null,
+        "retrievedFor": [
+          {
+            "query": "Loch Lomond"
+          }
+        ]
+      },
+      {
+        "kind": "brand",
+        "name": "Inchmurrin",
+        "score": 0.5,
+        "source": ["text", "prefix"],
+        "entityId": 1053,
+        "reference": "Loch Lomond (Inchmurrin)",
+        "shortName": "",
+        "retrievedFor": [
+          {
+            "query": "Loch Lomond"
+          }
+        ]
+      },
+      {
+        "kind": "company",
+        "name": "Loch Lomond Group",
+        "score": 0.5,
+        "source": ["text", "prefix"],
+        "entityId": 366126,
+        "reference": null,
+        "shortName": null,
+        "retrievedFor": [
+          {
+            "query": "Loch Lomond"
+          }
+        ]
+      },
+      {
+        "kind": "brand",
+        "name": "Cadée",
+        "score": 0.29705882352941176,
+        "source": ["contained"],
+        "entityId": 367403,
+        "reference": "Cadée",
+        "shortName": null,
+        "retrievedFor": [
+          {
+            "query": "William Cadenhead's"
+          }
+        ]
+      }
+    ],
+    "inspectedSeries": []
+  },
+  "provenance": {
+    "source": "production_miss",
+    "verifiedSourceUrls": [
+      "https://www.scotchwhiskyauctions.com/auctions/234-the-185th-auction/905121-springbank-2000-25-year-old/"
+    ],
+    "dbOutcome": {
+      "bottleId": null,
+      "createsBottle": false,
+      "summary": "Production returned no_match: it called the 2000 vintage and 44.5% unverified."
+    },
+    "notes": "Captured from saved classifier run 36734 (auction_lot 17820, model null, 2026-11-03T22:09:07.647Z). Production rationale: This appears to be one whisky bottle, but the exact release cannot be safely identified. The generic Springbank 25-year-old candidates do not establish a match to the source’s “2000” title, and the extracted ABV remains unverified. Do not create a Bottle from these unresolved facts. Expected outcome checked against the lot page on 2026-11-09 and a judged review of the 185th auction on 2026-11-03."
+  },
+  "expected": {
+    "status": "classified",
+    "action": "create_bottle",
+    "identityScope": "product",
+    "matchedBottleId": null,
+    "proposedBottle": {
+      "brand": {
+        "id": 1362
+      },
+      "category": "single_malt",
+      "statedAge": 25,
+      "vintageYear": 2000,
+      "bottlingYear": 2025,
+      "abv": 44.5
+    },
+    "proposedBottleNameIncludes": ["2000"],
+    "proposedBottleDistillerIds": [1362],
+    "summary": "Create Springbank 2000 25-year-old, bottled 2025, 44.5%. The lot page and label print the vintage, bottling year, and strength. Candidates 469 and 1563 are undated 25-year-olds, too broad for a vintage release."
+  }
+}

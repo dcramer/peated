@@ -1,0 +1,1095 @@
+{
+  "id": "auction-glen-deveron-10-no-vintage-create",
+  "name": "Glen Deveron 10 Year Old: create the undated 10-year-old; vintage-dated Bottles are too specific",
+  "input": {
+    "reference": {
+      "id": 15130,
+      "url": "https://www.scotchwhiskyauctions.com/auctions/234-the-185th-auction/903504-glen-deveron-10-year-old/",
+      "name": "Glen Deveron 10 Year Old",
+      "imageUrl": null,
+      "externalSiteId": 28097,
+      "currentBottleId": null
+    },
+    "extractedIdentity": {
+      "abv": 40,
+      "brand": null,
+      "series": null,
+      "bottler": null,
+      "edition": null,
+      "outturn": null,
+      "category": null,
+      "distillery": null,
+      "expression": null,
+      "maturation": null,
+      "stated_age": null,
+      "cask_number": null,
+      "single_cask": null,
+      "release_year": null,
+      "vintage_year": null,
+      "cask_strength": null
+    },
+    "extractedIdentitySource": "structured",
+    "imageEvidence": null,
+    "initialCandidates": [
+      {
+        "abv": 40,
+        "brand": "Glen Deveron",
+        "score": 86.991104,
+        "series": null,
+        "source": ["text", "context", "brand_coverage"],
+        "bottler": null,
+        "edition": null,
+        "outturn": null,
+        "bottleId": 68815,
+        "category": "single_malt",
+        "fullName": "Glen Deveron 1989 10-year-old",
+        "reference": null,
+        "statedAge": 10,
+        "caskNumber": null,
+        "comparison": {
+          "missing": [],
+          "conflicts": [],
+          "agreements": ["abv"]
+        },
+        "distillery": ["Macduff Distillery"],
+        "maturation": null,
+        "releaseDay": null,
+        "singleCask": null,
+        "releaseYear": null,
+        "vintageYear": 1989,
+        "bottlingYear": null,
+        "caskStrength": null,
+        "releaseMonth": null,
+        "familyContext": {
+          "siblingBottles": []
+        }
+      },
+      {
+        "abv": 40,
+        "brand": "The Deveron",
+        "score": 81.91612,
+        "series": null,
+        "source": ["vector", "text"],
+        "bottler": null,
+        "edition": null,
+        "outturn": null,
+        "bottleId": 65163,
+        "category": "single_malt",
+        "fullName": "The Deveron 10-year-old",
+        "reference": "Deveron 10-year-old, 40%",
+        "statedAge": 10,
+        "caskNumber": null,
+        "comparison": {
+          "missing": [],
+          "conflicts": [],
+          "agreements": ["abv"]
+        },
+        "distillery": ["Macduff Distillery"],
+        "maturation": null,
+        "releaseDay": null,
+        "singleCask": null,
+        "releaseYear": 2015,
+        "vintageYear": null,
+        "bottlingYear": null,
+        "caskStrength": null,
+        "releaseMonth": null,
+        "familyContext": {
+          "siblingBottles": []
+        }
+      },
+      {
+        "abv": 40,
+        "brand": "Glen Deveron",
+        "score": 58.081562,
+        "series": "Royal Burgh Collection",
+        "source": ["vector", "text"],
+        "bottler": null,
+        "edition": null,
+        "outturn": null,
+        "bottleId": 65414,
+        "category": "single_malt",
+        "fullName": "Glen Deveron 30-year-old",
+        "reference": "Glen Deveron 30-year-old, 40%",
+        "statedAge": 30,
+        "caskNumber": null,
+        "comparison": {
+          "missing": [],
+          "conflicts": [],
+          "agreements": ["abv"]
+        },
+        "distillery": ["Macduff Distillery"],
+        "maturation": null,
+        "releaseDay": null,
+        "singleCask": null,
+        "releaseYear": null,
+        "vintageYear": null,
+        "bottlingYear": null,
+        "caskStrength": null,
+        "releaseMonth": null,
+        "familyContext": {
+          "siblingBottles": []
+        }
+      },
+      {
+        "abv": 40,
+        "brand": "Glen Deveron",
+        "score": 57.74433,
+        "series": null,
+        "source": ["text"],
+        "bottler": null,
+        "edition": null,
+        "outturn": null,
+        "bottleId": 52262,
+        "category": "single_malt",
+        "fullName": "Glen Deveron 5-year-old",
+        "reference": null,
+        "statedAge": 5,
+        "caskNumber": null,
+        "comparison": {
+          "missing": [],
+          "conflicts": [],
+          "agreements": ["abv"]
+        },
+        "distillery": ["Macduff Distillery"],
+        "maturation": null,
+        "releaseDay": null,
+        "singleCask": null,
+        "releaseYear": null,
+        "vintageYear": null,
+        "bottlingYear": null,
+        "caskStrength": null,
+        "releaseMonth": null,
+        "familyContext": {
+          "siblingBottles": []
+        }
+      },
+      {
+        "abv": 40,
+        "brand": "Glen Deveron",
+        "score": 57.235703,
+        "series": null,
+        "source": ["text"],
+        "bottler": null,
+        "edition": null,
+        "outturn": null,
+        "bottleId": 52314,
+        "category": "single_malt",
+        "fullName": "Glen Deveron 5-year-old",
+        "reference": null,
+        "statedAge": 5,
+        "caskNumber": null,
+        "comparison": {
+          "missing": [],
+          "conflicts": [],
+          "agreements": ["abv"]
+        },
+        "distillery": ["Macduff Distillery"],
+        "maturation": null,
+        "releaseDay": null,
+        "singleCask": null,
+        "releaseYear": null,
+        "vintageYear": 1985,
+        "bottlingYear": null,
+        "caskStrength": null,
+        "releaseMonth": null,
+        "familyContext": {
+          "siblingBottles": []
+        }
+      },
+      {
+        "abv": 40,
+        "brand": "Glen Deveron",
+        "score": 52.992813,
+        "series": null,
+        "source": ["text"],
+        "bottler": null,
+        "edition": null,
+        "outturn": null,
+        "bottleId": 62313,
+        "category": "single_malt",
+        "fullName": "Glen Deveron 28-year-old Royal Burgh Collection",
+        "reference": null,
+        "statedAge": 28,
+        "caskNumber": null,
+        "comparison": {
+          "missing": [],
+          "conflicts": [],
+          "agreements": ["abv"]
+        },
+        "distillery": ["Macduff Distillery"],
+        "maturation": null,
+        "releaseDay": null,
+        "singleCask": null,
+        "releaseYear": null,
+        "vintageYear": null,
+        "bottlingYear": null,
+        "caskStrength": null,
+        "releaseMonth": null,
+        "familyContext": {
+          "siblingBottles": []
+        }
+      },
+      {
+        "abv": 40,
+        "brand": "Isle of Jura",
+        "score": 50.391945,
+        "series": null,
+        "source": ["text"],
+        "bottler": null,
+        "edition": null,
+        "outturn": null,
+        "bottleId": 45943,
+        "category": "single_malt",
+        "fullName": "Isle of Jura Origin - 10-year-old - 40.0% ABV - Oloroso Cask",
+        "reference": null,
+        "statedAge": 10,
+        "caskNumber": null,
+        "comparison": {
+          "missing": [],
+          "conflicts": [],
+          "agreements": ["abv"]
+        },
+        "distillery": ["Isle of Jura"],
+        "maturation": "oloroso",
+        "releaseDay": null,
+        "singleCask": null,
+        "releaseYear": null,
+        "vintageYear": null,
+        "bottlingYear": null,
+        "caskStrength": null,
+        "releaseMonth": null,
+        "familyContext": {
+          "siblingBottles": []
+        }
+      },
+      {
+        "abv": 40,
+        "brand": "anCnoc",
+        "score": 49.873028,
+        "series": null,
+        "source": ["text"],
+        "bottler": null,
+        "edition": null,
+        "outturn": null,
+        "bottleId": 45882,
+        "category": "single_malt",
+        "fullName": "anCnoc Peated - 10-year-old - 40.0% ABV - Bourbon Cask",
+        "reference": null,
+        "statedAge": 10,
+        "caskNumber": null,
+        "comparison": {
+          "missing": [],
+          "conflicts": [],
+          "agreements": ["abv"]
+        },
+        "distillery": ["Knockdhu"],
+        "maturation": "bourbon",
+        "releaseDay": null,
+        "singleCask": null,
+        "releaseYear": null,
+        "vintageYear": null,
+        "bottlingYear": null,
+        "caskStrength": null,
+        "releaseMonth": null,
+        "familyContext": {
+          "siblingBottles": []
+        }
+      },
+      {
+        "abv": 40,
+        "brand": "Glen Burn",
+        "score": 49.443436,
+        "series": null,
+        "source": ["text"],
+        "bottler": null,
+        "edition": null,
+        "outturn": null,
+        "bottleId": 68814,
+        "category": "single_malt",
+        "fullName": "Glen Burn 10-year-old",
+        "reference": null,
+        "statedAge": 10,
+        "caskNumber": null,
+        "comparison": {
+          "missing": [],
+          "conflicts": [],
+          "agreements": ["abv"]
+        },
+        "distillery": [],
+        "maturation": null,
+        "releaseDay": null,
+        "singleCask": null,
+        "releaseYear": null,
+        "vintageYear": null,
+        "bottlingYear": null,
+        "caskStrength": null,
+        "releaseMonth": null,
+        "familyContext": {
+          "siblingBottles": []
+        }
+      },
+      {
+        "abv": null,
+        "brand": "The Glen Grant",
+        "score": 48.64035,
+        "series": null,
+        "source": ["vector", "text"],
+        "bottler": null,
+        "edition": null,
+        "outturn": null,
+        "bottleId": 567,
+        "category": "single_malt",
+        "fullName": "The Glen Grant 10-year-old",
+        "reference": "Glen Grant 10-year-old",
+        "statedAge": 10,
+        "caskNumber": null,
+        "comparison": {
+          "missing": ["abv"],
+          "conflicts": ["brand", "distillers"],
+          "agreements": ["category", "statedAge"]
+        },
+        "distillery": ["The Glen Grant"],
+        "maturation": null,
+        "releaseDay": null,
+        "singleCask": null,
+        "releaseYear": null,
+        "vintageYear": null,
+        "bottlingYear": null,
+        "caskStrength": null,
+        "releaseMonth": null,
+        "familyContext": {
+          "siblingBottles": []
+        }
+      },
+      {
+        "abv": null,
+        "brand": "The Glen Grant",
+        "score": 48.24995,
+        "series": null,
+        "source": ["text"],
+        "bottler": null,
+        "edition": null,
+        "outturn": null,
+        "bottleId": 17616,
+        "category": "single_malt",
+        "fullName": "The Glen Grant Grant, 10-year-old",
+        "reference": null,
+        "statedAge": 10,
+        "caskNumber": null,
+        "comparison": {
+          "missing": ["abv"],
+          "conflicts": ["brand", "distillers"],
+          "agreements": ["category", "statedAge"]
+        },
+        "distillery": ["The Glen Grant"],
+        "maturation": null,
+        "releaseDay": null,
+        "singleCask": null,
+        "releaseYear": null,
+        "vintageYear": null,
+        "bottlingYear": null,
+        "caskStrength": null,
+        "releaseMonth": null,
+        "familyContext": {
+          "siblingBottles": []
+        }
+      },
+      {
+        "abv": 40,
+        "brand": "Isle of Jura",
+        "score": 45.975647,
+        "series": null,
+        "source": ["text"],
+        "bottler": null,
+        "edition": null,
+        "outturn": null,
+        "bottleId": 44114,
+        "category": "single_malt",
+        "fullName": "Isle of Jura 10-year-old - 40.0% ABV - Oloroso Cask",
+        "reference": null,
+        "statedAge": 10,
+        "caskNumber": null,
+        "comparison": {
+          "missing": [],
+          "conflicts": ["brand", "distillers"],
+          "agreements": ["category", "statedAge", "abv"]
+        },
+        "distillery": ["Isle of Jura"],
+        "maturation": "oloroso",
+        "releaseDay": null,
+        "singleCask": null,
+        "releaseYear": null,
+        "vintageYear": null,
+        "bottlingYear": null,
+        "caskStrength": null,
+        "releaseMonth": null,
+        "familyContext": {
+          "siblingBottles": []
+        }
+      },
+      {
+        "abv": 40,
+        "brand": "Gordon & MacPhail",
+        "score": 45.853703,
+        "series": null,
+        "source": ["vector", "text"],
+        "bottler": "Gordon & MacPhail",
+        "edition": null,
+        "outturn": null,
+        "bottleId": 65057,
+        "category": "single_malt",
+        "fullName": "Gordon & MacPhail Glen Grant 10-year-old",
+        "reference": "Gordon & MacPhail 10-year-old (distilled at Glen Grant), 40%",
+        "statedAge": 10,
+        "caskNumber": null,
+        "comparison": {
+          "missing": [],
+          "conflicts": ["brand", "distillers"],
+          "agreements": ["category", "statedAge", "abv"]
+        },
+        "distillery": ["The Glen Grant"],
+        "maturation": "refill bourbon casks",
+        "releaseDay": null,
+        "singleCask": null,
+        "releaseYear": null,
+        "vintageYear": null,
+        "bottlingYear": null,
+        "caskStrength": null,
+        "releaseMonth": null,
+        "familyContext": {
+          "siblingBottles": []
+        }
+      },
+      {
+        "abv": 40,
+        "brand": "Glen Scotia",
+        "score": 45.2905,
+        "series": null,
+        "source": ["vector", "text"],
+        "bottler": null,
+        "edition": null,
+        "outturn": null,
+        "bottleId": 53116,
+        "category": "single_malt",
+        "fullName": "Glen Scotia Campbeltown Unpeated",
+        "reference": "Glen Scotia 10-year-old, 40%",
+        "statedAge": 10,
+        "caskNumber": null,
+        "comparison": {
+          "missing": [],
+          "conflicts": [],
+          "agreements": ["abv"]
+        },
+        "distillery": ["Glen Scotia"],
+        "maturation": "First fill bourbon barrels",
+        "releaseDay": null,
+        "singleCask": null,
+        "releaseYear": null,
+        "vintageYear": null,
+        "bottlingYear": null,
+        "caskStrength": null,
+        "releaseMonth": null,
+        "familyContext": {
+          "siblingBottles": []
+        }
+      },
+      {
+        "abv": 40,
+        "brand": "Master of Malt",
+        "score": 44.753452,
+        "series": null,
+        "source": ["text"],
+        "bottler": "Master of Malt",
+        "edition": null,
+        "outturn": null,
+        "bottleId": 45638,
+        "category": "single_malt",
+        "fullName": "Master of Malt A Secret Speyside Distillery - 10-year-old - 40.0% ABV",
+        "reference": null,
+        "statedAge": 10,
+        "caskNumber": null,
+        "comparison": {
+          "missing": ["distillers"],
+          "conflicts": ["brand"],
+          "agreements": ["category", "statedAge", "abv"]
+        },
+        "distillery": [],
+        "maturation": null,
+        "releaseDay": null,
+        "singleCask": false,
+        "releaseYear": null,
+        "vintageYear": null,
+        "bottlingYear": null,
+        "caskStrength": null,
+        "releaseMonth": null,
+        "familyContext": {
+          "siblingBottles": []
+        }
+      },
+      {
+        "abv": 40,
+        "brand": "A.D. Rattray",
+        "score": 43.691772,
+        "series": "House Malt",
+        "source": ["text"],
+        "bottler": "A.D. Rattray",
+        "edition": null,
+        "outturn": null,
+        "bottleId": 59426,
+        "category": "single_malt",
+        "fullName": "A.D. Rattray Glen Garioch 10-year-old",
+        "reference": null,
+        "statedAge": 10,
+        "caskNumber": null,
+        "comparison": {
+          "missing": [],
+          "conflicts": ["brand", "distillers"],
+          "agreements": ["category", "statedAge", "abv"]
+        },
+        "distillery": ["Glen Garioch"],
+        "maturation": null,
+        "releaseDay": null,
+        "singleCask": null,
+        "releaseYear": null,
+        "vintageYear": null,
+        "bottlingYear": null,
+        "caskStrength": null,
+        "releaseMonth": null,
+        "familyContext": {
+          "siblingBottles": []
+        }
+      },
+      {
+        "abv": null,
+        "brand": "Glen Els",
+        "score": 41.650536,
+        "series": null,
+        "source": ["text"],
+        "bottler": "Glen Els",
+        "edition": null,
+        "outturn": null,
+        "bottleId": 3477,
+        "category": "single_malt",
+        "fullName": "Glen Els The Glen Els - X 10-year-old of The Glen Els",
+        "reference": null,
+        "statedAge": 10,
+        "caskNumber": null,
+        "comparison": {
+          "missing": ["abv", "distillers"],
+          "conflicts": ["brand"],
+          "agreements": ["category", "statedAge"]
+        },
+        "distillery": [],
+        "maturation": null,
+        "releaseDay": null,
+        "singleCask": null,
+        "releaseYear": null,
+        "vintageYear": null,
+        "bottlingYear": null,
+        "caskStrength": null,
+        "releaseMonth": null,
+        "familyContext": {
+          "siblingBottles": []
+        }
+      },
+      {
+        "abv": 40,
+        "brand": "Laphroaig",
+        "score": 38.73822,
+        "series": null,
+        "source": ["text"],
+        "bottler": null,
+        "edition": null,
+        "outturn": null,
+        "bottleId": 54469,
+        "category": "single_malt",
+        "fullName": "Laphroaig 10-year-old",
+        "reference": null,
+        "statedAge": 10,
+        "caskNumber": null,
+        "comparison": {
+          "missing": [],
+          "conflicts": ["brand", "distillers"],
+          "agreements": ["category", "statedAge", "abv"]
+        },
+        "distillery": ["Laphroaig"],
+        "maturation": "Matured for 10 years in ex-bourbon barrels",
+        "releaseDay": null,
+        "singleCask": false,
+        "releaseYear": null,
+        "vintageYear": null,
+        "bottlingYear": null,
+        "caskStrength": false,
+        "releaseMonth": null,
+        "familyContext": {
+          "siblingBottles": []
+        }
+      },
+      {
+        "abv": 40,
+        "brand": "Glen Moray",
+        "score": 37.121822,
+        "series": null,
+        "source": ["text"],
+        "bottler": "Glen Moray",
+        "edition": null,
+        "outturn": null,
+        "bottleId": 46830,
+        "category": "single_malt",
+        "fullName": "Glen Moray Edinburgh Homecoming Edition - 15-year-old - 40.0% ABV",
+        "reference": null,
+        "statedAge": 15,
+        "caskNumber": null,
+        "comparison": {
+          "missing": [],
+          "conflicts": [],
+          "agreements": ["abv"]
+        },
+        "distillery": ["Glen Moray"],
+        "maturation": null,
+        "releaseDay": null,
+        "singleCask": null,
+        "releaseYear": null,
+        "vintageYear": null,
+        "bottlingYear": null,
+        "caskStrength": null,
+        "releaseMonth": null,
+        "familyContext": {
+          "siblingBottles": []
+        }
+      },
+      {
+        "abv": 40,
+        "brand": "Glen Finloch",
+        "score": 36.985226,
+        "series": null,
+        "source": ["text"],
+        "bottler": "Jean Boyer",
+        "edition": null,
+        "outturn": null,
+        "bottleId": 45729,
+        "category": "blend",
+        "fullName": "Glen Finloch Peaty Reserve - 40.0% ABV",
+        "reference": null,
+        "statedAge": null,
+        "caskNumber": null,
+        "comparison": {
+          "missing": [],
+          "conflicts": [],
+          "agreements": ["abv"]
+        },
+        "distillery": [],
+        "maturation": null,
+        "releaseDay": null,
+        "singleCask": null,
+        "releaseYear": null,
+        "vintageYear": null,
+        "bottlingYear": null,
+        "caskStrength": null,
+        "releaseMonth": null,
+        "familyContext": {
+          "siblingBottles": []
+        }
+      },
+      {
+        "abv": 40,
+        "brand": "Glen Moray",
+        "score": 34.891617,
+        "series": null,
+        "source": ["text"],
+        "bottler": "Glen Moray",
+        "edition": null,
+        "outturn": null,
+        "bottleId": 45985,
+        "category": "single_malt",
+        "fullName": "Glen Moray Chardonnay Finish - 40.0% ABV - Chardonnay Cask",
+        "reference": null,
+        "statedAge": null,
+        "caskNumber": null,
+        "comparison": {
+          "missing": [],
+          "conflicts": [],
+          "agreements": ["abv"]
+        },
+        "distillery": ["Glen Moray"],
+        "maturation": "chardonnay",
+        "releaseDay": null,
+        "singleCask": null,
+        "releaseYear": null,
+        "vintageYear": null,
+        "bottlingYear": null,
+        "caskStrength": null,
+        "releaseMonth": null,
+        "familyContext": {
+          "siblingBottles": []
+        }
+      },
+      {
+        "abv": 40,
+        "brand": "Glen Moray",
+        "score": 34.891617,
+        "series": null,
+        "source": ["text"],
+        "bottler": "Glen Moray",
+        "edition": null,
+        "outturn": null,
+        "bottleId": 45644,
+        "category": "single_malt",
+        "fullName": "Glen Moray Forbidden Fruit - 40.0% ABV - Other Cask",
+        "reference": null,
+        "statedAge": null,
+        "caskNumber": null,
+        "comparison": {
+          "missing": [],
+          "conflicts": [],
+          "agreements": ["abv"]
+        },
+        "distillery": ["Glen Moray"],
+        "maturation": "other",
+        "releaseDay": null,
+        "singleCask": null,
+        "releaseYear": null,
+        "vintageYear": null,
+        "bottlingYear": null,
+        "caskStrength": null,
+        "releaseMonth": null,
+        "familyContext": {
+          "siblingBottles": []
+        }
+      },
+      {
+        "abv": 40,
+        "brand": "Glen Moray",
+        "score": 34.891617,
+        "series": null,
+        "source": ["text"],
+        "bottler": "Glen Moray",
+        "edition": null,
+        "outturn": null,
+        "bottleId": 45684,
+        "category": "single_malt",
+        "fullName": "Glen Moray Twisted Vine - 40.0% ABV - Cognac Cask",
+        "reference": null,
+        "statedAge": null,
+        "caskNumber": null,
+        "comparison": {
+          "missing": [],
+          "conflicts": [],
+          "agreements": ["abv"]
+        },
+        "distillery": ["Glen Moray"],
+        "maturation": "cognac",
+        "releaseDay": null,
+        "singleCask": null,
+        "releaseYear": null,
+        "vintageYear": null,
+        "bottlingYear": null,
+        "caskStrength": null,
+        "releaseMonth": null,
+        "familyContext": {
+          "siblingBottles": []
+        }
+      },
+      {
+        "abv": 40,
+        "brand": "Glenturret",
+        "score": 0.7498246444353338,
+        "series": null,
+        "source": ["vector"],
+        "bottler": null,
+        "edition": null,
+        "outturn": null,
+        "bottleId": 65631,
+        "category": "single_malt",
+        "fullName": "Glenturret 10-year-old",
+        "reference": "Glenturret 10-year-old, 40%",
+        "statedAge": 10,
+        "caskNumber": null,
+        "comparison": {
+          "missing": [],
+          "conflicts": ["brand", "distillers"],
+          "agreements": ["category", "statedAge", "abv"]
+        },
+        "distillery": ["Glenturret"],
+        "maturation": null,
+        "releaseDay": null,
+        "singleCask": null,
+        "releaseYear": null,
+        "vintageYear": null,
+        "bottlingYear": null,
+        "caskStrength": null,
+        "releaseMonth": null,
+        "familyContext": {
+          "siblingBottles": []
+        }
+      }
+    ]
+  },
+  "context": {
+    "inspectedBottleIds": [68815],
+    "bottleContexts": [
+      {
+        "exact": {
+          "abv": 40,
+          "edition": null,
+          "outturn": null,
+          "statedAge": 10,
+          "caskNumber": null,
+          "maturation": null,
+          "releaseDay": null,
+          "singleCask": null,
+          "releaseYear": null,
+          "vintageYear": 1989,
+          "bottlingYear": null,
+          "caskStrength": null,
+          "releaseMonth": null
+        },
+        "shared": {
+          "name": "1989 10-year-old",
+          "brand": {
+            "name": "Glen Deveron",
+            "entityId": 950
+          },
+          "series": null,
+          "bottler": null,
+          "category": "single_malt",
+          "statedAge": null,
+          "distillers": [
+            {
+              "name": "Macduff Distillery",
+              "entityId": 1160
+            }
+          ]
+        },
+        "groupId": 41776,
+        "bottleId": 68815,
+        "fullName": "Glen Deveron 1989 10-year-old",
+        "siblings": [],
+        "references": [],
+        "observations": [],
+        "imageSources": []
+      }
+    ],
+    "inspectedEntities": [
+      {
+        "kind": "brand",
+        "name": "Glen Deveron",
+        "score": 1,
+        "source": ["exact", "text", "prefix", "contained"],
+        "entityId": 950,
+        "reference": "Glen Deveron",
+        "shortName": null,
+        "retrievedFor": [
+          {
+            "exact": true,
+            "query": "Glen Deveron"
+          }
+        ]
+      },
+      {
+        "kind": "brand",
+        "name": "The Deveron",
+        "score": 1,
+        "source": ["contained", "exact", "text", "prefix"],
+        "entityId": 1405,
+        "reference": "Deveron",
+        "shortName": null,
+        "retrievedFor": [
+          {
+            "query": "Glen Deveron"
+          },
+          {
+            "exact": true,
+            "query": "The Deveron"
+          }
+        ]
+      },
+      {
+        "kind": "distillery",
+        "name": "Macduff Distillery",
+        "score": 1,
+        "source": ["exact", "text", "prefix", "contained"],
+        "entityId": 1160,
+        "reference": "Macduff Distillery",
+        "shortName": "Macduff",
+        "retrievedFor": [
+          {
+            "exact": true,
+            "query": "Macduff Distillery"
+          }
+        ]
+      },
+      {
+        "kind": "distillery",
+        "name": "Isle of Jura",
+        "score": 1,
+        "source": ["exact", "text", "prefix", "contained"],
+        "entityId": 1071,
+        "reference": "Isle of Jura",
+        "shortName": null,
+        "retrievedFor": [
+          {
+            "exact": true,
+            "query": "Isle of Jura"
+          }
+        ]
+      },
+      {
+        "kind": "distillery",
+        "name": "Glen Moray",
+        "score": 1,
+        "source": ["exact", "text", "prefix", "contained"],
+        "entityId": 129,
+        "reference": "Glen Moray",
+        "shortName": null,
+        "retrievedFor": [
+          {
+            "exact": true,
+            "query": "Glen Moray"
+          }
+        ]
+      },
+      {
+        "kind": "brand",
+        "name": "Glen Finloch",
+        "score": 1,
+        "source": ["exact", "text", "prefix", "contained"],
+        "entityId": 365816,
+        "reference": "Glen Finloch",
+        "shortName": null,
+        "retrievedFor": [
+          {
+            "exact": true,
+            "query": "Glen Finloch"
+          }
+        ]
+      },
+      {
+        "kind": "bottler",
+        "name": "Jean Boyer",
+        "score": 1,
+        "source": ["exact", "text", "prefix", "contained"],
+        "entityId": 5115,
+        "reference": "Jean Boyer",
+        "shortName": null,
+        "retrievedFor": [
+          {
+            "exact": true,
+            "query": "Jean Boyer"
+          }
+        ]
+      },
+      {
+        "kind": "brand",
+        "name": "anCnoc",
+        "score": 1,
+        "source": ["exact", "text", "prefix", "contained"],
+        "entityId": 35,
+        "reference": "anCnoc",
+        "shortName": null,
+        "retrievedFor": [
+          {
+            "exact": true,
+            "query": "anCnoc"
+          }
+        ]
+      },
+      {
+        "kind": "distillery",
+        "name": "Knockdhu",
+        "score": 1,
+        "source": ["text", "exact", "prefix", "contained"],
+        "entityId": 1116,
+        "reference": "Knockdhu",
+        "shortName": null,
+        "retrievedFor": [
+          {
+            "query": "anCnoc"
+          },
+          {
+            "exact": true,
+            "query": "Knockdhu"
+          }
+        ]
+      },
+      {
+        "kind": "brand",
+        "name": "Glen Burn",
+        "score": 1,
+        "source": ["exact", "text", "prefix", "contained"],
+        "entityId": 2800,
+        "reference": "Glen Burn",
+        "shortName": null,
+        "retrievedFor": [
+          {
+            "exact": true,
+            "query": "Glen Burn"
+          }
+        ]
+      },
+      {
+        "kind": "brand",
+        "name": "Glenburn",
+        "score": 1,
+        "source": ["exact", "contained"],
+        "entityId": 2861,
+        "reference": "Glenburn",
+        "shortName": null,
+        "retrievedFor": [
+          {
+            "exact": true,
+            "query": "Glen Burn"
+          }
+        ]
+      },
+      {
+        "kind": "distillery",
+        "name": "Glen Scotia",
+        "score": 1,
+        "source": ["exact", "text", "prefix", "contained"],
+        "entityId": 964,
+        "reference": "Glen Scotia",
+        "shortName": null,
+        "retrievedFor": [
+          {
+            "exact": true,
+            "query": "Glen Scotia"
+          }
+        ]
+      }
+    ],
+    "inspectedSeries": []
+  },
+  "provenance": {
+    "source": "production_miss",
+    "verifiedSourceUrls": [
+      "https://www.scotchwhiskyauctions.com/auctions/234-the-185th-auction/903504-glen-deveron-10-year-old/"
+    ],
+    "dbOutcome": {
+      "bottleId": null,
+      "createsBottle": false,
+      "summary": "Production returned no_match: it could not rule out a vintage release and would not create."
+    },
+    "notes": "Captured from saved classifier run 35097 (auction_lot 15130, model null, 2026-11-03T11:39:42.292Z). Production rationale: The source is a single whisky bottle, not an excluded product. Its title and extracted strength support Glen Deveron 10-year-old at 40% ABV, but the source evidence does not resolve whether it is a vintage-specific release. The inspected local Glen Deveron candidate is Glen Deveron 1989 10-year-old, and that vintage cannot be inferred from the listing title. The Deveron 10-year-old candidate is a differently branded release. Neither a safe match nor a complete, supported create action is established. Expected outcome checked against the lot page on 2026-11-09 and a judged review of the 185th auction on 2026-11-03."
+  },
+  "expected": {
+    "status": "classified",
+    "action": "create_bottle",
+    "identityScope": "product",
+    "matchedBottleId": null,
+    "proposedBottle": {
+      "brand": {
+        "id": 950
+      },
+      "category": "single_malt",
+      "statedAge": 10,
+      "abv": 40,
+      "vintageYear": null
+    },
+    "proposedBottleDistillerIdOneOf": [1160],
+    "summary": "Create Glen Deveron 10-year-old at 40%. The lot page and label give no vintage, so the 1989 10-year-old (68815) is too specific, and The Deveron 10-year-old (65163) is the 2015 rebrand under another Brand."
+  },
+  "knownFailure": {
+    "reason": "The agent treats the stored 1989-vintage Glen Deveron 10 (68815) as a possible match even though the lot prints no vintage, so it will neither match nor create."
+  }
+}

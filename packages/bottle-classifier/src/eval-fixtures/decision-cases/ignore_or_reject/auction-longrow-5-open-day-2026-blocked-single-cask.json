@@ -1,0 +1,1116 @@
+{
+  "id": "auction-longrow-5-open-day-2026-blocked-single-cask",
+  "name": "Longrow 5 Year Old Open Day 2026: right Bottle, but it wrongly stores single cask",
+  "input": {
+    "reference": {
+      "id": 16600,
+      "url": "https://www.scotchwhiskyauctions.com/auctions/234-the-185th-auction/905110-longrow-5-year-old-open-day-2026-35cl/",
+      "name": "Longrow 5 Year Old Open Day 2026 35cl",
+      "imageUrl": null,
+      "externalSiteId": 28097,
+      "currentBottleId": null
+    },
+    "extractedIdentity": {
+      "abv": 59.2,
+      "brand": null,
+      "series": null,
+      "bottler": null,
+      "edition": null,
+      "outturn": null,
+      "category": null,
+      "distillery": null,
+      "expression": null,
+      "maturation": null,
+      "stated_age": null,
+      "cask_number": null,
+      "single_cask": null,
+      "release_year": null,
+      "vintage_year": null,
+      "cask_strength": null
+    },
+    "extractedIdentitySource": "structured",
+    "imageEvidence": null,
+    "initialCandidates": [
+      {
+        "abv": 59.2,
+        "brand": "Longrow",
+        "score": 112.87854,
+        "series": "Open Day",
+        "source": ["vector", "text", "context", "brand_coverage"],
+        "bottler": null,
+        "edition": "2026",
+        "outturn": null,
+        "bottleId": 44254,
+        "category": "single_malt",
+        "fullName": "Longrow Open Day - 2026",
+        "reference": "Longrow Open Day 2026",
+        "statedAge": 5,
+        "caskNumber": null,
+        "comparison": {
+          "missing": [],
+          "conflicts": [],
+          "agreements": ["abv"]
+        },
+        "distillery": ["Springbank"],
+        "maturation": null,
+        "releaseDay": null,
+        "singleCask": true,
+        "releaseYear": 2026,
+        "vintageYear": null,
+        "bottlingYear": null,
+        "caskStrength": true,
+        "releaseMonth": null,
+        "familyContext": {
+          "siblingBottles": []
+        }
+      },
+      {
+        "abv": 56.2,
+        "brand": "Longrow",
+        "score": 83.70781,
+        "series": "Open Day",
+        "source": ["text"],
+        "bottler": null,
+        "edition": "2022",
+        "outturn": null,
+        "bottleId": 1511,
+        "category": "single_malt",
+        "fullName": "Longrow Open Day - 2022",
+        "reference": null,
+        "statedAge": 15,
+        "caskNumber": null,
+        "comparison": {
+          "missing": [],
+          "conflicts": ["abv"],
+          "agreements": []
+        },
+        "distillery": ["Springbank"],
+        "maturation": null,
+        "releaseDay": null,
+        "singleCask": null,
+        "releaseYear": 2022,
+        "vintageYear": null,
+        "bottlingYear": null,
+        "caskStrength": null,
+        "releaseMonth": null,
+        "familyContext": {
+          "siblingBottles": []
+        }
+      },
+      {
+        "abv": 48.1,
+        "brand": "Longrow",
+        "score": 83.31024,
+        "series": "Open Day",
+        "source": ["text", "brand", "brand_coverage"],
+        "bottler": null,
+        "edition": "2014",
+        "outturn": null,
+        "bottleId": 53893,
+        "category": "single_malt",
+        "fullName": "Longrow Open Day - 2014",
+        "reference": null,
+        "statedAge": 15,
+        "caskNumber": null,
+        "comparison": {
+          "missing": ["caskStrength", "singleCask"],
+          "conflicts": ["statedAge", "abv", "releaseYear", "edition"],
+          "agreements": ["category", "brand", "series", "distillers"]
+        },
+        "distillery": ["Springbank"],
+        "maturation": null,
+        "releaseDay": null,
+        "singleCask": null,
+        "releaseYear": 2014,
+        "vintageYear": 1998,
+        "bottlingYear": null,
+        "caskStrength": null,
+        "releaseMonth": null,
+        "familyContext": {
+          "siblingBottles": []
+        }
+      },
+      {
+        "abv": 58.5,
+        "brand": "Longrow",
+        "score": 81.936325,
+        "series": "Open Day",
+        "source": ["text", "brand", "brand_coverage"],
+        "bottler": null,
+        "edition": "2010",
+        "outturn": null,
+        "bottleId": 53894,
+        "category": "single_malt",
+        "fullName": "Longrow Open Day - 2010",
+        "reference": null,
+        "statedAge": 8,
+        "caskNumber": null,
+        "comparison": {
+          "missing": ["caskStrength"],
+          "conflicts": [
+            "statedAge",
+            "abv",
+            "releaseYear",
+            "singleCask",
+            "edition"
+          ],
+          "agreements": ["category", "brand", "series", "distillers"]
+        },
+        "distillery": ["Springbank"],
+        "maturation": null,
+        "releaseDay": null,
+        "singleCask": true,
+        "releaseYear": 2010,
+        "vintageYear": 2001,
+        "bottlingYear": null,
+        "caskStrength": null,
+        "releaseMonth": null,
+        "familyContext": {
+          "siblingBottles": []
+        }
+      },
+      {
+        "abv": 59.1,
+        "brand": "Longrow",
+        "score": 81.936325,
+        "series": "Open Day",
+        "source": ["text", "brand", "brand_coverage"],
+        "bottler": null,
+        "edition": "2012",
+        "outturn": 230,
+        "bottleId": 53895,
+        "category": "single_malt",
+        "fullName": "Longrow Open Day - 2012",
+        "reference": null,
+        "statedAge": 9,
+        "caskNumber": null,
+        "comparison": {
+          "missing": ["caskStrength"],
+          "conflicts": [
+            "statedAge",
+            "abv",
+            "releaseYear",
+            "singleCask",
+            "edition"
+          ],
+          "agreements": ["category", "brand", "series", "distillers"]
+        },
+        "distillery": ["Springbank"],
+        "maturation": null,
+        "releaseDay": null,
+        "singleCask": true,
+        "releaseYear": 2012,
+        "vintageYear": 2002,
+        "bottlingYear": null,
+        "caskStrength": null,
+        "releaseMonth": null,
+        "familyContext": {
+          "siblingBottles": []
+        }
+      },
+      {
+        "abv": null,
+        "brand": "Longrow",
+        "score": 78.05794,
+        "series": null,
+        "source": ["text", "brand"],
+        "bottler": "Springbank",
+        "edition": null,
+        "outturn": null,
+        "bottleId": 2545,
+        "category": "single_malt",
+        "fullName": "Longrow 2004 Open Day Bottling",
+        "reference": null,
+        "statedAge": 15,
+        "caskNumber": null,
+        "comparison": {
+          "missing": ["abv"],
+          "conflicts": [],
+          "agreements": []
+        },
+        "distillery": [],
+        "maturation": null,
+        "releaseDay": null,
+        "singleCask": null,
+        "releaseYear": null,
+        "vintageYear": null,
+        "bottlingYear": null,
+        "caskStrength": null,
+        "releaseMonth": null,
+        "familyContext": {
+          "siblingBottles": []
+        }
+      },
+      {
+        "abv": null,
+        "brand": "Longrow",
+        "score": 78.05794,
+        "series": null,
+        "source": ["text", "brand"],
+        "bottler": "Springbank",
+        "edition": null,
+        "outturn": null,
+        "bottleId": 2904,
+        "category": "single_malt",
+        "fullName": "Longrow 2005 Open Day 2018",
+        "reference": null,
+        "statedAge": 13,
+        "caskNumber": null,
+        "comparison": {
+          "missing": ["abv"],
+          "conflicts": [],
+          "agreements": []
+        },
+        "distillery": [],
+        "maturation": null,
+        "releaseDay": null,
+        "singleCask": null,
+        "releaseYear": null,
+        "vintageYear": null,
+        "bottlingYear": null,
+        "caskStrength": null,
+        "releaseMonth": null,
+        "familyContext": {
+          "siblingBottles": []
+        }
+      },
+      {
+        "abv": null,
+        "brand": "Longrow",
+        "score": 63.166664,
+        "series": "Open Day",
+        "source": ["text"],
+        "bottler": "Springbank",
+        "edition": "2021",
+        "outturn": null,
+        "bottleId": 1825,
+        "category": "single_malt",
+        "fullName": "Longrow Online Tasting Week - 2021",
+        "reference": null,
+        "statedAge": 17,
+        "caskNumber": null,
+        "comparison": {
+          "missing": ["abv"],
+          "conflicts": [],
+          "agreements": []
+        },
+        "distillery": [],
+        "maturation": null,
+        "releaseDay": null,
+        "singleCask": null,
+        "releaseYear": null,
+        "vintageYear": null,
+        "bottlingYear": null,
+        "caskStrength": null,
+        "releaseMonth": null,
+        "familyContext": {
+          "siblingBottles": []
+        }
+      },
+      {
+        "abv": 57.1,
+        "brand": "Springbank",
+        "score": 56.520527,
+        "series": null,
+        "source": ["text"],
+        "bottler": null,
+        "edition": "",
+        "outturn": null,
+        "bottleId": 43619,
+        "category": "single_malt",
+        "fullName": "Springbank 5-year-old Fresh Sherry",
+        "reference": null,
+        "statedAge": 5,
+        "caskNumber": null,
+        "comparison": {
+          "missing": [
+            "releaseYear",
+            "caskStrength",
+            "singleCask",
+            "edition",
+            "series"
+          ],
+          "conflicts": ["abv", "brand"],
+          "agreements": ["category", "statedAge", "distillers"]
+        },
+        "distillery": ["Springbank"],
+        "maturation": null,
+        "releaseDay": null,
+        "singleCask": null,
+        "releaseYear": null,
+        "vintageYear": null,
+        "bottlingYear": null,
+        "caskStrength": null,
+        "releaseMonth": null,
+        "familyContext": {
+          "siblingBottles": []
+        }
+      },
+      {
+        "abv": 59.2,
+        "brand": "Single Cask Nation",
+        "score": 55.390175,
+        "series": null,
+        "source": ["text"],
+        "bottler": "Single Cask Nation",
+        "edition": null,
+        "outturn": 194,
+        "bottleId": 47663,
+        "category": "bourbon",
+        "fullName": "Single Cask Nation High Wire 2020",
+        "reference": null,
+        "statedAge": 5,
+        "caskNumber": "907114",
+        "comparison": {
+          "missing": [],
+          "conflicts": [],
+          "agreements": ["abv"]
+        },
+        "distillery": ["High Wire Distilling Co."],
+        "maturation": "#3 New Charred Oak Barrel",
+        "releaseDay": null,
+        "singleCask": true,
+        "releaseYear": 2026,
+        "vintageYear": 2020,
+        "bottlingYear": 2026,
+        "caskStrength": null,
+        "releaseMonth": null,
+        "familyContext": {
+          "siblingBottles": []
+        }
+      },
+      {
+        "abv": 57,
+        "brand": "Springbank",
+        "score": 54.686882,
+        "series": null,
+        "source": ["text"],
+        "bottler": null,
+        "edition": null,
+        "outturn": null,
+        "bottleId": 63936,
+        "category": "single_malt",
+        "fullName": "Springbank 5-year-old 114 Proof",
+        "reference": null,
+        "statedAge": 5,
+        "caskNumber": null,
+        "comparison": {
+          "missing": ["releaseYear", "singleCask", "edition", "series"],
+          "conflicts": ["abv", "brand"],
+          "agreements": ["category", "statedAge", "caskStrength", "distillers"]
+        },
+        "distillery": ["Springbank"],
+        "maturation": null,
+        "releaseDay": null,
+        "singleCask": null,
+        "releaseYear": null,
+        "vintageYear": null,
+        "bottlingYear": null,
+        "caskStrength": true,
+        "releaseMonth": null,
+        "familyContext": {
+          "siblingBottles": []
+        }
+      },
+      {
+        "abv": 57.1,
+        "brand": "Longrow",
+        "score": 50.158512,
+        "series": null,
+        "source": ["vector", "text"],
+        "bottler": null,
+        "edition": "2026 Edition",
+        "outturn": null,
+        "bottleId": 53903,
+        "category": "single_malt",
+        "fullName": "Longrow 100° Proof - 2026 Edition",
+        "reference": "Longrow 100° Proof (2026 Edition)",
+        "statedAge": null,
+        "caskNumber": null,
+        "comparison": {
+          "missing": ["statedAge", "caskStrength", "singleCask", "series"],
+          "conflicts": ["abv"],
+          "agreements": [
+            "category",
+            "releaseYear",
+            "edition",
+            "brand",
+            "distillers"
+          ]
+        },
+        "distillery": ["Springbank"],
+        "maturation": null,
+        "releaseDay": null,
+        "singleCask": null,
+        "releaseYear": 2026,
+        "vintageYear": null,
+        "bottlingYear": null,
+        "caskStrength": null,
+        "releaseMonth": null,
+        "familyContext": {
+          "siblingBottles": []
+        }
+      },
+      {
+        "abv": null,
+        "brand": "Kilkerran",
+        "score": 49.56846,
+        "series": null,
+        "source": ["text"],
+        "bottler": "Glengyle",
+        "edition": null,
+        "outturn": null,
+        "bottleId": 2127,
+        "category": "single_malt",
+        "fullName": "Kilkerran 14-year-old Triple Distilled - Virtual Open Day 2020",
+        "reference": null,
+        "statedAge": 14,
+        "caskNumber": null,
+        "comparison": {
+          "missing": ["abv"],
+          "conflicts": [],
+          "agreements": []
+        },
+        "distillery": [],
+        "maturation": null,
+        "releaseDay": null,
+        "singleCask": null,
+        "releaseYear": null,
+        "vintageYear": null,
+        "bottlingYear": null,
+        "caskStrength": null,
+        "releaseMonth": null,
+        "familyContext": {
+          "siblingBottles": []
+        }
+      },
+      {
+        "abv": null,
+        "brand": "Kilkerran",
+        "score": 48.980465,
+        "series": null,
+        "source": ["text"],
+        "bottler": "Glengyle",
+        "edition": null,
+        "outturn": null,
+        "bottleId": 2508,
+        "category": "single_malt",
+        "fullName": "Kilkerran 15-year-old Open Day 2019",
+        "reference": null,
+        "statedAge": 15,
+        "caskNumber": null,
+        "comparison": {
+          "missing": ["abv"],
+          "conflicts": [],
+          "agreements": []
+        },
+        "distillery": [],
+        "maturation": null,
+        "releaseDay": null,
+        "singleCask": null,
+        "releaseYear": null,
+        "vintageYear": null,
+        "bottlingYear": null,
+        "caskStrength": null,
+        "releaseMonth": null,
+        "familyContext": {
+          "siblingBottles": []
+        }
+      },
+      {
+        "abv": 59.2,
+        "brand": "Bruichladdich Octomore",
+        "score": 47.618015,
+        "series": null,
+        "source": ["text"],
+        "bottler": null,
+        "edition": null,
+        "outturn": null,
+        "bottleId": 1535,
+        "category": "single_malt",
+        "fullName": "Octomore 13.1",
+        "reference": null,
+        "statedAge": 5,
+        "caskNumber": null,
+        "comparison": {
+          "missing": [],
+          "conflicts": [],
+          "agreements": ["abv"]
+        },
+        "distillery": ["Bruichladdich"],
+        "maturation": "First-fill bourbon casks",
+        "releaseDay": null,
+        "singleCask": null,
+        "releaseYear": 2022,
+        "vintageYear": 2016,
+        "bottlingYear": null,
+        "caskStrength": null,
+        "releaseMonth": null,
+        "familyContext": {
+          "siblingBottles": []
+        }
+      },
+      {
+        "abv": null,
+        "brand": "A Speyside Distillery",
+        "score": 40.86001,
+        "series": null,
+        "source": ["text"],
+        "bottler": "William Cadenhead's",
+        "edition": null,
+        "outturn": null,
+        "bottleId": 1913,
+        "category": "single_malt",
+        "fullName": "A Speyside Distillery 2001 CA Virtual Open Day 2020",
+        "reference": null,
+        "statedAge": 18,
+        "caskNumber": null,
+        "comparison": {
+          "missing": ["abv"],
+          "conflicts": [],
+          "agreements": []
+        },
+        "distillery": [],
+        "maturation": null,
+        "releaseDay": null,
+        "singleCask": null,
+        "releaseYear": null,
+        "vintageYear": null,
+        "bottlingYear": null,
+        "caskStrength": null,
+        "releaseMonth": null,
+        "familyContext": {
+          "siblingBottles": []
+        }
+      },
+      {
+        "abv": null,
+        "brand": "Longrow",
+        "score": 0.7150334003269937,
+        "series": null,
+        "source": ["vector"],
+        "bottler": null,
+        "edition": null,
+        "outturn": null,
+        "bottleId": 18257,
+        "category": "single_malt",
+        "fullName": "Longrow 10-year-old",
+        "reference": "Longrow, 10-year-old, 50%",
+        "statedAge": 10,
+        "caskNumber": null,
+        "comparison": {
+          "missing": ["abv"],
+          "conflicts": [],
+          "agreements": []
+        },
+        "distillery": [],
+        "maturation": null,
+        "releaseDay": null,
+        "singleCask": null,
+        "releaseYear": null,
+        "vintageYear": null,
+        "bottlingYear": null,
+        "caskStrength": null,
+        "releaseMonth": null,
+        "familyContext": {
+          "siblingBottles": []
+        }
+      },
+      {
+        "abv": null,
+        "brand": "Longrow",
+        "score": 0.7125473077787676,
+        "series": null,
+        "source": ["vector"],
+        "bottler": null,
+        "edition": null,
+        "outturn": null,
+        "bottleId": 17909,
+        "category": "single_malt",
+        "fullName": "Longrow 14-year-old",
+        "reference": "Longrow, 14-year-old, 46%",
+        "statedAge": 14,
+        "caskNumber": null,
+        "comparison": {
+          "missing": ["abv"],
+          "conflicts": [],
+          "agreements": []
+        },
+        "distillery": [],
+        "maturation": null,
+        "releaseDay": null,
+        "singleCask": null,
+        "releaseYear": null,
+        "vintageYear": null,
+        "bottlingYear": null,
+        "caskStrength": null,
+        "releaseMonth": null,
+        "familyContext": {
+          "siblingBottles": []
+        }
+      },
+      {
+        "abv": null,
+        "brand": "Longrow",
+        "score": 0.7063394270522497,
+        "series": null,
+        "source": ["vector"],
+        "bottler": null,
+        "edition": null,
+        "outturn": null,
+        "bottleId": 17864,
+        "category": "single_malt",
+        "fullName": "Longrow Gaja Borolo Finish, 7-year-old",
+        "reference": "Longrow, Gaja Borolo Finish, 7-year-old, 55.8%",
+        "statedAge": 7,
+        "caskNumber": null,
+        "comparison": {
+          "missing": ["abv"],
+          "conflicts": [],
+          "agreements": []
+        },
+        "distillery": [],
+        "maturation": null,
+        "releaseDay": null,
+        "singleCask": null,
+        "releaseYear": null,
+        "vintageYear": null,
+        "bottlingYear": null,
+        "caskStrength": null,
+        "releaseMonth": null,
+        "familyContext": {
+          "siblingBottles": []
+        }
+      },
+      {
+        "abv": null,
+        "brand": "Longrow",
+        "score": 0.6924691737895691,
+        "series": null,
+        "source": ["vector"],
+        "bottler": null,
+        "edition": null,
+        "outturn": null,
+        "bottleId": 18372,
+        "category": "single_malt",
+        "fullName": "Longrow Tokaji Wood, 10-year-old",
+        "reference": "Longrow Tokaji Wood, 10-year-old, 55.6%",
+        "statedAge": 10,
+        "caskNumber": null,
+        "comparison": {
+          "missing": ["abv"],
+          "conflicts": [],
+          "agreements": []
+        },
+        "distillery": [],
+        "maturation": null,
+        "releaseDay": null,
+        "singleCask": null,
+        "releaseYear": null,
+        "vintageYear": null,
+        "bottlingYear": null,
+        "caskStrength": null,
+        "releaseMonth": null,
+        "familyContext": {
+          "siblingBottles": []
+        }
+      },
+      {
+        "abv": null,
+        "brand": "Longrow",
+        "score": 0.6898652097909174,
+        "series": null,
+        "source": ["vector"],
+        "bottler": "Springbank",
+        "edition": null,
+        "outturn": null,
+        "bottleId": 1144,
+        "category": "single_malt",
+        "fullName": "Longrow CV",
+        "reference": "Longrow CV",
+        "statedAge": null,
+        "caskNumber": null,
+        "comparison": {
+          "missing": ["abv"],
+          "conflicts": [],
+          "agreements": []
+        },
+        "distillery": [],
+        "maturation": null,
+        "releaseDay": null,
+        "singleCask": null,
+        "releaseYear": null,
+        "vintageYear": null,
+        "bottlingYear": null,
+        "caskStrength": null,
+        "releaseMonth": null,
+        "familyContext": {
+          "siblingBottles": []
+        }
+      },
+      {
+        "abv": 55.9,
+        "brand": "Longrow",
+        "score": 0.6111111111111112,
+        "series": null,
+        "source": ["brand_coverage"],
+        "bottler": "William Cadenhead's",
+        "edition": null,
+        "outturn": null,
+        "bottleId": 69613,
+        "category": "single_malt",
+        "fullName": "Longrow 2015 11-year-old",
+        "reference": null,
+        "statedAge": 11,
+        "caskNumber": null,
+        "comparison": {
+          "missing": ["singleCask", "edition", "series"],
+          "conflicts": ["statedAge", "abv"],
+          "agreements": [
+            "category",
+            "releaseYear",
+            "caskStrength",
+            "brand",
+            "distillers"
+          ]
+        },
+        "distillery": ["Springbank"],
+        "maturation": "Fresh rye barrel",
+        "releaseDay": null,
+        "singleCask": null,
+        "releaseYear": 2026,
+        "vintageYear": 2015,
+        "bottlingYear": 2026,
+        "caskStrength": true,
+        "releaseMonth": null,
+        "familyContext": {
+          "siblingBottles": []
+        }
+      }
+    ]
+  },
+  "context": {
+    "inspectedBottleIds": [44254],
+    "bottleContexts": [
+      {
+        "exact": {
+          "abv": 59.2,
+          "edition": "2026",
+          "outturn": null,
+          "statedAge": null,
+          "caskNumber": null,
+          "maturation": null,
+          "releaseDay": null,
+          "singleCask": true,
+          "releaseYear": 2026,
+          "vintageYear": null,
+          "bottlingYear": null,
+          "caskStrength": true,
+          "releaseMonth": null
+        },
+        "shared": {
+          "name": "Open Day",
+          "brand": {
+            "name": "Longrow",
+            "entityId": 1152
+          },
+          "series": {
+            "name": "Open Day",
+            "seriesId": 656
+          },
+          "bottler": null,
+          "category": "single_malt",
+          "statedAge": 5,
+          "distillers": [
+            {
+              "name": "Springbank",
+              "entityId": 1362
+            }
+          ]
+        },
+        "groupId": 18074,
+        "bottleId": 44254,
+        "fullName": "Longrow Open Day - 2026",
+        "siblings": [],
+        "references": [
+          {
+            "name": "Longrow Open Day",
+            "ignored": false
+          },
+          {
+            "name": "Longrow Open Day 2026",
+            "ignored": false
+          }
+        ],
+        "observations": [],
+        "imageSources": []
+      }
+    ],
+    "inspectedEntities": [
+      {
+        "kind": "brand",
+        "name": "Longrow",
+        "score": 1,
+        "source": ["exact", "text", "prefix", "contained"],
+        "entityId": 1152,
+        "reference": "Longrow",
+        "shortName": null,
+        "retrievedFor": [
+          {
+            "exact": true,
+            "query": "Longrow"
+          }
+        ]
+      },
+      {
+        "kind": "distillery",
+        "name": "Springbank",
+        "score": 1,
+        "source": ["exact", "text", "prefix", "contained"],
+        "entityId": 1362,
+        "reference": "Springbank",
+        "shortName": null,
+        "retrievedFor": [
+          {
+            "exact": true,
+            "query": "Springbank"
+          }
+        ]
+      },
+      {
+        "kind": "bottler",
+        "name": "Single Cask Nation",
+        "score": 1,
+        "source": ["exact", "text", "prefix", "contained"],
+        "entityId": 365762,
+        "reference": "Single Cask Nation",
+        "shortName": null,
+        "retrievedFor": [
+          {
+            "exact": true,
+            "query": "Single Cask Nation"
+          }
+        ]
+      },
+      {
+        "kind": "distillery",
+        "name": "High Wire Distilling Co.",
+        "score": 1,
+        "source": ["exact", "text", "prefix", "contained"],
+        "entityId": 29378,
+        "reference": "High Wire Distilling Co.",
+        "shortName": null,
+        "retrievedFor": [
+          {
+            "exact": true,
+            "query": "High Wire Distilling Co."
+          }
+        ]
+      },
+      {
+        "kind": "brand",
+        "name": "Bruichladdich Octomore",
+        "score": 1,
+        "source": ["exact", "text", "prefix", "contained"],
+        "entityId": 1210,
+        "reference": "Bruichladdich Octomore",
+        "shortName": "Octomore",
+        "retrievedFor": [
+          {
+            "exact": true,
+            "query": "Bruichladdich Octomore"
+          },
+          {
+            "query": "Bruichladdich"
+          }
+        ]
+      },
+      {
+        "kind": "distillery",
+        "name": "Bruichladdich",
+        "score": 1,
+        "source": ["contained", "exact", "text", "prefix"],
+        "entityId": 192,
+        "reference": "Bruichladdich",
+        "shortName": "",
+        "retrievedFor": [
+          {
+            "query": "Bruichladdich Octomore"
+          },
+          {
+            "exact": true,
+            "query": "Bruichladdich"
+          }
+        ]
+      },
+      {
+        "kind": "brand",
+        "name": "Kilkerran",
+        "score": 1,
+        "source": ["exact", "text", "prefix", "contained"],
+        "entityId": 1103,
+        "reference": "Kilkerran",
+        "shortName": null,
+        "retrievedFor": [
+          {
+            "exact": true,
+            "query": "Kilkerran"
+          }
+        ]
+      },
+      {
+        "kind": "distillery",
+        "name": "Glengyle",
+        "score": 1,
+        "source": ["exact", "text", "prefix", "contained"],
+        "entityId": 243,
+        "reference": "Glengyle",
+        "shortName": null,
+        "retrievedFor": [
+          {
+            "exact": true,
+            "query": "Glengyle"
+          }
+        ]
+      },
+      {
+        "kind": "brand",
+        "name": "A Speyside Distillery",
+        "score": 1,
+        "source": ["exact", "text", "prefix", "contained"],
+        "entityId": 5,
+        "reference": "A Speyside Distillery",
+        "shortName": null,
+        "retrievedFor": [
+          {
+            "exact": true,
+            "query": "A Speyside Distillery"
+          }
+        ]
+      },
+      {
+        "kind": "bottler",
+        "name": "William Cadenhead's",
+        "score": 1,
+        "source": ["exact", "text", "prefix", "contained"],
+        "entityId": 336,
+        "reference": "William Cadenhead's",
+        "shortName": "Cadenhead's",
+        "retrievedFor": [
+          {
+            "exact": true,
+            "query": "William Cadenhead's"
+          }
+        ]
+      },
+      {
+        "kind": "brand",
+        "name": "Bruichladdich Port Charlotte",
+        "score": 0.5,
+        "source": ["text", "prefix"],
+        "entityId": 1269,
+        "reference": "Bruichladdich Port Charlotte",
+        "shortName": "Port Charlotte",
+        "retrievedFor": [
+          {
+            "query": "Bruichladdich"
+          }
+        ]
+      },
+      {
+        "kind": "distillery",
+        "name": "Speyside Distillery",
+        "score": 0.43947368421052635,
+        "source": ["contained"],
+        "entityId": 1356,
+        "reference": "Speyside Distillery",
+        "shortName": null,
+        "retrievedFor": [
+          {
+            "query": "A Speyside Distillery"
+          }
+        ]
+      },
+      {
+        "kind": "brand",
+        "name": "The Single Cask",
+        "score": 0.375,
+        "source": ["contained"],
+        "entityId": 366640,
+        "reference": "Single Cask",
+        "shortName": null,
+        "retrievedFor": [
+          {
+            "query": "Single Cask Nation"
+          }
+        ]
+      },
+      {
+        "kind": "brand",
+        "name": "Cadée",
+        "score": 0.29705882352941176,
+        "source": ["contained"],
+        "entityId": 367403,
+        "reference": "Cadée",
+        "shortName": null,
+        "retrievedFor": [
+          {
+            "query": "William Cadenhead's"
+          }
+        ]
+      },
+      {
+        "kind": "brand",
+        "name": "SPEY",
+        "score": 0.29210526315789476,
+        "source": ["contained"],
+        "entityId": 1353,
+        "reference": "SPEY",
+        "shortName": null,
+        "retrievedFor": [
+          {
+            "query": "A Speyside Distillery"
+          }
+        ]
+      },
+      {
+        "kind": "brand",
+        "name": "A Secret Speyside Distillery",
+        "score": 0.2,
+        "source": ["text"],
+        "entityId": 39,
+        "reference": null,
+        "shortName": null,
+        "retrievedFor": [
+          {
+            "query": "A Speyside Distillery"
+          }
+        ]
+      }
+    ],
+    "inspectedSeries": []
+  },
+  "provenance": {
+    "source": "production_miss",
+    "verifiedSourceUrls": [
+      "https://www.scotchwhiskyauctions.com/auctions/234-the-185th-auction/905110-longrow-5-year-old-open-day-2026-35cl/"
+    ],
+    "dbOutcome": {
+      "bottleId": null,
+      "createsBottle": false,
+      "summary": "Production returned no_match without filing a repair."
+    },
+    "notes": "Captured from saved classifier run 36017 (auction_lot 16600, model null, 2026-11-03T17:17:43.408Z). Production rationale: The auction listing is for one Longrow Open Day 2026 whisky bottle, not a set or sample. Bottle 44254 matches the age, ABV, release year, and other identity details, but its populated single-cask field conflicts with product evidence indicating a multi-cask release. It is not safe to assign without catalog review, and a duplicate should not be created. Expected outcome checked against the lot page on 2026-11-09 and a judged review of the 185th auction on 2026-11-03."
+  },
+  "expected": {
+    "status": "classified",
+    "action": "no_match",
+    "identityScope": "product",
+    "expectedTier": "review",
+    "blockedBottle": {
+      "bottleId": 44254,
+      "fields": ["singleCask"]
+    },
+    "summary": "Bottle 44254 is the Longrow Open Day 2026 release (59.2%), but it stores singleCask=true. The lot gives bourbon and Chardonnay casks and 1,750 bottles, so it is not one cask. Leave it for Bottle Review; do not create a duplicate."
+  }
+}

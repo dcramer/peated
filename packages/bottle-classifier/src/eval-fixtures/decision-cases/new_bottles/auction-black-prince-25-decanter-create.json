@@ -1,0 +1,1225 @@
+{
+  "id": "auction-black-prince-25-decanter-create",
+  "name": "Black Prince 25 Year Old Decanter: create the 25-year-old blend; the decanter is packaging",
+  "input": {
+    "reference": {
+      "id": 14090,
+      "url": "https://www.scotchwhiskyauctions.com/auctions/234-the-185th-auction/905387-black-prince-25-year-old-decanter/",
+      "name": "Black Prince 25 Year Old Decanter",
+      "imageUrl": null,
+      "externalSiteId": 28097,
+      "currentBottleId": null
+    },
+    "extractedIdentity": {
+      "abv": 40,
+      "brand": null,
+      "series": null,
+      "bottler": null,
+      "edition": null,
+      "outturn": null,
+      "category": null,
+      "distillery": null,
+      "expression": null,
+      "maturation": null,
+      "stated_age": null,
+      "cask_number": null,
+      "single_cask": null,
+      "release_year": null,
+      "vintage_year": null,
+      "cask_strength": null
+    },
+    "extractedIdentitySource": "structured",
+    "imageEvidence": null,
+    "initialCandidates": [
+      {
+        "abv": null,
+        "brand": "Mortlach",
+        "score": 65.36545,
+        "series": null,
+        "source": ["text"],
+        "bottler": null,
+        "edition": null,
+        "outturn": null,
+        "bottleId": 4148,
+        "category": "single_malt",
+        "fullName": "Mortlach 25-year-old Crystal Decanter",
+        "reference": null,
+        "statedAge": 25,
+        "caskNumber": null,
+        "comparison": {
+          "missing": [],
+          "conflicts": ["category", "brand"],
+          "agreements": ["statedAge"]
+        },
+        "distillery": ["Mortlach"],
+        "maturation": null,
+        "releaseDay": null,
+        "singleCask": null,
+        "releaseYear": null,
+        "vintageYear": null,
+        "bottlingYear": null,
+        "caskStrength": null,
+        "releaseMonth": null,
+        "familyContext": {
+          "siblingBottles": []
+        }
+      },
+      {
+        "abv": 40,
+        "brand": "Black Prince",
+        "score": 65.28134,
+        "series": null,
+        "source": ["text", "context", "brand_coverage"],
+        "bottler": null,
+        "edition": null,
+        "outturn": null,
+        "bottleId": 52271,
+        "category": "blend",
+        "fullName": "Black Prince 17-year-old",
+        "reference": null,
+        "statedAge": 17,
+        "caskNumber": null,
+        "comparison": {
+          "missing": [],
+          "conflicts": [],
+          "agreements": ["abv"]
+        },
+        "distillery": [],
+        "maturation": null,
+        "releaseDay": null,
+        "singleCask": null,
+        "releaseYear": null,
+        "vintageYear": null,
+        "bottlingYear": null,
+        "caskStrength": null,
+        "releaseMonth": null,
+        "familyContext": {
+          "siblingBottles": []
+        }
+      },
+      {
+        "abv": 50.5,
+        "brand": "XOP",
+        "score": 62.12404,
+        "series": null,
+        "source": ["text"],
+        "bottler": "Douglas Laing",
+        "edition": "Black Series",
+        "outturn": null,
+        "bottleId": 63277,
+        "category": "single_malt",
+        "fullName": "XOP Glen Keith 25-year-old - Black Series",
+        "reference": null,
+        "statedAge": 25,
+        "caskNumber": null,
+        "comparison": {
+          "missing": [],
+          "conflicts": ["category", "brand"],
+          "agreements": ["statedAge"]
+        },
+        "distillery": ["Glen Keith"],
+        "maturation": null,
+        "releaseDay": null,
+        "singleCask": null,
+        "releaseYear": null,
+        "vintageYear": null,
+        "bottlingYear": null,
+        "caskStrength": null,
+        "releaseMonth": null,
+        "familyContext": {
+          "siblingBottles": []
+        }
+      },
+      {
+        "abv": 51.2,
+        "brand": "Glenfarclas",
+        "score": 55.54297,
+        "series": null,
+        "source": ["text"],
+        "bottler": null,
+        "edition": "Decanter Series Release IV",
+        "outturn": null,
+        "bottleId": 62402,
+        "category": "single_malt",
+        "fullName": "Glenfarclas 25-year-old The Last of the Millennium - Decanter Series Release IV",
+        "reference": null,
+        "statedAge": 25,
+        "caskNumber": null,
+        "comparison": {
+          "missing": [],
+          "conflicts": ["category", "brand"],
+          "agreements": ["statedAge"]
+        },
+        "distillery": ["Glenfarclas"],
+        "maturation": null,
+        "releaseDay": null,
+        "singleCask": null,
+        "releaseYear": null,
+        "vintageYear": 1999,
+        "bottlingYear": null,
+        "caskStrength": null,
+        "releaseMonth": null,
+        "familyContext": {
+          "siblingBottles": []
+        }
+      },
+      {
+        "abv": 40,
+        "brand": "Bell's",
+        "score": 55.077354,
+        "series": null,
+        "source": ["text"],
+        "bottler": null,
+        "edition": "1998",
+        "outturn": null,
+        "bottleId": 63777,
+        "category": "blend",
+        "fullName": "Bell's Prince of Wales 50th Birthday Decanter - 1998",
+        "reference": null,
+        "statedAge": null,
+        "caskNumber": null,
+        "comparison": {
+          "missing": [],
+          "conflicts": [],
+          "agreements": ["abv"]
+        },
+        "distillery": [],
+        "maturation": null,
+        "releaseDay": null,
+        "singleCask": null,
+        "releaseYear": 1998,
+        "vintageYear": null,
+        "bottlingYear": null,
+        "caskStrength": null,
+        "releaseMonth": null,
+        "familyContext": {
+          "siblingBottles": []
+        }
+      },
+      {
+        "abv": 60.1,
+        "brand": "Old Particular",
+        "score": 52.71788,
+        "series": null,
+        "source": ["text"],
+        "bottler": "Douglas Laing",
+        "edition": "Black Label",
+        "outturn": 242,
+        "bottleId": 62523,
+        "category": "single_malt",
+        "fullName": "Old Particular Longmorn 1994 25-year-old - Black Label",
+        "reference": null,
+        "statedAge": 25,
+        "caskNumber": "13921",
+        "comparison": {
+          "missing": [],
+          "conflicts": ["category", "brand"],
+          "agreements": ["statedAge"]
+        },
+        "distillery": ["Longmorn"],
+        "maturation": "Refill hogshead",
+        "releaseDay": null,
+        "singleCask": true,
+        "releaseYear": null,
+        "vintageYear": 1994,
+        "bottlingYear": 2020,
+        "caskStrength": true,
+        "releaseMonth": null,
+        "familyContext": {
+          "siblingBottles": []
+        }
+      },
+      {
+        "abv": 47.5,
+        "brand": "Extra Old Particular",
+        "score": 49.115395,
+        "series": "The Black Series",
+        "source": ["text"],
+        "bottler": "Douglas Laing",
+        "edition": null,
+        "outturn": 129,
+        "bottleId": 66201,
+        "category": "single_malt",
+        "fullName": "Extra Old Particular Clynelish 1997 25-year-old",
+        "reference": null,
+        "statedAge": 25,
+        "caskNumber": "DL16314",
+        "comparison": {
+          "missing": [],
+          "conflicts": ["category", "brand"],
+          "agreements": ["statedAge"]
+        },
+        "distillery": ["Clynelish"],
+        "maturation": "Refill hogshead",
+        "releaseDay": null,
+        "singleCask": null,
+        "releaseYear": null,
+        "vintageYear": 1997,
+        "bottlingYear": 2023,
+        "caskStrength": null,
+        "releaseMonth": null,
+        "familyContext": {
+          "siblingBottles": []
+        }
+      },
+      {
+        "abv": null,
+        "brand": "Grant's",
+        "score": 46.209213,
+        "series": null,
+        "source": ["vector", "text"],
+        "bottler": null,
+        "edition": null,
+        "outturn": null,
+        "bottleId": 16991,
+        "category": "blend",
+        "fullName": "Grant's 25-year-old",
+        "reference": "Grant's 25-year-old, 40%",
+        "statedAge": 25,
+        "caskNumber": null,
+        "comparison": {
+          "missing": [],
+          "conflicts": ["brand"],
+          "agreements": ["category", "statedAge"]
+        },
+        "distillery": [],
+        "maturation": null,
+        "releaseDay": null,
+        "singleCask": null,
+        "releaseYear": null,
+        "vintageYear": null,
+        "bottlingYear": null,
+        "caskStrength": null,
+        "releaseMonth": null,
+        "familyContext": {
+          "siblingBottles": []
+        }
+      },
+      {
+        "abv": null,
+        "brand": "Barrowman's",
+        "score": 45.358303,
+        "series": null,
+        "source": ["text"],
+        "bottler": null,
+        "edition": "",
+        "outturn": null,
+        "bottleId": 43347,
+        "category": "blend",
+        "fullName": "Barrowman's 25-year-old",
+        "reference": null,
+        "statedAge": 25,
+        "caskNumber": null,
+        "comparison": {
+          "missing": [],
+          "conflicts": ["brand"],
+          "agreements": ["category", "statedAge"]
+        },
+        "distillery": [],
+        "maturation": null,
+        "releaseDay": null,
+        "singleCask": null,
+        "releaseYear": null,
+        "vintageYear": null,
+        "bottlingYear": null,
+        "caskStrength": null,
+        "releaseMonth": null,
+        "familyContext": {
+          "siblingBottles": []
+        }
+      },
+      {
+        "abv": null,
+        "brand": "Chivas Regal",
+        "score": 44.43685,
+        "series": null,
+        "source": ["vector", "text"],
+        "bottler": null,
+        "edition": null,
+        "outturn": null,
+        "bottleId": 16144,
+        "category": "blend",
+        "fullName": "Chivas Regal 25-year-old",
+        "reference": "Chivas Regal 25-year-old",
+        "statedAge": 25,
+        "caskNumber": null,
+        "comparison": {
+          "missing": [],
+          "conflicts": ["brand"],
+          "agreements": ["category", "statedAge"]
+        },
+        "distillery": [],
+        "maturation": null,
+        "releaseDay": null,
+        "singleCask": null,
+        "releaseYear": null,
+        "vintageYear": null,
+        "bottlingYear": null,
+        "caskStrength": null,
+        "releaseMonth": null,
+        "familyContext": {
+          "siblingBottles": []
+        }
+      },
+      {
+        "abv": 40,
+        "brand": "Chivas Regal",
+        "score": 44.3477,
+        "series": null,
+        "source": ["vector", "text"],
+        "bottler": null,
+        "edition": null,
+        "outturn": null,
+        "bottleId": 65190,
+        "category": "blend",
+        "fullName": "Chivas Regal 25-year-old",
+        "reference": "Chivas Regal 25-year-old, 40%",
+        "statedAge": 25,
+        "caskNumber": null,
+        "comparison": {
+          "missing": [],
+          "conflicts": ["brand"],
+          "agreements": ["category", "statedAge"]
+        },
+        "distillery": [],
+        "maturation": null,
+        "releaseDay": null,
+        "singleCask": null,
+        "releaseYear": null,
+        "vintageYear": null,
+        "bottlingYear": null,
+        "caskStrength": null,
+        "releaseMonth": null,
+        "familyContext": {
+          "siblingBottles": []
+        }
+      },
+      {
+        "abv": null,
+        "brand": "King's Crest",
+        "score": 43.975723,
+        "series": null,
+        "source": ["vector", "text"],
+        "bottler": null,
+        "edition": null,
+        "outturn": null,
+        "bottleId": 18282,
+        "category": "blend",
+        "fullName": "King's Crest 25-year-old",
+        "reference": "King's Crest, 25-year-old, 40%",
+        "statedAge": 25,
+        "caskNumber": null,
+        "comparison": {
+          "missing": [],
+          "conflicts": ["brand"],
+          "agreements": ["category", "statedAge"]
+        },
+        "distillery": [],
+        "maturation": null,
+        "releaseDay": null,
+        "singleCask": null,
+        "releaseYear": null,
+        "vintageYear": null,
+        "bottlingYear": null,
+        "caskStrength": null,
+        "releaseMonth": null,
+        "familyContext": {
+          "siblingBottles": []
+        }
+      },
+      {
+        "abv": null,
+        "brand": "Cutty Sark",
+        "score": 43.975723,
+        "series": null,
+        "source": ["text"],
+        "bottler": null,
+        "edition": null,
+        "outturn": null,
+        "bottleId": 17652,
+        "category": "blend",
+        "fullName": "Cutty Sark 25-year-old",
+        "reference": null,
+        "statedAge": 25,
+        "caskNumber": null,
+        "comparison": {
+          "missing": [],
+          "conflicts": ["brand"],
+          "agreements": ["category", "statedAge"]
+        },
+        "distillery": [],
+        "maturation": null,
+        "releaseDay": null,
+        "singleCask": null,
+        "releaseYear": null,
+        "vintageYear": null,
+        "bottlingYear": null,
+        "caskStrength": null,
+        "releaseMonth": null,
+        "familyContext": {
+          "siblingBottles": []
+        }
+      },
+      {
+        "abv": null,
+        "brand": "Dewar's",
+        "score": 43.54847,
+        "series": null,
+        "source": ["vector", "text"],
+        "bottler": null,
+        "edition": null,
+        "outturn": null,
+        "bottleId": 14267,
+        "category": "blend",
+        "fullName": "Dewar's 25-year-old",
+        "reference": "Dewar's 25-year-old",
+        "statedAge": 25,
+        "caskNumber": null,
+        "comparison": {
+          "missing": [],
+          "conflicts": ["brand"],
+          "agreements": ["category", "statedAge"]
+        },
+        "distillery": [],
+        "maturation": null,
+        "releaseDay": null,
+        "singleCask": null,
+        "releaseYear": null,
+        "vintageYear": null,
+        "bottlingYear": null,
+        "caskStrength": null,
+        "releaseMonth": null,
+        "familyContext": {
+          "siblingBottles": []
+        }
+      },
+      {
+        "abv": 40,
+        "brand": "Bell's",
+        "score": 42.578392,
+        "series": "Great Scottish Inventors",
+        "source": ["text"],
+        "bottler": null,
+        "edition": "James Watt Christmas Decanter",
+        "outturn": null,
+        "bottleId": 46793,
+        "category": "blend",
+        "fullName": "Bell's Extra Special - James Watt Christmas Decanter - 8-year-old - 2002 Release - 40.0% ABV",
+        "reference": null,
+        "statedAge": 8,
+        "caskNumber": null,
+        "comparison": {
+          "missing": [],
+          "conflicts": [],
+          "agreements": ["abv"]
+        },
+        "distillery": [],
+        "maturation": null,
+        "releaseDay": null,
+        "singleCask": null,
+        "releaseYear": 2002,
+        "vintageYear": null,
+        "bottlingYear": null,
+        "caskStrength": null,
+        "releaseMonth": null,
+        "familyContext": {
+          "siblingBottles": []
+        }
+      },
+      {
+        "abv": 40,
+        "brand": "Johnnie Walker",
+        "score": 41.371227,
+        "series": null,
+        "source": ["text"],
+        "bottler": "Johnnie Walker",
+        "edition": null,
+        "outturn": null,
+        "bottleId": 45650,
+        "category": "blend",
+        "fullName": "Johnnie Walker Black Ruby - 40.0% ABV",
+        "reference": null,
+        "statedAge": null,
+        "caskNumber": null,
+        "comparison": {
+          "missing": [],
+          "conflicts": [],
+          "agreements": ["abv"]
+        },
+        "distillery": [],
+        "maturation": null,
+        "releaseDay": null,
+        "singleCask": null,
+        "releaseYear": null,
+        "vintageYear": null,
+        "bottlingYear": null,
+        "caskStrength": null,
+        "releaseMonth": null,
+        "familyContext": {
+          "siblingBottles": []
+        }
+      },
+      {
+        "abv": 40,
+        "brand": "Prince Charlie",
+        "score": 39.94234,
+        "series": null,
+        "source": ["text"],
+        "bottler": "Lawson & Smith Ltd.",
+        "edition": null,
+        "outturn": null,
+        "bottleId": 52267,
+        "category": "blend",
+        "fullName": "Prince Charlie Special Reserve",
+        "reference": null,
+        "statedAge": null,
+        "caskNumber": null,
+        "comparison": {
+          "missing": [],
+          "conflicts": [],
+          "agreements": ["abv"]
+        },
+        "distillery": [],
+        "maturation": null,
+        "releaseDay": null,
+        "singleCask": null,
+        "releaseYear": null,
+        "vintageYear": null,
+        "bottlingYear": null,
+        "caskStrength": null,
+        "releaseMonth": null,
+        "familyContext": {
+          "siblingBottles": []
+        }
+      },
+      {
+        "abv": 40,
+        "brand": "Proper No. Twelve",
+        "score": 38.902607,
+        "series": null,
+        "source": ["text"],
+        "bottler": null,
+        "edition": null,
+        "outturn": null,
+        "bottleId": 45336,
+        "category": "blend",
+        "fullName": "Proper No. Twelve Black Reserve - 4-year-old - 40.0% ABV - Bourbon Cask",
+        "reference": null,
+        "statedAge": 4,
+        "caskNumber": null,
+        "comparison": {
+          "missing": [],
+          "conflicts": [],
+          "agreements": ["abv"]
+        },
+        "distillery": [],
+        "maturation": "bourbon",
+        "releaseDay": null,
+        "singleCask": null,
+        "releaseYear": null,
+        "vintageYear": null,
+        "bottlingYear": null,
+        "caskStrength": null,
+        "releaseMonth": null,
+        "familyContext": {
+          "siblingBottles": []
+        }
+      },
+      {
+        "abv": 40,
+        "brand": "Karuizawa",
+        "score": 37.49276,
+        "series": null,
+        "source": ["text"],
+        "bottler": null,
+        "edition": null,
+        "outturn": null,
+        "bottleId": 55057,
+        "category": "single_malt",
+        "fullName": "Karuizawa Prince Hotel Edition",
+        "reference": null,
+        "statedAge": 17,
+        "caskNumber": null,
+        "comparison": {
+          "missing": [],
+          "conflicts": [],
+          "agreements": ["abv"]
+        },
+        "distillery": ["Karuizawa"],
+        "maturation": null,
+        "releaseDay": null,
+        "singleCask": null,
+        "releaseYear": null,
+        "vintageYear": null,
+        "bottlingYear": 2000,
+        "caskStrength": false,
+        "releaseMonth": null,
+        "familyContext": {
+          "siblingBottles": []
+        }
+      },
+      {
+        "abv": 40,
+        "brand": "Johnnie Walker",
+        "score": 36.34579,
+        "series": null,
+        "source": ["text"],
+        "bottler": null,
+        "edition": "Squid Game Edition",
+        "outturn": null,
+        "bottleId": 45649,
+        "category": "blend",
+        "fullName": "Johnnie Walker Black Label - Squid Game Edition - 12-year-old - 40.0% ABV",
+        "reference": null,
+        "statedAge": 12,
+        "caskNumber": null,
+        "comparison": {
+          "missing": [],
+          "conflicts": [],
+          "agreements": ["abv"]
+        },
+        "distillery": [],
+        "maturation": null,
+        "releaseDay": null,
+        "singleCask": null,
+        "releaseYear": null,
+        "vintageYear": null,
+        "bottlingYear": null,
+        "caskStrength": null,
+        "releaseMonth": null,
+        "familyContext": {
+          "siblingBottles": []
+        }
+      },
+      {
+        "abv": 40,
+        "brand": "Black Bottle",
+        "score": 36.229893,
+        "series": null,
+        "source": ["text"],
+        "bottler": null,
+        "edition": "Islay Jazz Festival 2002",
+        "outturn": null,
+        "bottleId": 46429,
+        "category": "blend",
+        "fullName": "Black Bottle 10-year-old - Islay Jazz Festival 2002 - 2002 Release - 40.0% ABV",
+        "reference": null,
+        "statedAge": 10,
+        "caskNumber": null,
+        "comparison": {
+          "missing": [],
+          "conflicts": [],
+          "agreements": ["abv"]
+        },
+        "distillery": [],
+        "maturation": null,
+        "releaseDay": null,
+        "singleCask": null,
+        "releaseYear": 2002,
+        "vintageYear": null,
+        "bottlingYear": null,
+        "caskStrength": null,
+        "releaseMonth": null,
+        "familyContext": {
+          "siblingBottles": []
+        }
+      },
+      {
+        "abv": 40,
+        "brand": "Bushmills",
+        "score": 33.804222,
+        "series": null,
+        "source": ["text"],
+        "bottler": "Bushmills",
+        "edition": null,
+        "outturn": null,
+        "bottleId": 45771,
+        "category": "blend",
+        "fullName": "Bushmills Black Bush 80/20 PX Sherry Cask Reserve - 40.0% ABV - Pedro Ximenez Cask",
+        "reference": null,
+        "statedAge": null,
+        "caskNumber": null,
+        "comparison": {
+          "missing": [],
+          "conflicts": [],
+          "agreements": ["abv"]
+        },
+        "distillery": ["Bushmills"],
+        "maturation": "pedro_ximenez",
+        "releaseDay": null,
+        "singleCask": null,
+        "releaseYear": null,
+        "vintageYear": null,
+        "bottlingYear": null,
+        "caskStrength": null,
+        "releaseMonth": null,
+        "familyContext": {
+          "siblingBottles": []
+        }
+      },
+      {
+        "abv": 40,
+        "brand": "Bell's",
+        "score": 33.273216,
+        "series": null,
+        "source": ["text"],
+        "bottler": null,
+        "edition": "1995",
+        "outturn": null,
+        "bottleId": 63772,
+        "category": "blend",
+        "fullName": "Bell's Christmas Decanter - 1995",
+        "reference": null,
+        "statedAge": null,
+        "caskNumber": null,
+        "comparison": {
+          "missing": [],
+          "conflicts": [],
+          "agreements": ["abv"]
+        },
+        "distillery": [],
+        "maturation": null,
+        "releaseDay": null,
+        "singleCask": null,
+        "releaseYear": 1995,
+        "vintageYear": null,
+        "bottlingYear": null,
+        "caskStrength": null,
+        "releaseMonth": null,
+        "familyContext": {
+          "siblingBottles": []
+        }
+      },
+      {
+        "abv": 40,
+        "brand": "Master of Malt",
+        "score": 32.090683,
+        "series": null,
+        "source": ["text"],
+        "bottler": "Master of Malt",
+        "edition": "Small Batch",
+        "outturn": null,
+        "bottleId": 47150,
+        "category": "blend",
+        "fullName": "Master of Malt Blended Scotch Whisky - Small Batch - 25-year-old - 2018 Release - 1993 Vintage - 40.0% ABV",
+        "reference": null,
+        "statedAge": 25,
+        "caskNumber": null,
+        "comparison": {
+          "missing": [],
+          "conflicts": [],
+          "agreements": ["abv"]
+        },
+        "distillery": [],
+        "maturation": null,
+        "releaseDay": null,
+        "singleCask": null,
+        "releaseYear": 2018,
+        "vintageYear": 1993,
+        "bottlingYear": null,
+        "caskStrength": null,
+        "releaseMonth": null,
+        "familyContext": {
+          "siblingBottles": []
+        }
+      },
+      {
+        "abv": 40,
+        "brand": "Bell's",
+        "score": 31.755383,
+        "series": null,
+        "source": ["text"],
+        "bottler": null,
+        "edition": null,
+        "outturn": null,
+        "bottleId": 53131,
+        "category": "blend",
+        "fullName": "Bell's Christmas Decanter",
+        "reference": null,
+        "statedAge": null,
+        "caskNumber": null,
+        "comparison": {
+          "missing": [],
+          "conflicts": [],
+          "agreements": ["abv"]
+        },
+        "distillery": [],
+        "maturation": null,
+        "releaseDay": null,
+        "singleCask": null,
+        "releaseYear": 2006,
+        "vintageYear": null,
+        "bottlingYear": null,
+        "caskStrength": null,
+        "releaseMonth": null,
+        "familyContext": {
+          "siblingBottles": []
+        }
+      },
+      {
+        "abv": 40,
+        "brand": "Bell's",
+        "score": 29.737282,
+        "series": null,
+        "source": ["text"],
+        "bottler": null,
+        "edition": "1994",
+        "outturn": null,
+        "bottleId": 63774,
+        "category": "blend",
+        "fullName": "Bell's Christmas Decanter - 1994",
+        "reference": null,
+        "statedAge": null,
+        "caskNumber": null,
+        "comparison": {
+          "missing": [],
+          "conflicts": [],
+          "agreements": ["abv"]
+        },
+        "distillery": [],
+        "maturation": null,
+        "releaseDay": null,
+        "singleCask": null,
+        "releaseYear": 1994,
+        "vintageYear": null,
+        "bottlingYear": null,
+        "caskStrength": null,
+        "releaseMonth": null,
+        "familyContext": {
+          "siblingBottles": []
+        }
+      },
+      {
+        "abv": 40,
+        "brand": "Bell's",
+        "score": 29.737282,
+        "series": null,
+        "source": ["text"],
+        "bottler": null,
+        "edition": "1996",
+        "outturn": null,
+        "bottleId": 63773,
+        "category": "blend",
+        "fullName": "Bell's Christmas Decanter - 1996",
+        "reference": null,
+        "statedAge": null,
+        "caskNumber": null,
+        "comparison": {
+          "missing": [],
+          "conflicts": [],
+          "agreements": ["abv"]
+        },
+        "distillery": [],
+        "maturation": null,
+        "releaseDay": null,
+        "singleCask": null,
+        "releaseYear": 1996,
+        "vintageYear": null,
+        "bottlingYear": null,
+        "caskStrength": null,
+        "releaseMonth": null,
+        "familyContext": {
+          "siblingBottles": []
+        }
+      },
+      {
+        "abv": null,
+        "brand": "Royal Salute",
+        "score": 0.6803529880706272,
+        "series": null,
+        "source": ["vector"],
+        "bottler": null,
+        "edition": null,
+        "outturn": null,
+        "bottleId": 13308,
+        "category": "blend",
+        "fullName": "Royal Salute 25-year-old The Treasured Blend",
+        "reference": "Royal Salute 25-year-old The Treasured Blend, 40%",
+        "statedAge": 25,
+        "caskNumber": null,
+        "comparison": {
+          "missing": [],
+          "conflicts": ["brand"],
+          "agreements": ["category", "statedAge"]
+        },
+        "distillery": [],
+        "maturation": null,
+        "releaseDay": null,
+        "singleCask": null,
+        "releaseYear": null,
+        "vintageYear": null,
+        "bottlingYear": null,
+        "caskStrength": null,
+        "releaseMonth": null,
+        "familyContext": {
+          "siblingBottles": []
+        }
+      }
+    ]
+  },
+  "context": {
+    "inspectedBottleIds": [52271],
+    "bottleContexts": [
+      {
+        "exact": {
+          "abv": 40,
+          "edition": null,
+          "outturn": null,
+          "statedAge": 17,
+          "caskNumber": null,
+          "maturation": null,
+          "releaseDay": null,
+          "singleCask": null,
+          "releaseYear": null,
+          "vintageYear": null,
+          "bottlingYear": null,
+          "caskStrength": null,
+          "releaseMonth": null
+        },
+        "shared": {
+          "name": "17-year-old",
+          "brand": {
+            "name": "Black Prince",
+            "entityId": 2269
+          },
+          "series": null,
+          "bottler": null,
+          "category": "blend",
+          "statedAge": null,
+          "distillers": []
+        },
+        "groupId": 25231,
+        "bottleId": 52271,
+        "fullName": "Black Prince 17-year-old",
+        "siblings": [],
+        "references": [],
+        "observations": [],
+        "imageSources": []
+      }
+    ],
+    "inspectedEntities": [
+      {
+        "kind": "brand",
+        "name": "Black Prince",
+        "score": 1,
+        "source": ["exact", "text", "prefix", "contained"],
+        "entityId": 2269,
+        "reference": "Black Prince",
+        "shortName": null,
+        "retrievedFor": [
+          {
+            "exact": true,
+            "query": "Black Prince"
+          }
+        ]
+      },
+      {
+        "kind": "brand",
+        "name": "Bell's",
+        "score": 1,
+        "source": ["exact", "text", "prefix", "contained"],
+        "entityId": 31,
+        "reference": "Bell's",
+        "shortName": null,
+        "retrievedFor": [
+          {
+            "exact": true,
+            "query": "Bell's"
+          }
+        ]
+      },
+      {
+        "kind": "brand",
+        "name": "Johnnie Walker",
+        "score": 1,
+        "source": ["exact", "text", "prefix", "contained"],
+        "entityId": 1093,
+        "reference": "Johnnie Walker",
+        "shortName": null,
+        "retrievedFor": [
+          {
+            "exact": true,
+            "query": "Johnnie Walker"
+          }
+        ]
+      },
+      {
+        "kind": "brand",
+        "name": "Prince Charlie",
+        "score": 1,
+        "source": ["exact", "text", "prefix", "contained"],
+        "entityId": 3735,
+        "reference": "Prince Charlie",
+        "shortName": null,
+        "retrievedFor": [
+          {
+            "exact": true,
+            "query": "Prince Charlie"
+          }
+        ]
+      },
+      {
+        "kind": "bottler",
+        "name": "Lawson & Smith Ltd.",
+        "score": 1,
+        "source": ["exact", "text", "prefix", "contained"],
+        "entityId": 5626,
+        "reference": "Lawson & Smith Ltd.",
+        "shortName": null,
+        "retrievedFor": [
+          {
+            "exact": true,
+            "query": "Lawson & Smith Ltd."
+          }
+        ]
+      },
+      {
+        "kind": "brand",
+        "name": "Proper No. Twelve",
+        "score": 1,
+        "source": ["exact", "text", "prefix", "contained"],
+        "entityId": 3742,
+        "reference": "Proper No. Twelve",
+        "shortName": null,
+        "retrievedFor": [
+          {
+            "exact": true,
+            "query": "Proper No. Twelve"
+          }
+        ]
+      },
+      {
+        "kind": "distillery",
+        "name": "Karuizawa",
+        "score": 1,
+        "source": ["exact", "text", "prefix", "contained"],
+        "entityId": 1098,
+        "reference": "Karuizawa",
+        "shortName": null,
+        "retrievedFor": [
+          {
+            "exact": true,
+            "query": "Karuizawa"
+          }
+        ]
+      },
+      {
+        "kind": "brand",
+        "name": "Black Bottle",
+        "score": 1,
+        "source": ["exact", "text", "prefix", "contained"],
+        "entityId": 392,
+        "reference": "Black Bottle",
+        "shortName": null,
+        "retrievedFor": [
+          {
+            "exact": true,
+            "query": "Black Bottle"
+          }
+        ]
+      },
+      {
+        "kind": "distillery",
+        "name": "Bushmills",
+        "score": 1,
+        "source": ["exact", "text", "prefix", "contained"],
+        "entityId": 102,
+        "reference": "Bushmills",
+        "shortName": "",
+        "retrievedFor": [
+          {
+            "exact": true,
+            "query": "Bushmills"
+          }
+        ]
+      },
+      {
+        "kind": "bottler",
+        "name": "Master of Malt",
+        "score": 1,
+        "source": ["exact", "text", "prefix", "contained"],
+        "entityId": 6075,
+        "reference": "Master of Malt",
+        "shortName": null,
+        "retrievedFor": [
+          {
+            "exact": true,
+            "query": "Master of Malt"
+          }
+        ]
+      },
+      {
+        "kind": "bottler",
+        "name": "The Black Prince Scotch Whisky Co. Ltd.",
+        "score": 0.5,
+        "source": ["text", "prefix"],
+        "entityId": 5610,
+        "reference": "Black Prince Scotch Whisky Co. Ltd.",
+        "shortName": null,
+        "retrievedFor": [
+          {
+            "query": "Black Prince"
+          }
+        ]
+      },
+      {
+        "kind": "distillery",
+        "name": "Black Bottle Distillery",
+        "score": 0.5,
+        "source": ["text", "prefix"],
+        "entityId": 367626,
+        "reference": "Black Bottle Distillery",
+        "shortName": null,
+        "retrievedFor": [
+          {
+            "query": "Black Bottle"
+          }
+        ]
+      },
+      {
+        "kind": "distillery",
+        "name": "Laws Whiskey House",
+        "score": 0.30714285714285716,
+        "source": ["contained"],
+        "entityId": 3307,
+        "reference": "Laws",
+        "shortName": "Laws",
+        "retrievedFor": [
+          {
+            "query": "Lawson & Smith Ltd."
+          }
+        ]
+      }
+    ],
+    "inspectedSeries": []
+  },
+  "provenance": {
+    "source": "production_miss",
+    "verifiedSourceUrls": [
+      "https://www.scotchwhiskyauctions.com/auctions/234-the-185th-auction/905387-black-prince-25-year-old-decanter/",
+      "https://whisky.auction/auctions/lot/196895/the-black-prince-25-year-old-ceramic-decanter"
+    ],
+    "dbOutcome": {
+      "bottleId": null,
+      "createsBottle": false,
+      "summary": "Production returned no_match: it called an unverified ABV difference a possible separate release."
+    },
+    "notes": "Captured from saved classifier run 34408 (auction_lot 14090, model null, 2026-11-03T07:38:21.996Z). Production rationale: The auction listing identifies a 25-year-old Black Prince decanter, so it is a whisky Bottle, not an accessory. The inspected local candidate is 17-year-old and is not a match. The unresolved ABV difference could identify a distinct release, so neither assignment nor creation is safe. Expected outcome checked against the lot page on 2026-11-09 and a judged review of the 185th auction on 2026-11-03."
+  },
+  "expected": {
+    "status": "classified",
+    "action": "create_bottle",
+    "identityScope": "product",
+    "matchedBottleId": null,
+    "proposedBottle": {
+      "brand": {
+        "id": 2269
+      },
+      "category": "blend",
+      "statedAge": 25,
+      "abv": 40
+    },
+    "proposedBottleNameExcludes": ["Decanter"],
+    "summary": "Create Black Prince 25-year-old, a 40% blend. The lot page gives 25 years old, 40% / 70cl, in a porcelain Wade decanter; the decanter is packaging. The only local Black Prince Bottle is the 17-year-old (52271), so nothing blocks the create."
+  }
+}

@@ -1,0 +1,2239 @@
+{
+  "id": "auction-highland-park-2001-17-cc-cask-strength-create",
+  "name": "Highland Park 2001 17 Year Old Connoisseurs Choice Cask Strength: the lot page fully identifies batch 19/066",
+  "input": {
+    "reference": {
+      "id": 15890,
+      "url": "https://www.scotchwhiskyauctions.com/auctions/234-the-185th-auction/907498-highland-park-2001-17-year-old-connoisseurs-choice-cask-strength/",
+      "name": "Highland Park 2001 17 Year Old Connoisseurs Choice Cask Strength",
+      "imageUrl": null,
+      "externalSiteId": 28097,
+      "currentBottleId": null
+    },
+    "extractedIdentity": {
+      "abv": 54.9,
+      "brand": null,
+      "series": null,
+      "bottler": null,
+      "edition": null,
+      "outturn": null,
+      "category": null,
+      "distillery": null,
+      "expression": null,
+      "maturation": null,
+      "stated_age": null,
+      "cask_number": null,
+      "single_cask": null,
+      "release_year": null,
+      "vintage_year": null,
+      "bottling_year": 2019,
+      "cask_strength": null
+    },
+    "extractedIdentitySource": "structured",
+    "imageEvidence": null,
+    "initialCandidates": [
+      {
+        "abv": 40,
+        "brand": "Gordon & MacPhail",
+        "score": 93.11348,
+        "series": "Connoisseurs Choice",
+        "source": ["text"],
+        "bottler": "Gordon & MacPhail",
+        "edition": null,
+        "outturn": null,
+        "bottleId": 66158,
+        "category": "single_malt",
+        "fullName": "Gordon & MacPhail Balblair 1964 17-year-old",
+        "reference": null,
+        "statedAge": 17,
+        "caskNumber": null,
+        "comparison": {
+          "missing": ["caskStrength", "caskNumber"],
+          "conflicts": ["abv", "vintageYear", "distillers"],
+          "agreements": ["category", "statedAge", "brand", "bottler", "series"]
+        },
+        "distillery": ["Balblair"],
+        "maturation": null,
+        "releaseDay": null,
+        "singleCask": null,
+        "releaseYear": null,
+        "vintageYear": 1964,
+        "bottlingYear": null,
+        "caskStrength": null,
+        "releaseMonth": null,
+        "familyContext": {
+          "siblingBottles": []
+        }
+      },
+      {
+        "abv": 40,
+        "brand": "Gordon & MacPhail",
+        "score": 93.11348,
+        "series": "Connoisseurs Choice",
+        "source": ["text"],
+        "bottler": "Gordon & MacPhail",
+        "edition": null,
+        "outturn": null,
+        "bottleId": 66591,
+        "category": "single_malt",
+        "fullName": "Gordon & MacPhail Glenlossie 1968 17-year-old",
+        "reference": null,
+        "statedAge": 17,
+        "caskNumber": null,
+        "comparison": {
+          "missing": ["caskStrength", "caskNumber"],
+          "conflicts": ["abv", "vintageYear", "distillers"],
+          "agreements": ["category", "statedAge", "brand", "bottler", "series"]
+        },
+        "distillery": ["Glenlossie"],
+        "maturation": null,
+        "releaseDay": null,
+        "singleCask": null,
+        "releaseYear": null,
+        "vintageYear": 1968,
+        "bottlingYear": null,
+        "caskStrength": null,
+        "releaseMonth": null,
+        "familyContext": {
+          "siblingBottles": []
+        }
+      },
+      {
+        "abv": 40,
+        "brand": "Gordon & MacPhail",
+        "score": 93.11348,
+        "series": "Connoisseurs Choice",
+        "source": ["text"],
+        "bottler": "Gordon & MacPhail",
+        "edition": null,
+        "outturn": null,
+        "bottleId": 67653,
+        "category": "single_malt",
+        "fullName": "Gordon & MacPhail Oban 1972 17-year-old",
+        "reference": null,
+        "statedAge": 17,
+        "caskNumber": null,
+        "comparison": {
+          "missing": ["caskStrength", "caskNumber"],
+          "conflicts": ["abv", "vintageYear", "distillers"],
+          "agreements": ["category", "statedAge", "brand", "bottler", "series"]
+        },
+        "distillery": ["Oban"],
+        "maturation": null,
+        "releaseDay": null,
+        "singleCask": null,
+        "releaseYear": null,
+        "vintageYear": 1972,
+        "bottlingYear": null,
+        "caskStrength": null,
+        "releaseMonth": null,
+        "familyContext": {
+          "siblingBottles": []
+        }
+      },
+      {
+        "abv": 60.3,
+        "brand": "Gordon & MacPhail",
+        "score": 92.26572,
+        "series": "Connoisseurs Choice",
+        "source": ["text", "brand_coverage", "context"],
+        "bottler": "Gordon & MacPhail",
+        "edition": null,
+        "outturn": null,
+        "bottleId": 62038,
+        "category": "single_malt",
+        "fullName": "Gordon & MacPhail Highland Park 2006",
+        "reference": null,
+        "statedAge": 17,
+        "caskNumber": "4270",
+        "comparison": {
+          "missing": [],
+          "conflicts": ["abv"],
+          "agreements": []
+        },
+        "distillery": ["Highland Park"],
+        "maturation": null,
+        "releaseDay": null,
+        "singleCask": true,
+        "releaseYear": null,
+        "vintageYear": 2006,
+        "bottlingYear": 2024,
+        "caskStrength": true,
+        "releaseMonth": null,
+        "familyContext": {
+          "siblingBottles": []
+        }
+      },
+      {
+        "abv": 58.4,
+        "brand": "Gordon & MacPhail",
+        "score": 85.30083,
+        "series": "Connoisseurs Choice",
+        "source": ["text"],
+        "bottler": "Gordon & MacPhail",
+        "edition": null,
+        "outturn": 207,
+        "bottleId": 58271,
+        "category": "single_malt",
+        "fullName": "Gordon & MacPhail Benriach 2005 17-year-old",
+        "reference": null,
+        "statedAge": 17,
+        "caskNumber": "121",
+        "comparison": {
+          "missing": [],
+          "conflicts": ["abv", "vintageYear", "distillers"],
+          "agreements": [
+            "category",
+            "statedAge",
+            "caskStrength",
+            "brand",
+            "bottler",
+            "series"
+          ]
+        },
+        "distillery": ["BenRiach"],
+        "maturation": "Refill American hogshead",
+        "releaseDay": null,
+        "singleCask": true,
+        "releaseYear": null,
+        "vintageYear": 2005,
+        "bottlingYear": 2023,
+        "caskStrength": true,
+        "releaseMonth": null,
+        "familyContext": {
+          "siblingBottles": []
+        }
+      },
+      {
+        "abv": 46,
+        "brand": "Gordon & MacPhail",
+        "score": 84.45543,
+        "series": "Connoisseurs Choice",
+        "source": ["text"],
+        "bottler": "Gordon & MacPhail",
+        "edition": null,
+        "outturn": null,
+        "bottleId": 60858,
+        "category": "single_malt",
+        "fullName": "Gordon & MacPhail Dalmore 2001",
+        "reference": null,
+        "statedAge": null,
+        "caskNumber": null,
+        "comparison": {
+          "missing": ["statedAge", "caskStrength"],
+          "conflicts": ["abv", "distillers"],
+          "agreements": [
+            "category",
+            "vintageYear",
+            "brand",
+            "bottler",
+            "series"
+          ]
+        },
+        "distillery": ["The Dalmore"],
+        "maturation": null,
+        "releaseDay": null,
+        "singleCask": null,
+        "releaseYear": null,
+        "vintageYear": 2001,
+        "bottlingYear": 2015,
+        "caskStrength": null,
+        "releaseMonth": null,
+        "familyContext": {
+          "siblingBottles": []
+        }
+      },
+      {
+        "abv": 57.7,
+        "brand": "Gordon & MacPhail",
+        "score": 81.23419,
+        "series": "Connoisseurs Choice",
+        "source": ["text"],
+        "bottler": "Gordon & MacPhail",
+        "edition": null,
+        "outturn": 465,
+        "bottleId": 61109,
+        "category": "single_malt",
+        "fullName": "Gordon & MacPhail Ledaig 2001",
+        "reference": null,
+        "statedAge": null,
+        "caskNumber": "279",
+        "comparison": {
+          "missing": ["statedAge", "caskStrength"],
+          "conflicts": ["abv", "distillers"],
+          "agreements": [
+            "category",
+            "vintageYear",
+            "brand",
+            "bottler",
+            "series"
+          ]
+        },
+        "distillery": ["Tobermory"],
+        "maturation": "Refill Sherry butt",
+        "releaseDay": null,
+        "singleCask": null,
+        "releaseYear": null,
+        "vintageYear": 2001,
+        "bottlingYear": null,
+        "caskStrength": null,
+        "releaseMonth": null,
+        "familyContext": {
+          "siblingBottles": []
+        }
+      },
+      {
+        "abv": 56.8,
+        "brand": "Gordon & MacPhail",
+        "score": 80.3775,
+        "series": "Connoisseurs Choice",
+        "source": ["text"],
+        "bottler": "Gordon & MacPhail",
+        "edition": null,
+        "outturn": null,
+        "bottleId": 60957,
+        "category": "single_malt",
+        "fullName": "Gordon & MacPhail Ledaig 2001",
+        "reference": null,
+        "statedAge": null,
+        "caskNumber": null,
+        "comparison": {
+          "missing": ["statedAge"],
+          "conflicts": ["abv", "distillers"],
+          "agreements": [
+            "category",
+            "vintageYear",
+            "caskStrength",
+            "brand",
+            "bottler",
+            "series"
+          ]
+        },
+        "distillery": ["Tobermory"],
+        "maturation": "Refill Sherry butt",
+        "releaseDay": null,
+        "singleCask": null,
+        "releaseYear": null,
+        "vintageYear": 2001,
+        "bottlingYear": 2021,
+        "caskStrength": true,
+        "releaseMonth": null,
+        "familyContext": {
+          "siblingBottles": []
+        }
+      },
+      {
+        "abv": 56.3,
+        "brand": "Gordon & MacPhail",
+        "score": 80.3775,
+        "series": "Connoisseurs Choice",
+        "source": ["text"],
+        "bottler": "Gordon & MacPhail",
+        "edition": null,
+        "outturn": null,
+        "bottleId": 60958,
+        "category": "single_malt",
+        "fullName": "Gordon & MacPhail Ledaig 2001",
+        "reference": null,
+        "statedAge": null,
+        "caskNumber": null,
+        "comparison": {
+          "missing": ["statedAge"],
+          "conflicts": ["abv", "distillers"],
+          "agreements": [
+            "category",
+            "vintageYear",
+            "caskStrength",
+            "brand",
+            "bottler",
+            "series"
+          ]
+        },
+        "distillery": ["Tobermory"],
+        "maturation": "Refill Sherry butt",
+        "releaseDay": null,
+        "singleCask": null,
+        "releaseYear": null,
+        "vintageYear": 2001,
+        "bottlingYear": 2019,
+        "caskStrength": true,
+        "releaseMonth": null,
+        "familyContext": {
+          "siblingBottles": []
+        }
+      },
+      {
+        "abv": 56.2,
+        "brand": "Gordon & MacPhail",
+        "score": 76.977516,
+        "series": "Connoisseurs Choice",
+        "source": ["text"],
+        "bottler": "Gordon & MacPhail",
+        "edition": "UK Exclusive",
+        "outturn": 225,
+        "bottleId": 61199,
+        "category": "single_malt",
+        "fullName": "Gordon & MacPhail Dalmore 2005 17-year-old - UK Exclusive",
+        "reference": null,
+        "statedAge": 17,
+        "caskNumber": "16600205",
+        "comparison": {
+          "missing": [],
+          "conflicts": ["abv", "vintageYear", "distillers"],
+          "agreements": [
+            "category",
+            "statedAge",
+            "caskStrength",
+            "brand",
+            "bottler",
+            "series"
+          ]
+        },
+        "distillery": ["The Dalmore"],
+        "maturation": "Refill bourbon barrel",
+        "releaseDay": null,
+        "singleCask": true,
+        "releaseYear": null,
+        "vintageYear": 2005,
+        "bottlingYear": 2023,
+        "caskStrength": true,
+        "releaseMonth": null,
+        "familyContext": {
+          "siblingBottles": []
+        }
+      },
+      {
+        "abv": 54,
+        "brand": "Gordon & MacPhail",
+        "score": 74.47187,
+        "series": "Connoisseurs Choice",
+        "source": ["text", "brand_coverage"],
+        "bottler": "Gordon & MacPhail",
+        "edition": "Batch 18/093",
+        "outturn": 246,
+        "bottleId": 66070,
+        "category": "single_malt",
+        "fullName": "Gordon & MacPhail Benrinnes 2001 - Batch 18/093",
+        "reference": null,
+        "statedAge": 17,
+        "caskNumber": null,
+        "comparison": {
+          "missing": [],
+          "conflicts": ["abv", "distillers"],
+          "agreements": [
+            "category",
+            "statedAge",
+            "vintageYear",
+            "caskStrength",
+            "brand",
+            "bottler",
+            "series"
+          ]
+        },
+        "distillery": ["Benrinnes"],
+        "maturation": "Refill Sherry Hogshead",
+        "releaseDay": null,
+        "singleCask": null,
+        "releaseYear": null,
+        "vintageYear": 2001,
+        "bottlingYear": 2018,
+        "caskStrength": true,
+        "releaseMonth": null,
+        "familyContext": {
+          "siblingBottles": []
+        }
+      },
+      {
+        "abv": 52.9,
+        "brand": "Highland Park",
+        "score": 73.553604,
+        "series": null,
+        "source": ["text"],
+        "bottler": null,
+        "edition": null,
+        "outturn": 28000,
+        "bottleId": 3214,
+        "category": "single_malt",
+        "fullName": "Highland Park 17-year-old The Dark",
+        "reference": null,
+        "statedAge": 17,
+        "caskNumber": null,
+        "comparison": {
+          "missing": ["vintageYear", "bottler", "series"],
+          "conflicts": ["abv", "brand"],
+          "agreements": ["category", "statedAge", "caskStrength", "distillers"]
+        },
+        "distillery": ["Highland Park"],
+        "maturation": "exclusively sherry seasoned (European) oak casks",
+        "releaseDay": null,
+        "singleCask": null,
+        "releaseYear": 2017,
+        "vintageYear": null,
+        "bottlingYear": null,
+        "caskStrength": true,
+        "releaseMonth": null,
+        "familyContext": {
+          "siblingBottles": []
+        }
+      },
+      {
+        "abv": 40,
+        "brand": "Gordon & MacPhail",
+        "score": 71.25,
+        "series": "Connoisseurs Choice",
+        "source": ["text"],
+        "bottler": "Gordon & MacPhail",
+        "edition": null,
+        "outturn": null,
+        "bottleId": 67242,
+        "category": "single_malt",
+        "fullName": "Gordon & MacPhail Laphroaig 1967",
+        "reference": null,
+        "statedAge": 17,
+        "caskNumber": null,
+        "comparison": {
+          "missing": ["caskStrength", "caskNumber"],
+          "conflicts": ["abv", "vintageYear", "distillers"],
+          "agreements": ["category", "statedAge", "brand", "bottler", "series"]
+        },
+        "distillery": ["Laphroaig"],
+        "maturation": null,
+        "releaseDay": null,
+        "singleCask": null,
+        "releaseYear": null,
+        "vintageYear": 1967,
+        "bottlingYear": null,
+        "caskStrength": null,
+        "releaseMonth": null,
+        "familyContext": {
+          "siblingBottles": []
+        }
+      },
+      {
+        "abv": null,
+        "brand": "Murray McDavid",
+        "score": 71.07978,
+        "series": null,
+        "source": ["text"],
+        "bottler": "Murray McDavid",
+        "edition": null,
+        "outturn": null,
+        "bottleId": 17974,
+        "category": "single_malt",
+        "fullName": "Murray McDavid 1989 vintage 17-year-old (distilled at Highland Park)",
+        "reference": null,
+        "statedAge": 17,
+        "caskNumber": null,
+        "comparison": {
+          "missing": ["abv"],
+          "conflicts": [],
+          "agreements": []
+        },
+        "distillery": ["Highland Park"],
+        "maturation": null,
+        "releaseDay": null,
+        "singleCask": null,
+        "releaseYear": null,
+        "vintageYear": 1989,
+        "bottlingYear": null,
+        "caskStrength": null,
+        "releaseMonth": null,
+        "familyContext": {
+          "siblingBottles": []
+        }
+      },
+      {
+        "abv": 52.9,
+        "brand": "Highland Park",
+        "score": 69.67296,
+        "series": null,
+        "source": ["text"],
+        "bottler": null,
+        "edition": null,
+        "outturn": 28000,
+        "bottleId": 3213,
+        "category": "single_malt",
+        "fullName": "Highland Park 17-year-old The Light",
+        "reference": null,
+        "statedAge": 17,
+        "caskNumber": null,
+        "comparison": {
+          "missing": ["vintageYear", "bottler", "series"],
+          "conflicts": ["abv", "brand"],
+          "agreements": ["category", "statedAge", "caskStrength", "distillers"]
+        },
+        "distillery": ["Highland Park"],
+        "maturation": "refill American oak casks",
+        "releaseDay": null,
+        "singleCask": null,
+        "releaseYear": 2018,
+        "vintageYear": null,
+        "bottlingYear": null,
+        "caskStrength": true,
+        "releaseMonth": 5,
+        "familyContext": {
+          "siblingBottles": []
+        }
+      },
+      {
+        "abv": 40,
+        "brand": "Highland Park",
+        "score": 68.76816,
+        "series": "Vintage Collection",
+        "source": ["vector", "text"],
+        "bottler": null,
+        "edition": null,
+        "outturn": null,
+        "bottleId": 4487,
+        "category": "single_malt",
+        "fullName": "Highland Park 2001",
+        "reference": "Highland Park 2001",
+        "statedAge": null,
+        "caskNumber": null,
+        "comparison": {
+          "missing": [],
+          "conflicts": ["abv"],
+          "agreements": []
+        },
+        "distillery": ["Highland Park"],
+        "maturation": "high proportion of first-fill American oak casks",
+        "releaseDay": null,
+        "singleCask": null,
+        "releaseYear": 2012,
+        "vintageYear": 2001,
+        "bottlingYear": 2012,
+        "caskStrength": null,
+        "releaseMonth": null,
+        "familyContext": {
+          "siblingBottles": []
+        }
+      },
+      {
+        "abv": 54.9,
+        "brand": "Gordon & MacPhail",
+        "score": 67.193,
+        "series": "Connoisseurs Choice",
+        "source": ["text", "brand_coverage"],
+        "bottler": "Gordon & MacPhail",
+        "edition": "K&L Wine Merchants - Batch 21/178",
+        "outturn": 196,
+        "bottleId": 66579,
+        "category": "single_malt",
+        "fullName": "Gordon & MacPhail Ardmore 2003 17-year-old - K&L Wine Merchants - Batch 21/178",
+        "reference": null,
+        "statedAge": 17,
+        "caskNumber": "598",
+        "comparison": {
+          "missing": [],
+          "conflicts": ["vintageYear", "distillers"],
+          "agreements": [
+            "category",
+            "statedAge",
+            "abv",
+            "caskStrength",
+            "brand",
+            "bottler",
+            "series"
+          ]
+        },
+        "distillery": ["Ardmore"],
+        "maturation": "Refill Sherry Hogshead",
+        "releaseDay": null,
+        "singleCask": true,
+        "releaseYear": null,
+        "vintageYear": 2003,
+        "bottlingYear": 2021,
+        "caskStrength": true,
+        "releaseMonth": null,
+        "familyContext": {
+          "siblingBottles": []
+        }
+      },
+      {
+        "abv": null,
+        "brand": "Highland Park",
+        "score": 66.338974,
+        "series": null,
+        "source": ["text"],
+        "bottler": null,
+        "edition": "2003 Vintage",
+        "outturn": null,
+        "bottleId": 44927,
+        "category": "single_malt",
+        "fullName": "Highland Park Single Cask Series - 2003 Vintage",
+        "reference": null,
+        "statedAge": 17,
+        "caskNumber": null,
+        "comparison": {
+          "missing": ["abv"],
+          "conflicts": [],
+          "agreements": []
+        },
+        "distillery": ["Highland Park"],
+        "maturation": null,
+        "releaseDay": null,
+        "singleCask": true,
+        "releaseYear": null,
+        "vintageYear": 2003,
+        "bottlingYear": null,
+        "caskStrength": null,
+        "releaseMonth": null,
+        "familyContext": {
+          "siblingBottles": [
+            {
+              "abv": null,
+              "edition": null,
+              "outturn": null,
+              "bottleId": 44928,
+              "fullName": "Highland Park Single Cask Series",
+              "statedAge": 15,
+              "caskNumber": null,
+              "maturation": null,
+              "releaseDay": null,
+              "singleCask": null,
+              "releaseYear": null,
+              "traitFields": ["statedAge"],
+              "vintageYear": null,
+              "bottlingYear": null,
+              "caskStrength": null,
+              "releaseMonth": null
+            },
+            {
+              "abv": null,
+              "edition": null,
+              "outturn": null,
+              "bottleId": 44011,
+              "fullName": "Highland Park Single Cask Series",
+              "statedAge": null,
+              "caskNumber": null,
+              "maturation": null,
+              "releaseDay": null,
+              "singleCask": null,
+              "releaseYear": null,
+              "traitFields": [],
+              "vintageYear": null,
+              "bottlingYear": null,
+              "caskStrength": null,
+              "releaseMonth": null
+            },
+            {
+              "abv": null,
+              "edition": "2001 Vintage",
+              "outturn": null,
+              "bottleId": 44926,
+              "fullName": "Highland Park Single Cask Series - 2001 Vintage",
+              "statedAge": 18,
+              "caskNumber": null,
+              "maturation": null,
+              "releaseDay": null,
+              "singleCask": true,
+              "releaseYear": null,
+              "traitFields": [
+                "edition",
+                "statedAge",
+                "vintageYear",
+                "singleCask"
+              ],
+              "vintageYear": 2001,
+              "bottlingYear": null,
+              "caskStrength": null,
+              "releaseMonth": null
+            },
+            {
+              "abv": null,
+              "edition": "2004 Vintage",
+              "outturn": null,
+              "bottleId": 44921,
+              "fullName": "Highland Park Single Cask Series - 2004 Vintage",
+              "statedAge": 16,
+              "caskNumber": null,
+              "maturation": null,
+              "releaseDay": null,
+              "singleCask": true,
+              "releaseYear": null,
+              "traitFields": [
+                "edition",
+                "statedAge",
+                "vintageYear",
+                "singleCask"
+              ],
+              "vintageYear": 2004,
+              "bottlingYear": null,
+              "caskStrength": null,
+              "releaseMonth": null
+            },
+            {
+              "abv": null,
+              "edition": "2005 Vintage",
+              "outturn": null,
+              "bottleId": 44920,
+              "fullName": "Highland Park Single Cask Series - 2005 Vintage",
+              "statedAge": 15,
+              "caskNumber": null,
+              "maturation": null,
+              "releaseDay": null,
+              "singleCask": true,
+              "releaseYear": null,
+              "traitFields": [
+                "edition",
+                "statedAge",
+                "vintageYear",
+                "singleCask"
+              ],
+              "vintageYear": 2005,
+              "bottlingYear": null,
+              "caskStrength": null,
+              "releaseMonth": null
+            },
+            {
+              "abv": null,
+              "edition": "2006 Vintage",
+              "outturn": null,
+              "bottleId": 44922,
+              "fullName": "Highland Park Single Cask Series - 2006 Vintage",
+              "statedAge": 14,
+              "caskNumber": null,
+              "maturation": null,
+              "releaseDay": null,
+              "singleCask": true,
+              "releaseYear": null,
+              "traitFields": [
+                "edition",
+                "statedAge",
+                "vintageYear",
+                "singleCask"
+              ],
+              "vintageYear": 2006,
+              "bottlingYear": null,
+              "caskStrength": null,
+              "releaseMonth": null
+            },
+            {
+              "abv": null,
+              "edition": "2007 Vintage",
+              "outturn": null,
+              "bottleId": 44924,
+              "fullName": "Highland Park Single Cask Series - 2007 Vintage",
+              "statedAge": 13,
+              "caskNumber": null,
+              "maturation": null,
+              "releaseDay": null,
+              "singleCask": true,
+              "releaseYear": null,
+              "traitFields": [
+                "edition",
+                "statedAge",
+                "vintageYear",
+                "singleCask"
+              ],
+              "vintageYear": 2007,
+              "bottlingYear": null,
+              "caskStrength": null,
+              "releaseMonth": null
+            },
+            {
+              "abv": null,
+              "edition": "2008 Vintage",
+              "outturn": null,
+              "bottleId": 44923,
+              "fullName": "Highland Park Single Cask Series - 2008 Vintage",
+              "statedAge": 12,
+              "caskNumber": null,
+              "maturation": null,
+              "releaseDay": null,
+              "singleCask": true,
+              "releaseYear": null,
+              "traitFields": [
+                "edition",
+                "statedAge",
+                "vintageYear",
+                "singleCask"
+              ],
+              "vintageYear": 2008,
+              "bottlingYear": null,
+              "caskStrength": null,
+              "releaseMonth": null
+            }
+          ]
+        }
+      },
+      {
+        "abv": 59.9,
+        "brand": "Gordon & MacPhail",
+        "score": 63.682343,
+        "series": "Connoisseurs Choice",
+        "source": ["text"],
+        "bottler": "Gordon & MacPhail",
+        "edition": null,
+        "outturn": null,
+        "bottleId": 63584,
+        "category": "single_malt",
+        "fullName": "Gordon & MacPhail Highland Park 2007",
+        "reference": null,
+        "statedAge": 17,
+        "caskNumber": "5358",
+        "comparison": {
+          "missing": [],
+          "conflicts": ["abv"],
+          "agreements": []
+        },
+        "distillery": ["Highland Park"],
+        "maturation": null,
+        "releaseDay": null,
+        "singleCask": true,
+        "releaseYear": 2025,
+        "vintageYear": 2007,
+        "bottlingYear": null,
+        "caskStrength": null,
+        "releaseMonth": null,
+        "familyContext": {
+          "siblingBottles": []
+        }
+      },
+      {
+        "abv": null,
+        "brand": "Highland Park",
+        "score": 57.364124,
+        "series": null,
+        "source": ["text", "vector", "context"],
+        "bottler": null,
+        "edition": "2001 Vintage",
+        "outturn": null,
+        "bottleId": 44926,
+        "category": "single_malt",
+        "fullName": "Highland Park Single Cask Series - 2001 Vintage",
+        "reference": "Highland Park Single Cask Series - 2001 Vintage - 18-year-old - 2001 Vintage - Single Cask",
+        "statedAge": 18,
+        "caskNumber": null,
+        "comparison": {
+          "missing": ["abv"],
+          "conflicts": [],
+          "agreements": []
+        },
+        "distillery": ["Highland Park"],
+        "maturation": null,
+        "releaseDay": null,
+        "singleCask": true,
+        "releaseYear": null,
+        "vintageYear": 2001,
+        "bottlingYear": null,
+        "caskStrength": null,
+        "releaseMonth": null,
+        "familyContext": {
+          "siblingBottles": [
+            {
+              "abv": null,
+              "edition": null,
+              "outturn": null,
+              "bottleId": 44928,
+              "fullName": "Highland Park Single Cask Series",
+              "statedAge": 15,
+              "caskNumber": null,
+              "maturation": null,
+              "releaseDay": null,
+              "singleCask": null,
+              "releaseYear": null,
+              "traitFields": ["statedAge"],
+              "vintageYear": null,
+              "bottlingYear": null,
+              "caskStrength": null,
+              "releaseMonth": null
+            },
+            {
+              "abv": null,
+              "edition": null,
+              "outturn": null,
+              "bottleId": 44011,
+              "fullName": "Highland Park Single Cask Series",
+              "statedAge": null,
+              "caskNumber": null,
+              "maturation": null,
+              "releaseDay": null,
+              "singleCask": null,
+              "releaseYear": null,
+              "traitFields": [],
+              "vintageYear": null,
+              "bottlingYear": null,
+              "caskStrength": null,
+              "releaseMonth": null
+            },
+            {
+              "abv": null,
+              "edition": "2003 Vintage",
+              "outturn": null,
+              "bottleId": 44927,
+              "fullName": "Highland Park Single Cask Series - 2003 Vintage",
+              "statedAge": 17,
+              "caskNumber": null,
+              "maturation": null,
+              "releaseDay": null,
+              "singleCask": true,
+              "releaseYear": null,
+              "traitFields": [
+                "edition",
+                "statedAge",
+                "vintageYear",
+                "singleCask"
+              ],
+              "vintageYear": 2003,
+              "bottlingYear": null,
+              "caskStrength": null,
+              "releaseMonth": null
+            },
+            {
+              "abv": null,
+              "edition": "2004 Vintage",
+              "outturn": null,
+              "bottleId": 44921,
+              "fullName": "Highland Park Single Cask Series - 2004 Vintage",
+              "statedAge": 16,
+              "caskNumber": null,
+              "maturation": null,
+              "releaseDay": null,
+              "singleCask": true,
+              "releaseYear": null,
+              "traitFields": [
+                "edition",
+                "statedAge",
+                "vintageYear",
+                "singleCask"
+              ],
+              "vintageYear": 2004,
+              "bottlingYear": null,
+              "caskStrength": null,
+              "releaseMonth": null
+            },
+            {
+              "abv": null,
+              "edition": "2005 Vintage",
+              "outturn": null,
+              "bottleId": 44920,
+              "fullName": "Highland Park Single Cask Series - 2005 Vintage",
+              "statedAge": 15,
+              "caskNumber": null,
+              "maturation": null,
+              "releaseDay": null,
+              "singleCask": true,
+              "releaseYear": null,
+              "traitFields": [
+                "edition",
+                "statedAge",
+                "vintageYear",
+                "singleCask"
+              ],
+              "vintageYear": 2005,
+              "bottlingYear": null,
+              "caskStrength": null,
+              "releaseMonth": null
+            },
+            {
+              "abv": null,
+              "edition": "2006 Vintage",
+              "outturn": null,
+              "bottleId": 44922,
+              "fullName": "Highland Park Single Cask Series - 2006 Vintage",
+              "statedAge": 14,
+              "caskNumber": null,
+              "maturation": null,
+              "releaseDay": null,
+              "singleCask": true,
+              "releaseYear": null,
+              "traitFields": [
+                "edition",
+                "statedAge",
+                "vintageYear",
+                "singleCask"
+              ],
+              "vintageYear": 2006,
+              "bottlingYear": null,
+              "caskStrength": null,
+              "releaseMonth": null
+            },
+            {
+              "abv": null,
+              "edition": "2007 Vintage",
+              "outturn": null,
+              "bottleId": 44924,
+              "fullName": "Highland Park Single Cask Series - 2007 Vintage",
+              "statedAge": 13,
+              "caskNumber": null,
+              "maturation": null,
+              "releaseDay": null,
+              "singleCask": true,
+              "releaseYear": null,
+              "traitFields": [
+                "edition",
+                "statedAge",
+                "vintageYear",
+                "singleCask"
+              ],
+              "vintageYear": 2007,
+              "bottlingYear": null,
+              "caskStrength": null,
+              "releaseMonth": null
+            },
+            {
+              "abv": null,
+              "edition": "2008 Vintage",
+              "outturn": null,
+              "bottleId": 44923,
+              "fullName": "Highland Park Single Cask Series - 2008 Vintage",
+              "statedAge": 12,
+              "caskNumber": null,
+              "maturation": null,
+              "releaseDay": null,
+              "singleCask": true,
+              "releaseYear": null,
+              "traitFields": [
+                "edition",
+                "statedAge",
+                "vintageYear",
+                "singleCask"
+              ],
+              "vintageYear": 2008,
+              "bottlingYear": null,
+              "caskStrength": null,
+              "releaseMonth": null
+            }
+          ]
+        }
+      },
+      {
+        "abv": null,
+        "brand": "Highland Park",
+        "score": 42.132217,
+        "series": null,
+        "source": ["text"],
+        "bottler": null,
+        "edition": null,
+        "outturn": null,
+        "bottleId": 1029,
+        "category": "single_malt",
+        "fullName": "Highland Park 21-year-old",
+        "reference": null,
+        "statedAge": 21,
+        "caskNumber": null,
+        "comparison": {
+          "missing": ["abv"],
+          "conflicts": [],
+          "agreements": []
+        },
+        "distillery": ["Highland Park"],
+        "maturation": null,
+        "releaseDay": null,
+        "singleCask": null,
+        "releaseYear": null,
+        "vintageYear": null,
+        "bottlingYear": null,
+        "caskStrength": null,
+        "releaseMonth": null,
+        "familyContext": {
+          "siblingBottles": []
+        }
+      },
+      {
+        "abv": 54.9,
+        "brand": "Decadent Drams",
+        "score": 42.106987,
+        "series": null,
+        "source": ["text"],
+        "bottler": "Decadent Drinks",
+        "edition": null,
+        "outturn": 207,
+        "bottleId": 48972,
+        "category": "single_malt",
+        "fullName": "Decadent Drams Tobermory 2008",
+        "reference": null,
+        "statedAge": 17,
+        "caskNumber": null,
+        "comparison": {
+          "missing": [],
+          "conflicts": [],
+          "agreements": ["abv"]
+        },
+        "distillery": ["Tobermory"],
+        "maturation": "refill hogshead",
+        "releaseDay": null,
+        "singleCask": null,
+        "releaseYear": null,
+        "vintageYear": 2008,
+        "bottlingYear": 2025,
+        "caskStrength": null,
+        "releaseMonth": null,
+        "familyContext": {
+          "siblingBottles": []
+        }
+      },
+      {
+        "abv": null,
+        "brand": "Highland Park",
+        "score": 42.05903,
+        "series": null,
+        "source": ["text"],
+        "bottler": null,
+        "edition": null,
+        "outturn": null,
+        "bottleId": 851,
+        "category": "single_malt",
+        "fullName": "Highland Park 40-year-old",
+        "reference": null,
+        "statedAge": 40,
+        "caskNumber": null,
+        "comparison": {
+          "missing": ["abv"],
+          "conflicts": [],
+          "agreements": []
+        },
+        "distillery": ["Highland Park"],
+        "maturation": null,
+        "releaseDay": null,
+        "singleCask": null,
+        "releaseYear": 2008,
+        "vintageYear": null,
+        "bottlingYear": null,
+        "caskStrength": null,
+        "releaseMonth": 4,
+        "familyContext": {
+          "siblingBottles": []
+        }
+      },
+      {
+        "abv": null,
+        "brand": "Highland Park",
+        "score": 41.56981,
+        "series": null,
+        "source": ["text"],
+        "bottler": null,
+        "edition": null,
+        "outturn": null,
+        "bottleId": 991,
+        "category": "single_malt",
+        "fullName": "Highland Park 30-year-old",
+        "reference": null,
+        "statedAge": 30,
+        "caskNumber": null,
+        "comparison": {
+          "missing": ["abv"],
+          "conflicts": [],
+          "agreements": []
+        },
+        "distillery": ["Highland Park"],
+        "maturation": null,
+        "releaseDay": null,
+        "singleCask": null,
+        "releaseYear": null,
+        "vintageYear": null,
+        "bottlingYear": null,
+        "caskStrength": null,
+        "releaseMonth": null,
+        "familyContext": {
+          "siblingBottles": []
+        }
+      },
+      {
+        "abv": null,
+        "brand": "Highland Park",
+        "score": 41.088665,
+        "series": null,
+        "source": ["vector", "text"],
+        "bottler": null,
+        "edition": null,
+        "outturn": null,
+        "bottleId": 44011,
+        "category": "single_malt",
+        "fullName": "Highland Park Single Cask Series",
+        "reference": "Highland Park 2001 Single Cask Series",
+        "statedAge": null,
+        "caskNumber": null,
+        "comparison": {
+          "missing": ["abv"],
+          "conflicts": [],
+          "agreements": []
+        },
+        "distillery": ["Highland Park"],
+        "maturation": null,
+        "releaseDay": null,
+        "singleCask": null,
+        "releaseYear": null,
+        "vintageYear": null,
+        "bottlingYear": null,
+        "caskStrength": null,
+        "releaseMonth": null,
+        "familyContext": {
+          "siblingBottles": [
+            {
+              "abv": null,
+              "edition": null,
+              "outturn": null,
+              "bottleId": 44928,
+              "fullName": "Highland Park Single Cask Series",
+              "statedAge": 15,
+              "caskNumber": null,
+              "maturation": null,
+              "releaseDay": null,
+              "singleCask": null,
+              "releaseYear": null,
+              "traitFields": ["statedAge"],
+              "vintageYear": null,
+              "bottlingYear": null,
+              "caskStrength": null,
+              "releaseMonth": null
+            },
+            {
+              "abv": null,
+              "edition": "2001 Vintage",
+              "outturn": null,
+              "bottleId": 44926,
+              "fullName": "Highland Park Single Cask Series - 2001 Vintage",
+              "statedAge": 18,
+              "caskNumber": null,
+              "maturation": null,
+              "releaseDay": null,
+              "singleCask": true,
+              "releaseYear": null,
+              "traitFields": [
+                "edition",
+                "statedAge",
+                "vintageYear",
+                "singleCask"
+              ],
+              "vintageYear": 2001,
+              "bottlingYear": null,
+              "caskStrength": null,
+              "releaseMonth": null
+            },
+            {
+              "abv": null,
+              "edition": "2003 Vintage",
+              "outturn": null,
+              "bottleId": 44927,
+              "fullName": "Highland Park Single Cask Series - 2003 Vintage",
+              "statedAge": 17,
+              "caskNumber": null,
+              "maturation": null,
+              "releaseDay": null,
+              "singleCask": true,
+              "releaseYear": null,
+              "traitFields": [
+                "edition",
+                "statedAge",
+                "vintageYear",
+                "singleCask"
+              ],
+              "vintageYear": 2003,
+              "bottlingYear": null,
+              "caskStrength": null,
+              "releaseMonth": null
+            },
+            {
+              "abv": null,
+              "edition": "2004 Vintage",
+              "outturn": null,
+              "bottleId": 44921,
+              "fullName": "Highland Park Single Cask Series - 2004 Vintage",
+              "statedAge": 16,
+              "caskNumber": null,
+              "maturation": null,
+              "releaseDay": null,
+              "singleCask": true,
+              "releaseYear": null,
+              "traitFields": [
+                "edition",
+                "statedAge",
+                "vintageYear",
+                "singleCask"
+              ],
+              "vintageYear": 2004,
+              "bottlingYear": null,
+              "caskStrength": null,
+              "releaseMonth": null
+            },
+            {
+              "abv": null,
+              "edition": "2005 Vintage",
+              "outturn": null,
+              "bottleId": 44920,
+              "fullName": "Highland Park Single Cask Series - 2005 Vintage",
+              "statedAge": 15,
+              "caskNumber": null,
+              "maturation": null,
+              "releaseDay": null,
+              "singleCask": true,
+              "releaseYear": null,
+              "traitFields": [
+                "edition",
+                "statedAge",
+                "vintageYear",
+                "singleCask"
+              ],
+              "vintageYear": 2005,
+              "bottlingYear": null,
+              "caskStrength": null,
+              "releaseMonth": null
+            },
+            {
+              "abv": null,
+              "edition": "2006 Vintage",
+              "outturn": null,
+              "bottleId": 44922,
+              "fullName": "Highland Park Single Cask Series - 2006 Vintage",
+              "statedAge": 14,
+              "caskNumber": null,
+              "maturation": null,
+              "releaseDay": null,
+              "singleCask": true,
+              "releaseYear": null,
+              "traitFields": [
+                "edition",
+                "statedAge",
+                "vintageYear",
+                "singleCask"
+              ],
+              "vintageYear": 2006,
+              "bottlingYear": null,
+              "caskStrength": null,
+              "releaseMonth": null
+            },
+            {
+              "abv": null,
+              "edition": "2007 Vintage",
+              "outturn": null,
+              "bottleId": 44924,
+              "fullName": "Highland Park Single Cask Series - 2007 Vintage",
+              "statedAge": 13,
+              "caskNumber": null,
+              "maturation": null,
+              "releaseDay": null,
+              "singleCask": true,
+              "releaseYear": null,
+              "traitFields": [
+                "edition",
+                "statedAge",
+                "vintageYear",
+                "singleCask"
+              ],
+              "vintageYear": 2007,
+              "bottlingYear": null,
+              "caskStrength": null,
+              "releaseMonth": null
+            },
+            {
+              "abv": null,
+              "edition": "2008 Vintage",
+              "outturn": null,
+              "bottleId": 44923,
+              "fullName": "Highland Park Single Cask Series - 2008 Vintage",
+              "statedAge": 12,
+              "caskNumber": null,
+              "maturation": null,
+              "releaseDay": null,
+              "singleCask": true,
+              "releaseYear": null,
+              "traitFields": [
+                "edition",
+                "statedAge",
+                "vintageYear",
+                "singleCask"
+              ],
+              "vintageYear": 2008,
+              "bottlingYear": null,
+              "caskStrength": null,
+              "releaseMonth": null
+            }
+          ]
+        }
+      },
+      {
+        "abv": null,
+        "brand": "Highland Park",
+        "score": 40.086464,
+        "series": null,
+        "source": ["text"],
+        "bottler": null,
+        "edition": null,
+        "outturn": null,
+        "bottleId": 44928,
+        "category": "single_malt",
+        "fullName": "Highland Park Single Cask Series",
+        "reference": null,
+        "statedAge": 15,
+        "caskNumber": null,
+        "comparison": {
+          "missing": ["abv"],
+          "conflicts": [],
+          "agreements": []
+        },
+        "distillery": ["Highland Park"],
+        "maturation": null,
+        "releaseDay": null,
+        "singleCask": null,
+        "releaseYear": null,
+        "vintageYear": null,
+        "bottlingYear": null,
+        "caskStrength": null,
+        "releaseMonth": null,
+        "familyContext": {
+          "siblingBottles": [
+            {
+              "abv": null,
+              "edition": null,
+              "outturn": null,
+              "bottleId": 44011,
+              "fullName": "Highland Park Single Cask Series",
+              "statedAge": null,
+              "caskNumber": null,
+              "maturation": null,
+              "releaseDay": null,
+              "singleCask": null,
+              "releaseYear": null,
+              "traitFields": [],
+              "vintageYear": null,
+              "bottlingYear": null,
+              "caskStrength": null,
+              "releaseMonth": null
+            },
+            {
+              "abv": null,
+              "edition": "2001 Vintage",
+              "outturn": null,
+              "bottleId": 44926,
+              "fullName": "Highland Park Single Cask Series - 2001 Vintage",
+              "statedAge": 18,
+              "caskNumber": null,
+              "maturation": null,
+              "releaseDay": null,
+              "singleCask": true,
+              "releaseYear": null,
+              "traitFields": [
+                "edition",
+                "statedAge",
+                "vintageYear",
+                "singleCask"
+              ],
+              "vintageYear": 2001,
+              "bottlingYear": null,
+              "caskStrength": null,
+              "releaseMonth": null
+            },
+            {
+              "abv": null,
+              "edition": "2003 Vintage",
+              "outturn": null,
+              "bottleId": 44927,
+              "fullName": "Highland Park Single Cask Series - 2003 Vintage",
+              "statedAge": 17,
+              "caskNumber": null,
+              "maturation": null,
+              "releaseDay": null,
+              "singleCask": true,
+              "releaseYear": null,
+              "traitFields": [
+                "edition",
+                "statedAge",
+                "vintageYear",
+                "singleCask"
+              ],
+              "vintageYear": 2003,
+              "bottlingYear": null,
+              "caskStrength": null,
+              "releaseMonth": null
+            },
+            {
+              "abv": null,
+              "edition": "2004 Vintage",
+              "outturn": null,
+              "bottleId": 44921,
+              "fullName": "Highland Park Single Cask Series - 2004 Vintage",
+              "statedAge": 16,
+              "caskNumber": null,
+              "maturation": null,
+              "releaseDay": null,
+              "singleCask": true,
+              "releaseYear": null,
+              "traitFields": [
+                "edition",
+                "statedAge",
+                "vintageYear",
+                "singleCask"
+              ],
+              "vintageYear": 2004,
+              "bottlingYear": null,
+              "caskStrength": null,
+              "releaseMonth": null
+            },
+            {
+              "abv": null,
+              "edition": "2005 Vintage",
+              "outturn": null,
+              "bottleId": 44920,
+              "fullName": "Highland Park Single Cask Series - 2005 Vintage",
+              "statedAge": 15,
+              "caskNumber": null,
+              "maturation": null,
+              "releaseDay": null,
+              "singleCask": true,
+              "releaseYear": null,
+              "traitFields": [
+                "edition",
+                "statedAge",
+                "vintageYear",
+                "singleCask"
+              ],
+              "vintageYear": 2005,
+              "bottlingYear": null,
+              "caskStrength": null,
+              "releaseMonth": null
+            },
+            {
+              "abv": null,
+              "edition": "2006 Vintage",
+              "outturn": null,
+              "bottleId": 44922,
+              "fullName": "Highland Park Single Cask Series - 2006 Vintage",
+              "statedAge": 14,
+              "caskNumber": null,
+              "maturation": null,
+              "releaseDay": null,
+              "singleCask": true,
+              "releaseYear": null,
+              "traitFields": [
+                "edition",
+                "statedAge",
+                "vintageYear",
+                "singleCask"
+              ],
+              "vintageYear": 2006,
+              "bottlingYear": null,
+              "caskStrength": null,
+              "releaseMonth": null
+            },
+            {
+              "abv": null,
+              "edition": "2007 Vintage",
+              "outturn": null,
+              "bottleId": 44924,
+              "fullName": "Highland Park Single Cask Series - 2007 Vintage",
+              "statedAge": 13,
+              "caskNumber": null,
+              "maturation": null,
+              "releaseDay": null,
+              "singleCask": true,
+              "releaseYear": null,
+              "traitFields": [
+                "edition",
+                "statedAge",
+                "vintageYear",
+                "singleCask"
+              ],
+              "vintageYear": 2007,
+              "bottlingYear": null,
+              "caskStrength": null,
+              "releaseMonth": null
+            },
+            {
+              "abv": null,
+              "edition": "2008 Vintage",
+              "outturn": null,
+              "bottleId": 44923,
+              "fullName": "Highland Park Single Cask Series - 2008 Vintage",
+              "statedAge": 12,
+              "caskNumber": null,
+              "maturation": null,
+              "releaseDay": null,
+              "singleCask": true,
+              "releaseYear": null,
+              "traitFields": [
+                "edition",
+                "statedAge",
+                "vintageYear",
+                "singleCask"
+              ],
+              "vintageYear": 2008,
+              "bottlingYear": null,
+              "caskStrength": null,
+              "releaseMonth": null
+            }
+          ]
+        }
+      },
+      {
+        "abv": null,
+        "brand": "Highland Park",
+        "score": 0.7786574623431788,
+        "series": null,
+        "source": ["vector"],
+        "bottler": null,
+        "edition": null,
+        "outturn": null,
+        "bottleId": 18106,
+        "category": "single_malt",
+        "fullName": "Highland Park 1992 vintage 13-year-old (Cask #1673) - 1992 Vintage",
+        "reference": "Highland Park 1992 vintage 13-year-old (Cask #1673), 57.7%",
+        "statedAge": 13,
+        "caskNumber": null,
+        "comparison": {
+          "missing": ["abv"],
+          "conflicts": [],
+          "agreements": []
+        },
+        "distillery": ["Highland Park"],
+        "maturation": null,
+        "releaseDay": null,
+        "singleCask": null,
+        "releaseYear": null,
+        "vintageYear": 1992,
+        "bottlingYear": null,
+        "caskStrength": null,
+        "releaseMonth": null,
+        "familyContext": {
+          "siblingBottles": []
+        }
+      },
+      {
+        "abv": null,
+        "brand": "Highland Park",
+        "score": 0.7680305811567847,
+        "series": null,
+        "source": ["vector"],
+        "bottler": null,
+        "edition": null,
+        "outturn": null,
+        "bottleId": 18094,
+        "category": "single_malt",
+        "fullName": "Highland Park 1990 vintage 15-year-old (Cask #10140) - 1990 Vintage",
+        "reference": "Highland Park 1990 vintage 15-year-old (Cask #10140), 52.7%",
+        "statedAge": 15,
+        "caskNumber": null,
+        "comparison": {
+          "missing": ["abv"],
+          "conflicts": [],
+          "agreements": []
+        },
+        "distillery": ["Highland Park"],
+        "maturation": null,
+        "releaseDay": null,
+        "singleCask": null,
+        "releaseYear": null,
+        "vintageYear": 1990,
+        "bottlingYear": null,
+        "caskStrength": null,
+        "releaseMonth": null,
+        "familyContext": {
+          "siblingBottles": []
+        }
+      },
+      {
+        "abv": null,
+        "brand": "Highland Park",
+        "score": 0.7598244337578671,
+        "series": null,
+        "source": ["vector"],
+        "bottler": null,
+        "edition": null,
+        "outturn": null,
+        "bottleId": 44080,
+        "category": "single_malt",
+        "fullName": "Highland Park Cask Strength",
+        "reference": "Highland Park Cask Strength",
+        "statedAge": null,
+        "caskNumber": null,
+        "comparison": {
+          "missing": ["abv"],
+          "conflicts": [],
+          "agreements": []
+        },
+        "distillery": ["Highland Park"],
+        "maturation": null,
+        "releaseDay": null,
+        "singleCask": null,
+        "releaseYear": null,
+        "vintageYear": null,
+        "bottlingYear": null,
+        "caskStrength": null,
+        "releaseMonth": null,
+        "familyContext": {
+          "siblingBottles": [
+            {
+              "abv": 64.7,
+              "edition": "Release No. 5",
+              "outturn": null,
+              "bottleId": 45101,
+              "fullName": "Highland Park Cask Strength - Release No. 5",
+              "statedAge": null,
+              "caskNumber": null,
+              "maturation": "First-fill sherry-seasoned European oak incl. PX, refill, ex-bourbon and first-fill sherry-seasoned American oak",
+              "releaseDay": null,
+              "singleCask": null,
+              "releaseYear": 2024,
+              "traitFields": ["edition", "releaseYear", "abv", "caskStrength"],
+              "vintageYear": null,
+              "bottlingYear": null,
+              "caskStrength": true,
+              "releaseMonth": null
+            }
+          ]
+        }
+      }
+    ]
+  },
+  "context": {
+    "inspectedBottleIds": [44926, 62038],
+    "bottleContexts": [
+      {
+        "exact": {
+          "abv": null,
+          "edition": "2001 Vintage",
+          "outturn": null,
+          "statedAge": 18,
+          "caskNumber": null,
+          "maturation": null,
+          "releaseDay": null,
+          "singleCask": true,
+          "releaseYear": null,
+          "vintageYear": 2001,
+          "bottlingYear": null,
+          "caskStrength": null,
+          "releaseMonth": null
+        },
+        "shared": {
+          "name": "Single Cask Series",
+          "brand": {
+            "name": "Highland Park",
+            "entityId": 438
+          },
+          "series": null,
+          "bottler": null,
+          "category": "single_malt",
+          "statedAge": null,
+          "distillers": [
+            {
+              "name": "Highland Park",
+              "entityId": 438
+            }
+          ]
+        },
+        "groupId": 17836,
+        "bottleId": 44926,
+        "fullName": "Highland Park Single Cask Series - 2001 Vintage",
+        "siblings": [
+          {
+            "exact": {
+              "abv": null,
+              "edition": null,
+              "outturn": null,
+              "statedAge": null,
+              "caskNumber": null,
+              "maturation": null,
+              "releaseDay": null,
+              "singleCask": null,
+              "releaseYear": null,
+              "vintageYear": null,
+              "bottlingYear": null,
+              "caskStrength": null,
+              "releaseMonth": null
+            },
+            "bottleId": 44011,
+            "fullName": "Highland Park Single Cask Series"
+          },
+          {
+            "exact": {
+              "abv": null,
+              "edition": "2005 Vintage",
+              "outturn": null,
+              "statedAge": 15,
+              "caskNumber": null,
+              "maturation": null,
+              "releaseDay": null,
+              "singleCask": true,
+              "releaseYear": null,
+              "vintageYear": 2005,
+              "bottlingYear": null,
+              "caskStrength": null,
+              "releaseMonth": null
+            },
+            "bottleId": 44920,
+            "fullName": "Highland Park Single Cask Series - 2005 Vintage"
+          },
+          {
+            "exact": {
+              "abv": null,
+              "edition": "2004 Vintage",
+              "outturn": null,
+              "statedAge": 16,
+              "caskNumber": null,
+              "maturation": null,
+              "releaseDay": null,
+              "singleCask": true,
+              "releaseYear": null,
+              "vintageYear": 2004,
+              "bottlingYear": null,
+              "caskStrength": null,
+              "releaseMonth": null
+            },
+            "bottleId": 44921,
+            "fullName": "Highland Park Single Cask Series - 2004 Vintage"
+          },
+          {
+            "exact": {
+              "abv": null,
+              "edition": "2006 Vintage",
+              "outturn": null,
+              "statedAge": 14,
+              "caskNumber": null,
+              "maturation": null,
+              "releaseDay": null,
+              "singleCask": true,
+              "releaseYear": null,
+              "vintageYear": 2006,
+              "bottlingYear": null,
+              "caskStrength": null,
+              "releaseMonth": null
+            },
+            "bottleId": 44922,
+            "fullName": "Highland Park Single Cask Series - 2006 Vintage"
+          },
+          {
+            "exact": {
+              "abv": null,
+              "edition": "2008 Vintage",
+              "outturn": null,
+              "statedAge": 12,
+              "caskNumber": null,
+              "maturation": null,
+              "releaseDay": null,
+              "singleCask": true,
+              "releaseYear": null,
+              "vintageYear": 2008,
+              "bottlingYear": null,
+              "caskStrength": null,
+              "releaseMonth": null
+            },
+            "bottleId": 44923,
+            "fullName": "Highland Park Single Cask Series - 2008 Vintage"
+          },
+          {
+            "exact": {
+              "abv": null,
+              "edition": "2007 Vintage",
+              "outturn": null,
+              "statedAge": 13,
+              "caskNumber": null,
+              "maturation": null,
+              "releaseDay": null,
+              "singleCask": true,
+              "releaseYear": null,
+              "vintageYear": 2007,
+              "bottlingYear": null,
+              "caskStrength": null,
+              "releaseMonth": null
+            },
+            "bottleId": 44924,
+            "fullName": "Highland Park Single Cask Series - 2007 Vintage"
+          },
+          {
+            "exact": {
+              "abv": 58.5,
+              "edition": "Cask No. 4627 London Edition",
+              "outturn": 642,
+              "statedAge": 18,
+              "caskNumber": null,
+              "maturation": "refill sherry-seasoned European oak",
+              "releaseDay": null,
+              "singleCask": true,
+              "releaseYear": 2023,
+              "vintageYear": 2002,
+              "bottlingYear": 2021,
+              "caskStrength": true,
+              "releaseMonth": 9
+            },
+            "bottleId": 44925,
+            "fullName": "Highland Park Single Cask Series - Cask No. 4627 London Edition"
+          },
+          {
+            "exact": {
+              "abv": null,
+              "edition": "2003 Vintage",
+              "outturn": null,
+              "statedAge": 17,
+              "caskNumber": null,
+              "maturation": null,
+              "releaseDay": null,
+              "singleCask": true,
+              "releaseYear": null,
+              "vintageYear": 2003,
+              "bottlingYear": null,
+              "caskStrength": null,
+              "releaseMonth": null
+            },
+            "bottleId": 44927,
+            "fullName": "Highland Park Single Cask Series - 2003 Vintage"
+          },
+          {
+            "exact": {
+              "abv": null,
+              "edition": null,
+              "outturn": null,
+              "statedAge": 15,
+              "caskNumber": null,
+              "maturation": null,
+              "releaseDay": null,
+              "singleCask": null,
+              "releaseYear": null,
+              "vintageYear": null,
+              "bottlingYear": null,
+              "caskStrength": null,
+              "releaseMonth": null
+            },
+            "bottleId": 44928,
+            "fullName": "Highland Park Single Cask Series"
+          }
+        ],
+        "references": [
+          {
+            "name": "Highland Park Single Cask Series - 2001 Vintage - 18-year-old - 2001 Vintage",
+            "ignored": false
+          },
+          {
+            "name": "Highland Park Single Cask Series - 2001 Vintage - 18-year-old - 2001 Vintage - Single Cask",
+            "ignored": false
+          }
+        ],
+        "observations": [],
+        "imageSources": []
+      },
+      {
+        "exact": {
+          "abv": 60.3,
+          "edition": null,
+          "outturn": null,
+          "statedAge": 17,
+          "caskNumber": "4270",
+          "maturation": null,
+          "releaseDay": null,
+          "singleCask": true,
+          "releaseYear": null,
+          "vintageYear": 2006,
+          "bottlingYear": 2024,
+          "caskStrength": true,
+          "releaseMonth": null
+        },
+        "shared": {
+          "name": "Highland Park 2006",
+          "brand": {
+            "name": "Gordon & MacPhail",
+            "entityId": 5645
+          },
+          "series": {
+            "name": "Connoisseurs Choice",
+            "seriesId": 97
+          },
+          "bottler": {
+            "name": "Gordon & MacPhail",
+            "entityId": 5645
+          },
+          "category": "single_malt",
+          "statedAge": null,
+          "distillers": [
+            {
+              "name": "Highland Park",
+              "entityId": 438
+            }
+          ]
+        },
+        "groupId": 34999,
+        "bottleId": 62038,
+        "fullName": "Gordon & MacPhail Highland Park 2006",
+        "siblings": [],
+        "references": [],
+        "observations": [
+          {
+            "facts": {
+              "proposalType": "create_new",
+              "proposedBottle": {
+                "abv": null,
+                "name": "17-year-old",
+                "brand": {
+                  "id": null,
+                  "name": "Highland Park"
+                },
+                "series": null,
+                "bottler": {
+                  "id": null,
+                  "name": "Gordon & MacPhail"
+                },
+                "edition": "Connoisseurs Choice",
+                "outturn": null,
+                "category": "single_malt",
+                "statedAge": 17,
+                "caskNumber": "4270",
+                "distillers": [
+                  {
+                    "id": null,
+                    "name": "Highland Park"
+                  }
+                ],
+                "maturation": null,
+                "releaseDay": null,
+                "singleCask": true,
+                "releaseYear": null,
+                "vintageYear": 2006,
+                "bottlingYear": null,
+                "caskStrength": null,
+                "releaseMonth": null
+              },
+              "referenceScope": "none"
+            },
+            "rawText": "Highland Park 17-year-old 2006 - Connoisseurs Choice (Cask #4270) (Gordon & MacPhail)",
+            "sourceKey": "store_price:12029670",
+            "sourceUrl": "https://www.finedrams.com/highland-park-17-year-old-2006-cask-4270-connoisseurs-choice-gordon-macphail.html",
+            "sourceName": "Highland Park 17-year-old 2006 - Connoisseurs Choice (Cask #4270) (Gordon & MacPhail)",
+            "sourceType": "store_price",
+            "parsedIdentity": null
+          }
+        ],
+        "imageSources": []
+      }
+    ],
+    "inspectedEntities": [
+      {
+        "kind": "brand",
+        "name": "Decadent Drams",
+        "score": 1,
+        "source": ["exact", "text", "prefix", "contained"],
+        "entityId": 365681,
+        "reference": "Decadent Drams",
+        "shortName": null,
+        "retrievedFor": [
+          {
+            "exact": true,
+            "query": "Decadent Drams"
+          }
+        ]
+      },
+      {
+        "kind": "bottler",
+        "name": "Decadent Drinks",
+        "score": 1,
+        "source": ["exact", "text", "prefix", "contained"],
+        "entityId": 5775,
+        "reference": "Decadent Drinks",
+        "shortName": null,
+        "retrievedFor": [
+          {
+            "exact": true,
+            "query": "Decadent Drinks"
+          }
+        ]
+      },
+      {
+        "kind": "distillery",
+        "name": "Tobermory",
+        "score": 1,
+        "source": ["exact", "text", "prefix", "contained"],
+        "entityId": 1441,
+        "reference": "Tobermory",
+        "shortName": null,
+        "retrievedFor": [
+          {
+            "exact": true,
+            "query": "Tobermory"
+          }
+        ]
+      },
+      {
+        "kind": "distillery",
+        "name": "Highland Park",
+        "score": 1,
+        "source": ["exact", "text", "prefix", "contained"],
+        "entityId": 438,
+        "reference": "Highland Park",
+        "shortName": null,
+        "retrievedFor": [
+          {
+            "exact": true,
+            "query": "Highland Park"
+          }
+        ]
+      },
+      {
+        "kind": "bottler",
+        "name": "Murray McDavid",
+        "score": 1,
+        "source": ["exact", "text", "prefix", "contained"],
+        "entityId": 5670,
+        "reference": "Murray McDavid",
+        "shortName": null,
+        "retrievedFor": [
+          {
+            "exact": true,
+            "query": "Murray McDavid"
+          }
+        ]
+      },
+      {
+        "kind": "bottler",
+        "name": "Gordon & MacPhail",
+        "score": 1,
+        "source": ["exact", "text", "prefix", "contained"],
+        "entityId": 5645,
+        "reference": "Gordon & MacPhail",
+        "shortName": null,
+        "retrievedFor": [
+          {
+            "exact": true,
+            "query": "Gordon & MacPhail"
+          }
+        ]
+      },
+      {
+        "kind": "brand",
+        "name": "Cadée",
+        "score": 0.31153846153846154,
+        "source": ["contained"],
+        "entityId": 367403,
+        "reference": "Cadée",
+        "shortName": null,
+        "retrievedFor": [
+          {
+            "query": "Decadent Drams"
+          },
+          {
+            "query": "Decadent Drinks"
+          }
+        ]
+      }
+    ],
+    "inspectedSeries": []
+  },
+  "provenance": {
+    "source": "production_miss",
+    "verifiedSourceUrls": [
+      "https://www.scotchwhiskyauctions.com/auctions/234-the-185th-auction/907498-highland-park-2001-17-year-old-connoisseurs-choice-cask-strength/"
+    ],
+    "dbOutcome": {
+      "bottleId": null,
+      "createsBottle": false,
+      "summary": "Production returned no_match: the old page read returned only the site's age question, so it saw none of the lot facts."
+    },
+    "notes": "Captured from saved classifier run 35556 (auction_lot 15890, model null, 2026-11-03T14:44:52.904Z). Production rationale: This is one whisky Bottle, but its exact release identity is unresolved. The inspected local candidates are distinct releases: Bottle 62038 is a 2006 Highland Park at 60.3%, and Bottle 44926 is an official Highland Park 18-year-old Single Cask Series release. The available evidence is insufficient to safely create a Bottle or assign either candidate. Expected outcome checked against the lot page on 2026-11-09 and a judged review of the 185th auction on 2026-11-03."
+  },
+  "expected": {
+    "status": "classified",
+    "action": "create_bottle",
+    "identityScope": "exact_cask",
+    "matchedBottleId": null,
+    "proposedBottle": {
+      "brand": {
+        "id": 5645
+      },
+      "category": "single_malt",
+      "statedAge": 17,
+      "vintageYear": 2001,
+      "bottlingYear": 2019,
+      "abv": 54.9
+    },
+    "proposedBottleNameIncludes": ["Highland Park", "2001"],
+    "proposedBottleDistillerIds": [438],
+    "summary": "Create Gordon & MacPhail Connoisseurs Choice Highland Park 2001, 17 years old, bottled 10.04.2019, cask 19/066 (Gordon & MacPhail prints it as a batch number; The Whisky Exchange, which sold this bottling, lists it as the cask number of one first-fill bourbon barrel), 54.9%, 163 bottles. The lot page gives every fact. Candidate 62038 is a 2006 vintage at 60.3% and 44926 is an official Single Cask Series Bottle, so neither blocks the create."
+  }
+}
