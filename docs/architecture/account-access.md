@@ -77,6 +77,26 @@ after 10 minutes; access tokens expire after 7 days.
 Tokens without a purpose are rejected. When this check is first deployed,
 users must sign in again and request new emailed links.
 
+## Web Sessions
+
+The web app keeps the signed-in user and their access token in an encrypted
+`_session` cookie. Peated has no refresh tokens, so a web sign-in lasts as long
+as its access token: 7 days from sign-in, however active the member is.
+
+- The web treats a session as signed out once its token's `exp` has passed,
+  or when it has no token. Every server read goes through `getSession()`, so
+  pages, layouts, and server actions all see the same answer.
+- Saving the cookie (for example, the hourly account refresh) extends the
+  cookie's lifetime but never the token's.
+- The API can also reject a token that has not expired, such as one for a
+  deleted account. The browser's account-state handler (see Suspension)
+  refreshes the session, which clears a rejected one, and routes on the
+  result. Server components cannot write cookies, so when a server-rendered
+  page or server action fails for a signed-in member, the route error page
+  runs that same handler before it shows a failure. The OAuth approve action
+  handles `UNAUTHORIZED` and `ACCOUNT_SUSPENDED` itself, so the person returns
+  to the same authorization request without an error.
+
 ## Suspension
 
 Moderators and administrators suspend a member with
@@ -178,6 +198,9 @@ member removes it in their Apple ID settings. Revocation needs
 
 - user fields: `apps/server/src/db/schema/users.ts`
 - token signing and verification: `apps/server/src/lib/auth.ts`
+- web session cookie and token expiry: `apps/web/src/lib/session.server.ts`
+- web account-state handler: `apps/web/src/app/providers/providers.tsx`, also
+  run by `apps/web/src/components/routeErrorPage.tsx`
 - Apple identity token verification and revocation: `apps/server/src/lib/apple.ts`
 - account deletion: `apps/server/src/lib/accountDeletion.ts`,
   `apps/server/src/orpc/routes/users/delete.ts`,

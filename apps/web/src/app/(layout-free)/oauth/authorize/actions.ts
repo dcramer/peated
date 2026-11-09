@@ -1,5 +1,6 @@
 "use server";
 
+import { updateSession } from "@peated/web/lib/auth.actions";
 import {
   createAnonymousServerClient,
   createServerClient,
@@ -15,6 +16,7 @@ export async function approveOAuthAuthorization(formData: FormData) {
   await approveOAuthAuthorizationWith(formData, {
     authorize: client.oauth.authorize,
     redirect,
+    refreshSession: updateSession,
   });
 }
 

@@ -230,6 +230,14 @@ process.on("SIGTERM", () => {
 async function handleRpcRequest({ request, response, url }) {
   const path = url.pathname.replace(/^\/rpc\/?/, "");
   const input = await readRpcInput(request, url);
+  // A token the API rejects before it expires, such as one for a deleted account.
+  if (
+    getAccessToken(request).includes("session-rejected") &&
+    (path === "auth/me" || path === "tastingDrafts/list")
+  ) {
+    sendRpcUnauthorized(response);
+    return true;
+  }
   const bottleCheckResult = bottleCheckMock.handleRpcRequest({
     path,
     input,
