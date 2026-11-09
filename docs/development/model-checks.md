@@ -85,6 +85,16 @@ sentry api "/organizations/peated/events/?dataset=spans&field=bottle_classifier.
 
 ## Capture a production miss
 
+Every `no_match` a person reviews becomes a test case, whichever way it went
+(owner rule, 2026-11-09). This is how the suite grows from real inputs:
+
+- When the input had a right outcome, such as a match, a new Bottle, or an
+  ignore, the case expects that outcome. Mark it `knownFailure` until a change
+  makes it pass.
+- When `no_match` was right, the case expects `no_match`, so a later change
+  cannot start guessing. Use `expected.blockedBottle` when the right Bottle
+  is blocked by a wrong stored field.
+
 Store-price, review, and auction lot classifier runs are saved as Bottle checks
 with the full input, decision, and artifacts. An auction lot run uses
 `sourceKind=auction_lot` and the lot ID. To turn a wrong decision into a test case:

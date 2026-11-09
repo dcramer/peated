@@ -1,0 +1,1019 @@
+{
+  "id": "auction-smws-lemon-odyssey-match",
+  "name": "SMWS Lemon Odyssey 7 Year Old Blended Malt: match the only Lemon Odyssey, SM0.1",
+  "input": {
+    "reference": {
+      "id": 17589,
+      "url": "https://www.scotchwhiskyauctions.com/auctions/234-the-185th-auction/904420-smws-lemon-odyssey-7-year-old-blended-malt-2020-membership-exclusive/",
+      "name": "SMWS Lemon Odyssey 7 Year Old Blended Malt 2020 Membership Exclusive",
+      "imageUrl": null,
+      "externalSiteId": 28097,
+      "currentBottleId": null
+    },
+    "extractedIdentity": {
+      "abv": 50,
+      "brand": null,
+      "series": null,
+      "bottler": null,
+      "edition": null,
+      "outturn": null,
+      "category": null,
+      "distillery": null,
+      "expression": null,
+      "maturation": null,
+      "stated_age": null,
+      "cask_number": null,
+      "single_cask": null,
+      "release_year": null,
+      "vintage_year": null,
+      "cask_strength": null
+    },
+    "extractedIdentitySource": "structured",
+    "imageEvidence": null,
+    "initialCandidates": [
+      {
+        "abv": 50,
+        "brand": "The Scotch Malt Whisky Society",
+        "score": 173.18317,
+        "series": null,
+        "source": ["text", "context", "brand", "brand_coverage"],
+        "bottler": "The Scotch Malt Whisky Society",
+        "edition": null,
+        "outturn": 1500,
+        "bottleId": 49659,
+        "category": "blended_malt",
+        "fullName": "SMWS SM0.1 Lemon odyssey",
+        "reference": null,
+        "statedAge": 7,
+        "caskNumber": "SM0.1",
+        "comparison": {
+          "missing": [],
+          "conflicts": [],
+          "agreements": ["abv"]
+        },
+        "distillery": [],
+        "maturation": "1st & 2nd fill ex-bourbon barrels",
+        "releaseDay": null,
+        "singleCask": false,
+        "releaseYear": null,
+        "vintageYear": 2012,
+        "bottlingYear": null,
+        "caskStrength": null,
+        "releaseMonth": null,
+        "familyContext": {
+          "siblingBottles": []
+        }
+      },
+      {
+        "abv": 50,
+        "brand": "Living Souls",
+        "score": 76.77799,
+        "series": null,
+        "source": ["text"],
+        "bottler": "Living Souls",
+        "edition": null,
+        "outturn": null,
+        "bottleId": 46156,
+        "category": "single_malt",
+        "fullName": "Living Souls Ardnamurchan 7-year-old - 50.0% ABV - Bourbon Cask - Barrel - 1st Fill",
+        "reference": null,
+        "statedAge": 7,
+        "caskNumber": null,
+        "comparison": {
+          "missing": [],
+          "conflicts": [],
+          "agreements": ["abv"]
+        },
+        "distillery": ["Ardnamurchan"],
+        "maturation": "bourbon",
+        "releaseDay": null,
+        "singleCask": false,
+        "releaseYear": null,
+        "vintageYear": null,
+        "bottlingYear": null,
+        "caskStrength": null,
+        "releaseMonth": null,
+        "familyContext": {
+          "siblingBottles": []
+        }
+      },
+      {
+        "abv": 50,
+        "brand": "Brother's Bond",
+        "score": 56.780983,
+        "series": null,
+        "source": ["text"],
+        "bottler": null,
+        "edition": null,
+        "outturn": null,
+        "bottleId": 45994,
+        "category": "bourbon",
+        "fullName": "Brother's Bond Bottled-in-Bond Straight Bourbon Whiskey - 7-year-old - 50.0% ABV",
+        "reference": null,
+        "statedAge": 7,
+        "caskNumber": null,
+        "comparison": {
+          "missing": [],
+          "conflicts": [],
+          "agreements": ["abv"]
+        },
+        "distillery": [],
+        "maturation": null,
+        "releaseDay": null,
+        "singleCask": null,
+        "releaseYear": null,
+        "vintageYear": null,
+        "bottlingYear": null,
+        "caskStrength": false,
+        "releaseMonth": null,
+        "familyContext": {
+          "siblingBottles": []
+        }
+      },
+      {
+        "abv": null,
+        "brand": "Ballantine's",
+        "score": 49.601585,
+        "series": null,
+        "source": ["text"],
+        "bottler": null,
+        "edition": null,
+        "outturn": null,
+        "bottleId": 13278,
+        "category": "blend",
+        "fullName": "Ballantine's 7-year-old Bourbon Finish",
+        "reference": null,
+        "statedAge": 7,
+        "caskNumber": null,
+        "comparison": {
+          "missing": [
+            "abv",
+            "vintageYear",
+            "releaseYear",
+            "singleCask",
+            "caskNumber",
+            "bottler"
+          ],
+          "conflicts": ["category", "brand"],
+          "agreements": ["statedAge"]
+        },
+        "distillery": [],
+        "maturation": null,
+        "releaseDay": null,
+        "singleCask": null,
+        "releaseYear": null,
+        "vintageYear": null,
+        "bottlingYear": null,
+        "caskStrength": null,
+        "releaseMonth": null,
+        "familyContext": {
+          "siblingBottles": []
+        }
+      },
+      {
+        "abv": 47.5,
+        "brand": "Càrn Mòr",
+        "score": 49.545364,
+        "series": "Strictly Limited",
+        "source": ["text"],
+        "bottler": "Morrison Scotch Whisky Distillers",
+        "edition": null,
+        "outturn": 495,
+        "bottleId": 67512,
+        "category": "single_malt",
+        "fullName": "Càrn Mòr Glen Ord 2012 7-year-old",
+        "reference": null,
+        "statedAge": 7,
+        "caskNumber": null,
+        "comparison": {
+          "missing": ["releaseYear", "caskNumber"],
+          "conflicts": ["category", "abv", "brand", "bottler"],
+          "agreements": ["statedAge", "vintageYear", "singleCask"]
+        },
+        "distillery": ["Glen Ord"],
+        "maturation": "Bourbon barrels",
+        "releaseDay": null,
+        "singleCask": false,
+        "releaseYear": null,
+        "vintageYear": 2012,
+        "bottlingYear": 2020,
+        "caskStrength": false,
+        "releaseMonth": null,
+        "familyContext": {
+          "siblingBottles": []
+        }
+      },
+      {
+        "abv": 50,
+        "brand": "Living Souls",
+        "score": 49.49231,
+        "series": null,
+        "source": ["text"],
+        "bottler": "Living Souls",
+        "edition": null,
+        "outturn": null,
+        "bottleId": 47313,
+        "category": "single_malt",
+        "fullName": "Living Souls Bowmore",
+        "reference": null,
+        "statedAge": 7,
+        "caskNumber": null,
+        "comparison": {
+          "missing": ["vintageYear", "caskNumber"],
+          "conflicts": ["category", "releaseYear", "brand", "bottler"],
+          "agreements": ["statedAge", "abv", "singleCask"]
+        },
+        "distillery": ["Bowmore"],
+        "maturation": "Second-fill bourbon barrels",
+        "releaseDay": null,
+        "singleCask": false,
+        "releaseYear": 2025,
+        "vintageYear": null,
+        "bottlingYear": 2025,
+        "caskStrength": null,
+        "releaseMonth": null,
+        "familyContext": {
+          "siblingBottles": []
+        }
+      },
+      {
+        "abv": 50,
+        "brand": "Doc Holliday",
+        "score": 46.77497,
+        "series": null,
+        "source": ["text"],
+        "bottler": null,
+        "edition": null,
+        "outturn": null,
+        "bottleId": 63434,
+        "category": "bourbon",
+        "fullName": "Doc Holliday 7-year-old Straight Bourbon Whiskey",
+        "reference": null,
+        "statedAge": 7,
+        "caskNumber": null,
+        "comparison": {
+          "missing": [
+            "vintageYear",
+            "releaseYear",
+            "singleCask",
+            "caskNumber",
+            "bottler"
+          ],
+          "conflicts": ["category", "brand"],
+          "agreements": ["statedAge", "abv"]
+        },
+        "distillery": [],
+        "maturation": null,
+        "releaseDay": null,
+        "singleCask": null,
+        "releaseYear": null,
+        "vintageYear": null,
+        "bottlingYear": null,
+        "caskStrength": null,
+        "releaseMonth": null,
+        "familyContext": {
+          "siblingBottles": []
+        }
+      },
+      {
+        "abv": 50,
+        "brand": "Jaywalk",
+        "score": 46.364853,
+        "series": null,
+        "source": ["text"],
+        "bottler": null,
+        "edition": null,
+        "outturn": null,
+        "bottleId": 46970,
+        "category": "rye",
+        "fullName": "Jaywalk Bonded",
+        "reference": null,
+        "statedAge": 7,
+        "caskNumber": null,
+        "comparison": {
+          "missing": [],
+          "conflicts": [],
+          "agreements": ["abv"]
+        },
+        "distillery": ["New York Distilling Company"],
+        "maturation": null,
+        "releaseDay": null,
+        "singleCask": null,
+        "releaseYear": null,
+        "vintageYear": null,
+        "bottlingYear": null,
+        "caskStrength": null,
+        "releaseMonth": null,
+        "familyContext": {
+          "siblingBottles": []
+        }
+      },
+      {
+        "abv": 50,
+        "brand": "Fielden",
+        "score": 46.043064,
+        "series": null,
+        "source": ["text"],
+        "bottler": null,
+        "edition": "2020",
+        "outturn": null,
+        "bottleId": 46209,
+        "category": "rye",
+        "fullName": "Fielden Harvest - 2020 - 50.0% ABV",
+        "reference": null,
+        "statedAge": null,
+        "caskNumber": null,
+        "comparison": {
+          "missing": [],
+          "conflicts": [],
+          "agreements": ["abv"]
+        },
+        "distillery": ["The Oxford Artisan Distillery"],
+        "maturation": null,
+        "releaseDay": null,
+        "singleCask": null,
+        "releaseYear": null,
+        "vintageYear": null,
+        "bottlingYear": null,
+        "caskStrength": null,
+        "releaseMonth": null,
+        "familyContext": {
+          "siblingBottles": []
+        }
+      },
+      {
+        "abv": 50,
+        "brand": "Lochlea",
+        "score": 45.436413,
+        "series": null,
+        "source": ["text"],
+        "bottler": null,
+        "edition": null,
+        "outturn": null,
+        "bottleId": 62516,
+        "category": "single_malt",
+        "fullName": "Lochlea 7-year-old",
+        "reference": null,
+        "statedAge": 7,
+        "caskNumber": null,
+        "comparison": {
+          "missing": [
+            "vintageYear",
+            "releaseYear",
+            "singleCask",
+            "caskNumber",
+            "bottler"
+          ],
+          "conflicts": ["category", "brand"],
+          "agreements": ["statedAge", "abv"]
+        },
+        "distillery": ["Lochlea"],
+        "maturation": null,
+        "releaseDay": null,
+        "singleCask": null,
+        "releaseYear": null,
+        "vintageYear": null,
+        "bottlingYear": null,
+        "caskStrength": null,
+        "releaseMonth": null,
+        "familyContext": {
+          "siblingBottles": []
+        }
+      },
+      {
+        "abv": 50,
+        "brand": "Claxton's",
+        "score": 36.760723,
+        "series": "Exploration Series",
+        "source": ["text"],
+        "bottler": "Claxton's",
+        "edition": null,
+        "outturn": null,
+        "bottleId": 46449,
+        "category": "single_malt",
+        "fullName": "Claxton's Staoisha - 7-year-old - 2018 Vintage - 50.0% ABV - Single Cask",
+        "reference": null,
+        "statedAge": 7,
+        "caskNumber": null,
+        "comparison": {
+          "missing": [],
+          "conflicts": [],
+          "agreements": ["abv"]
+        },
+        "distillery": ["Bunnahabhain"],
+        "maturation": null,
+        "releaseDay": null,
+        "singleCask": true,
+        "releaseYear": null,
+        "vintageYear": 2018,
+        "bottlingYear": null,
+        "caskStrength": null,
+        "releaseMonth": null,
+        "familyContext": {
+          "siblingBottles": []
+        }
+      },
+      {
+        "abv": 50,
+        "brand": "Elevenses",
+        "score": 35.580486,
+        "series": null,
+        "source": ["text"],
+        "bottler": "Keeble Cask Company",
+        "edition": null,
+        "outturn": null,
+        "bottleId": 46856,
+        "category": "single_malt",
+        "fullName": "Elevenses Secret Fife - 7-year-old - 2007 Vintage - 50.0% ABV - Single Cask - Other Cask",
+        "reference": null,
+        "statedAge": 7,
+        "caskNumber": null,
+        "comparison": {
+          "missing": [],
+          "conflicts": [],
+          "agreements": ["abv"]
+        },
+        "distillery": [],
+        "maturation": "other",
+        "releaseDay": null,
+        "singleCask": true,
+        "releaseYear": null,
+        "vintageYear": 2007,
+        "bottlingYear": null,
+        "caskStrength": null,
+        "releaseMonth": null,
+        "familyContext": {
+          "siblingBottles": []
+        }
+      },
+      {
+        "abv": null,
+        "brand": "The Exclusive Malts",
+        "score": 35.541683,
+        "series": null,
+        "source": ["text"],
+        "bottler": "Creative Whisky Company",
+        "edition": null,
+        "outturn": null,
+        "bottleId": 44274,
+        "category": "single_malt",
+        "fullName": "The Exclusive Malts Islay",
+        "reference": null,
+        "statedAge": null,
+        "caskNumber": null,
+        "comparison": {
+          "missing": ["abv"],
+          "conflicts": [],
+          "agreements": []
+        },
+        "distillery": [],
+        "maturation": null,
+        "releaseDay": null,
+        "singleCask": null,
+        "releaseYear": null,
+        "vintageYear": null,
+        "bottlingYear": null,
+        "caskStrength": null,
+        "releaseMonth": null,
+        "familyContext": {
+          "siblingBottles": [
+            {
+              "abv": 57.1,
+              "edition": null,
+              "outturn": null,
+              "bottleId": 45142,
+              "fullName": "The Exclusive Malts Islay - 8-year-old - 2016 Release - 2007 Vintage - 57.1% ABV - Cask Strength",
+              "statedAge": 8,
+              "caskNumber": null,
+              "maturation": null,
+              "releaseDay": null,
+              "singleCask": null,
+              "releaseYear": 2016,
+              "traitFields": [
+                "statedAge",
+                "releaseYear",
+                "vintageYear",
+                "abv",
+                "caskStrength"
+              ],
+              "vintageYear": 2007,
+              "bottlingYear": null,
+              "caskStrength": true,
+              "releaseMonth": null
+            }
+          ]
+        }
+      },
+      {
+        "abv": null,
+        "brand": "Cotswolds",
+        "score": 35.274506,
+        "series": null,
+        "source": ["text"],
+        "bottler": "Cotswolds Distillery",
+        "edition": null,
+        "outturn": null,
+        "bottleId": 2759,
+        "category": null,
+        "fullName": "Cotswolds 2014 Odyssey Barley",
+        "reference": null,
+        "statedAge": 5,
+        "caskNumber": null,
+        "comparison": {
+          "missing": ["abv"],
+          "conflicts": [],
+          "agreements": []
+        },
+        "distillery": [],
+        "maturation": null,
+        "releaseDay": null,
+        "singleCask": null,
+        "releaseYear": null,
+        "vintageYear": null,
+        "bottlingYear": null,
+        "caskStrength": null,
+        "releaseMonth": null,
+        "familyContext": {
+          "siblingBottles": []
+        }
+      },
+      {
+        "abv": 50,
+        "brand": "Old Grand-Dad",
+        "score": 34.257973,
+        "series": null,
+        "source": ["text"],
+        "bottler": null,
+        "edition": null,
+        "outturn": null,
+        "bottleId": 47500,
+        "category": "bourbon",
+        "fullName": "Old Grand-Dad 7-year-old Bottled in Bond - 2026 Release - 2018 Vintage - 50.0% ABV",
+        "reference": null,
+        "statedAge": 7,
+        "caskNumber": null,
+        "comparison": {
+          "missing": [],
+          "conflicts": [],
+          "agreements": ["abv"]
+        },
+        "distillery": [],
+        "maturation": null,
+        "releaseDay": null,
+        "singleCask": false,
+        "releaseYear": 2026,
+        "vintageYear": 2018,
+        "bottlingYear": null,
+        "caskStrength": false,
+        "releaseMonth": null,
+        "familyContext": {
+          "siblingBottles": []
+        }
+      },
+      {
+        "abv": 50,
+        "brand": "Bruichladdich Port Charlotte",
+        "score": 33.614998,
+        "series": null,
+        "source": ["text"],
+        "bottler": null,
+        "edition": null,
+        "outturn": null,
+        "bottleId": 46038,
+        "category": "single_malt",
+        "fullName": "Port Charlotte Islay Barley - 7-year-old - 2014 Vintage - 50.0% ABV",
+        "reference": null,
+        "statedAge": 7,
+        "caskNumber": null,
+        "comparison": {
+          "missing": [],
+          "conflicts": [],
+          "agreements": ["abv"]
+        },
+        "distillery": ["Bruichladdich"],
+        "maturation": null,
+        "releaseDay": null,
+        "singleCask": null,
+        "releaseYear": null,
+        "vintageYear": 2014,
+        "bottlingYear": null,
+        "caskStrength": null,
+        "releaseMonth": null,
+        "familyContext": {
+          "siblingBottles": []
+        }
+      },
+      {
+        "abv": 50,
+        "brand": "The Scotch Malt Whisky Society",
+        "score": 33.397774,
+        "series": null,
+        "source": ["text"],
+        "bottler": "The Scotch Malt Whisky Society",
+        "edition": null,
+        "outturn": 1446,
+        "bottleId": 49510,
+        "category": "blended_malt",
+        "fullName": "SMWS BAT.11 The Tar Pit",
+        "reference": null,
+        "statedAge": 9,
+        "caskNumber": "BAT.11",
+        "comparison": {
+          "missing": [],
+          "conflicts": [],
+          "agreements": ["abv"]
+        },
+        "distillery": [],
+        "maturation": "Ex-Pedro Ximenes butts & ex-bourbon hogsheads",
+        "releaseDay": 30,
+        "singleCask": false,
+        "releaseYear": 2020,
+        "vintageYear": 2011,
+        "bottlingYear": null,
+        "caskStrength": null,
+        "releaseMonth": 11,
+        "familyContext": {
+          "siblingBottles": []
+        }
+      },
+      {
+        "abv": 50,
+        "brand": "Elevenses",
+        "score": 31.43011,
+        "series": null,
+        "source": ["text"],
+        "bottler": "Keeble Cask Company",
+        "edition": null,
+        "outturn": 565,
+        "bottleId": 53125,
+        "category": "single_malt",
+        "fullName": "Elevenses Lemon Sherbet, Anyone?",
+        "reference": null,
+        "statedAge": 6,
+        "caskNumber": null,
+        "comparison": {
+          "missing": [],
+          "conflicts": [],
+          "agreements": ["abv"]
+        },
+        "distillery": [],
+        "maturation": "marriage of two first-fill bourbon hogsheads",
+        "releaseDay": null,
+        "singleCask": false,
+        "releaseYear": null,
+        "vintageYear": 2018,
+        "bottlingYear": 2025,
+        "caskStrength": null,
+        "releaseMonth": null,
+        "familyContext": {
+          "siblingBottles": []
+        }
+      },
+      {
+        "abv": 50,
+        "brand": "Bruichladdich",
+        "score": 31.269358,
+        "series": null,
+        "source": ["text"],
+        "bottler": null,
+        "edition": null,
+        "outturn": null,
+        "bottleId": 45311,
+        "category": "single_grain",
+        "fullName": "Bruichladdich The Laddie Rye",
+        "reference": null,
+        "statedAge": 7,
+        "caskNumber": null,
+        "comparison": {
+          "missing": [],
+          "conflicts": [],
+          "agreements": ["abv"]
+        },
+        "distillery": ["Bruichladdich"],
+        "maturation": null,
+        "releaseDay": null,
+        "singleCask": null,
+        "releaseYear": null,
+        "vintageYear": null,
+        "bottlingYear": null,
+        "caskStrength": null,
+        "releaseMonth": null,
+        "familyContext": {
+          "siblingBottles": []
+        }
+      },
+      {
+        "abv": null,
+        "brand": "Wemyss Malts",
+        "score": 30.022636,
+        "series": null,
+        "source": ["text"],
+        "bottler": null,
+        "edition": null,
+        "outturn": null,
+        "bottleId": 17051,
+        "category": "single_malt",
+        "fullName": "Wemyss Malts 'Lemon Sorbet' 1998 (distilled at Auchentoshan)",
+        "reference": null,
+        "statedAge": null,
+        "caskNumber": null,
+        "comparison": {
+          "missing": ["abv"],
+          "conflicts": [],
+          "agreements": []
+        },
+        "distillery": [],
+        "maturation": null,
+        "releaseDay": null,
+        "singleCask": null,
+        "releaseYear": null,
+        "vintageYear": null,
+        "bottlingYear": null,
+        "caskStrength": null,
+        "releaseMonth": null,
+        "familyContext": {
+          "siblingBottles": []
+        }
+      }
+    ]
+  },
+  "context": {
+    "inspectedBottleIds": [49659],
+    "bottleContexts": [
+      {
+        "exact": {
+          "abv": 50,
+          "edition": null,
+          "outturn": 1500,
+          "statedAge": 7,
+          "caskNumber": "SM0.1",
+          "maturation": "1st & 2nd fill ex-bourbon barrels",
+          "releaseDay": null,
+          "singleCask": false,
+          "releaseYear": null,
+          "vintageYear": 2012,
+          "bottlingYear": null,
+          "caskStrength": null,
+          "releaseMonth": null
+        },
+        "shared": {
+          "name": "SM0.1 Lemon odyssey",
+          "brand": {
+            "name": "The Scotch Malt Whisky Society",
+            "entityId": 4263
+          },
+          "series": null,
+          "bottler": {
+            "name": "The Scotch Malt Whisky Society",
+            "entityId": 4263
+          },
+          "category": "blended_malt",
+          "statedAge": null,
+          "distillers": []
+        },
+        "groupId": 22619,
+        "bottleId": 49659,
+        "fullName": "SMWS SM0.1 Lemon odyssey",
+        "siblings": [],
+        "references": [
+          {
+            "name": "SMWS SM0.1 Lemon odyssey - 7-year-old - 2012 Vintage - 50.0% ABV",
+            "ignored": false
+          }
+        ],
+        "observations": [],
+        "imageSources": []
+      }
+    ],
+    "inspectedEntities": [
+      {
+        "kind": "bottler",
+        "name": "The Scotch Malt Whisky Society",
+        "score": 1,
+        "source": ["exact", "text", "prefix", "contained"],
+        "entityId": 4263,
+        "reference": "The Scotch Malt Whisky Society",
+        "shortName": "SMWS",
+        "retrievedFor": [
+          {
+            "exact": true,
+            "query": "The Scotch Malt Whisky Society"
+          }
+        ]
+      },
+      {
+        "kind": "brand",
+        "name": "Fielden",
+        "score": 1,
+        "source": ["exact", "text", "prefix", "contained"],
+        "entityId": 365868,
+        "reference": "Fielden",
+        "shortName": null,
+        "retrievedFor": [
+          {
+            "exact": true,
+            "query": "Fielden"
+          }
+        ]
+      },
+      {
+        "kind": "distillery",
+        "name": "The Oxford Artisan Distillery",
+        "score": 1,
+        "source": ["exact", "text", "prefix", "contained"],
+        "entityId": 1954,
+        "reference": "The Oxford Artisan Distillery",
+        "shortName": null,
+        "retrievedFor": [
+          {
+            "exact": true,
+            "query": "The Oxford Artisan Distillery"
+          }
+        ]
+      },
+      {
+        "kind": "brand",
+        "name": "Brother's Bond",
+        "score": 1,
+        "source": ["exact", "text", "prefix", "contained"],
+        "entityId": 83694,
+        "reference": null,
+        "shortName": null,
+        "retrievedFor": [
+          {
+            "exact": true,
+            "query": "Brother's Bond"
+          }
+        ]
+      },
+      {
+        "kind": "bottler",
+        "name": "Living Souls",
+        "score": 1,
+        "source": ["exact", "text", "prefix", "contained"],
+        "entityId": 365801,
+        "reference": "Living Souls",
+        "shortName": null,
+        "retrievedFor": [
+          {
+            "exact": true,
+            "query": "Living Souls"
+          }
+        ]
+      },
+      {
+        "kind": "distillery",
+        "name": "Ardnamurchan",
+        "score": 1,
+        "source": ["exact", "text", "prefix", "contained"],
+        "entityId": 84,
+        "reference": "Ardnamurchan",
+        "shortName": null,
+        "retrievedFor": [
+          {
+            "exact": true,
+            "query": "Ardnamurchan"
+          }
+        ]
+      },
+      {
+        "kind": "bottler",
+        "name": "Claxton's",
+        "score": 1,
+        "source": ["exact", "text", "prefix", "contained"],
+        "entityId": 6077,
+        "reference": "Claxton's",
+        "shortName": null,
+        "retrievedFor": [
+          {
+            "exact": true,
+            "query": "Claxton's"
+          }
+        ]
+      },
+      {
+        "kind": "distillery",
+        "name": "Bunnahabhain",
+        "score": 1,
+        "source": ["exact", "text", "prefix", "contained"],
+        "entityId": 144,
+        "reference": "Bunnahabhain",
+        "shortName": "",
+        "retrievedFor": [
+          {
+            "exact": true,
+            "query": "Bunnahabhain"
+          }
+        ]
+      },
+      {
+        "kind": "brand",
+        "name": "Elevenses",
+        "score": 1,
+        "source": ["exact", "text", "prefix", "contained"],
+        "entityId": 365848,
+        "reference": "Elevenses",
+        "shortName": null,
+        "retrievedFor": [
+          {
+            "exact": true,
+            "query": "Elevenses"
+          }
+        ]
+      },
+      {
+        "kind": "bottler",
+        "name": "Keeble Cask Company",
+        "score": 1,
+        "source": ["exact", "text", "prefix", "contained"],
+        "entityId": 365849,
+        "reference": "Keeble Cask Company",
+        "shortName": null,
+        "retrievedFor": [
+          {
+            "exact": true,
+            "query": "Keeble Cask Company"
+          }
+        ]
+      },
+      {
+        "kind": "brand",
+        "name": "Old Grand-Dad",
+        "score": 1,
+        "source": ["exact", "text", "prefix", "contained"],
+        "entityId": 1220,
+        "reference": "Old Grand-Dad",
+        "shortName": null,
+        "retrievedFor": [
+          {
+            "exact": true,
+            "query": "Old Grand-Dad"
+          }
+        ]
+      },
+      {
+        "kind": "brand",
+        "name": "Jaywalk",
+        "score": 1,
+        "source": ["exact", "text", "prefix", "contained"],
+        "entityId": 366008,
+        "reference": "Jaywalk",
+        "shortName": null,
+        "retrievedFor": [
+          {
+            "exact": true,
+            "query": "Jaywalk"
+          }
+        ]
+      },
+      {
+        "kind": "bottler",
+        "name": "The Whisky Society",
+        "score": 0.35,
+        "source": ["contained"],
+        "entityId": 367612,
+        "reference": "Whisky Society",
+        "shortName": null,
+        "retrievedFor": [
+          {
+            "query": "The Scotch Malt Whisky Society"
+          }
+        ]
+      },
+      {
+        "kind": "bottler",
+        "name": "&Whisky",
+        "score": 0.29615384615384616,
+        "source": ["contained"],
+        "entityId": 365821,
+        "reference": "&Whisky",
+        "shortName": null,
+        "retrievedFor": [
+          {
+            "query": "The Scotch Malt Whisky Society"
+          }
+        ]
+      }
+    ],
+    "inspectedSeries": []
+  },
+  "provenance": {
+    "source": "production_miss",
+    "verifiedSourceUrls": [
+      "https://www.scotchwhiskyauctions.com/auctions/234-the-185th-auction/904420-smws-lemon-odyssey-7-year-old-blended-malt-2020-membership-exclusive/"
+    ],
+    "dbOutcome": {
+      "bottleId": null,
+      "createsBottle": false,
+      "summary": "Production returned no_match: the server downgraded the agent's match because the source did not print SM0.1."
+    },
+    "notes": "Captured from saved classifier run 36637 (auction_lot 17589, model null, 2026-11-03T21:37:54.566Z). Production rationale: The auction listing is for one whisky Bottle. Its Lemon Odyssey name, 7-year age, blended-malt category and 50% ABV align with inspected Bottle 49659, whose reference identifies the SMWS SM0.1 Lemon Odyssey as a 2012 vintage. The listing’s 2020 wording does not conflict with the candidate’s missing release year. Server downgraded the existing-match recommendation because candidate cask code SM0.1 was not established by the source. Expected outcome checked against the lot page on 2026-11-09 and a judged review of the 185th auction on 2026-11-03."
+  },
+  "expected": {
+    "status": "classified",
+    "action": "match",
+    "identityScope": "product",
+    "matchedBottleId": 49659,
+    "summary": "Match 49659. Lemon Odyssey is the Society's blended malt SM0.1, and only one exists. The lot's 7 years old, 50%, and 1st and 2nd fill bourbon barrels agree with the stored Bottle."
+  }
+}

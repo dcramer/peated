@@ -1,0 +1,968 @@
+{
+  "id": "auction-lochside-1991-cc-2006-bottling-create",
+  "name": "Lochside 1991 Connoisseurs Choice: the 2006 bottling is its own Bottle beside the 2005 and 2010 ones",
+  "input": {
+    "reference": {
+      "id": 16530,
+      "url": "https://www.scotchwhiskyauctions.com/auctions/234-the-185th-auction/908304-lochside-1991-connoisseurs-choice/",
+      "name": "Lochside 1991 Connoisseurs Choice",
+      "imageUrl": null,
+      "externalSiteId": 28097,
+      "currentBottleId": null
+    },
+    "extractedIdentity": {
+      "abv": 43,
+      "brand": null,
+      "series": null,
+      "bottler": null,
+      "edition": null,
+      "outturn": null,
+      "category": null,
+      "distillery": null,
+      "expression": null,
+      "maturation": null,
+      "stated_age": null,
+      "cask_number": null,
+      "single_cask": null,
+      "release_year": null,
+      "vintage_year": null,
+      "cask_strength": null
+    },
+    "extractedIdentitySource": "structured",
+    "imageEvidence": null,
+    "initialCandidates": [
+      {
+        "abv": 43,
+        "brand": "Gordon & MacPhail",
+        "score": 85.48688,
+        "series": "Connoisseurs Choice",
+        "source": ["text", "context"],
+        "bottler": "Gordon & MacPhail",
+        "edition": null,
+        "outturn": null,
+        "bottleId": 58742,
+        "category": "single_malt",
+        "fullName": "Gordon & MacPhail Lochside 1991",
+        "reference": null,
+        "statedAge": null,
+        "caskNumber": null,
+        "comparison": {
+          "missing": [],
+          "conflicts": [],
+          "agreements": ["abv"]
+        },
+        "distillery": ["Lochside"],
+        "maturation": "Refill bourbon barrels",
+        "releaseDay": null,
+        "singleCask": null,
+        "releaseYear": null,
+        "vintageYear": 1991,
+        "bottlingYear": 2005,
+        "caskStrength": null,
+        "releaseMonth": null,
+        "familyContext": {
+          "siblingBottles": []
+        }
+      },
+      {
+        "abv": 43,
+        "brand": "Gordon & MacPhail",
+        "score": 85.48688,
+        "series": "Connoisseurs Choice",
+        "source": ["text", "context"],
+        "bottler": "Gordon & MacPhail",
+        "edition": null,
+        "outturn": null,
+        "bottleId": 58638,
+        "category": "single_malt",
+        "fullName": "Gordon & MacPhail Lochside 1991",
+        "reference": null,
+        "statedAge": null,
+        "caskNumber": null,
+        "comparison": {
+          "missing": [],
+          "conflicts": [],
+          "agreements": ["abv"]
+        },
+        "distillery": ["Lochside"],
+        "maturation": "Refill bourbon barrels",
+        "releaseDay": null,
+        "singleCask": null,
+        "releaseYear": null,
+        "vintageYear": 1991,
+        "bottlingYear": 2010,
+        "caskStrength": null,
+        "releaseMonth": null,
+        "familyContext": {
+          "siblingBottles": []
+        }
+      },
+      {
+        "abv": 43,
+        "brand": "Gordon & MacPhail",
+        "score": 57.95328,
+        "series": "Connoisseurs Choice",
+        "source": ["vector", "text"],
+        "bottler": "Gordon & MacPhail",
+        "edition": null,
+        "outturn": null,
+        "bottleId": 58762,
+        "category": "single_malt",
+        "fullName": "Gordon & MacPhail Littlemill 1991",
+        "reference": "Littlemill 1991 - Connoisseurs Choice (bottled 2010) (Gordon & MacPhail)",
+        "statedAge": null,
+        "caskNumber": null,
+        "comparison": {
+          "missing": [],
+          "conflicts": [],
+          "agreements": ["abv"]
+        },
+        "distillery": ["Littlemill"],
+        "maturation": "Refill bourbon barrels",
+        "releaseDay": null,
+        "singleCask": null,
+        "releaseYear": null,
+        "vintageYear": 1991,
+        "bottlingYear": 2010,
+        "caskStrength": null,
+        "releaseMonth": null,
+        "familyContext": {
+          "siblingBottles": []
+        }
+      },
+      {
+        "abv": 43,
+        "brand": "Gordon & MacPhail",
+        "score": 55.3849,
+        "series": "Connoisseurs Choice",
+        "source": ["text"],
+        "bottler": "Gordon & MacPhail",
+        "edition": null,
+        "outturn": null,
+        "bottleId": 66398,
+        "category": "single_malt",
+        "fullName": "Gordon & MacPhail Clynelish 1991",
+        "reference": null,
+        "statedAge": null,
+        "caskNumber": null,
+        "comparison": {
+          "missing": [],
+          "conflicts": [],
+          "agreements": ["abv"]
+        },
+        "distillery": ["Clynelish"],
+        "maturation": null,
+        "releaseDay": null,
+        "singleCask": null,
+        "releaseYear": null,
+        "vintageYear": 1991,
+        "bottlingYear": 2004,
+        "caskStrength": null,
+        "releaseMonth": null,
+        "familyContext": {
+          "siblingBottles": []
+        }
+      },
+      {
+        "abv": 43,
+        "brand": "Old Grand-Dad",
+        "score": 39.46279,
+        "series": null,
+        "source": ["text"],
+        "bottler": null,
+        "edition": null,
+        "outturn": null,
+        "bottleId": 45464,
+        "category": "bourbon",
+        "fullName": "Old Grand-Dad 86 Proof - 1991 Release - 43.0% ABV",
+        "reference": null,
+        "statedAge": null,
+        "caskNumber": null,
+        "comparison": {
+          "missing": [],
+          "conflicts": [],
+          "agreements": ["abv"]
+        },
+        "distillery": [],
+        "maturation": null,
+        "releaseDay": null,
+        "singleCask": null,
+        "releaseYear": 1991,
+        "vintageYear": null,
+        "bottlingYear": null,
+        "caskStrength": null,
+        "releaseMonth": null,
+        "familyContext": {
+          "siblingBottles": []
+        }
+      },
+      {
+        "abv": 43,
+        "brand": "Gordon & MacPhail",
+        "score": 37.996635,
+        "series": "Connoisseurs Choice",
+        "source": ["vector", "text"],
+        "bottler": "Gordon & MacPhail",
+        "edition": null,
+        "outturn": null,
+        "bottleId": 65339,
+        "category": "single_malt",
+        "fullName": "Gordon & MacPhail Ledaig",
+        "reference": "Gordon & MacPhail Connoisseurs' Choice 1998 Ledaig (distilled at Tobermory), 43%",
+        "statedAge": null,
+        "caskNumber": null,
+        "comparison": {
+          "missing": [],
+          "conflicts": [],
+          "agreements": ["abv"]
+        },
+        "distillery": ["Tobermory"],
+        "maturation": "Refill, remade American hogsheads",
+        "releaseDay": null,
+        "singleCask": null,
+        "releaseYear": null,
+        "vintageYear": 1998,
+        "bottlingYear": null,
+        "caskStrength": null,
+        "releaseMonth": null,
+        "familyContext": {
+          "siblingBottles": []
+        }
+      },
+      {
+        "abv": 43,
+        "brand": "Gordon & MacPhail",
+        "score": 36.261818,
+        "series": "Connoisseurs Choice",
+        "source": ["text"],
+        "bottler": "Gordon & MacPhail",
+        "edition": null,
+        "outturn": null,
+        "bottleId": 67029,
+        "category": "single_malt",
+        "fullName": "Gordon & MacPhail Ardbeg 1974",
+        "reference": null,
+        "statedAge": null,
+        "caskNumber": null,
+        "comparison": {
+          "missing": [],
+          "conflicts": [],
+          "agreements": ["abv"]
+        },
+        "distillery": ["Ardbeg"],
+        "maturation": null,
+        "releaseDay": null,
+        "singleCask": null,
+        "releaseYear": null,
+        "vintageYear": 1974,
+        "bottlingYear": 2003,
+        "caskStrength": null,
+        "releaseMonth": null,
+        "familyContext": {
+          "siblingBottles": []
+        }
+      },
+      {
+        "abv": 43,
+        "brand": "Gordon & MacPhail",
+        "score": 36.261818,
+        "series": "Connoisseurs Choice",
+        "source": ["text"],
+        "bottler": "Gordon & MacPhail",
+        "edition": null,
+        "outturn": null,
+        "bottleId": 66383,
+        "category": "single_malt",
+        "fullName": "Gordon & MacPhail Aultmore 1989",
+        "reference": null,
+        "statedAge": null,
+        "caskNumber": null,
+        "comparison": {
+          "missing": [],
+          "conflicts": [],
+          "agreements": ["abv"]
+        },
+        "distillery": ["Aultmore"],
+        "maturation": null,
+        "releaseDay": null,
+        "singleCask": null,
+        "releaseYear": null,
+        "vintageYear": 1989,
+        "bottlingYear": 2003,
+        "caskStrength": null,
+        "releaseMonth": null,
+        "familyContext": {
+          "siblingBottles": []
+        }
+      },
+      {
+        "abv": 43,
+        "brand": "Gordon & MacPhail",
+        "score": 36.261818,
+        "series": "Connoisseurs Choice",
+        "source": ["text"],
+        "bottler": "Gordon & MacPhail",
+        "edition": null,
+        "outturn": null,
+        "bottleId": 66366,
+        "category": "single_malt",
+        "fullName": "Gordon & MacPhail Aultmore 1997",
+        "reference": null,
+        "statedAge": null,
+        "caskNumber": null,
+        "comparison": {
+          "missing": [],
+          "conflicts": [],
+          "agreements": ["abv"]
+        },
+        "distillery": ["Aultmore"],
+        "maturation": null,
+        "releaseDay": null,
+        "singleCask": null,
+        "releaseYear": null,
+        "vintageYear": 1997,
+        "bottlingYear": 2011,
+        "caskStrength": null,
+        "releaseMonth": null,
+        "familyContext": {
+          "siblingBottles": []
+        }
+      },
+      {
+        "abv": 43,
+        "brand": "Gordon & MacPhail",
+        "score": 36.261818,
+        "series": "Connoisseurs Choice",
+        "source": ["text"],
+        "bottler": "Gordon & MacPhail",
+        "edition": null,
+        "outturn": null,
+        "bottleId": 69767,
+        "category": "single_malt",
+        "fullName": "Gordon & MacPhail Benrinnes 1974",
+        "reference": null,
+        "statedAge": null,
+        "caskNumber": null,
+        "comparison": {
+          "missing": [],
+          "conflicts": [],
+          "agreements": ["abv"]
+        },
+        "distillery": ["Benrinnes"],
+        "maturation": null,
+        "releaseDay": null,
+        "singleCask": null,
+        "releaseYear": null,
+        "vintageYear": 1974,
+        "bottlingYear": null,
+        "caskStrength": null,
+        "releaseMonth": null,
+        "familyContext": {
+          "siblingBottles": []
+        }
+      },
+      {
+        "abv": 43,
+        "brand": "Gordon & MacPhail",
+        "score": 36.261818,
+        "series": "Connoisseurs Choice",
+        "source": ["text"],
+        "bottler": "Gordon & MacPhail",
+        "edition": null,
+        "outturn": null,
+        "bottleId": 69768,
+        "category": "single_malt",
+        "fullName": "Gordon & MacPhail Benrinnes 1976",
+        "reference": null,
+        "statedAge": null,
+        "caskNumber": null,
+        "comparison": {
+          "missing": [],
+          "conflicts": [],
+          "agreements": ["abv"]
+        },
+        "distillery": ["Benrinnes"],
+        "maturation": null,
+        "releaseDay": null,
+        "singleCask": null,
+        "releaseYear": null,
+        "vintageYear": 1976,
+        "bottlingYear": 2010,
+        "caskStrength": null,
+        "releaseMonth": null,
+        "familyContext": {
+          "siblingBottles": []
+        }
+      },
+      {
+        "abv": 43,
+        "brand": "Gordon & MacPhail",
+        "score": 36.261818,
+        "series": "Connoisseurs Choice",
+        "source": ["text"],
+        "bottler": "Gordon & MacPhail",
+        "edition": null,
+        "outturn": null,
+        "bottleId": 61003,
+        "category": "single_malt",
+        "fullName": "Gordon & MacPhail Ledaig 1990",
+        "reference": null,
+        "statedAge": null,
+        "caskNumber": null,
+        "comparison": {
+          "missing": [],
+          "conflicts": [],
+          "agreements": ["abv"]
+        },
+        "distillery": ["Tobermory"],
+        "maturation": null,
+        "releaseDay": null,
+        "singleCask": null,
+        "releaseYear": null,
+        "vintageYear": 1990,
+        "bottlingYear": 2009,
+        "caskStrength": null,
+        "releaseMonth": null,
+        "familyContext": {
+          "siblingBottles": []
+        }
+      },
+      {
+        "abv": 43,
+        "brand": "Gordon & MacPhail",
+        "score": 36.261818,
+        "series": "Connoisseurs Choice",
+        "source": ["text"],
+        "bottler": "Gordon & MacPhail",
+        "edition": null,
+        "outturn": null,
+        "bottleId": 58764,
+        "category": "single_malt",
+        "fullName": "Gordon & MacPhail Pittyvaich 1993",
+        "reference": null,
+        "statedAge": null,
+        "caskNumber": null,
+        "comparison": {
+          "missing": [],
+          "conflicts": [],
+          "agreements": ["abv"]
+        },
+        "distillery": ["Pittyvaich"],
+        "maturation": null,
+        "releaseDay": null,
+        "singleCask": null,
+        "releaseYear": null,
+        "vintageYear": 1993,
+        "bottlingYear": 2007,
+        "caskStrength": null,
+        "releaseMonth": null,
+        "familyContext": {
+          "siblingBottles": []
+        }
+      },
+      {
+        "abv": 43,
+        "brand": "Gordon & MacPhail",
+        "score": 36.010796,
+        "series": "Connoisseurs Choice",
+        "source": ["text"],
+        "bottler": "Gordon & MacPhail",
+        "edition": null,
+        "outturn": null,
+        "bottleId": 61198,
+        "category": "single_malt",
+        "fullName": "Gordon & MacPhail Dalmore 1996",
+        "reference": null,
+        "statedAge": null,
+        "caskNumber": null,
+        "comparison": {
+          "missing": [],
+          "conflicts": [],
+          "agreements": ["abv"]
+        },
+        "distillery": ["The Dalmore"],
+        "maturation": null,
+        "releaseDay": null,
+        "singleCask": null,
+        "releaseYear": null,
+        "vintageYear": 1996,
+        "bottlingYear": 2011,
+        "caskStrength": null,
+        "releaseMonth": null,
+        "familyContext": {
+          "siblingBottles": []
+        }
+      },
+      {
+        "abv": 43,
+        "brand": "Gordon & MacPhail",
+        "score": 35.533916,
+        "series": "Connoisseurs Choice",
+        "source": ["text"],
+        "bottler": "Gordon & MacPhail",
+        "edition": null,
+        "outturn": null,
+        "bottleId": 66293,
+        "category": "single_malt",
+        "fullName": "Gordon & MacPhail Arran 1998",
+        "reference": null,
+        "statedAge": null,
+        "caskNumber": null,
+        "comparison": {
+          "missing": [],
+          "conflicts": [],
+          "agreements": ["abv"]
+        },
+        "distillery": ["Lochranza"],
+        "maturation": "Refill Sherry Hogsheads",
+        "releaseDay": null,
+        "singleCask": null,
+        "releaseYear": null,
+        "vintageYear": 1998,
+        "bottlingYear": 2007,
+        "caskStrength": null,
+        "releaseMonth": null,
+        "familyContext": {
+          "siblingBottles": []
+        }
+      }
+    ]
+  },
+  "context": {
+    "inspectedBottleIds": [58638, 58742],
+    "bottleContexts": [
+      {
+        "exact": {
+          "abv": 43,
+          "edition": null,
+          "outturn": null,
+          "statedAge": null,
+          "caskNumber": null,
+          "maturation": "Refill bourbon barrels",
+          "releaseDay": null,
+          "singleCask": null,
+          "releaseYear": null,
+          "vintageYear": 1991,
+          "bottlingYear": 2010,
+          "caskStrength": null,
+          "releaseMonth": null
+        },
+        "shared": {
+          "name": "Lochside 1991",
+          "brand": {
+            "name": "Gordon & MacPhail",
+            "entityId": 5645
+          },
+          "series": {
+            "name": "Connoisseurs Choice",
+            "seriesId": 97
+          },
+          "bottler": {
+            "name": "Gordon & MacPhail",
+            "entityId": 5645
+          },
+          "category": "single_malt",
+          "statedAge": null,
+          "distillers": [
+            {
+              "name": "Lochside",
+              "entityId": 1147
+            }
+          ]
+        },
+        "groupId": 31599,
+        "bottleId": 58638,
+        "fullName": "Gordon & MacPhail Lochside 1991",
+        "siblings": [],
+        "references": [],
+        "observations": [
+          {
+            "facts": {
+              "proposalType": "create_new",
+              "proposedBottle": {
+                "abv": null,
+                "name": "Lochside",
+                "brand": {
+                  "id": null,
+                  "name": "Gordon & MacPhail"
+                },
+                "series": {
+                  "id": null,
+                  "name": "Connoisseurs Choice"
+                },
+                "bottler": {
+                  "id": null,
+                  "name": "Gordon & MacPhail"
+                },
+                "edition": null,
+                "outturn": null,
+                "category": "single_malt",
+                "statedAge": null,
+                "caskNumber": null,
+                "distillers": [
+                  {
+                    "id": null,
+                    "name": "Lochside"
+                  }
+                ],
+                "maturation": null,
+                "releaseDay": null,
+                "singleCask": null,
+                "releaseYear": null,
+                "vintageYear": 1991,
+                "bottlingYear": 2010,
+                "caskStrength": null,
+                "releaseMonth": null
+              },
+              "referenceScope": "none"
+            },
+            "rawText": "Lochside 1991 - Connoisseurs Choice (bottled 2010) (Gordon & MacPhail)",
+            "sourceKey": "store_price:12033675",
+            "sourceUrl": "https://www.masterofmalt.com/whiskies/lochside/lochside-1991-bottled-2010-connoisseurs-choice-gordon-macphail-whisky/?sku=65336",
+            "sourceName": "Lochside 1991 - Connoisseurs Choice (bottled 2010) (Gordon & MacPhail)",
+            "sourceType": "store_price",
+            "parsedIdentity": null
+          }
+        ],
+        "imageSources": []
+      },
+      {
+        "exact": {
+          "abv": 43,
+          "edition": null,
+          "outturn": null,
+          "statedAge": null,
+          "caskNumber": null,
+          "maturation": "Refill bourbon barrels",
+          "releaseDay": null,
+          "singleCask": null,
+          "releaseYear": null,
+          "vintageYear": 1991,
+          "bottlingYear": 2005,
+          "caskStrength": null,
+          "releaseMonth": null
+        },
+        "shared": {
+          "name": "Lochside 1991",
+          "brand": {
+            "name": "Gordon & MacPhail",
+            "entityId": 5645
+          },
+          "series": {
+            "name": "Connoisseurs Choice",
+            "seriesId": 97
+          },
+          "bottler": {
+            "name": "Gordon & MacPhail",
+            "entityId": 5645
+          },
+          "category": "single_malt",
+          "statedAge": null,
+          "distillers": [
+            {
+              "name": "Lochside",
+              "entityId": 1147
+            }
+          ]
+        },
+        "groupId": 31703,
+        "bottleId": 58742,
+        "fullName": "Gordon & MacPhail Lochside 1991",
+        "siblings": [],
+        "references": [],
+        "observations": [
+          {
+            "facts": {
+              "proposalType": "create_new",
+              "proposedBottle": {
+                "abv": null,
+                "name": "Lochside",
+                "brand": {
+                  "id": null,
+                  "name": "Gordon & MacPhail"
+                },
+                "series": {
+                  "id": null,
+                  "name": "Connoisseurs Choice"
+                },
+                "bottler": {
+                  "id": null,
+                  "name": "Gordon & MacPhail"
+                },
+                "edition": null,
+                "outturn": null,
+                "category": "single_malt",
+                "statedAge": null,
+                "caskNumber": null,
+                "distillers": [
+                  {
+                    "id": null,
+                    "name": "Lochside"
+                  }
+                ],
+                "maturation": null,
+                "releaseDay": null,
+                "singleCask": null,
+                "releaseYear": null,
+                "vintageYear": 1991,
+                "bottlingYear": 2005,
+                "caskStrength": null,
+                "releaseMonth": null
+              },
+              "referenceScope": "none"
+            },
+            "rawText": "Lochside 1991 - Connoisseurs Choice (bottled 2005) (Gordon & MacPhail)",
+            "sourceKey": "store_price:12033690",
+            "sourceUrl": "https://www.masterofmalt.com/whiskies/lochside/lochside-1991-bottled-2005-connoisseurs-choice-gordon-and-macphail-whisky/?sku=146616",
+            "sourceName": "Lochside 1991 - Connoisseurs Choice (bottled 2005) (Gordon & MacPhail)",
+            "sourceType": "store_price",
+            "parsedIdentity": null
+          }
+        ],
+        "imageSources": []
+      }
+    ],
+    "inspectedEntities": [
+      {
+        "kind": "bottler",
+        "name": "Gordon & MacPhail",
+        "score": 1,
+        "source": ["exact", "text", "prefix", "contained"],
+        "entityId": 5645,
+        "reference": "Gordon & MacPhail",
+        "shortName": null,
+        "retrievedFor": [
+          {
+            "exact": true,
+            "query": "Gordon & MacPhail"
+          }
+        ]
+      },
+      {
+        "kind": "distillery",
+        "name": "Lochside",
+        "score": 1,
+        "source": ["exact", "text", "prefix", "contained"],
+        "entityId": 1147,
+        "reference": "Lochside",
+        "shortName": null,
+        "retrievedFor": [
+          {
+            "exact": true,
+            "query": "Lochside"
+          }
+        ]
+      },
+      {
+        "kind": "distillery",
+        "name": "Littlemill",
+        "score": 1,
+        "source": ["exact", "text", "prefix", "contained"],
+        "entityId": 1142,
+        "reference": "Littlemill",
+        "shortName": null,
+        "retrievedFor": [
+          {
+            "exact": true,
+            "query": "Littlemill"
+          }
+        ]
+      },
+      {
+        "kind": "distillery",
+        "name": "Clynelish",
+        "score": 1,
+        "source": ["exact", "text", "prefix", "contained"],
+        "entityId": 843,
+        "reference": "Clynelish",
+        "shortName": null,
+        "retrievedFor": [
+          {
+            "exact": true,
+            "query": "Clynelish"
+          }
+        ]
+      },
+      {
+        "kind": "brand",
+        "name": "Old Grand-Dad",
+        "score": 1,
+        "source": ["exact", "text", "prefix", "contained"],
+        "entityId": 1220,
+        "reference": "Old Grand-Dad",
+        "shortName": null,
+        "retrievedFor": [
+          {
+            "exact": true,
+            "query": "Old Grand-Dad"
+          }
+        ]
+      },
+      {
+        "kind": "distillery",
+        "name": "Tobermory",
+        "score": 1,
+        "source": ["exact", "text", "prefix", "contained"],
+        "entityId": 1441,
+        "reference": "Tobermory",
+        "shortName": null,
+        "retrievedFor": [
+          {
+            "exact": true,
+            "query": "Tobermory"
+          }
+        ]
+      },
+      {
+        "kind": "distillery",
+        "name": "Ardbeg",
+        "score": 1,
+        "source": ["exact", "text", "prefix", "contained"],
+        "entityId": 28,
+        "reference": "Ardbeg",
+        "shortName": null,
+        "retrievedFor": [
+          {
+            "exact": true,
+            "query": "Ardbeg"
+          }
+        ]
+      },
+      {
+        "kind": "distillery",
+        "name": "Aultmore",
+        "score": 1,
+        "source": ["exact", "text", "prefix", "contained"],
+        "entityId": 191,
+        "reference": "Aultmore",
+        "shortName": null,
+        "retrievedFor": [
+          {
+            "exact": true,
+            "query": "Aultmore"
+          }
+        ]
+      },
+      {
+        "kind": "distillery",
+        "name": "Benrinnes",
+        "score": 1,
+        "source": ["exact", "text", "prefix", "contained"],
+        "entityId": 89,
+        "reference": "Benrinnes",
+        "shortName": null,
+        "retrievedFor": [
+          {
+            "exact": true,
+            "query": "Benrinnes"
+          }
+        ]
+      },
+      {
+        "kind": "distillery",
+        "name": "Pittyvaich",
+        "score": 1,
+        "source": ["exact", "text", "prefix", "contained"],
+        "entityId": 1265,
+        "reference": "Pittyvaich",
+        "shortName": null,
+        "retrievedFor": [
+          {
+            "exact": true,
+            "query": "Pittyvaich"
+          }
+        ]
+      },
+      {
+        "kind": "distillery",
+        "name": "The Dalmore",
+        "score": 1,
+        "source": ["exact", "text", "prefix", "contained"],
+        "entityId": 870,
+        "reference": "The Dalmore",
+        "shortName": "Dalmore",
+        "retrievedFor": [
+          {
+            "exact": true,
+            "query": "The Dalmore"
+          }
+        ]
+      },
+      {
+        "kind": "distillery",
+        "name": "Lochranza",
+        "score": 1,
+        "source": ["exact", "text", "prefix", "contained"],
+        "entityId": 1146,
+        "reference": "Lochranza",
+        "shortName": null,
+        "retrievedFor": [
+          {
+            "exact": true,
+            "query": "Lochranza"
+          }
+        ]
+      },
+      {
+        "kind": "bottler",
+        "name": "Littlemill Blenders Ltd.",
+        "score": 0.5,
+        "source": ["text", "prefix"],
+        "entityId": 5862,
+        "reference": "Littlemill Blenders Ltd.",
+        "shortName": null,
+        "retrievedFor": [
+          {
+            "query": "Littlemill"
+          }
+        ]
+      },
+      {
+        "kind": "brand",
+        "name": "Emill",
+        "score": 0.35,
+        "source": ["contained"],
+        "entityId": 2682,
+        "reference": "Emill",
+        "shortName": null,
+        "retrievedFor": [
+          {
+            "query": "Littlemill"
+          }
+        ]
+      }
+    ],
+    "inspectedSeries": []
+  },
+  "provenance": {
+    "source": "production_miss",
+    "verifiedSourceUrls": [
+      "https://www.scotchwhiskyauctions.com/auctions/234-the-185th-auction/908304-lochside-1991-connoisseurs-choice/",
+      "https://www.masterofmalt.com/whiskies/lochside/lochside-1991-bottled-2005-connoisseurs-choice-gordon-and-macphail-whisky/"
+    ],
+    "dbOutcome": {
+      "bottleId": null,
+      "createsBottle": false,
+      "summary": "Production returned no_match: it could not tell which bottling the lot was, because the old page read returned only the site's age question."
+    },
+    "notes": "Captured from saved classifier run 35980 (auction_lot 16530, model null, 2026-11-03T17:08:17.086Z). Production rationale: The source is one whisky Bottle, but its title and available auction-page text do not resolve which bottling it is. The two inspected local candidates share the distillery, vintage, series, and 43% ABV, but differ in bottling year. The web evidence did not establish which release the auction lot represents, so neither candidate is safe to assign. Expected outcome checked against the lot page on 2026-11-09 and a judged review of the 185th auction on 2026-11-03."
+  },
+  "expected": {
+    "status": "classified",
+    "action": "create_bottle",
+    "identityScope": "product",
+    "matchedBottleId": null,
+    "proposedBottle": {
+      "brand": {
+        "id": 5645
+      },
+      "category": "single_malt",
+      "vintageYear": 1991,
+      "bottlingYear": 2006,
+      "abv": 43
+    },
+    "proposedBottleNameIncludes": ["Lochside", "1991"],
+    "proposedBottleDistillerIds": [1147],
+    "summary": "Create Gordon & MacPhail Connoisseurs Choice Lochside 1991, bottled 09.2006, 43%, refill bourbon barrel. The catalog keeps the 2005 (58742) and 2010 (58638) bottlings as separate Bottles, so the 2006 bottling needs its own."
+  }
+}

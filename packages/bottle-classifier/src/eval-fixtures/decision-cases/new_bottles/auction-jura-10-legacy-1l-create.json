@@ -1,0 +1,1237 @@
+{
+  "id": "auction-jura-10-legacy-1l-create",
+  "name": "Jura 10 Year Old Legacy 1L: Legacy is the printed expression name, so create it",
+  "input": {
+    "reference": {
+      "id": 16080,
+      "url": "https://www.scotchwhiskyauctions.com/auctions/234-the-185th-auction/905817-jura-10-year-old-legacy-1l/",
+      "name": "Jura 10 Year Old Legacy 1L",
+      "imageUrl": null,
+      "externalSiteId": 28097,
+      "currentBottleId": null
+    },
+    "extractedIdentity": {
+      "abv": null,
+      "brand": "Jura",
+      "series": null,
+      "bottler": null,
+      "edition": null,
+      "outturn": null,
+      "category": "single_malt",
+      "distillery": ["Isle of Jura"],
+      "expression": "Legacy",
+      "maturation": null,
+      "stated_age": 10,
+      "cask_number": null,
+      "release_day": null,
+      "single_cask": null,
+      "release_year": null,
+      "vintage_year": null,
+      "bottling_year": null,
+      "cask_strength": null,
+      "release_month": null
+    },
+    "extractedIdentitySource": "text",
+    "imageEvidence": null,
+    "initialCandidates": [
+      {
+        "abv": null,
+        "brand": "Isle of Jura",
+        "score": 74.247185,
+        "series": null,
+        "source": ["vector", "text", "context"],
+        "bottler": "Cane And Grain",
+        "edition": null,
+        "outturn": null,
+        "bottleId": 447,
+        "category": "single_malt",
+        "fullName": "Isle of Jura 10-year-old",
+        "reference": "Isle of Jura 10-year-old",
+        "statedAge": 10,
+        "caskNumber": null,
+        "comparison": {
+          "missing": [],
+          "conflicts": ["brand"],
+          "agreements": ["category", "statedAge", "distillers"]
+        },
+        "distillery": ["Isle of Jura"],
+        "maturation": null,
+        "releaseDay": null,
+        "singleCask": null,
+        "releaseYear": null,
+        "vintageYear": null,
+        "bottlingYear": null,
+        "caskStrength": null,
+        "releaseMonth": null,
+        "familyContext": {
+          "siblingBottles": []
+        }
+      },
+      {
+        "abv": null,
+        "brand": "Isle of Jura",
+        "score": 72.91381,
+        "series": null,
+        "source": ["text"],
+        "bottler": null,
+        "edition": null,
+        "outturn": null,
+        "bottleId": 3232,
+        "category": "single_malt",
+        "fullName": "Isle of Jura 10-year-old Origin",
+        "reference": null,
+        "statedAge": 10,
+        "caskNumber": null,
+        "comparison": {
+          "missing": [],
+          "conflicts": ["brand"],
+          "agreements": ["category", "statedAge", "distillers"]
+        },
+        "distillery": ["Isle of Jura"],
+        "maturation": null,
+        "releaseDay": null,
+        "singleCask": null,
+        "releaseYear": null,
+        "vintageYear": null,
+        "bottlingYear": null,
+        "caskStrength": null,
+        "releaseMonth": null,
+        "familyContext": {
+          "siblingBottles": []
+        }
+      },
+      {
+        "abv": 40,
+        "brand": "Isle of Jura",
+        "score": 71.07813,
+        "series": null,
+        "source": ["vector", "text", "context"],
+        "bottler": null,
+        "edition": null,
+        "outturn": null,
+        "bottleId": 44114,
+        "category": "single_malt",
+        "fullName": "Isle of Jura 10-year-old - 40.0% ABV - Oloroso Cask",
+        "reference": "Jura 10-year-old Single Malt Scotch Whisky",
+        "statedAge": 10,
+        "caskNumber": null,
+        "comparison": {
+          "missing": [],
+          "conflicts": ["brand"],
+          "agreements": ["category", "statedAge", "distillers"]
+        },
+        "distillery": ["Isle of Jura"],
+        "maturation": "oloroso",
+        "releaseDay": null,
+        "singleCask": null,
+        "releaseYear": null,
+        "vintageYear": null,
+        "bottlingYear": null,
+        "caskStrength": null,
+        "releaseMonth": null,
+        "familyContext": {
+          "siblingBottles": []
+        }
+      },
+      {
+        "abv": 40,
+        "brand": "Isle of Jura",
+        "score": 65.837845,
+        "series": null,
+        "source": ["vector", "text"],
+        "bottler": null,
+        "edition": null,
+        "outturn": null,
+        "bottleId": 45943,
+        "category": "single_malt",
+        "fullName": "Isle of Jura Origin - 10-year-old - 40.0% ABV - Oloroso Cask",
+        "reference": "Isle of Jura Origin - 10-year-old - 40.0% ABV - Oloroso Cask",
+        "statedAge": 10,
+        "caskNumber": null,
+        "comparison": {
+          "missing": [],
+          "conflicts": ["brand"],
+          "agreements": ["category", "statedAge", "distillers"]
+        },
+        "distillery": ["Isle of Jura"],
+        "maturation": "oloroso",
+        "releaseDay": null,
+        "singleCask": null,
+        "releaseYear": null,
+        "vintageYear": null,
+        "bottlingYear": null,
+        "caskStrength": null,
+        "releaseMonth": null,
+        "familyContext": {
+          "siblingBottles": []
+        }
+      },
+      {
+        "abv": null,
+        "brand": "Isle of Jura",
+        "score": 48.265327,
+        "series": null,
+        "source": ["text"],
+        "bottler": null,
+        "edition": null,
+        "outturn": null,
+        "bottleId": 1099,
+        "category": "single_malt",
+        "fullName": "Isle of Jura Superstition",
+        "reference": null,
+        "statedAge": null,
+        "caskNumber": null,
+        "comparison": {
+          "missing": ["statedAge"],
+          "conflicts": ["brand"],
+          "agreements": ["category", "distillers"]
+        },
+        "distillery": ["Isle of Jura"],
+        "maturation": null,
+        "releaseDay": null,
+        "singleCask": null,
+        "releaseYear": null,
+        "vintageYear": null,
+        "bottlingYear": null,
+        "caskStrength": null,
+        "releaseMonth": null,
+        "familyContext": {
+          "siblingBottles": []
+        }
+      },
+      {
+        "abv": 40,
+        "brand": "Isle of Jura",
+        "score": 47.646523,
+        "series": null,
+        "source": ["text"],
+        "bottler": null,
+        "edition": null,
+        "outturn": null,
+        "bottleId": 514,
+        "category": "single_malt",
+        "fullName": "Isle of Jura Journey",
+        "reference": null,
+        "statedAge": null,
+        "caskNumber": null,
+        "comparison": {
+          "missing": ["statedAge"],
+          "conflicts": ["brand"],
+          "agreements": ["category", "distillers"]
+        },
+        "distillery": ["Isle of Jura"],
+        "maturation": "American white oak ex-bourbon barrels",
+        "releaseDay": null,
+        "singleCask": null,
+        "releaseYear": null,
+        "vintageYear": null,
+        "bottlingYear": null,
+        "caskStrength": null,
+        "releaseMonth": null,
+        "familyContext": {
+          "siblingBottles": []
+        }
+      },
+      {
+        "abv": null,
+        "brand": "Isle of Jura",
+        "score": 46.795494,
+        "series": null,
+        "source": ["text"],
+        "bottler": null,
+        "edition": null,
+        "outturn": null,
+        "bottleId": 856,
+        "category": "single_malt",
+        "fullName": "Isle of Jura Turas-Mara",
+        "reference": null,
+        "statedAge": null,
+        "caskNumber": null,
+        "comparison": {
+          "missing": ["statedAge"],
+          "conflicts": ["brand"],
+          "agreements": ["category", "distillers"]
+        },
+        "distillery": ["Isle of Jura"],
+        "maturation": null,
+        "releaseDay": null,
+        "singleCask": null,
+        "releaseYear": null,
+        "vintageYear": null,
+        "bottlingYear": null,
+        "caskStrength": null,
+        "releaseMonth": null,
+        "familyContext": {
+          "siblingBottles": []
+        }
+      },
+      {
+        "abv": null,
+        "brand": "Isle of Jura",
+        "score": 46.795494,
+        "series": null,
+        "source": ["text"],
+        "bottler": null,
+        "edition": null,
+        "outturn": null,
+        "bottleId": 56403,
+        "category": "single_malt",
+        "fullName": "Isle of Jura Winter Edition",
+        "reference": null,
+        "statedAge": null,
+        "caskNumber": null,
+        "comparison": {
+          "missing": ["statedAge"],
+          "conflicts": ["brand"],
+          "agreements": ["category", "distillers"]
+        },
+        "distillery": ["Isle of Jura"],
+        "maturation": null,
+        "releaseDay": null,
+        "singleCask": null,
+        "releaseYear": null,
+        "vintageYear": null,
+        "bottlingYear": null,
+        "caskStrength": null,
+        "releaseMonth": null,
+        "familyContext": {
+          "siblingBottles": []
+        }
+      },
+      {
+        "abv": 44.5,
+        "brand": "Isle of Jura",
+        "score": 46.386234,
+        "series": null,
+        "source": ["text"],
+        "bottler": null,
+        "edition": null,
+        "outturn": null,
+        "bottleId": 63798,
+        "category": "single_malt",
+        "fullName": "Isle of Jura The Loch",
+        "reference": null,
+        "statedAge": null,
+        "caskNumber": null,
+        "comparison": {
+          "missing": ["statedAge"],
+          "conflicts": ["brand"],
+          "agreements": ["category", "distillers"]
+        },
+        "distillery": ["Isle of Jura"],
+        "maturation": null,
+        "releaseDay": null,
+        "singleCask": null,
+        "releaseYear": null,
+        "vintageYear": null,
+        "bottlingYear": null,
+        "caskStrength": null,
+        "releaseMonth": null,
+        "familyContext": {
+          "siblingBottles": []
+        }
+      },
+      {
+        "abv": 46,
+        "brand": "Isle of Jura",
+        "score": 45.995583,
+        "series": "Elements",
+        "source": ["text"],
+        "bottler": null,
+        "edition": null,
+        "outturn": 840,
+        "bottleId": 58385,
+        "category": "single_malt",
+        "fullName": "Isle of Jura Earth",
+        "reference": null,
+        "statedAge": null,
+        "caskNumber": null,
+        "comparison": {
+          "missing": ["statedAge"],
+          "conflicts": ["brand"],
+          "agreements": ["category", "distillers"]
+        },
+        "distillery": ["Isle of Jura"],
+        "maturation": null,
+        "releaseDay": null,
+        "singleCask": null,
+        "releaseYear": null,
+        "vintageYear": 1999,
+        "bottlingYear": 2008,
+        "caskStrength": null,
+        "releaseMonth": null,
+        "familyContext": {
+          "siblingBottles": []
+        }
+      },
+      {
+        "abv": 42,
+        "brand": "Isle of Jura",
+        "score": 45.539318,
+        "series": null,
+        "source": ["text"],
+        "bottler": null,
+        "edition": null,
+        "outturn": null,
+        "bottleId": 57078,
+        "category": "single_malt",
+        "fullName": "Isle of Jura Brooklyn",
+        "reference": null,
+        "statedAge": null,
+        "caskNumber": null,
+        "comparison": {
+          "missing": ["statedAge"],
+          "conflicts": ["brand"],
+          "agreements": ["category", "distillers"]
+        },
+        "distillery": ["Isle of Jura"],
+        "maturation": "American white oak bourbon casks, with Amoroso sherry and Pinot Noir cask finishes",
+        "releaseDay": null,
+        "singleCask": false,
+        "releaseYear": null,
+        "vintageYear": null,
+        "bottlingYear": null,
+        "caskStrength": null,
+        "releaseMonth": null,
+        "familyContext": {
+          "siblingBottles": []
+        }
+      },
+      {
+        "abv": null,
+        "brand": "Isle of Jura",
+        "score": 45.43042,
+        "series": null,
+        "source": ["text"],
+        "bottler": null,
+        "edition": null,
+        "outturn": null,
+        "bottleId": 4307,
+        "category": "single_malt",
+        "fullName": "Isle of Jura Prophecy Heavily Peated",
+        "reference": null,
+        "statedAge": null,
+        "caskNumber": null,
+        "comparison": {
+          "missing": ["statedAge"],
+          "conflicts": ["brand"],
+          "agreements": ["category", "distillers"]
+        },
+        "distillery": ["Isle of Jura"],
+        "maturation": null,
+        "releaseDay": null,
+        "singleCask": null,
+        "releaseYear": null,
+        "vintageYear": null,
+        "bottlingYear": null,
+        "caskStrength": null,
+        "releaseMonth": null,
+        "familyContext": {
+          "siblingBottles": []
+        }
+      },
+      {
+        "abv": null,
+        "brand": "Isle of Jura",
+        "score": 45.43042,
+        "series": null,
+        "source": ["text"],
+        "bottler": null,
+        "edition": null,
+        "outturn": null,
+        "bottleId": 4308,
+        "category": "single_malt",
+        "fullName": "Isle of Jura Superstition Lightly Peated",
+        "reference": null,
+        "statedAge": null,
+        "caskNumber": null,
+        "comparison": {
+          "missing": ["statedAge"],
+          "conflicts": ["brand"],
+          "agreements": ["category", "distillers"]
+        },
+        "distillery": ["Isle of Jura"],
+        "maturation": null,
+        "releaseDay": null,
+        "singleCask": null,
+        "releaseYear": null,
+        "vintageYear": null,
+        "bottlingYear": null,
+        "caskStrength": null,
+        "releaseMonth": null,
+        "familyContext": {
+          "siblingBottles": []
+        }
+      },
+      {
+        "abv": null,
+        "brand": "Isle of Jura",
+        "score": 45.228508,
+        "series": null,
+        "source": ["vector", "text"],
+        "bottler": null,
+        "edition": null,
+        "outturn": null,
+        "bottleId": 797,
+        "category": "single_malt",
+        "fullName": "Isle of Jura Seven Wood",
+        "reference": "Isle of Jura Seven Wood",
+        "statedAge": null,
+        "caskNumber": null,
+        "comparison": {
+          "missing": ["statedAge"],
+          "conflicts": ["brand"],
+          "agreements": ["category", "distillers"]
+        },
+        "distillery": ["Isle of Jura"],
+        "maturation": null,
+        "releaseDay": null,
+        "singleCask": null,
+        "releaseYear": null,
+        "vintageYear": null,
+        "bottlingYear": null,
+        "caskStrength": null,
+        "releaseMonth": null,
+        "familyContext": {
+          "siblingBottles": []
+        }
+      },
+      {
+        "abv": 40,
+        "brand": "Isle of Jura",
+        "score": 45.030624,
+        "series": null,
+        "source": ["text"],
+        "bottler": null,
+        "edition": null,
+        "outturn": null,
+        "bottleId": 63728,
+        "category": "single_malt",
+        "fullName": "Isle of Jura White Oak Cask",
+        "reference": null,
+        "statedAge": null,
+        "caskNumber": null,
+        "comparison": {
+          "missing": ["statedAge"],
+          "conflicts": ["brand"],
+          "agreements": ["category", "distillers"]
+        },
+        "distillery": ["Isle of Jura"],
+        "maturation": null,
+        "releaseDay": null,
+        "singleCask": null,
+        "releaseYear": null,
+        "vintageYear": null,
+        "bottlingYear": null,
+        "caskStrength": null,
+        "releaseMonth": null,
+        "familyContext": {
+          "siblingBottles": []
+        }
+      },
+      {
+        "abv": 40,
+        "brand": "Isle of Jura",
+        "score": 44.47264,
+        "series": null,
+        "source": ["text"],
+        "bottler": null,
+        "edition": null,
+        "outturn": null,
+        "bottleId": 58192,
+        "category": "single_malt",
+        "fullName": "Isle of Jura Bourbon Cask",
+        "reference": null,
+        "statedAge": null,
+        "caskNumber": null,
+        "comparison": {
+          "missing": ["statedAge"],
+          "conflicts": ["brand"],
+          "agreements": ["category", "distillers"]
+        },
+        "distillery": ["Isle of Jura"],
+        "maturation": "American white oak ex-bourbon casks",
+        "releaseDay": null,
+        "singleCask": null,
+        "releaseYear": null,
+        "vintageYear": null,
+        "bottlingYear": null,
+        "caskStrength": null,
+        "releaseMonth": null,
+        "familyContext": {
+          "siblingBottles": []
+        }
+      },
+      {
+        "abv": 40,
+        "brand": "Isle of Jura",
+        "score": 44.283768,
+        "series": null,
+        "source": ["text"],
+        "bottler": null,
+        "edition": null,
+        "outturn": null,
+        "bottleId": 56244,
+        "category": "single_malt",
+        "fullName": "Isle of Jura Rum Cask Finish",
+        "reference": null,
+        "statedAge": null,
+        "caskNumber": null,
+        "comparison": {
+          "missing": ["statedAge"],
+          "conflicts": ["brand"],
+          "agreements": ["category", "distillers"]
+        },
+        "distillery": ["Isle of Jura"],
+        "maturation": "Caribbean rum cask finish",
+        "releaseDay": null,
+        "singleCask": null,
+        "releaseYear": null,
+        "vintageYear": null,
+        "bottlingYear": null,
+        "caskStrength": null,
+        "releaseMonth": null,
+        "familyContext": {
+          "siblingBottles": []
+        }
+      },
+      {
+        "abv": null,
+        "brand": "Isle of Jura",
+        "score": 44.132828,
+        "series": null,
+        "source": ["text"],
+        "bottler": null,
+        "edition": null,
+        "outturn": null,
+        "bottleId": 4921,
+        "category": "single_malt",
+        "fullName": "Isle of Jura Prophecy Limited Annual Release Year 1",
+        "reference": null,
+        "statedAge": null,
+        "caskNumber": null,
+        "comparison": {
+          "missing": ["statedAge"],
+          "conflicts": ["brand"],
+          "agreements": ["category", "distillers"]
+        },
+        "distillery": ["Isle of Jura"],
+        "maturation": null,
+        "releaseDay": null,
+        "singleCask": null,
+        "releaseYear": null,
+        "vintageYear": null,
+        "bottlingYear": null,
+        "caskStrength": null,
+        "releaseMonth": null,
+        "familyContext": {
+          "siblingBottles": []
+        }
+      },
+      {
+        "abv": 43.6,
+        "brand": "Isle of Jura",
+        "score": 43.689995,
+        "series": null,
+        "source": ["text"],
+        "bottler": null,
+        "edition": null,
+        "outturn": null,
+        "bottleId": 68351,
+        "category": "single_malt",
+        "fullName": "Isle of Jura The Road",
+        "reference": null,
+        "statedAge": null,
+        "caskNumber": null,
+        "comparison": {
+          "missing": ["statedAge"],
+          "conflicts": ["brand"],
+          "agreements": ["category", "distillers"]
+        },
+        "distillery": ["Isle of Jura"],
+        "maturation": "Ex-bourbon casks; finished in casks previously holding 20-year-old Pedro Ximénez sherry",
+        "releaseDay": null,
+        "singleCask": null,
+        "releaseYear": 2018,
+        "vintageYear": null,
+        "bottlingYear": null,
+        "caskStrength": null,
+        "releaseMonth": 4,
+        "familyContext": {
+          "siblingBottles": []
+        }
+      },
+      {
+        "abv": null,
+        "brand": "Laphroaig",
+        "score": 0.7019595297306436,
+        "series": null,
+        "source": ["vector"],
+        "bottler": null,
+        "edition": null,
+        "outturn": null,
+        "bottleId": 1,
+        "category": "single_malt",
+        "fullName": "Laphroaig 10-year-old",
+        "reference": "Laphroaig 10-year-old Islay Single Malt Scotch Whisky",
+        "statedAge": 10,
+        "caskNumber": null,
+        "comparison": {
+          "missing": [],
+          "conflicts": ["brand", "distillers"],
+          "agreements": ["category", "statedAge"]
+        },
+        "distillery": ["Laphroaig"],
+        "maturation": null,
+        "releaseDay": null,
+        "singleCask": null,
+        "releaseYear": null,
+        "vintageYear": null,
+        "bottlingYear": null,
+        "caskStrength": null,
+        "releaseMonth": null,
+        "familyContext": {
+          "siblingBottles": []
+        }
+      }
+    ]
+  },
+  "context": {
+    "inspectedBottleIds": [447, 44114],
+    "bottleContexts": [
+      {
+        "exact": {
+          "abv": null,
+          "edition": null,
+          "outturn": null,
+          "statedAge": null,
+          "caskNumber": null,
+          "maturation": null,
+          "releaseDay": null,
+          "singleCask": null,
+          "releaseYear": null,
+          "vintageYear": null,
+          "bottlingYear": null,
+          "caskStrength": null,
+          "releaseMonth": null
+        },
+        "shared": {
+          "name": "10-year-old",
+          "brand": {
+            "name": "Isle of Jura",
+            "entityId": 1071
+          },
+          "series": null,
+          "bottler": {
+            "name": "Cane And Grain",
+            "entityId": 6038
+          },
+          "category": "single_malt",
+          "statedAge": 10,
+          "distillers": [
+            {
+              "name": "Isle of Jura",
+              "entityId": 1071
+            }
+          ]
+        },
+        "groupId": 9139,
+        "bottleId": 447,
+        "fullName": "Isle of Jura 10-year-old",
+        "siblings": [],
+        "references": [
+          {
+            "name": "Isle of Jura 10-year-old",
+            "ignored": false
+          }
+        ],
+        "observations": [
+          {
+            "facts": {
+              "proposalType": "no_match",
+              "proposedBottle": null,
+              "referenceScope": "none"
+            },
+            "rawText": "Isle of Jura 10-year-old - 2000s",
+            "sourceKey": "store_price:12058429",
+            "sourceUrl": "https://www.masterofmalt.com/whiskies/jura/isle-of-jura-10-year-old-2000s-whisky/?sku=141589",
+            "sourceName": "Isle of Jura 10-year-old - 2000s",
+            "sourceType": "store_price",
+            "parsedIdentity": {
+              "abv": 40,
+              "brand": "Jura",
+              "series": null,
+              "bottler": null,
+              "edition": null,
+              "outturn": null,
+              "category": "single_malt",
+              "distillery": ["Isle of Jura"],
+              "expression": null,
+              "maturation": null,
+              "stated_age": 10,
+              "cask_number": null,
+              "release_day": null,
+              "single_cask": null,
+              "release_year": null,
+              "vintage_year": null,
+              "bottling_year": null,
+              "cask_strength": null,
+              "release_month": null
+            }
+          },
+          {
+            "facts": {
+              "proposalType": "create_new",
+              "proposedBottle": {
+                "abv": null,
+                "name": "10-year-old",
+                "brand": {
+                  "id": null,
+                  "name": "Isle of Jura"
+                },
+                "series": null,
+                "bottler": null,
+                "edition": "1990s",
+                "outturn": null,
+                "category": "single_malt",
+                "statedAge": 10,
+                "caskNumber": null,
+                "distillers": [
+                  {
+                    "id": null,
+                    "name": "Isle of Jura"
+                  }
+                ],
+                "maturation": null,
+                "releaseDay": null,
+                "singleCask": null,
+                "releaseYear": null,
+                "vintageYear": null,
+                "bottlingYear": null,
+                "caskStrength": null,
+                "releaseMonth": null
+              },
+              "referenceScope": "none"
+            },
+            "rawText": "Isle of Jura 10-year-old - 1990s",
+            "sourceKey": "store_price:12032513",
+            "sourceUrl": "https://www.masterofmalt.com/whiskies/jura/jura-10-year-old-1990s-whisky/?sku=79948",
+            "sourceName": "Isle of Jura 10-year-old - 1990s",
+            "sourceType": "store_price",
+            "parsedIdentity": null
+          },
+          {
+            "facts": {
+              "proposalType": "no_match",
+              "proposedBottle": null
+            },
+            "rawText": "Isle of Jura 10-year-old",
+            "sourceKey": "store_price:12029392",
+            "sourceUrl": "https://www.finedrams.com/isle-of-jura-10-year-old-whisky.html",
+            "sourceName": "Isle of Jura 10-year-old",
+            "sourceType": "store_price",
+            "parsedIdentity": null
+          }
+        ],
+        "imageSources": []
+      },
+      {
+        "exact": {
+          "abv": 40,
+          "edition": null,
+          "outturn": null,
+          "statedAge": null,
+          "caskNumber": null,
+          "maturation": "oloroso",
+          "releaseDay": null,
+          "singleCask": null,
+          "releaseYear": null,
+          "vintageYear": null,
+          "bottlingYear": null,
+          "caskStrength": null,
+          "releaseMonth": null
+        },
+        "shared": {
+          "name": "10-year-old",
+          "brand": {
+            "name": "Isle of Jura",
+            "entityId": 1071
+          },
+          "series": null,
+          "bottler": null,
+          "category": "single_malt",
+          "statedAge": 10,
+          "distillers": [
+            {
+              "name": "Isle of Jura",
+              "entityId": 1071
+            }
+          ]
+        },
+        "groupId": 17937,
+        "bottleId": 44114,
+        "fullName": "Isle of Jura 10-year-old - 40.0% ABV - Oloroso Cask",
+        "siblings": [],
+        "references": [
+          {
+            "name": "Isle of Jura 10-year-old - 40.0% ABV - Oloroso Cask",
+            "ignored": false
+          },
+          {
+            "name": "Jura 10-year-old",
+            "ignored": false
+          },
+          {
+            "name": "Jura 10-year-old, 40%",
+            "ignored": false
+          },
+          {
+            "name": "Jura 10-year-old Scotch Whisky",
+            "ignored": false
+          },
+          {
+            "name": "Jura 10-year-old Single Malt Scotch Whisky",
+            "ignored": false
+          }
+        ],
+        "observations": [
+          {
+            "facts": {
+              "proposalType": "match_existing",
+              "proposedBottle": null,
+              "referenceScope": "none"
+            },
+            "rawText": "Jura 10-year-old Single Malt Scotch Whiskey",
+            "sourceKey": "store_price:12059081",
+            "sourceUrl": "https://kegnbottle.com/products/jura-10-year-single-malt-scotch-whiskey-750-ml",
+            "sourceName": "Jura 10-year-old Single Malt Scotch Whiskey",
+            "sourceType": "store_price",
+            "parsedIdentity": {
+              "abv": null,
+              "brand": "Jura",
+              "series": null,
+              "bottler": null,
+              "edition": null,
+              "outturn": null,
+              "category": "single_malt",
+              "distillery": ["Isle of Jura"],
+              "expression": null,
+              "maturation": null,
+              "stated_age": 10,
+              "cask_number": null,
+              "release_day": null,
+              "single_cask": null,
+              "release_year": null,
+              "vintage_year": null,
+              "bottling_year": null,
+              "cask_strength": null,
+              "release_month": null
+            }
+          },
+          {
+            "facts": {
+              "proposalType": "no_match",
+              "proposedBottle": null,
+              "referenceScope": "none"
+            },
+            "rawText": "Jura 10-year-old Single Malt Scotch Whisky",
+            "sourceKey": "store_price:12034972",
+            "sourceUrl": "https://www.missionliquor.com/products/isle-of-jura-10-yrs-750ml-1",
+            "sourceName": "Jura 10-year-old Single Malt Scotch Whisky",
+            "sourceType": "store_price",
+            "parsedIdentity": null
+          },
+          {
+            "facts": {
+              "proposalType": "no_match",
+              "proposedBottle": null,
+              "referenceScope": "none"
+            },
+            "rawText": "Jura 10-year-old",
+            "sourceKey": "store_price:12056563",
+            "sourceUrl": "https://www.thewhiskyworld.com/jura-10-year-old-p2500",
+            "sourceName": "Jura 10-year-old",
+            "sourceType": "store_price",
+            "parsedIdentity": null
+          },
+          {
+            "facts": {
+              "proposalType": "no_match",
+              "proposedBottle": null
+            },
+            "rawText": "Jura 10-year-old",
+            "sourceKey": "store_price:12030194",
+            "sourceUrl": "https://www.masterofmalt.com/whiskies/jura/jura-10-year-old-whisky/?sku=75309",
+            "sourceName": "Jura 10-year-old",
+            "sourceType": "store_price",
+            "parsedIdentity": null
+          },
+          {
+            "facts": {
+              "proposalType": "match_existing",
+              "releaseFacts": {},
+              "creationTarget": null,
+              "proposedBottle": null,
+              "proposedRelease": null
+            },
+            "rawText": "Jura 10-year-old",
+            "sourceKey": "store_price:11757770",
+            "sourceUrl": "https://www.reservebar.com/products/jura-10-year-old/GROUPING-34840.html",
+            "sourceName": "Jura 10-year-old",
+            "sourceType": "store_price",
+            "parsedIdentity": {
+              "abv": null,
+              "brand": "Jura",
+              "series": null,
+              "bottler": null,
+              "edition": null,
+              "category": null,
+              "cask_fill": null,
+              "cask_size": null,
+              "cask_type": null,
+              "distillery": ["Jura"],
+              "expression": null,
+              "stated_age": 10,
+              "single_cask": null,
+              "release_year": null,
+              "vintage_year": null,
+              "cask_strength": null
+            }
+          },
+          {
+            "facts": {
+              "proposalType": "match_existing",
+              "releaseFacts": {},
+              "creationTarget": null,
+              "proposedBottle": null,
+              "proposedRelease": null
+            },
+            "rawText": "Jura 10-year-old Scotch Whisky",
+            "sourceKey": "store_price:2141",
+            "sourceUrl": "https://woodencork.com/collections/whiskey/products/jura-10-year-old-scotch-whisky",
+            "sourceName": "Jura 10-year-old Scotch Whisky",
+            "sourceType": "store_price",
+            "parsedIdentity": {
+              "abv": null,
+              "brand": "Jura",
+              "series": null,
+              "bottler": null,
+              "edition": null,
+              "category": "single_malt",
+              "cask_fill": null,
+              "cask_size": null,
+              "cask_type": null,
+              "distillery": ["Jura"],
+              "expression": null,
+              "stated_age": 10,
+              "single_cask": null,
+              "release_year": null,
+              "vintage_year": null,
+              "cask_strength": null
+            }
+          },
+          {
+            "facts": {
+              "proposalType": "match_existing",
+              "releaseFacts": {},
+              "creationTarget": null,
+              "proposedBottle": null,
+              "proposedRelease": null
+            },
+            "rawText": "Jura 10-year-old Single Malt Scotch Whisky",
+            "sourceKey": "store_price:11949240",
+            "sourceUrl": "https://www.astorwines.com/javascript:__doPostBack('ctl00$ctl00$middleContent$pageContent$WUCSearchResults1$datResults$ctl08$lbItemName','')",
+            "sourceName": "Jura 10-year-old Single Malt Scotch Whisky",
+            "sourceType": "store_price",
+            "parsedIdentity": null
+          },
+          {
+            "facts": {
+              "proposalType": "create_new",
+              "releaseFacts": {
+                "abv": 40,
+                "caskType": "oloroso",
+                "statedAge": 10
+              },
+              "creationTarget": "bottle",
+              "proposedBottle": {
+                "abv": 40,
+                "name": "10-year-old",
+                "brand": {
+                  "id": null,
+                  "name": "Jura"
+                },
+                "series": null,
+                "bottler": null,
+                "edition": null,
+                "caskFill": null,
+                "caskSize": null,
+                "caskType": "oloroso",
+                "category": "single_malt",
+                "statedAge": 10,
+                "distillers": [
+                  {
+                    "id": null,
+                    "name": "Jura"
+                  }
+                ],
+                "singleCask": null,
+                "releaseYear": null,
+                "vintageYear": null,
+                "caskStrength": null
+              },
+              "proposedRelease": null
+            },
+            "rawText": "Jura 10-year-old",
+            "sourceKey": "store_price:9841163",
+            "sourceUrl": "https://www.totalwine.com/spirits/deals/scotch/single-malt/jura-10-yr/p/1776750?s=1805&igrules=true",
+            "sourceName": "Jura 10-year-old",
+            "sourceType": "store_price",
+            "parsedIdentity": {
+              "abv": null,
+              "brand": "Jura",
+              "series": null,
+              "bottler": null,
+              "edition": null,
+              "category": "single_malt",
+              "cask_fill": null,
+              "cask_size": null,
+              "cask_type": null,
+              "distillery": ["Jura"],
+              "expression": null,
+              "stated_age": 10,
+              "single_cask": null,
+              "release_year": null,
+              "vintage_year": null,
+              "cask_strength": null
+            }
+          }
+        ],
+        "imageSources": []
+      }
+    ],
+    "inspectedEntities": [
+      {
+        "kind": "distillery",
+        "name": "Isle of Jura",
+        "score": 1,
+        "source": ["exact", "text", "prefix", "contained"],
+        "entityId": 1071,
+        "reference": "Jura",
+        "shortName": null,
+        "retrievedFor": [
+          {
+            "exact": true,
+            "query": "Jura"
+          },
+          {
+            "exact": true,
+            "query": "Isle of Jura"
+          }
+        ]
+      },
+      {
+        "kind": "bottler",
+        "name": "Cane And Grain",
+        "score": 1,
+        "source": ["exact", "text", "prefix", "contained"],
+        "entityId": 6038,
+        "reference": "Cane And Grain",
+        "shortName": null,
+        "retrievedFor": [
+          {
+            "exact": true,
+            "query": "Cane And Grain"
+          }
+        ]
+      },
+      {
+        "kind": "distillery",
+        "name": "Laphroaig",
+        "score": 1,
+        "source": ["exact", "text", "prefix", "contained"],
+        "entityId": 1129,
+        "reference": "Laphroaig",
+        "shortName": "",
+        "retrievedFor": [
+          {
+            "exact": true,
+            "query": "Laphroaig"
+          }
+        ]
+      },
+      {
+        "kind": "distillery",
+        "name": "Grain",
+        "score": 0.33333333333333337,
+        "source": ["contained"],
+        "entityId": 2925,
+        "reference": "Grain",
+        "shortName": null,
+        "retrievedFor": [
+          {
+            "query": "Cane And Grain"
+          }
+        ]
+      },
+      {
+        "kind": "brand",
+        "name": "Old Jura",
+        "score": 0.2,
+        "source": ["text"],
+        "entityId": 365737,
+        "reference": null,
+        "shortName": null,
+        "retrievedFor": [
+          {
+            "query": "Jura"
+          }
+        ]
+      },
+      {
+        "kind": "company",
+        "name": "D. Johnston & Co. (Laphroaig) Ltd.",
+        "score": 0.2,
+        "source": ["text"],
+        "entityId": 5737,
+        "reference": null,
+        "shortName": null,
+        "retrievedFor": [
+          {
+            "query": "Laphroaig"
+          }
+        ]
+      }
+    ],
+    "inspectedSeries": []
+  },
+  "provenance": {
+    "source": "production_miss",
+    "verifiedSourceUrls": [
+      "https://www.scotchwhiskyauctions.com/auctions/234-the-185th-auction/905817-jura-10-year-old-legacy-1l/"
+    ],
+    "dbOutcome": {
+      "bottleId": null,
+      "createsBottle": false,
+      "summary": "Production returned no_match: it said the title alone did not settle the Legacy release."
+    },
+    "notes": "Captured from saved classifier run 35688 (auction_lot 16080, model null, 2026-11-03T15:19:46.704Z). Production rationale: The source appears to offer one whisky Bottle, but the auction title alone does not resolve the marketed identity. Inspected candidates 447 and 44114 do not safely establish the stated Legacy release; creating a new Bottle would risk combining unverified traits. Expected outcome checked against the lot page on 2026-11-09 and a judged review of the 185th auction on 2026-11-03."
+  },
+  "expected": {
+    "status": "classified",
+    "action": "create_bottle",
+    "identityScope": "product",
+    "matchedBottleId": null,
+    "proposedBottle": {
+      "brand": {
+        "id": 1071
+      },
+      "category": "single_malt",
+      "statedAge": 10,
+      "abv": 40
+    },
+    "proposedBottleNameIncludes": ["Legacy"],
+    "proposedBottleDistillerIdOneOf": [1071],
+    "summary": "Create Isle of Jura Legacy 10-year-old at 40%. The lot page calls it the old style 10 year old Jura Legacy and the label prints Legacy, so it is its own marketed Bottle. The plain 10-year-old candidates (447, 44114) do not cover it; 1 litre is packaging."
+  }
+}
