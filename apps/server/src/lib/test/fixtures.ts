@@ -1103,27 +1103,40 @@ export const ExternalSiteOrExisting = async (
   { ...data }: Partial<Omit<dbSchema.NewExternalSite, "id">> = {},
   db: AnyDatabase = dbConn,
 ): Promise<dbSchema.ExternalSite> => {
-  let type = data.type;
-  if (!type) {
-    const existing = await db.query.externalSites.findFirst();
-    if (existing) return existing;
-
-    type = choose(REGISTERED_EXTERNAL_SITE_KEY_LIST);
-  }
-
-  const existing = await db.query.externalSites.findFirst({
-    where: (externalSites, { eq }) => eq(externalSites.type, type),
-  });
+  const type = data.type;
+  const existing = await db.query.externalSites.findFirst(
+    type
+      ? { where: (externalSites, { eq }) => eq(externalSites.type, type) }
+      : undefined,
+  );
   if (existing) return existing;
 
-  return await ExternalSite({ ...data, type }, db);
+  return await ExternalSite(data, db);
 };
 
 export const ExternalSite = async (
   { ...data }: Partial<Omit<dbSchema.NewExternalSite, "id">> = {},
   db: AnyDatabase = dbConn,
 ): Promise<dbSchema.ExternalSite> => {
-  const type = data.type ?? choose(REGISTERED_EXTERNAL_SITE_KEY_LIST);
+  // `external_site.type` is unique, so a random type must skip types a test
+  // already created (for example `listing()` creates "totalwine").
+  let type = data.type;
+  if (!type) {
+    const usedTypes = new Set(
+      (await db.select({ type: externalSites.type }).from(externalSites)).map(
+        (row) => row.type,
+      ),
+    );
+    const freeTypes = REGISTERED_EXTERNAL_SITE_KEY_LIST.filter(
+      (key) => !usedTypes.has(key),
+    );
+    if (freeTypes.length === 0) {
+      throw new Error(
+        "Unable to create ExternalSite fixture: every registered type already exists. Pass a type or use ExternalSiteOrExisting.",
+      );
+    }
+    type = choose(freeTypes);
+  }
 
   const [result] = await db
     .insert(externalSites)
