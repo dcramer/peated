@@ -133,6 +133,11 @@ not a release identifier. Descriptions and price graphs are not saved. A complet
 read without useful facts, including a removed page, allows the normal title-based
 check; missing identity evidence still requires review.
 
+A page's stated volume outranks the size in the lot's index title. When a later
+listing check shows the same title and link, the lot keeps the page's volume,
+so a title that says 75cl cannot undo a page that says 70cl. A changed title
+or link clears the page read, and the title's size applies again.
+
 Detail facts never refresh availability or change prices. Changed facts produce
 a new matching fingerprint and check; earlier checks and results stay saved.
 Each request records the lot version, check ID, request time, and source URL to

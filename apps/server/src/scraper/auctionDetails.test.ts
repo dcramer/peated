@@ -432,6 +432,112 @@ test("a later listing check keeps a detail-read lot's identity and match", async
   });
 });
 
+test("a lot page's volume outlasts a different size in the listing title, so review is not reset", async ({
+  fixtures,
+}) => {
+  const site = await fixtures.ExternalSite({ type: "scotchwhiskyauctions" });
+  const title = "Maker's Mark Private Select for The Party Source 75cl";
+  const titleUrl =
+    "https://www.scotchwhiskyauctions.com/auctions/234-the-185th-auction/912345-makers-mark-private-select-75cl/";
+  const listing = (observedAt: Date) => ({
+    sourceKey: "lot:912345",
+    value: [
+      {
+        auction: {
+          sourceKey: "234",
+          name: "The 185th Auction",
+          url: "https://www.scotchwhiskyauctions.com/auctions/234-the-185th-auction/",
+        },
+        lot: {
+          sourceKey: "912345",
+          name: title,
+          url: titleUrl,
+          state: "closed" as const,
+          volume: 750,
+        },
+        observedAt: observedAt.toISOString(),
+      },
+    ],
+  });
+  async function saveNoMatchCheck(lot: AuctionLot) {
+    return (
+      await createBottleCheck({
+        intent: "resolve_reference",
+        sourceKind: "auction_lot",
+        sourceId: lot.id,
+        backgroundEventKey: auctionLotCheckKey(lot.id, lot.sourceFingerprint),
+        input: { reference: { id: lot.id, name: lot.name, url: lot.url } },
+        result: createDecidedBottleClassification({
+          decision: {
+            action: "no_match",
+            rationale: "No matching Bottle.",
+            candidateBottleIds: [],
+            matchedBottleId: null,
+            identityScope: "exact_cask",
+            observation: null,
+            proposedBottle: null,
+          },
+          artifacts: {},
+        }),
+      })
+    ).check;
+  }
+
+  // The index title says 75cl; its saved check sends the lot to review and
+  // asks for the lot page.
+  await auctionSink({
+    externalSiteId: site.id,
+    observation: listing(new Date(Date.now() - 60_000)),
+  });
+  const imported = (await db.query.auctionLots.findFirst())!;
+  expect(imported.volume).toBe(750);
+  await saveNoMatchCheck(imported);
+  await resolveAuctionLot(imported.id, imported.sourceFingerprint);
+
+  // The page says 70cl, a new identity with its own saved check.
+  const run = (await queueDetails())!;
+  const request = ScotchWhiskyAuctionDetailsCursorSchema.parse(run.cursor)
+    .lots[0];
+  const detailed = (await saveAuctionLotDetails(site.id, {
+    kind: "details",
+    request,
+    ...parseScotchWhiskyAuctionDetails(
+      `<main><h1>${title}</h1><div class="lotinfo"><div class="descr"><p>55.1% ABV / 70cl</p></div></div></main>`,
+    ),
+    checkedAt: new Date().toISOString(),
+  }))!;
+  expect(detailed).toMatchObject({ volume: 700, matchStatus: "pending" });
+  const pageCheck = await saveNoMatchCheck(detailed);
+  await applyAuctionLotMatchJob({
+    lotId: detailed.id,
+    fingerprint: detailed.sourceFingerprint,
+  });
+  const reviewed = (await db.query.auctionLots.findFirst())!;
+  expect(reviewed).toMatchObject({
+    matchStatus: "review",
+    matchCheckId: pageCheck.id,
+    sourceFingerprint: detailed.sourceFingerprint,
+  });
+  pushJob.mockClear();
+
+  // The next collection run sees the same 75cl title again.
+  await auctionSink({
+    externalSiteId: site.id,
+    observation: listing(new Date()),
+  });
+
+  const current = (await db.query.auctionLots.findFirst())!;
+  expect(current).toEqual({
+    ...reviewed,
+    lastCheckedAt: current.lastCheckedAt,
+  });
+  expect(current.lastCheckedAt > reviewed.lastCheckedAt).toBe(true);
+  expect(pushJob).not.toHaveBeenCalledWith(
+    "ResolveAuctionLot",
+    expect.anything(),
+  );
+});
+
 test("detail cursor resumes after a request-budget wait and removed pages stay reviewable", async ({
   fixtures,
 }) => {
