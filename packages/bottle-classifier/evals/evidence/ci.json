@@ -848,7 +848,8 @@
     "https://www.reddit.com/r/bourbon/comments/1mlz9gf/review_27_stagg_sazerac_barrel_select/",
     "https://www.abc.virginia.gov/products/bourbon/stagg-single-barrel-select",
     "https://caskcartel.com/products/stagg-sazerac-barrel-select-straight-bourbon-whiskey",
-    "https://shop.klwines.com/auctions/bidding/2083932"
+    "https://shop.klwines.com/auctions/bidding/2083932",
+    "https://shop.klwines.com/auctions/bidding/2083899"
   ],
   "cases": {
     "1792-single-barrel": {
@@ -15105,6 +15106,32 @@
               }
             ],
             "summary": "# 2016 Ichiro's Malt Chichibu \"Crane Series\" Kusuda Pinot Noir Wine Cask #14198 Single Malt Japanese Whisky (700ml)\n\nBid on this 1-700 ml bottle lot of 2016 Ichiro's Malt Chichibu Crane Series Kusuda Pinot Noir Wine Cask #14198 Single Malt Japanese Whisky (700ml).\n\nIncluded in this lot · 1 bottle\n\nProvenance: Purchased at reputable retailers and stored in a temperature and light controlled environment since acquisition.\n\nQuantity: 1\nBottle Size: 700 ml\nCondition: Original box. Bottled 2024. 119 Proof.\n\nCountry: Japan\n\nSKU: 2083932",
+            "provider": "firecrawl"
+          }
+        }
+      ],
+      "imageResults": []
+    },
+    "auction-klwines-clynelish-14-uk-70cl-match": {
+      "searchResult": {
+        "evidence": [],
+        "errors": []
+      },
+      "pageResults": [
+        {
+          "url": "https://shop.klwines.com/auctions/bidding/2083899",
+          "result": {
+            "query": "page opening",
+            "results": [
+              {
+                "url": "https://shop.klwines.com/auctions/bidding/2083899",
+                "title": "Clynelish 14 Year Old Highland Single Malt Scotch Whisky - K&L Wine Merchants",
+                "domain": "shop.klwines.com",
+                "description": null,
+                "extraSnippets": []
+              }
+            ],
+            "summary": "# Clynelish 14 Year Old Highland Single Malt Scotch Whisky\n\nBid on this bottle of Clynelish 14 Year Old Highland Single Malt Scotch Whisky. Clynelish distillery bottling for the UK bottled in the recent past. Note: this is a 70cl bottling\n\nIncluded in this lot · 1 bottle\n\nProvenance: Purchased at reputable retailers and auctions and stored in a temperature controlled environment since acquisition.\n\nQuantity: 1\nBottle Size: 750 ml\nCondition: 92 Proof.\n\nCountry: Scotland\n\nSKU: 2083899",
             "provider": "firecrawl"
           }
         }
