@@ -259,10 +259,18 @@ export async function upsertAuctionObservation(
     if (existing && observedAt <= existing.lastCheckedAt)
       return { lot: existing, isNew: false };
     const sameTitle = existing?.name === input.lot.name;
+    // Auction identity rule (owner: auctions): a lot page's stated volume
+    // outranks the size in its index title. An unchanged title and link keep
+    // the page's volume, so a title that says 75cl cannot undo a page that
+    // says 70cl and reset matching on every collection run.
+    const keepsDetailVolume =
+      sameTitle &&
+      existing?.url === input.lot.url &&
+      existing.sourceDetailsCheckedAt !== null;
     const identity = {
       name: input.lot.name,
       volume:
-        input.lot.volume === undefined
+        input.lot.volume === undefined || keepsDetailVolume
           ? sameTitle
             ? (existing?.volume ?? null)
             : null
