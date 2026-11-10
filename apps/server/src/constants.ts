@@ -71,6 +71,9 @@ export const EXTERNAL_SITE_DEFINITIONS = {
     name: "Scotch Whisky Auctions",
     initialRunEvery: null,
   },
+  // K&L auctions stay manual until a full run is checked; its terms forbid
+  // automated access without consent (docs/research/2026-11-10-klwines-auctions.md).
+  klwines: { name: "K&L Wine Merchants", initialRunEvery: null },
   // Astor stays manual-only while its non-browser catalog behavior is checked.
   astorwines: { name: "Astor Wines", initialRunEvery: null },
   // Berry Bros. & Rudd does not run automatically because robots.txt does not

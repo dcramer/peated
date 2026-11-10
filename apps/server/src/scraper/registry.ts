@@ -14,6 +14,11 @@ import {
   KegnbottleCursorSchema,
   KegnbottleObservationSchema,
 } from "./adapters/kegnbottle";
+import {
+  klwinesAuctionsAdapter,
+  KlwinesAuctionsCursorSchema,
+  KlwinesAuctionsObservationSchema,
+} from "./adapters/klwinesAuctions";
 import scrapeAstorWines from "./adapters/legacy/scrapeAstorWines";
 import scrapeBerryBrosRudd from "./adapters/legacy/scrapeBerryBrosRudd";
 import scrapeDouglasLaing from "./adapters/legacy/scrapeDouglasLaing";
@@ -184,6 +189,19 @@ export const scraperRegistry = createScraperRegistry({
       origins: [
         {
           origin: "https://www.scotchwhiskyauctions.com",
+          robots: { mode: "enforce" },
+        },
+      ],
+    }),
+    defineScrapeTarget({
+      key: "klwines",
+      enabled: true,
+      requestsPerHour: 240,
+      fasterRateReason:
+        "Each run reads about 40 list pages and up to 1,500 whisky lot pages; at 120 an hour a run would take more than half a day.",
+      origins: [
+        {
+          origin: "https://www.klwines.com",
           robots: { mode: "enforce" },
         },
       ],
@@ -425,6 +443,16 @@ export const scraperRegistry = createScraperRegistry({
       cursorSchema: ScotchWhiskyAuctionsCursorSchema,
       observationSchema: ScotchWhiskyAuctionsObservationSchema,
       adapter: scotchWhiskyAuctionsAdapter,
+      sink: auctionSink,
+    }),
+    defineScraperSource({
+      key: "klwines",
+      externalSiteKey: "klwines",
+      recordType: "auction",
+      targetKeys: ["klwines"],
+      cursorSchema: KlwinesAuctionsCursorSchema,
+      observationSchema: KlwinesAuctionsObservationSchema,
+      adapter: klwinesAuctionsAdapter,
       sink: auctionSink,
     }),
     ...legacyPriceSources.map((source) =>

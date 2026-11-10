@@ -67,7 +67,8 @@ External review sources must also follow the
 It covers review publishing, source approval, and rollback.
 
 Auction collection follows the [auction model and activation limits](../../../../docs/features/auctions.md).
-Scotch Whisky Auctions is enabled for manual runs, with no automatic schedule.
+Scotch Whisky Auctions and K&L Wine Merchants are enabled for manual runs,
+with no automatic schedule.
 Follow the [auction rollout procedure](../../../../docs/operations/auctions.md)
 after deploying the API and worker.
 

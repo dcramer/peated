@@ -126,6 +126,28 @@ and deploy both processes. Preserve lots, results, watches, and alert receipts.
 See the [auction model](../features/auctions.md) for freshness, matching,
 result history, and notification rules.
 
+## K&L Wine Merchants
+
+K&L (`klwines`) is enabled for manual runs only, with no schedule. It allows
+240 requests per hour. A run reads about 40 list pages and every single-bottle
+whisky lot page, up to about 1,500, so a full run takes six hours or more.
+Both K&L hosts sit behind Cloudflare and DataDome; expect the website to be
+marked blocked and its requests to go through Firecrawl.
+
+Closed lots stay on K&L's list for about two weeks, so run once after each
+batch closes to save its results, and once early in a batch to start
+matching. Check the first run's request count, blocked status, and a sample of
+lots against their pages before any second run:
+
+```sh
+pnpm cli api get /admin/external-sites/klwines/health
+pnpm cli api get '/admin/external-sites/klwines/runs?limit=5'
+pnpm cli api post /external-sites/klwines/trigger --yes
+```
+
+K&L's terms forbid automated access without consent. If K&L asks us to stop,
+disable the target in the registry and deploy. Keep the saved lots and results.
+
 ## Matching rollout
 
 Matching uses listing text, explicit facts, and a label reading of each

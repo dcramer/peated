@@ -15,6 +15,7 @@ const registeredSources = [
   "glenallachie",
   "healthyspirits",
   "kegnbottle",
+  "klwines",
   "masterofmalt",
   "missionliquor",
   "reservebar",
@@ -82,6 +83,12 @@ test("registers each built-in scraper source with its target", () => {
     "auction",
   );
   expectHourlyLimit("scotchwhiskyauctions", 480);
+  expect(EXTERNAL_SITE_DEFINITIONS.klwines.initialRunEvery).toBeNull();
+  expect(scraperRegistry.sources.get("klwines")?.recordType).toBe("auction");
+  expect(
+    scraperRegistry.targets.get("klwines")?.origins.map(({ origin }) => origin),
+  ).toEqual(["https://www.klwines.com"]);
+  expectHourlyLimit("klwines", 240);
   expect(EXTERNAL_SITE_DEFINITIONS.berrybrosrudd.initialRunEvery).toBeNull();
   expect(EXTERNAL_SITE_DEFINITIONS.dramfool.initialRunEvery).toBe(10080);
   expect(scraperRegistry.targets.get("dramfool")?.enabled).toBe(true);
