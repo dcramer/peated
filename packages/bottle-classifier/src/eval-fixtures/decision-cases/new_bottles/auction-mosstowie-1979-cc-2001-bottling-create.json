@@ -1,0 +1,1116 @@
+{
+  "id": "auction-mosstowie-1979-cc-2001-bottling-create",
+  "name": "Mosstowie 1979 Connoisseurs Choice: create the 2001 bottling",
+  "input": {
+    "reference": {
+      "id": 17117,
+      "url": "https://www.scotchwhiskyauctions.com/auctions/234-the-185th-auction/908301-mosstowie-1979-connoisseurs-choice/",
+      "name": "Mosstowie 1979 Connoisseurs Choice",
+      "imageUrl": null,
+      "externalSiteId": 28097,
+      "currentBottleId": null
+    },
+    "extractedIdentity": {
+      "abv": 40,
+      "brand": null,
+      "series": null,
+      "bottler": null,
+      "edition": null,
+      "outturn": null,
+      "category": null,
+      "distillery": null,
+      "expression": null,
+      "maturation": null,
+      "stated_age": null,
+      "cask_number": null,
+      "single_cask": null,
+      "release_year": null,
+      "vintage_year": null,
+      "cask_strength": null
+    },
+    "extractedIdentitySource": "structured",
+    "imageEvidence": null,
+    "initialCandidates": [
+      {
+        "abv": 40,
+        "brand": "Gordon & MacPhail",
+        "score": 86.93437,
+        "series": "Connoisseurs Choice",
+        "source": ["text", "brand_coverage", "context"],
+        "bottler": "Gordon & MacPhail",
+        "edition": null,
+        "outturn": null,
+        "bottleId": 63654,
+        "category": "single_malt",
+        "fullName": "Gordon & MacPhail Dallas Dhu 1979",
+        "reference": null,
+        "statedAge": null,
+        "caskNumber": null,
+        "comparison": {
+          "missing": [],
+          "conflicts": [],
+          "agreements": ["abv"]
+        },
+        "distillery": ["Dallas Dhu"],
+        "maturation": null,
+        "releaseDay": null,
+        "singleCask": null,
+        "releaseYear": null,
+        "vintageYear": 1979,
+        "bottlingYear": 1996,
+        "caskStrength": null,
+        "releaseMonth": null,
+        "familyContext": {
+          "siblingBottles": []
+        }
+      },
+      {
+        "abv": 40,
+        "brand": "Gordon & MacPhail",
+        "score": 86.93437,
+        "series": "Connoisseurs Choice",
+        "source": ["text", "brand_coverage"],
+        "bottler": "Gordon & MacPhail",
+        "edition": null,
+        "outturn": null,
+        "bottleId": 63684,
+        "category": "single_malt",
+        "fullName": "Gordon & MacPhail Port Ellen 1979",
+        "reference": null,
+        "statedAge": null,
+        "caskNumber": null,
+        "comparison": {
+          "missing": [],
+          "conflicts": [],
+          "agreements": ["abv"]
+        },
+        "distillery": ["Port Ellen"],
+        "maturation": null,
+        "releaseDay": null,
+        "singleCask": null,
+        "releaseYear": null,
+        "vintageYear": 1979,
+        "bottlingYear": 1994,
+        "caskStrength": null,
+        "releaseMonth": null,
+        "familyContext": {
+          "siblingBottles": []
+        }
+      },
+      {
+        "abv": 40,
+        "brand": "Gordon & MacPhail",
+        "score": 66.63099,
+        "series": "Connoisseurs Choice",
+        "source": ["text", "brand_coverage"],
+        "bottler": "Gordon & MacPhail",
+        "edition": null,
+        "outturn": null,
+        "bottleId": 67028,
+        "category": "single_malt",
+        "fullName": "Gordon & MacPhail Ardbeg 1973",
+        "reference": null,
+        "statedAge": null,
+        "caskNumber": null,
+        "comparison": {
+          "missing": [],
+          "conflicts": [],
+          "agreements": ["abv"]
+        },
+        "distillery": ["Ardbeg"],
+        "maturation": null,
+        "releaseDay": null,
+        "singleCask": null,
+        "releaseYear": null,
+        "vintageYear": 1973,
+        "bottlingYear": 2003,
+        "caskStrength": null,
+        "releaseMonth": null,
+        "familyContext": {
+          "siblingBottles": []
+        }
+      },
+      {
+        "abv": 40,
+        "brand": "Gordon & MacPhail",
+        "score": 66.63099,
+        "series": "Connoisseurs Choice",
+        "source": ["text", "brand_coverage"],
+        "bottler": "Gordon & MacPhail",
+        "edition": null,
+        "outturn": null,
+        "bottleId": 60777,
+        "category": "single_malt",
+        "fullName": "Gordon & MacPhail Ardbeg 1978",
+        "reference": null,
+        "statedAge": null,
+        "caskNumber": null,
+        "comparison": {
+          "missing": [],
+          "conflicts": [],
+          "agreements": ["abv"]
+        },
+        "distillery": ["Ardbeg"],
+        "maturation": null,
+        "releaseDay": null,
+        "singleCask": null,
+        "releaseYear": null,
+        "vintageYear": 1978,
+        "bottlingYear": 2000,
+        "caskStrength": null,
+        "releaseMonth": null,
+        "familyContext": {
+          "siblingBottles": []
+        }
+      },
+      {
+        "abv": 40,
+        "brand": "Gordon & MacPhail",
+        "score": 66.63099,
+        "series": "Connoisseurs Choice",
+        "source": ["text", "brand_coverage"],
+        "bottler": "Gordon & MacPhail",
+        "edition": null,
+        "outturn": null,
+        "bottleId": 58773,
+        "category": "single_malt",
+        "fullName": "Gordon & MacPhail Ardbeg 1991",
+        "reference": null,
+        "statedAge": null,
+        "caskNumber": null,
+        "comparison": {
+          "missing": [],
+          "conflicts": [],
+          "agreements": ["abv"]
+        },
+        "distillery": ["Ardbeg"],
+        "maturation": null,
+        "releaseDay": null,
+        "singleCask": null,
+        "releaseYear": null,
+        "vintageYear": 1991,
+        "bottlingYear": 2002,
+        "caskStrength": null,
+        "releaseMonth": null,
+        "familyContext": {
+          "siblingBottles": []
+        }
+      },
+      {
+        "abv": 40,
+        "brand": "Gordon & MacPhail",
+        "score": 66.63099,
+        "series": "Connoisseurs Choice",
+        "source": ["text"],
+        "bottler": "Gordon & MacPhail",
+        "edition": null,
+        "outturn": null,
+        "bottleId": 52286,
+        "category": "single_malt",
+        "fullName": "Gordon & MacPhail Banff 1974",
+        "reference": null,
+        "statedAge": null,
+        "caskNumber": null,
+        "comparison": {
+          "missing": [],
+          "conflicts": [],
+          "agreements": ["abv"]
+        },
+        "distillery": ["Banff"],
+        "maturation": null,
+        "releaseDay": null,
+        "singleCask": null,
+        "releaseYear": null,
+        "vintageYear": 1974,
+        "bottlingYear": null,
+        "caskStrength": null,
+        "releaseMonth": null,
+        "familyContext": {
+          "siblingBottles": []
+        }
+      },
+      {
+        "abv": 40,
+        "brand": "Gordon & MacPhail",
+        "score": 66.63099,
+        "series": "Connoisseurs Choice",
+        "source": ["text"],
+        "bottler": "Gordon & MacPhail",
+        "edition": null,
+        "outturn": null,
+        "bottleId": 66429,
+        "category": "single_malt",
+        "fullName": "Gordon & MacPhail Bladnoch 1984",
+        "reference": null,
+        "statedAge": null,
+        "caskNumber": null,
+        "comparison": {
+          "missing": [],
+          "conflicts": [],
+          "agreements": ["abv"]
+        },
+        "distillery": ["Bladnoch"],
+        "maturation": null,
+        "releaseDay": null,
+        "singleCask": null,
+        "releaseYear": null,
+        "vintageYear": 1984,
+        "bottlingYear": 1994,
+        "caskStrength": null,
+        "releaseMonth": null,
+        "familyContext": {
+          "siblingBottles": []
+        }
+      },
+      {
+        "abv": 40,
+        "brand": "Gordon & MacPhail",
+        "score": 66.63099,
+        "series": "Connoisseurs Choice",
+        "source": ["text"],
+        "bottler": "Gordon & MacPhail",
+        "edition": null,
+        "outturn": null,
+        "bottleId": 66454,
+        "category": "single_malt",
+        "fullName": "Gordon & MacPhail Bladnoch 1984",
+        "reference": null,
+        "statedAge": null,
+        "caskNumber": null,
+        "comparison": {
+          "missing": [],
+          "conflicts": [],
+          "agreements": ["abv"]
+        },
+        "distillery": ["Bladnoch"],
+        "maturation": null,
+        "releaseDay": null,
+        "singleCask": null,
+        "releaseYear": null,
+        "vintageYear": 1984,
+        "bottlingYear": 1993,
+        "caskStrength": null,
+        "releaseMonth": null,
+        "familyContext": {
+          "siblingBottles": []
+        }
+      },
+      {
+        "abv": 40,
+        "brand": "Gordon & MacPhail",
+        "score": 66.63099,
+        "series": "Connoisseurs Choice",
+        "source": ["text"],
+        "bottler": "Gordon & MacPhail",
+        "edition": null,
+        "outturn": null,
+        "bottleId": 66426,
+        "category": "single_malt",
+        "fullName": "Gordon & MacPhail Bladnoch 1984",
+        "reference": null,
+        "statedAge": null,
+        "caskNumber": null,
+        "comparison": {
+          "missing": [],
+          "conflicts": [],
+          "agreements": ["abv"]
+        },
+        "distillery": ["Bladnoch"],
+        "maturation": null,
+        "releaseDay": null,
+        "singleCask": null,
+        "releaseYear": null,
+        "vintageYear": 1984,
+        "bottlingYear": 1995,
+        "caskStrength": null,
+        "releaseMonth": null,
+        "familyContext": {
+          "siblingBottles": []
+        }
+      },
+      {
+        "abv": 40,
+        "brand": "Gordon & MacPhail",
+        "score": 66.63099,
+        "series": "Connoisseurs Choice",
+        "source": ["text"],
+        "bottler": "Gordon & MacPhail",
+        "edition": null,
+        "outturn": null,
+        "bottleId": 66427,
+        "category": "single_malt",
+        "fullName": "Gordon & MacPhail Bladnoch 1986",
+        "reference": null,
+        "statedAge": null,
+        "caskNumber": null,
+        "comparison": {
+          "missing": [],
+          "conflicts": [],
+          "agreements": ["abv"]
+        },
+        "distillery": ["Bladnoch"],
+        "maturation": null,
+        "releaseDay": null,
+        "singleCask": null,
+        "releaseYear": null,
+        "vintageYear": 1986,
+        "bottlingYear": 1998,
+        "caskStrength": null,
+        "releaseMonth": null,
+        "familyContext": {
+          "siblingBottles": []
+        }
+      },
+      {
+        "abv": 40,
+        "brand": "Gordon & MacPhail",
+        "score": 66.63099,
+        "series": "Connoisseurs Choice",
+        "source": ["text"],
+        "bottler": "Gordon & MacPhail",
+        "edition": null,
+        "outturn": null,
+        "bottleId": 66430,
+        "category": "single_malt",
+        "fullName": "Gordon & MacPhail Bladnoch 1986",
+        "reference": null,
+        "statedAge": null,
+        "caskNumber": null,
+        "comparison": {
+          "missing": [],
+          "conflicts": [],
+          "agreements": ["abv"]
+        },
+        "distillery": ["Bladnoch"],
+        "maturation": null,
+        "releaseDay": null,
+        "singleCask": null,
+        "releaseYear": null,
+        "vintageYear": 1986,
+        "bottlingYear": 1996,
+        "caskStrength": null,
+        "releaseMonth": null,
+        "familyContext": {
+          "siblingBottles": []
+        }
+      },
+      {
+        "abv": 40,
+        "brand": "Gordon & MacPhail",
+        "score": 66.63099,
+        "series": "Connoisseurs Choice",
+        "source": ["text"],
+        "bottler": "Gordon & MacPhail",
+        "edition": null,
+        "outturn": null,
+        "bottleId": 66447,
+        "category": "single_malt",
+        "fullName": "Gordon & MacPhail Bladnoch 1987",
+        "reference": null,
+        "statedAge": null,
+        "caskNumber": null,
+        "comparison": {
+          "missing": [],
+          "conflicts": [],
+          "agreements": ["abv"]
+        },
+        "distillery": ["Bladnoch"],
+        "maturation": null,
+        "releaseDay": null,
+        "singleCask": null,
+        "releaseYear": null,
+        "vintageYear": 1987,
+        "bottlingYear": 2000,
+        "caskStrength": null,
+        "releaseMonth": null,
+        "familyContext": {
+          "siblingBottles": []
+        }
+      },
+      {
+        "abv": 40,
+        "brand": "Gordon & MacPhail",
+        "score": 66.63099,
+        "series": "Connoisseurs Choice",
+        "source": ["text"],
+        "bottler": "Gordon & MacPhail",
+        "edition": null,
+        "outturn": null,
+        "bottleId": 66421,
+        "category": "single_malt",
+        "fullName": "Gordon & MacPhail Bladnoch 1987",
+        "reference": null,
+        "statedAge": null,
+        "caskNumber": null,
+        "comparison": {
+          "missing": [],
+          "conflicts": [],
+          "agreements": ["abv"]
+        },
+        "distillery": ["Bladnoch"],
+        "maturation": null,
+        "releaseDay": null,
+        "singleCask": null,
+        "releaseYear": null,
+        "vintageYear": 1987,
+        "bottlingYear": 1999,
+        "caskStrength": null,
+        "releaseMonth": null,
+        "familyContext": {
+          "siblingBottles": []
+        }
+      },
+      {
+        "abv": 40,
+        "brand": "Gordon & MacPhail",
+        "score": 66.63099,
+        "series": "Connoisseurs Choice",
+        "source": ["text"],
+        "bottler": "Gordon & MacPhail",
+        "edition": null,
+        "outturn": null,
+        "bottleId": 66450,
+        "category": "single_malt",
+        "fullName": "Gordon & MacPhail Bladnoch 1988",
+        "reference": null,
+        "statedAge": null,
+        "caskNumber": null,
+        "comparison": {
+          "missing": [],
+          "conflicts": [],
+          "agreements": ["abv"]
+        },
+        "distillery": ["Bladnoch"],
+        "maturation": null,
+        "releaseDay": null,
+        "singleCask": null,
+        "releaseYear": null,
+        "vintageYear": 1988,
+        "bottlingYear": 2002,
+        "caskStrength": null,
+        "releaseMonth": null,
+        "familyContext": {
+          "siblingBottles": []
+        }
+      },
+      {
+        "abv": 40,
+        "brand": "Gordon & MacPhail",
+        "score": 66.63099,
+        "series": "Connoisseurs Choice",
+        "source": ["text"],
+        "bottler": "Gordon & MacPhail",
+        "edition": null,
+        "outturn": null,
+        "bottleId": 66422,
+        "category": "single_malt",
+        "fullName": "Gordon & MacPhail Bladnoch 1988",
+        "reference": null,
+        "statedAge": null,
+        "caskNumber": null,
+        "comparison": {
+          "missing": [],
+          "conflicts": [],
+          "agreements": ["abv"]
+        },
+        "distillery": ["Bladnoch"],
+        "maturation": null,
+        "releaseDay": null,
+        "singleCask": null,
+        "releaseYear": null,
+        "vintageYear": 1988,
+        "bottlingYear": 2001,
+        "caskStrength": null,
+        "releaseMonth": null,
+        "familyContext": {
+          "siblingBottles": []
+        }
+      },
+      {
+        "abv": 40,
+        "brand": "Gordon & MacPhail",
+        "score": 66.63099,
+        "series": "Connoisseurs Choice",
+        "source": ["text"],
+        "bottler": "Gordon & MacPhail",
+        "edition": null,
+        "outturn": null,
+        "bottleId": 66425,
+        "category": "single_malt",
+        "fullName": "Gordon & MacPhail Bladnoch 1988",
+        "reference": null,
+        "statedAge": null,
+        "caskNumber": null,
+        "comparison": {
+          "missing": [],
+          "conflicts": ["vintageYear", "distillers"],
+          "agreements": ["category", "abv", "brand", "bottler", "series"]
+        },
+        "distillery": ["Bladnoch"],
+        "maturation": null,
+        "releaseDay": null,
+        "singleCask": null,
+        "releaseYear": null,
+        "vintageYear": 1988,
+        "bottlingYear": 2000,
+        "caskStrength": null,
+        "releaseMonth": null,
+        "familyContext": {
+          "siblingBottles": []
+        }
+      },
+      {
+        "abv": 40,
+        "brand": "Gordon & MacPhail",
+        "score": 66.63099,
+        "series": "Connoisseurs Choice",
+        "source": ["text"],
+        "bottler": "Gordon & MacPhail",
+        "edition": null,
+        "outturn": null,
+        "bottleId": 66424,
+        "category": "single_malt",
+        "fullName": "Gordon & MacPhail Bladnoch 1989",
+        "reference": null,
+        "statedAge": null,
+        "caskNumber": null,
+        "comparison": {
+          "missing": [],
+          "conflicts": ["vintageYear", "distillers"],
+          "agreements": ["category", "abv", "brand", "bottler", "series"]
+        },
+        "distillery": ["Bladnoch"],
+        "maturation": null,
+        "releaseDay": null,
+        "singleCask": null,
+        "releaseYear": null,
+        "vintageYear": 1989,
+        "bottlingYear": 2004,
+        "caskStrength": null,
+        "releaseMonth": null,
+        "familyContext": {
+          "siblingBottles": []
+        }
+      },
+      {
+        "abv": 40,
+        "brand": "Gordon & MacPhail",
+        "score": 66.63099,
+        "series": "Connoisseurs Choice",
+        "source": ["text"],
+        "bottler": "Gordon & MacPhail",
+        "edition": null,
+        "outturn": null,
+        "bottleId": 66451,
+        "category": "single_malt",
+        "fullName": "Gordon & MacPhail Bladnoch 1991",
+        "reference": null,
+        "statedAge": null,
+        "caskNumber": null,
+        "comparison": {
+          "missing": [],
+          "conflicts": ["vintageYear", "distillers"],
+          "agreements": ["category", "abv", "brand", "bottler", "series"]
+        },
+        "distillery": ["Bladnoch"],
+        "maturation": null,
+        "releaseDay": null,
+        "singleCask": null,
+        "releaseYear": null,
+        "vintageYear": 1991,
+        "bottlingYear": 2004,
+        "caskStrength": null,
+        "releaseMonth": null,
+        "familyContext": {
+          "siblingBottles": []
+        }
+      },
+      {
+        "abv": 40,
+        "brand": "Gordon & MacPhail",
+        "score": 66.63099,
+        "series": "Connoisseurs Choice",
+        "source": ["text"],
+        "bottler": "Gordon & MacPhail",
+        "edition": null,
+        "outturn": null,
+        "bottleId": 55934,
+        "category": "single_malt",
+        "fullName": "Gordon & MacPhail Brora 1972",
+        "reference": null,
+        "statedAge": null,
+        "caskNumber": null,
+        "comparison": {
+          "missing": [],
+          "conflicts": ["vintageYear", "distillers"],
+          "agreements": ["category", "abv", "brand", "bottler", "series"]
+        },
+        "distillery": ["Brora"],
+        "maturation": null,
+        "releaseDay": null,
+        "singleCask": null,
+        "releaseYear": null,
+        "vintageYear": 1972,
+        "bottlingYear": 1997,
+        "caskStrength": null,
+        "releaseMonth": null,
+        "familyContext": {
+          "siblingBottles": []
+        }
+      },
+      {
+        "abv": 40,
+        "brand": "Gordon & MacPhail",
+        "score": 66.63099,
+        "series": "Connoisseurs Choice",
+        "source": ["text"],
+        "bottler": "Gordon & MacPhail",
+        "edition": null,
+        "outturn": null,
+        "bottleId": 55932,
+        "category": "single_malt",
+        "fullName": "Gordon & MacPhail Brora 1972",
+        "reference": null,
+        "statedAge": null,
+        "caskNumber": null,
+        "comparison": {
+          "missing": [],
+          "conflicts": ["vintageYear", "distillers"],
+          "agreements": ["category", "abv", "brand", "bottler", "series"]
+        },
+        "distillery": ["Brora"],
+        "maturation": null,
+        "releaseDay": null,
+        "singleCask": null,
+        "releaseYear": null,
+        "vintageYear": 1972,
+        "bottlingYear": 1995,
+        "caskStrength": null,
+        "releaseMonth": null,
+        "familyContext": {
+          "siblingBottles": []
+        }
+      },
+      {
+        "abv": 40,
+        "brand": "Gordon & MacPhail",
+        "score": 66.63099,
+        "series": "Connoisseurs Choice",
+        "source": ["text"],
+        "bottler": "Gordon & MacPhail",
+        "edition": null,
+        "outturn": null,
+        "bottleId": 55930,
+        "category": "single_malt",
+        "fullName": "Gordon & MacPhail Brora 1972",
+        "reference": null,
+        "statedAge": null,
+        "caskNumber": null,
+        "comparison": {
+          "missing": [],
+          "conflicts": ["vintageYear", "distillers"],
+          "agreements": ["category", "abv", "brand", "bottler", "series"]
+        },
+        "distillery": ["Brora"],
+        "maturation": null,
+        "releaseDay": null,
+        "singleCask": null,
+        "releaseYear": null,
+        "vintageYear": 1972,
+        "bottlingYear": 1993,
+        "caskStrength": null,
+        "releaseMonth": null,
+        "familyContext": {
+          "siblingBottles": []
+        }
+      },
+      {
+        "abv": 40,
+        "brand": "Gordon & MacPhail",
+        "score": 66.63099,
+        "series": "Connoisseurs Choice",
+        "source": ["text"],
+        "bottler": "Gordon & MacPhail",
+        "edition": null,
+        "outturn": null,
+        "bottleId": 55805,
+        "category": "single_malt",
+        "fullName": "Gordon & MacPhail Brora 1972",
+        "reference": null,
+        "statedAge": null,
+        "caskNumber": null,
+        "comparison": {
+          "missing": [],
+          "conflicts": ["vintageYear", "distillers"],
+          "agreements": ["category", "abv", "brand", "bottler", "series"]
+        },
+        "distillery": ["Brora"],
+        "maturation": null,
+        "releaseDay": null,
+        "singleCask": null,
+        "releaseYear": null,
+        "vintageYear": 1972,
+        "bottlingYear": 1992,
+        "caskStrength": null,
+        "releaseMonth": null,
+        "familyContext": {
+          "siblingBottles": []
+        }
+      },
+      {
+        "abv": 40,
+        "brand": "Gordon & MacPhail",
+        "score": 66.63099,
+        "series": "Connoisseurs Choice",
+        "source": ["text"],
+        "bottler": "Gordon & MacPhail",
+        "edition": null,
+        "outturn": null,
+        "bottleId": 55938,
+        "category": "single_malt",
+        "fullName": "Gordon & MacPhail Brora 1982",
+        "reference": null,
+        "statedAge": null,
+        "caskNumber": null,
+        "comparison": {
+          "missing": [],
+          "conflicts": ["vintageYear", "distillers"],
+          "agreements": ["category", "abv", "brand", "bottler", "series"]
+        },
+        "distillery": ["Brora"],
+        "maturation": null,
+        "releaseDay": null,
+        "singleCask": null,
+        "releaseYear": null,
+        "vintageYear": 1982,
+        "bottlingYear": 2002,
+        "caskStrength": null,
+        "releaseMonth": null,
+        "familyContext": {
+          "siblingBottles": []
+        }
+      },
+      {
+        "abv": 40,
+        "brand": "Gordon & MacPhail",
+        "score": 66.63099,
+        "series": "Connoisseurs Choice",
+        "source": ["text"],
+        "bottler": "Gordon & MacPhail",
+        "edition": null,
+        "outturn": null,
+        "bottleId": 55936,
+        "category": "single_malt",
+        "fullName": "Gordon & MacPhail Brora 1982",
+        "reference": null,
+        "statedAge": null,
+        "caskNumber": null,
+        "comparison": {
+          "missing": [],
+          "conflicts": ["vintageYear", "distillers"],
+          "agreements": ["category", "abv", "brand", "bottler", "series"]
+        },
+        "distillery": ["Brora"],
+        "maturation": null,
+        "releaseDay": null,
+        "singleCask": null,
+        "releaseYear": null,
+        "vintageYear": 1982,
+        "bottlingYear": 1997,
+        "caskStrength": null,
+        "releaseMonth": null,
+        "familyContext": {
+          "siblingBottles": []
+        }
+      },
+      {
+        "abv": 40,
+        "brand": "Gordon & MacPhail",
+        "score": 66.63099,
+        "series": "Connoisseurs Choice",
+        "source": ["text"],
+        "bottler": "Gordon & MacPhail",
+        "edition": null,
+        "outturn": null,
+        "bottleId": 52288,
+        "category": "single_malt",
+        "fullName": "Gordon & MacPhail Brora 1982",
+        "reference": null,
+        "statedAge": null,
+        "caskNumber": null,
+        "comparison": {
+          "missing": [],
+          "conflicts": ["vintageYear", "distillers"],
+          "agreements": ["category", "abv", "brand", "bottler", "series"]
+        },
+        "distillery": ["Brora"],
+        "maturation": null,
+        "releaseDay": null,
+        "singleCask": null,
+        "releaseYear": null,
+        "vintageYear": 1982,
+        "bottlingYear": 2000,
+        "caskStrength": null,
+        "releaseMonth": null,
+        "familyContext": {
+          "siblingBottles": []
+        }
+      }
+    ]
+  },
+  "context": {
+    "inspectedBottleIds": [63654],
+    "bottleContexts": [
+      {
+        "exact": {
+          "abv": 40,
+          "edition": null,
+          "outturn": null,
+          "statedAge": null,
+          "caskNumber": null,
+          "maturation": null,
+          "releaseDay": null,
+          "singleCask": null,
+          "releaseYear": null,
+          "vintageYear": 1979,
+          "bottlingYear": 1996,
+          "caskStrength": null,
+          "releaseMonth": null
+        },
+        "shared": {
+          "name": "Dallas Dhu 1979",
+          "brand": {
+            "name": "Gordon & MacPhail",
+            "entityId": 5645
+          },
+          "series": {
+            "name": "Connoisseurs Choice",
+            "seriesId": 97
+          },
+          "bottler": {
+            "name": "Gordon & MacPhail",
+            "entityId": 5645
+          },
+          "category": "single_malt",
+          "statedAge": null,
+          "distillers": [
+            {
+              "name": "Dallas Dhu",
+              "entityId": 869
+            }
+          ]
+        },
+        "groupId": 36615,
+        "bottleId": 63654,
+        "fullName": "Gordon & MacPhail Dallas Dhu 1979",
+        "siblings": [],
+        "references": [],
+        "observations": [
+          {
+            "facts": {
+              "proposalType": "create_new",
+              "proposedBottle": {
+                "abv": null,
+                "name": "Dallas Dhu",
+                "brand": {
+                  "id": null,
+                  "name": "Gordon & MacPhail"
+                },
+                "series": {
+                  "id": null,
+                  "name": "Connoisseurs Choice"
+                },
+                "bottler": {
+                  "id": null,
+                  "name": "Gordon & MacPhail"
+                },
+                "edition": null,
+                "outturn": null,
+                "category": "single_malt",
+                "statedAge": null,
+                "caskNumber": null,
+                "distillers": [
+                  {
+                    "id": null,
+                    "name": "Dallas Dhu"
+                  }
+                ],
+                "maturation": null,
+                "releaseDay": null,
+                "singleCask": null,
+                "releaseYear": null,
+                "vintageYear": 1979,
+                "bottlingYear": 1996,
+                "caskStrength": null,
+                "releaseMonth": null
+              },
+              "referenceScope": "none"
+            },
+            "rawText": "Dallas Dhu 1979 - Connoiseurs Choice (bottled 1996) (Gordon & MacPhail)",
+            "sourceKey": "store_price:12033709",
+            "sourceUrl": "https://www.masterofmalt.com/whiskies/dallas-dhu/dallas-dhu-1979-bottled-1996-connoiseurs-choice-gordon-and-macphail-whisky/?sku=146354",
+            "sourceName": "Dallas Dhu 1979 - Connoiseurs Choice (bottled 1996) (Gordon & MacPhail)",
+            "sourceType": "store_price",
+            "parsedIdentity": null
+          }
+        ],
+        "imageSources": []
+      }
+    ],
+    "inspectedEntities": [
+      {
+        "kind": "bottler",
+        "name": "Gordon & MacPhail",
+        "score": 1,
+        "source": ["exact", "text", "prefix", "contained"],
+        "entityId": 5645,
+        "reference": "Gordon & MacPhail",
+        "shortName": null,
+        "retrievedFor": [
+          {
+            "exact": true,
+            "query": "Gordon & MacPhail"
+          }
+        ]
+      },
+      {
+        "kind": "distillery",
+        "name": "Dallas Dhu",
+        "score": 1,
+        "source": ["exact", "text", "prefix", "contained"],
+        "entityId": 869,
+        "reference": "Dallas Dhu",
+        "shortName": null,
+        "retrievedFor": [
+          {
+            "exact": true,
+            "query": "Dallas Dhu"
+          }
+        ]
+      },
+      {
+        "kind": "distillery",
+        "name": "Port Ellen",
+        "score": 1,
+        "source": ["exact", "text", "prefix", "contained"],
+        "entityId": 1271,
+        "reference": "Port Ellen",
+        "shortName": null,
+        "retrievedFor": [
+          {
+            "exact": true,
+            "query": "Port Ellen"
+          }
+        ]
+      },
+      {
+        "kind": "distillery",
+        "name": "Ardbeg",
+        "score": 1,
+        "source": ["exact", "text", "prefix", "contained"],
+        "entityId": 28,
+        "reference": "Ardbeg",
+        "shortName": null,
+        "retrievedFor": [
+          {
+            "exact": true,
+            "query": "Ardbeg"
+          }
+        ]
+      },
+      {
+        "kind": "distillery",
+        "name": "Banff",
+        "score": 1,
+        "source": ["exact", "text", "prefix", "contained"],
+        "entityId": 93,
+        "reference": "Banff",
+        "shortName": null,
+        "retrievedFor": [
+          {
+            "exact": true,
+            "query": "Banff"
+          }
+        ]
+      },
+      {
+        "kind": "distillery",
+        "name": "Bladnoch",
+        "score": 1,
+        "source": ["exact", "text", "prefix", "contained"],
+        "entityId": 110,
+        "reference": "Bladnoch",
+        "shortName": null,
+        "retrievedFor": [
+          {
+            "exact": true,
+            "query": "Bladnoch"
+          }
+        ]
+      },
+      {
+        "kind": "brand",
+        "name": "Mosstowie",
+        "score": 1,
+        "source": ["exact", "text", "prefix", "contained"],
+        "entityId": 1191,
+        "reference": "Mosstowie",
+        "shortName": null,
+        "retrievedFor": [
+          {
+            "exact": true,
+            "query": "Mosstowie"
+          }
+        ]
+      },
+      {
+        "kind": "bottler",
+        "name": "Bladnoch Forum",
+        "score": 0.5,
+        "source": ["text", "prefix"],
+        "entityId": 5595,
+        "reference": "Bladnoch Forum",
+        "shortName": null,
+        "retrievedFor": [
+          {
+            "query": "Bladnoch"
+          }
+        ]
+      }
+    ],
+    "inspectedSeries": []
+  },
+  "provenance": {
+    "source": "production_miss",
+    "verifiedSourceUrls": [
+      "https://www.scotchwhiskyauctions.com/auctions/234-the-185th-auction/908301-mosstowie-1979-connoisseurs-choice/"
+    ],
+    "dbOutcome": {
+      "bottleId": null,
+      "createsBottle": false,
+      "summary": "Production returned no_match: it found several 1979 Connoisseurs Choice bottlings and could not tell which one the lot was, because the old page read did not return the lot facts."
+    },
+    "notes": "Captured from saved classifier run 36261 (auction_lot 17117, model null, 2026-11-03T19:32:10.537Z). Production rationale: The source appears to offer one whisky bottle, but its exact marketed release cannot be established from the auction title. Web results identify multiple Gordon & MacPhail Connoisseurs Choice Mosstowie 1979 bottlings, including versions bottled in different years. The inspected local candidate, Gordon & MacPhail Dallas Dhu 1979 (63654), is a different distillery and is not a safe match. The exact release remains unresolved, so neither assignment nor creation is supported. The run predates reading Scotch Whisky Auctions lot pages (#1609), so the evidence pack adds the lot page text. Expected outcome checked against the lot page and photo on 2026-11-09, in a random sample of the 185th auction's no_match reviews."
+  },
+  "expected": {
+    "status": "classified",
+    "action": "create_bottle",
+    "identityScope": "product",
+    "matchedBottleId": null,
+    "proposedBottle": {
+      "brand": {
+        "id": 5645
+      },
+      "category": "single_malt",
+      "vintageYear": 1979,
+      "bottlingYear": 2001,
+      "abv": 40
+    },
+    "proposedBottleNameIncludes": ["Mosstowie", "1979"],
+    "proposedBottleDistillerIds": [1191],
+    "summary": "Create Gordon & MacPhail Connoisseurs Choice Mosstowie 1979, bottled 2001, 40%. The lot page gives the vintage, bottling year and strength. The local Gordon & MacPhail Mosstowie 1979 (64720) is the 2020 bottling at 49.8%, another Bottle."
+  },
+  "knownFailure": {
+    "reason": "The create is right, but the agent leaves Mosstowie's distillery id null although Entity 1191 is in its context."
+  }
+}

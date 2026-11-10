@@ -1,0 +1,1761 @@
+{
+  "id": "auction-rosebank-1980-11-cadenhead-150th-anniversary-create",
+  "name": "Rosebank 1980 11 Year Old Cadenhead's 150th Anniversary: create it; the broad Cadenhead's Rosebank 11 does not cover it",
+  "input": {
+    "reference": {
+      "id": 17358,
+      "url": "https://www.scotchwhiskyauctions.com/auctions/234-the-185th-auction/906002-rosebank-1980-11-year-old-cadenheads-150th-anniversary-bottling/",
+      "name": "Rosebank 1980 11 Year Old Cadenhead’s 150th Anniversary Bottling",
+      "imageUrl": null,
+      "externalSiteId": 28097,
+      "currentBottleId": null
+    },
+    "extractedIdentity": {
+      "abv": 60.1,
+      "brand": null,
+      "series": null,
+      "bottler": null,
+      "edition": null,
+      "outturn": null,
+      "category": null,
+      "distillery": null,
+      "expression": null,
+      "maturation": null,
+      "stated_age": null,
+      "cask_number": null,
+      "single_cask": null,
+      "release_year": null,
+      "vintage_year": null,
+      "cask_strength": null
+    },
+    "extractedIdentitySource": "structured",
+    "imageEvidence": null,
+    "initialCandidates": [
+      {
+        "abv": null,
+        "brand": "William Cadenhead's",
+        "score": 95.37506,
+        "series": null,
+        "source": ["text", "context", "brand_coverage"],
+        "bottler": null,
+        "edition": null,
+        "outturn": null,
+        "bottleId": 19118,
+        "category": "single_malt",
+        "fullName": "Cadenhead's 11-year-old (distilled at Rosebank)",
+        "reference": null,
+        "statedAge": 11,
+        "caskNumber": null,
+        "comparison": {
+          "missing": ["abv"],
+          "conflicts": [],
+          "agreements": []
+        },
+        "distillery": ["Rosebank"],
+        "maturation": null,
+        "releaseDay": null,
+        "singleCask": null,
+        "releaseYear": null,
+        "vintageYear": null,
+        "bottlingYear": null,
+        "caskStrength": null,
+        "releaseMonth": null,
+        "familyContext": {
+          "siblingBottles": []
+        }
+      },
+      {
+        "abv": null,
+        "brand": "William Cadenhead's",
+        "score": 69.590164,
+        "series": null,
+        "source": ["vector", "text"],
+        "bottler": "William Cadenhead's",
+        "edition": null,
+        "outturn": null,
+        "bottleId": 16774,
+        "category": "single_malt",
+        "fullName": "Cadenhead's 11-year-old (distilled at Bowmore)",
+        "reference": "Cadenhead's 11-year-old (distilled at Bowmore), 57.5%",
+        "statedAge": 11,
+        "caskNumber": null,
+        "comparison": {
+          "missing": ["abv"],
+          "conflicts": [],
+          "agreements": []
+        },
+        "distillery": ["Bowmore"],
+        "maturation": null,
+        "releaseDay": null,
+        "singleCask": null,
+        "releaseYear": null,
+        "vintageYear": null,
+        "bottlingYear": null,
+        "caskStrength": null,
+        "releaseMonth": null,
+        "familyContext": {
+          "siblingBottles": []
+        }
+      },
+      {
+        "abv": null,
+        "brand": "William Cadenhead's",
+        "score": 67.643005,
+        "series": null,
+        "source": ["text"],
+        "bottler": "William Cadenhead's",
+        "edition": "150th Anniversary",
+        "outturn": null,
+        "bottleId": 5461,
+        "category": "single_malt",
+        "fullName": "Cadenhead's Ardbeg 1974 18-year-old - 150th Anniversary",
+        "reference": null,
+        "statedAge": 18,
+        "caskNumber": null,
+        "comparison": {
+          "missing": ["abv"],
+          "conflicts": [],
+          "agreements": []
+        },
+        "distillery": ["Ardbeg"],
+        "maturation": null,
+        "releaseDay": null,
+        "singleCask": null,
+        "releaseYear": 1992,
+        "vintageYear": 1974,
+        "bottlingYear": 1992,
+        "caskStrength": null,
+        "releaseMonth": null,
+        "familyContext": {
+          "siblingBottles": []
+        }
+      },
+      {
+        "abv": null,
+        "brand": "William Cadenhead's",
+        "score": 61.0774,
+        "series": null,
+        "source": ["vector", "text"],
+        "bottler": "William Cadenhead's",
+        "edition": null,
+        "outturn": null,
+        "bottleId": 41266,
+        "category": "single_malt",
+        "fullName": "Cadenhead's 11-year-old (dstilled at Royal Brackla)",
+        "reference": "Cadenheads 11-year-old Royal Brackla",
+        "statedAge": 11,
+        "caskNumber": null,
+        "comparison": {
+          "missing": ["abv"],
+          "conflicts": [],
+          "agreements": []
+        },
+        "distillery": ["Royal Brackla"],
+        "maturation": null,
+        "releaseDay": null,
+        "singleCask": null,
+        "releaseYear": null,
+        "vintageYear": null,
+        "bottlingYear": null,
+        "caskStrength": null,
+        "releaseMonth": null,
+        "familyContext": {
+          "siblingBottles": []
+        }
+      },
+      {
+        "abv": 46,
+        "brand": "William Cadenhead's",
+        "score": 57.294304,
+        "series": "Duthies",
+        "source": ["text"],
+        "bottler": "William Cadenhead's",
+        "edition": null,
+        "outturn": 354,
+        "bottleId": 61285,
+        "category": "single_malt",
+        "fullName": "Cadenhead's Dalmore 11-year-old",
+        "reference": null,
+        "statedAge": 11,
+        "caskNumber": null,
+        "comparison": {
+          "missing": ["vintageYear", "edition"],
+          "conflicts": ["abv", "distillers"],
+          "agreements": ["category", "statedAge", "brand", "bottler"]
+        },
+        "distillery": ["The Dalmore"],
+        "maturation": null,
+        "releaseDay": null,
+        "singleCask": null,
+        "releaseYear": null,
+        "vintageYear": null,
+        "bottlingYear": null,
+        "caskStrength": null,
+        "releaseMonth": null,
+        "familyContext": {
+          "siblingBottles": []
+        }
+      },
+      {
+        "abv": null,
+        "brand": "Jack Daniel's",
+        "score": 52.124542,
+        "series": null,
+        "source": ["text"],
+        "bottler": null,
+        "edition": null,
+        "outturn": null,
+        "bottleId": 15896,
+        "category": "bourbon",
+        "fullName": "Jack Daniel's 150th Anniversary",
+        "reference": null,
+        "statedAge": null,
+        "caskNumber": null,
+        "comparison": {
+          "missing": ["abv"],
+          "conflicts": [],
+          "agreements": []
+        },
+        "distillery": ["Jack Daniel Distillery"],
+        "maturation": null,
+        "releaseDay": null,
+        "singleCask": null,
+        "releaseYear": null,
+        "vintageYear": null,
+        "bottlingYear": null,
+        "caskStrength": null,
+        "releaseMonth": null,
+        "familyContext": {
+          "siblingBottles": []
+        }
+      },
+      {
+        "abv": null,
+        "brand": "Grand Macnish",
+        "score": 51.57435,
+        "series": null,
+        "source": ["text"],
+        "bottler": null,
+        "edition": null,
+        "outturn": null,
+        "bottleId": 16614,
+        "category": "blend",
+        "fullName": "Grand Macnish 150th Anniversary Edition",
+        "reference": null,
+        "statedAge": null,
+        "caskNumber": null,
+        "comparison": {
+          "missing": ["abv"],
+          "conflicts": [],
+          "agreements": []
+        },
+        "distillery": [],
+        "maturation": null,
+        "releaseDay": null,
+        "singleCask": null,
+        "releaseYear": null,
+        "vintageYear": null,
+        "bottlingYear": null,
+        "caskStrength": null,
+        "releaseMonth": null,
+        "familyContext": {
+          "siblingBottles": []
+        }
+      },
+      {
+        "abv": null,
+        "brand": "Murray McDavid",
+        "score": 51.47796,
+        "series": null,
+        "source": ["text"],
+        "bottler": null,
+        "edition": null,
+        "outturn": null,
+        "bottleId": 18994,
+        "category": "single_malt",
+        "fullName": "Murray McDavid 1992, 10-year-old (distilled at Rosebank)",
+        "reference": null,
+        "statedAge": 10,
+        "caskNumber": null,
+        "comparison": {
+          "missing": [
+            "abv",
+            "vintageYear",
+            "releaseYear",
+            "caskStrength",
+            "edition",
+            "bottler",
+            "distillers"
+          ],
+          "conflicts": ["statedAge", "brand"],
+          "agreements": ["category"]
+        },
+        "distillery": [],
+        "maturation": null,
+        "releaseDay": null,
+        "singleCask": null,
+        "releaseYear": null,
+        "vintageYear": null,
+        "bottlingYear": null,
+        "caskStrength": null,
+        "releaseMonth": null,
+        "familyContext": {
+          "siblingBottles": []
+        }
+      },
+      {
+        "abv": null,
+        "brand": "Early Times",
+        "score": 50.511375,
+        "series": null,
+        "source": ["text"],
+        "bottler": null,
+        "edition": null,
+        "outturn": null,
+        "bottleId": 17504,
+        "category": null,
+        "fullName": "Early Times Kentucky Whisky (150th Anniversary Edition)",
+        "reference": null,
+        "statedAge": null,
+        "caskNumber": null,
+        "comparison": {
+          "missing": ["abv"],
+          "conflicts": [],
+          "agreements": []
+        },
+        "distillery": [],
+        "maturation": null,
+        "releaseDay": null,
+        "singleCask": null,
+        "releaseYear": null,
+        "vintageYear": null,
+        "bottlingYear": null,
+        "caskStrength": null,
+        "releaseMonth": null,
+        "familyContext": {
+          "siblingBottles": []
+        }
+      },
+      {
+        "abv": null,
+        "brand": "Rosebank",
+        "score": 47.10965,
+        "series": null,
+        "source": ["text"],
+        "bottler": null,
+        "edition": null,
+        "outturn": null,
+        "bottleId": 4162,
+        "category": "single_malt",
+        "fullName": "Rosebank 1992 Diageo Special Releases 2014",
+        "reference": null,
+        "statedAge": 22,
+        "caskNumber": null,
+        "comparison": {
+          "missing": [
+            "abv",
+            "vintageYear",
+            "releaseYear",
+            "caskStrength",
+            "edition",
+            "bottler"
+          ],
+          "conflicts": ["statedAge", "brand"],
+          "agreements": ["category", "distillers"]
+        },
+        "distillery": ["Rosebank"],
+        "maturation": null,
+        "releaseDay": null,
+        "singleCask": null,
+        "releaseYear": null,
+        "vintageYear": null,
+        "bottlingYear": null,
+        "caskStrength": null,
+        "releaseMonth": null,
+        "familyContext": {
+          "siblingBottles": []
+        }
+      },
+      {
+        "abv": null,
+        "brand": "Benrinnes",
+        "score": 46.0412,
+        "series": null,
+        "source": ["text"],
+        "bottler": "William Cadenhead's",
+        "edition": null,
+        "outturn": null,
+        "bottleId": 1644,
+        "category": "single_malt",
+        "fullName": "Benrinnes 11-year-old Original Collection",
+        "reference": null,
+        "statedAge": 11,
+        "caskNumber": null,
+        "comparison": {
+          "missing": ["abv", "vintageYear", "edition"],
+          "conflicts": ["brand", "distillers"],
+          "agreements": ["category", "statedAge", "bottler"]
+        },
+        "distillery": ["Benrinnes"],
+        "maturation": null,
+        "releaseDay": null,
+        "singleCask": null,
+        "releaseYear": null,
+        "vintageYear": null,
+        "bottlingYear": null,
+        "caskStrength": null,
+        "releaseMonth": null,
+        "familyContext": {
+          "siblingBottles": []
+        }
+      },
+      {
+        "abv": null,
+        "brand": "William Heavenhill",
+        "score": 44.30684,
+        "series": null,
+        "source": ["text"],
+        "bottler": null,
+        "edition": null,
+        "outturn": null,
+        "bottleId": 17747,
+        "category": "bourbon",
+        "fullName": "William Heavenhill 225th Anniversary Edition",
+        "reference": null,
+        "statedAge": null,
+        "caskNumber": null,
+        "comparison": {
+          "missing": [
+            "statedAge",
+            "abv",
+            "vintageYear",
+            "edition",
+            "bottler",
+            "distillers"
+          ],
+          "conflicts": ["category", "brand"],
+          "agreements": []
+        },
+        "distillery": [],
+        "maturation": null,
+        "releaseDay": null,
+        "singleCask": null,
+        "releaseYear": null,
+        "vintageYear": null,
+        "bottlingYear": null,
+        "caskStrength": null,
+        "releaseMonth": null,
+        "familyContext": {
+          "siblingBottles": []
+        }
+      },
+      {
+        "abv": 52.3,
+        "brand": "William Cadenhead's",
+        "score": 43.61048,
+        "series": "Authentic Collection",
+        "source": ["text", "brand_coverage"],
+        "bottler": "William Cadenhead's",
+        "edition": null,
+        "outturn": 210,
+        "bottleId": 52809,
+        "category": "single_malt",
+        "fullName": "Cadenhead's Caol Ila 1980",
+        "reference": null,
+        "statedAge": 36,
+        "caskNumber": null,
+        "comparison": {
+          "missing": [],
+          "conflicts": ["distillers"],
+          "agreements": ["category", "vintageYear", "brand", "bottler"]
+        },
+        "distillery": ["Caol Ila"],
+        "maturation": "Bourbon hogshead",
+        "releaseDay": null,
+        "singleCask": true,
+        "releaseYear": 2016,
+        "vintageYear": 1980,
+        "bottlingYear": 2016,
+        "caskStrength": null,
+        "releaseMonth": 7,
+        "familyContext": {
+          "siblingBottles": []
+        }
+      },
+      {
+        "abv": 60.5,
+        "brand": "William Cadenhead's",
+        "score": 42.53627,
+        "series": null,
+        "source": ["text", "brand_coverage"],
+        "bottler": "William Cadenhead's",
+        "edition": null,
+        "outturn": null,
+        "bottleId": 60730,
+        "category": "single_malt",
+        "fullName": "Cadenhead's Allt-a-Bhainne 1980",
+        "reference": null,
+        "statedAge": null,
+        "caskNumber": "100027",
+        "comparison": {
+          "missing": [],
+          "conflicts": ["distillers"],
+          "agreements": ["category", "vintageYear", "brand", "bottler"]
+        },
+        "distillery": ["Allt-a-Bhainne"],
+        "maturation": "sherry cask",
+        "releaseDay": null,
+        "singleCask": true,
+        "releaseYear": null,
+        "vintageYear": 1980,
+        "bottlingYear": null,
+        "caskStrength": true,
+        "releaseMonth": null,
+        "familyContext": {
+          "siblingBottles": []
+        }
+      },
+      {
+        "abv": null,
+        "brand": "Old Forester",
+        "score": 42.2911,
+        "series": null,
+        "source": ["text"],
+        "bottler": null,
+        "edition": null,
+        "outturn": null,
+        "bottleId": 13214,
+        "category": "bourbon",
+        "fullName": "Old Forester 150th Anniversary Kentucky Straight (Batch 03/03) (Batch Proof)",
+        "reference": null,
+        "statedAge": null,
+        "caskNumber": null,
+        "comparison": {
+          "missing": ["abv"],
+          "conflicts": [],
+          "agreements": []
+        },
+        "distillery": [],
+        "maturation": null,
+        "releaseDay": null,
+        "singleCask": null,
+        "releaseYear": null,
+        "vintageYear": null,
+        "bottlingYear": null,
+        "caskStrength": null,
+        "releaseMonth": null,
+        "familyContext": {
+          "siblingBottles": []
+        }
+      },
+      {
+        "abv": null,
+        "brand": "Old Forester",
+        "score": 41.059532,
+        "series": null,
+        "source": ["text"],
+        "bottler": null,
+        "edition": null,
+        "outturn": null,
+        "bottleId": 13212,
+        "category": "bourbon",
+        "fullName": "Old Forester 150th Anniversary Kentucky Straight Bourbon (Batch 02/03) (Batch Proof)",
+        "reference": null,
+        "statedAge": null,
+        "caskNumber": null,
+        "comparison": {
+          "missing": ["abv"],
+          "conflicts": [],
+          "agreements": []
+        },
+        "distillery": [],
+        "maturation": null,
+        "releaseDay": null,
+        "singleCask": null,
+        "releaseYear": null,
+        "vintageYear": null,
+        "bottlingYear": null,
+        "caskStrength": null,
+        "releaseMonth": null,
+        "familyContext": {
+          "siblingBottles": []
+        }
+      },
+      {
+        "abv": null,
+        "brand": "Old Forester",
+        "score": 40.789528,
+        "series": null,
+        "source": ["text"],
+        "bottler": null,
+        "edition": null,
+        "outturn": null,
+        "bottleId": 13211,
+        "category": "bourbon",
+        "fullName": "Old Forester 150th Anniversary Kentucky Straight Bourbon (Batch 01/03) (Batch Proof)",
+        "reference": null,
+        "statedAge": null,
+        "caskNumber": null,
+        "comparison": {
+          "missing": ["abv"],
+          "conflicts": [],
+          "agreements": []
+        },
+        "distillery": [],
+        "maturation": null,
+        "releaseDay": null,
+        "singleCask": null,
+        "releaseYear": null,
+        "vintageYear": null,
+        "bottlingYear": null,
+        "caskStrength": null,
+        "releaseMonth": null,
+        "familyContext": {
+          "siblingBottles": []
+        }
+      },
+      {
+        "abv": null,
+        "brand": "Rosebank",
+        "score": 39.387302,
+        "series": null,
+        "source": ["text"],
+        "bottler": "William Cadenhead's",
+        "edition": null,
+        "outturn": null,
+        "bottleId": 4695,
+        "category": "single_malt",
+        "fullName": "Rosebank 1989 CA Closed Distilleries",
+        "reference": null,
+        "statedAge": 30,
+        "caskNumber": null,
+        "comparison": {
+          "missing": ["abv"],
+          "conflicts": [],
+          "agreements": []
+        },
+        "distillery": ["Rosebank"],
+        "maturation": null,
+        "releaseDay": null,
+        "singleCask": null,
+        "releaseYear": null,
+        "vintageYear": null,
+        "bottlingYear": null,
+        "caskStrength": null,
+        "releaseMonth": null,
+        "familyContext": {
+          "siblingBottles": []
+        }
+      },
+      {
+        "abv": 60.1,
+        "brand": "William Cadenhead's",
+        "score": 36.077534,
+        "series": "Chairman's Stock",
+        "source": ["text"],
+        "bottler": "William Cadenhead's",
+        "edition": null,
+        "outturn": null,
+        "bottleId": 47330,
+        "category": "single_malt",
+        "fullName": "Cadenhead's Ardnamurchan 2019",
+        "reference": null,
+        "statedAge": 5,
+        "caskNumber": null,
+        "comparison": {
+          "missing": [],
+          "conflicts": [],
+          "agreements": ["abv"]
+        },
+        "distillery": ["Ardnamurchan"],
+        "maturation": "oloroso",
+        "releaseDay": null,
+        "singleCask": null,
+        "releaseYear": 2025,
+        "vintageYear": 2019,
+        "bottlingYear": null,
+        "caskStrength": null,
+        "releaseMonth": null,
+        "familyContext": {
+          "siblingBottles": []
+        }
+      },
+      {
+        "abv": null,
+        "brand": "Flora & Fauna",
+        "score": 35.96382,
+        "series": null,
+        "source": ["text"],
+        "bottler": null,
+        "edition": null,
+        "outturn": null,
+        "bottleId": 5189,
+        "category": "single_malt",
+        "fullName": "Flora & Fauna Rosebank 12-year-old",
+        "reference": null,
+        "statedAge": 12,
+        "caskNumber": null,
+        "comparison": {
+          "missing": ["abv"],
+          "conflicts": [],
+          "agreements": []
+        },
+        "distillery": ["Rosebank"],
+        "maturation": null,
+        "releaseDay": null,
+        "singleCask": null,
+        "releaseYear": null,
+        "vintageYear": null,
+        "bottlingYear": null,
+        "caskStrength": null,
+        "releaseMonth": null,
+        "familyContext": {
+          "siblingBottles": []
+        }
+      },
+      {
+        "abv": null,
+        "brand": "William Cadenhead's",
+        "score": 34.799313,
+        "series": null,
+        "source": ["text"],
+        "bottler": null,
+        "edition": null,
+        "outturn": null,
+        "bottleId": 16213,
+        "category": "single_malt",
+        "fullName": "Cadenhead's 1984 (distilled at Caol Ila)",
+        "reference": null,
+        "statedAge": 36,
+        "caskNumber": null,
+        "comparison": {
+          "missing": ["vintageYear", "bottler", "distillers"],
+          "conflicts": [],
+          "agreements": ["category", "brand"]
+        },
+        "distillery": [],
+        "maturation": null,
+        "releaseDay": null,
+        "singleCask": null,
+        "releaseYear": null,
+        "vintageYear": null,
+        "bottlingYear": null,
+        "caskStrength": null,
+        "releaseMonth": null,
+        "familyContext": {
+          "siblingBottles": []
+        }
+      },
+      {
+        "abv": null,
+        "brand": "Rosebank",
+        "score": 34.374123,
+        "series": null,
+        "source": ["vector", "text"],
+        "bottler": null,
+        "edition": null,
+        "outturn": null,
+        "bottleId": 12877,
+        "category": "single_malt",
+        "fullName": "Rosebank 30-year-old 1990 (Release 1)",
+        "reference": "Rosebank 30-year-old 1990 (Release 1), 48.6%",
+        "statedAge": 30,
+        "caskNumber": null,
+        "comparison": {
+          "missing": ["abv"],
+          "conflicts": [],
+          "agreements": []
+        },
+        "distillery": ["Rosebank"],
+        "maturation": null,
+        "releaseDay": null,
+        "singleCask": null,
+        "releaseYear": null,
+        "vintageYear": null,
+        "bottlingYear": null,
+        "caskStrength": null,
+        "releaseMonth": null,
+        "familyContext": {
+          "siblingBottles": []
+        }
+      },
+      {
+        "abv": null,
+        "brand": "William Cadenhead's",
+        "score": 34.27745,
+        "series": null,
+        "source": ["vector", "text"],
+        "bottler": null,
+        "edition": null,
+        "outturn": null,
+        "bottleId": 16229,
+        "category": "single_malt",
+        "fullName": "Cadenhead's 1989 (distilled at Linkwood)",
+        "reference": "Cadenhead's (distilled at Linkwood) 1989, 51.1%",
+        "statedAge": null,
+        "caskNumber": null,
+        "comparison": {
+          "missing": [
+            "statedAge",
+            "abv",
+            "vintageYear",
+            "edition",
+            "bottler",
+            "distillers"
+          ],
+          "conflicts": [],
+          "agreements": ["category", "brand"]
+        },
+        "distillery": [],
+        "maturation": null,
+        "releaseDay": null,
+        "singleCask": null,
+        "releaseYear": null,
+        "vintageYear": null,
+        "bottlingYear": null,
+        "caskStrength": null,
+        "releaseMonth": null,
+        "familyContext": {
+          "siblingBottles": []
+        }
+      },
+      {
+        "abv": null,
+        "brand": "William Cadenhead's",
+        "score": 34.27745,
+        "series": null,
+        "source": ["vector", "text"],
+        "bottler": null,
+        "edition": null,
+        "outturn": null,
+        "bottleId": 16222,
+        "category": "single_malt",
+        "fullName": "Cadenhead's 1996 (distilled at Dailuaine)",
+        "reference": "Cadenhead's (distilled at Dailuaine) 1996, 57.5%",
+        "statedAge": null,
+        "caskNumber": null,
+        "comparison": {
+          "missing": [
+            "statedAge",
+            "abv",
+            "vintageYear",
+            "edition",
+            "bottler",
+            "distillers"
+          ],
+          "conflicts": [],
+          "agreements": ["category", "brand"]
+        },
+        "distillery": [],
+        "maturation": null,
+        "releaseDay": null,
+        "singleCask": null,
+        "releaseYear": null,
+        "vintageYear": null,
+        "bottlingYear": null,
+        "caskStrength": null,
+        "releaseMonth": null,
+        "familyContext": {
+          "siblingBottles": []
+        }
+      },
+      {
+        "abv": null,
+        "brand": "William Cadenhead's",
+        "score": 34.27745,
+        "series": null,
+        "source": ["vector", "text"],
+        "bottler": null,
+        "edition": null,
+        "outturn": null,
+        "bottleId": 16172,
+        "category": "single_malt",
+        "fullName": "Cadenhead's 1989 (distilled at Glentauchers)",
+        "reference": "Cadenhead's (distilled at Glentauchers) 1989, 55.2%",
+        "statedAge": null,
+        "caskNumber": null,
+        "comparison": {
+          "missing": ["vintageYear", "bottler", "distillers"],
+          "conflicts": [],
+          "agreements": ["category", "brand"]
+        },
+        "distillery": [],
+        "maturation": null,
+        "releaseDay": null,
+        "singleCask": null,
+        "releaseYear": null,
+        "vintageYear": null,
+        "bottlingYear": null,
+        "caskStrength": null,
+        "releaseMonth": null,
+        "familyContext": {
+          "siblingBottles": []
+        }
+      },
+      {
+        "abv": null,
+        "brand": "William Cadenhead's",
+        "score": 34.27745,
+        "series": null,
+        "source": ["vector", "text"],
+        "bottler": null,
+        "edition": null,
+        "outturn": null,
+        "bottleId": 16224,
+        "category": "single_malt",
+        "fullName": "Cadenhead's 1996 (distilled at BenRiach)",
+        "reference": "Cadenhead's (distilled at BenRiach) 1996, 46.5%",
+        "statedAge": null,
+        "caskNumber": null,
+        "comparison": {
+          "missing": ["vintageYear", "bottler", "distillers"],
+          "conflicts": [],
+          "agreements": ["category", "brand"]
+        },
+        "distillery": [],
+        "maturation": null,
+        "releaseDay": null,
+        "singleCask": null,
+        "releaseYear": null,
+        "vintageYear": null,
+        "bottlingYear": null,
+        "caskStrength": null,
+        "releaseMonth": null,
+        "familyContext": {
+          "siblingBottles": []
+        }
+      },
+      {
+        "abv": null,
+        "brand": "William Cadenhead's",
+        "score": 34.27745,
+        "series": null,
+        "source": ["text"],
+        "bottler": null,
+        "edition": null,
+        "outturn": null,
+        "bottleId": 16215,
+        "category": "single_malt",
+        "fullName": "Cadenhead's 2005 (distilled at Bunnahabhain)",
+        "reference": null,
+        "statedAge": null,
+        "caskNumber": null,
+        "comparison": {
+          "missing": ["vintageYear", "bottler", "distillers"],
+          "conflicts": [],
+          "agreements": ["category", "brand"]
+        },
+        "distillery": [],
+        "maturation": null,
+        "releaseDay": null,
+        "singleCask": null,
+        "releaseYear": null,
+        "vintageYear": null,
+        "bottlingYear": null,
+        "caskStrength": null,
+        "releaseMonth": null,
+        "familyContext": {
+          "siblingBottles": []
+        }
+      },
+      {
+        "abv": null,
+        "brand": "Highland Park",
+        "score": 34.13404,
+        "series": null,
+        "source": ["text"],
+        "bottler": null,
+        "edition": null,
+        "outturn": null,
+        "bottleId": 18658,
+        "category": "single_malt",
+        "fullName": "Highland Park 24-year-old 1980 vintage - 1980 Vintage",
+        "reference": null,
+        "statedAge": 24,
+        "caskNumber": null,
+        "comparison": {
+          "missing": ["bottler"],
+          "conflicts": ["brand", "distillers"],
+          "agreements": ["category", "vintageYear"]
+        },
+        "distillery": ["Highland Park"],
+        "maturation": null,
+        "releaseDay": null,
+        "singleCask": null,
+        "releaseYear": null,
+        "vintageYear": 1980,
+        "bottlingYear": null,
+        "caskStrength": null,
+        "releaseMonth": null,
+        "familyContext": {
+          "siblingBottles": []
+        }
+      },
+      {
+        "abv": null,
+        "brand": "William Cadenhead's",
+        "score": 34.1158,
+        "series": null,
+        "source": ["vector", "text"],
+        "bottler": null,
+        "edition": null,
+        "outturn": null,
+        "bottleId": 19192,
+        "category": "single_malt",
+        "fullName": "Cadenhead's 1989 (distilled at Littlemill)",
+        "reference": "Cadenhead's, (distilled at Littlemill), 1989, 61.6%",
+        "statedAge": null,
+        "caskNumber": null,
+        "comparison": {
+          "missing": [
+            "statedAge",
+            "abv",
+            "vintageYear",
+            "edition",
+            "bottler",
+            "distillers"
+          ],
+          "conflicts": [],
+          "agreements": ["category", "brand"]
+        },
+        "distillery": [],
+        "maturation": null,
+        "releaseDay": null,
+        "singleCask": null,
+        "releaseYear": null,
+        "vintageYear": null,
+        "bottlingYear": null,
+        "caskStrength": null,
+        "releaseMonth": null,
+        "familyContext": {
+          "siblingBottles": []
+        }
+      },
+      {
+        "abv": 43,
+        "brand": "The Macallan",
+        "score": 32.773483,
+        "series": "Sherry Oak Collection",
+        "source": ["text"],
+        "bottler": null,
+        "edition": "1980 Vintage",
+        "outturn": null,
+        "bottleId": 5396,
+        "category": "single_malt",
+        "fullName": "The Macallan Sherry Oak - 1980 Vintage",
+        "reference": null,
+        "statedAge": 18,
+        "caskNumber": null,
+        "comparison": {
+          "missing": ["bottler"],
+          "conflicts": ["brand", "distillers"],
+          "agreements": ["category", "vintageYear"]
+        },
+        "distillery": ["The Macallan"],
+        "maturation": "Sherry seasoned oak casks",
+        "releaseDay": null,
+        "singleCask": false,
+        "releaseYear": null,
+        "vintageYear": 1980,
+        "bottlingYear": null,
+        "caskStrength": null,
+        "releaseMonth": null,
+        "familyContext": {
+          "siblingBottles": []
+        }
+      },
+      {
+        "abv": null,
+        "brand": "William Cadenhead's",
+        "score": 32.420444,
+        "series": null,
+        "source": ["vector", "text"],
+        "bottler": null,
+        "edition": null,
+        "outturn": null,
+        "bottleId": 16216,
+        "category": "single_malt",
+        "fullName": "Cadenhead's 2000 (distilled at Caol lla)",
+        "reference": "Cadenhead's (distilled at Caol lla) 2000, 54.4%",
+        "statedAge": null,
+        "caskNumber": null,
+        "comparison": {
+          "missing": ["vintageYear", "bottler", "distillers"],
+          "conflicts": [],
+          "agreements": ["category", "brand"]
+        },
+        "distillery": [],
+        "maturation": null,
+        "releaseDay": null,
+        "singleCask": null,
+        "releaseYear": null,
+        "vintageYear": null,
+        "bottlingYear": null,
+        "caskStrength": null,
+        "releaseMonth": null,
+        "familyContext": {
+          "siblingBottles": []
+        }
+      },
+      {
+        "abv": null,
+        "brand": "William Cadenhead's",
+        "score": 32.25107,
+        "series": null,
+        "source": ["vector", "text"],
+        "bottler": null,
+        "edition": null,
+        "outturn": null,
+        "bottleId": 19158,
+        "category": "single_malt",
+        "fullName": "Cadenhead's 1989 (distilled at Blair Athol)",
+        "reference": "Cadenhead's, (distilled at Blair Athol), 1989, 58.1%",
+        "statedAge": null,
+        "caskNumber": null,
+        "comparison": {
+          "missing": [
+            "statedAge",
+            "abv",
+            "vintageYear",
+            "edition",
+            "bottler",
+            "distillers"
+          ],
+          "conflicts": [],
+          "agreements": ["category", "brand"]
+        },
+        "distillery": [],
+        "maturation": null,
+        "releaseDay": null,
+        "singleCask": null,
+        "releaseYear": null,
+        "vintageYear": null,
+        "bottlingYear": null,
+        "caskStrength": null,
+        "releaseMonth": null,
+        "familyContext": {
+          "siblingBottles": []
+        }
+      },
+      {
+        "abv": 40,
+        "brand": "The Dalmore",
+        "score": 31.22055,
+        "series": null,
+        "source": ["text"],
+        "bottler": null,
+        "edition": null,
+        "outturn": null,
+        "bottleId": 61045,
+        "category": "single_malt",
+        "fullName": "Dalmore 1980 Rare Vintage",
+        "reference": null,
+        "statedAge": null,
+        "caskNumber": null,
+        "comparison": {
+          "missing": ["bottler"],
+          "conflicts": ["brand", "distillers"],
+          "agreements": ["category", "vintageYear"]
+        },
+        "distillery": ["The Dalmore"],
+        "maturation": null,
+        "releaseDay": null,
+        "singleCask": null,
+        "releaseYear": null,
+        "vintageYear": 1980,
+        "bottlingYear": 2009,
+        "caskStrength": null,
+        "releaseMonth": null,
+        "familyContext": {
+          "siblingBottles": []
+        }
+      },
+      {
+        "abv": null,
+        "brand": "William Cadenhead's",
+        "score": 30.475645,
+        "series": null,
+        "source": ["text"],
+        "bottler": "William Cadenhead's",
+        "edition": null,
+        "outturn": null,
+        "bottleId": 16843,
+        "category": "single_malt",
+        "fullName": "Cadenhead's 17-year-old (distilled at Glendullan)",
+        "reference": null,
+        "statedAge": 17,
+        "caskNumber": null,
+        "comparison": {
+          "missing": ["vintageYear"],
+          "conflicts": ["distillers"],
+          "agreements": ["category", "brand", "bottler"]
+        },
+        "distillery": ["Glendullan"],
+        "maturation": null,
+        "releaseDay": null,
+        "singleCask": null,
+        "releaseYear": null,
+        "vintageYear": null,
+        "bottlingYear": null,
+        "caskStrength": null,
+        "releaseMonth": null,
+        "familyContext": {
+          "siblingBottles": []
+        }
+      },
+      {
+        "abv": null,
+        "brand": "William Cadenhead's",
+        "score": 30.399624,
+        "series": null,
+        "source": ["vector", "text"],
+        "bottler": "William Cadenhead's",
+        "edition": null,
+        "outturn": null,
+        "bottleId": 19152,
+        "category": "single_malt",
+        "fullName": "Cadenhead's 12-year-old (distilled at Glenlivet)",
+        "reference": "Cadenhead's (distilled at Glenlivet) 12-year-old, 60.5%",
+        "statedAge": 12,
+        "caskNumber": null,
+        "comparison": {
+          "missing": ["abv"],
+          "conflicts": [],
+          "agreements": []
+        },
+        "distillery": ["The Glenlivet"],
+        "maturation": null,
+        "releaseDay": null,
+        "singleCask": null,
+        "releaseYear": null,
+        "vintageYear": null,
+        "bottlingYear": null,
+        "caskStrength": null,
+        "releaseMonth": null,
+        "familyContext": {
+          "siblingBottles": []
+        }
+      },
+      {
+        "abv": 43,
+        "brand": "Signatory Vintage",
+        "score": 29.8111,
+        "series": null,
+        "source": ["text"],
+        "bottler": "Signatory Vintage",
+        "edition": null,
+        "outturn": null,
+        "bottleId": 65993,
+        "category": "single_malt",
+        "fullName": "Signatory Vintage Clynelish 1980",
+        "reference": null,
+        "statedAge": 15,
+        "caskNumber": "1271",
+        "comparison": {
+          "missing": [],
+          "conflicts": ["brand", "bottler", "distillers"],
+          "agreements": ["category", "vintageYear"]
+        },
+        "distillery": ["Clynelish"],
+        "maturation": null,
+        "releaseDay": null,
+        "singleCask": null,
+        "releaseYear": null,
+        "vintageYear": 1980,
+        "bottlingYear": 1995,
+        "caskStrength": null,
+        "releaseMonth": null,
+        "familyContext": {
+          "siblingBottles": []
+        }
+      },
+      {
+        "abv": null,
+        "brand": "Scott's Selection",
+        "score": 29.461597,
+        "series": null,
+        "source": ["text"],
+        "bottler": null,
+        "edition": null,
+        "outturn": null,
+        "bottleId": 18224,
+        "category": "single_malt",
+        "fullName": "Scott's Selection 1980 Vintage (distilled at Glen Elgin)",
+        "reference": null,
+        "statedAge": null,
+        "caskNumber": null,
+        "comparison": {
+          "missing": ["bottler", "distillers"],
+          "conflicts": ["brand"],
+          "agreements": ["category", "vintageYear"]
+        },
+        "distillery": [],
+        "maturation": null,
+        "releaseDay": null,
+        "singleCask": null,
+        "releaseYear": null,
+        "vintageYear": 1980,
+        "bottlingYear": null,
+        "caskStrength": null,
+        "releaseMonth": null,
+        "familyContext": {
+          "siblingBottles": []
+        }
+      },
+      {
+        "abv": null,
+        "brand": "William Cadenhead's",
+        "score": 28.975971,
+        "series": null,
+        "source": ["text"],
+        "bottler": "William Cadenhead's",
+        "edition": null,
+        "outturn": null,
+        "bottleId": 16831,
+        "category": "single_malt",
+        "fullName": "Cadenhead's 22-year-old (distilled at Caol Ila)",
+        "reference": null,
+        "statedAge": 22,
+        "caskNumber": null,
+        "comparison": {
+          "missing": ["vintageYear"],
+          "conflicts": ["distillers"],
+          "agreements": ["category", "brand", "bottler"]
+        },
+        "distillery": ["Caol Ila"],
+        "maturation": null,
+        "releaseDay": null,
+        "singleCask": null,
+        "releaseYear": null,
+        "vintageYear": null,
+        "bottlingYear": null,
+        "caskStrength": null,
+        "releaseMonth": null,
+        "familyContext": {
+          "siblingBottles": []
+        }
+      },
+      {
+        "abv": null,
+        "brand": "William Cadenhead's",
+        "score": 28.975971,
+        "series": null,
+        "source": ["text"],
+        "bottler": "William Cadenhead's",
+        "edition": null,
+        "outturn": null,
+        "bottleId": 16828,
+        "category": "single_malt",
+        "fullName": "Cadenhead's 29-year-old (distilled at Caol Ila)",
+        "reference": null,
+        "statedAge": 29,
+        "caskNumber": null,
+        "comparison": {
+          "missing": ["vintageYear"],
+          "conflicts": ["distillers"],
+          "agreements": ["category", "brand", "bottler"]
+        },
+        "distillery": ["Caol Ila"],
+        "maturation": null,
+        "releaseDay": null,
+        "singleCask": null,
+        "releaseYear": null,
+        "vintageYear": null,
+        "bottlingYear": null,
+        "caskStrength": null,
+        "releaseMonth": null,
+        "familyContext": {
+          "siblingBottles": []
+        }
+      },
+      {
+        "abv": null,
+        "brand": "William Cadenhead's",
+        "score": 28.905079,
+        "series": null,
+        "source": ["text"],
+        "bottler": "William Cadenhead's",
+        "edition": null,
+        "outturn": null,
+        "bottleId": 16839,
+        "category": "single_malt",
+        "fullName": "Cadenhead's 15-year-old (distilled at Glen Grant)",
+        "reference": null,
+        "statedAge": 15,
+        "caskNumber": null,
+        "comparison": {
+          "missing": ["vintageYear"],
+          "conflicts": ["distillers"],
+          "agreements": ["category", "brand", "bottler"]
+        },
+        "distillery": ["The Glen Grant"],
+        "maturation": null,
+        "releaseDay": null,
+        "singleCask": null,
+        "releaseYear": null,
+        "vintageYear": null,
+        "bottlingYear": null,
+        "caskStrength": null,
+        "releaseMonth": null,
+        "familyContext": {
+          "siblingBottles": []
+        }
+      },
+      {
+        "abv": null,
+        "brand": "William Cadenhead's",
+        "score": 28.832363,
+        "series": null,
+        "source": ["text"],
+        "bottler": "William Cadenhead's",
+        "edition": null,
+        "outturn": null,
+        "bottleId": 16841,
+        "category": "single_malt",
+        "fullName": "Cadenhead's 12-year-old (distilled at Auchroisk)",
+        "reference": null,
+        "statedAge": 12,
+        "caskNumber": null,
+        "comparison": {
+          "missing": ["vintageYear"],
+          "conflicts": ["distillers"],
+          "agreements": ["category", "brand", "bottler"]
+        },
+        "distillery": ["Auchroisk"],
+        "maturation": null,
+        "releaseDay": null,
+        "singleCask": null,
+        "releaseYear": null,
+        "vintageYear": null,
+        "bottlingYear": null,
+        "caskStrength": null,
+        "releaseMonth": null,
+        "familyContext": {
+          "siblingBottles": []
+        }
+      }
+    ]
+  },
+  "context": {
+    "inspectedBottleIds": [19118],
+    "bottleContexts": [
+      {
+        "exact": {
+          "abv": null,
+          "edition": null,
+          "outturn": null,
+          "statedAge": null,
+          "caskNumber": null,
+          "maturation": null,
+          "releaseDay": null,
+          "singleCask": null,
+          "releaseYear": null,
+          "vintageYear": null,
+          "bottlingYear": null,
+          "caskStrength": null,
+          "releaseMonth": null
+        },
+        "shared": {
+          "name": "11-year-old (distilled at Rosebank)",
+          "brand": {
+            "name": "William Cadenhead's",
+            "entityId": 336
+          },
+          "series": null,
+          "bottler": null,
+          "category": "single_malt",
+          "statedAge": 11,
+          "distillers": [
+            {
+              "name": "Rosebank",
+              "entityId": 1296
+            }
+          ]
+        },
+        "groupId": 16094,
+        "bottleId": 19118,
+        "fullName": "Cadenhead's 11-year-old (distilled at Rosebank)",
+        "siblings": [],
+        "references": [
+          {
+            "name": "Cadenhead's 11-year-old (distilled at Rosebank)",
+            "ignored": false
+          },
+          {
+            "name": "Cadenhead's  (distilled at Rosebank), 11-year-old",
+            "ignored": false
+          },
+          {
+            "name": "Cadenhead's, (distilled at Rosebank), 11-year-old",
+            "ignored": false
+          },
+          {
+            "name": "William Cadenhead's 11-year-old (distilled at Rosebank)",
+            "ignored": false
+          }
+        ],
+        "observations": [],
+        "imageSources": []
+      }
+    ],
+    "inspectedEntities": [
+      {
+        "kind": "bottler",
+        "name": "William Cadenhead's",
+        "score": 1,
+        "source": ["exact", "text", "prefix", "contained"],
+        "entityId": 336,
+        "reference": "William Cadenhead's",
+        "shortName": "Cadenhead's",
+        "retrievedFor": [
+          {
+            "exact": true,
+            "query": "William Cadenhead's"
+          }
+        ]
+      },
+      {
+        "kind": "distillery",
+        "name": "Ardnamurchan",
+        "score": 1,
+        "source": ["exact", "text", "prefix", "contained"],
+        "entityId": 84,
+        "reference": "Ardnamurchan",
+        "shortName": null,
+        "retrievedFor": [
+          {
+            "exact": true,
+            "query": "Ardnamurchan"
+          }
+        ]
+      },
+      {
+        "kind": "distillery",
+        "name": "Ardbeg",
+        "score": 1,
+        "source": ["exact", "text", "prefix", "contained"],
+        "entityId": 28,
+        "reference": "Ardbeg",
+        "shortName": null,
+        "retrievedFor": [
+          {
+            "exact": true,
+            "query": "Ardbeg"
+          }
+        ]
+      },
+      {
+        "kind": "distillery",
+        "name": "Rosebank",
+        "score": 1,
+        "source": ["exact", "text", "prefix", "contained"],
+        "entityId": 1296,
+        "reference": "Rosebank",
+        "shortName": null,
+        "retrievedFor": [
+          {
+            "exact": true,
+            "query": "Rosebank"
+          }
+        ]
+      },
+      {
+        "kind": "brand",
+        "name": "Jack Daniel's",
+        "score": 1,
+        "source": ["exact", "text", "prefix", "contained"],
+        "entityId": 1079,
+        "reference": "Jack Daniel's",
+        "shortName": null,
+        "retrievedFor": [
+          {
+            "exact": true,
+            "query": "Jack Daniel's"
+          }
+        ]
+      },
+      {
+        "kind": "distillery",
+        "name": "Jack Daniel Distillery",
+        "score": 1,
+        "source": ["exact", "text", "prefix", "contained"],
+        "entityId": 366689,
+        "reference": "Jack Daniel Distillery",
+        "shortName": null,
+        "retrievedFor": [
+          {
+            "exact": true,
+            "query": "Jack Daniel Distillery"
+          }
+        ]
+      },
+      {
+        "kind": "brand",
+        "name": "Grand Macnish",
+        "score": 1,
+        "source": ["exact", "text", "prefix", "contained"],
+        "entityId": 996,
+        "reference": "Grand Macnish",
+        "shortName": null,
+        "retrievedFor": [
+          {
+            "exact": true,
+            "query": "Grand Macnish"
+          }
+        ]
+      },
+      {
+        "kind": "brand",
+        "name": "Early Times",
+        "score": 1,
+        "source": ["exact", "text", "prefix", "contained"],
+        "entityId": 896,
+        "reference": "Early Times",
+        "shortName": null,
+        "retrievedFor": [
+          {
+            "exact": true,
+            "query": "Early Times"
+          }
+        ]
+      },
+      {
+        "kind": "brand",
+        "name": "Old Forester",
+        "score": 1,
+        "source": ["exact", "text", "prefix", "contained"],
+        "entityId": 1219,
+        "reference": "Old Forester",
+        "shortName": null,
+        "retrievedFor": [
+          {
+            "exact": true,
+            "query": "Old Forester"
+          }
+        ]
+      },
+      {
+        "kind": "distillery",
+        "name": "Bowmore",
+        "score": 1,
+        "source": ["exact", "text", "prefix", "contained"],
+        "entityId": 394,
+        "reference": "Bowmore",
+        "shortName": null,
+        "retrievedFor": [
+          {
+            "exact": true,
+            "query": "Bowmore"
+          }
+        ]
+      },
+      {
+        "kind": "brand",
+        "name": "Flora & Fauna",
+        "score": 1,
+        "source": ["exact", "text", "prefix", "contained"],
+        "entityId": 367063,
+        "reference": "Flora & Fauna",
+        "shortName": null,
+        "retrievedFor": [
+          {
+            "exact": true,
+            "query": "Flora & Fauna"
+          }
+        ]
+      },
+      {
+        "kind": "distillery",
+        "name": "Royal Brackla",
+        "score": 1,
+        "source": ["exact", "text", "prefix", "contained"],
+        "entityId": 1300,
+        "reference": "Royal Brackla",
+        "shortName": null,
+        "retrievedFor": [
+          {
+            "exact": true,
+            "query": "Royal Brackla"
+          }
+        ]
+      },
+      {
+        "kind": "distillery",
+        "name": "Old Forester Distilling Co.",
+        "score": 0.5,
+        "source": ["text", "prefix"],
+        "entityId": 1862,
+        "reference": "Old Forester Distilling Co.",
+        "shortName": null,
+        "retrievedFor": [
+          {
+            "query": "Old Forester"
+          }
+        ]
+      },
+      {
+        "kind": "brand",
+        "name": "Cadée",
+        "score": 0.29705882352941176,
+        "source": ["contained"],
+        "entityId": 367403,
+        "reference": "Cadée",
+        "shortName": null,
+        "retrievedFor": [
+          {
+            "query": "William Cadenhead's"
+          }
+        ]
+      },
+      {
+        "kind": "company",
+        "name": "Morrison Bowmore Distillers Ltd",
+        "score": 0.2,
+        "source": ["text"],
+        "entityId": 5684,
+        "reference": null,
+        "shortName": null,
+        "retrievedFor": [
+          {
+            "query": "Bowmore"
+          }
+        ]
+      }
+    ],
+    "inspectedSeries": []
+  },
+  "provenance": {
+    "source": "production_miss",
+    "verifiedSourceUrls": [
+      "https://www.scotchwhiskyauctions.com/auctions/234-the-185th-auction/906002-rosebank-1980-11-year-old-cadenheads-150th-anniversary-bottling/",
+      "https://d3suvtcq00dftb.cloudfront.net/images/c7dd9a9fb577066233ab5dc168f052ee-zoom.jpg"
+    ],
+    "dbOutcome": {
+      "bottleId": null,
+      "createsBottle": false,
+      "summary": "Production returned no_match: it would neither match the broad candidate 19118 nor create next to it."
+    },
+    "notes": "Captured from saved classifier run 36444 (auction_lot 17358, model null, 2026-11-03T20:17:41.021Z). Production rationale: The source identifies a Rosebank 1980, 11-year-old Cadenhead's 150th Anniversary bottling at 60.1% ABV. Local candidate 19118 has the same brand, distillery and age, but lacks the release-specific details needed to confirm it is this exact marketed Bottle. Creating another Bottle could duplicate it, so neither assignment nor creation is safe. The run predates reading Scotch Whisky Auctions lot pages (#1609), so the evidence pack adds the lot page text. Expected outcome checked against the lot page and photo on 2026-11-09, in a random sample of the 185th auction's no_match reviews."
+  },
+  "expected": {
+    "status": "classified",
+    "action": "create_bottle",
+    "identityScope": "exact_cask",
+    "matchedBottleId": null,
+    "proposedBottle": {
+      "brand": {
+        "id": 336
+      },
+      "category": "single_malt",
+      "statedAge": 11,
+      "vintageYear": 1980,
+      "abv": 60.1
+    },
+    "proposedBottleNameIncludes": ["Rosebank", "1980"],
+    "proposedBottleDistillerIds": [1296],
+    "summary": "Create Cadenhead's Authentic Collection Rosebank 1980, 11 years old, distilled July 1980, bottled March 1992 for the 150th anniversary, from one individual cask at 60.1%. The label and lot page give every fact. Candidate 19118, Cadenhead's 11-year-old (distilled at Rosebank), has no vintage, strength or edition, so it is too broad to be this Bottle."
+  },
+  "knownFailure": {
+    "reason": "The agent matches Bottle 19118, which has no vintage, strength, or edition and is too broad for this cask."
+  }
+}

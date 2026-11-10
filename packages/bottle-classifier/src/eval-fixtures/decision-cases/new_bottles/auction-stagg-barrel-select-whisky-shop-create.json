@@ -1,0 +1,1556 @@
+{
+  "id": "auction-stagg-barrel-select-whisky-shop-create",
+  "name": "Stagg Sazerac Barrel Select for The Whisky Shop: create barrel 056 at 70.2%",
+  "input": {
+    "reference": {
+      "id": 17946,
+      "url": "https://www.scotchwhiskyauctions.com/auctions/234-the-185th-auction/904762-stagg-sazerac-barrel-select-for-the-whisky-shop/",
+      "name": "Stagg Sazerac Barrel Select For The Whisky Shop",
+      "imageUrl": null,
+      "externalSiteId": 28097,
+      "currentBottleId": null
+    },
+    "extractedIdentity": {
+      "abv": 70.2,
+      "brand": null,
+      "series": null,
+      "bottler": null,
+      "edition": null,
+      "outturn": null,
+      "category": null,
+      "distillery": null,
+      "expression": null,
+      "maturation": null,
+      "stated_age": null,
+      "cask_number": null,
+      "single_cask": null,
+      "release_year": null,
+      "vintage_year": null,
+      "cask_strength": null
+    },
+    "extractedIdentitySource": "structured",
+    "imageEvidence": null,
+    "initialCandidates": [
+      {
+        "abv": 45,
+        "brand": "Buffalo Trace Distillery",
+        "score": 71.501755,
+        "series": null,
+        "source": ["text"],
+        "bottler": null,
+        "edition": "For Bourbon Blackpool Bar",
+        "outturn": null,
+        "bottleId": 68678,
+        "category": "bourbon",
+        "fullName": "Buffalo Trace Single Barrel Select - For Bourbon Blackpool Bar",
+        "reference": null,
+        "statedAge": null,
+        "caskNumber": null,
+        "comparison": {
+          "missing": ["caskStrength"],
+          "conflicts": ["abv", "brand"],
+          "agreements": ["category", "singleCask", "distillers"]
+        },
+        "distillery": ["Buffalo Trace Distillery"],
+        "maturation": null,
+        "releaseDay": null,
+        "singleCask": true,
+        "releaseYear": null,
+        "vintageYear": null,
+        "bottlingYear": null,
+        "caskStrength": null,
+        "releaseMonth": null,
+        "familyContext": {
+          "siblingBottles": []
+        }
+      },
+      {
+        "abv": null,
+        "brand": "George T. Stagg",
+        "score": 70.40463,
+        "series": null,
+        "source": ["vector", "text"],
+        "bottler": null,
+        "edition": null,
+        "outturn": null,
+        "bottleId": 14286,
+        "category": "bourbon",
+        "fullName": "George T. Stagg (2017 Buffalo Trace Antique Collection)",
+        "reference": "George T. Stagg (2017 Buffalo Trace Antique Collection), 64.6%",
+        "statedAge": null,
+        "caskNumber": null,
+        "comparison": {
+          "missing": [
+            "abv",
+            "caskStrength",
+            "singleCask",
+            "edition",
+            "distillers"
+          ],
+          "conflicts": ["brand"],
+          "agreements": ["category"]
+        },
+        "distillery": [],
+        "maturation": null,
+        "releaseDay": null,
+        "singleCask": null,
+        "releaseYear": null,
+        "vintageYear": null,
+        "bottlingYear": null,
+        "caskStrength": null,
+        "releaseMonth": null,
+        "familyContext": {
+          "siblingBottles": []
+        }
+      },
+      {
+        "abv": 57,
+        "brand": "W.L. Weller",
+        "score": 68.35997,
+        "series": null,
+        "source": ["text"],
+        "bottler": null,
+        "edition": "Sazerac Barrel Select For Hard To Find Whisky",
+        "outturn": null,
+        "bottleId": 69324,
+        "category": "bourbon",
+        "fullName": "W.L. Weller Full Proof - Sazerac Barrel Select For Hard To Find Whisky",
+        "reference": null,
+        "statedAge": null,
+        "caskNumber": "236",
+        "comparison": {
+          "missing": [],
+          "conflicts": ["abv"],
+          "agreements": []
+        },
+        "distillery": ["Buffalo Trace Distillery"],
+        "maturation": null,
+        "releaseDay": null,
+        "singleCask": true,
+        "releaseYear": null,
+        "vintageYear": null,
+        "bottlingYear": null,
+        "caskStrength": true,
+        "releaseMonth": null,
+        "familyContext": {
+          "siblingBottles": []
+        }
+      },
+      {
+        "abv": null,
+        "brand": "George T. Stagg",
+        "score": 66.220215,
+        "series": null,
+        "source": ["vector", "text"],
+        "bottler": null,
+        "edition": null,
+        "outturn": null,
+        "bottleId": 13247,
+        "category": "bourbon",
+        "fullName": "George T. Stagg Kentucky Straight (Buffalo Trace Antique Collection 2020)",
+        "reference": "George T. Stagg Kentucky Straight (Buffalo Trace Antique Collection 2020), 65.2%",
+        "statedAge": null,
+        "caskNumber": null,
+        "comparison": {
+          "missing": [
+            "abv",
+            "caskStrength",
+            "singleCask",
+            "edition",
+            "distillers"
+          ],
+          "conflicts": ["brand"],
+          "agreements": ["category"]
+        },
+        "distillery": [],
+        "maturation": null,
+        "releaseDay": null,
+        "singleCask": null,
+        "releaseYear": null,
+        "vintageYear": null,
+        "bottlingYear": null,
+        "caskStrength": null,
+        "releaseMonth": null,
+        "familyContext": {
+          "siblingBottles": []
+        }
+      },
+      {
+        "abv": 57,
+        "brand": "W.L. Weller",
+        "score": 64.88407,
+        "series": null,
+        "source": ["text"],
+        "bottler": null,
+        "edition": "Sazerac Barrel Select",
+        "outturn": null,
+        "bottleId": 69323,
+        "category": "bourbon",
+        "fullName": "W.L. Weller Full Proof 7-year-old - Sazerac Barrel Select",
+        "reference": null,
+        "statedAge": 7,
+        "caskNumber": null,
+        "comparison": {
+          "missing": [],
+          "conflicts": ["abv"],
+          "agreements": []
+        },
+        "distillery": ["Buffalo Trace Distillery"],
+        "maturation": null,
+        "releaseDay": null,
+        "singleCask": null,
+        "releaseYear": null,
+        "vintageYear": null,
+        "bottlingYear": null,
+        "caskStrength": true,
+        "releaseMonth": null,
+        "familyContext": {
+          "siblingBottles": []
+        }
+      },
+      {
+        "abv": 72.4,
+        "brand": "George T. Stagg",
+        "score": 64.11041,
+        "series": "Buffalo Trace Antique Collection",
+        "source": ["vector", "text"],
+        "bottler": null,
+        "edition": null,
+        "outturn": null,
+        "bottleId": 65723,
+        "category": "bourbon",
+        "fullName": "George T. Stagg Bourbon",
+        "reference": "George T. Stagg, 72.4%",
+        "statedAge": null,
+        "caskNumber": null,
+        "comparison": {
+          "missing": ["singleCask", "edition"],
+          "conflicts": ["abv", "brand"],
+          "agreements": ["category", "caskStrength", "distillers"]
+        },
+        "distillery": ["Buffalo Trace Distillery"],
+        "maturation": null,
+        "releaseDay": null,
+        "singleCask": null,
+        "releaseYear": 2007,
+        "vintageYear": 1992,
+        "bottlingYear": null,
+        "caskStrength": true,
+        "releaseMonth": null,
+        "familyContext": {
+          "siblingBottles": []
+        }
+      },
+      {
+        "abv": 62.45,
+        "brand": "George T. Stagg",
+        "score": 62.813713,
+        "series": null,
+        "source": ["vector", "text"],
+        "bottler": null,
+        "edition": null,
+        "outturn": null,
+        "bottleId": 13980,
+        "category": "bourbon",
+        "fullName": "George T. Stagg 15-year-old (2018 Buffalo Trace Antique Collection)",
+        "reference": "George T. Stagg 15-year-old (2018 Buffalo Trace Antique Collection), 62.45%",
+        "statedAge": 15,
+        "caskNumber": null,
+        "comparison": {
+          "missing": ["singleCask", "edition"],
+          "conflicts": ["abv", "brand"],
+          "agreements": ["category", "caskStrength", "distillers"]
+        },
+        "distillery": ["Buffalo Trace Distillery"],
+        "maturation": null,
+        "releaseDay": null,
+        "singleCask": null,
+        "releaseYear": 2018,
+        "vintageYear": null,
+        "bottlingYear": null,
+        "caskStrength": true,
+        "releaseMonth": null,
+        "familyContext": {
+          "siblingBottles": []
+        }
+      },
+      {
+        "abv": 71.4,
+        "brand": "George T. Stagg",
+        "score": 61.408096,
+        "series": "Buffalo Trace Antique Collection",
+        "source": ["vector", "text"],
+        "bottler": null,
+        "edition": null,
+        "outturn": null,
+        "bottleId": 65547,
+        "category": "bourbon",
+        "fullName": "George T. Stagg Kentucky Straight Bourbon",
+        "reference": "George T. Stagg, 71.4%",
+        "statedAge": 16,
+        "caskNumber": null,
+        "comparison": {
+          "missing": ["singleCask", "edition"],
+          "conflicts": ["abv", "brand"],
+          "agreements": ["category", "caskStrength", "distillers"]
+        },
+        "distillery": ["Buffalo Trace Distillery"],
+        "maturation": null,
+        "releaseDay": null,
+        "singleCask": null,
+        "releaseYear": 2012,
+        "vintageYear": null,
+        "bottlingYear": null,
+        "caskStrength": true,
+        "releaseMonth": null,
+        "familyContext": {
+          "siblingBottles": []
+        }
+      },
+      {
+        "abv": null,
+        "brand": "George T. Stagg",
+        "score": 58.72347,
+        "series": null,
+        "source": ["vector", "text"],
+        "bottler": null,
+        "edition": null,
+        "outturn": null,
+        "bottleId": 13523,
+        "category": "bourbon",
+        "fullName": "George T. Stagg 15-year-old Kentucky Straight Bourbon (2019 Buffalo Trace Antique Collection)",
+        "reference": "George T. Stagg 15-year-old Kentucky Straight Bourbon (2019 Buffalo Trace Antique Collection), 58.45%",
+        "statedAge": 15,
+        "caskNumber": null,
+        "comparison": {
+          "missing": [
+            "abv",
+            "caskStrength",
+            "singleCask",
+            "edition",
+            "distillers"
+          ],
+          "conflicts": ["brand"],
+          "agreements": ["category"]
+        },
+        "distillery": [],
+        "maturation": null,
+        "releaseDay": null,
+        "singleCask": null,
+        "releaseYear": null,
+        "vintageYear": null,
+        "bottlingYear": null,
+        "caskStrength": null,
+        "releaseMonth": null,
+        "familyContext": {
+          "siblingBottles": []
+        }
+      },
+      {
+        "abv": 45,
+        "brand": "Buffalo Trace Distillery",
+        "score": 57.20394,
+        "series": null,
+        "source": ["text"],
+        "bottler": "Buffalo Trace Distillery",
+        "edition": null,
+        "outturn": null,
+        "bottleId": 45470,
+        "category": "bourbon",
+        "fullName": "Buffalo Trace Astor Select Single Barrel - 8-year-old - 2026 Release - 2018 Vintage - 45.0% ABV",
+        "reference": null,
+        "statedAge": 8,
+        "caskNumber": null,
+        "comparison": {
+          "missing": ["caskStrength", "edition"],
+          "conflicts": ["abv", "brand"],
+          "agreements": ["category", "singleCask", "distillers"]
+        },
+        "distillery": ["Buffalo Trace Distillery"],
+        "maturation": null,
+        "releaseDay": null,
+        "singleCask": true,
+        "releaseYear": 2026,
+        "vintageYear": 2018,
+        "bottlingYear": null,
+        "caskStrength": null,
+        "releaseMonth": null,
+        "familyContext": {
+          "siblingBottles": []
+        }
+      },
+      {
+        "abv": 45,
+        "brand": "Buffalo Trace Distillery",
+        "score": 53.41501,
+        "series": null,
+        "source": ["text"],
+        "bottler": null,
+        "edition": null,
+        "outturn": null,
+        "bottleId": 69554,
+        "category": "bourbon",
+        "fullName": "Buffalo Trace Bristol Single Barrel",
+        "reference": null,
+        "statedAge": null,
+        "caskNumber": null,
+        "comparison": {
+          "missing": ["caskStrength", "edition"],
+          "conflicts": ["abv", "brand"],
+          "agreements": ["category", "singleCask", "distillers"]
+        },
+        "distillery": ["Buffalo Trace Distillery"],
+        "maturation": null,
+        "releaseDay": null,
+        "singleCask": true,
+        "releaseYear": null,
+        "vintageYear": null,
+        "bottlingYear": null,
+        "caskStrength": null,
+        "releaseMonth": null,
+        "familyContext": {
+          "siblingBottles": []
+        }
+      },
+      {
+        "abv": null,
+        "brand": "Buffalo Trace Distillery",
+        "score": 53.244568,
+        "series": null,
+        "source": ["text"],
+        "bottler": "Master of Malt",
+        "edition": null,
+        "outturn": null,
+        "bottleId": 66903,
+        "category": "bourbon",
+        "fullName": "Buffalo Trace Single Barrel",
+        "reference": null,
+        "statedAge": null,
+        "caskNumber": "89",
+        "comparison": {
+          "missing": ["abv", "caskStrength", "edition"],
+          "conflicts": ["brand"],
+          "agreements": ["category", "singleCask", "distillers"]
+        },
+        "distillery": ["Buffalo Trace Distillery"],
+        "maturation": null,
+        "releaseDay": null,
+        "singleCask": true,
+        "releaseYear": null,
+        "vintageYear": null,
+        "bottlingYear": null,
+        "caskStrength": null,
+        "releaseMonth": null,
+        "familyContext": {
+          "siblingBottles": []
+        }
+      },
+      {
+        "abv": null,
+        "brand": "Buffalo Trace Distillery",
+        "score": 52.822655,
+        "series": null,
+        "source": ["text"],
+        "bottler": null,
+        "edition": null,
+        "outturn": null,
+        "bottleId": 16276,
+        "category": "bourbon",
+        "fullName": "Buffalo Trace French Oak Barrel Aged",
+        "reference": null,
+        "statedAge": null,
+        "caskNumber": null,
+        "comparison": {
+          "missing": ["abv", "caskStrength", "singleCask", "edition"],
+          "conflicts": ["brand"],
+          "agreements": ["category", "distillers"]
+        },
+        "distillery": ["Buffalo Trace Distillery"],
+        "maturation": null,
+        "releaseDay": null,
+        "singleCask": null,
+        "releaseYear": null,
+        "vintageYear": null,
+        "bottlingYear": null,
+        "caskStrength": null,
+        "releaseMonth": null,
+        "familyContext": {
+          "siblingBottles": []
+        }
+      },
+      {
+        "abv": 45,
+        "brand": "Buffalo Trace Distillery",
+        "score": 52.75521,
+        "series": null,
+        "source": ["text"],
+        "bottler": null,
+        "edition": null,
+        "outturn": 400,
+        "bottleId": 56914,
+        "category": "bourbon",
+        "fullName": "Buffalo Trace Six Millionth Barrel",
+        "reference": null,
+        "statedAge": null,
+        "caskNumber": null,
+        "comparison": {
+          "missing": ["caskStrength", "edition"],
+          "conflicts": ["abv", "brand"],
+          "agreements": ["category", "singleCask", "distillers"]
+        },
+        "distillery": ["Buffalo Trace Distillery"],
+        "maturation": null,
+        "releaseDay": null,
+        "singleCask": true,
+        "releaseYear": 2019,
+        "vintageYear": 2008,
+        "bottlingYear": null,
+        "caskStrength": null,
+        "releaseMonth": null,
+        "familyContext": {
+          "siblingBottles": []
+        }
+      },
+      {
+        "abv": 62.4,
+        "brand": "Stagg",
+        "score": 52.719368,
+        "series": null,
+        "source": ["text", "brand_coverage", "context"],
+        "bottler": null,
+        "edition": "Hedonism Wines 10th Anniversary",
+        "outturn": null,
+        "bottleId": 69248,
+        "category": "bourbon",
+        "fullName": "Stagg Single Barrel Select - Hedonism Wines 10th Anniversary",
+        "reference": null,
+        "statedAge": null,
+        "caskNumber": null,
+        "comparison": {
+          "missing": [],
+          "conflicts": ["abv"],
+          "agreements": []
+        },
+        "distillery": ["Buffalo Trace Distillery"],
+        "maturation": null,
+        "releaseDay": null,
+        "singleCask": true,
+        "releaseYear": null,
+        "vintageYear": null,
+        "bottlingYear": null,
+        "caskStrength": true,
+        "releaseMonth": null,
+        "familyContext": {
+          "siblingBottles": []
+        }
+      },
+      {
+        "abv": null,
+        "brand": "Buffalo Trace Distillery",
+        "score": 51.24079,
+        "series": null,
+        "source": ["text"],
+        "bottler": null,
+        "edition": null,
+        "outturn": null,
+        "bottleId": 16277,
+        "category": "bourbon",
+        "fullName": "Buffalo Trace French Oak Barrel Head Aged",
+        "reference": null,
+        "statedAge": null,
+        "caskNumber": null,
+        "comparison": {
+          "missing": ["abv", "caskStrength", "singleCask", "edition"],
+          "conflicts": ["brand"],
+          "agreements": ["category", "distillers"]
+        },
+        "distillery": ["Buffalo Trace Distillery"],
+        "maturation": null,
+        "releaseDay": null,
+        "singleCask": null,
+        "releaseYear": null,
+        "vintageYear": null,
+        "bottlingYear": null,
+        "caskStrength": null,
+        "releaseMonth": null,
+        "familyContext": {
+          "siblingBottles": []
+        }
+      },
+      {
+        "abv": 71.4,
+        "brand": "George T. Stagg",
+        "score": 51.205593,
+        "series": "Buffalo Trace Antique Collection",
+        "source": ["vector", "text"],
+        "bottler": "Buffalo Trace Distillery",
+        "edition": "2025 Release",
+        "outturn": null,
+        "bottleId": 47439,
+        "category": "bourbon",
+        "fullName": "George T. Stagg Kentucky Straight Bourbon - 2025 Release - 15-year-old - 2025 Release - 71.4% ABV - Cask Strength",
+        "reference": "George T. Stagg Kentucky Straight Bourbon - 2025 Release - 15-year-old - 2025 Release - 71.4% ABV - Cask Strength",
+        "statedAge": 15,
+        "caskNumber": null,
+        "comparison": {
+          "missing": ["singleCask"],
+          "conflicts": ["abv", "brand"],
+          "agreements": ["category", "caskStrength", "distillers"]
+        },
+        "distillery": ["Buffalo Trace Distillery"],
+        "maturation": null,
+        "releaseDay": null,
+        "singleCask": null,
+        "releaseYear": 2025,
+        "vintageYear": null,
+        "bottlingYear": null,
+        "caskStrength": true,
+        "releaseMonth": null,
+        "familyContext": {
+          "siblingBottles": []
+        }
+      },
+      {
+        "abv": 66.5,
+        "brand": "Stagg Jr.",
+        "score": 46.279118,
+        "series": null,
+        "source": ["text"],
+        "bottler": null,
+        "edition": "Wooden Cork Barrel Pick",
+        "outturn": null,
+        "bottleId": 62978,
+        "category": "bourbon",
+        "fullName": "Stagg Jr. Single Barrel Select - Wooden Cork Barrel Pick",
+        "reference": null,
+        "statedAge": null,
+        "caskNumber": null,
+        "comparison": {
+          "missing": [],
+          "conflicts": ["abv"],
+          "agreements": []
+        },
+        "distillery": [],
+        "maturation": null,
+        "releaseDay": null,
+        "singleCask": true,
+        "releaseYear": null,
+        "vintageYear": null,
+        "bottlingYear": null,
+        "caskStrength": true,
+        "releaseMonth": null,
+        "familyContext": {
+          "siblingBottles": []
+        }
+      },
+      {
+        "abv": 45,
+        "brand": "Eagle Rare",
+        "score": 38.66932,
+        "series": null,
+        "source": ["text"],
+        "bottler": null,
+        "edition": "Single Barrel Select for Wooden Cork",
+        "outturn": null,
+        "bottleId": 61615,
+        "category": "bourbon",
+        "fullName": "Eagle Rare 10-year-old - Single Barrel Select for Wooden Cork",
+        "reference": null,
+        "statedAge": 10,
+        "caskNumber": "251",
+        "comparison": {
+          "missing": [],
+          "conflicts": ["abv"],
+          "agreements": []
+        },
+        "distillery": ["Buffalo Trace Distillery"],
+        "maturation": null,
+        "releaseDay": null,
+        "singleCask": true,
+        "releaseYear": null,
+        "vintageYear": null,
+        "bottlingYear": null,
+        "caskStrength": null,
+        "releaseMonth": null,
+        "familyContext": {
+          "siblingBottles": []
+        }
+      },
+      {
+        "abv": 57,
+        "brand": "W.L. Weller",
+        "score": 38.6607,
+        "series": null,
+        "source": ["text"],
+        "bottler": null,
+        "edition": "Single Barrel Select For Fortnum & Mason",
+        "outturn": null,
+        "bottleId": 69325,
+        "category": "bourbon",
+        "fullName": "W.L. Weller Full Proof - Single Barrel Select For Fortnum & Mason",
+        "reference": null,
+        "statedAge": null,
+        "caskNumber": "#459",
+        "comparison": {
+          "missing": [],
+          "conflicts": ["abv"],
+          "agreements": []
+        },
+        "distillery": ["Buffalo Trace Distillery"],
+        "maturation": null,
+        "releaseDay": null,
+        "singleCask": true,
+        "releaseYear": null,
+        "vintageYear": null,
+        "bottlingYear": null,
+        "caskStrength": true,
+        "releaseMonth": null,
+        "familyContext": {
+          "siblingBottles": []
+        }
+      },
+      {
+        "abv": 57,
+        "brand": "W.L. Weller",
+        "score": 37.40728,
+        "series": null,
+        "source": ["text"],
+        "bottler": null,
+        "edition": "Single Barrel Select For Royal Mile Whiskies",
+        "outturn": null,
+        "bottleId": 69327,
+        "category": "bourbon",
+        "fullName": "W.L. Weller Full Proof - Single Barrel Select For Royal Mile Whiskies",
+        "reference": null,
+        "statedAge": null,
+        "caskNumber": "#385",
+        "comparison": {
+          "missing": [],
+          "conflicts": ["abv"],
+          "agreements": []
+        },
+        "distillery": ["Buffalo Trace Distillery"],
+        "maturation": null,
+        "releaseDay": null,
+        "singleCask": true,
+        "releaseYear": null,
+        "vintageYear": null,
+        "bottlingYear": null,
+        "caskStrength": true,
+        "releaseMonth": null,
+        "familyContext": {
+          "siblingBottles": []
+        }
+      },
+      {
+        "abv": 64.2,
+        "brand": "Stagg",
+        "score": 36.221634,
+        "series": null,
+        "source": ["text"],
+        "bottler": null,
+        "edition": null,
+        "outturn": null,
+        "bottleId": 13404,
+        "category": "bourbon",
+        "fullName": "Stagg Jr. Barrel Proof Kentucky Straight Bourbon (13th Edition)",
+        "reference": null,
+        "statedAge": null,
+        "caskNumber": null,
+        "comparison": {
+          "missing": [],
+          "conflicts": ["abv"],
+          "agreements": []
+        },
+        "distillery": [],
+        "maturation": null,
+        "releaseDay": null,
+        "singleCask": null,
+        "releaseYear": null,
+        "vintageYear": null,
+        "bottlingYear": null,
+        "caskStrength": true,
+        "releaseMonth": null,
+        "familyContext": {
+          "siblingBottles": []
+        }
+      },
+      {
+        "abv": 49.4,
+        "brand": "Glenfarclas",
+        "score": 35.99922,
+        "series": null,
+        "source": ["text"],
+        "bottler": null,
+        "edition": "for Secret Bottle Shop Hereford",
+        "outturn": 300,
+        "bottleId": 69482,
+        "category": "single_malt",
+        "fullName": "Glenfarclas 12-year-old - for Secret Bottle Shop Hereford",
+        "reference": null,
+        "statedAge": 12,
+        "caskNumber": null,
+        "comparison": {
+          "missing": [],
+          "conflicts": ["abv"],
+          "agreements": []
+        },
+        "distillery": ["Glenfarclas"],
+        "maturation": null,
+        "releaseDay": null,
+        "singleCask": null,
+        "releaseYear": null,
+        "vintageYear": null,
+        "bottlingYear": 2021,
+        "caskStrength": null,
+        "releaseMonth": null,
+        "familyContext": {
+          "siblingBottles": []
+        }
+      },
+      {
+        "abv": 57.1,
+        "brand": "Glenfarclas",
+        "score": 35.744606,
+        "series": null,
+        "source": ["text"],
+        "bottler": null,
+        "edition": "For The Whisky Shop",
+        "outturn": 300,
+        "bottleId": 70034,
+        "category": "single_malt",
+        "fullName": "Glenfarclas 10-year-old 100 Proof - For The Whisky Shop",
+        "reference": null,
+        "statedAge": 10,
+        "caskNumber": null,
+        "comparison": {
+          "missing": [],
+          "conflicts": ["abv"],
+          "agreements": []
+        },
+        "distillery": ["Glenfarclas"],
+        "maturation": "Sherry cask",
+        "releaseDay": null,
+        "singleCask": null,
+        "releaseYear": null,
+        "vintageYear": null,
+        "bottlingYear": 2023,
+        "caskStrength": null,
+        "releaseMonth": null,
+        "familyContext": {
+          "siblingBottles": []
+        }
+      },
+      {
+        "abv": null,
+        "brand": "George Dickel",
+        "score": 33.171886,
+        "series": null,
+        "source": ["text"],
+        "bottler": null,
+        "edition": null,
+        "outturn": null,
+        "bottleId": 13524,
+        "category": "bourbon",
+        "fullName": "George Dickel Barrel Select Tennessee Whiskey",
+        "reference": null,
+        "statedAge": null,
+        "caskNumber": null,
+        "comparison": {
+          "missing": ["abv"],
+          "conflicts": [],
+          "agreements": []
+        },
+        "distillery": [],
+        "maturation": null,
+        "releaseDay": null,
+        "singleCask": null,
+        "releaseYear": null,
+        "vintageYear": null,
+        "bottlingYear": null,
+        "caskStrength": null,
+        "releaseMonth": null,
+        "familyContext": {
+          "siblingBottles": []
+        }
+      },
+      {
+        "abv": null,
+        "brand": "George T. Stagg",
+        "score": 33.116585,
+        "series": null,
+        "source": ["text"],
+        "bottler": "Buffalo Trace Distillery",
+        "edition": null,
+        "outturn": null,
+        "bottleId": 1407,
+        "category": "bourbon",
+        "fullName": "George T. Stagg Barrel Proof Limited Edition",
+        "reference": null,
+        "statedAge": 16,
+        "caskNumber": null,
+        "comparison": {
+          "missing": ["abv"],
+          "conflicts": [],
+          "agreements": []
+        },
+        "distillery": [],
+        "maturation": null,
+        "releaseDay": null,
+        "singleCask": null,
+        "releaseYear": null,
+        "vintageYear": null,
+        "bottlingYear": null,
+        "caskStrength": true,
+        "releaseMonth": null,
+        "familyContext": {
+          "siblingBottles": []
+        }
+      },
+      {
+        "abv": null,
+        "brand": "Kilchoman",
+        "score": 33.017853,
+        "series": null,
+        "source": ["text"],
+        "bottler": null,
+        "edition": "for The Distillery Shop",
+        "outturn": null,
+        "bottleId": 60711,
+        "category": "single_malt",
+        "fullName": "Kilchoman 10-year-old Single Cask 12/2007 - for The Distillery Shop",
+        "reference": null,
+        "statedAge": null,
+        "caskNumber": "12/2007",
+        "comparison": {
+          "missing": ["abv"],
+          "conflicts": [],
+          "agreements": []
+        },
+        "distillery": ["Kilchoman"],
+        "maturation": "1st Fill Ex-Bourbon Barrel",
+        "releaseDay": null,
+        "singleCask": true,
+        "releaseYear": null,
+        "vintageYear": 2007,
+        "bottlingYear": 2018,
+        "caskStrength": null,
+        "releaseMonth": null,
+        "familyContext": {
+          "siblingBottles": []
+        }
+      },
+      {
+        "abv": 72.05,
+        "brand": "George T. Stagg",
+        "score": 0.713210690118112,
+        "series": null,
+        "source": ["vector"],
+        "bottler": null,
+        "edition": "2016 Release",
+        "outturn": null,
+        "bottleId": 62981,
+        "category": "bourbon",
+        "fullName": "George T. Stagg Kentucky Straight Bourbon - 2016 Release",
+        "reference": "George T. Stagg, 72.05%",
+        "statedAge": null,
+        "caskNumber": null,
+        "comparison": {
+          "missing": ["singleCask"],
+          "conflicts": ["abv", "brand"],
+          "agreements": ["category", "caskStrength", "distillers"]
+        },
+        "distillery": ["Buffalo Trace Distillery"],
+        "maturation": null,
+        "releaseDay": null,
+        "singleCask": null,
+        "releaseYear": 2016,
+        "vintageYear": null,
+        "bottlingYear": null,
+        "caskStrength": true,
+        "releaseMonth": null,
+        "familyContext": {
+          "siblingBottles": []
+        }
+      },
+      {
+        "abv": null,
+        "brand": "Barrell Whiskey",
+        "score": 0.6811009075780888,
+        "series": null,
+        "source": ["vector"],
+        "bottler": null,
+        "edition": null,
+        "outturn": null,
+        "bottleId": 16237,
+        "category": "blend",
+        "fullName": "Barrell Whiskey Batch 001",
+        "reference": "Barrell Whiskey (Batch 001), 61.25%",
+        "statedAge": null,
+        "caskNumber": null,
+        "comparison": {
+          "missing": ["abv"],
+          "conflicts": [],
+          "agreements": []
+        },
+        "distillery": [],
+        "maturation": null,
+        "releaseDay": null,
+        "singleCask": null,
+        "releaseYear": null,
+        "vintageYear": null,
+        "bottlingYear": null,
+        "caskStrength": null,
+        "releaseMonth": null,
+        "familyContext": {
+          "siblingBottles": []
+        }
+      },
+      {
+        "abv": 52.5,
+        "brand": "Hand Barrel",
+        "score": 0.6695382138356709,
+        "series": null,
+        "source": ["vector"],
+        "bottler": null,
+        "edition": null,
+        "outturn": null,
+        "bottleId": 45222,
+        "category": "bourbon",
+        "fullName": "Hand Barrel Single Barrel Select - 52.5% ABV - Cask Strength",
+        "reference": "Hand Barrel Single Barrel Select - 52.5% ABV - Cask Strength",
+        "statedAge": null,
+        "caskNumber": null,
+        "comparison": {
+          "missing": ["edition", "distillers"],
+          "conflicts": ["abv", "brand"],
+          "agreements": ["category", "caskStrength", "singleCask"]
+        },
+        "distillery": [],
+        "maturation": null,
+        "releaseDay": null,
+        "singleCask": true,
+        "releaseYear": null,
+        "vintageYear": null,
+        "bottlingYear": null,
+        "caskStrength": true,
+        "releaseMonth": null,
+        "familyContext": {
+          "siblingBottles": []
+        }
+      },
+      {
+        "abv": 62.86,
+        "brand": "Nashtucky Whiskey Co.",
+        "score": 0.6598568691539044,
+        "series": null,
+        "source": ["vector"],
+        "bottler": "Nashville Barrel Company",
+        "edition": null,
+        "outturn": null,
+        "bottleId": 45500,
+        "category": "bourbon",
+        "fullName": "Nashtucky Whiskey Co. Single Barrel Private Selection - 7-year-old - 62.9% ABV - Cask Strength",
+        "reference": "Nashtucky Whiskey Co. Single Barrel Private Selection - 7-year-old - 62.9% ABV - Cask Strength",
+        "statedAge": 7,
+        "caskNumber": null,
+        "comparison": {
+          "missing": ["edition", "distillers"],
+          "conflicts": ["abv", "brand"],
+          "agreements": ["category", "caskStrength", "singleCask"]
+        },
+        "distillery": [],
+        "maturation": null,
+        "releaseDay": null,
+        "singleCask": true,
+        "releaseYear": null,
+        "vintageYear": null,
+        "bottlingYear": null,
+        "caskStrength": true,
+        "releaseMonth": null,
+        "familyContext": {
+          "siblingBottles": []
+        }
+      },
+      {
+        "abv": null,
+        "brand": "Barrell Craft Spirits",
+        "score": 0.6571779137314736,
+        "series": null,
+        "source": ["vector"],
+        "bottler": "Barrell Craft Spirits",
+        "edition": null,
+        "outturn": null,
+        "bottleId": 41252,
+        "category": "bourbon",
+        "fullName": "Barrell Vantage",
+        "reference": "Barrell Vantage, 57.22%",
+        "statedAge": null,
+        "caskNumber": null,
+        "comparison": {
+          "missing": ["abv"],
+          "conflicts": [],
+          "agreements": []
+        },
+        "distillery": [],
+        "maturation": null,
+        "releaseDay": null,
+        "singleCask": null,
+        "releaseYear": null,
+        "vintageYear": null,
+        "bottlingYear": null,
+        "caskStrength": null,
+        "releaseMonth": null,
+        "familyContext": {
+          "siblingBottles": []
+        }
+      },
+      {
+        "abv": 62.95,
+        "brand": "Stagg",
+        "score": 0.5294117647058824,
+        "series": null,
+        "source": ["brand_coverage"],
+        "bottler": null,
+        "edition": "Batch 23C",
+        "outturn": null,
+        "bottleId": 64580,
+        "category": "bourbon",
+        "fullName": "Stagg Kentucky Straight Bourbon - Batch 23C",
+        "reference": null,
+        "statedAge": null,
+        "caskNumber": null,
+        "comparison": {
+          "missing": ["singleCask"],
+          "conflicts": ["abv"],
+          "agreements": ["category", "caskStrength", "brand", "distillers"]
+        },
+        "distillery": ["Buffalo Trace Distillery"],
+        "maturation": null,
+        "releaseDay": null,
+        "singleCask": null,
+        "releaseYear": null,
+        "vintageYear": null,
+        "bottlingYear": null,
+        "caskStrength": true,
+        "releaseMonth": null,
+        "familyContext": {
+          "siblingBottles": []
+        }
+      },
+      {
+        "abv": 63.8,
+        "brand": "Stagg",
+        "score": 0.5294117647058824,
+        "series": null,
+        "source": ["brand_coverage"],
+        "bottler": null,
+        "edition": "Batch 24A",
+        "outturn": null,
+        "bottleId": 68337,
+        "category": "bourbon",
+        "fullName": "Stagg Kentucky Straight Bourbon - Batch 24A",
+        "reference": null,
+        "statedAge": null,
+        "caskNumber": null,
+        "comparison": {
+          "missing": ["singleCask"],
+          "conflicts": ["abv"],
+          "agreements": ["category", "caskStrength", "brand", "distillers"]
+        },
+        "distillery": ["Buffalo Trace Distillery"],
+        "maturation": null,
+        "releaseDay": null,
+        "singleCask": null,
+        "releaseYear": 2024,
+        "vintageYear": null,
+        "bottlingYear": null,
+        "caskStrength": true,
+        "releaseMonth": null,
+        "familyContext": {
+          "siblingBottles": []
+        }
+      },
+      {
+        "abv": 63.9,
+        "brand": "Stagg",
+        "score": 0.5294117647058824,
+        "series": null,
+        "source": ["brand_coverage"],
+        "bottler": null,
+        "edition": "Batch 24B",
+        "outturn": null,
+        "bottleId": 64585,
+        "category": "bourbon",
+        "fullName": "Stagg Kentucky Straight Bourbon - Batch 24B",
+        "reference": null,
+        "statedAge": null,
+        "caskNumber": null,
+        "comparison": {
+          "missing": ["singleCask"],
+          "conflicts": ["abv"],
+          "agreements": ["category", "caskStrength", "brand", "distillers"]
+        },
+        "distillery": ["Buffalo Trace Distillery"],
+        "maturation": null,
+        "releaseDay": null,
+        "singleCask": null,
+        "releaseYear": 2024,
+        "vintageYear": null,
+        "bottlingYear": null,
+        "caskStrength": true,
+        "releaseMonth": null,
+        "familyContext": {
+          "siblingBottles": []
+        }
+      },
+      {
+        "abv": 64.45,
+        "brand": "Stagg",
+        "score": 0.5294117647058824,
+        "series": null,
+        "source": ["brand_coverage"],
+        "bottler": null,
+        "edition": "Batch 24C",
+        "outturn": null,
+        "bottleId": 64079,
+        "category": "bourbon",
+        "fullName": "Stagg Kentucky Straight Bourbon - Batch 24C",
+        "reference": null,
+        "statedAge": null,
+        "caskNumber": null,
+        "comparison": {
+          "missing": ["singleCask"],
+          "conflicts": ["abv"],
+          "agreements": ["category", "caskStrength", "brand", "distillers"]
+        },
+        "distillery": ["Buffalo Trace Distillery"],
+        "maturation": null,
+        "releaseDay": null,
+        "singleCask": null,
+        "releaseYear": null,
+        "vintageYear": null,
+        "bottlingYear": null,
+        "caskStrength": true,
+        "releaseMonth": null,
+        "familyContext": {
+          "siblingBottles": []
+        }
+      },
+      {
+        "abv": 63.7,
+        "brand": "Stagg",
+        "score": 0.5294117647058824,
+        "series": null,
+        "source": ["brand_coverage"],
+        "bottler": null,
+        "edition": "Batch 24D",
+        "outturn": null,
+        "bottleId": 64064,
+        "category": "bourbon",
+        "fullName": "Stagg Kentucky Straight Bourbon - Batch 24D",
+        "reference": null,
+        "statedAge": null,
+        "caskNumber": null,
+        "comparison": {
+          "missing": ["singleCask"],
+          "conflicts": ["abv"],
+          "agreements": ["category", "caskStrength", "brand", "distillers"]
+        },
+        "distillery": ["Buffalo Trace Distillery"],
+        "maturation": null,
+        "releaseDay": null,
+        "singleCask": null,
+        "releaseYear": 2024,
+        "vintageYear": null,
+        "bottlingYear": null,
+        "caskStrength": true,
+        "releaseMonth": null,
+        "familyContext": {
+          "siblingBottles": []
+        }
+      }
+    ]
+  },
+  "context": {
+    "inspectedBottleIds": [69248],
+    "bottleContexts": [
+      {
+        "exact": {
+          "abv": 62.4,
+          "edition": "Hedonism Wines 10th Anniversary",
+          "outturn": null,
+          "statedAge": null,
+          "caskNumber": null,
+          "maturation": null,
+          "releaseDay": null,
+          "singleCask": true,
+          "releaseYear": null,
+          "vintageYear": null,
+          "bottlingYear": null,
+          "caskStrength": true,
+          "releaseMonth": null
+        },
+        "shared": {
+          "name": "Single Barrel Select",
+          "brand": {
+            "name": "Stagg",
+            "entityId": 4064
+          },
+          "series": null,
+          "bottler": null,
+          "category": "bourbon",
+          "statedAge": null,
+          "distillers": [
+            {
+              "name": "Buffalo Trace Distillery",
+              "entityId": 483
+            }
+          ]
+        },
+        "groupId": 42209,
+        "bottleId": 69248,
+        "fullName": "Stagg Single Barrel Select - Hedonism Wines 10th Anniversary",
+        "siblings": [],
+        "references": [],
+        "observations": [],
+        "imageSources": []
+      }
+    ],
+    "inspectedEntities": [
+      {
+        "kind": "brand",
+        "name": "George Dickel",
+        "score": 1,
+        "source": ["exact", "text", "prefix", "contained"],
+        "entityId": 938,
+        "reference": "George Dickel",
+        "shortName": null,
+        "retrievedFor": [
+          {
+            "exact": true,
+            "query": "George Dickel"
+          }
+        ]
+      },
+      {
+        "kind": "brand",
+        "name": "George T. Stagg",
+        "score": 1,
+        "source": ["exact", "text", "prefix", "contained"],
+        "entityId": 939,
+        "reference": "George T. Stagg",
+        "shortName": null,
+        "retrievedFor": [
+          {
+            "exact": true,
+            "query": "George T. Stagg"
+          },
+          {
+            "query": "Stagg"
+          }
+        ]
+      },
+      {
+        "kind": "brand",
+        "name": "Stagg",
+        "score": 1,
+        "source": ["contained", "exact", "text", "prefix"],
+        "entityId": 4064,
+        "reference": "Stagg",
+        "shortName": null,
+        "retrievedFor": [
+          {
+            "query": "George T. Stagg"
+          },
+          {
+            "query": "Stagg Jr."
+          },
+          {
+            "exact": true,
+            "query": "Stagg"
+          }
+        ]
+      },
+      {
+        "kind": "distillery",
+        "name": "Buffalo Trace Distillery",
+        "score": 1,
+        "source": ["exact", "text", "prefix", "contained"],
+        "entityId": 483,
+        "reference": "Buffalo Trace Distillery",
+        "shortName": "Buffalo Trace",
+        "retrievedFor": [
+          {
+            "exact": true,
+            "query": "Buffalo Trace Distillery"
+          }
+        ]
+      },
+      {
+        "kind": "distillery",
+        "name": "Kilchoman",
+        "score": 1,
+        "source": ["exact", "text", "prefix", "contained"],
+        "entityId": 175,
+        "reference": "Kilchoman",
+        "shortName": "",
+        "retrievedFor": [
+          {
+            "exact": true,
+            "query": "Kilchoman"
+          }
+        ]
+      },
+      {
+        "kind": "brand",
+        "name": "Barrell Whiskey",
+        "score": 1,
+        "source": ["exact", "text", "prefix", "contained"],
+        "entityId": 391,
+        "reference": "Barrell Whiskey",
+        "shortName": null,
+        "retrievedFor": [
+          {
+            "exact": true,
+            "query": "Barrell Whiskey"
+          }
+        ]
+      },
+      {
+        "kind": "bottler",
+        "name": "Barrell Craft Spirits",
+        "score": 1,
+        "source": ["contained", "exact", "text", "prefix"],
+        "entityId": 75635,
+        "reference": "Barrel",
+        "shortName": "Barrell",
+        "retrievedFor": [
+          {
+            "query": "Barrell Whiskey"
+          },
+          {
+            "exact": true,
+            "query": "Barrell Craft Spirits"
+          }
+        ]
+      },
+      {
+        "kind": "brand",
+        "name": "W.L. Weller",
+        "score": 1,
+        "source": ["exact", "text", "prefix", "contained"],
+        "entityId": 1471,
+        "reference": "W.L. Weller",
+        "shortName": null,
+        "retrievedFor": [
+          {
+            "exact": true,
+            "query": "W.L. Weller"
+          }
+        ]
+      },
+      {
+        "kind": "brand",
+        "name": "Stagg Jr.",
+        "score": 1,
+        "source": ["exact", "text", "prefix", "contained"],
+        "entityId": 1366,
+        "reference": "Stagg Jr.",
+        "shortName": null,
+        "retrievedFor": [
+          {
+            "exact": true,
+            "query": "Stagg Jr."
+          },
+          {
+            "query": "Stagg"
+          }
+        ]
+      },
+      {
+        "kind": "brand",
+        "name": "Eagle Rare",
+        "score": 1,
+        "source": ["exact", "text", "prefix", "contained"],
+        "entityId": 895,
+        "reference": "Eagle Rare",
+        "shortName": null,
+        "retrievedFor": [
+          {
+            "exact": true,
+            "query": "Eagle Rare"
+          }
+        ]
+      },
+      {
+        "kind": "distillery",
+        "name": "Glenfarclas",
+        "score": 1,
+        "source": ["exact", "text", "prefix", "contained"],
+        "entityId": 976,
+        "reference": "Glenfarclas",
+        "shortName": null,
+        "retrievedFor": [
+          {
+            "exact": true,
+            "query": "Glenfarclas"
+          }
+        ]
+      },
+      {
+        "kind": "brand",
+        "name": "Weller",
+        "score": 0.4,
+        "source": ["contained"],
+        "entityId": 1479,
+        "reference": "Weller",
+        "shortName": null,
+        "retrievedFor": [
+          {
+            "query": "W.L. Weller"
+          }
+        ]
+      },
+      {
+        "kind": "brand",
+        "name": "Old Stagg",
+        "score": 0.2,
+        "source": ["text"],
+        "entityId": 3616,
+        "reference": null,
+        "shortName": null,
+        "retrievedFor": [
+          {
+            "query": "Stagg"
+          }
+        ]
+      }
+    ],
+    "inspectedSeries": []
+  },
+  "provenance": {
+    "source": "production_miss",
+    "verifiedSourceUrls": [
+      "https://www.scotchwhiskyauctions.com/auctions/234-the-185th-auction/904762-stagg-sazerac-barrel-select-for-the-whisky-shop/"
+    ],
+    "dbOutcome": {
+      "bottleId": null,
+      "createsBottle": false,
+      "summary": "Production returned no_match: it could not establish the exact marketed identity of the barrel selection."
+    },
+    "notes": "Captured from saved classifier run 36799 (auction_lot 17946, model null, 2026-11-03T23:07:53.636Z). Production rationale: This is in scope as a single whisky Bottle, but the available evidence does not establish its exact marketed identity well enough to match or create a Bottle. The inspected Stagg selection is a different release. The run predates reading Scotch Whisky Auctions lot pages (#1609), so the evidence pack adds the lot page text. Expected outcome checked against the lot page and photo on 2026-11-09, in a random sample of the 185th auction's no_match reviews."
+  },
+  "expected": {
+    "status": "classified",
+    "action": "create_bottle",
+    "identityScope": "exact_cask",
+    "matchedBottleId": null,
+    "proposedBottle": {
+      "category": "bourbon",
+      "abv": 70.2,
+      "singleCask": true
+    },
+    "summary": "Create the Stagg Sazerac Barrel Select bottled for The Whisky Shop, barrel 056, 70.2%, 75cl. The lot page names the selection, the barrel number and the strength. The inspected Stagg selection is a different barrel."
+  }
+}

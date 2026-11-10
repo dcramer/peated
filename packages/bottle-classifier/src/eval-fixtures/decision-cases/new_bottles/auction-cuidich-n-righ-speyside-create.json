@@ -1,0 +1,1794 @@
+{
+  "id": "auction-cuidich-n-righ-speyside-create",
+  "name": "Cuidich 'N Righ Speyside single malt: create it with no age, as the label prints none",
+  "input": {
+    "reference": {
+      "id": 17652,
+      "url": "https://www.scotchwhiskyauctions.com/auctions/234-the-185th-auction/904514-speyside-single-malt-cuidich-n-righ/",
+      "name": "Speyside Single Malt Cuidich 'N Righ",
+      "imageUrl": null,
+      "externalSiteId": 28097,
+      "currentBottleId": null
+    },
+    "extractedIdentity": {
+      "abv": 40,
+      "brand": null,
+      "series": null,
+      "bottler": null,
+      "edition": null,
+      "outturn": null,
+      "category": null,
+      "distillery": null,
+      "expression": null,
+      "maturation": null,
+      "stated_age": null,
+      "cask_number": null,
+      "single_cask": null,
+      "release_year": null,
+      "vintage_year": null,
+      "cask_strength": null
+    },
+    "extractedIdentitySource": "structured",
+    "imageEvidence": null,
+    "initialCandidates": [
+      {
+        "abv": 40,
+        "brand": "Gordon & MacPhail",
+        "score": 61.826004,
+        "series": null,
+        "source": ["text"],
+        "bottler": "Gordon & MacPhail",
+        "edition": null,
+        "outturn": null,
+        "bottleId": 58744,
+        "category": "single_malt",
+        "fullName": "Gordon & MacPhail Dallas Dhu 10-year-old",
+        "reference": null,
+        "statedAge": 10,
+        "caskNumber": null,
+        "comparison": {
+          "missing": ["caskStrength", "singleCask"],
+          "conflicts": ["brand"],
+          "agreements": ["category", "statedAge", "abv", "bottler"]
+        },
+        "distillery": ["Dallas Dhu"],
+        "maturation": null,
+        "releaseDay": null,
+        "singleCask": null,
+        "releaseYear": null,
+        "vintageYear": null,
+        "bottlingYear": null,
+        "caskStrength": null,
+        "releaseMonth": null,
+        "familyContext": {
+          "siblingBottles": []
+        }
+      },
+      {
+        "abv": 40,
+        "brand": "Gordon & MacPhail",
+        "score": 61.608402,
+        "series": null,
+        "source": ["vector", "text"],
+        "bottler": "Gordon & MacPhail",
+        "edition": null,
+        "outturn": null,
+        "bottleId": 65057,
+        "category": "single_malt",
+        "fullName": "Gordon & MacPhail Glen Grant 10-year-old",
+        "reference": "Gordon & MacPhail 10-year-old (distilled at Glen Grant), 40%",
+        "statedAge": 10,
+        "caskNumber": null,
+        "comparison": {
+          "missing": ["caskStrength", "singleCask"],
+          "conflicts": ["brand"],
+          "agreements": ["category", "statedAge", "abv", "bottler"]
+        },
+        "distillery": ["The Glen Grant"],
+        "maturation": "refill bourbon casks",
+        "releaseDay": null,
+        "singleCask": null,
+        "releaseYear": null,
+        "vintageYear": null,
+        "bottlingYear": null,
+        "caskStrength": null,
+        "releaseMonth": null,
+        "familyContext": {
+          "siblingBottles": []
+        }
+      },
+      {
+        "abv": 40,
+        "brand": "Gordon & MacPhail",
+        "score": 60.411156,
+        "series": "Distillery Labels",
+        "source": ["text"],
+        "bottler": "Gordon & MacPhail",
+        "edition": null,
+        "outturn": null,
+        "bottleId": 70007,
+        "category": "single_malt",
+        "fullName": "Gordon & MacPhail Glenburgie 10-year-old",
+        "reference": null,
+        "statedAge": 10,
+        "caskNumber": null,
+        "comparison": {
+          "missing": ["caskStrength", "singleCask"],
+          "conflicts": ["brand"],
+          "agreements": ["category", "statedAge", "abv", "bottler"]
+        },
+        "distillery": ["Glenburgie"],
+        "maturation": null,
+        "releaseDay": null,
+        "singleCask": null,
+        "releaseYear": null,
+        "vintageYear": null,
+        "bottlingYear": null,
+        "caskStrength": null,
+        "releaseMonth": null,
+        "familyContext": {
+          "siblingBottles": []
+        }
+      },
+      {
+        "abv": 40,
+        "brand": "Gordon & MacPhail",
+        "score": 58.30564,
+        "series": "Connoisseurs Choice",
+        "source": ["text"],
+        "bottler": "Gordon & MacPhail",
+        "edition": null,
+        "outturn": null,
+        "bottleId": 60998,
+        "category": "single_malt",
+        "fullName": "Gordon & MacPhail Ledaig 10-year-old 1972",
+        "reference": null,
+        "statedAge": 10,
+        "caskNumber": null,
+        "comparison": {
+          "missing": ["caskStrength", "singleCask"],
+          "conflicts": ["brand"],
+          "agreements": ["category", "statedAge", "abv", "bottler"]
+        },
+        "distillery": ["Tobermory"],
+        "maturation": null,
+        "releaseDay": null,
+        "singleCask": null,
+        "releaseYear": null,
+        "vintageYear": 1972,
+        "bottlingYear": null,
+        "caskStrength": null,
+        "releaseMonth": null,
+        "familyContext": {
+          "siblingBottles": []
+        }
+      },
+      {
+        "abv": 40,
+        "brand": "Gordon & MacPhail",
+        "score": 58.16517,
+        "series": "Rare Old",
+        "source": ["vector", "text"],
+        "bottler": "Gordon & MacPhail",
+        "edition": null,
+        "outturn": null,
+        "bottleId": 65842,
+        "category": "single_malt",
+        "fullName": "Gordon & MacPhail Rosebank 1989",
+        "reference": "Gordon & MacPhail 1989 Vintage, 10-year-old (distilled at Rosebank)",
+        "statedAge": 10,
+        "caskNumber": null,
+        "comparison": {
+          "missing": ["caskStrength", "singleCask"],
+          "conflicts": ["brand"],
+          "agreements": ["category", "statedAge", "abv", "bottler"]
+        },
+        "distillery": ["Rosebank"],
+        "maturation": null,
+        "releaseDay": null,
+        "singleCask": null,
+        "releaseYear": null,
+        "vintageYear": 1989,
+        "bottlingYear": null,
+        "caskStrength": null,
+        "releaseMonth": null,
+        "familyContext": {
+          "siblingBottles": []
+        }
+      },
+      {
+        "abv": 40,
+        "brand": "Gordon & MacPhail",
+        "score": 57.80857,
+        "series": "Connoisseurs Choice",
+        "source": ["text"],
+        "bottler": "Gordon & MacPhail",
+        "edition": null,
+        "outturn": null,
+        "bottleId": 67244,
+        "category": "single_malt",
+        "fullName": "Gordon & MacPhail Laphroaig 1969 10-year-old",
+        "reference": null,
+        "statedAge": 10,
+        "caskNumber": null,
+        "comparison": {
+          "missing": ["caskStrength", "singleCask"],
+          "conflicts": ["brand"],
+          "agreements": ["category", "statedAge", "abv", "bottler"]
+        },
+        "distillery": ["Laphroaig"],
+        "maturation": "Oak casks",
+        "releaseDay": null,
+        "singleCask": null,
+        "releaseYear": null,
+        "vintageYear": 1969,
+        "bottlingYear": null,
+        "caskStrength": null,
+        "releaseMonth": null,
+        "familyContext": {
+          "siblingBottles": []
+        }
+      },
+      {
+        "abv": 40,
+        "brand": "Gordon & MacPhail",
+        "score": 53.439247,
+        "series": "Private Collection",
+        "source": ["text"],
+        "bottler": "Gordon & MacPhail",
+        "edition": null,
+        "outturn": 4500,
+        "bottleId": 70102,
+        "category": "single_malt",
+        "fullName": "Gordon & MacPhail Imperial 1990 10-year-old Cognac Wood Finish",
+        "reference": null,
+        "statedAge": 10,
+        "caskNumber": null,
+        "comparison": {
+          "missing": ["caskStrength", "singleCask"],
+          "conflicts": ["brand"],
+          "agreements": ["category", "statedAge", "abv", "bottler"]
+        },
+        "distillery": ["Imperial"],
+        "maturation": "Cognac wood finish",
+        "releaseDay": null,
+        "singleCask": null,
+        "releaseYear": null,
+        "vintageYear": 1990,
+        "bottlingYear": 2000,
+        "caskStrength": null,
+        "releaseMonth": null,
+        "familyContext": {
+          "siblingBottles": []
+        }
+      },
+      {
+        "abv": 40,
+        "brand": "Isle of Jura",
+        "score": 49.2535,
+        "series": null,
+        "source": ["text"],
+        "bottler": null,
+        "edition": null,
+        "outturn": null,
+        "bottleId": 45943,
+        "category": "single_malt",
+        "fullName": "Isle of Jura Origin - 10-year-old - 40.0% ABV - Oloroso Cask",
+        "reference": null,
+        "statedAge": 10,
+        "caskNumber": null,
+        "comparison": {
+          "missing": ["caskStrength", "singleCask", "bottler"],
+          "conflicts": ["brand"],
+          "agreements": ["category", "statedAge", "abv"]
+        },
+        "distillery": ["Isle of Jura"],
+        "maturation": "oloroso",
+        "releaseDay": null,
+        "singleCask": null,
+        "releaseYear": null,
+        "vintageYear": null,
+        "bottlingYear": null,
+        "caskStrength": null,
+        "releaseMonth": null,
+        "familyContext": {
+          "siblingBottles": []
+        }
+      },
+      {
+        "abv": 40,
+        "brand": "anCnoc",
+        "score": 48.832783,
+        "series": null,
+        "source": ["text"],
+        "bottler": null,
+        "edition": null,
+        "outturn": null,
+        "bottleId": 45882,
+        "category": "single_malt",
+        "fullName": "anCnoc Peated - 10-year-old - 40.0% ABV - Bourbon Cask",
+        "reference": null,
+        "statedAge": 10,
+        "caskNumber": null,
+        "comparison": {
+          "missing": ["caskStrength", "singleCask", "bottler"],
+          "conflicts": ["brand"],
+          "agreements": ["category", "statedAge", "abv"]
+        },
+        "distillery": ["Knockdhu"],
+        "maturation": "bourbon",
+        "releaseDay": null,
+        "singleCask": null,
+        "releaseYear": null,
+        "vintageYear": null,
+        "bottlingYear": null,
+        "caskStrength": null,
+        "releaseMonth": null,
+        "familyContext": {
+          "siblingBottles": []
+        }
+      },
+      {
+        "abv": 40,
+        "brand": "Isle of Jura",
+        "score": 45.129993,
+        "series": null,
+        "source": ["text"],
+        "bottler": null,
+        "edition": null,
+        "outturn": null,
+        "bottleId": 44114,
+        "category": "single_malt",
+        "fullName": "Isle of Jura 10-year-old - 40.0% ABV - Oloroso Cask",
+        "reference": null,
+        "statedAge": 10,
+        "caskNumber": null,
+        "comparison": {
+          "missing": ["caskStrength", "singleCask", "bottler"],
+          "conflicts": ["brand"],
+          "agreements": ["category", "statedAge", "abv"]
+        },
+        "distillery": ["Isle of Jura"],
+        "maturation": "oloroso",
+        "releaseDay": null,
+        "singleCask": null,
+        "releaseYear": null,
+        "vintageYear": null,
+        "bottlingYear": null,
+        "caskStrength": null,
+        "releaseMonth": null,
+        "familyContext": {
+          "siblingBottles": []
+        }
+      },
+      {
+        "abv": 40,
+        "brand": "MacPhail's",
+        "score": 44.969208,
+        "series": null,
+        "source": ["text", "context"],
+        "bottler": "Gordon & MacPhail",
+        "edition": null,
+        "outturn": null,
+        "bottleId": 70199,
+        "category": "single_malt",
+        "fullName": "MacPhail's 10-year-old",
+        "reference": null,
+        "statedAge": 10,
+        "caskNumber": null,
+        "comparison": {
+          "missing": ["caskStrength", "singleCask"],
+          "conflicts": ["brand"],
+          "agreements": ["category", "statedAge", "abv", "bottler"]
+        },
+        "distillery": [],
+        "maturation": null,
+        "releaseDay": null,
+        "singleCask": null,
+        "releaseYear": null,
+        "vintageYear": null,
+        "bottlingYear": null,
+        "caskStrength": null,
+        "releaseMonth": null,
+        "familyContext": {
+          "siblingBottles": []
+        }
+      },
+      {
+        "abv": 40,
+        "brand": "Master of Malt",
+        "score": 43.757843,
+        "series": null,
+        "source": ["text"],
+        "bottler": "Master of Malt",
+        "edition": null,
+        "outturn": null,
+        "bottleId": 45638,
+        "category": "single_malt",
+        "fullName": "Master of Malt A Secret Speyside Distillery - 10-year-old - 40.0% ABV",
+        "reference": null,
+        "statedAge": 10,
+        "caskNumber": null,
+        "comparison": {
+          "missing": [],
+          "conflicts": [],
+          "agreements": ["abv"]
+        },
+        "distillery": [],
+        "maturation": null,
+        "releaseDay": null,
+        "singleCask": false,
+        "releaseYear": null,
+        "vintageYear": null,
+        "bottlingYear": null,
+        "caskStrength": null,
+        "releaseMonth": null,
+        "familyContext": {
+          "siblingBottles": []
+        }
+      },
+      {
+        "abv": 40,
+        "brand": "Laphroaig",
+        "score": 38.246765,
+        "series": null,
+        "source": ["text", "vector"],
+        "bottler": null,
+        "edition": null,
+        "outturn": null,
+        "bottleId": 54469,
+        "category": "single_malt",
+        "fullName": "Laphroaig 10-year-old",
+        "reference": "Laphroaig 10-year-old, 40%",
+        "statedAge": 10,
+        "caskNumber": null,
+        "comparison": {
+          "missing": ["bottler"],
+          "conflicts": ["brand"],
+          "agreements": [
+            "category",
+            "statedAge",
+            "abv",
+            "caskStrength",
+            "singleCask"
+          ]
+        },
+        "distillery": ["Laphroaig"],
+        "maturation": "Matured for 10 years in ex-bourbon barrels",
+        "releaseDay": null,
+        "singleCask": false,
+        "releaseYear": null,
+        "vintageYear": null,
+        "bottlingYear": null,
+        "caskStrength": false,
+        "releaseMonth": null,
+        "familyContext": {
+          "siblingBottles": []
+        }
+      },
+      {
+        "abv": 40,
+        "brand": "Glenturret",
+        "score": 38.009262,
+        "series": null,
+        "source": ["text", "vector"],
+        "bottler": null,
+        "edition": null,
+        "outturn": null,
+        "bottleId": 65631,
+        "category": "single_malt",
+        "fullName": "Glenturret 10-year-old",
+        "reference": "Glenturret 10-year-old, 40%",
+        "statedAge": 10,
+        "caskNumber": null,
+        "comparison": {
+          "missing": ["caskStrength", "singleCask", "bottler"],
+          "conflicts": ["brand"],
+          "agreements": ["category", "statedAge", "abv"]
+        },
+        "distillery": ["Glenturret"],
+        "maturation": null,
+        "releaseDay": null,
+        "singleCask": null,
+        "releaseYear": null,
+        "vintageYear": null,
+        "bottlingYear": null,
+        "caskStrength": null,
+        "releaseMonth": null,
+        "familyContext": {
+          "siblingBottles": []
+        }
+      },
+      {
+        "abv": 40,
+        "brand": "Talisker",
+        "score": 38.009262,
+        "series": null,
+        "source": ["text", "vector"],
+        "bottler": null,
+        "edition": null,
+        "outturn": null,
+        "bottleId": 68960,
+        "category": "single_malt",
+        "fullName": "Talisker 10-year-old",
+        "reference": "Talisker 10-year-old, 40%",
+        "statedAge": 10,
+        "caskNumber": null,
+        "comparison": {
+          "missing": ["caskStrength", "singleCask", "bottler"],
+          "conflicts": ["brand"],
+          "agreements": ["category", "statedAge", "abv"]
+        },
+        "distillery": ["Talisker"],
+        "maturation": null,
+        "releaseDay": null,
+        "singleCask": null,
+        "releaseYear": null,
+        "vintageYear": null,
+        "bottlingYear": null,
+        "caskStrength": null,
+        "releaseMonth": null,
+        "familyContext": {
+          "siblingBottles": []
+        }
+      },
+      {
+        "abv": 40,
+        "brand": "The Deveron",
+        "score": 37.45193,
+        "series": null,
+        "source": ["vector", "text"],
+        "bottler": null,
+        "edition": null,
+        "outturn": null,
+        "bottleId": 65163,
+        "category": "single_malt",
+        "fullName": "The Deveron 10-year-old",
+        "reference": "Deveron 10-year-old, 40%",
+        "statedAge": 10,
+        "caskNumber": null,
+        "comparison": {
+          "missing": [],
+          "conflicts": [],
+          "agreements": ["category", "statedAge", "abv"]
+        },
+        "distillery": ["Macduff Distillery"],
+        "maturation": null,
+        "releaseDay": null,
+        "singleCask": null,
+        "releaseYear": 2015,
+        "vintageYear": null,
+        "bottlingYear": null,
+        "caskStrength": null,
+        "releaseMonth": null,
+        "familyContext": {
+          "siblingBottles": []
+        }
+      },
+      {
+        "abv": 40,
+        "brand": "Yamazaki",
+        "score": 36.37465,
+        "series": null,
+        "source": ["text"],
+        "bottler": null,
+        "edition": null,
+        "outturn": null,
+        "bottleId": 5123,
+        "category": "single_malt",
+        "fullName": "Yamazaki 10-year-old",
+        "reference": null,
+        "statedAge": 10,
+        "caskNumber": null,
+        "comparison": {
+          "missing": [],
+          "conflicts": [],
+          "agreements": ["category", "statedAge", "abv"]
+        },
+        "distillery": ["Yamazaki"],
+        "maturation": null,
+        "releaseDay": null,
+        "singleCask": null,
+        "releaseYear": 1995,
+        "vintageYear": null,
+        "bottlingYear": null,
+        "caskStrength": null,
+        "releaseMonth": null,
+        "familyContext": {
+          "siblingBottles": []
+        }
+      },
+      {
+        "abv": 40,
+        "brand": "Lismore",
+        "score": 36.082127,
+        "series": null,
+        "source": ["text"],
+        "bottler": null,
+        "edition": null,
+        "outturn": null,
+        "bottleId": 56245,
+        "category": "single_malt",
+        "fullName": "Lismore 10-year-old",
+        "reference": null,
+        "statedAge": 10,
+        "caskNumber": null,
+        "comparison": {
+          "missing": [],
+          "conflicts": [],
+          "agreements": ["category", "statedAge", "abv"]
+        },
+        "distillery": [],
+        "maturation": null,
+        "releaseDay": null,
+        "singleCask": null,
+        "releaseYear": null,
+        "vintageYear": null,
+        "bottlingYear": null,
+        "caskStrength": null,
+        "releaseMonth": null,
+        "familyContext": {
+          "siblingBottles": []
+        }
+      },
+      {
+        "abv": 40,
+        "brand": "Longmorn",
+        "score": 36.082127,
+        "series": null,
+        "source": ["text"],
+        "bottler": null,
+        "edition": null,
+        "outturn": null,
+        "bottleId": 67988,
+        "category": "single_malt",
+        "fullName": "Longmorn 10-year-old",
+        "reference": null,
+        "statedAge": 10,
+        "caskNumber": null,
+        "comparison": {
+          "missing": [],
+          "conflicts": [],
+          "agreements": ["category", "statedAge", "abv"]
+        },
+        "distillery": ["Longmorn"],
+        "maturation": null,
+        "releaseDay": null,
+        "singleCask": null,
+        "releaseYear": null,
+        "vintageYear": null,
+        "bottlingYear": null,
+        "caskStrength": null,
+        "releaseMonth": null,
+        "familyContext": {
+          "siblingBottles": []
+        }
+      },
+      {
+        "abv": 40,
+        "brand": "Islay Gold",
+        "score": 35.85819,
+        "series": null,
+        "source": ["text"],
+        "bottler": null,
+        "edition": null,
+        "outturn": null,
+        "bottleId": 44216,
+        "category": "single_malt",
+        "fullName": "Islay Gold 10-year-old",
+        "reference": null,
+        "statedAge": 10,
+        "caskNumber": null,
+        "comparison": {
+          "missing": [],
+          "conflicts": [],
+          "agreements": ["category", "statedAge", "abv"]
+        },
+        "distillery": [],
+        "maturation": null,
+        "releaseDay": null,
+        "singleCask": null,
+        "releaseYear": null,
+        "vintageYear": null,
+        "bottlingYear": null,
+        "caskStrength": null,
+        "releaseMonth": null,
+        "familyContext": {
+          "siblingBottles": []
+        }
+      },
+      {
+        "abv": 40,
+        "brand": "Glenmorangie",
+        "score": 35.729095,
+        "series": null,
+        "source": ["text"],
+        "bottler": null,
+        "edition": null,
+        "outturn": null,
+        "bottleId": 5371,
+        "category": "single_malt",
+        "fullName": "Glenmorangie 10-year-old",
+        "reference": null,
+        "statedAge": 10,
+        "caskNumber": null,
+        "comparison": {
+          "missing": [],
+          "conflicts": [],
+          "agreements": ["category", "statedAge", "abv"]
+        },
+        "distillery": ["Glenmorangie"],
+        "maturation": null,
+        "releaseDay": null,
+        "singleCask": null,
+        "releaseYear": null,
+        "vintageYear": null,
+        "bottlingYear": null,
+        "caskStrength": null,
+        "releaseMonth": null,
+        "familyContext": {
+          "siblingBottles": []
+        }
+      },
+      {
+        "abv": 40,
+        "brand": "Highland Park",
+        "score": 35.45799,
+        "series": null,
+        "source": ["vector", "text"],
+        "bottler": null,
+        "edition": null,
+        "outturn": null,
+        "bottleId": 990,
+        "category": "single_malt",
+        "fullName": "Highland Park 10-year-old",
+        "reference": "Highland Park 10-year-old Viking Scars",
+        "statedAge": 10,
+        "caskNumber": null,
+        "comparison": {
+          "missing": [],
+          "conflicts": [],
+          "agreements": ["category", "statedAge", "abv"]
+        },
+        "distillery": ["Highland Park"],
+        "maturation": null,
+        "releaseDay": null,
+        "singleCask": null,
+        "releaseYear": null,
+        "vintageYear": null,
+        "bottlingYear": null,
+        "caskStrength": null,
+        "releaseMonth": null,
+        "familyContext": {
+          "siblingBottles": []
+        }
+      },
+      {
+        "abv": 40,
+        "brand": "Tomatin",
+        "score": 35.40542,
+        "series": null,
+        "source": ["text"],
+        "bottler": null,
+        "edition": null,
+        "outturn": null,
+        "bottleId": 66841,
+        "category": "single_malt",
+        "fullName": "Tomatin 10-year-old",
+        "reference": null,
+        "statedAge": 10,
+        "caskNumber": null,
+        "comparison": {
+          "missing": [],
+          "conflicts": [],
+          "agreements": ["category", "statedAge", "abv"]
+        },
+        "distillery": ["Tomatin"],
+        "maturation": "Bourbon casks",
+        "releaseDay": null,
+        "singleCask": null,
+        "releaseYear": 2025,
+        "vintageYear": null,
+        "bottlingYear": null,
+        "caskStrength": null,
+        "releaseMonth": null,
+        "familyContext": {
+          "siblingBottles": []
+        }
+      },
+      {
+        "abv": 40,
+        "brand": "Glen Burn",
+        "score": 34.784,
+        "series": null,
+        "source": ["text"],
+        "bottler": null,
+        "edition": null,
+        "outturn": null,
+        "bottleId": 68814,
+        "category": "single_malt",
+        "fullName": "Glen Burn 10-year-old",
+        "reference": null,
+        "statedAge": 10,
+        "caskNumber": null,
+        "comparison": {
+          "missing": [],
+          "conflicts": [],
+          "agreements": ["category", "statedAge", "abv"]
+        },
+        "distillery": [],
+        "maturation": null,
+        "releaseDay": null,
+        "singleCask": null,
+        "releaseYear": null,
+        "vintageYear": null,
+        "bottlingYear": null,
+        "caskStrength": null,
+        "releaseMonth": null,
+        "familyContext": {
+          "siblingBottles": []
+        }
+      },
+      {
+        "abv": 40,
+        "brand": "Hakushu Distillery",
+        "score": 34.784,
+        "series": null,
+        "source": ["text"],
+        "bottler": null,
+        "edition": null,
+        "outturn": null,
+        "bottleId": 51774,
+        "category": "single_malt",
+        "fullName": "Hakushu Distillery 10-year-old",
+        "reference": null,
+        "statedAge": 10,
+        "caskNumber": null,
+        "comparison": {
+          "missing": [],
+          "conflicts": [],
+          "agreements": ["category", "statedAge", "abv"]
+        },
+        "distillery": ["Hakushu Distillery"],
+        "maturation": null,
+        "releaseDay": null,
+        "singleCask": null,
+        "releaseYear": null,
+        "vintageYear": null,
+        "bottlingYear": null,
+        "caskStrength": null,
+        "releaseMonth": null,
+        "familyContext": {
+          "siblingBottles": []
+        }
+      },
+      {
+        "abv": 40,
+        "brand": "Loch Dhu",
+        "score": 34.617302,
+        "series": null,
+        "source": ["text"],
+        "bottler": null,
+        "edition": null,
+        "outturn": null,
+        "bottleId": 69093,
+        "category": "single_malt",
+        "fullName": "Loch Dhu 10-year-old",
+        "reference": null,
+        "statedAge": 10,
+        "caskNumber": null,
+        "comparison": {
+          "missing": [],
+          "conflicts": [],
+          "agreements": ["category", "statedAge", "abv"]
+        },
+        "distillery": ["Mannochmore"],
+        "maturation": null,
+        "releaseDay": null,
+        "singleCask": null,
+        "releaseYear": null,
+        "vintageYear": null,
+        "bottlingYear": null,
+        "caskStrength": null,
+        "releaseMonth": null,
+        "familyContext": {
+          "siblingBottles": []
+        }
+      },
+      {
+        "abv": 40,
+        "brand": "MacPhail's",
+        "score": 34.50408,
+        "series": null,
+        "source": ["text"],
+        "bottler": "Gordon & MacPhail",
+        "edition": null,
+        "outturn": null,
+        "bottleId": 45846,
+        "category": "single_malt",
+        "fullName": "MacPhail's Speyside Single Malt Scotch Whisky - 12-year-old - 40.0% ABV",
+        "reference": null,
+        "statedAge": 12,
+        "caskNumber": null,
+        "comparison": {
+          "missing": [],
+          "conflicts": [],
+          "agreements": ["abv"]
+        },
+        "distillery": [],
+        "maturation": null,
+        "releaseDay": null,
+        "singleCask": null,
+        "releaseYear": null,
+        "vintageYear": null,
+        "bottlingYear": null,
+        "caskStrength": null,
+        "releaseMonth": null,
+        "familyContext": {
+          "siblingBottles": []
+        }
+      },
+      {
+        "abv": 40,
+        "brand": "MacPhail's",
+        "score": 34.50408,
+        "series": null,
+        "source": ["text"],
+        "bottler": "Gordon & MacPhail",
+        "edition": null,
+        "outturn": null,
+        "bottleId": 46539,
+        "category": "single_malt",
+        "fullName": "MacPhail's Speyside Single Malt Scotch Whisky - 15-year-old - 40.0% ABV",
+        "reference": null,
+        "statedAge": 15,
+        "caskNumber": null,
+        "comparison": {
+          "missing": [],
+          "conflicts": [],
+          "agreements": ["abv"]
+        },
+        "distillery": [],
+        "maturation": null,
+        "releaseDay": null,
+        "singleCask": null,
+        "releaseYear": null,
+        "vintageYear": null,
+        "bottlingYear": null,
+        "caskStrength": null,
+        "releaseMonth": null,
+        "familyContext": {
+          "siblingBottles": []
+        }
+      },
+      {
+        "abv": null,
+        "brand": "Tamdhu",
+        "score": 34.462524,
+        "series": null,
+        "source": ["vector", "text"],
+        "bottler": null,
+        "edition": null,
+        "outturn": null,
+        "bottleId": 16892,
+        "category": "single_malt",
+        "fullName": "Tamdhu 10-year-old",
+        "reference": "Tamdhu 10-year-old, 40%",
+        "statedAge": 10,
+        "caskNumber": null,
+        "comparison": {
+          "missing": ["abv"],
+          "conflicts": [],
+          "agreements": ["category", "statedAge"]
+        },
+        "distillery": ["Tamdhu"],
+        "maturation": null,
+        "releaseDay": null,
+        "singleCask": null,
+        "releaseYear": null,
+        "vintageYear": null,
+        "bottlingYear": null,
+        "caskStrength": null,
+        "releaseMonth": null,
+        "familyContext": {
+          "siblingBottles": []
+        }
+      },
+      {
+        "abv": 40,
+        "brand": "Togouchi",
+        "score": 24.07802,
+        "series": null,
+        "source": ["text"],
+        "bottler": null,
+        "edition": null,
+        "outturn": null,
+        "bottleId": 46864,
+        "category": "blend",
+        "fullName": "Togouchi Kiwami - 40.0% ABV",
+        "reference": null,
+        "statedAge": null,
+        "caskNumber": null,
+        "comparison": {
+          "missing": [],
+          "conflicts": [],
+          "agreements": ["abv"]
+        },
+        "distillery": [],
+        "maturation": null,
+        "releaseDay": null,
+        "singleCask": null,
+        "releaseYear": null,
+        "vintageYear": null,
+        "bottlingYear": null,
+        "caskStrength": null,
+        "releaseMonth": null,
+        "familyContext": {
+          "siblingBottles": []
+        }
+      },
+      {
+        "abv": 40,
+        "brand": "Glenfairn",
+        "score": 24.027294,
+        "series": null,
+        "source": ["text"],
+        "bottler": null,
+        "edition": null,
+        "outturn": null,
+        "bottleId": 70033,
+        "category": "single_malt",
+        "fullName": "Glenfairn Speyside Single Malt",
+        "reference": null,
+        "statedAge": null,
+        "caskNumber": null,
+        "comparison": {
+          "missing": [],
+          "conflicts": [],
+          "agreements": ["abv"]
+        },
+        "distillery": [],
+        "maturation": null,
+        "releaseDay": null,
+        "singleCask": null,
+        "releaseYear": null,
+        "vintageYear": null,
+        "bottlingYear": null,
+        "caskStrength": null,
+        "releaseMonth": null,
+        "familyContext": {
+          "siblingBottles": []
+        }
+      },
+      {
+        "abv": 40,
+        "brand": "Togouchi",
+        "score": 23.954906,
+        "series": null,
+        "source": ["text"],
+        "bottler": "Chugoku Jozo",
+        "edition": null,
+        "outturn": null,
+        "bottleId": 45974,
+        "category": "blend",
+        "fullName": "Togouchi Premium - 40.0% ABV",
+        "reference": null,
+        "statedAge": null,
+        "caskNumber": null,
+        "comparison": {
+          "missing": [],
+          "conflicts": [],
+          "agreements": ["abv"]
+        },
+        "distillery": [],
+        "maturation": null,
+        "releaseDay": null,
+        "singleCask": null,
+        "releaseYear": null,
+        "vintageYear": null,
+        "bottlingYear": null,
+        "caskStrength": null,
+        "releaseMonth": null,
+        "familyContext": {
+          "siblingBottles": []
+        }
+      },
+      {
+        "abv": 40,
+        "brand": "Hamiltons",
+        "score": 23.89549,
+        "series": null,
+        "source": ["text"],
+        "bottler": "Charles Hamilton Ltd.",
+        "edition": null,
+        "outturn": null,
+        "bottleId": 45697,
+        "category": "blend",
+        "fullName": "Hamiltons Islay - 40.0% ABV",
+        "reference": null,
+        "statedAge": null,
+        "caskNumber": null,
+        "comparison": {
+          "missing": [],
+          "conflicts": [],
+          "agreements": ["abv"]
+        },
+        "distillery": [],
+        "maturation": null,
+        "releaseDay": null,
+        "singleCask": null,
+        "releaseYear": null,
+        "vintageYear": null,
+        "bottlingYear": null,
+        "caskStrength": null,
+        "releaseMonth": null,
+        "familyContext": {
+          "siblingBottles": []
+        }
+      },
+      {
+        "abv": 40,
+        "brand": "SPEY",
+        "score": 23.6697,
+        "series": null,
+        "source": ["text"],
+        "bottler": null,
+        "edition": null,
+        "outturn": null,
+        "bottleId": 45820,
+        "category": "single_malt",
+        "fullName": "SPEY 12-year-old",
+        "reference": null,
+        "statedAge": 12,
+        "caskNumber": null,
+        "comparison": {
+          "missing": [],
+          "conflicts": [],
+          "agreements": ["abv"]
+        },
+        "distillery": ["Speyside Distillery"],
+        "maturation": null,
+        "releaseDay": null,
+        "singleCask": null,
+        "releaseYear": null,
+        "vintageYear": null,
+        "bottlingYear": null,
+        "caskStrength": null,
+        "releaseMonth": null,
+        "familyContext": {
+          "siblingBottles": []
+        }
+      },
+      {
+        "abv": 40,
+        "brand": "Balnellan",
+        "score": 23.505703,
+        "series": null,
+        "source": ["text"],
+        "bottler": null,
+        "edition": null,
+        "outturn": null,
+        "bottleId": 64921,
+        "category": "single_malt",
+        "fullName": "Balnellan 12-year-old Speyside Glenlivet",
+        "reference": null,
+        "statedAge": 12,
+        "caskNumber": null,
+        "comparison": {
+          "missing": [],
+          "conflicts": [],
+          "agreements": ["abv"]
+        },
+        "distillery": [],
+        "maturation": null,
+        "releaseDay": null,
+        "singleCask": null,
+        "releaseYear": null,
+        "vintageYear": null,
+        "bottlingYear": null,
+        "caskStrength": null,
+        "releaseMonth": null,
+        "familyContext": {
+          "siblingBottles": []
+        }
+      },
+      {
+        "abv": 40,
+        "brand": "Old Williamsburg",
+        "score": 23.24014,
+        "series": null,
+        "source": ["text"],
+        "bottler": null,
+        "edition": null,
+        "outturn": null,
+        "bottleId": 47037,
+        "category": "bourbon",
+        "fullName": "Old Williamsburg Bourbon - 40.0% ABV",
+        "reference": null,
+        "statedAge": null,
+        "caskNumber": null,
+        "comparison": {
+          "missing": [],
+          "conflicts": [],
+          "agreements": ["abv"]
+        },
+        "distillery": [],
+        "maturation": null,
+        "releaseDay": null,
+        "singleCask": null,
+        "releaseYear": null,
+        "vintageYear": null,
+        "bottlingYear": null,
+        "caskStrength": null,
+        "releaseMonth": null,
+        "familyContext": {
+          "siblingBottles": []
+        }
+      },
+      {
+        "abv": 40,
+        "brand": "Starward",
+        "score": 23.24014,
+        "series": null,
+        "source": ["text"],
+        "bottler": null,
+        "edition": null,
+        "outturn": null,
+        "bottleId": 45659,
+        "category": "single_malt",
+        "fullName": "Starward Left-Field - 40.0% ABV",
+        "reference": null,
+        "statedAge": null,
+        "caskNumber": null,
+        "comparison": {
+          "missing": [],
+          "conflicts": [],
+          "agreements": ["abv"]
+        },
+        "distillery": ["Starward"],
+        "maturation": null,
+        "releaseDay": null,
+        "singleCask": null,
+        "releaseYear": null,
+        "vintageYear": null,
+        "bottlingYear": null,
+        "caskStrength": null,
+        "releaseMonth": null,
+        "familyContext": {
+          "siblingBottles": []
+        }
+      },
+      {
+        "abv": 40,
+        "brand": "Red Bank",
+        "score": 23.179314,
+        "series": null,
+        "source": ["text"],
+        "bottler": null,
+        "edition": null,
+        "outturn": null,
+        "bottleId": 46966,
+        "category": "blend",
+        "fullName": "Red Bank Whisky - 40.0% ABV",
+        "reference": null,
+        "statedAge": null,
+        "caskNumber": null,
+        "comparison": {
+          "missing": [],
+          "conflicts": [],
+          "agreements": ["abv"]
+        },
+        "distillery": [],
+        "maturation": null,
+        "releaseDay": null,
+        "singleCask": null,
+        "releaseYear": null,
+        "vintageYear": null,
+        "bottlingYear": null,
+        "caskStrength": null,
+        "releaseMonth": null,
+        "familyContext": {
+          "siblingBottles": []
+        }
+      },
+      {
+        "abv": 40,
+        "brand": "Whyte & Mackay",
+        "score": 23.179314,
+        "series": null,
+        "source": ["text"],
+        "bottler": "Whyte & Mackay",
+        "edition": null,
+        "outturn": null,
+        "bottleId": 45706,
+        "category": "blend",
+        "fullName": "Whyte & Mackay Special - 40.0% ABV",
+        "reference": null,
+        "statedAge": null,
+        "caskNumber": null,
+        "comparison": {
+          "missing": [],
+          "conflicts": [],
+          "agreements": ["abv"]
+        },
+        "distillery": [],
+        "maturation": null,
+        "releaseDay": null,
+        "singleCask": null,
+        "releaseYear": null,
+        "vintageYear": null,
+        "bottlingYear": null,
+        "caskStrength": null,
+        "releaseMonth": null,
+        "familyContext": {
+          "siblingBottles": []
+        }
+      },
+      {
+        "abv": 40,
+        "brand": "Angels' Nectar",
+        "score": 23.1199,
+        "series": null,
+        "source": ["text"],
+        "bottler": "Highfern",
+        "edition": null,
+        "outturn": null,
+        "bottleId": 47234,
+        "category": "blend",
+        "fullName": "Angels' Nectar Original - 40.0% ABV",
+        "reference": null,
+        "statedAge": null,
+        "caskNumber": null,
+        "comparison": {
+          "missing": [],
+          "conflicts": [],
+          "agreements": ["abv"]
+        },
+        "distillery": [],
+        "maturation": null,
+        "releaseDay": null,
+        "singleCask": false,
+        "releaseYear": null,
+        "vintageYear": null,
+        "bottlingYear": null,
+        "caskStrength": false,
+        "releaseMonth": null,
+        "familyContext": {
+          "siblingBottles": []
+        }
+      },
+      {
+        "abv": 40,
+        "brand": "Pure Scot",
+        "score": 23.1199,
+        "series": null,
+        "source": ["text"],
+        "bottler": null,
+        "edition": null,
+        "outturn": null,
+        "bottleId": 45718,
+        "category": "blend",
+        "fullName": "Pure Scot Signature - 40.0% ABV",
+        "reference": null,
+        "statedAge": null,
+        "caskNumber": null,
+        "comparison": {
+          "missing": [],
+          "conflicts": [],
+          "agreements": ["abv"]
+        },
+        "distillery": ["Bladnoch"],
+        "maturation": null,
+        "releaseDay": null,
+        "singleCask": null,
+        "releaseYear": null,
+        "vintageYear": null,
+        "bottlingYear": null,
+        "caskStrength": null,
+        "releaseMonth": null,
+        "familyContext": {
+          "siblingBottles": []
+        }
+      }
+    ]
+  },
+  "context": {
+    "inspectedBottleIds": [70199],
+    "bottleContexts": [
+      {
+        "exact": {
+          "abv": 40,
+          "edition": null,
+          "outturn": null,
+          "statedAge": 10,
+          "caskNumber": null,
+          "maturation": null,
+          "releaseDay": null,
+          "singleCask": null,
+          "releaseYear": null,
+          "vintageYear": null,
+          "bottlingYear": null,
+          "caskStrength": null,
+          "releaseMonth": null
+        },
+        "shared": {
+          "name": "10-year-old",
+          "brand": {
+            "name": "MacPhail's",
+            "entityId": 1165
+          },
+          "series": null,
+          "bottler": {
+            "name": "Gordon & MacPhail",
+            "entityId": 5645
+          },
+          "category": "single_malt",
+          "statedAge": null,
+          "distillers": []
+        },
+        "groupId": 43160,
+        "bottleId": 70199,
+        "fullName": "MacPhail's 10-year-old",
+        "siblings": [],
+        "references": [],
+        "observations": [],
+        "imageSources": []
+      }
+    ],
+    "inspectedEntities": [
+      {
+        "kind": "brand",
+        "name": "MacPhail's",
+        "score": 1,
+        "source": ["exact", "text", "prefix", "contained"],
+        "entityId": 1165,
+        "reference": "MacPhail's",
+        "shortName": null,
+        "retrievedFor": [
+          {
+            "exact": true,
+            "query": "MacPhail's"
+          }
+        ]
+      },
+      {
+        "kind": "bottler",
+        "name": "Gordon & MacPhail",
+        "score": 1,
+        "source": ["exact", "text", "prefix", "contained"],
+        "entityId": 5645,
+        "reference": "Gordon & MacPhail",
+        "shortName": null,
+        "retrievedFor": [
+          {
+            "exact": true,
+            "query": "Gordon & MacPhail"
+          }
+        ]
+      },
+      {
+        "kind": "bottler",
+        "name": "Master of Malt",
+        "score": 1,
+        "source": ["exact", "text", "prefix", "contained"],
+        "entityId": 6075,
+        "reference": "Master of Malt",
+        "shortName": null,
+        "retrievedFor": [
+          {
+            "exact": true,
+            "query": "Master of Malt"
+          }
+        ]
+      },
+      {
+        "kind": "brand",
+        "name": "Togouchi",
+        "score": 1,
+        "source": ["exact", "text", "prefix", "contained"],
+        "entityId": 1442,
+        "reference": "Togouchi",
+        "shortName": null,
+        "retrievedFor": [
+          {
+            "exact": true,
+            "query": "Togouchi"
+          }
+        ]
+      },
+      {
+        "kind": "brand",
+        "name": "Glenfairn",
+        "score": 1,
+        "source": ["exact", "text", "prefix", "contained"],
+        "entityId": 2872,
+        "reference": "Glenfairn",
+        "shortName": null,
+        "retrievedFor": [
+          {
+            "exact": true,
+            "query": "Glenfairn"
+          }
+        ]
+      },
+      {
+        "kind": "distillery",
+        "name": "Chugoku Jozo",
+        "score": 1,
+        "source": ["exact", "text", "prefix", "contained"],
+        "entityId": 7649,
+        "reference": "Chugoku Jozo",
+        "shortName": null,
+        "retrievedFor": [
+          {
+            "exact": true,
+            "query": "Chugoku Jozo"
+          }
+        ]
+      },
+      {
+        "kind": "brand",
+        "name": "Hamiltons",
+        "score": 1,
+        "source": ["exact", "text", "prefix", "contained"],
+        "entityId": 2961,
+        "reference": "Hamiltons",
+        "shortName": null,
+        "retrievedFor": [
+          {
+            "exact": true,
+            "query": "Hamiltons"
+          }
+        ]
+      },
+      {
+        "kind": "bottler",
+        "name": "Charles Hamilton Ltd.",
+        "score": 1,
+        "source": ["exact", "text", "prefix", "contained"],
+        "entityId": 365805,
+        "reference": "Charles Hamilton Ltd.",
+        "shortName": null,
+        "retrievedFor": [
+          {
+            "exact": true,
+            "query": "Charles Hamilton Ltd."
+          }
+        ]
+      },
+      {
+        "kind": "brand",
+        "name": "SPEY",
+        "score": 1,
+        "source": ["exact", "text", "prefix", "contained"],
+        "entityId": 1353,
+        "reference": "SPEY",
+        "shortName": null,
+        "retrievedFor": [
+          {
+            "exact": true,
+            "query": "SPEY"
+          },
+          {
+            "query": "Speyside Distillery"
+          }
+        ]
+      },
+      {
+        "kind": "distillery",
+        "name": "Speyside Distillery",
+        "score": 1,
+        "source": ["exact", "prefix", "contained"],
+        "entityId": 1356,
+        "reference": "Speyside Distillery",
+        "shortName": null,
+        "retrievedFor": [
+          {
+            "exact": true,
+            "query": "Speyside Distillery"
+          }
+        ]
+      },
+      {
+        "kind": "brand",
+        "name": "Balnellan",
+        "score": 1,
+        "source": ["exact", "text", "prefix", "contained"],
+        "entityId": 367413,
+        "reference": "Balnellan",
+        "shortName": null,
+        "retrievedFor": [
+          {
+            "exact": true,
+            "query": "Balnellan"
+          }
+        ]
+      },
+      {
+        "kind": "brand",
+        "name": "Old Williamsburg",
+        "score": 1,
+        "source": ["exact", "text", "prefix", "contained"],
+        "entityId": 365994,
+        "reference": "Old Williamsburg",
+        "shortName": null,
+        "retrievedFor": [
+          {
+            "exact": true,
+            "query": "Old Williamsburg"
+          }
+        ]
+      },
+      {
+        "kind": "brand",
+        "name": "Spey River",
+        "score": 0.5,
+        "source": ["text", "prefix"],
+        "entityId": 4020,
+        "reference": "Spey River",
+        "shortName": null,
+        "retrievedFor": [
+          {
+            "query": "SPEY"
+          }
+        ]
+      },
+      {
+        "kind": "brand",
+        "name": "Spey Royal",
+        "score": 0.5,
+        "source": ["text", "prefix"],
+        "entityId": 4021,
+        "reference": "Spey Royal",
+        "shortName": null,
+        "retrievedFor": [
+          {
+            "query": "SPEY"
+          }
+        ]
+      },
+      {
+        "kind": "brand",
+        "name": "Speyside Region Malt",
+        "score": 0.5,
+        "source": ["prefix"],
+        "entityId": 1358,
+        "reference": null,
+        "shortName": null,
+        "retrievedFor": [
+          {
+            "query": "SPEY"
+          }
+        ]
+      },
+      {
+        "kind": "company",
+        "name": "Speyside Distillers Company",
+        "score": 0.5,
+        "source": ["prefix"],
+        "entityId": 5752,
+        "reference": null,
+        "shortName": null,
+        "retrievedFor": [
+          {
+            "query": "SPEY"
+          }
+        ]
+      },
+      {
+        "kind": "distillery",
+        "name": "Highlander",
+        "score": 0.35,
+        "source": ["contained"],
+        "entityId": 3032,
+        "reference": "Highlander",
+        "shortName": null,
+        "retrievedFor": [
+          {
+            "query": "The Highlanders Museum"
+          }
+        ]
+      },
+      {
+        "kind": "brand",
+        "name": "FAIR.",
+        "score": 0.3388888888888889,
+        "source": ["contained"],
+        "entityId": 365979,
+        "reference": "FAIR.",
+        "shortName": null,
+        "retrievedFor": [
+          {
+            "query": "Glenfairn"
+          }
+        ]
+      },
+      {
+        "kind": "brand",
+        "name": "An Iconic Speyside Distillery",
+        "score": 0.2,
+        "source": ["text"],
+        "entityId": 2093,
+        "reference": null,
+        "shortName": null,
+        "retrievedFor": [
+          {
+            "query": "Speyside Distillery"
+          }
+        ]
+      },
+      {
+        "kind": "brand",
+        "name": "An Undisclosed Speyside Distillery",
+        "score": 0.2,
+        "source": ["text"],
+        "entityId": 2097,
+        "reference": null,
+        "shortName": null,
+        "retrievedFor": [
+          {
+            "query": "Speyside Distillery"
+          }
+        ]
+      },
+      {
+        "kind": "brand",
+        "name": "A Secret Speyside Distillery",
+        "score": 0.2,
+        "source": ["text"],
+        "entityId": 39,
+        "reference": null,
+        "shortName": null,
+        "retrievedFor": [
+          {
+            "query": "Speyside Distillery"
+          }
+        ]
+      },
+      {
+        "kind": "company",
+        "name": "The Gordon Highlanders Museum and Regimental Trust Fund",
+        "score": 0.2,
+        "source": ["text"],
+        "entityId": 366290,
+        "reference": null,
+        "shortName": null,
+        "retrievedFor": [
+          {
+            "query": "The Highlanders Museum"
+          }
+        ]
+      }
+    ],
+    "inspectedSeries": []
+  },
+  "provenance": {
+    "source": "production_miss",
+    "verifiedSourceUrls": [
+      "https://www.scotchwhiskyauctions.com/auctions/234-the-185th-auction/904514-speyside-single-malt-cuidich-n-righ/",
+      "https://d3suvtcq00dftb.cloudfront.net/images/2ba7526176c26e28a6a1173b83b2db28-zoom.jpg"
+    ],
+    "dbOutcome": {
+      "bottleId": null,
+      "createsBottle": false,
+      "summary": "Production returned no_match: it found a 10-year-old Gordon & MacPhail claim on the web but could not confirm the full identity."
+    },
+    "notes": "Captured from saved classifier run 36685 (auction_lot 17652, model null, 2026-11-03T21:50:17.470Z). Production rationale: The source is a single whisky Bottle, not an out-of-scope item. Product-specific web results identify Cuidich 'N Righ as a 10-year-old Speyside single malt bottled for the Highlander's Regimental Museum by Gordon & MacPhail at 40% ABV. Inspected Bottle 70199 is a generic MacPhail's 10-year-old and does not represent this distinct named release. The available evidence does not establish the marketed Brand, so neither assignment nor creation is safe. The run predates reading Scotch Whisky Auctions lot pages (#1609), so the evidence pack adds the lot page text. Expected outcome checked against the lot page and photo on 2026-11-09, in a random sample of the 185th auction's no_match reviews."
+  },
+  "expected": {
+    "status": "classified",
+    "action": "create_bottle",
+    "identityScope": "product",
+    "matchedBottleId": null,
+    "proposedBottle": {
+      "category": "single_malt",
+      "abv": 40,
+      "statedAge": null
+    },
+    "proposedBottleNameIncludes": ["Cuidich"],
+    "summary": "Create Cuidich 'N Righ single malt Scotch whisky, the malt whisky of the Highlanders' Regimental Museum, at 40%. The label and tube print the name, 40% and 70cl, and no age, bottler or distillery, so leave age empty. The generic MacPhail's 10-year-old (70199) is another Bottle."
+  },
+  "knownFailure": {
+    "reason": "The agent returns no_match because it cannot settle the Brand and label hierarchy for Cuidich 'N Righ."
+  }
+}

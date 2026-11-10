@@ -1,0 +1,1157 @@
+{
+  "id": "auction-stewarts-cream-of-the-barley-create",
+  "name": "Stewarts Cream of the Barley: create the 40% blended Scotch",
+  "input": {
+    "reference": {
+      "id": 17948,
+      "url": "https://www.scotchwhiskyauctions.com/auctions/234-the-185th-auction/904192-stewarts-cream-of-the-barley/",
+      "name": "Stewarts Cream Of The Barley",
+      "imageUrl": null,
+      "externalSiteId": 28097,
+      "currentBottleId": null
+    },
+    "extractedIdentity": {
+      "abv": 40,
+      "brand": null,
+      "series": null,
+      "bottler": null,
+      "edition": null,
+      "outturn": null,
+      "category": null,
+      "distillery": null,
+      "expression": null,
+      "maturation": null,
+      "stated_age": null,
+      "cask_number": null,
+      "single_cask": null,
+      "release_year": null,
+      "vintage_year": null,
+      "cask_strength": null
+    },
+    "extractedIdentitySource": "structured",
+    "imageEvidence": null,
+    "initialCandidates": [
+      {
+        "abv": null,
+        "brand": "Forty Creek",
+        "score": 28.277271,
+        "series": null,
+        "source": ["text"],
+        "bottler": null,
+        "edition": null,
+        "outturn": null,
+        "bottleId": 17020,
+        "category": "blend",
+        "fullName": "Forty Creek Cream",
+        "reference": null,
+        "statedAge": null,
+        "caskNumber": null,
+        "comparison": {
+          "missing": ["abv"],
+          "conflicts": ["brand"],
+          "agreements": ["category"]
+        },
+        "distillery": [],
+        "maturation": null,
+        "releaseDay": null,
+        "singleCask": null,
+        "releaseYear": null,
+        "vintageYear": null,
+        "bottlingYear": null,
+        "caskStrength": null,
+        "releaseMonth": null,
+        "familyContext": {
+          "siblingBottles": []
+        }
+      },
+      {
+        "abv": 40,
+        "brand": "Highland Malt",
+        "score": 27.986372,
+        "series": null,
+        "source": ["text"],
+        "bottler": null,
+        "edition": null,
+        "outturn": null,
+        "bottleId": 53137,
+        "category": "blend",
+        "fullName": "Highland Malt Barley Tap",
+        "reference": null,
+        "statedAge": null,
+        "caskNumber": null,
+        "comparison": {
+          "missing": [],
+          "conflicts": [],
+          "agreements": ["abv"]
+        },
+        "distillery": [],
+        "maturation": null,
+        "releaseDay": null,
+        "singleCask": null,
+        "releaseYear": null,
+        "vintageYear": null,
+        "bottlingYear": null,
+        "caskStrength": null,
+        "releaseMonth": null,
+        "familyContext": {
+          "siblingBottles": []
+        }
+      },
+      {
+        "abv": null,
+        "brand": "Canadian Club",
+        "score": 25.807838,
+        "series": null,
+        "source": ["text"],
+        "bottler": null,
+        "edition": null,
+        "outturn": null,
+        "bottleId": 14120,
+        "category": "blend",
+        "fullName": "Canadian Club 2018 Barley (Batch Edition)",
+        "reference": null,
+        "statedAge": null,
+        "caskNumber": null,
+        "comparison": {
+          "missing": ["abv"],
+          "conflicts": ["brand"],
+          "agreements": ["category"]
+        },
+        "distillery": [],
+        "maturation": null,
+        "releaseDay": null,
+        "singleCask": null,
+        "releaseYear": null,
+        "vintageYear": null,
+        "bottlingYear": null,
+        "caskStrength": null,
+        "releaseMonth": null,
+        "familyContext": {
+          "siblingBottles": []
+        }
+      },
+      {
+        "abv": 40,
+        "brand": "Jamie Stewart",
+        "score": 0.7046012922325718,
+        "series": null,
+        "source": ["vector"],
+        "bottler": null,
+        "edition": null,
+        "outturn": null,
+        "bottleId": 65025,
+        "category": "blend",
+        "fullName": "Jamie Stewart Blended Scotch Whisky",
+        "reference": "Jamie Stewart, 40%",
+        "statedAge": null,
+        "caskNumber": null,
+        "comparison": {
+          "missing": [],
+          "conflicts": [],
+          "agreements": ["abv"]
+        },
+        "distillery": [],
+        "maturation": null,
+        "releaseDay": null,
+        "singleCask": false,
+        "releaseYear": null,
+        "vintageYear": null,
+        "bottlingYear": null,
+        "caskStrength": false,
+        "releaseMonth": null,
+        "familyContext": {
+          "siblingBottles": []
+        }
+      },
+      {
+        "abv": 40,
+        "brand": "&Whisky",
+        "score": 0.6434245475605858,
+        "series": null,
+        "source": ["vector"],
+        "bottler": "&Whisky",
+        "edition": null,
+        "outturn": null,
+        "bottleId": 46987,
+        "category": "blend",
+        "fullName": "&Whisky Seaweed & Aeons & Butterscotch & Vanilla - 40.0% ABV",
+        "reference": "&Whisky Seaweed & Aeons & Butterscotch & Vanilla - 40.0% ABV",
+        "statedAge": null,
+        "caskNumber": null,
+        "comparison": {
+          "missing": [],
+          "conflicts": [],
+          "agreements": ["abv"]
+        },
+        "distillery": [],
+        "maturation": null,
+        "releaseDay": null,
+        "singleCask": null,
+        "releaseYear": null,
+        "vintageYear": null,
+        "bottlingYear": null,
+        "caskStrength": null,
+        "releaseMonth": null,
+        "familyContext": {
+          "siblingBottles": []
+        }
+      },
+      {
+        "abv": 40,
+        "brand": "Cutty Sark",
+        "score": 0.6422307871721813,
+        "series": null,
+        "source": ["vector"],
+        "bottler": null,
+        "edition": null,
+        "outturn": null,
+        "bottleId": 65553,
+        "category": "blended_malt",
+        "fullName": "Cutty Sark Storm",
+        "reference": "Cutty Sark Storm, 40%",
+        "statedAge": null,
+        "caskNumber": null,
+        "comparison": {
+          "missing": [],
+          "conflicts": [],
+          "agreements": ["abv"]
+        },
+        "distillery": [],
+        "maturation": null,
+        "releaseDay": null,
+        "singleCask": null,
+        "releaseYear": null,
+        "vintageYear": null,
+        "bottlingYear": null,
+        "caskStrength": null,
+        "releaseMonth": null,
+        "familyContext": {
+          "siblingBottles": []
+        }
+      },
+      {
+        "abv": 40,
+        "brand": "Sláinte",
+        "score": 0.6358923385722558,
+        "series": null,
+        "source": ["vector"],
+        "bottler": null,
+        "edition": null,
+        "outturn": null,
+        "bottleId": 64382,
+        "category": "blend",
+        "fullName": "Sláinte Signature Blend",
+        "reference": "Sláinte, 40%",
+        "statedAge": null,
+        "caskNumber": null,
+        "comparison": {
+          "missing": [],
+          "conflicts": [],
+          "agreements": ["abv"]
+        },
+        "distillery": [],
+        "maturation": null,
+        "releaseDay": null,
+        "singleCask": null,
+        "releaseYear": null,
+        "vintageYear": null,
+        "bottlingYear": null,
+        "caskStrength": null,
+        "releaseMonth": null,
+        "familyContext": {
+          "siblingBottles": []
+        }
+      },
+      {
+        "abv": 40,
+        "brand": "Stalk & Barrel",
+        "score": 0.6303105555912093,
+        "series": null,
+        "source": ["vector"],
+        "bottler": null,
+        "edition": null,
+        "outturn": null,
+        "bottleId": 56660,
+        "category": "blend",
+        "fullName": "Stalk & Barrel Blue Label Blend",
+        "reference": "Stalk & Barrel Blue Label Blend, 40%",
+        "statedAge": null,
+        "caskNumber": null,
+        "comparison": {
+          "missing": [],
+          "conflicts": [],
+          "agreements": ["abv"]
+        },
+        "distillery": [],
+        "maturation": null,
+        "releaseDay": null,
+        "singleCask": false,
+        "releaseYear": null,
+        "vintageYear": null,
+        "bottlingYear": null,
+        "caskStrength": false,
+        "releaseMonth": null,
+        "familyContext": {
+          "siblingBottles": []
+        }
+      },
+      {
+        "abv": 40,
+        "brand": "Mourne Dew",
+        "score": 0.6268549893914891,
+        "series": null,
+        "source": ["vector"],
+        "bottler": null,
+        "edition": null,
+        "outturn": null,
+        "bottleId": 64428,
+        "category": "blend",
+        "fullName": "Mourne Dew Blended Irish Whiskey",
+        "reference": "Mourne Dew, 40%",
+        "statedAge": null,
+        "caskNumber": null,
+        "comparison": {
+          "missing": [],
+          "conflicts": [],
+          "agreements": ["abv"]
+        },
+        "distillery": [],
+        "maturation": null,
+        "releaseDay": null,
+        "singleCask": null,
+        "releaseYear": null,
+        "vintageYear": null,
+        "bottlingYear": null,
+        "caskStrength": null,
+        "releaseMonth": null,
+        "familyContext": {
+          "siblingBottles": []
+        }
+      },
+      {
+        "abv": 40,
+        "brand": "Coperies",
+        "score": 0.6266483144017462,
+        "series": null,
+        "source": ["vector"],
+        "bottler": null,
+        "edition": null,
+        "outturn": null,
+        "bottleId": 64558,
+        "category": "single_malt",
+        "fullName": "Coperies Single Malt",
+        "reference": "Coperies Single Malt",
+        "statedAge": null,
+        "caskNumber": null,
+        "comparison": {
+          "missing": [],
+          "conflicts": [],
+          "agreements": ["abv"]
+        },
+        "distillery": [],
+        "maturation": null,
+        "releaseDay": null,
+        "singleCask": null,
+        "releaseYear": null,
+        "vintageYear": null,
+        "bottlingYear": null,
+        "caskStrength": null,
+        "releaseMonth": null,
+        "familyContext": {
+          "siblingBottles": []
+        }
+      },
+      {
+        "abv": 40,
+        "brand": "Cutty Sark",
+        "score": 0.6260154867012763,
+        "series": null,
+        "source": ["vector"],
+        "bottler": null,
+        "edition": null,
+        "outturn": null,
+        "bottleId": 43834,
+        "category": "blend",
+        "fullName": "Cutty Sark Blended Scotch Whisky",
+        "reference": "Cutty Sark, 40%",
+        "statedAge": null,
+        "caskNumber": null,
+        "comparison": {
+          "missing": [],
+          "conflicts": [],
+          "agreements": ["abv"]
+        },
+        "distillery": [],
+        "maturation": null,
+        "releaseDay": null,
+        "singleCask": false,
+        "releaseYear": null,
+        "vintageYear": null,
+        "bottlingYear": null,
+        "caskStrength": false,
+        "releaseMonth": null,
+        "familyContext": {
+          "siblingBottles": []
+        }
+      },
+      {
+        "abv": 40,
+        "brand": "Bell's",
+        "score": 0.6247764979422085,
+        "series": null,
+        "source": ["vector"],
+        "bottler": null,
+        "edition": null,
+        "outturn": null,
+        "bottleId": 47238,
+        "category": "blend",
+        "fullName": "Bell's Original - 40.0% ABV",
+        "reference": "Bell's Original - 40.0% ABV",
+        "statedAge": null,
+        "caskNumber": null,
+        "comparison": {
+          "missing": [],
+          "conflicts": ["brand"],
+          "agreements": ["category", "abv"]
+        },
+        "distillery": [],
+        "maturation": null,
+        "releaseDay": null,
+        "singleCask": false,
+        "releaseYear": null,
+        "vintageYear": null,
+        "bottlingYear": null,
+        "caskStrength": false,
+        "releaseMonth": null,
+        "familyContext": {
+          "siblingBottles": []
+        }
+      },
+      {
+        "abv": 40,
+        "brand": "Royal Crest",
+        "score": 0.62416658519182,
+        "series": null,
+        "source": ["vector"],
+        "bottler": null,
+        "edition": null,
+        "outturn": null,
+        "bottleId": 65185,
+        "category": null,
+        "fullName": "Royal Crest Canadian Whisky",
+        "reference": "Royal Crest, 40%",
+        "statedAge": null,
+        "caskNumber": null,
+        "comparison": {
+          "missing": [],
+          "conflicts": [],
+          "agreements": ["abv"]
+        },
+        "distillery": [],
+        "maturation": null,
+        "releaseDay": null,
+        "singleCask": null,
+        "releaseYear": null,
+        "vintageYear": null,
+        "bottlingYear": null,
+        "caskStrength": null,
+        "releaseMonth": null,
+        "familyContext": {
+          "siblingBottles": []
+        }
+      },
+      {
+        "abv": 40,
+        "brand": "Samuel Gelston's",
+        "score": 0.6228200050400672,
+        "series": null,
+        "source": ["vector"],
+        "bottler": null,
+        "edition": null,
+        "outturn": null,
+        "bottleId": 64522,
+        "category": "single_malt",
+        "fullName": "Samuel Gelston's Single Malt Irish Whiskey",
+        "reference": "Samuel Gelston's, 40%",
+        "statedAge": null,
+        "caskNumber": null,
+        "comparison": {
+          "missing": [],
+          "conflicts": [],
+          "agreements": ["abv"]
+        },
+        "distillery": [],
+        "maturation": null,
+        "releaseDay": null,
+        "singleCask": null,
+        "releaseYear": null,
+        "vintageYear": null,
+        "bottlingYear": null,
+        "caskStrength": null,
+        "releaseMonth": null,
+        "familyContext": {
+          "siblingBottles": []
+        }
+      },
+      {
+        "abv": 40,
+        "brand": "Jameson",
+        "score": 0.6214150935187966,
+        "series": null,
+        "source": ["vector"],
+        "bottler": null,
+        "edition": null,
+        "outturn": null,
+        "bottleId": 46973,
+        "category": "blend",
+        "fullName": "Jameson Irish Whiskey",
+        "reference": "Jameson, 40%",
+        "statedAge": null,
+        "caskNumber": null,
+        "comparison": {
+          "missing": [],
+          "conflicts": [],
+          "agreements": ["abv"]
+        },
+        "distillery": ["Midleton Distillery"],
+        "maturation": null,
+        "releaseDay": null,
+        "singleCask": null,
+        "releaseYear": null,
+        "vintageYear": null,
+        "bottlingYear": null,
+        "caskStrength": null,
+        "releaseMonth": null,
+        "familyContext": {
+          "siblingBottles": []
+        }
+      },
+      {
+        "abv": 40,
+        "brand": "Carlyle",
+        "score": 0.6212144814260185,
+        "series": null,
+        "source": ["vector"],
+        "bottler": null,
+        "edition": null,
+        "outturn": null,
+        "bottleId": 43902,
+        "category": "blend",
+        "fullName": "Carlyle Blended Scotch Whisky",
+        "reference": "Carlyle",
+        "statedAge": null,
+        "caskNumber": null,
+        "comparison": {
+          "missing": [],
+          "conflicts": ["brand"],
+          "agreements": ["category", "abv"]
+        },
+        "distillery": [],
+        "maturation": null,
+        "releaseDay": null,
+        "singleCask": null,
+        "releaseYear": null,
+        "vintageYear": null,
+        "bottlingYear": null,
+        "caskStrength": null,
+        "releaseMonth": null,
+        "familyContext": {
+          "siblingBottles": []
+        }
+      },
+      {
+        "abv": 40,
+        "brand": "Stalk & Barrel",
+        "score": 0.6211510374545298,
+        "series": null,
+        "source": ["vector"],
+        "bottler": null,
+        "edition": null,
+        "outturn": null,
+        "bottleId": 14485,
+        "category": "blend",
+        "fullName": "Stalk & Barrel Blue Label Blend (tweaked)",
+        "reference": "Stalk & Barrel Blue Label Blend (tweaked), 40%",
+        "statedAge": null,
+        "caskNumber": null,
+        "comparison": {
+          "missing": [],
+          "conflicts": ["brand"],
+          "agreements": ["category", "abv"]
+        },
+        "distillery": [],
+        "maturation": null,
+        "releaseDay": null,
+        "singleCask": false,
+        "releaseYear": null,
+        "vintageYear": null,
+        "bottlingYear": null,
+        "caskStrength": false,
+        "releaseMonth": null,
+        "familyContext": {
+          "siblingBottles": []
+        }
+      },
+      {
+        "abv": 40,
+        "brand": "Hell's Stone",
+        "score": 0.6205783618141597,
+        "series": null,
+        "source": ["vector"],
+        "bottler": null,
+        "edition": null,
+        "outturn": null,
+        "bottleId": 46933,
+        "category": "blend",
+        "fullName": "Hell's Stone Whisky",
+        "reference": "Hell's Stone Whisky - 40.0% ABV",
+        "statedAge": null,
+        "caskNumber": null,
+        "comparison": {
+          "missing": [],
+          "conflicts": ["brand"],
+          "agreements": ["category", "abv"]
+        },
+        "distillery": ["Pocketful of Stones"],
+        "maturation": null,
+        "releaseDay": null,
+        "singleCask": null,
+        "releaseYear": null,
+        "vintageYear": null,
+        "bottlingYear": null,
+        "caskStrength": null,
+        "releaseMonth": null,
+        "familyContext": {
+          "siblingBottles": []
+        }
+      },
+      {
+        "abv": null,
+        "brand": "Jameson",
+        "score": 0.6205411291771482,
+        "series": null,
+        "source": ["vector"],
+        "bottler": null,
+        "edition": null,
+        "outturn": null,
+        "bottleId": 2498,
+        "category": "blend",
+        "fullName": "Jameson Caskmates Stout Edition",
+        "reference": "Jameson Caskmates Stout Edition, 40%",
+        "statedAge": null,
+        "caskNumber": null,
+        "comparison": {
+          "missing": ["abv"],
+          "conflicts": ["brand"],
+          "agreements": ["category"]
+        },
+        "distillery": [],
+        "maturation": null,
+        "releaseDay": null,
+        "singleCask": null,
+        "releaseYear": null,
+        "vintageYear": null,
+        "bottlingYear": null,
+        "caskStrength": null,
+        "releaseMonth": null,
+        "familyContext": {
+          "siblingBottles": []
+        }
+      },
+      {
+        "abv": 40,
+        "brand": "Speyburn",
+        "score": 0.6171573557139783,
+        "series": null,
+        "source": ["vector"],
+        "bottler": null,
+        "edition": null,
+        "outturn": null,
+        "bottleId": 64264,
+        "category": "single_malt",
+        "fullName": "Speyburn Bradan Orach",
+        "reference": "Speyburn Bradan Orach, 40%",
+        "statedAge": null,
+        "caskNumber": null,
+        "comparison": {
+          "missing": [],
+          "conflicts": [],
+          "agreements": ["abv"]
+        },
+        "distillery": ["Speyburn"],
+        "maturation": null,
+        "releaseDay": null,
+        "singleCask": null,
+        "releaseYear": null,
+        "vintageYear": null,
+        "bottlingYear": null,
+        "caskStrength": null,
+        "releaseMonth": null,
+        "familyContext": {
+          "siblingBottles": []
+        }
+      },
+      {
+        "abv": 40,
+        "brand": "The Famous Grouse",
+        "score": 0.6144124104642801,
+        "series": null,
+        "source": ["vector"],
+        "bottler": null,
+        "edition": null,
+        "outturn": null,
+        "bottleId": 47033,
+        "category": "blend",
+        "fullName": "The Famous Grouse Blended Scotch Whisky",
+        "reference": "The Famous Grouse",
+        "statedAge": null,
+        "caskNumber": null,
+        "comparison": {
+          "missing": [],
+          "conflicts": [],
+          "agreements": ["abv"]
+        },
+        "distillery": [],
+        "maturation": null,
+        "releaseDay": null,
+        "singleCask": false,
+        "releaseYear": null,
+        "vintageYear": null,
+        "bottlingYear": null,
+        "caskStrength": false,
+        "releaseMonth": null,
+        "familyContext": {
+          "siblingBottles": []
+        }
+      },
+      {
+        "abv": 40,
+        "brand": "Clansman",
+        "score": 0.6133628436514758,
+        "series": null,
+        "source": ["vector"],
+        "bottler": null,
+        "edition": null,
+        "outturn": null,
+        "bottleId": 65188,
+        "category": "blend",
+        "fullName": "Clansman Blended Scotch Whisky",
+        "reference": "Clansman, 40%",
+        "statedAge": null,
+        "caskNumber": null,
+        "comparison": {
+          "missing": [],
+          "conflicts": [],
+          "agreements": ["abv"]
+        },
+        "distillery": ["Loch Lomond"],
+        "maturation": null,
+        "releaseDay": null,
+        "singleCask": false,
+        "releaseYear": null,
+        "vintageYear": null,
+        "bottlingYear": null,
+        "caskStrength": false,
+        "releaseMonth": null,
+        "familyContext": {
+          "siblingBottles": []
+        }
+      }
+    ]
+  },
+  "context": {
+    "inspectedBottleIds": [],
+    "bottleContexts": [],
+    "inspectedEntities": [
+      {
+        "kind": "brand",
+        "name": "Highland Malt",
+        "score": 1,
+        "source": ["exact", "text", "prefix", "contained"],
+        "entityId": 366707,
+        "reference": "Highland Malt",
+        "shortName": null,
+        "retrievedFor": [
+          {
+            "exact": true,
+            "query": "Highland Malt"
+          }
+        ]
+      },
+      {
+        "kind": "brand",
+        "name": "Jamie Stewart",
+        "score": 1,
+        "source": ["exact", "text", "prefix", "contained"],
+        "entityId": 367435,
+        "reference": "Jamie Stewart",
+        "shortName": null,
+        "retrievedFor": [
+          {
+            "exact": true,
+            "query": "Jamie Stewart"
+          }
+        ]
+      },
+      {
+        "kind": "brand",
+        "name": "Cutty Sark",
+        "score": 1,
+        "source": ["exact", "text", "prefix", "contained"],
+        "entityId": 108,
+        "reference": "Cutty Sark",
+        "shortName": null,
+        "retrievedFor": [
+          {
+            "exact": true,
+            "query": "Cutty Sark"
+          }
+        ]
+      },
+      {
+        "kind": "brand",
+        "name": "Sláinte",
+        "score": 1,
+        "source": ["exact", "text", "prefix", "contained"],
+        "entityId": 367273,
+        "reference": "Sláinte",
+        "shortName": null,
+        "retrievedFor": [
+          {
+            "exact": true,
+            "query": "Sláinte"
+          }
+        ]
+      },
+      {
+        "kind": "distillery",
+        "name": "Mourne Dew",
+        "score": 1,
+        "source": ["exact", "text", "prefix", "contained"],
+        "entityId": 3482,
+        "reference": "Mourne Dew",
+        "shortName": null,
+        "retrievedFor": [
+          {
+            "exact": true,
+            "query": "Mourne Dew"
+          }
+        ]
+      },
+      {
+        "kind": "brand",
+        "name": "Coperies",
+        "score": 1,
+        "source": ["exact", "text", "prefix", "contained"],
+        "entityId": 367313,
+        "reference": "Coperies",
+        "shortName": null,
+        "retrievedFor": [
+          {
+            "exact": true,
+            "query": "Coperies"
+          }
+        ]
+      },
+      {
+        "kind": "bottler",
+        "name": "&Whisky",
+        "score": 1,
+        "source": ["exact", "prefix", "contained"],
+        "entityId": 365821,
+        "reference": "&Whisky",
+        "shortName": null,
+        "retrievedFor": [
+          {
+            "exact": true,
+            "query": "&Whisky"
+          }
+        ]
+      },
+      {
+        "kind": "brand",
+        "name": "Royal Crest",
+        "score": 1,
+        "source": ["exact", "text", "prefix", "contained"],
+        "entityId": 367474,
+        "reference": "Royal Crest",
+        "shortName": null,
+        "retrievedFor": [
+          {
+            "exact": true,
+            "query": "Royal Crest"
+          }
+        ]
+      },
+      {
+        "kind": "brand",
+        "name": "Samuel Gelston's",
+        "score": 1,
+        "source": ["exact", "text", "prefix", "contained"],
+        "entityId": 2768,
+        "reference": "Samuel Gelston's",
+        "shortName": null,
+        "retrievedFor": [
+          {
+            "exact": true,
+            "query": "Samuel Gelston's"
+          }
+        ]
+      },
+      {
+        "kind": "brand",
+        "name": "Jameson",
+        "score": 1,
+        "source": ["exact", "text", "prefix", "contained"],
+        "entityId": 1083,
+        "reference": "Jameson",
+        "shortName": "",
+        "retrievedFor": [
+          {
+            "exact": true,
+            "query": "Jameson"
+          }
+        ]
+      },
+      {
+        "kind": "distillery",
+        "name": "Midleton Distillery",
+        "score": 1,
+        "source": ["exact", "text", "prefix", "contained"],
+        "entityId": 366687,
+        "reference": "Midleton Distillery",
+        "shortName": null,
+        "retrievedFor": [
+          {
+            "exact": true,
+            "query": "Midleton Distillery"
+          }
+        ]
+      },
+      {
+        "kind": "distillery",
+        "name": "Speyburn",
+        "score": 1,
+        "source": ["exact", "text", "prefix", "contained"],
+        "entityId": 1354,
+        "reference": "Speyburn",
+        "shortName": null,
+        "retrievedFor": [
+          {
+            "exact": true,
+            "query": "Speyburn"
+          }
+        ]
+      },
+      {
+        "kind": "brand",
+        "name": "Stewarts Cream of the Barley",
+        "score": 1,
+        "source": ["exact", "contained"],
+        "entityId": 1373,
+        "reference": "Stewarts Cream of the Barley",
+        "shortName": null,
+        "retrievedFor": [
+          {
+            "exact": true,
+            "query": "Stewart's Cream of the Barley"
+          }
+        ]
+      },
+      {
+        "kind": "brand",
+        "name": "SPEY",
+        "score": 0.35,
+        "source": ["contained"],
+        "entityId": 1353,
+        "reference": "SPEY",
+        "shortName": null,
+        "retrievedFor": [
+          {
+            "query": "Speyburn"
+          }
+        ]
+      },
+      {
+        "kind": "brand",
+        "name": "Midleton",
+        "score": 0.3388888888888889,
+        "source": ["contained"],
+        "entityId": 1181,
+        "reference": "Midleton",
+        "shortName": "",
+        "retrievedFor": [
+          {
+            "query": "Midleton Distillery"
+          }
+        ]
+      },
+      {
+        "kind": "brand",
+        "name": "Stewart's",
+        "score": 0.31666666666666665,
+        "source": ["contained"],
+        "entityId": 4082,
+        "reference": "Stewart's",
+        "shortName": null,
+        "retrievedFor": [
+          {
+            "query": "Stewart's Cream of the Barley"
+          }
+        ]
+      },
+      {
+        "kind": "brand",
+        "name": "Secret Highland Malt",
+        "score": 0.2,
+        "source": ["text"],
+        "entityId": 10213,
+        "reference": null,
+        "shortName": null,
+        "retrievedFor": [
+          {
+            "query": "Highland Malt"
+          }
+        ]
+      },
+      {
+        "kind": "brand",
+        "name": "Whiskyklubben Slainte",
+        "score": 0.2,
+        "source": ["text"],
+        "entityId": 5898,
+        "reference": null,
+        "shortName": null,
+        "retrievedFor": [
+          {
+            "query": "Sláinte"
+          }
+        ]
+      },
+      {
+        "kind": "bottler",
+        "name": "3006 Whisky",
+        "score": 0.2,
+        "source": ["text"],
+        "entityId": 5417,
+        "reference": null,
+        "shortName": null,
+        "retrievedFor": [
+          {
+            "query": "&Whisky"
+          }
+        ]
+      },
+      {
+        "kind": "bottler",
+        "name": "Abbey Whisky",
+        "score": 0.2,
+        "source": ["text"],
+        "entityId": 5511,
+        "reference": null,
+        "shortName": null,
+        "retrievedFor": [
+          {
+            "query": "&Whisky"
+          }
+        ]
+      },
+      {
+        "kind": "bottler",
+        "name": "Aberdeen Whisky Company",
+        "score": 0.2,
+        "source": ["text"],
+        "entityId": 5614,
+        "reference": null,
+        "shortName": null,
+        "retrievedFor": [
+          {
+            "query": "&Whisky"
+          }
+        ]
+      },
+      {
+        "kind": "bottler",
+        "name": "Abyss Whisky Bar",
+        "score": 0.2,
+        "source": ["text"],
+        "entityId": 366044,
+        "reference": null,
+        "shortName": null,
+        "retrievedFor": [
+          {
+            "query": "&Whisky"
+          }
+        ]
+      },
+      {
+        "kind": "distillery",
+        "name": "Bow Street (John Jameson) Distillery",
+        "score": 0.2,
+        "source": ["text"],
+        "entityId": 1574,
+        "reference": null,
+        "shortName": null,
+        "retrievedFor": [
+          {
+            "query": "Jameson"
+          }
+        ]
+      },
+      {
+        "kind": "company",
+        "name": "John Jameson & Son",
+        "score": 0.2,
+        "source": ["text"],
+        "entityId": 1089,
+        "reference": null,
+        "shortName": null,
+        "retrievedFor": [
+          {
+            "query": "Jameson"
+          }
+        ]
+      },
+      {
+        "kind": "distillery",
+        "name": "Old Midleton Distillery",
+        "score": 0.2,
+        "source": ["text"],
+        "entityId": 1866,
+        "reference": null,
+        "shortName": null,
+        "retrievedFor": [
+          {
+            "query": "Midleton Distillery"
+          }
+        ]
+      }
+    ],
+    "inspectedSeries": []
+  },
+  "provenance": {
+    "source": "production_miss",
+    "verifiedSourceUrls": [
+      "https://www.scotchwhiskyauctions.com/auctions/234-the-185th-auction/904192-stewarts-cream-of-the-barley/"
+    ],
+    "dbOutcome": {
+      "bottleId": null,
+      "createsBottle": false,
+      "summary": "Production returned no_match: it could not settle the Brand and expression split."
+    },
+    "notes": "Captured from saved classifier run 36800 (auction_lot 17948, model null, 2026-11-03T23:08:00.118Z). Production rationale: This is a single whisky Bottle, not an out-of-scope item. Search results support a blended Scotch whisky at 40% ABV, but do not settle the Brand and expression split needed to establish its complete identity. No safe local Bottle match or supported creation is available. The run predates reading Scotch Whisky Auctions lot pages (#1609), so the evidence pack adds the lot page text. Expected outcome checked against the lot page and photo on 2026-11-09, in a random sample of the 185th auction's no_match reviews."
+  },
+  "expected": {
+    "status": "classified",
+    "action": "create_bottle",
+    "identityScope": "product",
+    "matchedBottleId": null,
+    "proposedBottle": {
+      "category": "blend",
+      "abv": 40,
+      "statedAge": null
+    },
+    "proposedBottleNameIncludes": ["Cream of the Barley"],
+    "summary": "Create Stewart's Cream of the Barley, a blended Scotch at 40% with no age. The lot page tells its history as the Dundee blender's best-known blend and gives 40% and 70cl. No local Bottle is this blend."
+  }
+}

@@ -1,0 +1,1140 @@
+{
+  "id": "auction-lakes-private-reserve-connoisseurs-edition-create",
+  "name": "The Lakes Private Reserve The Connoisseur's Edition: create the 2022 56.6% release",
+  "input": {
+    "reference": {
+      "id": 4364,
+      "url": "https://www.scotchwhiskyauctions.com/auctions/232-the-183rd-auction/897864-the-lakes-distillery-private-reserve-the-connoisseurs-edition/",
+      "name": "The Lakes Distillery Private Reserve The Connoisseur's Edition",
+      "imageUrl": null,
+      "externalSiteId": 28097,
+      "currentBottleId": null
+    },
+    "extractedIdentity": {
+      "abv": null,
+      "brand": "The Lakes Distillery",
+      "series": "Private Reserve",
+      "bottler": null,
+      "edition": null,
+      "outturn": null,
+      "category": null,
+      "distillery": ["The Lakes Distillery"],
+      "expression": "The Connoisseur's Edition",
+      "maturation": null,
+      "stated_age": null,
+      "cask_number": null,
+      "release_day": null,
+      "single_cask": null,
+      "release_year": null,
+      "vintage_year": null,
+      "bottling_year": null,
+      "cask_strength": null,
+      "release_month": null
+    },
+    "extractedIdentitySource": "text",
+    "imageEvidence": null,
+    "initialCandidates": [
+      {
+        "abv": null,
+        "brand": "The Lakes",
+        "score": 46.079082,
+        "series": null,
+        "source": ["vector", "text"],
+        "bottler": null,
+        "edition": null,
+        "outturn": null,
+        "bottleId": 11937,
+        "category": "single_malt",
+        "fullName": "The Lakes Whiskymaker's Reserve No. 6",
+        "reference": "The Lakes Whiskymaker's Reserve No. 6, 52%",
+        "statedAge": null,
+        "caskNumber": null,
+        "comparison": {
+          "missing": ["series", "distillers"],
+          "conflicts": ["brand"],
+          "agreements": []
+        },
+        "distillery": [],
+        "maturation": null,
+        "releaseDay": null,
+        "singleCask": null,
+        "releaseYear": null,
+        "vintageYear": null,
+        "bottlingYear": null,
+        "caskStrength": null,
+        "releaseMonth": null,
+        "familyContext": {
+          "siblingBottles": []
+        }
+      },
+      {
+        "abv": null,
+        "brand": "The Lakes",
+        "score": 45.6345,
+        "series": null,
+        "source": ["text"],
+        "bottler": "The Lakes Distillery",
+        "edition": null,
+        "outturn": null,
+        "bottleId": 475,
+        "category": "single_malt",
+        "fullName": "The Lakes The Whiskymaker's Reserve No. 5",
+        "reference": null,
+        "statedAge": null,
+        "caskNumber": null,
+        "comparison": {
+          "missing": ["series", "distillers"],
+          "conflicts": ["brand"],
+          "agreements": []
+        },
+        "distillery": [],
+        "maturation": null,
+        "releaseDay": null,
+        "singleCask": null,
+        "releaseYear": null,
+        "vintageYear": null,
+        "bottlingYear": null,
+        "caskStrength": null,
+        "releaseMonth": null,
+        "familyContext": {
+          "siblingBottles": []
+        }
+      },
+      {
+        "abv": 52,
+        "brand": "The Lakes",
+        "score": 44.816986,
+        "series": "The Whiskymaker's Reserve",
+        "source": ["vector", "text"],
+        "bottler": null,
+        "edition": "No. 4",
+        "outturn": null,
+        "bottleId": 64424,
+        "category": "single_malt",
+        "fullName": "The Lakes The Whiskymaker's Reserve - No. 4",
+        "reference": "The Lakes Whiskymaker's Reserve No. 4",
+        "statedAge": null,
+        "caskNumber": null,
+        "comparison": {
+          "missing": [],
+          "conflicts": ["series"],
+          "agreements": ["brand", "distillers"]
+        },
+        "distillery": ["The Lakes Distillery"],
+        "maturation": null,
+        "releaseDay": null,
+        "singleCask": null,
+        "releaseYear": null,
+        "vintageYear": null,
+        "bottlingYear": null,
+        "caskStrength": null,
+        "releaseMonth": null,
+        "familyContext": {
+          "siblingBottles": []
+        }
+      },
+      {
+        "abv": null,
+        "brand": "The Lakes",
+        "score": 43.325554,
+        "series": null,
+        "source": ["vector", "text", "brand_coverage"],
+        "bottler": null,
+        "edition": null,
+        "outturn": null,
+        "bottleId": 13565,
+        "category": "single_malt",
+        "fullName": "The Lakes Distillery The Whiskymaker's Reserve No.1",
+        "reference": "The Lakes Distillery The Whiskymaker's Reserve No.1, 60.6%",
+        "statedAge": null,
+        "caskNumber": null,
+        "comparison": {
+          "missing": ["series", "distillers"],
+          "conflicts": ["brand"],
+          "agreements": []
+        },
+        "distillery": [],
+        "maturation": null,
+        "releaseDay": null,
+        "singleCask": null,
+        "releaseYear": null,
+        "vintageYear": null,
+        "bottlingYear": null,
+        "caskStrength": null,
+        "releaseMonth": null,
+        "familyContext": {
+          "siblingBottles": []
+        }
+      },
+      {
+        "abv": 54,
+        "brand": "The Lakes",
+        "score": 41.850105,
+        "series": "The Whiskymaker's Reserve",
+        "source": ["vector", "text"],
+        "bottler": null,
+        "edition": "No. 3",
+        "outturn": null,
+        "bottleId": 57112,
+        "category": "single_malt",
+        "fullName": "The Lakes The Whiskymaker's Reserve - No. 3",
+        "reference": "The Lakes Single Malt Whiskymaker's Reserve No.3",
+        "statedAge": null,
+        "caskNumber": null,
+        "comparison": {
+          "missing": [],
+          "conflicts": ["series"],
+          "agreements": ["brand", "distillers"]
+        },
+        "distillery": ["The Lakes Distillery"],
+        "maturation": "Matured in PX, Oloroso, Cream Sherry and red wine casks",
+        "releaseDay": 15,
+        "singleCask": false,
+        "releaseYear": 2020,
+        "vintageYear": null,
+        "bottlingYear": null,
+        "caskStrength": null,
+        "releaseMonth": 6,
+        "familyContext": {
+          "siblingBottles": []
+        }
+      },
+      {
+        "abv": 52,
+        "brand": "The Lakes",
+        "score": 40.82817,
+        "series": null,
+        "source": ["text"],
+        "bottler": null,
+        "edition": "No. 7",
+        "outturn": null,
+        "bottleId": 62832,
+        "category": "single_malt",
+        "fullName": "The Lakes Whiskymaker's Reserve - No. 7",
+        "reference": null,
+        "statedAge": null,
+        "caskNumber": null,
+        "comparison": {
+          "missing": ["series"],
+          "conflicts": ["brand"],
+          "agreements": ["distillers"]
+        },
+        "distillery": ["The Lakes Distillery"],
+        "maturation": null,
+        "releaseDay": null,
+        "singleCask": null,
+        "releaseYear": null,
+        "vintageYear": null,
+        "bottlingYear": null,
+        "caskStrength": null,
+        "releaseMonth": null,
+        "familyContext": {
+          "siblingBottles": []
+        }
+      },
+      {
+        "abv": 45,
+        "brand": "Last Mountain Distillery",
+        "score": 37.474052,
+        "series": null,
+        "source": ["text"],
+        "bottler": null,
+        "edition": null,
+        "outturn": null,
+        "bottleId": 16736,
+        "category": "single_malt",
+        "fullName": "Last Mountain Distillery Private Reserve",
+        "reference": null,
+        "statedAge": 12,
+        "caskNumber": null,
+        "comparison": {
+          "missing": ["series", "distillers"],
+          "conflicts": ["brand"],
+          "agreements": []
+        },
+        "distillery": [],
+        "maturation": null,
+        "releaseDay": null,
+        "singleCask": false,
+        "releaseYear": null,
+        "vintageYear": null,
+        "bottlingYear": null,
+        "caskStrength": false,
+        "releaseMonth": null,
+        "familyContext": {
+          "siblingBottles": []
+        }
+      },
+      {
+        "abv": 52,
+        "brand": "The Lakes",
+        "score": 36.0372,
+        "series": null,
+        "source": ["text"],
+        "bottler": null,
+        "edition": "No. 7",
+        "outturn": null,
+        "bottleId": 46017,
+        "category": "single_malt",
+        "fullName": "The Lakes The Whiskymaker's Reserve - No. 7 - 2023 Release - 52.0% ABV",
+        "reference": null,
+        "statedAge": null,
+        "caskNumber": null,
+        "comparison": {
+          "missing": ["series"],
+          "conflicts": ["brand"],
+          "agreements": ["distillers"]
+        },
+        "distillery": ["The Lakes Distillery"],
+        "maturation": null,
+        "releaseDay": null,
+        "singleCask": null,
+        "releaseYear": 2023,
+        "vintageYear": null,
+        "bottlingYear": null,
+        "caskStrength": null,
+        "releaseMonth": null,
+        "familyContext": {
+          "siblingBottles": []
+        }
+      },
+      {
+        "abv": 46,
+        "brand": "Adelphi",
+        "score": 34.493156,
+        "series": null,
+        "source": ["text"],
+        "bottler": "Adelphi",
+        "edition": null,
+        "outturn": null,
+        "bottleId": 63751,
+        "category": "blended_malt",
+        "fullName": "Adelphi Private Stock Reserve",
+        "reference": null,
+        "statedAge": null,
+        "caskNumber": null,
+        "comparison": {
+          "missing": ["series", "distillers"],
+          "conflicts": ["brand"],
+          "agreements": []
+        },
+        "distillery": [],
+        "maturation": null,
+        "releaseDay": null,
+        "singleCask": null,
+        "releaseYear": null,
+        "vintageYear": null,
+        "bottlingYear": null,
+        "caskStrength": null,
+        "releaseMonth": null,
+        "familyContext": {
+          "siblingBottles": []
+        }
+      },
+      {
+        "abv": 40,
+        "brand": "J.R. Ewing",
+        "score": 34.067413,
+        "series": null,
+        "source": ["text"],
+        "bottler": null,
+        "edition": null,
+        "outturn": null,
+        "bottleId": 65408,
+        "category": "bourbon",
+        "fullName": "J.R. Ewing Private Reserve 4-year-old",
+        "reference": null,
+        "statedAge": 4,
+        "caskNumber": null,
+        "comparison": {
+          "missing": ["series", "distillers"],
+          "conflicts": ["brand"],
+          "agreements": []
+        },
+        "distillery": [],
+        "maturation": null,
+        "releaseDay": null,
+        "singleCask": null,
+        "releaseYear": null,
+        "vintageYear": null,
+        "bottlingYear": null,
+        "caskStrength": null,
+        "releaseMonth": null,
+        "familyContext": {
+          "siblingBottles": []
+        }
+      },
+      {
+        "abv": null,
+        "brand": "Glenfarclas",
+        "score": 33.8227,
+        "series": null,
+        "source": ["text"],
+        "bottler": "Glenfarclas",
+        "edition": null,
+        "outturn": null,
+        "bottleId": 1751,
+        "category": "single_malt",
+        "fullName": "Glenfarclas Private Reserve Limited Edition",
+        "reference": null,
+        "statedAge": null,
+        "caskNumber": null,
+        "comparison": {
+          "missing": ["series", "distillers"],
+          "conflicts": ["brand"],
+          "agreements": []
+        },
+        "distillery": [],
+        "maturation": null,
+        "releaseDay": null,
+        "singleCask": null,
+        "releaseYear": null,
+        "vintageYear": null,
+        "bottlingYear": null,
+        "caskStrength": null,
+        "releaseMonth": null,
+        "familyContext": {
+          "siblingBottles": []
+        }
+      },
+      {
+        "abv": 50,
+        "brand": "Jefferson's",
+        "score": 32.77425,
+        "series": null,
+        "source": ["text"],
+        "bottler": "Wooden Cork",
+        "edition": "Private Select #969",
+        "outturn": null,
+        "bottleId": 64581,
+        "category": "bourbon",
+        "fullName": "Jefferson's Reserve Single Barrel - Private Select #969",
+        "reference": null,
+        "statedAge": null,
+        "caskNumber": null,
+        "comparison": {
+          "missing": ["series", "distillers"],
+          "conflicts": ["brand"],
+          "agreements": []
+        },
+        "distillery": [],
+        "maturation": null,
+        "releaseDay": null,
+        "singleCask": true,
+        "releaseYear": null,
+        "vintageYear": null,
+        "bottlingYear": null,
+        "caskStrength": null,
+        "releaseMonth": null,
+        "familyContext": {
+          "siblingBottles": []
+        }
+      },
+      {
+        "abv": 64.5,
+        "brand": "RY3",
+        "score": 32.249702,
+        "series": null,
+        "source": ["text"],
+        "bottler": null,
+        "edition": null,
+        "outturn": null,
+        "bottleId": 61376,
+        "category": null,
+        "fullName": "RY3 Private Reserve",
+        "reference": null,
+        "statedAge": 14,
+        "caskNumber": null,
+        "comparison": {
+          "missing": ["series", "distillers"],
+          "conflicts": ["brand"],
+          "agreements": []
+        },
+        "distillery": [],
+        "maturation": null,
+        "releaseDay": null,
+        "singleCask": true,
+        "releaseYear": null,
+        "vintageYear": null,
+        "bottlingYear": null,
+        "caskStrength": true,
+        "releaseMonth": null,
+        "familyContext": {
+          "siblingBottles": []
+        }
+      },
+      {
+        "abv": 57.65,
+        "brand": "Seelbach's",
+        "score": 30.761154,
+        "series": null,
+        "source": ["text"],
+        "bottler": "Seelbach's",
+        "edition": null,
+        "outturn": null,
+        "bottleId": 56472,
+        "category": "bourbon",
+        "fullName": "Seelbach's Private Reserve Amburana Barrel Finished",
+        "reference": null,
+        "statedAge": null,
+        "caskNumber": null,
+        "comparison": {
+          "missing": ["series", "distillers"],
+          "conflicts": ["brand"],
+          "agreements": []
+        },
+        "distillery": [],
+        "maturation": null,
+        "releaseDay": null,
+        "singleCask": false,
+        "releaseYear": null,
+        "vintageYear": null,
+        "bottlingYear": null,
+        "caskStrength": true,
+        "releaseMonth": null,
+        "familyContext": {
+          "siblingBottles": []
+        }
+      },
+      {
+        "abv": null,
+        "brand": "The Lakes",
+        "score": 29.742619,
+        "series": null,
+        "source": ["vector", "text"],
+        "bottler": null,
+        "edition": null,
+        "outturn": null,
+        "bottleId": 13189,
+        "category": "single_malt",
+        "fullName": "The Lakes The Whiskymaker's Edition Colheita",
+        "reference": "The Lakes The Whiskymaker's Edition Colheita, 52%",
+        "statedAge": null,
+        "caskNumber": null,
+        "comparison": {
+          "missing": ["series", "distillers"],
+          "conflicts": ["brand"],
+          "agreements": []
+        },
+        "distillery": [],
+        "maturation": null,
+        "releaseDay": null,
+        "singleCask": null,
+        "releaseYear": null,
+        "vintageYear": null,
+        "bottlingYear": null,
+        "caskStrength": null,
+        "releaseMonth": null,
+        "familyContext": {
+          "siblingBottles": []
+        }
+      },
+      {
+        "abv": null,
+        "brand": "The Lakes",
+        "score": 29.742619,
+        "series": null,
+        "source": ["vector", "text"],
+        "bottler": null,
+        "edition": null,
+        "outturn": null,
+        "bottleId": 13185,
+        "category": "blend",
+        "fullName": "The Lakes The One Signature Blend",
+        "reference": "The Lakes The One Signature Blend, 46.6%",
+        "statedAge": null,
+        "caskNumber": null,
+        "comparison": {
+          "missing": ["series", "distillers"],
+          "conflicts": ["brand"],
+          "agreements": []
+        },
+        "distillery": [],
+        "maturation": null,
+        "releaseDay": null,
+        "singleCask": null,
+        "releaseYear": null,
+        "vintageYear": null,
+        "bottlingYear": null,
+        "caskStrength": null,
+        "releaseMonth": null,
+        "familyContext": {
+          "siblingBottles": []
+        }
+      },
+      {
+        "abv": null,
+        "brand": "Finger Lakes Distilling",
+        "score": 28.973286,
+        "series": null,
+        "source": ["text"],
+        "bottler": null,
+        "edition": null,
+        "outturn": null,
+        "bottleId": 14209,
+        "category": "rye",
+        "fullName": "Finger Lakes Distilling McKenzie Rye",
+        "reference": null,
+        "statedAge": null,
+        "caskNumber": null,
+        "comparison": {
+          "missing": ["series", "distillers"],
+          "conflicts": ["brand"],
+          "agreements": []
+        },
+        "distillery": [],
+        "maturation": null,
+        "releaseDay": null,
+        "singleCask": null,
+        "releaseYear": null,
+        "vintageYear": null,
+        "bottlingYear": null,
+        "caskStrength": null,
+        "releaseMonth": null,
+        "familyContext": {
+          "siblingBottles": []
+        }
+      },
+      {
+        "abv": null,
+        "brand": "The Lakes",
+        "score": 28.848492,
+        "series": null,
+        "source": ["vector", "text"],
+        "bottler": null,
+        "edition": null,
+        "outturn": null,
+        "bottleId": 13186,
+        "category": "blend",
+        "fullName": "The Lakes The One Port Cask-Finished",
+        "reference": "The Lakes The One Port Cask-Finished, 46.6%",
+        "statedAge": null,
+        "caskNumber": null,
+        "comparison": {
+          "missing": ["series", "distillers"],
+          "conflicts": ["brand"],
+          "agreements": []
+        },
+        "distillery": [],
+        "maturation": null,
+        "releaseDay": null,
+        "singleCask": null,
+        "releaseYear": null,
+        "vintageYear": null,
+        "bottlingYear": null,
+        "caskStrength": null,
+        "releaseMonth": null,
+        "familyContext": {
+          "siblingBottles": []
+        }
+      },
+      {
+        "abv": null,
+        "brand": "The Lakes",
+        "score": 28.848492,
+        "series": null,
+        "source": ["vector", "text"],
+        "bottler": null,
+        "edition": null,
+        "outturn": null,
+        "bottleId": 13188,
+        "category": "blend",
+        "fullName": "The Lakes The One Sherry Cask-Finished",
+        "reference": "The Lakes The One Sherry Cask-Finished, 46.6%",
+        "statedAge": null,
+        "caskNumber": null,
+        "comparison": {
+          "missing": ["series", "distillers"],
+          "conflicts": [],
+          "agreements": ["brand"]
+        },
+        "distillery": [],
+        "maturation": null,
+        "releaseDay": null,
+        "singleCask": null,
+        "releaseYear": null,
+        "vintageYear": null,
+        "bottlingYear": null,
+        "caskStrength": null,
+        "releaseMonth": null,
+        "familyContext": {
+          "siblingBottles": []
+        }
+      },
+      {
+        "abv": 57.4,
+        "brand": "The Lakes",
+        "score": 28.670238,
+        "series": "Quatrefoil Collection",
+        "source": ["text"],
+        "bottler": null,
+        "edition": null,
+        "outturn": null,
+        "bottleId": 60319,
+        "category": "single_malt",
+        "fullName": "The Lakes Luck",
+        "reference": null,
+        "statedAge": null,
+        "caskNumber": null,
+        "comparison": {
+          "missing": [],
+          "conflicts": ["series"],
+          "agreements": ["brand", "distillers"]
+        },
+        "distillery": ["The Lakes Distillery"],
+        "maturation": "Spanish oak Pedro Ximénez sherry hogsheads",
+        "releaseDay": null,
+        "singleCask": false,
+        "releaseYear": 2020,
+        "vintageYear": null,
+        "bottlingYear": null,
+        "caskStrength": null,
+        "releaseMonth": null,
+        "familyContext": {
+          "siblingBottles": []
+        }
+      },
+      {
+        "abv": 54,
+        "brand": "The Lakes",
+        "score": 28.60947,
+        "series": null,
+        "source": ["text"],
+        "bottler": null,
+        "edition": null,
+        "outturn": null,
+        "bottleId": 62831,
+        "category": "single_malt",
+        "fullName": "The Lakes The Whiskymaker's Editions Galaxia",
+        "reference": null,
+        "statedAge": null,
+        "caskNumber": null,
+        "comparison": {
+          "missing": ["series"],
+          "conflicts": ["brand"],
+          "agreements": ["distillers"]
+        },
+        "distillery": ["The Lakes Distillery"],
+        "maturation": null,
+        "releaseDay": null,
+        "singleCask": null,
+        "releaseYear": null,
+        "vintageYear": null,
+        "bottlingYear": null,
+        "caskStrength": null,
+        "releaseMonth": null,
+        "familyContext": {
+          "siblingBottles": []
+        }
+      },
+      {
+        "abv": 56,
+        "brand": "The Lakes",
+        "score": 28.60947,
+        "series": null,
+        "source": ["text"],
+        "bottler": null,
+        "edition": null,
+        "outturn": null,
+        "bottleId": 63804,
+        "category": "single_malt",
+        "fullName": "The Lakes The Whiskymaker's Editions Liberty",
+        "reference": null,
+        "statedAge": null,
+        "caskNumber": null,
+        "comparison": {
+          "missing": ["series"],
+          "conflicts": ["brand"],
+          "agreements": ["distillers"]
+        },
+        "distillery": ["The Lakes Distillery"],
+        "maturation": null,
+        "releaseDay": null,
+        "singleCask": null,
+        "releaseYear": null,
+        "vintageYear": null,
+        "bottlingYear": null,
+        "caskStrength": null,
+        "releaseMonth": null,
+        "familyContext": {
+          "siblingBottles": []
+        }
+      },
+      {
+        "abv": 49,
+        "brand": "The Lakes",
+        "score": 28.60947,
+        "series": null,
+        "source": ["text"],
+        "bottler": null,
+        "edition": null,
+        "outturn": null,
+        "bottleId": 62833,
+        "category": "single_malt",
+        "fullName": "The Lakes The Whiskymaker's Editions Nostalgia",
+        "reference": null,
+        "statedAge": null,
+        "caskNumber": null,
+        "comparison": {
+          "missing": ["series"],
+          "conflicts": ["brand"],
+          "agreements": ["distillers"]
+        },
+        "distillery": ["The Lakes Distillery"],
+        "maturation": null,
+        "releaseDay": null,
+        "singleCask": null,
+        "releaseYear": null,
+        "vintageYear": null,
+        "bottlingYear": null,
+        "caskStrength": null,
+        "releaseMonth": null,
+        "familyContext": {
+          "siblingBottles": []
+        }
+      },
+      {
+        "abv": 46.6,
+        "brand": "The Lakes",
+        "score": 28.60947,
+        "series": "The Whiskymaker's Editions",
+        "source": ["text", "brand_coverage"],
+        "bottler": null,
+        "edition": null,
+        "outturn": 1002,
+        "bottleId": 58549,
+        "category": "single_malt",
+        "fullName": "The Lakes Cascade",
+        "reference": null,
+        "statedAge": null,
+        "caskNumber": null,
+        "comparison": {
+          "missing": [],
+          "conflicts": ["series"],
+          "agreements": ["brand", "distillers"]
+        },
+        "distillery": ["The Lakes Distillery"],
+        "maturation": null,
+        "releaseDay": null,
+        "singleCask": false,
+        "releaseYear": null,
+        "vintageYear": null,
+        "bottlingYear": null,
+        "caskStrength": null,
+        "releaseMonth": null,
+        "familyContext": {
+          "siblingBottles": []
+        }
+      },
+      {
+        "abv": 57.4,
+        "brand": "The Lakes",
+        "score": 28.507856,
+        "series": "Quatrefoil Collection",
+        "source": ["text"],
+        "bottler": null,
+        "edition": null,
+        "outturn": null,
+        "bottleId": 60302,
+        "category": "single_malt",
+        "fullName": "The Lakes Love",
+        "reference": null,
+        "statedAge": null,
+        "caskNumber": null,
+        "comparison": {
+          "missing": [],
+          "conflicts": ["series"],
+          "agreements": ["brand", "distillers"]
+        },
+        "distillery": ["The Lakes Distillery"],
+        "maturation": "American oak Oloroso and Pedro Ximénez sherry casks",
+        "releaseDay": null,
+        "singleCask": false,
+        "releaseYear": 2021,
+        "vintageYear": null,
+        "bottlingYear": null,
+        "caskStrength": null,
+        "releaseMonth": null,
+        "familyContext": {
+          "siblingBottles": []
+        }
+      },
+      {
+        "abv": null,
+        "brand": "The Lakes",
+        "score": 28.013348,
+        "series": null,
+        "source": ["vector", "text"],
+        "bottler": null,
+        "edition": null,
+        "outturn": null,
+        "bottleId": 13187,
+        "category": "blend",
+        "fullName": "The Lakes The One Orange Wine Cask-Finished",
+        "reference": "The Lakes The One Orange Wine Cask-Finished, 46.6%",
+        "statedAge": null,
+        "caskNumber": null,
+        "comparison": {
+          "missing": ["series", "distillers"],
+          "conflicts": [],
+          "agreements": ["brand"]
+        },
+        "distillery": [],
+        "maturation": null,
+        "releaseDay": null,
+        "singleCask": null,
+        "releaseYear": null,
+        "vintageYear": null,
+        "bottlingYear": null,
+        "caskStrength": null,
+        "releaseMonth": null,
+        "familyContext": {
+          "siblingBottles": []
+        }
+      },
+      {
+        "abv": 54,
+        "brand": "The Lakes",
+        "score": 27.89594,
+        "series": null,
+        "source": ["text"],
+        "bottler": null,
+        "edition": null,
+        "outturn": null,
+        "bottleId": 63342,
+        "category": "single_malt",
+        "fullName": "The Lakes The Whiskymaker's Editions Bal Masque",
+        "reference": null,
+        "statedAge": null,
+        "caskNumber": null,
+        "comparison": {
+          "missing": ["series"],
+          "conflicts": ["brand"],
+          "agreements": ["distillers"]
+        },
+        "distillery": ["The Lakes Distillery"],
+        "maturation": null,
+        "releaseDay": null,
+        "singleCask": null,
+        "releaseYear": null,
+        "vintageYear": null,
+        "bottlingYear": null,
+        "caskStrength": null,
+        "releaseMonth": null,
+        "familyContext": {
+          "siblingBottles": []
+        }
+      },
+      {
+        "abv": 46.6,
+        "brand": "The Lakes",
+        "score": 0.5714285714285714,
+        "series": null,
+        "source": ["brand_coverage"],
+        "bottler": "The Lakes Distillery",
+        "edition": "First Edition",
+        "outturn": null,
+        "bottleId": 52442,
+        "category": "blended_malt",
+        "fullName": "The Lakes Steel Bonnets - First Edition",
+        "reference": null,
+        "statedAge": null,
+        "caskNumber": null,
+        "comparison": {
+          "missing": ["series"],
+          "conflicts": [],
+          "agreements": ["brand", "distillers"]
+        },
+        "distillery": ["The Lakes Distillery"],
+        "maturation": null,
+        "releaseDay": null,
+        "singleCask": null,
+        "releaseYear": 2018,
+        "vintageYear": null,
+        "bottlingYear": null,
+        "caskStrength": null,
+        "releaseMonth": null,
+        "familyContext": {
+          "siblingBottles": []
+        }
+      }
+    ]
+  },
+  "context": {
+    "inspectedBottleIds": [],
+    "bottleContexts": [],
+    "inspectedEntities": [
+      {
+        "kind": "distillery",
+        "name": "The Lakes Distillery",
+        "score": 1,
+        "source": ["exact", "text", "prefix", "contained"],
+        "entityId": 1951,
+        "reference": "The Lakes Distillery",
+        "shortName": null,
+        "retrievedFor": [
+          {
+            "exact": true,
+            "query": "The Lakes Distillery"
+          },
+          {
+            "query": "The Lakes"
+          }
+        ]
+      },
+      {
+        "kind": "brand",
+        "name": "The Lakes",
+        "score": 1,
+        "source": ["contained", "exact", "text", "prefix"],
+        "entityId": 1412,
+        "reference": "The Lakes",
+        "shortName": null,
+        "retrievedFor": [
+          {
+            "query": "The Lakes Distillery"
+          },
+          {
+            "exact": true,
+            "query": "The Lakes"
+          }
+        ]
+      },
+      {
+        "kind": "distillery",
+        "name": "Last Mountain Distillery",
+        "score": 1,
+        "source": ["exact", "text", "prefix", "contained"],
+        "entityId": 3299,
+        "reference": "Last Mountain Distillery",
+        "shortName": null,
+        "retrievedFor": [
+          {
+            "exact": true,
+            "query": "Last Mountain Distillery"
+          }
+        ]
+      },
+      {
+        "kind": "bottler",
+        "name": "Adelphi",
+        "score": 1,
+        "source": ["exact", "text", "prefix", "contained"],
+        "entityId": 5575,
+        "reference": "Adelphi",
+        "shortName": null,
+        "retrievedFor": [
+          {
+            "exact": true,
+            "query": "Adelphi"
+          }
+        ]
+      },
+      {
+        "kind": "brand",
+        "name": "J.R. Ewing",
+        "score": 1,
+        "source": ["exact", "text", "prefix", "contained"],
+        "entityId": 367540,
+        "reference": "J.R. Ewing",
+        "shortName": null,
+        "retrievedFor": [
+          {
+            "exact": true,
+            "query": "J.R. Ewing"
+          }
+        ]
+      },
+      {
+        "kind": "distillery",
+        "name": "Glenfarclas",
+        "score": 1,
+        "source": ["exact", "text", "prefix", "contained"],
+        "entityId": 976,
+        "reference": "Glenfarclas",
+        "shortName": null,
+        "retrievedFor": [
+          {
+            "exact": true,
+            "query": "Glenfarclas"
+          }
+        ]
+      },
+      {
+        "kind": "brand",
+        "name": "Jefferson's",
+        "score": 1,
+        "source": ["exact", "text", "prefix", "contained"],
+        "entityId": 1084,
+        "reference": "Jefferson's",
+        "shortName": null,
+        "retrievedFor": [
+          {
+            "exact": true,
+            "query": "Jefferson's"
+          }
+        ]
+      },
+      {
+        "kind": "bottler",
+        "name": "Wooden Cork",
+        "score": 1,
+        "source": ["exact", "text", "prefix", "contained"],
+        "entityId": 367314,
+        "reference": "Wooden Cork",
+        "shortName": null,
+        "retrievedFor": [
+          {
+            "exact": true,
+            "query": "Wooden Cork"
+          }
+        ]
+      },
+      {
+        "kind": "brand",
+        "name": "RY3",
+        "score": 1,
+        "source": ["exact", "text", "prefix"],
+        "entityId": 3846,
+        "reference": "RY3",
+        "shortName": null,
+        "retrievedFor": [
+          {
+            "exact": true,
+            "query": "RY3"
+          }
+        ]
+      }
+    ],
+    "inspectedSeries": []
+  },
+  "provenance": {
+    "source": "production_miss",
+    "verifiedSourceUrls": [
+      "https://www.scotchwhiskyauctions.com/auctions/232-the-183rd-auction/897864-the-lakes-distillery-private-reserve-the-connoisseurs-edition/",
+      "https://www.whisky-online.com/collections/world-whisky/products/the-lakes-the-private-reserve-connoisseurs-edition-2022"
+    ],
+    "dbOutcome": {
+      "bottleId": null,
+      "createsBottle": false,
+      "summary": "Production returned no_match: the old page read did not return the lot facts, so it could not establish the release."
+    },
+    "notes": "Captured from saved classifier run 22410 (auction_lot 4364, model null, 2026-10-02T06:14:01.486Z). Production rationale: No local candidate represents this release. The available auction title and extraction are not enough to safely establish the canonical product name, brand, or other supported release identity for a match or creation. The run predates reading Scotch Whisky Auctions lot pages (#1609), so the evidence pack adds the lot page text. Expected outcome checked against the lot page and photo on 2026-11-09, in a random sample of the 185th auction's no_match reviews."
+  },
+  "expected": {
+    "status": "classified",
+    "action": "create_bottle",
+    "identityScope": "product",
+    "matchedBottleId": null,
+    "proposedBottle": {
+      "category": "single_malt",
+      "abv": 56.6
+    },
+    "proposedBottleNameIncludes": ["Private Reserve"],
+    "proposedBottleDistillerIdOneOf": [1951, 1412],
+    "summary": "Create The Lakes Private Reserve, The Connoisseur's Edition, bottled 2022 at 56.6%. The lot page says the edition is three sets of 100 bottles from three casks that look the same, so the lot cannot name its cask and the Bottle is the release, not one cask. No local Bottle is this release."
+  },
+  "knownFailure": {
+    "reason": "The agent treats the edition as three single-cask Bottles and returns no_match, though all three casks share one label."
+  }
+}

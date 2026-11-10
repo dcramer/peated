@@ -1,0 +1,1754 @@
+{
+  "id": "auction-wire-works-distillery-exclusive-hand-fill-create",
+  "name": "White Peak Wire Works Distillery Exclusive: create the Tawny Port hand-fill at 61.7%",
+  "input": {
+    "reference": {
+      "id": 18287,
+      "url": "https://www.scotchwhiskyauctions.com/auctions/234-the-185th-auction/907889-white-peaks-wire-works-distillery-exclusive/",
+      "name": "White Peaks Wire Works Distillery Exclusive",
+      "imageUrl": null,
+      "externalSiteId": 28097,
+      "currentBottleId": null
+    },
+    "extractedIdentity": {
+      "abv": 61.7,
+      "brand": null,
+      "series": null,
+      "bottler": null,
+      "edition": null,
+      "outturn": null,
+      "category": null,
+      "distillery": null,
+      "expression": null,
+      "maturation": null,
+      "stated_age": null,
+      "cask_number": null,
+      "single_cask": null,
+      "release_year": null,
+      "vintage_year": null,
+      "cask_strength": null
+    },
+    "extractedIdentitySource": "structured",
+    "imageEvidence": null,
+    "initialCandidates": [
+      {
+        "abv": 50.2,
+        "brand": "Wire Works",
+        "score": 104.65903,
+        "series": "Provenance",
+        "source": ["text", "brand_coverage", "context"],
+        "bottler": null,
+        "edition": null,
+        "outturn": null,
+        "bottleId": 46070,
+        "category": "single_malt",
+        "fullName": "Wire Works Port Cask - 50.2% ABV - Tawny Port Cask",
+        "reference": null,
+        "statedAge": null,
+        "caskNumber": null,
+        "comparison": {
+          "missing": [],
+          "conflicts": ["abv"],
+          "agreements": ["category", "brand", "distillers"]
+        },
+        "distillery": ["White Peak Distillery"],
+        "maturation": "tawny_port",
+        "releaseDay": null,
+        "singleCask": false,
+        "releaseYear": null,
+        "vintageYear": null,
+        "bottlingYear": null,
+        "caskStrength": null,
+        "releaseMonth": null,
+        "familyContext": {
+          "siblingBottles": []
+        }
+      },
+      {
+        "abv": 53.3,
+        "brand": "Wire Works",
+        "score": 87.33205,
+        "series": null,
+        "source": ["text", "brand_coverage"],
+        "bottler": null,
+        "edition": null,
+        "outturn": null,
+        "bottleId": 62799,
+        "category": "single_malt",
+        "fullName": "Wire Works Port Wine LBV",
+        "reference": null,
+        "statedAge": null,
+        "caskNumber": null,
+        "comparison": {
+          "missing": [],
+          "conflicts": ["abv"],
+          "agreements": ["category", "brand", "distillers"]
+        },
+        "distillery": ["White Peak Distillery"],
+        "maturation": null,
+        "releaseDay": null,
+        "singleCask": null,
+        "releaseYear": null,
+        "vintageYear": null,
+        "bottlingYear": null,
+        "caskStrength": null,
+        "releaseMonth": null,
+        "familyContext": {
+          "siblingBottles": []
+        }
+      },
+      {
+        "abv": 52.4,
+        "brand": "Wire Works",
+        "score": 84.730125,
+        "series": null,
+        "source": ["text", "brand_coverage"],
+        "bottler": null,
+        "edition": null,
+        "outturn": 1995,
+        "bottleId": 70439,
+        "category": "single_malt",
+        "fullName": "Wire Works Full Port",
+        "reference": null,
+        "statedAge": null,
+        "caskNumber": null,
+        "comparison": {
+          "missing": [],
+          "conflicts": ["abv"],
+          "agreements": ["category", "brand", "distillers"]
+        },
+        "distillery": ["White Peak Distillery"],
+        "maturation": null,
+        "releaseDay": null,
+        "singleCask": null,
+        "releaseYear": null,
+        "vintageYear": null,
+        "bottlingYear": null,
+        "caskStrength": true,
+        "releaseMonth": null,
+        "familyContext": {
+          "siblingBottles": []
+        }
+      },
+      {
+        "abv": 52.2,
+        "brand": "Wire Works",
+        "score": 82.189644,
+        "series": null,
+        "source": ["text", "brand_coverage"],
+        "bottler": null,
+        "edition": null,
+        "outturn": 1321,
+        "bottleId": 69333,
+        "category": "single_malt",
+        "fullName": "Wire Works Double Oak Port Cask",
+        "reference": null,
+        "statedAge": null,
+        "caskNumber": null,
+        "comparison": {
+          "missing": [],
+          "conflicts": ["abv"],
+          "agreements": ["category", "brand", "distillers"]
+        },
+        "distillery": ["White Peak Distillery"],
+        "maturation": "first-fill Bourbon barrels and Ruby Port casks",
+        "releaseDay": null,
+        "singleCask": null,
+        "releaseYear": null,
+        "vintageYear": null,
+        "bottlingYear": null,
+        "caskStrength": null,
+        "releaseMonth": null,
+        "familyContext": {
+          "siblingBottles": []
+        }
+      },
+      {
+        "abv": 46.8,
+        "brand": "Wire Works",
+        "score": 79.858185,
+        "series": null,
+        "source": ["text", "context"],
+        "bottler": null,
+        "edition": null,
+        "outturn": null,
+        "bottleId": 46062,
+        "category": "single_malt",
+        "fullName": "Wire Works Caduro X - 46.8% ABV",
+        "reference": null,
+        "statedAge": null,
+        "caskNumber": null,
+        "comparison": {
+          "missing": [],
+          "conflicts": ["abv"],
+          "agreements": []
+        },
+        "distillery": ["White Peak Distillery"],
+        "maturation": null,
+        "releaseDay": null,
+        "singleCask": null,
+        "releaseYear": null,
+        "vintageYear": null,
+        "bottlingYear": null,
+        "caskStrength": null,
+        "releaseMonth": null,
+        "familyContext": {
+          "siblingBottles": []
+        }
+      },
+      {
+        "abv": 46.8,
+        "brand": "Wire Works",
+        "score": 77.00163,
+        "series": null,
+        "source": ["text"],
+        "bottler": null,
+        "edition": null,
+        "outturn": null,
+        "bottleId": 46992,
+        "category": "single_malt",
+        "fullName": "Wire Works Caduro - 46.8% ABV",
+        "reference": null,
+        "statedAge": null,
+        "caskNumber": null,
+        "comparison": {
+          "missing": [],
+          "conflicts": ["abv"],
+          "agreements": ["category", "brand", "distillers"]
+        },
+        "distillery": ["White Peak Distillery"],
+        "maturation": null,
+        "releaseDay": null,
+        "singleCask": null,
+        "releaseYear": null,
+        "vintageYear": null,
+        "bottlingYear": null,
+        "caskStrength": null,
+        "releaseMonth": null,
+        "familyContext": {
+          "siblingBottles": []
+        }
+      },
+      {
+        "abv": 50,
+        "brand": "Wire Works",
+        "score": 74.87891,
+        "series": null,
+        "source": ["text"],
+        "bottler": null,
+        "edition": null,
+        "outturn": null,
+        "bottleId": 46068,
+        "category": "single_malt",
+        "fullName": "Wire Works Coastal Smoke - 50.0% ABV",
+        "reference": null,
+        "statedAge": null,
+        "caskNumber": null,
+        "comparison": {
+          "missing": [],
+          "conflicts": ["abv"],
+          "agreements": ["category", "brand", "distillers"]
+        },
+        "distillery": ["White Peak Distillery"],
+        "maturation": null,
+        "releaseDay": null,
+        "singleCask": null,
+        "releaseYear": null,
+        "vintageYear": null,
+        "bottlingYear": null,
+        "caskStrength": null,
+        "releaseMonth": null,
+        "familyContext": {
+          "siblingBottles": []
+        }
+      },
+      {
+        "abv": 51.5,
+        "brand": "Wire Works",
+        "score": 74.2847,
+        "series": null,
+        "source": ["text"],
+        "bottler": null,
+        "edition": null,
+        "outturn": null,
+        "bottleId": 62800,
+        "category": "single_malt",
+        "fullName": "Wire Works Alter Ego",
+        "reference": null,
+        "statedAge": null,
+        "caskNumber": null,
+        "comparison": {
+          "missing": [],
+          "conflicts": ["abv"],
+          "agreements": ["category", "brand", "distillers"]
+        },
+        "distillery": ["White Peak Distillery"],
+        "maturation": null,
+        "releaseDay": null,
+        "singleCask": null,
+        "releaseYear": null,
+        "vintageYear": null,
+        "bottlingYear": null,
+        "caskStrength": null,
+        "releaseMonth": null,
+        "familyContext": {
+          "siblingBottles": []
+        }
+      },
+      {
+        "abv": 57.3,
+        "brand": "Wire Works",
+        "score": 74.2847,
+        "series": null,
+        "source": ["text"],
+        "bottler": null,
+        "edition": null,
+        "outturn": 999,
+        "bottleId": 70438,
+        "category": "single_malt",
+        "fullName": "Wire Works Heritage Chevallier",
+        "reference": null,
+        "statedAge": null,
+        "caskNumber": null,
+        "comparison": {
+          "missing": [],
+          "conflicts": ["abv"],
+          "agreements": ["category", "brand", "distillers"]
+        },
+        "distillery": ["White Peak Distillery"],
+        "maturation": null,
+        "releaseDay": null,
+        "singleCask": null,
+        "releaseYear": null,
+        "vintageYear": null,
+        "bottlingYear": null,
+        "caskStrength": null,
+        "releaseMonth": null,
+        "familyContext": {
+          "siblingBottles": []
+        }
+      },
+      {
+        "abv": 53.6,
+        "brand": "Wire Works",
+        "score": 74.2847,
+        "series": null,
+        "source": ["text"],
+        "bottler": null,
+        "edition": null,
+        "outturn": null,
+        "bottleId": 62801,
+        "category": "single_malt",
+        "fullName": "Wire Works Moscatel Finish",
+        "reference": null,
+        "statedAge": null,
+        "caskNumber": null,
+        "comparison": {
+          "missing": [],
+          "conflicts": ["abv"],
+          "agreements": ["category", "brand", "distillers"]
+        },
+        "distillery": ["White Peak Distillery"],
+        "maturation": null,
+        "releaseDay": null,
+        "singleCask": null,
+        "releaseYear": null,
+        "vintageYear": null,
+        "bottlingYear": null,
+        "caskStrength": null,
+        "releaseMonth": null,
+        "familyContext": {
+          "siblingBottles": []
+        }
+      },
+      {
+        "abv": 53.6,
+        "brand": "Wire Works",
+        "score": 71.01684,
+        "series": null,
+        "source": ["text", "brand_coverage"],
+        "bottler": null,
+        "edition": null,
+        "outturn": 295,
+        "bottleId": 69334,
+        "category": "single_malt",
+        "fullName": "Wire Works Gather 1",
+        "reference": null,
+        "statedAge": null,
+        "caskNumber": null,
+        "comparison": {
+          "missing": [],
+          "conflicts": ["abv"],
+          "agreements": ["category", "brand", "distillers"]
+        },
+        "distillery": ["White Peak Distillery"],
+        "maturation": "ex-bourbon barrels, first-fill Moscatel cask",
+        "releaseDay": null,
+        "singleCask": null,
+        "releaseYear": null,
+        "vintageYear": null,
+        "bottlingYear": null,
+        "caskStrength": null,
+        "releaseMonth": null,
+        "familyContext": {
+          "siblingBottles": []
+        }
+      },
+      {
+        "abv": 57.3,
+        "brand": "Wire Works",
+        "score": 69.796486,
+        "series": null,
+        "source": ["text"],
+        "bottler": null,
+        "edition": null,
+        "outturn": 393,
+        "bottleId": 69336,
+        "category": "single_malt",
+        "fullName": "Wire Works Special Waters",
+        "reference": null,
+        "statedAge": null,
+        "caskNumber": null,
+        "comparison": {
+          "missing": [],
+          "conflicts": ["abv"],
+          "agreements": ["category", "brand", "distillers"]
+        },
+        "distillery": ["White Peak Distillery"],
+        "maturation": "American oak refill STR and ex-bourbon barrel",
+        "releaseDay": 12,
+        "singleCask": null,
+        "releaseYear": 2025,
+        "vintageYear": null,
+        "bottlingYear": null,
+        "caskStrength": null,
+        "releaseMonth": 4,
+        "familyContext": {
+          "siblingBottles": []
+        }
+      },
+      {
+        "abv": 53.4,
+        "brand": "Wire Works",
+        "score": 68.84456,
+        "series": null,
+        "source": ["text", "brand_coverage"],
+        "bottler": null,
+        "edition": null,
+        "outturn": null,
+        "bottleId": 45750,
+        "category": "single_malt",
+        "fullName": "Wire Works Bourbon Barrel - 53.4% ABV - Bourbon Cask - Barrel",
+        "reference": null,
+        "statedAge": null,
+        "caskNumber": null,
+        "comparison": {
+          "missing": [],
+          "conflicts": ["abv"],
+          "agreements": ["category", "brand", "distillers"]
+        },
+        "distillery": ["White Peak Distillery"],
+        "maturation": "bourbon",
+        "releaseDay": null,
+        "singleCask": null,
+        "releaseYear": null,
+        "vintageYear": null,
+        "bottlingYear": null,
+        "caskStrength": null,
+        "releaseMonth": null,
+        "familyContext": {
+          "siblingBottles": []
+        }
+      },
+      {
+        "abv": 51.7,
+        "brand": "Wire Works",
+        "score": 68.47095,
+        "series": null,
+        "source": ["text"],
+        "bottler": null,
+        "edition": null,
+        "outturn": null,
+        "bottleId": 62802,
+        "category": "single_malt",
+        "fullName": "Wire Works Whisky #8 Virgin Oak Finish",
+        "reference": null,
+        "statedAge": null,
+        "caskNumber": null,
+        "comparison": {
+          "missing": [],
+          "conflicts": ["abv"],
+          "agreements": ["category", "brand", "distillers"]
+        },
+        "distillery": ["White Peak Distillery"],
+        "maturation": null,
+        "releaseDay": null,
+        "singleCask": null,
+        "releaseYear": null,
+        "vintageYear": null,
+        "bottlingYear": null,
+        "caskStrength": null,
+        "releaseMonth": null,
+        "familyContext": {
+          "siblingBottles": []
+        }
+      },
+      {
+        "abv": 58,
+        "brand": "Wire Works",
+        "score": 67.846466,
+        "series": null,
+        "source": ["text", "brand_coverage"],
+        "bottler": null,
+        "edition": null,
+        "outturn": 898,
+        "bottleId": 70437,
+        "category": "single_malt",
+        "fullName": "Wire Works Caduro Cask Strength",
+        "reference": null,
+        "statedAge": null,
+        "caskNumber": null,
+        "comparison": {
+          "missing": [],
+          "conflicts": ["abv"],
+          "agreements": ["category", "brand", "distillers"]
+        },
+        "distillery": ["White Peak Distillery"],
+        "maturation": null,
+        "releaseDay": null,
+        "singleCask": null,
+        "releaseYear": null,
+        "vintageYear": null,
+        "bottlingYear": null,
+        "caskStrength": true,
+        "releaseMonth": null,
+        "familyContext": {
+          "siblingBottles": []
+        }
+      },
+      {
+        "abv": 49.2,
+        "brand": "Wire Works",
+        "score": 67.20843,
+        "series": null,
+        "source": ["text", "brand_coverage"],
+        "bottler": null,
+        "edition": null,
+        "outturn": null,
+        "bottleId": 46024,
+        "category": "single_malt",
+        "fullName": "Wire Works Calvados Arrivée - 49.2% ABV - Other Cask - 1st Fill",
+        "reference": null,
+        "statedAge": null,
+        "caskNumber": null,
+        "comparison": {
+          "missing": [],
+          "conflicts": ["abv"],
+          "agreements": ["category", "brand", "distillers"]
+        },
+        "distillery": ["White Peak Distillery"],
+        "maturation": "other",
+        "releaseDay": null,
+        "singleCask": null,
+        "releaseYear": null,
+        "vintageYear": null,
+        "bottlingYear": null,
+        "caskStrength": null,
+        "releaseMonth": null,
+        "familyContext": {
+          "siblingBottles": []
+        }
+      },
+      {
+        "abv": 53.6,
+        "brand": "Wire Works",
+        "score": 65.8795,
+        "series": null,
+        "source": ["text"],
+        "bottler": null,
+        "edition": "2025 Release",
+        "outturn": null,
+        "bottleId": 63454,
+        "category": "single_malt",
+        "fullName": "Wire Works Amarone Wine - 2025 Release",
+        "reference": null,
+        "statedAge": null,
+        "caskNumber": null,
+        "comparison": {
+          "missing": [],
+          "conflicts": ["abv"],
+          "agreements": ["category", "brand", "distillers"]
+        },
+        "distillery": ["White Peak Distillery"],
+        "maturation": null,
+        "releaseDay": null,
+        "singleCask": null,
+        "releaseYear": 2025,
+        "vintageYear": null,
+        "bottlingYear": null,
+        "caskStrength": null,
+        "releaseMonth": null,
+        "familyContext": {
+          "siblingBottles": []
+        }
+      },
+      {
+        "abv": 56.2,
+        "brand": "Wire Works",
+        "score": 65.39234,
+        "series": null,
+        "source": ["text"],
+        "bottler": null,
+        "edition": null,
+        "outturn": 801,
+        "bottleId": 69657,
+        "category": "single_malt",
+        "fullName": "Wire Works Rum Cask Finish",
+        "reference": null,
+        "statedAge": null,
+        "caskNumber": null,
+        "comparison": {
+          "missing": [],
+          "conflicts": ["abv"],
+          "agreements": ["category", "brand", "distillers"]
+        },
+        "distillery": ["White Peak Distillery"],
+        "maturation": "first-fill bourbon barrels, Derbyshire rum casks",
+        "releaseDay": null,
+        "singleCask": false,
+        "releaseYear": null,
+        "vintageYear": null,
+        "bottlingYear": null,
+        "caskStrength": true,
+        "releaseMonth": null,
+        "familyContext": {
+          "siblingBottles": []
+        }
+      },
+      {
+        "abv": 51.3,
+        "brand": "Wire Works",
+        "score": 60.639843,
+        "series": null,
+        "source": ["text", "brand_coverage"],
+        "bottler": null,
+        "edition": "Batch 3",
+        "outturn": 2457,
+        "bottleId": 46030,
+        "category": "single_malt",
+        "fullName": "Wire Works Necessary Evil Finish - Batch 3",
+        "reference": null,
+        "statedAge": null,
+        "caskNumber": null,
+        "comparison": {
+          "missing": [],
+          "conflicts": ["abv"],
+          "agreements": ["category", "brand", "distillers"]
+        },
+        "distillery": ["White Peak Distillery"],
+        "maturation": "Bourbon/Stout",
+        "releaseDay": null,
+        "singleCask": null,
+        "releaseYear": 2025,
+        "vintageYear": null,
+        "bottlingYear": null,
+        "caskStrength": true,
+        "releaseMonth": null,
+        "familyContext": {
+          "siblingBottles": []
+        }
+      },
+      {
+        "abv": 50.3,
+        "brand": "Wire Works",
+        "score": 60.17971,
+        "series": null,
+        "source": ["text", "brand_coverage"],
+        "bottler": null,
+        "edition": "Batch 01/2022",
+        "outturn": 5016,
+        "bottleId": 58000,
+        "category": "single_malt",
+        "fullName": "Wire Works First Release - Batch 01/2022",
+        "reference": null,
+        "statedAge": null,
+        "caskNumber": null,
+        "comparison": {
+          "missing": [],
+          "conflicts": ["abv"],
+          "agreements": ["category", "brand", "distillers"]
+        },
+        "distillery": ["White Peak Distillery"],
+        "maturation": "Ex-bourbon and STR red wine casks",
+        "releaseDay": null,
+        "singleCask": false,
+        "releaseYear": 2022,
+        "vintageYear": null,
+        "bottlingYear": null,
+        "caskStrength": null,
+        "releaseMonth": 2,
+        "familyContext": {
+          "siblingBottles": []
+        }
+      },
+      {
+        "abv": null,
+        "brand": "The GlenDronach",
+        "score": 40.715393,
+        "series": null,
+        "source": ["text"],
+        "bottler": null,
+        "edition": null,
+        "outturn": null,
+        "bottleId": 4620,
+        "category": "single_malt",
+        "fullName": "The GlenDronach 15-year-old Tawny Port Finish",
+        "reference": null,
+        "statedAge": 15,
+        "caskNumber": null,
+        "comparison": {
+          "missing": ["abv"],
+          "conflicts": ["brand", "distillers"],
+          "agreements": ["category"]
+        },
+        "distillery": ["The GlenDronach"],
+        "maturation": null,
+        "releaseDay": null,
+        "singleCask": null,
+        "releaseYear": null,
+        "vintageYear": null,
+        "bottlingYear": null,
+        "caskStrength": null,
+        "releaseMonth": null,
+        "familyContext": {
+          "siblingBottles": []
+        }
+      },
+      {
+        "abv": null,
+        "brand": "The GlenDronach",
+        "score": 40.715393,
+        "series": null,
+        "source": ["text"],
+        "bottler": null,
+        "edition": null,
+        "outturn": null,
+        "bottleId": 4051,
+        "category": "single_malt",
+        "fullName": "The GlenDronach 18-year-old Tawny Port Finish",
+        "reference": null,
+        "statedAge": 18,
+        "caskNumber": null,
+        "comparison": {
+          "missing": ["abv"],
+          "conflicts": ["brand", "distillers"],
+          "agreements": ["category"]
+        },
+        "distillery": ["The GlenDronach"],
+        "maturation": null,
+        "releaseDay": null,
+        "singleCask": null,
+        "releaseYear": null,
+        "vintageYear": null,
+        "bottlingYear": null,
+        "caskStrength": null,
+        "releaseMonth": null,
+        "familyContext": {
+          "siblingBottles": []
+        }
+      },
+      {
+        "abv": null,
+        "brand": "Spirit Works",
+        "score": 33.15754,
+        "series": null,
+        "source": ["text"],
+        "bottler": null,
+        "edition": null,
+        "outturn": null,
+        "bottleId": 11877,
+        "category": "rye",
+        "fullName": "Spirit Works Distillery",
+        "reference": null,
+        "statedAge": null,
+        "caskNumber": null,
+        "comparison": {
+          "missing": ["abv"],
+          "conflicts": [],
+          "agreements": []
+        },
+        "distillery": [],
+        "maturation": null,
+        "releaseDay": null,
+        "singleCask": null,
+        "releaseYear": null,
+        "vintageYear": null,
+        "bottlingYear": null,
+        "caskStrength": null,
+        "releaseMonth": null,
+        "familyContext": {
+          "siblingBottles": []
+        }
+      },
+      {
+        "abv": null,
+        "brand": "Spirit Works",
+        "score": 32.07461,
+        "series": null,
+        "source": ["text"],
+        "bottler": null,
+        "edition": null,
+        "outturn": null,
+        "bottleId": 16077,
+        "category": null,
+        "fullName": "Spirit Works Straight Wheat",
+        "reference": null,
+        "statedAge": null,
+        "caskNumber": null,
+        "comparison": {
+          "missing": ["abv"],
+          "conflicts": [],
+          "agreements": []
+        },
+        "distillery": [],
+        "maturation": null,
+        "releaseDay": null,
+        "singleCask": null,
+        "releaseYear": null,
+        "vintageYear": null,
+        "bottlingYear": null,
+        "caskStrength": null,
+        "releaseMonth": null,
+        "familyContext": {
+          "siblingBottles": []
+        }
+      },
+      {
+        "abv": null,
+        "brand": "Spirit Works",
+        "score": 31.973446,
+        "series": null,
+        "source": ["text"],
+        "bottler": null,
+        "edition": null,
+        "outturn": null,
+        "bottleId": 16078,
+        "category": "rye",
+        "fullName": "Spirit Works Straight Rye",
+        "reference": null,
+        "statedAge": null,
+        "caskNumber": null,
+        "comparison": {
+          "missing": ["abv"],
+          "conflicts": [],
+          "agreements": []
+        },
+        "distillery": [],
+        "maturation": null,
+        "releaseDay": null,
+        "singleCask": null,
+        "releaseYear": null,
+        "vintageYear": null,
+        "bottlingYear": null,
+        "caskStrength": null,
+        "releaseMonth": null,
+        "familyContext": {
+          "siblingBottles": []
+        }
+      },
+      {
+        "abv": null,
+        "brand": "Manatawny Still Works",
+        "score": 30.88319,
+        "series": null,
+        "source": ["text"],
+        "bottler": null,
+        "edition": null,
+        "outturn": null,
+        "bottleId": 16082,
+        "category": null,
+        "fullName": "Manatawny Still Works J. Potts",
+        "reference": null,
+        "statedAge": null,
+        "caskNumber": null,
+        "comparison": {
+          "missing": ["abv"],
+          "conflicts": [],
+          "agreements": []
+        },
+        "distillery": [],
+        "maturation": null,
+        "releaseDay": null,
+        "singleCask": null,
+        "releaseYear": null,
+        "vintageYear": null,
+        "bottlingYear": null,
+        "caskStrength": null,
+        "releaseMonth": null,
+        "familyContext": {
+          "siblingBottles": []
+        }
+      },
+      {
+        "abv": null,
+        "brand": "Spirit Works",
+        "score": 28.94027,
+        "series": null,
+        "source": ["text"],
+        "bottler": null,
+        "edition": null,
+        "outturn": null,
+        "bottleId": 13881,
+        "category": "rye",
+        "fullName": "Spirit Works Bottled in Bond Straight Rye",
+        "reference": null,
+        "statedAge": null,
+        "caskNumber": null,
+        "comparison": {
+          "missing": ["abv"],
+          "conflicts": [],
+          "agreements": []
+        },
+        "distillery": [],
+        "maturation": null,
+        "releaseDay": null,
+        "singleCask": null,
+        "releaseYear": null,
+        "vintageYear": null,
+        "bottlingYear": null,
+        "caskStrength": null,
+        "releaseMonth": null,
+        "familyContext": {
+          "siblingBottles": []
+        }
+      },
+      {
+        "abv": null,
+        "brand": "Manatawny Still Works",
+        "score": 28.597052,
+        "series": null,
+        "source": ["text"],
+        "bottler": null,
+        "edition": null,
+        "outturn": null,
+        "bottleId": 13950,
+        "category": "blend",
+        "fullName": "Manatawny Still Works Keystone Whiskey",
+        "reference": null,
+        "statedAge": 4,
+        "caskNumber": null,
+        "comparison": {
+          "missing": ["abv"],
+          "conflicts": [],
+          "agreements": []
+        },
+        "distillery": [],
+        "maturation": null,
+        "releaseDay": null,
+        "singleCask": null,
+        "releaseYear": null,
+        "vintageYear": null,
+        "bottlingYear": null,
+        "caskStrength": null,
+        "releaseMonth": null,
+        "familyContext": {
+          "siblingBottles": []
+        }
+      },
+      {
+        "abv": null,
+        "brand": "Spirit Works",
+        "score": 28.069866,
+        "series": null,
+        "source": ["text"],
+        "bottler": null,
+        "edition": null,
+        "outturn": null,
+        "bottleId": 13306,
+        "category": "bourbon",
+        "fullName": "Spirit Works Four Grain Straight Bourbon (Batch 001)",
+        "reference": null,
+        "statedAge": null,
+        "caskNumber": null,
+        "comparison": {
+          "missing": ["abv"],
+          "conflicts": [],
+          "agreements": []
+        },
+        "distillery": [],
+        "maturation": null,
+        "releaseDay": null,
+        "singleCask": null,
+        "releaseYear": null,
+        "vintageYear": null,
+        "bottlingYear": null,
+        "caskStrength": null,
+        "releaseMonth": null,
+        "familyContext": {
+          "siblingBottles": []
+        }
+      },
+      {
+        "abv": null,
+        "brand": "High Wire Distilling Co.",
+        "score": 27.433926,
+        "series": null,
+        "source": ["text"],
+        "bottler": null,
+        "edition": null,
+        "outturn": null,
+        "bottleId": 11851,
+        "category": "bourbon",
+        "fullName": "High Wire Distilling Co. New Southern Revival Straight Bourbon Whiskey",
+        "reference": null,
+        "statedAge": 2,
+        "caskNumber": null,
+        "comparison": {
+          "missing": ["abv"],
+          "conflicts": [],
+          "agreements": []
+        },
+        "distillery": ["High Wire Distilling Co."],
+        "maturation": null,
+        "releaseDay": null,
+        "singleCask": null,
+        "releaseYear": null,
+        "vintageYear": null,
+        "bottlingYear": null,
+        "caskStrength": null,
+        "releaseMonth": null,
+        "familyContext": {
+          "siblingBottles": []
+        }
+      },
+      {
+        "abv": null,
+        "brand": "Distillery 291",
+        "score": 0.6754903625371385,
+        "series": null,
+        "source": ["vector"],
+        "bottler": null,
+        "edition": null,
+        "outturn": null,
+        "bottleId": 13450,
+        "category": "bourbon",
+        "fullName": "291 E Cherry and Peach Wine-Barrel Finished Bourbon (Batch 6)",
+        "reference": "Distillery 291 E Cherry and Peach Wine-Barrel Finished Bourbon (Batch 6), 61.3%",
+        "statedAge": null,
+        "caskNumber": null,
+        "comparison": {
+          "missing": ["abv"],
+          "conflicts": [],
+          "agreements": []
+        },
+        "distillery": [],
+        "maturation": null,
+        "releaseDay": null,
+        "singleCask": null,
+        "releaseYear": null,
+        "vintageYear": null,
+        "bottlingYear": null,
+        "caskStrength": null,
+        "releaseMonth": null,
+        "familyContext": {
+          "siblingBottles": []
+        }
+      },
+      {
+        "abv": null,
+        "brand": "Stranahan's",
+        "score": 0.6643923005079857,
+        "series": null,
+        "source": ["vector"],
+        "bottler": null,
+        "edition": null,
+        "outturn": null,
+        "bottleId": 13305,
+        "category": "single_malt",
+        "fullName": "Stranahan's Diamond Peak (Batch 014)",
+        "reference": "Stranahan's Diamond Peak (Batch 014), 47%",
+        "statedAge": null,
+        "caskNumber": null,
+        "comparison": {
+          "missing": ["abv"],
+          "conflicts": [],
+          "agreements": []
+        },
+        "distillery": [],
+        "maturation": null,
+        "releaseDay": null,
+        "singleCask": null,
+        "releaseYear": null,
+        "vintageYear": null,
+        "bottlingYear": null,
+        "caskStrength": null,
+        "releaseMonth": null,
+        "familyContext": {
+          "siblingBottles": []
+        }
+      },
+      {
+        "abv": null,
+        "brand": "Peerless",
+        "score": 0.6573236598169865,
+        "series": null,
+        "source": ["vector"],
+        "bottler": null,
+        "edition": null,
+        "outturn": null,
+        "bottleId": 46398,
+        "category": "rye",
+        "fullName": "Peerless Small Batch",
+        "reference": "Peerless Small Batch - 55.7% ABV",
+        "statedAge": null,
+        "caskNumber": null,
+        "comparison": {
+          "missing": ["abv"],
+          "conflicts": [],
+          "agreements": []
+        },
+        "distillery": ["Kentucky Peerless Distilling Co."],
+        "maturation": null,
+        "releaseDay": null,
+        "singleCask": null,
+        "releaseYear": null,
+        "vintageYear": null,
+        "bottlingYear": null,
+        "caskStrength": null,
+        "releaseMonth": null,
+        "familyContext": {
+          "siblingBottles": []
+        }
+      },
+      {
+        "abv": null,
+        "brand": "Penderyn Distillery",
+        "score": 0.6544399964862602,
+        "series": null,
+        "source": ["vector"],
+        "bottler": null,
+        "edition": null,
+        "outturn": null,
+        "bottleId": 12804,
+        "category": "single_malt",
+        "fullName": "Penderyn 6-year-old Ex-Tawny Port Single Cask (PT138)",
+        "reference": "Penderyn 6-year-old Ex-Tawny Port Single Cask (PT138), 59.59%",
+        "statedAge": 6,
+        "caskNumber": null,
+        "comparison": {
+          "missing": ["abv"],
+          "conflicts": ["brand", "distillers"],
+          "agreements": ["category"]
+        },
+        "distillery": ["Penderyn Distillery"],
+        "maturation": null,
+        "releaseDay": null,
+        "singleCask": true,
+        "releaseYear": null,
+        "vintageYear": null,
+        "bottlingYear": null,
+        "caskStrength": null,
+        "releaseMonth": null,
+        "familyContext": {
+          "siblingBottles": []
+        }
+      },
+      {
+        "abv": null,
+        "brand": "Wood's High Mountain Distillery",
+        "score": 0.6539122695776878,
+        "series": null,
+        "source": ["vector"],
+        "bottler": null,
+        "edition": null,
+        "outturn": null,
+        "bottleId": 16007,
+        "category": "rye",
+        "fullName": "Wood's High Mountain Distillery Alpine Rye (Batch 2)",
+        "reference": "Wood's Alpine Rye (Batch #2), 49%",
+        "statedAge": null,
+        "caskNumber": null,
+        "comparison": {
+          "missing": ["abv"],
+          "conflicts": [],
+          "agreements": []
+        },
+        "distillery": [],
+        "maturation": null,
+        "releaseDay": null,
+        "singleCask": null,
+        "releaseYear": null,
+        "vintageYear": null,
+        "bottlingYear": null,
+        "caskStrength": null,
+        "releaseMonth": null,
+        "familyContext": {
+          "siblingBottles": []
+        }
+      },
+      {
+        "abv": null,
+        "brand": "Wood's High Mountain Distillery",
+        "score": 0.6489783310019894,
+        "series": null,
+        "source": ["vector"],
+        "bottler": null,
+        "edition": null,
+        "outturn": null,
+        "bottleId": 13169,
+        "category": "single_malt",
+        "fullName": "Wood's High Mountain Distillery Dawn Patrol Colorado (Batch 1)",
+        "reference": "Wood's Dawn Patrol Colorado (Batch 1), 48%",
+        "statedAge": null,
+        "caskNumber": null,
+        "comparison": {
+          "missing": ["abv"],
+          "conflicts": [],
+          "agreements": []
+        },
+        "distillery": [],
+        "maturation": null,
+        "releaseDay": null,
+        "singleCask": null,
+        "releaseYear": null,
+        "vintageYear": null,
+        "bottlingYear": null,
+        "caskStrength": null,
+        "releaseMonth": null,
+        "familyContext": {
+          "siblingBottles": []
+        }
+      },
+      {
+        "abv": null,
+        "brand": "Wood's High Mountain Distillery",
+        "score": 0.6409308954742521,
+        "series": null,
+        "source": ["vector"],
+        "bottler": null,
+        "edition": null,
+        "outturn": null,
+        "bottleId": 13393,
+        "category": "single_malt",
+        "fullName": "Wood's High Mountain Distillery 7-year-old Sawatch American Malt (Batch 2)",
+        "reference": "Wood's 7-year-old Sawatch American Malt (Batch 2), 49%",
+        "statedAge": 7,
+        "caskNumber": null,
+        "comparison": {
+          "missing": ["abv"],
+          "conflicts": [],
+          "agreements": []
+        },
+        "distillery": [],
+        "maturation": null,
+        "releaseDay": null,
+        "singleCask": null,
+        "releaseYear": null,
+        "vintageYear": null,
+        "bottlingYear": null,
+        "caskStrength": null,
+        "releaseMonth": null,
+        "familyContext": {
+          "siblingBottles": []
+        }
+      },
+      {
+        "abv": null,
+        "brand": "Penderyn Distillery",
+        "score": 0.610360445195945,
+        "series": null,
+        "source": ["vector"],
+        "bottler": null,
+        "edition": null,
+        "outturn": null,
+        "bottleId": 12969,
+        "category": "single_malt",
+        "fullName": "Penderyn 12-year-old Ex-Ruby Port Single Cask (PT136)",
+        "reference": "Penderyn 12-year-old Ex-Ruby Port Single Cask (PT136), 60.38%",
+        "statedAge": 12,
+        "caskNumber": null,
+        "comparison": {
+          "missing": ["abv"],
+          "conflicts": ["brand", "distillers"],
+          "agreements": ["category"]
+        },
+        "distillery": ["Penderyn Distillery"],
+        "maturation": null,
+        "releaseDay": null,
+        "singleCask": true,
+        "releaseYear": null,
+        "vintageYear": null,
+        "bottlingYear": null,
+        "caskStrength": null,
+        "releaseMonth": null,
+        "familyContext": {
+          "siblingBottles": []
+        }
+      },
+      {
+        "abv": null,
+        "brand": "Penderyn Distillery",
+        "score": 0.6086965749301472,
+        "series": null,
+        "source": ["vector"],
+        "bottler": null,
+        "edition": null,
+        "outturn": null,
+        "bottleId": 13033,
+        "category": "single_malt",
+        "fullName": "Penderyn 10-year-old Ruby Port Single Cask (PT–178)",
+        "reference": "Penderyn 10-year-old Ruby Port Single Cask (PT–178), 60.06%",
+        "statedAge": 10,
+        "caskNumber": null,
+        "comparison": {
+          "missing": ["abv"],
+          "conflicts": ["brand", "distillers"],
+          "agreements": ["category"]
+        },
+        "distillery": ["Penderyn Distillery"],
+        "maturation": null,
+        "releaseDay": null,
+        "singleCask": true,
+        "releaseYear": null,
+        "vintageYear": null,
+        "bottlingYear": null,
+        "caskStrength": null,
+        "releaseMonth": null,
+        "familyContext": {
+          "siblingBottles": []
+        }
+      }
+    ]
+  },
+  "context": {
+    "inspectedBottleIds": [46062, 46070],
+    "bottleContexts": [
+      {
+        "exact": {
+          "abv": 46.8,
+          "edition": null,
+          "outturn": null,
+          "statedAge": null,
+          "caskNumber": null,
+          "maturation": null,
+          "releaseDay": null,
+          "singleCask": null,
+          "releaseYear": null,
+          "vintageYear": null,
+          "bottlingYear": null,
+          "caskStrength": null,
+          "releaseMonth": null
+        },
+        "shared": {
+          "name": "Caduro X",
+          "brand": {
+            "name": "Wire Works",
+            "entityId": 365823
+          },
+          "series": null,
+          "bottler": null,
+          "category": "single_malt",
+          "statedAge": null,
+          "distillers": [
+            {
+              "name": "White Peak Distillery",
+              "entityId": 1992
+            }
+          ]
+        },
+        "groupId": 19022,
+        "bottleId": 46062,
+        "fullName": "Wire Works Caduro X - 46.8% ABV",
+        "siblings": [],
+        "references": [
+          {
+            "name": "Wire Works Caduro X",
+            "ignored": false
+          },
+          {
+            "name": "Wire Works Caduro X - 46.8% ABV",
+            "ignored": false
+          }
+        ],
+        "observations": [
+          {
+            "facts": {
+              "proposalType": "match_existing",
+              "proposedBottle": null,
+              "referenceScope": "none"
+            },
+            "rawText": "White Peak Wire Works - Caduro X",
+            "sourceKey": "store_price:12057688",
+            "sourceUrl": "https://www.thewhiskyworld.com/white-peak-wire-works-caduro-x-p17932",
+            "sourceName": "White Peak Wire Works - Caduro X",
+            "sourceType": "store_price",
+            "parsedIdentity": null
+          },
+          {
+            "facts": {
+              "proposalType": "create_new",
+              "proposedBottle": {
+                "abv": 46.8,
+                "name": "Caduro X",
+                "brand": {
+                  "id": 365823,
+                  "name": "Wire Works"
+                },
+                "series": null,
+                "bottler": null,
+                "edition": null,
+                "caskFill": null,
+                "caskSize": null,
+                "caskType": null,
+                "category": "single_malt",
+                "statedAge": null,
+                "distillers": [
+                  {
+                    "id": 1992,
+                    "name": "White Peak Distillery"
+                  }
+                ],
+                "singleCask": null,
+                "releaseYear": null,
+                "vintageYear": null,
+                "caskStrength": null
+              }
+            },
+            "rawText": "Wire Works Caduro X",
+            "sourceKey": "store_price:12031533",
+            "sourceUrl": "https://www.masterofmalt.com/whiskies/white-peak-distillery/wire-works-caduro-x-whisky/?sku=146251",
+            "sourceName": "Wire Works Caduro X",
+            "sourceType": "store_price",
+            "parsedIdentity": {
+              "abv": null,
+              "brand": "Wire Works",
+              "series": null,
+              "bottler": null,
+              "edition": null,
+              "category": "single_malt",
+              "cask_fill": null,
+              "cask_size": null,
+              "cask_type": null,
+              "distillery": [],
+              "expression": "Caduro X",
+              "stated_age": null,
+              "single_cask": null,
+              "release_year": null,
+              "vintage_year": null,
+              "cask_strength": null
+            }
+          }
+        ],
+        "imageSources": []
+      },
+      {
+        "exact": {
+          "abv": 50.2,
+          "edition": null,
+          "outturn": null,
+          "statedAge": null,
+          "caskNumber": null,
+          "maturation": "tawny_port",
+          "releaseDay": null,
+          "singleCask": false,
+          "releaseYear": null,
+          "vintageYear": null,
+          "bottlingYear": null,
+          "caskStrength": null,
+          "releaseMonth": null
+        },
+        "shared": {
+          "name": "Port Cask",
+          "brand": {
+            "name": "Wire Works",
+            "entityId": 365823
+          },
+          "series": {
+            "name": "Provenance",
+            "seriesId": 214
+          },
+          "bottler": null,
+          "category": "single_malt",
+          "statedAge": null,
+          "distillers": [
+            {
+              "name": "White Peak Distillery",
+              "entityId": 1992
+            }
+          ]
+        },
+        "groupId": 19030,
+        "bottleId": 46070,
+        "fullName": "Wire Works Port Cask - 50.2% ABV - Tawny Port Cask",
+        "siblings": [],
+        "references": [
+          {
+            "name": "Wire Works Port Cask - 50.2% ABV - Tawny Port Cask",
+            "ignored": false
+          }
+        ],
+        "observations": [
+          {
+            "facts": {
+              "proposalType": "create_new",
+              "proposedBottle": {
+                "abv": 50.2,
+                "name": "Port Cask",
+                "brand": {
+                  "id": 365823,
+                  "name": "Wire Works"
+                },
+                "series": {
+                  "id": null,
+                  "name": "Provenance"
+                },
+                "bottler": null,
+                "edition": null,
+                "caskFill": null,
+                "caskSize": null,
+                "caskType": "tawny_port",
+                "category": "single_malt",
+                "statedAge": null,
+                "distillers": [
+                  {
+                    "id": 1992,
+                    "name": "White Peak Distillery"
+                  }
+                ],
+                "singleCask": false,
+                "releaseYear": null,
+                "vintageYear": null,
+                "caskStrength": null
+              }
+            },
+            "rawText": "Wire Works Port Cask",
+            "sourceKey": "store_price:12031558",
+            "sourceUrl": "https://www.masterofmalt.com/whiskies/white-peak-distillery/wire-works-port-cask-whisky/?sku=143363",
+            "sourceName": "Wire Works Port Cask",
+            "sourceType": "store_price",
+            "parsedIdentity": {
+              "abv": null,
+              "brand": "Wire Works",
+              "series": null,
+              "bottler": null,
+              "edition": null,
+              "category": "single_malt",
+              "cask_fill": null,
+              "cask_size": null,
+              "cask_type": "other",
+              "distillery": ["White Peak Distillery"],
+              "expression": "Port Cask",
+              "stated_age": null,
+              "single_cask": null,
+              "release_year": null,
+              "vintage_year": null,
+              "cask_strength": null
+            }
+          }
+        ],
+        "imageSources": []
+      }
+    ],
+    "inspectedEntities": [
+      {
+        "kind": "distillery",
+        "name": "Spirit Works",
+        "score": 1,
+        "source": ["exact", "text", "prefix", "contained"],
+        "entityId": 4050,
+        "reference": "Spirit Works",
+        "shortName": null,
+        "retrievedFor": [
+          {
+            "exact": true,
+            "query": "Spirit Works"
+          }
+        ]
+      },
+      {
+        "kind": "distillery",
+        "name": "Manatawny Still Works",
+        "score": 1,
+        "source": ["exact", "text", "prefix", "contained"],
+        "entityId": 3399,
+        "reference": "Manatawny Still Works",
+        "shortName": null,
+        "retrievedFor": [
+          {
+            "exact": true,
+            "query": "Manatawny Still Works"
+          }
+        ]
+      },
+      {
+        "kind": "distillery",
+        "name": "High Wire Distilling Co.",
+        "score": 1,
+        "source": ["exact", "text", "prefix", "contained"],
+        "entityId": 29378,
+        "reference": "High Wire Distilling Co.",
+        "shortName": null,
+        "retrievedFor": [
+          {
+            "exact": true,
+            "query": "High Wire Distilling Co."
+          }
+        ]
+      },
+      {
+        "kind": "distillery",
+        "name": "Distillery 291",
+        "score": 1,
+        "source": ["exact", "text", "prefix", "contained"],
+        "entityId": 2602,
+        "reference": "Distillery 291",
+        "shortName": "291",
+        "retrievedFor": [
+          {
+            "exact": true,
+            "query": "Distillery 291"
+          }
+        ]
+      },
+      {
+        "kind": "brand",
+        "name": "Stranahan's",
+        "score": 1,
+        "source": ["exact", "text", "prefix", "contained"],
+        "entityId": 1376,
+        "reference": "Stranahan's",
+        "shortName": "",
+        "retrievedFor": [
+          {
+            "exact": true,
+            "query": "Stranahan's"
+          }
+        ]
+      },
+      {
+        "kind": "brand",
+        "name": "Peerless",
+        "score": 1,
+        "source": ["exact", "text", "prefix", "contained"],
+        "entityId": 1258,
+        "reference": "Peerless",
+        "shortName": null,
+        "retrievedFor": [
+          {
+            "exact": true,
+            "query": "Peerless"
+          },
+          {
+            "query": "Kentucky Peerless Distilling Co."
+          }
+        ]
+      },
+      {
+        "kind": "distillery",
+        "name": "Kentucky Peerless Distilling Co.",
+        "score": 1,
+        "source": ["text", "prefix", "exact", "contained"],
+        "entityId": 1780,
+        "reference": "Peerless Distillery",
+        "shortName": null,
+        "retrievedFor": [
+          {
+            "query": "Peerless"
+          },
+          {
+            "exact": true,
+            "query": "Kentucky Peerless Distilling Co."
+          }
+        ]
+      },
+      {
+        "kind": "distillery",
+        "name": "Wood's High Mountain Distillery",
+        "score": 1,
+        "source": ["exact", "text", "prefix", "contained"],
+        "entityId": 4503,
+        "reference": "Wood's High Mountain Distillery",
+        "shortName": null,
+        "retrievedFor": [
+          {
+            "exact": true,
+            "query": "Wood's High Mountain Distillery"
+          }
+        ]
+      },
+      {
+        "kind": "brand",
+        "name": "Wire Works",
+        "score": 1,
+        "source": ["exact", "text", "prefix", "contained"],
+        "entityId": 365823,
+        "reference": "Wire Works",
+        "shortName": null,
+        "retrievedFor": [
+          {
+            "exact": true,
+            "query": "Wire Works"
+          }
+        ]
+      },
+      {
+        "kind": "distillery",
+        "name": "White Peak Distillery",
+        "score": 1,
+        "source": ["exact", "text", "prefix", "contained"],
+        "entityId": 1992,
+        "reference": "White Peak Distillery",
+        "shortName": null,
+        "retrievedFor": [
+          {
+            "exact": true,
+            "query": "White Peak Distillery"
+          }
+        ]
+      },
+      {
+        "kind": "distillery",
+        "name": "Stranahan's Distillery",
+        "score": 0.5,
+        "source": ["text", "prefix"],
+        "entityId": 1929,
+        "reference": "Stranahan's Distillery",
+        "shortName": null,
+        "retrievedFor": [
+          {
+            "query": "Stranahan's"
+          }
+        ]
+      }
+    ],
+    "inspectedSeries": []
+  },
+  "provenance": {
+    "source": "production_miss",
+    "verifiedSourceUrls": [
+      "https://www.scotchwhiskyauctions.com/auctions/234-the-185th-auction/907889-white-peaks-wire-works-distillery-exclusive/",
+      "https://d3suvtcq00dftb.cloudfront.net/images/08367ac206ec7249fef74c343580356c-zoom.jpg"
+    ],
+    "dbOutcome": {
+      "bottleId": null,
+      "createsBottle": false,
+      "summary": "Production returned no_match: it could not tell whether the lot was the Tawny Port Cask release or a hand-fill."
+    },
+    "notes": "Captured from saved classifier run 37026 (auction_lot 18287, model null, 2026-11-04T00:03:30.155Z). Production rationale: No safe assignment or creation is supported. The inspected Wire Works Port Cask candidate is 50.2% ABV, so it does not match the source's 61.7% ABV. The available web result suggests a Tawny Port Cask release, but does not resolve whether this auction lot is that marketed release or a distillery hand-fill. The run predates reading Scotch Whisky Auctions lot pages (#1609), so the evidence pack adds the lot page text. Expected outcome checked against the lot page and photo on 2026-11-09, in a random sample of the 185th auction's no_match reviews."
+  },
+  "expected": {
+    "status": "classified",
+    "action": "create_bottle",
+    "identityScope": "product",
+    "matchedBottleId": null,
+    "proposedBottle": {
+      "category": "single_malt",
+      "abv": 61.7
+    },
+    "proposedBottleDistillerIds": [1992],
+    "summary": "Create the Wire Works Distillery Exclusive hand-fill from a Tawny Port cask at 61.7%. The lot page names the hand-fill, the cask type and the strength, and the label reads Wire Works, Single Malt English Whisky, Distillery Exclusive. The local Wire Works Port Cask (50.2%) is another Bottle."
+  },
+  "knownFailure": {
+    "reason": "The agent returns no_match because it cannot tell a marketed distillery exclusive from a hand-fill."
+  }
+}
