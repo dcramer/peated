@@ -635,6 +635,10 @@ const MatchDecisionSchema = BottleClassifierDecisionBaseSchema.extend({
   action: z.literal("match"),
   matchedBottleId: z.number().int(),
   proposedBottle: z.null().default(null),
+  // Set only when evidence contradicts stored fields of the matched Bottle
+  // and the stored values are record errors. The server starts a Bottle
+  // Review for it; the Match still applies.
+  blockedBottle: BlockedBottleSchema.nullable().optional(),
 });
 
 const CreateBottleDecisionSchema = BottleClassifierDecisionBaseSchema.extend({
@@ -647,8 +651,9 @@ const NoMatchDecisionSchema = BottleClassifierDecisionBaseSchema.extend({
   action: z.literal("no_match"),
   matchedBottleId: z.null().default(null),
   proposedBottle: z.null().default(null),
-  // Set only when the source is an inspected candidate whose stored fields
-  // evidence contradicts. The server starts a Bottle Review for it.
+  // Set only when the source is an inspected candidate, and a stored field
+  // that evidence contradicts may describe another release. The server starts
+  // a Bottle Review for it.
   blockedBottle: BlockedBottleSchema.nullable().optional(),
 });
 
@@ -675,9 +680,9 @@ export const BottleClassifierAgentDecisionSchema = z
     action: BottleClassifierActionSchema.describe(
       [
         "Decision action.",
-        "match: an existing Bottle is the exact marketed product and is safe for this assignment; set matchedBottleId.",
+        "match: an existing Bottle is the exact marketed product and is safe for this assignment, including when a stored field is a record error named in blockedBottle; set matchedBottleId.",
         "create_bottle: no inspected existing Bottle represents the exact marketed product, including plausible malformed candidates; set proposedBottle only, including every marketed release trait needed to identify it.",
-        "no_match: no safe existing target and no supported create action, including when an existing Bottle needs a separate Bottle Review before assignment is safe.",
+        "no_match: no safe existing target and no supported create action, including when a stored field of the closest Bottle may describe another release.",
         "ignore: the source sells something other than one whisky Bottle, so Peated does not track it; give the reason in rationale and leave matchedBottleId and proposedBottle null. Unclear whisky identity is no_match, not ignore.",
       ].join(" "),
     ),
@@ -697,7 +702,7 @@ export const BottleClassifierAgentDecisionSchema = z
     blockedBottle: BlockedBottleSchema.nullable()
       .default(null)
       .describe(
-        "Only with no_match. Set it when an inspected candidate is the source's exact Bottle, but evidence contradicts one or more of its stored fields. Leave it null when identity is unclear.",
+        "Set it when an inspected candidate is the source's exact Bottle, but evidence contradicts one or more of its stored fields. With match, it names the matched Bottle and stored values that are record errors. With no_match, a stored value may describe another release. Leave it null when identity is unclear, and with create_bottle or ignore.",
       ),
   })
   .strict();

@@ -888,19 +888,28 @@ function enforceSmwsSourceCode({
 /**
  * Blocked Bottle rule (owner: Bottle classifier). The agent may name the
  * source's own Bottle when evidence contradicts its stored fields. Code keeps
- * that claim only on the agent's own `no_match`, and only for a candidate the
- * agent inspected in this run, because the server starts a Bottle Review for
- * it. A match that code downgraded never names a Blocked Bottle.
+ * that claim only for a candidate the agent inspected in this run, because
+ * the server starts a Bottle Review for it. It keeps the claim on the agent's
+ * own `no_match`, and on a Match that still stands and selects that same
+ * Bottle. A match that code downgraded never names a Blocked Bottle.
  */
 function getAcceptedBlockedBottle({
   agentDecision,
+  finalDecision,
   artifacts,
 }: {
   agentDecision: BottleClassifierAgentDecision;
+  finalDecision: BottleClassificationDecision;
   artifacts: BottleClassificationArtifacts;
 }): BlockedBottle | null {
   const blockedBottle = agentDecision.blockedBottle;
-  if (!blockedBottle || agentDecision.action !== "no_match") return null;
+  if (!blockedBottle || agentDecision.action !== finalDecision.action)
+    return null;
+  if (
+    finalDecision.action === "match" &&
+    finalDecision.matchedBottleId !== blockedBottle.bottleId
+  )
+    return null;
 
   const isInspectedCandidate =
     artifacts.candidates.some(
@@ -970,9 +979,10 @@ export function finalizeBottleReferenceClassification({
     confidenceBasis:
       reviewedDecision.confidenceBasis ?? parsedDecision.confidenceBasis,
   };
-  if (finalDecision.action === "no_match") {
+  if (finalDecision.action === "no_match" || finalDecision.action === "match") {
     const blockedBottle = getAcceptedBlockedBottle({
       agentDecision: parsedDecision,
+      finalDecision,
       artifacts,
     });
     if (blockedBottle) finalDecision.blockedBottle = blockedBottle;

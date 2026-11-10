@@ -720,12 +720,13 @@
   },
   "expected": {
     "status": "classified",
-    "action": "no_match",
+    "action": "match",
     "identityScope": "product",
     "blockedBottle": {
       "bottleId": 4400,
       "fields": ["statedAge"]
     },
-    "summary": "Auchentoshan Valinch 2012 is a marketed cask-strength release, so it stays in scope. Local Bottle 4400 stores a 10-year age that conflicts with the no-age-statement release, so leave the lot unresolved instead of matching or creating a duplicate."
+    "summary": "Auchentoshan Valinch 2012 is a marketed cask-strength release, so it stays in scope. Match Bottle 4400, the 2012 release. Its stored 10-year age conflicts with the no-age-statement release and is a record error, so name it as the Blocked Bottle.",
+    "matchedBottleId": 4400
   }
 }

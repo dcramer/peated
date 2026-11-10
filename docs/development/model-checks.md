@@ -29,8 +29,10 @@ judgment that a repeatable code test cannot prove.
   id or with `BOTTLE_CLASSIFIER_EVAL_INCLUDE_KNOWN_FAILURES=1`. The change
   that fixes it removes the mark, and the case must then pass. Never mark a
   case only to raise the pass rate.
-- A `no_match` case for the right Bottle with a wrong stored field sets
+- A case for the right Bottle with a wrong stored field sets
   `expected.blockedBottle` to that Bottle and the fields that must be flagged.
+  It expects `match` when the stored value is a record error, and `no_match`
+  when it may describe another release.
   A `no_match` case for unclear identity may set it to `null`, so a needless
   Bottle Review fails the case.
 - Commit replay recordings required by a deliberate test case or test runner change.
@@ -93,7 +95,7 @@ Every `no_match` a person reviews becomes a test case, whichever way it went
   makes it pass.
 - When `no_match` was right, the case expects `no_match`, so a later change
   cannot start guessing. Use `expected.blockedBottle` when the right Bottle
-  is blocked by a wrong stored field.
+  has a stored field that may describe another release.
 
 Store-price, review, and auction lot classifier runs are saved as Bottle checks
 with the full input, decision, and artifacts. An auction lot run uses

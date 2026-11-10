@@ -1,6 +1,6 @@
 {
   "id": "auction-laphroaig-2000-cask-4045-blocked-age",
-  "name": "Laphroaig 2000 Single Cask #4045 Protectors of the Peat: right cask, but a worked-out stored age",
+  "name": "Laphroaig 2000 Single Cask #4045 Protectors of the Peat: right cask, with a worked-out stored age",
   "input": {
     "reference": {
       "id": 16370,
@@ -867,13 +867,13 @@
   },
   "expected": {
     "status": "classified",
-    "action": "no_match",
+    "action": "match",
     "identityScope": "exact_cask",
-    "expectedTier": "review",
     "blockedBottle": {
       "bottleId": 54570,
       "fields": ["statedAge"]
     },
-    "summary": "Bottle 54570 is cask 4045, distilled 2000, 51.9%, for Protectors of the Peat. It stores statedAge 22 while the lot says 23; the label prints only the year, so both ages are worked out from dates. Leave it for Bottle Review rather than create a duplicate."
+    "summary": "Match Bottle 54570: cask 4045, distilled 2000, 51.9%, for Protectors of the Peat. It stores statedAge 22 while the lot says 23. The cask number names one Bottle, so the age is a record question, not another release. Name it as the Blocked Bottle for Bottle Review.",
+    "matchedBottleId": 54570
   }
 }
