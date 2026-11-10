@@ -225,7 +225,9 @@ Deterministic code may handle:
 - the code-derived automation tier, `deriveAutomationTier`;
 - exact stored-reference lookup; and
 - the unique accepted Entity Reference for an Entity name already selected by
-  the model; and
+  the model. A create's Brand, distillery, or bottler named without a known id
+  is searched by that name after the agent returns, so an existing Entity is
+  reused and the save-time duplicate guard sees the Brand; and
 - verified closed identifiers such as SMWS bottle codes.
 
 It must not decide whisky-family meaning from brand prefixes, years, batch-like

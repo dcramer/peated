@@ -2351,6 +2351,125 @@ describe("createBottleClassifier", () => {
     });
   });
 
+  describe("a create that names an Entity without an id", () => {
+    const createDecision = (
+      brand: string,
+      distiller: string,
+    ): BottleClassifierAgentDecisionInput => ({
+      action: "create_bottle",
+      rationale: "Create the supported Bottle.",
+      candidateBottleIds: [],
+      identityScope: "exact_cask",
+      observation: null,
+      matchedBottleId: null,
+      proposedBottle: {
+        name: `${distiller} 2013 Cask 6`,
+        series: null,
+        category: "single_malt",
+        edition: null,
+        statedAge: 9,
+        caskStrength: null,
+        singleCask: true,
+        maturation: null,
+        caskNumber: "6",
+        outturn: null,
+        abv: 53.4,
+        vintageYear: 2013,
+        releaseYear: null,
+        brand: { id: null, name: brand },
+        distillers: [{ id: null, name: distiller }],
+        bottler: null,
+      },
+    });
+    const entity = (
+      entityId: number,
+      name: string,
+      source: string[],
+    ): EntityResolution => ({
+      entityId,
+      name,
+      shortName: null,
+      kind: "distillery",
+      reference: null,
+      score: 1,
+      source,
+    });
+    const classify = async (
+      decision: BottleClassifierAgentDecisionInput,
+      searchEntities: (args: SearchEntitiesArgs) => Promise<EntityResolution[]>,
+    ) => {
+      const { classifier } = createTestClassifier({
+        searchEntities,
+        runBottleClassifierAgent: async () => ({
+          decision,
+          artifacts: {
+            extractedIdentity: null,
+            searchEvidence: [],
+            candidates: [],
+            resolvedEntities: [],
+          },
+        }),
+      });
+      const result = await classifier.classifyBottleReference({
+        reference: { name: "Strathearn 2013 9 Year Old Cask #6" },
+        extractedIdentity: null,
+        initialCandidates: [],
+      });
+      expect(result.status).toBe("classified");
+      if (result.status !== "classified") throw new Error("not classified");
+      return result;
+    };
+
+    test("reuses the one existing Entity with that exact name", async () => {
+      const searchEntities = vi.fn(async ({ query }: SearchEntitiesArgs) =>
+        query === "Strathearn"
+          ? [entity(280, "Strathearn", ["exact"])]
+          : [entity(365820, "Thompson Bros.", ["exact"])],
+      );
+
+      const result = await classify(
+        createDecision("Thompson Bros.", "Strathearn"),
+        searchEntities,
+      );
+
+      expect(searchEntities).toHaveBeenCalledWith({
+        query: "Strathearn",
+        limit: 5,
+      });
+      expect(result.decision.proposedBottle?.brand).toEqual({
+        id: 365820,
+        name: "Thompson Bros.",
+      });
+      expect(result.decision.proposedBottle?.distillers).toEqual([
+        { id: 280, name: "Strathearn" },
+      ]);
+      expect(result.artifacts.resolvedEntities.map((e) => e.entityId)).toEqual(
+        expect.arrayContaining([280, 365820]),
+      );
+    });
+
+    test("keeps a new Entity when the name is ambiguous or only partly matches", async () => {
+      const result = await classify(
+        createDecision("Thompson Bros", "Strath"),
+        async ({ query }) =>
+          query === "Strath"
+            ? [entity(280, "Strathearn", ["text"])]
+            : [
+                entity(365820, "Thompson Bros", ["exact"]),
+                entity(367034, "Thompson Bros", ["exact"]),
+              ],
+      );
+
+      expect(result.decision.proposedBottle?.brand).toEqual({
+        id: null,
+        name: "Thompson Bros",
+      });
+      expect(result.decision.proposedBottle?.distillers).toEqual([
+        { id: null, name: "Strath" },
+      ]);
+    });
+  });
+
   test("does not investigate a sparse reference solely from maturation or outturn", async () => {
     const extractedIdentity: BottleExtractedDetails = {
       brand: "Example",

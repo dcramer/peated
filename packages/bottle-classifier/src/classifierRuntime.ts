@@ -484,20 +484,82 @@ export async function collectInitialResolvedEntities({
   return sortedResolvedEntities(resolvedEntities);
 }
 
+/**
+ * Bottle classifier rule (owner: Bottle matching): a create's Brand,
+ * distillery, or bottler that the agent named without a known id is looked
+ * up by that name before the decision is final. The review policy then
+ * reuses the Entity only when one exact name or reference matches, the same
+ * way saving a Bottle does. Doing it here lets the save-time duplicate guard,
+ * which needs a Brand id, see the existing Brand.
+ */
+async function resolveProposedEntityNames({
+  decision,
+  artifacts,
+  options,
+}: {
+  decision: BottleClassifierAgentDecisionInput;
+  artifacts: BottleClassificationArtifacts;
+  options: CreateBottleClassifierOptions;
+}): Promise<BottleClassificationArtifacts> {
+  const searchEntities = getBottleClassifierDataSource(options).searchEntities;
+  const proposedBottle = decision.proposedBottle;
+  if (decision.action !== "create_bottle" || !proposedBottle || !searchEntities)
+    return artifacts;
+
+  const resolvedIds = new Set(
+    artifacts.resolvedEntities.map((entity) => entity.entityId),
+  );
+  const requests: SearchEntitiesArgs[] = [];
+  const seen = new Set<string>();
+  for (const choice of [
+    proposedBottle.brand,
+    ...(proposedBottle.distillers ?? []),
+    proposedBottle.bottler,
+  ]) {
+    if (!choice || (choice.id != null && resolvedIds.has(choice.id))) continue;
+    addEntitySearchRequest(requests, seen, choice.name);
+  }
+  if (!requests.length) return artifacts;
+
+  const resolvedEntities = new Map(
+    artifacts.resolvedEntities.map((entity) => [entity.entityId, entity]),
+  );
+  for (const request of requests) {
+    for (const entity of await searchEntities(request)) {
+      mergeResolvedEntity(resolvedEntities, {
+        ...entity,
+        retrievedFor: [
+          buildEntityRetrievalRecord(request.query, entity.source),
+        ],
+      });
+    }
+  }
+  return buildBottleClassificationArtifacts({
+    ...artifacts,
+    resolvedEntities: sortedResolvedEntities(resolvedEntities),
+  });
+}
+
 export async function finalizeBottleClassifierAgentResult({
   reference,
   agentResult,
+  options,
 }: {
   reference: BottleReferenceInput;
   agentResult: {
     decision: BottleClassifierAgentDecisionInput;
     artifacts: BottleClassificationArtifacts;
   };
+  options: CreateBottleClassifierOptions;
 }): Promise<{
   decision: BottleClassificationDecision;
   artifacts: BottleClassificationArtifacts;
 }> {
-  const artifacts = agentResult.artifacts;
+  const artifacts = await resolveProposedEntityNames({
+    decision: agentResult.decision,
+    artifacts: agentResult.artifacts,
+    options,
+  });
   const decision = finalizeBottleReferenceClassification({
     reference,
     decision: agentResult.decision,
@@ -1385,6 +1447,7 @@ export function createBottleClassifier(
       const finalized = await finalizeBottleClassifierAgentResult({
         reference: parsedInput.reference,
         agentResult,
+        options,
       });
       artifacts = finalized.artifacts;
 
