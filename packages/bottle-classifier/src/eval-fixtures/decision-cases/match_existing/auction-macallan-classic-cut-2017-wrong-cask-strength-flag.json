@@ -1,6 +1,6 @@
 {
   "id": "auction-macallan-classic-cut-2017-wrong-cask-strength-flag",
-  "name": "auction title: the Classic Cut 2017 Bottle with a wrong cask-strength flag needs catalog review",
+  "name": "auction title: the Classic Cut 2017 Bottle matches despite a wrong cask-strength flag",
   "input": {
     "reference": {
       "id": 7551,
@@ -1524,13 +1524,13 @@
   },
   "expected": {
     "status": "classified",
-    "action": "no_match",
+    "action": "match",
     "identityScope": "product",
-    "expectedTier": "review",
     "blockedBottle": {
       "bottleId": 3277,
       "fields": ["caskStrength"]
     },
-    "summary": "Bottle 3277 is the right release, but it stores caskStrength=false while the release is bottled at cask strength. Leave the lot for Bottle Review; do not match or create a duplicate."
+    "summary": "Match Bottle 3277, the 2017 release. It stores caskStrength=false while the release is bottled at cask strength. The flag is a record error, so name it as the Blocked Bottle for Bottle Review and do not create a duplicate.",
+    "matchedBottleId": 3277
   }
 }

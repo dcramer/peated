@@ -1,6 +1,6 @@
 {
   "id": "image-backed-photo-requires-review-for-springbank-open-day-may-2026-30-year-old",
-  "name": "image-backed photo: requires review for Springbank Open Day May 2026 30-year-old",
+  "name": "image-backed photo: Springbank Open Day May 2026 30-year-old matches despite a wrong single-cask flag",
   "input": {
     "reference": {
       "name": "Bottle photo upload",
@@ -159,18 +159,15 @@
   },
   "expected": {
     "status": "classified",
-    "action": "no_match",
+    "action": "match",
     "identityScope": "product",
-    "matchedBottleId": null,
+    "matchedBottleId": 44256,
     "proposedBottle": null,
-    "expectedTier": "review",
-    "verifyEligible": false,
-    "suggestedNextStep": "manual_search",
     "blockedBottle": {
       "bottleId": 44256,
       "fields": ["singleCask"]
     },
-    "summary": "Return no_match for catalog review. Bottle 44256 is the exact marketed Open Day product, but its populated singleCask=true field conflicts with evidence that the release is a multi-cask vatting; do not assign it or create a duplicate until Bottle Review corrects the row."
+    "summary": "Match Bottle 44256, the exact Open Day product. Its stored singleCask=true is a record error: the release is a multi-cask vatting, and no other release carries that flag. Name it as the Blocked Bottle so Bottle Review corrects the row."
   },
   "localCatalog": {
     "entities": [

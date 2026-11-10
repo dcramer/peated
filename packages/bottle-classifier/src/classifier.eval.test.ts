@@ -461,9 +461,9 @@ function evaluateDecisionContract(
 
   if (expected.blockedBottle !== undefined) {
     const blockedBottle =
-      result.decision.action === "no_match"
-        ? (result.decision.blockedBottle ?? null)
-        : null;
+      result.decision.action === "create_bottle"
+        ? null
+        : (result.decision.blockedBottle ?? null);
     if (expected.blockedBottle === null) {
       if (blockedBottle) {
         failures.push(

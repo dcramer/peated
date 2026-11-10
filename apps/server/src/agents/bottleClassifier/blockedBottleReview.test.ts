@@ -46,6 +46,26 @@ describe("queueBlockedBottleReview", () => {
     );
   });
 
+  test("queues one Bottle Review for a match that names a Blocked Bottle", async () => {
+    await queueBlockedBottleReview(
+      classified({
+        action: "match",
+        rationale: "Batch 3 is the Bottle; its stored bottler is an error.",
+        candidateBottleIds: [44931],
+        identityScope: "product",
+        observation: null,
+        matchedBottleId: 44931,
+        proposedBottle: null,
+        blockedBottle,
+      }),
+    );
+
+    expect(pushJob).toHaveBeenCalledExactlyOnceWith(
+      "ReviewBlockedBottle",
+      blockedBottle,
+    );
+  });
+
   test("queues nothing for a no_match without a Blocked Bottle", async () => {
     await queueBlockedBottleReview(
       classified({

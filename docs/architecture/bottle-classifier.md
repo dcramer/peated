@@ -26,8 +26,8 @@ A reference result includes the facts that were extracted, candidates that were
 reviewed, evidence that was gathered, and resolved Brand, bottler, and distillery
 Entities. The model may match only a candidate that was retrieved for that run.
 
-`no_match` is a safe result. Use it when identity remains unclear or a stored
-conflict must be corrected before a reference can be assigned. Downstream code
+`no_match` is a safe result. Use it when identity remains unclear, or when a
+stored field that evidence contradicts may describe another release. Downstream code
 must not assign a candidate that the classifier did not match.
 
 Catalog correction is separate from reference resolution. A reference result
@@ -38,13 +38,32 @@ reference identifies.
 
 Sometimes an inspected candidate is the source's exact Bottle, but evidence
 contradicts one of its stored fields, such as a bottler on an official
-release, a wrong age, or a wrong ABV. The result is still `no_match`, so code
-never assigns a record that is wrong. The agent also returns `blockedBottle`:
-the Bottle ID, each stored field that the evidence contradicts, and a note
-with the stored value, the value the evidence shows, and its source.
+release, a wrong age, or a wrong ABV. The agent returns `blockedBottle`: the
+Bottle ID, each stored field that the evidence contradicts, and a note with
+the stored value, the value the evidence shows, and its source.
 
-Code keeps `blockedBottle` only on the agent's own `no_match`, and only for a
-candidate that the agent inspected in that run
+The agent then decides what the wrong value means (owner decision,
+2026-11-10):
+
+- **A record error.** The facts that tell this Bottle apart from its sibling
+  Bottles agree with the source, and no other marketed release carries the
+  stored value. A
+  stored bottler on an official release, a wrong category, or a name that
+  omits a printed vintage are common examples. The result is `match`. The
+  wrong field does not change which Bottle the source is, so the source is
+  assigned now and the Bottle is repaired separately.
+- **Possibly another release.** A sibling batch, edition, cask, or release
+  year could carry the stored value, or evidence cannot rule that out. The
+  result is `no_match`, so code never assigns a source
+  to a Bottle that may be a different, correct Bottle.
+
+A Match with a Blocked Bottle follows the normal automation rules below. When
+the source's own typed facts conflict with the matched Bottle, code still
+sends that Match to review.
+
+Code keeps `blockedBottle` only for a candidate that the agent inspected in
+that run. It keeps it on the agent's own `no_match`, and on a Match that
+selects that same Bottle
 (`getAcceptedBlockedBottle` in `packages/bottle-classifier/src/reviewPolicy.ts`).
 For every source, the server then queues one Bottle Review for that Bottle
 (`ReviewBlockedBottle`). That audit has the origin `reference_conflict`, gets
@@ -57,8 +76,8 @@ one review. A moderator who rejects or closes it is not asked again until
 those stored values change. No review starts while another open audit of the
 Bottle has work left.
 
-The sources that named the Bottle stay in review. Running them again after the
-fix is applied is not built yet; a moderator rechecks them by hand.
+A `no_match` source that named the Bottle stays in review. Running it again
+after the fix is applied is not built yet; a moderator rechecks it by hand.
 
 ## Scope
 
@@ -138,7 +157,8 @@ this role.
 False matches are worse than `no_match` or reviewed creation.
 
 - Match only when the candidate covers the complete observed Bottle and no
-  populated identity field conflicts.
+  populated identity field conflicts, except a record error named as a
+  Blocked Bottle (see Blocked Bottle).
 - A missing candidate field is compatible when evidence identifies the same
   Bottle. Match it and leave enrichment to a separate audit.
 - An unsupported extra trait makes a candidate too specific. A supported source
@@ -258,7 +278,9 @@ free text; the agent, or the person on submission, owns those judgments. For
 the agent, a stored Brand, bottler, or distillery blocks a match only when
 evidence contradicts it. One the source does not show is not a conflict: a
 label naming only the distillery does not block a candidate with a stored
-bottler, but a stored Brand of `Canadian` for a Canadian Club Bottle does.
+bottler. A stored Brand of `Canadian` for a Canadian Club Bottle is
+contradicted; the agent names it as a Blocked Bottle and matches or declines
+by the Blocked Bottle rule.
 
 - ABV conflicts on any difference.
 - A cask number ignores a leading `#` and letter case. Other punctuation

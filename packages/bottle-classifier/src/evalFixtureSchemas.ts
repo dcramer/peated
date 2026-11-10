@@ -123,8 +123,8 @@ export const classifierEvalExpectationSchema = z
       .min(1)
       .optional(),
     expectedTier: z.enum(["auto", "review"]).optional(),
-    // The Bottle that a no_match blocks, and the stored fields that must be
-    // among its flagged fields. `null` expects no Blocked Bottle.
+    // The Blocked Bottle that a no_match or match names, and the stored
+    // fields that must be among its flagged fields. `null` expects none.
     blockedBottle: z
       .object({
         bottleId: z.number().int(),
@@ -167,10 +167,18 @@ export const classifierEvalExpectationSchema = z
       });
     }
 
-    if (value.blockedBottle && value.action !== "no_match") {
+    if (
+      value.blockedBottle &&
+      value.action !== "no_match" &&
+      !(
+        value.action === "match" &&
+        value.matchedBottleId === value.blockedBottle.bottleId
+      )
+    ) {
       ctx.addIssue({
         code: z.ZodIssueCode.custom,
-        message: "`blockedBottle` requires `action = no_match`.",
+        message:
+          "`blockedBottle` requires `action = no_match`, or a match of that same Bottle.",
         path: ["blockedBottle"],
       });
     }

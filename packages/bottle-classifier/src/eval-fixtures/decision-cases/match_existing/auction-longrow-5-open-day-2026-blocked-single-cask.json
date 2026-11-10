@@ -1,6 +1,6 @@
 {
   "id": "auction-longrow-5-open-day-2026-blocked-single-cask",
-  "name": "Longrow 5 Year Old Open Day 2026: right Bottle, but it wrongly stores single cask",
+  "name": "Longrow 5 Year Old Open Day 2026: right Bottle, which wrongly stores single cask",
   "input": {
     "reference": {
       "id": 16600,
@@ -1104,13 +1104,13 @@
   },
   "expected": {
     "status": "classified",
-    "action": "no_match",
+    "action": "match",
     "identityScope": "product",
-    "expectedTier": "review",
     "blockedBottle": {
       "bottleId": 44254,
       "fields": ["singleCask"]
     },
-    "summary": "Bottle 44254 is the Longrow Open Day 2026 release (59.2%), but it stores singleCask=true. The lot gives bourbon and Chardonnay casks and 1,750 bottles, so it is not one cask. Leave it for Bottle Review; do not create a duplicate."
+    "summary": "Match Bottle 44254, the Longrow Open Day 2026 release (59.2%). It stores singleCask=true, but the lot gives bourbon and Chardonnay casks and 1,750 bottles. The flag is a record error, so name it as the Blocked Bottle for Bottle Review.",
+    "matchedBottleId": 44254
   }
 }

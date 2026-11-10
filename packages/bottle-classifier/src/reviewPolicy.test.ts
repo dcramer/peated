@@ -2078,9 +2078,11 @@ describe("blocked Bottle", () => {
   function finalizeBlocked({
     action = "no_match",
     bottleContexts = [inspectedContext],
+    blockedBottleId = kilkerranBatch3.bottleId,
   }: {
     action?: "no_match" | "match";
     bottleContexts?: (typeof inspectedContext)[];
+    blockedBottleId?: number;
   } = {}) {
     return finalizeBottleReferenceClassification({
       reference: { name: "Kilkerran Heavily Peated" },
@@ -2092,7 +2094,7 @@ describe("blocked Bottle", () => {
         observation: null,
         matchedBottleId: action === "match" ? kilkerranBatch3.bottleId : null,
         proposedBottle: null,
-        blockedBottle,
+        blockedBottle: { ...blockedBottle, bottleId: blockedBottleId },
       },
       artifacts: buildBottleClassificationArtifacts({
         candidates: [kilkerranBatch3],
@@ -2120,8 +2122,22 @@ describe("blocked Bottle", () => {
     expect(result).not.toHaveProperty("blockedBottle");
   });
 
-  test("never adds a Blocked Bottle to a match", () => {
-    const result = finalizeBlocked({ action: "match" });
+  test("keeps the Blocked Bottle on a match of that same Bottle", () => {
+    expect(finalizeBlocked({ action: "match" })).toMatchObject({
+      action: "match",
+      matchedBottleId: kilkerranBatch3.bottleId,
+      blockedBottle: {
+        bottleId: kilkerranBatch3.bottleId,
+        fields: ["bottler"],
+      },
+    });
+  });
+
+  test("drops a Blocked Bottle that is not the matched Bottle", () => {
+    const result = finalizeBlocked({
+      action: "match",
+      blockedBottleId: kilkerranBatch3.bottleId + 1,
+    });
 
     expect(result.action).toBe("match");
     expect(result).not.toHaveProperty("blockedBottle");
