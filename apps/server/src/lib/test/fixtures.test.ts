@@ -1,4 +1,5 @@
 import { and, eq } from "drizzle-orm";
+import { REGISTERED_EXTERNAL_SITE_KEY_LIST } from "../../constants";
 import { db } from "../../db";
 import {
   bottleGroupDistillers,
@@ -41,6 +42,33 @@ describe("location fixtures", () => {
     });
 
     expect(existing.id).toBe(first.id);
+  });
+});
+
+describe("external site fixtures", () => {
+  test("ExternalSite without a type picks a type no site uses yet", async ({
+    fixtures,
+  }) => {
+    const [freeType, ...usedTypes] = REGISTERED_EXTERNAL_SITE_KEY_LIST;
+    for (const type of usedTypes) {
+      await fixtures.ExternalSite({ type });
+    }
+
+    const site = await fixtures.ExternalSite();
+
+    expect(site.type).toBe(freeType);
+  });
+
+  test("ExternalSite without a type fails clearly when every type is used", async ({
+    fixtures,
+  }) => {
+    for (const type of REGISTERED_EXTERNAL_SITE_KEY_LIST) {
+      await fixtures.ExternalSite({ type });
+    }
+
+    await expect(fixtures.ExternalSite()).rejects.toThrow(
+      "every registered type already exists",
+    );
   });
 });
 
