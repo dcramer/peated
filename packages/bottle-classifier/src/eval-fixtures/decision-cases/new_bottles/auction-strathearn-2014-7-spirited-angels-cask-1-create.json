@@ -1,0 +1,1799 @@
+{
+  "id": "auction-strathearn-2014-7-spirited-angels-cask-1-create",
+  "name": "Strathearn 2014 7 Year Old Spirited Angels Cask #1 by Thompson Bros: create cask 107, the first release",
+  "input": {
+    "reference": {
+      "id": 17955,
+      "url": "https://www.scotchwhiskyauctions.com/auctions/234-the-185th-auction/906294-strathearn-2014-7-year-old-spirited-angels-cask-1-by-thompson-bros/",
+      "name": "Strathearn 2014 7 Year Old Spirited Angels Cask #1 By Thompson Bros",
+      "imageUrl": null,
+      "externalSiteId": 28097,
+      "currentBottleId": null
+    },
+    "extractedIdentity": {
+      "abv": 52.9,
+      "brand": null,
+      "series": null,
+      "bottler": null,
+      "edition": null,
+      "outturn": 116,
+      "category": null,
+      "distillery": null,
+      "expression": null,
+      "maturation": null,
+      "stated_age": null,
+      "cask_number": "107",
+      "single_cask": null,
+      "release_year": null,
+      "vintage_year": 2014,
+      "cask_strength": null
+    },
+    "extractedIdentitySource": "structured",
+    "imageEvidence": null,
+    "initialCandidates": [
+      {
+        "abv": 57.1,
+        "brand": "Thompson Bros.",
+        "score": 76.56677,
+        "series": null,
+        "source": ["text"],
+        "bottler": "Thompson Bros",
+        "edition": null,
+        "outturn": null,
+        "bottleId": 69918,
+        "category": "single_malt",
+        "fullName": "Thompson Bros. Dailuaine 2016 7-year-old",
+        "reference": null,
+        "statedAge": 7,
+        "caskNumber": null,
+        "comparison": {
+          "missing": ["singleCask", "caskNumber"],
+          "conflicts": ["abv", "vintageYear", "bottler", "distillers"],
+          "agreements": ["category", "statedAge", "brand"]
+        },
+        "distillery": ["Dailuaine"],
+        "maturation": "Oloroso hogsheads",
+        "releaseDay": null,
+        "singleCask": null,
+        "releaseYear": null,
+        "vintageYear": 2016,
+        "bottlingYear": 2023,
+        "caskStrength": null,
+        "releaseMonth": null,
+        "familyContext": {
+          "siblingBottles": []
+        }
+      },
+      {
+        "abv": 50,
+        "brand": "Bruichladdich Port Charlotte",
+        "score": 67.52049,
+        "series": null,
+        "source": ["text"],
+        "bottler": null,
+        "edition": null,
+        "outturn": null,
+        "bottleId": 46038,
+        "category": "single_malt",
+        "fullName": "Port Charlotte Islay Barley - 7-year-old - 2014 Vintage - 50.0% ABV",
+        "reference": null,
+        "statedAge": 7,
+        "caskNumber": null,
+        "comparison": {
+          "missing": ["caskNumber"],
+          "conflicts": ["abv"],
+          "agreements": ["vintageYear"]
+        },
+        "distillery": ["Bruichladdich"],
+        "maturation": null,
+        "releaseDay": null,
+        "singleCask": null,
+        "releaseYear": null,
+        "vintageYear": 2014,
+        "bottlingYear": null,
+        "caskStrength": null,
+        "releaseMonth": null,
+        "familyContext": {
+          "siblingBottles": []
+        }
+      },
+      {
+        "abv": 48.1,
+        "brand": "Thompson Bros.",
+        "score": 63.47607,
+        "series": null,
+        "source": ["vector", "text"],
+        "bottler": "Thompson Bros",
+        "edition": null,
+        "outturn": 223,
+        "bottleId": 47299,
+        "category": "single_malt",
+        "fullName": "Thompson Bros. Clynelish 2014",
+        "reference": "Clynelish 11-year-old 2014 (48,1%, Thompson Brothers, refill hogshead, 223 btl.)",
+        "statedAge": 11,
+        "caskNumber": null,
+        "comparison": {
+          "missing": ["singleCask", "caskNumber"],
+          "conflicts": ["statedAge", "abv", "bottler", "distillers"],
+          "agreements": ["category", "vintageYear", "brand"]
+        },
+        "distillery": ["Clynelish"],
+        "maturation": "Refill hogshead",
+        "releaseDay": null,
+        "singleCask": null,
+        "releaseYear": null,
+        "vintageYear": 2014,
+        "bottlingYear": 2025,
+        "caskStrength": null,
+        "releaseMonth": null,
+        "familyContext": {
+          "siblingBottles": []
+        }
+      },
+      {
+        "abv": 56.8,
+        "brand": "Thompson Bros.",
+        "score": 60.27702,
+        "series": null,
+        "source": ["text"],
+        "bottler": "Thompson Bros.",
+        "edition": null,
+        "outturn": 290,
+        "bottleId": 50676,
+        "category": "single_malt",
+        "fullName": "Thompson Bros. Bowmore 2014",
+        "reference": null,
+        "statedAge": 11,
+        "caskNumber": null,
+        "comparison": {
+          "missing": ["singleCask", "caskNumber"],
+          "conflicts": ["statedAge", "abv", "distillers"],
+          "agreements": ["category", "vintageYear", "brand", "bottler"]
+        },
+        "distillery": ["Bowmore"],
+        "maturation": "refill barrel",
+        "releaseDay": null,
+        "singleCask": null,
+        "releaseYear": 2026,
+        "vintageYear": 2014,
+        "bottlingYear": null,
+        "caskStrength": null,
+        "releaseMonth": null,
+        "familyContext": {
+          "siblingBottles": []
+        }
+      },
+      {
+        "abv": 54.1,
+        "brand": "Thompson Bros.",
+        "score": 60.013523,
+        "series": null,
+        "source": ["text"],
+        "bottler": "Thompson Bros",
+        "edition": null,
+        "outturn": null,
+        "bottleId": 69197,
+        "category": "single_malt",
+        "fullName": "Thompson Bros. Royal Brackla 2014 10-year-old",
+        "reference": null,
+        "statedAge": 10,
+        "caskNumber": null,
+        "comparison": {
+          "missing": ["singleCask", "caskNumber"],
+          "conflicts": ["statedAge", "abv", "bottler", "distillers"],
+          "agreements": ["category", "vintageYear", "brand"]
+        },
+        "distillery": ["Royal Brackla"],
+        "maturation": null,
+        "releaseDay": null,
+        "singleCask": null,
+        "releaseYear": null,
+        "vintageYear": 2014,
+        "bottlingYear": null,
+        "caskStrength": null,
+        "releaseMonth": null,
+        "familyContext": {
+          "siblingBottles": []
+        }
+      },
+      {
+        "abv": null,
+        "brand": "Alexander Murray & Co",
+        "score": 58.5449,
+        "series": null,
+        "source": ["text"],
+        "bottler": null,
+        "edition": "2014",
+        "outturn": null,
+        "bottleId": 45138,
+        "category": "single_malt",
+        "fullName": "Alexander Murray Tamdhu 7-year-old - 2014 - 2014 Vintage",
+        "reference": null,
+        "statedAge": 7,
+        "caskNumber": null,
+        "comparison": {
+          "missing": ["abv", "caskNumber"],
+          "conflicts": [],
+          "agreements": ["vintageYear"]
+        },
+        "distillery": ["Tamdhu"],
+        "maturation": null,
+        "releaseDay": null,
+        "singleCask": null,
+        "releaseYear": null,
+        "vintageYear": 2014,
+        "bottlingYear": null,
+        "caskStrength": null,
+        "releaseMonth": null,
+        "familyContext": {
+          "siblingBottles": [
+            {
+              "abv": null,
+              "edition": null,
+              "outturn": null,
+              "bottleId": 44217,
+              "fullName": "Alexander Murray Tamdhu 7-year-old",
+              "statedAge": 7,
+              "caskNumber": null,
+              "maturation": null,
+              "releaseDay": null,
+              "singleCask": null,
+              "releaseYear": null,
+              "traitFields": ["statedAge"],
+              "vintageYear": null,
+              "bottlingYear": null,
+              "caskStrength": null,
+              "releaseMonth": null
+            }
+          ]
+        }
+      },
+      {
+        "abv": 52,
+        "brand": "Chapter 7",
+        "score": 57.00283,
+        "series": "Monologue",
+        "source": ["text"],
+        "bottler": "Chapter 7",
+        "edition": null,
+        "outturn": null,
+        "bottleId": 70094,
+        "category": "single_malt",
+        "fullName": "Chapter 7 Highland 2014 7-year-old",
+        "reference": null,
+        "statedAge": 7,
+        "caskNumber": "700001",
+        "comparison": {
+          "missing": ["distillers"],
+          "conflicts": ["abv", "caskNumber", "brand", "bottler"],
+          "agreements": ["category", "statedAge", "vintageYear", "singleCask"]
+        },
+        "distillery": [],
+        "maturation": null,
+        "releaseDay": null,
+        "singleCask": true,
+        "releaseYear": null,
+        "vintageYear": 2014,
+        "bottlingYear": null,
+        "caskStrength": null,
+        "releaseMonth": null,
+        "familyContext": {
+          "siblingBottles": []
+        }
+      },
+      {
+        "abv": 55.3,
+        "brand": "Thompson Bros.",
+        "score": 56.788307,
+        "series": null,
+        "source": ["text"],
+        "bottler": "Thompson Bros",
+        "edition": null,
+        "outturn": 299,
+        "bottleId": 67860,
+        "category": "single_malt",
+        "fullName": "Thompson Bros. Braeval 2014",
+        "reference": null,
+        "statedAge": 12,
+        "caskNumber": null,
+        "comparison": {
+          "missing": ["singleCask", "caskNumber"],
+          "conflicts": ["statedAge", "abv", "bottler", "distillers"],
+          "agreements": ["category", "vintageYear", "brand"]
+        },
+        "distillery": ["Braeval"],
+        "maturation": "1st Fill PX Hogshead",
+        "releaseDay": null,
+        "singleCask": null,
+        "releaseYear": null,
+        "vintageYear": 2014,
+        "bottlingYear": null,
+        "caskStrength": null,
+        "releaseMonth": null,
+        "familyContext": {
+          "siblingBottles": []
+        }
+      },
+      {
+        "abv": 55.1,
+        "brand": "Thompson Bros.",
+        "score": 54.58481,
+        "series": null,
+        "source": ["text"],
+        "bottler": "Thompson Bros",
+        "edition": null,
+        "outturn": 294,
+        "bottleId": 69568,
+        "category": "single_malt",
+        "fullName": "Thompson Bros. Glen Spey 2014",
+        "reference": null,
+        "statedAge": 12,
+        "caskNumber": null,
+        "comparison": {
+          "missing": ["singleCask", "caskNumber"],
+          "conflicts": ["statedAge", "abv", "bottler", "distillers"],
+          "agreements": ["category", "vintageYear", "brand"]
+        },
+        "distillery": ["Glen Spey"],
+        "maturation": "1st Fill Bourbon Hogshead",
+        "releaseDay": null,
+        "singleCask": null,
+        "releaseYear": null,
+        "vintageYear": 2014,
+        "bottlingYear": null,
+        "caskStrength": null,
+        "releaseMonth": null,
+        "familyContext": {
+          "siblingBottles": []
+        }
+      },
+      {
+        "abv": null,
+        "brand": "Bruichladdich Port Charlotte",
+        "score": 53.829475,
+        "series": null,
+        "source": ["text"],
+        "bottler": null,
+        "edition": null,
+        "outturn": null,
+        "bottleId": 17387,
+        "category": "single_malt",
+        "fullName": "Port Charlotte PC7 7-year-old (Cask #1215)",
+        "reference": null,
+        "statedAge": 7,
+        "caskNumber": null,
+        "comparison": {
+          "missing": [
+            "abv",
+            "vintageYear",
+            "caskStrength",
+            "singleCask",
+            "caskNumber",
+            "bottler",
+            "distillers"
+          ],
+          "conflicts": ["brand"],
+          "agreements": ["category", "statedAge"]
+        },
+        "distillery": [],
+        "maturation": null,
+        "releaseDay": null,
+        "singleCask": null,
+        "releaseYear": null,
+        "vintageYear": null,
+        "bottlingYear": null,
+        "caskStrength": null,
+        "releaseMonth": null,
+        "familyContext": {
+          "siblingBottles": []
+        }
+      },
+      {
+        "abv": null,
+        "brand": "Strathearn",
+        "score": 53.625362,
+        "series": null,
+        "source": ["text", "context"],
+        "bottler": null,
+        "edition": null,
+        "outturn": null,
+        "bottleId": 2978,
+        "category": "single_malt",
+        "fullName": "Strathearn 2014 Private Cask Club",
+        "reference": null,
+        "statedAge": 6,
+        "caskNumber": null,
+        "comparison": {
+          "missing": [
+            "abv",
+            "vintageYear",
+            "singleCask",
+            "caskNumber",
+            "bottler"
+          ],
+          "conflicts": ["statedAge", "brand"],
+          "agreements": ["category", "distillers"]
+        },
+        "distillery": ["Strathearn"],
+        "maturation": null,
+        "releaseDay": null,
+        "singleCask": null,
+        "releaseYear": null,
+        "vintageYear": null,
+        "bottlingYear": null,
+        "caskStrength": null,
+        "releaseMonth": null,
+        "familyContext": {
+          "siblingBottles": []
+        }
+      },
+      {
+        "abv": null,
+        "brand": "Alexander Murray & Co",
+        "score": 53.397034,
+        "series": null,
+        "source": ["text"],
+        "bottler": null,
+        "edition": null,
+        "outturn": null,
+        "bottleId": 44217,
+        "category": "single_malt",
+        "fullName": "Alexander Murray Tamdhu 7-year-old",
+        "reference": null,
+        "statedAge": 7,
+        "caskNumber": null,
+        "comparison": {
+          "missing": [
+            "abv",
+            "vintageYear",
+            "singleCask",
+            "caskNumber",
+            "bottler"
+          ],
+          "conflicts": ["brand", "distillers"],
+          "agreements": ["category", "statedAge"]
+        },
+        "distillery": ["Tamdhu"],
+        "maturation": null,
+        "releaseDay": null,
+        "singleCask": null,
+        "releaseYear": null,
+        "vintageYear": null,
+        "bottlingYear": null,
+        "caskStrength": null,
+        "releaseMonth": null,
+        "familyContext": {
+          "siblingBottles": [
+            {
+              "abv": null,
+              "edition": "2014",
+              "outturn": null,
+              "bottleId": 45138,
+              "fullName": "Alexander Murray Tamdhu 7-year-old - 2014 - 2014 Vintage",
+              "statedAge": 7,
+              "caskNumber": null,
+              "maturation": null,
+              "releaseDay": null,
+              "singleCask": null,
+              "releaseYear": null,
+              "traitFields": ["edition", "statedAge", "vintageYear"],
+              "vintageYear": 2014,
+              "bottlingYear": null,
+              "caskStrength": null,
+              "releaseMonth": null
+            }
+          ]
+        }
+      },
+      {
+        "abv": 43,
+        "brand": "Jack Daniel's",
+        "score": 52.4171,
+        "series": "Legacy Edition",
+        "source": ["text"],
+        "bottler": null,
+        "edition": "Edition 1",
+        "outturn": null,
+        "bottleId": 45510,
+        "category": "bourbon",
+        "fullName": "Jack Daniel's Old No. 7 - Edition 1",
+        "reference": null,
+        "statedAge": null,
+        "caskNumber": null,
+        "comparison": {
+          "missing": [
+            "statedAge",
+            "vintageYear",
+            "caskStrength",
+            "singleCask",
+            "caskNumber",
+            "bottler"
+          ],
+          "conflicts": ["category", "abv", "brand", "distillers"],
+          "agreements": []
+        },
+        "distillery": ["Jack Daniel Distillery"],
+        "maturation": null,
+        "releaseDay": null,
+        "singleCask": null,
+        "releaseYear": null,
+        "vintageYear": null,
+        "bottlingYear": null,
+        "caskStrength": null,
+        "releaseMonth": null,
+        "familyContext": {
+          "siblingBottles": []
+        }
+      },
+      {
+        "abv": 50,
+        "brand": "That Boutique-y Whisky Company",
+        "score": 50.557175,
+        "series": null,
+        "source": ["text"],
+        "bottler": "That Boutique-y Whisky Company",
+        "edition": "Batch #1",
+        "outturn": 327,
+        "bottleId": 69801,
+        "category": "single_malt",
+        "fullName": "TBWC Adnams 7-year-old - Batch #1",
+        "reference": null,
+        "statedAge": 7,
+        "caskNumber": null,
+        "comparison": {
+          "missing": ["vintageYear", "caskNumber"],
+          "conflicts": ["abv", "brand", "bottler", "distillers"],
+          "agreements": ["category", "statedAge", "singleCask"]
+        },
+        "distillery": ["Adnams"],
+        "maturation": "French Oak Cask",
+        "releaseDay": null,
+        "singleCask": true,
+        "releaseYear": null,
+        "vintageYear": null,
+        "bottlingYear": null,
+        "caskStrength": null,
+        "releaseMonth": null,
+        "familyContext": {
+          "siblingBottles": []
+        }
+      },
+      {
+        "abv": 57.9,
+        "brand": "Kilkerran",
+        "score": 48.827415,
+        "series": null,
+        "source": ["text"],
+        "bottler": null,
+        "edition": "Batch #7",
+        "outturn": null,
+        "bottleId": 69051,
+        "category": "single_malt",
+        "fullName": "Kilkerran 8-year-old Cask Strength Port Cask Matured - Batch #7",
+        "reference": null,
+        "statedAge": 8,
+        "caskNumber": null,
+        "comparison": {
+          "missing": ["vintageYear", "singleCask", "caskNumber", "bottler"],
+          "conflicts": ["statedAge", "abv", "brand", "distillers"],
+          "agreements": ["category", "caskStrength"]
+        },
+        "distillery": ["Glengyle"],
+        "maturation": "Port cask matured",
+        "releaseDay": null,
+        "singleCask": null,
+        "releaseYear": 2022,
+        "vintageYear": null,
+        "bottlingYear": null,
+        "caskStrength": true,
+        "releaseMonth": null,
+        "familyContext": {
+          "siblingBottles": []
+        }
+      },
+      {
+        "abv": 45.5,
+        "brand": "Thompson Bros.",
+        "score": 48.309433,
+        "series": null,
+        "source": ["text"],
+        "bottler": "Thompson Bros.",
+        "edition": "Hermanos Thompson",
+        "outturn": null,
+        "bottleId": 47456,
+        "category": "single_malt",
+        "fullName": "Thompson Bros. Highland Malt - Hermanos Thompson - 10-year-old - 2026 Release - 45.5% ABV",
+        "reference": null,
+        "statedAge": 10,
+        "caskNumber": null,
+        "comparison": {
+          "missing": [
+            "vintageYear",
+            "caskStrength",
+            "singleCask",
+            "caskNumber",
+            "distillers"
+          ],
+          "conflicts": ["statedAge", "abv"],
+          "agreements": ["category", "brand", "bottler"]
+        },
+        "distillery": [],
+        "maturation": "finished in a manzanilla cask",
+        "releaseDay": null,
+        "singleCask": null,
+        "releaseYear": 2026,
+        "vintageYear": null,
+        "bottlingYear": null,
+        "caskStrength": null,
+        "releaseMonth": null,
+        "familyContext": {
+          "siblingBottles": []
+        }
+      },
+      {
+        "abv": 48.5,
+        "brand": "That Boutique-y Whisky Company",
+        "score": 47.771328,
+        "series": "World Series",
+        "source": ["text"],
+        "bottler": "That Boutique-y Whisky Company",
+        "edition": "Batch #1",
+        "outturn": 137,
+        "bottleId": 68627,
+        "category": "single_malt",
+        "fullName": "TBWC Elsburn 7-year-old - Batch #1",
+        "reference": null,
+        "statedAge": 7,
+        "caskNumber": null,
+        "comparison": {
+          "missing": ["vintageYear", "singleCask", "caskNumber"],
+          "conflicts": ["abv", "brand", "bottler", "distillers"],
+          "agreements": ["category", "statedAge"]
+        },
+        "distillery": ["Hercynian Distilling Co. / Hammerschmiede"],
+        "maturation": "Ex-sherry butt, then smaller sherry octave",
+        "releaseDay": null,
+        "singleCask": null,
+        "releaseYear": null,
+        "vintageYear": null,
+        "bottlingYear": null,
+        "caskStrength": null,
+        "releaseMonth": null,
+        "familyContext": {
+          "siblingBottles": []
+        }
+      },
+      {
+        "abv": 45.7,
+        "brand": "Thompson Bros.",
+        "score": 46.2094,
+        "series": null,
+        "source": ["vector", "text"],
+        "bottler": "Thompson Bros.",
+        "edition": null,
+        "outturn": null,
+        "bottleId": 56125,
+        "category": "single_malt",
+        "fullName": "Thompson Bros. Highland Peated",
+        "reference": "Thompson Bros Highland Peated Single Malt Scotch Whisky, 18-year-old, 70CL, 45.7% ABV",
+        "statedAge": 18,
+        "caskNumber": null,
+        "comparison": {
+          "missing": [
+            "vintageYear",
+            "caskStrength",
+            "singleCask",
+            "caskNumber",
+            "distillers"
+          ],
+          "conflicts": ["statedAge", "abv"],
+          "agreements": ["category", "brand", "bottler"]
+        },
+        "distillery": [],
+        "maturation": "Ex-Oloroso sherry casks",
+        "releaseDay": null,
+        "singleCask": null,
+        "releaseYear": null,
+        "vintageYear": null,
+        "bottlingYear": null,
+        "caskStrength": null,
+        "releaseMonth": null,
+        "familyContext": {
+          "siblingBottles": []
+        }
+      },
+      {
+        "abv": 59,
+        "brand": "Mars Komagatake Distillery",
+        "score": 46.195217,
+        "series": null,
+        "source": ["text"],
+        "bottler": null,
+        "edition": null,
+        "outturn": 287,
+        "bottleId": 57227,
+        "category": "single_malt",
+        "fullName": "Mars Komagatake Single Cask 2014 No.1841 7-year-old",
+        "reference": null,
+        "statedAge": 7,
+        "caskNumber": "1841",
+        "comparison": {
+          "missing": ["bottler"],
+          "conflicts": ["abv", "caskNumber", "brand", "distillers"],
+          "agreements": ["category", "statedAge", "vintageYear", "singleCask"]
+        },
+        "distillery": ["Mars Komagatake Distillery"],
+        "maturation": "Sherry Cask (#1841)",
+        "releaseDay": null,
+        "singleCask": true,
+        "releaseYear": 2022,
+        "vintageYear": 2014,
+        "bottlingYear": 2021,
+        "caskStrength": null,
+        "releaseMonth": 3,
+        "familyContext": {
+          "siblingBottles": []
+        }
+      },
+      {
+        "abv": 60.2,
+        "brand": "Ballindalloch",
+        "score": 45.79263,
+        "series": "Seven Springs Collection",
+        "source": ["text"],
+        "bottler": null,
+        "edition": "Edition No.1",
+        "outturn": 1200,
+        "bottleId": 68547,
+        "category": "single_malt",
+        "fullName": "Ballindalloch 7-year-old - Edition No.1",
+        "reference": null,
+        "statedAge": 7,
+        "caskNumber": null,
+        "comparison": {
+          "missing": ["vintageYear", "caskNumber", "bottler"],
+          "conflicts": ["abv", "singleCask", "brand", "distillers"],
+          "agreements": ["category", "statedAge", "caskStrength"]
+        },
+        "distillery": ["Ballindalloch"],
+        "maturation": "first-fill bourbon casks",
+        "releaseDay": null,
+        "singleCask": false,
+        "releaseYear": null,
+        "vintageYear": null,
+        "bottlingYear": null,
+        "caskStrength": true,
+        "releaseMonth": null,
+        "familyContext": {
+          "siblingBottles": []
+        }
+      },
+      {
+        "abv": 60.5,
+        "brand": "That Boutique-y Whisky Company",
+        "score": 45.052467,
+        "series": null,
+        "source": ["text"],
+        "bottler": "That Boutique-y Whisky Company",
+        "edition": "Batch 1",
+        "outturn": 1059,
+        "bottleId": 56192,
+        "category": "single_malt",
+        "fullName": "TBWC Speyside #7 - Batch 1",
+        "reference": null,
+        "statedAge": 9,
+        "caskNumber": null,
+        "comparison": {
+          "missing": ["vintageYear", "singleCask", "caskNumber", "distillers"],
+          "conflicts": ["statedAge", "abv", "brand", "bottler"],
+          "agreements": ["category", "caskStrength"]
+        },
+        "distillery": [],
+        "maturation": "Sherry butt finish",
+        "releaseDay": null,
+        "singleCask": null,
+        "releaseYear": null,
+        "vintageYear": null,
+        "bottlingYear": null,
+        "caskStrength": true,
+        "releaseMonth": null,
+        "familyContext": {
+          "siblingBottles": []
+        }
+      },
+      {
+        "abv": 60.9,
+        "brand": "Berry Bros & Rudd",
+        "score": 44.81935,
+        "series": "The Nordic Casks",
+        "source": ["text"],
+        "bottler": "Berry Bros & Rudd",
+        "edition": "#1",
+        "outturn": 243,
+        "bottleId": 58168,
+        "category": "single_malt",
+        "fullName": "Berry Bros & Rudd Fary Lochan 2014 - #1",
+        "reference": null,
+        "statedAge": null,
+        "caskNumber": "6",
+        "comparison": {
+          "missing": ["statedAge"],
+          "conflicts": ["abv", "caskNumber", "brand", "bottler", "distillers"],
+          "agreements": ["category", "vintageYear", "singleCask"]
+        },
+        "distillery": ["Fary Lochan"],
+        "maturation": null,
+        "releaseDay": null,
+        "singleCask": true,
+        "releaseYear": null,
+        "vintageYear": 2014,
+        "bottlingYear": 2021,
+        "caskStrength": true,
+        "releaseMonth": null,
+        "familyContext": {
+          "siblingBottles": []
+        }
+      },
+      {
+        "abv": 52.9,
+        "brand": "The Macallan",
+        "score": 26.857483,
+        "series": "Classic Cut",
+        "source": ["text"],
+        "bottler": null,
+        "edition": "2019 Edition",
+        "outturn": null,
+        "bottleId": 2550,
+        "category": "single_malt",
+        "fullName": "The Macallan Classic Cut - 2019 Edition",
+        "reference": null,
+        "statedAge": null,
+        "caskNumber": null,
+        "comparison": {
+          "missing": ["vintageYear", "caskNumber"],
+          "conflicts": [],
+          "agreements": ["abv"]
+        },
+        "distillery": ["The Macallan"],
+        "maturation": "Sherry-seasoned oak casks",
+        "releaseDay": null,
+        "singleCask": false,
+        "releaseYear": 2019,
+        "vintageYear": null,
+        "bottlingYear": null,
+        "caskStrength": null,
+        "releaseMonth": null,
+        "familyContext": {
+          "siblingBottles": []
+        }
+      },
+      {
+        "abv": 46,
+        "brand": "Whitlaw",
+        "score": 26.182215,
+        "series": null,
+        "source": ["text"],
+        "bottler": "The Ultimate",
+        "edition": null,
+        "outturn": null,
+        "bottleId": 1585,
+        "category": "single_malt",
+        "fullName": "Whitlaw 2014 The Ultimate - 2014 Vintage - 46.0% ABV - Single Cask",
+        "reference": null,
+        "statedAge": null,
+        "caskNumber": null,
+        "comparison": {
+          "missing": ["caskNumber"],
+          "conflicts": ["abv"],
+          "agreements": ["vintageYear"]
+        },
+        "distillery": [],
+        "maturation": null,
+        "releaseDay": null,
+        "singleCask": true,
+        "releaseYear": null,
+        "vintageYear": 2014,
+        "bottlingYear": null,
+        "caskStrength": null,
+        "releaseMonth": null,
+        "familyContext": {
+          "siblingBottles": []
+        }
+      },
+      {
+        "abv": 43.3,
+        "brand": "Evan Williams",
+        "score": 25.483883,
+        "series": null,
+        "source": ["text"],
+        "bottler": null,
+        "edition": null,
+        "outturn": null,
+        "bottleId": 45260,
+        "category": "bourbon",
+        "fullName": "Evan Williams Single Barrel Vintage - 2014 Vintage - 43.3% ABV",
+        "reference": null,
+        "statedAge": null,
+        "caskNumber": null,
+        "comparison": {
+          "missing": ["caskNumber"],
+          "conflicts": ["abv"],
+          "agreements": ["vintageYear"]
+        },
+        "distillery": [],
+        "maturation": null,
+        "releaseDay": null,
+        "singleCask": true,
+        "releaseYear": null,
+        "vintageYear": 2014,
+        "bottlingYear": null,
+        "caskStrength": null,
+        "releaseMonth": null,
+        "familyContext": {
+          "siblingBottles": []
+        }
+      },
+      {
+        "abv": 52.9,
+        "brand": "WhiskySponge",
+        "score": 25.459751,
+        "series": null,
+        "source": ["text"],
+        "bottler": "Decadent Drinks",
+        "edition": "Special Edition",
+        "outturn": 72,
+        "bottleId": 48888,
+        "category": "single_malt",
+        "fullName": "WhiskySponge Cragganmore 1986 - Special Edition",
+        "reference": null,
+        "statedAge": 37,
+        "caskNumber": null,
+        "comparison": {
+          "missing": ["caskNumber"],
+          "conflicts": ["vintageYear"],
+          "agreements": ["abv"]
+        },
+        "distillery": ["Cragganmore"],
+        "maturation": "Refill hogshead, then a first-fill Port barrique, then a second-fill barrel",
+        "releaseDay": null,
+        "singleCask": null,
+        "releaseYear": null,
+        "vintageYear": 1986,
+        "bottlingYear": 2024,
+        "caskStrength": true,
+        "releaseMonth": null,
+        "familyContext": {
+          "siblingBottles": []
+        }
+      },
+      {
+        "abv": 57.1,
+        "brand": "Signatory Vintage",
+        "score": 23.76025,
+        "series": "100 Proof Edition",
+        "source": ["text"],
+        "bottler": "Signatory Vintage",
+        "edition": "#67",
+        "outturn": null,
+        "bottleId": 45749,
+        "category": "single_malt",
+        "fullName": "Signatory Vintage Royal Brackla 2014 - #67",
+        "reference": null,
+        "statedAge": 11,
+        "caskNumber": null,
+        "comparison": {
+          "missing": ["caskNumber"],
+          "conflicts": ["abv"],
+          "agreements": ["vintageYear"]
+        },
+        "distillery": ["Royal Brackla"],
+        "maturation": null,
+        "releaseDay": null,
+        "singleCask": false,
+        "releaseYear": null,
+        "vintageYear": 2014,
+        "bottlingYear": null,
+        "caskStrength": null,
+        "releaseMonth": null,
+        "familyContext": {
+          "siblingBottles": []
+        }
+      },
+      {
+        "abv": 52.9,
+        "brand": "Alfred Giraud",
+        "score": 23.189438,
+        "series": null,
+        "source": ["text"],
+        "bottler": null,
+        "edition": null,
+        "outturn": null,
+        "bottleId": 64179,
+        "category": "blended_malt",
+        "fullName": "Alfred Giraud Une Odyssée",
+        "reference": null,
+        "statedAge": null,
+        "caskNumber": null,
+        "comparison": {
+          "missing": ["vintageYear", "caskNumber"],
+          "conflicts": [],
+          "agreements": ["abv"]
+        },
+        "distillery": [],
+        "maturation": "cognac cask",
+        "releaseDay": null,
+        "singleCask": true,
+        "releaseYear": null,
+        "vintageYear": null,
+        "bottlingYear": null,
+        "caskStrength": null,
+        "releaseMonth": null,
+        "familyContext": {
+          "siblingBottles": []
+        }
+      },
+      {
+        "abv": 57.1,
+        "brand": "Decadent Drams",
+        "score": 22.947828,
+        "series": null,
+        "source": ["text"],
+        "bottler": "Decadent Drinks",
+        "edition": null,
+        "outturn": 294,
+        "bottleId": 48937,
+        "category": "single_malt",
+        "fullName": "Decadent Drams Arran - 10-year-old - 2014 Vintage - 57.1% ABV",
+        "reference": null,
+        "statedAge": 10,
+        "caskNumber": null,
+        "comparison": {
+          "missing": ["caskNumber"],
+          "conflicts": ["abv"],
+          "agreements": ["vintageYear"]
+        },
+        "distillery": [],
+        "maturation": "Matured in a 1st fill sherry hogshead",
+        "releaseDay": null,
+        "singleCask": null,
+        "releaseYear": null,
+        "vintageYear": 2014,
+        "bottlingYear": 2025,
+        "caskStrength": null,
+        "releaseMonth": null,
+        "familyContext": {
+          "siblingBottles": []
+        }
+      },
+      {
+        "abv": 57.1,
+        "brand": "Decadent Drams",
+        "score": 22.792187,
+        "series": null,
+        "source": ["text"],
+        "bottler": "Decadent Drinks",
+        "edition": null,
+        "outturn": 297,
+        "bottleId": 45269,
+        "category": "single_malt",
+        "fullName": "Decadent Drams Glen Moray 2014",
+        "reference": null,
+        "statedAge": 10,
+        "caskNumber": null,
+        "comparison": {
+          "missing": ["caskNumber"],
+          "conflicts": ["abv"],
+          "agreements": ["vintageYear"]
+        },
+        "distillery": ["Glen Moray"],
+        "maturation": "2ND FILL SHERRY HOGSHEAD",
+        "releaseDay": null,
+        "singleCask": null,
+        "releaseYear": null,
+        "vintageYear": 2014,
+        "bottlingYear": 2025,
+        "caskStrength": null,
+        "releaseMonth": null,
+        "familyContext": {
+          "siblingBottles": []
+        }
+      },
+      {
+        "abv": 57.1,
+        "brand": "Watt Whisky",
+        "score": 22.771362,
+        "series": null,
+        "source": ["text"],
+        "bottler": "Watt Whisky",
+        "edition": null,
+        "outturn": null,
+        "bottleId": 47429,
+        "category": "single_malt",
+        "fullName": "Watt Whisky Laphroaig 2014",
+        "reference": null,
+        "statedAge": 12,
+        "caskNumber": null,
+        "comparison": {
+          "missing": ["caskNumber"],
+          "conflicts": ["abv"],
+          "agreements": ["vintageYear"]
+        },
+        "distillery": ["Laphroaig"],
+        "maturation": null,
+        "releaseDay": null,
+        "singleCask": null,
+        "releaseYear": null,
+        "vintageYear": 2014,
+        "bottlingYear": null,
+        "caskStrength": null,
+        "releaseMonth": null,
+        "familyContext": {
+          "siblingBottles": []
+        }
+      },
+      {
+        "abv": 57.1,
+        "brand": "Decadent Drams",
+        "score": 22.618176,
+        "series": null,
+        "source": ["text"],
+        "bottler": "Decadent Drinks",
+        "edition": null,
+        "outturn": 166,
+        "bottleId": 48930,
+        "category": "single_malt",
+        "fullName": "Decadent Drams Smogen - 10-year-old - 2014 Vintage - 57.1% ABV",
+        "reference": null,
+        "statedAge": 10,
+        "caskNumber": null,
+        "comparison": {
+          "missing": ["caskNumber"],
+          "conflicts": ["abv"],
+          "agreements": ["vintageYear"]
+        },
+        "distillery": ["Smögen Whisky"],
+        "maturation": "Matured in a madeira hogshead and finished in a plain refill hogshead",
+        "releaseDay": null,
+        "singleCask": null,
+        "releaseYear": null,
+        "vintageYear": 2014,
+        "bottlingYear": 2024,
+        "caskStrength": null,
+        "releaseMonth": null,
+        "familyContext": {
+          "siblingBottles": []
+        }
+      },
+      {
+        "abv": 48.5,
+        "brand": "Thompson Bros.",
+        "score": 22.375465,
+        "series": null,
+        "source": ["text"],
+        "bottler": null,
+        "edition": null,
+        "outturn": null,
+        "bottleId": 5679,
+        "category": "blended_malt",
+        "fullName": "Thompson Bros. SRV5",
+        "reference": null,
+        "statedAge": 8,
+        "caskNumber": null,
+        "comparison": {
+          "missing": ["caskNumber"],
+          "conflicts": ["abv"],
+          "agreements": ["vintageYear"]
+        },
+        "distillery": [],
+        "maturation": null,
+        "releaseDay": null,
+        "singleCask": null,
+        "releaseYear": null,
+        "vintageYear": 2014,
+        "bottlingYear": 2022,
+        "caskStrength": null,
+        "releaseMonth": null,
+        "familyContext": {
+          "siblingBottles": []
+        }
+      },
+      {
+        "abv": 47.5,
+        "brand": "Càrn Mòr",
+        "score": 22.207087,
+        "series": "Strictly Limited",
+        "source": ["text"],
+        "bottler": "Càrn Mòr",
+        "edition": null,
+        "outturn": null,
+        "bottleId": 46712,
+        "category": "single_malt",
+        "fullName": "Càrn Mòr Glentauchers 2014",
+        "reference": null,
+        "statedAge": 9,
+        "caskNumber": null,
+        "comparison": {
+          "missing": ["caskNumber"],
+          "conflicts": ["abv"],
+          "agreements": ["vintageYear"]
+        },
+        "distillery": ["Glentauchers"],
+        "maturation": "oak",
+        "releaseDay": null,
+        "singleCask": null,
+        "releaseYear": 2024,
+        "vintageYear": 2014,
+        "bottlingYear": null,
+        "caskStrength": null,
+        "releaseMonth": null,
+        "familyContext": {
+          "siblingBottles": []
+        }
+      },
+      {
+        "abv": 52.9,
+        "brand": "Elements of Islay",
+        "score": 21.443598,
+        "series": null,
+        "source": ["text"],
+        "bottler": "Speciality Drinks Ltd",
+        "edition": null,
+        "outturn": null,
+        "bottleId": 65527,
+        "category": "single_malt",
+        "fullName": "Elements of Islay Bw1",
+        "reference": null,
+        "statedAge": null,
+        "caskNumber": null,
+        "comparison": {
+          "missing": ["vintageYear", "caskNumber"],
+          "conflicts": [],
+          "agreements": ["abv"]
+        },
+        "distillery": ["Bowmore"],
+        "maturation": null,
+        "releaseDay": null,
+        "singleCask": null,
+        "releaseYear": null,
+        "vintageYear": null,
+        "bottlingYear": null,
+        "caskStrength": null,
+        "releaseMonth": null,
+        "familyContext": {
+          "siblingBottles": []
+        }
+      },
+      {
+        "abv": 45.7,
+        "brand": "Thompson Bros.",
+        "score": 0.7490217889248524,
+        "series": null,
+        "source": ["vector"],
+        "bottler": "Thompson Bros",
+        "edition": null,
+        "outturn": 140,
+        "bottleId": 67863,
+        "category": "single_malt",
+        "fullName": "Thompson Bros. Highland Single Malt Scotch Whisky 14-year-old",
+        "reference": "Highland Single Malt Scotch Whisky, 14-year-old, 70CL, 45.7% ABV",
+        "statedAge": 14,
+        "caskNumber": null,
+        "comparison": {
+          "missing": [
+            "vintageYear",
+            "caskStrength",
+            "singleCask",
+            "caskNumber",
+            "distillers"
+          ],
+          "conflicts": ["statedAge", "abv", "bottler"],
+          "agreements": ["category", "brand"]
+        },
+        "distillery": [],
+        "maturation": "3 years in ex-rum cask",
+        "releaseDay": null,
+        "singleCask": null,
+        "releaseYear": null,
+        "vintageYear": null,
+        "bottlingYear": null,
+        "caskStrength": null,
+        "releaseMonth": null,
+        "familyContext": {
+          "siblingBottles": []
+        }
+      },
+      {
+        "abv": 44.5,
+        "brand": "Thompson Bros.",
+        "score": 0.7473393074135206,
+        "series": null,
+        "source": ["vector"],
+        "bottler": "Thompson Bros.",
+        "edition": null,
+        "outturn": 504,
+        "bottleId": 56073,
+        "category": "single_malt",
+        "fullName": "Thompson Bros. Highland Single Malt Scotch Whisky",
+        "reference": "Thompson Bros Highland Single Malt Scotch Whisky, 19-year-old, 70CL, 44.5% ABV",
+        "statedAge": 19,
+        "caskNumber": null,
+        "comparison": {
+          "missing": [
+            "vintageYear",
+            "caskStrength",
+            "singleCask",
+            "caskNumber",
+            "distillers"
+          ],
+          "conflicts": ["statedAge", "abv"],
+          "agreements": ["category", "brand", "bottler"]
+        },
+        "distillery": [],
+        "maturation": "1st Fill Bourbon Barrels",
+        "releaseDay": null,
+        "singleCask": null,
+        "releaseYear": null,
+        "vintageYear": null,
+        "bottlingYear": null,
+        "caskStrength": null,
+        "releaseMonth": null,
+        "familyContext": {
+          "siblingBottles": []
+        }
+      },
+      {
+        "abv": 49.3,
+        "brand": "Thompson Bros.",
+        "score": 0.7466061858042072,
+        "series": null,
+        "source": ["vector"],
+        "bottler": "Thompson Bros.",
+        "edition": null,
+        "outturn": 275,
+        "bottleId": 446,
+        "category": "single_malt",
+        "fullName": "Thompson Bros. Islay Single Malt 1990 - 1990 Vintage - 49.3% ABV - Single Cask - Cask Strength",
+        "reference": "Thompson Bros. Islay Single Malt 1990 - 1990 Vintage - 49.3% ABV - Single Cask - Cask Strength",
+        "statedAge": 32,
+        "caskNumber": null,
+        "comparison": {
+          "missing": ["caskNumber", "distillers"],
+          "conflicts": ["statedAge", "abv", "vintageYear"],
+          "agreements": [
+            "category",
+            "caskStrength",
+            "singleCask",
+            "brand",
+            "bottler"
+          ]
+        },
+        "distillery": [],
+        "maturation": "Refill barrel",
+        "releaseDay": null,
+        "singleCask": true,
+        "releaseYear": null,
+        "vintageYear": 1990,
+        "bottlingYear": 2022,
+        "caskStrength": true,
+        "releaseMonth": null,
+        "familyContext": {
+          "siblingBottles": []
+        }
+      },
+      {
+        "abv": 48.5,
+        "brand": "Thompson Bros.",
+        "score": 0.7368459932670648,
+        "series": null,
+        "source": ["vector"],
+        "bottler": "Thompson Bros.",
+        "edition": null,
+        "outturn": null,
+        "bottleId": 46074,
+        "category": "single_malt",
+        "fullName": "Thompson Bros. Highland Single Malt Scotch Whisky - 18-year-old - 48.5% ABV",
+        "reference": "Thompson Bros Highland Single Malt Scotch Whisky, 18-year-old, 70CL, 48.5% ABV",
+        "statedAge": 18,
+        "caskNumber": null,
+        "comparison": {
+          "missing": [
+            "vintageYear",
+            "caskStrength",
+            "singleCask",
+            "caskNumber",
+            "distillers"
+          ],
+          "conflicts": ["statedAge", "abv"],
+          "agreements": ["category", "brand", "bottler"]
+        },
+        "distillery": [],
+        "maturation": null,
+        "releaseDay": null,
+        "singleCask": null,
+        "releaseYear": null,
+        "vintageYear": null,
+        "bottlingYear": null,
+        "caskStrength": null,
+        "releaseMonth": null,
+        "familyContext": {
+          "siblingBottles": []
+        }
+      }
+    ]
+  },
+  "context": {
+    "inspectedBottleIds": [2978],
+    "bottleContexts": [
+      {
+        "exact": {
+          "abv": null,
+          "edition": null,
+          "outturn": null,
+          "statedAge": null,
+          "caskNumber": null,
+          "maturation": null,
+          "releaseDay": null,
+          "singleCask": null,
+          "releaseYear": null,
+          "vintageYear": null,
+          "bottlingYear": null,
+          "caskStrength": null,
+          "releaseMonth": null
+        },
+        "shared": {
+          "name": "2014 Private Cask Club",
+          "brand": {
+            "name": "Strathearn",
+            "entityId": 280
+          },
+          "series": null,
+          "bottler": null,
+          "category": "single_malt",
+          "statedAge": 6,
+          "distillers": [
+            {
+              "name": "Strathearn",
+              "entityId": 280
+            }
+          ]
+        },
+        "groupId": 10905,
+        "bottleId": 2978,
+        "fullName": "Strathearn 2014 Private Cask Club",
+        "siblings": [],
+        "references": [
+          {
+            "name": "Strathearn 2014 Private Cask Club",
+            "ignored": false
+          }
+        ],
+        "observations": [],
+        "imageSources": []
+      }
+    ],
+    "inspectedEntities": [
+      {
+        "kind": "distillery",
+        "name": "The Macallan",
+        "score": 1,
+        "source": ["exact", "text", "prefix", "contained"],
+        "entityId": 1157,
+        "reference": "The Macallan",
+        "shortName": null,
+        "retrievedFor": [
+          {
+            "exact": true,
+            "query": "The Macallan"
+          }
+        ]
+      },
+      {
+        "kind": "bottler",
+        "name": "Alexander Murray & Co",
+        "score": 1,
+        "source": ["exact", "text", "prefix", "contained"],
+        "entityId": 5833,
+        "reference": "Alexander Murray & Co",
+        "shortName": "Alexander Murray",
+        "retrievedFor": [
+          {
+            "exact": true,
+            "query": "Alexander Murray & Co"
+          }
+        ]
+      },
+      {
+        "kind": "distillery",
+        "name": "Tamdhu",
+        "score": 1,
+        "source": ["exact", "text", "prefix", "contained"],
+        "entityId": 1386,
+        "reference": "Tamdhu",
+        "shortName": null,
+        "retrievedFor": [
+          {
+            "exact": true,
+            "query": "Tamdhu"
+          }
+        ]
+      },
+      {
+        "kind": "brand",
+        "name": "Alfred Giraud",
+        "score": 1,
+        "source": ["exact", "text", "prefix", "contained"],
+        "entityId": 29388,
+        "reference": "Alfred Giraud",
+        "shortName": null,
+        "retrievedFor": [
+          {
+            "exact": true,
+            "query": "Alfred Giraud"
+          }
+        ]
+      },
+      {
+        "kind": "brand",
+        "name": "Elements of Islay",
+        "score": 1,
+        "source": ["exact", "text", "prefix", "contained"],
+        "entityId": 365763,
+        "reference": "Elements of Islay",
+        "shortName": null,
+        "retrievedFor": [
+          {
+            "exact": true,
+            "query": "Elements of Islay"
+          }
+        ]
+      },
+      {
+        "kind": "bottler",
+        "name": "Speciality Drinks Ltd",
+        "score": 1,
+        "source": ["exact", "text", "prefix", "contained"],
+        "entityId": 6052,
+        "reference": "Speciality Drinks Ltd",
+        "shortName": null,
+        "retrievedFor": [
+          {
+            "exact": true,
+            "query": "Speciality Drinks Ltd"
+          }
+        ]
+      },
+      {
+        "kind": "distillery",
+        "name": "Bowmore",
+        "score": 1,
+        "source": ["exact", "text", "prefix", "contained"],
+        "entityId": 394,
+        "reference": "Bowmore",
+        "shortName": null,
+        "retrievedFor": [
+          {
+            "exact": true,
+            "query": "Bowmore"
+          }
+        ]
+      },
+      {
+        "kind": "brand",
+        "name": "Whitlaw",
+        "score": 1,
+        "source": ["exact", "text", "prefix", "contained"],
+        "entityId": 1493,
+        "reference": "Whitlaw",
+        "shortName": null,
+        "retrievedFor": [
+          {
+            "exact": true,
+            "query": "Whitlaw"
+          }
+        ]
+      },
+      {
+        "kind": "bottler",
+        "name": "The Ultimate",
+        "score": 1,
+        "source": ["exact", "text", "prefix", "contained"],
+        "entityId": 5420,
+        "reference": "The Ultimate",
+        "shortName": null,
+        "retrievedFor": [
+          {
+            "exact": true,
+            "query": "The Ultimate"
+          }
+        ]
+      },
+      {
+        "kind": "brand",
+        "name": "Evan Williams",
+        "score": 1,
+        "source": ["exact", "text", "prefix", "contained"],
+        "entityId": 908,
+        "reference": "Evan Williams",
+        "shortName": null,
+        "retrievedFor": [
+          {
+            "exact": true,
+            "query": "Evan Williams"
+          }
+        ]
+      },
+      {
+        "kind": "brand",
+        "name": "WhiskySponge",
+        "score": 1,
+        "source": ["exact", "text", "prefix", "contained"],
+        "entityId": 5863,
+        "reference": "WhiskySponge",
+        "shortName": null,
+        "retrievedFor": [
+          {
+            "exact": true,
+            "query": "WhiskySponge"
+          }
+        ]
+      },
+      {
+        "kind": "brand",
+        "name": "Whisky Sponge",
+        "score": 1,
+        "source": ["exact", "contained"],
+        "entityId": 366684,
+        "reference": "Whisky Sponge",
+        "shortName": null,
+        "retrievedFor": [
+          {
+            "exact": true,
+            "query": "WhiskySponge"
+          }
+        ]
+      },
+      {
+        "kind": "bottler",
+        "name": "Decadent Drinks",
+        "score": 1,
+        "source": ["exact", "text", "prefix", "contained"],
+        "entityId": 5775,
+        "reference": "Decadent Drinks",
+        "shortName": null,
+        "retrievedFor": [
+          {
+            "exact": true,
+            "query": "Decadent Drinks"
+          }
+        ]
+      },
+      {
+        "kind": "bottler",
+        "name": "The Ultimate Spirits",
+        "score": 0.5,
+        "source": ["text", "prefix"],
+        "entityId": 5378,
+        "reference": "The Ultimate Spirits",
+        "shortName": null,
+        "retrievedFor": [
+          {
+            "query": "The Ultimate"
+          }
+        ]
+      },
+      {
+        "kind": "bottler",
+        "name": "&Whisky",
+        "score": 0.35,
+        "source": ["contained"],
+        "entityId": 365821,
+        "reference": "&Whisky",
+        "shortName": null,
+        "retrievedFor": [
+          {
+            "query": "WhiskySponge"
+          }
+        ]
+      },
+      {
+        "kind": "brand",
+        "name": "Element",
+        "score": 0.3433333333333333,
+        "source": ["contained"],
+        "entityId": 366779,
+        "reference": "Element",
+        "shortName": null,
+        "retrievedFor": [
+          {
+            "query": "Elements of Islay"
+          }
+        ]
+      },
+      {
+        "kind": "brand",
+        "name": "The Islay",
+        "score": 0.31666666666666665,
+        "source": ["contained"],
+        "entityId": 366929,
+        "reference": "Islay",
+        "shortName": null,
+        "retrievedFor": [
+          {
+            "query": "Elements of Islay"
+          }
+        ]
+      },
+      {
+        "kind": "brand",
+        "name": "Cadée",
+        "score": 0.30714285714285716,
+        "source": ["contained"],
+        "entityId": 367403,
+        "reference": "Cadée",
+        "shortName": null,
+        "retrievedFor": [
+          {
+            "query": "Decadent Drinks"
+          }
+        ]
+      },
+      {
+        "kind": "company",
+        "name": "Morrison Bowmore Distillers Ltd",
+        "score": 0.2,
+        "source": ["text"],
+        "entityId": 5684,
+        "reference": null,
+        "shortName": null,
+        "retrievedFor": [
+          {
+            "query": "Bowmore"
+          }
+        ]
+      },
+      {
+        "kind": "bottler",
+        "name": "Old Evan Williams Distillery",
+        "score": 0.2,
+        "source": ["text"],
+        "entityId": 365769,
+        "reference": null,
+        "shortName": null,
+        "retrievedFor": [
+          {
+            "query": "Evan Williams"
+          }
+        ]
+      }
+    ],
+    "inspectedSeries": []
+  },
+  "provenance": {
+    "source": "production_miss",
+    "verifiedSourceUrls": [
+      "https://www.scotchwhiskyauctions.com/auctions/234-the-185th-auction/906294-strathearn-2014-7-year-old-spirited-angels-cask-1-by-thompson-bros/"
+    ],
+    "dbOutcome": {
+      "bottleId": null,
+      "createsBottle": false,
+      "summary": "Production returned no_match: it called the title's #1 and the cask number 107 conflicting cask identifiers."
+    },
+    "notes": "Captured from saved classifier run 36805 (auction_lot 17955, model null, 2026-11-03T23:09:27.146Z). Production rationale: This is a single marketed whisky bottle, but the conflicting cask identifiers leave its exact-cask identity unresolved. The inspected local Strathearn candidate is a different 6-year-old Private Cask Club release and is not a safe match. The run predates reading Scotch Whisky Auctions lot pages (#1609), so the evidence pack adds the lot page text. Expected outcome checked against the lot page and photo on 2026-11-09, in a random sample of the 185th auction's no_match reviews."
+  },
+  "expected": {
+    "status": "classified",
+    "action": "create_bottle",
+    "identityScope": "exact_cask",
+    "matchedBottleId": null,
+    "proposedBottle": {
+      "category": "single_malt",
+      "statedAge": 7,
+      "vintageYear": 2014,
+      "abv": 52.9,
+      "singleCask": true
+    },
+    "proposedBottleNameIncludes": ["Strathearn", "2014"],
+    "proposedBottleDistillerIds": [280],
+    "summary": "Create Thompson Bros Strathearn 2014 7-year-old, Spirited Angels release 1: distilled 07.08.2014, bottled 2022, port cask number 107, 52.9%, 116 bottles. The title's #1 is the series position, not the cask number. No local Bottle is this release."
+  }
+}

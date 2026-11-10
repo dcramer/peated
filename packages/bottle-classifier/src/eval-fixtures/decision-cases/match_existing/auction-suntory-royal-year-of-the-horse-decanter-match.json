@@ -1,0 +1,1553 @@
+{
+  "id": "auction-suntory-royal-year-of-the-horse-decanter-match",
+  "name": "Suntory Royal Year of the Horse decanter: match Suntory Royal; the zodiac decanter is packaging",
+  "input": {
+    "reference": {
+      "id": 17971,
+      "url": "https://www.scotchwhiskyauctions.com/auctions/234-the-185th-auction/905392-suntory-royal-year-of-the-horse-decanter-60cl/",
+      "name": "Suntory Royal Year Of The Horse Decanter 60cl",
+      "imageUrl": null,
+      "externalSiteId": 28097,
+      "currentBottleId": null
+    },
+    "extractedIdentity": {
+      "abv": 43,
+      "brand": null,
+      "series": null,
+      "bottler": null,
+      "edition": null,
+      "outturn": null,
+      "category": null,
+      "distillery": null,
+      "expression": null,
+      "maturation": null,
+      "stated_age": null,
+      "cask_number": null,
+      "single_cask": null,
+      "release_year": null,
+      "vintage_year": null,
+      "cask_strength": null
+    },
+    "extractedIdentitySource": "structured",
+    "imageEvidence": null,
+    "initialCandidates": [
+      {
+        "abv": 43,
+        "brand": "Glenfarclas",
+        "score": 55.01096,
+        "series": null,
+        "source": ["text"],
+        "bottler": null,
+        "edition": null,
+        "outturn": null,
+        "bottleId": 45438,
+        "category": "single_malt",
+        "fullName": "Glenfarclas 12-year-old",
+        "reference": null,
+        "statedAge": 12,
+        "caskNumber": null,
+        "comparison": {
+          "missing": ["releaseYear"],
+          "conflicts": ["category", "brand"],
+          "agreements": ["statedAge", "abv"]
+        },
+        "distillery": ["Glenfarclas"],
+        "maturation": null,
+        "releaseDay": null,
+        "singleCask": null,
+        "releaseYear": null,
+        "vintageYear": null,
+        "bottlingYear": null,
+        "caskStrength": null,
+        "releaseMonth": null,
+        "familyContext": {
+          "siblingBottles": []
+        }
+      },
+      {
+        "abv": 43,
+        "brand": "Suntory",
+        "score": 53.694527,
+        "series": null,
+        "source": ["text", "brand_coverage", "context"],
+        "bottler": null,
+        "edition": null,
+        "outturn": null,
+        "bottleId": 69254,
+        "category": "blend",
+        "fullName": "Suntory Royal",
+        "reference": null,
+        "statedAge": null,
+        "caskNumber": null,
+        "comparison": {
+          "missing": [],
+          "conflicts": [],
+          "agreements": ["abv"]
+        },
+        "distillery": [],
+        "maturation": null,
+        "releaseDay": null,
+        "singleCask": false,
+        "releaseYear": null,
+        "vintageYear": null,
+        "bottlingYear": null,
+        "caskStrength": null,
+        "releaseMonth": null,
+        "familyContext": {
+          "siblingBottles": []
+        }
+      },
+      {
+        "abv": 43,
+        "brand": "Islay Mist",
+        "score": 52.537827,
+        "series": null,
+        "source": ["text"],
+        "bottler": null,
+        "edition": null,
+        "outturn": null,
+        "bottleId": 17646,
+        "category": "blend",
+        "fullName": "Islay Mist 12-year-old - 43.0% ABV",
+        "reference": null,
+        "statedAge": 12,
+        "caskNumber": null,
+        "comparison": {
+          "missing": ["releaseYear"],
+          "conflicts": ["brand"],
+          "agreements": ["category", "statedAge", "abv"]
+        },
+        "distillery": [],
+        "maturation": null,
+        "releaseDay": null,
+        "singleCask": null,
+        "releaseYear": null,
+        "vintageYear": null,
+        "bottlingYear": null,
+        "caskStrength": null,
+        "releaseMonth": null,
+        "familyContext": {
+          "siblingBottles": []
+        }
+      },
+      {
+        "abv": 43,
+        "brand": "Isle of Skye",
+        "score": 50.113647,
+        "series": null,
+        "source": ["text"],
+        "bottler": "Ian Macleod Distillers",
+        "edition": null,
+        "outturn": null,
+        "bottleId": 45693,
+        "category": "blend",
+        "fullName": "Isle of Skye 12-year-old - 43.0% ABV",
+        "reference": null,
+        "statedAge": 12,
+        "caskNumber": null,
+        "comparison": {
+          "missing": ["releaseYear"],
+          "conflicts": ["brand"],
+          "agreements": ["category", "statedAge", "abv"]
+        },
+        "distillery": [],
+        "maturation": null,
+        "releaseDay": null,
+        "singleCask": null,
+        "releaseYear": null,
+        "vintageYear": null,
+        "bottlingYear": null,
+        "caskStrength": null,
+        "releaseMonth": null,
+        "familyContext": {
+          "siblingBottles": []
+        }
+      },
+      {
+        "abv": 43,
+        "brand": "Michel Couvreur",
+        "score": 48.30276,
+        "series": null,
+        "source": ["text"],
+        "bottler": "Michel Couvreur",
+        "edition": null,
+        "outturn": null,
+        "bottleId": 669,
+        "category": "blend",
+        "fullName": "Michel Couvreur Overaged Malt Whisky 12-year-old - 43.0% ABV",
+        "reference": null,
+        "statedAge": 12,
+        "caskNumber": null,
+        "comparison": {
+          "missing": ["releaseYear"],
+          "conflicts": ["brand"],
+          "agreements": ["category", "statedAge", "abv"]
+        },
+        "distillery": [],
+        "maturation": "Mainly sweet Pedro Ximénez sherry casks",
+        "releaseDay": null,
+        "singleCask": null,
+        "releaseYear": null,
+        "vintageYear": null,
+        "bottlingYear": null,
+        "caskStrength": null,
+        "releaseMonth": null,
+        "familyContext": {
+          "siblingBottles": []
+        }
+      },
+      {
+        "abv": 43,
+        "brand": "Calumet Farm",
+        "score": 48.157265,
+        "series": null,
+        "source": ["text"],
+        "bottler": null,
+        "edition": "100th Anniversary",
+        "outturn": null,
+        "bottleId": 45259,
+        "category": "bourbon",
+        "fullName": "Calumet Commemorative Ceramic Decanter - 100th Anniversary - 43.0% ABV",
+        "reference": null,
+        "statedAge": null,
+        "caskNumber": null,
+        "comparison": {
+          "missing": [],
+          "conflicts": [],
+          "agreements": ["abv"]
+        },
+        "distillery": [],
+        "maturation": null,
+        "releaseDay": null,
+        "singleCask": null,
+        "releaseYear": null,
+        "vintageYear": null,
+        "bottlingYear": null,
+        "caskStrength": null,
+        "releaseMonth": null,
+        "familyContext": {
+          "siblingBottles": []
+        }
+      },
+      {
+        "abv": 43,
+        "brand": "The Orientalist",
+        "score": 47.711826,
+        "series": null,
+        "source": ["text"],
+        "bottler": null,
+        "edition": null,
+        "outturn": null,
+        "bottleId": 46096,
+        "category": "blend",
+        "fullName": "The Orientalist Dragon - 12-year-old - 43.0% ABV - Oloroso Cask",
+        "reference": null,
+        "statedAge": 12,
+        "caskNumber": null,
+        "comparison": {
+          "missing": ["releaseYear"],
+          "conflicts": ["brand"],
+          "agreements": ["category", "statedAge", "abv"]
+        },
+        "distillery": [],
+        "maturation": "oloroso",
+        "releaseDay": null,
+        "singleCask": null,
+        "releaseYear": null,
+        "vintageYear": null,
+        "bottlingYear": null,
+        "caskStrength": null,
+        "releaseMonth": null,
+        "familyContext": {
+          "siblingBottles": []
+        }
+      },
+      {
+        "abv": 43,
+        "brand": "The GlenDronach",
+        "score": 45.839134,
+        "series": null,
+        "source": ["text"],
+        "bottler": null,
+        "edition": "Matured in Sherry Casks",
+        "outturn": null,
+        "bottleId": 47083,
+        "category": "single_malt",
+        "fullName": "The GlenDronach 12-year-old - Matured in Sherry Casks",
+        "reference": null,
+        "statedAge": 12,
+        "caskNumber": null,
+        "comparison": {
+          "missing": ["releaseYear"],
+          "conflicts": ["category", "brand"],
+          "agreements": ["statedAge", "abv"]
+        },
+        "distillery": ["The GlenDronach"],
+        "maturation": null,
+        "releaseDay": null,
+        "singleCask": null,
+        "releaseYear": null,
+        "vintageYear": null,
+        "bottlingYear": null,
+        "caskStrength": null,
+        "releaseMonth": null,
+        "familyContext": {
+          "siblingBottles": []
+        }
+      },
+      {
+        "abv": 43,
+        "brand": "White Horse",
+        "score": 41.380196,
+        "series": null,
+        "source": ["text"],
+        "bottler": null,
+        "edition": null,
+        "outturn": null,
+        "bottleId": 69331,
+        "category": "blend",
+        "fullName": "White Horse Year of the Horse 1978",
+        "reference": null,
+        "statedAge": null,
+        "caskNumber": null,
+        "comparison": {
+          "missing": [],
+          "conflicts": [],
+          "agreements": ["abv"]
+        },
+        "distillery": [],
+        "maturation": null,
+        "releaseDay": null,
+        "singleCask": null,
+        "releaseYear": null,
+        "vintageYear": null,
+        "bottlingYear": null,
+        "caskStrength": null,
+        "releaseMonth": null,
+        "familyContext": {
+          "siblingBottles": []
+        }
+      },
+      {
+        "abv": 43,
+        "brand": "Hibiki",
+        "score": 37.36171,
+        "series": null,
+        "source": ["vector", "text"],
+        "bottler": null,
+        "edition": null,
+        "outturn": null,
+        "bottleId": 11864,
+        "category": "blend",
+        "fullName": "Hibiki 12-year-old",
+        "reference": "Hibiki, 12-year-old, 43%",
+        "statedAge": 12,
+        "caskNumber": null,
+        "comparison": {
+          "missing": [],
+          "conflicts": ["releaseYear", "brand"],
+          "agreements": ["category", "statedAge", "abv"]
+        },
+        "distillery": ["Yamazaki", "Hakushu Distillery", "Chita Distillery"],
+        "maturation": null,
+        "releaseDay": null,
+        "singleCask": null,
+        "releaseYear": 2009,
+        "vintageYear": null,
+        "bottlingYear": null,
+        "caskStrength": null,
+        "releaseMonth": null,
+        "familyContext": {
+          "siblingBottles": []
+        }
+      },
+      {
+        "abv": 43,
+        "brand": "Ambassador",
+        "score": 36.580475,
+        "series": null,
+        "source": ["text"],
+        "bottler": null,
+        "edition": null,
+        "outturn": null,
+        "bottleId": 68434,
+        "category": "blend",
+        "fullName": "Ambassador 12-year-old",
+        "reference": null,
+        "statedAge": 12,
+        "caskNumber": null,
+        "comparison": {
+          "missing": ["releaseYear"],
+          "conflicts": ["brand"],
+          "agreements": ["category", "statedAge", "abv"]
+        },
+        "distillery": [],
+        "maturation": null,
+        "releaseDay": null,
+        "singleCask": null,
+        "releaseYear": null,
+        "vintageYear": null,
+        "bottlingYear": null,
+        "caskStrength": null,
+        "releaseMonth": null,
+        "familyContext": {
+          "siblingBottles": []
+        }
+      },
+      {
+        "abv": 43,
+        "brand": "Mitchell's",
+        "score": 36.580475,
+        "series": null,
+        "source": ["text"],
+        "bottler": null,
+        "edition": null,
+        "outturn": null,
+        "bottleId": 70210,
+        "category": "blend",
+        "fullName": "Mitchell's 12-year-old",
+        "reference": null,
+        "statedAge": 12,
+        "caskNumber": null,
+        "comparison": {
+          "missing": ["releaseYear"],
+          "conflicts": ["brand"],
+          "agreements": ["category", "statedAge", "abv"]
+        },
+        "distillery": [],
+        "maturation": null,
+        "releaseDay": null,
+        "singleCask": null,
+        "releaseYear": null,
+        "vintageYear": null,
+        "bottlingYear": null,
+        "caskStrength": null,
+        "releaseMonth": null,
+        "familyContext": {
+          "siblingBottles": []
+        }
+      },
+      {
+        "abv": 43,
+        "brand": "Chivas Regal",
+        "score": 35.262634,
+        "series": null,
+        "source": ["text"],
+        "bottler": null,
+        "edition": null,
+        "outturn": null,
+        "bottleId": 66967,
+        "category": "blend",
+        "fullName": "Chivas Regal 12-year-old",
+        "reference": null,
+        "statedAge": 12,
+        "caskNumber": null,
+        "comparison": {
+          "missing": ["releaseYear"],
+          "conflicts": ["brand"],
+          "agreements": ["category", "statedAge", "abv"]
+        },
+        "distillery": [],
+        "maturation": null,
+        "releaseDay": null,
+        "singleCask": null,
+        "releaseYear": null,
+        "vintageYear": null,
+        "bottlingYear": null,
+        "caskStrength": null,
+        "releaseMonth": null,
+        "familyContext": {
+          "siblingBottles": []
+        }
+      },
+      {
+        "abv": 43,
+        "brand": "King's Ransom",
+        "score": 35.262634,
+        "series": null,
+        "source": ["text"],
+        "bottler": null,
+        "edition": null,
+        "outturn": null,
+        "bottleId": 70144,
+        "category": "blend",
+        "fullName": "King's Ransom 12-year-old",
+        "reference": null,
+        "statedAge": 12,
+        "caskNumber": null,
+        "comparison": {
+          "missing": ["releaseYear"],
+          "conflicts": ["brand"],
+          "agreements": ["category", "statedAge", "abv"]
+        },
+        "distillery": [],
+        "maturation": null,
+        "releaseDay": null,
+        "singleCask": null,
+        "releaseYear": null,
+        "vintageYear": null,
+        "bottlingYear": null,
+        "caskStrength": null,
+        "releaseMonth": null,
+        "familyContext": {
+          "siblingBottles": []
+        }
+      },
+      {
+        "abv": 43,
+        "brand": "Horse Guards",
+        "score": 33.50306,
+        "series": null,
+        "source": ["text"],
+        "bottler": "Salisbury Blending Co Ltd",
+        "edition": null,
+        "outturn": null,
+        "bottleId": 52786,
+        "category": "blend",
+        "fullName": "Horse Guards 8-year-old",
+        "reference": null,
+        "statedAge": 8,
+        "caskNumber": null,
+        "comparison": {
+          "missing": [],
+          "conflicts": [],
+          "agreements": ["abv"]
+        },
+        "distillery": [],
+        "maturation": null,
+        "releaseDay": null,
+        "singleCask": false,
+        "releaseYear": null,
+        "vintageYear": null,
+        "bottlingYear": null,
+        "caskStrength": null,
+        "releaseMonth": null,
+        "familyContext": {
+          "siblingBottles": []
+        }
+      },
+      {
+        "abv": 43,
+        "brand": "Suntory",
+        "score": 33.36532,
+        "series": null,
+        "source": ["text", "brand_coverage"],
+        "bottler": null,
+        "edition": null,
+        "outturn": null,
+        "bottleId": 69255,
+        "category": null,
+        "fullName": "Suntory Special Reserve Suntory Open 1989",
+        "reference": null,
+        "statedAge": null,
+        "caskNumber": null,
+        "comparison": {
+          "missing": [],
+          "conflicts": [],
+          "agreements": ["abv"]
+        },
+        "distillery": [],
+        "maturation": null,
+        "releaseDay": null,
+        "singleCask": null,
+        "releaseYear": null,
+        "vintageYear": null,
+        "bottlingYear": null,
+        "caskStrength": null,
+        "releaseMonth": null,
+        "familyContext": {
+          "siblingBottles": []
+        }
+      },
+      {
+        "abv": 43,
+        "brand": "Glen Garioch",
+        "score": 33.282288,
+        "series": null,
+        "source": ["text"],
+        "bottler": null,
+        "edition": "Blue Decanter",
+        "outturn": null,
+        "bottleId": 43443,
+        "category": "single_malt",
+        "fullName": "Glen Garioch 21-year-old - Blue Decanter",
+        "reference": null,
+        "statedAge": 21,
+        "caskNumber": null,
+        "comparison": {
+          "missing": [],
+          "conflicts": [],
+          "agreements": ["abv"]
+        },
+        "distillery": ["Glen Garioch"],
+        "maturation": null,
+        "releaseDay": null,
+        "singleCask": null,
+        "releaseYear": null,
+        "vintageYear": null,
+        "bottlingYear": null,
+        "caskStrength": null,
+        "releaseMonth": null,
+        "familyContext": {
+          "siblingBottles": []
+        }
+      },
+      {
+        "abv": 43,
+        "brand": "Laphroaig",
+        "score": 32.839523,
+        "series": null,
+        "source": ["text"],
+        "bottler": null,
+        "edition": "Bonfanti Ceramic Decanter",
+        "outturn": null,
+        "bottleId": 54416,
+        "category": "single_malt",
+        "fullName": "Laphroaig 12-year-old - Bonfanti Ceramic Decanter",
+        "reference": null,
+        "statedAge": 12,
+        "caskNumber": null,
+        "comparison": {
+          "missing": [],
+          "conflicts": [],
+          "agreements": ["abv"]
+        },
+        "distillery": ["Laphroaig"],
+        "maturation": null,
+        "releaseDay": null,
+        "singleCask": null,
+        "releaseYear": null,
+        "vintageYear": null,
+        "bottlingYear": null,
+        "caskStrength": null,
+        "releaseMonth": null,
+        "familyContext": {
+          "siblingBottles": []
+        }
+      },
+      {
+        "abv": 43,
+        "brand": "Toki",
+        "score": 32.600437,
+        "series": null,
+        "source": ["vector", "text"],
+        "bottler": null,
+        "edition": null,
+        "outturn": null,
+        "bottleId": 51833,
+        "category": "blend",
+        "fullName": "Toki Blended Japanese Whisky",
+        "reference": "Suntory Toki",
+        "statedAge": null,
+        "caskNumber": null,
+        "comparison": {
+          "missing": [],
+          "conflicts": [],
+          "agreements": ["abv"]
+        },
+        "distillery": ["Yamazaki", "Hakushu Distillery", "Chita Distillery"],
+        "maturation": null,
+        "releaseDay": null,
+        "singleCask": null,
+        "releaseYear": 2016,
+        "vintageYear": null,
+        "bottlingYear": null,
+        "caskStrength": null,
+        "releaseMonth": null,
+        "familyContext": {
+          "siblingBottles": []
+        }
+      },
+      {
+        "abv": 43,
+        "brand": "Hibiki",
+        "score": 31.018147,
+        "series": null,
+        "source": ["text", "vector"],
+        "bottler": null,
+        "edition": null,
+        "outturn": null,
+        "bottleId": 47566,
+        "category": "blend",
+        "fullName": "Hibiki 17-year-old",
+        "reference": "Suntory 17-year-old 'Hibiki' (43%, OB, Japan, blend, +/-1992)",
+        "statedAge": 17,
+        "caskNumber": null,
+        "comparison": {
+          "missing": [],
+          "conflicts": [],
+          "agreements": ["abv"]
+        },
+        "distillery": ["Yamazaki", "Hakushu Distillery", "Chita Distillery"],
+        "maturation": null,
+        "releaseDay": null,
+        "singleCask": null,
+        "releaseYear": null,
+        "vintageYear": null,
+        "bottlingYear": null,
+        "caskStrength": null,
+        "releaseMonth": null,
+        "familyContext": {
+          "siblingBottles": []
+        }
+      },
+      {
+        "abv": 43,
+        "brand": "Karuizawa",
+        "score": 30.819351,
+        "series": null,
+        "source": ["text"],
+        "bottler": null,
+        "edition": null,
+        "outturn": null,
+        "bottleId": 53529,
+        "category": "single_malt",
+        "fullName": "Karuizawa Arita Porcelain Decanter",
+        "reference": null,
+        "statedAge": 30,
+        "caskNumber": null,
+        "comparison": {
+          "missing": [],
+          "conflicts": [],
+          "agreements": ["abv"]
+        },
+        "distillery": ["Karuizawa"],
+        "maturation": null,
+        "releaseDay": null,
+        "singleCask": null,
+        "releaseYear": null,
+        "vintageYear": null,
+        "bottlingYear": null,
+        "caskStrength": null,
+        "releaseMonth": null,
+        "familyContext": {
+          "siblingBottles": []
+        }
+      },
+      {
+        "abv": 43,
+        "brand": "Suntory Whisky",
+        "score": 30.745094,
+        "series": null,
+        "source": ["text"],
+        "bottler": null,
+        "edition": null,
+        "outturn": null,
+        "bottleId": 52775,
+        "category": "blend",
+        "fullName": "Suntory Whisky Old",
+        "reference": null,
+        "statedAge": null,
+        "caskNumber": null,
+        "comparison": {
+          "missing": [],
+          "conflicts": [],
+          "agreements": ["abv"]
+        },
+        "distillery": [],
+        "maturation": null,
+        "releaseDay": null,
+        "singleCask": null,
+        "releaseYear": null,
+        "vintageYear": null,
+        "bottlingYear": null,
+        "caskStrength": null,
+        "releaseMonth": null,
+        "familyContext": {
+          "siblingBottles": []
+        }
+      },
+      {
+        "abv": 43,
+        "brand": "Glenfiddich",
+        "score": 30.363655,
+        "series": null,
+        "source": ["text"],
+        "bottler": null,
+        "edition": null,
+        "outturn": null,
+        "bottleId": 53213,
+        "category": "single_malt",
+        "fullName": "Glenfiddich Centenary Wedgwood Decanter",
+        "reference": null,
+        "statedAge": 21,
+        "caskNumber": null,
+        "comparison": {
+          "missing": [],
+          "conflicts": [],
+          "agreements": ["abv"]
+        },
+        "distillery": ["Glenfiddich"],
+        "maturation": null,
+        "releaseDay": null,
+        "singleCask": null,
+        "releaseYear": 1987,
+        "vintageYear": null,
+        "bottlingYear": null,
+        "caskStrength": null,
+        "releaseMonth": null,
+        "familyContext": {
+          "siblingBottles": []
+        }
+      },
+      {
+        "abv": 43,
+        "brand": "Ballantine's",
+        "score": 29.842531,
+        "series": null,
+        "source": ["text"],
+        "bottler": null,
+        "edition": null,
+        "outturn": null,
+        "bottleId": 69741,
+        "category": "blend",
+        "fullName": "Ballantine's 21-year-old Decanter",
+        "reference": null,
+        "statedAge": 21,
+        "caskNumber": null,
+        "comparison": {
+          "missing": [],
+          "conflicts": [],
+          "agreements": ["abv"]
+        },
+        "distillery": [],
+        "maturation": null,
+        "releaseDay": null,
+        "singleCask": null,
+        "releaseYear": null,
+        "vintageYear": null,
+        "bottlingYear": null,
+        "caskStrength": null,
+        "releaseMonth": null,
+        "familyContext": {
+          "siblingBottles": []
+        }
+      },
+      {
+        "abv": 43,
+        "brand": "Jack Daniel's",
+        "score": 29.402992,
+        "series": null,
+        "source": ["text"],
+        "bottler": null,
+        "edition": null,
+        "outturn": null,
+        "bottleId": 54197,
+        "category": "bourbon",
+        "fullName": "Jack Daniel's 125th Anniversary Decanter",
+        "reference": null,
+        "statedAge": null,
+        "caskNumber": null,
+        "comparison": {
+          "missing": [],
+          "conflicts": [],
+          "agreements": ["abv"]
+        },
+        "distillery": ["Jack Daniel Distillery"],
+        "maturation": null,
+        "releaseDay": null,
+        "singleCask": null,
+        "releaseYear": 1990,
+        "vintageYear": null,
+        "bottlingYear": null,
+        "caskStrength": null,
+        "releaseMonth": null,
+        "familyContext": {
+          "siblingBottles": []
+        }
+      },
+      {
+        "abv": 43,
+        "brand": "Jack Daniel's",
+        "score": 29.402992,
+        "series": null,
+        "source": ["text"],
+        "bottler": null,
+        "edition": null,
+        "outturn": null,
+        "bottleId": 54291,
+        "category": "bourbon",
+        "fullName": "Jack Daniel's Maxwell House Decanter",
+        "reference": null,
+        "statedAge": null,
+        "caskNumber": null,
+        "comparison": {
+          "missing": [],
+          "conflicts": [],
+          "agreements": ["abv"]
+        },
+        "distillery": ["Jack Daniel Distillery"],
+        "maturation": null,
+        "releaseDay": null,
+        "singleCask": null,
+        "releaseYear": 1971,
+        "vintageYear": null,
+        "bottlingYear": null,
+        "caskStrength": null,
+        "releaseMonth": null,
+        "familyContext": {
+          "siblingBottles": []
+        }
+      },
+      {
+        "abv": 43,
+        "brand": "Suntory Whisky",
+        "score": 28.607395,
+        "series": null,
+        "source": ["text"],
+        "bottler": null,
+        "edition": null,
+        "outturn": null,
+        "bottleId": 69252,
+        "category": "blend",
+        "fullName": "Suntory Whisky Old Portopia '81",
+        "reference": null,
+        "statedAge": null,
+        "caskNumber": null,
+        "comparison": {
+          "missing": [],
+          "conflicts": ["brand"],
+          "agreements": ["category", "abv"]
+        },
+        "distillery": [],
+        "maturation": null,
+        "releaseDay": null,
+        "singleCask": null,
+        "releaseYear": 1981,
+        "vintageYear": null,
+        "bottlingYear": null,
+        "caskStrength": null,
+        "releaseMonth": null,
+        "familyContext": {
+          "siblingBottles": []
+        }
+      },
+      {
+        "abv": 43,
+        "brand": "Hibiki",
+        "score": 27.667763,
+        "series": null,
+        "source": ["text"],
+        "bottler": null,
+        "edition": null,
+        "outturn": null,
+        "bottleId": 51814,
+        "category": "blend",
+        "fullName": "Hibiki Suntory Whisky",
+        "reference": null,
+        "statedAge": null,
+        "caskNumber": null,
+        "comparison": {
+          "missing": [],
+          "conflicts": ["brand"],
+          "agreements": ["category", "abv"]
+        },
+        "distillery": ["Yamazaki", "Hakushu Distillery", "Chita Distillery"],
+        "maturation": null,
+        "releaseDay": null,
+        "singleCask": null,
+        "releaseYear": 1989,
+        "vintageYear": null,
+        "bottlingYear": 1989,
+        "caskStrength": null,
+        "releaseMonth": null,
+        "familyContext": {
+          "siblingBottles": []
+        }
+      },
+      {
+        "abv": 43,
+        "brand": "Suntory Whisky",
+        "score": 27.449154,
+        "series": null,
+        "source": ["text"],
+        "bottler": null,
+        "edition": null,
+        "outturn": null,
+        "bottleId": 69253,
+        "category": "blend",
+        "fullName": "Suntory Whisky Old - Year of the Dragon",
+        "reference": null,
+        "statedAge": null,
+        "caskNumber": null,
+        "comparison": {
+          "missing": [],
+          "conflicts": ["brand"],
+          "agreements": ["category", "abv"]
+        },
+        "distillery": [],
+        "maturation": null,
+        "releaseDay": null,
+        "singleCask": null,
+        "releaseYear": null,
+        "vintageYear": null,
+        "bottlingYear": null,
+        "caskStrength": null,
+        "releaseMonth": null,
+        "familyContext": {
+          "siblingBottles": []
+        }
+      },
+      {
+        "abv": 43,
+        "brand": "Hibiki",
+        "score": 26.3121,
+        "series": null,
+        "source": ["text"],
+        "bottler": null,
+        "edition": "100th Anniversary of Suntory Whisky",
+        "outturn": null,
+        "bottleId": 52829,
+        "category": "blend",
+        "fullName": "Hibiki Japanese Harmony Master's Select - 100th Anniversary of Suntory Whisky",
+        "reference": null,
+        "statedAge": null,
+        "caskNumber": null,
+        "comparison": {
+          "missing": [],
+          "conflicts": ["brand"],
+          "agreements": ["category", "abv"]
+        },
+        "distillery": ["Yamazaki", "Hakushu Distillery", "Chita Distillery"],
+        "maturation": null,
+        "releaseDay": null,
+        "singleCask": false,
+        "releaseYear": 2023,
+        "vintageYear": null,
+        "bottlingYear": 2023,
+        "caskStrength": null,
+        "releaseMonth": null,
+        "familyContext": {
+          "siblingBottles": []
+        }
+      },
+      {
+        "abv": 43,
+        "brand": "Hibiki",
+        "score": 0.738981068909993,
+        "series": null,
+        "source": ["vector"],
+        "bottler": null,
+        "edition": null,
+        "outturn": null,
+        "bottleId": 11865,
+        "category": "blend",
+        "fullName": "Hibiki Japanese Harmony",
+        "reference": "Suntory Hibiki Japanese Harmony",
+        "statedAge": null,
+        "caskNumber": null,
+        "comparison": {
+          "missing": [],
+          "conflicts": ["brand"],
+          "agreements": ["category", "abv"]
+        },
+        "distillery": ["Yamazaki", "Hakushu Distillery", "Chita Distillery"],
+        "maturation": null,
+        "releaseDay": null,
+        "singleCask": null,
+        "releaseYear": 2015,
+        "vintageYear": null,
+        "bottlingYear": null,
+        "caskStrength": null,
+        "releaseMonth": null,
+        "familyContext": {
+          "siblingBottles": []
+        }
+      },
+      {
+        "abv": 43,
+        "brand": "Hibiki",
+        "score": 0.712699647285303,
+        "series": null,
+        "source": ["vector"],
+        "bottler": null,
+        "edition": null,
+        "outturn": null,
+        "bottleId": 45206,
+        "category": "blend",
+        "fullName": "Hibiki Japanese Harmony Master's Select",
+        "reference": "Hibiki Harmony Master's Select - 43.0% ABV",
+        "statedAge": null,
+        "caskNumber": null,
+        "comparison": {
+          "missing": [],
+          "conflicts": ["brand"],
+          "agreements": ["category", "abv"]
+        },
+        "distillery": ["Yamazaki", "Hakushu Distillery", "Chita Distillery"],
+        "maturation": null,
+        "releaseDay": null,
+        "singleCask": null,
+        "releaseYear": null,
+        "vintageYear": null,
+        "bottlingYear": null,
+        "caskStrength": null,
+        "releaseMonth": null,
+        "familyContext": {
+          "siblingBottles": []
+        }
+      },
+      {
+        "abv": 43,
+        "brand": "Hibiki",
+        "score": 0.68947444821324,
+        "series": null,
+        "source": ["vector"],
+        "bottler": null,
+        "edition": null,
+        "outturn": 400,
+        "bottleId": 51829,
+        "category": "blend",
+        "fullName": "Hibiki 40-year-old",
+        "reference": "Hibiki 40-year-old, 43%",
+        "statedAge": 40,
+        "caskNumber": null,
+        "comparison": {
+          "missing": [],
+          "conflicts": ["brand"],
+          "agreements": ["category", "abv"]
+        },
+        "distillery": ["Yamazaki", "Hakushu Distillery", "Chita Distillery"],
+        "maturation": null,
+        "releaseDay": null,
+        "singleCask": null,
+        "releaseYear": 2024,
+        "vintageYear": null,
+        "bottlingYear": 2024,
+        "caskStrength": null,
+        "releaseMonth": null,
+        "familyContext": {
+          "siblingBottles": []
+        }
+      },
+      {
+        "abv": 43,
+        "brand": "Hibiki",
+        "score": 0.6876671661009134,
+        "series": null,
+        "source": ["vector"],
+        "bottler": null,
+        "edition": null,
+        "outturn": null,
+        "bottleId": 11866,
+        "category": "blend",
+        "fullName": "Hibiki 30-year-old",
+        "reference": "Hibiki 30-year-old, 43%",
+        "statedAge": 30,
+        "caskNumber": null,
+        "comparison": {
+          "missing": [],
+          "conflicts": ["brand"],
+          "agreements": ["category", "abv"]
+        },
+        "distillery": ["Yamazaki", "Hakushu Distillery", "Chita Distillery"],
+        "maturation": null,
+        "releaseDay": null,
+        "singleCask": null,
+        "releaseYear": null,
+        "vintageYear": null,
+        "bottlingYear": null,
+        "caskStrength": null,
+        "releaseMonth": null,
+        "familyContext": {
+          "siblingBottles": []
+        }
+      },
+      {
+        "abv": 43,
+        "brand": "Hibiki",
+        "score": 0.6820173468690824,
+        "series": null,
+        "source": ["vector"],
+        "bottler": null,
+        "edition": null,
+        "outturn": null,
+        "bottleId": 11863,
+        "category": "blend",
+        "fullName": "Hibiki 21-year-old",
+        "reference": "Hibiki 21-year-old, 43%",
+        "statedAge": 21,
+        "caskNumber": null,
+        "comparison": {
+          "missing": [],
+          "conflicts": ["brand"],
+          "agreements": ["category", "abv"]
+        },
+        "distillery": ["Yamazaki", "Hakushu Distillery", "Chita Distillery"],
+        "maturation": null,
+        "releaseDay": null,
+        "singleCask": null,
+        "releaseYear": null,
+        "vintageYear": null,
+        "bottlingYear": null,
+        "caskStrength": null,
+        "releaseMonth": null,
+        "familyContext": {
+          "siblingBottles": []
+        }
+      },
+      {
+        "abv": null,
+        "brand": "Suntory",
+        "score": 0.25,
+        "series": null,
+        "source": ["brand_coverage"],
+        "bottler": null,
+        "edition": null,
+        "outturn": null,
+        "bottleId": 11938,
+        "category": "blend",
+        "fullName": "Suntory Ao",
+        "reference": null,
+        "statedAge": null,
+        "caskNumber": null,
+        "comparison": {
+          "missing": ["statedAge", "abv", "releaseYear"],
+          "conflicts": [],
+          "agreements": ["category", "brand"]
+        },
+        "distillery": [],
+        "maturation": null,
+        "releaseDay": null,
+        "singleCask": null,
+        "releaseYear": null,
+        "vintageYear": null,
+        "bottlingYear": null,
+        "caskStrength": null,
+        "releaseMonth": null,
+        "familyContext": {
+          "siblingBottles": []
+        }
+      }
+    ]
+  },
+  "context": {
+    "inspectedBottleIds": [69254],
+    "bottleContexts": [
+      {
+        "exact": {
+          "abv": 43,
+          "edition": null,
+          "outturn": null,
+          "statedAge": null,
+          "caskNumber": null,
+          "maturation": null,
+          "releaseDay": null,
+          "singleCask": false,
+          "releaseYear": null,
+          "vintageYear": null,
+          "bottlingYear": null,
+          "caskStrength": null,
+          "releaseMonth": null
+        },
+        "shared": {
+          "name": "Royal",
+          "brand": {
+            "name": "Suntory",
+            "entityId": 1383
+          },
+          "series": null,
+          "bottler": null,
+          "category": "blend",
+          "statedAge": null,
+          "distillers": []
+        },
+        "groupId": 42215,
+        "bottleId": 69254,
+        "fullName": "Suntory Royal",
+        "siblings": [],
+        "references": [],
+        "observations": [],
+        "imageSources": []
+      }
+    ],
+    "inspectedEntities": [
+      {
+        "kind": "company",
+        "name": "Suntory",
+        "score": 1,
+        "source": ["exact", "text", "prefix", "contained"],
+        "entityId": 1383,
+        "reference": "Suntory",
+        "shortName": null,
+        "retrievedFor": [
+          {
+            "exact": true,
+            "query": "Suntory"
+          }
+        ]
+      },
+      {
+        "kind": "brand",
+        "name": "Calumet Farm",
+        "score": 1,
+        "source": ["exact", "text", "prefix", "contained"],
+        "entityId": 2009,
+        "reference": "Calumet Farm",
+        "shortName": "Calumet",
+        "retrievedFor": [
+          {
+            "exact": true,
+            "query": "Calumet Farm"
+          }
+        ]
+      },
+      {
+        "kind": "brand",
+        "name": "White Horse",
+        "score": 1,
+        "source": ["exact", "text", "prefix", "contained"],
+        "entityId": 1490,
+        "reference": "White Horse",
+        "shortName": null,
+        "retrievedFor": [
+          {
+            "exact": true,
+            "query": "White Horse"
+          }
+        ]
+      },
+      {
+        "kind": "brand",
+        "name": "Horse Guards",
+        "score": 1,
+        "source": ["exact", "text", "prefix", "contained"],
+        "entityId": 3058,
+        "reference": "Horse Guards",
+        "shortName": null,
+        "retrievedFor": [
+          {
+            "exact": true,
+            "query": "Horse Guards"
+          }
+        ]
+      },
+      {
+        "kind": "bottler",
+        "name": "Salisbury Blending Co Ltd",
+        "score": 1,
+        "source": ["exact", "text", "prefix", "contained"],
+        "entityId": 5822,
+        "reference": "Salisbury Blending Co Ltd",
+        "shortName": null,
+        "retrievedFor": [
+          {
+            "exact": true,
+            "query": "Salisbury Blending Co Ltd"
+          }
+        ]
+      },
+      {
+        "kind": "distillery",
+        "name": "Glen Garioch",
+        "score": 1,
+        "source": ["exact", "text", "prefix", "contained"],
+        "entityId": 261,
+        "reference": "Glen Garioch",
+        "shortName": null,
+        "retrievedFor": [
+          {
+            "exact": true,
+            "query": "Glen Garioch"
+          }
+        ]
+      },
+      {
+        "kind": "distillery",
+        "name": "Laphroaig",
+        "score": 1,
+        "source": ["exact", "text", "prefix", "contained"],
+        "entityId": 1129,
+        "reference": "Laphroaig",
+        "shortName": "",
+        "retrievedFor": [
+          {
+            "exact": true,
+            "query": "Laphroaig"
+          }
+        ]
+      },
+      {
+        "kind": "brand",
+        "name": "Toki",
+        "score": 1,
+        "source": ["exact", "text", "prefix", "contained"],
+        "entityId": 365793,
+        "reference": "Toki",
+        "shortName": null,
+        "retrievedFor": [
+          {
+            "exact": true,
+            "query": "Toki"
+          }
+        ]
+      },
+      {
+        "kind": "distillery",
+        "name": "Yamazaki",
+        "score": 1,
+        "source": ["exact", "text", "prefix", "contained"],
+        "entityId": 493,
+        "reference": "Yamazaki",
+        "shortName": "",
+        "retrievedFor": [
+          {
+            "exact": true,
+            "query": "Yamazaki"
+          }
+        ]
+      },
+      {
+        "kind": "distillery",
+        "name": "Hakushu Distillery",
+        "score": 1,
+        "source": ["exact", "text", "prefix", "contained"],
+        "entityId": 1007,
+        "reference": "Hakushu Distillery",
+        "shortName": null,
+        "retrievedFor": [
+          {
+            "exact": true,
+            "query": "Hakushu Distillery"
+          }
+        ]
+      },
+      {
+        "kind": "distillery",
+        "name": "Chita Distillery",
+        "score": 1,
+        "source": ["exact", "text", "prefix", "contained"],
+        "entityId": 1616,
+        "reference": "Chita Distillery",
+        "shortName": null,
+        "retrievedFor": [
+          {
+            "exact": true,
+            "query": "Chita Distillery"
+          }
+        ]
+      },
+      {
+        "kind": "brand",
+        "name": "Hibiki",
+        "score": 1,
+        "source": ["exact", "text", "prefix", "contained"],
+        "entityId": 1022,
+        "reference": "Hibiki",
+        "shortName": null,
+        "retrievedFor": [
+          {
+            "exact": true,
+            "query": "Hibiki"
+          }
+        ]
+      },
+      {
+        "kind": "company",
+        "name": "Suntory Global Spirits",
+        "score": 0.5,
+        "source": ["text", "prefix"],
+        "entityId": 366085,
+        "reference": "Suntory Global Spirits",
+        "shortName": null,
+        "retrievedFor": [
+          {
+            "query": "Suntory"
+          }
+        ]
+      },
+      {
+        "kind": "brand",
+        "name": "Suntory Whisky",
+        "score": 0.5,
+        "source": ["text", "prefix"],
+        "entityId": 5385,
+        "reference": "Suntory Whisky",
+        "shortName": null,
+        "retrievedFor": [
+          {
+            "query": "Suntory"
+          }
+        ]
+      },
+      {
+        "kind": "bottler",
+        "name": "White Horse Distillers",
+        "score": 0.5,
+        "source": ["text", "prefix"],
+        "entityId": 5870,
+        "reference": "White Horse Distillers",
+        "shortName": null,
+        "retrievedFor": [
+          {
+            "query": "White Horse"
+          }
+        ]
+      },
+      {
+        "kind": "brand",
+        "name": "The Essence of Suntory Whisky",
+        "score": 0.2,
+        "source": ["text"],
+        "entityId": 366628,
+        "reference": null,
+        "shortName": null,
+        "retrievedFor": [
+          {
+            "query": "Suntory"
+          }
+        ]
+      },
+      {
+        "kind": "company",
+        "name": "D. Johnston & Co. (Laphroaig) Ltd.",
+        "score": 0.2,
+        "source": ["text"],
+        "entityId": 5737,
+        "reference": null,
+        "shortName": null,
+        "retrievedFor": [
+          {
+            "query": "Laphroaig"
+          }
+        ]
+      },
+      {
+        "kind": "bottler",
+        "name": "Malt Bar, K S, The Attic and Revel Hibiki",
+        "score": 0.2,
+        "source": ["text"],
+        "entityId": 366766,
+        "reference": null,
+        "shortName": null,
+        "retrievedFor": [
+          {
+            "query": "Hibiki"
+          }
+        ]
+      }
+    ],
+    "inspectedSeries": []
+  },
+  "provenance": {
+    "source": "production_miss",
+    "verifiedSourceUrls": [
+      "https://www.scotchwhiskyauctions.com/auctions/234-the-185th-auction/905392-suntory-royal-year-of-the-horse-decanter-60cl/",
+      "https://d3suvtcq00dftb.cloudfront.net/images/fd200a7ca321c26d7f6a03cb3977c966-zoom.jpg"
+    ],
+    "dbOutcome": {
+      "bottleId": null,
+      "createsBottle": false,
+      "summary": "Production returned no_match: it treated the Year of the Horse decanter as a possibly separate release."
+    },
+    "notes": "Captured from saved classifier run 36818 (auction_lot 17971, model null, 2026-11-03T23:12:34.401Z). Production rationale: The source is a single whisky Bottle, but its title does not establish the specific Year of the Horse release. Inspected Bottle 69254 is the broader Suntory Royal expression and is not a safe match; the available evidence is insufficient to identify or create the exact release. The run predates reading Scotch Whisky Auctions lot pages (#1609), so the evidence pack adds the lot page text. Expected outcome checked against the lot page and photo on 2026-11-09, in a random sample of the 185th auction's no_match reviews."
+  },
+  "expected": {
+    "status": "classified",
+    "action": "match",
+    "identityScope": "product",
+    "matchedBottleId": 69254,
+    "proposedBottle": null,
+    "summary": "Match Suntory Royal (69254). The box reads Suntory Whisky Royal with the Year of the Horse sign, the bottle is a horse-shaped ceramic decanter, and the lot page gives 43% and 60cl, the same strength as 69254. The identity model treats a special bottle or box and its size as packaging of the same liquid, not a separate Bottle."
+  }
+}

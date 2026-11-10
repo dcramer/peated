@@ -1,0 +1,2441 @@
+{
+  "id": "auction-orcadian-12-old-man-of-hoy-blackadder-create",
+  "name": "Orcadian 12 Year Old The Old Man of Hoy by Blackadder: create cask OMH 2009-2",
+  "input": {
+    "reference": {
+      "id": 17213,
+      "url": "https://www.scotchwhiskyauctions.com/auctions/234-the-185th-auction/906585-orcadian-12-year-old-the-old-man-of-hoy-blackadder/",
+      "name": "Orcadian 12 Year Old ‘The Old Man Of Hoy’ Blackadder",
+      "imageUrl": null,
+      "externalSiteId": 28097,
+      "currentBottleId": null
+    },
+    "extractedIdentity": {
+      "abv": 43,
+      "brand": null,
+      "series": null,
+      "bottler": null,
+      "edition": null,
+      "outturn": 180,
+      "category": null,
+      "distillery": null,
+      "expression": null,
+      "maturation": null,
+      "stated_age": null,
+      "cask_number": null,
+      "single_cask": null,
+      "release_year": null,
+      "vintage_year": null,
+      "cask_strength": null
+    },
+    "extractedIdentitySource": "structured",
+    "imageEvidence": null,
+    "initialCandidates": [
+      {
+        "abv": null,
+        "brand": "Highland Park",
+        "score": 81.14598,
+        "series": null,
+        "source": ["vector", "text"],
+        "bottler": null,
+        "edition": "2001 Vintage",
+        "outturn": null,
+        "bottleId": 44926,
+        "category": "single_malt",
+        "fullName": "Highland Park Single Cask Series - 2001 Vintage",
+        "reference": "Highland Park Single Cask Series - 2001 Vintage - 18-year-old - 2001 Vintage - Single Cask",
+        "statedAge": 18,
+        "caskNumber": null,
+        "comparison": {
+          "missing": [
+            "abv",
+            "releaseYear",
+            "caskStrength",
+            "caskNumber",
+            "bottler"
+          ],
+          "conflicts": ["statedAge", "brand"],
+          "agreements": ["category", "singleCask", "distillers"]
+        },
+        "distillery": ["Highland Park"],
+        "maturation": null,
+        "releaseDay": null,
+        "singleCask": true,
+        "releaseYear": null,
+        "vintageYear": 2001,
+        "bottlingYear": null,
+        "caskStrength": null,
+        "releaseMonth": null,
+        "familyContext": {
+          "siblingBottles": [
+            {
+              "abv": null,
+              "edition": null,
+              "outturn": null,
+              "bottleId": 44928,
+              "fullName": "Highland Park Single Cask Series",
+              "statedAge": 15,
+              "caskNumber": null,
+              "maturation": null,
+              "releaseDay": null,
+              "singleCask": null,
+              "releaseYear": null,
+              "traitFields": ["statedAge"],
+              "vintageYear": null,
+              "bottlingYear": null,
+              "caskStrength": null,
+              "releaseMonth": null
+            },
+            {
+              "abv": null,
+              "edition": null,
+              "outturn": null,
+              "bottleId": 44011,
+              "fullName": "Highland Park Single Cask Series",
+              "statedAge": null,
+              "caskNumber": null,
+              "maturation": null,
+              "releaseDay": null,
+              "singleCask": null,
+              "releaseYear": null,
+              "traitFields": [],
+              "vintageYear": null,
+              "bottlingYear": null,
+              "caskStrength": null,
+              "releaseMonth": null
+            },
+            {
+              "abv": null,
+              "edition": "2003 Vintage",
+              "outturn": null,
+              "bottleId": 44927,
+              "fullName": "Highland Park Single Cask Series - 2003 Vintage",
+              "statedAge": 17,
+              "caskNumber": null,
+              "maturation": null,
+              "releaseDay": null,
+              "singleCask": true,
+              "releaseYear": null,
+              "traitFields": [
+                "edition",
+                "statedAge",
+                "vintageYear",
+                "singleCask"
+              ],
+              "vintageYear": 2003,
+              "bottlingYear": null,
+              "caskStrength": null,
+              "releaseMonth": null
+            },
+            {
+              "abv": null,
+              "edition": "2004 Vintage",
+              "outturn": null,
+              "bottleId": 44921,
+              "fullName": "Highland Park Single Cask Series - 2004 Vintage",
+              "statedAge": 16,
+              "caskNumber": null,
+              "maturation": null,
+              "releaseDay": null,
+              "singleCask": true,
+              "releaseYear": null,
+              "traitFields": [
+                "edition",
+                "statedAge",
+                "vintageYear",
+                "singleCask"
+              ],
+              "vintageYear": 2004,
+              "bottlingYear": null,
+              "caskStrength": null,
+              "releaseMonth": null
+            },
+            {
+              "abv": null,
+              "edition": "2005 Vintage",
+              "outturn": null,
+              "bottleId": 44920,
+              "fullName": "Highland Park Single Cask Series - 2005 Vintage",
+              "statedAge": 15,
+              "caskNumber": null,
+              "maturation": null,
+              "releaseDay": null,
+              "singleCask": true,
+              "releaseYear": null,
+              "traitFields": [
+                "edition",
+                "statedAge",
+                "vintageYear",
+                "singleCask"
+              ],
+              "vintageYear": 2005,
+              "bottlingYear": null,
+              "caskStrength": null,
+              "releaseMonth": null
+            },
+            {
+              "abv": null,
+              "edition": "2006 Vintage",
+              "outturn": null,
+              "bottleId": 44922,
+              "fullName": "Highland Park Single Cask Series - 2006 Vintage",
+              "statedAge": 14,
+              "caskNumber": null,
+              "maturation": null,
+              "releaseDay": null,
+              "singleCask": true,
+              "releaseYear": null,
+              "traitFields": [
+                "edition",
+                "statedAge",
+                "vintageYear",
+                "singleCask"
+              ],
+              "vintageYear": 2006,
+              "bottlingYear": null,
+              "caskStrength": null,
+              "releaseMonth": null
+            },
+            {
+              "abv": null,
+              "edition": "2007 Vintage",
+              "outturn": null,
+              "bottleId": 44924,
+              "fullName": "Highland Park Single Cask Series - 2007 Vintage",
+              "statedAge": 13,
+              "caskNumber": null,
+              "maturation": null,
+              "releaseDay": null,
+              "singleCask": true,
+              "releaseYear": null,
+              "traitFields": [
+                "edition",
+                "statedAge",
+                "vintageYear",
+                "singleCask"
+              ],
+              "vintageYear": 2007,
+              "bottlingYear": null,
+              "caskStrength": null,
+              "releaseMonth": null
+            },
+            {
+              "abv": null,
+              "edition": "2008 Vintage",
+              "outturn": null,
+              "bottleId": 44923,
+              "fullName": "Highland Park Single Cask Series - 2008 Vintage",
+              "statedAge": 12,
+              "caskNumber": null,
+              "maturation": null,
+              "releaseDay": null,
+              "singleCask": true,
+              "releaseYear": null,
+              "traitFields": [
+                "edition",
+                "statedAge",
+                "vintageYear",
+                "singleCask"
+              ],
+              "vintageYear": 2008,
+              "bottlingYear": null,
+              "caskStrength": null,
+              "releaseMonth": null
+            }
+          ]
+        }
+      },
+      {
+        "abv": 40,
+        "brand": "Highland Park",
+        "score": 66.000854,
+        "series": null,
+        "source": ["text"],
+        "bottler": null,
+        "edition": null,
+        "outturn": null,
+        "bottleId": 1158,
+        "category": "single_malt",
+        "fullName": "Highland Park 12-year-old",
+        "reference": null,
+        "statedAge": 12,
+        "caskNumber": null,
+        "comparison": {
+          "missing": [
+            "releaseYear",
+            "caskStrength",
+            "singleCask",
+            "caskNumber",
+            "bottler"
+          ],
+          "conflicts": ["abv", "brand"],
+          "agreements": ["category", "statedAge", "distillers"]
+        },
+        "distillery": ["Highland Park"],
+        "maturation": null,
+        "releaseDay": null,
+        "singleCask": null,
+        "releaseYear": null,
+        "vintageYear": null,
+        "bottlingYear": null,
+        "caskStrength": null,
+        "releaseMonth": null,
+        "familyContext": {
+          "siblingBottles": []
+        }
+      },
+      {
+        "abv": null,
+        "brand": "The Glenrothes",
+        "score": 60.468296,
+        "series": null,
+        "source": ["text"],
+        "bottler": null,
+        "edition": null,
+        "outturn": null,
+        "bottleId": 791,
+        "category": "single_malt",
+        "fullName": "The Glenrothes 2001",
+        "reference": null,
+        "statedAge": 12,
+        "caskNumber": null,
+        "comparison": {
+          "missing": [
+            "abv",
+            "releaseYear",
+            "caskStrength",
+            "singleCask",
+            "caskNumber",
+            "bottler"
+          ],
+          "conflicts": ["brand", "distillers"],
+          "agreements": ["category", "statedAge"]
+        },
+        "distillery": ["The Glenrothes"],
+        "maturation": null,
+        "releaseDay": null,
+        "singleCask": null,
+        "releaseYear": null,
+        "vintageYear": null,
+        "bottlingYear": null,
+        "caskStrength": null,
+        "releaseMonth": null,
+        "familyContext": {
+          "siblingBottles": []
+        }
+      },
+      {
+        "abv": 58.1,
+        "brand": "Gordon & MacPhail",
+        "score": 58.02952,
+        "series": null,
+        "source": ["text"],
+        "bottler": "Gordon & MacPhail",
+        "edition": null,
+        "outturn": null,
+        "bottleId": 65798,
+        "category": "single_malt",
+        "fullName": "Gordon & MacPhail Highland Park 1992",
+        "reference": null,
+        "statedAge": 12,
+        "caskNumber": null,
+        "comparison": {
+          "missing": [
+            "releaseYear",
+            "caskStrength",
+            "singleCask",
+            "caskNumber"
+          ],
+          "conflicts": ["abv", "brand", "bottler"],
+          "agreements": ["category", "statedAge", "distillers"]
+        },
+        "distillery": ["Highland Park"],
+        "maturation": null,
+        "releaseDay": null,
+        "singleCask": null,
+        "releaseYear": null,
+        "vintageYear": 1992,
+        "bottlingYear": null,
+        "caskStrength": null,
+        "releaseMonth": null,
+        "familyContext": {
+          "siblingBottles": []
+        }
+      },
+      {
+        "abv": null,
+        "brand": "Blackadder",
+        "score": 56.977104,
+        "series": null,
+        "source": ["vector", "text", "brand_coverage", "context"],
+        "bottler": null,
+        "edition": null,
+        "outturn": null,
+        "bottleId": 19147,
+        "category": "single_malt",
+        "fullName": "Blackadder 12-year-old 1988 (distilled at Laphroaig)",
+        "reference": "Blackadder 12-year-old (distilled at Laphroaig) 1988, 45%",
+        "statedAge": 12,
+        "caskNumber": null,
+        "comparison": {
+          "missing": ["abv"],
+          "conflicts": [],
+          "agreements": []
+        },
+        "distillery": [],
+        "maturation": null,
+        "releaseDay": null,
+        "singleCask": null,
+        "releaseYear": null,
+        "vintageYear": null,
+        "bottlingYear": null,
+        "caskStrength": null,
+        "releaseMonth": null,
+        "familyContext": {
+          "siblingBottles": []
+        }
+      },
+      {
+        "abv": 43,
+        "brand": "Ardbeg",
+        "score": 55.999973,
+        "series": null,
+        "source": ["text"],
+        "bottler": null,
+        "edition": "2001 Release",
+        "outturn": null,
+        "bottleId": 53545,
+        "category": "single_malt",
+        "fullName": "Ardbeg 1975 - 2001 Release",
+        "reference": null,
+        "statedAge": 26,
+        "caskNumber": null,
+        "comparison": {
+          "missing": ["caskStrength", "singleCask", "caskNumber", "bottler"],
+          "conflicts": ["statedAge", "brand", "distillers"],
+          "agreements": ["category", "abv", "releaseYear"]
+        },
+        "distillery": ["Ardbeg"],
+        "maturation": null,
+        "releaseDay": null,
+        "singleCask": null,
+        "releaseYear": 2001,
+        "vintageYear": 1975,
+        "bottlingYear": 2001,
+        "caskStrength": null,
+        "releaseMonth": null,
+        "familyContext": {
+          "siblingBottles": []
+        }
+      },
+      {
+        "abv": 46,
+        "brand": "The Quiet Man",
+        "score": 55.35826,
+        "series": null,
+        "source": ["text"],
+        "bottler": null,
+        "edition": null,
+        "outturn": null,
+        "bottleId": 62012,
+        "category": "single_malt",
+        "fullName": "The Quiet Man 12-year-old An Culchiste",
+        "reference": null,
+        "statedAge": 12,
+        "caskNumber": null,
+        "comparison": {
+          "missing": [
+            "releaseYear",
+            "caskStrength",
+            "singleCask",
+            "caskNumber",
+            "bottler",
+            "distillers"
+          ],
+          "conflicts": ["abv", "brand"],
+          "agreements": ["category", "statedAge"]
+        },
+        "distillery": [],
+        "maturation": null,
+        "releaseDay": null,
+        "singleCask": null,
+        "releaseYear": null,
+        "vintageYear": null,
+        "bottlingYear": null,
+        "caskStrength": null,
+        "releaseMonth": null,
+        "familyContext": {
+          "siblingBottles": []
+        }
+      },
+      {
+        "abv": 43,
+        "brand": "Glenfarclas",
+        "score": 55.00994,
+        "series": null,
+        "source": ["text"],
+        "bottler": null,
+        "edition": null,
+        "outturn": null,
+        "bottleId": 45438,
+        "category": "single_malt",
+        "fullName": "Glenfarclas 12-year-old",
+        "reference": null,
+        "statedAge": 12,
+        "caskNumber": null,
+        "comparison": {
+          "missing": [],
+          "conflicts": [],
+          "agreements": ["abv"]
+        },
+        "distillery": ["Glenfarclas"],
+        "maturation": null,
+        "releaseDay": null,
+        "singleCask": null,
+        "releaseYear": null,
+        "vintageYear": null,
+        "bottlingYear": null,
+        "caskStrength": null,
+        "releaseMonth": null,
+        "familyContext": {
+          "siblingBottles": []
+        }
+      },
+      {
+        "abv": null,
+        "brand": "Highland Park",
+        "score": 53.61174,
+        "series": null,
+        "source": ["text", "vector"],
+        "bottler": null,
+        "edition": "2008 Vintage",
+        "outturn": null,
+        "bottleId": 44923,
+        "category": "single_malt",
+        "fullName": "Highland Park Single Cask Series - 2008 Vintage",
+        "reference": "Highland Park Single Cask Series - 2008 Vintage - 12-year-old - 2008 Vintage",
+        "statedAge": 12,
+        "caskNumber": null,
+        "comparison": {
+          "missing": ["abv", "caskStrength", "bottler"],
+          "conflicts": ["brand"],
+          "agreements": ["category", "statedAge", "distillers"]
+        },
+        "distillery": ["Highland Park"],
+        "maturation": null,
+        "releaseDay": null,
+        "singleCask": true,
+        "releaseYear": null,
+        "vintageYear": 2008,
+        "bottlingYear": null,
+        "caskStrength": null,
+        "releaseMonth": null,
+        "familyContext": {
+          "siblingBottles": [
+            {
+              "abv": null,
+              "edition": null,
+              "outturn": null,
+              "bottleId": 44928,
+              "fullName": "Highland Park Single Cask Series",
+              "statedAge": 15,
+              "caskNumber": null,
+              "maturation": null,
+              "releaseDay": null,
+              "singleCask": null,
+              "releaseYear": null,
+              "traitFields": ["statedAge"],
+              "vintageYear": null,
+              "bottlingYear": null,
+              "caskStrength": null,
+              "releaseMonth": null
+            },
+            {
+              "abv": null,
+              "edition": null,
+              "outturn": null,
+              "bottleId": 44011,
+              "fullName": "Highland Park Single Cask Series",
+              "statedAge": null,
+              "caskNumber": null,
+              "maturation": null,
+              "releaseDay": null,
+              "singleCask": null,
+              "releaseYear": null,
+              "traitFields": [],
+              "vintageYear": null,
+              "bottlingYear": null,
+              "caskStrength": null,
+              "releaseMonth": null
+            },
+            {
+              "abv": null,
+              "edition": "2001 Vintage",
+              "outturn": null,
+              "bottleId": 44926,
+              "fullName": "Highland Park Single Cask Series - 2001 Vintage",
+              "statedAge": 18,
+              "caskNumber": null,
+              "maturation": null,
+              "releaseDay": null,
+              "singleCask": true,
+              "releaseYear": null,
+              "traitFields": [
+                "edition",
+                "statedAge",
+                "vintageYear",
+                "singleCask"
+              ],
+              "vintageYear": 2001,
+              "bottlingYear": null,
+              "caskStrength": null,
+              "releaseMonth": null
+            },
+            {
+              "abv": null,
+              "edition": "2003 Vintage",
+              "outturn": null,
+              "bottleId": 44927,
+              "fullName": "Highland Park Single Cask Series - 2003 Vintage",
+              "statedAge": 17,
+              "caskNumber": null,
+              "maturation": null,
+              "releaseDay": null,
+              "singleCask": true,
+              "releaseYear": null,
+              "traitFields": [
+                "edition",
+                "statedAge",
+                "vintageYear",
+                "singleCask"
+              ],
+              "vintageYear": 2003,
+              "bottlingYear": null,
+              "caskStrength": null,
+              "releaseMonth": null
+            },
+            {
+              "abv": null,
+              "edition": "2004 Vintage",
+              "outturn": null,
+              "bottleId": 44921,
+              "fullName": "Highland Park Single Cask Series - 2004 Vintage",
+              "statedAge": 16,
+              "caskNumber": null,
+              "maturation": null,
+              "releaseDay": null,
+              "singleCask": true,
+              "releaseYear": null,
+              "traitFields": [
+                "edition",
+                "statedAge",
+                "vintageYear",
+                "singleCask"
+              ],
+              "vintageYear": 2004,
+              "bottlingYear": null,
+              "caskStrength": null,
+              "releaseMonth": null
+            },
+            {
+              "abv": null,
+              "edition": "2005 Vintage",
+              "outturn": null,
+              "bottleId": 44920,
+              "fullName": "Highland Park Single Cask Series - 2005 Vintage",
+              "statedAge": 15,
+              "caskNumber": null,
+              "maturation": null,
+              "releaseDay": null,
+              "singleCask": true,
+              "releaseYear": null,
+              "traitFields": [
+                "edition",
+                "statedAge",
+                "vintageYear",
+                "singleCask"
+              ],
+              "vintageYear": 2005,
+              "bottlingYear": null,
+              "caskStrength": null,
+              "releaseMonth": null
+            },
+            {
+              "abv": null,
+              "edition": "2006 Vintage",
+              "outturn": null,
+              "bottleId": 44922,
+              "fullName": "Highland Park Single Cask Series - 2006 Vintage",
+              "statedAge": 14,
+              "caskNumber": null,
+              "maturation": null,
+              "releaseDay": null,
+              "singleCask": true,
+              "releaseYear": null,
+              "traitFields": [
+                "edition",
+                "statedAge",
+                "vintageYear",
+                "singleCask"
+              ],
+              "vintageYear": 2006,
+              "bottlingYear": null,
+              "caskStrength": null,
+              "releaseMonth": null
+            },
+            {
+              "abv": null,
+              "edition": "2007 Vintage",
+              "outturn": null,
+              "bottleId": 44924,
+              "fullName": "Highland Park Single Cask Series - 2007 Vintage",
+              "statedAge": 13,
+              "caskNumber": null,
+              "maturation": null,
+              "releaseDay": null,
+              "singleCask": true,
+              "releaseYear": null,
+              "traitFields": [
+                "edition",
+                "statedAge",
+                "vintageYear",
+                "singleCask"
+              ],
+              "vintageYear": 2007,
+              "bottlingYear": null,
+              "caskStrength": null,
+              "releaseMonth": null
+            }
+          ]
+        }
+      },
+      {
+        "abv": null,
+        "brand": "anCnoc",
+        "score": 53.499184,
+        "series": null,
+        "source": ["text"],
+        "bottler": null,
+        "edition": null,
+        "outturn": null,
+        "bottleId": 13465,
+        "category": "single_malt",
+        "fullName": "anCnoc 2001",
+        "reference": null,
+        "statedAge": 15,
+        "caskNumber": null,
+        "comparison": {
+          "missing": [
+            "abv",
+            "releaseYear",
+            "caskStrength",
+            "singleCask",
+            "caskNumber",
+            "bottler"
+          ],
+          "conflicts": ["statedAge", "brand", "distillers"],
+          "agreements": ["category"]
+        },
+        "distillery": ["anCnoc"],
+        "maturation": null,
+        "releaseDay": null,
+        "singleCask": null,
+        "releaseYear": null,
+        "vintageYear": 2001,
+        "bottlingYear": null,
+        "caskStrength": null,
+        "releaseMonth": null,
+        "familyContext": {
+          "siblingBottles": []
+        }
+      },
+      {
+        "abv": null,
+        "brand": "Balblair",
+        "score": 53.231445,
+        "series": null,
+        "source": ["text"],
+        "bottler": null,
+        "edition": null,
+        "outturn": null,
+        "bottleId": 17182,
+        "category": "single_malt",
+        "fullName": "Balblair 2001",
+        "reference": null,
+        "statedAge": null,
+        "caskNumber": null,
+        "comparison": {
+          "missing": [
+            "statedAge",
+            "abv",
+            "releaseYear",
+            "caskStrength",
+            "singleCask",
+            "caskNumber",
+            "bottler"
+          ],
+          "conflicts": ["brand", "distillers"],
+          "agreements": ["category"]
+        },
+        "distillery": ["Balblair"],
+        "maturation": null,
+        "releaseDay": null,
+        "singleCask": null,
+        "releaseYear": null,
+        "vintageYear": null,
+        "bottlingYear": null,
+        "caskStrength": null,
+        "releaseMonth": null,
+        "familyContext": {
+          "siblingBottles": []
+        }
+      },
+      {
+        "abv": 43,
+        "brand": "Lagavulin",
+        "score": 52.606895,
+        "series": "Distillers Edition",
+        "source": ["text"],
+        "bottler": null,
+        "edition": "2001 Release",
+        "outturn": null,
+        "bottleId": 53270,
+        "category": "single_malt",
+        "fullName": "Lagavulin Distillers Edition - 2001 Release",
+        "reference": null,
+        "statedAge": null,
+        "caskNumber": null,
+        "comparison": {
+          "missing": ["statedAge", "caskNumber", "bottler"],
+          "conflicts": ["singleCask", "brand", "distillers"],
+          "agreements": ["category", "abv", "releaseYear", "caskStrength"]
+        },
+        "distillery": ["Lagavulin"],
+        "maturation": "Pedro Ximénez-seasoned cask finish",
+        "releaseDay": null,
+        "singleCask": false,
+        "releaseYear": 2001,
+        "vintageYear": 1984,
+        "bottlingYear": 2001,
+        "caskStrength": false,
+        "releaseMonth": null,
+        "familyContext": {
+          "siblingBottles": []
+        }
+      },
+      {
+        "abv": 43,
+        "brand": "Islay Mist",
+        "score": 52.54256,
+        "series": null,
+        "source": ["text"],
+        "bottler": null,
+        "edition": null,
+        "outturn": null,
+        "bottleId": 17646,
+        "category": "blend",
+        "fullName": "Islay Mist 12-year-old - 43.0% ABV",
+        "reference": null,
+        "statedAge": 12,
+        "caskNumber": null,
+        "comparison": {
+          "missing": [],
+          "conflicts": [],
+          "agreements": ["abv"]
+        },
+        "distillery": [],
+        "maturation": null,
+        "releaseDay": null,
+        "singleCask": null,
+        "releaseYear": null,
+        "vintageYear": null,
+        "bottlingYear": null,
+        "caskStrength": null,
+        "releaseMonth": null,
+        "familyContext": {
+          "siblingBottles": []
+        }
+      },
+      {
+        "abv": 46,
+        "brand": "The Quiet Man",
+        "score": 52.152138,
+        "series": null,
+        "source": ["text"],
+        "bottler": null,
+        "edition": null,
+        "outturn": null,
+        "bottleId": 45604,
+        "category": "single_malt",
+        "fullName": "The Quiet Man Bordeaux Cask Finish - 12-year-old - 46.0% ABV - Bordeaux Cask",
+        "reference": null,
+        "statedAge": 12,
+        "caskNumber": null,
+        "comparison": {
+          "missing": [
+            "releaseYear",
+            "caskStrength",
+            "singleCask",
+            "caskNumber",
+            "bottler",
+            "distillers"
+          ],
+          "conflicts": ["abv", "brand"],
+          "agreements": ["category", "statedAge"]
+        },
+        "distillery": [],
+        "maturation": "bordeaux",
+        "releaseDay": null,
+        "singleCask": null,
+        "releaseYear": null,
+        "vintageYear": null,
+        "bottlingYear": null,
+        "caskStrength": null,
+        "releaseMonth": null,
+        "familyContext": {
+          "siblingBottles": []
+        }
+      },
+      {
+        "abv": null,
+        "brand": "Blackadder",
+        "score": 51.90629,
+        "series": null,
+        "source": ["vector", "text"],
+        "bottler": null,
+        "edition": null,
+        "outturn": null,
+        "bottleId": 12923,
+        "category": "single_malt",
+        "fullName": "Blackadder Raw Cask 12-year-old 2009 (Distilled at Blair Athol)",
+        "reference": "Blackadder Raw Cask 12-year-old 2009 (Distilled at Blair Athol), 59.1%",
+        "statedAge": 12,
+        "caskNumber": null,
+        "comparison": {
+          "missing": ["abv", "caskStrength", "bottler", "distillers"],
+          "conflicts": [],
+          "agreements": ["category", "statedAge", "brand"]
+        },
+        "distillery": [],
+        "maturation": null,
+        "releaseDay": null,
+        "singleCask": null,
+        "releaseYear": null,
+        "vintageYear": null,
+        "bottlingYear": null,
+        "caskStrength": null,
+        "releaseMonth": null,
+        "familyContext": {
+          "siblingBottles": []
+        }
+      },
+      {
+        "abv": 58.4,
+        "brand": "The Exclusive Malts",
+        "score": 51.776306,
+        "series": null,
+        "source": ["text"],
+        "bottler": "Creative Whisky Company",
+        "edition": null,
+        "outturn": null,
+        "bottleId": 65363,
+        "category": "single_malt",
+        "fullName": "The Exclusive Malts Bowmore 2001",
+        "reference": null,
+        "statedAge": 12,
+        "caskNumber": null,
+        "comparison": {
+          "missing": [
+            "releaseYear",
+            "caskStrength",
+            "singleCask",
+            "caskNumber"
+          ],
+          "conflicts": ["abv", "brand", "bottler", "distillers"],
+          "agreements": ["category", "statedAge"]
+        },
+        "distillery": ["Bowmore"],
+        "maturation": null,
+        "releaseDay": null,
+        "singleCask": null,
+        "releaseYear": null,
+        "vintageYear": 2001,
+        "bottlingYear": null,
+        "caskStrength": null,
+        "releaseMonth": null,
+        "familyContext": {
+          "siblingBottles": []
+        }
+      },
+      {
+        "abv": 43,
+        "brand": "Aberlour",
+        "score": 51.188187,
+        "series": null,
+        "source": ["text"],
+        "bottler": null,
+        "edition": null,
+        "outturn": null,
+        "bottleId": 66763,
+        "category": "single_malt",
+        "fullName": "Aberlour 2001 White Oak",
+        "reference": null,
+        "statedAge": null,
+        "caskNumber": null,
+        "comparison": {
+          "missing": [
+            "statedAge",
+            "releaseYear",
+            "caskStrength",
+            "singleCask",
+            "caskNumber",
+            "bottler"
+          ],
+          "conflicts": ["brand", "distillers"],
+          "agreements": ["category", "abv"]
+        },
+        "distillery": ["Aberlour"],
+        "maturation": null,
+        "releaseDay": null,
+        "singleCask": null,
+        "releaseYear": null,
+        "vintageYear": 2001,
+        "bottlingYear": 2012,
+        "caskStrength": null,
+        "releaseMonth": null,
+        "familyContext": {
+          "siblingBottles": []
+        }
+      },
+      {
+        "abv": null,
+        "brand": "Ledaig",
+        "score": 50.21818,
+        "series": null,
+        "source": ["text"],
+        "bottler": "Blackadder",
+        "edition": null,
+        "outturn": null,
+        "bottleId": 2532,
+        "category": "single_malt",
+        "fullName": "Ledaig 2001 BA Raw Cask",
+        "reference": null,
+        "statedAge": 17,
+        "caskNumber": null,
+        "comparison": {
+          "missing": [
+            "abv",
+            "releaseYear",
+            "caskStrength",
+            "singleCask",
+            "caskNumber",
+            "distillers"
+          ],
+          "conflicts": ["statedAge", "brand"],
+          "agreements": ["category", "bottler"]
+        },
+        "distillery": [],
+        "maturation": null,
+        "releaseDay": null,
+        "singleCask": null,
+        "releaseYear": null,
+        "vintageYear": null,
+        "bottlingYear": null,
+        "caskStrength": null,
+        "releaseMonth": null,
+        "familyContext": {
+          "siblingBottles": []
+        }
+      },
+      {
+        "abv": null,
+        "brand": "Bowmore",
+        "score": 50.21818,
+        "series": null,
+        "source": ["text"],
+        "bottler": "Blackadder",
+        "edition": null,
+        "outturn": null,
+        "bottleId": 3986,
+        "category": "single_malt",
+        "fullName": "Bowmore 2001 BA Raw Cask",
+        "reference": null,
+        "statedAge": 19,
+        "caskNumber": null,
+        "comparison": {
+          "missing": [
+            "abv",
+            "releaseYear",
+            "caskStrength",
+            "singleCask",
+            "caskNumber"
+          ],
+          "conflicts": ["statedAge", "brand", "distillers"],
+          "agreements": ["category", "bottler"]
+        },
+        "distillery": ["Bowmore"],
+        "maturation": null,
+        "releaseDay": null,
+        "singleCask": null,
+        "releaseYear": null,
+        "vintageYear": null,
+        "bottlingYear": null,
+        "caskStrength": null,
+        "releaseMonth": null,
+        "familyContext": {
+          "siblingBottles": []
+        }
+      },
+      {
+        "abv": 43,
+        "brand": "Isle of Skye",
+        "score": 50.10675,
+        "series": null,
+        "source": ["text"],
+        "bottler": "Ian Macleod Distillers",
+        "edition": null,
+        "outturn": null,
+        "bottleId": 45693,
+        "category": "blend",
+        "fullName": "Isle of Skye 12-year-old - 43.0% ABV",
+        "reference": null,
+        "statedAge": 12,
+        "caskNumber": null,
+        "comparison": {
+          "missing": [],
+          "conflicts": [],
+          "agreements": ["abv"]
+        },
+        "distillery": [],
+        "maturation": null,
+        "releaseDay": null,
+        "singleCask": null,
+        "releaseYear": null,
+        "vintageYear": null,
+        "bottlingYear": null,
+        "caskStrength": null,
+        "releaseMonth": null,
+        "familyContext": {
+          "siblingBottles": []
+        }
+      },
+      {
+        "abv": null,
+        "brand": "Springbank",
+        "score": 48.990314,
+        "series": null,
+        "source": ["text"],
+        "bottler": null,
+        "edition": null,
+        "outturn": null,
+        "bottleId": 4956,
+        "category": "single_malt",
+        "fullName": "Springbank 2001 Vintage (Batch 1)",
+        "reference": null,
+        "statedAge": 20,
+        "caskNumber": null,
+        "comparison": {
+          "missing": [
+            "abv",
+            "releaseYear",
+            "caskStrength",
+            "singleCask",
+            "caskNumber",
+            "bottler"
+          ],
+          "conflicts": ["statedAge", "brand", "distillers"],
+          "agreements": ["category"]
+        },
+        "distillery": ["Springbank"],
+        "maturation": null,
+        "releaseDay": null,
+        "singleCask": null,
+        "releaseYear": null,
+        "vintageYear": 2001,
+        "bottlingYear": null,
+        "caskStrength": null,
+        "releaseMonth": null,
+        "familyContext": {
+          "siblingBottles": []
+        }
+      },
+      {
+        "abv": null,
+        "brand": "Highland Park",
+        "score": 48.656418,
+        "series": null,
+        "source": ["vector", "text"],
+        "bottler": null,
+        "edition": null,
+        "outturn": null,
+        "bottleId": 44011,
+        "category": "single_malt",
+        "fullName": "Highland Park Single Cask Series",
+        "reference": "Highland Park 2001 Single Cask Series",
+        "statedAge": null,
+        "caskNumber": null,
+        "comparison": {
+          "missing": [
+            "statedAge",
+            "abv",
+            "releaseYear",
+            "caskStrength",
+            "singleCask",
+            "caskNumber",
+            "bottler"
+          ],
+          "conflicts": ["brand"],
+          "agreements": ["category", "distillers"]
+        },
+        "distillery": ["Highland Park"],
+        "maturation": null,
+        "releaseDay": null,
+        "singleCask": null,
+        "releaseYear": null,
+        "vintageYear": null,
+        "bottlingYear": null,
+        "caskStrength": null,
+        "releaseMonth": null,
+        "familyContext": {
+          "siblingBottles": [
+            {
+              "abv": null,
+              "edition": null,
+              "outturn": null,
+              "bottleId": 44928,
+              "fullName": "Highland Park Single Cask Series",
+              "statedAge": 15,
+              "caskNumber": null,
+              "maturation": null,
+              "releaseDay": null,
+              "singleCask": null,
+              "releaseYear": null,
+              "traitFields": ["statedAge"],
+              "vintageYear": null,
+              "bottlingYear": null,
+              "caskStrength": null,
+              "releaseMonth": null
+            },
+            {
+              "abv": null,
+              "edition": "2001 Vintage",
+              "outturn": null,
+              "bottleId": 44926,
+              "fullName": "Highland Park Single Cask Series - 2001 Vintage",
+              "statedAge": 18,
+              "caskNumber": null,
+              "maturation": null,
+              "releaseDay": null,
+              "singleCask": true,
+              "releaseYear": null,
+              "traitFields": [
+                "edition",
+                "statedAge",
+                "vintageYear",
+                "singleCask"
+              ],
+              "vintageYear": 2001,
+              "bottlingYear": null,
+              "caskStrength": null,
+              "releaseMonth": null
+            },
+            {
+              "abv": null,
+              "edition": "2003 Vintage",
+              "outturn": null,
+              "bottleId": 44927,
+              "fullName": "Highland Park Single Cask Series - 2003 Vintage",
+              "statedAge": 17,
+              "caskNumber": null,
+              "maturation": null,
+              "releaseDay": null,
+              "singleCask": true,
+              "releaseYear": null,
+              "traitFields": [
+                "edition",
+                "statedAge",
+                "vintageYear",
+                "singleCask"
+              ],
+              "vintageYear": 2003,
+              "bottlingYear": null,
+              "caskStrength": null,
+              "releaseMonth": null
+            },
+            {
+              "abv": null,
+              "edition": "2004 Vintage",
+              "outturn": null,
+              "bottleId": 44921,
+              "fullName": "Highland Park Single Cask Series - 2004 Vintage",
+              "statedAge": 16,
+              "caskNumber": null,
+              "maturation": null,
+              "releaseDay": null,
+              "singleCask": true,
+              "releaseYear": null,
+              "traitFields": [
+                "edition",
+                "statedAge",
+                "vintageYear",
+                "singleCask"
+              ],
+              "vintageYear": 2004,
+              "bottlingYear": null,
+              "caskStrength": null,
+              "releaseMonth": null
+            },
+            {
+              "abv": null,
+              "edition": "2005 Vintage",
+              "outturn": null,
+              "bottleId": 44920,
+              "fullName": "Highland Park Single Cask Series - 2005 Vintage",
+              "statedAge": 15,
+              "caskNumber": null,
+              "maturation": null,
+              "releaseDay": null,
+              "singleCask": true,
+              "releaseYear": null,
+              "traitFields": [
+                "edition",
+                "statedAge",
+                "vintageYear",
+                "singleCask"
+              ],
+              "vintageYear": 2005,
+              "bottlingYear": null,
+              "caskStrength": null,
+              "releaseMonth": null
+            },
+            {
+              "abv": null,
+              "edition": "2006 Vintage",
+              "outturn": null,
+              "bottleId": 44922,
+              "fullName": "Highland Park Single Cask Series - 2006 Vintage",
+              "statedAge": 14,
+              "caskNumber": null,
+              "maturation": null,
+              "releaseDay": null,
+              "singleCask": true,
+              "releaseYear": null,
+              "traitFields": [
+                "edition",
+                "statedAge",
+                "vintageYear",
+                "singleCask"
+              ],
+              "vintageYear": 2006,
+              "bottlingYear": null,
+              "caskStrength": null,
+              "releaseMonth": null
+            },
+            {
+              "abv": null,
+              "edition": "2007 Vintage",
+              "outturn": null,
+              "bottleId": 44924,
+              "fullName": "Highland Park Single Cask Series - 2007 Vintage",
+              "statedAge": 13,
+              "caskNumber": null,
+              "maturation": null,
+              "releaseDay": null,
+              "singleCask": true,
+              "releaseYear": null,
+              "traitFields": [
+                "edition",
+                "statedAge",
+                "vintageYear",
+                "singleCask"
+              ],
+              "vintageYear": 2007,
+              "bottlingYear": null,
+              "caskStrength": null,
+              "releaseMonth": null
+            },
+            {
+              "abv": null,
+              "edition": "2008 Vintage",
+              "outturn": null,
+              "bottleId": 44923,
+              "fullName": "Highland Park Single Cask Series - 2008 Vintage",
+              "statedAge": 12,
+              "caskNumber": null,
+              "maturation": null,
+              "releaseDay": null,
+              "singleCask": true,
+              "releaseYear": null,
+              "traitFields": [
+                "edition",
+                "statedAge",
+                "vintageYear",
+                "singleCask"
+              ],
+              "vintageYear": 2008,
+              "bottlingYear": null,
+              "caskStrength": null,
+              "releaseMonth": null
+            }
+          ]
+        }
+      },
+      {
+        "abv": 43,
+        "brand": "Michel Couvreur",
+        "score": 48.310635,
+        "series": null,
+        "source": ["text"],
+        "bottler": "Michel Couvreur",
+        "edition": null,
+        "outturn": null,
+        "bottleId": 669,
+        "category": "blend",
+        "fullName": "Michel Couvreur Overaged Malt Whisky 12-year-old - 43.0% ABV",
+        "reference": null,
+        "statedAge": 12,
+        "caskNumber": null,
+        "comparison": {
+          "missing": [],
+          "conflicts": [],
+          "agreements": ["abv"]
+        },
+        "distillery": [],
+        "maturation": "Mainly sweet Pedro Ximénez sherry casks",
+        "releaseDay": null,
+        "singleCask": null,
+        "releaseYear": null,
+        "vintageYear": null,
+        "bottlingYear": null,
+        "caskStrength": null,
+        "releaseMonth": null,
+        "familyContext": {
+          "siblingBottles": []
+        }
+      },
+      {
+        "abv": null,
+        "brand": "Grangestone",
+        "score": 48.295544,
+        "series": null,
+        "source": ["text"],
+        "bottler": null,
+        "edition": null,
+        "outturn": null,
+        "bottleId": 13972,
+        "category": "single_malt",
+        "fullName": "Grangestone 12-year-old Highland",
+        "reference": null,
+        "statedAge": 12,
+        "caskNumber": null,
+        "comparison": {
+          "missing": ["abv", "caskStrength", "bottler", "distillers"],
+          "conflicts": ["brand"],
+          "agreements": ["category", "statedAge"]
+        },
+        "distillery": [],
+        "maturation": null,
+        "releaseDay": null,
+        "singleCask": null,
+        "releaseYear": null,
+        "vintageYear": null,
+        "bottlingYear": null,
+        "caskStrength": null,
+        "releaseMonth": null,
+        "familyContext": {
+          "siblingBottles": []
+        }
+      },
+      {
+        "abv": 48,
+        "brand": "The Dalmore",
+        "score": 48.21439,
+        "series": null,
+        "source": ["text"],
+        "bottler": null,
+        "edition": null,
+        "outturn": null,
+        "bottleId": 61039,
+        "category": "single_malt",
+        "fullName": "Dalmore 2001 Vintage",
+        "reference": null,
+        "statedAge": null,
+        "caskNumber": null,
+        "comparison": {
+          "missing": [
+            "statedAge",
+            "releaseYear",
+            "caskStrength",
+            "singleCask",
+            "caskNumber",
+            "bottler"
+          ],
+          "conflicts": ["abv", "brand", "distillers"],
+          "agreements": ["category"]
+        },
+        "distillery": ["The Dalmore"],
+        "maturation": null,
+        "releaseDay": null,
+        "singleCask": null,
+        "releaseYear": null,
+        "vintageYear": 2001,
+        "bottlingYear": 2011,
+        "caskStrength": null,
+        "releaseMonth": null,
+        "familyContext": {
+          "siblingBottles": []
+        }
+      },
+      {
+        "abv": 43,
+        "brand": "The GlenDronach",
+        "score": 45.85854,
+        "series": null,
+        "source": ["text"],
+        "bottler": null,
+        "edition": "Matured in Sherry Casks",
+        "outturn": null,
+        "bottleId": 47083,
+        "category": "single_malt",
+        "fullName": "The GlenDronach 12-year-old - Matured in Sherry Casks",
+        "reference": null,
+        "statedAge": 12,
+        "caskNumber": null,
+        "comparison": {
+          "missing": [],
+          "conflicts": [],
+          "agreements": ["abv"]
+        },
+        "distillery": ["The GlenDronach"],
+        "maturation": null,
+        "releaseDay": null,
+        "singleCask": null,
+        "releaseYear": null,
+        "vintageYear": null,
+        "bottlingYear": null,
+        "caskStrength": null,
+        "releaseMonth": null,
+        "familyContext": {
+          "siblingBottles": []
+        }
+      },
+      {
+        "abv": null,
+        "brand": "Highland Park",
+        "score": 45.71746,
+        "series": null,
+        "source": ["text"],
+        "bottler": null,
+        "edition": null,
+        "outturn": null,
+        "bottleId": 2482,
+        "category": "single_malt",
+        "fullName": "Highland Park 12.5-year-old Viking Soul Cask",
+        "reference": null,
+        "statedAge": 12,
+        "caskNumber": null,
+        "comparison": {
+          "missing": ["abv", "caskStrength", "bottler"],
+          "conflicts": ["brand"],
+          "agreements": ["category", "statedAge", "distillers"]
+        },
+        "distillery": ["Highland Park"],
+        "maturation": null,
+        "releaseDay": null,
+        "singleCask": null,
+        "releaseYear": null,
+        "vintageYear": null,
+        "bottlingYear": null,
+        "caskStrength": null,
+        "releaseMonth": null,
+        "familyContext": {
+          "siblingBottles": []
+        }
+      },
+      {
+        "abv": 43,
+        "brand": "Tamdhu",
+        "score": 45.20143,
+        "series": null,
+        "source": ["text"],
+        "bottler": null,
+        "edition": null,
+        "outturn": null,
+        "bottleId": 45455,
+        "category": "single_malt",
+        "fullName": "Tamdhu 12-year-old Sherry Cask Matured - 43.0% ABV - Oloroso Cask",
+        "reference": null,
+        "statedAge": 12,
+        "caskNumber": null,
+        "comparison": {
+          "missing": [],
+          "conflicts": [],
+          "agreements": ["abv"]
+        },
+        "distillery": ["Tamdhu"],
+        "maturation": "oloroso",
+        "releaseDay": null,
+        "singleCask": null,
+        "releaseYear": null,
+        "vintageYear": null,
+        "bottlingYear": null,
+        "caskStrength": null,
+        "releaseMonth": null,
+        "familyContext": {
+          "siblingBottles": []
+        }
+      },
+      {
+        "abv": 43,
+        "brand": "The Balvenie",
+        "score": 45.20143,
+        "series": "Cask Finishes",
+        "source": ["text"],
+        "bottler": null,
+        "edition": null,
+        "outturn": null,
+        "bottleId": 46781,
+        "category": "single_malt",
+        "fullName": "The Balvenie Golden Cask - 12-year-old - 43.0% ABV",
+        "reference": null,
+        "statedAge": 12,
+        "caskNumber": null,
+        "comparison": {
+          "missing": [],
+          "conflicts": [],
+          "agreements": ["abv"]
+        },
+        "distillery": ["The Balvenie"],
+        "maturation": null,
+        "releaseDay": null,
+        "singleCask": null,
+        "releaseYear": null,
+        "vintageYear": null,
+        "bottlingYear": null,
+        "caskStrength": null,
+        "releaseMonth": null,
+        "familyContext": {
+          "siblingBottles": []
+        }
+      },
+      {
+        "abv": null,
+        "brand": "anCnoc",
+        "score": 44.48692,
+        "series": null,
+        "source": ["text"],
+        "bottler": null,
+        "edition": null,
+        "outturn": null,
+        "bottleId": 13654,
+        "category": "single_malt",
+        "fullName": "anCnoc 12-year-old",
+        "reference": null,
+        "statedAge": 12,
+        "caskNumber": null,
+        "comparison": {
+          "missing": ["abv", "caskStrength", "bottler", "distillers"],
+          "conflicts": ["brand"],
+          "agreements": ["category", "statedAge"]
+        },
+        "distillery": [],
+        "maturation": null,
+        "releaseDay": null,
+        "singleCask": null,
+        "releaseYear": null,
+        "vintageYear": null,
+        "bottlingYear": null,
+        "caskStrength": null,
+        "releaseMonth": null,
+        "familyContext": {
+          "siblingBottles": []
+        }
+      },
+      {
+        "abv": 43,
+        "brand": "Tomatin",
+        "score": 43.678596,
+        "series": null,
+        "source": ["text"],
+        "bottler": null,
+        "edition": null,
+        "outturn": null,
+        "bottleId": 476,
+        "category": "single_malt",
+        "fullName": "Tomatin 12-year-old",
+        "reference": null,
+        "statedAge": 12,
+        "caskNumber": null,
+        "comparison": {
+          "missing": ["caskStrength", "bottler"],
+          "conflicts": ["brand", "distillers"],
+          "agreements": ["category", "statedAge", "abv"]
+        },
+        "distillery": ["Tomatin"],
+        "maturation": null,
+        "releaseDay": null,
+        "singleCask": null,
+        "releaseYear": null,
+        "vintageYear": null,
+        "bottlingYear": null,
+        "caskStrength": null,
+        "releaseMonth": null,
+        "familyContext": {
+          "siblingBottles": []
+        }
+      },
+      {
+        "abv": null,
+        "brand": "The GlenDronach",
+        "score": 43.131588,
+        "series": null,
+        "source": ["text"],
+        "bottler": null,
+        "edition": null,
+        "outturn": null,
+        "bottleId": 4901,
+        "category": "single_malt",
+        "fullName": "The GlenDronach 12-year-old Original - Highland Single Malt Scotch Whisky",
+        "reference": null,
+        "statedAge": 12,
+        "caskNumber": null,
+        "comparison": {
+          "missing": ["abv", "caskStrength", "bottler"],
+          "conflicts": ["brand", "distillers"],
+          "agreements": ["category", "statedAge"]
+        },
+        "distillery": ["The GlenDronach"],
+        "maturation": null,
+        "releaseDay": null,
+        "singleCask": null,
+        "releaseYear": null,
+        "vintageYear": null,
+        "bottlingYear": null,
+        "caskStrength": null,
+        "releaseMonth": null,
+        "familyContext": {
+          "siblingBottles": []
+        }
+      },
+      {
+        "abv": null,
+        "brand": "The GlenDronach",
+        "score": 43.131588,
+        "series": null,
+        "source": ["text"],
+        "bottler": null,
+        "edition": null,
+        "outturn": null,
+        "bottleId": 5495,
+        "category": "single_malt",
+        "fullName": "The GlenDronach 12-year-old Original - Single Highland Malt Scotch Whisky",
+        "reference": null,
+        "statedAge": 12,
+        "caskNumber": null,
+        "comparison": {
+          "missing": ["abv", "caskStrength", "bottler"],
+          "conflicts": ["brand", "distillers"],
+          "agreements": ["category", "statedAge"]
+        },
+        "distillery": ["The GlenDronach"],
+        "maturation": null,
+        "releaseDay": null,
+        "singleCask": null,
+        "releaseYear": null,
+        "vintageYear": null,
+        "bottlingYear": null,
+        "caskStrength": null,
+        "releaseMonth": null,
+        "familyContext": {
+          "siblingBottles": []
+        }
+      },
+      {
+        "abv": 43,
+        "brand": "Glenkinchie",
+        "score": 42.650494,
+        "series": null,
+        "source": ["text"],
+        "bottler": null,
+        "edition": null,
+        "outturn": null,
+        "bottleId": 45594,
+        "category": "single_malt",
+        "fullName": "Glenkinchie Distillers Edition - 12-year-old - 2021 Release - 2009 Vintage - 43.0% ABV - Amontilado Cask",
+        "reference": null,
+        "statedAge": 12,
+        "caskNumber": null,
+        "comparison": {
+          "missing": [],
+          "conflicts": [],
+          "agreements": ["abv"]
+        },
+        "distillery": ["Glenkinchie"],
+        "maturation": "amontilado",
+        "releaseDay": null,
+        "singleCask": null,
+        "releaseYear": 2021,
+        "vintageYear": 2009,
+        "bottlingYear": null,
+        "caskStrength": null,
+        "releaseMonth": null,
+        "familyContext": {
+          "siblingBottles": []
+        }
+      },
+      {
+        "abv": 43,
+        "brand": "The Orientalist",
+        "score": 36.455593,
+        "series": null,
+        "source": ["text"],
+        "bottler": null,
+        "edition": null,
+        "outturn": null,
+        "bottleId": 46096,
+        "category": "blend",
+        "fullName": "The Orientalist Dragon - 12-year-old - 43.0% ABV - Oloroso Cask",
+        "reference": null,
+        "statedAge": 12,
+        "caskNumber": null,
+        "comparison": {
+          "missing": [],
+          "conflicts": [],
+          "agreements": ["abv"]
+        },
+        "distillery": [],
+        "maturation": "oloroso",
+        "releaseDay": null,
+        "singleCask": null,
+        "releaseYear": null,
+        "vintageYear": null,
+        "bottlingYear": null,
+        "caskStrength": null,
+        "releaseMonth": null,
+        "familyContext": {
+          "siblingBottles": []
+        }
+      },
+      {
+        "abv": 43,
+        "brand": "CRN57°",
+        "score": 35.576057,
+        "series": null,
+        "source": ["text"],
+        "bottler": "The Cairn Distillery",
+        "edition": null,
+        "outturn": null,
+        "bottleId": 47287,
+        "category": "blended_malt",
+        "fullName": "CRN57° 12-year-old",
+        "reference": null,
+        "statedAge": 12,
+        "caskNumber": null,
+        "comparison": {
+          "missing": [],
+          "conflicts": [],
+          "agreements": ["abv"]
+        },
+        "distillery": [],
+        "maturation": null,
+        "releaseDay": null,
+        "singleCask": null,
+        "releaseYear": 2025,
+        "vintageYear": null,
+        "bottlingYear": null,
+        "caskStrength": null,
+        "releaseMonth": null,
+        "familyContext": {
+          "siblingBottles": []
+        }
+      },
+      {
+        "abv": 43,
+        "brand": "Blackadder",
+        "score": 33.017605,
+        "series": null,
+        "source": ["text", "brand_coverage"],
+        "bottler": "Blackadder",
+        "edition": null,
+        "outturn": null,
+        "bottleId": 67267,
+        "category": "single_malt",
+        "fullName": "Blackadder Laphroaig 1979 18-year-old",
+        "reference": null,
+        "statedAge": 18,
+        "caskNumber": "5962",
+        "comparison": {
+          "missing": [],
+          "conflicts": [],
+          "agreements": ["abv"]
+        },
+        "distillery": ["Laphroaig"],
+        "maturation": "Oak cask",
+        "releaseDay": null,
+        "singleCask": true,
+        "releaseYear": null,
+        "vintageYear": 1979,
+        "bottlingYear": 1997,
+        "caskStrength": null,
+        "releaseMonth": null,
+        "familyContext": {
+          "siblingBottles": []
+        }
+      },
+      {
+        "abv": 43,
+        "brand": "The Glenrothes",
+        "score": 30.62368,
+        "series": null,
+        "source": ["text"],
+        "bottler": null,
+        "edition": null,
+        "outturn": null,
+        "bottleId": 46230,
+        "category": "single_malt",
+        "fullName": "The Glenrothes 15-year-old - 43.0% ABV",
+        "reference": null,
+        "statedAge": 15,
+        "caskNumber": null,
+        "comparison": {
+          "missing": [],
+          "conflicts": [],
+          "agreements": ["abv"]
+        },
+        "distillery": ["The Glenrothes"],
+        "maturation": null,
+        "releaseDay": null,
+        "singleCask": null,
+        "releaseYear": null,
+        "vintageYear": null,
+        "bottlingYear": null,
+        "caskStrength": null,
+        "releaseMonth": null,
+        "familyContext": {
+          "siblingBottles": []
+        }
+      },
+      {
+        "abv": 43,
+        "brand": "Blackadder",
+        "score": 29.304934,
+        "series": "Distillery Selection",
+        "source": ["text", "brand_coverage"],
+        "bottler": "Blackadder",
+        "edition": null,
+        "outturn": null,
+        "bottleId": 55608,
+        "category": "single_malt",
+        "fullName": "Blackadder Brora 1982",
+        "reference": null,
+        "statedAge": 13,
+        "caskNumber": "430",
+        "comparison": {
+          "missing": [],
+          "conflicts": [],
+          "agreements": ["abv"]
+        },
+        "distillery": ["Brora"],
+        "maturation": null,
+        "releaseDay": null,
+        "singleCask": true,
+        "releaseYear": null,
+        "vintageYear": 1982,
+        "bottlingYear": 1995,
+        "caskStrength": null,
+        "releaseMonth": null,
+        "familyContext": {
+          "siblingBottles": []
+        }
+      },
+      {
+        "abv": null,
+        "brand": "Blackadder",
+        "score": 0.7207832658609385,
+        "series": null,
+        "source": ["vector"],
+        "bottler": null,
+        "edition": null,
+        "outturn": null,
+        "bottleId": 18186,
+        "category": "single_malt",
+        "fullName": "Blackadder 'Raw Cask' Cask #841 1986 vintage (distilled at Bruichladdich)",
+        "reference": "Blackadder 'Raw Cask' (distilled at Bruichladdich) Cask #841 1986 vintage, 54.4%",
+        "statedAge": null,
+        "caskNumber": null,
+        "comparison": {
+          "missing": [
+            "statedAge",
+            "abv",
+            "caskStrength",
+            "bottler",
+            "distillers"
+          ],
+          "conflicts": [],
+          "agreements": ["category", "brand"]
+        },
+        "distillery": [],
+        "maturation": null,
+        "releaseDay": null,
+        "singleCask": null,
+        "releaseYear": null,
+        "vintageYear": 1986,
+        "bottlingYear": null,
+        "caskStrength": null,
+        "releaseMonth": null,
+        "familyContext": {
+          "siblingBottles": []
+        }
+      },
+      {
+        "abv": null,
+        "brand": "Blackadder",
+        "score": 0.6890047932978609,
+        "series": null,
+        "source": ["vector"],
+        "bottler": null,
+        "edition": null,
+        "outturn": null,
+        "bottleId": 12925,
+        "category": "single_malt",
+        "fullName": "Blackadder Raw Cask Red Snake [Cask ref: Redneck 111]",
+        "reference": "Blackadder Raw Cask Red Snake [Cask ref: Redneck 111], 60.2%",
+        "statedAge": null,
+        "caskNumber": null,
+        "comparison": {
+          "missing": [
+            "statedAge",
+            "abv",
+            "caskStrength",
+            "bottler",
+            "distillers"
+          ],
+          "conflicts": [],
+          "agreements": ["category", "brand"]
+        },
+        "distillery": [],
+        "maturation": null,
+        "releaseDay": null,
+        "singleCask": null,
+        "releaseYear": null,
+        "vintageYear": null,
+        "bottlingYear": null,
+        "caskStrength": null,
+        "releaseMonth": null,
+        "familyContext": {
+          "siblingBottles": []
+        }
+      },
+      {
+        "abv": null,
+        "brand": "Blackadder",
+        "score": 0.6724192452067399,
+        "series": null,
+        "source": ["vector"],
+        "bottler": null,
+        "edition": null,
+        "outturn": null,
+        "bottleId": 12927,
+        "category": "single_malt",
+        "fullName": "Blackadder Sherry Snake (Cask SS03)",
+        "reference": "Blackadder Sherry Snake (Cask SS03), 58.2%",
+        "statedAge": null,
+        "caskNumber": null,
+        "comparison": {
+          "missing": [
+            "statedAge",
+            "abv",
+            "caskStrength",
+            "bottler",
+            "distillers"
+          ],
+          "conflicts": [],
+          "agreements": ["category", "brand"]
+        },
+        "distillery": [],
+        "maturation": null,
+        "releaseDay": null,
+        "singleCask": null,
+        "releaseYear": null,
+        "vintageYear": null,
+        "bottlingYear": null,
+        "caskStrength": null,
+        "releaseMonth": null,
+        "familyContext": {
+          "siblingBottles": []
+        }
+      },
+      {
+        "abv": 43,
+        "brand": "Highland Park",
+        "score": 0.6644934789488653,
+        "series": null,
+        "source": ["vector"],
+        "bottler": null,
+        "edition": null,
+        "outturn": null,
+        "bottleId": 793,
+        "category": "single_malt",
+        "fullName": "Highland Park 18-year-old",
+        "reference": "Highland Park 18-year-old, 43%",
+        "statedAge": 18,
+        "caskNumber": null,
+        "comparison": {
+          "missing": [],
+          "conflicts": [],
+          "agreements": ["abv"]
+        },
+        "distillery": ["Highland Park"],
+        "maturation": null,
+        "releaseDay": null,
+        "singleCask": null,
+        "releaseYear": null,
+        "vintageYear": null,
+        "bottlingYear": null,
+        "caskStrength": null,
+        "releaseMonth": null,
+        "familyContext": {
+          "siblingBottles": []
+        }
+      },
+      {
+        "abv": 43,
+        "brand": "Blackadder",
+        "score": 0.4666666666666667,
+        "series": "Limited Editions",
+        "source": ["brand_coverage"],
+        "bottler": "Blackadder",
+        "edition": null,
+        "outturn": 348,
+        "bottleId": 67295,
+        "category": "single_malt",
+        "fullName": "Blackadder Laphroaig 1973",
+        "reference": null,
+        "statedAge": 22,
+        "caskNumber": "2259",
+        "comparison": {
+          "missing": ["caskStrength"],
+          "conflicts": ["statedAge", "distillers"],
+          "agreements": ["category", "abv", "brand", "bottler"]
+        },
+        "distillery": ["Laphroaig"],
+        "maturation": "Sherry oak cask",
+        "releaseDay": null,
+        "singleCask": true,
+        "releaseYear": null,
+        "vintageYear": 1973,
+        "bottlingYear": 1995,
+        "caskStrength": null,
+        "releaseMonth": null,
+        "familyContext": {
+          "siblingBottles": []
+        }
+      }
+    ]
+  },
+  "context": {
+    "inspectedBottleIds": [19147],
+    "bottleContexts": [
+      {
+        "exact": {
+          "abv": null,
+          "edition": null,
+          "outturn": null,
+          "statedAge": null,
+          "caskNumber": null,
+          "maturation": null,
+          "releaseDay": null,
+          "singleCask": null,
+          "releaseYear": null,
+          "vintageYear": null,
+          "bottlingYear": null,
+          "caskStrength": null,
+          "releaseMonth": null
+        },
+        "shared": {
+          "name": "12-year-old 1988 (distilled at Laphroaig)",
+          "brand": {
+            "name": "Blackadder",
+            "entityId": 6004
+          },
+          "series": null,
+          "bottler": null,
+          "category": "single_malt",
+          "statedAge": 12,
+          "distillers": []
+        },
+        "groupId": 16099,
+        "bottleId": 19147,
+        "fullName": "Blackadder 12-year-old 1988 (distilled at Laphroaig)",
+        "siblings": [],
+        "references": [
+          {
+            "name": "Blackadder 12-year-old 1988 (distilled at Laphroaig)",
+            "ignored": false
+          },
+          {
+            "name": "Blackadder 12-year-old (distilled at Laphroaig) 1988",
+            "ignored": false
+          },
+          {
+            "name": "Blackadder 12-year-old (distilled at Laphroaig) 1988, 45%",
+            "ignored": false
+          }
+        ],
+        "observations": [],
+        "imageSources": []
+      }
+    ],
+    "inspectedEntities": [
+      {
+        "kind": "distillery",
+        "name": "Glenfarclas",
+        "score": 1,
+        "source": ["exact", "text", "prefix", "contained"],
+        "entityId": 976,
+        "reference": "Glenfarclas",
+        "shortName": null,
+        "retrievedFor": [
+          {
+            "exact": true,
+            "query": "Glenfarclas"
+          }
+        ]
+      },
+      {
+        "kind": "brand",
+        "name": "Islay Mist",
+        "score": 1,
+        "source": ["exact", "text", "prefix", "contained"],
+        "entityId": 1066,
+        "reference": "Islay Mist",
+        "shortName": null,
+        "retrievedFor": [
+          {
+            "exact": true,
+            "query": "Islay Mist"
+          }
+        ]
+      },
+      {
+        "kind": "brand",
+        "name": "Isle of Skye",
+        "score": 1,
+        "source": ["exact", "text", "prefix", "contained"],
+        "entityId": 1073,
+        "reference": "Isle of Skye",
+        "shortName": null,
+        "retrievedFor": [
+          {
+            "exact": true,
+            "query": "Isle of Skye"
+          }
+        ]
+      },
+      {
+        "kind": "company",
+        "name": "Ian Macleod Distillers",
+        "score": 1,
+        "source": ["exact", "text", "prefix", "contained"],
+        "entityId": 5658,
+        "reference": "Ian Macleod Distillers",
+        "shortName": null,
+        "retrievedFor": [
+          {
+            "exact": true,
+            "query": "Ian Macleod Distillers"
+          }
+        ]
+      },
+      {
+        "kind": "bottler",
+        "name": "Michel Couvreur",
+        "score": 1,
+        "source": ["exact", "text", "prefix", "contained"],
+        "entityId": 1179,
+        "reference": "Michel Couvreur",
+        "shortName": null,
+        "retrievedFor": [
+          {
+            "exact": true,
+            "query": "Michel Couvreur"
+          }
+        ]
+      },
+      {
+        "kind": "brand",
+        "name": "The Orientalist",
+        "score": 1,
+        "source": ["exact", "text", "prefix", "contained"],
+        "entityId": 365873,
+        "reference": "The Orientalist",
+        "shortName": null,
+        "retrievedFor": [
+          {
+            "exact": true,
+            "query": "The Orientalist"
+          }
+        ]
+      },
+      {
+        "kind": "brand",
+        "name": "CRN57°",
+        "score": 1,
+        "source": ["exact", "text", "prefix", "contained"],
+        "entityId": 365874,
+        "reference": "CRN57°",
+        "shortName": null,
+        "retrievedFor": [
+          {
+            "exact": true,
+            "query": "CRN57°"
+          }
+        ]
+      },
+      {
+        "kind": "distillery",
+        "name": "The Cairn Distillery",
+        "score": 1,
+        "source": ["exact", "text", "prefix", "contained"],
+        "entityId": 365875,
+        "reference": "The Cairn Distillery",
+        "shortName": "The Cairn",
+        "retrievedFor": [
+          {
+            "exact": true,
+            "query": "The Cairn Distillery"
+          }
+        ]
+      },
+      {
+        "kind": "distillery",
+        "name": "The GlenDronach",
+        "score": 1,
+        "source": ["exact", "text", "prefix", "contained"],
+        "entityId": 973,
+        "reference": "The GlenDronach",
+        "shortName": null,
+        "retrievedFor": [
+          {
+            "exact": true,
+            "query": "The GlenDronach"
+          }
+        ]
+      },
+      {
+        "kind": "bottler",
+        "name": "Blackadder",
+        "score": 1,
+        "source": ["exact", "text", "prefix", "contained"],
+        "entityId": 6004,
+        "reference": "Blackadder",
+        "shortName": null,
+        "retrievedFor": [
+          {
+            "exact": true,
+            "query": "Blackadder"
+          }
+        ]
+      },
+      {
+        "kind": "distillery",
+        "name": "Laphroaig",
+        "score": 1,
+        "source": ["exact", "text", "prefix", "contained"],
+        "entityId": 1129,
+        "reference": "Laphroaig",
+        "shortName": "",
+        "retrievedFor": [
+          {
+            "exact": true,
+            "query": "Laphroaig"
+          }
+        ]
+      },
+      {
+        "kind": "distillery",
+        "name": "Tamdhu",
+        "score": 1,
+        "source": ["exact", "text", "prefix", "contained"],
+        "entityId": 1386,
+        "reference": "Tamdhu",
+        "shortName": null,
+        "retrievedFor": [
+          {
+            "exact": true,
+            "query": "Tamdhu"
+          }
+        ]
+      },
+      {
+        "kind": "distillery",
+        "name": "Highland Park",
+        "score": 1,
+        "source": ["exact", "text", "prefix", "contained"],
+        "entityId": 438,
+        "reference": "Highland Park",
+        "shortName": null,
+        "retrievedFor": [
+          {
+            "exact": true,
+            "query": "Highland Park"
+          }
+        ]
+      },
+      {
+        "kind": "brand",
+        "name": "The Islay",
+        "score": 0.3611111111111111,
+        "source": ["contained"],
+        "entityId": 366929,
+        "reference": "Islay",
+        "shortName": null,
+        "retrievedFor": [
+          {
+            "query": "Islay Mist"
+          }
+        ]
+      },
+      {
+        "kind": "company",
+        "name": "D. Johnston & Co. (Laphroaig) Ltd.",
+        "score": 0.2,
+        "source": ["text"],
+        "entityId": 5737,
+        "reference": null,
+        "shortName": null,
+        "retrievedFor": [
+          {
+            "query": "Laphroaig"
+          }
+        ]
+      }
+    ],
+    "inspectedSeries": []
+  },
+  "provenance": {
+    "source": "production_miss",
+    "verifiedSourceUrls": [
+      "https://www.scotchwhiskyauctions.com/auctions/234-the-185th-auction/906585-orcadian-12-year-old-the-old-man-of-hoy-blackadder/"
+    ],
+    "dbOutcome": {
+      "bottleId": null,
+      "createsBottle": false,
+      "summary": "Production returned no_match: the old page read did not return the lot facts, so it found too little evidence to create."
+    },
+    "notes": "Captured from saved classifier run 36334 (auction_lot 17213, model null, 2026-11-03T19:52:12.988Z). Production rationale: This is one whisky Bottle, but no inspected local candidate represents it. The plausible Blackadder 12-year-old candidate, bottle 19147, is identified as Laphroaig 1988 and does not safely match. The available evidence is insufficient to create a distinct Bottle without risking an ambiguous release identity. The run predates reading Scotch Whisky Auctions lot pages (#1609), so the evidence pack adds the lot page text. Expected outcome checked against the lot page and photo on 2026-11-09, in a random sample of the 185th auction's no_match reviews."
+  },
+  "expected": {
+    "status": "classified",
+    "action": "create_bottle",
+    "identityScope": "exact_cask",
+    "matchedBottleId": null,
+    "proposedBottle": {
+      "category": "single_malt",
+      "statedAge": 12,
+      "abv": 43
+    },
+    "proposedBottleNameIncludes": ["Old Man of Hoy"],
+    "summary": "Create Blackadder's The Old Man of Hoy, an Orcadian 12-year-old from cask OMH 2009-2, bottled October 2009 at 43%, 180 bottles. The lot page gives every fact. Candidate 19147 is a Blackadder Laphroaig 1988, another Bottle."
+  }
+}

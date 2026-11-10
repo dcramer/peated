@@ -1,0 +1,1711 @@
+{
+  "id": "auction-north-port-1974-cc-1993-bottling-create",
+  "name": "North Port-Brechin 1974 Connoisseurs Choice: create the 1993 bottling",
+  "input": {
+    "reference": {
+      "id": 17144,
+      "url": "https://www.scotchwhiskyauctions.com/auctions/234-the-185th-auction/904318-north-port-brechin-1974-connoisseurs-choice/",
+      "name": "North Port-Brechin 1974 Connoisseurs Choice",
+      "imageUrl": null,
+      "externalSiteId": 28097,
+      "currentBottleId": null
+    },
+    "extractedIdentity": {
+      "abv": 40,
+      "brand": null,
+      "series": null,
+      "bottler": null,
+      "edition": null,
+      "outturn": null,
+      "category": null,
+      "distillery": null,
+      "expression": null,
+      "maturation": null,
+      "stated_age": null,
+      "cask_number": null,
+      "single_cask": null,
+      "release_year": null,
+      "vintage_year": null,
+      "cask_strength": null
+    },
+    "extractedIdentitySource": "structured",
+    "imageEvidence": null,
+    "initialCandidates": [
+      {
+        "abv": 40,
+        "brand": "Gordon & MacPhail",
+        "score": 89.73079,
+        "series": "Connoisseurs Choice",
+        "source": ["text", "brand_coverage"],
+        "bottler": "Gordon & MacPhail",
+        "edition": null,
+        "outturn": null,
+        "bottleId": 52349,
+        "category": "single_malt",
+        "fullName": "Gordon & MacPhail Aberfeldy 1974",
+        "reference": null,
+        "statedAge": null,
+        "caskNumber": null,
+        "comparison": {
+          "missing": [],
+          "conflicts": [],
+          "agreements": ["abv"]
+        },
+        "distillery": ["Aberfeldy"],
+        "maturation": null,
+        "releaseDay": null,
+        "singleCask": null,
+        "releaseYear": null,
+        "vintageYear": 1974,
+        "bottlingYear": null,
+        "caskStrength": null,
+        "releaseMonth": null,
+        "familyContext": {
+          "siblingBottles": []
+        }
+      },
+      {
+        "abv": 40,
+        "brand": "Gordon & MacPhail",
+        "score": 89.73079,
+        "series": "Connoisseurs Choice",
+        "source": ["text", "brand_coverage"],
+        "bottler": "Gordon & MacPhail",
+        "edition": null,
+        "outturn": null,
+        "bottleId": 52286,
+        "category": "single_malt",
+        "fullName": "Gordon & MacPhail Banff 1974",
+        "reference": null,
+        "statedAge": null,
+        "caskNumber": null,
+        "comparison": {
+          "missing": [],
+          "conflicts": [],
+          "agreements": ["abv"]
+        },
+        "distillery": ["Banff"],
+        "maturation": null,
+        "releaseDay": null,
+        "singleCask": null,
+        "releaseYear": null,
+        "vintageYear": 1974,
+        "bottlingYear": null,
+        "caskStrength": null,
+        "releaseMonth": null,
+        "familyContext": {
+          "siblingBottles": []
+        }
+      },
+      {
+        "abv": 40,
+        "brand": "Gordon & MacPhail",
+        "score": 89.73079,
+        "series": "Connoisseurs Choice",
+        "source": ["text", "brand_coverage"],
+        "bottler": "Gordon & MacPhail",
+        "edition": null,
+        "outturn": null,
+        "bottleId": 52292,
+        "category": "single_malt",
+        "fullName": "Gordon & MacPhail Glencadam 1974",
+        "reference": null,
+        "statedAge": null,
+        "caskNumber": null,
+        "comparison": {
+          "missing": [],
+          "conflicts": [],
+          "agreements": ["abv"]
+        },
+        "distillery": ["Glencadam"],
+        "maturation": null,
+        "releaseDay": null,
+        "singleCask": null,
+        "releaseYear": null,
+        "vintageYear": 1974,
+        "bottlingYear": 1991,
+        "caskStrength": null,
+        "releaseMonth": null,
+        "familyContext": {
+          "siblingBottles": []
+        }
+      },
+      {
+        "abv": 40,
+        "brand": "Gordon & MacPhail",
+        "score": 89.73079,
+        "series": "Connoisseurs Choice",
+        "source": ["text", "brand_coverage"],
+        "bottler": "Gordon & MacPhail",
+        "edition": null,
+        "outturn": null,
+        "bottleId": 70056,
+        "category": "single_malt",
+        "fullName": "Gordon & MacPhail Glenkinchie 1974",
+        "reference": null,
+        "statedAge": null,
+        "caskNumber": null,
+        "comparison": {
+          "missing": [],
+          "conflicts": [],
+          "agreements": ["abv"]
+        },
+        "distillery": ["Glenkinchie"],
+        "maturation": null,
+        "releaseDay": null,
+        "singleCask": null,
+        "releaseYear": null,
+        "vintageYear": 1974,
+        "bottlingYear": null,
+        "caskStrength": null,
+        "releaseMonth": null,
+        "familyContext": {
+          "siblingBottles": []
+        }
+      },
+      {
+        "abv": 40,
+        "brand": "Gordon & MacPhail",
+        "score": 89.73079,
+        "series": "Connoisseurs Choice",
+        "source": ["text", "brand_coverage"],
+        "bottler": "Gordon & MacPhail",
+        "edition": null,
+        "outturn": null,
+        "bottleId": 66599,
+        "category": "single_malt",
+        "fullName": "Gordon & MacPhail Glenlossie 1974",
+        "reference": null,
+        "statedAge": null,
+        "caskNumber": null,
+        "comparison": {
+          "missing": [],
+          "conflicts": [],
+          "agreements": ["abv"]
+        },
+        "distillery": ["Glenlossie"],
+        "maturation": null,
+        "releaseDay": null,
+        "singleCask": null,
+        "releaseYear": null,
+        "vintageYear": 1974,
+        "bottlingYear": 1999,
+        "caskStrength": null,
+        "releaseMonth": null,
+        "familyContext": {
+          "siblingBottles": []
+        }
+      },
+      {
+        "abv": 40,
+        "brand": "Gordon & MacPhail",
+        "score": 89.73079,
+        "series": "Connoisseurs Choice",
+        "source": ["text", "brand_coverage"],
+        "bottler": "Gordon & MacPhail",
+        "edition": null,
+        "outturn": null,
+        "bottleId": 66615,
+        "category": "single_malt",
+        "fullName": "Gordon & MacPhail Glenlossie 1974",
+        "reference": null,
+        "statedAge": null,
+        "caskNumber": null,
+        "comparison": {
+          "missing": [],
+          "conflicts": [],
+          "agreements": ["abv"]
+        },
+        "distillery": ["Glenlossie"],
+        "maturation": null,
+        "releaseDay": null,
+        "singleCask": null,
+        "releaseYear": null,
+        "vintageYear": 1974,
+        "bottlingYear": 1994,
+        "caskStrength": null,
+        "releaseMonth": null,
+        "familyContext": {
+          "siblingBottles": []
+        }
+      },
+      {
+        "abv": 40,
+        "brand": "Gordon & MacPhail",
+        "score": 89.73079,
+        "series": "Connoisseurs Choice",
+        "source": ["text", "brand_coverage"],
+        "bottler": "Gordon & MacPhail",
+        "edition": null,
+        "outturn": null,
+        "bottleId": 66598,
+        "category": "single_malt",
+        "fullName": "Gordon & MacPhail Glenlossie 1974",
+        "reference": null,
+        "statedAge": null,
+        "caskNumber": null,
+        "comparison": {
+          "missing": [],
+          "conflicts": [],
+          "agreements": ["abv"]
+        },
+        "distillery": ["Glenlossie"],
+        "maturation": null,
+        "releaseDay": null,
+        "singleCask": null,
+        "releaseYear": null,
+        "vintageYear": 1974,
+        "bottlingYear": 1997,
+        "caskStrength": null,
+        "releaseMonth": null,
+        "familyContext": {
+          "siblingBottles": []
+        }
+      },
+      {
+        "abv": 43,
+        "brand": "Gordon & MacPhail",
+        "score": 85.88567,
+        "series": "Connoisseurs Choice",
+        "source": ["text"],
+        "bottler": "Gordon & MacPhail",
+        "edition": null,
+        "outturn": null,
+        "bottleId": 67029,
+        "category": "single_malt",
+        "fullName": "Gordon & MacPhail Ardbeg 1974",
+        "reference": null,
+        "statedAge": null,
+        "caskNumber": null,
+        "comparison": {
+          "missing": [],
+          "conflicts": ["abv", "distillers"],
+          "agreements": [
+            "category",
+            "vintageYear",
+            "brand",
+            "bottler",
+            "series"
+          ]
+        },
+        "distillery": ["Ardbeg"],
+        "maturation": null,
+        "releaseDay": null,
+        "singleCask": null,
+        "releaseYear": null,
+        "vintageYear": 1974,
+        "bottlingYear": 2003,
+        "caskStrength": null,
+        "releaseMonth": null,
+        "familyContext": {
+          "siblingBottles": []
+        }
+      },
+      {
+        "abv": 43,
+        "brand": "Gordon & MacPhail",
+        "score": 85.88567,
+        "series": "Connoisseurs Choice",
+        "source": ["text"],
+        "bottler": "Gordon & MacPhail",
+        "edition": null,
+        "outturn": null,
+        "bottleId": 69767,
+        "category": "single_malt",
+        "fullName": "Gordon & MacPhail Benrinnes 1974",
+        "reference": null,
+        "statedAge": null,
+        "caskNumber": null,
+        "comparison": {
+          "missing": [],
+          "conflicts": ["abv", "distillers"],
+          "agreements": [
+            "category",
+            "vintageYear",
+            "brand",
+            "bottler",
+            "series"
+          ]
+        },
+        "distillery": ["Benrinnes"],
+        "maturation": null,
+        "releaseDay": null,
+        "singleCask": null,
+        "releaseYear": null,
+        "vintageYear": 1974,
+        "bottlingYear": null,
+        "caskStrength": null,
+        "releaseMonth": null,
+        "familyContext": {
+          "siblingBottles": []
+        }
+      },
+      {
+        "abv": 40,
+        "brand": "Gordon & MacPhail",
+        "score": 79.84883,
+        "series": "Connoisseurs Choice",
+        "source": ["text", "brand_coverage"],
+        "bottler": "Gordon & MacPhail",
+        "edition": null,
+        "outturn": null,
+        "bottleId": 63684,
+        "category": "single_malt",
+        "fullName": "Gordon & MacPhail Port Ellen 1979",
+        "reference": null,
+        "statedAge": null,
+        "caskNumber": null,
+        "comparison": {
+          "missing": [],
+          "conflicts": [],
+          "agreements": ["abv"]
+        },
+        "distillery": ["Port Ellen"],
+        "maturation": null,
+        "releaseDay": null,
+        "singleCask": null,
+        "releaseYear": null,
+        "vintageYear": 1979,
+        "bottlingYear": 1994,
+        "caskStrength": null,
+        "releaseMonth": null,
+        "familyContext": {
+          "siblingBottles": []
+        }
+      },
+      {
+        "abv": 40,
+        "brand": "Gordon & MacPhail",
+        "score": 79.84883,
+        "series": "Connoisseurs Choice",
+        "source": ["text", "brand_coverage"],
+        "bottler": "Gordon & MacPhail",
+        "edition": null,
+        "outturn": null,
+        "bottleId": 67024,
+        "category": "single_malt",
+        "fullName": "Gordon & MacPhail Port Ellen 1980",
+        "reference": null,
+        "statedAge": null,
+        "caskNumber": null,
+        "comparison": {
+          "missing": [],
+          "conflicts": [],
+          "agreements": ["abv"]
+        },
+        "distillery": ["Port Ellen"],
+        "maturation": null,
+        "releaseDay": null,
+        "singleCask": null,
+        "releaseYear": null,
+        "vintageYear": 1980,
+        "bottlingYear": 1997,
+        "caskStrength": null,
+        "releaseMonth": null,
+        "familyContext": {
+          "siblingBottles": []
+        }
+      },
+      {
+        "abv": 40,
+        "brand": "Gordon & MacPhail",
+        "score": 79.84883,
+        "series": "Connoisseurs Choice",
+        "source": ["text", "brand_coverage"],
+        "bottler": "Gordon & MacPhail",
+        "edition": null,
+        "outturn": null,
+        "bottleId": 60715,
+        "category": "single_malt",
+        "fullName": "Gordon & MacPhail Port Ellen 1981",
+        "reference": null,
+        "statedAge": null,
+        "caskNumber": null,
+        "comparison": {
+          "missing": [],
+          "conflicts": [],
+          "agreements": ["abv"]
+        },
+        "distillery": ["Port Ellen"],
+        "maturation": null,
+        "releaseDay": null,
+        "singleCask": null,
+        "releaseYear": null,
+        "vintageYear": 1981,
+        "bottlingYear": 1999,
+        "caskStrength": null,
+        "releaseMonth": null,
+        "familyContext": {
+          "siblingBottles": []
+        }
+      },
+      {
+        "abv": 40,
+        "brand": "Gordon & MacPhail",
+        "score": 79.84883,
+        "series": "Connoisseurs Choice",
+        "source": ["text"],
+        "bottler": "Gordon & MacPhail",
+        "edition": null,
+        "outturn": null,
+        "bottleId": 67027,
+        "category": "single_malt",
+        "fullName": "Gordon & MacPhail Port Ellen 1981",
+        "reference": null,
+        "statedAge": null,
+        "caskNumber": null,
+        "comparison": {
+          "missing": [],
+          "conflicts": [],
+          "agreements": ["abv"]
+        },
+        "distillery": ["Port Ellen"],
+        "maturation": null,
+        "releaseDay": null,
+        "singleCask": null,
+        "releaseYear": null,
+        "vintageYear": 1981,
+        "bottlingYear": 2000,
+        "caskStrength": null,
+        "releaseMonth": null,
+        "familyContext": {
+          "siblingBottles": []
+        }
+      },
+      {
+        "abv": 40,
+        "brand": "Gordon & MacPhail",
+        "score": 66.635895,
+        "series": "Connoisseurs Choice",
+        "source": ["text"],
+        "bottler": "Gordon & MacPhail",
+        "edition": null,
+        "outturn": null,
+        "bottleId": 67028,
+        "category": "single_malt",
+        "fullName": "Gordon & MacPhail Ardbeg 1973",
+        "reference": null,
+        "statedAge": null,
+        "caskNumber": null,
+        "comparison": {
+          "missing": [],
+          "conflicts": [],
+          "agreements": ["abv"]
+        },
+        "distillery": ["Ardbeg"],
+        "maturation": null,
+        "releaseDay": null,
+        "singleCask": null,
+        "releaseYear": null,
+        "vintageYear": 1973,
+        "bottlingYear": 2003,
+        "caskStrength": null,
+        "releaseMonth": null,
+        "familyContext": {
+          "siblingBottles": []
+        }
+      },
+      {
+        "abv": 40,
+        "brand": "Gordon & MacPhail",
+        "score": 66.635895,
+        "series": "Connoisseurs Choice",
+        "source": ["text"],
+        "bottler": "Gordon & MacPhail",
+        "edition": null,
+        "outturn": null,
+        "bottleId": 60777,
+        "category": "single_malt",
+        "fullName": "Gordon & MacPhail Ardbeg 1978",
+        "reference": null,
+        "statedAge": null,
+        "caskNumber": null,
+        "comparison": {
+          "missing": [],
+          "conflicts": [],
+          "agreements": ["abv"]
+        },
+        "distillery": ["Ardbeg"],
+        "maturation": null,
+        "releaseDay": null,
+        "singleCask": null,
+        "releaseYear": null,
+        "vintageYear": 1978,
+        "bottlingYear": 2000,
+        "caskStrength": null,
+        "releaseMonth": null,
+        "familyContext": {
+          "siblingBottles": []
+        }
+      },
+      {
+        "abv": 40,
+        "brand": "Gordon & MacPhail",
+        "score": 66.635895,
+        "series": "Connoisseurs Choice",
+        "source": ["text"],
+        "bottler": "Gordon & MacPhail",
+        "edition": null,
+        "outturn": null,
+        "bottleId": 58773,
+        "category": "single_malt",
+        "fullName": "Gordon & MacPhail Ardbeg 1991",
+        "reference": null,
+        "statedAge": null,
+        "caskNumber": null,
+        "comparison": {
+          "missing": [],
+          "conflicts": [],
+          "agreements": ["abv"]
+        },
+        "distillery": ["Ardbeg"],
+        "maturation": null,
+        "releaseDay": null,
+        "singleCask": null,
+        "releaseYear": null,
+        "vintageYear": 1991,
+        "bottlingYear": 2002,
+        "caskStrength": null,
+        "releaseMonth": null,
+        "familyContext": {
+          "siblingBottles": []
+        }
+      },
+      {
+        "abv": 40,
+        "brand": "Gordon & MacPhail",
+        "score": 66.635895,
+        "series": "Connoisseurs Choice",
+        "source": ["text"],
+        "bottler": "Gordon & MacPhail",
+        "edition": null,
+        "outturn": null,
+        "bottleId": 52362,
+        "category": "single_malt",
+        "fullName": "Gordon & MacPhail Millburn 1971",
+        "reference": null,
+        "statedAge": null,
+        "caskNumber": null,
+        "comparison": {
+          "missing": [],
+          "conflicts": ["vintageYear", "distillers"],
+          "agreements": [
+            "category",
+            "abv",
+            "caskStrength",
+            "brand",
+            "bottler",
+            "series"
+          ]
+        },
+        "distillery": ["Millburn"],
+        "maturation": null,
+        "releaseDay": null,
+        "singleCask": null,
+        "releaseYear": null,
+        "vintageYear": 1971,
+        "bottlingYear": 1991,
+        "caskStrength": false,
+        "releaseMonth": null,
+        "familyContext": {
+          "siblingBottles": []
+        }
+      },
+      {
+        "abv": 40,
+        "brand": "Gordon & MacPhail",
+        "score": 66.635895,
+        "series": "Connoisseurs Choice",
+        "source": ["text"],
+        "bottler": "Gordon & MacPhail",
+        "edition": null,
+        "outturn": null,
+        "bottleId": 66426,
+        "category": "single_malt",
+        "fullName": "Gordon & MacPhail Bladnoch 1984",
+        "reference": null,
+        "statedAge": null,
+        "caskNumber": null,
+        "comparison": {
+          "missing": ["caskStrength"],
+          "conflicts": ["vintageYear", "distillers"],
+          "agreements": ["category", "abv", "brand", "bottler", "series"]
+        },
+        "distillery": ["Bladnoch"],
+        "maturation": null,
+        "releaseDay": null,
+        "singleCask": null,
+        "releaseYear": null,
+        "vintageYear": 1984,
+        "bottlingYear": 1995,
+        "caskStrength": null,
+        "releaseMonth": null,
+        "familyContext": {
+          "siblingBottles": []
+        }
+      },
+      {
+        "abv": 40,
+        "brand": "Gordon & MacPhail",
+        "score": 66.635895,
+        "series": "Connoisseurs Choice",
+        "source": ["text"],
+        "bottler": "Gordon & MacPhail",
+        "edition": null,
+        "outturn": null,
+        "bottleId": 66429,
+        "category": "single_malt",
+        "fullName": "Gordon & MacPhail Bladnoch 1984",
+        "reference": null,
+        "statedAge": null,
+        "caskNumber": null,
+        "comparison": {
+          "missing": ["caskStrength"],
+          "conflicts": ["vintageYear", "distillers"],
+          "agreements": ["category", "abv", "brand", "bottler", "series"]
+        },
+        "distillery": ["Bladnoch"],
+        "maturation": null,
+        "releaseDay": null,
+        "singleCask": null,
+        "releaseYear": null,
+        "vintageYear": 1984,
+        "bottlingYear": 1994,
+        "caskStrength": null,
+        "releaseMonth": null,
+        "familyContext": {
+          "siblingBottles": []
+        }
+      },
+      {
+        "abv": 40,
+        "brand": "Gordon & MacPhail",
+        "score": 66.635895,
+        "series": "Connoisseurs Choice",
+        "source": ["text"],
+        "bottler": "Gordon & MacPhail",
+        "edition": null,
+        "outturn": null,
+        "bottleId": 66427,
+        "category": "single_malt",
+        "fullName": "Gordon & MacPhail Bladnoch 1986",
+        "reference": null,
+        "statedAge": null,
+        "caskNumber": null,
+        "comparison": {
+          "missing": ["caskStrength"],
+          "conflicts": ["vintageYear", "distillers"],
+          "agreements": ["category", "abv", "brand", "bottler", "series"]
+        },
+        "distillery": ["Bladnoch"],
+        "maturation": null,
+        "releaseDay": null,
+        "singleCask": null,
+        "releaseYear": null,
+        "vintageYear": 1986,
+        "bottlingYear": 1998,
+        "caskStrength": null,
+        "releaseMonth": null,
+        "familyContext": {
+          "siblingBottles": []
+        }
+      },
+      {
+        "abv": 40,
+        "brand": "Gordon & MacPhail",
+        "score": 66.635895,
+        "series": "Connoisseurs Choice",
+        "source": ["text"],
+        "bottler": "Gordon & MacPhail",
+        "edition": null,
+        "outturn": null,
+        "bottleId": 66430,
+        "category": "single_malt",
+        "fullName": "Gordon & MacPhail Bladnoch 1986",
+        "reference": null,
+        "statedAge": null,
+        "caskNumber": null,
+        "comparison": {
+          "missing": ["caskStrength"],
+          "conflicts": ["vintageYear", "distillers"],
+          "agreements": ["category", "abv", "brand", "bottler", "series"]
+        },
+        "distillery": ["Bladnoch"],
+        "maturation": null,
+        "releaseDay": null,
+        "singleCask": null,
+        "releaseYear": null,
+        "vintageYear": 1986,
+        "bottlingYear": 1996,
+        "caskStrength": null,
+        "releaseMonth": null,
+        "familyContext": {
+          "siblingBottles": []
+        }
+      },
+      {
+        "abv": 40,
+        "brand": "Gordon & MacPhail",
+        "score": 66.635895,
+        "series": "Connoisseurs Choice",
+        "source": ["text"],
+        "bottler": "Gordon & MacPhail",
+        "edition": null,
+        "outturn": null,
+        "bottleId": 66421,
+        "category": "single_malt",
+        "fullName": "Gordon & MacPhail Bladnoch 1987",
+        "reference": null,
+        "statedAge": null,
+        "caskNumber": null,
+        "comparison": {
+          "missing": ["caskStrength"],
+          "conflicts": ["vintageYear", "distillers"],
+          "agreements": ["category", "abv", "brand", "bottler", "series"]
+        },
+        "distillery": ["Bladnoch"],
+        "maturation": null,
+        "releaseDay": null,
+        "singleCask": null,
+        "releaseYear": null,
+        "vintageYear": 1987,
+        "bottlingYear": 1999,
+        "caskStrength": null,
+        "releaseMonth": null,
+        "familyContext": {
+          "siblingBottles": []
+        }
+      },
+      {
+        "abv": 40,
+        "brand": "Gordon & MacPhail",
+        "score": 66.635895,
+        "series": "Connoisseurs Choice",
+        "source": ["text"],
+        "bottler": "Gordon & MacPhail",
+        "edition": null,
+        "outturn": null,
+        "bottleId": 66425,
+        "category": "single_malt",
+        "fullName": "Gordon & MacPhail Bladnoch 1988",
+        "reference": null,
+        "statedAge": null,
+        "caskNumber": null,
+        "comparison": {
+          "missing": ["caskStrength"],
+          "conflicts": ["vintageYear", "distillers"],
+          "agreements": ["category", "abv", "brand", "bottler", "series"]
+        },
+        "distillery": ["Bladnoch"],
+        "maturation": null,
+        "releaseDay": null,
+        "singleCask": null,
+        "releaseYear": null,
+        "vintageYear": 1988,
+        "bottlingYear": 2000,
+        "caskStrength": null,
+        "releaseMonth": null,
+        "familyContext": {
+          "siblingBottles": []
+        }
+      },
+      {
+        "abv": 40,
+        "brand": "Gordon & MacPhail",
+        "score": 66.635895,
+        "series": "Connoisseurs Choice",
+        "source": ["text"],
+        "bottler": "Gordon & MacPhail",
+        "edition": null,
+        "outturn": null,
+        "bottleId": 66450,
+        "category": "single_malt",
+        "fullName": "Gordon & MacPhail Bladnoch 1988",
+        "reference": null,
+        "statedAge": null,
+        "caskNumber": null,
+        "comparison": {
+          "missing": ["caskStrength"],
+          "conflicts": ["vintageYear", "distillers"],
+          "agreements": ["category", "abv", "brand", "bottler", "series"]
+        },
+        "distillery": ["Bladnoch"],
+        "maturation": null,
+        "releaseDay": null,
+        "singleCask": null,
+        "releaseYear": null,
+        "vintageYear": 1988,
+        "bottlingYear": 2002,
+        "caskStrength": null,
+        "releaseMonth": null,
+        "familyContext": {
+          "siblingBottles": []
+        }
+      },
+      {
+        "abv": 40,
+        "brand": "Gordon & MacPhail",
+        "score": 66.635895,
+        "series": "Connoisseurs Choice",
+        "source": ["text"],
+        "bottler": "Gordon & MacPhail",
+        "edition": null,
+        "outturn": null,
+        "bottleId": 66422,
+        "category": "single_malt",
+        "fullName": "Gordon & MacPhail Bladnoch 1988",
+        "reference": null,
+        "statedAge": null,
+        "caskNumber": null,
+        "comparison": {
+          "missing": ["caskStrength"],
+          "conflicts": ["vintageYear", "distillers"],
+          "agreements": ["category", "abv", "brand", "bottler", "series"]
+        },
+        "distillery": ["Bladnoch"],
+        "maturation": null,
+        "releaseDay": null,
+        "singleCask": null,
+        "releaseYear": null,
+        "vintageYear": 1988,
+        "bottlingYear": 2001,
+        "caskStrength": null,
+        "releaseMonth": null,
+        "familyContext": {
+          "siblingBottles": []
+        }
+      },
+      {
+        "abv": null,
+        "brand": "North Port",
+        "score": 59.63821,
+        "series": null,
+        "source": ["text", "context"],
+        "bottler": "Sestante",
+        "edition": null,
+        "outturn": null,
+        "bottleId": 5481,
+        "category": "single_malt",
+        "fullName": "North Port 1974 Ses Very Rare",
+        "reference": null,
+        "statedAge": 30,
+        "caskNumber": null,
+        "comparison": {
+          "missing": ["abv", "vintageYear"],
+          "conflicts": [],
+          "agreements": ["category", "distillers"]
+        },
+        "distillery": ["North Port"],
+        "maturation": null,
+        "releaseDay": null,
+        "singleCask": null,
+        "releaseYear": null,
+        "vintageYear": null,
+        "bottlingYear": null,
+        "caskStrength": null,
+        "releaseMonth": null,
+        "familyContext": {
+          "siblingBottles": []
+        }
+      },
+      {
+        "abv": 40,
+        "brand": "Tomintoul",
+        "score": 36.37659,
+        "series": null,
+        "source": ["text"],
+        "bottler": null,
+        "edition": null,
+        "outturn": null,
+        "bottleId": 45668,
+        "category": "single_malt",
+        "fullName": "Tomintoul White Port Cask Finish - 40.0% ABV - White Port Cask - Barrique",
+        "reference": null,
+        "statedAge": null,
+        "caskNumber": null,
+        "comparison": {
+          "missing": [],
+          "conflicts": [],
+          "agreements": ["abv"]
+        },
+        "distillery": ["Tomintoul"],
+        "maturation": "white_port",
+        "releaseDay": null,
+        "singleCask": null,
+        "releaseYear": null,
+        "vintageYear": null,
+        "bottlingYear": null,
+        "caskStrength": null,
+        "releaseMonth": null,
+        "familyContext": {
+          "siblingBottles": []
+        }
+      },
+      {
+        "abv": 40,
+        "brand": "Tomintoul",
+        "score": 34.930923,
+        "series": null,
+        "source": ["text"],
+        "bottler": null,
+        "edition": null,
+        "outturn": null,
+        "bottleId": 45783,
+        "category": "single_malt",
+        "fullName": "Tomintoul Tawny Port Cask Finish",
+        "reference": null,
+        "statedAge": null,
+        "caskNumber": null,
+        "comparison": {
+          "missing": ["vintageYear"],
+          "conflicts": ["distillers"],
+          "agreements": ["category", "abv"]
+        },
+        "distillery": ["Tomintoul"],
+        "maturation": "tawny_port",
+        "releaseDay": null,
+        "singleCask": null,
+        "releaseYear": null,
+        "vintageYear": null,
+        "bottlingYear": null,
+        "caskStrength": null,
+        "releaseMonth": null,
+        "familyContext": {
+          "siblingBottles": []
+        }
+      },
+      {
+        "abv": 40,
+        "brand": "Glen Moray",
+        "score": 32.047073,
+        "series": "Elgin Classic",
+        "source": ["text"],
+        "bottler": null,
+        "edition": null,
+        "outturn": null,
+        "bottleId": 45700,
+        "category": "single_malt",
+        "fullName": "Glen Moray Port Cask Finish",
+        "reference": null,
+        "statedAge": null,
+        "caskNumber": null,
+        "comparison": {
+          "missing": ["vintageYear"],
+          "conflicts": ["distillers"],
+          "agreements": ["category", "abv"]
+        },
+        "distillery": ["Glen Moray"],
+        "maturation": "tawny_port",
+        "releaseDay": null,
+        "singleCask": null,
+        "releaseYear": null,
+        "vintageYear": null,
+        "bottlingYear": null,
+        "caskStrength": null,
+        "releaseMonth": null,
+        "familyContext": {
+          "siblingBottles": []
+        }
+      },
+      {
+        "abv": 40,
+        "brand": "Kavalan",
+        "score": 32.004303,
+        "series": null,
+        "source": ["text"],
+        "bottler": null,
+        "edition": null,
+        "outturn": null,
+        "bottleId": 45856,
+        "category": "single_malt",
+        "fullName": "Kavalan Concertmaster Port Cask Finish - 40.0% ABV - Other Cask",
+        "reference": null,
+        "statedAge": null,
+        "caskNumber": null,
+        "comparison": {
+          "missing": ["vintageYear"],
+          "conflicts": ["distillers"],
+          "agreements": ["category", "abv"]
+        },
+        "distillery": ["Kavalan"],
+        "maturation": "other",
+        "releaseDay": null,
+        "singleCask": null,
+        "releaseYear": null,
+        "vintageYear": null,
+        "bottlingYear": null,
+        "caskStrength": null,
+        "releaseMonth": null,
+        "familyContext": {
+          "siblingBottles": []
+        }
+      },
+      {
+        "abv": 42,
+        "brand": "The Dalmore",
+        "score": 31.547173,
+        "series": null,
+        "source": ["text"],
+        "bottler": null,
+        "edition": null,
+        "outturn": 948,
+        "bottleId": 61046,
+        "category": "single_malt",
+        "fullName": "Dalmore 1974 Matusalem Sherry Finesse",
+        "reference": null,
+        "statedAge": null,
+        "caskNumber": null,
+        "comparison": {
+          "missing": [],
+          "conflicts": ["abv", "distillers"],
+          "agreements": ["category", "vintageYear"]
+        },
+        "distillery": ["The Dalmore"],
+        "maturation": null,
+        "releaseDay": null,
+        "singleCask": null,
+        "releaseYear": null,
+        "vintageYear": 1974,
+        "bottlingYear": 2008,
+        "caskStrength": null,
+        "releaseMonth": null,
+        "familyContext": {
+          "siblingBottles": []
+        }
+      },
+      {
+        "abv": null,
+        "brand": "Glenfarclas",
+        "score": 30.956264,
+        "series": null,
+        "source": ["text"],
+        "bottler": null,
+        "edition": null,
+        "outturn": null,
+        "bottleId": 18358,
+        "category": "single_malt",
+        "fullName": "Glenfarclas 1974 vintage",
+        "reference": null,
+        "statedAge": 46,
+        "caskNumber": null,
+        "comparison": {
+          "missing": ["abv"],
+          "conflicts": ["distillers"],
+          "agreements": ["category", "vintageYear"]
+        },
+        "distillery": ["Glenfarclas"],
+        "maturation": null,
+        "releaseDay": null,
+        "singleCask": null,
+        "releaseYear": null,
+        "vintageYear": 1974,
+        "bottlingYear": null,
+        "caskStrength": null,
+        "releaseMonth": null,
+        "familyContext": {
+          "siblingBottles": []
+        }
+      },
+      {
+        "abv": null,
+        "brand": "Ledaig",
+        "score": 30.854393,
+        "series": null,
+        "source": ["text"],
+        "bottler": "Tobermory",
+        "edition": null,
+        "outturn": null,
+        "bottleId": 5445,
+        "category": "single_malt",
+        "fullName": "Ledaig 1974 Vintage",
+        "reference": null,
+        "statedAge": 46,
+        "caskNumber": null,
+        "comparison": {
+          "missing": ["abv", "distillers"],
+          "conflicts": [],
+          "agreements": ["category", "vintageYear"]
+        },
+        "distillery": [],
+        "maturation": null,
+        "releaseDay": null,
+        "singleCask": null,
+        "releaseYear": null,
+        "vintageYear": 1974,
+        "bottlingYear": null,
+        "caskStrength": null,
+        "releaseMonth": null,
+        "familyContext": {
+          "siblingBottles": []
+        }
+      },
+      {
+        "abv": 40,
+        "brand": "Knockando",
+        "score": 30.75225,
+        "series": null,
+        "source": ["text"],
+        "bottler": null,
+        "edition": null,
+        "outturn": null,
+        "bottleId": 52822,
+        "category": "single_malt",
+        "fullName": "Knockando 1974",
+        "reference": null,
+        "statedAge": null,
+        "caskNumber": null,
+        "comparison": {
+          "missing": [],
+          "conflicts": ["distillers"],
+          "agreements": ["category", "abv", "vintageYear"]
+        },
+        "distillery": ["Knockando"],
+        "maturation": null,
+        "releaseDay": null,
+        "singleCask": null,
+        "releaseYear": null,
+        "vintageYear": 1974,
+        "bottlingYear": 1987,
+        "caskStrength": null,
+        "releaseMonth": null,
+        "familyContext": {
+          "siblingBottles": []
+        }
+      },
+      {
+        "abv": 43,
+        "brand": "The Macallan",
+        "score": 30.385391,
+        "series": "Sherry Oak Collection",
+        "source": ["text"],
+        "bottler": null,
+        "edition": "1974 Vintage",
+        "outturn": null,
+        "bottleId": 54978,
+        "category": "single_malt",
+        "fullName": "The Macallan Sherry Oak - 1974 Vintage",
+        "reference": null,
+        "statedAge": 18,
+        "caskNumber": null,
+        "comparison": {
+          "missing": [],
+          "conflicts": ["abv", "distillers"],
+          "agreements": ["category", "vintageYear"]
+        },
+        "distillery": ["The Macallan"],
+        "maturation": "Sherry seasoned oak casks",
+        "releaseDay": null,
+        "singleCask": false,
+        "releaseYear": null,
+        "vintageYear": 1974,
+        "bottlingYear": null,
+        "caskStrength": null,
+        "releaseMonth": null,
+        "familyContext": {
+          "siblingBottles": []
+        }
+      },
+      {
+        "abv": 45.4,
+        "brand": "Highland Park",
+        "score": 29.362106,
+        "series": null,
+        "source": ["vector", "text"],
+        "bottler": null,
+        "edition": "for Virginia ABC",
+        "outturn": null,
+        "bottleId": 18112,
+        "category": "single_malt",
+        "fullName": "Highland Park Single Cask - for Virginia ABC",
+        "reference": "Highland Park 1974 vintage 31-year-old (Cask #8998) - 1974 Vintage",
+        "statedAge": 31,
+        "caskNumber": "8998",
+        "comparison": {
+          "missing": [],
+          "conflicts": ["abv", "distillers"],
+          "agreements": ["category", "vintageYear"]
+        },
+        "distillery": ["Highland Park"],
+        "maturation": null,
+        "releaseDay": null,
+        "singleCask": true,
+        "releaseYear": null,
+        "vintageYear": 1974,
+        "bottlingYear": null,
+        "caskStrength": true,
+        "releaseMonth": null,
+        "familyContext": {
+          "siblingBottles": []
+        }
+      },
+      {
+        "abv": null,
+        "brand": "The Balvenie",
+        "score": 27.938723,
+        "series": null,
+        "source": ["text"],
+        "bottler": null,
+        "edition": null,
+        "outturn": null,
+        "bottleId": 18130,
+        "category": "single_malt",
+        "fullName": "The Balvenie 1974 vintage (Cask #17893)",
+        "reference": null,
+        "statedAge": 46,
+        "caskNumber": null,
+        "comparison": {
+          "missing": ["abv"],
+          "conflicts": ["distillers"],
+          "agreements": ["category", "vintageYear"]
+        },
+        "distillery": ["The Balvenie"],
+        "maturation": null,
+        "releaseDay": null,
+        "singleCask": null,
+        "releaseYear": null,
+        "vintageYear": 1974,
+        "bottlingYear": null,
+        "caskStrength": null,
+        "releaseMonth": null,
+        "familyContext": {
+          "siblingBottles": []
+        }
+      },
+      {
+        "abv": null,
+        "brand": "Cask & Thistle",
+        "score": 27.743134,
+        "series": null,
+        "source": ["text"],
+        "bottler": null,
+        "edition": null,
+        "outturn": null,
+        "bottleId": 65828,
+        "category": "single_malt",
+        "fullName": "Cask & Thistle Aberfeldy 1974",
+        "reference": null,
+        "statedAge": 29,
+        "caskNumber": null,
+        "comparison": {
+          "missing": ["abv"],
+          "conflicts": ["distillers"],
+          "agreements": ["category", "vintageYear"]
+        },
+        "distillery": ["Aberfeldy"],
+        "maturation": null,
+        "releaseDay": null,
+        "singleCask": null,
+        "releaseYear": null,
+        "vintageYear": 1974,
+        "bottlingYear": null,
+        "caskStrength": null,
+        "releaseMonth": null,
+        "familyContext": {
+          "siblingBottles": []
+        }
+      },
+      {
+        "abv": null,
+        "brand": "Murray McDavid",
+        "score": 27.270061,
+        "series": null,
+        "source": ["text"],
+        "bottler": null,
+        "edition": null,
+        "outturn": null,
+        "bottleId": 18593,
+        "category": "single_malt",
+        "fullName": "Murray McDavid Mission IV 1974 Vintage (distilled at Glendronach)",
+        "reference": null,
+        "statedAge": null,
+        "caskNumber": null,
+        "comparison": {
+          "missing": ["abv", "distillers"],
+          "conflicts": [],
+          "agreements": ["category", "vintageYear"]
+        },
+        "distillery": [],
+        "maturation": null,
+        "releaseDay": null,
+        "singleCask": null,
+        "releaseYear": null,
+        "vintageYear": 1974,
+        "bottlingYear": null,
+        "caskStrength": null,
+        "releaseMonth": null,
+        "familyContext": {
+          "siblingBottles": []
+        }
+      },
+      {
+        "abv": null,
+        "brand": "Longrow",
+        "score": 26.565046,
+        "series": null,
+        "source": ["text"],
+        "bottler": "Springbank",
+        "edition": null,
+        "outturn": null,
+        "bottleId": 1230,
+        "category": "single_malt",
+        "fullName": "Longrow 1974",
+        "reference": null,
+        "statedAge": 25,
+        "caskNumber": null,
+        "comparison": {
+          "missing": ["abv", "vintageYear", "distillers"],
+          "conflicts": [],
+          "agreements": ["category"]
+        },
+        "distillery": [],
+        "maturation": null,
+        "releaseDay": null,
+        "singleCask": null,
+        "releaseYear": null,
+        "vintageYear": null,
+        "bottlingYear": null,
+        "caskStrength": null,
+        "releaseMonth": null,
+        "familyContext": {
+          "siblingBottles": []
+        }
+      },
+      {
+        "abv": null,
+        "brand": "Murray McDavid",
+        "score": 26.562107,
+        "series": null,
+        "source": ["text"],
+        "bottler": null,
+        "edition": null,
+        "outturn": null,
+        "bottleId": 18555,
+        "category": "single_malt",
+        "fullName": "Murray McDavid Mission IV 1974 Vintage (distilled at Glen Spey)",
+        "reference": null,
+        "statedAge": 46,
+        "caskNumber": null,
+        "comparison": {
+          "missing": ["abv", "distillers"],
+          "conflicts": [],
+          "agreements": ["category", "vintageYear"]
+        },
+        "distillery": [],
+        "maturation": null,
+        "releaseDay": null,
+        "singleCask": null,
+        "releaseYear": null,
+        "vintageYear": 1974,
+        "bottlingYear": null,
+        "caskStrength": null,
+        "releaseMonth": null,
+        "familyContext": {
+          "siblingBottles": []
+        }
+      },
+      {
+        "abv": null,
+        "brand": "Scott's Selection",
+        "score": 26.170567,
+        "series": null,
+        "source": ["text"],
+        "bottler": null,
+        "edition": null,
+        "outturn": null,
+        "bottleId": 18589,
+        "category": "single_malt",
+        "fullName": "Scott's Selection 30-year-old 1974 vintage (distilled at Macallan)",
+        "reference": null,
+        "statedAge": 30,
+        "caskNumber": null,
+        "comparison": {
+          "missing": ["abv", "distillers"],
+          "conflicts": [],
+          "agreements": ["category", "vintageYear"]
+        },
+        "distillery": [],
+        "maturation": null,
+        "releaseDay": null,
+        "singleCask": null,
+        "releaseYear": null,
+        "vintageYear": 1974,
+        "bottlingYear": null,
+        "caskStrength": null,
+        "releaseMonth": null,
+        "familyContext": {
+          "siblingBottles": []
+        }
+      },
+      {
+        "abv": null,
+        "brand": "Port Ellen",
+        "score": 0.6492351923139871,
+        "series": null,
+        "source": ["vector"],
+        "bottler": null,
+        "edition": null,
+        "outturn": null,
+        "bottleId": 16724,
+        "category": "single_malt",
+        "fullName": "Port Ellen 34-year-old",
+        "reference": "Port Ellen 34-year-old, 55%",
+        "statedAge": 34,
+        "caskNumber": null,
+        "comparison": {
+          "missing": ["abv", "vintageYear"],
+          "conflicts": ["distillers"],
+          "agreements": ["category"]
+        },
+        "distillery": ["Port Ellen"],
+        "maturation": null,
+        "releaseDay": null,
+        "singleCask": null,
+        "releaseYear": null,
+        "vintageYear": null,
+        "bottlingYear": null,
+        "caskStrength": null,
+        "releaseMonth": null,
+        "familyContext": {
+          "siblingBottles": []
+        }
+      }
+    ]
+  },
+  "context": {
+    "inspectedBottleIds": [5481],
+    "bottleContexts": [
+      {
+        "exact": {
+          "abv": null,
+          "edition": null,
+          "outturn": null,
+          "statedAge": null,
+          "caskNumber": null,
+          "maturation": null,
+          "releaseDay": null,
+          "singleCask": null,
+          "releaseYear": null,
+          "vintageYear": null,
+          "bottlingYear": null,
+          "caskStrength": null,
+          "releaseMonth": null
+        },
+        "shared": {
+          "name": "1974 Ses Very Rare",
+          "brand": {
+            "name": "North Port",
+            "entityId": 1206
+          },
+          "series": null,
+          "bottler": {
+            "name": "Sestante",
+            "entityId": 5360
+          },
+          "category": "single_malt",
+          "statedAge": 30,
+          "distillers": [
+            {
+              "name": "North Port",
+              "entityId": 1206
+            }
+          ]
+        },
+        "groupId": 12370,
+        "bottleId": 5481,
+        "fullName": "North Port 1974 Ses Very Rare",
+        "siblings": [],
+        "references": [
+          {
+            "name": "North Port 1974 Ses Very Rare",
+            "ignored": false
+          }
+        ],
+        "observations": [],
+        "imageSources": []
+      }
+    ],
+    "inspectedEntities": [
+      {
+        "kind": "bottler",
+        "name": "Gordon & MacPhail",
+        "score": 1,
+        "source": ["exact", "text", "prefix", "contained"],
+        "entityId": 5645,
+        "reference": "Gordon & MacPhail",
+        "shortName": null,
+        "retrievedFor": [
+          {
+            "exact": true,
+            "query": "Gordon & MacPhail"
+          }
+        ]
+      },
+      {
+        "kind": "distillery",
+        "name": "Aberfeldy",
+        "score": 1,
+        "source": ["exact", "text", "prefix", "contained"],
+        "entityId": 42,
+        "reference": "Aberfeldy",
+        "shortName": null,
+        "retrievedFor": [
+          {
+            "exact": true,
+            "query": "Aberfeldy"
+          }
+        ]
+      },
+      {
+        "kind": "distillery",
+        "name": "Banff",
+        "score": 1,
+        "source": ["exact", "text", "prefix", "contained"],
+        "entityId": 93,
+        "reference": "Banff",
+        "shortName": null,
+        "retrievedFor": [
+          {
+            "exact": true,
+            "query": "Banff"
+          }
+        ]
+      },
+      {
+        "kind": "distillery",
+        "name": "Glencadam",
+        "score": 1,
+        "source": ["exact", "text", "prefix", "contained"],
+        "entityId": 114,
+        "reference": "Glencadam",
+        "shortName": null,
+        "retrievedFor": [
+          {
+            "exact": true,
+            "query": "Glencadam"
+          }
+        ]
+      },
+      {
+        "kind": "distillery",
+        "name": "Glenkinchie",
+        "score": 1,
+        "source": ["exact", "text", "prefix", "contained"],
+        "entityId": 980,
+        "reference": "Glenkinchie",
+        "shortName": null,
+        "retrievedFor": [
+          {
+            "exact": true,
+            "query": "Glenkinchie"
+          }
+        ]
+      },
+      {
+        "kind": "distillery",
+        "name": "Glenlossie",
+        "score": 1,
+        "source": ["exact", "text", "prefix", "contained"],
+        "entityId": 983,
+        "reference": "Glenlossie",
+        "shortName": null,
+        "retrievedFor": [
+          {
+            "exact": true,
+            "query": "Glenlossie"
+          }
+        ]
+      },
+      {
+        "kind": "distillery",
+        "name": "Port Ellen",
+        "score": 1,
+        "source": ["exact", "text", "prefix", "contained"],
+        "entityId": 1271,
+        "reference": "Port Ellen",
+        "shortName": null,
+        "retrievedFor": [
+          {
+            "exact": true,
+            "query": "Port Ellen"
+          }
+        ]
+      },
+      {
+        "kind": "distillery",
+        "name": "Tomintoul",
+        "score": 1,
+        "source": ["exact", "text", "prefix", "contained"],
+        "entityId": 174,
+        "reference": "Tomintoul",
+        "shortName": null,
+        "retrievedFor": [
+          {
+            "exact": true,
+            "query": "Tomintoul"
+          }
+        ]
+      },
+      {
+        "kind": "distillery",
+        "name": "Ardbeg",
+        "score": 1,
+        "source": ["exact", "text", "prefix", "contained"],
+        "entityId": 28,
+        "reference": "Ardbeg",
+        "shortName": null,
+        "retrievedFor": [
+          {
+            "exact": true,
+            "query": "Ardbeg"
+          }
+        ]
+      },
+      {
+        "kind": "distillery",
+        "name": "North Port",
+        "score": 1,
+        "source": ["exact", "text", "prefix", "contained"],
+        "entityId": 1206,
+        "reference": "North Port",
+        "shortName": null,
+        "retrievedFor": [
+          {
+            "exact": true,
+            "query": "North Port"
+          }
+        ]
+      }
+    ],
+    "inspectedSeries": []
+  },
+  "provenance": {
+    "source": "production_miss",
+    "verifiedSourceUrls": [
+      "https://www.scotchwhiskyauctions.com/auctions/234-the-185th-auction/904318-north-port-brechin-1974-connoisseurs-choice/"
+    ],
+    "dbOutcome": {
+      "bottleId": null,
+      "createsBottle": false,
+      "summary": "Production returned no_match: it could not tell which Connoisseurs Choice bottling the lot was, because the old page read did not return the lot facts."
+    },
+    "notes": "Captured from saved classifier run 36288 (auction_lot 17144, model null, 2026-11-03T19:38:30.112Z). Production rationale: This is one whisky bottle: a 1974 North Port-Brechin single malt from Gordon & MacPhail’s Connoisseurs Choice, at 40% ABV. No inspected local Bottle is a safe exact match; the North Port 1974 candidate is a 30-year-old Sestante bottling. The available evidence does not resolve which Gordon & MacPhail bottling the auction lot represents, so neither a match nor a distinct Bottle creation is supported. The run predates reading Scotch Whisky Auctions lot pages (#1609), so the evidence pack adds the lot page text. Expected outcome checked against the lot page and photo on 2026-11-09, in a random sample of the 185th auction's no_match reviews."
+  },
+  "expected": {
+    "status": "classified",
+    "action": "create_bottle",
+    "identityScope": "product",
+    "matchedBottleId": null,
+    "proposedBottle": {
+      "brand": {
+        "id": 5645
+      },
+      "category": "single_malt",
+      "vintageYear": 1974,
+      "bottlingYear": 1993,
+      "abv": 40
+    },
+    "proposedBottleNameIncludes": ["North Port", "1974"],
+    "proposedBottleDistillerIds": [1206],
+    "summary": "Create Gordon & MacPhail Connoisseurs Choice North Port 1974, bottled 1993, 40%. The lot page gives the vintage, bottling year and strength. The only local North Port 1974 is a 30-year-old Sestante bottling, another Bottle. Like the Lochside 1991 case, each Connoisseurs Choice bottling year is its own Bottle."
+  }
+}

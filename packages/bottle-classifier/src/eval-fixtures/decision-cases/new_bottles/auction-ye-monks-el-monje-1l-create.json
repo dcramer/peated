@@ -1,0 +1,1434 @@
+{
+  "id": "auction-ye-monks-el-monje-1l-create",
+  "name": "Ye Monks El Monje 1L: create Ye Monks; El Monje is its export-market name",
+  "input": {
+    "reference": {
+      "id": 4576,
+      "url": "https://www.scotchwhiskyauctions.com/auctions/232-the-183rd-auction/898448-ye-monks-el-monje-1l/",
+      "name": "Ye Monks El Monje 1L",
+      "imageUrl": null,
+      "externalSiteId": 28097,
+      "currentBottleId": null
+    },
+    "extractedIdentity": {
+      "abv": null,
+      "brand": "Ye Monks",
+      "series": null,
+      "bottler": null,
+      "edition": null,
+      "outturn": null,
+      "category": "blend",
+      "distillery": [],
+      "expression": "El Monje",
+      "maturation": null,
+      "stated_age": null,
+      "cask_number": null,
+      "release_day": null,
+      "single_cask": null,
+      "release_year": null,
+      "vintage_year": null,
+      "bottling_year": null,
+      "cask_strength": null,
+      "release_month": null
+    },
+    "extractedIdentitySource": "text",
+    "imageEvidence": null,
+    "initialCandidates": [
+      {
+        "abv": null,
+        "brand": "Stauning",
+        "score": 42.1908,
+        "series": null,
+        "source": ["text"],
+        "bottler": null,
+        "edition": null,
+        "outturn": null,
+        "bottleId": 13102,
+        "category": "single_malt",
+        "fullName": "Stauning El Clásico",
+        "reference": null,
+        "statedAge": null,
+        "caskNumber": null,
+        "comparison": {
+          "missing": [],
+          "conflicts": ["category", "brand"],
+          "agreements": []
+        },
+        "distillery": [],
+        "maturation": null,
+        "releaseDay": null,
+        "singleCask": null,
+        "releaseYear": null,
+        "vintageYear": null,
+        "bottlingYear": null,
+        "caskStrength": null,
+        "releaseMonth": null,
+        "familyContext": {
+          "siblingBottles": []
+        }
+      },
+      {
+        "abv": null,
+        "brand": "Potter's",
+        "score": 20.799892,
+        "series": null,
+        "source": ["vector", "text"],
+        "bottler": null,
+        "edition": null,
+        "outturn": null,
+        "bottleId": 16330,
+        "category": "blend",
+        "fullName": "Potter's s Special Old",
+        "reference": "Potter s Special Old",
+        "statedAge": null,
+        "caskNumber": null,
+        "comparison": {
+          "missing": [],
+          "conflicts": ["brand"],
+          "agreements": ["category"]
+        },
+        "distillery": [],
+        "maturation": null,
+        "releaseDay": null,
+        "singleCask": null,
+        "releaseYear": null,
+        "vintageYear": null,
+        "bottlingYear": null,
+        "caskStrength": null,
+        "releaseMonth": null,
+        "familyContext": {
+          "siblingBottles": []
+        }
+      },
+      {
+        "abv": 40,
+        "brand": "Ocean Whisky Co.",
+        "score": 20.72505,
+        "series": "Special Old",
+        "source": ["text"],
+        "bottler": null,
+        "edition": null,
+        "outturn": null,
+        "bottleId": 55601,
+        "category": "blend",
+        "fullName": "Ocean Whisky Co. Special Old",
+        "reference": null,
+        "statedAge": null,
+        "caskNumber": null,
+        "comparison": {
+          "missing": [],
+          "conflicts": ["brand"],
+          "agreements": ["category"]
+        },
+        "distillery": ["Karuizawa"],
+        "maturation": null,
+        "releaseDay": null,
+        "singleCask": null,
+        "releaseYear": null,
+        "vintageYear": null,
+        "bottlingYear": null,
+        "caskStrength": null,
+        "releaseMonth": null,
+        "familyContext": {
+          "siblingBottles": []
+        }
+      },
+      {
+        "abv": 43,
+        "brand": "Ocean Whisky Co.",
+        "score": 20.36826,
+        "series": "Special Old",
+        "source": ["text"],
+        "bottler": null,
+        "edition": null,
+        "outturn": null,
+        "bottleId": 54969,
+        "category": "blend",
+        "fullName": "Ocean Whisky Co. Special Old",
+        "reference": null,
+        "statedAge": 12,
+        "caskNumber": null,
+        "comparison": {
+          "missing": [],
+          "conflicts": ["brand"],
+          "agreements": ["category"]
+        },
+        "distillery": ["Karuizawa", "Yamanashi Distillery"],
+        "maturation": null,
+        "releaseDay": null,
+        "singleCask": false,
+        "releaseYear": null,
+        "vintageYear": null,
+        "bottlingYear": null,
+        "caskStrength": false,
+        "releaseMonth": null,
+        "familyContext": {
+          "siblingBottles": []
+        }
+      },
+      {
+        "abv": 40,
+        "brand": "Crown Royal",
+        "score": 20.11603,
+        "series": null,
+        "source": ["text"],
+        "bottler": null,
+        "edition": null,
+        "outturn": null,
+        "bottleId": 65765,
+        "category": "blend",
+        "fullName": "Crown Royal Special Reserve",
+        "reference": null,
+        "statedAge": null,
+        "caskNumber": null,
+        "comparison": {
+          "missing": [],
+          "conflicts": ["brand"],
+          "agreements": ["category"]
+        },
+        "distillery": [],
+        "maturation": null,
+        "releaseDay": null,
+        "singleCask": null,
+        "releaseYear": null,
+        "vintageYear": null,
+        "bottlingYear": null,
+        "caskStrength": null,
+        "releaseMonth": null,
+        "familyContext": {
+          "siblingBottles": []
+        }
+      },
+      {
+        "abv": 46,
+        "brand": "Flaming Leprechaun",
+        "score": 20.11603,
+        "series": null,
+        "source": ["text"],
+        "bottler": null,
+        "edition": null,
+        "outturn": null,
+        "bottleId": 65123,
+        "category": "blend",
+        "fullName": "Flaming Leprechaun Special Reserve",
+        "reference": null,
+        "statedAge": null,
+        "caskNumber": null,
+        "comparison": {
+          "missing": [],
+          "conflicts": ["brand"],
+          "agreements": ["category"]
+        },
+        "distillery": [],
+        "maturation": null,
+        "releaseDay": null,
+        "singleCask": null,
+        "releaseYear": null,
+        "vintageYear": null,
+        "bottlingYear": null,
+        "caskStrength": null,
+        "releaseMonth": null,
+        "familyContext": {
+          "siblingBottles": []
+        }
+      },
+      {
+        "abv": null,
+        "brand": "Slane",
+        "score": 20.057596,
+        "series": null,
+        "source": ["text"],
+        "bottler": null,
+        "edition": null,
+        "outturn": null,
+        "bottleId": 11881,
+        "category": "blend",
+        "fullName": "Slane Special Edition Extra Virgin Oak",
+        "reference": null,
+        "statedAge": null,
+        "caskNumber": null,
+        "comparison": {
+          "missing": [],
+          "conflicts": ["brand"],
+          "agreements": ["category"]
+        },
+        "distillery": [],
+        "maturation": null,
+        "releaseDay": null,
+        "singleCask": null,
+        "releaseYear": null,
+        "vintageYear": null,
+        "bottlingYear": null,
+        "caskStrength": null,
+        "releaseMonth": null,
+        "familyContext": {
+          "siblingBottles": []
+        }
+      },
+      {
+        "abv": 43,
+        "brand": "Ocean Whisky Co.",
+        "score": 19.827578,
+        "series": "Special Old",
+        "source": ["text"],
+        "bottler": null,
+        "edition": "SP",
+        "outturn": null,
+        "bottleId": 54970,
+        "category": "blend",
+        "fullName": "Ocean Whisky Co. Special Old - SP",
+        "reference": null,
+        "statedAge": null,
+        "caskNumber": null,
+        "comparison": {
+          "missing": [],
+          "conflicts": ["brand"],
+          "agreements": ["category"]
+        },
+        "distillery": ["Karuizawa"],
+        "maturation": null,
+        "releaseDay": null,
+        "singleCask": false,
+        "releaseYear": 1981,
+        "vintageYear": null,
+        "bottlingYear": null,
+        "caskStrength": false,
+        "releaseMonth": null,
+        "familyContext": {
+          "siblingBottles": []
+        }
+      },
+      {
+        "abv": 40,
+        "brand": "Royal Salute",
+        "score": 19.542639,
+        "series": null,
+        "source": ["text"],
+        "bottler": null,
+        "edition": "Special Batch",
+        "outturn": null,
+        "bottleId": 56716,
+        "category": "blend",
+        "fullName": "Royal Salute The Jodhpur Polo Edition - Special Batch",
+        "reference": null,
+        "statedAge": 21,
+        "caskNumber": null,
+        "comparison": {
+          "missing": [],
+          "conflicts": ["brand"],
+          "agreements": ["category"]
+        },
+        "distillery": [],
+        "maturation": null,
+        "releaseDay": null,
+        "singleCask": null,
+        "releaseYear": null,
+        "vintageYear": null,
+        "bottlingYear": null,
+        "caskStrength": null,
+        "releaseMonth": null,
+        "familyContext": {
+          "siblingBottles": []
+        }
+      },
+      {
+        "abv": 45,
+        "brand": "Michel Couvreur",
+        "score": 19.285538,
+        "series": null,
+        "source": ["text"],
+        "bottler": "Michel Couvreur",
+        "edition": null,
+        "outturn": null,
+        "bottleId": 466,
+        "category": "blend",
+        "fullName": "Michel Couvreur Special Vatting Peaty Malt Whisky",
+        "reference": null,
+        "statedAge": null,
+        "caskNumber": null,
+        "comparison": {
+          "missing": [],
+          "conflicts": ["brand"],
+          "agreements": ["category"]
+        },
+        "distillery": [],
+        "maturation": "Oak Sherry Casks",
+        "releaseDay": null,
+        "singleCask": null,
+        "releaseYear": null,
+        "vintageYear": null,
+        "bottlingYear": null,
+        "caskStrength": null,
+        "releaseMonth": null,
+        "familyContext": {
+          "siblingBottles": []
+        }
+      },
+      {
+        "abv": 43,
+        "brand": "Something Special",
+        "score": 19.174622,
+        "series": null,
+        "source": ["text"],
+        "bottler": "Hill Thomson & Co. Ltd.",
+        "edition": null,
+        "outturn": null,
+        "bottleId": 52270,
+        "category": "blend",
+        "fullName": "Something Special De Luxe",
+        "reference": null,
+        "statedAge": null,
+        "caskNumber": null,
+        "comparison": {
+          "missing": [],
+          "conflicts": ["brand"],
+          "agreements": ["category"]
+        },
+        "distillery": [],
+        "maturation": null,
+        "releaseDay": null,
+        "singleCask": null,
+        "releaseYear": null,
+        "vintageYear": null,
+        "bottlingYear": null,
+        "caskStrength": null,
+        "releaseMonth": null,
+        "familyContext": {
+          "siblingBottles": []
+        }
+      },
+      {
+        "abv": null,
+        "brand": "Monkey Shoulder",
+        "score": 0.6382518987144333,
+        "series": null,
+        "source": ["vector"],
+        "bottler": null,
+        "edition": null,
+        "outturn": null,
+        "bottleId": 13326,
+        "category": "blend",
+        "fullName": "Monkey Shoulder Smokey Monkey",
+        "reference": "Monkey Shoulder Smokey Monkey",
+        "statedAge": null,
+        "caskNumber": null,
+        "comparison": {
+          "missing": [],
+          "conflicts": ["brand"],
+          "agreements": ["category"]
+        },
+        "distillery": [],
+        "maturation": null,
+        "releaseDay": null,
+        "singleCask": null,
+        "releaseYear": null,
+        "vintageYear": null,
+        "bottlingYear": null,
+        "caskStrength": null,
+        "releaseMonth": null,
+        "familyContext": {
+          "siblingBottles": []
+        }
+      },
+      {
+        "abv": null,
+        "brand": "Monkey Shoulder",
+        "score": 0.6369717823314389,
+        "series": null,
+        "source": ["vector"],
+        "bottler": null,
+        "edition": null,
+        "outturn": null,
+        "bottleId": 9874,
+        "category": "blend",
+        "fullName": "Monkey Shoulder - Smooth And Rich (Batch 27)",
+        "reference": "Monkey Shoulder",
+        "statedAge": null,
+        "caskNumber": null,
+        "comparison": {
+          "missing": [],
+          "conflicts": ["brand"],
+          "agreements": ["category"]
+        },
+        "distillery": [],
+        "maturation": null,
+        "releaseDay": null,
+        "singleCask": null,
+        "releaseYear": null,
+        "vintageYear": null,
+        "bottlingYear": null,
+        "caskStrength": null,
+        "releaseMonth": null,
+        "familyContext": {
+          "siblingBottles": []
+        }
+      },
+      {
+        "abv": null,
+        "brand": "Shibui",
+        "score": 0.6065352955991159,
+        "series": null,
+        "source": ["vector"],
+        "bottler": null,
+        "edition": null,
+        "outturn": null,
+        "bottleId": 13024,
+        "category": "blend",
+        "fullName": "Shibui Pure Malt",
+        "reference": "Shibui Pure Malt",
+        "statedAge": null,
+        "caskNumber": null,
+        "comparison": {
+          "missing": [],
+          "conflicts": ["brand"],
+          "agreements": ["category"]
+        },
+        "distillery": [],
+        "maturation": null,
+        "releaseDay": null,
+        "singleCask": null,
+        "releaseYear": null,
+        "vintageYear": null,
+        "bottlingYear": null,
+        "caskStrength": null,
+        "releaseMonth": null,
+        "familyContext": {
+          "siblingBottles": []
+        }
+      },
+      {
+        "abv": null,
+        "brand": "Sansibar Whisky",
+        "score": 0.6057434784043214,
+        "series": null,
+        "source": ["vector"],
+        "bottler": "Sansibar Whisky",
+        "edition": null,
+        "outturn": null,
+        "bottleId": 9899,
+        "category": "blend",
+        "fullName": "Sansibar Whisky Speyside Region Very Old Selection",
+        "reference": "Sansibar Whisky Speyside Region Very Old Selection",
+        "statedAge": null,
+        "caskNumber": null,
+        "comparison": {
+          "missing": [],
+          "conflicts": ["brand"],
+          "agreements": ["category"]
+        },
+        "distillery": [],
+        "maturation": null,
+        "releaseDay": null,
+        "singleCask": null,
+        "releaseYear": null,
+        "vintageYear": null,
+        "bottlingYear": null,
+        "caskStrength": null,
+        "releaseMonth": null,
+        "familyContext": {
+          "siblingBottles": []
+        }
+      },
+      {
+        "abv": null,
+        "brand": "Compass Box",
+        "score": 0.6043376303415722,
+        "series": null,
+        "source": ["vector"],
+        "bottler": null,
+        "edition": null,
+        "outturn": null,
+        "bottleId": 42500,
+        "category": "blend",
+        "fullName": "Compass Box The Peat Monster Cask Strength",
+        "reference": "Compass Box Peat Monster Cask Strength",
+        "statedAge": null,
+        "caskNumber": null,
+        "comparison": {
+          "missing": [],
+          "conflicts": ["brand"],
+          "agreements": ["category"]
+        },
+        "distillery": [],
+        "maturation": null,
+        "releaseDay": null,
+        "singleCask": null,
+        "releaseYear": null,
+        "vintageYear": null,
+        "bottlingYear": null,
+        "caskStrength": true,
+        "releaseMonth": null,
+        "familyContext": {
+          "siblingBottles": []
+        }
+      },
+      {
+        "abv": 40,
+        "brand": "Monarch of the Glen",
+        "score": 0.6022887964867687,
+        "series": null,
+        "source": ["vector"],
+        "bottler": null,
+        "edition": null,
+        "outturn": null,
+        "bottleId": 65371,
+        "category": "blend",
+        "fullName": "Monarch of the Glen Blended Scotch Whisky",
+        "reference": "Monarch of the Glen",
+        "statedAge": null,
+        "caskNumber": null,
+        "comparison": {
+          "missing": [],
+          "conflicts": ["brand"],
+          "agreements": ["category"]
+        },
+        "distillery": [],
+        "maturation": null,
+        "releaseDay": null,
+        "singleCask": null,
+        "releaseYear": null,
+        "vintageYear": null,
+        "bottlingYear": null,
+        "caskStrength": null,
+        "releaseMonth": null,
+        "familyContext": {
+          "siblingBottles": []
+        }
+      },
+      {
+        "abv": null,
+        "brand": "Dewar's",
+        "score": 0.6003320126390863,
+        "series": null,
+        "source": ["vector"],
+        "bottler": null,
+        "edition": null,
+        "outturn": null,
+        "bottleId": 4030,
+        "category": "blend",
+        "fullName": "Dewar's 15-year-old The Monarch",
+        "reference": "Dewar's 15-year-old The Monarch, 40%",
+        "statedAge": 15,
+        "caskNumber": null,
+        "comparison": {
+          "missing": [],
+          "conflicts": ["brand"],
+          "agreements": ["category"]
+        },
+        "distillery": [],
+        "maturation": null,
+        "releaseDay": null,
+        "singleCask": null,
+        "releaseYear": null,
+        "vintageYear": null,
+        "bottlingYear": null,
+        "caskStrength": null,
+        "releaseMonth": null,
+        "familyContext": {
+          "siblingBottles": []
+        }
+      },
+      {
+        "abv": null,
+        "brand": "Michel Couvreur",
+        "score": 0.5933504351410024,
+        "series": null,
+        "source": ["vector"],
+        "bottler": "Michel Couvreur",
+        "edition": null,
+        "outturn": null,
+        "bottleId": 5620,
+        "category": "blend",
+        "fullName": "Michel Couvreur Overaged Malt Whisky",
+        "reference": "Overaged Malt Whisky Distilled in Scotland MCo",
+        "statedAge": null,
+        "caskNumber": null,
+        "comparison": {
+          "missing": [],
+          "conflicts": ["brand"],
+          "agreements": ["category"]
+        },
+        "distillery": [],
+        "maturation": null,
+        "releaseDay": null,
+        "singleCask": null,
+        "releaseYear": null,
+        "vintageYear": null,
+        "bottlingYear": null,
+        "caskStrength": null,
+        "releaseMonth": null,
+        "familyContext": {
+          "siblingBottles": []
+        }
+      },
+      {
+        "abv": 40,
+        "brand": "&Whisky",
+        "score": 0.5861047126110078,
+        "series": null,
+        "source": ["vector"],
+        "bottler": "&Whisky",
+        "edition": null,
+        "outturn": null,
+        "bottleId": 46987,
+        "category": "blend",
+        "fullName": "&Whisky Seaweed & Aeons & Butterscotch & Vanilla - 40.0% ABV",
+        "reference": "&Whisky Seaweed & Aeons & Butterscotch & Vanilla - 40.0% ABV",
+        "statedAge": null,
+        "caskNumber": null,
+        "comparison": {
+          "missing": [],
+          "conflicts": ["brand"],
+          "agreements": ["category"]
+        },
+        "distillery": [],
+        "maturation": null,
+        "releaseDay": null,
+        "singleCask": null,
+        "releaseYear": null,
+        "vintageYear": null,
+        "bottlingYear": null,
+        "caskStrength": null,
+        "releaseMonth": null,
+        "familyContext": {
+          "siblingBottles": []
+        }
+      },
+      {
+        "abv": null,
+        "brand": "Compass Box",
+        "score": 0.5854210232495546,
+        "series": null,
+        "source": ["vector"],
+        "bottler": "Compass Box",
+        "edition": null,
+        "outturn": null,
+        "bottleId": 11853,
+        "category": "blend",
+        "fullName": "Compass Box The Peat Monster Arcana",
+        "reference": "Compass Box Peat Monster ARCANA",
+        "statedAge": null,
+        "caskNumber": null,
+        "comparison": {
+          "missing": [],
+          "conflicts": ["brand"],
+          "agreements": ["category"]
+        },
+        "distillery": ["Ardbeg", "Miltonduff", "Talisker"],
+        "maturation": null,
+        "releaseDay": null,
+        "singleCask": null,
+        "releaseYear": null,
+        "vintageYear": null,
+        "bottlingYear": null,
+        "caskStrength": null,
+        "releaseMonth": null,
+        "familyContext": {
+          "siblingBottles": []
+        }
+      },
+      {
+        "abv": null,
+        "brand": "Buchanan's",
+        "score": 0.5795681803523404,
+        "series": null,
+        "source": ["vector"],
+        "bottler": null,
+        "edition": null,
+        "outturn": null,
+        "bottleId": 14445,
+        "category": "blend",
+        "fullName": "Buchanan's Master",
+        "reference": "Buchanan's Master Blend Scotch Whiskey",
+        "statedAge": null,
+        "caskNumber": null,
+        "comparison": {
+          "missing": [],
+          "conflicts": ["brand"],
+          "agreements": ["category"]
+        },
+        "distillery": [],
+        "maturation": null,
+        "releaseDay": null,
+        "singleCask": null,
+        "releaseYear": null,
+        "vintageYear": null,
+        "bottlingYear": null,
+        "caskStrength": null,
+        "releaseMonth": null,
+        "familyContext": {
+          "siblingBottles": []
+        }
+      },
+      {
+        "abv": null,
+        "brand": "Buchanan's",
+        "score": 0.5788993637574811,
+        "series": null,
+        "source": ["vector"],
+        "bottler": null,
+        "edition": null,
+        "outturn": null,
+        "bottleId": 14444,
+        "category": "blend",
+        "fullName": "Buchanan's Red Seal",
+        "reference": "Buchanan's Red Seal Blended Scotch Whiskey",
+        "statedAge": null,
+        "caskNumber": null,
+        "comparison": {
+          "missing": [],
+          "conflicts": ["brand"],
+          "agreements": ["category"]
+        },
+        "distillery": [],
+        "maturation": null,
+        "releaseDay": null,
+        "singleCask": null,
+        "releaseYear": null,
+        "vintageYear": null,
+        "bottlingYear": null,
+        "caskStrength": null,
+        "releaseMonth": null,
+        "familyContext": {
+          "siblingBottles": []
+        }
+      },
+      {
+        "abv": null,
+        "brand": "Crown Royal",
+        "score": 0.5783949574323518,
+        "series": null,
+        "source": ["vector"],
+        "bottler": null,
+        "edition": null,
+        "outturn": null,
+        "bottleId": 16604,
+        "category": "blend",
+        "fullName": "Crown Royal Monarch",
+        "reference": "Crown Royal Monarch, 40%",
+        "statedAge": null,
+        "caskNumber": null,
+        "comparison": {
+          "missing": [],
+          "conflicts": ["brand"],
+          "agreements": ["category"]
+        },
+        "distillery": [],
+        "maturation": null,
+        "releaseDay": null,
+        "singleCask": null,
+        "releaseYear": null,
+        "vintageYear": null,
+        "bottlingYear": null,
+        "caskStrength": null,
+        "releaseMonth": null,
+        "familyContext": {
+          "siblingBottles": []
+        }
+      },
+      {
+        "abv": null,
+        "brand": "Johnnie Walker",
+        "score": 0.5780734063617243,
+        "series": null,
+        "source": ["vector"],
+        "bottler": null,
+        "edition": null,
+        "outturn": null,
+        "bottleId": 11893,
+        "category": "blend",
+        "fullName": "Johnnie Walker High Rye",
+        "reference": "Johnnie Walker High Rye Blended Scotch Whisky",
+        "statedAge": null,
+        "caskNumber": null,
+        "comparison": {
+          "missing": [],
+          "conflicts": ["brand"],
+          "agreements": ["category"]
+        },
+        "distillery": [],
+        "maturation": null,
+        "releaseDay": null,
+        "singleCask": null,
+        "releaseYear": null,
+        "vintageYear": null,
+        "bottlingYear": null,
+        "caskStrength": null,
+        "releaseMonth": null,
+        "familyContext": {
+          "siblingBottles": []
+        }
+      },
+      {
+        "abv": null,
+        "brand": "Egan's",
+        "score": 0.4914028979880559,
+        "series": null,
+        "source": ["vector"],
+        "bottler": null,
+        "edition": null,
+        "outturn": null,
+        "bottleId": 13920,
+        "category": "blend",
+        "fullName": "Egan's Fortitude",
+        "reference": "Egan's Fortitude",
+        "statedAge": null,
+        "caskNumber": null,
+        "comparison": {
+          "missing": [],
+          "conflicts": ["brand"],
+          "agreements": ["category"]
+        },
+        "distillery": [],
+        "maturation": null,
+        "releaseDay": null,
+        "singleCask": null,
+        "releaseYear": null,
+        "vintageYear": null,
+        "bottlingYear": null,
+        "caskStrength": null,
+        "releaseMonth": null,
+        "familyContext": {
+          "siblingBottles": []
+        }
+      },
+      {
+        "abv": null,
+        "brand": "Celtic Cask",
+        "score": 0.4861665824496786,
+        "series": null,
+        "source": ["vector"],
+        "bottler": null,
+        "edition": null,
+        "outturn": null,
+        "bottleId": 16507,
+        "category": "blend",
+        "fullName": "Celtic Cask Cask Sé",
+        "reference": "Celtic Cask Sé",
+        "statedAge": null,
+        "caskNumber": null,
+        "comparison": {
+          "missing": [],
+          "conflicts": ["brand"],
+          "agreements": ["category"]
+        },
+        "distillery": [],
+        "maturation": null,
+        "releaseDay": null,
+        "singleCask": null,
+        "releaseYear": null,
+        "vintageYear": null,
+        "bottlingYear": null,
+        "caskStrength": null,
+        "releaseMonth": null,
+        "familyContext": {
+          "siblingBottles": []
+        }
+      },
+      {
+        "abv": null,
+        "brand": "Celtic Cask",
+        "score": 0.4856559778689339,
+        "series": null,
+        "source": ["vector"],
+        "bottler": null,
+        "edition": null,
+        "outturn": null,
+        "bottleId": 16506,
+        "category": "blend",
+        "fullName": "Celtic Cask Cask Dó",
+        "reference": "Celtic Cask Cask Dó",
+        "statedAge": null,
+        "caskNumber": null,
+        "comparison": {
+          "missing": [],
+          "conflicts": ["brand"],
+          "agreements": ["category"]
+        },
+        "distillery": [],
+        "maturation": null,
+        "releaseDay": null,
+        "singleCask": null,
+        "releaseYear": null,
+        "vintageYear": null,
+        "bottlingYear": null,
+        "caskStrength": null,
+        "releaseMonth": null,
+        "familyContext": {
+          "siblingBottles": []
+        }
+      },
+      {
+        "abv": null,
+        "brand": "Old Elk",
+        "score": 0.48118975887015614,
+        "series": null,
+        "source": ["vector"],
+        "bottler": null,
+        "edition": null,
+        "outturn": null,
+        "bottleId": 14136,
+        "category": "blend",
+        "fullName": "Old Elk Blended Straight Bourbon",
+        "reference": "Old Elk Blended Straight Bourbon Whiskey",
+        "statedAge": null,
+        "caskNumber": null,
+        "comparison": {
+          "missing": [],
+          "conflicts": ["brand"],
+          "agreements": ["category"]
+        },
+        "distillery": [],
+        "maturation": null,
+        "releaseDay": null,
+        "singleCask": null,
+        "releaseYear": null,
+        "vintageYear": null,
+        "bottlingYear": null,
+        "caskStrength": null,
+        "releaseMonth": null,
+        "familyContext": {
+          "siblingBottles": []
+        }
+      },
+      {
+        "abv": null,
+        "brand": "J.J. Corry",
+        "score": 0.47594678223335085,
+        "series": null,
+        "source": ["vector"],
+        "bottler": null,
+        "edition": null,
+        "outturn": null,
+        "bottleId": 13345,
+        "category": "blend",
+        "fullName": "J.J. Corry The Gael (Batch 2)",
+        "reference": "J.J. Corry The Gael",
+        "statedAge": null,
+        "caskNumber": null,
+        "comparison": {
+          "missing": [],
+          "conflicts": ["brand"],
+          "agreements": ["category"]
+        },
+        "distillery": [],
+        "maturation": null,
+        "releaseDay": null,
+        "singleCask": null,
+        "releaseYear": null,
+        "vintageYear": null,
+        "bottlingYear": null,
+        "caskStrength": null,
+        "releaseMonth": null,
+        "familyContext": {
+          "siblingBottles": []
+        }
+      },
+      {
+        "abv": null,
+        "brand": "Black Bull",
+        "score": 0.47055069673777616,
+        "series": null,
+        "source": ["vector"],
+        "bottler": null,
+        "edition": null,
+        "outturn": null,
+        "bottleId": 14471,
+        "category": "blend",
+        "fullName": "Black Bull Kyloe",
+        "reference": "Black Bull Kyloe",
+        "statedAge": null,
+        "caskNumber": null,
+        "comparison": {
+          "missing": [],
+          "conflicts": ["brand"],
+          "agreements": ["category"]
+        },
+        "distillery": [],
+        "maturation": null,
+        "releaseDay": null,
+        "singleCask": null,
+        "releaseYear": null,
+        "vintageYear": null,
+        "bottlingYear": null,
+        "caskStrength": null,
+        "releaseMonth": null,
+        "familyContext": {
+          "siblingBottles": []
+        }
+      },
+      {
+        "abv": null,
+        "brand": "Akkeshi",
+        "score": 0.4702546900644675,
+        "series": null,
+        "source": ["vector"],
+        "bottler": null,
+        "edition": "",
+        "outturn": null,
+        "bottleId": 43187,
+        "category": "blend",
+        "fullName": "Akkeshi Shosho Summer Fades",
+        "reference": "The Akkeshi Shosho Summer Fades",
+        "statedAge": null,
+        "caskNumber": null,
+        "comparison": {
+          "missing": [],
+          "conflicts": ["brand"],
+          "agreements": ["category"]
+        },
+        "distillery": ["Akkeshi Distillery"],
+        "maturation": null,
+        "releaseDay": null,
+        "singleCask": null,
+        "releaseYear": null,
+        "vintageYear": null,
+        "bottlingYear": null,
+        "caskStrength": null,
+        "releaseMonth": null,
+        "familyContext": {
+          "siblingBottles": []
+        }
+      },
+      {
+        "abv": null,
+        "brand": "Basil Hayden's",
+        "score": 0.46846004413866904,
+        "series": null,
+        "source": ["vector"],
+        "bottler": null,
+        "edition": null,
+        "outturn": null,
+        "bottleId": 13945,
+        "category": "blend",
+        "fullName": "Basil Hayden's Dark Rye",
+        "reference": "Basil Hayden's Dark Rye",
+        "statedAge": null,
+        "caskNumber": null,
+        "comparison": {
+          "missing": [],
+          "conflicts": ["brand"],
+          "agreements": ["category"]
+        },
+        "distillery": [],
+        "maturation": null,
+        "releaseDay": null,
+        "singleCask": null,
+        "releaseYear": null,
+        "vintageYear": null,
+        "bottlingYear": null,
+        "caskStrength": null,
+        "releaseMonth": null,
+        "familyContext": {
+          "siblingBottles": []
+        }
+      },
+      {
+        "abv": null,
+        "brand": "Bushmills",
+        "score": 0.46438852368998496,
+        "series": null,
+        "source": ["vector"],
+        "bottler": "Bushmills",
+        "edition": null,
+        "outturn": null,
+        "bottleId": 4990,
+        "category": "blend",
+        "fullName": "Bushmills 1608 400th Anniversary",
+        "reference": "Bushmills 1608",
+        "statedAge": null,
+        "caskNumber": null,
+        "comparison": {
+          "missing": [],
+          "conflicts": ["brand"],
+          "agreements": ["category"]
+        },
+        "distillery": [],
+        "maturation": null,
+        "releaseDay": null,
+        "singleCask": null,
+        "releaseYear": null,
+        "vintageYear": null,
+        "bottlingYear": null,
+        "caskStrength": null,
+        "releaseMonth": null,
+        "familyContext": {
+          "siblingBottles": []
+        }
+      }
+    ]
+  },
+  "context": {
+    "inspectedBottleIds": [],
+    "bottleContexts": [],
+    "inspectedEntities": [
+      {
+        "kind": "brand",
+        "name": "Ye Monks",
+        "score": 1,
+        "source": ["exact", "text", "prefix", "contained"],
+        "entityId": 1520,
+        "reference": "Ye Monks",
+        "shortName": null,
+        "retrievedFor": [
+          {
+            "exact": true,
+            "query": "Ye Monks"
+          }
+        ]
+      },
+      {
+        "kind": "brand",
+        "name": "Monkey Shoulder",
+        "score": 1,
+        "source": ["exact", "text", "prefix", "contained"],
+        "entityId": 1187,
+        "reference": "Monkey Shoulder",
+        "shortName": null,
+        "retrievedFor": [
+          {
+            "exact": true,
+            "query": "Monkey Shoulder"
+          }
+        ]
+      },
+      {
+        "kind": "brand",
+        "name": "Shibui",
+        "score": 1,
+        "source": ["exact", "text", "prefix", "contained"],
+        "entityId": 3942,
+        "reference": "Shibui",
+        "shortName": null,
+        "retrievedFor": [
+          {
+            "exact": true,
+            "query": "Shibui"
+          }
+        ]
+      },
+      {
+        "kind": "bottler",
+        "name": "Compass Box",
+        "score": 1,
+        "source": ["exact", "text", "prefix", "contained"],
+        "entityId": 1422,
+        "reference": "Compass Box",
+        "shortName": null,
+        "retrievedFor": [
+          {
+            "exact": true,
+            "query": "Compass Box"
+          }
+        ]
+      },
+      {
+        "kind": "distillery",
+        "name": "Ardbeg",
+        "score": 1,
+        "source": ["exact", "text", "prefix", "contained"],
+        "entityId": 28,
+        "reference": "Ardbeg",
+        "shortName": null,
+        "retrievedFor": [
+          {
+            "exact": true,
+            "query": "Ardbeg"
+          }
+        ]
+      },
+      {
+        "kind": "distillery",
+        "name": "Miltonduff",
+        "score": 1,
+        "source": ["exact", "text", "prefix", "contained"],
+        "entityId": 1185,
+        "reference": "Miltonduff",
+        "shortName": null,
+        "retrievedFor": [
+          {
+            "exact": true,
+            "query": "Miltonduff"
+          }
+        ]
+      },
+      {
+        "kind": "distillery",
+        "name": "Talisker",
+        "score": 1,
+        "source": ["exact", "text", "prefix", "contained"],
+        "entityId": 1385,
+        "reference": "Talisker",
+        "shortName": "",
+        "retrievedFor": [
+          {
+            "exact": true,
+            "query": "Talisker"
+          }
+        ]
+      },
+      {
+        "kind": "brand",
+        "name": "Egan's",
+        "score": 1,
+        "source": ["exact", "text", "prefix", "contained"],
+        "entityId": 2665,
+        "reference": "Egan's",
+        "shortName": null,
+        "retrievedFor": [
+          {
+            "exact": true,
+            "query": "Egan's"
+          }
+        ]
+      },
+      {
+        "kind": "brand",
+        "name": "Celtic Cask",
+        "score": 1,
+        "source": ["exact", "text", "prefix", "contained"],
+        "entityId": 2436,
+        "reference": "Celtic Cask",
+        "shortName": null,
+        "retrievedFor": [
+          {
+            "exact": true,
+            "query": "Celtic Cask"
+          }
+        ]
+      },
+      {
+        "kind": "brand",
+        "name": "Old Elk",
+        "score": 1,
+        "source": ["exact", "text", "prefix", "contained"],
+        "entityId": 1217,
+        "reference": "Old Elk",
+        "shortName": null,
+        "retrievedFor": [
+          {
+            "exact": true,
+            "query": "Old Elk"
+          }
+        ]
+      },
+      {
+        "kind": "bottler",
+        "name": "J.J. Corry",
+        "score": 1,
+        "source": ["exact", "text", "prefix", "contained"],
+        "entityId": 1076,
+        "reference": "J.J. Corry",
+        "shortName": null,
+        "retrievedFor": [
+          {
+            "exact": true,
+            "query": "J.J. Corry"
+          }
+        ]
+      },
+      {
+        "kind": "brand",
+        "name": "Black Bull",
+        "score": 1,
+        "source": ["exact", "text", "prefix", "contained"],
+        "entityId": 430,
+        "reference": "Black Bull",
+        "shortName": null,
+        "retrievedFor": [
+          {
+            "exact": true,
+            "query": "Black Bull"
+          }
+        ]
+      },
+      {
+        "kind": "brand",
+        "name": "Akkeshi",
+        "score": 1,
+        "source": ["exact", "text", "prefix", "contained"],
+        "entityId": 1399,
+        "reference": "Akkeshi",
+        "shortName": null,
+        "retrievedFor": [
+          {
+            "exact": true,
+            "query": "Akkeshi"
+          }
+        ]
+      },
+      {
+        "kind": "company",
+        "name": "Old Elk Distilleries, LLC",
+        "score": 0.5,
+        "source": ["text", "prefix"],
+        "entityId": 1861,
+        "reference": "Old Elk Distilleries, LLC",
+        "shortName": null,
+        "retrievedFor": [
+          {
+            "query": "Old Elk"
+          }
+        ]
+      },
+      {
+        "kind": "distillery",
+        "name": "Akkeshi Distillery",
+        "score": 0.5,
+        "source": ["text", "prefix"],
+        "entityId": 194,
+        "reference": "Akkeshi Distillery",
+        "shortName": null,
+        "retrievedFor": [
+          {
+            "query": "Akkeshi"
+          }
+        ]
+      },
+      {
+        "kind": "company",
+        "name": "Dailuaine-Talisker Distilleries Ltd",
+        "score": 0.2,
+        "source": ["text"],
+        "entityId": 366620,
+        "reference": null,
+        "shortName": null,
+        "retrievedFor": [
+          {
+            "query": "Talisker"
+          }
+        ]
+      }
+    ],
+    "inspectedSeries": []
+  },
+  "provenance": {
+    "source": "production_miss",
+    "verifiedSourceUrls": [
+      "https://www.scotchwhiskyauctions.com/auctions/232-the-183rd-auction/898448-ye-monks-el-monje-1l/",
+      "https://d3suvtcq00dftb.cloudfront.net/images/a79c4303e491cb358a5cea854d6a6d9e-zoom.jpg"
+    ],
+    "dbOutcome": {
+      "bottleId": null,
+      "createsBottle": false,
+      "summary": "Production returned no_match: it worried El Monje might be an age-stated release."
+    },
+    "notes": "Captured from saved classifier run 22571 (auction_lot 4576, model null, 2026-10-02T06:58:44.486Z). Production rationale: No local candidate represents Ye Monks El Monje. The available evidence supports the brand and Scotch whisky identity, but does not resolve whether this lot is the age-specific El Monje release; creating a bottle could merge distinct marketed releases. The run predates reading Scotch Whisky Auctions lot pages (#1609), so the evidence pack adds the lot page text. Expected outcome checked against the lot page and photo on 2026-11-09, in a random sample of the 185th auction's no_match reviews."
+  },
+  "expected": {
+    "status": "classified",
+    "action": "create_bottle",
+    "identityScope": "product",
+    "matchedBottleId": null,
+    "proposedBottle": {
+      "brand": {
+        "id": 1520
+      },
+      "category": "blend",
+      "abv": 43,
+      "statedAge": null
+    },
+    "proposedBottleNameExcludes": ["El Monje", "1L", "Litre"],
+    "summary": "Create the Ye Monks blended Scotch at 43%, with no age. The label reads Ye Monks, A Curious Old Whisky, Special Scotch Whisky, with \"El Monje\" beside the 43% and 1 litre. El Monje is the market name for the same liquid, and the identity model keeps a market name and the 1 litre size out of a separate Bottle. No local Ye Monks Bottle exists."
+  }
+}

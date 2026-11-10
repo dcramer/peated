@@ -1,0 +1,2398 @@
+{
+  "id": "auction-millburn-1983-private-cellar-create",
+  "name": "Millburn 1983 Private Cellar Cask Selection: create the Forbes Ross bottling with no age",
+  "input": {
+    "reference": {
+      "id": 17081,
+      "url": "https://www.scotchwhiskyauctions.com/auctions/234-the-185th-auction/908322-millburn-1983-very-rare-private-cellar-cask-selection-special-edition/",
+      "name": "Millburn 1983 Very Rare Private Cellar Cask Selection Special Edition",
+      "imageUrl": null,
+      "externalSiteId": 28097,
+      "currentBottleId": null
+    },
+    "extractedIdentity": {
+      "abv": 43,
+      "brand": null,
+      "series": null,
+      "bottler": null,
+      "edition": null,
+      "outturn": null,
+      "category": null,
+      "distillery": null,
+      "expression": null,
+      "maturation": null,
+      "stated_age": null,
+      "cask_number": null,
+      "single_cask": null,
+      "release_year": null,
+      "vintage_year": null,
+      "cask_strength": null
+    },
+    "extractedIdentitySource": "structured",
+    "imageEvidence": null,
+    "initialCandidates": [
+      {
+        "abv": 46,
+        "brand": "Kirkland Signature",
+        "score": 59.763916,
+        "series": null,
+        "source": ["text"],
+        "bottler": null,
+        "edition": null,
+        "outturn": null,
+        "bottleId": 64931,
+        "category": "single_malt",
+        "fullName": "Kirkland Signature 20-year-old Sherry Cask Finish Speyside",
+        "reference": null,
+        "statedAge": 20,
+        "caskNumber": null,
+        "comparison": {
+          "missing": [
+            "vintageYear",
+            "caskStrength",
+            "singleCask",
+            "bottler",
+            "distillers"
+          ],
+          "conflicts": ["abv", "brand"],
+          "agreements": ["category", "statedAge"]
+        },
+        "distillery": [],
+        "maturation": "Sherry cask finish",
+        "releaseDay": null,
+        "singleCask": null,
+        "releaseYear": null,
+        "vintageYear": null,
+        "bottlingYear": null,
+        "caskStrength": null,
+        "releaseMonth": null,
+        "familyContext": {
+          "siblingBottles": []
+        }
+      },
+      {
+        "abv": 46,
+        "brand": "The Glenlivet",
+        "score": 59.320316,
+        "series": "Cellar Collection",
+        "source": ["vector", "text"],
+        "bottler": null,
+        "edition": null,
+        "outturn": 8000,
+        "bottleId": 18964,
+        "category": "single_malt",
+        "fullName": "The Glenlivet Cellar Collection 1983 Vintage",
+        "reference": "The Glenlivet Cellar Collection 1983 Vintage - 1983 Vintage",
+        "statedAge": null,
+        "caskNumber": null,
+        "comparison": {
+          "missing": ["edition"],
+          "conflicts": ["abv", "series", "distillers"],
+          "agreements": ["category", "vintageYear"]
+        },
+        "distillery": ["The Glenlivet"],
+        "maturation": "Finished in French Limousin oak casks",
+        "releaseDay": null,
+        "singleCask": null,
+        "releaseYear": null,
+        "vintageYear": 1983,
+        "bottlingYear": 2003,
+        "caskStrength": null,
+        "releaseMonth": null,
+        "familyContext": {
+          "siblingBottles": []
+        }
+      },
+      {
+        "abv": 59,
+        "brand": "Signatory Vintage",
+        "score": 58.652004,
+        "series": "Vintage Collection",
+        "source": ["text"],
+        "bottler": "Signatory Vintage",
+        "edition": null,
+        "outturn": null,
+        "bottleId": 67369,
+        "category": "single_malt",
+        "fullName": "Signatory Vintage Glen Ord 1983 20-year-old",
+        "reference": null,
+        "statedAge": 20,
+        "caskNumber": "378",
+        "comparison": {
+          "missing": [],
+          "conflicts": ["abv", "brand", "distillers"],
+          "agreements": ["category", "statedAge", "vintageYear"]
+        },
+        "distillery": ["Glen Ord"],
+        "maturation": "Refill sherry butt",
+        "releaseDay": null,
+        "singleCask": true,
+        "releaseYear": null,
+        "vintageYear": 1983,
+        "bottlingYear": 2003,
+        "caskStrength": true,
+        "releaseMonth": null,
+        "familyContext": {
+          "siblingBottles": []
+        }
+      },
+      {
+        "abv": 46,
+        "brand": "First Cask",
+        "score": 57.906906,
+        "series": null,
+        "source": ["text"],
+        "bottler": "Direct Wines",
+        "edition": null,
+        "outturn": null,
+        "bottleId": 52736,
+        "category": "single_malt",
+        "fullName": "First Cask Caol Ila 1983 20-year-old",
+        "reference": null,
+        "statedAge": 20,
+        "caskNumber": "63",
+        "comparison": {
+          "missing": [],
+          "conflicts": ["abv", "brand", "distillers"],
+          "agreements": ["category", "statedAge", "vintageYear"]
+        },
+        "distillery": ["Caol Ila"],
+        "maturation": null,
+        "releaseDay": null,
+        "singleCask": true,
+        "releaseYear": null,
+        "vintageYear": 1983,
+        "bottlingYear": null,
+        "caskStrength": null,
+        "releaseMonth": null,
+        "familyContext": {
+          "siblingBottles": []
+        }
+      },
+      {
+        "abv": null,
+        "brand": "That Boutique-y Whisky Company",
+        "score": 53.927986,
+        "series": null,
+        "source": ["text"],
+        "bottler": null,
+        "edition": null,
+        "outturn": null,
+        "bottleId": 14165,
+        "category": "single_malt",
+        "fullName": "TBWC 20-year-old (distilled at Auchroisk)",
+        "reference": null,
+        "statedAge": 20,
+        "caskNumber": null,
+        "comparison": {
+          "missing": [
+            "abv",
+            "vintageYear",
+            "caskStrength",
+            "singleCask",
+            "bottler",
+            "distillers"
+          ],
+          "conflicts": ["brand"],
+          "agreements": ["category", "statedAge"]
+        },
+        "distillery": [],
+        "maturation": null,
+        "releaseDay": null,
+        "singleCask": null,
+        "releaseYear": null,
+        "vintageYear": null,
+        "bottlingYear": null,
+        "caskStrength": null,
+        "releaseMonth": null,
+        "familyContext": {
+          "siblingBottles": []
+        }
+      },
+      {
+        "abv": 51.1,
+        "brand": "Old & Rare",
+        "score": 52.76307,
+        "series": "Platinum Selection",
+        "source": ["text"],
+        "bottler": "Hunter Laing",
+        "edition": null,
+        "outturn": 154,
+        "bottleId": 59376,
+        "category": "single_malt",
+        "fullName": "Old & Rare Balmenach 1983",
+        "reference": null,
+        "statedAge": 40,
+        "caskNumber": null,
+        "comparison": {
+          "missing": ["edition"],
+          "conflicts": ["abv", "series", "distillers"],
+          "agreements": ["category", "vintageYear"]
+        },
+        "distillery": ["Balmenach"],
+        "maturation": "Refill hogshead",
+        "releaseDay": null,
+        "singleCask": true,
+        "releaseYear": null,
+        "vintageYear": 1983,
+        "bottlingYear": 2024,
+        "caskStrength": true,
+        "releaseMonth": null,
+        "familyContext": {
+          "siblingBottles": []
+        }
+      },
+      {
+        "abv": null,
+        "brand": "Midleton",
+        "score": 52.20193,
+        "series": null,
+        "source": ["text"],
+        "bottler": null,
+        "edition": null,
+        "outturn": null,
+        "bottleId": 18620,
+        "category": null,
+        "fullName": "Midleton Very Rare 2003 Vintage",
+        "reference": null,
+        "statedAge": null,
+        "caskNumber": null,
+        "comparison": {
+          "missing": ["abv"],
+          "conflicts": [],
+          "agreements": []
+        },
+        "distillery": [],
+        "maturation": null,
+        "releaseDay": null,
+        "singleCask": null,
+        "releaseYear": null,
+        "vintageYear": 2003,
+        "bottlingYear": null,
+        "caskStrength": null,
+        "releaseMonth": null,
+        "familyContext": {
+          "siblingBottles": []
+        }
+      },
+      {
+        "abv": 43,
+        "brand": "The Macallan",
+        "score": 49.86435,
+        "series": "Special Selection",
+        "source": ["text"],
+        "bottler": null,
+        "edition": null,
+        "outturn": null,
+        "bottleId": 52411,
+        "category": "single_malt",
+        "fullName": "The Macallan Special Selection",
+        "reference": null,
+        "statedAge": 17,
+        "caskNumber": null,
+        "comparison": {
+          "missing": [],
+          "conflicts": [],
+          "agreements": ["abv"]
+        },
+        "distillery": ["The Macallan"],
+        "maturation": "Sherry casks",
+        "releaseDay": null,
+        "singleCask": false,
+        "releaseYear": 1983,
+        "vintageYear": 1965,
+        "bottlingYear": 1983,
+        "caskStrength": false,
+        "releaseMonth": null,
+        "familyContext": {
+          "siblingBottles": []
+        }
+      },
+      {
+        "abv": null,
+        "brand": "Midleton",
+        "score": 49.302883,
+        "series": null,
+        "source": ["text"],
+        "bottler": null,
+        "edition": null,
+        "outturn": null,
+        "bottleId": 34651,
+        "category": "blend",
+        "fullName": "Midleton Very Rare (Vintage 2024)",
+        "reference": null,
+        "statedAge": null,
+        "caskNumber": null,
+        "comparison": {
+          "missing": ["abv"],
+          "conflicts": [],
+          "agreements": []
+        },
+        "distillery": [],
+        "maturation": null,
+        "releaseDay": null,
+        "singleCask": null,
+        "releaseYear": null,
+        "vintageYear": null,
+        "bottlingYear": null,
+        "caskStrength": null,
+        "releaseMonth": null,
+        "familyContext": {
+          "siblingBottles": []
+        }
+      },
+      {
+        "abv": null,
+        "brand": "Talisker",
+        "score": 48.622757,
+        "series": null,
+        "source": ["text"],
+        "bottler": null,
+        "edition": null,
+        "outturn": null,
+        "bottleId": 18934,
+        "category": "single_malt",
+        "fullName": "Talisker 20-year-old",
+        "reference": null,
+        "statedAge": 20,
+        "caskNumber": null,
+        "comparison": {
+          "missing": [
+            "abv",
+            "vintageYear",
+            "caskStrength",
+            "singleCask",
+            "bottler"
+          ],
+          "conflicts": ["brand", "distillers"],
+          "agreements": ["category", "statedAge"]
+        },
+        "distillery": ["Talisker"],
+        "maturation": null,
+        "releaseDay": null,
+        "singleCask": null,
+        "releaseYear": null,
+        "vintageYear": null,
+        "bottlingYear": null,
+        "caskStrength": null,
+        "releaseMonth": null,
+        "familyContext": {
+          "siblingBottles": []
+        }
+      },
+      {
+        "abv": 43,
+        "brand": "The Dalmore",
+        "score": 47.657097,
+        "series": null,
+        "source": ["text"],
+        "bottler": null,
+        "edition": null,
+        "outturn": null,
+        "bottleId": 60870,
+        "category": "single_malt",
+        "fullName": "Dalmore 20-year-old",
+        "reference": null,
+        "statedAge": 20,
+        "caskNumber": null,
+        "comparison": {
+          "missing": ["vintageYear", "caskStrength", "singleCask", "bottler"],
+          "conflicts": ["brand", "distillers"],
+          "agreements": ["category", "statedAge", "abv"]
+        },
+        "distillery": ["The Dalmore"],
+        "maturation": null,
+        "releaseDay": null,
+        "singleCask": null,
+        "releaseYear": null,
+        "vintageYear": null,
+        "bottlingYear": null,
+        "caskStrength": null,
+        "releaseMonth": null,
+        "familyContext": {
+          "siblingBottles": []
+        }
+      },
+      {
+        "abv": null,
+        "brand": "Milford",
+        "score": 46.92616,
+        "series": null,
+        "source": ["vector", "text"],
+        "bottler": null,
+        "edition": null,
+        "outturn": null,
+        "bottleId": 17363,
+        "category": "single_malt",
+        "fullName": "Milford 20-year-old",
+        "reference": "Milford 20-year-old, 43%",
+        "statedAge": 20,
+        "caskNumber": null,
+        "comparison": {
+          "missing": [
+            "abv",
+            "vintageYear",
+            "caskStrength",
+            "singleCask",
+            "bottler",
+            "distillers"
+          ],
+          "conflicts": ["brand"],
+          "agreements": ["category", "statedAge"]
+        },
+        "distillery": [],
+        "maturation": null,
+        "releaseDay": null,
+        "singleCask": null,
+        "releaseYear": null,
+        "vintageYear": null,
+        "bottlingYear": null,
+        "caskStrength": null,
+        "releaseMonth": null,
+        "familyContext": {
+          "siblingBottles": []
+        }
+      },
+      {
+        "abv": 46,
+        "brand": "BenRiach",
+        "score": 46.703915,
+        "series": null,
+        "source": ["text"],
+        "bottler": null,
+        "edition": null,
+        "outturn": null,
+        "bottleId": 65791,
+        "category": "single_malt",
+        "fullName": "BenRiach 20-year-old",
+        "reference": null,
+        "statedAge": 20,
+        "caskNumber": null,
+        "comparison": {
+          "missing": ["vintageYear", "caskStrength", "singleCask", "bottler"],
+          "conflicts": ["abv", "brand", "distillers"],
+          "agreements": ["category", "statedAge"]
+        },
+        "distillery": ["BenRiach"],
+        "maturation": null,
+        "releaseDay": null,
+        "singleCask": null,
+        "releaseYear": null,
+        "vintageYear": null,
+        "bottlingYear": null,
+        "caskStrength": null,
+        "releaseMonth": null,
+        "familyContext": {
+          "siblingBottles": []
+        }
+      },
+      {
+        "abv": 43,
+        "brand": "J&B",
+        "score": 46.176296,
+        "series": null,
+        "source": ["text"],
+        "bottler": null,
+        "edition": null,
+        "outturn": null,
+        "bottleId": 68961,
+        "category": "blend",
+        "fullName": "J&B 20-year-old",
+        "reference": null,
+        "statedAge": 20,
+        "caskNumber": null,
+        "comparison": {
+          "missing": [
+            "vintageYear",
+            "caskStrength",
+            "singleCask",
+            "bottler",
+            "distillers"
+          ],
+          "conflicts": ["category", "brand"],
+          "agreements": ["statedAge", "abv"]
+        },
+        "distillery": [],
+        "maturation": null,
+        "releaseDay": null,
+        "singleCask": null,
+        "releaseYear": null,
+        "vintageYear": null,
+        "bottlingYear": null,
+        "caskStrength": null,
+        "releaseMonth": null,
+        "familyContext": {
+          "siblingBottles": []
+        }
+      },
+      {
+        "abv": null,
+        "brand": "Eagle Rare",
+        "score": 45.775322,
+        "series": null,
+        "source": ["text"],
+        "bottler": null,
+        "edition": null,
+        "outturn": null,
+        "bottleId": 42830,
+        "category": "bourbon",
+        "fullName": "Eagle Rare Double Eagle Very Rare",
+        "reference": null,
+        "statedAge": null,
+        "caskNumber": null,
+        "comparison": {
+          "missing": ["abv"],
+          "conflicts": [],
+          "agreements": []
+        },
+        "distillery": ["Buffalo Trace Distillery"],
+        "maturation": null,
+        "releaseDay": null,
+        "singleCask": null,
+        "releaseYear": 2021,
+        "vintageYear": null,
+        "bottlingYear": null,
+        "caskStrength": null,
+        "releaseMonth": null,
+        "familyContext": {
+          "siblingBottles": [
+            {
+              "abv": null,
+              "edition": null,
+              "outturn": null,
+              "bottleId": 42633,
+              "fullName": "Eagle Rare Double Eagle Very Rare",
+              "statedAge": 20,
+              "caskNumber": null,
+              "maturation": null,
+              "releaseDay": null,
+              "singleCask": null,
+              "releaseYear": 2020,
+              "traitFields": ["statedAge", "releaseYear", "vintageYear"],
+              "vintageYear": 2000,
+              "bottlingYear": null,
+              "caskStrength": null,
+              "releaseMonth": null
+            },
+            {
+              "abv": null,
+              "edition": null,
+              "outturn": null,
+              "bottleId": 42631,
+              "fullName": "Eagle Rare Double Eagle Very Rare",
+              "statedAge": 20,
+              "caskNumber": null,
+              "maturation": null,
+              "releaseDay": null,
+              "singleCask": null,
+              "releaseYear": 2023,
+              "traitFields": ["statedAge", "releaseYear", "vintageYear"],
+              "vintageYear": 2003,
+              "bottlingYear": null,
+              "caskStrength": null,
+              "releaseMonth": null
+            },
+            {
+              "abv": null,
+              "edition": null,
+              "outturn": null,
+              "bottleId": 42632,
+              "fullName": "Eagle Rare Double Eagle Very Rare",
+              "statedAge": 20,
+              "caskNumber": null,
+              "maturation": null,
+              "releaseDay": null,
+              "singleCask": null,
+              "releaseYear": 2019,
+              "traitFields": ["statedAge", "releaseYear", "vintageYear"],
+              "vintageYear": 1999,
+              "bottlingYear": null,
+              "caskStrength": null,
+              "releaseMonth": null
+            }
+          ]
+        }
+      },
+      {
+        "abv": null,
+        "brand": "Eagle Rare",
+        "score": 45.753746,
+        "series": null,
+        "source": ["text"],
+        "bottler": null,
+        "edition": null,
+        "outturn": null,
+        "bottleId": 42632,
+        "category": "bourbon",
+        "fullName": "Eagle Rare Double Eagle Very Rare",
+        "reference": null,
+        "statedAge": 20,
+        "caskNumber": null,
+        "comparison": {
+          "missing": ["abv"],
+          "conflicts": [],
+          "agreements": []
+        },
+        "distillery": ["Buffalo Trace Distillery"],
+        "maturation": null,
+        "releaseDay": null,
+        "singleCask": null,
+        "releaseYear": 2019,
+        "vintageYear": 1999,
+        "bottlingYear": null,
+        "caskStrength": null,
+        "releaseMonth": null,
+        "familyContext": {
+          "siblingBottles": [
+            {
+              "abv": null,
+              "edition": null,
+              "outturn": null,
+              "bottleId": 42633,
+              "fullName": "Eagle Rare Double Eagle Very Rare",
+              "statedAge": 20,
+              "caskNumber": null,
+              "maturation": null,
+              "releaseDay": null,
+              "singleCask": null,
+              "releaseYear": 2020,
+              "traitFields": ["statedAge", "releaseYear", "vintageYear"],
+              "vintageYear": 2000,
+              "bottlingYear": null,
+              "caskStrength": null,
+              "releaseMonth": null
+            },
+            {
+              "abv": null,
+              "edition": null,
+              "outturn": null,
+              "bottleId": 42830,
+              "fullName": "Eagle Rare Double Eagle Very Rare",
+              "statedAge": null,
+              "caskNumber": null,
+              "maturation": null,
+              "releaseDay": null,
+              "singleCask": null,
+              "releaseYear": 2021,
+              "traitFields": ["releaseYear"],
+              "vintageYear": null,
+              "bottlingYear": null,
+              "caskStrength": null,
+              "releaseMonth": null
+            },
+            {
+              "abv": null,
+              "edition": null,
+              "outturn": null,
+              "bottleId": 42631,
+              "fullName": "Eagle Rare Double Eagle Very Rare",
+              "statedAge": 20,
+              "caskNumber": null,
+              "maturation": null,
+              "releaseDay": null,
+              "singleCask": null,
+              "releaseYear": 2023,
+              "traitFields": ["statedAge", "releaseYear", "vintageYear"],
+              "vintageYear": 2003,
+              "bottlingYear": null,
+              "caskStrength": null,
+              "releaseMonth": null
+            }
+          ]
+        }
+      },
+      {
+        "abv": null,
+        "brand": "Eagle Rare",
+        "score": 45.753746,
+        "series": null,
+        "source": ["text"],
+        "bottler": null,
+        "edition": null,
+        "outturn": null,
+        "bottleId": 42633,
+        "category": "bourbon",
+        "fullName": "Eagle Rare Double Eagle Very Rare",
+        "reference": null,
+        "statedAge": 20,
+        "caskNumber": null,
+        "comparison": {
+          "missing": ["abv"],
+          "conflicts": [],
+          "agreements": []
+        },
+        "distillery": ["Buffalo Trace Distillery"],
+        "maturation": null,
+        "releaseDay": null,
+        "singleCask": null,
+        "releaseYear": 2020,
+        "vintageYear": 2000,
+        "bottlingYear": null,
+        "caskStrength": null,
+        "releaseMonth": null,
+        "familyContext": {
+          "siblingBottles": [
+            {
+              "abv": null,
+              "edition": null,
+              "outturn": null,
+              "bottleId": 42830,
+              "fullName": "Eagle Rare Double Eagle Very Rare",
+              "statedAge": null,
+              "caskNumber": null,
+              "maturation": null,
+              "releaseDay": null,
+              "singleCask": null,
+              "releaseYear": 2021,
+              "traitFields": ["releaseYear"],
+              "vintageYear": null,
+              "bottlingYear": null,
+              "caskStrength": null,
+              "releaseMonth": null
+            },
+            {
+              "abv": null,
+              "edition": null,
+              "outturn": null,
+              "bottleId": 42631,
+              "fullName": "Eagle Rare Double Eagle Very Rare",
+              "statedAge": 20,
+              "caskNumber": null,
+              "maturation": null,
+              "releaseDay": null,
+              "singleCask": null,
+              "releaseYear": 2023,
+              "traitFields": ["statedAge", "releaseYear", "vintageYear"],
+              "vintageYear": 2003,
+              "bottlingYear": null,
+              "caskStrength": null,
+              "releaseMonth": null
+            },
+            {
+              "abv": null,
+              "edition": null,
+              "outturn": null,
+              "bottleId": 42632,
+              "fullName": "Eagle Rare Double Eagle Very Rare",
+              "statedAge": 20,
+              "caskNumber": null,
+              "maturation": null,
+              "releaseDay": null,
+              "singleCask": null,
+              "releaseYear": 2019,
+              "traitFields": ["statedAge", "releaseYear", "vintageYear"],
+              "vintageYear": 1999,
+              "bottlingYear": null,
+              "caskStrength": null,
+              "releaseMonth": null
+            }
+          ]
+        }
+      },
+      {
+        "abv": 43,
+        "brand": "Burberrys'",
+        "score": 45.553368,
+        "series": null,
+        "source": ["text"],
+        "bottler": "Burberrys'",
+        "edition": null,
+        "outturn": null,
+        "bottleId": 68695,
+        "category": "single_malt",
+        "fullName": "Burberrys' 1968 20-year-old",
+        "reference": null,
+        "statedAge": 20,
+        "caskNumber": null,
+        "comparison": {
+          "missing": ["caskStrength", "singleCask", "distillers"],
+          "conflicts": ["vintageYear", "brand", "bottler"],
+          "agreements": ["category", "statedAge", "abv"]
+        },
+        "distillery": [],
+        "maturation": "Sherry oak",
+        "releaseDay": null,
+        "singleCask": null,
+        "releaseYear": null,
+        "vintageYear": 1968,
+        "bottlingYear": 1988,
+        "caskStrength": null,
+        "releaseMonth": null,
+        "familyContext": {
+          "siblingBottles": []
+        }
+      },
+      {
+        "abv": null,
+        "brand": "Midleton",
+        "score": 45.545094,
+        "series": null,
+        "source": ["text"],
+        "bottler": null,
+        "edition": null,
+        "outturn": null,
+        "bottleId": 16482,
+        "category": "blend",
+        "fullName": "Midleton Very Rare 2014",
+        "reference": null,
+        "statedAge": null,
+        "caskNumber": null,
+        "comparison": {
+          "missing": ["abv"],
+          "conflicts": [],
+          "agreements": []
+        },
+        "distillery": [],
+        "maturation": null,
+        "releaseDay": null,
+        "singleCask": null,
+        "releaseYear": null,
+        "vintageYear": null,
+        "bottlingYear": null,
+        "caskStrength": null,
+        "releaseMonth": null,
+        "familyContext": {
+          "siblingBottles": []
+        }
+      },
+      {
+        "abv": null,
+        "brand": "Midleton",
+        "score": 45.545094,
+        "series": null,
+        "source": ["text"],
+        "bottler": null,
+        "edition": null,
+        "outturn": null,
+        "bottleId": 16189,
+        "category": "blend",
+        "fullName": "Midleton Very Rare 2015",
+        "reference": null,
+        "statedAge": null,
+        "caskNumber": null,
+        "comparison": {
+          "missing": ["abv"],
+          "conflicts": [],
+          "agreements": []
+        },
+        "distillery": [],
+        "maturation": null,
+        "releaseDay": null,
+        "singleCask": null,
+        "releaseYear": null,
+        "vintageYear": null,
+        "bottlingYear": null,
+        "caskStrength": null,
+        "releaseMonth": null,
+        "familyContext": {
+          "siblingBottles": []
+        }
+      },
+      {
+        "abv": null,
+        "brand": "Midleton",
+        "score": 45.54445,
+        "series": null,
+        "source": ["text"],
+        "bottler": null,
+        "edition": null,
+        "outturn": null,
+        "bottleId": 14484,
+        "category": "blend",
+        "fullName": "Midleton Very Rare 2016",
+        "reference": null,
+        "statedAge": null,
+        "caskNumber": null,
+        "comparison": {
+          "missing": ["abv"],
+          "conflicts": [],
+          "agreements": []
+        },
+        "distillery": [],
+        "maturation": null,
+        "releaseDay": null,
+        "singleCask": null,
+        "releaseYear": null,
+        "vintageYear": null,
+        "bottlingYear": null,
+        "caskStrength": null,
+        "releaseMonth": null,
+        "familyContext": {
+          "siblingBottles": []
+        }
+      },
+      {
+        "abv": null,
+        "brand": "Midleton",
+        "score": 45.54445,
+        "series": null,
+        "source": ["text"],
+        "bottler": null,
+        "edition": null,
+        "outturn": null,
+        "bottleId": 14246,
+        "category": "blend",
+        "fullName": "Midleton Very Rare 2017",
+        "reference": null,
+        "statedAge": null,
+        "caskNumber": null,
+        "comparison": {
+          "missing": ["abv"],
+          "conflicts": [],
+          "agreements": []
+        },
+        "distillery": [],
+        "maturation": null,
+        "releaseDay": null,
+        "singleCask": null,
+        "releaseYear": null,
+        "vintageYear": null,
+        "bottlingYear": null,
+        "caskStrength": null,
+        "releaseMonth": null,
+        "familyContext": {
+          "siblingBottles": []
+        }
+      },
+      {
+        "abv": null,
+        "brand": "Midleton",
+        "score": 45.54445,
+        "series": null,
+        "source": ["text"],
+        "bottler": null,
+        "edition": null,
+        "outturn": null,
+        "bottleId": 13853,
+        "category": "blend",
+        "fullName": "Midleton Very Rare 2018",
+        "reference": null,
+        "statedAge": null,
+        "caskNumber": null,
+        "comparison": {
+          "missing": ["abv"],
+          "conflicts": [],
+          "agreements": []
+        },
+        "distillery": [],
+        "maturation": null,
+        "releaseDay": null,
+        "singleCask": null,
+        "releaseYear": null,
+        "vintageYear": null,
+        "bottlingYear": null,
+        "caskStrength": null,
+        "releaseMonth": null,
+        "familyContext": {
+          "siblingBottles": []
+        }
+      },
+      {
+        "abv": null,
+        "brand": "Midleton",
+        "score": 45.54445,
+        "series": null,
+        "source": ["text"],
+        "bottler": null,
+        "edition": null,
+        "outturn": null,
+        "bottleId": 13501,
+        "category": "blend",
+        "fullName": "Midleton Very Rare 2019",
+        "reference": null,
+        "statedAge": null,
+        "caskNumber": null,
+        "comparison": {
+          "missing": ["abv"],
+          "conflicts": [],
+          "agreements": []
+        },
+        "distillery": [],
+        "maturation": null,
+        "releaseDay": null,
+        "singleCask": null,
+        "releaseYear": null,
+        "vintageYear": null,
+        "bottlingYear": null,
+        "caskStrength": null,
+        "releaseMonth": null,
+        "familyContext": {
+          "siblingBottles": []
+        }
+      },
+      {
+        "abv": null,
+        "brand": "Midleton",
+        "score": 45.54445,
+        "series": null,
+        "source": ["text"],
+        "bottler": null,
+        "edition": null,
+        "outturn": null,
+        "bottleId": 13083,
+        "category": "blend",
+        "fullName": "Midleton Very Rare 2020",
+        "reference": null,
+        "statedAge": null,
+        "caskNumber": null,
+        "comparison": {
+          "missing": ["abv"],
+          "conflicts": [],
+          "agreements": []
+        },
+        "distillery": [],
+        "maturation": null,
+        "releaseDay": null,
+        "singleCask": null,
+        "releaseYear": null,
+        "vintageYear": null,
+        "bottlingYear": null,
+        "caskStrength": null,
+        "releaseMonth": null,
+        "familyContext": {
+          "siblingBottles": []
+        }
+      },
+      {
+        "abv": null,
+        "brand": "Littlemill",
+        "score": 45.434326,
+        "series": null,
+        "source": ["text"],
+        "bottler": null,
+        "edition": null,
+        "outturn": null,
+        "bottleId": 15892,
+        "category": "single_malt",
+        "fullName": "Littlemill 25-year-old Private Cellar Edition",
+        "reference": null,
+        "statedAge": 25,
+        "caskNumber": null,
+        "comparison": {
+          "missing": ["abv"],
+          "conflicts": [],
+          "agreements": []
+        },
+        "distillery": ["Littlemill"],
+        "maturation": null,
+        "releaseDay": null,
+        "singleCask": null,
+        "releaseYear": null,
+        "vintageYear": null,
+        "bottlingYear": null,
+        "caskStrength": null,
+        "releaseMonth": null,
+        "familyContext": {
+          "siblingBottles": []
+        }
+      },
+      {
+        "abv": null,
+        "brand": "The Glenrothes",
+        "score": 45.33508,
+        "series": null,
+        "source": ["vector", "text"],
+        "bottler": null,
+        "edition": null,
+        "outturn": null,
+        "bottleId": 18686,
+        "category": "single_malt",
+        "fullName": "The Glenrothes othes, 20-year-old old, 1984 Vintage",
+        "reference": "Glenrothes, 20-year-old, 1984 Vintage, 43%",
+        "statedAge": 20,
+        "caskNumber": null,
+        "comparison": {
+          "missing": ["abv", "caskStrength", "singleCask", "bottler"],
+          "conflicts": ["vintageYear", "brand", "distillers"],
+          "agreements": ["category", "statedAge"]
+        },
+        "distillery": ["The Glenrothes"],
+        "maturation": null,
+        "releaseDay": null,
+        "singleCask": null,
+        "releaseYear": null,
+        "vintageYear": 1984,
+        "bottlingYear": null,
+        "caskStrength": null,
+        "releaseMonth": null,
+        "familyContext": {
+          "siblingBottles": []
+        }
+      },
+      {
+        "abv": null,
+        "brand": "Deanston",
+        "score": 45.23656,
+        "series": null,
+        "source": ["text"],
+        "bottler": null,
+        "edition": null,
+        "outturn": null,
+        "bottleId": 15986,
+        "category": "single_malt",
+        "fullName": "Deanston 20-year-old Oloroso",
+        "reference": null,
+        "statedAge": 20,
+        "caskNumber": null,
+        "comparison": {
+          "missing": [
+            "abv",
+            "vintageYear",
+            "caskStrength",
+            "singleCask",
+            "bottler"
+          ],
+          "conflicts": ["brand", "distillers"],
+          "agreements": ["category", "statedAge"]
+        },
+        "distillery": ["Deanston"],
+        "maturation": null,
+        "releaseDay": null,
+        "singleCask": null,
+        "releaseYear": null,
+        "vintageYear": null,
+        "bottlingYear": null,
+        "caskStrength": null,
+        "releaseMonth": null,
+        "familyContext": {
+          "siblingBottles": []
+        }
+      },
+      {
+        "abv": 42,
+        "brand": "Alberta Premium",
+        "score": 45.128113,
+        "series": null,
+        "source": ["text"],
+        "bottler": null,
+        "edition": null,
+        "outturn": null,
+        "bottleId": 13657,
+        "category": null,
+        "fullName": "Alberta Premium 20-year-old",
+        "reference": null,
+        "statedAge": 20,
+        "caskNumber": null,
+        "comparison": {
+          "missing": ["category", "vintageYear", "bottler", "distillers"],
+          "conflicts": ["abv", "brand"],
+          "agreements": ["statedAge", "caskStrength", "singleCask"]
+        },
+        "distillery": [],
+        "maturation": null,
+        "releaseDay": null,
+        "singleCask": false,
+        "releaseYear": null,
+        "vintageYear": null,
+        "bottlingYear": null,
+        "caskStrength": false,
+        "releaseMonth": null,
+        "familyContext": {
+          "siblingBottles": []
+        }
+      },
+      {
+        "abv": null,
+        "brand": "BenRiach",
+        "score": 44.85902,
+        "series": null,
+        "source": ["text"],
+        "bottler": null,
+        "edition": null,
+        "outturn": null,
+        "bottleId": 3685,
+        "category": "single_malt",
+        "fullName": "BenRiach 20-year-old Dark Blue Label",
+        "reference": null,
+        "statedAge": 20,
+        "caskNumber": null,
+        "comparison": {
+          "missing": [
+            "abv",
+            "vintageYear",
+            "caskStrength",
+            "singleCask",
+            "bottler"
+          ],
+          "conflicts": ["brand", "distillers"],
+          "agreements": ["category", "statedAge"]
+        },
+        "distillery": ["BenRiach"],
+        "maturation": null,
+        "releaseDay": null,
+        "singleCask": null,
+        "releaseYear": null,
+        "vintageYear": null,
+        "bottlingYear": null,
+        "caskStrength": null,
+        "releaseMonth": null,
+        "familyContext": {
+          "siblingBottles": []
+        }
+      },
+      {
+        "abv": 43,
+        "brand": "Signatory Vintage",
+        "score": 44.476044,
+        "series": "Vintage Collection",
+        "source": ["text"],
+        "bottler": "Signatory Vintage",
+        "edition": null,
+        "outturn": 405,
+        "bottleId": 55765,
+        "category": "single_malt",
+        "fullName": "Signatory Vintage Brora 1981 20-year-old",
+        "reference": null,
+        "statedAge": 20,
+        "caskNumber": "575",
+        "comparison": {
+          "missing": [],
+          "conflicts": ["vintageYear", "brand", "distillers"],
+          "agreements": ["category", "statedAge", "abv"]
+        },
+        "distillery": ["Brora"],
+        "maturation": null,
+        "releaseDay": null,
+        "singleCask": true,
+        "releaseYear": null,
+        "vintageYear": 1981,
+        "bottlingYear": 2001,
+        "caskStrength": false,
+        "releaseMonth": null,
+        "familyContext": {
+          "siblingBottles": []
+        }
+      },
+      {
+        "abv": 46,
+        "brand": "First Cask",
+        "score": 44.279114,
+        "series": null,
+        "source": ["text"],
+        "bottler": "First Cask",
+        "edition": null,
+        "outturn": null,
+        "bottleId": 63326,
+        "category": "single_malt",
+        "fullName": "First Cask Littlemill 20-year-old",
+        "reference": null,
+        "statedAge": 20,
+        "caskNumber": "2919",
+        "comparison": {
+          "missing": [],
+          "conflicts": ["abv", "brand", "distillers"],
+          "agreements": ["category", "statedAge", "vintageYear"]
+        },
+        "distillery": ["Littlemill"],
+        "maturation": null,
+        "releaseDay": null,
+        "singleCask": true,
+        "releaseYear": 2004,
+        "vintageYear": 1983,
+        "bottlingYear": null,
+        "caskStrength": null,
+        "releaseMonth": null,
+        "familyContext": {
+          "siblingBottles": []
+        }
+      },
+      {
+        "abv": 43,
+        "brand": "Signatory Vintage",
+        "score": 44.16253,
+        "series": "Vintage Collection",
+        "source": ["text"],
+        "bottler": "Signatory Vintage",
+        "edition": null,
+        "outturn": 380,
+        "bottleId": 55766,
+        "category": "single_malt",
+        "fullName": "Signatory Vintage Brora 1981 20-year-old",
+        "reference": null,
+        "statedAge": 20,
+        "caskNumber": "576",
+        "comparison": {
+          "missing": [],
+          "conflicts": ["vintageYear", "brand", "distillers"],
+          "agreements": ["category", "statedAge", "abv"]
+        },
+        "distillery": ["Brora"],
+        "maturation": "Oak cask",
+        "releaseDay": null,
+        "singleCask": true,
+        "releaseYear": null,
+        "vintageYear": 1981,
+        "bottlingYear": 2001,
+        "caskStrength": false,
+        "releaseMonth": null,
+        "familyContext": {
+          "siblingBottles": []
+        }
+      },
+      {
+        "abv": 43,
+        "brand": "Signatory Vintage",
+        "score": 44.16253,
+        "series": "Vintage Collection",
+        "source": ["text"],
+        "bottler": "Signatory Vintage",
+        "edition": null,
+        "outturn": 403,
+        "bottleId": 55767,
+        "category": "single_malt",
+        "fullName": "Signatory Vintage Brora 1981 20-year-old",
+        "reference": null,
+        "statedAge": 20,
+        "caskNumber": "577",
+        "comparison": {
+          "missing": [],
+          "conflicts": ["vintageYear", "brand", "distillers"],
+          "agreements": ["category", "statedAge", "abv"]
+        },
+        "distillery": ["Brora"],
+        "maturation": "Oak cask",
+        "releaseDay": null,
+        "singleCask": true,
+        "releaseYear": null,
+        "vintageYear": 1981,
+        "bottlingYear": 2001,
+        "caskStrength": false,
+        "releaseMonth": null,
+        "familyContext": {
+          "siblingBottles": []
+        }
+      },
+      {
+        "abv": 43,
+        "brand": "Signatory Vintage",
+        "score": 44.16253,
+        "series": "Vintage Collection",
+        "source": ["text"],
+        "bottler": "Signatory Vintage",
+        "edition": null,
+        "outturn": 412,
+        "bottleId": 55768,
+        "category": "single_malt",
+        "fullName": "Signatory Vintage Brora 1981 20-year-old",
+        "reference": null,
+        "statedAge": 20,
+        "caskNumber": "578",
+        "comparison": {
+          "missing": [],
+          "conflicts": ["vintageYear", "brand", "distillers"],
+          "agreements": ["category", "statedAge", "abv"]
+        },
+        "distillery": ["Brora"],
+        "maturation": "Oak cask",
+        "releaseDay": null,
+        "singleCask": true,
+        "releaseYear": null,
+        "vintageYear": 1981,
+        "bottlingYear": 2001,
+        "caskStrength": false,
+        "releaseMonth": null,
+        "familyContext": {
+          "siblingBottles": []
+        }
+      },
+      {
+        "abv": null,
+        "brand": "Bowmore",
+        "score": 43.93623,
+        "series": null,
+        "source": ["text"],
+        "bottler": null,
+        "edition": null,
+        "outturn": null,
+        "bottleId": 556,
+        "category": "single_malt",
+        "fullName": "Bowmore 20-year-old",
+        "reference": null,
+        "statedAge": 20,
+        "caskNumber": null,
+        "comparison": {
+          "missing": [
+            "abv",
+            "vintageYear",
+            "caskStrength",
+            "singleCask",
+            "bottler"
+          ],
+          "conflicts": ["brand", "distillers"],
+          "agreements": ["category", "statedAge"]
+        },
+        "distillery": ["Bowmore"],
+        "maturation": null,
+        "releaseDay": null,
+        "singleCask": null,
+        "releaseYear": null,
+        "vintageYear": null,
+        "bottlingYear": null,
+        "caskStrength": null,
+        "releaseMonth": null,
+        "familyContext": {
+          "siblingBottles": []
+        }
+      },
+      {
+        "abv": null,
+        "brand": "Tobermory",
+        "score": 43.93623,
+        "series": null,
+        "source": ["text"],
+        "bottler": null,
+        "edition": null,
+        "outturn": null,
+        "bottleId": 875,
+        "category": "single_malt",
+        "fullName": "Tobermory 20-year-old",
+        "reference": null,
+        "statedAge": 20,
+        "caskNumber": null,
+        "comparison": {
+          "missing": [
+            "abv",
+            "vintageYear",
+            "caskStrength",
+            "singleCask",
+            "bottler"
+          ],
+          "conflicts": ["brand", "distillers"],
+          "agreements": ["category", "statedAge"]
+        },
+        "distillery": ["Tobermory"],
+        "maturation": null,
+        "releaseDay": null,
+        "singleCask": null,
+        "releaseYear": null,
+        "vintageYear": null,
+        "bottlingYear": null,
+        "caskStrength": null,
+        "releaseMonth": null,
+        "familyContext": {
+          "siblingBottles": []
+        }
+      },
+      {
+        "abv": null,
+        "brand": "Tullibardine",
+        "score": 43.93623,
+        "series": null,
+        "source": ["text"],
+        "bottler": null,
+        "edition": null,
+        "outturn": null,
+        "bottleId": 1013,
+        "category": "single_malt",
+        "fullName": "Tullibardine 20-year-old",
+        "reference": null,
+        "statedAge": 20,
+        "caskNumber": null,
+        "comparison": {
+          "missing": [
+            "abv",
+            "vintageYear",
+            "caskStrength",
+            "singleCask",
+            "bottler"
+          ],
+          "conflicts": ["brand", "distillers"],
+          "agreements": ["category", "statedAge"]
+        },
+        "distillery": ["Tullibardine"],
+        "maturation": null,
+        "releaseDay": null,
+        "singleCask": null,
+        "releaseYear": null,
+        "vintageYear": null,
+        "bottlingYear": null,
+        "caskStrength": null,
+        "releaseMonth": null,
+        "familyContext": {
+          "siblingBottles": []
+        }
+      },
+      {
+        "abv": null,
+        "brand": "Ledaig",
+        "score": 43.781376,
+        "series": null,
+        "source": ["text"],
+        "bottler": "Tobermory",
+        "edition": null,
+        "outturn": null,
+        "bottleId": 1236,
+        "category": "single_malt",
+        "fullName": "Ledaig 20-year-old",
+        "reference": null,
+        "statedAge": 20,
+        "caskNumber": null,
+        "comparison": {
+          "missing": [
+            "abv",
+            "vintageYear",
+            "caskStrength",
+            "singleCask",
+            "distillers"
+          ],
+          "conflicts": ["brand", "bottler"],
+          "agreements": ["category", "statedAge"]
+        },
+        "distillery": [],
+        "maturation": null,
+        "releaseDay": null,
+        "singleCask": null,
+        "releaseYear": null,
+        "vintageYear": null,
+        "bottlingYear": null,
+        "caskStrength": null,
+        "releaseMonth": null,
+        "familyContext": {
+          "siblingBottles": []
+        }
+      },
+      {
+        "abv": null,
+        "brand": "Scott's Selection",
+        "score": 43.716213,
+        "series": null,
+        "source": ["vector", "text"],
+        "bottler": null,
+        "edition": null,
+        "outturn": null,
+        "bottleId": 18595,
+        "category": "single_malt",
+        "fullName": "Scott's Selection 21-year-old 1983 vintage (distilled at Auchentoshan)",
+        "reference": "Scott's Selection (distilled at Auchentoshan) 21-year-old 1983 vintage, 52.4%",
+        "statedAge": 21,
+        "caskNumber": null,
+        "comparison": {
+          "missing": ["abv", "edition", "series", "distillers"],
+          "conflicts": [],
+          "agreements": ["category", "vintageYear"]
+        },
+        "distillery": [],
+        "maturation": null,
+        "releaseDay": null,
+        "singleCask": null,
+        "releaseYear": null,
+        "vintageYear": 1983,
+        "bottlingYear": null,
+        "caskStrength": null,
+        "releaseMonth": null,
+        "familyContext": {
+          "siblingBottles": []
+        }
+      },
+      {
+        "abv": null,
+        "brand": "Bruichladdich",
+        "score": 43.67827,
+        "series": null,
+        "source": ["text"],
+        "bottler": null,
+        "edition": null,
+        "outturn": null,
+        "bottleId": 18614,
+        "category": "single_malt",
+        "fullName": "Bruichladdich 20-year-old (2nd Edition)",
+        "reference": null,
+        "statedAge": 20,
+        "caskNumber": null,
+        "comparison": {
+          "missing": [
+            "abv",
+            "vintageYear",
+            "caskStrength",
+            "singleCask",
+            "bottler"
+          ],
+          "conflicts": ["brand", "distillers"],
+          "agreements": ["category", "statedAge"]
+        },
+        "distillery": ["Bruichladdich"],
+        "maturation": null,
+        "releaseDay": null,
+        "singleCask": null,
+        "releaseYear": null,
+        "vintageYear": null,
+        "bottlingYear": null,
+        "caskStrength": null,
+        "releaseMonth": null,
+        "familyContext": {
+          "siblingBottles": []
+        }
+      },
+      {
+        "abv": null,
+        "brand": "Glen Deveron",
+        "score": 43.368073,
+        "series": null,
+        "source": ["text"],
+        "bottler": "Macduff Distillery",
+        "edition": null,
+        "outturn": null,
+        "bottleId": 4258,
+        "category": "single_malt",
+        "fullName": "Glen Deveron 20-year-old Royal Burgh Collection",
+        "reference": null,
+        "statedAge": 20,
+        "caskNumber": null,
+        "comparison": {
+          "missing": [
+            "abv",
+            "vintageYear",
+            "caskStrength",
+            "singleCask",
+            "distillers"
+          ],
+          "conflicts": ["brand", "bottler"],
+          "agreements": ["category", "statedAge"]
+        },
+        "distillery": [],
+        "maturation": null,
+        "releaseDay": null,
+        "singleCask": null,
+        "releaseYear": null,
+        "vintageYear": null,
+        "bottlingYear": null,
+        "caskStrength": null,
+        "releaseMonth": null,
+        "familyContext": {
+          "siblingBottles": []
+        }
+      },
+      {
+        "abv": 46,
+        "brand": "First Cask",
+        "score": 43.283577,
+        "series": null,
+        "source": ["text"],
+        "bottler": "First Cask",
+        "edition": null,
+        "outturn": null,
+        "bottleId": 63330,
+        "category": "single_malt",
+        "fullName": "First Cask Caol Ila 20-year-old",
+        "reference": null,
+        "statedAge": 20,
+        "caskNumber": "54",
+        "comparison": {
+          "missing": [],
+          "conflicts": ["abv", "brand", "distillers"],
+          "agreements": ["category", "statedAge", "vintageYear"]
+        },
+        "distillery": ["Caol Ila"],
+        "maturation": null,
+        "releaseDay": null,
+        "singleCask": true,
+        "releaseYear": null,
+        "vintageYear": 1983,
+        "bottlingYear": null,
+        "caskStrength": null,
+        "releaseMonth": null,
+        "familyContext": {
+          "siblingBottles": []
+        }
+      },
+      {
+        "abv": 54.5,
+        "brand": "Scott's Selection",
+        "score": 42.7005,
+        "series": null,
+        "source": ["text"],
+        "bottler": "Scott's Selection",
+        "edition": null,
+        "outturn": null,
+        "bottleId": 68174,
+        "category": "single_malt",
+        "fullName": "Scott's Selection Longmorn-Glenlivet 1983",
+        "reference": null,
+        "statedAge": null,
+        "caskNumber": null,
+        "comparison": {
+          "missing": ["edition", "series"],
+          "conflicts": ["abv", "distillers"],
+          "agreements": ["category", "vintageYear"]
+        },
+        "distillery": ["Longmorn"],
+        "maturation": "Sherry Wood",
+        "releaseDay": null,
+        "singleCask": null,
+        "releaseYear": null,
+        "vintageYear": 1983,
+        "bottlingYear": 2003,
+        "caskStrength": null,
+        "releaseMonth": null,
+        "familyContext": {
+          "siblingBottles": []
+        }
+      },
+      {
+        "abv": 51.6,
+        "brand": "Riegger's Selection",
+        "score": 41.324917,
+        "series": null,
+        "source": ["text"],
+        "bottler": "Riegger's Selection",
+        "edition": null,
+        "outturn": null,
+        "bottleId": 68245,
+        "category": "single_malt",
+        "fullName": "Riegger's Selection Longmorn 1983",
+        "reference": null,
+        "statedAge": null,
+        "caskNumber": "51",
+        "comparison": {
+          "missing": ["edition", "series"],
+          "conflicts": ["abv", "distillers"],
+          "agreements": ["category", "vintageYear"]
+        },
+        "distillery": ["Longmorn"],
+        "maturation": "Hogshead",
+        "releaseDay": null,
+        "singleCask": null,
+        "releaseYear": null,
+        "vintageYear": 1983,
+        "bottlingYear": 2007,
+        "caskStrength": true,
+        "releaseMonth": null,
+        "familyContext": {
+          "siblingBottles": []
+        }
+      },
+      {
+        "abv": 55.1,
+        "brand": "Special Releases",
+        "score": 40.048264,
+        "series": null,
+        "source": ["text"],
+        "bottler": null,
+        "edition": "2014",
+        "outturn": 6300,
+        "bottleId": 4005,
+        "category": "single_malt",
+        "fullName": "Special Releases Caol Ila 1983 - 2014",
+        "reference": null,
+        "statedAge": 30,
+        "caskNumber": null,
+        "comparison": {
+          "missing": ["series"],
+          "conflicts": ["abv", "distillers"],
+          "agreements": ["category", "vintageYear"]
+        },
+        "distillery": ["Caol Ila"],
+        "maturation": null,
+        "releaseDay": null,
+        "singleCask": null,
+        "releaseYear": 2014,
+        "vintageYear": 1983,
+        "bottlingYear": null,
+        "caskStrength": null,
+        "releaseMonth": null,
+        "familyContext": {
+          "siblingBottles": []
+        }
+      },
+      {
+        "abv": null,
+        "brand": "Midleton",
+        "score": 39.41362,
+        "series": null,
+        "source": ["text"],
+        "bottler": null,
+        "edition": null,
+        "outturn": null,
+        "bottleId": 43939,
+        "category": null,
+        "fullName": "Midleton Very Rare 200th Anniversary 28-year-old",
+        "reference": null,
+        "statedAge": 28,
+        "caskNumber": null,
+        "comparison": {
+          "missing": [
+            "category",
+            "abv",
+            "vintageYear",
+            "edition",
+            "series",
+            "distillers"
+          ],
+          "conflicts": [],
+          "agreements": []
+        },
+        "distillery": [],
+        "maturation": null,
+        "releaseDay": null,
+        "singleCask": null,
+        "releaseYear": null,
+        "vintageYear": null,
+        "bottlingYear": null,
+        "caskStrength": null,
+        "releaseMonth": null,
+        "familyContext": {
+          "siblingBottles": []
+        }
+      },
+      {
+        "abv": null,
+        "brand": "Murray McDavid",
+        "score": 0.671366703203519,
+        "series": null,
+        "source": ["vector"],
+        "bottler": null,
+        "edition": null,
+        "outturn": null,
+        "bottleId": 17903,
+        "category": "single_malt",
+        "fullName": "Murray McDavid 'Mission' 1986 vintage, 20-year-old (distilled at Glenglassaugh)",
+        "reference": "Murray McDavid 'Mission' (distilled at Glenglassaugh), 1986 vintage, 20-year-old, 55.3%",
+        "statedAge": 20,
+        "caskNumber": null,
+        "comparison": {
+          "missing": [
+            "abv",
+            "caskStrength",
+            "singleCask",
+            "bottler",
+            "distillers"
+          ],
+          "conflicts": ["vintageYear", "brand"],
+          "agreements": ["category", "statedAge"]
+        },
+        "distillery": [],
+        "maturation": null,
+        "releaseDay": null,
+        "singleCask": null,
+        "releaseYear": null,
+        "vintageYear": 1986,
+        "bottlingYear": null,
+        "caskStrength": null,
+        "releaseMonth": null,
+        "familyContext": {
+          "siblingBottles": []
+        }
+      },
+      {
+        "abv": null,
+        "brand": "Scott's Selection",
+        "score": 0.6678998409819622,
+        "series": null,
+        "source": ["vector"],
+        "bottler": null,
+        "edition": null,
+        "outturn": null,
+        "bottleId": 18224,
+        "category": "single_malt",
+        "fullName": "Scott's Selection 1980 Vintage (distilled at Glen Elgin)",
+        "reference": "Scott's Selection (distilled at Glen Elgin), 1980 Vintage, 44.1%",
+        "statedAge": null,
+        "caskNumber": null,
+        "comparison": {
+          "missing": ["abv", "edition", "series", "distillers"],
+          "conflicts": ["vintageYear"],
+          "agreements": ["category"]
+        },
+        "distillery": [],
+        "maturation": null,
+        "releaseDay": null,
+        "singleCask": null,
+        "releaseYear": null,
+        "vintageYear": 1980,
+        "bottlingYear": null,
+        "caskStrength": null,
+        "releaseMonth": null,
+        "familyContext": {
+          "siblingBottles": []
+        }
+      },
+      {
+        "abv": null,
+        "brand": "Scott's Selection",
+        "score": 0.6672540921402382,
+        "series": null,
+        "source": ["vector"],
+        "bottler": null,
+        "edition": null,
+        "outturn": null,
+        "bottleId": 18072,
+        "category": "single_malt",
+        "fullName": "Scott's Selection 1984 vintage (distilled at Caol Ila)",
+        "reference": "Scott's Selection (distilled at Caol Ila), 1984 vintage, 53.5%",
+        "statedAge": null,
+        "caskNumber": null,
+        "comparison": {
+          "missing": ["abv", "edition", "series", "distillers"],
+          "conflicts": ["vintageYear"],
+          "agreements": ["category"]
+        },
+        "distillery": [],
+        "maturation": null,
+        "releaseDay": null,
+        "singleCask": null,
+        "releaseYear": null,
+        "vintageYear": 1984,
+        "bottlingYear": null,
+        "caskStrength": null,
+        "releaseMonth": null,
+        "familyContext": {
+          "siblingBottles": []
+        }
+      },
+      {
+        "abv": 43,
+        "brand": "Gordon & MacPhail",
+        "score": 0.6669671987064539,
+        "series": "Connoisseurs Choice",
+        "source": ["vector"],
+        "bottler": "Gordon & MacPhail",
+        "edition": null,
+        "outturn": null,
+        "bottleId": 65817,
+        "category": "single_malt",
+        "fullName": "Gordon & MacPhail Tamnavulin 1989",
+        "reference": "Gordon & MacPhail 43%, 1989 Vintage (distilled at Tamnavulin)",
+        "statedAge": null,
+        "caskNumber": null,
+        "comparison": {
+          "missing": [],
+          "conflicts": [],
+          "agreements": ["abv"]
+        },
+        "distillery": ["Tamnavulin"],
+        "maturation": null,
+        "releaseDay": null,
+        "singleCask": null,
+        "releaseYear": null,
+        "vintageYear": 1989,
+        "bottlingYear": 2004,
+        "caskStrength": null,
+        "releaseMonth": null,
+        "familyContext": {
+          "siblingBottles": []
+        }
+      },
+      {
+        "abv": null,
+        "brand": "Bushmills",
+        "score": 0.6538701185758014,
+        "series": null,
+        "source": ["vector"],
+        "bottler": null,
+        "edition": null,
+        "outturn": null,
+        "bottleId": 43103,
+        "category": "single_malt",
+        "fullName": "Bushmills The Rare Casks 31-year-old",
+        "reference": "Bushmills The Rare Casks 31-year-old, 45.6%",
+        "statedAge": 31,
+        "caskNumber": null,
+        "comparison": {
+          "missing": ["abv", "vintageYear", "edition", "series"],
+          "conflicts": ["distillers"],
+          "agreements": ["category"]
+        },
+        "distillery": ["Bushmills"],
+        "maturation": null,
+        "releaseDay": null,
+        "singleCask": null,
+        "releaseYear": null,
+        "vintageYear": null,
+        "bottlingYear": null,
+        "caskStrength": null,
+        "releaseMonth": null,
+        "familyContext": {
+          "siblingBottles": []
+        }
+      },
+      {
+        "abv": null,
+        "brand": "Scott's Selection",
+        "score": 0.6510039491976675,
+        "series": null,
+        "source": ["vector"],
+        "bottler": null,
+        "edition": null,
+        "outturn": null,
+        "bottleId": 18198,
+        "category": "single_malt",
+        "fullName": "Scott's Selection 1981 vintage (distilled at Highland Park)",
+        "reference": "Scott's Selection (distilled at Highland Park) 1981 vintage, 50.6%",
+        "statedAge": null,
+        "caskNumber": null,
+        "comparison": {
+          "missing": ["abv", "edition", "series"],
+          "conflicts": ["vintageYear", "distillers"],
+          "agreements": ["category"]
+        },
+        "distillery": ["Highland Park"],
+        "maturation": null,
+        "releaseDay": null,
+        "singleCask": null,
+        "releaseYear": null,
+        "vintageYear": 1981,
+        "bottlingYear": null,
+        "caskStrength": null,
+        "releaseMonth": null,
+        "familyContext": {
+          "siblingBottles": []
+        }
+      },
+      {
+        "abv": null,
+        "brand": "The Glenlivet",
+        "score": 0.6485015005319039,
+        "series": null,
+        "source": ["vector"],
+        "bottler": null,
+        "edition": null,
+        "outturn": null,
+        "bottleId": 17570,
+        "category": "single_malt",
+        "fullName": "The Glenlivet Cellar Collection 1973 vintage",
+        "reference": "Glenlivet Cellar Collection 1973 vintage",
+        "statedAge": 47,
+        "caskNumber": null,
+        "comparison": {
+          "missing": ["abv", "edition", "series"],
+          "conflicts": ["vintageYear", "distillers"],
+          "agreements": ["category"]
+        },
+        "distillery": ["The Glenlivet"],
+        "maturation": null,
+        "releaseDay": null,
+        "singleCask": null,
+        "releaseYear": null,
+        "vintageYear": 1973,
+        "bottlingYear": null,
+        "caskStrength": null,
+        "releaseMonth": null,
+        "familyContext": {
+          "siblingBottles": []
+        }
+      },
+      {
+        "abv": 49,
+        "brand": "Bushmills",
+        "score": 0.6480524716645796,
+        "series": null,
+        "source": ["vector"],
+        "bottler": null,
+        "edition": "No. 03",
+        "outturn": null,
+        "bottleId": 61834,
+        "category": "single_malt",
+        "fullName": "Bushmills Rare Casks 30-year-old Madeira Casks - No. 03",
+        "reference": "Bushmills The Rare Cask 30-year-old Madeira Cask, 49%",
+        "statedAge": 30,
+        "caskNumber": null,
+        "comparison": {
+          "missing": ["vintageYear", "series"],
+          "conflicts": ["abv", "distillers"],
+          "agreements": ["category"]
+        },
+        "distillery": ["Bushmills"],
+        "maturation": null,
+        "releaseDay": null,
+        "singleCask": null,
+        "releaseYear": null,
+        "vintageYear": null,
+        "bottlingYear": null,
+        "caskStrength": null,
+        "releaseMonth": null,
+        "familyContext": {
+          "siblingBottles": []
+        }
+      },
+      {
+        "abv": 59.8,
+        "brand": "Highland Park",
+        "score": 0.6472288669695953,
+        "series": null,
+        "source": ["vector"],
+        "bottler": null,
+        "edition": "for Green's",
+        "outturn": null,
+        "bottleId": 18115,
+        "category": "single_malt",
+        "fullName": "Highland Park Single Cask - for Green's",
+        "reference": "Highland Park 1983 vintage 23-year-old (Cask #691) - 1983 Vintage",
+        "statedAge": 23,
+        "caskNumber": "691",
+        "comparison": {
+          "missing": ["series"],
+          "conflicts": ["abv", "distillers"],
+          "agreements": ["category", "vintageYear"]
+        },
+        "distillery": ["Highland Park"],
+        "maturation": null,
+        "releaseDay": null,
+        "singleCask": true,
+        "releaseYear": null,
+        "vintageYear": 1983,
+        "bottlingYear": 2006,
+        "caskStrength": true,
+        "releaseMonth": null,
+        "familyContext": {
+          "siblingBottles": []
+        }
+      }
+    ]
+  },
+  "context": {
+    "inspectedBottleIds": [],
+    "bottleContexts": [],
+    "inspectedEntities": [
+      {
+        "kind": "distillery",
+        "name": "The Macallan",
+        "score": 1,
+        "source": ["exact", "text", "prefix", "contained"],
+        "entityId": 1157,
+        "reference": "The Macallan",
+        "shortName": null,
+        "retrievedFor": [
+          {
+            "exact": true,
+            "query": "The Macallan"
+          }
+        ]
+      },
+      {
+        "kind": "bottler",
+        "name": "Gordon & MacPhail",
+        "score": 1,
+        "source": ["exact", "text", "prefix", "contained"],
+        "entityId": 5645,
+        "reference": "Gordon & MacPhail",
+        "shortName": null,
+        "retrievedFor": [
+          {
+            "exact": true,
+            "query": "Gordon & MacPhail"
+          }
+        ]
+      },
+      {
+        "kind": "distillery",
+        "name": "Tamnavulin",
+        "score": 1,
+        "source": ["exact", "text", "prefix", "contained"],
+        "entityId": 1387,
+        "reference": "Tamnavulin",
+        "shortName": null,
+        "retrievedFor": [
+          {
+            "exact": true,
+            "query": "Tamnavulin"
+          }
+        ]
+      },
+      {
+        "kind": "brand",
+        "name": "Midleton",
+        "score": 1,
+        "source": ["exact", "text", "prefix", "contained"],
+        "entityId": 1181,
+        "reference": "Midleton",
+        "shortName": "",
+        "retrievedFor": [
+          {
+            "exact": true,
+            "query": "Midleton"
+          }
+        ]
+      },
+      {
+        "kind": "brand",
+        "name": "Eagle Rare",
+        "score": 1,
+        "source": ["exact", "text", "prefix", "contained"],
+        "entityId": 895,
+        "reference": "Eagle Rare",
+        "shortName": null,
+        "retrievedFor": [
+          {
+            "exact": true,
+            "query": "Eagle Rare"
+          }
+        ]
+      },
+      {
+        "kind": "distillery",
+        "name": "Buffalo Trace Distillery",
+        "score": 1,
+        "source": ["exact", "text", "prefix", "contained"],
+        "entityId": 483,
+        "reference": "Buffalo Trace Distillery",
+        "shortName": "Buffalo Trace",
+        "retrievedFor": [
+          {
+            "exact": true,
+            "query": "Buffalo Trace Distillery"
+          }
+        ]
+      },
+      {
+        "kind": "distillery",
+        "name": "Littlemill",
+        "score": 1,
+        "source": ["exact", "text", "prefix", "contained"],
+        "entityId": 1142,
+        "reference": "Littlemill",
+        "shortName": null,
+        "retrievedFor": [
+          {
+            "exact": true,
+            "query": "Littlemill"
+          }
+        ]
+      },
+      {
+        "kind": "brand",
+        "name": "Private Cellar",
+        "score": 1,
+        "source": ["exact", "text", "prefix", "contained"],
+        "entityId": 5824,
+        "reference": "Private Cellar",
+        "shortName": null,
+        "retrievedFor": [
+          {
+            "exact": true,
+            "query": "Private Cellar"
+          }
+        ]
+      },
+      {
+        "kind": "company",
+        "name": "Speyside Distillers Company",
+        "score": 1,
+        "source": ["exact", "text", "prefix", "contained"],
+        "entityId": 5752,
+        "reference": "Speyside Distillers Company",
+        "shortName": null,
+        "retrievedFor": [
+          {
+            "exact": true,
+            "query": "Speyside Distillers Company"
+          }
+        ]
+      },
+      {
+        "kind": "distillery",
+        "name": "Millburn",
+        "score": 1,
+        "source": ["exact", "text", "prefix", "contained"],
+        "entityId": 1183,
+        "reference": "Millburn",
+        "shortName": null,
+        "retrievedFor": [
+          {
+            "exact": true,
+            "query": "Millburn"
+          }
+        ]
+      },
+      {
+        "kind": "distillery",
+        "name": "Midleton Distillery",
+        "score": 0.5,
+        "source": ["text", "prefix"],
+        "entityId": 366687,
+        "reference": "Midleton Distillery",
+        "shortName": null,
+        "retrievedFor": [
+          {
+            "query": "Midleton"
+          }
+        ]
+      },
+      {
+        "kind": "bottler",
+        "name": "Littlemill Blenders Ltd.",
+        "score": 0.5,
+        "source": ["text", "prefix"],
+        "entityId": 5862,
+        "reference": "Littlemill Blenders Ltd.",
+        "shortName": null,
+        "retrievedFor": [
+          {
+            "query": "Littlemill"
+          }
+        ]
+      },
+      {
+        "kind": "brand",
+        "name": "Emill",
+        "score": 0.35,
+        "source": ["contained"],
+        "entityId": 2682,
+        "reference": "Emill",
+        "shortName": null,
+        "retrievedFor": [
+          {
+            "query": "Littlemill"
+          }
+        ]
+      },
+      {
+        "kind": "brand",
+        "name": "SPEY",
+        "score": 0.28200000000000003,
+        "source": ["contained"],
+        "entityId": 1353,
+        "reference": "SPEY",
+        "shortName": null,
+        "retrievedFor": [
+          {
+            "query": "Speyside Distillers Company"
+          }
+        ]
+      },
+      {
+        "kind": "distillery",
+        "name": "Old Midleton Distillery",
+        "score": 0.2,
+        "source": ["text"],
+        "entityId": 1866,
+        "reference": null,
+        "shortName": null,
+        "retrievedFor": [
+          {
+            "query": "Midleton"
+          }
+        ]
+      }
+    ],
+    "inspectedSeries": []
+  },
+  "provenance": {
+    "source": "production_miss",
+    "verifiedSourceUrls": [
+      "https://www.scotchwhiskyauctions.com/auctions/234-the-185th-auction/908322-millburn-1983-very-rare-private-cellar-cask-selection-special-edition/",
+      "https://d3suvtcq00dftb.cloudfront.net/images/2a8b902f71f06cf08692b6b8fb34359f-zoom.jpg",
+      "https://www.whisky-online.com/products/millburn-1983-private-cellar"
+    ],
+    "dbOutcome": {
+      "bottleId": null,
+      "createsBottle": false,
+      "summary": "Production returned no_match: it found a 20-year-old claim on the web but could not resolve the release wording."
+    },
+    "notes": "Captured from saved classifier run 36238 (auction_lot 17081, model null, 2026-11-03T19:26:30.541Z). Production rationale: The source is one Millburn whisky bottle. Search evidence supports a 1983 vintage, 20-year age, and 43% ABV, but does not resolve the release wording in the auction title. No local candidate represents this product, and the remaining uncertainty is not sufficient to create a complete Bottle safely. The run predates reading Scotch Whisky Auctions lot pages (#1609), so the evidence pack adds the lot page text. Expected outcome checked against the lot page and photo on 2026-11-09, in a random sample of the 185th auction's no_match reviews."
+  },
+  "expected": {
+    "status": "classified",
+    "action": "create_bottle",
+    "identityScope": "product",
+    "matchedBottleId": null,
+    "proposedBottle": {
+      "category": "single_malt",
+      "vintageYear": 1983,
+      "abv": 43,
+      "statedAge": null
+    },
+    "proposedBottleNameIncludes": ["Millburn", "1983"],
+    "proposedBottleDistillerIds": [1183],
+    "summary": "Create Forbes Ross & Co's Very Rare Private Cellar Cask Selection, Special Edition, Millburn 1983, at 43%. The label prints the distillery, 1983, 43% and 70cl and no age, so leave age empty; the lot page's \"Distilled: 10983\" is a typo for 1983. No local Bottle is a Millburn 1983."
+  }
+}

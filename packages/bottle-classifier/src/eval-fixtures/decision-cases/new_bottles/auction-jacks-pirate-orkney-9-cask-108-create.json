@@ -1,0 +1,1797 @@
+{
+  "id": "auction-jacks-pirate-orkney-9-cask-108-create",
+  "name": "Orkney 9 Year Old Jack's Pirate Whisky: the label photo shows cask 108, so create it despite the lot page's 16-year-old text",
+  "input": {
+    "reference": {
+      "id": 17217,
+      "url": "https://www.scotchwhiskyauctions.com/auctions/234-the-185th-auction/906193-orkney-single-malt-9-year-old-jacks-pirate-whisky/",
+      "name": "Orkney Single Malt 9 Year Old Jack’s Pirate Whisky",
+      "imageUrl": null,
+      "externalSiteId": 28097,
+      "currentBottleId": null
+    },
+    "extractedIdentity": {
+      "abv": 58,
+      "brand": null,
+      "series": null,
+      "bottler": null,
+      "edition": null,
+      "outturn": null,
+      "category": null,
+      "distillery": null,
+      "expression": null,
+      "maturation": null,
+      "stated_age": null,
+      "cask_number": "421",
+      "single_cask": null,
+      "release_year": null,
+      "vintage_year": null,
+      "cask_strength": null
+    },
+    "extractedIdentitySource": "structured",
+    "imageEvidence": {
+      "sourceImageId": "auction_lot:17217",
+      "extractors": [
+        {
+          "kind": "vision",
+          "confidence": 0.75,
+          "textSpans": [
+            {
+              "text": "JACK'S PIRATE WHISKY\nORKNEY SINGLE MALT\nSCOTCH WHISKY\nYEARS 9\nONLY 290 BOTTLES\nCASK N°: 108\n70cl\n59.5% vol\nLIMITED EDITION • PRODUCT OF SCOTLAND",
+              "confidence": 0.75
+            }
+          ],
+          "observations": [
+            "Read whisky label identity from the auction lot photo."
+          ]
+        }
+      ],
+      "fieldCandidates": {
+        "brand": {
+          "value": "Jack's Pirate Whisky",
+          "confidence": 0.75,
+          "sourceExtractorIndexes": [0]
+        },
+        "category": {
+          "value": "single_malt",
+          "confidence": 0.75,
+          "sourceExtractorIndexes": [0]
+        },
+        "statedAge": {
+          "value": 9,
+          "confidence": 0.75,
+          "sourceExtractorIndexes": [0]
+        },
+        "caskNumber": {
+          "value": "108",
+          "confidence": 0.75,
+          "sourceExtractorIndexes": [0]
+        },
+        "abv": {
+          "value": 59.5,
+          "confidence": 0.75,
+          "sourceExtractorIndexes": [0]
+        }
+      },
+      "photoSuitability": {
+        "isSingleBottlePhoto": true,
+        "labelReadable": true,
+        "suitableAsTastingImage": false,
+        "suitableAsBottleImage": false,
+        "reason": null
+      },
+      "conflicts": []
+    },
+    "initialCandidates": [
+      {
+        "abv": 58.3,
+        "brand": "Jack Wiebers Whisky World",
+        "score": 69.84645,
+        "series": "Prenzlow Portfolio Collection",
+        "source": ["text"],
+        "bottler": "Jack Wiebers Whisky World",
+        "edition": null,
+        "outturn": 120,
+        "bottleId": 68131,
+        "category": "single_malt",
+        "fullName": "Jack Wiebers Whisky World Longmorn 1972",
+        "reference": null,
+        "statedAge": null,
+        "caskNumber": null,
+        "comparison": {
+          "missing": ["statedAge", "caskNumber"],
+          "conflicts": ["abv", "brand", "distillers"],
+          "agreements": ["category", "singleCask", "bottler"]
+        },
+        "distillery": ["Longmorn"],
+        "maturation": null,
+        "releaseDay": null,
+        "singleCask": true,
+        "releaseYear": null,
+        "vintageYear": 1972,
+        "bottlingYear": null,
+        "caskStrength": null,
+        "releaseMonth": null,
+        "familyContext": {
+          "siblingBottles": []
+        }
+      },
+      {
+        "abv": 53.2,
+        "brand": "Jack Wiebers Whisky World",
+        "score": 69.84645,
+        "series": "The Cross Hill",
+        "source": ["text"],
+        "bottler": "Jack Wiebers Whisky World",
+        "edition": null,
+        "outturn": 130,
+        "bottleId": 68134,
+        "category": "single_malt",
+        "fullName": "Jack Wiebers Whisky World Longmorn 1975",
+        "reference": null,
+        "statedAge": null,
+        "caskNumber": null,
+        "comparison": {
+          "missing": ["statedAge", "caskNumber"],
+          "conflicts": ["abv", "brand", "distillers"],
+          "agreements": ["category", "singleCask", "bottler"]
+        },
+        "distillery": ["Longmorn"],
+        "maturation": null,
+        "releaseDay": null,
+        "singleCask": true,
+        "releaseYear": null,
+        "vintageYear": 1975,
+        "bottlingYear": 2007,
+        "caskStrength": null,
+        "releaseMonth": null,
+        "familyContext": {
+          "siblingBottles": []
+        }
+      },
+      {
+        "abv": 58,
+        "brand": "The Scotch Malt Whisky Society",
+        "score": 46.111732,
+        "series": null,
+        "source": ["text"],
+        "bottler": "The Scotch Malt Whisky Society",
+        "edition": null,
+        "outturn": 251,
+        "bottleId": 48987,
+        "category": "single_malt",
+        "fullName": "SMWS 73.121 Meemaws Moonpie",
+        "reference": null,
+        "statedAge": 9,
+        "caskNumber": "73.121",
+        "comparison": {
+          "missing": [],
+          "conflicts": ["caskNumber", "distillers"],
+          "agreements": ["category", "statedAge", "abv"]
+        },
+        "distillery": ["Aultmore"],
+        "maturation": "1st fill ex-bourbon barrel",
+        "releaseDay": null,
+        "singleCask": true,
+        "releaseYear": null,
+        "vintageYear": 2011,
+        "bottlingYear": null,
+        "caskStrength": null,
+        "releaseMonth": null,
+        "familyContext": {
+          "siblingBottles": []
+        }
+      },
+      {
+        "abv": 58,
+        "brand": "The Scotch Malt Whisky Society",
+        "score": 45.86988,
+        "series": null,
+        "source": ["text"],
+        "bottler": "The Scotch Malt Whisky Society",
+        "edition": null,
+        "outturn": null,
+        "bottleId": 48683,
+        "category": "single_malt",
+        "fullName": "SMWS 58.48 Smokescreen",
+        "reference": null,
+        "statedAge": 9,
+        "caskNumber": "58.48",
+        "comparison": {
+          "missing": [],
+          "conflicts": ["caskNumber", "distillers"],
+          "agreements": ["category", "statedAge", "abv"]
+        },
+        "distillery": ["Strathisla"],
+        "maturation": "1st fill ex-bourbon barrel",
+        "releaseDay": 17,
+        "singleCask": true,
+        "releaseYear": 2022,
+        "vintageYear": 2012,
+        "bottlingYear": null,
+        "caskStrength": null,
+        "releaseMonth": 6,
+        "familyContext": {
+          "siblingBottles": []
+        }
+      },
+      {
+        "abv": 58,
+        "brand": "Cooper's Choice",
+        "score": 42.673805,
+        "series": null,
+        "source": ["text"],
+        "bottler": "The Vintage Malt Whisky Co Ltd.",
+        "edition": null,
+        "outturn": null,
+        "bottleId": 46493,
+        "category": "single_malt",
+        "fullName": "Cooper's Choice Ruadh Maor",
+        "reference": null,
+        "statedAge": 9,
+        "caskNumber": "1906",
+        "comparison": {
+          "missing": [],
+          "conflicts": ["caskNumber", "distillers"],
+          "agreements": ["category", "statedAge", "abv"]
+        },
+        "distillery": ["Glenturret"],
+        "maturation": "bourbon",
+        "releaseDay": null,
+        "singleCask": true,
+        "releaseYear": null,
+        "vintageYear": 2013,
+        "bottlingYear": null,
+        "caskStrength": null,
+        "releaseMonth": null,
+        "familyContext": {
+          "siblingBottles": []
+        }
+      },
+      {
+        "abv": 58,
+        "brand": "The Scotch Malt Whisky Society",
+        "score": 42.331734,
+        "series": null,
+        "source": ["text"],
+        "bottler": "The Scotch Malt Whisky Society",
+        "edition": null,
+        "outturn": null,
+        "bottleId": 48213,
+        "category": "single_malt",
+        "fullName": "SMWS 10.256 Winter's green lichen",
+        "reference": null,
+        "statedAge": 9,
+        "caskNumber": "10.256",
+        "comparison": {
+          "missing": [],
+          "conflicts": ["caskNumber", "brand", "bottler", "distillers"],
+          "agreements": ["category", "statedAge", "abv", "singleCask"]
+        },
+        "distillery": ["Bunnahabhain"],
+        "maturation": "2nd fill ex-px hogshead",
+        "releaseDay": 3,
+        "singleCask": true,
+        "releaseYear": 2023,
+        "vintageYear": 2013,
+        "bottlingYear": null,
+        "caskStrength": null,
+        "releaseMonth": 11,
+        "familyContext": {
+          "siblingBottles": []
+        }
+      },
+      {
+        "abv": null,
+        "brand": "Bladnoch",
+        "score": 42.295258,
+        "series": null,
+        "source": ["text"],
+        "bottler": null,
+        "edition": null,
+        "outturn": null,
+        "bottleId": 17110,
+        "category": "single_malt",
+        "fullName": "Bladnoch 9-year-old",
+        "reference": null,
+        "statedAge": 9,
+        "caskNumber": null,
+        "comparison": {
+          "missing": ["abv", "caskNumber"],
+          "conflicts": ["distillers"],
+          "agreements": ["category", "statedAge"]
+        },
+        "distillery": ["Bladnoch"],
+        "maturation": null,
+        "releaseDay": null,
+        "singleCask": null,
+        "releaseYear": null,
+        "vintageYear": null,
+        "bottlingYear": null,
+        "caskStrength": null,
+        "releaseMonth": null,
+        "familyContext": {
+          "siblingBottles": []
+        }
+      },
+      {
+        "abv": null,
+        "brand": "Bowmore",
+        "score": 42.295258,
+        "series": null,
+        "source": ["text"],
+        "bottler": null,
+        "edition": null,
+        "outturn": null,
+        "bottleId": 15907,
+        "category": "single_malt",
+        "fullName": "Bowmore 9-year-old",
+        "reference": null,
+        "statedAge": 9,
+        "caskNumber": null,
+        "comparison": {
+          "missing": ["abv", "caskNumber"],
+          "conflicts": ["distillers"],
+          "agreements": ["category", "statedAge"]
+        },
+        "distillery": ["Bowmore"],
+        "maturation": null,
+        "releaseDay": null,
+        "singleCask": null,
+        "releaseYear": null,
+        "vintageYear": null,
+        "bottlingYear": null,
+        "caskStrength": null,
+        "releaseMonth": null,
+        "familyContext": {
+          "siblingBottles": []
+        }
+      },
+      {
+        "abv": 58,
+        "brand": "The Scotch Malt Whisky Society",
+        "score": 40.895374,
+        "series": null,
+        "source": ["text"],
+        "bottler": "The Scotch Malt Whisky Society",
+        "edition": null,
+        "outturn": null,
+        "bottleId": 49173,
+        "category": "single_malt",
+        "fullName": "SMWS 93.187 Baldrick's aquatic dress turnip",
+        "reference": null,
+        "statedAge": 9,
+        "caskNumber": "93.187",
+        "comparison": {
+          "missing": [],
+          "conflicts": ["caskNumber", "brand", "bottler", "distillers"],
+          "agreements": ["category", "statedAge", "abv", "singleCask"]
+        },
+        "distillery": ["Glen Scotia"],
+        "maturation": "1st fill barrel",
+        "releaseDay": 2,
+        "singleCask": true,
+        "releaseYear": 2022,
+        "vintageYear": 2013,
+        "bottlingYear": null,
+        "caskStrength": null,
+        "releaseMonth": 9,
+        "familyContext": {
+          "siblingBottles": []
+        }
+      },
+      {
+        "abv": 58,
+        "brand": "Thompson Bros",
+        "score": 40.853348,
+        "series": null,
+        "source": ["text"],
+        "bottler": "Thompson Bros",
+        "edition": null,
+        "outturn": null,
+        "bottleId": 61101,
+        "category": "single_malt",
+        "fullName": "Thompson Bros Ledaig 9-year-old 2007",
+        "reference": null,
+        "statedAge": 9,
+        "caskNumber": null,
+        "comparison": {
+          "missing": ["caskNumber"],
+          "conflicts": ["distillers"],
+          "agreements": ["category", "statedAge", "abv"]
+        },
+        "distillery": ["Tobermory"],
+        "maturation": null,
+        "releaseDay": null,
+        "singleCask": null,
+        "releaseYear": null,
+        "vintageYear": 2007,
+        "bottlingYear": 2016,
+        "caskStrength": null,
+        "releaseMonth": null,
+        "familyContext": {
+          "siblingBottles": []
+        }
+      },
+      {
+        "abv": 58,
+        "brand": "The Scotch Malt Whisky Society",
+        "score": 40.786827,
+        "series": null,
+        "source": ["text"],
+        "bottler": "The Scotch Malt Whisky Society",
+        "edition": null,
+        "outturn": 211,
+        "bottleId": 47992,
+        "category": "single_malt",
+        "fullName": "SMWS 1.235 Icing like a bird",
+        "reference": null,
+        "statedAge": 9,
+        "caskNumber": "1.235",
+        "comparison": {
+          "missing": [],
+          "conflicts": ["caskNumber", "brand", "bottler", "distillers"],
+          "agreements": ["category", "statedAge", "abv", "singleCask"]
+        },
+        "distillery": ["Glenfarclas"],
+        "maturation": "1st fill ex-bourbon barrel",
+        "releaseDay": 4,
+        "singleCask": true,
+        "releaseYear": 2020,
+        "vintageYear": 2011,
+        "bottlingYear": null,
+        "caskStrength": null,
+        "releaseMonth": 12,
+        "familyContext": {
+          "siblingBottles": []
+        }
+      },
+      {
+        "abv": null,
+        "brand": "Hazelburn",
+        "score": 39.3537,
+        "series": null,
+        "source": ["text"],
+        "bottler": null,
+        "edition": null,
+        "outturn": null,
+        "bottleId": 14368,
+        "category": "single_malt",
+        "fullName": "Hazelburn 9-year-old Barolo Cask",
+        "reference": null,
+        "statedAge": 9,
+        "caskNumber": null,
+        "comparison": {
+          "missing": ["abv", "caskNumber", "distillers"],
+          "conflicts": [],
+          "agreements": ["category", "statedAge"]
+        },
+        "distillery": [],
+        "maturation": null,
+        "releaseDay": null,
+        "singleCask": null,
+        "releaseYear": null,
+        "vintageYear": null,
+        "bottlingYear": null,
+        "caskStrength": null,
+        "releaseMonth": null,
+        "familyContext": {
+          "siblingBottles": []
+        }
+      },
+      {
+        "abv": 58,
+        "brand": "Dràm Mòr",
+        "score": 39.160515,
+        "series": null,
+        "source": ["text"],
+        "bottler": "Dràm Mòr",
+        "edition": null,
+        "outturn": null,
+        "bottleId": 46489,
+        "category": "single_malt",
+        "fullName": "Dràm Mòr Macduff 2012",
+        "reference": null,
+        "statedAge": 9,
+        "caskNumber": "900047",
+        "comparison": {
+          "missing": [],
+          "conflicts": ["caskNumber", "brand", "bottler", "distillers"],
+          "agreements": ["category", "statedAge", "abv", "singleCask"]
+        },
+        "distillery": ["Macduff Distillery"],
+        "maturation": "other",
+        "releaseDay": null,
+        "singleCask": true,
+        "releaseYear": null,
+        "vintageYear": 2012,
+        "bottlingYear": null,
+        "caskStrength": true,
+        "releaseMonth": null,
+        "familyContext": {
+          "siblingBottles": []
+        }
+      },
+      {
+        "abv": null,
+        "brand": "Mosswood",
+        "score": 37.01365,
+        "series": null,
+        "source": ["text"],
+        "bottler": null,
+        "edition": null,
+        "outturn": null,
+        "bottleId": 14492,
+        "category": null,
+        "fullName": "Mosswood Barrel Aged American Whiskey 9-year-old",
+        "reference": null,
+        "statedAge": 9,
+        "caskNumber": null,
+        "comparison": {
+          "missing": ["category", "abv", "caskNumber", "distillers"],
+          "conflicts": [],
+          "agreements": ["statedAge"]
+        },
+        "distillery": [],
+        "maturation": null,
+        "releaseDay": null,
+        "singleCask": null,
+        "releaseYear": null,
+        "vintageYear": null,
+        "bottlingYear": null,
+        "caskStrength": null,
+        "releaseMonth": null,
+        "familyContext": {
+          "siblingBottles": []
+        }
+      },
+      {
+        "abv": null,
+        "brand": "The GlenDronach",
+        "score": 37.010452,
+        "series": null,
+        "source": ["text"],
+        "bottler": "The GlenDronach",
+        "edition": "Batch 9",
+        "outturn": null,
+        "bottleId": 44909,
+        "category": "single_malt",
+        "fullName": "The GlenDronach Cask Strength - Batch 9",
+        "reference": null,
+        "statedAge": null,
+        "caskNumber": null,
+        "comparison": {
+          "missing": ["statedAge", "abv", "caskNumber", "distillers"],
+          "conflicts": [],
+          "agreements": ["category"]
+        },
+        "distillery": [],
+        "maturation": null,
+        "releaseDay": null,
+        "singleCask": null,
+        "releaseYear": null,
+        "vintageYear": null,
+        "bottlingYear": null,
+        "caskStrength": true,
+        "releaseMonth": null,
+        "familyContext": {
+          "siblingBottles": [
+            {
+              "abv": null,
+              "edition": null,
+              "outturn": null,
+              "bottleId": 44009,
+              "fullName": "The GlenDronach Cask Strength",
+              "statedAge": null,
+              "caskNumber": null,
+              "maturation": null,
+              "releaseDay": null,
+              "singleCask": null,
+              "releaseYear": null,
+              "traitFields": [],
+              "vintageYear": null,
+              "bottlingYear": null,
+              "caskStrength": null,
+              "releaseMonth": null
+            },
+            {
+              "abv": null,
+              "edition": "Batch 1",
+              "outturn": null,
+              "bottleId": 44901,
+              "fullName": "The GlenDronach Cask Strength - Batch 1",
+              "statedAge": null,
+              "caskNumber": null,
+              "maturation": null,
+              "releaseDay": null,
+              "singleCask": null,
+              "releaseYear": null,
+              "traitFields": ["edition", "caskStrength"],
+              "vintageYear": null,
+              "bottlingYear": null,
+              "caskStrength": true,
+              "releaseMonth": null
+            },
+            {
+              "abv": null,
+              "edition": "Batch 10",
+              "outturn": null,
+              "bottleId": 44910,
+              "fullName": "The GlenDronach Cask Strength - Batch 10 - 10-year-old",
+              "statedAge": 10,
+              "caskNumber": null,
+              "maturation": null,
+              "releaseDay": null,
+              "singleCask": null,
+              "releaseYear": null,
+              "traitFields": ["edition", "statedAge", "caskStrength"],
+              "vintageYear": null,
+              "bottlingYear": null,
+              "caskStrength": true,
+              "releaseMonth": null
+            },
+            {
+              "abv": null,
+              "edition": "Batch 2",
+              "outturn": null,
+              "bottleId": 44902,
+              "fullName": "The GlenDronach Cask Strength - Batch 2",
+              "statedAge": null,
+              "caskNumber": null,
+              "maturation": null,
+              "releaseDay": null,
+              "singleCask": null,
+              "releaseYear": null,
+              "traitFields": ["edition", "caskStrength"],
+              "vintageYear": null,
+              "bottlingYear": null,
+              "caskStrength": true,
+              "releaseMonth": null
+            },
+            {
+              "abv": null,
+              "edition": "Batch 3",
+              "outturn": null,
+              "bottleId": 44903,
+              "fullName": "The GlenDronach Cask Strength - Batch 3",
+              "statedAge": null,
+              "caskNumber": null,
+              "maturation": null,
+              "releaseDay": null,
+              "singleCask": null,
+              "releaseYear": null,
+              "traitFields": ["edition", "caskStrength"],
+              "vintageYear": null,
+              "bottlingYear": null,
+              "caskStrength": true,
+              "releaseMonth": null
+            },
+            {
+              "abv": null,
+              "edition": "Batch 4",
+              "outturn": null,
+              "bottleId": 44905,
+              "fullName": "The GlenDronach Cask Strength - Batch 4 - 12-year-old",
+              "statedAge": 12,
+              "caskNumber": null,
+              "maturation": null,
+              "releaseDay": null,
+              "singleCask": null,
+              "releaseYear": null,
+              "traitFields": ["edition", "statedAge", "caskStrength"],
+              "vintageYear": null,
+              "bottlingYear": null,
+              "caskStrength": true,
+              "releaseMonth": null
+            },
+            {
+              "abv": null,
+              "edition": "Batch 5",
+              "outturn": null,
+              "bottleId": 44904,
+              "fullName": "The GlenDronach Cask Strength - Batch 5 - 10-year-old",
+              "statedAge": 10,
+              "caskNumber": null,
+              "maturation": null,
+              "releaseDay": null,
+              "singleCask": null,
+              "releaseYear": null,
+              "traitFields": ["edition", "statedAge", "caskStrength"],
+              "vintageYear": null,
+              "bottlingYear": null,
+              "caskStrength": true,
+              "releaseMonth": null
+            },
+            {
+              "abv": null,
+              "edition": "Batch 6",
+              "outturn": null,
+              "bottleId": 44906,
+              "fullName": "The GlenDronach Cask Strength - Batch 6",
+              "statedAge": null,
+              "caskNumber": null,
+              "maturation": null,
+              "releaseDay": null,
+              "singleCask": null,
+              "releaseYear": null,
+              "traitFields": ["edition", "caskStrength"],
+              "vintageYear": null,
+              "bottlingYear": null,
+              "caskStrength": true,
+              "releaseMonth": null
+            }
+          ]
+        }
+      },
+      {
+        "abv": 58.8,
+        "brand": "Duncan Taylor",
+        "score": 30.429298,
+        "series": "Rare Auld",
+        "source": ["text"],
+        "bottler": "Duncan Taylor",
+        "edition": null,
+        "outturn": 249,
+        "bottleId": 68764,
+        "category": "single_malt",
+        "fullName": "Duncan Taylor Dallas Dhu 1981",
+        "reference": null,
+        "statedAge": 26,
+        "caskNumber": "421",
+        "comparison": {
+          "missing": [],
+          "conflicts": ["abv"],
+          "agreements": ["caskNumber"]
+        },
+        "distillery": ["Dallas Dhu"],
+        "maturation": "Oak cask",
+        "releaseDay": null,
+        "singleCask": true,
+        "releaseYear": null,
+        "vintageYear": 1981,
+        "bottlingYear": 2007,
+        "caskStrength": true,
+        "releaseMonth": null,
+        "familyContext": {
+          "siblingBottles": []
+        }
+      },
+      {
+        "abv": 58,
+        "brand": "Smokehead",
+        "score": 29.81007,
+        "series": null,
+        "source": ["text"],
+        "bottler": "Ian Macleod Distillers",
+        "edition": null,
+        "outturn": null,
+        "bottleId": 45868,
+        "category": "single_malt",
+        "fullName": "Smokehead High Voltage - 58.0% ABV",
+        "reference": null,
+        "statedAge": null,
+        "caskNumber": null,
+        "comparison": {
+          "missing": ["caskNumber"],
+          "conflicts": [],
+          "agreements": ["abv"]
+        },
+        "distillery": [],
+        "maturation": null,
+        "releaseDay": null,
+        "singleCask": null,
+        "releaseYear": null,
+        "vintageYear": null,
+        "bottlingYear": null,
+        "caskStrength": null,
+        "releaseMonth": null,
+        "familyContext": {
+          "siblingBottles": []
+        }
+      },
+      {
+        "abv": 57.1,
+        "brand": "Bimber",
+        "score": 29.483265,
+        "series": "The Spirit of the Underground",
+        "source": ["text"],
+        "bottler": null,
+        "edition": null,
+        "outturn": 274,
+        "bottleId": 59127,
+        "category": "single_malt",
+        "fullName": "Bimber Tottenham Court Road",
+        "reference": null,
+        "statedAge": null,
+        "caskNumber": "421",
+        "comparison": {
+          "missing": [],
+          "conflicts": ["abv"],
+          "agreements": ["caskNumber"]
+        },
+        "distillery": ["Bimber"],
+        "maturation": "Ex-rye cask",
+        "releaseDay": null,
+        "singleCask": true,
+        "releaseYear": null,
+        "vintageYear": null,
+        "bottlingYear": 2023,
+        "caskStrength": true,
+        "releaseMonth": null,
+        "familyContext": {
+          "siblingBottles": []
+        }
+      },
+      {
+        "abv": 58,
+        "brand": "The Six Isles",
+        "score": 27.796484,
+        "series": null,
+        "source": ["text"],
+        "bottler": "Ian Macleod Distillers",
+        "edition": null,
+        "outturn": null,
+        "bottleId": 46874,
+        "category": "blend",
+        "fullName": "The Six Isles Batch Strength - 58.0% ABV",
+        "reference": null,
+        "statedAge": null,
+        "caskNumber": null,
+        "comparison": {
+          "missing": ["caskNumber"],
+          "conflicts": [],
+          "agreements": ["abv"]
+        },
+        "distillery": [],
+        "maturation": null,
+        "releaseDay": null,
+        "singleCask": null,
+        "releaseYear": null,
+        "vintageYear": null,
+        "bottlingYear": null,
+        "caskStrength": null,
+        "releaseMonth": null,
+        "familyContext": {
+          "siblingBottles": []
+        }
+      },
+      {
+        "abv": 58,
+        "brand": "The Scotch Malt Whisky Society",
+        "score": 24.095041,
+        "series": null,
+        "source": ["text"],
+        "bottler": "The Scotch Malt Whisky Society",
+        "edition": null,
+        "outturn": null,
+        "bottleId": 55919,
+        "category": "single_malt",
+        "fullName": "SMWS 10.1 Bunnahabhain 1974/1984 (58.0%,, #)",
+        "reference": null,
+        "statedAge": null,
+        "caskNumber": "10.1",
+        "comparison": {
+          "missing": [],
+          "conflicts": ["caskNumber"],
+          "agreements": ["abv"]
+        },
+        "distillery": ["Bunnahabhain"],
+        "maturation": null,
+        "releaseDay": null,
+        "singleCask": true,
+        "releaseYear": null,
+        "vintageYear": 1974,
+        "bottlingYear": 1984,
+        "caskStrength": null,
+        "releaseMonth": null,
+        "familyContext": {
+          "siblingBottles": []
+        }
+      },
+      {
+        "abv": 58,
+        "brand": "Wemyss Malts",
+        "score": 22.595005,
+        "series": "Batch Strength",
+        "source": ["text"],
+        "bottler": "Wemyss Malts",
+        "edition": "Batch 002",
+        "outturn": null,
+        "bottleId": 46841,
+        "category": "blend",
+        "fullName": "Wemyss Malts Spice King - Batch 002 - 58.0% ABV - Cask Strength",
+        "reference": null,
+        "statedAge": null,
+        "caskNumber": null,
+        "comparison": {
+          "missing": ["caskNumber"],
+          "conflicts": [],
+          "agreements": ["abv"]
+        },
+        "distillery": [],
+        "maturation": null,
+        "releaseDay": null,
+        "singleCask": null,
+        "releaseYear": null,
+        "vintageYear": null,
+        "bottlingYear": null,
+        "caskStrength": true,
+        "releaseMonth": null,
+        "familyContext": {
+          "siblingBottles": []
+        }
+      },
+      {
+        "abv": 58,
+        "brand": "The Scotch Malt Whisky Society",
+        "score": 21.505117,
+        "series": null,
+        "source": ["text"],
+        "bottler": "The Scotch Malt Whisky Society",
+        "edition": null,
+        "outturn": null,
+        "bottleId": 43400,
+        "category": "single_malt",
+        "fullName": "SMWS 5.140 Fluffylump",
+        "reference": null,
+        "statedAge": 11,
+        "caskNumber": "5.140",
+        "comparison": {
+          "missing": [],
+          "conflicts": ["caskNumber"],
+          "agreements": ["abv"]
+        },
+        "distillery": ["Auchentoshan"],
+        "maturation": "2nd fill ex-bourbon barrel",
+        "releaseDay": 4,
+        "singleCask": true,
+        "releaseYear": 2025,
+        "vintageYear": 2014,
+        "bottlingYear": null,
+        "caskStrength": null,
+        "releaseMonth": 4,
+        "familyContext": {
+          "siblingBottles": []
+        }
+      },
+      {
+        "abv": 58,
+        "brand": "SPEY",
+        "score": 21.50272,
+        "series": null,
+        "source": ["text"],
+        "bottler": null,
+        "edition": "Batch 4",
+        "outturn": null,
+        "bottleId": 46108,
+        "category": "single_malt",
+        "fullName": "SPEY Fumare Cask Strength - Batch 4",
+        "reference": null,
+        "statedAge": null,
+        "caskNumber": null,
+        "comparison": {
+          "missing": ["caskNumber"],
+          "conflicts": [],
+          "agreements": ["abv"]
+        },
+        "distillery": ["Speyside Distillery"],
+        "maturation": null,
+        "releaseDay": null,
+        "singleCask": null,
+        "releaseYear": null,
+        "vintageYear": null,
+        "bottlingYear": null,
+        "caskStrength": true,
+        "releaseMonth": null,
+        "familyContext": {
+          "siblingBottles": []
+        }
+      },
+      {
+        "abv": 58,
+        "brand": "The Scotch Malt Whisky Society",
+        "score": 20.54533,
+        "series": null,
+        "source": ["text"],
+        "bottler": "The Scotch Malt Whisky Society",
+        "edition": null,
+        "outturn": null,
+        "bottleId": 43270,
+        "category": "single_malt",
+        "fullName": "SMWS 60.46 Forest florist",
+        "reference": null,
+        "statedAge": 11,
+        "caskNumber": "60.46",
+        "comparison": {
+          "missing": [],
+          "conflicts": ["caskNumber"],
+          "agreements": ["abv"]
+        },
+        "distillery": ["Aberfeldy"],
+        "maturation": "1st fill ex-bourbon hogshead",
+        "releaseDay": 10,
+        "singleCask": true,
+        "releaseYear": 2025,
+        "vintageYear": 2013,
+        "bottlingYear": null,
+        "caskStrength": null,
+        "releaseMonth": 1,
+        "familyContext": {
+          "siblingBottles": []
+        }
+      },
+      {
+        "abv": 58,
+        "brand": "The Scotch Malt Whisky Society",
+        "score": 20.200005,
+        "series": null,
+        "source": ["text"],
+        "bottler": "The Scotch Malt Whisky Society",
+        "edition": null,
+        "outturn": 268,
+        "bottleId": 48615,
+        "category": "single_malt",
+        "fullName": "SMWS 53.334 Molotov wellingtons",
+        "reference": null,
+        "statedAge": 13,
+        "caskNumber": "53.334",
+        "comparison": {
+          "missing": [],
+          "conflicts": ["caskNumber"],
+          "agreements": ["abv"]
+        },
+        "distillery": ["Caol Ila"],
+        "maturation": "Refill ex-bourbon hogshead",
+        "releaseDay": null,
+        "singleCask": true,
+        "releaseYear": null,
+        "vintageYear": 2006,
+        "bottlingYear": null,
+        "caskStrength": null,
+        "releaseMonth": null,
+        "familyContext": {
+          "siblingBottles": []
+        }
+      },
+      {
+        "abv": 58,
+        "brand": "Rare Malts Selection",
+        "score": 20.198635,
+        "series": null,
+        "source": ["text"],
+        "bottler": null,
+        "edition": null,
+        "outturn": null,
+        "bottleId": 49742,
+        "category": "single_malt",
+        "fullName": "Rare Malts Selection Dallas Dhu 1970 24-year-old",
+        "reference": null,
+        "statedAge": 24,
+        "caskNumber": null,
+        "comparison": {
+          "missing": ["caskNumber"],
+          "conflicts": [],
+          "agreements": ["abv"]
+        },
+        "distillery": ["Dallas Dhu"],
+        "maturation": null,
+        "releaseDay": null,
+        "singleCask": null,
+        "releaseYear": 1995,
+        "vintageYear": 1970,
+        "bottlingYear": 1995,
+        "caskStrength": true,
+        "releaseMonth": null,
+        "familyContext": {
+          "siblingBottles": []
+        }
+      },
+      {
+        "abv": 58,
+        "brand": "Special Releases",
+        "score": 19.320644,
+        "series": null,
+        "source": ["text"],
+        "bottler": null,
+        "edition": "2024",
+        "outturn": null,
+        "bottleId": 45209,
+        "category": "single_malt",
+        "fullName": "Special Releases Oban - Coastal Orchard - 2024",
+        "reference": null,
+        "statedAge": 10,
+        "caskNumber": null,
+        "comparison": {
+          "missing": ["caskNumber"],
+          "conflicts": [],
+          "agreements": ["abv"]
+        },
+        "distillery": ["Oban"],
+        "maturation": "Refill casks; finished in charred American oak barrels seasoned with Oloroso sherry",
+        "releaseDay": null,
+        "singleCask": false,
+        "releaseYear": 2024,
+        "vintageYear": null,
+        "bottlingYear": 2024,
+        "caskStrength": true,
+        "releaseMonth": null,
+        "familyContext": {
+          "siblingBottles": []
+        }
+      },
+      {
+        "abv": 58,
+        "brand": "Edradour",
+        "score": 18.845499,
+        "series": null,
+        "source": ["text"],
+        "bottler": null,
+        "edition": null,
+        "outturn": null,
+        "bottleId": 45553,
+        "category": "single_malt",
+        "fullName": "Edradour Cask Strength Oloroso Sherry - 21-year-old - 2014 Release - 1993 Vintage - 58.0% ABV - Single Cask - Oloroso Cask - Butt - 1st Fill",
+        "reference": null,
+        "statedAge": 21,
+        "caskNumber": null,
+        "comparison": {
+          "missing": ["caskNumber"],
+          "conflicts": [],
+          "agreements": ["abv"]
+        },
+        "distillery": ["Edradour"],
+        "maturation": "oloroso",
+        "releaseDay": null,
+        "singleCask": true,
+        "releaseYear": 2014,
+        "vintageYear": 1993,
+        "bottlingYear": null,
+        "caskStrength": true,
+        "releaseMonth": null,
+        "familyContext": {
+          "siblingBottles": []
+        }
+      },
+      {
+        "abv": 58,
+        "brand": "Glasgow 1770",
+        "score": 17.565838,
+        "series": "Small Batch Series",
+        "source": ["text"],
+        "bottler": null,
+        "edition": "Batch 2",
+        "outturn": null,
+        "bottleId": 46730,
+        "category": "single_malt",
+        "fullName": "Glasgow 1770 Cognac Cask Finish - Batch 2",
+        "reference": null,
+        "statedAge": 6,
+        "caskNumber": null,
+        "comparison": {
+          "missing": ["caskNumber"],
+          "conflicts": [],
+          "agreements": ["abv"]
+        },
+        "distillery": ["Glasgow Distillery"],
+        "maturation": "cognac",
+        "releaseDay": null,
+        "singleCask": false,
+        "releaseYear": null,
+        "vintageYear": null,
+        "bottlingYear": null,
+        "caskStrength": null,
+        "releaseMonth": null,
+        "familyContext": {
+          "siblingBottles": []
+        }
+      },
+      {
+        "abv": 58,
+        "brand": "Signatory Vintage",
+        "score": 15.622753,
+        "series": null,
+        "source": ["text"],
+        "bottler": "Signatory Vintage",
+        "edition": null,
+        "outturn": null,
+        "bottleId": 65744,
+        "category": "single_malt",
+        "fullName": "Signatory Vintage Laphroaig 1999",
+        "reference": null,
+        "statedAge": 7,
+        "caskNumber": null,
+        "comparison": {
+          "missing": ["caskNumber"],
+          "conflicts": [],
+          "agreements": ["abv"]
+        },
+        "distillery": ["Laphroaig"],
+        "maturation": null,
+        "releaseDay": null,
+        "singleCask": null,
+        "releaseYear": null,
+        "vintageYear": 1999,
+        "bottlingYear": null,
+        "caskStrength": true,
+        "releaseMonth": null,
+        "familyContext": {
+          "siblingBottles": []
+        }
+      },
+      {
+        "abv": null,
+        "brand": "Arran",
+        "score": 0.6691729456046035,
+        "series": null,
+        "source": ["vector"],
+        "bottler": null,
+        "edition": null,
+        "outturn": null,
+        "bottleId": 16424,
+        "category": "single_malt",
+        "fullName": "Arran Malt Orkney Bere",
+        "reference": "Arran Malt Orkney Bere, 56.2%",
+        "statedAge": null,
+        "caskNumber": null,
+        "comparison": {
+          "missing": ["statedAge", "abv", "caskNumber", "distillers"],
+          "conflicts": [],
+          "agreements": ["category"]
+        },
+        "distillery": [],
+        "maturation": null,
+        "releaseDay": null,
+        "singleCask": null,
+        "releaseYear": null,
+        "vintageYear": null,
+        "bottlingYear": null,
+        "caskStrength": null,
+        "releaseMonth": null,
+        "familyContext": {
+          "siblingBottles": []
+        }
+      },
+      {
+        "abv": null,
+        "brand": "Old Pulteney",
+        "score": 0.6276336692788639,
+        "series": null,
+        "source": ["vector"],
+        "bottler": null,
+        "edition": null,
+        "outturn": null,
+        "bottleId": 17037,
+        "category": "single_malt",
+        "fullName": "Old Pulteney WK499",
+        "reference": "Old Pulteney WK499, 52%",
+        "statedAge": null,
+        "caskNumber": null,
+        "comparison": {
+          "missing": ["statedAge", "abv", "caskNumber", "distillers"],
+          "conflicts": [],
+          "agreements": ["category"]
+        },
+        "distillery": [],
+        "maturation": null,
+        "releaseDay": null,
+        "singleCask": null,
+        "releaseYear": null,
+        "vintageYear": null,
+        "bottlingYear": null,
+        "caskStrength": null,
+        "releaseMonth": null,
+        "familyContext": {
+          "siblingBottles": []
+        }
+      },
+      {
+        "abv": null,
+        "brand": "Old Pulteney",
+        "score": 0.6195527543852811,
+        "series": null,
+        "source": ["vector"],
+        "bottler": null,
+        "edition": null,
+        "outturn": null,
+        "bottleId": 14088,
+        "category": "single_malt",
+        "fullName": "Old Pulteney Clipper",
+        "reference": "Old Pulteney Clipper, 46%",
+        "statedAge": null,
+        "caskNumber": null,
+        "comparison": {
+          "missing": ["statedAge", "abv", "caskNumber", "distillers"],
+          "conflicts": [],
+          "agreements": ["category"]
+        },
+        "distillery": [],
+        "maturation": null,
+        "releaseDay": null,
+        "singleCask": null,
+        "releaseYear": null,
+        "vintageYear": null,
+        "bottlingYear": null,
+        "caskStrength": null,
+        "releaseMonth": null,
+        "familyContext": {
+          "siblingBottles": []
+        }
+      },
+      {
+        "abv": null,
+        "brand": "Arran",
+        "score": 0.6158798383275352,
+        "series": null,
+        "source": ["vector"],
+        "bottler": null,
+        "edition": null,
+        "outturn": null,
+        "bottleId": 16106,
+        "category": "single_malt",
+        "fullName": "Arran Smugglers' Series Vol. 1 The Illicit Stills",
+        "reference": "Arran Smugglers' Series Vol. 1 The Illicit Stills, 56.4%",
+        "statedAge": null,
+        "caskNumber": null,
+        "comparison": {
+          "missing": ["statedAge", "abv", "caskNumber", "distillers"],
+          "conflicts": [],
+          "agreements": ["category"]
+        },
+        "distillery": [],
+        "maturation": null,
+        "releaseDay": null,
+        "singleCask": null,
+        "releaseYear": null,
+        "vintageYear": null,
+        "bottlingYear": null,
+        "caskStrength": null,
+        "releaseMonth": null,
+        "familyContext": {
+          "siblingBottles": []
+        }
+      },
+      {
+        "abv": 58,
+        "brand": "Lark",
+        "score": 0.6126307733869502,
+        "series": null,
+        "source": ["vector"],
+        "bottler": null,
+        "edition": null,
+        "outturn": null,
+        "bottleId": 65634,
+        "category": null,
+        "fullName": "Lark Single Cask",
+        "reference": "Lark Single Cask, 58%",
+        "statedAge": null,
+        "caskNumber": null,
+        "comparison": {
+          "missing": ["category", "statedAge", "caskNumber"],
+          "conflicts": ["distillers"],
+          "agreements": ["abv"]
+        },
+        "distillery": ["Lark"],
+        "maturation": null,
+        "releaseDay": null,
+        "singleCask": true,
+        "releaseYear": null,
+        "vintageYear": null,
+        "bottlingYear": null,
+        "caskStrength": null,
+        "releaseMonth": null,
+        "familyContext": {
+          "siblingBottles": []
+        }
+      },
+      {
+        "abv": null,
+        "brand": "Old Pulteney",
+        "score": 0.6115254053484311,
+        "series": null,
+        "source": ["vector"],
+        "bottler": null,
+        "edition": null,
+        "outturn": null,
+        "bottleId": 16752,
+        "category": "single_malt",
+        "fullName": "Old Pulteney Navigator",
+        "reference": "Old Pulteney Navigator, 46%",
+        "statedAge": null,
+        "caskNumber": null,
+        "comparison": {
+          "missing": ["statedAge", "abv", "caskNumber", "distillers"],
+          "conflicts": [],
+          "agreements": ["category"]
+        },
+        "distillery": [],
+        "maturation": null,
+        "releaseDay": null,
+        "singleCask": null,
+        "releaseYear": null,
+        "vintageYear": null,
+        "bottlingYear": null,
+        "caskStrength": null,
+        "releaseMonth": null,
+        "familyContext": {
+          "siblingBottles": []
+        }
+      }
+    ]
+  },
+  "context": {
+    "inspectedBottleIds": [],
+    "bottleContexts": [],
+    "inspectedEntities": [
+      {
+        "kind": "brand",
+        "name": "Smokehead",
+        "score": 1,
+        "source": ["exact", "text", "prefix", "contained"],
+        "entityId": 1348,
+        "reference": "Smokehead",
+        "shortName": null,
+        "retrievedFor": [
+          {
+            "exact": true,
+            "query": "Smokehead"
+          }
+        ]
+      },
+      {
+        "kind": "company",
+        "name": "Ian Macleod Distillers",
+        "score": 1,
+        "source": ["exact", "text", "prefix", "contained"],
+        "entityId": 5658,
+        "reference": "Ian Macleod Distillers",
+        "shortName": null,
+        "retrievedFor": [
+          {
+            "exact": true,
+            "query": "Ian Macleod Distillers"
+          }
+        ]
+      },
+      {
+        "kind": "brand",
+        "name": "The Six Isles",
+        "score": 1,
+        "source": ["exact", "text", "prefix", "contained"],
+        "entityId": 4273,
+        "reference": "The Six Isles",
+        "shortName": null,
+        "retrievedFor": [
+          {
+            "exact": true,
+            "query": "The Six Isles"
+          }
+        ]
+      },
+      {
+        "kind": "brand",
+        "name": "Wemyss Malts",
+        "score": 1,
+        "source": ["exact", "text", "prefix", "contained"],
+        "entityId": 5718,
+        "reference": "Wemyss Malts",
+        "shortName": null,
+        "retrievedFor": [
+          {
+            "exact": true,
+            "query": "Wemyss Malts"
+          }
+        ]
+      },
+      {
+        "kind": "brand",
+        "name": "SPEY",
+        "score": 1,
+        "source": ["exact", "text", "prefix", "contained"],
+        "entityId": 1353,
+        "reference": "SPEY",
+        "shortName": null,
+        "retrievedFor": [
+          {
+            "exact": true,
+            "query": "SPEY"
+          },
+          {
+            "query": "Speyside Distillery"
+          }
+        ]
+      },
+      {
+        "kind": "distillery",
+        "name": "Speyside Distillery",
+        "score": 1,
+        "source": ["exact", "prefix", "contained"],
+        "entityId": 1356,
+        "reference": "Speyside Distillery",
+        "shortName": null,
+        "retrievedFor": [
+          {
+            "exact": true,
+            "query": "Speyside Distillery"
+          }
+        ]
+      },
+      {
+        "kind": "brand",
+        "name": "Rare Malts Selection",
+        "score": 1,
+        "source": ["exact", "text", "prefix", "contained"],
+        "entityId": 366603,
+        "reference": "Rare Malts Selection",
+        "shortName": null,
+        "retrievedFor": [
+          {
+            "exact": true,
+            "query": "Rare Malts Selection"
+          }
+        ]
+      },
+      {
+        "kind": "distillery",
+        "name": "Dallas Dhu",
+        "score": 1,
+        "source": ["exact", "text", "prefix", "contained"],
+        "entityId": 869,
+        "reference": "Dallas Dhu",
+        "shortName": null,
+        "retrievedFor": [
+          {
+            "exact": true,
+            "query": "Dallas Dhu"
+          }
+        ]
+      },
+      {
+        "kind": "brand",
+        "name": "Special Releases",
+        "score": 1,
+        "source": ["exact", "text", "prefix", "contained"],
+        "entityId": 366607,
+        "reference": "Special Releases",
+        "shortName": null,
+        "retrievedFor": [
+          {
+            "exact": true,
+            "query": "Special Releases"
+          }
+        ]
+      },
+      {
+        "kind": "distillery",
+        "name": "Oban",
+        "score": 1,
+        "source": ["exact", "text", "prefix", "contained"],
+        "entityId": 1208,
+        "reference": "Oban",
+        "shortName": null,
+        "retrievedFor": [
+          {
+            "exact": true,
+            "query": "Oban"
+          }
+        ]
+      },
+      {
+        "kind": "distillery",
+        "name": "Edradour",
+        "score": 1,
+        "source": ["exact", "text", "prefix", "contained"],
+        "entityId": 405,
+        "reference": "Edradour",
+        "shortName": null,
+        "retrievedFor": [
+          {
+            "exact": true,
+            "query": "Edradour"
+          }
+        ]
+      },
+      {
+        "kind": "brand",
+        "name": "Glasgow 1770",
+        "score": 1,
+        "source": ["exact", "text", "prefix", "contained"],
+        "entityId": 3,
+        "reference": "Glasgow 1770",
+        "shortName": null,
+        "retrievedFor": [
+          {
+            "exact": true,
+            "query": "Glasgow 1770"
+          }
+        ]
+      },
+      {
+        "kind": "bottler",
+        "name": "Jack Wiebers Whisky World",
+        "score": 1,
+        "source": ["exact", "text", "prefix", "contained"],
+        "entityId": 5136,
+        "reference": "Jack Wiebers Whisky World",
+        "shortName": null,
+        "retrievedFor": [
+          {
+            "exact": true,
+            "query": "Jack Wiebers Whisky World"
+          }
+        ]
+      },
+      {
+        "kind": "brand",
+        "name": "Spey River",
+        "score": 0.5,
+        "source": ["text", "prefix"],
+        "entityId": 4020,
+        "reference": "Spey River",
+        "shortName": null,
+        "retrievedFor": [
+          {
+            "query": "SPEY"
+          }
+        ]
+      },
+      {
+        "kind": "brand",
+        "name": "Spey Royal",
+        "score": 0.5,
+        "source": ["text", "prefix"],
+        "entityId": 4021,
+        "reference": "Spey Royal",
+        "shortName": null,
+        "retrievedFor": [
+          {
+            "query": "SPEY"
+          }
+        ]
+      },
+      {
+        "kind": "brand",
+        "name": "Speyside Region Malt",
+        "score": 0.5,
+        "source": ["prefix"],
+        "entityId": 1358,
+        "reference": null,
+        "shortName": null,
+        "retrievedFor": [
+          {
+            "query": "SPEY"
+          }
+        ]
+      },
+      {
+        "kind": "company",
+        "name": "Speyside Distillers Company",
+        "score": 0.5,
+        "source": ["prefix"],
+        "entityId": 5752,
+        "reference": null,
+        "shortName": null,
+        "retrievedFor": [
+          {
+            "query": "SPEY"
+          }
+        ]
+      },
+      {
+        "kind": "brand",
+        "name": "Jack's Pirate",
+        "score": 0.37941176470588234,
+        "source": ["contained"],
+        "entityId": 159,
+        "reference": "Jack's Pirate",
+        "shortName": null,
+        "retrievedFor": [
+          {
+            "query": "Jack's Pirate Whisky"
+          }
+        ]
+      },
+      {
+        "kind": "bottler",
+        "name": "&Whisky",
+        "score": 0.3205882352941177,
+        "source": ["contained"],
+        "entityId": 365821,
+        "reference": "&Whisky",
+        "shortName": null,
+        "retrievedFor": [
+          {
+            "query": "Jack Wiebers Whisky World"
+          },
+          {
+            "query": "Jack's Pirate Whisky"
+          }
+        ]
+      },
+      {
+        "kind": "brand",
+        "name": "Swhisky",
+        "score": 0.31363636363636366,
+        "source": ["contained"],
+        "entityId": 4115,
+        "reference": "Swhisky",
+        "shortName": null,
+        "retrievedFor": [
+          {
+            "query": "Jack Wiebers Whisky World"
+          }
+        ]
+      },
+      {
+        "kind": "brand",
+        "name": "An Iconic Speyside Distillery",
+        "score": 0.2,
+        "source": ["text"],
+        "entityId": 2093,
+        "reference": null,
+        "shortName": null,
+        "retrievedFor": [
+          {
+            "query": "Speyside Distillery"
+          }
+        ]
+      },
+      {
+        "kind": "brand",
+        "name": "An Undisclosed Speyside Distillery",
+        "score": 0.2,
+        "source": ["text"],
+        "entityId": 2097,
+        "reference": null,
+        "shortName": null,
+        "retrievedFor": [
+          {
+            "query": "Speyside Distillery"
+          }
+        ]
+      },
+      {
+        "kind": "brand",
+        "name": "A Secret Speyside Distillery",
+        "score": 0.2,
+        "source": ["text"],
+        "entityId": 39,
+        "reference": null,
+        "shortName": null,
+        "retrievedFor": [
+          {
+            "query": "Speyside Distillery"
+          }
+        ]
+      }
+    ],
+    "inspectedSeries": []
+  },
+  "provenance": {
+    "source": "production_miss",
+    "verifiedSourceUrls": [
+      "https://www.scotchwhiskyauctions.com/auctions/234-the-185th-auction/906193-orkney-single-malt-9-year-old-jacks-pirate-whisky/",
+      "https://d3suvtcq00dftb.cloudfront.net/images/da64b623b9eb486fa988b168a20d29aa-zoom.jpg",
+      "https://tarpon-flower-d8m4.squarespace.com/home/2024/6/7/orkney-9-year-jacks-pirate-whisky-berfahrt-nach-sachsen-part-i-cask-108"
+    ],
+    "dbOutcome": {
+      "bottleId": null,
+      "createsBottle": false,
+      "summary": "Production returned no_match: the title's 9 years conflicted with the lot page's 16 years, and no photo reading was available."
+    },
+    "notes": "Captured from saved classifier run 36341 (auction_lot 17217, model null, 2026-11-03T19:54:09.133Z). Production rationale: This is a single whisky Bottle, not an out-of-scope product. No inspected local candidate represents it. The available web snippets concern other Jack’s Pirate Orkney releases and do not resolve the exact bottle’s cask and strength, so there is not enough support to match or create an exact Bottle. The run predates reading Scotch Whisky Auctions lot pages (#1609), so the evidence pack adds the lot page text. Expected outcome checked against the lot page and photo on 2026-11-09, in a random sample of the 185th auction's no_match reviews. This case adds a reviewed transcription of the lot's first photo at full size, in the shape production's label reading takes; no extractor ran on this lot."
+  },
+  "expected": {
+    "status": "classified",
+    "action": "create_bottle",
+    "identityScope": "exact_cask",
+    "matchedBottleId": null,
+    "proposedBottle": {
+      "category": "single_malt",
+      "statedAge": 9,
+      "abv": 59.5,
+      "singleCask": true
+    },
+    "proposedBottleNameIncludes": ["Orkney"],
+    "summary": "Create Jack Wiebers' Jack's Pirate Whisky Orkney 9-year-old, cask 108, 290 bottles, 59.5%. The title and the label photo both say 9 years; the label prints cask No. 108, only 290 bottles, 70cl and 59.5%. The lot page's facts (16 years, cask 421, 58%, 252 bottles, bottled 2018) describe another Jack's Pirate bottling, so the photo settles it. A published review lists cask 108 as a 9-year-old bottled 2019 at 59.5%."
+  }
+}

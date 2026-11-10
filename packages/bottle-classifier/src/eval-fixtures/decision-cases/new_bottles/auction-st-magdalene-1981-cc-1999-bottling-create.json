@@ -1,0 +1,1065 @@
+{
+  "id": "auction-st-magdalene-1981-cc-1999-bottling-create",
+  "name": "St Magdalene 1981 Connoisseurs Choice: create the 1999 bottling",
+  "input": {
+    "reference": {
+      "id": 17942,
+      "url": "https://www.scotchwhiskyauctions.com/auctions/234-the-185th-auction/908278-st-magdalene-1981-connoisseurs-choice/",
+      "name": "St Magdalene 1981 Connoisseurs Choice",
+      "imageUrl": null,
+      "externalSiteId": 28097,
+      "currentBottleId": null
+    },
+    "extractedIdentity": {
+      "abv": 40,
+      "brand": null,
+      "series": null,
+      "bottler": null,
+      "edition": null,
+      "outturn": null,
+      "category": null,
+      "distillery": null,
+      "expression": null,
+      "maturation": null,
+      "stated_age": null,
+      "cask_number": null,
+      "single_cask": null,
+      "release_year": null,
+      "vintage_year": null,
+      "cask_strength": null
+    },
+    "extractedIdentitySource": "structured",
+    "imageEvidence": null,
+    "initialCandidates": [
+      {
+        "abv": 40,
+        "brand": "Gordon & MacPhail",
+        "score": 88.463165,
+        "series": "Connoisseurs Choice",
+        "source": ["text", "brand_coverage"],
+        "bottler": "Gordon & MacPhail",
+        "edition": null,
+        "outturn": null,
+        "bottleId": 61358,
+        "category": "single_malt",
+        "fullName": "Gordon & MacPhail Convalmore 1981",
+        "reference": null,
+        "statedAge": null,
+        "caskNumber": null,
+        "comparison": {
+          "missing": [],
+          "conflicts": [],
+          "agreements": ["abv"]
+        },
+        "distillery": ["Convalmore"],
+        "maturation": null,
+        "releaseDay": null,
+        "singleCask": null,
+        "releaseYear": null,
+        "vintageYear": 1981,
+        "bottlingYear": 1998,
+        "caskStrength": null,
+        "releaseMonth": null,
+        "familyContext": {
+          "siblingBottles": []
+        }
+      },
+      {
+        "abv": 40,
+        "brand": "Gordon & MacPhail",
+        "score": 87.06645,
+        "series": "Centenary Reserve",
+        "source": ["text", "context"],
+        "bottler": "Gordon & MacPhail",
+        "edition": null,
+        "outturn": null,
+        "bottleId": 65921,
+        "category": "single_malt",
+        "fullName": "Gordon & MacPhail St. Magdalene 1980",
+        "reference": null,
+        "statedAge": null,
+        "caskNumber": null,
+        "comparison": {
+          "missing": [],
+          "conflicts": [],
+          "agreements": ["abv"]
+        },
+        "distillery": ["St. Magdalene"],
+        "maturation": null,
+        "releaseDay": null,
+        "singleCask": null,
+        "releaseYear": 1995,
+        "vintageYear": 1980,
+        "bottlingYear": 1995,
+        "caskStrength": null,
+        "releaseMonth": null,
+        "familyContext": {
+          "siblingBottles": []
+        }
+      },
+      {
+        "abv": 40,
+        "brand": "Gordon & MacPhail",
+        "score": 85.46719,
+        "series": "Connoisseurs Choice",
+        "source": ["text", "brand_coverage"],
+        "bottler": "Gordon & MacPhail",
+        "edition": null,
+        "outturn": null,
+        "bottleId": 60715,
+        "category": "single_malt",
+        "fullName": "Gordon & MacPhail Port Ellen 1981",
+        "reference": null,
+        "statedAge": null,
+        "caskNumber": null,
+        "comparison": {
+          "missing": [],
+          "conflicts": [],
+          "agreements": ["abv"]
+        },
+        "distillery": ["Port Ellen"],
+        "maturation": null,
+        "releaseDay": null,
+        "singleCask": null,
+        "releaseYear": null,
+        "vintageYear": 1981,
+        "bottlingYear": 1999,
+        "caskStrength": null,
+        "releaseMonth": null,
+        "familyContext": {
+          "siblingBottles": []
+        }
+      },
+      {
+        "abv": 40,
+        "brand": "Gordon & MacPhail",
+        "score": 85.46719,
+        "series": "Connoisseurs Choice",
+        "source": ["text", "brand_coverage"],
+        "bottler": "Gordon & MacPhail",
+        "edition": null,
+        "outturn": null,
+        "bottleId": 67027,
+        "category": "single_malt",
+        "fullName": "Gordon & MacPhail Port Ellen 1981",
+        "reference": null,
+        "statedAge": null,
+        "caskNumber": null,
+        "comparison": {
+          "missing": [],
+          "conflicts": [],
+          "agreements": ["abv"]
+        },
+        "distillery": ["Port Ellen"],
+        "maturation": null,
+        "releaseDay": null,
+        "singleCask": null,
+        "releaseYear": null,
+        "vintageYear": 1981,
+        "bottlingYear": 2000,
+        "caskStrength": null,
+        "releaseMonth": null,
+        "familyContext": {
+          "siblingBottles": []
+        }
+      },
+      {
+        "abv": 40,
+        "brand": "Gordon & MacPhail",
+        "score": 66.59916,
+        "series": "Connoisseurs Choice",
+        "source": ["text", "brand_coverage"],
+        "bottler": "Gordon & MacPhail",
+        "edition": null,
+        "outturn": null,
+        "bottleId": 67028,
+        "category": "single_malt",
+        "fullName": "Gordon & MacPhail Ardbeg 1973",
+        "reference": null,
+        "statedAge": null,
+        "caskNumber": null,
+        "comparison": {
+          "missing": [],
+          "conflicts": [],
+          "agreements": ["abv"]
+        },
+        "distillery": ["Ardbeg"],
+        "maturation": null,
+        "releaseDay": null,
+        "singleCask": null,
+        "releaseYear": null,
+        "vintageYear": 1973,
+        "bottlingYear": 2003,
+        "caskStrength": null,
+        "releaseMonth": null,
+        "familyContext": {
+          "siblingBottles": []
+        }
+      },
+      {
+        "abv": 40,
+        "brand": "Gordon & MacPhail",
+        "score": 66.59916,
+        "series": "Connoisseurs Choice",
+        "source": ["text", "brand_coverage"],
+        "bottler": "Gordon & MacPhail",
+        "edition": null,
+        "outturn": null,
+        "bottleId": 60777,
+        "category": "single_malt",
+        "fullName": "Gordon & MacPhail Ardbeg 1978",
+        "reference": null,
+        "statedAge": null,
+        "caskNumber": null,
+        "comparison": {
+          "missing": [],
+          "conflicts": [],
+          "agreements": ["abv"]
+        },
+        "distillery": ["Ardbeg"],
+        "maturation": null,
+        "releaseDay": null,
+        "singleCask": null,
+        "releaseYear": null,
+        "vintageYear": 1978,
+        "bottlingYear": 2000,
+        "caskStrength": null,
+        "releaseMonth": null,
+        "familyContext": {
+          "siblingBottles": []
+        }
+      },
+      {
+        "abv": 40,
+        "brand": "Gordon & MacPhail",
+        "score": 66.59916,
+        "series": "Connoisseurs Choice",
+        "source": ["text", "brand_coverage"],
+        "bottler": "Gordon & MacPhail",
+        "edition": null,
+        "outturn": null,
+        "bottleId": 58773,
+        "category": "single_malt",
+        "fullName": "Gordon & MacPhail Ardbeg 1991",
+        "reference": null,
+        "statedAge": null,
+        "caskNumber": null,
+        "comparison": {
+          "missing": [],
+          "conflicts": [],
+          "agreements": ["abv"]
+        },
+        "distillery": ["Ardbeg"],
+        "maturation": null,
+        "releaseDay": null,
+        "singleCask": null,
+        "releaseYear": null,
+        "vintageYear": 1991,
+        "bottlingYear": 2002,
+        "caskStrength": null,
+        "releaseMonth": null,
+        "familyContext": {
+          "siblingBottles": []
+        }
+      },
+      {
+        "abv": 40,
+        "brand": "Gordon & MacPhail",
+        "score": 66.59916,
+        "series": "Connoisseurs Choice",
+        "source": ["text"],
+        "bottler": "Gordon & MacPhail",
+        "edition": null,
+        "outturn": null,
+        "bottleId": 52286,
+        "category": "single_malt",
+        "fullName": "Gordon & MacPhail Banff 1974",
+        "reference": null,
+        "statedAge": null,
+        "caskNumber": null,
+        "comparison": {
+          "missing": [],
+          "conflicts": [],
+          "agreements": ["abv"]
+        },
+        "distillery": ["Banff"],
+        "maturation": null,
+        "releaseDay": null,
+        "singleCask": null,
+        "releaseYear": null,
+        "vintageYear": 1974,
+        "bottlingYear": null,
+        "caskStrength": null,
+        "releaseMonth": null,
+        "familyContext": {
+          "siblingBottles": []
+        }
+      },
+      {
+        "abv": 40,
+        "brand": "Gordon & MacPhail",
+        "score": 66.59916,
+        "series": "Connoisseurs Choice",
+        "source": ["text"],
+        "bottler": "Gordon & MacPhail",
+        "edition": null,
+        "outturn": null,
+        "bottleId": 66429,
+        "category": "single_malt",
+        "fullName": "Gordon & MacPhail Bladnoch 1984",
+        "reference": null,
+        "statedAge": null,
+        "caskNumber": null,
+        "comparison": {
+          "missing": [],
+          "conflicts": [],
+          "agreements": ["abv"]
+        },
+        "distillery": ["Bladnoch"],
+        "maturation": null,
+        "releaseDay": null,
+        "singleCask": null,
+        "releaseYear": null,
+        "vintageYear": 1984,
+        "bottlingYear": 1994,
+        "caskStrength": null,
+        "releaseMonth": null,
+        "familyContext": {
+          "siblingBottles": []
+        }
+      },
+      {
+        "abv": 40,
+        "brand": "Gordon & MacPhail",
+        "score": 66.59916,
+        "series": "Connoisseurs Choice",
+        "source": ["text"],
+        "bottler": "Gordon & MacPhail",
+        "edition": null,
+        "outturn": null,
+        "bottleId": 66426,
+        "category": "single_malt",
+        "fullName": "Gordon & MacPhail Bladnoch 1984",
+        "reference": null,
+        "statedAge": null,
+        "caskNumber": null,
+        "comparison": {
+          "missing": [],
+          "conflicts": [],
+          "agreements": ["abv"]
+        },
+        "distillery": ["Bladnoch"],
+        "maturation": null,
+        "releaseDay": null,
+        "singleCask": null,
+        "releaseYear": null,
+        "vintageYear": 1984,
+        "bottlingYear": 1995,
+        "caskStrength": null,
+        "releaseMonth": null,
+        "familyContext": {
+          "siblingBottles": []
+        }
+      },
+      {
+        "abv": 40,
+        "brand": "Gordon & MacPhail",
+        "score": 66.59916,
+        "series": "Connoisseurs Choice",
+        "source": ["text"],
+        "bottler": "Gordon & MacPhail",
+        "edition": null,
+        "outturn": null,
+        "bottleId": 66430,
+        "category": "single_malt",
+        "fullName": "Gordon & MacPhail Bladnoch 1986",
+        "reference": null,
+        "statedAge": null,
+        "caskNumber": null,
+        "comparison": {
+          "missing": [],
+          "conflicts": [],
+          "agreements": ["abv"]
+        },
+        "distillery": ["Bladnoch"],
+        "maturation": null,
+        "releaseDay": null,
+        "singleCask": null,
+        "releaseYear": null,
+        "vintageYear": 1986,
+        "bottlingYear": 1996,
+        "caskStrength": null,
+        "releaseMonth": null,
+        "familyContext": {
+          "siblingBottles": []
+        }
+      },
+      {
+        "abv": 40,
+        "brand": "Gordon & MacPhail",
+        "score": 66.59916,
+        "series": "Connoisseurs Choice",
+        "source": ["text"],
+        "bottler": "Gordon & MacPhail",
+        "edition": null,
+        "outturn": null,
+        "bottleId": 66427,
+        "category": "single_malt",
+        "fullName": "Gordon & MacPhail Bladnoch 1986",
+        "reference": null,
+        "statedAge": null,
+        "caskNumber": null,
+        "comparison": {
+          "missing": [],
+          "conflicts": [],
+          "agreements": ["abv"]
+        },
+        "distillery": ["Bladnoch"],
+        "maturation": null,
+        "releaseDay": null,
+        "singleCask": null,
+        "releaseYear": null,
+        "vintageYear": 1986,
+        "bottlingYear": 1998,
+        "caskStrength": null,
+        "releaseMonth": null,
+        "familyContext": {
+          "siblingBottles": []
+        }
+      },
+      {
+        "abv": 40,
+        "brand": "Gordon & MacPhail",
+        "score": 66.59916,
+        "series": "Connoisseurs Choice",
+        "source": ["text"],
+        "bottler": "Gordon & MacPhail",
+        "edition": null,
+        "outturn": null,
+        "bottleId": 66447,
+        "category": "single_malt",
+        "fullName": "Gordon & MacPhail Bladnoch 1987",
+        "reference": null,
+        "statedAge": null,
+        "caskNumber": null,
+        "comparison": {
+          "missing": [],
+          "conflicts": [],
+          "agreements": ["abv"]
+        },
+        "distillery": ["Bladnoch"],
+        "maturation": null,
+        "releaseDay": null,
+        "singleCask": null,
+        "releaseYear": null,
+        "vintageYear": 1987,
+        "bottlingYear": 2000,
+        "caskStrength": null,
+        "releaseMonth": null,
+        "familyContext": {
+          "siblingBottles": []
+        }
+      },
+      {
+        "abv": 40,
+        "brand": "Gordon & MacPhail",
+        "score": 66.59916,
+        "series": "Connoisseurs Choice",
+        "source": ["text"],
+        "bottler": "Gordon & MacPhail",
+        "edition": null,
+        "outturn": null,
+        "bottleId": 66450,
+        "category": "single_malt",
+        "fullName": "Gordon & MacPhail Bladnoch 1988",
+        "reference": null,
+        "statedAge": null,
+        "caskNumber": null,
+        "comparison": {
+          "missing": [],
+          "conflicts": [],
+          "agreements": ["abv"]
+        },
+        "distillery": ["Bladnoch"],
+        "maturation": null,
+        "releaseDay": null,
+        "singleCask": null,
+        "releaseYear": null,
+        "vintageYear": 1988,
+        "bottlingYear": 2002,
+        "caskStrength": null,
+        "releaseMonth": null,
+        "familyContext": {
+          "siblingBottles": []
+        }
+      },
+      {
+        "abv": 40,
+        "brand": "Gordon & MacPhail",
+        "score": 66.59916,
+        "series": "Connoisseurs Choice",
+        "source": ["text"],
+        "bottler": "Gordon & MacPhail",
+        "edition": null,
+        "outturn": null,
+        "bottleId": 66425,
+        "category": "single_malt",
+        "fullName": "Gordon & MacPhail Bladnoch 1988",
+        "reference": null,
+        "statedAge": null,
+        "caskNumber": null,
+        "comparison": {
+          "missing": [],
+          "conflicts": [],
+          "agreements": ["abv"]
+        },
+        "distillery": ["Bladnoch"],
+        "maturation": null,
+        "releaseDay": null,
+        "singleCask": null,
+        "releaseYear": null,
+        "vintageYear": 1988,
+        "bottlingYear": 2000,
+        "caskStrength": null,
+        "releaseMonth": null,
+        "familyContext": {
+          "siblingBottles": []
+        }
+      },
+      {
+        "abv": 40,
+        "brand": "Gordon & MacPhail",
+        "score": 66.59916,
+        "series": "Connoisseurs Choice",
+        "source": ["text"],
+        "bottler": "Gordon & MacPhail",
+        "edition": null,
+        "outturn": null,
+        "bottleId": 66454,
+        "category": "single_malt",
+        "fullName": "Gordon & MacPhail Bladnoch 1984",
+        "reference": null,
+        "statedAge": null,
+        "caskNumber": null,
+        "comparison": {
+          "missing": [],
+          "conflicts": ["vintageYear", "distillers"],
+          "agreements": ["category", "abv", "brand", "bottler", "series"]
+        },
+        "distillery": ["Bladnoch"],
+        "maturation": null,
+        "releaseDay": null,
+        "singleCask": null,
+        "releaseYear": null,
+        "vintageYear": 1984,
+        "bottlingYear": 1993,
+        "caskStrength": null,
+        "releaseMonth": null,
+        "familyContext": {
+          "siblingBottles": []
+        }
+      },
+      {
+        "abv": 40,
+        "brand": "Gordon & MacPhail",
+        "score": 66.59916,
+        "series": "Connoisseurs Choice",
+        "source": ["text"],
+        "bottler": "Gordon & MacPhail",
+        "edition": null,
+        "outturn": null,
+        "bottleId": 66421,
+        "category": "single_malt",
+        "fullName": "Gordon & MacPhail Bladnoch 1987",
+        "reference": null,
+        "statedAge": null,
+        "caskNumber": null,
+        "comparison": {
+          "missing": [],
+          "conflicts": ["vintageYear", "distillers"],
+          "agreements": ["category", "abv", "brand", "bottler", "series"]
+        },
+        "distillery": ["Bladnoch"],
+        "maturation": null,
+        "releaseDay": null,
+        "singleCask": null,
+        "releaseYear": null,
+        "vintageYear": 1987,
+        "bottlingYear": 1999,
+        "caskStrength": null,
+        "releaseMonth": null,
+        "familyContext": {
+          "siblingBottles": []
+        }
+      },
+      {
+        "abv": 40,
+        "brand": "Gordon & MacPhail",
+        "score": 66.59916,
+        "series": "Connoisseurs Choice",
+        "source": ["text"],
+        "bottler": "Gordon & MacPhail",
+        "edition": null,
+        "outturn": null,
+        "bottleId": 66422,
+        "category": "single_malt",
+        "fullName": "Gordon & MacPhail Bladnoch 1988",
+        "reference": null,
+        "statedAge": null,
+        "caskNumber": null,
+        "comparison": {
+          "missing": [],
+          "conflicts": ["vintageYear", "distillers"],
+          "agreements": ["category", "abv", "brand", "bottler", "series"]
+        },
+        "distillery": ["Bladnoch"],
+        "maturation": null,
+        "releaseDay": null,
+        "singleCask": null,
+        "releaseYear": null,
+        "vintageYear": 1988,
+        "bottlingYear": 2001,
+        "caskStrength": null,
+        "releaseMonth": null,
+        "familyContext": {
+          "siblingBottles": []
+        }
+      },
+      {
+        "abv": 40,
+        "brand": "Gordon & MacPhail",
+        "score": 66.59916,
+        "series": "Connoisseurs Choice",
+        "source": ["text"],
+        "bottler": "Gordon & MacPhail",
+        "edition": null,
+        "outturn": null,
+        "bottleId": 66424,
+        "category": "single_malt",
+        "fullName": "Gordon & MacPhail Bladnoch 1989",
+        "reference": null,
+        "statedAge": null,
+        "caskNumber": null,
+        "comparison": {
+          "missing": [],
+          "conflicts": ["vintageYear", "distillers"],
+          "agreements": ["category", "abv", "brand", "bottler", "series"]
+        },
+        "distillery": ["Bladnoch"],
+        "maturation": null,
+        "releaseDay": null,
+        "singleCask": null,
+        "releaseYear": null,
+        "vintageYear": 1989,
+        "bottlingYear": 2004,
+        "caskStrength": null,
+        "releaseMonth": null,
+        "familyContext": {
+          "siblingBottles": []
+        }
+      },
+      {
+        "abv": 40,
+        "brand": "Gordon & MacPhail",
+        "score": 66.59916,
+        "series": "Connoisseurs Choice",
+        "source": ["text"],
+        "bottler": "Gordon & MacPhail",
+        "edition": null,
+        "outturn": null,
+        "bottleId": 66451,
+        "category": "single_malt",
+        "fullName": "Gordon & MacPhail Bladnoch 1991",
+        "reference": null,
+        "statedAge": null,
+        "caskNumber": null,
+        "comparison": {
+          "missing": [],
+          "conflicts": ["vintageYear", "distillers"],
+          "agreements": ["category", "abv", "brand", "bottler", "series"]
+        },
+        "distillery": ["Bladnoch"],
+        "maturation": null,
+        "releaseDay": null,
+        "singleCask": null,
+        "releaseYear": null,
+        "vintageYear": 1991,
+        "bottlingYear": 2004,
+        "caskStrength": null,
+        "releaseMonth": null,
+        "familyContext": {
+          "siblingBottles": []
+        }
+      },
+      {
+        "abv": 40,
+        "brand": "Gordon & MacPhail",
+        "score": 66.59916,
+        "series": "Connoisseurs Choice",
+        "source": ["text"],
+        "bottler": "Gordon & MacPhail",
+        "edition": null,
+        "outturn": null,
+        "bottleId": 55805,
+        "category": "single_malt",
+        "fullName": "Gordon & MacPhail Brora 1972",
+        "reference": null,
+        "statedAge": null,
+        "caskNumber": null,
+        "comparison": {
+          "missing": [],
+          "conflicts": ["vintageYear", "distillers"],
+          "agreements": ["category", "abv", "brand", "bottler", "series"]
+        },
+        "distillery": ["Brora"],
+        "maturation": null,
+        "releaseDay": null,
+        "singleCask": null,
+        "releaseYear": null,
+        "vintageYear": 1972,
+        "bottlingYear": 1992,
+        "caskStrength": null,
+        "releaseMonth": null,
+        "familyContext": {
+          "siblingBottles": []
+        }
+      },
+      {
+        "abv": 40,
+        "brand": "Gordon & MacPhail",
+        "score": 66.59916,
+        "series": "Connoisseurs Choice",
+        "source": ["text"],
+        "bottler": "Gordon & MacPhail",
+        "edition": null,
+        "outturn": null,
+        "bottleId": 55934,
+        "category": "single_malt",
+        "fullName": "Gordon & MacPhail Brora 1972",
+        "reference": null,
+        "statedAge": null,
+        "caskNumber": null,
+        "comparison": {
+          "missing": [],
+          "conflicts": ["vintageYear", "distillers"],
+          "agreements": ["category", "abv", "brand", "bottler", "series"]
+        },
+        "distillery": ["Brora"],
+        "maturation": null,
+        "releaseDay": null,
+        "singleCask": null,
+        "releaseYear": null,
+        "vintageYear": 1972,
+        "bottlingYear": 1997,
+        "caskStrength": null,
+        "releaseMonth": null,
+        "familyContext": {
+          "siblingBottles": []
+        }
+      },
+      {
+        "abv": 40,
+        "brand": "Gordon & MacPhail",
+        "score": 66.59916,
+        "series": "Connoisseurs Choice",
+        "source": ["text"],
+        "bottler": "Gordon & MacPhail",
+        "edition": null,
+        "outturn": null,
+        "bottleId": 55930,
+        "category": "single_malt",
+        "fullName": "Gordon & MacPhail Brora 1972",
+        "reference": null,
+        "statedAge": null,
+        "caskNumber": null,
+        "comparison": {
+          "missing": [],
+          "conflicts": ["vintageYear", "distillers"],
+          "agreements": ["category", "abv", "brand", "bottler", "series"]
+        },
+        "distillery": ["Brora"],
+        "maturation": null,
+        "releaseDay": null,
+        "singleCask": null,
+        "releaseYear": null,
+        "vintageYear": 1972,
+        "bottlingYear": 1993,
+        "caskStrength": null,
+        "releaseMonth": null,
+        "familyContext": {
+          "siblingBottles": []
+        }
+      },
+      {
+        "abv": 40,
+        "brand": "Gordon & MacPhail",
+        "score": 66.59916,
+        "series": "Connoisseurs Choice",
+        "source": ["text"],
+        "bottler": "Gordon & MacPhail",
+        "edition": null,
+        "outturn": null,
+        "bottleId": 55932,
+        "category": "single_malt",
+        "fullName": "Gordon & MacPhail Brora 1972",
+        "reference": null,
+        "statedAge": null,
+        "caskNumber": null,
+        "comparison": {
+          "missing": [],
+          "conflicts": ["vintageYear", "distillers"],
+          "agreements": ["category", "abv", "brand", "bottler", "series"]
+        },
+        "distillery": ["Brora"],
+        "maturation": null,
+        "releaseDay": null,
+        "singleCask": null,
+        "releaseYear": null,
+        "vintageYear": 1972,
+        "bottlingYear": 1995,
+        "caskStrength": null,
+        "releaseMonth": null,
+        "familyContext": {
+          "siblingBottles": []
+        }
+      },
+      {
+        "abv": 40,
+        "brand": "Gordon & MacPhail",
+        "score": 66.59916,
+        "series": "Connoisseurs Choice",
+        "source": ["text"],
+        "bottler": "Gordon & MacPhail",
+        "edition": null,
+        "outturn": null,
+        "bottleId": 55938,
+        "category": "single_malt",
+        "fullName": "Gordon & MacPhail Brora 1982",
+        "reference": null,
+        "statedAge": null,
+        "caskNumber": null,
+        "comparison": {
+          "missing": [],
+          "conflicts": ["vintageYear", "distillers"],
+          "agreements": ["category", "abv", "brand", "bottler", "series"]
+        },
+        "distillery": ["Brora"],
+        "maturation": null,
+        "releaseDay": null,
+        "singleCask": null,
+        "releaseYear": null,
+        "vintageYear": 1982,
+        "bottlingYear": 2002,
+        "caskStrength": null,
+        "releaseMonth": null,
+        "familyContext": {
+          "siblingBottles": []
+        }
+      }
+    ]
+  },
+  "context": {
+    "inspectedBottleIds": [65921],
+    "bottleContexts": [
+      {
+        "exact": {
+          "abv": 40,
+          "edition": null,
+          "outturn": null,
+          "statedAge": null,
+          "caskNumber": null,
+          "maturation": null,
+          "releaseDay": null,
+          "singleCask": null,
+          "releaseYear": 1995,
+          "vintageYear": 1980,
+          "bottlingYear": 1995,
+          "caskStrength": null,
+          "releaseMonth": null
+        },
+        "shared": {
+          "name": "St. Magdalene 1980",
+          "brand": {
+            "name": "Gordon & MacPhail",
+            "entityId": 5645
+          },
+          "series": {
+            "name": "Centenary Reserve",
+            "seriesId": 1217
+          },
+          "bottler": {
+            "name": "Gordon & MacPhail",
+            "entityId": 5645
+          },
+          "category": "single_malt",
+          "statedAge": null,
+          "distillers": [
+            {
+              "name": "St. Magdalene",
+              "entityId": 1365
+            }
+          ]
+        },
+        "groupId": 38882,
+        "bottleId": 65921,
+        "fullName": "Gordon & MacPhail St. Magdalene 1980",
+        "siblings": [],
+        "references": [],
+        "observations": [],
+        "imageSources": []
+      }
+    ],
+    "inspectedEntities": [
+      {
+        "kind": "bottler",
+        "name": "Gordon & MacPhail",
+        "score": 1,
+        "source": ["exact", "text", "prefix", "contained"],
+        "entityId": 5645,
+        "reference": "Gordon & MacPhail",
+        "shortName": null,
+        "retrievedFor": [
+          {
+            "exact": true,
+            "query": "Gordon & MacPhail"
+          }
+        ]
+      },
+      {
+        "kind": "distillery",
+        "name": "Convalmore",
+        "score": 1,
+        "source": ["exact", "text", "prefix", "contained"],
+        "entityId": 849,
+        "reference": "Convalmore",
+        "shortName": null,
+        "retrievedFor": [
+          {
+            "exact": true,
+            "query": "Convalmore"
+          }
+        ]
+      },
+      {
+        "kind": "distillery",
+        "name": "St. Magdalene",
+        "score": 1,
+        "source": ["exact", "text", "prefix", "contained"],
+        "entityId": 1365,
+        "reference": "St. Magdalene",
+        "shortName": null,
+        "retrievedFor": [
+          {
+            "exact": true,
+            "query": "St. Magdalene"
+          }
+        ]
+      },
+      {
+        "kind": "distillery",
+        "name": "Port Ellen",
+        "score": 1,
+        "source": ["exact", "text", "prefix", "contained"],
+        "entityId": 1271,
+        "reference": "Port Ellen",
+        "shortName": null,
+        "retrievedFor": [
+          {
+            "exact": true,
+            "query": "Port Ellen"
+          }
+        ]
+      },
+      {
+        "kind": "distillery",
+        "name": "Ardbeg",
+        "score": 1,
+        "source": ["exact", "text", "prefix", "contained"],
+        "entityId": 28,
+        "reference": "Ardbeg",
+        "shortName": null,
+        "retrievedFor": [
+          {
+            "exact": true,
+            "query": "Ardbeg"
+          }
+        ]
+      },
+      {
+        "kind": "distillery",
+        "name": "Banff",
+        "score": 1,
+        "source": ["exact", "text", "prefix", "contained"],
+        "entityId": 93,
+        "reference": "Banff",
+        "shortName": null,
+        "retrievedFor": [
+          {
+            "exact": true,
+            "query": "Banff"
+          }
+        ]
+      },
+      {
+        "kind": "distillery",
+        "name": "Bladnoch",
+        "score": 1,
+        "source": ["exact", "text", "prefix", "contained"],
+        "entityId": 110,
+        "reference": "Bladnoch",
+        "shortName": null,
+        "retrievedFor": [
+          {
+            "exact": true,
+            "query": "Bladnoch"
+          }
+        ]
+      },
+      {
+        "kind": "bottler",
+        "name": "Bladnoch Forum",
+        "score": 0.5,
+        "source": ["text", "prefix"],
+        "entityId": 5595,
+        "reference": "Bladnoch Forum",
+        "shortName": null,
+        "retrievedFor": [
+          {
+            "query": "Bladnoch"
+          }
+        ]
+      }
+    ],
+    "inspectedSeries": []
+  },
+  "provenance": {
+    "source": "production_miss",
+    "verifiedSourceUrls": [
+      "https://www.scotchwhiskyauctions.com/auctions/234-the-185th-auction/908278-st-magdalene-1981-connoisseurs-choice/"
+    ],
+    "dbOutcome": {
+      "bottleId": null,
+      "createsBottle": false,
+      "summary": "Production returned no_match: it could not tell which bottling the lot was, because the old page read did not return the lot facts."
+    },
+    "notes": "Captured from saved classifier run 36796 (auction_lot 17942, model null, 2026-11-03T23:07:05.180Z). Production rationale: This is a whisky bottle, but the available source does not establish which bottling it represents. No local candidate matches the St Magdalene 1981 release: the nearby 1981 candidates are from other distilleries, and the inspected St. Magdalene candidate is a 1980 Centenary Reserve. Do not create a potentially ambiguous duplicate. The run predates reading Scotch Whisky Auctions lot pages (#1609), so the evidence pack adds the lot page text. Expected outcome checked against the lot page and photo on 2026-11-09, in a random sample of the 185th auction's no_match reviews."
+  },
+  "expected": {
+    "status": "classified",
+    "action": "create_bottle",
+    "identityScope": "product",
+    "matchedBottleId": null,
+    "proposedBottle": {
+      "brand": {
+        "id": 5645
+      },
+      "category": "single_malt",
+      "vintageYear": 1981,
+      "bottlingYear": 1999,
+      "abv": 40
+    },
+    "proposedBottleNameIncludes": ["1981"],
+    "proposedBottleDistillerIds": [1365],
+    "summary": "Create Gordon & MacPhail Connoisseurs Choice St Magdalene 1981, bottled 1999, 40%. The lot page gives the vintage, bottling year and strength. No local Bottle is a St Magdalene 1981; the inspected St Magdalene is a 1980 Centenary Reserve."
+  }
+}
