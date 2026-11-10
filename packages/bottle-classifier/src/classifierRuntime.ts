@@ -490,7 +490,9 @@ export async function collectInitialResolvedEntities({
  * up by that name before the decision is final. The review policy then
  * reuses the Entity only when one exact name or reference matches, the same
  * way saving a Bottle does. Doing it here lets the save-time duplicate guard,
- * which needs a Brand id, see the existing Brand.
+ * which needs a Brand id, see the existing Brand. This is not best-effort:
+ * a failed lookup throws, because a create without the Brand id would skip
+ * that guard.
  */
 async function resolveProposedEntityNames({
   decision,
