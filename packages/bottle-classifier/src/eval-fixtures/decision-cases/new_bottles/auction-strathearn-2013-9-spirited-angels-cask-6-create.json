@@ -2085,6 +2085,21 @@
             "query": "That Boutique-y Whisky Company"
           }
         ]
+      },
+      {
+        "kind": "distillery",
+        "name": "Strathearn",
+        "score": 1,
+        "source": ["exact"],
+        "entityId": 280,
+        "reference": null,
+        "shortName": null,
+        "retrievedFor": [
+          {
+            "exact": true,
+            "query": "Strathearn"
+          }
+        ]
       }
     ],
     "inspectedSeries": []
@@ -2100,7 +2115,7 @@
       "createsBottle": false,
       "summary": "Production returned no_match: it called the title's #6 and the cask number 10 conflicting cask identifiers."
     },
-    "notes": "Captured from saved classifier run 36806 (auction_lot 17952, model null, 2026-11-03T23:09:32.496Z). Production rationale: This is a single marketed Strathearn single malt, not an out-of-scope item. The inspected local candidate 69250 is a different release: Release No. 7, cask 001, 50.9% ABV. The source’s cask identifier remains disputed, so neither matching that candidate nor creating a new exact-cask Bottle is safe. The run predates reading Scotch Whisky Auctions lot pages (#1609), so the evidence pack adds the lot page text. Expected outcome checked against the lot page and photo on 2026-11-09, in a random sample of the 185th auction's no_match reviews."
+    "notes": "Captured from saved classifier run 36806 (auction_lot 17952, model null, 2026-11-03T23:09:32.496Z). Production rationale: This is a single marketed Strathearn single malt, not an out-of-scope item. The inspected local candidate 69250 is a different release: Release No. 7, cask 001, 50.9% ABV. The source’s cask identifier remains disputed, so neither matching that candidate nor creating a new exact-cask Bottle is safe. The run predates reading Scotch Whisky Auctions lot pages (#1609), so the evidence pack adds the lot page text. Expected outcome checked against the lot page and photo on 2026-11-09, in a random sample of the 185th auction's no_match reviews. Entity 280 (Strathearn, distillery, checked in production 2026-11-10) was added to the inspected Entities so the eval's Entity search returns it, as production search does."
   },
   "expected": {
     "status": "classified",
@@ -2117,8 +2132,5 @@
     "proposedBottleNameIncludes": ["Strathearn", "2013"],
     "proposedBottleDistillerIds": [280],
     "summary": "Create Thompson Bros Strathearn 2013 9-year-old, Spirited Angels release 6: distilled 01.11.2013, French oak cask number 10, 53.4%, 47 bottles. The lot page explains the title's #6: it is cask 6 of 7 in the Spirited Angels series, and the cask number is 10. Candidate 69250 is release 7 (cask 001, 50.9%), another Bottle."
-  },
-  "knownFailure": {
-    "reason": "The create is right, but the agent leaves Strathearn's distillery id null although Entity 280 is in its context."
   }
 }
