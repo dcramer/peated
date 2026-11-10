@@ -847,7 +847,8 @@
     "https://worldofwhiskeysale.com/product/stagg-sazerac-barrel-select-straight-bourbon-whiskey/",
     "https://www.reddit.com/r/bourbon/comments/1mlz9gf/review_27_stagg_sazerac_barrel_select/",
     "https://www.abc.virginia.gov/products/bourbon/stagg-single-barrel-select",
-    "https://caskcartel.com/products/stagg-sazerac-barrel-select-straight-bourbon-whiskey"
+    "https://caskcartel.com/products/stagg-sazerac-barrel-select-straight-bourbon-whiskey",
+    "https://shop.klwines.com/auctions/bidding/2083932"
   ],
   "cases": {
     "1792-single-barrel": {
@@ -15078,6 +15079,32 @@
               }
             ],
             "summary": "# Stagg Sazerac Barrel Select For The Whisky Shop\n\nLot number: 185-01585\n\nLaunched into the world in 2002, George T Stagg - named after the man who helped build up the reputation of what is now the Buffalo Trace Distillery and brand - immediately garnered reviews and accolades of which lesser drams can only dream. Winning the Malt Advocate’s Whiskey of the Year within months of its release and championed by Jim Murray, Bourbon of the Year for three years in a row 2008 - 2010 and indeed World Whisky of the Year in 2004, George T. Stagg’s high rye recipe, long aging and uncut strength result in one of the world’s greatest whiskies.\n\nSazerac Barrel Select bottled for The Whisky Shop.\n\nBarrel Number: 056\n\n70.2% ABV / 75cl\n\nPlease examine all images of the lot, any packaging and labels carefully and satisfy yourself as to their condition before making a bid.",
+            "provider": "firecrawl"
+          }
+        }
+      ],
+      "imageResults": []
+    },
+    "auction-klwines-chichibu-2016-cask-14198-crane-series-match": {
+      "searchResult": {
+        "evidence": [],
+        "errors": []
+      },
+      "pageResults": [
+        {
+          "url": "https://shop.klwines.com/auctions/bidding/2083932",
+          "result": {
+            "query": "page opening",
+            "results": [
+              {
+                "url": "https://shop.klwines.com/auctions/bidding/2083932",
+                "title": "2016 Ichiro's Malt Chichibu \"Crane Series\" Kusuda Pinot Noir Wine Cask #14198 Single Malt Japanese Whisky (700ml) - K&L Wine Merchants",
+                "domain": "shop.klwines.com",
+                "description": null,
+                "extraSnippets": []
+              }
+            ],
+            "summary": "# 2016 Ichiro's Malt Chichibu \"Crane Series\" Kusuda Pinot Noir Wine Cask #14198 Single Malt Japanese Whisky (700ml)\n\nBid on this 1-700 ml bottle lot of 2016 Ichiro's Malt Chichibu Crane Series Kusuda Pinot Noir Wine Cask #14198 Single Malt Japanese Whisky (700ml).\n\nIncluded in this lot · 1 bottle\n\nProvenance: Purchased at reputable retailers and stored in a temperature and light controlled environment since acquisition.\n\nQuantity: 1\nBottle Size: 700 ml\nCondition: Original box. Bottled 2024. 119 Proof.\n\nCountry: Japan\n\nSKU: 2083932",
             "provider": "firecrawl"
           }
         }
