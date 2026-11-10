@@ -251,5 +251,23 @@ Late corrections outside the selected event require an explicitly scoped collect
 Choose a repeat interval within the 6-hour freshness window only after
 measuring a complete run. Automated activation is a separate operator decision.
 
+### K&L Wine Merchants
+
+`klwines` collects K&L's spirits auctions from one list that holds open lots
+and the most recent closed batch. K&L has no auction id: it closes a batch of
+lots on one day, ten minutes apart. Peated groups lots into one auction per
+original closing day in Pacific time, so a late bid that extends a lot does not
+move it to another auction. The lot key is K&L's SKU.
+
+The source skips lots K&L files under a spirit other than whisky, by K&L's own
+category, and lots of more than one bottle. It reads every remaining lot page
+during collection, so each new lot already has its size, condition note,
+stated proof, and bottling year when matching starts. Prices are in US
+dollars. Only a completed order with bids is a sale; an unsold lot shows its
+starting price, which is never saved as a result. Each run re-reads every
+listed whisky lot page. K&L's terms forbid automated access without consent,
+so the source is manual-only; see the
+[source check](../research/2026-11-10-klwines-auctions.md).
+
 Rollback stops the source and hides the UI; it must preserve saved lots,
 results, watches, and alert receipts.
