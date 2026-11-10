@@ -2117,5 +2117,8 @@
     "proposedBottleNameIncludes": ["Strathearn", "2013"],
     "proposedBottleDistillerIds": [280],
     "summary": "Create Thompson Bros Strathearn 2013 9-year-old, Spirited Angels release 6: distilled 01.11.2013, French oak cask number 10, 53.4%, 47 bottles. The lot page explains the title's #6: it is cask 6 of 7 in the Spirited Angels series, and the cask number is 10. Candidate 69250 is release 7 (cask 001, 50.9%), another Bottle."
+  },
+  "knownFailure": {
+    "reason": "The create is right, but the agent leaves Strathearn's distillery id null although Entity 280 is in its context."
   }
 }

@@ -1795,5 +1795,8 @@
     "proposedBottleNameIncludes": ["Strathearn", "2014"],
     "proposedBottleDistillerIds": [280],
     "summary": "Create Thompson Bros Strathearn 2014 7-year-old, Spirited Angels release 1: distilled 07.08.2014, bottled 2022, port cask number 107, 52.9%, 116 bottles. The title's #1 is the series position, not the cask number. No local Bottle is this release."
+  },
+  "knownFailure": {
+    "reason": "The agent returns no_match although the lot page gives cask, vintage, age, and strength for this cask."
   }
 }

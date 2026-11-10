@@ -1787,5 +1787,8 @@
     },
     "proposedBottleNameIncludes": ["Cuidich"],
     "summary": "Create Cuidich 'N Righ single malt Scotch whisky, the malt whisky of the Highlanders' Regimental Museum, at 40%. The label and tube print the name, 40% and 70cl, and no age, bottler or distillery, so leave age empty. The generic MacPhail's 10-year-old (70199) is another Bottle."
+  },
+  "knownFailure": {
+    "reason": "The agent returns no_match because it cannot settle the Brand and label hierarchy for Cuidich 'N Righ."
   }
 }

@@ -2394,5 +2394,8 @@
     "proposedBottleNameIncludes": ["Millburn", "1983"],
     "proposedBottleDistillerIds": [1183],
     "summary": "Create Forbes Ross & Co's Very Rare Private Cellar Cask Selection, Special Edition, Millburn 1983, at 43%. The label prints the distillery, 1983, 43% and 70cl and no age, so leave age empty; the lot page's \"Distilled: 10983\" is a typo for 1983. No local Bottle is a Millburn 1983."
+  },
+  "knownFailure": {
+    "reason": "The agent returns no_match although the lot page gives vintage, strength, and the Private Cellar label."
   }
 }

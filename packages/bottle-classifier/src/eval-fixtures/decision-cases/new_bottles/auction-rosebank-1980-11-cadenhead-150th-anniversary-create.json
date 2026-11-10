@@ -1754,5 +1754,8 @@
     "proposedBottleNameIncludes": ["Rosebank", "1980"],
     "proposedBottleDistillerIds": [1296],
     "summary": "Create Cadenhead's Authentic Collection Rosebank 1980, 11 years old, distilled July 1980, bottled March 1992 for the 150th anniversary, from one individual cask at 60.1%. The label and lot page give every fact. Candidate 19118, Cadenhead's 11-year-old (distilled at Rosebank), has no vintage, strength or edition, so it is too broad to be this Bottle."
+  },
+  "knownFailure": {
+    "reason": "The agent matches Bottle 19118, which has no vintage, strength, or edition and is too broad for this cask."
   }
 }

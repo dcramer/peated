@@ -1430,5 +1430,8 @@
     },
     "proposedBottleNameExcludes": ["El Monje", "1L", "Litre"],
     "summary": "Create the Ye Monks blended Scotch at 43%, with no age. The label reads Ye Monks, A Curious Old Whisky, Special Scotch Whisky, with \"El Monje\" beside the 43% and 1 litre. El Monje is the market name for the same liquid, and the identity model keeps a market name and the 1 litre size out of a separate Bottle. No local Ye Monks Bottle exists."
+  },
+  "knownFailure": {
+    "reason": "The create names the Bottle El Monje, a market name for Ye Monks, instead of leaving it out of the name."
   }
 }

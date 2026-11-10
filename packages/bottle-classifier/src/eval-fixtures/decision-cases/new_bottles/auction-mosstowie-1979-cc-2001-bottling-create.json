@@ -1109,5 +1109,8 @@
     "proposedBottleNameIncludes": ["Mosstowie", "1979"],
     "proposedBottleDistillerIds": [1191],
     "summary": "Create Gordon & MacPhail Connoisseurs Choice Mosstowie 1979, bottled 2001, 40%. The lot page gives the vintage, bottling year and strength. The local Gordon & MacPhail Mosstowie 1979 (64720) is the 2020 bottling at 49.8%, another Bottle."
+  },
+  "knownFailure": {
+    "reason": "The create is right, but the agent leaves Mosstowie's distillery id null although Entity 1191 is in its context."
   }
 }

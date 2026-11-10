@@ -1133,5 +1133,8 @@
     "proposedBottleNameIncludes": ["Private Reserve"],
     "proposedBottleDistillerIdOneOf": [1951, 1412],
     "summary": "Create The Lakes Private Reserve, The Connoisseur's Edition, bottled 2022 at 56.6%. The lot page says the edition is three sets of 100 bottles from three casks that look the same, so the lot cannot name its cask and the Bottle is the release, not one cask. No local Bottle is this release."
+  },
+  "knownFailure": {
+    "reason": "The agent treats the edition as three single-cask Bottles and returns no_match, though all three casks share one label."
   }
 }

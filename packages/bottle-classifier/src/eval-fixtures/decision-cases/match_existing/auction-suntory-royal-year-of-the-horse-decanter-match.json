@@ -1549,5 +1549,8 @@
     "matchedBottleId": 69254,
     "proposedBottle": null,
     "summary": "Match Suntory Royal (69254). The box reads Suntory Whisky Royal with the Year of the Horse sign, the bottle is a horse-shaped ceramic decanter, and the lot page gives 43% and 60cl, the same strength as 69254. The identity model treats a special bottle or box and its size as packaging of the same liquid, not a separate Bottle."
+  },
+  "knownFailure": {
+    "reason": "The agent treats the Year of the Horse decanter as a separate release and returns no_match instead of matching Suntory Royal."
   }
 }

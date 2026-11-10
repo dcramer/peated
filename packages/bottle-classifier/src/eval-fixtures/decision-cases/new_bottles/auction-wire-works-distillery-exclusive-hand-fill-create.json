@@ -1747,5 +1747,8 @@
     },
     "proposedBottleDistillerIds": [1992],
     "summary": "Create the Wire Works Distillery Exclusive hand-fill from a Tawny Port cask at 61.7%. The lot page names the hand-fill, the cask type and the strength, and the label reads Wire Works, Single Malt English Whisky, Distillery Exclusive. The local Wire Works Port Cask (50.2%) is another Bottle."
+  },
+  "knownFailure": {
+    "reason": "The agent returns no_match because it cannot tell a marketed distillery exclusive from a hand-fill."
   }
 }
