@@ -58,7 +58,7 @@
     "drizzle-orm": "catalog:",
     "error-cause": "^1.0.9",
     "google-auth-library": "^10.6.1",
-    "hono": "^4.13.13",
+    "hono": "^4.13.16",
     "ioredis": "^5.11.1",
     "jose": "^6.2.12",
     "jsonwebtoken": "^9.0.3",
