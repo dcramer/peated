@@ -23,7 +23,7 @@
     "@ai-sdk/gateway": "^4.0.129",
     "@faker-js/faker": "^10.6.0",
     "@google-cloud/storage": "^7.22.0",
-    "@hono/node-server": "^2.1.5",
+    "@hono/node-server": "^2.1.6",
     "@logtape/hono": "catalog:",
     "@logtape/logtape": "catalog:",
     "@logtape/redaction": "catalog:",
